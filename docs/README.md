@@ -10,15 +10,15 @@
 
 ## Cyber
 
-[README](cyber/README.md) - All you need to know about Apollo Cyber 
+[README](cyber/README.md) - All you need to know about Apollo Cyber
 
 ## Specs
 
-[README](specs/README.md) - A Deep dive into Apollo's Hardware and Software specifications (only recommended for expert level developers that have successfully installed and launched Apollo) 
+[README](specs/README.md) - A Deep dive into Apollo's Hardware and Software specifications (only recommended for expert level developers that have successfully installed and launched Apollo)
 
 ## Howto Guides
 
-[README](howto/README.md) - Brief technical solutions to common problems that developers face during the installation and use of the Apollo platform 
+[README](howto/README.md) - Brief technical solutions to common problems that developers face during the installation and use of the Apollo platform
 
 ## FAQs
 

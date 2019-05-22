@@ -3,10 +3,10 @@
 ## How many typer of sensors calibrations are present?
 
 There are 5 types of calibration:
-* Camera - Camera 
+* Camera - Camera
 * Camera - LiDAR
-* Radar - Camera 
-* LiDAR - GNSS 
+* Radar - Camera
+* LiDAR - GNSS
 * IMU - Vehicle
 
 For additional information on Sensor Calibration, please refer to our [calibration guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_2_0_sensor_calibration_guide.md)
