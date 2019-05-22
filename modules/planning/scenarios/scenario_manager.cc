@@ -181,8 +181,9 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
           overlap.first == ReferenceLineInfo::YIELD_SIGN) {
         const double distance_to = overlap.second.start_s - dest_sl.s();
         const double distance_passed = dest_sl.s() - overlap.second.end_s;
-        if (distance_to > 0 && distance_to < kDisanceToAvoidJunction ||
-            distance_passed > 0 && distance_passed < kDisanceToAvoidJunction) {
+        if ((distance_to > 0 && distance_to < kDisanceToAvoidJunction) ||
+            (distance_passed > 0 &&
+             distance_passed < kDisanceToAvoidJunction)) {
           pull_over_scenario = false;
           break;
         }
