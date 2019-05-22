@@ -44,7 +44,7 @@ TEST(BridgeBufferTest, bridge_buf_test) {
   char *p2 = buf;
   EXPECT_EQ(100, buf.capacity());
   EXPECT_EQ(80, buf.size());
-  EXPECT_FALSE((p2 != p1));
+  EXPECT_EQ((p2, p1));
   EXPECT_FALSE((buf == nullptr));
 
   std::string str1("hi world");
