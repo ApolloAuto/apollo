@@ -147,6 +147,9 @@ message SimpleLateralDebug {
   // term for control usage
   optional double lateral_error_feedback = 28;
   optional double heading_error_feedback = 29;
+
+  optional double target_point_x = 30;
+  optional double target_point_y = 31;
 }
 
 message SimpleMPCDebug {
