@@ -96,7 +96,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
   piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_bound);
 
   // TODO(Hongyi): delete this when ready to use vehicle_params
-  piecewise_jerk_problem.set_ddx_bounds(-4.4, 2.0);
+  piecewise_jerk_problem.set_ddx_bounds(-4.0, 2.0);
 
   piecewise_jerk_problem.set_dx_ref(piecewise_jerk_speed_config.ref_v_weight(),
                                     FLAGS_default_cruise_speed);
