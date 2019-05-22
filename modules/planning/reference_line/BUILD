@@ -115,6 +115,7 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/math/discretized_points_smoothing:cos_theta_smoother",
         "//modules/planning/math/discretized_points_smoothing:fem_pos_deviation_smoother",
+        "//modules/planning/math:discrete_points_math",
         "//modules/planning/proto:planning_proto",
         "@ipopt",
     ],

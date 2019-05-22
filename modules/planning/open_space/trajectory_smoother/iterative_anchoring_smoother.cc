@@ -21,17 +21,23 @@
 #include "modules/planning/open_space/trajectory_smoother/iterative_anchoring_smoother.h"
 
 #include "modules/common/math/math_utils.h"
+#include "modules/planning/math/discrete_points_math.h"
 #include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_smoother.h"
 
 namespace apollo {
 namespace planning {
 
+using apollo::common::PathPoint;
 using apollo::common::math::Vec2d;
-
 bool IterativeAnchoringSmoother::Smooth(
     const Eigen::MatrixXd& xWS, const double init_a, const double init_v,
     const std::vector<std::vector<Vec2d>>& obstacles_vertices_vec,
     DiscretizedTrajectory* discretized_trajectory) {
+  if (xWS.cols() < 2) {
+    AERROR << "reference points size smaller than two, smoother early "
+              "returned";
+    return false;
+  }
   // Set gear of the trajectory
   gear_ = CheckGear(xWS);
   // Interpolate the traj
@@ -42,7 +48,7 @@ bool IterativeAnchoringSmoother::Smooth(
   for (size_t i = 0; i < xWS_size; ++i) {
     Vec2d cur_path_point(xWS(0, i), xWS(1, i));
     accumulated_s += cur_path_point.DistanceTo(last_path_point);
-    common::PathPoint path_point;
+    PathPoint path_point;
     path_point.set_x(xWS(0, i));
     path_point.set_y(xWS(1, i));
     path_point.set_theta(xWS(2, i));
@@ -74,7 +80,7 @@ bool IterativeAnchoringSmoother::Smooth(
   Vec2d initial_vec(first_to_second_s, 0);
   initial_vec.SelfRotate(initial_heading);
   initial_vec += first_point;
-  common::PathPoint second_path_point;
+  PathPoint second_path_point;
   second_path_point.set_x(initial_vec.x());
   second_path_point.set_y(initial_vec.y());
   second_path_point.set_theta(interpolated_warm_start_path[1].theta());
@@ -90,7 +96,7 @@ bool IterativeAnchoringSmoother::Smooth(
   Vec2d end_vec(second_last_to_last_s, 0);
   end_vec.SelfRotate(common::math::NormalizeAngle(end_heading + M_PI));
   end_vec += last_point;
-  common::PathPoint second_to_last_path_point;
+  PathPoint second_to_last_path_point;
   second_to_last_path_point.set_x(end_vec.x());
   second_to_last_path_point.set_y(end_vec.y());
   second_to_last_path_point.set_y(
@@ -182,7 +188,10 @@ bool IterativeAnchoringSmoother::SmoothPath(
       smoothed_point2d.emplace_back(opt_x[i], opt_y[i]);
     }
 
-    SetPathProfile(smoothed_point2d, smoothed_path_points);
+    if (!SetPathProfile(smoothed_point2d, smoothed_path_points)) {
+      AERROR << "Set path profile fails";
+      return false;
+    }
 
     is_collision_free = CheckCollision(
         *smoothed_path_points, obstacles_vertices_vec, &colliding_point_index);
@@ -210,9 +219,51 @@ void IterativeAnchoringSmoother::AdjustPathBounds(
   }
 }
 
-void IterativeAnchoringSmoother::SetPathProfile(
+bool IterativeAnchoringSmoother::SetPathProfile(
     const std::vector<std::pair<double, double>>& point2d,
-    DiscretizedPath* raw_path_points) {}
+    DiscretizedPath* raw_path_points) {
+  // Compute path profile
+  std::vector<double> headings;
+  std::vector<double> kappas;
+  std::vector<double> dkappas;
+  std::vector<double> accumulated_s;
+  if (!DiscretePointsMath::ComputePathProfile(
+          point2d, &headings, &accumulated_s, &kappas, &dkappas)) {
+    return false;
+  }
+  CHECK_EQ(point2d.size(), headings.size());
+  CHECK_EQ(point2d.size(), kappas.size());
+  CHECK_EQ(point2d.size(), dkappas.size());
+  CHECK_EQ(point2d.size(), accumulated_s.size());
+
+  // Adjust heading, kappa and dkappa direction according to gear
+  if (!gear_) {
+    std::for_each(headings.begin(), headings.end(), [](double& heading) {
+      heading = common::math::NormalizeAngle(heading + M_PI);
+    });
+    std::for_each(kappas.begin(), kappas.end(),
+                  [](double& kappa) { kappa = -kappa; });
+    std::for_each(accumulated_s.begin(), accumulated_s.end(),
+                  [](double& accumulated_distance) {
+                    accumulated_distance = -accumulated_distance;
+                  });
+  }
+
+  // Load into path point
+  size_t points_size = point2d.size();
+  raw_path_points->clear();
+  for (size_t i = 0; i < points_size; ++i) {
+    PathPoint path_point;
+    path_point.set_x(point2d[i].first);
+    path_point.set_y(point2d[i].second);
+    path_point.set_theta(headings[i]);
+    path_point.set_s(accumulated_s[i]);
+    path_point.set_kappa(kappas[i]);
+    path_point.set_dkappa(dkappas[i]);
+    raw_path_points->push_back(std::move(path_point));
+  }
+  return true;
+}
 
 bool IterativeAnchoringSmoother::CheckGear(const Eigen::MatrixXd& xWS) {
   return true;

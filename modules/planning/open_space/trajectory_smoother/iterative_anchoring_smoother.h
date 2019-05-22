@@ -59,7 +59,7 @@ class IterativeAnchoringSmoother {
   void AdjustPathBounds(const std::vector<size_t>& colliding_point_index,
                         std::vector<double>* bounds);
 
-  void SetPathProfile(const std::vector<std::pair<double, double>>& point2d,
+  bool SetPathProfile(const std::vector<std::pair<double, double>>& point2d,
                       DiscretizedPath* raw_path_points);
 
   bool CheckGear(const Eigen::MatrixXd& xWS);
