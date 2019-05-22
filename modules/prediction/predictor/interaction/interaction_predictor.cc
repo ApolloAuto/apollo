@@ -261,7 +261,8 @@ double InteractionPredictor::ComputeTrajectoryCost(const Obstacle& obstacle,
     std::vector<double> cost_values = {lon_acc_cost, centri_acc_cost,
                                        collision_cost};
     FeatureOutput::InsertDataForTuning(
-        obstacle.latest_feature(), cost_values, "interaction", lane_sequence);
+        obstacle.latest_feature(), cost_values, "interaction", lane_sequence,
+        adc_trajectory_);
   }
 
   return total_cost;
