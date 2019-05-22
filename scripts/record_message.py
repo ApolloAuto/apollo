@@ -124,7 +124,7 @@ class Recorder(object):
         task_id = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
         task_dir = os.path.join(disk, 'data/bag', task_id)
         print('Recording bag to {}'.format(task_dir))
-        log_file = '/apollo/data/log/smart_record.out'
+        log_file = '/apollo/data/log/smart_recorder.out'
         cmd = '''
             source /apollo/scripts/apollo_base.sh
             source /apollo/framework/install/setup.bash
