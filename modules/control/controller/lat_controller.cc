@@ -520,11 +520,12 @@ void LatController::UpdateState(SimpleLateralDebug *debug) {
       std::fabs(vehicle_state->linear_velocity()) <=
           control_conf_->lon_controller_conf().switch_speed()) {
     matrix_state_(0, 0) = debug->lateral_error_feedback();
+    matrix_state_(2, 0) = debug->heading_error_feedback();
   } else {
     matrix_state_(0, 0) = debug->lateral_error();
+    matrix_state_(2, 0) = debug->heading_error();
   }
   matrix_state_(1, 0) = debug->lateral_error_rate();
-  matrix_state_(2, 0) = debug->heading_error();
   matrix_state_(3, 0) = debug->heading_error_rate();
 
   // Next elements are depending on preview window size;
@@ -627,6 +628,27 @@ void LatController::ComputeLateralErrors(
     heading_error = heading_error_filter_.Update(heading_error);
   }
   debug->set_heading_error(heading_error);
+
+  double heading_error_feedback;
+  if (VehicleStateProvider::Instance()->gear() ==
+      canbus::Chassis::GEAR_REVERSE) {
+    auto lookback_point = trajectory_analyzer.QueryNearestPointByRelativeTime(
+        target_point.relative_time() +
+        lookback_station_ /
+            (std::max(std::fabs(linear_v), 0.1) * std::cos(heading_error)));
+    heading_error_feedback = common::math::NormalizeAngle(
+        heading_error + target_point.path_point().theta() -
+        lookback_point.path_point().theta());
+  } else {
+    auto lookahead_point = trajectory_analyzer.QueryNearestPointByRelativeTime(
+        target_point.relative_time() +
+        lookahead_station_ /
+            (std::max(std::fabs(linear_v), 0.1) * std::cos(heading_error)));
+    heading_error_feedback = common::math::NormalizeAngle(
+        heading_error + target_point.path_point().theta() -
+        lookahead_point.path_point().theta());
+  }
+  debug->set_heading_error_feedback(heading_error_feedback);
 
   double lateral_error_feedback;
   if (VehicleStateProvider::Instance()->gear() ==

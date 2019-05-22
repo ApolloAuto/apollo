@@ -146,6 +146,7 @@ message SimpleLateralDebug {
   // modified lateral_error with look-ahead or look-back station, as the feedback
   // term for control usage
   optional double lateral_error_feedback = 28;
+  optional double heading_error_feedback = 29;
 }
 
 message SimpleMPCDebug {
