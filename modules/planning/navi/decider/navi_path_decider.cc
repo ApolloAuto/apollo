@@ -251,7 +251,7 @@ bool NaviPathDecider::GetBasicPathData(
     return false;
   }
 
-  // get the start plan point project s on refernce line and get the length of
+  // get the start plan point project s on reference line and get the length of
   // reference line
   auto start_plan_point_project = reference_line.GetReferencePoint(
       start_plan_point_.x(), start_plan_point_.y());
