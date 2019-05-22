@@ -189,6 +189,7 @@ Status PathBoundsDecider::Process(
       if (!SearchPullOverPosition(*frame, *reference_line_info,
                                   regular_self_path_bound,
                                   &pull_over_configuration)) {
+        ADEBUG << "Failed to find a pull-over position.";
         pull_over_info->set_exist_pull_over_position(false);
       } else {
         pull_over_info->set_exist_pull_over_position(true);
@@ -368,7 +369,10 @@ bool PathBoundsDecider::SearchPullOverPosition(
   const double adc_end_s = reference_line_info.AdcSlBoundary().end_s();
 
   // Check if destination is some distance away from ADC.
+  ADEBUG << "Destination is at s = " << destination_s
+         << ", ADC is at s = " << adc_end_s;
   if (destination_s - adc_end_s < FLAGS_destination_to_adc_buffer) {
+    ADEBUG << "ADC is close to the destination.";
     const auto& pull_over_status =
         PlanningContext::Instance()->planning_status().pull_over();
     if (pull_over_status.exist_pull_over_position()) {
