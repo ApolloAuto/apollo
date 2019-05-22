@@ -71,7 +71,7 @@ DEFINE_bool(enable_scenario_bare_intersection, false,
             "enable bare_intersection scenarios in planning");
 
 DEFINE_bool(enable_scenario_pull_over, false,
-            "enable side pass scenario in planning");
+            "enable pull-over scenario in planning");
 
 DEFINE_double(side_pass_min_signal_intersection_distance, 50.0,
               "meter, for intersection has signal, ADC will enter side pass "
@@ -480,7 +480,7 @@ DEFINE_bool(use_s_curve_speed_smooth, false,
             "speed/acceleration.");
 
 // pull-over
-DEFINE_double(destination_to_adc_buffer, 10.0,
+DEFINE_double(destination_to_adc_buffer, 25.0,
               "If the destination is within this distance from ADC, "
               "then don't search for pull-over position.");
 
