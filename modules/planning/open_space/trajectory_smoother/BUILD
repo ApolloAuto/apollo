@@ -194,7 +194,7 @@ cc_library(
     ],
 )
 
-cc_library (
+cc_library(
     name = "iterative_anchoring_smoother",
     srcs = [
         "iterative_anchoring_smoother.cc",
@@ -313,7 +313,5 @@ cc_test(
         "@gtest//:main",
     ],
 )
-
-
 
 cpplint()

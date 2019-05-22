@@ -491,7 +491,7 @@ cc_test(
     deps = [
         "//cyber:cyber_core",
         "//cyber/proto:unit_test_cc_proto",
-	"@gtest//:main",
+        "@gtest//:main",
     ],
 )
 
