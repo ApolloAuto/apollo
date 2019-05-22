@@ -46,6 +46,7 @@ using cyber::CreateNode;
 using cyber::common::EnsureDirectory;
 using cyber::common::GetFileName;
 using cyber::common::PathExists;
+using cyber::common::RemoveAllFiles;
 using cyber::record::HeaderBuilder;
 using cyber::record::Recorder;
 using cyber::record::RecordFileReader;
@@ -102,6 +103,10 @@ bool RealtimeRecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
       !EnsureDirectory(restored_output_dir_)) {
     AERROR << "unable to init input/output dir: " << source_record_dir_ << "/"
            << restored_output_dir_;
+    return false;
+  }
+  if (!RemoveAllFiles(source_record_dir_)) {
+    AERROR << "unable to clear input dir: " << source_record_dir_;
     return false;
   }
   // Init recorder
@@ -187,7 +192,7 @@ void RealtimeRecordProcessor::MonitorStatus() {
   AINFO << "wait for a while trying to complete the restore work";
   std::this_thread::sleep_for(std::chrono::milliseconds(recorder_wait_time_));
   is_terminating_ = true;
-  PublishStatus(RecordingState::RECORDING, "smart recorder terminating");
+  PublishStatus(RecordingState::TERMINATING, "smart recorder terminating");
 }
 
 void RealtimeRecordProcessor::PublishStatus(const RecordingState state,
