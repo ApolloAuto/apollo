@@ -203,6 +203,7 @@ cc_library(
         "iterative_anchoring_smoother.h",
     ],
     deps = [
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/planning/common/path:discretized_path",
         "//modules/planning/common/speed:speed_data",

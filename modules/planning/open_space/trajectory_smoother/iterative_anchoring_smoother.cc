@@ -20,6 +20,8 @@
 
 #include "modules/planning/open_space/trajectory_smoother/iterative_anchoring_smoother.h"
 
+#include "cyber/common/log.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/planning/math/discrete_points_math.h"
 #include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_smoother.h"
@@ -28,7 +30,20 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::PathPoint;
+using apollo::common::math::Box2d;
+using apollo::common::math::LineSegment2d;
+using apollo::common::math::NormalizeAngle;
 using apollo::common::math::Vec2d;
+
+IterativeAnchoringSmoother::IterativeAnchoringSmoother() {
+  const auto& vehicle_param =
+      common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
+  ego_length_ = vehicle_param.length();
+  ego_width_ = vehicle_param.width();
+  center_shift_distance_ =
+      ego_length_ / 2.0 - vehicle_param.back_edge_to_center();
+}
+
 bool IterativeAnchoringSmoother::Smooth(
     const Eigen::MatrixXd& xWS, const double init_a, const double init_v,
     const std::vector<std::vector<Vec2d>>& obstacles_vertices_vec,
@@ -40,6 +55,21 @@ bool IterativeAnchoringSmoother::Smooth(
   }
   // Set gear of the trajectory
   gear_ = CheckGear(xWS);
+
+  // Set obstacle in form of linesegments
+  std::vector<std::vector<LineSegment2d>> obstacles_linesegments_vec;
+  for (const auto& obstacle_vertices : obstacles_vertices_vec) {
+    size_t vertices_num = obstacle_vertices.size();
+    std::vector<LineSegment2d> obstacle_linesegments;
+    for (size_t i = 0; i + 1 < vertices_num; ++i) {
+      LineSegment2d line_segment =
+          LineSegment2d(obstacle_vertices[i], obstacle_vertices[i + 1]);
+      obstacle_linesegments.emplace_back(line_segment);
+    }
+    obstacles_linesegments_vec.emplace_back(obstacle_linesegments);
+  }
+  obstacles_linesegments_vec_ = std::move(obstacles_linesegments_vec);
+
   // Interpolate the traj
   DiscretizedPath warm_start_path;
   size_t xWS_size = xWS.cols();
@@ -94,7 +124,7 @@ bool IterativeAnchoringSmoother::Smooth(
       interpolated_warm_start_path[interpolated_path_size - 1].x(),
       interpolated_warm_start_path[interpolated_path_size - 1].y());
   Vec2d end_vec(second_last_to_last_s, 0);
-  end_vec.SelfRotate(common::math::NormalizeAngle(end_heading + M_PI));
+  end_vec.SelfRotate(NormalizeAngle(end_heading + M_PI));
   end_vec += last_point;
   PathPoint second_to_last_path_point;
   second_to_last_path_point.set_x(end_vec.x());
@@ -116,7 +146,7 @@ bool IterativeAnchoringSmoother::Smooth(
 
   // Smooth path to have smoothed x, y, phi, kappa and s
   DiscretizedPath smoothed_path_points;
-  if (!SmoothPath(interpolated_warm_start_path, bounds, obstacles_vertices_vec,
+  if (!SmoothPath(interpolated_warm_start_path, bounds,
                   &smoothed_path_points)) {
     return false;
   }
@@ -138,7 +168,6 @@ bool IterativeAnchoringSmoother::Smooth(
 
 bool IterativeAnchoringSmoother::SmoothPath(
     const DiscretizedPath& raw_path_points, const std::vector<double>& bounds,
-    const std::vector<std::vector<Vec2d>>& obstacles_vertices_vec,
     DiscretizedPath* smoothed_path_points) {
   std::vector<std::pair<double, double>> raw_point2d;
   std::vector<double> flexible_bounds;
@@ -193,22 +222,46 @@ bool IterativeAnchoringSmoother::SmoothPath(
       return false;
     }
 
-    is_collision_free = CheckCollision(
-        *smoothed_path_points, obstacles_vertices_vec, &colliding_point_index);
+    is_collision_free =
+        CheckCollisionAvoidance(*smoothed_path_points, &colliding_point_index);
   }
   return true;
 }
 
-bool IterativeAnchoringSmoother::CheckCollision(
+bool IterativeAnchoringSmoother::CheckCollisionAvoidance(
     const DiscretizedPath& path_points,
-    const std::vector<std::vector<Vec2d>>& obstacles_vertices_vec,
     std::vector<size_t>* colliding_point_index) {
+  CHECK_NOTNULL(colliding_point_index);
+
+  colliding_point_index->clear();
+  size_t path_points_size = path_points.size();
+  for (size_t i = 0; i < path_points_size; ++i) {
+    Box2d ego_box({path_points[i].x() + center_shift_distance_ *
+                                            std::cos(path_points[i].theta()),
+                   path_points[i].y() + center_shift_distance_ *
+                                            std::sin(path_points[i].theta())},
+                  path_points[i].theta(), ego_length_, ego_width_);
+    for (const auto& obstacle_linesegments : obstacles_linesegments_vec_) {
+      for (const LineSegment2d& linesegment : obstacle_linesegments) {
+        if (ego_box.HasOverlap(linesegment)) {
+          colliding_point_index->push_back(i);
+        }
+      }
+    }
+  }
+
+  if (!colliding_point_index->empty()) {
+    return false;
+  }
   return true;
 }
 
 void IterativeAnchoringSmoother::AdjustPathBounds(
     const std::vector<size_t>& colliding_point_index,
     std::vector<double>* bounds) {
+  CHECK_NOTNULL(bounds);
+  CHECK_GT(bounds->size(), *(std::max_element(colliding_point_index.begin(),
+                                            colliding_point_index.end())));
   if (colliding_point_index.empty()) {
     return;
   }
@@ -222,6 +275,7 @@ void IterativeAnchoringSmoother::AdjustPathBounds(
 bool IterativeAnchoringSmoother::SetPathProfile(
     const std::vector<std::pair<double, double>>& point2d,
     DiscretizedPath* raw_path_points) {
+  CHECK_NOTNUll(raw_path_points);
   // Compute path profile
   std::vector<double> headings;
   std::vector<double> kappas;
@@ -239,7 +293,7 @@ bool IterativeAnchoringSmoother::SetPathProfile(
   // Adjust heading, kappa and dkappa direction according to gear
   if (!gear_) {
     std::for_each(headings.begin(), headings.end(), [](double& heading) {
-      heading = common::math::NormalizeAngle(heading + M_PI);
+      heading = NormalizeAngle(heading + M_PI);
     });
     std::for_each(kappas.begin(), kappas.end(),
                   [](double& kappa) { kappa = -kappa; });
@@ -266,7 +320,13 @@ bool IterativeAnchoringSmoother::SetPathProfile(
 }
 
 bool IterativeAnchoringSmoother::CheckGear(const Eigen::MatrixXd& xWS) {
-  return true;
+  CHECK_GT(xWS.size(), 1);
+  double init_heading_angle = xWS(2, 0);
+  const Vec2d init_tracking_vector(xWS(0, 1) - xWS(0, 0),
+                                   xWS(1, 1) - xWS(1, 0));
+  double init_tracking_angle = init_tracking_vector.Angle();
+  return std::abs(NormalizeAngle(init_tracking_angle - init_heading_angle)) <
+         M_PI_2;
 }
 
 bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,

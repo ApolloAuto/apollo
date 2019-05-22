@@ -26,6 +26,8 @@
 #include "Eigen/Eigen"
 
 #include "modules/common/math/vec2d.h"
+#include "modules/common/math/box2d.h"
+#include "modules/common/math/line_segment2d.h"
 #include "modules/planning/common/path/discretized_path.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
@@ -34,7 +36,7 @@ namespace apollo {
 namespace planning {
 class IterativeAnchoringSmoother {
  public:
-  IterativeAnchoringSmoother() = default;
+  IterativeAnchoringSmoother();
 
   ~IterativeAnchoringSmoother() = default;
 
@@ -47,13 +49,9 @@ class IterativeAnchoringSmoother {
  private:
   bool SmoothPath(const DiscretizedPath& raw_path_points,
                   const std::vector<double>& bounds,
-                  const std::vector<std::vector<common::math::Vec2d>>&
-                      obstacles_vertices_vec,
                   DiscretizedPath* smoothed_path_points);
 
-  bool CheckCollision(const DiscretizedPath& path_points,
-                      const std::vector<std::vector<common::math::Vec2d>>&
-                          obstacles_vertices_vec,
+  bool CheckCollisionAvoidance(const DiscretizedPath& path_points,
                       std::vector<size_t>* colliding_point_index);
 
   void AdjustPathBounds(const std::vector<size_t>& colliding_point_index,
@@ -72,6 +70,14 @@ class IterativeAnchoringSmoother {
                            DiscretizedTrajectory* discretized_trajectory);
 
  private:
+  // vehicle_param
+  double ego_length_ = 0.0;
+  double ego_width_ = 0.0;
+  double center_shift_distance_ = 0.0;
+
+  std::vector<std::vector<common::math::LineSegment2d>>
+      obstacles_linesegments_vec_;
+
   // gear DRIVE as true and gear REVERSE as false
   bool gear_ = false;
 };
