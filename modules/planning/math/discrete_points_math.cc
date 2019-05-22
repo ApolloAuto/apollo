@@ -22,19 +22,27 @@
 
 #include <cmath>
 
+#include "cyber/common/log.h"
+
 namespace apollo {
 namespace planning {
 
 bool DiscretePointsMath::ComputePathProfile(
     const std::vector<std::pair<double, double>>& xy_points,
-    std::vector<double>* headings, std::vector<double>* kappas,
-    std::vector<double>* dkappas) {
+      std::vector<double>* headings, std::vector<double>* accumulated_s,
+      std::vector<double>* kappas, std::vector<double>* dkappas) {
+  CHECK_NOTNULL(headings);
+  CHECK_NOTNULL(kappas);
+  CHECK_NOTNULL(dkappas);
+  headings->clear();
+  kappas->clear();
+  dkappas->clear();
+
   if (xy_points.size() < 2) {
       return false;
   }
   std::vector<double> dxs;
   std::vector<double> dys;
-  std::vector<double> accumulated_s;
   std::vector<double> y_over_s_first_derivatives;
   std::vector<double> x_over_s_first_derivatives;
   std::vector<double> y_over_s_second_derivatives;
@@ -67,7 +75,7 @@ bool DiscretePointsMath::ComputePathProfile(
 
   // Get linear interpolated s for dkappa calculation
   double distance = 0.0;
-  accumulated_s.push_back(distance);
+  accumulated_s->push_back(distance);
   double fx = xy_points[0].first;
   double fy = xy_points[0].second;
   double nx = 0.0;
@@ -77,7 +85,7 @@ bool DiscretePointsMath::ComputePathProfile(
     ny = xy_points[i].second;
     double end_segment_s =
         std::sqrt((fx - nx) * (fx - nx) + (fy - ny) * (fy - ny));
-    accumulated_s.push_back(end_segment_s + distance);
+    accumulated_s->push_back(end_segment_s + distance);
     distance += end_segment_s;
     fx = nx;
     fy = ny;
@@ -90,19 +98,19 @@ bool DiscretePointsMath::ComputePathProfile(
     double yds = 0.0;
     if (i == 0) {
       xds = (xy_points[i + 1].first - xy_points[i].first) /
-            (accumulated_s[i + 1] - accumulated_s[i]);
+            (accumulated_s->at(i + 1) - accumulated_s->at(i));
       yds = (xy_points[i + 1].second - xy_points[i].second) /
-            (accumulated_s[i + 1] - accumulated_s[i]);
+            (accumulated_s->at(i + 1) - accumulated_s->at(i));
     } else if (i == points_size - 1) {
       xds = (xy_points[i].first - xy_points[i - 1].first) /
-            (accumulated_s[i] - accumulated_s[i - 1]);
+            (accumulated_s->at(i) - accumulated_s->at(i - 1));
       yds = (xy_points[i].second - xy_points[i - 1].second) /
-            (accumulated_s[i] - accumulated_s[i - 1]);
+            (accumulated_s->at(i) - accumulated_s->at(i - 1));
     } else {
       xds = (xy_points[i + 1].first - xy_points[i - 1].first) /
-            (accumulated_s[i + 1] - accumulated_s[i - 1]);
+            (accumulated_s->at(i + 1) - accumulated_s->at(i - 1));
       yds = (xy_points[i + 1].second - xy_points[i - 1].second) /
-            (accumulated_s[i + 1] - accumulated_s[i - 1]);
+            (accumulated_s->at(i + 1) - accumulated_s->at(i - 1));
     }
     x_over_s_first_derivatives.push_back(xds);
     y_over_s_first_derivatives.push_back(yds);
@@ -116,24 +124,24 @@ bool DiscretePointsMath::ComputePathProfile(
     if (i == 0) {
       xdds =
           (x_over_s_first_derivatives[i + 1] - x_over_s_first_derivatives[i]) /
-          (accumulated_s[i + 1] - accumulated_s[i]);
+          (accumulated_s->at(i + 1) - accumulated_s->at(i));
       ydds =
           (y_over_s_first_derivatives[i + 1] - y_over_s_first_derivatives[i]) /
-          (accumulated_s[i + 1] - accumulated_s[i]);
+          (accumulated_s->at(i + 1) - accumulated_s->at(i));
     } else if (i == points_size - 1) {
       xdds =
           (x_over_s_first_derivatives[i] - x_over_s_first_derivatives[i - 1]) /
-          (accumulated_s[i] - accumulated_s[i - 1]);
+          (accumulated_s->at(i) - accumulated_s->at(i - 1));
       ydds =
           (y_over_s_first_derivatives[i] - y_over_s_first_derivatives[i - 1]) /
-          (accumulated_s[i] - accumulated_s[i - 1]);
+          (accumulated_s->at(i) - accumulated_s->at(i - 1));
     } else {
       xdds = (x_over_s_first_derivatives[i + 1] -
               x_over_s_first_derivatives[i - 1]) /
-             (accumulated_s[i + 1] - accumulated_s[i - 1]);
+             (accumulated_s->at(i + 1) - accumulated_s->at(i - 1));
       ydds = (y_over_s_first_derivatives[i + 1] -
               y_over_s_first_derivatives[i - 1]) /
-             (accumulated_s[i + 1] - accumulated_s[i - 1]);
+             (accumulated_s->at(i + 1) - accumulated_s->at(i - 1));
     }
     x_over_s_second_derivatives.push_back(xdds);
     y_over_s_second_derivatives.push_back(ydds);
@@ -155,13 +163,13 @@ bool DiscretePointsMath::ComputePathProfile(
     double dkappa = 0.0;
     if (i == 0) {
       dkappa = (kappas->at(i + 1) - kappas->at(i)) /
-               (accumulated_s[i + 1] - accumulated_s[i]);
+               (accumulated_s->at(i + 1) - accumulated_s->at(i));
     } else if (i == points_size - 1) {
       dkappa = (kappas->at(i) - kappas->at(i - 1)) /
-               (accumulated_s[i] - accumulated_s[i - 1]);
+               (accumulated_s->at(i) - accumulated_s->at(i - 1));
     } else {
       dkappa = (kappas->at(i + 1) - kappas->at(i - 1)) /
-               (accumulated_s[i + 1] - accumulated_s[i - 1]);
+               (accumulated_s->at(i + 1) - accumulated_s->at(i - 1));
     }
     dkappas->push_back(dkappa);
   }

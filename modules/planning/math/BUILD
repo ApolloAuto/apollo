@@ -20,6 +20,9 @@ cc_library(
     hdrs = [
         "discrete_points_math.h",
     ],
+    deps = [
+        "//cyber/common:log",
+    ],
 )
 
 cc_test(
