@@ -26,12 +26,14 @@
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/common.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
+using apollo::common::ErrorCode;
 using apollo::common::VehicleState;
 using apollo::common::math::Vec2d;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
@@ -46,27 +48,54 @@ Status OpenSpacePreStopDecider::Process(
     Frame* frame, ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
-
-  CheckOpenSpacePreStop(frame, reference_line_info);
-
+  open_space_pre_stop_decider_config_ =
+      config_.open_space_pre_stop_decider_config();
+  double target_s = 0.0;
+  const auto& stop_type = open_space_pre_stop_decider_config_.stop_type();
+  switch (stop_type) {
+    case OpenSpacePreStopDeciderConfig::PARKING:
+      if (!CheckParkingSpotPreStop(frame, reference_line_info, &target_s)) {
+        const std::string msg = "Checking parking spot pre stop fails";
+        AERROR << msg;
+        return Status(ErrorCode::PLANNING_ERROR, msg);
+      }
+      break;
+    case OpenSpacePreStopDeciderConfig::PULL_OVER:
+      if (!CheckPullOverPreStop(frame, reference_line_info, &target_s)) {
+        const std::string msg = "Checking pull over pre stop fails";
+        AERROR << msg;
+        return Status(ErrorCode::PLANNING_ERROR, msg);
+      }
+      break;
+    default:
+      const std::string msg = "This stop type not implemented";
+      AERROR << msg;
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  SetStopFence(target_s, frame, reference_line_info);
   return Status::OK();
 }
 
-void OpenSpacePreStopDecider::CheckOpenSpacePreStop(
-    Frame* const frame, ReferenceLineInfo* const reference_line_info) {
-  const auto& open_space_config = config_.open_space_pre_stop_decider_config();
+bool OpenSpacePreStopDecider::CheckPullOverPreStop(
+    Frame* const frame, ReferenceLineInfo* const reference_line_info,
+    double* target_s) {
+  const auto& pull_over_info =
+      PlanningContext::Instance()->planning_status().pull_over();
+  const auto& pull_over_s = pull_over_info.pull_over_s();
+  *target_s = pull_over_s;
+  return true;
+}
 
-  if (frame->open_space_info().open_space_pre_stop_finished()) {
-    return;
-  }
-
-  const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
-  const VehicleState& vehicle_state = frame->vehicle_state();
+bool OpenSpacePreStopDecider::CheckParkingSpotPreStop(
+    Frame* const frame, ReferenceLineInfo* const reference_line_info,
+    double* target_s) {
   const auto& target_parking_spot_id =
       frame->open_space_info().target_parking_spot_id();
   const auto& nearby_path = reference_line_info->reference_line().map_path();
-  AERROR_IF(target_parking_spot_id.empty())
-      << "no target parking spot id found when setting pre stop fence";
+  if (target_parking_spot_id.empty()) {
+    AERROR << "no target parking spot id found when setting pre stop fence";
+    return false;
+  }
 
   double target_area_center_s = 0.0;
   bool target_area_found = false;
@@ -97,24 +126,38 @@ void OpenSpacePreStopDecider::CheckOpenSpacePreStop(
       target_area_found = true;
     }
   }
-  AERROR_IF(!target_area_found)
-      << "no target parking spot found on reference line";
 
+  if (!target_area_found) {
+    AERROR << "no target parking spot found on reference line";
+    return false;
+  }
+  *target_s = target_area_center_s;
+  return true;
+}
+
+void OpenSpacePreStopDecider::SetStopFence(
+    const double target_s, Frame* const frame,
+    ReferenceLineInfo* const reference_line_info) {
+  const auto& nearby_path = reference_line_info->reference_line().map_path();
+  const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
+  const VehicleState& vehicle_state = frame->vehicle_state();
   double stop_line_s = 0.0;
-  double stop_distance_to_target = open_space_config.stop_distance_to_target();
+  double stop_distance_to_target =
+      open_space_pre_stop_decider_config_.stop_distance_to_target();
   double static_linear_velocity_epsilon = 1.0e-2;
   CHECK_GE(stop_distance_to_target, 1.0e-8);
-  double target_vehicle_offset = target_area_center_s - adc_front_edge_s;
+  double target_vehicle_offset = target_s - adc_front_edge_s;
   if (target_vehicle_offset > stop_distance_to_target) {
-    stop_line_s = target_area_center_s - stop_distance_to_target;
+    stop_line_s = target_s - stop_distance_to_target;
   } else if (std::abs(target_vehicle_offset) < stop_distance_to_target) {
-    stop_line_s = target_area_center_s + stop_distance_to_target;
+    stop_line_s = target_s + stop_distance_to_target;
   } else if (target_vehicle_offset < -stop_distance_to_target) {
     if (!frame->open_space_info().pre_stop_rightaway_flag()) {
       // TODO(Jinyun) Use constant comfortable deacceleration rather than
       // distance by config to set stop fence
       stop_line_s =
-          adc_front_edge_s + open_space_config.rightaway_stop_distance();
+          adc_front_edge_s +
+          open_space_pre_stop_decider_config_.rightaway_stop_distance();
       if (std::abs(vehicle_state.linear_velocity()) <
           static_linear_velocity_epsilon) {
         stop_line_s = adc_front_edge_s;
@@ -132,8 +175,7 @@ void OpenSpacePreStopDecider::CheckOpenSpacePreStop(
     }
   }
 
-  const std::string stop_wall_id =
-      OPEN_SPACE_VO_ID_PREFIX + target_parking_spot_id;
+  const std::string stop_wall_id = OPEN_SPACE_STOP_ID;
   std::vector<std::string> wait_for_obstacles;
   frame->mutable_open_space_info()->set_open_space_pre_stop_fence_s(
       stop_line_s);
