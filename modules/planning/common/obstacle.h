@@ -199,12 +199,12 @@ class Obstacle {
   void SetPerceptionSlBoundary(const SLBoundary& sl_boundary);
 
   /**
-   * @brief check if a ObjectDecisionType is a longitudinal decision.
+   * @brief check if an ObjectDecisionType is a longitudinal decision.
    **/
   static bool IsLongitudinalDecision(const ObjectDecisionType& decision);
 
   /**
-   * @brief check if a ObjectDecisionType is a lateral decision.
+   * @brief check if an ObjectDecisionType is a lateral decision.
    **/
   static bool IsLateralDecision(const ObjectDecisionType& decision);
 
