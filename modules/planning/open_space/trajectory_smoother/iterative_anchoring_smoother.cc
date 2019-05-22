@@ -203,7 +203,7 @@ void IterativeAnchoringSmoother::AdjustPathBounds(
   if (colliding_point_index.empty()) {
     return;
   }
-  //TODO(Jinyun): move to confs
+  // TODO(Jinyun): move to confs
   const double decrease_ratio = 0.5;
   for (const auto index : colliding_point_index) {
     bounds->at(index) *= decrease_ratio;
@@ -212,9 +212,7 @@ void IterativeAnchoringSmoother::AdjustPathBounds(
 
 void IterativeAnchoringSmoother::SetPathProfile(
     const std::vector<std::pair<double, double>>& point2d,
-    DiscretizedPath* raw_path_points) {
-
-    }
+    DiscretizedPath* raw_path_points) {}
 
 bool IterativeAnchoringSmoother::CheckGear(const Eigen::MatrixXd& xWS) {
   return true;
