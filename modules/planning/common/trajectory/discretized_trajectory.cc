@@ -63,14 +63,14 @@ TrajectoryPoint DiscretizedTrajectory::Evaluate(
 }
 
 size_t DiscretizedTrajectory::QueryLowerBoundPoint(
-    const double relative_time) const {
+    const double relative_time, const double epsilon) const {
   CHECK(!empty());
 
   if (relative_time >= back().relative_time()) {
     return size() - 1;
   }
-  auto func = [](const TrajectoryPoint& tp, const double relative_time) {
-    return tp.relative_time() < relative_time;
+  auto func = [&epsilon](const TrajectoryPoint& tp, const double relative_time) {
+    return tp.relative_time() + epsilon < relative_time;
   };
   auto it_lower = std::lower_bound(begin(), end(), relative_time, func);
   return std::distance(begin(), it_lower);

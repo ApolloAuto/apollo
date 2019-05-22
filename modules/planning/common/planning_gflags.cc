@@ -325,7 +325,7 @@ DEFINE_bool(enable_follow_accel_constraint, true,
 DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");
 
 /// thread pool
-DEFINE_uint32(max_planning_thread_pool_size, 15,
+DEFINE_uint64(max_planning_thread_pool_size, 15,
               "num of thread used in planning thread pool.");
 DEFINE_bool(use_multi_thread_to_add_obstacles, false,
             "use multiple thread to add obstacles.");
@@ -342,7 +342,7 @@ DEFINE_double(trajectory_space_resolution, 1.0,
               "Trajectory space resolution in planning");
 DEFINE_double(decision_horizon, 200.0,
               "Longitudinal horizon for decision making");
-DEFINE_uint32(num_velocity_sample, 6,
+DEFINE_uint64(num_velocity_sample, 6,
               "The number of velocity samples in end condition sampler.");
 DEFINE_bool(enable_backup_trajectory, true,
             "If generate backup trajectory when planning fail");
@@ -354,7 +354,7 @@ DEFINE_double(lon_collision_buffer, 2.0,
               "The longitudinal buffer to keep distance to other vehicles");
 DEFINE_double(lat_collision_buffer, 0.1,
               "The lateral buffer to keep distance to other vehicles");
-DEFINE_uint32(num_sample_follow_per_timestamp, 3,
+DEFINE_uint64(num_sample_follow_per_timestamp, 3,
               "The number of sample points for each timestamp to follow");
 
 // Lattice Evaluate Parameters
@@ -467,7 +467,7 @@ DEFINE_bool(use_dual_variable_warm_start, true,
 DEFINE_bool(use_gear_shift_trajectory, false,
             "allow some time for the vehicle to shift gear");
 
-DEFINE_uint32(open_space_trajectory_stitching_preserved_length,
+DEFINE_uint64(open_space_trajectory_stitching_preserved_length,
               std::numeric_limits<uint32_t>::infinity(),
               "preserved points number in trajectory stitching for open space "
               "trajectory");
@@ -566,5 +566,5 @@ DEFINE_bool(enable_lane_change_urgency_checking, true,
 DEFINE_double(short_path_length_threshold, 20.0,
               "Threshold for too short path length");
 
-DEFINE_uint32(trajectory_stitching_preserved_length, 20,
+DEFINE_uint64(trajectory_stitching_preserved_length, 20,
               "preserved points number in trajectory stitching");
