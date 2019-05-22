@@ -23,7 +23,7 @@ The controllers include a lateral controller that manages the steering commands 
 #### Lateral Controller
 The lateral controller is an LQR-Based Optimal Controller. The dynamic model of this controller is a simple bicycle model with side slip. It is divided into two categories, including a closed loop and an open loop.
 
-- The closed loop provides discrete feedback LQR controller with 4 states:  
+- The closed loop provides discrete feedback LQR controller with 4 states:
   - Lateral Error
   - Lateral Error Rate
   - Heading Error
