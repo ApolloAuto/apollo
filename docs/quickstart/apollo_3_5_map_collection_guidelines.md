@@ -58,7 +58,7 @@ Confirm whether the sensors are ready. The button should be `Green`
 
 The only special case is that the additional front lidar 16 (which is facing upwards) which is installed for traffic lights, is not Green – this can be ignored when traffic light information is not being collected
 
-    ![](images/map1.png)
+![](images/map1.png)
 
 2. Go into your terminal,
     - Enter `dev_docker` on your terminal and type `cyber_monitor` 
