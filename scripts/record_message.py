@@ -125,11 +125,12 @@ class Recorder(object):
         task_dir = os.path.join(disk, 'data/bag', task_id)
         print('Recording bag to {}'.format(task_dir))
         log_file = '/apollo/data/log/smart_recorder.out'
+        recorder_exe = '/apollo/bazel-bin/modules/data/tools/smart_recorder/smart_recorder'
         cmd = '''
             source /apollo/scripts/apollo_base.sh
             source /apollo/framework/install/setup.bash
-            nohup smart_recorder --source_records_dir={} --restored_output_dir={} > {} 2>&1 &
-        '''.format(reuse_pool_dir, task_dir, log_file)
+            nohup {} --source_records_dir={} --restored_output_dir={} > {} 2>&1 &
+        '''.format(recorder_exe, reuse_pool_dir, task_dir, log_file)
         shell_cmd(cmd)
 
     @staticmethod
