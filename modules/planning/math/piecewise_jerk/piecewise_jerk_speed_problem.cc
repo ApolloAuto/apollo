@@ -148,5 +148,21 @@ void PiecewiseJerkSpeedProblem::CalculateOffset(std::vector<c_float>* q) {
   }
 }
 
+OSQPSettings* PiecewiseJerkSpeedProblem::SolverDefaultSettings() {
+  // Define Solver default settings
+  OSQPSettings* settings =
+      reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
+  osqp_set_default_settings(settings);
+  settings->eps_abs = 1e-4;
+  settings->eps_rel = 1e-4;
+  settings->eps_prim_inf = 1e-5;
+  settings->eps_dual_inf = 1e-5;
+  settings->polish = true;
+  settings->verbose = FLAGS_enable_osqp_debug;
+  settings->scaled_termination = true;
+
+  return settings;
+}
+
 }  // namespace planning
 }  // namespace apollo

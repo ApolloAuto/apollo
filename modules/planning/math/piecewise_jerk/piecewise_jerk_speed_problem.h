@@ -70,6 +70,8 @@ class PiecewiseJerkSpeedProblem : public PiecewiseJerkProblem {
 
   void CalculateOffset(std::vector<c_float>* q) override;
 
+  OSQPSettings* SolverDefaultSettings() override;
+
   bool has_x_ref_ = false;
   double weight_x_ref_ = 0.0;
   std::vector<double> x_ref_;
