@@ -12,6 +12,16 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "discrete_points_math",
+    srcs = [
+        "discrete_points_math.cc",
+    ],
+    hdrs = [
+        "discrete_points_math.h",
+    ],
+)
+
 cc_test(
     name = "curve_math_test",
     size = "small",
