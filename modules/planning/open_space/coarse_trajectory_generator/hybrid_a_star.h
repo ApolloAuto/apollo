@@ -93,7 +93,7 @@ class HybridAStar {
   bool GetTemporalProfile(HybridAStartResult* result);
   bool GenerateSpeedAcceleration(HybridAStartResult* result);
   bool GenerateSCurveSpeedAcceleration(HybridAStartResult* result);
-  bool CombinePathAndSpeedProfile(const PathData& path_data,
+  bool CombinePathAndSpeedProfile(const DiscretizedPath& discretized_path,
                                   const SpeedData& speed_data,
                                   HybridAStartResult* result);
 

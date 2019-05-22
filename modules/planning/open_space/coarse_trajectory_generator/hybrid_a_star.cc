@@ -438,9 +438,9 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   return true;
 }
 
-bool HybridAStar::CombinePathAndSpeedProfile(const PathData& path_data,
-                                             const SpeedData& speed_data,
-                                             HybridAStartResult* result) {
+bool HybridAStar::CombinePathAndSpeedProfile(
+    const DiscretizedPath& discretized_path, const SpeedData& speed_data,
+    HybridAStartResult* result) {
   CHECK(result != nullptr);
 
   // Clear the result
@@ -449,32 +449,26 @@ bool HybridAStar::CombinePathAndSpeedProfile(const PathData& path_data,
   result->phi.clear();
   result->v.clear();
   result->a.clear();
-  result->steer.clear();
   result->accumulated_s.clear();
 
-  if (path_data.discretized_path().empty()) {
+  if (discretized_path.empty()) {
     AWARN << "path data is empty";
     return false;
   }
 
-  // TODO(QiL): load 0.05 from configs
   for (double cur_rel_time = 0.0; cur_rel_time < speed_data.TotalTime();
-       cur_rel_time += 0.05) {
+       cur_rel_time += delta_t_) {
     common::SpeedPoint speed_point;
     if (!speed_data.EvaluateByTime(cur_rel_time, &speed_point)) {
       AERROR << "Fail to get speed point with relative time " << cur_rel_time;
       return false;
     }
 
-    if (speed_point.s() > path_data.discretized_path().Length()) {
+    if (speed_point.s() > discretized_path.Length()) {
       break;
     }
-    common::PathPoint path_point;
-    if (!path_data.GetPathPointWithPathS(speed_point.s(), &path_point)) {
-      AERROR << "Fail to get path data with s " << speed_point.s()
-             << "path total length " << path_data.discretized_path().Length();
-      return false;
-    }
+
+    common::PathPoint path_point = discretized_path.Evaluate(speed_point.s());
     path_point.set_s(path_point.s());
 
     result->x.push_back(path_point.x());
@@ -540,13 +534,22 @@ bool HybridAStar::TrajectoryPartition(
         AERROR << "GenerateSCurveSpeedAcceleration fail";
         return false;
       }
-      // TODO: generate PathData and SpeedData from results and combine
-      // profiles.
-
-      PathData path_data;
       SpeedData speed_data;
-      DiscretizedTrajectory discretized_trajectory;
-      if (!CombinePathAndSpeedProfile(path_data, speed_data, &result)) {
+      std::vector<common::PathPoint> path_points;
+      const size_t size_x = result.x.size();
+      for (size_t i = 0; i < size_x; ++i) {
+        common::PathPoint path_point = common::util::MakePathPoint(
+            result.x[i], result.y[i], 0.0, result.phi[i], 0.0, 0.0, 0.0);
+        path_point.set_s(result.accumulated_s[i]);
+        path_points.emplace_back(std::move(path_point));
+
+        speed_data.AppendSpeedPoint(result.accumulated_s[i],
+                                    static_cast<double>(i) * delta_t_,
+                                    result.v[i], result.a[i], 0.0);
+      }
+      DiscretizedPath discretized_path(path_points);
+
+      if (!CombinePathAndSpeedProfile(discretized_path, speed_data, &result)) {
         return false;
       }
     } else {
