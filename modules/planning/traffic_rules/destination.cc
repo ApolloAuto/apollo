@@ -95,9 +95,10 @@ int Destination::MakeDecisions(Frame* frame,
           &pull_over_sl);
 
       const double stop_line_s = pull_over_sl.s() +
-          VehicleConfigHelper::GetConfig().vehicle_param()
-                                          .front_edge_to_center() +
-          config_.destination().stop_distance();
+                                 VehicleConfigHelper::GetConfig()
+                                     .vehicle_param()
+                                     .front_edge_to_center() +
+                                 config_.destination().stop_distance();
       util::BuildStopDecision(
           stop_wall_id, stop_line_s, config_.destination().stop_distance(),
           StopReasonCode::STOP_REASON_PULL_OVER, wait_for_obstacle_ids,

@@ -62,8 +62,8 @@ TrajectoryPoint DiscretizedTrajectory::Evaluate(
       *(it_lower - 1), *it_lower, relative_time);
 }
 
-size_t DiscretizedTrajectory::QueryLowerBoundPoint(
-    const double relative_time, const double epsilon) const {
+size_t DiscretizedTrajectory::QueryLowerBoundPoint(const double relative_time,
+                                                   const double epsilon) const {
   CHECK(!empty());
 
   if (relative_time >= back().relative_time()) {
