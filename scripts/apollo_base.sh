@@ -109,7 +109,7 @@ function set_lib_path() {
   fi
   export PYTHONPATH=/usr/local/lib/python2.7/dist-packages:${PY_LIB_PATH}:${PY_TOOLS_PATH}:${PYTHONPATH}
   if [ -e /usr/local/cuda-8.0/ ];then
-    export PATH=/usr/local/cuda-8.0/bin:$PATH
+    export PATH=/usr/local/cuda-8.0/bin:/bazel-bin/modules/data/tools/smart_recorder:$PATH
     export LD_LIBRARY_PATH=/usr/local/cuda-8.0/lib64:$LD_LIBRARY_PATH
     export C_INCLUDE_PATH=/usr/local/cuda-8.0/include:$C_INCLUDE_PATH
     export CPLUS_INCLUDE_PATH=/usr/local/cuda-8.0/include:$CPLUS_INCLUDE_PATH
