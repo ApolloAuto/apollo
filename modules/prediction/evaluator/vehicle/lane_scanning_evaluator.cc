@@ -334,7 +334,7 @@ bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
   }
 
   if (FLAGS_prediction_offline_mode ==
-          PredictionConstants::kDumpDataForLearning) {
+      PredictionConstants::kDumpDataForLearning) {
     // Early exit without appending zero for offline_dataforlearn_dump
     return true;
   }

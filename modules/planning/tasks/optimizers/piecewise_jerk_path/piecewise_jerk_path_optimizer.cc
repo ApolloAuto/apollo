@@ -97,7 +97,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
         path_boundary.boundary(), w, &opt_l, &opt_dl, &opt_ddl, max_iter);
 
     if (res_opt) {
-      for (size_t i = 0; i < path_boundary.boundary().size(); i+=4) {
+      for (size_t i = 0; i < path_boundary.boundary().size(); i += 4) {
         ADEBUG << "for s[" << static_cast<double>(i) * path_boundary.delta_s()
                << "], l = " << opt_l[i] << ", dl = " << opt_dl[i];
       }
