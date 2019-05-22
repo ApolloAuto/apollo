@@ -423,7 +423,7 @@ DEFINE_double(nudge_buffer, 0.3, "buffer to nudge for lateral optimization");
 DEFINE_bool(use_planning_fallback, true,
             "Use fallback trajectory for planning.");
 DEFINE_double(fallback_total_time, 3.0, "total fallback trajectory time");
-DEFINE_double(fallback_time_unit, 0.02,
+DEFINE_double(fallback_time_unit, 0.1,
               "fallback trajectory unit time in seconds");
 DEFINE_double(
     fallback_distance_buffer, 0.5,
