@@ -41,7 +41,8 @@ constexpr double kPathBoundsDeciderHorizon = 150.0;
 constexpr double kPathBoundsDeciderResolution = 0.5;
 constexpr double kDefaultLaneWidth = 5.0;
 constexpr double kDefaultRoadWidth = 20.0;
-constexpr int kNumExtraTailBoundPoint = 10;
+// TODO(all): Update extra tail point base on vehicle speed.
+constexpr int kNumExtraTailBoundPoint = 20;
 
 class PathBoundsDecider : public Decider {
  public:
