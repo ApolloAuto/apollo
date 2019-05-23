@@ -90,8 +90,8 @@ class FeatureOutput {
    * @param lane sequence
    * @param adc trajectory
    */
-  static void InsertDataForTuning(const Feature& feature,
-      const std::vector<double>& feature_values,
+  static void InsertDataForTuning(
+      const Feature& feature, const std::vector<double>& feature_values,
       const std::string& category, const LaneSequence& lane_sequence,
       const std::vector<apollo::common::TrajectoryPoint>& adc_trajectory);
 

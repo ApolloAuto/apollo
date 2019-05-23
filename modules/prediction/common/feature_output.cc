@@ -25,8 +25,8 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::util::StrCat;
 using apollo::common::TrajectoryPoint;
+using apollo::common::util::StrCat;
 
 Features FeatureOutput::features_;
 ListDataForLearning FeatureOutput::list_data_for_learning_;

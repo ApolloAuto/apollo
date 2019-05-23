@@ -29,8 +29,8 @@ namespace planning {
 
 bool DiscretePointsMath::ComputePathProfile(
     const std::vector<std::pair<double, double>>& xy_points,
-      std::vector<double>* headings, std::vector<double>* accumulated_s,
-      std::vector<double>* kappas, std::vector<double>* dkappas) {
+    std::vector<double>* headings, std::vector<double>* accumulated_s,
+    std::vector<double>* kappas, std::vector<double>* dkappas) {
   CHECK_NOTNULL(headings);
   CHECK_NOTNULL(kappas);
   CHECK_NOTNULL(dkappas);
@@ -39,7 +39,7 @@ bool DiscretePointsMath::ComputePathProfile(
   dkappas->clear();
 
   if (xy_points.size() < 2) {
-      return false;
+    return false;
   }
   std::vector<double> dxs;
   std::vector<double> dys;
