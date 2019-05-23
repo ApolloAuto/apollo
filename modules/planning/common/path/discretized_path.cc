@@ -41,7 +41,7 @@ double DiscretizedPath::Length() const {
 
 PathPoint DiscretizedPath::Evaluate(const double path_s) const {
   CHECK(!empty());
-  auto it_lower = QueryLowerBound(path_s);
+  auto it_lower = QueryLowerBoundbyAbsoluteS(path_s);
   if (it_lower == begin()) {
     return front();
   }
@@ -52,10 +52,10 @@ PathPoint DiscretizedPath::Evaluate(const double path_s) const {
                                                            *it_lower, path_s);
 }
 
-std::vector<PathPoint>::const_iterator DiscretizedPath::QueryLowerBound(
-    const double path_s) const {
+std::vector<PathPoint>::const_iterator
+DiscretizedPath::QueryLowerBoundbyAbsoluteS(const double path_s) const {
   auto func = [](const PathPoint &tp, const double path_s) {
-    return tp.s() < path_s;
+    return std::fabs(tp.s()) < std::fabs(path_s);
   };
   return std::lower_bound(begin(), end(), path_s, func);
 }
