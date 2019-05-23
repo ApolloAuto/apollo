@@ -55,7 +55,6 @@ DECLARE_double(rtk_trajectory_resolution);
 DECLARE_bool(enable_reference_line_stitching);
 DECLARE_double(look_forward_extend_distance);
 DECLARE_double(reference_line_stitch_overlap_distance);
-DECLARE_double(reference_line_lateral_buffer);
 
 DECLARE_bool(enable_smooth_reference_line);
 
