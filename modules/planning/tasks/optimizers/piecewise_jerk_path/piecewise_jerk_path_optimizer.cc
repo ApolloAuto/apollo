@@ -82,14 +82,17 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     std::vector<double> opt_dl;
     std::vector<double> opt_ddl;
 
-    const auto& pull_over_info =
-        PlanningContext::Instance()->planning_status().pull_over();
-
     std::array<double, 3> end_state = {0.0, 0.0, 0.0};
-    // Set end lateral to be at the desired pull over destination if enter into
-    // pull over scenario.
-    if (pull_over_info.exist_pull_over_position()) {
-      end_state[0] = pull_over_info.pull_over_l();
+
+    if (!FLAGS_enable_force_pull_over_open_space_parking_test) {
+      // pull over scenario.
+      const auto& pull_over_info =
+          PlanningContext::Instance()->planning_status().pull_over();
+
+      // Set end lateral to be at the desired pull over destination
+      if (pull_over_info.exist_pull_over_position()) {
+        end_state[0] = pull_over_info.pull_over_l();
+      }
     }
 
     bool res_opt = OptimizePath(
