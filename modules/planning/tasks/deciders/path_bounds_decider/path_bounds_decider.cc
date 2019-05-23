@@ -180,6 +180,7 @@ Status PathBoundsDecider::Process(
   // If needed, search for pull-over position.
   if (config_.path_bounds_decider_config().is_pull_over()) {
     if (!exist_self_path_bound) {
+      pull_over_info->set_is_feasible(false);
       pull_over_info->set_exist_pull_over_position(false);
     } else {
       // TODO(QiL, Jiacheng): simplify the interface for
@@ -189,9 +190,11 @@ Status PathBoundsDecider::Process(
       if (!SearchPullOverPosition(*frame, *reference_line_info,
                                   regular_self_path_bound,
                                   &pull_over_configuration)) {
-        ADEBUG << "Failed to find a pull-over position.";
+        pull_over_info->set_is_feasible(false);
         pull_over_info->set_exist_pull_over_position(false);
+        ADEBUG << "Failed to find a pull-over position.";
       } else {
+        pull_over_info->set_is_feasible(true);
         pull_over_info->set_exist_pull_over_position(true);
         pull_over_info->set_pull_over_s(std::get<0>(pull_over_configuration));
         pull_over_info->set_pull_over_l(std::get<1>(pull_over_configuration));
