@@ -198,7 +198,6 @@ Status LatController::Init(const ControlConf *control_conf) {
   matrix_a_coeff_ = Matrix::Zero(matrix_size, matrix_size);
   matrix_a_coeff_(1, 1) = -(cf_ + cr_) / mass_;
   matrix_a_coeff_(1, 3) = (lr_ * cr_ - lf_ * cf_) / mass_;
-  matrix_a_coeff_(2, 3) = 1.0;
   matrix_a_coeff_(3, 1) = (lr_ * cr_ - lf_ * cf_) / iz_;
   matrix_a_coeff_(3, 3) = -1.0 * (lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_;
 
@@ -608,8 +607,8 @@ void LatController::ComputeLateralErrors(
   const double dx = x - target_point.path_point().x();
   const double dy = y - target_point.path_point().y();
 
-  debug->set_target_point_x(target_point.path_point().x());
-  debug->set_target_point_y(target_point.path_point().y());
+  debug->mutable_current_target_point()->set_x(target_point.path_point().x());
+  debug->mutable_current_target_point()->set_y(target_point.path_point().y());
 
   ADEBUG << "x point: " << x << " y point: " << y;
   ADEBUG << "match point information : " << target_point.ShortDebugString();

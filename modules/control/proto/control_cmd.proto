@@ -104,6 +104,12 @@ message SimpleLongitudinalDebug {
   optional double jerk_error = 31;
 }
 
+message CurrentTargetPoint
+{
+    optional double x = 1;
+    optional double y = 2;
+}
+
 message SimpleLateralDebug {
   optional double lateral_error = 1;
   optional double ref_heading = 2;
@@ -148,8 +154,7 @@ message SimpleLateralDebug {
   optional double lateral_error_feedback = 28;
   optional double heading_error_feedback = 29;
 
-  optional double target_point_x = 30;
-  optional double target_point_y = 31;
+  optional CurrentTargetPoint current_target_point = 30;
 }
 
 message SimpleMPCDebug {
