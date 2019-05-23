@@ -178,7 +178,7 @@ Status PathBoundsDecider::Process(
                              ->mutable_planning_status()
                              ->mutable_pull_over();
   // If needed, search for pull-over position.
-  if (Decider::config_.path_bounds_decider_config().is_pull_over()) {
+  if (config_.path_bounds_decider_config().is_pull_over()) {
     if (!exist_self_path_bound) {
       pull_over_info->set_exist_pull_over_position(false);
     } else {
@@ -371,7 +371,9 @@ bool PathBoundsDecider::SearchPullOverPosition(
   // Check if destination is some distance away from ADC.
   ADEBUG << "Destination is at s = " << destination_s
          << ", ADC is at s = " << adc_end_s;
-  if (destination_s - adc_end_s < FLAGS_destination_to_adc_buffer) {
+  if (destination_s - adc_end_s <
+      config_.path_bounds_decider_config()
+             .pull_over_destination_to_adc_buffer()) {
     ADEBUG << "ADC is close to the destination.";
     const auto& pull_over_status =
         PlanningContext::Instance()->planning_status().pull_over();
@@ -401,7 +403,10 @@ bool PathBoundsDecider::SearchPullOverPosition(
   }
 
   // Check if destination is within path-bounds searching scope.
-  if (destination_s + FLAGS_destination_to_pathend_buffer >=
+  const double destination_to_pathend_buffer =
+      config_.path_bounds_decider_config()
+             .pull_over_destination_to_pathend_buffer();
+  if (destination_s + destination_to_pathend_buffer >=
       std::get<0>(path_bound.back())) {
     ADEBUG << "Destination is not within path_bounds search scope";
     return false;
@@ -434,7 +439,7 @@ bool PathBoundsDecider::SearchPullOverPosition(
       reference_line_info.reference_line().GetLaneWidth(
           curr_s, &curr_lane_left_width, &curr_lane_right_width);
       if (std::fabs(curr_right_bound + adc_half_width - curr_lane_right_width) >
-          FLAGS_pull_over_road_edge_buffer) {
+          config_.path_bounds_decider_config().pull_over_road_edge_buffer()) {
         ADEBUG << "Not close enough to lane-edge. Not feasible for pull-over.";
         is_feasible_window = false;
         break;
