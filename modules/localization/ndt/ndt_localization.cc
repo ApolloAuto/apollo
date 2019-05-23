@@ -50,7 +50,8 @@ void NDTLocalization::Init() {
       FLAGS_map_dir + "/" + FLAGS_ndt_map_dir + "/" + FLAGS_local_map_name;
   AINFO << "map folder: " << map_path_;
   velodyne_extrinsic_ = Eigen::Affine3d::Identity();
-  bool success = LoadLidarExtrinsic(lidar_extrinsics_file, &velodyne_extrinsic_);
+  bool success =
+      LoadLidarExtrinsic(lidar_extrinsics_file, &velodyne_extrinsic_);
   if (!success) {
     AERROR << "LocalizationLidar: Fail to access the lidar"
               " extrinsic file: "
