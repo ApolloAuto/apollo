@@ -38,10 +38,12 @@ DECLARE_string(scenario_valet_parking_config_file);
 
 DECLARE_bool(enable_scenario_bare_intersection);
 DECLARE_bool(enable_scenario_pull_over);
-DECLARE_double(side_pass_min_signal_intersection_distance);
-DECLARE_bool(enable_scenario_side_pass_multiple_parked_obstacles);
 DECLARE_bool(enable_scenario_stop_sign);
 DECLARE_bool(enable_scenario_traffic_light);
+
+DECLARE_double(side_pass_min_signal_intersection_distance);
+DECLARE_bool(enable_scenario_side_pass_multiple_parked_obstacles);
+DECLARE_bool(enable_force_pull_over_open_space_parking_test);
 
 DECLARE_string(traffic_rule_config_filename);
 DECLARE_string(smoother_config_filename);
