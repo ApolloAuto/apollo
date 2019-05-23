@@ -449,14 +449,18 @@ bool HybridAStar::CombinePathAndSpeedProfile(
   result->phi.clear();
   result->v.clear();
   result->a.clear();
+  result->steer.clear();
   result->accumulated_s.clear();
 
   if (discretized_path.empty()) {
-    AWARN << "path data is empty";
+    AERROR << "path data is empty";
     return false;
   }
 
-  for (double cur_rel_time = 0.0; cur_rel_time < speed_data.TotalTime();
+  const double kEpsilon = 1e-6;
+
+  for (double cur_rel_time = 0.0;
+       cur_rel_time < speed_data.TotalTime() + kEpsilon;
        cur_rel_time += delta_t_) {
     common::SpeedPoint speed_point;
     if (!speed_data.EvaluateByTime(cur_rel_time, &speed_point)) {
@@ -464,7 +468,13 @@ bool HybridAStar::CombinePathAndSpeedProfile(
       return false;
     }
 
-    if (speed_point.s() > discretized_path.Length()) {
+    ADEBUG << "speed_point debug: " << speed_point.ShortDebugString();
+
+    if (std::abs(speed_point.s()) > std::abs(discretized_path.Length())) {
+      AERROR << "Speed data s larger than the discretized path total lenghth, "
+                "with speed_data.s(): "
+             << speed_point.s()
+             << " and discretized_path.Length(): " << discretized_path.Length();
       break;
     }
 
@@ -476,8 +486,19 @@ bool HybridAStar::CombinePathAndSpeedProfile(
     result->phi.push_back(path_point.theta());
     result->v.push_back(speed_point.v());
     result->a.push_back(speed_point.a());
-    // TODO(QiL): update steer.
     result->accumulated_s.push_back(speed_point.s());
+  }
+  // load steering from phi
+  result->a.pop_back();
+  for (size_t i = 0; i + 1 < result->x.size(); ++i) {
+    double discrete_steer = (result->phi[i + 1] - result->phi[i]) *
+                            vehicle_param_.wheel_base() / step_size_;
+    if (result->v[i] > 0.0) {
+      discrete_steer = std::atan(discrete_steer);
+    } else {
+      discrete_steer = std::atan(-discrete_steer);
+    }
+    result->steer.push_back(discrete_steer);
   }
   return true;
 }
@@ -527,6 +548,7 @@ bool HybridAStar::TrajectoryPartition(
   current_traj->y.push_back(y.back());
   current_traj->phi.push_back(phi.back());
 
+  ADEBUG << "size of partitioned result: " << partitioned_result->size();
   // Retrieve v, a and steer from path
   for (auto& result : *partitioned_result) {
     if (FLAGS_use_s_curve_speed_smooth) {
@@ -534,6 +556,10 @@ bool HybridAStar::TrajectoryPartition(
         AERROR << "GenerateSCurveSpeedAcceleration fail";
         return false;
       }
+      AERROR << "result size before combination: x, " << result.x.size()
+             << " steer: " << result.steer.size()
+             << " acceleration: " << result.a.size();
+
       SpeedData speed_data;
       std::vector<common::PathPoint> path_points;
       const size_t size_x = result.x.size();
@@ -547,11 +573,17 @@ bool HybridAStar::TrajectoryPartition(
                                     static_cast<double>(i) * delta_t_,
                                     result.v[i], result.a[i], 0.0);
       }
+      ADEBUG << "Path points size: " << path_points.size();
+      ADEBUG << "Speed points size: " << speed_data.size();
       DiscretizedPath discretized_path(path_points);
 
       if (!CombinePathAndSpeedProfile(discretized_path, speed_data, &result)) {
         return false;
       }
+      ADEBUG << "result size after combination: x, " << result.x.size()
+             << " steer: " << result.steer.size()
+             << " acceleration: " << result.a.size();
+
     } else {
       if (!GenerateSpeedAcceleration(&result)) {
         AERROR << "GenerateSpeedAcceleration fail";
