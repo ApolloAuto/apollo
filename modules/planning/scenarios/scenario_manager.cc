@@ -167,7 +167,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
 
   bool pull_over_scenario =
       (frame.reference_line_info().size() == 1 &&  // NO, while changing lane
-       adc_distance_to_dest > 0 &&
+       adc_distance_to_dest > 0.0 &&
        adc_distance_to_dest <=
            scenario_config.start_pull_over_scenario_distance());
 
@@ -181,14 +181,20 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
           overlap.first == ReferenceLineInfo::YIELD_SIGN) {
         const double distance_to = overlap.second.start_s - dest_sl.s();
         const double distance_passed = dest_sl.s() - overlap.second.end_s;
-        if ((distance_to > 0 && distance_to < kDisanceToAvoidJunction) ||
-            (distance_passed > 0 &&
+        if ((distance_to > 0.0 && distance_to < kDisanceToAvoidJunction) ||
+            (distance_passed > 0.0 &&
              distance_passed < kDisanceToAvoidJunction)) {
           pull_over_scenario = false;
           break;
         }
       }
     }
+  }
+
+  if (pull_over_scenario) {
+    const auto& pull_over_status =
+        PlanningContext::Instance()->planning_status().pull_over();
+    pull_over_scenario = pull_over_status.is_feasible();
   }
 
   switch (current_scenario_->scenario_type()) {
@@ -234,7 +240,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
          << "] stop_sign_overlap_start_s[" << stop_sign_overlap.start_s << "]";
 
   const bool stop_sign_scenario =
-      (adc_distance_to_stop_sign > 0 &&
+      (adc_distance_to_stop_sign > 0.0 &&
        adc_distance_to_stop_sign <=
            scenario_config.start_stop_sign_scenario_distance());
   const bool stop_sign_all_way = false;  // TODO(all)
@@ -315,7 +321,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
            << adc_distance_to_traffic_light << "]";
 
     // enter traffic-light scenarios: based on distance only
-    if (adc_distance_to_traffic_light > 0 &&
+    if (adc_distance_to_traffic_light > 0.0 &&
         adc_distance_to_traffic_light <=
             scenario_config.start_traffic_light_scenario_distance()) {
       traffic_light_scenario = true;
@@ -403,7 +409,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectBareIntersectionScenario(
          << "]";
 
   const bool bare_junction_scenario =
-      (adc_distance_to_pnc_junction > 0 &&
+      (adc_distance_to_pnc_junction > 0.0 &&
        adc_distance_to_pnc_junction <=
            scenario_config.start_bare_intersection_scenario_distance());
 

@@ -72,7 +72,21 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const auto& pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
-  double distance = adc_front_edge_s - pull_over_status.pull_over_s();
+
+  if (!pull_over_status.is_feasible() ||
+      !pull_over_status.has_pull_over_x() ||
+      !pull_over_status.has_pull_over_y()) {
+    ADEBUG << "pull_over status not set properly: "
+           << pull_over_status.DebugString();
+    return UNKNOWN;
+  }
+
+  common::SLPoint pull_over_sl;
+  const auto& reference_line = reference_line_info.reference_line();
+  reference_line.XYToSL(
+      {pull_over_status.pull_over_x(), pull_over_status.pull_over_y()},
+      &pull_over_sl);
+  double distance = adc_front_edge_s - pull_over_sl.s();
   if (distance >= scenario_config.pass_destination_threshold()) {
     ADEBUG << "ADC passed pull-over spot: distance[" << distance << "]";
     return PASS_DESTINATION;
