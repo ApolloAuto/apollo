@@ -38,7 +38,7 @@ class DiscretizedPath : public std::vector<common::PathPoint> {
   common::PathPoint Evaluate(const double path_s) const;
 
  protected:
-  std::vector<common::PathPoint>::const_iterator QueryLowerBound(
+  std::vector<common::PathPoint>::const_iterator QueryLowerBoundbyAbsoluteS(
       const double path_s) const;
 };
 
