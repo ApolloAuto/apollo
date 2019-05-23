@@ -174,50 +174,43 @@ Status PathBoundsDecider::Process(
   // Remove redundant boundaries.
   RemoveRedundantPathBoundaries(&candidate_path_boundaries);
 
-  auto* pull_over_info = PlanningContext::Instance()
+  auto* pull_over_status = PlanningContext::Instance()
                              ->mutable_planning_status()
                              ->mutable_pull_over();
   // If needed, search for pull-over position.
   if (config_.path_bounds_decider_config().is_pull_over()) {
     if (!exist_self_path_bound) {
-      pull_over_info->set_is_feasible(false);
-      pull_over_info->set_exist_pull_over_position(false);
+      pull_over_status->Clear();
+      pull_over_status->set_is_feasible(false);
     } else {
       // TODO(QiL, Jiacheng): simplify the interface for
       // 'SearchPullOverPosition' and use proto directly
-      std::tuple<double, double, double, double, double, int>
-          pull_over_configuration;
+      std::tuple<double, double, double, int> pull_over_configuration;
       if (!SearchPullOverPosition(*frame, *reference_line_info,
                                   regular_self_path_bound,
                                   &pull_over_configuration)) {
-        pull_over_info->set_is_feasible(false);
-        pull_over_info->set_exist_pull_over_position(false);
+        pull_over_status->Clear();
+        pull_over_status->set_is_feasible(false);
         ADEBUG << "Failed to find a pull-over position.";
       } else {
-        pull_over_info->set_is_feasible(true);
-        pull_over_info->set_exist_pull_over_position(true);
-        pull_over_info->set_pull_over_s(std::get<0>(pull_over_configuration));
-        pull_over_info->set_pull_over_l(std::get<1>(pull_over_configuration));
-        pull_over_info->set_pull_over_x(std::get<2>(pull_over_configuration));
-        pull_over_info->set_pull_over_y(std::get<3>(pull_over_configuration));
-        pull_over_info->set_pull_over_theta(
-            std::get<4>(pull_over_configuration));
+        pull_over_status->Clear();
+        pull_over_status->set_is_feasible(true);
+        pull_over_status->set_x(std::get<0>(pull_over_configuration));
+        pull_over_status->set_y(std::get<1>(pull_over_configuration));
+        pull_over_status->set_theta(std::get<2>(pull_over_configuration));
+
         // TODO(jiacheng): find-tune this.
-        pull_over_info->set_pull_over_length_front(
+        pull_over_status->set_length_front(
             VehicleConfigHelper::GetConfig().vehicle_param().length());
-        pull_over_info->set_pull_over_length_back(
+        pull_over_status->set_length_back(
             VehicleConfigHelper::GetConfig().vehicle_param().length());
-        pull_over_info->set_pull_over_width_left(
+        pull_over_status->set_width_left(
             VehicleConfigHelper::GetConfig().vehicle_param().width() + 0.5);
-        pull_over_info->set_pull_over_width_right(
+        pull_over_status->set_width_right(
             VehicleConfigHelper::GetConfig().vehicle_param().width());
-        ADEBUG << "pull over: s[" << std::get<0>(pull_over_configuration)
-               << "] l[" << std::get<1>(pull_over_configuration) << "] x["
-               << std::get<2>(pull_over_configuration) << "] y["
-               << std::get<3>(pull_over_configuration) << "] theta["
-               << std::get<4>(pull_over_configuration) << "]";
+
         // Trim the path bound based on the pull-over s.
-        int pull_over_pos_idx = std::max(std::get<5>(pull_over_configuration),
+        int pull_over_pos_idx = std::max(std::get<3>(pull_over_configuration),
                                          kNumExtraTailBoundPoint) +
                                 kNumExtraTailBoundPoint;
         for (auto& path_boundary : candidate_path_boundaries) {
@@ -359,8 +352,7 @@ std::string PathBoundsDecider::GenerateFallbackPathBound(
 bool PathBoundsDecider::SearchPullOverPosition(
     const Frame& frame, const ReferenceLineInfo& reference_line_info,
     const std::vector<std::tuple<double, double, double>>& path_bound,
-    std::tuple<double, double, double, double, double, int>* const
-        pull_over_configuration) {
+    std::tuple<double, double, double, int>* const pull_over_configuration) {
   // destination_s based on routing_end
   const auto& reference_line = reference_line_info_->reference_line();
   common::SLPoint destination_sl;
@@ -380,11 +372,15 @@ bool PathBoundsDecider::SearchPullOverPosition(
     ADEBUG << "ADC is close to the destination.";
     const auto& pull_over_status =
         PlanningContext::Instance()->planning_status().pull_over();
-    if (pull_over_status.exist_pull_over_position()) {
+    if (pull_over_status.has_x() && pull_over_status.has_y()) {
       common::SLPoint pull_over_sl;
-      reference_line.XYToSL(
-          {pull_over_status.pull_over_x(), pull_over_status.pull_over_y()},
-          &pull_over_sl);
+      reference_line.XYToSL({pull_over_status.x(), pull_over_status.y()},
+                            &pull_over_sl);
+
+      ADEBUG << "pull-over pisition: s[" << pull_over_sl.s()
+             << "] l[" << pull_over_sl.l() << "] x[" << pull_over_status.x()
+             << "] y[" << pull_over_status.y()
+             << "] theta[" << pull_over_status.theta() << "]";
       int pull_over_idx = 0;
       for (const auto& path_bound_point : path_bound) {
         if (std::get<0>(path_bound_point) < pull_over_sl.s()) {
@@ -394,8 +390,9 @@ bool PathBoundsDecider::SearchPullOverPosition(
         }
       }
       *pull_over_configuration = std::make_tuple(
-          pull_over_sl.s(), pull_over_sl.l(), pull_over_status.pull_over_x(),
-          pull_over_status.pull_over_y(), pull_over_status.pull_over_theta(),
+          pull_over_status.x(),
+          pull_over_status.y(),
+          pull_over_status.theta(),
           pull_over_idx);
       return true;
     } else {
@@ -504,7 +501,7 @@ bool PathBoundsDecider::SearchPullOverPosition(
       const double pull_over_theta = reference_point.heading();
 
       *pull_over_configuration =
-          std::make_tuple(pull_over_s, pull_over_l, pull_over_x, pull_over_y,
+          std::make_tuple(pull_over_x, pull_over_y,
                           pull_over_theta, (i + j) / 2);
       break;
     }

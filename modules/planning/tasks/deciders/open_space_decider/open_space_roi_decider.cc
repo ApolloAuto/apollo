@@ -200,11 +200,11 @@ void OpenSpaceRoiDecider::SetParkingSpotEndPose(
 }
 
 void OpenSpaceRoiDecider::SetPullOverSpotEndPose(Frame *const frame) {
-  const auto &pull_over_info =
+  const auto &pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
-  double pull_over_x = pull_over_info.pull_over_x();
-  double pull_over_y = pull_over_info.pull_over_y();
-  double pull_over_theta = pull_over_info.pull_over_theta();
+  const double pull_over_x = pull_over_status.x();
+  const double pull_over_y = pull_over_status.y();
+  double pull_over_theta = pull_over_status.theta();
 
   // Normalize according to origin_point and origin_heading
   const auto &origin_point = frame->open_space_info().origin_point();
@@ -641,9 +641,11 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
 bool OpenSpaceRoiDecider::GetPullOverSpot(
     Frame *const frame, std::array<common::math::Vec2d, 4> *vertices,
     hdmap::Path *nearby_path) {
-  const auto &pull_over_info =
+  const auto &pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
-  if (!pull_over_info.exist_pull_over_position()) {
+  if (!pull_over_status.has_x() ||
+      !pull_over_status.has_y() ||
+      !pull_over_status.has_theta()) {
     AERROR << "Pull over position not set in planning context";
     return false;
   }
@@ -658,13 +660,13 @@ bool OpenSpaceRoiDecider::GetPullOverSpot(
       frame->reference_line_info().front().reference_line().GetMapPath();
 
   // Construct left_top, left_down, right_down, right_top points
-  double pull_over_x = pull_over_info.pull_over_x();
-  double pull_over_y = pull_over_info.pull_over_y();
-  const double pull_over_theta = pull_over_info.pull_over_theta();
-  const double pull_over_length_front = pull_over_info.pull_over_length_front();
-  const double pull_over_length_back = pull_over_info.pull_over_length_back();
-  const double pull_over_width_left = pull_over_info.pull_over_width_left();
-  const double pull_over_width_right = pull_over_info.pull_over_width_right();
+  double pull_over_x = pull_over_status.x();
+  double pull_over_y = pull_over_status.y();
+  const double pull_over_theta = pull_over_status.theta();
+  const double pull_over_length_front = pull_over_status.length_front();
+  const double pull_over_length_back = pull_over_status.length_back();
+  const double pull_over_width_left = pull_over_status.width_left();
+  const double pull_over_width_right = pull_over_status.width_right();
 
   Vec2d center_shift_vec((pull_over_length_front - pull_over_length_back) * 0.5,
                          (pull_over_width_left - pull_over_width_right) * 0.5);

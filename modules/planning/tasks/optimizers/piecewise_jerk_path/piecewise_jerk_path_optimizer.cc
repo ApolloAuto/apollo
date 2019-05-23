@@ -86,12 +86,15 @@ common::Status PiecewiseJerkPathOptimizer::Process(
 
     if (!FLAGS_enable_force_pull_over_open_space_parking_test) {
       // pull over scenario.
-      const auto& pull_over_info =
+      const auto& pull_over_status =
           PlanningContext::Instance()->planning_status().pull_over();
 
       // Set end lateral to be at the desired pull over destination
-      if (pull_over_info.exist_pull_over_position()) {
-        end_state[0] = pull_over_info.pull_over_l();
+      if (pull_over_status.has_x() && pull_over_status.has_y()) {
+        common::SLPoint pull_over_sl;
+        reference_line.XYToSL({pull_over_status.x(), pull_over_status.y()},
+                              &pull_over_sl);
+        end_state[0] = pull_over_sl.l();
       }
     }
 

@@ -74,8 +74,9 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
       PlanningContext::Instance()->planning_status().pull_over();
 
   if (!pull_over_status.is_feasible() ||
-      !pull_over_status.has_pull_over_x() ||
-      !pull_over_status.has_pull_over_y()) {
+      !pull_over_status.has_x() ||
+      !pull_over_status.has_y() ||
+      !pull_over_status.has_theta()) {
     ADEBUG << "pull_over status not set properly: "
            << pull_over_status.DebugString();
     return UNKNOWN;
@@ -83,9 +84,8 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
 
   common::SLPoint pull_over_sl;
   const auto& reference_line = reference_line_info.reference_line();
-  reference_line.XYToSL(
-      {pull_over_status.pull_over_x(), pull_over_status.pull_over_y()},
-      &pull_over_sl);
+  reference_line.XYToSL({pull_over_status.x(), pull_over_status.y()},
+                        &pull_over_sl);
   double distance = adc_front_edge_s - pull_over_sl.s();
   if (distance >= scenario_config.pass_destination_threshold()) {
     ADEBUG << "ADC passed pull-over spot: distance[" << distance << "]";
@@ -108,11 +108,11 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
   common::math::Vec2d adc_position = {
       common::VehicleStateProvider::Instance()->x(),
       common::VehicleStateProvider::Instance()->y()};
-  common::math::Vec2d pull_over_position = {pull_over_status.pull_over_x(),
-                                            pull_over_status.pull_over_y()};
+  common::math::Vec2d pull_over_position = {pull_over_status.x(),
+                                            pull_over_status.y()};
   distance = DistanceXY(adc_position, pull_over_position);
   const double theta_diff = std::fabs(common::math::NormalizeAngle(
-      pull_over_status.pull_over_theta() -
+      pull_over_status.theta() -
       common::VehicleStateProvider::Instance()->heading()));
   ADEBUG << "adc_position(" << adc_position.x() << ", " << adc_position.y()
          << ") pull_over_position(" << pull_over_position.x() << ", "
