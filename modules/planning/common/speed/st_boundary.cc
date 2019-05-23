@@ -280,7 +280,7 @@ bool STBoundary::GetUnblockSRange(const double curr_time, double* s_upper,
   CHECK_NOTNULL(s_upper);
   CHECK_NOTNULL(s_lower);
 
-  *s_upper = FLAGS_speed_lon_decision_horizon;
+  *s_upper = FLAGS_decision_horizon;
   *s_lower = 0.0;
   if (curr_time < min_t_ || curr_time > max_t_) {
     return true;
@@ -338,7 +338,7 @@ bool STBoundary::GetBoundarySRange(const double curr_time, double* s_upper,
   *s_lower = lower_points_[left].s() +
              r * (lower_points_[right].s() - lower_points_[left].s());
 
-  *s_upper = std::fmin(*s_upper, FLAGS_speed_lon_decision_horizon);
+  *s_upper = std::fmin(*s_upper, FLAGS_decision_horizon);
   *s_lower = std::fmax(*s_lower, 0.0);
   return true;
 }
