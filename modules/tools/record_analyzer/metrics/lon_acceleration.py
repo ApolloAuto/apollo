@@ -77,9 +77,9 @@ class LonAcceleration:
             if ACCEL_H_LB <= accel:
                 accel_high_cnt += 1
 
-        if len(self.init_point_accel) > 0:
-            lon_acceleration["max"] = max(self.init_point_accel)
-            lon_acceleration["avg"] = np.average(self.init_point_accel)
+        if len(self.acceleration_list) > 0:
+            lon_acceleration["max"] = max(self.acceleration_list)
+            lon_acceleration["avg"] = np.average(self.acceleration_list)
         else:
             lon_acceleration["max"] = 0.0
             lon_acceleration["avg"] = 0.0
@@ -106,7 +106,7 @@ class LonAcceleration:
 
         lon_deceleration = {}
         if len(self.deceleration_list) > 0:
-            lon_deceleration["max"] = max(self.deceleration_list, key=abs)
+            lon_deceleration["max"] = abs(max(self.deceleration_list, key=abs))
             lon_deceleration["avg"] = np.average(np.absolute(self.deceleration_list))
         else:
             lon_deceleration["max"] = 0.0
@@ -137,8 +137,8 @@ class LonAcceleration:
                 jerk_high_cnt += 1
 
         lon_acc_jerk = {}
-        if len(self.jerk_list) > 0:
-            lon_acc_jerk["max"] = max(self.acc_jerk_list, key=abs)
+        if len(self.acc_jerk_list) > 0:
+            lon_acc_jerk["max"] = abs(max(self.acc_jerk_list, key=abs))
             jerk_avg = np.average(np.absolute(self.acc_jerk_list))
             lon_acc_jerk["avg"] = jerk_avg
         else:
@@ -170,9 +170,9 @@ class LonAcceleration:
                 jerk_high_cnt += 1
 
         lon_dec_jerk = {}
-        if len(self.jerk_list) > 0:
-            lon_dec_jerk["max"] = max(self.acc_jerk_list, key=abs)
-            jerk_avg = np.average(np.absolute(self.acc_jerk_list))
+        if len(self.dec_jerk_list) > 0:
+            lon_dec_jerk["max"] = abs(max(self.dec_jerk_list, key=abs))
+            jerk_avg = np.average(np.absolute(self.dec_jerk_list))
             lon_dec_jerk["avg"] = jerk_avg
         else:
             lon_dec_jerk["max"] = 0
