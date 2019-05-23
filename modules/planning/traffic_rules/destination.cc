@@ -85,14 +85,12 @@ int Destination::MakeDecisions(Frame* frame,
     const auto& pull_over_status =
         PlanningContext::Instance()->planning_status().pull_over();
     if (pull_over_status.is_feasible() &&
-        pull_over_status.has_pull_over_x() &&
-        pull_over_status.has_pull_over_y()) {
+        pull_over_status.has_x() && pull_over_status.has_y()) {
       // build stop decision based on pull-over position
       ADEBUG << "BuildStopDecision: pull-over position";
       common::SLPoint pull_over_sl;
-      reference_line.XYToSL(
-          {pull_over_status.pull_over_x(), pull_over_status.pull_over_y()},
-          &pull_over_sl);
+      reference_line.XYToSL({pull_over_status.x(), pull_over_status.y()},
+                            &pull_over_sl);
 
       const double stop_line_s = pull_over_sl.s() +
                                  VehicleConfigHelper::GetConfig()
