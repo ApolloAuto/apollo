@@ -146,7 +146,7 @@ bool MeasureRepublishProcess::NovatelBestgnssposProcess(
 
   // If sins is align, we only need measure of xyz from bestgnsspos.
   // If sins is not align, in order to init sins, we need
-  // (1) send a initial measure of xyz; (2) send measure of xyz and velocity.
+  // (1) send an initial measure of xyz; (2) send measure of xyz and velocity.
   if (is_sins_align) {
     TransferXYZFromBestgnsspose(bestgnsspos_msg, measure);
   } else {

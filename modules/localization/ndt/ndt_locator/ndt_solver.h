@@ -254,7 +254,7 @@ class NormalDistributionsTransform {
                             Eigen::Matrix<double, 6, 1> *p,
                             bool ComputeHessian = true);
 
-  /**@brief Compute individual point contirbutions to derivatives of
+  /**@brief Compute individual point contributions to derivatives of
    * probability function w.r.t. the transformation vector. */
   double UpdateDerivatives(Eigen::Matrix<double, 6, 1> *score_gradient,
                            Eigen::Matrix<double, 6, 6> *hessian,
@@ -276,7 +276,7 @@ class NormalDistributionsTransform {
                       const PointCloudSource &trans_cloud,
                       Eigen::Matrix<double, 6, 1> *p);
 
-  /**@brief Compute individual point contirbutions to hessian of probability
+  /**@brief Compute individual point contributions to hessian of probability
    * function. */
   void UpdateHessian(Eigen::Matrix<double, 6, 6> *hessian,
                      const Eigen::Vector3d &x_trans,
@@ -302,14 +302,14 @@ class NormalDistributionsTransform {
                                double f_u, double g_u, double a_t, double f_t,
                                double g_t);
 
-  /**@brief Auxilary function used to determine endpoints of More-Thuente
+  /**@brief Auxiliary function used to determine endpoints of More-Thuente
    * interval. */
   inline double AuxilaryFunctionPsimt(double a, double f_a, double f_0,
                                       double g_0, double mu = 1.e-4) {
     return (f_a - f_0 - mu * g_0 * a);
   }
 
-  /**@brief Auxilary function derivative used to determine endpoints of
+  /**@brief Auxiliary function derivative used to determine endpoints of
    * More-Thuente interval. */
   inline double AuxilaryFunctionDpsimt(double g_a, double g_0,
                                        double mu = 1.e-4) {

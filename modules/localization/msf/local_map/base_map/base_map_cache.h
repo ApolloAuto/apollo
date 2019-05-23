@@ -71,7 +71,7 @@ class LRUCache {
   int Capacity() { return capacity_; }
 
  protected:
-  /**@brief do something before remove a element from cache.
+  /**@brief do something before remove an element from cache.
    * Return true if the element can be removed. Return false if the element
    * can't be removed. Then the cache will try to find another element to
    * remove. */
@@ -80,7 +80,7 @@ class LRUCache {
  private:
   /**@brief The max caoacity of LRUCache. */
   int capacity_;
-  /**@brief Increse the search speed in queue. */
+  /**@brief Increase the search speed in queue. */
   std::map<Key, ListIterator> map_;
   /**@brief The least recently used queue. */
   std::list<std::pair<Key, Element *>> list_;
@@ -195,7 +195,7 @@ class MapNodeCacheL1 : public LRUCache<Key, MapNode> {
   explicit MapNodeCacheL1(int capacity) : LRUCache<Key, MapNode>(capacity) {}
 
  protected:
-  /**@brief do something before remove a element from cache.
+  /**@brief do something before remove an element from cache.
    * Return true if the element can be removed. Return false if the element
    * can't be removed. Then the cache will try to find another element to
    * remove. */
@@ -212,7 +212,7 @@ class MapNodeCacheL2 : public LRUCache<Key, MapNode> {
   explicit MapNodeCacheL2(int capacity) : LRUCache<Key, MapNode>(capacity) {}
 
  protected:
-  /**@brief do something before remove a element from cache.
+  /**@brief do something before remove an element from cache.
    * Return true if the element can be removed. Return false if the element
    * can't be removed. Then the cache will try to find another element to
    * remove. */
