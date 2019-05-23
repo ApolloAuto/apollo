@@ -90,7 +90,7 @@ struct LosslessMapCell {
   /**@brief Get the binary size of the object. */
   unsigned int GetBinarySize() const;
 
-  /**@brief Match a layer in the map cell given a altitude.
+  /**@brief Match a layer in the map cell given an altitude.
    * @return The valid layer ID is 1 ~ N (The layer 0 is the layer includes all
    * the samples). If there is no existing layer, return 0. */
   unsigned int GetLayerId(double altitude) const;
