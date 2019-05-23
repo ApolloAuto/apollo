@@ -24,6 +24,7 @@ class LatAcceleration:
         self.centripetal_jerk_list = []
 
     def put(self, adc_trajectory):
+        init_point = adc_trajectory.debug.planning_data.init_point
         # centripetal_jerk
         centripetal_jerk = 2 * init_point.v * init_point.a \
             * init_point.path_point.kappa + init_point.v \
@@ -59,7 +60,7 @@ class LatAcceleration:
         # centripetal_accel
         lat_accel = {}
         if len(self.centripetal_accel_list) > 0:
-            lat_accel["max"] = max(self.centripetal_accel_list, key=abs)
+            lat_accel["max"] = abs(max(self.centripetal_accel_list, key=abs))
             accel_avg = np.average(np.absolute(self.centripetal_accel_list))
             lat_accel["avg"] = accel_avg
         else:
@@ -94,13 +95,13 @@ class LatAcceleration:
         # centripetal_jerk
         lat_jerk = {}
         if len(self.centripetal_jerk_list) > 0:
-            lat_jerk["max"] = max(self.centripetal_jerk_list, key=abs)
+            lat_jerk["max"] = abs(max(self.centripetal_jerk_list, key=abs))
             jerk_avg = np.average(np.absolute(self.centripetal_jerk_list))
             lat_jerk["avg"] = jerk_avg
         else:
             lat_jerk["max"] = 0
             lat_jerk["avg"] = 0
-        lat_jerk["medium_cnt"] = self.lat_jerk_medium_cnt
-        lat_jerk["high_cnt"] = self.lat_jerk_high_cnt
+        lat_jerk["medium_cnt"] = lat_jerk_medium_cnt
+        lat_jerk["high_cnt"] = lat_jerk_high_cnt
 
         return lat_jerk
