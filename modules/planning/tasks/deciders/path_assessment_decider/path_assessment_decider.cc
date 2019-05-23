@@ -364,9 +364,11 @@ void PathAssessmentDecider::SetPathInfo(
   //  - distance to the closest obstacle.
   std::vector<PathPointDecision> path_decision;
   InitPathPointDecision(*path_data, &path_decision);
-  SetPathPointType(reference_line_info, *path_data, &path_decision);
-  SetObstacleDistance(reference_line_info, *path_data, &path_decision);
-
+  if (path_data->path_label().find("fallback") == std::string::npos &&
+      path_data->path_label().find("self") == std::string::npos) {
+    SetPathPointType(reference_line_info, *path_data, &path_decision);
+  }
+  // SetObstacleDistance(reference_line_info, *path_data, &path_decision);
   path_data->SetPathPointDecisionGuide(path_decision);
 }
 
