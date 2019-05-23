@@ -23,8 +23,8 @@ In addition, Lidar connectivity via Ethernet, WWAN gateway via 4G LTE module, an
 
 1. General purpose UART port(reserved) 
 2. External PCI Express Port (Support X4 or X8) For connections to IPC, please use EXTN port.
-3. GPS PPS / GPRMC Output Rectangular Port (3 Ports) for LiDAR
-4. Power and PPS/GPRMC Cylindrical Output Port for Stereo Camera/ LiDAR
+3. GPS PPS/GPRMC Output Rectangular Port (3 Ports) for LiDAR
+4. Power and PPS/GPRMC Cylindrical Output Port for Stereo Camera/LiDAR
 5. CAN Bus (4 Ports)
 6. Main Power Input Connector 
 
