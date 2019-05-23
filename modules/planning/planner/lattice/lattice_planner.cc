@@ -167,8 +167,7 @@ Status LatticePlanner::PlanOnReferenceLine(
   // 4. parse the decision and get the planning target.
   auto ptr_path_time_graph = std::make_shared<PathTimeGraph>(
       ptr_prediction_querier->GetObstacles(), *ptr_reference_line,
-      reference_line_info, init_s[0],
-      init_s[0] + FLAGS_speed_lon_decision_horizon, 0.0,
+      reference_line_info, init_s[0], init_s[0] + FLAGS_decision_horizon, 0.0,
       FLAGS_trajectory_time_length, init_d);
 
   double speed_limit =

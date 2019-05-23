@@ -343,8 +343,8 @@ DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
 DEFINE_double(trajectory_space_resolution, 1.0,
               "Trajectory space resolution in planning");
-DEFINE_double(speed_lon_decision_horizon, 200.0,
-              "Longitudinal horizon for speed decision making (meter)");
+DEFINE_double(decision_horizon, 200.0,
+              "Longitudinal horizon for decision making");
 DEFINE_uint64(num_velocity_sample, 6,
               "The number of velocity samples in end condition sampler.");
 DEFINE_bool(enable_backup_trajectory, true,

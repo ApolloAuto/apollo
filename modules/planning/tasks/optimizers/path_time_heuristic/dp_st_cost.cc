@@ -110,7 +110,9 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
     }
 
     auto boundary = obstacle->st_boundary();
-    if (boundary.min_s() > FLAGS_speed_lon_decision_horizon) {
+    // TODO(all): merge this parameter with existing parameter
+    const double kIgnoreDistance = 200.0;
+    if (boundary.min_s() > kIgnoreDistance) {
       continue;
     }
     if (t < boundary.min_t() || t > boundary.max_t()) {
@@ -133,8 +135,8 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
     }
     if (s < s_lower) {
       // TODO(all): merge this parameter with existing parameter
-      const double follow_distance_s =
-          obstacle->speed() * config_.safe_time_buffer();
+      constexpr double kSafeTimeBuffer = 3.0;
+      const double follow_distance_s = obstacle->speed() * kSafeTimeBuffer;
       if (s + follow_distance_s < s_lower) {
         continue;
       } else {
@@ -143,10 +145,11 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
                 s_diff * s_diff;
       }
     } else if (s > s_upper) {
-      if (s > s_upper + config_.safe_distance()) {
+      const double kSafeDistance = 20.0;  // or calculated from velocity
+      if (s > s_upper + kSafeDistance) {
         continue;
       } else {
-        auto s_diff = config_.safe_distance() + s_upper - s;
+        auto s_diff = kSafeDistance + s_upper - s;
         cost += config_.obstacle_weight() * config_.default_obstacle_cost() *
                 s_diff * s_diff;
       }
