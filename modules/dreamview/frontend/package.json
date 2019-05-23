@@ -5,7 +5,7 @@
     "main": "app.js",
     "author": "adu-sim",
     "license": "Apache-2.0",
-    "engines" : {
+    "engines": {
         "npm": ">=5.6.0",
         "node": ">=8.11.1"
     },
@@ -64,7 +64,7 @@
         "url-loader": "^0.5.8",
         "webapp-webpack-plugin": "^2.6.0",
         "webpack": "^4.0.0",
-        "webpack-bundle-analyzer": "^3.0.3",
+        "webpack-bundle-analyzer": "^3.3.2",
         "webpack-cli": "^3.2.3",
         "webpack-dev-server": "^3.1.14",
         "worker-loader": "^1.1.0",
