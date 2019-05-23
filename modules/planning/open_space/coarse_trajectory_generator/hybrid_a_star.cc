@@ -457,10 +457,9 @@ bool HybridAStar::CombinePathAndSpeedProfile(
     return false;
   }
 
-  const double kEpsilon = 1e-6;
+  const double total_time_upper_bound = speed_data.TotalTime() + 1e-6;
 
-  for (double cur_rel_time = 0.0;
-       cur_rel_time < speed_data.TotalTime() + kEpsilon;
+  for (double cur_rel_time = 0.0; cur_rel_time < total_time_upper_bound;
        cur_rel_time += delta_t_) {
     common::SpeedPoint speed_point;
     if (!speed_data.EvaluateByTime(cur_rel_time, &speed_point)) {
@@ -480,6 +479,8 @@ bool HybridAStar::CombinePathAndSpeedProfile(
 
     common::PathPoint path_point = discretized_path.Evaluate(speed_point.s());
     path_point.set_s(path_point.s());
+
+    ADEBUG << "path_point debug: " << path_point.ShortDebugString();
 
     result->x.push_back(path_point.x());
     result->y.push_back(path_point.y());
@@ -556,7 +557,7 @@ bool HybridAStar::TrajectoryPartition(
         AERROR << "GenerateSCurveSpeedAcceleration fail";
         return false;
       }
-      AERROR << "result size before combination: x, " << result.x.size()
+      ADEBUG << "result size before combination: x, " << result.x.size()
              << " steer: " << result.steer.size()
              << " acceleration: " << result.a.size();
 
