@@ -122,9 +122,6 @@ DEFINE_double(look_forward_extend_distance, 50,
 DEFINE_double(reference_line_stitch_overlap_distance, 20,
               "The overlap distance with the existing reference line when "
               "stitching the existing reference line");
-DEFINE_double(reference_line_lateral_buffer, 0.5,
-              "When creating reference line, the minimum distance with road "
-              "curb for a vehicle driving on this line.");
 
 DEFINE_bool(enable_smooth_reference_line, true,
             "enable smooth the map reference line");
