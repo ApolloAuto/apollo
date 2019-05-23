@@ -207,6 +207,7 @@ cc_library(
         "//modules/common/math",
         "//modules/planning/common/path:discretized_path",
         "//modules/planning/common/speed:speed_data",
+        "//modules/planning/common:speed_profile_generator",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/math:discrete_points_math",
         "//modules/planning/math/discretized_points_smoothing:fem_pos_deviation_smoother",

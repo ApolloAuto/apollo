@@ -25,9 +25,9 @@
 
 #include "Eigen/Eigen"
 
-#include "modules/common/math/vec2d.h"
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/line_segment2d.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/planning/common/path/discretized_path.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
@@ -52,7 +52,7 @@ class IterativeAnchoringSmoother {
                   DiscretizedPath* smoothed_path_points);
 
   bool CheckCollisionAvoidance(const DiscretizedPath& path_points,
-                      std::vector<size_t>* colliding_point_index);
+                               std::vector<size_t>* colliding_point_index);
 
   void AdjustPathBounds(const std::vector<size_t>& colliding_point_index,
                         std::vector<double>* bounds);
@@ -65,9 +65,11 @@ class IterativeAnchoringSmoother {
   bool SmoothSpeed(const double init_a, const double init_v,
                    const double path_length, SpeedData* smoothed_speeds);
 
-  bool CombinePathAndSpeed(const DiscretizedPath& raw_path_points,
-                           const SpeedData& smoothed_speeds,
+  bool CombinePathAndSpeed(const DiscretizedPath& path_points,
+                           const SpeedData& speed_points,
                            DiscretizedTrajectory* discretized_trajectory);
+
+  void AdjustPathAndSpeedByGear(DiscretizedTrajectory* discretized_trajectory);
 
  private:
   // vehicle_param

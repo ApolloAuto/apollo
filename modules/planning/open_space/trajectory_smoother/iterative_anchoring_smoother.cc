@@ -25,11 +25,13 @@
 #include "modules/common/math/math_utils.h"
 #include "modules/planning/math/discrete_points_math.h"
 #include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_smoother.h"
+#include "modules/planning/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
 using apollo::common::math::Box2d;
 using apollo::common::math::LineSegment2d;
 using apollo::common::math::NormalizeAngle;
@@ -53,6 +55,8 @@ bool IterativeAnchoringSmoother::Smooth(
               "returned";
     return false;
   }
+  const auto start_timestamp = std::chrono::system_clock::now();
+
   // Set gear of the trajectory
   gear_ = CheckGear(xWS);
 
@@ -144,12 +148,22 @@ bool IterativeAnchoringSmoother::Smooth(
   bounds[interpolated_path_size - 1] = 0.0;
   bounds[interpolated_path_size - 2] = 0.0;
 
+  const auto path_smooth_start_timestamp = std::chrono::system_clock::now();
+
   // Smooth path to have smoothed x, y, phi, kappa and s
   DiscretizedPath smoothed_path_points;
   if (!SmoothPath(interpolated_warm_start_path, bounds,
                   &smoothed_path_points)) {
     return false;
   }
+
+  const auto path_smooth_end_timestamp = std::chrono::system_clock::now();
+  std::chrono::duration<double> path_smooth_diff =
+      path_smooth_end_timestamp - path_smooth_start_timestamp;
+  ADEBUG << "iterative anchoring smoother totoal time: "
+         << path_smooth_diff.count() * 1000.0 << " ms.";
+
+  const auto speed_smooth_start_timestamp = std::chrono::system_clock::now();
 
   // Smooth speed to have smoothed v and a
   SpeedData smoothed_speeds;
@@ -158,11 +172,24 @@ bool IterativeAnchoringSmoother::Smooth(
     return false;
   }
 
+  const auto speed_smooth_end_timestamp = std::chrono::system_clock::now();
+  std::chrono::duration<double> speed_smooth_diff =
+      speed_smooth_end_timestamp - speed_smooth_start_timestamp;
+  ADEBUG << "iterative anchoring smoother totoal time: "
+         << speed_smooth_diff.count() * 1000.0 << " ms.";
+
   // Combine path and speed
   if (!CombinePathAndSpeed(smoothed_path_points, smoothed_speeds,
                            discretized_trajectory)) {
     return false;
   }
+
+  AdjustPathAndSpeedByGear(discretized_trajectory);
+
+  const auto end_timestamp = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff = end_timestamp - start_timestamp;
+  ADEBUG << "iterative anchoring smoother totoal time: "
+         << diff.count() * 1000.0 << " ms.";
   return true;
 }
 
@@ -191,6 +218,7 @@ bool IterativeAnchoringSmoother::SmoothPath(
   bool is_collision_free = false;
   std::vector<size_t> colliding_point_index;
   std::vector<std::pair<double, double>> smoothed_point2d;
+  size_t counter = 0;
   while (!is_collision_free) {
     AdjustPathBounds(colliding_point_index, &flexible_bounds);
     fem_pos_smoother.set_ref_points(raw_point2d);
@@ -224,6 +252,7 @@ bool IterativeAnchoringSmoother::SmoothPath(
 
     is_collision_free =
         CheckCollisionAvoidance(*smoothed_path_points, &colliding_point_index);
+    ADEBUG << "loop iteration number is " << counter;
   }
   return true;
 }
@@ -236,11 +265,13 @@ bool IterativeAnchoringSmoother::CheckCollisionAvoidance(
   colliding_point_index->clear();
   size_t path_points_size = path_points.size();
   for (size_t i = 0; i < path_points_size; ++i) {
-    Box2d ego_box({path_points[i].x() + center_shift_distance_ *
-                                            std::cos(path_points[i].theta()),
-                   path_points[i].y() + center_shift_distance_ *
-                                            std::sin(path_points[i].theta())},
-                  path_points[i].theta(), ego_length_, ego_width_);
+    const double heading = gear_
+                               ? path_points[i].theta()
+                               : NormalizeAngle(path_points[i].theta() + M_PI);
+    Box2d ego_box(
+        {path_points[i].x() + center_shift_distance_ * std::cos(heading),
+         path_points[i].y() + center_shift_distance_ * std::sin(heading)},
+        heading, ego_length_, ego_width_);
     for (const auto& obstacle_linesegments : obstacles_linesegments_vec_) {
       for (const LineSegment2d& linesegment : obstacle_linesegments) {
         if (ego_box.HasOverlap(linesegment)) {
@@ -261,7 +292,7 @@ void IterativeAnchoringSmoother::AdjustPathBounds(
     std::vector<double>* bounds) {
   CHECK_NOTNULL(bounds);
   CHECK_GT(bounds->size(), *(std::max_element(colliding_point_index.begin(),
-                                            colliding_point_index.end())));
+                                              colliding_point_index.end())));
   if (colliding_point_index.empty()) {
     return;
   }
@@ -275,7 +306,7 @@ void IterativeAnchoringSmoother::AdjustPathBounds(
 bool IterativeAnchoringSmoother::SetPathProfile(
     const std::vector<std::pair<double, double>>& point2d,
     DiscretizedPath* raw_path_points) {
-  CHECK_NOTNUll(raw_path_points);
+  CHECK_NOTNULL(raw_path_points);
   // Compute path profile
   std::vector<double> headings;
   std::vector<double> kappas;
@@ -289,19 +320,6 @@ bool IterativeAnchoringSmoother::SetPathProfile(
   CHECK_EQ(point2d.size(), kappas.size());
   CHECK_EQ(point2d.size(), dkappas.size());
   CHECK_EQ(point2d.size(), accumulated_s.size());
-
-  // Adjust heading, kappa and dkappa direction according to gear
-  if (!gear_) {
-    std::for_each(headings.begin(), headings.end(), [](double& heading) {
-      heading = NormalizeAngle(heading + M_PI);
-    });
-    std::for_each(kappas.begin(), kappas.end(),
-                  [](double& kappa) { kappa = -kappa; });
-    std::for_each(accumulated_s.begin(), accumulated_s.end(),
-                  [](double& accumulated_distance) {
-                    accumulated_distance = -accumulated_distance;
-                  });
-  }
 
   // Load into path point
   size_t points_size = point2d.size();
@@ -333,13 +351,113 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
                                              const double init_v,
                                              const double path_length,
                                              SpeedData* smoothed_speeds) {
+  // TODO(Jinyun): move to confs
+  const double max_v = 2.0;
+  const double max_acc = 1.0;
+  const double max_acc_jerk = 3.0;
+  const double delta_t = 0.2;
+  const double total_t = 8.0;
+  const size_t num_of_knots = static_cast<size_t>(total_t / delta_t) + 1;
+  std::array<double, 3> init_s = {0.0, std::abs(init_v), std::abs(init_a)};
+  std::array<double, 3> end_s = {path_length, 0.0, 0.0};
+
+  PiecewiseJerkSpeedProblem piecewise_jerk_problem(num_of_knots, delta_t,
+                                                   init_s);
+
+  piecewise_jerk_problem.set_end_state_ref({10000.0, 0.0, 0.0}, end_s);
+
+  // TODO(Jinyun): tune the params and move to a config
+  piecewise_jerk_problem.set_weight_ddx(1.0);
+  piecewise_jerk_problem.set_weight_dddx(0.01);
+  piecewise_jerk_problem.set_x_bounds(0.0, path_length);
+  piecewise_jerk_problem.set_dx_bounds(0.0, std::fmax(max_v, std::abs(init_v)));
+  piecewise_jerk_problem.set_ddx_bounds(-max_acc, max_acc);
+  piecewise_jerk_problem.set_dddx_bound(max_acc_jerk);
+
+  // Solve the problem
+  if (!piecewise_jerk_problem.Optimize()) {
+    AERROR << "Piecewise jerk speed optimizer failed!";
+    return false;
+  }
+
+  // Extract output
+  const std::vector<double>& s = piecewise_jerk_problem.opt_x();
+  const std::vector<double>& ds = piecewise_jerk_problem.opt_dx();
+  const std::vector<double>& dds = piecewise_jerk_problem.opt_ddx();
+
+  // Assign speed point by gear
+  SpeedData speed_data;
+  speed_data.AppendSpeedPoint(s[0], 0.0, ds[0], dds[0], 0.0);
+  for (size_t i = 1; i < num_of_knots; ++i) {
+    // Avoid the very last points when already stopped
+    if (s[i] - s[i - 1] <= 0.0 || ds[i] <= 0.0) {
+      break;
+    }
+    speed_data.AppendSpeedPoint(s[i], delta_t * static_cast<double>(i), ds[i],
+                                dds[i], (dds[i] - dds[i - 1]) / delta_t);
+  }
+
+  // Check the speed planning ends at desired path length
+  if (speed_data.back().s() < path_length) {
+    AERROR << "speed_data.back().s() is " << speed_data.back().s()
+           << "and path_length is " << path_length;
+    return false;
+  }
+
   return true;
 }
 
 bool IterativeAnchoringSmoother::CombinePathAndSpeed(
-    const DiscretizedPath& raw_path_points, const SpeedData& smoothed_speeds,
+    const DiscretizedPath& path_points, const SpeedData& speed_points,
     DiscretizedTrajectory* discretized_trajectory) {
+  // TODO(Jinyun): move to confs
+  const double kDenseTimeResoltuion = 0.2;
+  if (path_points.empty()) {
+    AERROR << "path data is empty";
+    return false;
+  }
+  for (double cur_rel_time = 0.0; cur_rel_time < speed_points.TotalTime();
+       cur_rel_time += kDenseTimeResoltuion) {
+    common::SpeedPoint speed_point;
+    if (!speed_points.EvaluateByTime(cur_rel_time, &speed_point)) {
+      AERROR << "Fail to get speed point with relative time " << cur_rel_time;
+      return false;
+    }
+
+    if (speed_point.s() > path_points.Length()) {
+      break;
+    }
+
+    common::PathPoint path_point = path_points.Evaluate(speed_point.s());
+
+    common::TrajectoryPoint trajectory_point;
+    trajectory_point.mutable_path_point()->CopyFrom(path_point);
+    trajectory_point.set_v(speed_point.v());
+    trajectory_point.set_a(speed_point.a());
+    trajectory_point.set_relative_time(speed_point.t());
+    discretized_trajectory->AppendTrajectoryPoint(trajectory_point);
+  }
   return true;
+}
+
+void IterativeAnchoringSmoother::AdjustPathAndSpeedByGear(
+    DiscretizedTrajectory* discretized_trajectory) {
+  if (gear_) {
+    return;
+  }
+  std::for_each(
+      discretized_trajectory->begin(), discretized_trajectory->end(),
+      [](TrajectoryPoint& trajectory_point) {
+        trajectory_point.mutable_path_point()->set_theta(
+            NormalizeAngle(trajectory_point.path_point().theta() + M_PI));
+        trajectory_point.mutable_path_point()->set_s(
+            -1.0 * trajectory_point.path_point().s());
+        trajectory_point.mutable_path_point()->set_kappa(
+            -1.0 * trajectory_point.path_point().kappa());
+        // dkappa stays the same as direction of both kappa and s are reversed
+        trajectory_point.set_v(-1.0 * trajectory_point.v());
+        trajectory_point.set_a(-1.0 * trajectory_point.a());
+      });
 }
 }  // namespace planning
 }  // namespace apollo
