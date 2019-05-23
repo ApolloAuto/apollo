@@ -243,6 +243,9 @@ default_task_config: {
   path_bounds_decider_config {
     is_lane_borrowing: false
     is_pull_over: false
+    pull_over_destination_to_adc_buffer: 25.0
+    pull_over_destination_to_pathend_buffer: 10.0
+    pull_over_road_edge_buffer: 0.15
   }
 }
 default_task_config: {
