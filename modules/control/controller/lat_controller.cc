@@ -607,8 +607,10 @@ void LatController::ComputeLateralErrors(
   const double dx = x - target_point.path_point().x();
   const double dy = y - target_point.path_point().y();
 
-  debug->mutable_current_target_point()->set_x(target_point.path_point().x());
-  debug->mutable_current_target_point()->set_y(target_point.path_point().y());
+  debug->mutable_current_target_point()->mutable_path_point()->set_x(
+      target_point.path_point().x());
+  debug->mutable_current_target_point()->mutable_path_point()->set_y(
+      target_point.path_point().y());
 
   ADEBUG << "x point: " << x << " y point: " << y;
   ADEBUG << "match point information : " << target_point.ShortDebugString();
