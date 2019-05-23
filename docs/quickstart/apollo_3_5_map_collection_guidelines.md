@@ -126,45 +126,16 @@ The only special case is that the additional front lidar 16 (which is facing upw
 2. For Lidar topics:
     - For the vehicles that are needed for map data verification, all the LiDAR related point cloud topics (velodynescan, pointcloud2, compenstator/pointcloud2) must be saved and sent to us
     - After the vehicle passes the map verification, only velodynescan & pointcloud2 are needed for map creation
+3.  Compress the data collected to reduce the upload time.
 
 ## Data Upload
 
-The collected map data is placed in the */apollo/data/bag/(start time of collection, e.g.,2018-04-14-21-20-24)* directory by default, package the data as tar.gz compressed file and upload them to the [Apollo Data Official Website](http://data.apollo.auto/hd_map_intro/?locale=en-us).
+The collected map data is placed in the */apollo/data/bag/(start time of collection, e.g.,2018-04-14-21-20-24)* directory by default, package the data as tar.gz compressed file and contact the team (wuzhenni01@baidu.com) to learn how to mail/upload your data to us for map generation.
 
 ```
 Note:
-Please follow the aforementioned data collection guide to acquire data for a small area and upload it to use for verification purposes.
+Please follow the aforementioned data collection guide to acquire data for a small area and upload it to use for verification purposes. This step is vital to understand if your sensors have captured the right data for our map generation process.
 ```
-
-You could always reach out to the team to upload the data for you. 
-
-## Map Production Service
-
-1. **Permission Application**
-
-Firstly, you would need to create a Baidu account, log into the account, and apply for permission to use map production service (you only need to apply once， skip this step if you have already applied).
-
-![](images/map_collection_request_en.png)
-
-2. **Map Technical Service**
-
-Users can create new areas, create mapping tasks, manage map data, track the progress of cartography, and download map data on this page. 
-
-![](images/map_collection_Area_en.png)
-
-
-3. **Data Management**
-
-After clicking “Management”, users can open the data management page. On this page, you can view the description of data upload. After all the data is uploaded, the data can be submitted. Once the data is submitted, you will be unable to edit it as this initiates the drawing process.
-
-![](images/map_collection_Management_en.png)
-
-4. **Data Download**
-
-When the demand status is "Published", click "Download" to download the map data. If you need to update the map, please click "Update Data" to initiate the mapping process. You would need to re-upload the data and submit it to restart the drawing process.
-
-![](images/map_collection_Download_en.png)
-
 
 ## FAQs
 
