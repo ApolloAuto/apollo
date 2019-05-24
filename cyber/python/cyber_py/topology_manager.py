@@ -48,14 +48,15 @@ class Topology_Manager(object):
         Init Topology Manager.
         """
         print("init topology manager successful")
-        self.node_manager = "null"
-        self.channel_manager = "null"
+        self.node_manager = None
+        self.channel_manager = None
 
     def has_node(self, node_name):
         """
         check Has Specific Node.
         """
-        self.node_manager = _CYBER_TOPOLOGY_MANAGER.new_Node_Manager()
+        if not self.node_manager:
+            self.node_manager = _CYBER_TOPOLOGY_MANAGER.new_Node_Manager()
         flag = _CYBER_TOPOLOGY_MANAGER.Py_HasNode(self.node_manager, node_name)
         return flag
 
@@ -63,7 +64,8 @@ class Topology_Manager(object):
         """
         Get Node List.
         """
-        self.node_manager = _CYBER_TOPOLOGY_MANAGER.new_Node_Manager()
+        if not self.node_manager:
+            self.node_manager = _CYBER_TOPOLOGY_MANAGER.new_Node_Manager()
         node_list = _CYBER_TOPOLOGY_MANAGER.Py_GetNodeList(self.node_manager)
         return node_list
 
@@ -71,7 +73,8 @@ class Topology_Manager(object):
         """
         Show Node Info.
         """
-        self.node_manager = _CYBER_TOPOLOGY_MANAGER.new_Node_Manager()
+        if not self.node_manager:
+            self.node_manager = _CYBER_TOPOLOGY_MANAGER.new_Node_Manager()
         ret = _CYBER_TOPOLOGY_MANAGER.Py_ShowNodeInfo(
             self.node_manager, node_name)
         return ret
@@ -80,7 +83,8 @@ class Topology_Manager(object):
         """
         Get Channel List.
         """
-        self.channel_manager = _CYBER_TOPOLOGY_MANAGER.new_Channel_Manager()
+        if not self.channel_manager:
+            self.channel_manager = _CYBER_TOPOLOGY_MANAGER.new_Channel_Manager()
         channel_list = _CYBER_TOPOLOGY_MANAGER.Py_GetChannelList(
             self.channel_manager)
         return channel_list
@@ -89,7 +93,8 @@ class Topology_Manager(object):
         """
         Get Reader List.
         """
-        self.channel_manager = _CYBER_TOPOLOGY_MANAGER.new_Channel_Manager()
+        if not self.channel_manager:
+            self.channel_manager = _CYBER_TOPOLOGY_MANAGER.new_Channel_Manager()
         reader_list = _CYBER_TOPOLOGY_MANAGER.Py_GetReaderList(
             self.channel_manager)
         return reader_list
@@ -98,7 +103,8 @@ class Topology_Manager(object):
         """
         Get Writer List.
         """
-        self.channel_manager = _CYBER_TOPOLOGY_MANAGER.new_Channel_Manager()
+        if not self.channel_manager:
+            self.channel_manager = _CYBER_TOPOLOGY_MANAGER.new_Channel_Manager()
         writer_list = _CYBER_TOPOLOGY_MANAGER.Py_GetWriterList(
             self.channel_manager)
         return writer_list
@@ -107,7 +113,8 @@ class Topology_Manager(object):
         """
         Get Node Writes.
         """
-        self.channel_manager = _CYBER_TOPOLOGY_MANAGER.new_Channel_Manager()
+        if not self.channel_manager:
+            self.channel_manager = _CYBER_TOPOLOGY_MANAGER.new_Channel_Manager()
         node_writers = _CYBER_TOPOLOGY_MANAGER.Py_GetWritersOfNode(
             self.channel_manager, node_name)
         return node_writers
@@ -116,7 +123,8 @@ class Topology_Manager(object):
         """
         Get Node Readers.
         """
-        self.channel_manager = _CYBER_TOPOLOGY_MANAGER.new_Channel_Manager()
+        if not self.channel_manager:
+            self.channel_manager = _CYBER_TOPOLOGY_MANAGER.new_Channel_Manager()
         node_readers = _CYBER_TOPOLOGY_MANAGER.Py_GetReadersOfNode(
             self.channel_manager, node_name)
         return node_readers
@@ -125,7 +133,8 @@ class Topology_Manager(object):
         """
         Show Channel Info.
         """
-        self.channel_manager = _CYBER_TOPOLOGY_MANAGER.new_Channel_Manager()
+        if not self.channel_manager:
+            self.channel_manager = _CYBER_TOPOLOGY_MANAGER.new_Channel_Manager()
         ret = _CYBER_TOPOLOGY_MANAGER.Py_ShowChannelInfo(
             self.channel_manager, channel_name)
         return ret
