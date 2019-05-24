@@ -76,36 +76,31 @@ bool ReferenceLine::Stitch(const ReferenceLine& other) {
     AWARN << "Failed to project the first point to the other reference line.";
     return false;
   }
-  constexpr double kStitchingError = 2e-2;
-  bool first_join = first_sl.s() > 0 && first_sl.s() < other.Length() &&
-                    std::fabs(first_sl.l()) < kStitchingError;
+  bool first_join = first_sl.s() > 0 && first_sl.s() < other.Length();
+
   auto last_point = reference_points_.back();
   common::SLPoint last_sl;
   if (!other.XYToSL(last_point, &last_sl)) {
     AWARN << "Failed to project the last point to the other reference line.";
     return false;
   }
-  bool last_join = last_sl.s() > 0 && last_sl.s() < other.Length() &&
-                   std::fabs(last_sl.l()) < kStitchingError;
-  const auto& other_points = other.reference_points();
+  bool last_join = last_sl.s() > 0 && last_sl.s() < other.Length();
+
   if (!first_join && !last_join) {
-    common::SLPoint other_first;
-    if (!XYToSL(other_points.front(), &other_first)) {
-      AERROR << "Cannot project point : " << other_points.front().DebugString();
-      return false;
-    }
-    bool other_on_current = other_first.s() >= 0 &&
-                            other_first.s() < Length() &&
-                            std::fabs(other_first.l()) < kStitchingError;
-    if (other_on_current) {
-      return true;
-    }
     AERROR << "These reference lines are not connected.";
     return false;
   }
+
   const auto& accumulated_s = other.map_path().accumulated_s();
+  const auto& other_points = other.reference_points();
   auto lower = accumulated_s.begin();
+  constexpr double kStitchingError = 1e-1;
   if (first_join) {
+    if (first_sl.l() > kStitchingError) {
+      AERROR << "lateral stitching error on first join of reference line too "
+                "big, stitching fails";
+      return false;
+    }
     lower = std::lower_bound(accumulated_s.begin(), accumulated_s.end(),
                              first_sl.s());
     size_t start_i = std::distance(accumulated_s.begin(), lower);
@@ -113,6 +108,11 @@ bool ReferenceLine::Stitch(const ReferenceLine& other) {
                              other_points.begin() + start_i);
   }
   if (last_join) {
+    if (last_sl.l() > kStitchingError) {
+      AERROR << "lateral stitching error on first join of reference line too "
+                "big, stitching fails";
+      return false;
+    }
     auto upper = std::upper_bound(lower, accumulated_s.end(), last_sl.s());
     auto end_i = std::distance(accumulated_s.begin(), upper);
     reference_points_.insert(reference_points_.end(),
@@ -209,7 +209,7 @@ common::FrenetFramePoint ReferenceLine::GetFrenetPoint(
   return frenet_frame_point;
 }
 
-std::pair<std::array<double, 3>, std::array<double, 3> >
+std::pair<std::array<double, 3>, std::array<double, 3>>
 ReferenceLine::ToFrenetFrame(const common::TrajectoryPoint& traj_point) const {
   CHECK(!reference_points_.empty());
 
