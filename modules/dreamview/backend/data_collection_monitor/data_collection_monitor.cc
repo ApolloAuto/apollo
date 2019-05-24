@@ -84,7 +84,7 @@ bool IsCompliedWithCriterion(float actual_value,
     case ComparisonOperator::NOT_EQUAL:
       return (actual_value != target_value);
     default:
-      AERROR << "Unsupported comparision operator found:"
+      AERROR << "Unsupported comparison operator found:"
              << comparison_operator;
       return false;
   }
