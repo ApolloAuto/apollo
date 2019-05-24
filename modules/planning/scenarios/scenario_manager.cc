@@ -913,8 +913,7 @@ void ScenarioManager::UpdatePlanningContextPullOverScenario(
   if (scenario_type != ScenarioConfig::PULL_OVER) {
     PlanningContext::Instance()
         ->mutable_planning_status()
-        ->mutable_pull_over()
-        ->Clear();
+        ->clear_pull_over();
     return;
   }
 }
