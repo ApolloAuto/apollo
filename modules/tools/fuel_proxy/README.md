@@ -5,7 +5,7 @@ partners.
 
 ## Prerequisite
 
-1. Install and activate the corresponded Conda environment.
+1. Install and activate the corresponding Conda environment.
 
    ```bash
    conda env update -f conda-py37.yaml
