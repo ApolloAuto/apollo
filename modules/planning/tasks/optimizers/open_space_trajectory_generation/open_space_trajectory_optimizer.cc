@@ -776,10 +776,39 @@ bool OpenSpaceTrajectoryOptimizer::GenerateDecoupledTraj(
   return true;
 }
 
+// TODO(Jinyun): tmp interface, will refactor
 void OpenSpaceTrajectoryOptimizer::LoadResult(
     const DiscretizedTrajectory& discretized_trajectory,
     Eigen::MatrixXd* state_result_dc, Eigen::MatrixXd* control_result_dc,
-    Eigen::MatrixXd* time_result_dc) {}
+    Eigen::MatrixXd* time_result_dc) {
+  const size_t points_size = discretized_trajectory.size();
+  CHECK_GT(points_size, 1);
+  *state_result_dc = Eigen::MatrixXd::Zero(4, points_size);
+  *control_result_dc = Eigen::MatrixXd::Zero(2, points_size - 1);
+  *time_result_dc = Eigen::MatrixXd::Zero(1, points_size - 1);
+
+  auto& state_result = *state_result_dc;
+  for (size_t i = 0; i < points_size; ++i) {
+    state_result(0, i) = discretized_trajectory[i].path_point().x();
+    state_result(1, i) = discretized_trajectory[i].path_point().y();
+    state_result(2, i) = discretized_trajectory[i].path_point().theta();
+    state_result(3, i) = discretized_trajectory[i].v();
+  }
+
+  auto& control_result = *control_result_dc;
+  auto& time_result = *time_result_dc;
+  const double wheel_base = common::VehicleConfigHelper::Instance()
+                                ->GetConfig()
+                                .vehicle_param()
+                                .wheel_base();
+  for (size_t i = 0; i + 1 < points_size; ++i) {
+    control_result(0, i) =
+        std::atan(discretized_trajectory[i].path_point().kappa() * wheel_base);
+    control_result(1, i) = discretized_trajectory[i].a();
+    time_result(0, i) = discretized_trajectory[i + 1].relative_time() -
+                        discretized_trajectory[i].relative_time();
+  }
+}
 
 }  // namespace planning
 }  // namespace apollo
