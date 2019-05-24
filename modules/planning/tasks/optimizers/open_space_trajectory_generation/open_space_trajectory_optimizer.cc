@@ -167,6 +167,17 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
         return Status(ErrorCode::PLANNING_ERROR,
                       "distance approach smoothing problem failed to solve");
       }
+
+      // TODO(Jinyun): Further testing
+      // if (!GenerateDecoupledTraj(
+      //         xWS_vec[i], last_time_u(1, 0), init_v, obstacles_vertices_vec,
+      //         &state_result_ds_vec[i], &control_result_ds_vec[i],
+      //         &time_result_ds_vec[i])) {
+      //   ADEBUG << "Smoother fail at " << i << "th trajectory";
+      //   ADEBUG << i << "th trajectory size is " << xWS_vec[i].cols();
+      //   return Status(ErrorCode::PLANNING_ERROR,
+      //                 "distance approach smoothing problem failed to solve");
+      // }
     }
 
     // Retrive the trajectory in one piece
