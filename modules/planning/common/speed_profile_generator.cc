@@ -67,7 +67,7 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(num_of_knots, delta_t,
                                                    init_s);
 
-  piecewise_jerk_problem.set_end_state_ref({10000.0, 0.0, 0.0}, end_s);
+  piecewise_jerk_problem.set_end_state_ref({1000.0, 0.0, 0.0}, end_s);
 
   // TODO(Hongyi): tune the params and move to a config
   piecewise_jerk_problem.set_weight_ddx(1.0);
