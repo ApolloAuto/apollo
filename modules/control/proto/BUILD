@@ -26,7 +26,7 @@ proto_library(
         "//modules/common/proto:drive_state_proto_lib",
         "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:header_proto_lib",
-        "//modules/common/proto:vehicle_signal_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
+        "//modules/common/proto:vehicle_signal_proto_lib",
     ],
 )
