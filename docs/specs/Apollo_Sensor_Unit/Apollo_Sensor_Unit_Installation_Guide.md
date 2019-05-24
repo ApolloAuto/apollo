@@ -43,7 +43,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
    |MFR|MPN|Description|
    |---------------|--------|-----------|
    |TE Connectivity|DTF13-2P|DT RECP ASM|
-    |
+    
 
    | PIN # | NAME | I/O  | Description        |
    | ----- | ---- | ---- | ------------------ |
@@ -71,7 +71,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
    | MFR             | MPN       | Description                               |
    | :-------------- | --------- | ----------------------------------------- |
    | TE Connectivity | 1565749-1 | Automotive Connectors 025 CAP ASSY, 4 Pin |
-    |
+    
 
    | PIN # | NAME  | I/O   | Description                                                  |
    | ----- | ----- | ----- | ------------------------------------------------------------ |
@@ -89,7 +89,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
    |MFR| MPN| Description|
    | --------------- | --------- | ------------------------------------------------- |
    | TE Connectivity | 1376350-2 | Automotive Connectors 025 I/O CAP HSG ASSY, 8 Pin |
-    |
+    
 
    | PIN # | NAME   | I/O    | Description                                             |
    | ----- | ------ | ------ | ------------------------------------------------------- |
@@ -111,7 +111,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
    | MFR             | MPN       | Description                                        |
    | --------------- | --------- | -------------------------------------------------- |
    | TE Connectivity | 1318772-2 | Automotive Connectors 025 I/O CAP HSG ASSY, 12 Pin |
-     |
+     
 
    | PIN # | NAME   | I/O   | Description     |
    | ----- | ------ | ----- | --------------- |
@@ -163,7 +163,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
       | MFR             | MPN       | Description                                        |
    | --------------- | --------- | -------------------------------------------------- |
    | Digi-Key | APC1735-ND | CONN RCPT FMALE 8POS SOLDER CUP |
-    |
+
    
 
     | PIN # | NAME   | I/O   | Description     |
