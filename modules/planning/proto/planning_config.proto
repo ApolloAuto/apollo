@@ -130,15 +130,16 @@ message ScenarioTrafficLightUnprotectedRightTurnConfig {
   optional double min_pass_s_distance = 5 [default = 3.0];  // meter
   optional float red_light_right_turn_stop_duration_sec = 6 [default = 3.0];  // sec
   optional float creep_timeout_sec = 7 [default = 10.0];  // sec
-
 }
 
 message ScenarioPullOverConfig {
   optional double start_pull_over_scenario_distance = 1 [default = 50.0];  // meter
-  optional double max_adc_stop_speed = 2 [default = 0.1];  // m/s
-  optional double max_position_error_to_end_point = 3 [default = 0.5];
-  optional double max_theta_error_to_end_point = 4 [default = 0.2];
-  optional double pass_destination_threshold = 5 [default = 10.0];
+  optional double max_pull_over_scenario_distance = 2 [default = 10.0];  // meter
+  optional double max_adc_stop_speed = 3 [default = 0.1];  // m/s
+  optional double max_s_error_to_end_point = 4 [default = 0.2];
+  optional double max_l_error_to_end_point = 5 [default = 0.5];
+  optional double max_theta_error_to_end_point = 6 [default = 0.2];
+  optional double pass_destination_threshold = 7 [default = 10.0];
 }
 
 message ScenarioValetParkingConfig {

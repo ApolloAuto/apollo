@@ -16,6 +16,7 @@
 
 #include "modules/planning/scenarios/util/util.h"
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
@@ -27,6 +28,7 @@ namespace scenario {
 namespace util {
 
 using common::util::DistanceXY;
+using common::VehicleConfigHelper;
 using hdmap::PathOverlap;
 
 hdmap::PathOverlap* GetOverlapOnReferenceLine(
@@ -103,21 +105,26 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
     return APPOACHING;
   }
 
-  common::math::Vec2d adc_position = {
+  common::SLPoint adc_position_sl;
+  const common::math::Vec2d adc_position = {
       common::VehicleStateProvider::Instance()->x(),
       common::VehicleStateProvider::Instance()->y()};
-  common::math::Vec2d pull_over_position = {pull_over_status.x(),
-                                            pull_over_status.y()};
-  distance = DistanceXY(adc_position, pull_over_position);
+  reference_line.XYToSL(adc_position, &adc_position_sl);
+
+  const double s_diff = pull_over_sl.s() - adc_position_sl.s();
+  const double l_diff = std::fabs(pull_over_sl.l() - adc_position_sl.l());
+
   const double theta_diff = std::fabs(common::math::NormalizeAngle(
       pull_over_status.theta() -
       common::VehicleStateProvider::Instance()->heading()));
-  ADEBUG << "adc_position(" << adc_position.x() << ", " << adc_position.y()
-         << ") pull_over_position(" << pull_over_position.x() << ", "
-         << pull_over_position.y() << ") distance[" << distance
+  ADEBUG << "adc_position_s[" << adc_position_sl.s()
+         << "] adc_position_l[" << adc_position_sl.l()
+         << "] pull_over_s[" << pull_over_sl.s() << "] pull_over_l["
+         << pull_over_sl.l() << "] s_diff[" << s_diff << "] l_diff[" << l_diff
          << "] theta_diff[" << theta_diff << "]";
 
-  if (distance <= scenario_config.max_position_error_to_end_point() &&
+  if (s_diff >= 0 && s_diff <= scenario_config.max_s_error_to_end_point() &&
+      l_diff <= scenario_config.max_l_error_to_end_point() &&
       theta_diff <= scenario_config.max_theta_error_to_end_point()) {
     return PARK_COMPLETE;
   } else {
