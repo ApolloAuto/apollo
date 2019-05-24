@@ -73,10 +73,8 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
   const auto& pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
 
-  if (!pull_over_status.is_feasible() ||
-      !pull_over_status.has_x() ||
-      !pull_over_status.has_y() ||
-      !pull_over_status.has_theta()) {
+  if (!pull_over_status.is_feasible() || !pull_over_status.has_x() ||
+      !pull_over_status.has_y() || !pull_over_status.has_theta()) {
     ADEBUG << "pull_over status not set properly: "
            << pull_over_status.DebugString();
     return UNKNOWN;

@@ -906,14 +906,11 @@ void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
   }
 }
 
-
 // update: pull_over status in PlanningContext
 void ScenarioManager::UpdatePlanningContextPullOverScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
   if (scenario_type != ScenarioConfig::PULL_OVER) {
-    PlanningContext::Instance()
-        ->mutable_planning_status()
-        ->clear_pull_over();
+    PlanningContext::Instance()->mutable_planning_status()->clear_pull_over();
     return;
   }
 }

@@ -643,8 +643,7 @@ bool OpenSpaceRoiDecider::GetPullOverSpot(
     hdmap::Path *nearby_path) {
   const auto &pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
-  if (!pull_over_status.has_x() ||
-      !pull_over_status.has_y() ||
+  if (!pull_over_status.has_x() || !pull_over_status.has_y() ||
       !pull_over_status.has_theta()) {
     AERROR << "Pull over position not set in planning context";
     return false;

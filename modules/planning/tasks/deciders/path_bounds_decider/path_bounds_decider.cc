@@ -175,8 +175,8 @@ Status PathBoundsDecider::Process(
   RemoveRedundantPathBoundaries(&candidate_path_boundaries);
 
   auto* pull_over_status = PlanningContext::Instance()
-                             ->mutable_planning_status()
-                             ->mutable_pull_over();
+                               ->mutable_planning_status()
+                               ->mutable_pull_over();
   // If needed, search for pull-over position.
   if (config_.path_bounds_decider_config().is_pull_over()) {
     if (!exist_self_path_bound) {
@@ -366,9 +366,8 @@ bool PathBoundsDecider::SearchPullOverPosition(
   // Check if destination is some distance away from ADC.
   ADEBUG << "Destination is at s = " << destination_s
          << ", ADC is at s = " << adc_end_s;
-  if (destination_s - adc_end_s <
-      config_.path_bounds_decider_config()
-             .pull_over_destination_to_adc_buffer()) {
+  if (destination_s - adc_end_s < config_.path_bounds_decider_config()
+                                      .pull_over_destination_to_adc_buffer()) {
     ADEBUG << "ADC is close to the destination.";
     const auto& pull_over_status =
         PlanningContext::Instance()->planning_status().pull_over();
@@ -377,10 +376,10 @@ bool PathBoundsDecider::SearchPullOverPosition(
       reference_line.XYToSL({pull_over_status.x(), pull_over_status.y()},
                             &pull_over_sl);
 
-      ADEBUG << "pull-over pisition: s[" << pull_over_sl.s()
-             << "] l[" << pull_over_sl.l() << "] x[" << pull_over_status.x()
-             << "] y[" << pull_over_status.y()
-             << "] theta[" << pull_over_status.theta() << "]";
+      ADEBUG << "pull-over pisition: s[" << pull_over_sl.s() << "] l["
+             << pull_over_sl.l() << "] x[" << pull_over_status.x() << "] y["
+             << pull_over_status.y() << "] theta[" << pull_over_status.theta()
+             << "]";
       int pull_over_idx = 0;
       for (const auto& path_bound_point : path_bound) {
         if (std::get<0>(path_bound_point) < pull_over_sl.s()) {
@@ -389,11 +388,9 @@ bool PathBoundsDecider::SearchPullOverPosition(
           break;
         }
       }
-      *pull_over_configuration = std::make_tuple(
-          pull_over_status.x(),
-          pull_over_status.y(),
-          pull_over_status.theta(),
-          pull_over_idx);
+      *pull_over_configuration =
+          std::make_tuple(pull_over_status.x(), pull_over_status.y(),
+                          pull_over_status.theta(), pull_over_idx);
       return true;
     } else {
       ADEBUG << "Destination is too close to ADC. distance["
@@ -405,7 +402,7 @@ bool PathBoundsDecider::SearchPullOverPosition(
   // Check if destination is within path-bounds searching scope.
   const double destination_to_pathend_buffer =
       config_.path_bounds_decider_config()
-             .pull_over_destination_to_pathend_buffer();
+          .pull_over_destination_to_pathend_buffer();
   if (destination_s + destination_to_pathend_buffer >=
       std::get<0>(path_bound.back())) {
     ADEBUG << "Destination is not within path_bounds search scope";
@@ -500,9 +497,8 @@ bool PathBoundsDecider::SearchPullOverPosition(
           reference_line.GetReferencePoint(pull_over_s);
       const double pull_over_theta = reference_point.heading();
 
-      *pull_over_configuration =
-          std::make_tuple(pull_over_x, pull_over_y,
-                          pull_over_theta, (i + j) / 2);
+      *pull_over_configuration = std::make_tuple(pull_over_x, pull_over_y,
+                                                 pull_over_theta, (i + j) / 2);
       break;
     }
     --i;
