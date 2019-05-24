@@ -477,7 +477,8 @@ bool HybridAStar::CombinePathAndSpeedProfile(
       break;
     }
 
-    common::PathPoint path_point = discretized_path.Evaluate(speed_point.s());
+    common::PathPoint path_point =
+        discretized_path.EvaluateReverse(speed_point.s());
     path_point.set_s(path_point.s());
 
     ADEBUG << "path_point debug: " << path_point.ShortDebugString();
