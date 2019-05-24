@@ -777,6 +777,9 @@ void ScenarioManager::UpdatePlanningContext(
 
   // TrafficLight scenario
   UpdatePlanningContextTrafficLightScenario(frame, scenario_type);
+
+  // PullOver scenario
+  UpdatePlanningContextPullOverScenario(frame, scenario_type);
 }
 
 // update: bare_intersection status in PlanningContext
@@ -900,6 +903,19 @@ void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
              << traffic_light_overlap.object_id << "] start_s["
              << traffic_light_overlap.start_s << "]";
     }
+  }
+}
+
+
+// update: pull_over status in PlanningContext
+void ScenarioManager::UpdatePlanningContextPullOverScenario(
+    const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
+  if (scenario_type != ScenarioConfig::PULL_OVER) {
+    PlanningContext::Instance()
+        ->mutable_planning_status()
+        ->mutable_pull_over()
+        ->Clear();
+    return;
   }
 }
 

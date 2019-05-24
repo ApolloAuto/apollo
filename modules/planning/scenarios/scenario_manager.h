@@ -96,6 +96,9 @@ class ScenarioManager final {
   void UpdatePlanningContextTrafficLightScenario(
       const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
 
+  void UpdatePlanningContextPullOverScenario(
+      const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
+
  private:
   std::unordered_map<ScenarioConfig::ScenarioType, ScenarioConfig,
                      std::hash<int>>
