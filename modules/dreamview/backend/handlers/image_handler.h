@@ -39,7 +39,7 @@ namespace dreamview {
  * @class ImageHandler
  *
  * @brief The ImageHandler, built on top of CivetHandler, converts the received
- * ROS image message to a image stream, wrapped by MJPEG Streaming Protocol.
+ * ROS image message to an image stream, wrapped by MJPEG Streaming Protocol.
  */
 class ImageHandler : public CivetHandler {
  public:
