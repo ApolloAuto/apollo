@@ -92,6 +92,12 @@ bool DiscretePointsReferenceLineSmoother::Smooth(
     status = CosThetaSmooth(raw_point2d, anchorpoints_lateralbound,
                             &smoothed_point2d);
   } else if (use_fem_pos_) {
+    // box contraints on pos are used in fem pos smoother, thus shrink the
+    // bounds by 1.0 / sqrt(2.0)
+    double box_ratio = 1.0 / std::sqrt(2.0);
+    for (auto& bound : anchorpoints_lateralbound) {
+      bound *= box_ratio;
+    }
     status =
         FemPosSmooth(raw_point2d, anchorpoints_lateralbound, &smoothed_point2d);
   } else {
