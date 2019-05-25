@@ -18,12 +18,15 @@
 
 """ Vehicle calibration with fuel service. """
 
+import json
 import os
 
 from absl import app
 from absl import flags
 from absl import logging
+import google.protobuf.json_format as json_format
 import google.protobuf.text_format as text_format
+import requests
 
 from modules.tools.fuel_proxy.proto.job_config_pb2 import JobConfig
 
@@ -37,33 +40,49 @@ class VehicleCalibration(object):
 
     def __init__(self):
         self.job_config = None
-        if not self.sanity_check():
-            return None
 
-    def sanity_check(self):
-        """Sanity check input data."""
+    def parse_input(self):
+        """Parse and sanity check input data."""
         # Read and parse job_config
-        job_config = flags.FLAGS.job_config
-        if not job_config:
-            logging.fatal('Please provide proper --job_config.')
+        job_config_file = flags.FLAGS.job_config
+        if not job_config_file:
+            logging.error('Please provide proper --job_config.')
             return False
-        if not os.path.exists(job_config):
-            logging.fatal('The given job_config file not exist.')
+        if not os.path.exists(job_config_file):
+            logging.error('The given job_config file not exist.')
             return False
         try:
-            with open(job_config, 'r') as fin:
+            with open(job_config_file, 'r') as fin:
                 self.job_config = text_format.Merge(fin.read(), JobConfig())
         except Exception as e:
-            logging.fatal('Failed to parse job_config: {}'.format(e))
+            logging.error('Failed to parse job_config: {}'.format(e))
             return False
 
+        logging.info('Parsed input successfully!')
         return True
 
-def main(argv):
-    calibration = VehicleCalibration()
-    if calibration is None:
-        return
+    def send_request(self):
+        """Send job config to remote fuel proxy."""
+        if not flags.FLAGS.fuel_proxy:
+            logging.error('Please provide proper --fuel_proxy.')
+            return
+        request_json = json_format.MessageToJson(
+            self.job_config, preserving_proto_field_name=True)
+        request = requests.post(flags.FLAGS.fuel_proxy, json=request_json)
+        if request.ok:
+            response = json.loads(request.json())
+            logging.info('OK: {}'.format(response.get('message')))
+        else:
+            logging.error('Request failed with HTTP code {}'.format(
+                request.status_code))
 
+
+def main(argv):
+    """Main process."""
+    calibration = VehicleCalibration()
+    if not calibration.parse_input():
+        return
+    calibration.send_request()
 
 if __name__ == '__main__':
     app.run(main)
