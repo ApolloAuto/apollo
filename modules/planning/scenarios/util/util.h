@@ -25,9 +25,20 @@ namespace planning {
 namespace scenario {
 namespace util {
 
+enum PullOverStatus {
+  UNKNOWN = 0,
+  APPOACHING = 1,
+  PARK_COMPLETE = 2,
+  PARK_FAIL = 3,
+  PASS_DESTINATION = 4,
+};
+
 hdmap::PathOverlap* GetOverlapOnReferenceLine(
     const ReferenceLineInfo& reference_line_info, const std::string& overlap_id,
     const ReferenceLineInfo::OverlapType& overlap_type);
+
+PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
+                                const ScenarioPullOverConfig& scenario_config);
 
 }  // namespace util
 }  // namespace scenario

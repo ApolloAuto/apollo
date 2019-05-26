@@ -7,10 +7,12 @@ cc_library(
     srcs = [
         "pull_over_scenario.cc",
         "stage_approach.cc",
+        "stage_retry_parking.cc",
     ],
     hdrs = [
         "pull_over_scenario.h",
         "stage_approach.h",
+        "stage_retry_parking.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
@@ -22,6 +24,7 @@ cc_library(
         "//modules/planning/common/util:util_lib",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/scenarios:scenario",
+        "//modules/planning/scenarios/util:scenario_util_lib",
         "@eigen",
     ],
 )

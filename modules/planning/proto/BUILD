@@ -159,6 +159,7 @@ proto_library(
         ":navi_path_decider_config_proto_lib",
         ":navi_speed_decider_config_proto_lib",
         ":open_space_fallback_decider_config_proto_lib",
+        ":open_space_pre_stop_decider_config_proto_lib",
         ":open_space_roi_decider_config_proto_lib",
         ":open_space_trajectory_partition_config_proto_lib",
         ":open_space_trajectory_provider_config_proto_lib",
@@ -170,6 +171,7 @@ proto_library(
         ":planner_open_space_config_proto_lib",
         ":proceed_with_caution_speed_config_proto_lib",
         ":reference_line_smoother_config_proto_lib",
+        ":rule_based_stop_decider_config_proto_lib",
         ":speed_bounds_decider_config_proto_lib",
     ],
 )
@@ -361,7 +363,7 @@ proto_library(
         ":planning_config_proto_lib",
         ":planning_proto_lib",
         "//modules/common/proto:drive_state_proto_lib",
-        "//modules/common/proto:geometry_proto_lib",
+        "//modules/common/proto:pnc_point_proto_lib",
         "//modules/routing/proto:routing_proto_lib",
     ],
 )
@@ -536,6 +538,20 @@ cc_proto_library(
     ],
 )
 
+proto_library(
+    name = "open_space_pre_stop_decider_config_proto_lib",
+    srcs = [
+        "open_space_pre_stop_decider_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "open_space_pre_stop_decider_config_proto",
+    deps = [
+        ":open_space_pre_stop_decider_config_proto_lib",
+    ],
+)
+
 cc_proto_library(
     name = "path_decider_info_proto",
     deps = [
@@ -547,6 +563,20 @@ proto_library(
     name = "path_decider_info_proto_lib",
     srcs = [
         "path_decider_info.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "rule_based_stop_decider_config_proto",
+    deps = [
+        ":rule_based_stop_decider_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "rule_based_stop_decider_config_proto_lib",
+    srcs = [
+        "rule_based_stop_decider_config.proto",
     ],
 )
 

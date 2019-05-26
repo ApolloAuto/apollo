@@ -50,22 +50,20 @@ PiecewiseJerkSpeedOptimizer::PiecewiseJerkSpeedOptimizer(
   CHECK(config_.has_piecewise_jerk_speed_config());
 }
 
-Status PiecewiseJerkSpeedOptimizer::Process(
-    const PathData& path_data, const TrajectoryPoint& init_point,
-    const ReferenceLine& reference_line, const SpeedData& reference_speed_data,
-    PathDecision* const path_decision, SpeedData* const speed_data) {
+Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
+                                            const TrajectoryPoint& init_point,
+                                            SpeedData* const speed_data) {
   if (reference_line_info_->ReachedDestination()) {
     return Status::OK();
   }
+
+  CHECK(speed_data != nullptr);
+  SpeedData reference_speed_data = *speed_data;
 
   if (path_data.discretized_path().empty()) {
     std::string msg("Empty path data");
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
-
-  for (const auto* obstacle : path_decision->obstacles().Items()) {
-    DCHECK(obstacle->HasLongitudinalDecision());
   }
   StGraphData& st_graph_data = *reference_line_info_->mutable_st_graph_data();
 
@@ -98,7 +96,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(
   piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_bound);
 
   // TODO(Hongyi): delete this when ready to use vehicle_params
-  piecewise_jerk_problem.set_ddx_bounds(-4.4, 2.0);
+  piecewise_jerk_problem.set_ddx_bounds(-4.0, 2.0);
 
   piecewise_jerk_problem.set_dx_ref(piecewise_jerk_speed_config.ref_v_weight(),
                                     FLAGS_default_cruise_speed);
@@ -154,10 +152,9 @@ Status PiecewiseJerkSpeedOptimizer::Process(
     const double path_s = sp.s();
     x_ref.emplace_back(path_s);
     // get curvature
-    PathPoint path_point;
-    path_data.GetPathPointWithPathS(path_s, &path_point);
-    penalty_dx.emplace_back(std::fabs(path_point.kappa()) *
-                            piecewise_jerk_speed_config.kappa_penalty_weight());
+    PathPoint path_point = path_data.GetPathPointWithPathS(path_s);
+    penalty_dx.push_back(std::fabs(path_point.kappa()) *
+                         piecewise_jerk_speed_config.kappa_penalty_weight());
     // get v_upper_bound
     const double v_lower_bound = 0.0;
     double v_upper_bound = FLAGS_planning_upper_speed_limit;

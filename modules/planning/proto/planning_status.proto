@@ -3,7 +3,7 @@ syntax = "proto2";
 package apollo.planning;
 
 import "modules/common/proto/drive_state.proto";
-import "modules/common/proto/geometry.proto";
+import "modules/common/proto/pnc_point.proto";
 import "modules/planning/proto/planning_config.proto";
 import "modules/routing/proto/routing.proto";
 
@@ -53,12 +53,15 @@ message PedestrianStatus {
 }
 
 message PullOverStatus {
-  optional bool exist_pull_over_position = 1 [default = false];
-  optional double pull_over_s = 2 [default = 0.0];
-  optional double pull_over_l = 3 [default = 0.0];
-  optional double pull_over_x = 4 [default = 0.0];
-  optional double pull_over_y = 5 [default = 0.0];
-  optional double pull_over_theta = 6 [default = 0.0];
+  optional bool is_feasible = 1 [default = true];
+  optional double x = 2 [default = 0.0];
+  optional double y = 3 [default = 0.0];
+  optional double theta = 4 [default = 0.0];
+  optional double length_front = 5 [default = 0.0];
+  optional double length_back = 6 [default = 0.0];
+  optional double width_left = 7 [default = 0.0];
+  optional double width_right = 8 [default = 0.0];
+  optional int32 idx = 9 [default = 0];
 }
 
 message ReroutingStatus {
@@ -92,6 +95,10 @@ message TrafficLightStatus {
   repeated string done_traffic_light_overlap_id = 2;
 }
 
+message SidePassStopStatus {
+  optional apollo.common.PathPoint change_lane_stop_path_point = 1;
+  optional bool check_clear_flag = 2;
+}
 
 message PlanningStatus {
   optional BareIntersectionStatus bare_intersection = 1;
@@ -107,4 +114,5 @@ message PlanningStatus {
   optional SidePassStatus side_pass = 11;
   optional StopSignStatus stop_sign = 12;
   optional TrafficLightStatus traffic_light = 13;
+  optional SidePassStopStatus side_pass_stop = 14;
 }

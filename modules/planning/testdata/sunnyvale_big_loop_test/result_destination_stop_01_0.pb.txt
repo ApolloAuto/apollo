@@ -12,10 +12,10 @@ decision {
       reason_code: STOP_REASON_DESTINATION
       reason: "stop by DEST"
       stop_point {
-        x: 587095.5758622135
-        y: 4141212.9134125635
+        x: 587095.58739002259
+        y: 4141212.9632723411
       }
-      stop_heading: 2.8940362403212765
+      stop_heading: 2.8937472811347296
       change_lane_type: FORWARD
     }
   }
@@ -28,11 +28,11 @@ decision {
           reason_code: STOP_REASON_DESTINATION
           distance_s: -0.5
           stop_point {
-            x: 587095.5758622135
-            y: 4141212.9134125635
+            x: 587095.58739002259
+            y: 4141212.9632723411
             z: 0
           }
-          stop_heading: 2.8940362403212765
+          stop_heading: 2.8937472811347296
         }
       }
     }

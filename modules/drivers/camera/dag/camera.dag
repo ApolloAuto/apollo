@@ -40,25 +40,24 @@ module_config {
       }
     }
 
-    components {
-      class_name : "CameraComponent"
-      config {
-        name : "camera_front_fisheye"
-        config_file_path : "/apollo/modules/drivers/camera/conf/camera_front_fisheye.pb.txt"
-      }
-    }
-
-    components {
-      class_name : "CompressComponent"
-      config {
-        name : "camera_front_fisheye_compress"
-        config_file_path : "/apollo/modules/drivers/camera/conf/camera_front_fisheye.pb.txt"
-        readers {
-          channel: "/apollo/sensor/camera/front_fisheye/image"
-          pending_queue_size: 10
-        }
-      }
-    }
+#    components {
+#      class_name : "CameraComponent"
+#      config {
+#        name : "camera_front_fisheye"
+#        config_file_path : "/apollo/modules/drivers/camera/conf/camera_front_fisheye.pb.txt"
+#      }
+#    }
+#    components {
+#      class_name : "CompressComponent"
+#      config {
+#        name : "camera_front_fisheye_compress"
+#        config_file_path : "/apollo/modules/drivers/camera/conf/camera_front_fisheye.pb.txt"
+#        readers {
+#          channel: "/apollo/sensor/camera/front_fisheye/image"
+#          pending_queue_size: 10
+#        }
+#      }
+#    }
 
     # components {
     #   class_name : "CameraComponent"

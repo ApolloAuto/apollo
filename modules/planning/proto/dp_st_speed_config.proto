@@ -37,4 +37,8 @@ message DpStSpeedConfig {
   // other constraint
   optional double max_acceleration = 60 [default = 4.5];
   optional double max_deceleration = 61 [default = -4.5];
+
+  // buffer
+  optional double safe_time_buffer = 70 [default = 3.0];
+  optional double safe_distance = 71 [default = 20.0];
 }

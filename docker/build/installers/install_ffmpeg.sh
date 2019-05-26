@@ -37,8 +37,8 @@ HG_SETTING_FILE="/root/.hgrc"
 echo "$HG_SETTING" > $HG_SETTING_FILE
 if cd x265 2> /dev/null; then hg pull && hg update && cd ..; else hg clone https://bitbucket.org/multicoreware/x265; fi
 rm $HG_SETTING_FILE
-wget -O ffmpeg-snapshot.tar.bz2 https://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2
-tar xjvf ffmpeg-snapshot.tar.bz2
+wget https://github.com/FFmpeg/FFmpeg/archive/n4.1.3.tar.gz
+tar zxvf n4.1.3.tar.gz && mv FFmpeg-n4.1.3 ffmpeg
 
 # Build and install
 pushd nasm-2.14.02

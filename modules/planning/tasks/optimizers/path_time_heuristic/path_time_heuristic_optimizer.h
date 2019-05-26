@@ -42,16 +42,12 @@ class PathTimeHeuristicOptimizer : public SpeedOptimizer {
  private:
   common::Status Process(const PathData& path_data,
                          const common::TrajectoryPoint& init_point,
-                         const ReferenceLine& reference_line,
-                         const SpeedData& reference_speed_data,
-                         PathDecision* const path_decision,
                          SpeedData* const speed_data) override;
 
-  bool SearchStGraph(SpeedData* speed_data) const;
+  bool SearchPathTimeGraph(SpeedData* speed_data) const;
 
  private:
   common::TrajectoryPoint init_point_;
-  const ReferenceLine* reference_line_ = nullptr;
   SLBoundary adc_sl_boundary_;
   DpStSpeedConfig dp_st_speed_config_;
 };

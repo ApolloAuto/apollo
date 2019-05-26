@@ -22,6 +22,7 @@
 
 #include "cyber/common/log.h"
 #include "modules/planning/scenarios/park/pull_over/stage_approach.h"
+#include "modules/planning/scenarios/park/pull_over/stage_retry_parking.h"
 
 namespace apollo {
 namespace planning {
@@ -56,6 +57,11 @@ void PullOverScenario::RegisterStages() {
       ScenarioConfig::PULL_OVER_APPROACH,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
         return new PullOverStageApproach(config);
+      });
+  s_stage_factory_.Register(
+      ScenarioConfig::PULL_OVER_RETRY_PARKING,
+      [](const ScenarioConfig::StageConfig& config) -> Stage* {
+        return new PullOverStageRetryParking(config);
       });
 }
 

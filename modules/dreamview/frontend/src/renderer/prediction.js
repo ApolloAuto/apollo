@@ -49,7 +49,7 @@ export default class Prediction {
             }
 
             // Take the prediction line with highest probability as major, others as minor.
-            _.sortBy(predictions, o => o.probablity);
+            _.sortBy(predictions, o => o.probability);
             const predictionMajor = predictions[predictions.length - 1];
             const predictionMinor = predictions.slice(0, predictions.length - 1);
 

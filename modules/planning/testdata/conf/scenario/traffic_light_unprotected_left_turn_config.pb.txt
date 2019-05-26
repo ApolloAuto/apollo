@@ -13,21 +13,21 @@ stage_type: TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_INTERSECTION_CRUISE
 stage_config: {
   stage_type: TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP
   enabled: true
-  task_type: DECIDER_CREEP
+  task_type: CREEP_DECIDER
   task_type: PATH_LANE_BORROW_DECIDER
   task_type: PATH_BOUNDS_DECIDER
   task_type: PIECEWISE_JERK_PATH_OPTIMIZER
   task_type: PATH_ASSESSMENT_DECIDER
   task_type: PATH_DECIDER
+  task_type: RULE_BASED_STOP_DECIDER
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
   task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
-  # task_type: PROCEED_WITH_CAUTION_SPEED
   task_config: {
-    task_type: DECIDER_CREEP
-    decider_creep_config: {
+    task_type: CREEP_DECIDER
+    creep_decider_config: {
       stop_distance: 0.3
       speed_limit: 1.0
       max_valid_stop_distance: 0.4
@@ -58,12 +58,6 @@ stage_config: {
     task_type: SPEED_DECIDER
   }
   task_config: {
-    task_type: PROCEED_WITH_CAUTION_SPEED
-    proceed_with_caution_speed_config: {
-      max_distance: 5.0
-    }
-  }
-  task_config: {
     task_type: SPEED_BOUNDS_PRIORI_DECIDER
   }
   task_config: {
@@ -71,6 +65,9 @@ stage_config: {
   }
   task_config: {
     task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: RULE_BASED_STOP_DECIDER
   }
 }
 
@@ -82,6 +79,7 @@ stage_config: {
   task_type: PIECEWISE_JERK_PATH_OPTIMIZER
   task_type: PATH_ASSESSMENT_DECIDER
   task_type: PATH_DECIDER
+  task_type: RULE_BASED_STOP_DECIDER
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
@@ -119,5 +117,8 @@ stage_config: {
   }
   task_config: {
     task_type: SPEED_BOUNDS_FINAL_DECIDER
+  }
+  task_config: {
+    task_type: RULE_BASED_STOP_DECIDER
   }
 }

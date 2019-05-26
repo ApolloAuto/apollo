@@ -43,10 +43,10 @@ class Task {
 
   const TaskConfig& Config() const { return config_; }
 
-  virtual apollo::common::Status Execute(
-      Frame* frame, ReferenceLineInfo* reference_line_info);
+  virtual common::Status Execute(Frame* frame,
+                                 ReferenceLineInfo* reference_line_info);
 
-  virtual apollo::common::Status Execute(Frame* frame);
+  virtual common::Status Execute(Frame* frame);
 
  protected:
   Frame* frame_ = nullptr;

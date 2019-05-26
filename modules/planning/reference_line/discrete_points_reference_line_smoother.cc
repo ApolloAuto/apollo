@@ -24,6 +24,7 @@
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/math/discrete_points_math.h"
 #include "modules/planning/math/discretized_points_smoothing/cos_theta_smoother.h"
 #include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_smoother.h"
 
@@ -91,10 +92,16 @@ bool DiscretePointsReferenceLineSmoother::Smooth(
     status = CosThetaSmooth(raw_point2d, anchorpoints_lateralbound,
                             &smoothed_point2d);
   } else if (use_fem_pos_) {
+    // box contraints on pos are used in fem pos smoother, thus shrink the
+    // bounds by 1.0 / sqrt(2.0)
+    double box_ratio = 1.0 / std::sqrt(2.0);
+    for (auto& bound : anchorpoints_lateralbound) {
+      bound *= box_ratio;
+    }
     status =
         FemPosSmooth(raw_point2d, anchorpoints_lateralbound, &smoothed_point2d);
   } else {
-    AERROR << "no smoothing method choosen";
+    AERROR << "no smoothing method chosen";
     return false;
   }
 
@@ -104,10 +111,10 @@ bool DiscretePointsReferenceLineSmoother::Smooth(
   }
 
   const auto solver_end_timestamp = std::chrono::system_clock::now();
-  std::chrono::duration<double> diff =
+  std::chrono::duration<double> solver_diff =
       solver_end_timestamp - solver_start_timestamp;
   ADEBUG << "discrete_points reference line smoother solver time: "
-         << diff.count() * 1000.0 << " ms.";
+         << solver_diff.count() * 1000.0 << " ms.";
 
   DeNormalizePoints(&smoothed_point2d);
 
@@ -122,9 +129,9 @@ bool DiscretePointsReferenceLineSmoother::Smooth(
   *smoothed_reference_line = ReferenceLine(ref_points);
 
   const auto end_timestamp = std::chrono::system_clock::now();
-  std::chrono::duration<double> solver_diff = end_timestamp - start_timestamp;
+  std::chrono::duration<double> diff = end_timestamp - start_timestamp;
   ADEBUG << "discrete_points reference line smoother totoal time: "
-         << solver_diff.count() * 1000.0 << " ms.";
+         << diff.count() * 1000.0 << " ms.";
   return true;
 }
 
@@ -240,26 +247,25 @@ void DiscretePointsReferenceLineSmoother::NormalizePoints(
     std::vector<std::pair<double, double>>* xy_points) {
   zero_x_ = xy_points->front().first;
   zero_y_ = xy_points->front().second;
-
   std::for_each(xy_points->begin(), xy_points->end(),
-                [this](std::pair<double, double>& p) {
-                  auto curr_x = p.first;
-                  auto curr_y = p.second;
+                [this](std::pair<double, double>& point) {
+                  auto curr_x = point.first;
+                  auto curr_y = point.second;
                   std::pair<double, double> xy(curr_x - zero_x_,
                                                curr_y - zero_y_);
-                  p = xy;
+                  point = std::move(xy);
                 });
 }
 
 void DiscretePointsReferenceLineSmoother::DeNormalizePoints(
     std::vector<std::pair<double, double>>* xy_points) {
   std::for_each(xy_points->begin(), xy_points->end(),
-                [this](std::pair<double, double>& p) {
-                  auto curr_x = p.first;
-                  auto curr_y = p.second;
+                [this](std::pair<double, double>& point) {
+                  auto curr_x = point.first;
+                  auto curr_y = point.second;
                   std::pair<double, double> xy(curr_x + zero_x_,
                                                curr_y + zero_y_);
-                  p = xy;
+                  point = std::move(xy);
                 });
 }
 
@@ -267,144 +273,18 @@ bool DiscretePointsReferenceLineSmoother::GenerateRefPointProfile(
     const ReferenceLine& raw_reference_line,
     const std::vector<std::pair<double, double>>& xy_points,
     std::vector<ReferencePoint>* reference_points) {
-  std::vector<double> dxs;
-  std::vector<double> dys;
-  std::vector<double> y_over_s_first_derivatives;
-  std::vector<double> x_over_s_first_derivatives;
-  std::vector<double> y_over_s_second_derivatives;
-  std::vector<double> x_over_s_second_derivatives;
+  // Compute path profile
   std::vector<double> headings;
   std::vector<double> kappas;
-  std::vector<double> accumulated_s;
   std::vector<double> dkappas;
-
-  // Get finite difference approximated dx and dy for heading and kappa
-  // calculation
-  size_t points_size = xy_points.size();
-  for (size_t i = 0; i < points_size; ++i) {
-    double x_delta = 0.0;
-    double y_delta = 0.0;
-    if (i == 0) {
-      x_delta = (xy_points[i + 1].first - xy_points[i].first);
-      y_delta = (xy_points[i + 1].second - xy_points[i].second);
-    } else if (i == points_size - 1) {
-      x_delta = (xy_points[i].first - xy_points[i - 1].first);
-      y_delta = (xy_points[i].second - xy_points[i - 1].second);
-    } else {
-      x_delta = 0.5 * (xy_points[i + 1].first - xy_points[i - 1].first);
-      y_delta = 0.5 * (xy_points[i + 1].second - xy_points[i - 1].second);
-    }
-    dxs.push_back(x_delta);
-    dys.push_back(y_delta);
-  }
-
-  // Heading calculation
-  for (size_t i = 0; i < points_size; ++i) {
-    headings.push_back(std::atan2(dys[i], dxs[i]));
-  }
-
-  // Get linear interpolated s for dkappa calculation
-  double distance = 0.0;
-  accumulated_s.push_back(distance);
-  double fx = xy_points[0].first;
-  double fy = xy_points[0].second;
-  double nx = 0.0;
-  double ny = 0.0;
-  for (size_t i = 1; i < points_size; ++i) {
-    nx = xy_points[i].first;
-    ny = xy_points[i].second;
-    double end_segment_s =
-        std::sqrt((fx - nx) * (fx - nx) + (fy - ny) * (fy - ny));
-    accumulated_s.push_back(end_segment_s + distance);
-    distance += end_segment_s;
-    fx = nx;
-    fy = ny;
-  }
-
-  // Get finite difference approximated first derivative of y and x respective
-  // to s for kappa calculation
-  for (size_t i = 0; i < points_size; ++i) {
-    double xds = 0.0;
-    double yds = 0.0;
-    if (i == 0) {
-      xds = (xy_points[i + 1].first - xy_points[i].first) /
-            (accumulated_s[i + 1] - accumulated_s[i]);
-      yds = (xy_points[i + 1].second - xy_points[i].second) /
-            (accumulated_s[i + 1] - accumulated_s[i]);
-    } else if (i == points_size - 1) {
-      xds = (xy_points[i].first - xy_points[i - 1].first) /
-            (accumulated_s[i] - accumulated_s[i - 1]);
-      yds = (xy_points[i].second - xy_points[i - 1].second) /
-            (accumulated_s[i] - accumulated_s[i - 1]);
-    } else {
-      xds = (xy_points[i + 1].first - xy_points[i - 1].first) /
-            (accumulated_s[i + 1] - accumulated_s[i - 1]);
-      yds = (xy_points[i + 1].second - xy_points[i - 1].second) /
-            (accumulated_s[i + 1] - accumulated_s[i - 1]);
-    }
-    x_over_s_first_derivatives.push_back(xds);
-    y_over_s_first_derivatives.push_back(yds);
-  }
-
-  // Get finite difference approximated second derivative of y and x respective
-  // to s for kappa calculation
-  for (size_t i = 0; i < points_size; ++i) {
-    double xdds = 0.0;
-    double ydds = 0.0;
-    if (i == 0) {
-      xdds =
-          (x_over_s_first_derivatives[i + 1] - x_over_s_first_derivatives[i]) /
-          (accumulated_s[i + 1] - accumulated_s[i]);
-      ydds =
-          (y_over_s_first_derivatives[i + 1] - y_over_s_first_derivatives[i]) /
-          (accumulated_s[i + 1] - accumulated_s[i]);
-    } else if (i == points_size - 1) {
-      xdds =
-          (x_over_s_first_derivatives[i] - x_over_s_first_derivatives[i - 1]) /
-          (accumulated_s[i] - accumulated_s[i - 1]);
-      ydds =
-          (y_over_s_first_derivatives[i] - y_over_s_first_derivatives[i - 1]) /
-          (accumulated_s[i] - accumulated_s[i - 1]);
-    } else {
-      xdds = (x_over_s_first_derivatives[i + 1] -
-              x_over_s_first_derivatives[i - 1]) /
-             (accumulated_s[i + 1] - accumulated_s[i - 1]);
-      ydds = (y_over_s_first_derivatives[i + 1] -
-              y_over_s_first_derivatives[i - 1]) /
-             (accumulated_s[i + 1] - accumulated_s[i - 1]);
-    }
-    x_over_s_second_derivatives.push_back(xdds);
-    y_over_s_second_derivatives.push_back(ydds);
-  }
-
-  for (size_t i = 0; i < points_size; ++i) {
-    double xds = x_over_s_first_derivatives[i];
-    double yds = y_over_s_first_derivatives[i];
-    double xdds = x_over_s_second_derivatives[i];
-    double ydds = y_over_s_second_derivatives[i];
-    double kappa =
-        (xds * ydds - yds * xdds) /
-        (std::sqrt(xds * xds + yds * yds) * (xds * xds + yds * yds) + 1e-6);
-    kappas.push_back(kappa);
-  }
-
-  // Dkappa calculation
-  for (size_t i = 0; i < points_size; ++i) {
-    double dkappa = 0.0;
-    if (i == 0) {
-      dkappa = (kappas[i + 1] - kappas[i]) /
-               (accumulated_s[i + 1] - accumulated_s[i]);
-    } else if (i == points_size - 1) {
-      dkappa = (kappas[i] - kappas[i - 1]) /
-               (accumulated_s[i] - accumulated_s[i - 1]);
-    } else {
-      dkappa = (kappas[i + 1] - kappas[i - 1]) /
-               (accumulated_s[i + 1] - accumulated_s[i - 1]);
-    }
-    dkappas.push_back(dkappa);
+  std::vector<double> accumulated_s;
+  if (!DiscretePointsMath::ComputePathProfile(
+          xy_points, &headings, &accumulated_s, &kappas, &dkappas)) {
+    return false;
   }
 
   // Load into ReferencePoints
+  size_t points_size = xy_points.size();
   for (size_t i = 0; i < points_size; ++i) {
     common::SLPoint ref_sl_point;
     if (!raw_reference_line.XYToSL({xy_points[i].first, xy_points[i].second},

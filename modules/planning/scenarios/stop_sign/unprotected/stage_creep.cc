@@ -33,7 +33,7 @@
 #include "modules/planning/common/speed_profile_generator.h"
 #include "modules/planning/common/util/util.h"
 #include "modules/planning/scenarios/util/util.h"
-#include "modules/planning/tasks/deciders/decider_creep.h"
+#include "modules/planning/tasks/deciders/creep_decider/creep_decider.h"
 
 namespace apollo {
 namespace planning {
@@ -81,7 +81,7 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
   const double wait_time =
       Clock::NowInSeconds() - GetContext()->creep_start_time;
   const double timeout_sec = scenario_config_.creep_timeout_sec();
-  auto* task = dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP));
+  auto* task = dynamic_cast<CreepDecider*>(FindTask(TaskConfig::CREEP_DECIDER));
 
   if (task == nullptr) {
     AERROR << "task is nullptr";
@@ -104,7 +104,7 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
   }
 
   // set param for PROCEED_WITH_CAUTION_SPEED
-  // dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
+  // dynamic_cast<CreepDecider*>(FindTask(TaskConfig::CREEP_DECIDER))
   //    ->SetProceedWithCautionSpeedParam(*frame, reference_line_info,
   //                                      stop_sign_end_s);
 

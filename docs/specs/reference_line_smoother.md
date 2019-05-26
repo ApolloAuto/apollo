@@ -27,11 +27,11 @@ $$
 
 ```
 $$
-cost = 
-\sum_{i=1}^{n} 
+cost =
+\sum_{i=1}^{n}
 \Big(
-\int\limits_{0}^{t_i} (f_i''')^2(t) dt 
-+ \int\limits_{0}^{t_i} (g_i''')^2(t) dt 
+\int\limits_{0}^{t_i} (f_i''')^2(t) dt
++ \int\limits_{0}^{t_i} (g_i''')^2(t) dt
 \Big)
 $$
 ```
@@ -41,7 +41,7 @@ $$
 QP formulation:
 ```
 $$
-\frac{1}{2} \cdot x^T \cdot H \cdot x + f^T \cdot x 
+\frac{1}{2} \cdot x^T \cdot H \cdot x + f^T \cdot x
 \\
 s.t. LB \leq x \leq UB
 \\
@@ -52,18 +52,18 @@ $$
 ```
 
 
-## 2 Constraints  
+## 2 Constraints
 
 
 ### 2.1 Joint smoothness  constraints
 
-This constraint smoothes the spline joint.  Let's assume two segments, $seg_k$ and $seg_{k+1}$, are connected and the accumulated **s** of segment $seg_k$ is $s_k$. Calculate the constraint equation as: 
+This constraint smoothes the spline joint.  Let's assume two segments, $seg_k$ and $seg_{k+1}$, are connected and the accumulated **s** of segment $seg_k$ is $s_k$. Calculate the constraint equation as:
 ```
 $$
 f_k(s_k) = f_{k+1} (s_0)
 $$
 ```
-Similarly the formula works for the equality constraints, such as: 
+Similarly the formula works for the equality constraints, such as:
 ```
 $$
 f'_k(s_k) = f'_{k+1} (s_0)
@@ -84,7 +84,7 @@ $$
 
 ### 2.2 Sampled points for boundary constraint
 
-Evenly sample **m** points along the path and check the predefined boundaries at those points.  
+Evenly sample **m** points along the path and check the predefined boundaries at those points.
 ```
 $$
 f_i(t_l) - x_l< boundary

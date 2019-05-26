@@ -549,9 +549,15 @@ bool ReferenceLineInfo::CombinePathAndSpeedProfile(
   const double kSparseTimeResolution = FLAGS_trajectory_time_max_interval;
   const double kDenseTimeSec = FLAGS_trajectory_time_high_density_period;
   if (path_data_.discretized_path().empty()) {
-    AWARN << "path data is empty";
+    AERROR << "path data is empty";
     return false;
   }
+
+  if (speed_data_.empty()) {
+    AERROR << "speed profile is empty";
+    return false;
+  }
+
   for (double cur_rel_time = 0.0; cur_rel_time < speed_data_.TotalTime();
        cur_rel_time += (cur_rel_time < kDenseTimeSec ? kDenseTimeResoltuion
                                                      : kSparseTimeResolution)) {
@@ -564,12 +570,8 @@ bool ReferenceLineInfo::CombinePathAndSpeedProfile(
     if (speed_point.s() > path_data_.discretized_path().Length()) {
       break;
     }
-    common::PathPoint path_point;
-    if (!path_data_.GetPathPointWithPathS(speed_point.s(), &path_point)) {
-      AERROR << "Fail to get path data with s " << speed_point.s()
-             << "path total length " << path_data_.discretized_path().Length();
-      return false;
-    }
+    common::PathPoint path_point =
+        path_data_.GetPathPointWithPathS(speed_point.s());
     path_point.set_s(path_point.s() + start_s);
 
     common::TrajectoryPoint trajectory_point;

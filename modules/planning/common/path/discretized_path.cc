@@ -60,5 +60,26 @@ std::vector<PathPoint>::const_iterator DiscretizedPath::QueryLowerBound(
   return std::lower_bound(begin(), end(), path_s, func);
 }
 
+PathPoint DiscretizedPath::EvaluateReverse(const double path_s) const {
+  CHECK(!empty());
+  auto it_upper = QueryUpperBound(path_s);
+  if (it_upper == begin()) {
+    return front();
+  }
+  if (it_upper == end()) {
+    return back();
+  }
+  return common::math::InterpolateUsingLinearApproximation(*(it_upper - 1),
+                                                           *it_upper, path_s);
+}
+
+std::vector<PathPoint>::const_iterator DiscretizedPath::QueryUpperBound(
+    const double path_s) const {
+  auto func = [](const double path_s, const PathPoint &tp) {
+    return tp.s() < path_s;
+  };
+  return std::upper_bound(begin(), end(), path_s, func);
+}
+
 }  // namespace planning
 }  // namespace apollo

@@ -91,6 +91,7 @@ proto_library(
         "offline_features.proto",
     ],
     deps = [
+        "//modules/common/proto:pnc_point_proto_lib",
         "//modules/prediction/proto:feature_proto_lib",
         "//modules/prediction/proto:prediction_proto_lib",
     ],

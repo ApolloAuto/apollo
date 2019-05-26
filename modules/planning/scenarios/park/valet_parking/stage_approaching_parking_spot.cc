@@ -50,8 +50,6 @@ Stage::StageStatus StageApproachingParkingSpot::Process(
     return StageStatus::ERROR;
   }
 
-  frame->mutable_open_space_info()->set_open_space_pre_stop_finished(
-      GetContext()->valet_parking_pre_stop_finished);
   *(frame->mutable_open_space_info()->mutable_target_parking_spot_id()) =
       GetContext()->target_parking_spot_id;
   frame->mutable_open_space_info()->set_pre_stop_rightaway_flag(
@@ -100,8 +98,6 @@ bool StageApproachingParkingSpot::CheckADCStop(const Frame& frame) {
     ADEBUG << "not a valid stop. too far from stop line.";
     return false;
   }
-
-  GetContext()->valet_parking_pre_stop_finished = true;
   return true;
 }
 

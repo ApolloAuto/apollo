@@ -59,7 +59,6 @@ cc_test(
     data = [
         ":testdata",
         "//modules/common/util",
-        "//modules/map:map_data",
     ],
     deps = [
         ":hdmap",
@@ -77,7 +76,6 @@ cc_test(
     ],
     data = [
         ":testdata",
-        "//modules/map:map_data",
     ],
     deps = [
         ":hdmap_util",

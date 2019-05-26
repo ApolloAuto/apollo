@@ -105,10 +105,6 @@ void ScenarioManager::RegisterScenarios() {
   CHECK(Scenario::LoadConfig(FLAGS_scenario_lane_follow_config_file,
                              &config_map_[ScenarioConfig::LANE_FOLLOW]));
 
-  // side_pass
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_side_pass_config_file,
-                             &config_map_[ScenarioConfig::SIDE_PASS]));
-
   // bare_intersection
   CHECK(Scenario::LoadConfig(
       FLAGS_scenario_bare_intersection_unprotected_config_file,
@@ -169,10 +165,38 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
          << "] destination_s[" << dest_sl.s() << "] adc_front_edge_s["
          << adc_front_edge_s << "]";
 
-  const bool pull_over_scenario =
-      (adc_distance_to_dest > 0 &&
+  bool pull_over_scenario =
+      (frame.reference_line_info().size() == 1 &&  // NO, while changing lane
+       adc_distance_to_dest >=
+           scenario_config.max_pull_over_scenario_distance() &&
        adc_distance_to_dest <=
            scenario_config.start_pull_over_scenario_distance());
+
+  // check around junction
+  if (pull_over_scenario) {
+    constexpr double kDisanceToAvoidJunction = 8.0;  // meter
+    for (const auto& overlap : first_encountered_overlap_map_) {
+      if (overlap.first == ReferenceLineInfo::PNC_JUNCTION ||
+          overlap.first == ReferenceLineInfo::SIGNAL ||
+          overlap.first == ReferenceLineInfo::STOP_SIGN ||
+          overlap.first == ReferenceLineInfo::YIELD_SIGN) {
+        const double distance_to = overlap.second.start_s - dest_sl.s();
+        const double distance_passed = dest_sl.s() - overlap.second.end_s;
+        if ((distance_to > 0.0 && distance_to < kDisanceToAvoidJunction) ||
+            (distance_passed > 0.0 &&
+             distance_passed < kDisanceToAvoidJunction)) {
+          pull_over_scenario = false;
+          break;
+        }
+      }
+    }
+  }
+
+  if (pull_over_scenario) {
+    const auto& pull_over_status =
+        PlanningContext::Instance()->planning_status().pull_over();
+    pull_over_scenario = pull_over_status.is_feasible();
+  }
 
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
@@ -181,7 +205,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
       }
       break;
     case ScenarioConfig::CHANGE_LANE:
-    case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
@@ -218,7 +241,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
          << "] stop_sign_overlap_start_s[" << stop_sign_overlap.start_s << "]";
 
   const bool stop_sign_scenario =
-      (adc_distance_to_stop_sign > 0 &&
+      (adc_distance_to_stop_sign > 0.0 &&
        adc_distance_to_stop_sign <=
            scenario_config.start_stop_sign_scenario_distance());
   const bool stop_sign_all_way = false;  // TODO(all)
@@ -226,7 +249,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
-    case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::PULL_OVER:
       if (stop_sign_scenario) {
         return stop_sign_all_way ? ScenarioConfig::STOP_SIGN_PROTECTED
@@ -300,7 +322,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
            << adc_distance_to_traffic_light << "]";
 
     // enter traffic-light scenarios: based on distance only
-    if (adc_distance_to_traffic_light > 0 &&
+    if (adc_distance_to_traffic_light > 0.0 &&
         adc_distance_to_traffic_light <=
             scenario_config.start_traffic_light_scenario_distance()) {
       traffic_light_scenario = true;
@@ -321,7 +343,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
-    case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::PULL_OVER:
       if (traffic_light_scenario) {
         const auto& turn_type = reference_line_info.GetPathTurnType(
@@ -389,14 +410,13 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectBareIntersectionScenario(
          << "]";
 
   const bool bare_junction_scenario =
-      (adc_distance_to_pnc_junction > 0 &&
+      (adc_distance_to_pnc_junction > 0.0 &&
        adc_distance_to_pnc_junction <=
            scenario_config.start_bare_intersection_scenario_distance());
 
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
-    case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::PULL_OVER:
       if (bare_junction_scenario) {
         return ScenarioConfig::BARE_INTERSECTION_UNPROTECTED;
@@ -758,6 +778,9 @@ void ScenarioManager::UpdatePlanningContext(
 
   // TrafficLight scenario
   UpdatePlanningContextTrafficLightScenario(frame, scenario_type);
+
+  // PullOver scenario
+  UpdatePlanningContextPullOverScenario(frame, scenario_type);
 }
 
 // update: bare_intersection status in PlanningContext
@@ -881,6 +904,15 @@ void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
              << traffic_light_overlap.object_id << "] start_s["
              << traffic_light_overlap.start_s << "]";
     }
+  }
+}
+
+// update: pull_over status in PlanningContext
+void ScenarioManager::UpdatePlanningContextPullOverScenario(
+    const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
+  if (scenario_type != ScenarioConfig::PULL_OVER) {
+    PlanningContext::Instance()->mutable_planning_status()->clear_pull_over();
+    return;
   }
 }
 

@@ -127,6 +127,6 @@ void RenderableObject::Render(const QMatrix4x4* mvp) {
       shader_program_->release();
     }
   } else {
-    std::cerr << "Please initalize the object" << std::endl;
+    std::cerr << "Please initialize the object" << std::endl;
   }
 }

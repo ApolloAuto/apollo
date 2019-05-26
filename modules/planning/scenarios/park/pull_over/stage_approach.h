@@ -43,7 +43,7 @@ class PullOverStageApproach : public Stage {
     return Stage::GetContextAs<PullOverContext>();
   }
 
-  Stage::StageStatus FinishStage();
+  Stage::StageStatus FinishStage(const bool success);
 
  private:
   ScenarioPullOverConfig scenario_config_;

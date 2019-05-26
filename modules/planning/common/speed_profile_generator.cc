@@ -43,6 +43,7 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   AERROR << "Fallback using piecewise jerk speed!";
   const double init_v = EgoInfo::Instance()->start_point().v();
   const double init_a = EgoInfo::Instance()->start_point().a();
+  AWARN << "init_v = " << init_v << ", init_a = " << init_a;
   const auto& veh_param =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
 
@@ -66,7 +67,7 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(num_of_knots, delta_t,
                                                    init_s);
 
-  piecewise_jerk_problem.set_end_state_ref({10000.0, 0.0, 0.0}, end_s);
+  piecewise_jerk_problem.set_end_state_ref({1000.0, 0.0, 0.0}, end_s);
 
   // TODO(Hongyi): tune the params and move to a config
   piecewise_jerk_problem.set_weight_ddx(1.0);
@@ -78,7 +79,7 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   piecewise_jerk_problem.set_ddx_bounds(veh_param.max_deceleration(),
                                         veh_param.max_acceleration());
   // TODO(Hongyi): Set back to vehicle_params when ready
-  piecewise_jerk_problem.set_ddx_bounds(-4.4, 2.0);
+  piecewise_jerk_problem.set_ddx_bounds(-4.0, 2.0);
   piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_bound);
 
   // Solve the problem
@@ -91,6 +92,11 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   const std::vector<double>& s = piecewise_jerk_problem.opt_x();
   const std::vector<double>& ds = piecewise_jerk_problem.opt_dx();
   const std::vector<double>& dds = piecewise_jerk_problem.opt_ddx();
+
+  for (size_t i = 0; i < num_of_knots; ++i) {
+    ADEBUG << "For[" << delta_t * static_cast<double>(i) << "], s = " << s[i]
+           << ", v = " << ds[i] << ", a = " << dds[i];
+  }
 
   SpeedData speed_data;
   speed_data.AppendSpeedPoint(s[0], 0.0, ds[0], dds[0], 0.0);
@@ -156,7 +162,8 @@ SpeedData SpeedProfileGenerator::GenerateStopProfile(const double init_speed,
   double pre_v = init_speed;
   double acc = FLAGS_slowdown_profile_deceleration;
 
-  for (double t = 0.0; t < max_t; t += unit_t) {
+  speed_data.AppendSpeedPoint(0.0, 0.0, init_speed, init_acc, 0.0);
+  for (double t = unit_t; t < max_t; t += unit_t) {
     double s = 0.0;
     double v = 0.0;
     s = std::fmax(pre_s,
@@ -280,7 +287,7 @@ SpeedData SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(
     const double distance, const double max_speed) {
   constexpr double kConstDeceleration = -0.8;  // (~3sec to fully stop)
   constexpr double kProceedingSpeed = 2.23;    // (5mph proceeding speed)
-  const double proceeding_speed = std::min(max_speed, kProceedingSpeed);
+  const double proceeding_speed = std::fmin(max_speed, kProceedingSpeed);
   const double distance_to_start_deceleration =
       proceeding_speed * proceeding_speed / kConstDeceleration / 2;
   bool is_const_deceleration_mode = distance < distance_to_start_deceleration;

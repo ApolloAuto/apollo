@@ -4,15 +4,14 @@ licenses(["notice"])
 
 cc_library(
     name = "rss",
+    srcs = [
+        "lib/librss_module.so",
+        "lib/librss_support.so",
+    ],
     hdrs = glob([
-        "include/**/*.hpp"
+        "include/**/*.hpp",
     ]),
     includes = [
         "include",
     ],
-    srcs = [
-        "lib/librss_module.so",
-        "lib/librss_support.so",
-    ]
 )
-

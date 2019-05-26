@@ -32,9 +32,9 @@
 namespace apollo {
 namespace planning {
 
-class DeciderCreep : public Decider {
+class CreepDecider : public Decider {
  public:
-  explicit DeciderCreep(const TaskConfig& config);
+  explicit CreepDecider(const TaskConfig& config);
 
   apollo::common::Status Process(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;

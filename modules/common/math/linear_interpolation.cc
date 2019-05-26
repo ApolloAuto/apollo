@@ -60,7 +60,6 @@ PathPoint InterpolateUsingLinearApproximation(const PathPoint &p0,
                                               const double s) {
   double s0 = p0.s();
   double s1 = p1.s();
-  CHECK_LE(s0, s1);
 
   PathPoint path_point;
   double weight = (s - s0) / (s1 - s0);

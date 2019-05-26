@@ -22,8 +22,8 @@
 
 #include "cyber/common/log.h"
 
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -43,24 +43,33 @@ Stage::StageStatus PullOverStageApproach::Process(
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
-  if (!config_.enabled()) {
-    return FinishStage();
-  }
-
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "StopSignUnprotectedStageCreep planning error";
+    AERROR << "PullOverStageApproach planning error";
   }
 
-  // TODO(all): to be implemented
-  if (0) {
-    return FinishStage();
+  const auto& reference_line_info = frame->reference_line_info().front();
+  scenario::util::PullOverStatus status =
+      scenario::util::CheckADCPullOver(reference_line_info, scenario_config_);
+
+  if (status == scenario::util::UNKNOWN ||
+      status == scenario::util::PASS_DESTINATION ||
+      status == scenario::util::PARK_COMPLETE) {
+    return FinishStage(true);
+  } else if (status == scenario::util::PARK_FAIL) {
+    return FinishStage(false);
   }
+
   return StageStatus::RUNNING;
 }
 
-Stage::StageStatus PullOverStageApproach::FinishStage() {
-  return FinishScenario();
+Stage::StageStatus PullOverStageApproach::FinishStage(const bool success) {
+  if (success) {
+    return FinishScenario();
+  } else {
+    next_stage_ = ScenarioConfig::PULL_OVER_RETRY_PARKING;
+    return Stage::FINISHED;
+  }
 }
 
 }  // namespace pull_over

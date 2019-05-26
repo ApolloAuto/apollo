@@ -201,11 +201,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
   }
 
-  double forward_rel_time =
-      prev_trajectory
-          ->TrajectoryPointAt(static_cast<uint32_t>(time_matched_index))
-          .relative_time() +
-      planning_cycle_time;
+  double forward_rel_time = veh_rel_time + planning_cycle_time;
 
   size_t forward_time_index =
       prev_trajectory->QueryLowerBoundPoint(forward_rel_time);
@@ -238,10 +234,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
 std::pair<double, double> TrajectoryStitcher::ComputePositionProjection(
     const double x, const double y, const TrajectoryPoint& p) {
   Vec2d v(x - p.path_point().x(), y - p.path_point().y());
-  Vec2d n(common::math::cos(
-              common::math::Angle16::from_rad(p.path_point().theta())),
-          common::math::sin(
-              common::math::Angle16::from_rad(p.path_point().theta())));
+  Vec2d n(std::cos(p.path_point().theta()), std::sin(p.path_point().theta()));
 
   std::pair<double, double> frenet_sd;
   frenet_sd.first = v.InnerProd(n) + p.path_point().s();

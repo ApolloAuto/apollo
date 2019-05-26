@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package apollo.bridge;
+
+message UDPBridgeRemoteInfo {
+    optional string remote_ip = 1 [default = "127.0.0.1"];
+    optional int32 remote_port = 2 [default = 8900];
+    optional string proto_name = 3 [default = "ProtoMsgName"];
+}

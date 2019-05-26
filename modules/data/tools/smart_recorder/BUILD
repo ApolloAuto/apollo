@@ -6,8 +6,37 @@ cc_binary(
     name = "smart_recorder",
     srcs = ["smart_recorder.cc"],
     deps = [
-        ":record_processor",
+        ":post_record_processor",
+        ":realtime_record_processor",
         ":smart_recorder_gflags",
+    ],
+)
+
+cc_library(
+    name = "post_record_processor",
+    srcs = ["post_record_processor.cc"],
+    hdrs = ["post_record_processor.h"],
+    deps = [
+        ":channel_pool",
+        ":record_processor",
+        "//cyber/record:record_reader",
+        "//cyber/record:record_viewer",
+    ],
+)
+
+cc_library(
+    name = "realtime_record_processor",
+    srcs = ["realtime_record_processor.cc"],
+    hdrs = ["realtime_record_processor.h"],
+    deps = [
+        ":channel_pool",
+        ":record_processor",
+        "//cyber",
+        "//cyber/record:record_file_reader",
+        "//cyber/record:record_reader",
+        "//cyber/record:record_viewer",
+        "//cyber/tools/cyber_recorder:recorder",
+        "//modules/data/tools/smart_recorder/proto:smart_recorder_status_proto",
     ],
 )
 
@@ -16,15 +45,11 @@ cc_library(
     srcs = ["record_processor.cc"],
     hdrs = ["record_processor.h"],
     deps = [
-        ":channel_pool",
         ":drive_event_trigger",
         ":emergency_mode_trigger",
+        ":interval_pool",
         ":small_topics_trigger",
         "//cyber/common:file",
-        "//cyber/message:message_traits",
-        "//cyber/message:raw_message",
-        "//cyber/record:record_reader",
-        "//cyber/record:record_viewer",
         "//cyber/record:record_writer",
         "//modules/common/util",
     ],

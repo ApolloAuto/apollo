@@ -41,10 +41,8 @@ constexpr double kPathBoundsDeciderHorizon = 150.0;
 constexpr double kPathBoundsDeciderResolution = 0.5;
 constexpr double kDefaultLaneWidth = 5.0;
 constexpr double kDefaultRoadWidth = 20.0;
-constexpr double kObstacleStartSBuffer = 3.0;
-constexpr double kObstacleEndSBuffer = 2.0;
-constexpr double kObstacleLBuffer = 0.4;
-constexpr int kNumExtraTailBoundPoint = 10;
+// TODO(all): Update extra tail point base on vehicle speed.
+constexpr int kNumExtraTailBoundPoint = 20;
 
 class PathBoundsDecider : public Decider {
  public:
@@ -111,11 +109,21 @@ class PathBoundsDecider : public Decider {
       const ReferenceLineInfo& reference_line_info,
       std::vector<std::tuple<double, double, double>>* const path_bound);
 
-  bool SearchPullOverPosition(
+  std::string GeneratePullOverPathBound(
       const ReferenceLineInfo& reference_line_info,
+      std::vector<std::tuple<double, double, double>>* const path_bound);
+
+  // bool SetUpPullOver(
+  //     const Frame& frame, const ReferenceLineInfo& reference_line_info,
+  //     );
+
+  // bool IsValidPullOverPosition(
+  //     );
+
+  bool SearchPullOverPosition(
+      const Frame& frame, const ReferenceLineInfo& reference_line_info,
       const std::vector<std::tuple<double, double, double>>& path_bound,
-      std::tuple<double, double, double, double, double>* const
-          pull_over_configuration);
+      std::tuple<double, double, double, int>* const pull_over_configuration);
 
   /** @brief Remove redundant path bounds in the following manner:
    *   - if "left" is contained by "right", remove "left"; vice versa.
@@ -138,6 +146,15 @@ class PathBoundsDecider : public Decider {
       const ReferenceLine& reference_line,
       std::vector<std::tuple<double, double, double>>* const path_bound);
 
+  /** @brief Refine the boundary based on the road-info.
+    *  The returned boundary is with respect to the lane-center (NOT the 
+    *  reference_line), though for most of the times reference_line's
+    *  deviation from lane-center is negligible.
+    */
+  bool GetBoundaryFromRoads(
+      const ReferenceLineInfo& reference_line_info,
+      std::vector<std::tuple<double, double, double>>* const path_bound);
+
   /** @brief Refine the boundary based on lane-info and ADC's location.
    *   It will comply to the lane-boundary. However, if the ADC itself
    *   is out of the given lane(s), it will adjust the boundary
@@ -149,9 +166,7 @@ class PathBoundsDecider : public Decider {
       std::vector<std::tuple<double, double, double>>* const path_bound,
       std::string* const borrow_lane_type);
 
-  bool GetLaneInfoFromPoint(double point_x, double point_y, double point_z,
-                            double point_theta,
-                            hdmap::LaneInfoConstPtr* const lane);
+  void ConvertBoundaryAxesFromLaneCenterToRefLine();
 
   /** @brief Refine the boundary based on static obstacles. It will make sure
    *   the boundary doesn't contain any static obstacle so that the path
@@ -214,14 +229,12 @@ class PathBoundsDecider : public Decider {
       const std::vector<std::tuple<double, double, double>>& path_boundaries);
 
  private:
-  std::string blocking_obstacle_id_ = "";
   double adc_frenet_s_ = 0.0;
   double adc_frenet_sd_ = 0.0;
   double adc_frenet_l_ = 0.0;
   double adc_frenet_ld_ = 0.0;
   double adc_l_to_lane_center_ = 0.0;
   double adc_lane_width_ = 0.0;
-  hdmap::LaneInfoConstPtr adc_lane_info_;
 
   FRIEND_TEST(PathBoundsDeciderTest, InitPathBoundary);
   FRIEND_TEST(PathBoundsDeciderTest, GetBoundaryFromLanesAndADC);

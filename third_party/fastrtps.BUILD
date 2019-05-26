@@ -4,10 +4,8 @@ cc_library(
         "lib/*.so.*",
         "lib/*.so",
     ]),
-
     includes = [
         "include",
     ],
-
     visibility = ["//visibility:public"],
 )

@@ -186,7 +186,7 @@ double NaviObstacleDecider::GetObstacleActualOffsetDistance(
   auto obs_width = iter->first;
   auto lat_dist = iter->second;
   ADEBUG << "get obstacle width : " << obs_width
-         << "get lattitude distance : " << lat_dist;
+         << "get latitude distance : " << lat_dist;
   auto actual_dist = std::fabs(lat_dist) - obs_width / 2.0 -
                      VehicleParam().left_edge_to_center();
 

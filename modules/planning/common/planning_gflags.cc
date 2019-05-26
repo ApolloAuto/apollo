@@ -71,10 +71,8 @@ DEFINE_bool(enable_scenario_bare_intersection, false,
             "enable bare_intersection scenarios in planning");
 
 DEFINE_bool(enable_scenario_pull_over, false,
-            "enable side pass scenario in planning");
+            "enable pull-over scenario in planning");
 
-DEFINE_bool(enable_scenario_side_pass, true,
-            "enable side pass scenario in planning");
 DEFINE_double(side_pass_min_signal_intersection_distance, 50.0,
               "meter, for intersection has signal, ADC will enter side pass "
               "scenario only when it is farther than this threshoold");
@@ -87,6 +85,9 @@ DEFINE_bool(enable_scenario_stop_sign, true,
 
 DEFINE_bool(enable_scenario_traffic_light, true,
             "enable traffic_light scenarios in planning");
+
+DEFINE_bool(enable_force_pull_over_open_space_parking_test, false,
+            "enable force_pull_over_open_space_parking_test");
 
 DEFINE_string(traffic_rule_config_filename,
               "/apollo/modules/planning/conf/traffic_rule_config.pb.txt",
@@ -121,9 +122,6 @@ DEFINE_double(look_forward_extend_distance, 50,
 DEFINE_double(reference_line_stitch_overlap_distance, 20,
               "The overlap distance with the existing reference line when "
               "stitching the existing reference line");
-DEFINE_double(reference_line_lateral_buffer, 0.5,
-              "When creating reference line, the minimum distance with road "
-              "curb for a vehicle driving on this line.");
 
 DEFINE_bool(enable_smooth_reference_line, true,
             "enable smooth the map reference line");
@@ -240,7 +238,7 @@ DEFINE_double(max_stop_distance_obstacle, 10.0,
 DEFINE_double(min_stop_distance_obstacle, 6.0,
               "min stop distance from in-lane obstacle (meters)");
 DEFINE_double(nudge_distance_obstacle, 0.3,
-              "minimum distance to nudge a obstacle (meters)");
+              "minimum distance to nudge an obstacle (meters)");
 DEFINE_double(follow_min_distance, 3.0,
               "min follow distance for vehicles/bicycles/moving objects");
 DEFINE_double(follow_min_obs_lateral_distance, 2.5,
@@ -271,6 +269,15 @@ DEFINE_double(virtual_stop_wall_length, 0.1,
               "virtual stop wall length (meters)");
 DEFINE_double(virtual_stop_wall_height, 2.0,
               "virtual stop wall height (meters)");
+
+DEFINE_double(obstacle_lat_buffer, 0.4,
+              "obstacle lateral buffer (meters) for deciding path boundaries");
+DEFINE_double(obstacle_lon_start_buffer, 3.0,
+              "obstacle longitudinal start buffer (meters) for deciding "
+              "path boundaries");
+DEFINE_double(obstacle_lon_end_buffer, 2.0,
+              "obstacle longitudinal end buffer (meters) for deciding "
+              "path boundaries");
 
 // Prediction Part
 DEFINE_double(prediction_total_time, 5.0, "Total prediction time");
@@ -309,7 +316,7 @@ DEFINE_double(perception_confidence_threshold, 0.4,
               "this threshold.");
 
 // QpSt optimizer
-DEFINE_double(slowdown_profile_deceleration, -1.0,
+DEFINE_double(slowdown_profile_deceleration, -4.0,
               "The deceleration to generate slowdown profile. unit: m/s^2.");
 DEFINE_bool(enable_follow_accel_constraint, true,
             "Enable follow acceleration constraint.");
@@ -318,27 +325,24 @@ DEFINE_bool(enable_follow_accel_constraint, true,
 DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");
 
 /// thread pool
-DEFINE_uint32(max_planning_thread_pool_size, 15,
+DEFINE_uint64(max_planning_thread_pool_size, 15,
               "num of thread used in planning thread pool.");
 DEFINE_bool(use_multi_thread_to_add_obstacles, false,
             "use multiple thread to add obstacles.");
-DEFINE_bool(
-    enable_multi_thread_in_dp_poly_path, false,
-    "Enable multiple thread to calculation curve cost in dp_poly_path.");
 DEFINE_bool(enable_multi_thread_in_dp_st_graph, false,
             "Enable multiple thread to calculation curve cost in dp_st_graph.");
 
 /// Lattice Planner
-DEFINE_double(lattice_epsilon, 1e-6, "Epsilon in lattice planner.");
+DEFINE_double(numerical_epsilon, 1e-6, "Epsilon in lattice planner.");
 DEFINE_double(default_cruise_speed, 5.0, "default cruise speed");
 DEFINE_bool(enable_auto_tuning, false, "enable auto tuning data emission");
 DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
 DEFINE_double(trajectory_space_resolution, 1.0,
               "Trajectory space resolution in planning");
-DEFINE_double(decision_horizon, 200.0,
-              "Longitudinal horizon for decision making");
-DEFINE_uint32(num_velocity_sample, 6,
+DEFINE_double(speed_lon_decision_horizon, 200.0,
+              "Longitudinal horizon for speed decision making (meter)");
+DEFINE_uint64(num_velocity_sample, 6,
               "The number of velocity samples in end condition sampler.");
 DEFINE_bool(enable_backup_trajectory, true,
             "If generate backup trajectory when planning fail");
@@ -350,7 +354,7 @@ DEFINE_double(lon_collision_buffer, 2.0,
               "The longitudinal buffer to keep distance to other vehicles");
 DEFINE_double(lat_collision_buffer, 0.1,
               "The lateral buffer to keep distance to other vehicles");
-DEFINE_uint32(num_sample_follow_per_timestamp, 3,
+DEFINE_uint64(num_sample_follow_per_timestamp, 3,
               "The number of sample points for each timestamp to follow");
 
 // Lattice Evaluate Parameters
@@ -419,7 +423,7 @@ DEFINE_double(nudge_buffer, 0.3, "buffer to nudge for lateral optimization");
 DEFINE_bool(use_planning_fallback, true,
             "Use fallback trajectory for planning.");
 DEFINE_double(fallback_total_time, 3.0, "total fallback trajectory time");
-DEFINE_double(fallback_time_unit, 0.02,
+DEFINE_double(fallback_time_unit, 0.1,
               "fallback trajectory unit time in seconds");
 DEFINE_double(
     fallback_distance_buffer, 0.5,
@@ -463,7 +467,7 @@ DEFINE_bool(use_dual_variable_warm_start, true,
 DEFINE_bool(use_gear_shift_trajectory, false,
             "allow some time for the vehicle to shift gear");
 
-DEFINE_uint32(open_space_trajectory_stitching_preserved_length,
+DEFINE_uint64(open_space_trajectory_stitching_preserved_length,
               std::numeric_limits<uint32_t>::infinity(),
               "preserved points number in trajectory stitching for open space "
               "trajectory");
@@ -475,26 +479,10 @@ DEFINE_bool(use_s_curve_speed_smooth, false,
             "Whether use s-curve (piecewise_jerk) for smoothing Hybrid Astar "
             "speed/acceleration.");
 
-// pull-over
-DEFINE_double(destination_to_adc_buffer, 10.0,
-              "If the destination is within this distance from ADC, "
-              "then don't search for pull-over position.");
-
-DEFINE_double(destination_to_pathend_buffer, 10.0,
-              "If the destination is within this distance to path-end, "
-              "then don't search for pull-over position. Wait until "
-              "destination gets closer.");
-
-DEFINE_double(pull_over_road_edge_buffer, 0.15,
-              "If the available path boundary's edge is not within this "
-              "distance from the road edge, then this position is not "
-              "qualified for being a pull-over position.");
 DEFINE_bool(
     enable_parallel_trajectory_smoothing, false,
     "Whether to partition the trajectory first and do smoothing in parallel");
 
-DEFINE_bool(use_osqp_optimizer_for_qp_st, false,
-            "Use OSQP optimizer for QpSt speed optimization.");
 DEFINE_bool(use_osqp_optimizer_for_reference_line, true,
             "Use OSQP optimizer for reference line optimization.");
 DEFINE_bool(enable_osqp_debug, false,
@@ -564,5 +552,5 @@ DEFINE_bool(enable_lane_change_urgency_checking, true,
 DEFINE_double(short_path_length_threshold, 20.0,
               "Threshold for too short path length");
 
-DEFINE_uint32(trajectory_stitching_preserved_length, 20,
+DEFINE_uint64(trajectory_stitching_preserved_length, 20,
               "preserved points number in trajectory stitching");

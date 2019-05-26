@@ -112,7 +112,7 @@ cc_test(
     ],
     data = [
         ":testdata",
-        "//modules/map:map_data",
+        "//modules/map/data:map_sunnyvale_loop",
     ],
     deps = [
         ":pnc_map",
@@ -130,7 +130,7 @@ cc_test(
     ],
     data = [
         ":testdata",
-        "//modules/map:map_data",
+        "//modules/map/data:map_sunnyvale_loop",
     ],
     deps = [
         ":route_segments",

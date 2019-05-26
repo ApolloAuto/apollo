@@ -38,7 +38,7 @@ namespace can {
 
 /**
  * @class ExampleCanClient
- * @brief The class which defines a Example CAN client which inherits CanClient.
+ * @brief The class which defines an Example CAN client which inherits CanClient.
  */
 class ExampleCanClient : public CanClient {
  public:
@@ -106,14 +106,14 @@ class ExampleCanClient : public CanClient {
 To register the New CAN Card in CanClientFactory,
 add the following code to `CanClientFactory`:
 ```cpp
-void CanClientFactory::RegisterCanClients() {  
-  Register(CANCardParameter::ESD_CAN, 
-           []() -> CanClient* { return new can::EsdCanClient(); });  
-  
-  // register the new CAN card here.  
-  Register(CANCardParameter::EXAMPLE_CAN,  
-           []() -> CanClient* { return new can::ExampleCanClient(); });  
-}  
+void CanClientFactory::RegisterCanClients() {
+  Register(CANCardParameter::ESD_CAN,
+           []() -> CanClient* { return new can::EsdCanClient(); });
+
+  // register the new CAN card here.
+  Register(CANCardParameter::EXAMPLE_CAN,
+           []() -> CanClient* { return new can::ExampleCanClient(); });
+}
 ```
 
 ### Step 3
@@ -128,13 +128,13 @@ message CANCardParameter {
     ESD_CAN = 1;
     EXAMPLE_CAN = 2; // add new CAN card here.
   }
-  ... ... 
+  ... ...
 }
 ```
 Update `/modules/canbus/conf/canbus_conf.pb.txt`
 
 ```txt
-... ... 
+... ...
 can_card_parameter {
   brand:EXAMPLE_CAN
   type: PCI_CARD // suppose the new can card is PCI_CARD

@@ -315,7 +315,7 @@ int main(int argc, char **argv) {
   std::string command_line = "cyber_recorder info " + record_file_name;
   int ret = system(command_line.c_str());
 
-  std::cout << "Convertion finished! Took " << ros::Time::now() - start_time
+  std::cout << "Conversion finished! Took " << ros::Time::now() - start_time
             << " seconds in total." << std::endl;
   return ret;
 }

@@ -50,11 +50,11 @@
     "arrow-spacing": "error",
     // Disallow reassigning `const` variables.
     "no-const-assign": "error",
-    // Disallow unecessary constructors.
+    // Disallow unnecessary constructors.
     "no-useless-constructor": "error",
     // Require `let` or `const` instead of `var`.
     "no-var": "error",
-    // Require `const` declaration for variables taht are never
+    // Require `const` declaration for variables that are never
     // reassigned after declared.
     "prefer-const": "error",
   },
