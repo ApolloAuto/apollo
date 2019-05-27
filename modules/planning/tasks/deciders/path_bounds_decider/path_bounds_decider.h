@@ -147,10 +147,10 @@ class PathBoundsDecider : public Decider {
       std::vector<std::tuple<double, double, double>>* const path_bound);
 
   /** @brief Refine the boundary based on the road-info.
-    *  The returned boundary is with respect to the lane-center (NOT the 
-    *  reference_line), though for most of the times reference_line's
-    *  deviation from lane-center is negligible.
-    */
+   *  The returned boundary is with respect to the lane-center (NOT the
+   *  reference_line), though for most of the times reference_line's
+   *  deviation from lane-center is negligible.
+   */
   bool GetBoundaryFromRoads(
       const ReferenceLineInfo& reference_line_info,
       std::vector<std::tuple<double, double, double>>* const path_bound);
