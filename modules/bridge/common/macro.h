@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/bridge/udp_bridge_sender_component.h"
 
-#include "cyber/init.h"
-#include "gtest/gtest.h"
+#pragma once
 
 namespace apollo {
 namespace bridge {
 
-TEST(UDPBridgeSenderComponentTest, Simple) {
-  cyber::Init("udp_bridge_component_test");
-  UDPBridgeSenderComponent<planning::ADCTrajectory> udp_bridge_component;
-  EXPECT_EQ(udp_bridge_component.Name(), "Bridge");
-}
+#define _1K 1024
+
+#define FREE_ARRY(arry) \
+  if (arry) { \
+    delete[] arry; \
+  } \
+  arry = nullptr
+
+#define FREE_POINTER(p) \
+  if (p) { \
+    delete p; \
+  } \
+  p = nullptr
 
 }  // namespace bridge
 }  // namespace apollo

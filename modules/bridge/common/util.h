@@ -13,19 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/bridge/udp_bridge_sender_component.h"
 
-#include "cyber/init.h"
-#include "gtest/gtest.h"
+#pragma once
+
+#include <memory>
+#include <string>
+#include <cstring>
+#include "modules/bridge/common/bridge_buffer.h"
 
 namespace apollo {
 namespace bridge {
 
-TEST(UDPBridgeSenderComponentTest, Simple) {
-  cyber::Init("udp_bridge_component_test");
-  UDPBridgeSenderComponent<planning::ADCTrajectory> udp_bridge_component;
-  EXPECT_EQ(udp_bridge_component.Name(), "Bridge");
+const int HEADER_BUF_SIZE = sizeof(size_t);
+template<typename T>
+void WriteToBuffer(BridgeBuffer<char> *buf, const std::shared_ptr<T> &pb_msg) {
+  if (!buf) {
+    return;
+  }
+  size_t msg_len = pb_msg->ByteSize();
+  size_t total_size = HEADER_BUF_SIZE + msg_len;
+
+  buf->reset(total_size);
+
+  buf->write(0, reinterpret_cast<char*>(&msg_len), sizeof(size_t));
+  pb_msg->SerializeToArray(reinterpret_cast<char*>(buf + sizeof(size_t)),
+   static_cast<int>(msg_len));
 }
+
+int GetProtoSize(const char *buf, size_t size);
 
 }  // namespace bridge
 }  // namespace apollo

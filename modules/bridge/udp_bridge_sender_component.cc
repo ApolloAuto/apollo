@@ -14,25 +14,25 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/bridge/udp_bridge_component.h"
+#include "modules/bridge/udp_bridge_sender_component.h"
+#include "modules/bridge/common/util.h"
+#include "modules/bridge/common/macro.h"
 
 namespace apollo {
 namespace bridge {
 
 #define BRIDGE_IMPL(pb_msg) \
-  template class UDPBridgeComponent<pb_msg>
-
-#define _1K 1024
+  template class UDPBridgeSenderComponent<pb_msg>
 
 using apollo::cyber::io::Session;
 using apollo::localization::LocalizationEstimate;
-using apollo::bridge::UDPBridgeRemoteInfo;
+using apollo::bridge::UDPBridgeSenderRemoteInfo;
 
 template<typename T>
-bool UDPBridgeComponent<T>::Init() {
+bool UDPBridgeSenderComponent<T>::Init() {
   AINFO << "UDP bridge init, startin..";
   buf_.reset(_1K);
-  apollo::bridge::UDPBridgeRemoteInfo udp_bridge_remote;
+  apollo::bridge::UDPBridgeSenderRemoteInfo udp_bridge_remote;
   if (!this->GetProtoConfig(&udp_bridge_remote)) {
     AINFO << "load udp bridge component proto param failed";
     return false;
@@ -47,7 +47,7 @@ bool UDPBridgeComponent<T>::Init() {
 }
 
 template<typename T>
-bool UDPBridgeComponent<T>::Proc(const std::shared_ptr<T> &pb_msg) {
+bool UDPBridgeSenderComponent<T>::Proc(const std::shared_ptr<T> &pb_msg) {
   if (remote_port_ == 0 || remote_ip_.empty()) {
     AERROR << "remote info is invalid!";
     return false;
@@ -74,15 +74,14 @@ bool UDPBridgeComponent<T>::Proc(const std::shared_ptr<T> &pb_msg) {
           return;
         }
 
-        unsigned int msg_len = pb_msg->ByteSize();
-        buf_.reset(msg_len);
         std::lock_guard<std::mutex> lg(mutex_);
-        char *buf = buf_;
-        pb_msg->SerializeToArray(buf, msg_len);
-        if (session.Send(buf, msg_len, 0) < 0) {
+        WriteToBuffer(&buf_, pb_msg);
+        if (session.Send(buf_, buf_.size(), 0) < 0) {
           std::cout << "send message failed." << std::endl;
+          session.Close();
           return;
         }
+        session.Close();
       },
       "bridge_client");
 

@@ -16,17 +16,33 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//modules/bridge/common:bridge_gflags",
         "//modules/bridge/common:bridge_buffer",
+        "//modules/bridge/common:util",
+        "//modules/bridge/common:macro",
         "//modules/bridge/proto:udp_bridge_remote_info_proto",
     ],
 )
 
 cc_library(
-    name = "udp_bridge_component_lib",
+    name = "udp_bridge_sender_component_lib",
     srcs = [
-        "udp_bridge_component.cc",
+        "udp_bridge_sender_component.cc",
     ],
     hdrs = [
-        "udp_bridge_component.h",
+        "udp_bridge_sender_component.h",
+    ],
+    copts = ['-DMODULE_NAME=\\"bridge\\"'],
+    deps = [
+        ":udp_bridge",
+    ],
+)
+
+cc_library(
+    name = "udp_bridge_receiver_component_lib",
+    srcs = [
+        "udp_bridge_receiver_component.cc",
+    ],
+    hdrs = [
+        "udp_bridge_receiver_component.h",
     ],
     copts = ['-DMODULE_NAME=\\"bridge\\"'],
     deps = [
@@ -35,10 +51,17 @@ cc_library(
 )
 
 cc_binary(
-    name = "libudp_bridge_component.so",
+    name = "libudp_bridge_sender_component.so",
     linkshared = True,
     linkstatic = False,
-    deps = [":udp_bridge_component_lib"],
+    deps = [":udp_bridge_sender_component_lib"],
+)
+
+cc_binary(
+    name = "libudp_bridge_receiver_component.so",
+    linkshared = True,
+    linkstatic = False,
+    deps = [":udp_bridge_receiver_component_lib"],
 )
 
 cc_test(
@@ -48,7 +71,7 @@ cc_test(
         "udp_bridge_component_test.cc",
     ],
     deps = [
-        ":udp_bridge_component_lib",
+        ":udp_bridge_sender_component_lib",
         "@gtest//:main",
     ],
 )

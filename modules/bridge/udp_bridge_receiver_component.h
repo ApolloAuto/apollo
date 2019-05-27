@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
 #pragma once
 
 #include <netinet/in.h>
@@ -32,40 +31,46 @@
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/planning/proto/planning.pb.h"
-#include "modules/common/util/util.h"
 #include "modules/bridge/common/bridge_gflags.h"
 #include "modules/bridge/common/bridge_buffer.h"
 #include "modules/bridge/proto/udp_bridge_remote_info.pb.h"
 
+#include "modules/planning/proto/planning.pb.h"
+
 namespace apollo {
 namespace bridge {
 
-template<typename T>
-class UDPBridgeComponent final
-    : public cyber::Component<T> {
+#define RECEIVER_BRIDGE_COMPONENT_REGISTER(pb_msg) \
+  CYBER_REGISTER_COMPONENT(UDPBridgeReceiverComponent<pb_msg>)
+
+template <typename T>
+class UDPBridgeReceiverComponent final
+  : public cyber::Component<> {
  public:
-  UDPBridgeComponent()
-    : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
+  UDPBridgeReceiverComponent();
+  ~UDPBridgeReceiverComponent();
 
   bool Init() override;
-  bool Proc(const std::shared_ptr<T> &pb_msg) override;
 
-  std::string Name() const {
-    return FLAGS_bridge_module_name;
-  }
+  std::string Name() const { return FLAGS_bridge_module_name; }
 
  private:
+  bool InitSession(uint16_t port);
+  bool MsgHandle();
+  void MsgDispatcher();
+ private:
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
-  unsigned int remote_port_ = 0;
-  std::string remote_ip_ = "";
+  unsigned int bind_port_ = 0;
   std::string proto_name_ = "";
+  std::string topic_name_ = "";
   BridgeBuffer<char> buf_;
+  std::shared_ptr<cyber::Writer<T>> writer_;
   std::mutex mutex_;
+
+  std::shared_ptr<apollo::cyber::io::Session> session_
+    = std::make_shared<apollo::cyber::io::Session>();
 };
 
-CYBER_REGISTER_COMPONENT(UDPBridgeComponent<planning::ADCTrajectory>)
-CYBER_REGISTER_COMPONENT(UDPBridgeComponent<localization::LocalizationEstimate>)
-
+RECEIVER_BRIDGE_COMPONENT_REGISTER(planning::ADCTrajectory)
 }  // namespace bridge
 }  // namespace apollo

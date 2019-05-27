@@ -22,6 +22,26 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "util",
+    srcs = [
+        "util.cc",
+    ],
+    hdrs = [
+        "util.h",
+    ],
+    deps = [
+        "bridge_buffer",
+    ],
+)
+
+cc_library(
+    name = "macro",
+    hdrs = [
+        "macro.h",
+    ],
+)
+
 cc_test(
     name = "bridge_buffer_test",
     size = "small",
