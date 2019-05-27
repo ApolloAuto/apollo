@@ -309,7 +309,7 @@ Chassis LincolnController::chassis() {
     chassis_.set_chassis_error_mask(chassis_error_mask_);
   }
 
-  // 6d, 6e, 6f, if gps valid is availiable, assume all gps related field
+  // 6d, 6e, 6f, if gps valid is available, assume all gps related field
   // available
   if (chassis_detail.basic().has_gps_valid()) {
     chassis_.mutable_chassis_gps()->set_latitude(
