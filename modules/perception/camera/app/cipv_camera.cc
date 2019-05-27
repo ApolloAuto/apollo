@@ -572,17 +572,17 @@ bool Cipv::IsPointLeftOfLine(const Point2Df &point,
             << "), cross_product: " << cross_product;
     }
     return true;
-  } else {
-    if (debug_level_ >= 2) {
-      AINFO << "point (" << point(0) << ", " << point(1)
-            << ") is right of line_segment (" << line_seg_start_point(0) << ", "
-            << line_seg_start_point(1) << ")->(" << line_seg_end_point(0)
-            << ", " << line_seg_end_point(1)
-            << "), cross_product: " << cross_product;
-    }
-    return false;
   }
+  if (debug_level_ >= 2) {
+    AINFO << "point (" << point(0) << ", " << point(1)
+          << ") is right of line_segment (" << line_seg_start_point(0) << ", "
+          << line_seg_start_point(1) << ")->(" << line_seg_end_point(0)
+          << ", " << line_seg_end_point(1)
+          << "), cross_product: " << cross_product;
+  }
+  return false;
 }
+
 // Check if the object is in the lane in image space
 bool Cipv::IsObjectInTheLaneImage(const std::shared_ptr<base::Object> &object,
                                   const EgoLane &egolane_image,
@@ -706,7 +706,7 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
     }
   }
 
-  return (b_left_lane_clear && b_right_lane_clear);
+  return b_left_lane_clear && b_right_lane_clear;
 }
 
 // Check if the object is in the lane in ego-ground space
@@ -717,10 +717,9 @@ bool Cipv::IsObjectInTheLane(const std::shared_ptr<base::Object> &object,
                              float *distance) {
   if (b_image_based_cipv_) {
     return IsObjectInTheLaneImage(object, egolane_image, distance);
-  } else {
-    return IsObjectInTheLaneGround(object, egolane_ground, world2camera,
-                                   distance);
   }
+  return IsObjectInTheLaneGround(object, egolane_ground, world2camera,
+                                 distance);
 }
 
 // =====================================================================
@@ -822,9 +821,9 @@ bool Cipv::TranformPoint(const Eigen::VectorXf &in,
   Eigen::VectorXf trans_pt = motion_matrix * in;
   if (fabs(trans_pt(3)) < kFloatEpsilon) {
     return false;
-  } else {
-    trans_pt /= trans_pt(3);
   }
+
+  trans_pt /= trans_pt(3);
   *out << trans_pt(0), trans_pt(1), trans_pt(2);
   return true;
 }
@@ -960,13 +959,12 @@ bool Cipv::image2ground(const float image_x, const float image_y,
   if (fabs(p_ground(2)) > std::numeric_limits<double>::min()) {
     *ground_x = static_cast<float>(p_ground(0) / p_ground(2));
     *ground_y = static_cast<float>(p_ground(1) / p_ground(2));
-  } else {
-    if (debug_level_ >= 1) {
-      AINFO << "p_ground(2) too small :" << p_ground(2);
-    }
-    return false;
+    return true;
   }
-  return true;
+  if (debug_level_ >= 1) {
+    AINFO << "p_ground(2) too small :" << p_ground(2);
+  }
+  return false;
 }
 
 bool Cipv::ground2image(const float ground_x, const float ground_y,
@@ -979,13 +977,12 @@ bool Cipv::ground2image(const float ground_x, const float ground_y,
   if (fabs(p_image(2)) > std::numeric_limits<double>::min()) {
     *image_x = static_cast<float>(p_image(0) / p_image(2));
     *image_y = static_cast<float>(p_image(1) / p_image(2));
-  } else {
-    if (debug_level_ >= 1) {
-      AINFO << "p_image(2) too small :" << p_image(2);
-    }
-    return false;
+    return true;
   }
-  return true;
+  if (debug_level_ >= 1) {
+    AINFO << "p_image(2) too small :" << p_image(2);
+  }
+  return false;
 }
 
 std::string Cipv::Name() const { return "Cipv"; }
