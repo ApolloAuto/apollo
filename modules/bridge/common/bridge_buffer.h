@@ -21,18 +21,6 @@
 namespace apollo {
 namespace bridge {
 
-// Put this in the declarations for a class to be uncopyable.
-#define DISABLE_COPY(TypeName) TypeName(const TypeName &) = delete
-
-// Put this in the declarations for a class to be unassignable.
-#define DISABLE_ASSIGN(TypeName) void operator=(const TypeName &) = delete
-
-// A macro to disallow the copy constructor and operator= functions.
-// This should be used in the private: declarations for a class.
-#define DISABLE_COPY_AND_ASSIGN(TypeName) \
-  DISABLE_COPY(TypeName);                 \
-  DISABLE_ASSIGN(TypeName)
-
 template<typename T>
 class BridgeBuffer {
  public:
@@ -51,7 +39,9 @@ class BridgeBuffer {
   size_t size_ = 0;
   size_t capacity_ = 0;
   std::mutex mutex_;
-  DISABLE_COPY_AND_ASSIGN(BridgeBuffer);
+
+  BridgeBuffer(const BridgeBuffer &) = delete;
+  BridgeBuffer &operator=(const BridgeBuffer &) = delete;
 };
 
 }  // namespace bridge

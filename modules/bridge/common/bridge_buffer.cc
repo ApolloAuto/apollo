@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/bridge/common/bridge_buffer.h"
+
 #include <memory.h>
 
 namespace apollo {

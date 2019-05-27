@@ -31,7 +31,7 @@ cc_library(
         "util.h",
     ],
     deps = [
-        "bridge_buffer",
+        ":bridge_buffer",
     ],
 )
 
@@ -49,7 +49,7 @@ cc_test(
         "bridge_buffer_test.cc",
     ],
     deps = [
-        "bridge_buffer",
+        ":bridge_buffer",
         "@gtest//:main",
     ],
 )

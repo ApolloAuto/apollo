@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/bridge/common/bridge_buffer.h"
 
 #include <stdio.h>
 #include <gtest/gtest.h>
 #include <string>
-#include "modules/bridge/common/bridge_buffer.h"
 
 namespace apollo {
 namespace bridge {
