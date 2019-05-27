@@ -85,12 +85,14 @@ message ReferenceLineSmootherConfig {
   // considered as a wide lane
   // wide lane handing feature will be disabled if this number is negative
   optional double wide_lane_threshold_factor = 7 [default = 2.0];
-  // In a wide lane case, leave the left side (or right side on a left-handed
-  // driving map) this amount times adc width
-  optional double wide_lane_shift_remain_factor = 8 [default = 0.5];
+  // In a wide lane case, leave the left side bound (or right side on a left-handed
+  // driving map) this amount times drivable lane half width
+  optional double wide_lane_shift_ratio = 8 [default = 0.25];
+
+  optional double lateral_buffer = 9 [default = 0.2];
 
   // The output resolution for reference line.
-  optional double resolution = 9 [default = 0.02];
+  optional double resolution = 10 [default = 0.02];
 
   oneof SmootherConfig {
     QpSplineSmootherConfig qp_spline = 20;

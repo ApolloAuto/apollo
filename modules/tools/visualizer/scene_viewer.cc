@@ -437,7 +437,7 @@ void SceneViewer::mouseReleaseEvent(QMouseEvent *event) {
       camera_dialog_ = new SceneCameraDialog(this);
       if (!camera_dialog_) {
         QMessageBox::warning(this, tr("Error"),
-                             tr("No Enought for creating Camera Dialog!!!"),
+                             tr("No Enough for creating Camera Dialog!!!"),
                              QMessageBox::Ok);
         goto retLabel;
       } else {

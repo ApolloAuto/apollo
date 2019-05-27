@@ -323,6 +323,10 @@ void EvaluatorManager::BuildObstacleIdHistoryMap() {
 
 void EvaluatorManager::DumpCurrentFrameEnv() {
   FrameEnv curr_frame_env;
+  auto obstacles_container =
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
+  curr_frame_env.set_timestamp(obstacles_container->timestamp());
   for (const auto obstacle_id_history_pair : obstacle_id_history_map_) {
     int id = obstacle_id_history_pair.first;
     if (id != -1) {

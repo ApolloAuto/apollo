@@ -43,7 +43,7 @@ class PullOverStageRetryParking : public Stage {
     return Stage::GetContextAs<PullOverContext>();
   }
 
-  Stage::StageStatus FinishStage(const bool success);
+  Stage::StageStatus FinishStage();
 
  private:
   ScenarioPullOverConfig scenario_config_;

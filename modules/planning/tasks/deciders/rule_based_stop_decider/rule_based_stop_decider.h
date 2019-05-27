@@ -67,6 +67,7 @@ class RuleBasedStopDecider : public Decider {
  private:
   RuleBasedStopDeciderConfig rule_based_stop_decider_config_;
   bool is_clear_to_change_lane_ = false;
+  bool is_change_lane_planning_succeed_ = false;
 };
 }  // namespace planning
 }  // namespace apollo

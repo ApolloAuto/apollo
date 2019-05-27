@@ -1,4 +1,4 @@
-# How to Launch and Run Apollo 
+# How to Launch and Run Apollo
 First check and make sure you are in development docker container before you proceed. Now you will need to build from the source. If you want to run the entire system, make sure you have an
 nVidia GPU and that you have installed the Linux nVidia drivers.
 You could still proceed with the next few steps even if you are missing the Linux nVidia drivers, as the system will run but with the CUDA-based perception and other modules.

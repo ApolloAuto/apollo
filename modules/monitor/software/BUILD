@@ -70,4 +70,17 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "recorder_monitor",
+    srcs = ["recorder_monitor.cc"],
+    hdrs = ["recorder_monitor.h"],
+    deps = [
+        ":summary_monitor",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/data/tools/smart_recorder/proto:smart_recorder_status_proto",
+        "//modules/monitor/common:monitor_manager",
+        "//modules/monitor/common:recurrent_runner",
+    ],
+)
+
 cpplint()

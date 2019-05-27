@@ -320,7 +320,7 @@ bool Spline2dConstraint::AddPointAngleConstraint(const double t,
   return AddInequalityConstraint(affine_inequality, affine_inequality_boundary);
 }
 
-// guarantee upto values are joint
+// guarantee up to values are joint
 bool Spline2dConstraint::AddSmoothConstraint() {
   if (t_knots_.size() < 3) {
     return false;
@@ -345,7 +345,7 @@ bool Spline2dConstraint::AddSmoothConstraint() {
   return AddEqualityConstraint(affine_equality, affine_boundary);
 }
 
-// guarantee upto derivative are joint
+// guarantee up to derivative are joint
 bool Spline2dConstraint::AddDerivativeSmoothConstraint() {
   if (t_knots_.size() < 3) {
     return true;
@@ -376,7 +376,7 @@ bool Spline2dConstraint::AddDerivativeSmoothConstraint() {
   return AddEqualityConstraint(affine_equality, affine_boundary);
 }
 
-// guarantee upto second order derivative are joint
+// guarantee up to second order derivative are joint
 bool Spline2dConstraint::AddSecondDerivativeSmoothConstraint() {
   if (t_knots_.size() < 3) {
     return true;
@@ -413,7 +413,7 @@ bool Spline2dConstraint::AddSecondDerivativeSmoothConstraint() {
   return AddEqualityConstraint(affine_equality, affine_boundary);
 }
 
-// guarantee upto third order derivative are joint
+// guarantee up to third order derivative are joint
 bool Spline2dConstraint::AddThirdDerivativeSmoothConstraint() {
   if (t_knots_.size() < 3) {
     return false;

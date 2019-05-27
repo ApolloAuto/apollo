@@ -38,7 +38,7 @@ PiecewiseJerkTrajectory1d::PiecewiseJerkTrajectory1d(const double p,
 
 void PiecewiseJerkTrajectory1d::AppendSegment(const double jerk,
                                               const double param) {
-  CHECK_GT(param, FLAGS_lattice_epsilon);
+  CHECK_GT(param, FLAGS_numerical_epsilon);
 
   param_.push_back(param_.back() + param);
 
@@ -53,7 +53,7 @@ void PiecewiseJerkTrajectory1d::AppendSegment(const double jerk,
 
 double PiecewiseJerkTrajectory1d::Evaluate(const std::uint32_t order,
                                            const double param) const {
-  CHECK_GE(param, -FLAGS_lattice_epsilon);
+  CHECK_GE(param, -FLAGS_numerical_epsilon);
 
   auto it_lower = std::lower_bound(param_.begin(), param_.end(), param);
 

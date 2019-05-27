@@ -22,9 +22,8 @@
 
 #include "cyber/common/log.h"
 
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_context.h"
+#include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -49,15 +48,18 @@ Stage::StageStatus PullOverStageRetryParking::Process(
     AERROR << "PullOverStageRetryParking planning error";
   }
 
-  // TODO(all): to be implemented
-  if (0) {
-    return FinishStage(true);
+  const auto& reference_line_info = frame->reference_line_info().front();
+  scenario::util::PullOverStatus status =
+      scenario::util::CheckADCPullOver(reference_line_info, scenario_config_);
+  if (status == scenario::util::PASS_DESTINATION ||
+      status == scenario::util::PARK_COMPLETE) {
+    return FinishStage();
   }
 
   return StageStatus::RUNNING;
 }
 
-Stage::StageStatus PullOverStageRetryParking::FinishStage(const bool success) {
+Stage::StageStatus PullOverStageRetryParking::FinishStage() {
   return FinishScenario();
 }
 

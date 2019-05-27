@@ -31,7 +31,7 @@ namespace planning {
 ConstantDecelerationTrajectory1d::ConstantDecelerationTrajectory1d(
     const double init_s, const double init_v, const double a)
     : init_s_(init_s), init_v_(init_v), deceleration_(-a) {
-  if (init_v_ < -FLAGS_lattice_epsilon) {
+  if (init_v_ < -FLAGS_numerical_epsilon) {
     AERROR << "negative init v = " << init_v_;
   }
   init_v_ = std::fabs(init_v_);

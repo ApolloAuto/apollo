@@ -149,7 +149,7 @@ class DreamviewStore {
         this.options[option] = (enabled || false);
     }
 
-    // This function is triggered automatically whenever a observable changes
+    // This function is triggered automatically whenever an observable changes
     updateDimension() {
         let offsetX = 0;
         let offsetY = 0;
@@ -256,7 +256,7 @@ const timer = PARAMETERS.debug.autoMonitorMessage ? setInterval(() => {
                      "localization module.",
         }, {
             level: "INFO",
-            message: "Monitor module has started and is succesfully " +
+            message: "Monitor module has started and is successfully " +
                      "initialized.",
         }][Math.floor(Math.random() * 4)];
     STORE.monitor.insert(item.level, item.message, Date.now());

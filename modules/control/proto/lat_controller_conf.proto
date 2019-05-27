@@ -28,4 +28,7 @@ message LatControllerConf {
   optional apollo.control.GainScheduler heading_err_gain_scheduler = 17;
   optional LeadlagConf reverse_leadlag_conf = 18;
   optional bool enable_reverse_leadlag_compensation = 19 [default = false];
+  optional bool enable_look_ahead_back_control = 20 [default = false];
+  optional double lookahead_station = 21 [default = 0.0];
+  optional double lookback_station = 22 [default = 0.0];
 }

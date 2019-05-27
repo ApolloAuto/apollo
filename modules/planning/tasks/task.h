@@ -43,8 +43,8 @@ class Task {
 
   const TaskConfig& Config() const { return config_; }
 
-  virtual common::Status Execute(
-      Frame* frame, ReferenceLineInfo* reference_line_info);
+  virtual common::Status Execute(Frame* frame,
+                                 ReferenceLineInfo* reference_line_info);
 
   virtual common::Status Execute(Frame* frame);
 

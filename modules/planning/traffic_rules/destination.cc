@@ -84,20 +84,24 @@ int Destination::MakeDecisions(Frame* frame,
   if (FLAGS_enable_scenario_pull_over) {
     const auto& pull_over_status =
         PlanningContext::Instance()->planning_status().pull_over();
-    if (pull_over_status.exist_pull_over_position() &&
-        pull_over_status.has_pull_over_s()) {
+    if (pull_over_status.is_feasible() && pull_over_status.has_x() &&
+        pull_over_status.has_y()) {
       // build stop decision based on pull-over position
       ADEBUG << "BuildStopDecision: pull-over position";
-      const double stop_line_s = pull_over_status.pull_over_s() +
-          VehicleConfigHelper::GetConfig().vehicle_param().length() +
-          config_.destination().stop_distance();
-      util::BuildStopDecision(stop_wall_id,
-                              stop_line_s,
-                              config_.destination().stop_distance(),
-                              StopReasonCode::STOP_REASON_PULL_OVER,
-                              wait_for_obstacle_ids,
-                              TrafficRuleConfig::RuleId_Name(config_.rule_id()),
-                              frame, reference_line_info);
+      common::SLPoint pull_over_sl;
+      reference_line.XYToSL({pull_over_status.x(), pull_over_status.y()},
+                            &pull_over_sl);
+
+      const double stop_line_s = pull_over_sl.s() +
+                                 VehicleConfigHelper::GetConfig()
+                                     .vehicle_param()
+                                     .front_edge_to_center() +
+                                 config_.destination().stop_distance();
+      util::BuildStopDecision(
+          stop_wall_id, stop_line_s, config_.destination().stop_distance(),
+          StopReasonCode::STOP_REASON_PULL_OVER, wait_for_obstacle_ids,
+          TrafficRuleConfig::RuleId_Name(config_.rule_id()), frame,
+          reference_line_info);
       return 0;
     }
   }

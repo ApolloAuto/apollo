@@ -95,7 +95,7 @@ typedef Leaf *LeafPtr;
 /**@brief Const pointer to VoxelGridCovariance leaf structure */
 typedef const Leaf *LeafConstPtr;
 
-/**@brief A searchable voxel strucure containing the mean and covariance of the
+/**@brief A searchable voxel structure containing the mean and covariance of the
  * data. */
 template <typename PointT>
 class VoxelGridCovariance {
@@ -253,7 +253,7 @@ class VoxelGridCovariance {
   }
 
  protected:
-  /**@brief Minimum points contained with in a voxel to allow it to be useable.
+  /**@brief Minimum points contained with in a voxel to allow it to be usable.
    */
   int min_points_per_voxel_;
 
@@ -261,7 +261,7 @@ class VoxelGridCovariance {
    * less than a sufficient number of points). */
   std::map<size_t, Leaf> leaves_;
 
-  /**@brief Point cloud containing centroids of voxels containing atleast
+  /**@brief Point cloud containing centroids of voxels containing at least
    * minimum number of points. */
   PointCloudPtr voxel_centroids_;
 

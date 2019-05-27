@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
 #include "modules/bridge/udp_bridge_sender_component.h"
 
 #include "cyber/init.h"

@@ -100,7 +100,7 @@ Map<std::string, std::string> ListFilesAsDict(const std::string& dir,
   Map<std::string, std::string> result;
   const std::string pattern = StrCat(dir, "/*", extension);
   for (const std::string& file_path : cyber::common::Glob(pattern)) {
-    // Remove the extention and convert to title case as the file title.
+    // Remove the extension and convert to title case as the file title.
     const std::string filename = cyber::common::GetFileName(file_path);
     const std::string file_title =
         TitleCase(filename.substr(0, filename.length() - extension.length()));
@@ -373,7 +373,7 @@ void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
                                  const bool is_reportable) {
   std::shared_ptr<DriveEvent> drive_event = std::make_shared<DriveEvent>();
   apollo::common::util::FillHeader("HMI", drive_event.get());
-  // TODO(xiaoxq): Here we reuse the header time field as the event occuring
+  // TODO(xiaoxq): Here we reuse the header time field as the event occurring
   // time. A better solution might be adding the field to DriveEvent proto to
   // make it clear.
   drive_event->mutable_header()->set_timestamp_sec(

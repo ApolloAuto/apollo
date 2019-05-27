@@ -171,8 +171,8 @@ bool DualVariableWarmStartOSQPInterface::optimize() {
   // Define Solver settings as default
   osqp_set_default_settings(settings);
   settings->alpha = 1.0;  // Change alpha parameter
-  settings->eps_abs = 1.0e-04;
-  settings->eps_rel = 1.0e-04;
+  settings->eps_abs = 1.0e-03;
+  settings->eps_rel = 1.0e-03;
   settings->max_iter = 10000;
   settings->polish = true;
   settings->verbose = FLAGS_enable_osqp_debug;
@@ -197,8 +197,8 @@ bool DualVariableWarmStartOSQPInterface::optimize() {
 
   // check state
   if (work->info->status_val != 1 && work->info->status_val != 2) {
-    AERROR << "OSQP dual warm up unsuccess, "
-           << "return status: " << work->info->status;
+    AWARN << "OSQP dual warm up unsuccess, "
+          << "return status: " << work->info->status;
     succ = false;
   }
 

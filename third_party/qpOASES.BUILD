@@ -8,8 +8,6 @@ exports_files(["qpOASES/LICENSE"])
 
 cc_library(
     name = "qpOASES",
-    linkstatic = False,
-    tags = ["manual"],
     srcs = [
         "src/BLASReplacement.cpp",
         "src/Bounds.cpp",
@@ -84,5 +82,7 @@ cc_library(
         "include",
         "src",
     ],
+    linkstatic = False,
+    tags = ["manual"],
     visibility = ["//visibility:public"],
 )

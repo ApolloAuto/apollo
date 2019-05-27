@@ -95,7 +95,7 @@ class HMIWorker {
 
   const HMIConfig config_;
 
-  // HMI status maintainence.
+  // HMI status maintenance.
   HMIStatus status_;
   HMIMode current_mode_;
   bool status_changed_ = false;

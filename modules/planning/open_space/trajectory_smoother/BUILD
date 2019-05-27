@@ -194,6 +194,27 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "iterative_anchoring_smoother",
+    srcs = [
+        "iterative_anchoring_smoother.cc",
+    ],
+    hdrs = [
+        "iterative_anchoring_smoother.h",
+    ],
+    deps = [
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/math",
+        "//modules/planning/common:speed_profile_generator",
+        "//modules/planning/common/path:discretized_path",
+        "//modules/planning/common/speed:speed_data",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/math:discrete_points_math",
+        "//modules/planning/math/discretized_points_smoothing:fem_pos_deviation_smoother",
+        "@eigen",
+    ],
+)
+
 cuda_library(
     name = "planning_block",
     srcs = [

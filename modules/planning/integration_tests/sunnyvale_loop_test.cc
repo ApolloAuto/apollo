@@ -39,7 +39,6 @@ class SunnyvaleLoopTest : public PlanningTestBase {
     FLAGS_planning_upper_speed_limit = 12.5;
     FLAGS_use_multi_thread_to_add_obstacles = false;
 
-    FLAGS_enable_scenario_side_pass = false;
     FLAGS_enable_scenario_stop_sign = false;
     FLAGS_enable_scenario_traffic_light = false;
     FLAGS_enable_rss_info = false;

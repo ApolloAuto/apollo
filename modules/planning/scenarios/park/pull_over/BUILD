@@ -24,6 +24,7 @@ cc_library(
         "//modules/planning/common/util:util_lib",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/scenarios:scenario",
+        "//modules/planning/scenarios/util:scenario_util_lib",
         "@eigen",
     ],
 )

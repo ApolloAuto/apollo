@@ -73,7 +73,7 @@ class PathAssessmentDecider : public Decider {
   //   * @param path_data
   //   * @return It returns the last index that the path returns to self-lane.
   //   *   If the path always stays within self-lane, it returns the size()-1.
-  //   *   If the path never returns back to self-lane, returns -1.
+  //   *   If the path never returns to self-lane, returns -1.
   // int IsReturningToSelfLane(
   // const ReferenceLineInfo& reference_line_info, const PathData& path_data);
 

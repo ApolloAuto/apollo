@@ -33,7 +33,6 @@
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/util.h"
 #include "modules/planning/scenarios/util/util.h"
-#include "modules/planning/tasks/deciders/decider_creep.h"
 
 namespace apollo {
 namespace planning {
