@@ -2,6 +2,7 @@ cyber_modules {
   key: "Camera"
   value: {
     dag_files: "/apollo/modules/drivers/camera/dag/camera.dag"
+    dag_files: "/apollo/modules/drivers/video/dag/video.dag"
   }
 }
 cyber_modules {

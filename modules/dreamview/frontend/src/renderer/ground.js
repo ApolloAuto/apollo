@@ -56,7 +56,7 @@ export default class Ground {
                 this.loadGrid(coordinates);
             }
         } else {
-            this.mesh.type = "refelction";
+            this.mesh.type = "reflection";
         }
 
         if (this.mesh.type === "grid") {

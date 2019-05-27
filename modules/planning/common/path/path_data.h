@@ -62,8 +62,7 @@ class PathData {
   const std::vector<std::tuple<double, PathPointType, double>>
       &path_point_decision_guide() const;
 
-  bool GetPathPointWithPathS(const double s,
-                             common::PathPoint *const path_point) const;
+  common::PathPoint GetPathPointWithPathS(const double s) const;
 
   std::list<std::pair<DiscretizedPath, FrenetFramePath>> &path_data_history();
 

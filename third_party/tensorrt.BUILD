@@ -12,9 +12,12 @@ licenses([
     "notice",  # Portions BSD
 ])
 
-
 cc_library(
     name = "tensorrt",
+    includes = [
+        ".",
+        "/usr/include/tensorrt",
+    ],
     linkopts = [
         "-L/usr/lib/x86_64-linux-gnu/",
         "-lnvcaffe_parser",
@@ -22,7 +25,5 @@ cc_library(
         "-lnvinfer_plugin",
         "-lnvparsers",
     ],
-
-    includes = [".","/usr/include/tensorrt",],
     visibility = ["//visibility:public"],
 )

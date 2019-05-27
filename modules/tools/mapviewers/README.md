@@ -33,7 +33,7 @@ python modules/tools/mapviewer/gmap_viwer.py map_path_and_file utm_zone_id
 ```
 
 ### hdmapviewer.py
-Activate enviroments:
+Activate environments:
 
 ```
 conda create --name py27bokeh python=2.7.15 numpy scipy bokeh protobuf
@@ -54,7 +54,7 @@ hdmap.html
 can be found in your Apollo root dir.
 
 
-Deactivate enviroments:
+Deactivate environments:
 ```
 conda deactivate
 ```

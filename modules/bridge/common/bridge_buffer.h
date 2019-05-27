@@ -28,10 +28,10 @@ class BridgeBuffer {
   explicit BridgeBuffer(size_t size);
   virtual ~BridgeBuffer();
 
-  operator T* ();
+  operator T *();
   void reset(size_t size);
-  size_t size() const { return size_;}
-  size_t capacity() const { return capacity_;}
+  size_t size() const { return size_; }
+  size_t capacity() const { return capacity_; }
   void write(size_t index, const T *data, size_t size);
 
  private:

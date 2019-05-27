@@ -35,6 +35,12 @@ using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::Vec2d;
 
+namespace {
+// TODO(ALL): temporarily copy the value from lane_follow_stage.cc, will extract
+// as a common value for planning later
+constexpr double kStraightForwardLineCost = 10.0;
+}  // namespace
+
 RuleBasedStopDecider::RuleBasedStopDecider(const TaskConfig &config)
     : Decider(config) {
   CHECK(config.has_rule_based_stop_decider_config());
@@ -66,10 +72,14 @@ void RuleBasedStopDecider::CheckLaneChangeUrgency(Frame *const frame) {
     if (reference_line_info.IsChangeLanePath()) {
       is_clear_to_change_lane_ =
           LaneChangeDecider::IsClearToChangeLane(&reference_line_info);
+      is_change_lane_planning_succeed_ =
+          reference_line_info.Cost() < kStraightForwardLineCost;
       continue;
     }
-    // If it's not in lane-change scenario or target lane is not blocked, skip
-    if (frame->reference_line_info().size() <= 1 || is_clear_to_change_lane_) {
+    // If it's not in lane-change scenario || (target lane is not blocked &&
+    // change lane planning succeed), skip
+    if (frame->reference_line_info().size() <= 1 ||
+        (is_clear_to_change_lane_ && is_change_lane_planning_succeed_)) {
       continue;
     }
     // When the target lane is blocked in change-lane case, check the urgency
@@ -147,6 +157,15 @@ void RuleBasedStopDecider::StopOnSidePass(
 
   if (!side_pass_info.check_clear_flag() &&
       CheckSidePassStop(path_data, *reference_line_info, &stop_s_on_pathdata)) {
+    if (!LaneChangeDecider::IsPerceptionBlocked(
+            *reference_line_info,
+            rule_based_stop_decider_config_.search_beam_length(),
+            rule_based_stop_decider_config_.search_beam_radius_intensity(),
+            rule_based_stop_decider_config_.search_range(),
+            rule_based_stop_decider_config_.is_block_angle_threshold()) &&
+        LaneChangeDecider::IsClearToChangeLane(reference_line_info)) {
+      return;
+    }
     if (!CheckADCStop(path_data, *reference_line_info, stop_s_on_pathdata)) {
       if (!BuildSidePassStopFence(
               path_data, stop_s_on_pathdata,

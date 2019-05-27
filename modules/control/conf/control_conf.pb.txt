@@ -50,6 +50,9 @@ lat_controller_conf {
   max_iteration: 150
   max_lateral_acceleration: 5.0
   enable_reverse_leadlag_compensation: false
+  enable_look_ahead_back_control: false
+  lookahead_station: 0.0
+  lookback_station: 0.0
   lat_err_gain_scheduler {
     scheduler {
       speed: 4.0

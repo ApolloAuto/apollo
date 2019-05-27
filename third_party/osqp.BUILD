@@ -4,14 +4,13 @@ licenses(["notice"])
 
 cc_library(
     name = "osqp",
-    includes = [
-	".",
-    ],
     include_prefix = "osqp",
+    includes = [
+        ".",
+    ],
     linkopts = [
-	"-L/usr/local/lib",
+        "-L/usr/local/lib",
         "-Wl,-rpath,/usr/lib/x86_64-linux-gnu/",
-	"-losqp",
+        "-losqp",
     ],
 )
-

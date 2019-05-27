@@ -312,7 +312,7 @@ void NormalDistributionsTransform<PointSource, PointTarget>::
   }
   loop_timer.End("Ndt loop.");
 
-  // Store transformation probability.  The realtive differences within each
+  // Store transformation probability.  The relative differences within each
   // scan registration are accurate but the normalization constants need to be
   // modified for it to be globally accurate
   trans_probability_ = score / static_cast<double>(input_->points.size());
@@ -345,7 +345,7 @@ NormalDistributionsTransform<PointSource, PointTarget>::ComputeDerivatives(
   for (size_t idx = 0; idx < input_->points.size(); idx++) {
     x_trans_pt = trans_cloud->points[idx];
 
-    // Find nieghbors (Radius search has been experimentally faster than
+    // Find neighbors (Radius search has been experimentally faster than
     // direct neighbor checking.
     std::vector<TargetGridLeafConstPtr> neighborhood;
     std::vector<float> distances;
@@ -502,7 +502,7 @@ NormalDistributionsTransform<PointSource, PointTarget>::UpdateDerivatives(
   // e^(-d_2/2 * (x_k - mu_k)^T Sigma_k^-1 (x_k - mu_k)) Equation 6.9 [Magnusson
   // 2009]
   double e_x_cov_x = exp(-gauss_d2_ * x_trans.dot(c_inv * x_trans) / 2);
-  // Calculate probability of transtormed points existance, Equation 6.9
+  // Calculate probability of transtormed points existence, Equation 6.9
   // [Magnusson 2009]
   double score_inc = -gauss_d1_ * e_x_cov_x;
 
@@ -562,7 +562,7 @@ void NormalDistributionsTransform<PointSource, PointTarget>::ComputeHessian(
   for (size_t idx = 0; idx < input_->points.size(); idx++) {
     x_trans_pt = trans_cloud.points[idx];
 
-    // Find nieghbors (Radius search has been experimentally faster than
+    // Find neighbors (Radius search has been experimentally faster than
     // direct neighbor checking.
     std::vector<TargetGridLeafConstPtr> neighborhood;
     std::vector<float> distances;
@@ -833,7 +833,7 @@ NormalDistributionsTransform<PointSource, PointTarget>::ComputeStepLengthMt(
   while (!interval_converged && step_iterations < max_step_iterations &&
          !(psi_t <= 0 /*Sufficient Decrease*/ &&
            d_phi_t <= -nu * d_phi_0 /*Curvature Condition*/)) {
-    // Use auxilary function if interval I is not closed
+    // Use auxiliary function if interval I is not closed
     if (open_interval) {
       a_t = TrialValueSelectionMt(a_l, f_l, g_l, a_u, f_u, g_u, a_t, psi_t,
                                   d_psi_t);

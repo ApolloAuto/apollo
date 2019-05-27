@@ -268,6 +268,59 @@ bool LaneChangeDecider::IsClearToChangeLane(
   return true;
 }
 
+bool LaneChangeDecider::IsPerceptionBlocked(
+    const ReferenceLineInfo& reference_line_info,
+    const double search_beam_length, const double search_beam_radius_intensity,
+    const double search_range, const double is_block_angle_threshold) {
+  const auto& vehicle_state = reference_line_info.vehicle_state();
+  const common::math::Vec2d adv_pos(vehicle_state.x(), vehicle_state.y());
+  const double adv_heading = vehicle_state.heading();
+
+  double left_most_angle =
+      common::math::NormalizeAngle(adv_heading + 0.5 * search_range);
+  double right_most_angle =
+      common::math::NormalizeAngle(adv_heading - 0.5 * search_range);
+  bool right_most_found = false;
+
+  for (auto* obstacle :
+       reference_line_info.path_decision().obstacles().Items()) {
+    if (obstacle->IsVirtual()) {
+      ADEBUG << "skip one virtual obstacle";
+      continue;
+    }
+    const auto& obstacle_polygon = obstacle->PerceptionPolygon();
+    for (double search_angle = 0.0; search_angle < search_range;
+         search_angle += search_beam_radius_intensity) {
+      common::math::Vec2d search_beam_end(search_beam_length, 0.0);
+      const double beam_heading = common::math::NormalizeAngle(
+          adv_heading - 0.5 * search_range + search_angle);
+      search_beam_end.SelfRotate(beam_heading);
+      search_beam_end += adv_pos;
+      common::math::LineSegment2d search_beam(adv_pos, search_beam_end);
+
+      if (!right_most_found && obstacle_polygon.HasOverlap(search_beam)) {
+        right_most_found = true;
+        right_most_angle = beam_heading;
+      }
+
+      if (right_most_found && !obstacle_polygon.HasOverlap(search_beam)) {
+        left_most_angle = beam_heading - search_angle;
+        break;
+      }
+    }
+    if (!right_most_found) {
+      // obstacle is not in search range
+      continue;
+    }
+    if (std::abs(common::math::NormalizeAngle(
+            left_most_angle - right_most_angle)) > is_block_angle_threshold) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 bool LaneChangeDecider::HysteresisFilter(const double obstacle_distance,
                                          const double safe_distance,
                                          const double distance_buffer,

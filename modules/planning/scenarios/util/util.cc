@@ -16,13 +16,19 @@
 
 #include "modules/planning/scenarios/util/util.h"
 
+#include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/util/util.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
+#include "modules/planning/common/planning_context.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace util {
 
+using common::util::DistanceXY;
+using common::VehicleConfigHelper;
 using hdmap::PathOverlap;
 
 hdmap::PathOverlap* GetOverlapOnReferenceLine(
@@ -58,6 +64,72 @@ hdmap::PathOverlap* GetOverlapOnReferenceLine(
   }
 
   return nullptr;
+}
+
+/**
+ * @brief: check adc parked properly
+ */
+PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
+                                const ScenarioPullOverConfig& scenario_config) {
+  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+  const auto& pull_over_status =
+      PlanningContext::Instance()->planning_status().pull_over();
+
+  if (!pull_over_status.is_feasible() || !pull_over_status.has_x() ||
+      !pull_over_status.has_y() || !pull_over_status.has_theta()) {
+    ADEBUG << "pull_over status not set properly: "
+           << pull_over_status.DebugString();
+    return UNKNOWN;
+  }
+
+  common::SLPoint pull_over_sl;
+  const auto& reference_line = reference_line_info.reference_line();
+  reference_line.XYToSL({pull_over_status.x(), pull_over_status.y()},
+                        &pull_over_sl);
+  double distance = adc_front_edge_s - pull_over_sl.s();
+  if (distance >= scenario_config.pass_destination_threshold()) {
+    ADEBUG << "ADC passed pull-over spot: distance[" << distance << "]";
+    return PASS_DESTINATION;
+  }
+
+  const double adc_speed =
+      common::VehicleStateProvider::Instance()->linear_velocity();
+  if (adc_speed > scenario_config.max_adc_stop_speed()) {
+    ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
+    return APPOACHING;
+  }
+
+  constexpr double kStartParkCheckRange = 3.0;  // meter
+  if (distance <= -kStartParkCheckRange) {
+    ADEBUG << "ADC still far: distance[" << distance << "]";
+    return APPOACHING;
+  }
+
+  common::SLPoint adc_position_sl;
+  const common::math::Vec2d adc_position = {
+      common::VehicleStateProvider::Instance()->x(),
+      common::VehicleStateProvider::Instance()->y()};
+  reference_line.XYToSL(adc_position, &adc_position_sl);
+
+  const double s_diff = pull_over_sl.s() - adc_position_sl.s();
+  const double l_diff = std::fabs(pull_over_sl.l() - adc_position_sl.l());
+
+  const double theta_diff = std::fabs(common::math::NormalizeAngle(
+      pull_over_status.theta() -
+      common::VehicleStateProvider::Instance()->heading()));
+  ADEBUG << "adc_position_s[" << adc_position_sl.s()
+         << "] adc_position_l[" << adc_position_sl.l()
+         << "] pull_over_s[" << pull_over_sl.s() << "] pull_over_l["
+         << pull_over_sl.l() << "] s_diff[" << s_diff << "] l_diff[" << l_diff
+         << "] theta_diff[" << theta_diff << "]";
+
+  if (s_diff >= 0 && s_diff <= scenario_config.max_s_error_to_end_point() &&
+      l_diff <= scenario_config.max_l_error_to_end_point() &&
+      theta_diff <= scenario_config.max_theta_error_to_end_point()) {
+    return PARK_COMPLETE;
+  } else {
+    return PARK_FAIL;
+  }
 }
 
 }  // namespace util

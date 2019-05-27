@@ -832,6 +832,7 @@ bool Cipv::TranformPoint(const Eigen::VectorXf &in,
 }
 
 bool Cipv::CollectDrops(const base::MotionBufferPtr &motion_buffer,
+                        const Eigen::Affine3d &world2camera,
                         std::vector<std::shared_ptr<base::Object>> *objects) {
   int motion_size = static_cast<int>(motion_buffer->size());
   if (debug_level_ >= 2) {
@@ -864,20 +865,28 @@ bool Cipv::CollectDrops(const base::MotionBufferPtr &motion_buffer,
 
     object_id_skip_count_[cur_id] = 0;
 
+    auto pos = world2camera * obj->center;
+    float center_x = static_cast<float>(pos(2));
+    float center_y = static_cast<float>(-pos(0));
+
     object_trackjectories_[cur_id].push_back(
-        std::make_pair(obj->center(0), obj->center(1)));
+        std::make_pair(center_x, center_y));
 
     if (debug_level_ >= 2) {
       AINFO << "object_trackjectories_[" << cur_id
             << " ].size(): " << object_trackjectories_[cur_id].size();
     }
 
-    //    obj->drops.clear();
+    Eigen::Matrix4f accum_motion_buffer =
+        motion_buffer->at(motion_size - 1).motion;
     // Add drops
     for (std::size_t it = object_trackjectories_[cur_id].size() - 1, count = 0;
          it > 0; it--, count++) {
       if (count >= kDropsHistorySize || count > motion_buffer->size()) {
         break;
+      }
+      if (static_cast<int>(it) + 1 > motion_size) {
+        continue;
       }
       Eigen::VectorXf pt =
           Eigen::VectorXf::Zero((*motion_buffer)[0].motion.cols());
@@ -887,9 +896,20 @@ bool Cipv::CollectDrops(const base::MotionBufferPtr &motion_buffer,
       pt(3) = 1.0f;
 
       Eigen::Vector3d transformed_pt;
-      TranformPoint(pt, (*motion_buffer)[motion_size - count - 1].motion,
-                    &transformed_pt);
-      //      obj->drops.emplace_back(transformed_pt);
+      accum_motion_buffer *= motion_buffer->at(motion_size - it - 1).motion;
+      TranformPoint(pt, accum_motion_buffer, &transformed_pt);
+      // TranformPoint(pt, (*motion_buffer)[motion_size - count - 1].motion,
+      //               &transformed_pt);
+      if (debug_level_ >= 3) {
+        AINFO << "(*motion_buffer)[" << motion_size - it - 1 << "].motion:";
+        AINFO << motion_buffer->at(motion_size - it - 1).motion;
+        AINFO << "accum_motion_buffer[" << motion_size - it - 1 << "] =";
+        AINFO << accum_motion_buffer;
+        AINFO << "target[" << obj->track_id << "][" << it << "]: ("
+              << transformed_pt(0) << ", " << transformed_pt(1) << ")";
+      }
+      obj->drops[count] = transformed_pt;
+      obj->drop_num = count;
     }
   }
 
@@ -926,7 +946,7 @@ bool Cipv::CollectDrops(const base::MotionBufferPtr &motion_buffer,
     for (auto obj : *objects) {
       int cur_id = obj->track_id;
       AINFO << "obj->track_id: " << cur_id;
-      //      AINFO << "obj->drops.size(): " << obj->drops.size();
+      AINFO << "obj->drop_num: " << obj->drop_num;
     }
   }
   return true;

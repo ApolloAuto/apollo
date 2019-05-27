@@ -6,6 +6,7 @@ import "modules/planning/proto/decider_config.proto";
 import "modules/planning/proto/dp_st_speed_config.proto";
 import "modules/planning/proto/lane_change_decider_config.proto";
 import "modules/planning/proto/open_space_fallback_decider_config.proto";
+import "modules/planning/proto/open_space_pre_stop_decider_config.proto";
 import "modules/planning/proto/open_space_roi_decider_config.proto";
 import "modules/planning/proto/open_space_trajectory_provider_config.proto";
 import "modules/planning/proto/open_space_trajectory_partition_config.proto";
@@ -39,7 +40,7 @@ message TaskConfig {
     NAVI_PATH_DECIDER = 7;
     NAVI_SPEED_DECIDER = 8;
     NAVI_OBSTACLE_DECIDER = 9;
-    DECIDER_CREEP = 11;
+    CREEP_DECIDER = 11;
     OPEN_SPACE_PRE_STOP_DECIDER = 12;
     PROCEED_WITH_CAUTION_SPEED = 15;
     DECIDER_RSS = 16;
@@ -62,7 +63,7 @@ message TaskConfig {
     DpStSpeedConfig dp_st_speed_config = 3;
     PathDeciderConfig path_decider_config = 7;
     ProceedWithCautionSpeedConfig proceed_with_caution_speed_config = 8;
-    DeciderCreepConfig decider_creep_config = 10;
+    CreepDeciderConfig creep_decider_config = 10;
     OpenSpacePreStopDeciderConfig open_space_pre_stop_decider_config = 11;
     SpeedBoundsDeciderConfig speed_bounds_decider_config = 15;
     PiecewiseJerkPathConfig piecewise_jerk_path_config = 16;
@@ -129,15 +130,16 @@ message ScenarioTrafficLightUnprotectedRightTurnConfig {
   optional double min_pass_s_distance = 5 [default = 3.0];  // meter
   optional float red_light_right_turn_stop_duration_sec = 6 [default = 3.0];  // sec
   optional float creep_timeout_sec = 7 [default = 10.0];  // sec
-
 }
 
 message ScenarioPullOverConfig {
   optional double start_pull_over_scenario_distance = 1 [default = 50.0];  // meter
-  optional double max_adc_stop_speed = 2 [default = 0.1];  // m/s
-  optional double max_position_error_to_end_point = 3 [default = 0.5];
-  optional double max_theta_error_to_end_point = 4 [default = 0.2];
-  optional double pass_destination_threshold = 5 [default = 10.0];
+  optional double max_pull_over_scenario_distance = 2 [default = 10.0];  // meter
+  optional double max_adc_stop_speed = 3 [default = 0.1];  // m/s
+  optional double max_s_error_to_end_point = 4 [default = 0.2];
+  optional double max_l_error_to_end_point = 5 [default = 0.5];
+  optional double max_theta_error_to_end_point = 6 [default = 0.2];
+  optional double pass_destination_threshold = 7 [default = 10.0];
 }
 
 message ScenarioValetParkingConfig {

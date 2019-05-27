@@ -38,11 +38,27 @@ class LaneChangeDecider : public Decider {
   explicit LaneChangeDecider(const TaskConfig& config);
 
   /**
-   * @brief static function to check if the ChangeLanePath type of reference
+   * @brief A static function to check if the ChangeLanePath type of reference
    * line is safe or if current reference line is safe to deviate away and come
    * back
    */
   static bool IsClearToChangeLane(ReferenceLineInfo* reference_line_info);
+
+  /**
+   * @brief A static function to estimate if an obstacle in certain range in
+   * front of ADV blocks too much space perception behind itself by beam
+   * scanning
+   * @param search_beam_length is the length of scanning beam
+   * @param search_beam_radius_intensity is the resolution of scanning
+   * @param search_range is the scanning range centering at ADV heading
+   * @param is_block_angle_threshold is the threshold to tell how big a block
+   *        angle range is percption blocking
+   */
+  static bool IsPerceptionBlocked(const ReferenceLineInfo& reference_line_info,
+                                  const double search_beam_length,
+                                  const double search_beam_radius_intensity,
+                                  const double search_range,
+                                  const double is_block_angle_threshold);
 
  private:
   common::Status Process(Frame* frame) override;

@@ -68,5 +68,46 @@ TEST(DiscretizedPathTest, basic_test) {
   EXPECT_EQ(discretized_path.size(), 0);
 }
 
+TEST(DiscretizedPathTest, reverse_case) {
+  PathPoint p1 = MakePathPoint(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  p1.set_s(0.0);
+  PathPoint p2 = MakePathPoint(1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  p2.set_s(-std::sqrt(1.0 + 1.0) + p1.s());
+  PathPoint p3 = MakePathPoint(2.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  p3.set_s(-std::sqrt(1.0 + 1.0) + p2.s());
+  PathPoint p4 = MakePathPoint(3.0, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  p4.set_s(-std::sqrt(1.0 + 1.0) + p3.s());
+
+  std::vector<PathPoint> path_points{p1, p2, p3, p4};
+
+  DiscretizedPath discretized_path(path_points);
+  EXPECT_EQ(discretized_path.size(), 4);
+
+  EXPECT_DOUBLE_EQ(discretized_path.Length(), -std::sqrt(1.0 + 1.0) * 3.0);
+
+  auto eval_p1 = discretized_path.EvaluateReverse(0.0);
+  EXPECT_DOUBLE_EQ(eval_p1.s(), 0.0);
+  EXPECT_DOUBLE_EQ(eval_p1.x(), 0.0);
+  EXPECT_DOUBLE_EQ(eval_p1.y(), 0.0);
+
+  auto eval_p2 = discretized_path.EvaluateReverse(-0.3 * std::sqrt(2.0));
+  EXPECT_DOUBLE_EQ(eval_p2.s(), -0.3 * std::sqrt(2.0));
+  EXPECT_DOUBLE_EQ(eval_p2.x(), 0.3);
+  EXPECT_DOUBLE_EQ(eval_p2.y(), 0.3);
+
+  auto eval_p3 = discretized_path.EvaluateReverse(-1.8);
+  EXPECT_DOUBLE_EQ(eval_p3.s(), -1.8);
+  EXPECT_DOUBLE_EQ(eval_p3.x(), (1.0 + 0.8) / std::sqrt(2));
+  EXPECT_DOUBLE_EQ(eval_p3.y(), (1.0 + 0.8) / std::sqrt(2));
+
+  auto eval_p4 = discretized_path.EvaluateReverse(-2.5);
+  EXPECT_DOUBLE_EQ(eval_p4.s(), -2.5);
+  EXPECT_DOUBLE_EQ(eval_p4.x(), (2.0 + 0.5) / std::sqrt(2));
+  EXPECT_DOUBLE_EQ(eval_p4.y(), (2.0 + 0.5) / std::sqrt(2));
+
+  discretized_path.clear();
+  EXPECT_EQ(discretized_path.size(), 0);
+}
+
 }  // namespace planning
 }  // namespace apollo

@@ -13,4 +13,4 @@ cd apollo-kernel
 2.  Add the ESD CAN driver source code according to [ESDCAN-README.md](https://github.com/ApolloAuto/apollo-kernel/blob/master/linux/ESDCAN-README.md).
 3.  Build the kernel with the following command:
 ```bash build.sh```
-4.  Install the kernel the same way as using a pre-built [Apollo Kernel](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_install_apollo_kernel.md). 
+4.  Install the kernel the same way as using a pre-built [Apollo Kernel](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_install_apollo_kernel.md).

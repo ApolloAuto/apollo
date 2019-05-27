@@ -34,9 +34,8 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 Apollo 3.5 is loaded with new modules and features, but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding on Apollo's core technology and platform. 
 
-**To learn more, please refer to the
-[migration guide](docs/howto/how_to_migrate_to_the_updated_apollo_master_from_old_versions.md)
-for information about migrating to the updated Apollo master from an old version.
+**[Attention]** The Apollo team has decided to retire Git LFS which might impact your development. For details please refer to:
+[migration guide](docs/howto/how_to_migrate_to_the_updated_apollo_master_from_old_versions.md).
 
 [Want to contribute to our code?](CONTRIBUTING.md) follow this guide.
 

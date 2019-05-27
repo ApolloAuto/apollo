@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message OpenSpacePreStopDeciderConfig {
+  // roi scenario definitions
+  enum StopType {
+    NOT_DEFINED = 0;
+    PARKING = 1;
+    PULL_OVER = 2;
+    NARROW_STREET_U_TURN = 3;
+  }
+  optional StopType stop_type = 1;
+  optional double rightaway_stop_distance = 2 [default = 2.0];  // meter
+  optional double stop_distance_to_target = 3 [default = 5.0];  // second
+}

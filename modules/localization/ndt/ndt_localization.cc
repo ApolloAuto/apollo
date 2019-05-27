@@ -50,8 +50,9 @@ void NDTLocalization::Init() {
       FLAGS_map_dir + "/" + FLAGS_ndt_map_dir + "/" + FLAGS_local_map_name;
   AINFO << "map folder: " << map_path_;
   velodyne_extrinsic_ = Eigen::Affine3d::Identity();
-  bool sucess = LoadLidarExtrinsic(lidar_extrinsics_file, &velodyne_extrinsic_);
-  if (!sucess) {
+  bool success =
+      LoadLidarExtrinsic(lidar_extrinsics_file, &velodyne_extrinsic_);
+  if (!success) {
     AERROR << "LocalizationLidar: Fail to access the lidar"
               " extrinsic file: "
            << lidar_extrinsics_file;
@@ -63,8 +64,8 @@ void NDTLocalization::Init() {
         << velodyne_extrinsic_.translation().z() << ", " << ext_quat.x() << ", "
         << ext_quat.y() << ", " << ext_quat.z() << ", " << ext_quat.w();
 
-  sucess = LoadLidarHeight(lidar_height_file, &lidar_height_);
-  if (!sucess) {
+  success = LoadLidarHeight(lidar_height_file, &lidar_height_);
+  if (!success) {
     AWARN << "LocalizationLidar: Fail to load the lidar"
              " height file: "
           << lidar_height_file << " Will use default value!";

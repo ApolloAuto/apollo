@@ -67,6 +67,18 @@ data_files {
   dest_path: "/apollo/modules/drivers/camera/conf"
 }
 data_files {
+  source_path: "camera_dag"
+  dest_path: "/apollo/modules/drivers/camera/dag"
+}
+data_files {
+  source_path: "video_conf"
+  dest_path: "/apollo/modules/drivers/video/conf"
+}
+data_files {
+  source_path: "video_dag"
+  dest_path: "/apollo/modules/drivers/video/dag"
+}
+data_files {
   source_path: "cyber_conf"
   dest_path: "/apollo/cyber/conf"
 }

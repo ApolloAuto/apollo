@@ -778,14 +778,13 @@ int FusionCameraDetectionComponent::InternalProc(
       cipv_.DetermineCipv(camera_frame.lane_objects, cipv_options, world2camera,
                           &camera_frame.tracked_objects);
 
-      // TODO(techoe): Activate CollectDrops after test
-      // // Get Drop points
-      // // motion_buffer_ = motion_service_->GetMotionBuffer();
-      // if (motion_buffer_->size() > 0) {
-      //  cipv_.CollectDrops(motion_buffer_, &camera_frame.tracked_objects);
-      // } else {
-      //   AWARN << "motion_buffer is empty";
-      // }
+      // Get Drop points
+      if (motion_buffer_->size() > 0) {
+        cipv_.CollectDrops(motion_buffer_, world2camera,
+                           &camera_frame.tracked_objects);
+      } else {
+        AWARN << "motion_buffer is empty";
+      }
     }
   }
 

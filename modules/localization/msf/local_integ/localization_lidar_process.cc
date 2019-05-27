@@ -107,8 +107,8 @@ Status LocalizationLidarProcess::Init(const LocalizationIntegParam& params) {
   local_lidar_status_ = LocalLidarStatus::MSF_LOCAL_LIDAR_UNDEFINED_STATUS;
   local_lidar_quality_ = LocalLidarQuality::MSF_LOCAL_LIDAR_BAD;
 
-  bool sucess = LoadLidarExtrinsic(lidar_extrinsic_file_, &lidar_extrinsic_);
-  if (!sucess) {
+  bool success = LoadLidarExtrinsic(lidar_extrinsic_file_, &lidar_extrinsic_);
+  if (!success) {
     AERROR << "LocalizationLidar: Fail to access the lidar"
               " extrinsic file: "
            << lidar_extrinsic_file_;
@@ -116,8 +116,8 @@ Status LocalizationLidarProcess::Init(const LocalizationIntegParam& params) {
                   "Fail to access the lidar extrinsic file");
   }
 
-  sucess = LoadLidarHeight(lidar_height_file_, &lidar_height_);
-  if (!sucess) {
+  success = LoadLidarHeight(lidar_height_file_, &lidar_height_);
+  if (!success) {
     AWARN << "LocalizationLidar: Fail to load the lidar"
              " height file: "
           << lidar_height_file_ << " Will use default value!";
@@ -312,7 +312,7 @@ bool LocalizationLidarProcess::GetPredictPose(const double lidar_time,
 
   if (state < 0) {
     AINFO << "LocalizationLidar GetPredictPose: "
-          << "Recive a lidar msg, but can't query predict pose.";
+          << "Receive a lidar msg, but can't query predict pose.";
     *forecast_state = ForecastState::NOT_VALID;
     return false;
   }

@@ -53,12 +53,15 @@ message PedestrianStatus {
 }
 
 message PullOverStatus {
-  optional bool exist_pull_over_position = 1 [default = false];
-  optional double pull_over_s = 2 [default = 0.0];
-  optional double pull_over_l = 3 [default = 0.0];
-  optional double pull_over_x = 4 [default = 0.0];
-  optional double pull_over_y = 5 [default = 0.0];
-  optional double pull_over_theta = 6 [default = 0.0];
+  optional bool is_feasible = 1 [default = true];
+  optional double x = 2 [default = 0.0];
+  optional double y = 3 [default = 0.0];
+  optional double theta = 4 [default = 0.0];
+  optional double length_front = 5 [default = 0.0];
+  optional double length_back = 6 [default = 0.0];
+  optional double width_left = 7 [default = 0.0];
+  optional double width_right = 8 [default = 0.0];
+  optional int32 idx = 9 [default = 0];
 }
 
 message ReroutingStatus {

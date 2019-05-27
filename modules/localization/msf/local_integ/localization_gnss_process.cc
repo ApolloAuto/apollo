@@ -136,7 +136,7 @@ void LocalizationGnssProcess::RawEphemerisProcess(
   auto gnss_orbit = msg;
   if (gnss_orbit.gnss_type() == drivers::gnss::GnssType::GLO_SYS) {
     /* caros driver (derived from rtklib src) set glonass eph toe as the GPST,
-     * and here convert it back to UTC(+0), so leap seconds shoudl be in
+     * and here convert it back to UTC(+0), so leap seconds should be in
      * accordance with the GNSS-Driver
      */
     double leap_sec =
@@ -316,7 +316,7 @@ bool LocalizationGnssProcess::GnssPosition(EpochObservationMsg *raw_rover_obs) {
   }
   LogPnt(gnss_pnt_result_, gnss_solver_->get_ratio());
   if (!sins_align_finish_) {
-    AWARN << "Sins-ekf has not converged or finished its aligment!";
+    AWARN << "Sins-ekf has not converged or finished its alignment!";
   }
   if (gnss_pnt_result_.has_std_pos_x_m() &&
       gnss_pnt_result_.has_std_pos_y_m() &&

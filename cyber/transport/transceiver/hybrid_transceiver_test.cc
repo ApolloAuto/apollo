@@ -22,6 +22,7 @@
 
 #include "cyber/common/global_data.h"
 #include "cyber/common/util.h"
+#include "cyber/init.h"
 #include "cyber/proto/unit_test.pb.h"
 #include "cyber/transport/qos/qos_profile_conf.h"
 #include "cyber/transport/receiver/hybrid_receiver.h"
@@ -343,6 +344,7 @@ TEST_F(HybridTransceiverTest, enable_and_disable_with_param_diff_host) {
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
+  apollo::cyber::Init(argv[0]);
   apollo::cyber::transport::Transport::Instance();
   auto res = RUN_ALL_TESTS();
   apollo::cyber::transport::Transport::Instance()->Shutdown();

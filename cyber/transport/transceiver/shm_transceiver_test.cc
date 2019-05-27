@@ -22,9 +22,11 @@
 
 #include "cyber/common/global_data.h"
 #include "cyber/common/util.h"
+#include "cyber/init.h"
 #include "cyber/proto/unit_test.pb.h"
 #include "cyber/transport/receiver/shm_receiver.h"
 #include "cyber/transport/transmitter/shm_transmitter.h"
+#include "cyber/transport/transport.h"
 
 namespace apollo {
 namespace cyber {
@@ -150,3 +152,12 @@ TEST_F(ShmTransceiverTest, enable_and_disable) {
 }  // namespace transport
 }  // namespace cyber
 }  // namespace apollo
+
+int main(int argc, char** argv) {
+  testing::InitGoogleTest(&argc, argv);
+  apollo::cyber::Init(argv[0]);
+  apollo::cyber::transport::Transport::Instance();
+  auto res = RUN_ALL_TESTS();
+  apollo::cyber::transport::Transport::Instance()->Shutdown();
+  return res;
+}

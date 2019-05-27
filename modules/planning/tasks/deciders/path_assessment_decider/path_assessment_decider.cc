@@ -60,12 +60,13 @@ Status PathAssessmentDecider::Process(
   } else {
     ADEBUG << "There are " << candidate_path_data.size() << " candidate paths";
   }
+  const auto& end_time0 = std::chrono::system_clock::now();
 
   // 1. Remove invalid path.
   std::vector<PathData> valid_path_data;
   for (const auto& curr_path_data : candidate_path_data) {
-    RecordDebugInfo(curr_path_data, curr_path_data.path_label(),
-                    reference_line_info);
+    // RecordDebugInfo(curr_path_data, curr_path_data.path_label(),
+    //                 reference_line_info);
     if (curr_path_data.path_label().find("fallback") != std::string::npos) {
       if (IsValidFallbackPath(*reference_line_info, curr_path_data)) {
         valid_path_data.push_back(curr_path_data);
@@ -76,6 +77,10 @@ Status PathAssessmentDecider::Process(
       }
     }
   }
+  const auto& end_time1 = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff = end_time1 - end_time0;
+  ADEBUG << "Time for path validity checking: " << diff.count() * 1000
+         << " msec.";
 
   // 2. Analyze and add important info for speed decider to use.
   for (auto& curr_path_data : valid_path_data) {
@@ -100,6 +105,9 @@ Status PathAssessmentDecider::Process(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   ADEBUG << "There are " << valid_path_data.size() << " valid path data.";
+  const auto& end_time2 = std::chrono::system_clock::now();
+  diff = end_time2 - end_time1;
+  ADEBUG << "Time for path info labeling: " << diff.count() * 1000 << " msec.";
 
   // 3. Pick the optimal path.
   std::sort(valid_path_data.begin(), valid_path_data.end(),
@@ -172,7 +180,7 @@ Status PathAssessmentDecider::Process(
                 return lhs_on_reverse < rhs_on_reverse;
               }
               // If same length, both neighbor lane are forward,
-              // then select the one that returns back to in-lane earlier.
+              // then select the one that returns to in-lane earlier.
               constexpr double kBackToSelfLaneComparisonTolerance = 20.0;
               int lhs_back_idx =
                   GetBackToInLaneIndex(lhs.path_point_decision_guide());
@@ -208,6 +216,10 @@ Status PathAssessmentDecider::Process(
   *(reference_line_info->mutable_path_data()) = valid_path_data.front();
   reference_line_info->SetBlockingObstacleId(
       valid_path_data.front().blocking_obstacle_id());
+  const auto& end_time3 = std::chrono::system_clock::now();
+  diff = end_time3 - end_time2;
+  ADEBUG << "Time for optimal path selection: " << diff.count() * 1000
+         << " msec.";
 
   // TODO(jiacheng): retire the following code.
   std::vector<PathData> new_candidate_path_data;
@@ -290,6 +302,9 @@ Status PathAssessmentDecider::Process(
           ->set_decided_side_pass_direction(-1);
     }
   }
+  const auto& end_time4 = std::chrono::system_clock::now();
+  diff = end_time4 - end_time3;
+  ADEBUG << "Time for FSM state updating: " << diff.count() * 1000 << " msec.";
 
   // Plot the path in simulator for debug purpose.
   RecordDebugInfo(reference_line_info->path_data(), "Planning PathData",
@@ -349,9 +364,11 @@ void PathAssessmentDecider::SetPathInfo(
   //  - distance to the closest obstacle.
   std::vector<PathPointDecision> path_decision;
   InitPathPointDecision(*path_data, &path_decision);
-  SetPathPointType(reference_line_info, *path_data, &path_decision);
-  SetObstacleDistance(reference_line_info, *path_data, &path_decision);
-
+  if (path_data->path_label().find("fallback") == std::string::npos &&
+      path_data->path_label().find("self") == std::string::npos) {
+    SetPathPointType(reference_line_info, *path_data, &path_decision);
+  }
+  // SetObstacleDistance(reference_line_info, *path_data, &path_decision);
   path_data->SetPathPointDecisionGuide(path_decision);
 }
 

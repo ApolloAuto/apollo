@@ -23,17 +23,17 @@ default_task_config: {
 default_task_config: {
   task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   piecewise_jerk_speed_config {
-    acc_weight: 10.0
-    jerk_weight: 30.0
-    kappa_penalty_weight: 20000.0
-    ref_s_weight: 100.0
-    ref_v_weight: 100.0
+    acc_weight: 1.0
+    jerk_weight: 3.0
+    kappa_penalty_weight: 2000.0
+    ref_s_weight: 10.0
+    ref_v_weight: 10.0
   }
 }
 default_task_config: {
   task_type: DP_ST_SPEED_OPTIMIZER
   dp_st_speed_config {
-    matrix_dimension_s: 150
+    matrix_dimension_s: 300
     matrix_dimension_t: 8
 
     speed_weight: 0.0
@@ -69,6 +69,10 @@ default_task_config: {
   rule_based_stop_decider_config {
     max_adc_stop_speed: 0.5
     max_valid_stop_distance: 0.5
+    search_beam_length: 20.0
+    search_beam_radius_intensity: 0.08
+    search_range: 3.14
+    is_block_angle_threshold: 0.5
   }
 }
 default_task_config: {
@@ -239,6 +243,9 @@ default_task_config: {
   path_bounds_decider_config {
     is_lane_borrowing: false
     is_pull_over: false
+    pull_over_destination_to_adc_buffer: 25.0
+    pull_over_destination_to_pathend_buffer: 10.0
+    pull_over_road_edge_buffer: 0.15
   }
 }
 default_task_config: {

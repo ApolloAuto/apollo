@@ -51,7 +51,6 @@ DEFINE_string(test_previous_planning_file, "",
 
 void PlanningTestBase::SetUpTestCase() {
   FLAGS_use_multi_thread_to_add_obstacles = false;
-  FLAGS_enable_multi_thread_in_dp_poly_path = false;
   FLAGS_enable_multi_thread_in_dp_st_graph = false;
   FLAGS_planning_config_file =
       "/apollo/modules/planning/conf/planning_config.pb.txt";
@@ -73,7 +72,6 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_enable_trajectory_check = false;
   FLAGS_planning_test_mode = true;
   FLAGS_enable_lag_prediction = false;
-  FLAGS_use_osqp_optimizer_for_qp_st = false;
   FLAGS_use_osqp_optimizer_for_reference_line = false;
 }
 

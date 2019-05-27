@@ -23,8 +23,8 @@ In addition, Lidar connectivity via Ethernet, WWAN gateway via 4G LTE module, an
 
 1. General purpose UART port(reserved) 
 2. External PCI Express Port (Support X4 or X8) For connections to IPC, please use EXTN port.
-3. GPS PPS / GPRMC Output Port ( 3 Ports)
-4. Power and PPS/GPRMC Output Port for Stereo Camera
+3. GPS PPS/GPRMC Output Rectangular Port (3 Ports) for LiDAR
+4. Power and PPS/GPRMC Cylindrical Output Port for Stereo Camera/LiDAR
 5. CAN Bus (4 Ports)
 6. Main Power Input Connector 
 
@@ -43,6 +43,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
    |MFR|MPN|Description|
    |---------------|--------|-----------|
    |TE Connectivity|DTF13-2P|DT RECP ASM|
+    
 
    | PIN # | NAME | I/O  | Description        |
    | ----- | ---- | ---- | ------------------ |
@@ -70,11 +71,12 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
    | MFR             | MPN       | Description                               |
    | :-------------- | --------- | ----------------------------------------- |
    | TE Connectivity | 1565749-1 | Automotive Connectors 025 CAP ASSY, 4 Pin |
+    
 
    | PIN # | NAME  | I/O   | Description                                                  |
    | ----- | ----- | ----- | ------------------------------------------------------------ |
-   | 1     | NC    | NC    | NO CIRCUIT                                                   |
-   | 2     | GPRMC | INPUT | GPS Specific information contains time, date, position, track made good and speed data provided by GPS navigation receiver.  RS-232 Signal level. |
+   | 1     | GPRMC    | INPUT    | GPRMC TX                                                 |
+   | 2     | NC | NC | NO CIRCUIT |
    | 3     | GND   | PWR   | GROUND (the ground for PPS and GPRMC should be shorted on ground) |
    | 4     | PPS   | INPUT | Pulse per Second from GPS transceiver, 3.3V CMOS Signal      |
 
@@ -87,6 +89,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
    |MFR| MPN| Description|
    | --------------- | --------- | ------------------------------------------------- |
    | TE Connectivity | 1376350-2 | Automotive Connectors 025 I/O CAP HSG ASSY, 8 Pin |
+    
 
    | PIN # | NAME   | I/O    | Description                                             |
    | ----- | ------ | ------ | ------------------------------------------------------- |
@@ -108,6 +111,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
    | MFR             | MPN       | Description                                        |
    | --------------- | --------- | -------------------------------------------------- |
    | TE Connectivity | 1318772-2 | Automotive Connectors 025 I/O CAP HSG ASSY, 12 Pin |
+     
 
    | PIN # | NAME   | I/O   | Description     |
    | ----- | ------ | ----- | --------------- |
@@ -123,6 +127,52 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
    | 10   | CANH-3 | INOUT | Channel 3, CANH |
    | 11   | CANL-3 | INOUT | Channel 3, CANL |
    | 12   | GND    | PWR   | Ground          |
+
+6. GPS PPS / GPRMC Output Rectangular Port 
+
+    The Connector provides 8 ports for 3 LiDARs
+
+
+    ![](images/ASU_Port3.png)
+
+      | MFR             | MPN       | Description                                        |
+   | --------------- | --------- | -------------------------------------------------- |
+   | Digi-Key | A121343-ND | 025 I/O PLUG HSG ASSY 8P |
+    |
+
+
+    | PIN # | NAME   | I/O   | Description     |
+   | ----- | ------ | ----- | --------------- |
+   | 1     | GPRMC | OUT | GPRMC (ASU) -> Pin4 GPS_RXD_CNT (LiDAR 1) |
+   | 2     | PPS | OUT | PPS (ASU) -> Pin1 GPS_PULSE_CNT (LiDAR 1)|
+   | 3     | GPRMC    | OUT   | GPRMC (ASU) -> Pin4 GPS_RXD_CNT (LiDAR 2)           |
+   | 4     | PPS| OUT | PPS (ASU) -> Pin1 GPS_PULSE_CNT (LiDAR 2)|
+   | 5    | GPRMC | OUT | GPRMC (ASU) -> Pin4 GPS_RXD_CNT (LiDAR 3) |
+   | 6    | GND    | PWR   | Ground (ASU) -> Pin3 GND (LiDAR 1,3)      |
+   | 7    | GND | PWR | Ground (ASU) -> Pin3 GND (LiDAR 2)  |
+   | 8    | PPS | OUT | PPS (ASU) -> Pin1 GPS_PULSE_CNT (LiDAR 3)|
+  
+
+7. PPS/GPRMC Cylindrical Output Port for Stereo Camera/ LiDAR
+
+    The Connector provides 8 ports but we currently use only 3
+
+
+    ![](images/ASU_Port4.png)
+
+      | MFR             | MPN       | Description                                        |
+   | --------------- | --------- | -------------------------------------------------- |
+   | Digi-Key | APC1735-ND | CONN RCPT FMALE 8POS SOLDER CUP |
+
+   
+
+    | PIN # | NAME   | I/O   | Description     |
+    | ----- | ------ | ----- | --------------- |
+    |   6     | PPS |  OUT | PPS (ASU) -> Pin1 GPS_PULSE_CNT (LiDAR)
+    | 7     | GPRMC | OUT | GPRMC (ASU) -> Pin4 GPS_RXD_CNT (LiDAR) |
+    | 8     |  GND   | PWR   | Ground (ASU) -> Pin3 GND (LiDAR)        |
+
+
 
    
 ## Disclaimer

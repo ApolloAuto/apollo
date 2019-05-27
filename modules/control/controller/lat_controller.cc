@@ -101,6 +101,8 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
   cf_ = control_conf->lat_controller_conf().cf();
   cr_ = control_conf->lat_controller_conf().cr();
   preview_window_ = control_conf->lat_controller_conf().preview_window();
+  lookahead_station_ = control_conf->lat_controller_conf().lookahead_station();
+  lookback_station_ = control_conf->lat_controller_conf().lookback_station();
   wheelbase_ = vehicle_param_.wheel_base();
   steer_ratio_ = vehicle_param_.steer_ratio();
   steer_single_direction_max_degree_ =
@@ -196,7 +198,6 @@ Status LatController::Init(const ControlConf *control_conf) {
   matrix_a_coeff_ = Matrix::Zero(matrix_size, matrix_size);
   matrix_a_coeff_(1, 1) = -(cf_ + cr_) / mass_;
   matrix_a_coeff_(1, 3) = (lr_ * cr_ - lf_ * cf_) / mass_;
-  matrix_a_coeff_(2, 3) = 1.0;
   matrix_a_coeff_(3, 1) = (lr_ * cr_ - lf_ * cf_) / iz_;
   matrix_a_coeff_(3, 3) = -1.0 * (lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_;
 
@@ -355,7 +356,12 @@ Status LatController::ComputeControlCommand(
   trajectory_analyzer_ =
       std::move(TrajectoryAnalyzer(&target_tracking_trajectory));
 
-  if ((vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE)) {
+  if (((FLAGS_trajectory_transform_to_com_reverse &&
+        vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) ||
+       (FLAGS_trajectory_transform_to_com_drive &&
+        vehicle_state->gear() == canbus::Chassis::GEAR_DRIVE)) &&
+      (std::fabs(vehicle_state->linear_velocity()) <=
+       control_conf_->lon_controller_conf().switch_speed())) {
     trajectory_analyzer_.TrajectoryTransformToCOM(lr_);
   }
 
@@ -509,9 +515,16 @@ void LatController::UpdateState(SimpleLateralDebug *debug) {
 
   // State matrix update;
   // First four elements are fixed;
-  matrix_state_(0, 0) = debug->lateral_error();
+  if (control_conf_->lat_controller_conf().enable_look_ahead_back_control() &&
+      std::fabs(vehicle_state->linear_velocity()) <=
+          control_conf_->lon_controller_conf().switch_speed()) {
+    matrix_state_(0, 0) = debug->lateral_error_feedback();
+    matrix_state_(2, 0) = debug->heading_error_feedback();
+  } else {
+    matrix_state_(0, 0) = debug->lateral_error();
+    matrix_state_(2, 0) = debug->heading_error();
+  }
   matrix_state_(1, 0) = debug->lateral_error_rate();
-  matrix_state_(2, 0) = debug->heading_error();
   matrix_state_(3, 0) = debug->heading_error_rate();
 
   // Next elements are depending on preview window size;
@@ -594,6 +607,11 @@ void LatController::ComputeLateralErrors(
   const double dx = x - target_point.path_point().x();
   const double dy = y - target_point.path_point().y();
 
+  debug->mutable_current_target_point()->mutable_path_point()->set_x(
+      target_point.path_point().x());
+  debug->mutable_current_target_point()->mutable_path_point()->set_y(
+      target_point.path_point().y());
+
   ADEBUG << "x point: " << x << " y point: " << y;
   ADEBUG << "match point information : " << target_point.ShortDebugString();
 
@@ -614,6 +632,38 @@ void LatController::ComputeLateralErrors(
     heading_error = heading_error_filter_.Update(heading_error);
   }
   debug->set_heading_error(heading_error);
+
+  double heading_error_feedback;
+  if (VehicleStateProvider::Instance()->gear() ==
+      canbus::Chassis::GEAR_REVERSE) {
+    auto lookback_point = trajectory_analyzer.QueryNearestPointByRelativeTime(
+        target_point.relative_time() +
+        lookback_station_ /
+            (std::max(std::fabs(linear_v), 0.1) * std::cos(heading_error)));
+    heading_error_feedback = common::math::NormalizeAngle(
+        heading_error + target_point.path_point().theta() -
+        lookback_point.path_point().theta());
+  } else {
+    auto lookahead_point = trajectory_analyzer.QueryNearestPointByRelativeTime(
+        target_point.relative_time() +
+        lookahead_station_ /
+            (std::max(std::fabs(linear_v), 0.1) * std::cos(heading_error)));
+    heading_error_feedback = common::math::NormalizeAngle(
+        heading_error + target_point.path_point().theta() -
+        lookahead_point.path_point().theta());
+  }
+  debug->set_heading_error_feedback(heading_error_feedback);
+
+  double lateral_error_feedback;
+  if (VehicleStateProvider::Instance()->gear() ==
+      canbus::Chassis::GEAR_REVERSE) {
+    lateral_error_feedback =
+        lateral_error - lookback_station_ * std::sin(heading_error);
+  } else {
+    lateral_error_feedback =
+        lateral_error + lookahead_station_ * std::sin(heading_error);
+  }
+  debug->set_lateral_error_feedback(lateral_error_feedback);
 
   auto lateral_error_dot = linear_v * std::sin(heading_error);
   auto lateral_error_dot_dot = linear_a * std::sin(heading_error);

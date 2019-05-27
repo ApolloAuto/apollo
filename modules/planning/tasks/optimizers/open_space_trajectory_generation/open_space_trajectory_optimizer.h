@@ -21,6 +21,7 @@
 #pragma once
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "Eigen/Eigen"
@@ -31,6 +32,7 @@
 #include "modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.h"
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_problem.h"
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_problem.h"
+#include "modules/planning/open_space/trajectory_smoother/iterative_anchoring_smoother.h"
 #include "modules/planning/proto/open_space_trajectory_provider_config.pb.h"
 
 namespace apollo {
@@ -123,6 +125,18 @@ class OpenSpaceTrajectoryOptimizer {
       Eigen::MatrixXd* time_result_ds, Eigen::MatrixXd* l_warm_up,
       Eigen::MatrixXd* n_warm_up, Eigen::MatrixXd* dual_l_result_ds,
       Eigen::MatrixXd* dual_n_result_ds);
+
+  bool GenerateDecoupledTraj(
+      const Eigen::MatrixXd& xWS, const double init_a, const double init_v,
+      const std::vector<std::vector<common::math::Vec2d>>&
+          obstacles_vertices_vec,
+      Eigen::MatrixXd* state_result_dc, Eigen::MatrixXd* control_result_dc,
+      Eigen::MatrixXd* time_result_dc);
+
+  void LoadResult(const DiscretizedTrajectory& discretized_trajectory,
+                  Eigen::MatrixXd* state_result_dc,
+                  Eigen::MatrixXd* control_result_dc,
+                  Eigen::MatrixXd* time_result_dc);
 
   void CombineTrajectories(
       const std::vector<Eigen::MatrixXd>& xWS_vec,

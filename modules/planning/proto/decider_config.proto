@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.planning;
 
-message DeciderCreepConfig {
+message CreepDeciderConfig {
   // stop distance(m) to the creeping stop fence while creeping
   optional double stop_distance = 1 [default = 0.5];  // meter
   optional double speed_limit = 2 [default = 1.0];    // m/s
@@ -15,11 +15,6 @@ message DeciderCreepConfig {
   // on same direction of ADC while creeping
   optional double ignore_max_st_min_t = 5 [default = 0.1];  // second
   optional double ignore_min_st_min_s = 6 [default = 15.0];  // meter
-}
-
-message OpenSpacePreStopDeciderConfig {
-  optional double rightaway_stop_distance = 1 [default = 2.0];  // meter
-  optional double stop_distance_to_target = 2 [default = 5.0];  // second
 }
 
 message SidePassSafetyConfig {

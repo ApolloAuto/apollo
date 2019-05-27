@@ -3,10 +3,10 @@
 ## Setup docker image in CentOS based system
 
 ApolloAuto uses Ubuntu partially because of the Linux distribution dependency of ROS indigo. There is a script
-`${apollo\_root}/docker/scirpts/install\_dcoker.sh` inside the docker image involved. Most cloud based servers have already installed docker, hence you can just go ahead without touching it. 
+`${apollo\_root}/docker/scripts/install\_dcoker.sh` inside the docker image involved. Most cloud based servers have already installed docker, hence you can just go ahead without touching it.
 
 In CentOS, to install docker
-you can either follow [this installation guide](https://docs.docker.com/engine/installation/linux/docker-ce/centos/#os-requirements) 
+you can either follow [this installation guide](https://docs.docker.com/engine/installation/linux/docker-ce/centos/#os-requirements)
  to install Docker- CE for CentOS or you could write the following:
 
 > sudo yum update && sudo yum install -y docker
@@ -19,8 +19,8 @@ Check its health status by
 
 > sudo systemctl status docker
 
-As a matter of the fact, we recommend you to install `nvidia-docker`. `Nvidia-docker2` is currently 
-under `alpha` verision, and should not be used in production environment. 
+As a matter of the fact, we recommend you to install `nvidia-docker`. `Nvidia-docker2` is currently
+under `alpha` verision, and should not be used in production environment.
 
 As typically sugggested by Docker, you should add your name to the docker group
 
@@ -28,17 +28,17 @@ As typically sugggested by Docker, you should add your name to the docker group
 
 You can then build out Apollo based on the steps in the installation guide.
 
-Before executing `dev_start.sh` to build or pull an image from  apolloauto for CentOS, you have to 
+Before executing `dev_start.sh` to build or pull an image from  apolloauto for CentOS, you have to
 modify ${apollo\_auto}/scripts/docker\_adduser.sh first by adding `--force-badname` in line 21.
 
 > adduser --force-badname --disable-password ...
 
 ## GPU enabled container for perception research
 
-#### Update driver in host 
+#### Update driver in host
 
-This part is much more tricky because you have to install an nvidia driver in docker container as the same 
-version of that in your host machine and stop "nvidia.uvm" relevant modules. 
+This part is much more tricky because you have to install an nvidia driver in docker container as the same
+version of that in your host machine and stop "nvidia.uvm" relevant modules.
 
 If you are using `VirtualBox`, whether the virtual graphic adapter \(VGA\) can pass through hardware depends
 on your nvidia driver and gpu versions. Some developlers suggest KVM, VMWare and Xen where hardware passthrough to VM
@@ -58,11 +58,11 @@ Although you can succeed in the above solution, it is not recommended as it is t
 
 A better way is to apply for operation time and update Baidu's driver inside docker. The following problems may arise:
 
-1. gcc version confliction with NVIDIA driver: 
+1. gcc version confliction with NVIDIA driver:
    - baidu uses gcc-4.8.4, it is old, check `install_nvidia_driver.sh` to see how to update
 2. bazel dependency: after installation of the driver, you would have to roll back the default gcc version to build apollo
 3. resintall cuda: it will cost you roughly 2GB, please scale the container to proper size by adjusting paremters in `docker run` statement
-   - inspect mounted disk inside docker, `df -h`, replace the directory which you think good in `reinstall_cuda.sh`  
+   - inspect mounted disk inside docker, `df -h`, replace the directory which you think good in `reinstall_cuda.sh`
      keyword `--tmpdir`
 
 After installation you, can check the situation by issuing
@@ -86,7 +86,7 @@ You can refer to my [DockerHub](https://hub.docker.com/r/yiakwy/apolloautocentos
 
 ## Troubleshooting
 
-What if you committed incorrect `\*.pd.txt` files and cannot rebase to the lastest developer branch? Try the 
+What if you committed incorrect `\*.pd.txt` files and cannot rebase to the latest developer branch? Try the
 following commands:
 
 ```
