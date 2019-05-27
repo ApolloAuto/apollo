@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-""" Vehicle calibration with fuel service. """
+""" Submit Apollo fuel job. """
 
 import json
 import os
@@ -32,11 +32,11 @@ from modules.tools.fuel_proxy.proto.job_config_pb2 import JobConfig
 
 
 flags.DEFINE_string('fuel_proxy', None, 'Endpoint of Apollo-Fuel proxy.')
-flags.DEFINE_string('job_config', None, 'Vehicle calibration job config.')
+flags.DEFINE_string('job_config', None, 'Apollo fuel job config.')
 
 
-class VehicleCalibration(object):
-    """ Vehicle calibration with fuel service. """
+class FuelJob(object):
+    """ Job backed with Apollo fuel service. """
 
     def __init__(self):
         self.job_config = None
@@ -71,20 +71,20 @@ class VehicleCalibration(object):
             self.job_config, preserving_proto_field_name=True)
         request = requests.post(flags.FLAGS.fuel_proxy, json=request_json,
                                 verify=self.ssl_cert)
+        response = json.loads(request.json()) if request.json() else {}
         if request.ok:
-            response = json.loads(request.json())
-            logging.info('OK: {}'.format(response.get('message')))
+            logging.info(response.get('message') or 'OK')
         else:
-            logging.error('Request failed with HTTP code {}'.format(
-                request.status_code))
+            logging.error(
+                response.get('message') or
+                'Request failed with HTTP code {}'.format(request.status_code))
 
 
 def main(argv):
     """Main process."""
-    calibration = VehicleCalibration()
-    if not calibration.parse_input():
-        return
-    calibration.send_request()
+    job = FuelJob()
+    if job.parse_input():
+        job.send_request()
 
 if __name__ == '__main__':
     app.run(main)

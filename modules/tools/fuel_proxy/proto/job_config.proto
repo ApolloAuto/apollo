@@ -32,9 +32,12 @@ message JobConfig {
     VEHICLE_CALIBRATION = 1;
   }
   optional JobType job_type = 1;
+  // You must have an assigned partner ID to use the service. Contact our BD
+  // department for more information.
+  optional string partner_id = 2;
 
-  optional Storage storage = 2;
+  optional Storage storage = 3;
   // 1. For object storage like BOS and S3, the path should be a key.
   // 2. If not provided, we'll take the storage root as data path.
-  optional string input_data_path = 3;
+  optional string input_data_path = 4;
 }
