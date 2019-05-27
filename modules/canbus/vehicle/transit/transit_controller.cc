@@ -597,7 +597,7 @@ void TransitController::SecurityDogThreadFunc() {
 }
 
 bool TransitController::CheckResponse() {
-  // TODO(Udelv): Add seperate indicators
+  // TODO(Udelv): Add separate indicators
   ChassisDetail chassis_detail;
   if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
     AERROR_EVERY(100) << "get chassis detail failed.";
