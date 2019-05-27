@@ -225,9 +225,10 @@ void GriddedPathTimeGraph::CalculateCostAt(
   const uint32_t r = msg->r;
   auto& cost_cr = cost_table_[c][r];
   // TODO(Hongyi): refactor ObstacleCost for faster approach to stop_sign
-  cost_cr.SetObstacleCost(dp_st_cost_.GetObstacleCost(cost_cr) +
+  cost_cr.SetObstacleCost(
+      dp_st_cost_.GetObstacleCost(cost_cr) +
       (gridded_path_time_graph_config_.matrix_dimension_s() - r) *
-      gridded_path_time_graph_config_.default_speed_cost());
+          gridded_path_time_graph_config_.default_speed_cost());
   if (cost_cr.obstacle_cost() > std::numeric_limits<double>::max()) {
     return;
   }
