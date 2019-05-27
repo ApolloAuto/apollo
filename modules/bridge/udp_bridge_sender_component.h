@@ -27,12 +27,14 @@
 
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"
+
 #include "cyber/cyber.h"
 #include "cyber/init.h"
 #include "cyber/io/session.h"
 #include "cyber/scheduler/scheduler_factory.h"
 #include "modules/bridge/common/bridge_buffer.h"
 #include "modules/bridge/common/bridge_gflags.h"
+#include "modules/bridge/common/bridge_buffer.h"
 #include "modules/bridge/proto/udp_bridge_remote_info.pb.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/util/util.h"
@@ -41,13 +43,10 @@
 namespace apollo {
 namespace bridge {
 
-#define BRIDGE_COMPONENT_REGISTER(pb_msg) \
-  CYBER_REGISTER_COMPONENT(UDPBridgeSenderComponent<pb_msg>)
-
 template <typename T>
-class UDPBridgeSenderComponent final : public cyber::Component<T> {
+class UDPBridgeComponent final : public cyber::Component<T> {
  public:
-  UDPBridgeSenderComponent()
+  UDPBridgeComponent()
       : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
 
   bool Init() override;
