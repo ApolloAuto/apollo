@@ -40,6 +40,7 @@ class VehicleCalibration(object):
 
     def __init__(self):
         self.job_config = None
+        self.ssl_cert = os.path.join(os.path.dirname(__file__), 'conf/cert.pem')
 
     def parse_input(self):
         """Parse and sanity check input data."""
@@ -68,7 +69,8 @@ class VehicleCalibration(object):
             return
         request_json = json_format.MessageToJson(
             self.job_config, preserving_proto_field_name=True)
-        request = requests.post(flags.FLAGS.fuel_proxy, json=request_json)
+        request = requests.post(flags.FLAGS.fuel_proxy, json=request_json,
+                                verify=self.ssl_cert)
         if request.ok:
             response = json.loads(request.json())
             logging.info('OK: {}'.format(response.get('message')))
