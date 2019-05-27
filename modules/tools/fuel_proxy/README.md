@@ -8,7 +8,7 @@ partners.
 1. Install and activate the corresponding Conda environment.
 
    ```bash
-   conda env update -f conda-py37.yaml
+   conda env update -f conf/conda-py37.yaml
    source activate fuel-proxy
    ```
 
