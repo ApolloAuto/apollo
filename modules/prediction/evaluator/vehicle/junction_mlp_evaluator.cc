@@ -60,7 +60,7 @@ JunctionMLPEvaluator::JunctionMLPEvaluator() : device_(torch::kCPU) {
 
 void JunctionMLPEvaluator::Clear() {}
 
-void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Sanity checks.
   omp_set_num_threads(1);
   Clear();
@@ -68,7 +68,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
     AERROR << "Obstacle [" << id << "] has no latest feature.";
-    return;
+    return false;
   }
   Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
   CHECK_NOTNULL(latest_feature_ptr);
@@ -77,7 +77,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   if (!latest_feature_ptr->has_junction_feature() ||
       latest_feature_ptr->junction_feature().junction_exit_size() < 1) {
     ADEBUG << "Obstacle [" << id << "] has no junction_exit.";
-    return;
+    return false;
   }
 
   std::vector<double> feature_values;
@@ -88,7 +88,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
                                          "junction", nullptr);
     ADEBUG << "Save extracted features for learning locally.";
-    return;  // Skip Compute probability for offline mode
+    return false;  // Skip Compute probability for offline mode
   }
   std::vector<torch::jit::IValue> torch_inputs;
   int input_dim = static_cast<int>(
@@ -123,7 +123,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   CHECK_NOTNULL(lane_graph_ptr);
   if (lane_graph_ptr->lane_sequence_size() == 0) {
     AERROR << "Obstacle [" << id << "] has no lane sequences.";
-    return;
+    return false;
   }
 
   std::unordered_map<std::string, double> junction_exit_prob;
@@ -156,6 +156,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       }
     }
   }
+  return true;
 }
 
 void JunctionMLPEvaluator::ExtractFeatureValues(

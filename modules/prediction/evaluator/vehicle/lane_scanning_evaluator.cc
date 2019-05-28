@@ -44,12 +44,13 @@ LaneScanningEvaluator::LaneScanningEvaluator() : device_(torch::kCPU) {
   LoadModel();
 }
 
-void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   std::vector<Obstacle*> dummy_dynamic_env;
   Evaluate(obstacle_ptr, dummy_dynamic_env);
+  return true;
 }
 
-void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
+bool LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
                                      std::vector<Obstacle*> dynamic_env) {
   // Sanity checks.
   omp_set_num_threads(1);
@@ -57,21 +58,21 @@ void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
     AERROR << "Obstacle [" << id << "] has no latest feature.";
-    return;
+    return false;
   }
   Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
   CHECK_NOTNULL(latest_feature_ptr);
   if (!latest_feature_ptr->has_lane() ||
       !latest_feature_ptr->lane().has_lane_graph_ordered()) {
     AERROR << "Obstacle [" << id << "] has no lane graph.";
-    return;
+    return false;
   }
   LaneGraph* lane_graph_ptr =
       latest_feature_ptr->mutable_lane()->mutable_lane_graph_ordered();
   CHECK_NOTNULL(lane_graph_ptr);
   if (lane_graph_ptr->lane_sequence_size() == 0) {
     AERROR << "Obstacle [" << id << "] has no lane sequences.";
-    return;
+    return false;
   }
   ADEBUG << "There are " << lane_graph_ptr->lane_sequence_size()
          << " lane sequences to scan.";
@@ -90,7 +91,7 @@ void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
                                          string_feature_values, "cruise",
                                          nullptr);
     ADEBUG << "Save extracted features for learning locally.";
-    return;
+    return true;
   }
 
   feature_values.push_back(static_cast<double>(MAX_NUM_LANE));
@@ -104,6 +105,7 @@ void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
   torch_inputs.push_back(std::move(torch_input));
   ModelInference(torch_inputs, torch_lane_scanning_model_ptr_,
                  latest_feature_ptr);
+  return true;
 }
 
 bool LaneScanningEvaluator::ExtractStringFeatures(
