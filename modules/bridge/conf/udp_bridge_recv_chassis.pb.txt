@@ -1,3 +1,0 @@
-topic_name: ""
-bind_port: 8900
-proto_name: "ADCTrajectory"
