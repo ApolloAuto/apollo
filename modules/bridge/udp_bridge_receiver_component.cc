@@ -21,6 +21,9 @@
 namespace apollo {
 namespace bridge {
 
+#define BRIDGE_RECV_IMPL(pb_msg) \
+  template class UDPBridgeReceiverComponent<pb_msg>
+
 template<typename T>
 UDPBridgeReceiverComponent<T>::UDPBridgeReceiverComponent()
   : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
@@ -115,5 +118,7 @@ void UDPBridgeReceiverComponent<T>::MsgDispatcher() {
       },
       "bridge_server");
 }
+
+BRIDGE_RECV_IMPL(canbus::ChassisDetail);
 }  // namespace bridge
 }  // namespace apollo
