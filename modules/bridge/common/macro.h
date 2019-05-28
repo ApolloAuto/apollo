@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,22 @@
 
 #pragma once
 
-#include <mutex>
-
 namespace apollo {
 namespace bridge {
 
-template<typename T>
-class BridgeBuffer {
- public:
-  BridgeBuffer();
-  explicit BridgeBuffer(size_t size);
-  virtual ~BridgeBuffer();
+#define _1K 1024
 
-  operator T *();
-  void reset(size_t size);
-  size_t size() const { return size_; }
-  size_t capacity() const { return capacity_; }
-  void write(size_t index, const T *data, size_t size);
+#define FREE_ARRY(arry) \
+  if (arry) { \
+    delete[] arry; \
+  } \
+  arry = nullptr
 
- private:
-  T *buf_ = nullptr;
-  size_t size_ = 0;
-  size_t capacity_ = 0;
-  std::mutex mutex_;
-
-  BridgeBuffer(const BridgeBuffer &) = delete;
-  BridgeBuffer &operator=(const BridgeBuffer &) = delete;
-};
+#define FREE_POINTER(p) \
+  if (p) { \
+    delete p; \
+  } \
+  p = nullptr
 
 }  // namespace bridge
 }  // namespace apollo

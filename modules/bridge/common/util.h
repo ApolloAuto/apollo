@@ -14,41 +14,33 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/bridge/common/bridge_buffer.h"
+#pragma once
 
-#include <gtest/gtest.h>
-#include <stdio.h>
+#include <memory>
 #include <string>
+#include <cstring>
+#include "modules/bridge/common/bridge_buffer.h"
 
 namespace apollo {
 namespace bridge {
 
-TEST(BridgeBufferTest, bridge_buf_test) {
-  BridgeBuffer<char> buf;
-  char *p = buf;
-  EXPECT_EQ(0, buf.capacity());
-  EXPECT_EQ(0, buf.size());
+const int HEADER_BUF_SIZE = sizeof(size_t);
+template<typename T>
+void WriteToBuffer(BridgeBuffer<char> *buf, const std::shared_ptr<T> &pb_msg) {
+  if (!buf) {
+    return;
+  }
+  size_t msg_len = pb_msg->ByteSize();
+  size_t total_size = HEADER_BUF_SIZE + msg_len;
 
-  buf.reset(100);
-  char *p1 = buf;
-  EXPECT_EQ(100, buf.capacity());
-  EXPECT_EQ(100, buf.size());
-  EXPECT_NE(p, p1);
+  buf->reset(total_size);
 
-  std::string str("hello world");
-  snprintf(buf, str.length() + 1, "%s", str.c_str());
-  EXPECT_STREQ(buf, str.c_str());
-
-  buf.reset(80);
-  char *p2 = buf;
-  EXPECT_EQ(100, buf.capacity());
-  EXPECT_EQ(80, buf.size());
-  EXPECT_EQ(p2, p1);
-
-  std::string str1("hi world");
-  snprintf(buf, str1.length() + 1, "%s", str1.c_str());
-  EXPECT_STREQ(buf, str1.c_str());
+  buf->write(0, reinterpret_cast<char*>(&msg_len), sizeof(size_t));
+  pb_msg->SerializeToArray(reinterpret_cast<char*>(buf + sizeof(size_t)),
+   static_cast<int>(msg_len));
 }
+
+int GetProtoSize(const char *buf, size_t size);
 
 }  // namespace bridge
 }  // namespace apollo

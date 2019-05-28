@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,36 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
-#pragma once
-
-#include <mutex>
+#include "modules/bridge/common/util.h"
 
 namespace apollo {
 namespace bridge {
 
-template<typename T>
-class BridgeBuffer {
- public:
-  BridgeBuffer();
-  explicit BridgeBuffer(size_t size);
-  virtual ~BridgeBuffer();
-
-  operator T *();
-  void reset(size_t size);
-  size_t size() const { return size_; }
-  size_t capacity() const { return capacity_; }
-  void write(size_t index, const T *data, size_t size);
-
- private:
-  T *buf_ = nullptr;
-  size_t size_ = 0;
-  size_t capacity_ = 0;
-  std::mutex mutex_;
-
-  BridgeBuffer(const BridgeBuffer &) = delete;
-  BridgeBuffer &operator=(const BridgeBuffer &) = delete;
-};
+int GetProtoSize(const char *buf, size_t size) {
+  if (size != sizeof(size_t)) {
+    return 0;
+  }
+  char size_buf[sizeof(size_t)] = {0};
+  memcpy(size_buf, buf, sizeof(size_t));
+  int proto_size = *(reinterpret_cast<int*>(size_buf));
+  return proto_size;
+}
 
 }  // namespace bridge
 }  // namespace apollo

@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/bridge/common/bridge_buffer.h"
+
 #include <memory.h>
 
 namespace apollo {
@@ -26,7 +27,7 @@ template <typename T>
 BridgeBuffer<T>::BridgeBuffer() {}
 
 template <typename T>
-BridgeBuffer<T>::BridgeBuffer(unsigned int size) {
+BridgeBuffer<T>::BridgeBuffer(size_t size) {
   reset(size);
 }
 
@@ -47,7 +48,7 @@ BridgeBuffer<T>::operator T*() {
 }
 
 template <typename T>
-void BridgeBuffer<T>::reset(unsigned int size) {
+void BridgeBuffer<T>::reset(size_t size) {
   std::lock_guard<std::mutex> lg(mutex_);
   if (capacity_ < size) {
     if (buf_) {
@@ -57,7 +58,15 @@ void BridgeBuffer<T>::reset(unsigned int size) {
     buf_ = new T[capacity_];
   }
   size_ = size;
-  memset(buf_, 0, sizeof(T) * capacity_);
+  memset(buf_, 0, sizeof(T)*capacity_);
+}
+
+template <typename T>
+void BridgeBuffer<T>::write(size_t index, const T *data, size_t size) {
+  std::lock_guard<std::mutex> lg(mutex_);
+  reset(size + index);
+  T *p = buf_ + index;
+  memcpy(p, data, size);
 }
 
 BRIDGE_IMPL(char);
