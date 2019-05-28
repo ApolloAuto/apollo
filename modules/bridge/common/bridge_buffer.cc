@@ -43,7 +43,7 @@ BridgeBuffer<T>::~BridgeBuffer() {
 }
 
 template <typename T>
-BridgeBuffer<T>::operator T*() {
+BridgeBuffer<T>::operator T *() {
   return buf_;
 }
 
@@ -58,7 +58,7 @@ void BridgeBuffer<T>::reset(size_t size) {
     buf_ = new T[capacity_];
   }
   size_ = size;
-  memset(buf_, 0, sizeof(T)*capacity_);
+  memset(buf_, 0, sizeof(T) * capacity_);
 }
 
 template <typename T>

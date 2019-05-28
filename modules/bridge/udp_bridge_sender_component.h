@@ -20,23 +20,23 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 
+#include <iostream>
 #include <memory>
 #include <string>
-#include <iostream>
 #include <vector>
 
+#include "cyber/class_loader/class_loader.h"
+#include "cyber/component/component.h"
 #include "cyber/cyber.h"
 #include "cyber/init.h"
 #include "cyber/io/session.h"
 #include "cyber/scheduler/scheduler_factory.h"
-#include "cyber/class_loader/class_loader.h"
-#include "cyber/component/component.h"
-#include "modules/common/monitor_log/monitor_log_buffer.h"
-#include "modules/planning/proto/planning.pb.h"
-#include "modules/common/util/util.h"
-#include "modules/bridge/common/bridge_gflags.h"
 #include "modules/bridge/common/bridge_buffer.h"
+#include "modules/bridge/common/bridge_gflags.h"
 #include "modules/bridge/proto/udp_bridge_remote_info.pb.h"
+#include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/common/util/util.h"
+#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace bridge {
@@ -44,19 +44,16 @@ namespace bridge {
 #define BRIDGE_COMPONENT_REGISTER(pb_msg) \
   CYBER_REGISTER_COMPONENT(UDPBridgeSenderComponent<pb_msg>)
 
-template<typename T>
-class UDPBridgeSenderComponent final
-    : public cyber::Component<T> {
+template <typename T>
+class UDPBridgeSenderComponent final : public cyber::Component<T> {
  public:
   UDPBridgeSenderComponent()
-    : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
+      : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
 
   bool Init() override;
   bool Proc(const std::shared_ptr<T> &pb_msg) override;
 
-  std::string Name() const {
-    return FLAGS_bridge_module_name;
-  }
+  std::string Name() const { return FLAGS_bridge_module_name; }
 
  private:
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
