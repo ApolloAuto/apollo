@@ -67,7 +67,7 @@ Stage::StageStatus PullOverStageApproach::FinishStage(const bool success) {
   if (success) {
     return FinishScenario();
   } else {
-    next_stage_ = ScenarioConfig::PULL_OVER_RETRY_PARKING;
+    next_stage_ = ScenarioConfig::PULL_OVER_RETRY_APPROACH_PARKING;
     return Stage::FINISHED;
   }
 }
