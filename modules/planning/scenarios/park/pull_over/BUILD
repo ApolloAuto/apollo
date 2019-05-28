@@ -7,11 +7,13 @@ cc_library(
     srcs = [
         "pull_over_scenario.cc",
         "stage_approach.cc",
+        "stage_retry_approach_parking.cc",
         "stage_retry_parking.cc",
     ],
     hdrs = [
         "pull_over_scenario.h",
         "stage_approach.h",
+        "stage_retry_approach_parking.h",
         "stage_retry_parking.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
