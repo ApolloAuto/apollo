@@ -156,7 +156,6 @@ bool RecordFileWriter::WriteSection(const T& message) {
     }
   }
   header_.set_size(CurrentPosition());
-  ACHECK(0 == fsync(fd_));
   return true;
 }
 
