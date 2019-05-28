@@ -2490,7 +2490,7 @@ layer {
     propagate_down: 1
     propagate_down: 0
     top: "rtswt_loss"
-    loss_weight: 1 
+    loss_weight: 1
     loss_param {
         ignore_label: -1
         normalization: VALID
