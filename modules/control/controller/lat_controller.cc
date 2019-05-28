@@ -365,6 +365,36 @@ Status LatController::ComputeControlCommand(
     trajectory_analyzer_.TrajectoryTransformToCOM(lr_);
   }
 
+  if (vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) {
+    matrix_a_(0, 1) = 0.0;
+
+    matrix_a_(1, 2) = (-cf_ - cr_) / mass_;
+    matrix_a_(3, 2) = (-lf_ * cf_ + lr_ * cr_) / iz_;
+
+    matrix_a_coeff_(0, 2) = 1.0;
+
+    matrix_a_coeff_(1, 1) = (cf_ + cr_) / mass_;
+    matrix_a_coeff_(1, 3) = (-lr_ * cr_ + lf_ * cf_) / mass_;
+    matrix_a_coeff_(3, 1) = (-lr_ * cr_ + lf_ * cf_) / iz_;
+    matrix_a_coeff_(3, 3) = -1.0 * (-lf_ * lf_ * cf_ - lr_ * lr_ * cr_) / iz_;
+
+    matrix_b_(1, 0) = -cf_ / mass_;
+    matrix_b_(3, 0) = -lf_ * cf_ / iz_;
+    matrix_bd_ = matrix_b_ * ts_;
+  } else {
+    matrix_a_(1, 2) = (cf_ + cr_) / mass_;
+    matrix_a_(3, 2) = (lf_ * cf_ - lr_ * cr_) / iz_;
+
+    matrix_a_coeff_(1, 1) = -(cf_ + cr_) / mass_;
+    matrix_a_coeff_(1, 3) = (lr_ * cr_ - lf_ * cf_) / mass_;
+    matrix_a_coeff_(3, 1) = (lr_ * cr_ - lf_ * cf_) / iz_;
+    matrix_a_coeff_(3, 3) = -1.0 * (lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_;
+
+    matrix_b_(1, 0) = cf_ / mass_;
+    matrix_b_(3, 0) = lf_ * cf_ / iz_;
+    matrix_bd_ = matrix_b_ * ts_;
+  }
+
   UpdateDrivingOrientation();
 
   SimpleLateralDebug *debug = cmd->mutable_debug()->mutable_simple_lat_debug();
@@ -398,11 +428,11 @@ Status LatController::ComputeControlCommand(
   // Add gain scheduler for higher speed steering
   if (FLAGS_enable_gain_scheduler) {
     matrix_q_updated_(0, 0) =
-        matrix_q_(0, 0) *
-        lat_err_interpolation_->Interpolate(vehicle_state->linear_velocity());
+        matrix_q_(0, 0) * lat_err_interpolation_->Interpolate(
+                              std::fabs(vehicle_state->linear_velocity()));
     matrix_q_updated_(2, 2) =
         matrix_q_(2, 2) * heading_err_interpolation_->Interpolate(
-                              vehicle_state->linear_velocity());
+                              std::fabs(vehicle_state->linear_velocity()));
     common::math::SolveLQRProblem(matrix_adc_, matrix_bdc_, matrix_q_updated_,
                                   matrix_r_, lqr_eps_, lqr_max_iteration_,
                                   &matrix_k_);
@@ -427,8 +457,8 @@ Status LatController::ComputeControlCommand(
                             .enable_reverse_leadlag_compensation();
   if (enable_leadlag) {
     steer_angle = common::math::Clamp(
-        leadlag_controller_.Control(steer_angle_feedback, ts_) +
-            steer_angle_feedforward,
+        leadlag_controller_.Control(-matrix_state_(0, 0), ts_) +
+            steer_angle_feedback + steer_angle_feedforward,
         -100.0, 100.0);
   } else {
     steer_angle = common::math::Clamp(
@@ -553,8 +583,16 @@ void LatController::UpdateState(SimpleLateralDebug *debug) {
 }
 
 void LatController::UpdateMatrix() {
-  const double v = std::max(VehicleStateProvider::Instance()->linear_velocity(),
-                            minimum_speed_protection_);
+  double v;
+  if (VehicleStateProvider::Instance()->gear() ==
+      canbus::Chassis::GEAR_REVERSE) {
+    v = std::min(VehicleStateProvider::Instance()->linear_velocity(),
+                 -minimum_speed_protection_);
+    matrix_a_(0, 2) = matrix_a_coeff_(0, 2) * v;
+  } else {
+    v = std::max(VehicleStateProvider::Instance()->linear_velocity(),
+                 minimum_speed_protection_);
+  }
   matrix_a_(1, 1) = matrix_a_coeff_(1, 1) / v;
   matrix_a_(1, 3) = matrix_a_coeff_(1, 3) / v;
   matrix_a_(3, 1) = matrix_a_coeff_(3, 1) / v;
@@ -583,12 +621,24 @@ double LatController::ComputeFeedForward(double ref_curvature) const {
 
   // then change it from rad to %
   const double v = VehicleStateProvider::Instance()->linear_velocity();
-  const double steer_angle_feedforwardterm =
-      (wheelbase_ * ref_curvature + kv * v * v * ref_curvature -
-       matrix_k_(0, 2) *
-           (lr_ * ref_curvature -
-            lf_ * mass_ * v * v * ref_curvature / 2 / cr_ / wheelbase_)) *
-      180 / M_PI * steer_ratio_ / steer_single_direction_max_degree_ * 100;
+  double steer_angle_feedforwardterm;
+  if (VehicleStateProvider::Instance()->gear() ==
+      canbus::Chassis::GEAR_REVERSE) {
+    steer_angle_feedforwardterm =
+        (wheelbase_ * ref_curvature - kv * v * v * ref_curvature -
+         0.0 * matrix_k_(0, 2) *
+             (lr_ * ref_curvature +
+              lf_ * mass_ * v * v * ref_curvature / 2 / cr_ / wheelbase_)) *
+        180 / M_PI * steer_ratio_ / steer_single_direction_max_degree_ * 100;
+  } else {
+    steer_angle_feedforwardterm =
+        (wheelbase_ * ref_curvature + kv * v * v * ref_curvature -
+         matrix_k_(0, 2) *
+             (lr_ * ref_curvature -
+              lf_ * mass_ * v * v * ref_curvature / 2 / cr_ / wheelbase_)) *
+        180 / M_PI * steer_ratio_ / steer_single_direction_max_degree_ * 100;
+  }
+
   return steer_angle_feedforwardterm;
 }
 
@@ -640,9 +690,7 @@ void LatController::ComputeLateralErrors(
         target_point.relative_time() +
         lookback_station_ /
             (std::max(std::fabs(linear_v), 0.1) * std::cos(heading_error)));
-    heading_error_feedback = common::math::NormalizeAngle(
-        heading_error + target_point.path_point().theta() -
-        lookback_point.path_point().theta());
+    heading_error_feedback = common::math::NormalizeAngle(heading_error);
   } else {
     auto lookahead_point = trajectory_analyzer.QueryNearestPointByRelativeTime(
         target_point.relative_time() +
@@ -680,7 +728,13 @@ void LatController::ComputeLateralErrors(
       (debug->lateral_acceleration() - previous_lateral_acceleration_) / ts_);
   previous_lateral_acceleration_ = debug->lateral_acceleration();
 
-  debug->set_heading_rate(angular_v);
+  if (VehicleStateProvider::Instance()->gear() ==
+      canbus::Chassis::GEAR_REVERSE) {
+    debug->set_heading_rate(-angular_v);
+  } else {
+    debug->set_heading_rate(angular_v);
+  }
+
   debug->set_ref_heading_rate(target_point.path_point().kappa() *
                               target_point.v());
   debug->set_heading_error_rate(debug->heading_rate() -
