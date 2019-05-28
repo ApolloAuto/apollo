@@ -86,14 +86,14 @@ class Node {
       -> std::shared_ptr<cyber::Reader<MessageT>>;
 
   /**
-  * @brief create reader by the config file.
-  *
-  * @tparam MessageT is the message type.
-  * @param config is a file includes the channel name and other info.
-  * @param reader_func is the callback function, when the message is recevied.
-  *
-  * @return the reader of a message type.
-  */
+   * @brief create reader by the config file.
+   *
+   * @tparam MessageT is the message type.
+   * @param config is a file includes the channel name and other info.
+   * @param reader_func is the callback function, when the message is recevied.
+   *
+   * @return the reader of a message type.
+   */
   template <typename MessageT>
   auto CreateReader(const ReaderConfig& config,
                     const CallbackFunc<MessageT>& reader_func = nullptr)
@@ -127,15 +127,15 @@ class Node {
       -> std::shared_ptr<Writer<MessageT>>;
 
   /**
-    * @brief create service for message communication.
-    *
-    * @tparam Request the request message from the client.
-    * @tparam Response the response message from the service.
-    * @param service_name is the service name.
-    * @param service_calllback is the callback function used to process Request.
-    *
-    * @return the service object for process Request.
-    */
+   * @brief create service for message communication.
+   *
+   * @tparam Request the request message from the client.
+   * @tparam Response the response message from the service.
+   * @param service_name is the service name.
+   * @param service_calllback is the callback function used to process Request.
+   *
+   * @return the service object for process Request.
+   */
   template <typename Request, typename Response>
   auto CreateService(const std::string& service_name,
                      const typename Service<Request, Response>::ServiceCallback&
@@ -143,14 +143,14 @@ class Node {
       -> std::shared_ptr<Service<Request, Response>>;
 
   /**
-  * @brief create client for message communication.
-  *
-  * @tparam Request the request message from the client.
-  * @tparam Response the response message from the service.
-  * @param service_name is the service name.
-  *
-  * @return the Client to send the request.
-  */
+   * @brief create client for message communication.
+   *
+   * @tparam Request the request message from the client.
+   * @tparam Response the response message from the service.
+   * @param service_name is the service name.
+   *
+   * @return the Client to send the request.
+   */
   template <typename Request, typename Response>
   auto CreateClient(const std::string& service_name)
       -> std::shared_ptr<Client<Request, Response>>;

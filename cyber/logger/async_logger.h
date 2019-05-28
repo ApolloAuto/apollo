@@ -73,7 +73,7 @@ class AsyncLogger : public google::base::Logger {
   ~AsyncLogger();
 
   /**
-   * @brief start the async logger 
+   * @brief start the async logger
    */
   void Start();
 
@@ -85,13 +85,13 @@ class AsyncLogger : public google::base::Logger {
    */
   void Stop();
 
-  /** 
+  /**
    * @brief Write a message to the log. Start() must have been called.
    *
    * @param force_flush is set by the GLog library based on the configured
    * '--logbuflevel' flag.
    * Any messages logged at the configured level or higher result in
-   * 'force_flush' being set to true, indicating that the message should be 
+   * 'force_flush' being set to true, indicating that the message should be
    * immediately written to the log rather than buffered in memory.
    * @param timestamp is the time of write a message
    * @param message is the info to be written
@@ -109,14 +109,14 @@ class AsyncLogger : public google::base::Logger {
    * @brief Get the current LOG file size.
    * The return value is an approximate value since some
    * logged data may not have been flushed to disk yet.
-   * 
+   *
    * @return the log file size
    */
   uint32_t LogSize() override;
 
   /**
    * @brief get the log thead
-   * 
+   *
    * @return the pointer of log thread
    */
   const std::thread* LogThread() const { return &thread_; }
