@@ -44,10 +44,10 @@ void YoloObstacleDetector::LoadInputShape(const yolo::ModelParam &model_param) {
   float roi_ratio = cropped_ratio * static_cast<float>(image_height) /
                     static_cast<float>(image_width);
   width_ = static_cast<int>(resized_width + aligned_pixel / 2) / aligned_pixel *
-           aligned_pixel;  // TO DO : Suspicous code
+           aligned_pixel;  // TO DO : Suspicious code
   height_ = static_cast<int>(static_cast<float>(width_) * roi_ratio +
                              static_cast<float>(aligned_pixel) / 2.0f) /
-            aligned_pixel * aligned_pixel;  // TO DO : Suspicous code
+            aligned_pixel * aligned_pixel;  // TO DO : Suspicious code
 
   AINFO << "image_height=" << image_height << ", "
         << "image_width=" << image_width << ", "

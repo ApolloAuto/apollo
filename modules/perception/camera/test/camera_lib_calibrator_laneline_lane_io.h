@@ -36,7 +36,7 @@ bool LoadLaneDet(const std::string &filename, EgoLane *ego_lane);
 //                   std::vector<EgoLane> *ego_lanes);
 
 std::vector<std::string> Split(const std::string &s,
-                               const std::string &seperator);
+                               const std::string &separator);
 
 bool LoadCamera2WorldTfs(const std::string &filename,
                          std::vector<std::string> *frame_list,

@@ -3284,7 +3284,7 @@ inline T IMaxDiagonalElement(const T *a, int n) {
   return (val);
 }
 
-// Compute the the index of element with largest element in array
+// Compute the index of element with largest element in array
 inline int IMaxIndex(const double *a, int n) {
   int bi;
   double b, t;
@@ -3325,7 +3325,7 @@ inline int IMaxIndex(const int *a, int n) {
   return (bi);
 }
 
-// Compute the the index of element with largest  magnitude element in array
+// Compute the index of element with largest  magnitude element in array
 inline int IMaxAbsIndex(const double *a, int n) {
   int bi;
   double b, t;
@@ -3365,7 +3365,7 @@ inline int IMaxAbsIndex(const int *a, int n) {
     }
   return (bi);
 }
-// Compute the the index of element with smallest magnitude element in array
+// Compute the index of element with smallest magnitude element in array
 inline int IMinAbsIndex(const double *a, int n) {
   int bi;
   double b, t;

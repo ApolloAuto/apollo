@@ -279,7 +279,7 @@ void Target::Update3D(CameraFrame *frame) {
       Eigen::VectorXd measured_theta(1);
       measured_theta << std::atan2(displacement[1], displacement[0]);
       displacement_theta.AddMeasure(measured_theta);
-      // if an object is moving, its displacement oritentation should be
+      // if an object is moving, its displacement orientation should be
       // consistent
       stable_moving = displacement_theta.get_variance()(0, 0) <
                       target_param_.displacement_theta_var();
