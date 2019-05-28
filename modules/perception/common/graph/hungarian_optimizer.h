@@ -260,7 +260,7 @@ void HungarianOptimizer<T>::Maximize(
 
 /* Find an assignment which minimizes the overall costs.
  * Return an array of pairs of integers. Each pair (i, j) corresponds to
- * assinging agent i to task j. */
+ * assigning agent i to task j. */
 template <typename T>
 void HungarianOptimizer<T>::Minimize(
     std::vector<std::pair<size_t, size_t>>* assignments) {

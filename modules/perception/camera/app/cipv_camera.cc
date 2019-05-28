@@ -647,7 +647,7 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
   closest_index = -1;
   shortest_distance = kMaxFloat;
   for (size_t i = 0; i + 1 < egolane_ground.left_line.line_point.size(); ++i) {
-    // If a end point is in the closest left lane line segments
+    // If an end point is in the closest left lane line segments
     distance = kMaxFloat;
     if (DistanceFromPointToLineSegment(
             closted_object_edge.end_point,
@@ -689,7 +689,7 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
   closest_index = -1;
   shortest_distance = kMaxFloat;
   for (size_t i = 0; i + 1 < egolane_ground.right_line.line_point.size(); ++i) {
-    // If a end point is in the closest right lane line segments
+    // If an end point is in the closest right lane line segments
     distance = kMaxFloat;
     if (DistanceFromPointToLineSegment(
             closted_object_edge.start_point,

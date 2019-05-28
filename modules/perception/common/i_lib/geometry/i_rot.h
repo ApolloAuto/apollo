@@ -456,7 +456,7 @@ inline void i_rot_invert_rodrigues_3x3(const T R[9],
   i_scale3(v, theta);
 }
 
-/*This routine finds a rotation matrix R that rotates unit vector a onto unit
+/*This routine finds a rotation matrix R that rotates unit vector an onto unit
   vector b.
   a and b are both assumed to be unit vectors. Corner cases are a and b are
   parallel*/
