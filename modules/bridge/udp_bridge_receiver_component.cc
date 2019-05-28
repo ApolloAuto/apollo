@@ -118,6 +118,6 @@ void UDPBridgeReceiverComponent<T>::MsgDispatcher() {
       "bridge_server");
 }
 
-BRIDGE_RECV_IMPL(canbus::ChassisDetail);
+BRIDGE_RECV_IMPL(canbus::Chassis);
 }  // namespace bridge
 }  // namespace apollo

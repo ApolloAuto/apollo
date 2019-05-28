@@ -35,7 +35,7 @@
 #include "modules/bridge/proto/udp_bridge_remote_info.pb.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 
-#include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/canbus/proto/chassis.pb.h"
 
 namespace apollo {
 namespace bridge {
@@ -71,6 +71,6 @@ class UDPBridgeReceiverComponent final : public cyber::Component<> {
       std::make_shared<apollo::cyber::io::Session>();
 };
 
-RECEIVER_BRIDGE_COMPONENT_REGISTER(canbus::ChassisDetail)
+RECEIVER_BRIDGE_COMPONENT_REGISTER(canbus::Chassis)
 }  // namespace bridge
 }  // namespace apollo
