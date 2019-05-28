@@ -16,21 +16,21 @@
 # limitations under the License.
 ###############################################################################
 
+# Usage:
+#   ./build_cyber.sh ./cyber.x86_64.dockerfile
+DOCKERFILE=$1
+
+
+CONTEXT="$(dirname "${BASH_SOURCE[0]}")"
+
+REPO=apolloauto/apollo
+ARCH=$(uname -m)
+TIME=$(date +%Y%m%d_%H%M)
+
+TAG="${REPO}:cyber-${ARCH}-18.04-${TIME}"
+
 # Fail on first error.
 set -e
-
-cd "$(dirname "${BASH_SOURCE[0]}")"
-
-wget https://github.com/PointCloudLibrary/pcl/archive/pcl-1.7.2.tar.gz
-
-tar xzvf pcl-1.7.2.tar.gz
-
-cd pcl-pcl-1.7.2/
-mkdir build
-cd build
-cmake ..
-make -j 2
-make install
-
-#clean up
-cd ../../ && rm -rf pcl-1.7.2.tar.gz pcl-pcl-1.7.2
+#docker build --no-cache=true -t ${TAG} -f ${DOCKERFILE} ${CONTEXT}
+docker build -t ${TAG} -f ${DOCKERFILE} ${CONTEXT}
+echo "Built new image ${TAG}"

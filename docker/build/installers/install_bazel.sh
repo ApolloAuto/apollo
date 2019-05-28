@@ -19,17 +19,10 @@
 # Fail on first error.
 set -e
 
-# Install Java8.
-add-apt-repository -y ppa:webupd8team/java
-echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections
-echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
-curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
-
 apt-get update -y
-apt-get install -y oracle-java8-installer
+apt-get install -y openjdk-8-jdk
 
 # Install Bazel.
-cd "$(dirname "${BASH_SOURCE[0]}")"
 wget https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-installer-linux-x86_64.sh
 bash bazel-0.5.3-installer-linux-x86_64.sh
 
