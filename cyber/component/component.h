@@ -37,18 +37,52 @@ namespace cyber {
 using apollo::cyber::common::GlobalData;
 using apollo::cyber::proto::RoleAttributes;
 
+/**
+ * @brief .
+ * The Component can process up to four channels of messages. The message type
+ * is specified when the component is created. The Component is inherited from
+ * ComponentBase. Your component can inherit from Component, and implement
+ * Init() & Proc(...), They are picked up by the CyberRT. There are 4
+ * specialization implementations.
+ *
+ * @tparam M0 the first message.
+ * @tparam M1 the second message.
+ * @tparam M2 the thrid message.
+ * @tparam M3 the fourth message.
+ * @warning The Init & Proc functions need to be overloaded, but don't want to
+ * be called. They are called by the CyberRT Frame.
+ *
+ */
 template <typename M0 = NullType, typename M1 = NullType,
           typename M2 = NullType, typename M3 = NullType>
 class Component : public ComponentBase {
  public:
   Component() {}
   ~Component() override {}
+
+  /**
+   * @brief init the component by protobuf object.
+   *
+   * @param config which is define in 'cyber/proto/component_conf.proto'
+   *
+   * @return returns true if successful, otherwise returns false
+   */
   bool Initialize(const ComponentConfig& config) override;
   bool Process(const std::shared_ptr<M0>& msg0, const std::shared_ptr<M1>& msg1,
                const std::shared_ptr<M2>& msg2,
                const std::shared_ptr<M3>& msg3);
 
  private:
+  /**
+   * @brief The process logical of yours.
+   *
+   * @param msg0 the first channel message.
+   * @param msg1 the second channel message.
+   * @param msg2 the third channel message.
+   * @param msg3 the fourth channel message.
+   *
+   * @return returns true if successful, otherwise returns false
+   */
   virtual bool Proc(const std::shared_ptr<M0>& msg0,
                     const std::shared_ptr<M1>& msg1,
                     const std::shared_ptr<M2>& msg2,
@@ -493,16 +527,16 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
   auto sched = scheduler::Instance();
   std::weak_ptr<Component<M0, M1, M2, M3>> self =
       std::dynamic_pointer_cast<Component<M0, M1, M2, M3>>(shared_from_this());
-  auto func =
-      [self](const std::shared_ptr<M0>& msg0, const std::shared_ptr<M1>& msg1,
-             const std::shared_ptr<M2>& msg2, const std::shared_ptr<M3>& msg3) {
-        auto ptr = self.lock();
-        if (ptr) {
-          ptr->Process(msg0, msg1, msg2, msg3);
-        } else {
-          AERROR << "Component object has been destroyed." << std::endl;
-        }
-      };
+  auto func = [self](
+      const std::shared_ptr<M0>& msg0, const std::shared_ptr<M1>& msg1,
+      const std::shared_ptr<M2>& msg2, const std::shared_ptr<M3>& msg3) {
+    auto ptr = self.lock();
+    if (ptr) {
+      ptr->Process(msg0, msg1, msg2, msg3);
+    } else {
+      AERROR << "Component object has been destroyed." << std::endl;
+    }
+  };
 
   std::vector<data::VisitorConfig> config_list;
   for (auto& reader : readers_) {
