@@ -527,16 +527,16 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
   auto sched = scheduler::Instance();
   std::weak_ptr<Component<M0, M1, M2, M3>> self =
       std::dynamic_pointer_cast<Component<M0, M1, M2, M3>>(shared_from_this());
-  auto func = [self](
-      const std::shared_ptr<M0>& msg0, const std::shared_ptr<M1>& msg1,
-      const std::shared_ptr<M2>& msg2, const std::shared_ptr<M3>& msg3) {
-    auto ptr = self.lock();
-    if (ptr) {
-      ptr->Process(msg0, msg1, msg2, msg3);
-    } else {
-      AERROR << "Component object has been destroyed." << std::endl;
-    }
-  };
+  auto func =
+      [self](const std::shared_ptr<M0>& msg0, const std::shared_ptr<M1>& msg1,
+             const std::shared_ptr<M2>& msg2, const std::shared_ptr<M3>& msg3) {
+        auto ptr = self.lock();
+        if (ptr) {
+          ptr->Process(msg0, msg1, msg2, msg3);
+        } else {
+          AERROR << "Component object has been destroyed." << std::endl;
+        }
+      };
 
   std::vector<data::VisitorConfig> config_list;
   for (auto& reader : readers_) {
