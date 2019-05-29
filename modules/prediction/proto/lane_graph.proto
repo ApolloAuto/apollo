@@ -4,6 +4,7 @@ package apollo.prediction;
 
 import "modules/common/proto/geometry.proto";
 import "modules/common/proto/pnc_point.proto";
+import "modules/map/proto/map_lane.proto";
 
 message LanePoint {
   optional apollo.common.Point3D position = 1;
@@ -51,7 +52,7 @@ message StopSign {
   optional double lane_sequence_s = 4;  // the s value along lane sequence
 }
 
-// next id = 22
+// next id = 23
 message LaneSequence {
   optional int32 lane_sequence_id = 1;
   repeated LaneSegment lane_segment = 2;
@@ -73,6 +74,8 @@ message LaneSequence {
   optional double time_to_lane_center = 16;
   optional double time_to_lane_edge = 19;
   repeated apollo.common.PathPoint path_point = 8;
+
+  optional apollo.hdmap.Lane.LaneType lane_type = 22;
 
   enum BehaviorType {
     NOT_GOTO_LANE = 1;
