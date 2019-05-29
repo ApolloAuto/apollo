@@ -60,7 +60,8 @@ class RoadGraph {
  private:
   /**
    * @brief
-   * @param The accumulated s starting from the obstacle's position.
+   * @param The accumulated s-distance starting from the obstacle's position
+   *        up until the beginning of current lane-segment.
    * @param The starting s of the lane_segment to compute lane_sequence,
    *        this should be start_s_ for the first time, and zero for
    *        subsequent recursions.
@@ -74,7 +75,7 @@ class RoadGraph {
   void ComputeLaneSequence(const double accumulated_s, const double start_s,
                            std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
                            const int graph_search_horizon,
-                           const bool consider_divide,
+                           const bool consider_lane_split,
                            std::vector<LaneSegment>* const lane_segments,
                            LaneGraph* const lane_graph_ptr) const;
 
