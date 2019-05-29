@@ -26,6 +26,7 @@
 #include <string>
 #include <thread>
 #include <unordered_map>
+#include <algorithm>
 #include <utility>
 #include <vector>
 
@@ -193,8 +194,8 @@ class PyService {
         data_type_(data_type),
         func_(nullptr) {
     auto f = [this](
-                 const std::shared_ptr<const message::PyMessageWrap>& request,
-                 std::shared_ptr<message::PyMessageWrap>& response) {
+        const std::shared_ptr<const message::PyMessageWrap>& request,
+        std::shared_ptr<message::PyMessageWrap>& response) {
       response = this->cb(request);
     };
     service_ =
@@ -429,6 +430,104 @@ class PyChannelUtils {
 };
 
 google::protobuf::Message* PyChannelUtils::raw_msg_class_ = nullptr;
+
+class PyNodeUtils {
+ public:
+  static std::vector<std::string> get_active_nodes(uint8_t sleep_s = 2) {
+    auto topology =
+        apollo::cyber::service_discovery::TopologyManager::Instance();
+    sleep(sleep_s);
+    std::vector<std::string> node_names;
+    std::vector<RoleAttributes> nodes;
+    topology->node_manager()->GetNodes(&nodes);
+    if (nodes.empty()) {
+      AERROR << "no node found.";
+      return node_names;
+    }
+
+    std::sort(nodes.begin(), nodes.end(),
+              [](const RoleAttributes& na, const RoleAttributes& nb) -> bool {
+                if (na.node_name().compare(nb.node_name()) <= 0) {
+                  return true;
+                } else {
+                  return false;
+                }
+              });
+    for (auto& node : nodes) {
+      node_names.emplace_back(node.node_name());
+    }
+    return node_names;
+  }
+
+  static std::string get_node_attr(const std::string& node_name,
+                                   uint8_t sleep_s = 2) {
+    auto topology =
+        apollo::cyber::service_discovery::TopologyManager::Instance();
+    sleep(sleep_s);
+
+    if (!topology->node_manager()->HasNode(node_name)) {
+      AERROR << "no node named: " << node_name;
+      return "";
+    }
+
+    std::vector<RoleAttributes> nodes;
+    topology->node_manager()->GetNodes(&nodes);
+    std::string msgdata;
+    for (auto& node_attr : nodes) {
+      if (node_attr.node_name() == node_name) {
+        node_attr.SerializeToString(&msgdata);
+        return msgdata;
+      }
+    }
+    return "";
+  }
+
+  static std::vector<std::string> get_readersofnode(
+      const std::string& node_name, uint8_t sleep_s = 2) {
+    std::vector<std::string> reader_channels;
+    auto topology =
+        apollo::cyber::service_discovery::TopologyManager::Instance();
+    sleep(sleep_s);
+    if (!topology->node_manager()->HasNode(node_name)) {
+      AERROR << "no node named: " << node_name;
+      return reader_channels;
+    }
+
+    std::vector<RoleAttributes> readers;
+    auto channel_mgr = topology->channel_manager();
+    channel_mgr->GetReadersOfNode(node_name, &readers);
+    for (auto& reader : readers) {
+      if (reader.channel_name() == "param_event") {
+        continue;
+      }
+      reader_channels.emplace_back(reader.channel_name());
+    }
+    return reader_channels;
+  }
+
+  static std::vector<std::string> get_writersofnode(
+      const std::string& node_name, uint8_t sleep_s = 2) {
+    std::vector<std::string> writer_channels;
+    auto topology =
+        apollo::cyber::service_discovery::TopologyManager::Instance();
+    sleep(sleep_s);
+    if (!topology->node_manager()->HasNode(node_name)) {
+      AERROR << "no node named: " << node_name;
+      return writer_channels;
+    }
+
+    std::vector<RoleAttributes> writers;
+    auto channel_mgr = topology->channel_manager();
+    channel_mgr->GetWritersOfNode(node_name, &writers);
+    for (auto& writer : writers) {
+      if (writer.channel_name() == "param_event") {
+        continue;
+      }
+      writer_channels.emplace_back(writer.channel_name());
+    }
+    return writer_channels;
+  }
+};
 
 }  // namespace cyber
 }  // namespace apollo
