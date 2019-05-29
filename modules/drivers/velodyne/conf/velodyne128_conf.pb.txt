@@ -8,7 +8,7 @@ firing_data_port: 2368
 positioning_data_port: 8308
 use_sensor_sync: false
 max_range: 100.0
-min_range: 0.9 
+min_range: 0.9
 use_gps_time: true
 calibration_online: false
 calibration_file: "/apollo/modules/drivers/velodyne/params/velodyne128_VLS_calibration.yaml"

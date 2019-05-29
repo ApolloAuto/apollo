@@ -1,5 +1,5 @@
 max_interval_ms: 50
-drop_expired_data : true 
+drop_expired_data : true
 fusion_channel: "/apollo/sensor/lidar16/fusion/PointCloud2"
 input_channel: [
     "/apollo/sensor/lidar16/rear/left/PointCloud2",
