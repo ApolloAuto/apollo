@@ -469,16 +469,22 @@ bool HybridAStar::CombinePathAndSpeedProfile(
 
     ADEBUG << "speed_point debug: " << speed_point.ShortDebugString();
 
-    if (std::abs(speed_point.s()) > std::abs(discretized_path.Length())) {
+    if (std::abs(speed_point.s()) >
+        std::abs(discretized_path.Length()) + 1e-6) {
       AERROR << "Speed data s larger than the discretized path total lenghth, "
                 "with speed_data.s(): "
              << speed_point.s()
              << " and discretized_path.Length(): " << discretized_path.Length();
-      break;
+      return false;
     }
 
-    common::PathPoint path_point =
-        discretized_path.EvaluateReverse(speed_point.s());
+    common::PathPoint path_point;
+    if (speed_point.s() < 0.0) {
+      path_point = discretized_path.EvaluateReverse(speed_point.s());
+    } else {
+      path_point = discretized_path.Evaluate(speed_point.s());
+    }
+
     path_point.set_s(path_point.s());
 
     ADEBUG << "path_point debug: " << path_point.ShortDebugString();
@@ -489,6 +495,12 @@ bool HybridAStar::CombinePathAndSpeedProfile(
     result->v.push_back(speed_point.v());
     result->a.push_back(speed_point.a());
     result->accumulated_s.push_back(speed_point.s());
+
+    ADEBUG << "Combined results: "
+           << " x: " << result->x.back() << " y: " << result->y.back()
+           << " phi: " << result->phi.back() << " v: " << result->v.back()
+           << " a: " << result->a.back()
+           << " s: " << result->accumulated_s.back();
   }
   // load steering from phi
   result->a.pop_back();
