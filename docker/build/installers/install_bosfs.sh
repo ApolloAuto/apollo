@@ -22,9 +22,17 @@ set -e
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # Prepare
-PACKAGE="bosfs-1.0.0.9.tar.gz"
 apt-get update -y
-apt-get install -y libfuse-dev autotools-dev automake uuid-dev
+apt-get install -y \
+    automake \
+    autotools-dev \
+    g++ \
+    libcurl4-openssl-dev \
+    libfuse-dev \
+    libssl-dev \
+    make \
+    uuid-dev
+PACKAGE="bosfs-1.0.0.9.tar.gz"
 wget http://sdk.bce.baidu.com/console-sdk/${PACKAGE}
 tar zxf ${PACKAGE}
 
@@ -35,4 +43,3 @@ popd
 
 # Clean
 rm -fr ${PACKAGE} bosfs-1.0.0
-apt-get autoremove -y libfuse-dev
