@@ -25,6 +25,9 @@
 namespace apollo {
 namespace cyber {
 
+/**
+ * @brief Cyber has builtin time type Time.
+ */
 class Time {
  public:
   static const Time MAX;
@@ -38,13 +41,47 @@ class Time {
   Time& operator=(const Time& other);
   ~Time() {}
 
+  /**
+   * @brief get the current time.
+   *
+   * @return return the current time.
+   */
   static Time Now();
   static Time MonoTime();
+
+  /**
+   * @brief Sleep Until time.
+   *
+   * @param time the Time object.
+   */
   static void SleepUntil(const Time& time);
 
+  /**
+   * @brief convert time to second.
+   *
+   * @return return a double value unit is second.
+   */
   double ToSecond() const;
+
+  /**
+   * @brief convert time to nanosecond.
+   *
+   * @return return a unit64_t value unit is nanosecond.
+   */
   uint64_t ToNanosecond() const;
+
+  /**
+   * @brief convert time to a string.
+   *
+   * @return return a string.
+   */
   std::string ToString() const;
+
+  /**
+   * @brief determine if time is 0
+   *
+   * @return return true if time is 0
+   */
   bool IsZero() const;
 
   Duration operator-(const Time& rhs) const;
