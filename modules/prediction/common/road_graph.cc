@@ -135,7 +135,7 @@ bool RoadGraph::IsOnLaneGraph(std::shared_ptr<const LaneInfo> lane_info_ptr,
 void RoadGraph::ComputeLaneSequence(
     const double accumulated_s, const double start_s,
     std::shared_ptr<const LaneInfo> lane_info_ptr,
-    const int graph_search_horizon, const bool consider_divide,
+    const int graph_search_horizon, const bool consider_lane_split,
     std::vector<LaneSegment>* const lane_segments,
     LaneGraph* const lane_graph_ptr) const {
   // Sanity checks.
@@ -163,58 +163,48 @@ void RoadGraph::ComputeLaneSequence(
   lane_segment.set_total_length(lane_info_ptr->total_length());
   lane_segments->push_back(std::move(lane_segment));
 
+  // End condition: if search reached the max. search distance,
+  // or if there is no more successor lane_segment.
   if (accumulated_s + lane_info_ptr->total_length() - start_s >= length_ ||
       lane_info_ptr->lane().successor_id_size() == 0) {
-    // End condition: if search reached the max. search distance,
-    //             or if there is no more successor lane_segment.
     LaneSequence* sequence = lane_graph_ptr->add_lane_sequence();
-    *sequence->mutable_lane_segment() = {lane_segments->begin(),
-                                         lane_segments->end()};
+    *sequence->mutable_lane_segment() =
+        {lane_segments->begin(), lane_segments->end()};
     sequence->set_label(0);
-  } else {
-    const double successor_accumulated_s =
-        accumulated_s + lane_info_ptr->total_length() - start_s;
+    lane_segments->pop_back();
+    return;
+  }
 
-    // Sort the successor lane_segments from left to right.
-    std::vector<std::shared_ptr<const hdmap::LaneInfo>> successor_lanes;
-    for (const auto& successor_lane_id : lane_info_ptr->lane().successor_id()) {
-      successor_lanes.push_back(
-          PredictionMap::LaneById(successor_lane_id.id()));
-    }
-    std::sort(successor_lanes.begin(), successor_lanes.end(), IsAtLeft);
-
-    if (!successor_lanes.empty()) {
-      if (consider_divide) {
-        if (successor_lanes.size() > 1) {
-          // Run recursion function to perform DFS.
-          for (const auto& successor_lane : successor_lanes) {
-            bool consider_divide_further = false;
-            if (FLAGS_prediction_offline_mode ==
-                    PredictionConstants::kDumpFeatureProto ||
-                FLAGS_prediction_offline_mode ==
-                    PredictionConstants::kDumpDataForLearning) {
-              consider_divide_further = true;
-            }
-            ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lane,
-                                graph_search_horizon - 1,
-                                consider_divide_further, lane_segments,
-                                lane_graph_ptr);
-          }
-        } else {
-          ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lanes[0],
-                              graph_search_horizon - 1, true, lane_segments,
-                              lane_graph_ptr);
-        }
-      } else {
-        auto selected_successor_lane =
-            LaneWithSmallestAverageCurvature(successor_lanes);
-        ComputeLaneSequence(successor_accumulated_s, 0.0,
-                            selected_successor_lane, graph_search_horizon - 1,
-                            false, lane_segments, lane_graph_ptr);
-      }
-    }
+  // Otherwise, continue searching for subsequent lane_segments.
+  const double successor_accumulated_s =
+      accumulated_s + lane_info_ptr->total_length() - start_s;
+  // Sort the successor lane_segments from left to right.
+  std::vector<std::shared_ptr<const hdmap::LaneInfo>> successor_lanes;
+  for (const auto& successor_lane_id : lane_info_ptr->lane().successor_id()) {
+    successor_lanes.push_back(
+        PredictionMap::LaneById(successor_lane_id.id()));
+  }
+  std::sort(successor_lanes.begin(), successor_lanes.end(), IsAtLeft);
+  // Based on other conditions, select what successor lanes should be used,
+  // and decide whether future recursions should consider lane-splitting.
+  if (!consider_lane_split) {
+    successor_lanes = { LaneWithSmallestAverageCurvature(successor_lanes) };
+  }
+  bool consider_further_lane_split =
+      (FLAGS_prediction_offline_mode ==
+          PredictionConstants::kDumpFeatureProto) ||
+      (FLAGS_prediction_offline_mode ==
+          PredictionConstants::kDumpDataForLearning) ||
+      (consider_lane_split && successor_lanes.size() == 1);
+  // Recursively expand lane-sequence.
+  for (const auto& successor_lane : successor_lanes) {
+    ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lane,
+                        graph_search_horizon - 1,
+                        consider_further_lane_split, lane_segments,
+                        lane_graph_ptr);
   }
   lane_segments->pop_back();
+  return;
 }
 
 std::shared_ptr<const hdmap::LaneInfo>
