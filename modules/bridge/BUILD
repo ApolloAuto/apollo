@@ -8,17 +8,16 @@ cc_library(
     deps = [
         "//cyber",
         "//external:gflags",
-
         "//modules/bridge/common:bridge_buffer",
         "//modules/bridge/common:bridge_gflags",
+        "//modules/bridge/common:macro",
+        "//modules/bridge/common:util",
         "//modules/bridge/proto:udp_bridge_remote_info_proto",
         "//modules/common",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
         "//modules/common/time",
         "//modules/common/util",
-        "//modules/bridge/common:macro",
-        "//modules/bridge/common:util",
         "//modules/planning/proto:planning_proto",
     ],
 )
