@@ -188,6 +188,7 @@ message ControlData {
   optional double station_error = 2;
   optional double lateral_error = 3;
   optional double heading_error = 4;
+  optional apollo.common.TrajectoryPoint current_target_point = 5;
 }
 
 message Notification {

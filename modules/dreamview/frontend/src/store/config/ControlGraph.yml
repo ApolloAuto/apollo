@@ -19,6 +19,12 @@ trajectoryGraph:
             pose:
                 color: 'rgba(0, 255, 0, 1)' # green
         lines:
+            currentTargetPoint:
+                color: 'rgba(9, 122, 30, 1)' # green
+                borderWidth: 0
+                pointRadius: 3
+                fill: false
+                showLine: false
             real:
                 color: 'rgba(0, 106, 255, 1)' # blue
                 borderWidth: 2

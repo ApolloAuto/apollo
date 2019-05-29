@@ -1097,6 +1097,9 @@ void SimulationWorldService::UpdateSimulationWorld(
       if (simple_lat.has_lateral_error()) {
         control_data->set_lateral_error(simple_lat.lateral_error());
       }
+      if (simple_lat.has_current_target_point()) {
+        control_data->mutable_current_target_point()->CopyFrom(simple_lat.current_target_point());
+      }
     } else if (debug.has_simple_mpc_debug()) {
       auto &simple_mpc = debug.simple_mpc_debug();
       if (simple_mpc.has_station_error()) {
