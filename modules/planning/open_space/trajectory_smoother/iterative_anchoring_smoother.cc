@@ -208,8 +208,8 @@ bool IterativeAnchoringSmoother::Smooth(
 
   const auto end_timestamp = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_timestamp - start_timestamp;
-  ADEBUG << "iterative anchoring smoother total time: "
-         << diff.count() * 1000.0 << " ms.";
+  ADEBUG << "iterative anchoring smoother total time: " << diff.count() * 1000.0
+         << " ms.";
   return true;
 }
 

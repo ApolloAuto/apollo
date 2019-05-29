@@ -22,8 +22,8 @@
 
 #include "cyber/common/log.h"
 #include "modules/planning/scenarios/park/pull_over/stage_approach.h"
-#include "modules/planning/scenarios/park/pull_over/stage_retry_parking.h"
 #include "modules/planning/scenarios/park/pull_over/stage_retry_approach_parking.h"
+#include "modules/planning/scenarios/park/pull_over/stage_retry_parking.h"
 
 namespace apollo {
 namespace planning {
