@@ -28,7 +28,7 @@ class CloudMask {
   CloudMask() = default;
   ~CloudMask() = default;
 
-  // @brief: set mask size and inital value
+  // @brief: set mask size and initial value
   // @param [in]: size, mask size
   // @param [in]: value, initial value
   inline void Set(size_t size, int init_value) {
