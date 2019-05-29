@@ -28,17 +28,17 @@
 namespace apollo {
 namespace prediction {
 
-class JunctionMAPEvaluator : public Evaluator {
+class JunctionMapEvaluator : public Evaluator {
  public:
   /**
    * @brief Constructor
    */
-  JunctionMAPEvaluator();
+  JunctionMapEvaluator();
 
   /**
    * @brief Destructor
    */
-  virtual ~JunctionMAPEvaluator() = default;
+  virtual ~JunctionMapEvaluator() = default;
 
   /**
    * @brief Clear obstacle feature map
