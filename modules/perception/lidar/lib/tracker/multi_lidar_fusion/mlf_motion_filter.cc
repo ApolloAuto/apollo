@@ -218,7 +218,7 @@ void MlfMotionFilter::KalmanFilterUpdateWithPartialObservation(
       static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>(
           kalman_gain_matrix * (measurement - observation_transform * state));
 
-  // 3. gain adjustment and esitmate posterior
+  // 3. gain adjustment and estimate posterior
   StateGainAdjustment(track_data, latest_object, new_object, &state_gain);
 
   state = state + state_gain;
@@ -327,7 +327,7 @@ void MlfMotionFilter::ConvergenceEstimationAndBoostUp(
   ComputeConvergenceConfidence(track_data, new_object, true);
   UpdateConverged(track_data, new_object);
 
-  // do not boostup belief if useable measure velocity is not enough
+  // do not boostup belief if usable measure velocity is not enough
   if (window_size <
       static_cast<size_t>(new_object->boostup_need_history_size)) {
     return;
@@ -452,7 +452,7 @@ void MlfMotionFilter::BoostupState(const MlfTrackDataConstPtr& track_data,
   }
   // Increase belief when belief less than min boosted velocity
   // Decrease belief when belief greater than max boosted velocity
-  // now boosted_accelaration not used in orignal version, maybe use later
+  // now boosted_accelaration not used in original version, maybe use later
   if (min_boosted_velocity_norm > new_obj_belief_velocity.norm()) {
     // Eigen::Vector3d boosted_accelaration =
     // (min_boosted_velocity - new_obj_belief_velocity)/new_latest_time_diff_;

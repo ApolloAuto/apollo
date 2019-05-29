@@ -30,7 +30,7 @@ enum class LaneLineType {
   YELLOW_SOLID
 };
 
-/// Defintion of the position of a lane marking in respect to the ego lane.
+/// Definition of the position of a lane marking in respect to the ego lane.
 enum class LaneLinePositionType {
   CURB_LEFT = -5,
   FOURTH_LEFT = -4,
