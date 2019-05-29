@@ -56,7 +56,7 @@ class JunctionMAPEvaluator : public Evaluator {
    * @param Obstacle pointer
    *        Feature container in a vector for receiving the feature values
    */
-  void ExtractFeatureValues(Obstacle* obstacle_ptr,
+  bool ExtractFeatureValues(Obstacle* obstacle_ptr,
                             std::vector<double>* feature_values);
 
   /**
@@ -71,6 +71,8 @@ class JunctionMAPEvaluator : public Evaluator {
   void LoadModel();
 
  private:
+  // junction exit mask
+  static const size_t JUNCTION_FEATURE_SIZE = 12;
   std::shared_ptr<torch::jit::script::Module> torch_model_ptr_ = nullptr;
   torch::Device device_;
 };
