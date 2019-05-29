@@ -29,13 +29,13 @@
 namespace apollo {
 namespace prediction {
 
-JunctionMAPEvaluator::JunctionMAPEvaluator() : device_(torch::kCPU) {
+JunctionMapEvaluator::JunctionMapEvaluator() : device_(torch::kCPU) {
   LoadModel();
 }
 
-void JunctionMAPEvaluator::Clear() {}
+void JunctionMapEvaluator::Clear() {}
 
-bool JunctionMAPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Sanity checks.
   omp_set_num_threads(1);
   Clear();
@@ -119,7 +119,7 @@ bool JunctionMAPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   return true;
 }
 
-bool JunctionMAPEvaluator::ExtractFeatureValues(
+bool JunctionMapEvaluator::ExtractFeatureValues(
     Obstacle* obstacle_ptr, std::vector<double>* feature_values) {
   feature_values->clear();
   feature_values->resize(JUNCTION_FEATURE_SIZE, 0.0);
@@ -152,7 +152,7 @@ bool JunctionMAPEvaluator::ExtractFeatureValues(
   return true;
 }
 
-void JunctionMAPEvaluator::LoadModel() {
+void JunctionMapEvaluator::LoadModel() {
   // TODO(all) uncomment the following when cuda issue is resolved
   // if (torch::cuda::is_available()) {
   //   ADEBUG << "CUDA is available";
