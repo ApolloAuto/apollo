@@ -1,3 +1,3 @@
-topic_name: "/apollo/canbus/chassis_detail"
+topic_name: "/apollo/canbus/Chassis"
 bind_port: 8900
-proto_name: "ChassisDetail"
+proto_name: "Chassis"

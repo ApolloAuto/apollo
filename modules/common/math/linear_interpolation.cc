@@ -96,7 +96,7 @@ TrajectoryPoint InterpolateUsingLinearApproximation(const TrajectoryPoint &tp0,
   tp.set_v(lerp(tp0.v(), t0, tp1.v(), t1, t));
   tp.set_a(lerp(tp0.a(), t0, tp1.a(), t1, t));
   tp.set_relative_time(t);
-  tp.set_steer(slerp(tp0.steer(), t0, tp0.steer(), t1, t));
+  tp.set_steer(slerp(tp0.steer(), t0, tp1.steer(), t1, t));
 
   PathPoint *path_point = tp.mutable_path_point();
   path_point->set_x(lerp(pp0.x(), t0, pp1.x(), t1, t));

@@ -34,7 +34,7 @@ radar_conf {
   rcs_threshold: RCS_THRESHOLD_STANDARD
 
   # unit: nanoseconds, 20ms for 50hz
-  input_send_interval: 20000000 
+  input_send_interval: 20000000
 }
 
 radar_channel: "/apollo/sensor/radar"

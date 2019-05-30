@@ -354,7 +354,7 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   result->accumulated_s.push_back(0.0);
   result->v.push_back(0.0);
   x_bounds.emplace_back(-10.0, 10.0);
-  dx_bounds.emplace_back(-10.0, 10.0);
+  dx_bounds.emplace_back(0.0, 0.0);
 
   ADEBUG << "Initial accumulated_s: " << 0.0 << " initial discrete_v: " << 0.0;
 
@@ -377,7 +377,9 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
            << " dx_bounds: " << discrete_v - 10 << " and " << discrete_v + 10;
   }
 
+  // Force last point velocity to be zero
   result->v[x_size - 1] = 0.0;
+  dx_bounds[x_size - 1] = {0.0, 0.0};
 
   std::array<double, 3> init_s = {result->accumulated_s[0], result->v[0],
                                   (result->v[1] - result->v[0]) / delta_t_};
@@ -397,9 +399,9 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   path_time_qp.set_weight_ddx(s_curve_config.acc_weight());
   path_time_qp.set_weight_dddx(s_curve_config.jerk_weight());
 
-  path_time_qp.set_x_bounds(x_bounds);
+  path_time_qp.set_x_bounds(std::move(x_bounds));
 
-  path_time_qp.set_dx_bounds(dx_bounds);
+  path_time_qp.set_dx_bounds(std::move(dx_bounds));
 
   // TODO(QiL): load this from configs
   path_time_qp.set_ddx_bounds(-4.4, 10.0);
@@ -422,6 +424,8 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   result->v = path_time_qp.opt_dx();
   result->a = path_time_qp.opt_ddx();
   result->a.pop_back();
+
+  ADEBUG << "End velocity after optimization is: " << result->v.back();
 
   // load steering from phi
   for (size_t i = 0; i + 1 < x_size; ++i) {
@@ -469,16 +473,22 @@ bool HybridAStar::CombinePathAndSpeedProfile(
 
     ADEBUG << "speed_point debug: " << speed_point.ShortDebugString();
 
-    if (std::abs(speed_point.s()) > std::abs(discretized_path.Length())) {
+    if (std::abs(speed_point.s()) >
+        std::abs(discretized_path.Length()) + 1e-6) {
       AERROR << "Speed data s larger than the discretized path total lenghth, "
                 "with speed_data.s(): "
              << speed_point.s()
              << " and discretized_path.Length(): " << discretized_path.Length();
-      break;
+      return false;
     }
 
-    common::PathPoint path_point =
-        discretized_path.EvaluateReverse(speed_point.s());
+    common::PathPoint path_point;
+    if (speed_point.s() < 0.0) {
+      path_point = discretized_path.EvaluateReverse(speed_point.s());
+    } else {
+      path_point = discretized_path.Evaluate(speed_point.s());
+    }
+
     path_point.set_s(path_point.s());
 
     ADEBUG << "path_point debug: " << path_point.ShortDebugString();
@@ -489,6 +499,12 @@ bool HybridAStar::CombinePathAndSpeedProfile(
     result->v.push_back(speed_point.v());
     result->a.push_back(speed_point.a());
     result->accumulated_s.push_back(speed_point.s());
+
+    ADEBUG << "Combined results: "
+           << " x: " << result->x.back() << " y: " << result->y.back()
+           << " phi: " << result->phi.back() << " v: " << result->v.back()
+           << " a: " << result->a.back()
+           << " s: " << result->accumulated_s.back();
   }
   // load steering from phi
   result->a.pop_back();
@@ -550,7 +566,8 @@ bool HybridAStar::TrajectoryPartition(
   current_traj->y.push_back(y.back());
   current_traj->phi.push_back(phi.back());
 
-  ADEBUG << "size of partitioned result: " << partitioned_result->size();
+  ADEBUG << "size of partitioned result in HybridAStar: "
+         << partitioned_result->size();
   // Retrieve v, a and steer from path
   for (auto& result : *partitioned_result) {
     if (FLAGS_use_s_curve_speed_smooth) {

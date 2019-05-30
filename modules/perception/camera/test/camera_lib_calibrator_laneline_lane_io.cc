@@ -111,14 +111,14 @@ bool LoadLaneDet(const std::string &filename, EgoLane *ego_lane) {
 // }
 
 std::vector<std::string> Split(const std::string &s,
-                               const std::string &seperator) {
+                               const std::string &separator) {
   std::vector<std::string> result = {};
-  std::string::size_type pos2 = s.find(seperator);
+  std::string::size_type pos2 = s.find(separator);
   std::string::size_type pos1 = 0;
   while (std::string::npos != pos2) {
     result.push_back(s.substr(pos1, pos2 - pos1));
-    pos1 = pos2 + seperator.size();
-    pos2 = s.find(seperator, pos1);
+    pos1 = pos2 + separator.size();
+    pos2 = s.find(separator, pos1);
   }
   if (pos1 != s.length()) {
     result.push_back(s.substr(pos1));
@@ -141,11 +141,11 @@ bool LoadCamera2WorldTfs(const std::string &filename,
   }
   std::stringstream ss_temp;
   std::string line;
-  std::string seperator = "\t";
+  std::string separator = "\t";
   const int kLength = 18;  // 2 info items + 4 * 4 transform
   const int kShift = 2;
   while (getline(fin, line)) {
-    std::vector<std::string> tf_info = Split(line, seperator);
+    std::vector<std::string> tf_info = Split(line, separator);
     assert(tf_info.size() == kLength);
 
     frame_list->push_back(tf_info[0]);

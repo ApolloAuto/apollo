@@ -87,7 +87,7 @@ bool HoughTransfer::Init(int img_w, int img_h, float d_r, float d_theta) {
 // @brief: HoughTransform in 2D binary image
 // @params[IN] image: 2D binary image.
 //             with_distribute: flag to control whether to calculate element
-//                              lenght,vote_num,pts in HoughLine
+//                              length,vote_num,pts in HoughLine
 bool HoughTransfer::ImageVote(const std::vector<int>& image,
                               bool with_distribute) {
   if (image.size() != query_map_.size()) {
@@ -107,7 +107,7 @@ bool HoughTransfer::ImageVote(const std::vector<int>& image,
 // @brief: transform one point to parameter space in polar coodinates and vote
 // @params[IN] x, y: pos in image.
 //             with_distribute: flag to control whether to calculate element
-//                              lenght,vote_num,pts in HoughLine
+//                              length,vote_num,pts in HoughLine
 void HoughTransfer::PointVote(int x, int y, bool with_distribute) {
   const int pos = y * img_w_ + x;
   PointVote(pos, with_distribute);
@@ -128,7 +128,7 @@ void HoughTransfer::PointVote(int pos, bool with_distribute) {
 // @params[IN] min_pt_num: minimum points on the same line.
 //             r_neibor, theta_neibor: query region
 //             with_distribute: flag to control whether to calculate element
-//                              lenght,vote_num,pts in HoughLine
+//                              length,vote_num,pts in HoughLine
 //             lines: save lines detected.
 bool HoughTransfer::GetLines(int min_pt_num, int r_neibor, int theta_neibor,
                              bool with_distribute,
@@ -139,7 +139,7 @@ bool HoughTransfer::GetLines(int min_pt_num, int r_neibor, int theta_neibor,
   int r_step = 2 * r_neibor + 1;
   int theta_step = 2 * theta_neibor + 1;
 
-  // search one vote neibor for max_vote position in the region
+  // search one vote neighbor for max_vote position in the region
   std::set<int> max_vote_lines;
   GetMaxVotes(min_pt_num, r_neibor, theta_neibor, r_step, theta_step,
               &max_vote_lines);

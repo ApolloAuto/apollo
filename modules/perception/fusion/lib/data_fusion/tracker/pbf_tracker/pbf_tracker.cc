@@ -87,7 +87,7 @@ bool PbfTracker::InitMethods() {
   if (s_existance_fusion_method_ == "DstExistanceFusion") {
     existance_fusion_.reset(new DstExistanceFusion(track_));
   } else {
-    AERROR << "Unknown existance fusion : " << s_existance_fusion_method_;
+    AERROR << "Unknown existence fusion : " << s_existance_fusion_method_;
     return false;
   }
 

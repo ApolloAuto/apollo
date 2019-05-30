@@ -204,7 +204,7 @@ inline int IRound(double a) {
                      : (static_cast<int>(a - 0.5)));
 }
 
-// Rounds a upward, returning the smallest integral value that is not less than
+// Rounds an upward, returning the smallest integral value that is not less than
 //  * a
 inline int ICeil(int a) { return (a); }
 inline int ICeil(float a) { return static_cast<int>(ceilf(a)); }
@@ -534,7 +534,7 @@ inline void IGaussian2D(double *kernel, int n, const double sigma) {
   }
 }
 
-// Move a into b, without necessarily preserving the value of a. This function
+// Move an into b, without necessarily preserving the value of a. This function
 // is * specialized for types that are expensive to copy
 template <typename T>
 inline void IMove(const T &a, T *b) {

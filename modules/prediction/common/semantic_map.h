@@ -59,6 +59,7 @@ class SemanticMap {
   cv::Mat base_img_;
   SemanticMapConfig config_;
   cv::Mat curr_img_;
+  std::unordered_map<int, ObstacleHistory> obstacle_id_history_map_;
   double curr_base_x_ = 0.0;
   double curr_base_y_ = 0.0;
   double curr_timestamp_ = 0.0;

@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 #include "modules/bridge/udp_bridge_receiver_component.h"
-#include "modules/bridge/common/util.h"
 #include "modules/bridge/common/macro.h"
+#include "modules/bridge/common/util.h"
 
 namespace apollo {
 namespace bridge {
@@ -24,9 +24,9 @@ namespace bridge {
 #define BRIDGE_RECV_IMPL(pb_msg) \
   template class UDPBridgeReceiverComponent<pb_msg>
 
-template<typename T>
+template <typename T>
 UDPBridgeReceiverComponent<T>::UDPBridgeReceiverComponent()
-  : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
+    : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
 
 template <typename T>
 UDPBridgeReceiverComponent<T>::~UDPBridgeReceiverComponent() {
@@ -35,7 +35,7 @@ UDPBridgeReceiverComponent<T>::~UDPBridgeReceiverComponent() {
   }
 }
 
-template<typename T>
+template <typename T>
 bool UDPBridgeReceiverComponent<T>::Init() {
   AINFO << "UDP bridge receiver init, startin..";
   buf_.reset(_1K);
@@ -47,8 +47,8 @@ bool UDPBridgeReceiverComponent<T>::Init() {
   bind_port_ = udp_bridge_remote.bind_port();
   proto_name_ = udp_bridge_remote.proto_name();
   topic_name_ = udp_bridge_remote.topic_name();
-  AINFO << "UDP Bridge remote port is: "<< bind_port_;
-  AINFO << "UDP Bridge for Proto is: "<< proto_name_;
+  AINFO << "UDP Bridge remote port is: " << bind_port_;
+  AINFO << "UDP Bridge for Proto is: " << proto_name_;
   writer_ = node_->CreateWriter<T>(topic_name_.c_str());
 
   if (!InitSession((uint16_t)bind_port_)) {
@@ -67,7 +67,7 @@ bool UDPBridgeReceiverComponent<T>::InitSession(uint16_t port) {
 
   session_->Socket(AF_INET, SOCK_DGRAM, 0);
   if (session_->Bind((struct sockaddr*)&addr, sizeof(addr)) < 0) {
-    AINFO << "bind prot ["  << port << "] failed";
+    AINFO << "bind prot [" << port << "] failed";
     session_->Close();
     return false;
   }
@@ -82,9 +82,9 @@ bool UDPBridgeReceiverComponent<T>::MsgHandle() {
   buf_.reset(_1K);
 
   char header_size[sizeof(size_t)] = {0};
-  bytes = static_cast<int>(
-      session_->RecvFrom(header_size, sizeof(header_size), 0,
-        (struct sockaddr*)&client_addr, &sock_len));
+  bytes = static_cast<int>(session_->RecvFrom(header_size, sizeof(header_size),
+                                              0, (struct sockaddr*)&client_addr,
+                                              &sock_len));
   if (bytes <= 0) {
     return false;
   }
@@ -94,9 +94,8 @@ bool UDPBridgeReceiverComponent<T>::MsgHandle() {
   }
 
   buf_.reset(msg_len);
-  bytes = static_cast<int>(
-      session_->RecvFrom(buf_, buf_.capacity(), 0,
-        (struct sockaddr*)&client_addr, &sock_len));
+  bytes = static_cast<int>(session_->RecvFrom(
+      buf_, buf_.capacity(), 0, (struct sockaddr*)&client_addr, &sock_len));
   if (bytes <= 0 || bytes != msg_len) {
     return false;
   }
@@ -119,6 +118,6 @@ void UDPBridgeReceiverComponent<T>::MsgDispatcher() {
       "bridge_server");
 }
 
-BRIDGE_RECV_IMPL(canbus::ChassisDetail);
+BRIDGE_RECV_IMPL(canbus::Chassis);
 }  // namespace bridge
 }  // namespace apollo

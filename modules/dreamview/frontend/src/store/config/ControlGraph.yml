@@ -17,8 +17,15 @@ trajectoryGraph:
     properties:
         cars:
             pose:
-                color: 'rgba(0, 255, 0, 1)' # green
+                color: 'rgba(0, 255, 0, 0.55)' # green
         lines:
+            currentTargetPoint:
+                color: 'rgba(360, 0, 0, 1)' # red
+                borderWidth: 0
+                pointRadius: 7
+                fill: false
+                showLine: false
+                pointStyle: 'crossRot'
             real:
                 color: 'rgba(0, 106, 255, 1)' # blue
                 borderWidth: 2

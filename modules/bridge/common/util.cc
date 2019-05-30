@@ -24,7 +24,7 @@ int GetProtoSize(const char *buf, size_t size) {
   }
   char size_buf[sizeof(size_t)] = {0};
   memcpy(size_buf, buf, sizeof(size_t));
-  int proto_size = *(reinterpret_cast<int*>(size_buf));
+  int proto_size = *(reinterpret_cast<int *>(size_buf));
   return proto_size;
 }
 

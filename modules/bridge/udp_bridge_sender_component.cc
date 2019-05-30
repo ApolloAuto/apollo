@@ -15,18 +15,17 @@
  *****************************************************************************/
 
 #include "modules/bridge/udp_bridge_sender_component.h"
-#include "modules/bridge/common/util.h"
 #include "modules/bridge/common/macro.h"
+#include "modules/bridge/common/util.h"
 
 namespace apollo {
 namespace bridge {
 
-#define BRIDGE_IMPL(pb_msg) \
-  template class UDPBridgeSenderComponent<pb_msg>
+#define BRIDGE_IMPL(pb_msg) template class UDPBridgeSenderComponent<pb_msg>
 
+using apollo::bridge::UDPBridgeSenderRemoteInfo;
 using apollo::cyber::io::Session;
 using apollo::localization::LocalizationEstimate;
-using apollo::bridge::UDPBridgeSenderRemoteInfo;
 
 template <typename T>
 bool UDPBridgeSenderComponent<T>::Init() {
@@ -67,7 +66,7 @@ bool UDPBridgeSenderComponent<T>::Proc(const std::shared_ptr<T> &pb_msg) {
 
         Session session;
         session.Socket(AF_INET, SOCK_DGRAM, 0);
-        if (session.Connect((struct sockaddr*)&server_addr,
+        if (session.Connect((struct sockaddr *)&server_addr,
                             sizeof(server_addr)) < 0) {
           std::cout << "connect to server failed, " << strerror(errno)
                     << std::endl;

@@ -143,6 +143,27 @@ cc_test(
 )
 
 cc_library(
+    name = "junction_map_evaluator",
+    srcs = [
+        "junction_map_evaluator.cc",
+    ],
+    hdrs = [
+        "junction_map_evaluator.h",
+    ],
+    deps = [
+        "//modules/prediction/common:prediction_util",
+        "//modules/prediction/evaluator",
+    ] + select({
+        "//tools/platforms:use_gpu": [
+            "@pytorch",
+        ],
+        "//conditions:default": [
+            "@pytorch",
+        ],
+    }),
+)
+
+cc_library(
     name = "cruise_mlp_evaluator",
     srcs = [
         "cruise_mlp_evaluator.cc",

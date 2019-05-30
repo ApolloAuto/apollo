@@ -63,13 +63,13 @@ bool DstExistanceFusion::Init() {
   for (auto valid_dist : params.camera_valid_dist()) {
     std::string camera_id = valid_dist.camera_name();
     options_.camera_max_valid_dist_[camera_id] = valid_dist.valid_dist();
-    AINFO << "dst existance fusion params: " << camera_id
+    AINFO << "dst existence fusion params: " << camera_id
           << " max valid dist: " << options_.camera_max_valid_dist_[camera_id];
   }
 
   options_.track_object_max_match_distance_ =
       params.track_object_max_match_distance();
-  AINFO << "dst existance fusion params: "
+  AINFO << "dst existence fusion params: "
         << " track_object_max_match_distance: "
         << options_.track_object_max_match_distance_;
 

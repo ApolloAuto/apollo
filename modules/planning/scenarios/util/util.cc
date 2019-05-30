@@ -27,8 +27,8 @@ namespace planning {
 namespace scenario {
 namespace util {
 
-using common::util::DistanceXY;
 using common::VehicleConfigHelper;
+using common::util::DistanceXY;
 using hdmap::PathOverlap;
 
 hdmap::PathOverlap* GetOverlapOnReferenceLine(
@@ -117,11 +117,10 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
   const double theta_diff = std::fabs(common::math::NormalizeAngle(
       pull_over_status.theta() -
       common::VehicleStateProvider::Instance()->heading()));
-  ADEBUG << "adc_position_s[" << adc_position_sl.s()
-         << "] adc_position_l[" << adc_position_sl.l()
-         << "] pull_over_s[" << pull_over_sl.s() << "] pull_over_l["
-         << pull_over_sl.l() << "] s_diff[" << s_diff << "] l_diff[" << l_diff
-         << "] theta_diff[" << theta_diff << "]";
+  ADEBUG << "adc_position_s[" << adc_position_sl.s() << "] adc_position_l["
+         << adc_position_sl.l() << "] pull_over_s[" << pull_over_sl.s()
+         << "] pull_over_l[" << pull_over_sl.l() << "] s_diff[" << s_diff
+         << "] l_diff[" << l_diff << "] theta_diff[" << theta_diff << "]";
 
   if (s_diff >= 0 && s_diff <= scenario_config.max_s_error_to_end_point() &&
       l_diff <= scenario_config.max_l_error_to_end_point() &&

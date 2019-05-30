@@ -1,6 +1,6 @@
 omit_bottom_line_num: 3
-laneline_point_score_thresh: 0.4 
+laneline_point_score_thresh: 0.4
 laneline_map_score_thresh: 0.6
-laneline_point_min_num_thresh: 2 
-cc_valid_pixels_ratio: 2 
+laneline_point_min_num_thresh: 2
+cc_valid_pixels_ratio: 2
 laneline_reject_dist_thresh: 50

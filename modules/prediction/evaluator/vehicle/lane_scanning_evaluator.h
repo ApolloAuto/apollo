@@ -44,14 +44,14 @@ class LaneScanningEvaluator : public Evaluator {
    * @brief Override Evaluate
    * @param Obstacle pointer
    */
-  void Evaluate(Obstacle* obstacle_ptr) override;
+  bool Evaluate(Obstacle* obstacle_ptr) override;
 
   /**
    * @brief Override Evaluate
    * @param Obstacle pointer
    * @param vector of all Obstacles
    */
-  void Evaluate(Obstacle* obstacle_ptr,
+  bool Evaluate(Obstacle* obstacle_ptr,
                 std::vector<Obstacle*> dynamic_env) override;
 
   /**

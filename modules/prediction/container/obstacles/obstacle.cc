@@ -886,6 +886,7 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
     lane_feature->set_lane_heading(nearest_point_heading);
     lane_feature->set_dist_to_left_boundary(left - l);
     lane_feature->set_dist_to_right_boundary(right + l);
+    lane_feature->set_lane_type(current_lane->lane().type());
     if (std::fabs(angle_diff) < min_heading_diff) {
       lane.mutable_lane_feature()->CopyFrom(*lane_feature);
       min_heading_diff = std::fabs(angle_diff);
@@ -963,6 +964,7 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
     lane_feature->set_angle_diff(angle_diff);
     lane_feature->set_dist_to_left_boundary(left - l);
     lane_feature->set_dist_to_right_boundary(right + l);
+    lane_feature->set_lane_type(nearby_lane->lane().type());
     ADEBUG << "Obstacle [" << id_ << "] has nearby lanes ["
            << lane_feature->ShortDebugString() << "]";
   }
@@ -1013,6 +1015,7 @@ void Obstacle::BuildLaneGraph() {
       lane_seq_ptr->set_lane_s(lane.lane_s());
       lane_seq_ptr->set_lane_l(lane.lane_l());
       lane_seq_ptr->set_vehicle_on_lane(true);
+      lane_seq_ptr->set_lane_type(lane.lane_type());
       SetLaneSequenceStopSign(lane_seq_ptr);
       ADEBUG << "Obstacle [" << id_ << "] set a lane sequence ["
              << lane_seq.ShortDebugString() << "].";
@@ -1040,6 +1043,7 @@ void Obstacle::BuildLaneGraph() {
       lane_seq_ptr->set_lane_s(lane.lane_s());
       lane_seq_ptr->set_lane_l(lane.lane_l());
       lane_seq_ptr->set_vehicle_on_lane(false);
+      lane_seq_ptr->set_lane_type(lane.lane_type());
       SetLaneSequenceStopSign(lane_seq_ptr);
       ADEBUG << "Obstacle [" << id_ << "] set a lane sequence ["
              << lane_seq.ShortDebugString() << "].";

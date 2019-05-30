@@ -22,15 +22,15 @@ namespace bridge {
 #define _1K 1024
 
 #define FREE_ARRY(arry) \
-  if (arry) { \
-    delete[] arry; \
-  } \
+  if (arry) {           \
+    delete[] arry;      \
+  }                     \
   arry = nullptr
 
 #define FREE_POINTER(p) \
-  if (p) { \
-    delete p; \
-  } \
+  if (p) {              \
+    delete p;           \
+  }                     \
   p = nullptr
 
 }  // namespace bridge

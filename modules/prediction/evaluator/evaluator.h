@@ -53,16 +53,16 @@ class Evaluator {
    * @brief Evaluate an obstacle
    * @param Obstacle pointer
    */
-  virtual void Evaluate(Obstacle* obstacle) = 0;
+  virtual bool Evaluate(Obstacle* obstacle) = 0;
 
   /**
    * @brief Evaluate an obstacle
    * @param Obstacle pointer
    * @param vector of all Obstacles
    */
-  virtual void Evaluate(Obstacle* obstacle,
+  virtual bool Evaluate(Obstacle* obstacle,
                         std::vector<Obstacle*> dynamic_env) {
-    Evaluate(obstacle);
+    return Evaluate(obstacle);
   }
 
   /**

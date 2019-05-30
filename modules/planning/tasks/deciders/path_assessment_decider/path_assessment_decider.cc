@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <utility>
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
@@ -228,7 +229,7 @@ Status PathAssessmentDecider::Process(
       new_candidate_path_data.push_back(curr_path_data);
     }
   }
-  reference_line_info->SetCandidatePathData(new_candidate_path_data);
+  reference_line_info->SetCandidatePathData(std::move(new_candidate_path_data));
 
   // 4. Update necessary info for lane-borrow decider's future uses.
   // Update front static obstacle's info.

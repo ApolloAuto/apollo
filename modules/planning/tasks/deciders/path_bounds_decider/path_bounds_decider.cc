@@ -102,7 +102,8 @@ Status PathBoundsDecider::Process(
   if (reference_line_info->is_path_lane_borrow()) {
     // Try borrowing from left and from right neighbor lane.
     switch (PlanningContext::Instance()
-                ->path_decider_info().decided_side_pass_direction()) {
+                ->path_decider_info()
+                .decided_side_pass_direction()) {
       case 0:
         lane_borrow_info_list = {LaneBorrowInfo::LEFT_BORROW,
                                  LaneBorrowInfo::RIGHT_BORROW,
@@ -227,7 +228,8 @@ Status PathBoundsDecider::Process(
   }
 
   // Success
-  reference_line_info->SetCandidatePathBoundaries(candidate_path_boundaries);
+  reference_line_info->SetCandidatePathBoundaries(
+      std::move(candidate_path_boundaries));
   ADEBUG << "Completed regular and fallback path boundaries generation.";
   return Status::OK();
 }

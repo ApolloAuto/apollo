@@ -19,12 +19,12 @@ exposure: 100
 auto_white_balance: true
 white_balance: 4000
 bytes_per_pixel: 2
-trigger_internal: 0 
+trigger_internal: 0
 trigger_fps: 20
 channel_name: "/apollo/sensor/camera/obstacle/front_6mm"
 device_wait_ms: 2000
-spin_rate: 200 
-output_type: RGB 
+spin_rate: 200
+output_type: RGB
 
 compress_conf {
     output_channel: "/apollo/sensor/camera/obstacle/front_6mm/compressed"

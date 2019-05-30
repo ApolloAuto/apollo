@@ -59,7 +59,7 @@ std::unique_ptr<AbstractVehicleFactory> VehicleFactory::CreateVehicle(
            << vehicle_parameter.DebugString();
   } else {
     abstract_factory->SetVehicleParameter(vehicle_parameter);
-    AINFO << "succesfully created vehicle factory with "
+    AINFO << "successfully created vehicle factory with "
           << vehicle_parameter.DebugString();
   }
   return abstract_factory;

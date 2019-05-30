@@ -31,13 +31,13 @@ using apollo::common::adapter::AdapterConfig;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 
-void PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Sanity checks.
   CHECK_NOTNULL(obstacle_ptr);
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
     AERROR << "Obstacle [" << id << "] has no latest feature.";
-    return;
+    return false;
   }
   Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
   CHECK_NOTNULL(latest_feature_ptr);
@@ -51,9 +51,10 @@ void PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
                                          "pedestrian", nullptr);
     ADEBUG << "Saving extracted features for learning locally.";
-    return;
+    return true;
   }
   // TODO(jiacheng): once the model is trained, implement this online part.
+  return true;
 }
 
 bool PedestrianInteractionEvaluator::ExtractFeatures(

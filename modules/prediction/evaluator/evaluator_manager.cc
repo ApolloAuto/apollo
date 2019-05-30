@@ -179,8 +179,6 @@ void EvaluatorManager::Run() {
     if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpFrameEnv) {
       return;
     }
-  }
-  if (FLAGS_enable_semantic_map) {
     SemanticMap::Instance()->RunCurrFrame(obstacle_id_history_map_);
   }
 

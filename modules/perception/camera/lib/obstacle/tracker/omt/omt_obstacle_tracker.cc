@@ -435,8 +435,8 @@ bool OMTObstacleTracker::Associate3D(const ObstacleTrackerOptions &options,
   reference_.UpdateReference(frame, targets_);
   frame->tracked_objects.clear();
   TrackObjectPtrs track_objects;
-  // mismatch may lead to a abnormal movement
-  // if a abnormal movement is found, remove old target and create new one
+  // mismatch may lead to an abnormal movement
+  // if an abnormal movement is found, remove old target and create new one
   for (auto &target : targets_) {
     if (target.isLost() || target.Size() == 1) {
       continue;

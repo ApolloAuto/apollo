@@ -16,16 +16,16 @@
 
 #pragma once
 
+#include <cstring>
 #include <memory>
 #include <string>
-#include <cstring>
 #include "modules/bridge/common/bridge_buffer.h"
 
 namespace apollo {
 namespace bridge {
 
 const int HEADER_BUF_SIZE = sizeof(size_t);
-template<typename T>
+template <typename T>
 void WriteToBuffer(BridgeBuffer<char> *buf, const std::shared_ptr<T> &pb_msg) {
   if (!buf) {
     return;
@@ -35,9 +35,9 @@ void WriteToBuffer(BridgeBuffer<char> *buf, const std::shared_ptr<T> &pb_msg) {
 
   buf->reset(total_size);
 
-  buf->write(0, reinterpret_cast<char*>(&msg_len), sizeof(size_t));
-  pb_msg->SerializeToArray(reinterpret_cast<char*>(buf + sizeof(size_t)),
-   static_cast<int>(msg_len));
+  buf->write(0, reinterpret_cast<char *>(&msg_len), sizeof(size_t));
+  pb_msg->SerializeToArray(reinterpret_cast<char *>(buf + sizeof(size_t)),
+                           static_cast<int>(msg_len));
 }
 
 int GetProtoSize(const char *buf, size_t size);

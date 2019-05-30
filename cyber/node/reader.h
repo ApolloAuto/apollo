@@ -50,6 +50,7 @@ const uint32_t DEFAULT_PENDING_QUEUE_SIZE = 1;
 /**
  * @class Reader
  * @brief .
+ *
  * Reader objecte subscribes to the channel for message received.
  *
  */
@@ -64,7 +65,8 @@ class Reader : public ReaderBase {
       typename std::list<std::shared_ptr<MessageT>>::const_iterator;
 
   /**
-   * Constuctor a Reader object.
+   * @brief Constuctor a Reader object.
+   *
    * @param role_attr is a protobuf message RoleAttributes, which includes the
    * channel name and other info.
    * @param reader_func is the callback function, when the message is recevied.

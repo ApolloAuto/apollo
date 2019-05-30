@@ -186,7 +186,7 @@ void TrackedObject::CopyFrom(TrackedObjectPtr rhs, bool is_deep) {
 void TrackedObject::ToObject(base::ObjectPtr obj) const {
   *obj = *object_ptr;
   // obj id keep default
-  // obj polygon calculate outside, beacuse
+  // obj polygon calculate outside, because
   /* 1. if ConvexHull2D as member variable:
            constructor time consume a little large
      2. if ConvexHull2D as static or global variable:
