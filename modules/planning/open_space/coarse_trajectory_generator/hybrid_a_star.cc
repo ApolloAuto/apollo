@@ -354,7 +354,7 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   result->accumulated_s.push_back(0.0);
   result->v.push_back(0.0);
   x_bounds.emplace_back(-10.0, 10.0);
-  dx_bounds.emplace_back(-10.0, 10.0);
+  dx_bounds.emplace_back(0.0, 0.0);
 
   ADEBUG << "Initial accumulated_s: " << 0.0 << " initial discrete_v: " << 0.0;
 
@@ -377,7 +377,9 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
            << " dx_bounds: " << discrete_v - 10 << " and " << discrete_v + 10;
   }
 
+  // Force last point velocity to be zero
   result->v[x_size - 1] = 0.0;
+  dx_bounds[x_size - 1] = {0.0, 0.0};
 
   std::array<double, 3> init_s = {result->accumulated_s[0], result->v[0],
                                   (result->v[1] - result->v[0]) / delta_t_};
@@ -422,6 +424,8 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   result->v = path_time_qp.opt_dx();
   result->a = path_time_qp.opt_ddx();
   result->a.pop_back();
+
+  ADEBUG << "End velocity after optimization is: " << result->v.back();
 
   // load steering from phi
   for (size_t i = 0; i + 1 < x_size; ++i) {
@@ -562,7 +566,8 @@ bool HybridAStar::TrajectoryPartition(
   current_traj->y.push_back(y.back());
   current_traj->phi.push_back(phi.back());
 
-  ADEBUG << "size of partitioned result: " << partitioned_result->size();
+  ADEBUG << "size of partitioned result in HybridAStar: "
+         << partitioned_result->size();
   // Retrieve v, a and steer from path
   for (auto& result : *partitioned_result) {
     if (FLAGS_use_s_curve_speed_smooth) {
