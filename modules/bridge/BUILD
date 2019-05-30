@@ -19,8 +19,6 @@ cc_library(
         "//modules/common/monitor_log",
         "//modules/common/time",
         "//modules/common/util",
-        "//modules/bridge/common:macro",
-        "//modules/bridge/common:util",
         "//modules/planning/proto:planning_proto",
     ],
 )
