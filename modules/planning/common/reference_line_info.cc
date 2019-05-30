@@ -219,15 +219,20 @@ bool ReferenceLineInfo::GetFirstOverlap(
   constexpr double kMaxOverlapRange = 500.0;
   double overlap_min_s = kMaxOverlapRange;
 
+  std::size_t min_s_index = 0;
+  std::size_t i = 0;
   for (const auto& overlap : path_overlaps) {
+    ++i;
     if (overlap.end_s < start_s) {
       continue;
     }
     if (overlap_min_s > overlap.start_s) {
-      *path_overlap = overlap;
+      min_s_index = i;
       overlap_min_s = overlap.start_s;
     }
   }
+  *path_overlap = path_overlaps[min_s_index];
+
   return overlap_min_s < kMaxOverlapRange;
 }
 
