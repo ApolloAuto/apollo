@@ -30,7 +30,7 @@ Setup steps:
     `Note:` If you do not have a GPU, you can use the following script instead
 
     ```
-    bash apollo.sh build_cpu
+    bash apollo.sh build_gpu
     ```
 
 4. Bootstrap to start ros call and Monitor module and Dreamview
