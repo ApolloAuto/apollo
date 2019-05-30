@@ -12,3 +12,5 @@
 --use_navigation_mode=false
 
 --map_dir=/apollo/modules/map/data/sunnyvale_big_loop
+
+--minloglevel=2
