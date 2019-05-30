@@ -292,12 +292,17 @@ bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
     // Get all the properties of the current lane-sequence.
     // Go through all the lane-points to fill up the feature_values.
     const LaneSequence& lane_sequence = lane_graph_ptr->lane_sequence(i);
-    for (int j = 0; j < lane_sequence.lane_segment_size(); ++j) {
+    for (int j = lane_sequence.adc_lane_segment_idx();
+         j < lane_sequence.lane_segment_size(); ++j) {
       if (count >= SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
         break;
       }
       const LaneSegment& lane_segment = lane_sequence.lane_segment(j);
-      for (int k = 0; k < lane_segment.lane_point_size(); ++k) {
+      int k_starting_idx = 0;
+      // if (j == lane_sequence.adc_lane_segment_idx()) {
+        
+      // }
+      for (int k = k_starting_idx; k < lane_segment.lane_point_size(); ++k) {
         if (count >= SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
           break;
         }
