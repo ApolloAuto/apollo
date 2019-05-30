@@ -15,6 +15,7 @@
 # limitations under the License.
 # ****************************************************************************
 
+from cyber_py import cyber
 import sys
 import os
 import time
@@ -22,20 +23,19 @@ import math
 import traceback
 
 sys.path.append("../")
-from cyber_py import cyber
 
 NAME = 'cyber_node'
 
 
 def print_node_info(node_name):
-    rolsattr_rawdata = cyber.NodeUtils.get_node_attr(node_name)
+    roleattr_rawdata = cyber.NodeUtils.get_node_attr(node_name)
     from cyber.proto.role_attributes_pb2 import RoleAttributes
     try:
         msg = RoleAttributes()
-        msg.ParseFromString(rolsattr_rawdata)
+        msg.ParseFromString(roleattr_rawdata)
         assert(node_name == msg.node_name)
     except:
-        print "RoleAttributes ParseFromString failed. size is ", len(rolsattr_rawdata)
+        print "RoleAttributes ParseFromString failed. size is ", len(roleattr_rawdata)
         return
     print "nodename\t", msg.node_name
     print "processid\t", msg.process_id
@@ -54,6 +54,7 @@ def print_node_info(node_name):
     for channel in writer_channels:
         print channel
     print ""
+
 
 def _node_cmd_info(argv):
     """
@@ -113,6 +114,7 @@ Commands:
 Type cyber_node <command> -h for more detailed usage, e.g. 'cyber_node echo -h'
 """)
     sys.exit(getattr(os, 'EX_USAGE', 1))
+
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
