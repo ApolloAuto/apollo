@@ -45,7 +45,7 @@ struct Chunk {
   Chunk() { clear(); }
 
   inline void clear() {
-    body_.clear_messages();
+    body_.reset(new ChunkBody());
     header_.set_begin_time(0);
     header_.set_end_time(0);
     header_.set_message_number(0);
@@ -54,7 +54,7 @@ struct Chunk {
 
   inline void add(const SingleMessage& message) {
     std::lock_guard<std::mutex> lock(mutex_);
-    SingleMessage* p_message = body_.add_messages();
+    SingleMessage* p_message = body_->add_messages();
     *p_message = message;
     if (header_.begin_time() == 0) {
       header_.set_begin_time(message.time());
@@ -73,7 +73,7 @@ struct Chunk {
 
   std::mutex mutex_;
   ChunkHeader header_;
-  ChunkBody body_;
+  std::unique_ptr<ChunkBody> body_ = nullptr;
 };
 
 class RecordFileWriter : public RecordFileBase {

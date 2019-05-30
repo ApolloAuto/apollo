@@ -58,12 +58,15 @@ class RecordReader : public RecordBase {
   const proto::Header& header() const { return header_; }
   const ChannelInfoMap& channel_info() const { return channel_info_; }
 
+  void SetFlushMode(const bool is_flush_mode) { flush_mode_ = is_flush_mode; }
+
  private:
   bool ReadNextChunk(uint64_t begin_time, uint64_t end_time);
 
   bool is_valid_ = false;
   bool reach_end_ = false;
-  proto::ChunkBody chunk_;
+  bool flush_mode_ = false;
+  std::unique_ptr<proto::ChunkBody> chunk_ = nullptr;
   proto::Index index_;
   int message_index_ = 0;
   ChannelInfoMap channel_info_;
