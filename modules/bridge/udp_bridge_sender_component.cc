@@ -42,9 +42,9 @@ bool UDPBridgeComponent<T>::Init() {
   remote_ip_ = udp_bridge_remote.remote_ip();
   remote_port_ = udp_bridge_remote.remote_port();
   proto_name_ = udp_bridge_remote.proto_name();
-  AINFO << "UDP Bridge remote ip is: "<< remote_ip_;
-  AINFO << "UDP Bridge remote port is: "<< remote_port_;
-  AINFO << "UDP Bridge for Proto is: "<< proto_name_;
+  AINFO << "UDP Bridge remote ip is: " << remote_ip_;
+  AINFO << "UDP Bridge remote port is: " << remote_port_;
+  AINFO << "UDP Bridge for Proto is: " << proto_name_;
   return true;
 }
 
@@ -55,7 +55,7 @@ bool UDPBridgeComponent<T>::Proc(const std::shared_ptr<T> &pb_msg) {
     return false;
   }
 
-  if (pb_msg== nullptr) {
+  if (pb_msg == nullptr) {
     AERROR << "proto msg is not ready!";
     return false;
   }
