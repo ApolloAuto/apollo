@@ -44,9 +44,8 @@ namespace bridge {
 #define BRIDGE_COMPONENT_REGISTER(pb_msg) \
   CYBER_REGISTER_COMPONENT(UDPBridgeSenderComponent<pb_msg>)
 
-template<typename T>
-class UDPBridgeSenderComponent final
-    : public cyber::Component<T> {
+template <typename T>
+class UDPBridgeSenderComponent final : public cyber::Component<T> {
  public:
   UDPBridgeSenderComponent()
     : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
@@ -54,9 +53,7 @@ class UDPBridgeSenderComponent final
   bool Init() override;
   bool Proc(const std::shared_ptr<T> &pb_msg) override;
 
-  std::string Name() const {
-    return FLAGS_bridge_module_name;
-  }
+  std::string Name() const { return FLAGS_bridge_module_name; }
 
  private:
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
