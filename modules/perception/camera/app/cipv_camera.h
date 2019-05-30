@@ -41,8 +41,9 @@ struct CipvOptions {
   float yaw_angle = 0.0f;
 };
 
-constexpr float kMinVelocity = 5;  // in m/s
+constexpr float kMinVelocity = 15.0f;  // in m/s
 constexpr float kMaxDistObjectToLaneInMeter = 7.0f;
+constexpr float kMaxDistObjectToLaneInPixel = 10.0f;
 const std::size_t kDropsHistorySize = 20;
 const std::size_t kMaxObjectNum = 100;
 const std::size_t kMaxAllowedSkipObject = 10;
@@ -110,7 +111,8 @@ class Cipv {
   // Get closest edge of an object in image coordinate
   bool FindClosestObjectImage(const std::shared_ptr<base::Object> &object,
                               const EgoLane &egolane_image,
-                              LineSegment2Df *closted_object_edge);
+                              LineSegment2Df *closted_object_edge,
+                              float *distance);
 
   // Get closest edge of an object in ground coordinate
   bool FindClosestObjectGround(const std::shared_ptr<base::Object> &object,
@@ -184,6 +186,7 @@ class Cipv {
       single_virtual_egolane_width_in_meter_ * 0.5f;
   float half_vehicle_width_in_meter_ = kMaxVehicleWidthInMeter * 0.5f;
   float max_dist_object_to_lane_in_meter_ = kMaxDistObjectToLaneInMeter;
+  float max_dist_object_to_lane_in_pixel_ = kMaxDistObjectToLaneInPixel;
   float MAX_VEHICLE_WIDTH_METER = 5.0f;
   float EPSILON = 1.0e-6f;
   std::size_t kDropsHistorySize = 100;
