@@ -397,9 +397,9 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   path_time_qp.set_weight_ddx(s_curve_config.acc_weight());
   path_time_qp.set_weight_dddx(s_curve_config.jerk_weight());
 
-  path_time_qp.set_x_bounds(x_bounds);
+  path_time_qp.set_x_bounds(std::move(x_bounds));
 
-  path_time_qp.set_dx_bounds(dx_bounds);
+  path_time_qp.set_dx_bounds(std::move(dx_bounds));
 
   // TODO(QiL): load this from configs
   path_time_qp.set_ddx_bounds(-4.4, 10.0);
