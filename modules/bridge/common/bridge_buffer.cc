@@ -69,14 +69,6 @@ void BridgeBuffer<T>::write(size_t index, const T *data, size_t size) {
   memcpy(p, data, size);
 }
 
-template <typename T>
-void BridgeBuffer<T>::write(size_t index, const T *data, size_t size) {
-  std::lock_guard<std::mutex> lg(mutex_);
-  reset(size + index);
-  T *p = buf_ + index;
-  memcpy(p, data, size);
-}
-
 BRIDGE_IMPL(char);
 BRIDGE_IMPL(int);
 BRIDGE_IMPL(double);
