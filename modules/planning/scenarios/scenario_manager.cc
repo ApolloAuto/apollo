@@ -935,8 +935,9 @@ void ScenarioManager::UpdatePlanningContextPullOverScenario(
 
       constexpr double kDestMaxDelta = 30.0;  // meter
       if (std::fabs(dest_sl.s() - pull_over_sl.s()) > kDestMaxDelta) {
-        PlanningContext::Instance()->mutable_planning_status()
-                                   ->clear_pull_over();
+        PlanningContext::Instance()
+            ->mutable_planning_status()
+            ->clear_pull_over();
       }
     }
   }
