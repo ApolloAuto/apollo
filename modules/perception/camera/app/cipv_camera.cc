@@ -93,9 +93,9 @@ bool Cipv::GetEgoLane(const std::vector<base::LaneLine> &lane_objects,
         lane_object.curve_car_coord_point_set.size();
     if (lane_object.pos_type == base::LaneLinePositionType::EGO_LEFT) {
       if (debug_level_ >= 2) {
-        AINFO << "[GetEgoLane]LEFT_lane_objects[" << i
+        AINFO << "[GetEgoLane]LEFT_image_lane_objects[" << i
               << "].curve_image_point_set.size(): " << curve_image_point_size;
-        AINFO << "[GetEgoLane]LEFT_lane_objects[" << i
+        AINFO << "[GetEgoLane]LEFT_ground_lane_objects[" << i
               << "].curve_car_coord_point_set_size: "
               << curve_car_coord_point_set_size;
       }
@@ -113,14 +113,17 @@ bool Cipv::GetEgoLane(const std::vector<base::LaneLine> &lane_objects,
         for (size_t j = 0; j < curve_image_point_size; ++j) {
           // image_point
           x = lane_object.curve_image_point_set[j].x;
-          y = lane_object.curve_image_point_set[j].x;
+          y = lane_object.curve_image_point_set[j].y;
           egolane_image->left_line.line_point.emplace_back(x, y);
         }
       }
     } else if (lane_object.pos_type == base::LaneLinePositionType::EGO_RIGHT) {
       if (debug_level_ >= 2) {
-        AINFO << "[GetEgoLane]RIGHT_lane_objects[" << i
+        AINFO << "[GetEgoLane]RIGHT_image_lane_objects[" << i
               << "].curve_image_point_set.size(): " << curve_image_point_size;
+        AINFO << "[GetEgoLane]RIGHT_ground_lane_objects[" << i
+              << "].curve_car_coord_point_set_size: "
+              << curve_car_coord_point_set_size;
       }
       if (curve_image_point_size < min_laneline_length_for_cipv_) {
         *b_right_valid = false;
@@ -254,7 +257,8 @@ bool Cipv::CreateVirtualEgoLane(const float yaw_rate, const float velocity,
 // Get closest edge of an object in image coordinate
 bool Cipv::FindClosestObjectImage(const std::shared_ptr<base::Object> &object,
                                   const EgoLane &egolane_image,
-                                  LineSegment2Df *closted_object_edge) {
+                                  LineSegment2Df *closted_object_edge,
+                                  float *distance) {
   float size_x = object->size(0);
   float size_y = object->size(1);
   float size_z = object->size(2);
@@ -265,79 +269,37 @@ bool Cipv::FindClosestObjectImage(const std::shared_ptr<base::Object> &object,
     // size_z = 0.1;
     return false;
   }
-  // float center_x = static_cast<float>(object->center(0));
-  // float center_y = static_cast<float>(object->center(1));
-  float center_x =
-      static_cast<float>(object->camera_supplement.local_center(0));
-  float center_y =
-      static_cast<float>(object->camera_supplement.local_center(1));
+  // Footprint (left + width/2, top + height) as a center position
+  float center_x = (object->camera_supplement.box.xmin +
+                    object->camera_supplement.box.xmin) * 0.5f;
+  float center_y = object->camera_supplement.box.ymax;
 
-  // Direction should be changed based on alpha angle and more.
-  float direction_x = object->direction(0);
-  float direction_y = object->direction(1);
-  float x1 = size_x / 2;
-  float x2 = 0 - x1;
-  float y1 = size_y / 2;
-  float y2 = 0 - y1;
-  float len = static_cast<float>(
-      sqrt(direction_x * direction_x + direction_y * direction_y));
-  float cos_theta = direction_x / len;
-  float sin_theta = -direction_y / len;
-
-  // Check if object direction is less than +-45 degree
-  // angle = atan2(y, x)
-  if (fabs(atan2(object->direction(1), object->direction(0))) <=
-      k45DegreeInRadian) {
-    // get back of the vehicle
-    closted_object_edge->start_point(0) =
-        x2 * cos_theta + y1 * sin_theta + center_x;
-    closted_object_edge->start_point(1) =
-        y1 * cos_theta - x2 * sin_theta + center_y;
-
-    closted_object_edge->end_point(0) =
-        x2 * cos_theta + y2 * sin_theta + center_x;
-    closted_object_edge->end_point(1) =
-        y2 * cos_theta - x2 * sin_theta + center_y;
-
-    // If a vehicle faces side way, extract the side edge of a vehicle
-  } else if (atan2(object->direction(1), object->direction(0)) >
-             k45DegreeInRadian) {
-    // get left side of the vehicle
-    closted_object_edge->start_point(0) =
-        x2 * cos_theta + y1 * sin_theta + center_x;
-    closted_object_edge->start_point(1) =
-        y1 * cos_theta - x2 * sin_theta + center_y;
-
-    closted_object_edge->end_point(0) =
-        x2 * cos_theta + y1 * sin_theta + center_x;
-    closted_object_edge->end_point(1) =
-        y1 * cos_theta - x2 * sin_theta + center_y;
-  } else if (atan2(object->direction(1), object->direction(0)) <
-             -k45DegreeInRadian) {
-    // get right side of the vehicle
-
-    closted_object_edge->start_point(0) =
-        x1 * cos_theta + y2 * sin_theta + center_x;
-    closted_object_edge->start_point(1) =
-        y2 * cos_theta - x1 * sin_theta + center_y;
-
-    closted_object_edge->end_point(0) =
-        x2 * cos_theta + y2 * sin_theta + center_x;
-    closted_object_edge->end_point(1) =
-        y2 * cos_theta - x2 * sin_theta + center_y;
-  } else {
-    // don't get front of vehicle
-    closted_object_edge->start_point(0) =
-        x1 * cos_theta + y1 * sin_theta + center_x;
-    closted_object_edge->start_point(1) =
-        y1 * cos_theta - x1 * sin_theta + center_y;
-
-    closted_object_edge->end_point(0) =
-        x1 * cos_theta + y2 * sin_theta + center_x;
-    closted_object_edge->end_point(1) =
-        y2 * cos_theta - x1 * sin_theta + center_y;
+  if (debug_level_ >= 3) {
+    AINFO << "object->camera_supplement.box = base::RectF("
+          << object->camera_supplement.box.xmin << ", "
+          << object->camera_supplement.box.ymin << ", "
+          << object->camera_supplement.box.xmax -
+                 object->camera_supplement.box.xmin
+          << ", "
+          << object->camera_supplement.box.ymax -
+                 object->camera_supplement.box.ymin
+          << ");";
   }
+  closted_object_edge->start_point(0) = object->camera_supplement.box.xmin;
+  closted_object_edge->start_point(1) = object->camera_supplement.box.ymax;
 
+  closted_object_edge->end_point(0) = object->camera_supplement.box.xmax;
+  closted_object_edge->end_point(1) = object->camera_supplement.box.ymax;
+
+  *distance =
+      static_cast<float>(sqrt(center_x * center_x + center_y *center_y));
+  if (debug_level_ >= 2) {
+    AINFO << "start(" << closted_object_edge->start_point(0) << ", "
+          << closted_object_edge->start_point(1) << ")->";
+    AINFO << "end(" << closted_object_edge->end_point(0) << ", "
+          << closted_object_edge->end_point(1) << ")";
+    AINFO << "closest distance: " <<  *distance;
+  }
   return true;
 }
 // Get closest edge of an object in ground coordinate
@@ -464,6 +426,10 @@ bool Cipv::FindClosestObjectGround(const std::shared_ptr<base::Object> &object,
   }
 
   if (left_index < 0 || right_index < 0 || left_index == right_index) {
+    if (debug_level_ >= 2) {
+      AINFO << "left_index: " << left_index;
+      AINFO << "right_index: " << right_index;
+    }
     return false;
   }
 
@@ -583,8 +549,119 @@ bool Cipv::IsPointLeftOfLine(const Point2Df &point,
 // Check if the object is in the lane in image space
 bool Cipv::IsObjectInTheLaneImage(const std::shared_ptr<base::Object> &object,
                                   const EgoLane &egolane_image,
-                                  float *distance) {
-  return true;
+                                  float *object_distance) {
+  LineSegment2Df closted_object_edge;
+  bool b_left_lane_clear = false;
+  bool b_right_lane_clear = false;
+  float shortest_distance = kMaxFloat;
+  float distance = 0.0f;
+
+  int closest_index = -1;
+  // Find closest edge of a given object bounding box
+  float b_valid_object = FindClosestObjectImage(
+      object, egolane_image, &closted_object_edge, &distance);
+  if (!b_valid_object) {
+    if (debug_level_ >= 1) {
+      AINFO << "The closest edge of an object is not available";
+    }
+    return false;
+  }
+  *object_distance = distance;
+
+  if (debug_level_ >= 3) {
+    AINFO << "egolane_image.left_line.line_point.size(): "
+          << egolane_image.left_line.line_point.size();
+  }
+  if (egolane_image.left_line.line_point.size() <= 1) {
+    if (debug_level_ >= 1) {
+      AINFO << "No left lane";
+    }
+    return false;
+  }
+
+  // Check end_point and left lane
+  closest_index = -1;
+  shortest_distance = kMaxFloat;
+  for (size_t i = 0; i + 1 < egolane_image.left_line.line_point.size(); ++i) {
+    // If an end point is in the closest left lane line segments
+    distance = kMaxFloat;
+    if (DistanceFromPointToLineSegment(
+            closted_object_edge.end_point,
+            egolane_image.left_line.line_point[i],
+            egolane_image.left_line.line_point[i + 1], &distance)) {
+      if (distance < shortest_distance) {
+        closest_index = static_cast<int>(i);
+        shortest_distance = distance;
+      }
+    }
+  }
+
+  // When the closest line segment was found
+  if (closest_index >= 0) {
+    // Check if the end point is on the right of the line segment
+    if (debug_level_ >= 3) {
+      AINFO << "[Left] closest_index: " << closest_index
+            << ", shortest_distance: " << shortest_distance;
+      AINFO << "Should be left to be selected";
+    }
+    if (IsPointLeftOfLine(
+            closted_object_edge.end_point,
+            egolane_image.left_line.line_point[closest_index],
+            egolane_image.left_line.line_point[closest_index + 1])) {
+      b_left_lane_clear = true;
+      AINFO << "The left lane is clear";
+    }
+  }
+
+  if (debug_level_ >= 3) {
+    AINFO << "egolane_image.right_line.line_point.size(): "
+          << egolane_image.right_line.line_point.size();
+  }
+  // Check start_point and right lane
+  if (egolane_image.right_line.line_point.size() <= 1) {
+    if (debug_level_ >= 1) {
+      AINFO << "No right lane";
+    }
+    return false;
+  }
+  closest_index = -1;
+  shortest_distance = kMaxFloat;
+  for (size_t i = 0; i + 1 < egolane_image.right_line.line_point.size(); ++i) {
+    // If an end point is in the closest right lane line segments
+    distance = kMaxFloat;
+    if (DistanceFromPointToLineSegment(
+            closted_object_edge.start_point,
+            egolane_image.right_line.line_point[i],
+            egolane_image.right_line.line_point[i + 1], &distance)) {
+      if (distance < shortest_distance) {
+        closest_index = static_cast<int>(i);
+        shortest_distance = distance;
+      }
+    }
+  }
+  // When the closest line segment was found
+  if (closest_index >= 0) {
+    if (debug_level_ >= 3) {
+      AINFO << "[right] closest_index: " << closest_index
+            << ", shortest_distance: " << shortest_distance;
+      AINFO << "Should be right to be selected";
+    }
+    // Check if the end point is on the right of the line segment
+    if (!IsPointLeftOfLine(
+            closted_object_edge.start_point,
+            egolane_image.right_line.line_point[closest_index],
+            egolane_image.right_line.line_point[closest_index + 1])) {
+      b_right_lane_clear = true;
+      AINFO << "The right lane is clear";
+    }
+  }
+
+  if (b_left_lane_clear && b_right_lane_clear) {
+    AINFO << "The object is in the ego lane";
+  } else {
+    AINFO << "The object is out of the ego lane";
+  }
+  return (b_left_lane_clear && b_right_lane_clear);
 }
 
 // Check if the object is in the lane in ego-ground space
@@ -611,7 +688,7 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
       object, egolane_ground, world2camera, &closted_object_edge, &distance);
   if (!b_valid_object) {
     if (debug_level_ >= 1) {
-      ADEBUG << "The closest edge of an object is not available";
+      AINFO << "The closest edge of an object is not available";
     }
     return false;
   }
