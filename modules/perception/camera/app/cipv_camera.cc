@@ -169,8 +169,7 @@ float Cipv::VehicleDynamics(const uint32_t tick, const float yaw_rate,
   // Option 2. Sphere model
   float adjusted_velocity = std::max(kMinVelocity, velocity);
   float theta = static_cast<float>(tick) * time_unit * yaw_rate;
-  float displacement =
-      static_cast<float>(tick) * time_unit * adjusted_velocity;
+  float displacement = static_cast<float>(tick) * time_unit * adjusted_velocity;
   *x = displacement * static_cast<float>(cos(theta));
   *y = displacement * static_cast<float>(sin(theta));
 
@@ -251,7 +250,6 @@ bool Cipv::CreateVirtualEgoLane(const float yaw_rate, const float velocity,
 
   return true;
 }
-
 
 // Get closest edge of an object in image coordinate
 bool Cipv::FindClosestObjectImage(const std::shared_ptr<base::Object> &object,
@@ -576,9 +574,8 @@ bool Cipv::IsPointLeftOfLine(const Point2Df &point,
   if (debug_level_ >= 2) {
     AINFO << "point (" << point(0) << ", " << point(1)
           << ") is right of line_segment (" << line_seg_start_point(0) << ", "
-          << line_seg_start_point(1) << ")->(" << line_seg_end_point(0)
-          << ", " << line_seg_end_point(1)
-          << "), cross_product: " << cross_product;
+          << line_seg_start_point(1) << ")->(" << line_seg_end_point(0) << ", "
+          << line_seg_end_point(1) << "), cross_product: " << cross_product;
   }
   return false;
 }
@@ -767,7 +764,7 @@ bool Cipv::DetermineCipv(const std::vector<base::LaneLine> &lane_objects,
     if (IsObjectInTheLane((*objects)[i], egolane_image, egolane_ground,
                           world2camera, &distance) ||
         IsObjectInTheLane((*objects)[i], egolane_image, virtual_egolane_ground,
-                            world2camera, &distance)) {
+                          world2camera, &distance)) {
       if (cipv_index < 0 || distance < min_distance) {
         cipv_index = i;
         cipv_track_id = (*objects)[i]->track_id;
