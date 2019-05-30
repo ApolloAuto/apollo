@@ -11,6 +11,4 @@
 
 --use_navigation_mode=false
 
---stderrthreshold=ERROR
-
 --map_dir=/apollo/modules/map/data/sunnyvale_big_loop
