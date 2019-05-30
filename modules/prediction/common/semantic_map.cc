@@ -68,11 +68,14 @@ void SemanticMap::RunCurrFrame(
   }
 
   // Crop ego_vehicle for demo
-  cv::Mat output_img =
-      CropByHistory(obstacle_id_history_map_.at(-1), cv::Scalar(0, 0, 255));
-  cv::namedWindow("Demo window", cv::WINDOW_NORMAL);
-  cv::imshow("Demo window", output_img);
-  cv::waitKey();
+  if (false) {
+    cv::Mat output_img;
+    if (GetMapById(-1, &output_img)) {
+      cv::namedWindow("Demo window", cv::WINDOW_NORMAL);
+      cv::imshow("Demo window", output_img);
+      cv::waitKey();
+    }
+  }
 }
 
 void SemanticMap::DrawRect(const Feature& feature, const cv::Scalar& color,
@@ -146,6 +149,17 @@ cv::Mat SemanticMap::CropByHistory(const ObstacleHistory& history,
   cv::Point2i center_point =
       GetTransPoint(curr_feature.position().x(), curr_feature.position().y());
   return CropArea(feature_map, center_point, curr_feature.theta());
+}
+
+bool SemanticMap::GetMapById(const int obstacle_id, cv::Mat* feature_map) {
+  if (obstacle_id_history_map_.find(obstacle_id) ==
+      obstacle_id_history_map_.end()) {
+    return false;
+  }
+  cv::Mat output_img = CropByHistory(obstacle_id_history_map_[obstacle_id],
+                                     cv::Scalar(0, 0, 255));
+  output_img.copyTo(*feature_map);
+  return true;
 }
 
 }  // namespace prediction
