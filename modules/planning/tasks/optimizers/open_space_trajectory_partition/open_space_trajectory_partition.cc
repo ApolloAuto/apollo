@@ -234,6 +234,10 @@ Status OpenSpaceTrajectoryPartition::Process() {
 void OpenSpaceTrajectoryPartition::InterpolateTrajectory(
     const DiscretizedTrajectory& stitched_trajectory_result,
     DiscretizedTrajectory* interpolated_trajectory) {
+  if (FLAGS_use_iterative_anchoring_smoother) {
+    *interpolated_trajectory = stitched_trajectory_result;
+    return;
+  }
   interpolated_trajectory->clear();
   size_t interpolated_pieces_num =
       open_space_trajectory_partition_config_.interpolated_pieces_num();
