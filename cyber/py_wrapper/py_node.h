@@ -19,6 +19,7 @@
 
 #include <unistd.h>
 
+#include <algorithm>
 #include <deque>
 #include <iostream>
 #include <memory>
@@ -26,7 +27,6 @@
 #include <string>
 #include <thread>
 #include <unordered_map>
-#include <algorithm>
 #include <utility>
 #include <vector>
 
@@ -194,8 +194,8 @@ class PyService {
         data_type_(data_type),
         func_(nullptr) {
     auto f = [this](
-        const std::shared_ptr<const message::PyMessageWrap>& request,
-        std::shared_ptr<message::PyMessageWrap>& response) {
+                 const std::shared_ptr<const message::PyMessageWrap>& request,
+                 std::shared_ptr<message::PyMessageWrap>& response) {
       response = this->cb(request);
     };
     service_ =
