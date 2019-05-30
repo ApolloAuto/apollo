@@ -10047,6 +10047,10 @@
                 "laneHeading": {
                   "type": "double",
                   "id": 8
+                },
+                "laneType": {
+                  "type": "apollo.hdmap.Lane.LaneType",
+                  "id": 9
                 }
               }
             },
@@ -10561,6 +10565,10 @@
                   "rule": "repeated",
                   "type": "apollo.common.PathPoint",
                   "id": 8
+                },
+                "laneType": {
+                  "type": "apollo.hdmap.Lane.LaneType",
+                  "id": 22
                 },
                 "behaviorType": {
                   "type": "BehaviorType",
