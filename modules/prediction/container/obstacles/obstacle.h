@@ -295,6 +295,7 @@ class Obstacle {
   void SetLanePoints(Feature* feature);
   void SetLanePoints(const Feature* feature, const double lane_point_spacing,
                      const uint64_t max_num_lane_point,
+                     const bool is_bidirection,
                      LaneGraph* const lane_graph);
 
   /** @brief This functions is mainly for lane-sequence kappa calculation.
