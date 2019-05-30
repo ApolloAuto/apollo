@@ -142,7 +142,7 @@ bool RealtimeRecordProcessor::Process() {
   // Recorder goes first
   recorder_->Start();
   PublishStatus(RecordingState::RECORDING, "smart recorder started");
-  std::shared_ptr<std::thread> monitor_thread_ =
+  std::shared_ptr<std::thread> monitor_thread =
       std::make_shared<std::thread>([this]() { this->MonitorStatus(); });
   // Now fast reader follows and reacts for any events
   std::string record_path;
@@ -169,9 +169,9 @@ bool RealtimeRecordProcessor::Process() {
   } while (!is_terminating_);
   // Try restore the rest of messages one last time
   RestoreMessage(UINT64_MAX);
-  if (monitor_thread_ && monitor_thread_->joinable()) {
-    monitor_thread_->join();
-    monitor_thread_ = nullptr;
+  if (monitor_thread && monitor_thread->joinable()) {
+    monitor_thread->join();
+    monitor_thread = nullptr;
   }
   PublishStatus(RecordingState::STOPPED, "smart recorder stopped");
   return true;
