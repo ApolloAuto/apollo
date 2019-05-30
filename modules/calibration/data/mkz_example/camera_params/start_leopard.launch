@@ -63,5 +63,5 @@
       <remap from="/apollo/sensor/camera/traffic/camera_info" to="$(arg front_obstacle_6mm_topic_name)/camera_info" />
     </node>
   </group>
-  
+
 </launch>

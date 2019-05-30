@@ -25,9 +25,9 @@
     <arg name="model" value="$(arg model)"/>
     <arg name="rpm" value="$(arg rpm)"/>
     <arg name="frame_id" value="$(arg velodyne64_frame_id)"/>
-    <arg name="topic" value="/apollo/sensor/velodyne64/VelodyneScanUnified"/>    
+    <arg name="topic" value="/apollo/sensor/velodyne64/VelodyneScanUnified"/>
   </include>
-  
+
   <!-- start cloud nodelet using test calibration file -->
   <include file="$(find velodyne_pointcloud)/launch/convert_nodelet.launch">
     <arg name="node_name" value="sensor_velodyne64_convert"/>
@@ -41,7 +41,7 @@
     <arg name="topic_pointcloud" default="/apollo/sensor/velodyne64/PointCloud2"/>
     <arg name="topic_packets" default="/apollo/sensor/velodyne64/VelodyneScanUnified"/>
   </include>
-  
+
    <!-- start 64 compensator nodelet -->
   <include file="$(find velodyne_pointcloud)/launch/compensator_nodelet.launch">
     <arg name="node_name" value="sensor_velodyne64_compensator"/>
