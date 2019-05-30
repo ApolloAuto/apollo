@@ -25,6 +25,7 @@
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
+#include "modules/prediction/common/semantic_map.h"
 
 namespace apollo {
 namespace prediction {
@@ -54,11 +55,19 @@ bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     ADEBUG << "Obstacle [" << id << "] has less than two junction_exits.";
     return false;
   }
-
   // Extract features of junction_exit_mask
   std::vector<double> feature_values;
   if (!ExtractFeatureValues(obstacle_ptr, &feature_values)) {
     ADEBUG << "Obstacle [" << id << "] failed to extract junction exit mask";
+    return false;
+  }
+
+  if (!FLAGS_enable_semantic_map) {
+    ADEBUG << "Not enable semantic map, exit junction_map_evaluator.";
+    return false;
+  }
+  cv::Mat feature_map;
+  if (!SemanticMap::Instance()->GetMapById(id, &feature_map)) {
     return false;
   }
 
