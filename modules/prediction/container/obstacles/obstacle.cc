@@ -1207,7 +1207,7 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
 
   // Build lane_points.
   if (feature->lane().has_lane_graph_ordered()) {
-    SetLanePoints(feature, 0.5, 120,
+    SetLanePoints(feature, 0.5, 180,
                   feature->mutable_lane()->mutable_lane_graph_ordered());
     SetLaneSequencePath(feature->mutable_lane()->mutable_lane_graph_ordered());
   }
@@ -1244,9 +1244,9 @@ void Obstacle::SetLanePoints(const Feature* feature,
     if (lane_sequence->lane_segment_size() <= 0) {
       continue;
     }
-    int lane_index = 0;
+    int lane_index = lane_sequence->adc_lane_segment_idx();
     LaneSegment* lane_segment = lane_sequence->mutable_lane_segment(lane_index);
-    double start_s = lane_sequence->lane_segment(lane_index).start_s();
+    double start_s = lane_segment->adc_s();
     double total_s = 0.0;
     double lane_seg_s = start_s;
     std::size_t count_point = 0;
