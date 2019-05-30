@@ -15,7 +15,6 @@
 # limitations under the License.
 # ****************************************************************************
 
-from cyber_py import cyber
 import sys
 import os
 import time
@@ -23,6 +22,7 @@ import math
 import traceback
 
 sys.path.append("../")
+from cyber_py import cyber
 
 NAME = 'cyber_node'
 
