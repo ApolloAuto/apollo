@@ -144,13 +144,16 @@ message SimpleLateralDebug {
   optional double heading_jerk = 26;
   optional double heading_error_jerk = 27;
 
-  // modified lateral_error with look-ahead or look-back station, as the feedback
-  // term for control usage
+  // modified lateral_error and heading_error with look-ahead or look-back
+  // station, as the feedback term for control usage
   optional double lateral_error_feedback = 28;
   optional double heading_error_feedback = 29;
 
   // current planning target point
   optional apollo.common.TrajectoryPoint current_target_point = 30;
+
+  // Augmented feedback control term in addition to LQR control
+  optional double steer_angle_feedback_augment = 31;
 }
 
 message SimpleMPCDebug {

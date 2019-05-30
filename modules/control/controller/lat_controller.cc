@@ -442,18 +442,18 @@ Status LatController::ComputeControlCommand(
 
   // Clamp the steer angle to -100.0 to 100.0
   double steer_angle = 0.0;
+  double steer_angle_feedback_augment = 0.0;
   bool enable_leadlag = control_conf_->lat_controller_conf()
                             .enable_reverse_leadlag_compensation();
   if (enable_leadlag) {
-    steer_angle = common::math::Clamp(
+    steer_angle_feedback_augment =
         leadlag_controller_.Control(-matrix_state_(0, 0), ts_) * 180 / M_PI *
-                steer_ratio_ / steer_single_direction_max_degree_ * 100 +
-            steer_angle_feedback + steer_angle_feedforward,
-        -100.0, 100.0);
-  } else {
-    steer_angle = common::math::Clamp(
-        steer_angle_feedback + steer_angle_feedforward, -100.0, 100.0);
+        steer_ratio_ / steer_single_direction_max_degree_ * 100;
   }
+  steer_angle =
+      common::math::Clamp(steer_angle_feedback + steer_angle_feedforward +
+                              steer_angle_feedback_augment,
+                          -100.0, 100.0);
 
   if (FLAGS_set_steer_limit) {
     const double steer_limit = std::atan(max_lat_acc_ * min_turn_radius_ /
@@ -509,6 +509,7 @@ Status LatController::ComputeControlCommand(
   debug->set_steer_angle_heading_rate_contribution(
       steer_angle_heading_rate_contribution);
   debug->set_steer_angle_feedback(steer_angle_feedback);
+  debug->set_steer_angle_feedback_augment(steer_angle_feedback_augment);
   debug->set_steering_position(chassis->steering_percentage());
   debug->set_ref_speed(vehicle_state->linear_velocity());
 
