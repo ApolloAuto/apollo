@@ -152,6 +152,7 @@ cc_library(
     ],
     deps = [
         "//modules/prediction/common:prediction_util",
+        "//modules/prediction/common:semantic_map",
         "//modules/prediction/evaluator",
     ] + select({
         "//tools/platforms:use_gpu": [
