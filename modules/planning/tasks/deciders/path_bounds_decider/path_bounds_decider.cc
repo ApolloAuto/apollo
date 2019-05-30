@@ -228,7 +228,8 @@ Status PathBoundsDecider::Process(
   }
 
   // Success
-  reference_line_info->SetCandidatePathBoundaries(candidate_path_boundaries);
+  reference_line_info->SetCandidatePathBoundaries(
+      std::move(candidate_path_boundaries));
   ADEBUG << "Completed regular and fallback path boundaries generation.";
   return Status::OK();
 }
