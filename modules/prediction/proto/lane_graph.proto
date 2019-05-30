@@ -39,6 +39,7 @@ message LaneSegment {
   // If this lane-segment is the one that's closest to ADC,
   // then adc_s gives the s of the ADC.
   optional double adc_s = 7 [default = 0.0];
+  optional int32 adc_lane_point_idx = 8 [default = 0];
   optional double total_length = 6 [default = 0.0];
 }
 

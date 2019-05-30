@@ -1207,7 +1207,7 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
 
   // Build lane_points.
   if (feature->lane().has_lane_graph_ordered()) {
-    SetLanePoints(feature, 0.5, 180,
+    SetLanePoints(feature, 0.5, 180, true,
                   feature->mutable_lane()->mutable_lane_graph_ordered());
     SetLaneSequencePath(feature->mutable_lane()->mutable_lane_graph_ordered());
   }
@@ -1219,13 +1219,14 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
 void Obstacle::SetLanePoints(Feature* feature) {
   LaneGraph* lane_graph = feature->mutable_lane()->mutable_lane_graph();
   SetLanePoints(feature, FLAGS_target_lane_gap, FLAGS_max_num_lane_point,
-                lane_graph);
+                false, lane_graph);
 }
 
 // The generic SetLanePoints
 void Obstacle::SetLanePoints(const Feature* feature,
                              const double lane_point_spacing,
                              const uint64_t max_num_lane_point,
+                             const bool is_bidirection,
                              LaneGraph* const lane_graph) {
   ADEBUG << "Spacing = " << lane_point_spacing;
   // Sanity checks.
@@ -1244,34 +1245,91 @@ void Obstacle::SetLanePoints(const Feature* feature,
     if (lane_sequence->lane_segment_size() <= 0) {
       continue;
     }
+    // TODO(jiacheng): can refactor the following two parts into one to
+    //                 make it more elegant.
+
+    // If building bidirectionally, then build backward lane-points as well.
+    if (is_bidirection) {
+      int lane_index = 0;
+      double lane_seg_s = lane_sequence->lane_segment(lane_index).start_s();
+      while (lane_index < lane_sequence->lane_segment_size()) {
+        // Go through lane_segment one by one sequentially.
+        LaneSegment* lane_segment =
+            lane_sequence->mutable_lane_segment(lane_index);
+
+        // End-condition: reached the current ADC's location.
+        if (lane_index == lane_sequence->adc_lane_segment_idx() &&
+            lane_seg_s > lane_segment->adc_s()) {
+          lane_segment->set_adc_lane_point_idx(
+              lane_segment->lane_point_size() - 1);
+          break;
+        }
+
+        if (lane_seg_s > lane_segment->end_s()) {
+          // If already exceeds the current lane_segment, then go to the
+          // next following one.
+          ADEBUG << "Move on to the next lane-segment.";
+          lane_seg_s = lane_seg_s - lane_segment->end_s();
+          ++lane_index;
+        } else {
+          // Otherwise, update lane_graph:
+          // 1. Sanity checks.
+          std::string lane_id = lane_segment->lane_id();
+          lane_segment->set_lane_turn_type(PredictionMap::LaneTurnType(lane_id));
+          ADEBUG << "Currently on " << lane_id;
+          auto lane_info = PredictionMap::LaneById(lane_id);
+          if (lane_info == nullptr) {
+            break;
+          }
+          // 2. Get the closeset lane_point
+          ADEBUG << "Lane-segment s = " << lane_seg_s;
+          Eigen::Vector2d lane_point_pos =
+              PredictionMap::PositionOnLane(lane_info, lane_seg_s);
+          double lane_point_heading =
+              PredictionMap::HeadingOnLane(lane_info, lane_seg_s);
+          double lane_point_width =
+              PredictionMap::LaneTotalWidth(lane_info, lane_seg_s);
+          double lane_point_angle_diff =
+              common::math::AngleDiff(lane_point_heading, heading);
+          // 3. Update it into the lane_graph
+          ADEBUG << lane_point_pos[0] << "    " << lane_point_pos[1];
+          LanePoint lane_point;
+          lane_point.mutable_position()->set_x(lane_point_pos[0]);
+          lane_point.mutable_position()->set_y(lane_point_pos[1]);
+          lane_point.set_heading(lane_point_heading);
+          lane_point.set_width(lane_point_width);
+          lane_point.set_angle_diff(lane_point_angle_diff);
+          // Update into lane_segment.
+          lane_segment->add_lane_point()->CopyFrom(lane_point);
+          lane_seg_s += lane_point_spacing;
+        }
+      }
+    }
+
+    // Build lane-point in the forward direction.
     int lane_index = lane_sequence->adc_lane_segment_idx();
-    LaneSegment* lane_segment = lane_sequence->mutable_lane_segment(lane_index);
-    double start_s = lane_segment->adc_s();
     double total_s = 0.0;
-    double lane_seg_s = start_s;
+    double lane_seg_s = lane_sequence->lane_segment(lane_index).adc_s();
     std::size_t count_point = 0;
-    // Go through lane_segment one by one sequentially.
     while (lane_index < lane_sequence->lane_segment_size() &&
            count_point < max_num_lane_point) {
+      // Go through lane_segment one by one sequentially.
+      LaneSegment* lane_segment =
+          lane_sequence->mutable_lane_segment(lane_index);
+
       if (lane_seg_s > lane_segment->end_s()) {
         // If already exceeds the current lane_segment, then go to the
         // next following one.
         ADEBUG << "Move on to the next lane-segment.";
-        start_s = lane_seg_s - lane_segment->end_s();
-        lane_seg_s = start_s;
+        lane_seg_s = lane_seg_s - lane_segment->end_s();
         ++lane_index;
-        if (lane_index < lane_sequence->lane_segment_size()) {
-          lane_segment = lane_sequence->mutable_lane_segment(lane_index);
-        } else {
-          lane_segment = nullptr;
-        }
       } else {
         // Otherwise, update lane_graph:
         // 1. Sanity checks.
         std::string lane_id = lane_segment->lane_id();
+        lane_segment->set_lane_turn_type(PredictionMap::LaneTurnType(lane_id));
         ADEBUG << "Currently on " << lane_id;
-        std::shared_ptr<const LaneInfo> lane_info =
-            PredictionMap::LaneById(lane_id);
+        auto lane_info = PredictionMap::LaneById(lane_id);
         if (lane_info == nullptr) {
           break;
         }
@@ -1285,19 +1343,20 @@ void Obstacle::SetLanePoints(const Feature* feature,
             PredictionMap::LaneTotalWidth(lane_info, lane_seg_s);
         double lane_point_angle_diff =
             common::math::AngleDiff(lane_point_heading, heading);
-
         // 3. Update it into the lane_graph
         ADEBUG << lane_point_pos[0] << "    " << lane_point_pos[1];
         LanePoint lane_point;
+        // Update direct information.
         lane_point.mutable_position()->set_x(lane_point_pos[0]);
         lane_point.mutable_position()->set_y(lane_point_pos[1]);
         lane_point.set_heading(lane_point_heading);
         lane_point.set_width(lane_point_width);
+        lane_point.set_angle_diff(lane_point_angle_diff);
+        // Update deducted information.
         double lane_l = feature->lane().lane_feature().lane_l();
         lane_point.set_relative_s(total_s);
         lane_point.set_relative_l(0.0 - lane_l);
-        lane_point.set_angle_diff(lane_point_angle_diff);
-        lane_segment->set_lane_turn_type(PredictionMap::LaneTurnType(lane_id));
+        // Update into lane_segment.
         lane_segment->add_lane_point()->CopyFrom(lane_point);
         ++count_point;
         total_s += lane_point_spacing;
