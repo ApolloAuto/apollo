@@ -366,34 +366,23 @@ Status LatController::ComputeControlCommand(
   }
 
   if (vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) {
+    cf_ = -control_conf_->lat_controller_conf().cf();
+    cr_ = -control_conf_->lat_controller_conf().cr();
     matrix_a_(0, 1) = 0.0;
-
-    matrix_a_(1, 2) = (-cf_ - cr_) / mass_;
-    matrix_a_(3, 2) = (-lf_ * cf_ + lr_ * cr_) / iz_;
-
     matrix_a_coeff_(0, 2) = 1.0;
-
-    matrix_a_coeff_(1, 1) = (cf_ + cr_) / mass_;
-    matrix_a_coeff_(1, 3) = (-lr_ * cr_ + lf_ * cf_) / mass_;
-    matrix_a_coeff_(3, 1) = (-lr_ * cr_ + lf_ * cf_) / iz_;
-    matrix_a_coeff_(3, 3) = -1.0 * (-lf_ * lf_ * cf_ - lr_ * lr_ * cr_) / iz_;
-
-    matrix_b_(1, 0) = -cf_ / mass_;
-    matrix_b_(3, 0) = -lf_ * cf_ / iz_;
-    matrix_bd_ = matrix_b_ * ts_;
   } else {
-    matrix_a_(1, 2) = (cf_ + cr_) / mass_;
-    matrix_a_(3, 2) = (lf_ * cf_ - lr_ * cr_) / iz_;
-
-    matrix_a_coeff_(1, 1) = -(cf_ + cr_) / mass_;
-    matrix_a_coeff_(1, 3) = (lr_ * cr_ - lf_ * cf_) / mass_;
-    matrix_a_coeff_(3, 1) = (lr_ * cr_ - lf_ * cf_) / iz_;
-    matrix_a_coeff_(3, 3) = -1.0 * (lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_;
-
-    matrix_b_(1, 0) = cf_ / mass_;
-    matrix_b_(3, 0) = lf_ * cf_ / iz_;
-    matrix_bd_ = matrix_b_ * ts_;
+    cf_ = control_conf_->lat_controller_conf().cf();
+    cr_ = control_conf_->lat_controller_conf().cr();
   }
+  matrix_a_(1, 2) = (cf_ + cr_) / mass_;
+  matrix_a_(3, 2) = (lf_ * cf_ - lr_ * cr_) / iz_;
+  matrix_a_coeff_(1, 1) = -(cf_ + cr_) / mass_;
+  matrix_a_coeff_(1, 3) = (lr_ * cr_ - lf_ * cf_) / mass_;
+  matrix_a_coeff_(3, 1) = (lr_ * cr_ - lf_ * cf_) / iz_;
+  matrix_a_coeff_(3, 3) = -1.0 * (lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_;
+  matrix_b_(1, 0) = cf_ / mass_;
+  matrix_b_(3, 0) = lf_ * cf_ / iz_;
+  matrix_bd_ = matrix_b_ * ts_;
 
   UpdateDrivingOrientation();
 
@@ -457,7 +446,8 @@ Status LatController::ComputeControlCommand(
                             .enable_reverse_leadlag_compensation();
   if (enable_leadlag) {
     steer_angle = common::math::Clamp(
-        leadlag_controller_.Control(-matrix_state_(0, 0), ts_) +
+        leadlag_controller_.Control(-matrix_state_(0, 0), ts_) * 180 / M_PI *
+                steer_ratio_ / steer_single_direction_max_degree_ * 100 +
             steer_angle_feedback + steer_angle_feedforward,
         -100.0, 100.0);
   } else {
@@ -624,12 +614,9 @@ double LatController::ComputeFeedForward(double ref_curvature) const {
   double steer_angle_feedforwardterm;
   if (VehicleStateProvider::Instance()->gear() ==
       canbus::Chassis::GEAR_REVERSE) {
-    steer_angle_feedforwardterm =
-        (wheelbase_ * ref_curvature - kv * v * v * ref_curvature -
-         0.0 * matrix_k_(0, 2) *
-             (lr_ * ref_curvature +
-              lf_ * mass_ * v * v * ref_curvature / 2 / cr_ / wheelbase_)) *
-        180 / M_PI * steer_ratio_ / steer_single_direction_max_degree_ * 100;
+    steer_angle_feedforwardterm = wheelbase_ * ref_curvature * 180 / M_PI *
+                                  steer_ratio_ /
+                                  steer_single_direction_max_degree_ * 100;
   } else {
     steer_angle_feedforwardterm =
         (wheelbase_ * ref_curvature + kv * v * v * ref_curvature -
@@ -686,11 +673,7 @@ void LatController::ComputeLateralErrors(
   double heading_error_feedback;
   if (VehicleStateProvider::Instance()->gear() ==
       canbus::Chassis::GEAR_REVERSE) {
-    auto lookback_point = trajectory_analyzer.QueryNearestPointByRelativeTime(
-        target_point.relative_time() +
-        lookback_station_ /
-            (std::max(std::fabs(linear_v), 0.1) * std::cos(heading_error)));
-    heading_error_feedback = common::math::NormalizeAngle(heading_error);
+    heading_error_feedback = heading_error;
   } else {
     auto lookahead_point = trajectory_analyzer.QueryNearestPointByRelativeTime(
         target_point.relative_time() +
@@ -734,7 +717,6 @@ void LatController::ComputeLateralErrors(
   } else {
     debug->set_heading_rate(angular_v);
   }
-
   debug->set_ref_heading_rate(target_point.path_point().kappa() *
                               target_point.v());
   debug->set_heading_error_rate(debug->heading_rate() -
