@@ -66,13 +66,11 @@ DEFINE_bool(
     "Enable planning trajectory coordinate transformation from center of "
     "rear-axis to center of mass, during forward driving");
 
-<<<<<<< HEAD
 DEFINE_bool(enable_maximum_steer_rate_limit, false,
             "Enable steer rate limit obtained from vehicle_param.pb.txt");
-=======
-DEFINE_bool(query_time_nearest_point_only, true,
+
+DEFINE_bool(query_time_nearest_point_only, false,
             "only use the trajectory point at nearest time as target point");
 
-DEFINE_bool(query_forward_time_point_only, true,
+DEFINE_bool(query_forward_time_point_only, false,
             "only use the trajectory point in future");
->>>>>>> c38e2cfcd... control: query time nearest trajectory point as current target point only
