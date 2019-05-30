@@ -37,9 +37,8 @@ message LaneSegment {
   optional uint32 lane_turn_type = 4 [default = 0];
   repeated LanePoint lane_point = 5;
   // If this lane-segment is the one that's closest to ADC,
-  // then adc_lane_point_idx gives the index of the lane-point that is
-  // closest to the ADC.
-  optional int32 adc_lane_point_idx = 7 [default = -1];
+  // then adc_s gives the s of the ADC.
+  optional double adc_s = 7 [default = 0.0];
   optional double total_length = 6 [default = 0.0];
 }
 
@@ -60,15 +59,16 @@ message StopSign {
 message LaneSequence {
   optional int32 lane_sequence_id = 1;
   repeated LaneSegment lane_segment = 2;
+  // The index of the lane-segment that is closest to ADC:
+  optional int32 adc_lane_segment_idx = 23 [default = 0];
   repeated apollo.common.PathPoint path_point = 8;
   optional apollo.hdmap.Lane.LaneType lane_type = 22;
-  // The index of the lane-segment that is closest to ADC:
-  optional int32 adc_lane_segment_idx = 23 [default = -1];
+  optional double lane_s = 17;
+  optional double lane_l = 18;
+  optional bool vehicle_on_lane = 10;
 
   // nearby obstacles on this lane sequence
   repeated NearbyObstacle nearby_obstacle = 3;
-  optional double lane_s = 17;
-  optional double lane_l = 18;
   optional StopSign stop_sign = 20;
   optional int32 right_of_way = 21; // right_of_way score
 
@@ -81,7 +81,6 @@ message LaneSequence {
   optional double acceleration = 7 [default = 0.0];
   optional double time_to_lane_center = 16;
   optional double time_to_lane_edge = 19;
-
   enum BehaviorType {
     NOT_GOTO_LANE = 1;
     CONSTANT_SPEED = 2;
@@ -91,8 +90,6 @@ message LaneSequence {
     LARGE_DECELERATION = 6;
   }
   optional BehaviorType behavior_type = 9;
-  optional bool vehicle_on_lane = 10;
-
   // lane points on this lane sequence
   repeated LanePoint curr_lane_point = 11;
   // lane points on the left neighbor lane sequence

@@ -105,13 +105,78 @@ Status RoadGraph::BuildLaneGraph(LaneGraph* const lane_graph_ptr) {
   }
 
   // Run the recursive function to perform DFS.
-  std::vector<LaneSegment> lane_segments;
+  std::list<LaneSegment> lane_segments;
   double accumulated_s = 0.0;
-  ComputeLaneSequence(accumulated_s, start_s_, lane_info_ptr_,
+  ConstructLaneSequence(accumulated_s, start_s_, lane_info_ptr_,
                       FLAGS_road_graph_max_search_horizon, consider_divide_,
                       &lane_segments, lane_graph_ptr);
 
   return Status::OK();
+}
+
+Status RoadGraph::BuildLaneGraphBidirection(LaneGraph* const lane_graph_ptr) {
+  // Sanity checks.
+  if (length_ < 0.0 || lane_info_ptr_ == nullptr) {
+    const auto error_msg = common::util::StrCat(
+        "Invalid road graph settings. Road graph length = ", length_);
+    AERROR << error_msg;
+    return Status(ErrorCode::PREDICTION_ERROR, error_msg);
+  }
+  if (lane_graph_ptr == nullptr) {
+    const auto error_msg = "Invalid input lane graph.";
+    AERROR << error_msg;
+    return Status(ErrorCode::PREDICTION_ERROR, error_msg);
+  }
+
+  // Run the recursive function to perform DFS.
+  std::list<LaneSegment> lane_segments;
+  LaneGraph lane_graph_successor;
+  ConstructLaneSequence(true, 0.0, start_s_, lane_info_ptr_,
+                      FLAGS_road_graph_max_search_horizon, consider_divide_,
+                      &lane_segments, &lane_graph_successor);
+  lane_segments.clear();
+  LaneGraph lane_graph_predecessor;
+  length_ = length_ / 2.0;
+  ConstructLaneSequence(false, 0.0, start_s_, lane_info_ptr_,
+                      FLAGS_road_graph_max_search_horizon, consider_divide_,
+                      &lane_segments, &lane_graph_predecessor);
+  *lane_graph_ptr = CombineLaneGraphs(
+      lane_graph_predecessor, lane_graph_successor);
+
+  return Status::OK();
+}
+
+LaneGraph RoadGraph::CombineLaneGraphs(
+    const LaneGraph& lane_graph_predecessor,
+    const LaneGraph& lane_graph_successor) {
+  LaneGraph final_lane_graph;
+  for (const auto& lane_sequence_pre : lane_graph_predecessor.lane_sequence()) {
+    const auto& ending_lane_segment = lane_sequence_pre.lane_segment(
+        lane_sequence_pre.lane_segment_size() - 1);
+    for (const auto& lane_sequence_suc : lane_graph_successor.lane_sequence()) {
+      if (lane_sequence_suc.lane_segment(0).lane_id() ==
+          ending_lane_segment.lane_id()) {
+        LaneSequence* lane_sequence = final_lane_graph.add_lane_sequence();
+        for (const auto& it : lane_sequence_pre.lane_segment()) {
+          *(lane_sequence->add_lane_segment()) = it;
+        }
+        lane_sequence->mutable_lane_segment(
+            lane_sequence->lane_segment_size() - 1)->set_end_s(
+                lane_sequence_suc.lane_segment(0).end_s());
+        lane_sequence->mutable_lane_segment(
+            lane_sequence->lane_segment_size() - 1)->set_adc_s(
+                lane_sequence_suc.lane_segment(0).start_s());
+        lane_sequence->set_adc_lane_segment_idx(
+            lane_sequence->lane_segment_size() - 1);
+        for (int i = 1; i < lane_sequence_suc.lane_segment_size(); ++i) {
+          *(lane_sequence->add_lane_segment()) =
+              lane_sequence_suc.lane_segment(i);
+        }
+      }
+    }
+  }
+
+  return final_lane_graph;
 }
 
 bool RoadGraph::IsOnLaneGraph(std::shared_ptr<const LaneInfo> lane_info_ptr,
@@ -128,15 +193,26 @@ bool RoadGraph::IsOnLaneGraph(std::shared_ptr<const LaneInfo> lane_info_ptr,
       }
     }
   }
-
   return false;
 }
 
-void RoadGraph::ComputeLaneSequence(
-    const double accumulated_s, const double start_s,
+void RoadGraph::ConstructLaneSequence(
+    const double accumulated_s, const double curr_lane_seg_s,
     std::shared_ptr<const LaneInfo> lane_info_ptr,
     const int graph_search_horizon, const bool consider_lane_split,
-    std::vector<LaneSegment>* const lane_segments,
+    std::list<LaneSegment>* const lane_segments,
+    LaneGraph* const lane_graph_ptr) const {
+  ConstructLaneSequence(true, accumulated_s, curr_lane_seg_s,
+      lane_info_ptr, graph_search_horizon, consider_lane_split,
+      lane_segments, lane_graph_ptr);
+}
+
+void RoadGraph::ConstructLaneSequence(
+    const bool search_forward_direction,
+    const double accumulated_s, const double curr_lane_seg_s,
+    std::shared_ptr<const LaneInfo> lane_info_ptr,
+    const int graph_search_horizon, const bool consider_lane_split,
+    std::list<LaneSegment>* const lane_segments,
     LaneGraph* const lane_graph_ptr) const {
   // Sanity checks.
   if (lane_info_ptr == nullptr) {
@@ -151,59 +227,90 @@ void RoadGraph::ComputeLaneSequence(
 
   // Create a new lane_segment based on the current lane_info_ptr.
   LaneSegment lane_segment;
+  lane_segment.set_adc_s(curr_lane_seg_s);
   lane_segment.set_lane_id(lane_info_ptr->id().id());
-  lane_segment.set_start_s(start_s);
   lane_segment.set_lane_turn_type(
       PredictionMap::LaneTurnType(lane_info_ptr->id().id()));
-  if (accumulated_s + lane_info_ptr->total_length() - start_s >= length_) {
-    lane_segment.set_end_s(length_ - accumulated_s + start_s);
-  } else {
-    lane_segment.set_end_s(lane_info_ptr->total_length());
-  }
   lane_segment.set_total_length(lane_info_ptr->total_length());
-  lane_segments->push_back(std::move(lane_segment));
+  if (search_forward_direction) {
+    lane_segment.set_start_s(curr_lane_seg_s);
+    lane_segment.set_end_s(std::fmin(
+        curr_lane_seg_s + length_ - accumulated_s,
+        lane_info_ptr->total_length()));
+  } else {
+    lane_segment.set_start_s(std::fmax(
+        0.0, curr_lane_seg_s - (length_ - accumulated_s)));
+    lane_segment.set_end_s(curr_lane_seg_s);
+  }
+  if (search_forward_direction) {
+    lane_segments->push_back(std::move(lane_segment));
+  } else {
+    lane_segments->push_front(std::move(lane_segment));
+  }
 
-  // End condition: if search reached the max. search distance,
+  // End condition: if search reached the maximum search distance,
   // or if there is no more successor lane_segment.
-  if (accumulated_s + lane_info_ptr->total_length() - start_s >= length_ ||
+  if ((search_forward_direction ?
+          lane_segment.end_s() < lane_info_ptr->total_length() :
+          lane_segment.start_s() > 0.0) ||
       lane_info_ptr->lane().successor_id_size() == 0) {
     LaneSequence* sequence = lane_graph_ptr->add_lane_sequence();
-    *sequence->mutable_lane_segment() =
-        {lane_segments->begin(), lane_segments->end()};
+    for (const auto& it : *lane_segments) {
+      *(sequence->add_lane_segment()) = it;
+    }
     sequence->set_label(0);
-    lane_segments->pop_back();
+    if (search_forward_direction) {
+      lane_segments->pop_back();
+    } else {
+      lane_segments->pop_front();
+    }
     return;
   }
 
   // Otherwise, continue searching for subsequent lane_segments.
-  const double successor_accumulated_s =
-      accumulated_s + lane_info_ptr->total_length() - start_s;
-  // Sort the successor lane_segments from left to right.
-  std::vector<std::shared_ptr<const hdmap::LaneInfo>> successor_lanes;
-  for (const auto& successor_lane_id : lane_info_ptr->lane().successor_id()) {
-    successor_lanes.push_back(
-        PredictionMap::LaneById(successor_lane_id.id()));
-  }
-  std::sort(successor_lanes.begin(), successor_lanes.end(), IsAtLeft);
-  // Based on other conditions, select what successor lanes should be used,
-  // and decide whether future recursions should consider lane-splitting.
-  if (!consider_lane_split) {
-    successor_lanes = { LaneWithSmallestAverageCurvature(successor_lanes) };
+  double new_accumulated_s = 0.0;
+  std::vector<std::shared_ptr<const hdmap::LaneInfo>> candidate_lanes;
+  if (search_forward_direction) {
+    new_accumulated_s =
+        accumulated_s + lane_info_ptr->total_length() - curr_lane_seg_s;
+    // Sort the successor lane_segments from left to right.
+    for (const auto& successor_lane_id :
+         lane_info_ptr->lane().successor_id()) {
+      candidate_lanes.push_back(
+          PredictionMap::LaneById(successor_lane_id.id()));
+    }
+    std::sort(candidate_lanes.begin(), candidate_lanes.end(), IsAtLeft);
+    // Based on other conditions, select what successor lanes should be used.
+    if (!consider_lane_split) {
+      candidate_lanes = { LaneWithSmallestAverageCurvature(candidate_lanes) };
+    }
+  } else {
+    new_accumulated_s = accumulated_s + curr_lane_seg_s;
+    for (const auto& predecessor_lane_id :
+         lane_info_ptr->lane().predecessor_id()) {
+      candidate_lanes.push_back(
+          PredictionMap::LaneById(predecessor_lane_id.id()));
+    }
   }
   bool consider_further_lane_split =
+      !search_forward_direction ||
       (FLAGS_prediction_offline_mode ==
           PredictionConstants::kDumpFeatureProto) ||
       (FLAGS_prediction_offline_mode ==
           PredictionConstants::kDumpDataForLearning) ||
-      (consider_lane_split && successor_lanes.size() == 1);
+      (consider_lane_split && candidate_lanes.size() == 1);
   // Recursively expand lane-sequence.
-  for (const auto& successor_lane : successor_lanes) {
-    ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lane,
-                        graph_search_horizon - 1,
+  for (const auto& candidate_lane : candidate_lanes) {
+    ConstructLaneSequence(search_forward_direction, new_accumulated_s,
+                        0.0, candidate_lane, graph_search_horizon - 1,
                         consider_further_lane_split, lane_segments,
                         lane_graph_ptr);
   }
-  lane_segments->pop_back();
+  if (search_forward_direction) {
+    lane_segments->pop_back();
+  } else {
+    lane_segments->pop_front();
+  }
   return;
 }
 
