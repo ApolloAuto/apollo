@@ -223,7 +223,7 @@ void RecordFileWriter::Flush() {
     if (chunk_flush_->empty()) {
       continue;
     }
-    if (!WriteChunk(chunk_flush_->header_, chunk_flush_->body_)) {
+    if (!WriteChunk(chunk_flush_->header_, *(chunk_flush_->body_.get()))) {
       AERROR << "Write chunk fail.";
     }
     chunk_flush_->clear();
