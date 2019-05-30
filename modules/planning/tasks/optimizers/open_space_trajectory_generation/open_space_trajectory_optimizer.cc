@@ -156,33 +156,33 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
         last_time_u << 0.0, 0.0;
         init_v = 0.0;
       }
-
-      if (!GenerateDistanceApproachTraj(
-              xWS_vec[i], uWS_vec[i], XYbounds, obstacles_edges_num,
-              obstacles_A, obstacles_b, obstacles_vertices_vec, last_time_u,
-              init_v, &state_result_ds_vec[i], &control_result_ds_vec[i],
-              &time_result_ds_vec[i], &l_warm_up_vec[i], &n_warm_up_vec[i],
-              &dual_l_result_ds_vec[i], &dual_n_result_ds_vec[i])) {
-        ADEBUG << "Smoother fail at " << i
-               << "th trajectory with index starts from 0";
-        ADEBUG << i << "th trajectory size is " << xWS_vec[i].cols();
-        ADEBUG << "State matrix: " << xWS_vec[i];
-        ADEBUG << "Control matrix: " << uWS_vec[i];
-
-        return Status(ErrorCode::PLANNING_ERROR,
-                      "distance approach smoothing problem failed to solve");
-      }
-
       // TODO(Jinyun): Further testing
-      // if (!GenerateDecoupledTraj(
-      //         xWS_vec[i], last_time_u(1, 0), init_v, obstacles_vertices_vec,
-      //         &state_result_ds_vec[i], &control_result_ds_vec[i],
-      //         &time_result_ds_vec[i])) {
-      //   ADEBUG << "Smoother fail at " << i << "th trajectory";
-      //   ADEBUG << i << "th trajectory size is " << xWS_vec[i].cols();
-      //   return Status(ErrorCode::PLANNING_ERROR,
-      //                 "distance approach smoothing problem failed to solve");
-      // }
+      if (FLAGS_use_iterative_anchoring_smoother) {
+        if (!GenerateDecoupledTraj(
+                xWS_vec[i], last_time_u(1, 0), init_v, obstacles_vertices_vec,
+                &state_result_ds_vec[i], &control_result_ds_vec[i],
+                &time_result_ds_vec[i])) {
+          ADEBUG << "Smoother fail at " << i << "th trajectory";
+          ADEBUG << i << "th trajectory size is " << xWS_vec[i].cols();
+          return Status(ErrorCode::PLANNING_ERROR,
+                        "distance approach smoothing problem failed to solve");
+        }
+      } else {
+        if (!GenerateDistanceApproachTraj(
+                xWS_vec[i], uWS_vec[i], XYbounds, obstacles_edges_num,
+                obstacles_A, obstacles_b, obstacles_vertices_vec, last_time_u,
+                init_v, &state_result_ds_vec[i], &control_result_ds_vec[i],
+                &time_result_ds_vec[i], &l_warm_up_vec[i], &n_warm_up_vec[i],
+                &dual_l_result_ds_vec[i], &dual_n_result_ds_vec[i])) {
+          ADEBUG << "Smoother fail at " << i
+                 << "th trajectory with index starts from 0";
+          ADEBUG << i << "th trajectory size is " << xWS_vec[i].cols();
+          ADEBUG << "State matrix: " << xWS_vec[i];
+          ADEBUG << "Control matrix: " << uWS_vec[i];
+          return Status(ErrorCode::PLANNING_ERROR,
+                        "distance approach smoothing problem failed to solve");
+        }
+      }
     }
 
     // Retrive the trajectory in one piece
@@ -322,6 +322,7 @@ void OpenSpaceTrajectoryOptimizer::RecordDebugInfo(
   double relative_time = 0;
 
   // load smoothed trajectory
+  horizon = state_result_ds.cols() - 1;
   auto* smoothed_trajectory = open_space_debug_.mutable_smoothed_trajectory();
   for (size_t i = 0; i < horizon; ++i) {
     auto* smoothed_point = smoothed_trajectory->add_vehicle_motion_point();

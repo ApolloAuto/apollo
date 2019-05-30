@@ -31,6 +31,7 @@
 #include "modules/planning/common/path/discretized_path.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
 
 namespace apollo {
 namespace planning {
@@ -47,6 +48,11 @@ class IterativeAnchoringSmoother {
               DiscretizedTrajectory* discretized_trajectory);
 
  private:
+  void AdjustStartEndHeading(const Eigen::MatrixXd& xWS, DiscretizedPath* path,
+                             std::vector<double>* bounds);
+
+  bool CheckInputValidity(const DiscretizedPath& path_points);
+
   bool SmoothPath(const DiscretizedPath& raw_path_points,
                   const std::vector<double>& bounds,
                   DiscretizedPath* smoothed_path_points);
@@ -70,6 +76,13 @@ class IterativeAnchoringSmoother {
                            DiscretizedTrajectory* discretized_trajectory);
 
   void AdjustPathAndSpeedByGear(DiscretizedTrajectory* discretized_trajectory);
+
+  bool GenerateStopProfileFromPolynomial(const double init_acc,
+                                         const double init_speed,
+                                         const double stop_distance,
+                                         SpeedData* smoothed_speeds);
+
+  bool IsValidPolynomialProfile(const QuinticPolynomialCurve1d& curve);
 
  private:
   // vehicle_param

@@ -480,6 +480,10 @@ DEFINE_bool(use_s_curve_speed_smooth, false,
             "speed/acceleration.");
 
 DEFINE_bool(
+    use_iterative_anchoring_smoother, false,
+    "Whether use iterative_anchoring_smoother for open space planning ");
+
+DEFINE_bool(
     enable_parallel_trajectory_smoothing, false,
     "Whether to partition the trajectory first and do smoothing in parallel");
 
