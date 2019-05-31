@@ -102,10 +102,33 @@ Status PathBoundsDecider::Process(
                                ->mutable_planning_status()
                                ->mutable_pull_over();
   if (pull_over_status->is_in_pull_over_scenario()) {
-    reference_line_info->SetCandidatePathBoundaries(
-        std::move(candidate_path_boundaries));
-    ADEBUG << "Completed pullover and fallback path boundaries generation.";
-    return Status::OK();
+    PathBound pullover_path_bound;
+    std::string pullover_path_bound_msg =
+        GeneratePullOverPathBound(*reference_line_info, &pullover_path_bound);
+    if (pullover_path_bound_msg != "") {
+      AWARN << "Cannot generate a pullover path bound, do regular planning.";
+    } else {
+      CHECK(!pullover_path_bound.empty());
+      CHECK_LE(adc_frenet_l_, std::get<2>(pullover_path_bound[0]));
+      CHECK_GE(adc_frenet_l_, std::get<1>(pullover_path_bound[0]));
+
+      // Update the fallback path boundary into the reference_line_info.
+      std::vector<std::pair<double, double>> pullover_path_bound_pair;
+      for (size_t i = 0; i < pullover_path_bound.size(); ++i) {
+        pullover_path_bound_pair.emplace_back(
+            std::get<1>(pullover_path_bound[i]),
+            std::get<2>(pullover_path_bound[i]));
+      }
+      candidate_path_boundaries.emplace_back(std::get<0>(pullover_path_bound[0]),
+                                             kPathBoundsDeciderResolution,
+                                             pullover_path_bound_pair);
+      candidate_path_boundaries.back().set_label("regular/pullover");
+
+      reference_line_info->SetCandidatePathBoundaries(
+          std::move(candidate_path_boundaries));
+      ADEBUG << "Completed pullover and fallback path boundaries generation.";
+      return Status::OK();
+    }
   }
 
   // Generate regular path boundaries.
@@ -348,6 +371,13 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(
     AERROR << msg;
     return msg;
   }
+  if (adc_frenet_l_ < std::get<1>(path_bound->front()) ||
+      adc_frenet_l_ > std::get<2>(path_bound->front())) {
+    const std::string msg =
+        "ADC is outside road boundary already. Cannot generate pull-over path";
+    AERROR << msg;
+    return msg;
+  }
   // PathBoundsDebugString(*path_bound);
 
   // 3. Fine-tune the boundary based on static obstacles
@@ -361,6 +391,9 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(
     AERROR << msg;
     return msg;
   }
+  // PathBoundsDebugString(*path_bound);
+
+  // SearchPullOverPosition()
 
   return "";
 }
