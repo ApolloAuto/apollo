@@ -1207,7 +1207,7 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
 
   // Build lane_points.
   if (feature->lane().has_lane_graph_ordered()) {
-    SetLanePoints(feature, 0.5, 180, true,
+    SetLanePoints(feature, 0.5, 110, true,
                   feature->mutable_lane()->mutable_lane_graph_ordered());
     SetLaneSequencePath(feature->mutable_lane()->mutable_lane_graph_ordered());
   }
@@ -1260,8 +1260,7 @@ void Obstacle::SetLanePoints(const Feature* feature,
         // End-condition: reached the current ADC's location.
         if (lane_index == lane_sequence->adc_lane_segment_idx() &&
             lane_seg_s > lane_segment->adc_s()) {
-          lane_segment->set_adc_lane_point_idx(
-              lane_segment->lane_point_size() - 1);
+          lane_segment->set_adc_lane_point_idx(lane_segment->lane_point_size());
           break;
         }
 
@@ -1275,7 +1274,8 @@ void Obstacle::SetLanePoints(const Feature* feature,
           // Otherwise, update lane_graph:
           // 1. Sanity checks.
           std::string lane_id = lane_segment->lane_id();
-          lane_segment->set_lane_turn_type(PredictionMap::LaneTurnType(lane_id));
+          lane_segment->set_lane_turn_type(
+              PredictionMap::LaneTurnType(lane_id));
           ADEBUG << "Currently on " << lane_id;
           auto lane_info = PredictionMap::LaneById(lane_id);
           if (lane_info == nullptr) {
