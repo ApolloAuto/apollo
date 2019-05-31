@@ -49,7 +49,7 @@ class Node {
   friend std::unique_ptr<Node> CreateNode(const std::string&,
                                           const std::string&);
   virtual ~Node();
-  
+
   /**
    * @brief Get node's name.
    * @warning duplicate node name is not allowed in the topo.
@@ -124,10 +124,10 @@ class Node {
   auto CreateClient(const std::string& service_name)
       -> std::shared_ptr<Client<Request, Response>>;
 
-	///< observe all readers' data
+  ///< observe all readers' data
   void Observe();
 
-	///< clear all readers' data
+  ///< clear all readers' data
   void ClearData();
 
   template <typename MessageT>

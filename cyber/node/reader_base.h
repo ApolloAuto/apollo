@@ -65,7 +65,7 @@ class ReaderBase {
   virtual double GetDelaySec() const = 0;
   ///< Get `pending_queue_size`
   virtual uint32_t PendingQueueSize() const = 0;
-  ///< Is there is at least one writer publish the channel that we subscribes? 
+  ///< Is there is at least one writer publish the channel that we subscribes?
   virtual bool HasWriter() { return false; }
   ///< Get all writers pushlish the channel we subscribes
   virtual void GetWriters(std::vector<proto::RoleAttributes>* writers) {}
@@ -93,12 +93,15 @@ class ReaderBase {
 
 /**
  * @brief One Channel is related to one Receiver.
- * RecieverManager is in charge of attaching one Receiver to its responding Channel. 
- * We pass a DataDispatche's callback func to this Receiver so when a message is received,
- * it will be push to the `ChannelBuffer`, and `DataVisitor` will `Fetch` data and pass
+ * RecieverManager is in charge of attaching one Receiver to its responding
+ * Channel.
+ * We pass a DataDispatche's callback func to this Receiver so when a message is
+ * received,
+ * it will be push to the `ChannelBuffer`, and `DataVisitor` will `Fetch` data
+ * and pass
  * to `Reader`'s callback func
- * 
- * @tparam MessageT 
+ *
+ * @tparam MessageT
  */
 template <typename MessageT>
 class ReceiverManager {
@@ -120,7 +123,7 @@ class ReceiverManager {
 
 /**
  * @brief Construct a new Receiver Manager< Message T>:: Receiver Manager object
- * 
+ *
  * @tparam MessageT param
  */
 template <typename MessageT>

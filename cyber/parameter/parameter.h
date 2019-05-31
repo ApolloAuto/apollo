@@ -88,7 +88,8 @@ class Parameter {
    */
   inline ParamType Type() const;
 
-  ///< Get Paramter's type name, i.e. INT,DOUBLE,STRING or protobuf message's fullname
+  ///< Get Paramter's type name, i.e. INT,DOUBLE,STRING or protobuf message's
+  ///< fullname
   inline std::string TypeName() const;
 
   ///< Get Paramter's descriptor, only work on protobuf types
@@ -108,7 +109,7 @@ class Parameter {
   ///< show debug string
   std::string DebugString() const;
 
-  ///< Translate paramter value as a protobuf::Message 
+  ///< Translate paramter value as a protobuf::Message
   template <typename ValueType>
   typename std::enable_if<
       std::is_base_of<google::protobuf::Message, ValueType>::value,
@@ -209,7 +210,7 @@ inline std::string Parameter::Descriptor() const { return param_.proto_desc(); }
 
 inline const std::string Parameter::Name() const { return param_.name(); }
 
-///< 
+///<
 inline bool Parameter::AsBool() const { return value<bool>(); }
 
 inline int64_t Parameter::AsInt64() const { return value<int64_t>(); }
