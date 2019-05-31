@@ -151,8 +151,10 @@ bool LaneScanningEvaluator::ExtractFeatures(
     AERROR << "Failed to extract static environmental features around obs_id = "
            << id;
   }
-  if (static_feature_values.size() % (SINGLE_LANE_FEATURE_SIZE *
-          (LANE_POINTS_SIZE + BACKWARD_LANE_POINTS_SIZE)) != 0) {
+  if (static_feature_values.size() %
+          (SINGLE_LANE_FEATURE_SIZE *
+           (LANE_POINTS_SIZE + BACKWARD_LANE_POINTS_SIZE)) !=
+      0) {
     AERROR << "Obstacle [" << id << "] has incorrect static env feature size: "
            << static_feature_values.size() << ".";
     return false;
@@ -332,10 +334,10 @@ bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
     while (count >= SINGLE_LANE_FEATURE_SIZE * 2 &&
            count < SINGLE_LANE_FEATURE_SIZE * BACKWARD_LANE_POINTS_SIZE) {
       std::size_t s = backward_feature_values.size();
-      double relative_l_new = 2 * backward_feature_values[s - 1] -
-                              backward_feature_values[s - 5];
-      double relative_s_new = 2 * backward_feature_values[s - 2] -
-                              backward_feature_values[s - 6];
+      double relative_l_new =
+          2 * backward_feature_values[s - 1] - backward_feature_values[s - 5];
+      double relative_s_new =
+          2 * backward_feature_values[s - 2] - backward_feature_values[s - 6];
       double relative_ang_new = backward_feature_values[s - 3];
 
       backward_feature_values.push_back(0.0);
@@ -346,8 +348,8 @@ bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
       count += 4;
     }
 
-    for (int j = static_cast<int>(backward_feature_values.size()) - 1;
-         j >= 0; --j) {
+    for (int j = static_cast<int>(backward_feature_values.size()) - 1; j >= 0;
+         --j) {
       feature_values->push_back(backward_feature_values[j]);
     }
 

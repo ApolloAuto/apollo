@@ -271,7 +271,8 @@ bool Cipv::FindClosestObjectImage(const std::shared_ptr<base::Object> &object,
   }
   // Footprint (left + width/2, top + height) as a center position
   float center_x = (object->camera_supplement.box.xmin +
-                    object->camera_supplement.box.xmin) * 0.5f;
+                    object->camera_supplement.box.xmin) *
+                   0.5f;
   float center_y = object->camera_supplement.box.ymax;
 
   if (debug_level_ >= 3) {
@@ -292,13 +293,13 @@ bool Cipv::FindClosestObjectImage(const std::shared_ptr<base::Object> &object,
   closted_object_edge->end_point(1) = object->camera_supplement.box.ymax;
 
   *distance =
-      static_cast<float>(sqrt(center_x * center_x + center_y *center_y));
+      static_cast<float>(sqrt(center_x * center_x + center_y * center_y));
   if (debug_level_ >= 2) {
     AINFO << "start(" << closted_object_edge->start_point(0) << ", "
           << closted_object_edge->start_point(1) << ")->";
     AINFO << "end(" << closted_object_edge->end_point(0) << ", "
           << closted_object_edge->end_point(1) << ")";
-    AINFO << "closest distance: " <<  *distance;
+    AINFO << "closest distance: " << *distance;
   }
   return true;
 }
