@@ -30,6 +30,13 @@
 namespace apollo {
 namespace cyber {
 
+/**
+ * @class Writer<MessageT>
+ * @brief The Channel Writer has only one function: publish message through the channel
+ * pointed in its RoleAttributes
+ * 
+ * @tparam MessageT Message Type of the Writer handles
+ */
 template <typename MessageT>
 class Writer : public WriterBase {
  public:
@@ -37,16 +44,28 @@ class Writer : public WriterBase {
   using ChangeConnection =
       typename service_discovery::Manager::ChangeConnection;
 
+  /**
+   * @brief Construct a new Writer object
+   * 
+   * @param role_attr we use RoleAttributes to identify a Writer
+   */
   explicit Writer(const proto::RoleAttributes& role_attr);
   virtual ~Writer();
 
+  ///< Init the Writer
   bool Init() override;
+  ///< Shutdown the Writer
   void Shutdown() override;
 
+  ///< Write a MessageT instance
   virtual bool Write(const MessageT& msg);
+  ///< Write a shared ptr of MessageT
   virtual bool Write(const std::shared_ptr<MessageT>& msg_ptr);
 
+  ///< Is there any Reader that subscribes our Channel?
+  ///< You can publish message when this return true
   bool HasReader() override;
+  ///< Get all Readers that subscriber our writing channel
   void GetReaders(std::vector<proto::RoleAttributes>* readers) override;
 
  private:

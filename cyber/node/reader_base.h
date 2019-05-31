@@ -35,34 +35,55 @@ using apollo::cyber::common::GlobalData;
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::TransPerf;
 
+/**
+ * @class ReaderBase
+ * @brief Base Class for Reader
+ * Reader is identified by one apollo::cyber::proto::RoleAttribute,
+ * it constains the channel_name, channel_id that we subscribe,
+ * and host_name, process_id and node that we are located,
+ * and qos that describes our transportation quality.
+ */
 class ReaderBase {
  public:
   explicit ReaderBase(const proto::RoleAttributes& role_attr)
       : role_attr_(role_attr), init_(false) {}
   virtual ~ReaderBase() {}
 
+  ///< Init the Reader object
   virtual bool Init() = 0;
+  ///< Shutdown the Reader object
   virtual void Shutdown() = 0;
+  ///< Clear local data
   virtual void ClearData() = 0;
+  ///< Get stored data
   virtual void Observe() = 0;
+  ///< Is there any data to handle?
   virtual bool Empty() const = 0;
+  ///< Do we received messages since laste `ClearData`?
   virtual bool HasReceived() const = 0;
+  ///< Get time interval of since last receive message
   virtual double GetDelaySec() const = 0;
+  ///< Get `pending_queue_size`
   virtual uint32_t PendingQueueSize() const = 0;
-
+  ///< Is there is at least one writer publish the channel that we subscribes? 
   virtual bool HasWriter() { return false; }
+  ///< Get all writers pushlish the channel we subscribes
   virtual void GetWriters(std::vector<proto::RoleAttributes>* writers) {}
 
+  ///< Get Reader's Channel name
   const std::string& GetChannelName() const {
     return role_attr_.channel_name();
   }
 
+  ///< Get Reader's Channel id
   uint64_t ChannelId() const { return role_attr_.channel_id(); }
 
+  ///< Get qos profile. You can see qos's description
   const proto::QosProfile& QosProfile() const {
     return role_attr_.qos_profile();
   }
 
+  ///< whether is it inited
   bool IsInit() const { return init_.load(); }
 
  protected:
@@ -70,9 +91,19 @@ class ReaderBase {
   std::atomic<bool> init_;
 };
 
+/**
+ * @brief One Channel is related to one Receiver.
+ * RecieverManager is in charge of attaching one Receiver to its responding Channel. 
+ * We pass a DataDispatche's callback func to this Receiver so when a message is received,
+ * it will be push to the `ChannelBuffer`, and `DataVisitor` will `Fetch` data and pass
+ * to `Reader`'s callback func
+ * 
+ * @tparam MessageT 
+ */
 template <typename MessageT>
 class ReceiverManager {
  public:
+  ReceiverManager();
   ~ReceiverManager() { receiver_map_.clear(); }
 
   auto GetReceiver(const proto::RoleAttributes& role_attr) ->
@@ -87,6 +118,11 @@ class ReceiverManager {
   DECLARE_SINGLETON(ReceiverManager<MessageT>)
 };
 
+/**
+ * @brief Construct a new Receiver Manager< Message T>:: Receiver Manager object
+ * 
+ * @tparam MessageT param
+ */
 template <typename MessageT>
 ReceiverManager<MessageT>::ReceiverManager() {}
 

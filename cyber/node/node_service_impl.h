@@ -31,6 +31,11 @@ namespace cyber {
 
 class Node;
 
+/**
+ * @class NodeServiceImpl
+ * @brief The implementation for Node to create Objects connected by Param.
+ * e.g. Param Server and Client
+ */
 class NodeServiceImpl {
  public:
   friend class Node;

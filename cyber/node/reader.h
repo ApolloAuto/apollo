@@ -49,10 +49,17 @@ const uint32_t DEFAULT_PENDING_QUEUE_SIZE = 1;
 
 /**
  * @class Reader
- * @brief .
- *
- * Reader objecte subscribes to the channel for message received.
- *
+ * @brief Reader subscribes a channel, it has two main functions:
+ * 1. You can pass a `CallbackFunc` to handle the message then it arrived
+ * 2. You can Observe messages that Blocker cached. Reader automatically push the message 
+ * to Blocker's `PublishQueue`, and we can use `Observe` to fetch messages from `PublishQueue` 
+ * to `ObserveQueue`. But, if you have set CallbackFunc, you can ignore this.
+ * One Reader uses one `ChannelBuffer`, the message we are handling is stored in ChannelBuffer
+ * Reader will Join the topology when init and Leave the topology when shutdown
+ * @warning To save resource, `ChannelBuffer` has limited length,
+ * it's passed through the `pending_queue_size` param. pending_queue_size is default set to 1,
+ * So, If you handle slower than writer sending, older messages that are not handled will be lost.
+ * You can increase `pending_queue_size` to resolve this problem.
  */
 template <typename MessageT>
 class Reader : public ReaderBase {
@@ -65,8 +72,7 @@ class Reader : public ReaderBase {
       typename std::list<std::shared_ptr<MessageT>>::const_iterator;
 
   /**
-   * @brief Constuctor a Reader object.
-   *
+   * Constuctor a Reader object.
    * @param role_attr is a protobuf message RoleAttributes, which includes the
    * channel name and other info.
    * @param reader_func is the callback function, when the message is recevied.
@@ -79,24 +85,38 @@ class Reader : public ReaderBase {
                   uint32_t pending_queue_size = DEFAULT_PENDING_QUEUE_SIZE);
   virtual ~Reader();
 
+  ///< Init the Reader object
   bool Init() override;
+  ///< Shutdown the Reader object
   void Shutdown() override;
+  ///< Get All data that `Blocker` stores
   void Observe() override;
+  ///< Clear `Blocker`'s data
   void ClearData() override;
+  ///< Has we received data
   bool HasReceived() const override;
+  ///< Is ObservedQueue is empty
   bool Empty() const override;
   double GetDelaySec() const override;
+  ///< Get pending_queue_size configuration
   uint32_t PendingQueueSize() const override;
-
+  ///< Push `msg` to Blocker's `PublishQueue`
   virtual void Enqueue(const std::shared_ptr<MessageT>& msg);
+  ///< Set Blocker's `PublishQueue`'s capacity
   virtual void SetHistoryDepth(const uint32_t& depth);
+  ///< Get Blocker's `PublishQueue`'s capacity
   virtual uint32_t GetHistoryDepth() const;
+  ///< Get the lastest message we `Observe`
   virtual std::shared_ptr<MessageT> GetLatestObserved() const;
+  ///< Get the oldest message we `Observe`
   virtual std::shared_ptr<MessageT> GetOldestObserved() const;
+  ///< Get the begin iterator of `ObserveQueue`, used to traverse
   virtual Iterator Begin() const { return blocker_->ObservedBegin(); }
+  ///< Get the end iterator of `ObserveQueue`, used to traverse
   virtual Iterator End() const { return blocker_->ObservedEnd(); }
-
+  ///< Is there is at least one writer publish the channel that we subscribes? 
   bool HasWriter() override;
+  ///< Get all writers pushlish the channel we subscribes
   void GetWriters(std::vector<proto::RoleAttributes>* writers) override;
 
  protected:

@@ -33,21 +33,37 @@ using apollo::cyber::proto::ParamType;
 
 /**
  * @class Parameter
+ * @brief A `Parameter` holds an apollo::cyber::proto::Param,
+ * It's more human-readable, you can use basic-value type and Protobuf values
+ * to construct a paramter. Parameter is identified by their `name`,
+ * and you can get Parameter content by call value()
  */
 class Parameter {
  public:
+  ///< Empty contructor
   Parameter();
+  ///< copy-constructor
   explicit Parameter(const Parameter& parameter);
+  ///< Just point the paramter's name
   explicit Parameter(const std::string& name);
+  ///< use a bool type value to construct the parameter
   Parameter(const std::string& name, const bool bool_value);
+  ///< use a bool type value to construct the parameter
   Parameter(const std::string& name, const int int_value);
+  ///< use a int64_t type value to construct the parameter
   Parameter(const std::string& name, const int64_t int_value);
-  Parameter(const std::string& name, const float double_value);
+  ///< use a float type value to construct the parameter
+  Parameter(const std::string& name, const float doule_value);
+  ///< use a double type value to construct the parameter
   Parameter(const std::string& name, const double double_value);
+  ///< use a string type value to construct the parameter
   Parameter(const std::string& name, const std::string& string_value);
+  ///< use a const char* type value to construct the parameter
   Parameter(const std::string& name, const char* string_value);
+  ///< use a protobuf type value to construct the parameter
   Parameter(const std::string& name, const std::string& msg_str,
             const std::string& full_name, const std::string& proto_desc);
+  ///< use a google::protobuf::Message type value to construct the parameter
   Parameter(const std::string& name, const google::protobuf::Message& msg);
 
   /**
@@ -67,41 +83,58 @@ class Parameter {
   Param ToProtoParam() const;
 
   /**
-   * @brief Get the cyber:parameter::ParameterType of this object
-   * @return cyber:parameter::ParameterType
+   * @brief Get the cyber:parameter::ParamType of this object
+   * @return result cyber:parameter::ParameterType
    */
   inline ParamType Type() const;
+
+  ///< Get Paramter's type name, i.e. INT,DOUBLE,STRING or protobuf message's fullname
   inline std::string TypeName() const;
+
+  ///< Get Paramter's descriptor, only work on protobuf types
   inline std::string Descriptor() const;
+
+  ///< Get Parameter's name
   inline const std::string Name() const;
+
+  ///< Get Paramter as a bool value
   inline bool AsBool() const;
+  ///< Get Paramter as a int64_t value
   inline int64_t AsInt64() const;
+  ///< Get Paramter as a double value
   inline double AsDouble() const;
+  ///< Get Paramter as a string value
   inline const std::string AsString() const;
+  ///< show debug string
   std::string DebugString() const;
 
+  ///< Translate paramter value as a protobuf::Message 
   template <typename ValueType>
   typename std::enable_if<
       std::is_base_of<google::protobuf::Message, ValueType>::value,
       ValueType>::type
   value() const;
 
+  ///< Translate paramter value to int type
   template <typename ValueType>
   typename std::enable_if<std::is_integral<ValueType>::value &&
                               !std::is_same<ValueType, bool>::value,
                           ValueType>::type
   value() const;
 
+  ///< Translate paramter value to bool type
   template <typename ValueType>
   typename std::enable_if<std::is_floating_point<ValueType>::value,
                           ValueType>::type
   value() const;
 
+  ///< Translate paramter value to string type
   template <typename ValueType>
   typename std::enable_if<std::is_convertible<ValueType, std::string>::value,
                           const std::string&>::type
   value() const;
 
+  ///< Translate paramter value to bool type
   template <typename ValueType>
   typename std::enable_if<std::is_same<ValueType, bool>::value, bool>::type
   value() const;
@@ -176,6 +209,7 @@ inline std::string Parameter::Descriptor() const { return param_.proto_desc(); }
 
 inline const std::string Parameter::Name() const { return param_.name(); }
 
+///< 
 inline bool Parameter::AsBool() const { return value<bool>(); }
 
 inline int64_t Parameter::AsInt64() const { return value<int64_t>(); }
