@@ -151,8 +151,10 @@ bool RealtimeRecordProcessor::Process() {
       AINFO << "record reader " << record_path << " reached end, exit now";
       break;
     }
-    RecordViewer viewer(std::make_shared<RecordReader>(record_path), 0,
-                        UINT64_MAX, ChannelPool::Instance()->GetAllChannels());
+    auto reader = std::make_shared<RecordReader>(record_path);
+    reader->SetFlushMode(true);
+    RecordViewer viewer(reader, 0, UINT64_MAX,
+                        ChannelPool::Instance()->GetAllChannels());
     AINFO << "checking " << record_path << ": " << viewer.begin_time() << " - "
           << viewer.end_time();
     if (restore_reader_time_ == 0) {
@@ -243,6 +245,7 @@ void RealtimeRecordProcessor::RestoreMessage(const uint64_t message_time) {
     AINFO << "target restoring " << restore_path_ << ": "
           << restore_reader_time_ << " - " << target_end;
     auto reader = std::make_shared<RecordReader>(restore_path_);
+    reader->SetFlushMode(true);
     restore_reader_time_ =
         std::max(restore_reader_time_, reader->header().begin_time());
     if (restore_reader_time_ > target_end ||
@@ -258,9 +261,11 @@ void RealtimeRecordProcessor::RestoreMessage(const uint64_t message_time) {
       if ((!small_channels_only && msg.time >= interval.begin_time &&
            msg.time <= interval.end_time) ||
           ShouldRestore(msg)) {
-        writer_->WriteChannel(msg.channel_name,
-                              reader->GetMessageType(msg.channel_name),
-                              reader->GetProtoDesc(msg.channel_name));
+        if (writer_->IsNewChannel(msg.channel_name)) {
+          writer_->WriteChannel(msg.channel_name,
+                                reader->GetMessageType(msg.channel_name),
+                                reader->GetProtoDesc(msg.channel_name));
+        }
         writer_->WriteMessage(msg.channel_name, msg.content, msg.time);
       }
     }
