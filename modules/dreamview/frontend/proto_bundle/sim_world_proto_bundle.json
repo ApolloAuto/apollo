@@ -6347,6 +6347,13 @@
                   "options": {
                     "default": 0
                   }
+                },
+                "isInPullOverScenario": {
+                  "type": "bool",
+                  "id": 10,
+                  "options": {
+                    "default": false
+                  }
                 }
               }
             },
@@ -10451,6 +10458,20 @@
                   "type": "LanePoint",
                   "id": 5
                 },
+                "adcS": {
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "adcLanePointIdx": {
+                  "type": "int32",
+                  "id": 8,
+                  "options": {
+                    "default": 0
+                  }
+                },
                 "totalLength": {
                   "type": "double",
                   "id": 6,
@@ -10507,10 +10528,21 @@
                   "type": "LaneSegment",
                   "id": 2
                 },
-                "nearbyObstacle": {
+                "adcLaneSegmentIdx": {
+                  "type": "int32",
+                  "id": 23,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "pathPoint": {
                   "rule": "repeated",
-                  "type": "NearbyObstacle",
-                  "id": 3
+                  "type": "apollo.common.PathPoint",
+                  "id": 8
+                },
+                "laneType": {
+                  "type": "apollo.hdmap.Lane.LaneType",
+                  "id": 22
                 },
                 "laneS": {
                   "type": "double",
@@ -10519,6 +10551,15 @@
                 "laneL": {
                   "type": "double",
                   "id": 18
+                },
+                "vehicleOnLane": {
+                  "type": "bool",
+                  "id": 10
+                },
+                "nearbyObstacle": {
+                  "rule": "repeated",
+                  "type": "NearbyObstacle",
+                  "id": 3
                 },
                 "stopSign": {
                   "type": "StopSign",
@@ -10561,22 +10602,9 @@
                   "type": "double",
                   "id": 19
                 },
-                "pathPoint": {
-                  "rule": "repeated",
-                  "type": "apollo.common.PathPoint",
-                  "id": 8
-                },
-                "laneType": {
-                  "type": "apollo.hdmap.Lane.LaneType",
-                  "id": 22
-                },
                 "behaviorType": {
                   "type": "BehaviorType",
                   "id": 9
-                },
-                "vehicleOnLane": {
-                  "type": "bool",
-                  "id": 10
                 },
                 "currLanePoint": {
                   "rule": "repeated",
