@@ -97,9 +97,9 @@ base::TLColor SemanticReviser::ReviseBySemantic(
     vote.at(static_cast<int>(color))++;
   }
 
-  if (vote.at(static_cast<size_t>(base::TLColor::TL_RED) == 0) &&
-      vote.at(static_cast<size_t>(base::TLColor::TL_GREEN) == 0) &&
-      vote.at(static_cast<size_t>(base::TLColor::TL_YELLOW)) == 0) {
+  if ((vote.at(static_cast<size_t>(base::TLColor::TL_RED)) == 0) &&
+      (vote.at(static_cast<size_t>(base::TLColor::TL_GREEN)) == 0) &&
+      (vote.at(static_cast<size_t>(base::TLColor::TL_YELLOW)) == 0)) {
     if (vote.at(static_cast<size_t>(base::TLColor::TL_BLACK)) > 0) {
       return base::TLColor::TL_BLACK;
     } else {
