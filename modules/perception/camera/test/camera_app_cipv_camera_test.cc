@@ -259,8 +259,7 @@ TEST(CIPV, cipv_ground_test) {
     std::vector<std::shared_ptr<base::Object>> objects;
     base::ObjectPtr object1(new base::Object);
     object1->track_id = 0;
-    object1->camera_supplement.box =
-        base::RectF(83.0f, 486.73f, 15.0f, 39.6f);
+    object1->camera_supplement.box = base::RectF(83.0f, 486.73f, 15.0f, 39.6f);
     object1->center(0) = 12.0;
     object1->center(1) = 0.0;
     object1->center(2) = 6.0;
@@ -358,7 +357,6 @@ TEST(CIPV, cipv_image_test) {
     base::Point2DF ground_point;
     base::Point2DF image_point;
 
-
     image_point.x = 0.0f;
     image_point.y = 1000.0f;
     left_lane_instance.curve_image_point_set.push_back(image_point);
@@ -430,8 +428,7 @@ TEST(CIPV, cipv_image_test) {
     std::vector<std::shared_ptr<base::Object>> objects;
     base::ObjectPtr object1(new base::Object);
     object1->track_id = 0;
-    object1->camera_supplement.box =
-        base::RectF(50.0f, 200.0f, 15.0f, 39.6f);
+    object1->camera_supplement.box = base::RectF(50.0f, 200.0f, 15.0f, 39.6f);
     object1->center(0) = 6.0;
     object1->center(1) = 12.0;
     object1->center(2) = 0.0;
