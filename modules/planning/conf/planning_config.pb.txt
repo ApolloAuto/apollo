@@ -197,6 +197,7 @@ default_task_config: {
         max_position_error_to_end_point: 0.05
         max_theta_error_to_end_point: 0.05
         is_near_destination_threshold: 0.05
+        enable_check_parallel_trajectory: true
       }
     }
   }

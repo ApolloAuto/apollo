@@ -142,6 +142,16 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
     for (size_t i = 0; i < size; ++i) {
       LoadHybridAstarResultInEigen(&partition_trajectories[i], &xWS_vec[i],
                                    &uWS_vec[i]);
+      // checking initial and ending points
+      if (config_.
+          planner_open_space_config().enable_check_parallel_trajectory()) {
+        AINFO << "trajectory id: " << i;
+        AINFO << "trajectory partitioned size: " << xWS_vec[i].cols();
+        AINFO << "initial point: " << xWS_vec[i].col(0).transpose();
+        AINFO << "ending point: "
+            << xWS_vec[i].col(xWS_vec[i].cols() - 1).transpose();
+      }
+
       Eigen::MatrixXd last_time_u(2, 1);
       double init_v = 0.0;
       // Stitching point control and velocity is set for first piece of

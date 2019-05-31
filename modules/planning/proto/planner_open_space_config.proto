@@ -32,6 +32,7 @@ message PlannerOpenSpaceConfig {
   optional double max_position_error_to_end_point = 7 [default = 0.5];
   optional double max_theta_error_to_end_point = 8 [default = 0.2];
   optional double is_near_destination_threshold = 9 [default = 0.001];
+  optional bool enable_check_parallel_trajectory = 10 [default = false];
 }
 
 message ROIConfig {
