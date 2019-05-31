@@ -8,7 +8,6 @@ cc_library(
     deps = [
         "//cyber",
         "//external:gflags",
-
         "//modules/bridge/common:bridge_buffer",
         "//modules/bridge/common:bridge_gflags",
         "//modules/bridge/common:macro",
