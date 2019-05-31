@@ -256,9 +256,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
       if (CheckOverlap(curr_point_on_path, obs_box,
                        speed_bounds_config_.boundary_buffer())) {
         const double backward_distance = -vehicle_param_.front_edge_to_center();
-        const double forward_distance = vehicle_param_.length() +
-                                        vehicle_param_.width() +
-                                        obs_box.length() + obs_box.width();
+        const double forward_distance = obs_box.length();
         double low_s =
             std::fmax(0.0, curr_point_on_path.s() + backward_distance);
         double high_s = std::fmin(planning_distance_,
