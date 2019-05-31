@@ -289,12 +289,16 @@ class Obstacle {
 
   void SetLaneSequenceStopSign(LaneSequence* lane_sequence_ptr);
 
+  /** @brief This functions updates the lane-points into the lane-segments
+   *        based on the given lane_point_spacing.
+   */
   void SetLanePoints(Feature* feature);
-
   void SetLanePoints(const Feature* feature, const double lane_point_spacing,
                      const uint64_t max_num_lane_point,
-                     LaneGraph* const lane_graph);
+                     const bool is_bidirection, LaneGraph* const lane_graph);
 
+  /** @brief This functions is mainly for lane-sequence kappa calculation.
+   */
   void SetLaneSequencePath(LaneGraph* const lane_graph);
 
   void InitKFPedestrianTracker(const Feature& feature);

@@ -21,7 +21,7 @@
 namespace apollo {
 namespace bridge {
 
-template<typename T>
+template <typename T>
 class BridgeBuffer {
  public:
   BridgeBuffer();

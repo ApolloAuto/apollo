@@ -34,6 +34,7 @@
 #include "modules/prediction/evaluator/pedestrian/pedestrian_interaction_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/cost_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
+#include "modules/prediction/evaluator/vehicle/junction_map_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/lane_scanning_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
@@ -93,6 +94,7 @@ void EvaluatorManager::RegisterEvaluators() {
   RegisterEvaluator(ObstacleConf::CYCLIST_KEEP_LANE_EVALUATOR);
   RegisterEvaluator(ObstacleConf::LANE_SCANNING_EVALUATOR);
   RegisterEvaluator(ObstacleConf::PEDESTRIAN_INTERACTION_EVALUATOR);
+  RegisterEvaluator(ObstacleConf::JUNCTION_MAP_EVALUATOR);
 }
 
 void EvaluatorManager::Init(const PredictionConf& config) {
@@ -179,8 +181,6 @@ void EvaluatorManager::Run() {
     if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpFrameEnv) {
       return;
     }
-  }
-  if (FLAGS_enable_semantic_map) {
     SemanticMap::Instance()->RunCurrFrame(obstacle_id_history_map_);
   }
 
@@ -374,6 +374,10 @@ std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
     }
     case ObstacleConf::PEDESTRIAN_INTERACTION_EVALUATOR: {
       evaluator_ptr.reset(new PedestrianInteractionEvaluator());
+      break;
+    }
+    case ObstacleConf::JUNCTION_MAP_EVALUATOR: {
+      evaluator_ptr.reset(new JunctionMapEvaluator());
       break;
     }
     default: { break; }

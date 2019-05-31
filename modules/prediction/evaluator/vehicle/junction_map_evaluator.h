@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,35 +14,36 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- * @brief Define the cyclist keep lane predictor class
- */
-
 #pragma once
 
+#include <memory>
 #include <string>
+#include <vector>
+
+#include "torch/script.h"
+#include "torch/torch.h"
 
 #include "modules/prediction/evaluator/evaluator.h"
 
-/**
- * @namespace apollo::prediction
- * @brief apollo::prediction
- */
 namespace apollo {
 namespace prediction {
 
-class CyclistKeepLaneEvaluator : public Evaluator {
+class JunctionMapEvaluator : public Evaluator {
  public:
   /**
    * @brief Constructor
    */
-  CyclistKeepLaneEvaluator() = default;
+  JunctionMapEvaluator();
 
   /**
    * @brief Destructor
    */
-  virtual ~CyclistKeepLaneEvaluator() = default;
+  virtual ~JunctionMapEvaluator() = default;
+
+  /**
+   * @brief Clear obstacle feature map
+   */
+  void Clear();
 
   /**
    * @brief Override Evaluate
@@ -51,13 +52,29 @@ class CyclistKeepLaneEvaluator : public Evaluator {
   bool Evaluate(Obstacle* obstacle_ptr) override;
 
   /**
+   * @brief Extract feature vector
+   * @param Obstacle pointer
+   *        Feature container in a vector for receiving the feature values
+   */
+  bool ExtractFeatureValues(Obstacle* obstacle_ptr,
+                            std::vector<double>* feature_values);
+
+  /**
    * @brief Get the name of evaluator.
    */
-  std::string GetName() override { return "CYCLIST_KEEP_LANE_EVALUATOR"; }
+  std::string GetName() override { return "JUNCTION_MAP_EVALUATOR"; }
 
  private:
-  double ComputeProbability(const std::string& curr_lane_id,
-                            const LaneSequence& lane_sequence);
+  /**
+   * @brief Load mode file
+   */
+  void LoadModel();
+
+ private:
+  // junction exit mask
+  static const size_t JUNCTION_FEATURE_SIZE = 12;
+  std::shared_ptr<torch::jit::script::Module> torch_model_ptr_ = nullptr;
+  torch::Device device_;
 };
 
 }  // namespace prediction

@@ -161,7 +161,7 @@ ProjectionCacheObject* TrackObjectDistance::BuildProjectionCacheObject(
     }
   }
   // 5. if not all lidar 3d vertices outside frustum, build projection object
-  // of its cloud and cache it, else build & cache a empty one.
+  // of its cloud and cache it, else build & cache an empty one.
   if (!is_all_lidar_3d_vertices_outside_frustum) {
     // 5.1 check whehter downsampling needed
     size_t every_n = 1;
@@ -753,7 +753,7 @@ bool TrackObjectDistance::ComputePolygonCenter(
 }
 
 // @brief: compute polygon center
-// @return true if get center succesfully, otherwise return false
+// @return true if get center successfully, otherwise return false
 bool TrackObjectDistance::ComputePolygonCenter(
     const base::PolygonDType& polygon, const Eigen::Vector3d& ref_pos,
     int range, Eigen::Vector3d* center) {

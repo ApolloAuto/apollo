@@ -470,7 +470,7 @@ def gen_esd_can_extended(str):
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print "Usage:\npython %s some_config.yml" % sys.argv[0]
-        sys.exit(1)
+        sys.exit(0)
     with open(sys.argv[1], 'r') as fp:
         conf = yaml.load(fp)
     protocol_conf = conf["protocol_conf"]

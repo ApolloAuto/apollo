@@ -337,6 +337,9 @@ class SimulationWorldService {
   double current_real_dist_ = 0.0;
   double current_rss_safe_dist_ = 0.0;
 
+  // Gear Location
+  apollo::canbus::Chassis_GearPosition gear_location_;
+
   // Readers.
   std::shared_ptr<cyber::Reader<apollo::canbus::Chassis>> chassis_reader_;
   std::shared_ptr<cyber::Reader<apollo::localization::Gps>> gps_reader_;

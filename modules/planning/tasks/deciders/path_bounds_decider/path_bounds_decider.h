@@ -43,6 +43,8 @@ constexpr double kDefaultLaneWidth = 5.0;
 constexpr double kDefaultRoadWidth = 20.0;
 // TODO(all): Update extra tail point base on vehicle speed.
 constexpr int kNumExtraTailBoundPoint = 20;
+constexpr double kPulloverLonSearchCoeff = 2.0;
+constexpr double kPulloverLatSearchCoeff = 1.05;
 
 class PathBoundsDecider : public Decider {
  public:
@@ -110,15 +112,12 @@ class PathBoundsDecider : public Decider {
       std::vector<std::tuple<double, double, double>>* const path_bound);
 
   std::string GeneratePullOverPathBound(
-      const ReferenceLineInfo& reference_line_info,
+      const Frame& frame, const ReferenceLineInfo& reference_line_info,
       std::vector<std::tuple<double, double, double>>* const path_bound);
 
-  // bool SetUpPullOver(
-  //     const Frame& frame, const ReferenceLineInfo& reference_line_info,
-  //     );
-
-  // bool IsValidPullOverPosition(
-  //     );
+  int IsPointWithinPathBound(const ReferenceLineInfo& reference_line_info,
+      const double x, const double y,
+      const std::vector<std::tuple<double, double, double>>& path_bound);
 
   bool SearchPullOverPosition(
       const Frame& frame, const ReferenceLineInfo& reference_line_info,

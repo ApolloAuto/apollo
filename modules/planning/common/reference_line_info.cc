@@ -488,7 +488,8 @@ bool ReferenceLineInfo::IsIrrelevantObstacle(const Obstacle& obstacle) {
   }
   if (is_on_reference_line_ &&
       obstacle_boundary.end_s() < sl_boundary_info_.adc_sl_boundary_.end_s() &&
-      reference_line_.IsOnLane(obstacle_boundary)) {
+      (reference_line_.IsOnLane(obstacle_boundary) ||
+       obstacle_boundary.end_s() < 0.0)) {  // if obstacle is far backward
     return true;
   }
   return false;

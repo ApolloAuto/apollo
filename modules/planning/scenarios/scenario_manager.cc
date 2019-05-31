@@ -910,9 +910,40 @@ void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
 // update: pull_over status in PlanningContext
 void ScenarioManager::UpdatePlanningContextPullOverScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
-  if (scenario_type != ScenarioConfig::PULL_OVER) {
-    PlanningContext::Instance()->mutable_planning_status()->clear_pull_over();
+  if (scenario_type == ScenarioConfig::PULL_OVER) {
+    PlanningContext::Instance()->mutable_planning_status()->
+        mutable_pull_over()->set_is_in_pull_over_scenario(true);
     return;
+  }
+  PlanningContext::Instance()->mutable_planning_status()->
+      mutable_pull_over()->set_is_in_pull_over_scenario(false);
+
+  const auto& pull_over_status =
+      PlanningContext::Instance()->planning_status().pull_over();
+  if (pull_over_status.has_x() && pull_over_status.has_y()) {
+    const auto& routing = frame.local_view().routing;
+    if (routing->routing_request().waypoint_size() >= 2) {
+      // keep pull-over stop fence if destination not changed
+      const auto& reference_line_info = frame.reference_line_info().front();
+      const auto& reference_line = reference_line_info.reference_line();
+
+      common::SLPoint dest_sl;
+      const auto& routing_end =
+          *(routing->routing_request().waypoint().rbegin());
+      reference_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()},
+                            &dest_sl);
+
+      common::SLPoint pull_over_sl;
+      reference_line.XYToSL({pull_over_status.x(), pull_over_status.y()},
+                            &pull_over_sl);
+
+      constexpr double kDestMaxDelta = 30.0;  // meter
+      if (std::fabs(dest_sl.s() - pull_over_sl.s()) > kDestMaxDelta) {
+        PlanningContext::Instance()
+            ->mutable_planning_status()
+            ->clear_pull_over();
+      }
+    }
   }
 }
 
