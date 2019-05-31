@@ -27,6 +27,7 @@ enum HType {
   Msg_ID,
   Msg_Size,
   Msg_Packs,
+  Pack_Size,
   Msg_Index,
   Time_Stamp,
 
