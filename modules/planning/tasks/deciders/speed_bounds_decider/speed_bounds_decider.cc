@@ -61,7 +61,7 @@ Status SpeedBoundsDecider::Process(
   // 1. Map obstacles into st graph
   STBoundaryMapper boundary_mapper(adc_sl_boundary, speed_bounds_config_,
                                    reference_line, path_data,
-                                   speed_bounds_config_.total_path_length(),
+                                   path_data.discretized_path().Length(),
                                    speed_bounds_config_.total_time());
 
   path_decision->EraseStBoundaries();
@@ -103,7 +103,6 @@ Status SpeedBoundsDecider::Process(
 
   // 3. Get path_length as s axis search bound in st graph
   const double path_data_length = path_data.discretized_path().Length();
-  const double path_length_by_conf = speed_bounds_config_.total_path_length();
 
   // 4. Get time duration as t axis search bound in st graph
   const double total_time_by_conf = speed_bounds_config_.total_time();
@@ -117,8 +116,8 @@ Status SpeedBoundsDecider::Process(
   STGraphDebug *st_graph_debug = debug->mutable_planning_data()->add_st_graph();
 
   st_graph_data->LoadData(boundaries, min_s_on_st_boundaries, init_point,
-                          speed_limit, path_data_length, path_length_by_conf,
-                          total_time_by_conf, st_graph_debug);
+                          speed_limit, path_data_length, total_time_by_conf,
+                          st_graph_debug);
 
   // Create and record st_graph debug info
   RecordSTGraphDebug(*st_graph_data, st_graph_debug);
