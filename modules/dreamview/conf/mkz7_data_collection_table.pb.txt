@@ -715,7 +715,7 @@ scenario {
           value: 1
         }
       }
-    }    
+    }
   }
 }
 
@@ -1436,7 +1436,7 @@ scenario {
       }
     }
 
-    
+
     category {
       key: "Branch Right, Speed 0 ~ 10mps, Throttle deadzone ~ 25%"
       value {
@@ -2150,7 +2150,7 @@ scenario {
         }
       }
     }
-  }  
+  }
 }
 
 scenario {
@@ -2651,7 +2651,7 @@ scenario {
         }
       }
     }
-    
+
     category {
       key: "Turn Right, Speed 0 ~ 10mps, Throttle deadzone ~ 25%"
       value {
@@ -3147,7 +3147,7 @@ scenario {
         }
       }
     }
-  }  
+  }
 }
 
 scenario {
@@ -3588,7 +3588,7 @@ scenario {
         }
       }
     }
-    
+
     category {
       key: "Sharp Right, Speed 0 ~ 10mps, Throttle deadzone ~ 25%"
       value {
@@ -4024,7 +4024,7 @@ scenario {
         }
       }
     }
-  }  
+  }
 }
 
 scenario {
