@@ -119,9 +119,9 @@ Status PathBoundsDecider::Process(
             std::get<1>(pullover_path_bound[i]),
             std::get<2>(pullover_path_bound[i]));
       }
-      candidate_path_boundaries.emplace_back(std::get<0>(pullover_path_bound[0]),
-                                             kPathBoundsDeciderResolution,
-                                             pullover_path_bound_pair);
+      candidate_path_boundaries.emplace_back(
+          std::get<0>(pullover_path_bound[0]),
+          kPathBoundsDeciderResolution, pullover_path_bound_pair);
       candidate_path_boundaries.back().set_label("regular/pullover");
 
       reference_line_info->SetCandidatePathBoundaries(
@@ -241,7 +241,8 @@ Status PathBoundsDecider::Process(
   //           VehicleConfigHelper::GetConfig().vehicle_param().width());
 
   //       // Trim the path bound based on the pull-over s.
-  //       int pull_over_pos_idx = std::max(std::get<3>(pull_over_configuration),
+  //       int pull_over_pos_idx =
+  //            std::max(std::get<3>(pull_over_configuration),
   //                                        kNumExtraTailBoundPoint) +
   //                               kNumExtraTailBoundPoint;
   //       for (auto& path_boundary : candidate_path_boundaries) {
@@ -481,8 +482,8 @@ int PathBoundsDecider::IsPointWithinPathBound(
     return 0;
   }
   int idx_after = 0;
-  while(idx_after < static_cast<int>(path_bound.size()) &&
-        std::get<0>(path_bound[idx_after]) < point_sl.s()) {
+  while (idx_after < static_cast<int>(path_bound.size()) &&
+         std::get<0>(path_bound[idx_after]) < point_sl.s()) {
     ++idx_after;
   }
   int idx_before = idx_after - 1;
@@ -514,31 +515,6 @@ bool PathBoundsDecider::SearchPullOverPosition(
          << ", ADC is at s = " << adc_end_s;
   if (destination_s - adc_end_s < config_.path_bounds_decider_config()
           .pull_over_destination_to_adc_buffer()) {
-    // ADEBUG << "ADC is close to the destination.";
-    // const auto& pull_over_status =
-    //     PlanningContext::Instance()->planning_status().pull_over();
-    // if (pull_over_status.has_x() && pull_over_status.has_y()) {
-    //   common::SLPoint pull_over_sl;
-    //   reference_line.XYToSL({pull_over_status.x(), pull_over_status.y()},
-    //                         &pull_over_sl);
-
-    //   ADEBUG << "pull-over pisition: s[" << pull_over_sl.s() << "] l["
-    //          << pull_over_sl.l() << "] x[" << pull_over_status.x() << "] y["
-    //          << pull_over_status.y() << "] theta[" << pull_over_status.theta()
-    //          << "]";
-    //   int pull_over_idx = 0;
-    //   for (const auto& path_bound_point : path_bound) {
-    //     if (std::get<0>(path_bound_point) < pull_over_sl.s()) {
-    //       ++pull_over_idx;
-    //     } else {
-    //       break;
-    //     }
-    //   }
-    //   *pull_over_configuration =
-    //       std::make_tuple(pull_over_status.x(), pull_over_status.y(),
-    //                       pull_over_status.theta(), pull_over_idx);
-    //   return true;
-    // } else {
     ADEBUG << "Destination is too close to ADC. distance["
            << destination_s - adc_end_s << "]";
     return false;
@@ -603,7 +579,7 @@ bool PathBoundsDecider::SearchPullOverPosition(
       // const auto hdmap_ptr = HDMapUtil::BaseMapPtr();
       // if (reference_line_info.GetNeighborLaneInfo(LaneType::RightForward,
       //                                             curr_s, &neighbor_lane_id,
-      //                                             &curr_neighbor_lane_width)) {
+      //                                          &curr_neighbor_lane_width)) {
       //   const auto neighbor_lane = hdmap_ptr->GetLaneById(neighbor_lane_id);
       //   if (neighbor_lane &&
       //       neighbor_lane->lane().type() == hdmap::Lane::CITY_DRIVING) {
@@ -615,7 +591,7 @@ bool PathBoundsDecider::SearchPullOverPosition(
       // }
       // if (reference_line_info.GetNeighborLaneInfo(LaneType::RightReverse,
       //                                             curr_s, &neighbor_lane_id,
-      //                                             &curr_neighbor_lane_width)) {
+      //                                          &curr_neighbor_lane_width)) {
       //   const auto neighbor_lane = hdmap_ptr->GetLaneById(neighbor_lane_id);
       //   if (neighbor_lane &&
       //       neighbor_lane->lane().type() == hdmap::Lane::CITY_DRIVING) {
