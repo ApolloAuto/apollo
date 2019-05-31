@@ -123,32 +123,6 @@ void SpeedProfileGenerator::FillEnoughSpeedPoints(SpeedData* const speed_data) {
   }
 }
 
-SpeedData SpeedProfileGenerator::GenerateFallbackSpeedProfile() {
-  const double init_v = EgoInfo::Instance()->start_point().v();
-  const double init_a = EgoInfo::Instance()->start_point().a();
-  if (init_v > FLAGS_polynomial_speed_fallback_velocity) {
-    auto speed_data = GenerateStopProfileFromPolynomial(init_v, init_a);
-    if (!speed_data.empty()) {
-      return speed_data;
-    }
-  }
-  return GenerateStopProfile(init_v, init_a);
-}
-
-SpeedData SpeedProfileGenerator::GenerateFallbackSpeedProfileWithStopDistance(
-    const double stop_distance) {
-  const double init_v = EgoInfo::Instance()->start_point().v();
-  const double init_a = EgoInfo::Instance()->start_point().a();
-  if (init_v > FLAGS_polynomial_speed_fallback_velocity) {
-    auto speed_data =
-        GenerateStopProfileFromPolynomial(init_v, init_a, stop_distance);
-    if (!speed_data.empty()) {
-      return speed_data;
-    }
-  }
-  return GenerateStopProfile(init_v, init_a, stop_distance);
-}
-
 SpeedData SpeedProfileGenerator::GenerateStopProfile(const double init_speed,
                                                      const double init_acc) {
   AERROR << "Slowing down the car within a constant deceleration with fallback "
@@ -208,79 +182,6 @@ SpeedData SpeedProfileGenerator::GenerateStopProfile(
   }
   FillEnoughSpeedPoints(&speed_data);
   return speed_data;
-}
-
-SpeedData SpeedProfileGenerator::GenerateStopProfileFromPolynomial(
-    const double init_speed, const double init_acc,
-    const double stop_distance) {
-  AERROR << "Slowing down the car within a stop distance with polynomial.";
-  constexpr double kMaxT = 4.0;
-  // TODO(Jinyun) reduce or refactor below configuration numbers
-  const double max_s = std::min(50.0, stop_distance);
-  for (double t = 2.0; t <= kMaxT; t += 0.5) {
-    for (double s = 0.0; s < max_s; s += 0.5) {
-      QuinticPolynomialCurve1d curve(0.0, init_speed, init_acc, s, 0.0, 0.0, t);
-      if (!IsValidProfile(curve)) {
-        continue;
-      }
-      constexpr double kUnitT = 0.02;
-      SpeedData speed_data;
-      for (double curve_t = 0.0; curve_t <= t; curve_t += kUnitT) {
-        const double curve_s = curve.Evaluate(0, curve_t);
-        const double curve_v = curve.Evaluate(1, curve_t);
-        const double curve_a = curve.Evaluate(2, curve_t);
-        const double curve_da = curve.Evaluate(3, curve_t);
-        speed_data.AppendSpeedPoint(curve_s, curve_t, curve_v, curve_a,
-                                    curve_da);
-      }
-      FillEnoughSpeedPoints(&speed_data);
-      return speed_data;
-    }
-  }
-  return SpeedData();
-}
-
-SpeedData SpeedProfileGenerator::GenerateStopProfileFromPolynomial(
-    const double init_speed, const double init_acc) {
-  AERROR << "Slowing down the car with polynomial.";
-  constexpr double kMaxT = 4.0;
-  for (double t = 2.0; t <= kMaxT; t += 0.5) {
-    for (double s = 0.0;
-         s < std::min(50.0, EgoInfo::Instance()->front_clear_distance() - 0.3);
-         s += 1.0) {
-      QuinticPolynomialCurve1d curve(0.0, init_speed, init_acc, s, 0.0, 0.0, t);
-      if (!IsValidProfile(curve)) {
-        continue;
-      }
-      constexpr double kUnitT = 0.02;
-      SpeedData speed_data;
-      for (double curve_t = 0.0; curve_t <= t; curve_t += kUnitT) {
-        const double curve_s = curve.Evaluate(0, curve_t);
-        const double curve_v = curve.Evaluate(1, curve_t);
-        const double curve_a = curve.Evaluate(2, curve_t);
-        const double curve_da = curve.Evaluate(3, curve_t);
-        speed_data.AppendSpeedPoint(curve_s, curve_t, curve_v, curve_a,
-                                    curve_da);
-      }
-      FillEnoughSpeedPoints(&speed_data);
-      return speed_data;
-    }
-  }
-  return SpeedData();
-}
-
-bool SpeedProfileGenerator::IsValidProfile(
-    const QuinticPolynomialCurve1d& curve) {
-  for (double evaluate_t = 0.1; evaluate_t <= curve.ParamLength();
-       evaluate_t += 0.2) {
-    const double v = curve.Evaluate(1, evaluate_t);
-    const double a = curve.Evaluate(2, evaluate_t);
-    constexpr double kEpsilon = 1e-3;
-    if (v < -kEpsilon || a < -5.0) {
-      return false;
-    }
-  }
-  return true;
 }
 
 SpeedData SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(
