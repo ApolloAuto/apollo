@@ -97,6 +97,17 @@ Status PathBoundsDecider::Process(
                                          fallback_path_bound_pair);
   candidate_path_boundaries.back().set_label("fallback");
 
+  // If pull-over is requested, generate pull-over path boundary.
+  auto* pull_over_status = PlanningContext::Instance()
+                               ->mutable_planning_status()
+                               ->mutable_pull_over();
+  if (pull_over_status->is_in_pull_over_scenario()) {
+    reference_line_info->SetCandidatePathBoundaries(
+        std::move(candidate_path_boundaries));
+    ADEBUG << "Completed pullover and fallback path boundaries generation.";
+    return Status::OK();
+  }
+
   // Generate regular path boundaries.
   std::vector<LaneBorrowInfo> lane_borrow_info_list;
   if (reference_line_info->is_path_lane_borrow()) {
@@ -172,11 +183,8 @@ Status PathBoundsDecider::Process(
   }
 
   // Remove redundant boundaries.
-  RemoveRedundantPathBoundaries(&candidate_path_boundaries);
+  // RemoveRedundantPathBoundaries(&candidate_path_boundaries);
 
-  auto* pull_over_status = PlanningContext::Instance()
-                               ->mutable_planning_status()
-                               ->mutable_pull_over();
   // If needed, search for pull-over position.
   if (config_.path_bounds_decider_config().is_pull_over()) {
     if (!exist_self_path_bound) {
