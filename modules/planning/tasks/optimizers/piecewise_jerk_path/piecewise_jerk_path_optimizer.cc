@@ -175,9 +175,6 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   *dx = piecewise_jerk_problem.opt_dx();
   *ddx = piecewise_jerk_problem.opt_ddx();
 
-  // for (size_t i = 0; i < lat_boundaries.size(); ++i) {
-  //   AERROR << "For s = [" << i << "], x = " << (*x)[i];
-  // }
   return true;
 }
 

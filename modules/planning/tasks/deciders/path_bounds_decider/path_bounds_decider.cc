@@ -208,57 +208,6 @@ Status PathBoundsDecider::Process(
   // Remove redundant boundaries.
   // RemoveRedundantPathBoundaries(&candidate_path_boundaries);
 
-  // If needed, search for pull-over position.
-  // if (config_.path_bounds_decider_config().is_pull_over()) {
-  //   if (!exist_self_path_bound) {
-  //     pull_over_status->Clear();
-  //     pull_over_status->set_is_feasible(false);
-  //   } else {
-  //     // TODO(QiL, Jiacheng): simplify the interface for
-  //     // 'SearchPullOverPosition' and use proto directly
-  //     std::tuple<double, double, double, int> pull_over_configuration;
-  //     if (!SearchPullOverPosition(*frame, *reference_line_info,
-  //                                 regular_self_path_bound,
-  //                                 &pull_over_configuration)) {
-  //       pull_over_status->Clear();
-  //       pull_over_status->set_is_feasible(false);
-  //       ADEBUG << "Failed to find a pull-over position.";
-  //     } else {
-  //       pull_over_status->Clear();
-  //       pull_over_status->set_is_feasible(true);
-  //       pull_over_status->set_x(std::get<0>(pull_over_configuration));
-  //       pull_over_status->set_y(std::get<1>(pull_over_configuration));
-  //       pull_over_status->set_theta(std::get<2>(pull_over_configuration));
-
-  //       // TODO(jiacheng): find-tune this.
-  //       pull_over_status->set_length_front(
-  //           VehicleConfigHelper::GetConfig().vehicle_param().length());
-  //       pull_over_status->set_length_back(
-  //           VehicleConfigHelper::GetConfig().vehicle_param().length());
-  //       pull_over_status->set_width_left(
-  //           VehicleConfigHelper::GetConfig().vehicle_param().width() + 0.5);
-  //       pull_over_status->set_width_right(
-  //           VehicleConfigHelper::GetConfig().vehicle_param().width());
-
-  //       // Trim the path bound based on the pull-over s.
-  //       int pull_over_pos_idx =
-  //            std::max(std::get<3>(pull_over_configuration),
-  //                                        kNumExtraTailBoundPoint) +
-  //                               kNumExtraTailBoundPoint;
-  //       for (auto& path_boundary : candidate_path_boundaries) {
-  //         if (path_boundary.label().find("regular") != std::string::npos) {
-  //           std::vector<std::pair<double, double>> new_path_boundary_pair;
-  //           for (size_t i = 0; i <= static_cast<size_t>(pull_over_pos_idx);
-  //                ++i) {
-  //             new_path_boundary_pair.push_back(path_boundary.boundary()[i]);
-  //           }
-  //           path_boundary.set_boundary(new_path_boundary_pair);
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
-
   // Success
   reference_line_info->SetCandidatePathBoundaries(
       std::move(candidate_path_boundaries));
@@ -582,37 +531,6 @@ bool PathBoundsDecider::SearchPullOverPosition(
         is_feasible_window = false;
         break;
       }
-
-      // // check rightmost driving lane:
-      // //   NONE/CITY_DRIVING/BIKING/SIDEWALK/PARKING
-      // // TODO(all): fix driving - bike - driving
-      // double curr_neighbor_lane_width = 0.0;
-      // hdmap::Id neighbor_lane_id;
-      // const auto hdmap_ptr = HDMapUtil::BaseMapPtr();
-      // if (reference_line_info.GetNeighborLaneInfo(LaneType::RightForward,
-      //                                             curr_s, &neighbor_lane_id,
-      //                                          &curr_neighbor_lane_width)) {
-      //   const auto neighbor_lane = hdmap_ptr->GetLaneById(neighbor_lane_id);
-      //   if (neighbor_lane &&
-      //       neighbor_lane->lane().type() == hdmap::Lane::CITY_DRIVING) {
-      //     ADEBUG << "Not the rightmost CITY_DRIVING lane. "
-      //            << "Not feasible for pull-over.";
-      //     is_feasible_window = false;
-      //     break;
-      //   }
-      // }
-      // if (reference_line_info.GetNeighborLaneInfo(LaneType::RightReverse,
-      //                                             curr_s, &neighbor_lane_id,
-      //                                          &curr_neighbor_lane_width)) {
-      //   const auto neighbor_lane = hdmap_ptr->GetLaneById(neighbor_lane_id);
-      //   if (neighbor_lane &&
-      //       neighbor_lane->lane().type() == hdmap::Lane::CITY_DRIVING) {
-      //     ADEBUG << "Not the rightmost CITY_DRIVING lane. "
-      //            << "Not feasible for pull-over.";
-      //     is_feasible_window = false;
-      //     break;
-      //   }
-      // }
 
       --j;
     }
