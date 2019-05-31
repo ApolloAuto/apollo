@@ -33,6 +33,10 @@ TEST(BridgeBufferTest, bridge_buf_test) {
   char *p1 = buf;
   EXPECT_EQ(100, buf.capacity());
   EXPECT_EQ(100, buf.size());
+  EXPECT_NE(p, p1);
+
+  std::string str("hello world");
+  snprintf(buf, str.length() + 1, "%s", str.c_str());
   EXPECT_STREQ(buf, str.c_str());
 
   buf.reset(80);
