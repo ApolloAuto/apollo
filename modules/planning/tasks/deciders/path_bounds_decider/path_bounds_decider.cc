@@ -407,7 +407,13 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(const Frame& frame,
              curr_idx + kNumExtraTailBoundPoint) {
         path_bound->pop_back();
       }
-      // PathBoundsDebugString(*path_bound);
+      for (int idx = 0; idx < kNumExtraTailBoundPoint; ++idx) {
+        std::get<1>((*path_bound)[path_bound->size() - 1 - idx]) =
+            std::get<1>((*path_bound)[curr_idx]);
+        std::get<2>((*path_bound)[path_bound->size() - 1 - idx]) =
+            std::get<2>((*path_bound)[curr_idx]);
+      }
+      PathBoundsDebugString(*path_bound);
       return "";
     }
   }
@@ -439,6 +445,12 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(const Frame& frame,
   while (static_cast<int>(path_bound->size()) - 1 >
          std::get<3>(pull_over_configuration) + kNumExtraTailBoundPoint) {
     path_bound->pop_back();
+  }
+  for (int idx = 0; idx < kNumExtraTailBoundPoint; ++idx) {
+    std::get<1>((*path_bound)[path_bound->size() - 1 - idx]) =
+        std::get<1>((*path_bound)[std::get<3>(pull_over_configuration)]);
+    std::get<2>((*path_bound)[path_bound->size() - 1 - idx]) =
+        std::get<2>((*path_bound)[std::get<3>(pull_over_configuration)]);
   }
 
   return "";

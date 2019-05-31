@@ -91,7 +91,9 @@ Status PathAssessmentDecider::Process(
     SetPathInfo(*reference_line_info, &curr_path_data);
     // Trim all the lane-borrowing paths so that it ends with an in-lane
     // position.
-    TrimTailingOutLanePoints(&curr_path_data);
+    if (curr_path_data.path_label().find("pullover") == std::string::npos) {
+      TrimTailingOutLanePoints(&curr_path_data);
+    }
     // TODO(jiacheng): remove empty path_data.
 
     // RecordDebugInfo(curr_path_data, curr_path_data.path_label(),
