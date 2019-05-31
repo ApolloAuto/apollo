@@ -9,10 +9,15 @@ message BosConfig {
   optional string access_key = 2;
   optional string secret_key = 3;
 
-  // It's required to provide correct BOS endpoint. Please read the document
+  // It's required to provide correct BOS region. Please read the document
   // https://cloud.baidu.com/doc/BOS/S3.html#.E6.9C.8D.E5.8A.A1.E5.9F.9F.E5.90.8D
   // and check your configuration.
-  optional string endpoint = 4 [default = "https://s3.bj.bcebos.com"];
+  enum Region {
+    bj = 0;
+    gz = 1;
+    su = 2;
+  }
+  optional Region region = 4 [default = bj];
 }
 
 // Accept exactly one storage access config. And we highly recommend the
