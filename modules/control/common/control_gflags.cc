@@ -65,3 +65,6 @@ DEFINE_bool(
     trajectory_transform_to_com_drive, false,
     "Enable planning trajectory coordinate transformation from center of "
     "rear-axis to center of mass, during forward driving");
+
+DEFINE_bool(enable_maximum_steer_rate_limit, false,
+            "Enable steer rate limit obtained from vehicle_param.pb.txt");
