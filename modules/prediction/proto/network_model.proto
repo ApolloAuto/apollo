@@ -7,7 +7,7 @@ import "modules/prediction/proto/network_layers.proto";
 message VerificationSample {
   // data used to vertify the network model
   repeated TensorParameter features = 1;  // input to the network
-  optional float probability = 2;         // ouput probability of the network
+  optional float probability = 2;         // output probability of the network
   optional float distance = 3;            // output acceleration of the network
 }
 
