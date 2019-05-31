@@ -43,9 +43,6 @@ DEFINE_string(scenario_pull_over_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/pull_over_config.pb.txt",
               "The pull_over scenario configuration file");
-DEFINE_string(scenario_side_pass_config_file,
-              "/apollo/modules/planning/conf/scenario/side_pass_config.pb.txt",
-              "side_pass scenario configuration file");
 DEFINE_string(scenario_stop_sign_unprotected_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/stop_sign_unprotected_config.pb.txt",
@@ -73,9 +70,6 @@ DEFINE_bool(enable_scenario_bare_intersection, false,
 DEFINE_bool(enable_scenario_pull_over, false,
             "enable pull-over scenario in planning");
 
-DEFINE_double(side_pass_min_signal_intersection_distance, 50.0,
-              "meter, for intersection has signal, ADC will enter side pass "
-              "scenario only when it is farther than this threshoold");
 DEFINE_bool(enable_scenario_side_pass_multiple_parked_obstacles, true,
             "enable ADC to side-pass multiple parked obstacles without"
             "worrying if the obstacles are blocked by others.");
@@ -509,26 +503,6 @@ DEFINE_bool(
 DEFINE_double(smoother_stop_distance, 10.0,
               "(unit: meter) for ADC stop, if it is close to the stop point "
               "within this threshold, current planning will be smoothed.");
-
-DEFINE_double(side_pass_road_buffer, 0.05,
-              "(unit: meter) for side pass scenario ");
-DEFINE_double(side_pass_obstacle_l_buffer, 0.1,
-              "(unit: meter) for side pass scenario ");
-DEFINE_double(side_pass_obstacle_s_buffer, 2.0,
-              "(unit: meter) for side pass scenario ");
-DEFINE_double(side_pass_extra_road_buffer_during_turning, 0.1,
-              "(unit: meter) for side pass scenario ");
-DEFINE_double(side_pass_vehicle_buffer, 0.1,
-              "(unit: meter) for side pass scenario ");
-DEFINE_double(side_pass_off_road_center_threshold, 0.4,
-              "(unit: meter) for side pass scenario ");
-DEFINE_double(side_pass_trim_watch_window, 12.0,
-              "(unit: meter) for side pass scenario ");
-DEFINE_bool(side_pass_use_actual_laneinfo_for_path_generation, false,
-            "Whether to use the actual laneinfo for side-pass path generation,"
-            " or to use the planning starting-point's laneinfo all the time.");
-DEFINE_double(side_pass_driving_width_l_buffer, 0.1,
-              "(unit: meter) for side pass driving width l buffer");
 
 DEFINE_bool(enable_parallel_hybrid_a, false,
             "True to enable hybrid a* parallel implementation.");
