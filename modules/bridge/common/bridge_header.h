@@ -87,6 +87,7 @@ class BridgeHeader {
   HeaderItem<Msg_ID, uint32_t> msg_id_;
   HeaderItem<Msg_Size, size_t> msg_size_;
   HeaderItem<Msg_Packs, uint32_t> total_packs_;
+  HeaderItem<Pack_Size, size_t> pack_size_;
   HeaderItem<Msg_Index, uint32_t> index_;
   HeaderItem<Time_Stamp, double> time_stamp_;
   size_t header_size_ = 0;
@@ -96,6 +97,7 @@ class BridgeHeader {
     &msg_id_,
     &msg_size_,
     &total_packs_,
+    &pack_size_,
     &index_,
     &time_stamp_,
   };
