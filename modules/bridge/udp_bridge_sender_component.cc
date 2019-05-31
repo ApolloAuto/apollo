@@ -15,23 +15,20 @@
  *****************************************************************************/
 
 #include "modules/bridge/udp_bridge_sender_component.h"
-#include "modules/bridge/common/util.h"
 #include "modules/bridge/common/macro.h"
+#include "modules/bridge/common/util.h"
 
 namespace apollo {
 namespace bridge {
 
-#define BRIDGE_IMPL(pb_msg) template class UDPBridgeComponent<pb_msg>
+#define BRIDGE_IMPL(pb_msg) template class UDPBridgeSenderComponent<pb_msg>
 
-#define _1K 1024
-
-using apollo::bridge::UDPBridgeRemoteInfo;
+using apollo::bridge::UDPBridgeSenderRemoteInfo;
 using apollo::cyber::io::Session;
 using apollo::localization::LocalizationEstimate;
-using apollo::bridge::UDPBridgeSenderRemoteInfo;
 
 template <typename T>
-bool UDPBridgeComponent<T>::Init() {
+bool UDPBridgeSenderComponent<T>::Init() {
   AINFO << "UDP bridge init, startin..";
   buf_.reset(_1K);
   apollo::bridge::UDPBridgeSenderRemoteInfo udp_bridge_remote;
@@ -49,7 +46,7 @@ bool UDPBridgeComponent<T>::Init() {
 }
 
 template <typename T>
-bool UDPBridgeComponent<T>::Proc(const std::shared_ptr<T> &pb_msg) {
+bool UDPBridgeSenderComponent<T>::Proc(const std::shared_ptr<T> &pb_msg) {
   if (remote_port_ == 0 || remote_ip_.empty()) {
     AERROR << "remote info is invalid!";
     return false;
@@ -69,7 +66,7 @@ bool UDPBridgeComponent<T>::Proc(const std::shared_ptr<T> &pb_msg) {
 
         Session session;
         session.Socket(AF_INET, SOCK_DGRAM, 0);
-        if (session.Connect((struct sockaddr*)&server_addr,
+        if (session.Connect((struct sockaddr *)&server_addr,
                             sizeof(server_addr)) < 0) {
           std::cout << "connect to server failed, " << strerror(errno)
                     << std::endl;
