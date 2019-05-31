@@ -1310,6 +1310,10 @@ void Obstacle::SetLanePoints(const Feature* feature,
     int lane_index = lane_sequence->adc_lane_segment_idx();
     double total_s = 0.0;
     double lane_seg_s = lane_sequence->lane_segment(lane_index).adc_s();
+    if (!is_bidirection) {
+      lane_index = 0;
+      lane_seg_s = lane_sequence->lane_segment(0).start_s();
+    }
     std::size_t count_point = 0;
     while (lane_index < lane_sequence->lane_segment_size() &&
            count_point < max_num_lane_point) {
