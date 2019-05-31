@@ -40,30 +40,55 @@ using apollo::cyber::proto::ParamType;
  */
 class Parameter {
  public:
-  ///< Empty contructor
+  /**
+   * @brief Empty contructor
+   */
   Parameter();
-  ///< copy-constructor
+  /**
+   * @brief copy-constructor
+   */
   explicit Parameter(const Parameter& parameter);
-  ///< Just point the paramter's name
+  /**
+   * @brief Just point the paramter's name
+   */
   explicit Parameter(const std::string& name);
-  ///< use a bool type value to construct the parameter
+  /**
+   * @brief use a bool type value to construct the parameter
+   */
   Parameter(const std::string& name, const bool bool_value);
-  ///< use a bool type value to construct the parameter
+  /**
+   * @brief use a int type value to construct the parameter
+   */
   Parameter(const std::string& name, const int int_value);
-  ///< use a int64_t type value to construct the parameter
+  /**
+   * @brief use a int64_t type value to construct the parameter
+   */
   Parameter(const std::string& name, const int64_t int_value);
-  ///< use a float type value to construct the parameter
+  /**
+   * @brief use a float type value to construct the parameter
+   */
   Parameter(const std::string& name, const float doule_value);
-  ///< use a double type value to construct the parameter
+  /**
+   * @brief use a double type value to construct the parameter
+   */
   Parameter(const std::string& name, const double double_value);
-  ///< use a string type value to construct the parameter
+  /**
+   * @brief use a string type value to construct the parameter
+   */
   Parameter(const std::string& name, const std::string& string_value);
-  ///< use a const char* type value to construct the parameter
+  /**
+   * @brief use a char* type value to construct the parameter
+   */
   Parameter(const std::string& name, const char* string_value);
-  ///< use a protobuf type value to construct the parameter
+  /**
+   * @brief use a protobuf type value to construct the parameter
+   */
   Parameter(const std::string& name, const std::string& msg_str,
             const std::string& full_name, const std::string& proto_desc);
-  ///< use a google::protobuf::Message type value to construct the parameter
+  /**
+   * @brief use a google::protobuf::Message type value to construct the
+   * parameter
+   */
   Parameter(const std::string& name, const google::protobuf::Message& msg);
 
   /**
