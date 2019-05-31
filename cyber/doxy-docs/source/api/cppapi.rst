@@ -10,7 +10,7 @@ Defined in ``cyber/node/node.h``
 
 
 cyber/node/reader_base.h
-====================
+===========================
 
 Defined in ``cyber/node/reader_base.h``
 
@@ -30,7 +30,7 @@ Defined in ``cyber/node/reader.h``
 
 
 cyber/node/writer_base.h
-====================
+=============================
 
 Defined in ``cyber/node/writer_base.h``
 
@@ -54,7 +54,7 @@ cyber/node/node_channel_impl.h
 
 Defined in ``cyber/node/node_channel_impl.h``
 
-.. doxygenclass:: apollo::cyber::ReaderConfig
+.. doxygenstruct:: apollo::cyber::ReaderConfig
    :members:
    :project: Cyber RT Documents
 
