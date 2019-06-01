@@ -42,6 +42,17 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "bridge_header",
+    srcs = [
+        "bridge_header.cc",
+    ],
+    hdrs = [
+        "bridge_header.h",
+        "bridge_header_item.h",
+    ],
+)
+
 cc_test(
     name = "bridge_buffer_test",
     size = "small",
