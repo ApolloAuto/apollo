@@ -116,9 +116,15 @@ bool IterativeAnchoringSmoother::Smooth(
   // Check initial path collision avoidance, if it fails, smoother assumption
   // fails
   // TODO(Jinyun): Fix initial interpolating collision
-  if (!CheckInputValidity(interpolated_warm_start_path)) {
-    AERROR << "Interpolated warm start trajectory colliding with obstacle";
-    return false;
+  std::vector<size_t> colliding_point_index;
+  if (!CheckInputValidity(interpolated_warm_start_path,
+                          &colliding_point_index)) {
+    ADEBUG << "Interpolated warm start trajectory colliding with obstacle";
+    if (!ReAnchoring(colliding_point_index, &interpolated_warm_start_path)) {
+      AERROR << "Fail to reanchor colliding interpolated warm start trajectory "
+                "in reasonable range";
+      return false;
+    }
   }
 
   const auto path_smooth_start_timestamp = std::chrono::system_clock::now();
@@ -225,22 +231,95 @@ void IterativeAnchoringSmoother::AdjustStartEndHeading(
 }
 
 bool IterativeAnchoringSmoother::CheckInputValidity(
-    const DiscretizedPath& path_points) {
+    const DiscretizedPath& path_points,
+    std::vector<size_t>* colliding_point_index) {
+  CHECK_NOTNULL(colliding_point_index);
+  colliding_point_index->clear();
+
   const size_t path_points_size = path_points.size();
   for (size_t i = 0; i < path_points_size; ++i) {
     const double heading = path_points[i].theta();
-
     Box2d ego_box(
         {path_points[i].x() + center_shift_distance_ * std::cos(heading),
          path_points[i].y() + center_shift_distance_ * std::sin(heading)},
         heading, ego_length_, ego_width_);
 
+    bool is_colliding = false;
     for (const auto& obstacle_linesegments : obstacles_linesegments_vec_) {
       for (const LineSegment2d& linesegment : obstacle_linesegments) {
         if (ego_box.HasOverlap(linesegment)) {
-          return false;
+          colliding_point_index->push_back(i);
+          is_colliding = true;
+          break;
         }
       }
+      if (is_colliding) {
+        break;
+      }
+    }
+  }
+  if (!colliding_point_index->empty()) {
+    return false;
+  }
+  return true;
+}
+
+bool IterativeAnchoringSmoother::ReAnchoring(
+    const std::vector<size_t>& colliding_point_index,
+    DiscretizedPath* path_points) {
+  CHECK_NOTNULL(path_points);
+  if (colliding_point_index.empty()) {
+    ADEBUG << "no point needs to be re-anchored";
+    return true;
+  }
+  CHECK_GT(path_points->size(),
+           *(std::max_element(colliding_point_index.begin(),
+                              colliding_point_index.end())));
+  // TODO(Jinyun): move to confs
+  const size_t reanchoring_trails_num = 10;
+  const double stddev = 0.25;
+  std::random_device rd;
+  std::default_random_engine gen = std::default_random_engine(rd());
+  std::normal_distribution<> dis{0, stddev};
+
+  for (const auto index : colliding_point_index) {
+    bool reanchoring_success = false;
+    for (size_t i = 0; i < reanchoring_trails_num; ++i) {
+      // Get ego box for collision check on collision point index
+      const double heading = path_points->at(index).theta();
+      Box2d ego_box({path_points->at(index).x() +
+                         center_shift_distance_ * std::cos(heading),
+                     path_points->at(index).y() +
+                         center_shift_distance_ * std::sin(heading)},
+                    heading, ego_length_, ego_width_);
+      bool is_colliding = false;
+      for (const auto& obstacle_linesegments : obstacles_linesegments_vec_) {
+        for (const LineSegment2d& linesegment : obstacle_linesegments) {
+          if (ego_box.HasOverlap(linesegment)) {
+            is_colliding = true;
+            break;
+          }
+        }
+        if (is_colliding) {
+          break;
+        }
+      }
+      if (is_colliding) {
+        // Adjust the point by randomly move around the original points
+        double rand_dev =
+            common::math::Clamp(dis(gen), 2.0 * stddev, -2.0 * stddev);
+        path_points->at(index).set_x(path_points->at(index).x() + rand_dev);
+        path_points->at(index).set_y(path_points->at(index).y() + rand_dev);
+      } else {
+        reanchoring_success = true;
+        break;
+      }
+    }
+
+    if (!reanchoring_success) {
+      AERROR << "interpolated points at index " << index
+             << "can't be successfully reanchored";
+      return false;
     }
   }
   return true;
@@ -327,7 +406,7 @@ bool IterativeAnchoringSmoother::CheckCollisionAvoidance(
          path_points[i].y() + center_shift_distance_ * std::sin(heading)},
         heading, ego_length_, ego_width_);
 
-    double is_colliding = false;
+    bool is_colliding = false;
     for (const auto& obstacle_linesegments : obstacles_linesegments_vec_) {
       for (const LineSegment2d& linesegment : obstacle_linesegments) {
         if (ego_box.HasOverlap(linesegment)) {

@@ -51,7 +51,11 @@ class IterativeAnchoringSmoother {
   void AdjustStartEndHeading(const Eigen::MatrixXd& xWS, DiscretizedPath* path,
                              std::vector<double>* bounds);
 
-  bool CheckInputValidity(const DiscretizedPath& path_points);
+  bool CheckInputValidity(const DiscretizedPath& path_points,
+                          std::vector<size_t>* colliding_point_index);
+
+  bool ReAnchoring(const std::vector<size_t>& colliding_point_index,
+                   DiscretizedPath* path_points);
 
   bool SmoothPath(const DiscretizedPath& raw_path_points,
                   const std::vector<double>& bounds,
