@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_map/base_map/base_map_pool.h"
-
-#include "cyber/common/log.h"
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
@@ -43,9 +41,7 @@ void BaseMapNodePool::Initial(const BaseMapConfig* map_config,
 }
 
 void BaseMapNodePool::Release() {
-  if (node_reset_workers_.valid()) {
-    node_reset_workers_.get();
-  }
+  node_reset_workers_.get();
   typename std::list<BaseMapNode*>::iterator i = free_list_.begin();
   while (i != free_list_.end()) {
     FinalizeMapNode(*i);
@@ -65,14 +61,12 @@ void BaseMapNodePool::Release() {
 
 BaseMapNode* BaseMapNodePool::AllocMapNode() {
   if (free_list_.empty()) {
-    if (node_reset_workers_.valid()) {
-      node_reset_workers_.wait();
-    }
+    node_reset_workers_.wait();
   }
   boost::unique_lock<boost::mutex> lock(mutex_);
   if (free_list_.empty()) {
     if (is_fixed_size_) {
-      return nullptr;
+      return NULL;
     }
     BaseMapNode* node = AllocNewMapNode();
     InitNewMapNode(node);
@@ -89,7 +83,7 @@ BaseMapNode* BaseMapNodePool::AllocMapNode() {
 
 void BaseMapNodePool::FreeMapNode(BaseMapNode* map_node) {
   node_reset_workers_ =
-      cyber::Async(&BaseMapNodePool::FreeMapNodeTask, this, map_node);
+    cyber::Async(&BaseMapNodePool::FreeMapNodeTask, this, map_node);
 }
 
 void BaseMapNodePool::FreeMapNodeTask(BaseMapNode* map_node) {
@@ -98,14 +92,16 @@ void BaseMapNodePool::FreeMapNodeTask(BaseMapNode* map_node) {
   {
     boost::unique_lock<boost::mutex> lock(mutex_);
     typename std::set<BaseMapNode*>::iterator f = busy_nodes_.find(map_node);
-    DCHECK(f != busy_nodes_.end());
+    if (f == busy_nodes_.end()) {
+      throw "[BaseMapNodePool::free_map_node_task] f == busy_nodes_.end()";
+    }
     free_list_.push_back(*f);
     busy_nodes_.erase(f);
   }
 }
 
 void BaseMapNodePool::InitNewMapNode(BaseMapNode* node) {
-  node->InitMapMatrix(map_config_);
+  node->Init(map_config_);
   return;
 }
 

@@ -18,8 +18,8 @@ cc_binary(
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
-        "//modules/localization/msf/local_map/lossless_map:localization_msf_lossless_map",
-        "@eigen",
+        "//modules/localization/msf/local_map/pyramid_map:localization_msf_pyramid_map",
+        "@eigen//:eigen",
     ],
 )
 
@@ -36,12 +36,9 @@ cc_binary(
     linkstatic = 0,
     deps = [
         "//cyber",
-        "//modules/localization/msf/common/io:localization_msf_common_io",
-        "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
-        "//modules/localization/msf/local_map/lossless_map:localization_msf_lossless_map",
-        "//modules/localization/msf/local_map/lossy_map:localization_msf_lossy_map",
-        "@eigen",
+        "//modules/localization/msf/local_map/pyramid_map:localization_msf_pyramid_map",
+        "@eigen//:eigen",
     ],
 )
 
@@ -58,7 +55,7 @@ cc_binary(
     linkstatic = 0,
     deps = [
         "//modules/localization/msf/local_tool/map_creation/poses_interpolation:poses_interpolation_lib",
-        "@eigen",
+        "@eigen//:eigen",
     ],
 )
 

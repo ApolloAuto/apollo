@@ -15,17 +15,59 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_map/ndt_map/ndt_map_node.h"
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_matrix.h"
+#include "modules/localization/msf/local_map/ndt_map/ndt_map_matrix_handler.h"
+#include "modules/localization/msf/local_map/ndt_map/ndt_map_node_config.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
 
-NdtMapNode::NdtMapNode() : BaseMapNode(new NdtMapMatrix(), new ZlibStrategy()) {
+NdtMapNode::NdtMapNode() {}
+NdtMapNode::~NdtMapNode() {}
+
+void NdtMapNode::Init(const BaseMapConfig* map_config) {
+  map_config_ = map_config;
+
+  map_node_config_ = new NdtMapNodeConfig();
+  map_node_config_->map_version_ = map_config_->GetMapVersion();
+  map_node_config_->has_map_version_ = false;
+  map_node_config_->has_body_md5_ = false;
+  is_reserved_ = false;
+  data_is_ready_ = false;
+  is_changed_ = false;
   num_valid_cells_ = 0;
   num_valid_single_cells_ = 0;
+
+  map_matrix_ = new NdtMapMatrix();
+  map_matrix_handler_ = NdtMapMatrixHandlerSelector::AllocNdtMapMatrixHandler();
+  compression_strategy_ = new ZlibStrategy();
+  InitMapMatrix(map_config_);
 }
-NdtMapNode::~NdtMapNode() {}
+void NdtMapNode::Init(const BaseMapConfig* map_config,
+                      const MapNodeIndex& index, bool create_map_cells) {
+  map_config_ = map_config;
+
+  map_node_config_ = new NdtMapNodeConfig();
+  map_node_config_->node_index_ = index;
+  map_node_config_->map_version_ = map_config_->GetMapVersion();
+  left_top_corner_ =
+      ComputeLeftTopCorner(*map_config_, map_node_config_->node_index_);
+  map_node_config_->has_map_version_ = false;
+  map_node_config_->has_body_md5_ = false;
+  is_reserved_ = false;
+  data_is_ready_ = false;
+  is_changed_ = false;
+  num_valid_cells_ = 0;
+  num_valid_single_cells_ = 0;
+
+  map_matrix_ = new NdtMapMatrix();
+  map_matrix_handler_ = NdtMapMatrixHandlerSelector::AllocNdtMapMatrixHandler();
+  compression_strategy_ = new ZlibStrategy();
+  if (create_map_cells) {
+    InitMapMatrix(map_config_);
+  }
+}
+
 Eigen::Vector3d NdtMapNode::GetCoordinate3D(unsigned int x, unsigned int y,
                                             int altitude_index) const {
   const Eigen::Vector2d& left_top_corner = GetLeftTopCorner();

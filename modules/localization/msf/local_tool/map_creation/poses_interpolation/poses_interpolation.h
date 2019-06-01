@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@
 
 #include <Eigen/Geometry>
 #include <iostream>
-#include <string>
 #include <vector>
+#include <string>
 
 /**
  * @namespace apollo::localization
@@ -55,10 +55,10 @@ class PosesInterpolation {
                                std::vector<Eigen::Affine3d> *out_poses);
 
  private:
-  std::string input_poses_path_;
-  std::string ref_timestamps_path_;
-  std::string out_poses_path_;
-  std::string extrinsic_path_;
+  std::string input_poses_path_ = "";
+  std::string ref_timestamps_path_ = "";
+  std::string out_poses_path_ = "";
+  std::string extrinsic_path_ = "";
 
   Eigen::Affine3d velodyne_extrinsic_;
 

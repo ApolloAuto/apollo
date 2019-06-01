@@ -127,7 +127,8 @@ python ./scripts/record_bag.py --stop
 ## 7. 验证定位结果（可选）
 
 NDT模块定位结果的验证使用MSF模块的验证工具。
-假设步骤5中录取的数据存放路径为OUTPUT_PATH，杆臂值外参的路径为ANT_IMU_PATH
+假设步骤5中录取的数据存放路径为OUTPUT_PATH，杆臂值外参的路径为ANT_IMU_PATH。
+首先将录制的数据包重命名为以`.record`为后缀的文件。
 
 运行脚本
 ```

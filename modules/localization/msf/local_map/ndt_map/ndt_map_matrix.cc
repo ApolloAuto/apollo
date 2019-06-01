@@ -32,19 +32,21 @@ NdtMapSingleCell::NdtMapSingleCell() {
   is_icov_available_ = 0;
 }
 
-unsigned int NdtMapSingleCell::LoadBinary(unsigned char* buf) {
-  float* f_buf = reinterpret_cast<float*>(buf);
+size_t NdtMapSingleCell::LoadBinary(const unsigned char* buf) {
+  const float* f_buf = reinterpret_cast<const float*>(buf);
   intensity_ = *f_buf;
   ++f_buf;
   intensity_var_ = *f_buf;
   ++f_buf;
-  unsigned int* ui_buf =
-      reinterpret_cast<unsigned int*>(reinterpret_cast<void*>(f_buf));
+  const unsigned int* ui_buf =
+      reinterpret_cast<const unsigned int*>(
+        reinterpret_cast<const void*>(f_buf));
   road_pt_count_ = *ui_buf;
   ++ui_buf;
   count_ = *ui_buf;
   ++ui_buf;
-  f_buf = reinterpret_cast<float*>(reinterpret_cast<void*>(ui_buf));
+  f_buf = reinterpret_cast<const float*>(
+    reinterpret_cast<const void*>(ui_buf));
   centroid_[0] = *f_buf;
   ++f_buf;
   centroid_[1] = *f_buf;
@@ -65,7 +67,8 @@ unsigned int NdtMapSingleCell::LoadBinary(unsigned char* buf) {
       }
     }
     ++f_buf;
-    unsigned char* uc_buf = reinterpret_cast<unsigned char*>(f_buf);
+    const unsigned char* uc_buf =
+      reinterpret_cast<const unsigned char*>(f_buf);
     is_icov_available_ = *uc_buf;
   } else {
     centroid_icov_ = Eigen::Matrix3f::Identity();
@@ -180,33 +183,33 @@ int NdtMapCells::AddSample(const float intensity, const float altitude,
   return altitude_index;
 }
 
-unsigned int NdtMapCells::LoadBinary(unsigned char* buf) {
-  unsigned int* p = reinterpret_cast<unsigned int*>(buf);
+size_t NdtMapCells::LoadBinary(const unsigned char* buf) {
+  const unsigned int* p = reinterpret_cast<const unsigned int*>(buf);
   unsigned int size = *p;
   ++p;
 
-  unsigned char* pp = reinterpret_cast<unsigned char*>(p);
+  const unsigned char* pp = reinterpret_cast<const unsigned char*>(p);
   for (unsigned int i = 0; i < size; ++i) {
-    int* ppp = reinterpret_cast<int*>(pp);
+    const int* ppp = reinterpret_cast<const int*>(pp);
     int altitude_index = *ppp;
     ++ppp;
-    pp = reinterpret_cast<unsigned char*>(ppp);
+    pp = reinterpret_cast<const unsigned char*>(ppp);
     NdtMapSingleCell cell;
     unsigned int processed_size = cell.LoadBinary(pp);
     cells_[altitude_index] = cell;
     pp += processed_size;
   }
 
-  int* ppp = reinterpret_cast<int*>(pp);
+  const int* ppp = reinterpret_cast<const int*>(pp);
   max_altitude_index_ = *ppp;
   ++ppp;
   min_altitude_index_ = *ppp;
   ++ppp;
 
-  p = reinterpret_cast<unsigned int*>(ppp);
+  p = reinterpret_cast<const unsigned int*>(ppp);
   size = *p;
   ++p;
-  ppp = reinterpret_cast<int*>(p);
+  ppp = reinterpret_cast<const int*>(p);
   for (unsigned int i = 0; i < size; ++i) {
     int index = *ppp;
     ++ppp;
@@ -339,13 +342,13 @@ NdtMapMatrix::NdtMapMatrix(const NdtMapMatrix& cells) {
   }
 }
 
-void NdtMapMatrix::Init(const BaseMapConfig* config) {
-  Init(config->map_node_size_y_, config->map_node_size_x_);
+void NdtMapMatrix::Init(const BaseMapConfig& config) {
+  Init(config.map_node_size_y_, config.map_node_size_x_);
   return;
 }
 
-void NdtMapMatrix::Reset(const BaseMapConfig* config) {
-  Reset(config->map_node_size_y_, config->map_node_size_x_);
+void NdtMapMatrix::Reset() {
+  Reset(rows_, cols_);
 }
 
 void NdtMapMatrix::Init(unsigned int rows, unsigned int cols) {
@@ -365,14 +368,14 @@ void NdtMapMatrix::Reset(unsigned int rows, unsigned int cols) {
   }
 }
 
-unsigned int NdtMapMatrix::LoadBinary(unsigned char* buf) {
-  unsigned int* p = reinterpret_cast<unsigned int*>(buf);
+size_t NdtMapMatrix::LoadBinary(const unsigned char* buf) {
+  const unsigned int* p = reinterpret_cast<const unsigned int*>(buf);
   rows_ = *p;
   ++p;
   cols_ = *p;
   ++p;
   Init(rows_, cols_);
-  unsigned char* pp = reinterpret_cast<unsigned char*>(p);
+  const unsigned char* pp = reinterpret_cast<const unsigned char*>(p);
   for (unsigned int y = 0; y < rows_; ++y) {
     for (unsigned int x = 0; x < cols_; ++x) {
       NdtMapCells& cell = GetMapCell(y, x);
@@ -383,7 +386,7 @@ unsigned int NdtMapMatrix::LoadBinary(unsigned char* buf) {
   return GetBinarySize();
 }
 
-unsigned int NdtMapMatrix::CreateBinary(unsigned char* buf,
+size_t NdtMapMatrix::CreateBinary(unsigned char* buf,
                                         unsigned int buf_size) const {
   unsigned int target_size = GetBinarySize();
   if (buf_size >= target_size) {
@@ -407,9 +410,9 @@ unsigned int NdtMapMatrix::CreateBinary(unsigned char* buf,
   return target_size;
 }
 
-unsigned int NdtMapMatrix::GetBinarySize() const {
-  unsigned int target_size =
-      static_cast<unsigned int>(sizeof(unsigned int) * 2);
+size_t NdtMapMatrix::GetBinarySize() const {
+  size_t target_size =
+      sizeof(unsigned int) * 2;
   for (unsigned int y = 0; y < rows_; ++y) {
     for (unsigned int x = 0; x < cols_; ++x) {
       const NdtMapCells& cell = GetMapCell(y, x);
@@ -429,7 +432,7 @@ void NdtMapMatrix::Reduce(NdtMapMatrix* cells, const NdtMapMatrix& cells_new) {
   }
 }
 
-void NdtMapMatrix::GetIntensityImg(cv::Mat* intensity_img) const {
+bool NdtMapMatrix::GetIntensityImg(cv::Mat* intensity_img) const {
   *intensity_img = cv::Mat(cv::Size(cols_, rows_), CV_8UC1);
   for (unsigned int y = 0; y < rows_; ++y) {
     for (unsigned int x = 0; x < cols_; ++x) {
@@ -441,6 +444,7 @@ void NdtMapMatrix::GetIntensityImg(cv::Mat* intensity_img) const {
                               .intensity_);
     }
   }
+  return true;
 }
 
 }  // namespace msf

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
-
 #include "modules/localization/msf/local_tool/map_creation/poses_interpolation/poses_interpolation.h"
 
 int main(int argc, char **argv) {

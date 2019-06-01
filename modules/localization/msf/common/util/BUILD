@@ -17,16 +17,17 @@ cc_library(
 )
 
 cc_library(
-    name = "localization_msf_common_util_system_utility",
-    srcs = ["system_utility.cc"],
-    hdrs = ["system_utility.h"],
+    name = "localization_msf_common_util_file_utility",
+    srcs = ["file_utility.cc"],
+    hdrs = ["file_utility.h"],
     linkopts = [
         "-lboost_filesystem",
         "-lboost_system",
     ],
     deps = [
-        "//cyber",
+        "//modules/common",
         "@eigen",
+        "@fastrtps",
     ],
 )
 
@@ -87,17 +88,17 @@ filegroup(
     srcs = glob(["common/test_data/**"]),
 )
 
-cc_test(
-    name = "localization_msf_common_system_utility_test",
-    size = "medium",
-    timeout = "short",
-    srcs = ["system_utility_test.cc"],
-    data = ["localization_msf_common_test_data"],
-    deps = [
-        "//modules/localization/msf/common/util:localization_msf_common_util_system_utility",
-        "@gtest//:main",
-    ],
-)
+#cc_test(
+#    name = "localization_msf_common_file_utility_test",
+#    size = "medium",
+#    timeout = "short",
+#    srcs = ["file_utility_test.cc"],
+#    data = ["localization_msf_common_test_data"],
+#    deps = [
+#        "//modules/localization/msf/common/util:localization_msf_common_util_file_utility",
+#        "@gtest//:main",
+#    ],
+#)
 
 cc_test(
     name = "localization_msf_common_frame_transform_test",

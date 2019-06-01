@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,26 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <vector>
+
 #include "boost/filesystem.hpp"
 #include "boost/program_options.hpp"
 
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 #include "modules/localization/msf/common/util/extract_ground_plane.h"
-#include "modules/localization/msf/common/util/system_utility.h"
-#include "modules/localization/msf/local_map/lossless_map/lossless_map.h"
-#include "modules/localization/msf/local_map/lossless_map/lossless_map_pool.h"
+#include "modules/localization/msf/common/util/file_utility.h"
+#include "modules/localization/msf/local_map/pyramid_map/pyramid_map.h"
+#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_pool.h"
 
 const unsigned int CAR_SENSOR_LASER_NUMBER = 64;
 
 using apollo::localization::msf::FeatureXYPlane;
-using apollo::localization::msf::LosslessMap;
-using apollo::localization::msf::LosslessMapConfig;
-using apollo::localization::msf::LosslessMapNodePool;
 using apollo::localization::msf::MapNodeIndex;
+using apollo::localization::msf::PyramidMap;
+using apollo::localization::msf::PyramidMapConfig;
+using apollo::localization::msf::PyramidMapMatrix;
+using apollo::localization::msf::PyramidMapNode;
+using apollo::localization::msf::PyramidMapNodePool;
 typedef apollo::localization::msf::FeatureXYPlane::PointT PclPointT;
 typedef apollo::localization::msf::FeatureXYPlane::PointCloudT PclPointCloudT;
 typedef apollo::localization::msf::FeatureXYPlane::PointCloudPtrT
@@ -108,11 +112,11 @@ int main(int argc, char** argv) {
     return -1;
   }
 
-  const std::vector<std::string> pcd_folder_paths =
+  const std::vector<std::string> pcd_folder_pathes =
       boost_args["pcd_folders"].as<std::vector<std::string>>();
   const std::vector<std::string> pose_files =
       boost_args["pose_files"].as<std::vector<std::string>>();
-  if (pcd_folder_paths.size() != pose_files.size()) {
+  if (pcd_folder_pathes.size() != pose_files.size()) {
     std::cerr << "The count of pcd folders is not equal pose files"
               << std::endl;
     return -1;
@@ -128,14 +132,14 @@ int main(int argc, char** argv) {
       boost_args["coordinate_type"].as<std::string>();
   if (strcasecmp(coordinate_type.c_str(), "UTM") != 0 &&
       strcasecmp(coordinate_type.c_str(), "LTM") != 0) {
-    std::cerr << "Coordinate type invalid. (UTM or LTM)" << std::endl;
+    std::cerr << "Coordinate type invalide. (UTM or LTM)" << std::endl;
     return -1;
   }
   const std::string map_resolution_type =
       boost_args["map_resolution_type"].as<std::string>();
   if (strcasecmp(map_resolution_type.c_str(), "single") != 0 &&
       strcasecmp(map_resolution_type.c_str(), "multi") != 0) {
-    std::cerr << "Map resolution type invalid. (single or multi)" << std::endl;
+    std::cerr << "Map resolution type invalide. (single or multi)" << std::endl;
     return -1;
   }
 
@@ -155,32 +159,32 @@ int main(int argc, char** argv) {
               << "4.0, 8.0 or 16.0." << std::endl;
   }
 
-  const size_t num_trials = pcd_folder_paths.size();
+  const unsigned int num_trials = pcd_folder_pathes.size();
 
   // load all poses
   std::cerr << "Pcd folders are as follows:" << std::endl;
-  for (size_t i = 0; i < num_trials; ++i) {
-    std::cerr << pcd_folder_paths[i] << std::endl;
+  for (std::size_t i = 0; i < num_trials; ++i) {
+    std::cerr << pcd_folder_pathes[i] << std::endl;
   }
   std::vector<std::vector<Eigen::Affine3d>> ieout_poses(num_trials);
   std::vector<std::vector<double>> time_stamps(num_trials);
   std::vector<std::vector<unsigned int>> pcd_indices(num_trials);
-  for (size_t i = 0; i < pose_files.size(); ++i) {
+  for (std::size_t i = 0; i < pose_files.size(); ++i) {
     apollo::localization::msf::velodyne::LoadPcdPoses(
         pose_files[i], &ieout_poses[i], &time_stamps[i], &pcd_indices[i]);
   }
 
-  LosslessMapConfig conf;
-  LosslessMap map(&conf);
-  LosslessMapConfig& loss_less_config =
-      static_cast<LosslessMapConfig&>(map.GetConfig());
+  PyramidMapConfig conf("lossless_map");
+  PyramidMap map(&conf);
+  PyramidMapConfig& loss_less_config =
+      static_cast<PyramidMapConfig&>(map.GetMapConfig());
   std::string map_folder_path = map_base_folder + "/lossless_map";
-  if (!apollo::localization::msf::system::IsExists(map_folder_path)) {
-    apollo::localization::msf::system::CreateDirectory(map_folder_path);
+  if (!apollo::localization::msf::FileUtility::IsExists(map_folder_path)) {
+    apollo::localization::msf::FileUtility::CreateDirectory(map_folder_path);
   }
   map.SetMapFolderPath(map_folder_path);
-  for (size_t i = 0; i < pcd_folder_paths.size(); ++i) {
-    map.AddDataset(pcd_folder_paths[i]);
+  for (size_t i = 0; i < pcd_folder_pathes.size(); ++i) {
+    map.AddDataset(pcd_folder_pathes[i]);
   }
   if (strcasecmp(map_resolution_type.c_str(), "single") == 0) {
     loss_less_config.SetSingleResolutions(single_resolution_map);
@@ -231,10 +235,8 @@ int main(int argc, char** argv) {
     fprintf(file, "Map row x col: \n");
     for (size_t i = 0; i < loss_less_config.map_resolutions_.size(); ++i) {
       fprintf(file, "%u x %u, ",
-              MapNodeIndex::GetMapIndexRangeNorth(loss_less_config,
-                                                  static_cast<unsigned int>(i)),
-              MapNodeIndex::GetMapIndexRangeEast(loss_less_config,
-                                                 static_cast<unsigned int>(i)));
+              MapNodeIndex::GetMapIndexRangeNorth(loss_less_config, i),
+              MapNodeIndex::GetMapIndexRangeEast(loss_less_config, i));
     }
     fprintf(file, "Map image max intensity: %lf\n",
             loss_less_config.max_intensity_value_);
@@ -242,7 +244,7 @@ int main(int argc, char** argv) {
             loss_less_config.max_intensity_var_value_);
     fprintf(file, "PCD folders: \n");
     for (unsigned int trial = 0; trial < num_trials; ++trial) {
-      fprintf(file, "%s\n", pcd_folder_paths[trial].c_str());
+      fprintf(file, "%s\n", pcd_folder_pathes[trial].c_str());
     }
     fclose(file);
   } else {
@@ -250,7 +252,7 @@ int main(int argc, char** argv) {
               << "./lossless_map/config.txt" << std::endl;
   }
 
-  LosslessMapNodePool lossless_map_node_pool(25, 8);
+  PyramidMapNodePool lossless_map_node_pool(25, 8);
   lossless_map_node_pool.Initial(&loss_less_config);
   map.InitMapNodeCaches(12, 24);
   map.AttachMapNodePool(&lossless_map_node_pool);
@@ -264,7 +266,7 @@ int main(int argc, char** argv) {
       std::string pcd_file_path;
       std::ostringstream ss;
       ss << pcd_indices[trial][frame_idx];
-      pcd_file_path = pcd_folder_paths[trial] + "/" + ss.str() + ".pcd";
+      pcd_file_path = pcd_folder_pathes[trial] + "/" + ss.str() + ".pcd";
       const Eigen::Affine3d& pcd_pose = poses[trial_frame_idx];
       apollo::localization::msf::velodyne::LoadPcds(
           pcd_file_path, trial_frame_idx, pcd_pose, &velodyne_frame, false);
@@ -272,11 +274,21 @@ int main(int argc, char** argv) {
              << "3D Points at Trial: " << trial << " Frame: " << trial_frame_idx
              << ".";
 
+      unsigned int resolution_id = 0;
+      unsigned int row = 0;
+      unsigned int col = 0;
       for (size_t i = 0; i < velodyne_frame.pt3ds.size(); ++i) {
         Eigen::Vector3d& pt3d_local = velodyne_frame.pt3ds[i];
         unsigned char intensity = velodyne_frame.intensities[i];
         Eigen::Vector3d pt3d_global = velodyne_frame.pose * pt3d_local;
-        map.SetValue(pt3d_global, zone_id, intensity);
+        MapNodeIndex map_node_index = MapNodeIndex::GetMapNodeIndex(
+            loss_less_config, pt3d_global, resolution_id, zone_id);
+        PyramidMapNode* map_node =
+            dynamic_cast<PyramidMapNode*>(map.GetMapNodeSafe(map_node_index));
+        map_node->GetCoordinate(pt3d_global, &col, &row);
+        PyramidMapMatrix& map_matrix =
+            dynamic_cast<PyramidMapMatrix&>(map_node->GetMapCellMatrix());
+        map_matrix.SetIntensitySafe(intensity, row, col);
       }
 
       if (use_plane_inliers_only) {
@@ -284,9 +296,9 @@ int main(int argc, char** argv) {
         pcl_pc->resize(velodyne_frame.pt3ds.size());
         for (size_t i = 0; i < velodyne_frame.pt3ds.size(); ++i) {
           PclPointT& pt = pcl_pc->at(i);
-          pt.x = static_cast<float>(velodyne_frame.pt3ds[i][0]);
-          pt.y = static_cast<float>(velodyne_frame.pt3ds[i][1]);
-          pt.z = static_cast<float>(velodyne_frame.pt3ds[i][2]);
+          pt.x = velodyne_frame.pt3ds[i][0];
+          pt.y = velodyne_frame.pt3ds[i][1];
+          pt.z = velodyne_frame.pt3ds[i][2];
           pt.intensity = static_cast<float>(velodyne_frame.intensities[i]);
         }
 
@@ -302,7 +314,16 @@ int main(int argc, char** argv) {
           unsigned char intensity =
               static_cast<unsigned char>(plane_pt.intensity);
           Eigen::Vector3d pt3d_global = velodyne_frame.pose * pt3d_local_double;
-          map.SetValueLayer(pt3d_global, zone_id, intensity);
+          float ground_altitude = pt3d_global[2];
+          MapNodeIndex map_node_index = MapNodeIndex::GetMapNodeIndex(
+              loss_less_config, pt3d_global, resolution_id, zone_id);
+          PyramidMapNode* map_node =
+              dynamic_cast<PyramidMapNode*>(map.GetMapNodeSafe(map_node_index));
+          map_node->GetCoordinate(pt3d_global, &col, &row);
+          PyramidMapMatrix& map_matrix =
+              dynamic_cast<PyramidMapMatrix&>(map_node->GetMapCellMatrix());
+          map_matrix.SetIntensitySafe(intensity, row, col);
+          map_matrix.SetGroundAltitudeSafe(ground_altitude, row, col);
         }
       }
     }
@@ -317,33 +338,45 @@ int main(int argc, char** argv) {
       const Eigen::Affine3d& ieout_pose = ieout_poses[trial][i];
       const Eigen::Vector3d& pt3d = ieout_pose.translation();
       unsigned int resolution_id = 0;
+      unsigned int row = 0;
+      unsigned int col = 0;
+      MapNodeIndex map_node_index = MapNodeIndex::GetMapNodeIndex(
+          loss_less_config, pt3d, resolution_id, zone_id);
+      PyramidMapNode* map_node =
+          dynamic_cast<PyramidMapNode*>(map.GetMapNodeSafe(map_node_index));
+      map_node->GetCoordinate(pt3d, &col, &row);
+      PyramidMapMatrix& map_matrix =
+          dynamic_cast<PyramidMapMatrix&>(map_node->GetMapCellMatrix());
+
       if (use_plane_inliers_only) {
         // Use the altitudes from layer 0 (layer 1 internally in the Map).
-        unsigned int layer_id = 0;
         std::vector<unsigned int> layer_counts;
-        map.GetCountSafe(pt3d, zone_id, resolution_id, &layer_counts);
-        if (layer_counts.empty()) {
+        const unsigned int* ground_count =
+            map_matrix.GetGroundCountSafe(row, col);
+        if (!ground_count) {
           AERROR << "No ground layer, skip.";
           continue;
         }
-        if (layer_counts[layer_id] > 0) {
-          std::vector<float> layer_alts;
-          map.GetAltSafe(pt3d, zone_id, resolution_id, &layer_alts);
-          if (layer_alts.empty()) {
+        if (*ground_count > 0) {
+          // std::vector<float> layer_alts;
+          // map.GetAltSafe(pt3d, zone_id, resolution_id, &layer_alts);
+          const float* ground_altitude =
+              map_matrix.GetGroundAltitudeSafe(row, col);
+          if (!ground_altitude) {
             AERROR << "No ground points, skip.";
             continue;
           }
-          float alt = layer_alts[layer_id];
-          double height_diff = pt3d[2] - alt;
+          // float alt = layer_alts[layer_id];
+          double height_diff = pt3d[2] - *ground_altitude;
           VarianceOnline(&mean_height_diff, &var_height_diff,
                          &count_height_diff, height_diff);
         }
       } else {
         // Use the altitudes from all layers
-        unsigned int count = map.GetCountSafe(pt3d, zone_id, resolution_id);
-        if (count > 0) {
-          float alt = map.GetAltSafe(pt3d, zone_id, resolution_id);
-          double height_diff = pt3d[2] - alt;
+        const unsigned int* count = map_matrix.GetCountSafe(row, col);
+        if (*count > 0) {
+          const float* alt = map_matrix.GetAltitudeSafe(row, col);
+          double height_diff = pt3d[2] - *alt;
           VarianceOnline(&mean_height_diff, &var_height_diff,
                          &count_height_diff, height_diff);
         }
@@ -351,10 +384,9 @@ int main(int argc, char** argv) {
     }
   }
 
-  map.GetConfig().map_ground_height_offset_ =
-      static_cast<float>(mean_height_diff);
-  std::string config_path = map.GetConfig().map_folder_path_ + "/config.xml";
-  map.GetConfig().Save(config_path);
+  map.GetMapConfig().map_ground_height_offset_ = mean_height_diff;
+  std::string config_path = map.GetMapConfig().map_folder_path_ + "/config.xml";
+  map.GetMapConfig().Save(config_path);
   ADEBUG << "Mean: " << mean_height_diff << ", Var: " << var_height_diff << ".";
   return 0;
 }

@@ -37,7 +37,7 @@ class NdtMapSingleCell {
   /**@brief Load the map cell from a binary chunk.
    * @param <return> The size read (the real size of object).
    */
-  unsigned int LoadBinary(unsigned char* buf);
+  size_t LoadBinary(const unsigned char* buf);
   /**@brief Create the binary. Serialization of the object.
    * @param <buf, buf_size> The buffer and its size.
    * @param <return> The required or the used size of is returned.
@@ -103,7 +103,7 @@ class NdtMapCells {
   /**@brief Load the map cell from a binary chunk.
    * @param <return> The size read (the real size of object).
    */
-  unsigned int LoadBinary(unsigned char* buf);
+  size_t LoadBinary(const unsigned char* buf);
   /**@brief Create the binary. Serialization of the object.
    * @param <buf, buf_size> The buffer and its size.
    * @param <return> The required or the used size of is returned.
@@ -143,9 +143,9 @@ class NdtMapMatrix : public BaseMapMatrix {
   NdtMapMatrix(const NdtMapMatrix& cells);
 
   /**@brief Initialize the matrix with the config. */
-  virtual void Init(const BaseMapConfig* config);
+  virtual void Init(const BaseMapConfig& config);
   /**@brief Reset the matrix item to default value. */
-  virtual void Reset(const BaseMapConfig* config);
+  virtual void Reset();
 
   /**@brief Initialize the matrix with the size of rows and columns. */
   void Init(unsigned int rows, unsigned int cols);
@@ -154,17 +154,17 @@ class NdtMapMatrix : public BaseMapMatrix {
   /**@brief Load the map cell from a binary chunk.
    * @param <return> The size read (the real size of object).
    */
-  virtual unsigned int LoadBinary(unsigned char* buf);
+  virtual size_t LoadBinary(const unsigned char* buf);
   /**@brief Create the binary. Serialization of the object.
    * @param <buf, buf_size> The buffer and its size.
    * @param <return> The required or the used size of is returned.
    */
-  virtual unsigned int CreateBinary(unsigned char* buf,
+  virtual size_t CreateBinary(unsigned char* buf,
                                     unsigned int buf_size) const;
   /**@brief Get the binary size of the object. */
-  virtual unsigned int GetBinarySize() const;
+  virtual size_t GetBinarySize() const;
 
-  virtual void GetIntensityImg(cv::Mat* intensity_img) const;
+  virtual bool GetIntensityImg(cv::Mat* intensity_img) const;
 
   /**@brief Get a const map cell. */
   inline const NdtMapCells& GetMapCell(unsigned int row,

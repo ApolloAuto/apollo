@@ -14,7 +14,10 @@ cc_library(
         "ndt_localization.h",
         "ndt_localization_component.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"NDTlocalization\\\""],
+    copts = [
+        "-O2",
+        "-DMODULE_NAME=\\\"NDTlocalization\\\""
+        ],
     linkopts = [
         "-lboost_filesystem",
         "-lboost_system",
