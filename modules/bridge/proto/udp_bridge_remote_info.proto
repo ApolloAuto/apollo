@@ -13,3 +13,4 @@ message UDPBridgeReceiverRemoteInfo {
     optional int32 bind_port = 2 [default = 8500];
     optional string proto_name = 3 [default = "ProtoMsgName"];
 }
+
