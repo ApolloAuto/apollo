@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
 #pragma once
 
+#include <Eigen/Core>
 #include <list>
 #include <set>
-
 #include "boost/thread.hpp"
-
 #include "cyber/task/task.h"
 #include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
 
@@ -64,29 +62,29 @@ class BaseMapNodePool {
   /**@brief new a map node. */
   virtual BaseMapNode* AllocNewMapNode() = 0;
   /**@brief init a map node. */
-  void InitNewMapNode(BaseMapNode* node);
-  /**@brief Finalize a map node, before reset or delloc the map node. */
-  void FinalizeMapNode(BaseMapNode* node);
+  virtual void InitNewMapNode(BaseMapNode* node);
+  /**@brief finalize a map node, before reset or delloc the map node. */
+  virtual void FinalizeMapNode(BaseMapNode* node);
   /**@brief delloc a map node. */
-  void DellocMapNode(BaseMapNode* node);
+  virtual void DellocMapNode(BaseMapNode* node);
   /**@brief reset a map node. */
-  void ResetMapNode(BaseMapNode* node);
+  virtual void ResetMapNode(BaseMapNode* node);
 
  protected:
   /**@brief The flag of pool auto expand. */
-  bool is_fixed_size_;
+  bool is_fixed_size_ = 0;
   /**@brief The list for free node. */
   std::list<BaseMapNode*> free_list_;
   /**@brief The set for used node. */
   std::set<BaseMapNode*> busy_nodes_;
   /**@brief The size of memory pool. */
-  unsigned int pool_size_;
+  unsigned int pool_size_ = 0;
   /**@brief The thread pool for release node. */
   std::future<void> node_reset_workers_;
   /**@brief The mutex for release thread.*/
   boost::mutex mutex_;
   /**@brief The mutex for release thread.*/
-  const BaseMapConfig* map_config_;
+  const BaseMapConfig* map_config_ = nullptr;
 };
 
 }  // namespace msf

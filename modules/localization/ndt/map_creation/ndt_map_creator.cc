@@ -21,7 +21,7 @@
 #include <vector>
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 #include "modules/localization/msf/common/util/extract_ground_plane.h"
-#include "modules/localization/msf/common/util/system_utility.h"
+#include "modules/localization/msf/common/util/file_utility.h"
 #include "modules/localization/msf/local_map/ndt_map/ndt_map.h"
 #include "modules/localization/msf/local_map/ndt_map/ndt_map_pool.h"
 
@@ -110,8 +110,9 @@ int main(int argc, char** argv) {
         pose_files[i], &pcd_poses[i], &time_stamps[i], &pcd_indices[i]);
   }
 
-  if (!apollo::localization::msf::system::IsExists(map_base_folder)) {
-    if (apollo::localization::msf::system::CreateDirectory(map_base_folder)) {
+  if (!apollo::localization::msf::FileUtility::IsExists(map_base_folder)) {
+    if (apollo::localization::msf::FileUtility::CreateDirectory(
+            map_base_folder)) {
       std::cerr << "Create map directory failed." << std::endl;
     }
   }

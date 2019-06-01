@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,14 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
-
-#include "modules/localization/msf/local_map/lossless_map/lossless_map.h"
-#include "modules/localization/msf/local_map/lossless_map/lossless_map_config.h"
-#include "modules/localization/msf/local_map/lossless_map/lossless_map_matrix.h"
-#include "modules/localization/msf/local_map/lossless_map/lossless_map_pool.h"
-
-#include "modules/localization/msf/local_map/lossy_map/lossy_map_2d.h"
-#include "modules/localization/msf/local_map/lossy_map/lossy_map_config_2d.h"
-#include "modules/localization/msf/local_map/lossy_map/lossy_map_matrix_2d.h"
-#include "modules/localization/msf/local_map/lossy_map/lossy_map_node_2d.h"
-#include "modules/localization/msf/local_map/lossy_map/lossy_map_pool_2d.h"
+#include "modules/localization/msf/local_map/pyramid_map/pyramid_map.h"
+#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_config.h"
+#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_matrix.h"
+#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_pool.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
-
-typedef LossyMap2D LossyMap;
-typedef LossyMapNode2D LossyMapNode;
-typedef LossyMapNodePool2D LossyMapNodePool;
-typedef LossyMapMatrix2D LossyMapMatrix;
-typedef LossyMapConfig2D LossyMapConfig;
 
 MapNodeIndex GetMapIndexFromMapFolder(const std::string& map_folder) {
   MapNodeIndex index;
@@ -95,17 +82,12 @@ bool GetAllMapIndex(const std::string& src_map_folder,
 }  // namespace localization
 }  // namespace apollo
 
-using apollo::localization::msf::LosslessMap;
-using apollo::localization::msf::LosslessMapConfig;
-using apollo::localization::msf::LosslessMapMatrix;
-using apollo::localization::msf::LosslessMapNode;
-using apollo::localization::msf::LosslessMapNodePool;
-using apollo::localization::msf::LossyMap;
-using apollo::localization::msf::LossyMapConfig;
-using apollo::localization::msf::LossyMapMatrix;
-using apollo::localization::msf::LossyMapNode;
-using apollo::localization::msf::LossyMapNodePool;
 using apollo::localization::msf::MapNodeIndex;
+using apollo::localization::msf::PyramidMap;
+using apollo::localization::msf::PyramidMapConfig;
+using apollo::localization::msf::PyramidMapMatrix;
+using apollo::localization::msf::PyramidMapNode;
+using apollo::localization::msf::PyramidMapNodePool;
 
 int main(int argc, char** argv) {
   boost::program_options::options_description boost_desc("Allowed options");
@@ -131,11 +113,11 @@ int main(int argc, char** argv) {
   const std::string dst_path = boost_args["dstdir"].as<std::string>();
   std::string src_map_folder = src_path + "/";
 
-  LosslessMapConfig lossless_config("lossless_map");
-  LosslessMapNodePool lossless_map_node_pool(25, 8);
+  PyramidMapConfig lossless_config("lossless_map");
+  PyramidMapNodePool lossless_map_node_pool(25, 8);
   lossless_map_node_pool.Initial(&lossless_config);
 
-  LosslessMap lossless_map(&lossless_config);
+  PyramidMap lossless_map(&lossless_config);
   lossless_map.InitMapNodeCaches(12, 24);
   lossless_map.AttachMapNodePool(&lossless_map_node_pool);
   if (!lossless_map.SetMapFolderPath(src_map_folder)) {
@@ -153,17 +135,16 @@ int main(int argc, char** argv) {
   GetAllMapIndex(src_map_folder, dst_map_folder, &buf);
   std::cout << "index size: " << buf.size() << std::endl;
 
-  LosslessMapConfig config_transform_lossy("lossless_map");
+  PyramidMapConfig config_transform_lossy("lossless_map");
   config_transform_lossy.Load(src_map_folder + "config.xml");
   config_transform_lossy.map_version_ = "lossy_map";
   config_transform_lossy.Save(dst_map_folder + "config.xml");
 
   std::cout << "lossy map directory structure has built." << std::endl;
 
-  LossyMapConfig lossy_config("lossy_map");
-  LossyMapNodePool lossy_map_node_pool(25, 8);
-  lossy_map_node_pool.Initial(&lossy_config);
-  LossyMap lossy_map(&lossy_config);
+  PyramidMapNodePool lossy_map_node_pool(25, 8);
+  lossy_map_node_pool.Initial(&config_transform_lossy);
+  PyramidMap lossy_map(&config_transform_lossy);
   lossy_map.InitMapNodeCaches(12, 24);
   lossy_map.AttachMapNodePool(&lossy_map_node_pool);
   if (!lossy_map.SetMapFolderPath(dst_map_folder)) {
@@ -173,59 +154,57 @@ int main(int argc, char** argv) {
   int index = 0;
   auto itr = buf.begin();
   for (; itr != buf.end(); ++itr, ++index) {
-    // int single_alt = 0;
-    // int double_alt = 0;
-    // float delta_alt_max = 0.0f;
-    // float delta_alt_min = 100.0f;
-    // int delta_alt_minus_num = 0;
-    // float alt_max = 0.0f;
-    // float alt_min = 100.0f;
-
-    LosslessMapNode* lossless_node =
-        static_cast<LosslessMapNode*>(lossless_map.GetMapNodeSafe(*itr));
-    if (lossless_node == nullptr) {
-      std::cerr << "index: " << index << " is a nullptr pointer!" << std::endl;
+    PyramidMapNode* lossless_node =
+        static_cast<PyramidMapNode*>(lossless_map.GetMapNodeSafe(*itr));
+    if (lossless_node == NULL) {
+      std::cerr << "index: " << index << " is a NULL pointer!" << std::endl;
       continue;
     }
-    LosslessMapMatrix& lossless_matrix =
-        static_cast<LosslessMapMatrix&>(lossless_node->GetMapCellMatrix());
+    PyramidMapMatrix& lossless_matrix =
+        static_cast<PyramidMapMatrix&>(lossless_node->GetMapCellMatrix());
 
-    LossyMapNode* lossy_node =
-        static_cast<LossyMapNode*>(lossy_map.GetMapNodeSafe(*itr));
-    LossyMapMatrix& lossy_matrix =
-        static_cast<LossyMapMatrix&>(lossy_node->GetMapCellMatrix());
+    PyramidMapNode* lossy_node =
+        static_cast<PyramidMapNode*>(lossy_map.GetMapNodeSafe(*itr));
+    PyramidMapMatrix& lossy_matrix =
+        static_cast<PyramidMapMatrix&>(lossy_node->GetMapCellMatrix());
 
     int rows = lossless_config.map_node_size_y_;
     int cols = lossless_config.map_node_size_x_;
     for (int row = 0; row < rows; ++row) {
       for (int col = 0; col < cols; ++col) {
-        float intensity = lossless_node->GetValue(row, col);
-        float intensity_var = lossless_node->GetVar(row, col);
-        unsigned int count = lossless_node->GetCount(row, col);
-
+        const float* intensity = lossless_matrix.GetIntensitySafe(row, col);
+        const float* intensity_var =
+            lossless_matrix.GetIntensityVarSafe(row, col);
+        const unsigned int* count = lossless_matrix.GetCountSafe(row, col);
         // Read altitude
-        float altitude_ground = 0.0f;
-        float altitude_avg = 0.0f;
-        bool is_ground_useful = false;
-        std::vector<float> layer_alts;
-        std::vector<unsigned int> layer_counts;
-        lossless_matrix.GetMapCell(row, col).GetCount(&layer_counts);
-        lossless_matrix.GetMapCell(row, col).GetAlt(&layer_alts);
-        if (layer_counts.empty() || layer_alts.empty()) {
-          altitude_avg = lossless_node->GetAlt(row, col);
-          is_ground_useful = false;
-        } else {
-          altitude_avg = lossless_node->GetAlt(row, col);
-          altitude_ground = layer_alts[0];
-          is_ground_useful = true;
+        const float* altitude_avg = lossless_matrix.GetAltitudeSafe(row, col);
+        const float* altitude_var =
+            lossless_matrix.GetAltitudeVarSafe(row, col);
+        const float* altitude_ground =
+            lossless_matrix.GetGroundAltitudeSafe(row, col);
+        const unsigned int* ground_count =
+            lossless_matrix.GetGroundCountSafe(row, col);
+        if (intensity) {
+          lossy_matrix.SetIntensitySafe(*intensity, row, col);
         }
-
-        lossy_matrix[row][col].intensity = intensity;
-        lossy_matrix[row][col].intensity_var = intensity_var;
-        lossy_matrix[row][col].count = count;
-        lossy_matrix[row][col].altitude = altitude_avg;
-        lossy_matrix[row][col].altitude_ground = altitude_ground;
-        lossy_matrix[row][col].is_ground_useful = is_ground_useful;
+        if (intensity_var) {
+          lossy_matrix.SetIntensityVarSafe(*intensity_var, row, col);
+        }
+        if (count) {
+          lossy_matrix.SetCountSafe(*count, row, col);
+        }
+        if (altitude_avg) {
+          lossy_matrix.SetAltitudeSafe(*altitude_avg, row, col);
+        }
+        if (altitude_var) {
+          lossy_matrix.SetAltitudeVarSafe(*altitude_var, row, col);
+        }
+        if (altitude_ground) {
+          lossy_matrix.SetGroundAltitudeSafe(*altitude_ground, row, col);
+        }
+        if (ground_count) {
+          lossy_matrix.SetGroundCountSafe(*ground_count, row, col);
+        }
       }
     }
     lossy_node->SetIsChanged(true);

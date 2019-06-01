@@ -102,6 +102,7 @@ python ./scripts/record_bag.py stop
 
 ## 7. Verify the localization result (optional)
 NDT localization module also use the same evaluation scripts as MSF localization module.
+First, rename the recording file with suffix `.record`.
 
 ```
 ./scripts/msf_local_evaluation.sh OUTPUT_PATH ANT_IMU_PATH

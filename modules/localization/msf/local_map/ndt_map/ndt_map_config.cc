@@ -47,16 +47,17 @@ void NdtMapConfig::SetMultiResolutionsZ() {
   map_resolutions_z_.push_back(16);
 }
 
-void NdtMapConfig::CreateXml(boost::property_tree::ptree* config) const {
+bool NdtMapConfig::CreateXml(boost::property_tree::ptree* config) const {
   BaseMapConfig::CreateXml(config);
   config->put("map.map_config.compression", map_is_compression_);
   for (size_t i = 0; i < map_resolutions_.size(); ++i) {
     config->add("map.map_config.resolutions_z.resolution",
                 map_resolutions_z_[i]);
   }
+  return true;
 }
 
-void NdtMapConfig::LoadXml(boost::property_tree::ptree* config) {
+bool NdtMapConfig::LoadXml(boost::property_tree::ptree* config) {
   BaseMapConfig::LoadXml(*config);
   map_is_compression_ = config->get<bool>("map.map_config.compression");
   map_resolutions_z_.clear();
@@ -65,6 +66,7 @@ void NdtMapConfig::LoadXml(boost::property_tree::ptree* config) {
     map_resolutions_z_.push_back(
         static_cast<float>(atof(v.second.data().c_str())));
   }
+  return true;
 }
 
 }  // namespace msf
