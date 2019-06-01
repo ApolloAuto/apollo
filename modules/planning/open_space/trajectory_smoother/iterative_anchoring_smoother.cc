@@ -494,11 +494,11 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
                                              SpeedData* smoothed_speeds) {
   // TODO(Jinyun): move to confs
   const double max_v = 1.0;
-  const double max_acc = 2.0;
+  const double max_acc = 1.0;
   const double max_acc_jerk = 3.0;
   const double delta_t = 0.2;
   // TODO(Jinyun): refine the hueristic
-  const double total_t = 50.0;
+  const double total_t = 60.0;
   const size_t num_of_knots = static_cast<size_t>(total_t / delta_t) + 1;
 
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(
@@ -543,8 +543,16 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
 
   // Assign speed point by gear
   smoothed_speeds->AppendSpeedPoint(s[0], 0.0, ds[0], dds[0], 0.0);
-  const double kEpislon = 1.0e-3;
+  const double kEpislon = 1.0e-2;
   for (size_t i = 1; i < num_of_knots; ++i) {
+    if (s[i] < s[i - 1]) {
+      if (path_length - s[i] < kEpislon) {
+        break;
+      } else {
+        AERROR << "unexpected decreasing s in speed smoothing";
+        return false;
+      }
+    }
     // Cut the speed data when it is about to meet end condition
     if ((path_length - s[i] < kEpislon && ds[i] < kEpislon &&
          dds[i] < kEpislon)) {
@@ -557,7 +565,6 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
                                       ds[i], dds[i],
                                       (dds[i] - dds[i - 1]) / delta_t);
   }
-
   return true;
 }
 
