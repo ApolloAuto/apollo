@@ -81,7 +81,8 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
     }
     case 2: {
       if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap ||
-          FeatureOutput::SizeOfDataForLearning() > FLAGS_max_num_dump_feature) {
+          FeatureOutput::SizeOfDataForLearning() >
+              FLAGS_max_num_dump_dataforlearn) {
         FeatureOutput::WriteDataForLearning();
       }
       break;
