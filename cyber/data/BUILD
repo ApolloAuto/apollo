@@ -134,4 +134,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "all_latest_test",
+    size = "small",
+    srcs = [
+        "fusion/all_latest_test.cc",
+    ],
+    deps = [
+        "//cyber",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
