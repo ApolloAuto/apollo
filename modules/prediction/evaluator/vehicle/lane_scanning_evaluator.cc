@@ -146,8 +146,10 @@ bool LaneScanningEvaluator::ExtractFeatures(
 
   // Extract static environmental (lane-related) features.
   std::vector<double> static_feature_values;
+  std::vector<int> lane_sequence_idx_to_remove;
   if (!ExtractStaticEnvFeatures(obstacle_ptr, lane_graph_ptr,
-                                &static_feature_values)) {
+                                &static_feature_values,
+                                &lane_sequence_idx_to_remove)) {
     AERROR << "Failed to extract static environmental features around obs_id = "
            << id;
   }
@@ -276,7 +278,8 @@ bool LaneScanningEvaluator::ExtractObstacleFeatures(
 
 bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
     const Obstacle* obstacle_ptr, const LaneGraph* lane_graph_ptr,
-    std::vector<double>* feature_values) {
+    std::vector<double>* feature_values,
+    std::vector<int>* lane_sequence_idx_to_remove) {
   // Sanity checks.
   CHECK_NOTNULL(lane_graph_ptr);
   feature_values->clear();
@@ -309,9 +312,6 @@ bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
       }
       for (int k = k_starting_idx; k >= 0; --k) {
         if (count >= SINGLE_LANE_FEATURE_SIZE * BACKWARD_LANE_POINTS_SIZE) {
-          break;
-        }
-        if (j == 0 && k == 0) {
           break;
         }
         const LanePoint& lane_point = lane_segment.lane_point(k);

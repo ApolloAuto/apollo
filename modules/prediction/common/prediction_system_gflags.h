@@ -38,3 +38,4 @@ DECLARE_int32(max_thread_num);
 // Bag replay timestamp gap
 DECLARE_double(replay_timestamp_gap);
 DECLARE_int32(max_num_dump_feature);
+DECLARE_int32(max_num_dump_dataforlearn);
