@@ -68,3 +68,9 @@ DEFINE_bool(
 
 DEFINE_bool(enable_maximum_steer_rate_limit, false,
             "Enable steer rate limit obtained from vehicle_param.pb.txt");
+
+DEFINE_bool(query_time_nearest_point_only, false,
+            "only use the trajectory point at nearest time as target point");
+
+DEFINE_bool(query_forward_time_point_only, false,
+            "only use the trajectory point in future");
