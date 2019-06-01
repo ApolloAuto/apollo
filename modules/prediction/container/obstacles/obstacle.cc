@@ -1152,7 +1152,7 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
     return;
   }
   // double speed = feature->speed();
-  double road_graph_search_distance = 60.0;  // (45mph for 3sec)
+  double road_graph_search_distance = 50.0 * 0.95;  // (45mph for 3sec)
   // std::fmax(speed * FLAGS_prediction_trajectory_time_length +
   //               0.5 * FLAGS_vehicle_max_linear_acc *
   //               FLAGS_prediction_trajectory_time_length *
@@ -1207,7 +1207,7 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
 
   // Build lane_points.
   if (feature->lane().has_lane_graph_ordered()) {
-    SetLanePoints(feature, 0.5, 110, true,
+    SetLanePoints(feature, 0.5, 100, true,
                   feature->mutable_lane()->mutable_lane_graph_ordered());
     SetLaneSequencePath(feature->mutable_lane()->mutable_lane_graph_ordered());
   }

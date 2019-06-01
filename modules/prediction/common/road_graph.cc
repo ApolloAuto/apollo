@@ -17,6 +17,7 @@
 #include "modules/prediction/common/road_graph.h"
 
 #include <algorithm>
+#include <set>
 #include <utility>
 
 #include "modules/prediction/common/prediction_constants.h"
@@ -224,20 +225,22 @@ void RoadGraph::ConstructLaneSequence(
   }
 
   // Create a new lane_segment based on the current lane_info_ptr.
+  double curr_s = curr_lane_seg_s >= 0.0 ?
+    curr_lane_seg_s : lane_info_ptr->total_length();
   LaneSegment lane_segment;
-  lane_segment.set_adc_s(curr_lane_seg_s);
+  lane_segment.set_adc_s(curr_s);
   lane_segment.set_lane_id(lane_info_ptr->id().id());
   lane_segment.set_lane_turn_type(
       PredictionMap::LaneTurnType(lane_info_ptr->id().id()));
   lane_segment.set_total_length(lane_info_ptr->total_length());
   if (search_forward_direction) {
-    lane_segment.set_start_s(curr_lane_seg_s);
-    lane_segment.set_end_s(std::fmin(curr_lane_seg_s + length_ - accumulated_s,
+    lane_segment.set_start_s(curr_s);
+    lane_segment.set_end_s(std::fmin(curr_s + length_ - accumulated_s,
                                      lane_info_ptr->total_length()));
   } else {
     lane_segment.set_start_s(
-        std::fmax(0.0, curr_lane_seg_s - (length_ - accumulated_s)));
-    lane_segment.set_end_s(curr_lane_seg_s);
+        std::fmax(0.0, curr_s - (length_ - accumulated_s)));
+    lane_segment.set_end_s(curr_s);
   }
   if (search_forward_direction) {
     lane_segments->push_back(std::move(lane_segment));
@@ -271,26 +274,35 @@ void RoadGraph::ConstructLaneSequence(
 
   // Otherwise, continue searching for subsequent lane_segments.
   double new_accumulated_s = 0.0;
+  double new_lane_seg_s = 0.0;
   std::vector<std::shared_ptr<const hdmap::LaneInfo>> candidate_lanes;
+  std::set<std::string> set_lane_ids;
   if (search_forward_direction) {
     new_accumulated_s =
-        accumulated_s + lane_info_ptr->total_length() - curr_lane_seg_s;
-    // Sort the successor lane_segments from left to right.
+        accumulated_s + lane_info_ptr->total_length() - curr_s;
+    // Reundancy removal.
     for (const auto& successor_lane_id : lane_info_ptr->lane().successor_id()) {
-      candidate_lanes.push_back(
-          PredictionMap::LaneById(successor_lane_id.id()));
+      set_lane_ids.insert(successor_lane_id.id());
     }
+    for (const auto& unique_id : set_lane_ids) {
+      candidate_lanes.push_back(PredictionMap::LaneById(unique_id));
+    }
+    // Sort the successor lane_segments from left to right.
     std::sort(candidate_lanes.begin(), candidate_lanes.end(), IsAtLeft);
     // Based on other conditions, select what successor lanes should be used.
     if (!consider_lane_split) {
       candidate_lanes = {LaneWithSmallestAverageCurvature(candidate_lanes)};
     }
   } else {
-    new_accumulated_s = accumulated_s + curr_lane_seg_s;
+    new_accumulated_s = accumulated_s + curr_s;
+    new_lane_seg_s = -0.1;
+    // Redundancy removal.
     for (const auto& predecessor_lane_id :
          lane_info_ptr->lane().predecessor_id()) {
-      candidate_lanes.push_back(
-          PredictionMap::LaneById(predecessor_lane_id.id()));
+      set_lane_ids.insert(predecessor_lane_id.id());
+    }
+    for (const auto& unique_id : set_lane_ids) {
+      candidate_lanes.push_back(PredictionMap::LaneById(unique_id));
     }
   }
   bool consider_further_lane_split =
@@ -302,10 +314,9 @@ void RoadGraph::ConstructLaneSequence(
       (consider_lane_split && candidate_lanes.size() == 1);
   // Recursively expand lane-sequence.
   for (const auto& candidate_lane : candidate_lanes) {
-    ConstructLaneSequence(search_forward_direction, new_accumulated_s, 0.0,
-                          candidate_lane, graph_search_horizon - 1,
-                          consider_further_lane_split, lane_segments,
-                          lane_graph_ptr);
+    ConstructLaneSequence(search_forward_direction, new_accumulated_s,
+        new_lane_seg_s, candidate_lane, graph_search_horizon - 1,
+        consider_further_lane_split, lane_segments, lane_graph_ptr);
   }
   if (search_forward_direction) {
     lane_segments->pop_back();
