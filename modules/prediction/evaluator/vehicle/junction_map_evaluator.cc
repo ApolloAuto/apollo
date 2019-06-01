@@ -82,14 +82,14 @@ bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   img_tensor[0][0] = img_tensor[0][0].sub(0.485).div(0.229);
   img_tensor[0][1] = img_tensor[0][1].sub(0.456).div(0.224);
   img_tensor[0][2] = img_tensor[0][2].sub(0.406).div(0.225);
-  torch_inputs.push_back(std::move(img_tensor));
   // Process junction_exit_mask
   torch::Tensor junction_exit_mask =
       torch::zeros({1, static_cast<int>(feature_values.size())});
   for (size_t i = 0; i < feature_values.size(); ++i) {
     junction_exit_mask[0][i] = static_cast<float>(feature_values[i]);
   }
-  torch_inputs.push_back(std::move(junction_exit_mask));
+  torch_inputs.push_back(
+      torch::jit::Tuple::create({img_tensor, junction_exit_mask}));
 
   // Compute probability
   std::vector<double> probability;
