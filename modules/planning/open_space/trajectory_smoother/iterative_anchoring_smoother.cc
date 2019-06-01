@@ -155,7 +155,7 @@ bool IterativeAnchoringSmoother::Smooth(
   const auto speed_smooth_end_timestamp = std::chrono::system_clock::now();
   std::chrono::duration<double> speed_smooth_diff =
       speed_smooth_end_timestamp - speed_smooth_start_timestamp;
-  AERROR << "iterative anchoring speed smoother time: "
+  ADEBUG << "iterative anchoring speed smoother time: "
          << speed_smooth_diff.count() * 1000.0 << " ms.";
 
   // Combine path and speed
@@ -445,7 +445,7 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
 
   // TODO(Jinyun): tune the params and move to a config
   piecewise_jerk_problem.set_weight_ddx(1.0);
-  piecewise_jerk_problem.set_weight_dddx(0.01);
+  piecewise_jerk_problem.set_weight_dddx(1.0);
   piecewise_jerk_problem.set_x_bounds(x_bounds);
   piecewise_jerk_problem.set_dx_bounds(dx_bounds);
   piecewise_jerk_problem.set_ddx_bounds(ddx_bounds);
@@ -467,8 +467,8 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
   const double kEpislon = 1.0e-3;
   for (size_t i = 1; i < num_of_knots; ++i) {
     // Cut the speed data when it is about to meet end condition
-    if (path_length - s[i] < kEpislon && ds[i] < kEpislon &&
-        dds[i] < kEpislon) {
+    if ((path_length - s[i] < kEpislon && ds[i] < kEpislon &&
+         dds[i] < kEpislon)) {
       smoothed_speeds->AppendSpeedPoint(s[i], delta_t * static_cast<double>(i),
                                         ds[i], dds[i],
                                         (dds[i] - dds[i - 1]) / delta_t);
