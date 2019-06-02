@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ###############################################################################
-# Copyright 2018 The Apollo Authors. All Rights Reserved.
+# Copyright 2019 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,21 +16,21 @@
 # limitations under the License.
 ###############################################################################
 
-# Fail on first error.
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-wget https://github.com/PointCloudLibrary/pcl/archive/pcl-1.7.2.tar.gz
-
-tar xzvf pcl-1.7.2.tar.gz
-
-cd pcl-pcl-1.7.2/
-mkdir build
-cd build
-cmake ..
-make -j 2
+git clone https://github.com/eProsima/Fast-RTPS.git
+pushd Fast-RTPS
+git checkout origin/release/1.5.0
+git submodule init
+git submodule update
+patch -p1 < ../FastRTPS_1.5.0.patch
+mkdir -p build && cd build
+cmake -DTHIRDPARTY=ON -DCMAKE_INSTALL_PREFIX=./external/install ../
+make -j 8
 make install
+rm -rf /usr/local/fast-rtps
+mv ./external/install /usr/local/fast-rtps
+popd
 
-#clean up
-cd ../../ && rm -rf pcl-1.7.2.tar.gz pcl-pcl-1.7.2
