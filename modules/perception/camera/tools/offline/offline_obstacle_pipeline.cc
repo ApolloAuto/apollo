@@ -55,7 +55,6 @@ DEFINE_string(config_root,
               "config_root");
 DEFINE_string(tf_file, "", "tf file");
 DEFINE_string(config_file, "obstacle.pt", "config_file");
-DEFINE_string(narrow_name, "front_12mm", " camera for projecting");
 DEFINE_string(base_camera_name, "front_6mm", "camera to be projected");
 DEFINE_string(sensor_name, "front_6mm,front_12mm", "camera to use");
 DEFINE_string(params_dir, "/apollo/modules/perception/data/params",
