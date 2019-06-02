@@ -57,25 +57,25 @@ char *SerializeItemImp(const HeaderItem<t, T> &item, char *buf, size_t buf_size,
     buf_size < size_t(sizeof(t) + item.ValueSize() + 2) ) {
     return nullptr;
   }
-  char *p = buf;
+  char *res = buf;
   size_t item_size = item.ValueSize();
 
-  HType t1 = t;
-  memcpy(p, &t1, sizeof(HType));
-  p[sizeof(HType)] = ':';
-  p = p + sizeof(HType) + 1;
+  HType type = t;
+  memcpy(res, &type, sizeof(HType));
+  res[sizeof(HType)] = ':';
+  res = res + sizeof(HType) + 1;
   *serialized_size += sizeof(HType) + 1;
 
-  memcpy(p, &item_size, sizeof(size_t));
-  p[sizeof(size_t)] = ':';
-  p = p + sizeof(size_t) + 1;
+  memcpy(res, &item_size, sizeof(size_t));
+  res[sizeof(size_t)] = ':';
+  res = res + sizeof(size_t) + 1;
   *serialized_size += sizeof(size_t) + 1;
 
-  memcpy(p, item.GetValuePtr(), item.ValueSize());
-  p[item.ValueSize()] = '\n';
-  p += item.ValueSize() + 1;
+  memcpy(res, item.GetValuePtr(), item.ValueSize());
+  res[item.ValueSize()] = '\n';
+  res += item.ValueSize() + 1;
   *serialized_size += item.ValueSize() + 1;
-  return p;
+  return res;
 }
 
 template <enum HType t, typename T>
@@ -84,7 +84,7 @@ const char *DiserializeItemImp(HeaderItem<t, T> *item, const char *buf,
   if (!buf || !diserialized_size) {
     return nullptr;
   }
-  const char *p = buf;
+  const char *res = buf;
 
   char p_type[sizeof(HType)] = {0};
   memcpy(p_type, buf, sizeof(HType));
@@ -92,19 +92,19 @@ const char *DiserializeItemImp(HeaderItem<t, T> *item, const char *buf,
   if (type != t) {
     return nullptr;
   }
-  p += sizeof(HType) + 1;
+  res += sizeof(HType) + 1;
   *diserialized_size += sizeof(HType) + 1;
 
   char p_size[sizeof(size_t)] = {0};
-  memcpy(p_size, p, sizeof(size_t));
+  memcpy(p_size, res, sizeof(size_t));
   size_t size = *(reinterpret_cast<size_t *>(p_size));
-  p += sizeof(size_t) + 1;
+  res += sizeof(size_t) + 1;
   *diserialized_size += sizeof(size_t) + 1;
 
-  item->SetValue(p);
-  p += size + 1;
+  item->SetValue(res);
+  res += size + 1;
   *diserialized_size += size + 1;
-  return p;
+  return res;
 }
 
 template <enum HType t, typename T>

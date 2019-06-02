@@ -25,13 +25,13 @@ bool BridgeHeader::Serialize(char *buf, size_t size) {
   if (!buf || size == 0) {
     return false;
   }
-  char *p = buf;
+  char *cursor = buf;
   char *p_header_size = nullptr;
-  p = SerializeHeaderFlag(p, size);
-  p_header_size = p;
-  p += sizeof(size_t) + 1;
+  cursor = SerializeHeaderFlag(cursor, size);
+  p_header_size = cursor;
+  cursor += sizeof(size_t) + 1;
   for (int i = 0; i < Header_Tail; i++) {
-    p = header_item[i]->SerializeItem(p, size, &header_size_);
+    cursor = header_item[i]->SerializeItem(cursor, size, &header_size_);
   }
 
   if (!SerializeHeaderSize(p_header_size, size)) {
@@ -44,27 +44,27 @@ bool BridgeHeader::Diserialize(const char *buf) {
   if (!IsAvailable(buf)) {
     return false;
   }
-  const char *p = buf + sizeof(BRIDGE_HEADER_FLAG) + 1;
+  const char *cursor = buf + sizeof(BRIDGE_HEADER_FLAG) + 1;
 
-  if (!DiserializeBasicType<size_t, sizeof(size_t)>(&header_size_, p)) {
+  if (!DiserializeBasicType<size_t, sizeof(size_t)>(&header_size_, cursor)) {
     return false;
   }
-  p += sizeof(size_t) + 1;
+  cursor += sizeof(size_t) + 1;
 
   size_t i = header_size_ - sizeof(BRIDGE_HEADER_FLAG) - sizeof(size_t) - 2;
   while (i >= 0) {
-    HType type = *(reinterpret_cast<const HType *>(p));
+    HType type = *(reinterpret_cast<const HType *>(cursor));
     if (type > Header_Tail || type < 0) {
-      p += sizeof(HType) + 1;
-      size_t size = *(reinterpret_cast<const size_t *>(p));
-      p += sizeof(size_t) + size + 2;
+      cursor += sizeof(HType) + 1;
+      size_t size = *(reinterpret_cast<const size_t *>(cursor));
+      cursor += sizeof(size_t) + size + 2;
       i -= sizeof(HType) + sizeof(size_t) + size + 3;
       continue;
     } else {
       size_t value_size = 0;
       for (int i = 0; i < Header_Tail; i++) {
         if (type == header_item[i]->GetType()) {
-          p = header_item[i]->DiserializeItem(p, &value_size);
+          cursor = header_item[i]->DiserializeItem(cursor, &value_size);
         }
       }
       i -= value_size;
@@ -93,9 +93,7 @@ char *BridgeHeader::SerializeHeaderFlag(char *buf, size_t size) {
 
 
 char *BridgeHeader::SerializeHeaderSize(char *buf, size_t size) {
-  char *p = SerializeBasicType<size_t, sizeof(size_t)>(&header_size_, buf,
-    size);
-  return p;
+  return SerializeBasicType<size_t, sizeof(size_t)>(&header_size_, buf, size);
 }
 
 }  // namespace bridge

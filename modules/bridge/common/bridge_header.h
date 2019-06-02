@@ -60,11 +60,11 @@ class BridgeHeader {
       return nullptr;
     }
     header_size_ += S + 1;
-    char *p = buf;
-    memcpy(p, value, S);
-    p[S] = '\n';
-    p += S + 1;
-    return p;
+    char *res = buf;
+    memcpy(res, value, S);
+    res[S] = '\n';
+    res += S + 1;
+    return res;
   }
 
   template <typename T, size_t S>
@@ -72,9 +72,9 @@ class BridgeHeader {
     if (!buf) {
       return false;
     }
-    char p[S] = {0};
-    memcpy(p, buf, S);
-    *value = *(reinterpret_cast<T *>(p));
+    char temp[S] = {0};
+    memcpy(temp, buf, S);
+    *value = *(reinterpret_cast<T *>(temp));
     return true;
   }
 
