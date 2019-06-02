@@ -76,8 +76,9 @@ bool ChangeLane::FilterObstacles(ReferenceLineInfo* reference_line_info) {
   }
   if (first_guard_vehicle) {
     guard_obstacles_.push_back(first_guard_vehicle);
+    return true;
   }
-  return true;
+  return false;
 }
 
 bool ChangeLane::CreateGuardObstacle(
