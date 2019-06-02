@@ -1,0 +1,82 @@
+/******************************************************************************
+ * Created on Thu Aug 16 2018
+ *
+ * Copyright (c) 2018 Baidu.com, Inc. All Rights Reserved
+ *
+ * @file: dynamic_align.h 
+ * @desc: description
+ * @author: yuanyijunj@baidu.com
+  *****************************************************************************/
+#ifndef _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_CHANNEL_CHECKER_H
+#define _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_CHANNEL_CHECKER_H
+
+#include <vector>
+#include <string>
+#include <map>
+#include <set>
+#include <memory> // shared_ptr
+#include <utility> // make_pair
+#include "common.hpp"
+#include "modules/map/tools/map_datachecker/proto/collection_error_code.pb.h"
+
+namespace adu {
+namespace workers {
+namespace collection {
+
+struct CyberRecordChannel {
+    std::string channel_name;
+    uint64_t msgnum;
+    std::string msg_type;
+};
+
+struct CyberRecordInfo {
+    std::string path;
+    // std::string version;
+    double duration; // sec
+    uint64_t start_time;
+    uint64_t end_time;
+    // int msgnum;
+    // int chunknum;
+    // uint64_t size; //bytes
+    std::vector<CyberRecordChannel> channels;
+};
+
+struct OneRecordChannelCheckResult {
+    std::string record_path;
+    uint64_t start_time;
+    std::vector<std::string> lack_channels;
+    std::map<std::string, std::pair<double, double>> inadequate_rate; // channel_name <------> (expected_rate, actual_rate)
+};
+
+typedef std::shared_ptr<std::vector<OneRecordChannelCheckResult>> CheckResult;
+typedef std::vector<OneRecordChannelCheckResult>::iterator CheckResultIterator;
+
+
+
+class ChannelVerify {
+public:
+    ChannelVerify(std::shared_ptr<JSonConf> sp_conf);
+    ErrorCode check(std::string record_dir_or_record_full_path);
+    std::shared_ptr<std::vector<OneRecordChannelCheckResult>> get_check_result();
+    ErrorCode get_return_state();
+private:
+    bool is_record_file(std::string path);
+    std::shared_ptr<CyberRecordInfo> get_record_info(std::string record_path);
+    int incremental_check(std::vector<std::string> records_path);
+    std::vector<std::string> get_records_path(std::string record_dir_or_record_full_path);
+    bool is_record_checked(std::string record_path);
+    OneRecordChannelCheckResult check_record_channels(std::string record_path);
+    void reset();
+private:
+    std::shared_ptr<JSonConf> _sp_conf = nullptr;
+    CheckResult _sp_vec_check_result = nullptr;
+    ErrorCode _return_state;
+    std::set<std::string> _checked_records;
+};
+
+
+} // collection
+} // workers
+} // adu
+
+#endif // _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_CHANNEL_CHECKER_H

@@ -1,0 +1,31 @@
+/******************************************************************************
+ * Copyright (c) 2018 Baidu.com, Inc. All Rights Reserved
+ *
+ * @file worker_gflags.cpp
+ * @desc The gflags definition of demo-worker.
+ * @author Tong Wu<wutong14@baidu.com>
+ *****************************************************************************/
+
+
+#include "worker_gflags.h"
+
+namespace adu {
+namespace workers {
+namespace collection {
+
+// Server address
+DEFINE_string(map_datachecker_host, "127.0.0.1", "the demo worker grpc server host");
+DEFINE_string(map_datachecker_port, "50100", "the demo worker grpc server port");
+
+// Cybertron topics
+//DEFINE_string(demo_worker_adc_status_topic, "/pnc/carstatus", "the topic name for ADC status");
+DEFINE_string(topic_inpspva, "/sensor/novatel/inspva", "the topic name for pose");
+DEFINE_string(topic_inpspvax, "/sensor/novatel/inspvax", "the topic name for status");
+DEFINE_string(topic_bestgnsspos, "/sensor/novatel/bestgnsspos", "the topic name for pose and status");
+
+//configure file
+DEFINE_string(conf_json, "/home/caros/kinglong/conf/map-datachecker.json", "configure file");
+
+}  // collection
+}  // workers
+}  // adu
