@@ -95,12 +95,12 @@ void RacobitRadarMessageManager::Parse(const uint32_t message_id,
 
     if (sensor_data_.contiobs_size() <=
         sensor_data_.object_list_status().nof_objects()) {
-      // maybe lost a object_list_status msg
+      // maybe lost an object_list_status msg
       common::util::FillHeader("racobit_radar", &sensor_data_);
       writer_->Write(sensor_data_);
     }
     sensor_data_.Clear();
-    // fill header when recieve the general info message
+    // fill header when receive the general info message
   }
 
   sensor_protocol_data->Parse(data, length, &sensor_data_);

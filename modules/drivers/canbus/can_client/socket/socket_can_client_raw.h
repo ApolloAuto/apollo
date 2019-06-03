@@ -55,7 +55,7 @@ namespace can {
 
 /**
  * @class SocketCanClientRaw
- * @brief The class which defines a ESD CAN client which inherites CanClient.
+ * @brief The class which defines an ESD CAN client which inherites CanClient.
  */
 class SocketCanClientRaw : public CanClient {
  public:

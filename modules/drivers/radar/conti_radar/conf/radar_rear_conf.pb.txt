@@ -33,7 +33,7 @@ radar_conf {
   store_in_nvm: 1
   rcs_threshold: RCS_THRESHOLD_STANDARD
 
-  # unit: nanoseconds, 20ms for 50hz
+  # unit: nanoseconds, 20ms for 50Hz
   input_send_interval: 20000000
 }
 

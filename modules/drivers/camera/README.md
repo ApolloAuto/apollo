@@ -1,5 +1,5 @@
 ####Driver for V4L USB Cameras
-This package is based off of V4L devices specifically instead of just UVC.
+This package is based on V4L devices specifically instead of just UVC.
 
 ### License
 usb_cam is released with a BSD license. For full terms and conditions, see the [LICENSE](LICENSE) file.
