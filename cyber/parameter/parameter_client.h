@@ -30,6 +30,11 @@ namespace cyber {
 
 class Node;
 
+/**
+ * @class ParameterClient
+ * @brief Parameter Client is used to set/get/list parameter(s)
+ * by sending a request to ParameterServer
+ */
 class ParameterClient {
  public:
   using Param = apollo::cyber::proto::Param;
@@ -52,7 +57,7 @@ class ParameterClient {
   /**
    * @brief Get the Parameter object
    *
-   * @param param_name
+   * @param param_name 
    * @param parameter the pointer to store
    * @return true
    * @return false call service fail or timeout

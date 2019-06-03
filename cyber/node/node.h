@@ -34,9 +34,8 @@ class TimerComponent;
 
 /**
  * @class Node
- * @brief .
- * Node is the fundamental building block of Cyber RT.
- * Every module contains and communicates through the node.
+ * @brief Node is the fundamental building block of Cyber RT.
+ * every module contains and communicates through the node.
  * A module can have different types of communication by defining
  * read/write and/or service/client in a node.
  * @warning Duplicate name is not allowed in topo objects, such as node,
@@ -52,33 +51,43 @@ class Node {
   virtual ~Node();
 
   /**
-   * @brief get the node's name.
-   *
-   * @return node's name.
+   * @brief Get node's name.
+   * @warning duplicate node name is not allowed in the topo.
    */
   const std::string& Name() const;
 
   /**
-   * @brief create writer by the role attributes.
-   *
-   * @tparam MessageT is the message type.
-   * @param role_attr is a protobuf message RoleAttributes, which
-   * includes the channel name and other info.
-   *
-   * @return the writer of a message type.
+   * @brief Create a Writer with specific message type.
+   * 
+   * @tparam MessageT Message Type
+   * @param role_attr is a protobuf message RoleAttributes, which includes the
+   * channel name and other info. 
+   * @return std::shared_ptr<Writer<MessageT>> result Writer Object
    */
   template <typename MessageT>
   auto CreateWriter(const proto::RoleAttributes& role_attr)
       -> std::shared_ptr<Writer<MessageT>>;
 
   /**
-   * @brief create reader by the channel name.
-   *
-   * @tparam MessageT is the message type.
-   * @param channel_name is the channel of the reader subscribed.
-   * @param reader_func is the callback function, when the message is recevied.
-   *
-   * @return the reader of a message type.
+   * @brief Create a Writer with specific message type.
+   * 
+   * @tparam MessageT Message Type
+   * @param channel_name the channel name to be published.
+   * @return std::shared_ptr<Writer<MessageT>> result Writer Object
+   */
+  template <typename MessageT>
+  auto CreateWriter(const std::string& channel_name)
+      -> std::shared_ptr<Writer<MessageT>>;
+
+  /**
+   * @brief Create a Reader with specific message type with channel name
+   * qos and other configs used will be default
+   * 
+   * @tparam MessageT Message Type
+   * @param channel_name the channel of the reader subscribed.
+   * @param reader_func invoked when message receive
+   * invoked when the message is received.
+   * @return std::shared_ptr<cyber::Reader<MessageT>> result Reader Object
    */
   template <typename MessageT>
   auto CreateReader(const std::string& channel_name,
@@ -86,13 +95,13 @@ class Node {
       -> std::shared_ptr<cyber::Reader<MessageT>>;
 
   /**
-   * @brief create reader by the config file.
-   *
-   * @tparam MessageT is the message type.
-   * @param config is a file includes the channel name and other info.
-   * @param reader_func is the callback function, when the message is recevied.
-   *
-   * @return the reader of a message type.
+   * @brief Create a Reader with specific message type with reader config
+   * 
+   * @tparam MessageT Message Type
+   * @param config instance of `ReaderConfig`,
+   * include channel name, qos and pending queue size
+   * @param reader_func invoked when message receive
+   * @return std::shared_ptr<cyber::Reader<MessageT>> result Reader Object
    */
   template <typename MessageT>
   auto CreateReader(const ReaderConfig& config,
@@ -100,14 +109,13 @@ class Node {
       -> std::shared_ptr<cyber::Reader<MessageT>>;
 
   /**
-   * @brief create reader by the role attributes.
-   *
-   * @tparam MessageT is the message type.
-   * @param role_attr is a protobuf message RoleAttributes, which includes the
-   * channel name and other info.
-   * @param reader_func is the callback function, when the message is recevied.
-   *
-   * @return the reader of the message type.
+   * @brief Create a Reader object with `RoleAttributes`
+   * 
+   * @tparam MessageT Message Type
+   * @param role_attr instance of `RoleAttributes`,
+   * includes channel name, qos, etc.
+   * @param reader_func invoked when message receive
+   * @return std::shared_ptr<cyber::Reader<MessageT>> result Reader Object 
    */
   template <typename MessageT>
   auto CreateReader(const proto::RoleAttributes& role_attr,
@@ -115,49 +123,49 @@ class Node {
       -> std::shared_ptr<cyber::Reader<MessageT>>;
 
   /**
-   * @brief create writer by the channel name.
-   *
-   * @tparam MessageT  is the message type.
-   * @param channel_name is the channel of the writer published.
-   *
-   * @return the writer of the message type.
-   */
-  template <typename MessageT>
-  auto CreateWriter(const std::string& channel_name)
-      -> std::shared_ptr<Writer<MessageT>>;
-
-  /**
-   * @brief create service for message communication.
-   *
-   * @tparam Request the request message from the client.
-   * @tparam Response the response message from the service.
-   * @param service_name is the service name.
-   * @param service_calllback is the callback function used to process Request.
-   *
-   * @return the service object for process Request.
+   * @brief Create a Service object with specific `service_name`
+   * 
+   * @tparam Request Message Type of the Request
+   * @tparam Response Message Type of the Response
+   * @param service_name specific service name to a serve
+   * @param service_callback invoked when a service is called
+   * @return std::shared_ptr<Service<Request, Response>> result `Service`
    */
   template <typename Request, typename Response>
   auto CreateService(const std::string& service_name,
                      const typename Service<Request, Response>::ServiceCallback&
-                         service_calllback)
+                         service_callback)
       -> std::shared_ptr<Service<Request, Response>>;
 
   /**
-   * @brief create client for message communication.
-   *
-   * @tparam Request the request message from the client.
-   * @tparam Response the response message from the service.
-   * @param service_name is the service name.
-   *
-   * @return the Client to send the request.
+   * @brief Create a Client object to request Service with `service_name`
+   * 
+   * @tparam Request Message Type of the Request
+   * @tparam Response Message Type of the Response
+   * @param service_name specific service name to a Service
+   * @return std::shared_ptr<Client<Request, Response>> result `Client`
    */
   template <typename Request, typename Response>
   auto CreateClient(const std::string& service_name)
       -> std::shared_ptr<Client<Request, Response>>;
 
+  /**
+   * @brief Observe all readers' data
+   */
   void Observe();
+
+  /**
+   * @brief clear all readers' data
+   */
   void ClearData();
 
+  /**
+   * @brief Get the Reader object that subscribe `channel_name`
+   * 
+   * @tparam MessageT Message Type
+   * @param channel_name channel name
+   * @return std::shared_ptr<Reader<MessageT>> result reader
+   */
   template <typename MessageT>
   auto GetReader(const std::string& channel_name)
       -> std::shared_ptr<Reader<MessageT>>;
@@ -246,9 +254,9 @@ template <typename Request, typename Response>
 auto Node::CreateService(
     const std::string& service_name,
     const typename Service<Request, Response>::ServiceCallback&
-        service_calllback) -> std::shared_ptr<Service<Request, Response>> {
+        service_callback) -> std::shared_ptr<Service<Request, Response>> {
   return node_service_impl_->template CreateService<Request, Response>(
-      service_name, service_calllback);
+      service_name, service_callback);
 }
 
 template <typename Request, typename Response>
