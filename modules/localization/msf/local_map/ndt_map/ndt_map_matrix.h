@@ -42,9 +42,9 @@ class NdtMapSingleCell {
    * @param <buf, buf_size> The buffer and its size.
    * @param <return> The required or the used size of is returned.
    */
-  unsigned int CreateBinary(unsigned char* buf, unsigned int buf_size) const;
+  size_t CreateBinary(unsigned char* buf, size_t buf_size) const;
   /**@brief Get the binary size of the object. */
-  unsigned int GetBinarySize() const;
+  size_t GetBinarySize() const;
   /**@brief Overloading the assign operator. */
   NdtMapSingleCell& operator=(const NdtMapSingleCell& ref);
 
@@ -108,9 +108,9 @@ class NdtMapCells {
    * @param <buf, buf_size> The buffer and its size.
    * @param <return> The required or the used size of is returned.
    */
-  unsigned int CreateBinary(unsigned char* buf, unsigned int buf_size) const;
+  size_t CreateBinary(unsigned char* buf, size_t buf_size) const;
   /**@brief Get the binary size of the object. */
-  unsigned int GetBinarySize() const;
+  size_t GetBinarySize() const;
 
   /**@brief Calculate altitude index from altitude. */
   static int CalAltitudeIndex(const float resolution, const float altitude);
@@ -160,7 +160,7 @@ class NdtMapMatrix : public BaseMapMatrix {
    * @param <return> The required or the used size of is returned.
    */
   virtual size_t CreateBinary(unsigned char* buf,
-                                    unsigned int buf_size) const;
+                              size_t buf_size) const;
   /**@brief Get the binary size of the object. */
   virtual size_t GetBinarySize() const;
 

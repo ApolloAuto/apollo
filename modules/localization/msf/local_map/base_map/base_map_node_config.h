@@ -43,7 +43,7 @@ class BaseMapNodeConfig {
    * @param <return> The required or the used size.
    */
   virtual unsigned int CreateBinary(unsigned char *buf,
-                                    unsigned int buf_size) const;
+                                    size_t buf_size) const;
   /**@brief Get the size of the config in bytes. */
   virtual unsigned int GetBinarySize() const;
 
@@ -51,7 +51,7 @@ class BaseMapNodeConfig {
   MapNodeIndex node_index_;
   MapVersion map_version_ = MapVersion::UNKNOWN;
   unsigned char body_md5_[MD5LENTH] = {0};
-  unsigned int body_size_ = 0;
+  size_t body_size_ = 0;
   bool has_map_version_ = true;
   bool has_body_md5_ = true;
 };

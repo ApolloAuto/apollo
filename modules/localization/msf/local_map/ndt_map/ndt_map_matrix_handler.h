@@ -41,7 +41,7 @@ class NdtMapMatrixHandler : public BaseMapMatrixHandler {
    * @param <return> The required or the used size of is returned.
    */
   size_t CreateBinary(const BaseMapMatrix* matrix,
-                                 unsigned char* buf, unsigned int buf_size);
+                                 unsigned char* buf, size_t buf_size);
   /**@brief Get the binary size of the object. */
   size_t GetBinarySize(const BaseMapMatrix* matrix);
 };

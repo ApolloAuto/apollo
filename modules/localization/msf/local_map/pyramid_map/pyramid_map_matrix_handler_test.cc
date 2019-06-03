@@ -60,8 +60,8 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, LossyMapFullAltMatrixHandler) {
   pm_matrix->SetCountMatrix(uint_data, 4, 0);
 
   // normal case: check get/create/load
-  unsigned int expect_size =
-      static_cast<unsigned int>(sizeof(unsigned int) * 2 + sizeof(float) * 4);
+  size_t expect_size =
+      sizeof(unsigned int) * 2 + sizeof(float) * 4;
   expect_size +=
       pm_matrix->GetRowsSafe() * pm_matrix->GetColsSafe() *
       (sizeof(unsigned char) + sizeof(unsigned char) + sizeof(uint16_t) +

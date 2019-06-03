@@ -45,7 +45,7 @@ size_t NdtMapMatrixHandler::LoadBinary(const unsigned char* buf,
  */
 size_t NdtMapMatrixHandler::CreateBinary(const BaseMapMatrix* matrix,
                                          unsigned char* buf,
-                                         unsigned int buf_size) {
+                                         size_t buf_size) {
   if (!matrix) {
     return 0;
   }

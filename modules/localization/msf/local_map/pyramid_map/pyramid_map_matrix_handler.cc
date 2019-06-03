@@ -135,8 +135,8 @@ LossyMapFullAltMatrixHandler::LossyMapFullAltMatrixHandler() {}
 
 LossyMapFullAltMatrixHandler::~LossyMapFullAltMatrixHandler() {}
 
-size_t LossyMapFullAltMatrixHandler::LoadBinary(
-    const unsigned char* buf, BaseMapMatrix* base_matrix) {
+size_t LossyMapFullAltMatrixHandler::LoadBinary(const unsigned char* buf,
+                                                BaseMapMatrix* base_matrix) {
   PyramidMapMatrix* matrix = dynamic_cast<PyramidMapMatrix*>(base_matrix);
 
   size_t binary_size = sizeof(unsigned int) * 2;
@@ -203,9 +203,10 @@ size_t LossyMapFullAltMatrixHandler::LoadBinary(
     const unsigned char* p_high = uc_p;
     for (unsigned int r = 0; r < rows; ++r) {
       for (unsigned int c = 0; c < cols; ++c) {
-        uint16_t var = static_cast<uint16_t>(p_high[r * cols + c]);
-        var = var * 256u + static_cast<uint16_t>(p_low[r * cols + c]);
-        DecodeIntensityVar(var, &(*intensity_var_matrix)[r][c]);
+        unsigned int var = static_cast<unsigned int>(p_high[r * cols + c]);
+        var = var * 256u + static_cast<unsigned int>(p_low[r * cols + c]);
+        DecodeIntensityVar(static_cast<uint16_t>(var),
+                           &(*intensity_var_matrix)[r][c]);
       }
     }
     uc_p += 2 * matrix_size;
@@ -218,10 +219,10 @@ size_t LossyMapFullAltMatrixHandler::LoadBinary(
     const unsigned char* p_high = uc_p;
     for (unsigned int r = 0; r < rows; ++r) {
       for (unsigned int c = 0; c < cols; ++c) {
-        uint16_t alt = static_cast<uint16_t>(p_high[r * cols + c]);
-        alt = alt * 256 + static_cast<uint16_t>(p_low[r * cols + c]);
-        DecodeAltitude(alt, alt_avg_min_, alt_avg_interval_,
-                       &(*altitude_matrix)[r][c]);
+        unsigned int alt = static_cast<unsigned int>(p_high[r * cols + c]);
+        alt = alt * 256u + static_cast<unsigned int>(p_low[r * cols + c]);
+        DecodeAltitude(static_cast<uint16_t>(alt), alt_avg_min_,
+                       alt_avg_interval_, &(*altitude_matrix)[r][c]);
       }
     }
     uc_p += 2 * matrix_size;
@@ -234,10 +235,10 @@ size_t LossyMapFullAltMatrixHandler::LoadBinary(
     const unsigned char* p_high = uc_p;
     for (unsigned int r = 0; r < rows; ++r) {
       for (unsigned int c = 0; c < cols; ++c) {
-        uint16_t alt = static_cast<uint16_t>(p_high[r * cols + c]);
-        alt = alt * 256 + static_cast<uint16_t>(p_low[r * cols + c]);
-        DecodeAltitude(alt, ground_alt_min_, ground_alt_interval_,
-                       &(*ground_altitude_matrix)[r][c]);
+        unsigned int alt = static_cast<unsigned int>(p_high[r * cols + c]);
+        alt = alt * 256u + static_cast<unsigned int>(p_low[r * cols + c]);
+        DecodeAltitude(static_cast<uint16_t>(alt), ground_alt_min_,
+                       ground_alt_interval_, &(*ground_altitude_matrix)[r][c]);
       }
     }
     uc_p += 2 * matrix_size;
@@ -247,8 +248,7 @@ size_t LossyMapFullAltMatrixHandler::LoadBinary(
 }
 
 size_t LossyMapFullAltMatrixHandler::CreateBinary(
-    const BaseMapMatrix* base_matrix, unsigned char* buf,
-    unsigned int buf_size) {
+    const BaseMapMatrix* base_matrix, unsigned char* buf, size_t buf_size) {
   const PyramidMapMatrix* matrix =
       dynamic_cast<const PyramidMapMatrix*>(base_matrix);
 
@@ -342,7 +342,7 @@ size_t LossyMapFullAltMatrixHandler::CreateBinary(
       for (unsigned int c = 0; c < cols; ++c) {
         const float* intensity =
             static_cast<const float*>(matrix->GetIntensitySafe(r, c));
-        float ity = (intensity != NULL) ? *intensity : 0.0;
+        float ity = (intensity != NULL) ? *intensity : 0.0f;
         uc_p[r * cols + c] = EncodeIntensity(ity);
       }
     }
@@ -356,10 +356,10 @@ size_t LossyMapFullAltMatrixHandler::CreateBinary(
       for (unsigned int c = 0; c < cols; ++c) {
         const float* intensity_var =
             static_cast<const float*>(matrix->GetIntensityVarSafe(r, c));
-        float iv = (intensity_var != NULL) ? *intensity_var : 0.0;
+        float iv = (intensity_var != NULL) ? *intensity_var : 0.0f;
         uint16_t var = EncodeIntensityVar(iv);
-        p_high[r * cols + c] = var / 256;
-        p_low[r * cols + c] = var % 256;
+        p_high[r * cols + c] = static_cast<uint8_t>(var / 256);
+        p_low[r * cols + c] = static_cast<uint8_t>(var % 256);
       }
     }
     uc_p += 2 * matrix_size;
@@ -371,10 +371,10 @@ size_t LossyMapFullAltMatrixHandler::CreateBinary(
     for (unsigned int r = 0; r < rows; ++r) {
       for (unsigned int c = 0; c < cols; ++c) {
         const float* altitude = matrix->GetAltitudeSafe(r, c);
-        float a = (altitude != NULL) ? *altitude : 0.0;
+        float a = (altitude != NULL) ? *altitude : 0.0f;
         uint16_t alt = EncodeAltitude(a, alt_avg_min_, alt_avg_interval_);
-        p_high[r * cols + c] = alt / 256;
-        p_low[r * cols + c] = alt % 256;
+        p_high[r * cols + c] = static_cast<unsigned char>(alt / 256);
+        p_low[r * cols + c] = static_cast<unsigned char>(alt % 256);
       }
     }
     uc_p += 2 * matrix_size;
@@ -386,11 +386,11 @@ size_t LossyMapFullAltMatrixHandler::CreateBinary(
     for (unsigned int r = 0; r < rows; ++r) {
       for (unsigned int c = 0; c < cols; ++c) {
         const float* ground_altitude = matrix->GetGroundAltitudeSafe(r, c);
-        float ga = (ground_altitude != NULL) ? *ground_altitude : 0.0;
+        float ga = (ground_altitude != NULL) ? *ground_altitude : 0.0f;
         uint16_t alt =
             EncodeAltitude(ga, ground_alt_min_, ground_alt_interval_);
-        p_high[r * cols + c] = alt / 256;
-        p_low[r * cols + c] = alt % 256;
+        p_high[r * cols + c] = static_cast<unsigned char>(alt / 256);
+        p_low[r * cols + c] = static_cast<unsigned char>(alt % 256);
       }
     }
     uc_p += 2 * matrix_size;
@@ -429,8 +429,8 @@ LosslessMapMatrixHandler::LosslessMapMatrixHandler() {}
 
 LosslessMapMatrixHandler::~LosslessMapMatrixHandler() {}
 
-size_t LosslessMapMatrixHandler::LoadBinary(
-    const unsigned char* buf, BaseMapMatrix* base_matrix) {
+size_t LosslessMapMatrixHandler::LoadBinary(const unsigned char* buf,
+                                            BaseMapMatrix* base_matrix) {
   PyramidMapMatrix* matrix = dynamic_cast<PyramidMapMatrix*>(base_matrix);
 
   size_t binary_size = sizeof(unsigned int) * 2;  // rows and cols
@@ -498,9 +498,9 @@ size_t LosslessMapMatrixHandler::LoadBinary(
   return binary_size;
 }
 
-size_t LosslessMapMatrixHandler::CreateBinary(
-    const BaseMapMatrix* base_matrix, unsigned char* buf,
-    unsigned int buf_size) {
+size_t LosslessMapMatrixHandler::CreateBinary(const BaseMapMatrix* base_matrix,
+                                              unsigned char* buf,
+                                              size_t buf_size) {
   const PyramidMapMatrix* matrix =
       dynamic_cast<const PyramidMapMatrix*>(base_matrix);
 
@@ -539,13 +539,13 @@ size_t LosslessMapMatrixHandler::CreateBinary(
             const unsigned int* count = matrix->GetCountSafe(y, x);
 
             float* float_p = reinterpret_cast<float*>(uint_p);
-            *float_p = (intensity != NULL) ? *intensity : 0.0;
+            *float_p = (intensity != NULL) ? *intensity : 0.0f;
             ++float_p;
-            *float_p = (intensity_var != NULL) ? *intensity_var : 0.0;
+            *float_p = (intensity_var != NULL) ? *intensity_var : 0.0f;
             ++float_p;
-            *float_p = (altitude != NULL) ? *altitude : 0.0;
+            *float_p = (altitude != NULL) ? *altitude : 0.0f;
             ++float_p;
-            *float_p = (altitude_var != NULL) ? *altitude_var : 0.0;
+            *float_p = (altitude_var != NULL) ? *altitude_var : 0.0f;
             ++float_p;
             uint_p = reinterpret_cast<unsigned int*>(float_p);
             *uint_p = (count != NULL) ? *count : 0;
@@ -555,13 +555,13 @@ size_t LosslessMapMatrixHandler::CreateBinary(
             const unsigned int* ground_count = matrix->GetGroundCountSafe(y, x);
 
             float* float_p = reinterpret_cast<float*>(uint_p);
-            *float_p = 0.0;
+            *float_p = 0.0f;
             ++float_p;
-            *float_p = 0.0;
+            *float_p = 0.0f;
             ++float_p;
-            *float_p = (ground_altitude != NULL) ? *ground_altitude : 0.0;
+            *float_p = (ground_altitude != NULL) ? *ground_altitude : 0.0f;
             ++float_p;
-            *float_p = 0.0;
+            *float_p = 0.0f;
             ++float_p;
             uint_p = reinterpret_cast<unsigned int*>(float_p);
             *uint_p = (ground_count != NULL) ? *ground_count : 0;
@@ -613,8 +613,8 @@ PyramidLossyMapMatrixHandler::PyramidLossyMapMatrixHandler() {}
 
 PyramidLossyMapMatrixHandler::~PyramidLossyMapMatrixHandler() {}
 
-size_t PyramidLossyMapMatrixHandler::LoadBinary(
-    const unsigned char* buf, BaseMapMatrix* base_matrix) {
+size_t PyramidLossyMapMatrixHandler::LoadBinary(const unsigned char* buf,
+                                                BaseMapMatrix* base_matrix) {
   PyramidMapMatrix* matrix = dynamic_cast<PyramidMapMatrix*>(base_matrix);
 
   size_t binary_size = sizeof(unsigned int) * 4;
@@ -718,7 +718,7 @@ size_t PyramidLossyMapMatrixHandler::LoadBinary(
       for (unsigned int r = 0; r < rows; ++r) {
         for (unsigned int c = 0; c < cols; ++c) {
           uint16_t var = p_high[r * cols + c];
-          var = var * 256 + p_low[r * cols + c];
+          var = static_cast<uint16_t>(var * 256 + p_low[r * cols + c]);
           DecodeIntensityVar(var, &(*intensity_var_matrix)[r][c]);
         }
       }
@@ -733,7 +733,7 @@ size_t PyramidLossyMapMatrixHandler::LoadBinary(
       for (unsigned int r = 0; r < rows; ++r) {
         for (unsigned int c = 0; c < cols; ++c) {
           uint16_t alt = p_high[r * cols + c];
-          alt = alt * 256 + p_low[r * cols + c];
+          alt = static_cast<uint16_t>(alt * 256 + p_low[r * cols + c]);
           DecodeAltitude(alt, alt_avg_min_, alt_avg_interval_,
                          &(*altitude_matrix)[r][c]);
         }
@@ -756,7 +756,7 @@ size_t PyramidLossyMapMatrixHandler::LoadBinary(
       for (unsigned int r = 0; r < rows; ++r) {
         for (unsigned int c = 0; c < cols; ++c) {
           uint16_t alt = p_high[r * cols + c];
-          alt = alt * 256 + p_low[r * cols + c];
+          alt = static_cast<uint16_t>(alt * 256 + p_low[r * cols + c]);
           DecodeAltitude(alt, ground_alt_min_, ground_alt_interval_,
                          &(*ground_altitude_matrix)[r][c]);
         }
@@ -769,8 +769,7 @@ size_t PyramidLossyMapMatrixHandler::LoadBinary(
 }
 
 size_t PyramidLossyMapMatrixHandler::CreateBinary(
-    const BaseMapMatrix* base_matrix, unsigned char* buf,
-    unsigned int buf_size) {
+    const BaseMapMatrix* base_matrix, unsigned char* buf, size_t buf_size) {
   const PyramidMapMatrix* matrix =
       dynamic_cast<const PyramidMapMatrix*>(base_matrix);
 
@@ -918,8 +917,8 @@ size_t PyramidLossyMapMatrixHandler::CreateBinary(
           for (unsigned int c = 0; c < cols; ++c) {
             const float* intensity_var = matrix->GetIntensityVarSafe(r, c, l);
             uint16_t var = EncodeIntensityVar(*intensity_var);
-            p_high[r * cols + c] = var / 256;
-            p_low[r * cols + c] = var % 256;
+            p_high[r * cols + c] = static_cast<unsigned char>(var / 256);
+            p_low[r * cols + c] = static_cast<unsigned char>(var % 256);
           }
         }
         uc_p += 2 * matrix_size;
@@ -934,8 +933,8 @@ size_t PyramidLossyMapMatrixHandler::CreateBinary(
             const float* altitude = matrix->GetAltitudeSafe(r, c, l);
             uint16_t alt =
                 EncodeAltitude(*altitude, alt_avg_min_, alt_avg_interval_);
-            p_high[r * cols + c] = alt / 256;
-            p_low[r * cols + c] = alt % 256;
+            p_high[r * cols + c] = static_cast<unsigned char>(alt / 256);
+            p_low[r * cols + c] = static_cast<unsigned char>(alt % 256);
           }
         }
         uc_p += 2 * matrix_size;
@@ -956,8 +955,8 @@ size_t PyramidLossyMapMatrixHandler::CreateBinary(
                 matrix->GetGroundAltitudeSafe(r, c, l);
             uint16_t alt = EncodeAltitude(*ground_altitude, ground_alt_min_,
                                           ground_alt_interval_);
-            p_high[r * cols + c] = alt / 256;
-            p_low[r * cols + c] = alt % 256;
+            p_high[r * cols + c] = static_cast<unsigned char>(alt / 256);
+            p_low[r * cols + c] = static_cast<unsigned char>(alt % 256);
           }
         }
         uc_p += 2 * matrix_size;
@@ -990,9 +989,8 @@ size_t PyramidLossyMapMatrixHandler::GetBinarySize(
   // rows and cols in first level
   // space for has_*
   // altitude min & ground altitude min
-  size_t target_size = sizeof(unsigned int) * 2 +
-                                  sizeof(unsigned int) * 2 +
-                                  sizeof(unsigned char) * 4 + sizeof(float) * 2;
+  size_t target_size = sizeof(unsigned int) * 2 + sizeof(unsigned int) * 2 +
+                       sizeof(unsigned char) * 4 + sizeof(float) * 2;
 
   for (unsigned int l = 0; l < resolution_num; ++l) {
     unsigned int matrix_size = matrix->GetRowsSafe(l) * matrix->GetColsSafe(l);
@@ -1027,8 +1025,8 @@ PyramidLosslessMapMatrixHandler::PyramidLosslessMapMatrixHandler() {}
 
 PyramidLosslessMapMatrixHandler::~PyramidLosslessMapMatrixHandler() {}
 
-size_t PyramidLosslessMapMatrixHandler::LoadBinary(
-    const unsigned char* buf, BaseMapMatrix* base_matrix) {
+size_t PyramidLosslessMapMatrixHandler::LoadBinary(const unsigned char* buf,
+                                                   BaseMapMatrix* base_matrix) {
   PyramidMapMatrix* matrix = dynamic_cast<PyramidMapMatrix*>(base_matrix);
 
   size_t binary_size = sizeof(unsigned int) * 4;
@@ -1125,8 +1123,7 @@ size_t PyramidLosslessMapMatrixHandler::LoadBinary(
 }
 
 size_t PyramidLosslessMapMatrixHandler::CreateBinary(
-    const BaseMapMatrix* base_matrix, unsigned char* buf,
-    unsigned int buf_size) {
+    const BaseMapMatrix* base_matrix, unsigned char* buf, size_t buf_size) {
   const PyramidMapMatrix* matrix =
       dynamic_cast<const PyramidMapMatrix*>(base_matrix);
 
@@ -1264,9 +1261,8 @@ size_t PyramidLosslessMapMatrixHandler::GetBinarySize(
   // resolution_num and ratio
   // rows and cols in first level
   // space for has_*
-  size_t target_size = sizeof(unsigned int) * 2 +
-                                  sizeof(unsigned int) * 2 +
-                                  sizeof(unsigned char) * 4;
+  size_t target_size = sizeof(unsigned int) * 2 + sizeof(unsigned int) * 2 +
+                       sizeof(unsigned char) * 4;
 
   for (unsigned int l = 0; l < resolution_num; ++l) {
     unsigned int matrix_size = matrix->GetRowsSafe(l) * matrix->GetColsSafe(l);

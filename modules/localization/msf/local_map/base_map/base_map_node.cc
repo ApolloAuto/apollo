@@ -188,13 +188,13 @@ bool BaseMapNode::Load(const char* filename) {
 
 bool BaseMapNode::LoadBinary(FILE* file) {
   // Load the header
-  unsigned int header_size = GetHeaderBinarySize();
+  size_t header_size = GetHeaderBinarySize();
   std::vector<unsigned char> buf(header_size);
   size_t read_size = fread(&buf[0], 1, header_size, file);
   if (read_size != header_size) {
     return false;
   }
-  unsigned int processed_size = LoadHeaderBinary(&buf[0]);
+  size_t processed_size = LoadHeaderBinary(&buf[0]);
   if (processed_size != header_size) {
     return false;
   }
@@ -216,7 +216,7 @@ bool BaseMapNode::CreateBinary(FILE* file) const {
   std::vector<unsigned char> buffer;
   buffer.resize(buf_size);
 
-  unsigned int binary_size = 0;
+  size_t binary_size = 0;
   std::vector<unsigned char> body_buffer;
   size_t processed_size = CreateBodyBinary(&body_buffer);
 
@@ -230,7 +230,7 @@ bool BaseMapNode::CreateBinary(FILE* file) const {
   }
 
   // Create header
-  unsigned int header_size = GetHeaderBinarySize();
+  size_t header_size = GetHeaderBinarySize();
   std::vector<unsigned char> header_buf(header_size);
   processed_size = CreateHeaderBinary(&buffer[0], buf_size);
 
@@ -238,7 +238,7 @@ bool BaseMapNode::CreateBinary(FILE* file) const {
     return false;
   }
 
-  unsigned int buffer_bias = processed_size;
+  size_t buffer_bias = processed_size;
   buf_size -= processed_size;
   binary_size += processed_size;
   // Create body
@@ -255,7 +255,7 @@ size_t BaseMapNode::GetBinarySize() const {
   return GetBodyBinarySize() + GetHeaderBinarySize();
 }
 
-unsigned int BaseMapNode::LoadHeaderBinary(const unsigned char* buf) {
+size_t BaseMapNode::LoadHeaderBinary(const unsigned char* buf) {
   BaseMapNodeConfig* node_config_tem = map_node_config_->Clone();
 
   size_t target_size = map_node_config_->LoadBinary(buf);
@@ -275,17 +275,17 @@ unsigned int BaseMapNode::LoadHeaderBinary(const unsigned char* buf) {
   return target_size;
 }
 
-unsigned int BaseMapNode::CreateHeaderBinary(unsigned char* buf,
-                                             unsigned int buf_size) const {
+size_t BaseMapNode::CreateHeaderBinary(unsigned char* buf,
+                                             size_t buf_size) const {
   map_node_config_->body_size_ = file_body_binary_size_;
   return map_node_config_->CreateBinary(buf, buf_size);
 }
 
-unsigned int BaseMapNode::GetHeaderBinarySize() const {
+size_t BaseMapNode::GetHeaderBinarySize() const {
   return map_node_config_->GetBinarySize();
 }
 
-unsigned int BaseMapNode::LoadBodyBinary(std::vector<unsigned char>* buf) {
+size_t BaseMapNode::LoadBodyBinary(std::vector<unsigned char>* buf) {
   if (compression_strategy_ == NULL) {
     return map_matrix_handler_->LoadBinary(&(*buf)[0], map_matrix_);
   }
@@ -293,16 +293,17 @@ unsigned int BaseMapNode::LoadBodyBinary(std::vector<unsigned char>* buf) {
   compression_strategy_->Decode(buf, &buf_uncompressed);
   uncompressed_file_body_size_ = buf_uncompressed.size();
   std::cout << "map node compress ratio: "
-            << static_cast<float>(buf->size()) / uncompressed_file_body_size_
+            << static_cast<float>(buf->size()) /
+               static_cast<float>(uncompressed_file_body_size_)
             << std::endl;
 
   return map_matrix_handler_->LoadBinary(&buf_uncompressed[0], map_matrix_);
 }
 
-unsigned int BaseMapNode::CreateBodyBinary(
+size_t BaseMapNode::CreateBodyBinary(
     std::vector<unsigned char>* buf) const {
   if (compression_strategy_ == NULL) {
-    unsigned int body_size = GetBodyBinarySize();
+    size_t body_size = GetBodyBinarySize();
     buf->resize(body_size);
     file_body_binary_size_ =
         map_matrix_handler_->CreateBinary(map_matrix_, &(*buf)[0], body_size);
@@ -310,9 +311,9 @@ unsigned int BaseMapNode::CreateBodyBinary(
   }
   std::vector<unsigned char> buf_uncompressed;
   // Compute the uncompression binary body size
-  unsigned int body_size = GetBodyBinarySize();
+  size_t body_size = GetBodyBinarySize();
   buf_uncompressed.resize(body_size);
-  unsigned int binary_size = map_matrix_handler_->CreateBinary(
+  size_t binary_size = map_matrix_handler_->CreateBinary(
       map_matrix_, &buf_uncompressed[0], body_size);
   if (binary_size == 0) {
     return 0;
@@ -324,7 +325,7 @@ unsigned int BaseMapNode::CreateBodyBinary(
   return buf->size();
 }
 
-unsigned int BaseMapNode::GetBodyBinarySize() const {
+size_t BaseMapNode::GetBodyBinarySize() const {
   return map_matrix_handler_->GetBinarySize(map_matrix_);
 }
 
@@ -354,8 +355,10 @@ bool BaseMapNode::GetCoordinate(const Eigen::Vector3d& coordinate,
 Eigen::Vector2d BaseMapNode::GetCoordinate(unsigned int x,
                                            unsigned int y) const {
   const Eigen::Vector2d& left_top_corner = GetLeftTopCorner();
-  Eigen::Vector2d coord(left_top_corner[0] + x * GetMapResolution(),
-                        left_top_corner[1] + y * GetMapResolution());
+  Eigen::Vector2d coord(left_top_corner[0] +
+                        static_cast<float>(x) * GetMapResolution(),
+                        left_top_corner[1] +
+                        static_cast<float>(y) * GetMapResolution());
   return coord;
 }
 
@@ -369,11 +372,13 @@ Eigen::Vector2d BaseMapNode::ComputeLeftTopCorner(const BaseMapConfig& config,
                                                   const MapNodeIndex& index) {
   Eigen::Vector2d coord;
   coord[0] = config.map_range_.GetMinX() +
-             config.map_node_size_x_ *
-                 config.map_resolutions_[index.resolution_id_] * index.n_;
+            static_cast<float>(config.map_node_size_x_) *
+            config.map_resolutions_[index.resolution_id_] *
+            static_cast<float>(index.n_);
   coord[1] = config.map_range_.GetMinY() +
-             config.map_node_size_y_ *
-                 config.map_resolutions_[index.resolution_id_] * index.m_;
+             static_cast<float>(config.map_node_size_y_) *
+             config.map_resolutions_[index.resolution_id_] *
+             static_cast<float>(index.m_);
   if (coord[0] >= config.map_range_.GetMaxX()) {
     throw "[BaseMapNode::ComputeLeftTopCorner] coord[0]"
                 " >= config.map_range_.GetMaxX()";
@@ -389,11 +394,13 @@ Eigen::Vector2d BaseMapNode::GetLeftTopCorner(const BaseMapConfig& config,
                                               const MapNodeIndex& index) {
   Eigen::Vector2d coord;
   coord[0] = config.map_range_.GetMinX() +
-             config.map_node_size_x_ *
-                 config.map_resolutions_[index.resolution_id_] * index.n_;
+             static_cast<float>(config.map_node_size_x_) *
+             config.map_resolutions_[index.resolution_id_] *
+             static_cast<float>(index.n_);
   coord[1] = config.map_range_.GetMinY() +
-             config.map_node_size_y_ *
-                 config.map_resolutions_[index.resolution_id_] * index.m_;
+             static_cast<float>(config.map_node_size_y_) *
+             config.map_resolutions_[index.resolution_id_] *
+             static_cast<float>(index.m_);
   DCHECK_LT(coord[0], config.map_range_.GetMaxX());
   DCHECK_LT(coord[1], config.map_range_.GetMaxY());
   return coord;

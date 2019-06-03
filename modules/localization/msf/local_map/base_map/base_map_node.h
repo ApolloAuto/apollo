@@ -155,27 +155,27 @@ class BaseMapNode {
   /**@brief Load the map node header from a binary chunk.
    * @param <return> The size read (the real size of header).
    */
-  virtual unsigned int LoadHeaderBinary(const unsigned char* buf);
+  virtual size_t LoadHeaderBinary(const unsigned char* buf);
   /**@brief Create the binary header.
    * @param <buf, buf_size> The buffer and its size.
    * @param <return> The required or the used size of is returned.
    */
-  virtual unsigned int CreateHeaderBinary(unsigned char* buf,
-                                          unsigned int buf_size) const;
+  virtual size_t CreateHeaderBinary(unsigned char* buf,
+                                          size_t buf_size) const;
   /**@brief Get the size of the header in bytes. */
-  virtual unsigned int GetHeaderBinarySize() const;
+  virtual size_t GetHeaderBinarySize() const;
 
   /**@brief Load the map node body from a binary chunk.
    * @param <return> The size read (the real size of body).
    */
-  virtual unsigned int LoadBodyBinary(std::vector<unsigned char>* buf);
+  virtual size_t LoadBodyBinary(std::vector<unsigned char>* buf);
   /**@brief Create the binary body.
    * @param <buf, buf_size> The buffer and its size.
    * @param <return> The required or the used size of is returned.
    */
-  virtual unsigned int CreateBodyBinary(std::vector<unsigned char>* buf) const;
+  virtual size_t CreateBodyBinary(std::vector<unsigned char>* buf) const;
   /**@brief Get the size of the body in bytes. */
-  virtual unsigned int GetBodyBinarySize() const;
+  virtual size_t GetBodyBinarySize() const;
 
   /**@brief The map settings. */
   const BaseMapConfig* map_config_ = nullptr;
@@ -200,9 +200,9 @@ class BaseMapNode {
   /* *@brief Indicate map node data is ready*/
   bool data_is_ready_ = false;
   /**@brief The body binary size in file. */
-  mutable unsigned int file_body_binary_size_ = 0;
+  mutable size_t file_body_binary_size_ = 0;
 
-  mutable unsigned int uncompressed_file_body_size_ = 0;
+  mutable size_t uncompressed_file_body_size_ = 0;
   /**@bried The compression strategy. */
   CompressionStrategy* compression_strategy_ = nullptr;
 };

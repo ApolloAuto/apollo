@@ -77,9 +77,9 @@ size_t NdtMapSingleCell::LoadBinary(const unsigned char* buf) {
   return GetBinarySize();
 }
 
-unsigned int NdtMapSingleCell::CreateBinary(unsigned char* buf,
-                                            unsigned int buf_size) const {
-  unsigned int target_size = GetBinarySize();
+size_t NdtMapSingleCell::CreateBinary(unsigned char* buf,
+                                            size_t buf_size) const {
+  size_t target_size = GetBinarySize();
   if (buf_size >= target_size) {
     float* p = reinterpret_cast<float*>(buf);
     *p = intensity_;
@@ -120,13 +120,13 @@ unsigned int NdtMapSingleCell::CreateBinary(unsigned char* buf,
   return target_size;
 }
 
-unsigned int NdtMapSingleCell::GetBinarySize() const {
-  unsigned int sz =
-      static_cast<unsigned int>(sizeof(float) * 2 + sizeof(unsigned int) * 2 +
-                                sizeof(float) * 3 + sizeof(float) * 9);
+size_t NdtMapSingleCell::GetBinarySize() const {
+  size_t sz =
+      sizeof(float) * 2 + sizeof(unsigned int) * 2 +
+      sizeof(float) * 3 + sizeof(float) * 9;
   if (count_ >= minimum_points_threshold_) {
-    sz += static_cast<unsigned int>(sizeof(float) * 9 +
-                                    sizeof(unsigned char) * 1);
+    sz += sizeof(float) * 9 +
+          sizeof(unsigned char) * 1;
   }
   return sz;
 }
@@ -195,7 +195,7 @@ size_t NdtMapCells::LoadBinary(const unsigned char* buf) {
     ++ppp;
     pp = reinterpret_cast<const unsigned char*>(ppp);
     NdtMapSingleCell cell;
-    unsigned int processed_size = cell.LoadBinary(pp);
+    size_t processed_size = cell.LoadBinary(pp);
     cells_[altitude_index] = cell;
     pp += processed_size;
   }
@@ -219,9 +219,9 @@ size_t NdtMapCells::LoadBinary(const unsigned char* buf) {
   return GetBinarySize();
 }
 
-unsigned int NdtMapCells::CreateBinary(unsigned char* buf,
-                                       unsigned int buf_size) const {
-  unsigned int target_size = GetBinarySize();
+size_t NdtMapCells::CreateBinary(unsigned char* buf,
+                                       size_t buf_size) const {
+  size_t target_size = GetBinarySize();
   if (buf_size >= target_size) {
     unsigned int* p = reinterpret_cast<unsigned int*>(buf);
     *p = static_cast<unsigned int>(cells_.size());
@@ -235,7 +235,7 @@ unsigned int NdtMapCells::CreateBinary(unsigned char* buf,
       *ppp = altitude_index;
       ++ppp;
       pp = reinterpret_cast<unsigned char*>(ppp);
-      unsigned int processed_size = cell.CreateBinary(pp, buf_size);
+      size_t processed_size = cell.CreateBinary(pp, buf_size);
       assert(buf_size >= processed_size);
       buf_size -= processed_size;
       pp += processed_size;
@@ -247,9 +247,9 @@ unsigned int NdtMapCells::CreateBinary(unsigned char* buf,
     *ppp = min_altitude_index_;
     ++ppp;
 
-    unsigned int size = static_cast<unsigned int>(road_cell_indices_.size());
+    size_t size = road_cell_indices_.size();
     p = reinterpret_cast<unsigned int*>(ppp);
-    *p = size;
+    *p = static_cast<unsigned int>(size);
     ++p;
     ppp = reinterpret_cast<int*>(p);
     for (unsigned int i = 0; i < size; ++i) {
@@ -260,19 +260,16 @@ unsigned int NdtMapCells::CreateBinary(unsigned char* buf,
   return target_size;
 }
 
-unsigned int NdtMapCells::GetBinarySize() const {
-  unsigned int target_size = sizeof(unsigned int);
+size_t NdtMapCells::GetBinarySize() const {
+  size_t target_size = sizeof(unsigned int);
   for (auto it = cells_.begin(); it != cells_.end(); ++it) {
-    target_size += static_cast<unsigned int>(sizeof(int));
+    target_size += sizeof(int);
     const NdtMapSingleCell& cell = it->second;
     target_size += cell.GetBinarySize();
   }
-
-  target_size += static_cast<unsigned int>(sizeof(int) * 2);
-  target_size += static_cast<unsigned int>(sizeof(unsigned int));
-  target_size +=
-      static_cast<unsigned int>(sizeof(int) * road_cell_indices_.size());
-
+  target_size += sizeof(int) * 2;
+  target_size += sizeof(unsigned int);
+  target_size += sizeof(int) * road_cell_indices_.size();
   return target_size;
 }
 
@@ -379,7 +376,7 @@ size_t NdtMapMatrix::LoadBinary(const unsigned char* buf) {
   for (unsigned int y = 0; y < rows_; ++y) {
     for (unsigned int x = 0; x < cols_; ++x) {
       NdtMapCells& cell = GetMapCell(y, x);
-      unsigned int processed_size = cell.LoadBinary(pp);
+      size_t processed_size = cell.LoadBinary(pp);
       pp += processed_size;
     }
   }
@@ -387,8 +384,8 @@ size_t NdtMapMatrix::LoadBinary(const unsigned char* buf) {
 }
 
 size_t NdtMapMatrix::CreateBinary(unsigned char* buf,
-                                        unsigned int buf_size) const {
-  unsigned int target_size = GetBinarySize();
+                                  size_t buf_size) const {
+  size_t target_size = GetBinarySize();
   if (buf_size >= target_size) {
     unsigned int* p = reinterpret_cast<unsigned int*>(buf);
     *p = rows_;
@@ -400,7 +397,7 @@ size_t NdtMapMatrix::CreateBinary(unsigned char* buf,
     for (unsigned int y = 0; y < rows_; ++y) {
       for (unsigned int x = 0; x < cols_; ++x) {
         const NdtMapCells& cell = GetMapCell(y, x);
-        unsigned int processed_size = cell.CreateBinary(pp, buf_size);
+        size_t processed_size = cell.CreateBinary(pp, buf_size);
         assert(buf_size >= processed_size);
         buf_size -= processed_size;
         pp += processed_size;

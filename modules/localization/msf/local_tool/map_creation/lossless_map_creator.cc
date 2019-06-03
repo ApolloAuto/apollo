@@ -159,7 +159,7 @@ int main(int argc, char** argv) {
               << "4.0, 8.0 or 16.0." << std::endl;
   }
 
-  const unsigned int num_trials = pcd_folder_pathes.size();
+  const size_t num_trials = pcd_folder_pathes.size();
 
   // load all poses
   std::cerr << "Pcd folders are as follows:" << std::endl;
@@ -233,7 +233,8 @@ int main(int argc, char** argv) {
     fprintf(file, "Map node size: %d x %d\n", loss_less_config.map_node_size_x_,
             loss_less_config.map_node_size_y_);
     fprintf(file, "Map row x col: \n");
-    for (size_t i = 0; i < loss_less_config.map_resolutions_.size(); ++i) {
+    for (unsigned int i = 0; i < loss_less_config.map_resolutions_.size();
+         ++i) {
       fprintf(file, "%u x %u, ",
               MapNodeIndex::GetMapIndexRangeNorth(loss_less_config, i),
               MapNodeIndex::GetMapIndexRangeEast(loss_less_config, i));
@@ -296,9 +297,9 @@ int main(int argc, char** argv) {
         pcl_pc->resize(velodyne_frame.pt3ds.size());
         for (size_t i = 0; i < velodyne_frame.pt3ds.size(); ++i) {
           PclPointT& pt = pcl_pc->at(i);
-          pt.x = velodyne_frame.pt3ds[i][0];
-          pt.y = velodyne_frame.pt3ds[i][1];
-          pt.z = velodyne_frame.pt3ds[i][2];
+          pt.x = static_cast<float>(velodyne_frame.pt3ds[i][0]);
+          pt.y = static_cast<float>(velodyne_frame.pt3ds[i][1]);
+          pt.z = static_cast<float>(velodyne_frame.pt3ds[i][2]);
           pt.intensity = static_cast<float>(velodyne_frame.intensities[i]);
         }
 
@@ -314,7 +315,7 @@ int main(int argc, char** argv) {
           unsigned char intensity =
               static_cast<unsigned char>(plane_pt.intensity);
           Eigen::Vector3d pt3d_global = velodyne_frame.pose * pt3d_local_double;
-          float ground_altitude = pt3d_global[2];
+          float ground_altitude = static_cast<float>(pt3d_global[2]);
           MapNodeIndex map_node_index = MapNodeIndex::GetMapNodeIndex(
               loss_less_config, pt3d_global, resolution_id, zone_id);
           PyramidMapNode* map_node =
@@ -384,7 +385,8 @@ int main(int argc, char** argv) {
     }
   }
 
-  map.GetMapConfig().map_ground_height_offset_ = mean_height_diff;
+  map.GetMapConfig().map_ground_height_offset_ =
+      static_cast<float>(mean_height_diff);
   std::string config_path = map.GetMapConfig().map_folder_path_ + "/config.xml";
   map.GetMapConfig().Save(config_path);
   ADEBUG << "Mean: " << mean_height_diff << ", Var: " << var_height_diff << ".";

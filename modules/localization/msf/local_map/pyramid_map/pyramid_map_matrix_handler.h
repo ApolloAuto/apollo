@@ -65,7 +65,7 @@ class LossyMapFullAltMatrixHandler : public LossyMapMatrixHandler {
   virtual size_t LoadBinary(const unsigned char* buf,
                                   BaseMapMatrix* matrix);
   virtual size_t CreateBinary(const BaseMapMatrix* matrix,
-                                    unsigned char* buf, unsigned int buf_size);
+                                    unsigned char* buf, size_t buf_size);
   virtual size_t GetBinarySize(const BaseMapMatrix* matrix);
 };
 
@@ -76,7 +76,7 @@ class LosslessMapMatrixHandler : public BaseMapMatrixHandler {
   virtual size_t LoadBinary(const unsigned char* buf,
                                   BaseMapMatrix* matrix);
   virtual size_t CreateBinary(const BaseMapMatrix* matrix,
-                                    unsigned char* buf, unsigned int buf_size);
+                                    unsigned char* buf, size_t buf_size);
   virtual size_t GetBinarySize(const BaseMapMatrix* matrix);
 };
 
@@ -87,7 +87,7 @@ class PyramidLossyMapMatrixHandler : public LossyMapMatrixHandler {
   virtual size_t LoadBinary(const unsigned char* buf,
                                   BaseMapMatrix* matrix);
   virtual size_t CreateBinary(const BaseMapMatrix* matrix,
-                                    unsigned char* buf, unsigned int buf_size);
+                                    unsigned char* buf, size_t buf_size);
   virtual size_t GetBinarySize(const BaseMapMatrix* matrix);
 };
 
@@ -98,7 +98,7 @@ class PyramidLosslessMapMatrixHandler : public BaseMapMatrixHandler {
   virtual size_t LoadBinary(const unsigned char* buf,
                                   BaseMapMatrix* matrix);
   virtual size_t CreateBinary(const BaseMapMatrix* matrix,
-                                    unsigned char* buf, unsigned int buf_size);
+                                    unsigned char* buf, size_t buf_size);
   virtual size_t GetBinarySize(const BaseMapMatrix* matrix);
 };
 

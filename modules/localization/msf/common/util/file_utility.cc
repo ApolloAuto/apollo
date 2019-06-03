@@ -92,7 +92,7 @@ void FileUtility::ComputeBinaryMd5(const unsigned char *binary, size_t size,
                                    unsigned char res[UCHAR_MD5LENTH]) {
   MD5 md5;
   md5.init();
-  md5.update(binary, size);
+  md5.update(binary, static_cast<unsigned int>(size));
   md5.finalize();
   for (uint8_t i = 0; i < UCHAR_MD5LENTH; ++i) {
     res[i] = md5.digest[i];

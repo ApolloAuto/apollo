@@ -36,7 +36,7 @@ class BaseMapMatrixHandler {
    */
   virtual size_t CreateBinary(const BaseMapMatrix* matrix,
                                          unsigned char* buf,
-                                         unsigned int buf_size) = 0;
+                                         size_t buf_size) = 0;
   /**@brief Get the binary size of the object. */
   virtual size_t GetBinarySize(const BaseMapMatrix* matrix) = 0;
 };

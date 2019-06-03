@@ -83,7 +83,7 @@ unsigned int BaseMapNodeConfig::LoadBinary(const unsigned char *buf) {
 }
 
 unsigned int BaseMapNodeConfig::CreateBinary(unsigned char *buf,
-                                             unsigned int buf_size) const {
+                                             size_t buf_size) const {
   unsigned int target_size = GetBinarySize();
 
   if (buf_size < target_size) {
@@ -124,7 +124,7 @@ unsigned int BaseMapNodeConfig::CreateBinary(unsigned char *buf,
   ++ui_p;
 
   // the body size
-  *ui_p = body_size_;
+  *ui_p = static_cast<unsigned int>(body_size_);
 
   return target_size;
 }
