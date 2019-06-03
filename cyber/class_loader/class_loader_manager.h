@@ -77,10 +77,9 @@ std::shared_ptr<Base> ClassLoaderManager::CreateClassObj(
   ClassLoader* loader = GetClassLoaderByLibPath(library_path);
   if (loader) {
     return (loader->CreateClassObj<Base>(class_name));
-  } else {
-    AERROR << "Could not create classobj, there is no ClassLoader in: "
-           << class_name;
   }
+  AERROR << "Could not create classobj, there is no ClassLoader in: "
+         << class_name;
   return std::shared_ptr<Base>();
 }
 

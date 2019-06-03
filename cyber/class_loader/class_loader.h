@@ -79,7 +79,7 @@ std::shared_ptr<Base> ClassLoader::CreateClassObj(
   }
 
   Base* class_object = utility::CreateClassObj<Base>(class_name, this);
-  if (nullptr == class_object) {
+  if (class_object == nullptr) {
     AWARN << "CreateClassObj failed, ensure class has been registered. "
           << "classname: " << class_name << ",lib: " << GetLibraryPath();
     return std::shared_ptr<Base>();
@@ -101,7 +101,7 @@ void ClassLoader::OnClassObjDeleter(Base* obj) {
 
   std::lock_guard<std::mutex> lck(classobj_ref_count_mutex_);
   delete obj;
-  classobj_ref_count_ = classobj_ref_count_ - 1;
+  --classobj_ref_count_;
 }
 
 }  // namespace class_loader
