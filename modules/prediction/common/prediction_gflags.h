@@ -87,6 +87,7 @@ DECLARE_double(pedestrian_max_acc);
 DECLARE_double(still_speed);
 DECLARE_string(evaluator_vehicle_mlp_file);
 DECLARE_string(torch_vehicle_junction_mlp_file);
+DECLARE_string(torch_vehicle_junction_map_file);
 DECLARE_string(torch_vehicle_cruise_go_file);
 DECLARE_string(torch_vehicle_cruise_cutin_file);
 DECLARE_string(torch_vehicle_lane_scanning_file);

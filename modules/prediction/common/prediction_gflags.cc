@@ -136,6 +136,9 @@ DEFINE_string(evaluator_vehicle_rnn_file,
 DEFINE_string(torch_vehicle_junction_mlp_file,
               "/apollo/modules/prediction/data/junction_mlp_vehicle_model.pt",
               "Vehicle junction MLP model file");
+DEFINE_string(torch_vehicle_junction_map_file,
+              "/apollo/modules/prediction/data/junction_map_vehicle_model.pt",
+              "Vehicle junction map model file");
 DEFINE_string(torch_vehicle_cruise_go_file,
               "/apollo/modules/prediction/data/cruise_go_vehicle_model.pt",
               "Vehicle cruise go model file");
