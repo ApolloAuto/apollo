@@ -44,18 +44,18 @@ RUN apt update -y && \
     libopenni-dev \
     libopenni2-0 \
     libopenni2-dev \
-    software-properties-common 
+    software-properties-common
     #rm -fr /var/lib/apt/lists/*
 
 #install gcc 4.8.5
-RUN rm -f /usr/bin/gcc 
-RUN ln -s /usr/bin/gcc-4.8 /etc/alternatives/gcc 
+RUN rm -f /usr/bin/gcc
+RUN ln -s /usr/bin/gcc-4.8 /etc/alternatives/gcc
 RUN ln -s /etc/alternatives/gcc /usr/bin/gcc
 RUN rm -f /usr/bin/g++
 RUN ln -s /usr/bin/g++-4.8 /etc/alternatives/g++
 RUN ln -s /etc/alternatives/g++ /usr/bin/g++
 
-# Run installer 
+# Run installer
 COPY installers /tmp/installers
 RUN bash /tmp/installers/install_bazel.sh
 RUN bash /tmp/installers/install_gflags_glog.sh
@@ -64,7 +64,7 @@ RUN bash /tmp/installers/install_bazel_packages.sh
 RUN bash /tmp/installers/install_google_styleguide.sh
 RUN bash /tmp/installers/install_osqp.sh
 
-# Add Bionic source    
+# Add Bionic source
 RUN echo "deb http://us.archive.ubuntu.com/ubuntu/ bionic main restricted" > /etc/apt/sources.list
 RUN echo "deb http://us.archive.ubuntu.com/ubuntu/ bionic-updates main restricted" >> /etc/apt/sources.list
 RUN echo "deb http://us.archive.ubuntu.com/ubuntu/ bionic universe" >> /etc/apt/sources.list
@@ -78,7 +78,7 @@ RUN echo "deb http://security.ubuntu.com/ubuntu bionic-security multiverse" >> /
 #add Trusty universe into apt source for Poco foundation 9
 RUN echo "deb http://dk.archive.ubuntu.com/ubuntu/ trusty main" >> /etc/apt/sources.list
 RUN echo "deb http://dk.archive.ubuntu.com/ubuntu/ trusty universe" >> /etc/apt/sources.list
-RUN apt update -y 
+RUN apt update -y
 RUN apt install -y --allow-downgrades \
     libboost-system1.54.0 \
     libboost-thread1.54.0 \
@@ -96,10 +96,10 @@ RUN apt install -y --allow-downgrades \
     libvtk6-dev \
     libvtk6.3 \
     vtk6 \
-    libpocofoundation9 
+    libpocofoundation9
 RUN rm -f /usr/lib/libPocoFoundation.so
 RUN ln -s /usr/lib/libPocoFoundation.so.9 /usr/lib/libPocoFoundation.so
-RUN ln -s /usr/lib/x86_64-linux-gnu/libboost_filesystem.so.1.54.0 /usr/lib/x86_64-linux-gnu/libboost_filesystem.so 
+RUN ln -s /usr/lib/x86_64-linux-gnu/libboost_filesystem.so.1.54.0 /usr/lib/x86_64-linux-gnu/libboost_filesystem.so
 RUN ln -s /usr/lib/x86_64-linux-gnu/libboost_iostreams.so.1.54.0 /usr/lib/x86_64-linux-gnu/libboost_iostreams.so
 RUN ln -s /usr/lib/x86_64-linux-gnu/libboost_date_time.so.1.65.1 /usr/lib/x86_64-linux-gnu/libboost_date_time.so
 RUN ln -s /usr/lib/x86_64-linux-gnu/libboost_regex.so.1.65.1 /usr/lib/x86_64-linux-gnu/libboost_regex.so
@@ -107,7 +107,7 @@ RUN ln -s /usr/lib/x86_64-linux-gnu/libboost_serialization.so.1.65.1 /usr/lib/x8
 RUN ln -s /usr/lib/x86_64-linux-gnu/libboost_signals.so.1.54.0 /usr/lib/x86_64-linux-gnu/libboost_signals.so
 RUN ln -s /usr/lib/x86_64-linux-gnu/libboost_system.so.1.54.0 /usr/lib/x86_64-linux-gnu/libboost_system.so
 RUN ln -s /usr/lib/x86_64-linux-gnu/libboost_thread.so.1.54.0 /usr/lib/x86_64-linux-gnu/libboost_thread.so
-RUN ln -s /usr/lib/x86_64-linux-gnu/libboost_wserialization.so.1.65.1 /usr/lib/x86_64-linux-gnu/libboost_wserialization.so 
+RUN ln -s /usr/lib/x86_64-linux-gnu/libboost_wserialization.so.1.65.1 /usr/lib/x86_64-linux-gnu/libboost_wserialization.so
 RUN ln -s /usr/lib/x86_64-linux-gnu/libboost_chrono.so.1.54.0 /usr/lib/x86_64-linux-gnu/libboost_chrono.so
 RUN ln -s /usr/lib/python2.7/dist-packages/vtk/libvtkRenderingPythonTkWidgets.x86_64-linux-gnu.so /usr/lib/x86_64-linux-gnu/libvtkRenderingPythonTkWidgets.so
 
