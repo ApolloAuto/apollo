@@ -5,7 +5,7 @@ Defined in ``cyber/node/node.h``
 
 .. doxygenclass:: apollo::cyber::Node
    :members:
-   :project: Cyber RT Documents 
+   :project: Cyber RT Documents
 
 
 cyber/node/reader_base.h
