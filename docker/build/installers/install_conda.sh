@@ -29,8 +29,9 @@ bash "${INSTALLER}" -b -p "${CONDA_PATH}"
 # Update conda base to the latest.
 "${CONDA_PATH}/bin/conda" update -n base -c defaults conda
 
-# Init python 2.7 environment.
-"${CONDA_PATH}/bin/conda" env update -f py27_conda.yml
+# Init python envs.
+"${CONDA_PATH}/bin/conda" env update -f py27_conda.yaml
+"${CONDA_PATH}/bin/conda" env update -f py37_conda.yaml
 
 # Clean up.
 rm -f "${INSTALLER}"
