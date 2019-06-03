@@ -25,16 +25,35 @@
 namespace apollo {
 namespace cyber {
 
+/**
+ * @class ClientBase
+ * @brief Base class of Client
+ *
+ */
 class ClientBase {
  public:
+  /**
+   * @brief Construct a new Client Base object
+   *
+   * @param service_name the service we can request
+   */
   explicit ClientBase(const std::string& service_name)
       : service_name_(service_name) {}
   virtual ~ClientBase() {}
 
+  /**
+   * @brief Destroy the Client
+   */
   virtual void Destroy() = 0;
 
+  /**
+   * @brief Get the service name
+   */
   const std::string& ServiceName() const { return service_name_; }
 
+  /**
+   * @brief Ensure whether there is any Service named `service_name_`
+   */
   virtual bool ServiceIsReady() const = 0;
 
  protected:
