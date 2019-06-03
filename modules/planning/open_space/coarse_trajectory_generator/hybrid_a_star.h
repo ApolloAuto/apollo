@@ -93,6 +93,9 @@ class HybridAStar {
   bool GetTemporalProfile(HybridAStartResult* result);
   bool GenerateSpeedAcceleration(HybridAStartResult* result);
   bool GenerateSCurveSpeedAcceleration(HybridAStartResult* result);
+  bool CombinePathAndSpeedProfile(const DiscretizedPath& discretized_path,
+                                  const SpeedData& speed_data,
+                                  HybridAStartResult* result);
 
  private:
   PlannerOpenSpaceConfig planner_open_space_config_;

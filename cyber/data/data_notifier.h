@@ -74,7 +74,7 @@ inline bool DataNotifier::Notify(const uint64_t channel_id) {
   NotifyVector* notifies = nullptr;
   if (notifies_map_.Get(channel_id, &notifies)) {
     for (auto& notifier : *notifies) {
-      if (notifier->callback) {
+      if (notifier && notifier->callback) {
         notifier->callback();
       }
     }

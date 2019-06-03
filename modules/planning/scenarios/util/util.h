@@ -34,13 +34,11 @@ enum PullOverStatus {
 };
 
 hdmap::PathOverlap* GetOverlapOnReferenceLine(
-    const ReferenceLineInfo& reference_line_info,
-    const std::string& overlap_id,
+    const ReferenceLineInfo& reference_line_info, const std::string& overlap_id,
     const ReferenceLineInfo::OverlapType& overlap_type);
 
 PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
                                 const ScenarioPullOverConfig& scenario_config);
-
 
 }  // namespace util
 }  // namespace scenario

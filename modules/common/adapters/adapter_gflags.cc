@@ -132,7 +132,7 @@ DEFINE_string(image_short_topic,
 DEFINE_string(image_long_topic, "/apollo/sensor/camera/traffic/image_long",
               "long camera image topic name");
 DEFINE_string(image_usb_cam_topic, "/apollo/sensor/camera/image_usb_cam",
-              "usb camera image topic name");
+              "USB camera image topic name");
 DEFINE_string(camera_image_long_topic, "/apollo/sensor/camera/image_long",
               "long camera image topic name");
 DEFINE_string(camera_image_short_topic, "/apollo/sensor/camera/image_short",
@@ -205,6 +205,7 @@ DEFINE_string(heading_topic, "/apollo/sensor/gnss/heading",
               "gnss heading topic name");
 DEFINE_string(rtcm_data_topic, "/apollo/sensor/gnss/rtcm_data",
               "gnss rtcm data topic name");
-DEFINE_string(data_topic, "/apollo/data", "Data topic.");
 DEFINE_string(tf_topic, "/tf", "Transform topic.");
 DEFINE_string(tf_static_topic, "/tf_static", "Transform static topic.");
+DEFINE_string(recorder_status_topic, "/apollo/data/recorder/status",
+              "Recorder status topic.");

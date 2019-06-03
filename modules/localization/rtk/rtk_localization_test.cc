@@ -41,7 +41,7 @@ class RTKLocalizationTest : public ::testing::Test {
 };
 
 TEST_F(RTKLocalizationTest, InterpolateIMU) {
-  // timestamp inbetween + time_diff is big enough(>0.001), interpolate
+  // timestamp in between + time_diff is big enough(>0.001), interpolate
   {
     apollo::localization::CorrectedImu imu1;
     load_data("modules/localization/testdata/1_imu_1.pb.txt", &imu1);
@@ -60,7 +60,7 @@ TEST_F(RTKLocalizationTest, InterpolateIMU) {
     EXPECT_EQ(expected_result.DebugString(), imu.DebugString());
   }
 
-  // timestamp inbetween + time_diff is too small(<0.001), no interpolate
+  // timestamp in between + time_diff is too small(<0.001), no interpolate
   {
     apollo::localization::CorrectedImu imu1;
     load_data("modules/localization/testdata/2_imu_1.pb.txt", &imu1);

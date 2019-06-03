@@ -33,6 +33,11 @@ double PathBoundary::start_s() const { return start_s_; }
 
 double PathBoundary::delta_s() const { return delta_s_; }
 
+void PathBoundary::set_boundary(
+    const std::vector<std::pair<double, double>>& boundary) {
+  boundary_ = boundary;
+}
+
 const std::vector<std::pair<double, double>>& PathBoundary::boundary() const {
   return boundary_;
 }

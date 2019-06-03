@@ -354,7 +354,7 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   result->accumulated_s.push_back(0.0);
   result->v.push_back(0.0);
   x_bounds.emplace_back(-10.0, 10.0);
-  dx_bounds.emplace_back(-10.0, 10.0);
+  dx_bounds.emplace_back(0.0, 0.0);
 
   ADEBUG << "Initial accumulated_s: " << 0.0 << " initial discrete_v: " << 0.0;
 
@@ -377,7 +377,9 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
            << " dx_bounds: " << discrete_v - 10 << " and " << discrete_v + 10;
   }
 
+  // Force last point velocity to be zero
   result->v[x_size - 1] = 0.0;
+  dx_bounds[x_size - 1] = {0.0, 0.0};
 
   std::array<double, 3> init_s = {result->accumulated_s[0], result->v[0],
                                   (result->v[1] - result->v[0]) / delta_t_};
@@ -397,9 +399,9 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   path_time_qp.set_weight_ddx(s_curve_config.acc_weight());
   path_time_qp.set_weight_dddx(s_curve_config.jerk_weight());
 
-  path_time_qp.set_x_bounds(x_bounds);
+  path_time_qp.set_x_bounds(std::move(x_bounds));
 
-  path_time_qp.set_dx_bounds(dx_bounds);
+  path_time_qp.set_dx_bounds(std::move(dx_bounds));
 
   // TODO(QiL): load this from configs
   path_time_qp.set_ddx_bounds(-4.4, 10.0);
@@ -423,6 +425,8 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   result->a = path_time_qp.opt_ddx();
   result->a.pop_back();
 
+  ADEBUG << "End velocity after optimization is: " << result->v.back();
+
   // load steering from phi
   for (size_t i = 0; i + 1 < x_size; ++i) {
     double discrete_steer = (result->phi[i + 1] - result->phi[i]) *
@@ -435,6 +439,85 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
     result->steer.push_back(discrete_steer);
   }
 
+  return true;
+}
+
+bool HybridAStar::CombinePathAndSpeedProfile(
+    const DiscretizedPath& discretized_path, const SpeedData& speed_data,
+    HybridAStartResult* result) {
+  CHECK(result != nullptr);
+
+  // Clear the result
+  result->x.clear();
+  result->y.clear();
+  result->phi.clear();
+  result->v.clear();
+  result->a.clear();
+  result->steer.clear();
+  result->accumulated_s.clear();
+
+  if (discretized_path.empty()) {
+    AERROR << "path data is empty";
+    return false;
+  }
+
+  const double total_time_upper_bound = speed_data.TotalTime() + 1e-6;
+
+  for (double cur_rel_time = 0.0; cur_rel_time < total_time_upper_bound;
+       cur_rel_time += delta_t_) {
+    common::SpeedPoint speed_point;
+    if (!speed_data.EvaluateByTime(cur_rel_time, &speed_point)) {
+      AERROR << "Fail to get speed point with relative time " << cur_rel_time;
+      return false;
+    }
+
+    ADEBUG << "speed_point debug: " << speed_point.ShortDebugString();
+
+    if (std::abs(speed_point.s()) >
+        std::abs(discretized_path.Length()) + 1e-6) {
+      AERROR << "Speed data s larger than the discretized path total lenghth, "
+                "with speed_data.s(): "
+             << speed_point.s()
+             << " and discretized_path.Length(): " << discretized_path.Length();
+      return false;
+    }
+
+    common::PathPoint path_point;
+    if (speed_point.s() < 0.0) {
+      path_point = discretized_path.EvaluateReverse(speed_point.s());
+    } else {
+      path_point = discretized_path.Evaluate(speed_point.s());
+    }
+
+    path_point.set_s(path_point.s());
+
+    ADEBUG << "path_point debug: " << path_point.ShortDebugString();
+
+    result->x.push_back(path_point.x());
+    result->y.push_back(path_point.y());
+    result->phi.push_back(path_point.theta());
+    result->v.push_back(speed_point.v());
+    result->a.push_back(speed_point.a());
+    result->accumulated_s.push_back(speed_point.s());
+
+    ADEBUG << "Combined results: "
+           << " x: " << result->x.back() << " y: " << result->y.back()
+           << " phi: " << result->phi.back() << " v: " << result->v.back()
+           << " a: " << result->a.back()
+           << " s: " << result->accumulated_s.back();
+  }
+  // load steering from phi
+  result->a.pop_back();
+  for (size_t i = 0; i + 1 < result->x.size(); ++i) {
+    double discrete_steer = (result->phi[i + 1] - result->phi[i]) *
+                            vehicle_param_.wheel_base() / step_size_;
+    if (result->v[i] > 0.0) {
+      discrete_steer = std::atan(discrete_steer);
+    } else {
+      discrete_steer = std::atan(-discrete_steer);
+    }
+    result->steer.push_back(discrete_steer);
+  }
   return true;
 }
 
@@ -483,6 +566,8 @@ bool HybridAStar::TrajectoryPartition(
   current_traj->y.push_back(y.back());
   current_traj->phi.push_back(phi.back());
 
+  ADEBUG << "size of partitioned result in HybridAStar: "
+         << partitioned_result->size();
   // Retrieve v, a and steer from path
   for (auto& result : *partitioned_result) {
     if (FLAGS_use_s_curve_speed_smooth) {
@@ -490,6 +575,34 @@ bool HybridAStar::TrajectoryPartition(
         AERROR << "GenerateSCurveSpeedAcceleration fail";
         return false;
       }
+      ADEBUG << "result size before combination: x, " << result.x.size()
+             << " steer: " << result.steer.size()
+             << " acceleration: " << result.a.size();
+
+      SpeedData speed_data;
+      std::vector<common::PathPoint> path_points;
+      const size_t size_x = result.x.size();
+      for (size_t i = 0; i < size_x; ++i) {
+        common::PathPoint path_point = common::util::MakePathPoint(
+            result.x[i], result.y[i], 0.0, result.phi[i], 0.0, 0.0, 0.0);
+        path_point.set_s(result.accumulated_s[i]);
+        path_points.emplace_back(std::move(path_point));
+
+        speed_data.AppendSpeedPoint(result.accumulated_s[i],
+                                    static_cast<double>(i) * delta_t_,
+                                    result.v[i], result.a[i], 0.0);
+      }
+      ADEBUG << "Path points size: " << path_points.size();
+      ADEBUG << "Speed points size: " << speed_data.size();
+      DiscretizedPath discretized_path(path_points);
+
+      if (!CombinePathAndSpeedProfile(discretized_path, speed_data, &result)) {
+        return false;
+      }
+      ADEBUG << "result size after combination: x, " << result.x.size()
+             << " steer: " << result.steer.size()
+             << " acceleration: " << result.a.size();
+
     } else {
       if (!GenerateSpeedAcceleration(&result)) {
         AERROR << "GenerateSpeedAcceleration fail";
@@ -590,7 +703,7 @@ bool HybridAStar::Plan(
     const std::string current_id = open_pq_.top().first;
     open_pq_.pop();
     std::shared_ptr<Node3d> current_node = open_set_[current_id];
-    // check if a analystic curve could be connected from current
+    // check if an analystic curve could be connected from current
     // configuration to the end configuration without collision. if so, search
     // ends.
     start_time = Clock::NowInSeconds();

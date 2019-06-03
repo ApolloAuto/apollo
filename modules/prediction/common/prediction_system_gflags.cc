@@ -60,4 +60,6 @@ DEFINE_int32(max_thread_num, 8, "Maximal number of threads.");
 // Bag replay timestamp gap
 DEFINE_double(replay_timestamp_gap, 10.0,
               "Max timestamp gap for rosbag replay");
-DEFINE_int32(max_num_dump_feature, 50000, "Max number of features to dump");
+DEFINE_int32(max_num_dump_feature, 10000, "Max number of features to dump");
+DEFINE_int32(max_num_dump_dataforlearn, 5000,
+             "Max number of dataforlearn to dump");

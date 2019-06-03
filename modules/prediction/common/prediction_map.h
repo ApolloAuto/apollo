@@ -84,7 +84,7 @@ class PredictionMap {
       const std::string& id);
 
   /**
-   * @brief Get a shared pointer to a overlap by overlap ID.
+   * @brief Get a shared pointer to an overlap by overlap ID.
    * @param id The ID of the target overlap ID in the form of string.
    * @return A shared pointer to the overlap with the input overlap ID.
    */

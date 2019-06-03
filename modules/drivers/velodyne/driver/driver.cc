@@ -113,7 +113,7 @@ bool VelodyneDriver::Poll(const std::shared_ptr<VelodyneScan>& scan) {
   }
 
   if (scan->firing_pkts_size() <= 0) {
-    AINFO << "Get a empty scan from port: " << config_.firing_data_port();
+    AINFO << "Get an empty scan from port: " << config_.firing_data_port();
     return false;
   }
 

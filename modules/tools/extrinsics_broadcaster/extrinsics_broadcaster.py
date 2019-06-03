@@ -31,7 +31,7 @@ def main():
     """
     if len(sys.argv) < 2:
         print('Usage: %s extrinsic_example.yaml' % sys.argv[0])
-        sys.exit(1)
+        sys.exit(0)
 
     with open(sys.argv[1]) as fp:
         transform_stamped = yaml.safe_load(fp)

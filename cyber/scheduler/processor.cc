@@ -24,7 +24,6 @@
 #include "cyber/common/global_data.h"
 #include "cyber/common/log.h"
 #include "cyber/croutine/croutine.h"
-#include "cyber/scheduler/processor_context.h"
 
 namespace apollo {
 namespace cyber {

@@ -1,8 +1,10 @@
 scenario_type: PULL_OVER
 pull_over_config: {
   start_pull_over_scenario_distance: 50.0
+  max_pull_over_scenario_distance: 10.0
   max_adc_stop_speed: 0.3
-  max_position_error_to_end_point: 0.3
+  max_s_error_to_end_point: 0.3
+  max_l_error_to_end_point: 1.0
   max_theta_error_to_end_point: 0.2
   pass_destination_threshold: 15.0
 }
@@ -34,6 +36,9 @@ stage_config: {
     path_bounds_decider_config {
       is_lane_borrowing: false
       is_pull_over: true
+      pull_over_destination_to_adc_buffer: 25.0
+      pull_over_destination_to_pathend_buffer: 10.0
+      pull_over_road_edge_buffer: 0.15
     }
   }
   task_config: {
@@ -69,6 +74,65 @@ stage_config: {
 }
 
 stage_config: {
+    stage_type: PULL_OVER_RETRY_APPROACH_PARKING
+    enabled: true
+    task_type: OPEN_SPACE_PRE_STOP_DECIDER
+    task_type: PATH_LANE_BORROW_DECIDER
+    task_type: PATH_BOUNDS_DECIDER
+    task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+    task_type: PATH_ASSESSMENT_DECIDER
+    task_type: PATH_DECIDER
+    task_type: RULE_BASED_STOP_DECIDER
+    task_type: SPEED_BOUNDS_PRIORI_DECIDER
+    task_type: DP_ST_SPEED_OPTIMIZER
+    task_type: SPEED_DECIDER
+    task_type: SPEED_BOUNDS_FINAL_DECIDER
+    task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
+    task_config: {
+        task_type: OPEN_SPACE_PRE_STOP_DECIDER
+        open_space_pre_stop_decider_config {
+            stop_type: PARKING
+        }
+    }
+    task_config: {
+        task_type: PATH_LANE_BORROW_DECIDER
+        path_lane_borrow_decider_config {
+         allow_lane_borrowing: true
+      }
+    }
+    task_config: {
+        task_type: PATH_BOUNDS_DECIDER
+    }
+    task_config: {
+        task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+    }
+    task_config: {
+        task_type: PATH_ASSESSMENT_DECIDER
+    }
+    task_config: {
+        task_type: PATH_DECIDER
+    }
+    task_config: {
+        task_type: SPEED_BOUNDS_PRIORI_DECIDER
+    }
+    task_config: {
+        task_type: DP_ST_SPEED_OPTIMIZER
+    }
+    task_config: {
+        task_type: SPEED_DECIDER
+    }
+    task_config: {
+        task_type: SPEED_BOUNDS_FINAL_DECIDER
+    }
+    task_config: {
+        task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
+    }
+    task_config: {
+        task_type: RULE_BASED_STOP_DECIDER
+    }
+}
+
+stage_config: {
     stage_type: PULL_OVER_RETRY_PARKING
     enabled: true
     task_type: OPEN_SPACE_ROI_DECIDER
@@ -77,6 +141,9 @@ stage_config: {
     task_type: OPEN_SPACE_FALLBACK_DECIDER
     task_config: {
         task_type: OPEN_SPACE_ROI_DECIDER
+        open_space_roi_decider_config {
+            roi_type: PULL_OVER
+        }
     }
     task_config: {
         task_type: OPEN_SPACE_TRAJECTORY_PROVIDER

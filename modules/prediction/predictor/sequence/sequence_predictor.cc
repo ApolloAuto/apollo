@@ -74,12 +74,17 @@ void SequencePredictor::FilterLaneSequences(
    */
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = lane_graph.lane_sequence(i);
+    if (sequence.lane_type() == apollo::hdmap::Lane::PARKING) {
+      (*enable_lane_sequence)[i] = false;
+      ADEBUG << "Ignore lane sequence [" << ToString(sequence) << "].";
+      continue;
+    }
     lane_change_type[i] = GetLaneChangeType(lane_id, sequence);
 
     if (lane_change_type[i] != LaneChangeType::LEFT &&
         lane_change_type[i] != LaneChangeType::RIGHT &&
         lane_change_type[i] != LaneChangeType::ONTO_LANE) {
-      ADEBUG "Ignore lane sequence [" << ToString(sequence) << "].";
+      ADEBUG << "Ignore lane sequence [" << ToString(sequence) << "].";
       continue;
     }
 

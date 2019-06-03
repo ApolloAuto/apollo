@@ -66,7 +66,7 @@ class TrackObjectDistance {
   // @return the similarity which belongs to [0, 1]. When velodyne64
   // observation is similar to the camera one, the similarity would
   // close to 1. Otherwise, it would close to 0.
-  // @NOTE: orginal method name is compute_velodyne64_camera_dist_score
+  // @NOTE: original method name is compute_velodyne64_camera_dist_score
   double ComputeLidarCameraSimilarity(const SensorObjectConstPtr& lidar,
                                       const SensorObjectConstPtr& camera,
                                       const bool measurement_is_lidar);

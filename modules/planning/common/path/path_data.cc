@@ -111,10 +111,8 @@ void PathData::SetReferenceLine(const ReferenceLine *reference_line) {
   reference_line_ = reference_line;
 }
 
-bool PathData::GetPathPointWithPathS(
-    const double s, common::PathPoint *const path_point) const {
-  *path_point = discretized_path_.Evaluate(s);
-  return true;
+common::PathPoint PathData::GetPathPointWithPathS(const double s) const {
+  return discretized_path_.Evaluate(s);
 }
 
 bool PathData::GetPathPointWithRefS(const double ref_s,

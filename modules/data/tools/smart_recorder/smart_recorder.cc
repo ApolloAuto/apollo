@@ -14,18 +14,24 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <memory>
+
 #include "gflags/gflags.h"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/util/string_util.h"
 
-#include "modules/data/tools/smart_recorder/record_processor.h"
+#include "modules/data/tools/smart_recorder/post_record_processor.h"
+#include "modules/data/tools/smart_recorder/realtime_record_processor.h"
 #include "modules/data/tools/smart_recorder/smart_recorder_gflags.h"
 
 using apollo::common::util::StrCat;
 using apollo::cyber::common::GetProtoFromFile;
+using apollo::data::PostRecordProcessor;
+using apollo::data::RealtimeRecordProcessor;
 using apollo::data::RecordProcessor;
+using apollo::data::SmartRecordTrigger;
 
 int main(int argc, char** argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
@@ -34,18 +40,23 @@ int main(int argc, char** argv) {
   }
   AINFO << "input dir: " << FLAGS_source_records_dir
         << ". output dir: " << FLAGS_restored_output_dir
-        << ". config file: " << FLAGS_smart_recorder_config_filename;
+        << ". config file: " << FLAGS_smart_recorder_config_filename
+        << ". program name: " << argv[0];
   SmartRecordTrigger trigger_conf;
   CHECK(GetProtoFromFile(FLAGS_smart_recorder_config_filename, &trigger_conf))
       << "Failed to load triggers config file "
       << FLAGS_smart_recorder_config_filename;
-  RecordProcessor record_processor(FLAGS_source_records_dir,
-                                   FLAGS_restored_output_dir);
-  if (!record_processor.Init(trigger_conf)) {
+  auto processor = std::unique_ptr<RecordProcessor>(new RealtimeRecordProcessor(
+      FLAGS_source_records_dir, FLAGS_restored_output_dir));
+  if (!FLAGS_real_time_trigger) {
+    processor = std::unique_ptr<RecordProcessor>(new PostRecordProcessor(
+        FLAGS_source_records_dir, FLAGS_restored_output_dir));
+  }
+  if (!processor->Init(trigger_conf)) {
     AERROR << "failed to init record processor";
     return -1;
   }
-  if (!record_processor.Process()) {
+  if (!processor->Process()) {
     AERROR << "failed to process records";
     return -1;
   }

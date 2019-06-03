@@ -50,3 +50,11 @@ DECLARE_int32(localization_pending_queue_size);
 DECLARE_int32(pad_msg_pending_queue_size);
 
 DECLARE_bool(reverse_heading_control);
+
+DECLARE_bool(trajectory_transform_to_com_reverse);
+DECLARE_bool(trajectory_transform_to_com_drive);
+
+DECLARE_bool(enable_maximum_steer_rate_limit);
+
+DECLARE_bool(query_time_nearest_point_only);
+DECLARE_bool(query_forward_time_point_only);

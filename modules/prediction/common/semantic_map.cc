@@ -46,8 +46,9 @@ void SemanticMap::Init() {
 
 void SemanticMap::RunCurrFrame(
     const std::unordered_map<int, ObstacleHistory>& obstacle_id_history_map) {
+  obstacle_id_history_map_ = obstacle_id_history_map;
   // TODO(Hongyi): moving all these magic numbers to conf
-  const Feature& ego_feature = obstacle_id_history_map.at(-1).feature(0);
+  const Feature& ego_feature = obstacle_id_history_map_.at(-1).feature(0);
   curr_timestamp_ = ego_feature.timestamp();
   curr_base_x_ = ego_feature.position().x() - config_.observation_range();
   curr_base_y_ = ego_feature.position().y() - config_.observation_range();
@@ -61,17 +62,20 @@ void SemanticMap::RunCurrFrame(
   base_img_(rect).copyTo(curr_img_);
 
   // Draw all obstacles_history
-  for (const auto obstacle_id_history_pair : obstacle_id_history_map) {
+  for (const auto obstacle_id_history_pair : obstacle_id_history_map_) {
     DrawHistory(obstacle_id_history_pair.second, cv::Scalar(0, 255, 255),
                 &curr_img_);
   }
 
   // Crop ego_vehicle for demo
-  cv::Mat output_img =
-      CropByHistory(obstacle_id_history_map.at(-1), cv::Scalar(0, 0, 255));
-  cv::namedWindow("Demo window", cv::WINDOW_NORMAL);
-  cv::imshow("Demo window", output_img);
-  cv::waitKey();
+  if (false) {
+    cv::Mat output_img;
+    if (GetMapById(-1, &output_img)) {
+      cv::namedWindow("Demo window", cv::WINDOW_NORMAL);
+      cv::imshow("Demo window", output_img);
+      cv::waitKey();
+    }
+  }
 }
 
 void SemanticMap::DrawRect(const Feature& feature, const cv::Scalar& color,
@@ -145,6 +149,17 @@ cv::Mat SemanticMap::CropByHistory(const ObstacleHistory& history,
   cv::Point2i center_point =
       GetTransPoint(curr_feature.position().x(), curr_feature.position().y());
   return CropArea(feature_map, center_point, curr_feature.theta());
+}
+
+bool SemanticMap::GetMapById(const int obstacle_id, cv::Mat* feature_map) {
+  if (obstacle_id_history_map_.find(obstacle_id) ==
+      obstacle_id_history_map_.end()) {
+    return false;
+  }
+  cv::Mat output_img = CropByHistory(obstacle_id_history_map_[obstacle_id],
+                                     cv::Scalar(0, 0, 255));
+  output_img.copyTo(*feature_map);
+  return true;
 }
 
 }  // namespace prediction

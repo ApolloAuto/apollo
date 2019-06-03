@@ -21,11 +21,6 @@
 namespace apollo {
 namespace planning {
 
-// PlanningContext::PlanningStatus PlanningContext::planning_status_;
-// PlanningContext::SidePassInfo PlanningContext::side_pass_info_;
-// PlanningContext::FallBackInfo PlanningContext::fallback_info_;
-// PlanningContext::OpenSpaceInfo PlanningContext::open_space_info_;
-
 PlanningContext::PlanningContext() {}
 
 void PlanningContext::Init() {}

@@ -148,7 +148,7 @@ bool ProbabilisticFusion::Fuse(const FusionOptions& options,
   sensor_data_manager->GetLatestFrames(fusion_time, &frames);
   AINFO << "Get " << frames.size() << " related frames for fusion";
 
-  // 3. peform fusion on related frames
+  // 3. perform fusion on related frames
   for (const auto& frame : frames) {
     FuseFrame(frame);
   }
@@ -217,7 +217,7 @@ void ProbabilisticFusion::UpdateAssignedTracks(
     const SensorFramePtr& frame,
     const std::vector<TrackMeasurmentPair>& assignments) {
   // Attention: match_distance should be used
-  // in ExistanceFusion to calculate existance score.
+  // in ExistanceFusion to calculate existence score.
   // We set match_distance to zero if track and object are matched,
   // which only has a small difference compared with actural match_distance
   TrackerOptions options;

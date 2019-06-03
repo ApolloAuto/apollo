@@ -82,14 +82,21 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     std::vector<double> opt_dl;
     std::vector<double> opt_ddl;
 
-    const auto& pull_over_info =
-        PlanningContext::Instance()->planning_status().pull_over();
-
     std::array<double, 3> end_state = {0.0, 0.0, 0.0};
-    // Set end lateral to be at the desired pull over destination if enter into
-    // pull over scenario.
-    if (pull_over_info.exist_pull_over_position()) {
-      end_state[0] = pull_over_info.pull_over_l();
+
+    if (!FLAGS_enable_force_pull_over_open_space_parking_test) {
+      // pull over scenario.
+      const auto& pull_over_status =
+          PlanningContext::Instance()->planning_status().pull_over();
+
+      // Set end lateral to be at the desired pull over destination
+      if (pull_over_status.has_x() && pull_over_status.has_y() &&
+          path_boundary.label().find("pullover") != std::string::npos) {
+        common::SLPoint pull_over_sl;
+        reference_line.XYToSL({pull_over_status.x(), pull_over_status.y()},
+                              &pull_over_sl);
+        end_state[0] = pull_over_sl.l();
+      }
     }
 
     bool res_opt = OptimizePath(
@@ -97,6 +104,10 @@ common::Status PiecewiseJerkPathOptimizer::Process(
         path_boundary.boundary(), w, &opt_l, &opt_dl, &opt_ddl, max_iter);
 
     if (res_opt) {
+      for (size_t i = 0; i < path_boundary.boundary().size(); i += 4) {
+        ADEBUG << "for s[" << static_cast<double>(i) * path_boundary.delta_s()
+               << "], l = " << opt_l[i] << ", dl = " << opt_dl[i];
+      }
       auto frenet_frame_path =
           ToPiecewiseJerkPath(opt_l, opt_dl, opt_ddl, path_boundary.delta_s(),
                               path_boundary.start_s());
@@ -128,7 +139,12 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   PiecewiseJerkPathProblem piecewise_jerk_problem(lat_boundaries.size(),
                                                   delta_s, init_state);
 
+  // TODO(Hongyi): update end_state settings
   piecewise_jerk_problem.set_end_state_ref({1000.0, 0.0, 0.0}, end_state);
+  if (end_state[0] != 0) {
+    std::vector<double> x_ref(lat_boundaries.size(), end_state[0]);
+    piecewise_jerk_problem.set_x_ref(10.0, x_ref);
+  }
 
   piecewise_jerk_problem.set_weight_x(w[0]);
   piecewise_jerk_problem.set_weight_dx(w[1]);
@@ -158,6 +174,7 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   *x = piecewise_jerk_problem.opt_x();
   *dx = piecewise_jerk_problem.opt_dx();
   *ddx = piecewise_jerk_problem.opt_ddx();
+
   return true;
 }
 

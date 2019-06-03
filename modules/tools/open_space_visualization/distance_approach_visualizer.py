@@ -31,8 +31,8 @@ def SmoothTrajectory(visualize_flag):
     # parameter(except max, min and car size is defined in proto)
     num_output_buffer = 10000
     sx = -8
-    sy = 4
-    sphi = 0.0
+    sy = 1.5
+    sphi = 0.5
 
     scenario = "backward"
     # scenario = "parallel"

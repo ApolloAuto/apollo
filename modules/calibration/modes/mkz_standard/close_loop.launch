@@ -35,7 +35,7 @@
 		<sched_name>CYBER_COMPUTE</sched_name>
 		<version>1.0.0</version>
 	</module>
-	
+
 	<module>
 		<name>localization</name>
 		<dag_conf>/apollo/modules/localization/dag/dag_streaming_msf_localization.dag</dag_conf>

@@ -20,7 +20,7 @@ obstacle_conf {
   predictor_type: FREE_MOVE_PREDICTOR
 }
 obstacle_conf {
-  obstacle_type: BICYCLE 
+  obstacle_type: BICYCLE
   obstacle_status: ON_LANE
   evaluator_type: CYCLIST_KEEP_LANE_EVALUATOR
   predictor_type: LANE_SEQUENCE_PREDICTOR

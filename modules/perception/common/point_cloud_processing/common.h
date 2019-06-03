@@ -108,7 +108,7 @@ void GetMinMaxIn3DWithRange(const base::AttributePointCloud<PointT> &cloud,
   }
 }
 
-// @brief get the maximum and minimum in each axis of a indexed point cloud
+// @brief get the maximum and minimum in each axis of an indexed point cloud
 // old name: du_get_min_max_3d
 template <typename PointT>
 void GetMinMaxIn3D(const base::AttributePointCloud<PointT> &cloud,

@@ -180,7 +180,7 @@ DEFINE_uint32(junction_historical_frame_length, 5,
               "that the junction model will look at.");
 DEFINE_double(junction_exit_lane_threshold, 0.1,
               "If a lane extends out of the junction by this value,"
-              "consider it as a exit_lane.");
+              "consider it as an exit_lane.");
 DEFINE_double(distance_beyond_junction, 0.5,
               "If the obstacle is in junction more than this threshold,"
               "consider it in junction.");

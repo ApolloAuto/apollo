@@ -117,6 +117,7 @@ message ReferenceLineDebug {
   optional double dkappa_rms = 12;
   optional double kappa_max_abs = 13;
   optional double dkappa_max_abs = 14;
+  optional double average_offset = 15;
 }
 
 message SampleLayerDebug {

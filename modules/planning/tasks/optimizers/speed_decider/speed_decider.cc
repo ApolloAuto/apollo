@@ -417,15 +417,6 @@ bool SpeedDecider::CreateYieldDecision(
 
   PerceptionObstacle::Type obstacle_type = obstacle.Perception().type();
   double yield_distance = FLAGS_yield_distance;
-  switch (obstacle_type) {
-    case PerceptionObstacle::PEDESTRIAN:
-    case PerceptionObstacle::BICYCLE:
-      yield_distance = FLAGS_yield_distance_pedestrian_bycicle;
-      break;
-    default:
-      yield_distance = FLAGS_yield_distance;
-      break;
-  }
 
   const auto& obstacle_boundary = obstacle.st_boundary();
   const double yield_distance_s =

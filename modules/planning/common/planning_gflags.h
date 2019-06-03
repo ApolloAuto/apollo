@@ -38,11 +38,12 @@ DECLARE_string(scenario_valet_parking_config_file);
 
 DECLARE_bool(enable_scenario_bare_intersection);
 DECLARE_bool(enable_scenario_pull_over);
-DECLARE_bool(enable_scenario_side_pass);
-DECLARE_double(side_pass_min_signal_intersection_distance);
-DECLARE_bool(enable_scenario_side_pass_multiple_parked_obstacles);
 DECLARE_bool(enable_scenario_stop_sign);
 DECLARE_bool(enable_scenario_traffic_light);
+
+DECLARE_double(side_pass_min_signal_intersection_distance);
+DECLARE_bool(enable_scenario_side_pass_multiple_parked_obstacles);
+DECLARE_bool(enable_force_pull_over_open_space_parking_test);
 
 DECLARE_string(traffic_rule_config_filename);
 DECLARE_string(smoother_config_filename);
@@ -54,7 +55,6 @@ DECLARE_double(rtk_trajectory_resolution);
 DECLARE_bool(enable_reference_line_stitching);
 DECLARE_double(look_forward_extend_distance);
 DECLARE_double(reference_line_stitch_overlap_distance);
-DECLARE_double(reference_line_lateral_buffer);
 
 DECLARE_bool(enable_smooth_reference_line);
 
@@ -160,27 +160,25 @@ DECLARE_bool(enable_follow_accel_constraint);
 DECLARE_bool(enable_sqp_solver);
 
 /// thread pool
-DECLARE_uint32(max_planning_thread_pool_size);
+DECLARE_uint64(max_planning_thread_pool_size);
 DECLARE_bool(use_multi_thread_to_add_obstacles);
-DECLARE_bool(enable_multi_thread_in_dp_poly_path);
 DECLARE_bool(enable_multi_thread_in_dp_st_graph);
 
-// lattice planner
-DECLARE_double(lattice_epsilon);
+DECLARE_double(numerical_epsilon);
 DECLARE_double(default_cruise_speed);
 
 DECLARE_bool(enable_auto_tuning);
 DECLARE_double(trajectory_time_resolution);
 DECLARE_double(trajectory_space_resolution);
 DECLARE_double(lateral_acceleration_bound);
-DECLARE_double(decision_horizon);
-DECLARE_uint32(num_velocity_sample);
+DECLARE_double(speed_lon_decision_horizon);
+DECLARE_uint64(num_velocity_sample);
 DECLARE_bool(enable_backup_trajectory);
 DECLARE_double(backup_trajectory_cost);
 DECLARE_double(min_velocity_sample_gap);
 DECLARE_double(lon_collision_buffer);
 DECLARE_double(lat_collision_buffer);
-DECLARE_uint32(num_sample_follow_per_timestamp);
+DECLARE_uint64(num_sample_follow_per_timestamp);
 
 DECLARE_bool(lateral_optimization);
 DECLARE_double(weight_lateral_offset);
@@ -238,17 +236,12 @@ DECLARE_bool(enable_perception_obstacles);
 DECLARE_bool(enable_open_space_planner_thread);
 DECLARE_bool(use_dual_variable_warm_start);
 DECLARE_bool(use_gear_shift_trajectory);
-DECLARE_uint32(open_space_trajectory_stitching_preserved_length);
+DECLARE_uint64(open_space_trajectory_stitching_preserved_length);
 DECLARE_bool(enable_smoother_failsafe);
 DECLARE_bool(use_s_curve_speed_smooth);
+DECLARE_bool(use_iterative_anchoring_smoother);
 DECLARE_bool(enable_parallel_trajectory_smoothing);
 
-// pull-over
-DECLARE_double(destination_to_adc_buffer);
-DECLARE_double(destination_to_pathend_buffer);
-DECLARE_double(pull_over_road_edge_buffer);
-
-DECLARE_bool(use_osqp_optimizer_for_qp_st);
 DECLARE_bool(use_osqp_optimizer_for_reference_line);
 DECLARE_bool(enable_osqp_debug);
 DECLARE_bool(export_chart);
@@ -288,4 +281,4 @@ DECLARE_double(message_latency_threshold);
 DECLARE_bool(enable_lane_change_urgency_checking);
 DECLARE_double(short_path_length_threshold);
 
-DECLARE_uint32(trajectory_stitching_preserved_length);
+DECLARE_uint64(trajectory_stitching_preserved_length);

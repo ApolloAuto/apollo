@@ -76,7 +76,7 @@ LaneGraph ObstacleClusters::GetLaneGraphWithoutMemorizing(
     std::shared_ptr<const LaneInfo> lane_info_ptr) {
   RoadGraph road_graph(start_s, length, true, lane_info_ptr);
   LaneGraph lane_graph;
-  road_graph.BuildLaneGraph(&lane_graph);
+  road_graph.BuildLaneGraphBidirection(&lane_graph);
   return lane_graph;
 }
 

@@ -47,6 +47,7 @@ export default class TileGround {
             mpp: metadata.mpp,
             tile: metadata.tile,
             imageUrl: metadata.image_url,
+            availableMapTiles: new Set(metadata.availableImages),
         };
 
         this.mapId = metadata.mapid;
@@ -106,8 +107,13 @@ export default class TileGround {
     }
 
     appendTiles(row, col, key, coordinates, scene) {
+        const imageName = `${this.metadata.mpp}_${row}_${col}_${this.metadata.tile}.png`;
+        if (!this.metadata.availableMapTiles.has(imageName)) {
+            return;
+        }
+
         const mapUrl = this.metadata.imageUrl
-               ? `${this.mapUrlPrefix}/${this.metadata.mpp}_${row}_${col}_${this.metadata.tile}.png`
+               ? `${this.mapUrlPrefix}/${imageName}`
                : `${this.mapUrlPrefix}?mapId=${this.mapId}&i=${row}&j=${col}`;
 
         const position = coordinates.applyOffset({

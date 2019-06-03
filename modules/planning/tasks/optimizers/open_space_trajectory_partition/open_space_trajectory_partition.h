@@ -59,9 +59,14 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
 
   void UpdateTrajHistory(const std::string& chosen_trajectory_encoding);
 
-  void PartitionTrajectory(
-      DiscretizedTrajectory* interpolated_trajectory_result_ptr,
-      std::vector<TrajGearPair>* paritioned_trajectories);
+  void PartitionTrajectory(const DiscretizedTrajectory& trajectory,
+                           std::vector<TrajGearPair>* paritioned_trajectories);
+
+  void LoadTrajectoryPoint(const common::TrajectoryPoint& trajectory_point,
+                           const canbus::Chassis::GearPosition& gear,
+                           common::math::Vec2d* last_pos_vec,
+                           double* distance_s,
+                           DiscretizedTrajectory* current_trajectory);
 
   bool CheckReachTrajectoryEnd(const DiscretizedTrajectory& trajectory,
                                const canbus::Chassis::GearPosition& gear,
@@ -101,6 +106,8 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
   double ego_length_ = 0.0;
   double ego_width_ = 0.0;
   double shift_distance_ = 0.0;
+  double wheel_base_ = 0.0;
+
   double ego_theta_ = 0.0;
   double ego_x_ = 0.0;
   double ego_y_ = 0.0;

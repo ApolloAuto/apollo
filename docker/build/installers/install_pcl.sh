@@ -26,9 +26,11 @@ wget https://github.com/PointCloudLibrary/pcl/archive/pcl-1.7.2.tar.gz
 tar xzvf pcl-1.7.2.tar.gz
 
 cd pcl-pcl-1.7.2/
-
-export TASK=build
-export CC=gcc
-bash .travis.sh
+mkdir build
 cd build
-sudo make install
+cmake ..
+make -j 2
+make install
+
+#clean up
+cd ../../ && rm -rf pcl-1.7.2.tar.gz pcl-pcl-1.7.2

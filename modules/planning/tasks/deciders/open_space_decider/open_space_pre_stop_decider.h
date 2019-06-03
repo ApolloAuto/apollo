@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "modules/planning/proto/decider_config.pb.h"
+#include "modules/planning/proto/open_space_pre_stop_decider_config.pb.h"
 
 #include "cyber/common/macros.h"
 
@@ -39,11 +39,20 @@ class OpenSpacePreStopDecider : public Decider {
   apollo::common::Status Process(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
-  void CheckOpenSpacePreStop(Frame* const frame,
-                             ReferenceLineInfo* const reference_line_info);
+  bool CheckParkingSpotPreStop(Frame* const frame,
+                               ReferenceLineInfo* const reference_line_info,
+                               double* target_s);
+
+  bool CheckPullOverPreStop(Frame* const frame,
+                            ReferenceLineInfo* const reference_line_info,
+                            double* target_s);
+
+  void SetStopFence(const double target_s, Frame* const frame,
+                    ReferenceLineInfo* const reference_line_info);
 
  private:
-  static constexpr const char* OPEN_SPACE_VO_ID_PREFIX = "OP_";
+  static constexpr const char* OPEN_SPACE_STOP_ID = "OPEN_SPACE_PRE_STOP";
+  OpenSpacePreStopDeciderConfig open_space_pre_stop_decider_config_;
 };
 
 }  // namespace planning

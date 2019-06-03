@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>bridge_sender</name>
+        <dag_conf>/apollo/modules/bridge/dag/bridge_sender.dag</dag_conf>
+        <process_name>udp_bridge_sender</process_name>
+    </module>
+</cyber>

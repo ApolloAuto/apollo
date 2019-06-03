@@ -1,6 +1,6 @@
 config: {
   rule_id: BACKSIDE_VEHICLE
-  enabled: true
+  enabled: false
   backside_vehicle {
     backside_lane_width: 4.0
   }

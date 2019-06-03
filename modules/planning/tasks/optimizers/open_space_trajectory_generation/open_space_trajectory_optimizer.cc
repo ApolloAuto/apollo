@@ -138,10 +138,20 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
     dual_n_result_ds_vec.resize(size);
 
     // In for loop
-    ADEBUG << "Trajectories size is " << size;
+    ADEBUG << "Trajectories size in smoother is " << size;
     for (size_t i = 0; i < size; ++i) {
       LoadHybridAstarResultInEigen(&partition_trajectories[i], &xWS_vec[i],
                                    &uWS_vec[i]);
+      // checking initial and ending points
+      if (config_.planner_open_space_config()
+              .enable_check_parallel_trajectory()) {
+        AINFO << "trajectory id: " << i;
+        AINFO << "trajectory partitioned size: " << xWS_vec[i].cols();
+        AINFO << "initial point: " << xWS_vec[i].col(0).transpose();
+        AINFO << "ending point: "
+              << xWS_vec[i].col(xWS_vec[i].cols() - 1).transpose();
+      }
+
       Eigen::MatrixXd last_time_u(2, 1);
       double init_v = 0.0;
       // Stitching point control and velocity is set for first piece of
@@ -156,16 +166,32 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
         last_time_u << 0.0, 0.0;
         init_v = 0.0;
       }
-      if (!GenerateDistanceApproachTraj(
-              xWS_vec[i], uWS_vec[i], XYbounds, obstacles_edges_num,
-              obstacles_A, obstacles_b, obstacles_vertices_vec, last_time_u,
-              init_v, &state_result_ds_vec[i], &control_result_ds_vec[i],
-              &time_result_ds_vec[i], &l_warm_up_vec[i], &n_warm_up_vec[i],
-              &dual_l_result_ds_vec[i], &dual_n_result_ds_vec[i])) {
-        ADEBUG << "Smoother fail at " << i << "th trajectory";
-        ADEBUG << i << "th trajectory size is " << xWS_vec[i].cols();
-        return Status(ErrorCode::PLANNING_ERROR,
-                      "distance approach smoothing problem failed to solve");
+      // TODO(Jinyun): Further testing
+      if (FLAGS_use_iterative_anchoring_smoother) {
+        if (!GenerateDecoupledTraj(
+                xWS_vec[i], last_time_u(1, 0), init_v, obstacles_vertices_vec,
+                &state_result_ds_vec[i], &control_result_ds_vec[i],
+                &time_result_ds_vec[i])) {
+          ADEBUG << "Smoother fail at " << i << "th trajectory";
+          ADEBUG << i << "th trajectory size is " << xWS_vec[i].cols();
+          return Status(ErrorCode::PLANNING_ERROR,
+                        "distance approach smoothing problem failed to solve");
+        }
+      } else {
+        if (!GenerateDistanceApproachTraj(
+                xWS_vec[i], uWS_vec[i], XYbounds, obstacles_edges_num,
+                obstacles_A, obstacles_b, obstacles_vertices_vec, last_time_u,
+                init_v, &state_result_ds_vec[i], &control_result_ds_vec[i],
+                &time_result_ds_vec[i], &l_warm_up_vec[i], &n_warm_up_vec[i],
+                &dual_l_result_ds_vec[i], &dual_n_result_ds_vec[i])) {
+          ADEBUG << "Smoother fail at " << i
+                 << "th trajectory with index starts from 0";
+          ADEBUG << i << "th trajectory size is " << xWS_vec[i].cols();
+          ADEBUG << "State matrix: " << xWS_vec[i];
+          ADEBUG << "Control matrix: " << uWS_vec[i];
+          return Status(ErrorCode::PLANNING_ERROR,
+                        "distance approach smoothing problem failed to solve");
+        }
       }
     }
 
@@ -306,6 +332,7 @@ void OpenSpaceTrajectoryOptimizer::RecordDebugInfo(
   double relative_time = 0;
 
   // load smoothed trajectory
+  horizon = state_result_ds.cols() - 1;
   auto* smoothed_trajectory = open_space_debug_.mutable_smoothed_trajectory();
   for (size_t i = 0; i < horizon; ++i) {
     auto* smoothed_point = smoothed_trajectory->add_vehicle_motion_point();
@@ -757,6 +784,57 @@ void OpenSpaceTrajectoryOptimizer::CombineTrajectories(
   *n_warm_up = std::move(n_warm_up_);
   *dual_l_result_ds = std::move(dual_l_result_ds_);
   *dual_n_result_ds = std::move(dual_n_result_ds_);
+}
+
+bool OpenSpaceTrajectoryOptimizer::GenerateDecoupledTraj(
+    const Eigen::MatrixXd& xWS, const double init_a, const double init_v,
+    const std::vector<std::vector<common::math::Vec2d>>& obstacles_vertices_vec,
+    Eigen::MatrixXd* state_result_dc, Eigen::MatrixXd* control_result_dc,
+    Eigen::MatrixXd* time_result_dc) {
+  IterativeAnchoringSmoother iterative_anchoring_smoother;
+  DiscretizedTrajectory smoothed_trajectory;
+  if (!iterative_anchoring_smoother.Smooth(
+          xWS, init_a, init_v, obstacles_vertices_vec, &smoothed_trajectory)) {
+    return false;
+  }
+
+  LoadResult(smoothed_trajectory, state_result_dc, control_result_dc,
+             time_result_dc);
+  return true;
+}
+
+// TODO(Jinyun): tmp interface, will refactor
+void OpenSpaceTrajectoryOptimizer::LoadResult(
+    const DiscretizedTrajectory& discretized_trajectory,
+    Eigen::MatrixXd* state_result_dc, Eigen::MatrixXd* control_result_dc,
+    Eigen::MatrixXd* time_result_dc) {
+  const size_t points_size = discretized_trajectory.size();
+  CHECK_GT(points_size, 1);
+  *state_result_dc = Eigen::MatrixXd::Zero(4, points_size);
+  *control_result_dc = Eigen::MatrixXd::Zero(2, points_size - 1);
+  *time_result_dc = Eigen::MatrixXd::Zero(1, points_size - 1);
+
+  auto& state_result = *state_result_dc;
+  for (size_t i = 0; i < points_size; ++i) {
+    state_result(0, i) = discretized_trajectory[i].path_point().x();
+    state_result(1, i) = discretized_trajectory[i].path_point().y();
+    state_result(2, i) = discretized_trajectory[i].path_point().theta();
+    state_result(3, i) = discretized_trajectory[i].v();
+  }
+
+  auto& control_result = *control_result_dc;
+  auto& time_result = *time_result_dc;
+  const double wheel_base = common::VehicleConfigHelper::Instance()
+                                ->GetConfig()
+                                .vehicle_param()
+                                .wheel_base();
+  for (size_t i = 0; i + 1 < points_size; ++i) {
+    control_result(0, i) =
+        std::atan(discretized_trajectory[i].path_point().kappa() * wheel_base);
+    control_result(1, i) = discretized_trajectory[i].a();
+    time_result(0, i) = discretized_trajectory[i + 1].relative_time() -
+                        discretized_trajectory[i].relative_time();
+  }
 }
 
 }  // namespace planning

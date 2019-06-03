@@ -326,7 +326,7 @@ message Ads1_111 {
     ADS_AEB_TGTDECEL_REQ_NO_DEMAND = 0;
     ADS_AEB_TGTDECEL_REQ_DEMAND = 1;
   }
-  // ADS request ESP/VLC to decelerate untill standstill. [] [0|1]
+  // ADS request ESP/VLC to decelerate until standstill. [] [0|1]
   optional Ads_dectostopType ads_dectostop = 1;
   // The status of the ADS control unit.The ADS mode should be contained in every message sent by ADS [] [0|31]
   optional Ads_modeType ads_mode = 2;

@@ -96,6 +96,9 @@ class ScenarioManager final {
   void UpdatePlanningContextTrafficLightScenario(
       const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
 
+  void UpdatePlanningContextPullOverScenario(
+      const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
+
  private:
   std::unordered_map<ScenarioConfig::ScenarioType, ScenarioConfig,
                      std::hash<int>>
@@ -107,9 +110,6 @@ class ScenarioManager final {
   std::unordered_map<ReferenceLineInfo::OverlapType, hdmap::PathOverlap,
                      std::hash<int>>
       first_encountered_overlap_map_;
-
-  // TODO(all): move to scenario conf later
-  const double signal_expire_time_sec_ = 5.0;  // sec
 };
 
 }  // namespace scenario

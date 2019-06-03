@@ -36,6 +36,8 @@ class SemanticMap {
   void RunCurrFrame(
       const std::unordered_map<int, ObstacleHistory>& obstacle_id_history_map);
 
+  bool GetMapById(const int obstacle_id, cv::Mat* feature_map);
+
  private:
   cv::Point2i GetTransPoint(double x, double y) {
     return cv::Point2i(static_cast<int>((x - curr_base_x_) / 0.1),
@@ -59,6 +61,7 @@ class SemanticMap {
   cv::Mat base_img_;
   SemanticMapConfig config_;
   cv::Mat curr_img_;
+  std::unordered_map<int, ObstacleHistory> obstacle_id_history_map_;
   double curr_base_x_ = 0.0;
   double curr_base_y_ = 0.0;
   double curr_timestamp_ = 0.0;

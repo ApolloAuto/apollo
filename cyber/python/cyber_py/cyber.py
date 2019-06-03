@@ -343,3 +343,42 @@ class ChannelUtils(object):
         Output: {'channel1':[], 'channel2':[]} .channels info
         """
         return _CYBER_NODE.PyChannelUtils_get_channels_info(sleep_s)
+
+
+class NodeUtils(object):
+
+    @staticmethod
+    def get_nodes(sleep_s=2):
+        """
+        Get active nodes name
+        Input: wait for topo discovery
+        Output: all active channels
+        """
+        return _CYBER_NODE.PyNodeUtils_get_active_nodes(sleep_s)
+
+    @staticmethod
+    def get_node_attr(node_name, sleep_s=2):
+        """
+        Get node attribute
+        Input: node name, wait for topo discovery
+        Output: the node's attribute.
+        """
+        return _CYBER_NODE.PyNodeUtils_get_node_attr(node_name, sleep_s)
+
+    @staticmethod
+    def get_readersofnode(node_name, sleep_s=2):
+        """
+        Get node's reader channelnames
+        Input: node name, wait for topo discovery
+        Output: node's readers channelname.
+        """
+        return _CYBER_NODE.PyNodeUtils_get_readersofnode(node_name, sleep_s)
+
+    @staticmethod
+    def get_writersofnode(node_name, sleep_s=2):
+        """
+        Get node's writer channelnames
+        Input: node name, wait for topo discovery
+        Output: node's writers channelname.
+        """
+        return _CYBER_NODE.PyNodeUtils_get_writersofnode(node_name, sleep_s)

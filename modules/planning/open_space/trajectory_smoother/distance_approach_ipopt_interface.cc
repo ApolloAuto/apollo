@@ -212,11 +212,11 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
 
   // 2. control variables, 2 * [0, horizon_-1]
   for (int i = 0; i < horizon_; ++i) {
-    // u1
+    // steer
     x_l[variable_index] = -2e19;
     x_u[variable_index] = 2e19;
 
-    // u2
+    // a
     x_l[variable_index + 1] = -2e19;
     x_u[variable_index + 1] = 2e19;
 

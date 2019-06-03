@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include "modules/perception/camera/app/cipv_camera.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/tools/offline/transform_server.h"
@@ -59,12 +60,17 @@ class Visualizer {
       const CameraFrame &frame,
       const base::MotionBufferPtr motion_buffer,
       const Eigen::Affine3d &world2camera);
-  void Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
-                                          const CameraFrame &frame,
-                                          const Eigen::Matrix3d intrinsic,
-                                          const Eigen::Matrix4d extrinsic,
-                                          const Eigen::Affine3d &world2camera);
+  void Draw2Dand3D_all_info_single_camera(
+      const cv::Mat &img,
+      const CameraFrame &frame,
+      const Eigen::Matrix3d &intrinsic,
+      const Eigen::Matrix4d &extrinsic,
+      const Eigen::Affine3d &world2camera,
+      const base::MotionBufferPtr motion_buffer);
+  bool DrawTrajectories(const base::ObjectPtr &object,
+      const base::MotionBufferPtr motion_buffer);
   cv::Point world_point_to_bigimg(const Eigen::Vector2d &p);
+  cv::Point world_point_to_bigimg(const Eigen::Vector4f &p);
   Eigen::Vector2d image2ground(cv::Point p_img);
   cv::Point ground2image(Eigen::Vector2d p_ground);
   std::string type_to_string(const apollo::perception::base::ObjectType type);
@@ -76,7 +82,7 @@ class Visualizer {
     roi_height_ = crop_height;
     roi_width_ = crop_width;
   }
-  bool euler_to_quaternion(Eigen::Vector4d *quarternion,
+  bool euler_to_quaternion(Eigen::Vector4d *quaternion,
                            const double pitch_radian, const double yaw_radian,
                            const double roll_radian);
   bool save_manual_calibration_parameter(const std::string &camera_name,
@@ -85,7 +91,7 @@ class Visualizer {
                                          const double roll_adj_degree);
   bool save_extrinsic_in_yaml(const std::string &camera_name,
                               const Eigen::Matrix4d &extrinsic,
-                              const Eigen::Vector4d &quarternion,
+                              const Eigen::Vector4d &quaternion,
                               const double pitch_radian,
                               const double yaw_radian,
                               const double roll_radian);
@@ -164,6 +170,7 @@ class Visualizer {
   bool show_camera_box2d_ = true;
   bool show_camera_box3d_ = true;
   bool show_camera_bdv_ = true;
+  bool show_virtual_egolane_ = true;
   bool show_radar_pc_ = true;
   bool show_fusion_ = false;
   bool show_associate_color_ = false;
@@ -182,6 +189,12 @@ class Visualizer {
   std::string help_str_;
   // color
   cv::Scalar color_cipv_ = cv::Scalar(255, 255, 255);
+  cv::Scalar virtual_lane_color_ = cv::Scalar(0, 0, 255);
+  int line_thickness_ = 2;
+  int cipv_line_thickness_ = 6;
+  int trajectory_line_thickness_ = 1;
+  double speed_limit_ = 1.0;  // in m/s
+  Cipv cipv_;
 };
 
 }  // namespace camera

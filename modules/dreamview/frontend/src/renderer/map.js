@@ -274,7 +274,7 @@ export default class Map {
         const boundary1 = boundaryPoints[0];
         const boundary2 = boundaryPoints[1];
         const boundary3 = boundaryPoints[2];
-        // get a orthogonal line of the plane (only need its projection on XY coordinate system)
+        // get an orthogonal line of the plane (only need its projection on XY coordinate system)
         // construct ax+by+c=0 ==> orthogonalX*x+orthogonalY*y+constant=0
         const orthogonalX = (boundary2.x - boundary1.x) * (boundary3.z - boundary1.z)
             - (boundary3.x - boundary1.x) * (boundary2.z - boundary1.z);

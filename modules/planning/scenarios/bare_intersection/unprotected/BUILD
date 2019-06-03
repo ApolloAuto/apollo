@@ -25,7 +25,7 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//modules/planning/scenarios:scenario",
         "//modules/planning/scenarios:stage_intersection_cruise_impl",
-        "//modules/planning/tasks/deciders:decider",
+        "//modules/planning/tasks/deciders/creep_decider",
         "@eigen",
     ],
 )

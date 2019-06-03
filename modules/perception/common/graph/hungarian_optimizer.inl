@@ -44,8 +44,8 @@ HungarianOptimizer<T>::HungarianOptimizer(int max_optimization_size)
   uncov_col_.reserve(max_optimization_size);
 }
 
-/* Find an assignment which maximizes the overall costs. 
- * Return an array of pairs of integers. Each pair (i, j) corresponds to 
+/* Find an assignment which maximizes the overall costs.
+ * Return an array of pairs of integers. Each pair (i, j) corresponds to
  * assigning agent i to task j. */
 template <typename T>
 void HungarianOptimizer<T>::Maximize(
@@ -61,9 +61,9 @@ void HungarianOptimizer<T>::Maximize(
   Minimize(assignments);
 }
 
-/* Find an assignment which minimizes the overall costs. 
- * Return an array of pairs of integers. Each pair (i, j) corresponds to 
- * assinging agent i to task j. */
+/* Find an assignment which minimizes the overall costs.
+ * Return an array of pairs of integers. Each pair (i, j) corresponds to
+ * assigning agent i to task j. */
 template <typename T>
 void HungarianOptimizer<T>::Minimize(
     std::vector<std::pair<size_t, size_t> >* assignments) {
@@ -88,8 +88,8 @@ void HungarianOptimizer<T>::OptimizationInit() {
   matrix_size_ = std::max(height_, width_);
   max_cost_ = 0;
 
-  /* generate the expanded cost matrix by adding extra 0s in order to make a 
-   * square matrix. Meanwhile, find the max cost in the matrix. It may be used 
+  /* generate the expanded cost matrix by adding extra 0s in order to make a
+   * square matrix. Meanwhile, find the max cost in the matrix. It may be used
    * later, if we want to maximizing rather than minimizing the overall costs.*/
   costs_.resize(matrix_size_, matrix_size_);
   for (size_t row = 0; row < matrix_size_; ++row) {
@@ -450,10 +450,10 @@ void HungarianOptimizer<T>::MakeAugmentingPath() {
    * and terminates if we reach a primed zero in a column with no star, our
    * path_ must either contain matrix_size_ or fewer stars (in which case the
    * loop iterates fewer than matrix_size_ times), or it contains more.  In
-   * that case, because (1) implies that there are fewer than matrix_size_ 
-   * stars, we must have visited at least one star more than once. Consider 
+   * that case, because (1) implies that there are fewer than matrix_size_
+   * stars, we must have visited at least one star more than once. Consider
    * the first such star that we visit more than once; it must have been reached
-   * immediately after visiting a prime in the same row.  By (2), this prime 
+   * immediately after visiting a prime in the same row.  By (2), this prime
    * is unique and so must have also been visited more than once.
    * Therefore, that prime must be in the same column as a star that has been
    * visited more than once, contradicting the assumption that we chose the
@@ -499,7 +499,7 @@ void HungarianOptimizer<T>::MakeAugmentingPath() {
 }
 
 /* Step 6:
- * Add the smallest uncovered value in the matrix to every element of each 
+ * Add the smallest uncovered value in the matrix to every element of each
  * covered row, and subtract it from every element of each uncovered column.
  * Return to Step 4 without altering any stars, primes, or covered lines. */
 template <typename T>

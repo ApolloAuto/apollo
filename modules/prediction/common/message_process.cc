@@ -157,8 +157,12 @@ void MessageProcess::OnPerception(
         AERROR << "Obstacle [" << id << "] has no latest feature.";
         continue;
       }
+      // TODO(all): the adc trajectory should be part of features for learning
+      //            algorithms rather than part of the feature.proto
+      /*
       *obstacle_ptr->mutable_latest_feature()->mutable_adc_trajectory_point() =
           ptr_ego_trajectory_container->adc_trajectory().trajectory_point();
+      */
       FeatureOutput::InsertFeatureProto(obstacle_ptr->latest_feature());
       ADEBUG << "Insert feature into feature output";
     }

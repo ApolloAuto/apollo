@@ -163,8 +163,17 @@ std::vector<std::string> Glob(const std::string &pattern) {
 bool CopyFile(const std::string &from, const std::string &to) {
   std::ifstream src(from, std::ios::binary);
   if (!src) {
-    AERROR << "Source path doesn't exist: " << from;
-    return false;
+    AWARN << "Source path could not be normally opened: " << from;
+    std::string command = "cp -r " + from + " " + to;
+    ADEBUG << command;
+    const int ret = std::system(command.c_str());
+    if (ret == 0) {
+      ADEBUG << "Copy success, command returns " << ret;
+      return true;
+    } else {
+      ADEBUG << "Copy error, command returns " << ret;
+      return false;
+    }
   }
 
   std::ofstream dst(to, std::ios::binary);

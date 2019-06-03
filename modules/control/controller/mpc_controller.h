@@ -272,7 +272,7 @@ class MPCController : public Controller {
   bool enable_mpc_feedforward_compensation_ = false;
 
   // Limitation for judging if the unconstraint analytical control is close
-  // enough to the the solver's output with constraint
+  // enough to the solver's output with constraint
   double unconstraint_control_diff_limit_ = 5.0;
 };
 

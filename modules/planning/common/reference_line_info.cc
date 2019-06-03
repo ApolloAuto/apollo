@@ -219,15 +219,22 @@ bool ReferenceLineInfo::GetFirstOverlap(
   constexpr double kMaxOverlapRange = 500.0;
   double overlap_min_s = kMaxOverlapRange;
 
-  for (const auto& overlap : path_overlaps) {
-    if (overlap.end_s < start_s) {
+  auto overlap_min_s_iter = path_overlaps.end();
+  for (auto iter = path_overlaps.begin(); iter != path_overlaps.end(); ++iter) {
+    if (iter->end_s < start_s) {
       continue;
     }
-    if (overlap_min_s > overlap.start_s) {
-      *path_overlap = overlap;
-      overlap_min_s = overlap.start_s;
+    if (overlap_min_s > iter->start_s) {
+      overlap_min_s_iter = iter;
+      overlap_min_s = iter->start_s;
     }
   }
+
+  // Ensure that the path_overlaps is not empty.
+  if (overlap_min_s_iter != path_overlaps.end()) {
+    *path_overlap = *overlap_min_s_iter;
+  }
+
   return overlap_min_s < kMaxOverlapRange;
 }
 
@@ -488,7 +495,8 @@ bool ReferenceLineInfo::IsIrrelevantObstacle(const Obstacle& obstacle) {
   }
   if (is_on_reference_line_ &&
       obstacle_boundary.end_s() < sl_boundary_info_.adc_sl_boundary_.end_s() &&
-      reference_line_.IsOnLane(obstacle_boundary)) {
+      (reference_line_.IsOnLane(obstacle_boundary) ||
+       obstacle_boundary.end_s() < 0.0)) {  // if obstacle is far backward
     return true;
   }
   return false;
@@ -549,9 +557,15 @@ bool ReferenceLineInfo::CombinePathAndSpeedProfile(
   const double kSparseTimeResolution = FLAGS_trajectory_time_max_interval;
   const double kDenseTimeSec = FLAGS_trajectory_time_high_density_period;
   if (path_data_.discretized_path().empty()) {
-    AWARN << "path data is empty";
+    AERROR << "path data is empty";
     return false;
   }
+
+  if (speed_data_.empty()) {
+    AERROR << "speed profile is empty";
+    return false;
+  }
+
   for (double cur_rel_time = 0.0; cur_rel_time < speed_data_.TotalTime();
        cur_rel_time += (cur_rel_time < kDenseTimeSec ? kDenseTimeResoltuion
                                                      : kSparseTimeResolution)) {
@@ -564,12 +578,8 @@ bool ReferenceLineInfo::CombinePathAndSpeedProfile(
     if (speed_point.s() > path_data_.discretized_path().Length()) {
       break;
     }
-    common::PathPoint path_point;
-    if (!path_data_.GetPathPointWithPathS(speed_point.s(), &path_point)) {
-      AERROR << "Fail to get path data with s " << speed_point.s()
-             << "path total length " << path_data_.discretized_path().Length();
-      return false;
-    }
+    common::PathPoint path_point =
+        path_data_.GetPathPointWithPathS(speed_point.s());
     path_point.set_s(path_point.s() + start_s);
 
     common::TrajectoryPoint trajectory_point;

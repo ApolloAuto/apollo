@@ -21,6 +21,8 @@
 #include <unistd.h>
 #include <thread>
 
+#include "cyber/init.h"
+
 namespace apollo {
 namespace cyber {
 namespace io {
@@ -103,5 +105,6 @@ TEST(PollerTest, operation) {
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
+  apollo::cyber::Init(argv[0]);
   return RUN_ALL_TESTS();
 }

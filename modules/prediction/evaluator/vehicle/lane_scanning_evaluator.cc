@@ -26,6 +26,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/prediction/common/feature_output.h"
+#include "modules/prediction/common/prediction_constants.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/container_manager.h"
@@ -43,12 +44,13 @@ LaneScanningEvaluator::LaneScanningEvaluator() : device_(torch::kCPU) {
   LoadModel();
 }
 
-void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   std::vector<Obstacle*> dummy_dynamic_env;
   Evaluate(obstacle_ptr, dummy_dynamic_env);
+  return true;
 }
 
-void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
+bool LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
                                      std::vector<Obstacle*> dynamic_env) {
   // Sanity checks.
   omp_set_num_threads(1);
@@ -56,21 +58,21 @@ void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
     AERROR << "Obstacle [" << id << "] has no latest feature.";
-    return;
+    return false;
   }
   Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
   CHECK_NOTNULL(latest_feature_ptr);
   if (!latest_feature_ptr->has_lane() ||
       !latest_feature_ptr->lane().has_lane_graph_ordered()) {
     AERROR << "Obstacle [" << id << "] has no lane graph.";
-    return;
+    return false;
   }
   LaneGraph* lane_graph_ptr =
       latest_feature_ptr->mutable_lane()->mutable_lane_graph_ordered();
   CHECK_NOTNULL(lane_graph_ptr);
   if (lane_graph_ptr->lane_sequence_size() == 0) {
     AERROR << "Obstacle [" << id << "] has no lane sequences.";
-    return;
+    return false;
   }
   ADEBUG << "There are " << lane_graph_ptr->lane_sequence_size()
          << " lane sequences to scan.";
@@ -89,7 +91,7 @@ void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
                                          string_feature_values, "cruise",
                                          nullptr);
     ADEBUG << "Save extracted features for learning locally.";
-    return;
+    return true;
   }
 
   feature_values.push_back(static_cast<double>(MAX_NUM_LANE));
@@ -103,6 +105,7 @@ void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
   torch_inputs.push_back(std::move(torch_input));
   ModelInference(torch_inputs, torch_lane_scanning_model_ptr_,
                  latest_feature_ptr);
+  return true;
 }
 
 bool LaneScanningEvaluator::ExtractStringFeatures(
@@ -110,8 +113,9 @@ bool LaneScanningEvaluator::ExtractStringFeatures(
     std::vector<std::string>* const string_feature_values) {
   for (const LaneSequence& lane_sequence : lane_graph.lane_sequence()) {
     string_feature_values->push_back("|");
-    for (const LaneSegment& lane_segment : lane_sequence.lane_segment()) {
-      string_feature_values->push_back(lane_segment.lane_id());
+    for (int i = lane_sequence.adc_lane_segment_idx();
+         i < static_cast<int>(lane_sequence.lane_segment_size()); ++i) {
+      string_feature_values->push_back(lane_sequence.lane_segment(i).lane_id());
     }
   }
   return true;
@@ -142,15 +146,18 @@ bool LaneScanningEvaluator::ExtractFeatures(
 
   // Extract static environmental (lane-related) features.
   std::vector<double> static_feature_values;
+  std::vector<int> lane_sequence_idx_to_remove;
   if (!ExtractStaticEnvFeatures(obstacle_ptr, lane_graph_ptr,
-                                &static_feature_values)) {
-    ADEBUG << "Failed to extract static environmental features around obs_id = "
+                                &static_feature_values,
+                                &lane_sequence_idx_to_remove)) {
+    AERROR << "Failed to extract static environmental features around obs_id = "
            << id;
   }
   if (static_feature_values.size() %
-          (SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) !=
+          (SINGLE_LANE_FEATURE_SIZE *
+           (LANE_POINTS_SIZE + BACKWARD_LANE_POINTS_SIZE)) !=
       0) {
-    ADEBUG << "Obstacle [" << id << "] has incorrect static env feature size: "
+    AERROR << "Obstacle [" << id << "] has incorrect static env feature size: "
            << static_feature_values.size() << ".";
     return false;
   }
@@ -271,7 +278,8 @@ bool LaneScanningEvaluator::ExtractObstacleFeatures(
 
 bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
     const Obstacle* obstacle_ptr, const LaneGraph* lane_graph_ptr,
-    std::vector<double>* feature_values) {
+    std::vector<double>* feature_values,
+    std::vector<int>* lane_sequence_idx_to_remove) {
   // Sanity checks.
   CHECK_NOTNULL(lane_graph_ptr);
   feature_values->clear();
@@ -285,16 +293,80 @@ bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
   // Go through every lane-sequence (ordered from left to right) and
   // extract needed features.
   for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
-    size_t count = 0;
     // Get all the properties of the current lane-sequence.
     // Go through all the lane-points to fill up the feature_values.
     const LaneSequence& lane_sequence = lane_graph_ptr->lane_sequence(i);
-    for (int j = 0; j < lane_sequence.lane_segment_size(); ++j) {
+
+    // Extract features from backward lane-points.
+    size_t count = 0;
+    std::vector<double> backward_feature_values;
+    for (int j = lane_sequence.adc_lane_segment_idx(); j >= 0; --j) {
+      if (count >= SINGLE_LANE_FEATURE_SIZE * BACKWARD_LANE_POINTS_SIZE) {
+        break;
+      }
+      const LaneSegment& lane_segment = lane_sequence.lane_segment(j);
+      int k_starting_idx = lane_segment.lane_point_size() - 1;
+      if (j == lane_sequence.adc_lane_segment_idx()) {
+        k_starting_idx = std::min(lane_segment.adc_lane_point_idx(),
+                                  lane_segment.lane_point_size() - 1);
+      }
+      for (int k = k_starting_idx; k >= 0; --k) {
+        if (count >= SINGLE_LANE_FEATURE_SIZE * BACKWARD_LANE_POINTS_SIZE) {
+          break;
+        }
+        const LanePoint& lane_point = lane_segment.lane_point(k);
+        std::pair<double, double> relative_s_l =
+            WorldCoordToObjCoord(std::make_pair(lane_point.position().x(),
+                                                lane_point.position().y()),
+                                 obs_curr_pos, obs_curr_heading);
+        double relative_ang =
+            WorldAngleToObjAngle(lane_point.heading(), obs_curr_heading);
+
+        backward_feature_values.push_back(lane_point.kappa());
+        backward_feature_values.push_back(relative_ang);
+        backward_feature_values.push_back(relative_s_l.first);
+        backward_feature_values.push_back(relative_s_l.second);
+
+        count += 4;
+      }
+    }
+    // If lane-points are not enough, then extrapolate linearly.
+    while (count >= SINGLE_LANE_FEATURE_SIZE * 2 &&
+           count < SINGLE_LANE_FEATURE_SIZE * BACKWARD_LANE_POINTS_SIZE) {
+      std::size_t s = backward_feature_values.size();
+      double relative_l_new =
+          2 * backward_feature_values[s - 1] - backward_feature_values[s - 5];
+      double relative_s_new =
+          2 * backward_feature_values[s - 2] - backward_feature_values[s - 6];
+      double relative_ang_new = backward_feature_values[s - 3];
+
+      backward_feature_values.push_back(0.0);
+      backward_feature_values.push_back(relative_ang_new);
+      backward_feature_values.push_back(relative_s_new);
+      backward_feature_values.push_back(relative_l_new);
+
+      count += 4;
+    }
+
+    for (int j = static_cast<int>(backward_feature_values.size()) - 1; j >= 0;
+         --j) {
+      feature_values->push_back(backward_feature_values[j]);
+    }
+
+    // Extract features from forward lane-points.
+    count = 0;
+    for (int j = lane_sequence.adc_lane_segment_idx();
+         j < lane_sequence.lane_segment_size(); ++j) {
       if (count >= SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
         break;
       }
       const LaneSegment& lane_segment = lane_sequence.lane_segment(j);
-      for (int k = 0; k < lane_segment.lane_point_size(); ++k) {
+      int k_starting_idx = 0;
+      if (j == lane_sequence.adc_lane_segment_idx()) {
+        k_starting_idx = std::min(lane_segment.adc_lane_point_idx(),
+                                  lane_segment.lane_point_size() - 1);
+      }
+      for (int k = k_starting_idx; k < lane_segment.lane_point_size(); ++k) {
         if (count >= SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
           break;
         }
@@ -313,7 +385,6 @@ bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
         count += 4;
       }
     }
-
     // If lane-points are not enough, then extrapolate linearly.
     while (count >= SINGLE_LANE_FEATURE_SIZE * 2 &&
            count < SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
@@ -330,6 +401,12 @@ bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
       feature_values->push_back(0.0);
       count += 4;
     }
+  }
+
+  if (FLAGS_prediction_offline_mode ==
+      PredictionConstants::kDumpDataForLearning) {
+    // Early exit without appending zero for offline_dataforlearn_dump
+    return true;
   }
 
   size_t max_feature_size =
