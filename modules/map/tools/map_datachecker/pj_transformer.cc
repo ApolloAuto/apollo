@@ -6,16 +6,15 @@
  * @file: common.h
  * @desc: description
  * @author: yuanyijun@baidu.com
-  *****************************************************************************/
+  ****************************************************************************/
 
 #include <iostream>
 #include <sstream>
-#include "pj_transformer.h"
+#include "modules/map/tools/map_datachecker/pj_transformer.h"
 
 namespace adu {
 namespace workers {
 namespace collection {
-
 
 PJTransformer::PJTransformer(int zone_id) {
     // init projPJ
@@ -44,16 +43,17 @@ PJTransformer::~PJTransformer() {
         _pj_utm = NULL;
     }
 }
-int PJTransformer::latlong_to_utm(long point_count, int point_offset,
-                                  double *x, double *y, double *z) { 
+int PJTransformer::latlong_to_utm(int64_t point_count, int point_offset,
+                                  double *x, double *y, double *z) {
     if (!_pj_latlong || !_pj_utm) {
-        std::cerr << "_pj_latlong:" << _pj_latlong << "_pj_utm:" << _pj_utm << std::endl;
+        std::cerr << "_pj_latlong:" << _pj_latlong
+                  << "_pj_utm:" << _pj_utm << std::endl;
         return -1;
     }
-    return pj_transform(_pj_latlong, _pj_utm, point_count, point_offset, x, y, z);
+    return pj_transform(
+        _pj_latlong, _pj_utm, point_count, point_offset, x, y, z);
 }
 
-
-}  // adu
-}  // workers
-}  // collection
+}  // namespace collection
+}  // namespace workers
+}  // namespace adu

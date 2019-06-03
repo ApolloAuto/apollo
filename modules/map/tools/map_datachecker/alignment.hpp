@@ -11,7 +11,8 @@
 #define _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_ALIGNMENT_HPP
 
 #include <memory>
-#include "common.hpp"
+#include <vector>
+#include "modules/map/tools/map_datachecker/common.hpp"
 #include "modules/map/tools/map_datachecker/proto/collection_error_code.pb.h"
 
 namespace adu {
@@ -25,14 +26,14 @@ typedef struct BadOrGoodPoseInfo {
 } BadOrGoodPoseInfo;
 
 class Alignment {
-public:
-    Alignment(std::shared_ptr<JSonConf> sp_conf) {
+ public:
+    explicit Alignment(std::shared_ptr<JSonConf> sp_conf) {
         _return_state = ErrorCode::SUCCESS;
         _sp_conf = sp_conf;
     }
     virtual ~Alignment() {}
     std::shared_ptr<JSonConf> _sp_conf = nullptr;
-    virtual ErrorCode process(std::vector<FramePose>& poses) = 0;
+    virtual ErrorCode process(const std::vector<FramePose>& poses) = 0;
     virtual void reset() = 0;
 
     virtual double get_progress() {
@@ -47,25 +48,29 @@ public:
         _end_time = end_time;
     }
 
-    virtual void update_bad_pose_info(FramePose& pose) {
-        update_pose_info(pose, _bad_pose_info);
-    }
-    
-    virtual void clear_bad_pose_info() {
-        clear_pose_info(_bad_pose_info);
+    virtual void update_bad_pose_info(const FramePose& pose) {
+        update_pose_info(pose, _sp_bad_pose_info);
     }
 
-    virtual void update_good_pose_info(FramePose& pose) {
-        update_pose_info(pose, _good_pose_info);
+    virtual void clear_bad_pose_info() {
+        clear_pose_info(_sp_bad_pose_info);
+    }
+
+    virtual void update_good_pose_info(const FramePose& pose) {
+        update_pose_info(pose, _sp_good_pose_info);
     }
 
     virtual void clear_good_pose_info() {
-        clear_pose_info(_good_pose_info);
+        clear_pose_info(_sp_good_pose_info);
     }
 
-    virtual bool is_good_pose(std::vector<FramePose> & poses, int pose_index) {
-        if ( poses.size() < 0 || pose_index <= 0 || pose_index >= int(poses.size()) ) {
-            AINFO << "params error. poses size:" << poses.size() << ",pose_index:" << pose_index;
+    virtual bool is_good_pose(
+        const std::vector<FramePose> & poses, int pose_index) {
+        if ( poses.size() < 0
+            || pose_index <= 0
+            || pose_index >= static_cast<int>(poses.size()) ) {
+            AINFO << "params error. poses size:" << poses.size()
+                  << ",pose_index:" << pose_index;
             return true;
         }
 
@@ -73,8 +78,10 @@ public:
         float diff_age = poses[pose_index].diff_age;
         double local_std = poses[pose_index].local_std;
 
-        if ( _sp_conf->position_type_range.find(position_type) != _sp_conf->position_type_range.end()
-             && diff_age >= _sp_conf->diff_age_range.first && diff_age <= _sp_conf->diff_age_range.second
+        if ( _sp_conf->position_type_range.find(position_type)
+             != _sp_conf->position_type_range.end()
+             && diff_age >= _sp_conf->diff_age_range.first
+             && diff_age <= _sp_conf->diff_age_range.second
              && local_std <= _sp_conf->local_std_upper_limit ) {
             return true;
         }
@@ -85,21 +92,25 @@ public:
         return _return_state;
     }
 
-protected:
-
-    void update_pose_info(FramePose& pose, BadOrGoodPoseInfo& pose_info) {
+ protected:
+    void update_pose_info(const FramePose& pose,
+        std::shared_ptr<BadOrGoodPoseInfo> sp_pose_info) {
+        BadOrGoodPoseInfo &pose_info = *sp_pose_info;
         if ( pose_info.pose_count == 0 ) {
             pose_info.start_time = pose.time_stamp;
             pose_info.pose_count++;
-            fprintf(stderr, "update start time:%lf,pose count:%d\n", pose_info.start_time, pose_info.pose_count);
+            fprintf(stderr, "update start time:%lf,pose count:%d\n",
+                pose_info.start_time, pose_info.pose_count);
         } else {
             pose_info.end_time = pose.time_stamp;
             pose_info.pose_count++;
-            fprintf(stderr, "update end time:%lf,pose count:%d\n", pose_info.end_time, pose_info.pose_count);
+            fprintf(stderr, "update end time:%lf,pose count:%d\n",
+                pose_info.end_time, pose_info.pose_count);
         }
     }
 
-    void clear_pose_info(BadOrGoodPoseInfo& pose_info) {
+    void clear_pose_info(std::shared_ptr<BadOrGoodPoseInfo> sp_pose_info) {
+        BadOrGoodPoseInfo &pose_info = *sp_pose_info;
         pose_info.start_time = pose_info.end_time = -1.0;
         pose_info.pose_count = 0;
     }
@@ -111,27 +122,27 @@ protected:
             return -1;
         }
 
-        for(size_t i = 0; i < size; i++) {
+        for (size_t i = 0; i < size; i++) {
             if ( poses[i].time_stamp >= time ) {
-                return int(i);
+                return static_cast<int>(i);
             }
         }
-        return int(size);
+        return static_cast<int>(size);
     }
 
 
-protected:    
+ protected:
     double _progress, _last_progress;
     double _start_time, _end_time;
     int _start_index, _end_index;
-    BadOrGoodPoseInfo _bad_pose_info, _good_pose_info;
+    // BadOrGoodPoseInfo _bad_pose_info, _good_pose_info;
+    std::shared_ptr<BadOrGoodPoseInfo> _sp_bad_pose_info = nullptr;
+    std::shared_ptr<BadOrGoodPoseInfo> _sp_good_pose_info = nullptr;
     ErrorCode _return_state;
 };
 
+}  // namespace collection
+}  // namespace workers
+}  // namespace adu
 
-} // collection
-} // workers
-} // adu
-
-
-#endif // _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_ALIGNMENT_HPP
+#endif  // _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_ALIGNMENT_HPP

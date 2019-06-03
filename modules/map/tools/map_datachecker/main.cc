@@ -7,17 +7,15 @@
  *****************************************************************************/
 
 #include <google/protobuf/text_format.h>
-#include "worker.h"
 #include "cyber/cyber.h"
+#include "modules/map/tools/map_datachecker/worker.h"
+
 
 int main(int argc, char** argv) {
     fprintf(stderr, "parsing command lines\n");
     google::ParseCommandLineFlags(&argc, &argv, true);
     fprintf(stdout, "parsing command lines done\n");
-    // if (Logger::Create() != SUCC) {
-    //     std::cout << "Create logger error!" << std::endl;
-    //     return -1;
-    // }
+
     fprintf(stderr, "init logger\n");
     if (apollo::cyber::Init(argv[0])) {
         AINFO << "init logger succeed";
@@ -26,7 +24,6 @@ int main(int argc, char** argv) {
     }
 
     google::SetStderrLogging(FLAGS_minloglevel);
-    // AINFO << "Create logger successfully";
 
     AINFO << "starting worker";
     adu::workers::collection::Mapdatachecker worker;

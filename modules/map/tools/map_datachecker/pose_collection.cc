@@ -7,7 +7,7 @@
  * @desc: description
  * @author: author
   *****************************************************************************/
-#include "pose_collection.h"
+#include "modules/map/tools/map_datachecker/pose_collection.h"
 
 namespace adu {
 namespace workers {
@@ -20,45 +20,19 @@ PoseCollection::PoseCollection(std::shared_ptr<JSonConf> sp_conf) {
 
 void PoseCollection::reset() {
     _sp_poses = std::make_shared<std::vector<FramePose>>();
-//    _state = PoseCollectionState::IDLE;
 }
 
-//void PoseCollection::set_state(PoseCollectionState state) {
-//    _state = state;
-//}
-
-//PoseCollectionState PoseCollection::get_state() {
-//    return _state;
-//}
-
-//void PoseCollection::start_collect() {
-//    if ( get_state() == PoseCollectionState::RUNNING ) {
-//        AINFO << "pose collection is working. do not need start again";
-//        return;
-//    }
-//    set_state(PoseCollectionState::RUNNING);
-//}
-
-void PoseCollection::collect(FramePose& pose) {
-//    if ( get_state() != PoseCollectionState::RUNNING ) {
-//        AINFO << "pose collection is not work. it need start first";
-//        return;
-//    }
-
-    if ( _sp_poses == nullptr ) {
+void PoseCollection::collect(const FramePose& pose) {
+    if (_sp_poses == nullptr) {
         _sp_poses = std::make_shared<std::vector<FramePose>>();
     }
     _sp_poses->push_back(pose);
 }
 
-//void PoseCollection::stop_collect() {
-//    set_state(PoseCollectionState::IDLE);
-//}
-
 std::shared_ptr<std::vector<FramePose>> PoseCollection::get_poses() {
     return _sp_poses;
 }
 
-} // collection
-} // workers
-} // adu
+}  // namespace collection
+}  // namespace workers
+}  // namespace adu

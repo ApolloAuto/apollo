@@ -5,13 +5,13 @@
  * @desc A worker for demo show, create grpc channel between app.
  * @author Tong Wu<wutong14@baidu.com>
  *****************************************************************************/
-
+#include "modules/map/tools/map_datachecker/worker.h"
+#include "modules/map/tools/map_datachecker/worker_cyber_node.h"
+#include "modules/map/tools/map_datachecker/worker_agent.h"
+#include "modules/map/tools/map_datachecker/worker_gflags.h"
 #include <grpc++/grpc++.h>
-#include "worker.h"
-#include "worker_cyber_node.h"
-#include "worker_agent.h"
+#include <memory>
 #include "cyber/cyber.h"
-#include "worker_gflags.h"
 
 using grpc::Server;
 using grpc::ServerBuilder;
@@ -22,27 +22,26 @@ namespace workers {
 namespace collection {
 
 bool Mapdatachecker::Init() {
-    _grpc_address = FLAGS_map_datachecker_host + ":" + FLAGS_map_datachecker_port;
+    _grpc_address =
+        FLAGS_map_datachecker_host + ":" + FLAGS_map_datachecker_port;
     return true;
 }
 
 bool Mapdatachecker::Start() {
-
     AINFO << "Mapdatachecker::Start";
     Init();
 
-
     AINFO << "creating agent";
-    std::shared_ptr<MapDataCheckerAgent> agent = std::make_shared<MapDataCheckerAgent>();
+    std::shared_ptr<MapDataCheckerAgent>
+        agent = std::make_shared<MapDataCheckerAgent>();
 
-    
     AINFO << "creating node";
     bool cyber_node_inited = false;
     std::shared_ptr<MapDataCheckerCyberNode> cyber_node =
-            std::make_shared<MapDataCheckerCyberNode>(agent, cyber_node_inited);
+            std::make_shared<MapDataCheckerCyberNode>(
+                agent, &cyber_node_inited);
     if (!cyber_node_inited) {
-        AFATAL << "Error in create MapDataCheckerCyberNode!!!";
-        // apollo::cyber::Shutdown();
+        AFATAL << "Error in create MapDataCheckerCyberNode";
         apollo::cyber::WaitForShutdown();
         apollo::cyber::Clear();
         return false;
@@ -54,11 +53,11 @@ bool Mapdatachecker::Start() {
     builder.AddListeningPort(_grpc_address, grpc::InsecureServerCredentials());
     builder.RegisterService(agent.get());
     std::unique_ptr<Server> server(builder.BuildAndStart());
-    //server->Wait();
+    // server->Wait();
     AINFO << "Server listening on " << _grpc_address;
     AINFO << "Start HMI Server Successfully";
-    // apollo::cyber::Spin();
     apollo::cyber::WaitForShutdown();
+    apollo::cyber::Clear();
     return true;
 }
 
@@ -67,9 +66,8 @@ bool Mapdatachecker::Stop() {
 }
 
 void Mapdatachecker::Report() {
-
 }
 
-}  // collection
-}  // workers
-}  // adu
+}  // namespace collection
+}  // namespace workers
+}  // namespace adu

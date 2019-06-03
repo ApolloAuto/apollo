@@ -10,25 +10,25 @@
 #ifndef _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_PJ_TRANSFORMER_H
 #define _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_PJ_TRANSFORMER_H
 
-#include "proj_api.h"
+#include <proj_api.h>
 
 namespace adu {
 namespace workers {
 namespace collection {
 
 class PJTransformer {
-public:
-    PJTransformer(int zone_id = 50);
+ public:
+    explicit PJTransformer(int zone_id = 50);
     ~PJTransformer();
-    int latlong_to_utm(long point_count, int point_offset, double *x, double *y, double *z);
-private:
+    int latlong_to_utm(
+        int64_t point_count, int point_offset, double *x, double *y, double *z);
+ private:
     projPJ _pj_latlong;
     projPJ _pj_utm;
 };
 
-} // collection
-} // workers
-} // adu
+}  // namespace collection
+}  // namespace workers
+}  // namespace adu
 
-
-#endif // _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_PJ_TRANSFORMER_H 
+#endif  // _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_PJ_TRANSFORMER_H

@@ -9,45 +9,38 @@
   *****************************************************************************/
 #ifndef _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_EIGHT_ROUTE_H
 #define _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_EIGHT_ROUTE_H
-
-#include <memory>
 #include <grpc++/grpc++.h>
+#include <memory>
+#include <vector>
+#include "modules/map/tools/map_datachecker/common.hpp"
+#include "modules/map/tools/map_datachecker/worker_gflags.h"
+#include "modules/map/tools/map_datachecker/alignment.hpp"
 #include "cyber/cyber.h"
-#include "common.hpp"
-#include "worker_gflags.h"
-#include "alignment.hpp"
 
 namespace adu {
 namespace workers {
 namespace collection {
 
-
 class EightRoute: public Alignment {
-
-public:
-    EightRoute(std::shared_ptr<JSonConf> sp_conf);
-    ErrorCode process(std::vector<FramePose>& poses);
+ public:
+    explicit EightRoute(std::shared_ptr<JSonConf> sp_conf);
+    ErrorCode process(const std::vector<FramePose>& poses);
     double get_progress();
 
-private:
+ private:
     void reset();
-    bool is_eight_route_pose(std::vector<FramePose> & poses, int pose_index);
-    //double get_hz(std::vector<FramePose> & poses);
-    //bool is_bad_pose_overload();
+    bool is_eight_route_pose(
+        const std::vector<FramePose> & poses, int pose_index);
     double get_good_pose_during();
-    double get_eight_route_progress(std::vector<FramePose> & poses);
+    double get_eight_route_progress(const std::vector<FramePose> & poses);
 
-private:
+ private:
     double _progress;
-    //char _start_count;
     double _last_yaw;
-    //int _eight_tolerance;
-    //int _valid_frame_count;
 };
 
+}  // namespace collection
+}  // namespace workers
+}  // namespace adu
 
-} // collection
-} // workers
-} // adu
-
-#endif //_MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_EIGHT_ROUTE_H
+#endif  // _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_EIGHT_ROUTE_H

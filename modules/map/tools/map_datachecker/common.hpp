@@ -10,7 +10,9 @@
 
 #ifndef _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_COMMON_HPP
 #define _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_COMMON_HPP
-
+#include <boost/filesystem.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include <vector>
 #include <set>
 #include <string>
@@ -19,9 +21,6 @@
 #include <ctime>
 #include <memory>
 #include <iostream>
-#include <boost/filesystem.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
 #include "cyber/cyber.h"
 
 namespace adu {
@@ -38,9 +37,8 @@ constexpr double UTMScaleFactor = 0.9996;
 
 typedef unsigned char uchar;
 
-struct FramePose
-{
-    double time_stamp;   //unix time
+struct FramePose {
+    double time_stamp;  // unix time
     double tx, ty, tz;
     double qx, qy, qz, qw;
     double latitude, longitude, altitude;
@@ -59,8 +57,7 @@ enum class State {
 };
 
 
-struct JSonConf
-{
+struct JSonConf {
     std::string topic_to_get_pose;
     std::vector<std::pair<std::string, double>> topic_list;
     double start_time_debug;
@@ -71,7 +68,7 @@ struct JSonConf
     std::set<unsigned int> position_type_range;
     std::pair<float, float> diff_age_range;
     double local_std_upper_limit;
-    //double local_err;
+    // double local_err;
 
     /*channel检查触发周期，单位是秒*/
     int channel_check_trigger_gap;
@@ -131,32 +128,34 @@ struct JSonConf
 inline std::shared_ptr<JSonConf> parse_json(std::string conf_path) {
     std::cerr << "parsing json config" << std::endl;
     boost::filesystem::path path(conf_path);
-    if( ! boost::filesystem::exists(path) ) {
-        std::cerr << "json config file " << conf_path << " is not exist" << std::endl;
+    if (!boost::filesystem::exists(path)) {
+        std::cerr << "json config file "
+                  << conf_path << " is not exist" << std::endl;
         return nullptr;
     }
-    
+
     std::shared_ptr<JSonConf> conf(new JSonConf);
     boost::property_tree::ptree pt;
-    try
-    {
+    try {
         boost::property_tree::read_json(conf_path, pt);
-   
+
         conf->start_time_debug = pt.get<double>("start_time_debug");
         conf->use_system_time = pt.get<bool>("use_system_time");
-        conf->topic_rate_tolerance = pt.get<double>("topic_rate_tolerance"); 
+        conf->topic_rate_tolerance = pt.get<double>("topic_rate_tolerance");
         conf->topic_to_get_pose = pt.get<std::string>("topic_to_get_pose");
         boost::property_tree::ptree children2 = pt.get_child("topic_list");
-        for( auto it = children2.begin(); it != children2.end(); it++ )
-        {
-            conf->topic_list.push_back( std::make_pair(it->first, it->second.get_value<double>()) );
+        for (auto it = children2.begin(); it != children2.end(); it++) {
+            conf->topic_list.push_back(
+                std::make_pair(it->first, it->second.get_value<double>()));
         }
 
         conf->solution_status = pt.get<unsigned int>("solution_status");
 
-        boost::property_tree::ptree position_type = pt.get_child("position_type");
-        for ( auto it = position_type.begin(); it != position_type.end(); it ++) {
-            conf->position_type_range.insert( it->second.get_value<unsigned int>() ); // it->first is empty
+        boost::property_tree::ptree
+            position_type = pt.get_child("position_type");
+        for (auto it = position_type.begin(); it != position_type.end(); it++) {
+            conf->position_type_range.insert(
+                it->second.get_value<unsigned int>());
         }
 
         conf->local_std_upper_limit = pt.get<double>("local_std_upper_limit");
@@ -164,49 +163,70 @@ inline std::shared_ptr<JSonConf> parse_json(std::string conf_path) {
         boost::property_tree::ptree diff_age = pt.get_child("diff_age");
         {
             auto it = diff_age.begin();
-            conf->diff_age_range.first = it->second.get_value<float>(); // it->first is empty
+            conf->diff_age_range.first = it->second.get_value<float>();
             it++;
             conf->diff_age_range.second = it->second.get_value<float>();
         }
 
-        conf->channel_check_trigger_gap = pt.get<int>("channel_check_trigger_gap");
-        conf->alignment_featch_pose_sleep = pt.get<int>("alignment_featch_pose_sleep");
-        conf->static_align_duration = pt.get<double>("static_align_duration");
-        conf->static_align_tolerance = pt.get<double>("static_align_tolerance");
-        conf->static_align_dist_thresh = pt.get<double>("static_align_dist_thresh");
+        conf->channel_check_trigger_gap
+            = pt.get<int>("channel_check_trigger_gap");
+        conf->alignment_featch_pose_sleep
+            = pt.get<int>("alignment_featch_pose_sleep");
+        conf->static_align_duration
+            = pt.get<double>("static_align_duration");
+        conf->static_align_tolerance
+            = pt.get<double>("static_align_tolerance");
+        conf->static_align_dist_thresh
+            = pt.get<double>("static_align_dist_thresh");
 
+        conf->dynamic_align_turn_angle
+            = pt.get<double>("dynamic_align_turn_angle");
+        conf->dynamic_align_straight_angle
+            = pt.get<double>("dynamic_align_straight_angle");
+        conf->dynamic_align_vel
+            = pt.get<double>("dynamic_align_vel");
+        conf->dynamic_align_duration
+            = pt.get<double>("dynamic_align_duration");
+        conf->dynamic_align_bad_pose_tolerance
+            = pt.get<int>("dynamic_align_bad_pose_tolerance");
+        conf->dynamic_align_segment
+            = pt.get<int>("dynamic_align_segment");
+        conf->dynamic_align_dist_per_segment
+            = pt.get<double>("dynamic_align_dist_per_segment");
 
-        conf->dynamic_align_turn_angle = pt.get<double>("dynamic_align_turn_angle");
-        conf->dynamic_align_straight_angle = pt.get<double>("dynamic_align_straight_angle");
-        conf->dynamic_align_vel = pt.get<double>("dynamic_align_vel");
-        conf->dynamic_align_duration = pt.get<double>("dynamic_align_duration");
-        conf->dynamic_align_bad_pose_tolerance = pt.get<int>("dynamic_align_bad_pose_tolerance");
-        conf->dynamic_align_segment = pt.get<int>("dynamic_align_segment");
-        conf->dynamic_align_dist_per_segment = pt.get<double>("dynamic_align_dist_per_segment");
+        conf->eight_angle
+            = pt.get<double>("eight_angle");
+        conf->eight_duration
+            = pt.get<double>("eight_duration");
+        conf->eight_vel
+            = pt.get<double>("eight_vel");
+        conf->eight_bad_pose_tolerance
+            = pt.get<int>("eight_bad_pose_tolerance");
 
-        conf->eight_angle = pt.get<double>("eight_angle");
-        conf->eight_duration = pt.get<double>("eight_duration");
-        conf->eight_vel = pt.get<double>("eight_vel");
-        conf->eight_bad_pose_tolerance = pt.get<int>("eight_bad_pose_tolerance");
-
-        conf->laps_frames_thresh = pt.get<int>("laps_frames_thresh");
-        conf->laps_alpha_err_thresh = pt.get<double>("laps_alpha_err_thresh");
-        conf->laps_time_err_thresh = pt.get<double>("laps_time_err_thresh");
-        conf->laps_search_diameter = pt.get<int>("laps_search_diameter");
-        conf->laps_number = pt.get<int>("laps_number");
-        conf->laps_number_additional = pt.get<int>("laps_number_additional");
-        conf->laps_rate_thresh = pt.get<double>("laps_rate_thresh");
-        conf->laps_inspva_downsample_freq = pt.get<int>("laps_inspva_downsample_freq");
+        conf->laps_frames_thresh
+            = pt.get<int>("laps_frames_thresh");
+        conf->laps_alpha_err_thresh
+            = pt.get<double>("laps_alpha_err_thresh");
+        conf->laps_time_err_thresh
+            = pt.get<double>("laps_time_err_thresh");
+        conf->laps_search_diameter
+            = pt.get<int>("laps_search_diameter");
+        conf->laps_number
+            = pt.get<int>("laps_number");
+        conf->laps_number_additional
+            = pt.get<int>("laps_number_additional");
+        conf->laps_rate_thresh
+            = pt.get<double>("laps_rate_thresh");
+        conf->laps_inspva_downsample_freq
+            = pt.get<int>("laps_inspva_downsample_freq");
     }
-    catch(const boost::property_tree::json_parser_error& e)
-    {
+    catch(const boost::property_tree::json_parser_error& e) {
         std::cerr << e.what() << '\n';
     }
-    catch(const std::exception& e)
-    {
+    catch(const std::exception& e) {
         std::cerr << e.what() << '\n';
     }
-        
+
     return conf;
 }
 
@@ -215,7 +235,7 @@ inline double get_yaw(double from_x, double from_y, double to_x, double to_y) {
     double vecx = to_x - from_x;
     double vecy = to_y - from_y;
 
-    double alpha = acos( vecy / sqrt( vecx * vecx + vecy * vecy ) );
+    double alpha = acos(vecy / sqrt(vecx * vecx + vecy * vecy));
     if ( vecx < 0 ) {
         alpha = 2 * M_PI - alpha;
     }
@@ -224,31 +244,10 @@ inline double get_yaw(double from_x, double from_y, double to_x, double to_y) {
 
 inline double unixtime_now() {
     return apollo::cyber::Time::Now().ToSecond();
-    //return std::time(0);
 }
-//double haver_sin(double x) {
-//    double v = sin(x / 2.0);
-//    return v * v;
-//}
 
-//double get_dist_in_meters_from_lon_lat(double lon1, double lat1, double lon2, double lat2) {
-//    // see https://blog.csdn.net/u011001084/article/details/52980834
-//    double rad_lon1 = lon1 * DEGRESS_TO_RADIANS;
-//    double rad_lat1 = lat1 * DEGRESS_TO_RADIANS;
-//    double rad_lon2 = lon2 * DEGRESS_TO_RADIANS;
-//    double rad_lat2 = lat2 * DEGRESS_TO_RADIANS;
-//
-//    double a = rad_lat1 - rad_lat2;
-//    double b = rad_lon1 - rad_lon2;
-//    double h = haver_sin(a) + cos(rad_lat1) * cos(rad_lat2) * haver_sin(b);
-//    double distance = 2 * EARTH_RADIUS * asin( sqrt(h) );
-//    return distance;
-//}
+}  // namespace collection
+}  // namespace workers
+}  // namespace adu
 
-
-
-}  // adu
-}  // workers
-}  // collection
-
-#endif //_MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_COMMON_HPP
+#endif  // _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_COMMON_HPP

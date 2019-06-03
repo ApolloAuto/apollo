@@ -8,15 +8,15 @@
 
 #ifndef _MODULES_DATA_CHECKER_DEMO_WORKER_INCLUDE_WORKER_H
 #define _MODULES_DATA_CHECKER_DEMO_WORKER_INCLUDE_WORKER_H
-
 #include <grpc++/grpc++.h>
+#include <string>
 
 namespace adu {
 namespace workers {
 namespace collection {
 
 class Mapdatachecker {
-public:
+ public:
     Mapdatachecker() {}
     ~Mapdatachecker() {}
 
@@ -25,12 +25,12 @@ public:
     bool Stop();
     void Report();
 
-private:
+ private:
     std::string _grpc_address;
 };
 
-}  // adu
-}  // workers
-}  // collection
+}  // namespace collection
+}  // namespace workers
+}  // namespace adu
 
 #endif  // _MODULES_DATA_CHECKER_DEMO_WORKER_INCLUDE_WORKER_H

@@ -9,7 +9,7 @@
 #ifndef _MODULES_DATA_CHECKER_DEMO_WORKER_INCLUDE_WORKER_CYBER_NODE_H
 #define _MODULES_DATA_CHECKER_DEMO_WORKER_INCLUDE_WORKER_CYBER_NODE_H
 
-
+#include <memory>
 #include "cyber/cyber.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 
@@ -20,27 +20,30 @@ namespace collection {
 class MapDataCheckerAgent;
 
 // need to add cybertron node creater
-class MapDataCheckerCyberNode : public std::enable_shared_from_this<MapDataCheckerCyberNode> {
-public:
-    MapDataCheckerCyberNode(std::shared_ptr<MapDataCheckerAgent> agent, bool &init_success);
-    ~MapDataCheckerCyberNode();
+class MapDataCheckerCyberNode:
+    public std::enable_shared_from_this<MapDataCheckerCyberNode> {
+ public:
+    MapDataCheckerCyberNode(
+        std::shared_ptr<MapDataCheckerAgent> agent,
+        bool *init_success);
 
     inline std::shared_ptr<MapDataCheckerCyberNode> get_worker_cyber_node() {
         return shared_from_this();
     }
 
-
-private:
+ private:
     int create_channel_subscriber();
 
-private:
+ private:
+    using GnssBestPose_t = apollo::drivers::gnss::GnssBestPose;
     std::shared_ptr<apollo::cyber::Node> _node = nullptr;
-    std::shared_ptr<apollo::cyber::Reader<apollo::drivers::gnss::GnssBestPose>> _bestgnsspos_reader = nullptr;
+    std::shared_ptr<apollo::cyber::Reader<GnssBestPose_t>>
+        _bestgnsspos_reader = nullptr;
     std::shared_ptr<MapDataCheckerAgent> _agent = nullptr;
 };
 
-}  // collection
-}  // workers
-}  // adu
+}  // namespace collection
+}  // namespace workers
+}  // namespace adu
 
 #endif  // _MODULES_DATA_CHECKER_DEMO_WORKER_INCLUDE_WORKER_CYBER_NODE_H

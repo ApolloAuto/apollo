@@ -11,7 +11,7 @@
 #define _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_POSE_COLLECTION_H
 #include <memory>
 #include <vector>
-#include "common.hpp"
+#include "modules/map/tools/map_datachecker/common.hpp"
 
 namespace adu {
 namespace workers {
@@ -23,28 +23,22 @@ enum class PoseCollectionState {
 };
 
 class PoseCollection {
-public:
-    PoseCollection(std::shared_ptr<JSonConf> sp_conf);
-//    void start_collect();
-    void collect(FramePose& pose);
-//    void stop_collect();
+ public:
+    explicit PoseCollection(std::shared_ptr<JSonConf> sp_conf);
+    void collect(const FramePose& pose);
     std::shared_ptr<std::vector<FramePose>> get_poses();
 
-private:
-//    void set_state(PoseCollectionState state);
-//    PoseCollectionState get_state();
+ private:
     void reset();
 
-private:
+ private:
     std::shared_ptr<std::vector<FramePose>> _sp_poses = nullptr;
     std::shared_ptr<JSonConf> _sp_conf = nullptr;
-//    PoseCollectionState _state;
 };
 
+}  // namespace collection
+}  // namespace workers
+}  // namespace adu
 
-} // collection
-} // workers
-} // adu
 
-
-#endif // _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_POSE_COLLECTION_H
+#endif  // _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_POSE_COLLECTION_H

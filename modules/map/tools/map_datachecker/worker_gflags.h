@@ -19,18 +19,14 @@ namespace collection {
 DECLARE_string(map_datachecker_host);
 DECLARE_string(map_datachecker_port);
 
-// hdmap file define
-//DECLARE_string(demo_worker_base_map_filename);
-
 // Cybertron topics
-//DECLARE_string(demo_worker_adc_status_topic);
 DECLARE_string(topic_inpspva);
 DECLARE_string(topic_inpspvax);
 DECLARE_string(topic_bestgnsspos);
 DECLARE_string(conf_json);
 
-}  // adu
-}  // workers
-}  // collection
+}  // namespace collection
+}  // namespace workers
+}  // namespace adu
 
-#endif // _MODULES_DATA_CHECKER_DEMO_WORKER_INCLUDE_WORKER_GFLAGS_H
+#endif  // _MODULES_DATA_CHECKER_DEMO_WORKER_INCLUDE_WORKER_GFLAGS_H
