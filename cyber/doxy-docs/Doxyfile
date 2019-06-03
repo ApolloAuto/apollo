@@ -1,6 +1,6 @@
 PROJECT_NAME      = "Cyber RT Documents"
 XML_OUTPUT        = xml
-INPUT             =  ../cyber.h ../init.h ../node ../record ../time ../timer ../component ../logger
+INPUT             =  ../cyber.h ../init.h ../node ../record ../time ../timer ../component ../logger ../parameter ../service ../service_discovery
 FILE_PATTERNS     = *.h
 RECURSIVE         = YES
 GENERATE_LATEX    = NO
