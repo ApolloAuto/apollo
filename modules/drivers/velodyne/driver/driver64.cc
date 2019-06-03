@@ -51,7 +51,7 @@ bool Velodyne64Driver::Poll(const std::shared_ptr<VelodyneScan>& scan) {
   }
 
   if (scan->firing_pkts_size() <= 0) {
-    AINFO << "Get a empty scan from port: " << config_.firing_data_port();
+    AINFO << "Get an empty scan from port: " << config_.firing_data_port();
     return false;
   }
 
@@ -95,7 +95,7 @@ int Velodyne64Driver::PollStandardSync(std::shared_ptr<VelodyneScan> scan) {
       int rc = input_->get_firing_data_packet(packet);
 
       if (rc == 0) {
-        // check the angle for every packet if a packet has a angle
+        // check the angle for every packet if a packet has an angle
         if (CheckAngle(*packet) &&
             (scan->firing_pkts_size() > 0.5 * config_.npackets())) {
           return 0;
