@@ -78,7 +78,6 @@ default_task_config: {
 default_task_config: {
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
   speed_bounds_decider_config {
-    total_path_length: 149
     total_time: 7.0
     boundary_buffer: 0.25
     high_speed_centric_acceleration_limit: 2.0
@@ -97,7 +96,6 @@ default_task_config: {
 default_task_config: {
   task_type: SPEED_BOUNDS_FINAL_DECIDER
   speed_bounds_decider_config {
-    total_path_length: 250
     total_time: 7.0
     boundary_buffer: 0.1
     high_speed_centric_acceleration_limit: 2.0
@@ -197,6 +195,7 @@ default_task_config: {
         max_position_error_to_end_point: 0.05
         max_theta_error_to_end_point: 0.05
         is_near_destination_threshold: 0.05
+        enable_check_parallel_trajectory: true
       }
     }
   }

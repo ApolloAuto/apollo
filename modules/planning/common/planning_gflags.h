@@ -237,6 +237,7 @@ DECLARE_bool(use_gear_shift_trajectory);
 DECLARE_uint64(open_space_trajectory_stitching_preserved_length);
 DECLARE_bool(enable_smoother_failsafe);
 DECLARE_bool(use_s_curve_speed_smooth);
+DECLARE_bool(use_iterative_anchoring_smoother);
 DECLARE_bool(enable_parallel_trajectory_smoothing);
 
 DECLARE_bool(use_osqp_optimizer_for_reference_line);

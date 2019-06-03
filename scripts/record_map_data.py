@@ -53,7 +53,9 @@ MAP_COLLECTION_DATA_TOPICS = [
     '/apollo/sensor/lidar16/front/up/PointCloud2',
     '/apollo/sensor/lidar16/front/up/compensator/PointCloud2',
     '/apollo/sensor/lidar128/PointCloud2',
-    '/apollo/sensor/lidar128/compensator/PointCloud2',
+    '/apollo/sensor/velodyne64/compensator/PointCloud2',
+    '/apollo/sensor/velodyne64/PointCloud2',
+    '/apollo/sensor/velodyne64/velodyneScan',
 ]
 
 def shell_cmd(cmd, alert_on_failure=True):

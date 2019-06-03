@@ -33,14 +33,14 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::ErrorCode;
-using common::PathPoint;
-using common::Status;
-using common::TrajectoryPoint;
-using common::math::Box2d;
-using common::math::NormalizeAngle;
-using common::math::Polygon2d;
-using common::math::Vec2d;
-using common::time::Clock;
+using apollo::common::PathPoint;
+using apollo::common::Status;
+using apollo::common::TrajectoryPoint;
+using apollo::common::math::Box2d;
+using apollo::common::math::NormalizeAngle;
+using apollo::common::math::Polygon2d;
+using apollo::common::math::Vec2d;
+using apollo::common::time::Clock;
 
 OpenSpaceTrajectoryPartition::OpenSpaceTrajectoryPartition(
     const TaskConfig& config)
@@ -61,6 +61,7 @@ OpenSpaceTrajectoryPartition::OpenSpaceTrajectoryPartition(
   ego_length_ = vehicle_param_.length();
   ego_width_ = vehicle_param_.width();
   shift_distance_ = ego_length_ / 2.0 - vehicle_param_.back_edge_to_center();
+  wheel_base_ = vehicle_param_.wheel_base();
 }
 
 void OpenSpaceTrajectoryPartition::Restart() {
@@ -89,7 +90,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
   auto* paritioned_trajectories =
       open_space_info_ptr->mutable_paritioned_trajectories();
 
-  PartitionTrajectory(interpolated_trajectory_result_ptr,
+  PartitionTrajectory(*interpolated_trajectory_result_ptr,
                       paritioned_trajectories);
 
   // Choose the one to follow based on the closest partitioned trajectory
@@ -234,6 +235,10 @@ Status OpenSpaceTrajectoryPartition::Process() {
 void OpenSpaceTrajectoryPartition::InterpolateTrajectory(
     const DiscretizedTrajectory& stitched_trajectory_result,
     DiscretizedTrajectory* interpolated_trajectory) {
+  if (FLAGS_use_iterative_anchoring_smoother) {
+    *interpolated_trajectory = stitched_trajectory_result;
+    return;
+  }
   interpolated_trajectory->clear();
   size_t interpolated_pieces_num =
       open_space_trajectory_partition_config_.interpolated_pieces_num();
@@ -345,124 +350,96 @@ void OpenSpaceTrajectoryPartition::UpdateTrajHistory(
 }
 
 void OpenSpaceTrajectoryPartition::PartitionTrajectory(
-    DiscretizedTrajectory* interpolated_trajectory_result_ptr,
+    const DiscretizedTrajectory& raw_trajectory,
     std::vector<TrajGearPair>* paritioned_trajectories) {
+  CHECK_NOTNULL(paritioned_trajectories);
+
+  size_t horizon = raw_trajectory.size();
+
+  paritioned_trajectories->clear();
   paritioned_trajectories->emplace_back();
-  TrajGearPair* current_trajectory = &(paritioned_trajectories->back());
-  // Set initial gear position for first ADCTrajectory depending on v
-  // and check potential edge cases
-  size_t horizon = interpolated_trajectory_result_ptr->size();
-  size_t initial_horizon = std::min(
-      horizon, static_cast<size_t>(open_space_trajectory_partition_config_
-                                       .initial_gear_check_horizon()));
-  int direction_flag = 0;
-  int init_direction = 0;
-  for (size_t i = 0; i < initial_horizon; ++i) {
-    if (interpolated_trajectory_result_ptr->at(i).v() > 0.0) {
-      direction_flag++;
-      if (init_direction == 0) {
-        init_direction++;
-      }
-    } else if (interpolated_trajectory_result_ptr->at(i).v() < 0.0) {
-      direction_flag--;
-      if (init_direction == 0) {
-        init_direction--;
-      }
-    }
-  }
+  TrajGearPair* current_trajectory_gear = &(paritioned_trajectories->back());
 
-  if (direction_flag > 1) {
-    ADEBUG << "Initial gear set to DRIVE";
-    current_trajectory->second = canbus::Chassis::GEAR_DRIVE;
-  } else if (direction_flag < -1) {
-    ADEBUG << "Initial gear set to REVERSE";
-    current_trajectory->second = canbus::Chassis::GEAR_REVERSE;
-  } else {
-    if (init_direction > 0) {
-      ADEBUG << "Gear set to DRIVE but initial speed oscillate too frequent "
-                "around zero";
-      current_trajectory->second = canbus::Chassis::GEAR_DRIVE;
-    } else if (init_direction < 0) {
-      ADEBUG << "Gear set to REVERSE but initial speed oscillate too frequent "
-                "around zero";
-      current_trajectory->second = canbus::Chassis::GEAR_REVERSE;
-    } else {
-      ADEBUG << "Invalid trajectory start! Speed values of initial points are "
-                "too small to decide gear. DRIVE is set as default";
-      current_trajectory->second = canbus::Chassis::GEAR_DRIVE;
-    }
-  }
+  auto* trajectory = &(current_trajectory_gear->first);
+  auto* gear = &(current_trajectory_gear->second);
 
-  // Align the gear selection and velocity direction
-  for (size_t i = 0; i < initial_horizon; ++i) {
-    auto* trajectory_point_i = &(interpolated_trajectory_result_ptr->at(i));
-    if (current_trajectory->second == canbus::Chassis::GEAR_REVERSE) {
-      trajectory_point_i->set_v(trajectory_point_i->v() > 0.0
-                                    ? -trajectory_point_i->v()
-                                    : trajectory_point_i->v());
-    } else {
-      trajectory_point_i->set_v(trajectory_point_i->v() < 0.0
-                                    ? -trajectory_point_i->v()
-                                    : trajectory_point_i->v());
-    }
-  }
-  // Partition trajectory points into each trajectory
-  constexpr double kGearShiftEpsilon = 0.0;
+  // Decide initial gear
+  const auto& first_path_point = raw_trajectory.front().path_point();
+  const auto& second_path_point = raw_trajectory[1].path_point();
+  double heading_angle = first_path_point.theta();
+  const Vec2d init_tracking_vector(
+      second_path_point.x() - first_path_point.x(),
+      second_path_point.y() - first_path_point.y());
+  double tracking_angle = init_tracking_vector.Angle();
+  *gear =
+      std::abs(common::math::NormalizeAngle(tracking_angle - heading_angle)) <
+              (M_PI_2)
+          ? canbus::Chassis::GEAR_DRIVE
+          : canbus::Chassis::GEAR_REVERSE;
+
+  // Set accumulated distance
+  Vec2d last_pos_vec(first_path_point.x(), first_path_point.y());
   double distance_s = 0.0;
-  for (size_t i = 0; i < horizon; ++i) {
-    // shift from GEAR_DRIVE to GEAR_REVERSE if v < 0
-    // then add a new trajectory with GEAR_REVERSE
-    const TrajectoryPoint& trajectory_point_i =
-        interpolated_trajectory_result_ptr->at(i);
-    // ADEBUG << "trajectory velocity is " << trajectory_point_i.v();
-    if (trajectory_point_i.v() < -kGearShiftEpsilon &&
-        current_trajectory->second == canbus::Chassis::GEAR_DRIVE) {
+
+  for (size_t i = 0; i < horizon - 1; ++i) {
+    const TrajectoryPoint& trajectory_point = raw_trajectory.at(i);
+    const TrajectoryPoint& next_trajectory_point = raw_trajectory.at(i + 1);
+
+    // Check gear change
+    heading_angle = trajectory_point.path_point().theta();
+    const Vec2d tracking_vector(next_trajectory_point.path_point().x() -
+                                    trajectory_point.path_point().x(),
+                                next_trajectory_point.path_point().y() -
+                                    trajectory_point.path_point().y());
+    tracking_angle = tracking_vector.Angle();
+    auto cur_gear =
+        std::abs(common::math::NormalizeAngle(tracking_angle - heading_angle)) <
+                (M_PI_2)
+            ? canbus::Chassis::GEAR_DRIVE
+            : canbus::Chassis::GEAR_REVERSE;
+
+    if (cur_gear != *gear) {
+      LoadTrajectoryPoint(trajectory_point, *gear, &last_pos_vec, &distance_s,
+                          trajectory);
+
       paritioned_trajectories->emplace_back();
-      current_trajectory = &(paritioned_trajectories->back());
-      ADEBUG << "Gear set to REVERSE";
-      current_trajectory->second = canbus::Chassis::GEAR_REVERSE;
-      distance_s = 0.0;
-    }
-    // Shift from GEAR_REVERSE to GEAR_DRIVE if v > 0
-    // then add a new trajectory with GEAR_DRIVE
-    if (trajectory_point_i.v() > kGearShiftEpsilon &&
-        current_trajectory->second == canbus::Chassis::GEAR_REVERSE) {
-      paritioned_trajectories->emplace_back();
-      current_trajectory = &(paritioned_trajectories->back());
-      ADEBUG << "Gear set to DRIVE";
-      current_trajectory->second = canbus::Chassis::GEAR_DRIVE;
+      current_trajectory_gear = &(paritioned_trajectories->back());
+      current_trajectory_gear->second = cur_gear;
       distance_s = 0.0;
     }
 
-    current_trajectory->first.emplace_back();
-    TrajectoryPoint* point = &(current_trajectory->first.back());
-    point->set_relative_time(trajectory_point_i.relative_time());
-    point->mutable_path_point()->set_x(trajectory_point_i.path_point().x());
-    point->mutable_path_point()->set_y(trajectory_point_i.path_point().y());
-    point->mutable_path_point()->set_theta(
-        trajectory_point_i.path_point().theta());
-    if (i > 0) {
-      const PathPoint& path_point_i = trajectory_point_i.path_point();
-      const PathPoint& path_point_pre_i =
-          interpolated_trajectory_result_ptr->at(i - 1).path_point();
-      distance_s +=
-          (current_trajectory->second == canbus::Chassis::GEAR_REVERSE ? -1.0
-                                                                       : 1.0) *
-          std::sqrt((path_point_i.x() - path_point_pre_i.x()) *
-                        (path_point_i.x() - path_point_pre_i.x()) +
-                    (path_point_i.y() - path_point_pre_i.y()) *
-                        (path_point_i.y() - path_point_pre_i.y()));
-    }
-    point->mutable_path_point()->set_s(distance_s);
+    trajectory = &(current_trajectory_gear->first);
+    gear = &(current_trajectory_gear->second);
 
-    point->set_v(trajectory_point_i.v());
-    const auto& vehicle_config =
-        common::VehicleConfigHelper::Instance()->GetConfig();
-    point->mutable_path_point()->set_kappa(
-        std::tan(trajectory_point_i.steer()) /
-        vehicle_config.vehicle_param().wheel_base());
-    point->set_a(trajectory_point_i.a());
+    LoadTrajectoryPoint(trajectory_point, *gear, &last_pos_vec, &distance_s,
+                        trajectory);
   }
+
+  const TrajectoryPoint& last_trajectory_point = raw_trajectory.back();
+  LoadTrajectoryPoint(last_trajectory_point, *gear, &last_pos_vec, &distance_s,
+                      trajectory);
+}
+
+void OpenSpaceTrajectoryPartition::LoadTrajectoryPoint(
+    const TrajectoryPoint& trajectory_point,
+    const canbus::Chassis::GearPosition& gear, Vec2d* last_pos_vec,
+    double* distance_s, DiscretizedTrajectory* current_trajectory) {
+  current_trajectory->emplace_back();
+  TrajectoryPoint* point = &(current_trajectory->back());
+  point->set_relative_time(trajectory_point.relative_time());
+  point->mutable_path_point()->set_x(trajectory_point.path_point().x());
+  point->mutable_path_point()->set_y(trajectory_point.path_point().y());
+  point->mutable_path_point()->set_theta(trajectory_point.path_point().theta());
+  point->set_v(trajectory_point.v());
+  point->mutable_path_point()->set_s(*distance_s);
+  Vec2d cur_pos_vec(trajectory_point.path_point().x(),
+                    trajectory_point.path_point().y());
+  *distance_s += (gear == canbus::Chassis::GEAR_REVERSE ? -1.0 : 1.0) *
+                 (cur_pos_vec.DistanceTo(*last_pos_vec));
+  *last_pos_vec = cur_pos_vec;
+  point->mutable_path_point()->set_kappa(std::tan(trajectory_point.steer()) /
+                                         wheel_base_);
+  point->set_a(trajectory_point.a());
 }
 
 bool OpenSpaceTrajectoryPartition::CheckReachTrajectoryEnd(

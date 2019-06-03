@@ -409,13 +409,17 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
     }
 
     // Retrieve result in one single trajectory
-
     size_t trajectory_point_size = 0;
     for (size_t i = 0; i < size; ++i) {
       if (state_result_ds_vec[i].cols() < 2) {
         AERROR << "state horizon smaller than 2";
         return false;
       }
+      AINFO << "trajectory idx: "
+          << "idx range: "
+          << trajectory_point_size << ", "
+          << trajectory_point_size +
+              static_cast<size_t>(state_result_ds_vec[i].cols()) - 1;
       trajectory_point_size +=
           static_cast<size_t>(state_result_ds_vec[i].cols()) - 1;
     }
@@ -449,10 +453,22 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
       }
     }
 
+    const uint64_t time_dimension = time_result_ds_vec.front().rows();
+    Eigen::MatrixXd time_result_ds;
+    time_result_ds.resize(time_dimension, trajectory_point_size - 1);
+    k = 0;
+    for (size_t i = 0; i < size; ++i) {
+      uint64_t time_col_num = time_result_ds_vec[i].cols() - 1;
+      for (uint64_t j = 0; j < time_col_num; ++j) {
+        time_result_ds.col(k) = time_result_ds_vec[i].col(j);
+        ++k;
+      }
+    }
+
     *(result_ptr->PrepareHybridAResult()) = hybrid_astar_result;
     *(result_ptr->PrepareStateResult()) = state_result_ds;
     *(result_ptr->PrepareControlResult()) = control_result_ds;
-
+    *(result_ptr->PrepareTimeResult()) = time_result_ds;
   } else {
     Eigen::MatrixXd state_result_ds;
     Eigen::MatrixXd control_result_ds;
@@ -508,11 +524,16 @@ void DistanceGetResult(ResultContainer* result_ptr,
     opt_phi[i] = (*(result_ptr->PrepareStateResult()))(2, i);
     opt_v[i] = (*(result_ptr->PrepareStateResult()))(3, i);
   }
-  if (result_ptr->PrepareLResult()->cols() != 0 &&
-      result_ptr->PrepareTimeResult() != 0 &&
-      result_ptr->PrepareNResult() != 0) {
+
+  if (result_ptr->PrepareTimeResult() != 0) {
     for (size_t i = 0; i + 1 < size_by_distance; ++i) {
       opt_time[i] = (*(result_ptr->PrepareTimeResult()))(0, i);
+    }
+  }
+
+  if (result_ptr->PrepareLResult()->cols() != 0 &&
+      result_ptr->PrepareNResult() != 0) {
+    for (size_t i = 0; i + 1 < size_by_distance; ++i) {
       for (size_t j = 0; j < obstacles_edges_sum; ++j) {
         opt_dual_l[i * obstacles_edges_sum + j] =
             (*(result_ptr->PrepareLResult()))(j, i);

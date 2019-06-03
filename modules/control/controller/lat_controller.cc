@@ -478,10 +478,23 @@ Status LatController::ComputeControlCommand(
       chassis->driving_mode() == canbus::Chassis::COMPLETE_AUTO_DRIVE) {
     steer_angle = pre_steer_angle_;
   }
-  pre_steer_angle_ = steer_angle;
-  cmd->set_steering_target(steer_angle);
 
-  cmd->set_steering_rate(FLAGS_steer_angle_rate);
+  const double steer_diff_with_max_rate =
+      vehicle_param_.max_steer_angle_rate() * ts_ * 180 / M_PI /
+      steer_single_direction_max_degree_ * 100;
+
+  if (FLAGS_enable_maximum_steer_rate_limit) {
+    cmd->set_steering_target(common::math::Clamp(
+        steer_angle, pre_steer_angle_ - steer_diff_with_max_rate,
+        pre_steer_angle_ + steer_diff_with_max_rate));
+    pre_steer_angle_ = cmd->steering_target();
+    cmd->set_steering_rate(steer_diff_with_max_rate / ts_);
+  } else {
+    pre_steer_angle_ = steer_angle;
+    cmd->set_steering_target(steer_angle);
+    cmd->set_steering_rate(FLAGS_steer_angle_rate);
+  }
+
   // compute extra information for logging and debugging
   const double steer_angle_lateral_contribution =
       -matrix_k_(0, 0) * matrix_state_(0, 0) * 180 / M_PI * steer_ratio_ /
@@ -635,12 +648,18 @@ void LatController::ComputeLateralErrors(
     const double angular_v, const double linear_a,
     const TrajectoryAnalyzer &trajectory_analyzer, SimpleLateralDebug *debug) {
   TrajectoryPoint target_point;
-  if (FLAGS_use_navigation_mode &&
-      !FLAGS_enable_navigation_mode_position_update) {
+
+  if (FLAGS_query_time_nearest_point_only) {
     target_point = trajectory_analyzer.QueryNearestPointByAbsoluteTime(
         Clock::NowInSeconds() + query_relative_time_);
   } else {
-    target_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
+    if (FLAGS_use_navigation_mode &&
+        !FLAGS_enable_navigation_mode_position_update) {
+      target_point = trajectory_analyzer.QueryNearestPointByAbsoluteTime(
+          Clock::NowInSeconds() + query_relative_time_);
+    } else {
+      target_point = trajectory_analyzer.QueryNearestPointByPosition(x, y);
+    }
   }
   const double dx = x - target_point.path_point().x();
   const double dy = y - target_point.path_point().y();

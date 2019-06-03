@@ -74,11 +74,13 @@ TEST(DataVisitorTest, two_channel) {
   auto dv =
       std::make_shared<DataVisitor<RawMessage, RawMessage>>(InitConfigs(2));
 
-  DispatchMessage(channel0, 1);
   std::shared_ptr<RawMessage> msg0;
   std::shared_ptr<RawMessage> msg1;
+  DispatchMessage(channel0, 1);
   EXPECT_FALSE(dv->TryFetch(msg0, msg1));
   DispatchMessage(channel1, 1);
+  EXPECT_FALSE(dv->TryFetch(msg0, msg1));
+  DispatchMessage(channel0, 1);
   EXPECT_TRUE(dv->TryFetch(msg0, msg1));
   DispatchMessage(channel0, 10);
   for (int i = 0; i < 10; ++i) {
@@ -91,14 +93,16 @@ TEST(DataVisitorTest, three_channel) {
   auto dv = std::make_shared<DataVisitor<RawMessage, RawMessage, RawMessage>>(
       InitConfigs(3));
 
-  DispatchMessage(channel0, 1);
   std::shared_ptr<RawMessage> msg0;
   std::shared_ptr<RawMessage> msg1;
   std::shared_ptr<RawMessage> msg2;
+  DispatchMessage(channel0, 1);
   EXPECT_FALSE(dv->TryFetch(msg0, msg1, msg2));
   DispatchMessage(channel1, 1);
   EXPECT_FALSE(dv->TryFetch(msg0, msg1, msg2));
   DispatchMessage(channel2, 1);
+  EXPECT_FALSE(dv->TryFetch(msg0, msg1, msg2));
+  DispatchMessage(channel0, 1);
   EXPECT_TRUE(dv->TryFetch(msg0, msg1, msg2));
   DispatchMessage(channel0, 10);
   for (int i = 0; i < 10; ++i) {
@@ -112,17 +116,19 @@ TEST(DataVisitorTest, four_channel) {
       DataVisitor<RawMessage, RawMessage, RawMessage, RawMessage>>(
       InitConfigs(4));
 
-  DispatchMessage(channel0, 1);
   std::shared_ptr<RawMessage> msg0;
   std::shared_ptr<RawMessage> msg1;
   std::shared_ptr<RawMessage> msg2;
   std::shared_ptr<RawMessage> msg3;
+  DispatchMessage(channel0, 1);
   EXPECT_FALSE(dv->TryFetch(msg0, msg1, msg2, msg3));
   DispatchMessage(channel1, 1);
   EXPECT_FALSE(dv->TryFetch(msg0, msg1, msg2, msg3));
   DispatchMessage(channel2, 1);
   EXPECT_FALSE(dv->TryFetch(msg0, msg1, msg2, msg3));
   DispatchMessage(channel3, 1);
+  EXPECT_FALSE(dv->TryFetch(msg0, msg1, msg2, msg3));
+  DispatchMessage(channel0, 1);
   EXPECT_TRUE(dv->TryFetch(msg0, msg1, msg2, msg3));
   DispatchMessage(channel0, 10);
   for (int i = 0; i < 10; ++i) {

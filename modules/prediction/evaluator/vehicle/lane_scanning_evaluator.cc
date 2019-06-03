@@ -146,13 +146,17 @@ bool LaneScanningEvaluator::ExtractFeatures(
 
   // Extract static environmental (lane-related) features.
   std::vector<double> static_feature_values;
+  std::vector<int> lane_sequence_idx_to_remove;
   if (!ExtractStaticEnvFeatures(obstacle_ptr, lane_graph_ptr,
-                                &static_feature_values)) {
+                                &static_feature_values,
+                                &lane_sequence_idx_to_remove)) {
     AERROR << "Failed to extract static environmental features around obs_id = "
            << id;
   }
-  if (static_feature_values.size() % (SINGLE_LANE_FEATURE_SIZE *
-          (LANE_POINTS_SIZE + BACKWARD_LANE_POINTS_SIZE)) != 0) {
+  if (static_feature_values.size() %
+          (SINGLE_LANE_FEATURE_SIZE *
+           (LANE_POINTS_SIZE + BACKWARD_LANE_POINTS_SIZE)) !=
+      0) {
     AERROR << "Obstacle [" << id << "] has incorrect static env feature size: "
            << static_feature_values.size() << ".";
     return false;
@@ -274,7 +278,8 @@ bool LaneScanningEvaluator::ExtractObstacleFeatures(
 
 bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
     const Obstacle* obstacle_ptr, const LaneGraph* lane_graph_ptr,
-    std::vector<double>* feature_values) {
+    std::vector<double>* feature_values,
+    std::vector<int>* lane_sequence_idx_to_remove) {
   // Sanity checks.
   CHECK_NOTNULL(lane_graph_ptr);
   feature_values->clear();
@@ -309,9 +314,6 @@ bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
         if (count >= SINGLE_LANE_FEATURE_SIZE * BACKWARD_LANE_POINTS_SIZE) {
           break;
         }
-        if (j == 0 && k == 0) {
-          break;
-        }
         const LanePoint& lane_point = lane_segment.lane_point(k);
         std::pair<double, double> relative_s_l =
             WorldCoordToObjCoord(std::make_pair(lane_point.position().x(),
@@ -332,10 +334,10 @@ bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
     while (count >= SINGLE_LANE_FEATURE_SIZE * 2 &&
            count < SINGLE_LANE_FEATURE_SIZE * BACKWARD_LANE_POINTS_SIZE) {
       std::size_t s = backward_feature_values.size();
-      double relative_l_new = 2 * backward_feature_values[s - 1] -
-                              backward_feature_values[s - 5];
-      double relative_s_new = 2 * backward_feature_values[s - 2] -
-                              backward_feature_values[s - 6];
+      double relative_l_new =
+          2 * backward_feature_values[s - 1] - backward_feature_values[s - 5];
+      double relative_s_new =
+          2 * backward_feature_values[s - 2] - backward_feature_values[s - 6];
       double relative_ang_new = backward_feature_values[s - 3];
 
       backward_feature_values.push_back(0.0);
@@ -346,8 +348,8 @@ bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
       count += 4;
     }
 
-    for (int j = static_cast<int>(backward_feature_values.size()) - 1;
-         j >= 0; --j) {
+    for (int j = static_cast<int>(backward_feature_values.size()) - 1; j >= 0;
+         --j) {
       feature_values->push_back(backward_feature_values[j]);
     }
 

@@ -62,6 +62,7 @@ message PullOverStatus {
   optional double width_left = 7 [default = 0.0];
   optional double width_right = 8 [default = 0.0];
   optional int32 idx = 9 [default = 0];
+  optional bool is_in_pull_over_scenario = 10 [default = false];
 }
 
 message ReroutingStatus {

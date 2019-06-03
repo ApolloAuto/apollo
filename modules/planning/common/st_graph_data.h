@@ -39,7 +39,6 @@ class StGraphData {
                 const double min_s_on_st_boundaries,
                 const apollo::common::TrajectoryPoint& init_point,
                 const SpeedLimit& speed_limit, const double path_data_length,
-                const double path_length_by_conf,
                 const double total_time_by_conf,
                 planning_internal::STGraphDebug* st_graph_debug);
 
@@ -54,10 +53,6 @@ class StGraphData {
   const SpeedLimit& speed_limit() const;
 
   double path_length() const;
-
-  double path_data_length() const;
-
-  double path_length_by_conf() const;
 
   double total_time_by_conf() const;
 

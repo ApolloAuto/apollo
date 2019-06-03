@@ -62,10 +62,10 @@ class RoadGraph {
 
  private:
   /** @brief Combine the lane-graph of forward direction and that of backward
-    *        direction together.
-    */
+   *        direction together.
+   */
   LaneGraph CombineLaneGraphs(const LaneGraph& lane_graph_predecessor,
-      const LaneGraph& lane_graph_successor);
+                              const LaneGraph& lane_graph_successor);
 
   /**
    * @brief
@@ -81,17 +81,18 @@ class RoadGraph {
    * @param The vector of lane_segments visited (DFS).
    * @param The LaneGraph that we need to write in.
    */
-  void ConstructLaneSequence(const bool search_forward_direction,
-      const double accumulated_s, const  double curr_lane_seg_s,
+  void ConstructLaneSequence(
+      const bool search_forward_direction, const double accumulated_s,
+      const double curr_lane_seg_s,
       std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
       const int graph_search_horizon, const bool consider_lane_split,
       std::list<LaneSegment>* const lane_segments,
       LaneGraph* const lane_graph_ptr) const;
 
   /** @brief If direction unspecified, by default construct forward direction.
-    */
-  void ConstructLaneSequence(const double accumulated_s,
-      const double curr_lane_seg_s,
+   */
+  void ConstructLaneSequence(
+      const double accumulated_s, const double curr_lane_seg_s,
       std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
       const int graph_search_horizon, const bool consider_lane_split,
       std::list<LaneSegment>* const lane_segments,
