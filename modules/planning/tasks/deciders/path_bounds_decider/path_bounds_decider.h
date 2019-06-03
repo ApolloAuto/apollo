@@ -115,8 +115,9 @@ class PathBoundsDecider : public Decider {
       const Frame& frame, const ReferenceLineInfo& reference_line_info,
       std::vector<std::tuple<double, double, double>>* const path_bound);
 
-  int IsPointWithinPathBound(const ReferenceLineInfo& reference_line_info,
-      const double x, const double y,
+  int IsPointWithinPathBound(
+      const ReferenceLineInfo& reference_line_info, const double x,
+      const double y,
       const std::vector<std::tuple<double, double, double>>& path_bound);
 
   bool SearchPullOverPosition(

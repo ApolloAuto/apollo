@@ -127,8 +127,8 @@ TEST_F(DpStGraphTest, simple) {
   planning_internal::STGraphDebug st_graph_debug;
 
   st_graph_data_ = StGraphData();
-  st_graph_data_.LoadData(boundaries, 30.0, init_point_, speed_limit_,
-                          120.0, 7.0, &st_graph_debug);
+  st_graph_data_.LoadData(boundaries, 30.0, init_point_, speed_limit_, 120.0,
+                          7.0, &st_graph_debug);
 
   GriddedPathTimeGraph dp_st_graph(st_graph_data_, dp_config_, obstacles_,
                                    init_point_);

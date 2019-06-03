@@ -225,8 +225,8 @@ void RoadGraph::ConstructLaneSequence(
   }
 
   // Create a new lane_segment based on the current lane_info_ptr.
-  double curr_s = curr_lane_seg_s >= 0.0 ?
-    curr_lane_seg_s : lane_info_ptr->total_length();
+  double curr_s =
+      curr_lane_seg_s >= 0.0 ? curr_lane_seg_s : lane_info_ptr->total_length();
   LaneSegment lane_segment;
   lane_segment.set_adc_s(curr_s);
   lane_segment.set_lane_id(lane_info_ptr->id().id());
@@ -278,8 +278,7 @@ void RoadGraph::ConstructLaneSequence(
   std::vector<std::shared_ptr<const hdmap::LaneInfo>> candidate_lanes;
   std::set<std::string> set_lane_ids;
   if (search_forward_direction) {
-    new_accumulated_s =
-        accumulated_s + lane_info_ptr->total_length() - curr_s;
+    new_accumulated_s = accumulated_s + lane_info_ptr->total_length() - curr_s;
     // Reundancy removal.
     for (const auto& successor_lane_id : lane_info_ptr->lane().successor_id()) {
       set_lane_ids.insert(successor_lane_id.id());
@@ -315,8 +314,9 @@ void RoadGraph::ConstructLaneSequence(
   // Recursively expand lane-sequence.
   for (const auto& candidate_lane : candidate_lanes) {
     ConstructLaneSequence(search_forward_direction, new_accumulated_s,
-        new_lane_seg_s, candidate_lane, graph_search_horizon - 1,
-        consider_further_lane_split, lane_segments, lane_graph_ptr);
+                          new_lane_seg_s, candidate_lane,
+                          graph_search_horizon - 1, consider_further_lane_split,
+                          lane_segments, lane_graph_ptr);
   }
   if (search_forward_direction) {
     lane_segments->pop_back();

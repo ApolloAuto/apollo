@@ -120,8 +120,8 @@ Status PathBoundsDecider::Process(
             std::get<2>(pullover_path_bound[i]));
       }
       candidate_path_boundaries.emplace_back(
-          std::get<0>(pullover_path_bound[0]),
-          kPathBoundsDeciderResolution, pullover_path_bound_pair);
+          std::get<0>(pullover_path_bound[0]), kPathBoundsDeciderResolution,
+          pullover_path_bound_pair);
       candidate_path_boundaries.back().set_label("regular/pullover");
 
       reference_line_info->SetCandidatePathBoundaries(
@@ -304,8 +304,9 @@ std::string PathBoundsDecider::GenerateRegularPathBound(
   return "";
 }
 
-std::string PathBoundsDecider::GeneratePullOverPathBound(const Frame& frame,
-    const ReferenceLineInfo& reference_line_info, PathBound* const path_bound) {
+std::string PathBoundsDecider::GeneratePullOverPathBound(
+    const Frame& frame, const ReferenceLineInfo& reference_line_info,
+    PathBound* const path_bound) {
   // 1. Initialize the path boundaries to be an indefinitely large area.
   if (!InitPathBoundary(reference_line_info.reference_line(), path_bound)) {
     const std::string msg = "Failed to initialize path boundaries.";
@@ -348,8 +349,9 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(const Frame& frame,
                                ->mutable_pull_over();
   // If already found a pull-over position, simply check if it's valid.
   if (pull_over_status->is_feasible()) {
-    int curr_idx = IsPointWithinPathBound(reference_line_info,
-        pull_over_status->x(), pull_over_status->y(), *path_bound);
+    int curr_idx =
+        IsPointWithinPathBound(reference_line_info, pull_over_status->x(),
+                               pull_over_status->y(), *path_bound);
     if (curr_idx > 0) {
       // Trim path-bound properly.
       while (static_cast<int>(path_bound->size()) - 1 >
@@ -369,9 +371,8 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(const Frame& frame,
   // If haven't found a pull-over position, search for one.
   std::tuple<double, double, double, int> pull_over_configuration;
   if (!SearchPullOverPosition(frame, reference_line_info, *path_bound,
-          &pull_over_configuration)) {
-    const std::string msg =
-        "Failed to find a proper pull-over position.";
+                              &pull_over_configuration)) {
+    const std::string msg = "Failed to find a proper pull-over position.";
     AERROR << msg;
     pull_over_status->Clear();
     pull_over_status->set_is_feasible(false);
@@ -433,8 +434,8 @@ std::string PathBoundsDecider::GenerateFallbackPathBound(
 }
 
 int PathBoundsDecider::IsPointWithinPathBound(
-    const ReferenceLineInfo& reference_line_info,
-    const double x, const double y,
+    const ReferenceLineInfo& reference_line_info, const double x,
+    const double y,
     const std::vector<std::tuple<double, double, double>>& path_bound) {
   common::SLPoint point_sl;
   reference_line_info.reference_line().XYToSL({x, y}, &point_sl);
@@ -475,7 +476,7 @@ bool PathBoundsDecider::SearchPullOverPosition(
   ADEBUG << "Destination is at s = " << destination_s
          << ", ADC is at s = " << adc_end_s;
   if (destination_s - adc_end_s < config_.path_bounds_decider_config()
-          .pull_over_destination_to_adc_buffer()) {
+                                      .pull_over_destination_to_adc_buffer()) {
     ADEBUG << "Destination is too close to ADC. distance["
            << destination_s - adc_end_s << "]";
     return false;
@@ -483,8 +484,9 @@ bool PathBoundsDecider::SearchPullOverPosition(
   }
 
   // Check if destination is within path-bounds searching scope.
-  const double destination_to_pathend_buffer = config_
-      .path_bounds_decider_config().pull_over_destination_to_pathend_buffer();
+  const double destination_to_pathend_buffer =
+      config_.path_bounds_decider_config()
+          .pull_over_destination_to_pathend_buffer();
   if (destination_s + destination_to_pathend_buffer >=
       std::get<0>(path_bound.back())) {
     ADEBUG << "Destination is not within path_bounds search scope";
@@ -492,10 +494,12 @@ bool PathBoundsDecider::SearchPullOverPosition(
   }
 
   // Search for a feasible location for pull-over.
-  const double pull_over_space_length = kPulloverLonSearchCoeff *
-      VehicleConfigHelper::GetConfig().vehicle_param().length() -
+  const double pull_over_space_length =
+      kPulloverLonSearchCoeff *
+          VehicleConfigHelper::GetConfig().vehicle_param().length() -
       FLAGS_obstacle_lon_start_buffer - FLAGS_obstacle_lon_end_buffer;
-  const double pull_over_space_width = (kPulloverLatSearchCoeff - 1.0) *
+  const double pull_over_space_width =
+      (kPulloverLatSearchCoeff - 1.0) *
       VehicleConfigHelper::GetConfig().vehicle_param().width();
   const double adc_half_width =
       VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
@@ -1266,8 +1270,8 @@ void PathBoundsDecider::PathBoundsDebugString(
     const PathBound& path_boundaries) {
   for (size_t i = 0; i < path_boundaries.size(); ++i) {
     AWARN << "idx " << i << "; s = " << std::get<0>(path_boundaries[i])
-           << "; l_min = " << std::get<1>(path_boundaries[i])
-           << "; l_max = " << std::get<2>(path_boundaries[i]);
+          << "; l_min = " << std::get<1>(path_boundaries[i])
+          << "; l_max = " << std::get<2>(path_boundaries[i]);
   }
 }
 
