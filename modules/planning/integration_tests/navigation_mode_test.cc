@@ -39,7 +39,7 @@ class NavigationModeTest : public PlanningTestBase {
         "modules/planning/conf/lane_follow_scenario_config.pb.txt";
     FLAGS_test_data_dir = "modules/planning/testdata/navigation_mode_test";
     FLAGS_traffic_rule_config_filename =
-        "modules/planning/conf/navi_traffic_rule_config.pb.txt";
+        "modules/planning/conf/traffic_rule_config.pb.txt";
   }
 };
 
