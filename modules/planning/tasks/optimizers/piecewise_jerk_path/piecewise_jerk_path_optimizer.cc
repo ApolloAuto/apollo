@@ -54,7 +54,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       piecewise_jerk_path_config.l_weight(),
       piecewise_jerk_path_config.dl_weight() *
           std::fmax(init_frenet_state.first[1] * init_frenet_state.first[1],
-                    1.0),
+                    5.0),
       piecewise_jerk_path_config.ddl_weight(),
       piecewise_jerk_path_config.dddl_weight(), 0.0};
 
