@@ -27,6 +27,7 @@
 
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h"
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_path_problem.h"
 
