@@ -38,26 +38,31 @@ _CYBER_RECORD = importlib.import_module('_cyber_record')
 PyBagMessage = collections.namedtuple('PyBagMessage',
                                       'topic message data_type timestamp')
 
-# Record file class
+
 class RecordReader(object):
+
     """
     Class for cyber RecordReader wrapper.
     """
 
+    ##
+    # @brief the constructor function.
+    #
+    # @param file_name the record file name.
     def __init__(self, file_name):
         self.record_reader = _CYBER_RECORD.new_PyRecordReader(file_name)
 
     def __del__(self):
         _CYBER_RECORD.delete_PyRecordReader(self.record_reader)
 
+    ##
+    # @brief Read message from bag file.
+    #
+    # @param start_time the start time to read.
+    # @param end_time the end time to read.
+    #
+    # @return return (channnel, data, data_type, timestamp)
     def read_messages(self, start_time=0, end_time=18446744073709551615):
-        """
-        Read message from bag file.
-        @param self
-        @param start_time:
-        @param end_time:
-        @return: generator of (message, data_type, timestamp)
-        """
         while True:
             message = _CYBER_RECORD.PyRecordReader_ReadMessage(
                 self.record_reader, start_time, end_time)
@@ -69,17 +74,23 @@ class RecordReader(object):
                 # print "No message more."
                 break
 
+    ##
+    # @brief Return message count of the channel in current record file.
+    #
+    # @param channel_name the channel name.
+    #
+    # @return return the message count.
     def get_messagenumber(self, channel_name):
-        """
-        Return message count.
-        """
         return _CYBER_RECORD.PyRecordReader_GetMessageNumber(
             self.record_reader, channel_name)
 
+    ##
+    # @brief Get the corresponding message type of channel.
+    #
+    # @param channel_name channel name.
+    #
+    # @return return the name of ther string type.
     def get_messagetype(self, channel_name):
-        """
-        Return message type.
-        """
         return _CYBER_RECORD.PyRecordReader_GetMessageType(
             self.record_reader, channel_name)
 
@@ -104,7 +115,7 @@ class RecordReader(object):
 
     def get_channellist(self):
         """
-        Return channel list.
+        Return current channel names list.
         """
         return _CYBER_RECORD.PyRecordReader_GetChannelList(self.record_reader)
 
@@ -115,6 +126,11 @@ class RecordWriter(object):
     Class for cyber RecordWriter wrapper.
     """
 
+    ##
+    # @brief the constructor function.
+    #
+    # @param file_segmentation_size_kb size to segment the file, 0 is no segmentation.
+    # @param file_segmentation_interval_sec size to segment the file, 0 is no segmentation.
     def __init__(self, file_segmentation_size_kb=0,
                  file_segmentation_interval_sec=0):
         self.record_writer = _CYBER_RECORD.new_PyRecordWriter()
@@ -126,18 +142,31 @@ class RecordWriter(object):
     def __del__(self):
         _CYBER_RECORD.delete_PyRecordWriter(self.record_writer)
 
+    ##
+    # @brief Open record file for write.
+    #
+    # @param path the file path.
+    #
+    # @return Success is Ture, other False.
     def open(self, path):
-        """
-        Open record file for write.
-        """
         return _CYBER_RECORD.PyRecordWriter_Open(self.record_writer, path)
 
+    ##
+    # @brief Close record file.
     def close(self):
         """
         Close record file.
         """
         _CYBER_RECORD.PyRecordWriter_Close(self.record_writer)
 
+    ##
+    # @brief Writer channel by channelname, typename, protodesc.
+    #
+    # @param channel_name the channel name to write
+    # @param type_name a string of message type name.
+    # @param proto_desc the message descriptor.
+    #
+    # @return Success is Ture, other False.
     def write_channel(self, channel_name, type_name, proto_desc):
         """
         Writer channel by channelname,typename,protodesc
@@ -145,6 +174,15 @@ class RecordWriter(object):
         return _CYBER_RECORD.PyRecordWriter_WriteChannel(
             self.record_writer, channel_name, type_name, proto_desc)
 
+    ##
+    # @brief Writer msg: channelname, data, writer time.
+    #
+    # @param channel_name channel name to write.
+    # @param data when raw is True, data processed as a rawdata, other it needs to SerializeToString
+    # @param time message time.
+    # @param raw the flag implies data whether or not a rawdata.
+    #
+    # @return Success is Ture, other False.
     def write_message(self, channel_name, data, time, raw=True):
         """
         Writer msg:channelname,rawmsg,writer time

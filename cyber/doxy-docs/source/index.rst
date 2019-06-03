@@ -36,4 +36,5 @@ it is highly optimized for performance, latency, and data throughput.
    :maxdepth: 2
 
    api/cppapi_index
+   api/pythonapi_index
 
