@@ -57,7 +57,7 @@ std::vector<TrajectoryPoint>
 TrajectoryStitcher::ComputeReinitStitchingTrajectory(
     const double planning_cycle_time, const VehicleState& vehicle_state) {
   TrajectoryPoint reinit_point;
-  constexpr double kEpsilon = 1e-2;
+  constexpr double kEpsilon = 0.2;
   if (std::abs(vehicle_state.linear_velocity()) < kEpsilon &&
       std::abs(vehicle_state.linear_acceleration()) < kEpsilon) {
     reinit_point = ComputeTrajectoryPointFromVehicleState(vehicle_state);
