@@ -88,18 +88,6 @@ filegroup(
     srcs = glob(["common/test_data/**"]),
 )
 
-#cc_test(
-#    name = "localization_msf_common_file_utility_test",
-#    size = "medium",
-#    timeout = "short",
-#    srcs = ["file_utility_test.cc"],
-#    data = ["localization_msf_common_test_data"],
-#    deps = [
-#        "//modules/localization/msf/common/util:localization_msf_common_util_file_utility",
-#        "@gtest//:main",
-#    ],
-#)
-
 cc_test(
     name = "localization_msf_common_frame_transform_test",
     size = "medium",

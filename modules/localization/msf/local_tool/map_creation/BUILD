@@ -15,6 +15,7 @@ cc_binary(
     linkstatic = 0,
     deps = [
         "//cyber",
+        "//cyber/common:common",
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",

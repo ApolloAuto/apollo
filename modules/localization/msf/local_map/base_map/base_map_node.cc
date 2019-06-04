@@ -18,6 +18,7 @@
 #include <cstdio>
 #include <string>
 #include <vector>
+#include "cyber/common/file.h"
 #include "modules/localization/msf/common/util/file_utility.h"
 #include "modules/localization/msf/local_map/base_map/base_map_matrix.h"
 
@@ -407,15 +408,10 @@ Eigen::Vector2d BaseMapNode::GetLeftTopCorner(const BaseMapConfig& config,
 }
 
 bool BaseMapNode::CreateMapDirectory(const std::string& path) const {
-  if (FileUtility::IsExists(path)) {
-    if (!FileUtility::IsDirectory(path)) {
-      return false;
-    } else {
-      return true;
-    }
-  } else {
-    return FileUtility::CreateDirectory(path);
+  if (!cyber::common::DirectoryExists(path)) {
+    return cyber::common::EnsureDirectory(path);
   }
+  return true;
 }
 
 bool BaseMapNode::CreateMapDirectoryRecursively(
@@ -437,7 +433,7 @@ bool BaseMapNode::CheckMapDirectoryRecursively(
 
   for (unsigned int i = 0; i < paths.size(); ++i) {
     path = path + paths[i];
-    if (!(FileUtility::IsExists(path) && FileUtility::IsDirectory(path))) {
+    if (!(cyber::common::DirectoryExists(path))) {
       return false;
     }
   }

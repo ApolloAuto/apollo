@@ -113,7 +113,7 @@ bool BaseMap::SetMapFolderPath(const std::string folder_path) {
   map_config_->map_folder_path_ = folder_path;
   // Try to load the config
   std::string config_path = map_config_->map_folder_path_ + "/config.xml";
-  if (FileUtility::IsExists(config_path)) {
+  if (cyber::common::PathExists(config_path)) {
     map_config_->Load(config_path);
     return true;
   }

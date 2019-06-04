@@ -49,7 +49,7 @@ run the script in apollo directory
 ```
 This script will run localization program in the background. You can check if the program is running by using the command.
 ```
-ps -e | grep "ndt_localization".
+ps -e | grep "ndt_localization"
 ```     
 
 In /apollo/data/log directory, you can see the localization log files.     

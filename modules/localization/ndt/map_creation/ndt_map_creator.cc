@@ -110,11 +110,8 @@ int main(int argc, char** argv) {
         pose_files[i], &pcd_poses[i], &time_stamps[i], &pcd_indices[i]);
   }
 
-  if (!apollo::localization::msf::FileUtility::IsExists(map_base_folder)) {
-    if (apollo::localization::msf::FileUtility::CreateDirectory(
-            map_base_folder)) {
+  if (!apollo::cyber::common::EnsureDirectory(map_base_folder)) {
       std::cerr << "Create map directory failed." << std::endl;
-    }
   }
 
   // Output Config file

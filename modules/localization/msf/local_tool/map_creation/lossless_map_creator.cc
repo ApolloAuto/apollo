@@ -19,6 +19,7 @@
 #include "boost/filesystem.hpp"
 #include "boost/program_options.hpp"
 
+#include "cyber/common/file.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 #include "modules/localization/msf/common/util/extract_ground_plane.h"
 #include "modules/localization/msf/common/util/file_utility.h"
@@ -179,9 +180,10 @@ int main(int argc, char** argv) {
   PyramidMapConfig& loss_less_config =
       static_cast<PyramidMapConfig&>(map.GetMapConfig());
   std::string map_folder_path = map_base_folder + "/lossless_map";
-  if (!apollo::localization::msf::FileUtility::IsExists(map_folder_path)) {
-    apollo::localization::msf::FileUtility::CreateDirectory(map_folder_path);
-  }
+  apollo::cyber::common::EnsureDirectory(map_folder_path);
+//  if (!apollo::localization::msf::FileUtility::IsExists(map_folder_path)) {
+//    apollo::localization::msf::FileUtility::CreateDirectory(map_folder_path);
+//  }
   map.SetMapFolderPath(map_folder_path);
   for (size_t i = 0; i < pcd_folder_pathes.size(); ++i) {
     map.AddDataset(pcd_folder_pathes[i]);

@@ -15,6 +15,7 @@ cc_library(
     deps = [
         "//modules/common/util",
         "//cyber/task:task",
+        "//cyber/common:common",
         "//modules/localization/msf/common/util:localization_msf_common_util_compression",
         "//modules/localization/msf/common/util:localization_msf_common_util_file_utility",
         "//modules/localization/msf/common/util:localization_msf_common_util",
