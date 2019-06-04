@@ -134,7 +134,8 @@ message ScenarioTrafficLightUnprotectedRightTurnConfig {
 
 message ScenarioPullOverConfig {
   optional double start_pull_over_scenario_distance = 1 [default = 50.0];  // meter
-  optional double max_pull_over_scenario_distance = 2 [default = 10.0];  // meter
+  // keep the same value as pull_over_destination_to_adc_buffer in PathBoundsDeciderConfig
+  optional double pull_over_min_buffer = 2 [default = 25.0];  // meter
   optional double max_adc_stop_speed = 3 [default = 0.1];  // m/s
   optional double max_s_error_to_end_point = 4 [default = 0.2];
   optional double max_l_error_to_end_point = 5 [default = 0.5];
