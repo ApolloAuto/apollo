@@ -44,7 +44,7 @@ constexpr double kDefaultRoadWidth = 20.0;
 // TODO(all): Update extra tail point base on vehicle speed.
 constexpr int kNumExtraTailBoundPoint = 20;
 constexpr double kPulloverLonSearchCoeff = 2.0;
-constexpr double kPulloverLatSearchCoeff = 1.05;
+constexpr double kPulloverLatSearchCoeff = 1.06;
 
 class PathBoundsDecider : public Decider {
  public:
@@ -166,7 +166,9 @@ class PathBoundsDecider : public Decider {
       std::vector<std::tuple<double, double, double>>* const path_bound,
       std::string* const borrow_lane_type);
 
-  void ConvertBoundaryAxesFromLaneCenterToRefLine();
+  void ConvertBoundaryAxesFromLaneCenterToRefLine(
+      const ReferenceLineInfo& reference_line_info,
+      std::vector<std::tuple<double, double, double>>* const path_bound);
 
   /** @brief Refine the boundary based on static obstacles. It will make sure
    *   the boundary doesn't contain any static obstacle so that the path
