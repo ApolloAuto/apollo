@@ -195,6 +195,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
     }
   }
 
+<<<<<<< HEAD
   // check rightmost driving lane along pull-over path
   if (pull_over_scenario) {
     double check_s = adc_front_edge_s;
