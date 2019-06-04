@@ -366,7 +366,7 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(
         std::get<2>((*path_bound)[path_bound->size() - 1 - idx]) =
             std::get<2>((*path_bound)[curr_idx]);
       }
-      PathBoundsDebugString(*path_bound);
+      // PathBoundsDebugString(*path_bound);
       return "";
     }
   }
