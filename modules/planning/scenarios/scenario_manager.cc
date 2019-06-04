@@ -21,6 +21,8 @@
 #include <utility>
 #include <vector>
 
+#include "modules/map/proto/map_lane.pb.h"
+
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -39,6 +41,7 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 
+using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::PathOverlap;
 
 bool ScenarioManager::Init(
@@ -188,6 +191,51 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
           pull_over_scenario = false;
           break;
         }
+      }
+    }
+  }
+
+  // check rightmost driving lane along pull-over path
+  if (pull_over_scenario) {
+    double check_s = adc_front_edge_s;
+    constexpr double kDistanceUnit = 5.0;
+    while (check_s < dest_sl.s()) {
+      check_s += kDistanceUnit;
+
+      std::vector<hdmap::LaneInfoConstPtr> lanes;
+      reference_line.GetLaneFromS(check_s, &lanes);
+      if (lanes.size() <= 0) {
+        ADEBUG << "check_s[" << check_s << "] can't find a lane";
+        continue;
+      }
+      const hdmap::LaneInfoConstPtr lane = lanes[0];
+      const std::string lane_id = lane->lane().id().id();
+      ADEBUG << "check_s[" << check_s << "] lane[" << lane_id << "]";
+
+      // check neighbor lanes type: NONE/CITY_DRIVING/BIKING/SIDEWALK/PARKING
+      bool rightmost_driving_lane = true;
+      for (const auto& neighbor_lane_id :
+          lane->lane().right_neighbor_forward_lane_id()) {
+        const auto hdmap_ptr = HDMapUtil::BaseMapPtr();
+        CHECK_NOTNULL(hdmap_ptr);
+        const auto neighbor_lane = hdmap_ptr->GetLaneById(neighbor_lane_id);
+        if (neighbor_lane == nullptr) {
+          ADEBUG << "Failed to find neighbor lane["
+                 << neighbor_lane_id.id() << "]";
+          continue;
+        }
+        const auto& lane_type = neighbor_lane->lane().type();
+        if (lane_type == hdmap::Lane::CITY_DRIVING) {
+          ADEBUG << "lane[" << lane_id << "]'s right neighbor forward lane["
+                 << neighbor_lane_id.id() << "] type["
+                 << Lane_LaneType_Name(lane_type) << "] can't pull over";
+          rightmost_driving_lane = false;
+          break;
+        }
+      }
+      if (!rightmost_driving_lane) {
+        pull_over_scenario = false;
+        break;
       }
     }
   }
