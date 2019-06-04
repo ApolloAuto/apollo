@@ -115,7 +115,8 @@ class Client : public ClientBase {
   SharedFuture AsyncSendRequest(const Request& request);
 
   /**
-   * @brief Send Request shared ptr asynchronously and invoke `cb` after we get response
+   * @brief Send Request shared ptr asynchronously and invoke `cb` after we get
+   * response
    *
    * @param request Request shared ptr
    * @param cb callback function after we get response

@@ -88,9 +88,8 @@ char *BridgeHeader::SerializeHeaderFlag(char *buf, size_t size) {
     return nullptr;
   }
   return SerializeBasicType<char, sizeof(BRIDGE_HEADER_FLAG)>(
-    BRIDGE_HEADER_FLAG, buf, size);
+      BRIDGE_HEADER_FLAG, buf, size);
 }
-
 
 char *BridgeHeader::SerializeHeaderSize(char *buf, size_t size) {
   return SerializeBasicType<size_t, sizeof(size_t)>(&header_size_, buf, size);

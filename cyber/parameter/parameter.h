@@ -125,7 +125,8 @@ class Parameter {
             const std::string& full_name, const std::string& proto_desc);
 
   /**
-   * @brief use a google::protobuf::Message type value to construct the parameter
+   * @brief use a google::protobuf::Message type value to construct the
+   * parameter
    *
    * @param name Parameter name
    * @param msg protobuf message

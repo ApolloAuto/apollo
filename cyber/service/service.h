@@ -32,7 +32,8 @@ namespace cyber {
 
 /**
  * @class Service
- * @brief Service handles `Request` from the Client, and send a `Response` to it.
+ * @brief Service handles `Request` from the Client, and send a `Response` to
+ * it.
  *
  * @tparam Request the request type
  * @tparam Response the response type

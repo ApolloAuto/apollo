@@ -90,7 +90,8 @@ class Manager {
   /**
    * @brief Join the topology
    *
-   * @param attr is the attributes that will be sent to other Manager(include ourselves)
+   * @param attr is the attributes that will be sent to other Manager(include
+   * ourselves)
    * @param role is one of RoleType enum
    * @param need_publish Is need to publish out?
    * @return true if Join topology successfully
@@ -102,7 +103,8 @@ class Manager {
   /**
    * @brief Leave the topology
    *
-   * @param attr is the attributes that will be sent to other Manager(include ourselves)
+   * @param attr is the attributes that will be sent to other Manager(include
+   * ourselves)
    * @param role if one of RoleType enum.
    * @return true if Leave topology successfully
    * @return false if Leave topology failed
@@ -110,7 +112,8 @@ class Manager {
   bool Leave(const RoleAttributes& attr, RoleType role);
 
   /**
-   * @brief Add topology change listener, when topology changed, func will be called.
+   * @brief Add topology change listener, when topology changed, func will be
+   * called.
    *
    * @param func the callback function
    * @return ChangeConnection Store it to use when you want to stop listening.

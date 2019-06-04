@@ -28,7 +28,8 @@ namespace cyber {
 
 /**
  * @class WriterBase
- * @brief Base class for a Writer. A Writer is an object to send messages through a 'Channel'
+ * @brief Base class for a Writer. A Writer is an object to send messages
+ * through a 'Channel'
  * @warning One Writer can only write one channel.
  * But different writers can write through the same channel
  */
