@@ -532,3 +532,6 @@ DEFINE_double(short_path_length_threshold, 20.0,
 
 DEFINE_uint64(trajectory_stitching_preserved_length, 20,
               "preserved points number in trajectory stitching");
+
+DEFINE_double(side_pass_driving_width_l_buffer, 0.1,
+              "(unit: meter) for side pass driving width l buffer");

@@ -255,6 +255,8 @@ DECLARE_double(rss_max_front_obstacle_distance);
 DECLARE_bool(enable_planning_smoother);
 DECLARE_double(smoother_stop_distance);
 
+DECLARE_double(side_pass_driving_width_l_buffer);
+
 DECLARE_bool(enable_parallel_hybrid_a);
 
 DECLARE_double(vehicle_low_speed_threshold);
