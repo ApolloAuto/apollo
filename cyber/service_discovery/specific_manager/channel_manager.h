@@ -82,7 +82,8 @@ class ChannelManager : public Manager {
   void GetMsgType(const std::string& channel_name, std::string* msg_type);
 
   /**
-   * @brief Inquire if there is at least one Writer that publishes `channel_name`
+   * @brief Inquire if there is at least one Writer that publishes
+   * `channel_name`
    *
    * @param channel_name channel name we want to inquire
    * @return true if there is at least one Writer
@@ -115,7 +116,8 @@ class ChannelManager : public Manager {
                            RoleAttrVec* writers);
 
   /**
-   * @brief Inquire if there is at least one Reader that publishes `channel_name`
+   * @brief Inquire if there is at least one Reader that publishes
+   * `channel_name`
    *
    * @param channel_name channel name we want to inquire
    * @return true if there is at least one Reader
@@ -149,8 +151,9 @@ class ChannelManager : public Manager {
 
   /**
    * @brief Get the Upstream Of Node object.
-   * If Node A has writer that publishes channel-1, and Node B has reader that subscribes channel-1
-   * then A is B's Upstream node, and B is A's Downstream node
+   * If Node A has writer that publishes channel-1, and Node B has reader that
+   * subscribes channel-1 then A is B's Upstream node, and B is A's Downstream
+   * node
    *
    * @param node_name node's name we want to inquire
    * @param upstream_nodes result RoleAttribute vector
@@ -160,8 +163,9 @@ class ChannelManager : public Manager {
 
   /**
    * @brief Get the Downstream Of Node object.
-   * If Node A has writer that publishes channel-1, and Node B has reader that subscribes channel-1
-   * then A is B's Upstream node, and B is A's Downstream node
+   * If Node A has writer that publishes channel-1, and Node B has reader that
+   * subscribes channel-1 then A is B's Upstream node, and B is A's Downstream
+   * node
    *
    * @param node_name node's name we want to inquire
    * @param downstream_nodes result RoleAttribute vector

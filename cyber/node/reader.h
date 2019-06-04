@@ -51,15 +51,17 @@ const uint32_t DEFAULT_PENDING_QUEUE_SIZE = 1;
  * @class Reader
  * @brief Reader subscribes a channel, it has two main functions:
  * 1. You can pass a `CallbackFunc` to handle the message then it arrived
- * 2. You can Observe messages that Blocker cached. Reader automatically push the message
- * to Blocker's `PublishQueue`, and we can use `Observe` to fetch messages from `PublishQueue`
- * to `ObserveQueue`. But, if you have set CallbackFunc, you can ignore this.
- * One Reader uses one `ChannelBuffer`, the message we are handling is stored in ChannelBuffer
- * Reader will Join the topology when init and Leave the topology when shutdown
+ * 2. You can Observe messages that Blocker cached. Reader automatically push
+ * the message to Blocker's `PublishQueue`, and we can use `Observe` to fetch
+ * messages from `PublishQueue` to `ObserveQueue`. But, if you have set
+ * CallbackFunc, you can ignore this. One Reader uses one `ChannelBuffer`, the
+ * message we are handling is stored in ChannelBuffer Reader will Join the
+ * topology when init and Leave the topology when shutdown
  * @warning To save resource, `ChannelBuffer` has limited length,
- * it's passed through the `pending_queue_size` param. pending_queue_size is default set to 1,
- * So, If you handle slower than writer sending, older messages that are not handled will be lost.
- * You can increase `pending_queue_size` to resolve this problem.
+ * it's passed through the `pending_queue_size` param. pending_queue_size is
+ * default set to 1, So, If you handle slower than writer sending, older
+ * messages that are not handled will be lost. You can increase
+ * `pending_queue_size` to resolve this problem.
  */
 template <typename MessageT>
 class Reader : public ReaderBase {
@@ -188,7 +190,8 @@ class Reader : public ReaderBase {
   virtual Iterator End() const { return blocker_->ObservedEnd(); }
 
   /**
-   * @brief Is there is at least one writer publish the channel that we subscribes?
+   * @brief Is there is at least one writer publish the channel that we
+   * subscribes?
    *
    * @return true if the channel has writer
    * @return false if the channel has no writer

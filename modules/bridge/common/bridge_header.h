@@ -35,7 +35,7 @@ class BridgeHeader {
   bool Diserialize(const char *buf);
   bool IsAvailable(const char *buf);
 
-  uint32_t GetHeaderVer() const { return header_ver_.value_;}
+  uint32_t GetHeaderVer() const { return header_ver_.value_; }
   size_t GetHeaderSize() const { return msg_size_.value_; }
   std::string GetMsgName() const { return msg_name_.value_; }
   uint32_t GetMsgID() const { return msg_id_.value_; }
@@ -92,14 +92,8 @@ class BridgeHeader {
   HeaderItem<Time_Stamp, double> time_stamp_;
   size_t header_size_ = 0;
   HeaderItemBase *header_item[Header_Tail] = {
-    &header_ver_,
-    &msg_name_,
-    &msg_id_,
-    &msg_size_,
-    &total_packs_,
-    &pack_size_,
-    &index_,
-    &time_stamp_,
+      &header_ver_,  &msg_name_,  &msg_id_, &msg_size_,
+      &total_packs_, &pack_size_, &index_,  &time_stamp_,
   };
 };
 

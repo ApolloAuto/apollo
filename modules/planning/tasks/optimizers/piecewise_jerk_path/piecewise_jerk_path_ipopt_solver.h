@@ -31,15 +31,16 @@ namespace planning {
 
 class PiecewiseJerkPathIpoptSolver : public Ipopt::TNLP {
  public:
-  PiecewiseJerkPathIpoptSolver(const double d_init,
-      const double d_prime_init, const double d_pprime_init,
-      const double delta_s, const double d_ppprime_max,
-      std::vector<std::pair<double, double>> d_bounds);
+  PiecewiseJerkPathIpoptSolver(const double d_init, const double d_prime_init,
+                               const double d_pprime_init, const double delta_s,
+                               const double d_ppprime_max,
+                               std::vector<std::pair<double, double>> d_bounds);
 
   virtual ~PiecewiseJerkPathIpoptSolver() = default;
 
   void set_objective_weights(const double w_x, const double w_dx,
-      const double w_ddx, const double w_dddx, const double w_d_obs);
+                             const double w_ddx, const double w_dddx,
+                             const double w_d_obs);
 
   /** Method to return some info about the nlp */
   bool get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag,
@@ -71,8 +72,9 @@ class PiecewiseJerkPathIpoptSolver : public Ipopt::TNLP {
                   int* iRow, int* jCol, double* values) override;
 
   /** Method to return:
-   *   1) The structure of the hessian of the lagrangian (if "values" is nullptr)
-   *   2) The values of the hessian of the lagrangian (if "values" is not nullptr)
+   *   1) The structure of the hessian of the lagrangian (if "values" is
+   * nullptr) 2) The values of the hessian of the lagrangian (if "values" is not
+   * nullptr)
    */
   bool eval_h(int n, const double* x, bool new_x, double obj_factor, int m,
               const double* lambda, bool new_lambda, int nele_hess, int* iRow,
@@ -87,10 +89,9 @@ class PiecewiseJerkPathIpoptSolver : public Ipopt::TNLP {
                          double obj_value, const Ipopt::IpoptData* ip_data,
                          Ipopt::IpoptCalculatedQuantities* ip_cq) override;
 
-  void GetOptimizationResult(
-      std::vector<double>* ptr_opt_d,
-      std::vector<double>* ptr_opt_d_prime,
-      std::vector<double>* ptr_opt_d_pprime) const;
+  void GetOptimizationResult(std::vector<double>* ptr_opt_d,
+                             std::vector<double>* ptr_opt_d_prime,
+                             std::vector<double>* ptr_opt_d_pprime) const;
 
  private:
   int num_of_points_;
@@ -127,7 +128,6 @@ class PiecewiseJerkPathIpoptSolver : public Ipopt::TNLP {
 
   std::vector<double> opt_ddx_;
 };
-
 
 }  // namespace planning
 }  // namespace apollo

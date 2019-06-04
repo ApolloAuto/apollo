@@ -32,8 +32,8 @@ namespace cyber {
 
 /**
  * @class Writer<MessageT>
- * @brief The Channel Writer has only one function: publish message through the channel
- * pointed in its RoleAttributes
+ * @brief The Channel Writer has only one function: publish message through the
+ * channel pointed in its RoleAttributes
  *
  * @tparam MessageT Message Type of the Writer handles
  */

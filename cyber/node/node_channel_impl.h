@@ -49,7 +49,7 @@ struct ReaderConfig {  ///< configurations for a Reader
         qos_profile(other.qos_profile),
         pending_queue_size(other.pending_queue_size) {}
 
-  std::string channel_name;  //< channel reads
+  std::string channel_name;       //< channel reads
   proto::QosProfile qos_profile;  //< the qos configuration
   /**
    * @brief configuration for responding ChannelBuffer.
