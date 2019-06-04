@@ -55,7 +55,6 @@ bool Mapdatachecker::Start() {
     std::unique_ptr<Server> server(builder.BuildAndStart());
     // server->Wait();
     AINFO << "Server listening on " << _grpc_address;
-    AINFO << "Start HMI Server Successfully";
     apollo::cyber::WaitForShutdown();
     apollo::cyber::Clear();
     return true;

@@ -1,0 +1,86 @@
+syntax = "proto2";
+package adu.workers.collection;
+
+import "collection_data_message.proto";
+import "collection_check_message.proto";
+import "collection_error_code.proto";
+
+// FetchCollectionInfo API, APP used
+message FetchCollectionKeys {
+    repeated FetchCollectionKey keys = 1;     // request keys
+}
+
+enum FetchCollectionKey {
+    DISKINFO = 1;
+    RTK = 2;
+    DEVICE = 3;
+    BSINFO = 4;
+}
+
+enum TaskHandlerType {
+    TASK_QUERY = 0;
+    TASK_CLEAR = 1;
+    TASK_START = 2;
+    TASK_STOP = 3;
+}
+
+message DiskStatus {
+    optional ErrorCode code = 1;
+    optional DiskInfo diskinfo = 2;
+}
+
+message CarStatus {
+    optional ErrorCode code = 1;
+    optional double speed = 2;      // speed in m/s
+    optional double odo_meter = 3;  // odometer in km
+}
+
+message RtkStatus {
+    enum Status {
+        OUTSTANDING = 1;
+        GOOD = 2;
+        PASS = 3;
+        FAIL = 4;
+    }
+
+    optional ErrorCode code = 1;
+    optional Status rtk = 2;
+}
+
+message BSStatus {
+    optional ErrorCode code = 1;
+    optional string bsinfo = 2;
+}
+
+message FetchCollectionPackage {
+    optional ErrorCode code = 1;
+    optional DiskStatus diskstatus = 2;
+    optional CarStatus carstatus = 3;
+    optional RtkStatus rtkstatus = 4;
+    optional BSStatus bsstatus = 5;
+}
+
+// TaskHandler API, APP used
+message TaskRequest {
+    optional string collect_id = 1;
+    optional TaskHandlerType type = 2;
+    optional DataType data_type = 3;
+}
+
+// LoopsCollection API, APP used
+message LoopsCollectionRequest {
+    enum CollectionType {
+        START_COLLECTION = 1;
+        STOP_COLLECTION = 2;
+    }
+
+    optional CollectionType collection_type = 1;
+    optional DataType data_type = 2;
+}
+
+// DiskFormat API request has been defined in "collection_data_message.proto"
+// TaskHandler & DiskFormat & LoopsCollection response
+message StatusResponse {
+    required ErrorCode code = 1;
+    optional string errmsg = 2;
+}

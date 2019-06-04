@@ -1,0 +1,23 @@
+grpc_host_port: &grpc_host_port
+  grpc_host: "127.0.0.1"
+  grpc_port: "50100"
+
+client:
+  <<: *grpc_host_port
+
+channel_check:
+  check_period: 60
+  stop_flag_file: "channel_check.stop"
+  <<: *grpc_host_port
+
+static_align:
+  <<: *grpc_host_port
+
+eight_route:
+  <<: *grpc_host_port
+
+data_collect:
+  time_flag_file: "collect.time"
+
+loops_check:
+  <<: *grpc_host_port

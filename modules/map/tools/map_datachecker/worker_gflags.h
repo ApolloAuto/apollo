@@ -20,8 +20,6 @@ DECLARE_string(map_datachecker_host);
 DECLARE_string(map_datachecker_port);
 
 // Cybertron topics
-DECLARE_string(topic_inpspva);
-DECLARE_string(topic_inpspvax);
 DECLARE_string(topic_bestgnsspos);
 DECLARE_string(conf_json);
 

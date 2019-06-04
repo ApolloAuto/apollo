@@ -25,21 +25,13 @@ DEFINE_string(
 
 // Cybertron topics
 DEFINE_string(
-    topic_inpspva,
-    "/sensor/novatel/inspva",
-    "the topic name for pose");
-DEFINE_string(
-    topic_inpspvax,
-    "/sensor/novatel/inspvax",
-    "the topic name for status");
-DEFINE_string(
     topic_bestgnsspos,
-    "/sensor/novatel/bestgnsspos",
+    "/apollo/sensor/gnss/best_pose",
     "the topic name for pose and status");
 // configure file
 DEFINE_string(
     conf_json,
-    "/home/caros/kinglong/conf/map-datachecker.json",
+    "/apollo/modules/map/tools/map_datachecker/conf/map-datachecker.json",
     "configure file");
 
 }  // namespace collection

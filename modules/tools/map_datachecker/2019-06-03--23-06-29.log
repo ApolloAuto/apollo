@@ -1,0 +1,17 @@
+parsing command lines
+init logger
+WARNING: Logging before InitGoogleLogging() is written to STDERR
+I0603 23:06:29.073964 81366 global_data.cc:150] [map_datachecker] host ip: 172.20.70.15
+I0603 23:06:29.079824 81366 main.cc:28] [map_datachecker] starting worker
+I0603 23:06:29.079854 81366 worker.cc:31] [map_datachecker] Mapdatachecker::Start
+I0603 23:06:29.079866 81366 worker.cc:34] [map_datachecker] creating agent
+parsing command lines done
+parsing json config
+proj4 init success
+I0603 23:06:29.082402 81366 worker_agent.cc:32] [map_datachecker] MapDataCheckerAgent create successfully
+I0603 23:06:29.082425 81366 worker.cc:38] [map_datachecker] creating node
+I0603 23:06:29.091189 81366 worker_cyber_node.cc:50] [map_datachecker] create bestgnsspos reader, topic: /sensor/novatel/bestgnsspos
+I0603 23:06:29.312958 81366 scheduler.cc:55] [map_datachecker] create croutine: cybernode_map_datachecker_/sensor/novatel/bestgnsspos
+I0603 23:06:29.313294 81366 worker_cyber_node.cc:42] [map_datachecker] map-datachecker cyber node create successfully
+I0603 23:06:29.313321 81366 worker.cc:51] [map_datachecker] register service
+I0603 23:06:29.313885 81366 worker.cc:57] [map_datachecker] Server listening on 127.0.0.1:50100

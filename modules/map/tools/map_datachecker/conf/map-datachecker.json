@@ -1,12 +1,7 @@
 {
     "topic_list": {
-        "/sensor/novatel/bestgnsspos": 0.9,
-        "/sensor/velodyne16/right/VelodyneScan": 5,
-        "/sensor/velodyne16/left/VelodyneScan": 5,
-        "/sensor/velodyne16/back/VelodyneScan": 5,
-        "/sensor/camera/smartereye/image": 3
+        "/apollo/sensor/gnss/best_pose": 0.9
     },
-    "topic_to_get_pose": "/sensor/novatel/bestgnsspos",
     "start_time_debug": 0,
     "use_system_time": false,
     "topic_rate_tolerance": 1.0,
