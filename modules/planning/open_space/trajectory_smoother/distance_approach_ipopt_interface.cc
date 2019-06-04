@@ -446,7 +446,7 @@ bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
 bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
                                             int m, double* g) {
   eval_constraints(n, x, m, g);
-  if (enable_constraint_check_) check_g(n, x, m, g);
+  // if (enable_constraint_check_) check_g(n, x, m, g);
   return true;
 }
 

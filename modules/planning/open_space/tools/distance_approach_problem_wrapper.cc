@@ -325,6 +325,8 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
       FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
       << "Failed to load open space config file "
       << FLAGS_planner_open_space_config_filename;
+  AINFO << "FLAGS_planner_open_space_config_filename: "
+      << FLAGS_planner_open_space_config_filename;
 
   std::string flag_file_path = "/apollo/modules/planning/conf/planning.conf";
   google::SetCommandLineOption("flagfile", flag_file_path.c_str());
@@ -397,6 +399,12 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
       double piece_wise_ex = partition_trajectories[i].x.back();
       double piece_wise_ey = partition_trajectories[i].y.back();
       double piece_wise_ephi = partition_trajectories[i].phi.back();
+
+      if (planner_open_space_config_.enable_check_parallel_trajectory()) {
+        AINFO << "trajectory idx: " << i;
+        AINFO << "trajectory pt number: " << partition_trajectories[i].x.size();
+      }
+
       if (!DistanceSmoothing(planner_open_space_config_, *obstacles_ptr,
                              piece_wise_sx, piece_wise_sy, piece_wise_sphi,
                              piece_wise_ex, piece_wise_ey, piece_wise_ephi,
