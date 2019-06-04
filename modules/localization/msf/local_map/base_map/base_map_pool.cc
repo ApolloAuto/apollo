@@ -41,7 +41,9 @@ void BaseMapNodePool::Initial(const BaseMapConfig* map_config,
 }
 
 void BaseMapNodePool::Release() {
-  node_reset_workers_.get();
+  if (node_reset_workers_.valid()) {
+      node_reset_workers_.get();
+  }
   typename std::list<BaseMapNode*>::iterator i = free_list_.begin();
   while (i != free_list_.end()) {
     FinalizeMapNode(*i);
@@ -61,7 +63,9 @@ void BaseMapNodePool::Release() {
 
 BaseMapNode* BaseMapNodePool::AllocMapNode() {
   if (free_list_.empty()) {
-    node_reset_workers_.wait();
+    if (node_reset_workers_.valid()) {
+        node_reset_workers_.wait();
+    }
   }
   boost::unique_lock<boost::mutex> lock(mutex_);
   if (free_list_.empty()) {

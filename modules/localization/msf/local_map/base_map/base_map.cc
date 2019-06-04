@@ -174,7 +174,9 @@ void BaseMap::LoadMapNodes(std::set<MapNodeIndex>* map_ids) {
   }
 
   for (auto& future : load_futures_) {
-    future.get();
+    if (future.valid()) {
+        future.get();
+    }
   }
 
   // check in cacheL2 again
