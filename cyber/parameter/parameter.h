@@ -41,7 +41,7 @@ using apollo::cyber::proto::ParamType;
 class Parameter {
  public:
   /**
-   * @brief Empty contructor
+   * @brief Empty constructor
    */
   Parameter();
 
@@ -185,7 +185,7 @@ class Parameter {
   inline bool AsBool() const;
 
   /**
-   * @brief Get Paramter as a int64_t value
+   * @brief Get Paramter as an int64_t value
    *
    * @return int64_t int64 type result
    */

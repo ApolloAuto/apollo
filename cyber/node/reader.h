@@ -160,7 +160,7 @@ class Reader : public ReaderBase {
   virtual uint32_t GetHistoryDepth() const;
 
   /**
-   * @brief Get the lastest message we `Observe`
+   * @brief Get the latest message we `Observe`
    *
    * @return std::shared_ptr<MessageT> the latest message
    */
