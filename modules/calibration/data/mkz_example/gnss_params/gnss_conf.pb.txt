@@ -46,4 +46,35 @@ tf {
 
 # If given, the driver will send velocity info into novatel one time per second
 wheel_parameters: "SETWHEELPARAMETERS 100 1 1\r\n"
+gpsbin_folder: "/apollo/data/gpsbin"
 
+# login_commands: "UNLOGALL THISPORT\r\n"
+# login_commands: "SETIMUTOANTOFFSET 0 0.71 1.080 0.05 0.05 0.08\r\n"
+# login_commands: "SETINSOFFSET 0 0 0\r\n"
+# login_commands: "LOG COM2 GPRMC ONTIME 1.0 0.25\r\n"
+# login_commands: "EVENTOUTCONTROL MARK2 ENABLE POSITIVE 999999990 10\r\n"
+# login_commands: "EVENTOUTCONTROL MARK1 ENABLE POSITIVE 500000000 500000000\r\n"
+# login_commands: "LOG GPGGA ONTIME 1.0\r\n"
+
+# login_commands: "log bestgnssposb ontime 1\r\n"
+# login_commands: "log bestgnssvelb ontime 1\r\n"
+# login_commands: "log bestposb ontime 1\r\n"
+# login_commands: "log INSPVAXB ontime 1\r\n"
+# login_commands: "log INSPVASB ontime 0.01\r\n"
+# login_commands: "log CORRIMUDATASB ontime 0.01\r\n"
+# login_commands: "log RAWIMUSXB ontime 0.01\r\n"
+# login_commands: "log mark1pvab onnew\r\n"
+
+# login_commands: "log rangeb ontime 1\r\n"
+# login_commands: "log bdsephemerisb\r\n"
+# login_commands: "log gpsephemb\r\n"
+# login_commands: "log gloephemerisb\r\n"
+# login_commands: "log bdsephemerisb ontime 15\r\n"
+# login_commands: "log gpsephemb ontime 15\r\n"
+# login_commands: "log gloephemerisb ontime 15\r\n"
+
+# login_commands: "log imutoantoffsetsb once\r\n"
+# login_commands: "log vehiclebodyrotationb onchanged\r\n"
+
+# logout_commands: "EVENTOUTCONTROL MARK2 DISABLE\r\n"
+# logout_commands: "EVENTOUTCONTROL MARK1 DISABLE\r\n"
