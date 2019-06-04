@@ -64,15 +64,15 @@ class PiecewiseJerkPathIpoptSolver : public Ipopt::TNLP {
   bool eval_g(int n, const double* x, bool new_x, int m, double* g) override;
 
   /** Method to return:
-   *   1) The structure of the jacobian (if "values" is NULL)
-   *   2) The values of the jacobian (if "values" is not NULL)
+   *   1) The structure of the jacobian (if "values" is nullptr)
+   *   2) The values of the jacobian (if "values" is not nullptr)
    */
   bool eval_jac_g(int n, const double* x, bool new_x, int m, int nele_jac,
                   int* iRow, int* jCol, double* values) override;
 
   /** Method to return:
-   *   1) The structure of the hessian of the lagrangian (if "values" is NULL)
-   *   2) The values of the hessian of the lagrangian (if "values" is not NULL)
+   *   1) The structure of the hessian of the lagrangian (if "values" is nullptr)
+   *   2) The values of the hessian of the lagrangian (if "values" is not nullptr)
    */
   bool eval_h(int n, const double* x, bool new_x, double obj_factor, int m,
               const double* lambda, bool new_lambda, int nele_hess, int* iRow,
