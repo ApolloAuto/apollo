@@ -53,7 +53,7 @@ message PedestrianStatus {
 }
 
 message PullOverStatus {
-  optional bool is_feasible = 1 [default = true];
+  optional bool is_feasible = 1 [default = false];  // default must be false
   optional double x = 2 [default = 0.0];
   optional double y = 3 [default = 0.0];
   optional double theta = 4 [default = 0.0];
