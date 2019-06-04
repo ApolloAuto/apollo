@@ -147,7 +147,6 @@ bool PiecewiseJerkPathIpoptSolver::get_starting_point(int n, bool init_x,
                                                       int m, bool init_lambda,
                                                       double* lambda) {
   CHECK_EQ(num_of_variables_, n);
-  ;
 
   auto offset_dx = num_of_points_;
   auto offset_ddx = num_of_points_ + num_of_points_;
