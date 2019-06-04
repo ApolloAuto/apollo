@@ -57,7 +57,7 @@ class ParameterClient {
   /**
    * @brief Get the Parameter object
    *
-   * @param param_name 
+   * @param param_name
    * @param parameter the pointer to store
    * @return true
    * @return false call service fail or timeout

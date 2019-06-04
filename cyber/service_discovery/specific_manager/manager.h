@@ -70,7 +70,7 @@ class Manager {
 
   /**
    * @brief Startup topology discovery
-   * 
+   *
    * @param participant is used to create rtps Publisher and Subscriber
    * @return true if start successfully
    * @return false if start fail
@@ -89,7 +89,7 @@ class Manager {
 
   /**
    * @brief Join the topology
-   * 
+   *
    * @param attr is the attributes that will be sent to other Manager(include ourselves)
    * @param role is one of RoleType enum
    * @param need_publish Is need to publish out?
@@ -101,8 +101,8 @@ class Manager {
 
   /**
    * @brief Leave the topology
-   * 
-   * @param attr is the attributes that will be sent to other Manager(include ourselves) 
+   *
+   * @param attr is the attributes that will be sent to other Manager(include ourselves)
    * @param role if one of RoleType enum.
    * @return true if Leave topology successfully
    * @return false if Leave topology failed
@@ -111,7 +111,7 @@ class Manager {
 
   /**
    * @brief Add topology change listener, when topology changed, func will be called.
-   * 
+   *
    * @param func the callback function
    * @return ChangeConnection Store it to use when you want to stop listening.
    */
@@ -119,14 +119,14 @@ class Manager {
 
   /**
    * @brief Remove our listener for topology change.
-   * 
+   *
    * @param conn is the return value of `AddChangeListener`
    */
   void RemoveChangeListener(const ChangeConnection& conn);
 
   /**
    * @brief Called when a process' topology manager instance leave
-   * 
+   *
    * @param host_name is the process's host's name
    * @param process_id is the process' id
    */

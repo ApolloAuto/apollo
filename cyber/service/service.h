@@ -33,7 +33,7 @@ namespace cyber {
 /**
  * @class Service
  * @brief Service handles `Request` from the Client, and send a `Response` to it.
- * 
+ *
  * @tparam Request the request type
  * @tparam Response the response type
  */
@@ -44,7 +44,7 @@ class Service : public ServiceBase {
                                              std::shared_ptr<Response>&)>;
   /**
    * @brief Construct a new Service object
-   * 
+   *
    * @param node_name used to fill RoleAttribute when join the topology
    * @param service_name the service name we provide
    * @param service_callback reference of `ServiceCallback` object
@@ -59,7 +59,7 @@ class Service : public ServiceBase {
 
   /**
    * @brief Construct a new Service object
-   * 
+   *
    * @param node_name used to fill RoleAttribute when join the topology
    * @param service_name the service name we provide
    * @param service_callback rvalue reference of `ServiceCallback` object

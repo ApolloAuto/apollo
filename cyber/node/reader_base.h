@@ -51,7 +51,7 @@ class ReaderBase {
 
   /**
    * @brief Init the Reader object
-   * 
+   *
    * @return true if init successfully
    * @return false if init failed
    */
@@ -74,7 +74,7 @@ class ReaderBase {
 
   /**
    * @brief Query whether the Reader has data to be handled
-   * 
+   *
    * @return true if data container is empty
    * @return false if data container has data
    */
@@ -82,7 +82,7 @@ class ReaderBase {
 
   /**
    * @brief Query whether we have received data since last clear
-   * 
+   *
    * @return true if the reader has received data
    * @return false if the reader has not received data
    */
@@ -90,21 +90,21 @@ class ReaderBase {
 
   /**
    * @brief Get time interval of since last receive message
-   * 
+   *
    * @return double seconds delay
    */
   virtual double GetDelaySec() const = 0;
 
   /**
    * @brief Get the value of pending queue size
-   * 
+   *
    * @return uint32_t result value
    */
   virtual uint32_t PendingQueueSize() const = 0;
 
   /**
-   * @brief Query is there any writer that publish the subscribed channel 
-   * 
+   * @brief Query is there any writer that publish the subscribed channel
+   *
    * @return true if there is at least one Writer publish the channel
    * @return false if there is no Writer publish the channel
    */
@@ -112,14 +112,14 @@ class ReaderBase {
 
   /**
    * @brief Get all writers pushlish the channel we subscribes
-   * 
+   *
    * @param writers result RoleAttributes vector
    */
   virtual void GetWriters(std::vector<proto::RoleAttributes>* writers) {}
 
   /**
    * @brief Get Reader's Channel name
-   * 
+   *
    * @return const std::string& channel name
    */
   const std::string& GetChannelName() const {
@@ -128,14 +128,14 @@ class ReaderBase {
 
   /**
    * @brief Get Reader's Channel id
-   * 
+   *
    * @return uint64_t channel id
    */
   uint64_t ChannelId() const { return role_attr_.channel_id(); }
 
   /**
    * @brief Get qos profile. You can see qos description
-   * 
+   *
    * @return const proto::QosProfile& result qos
    */
   const proto::QosProfile& QosProfile() const {
@@ -144,7 +144,7 @@ class ReaderBase {
 
   /**
    * @brief Query whether the Reader is initialized
-   * 
+   *
    * @return true if the Reader has been inited
    * @return false if the Reader has not been inited
    */
@@ -157,11 +157,11 @@ class ReaderBase {
 
 /**
  * @brief One Channel is related to one Receiver.
- * ReceiverManager is in charge of attaching one Receiver to its responding Channel. 
+ * ReceiverManager is in charge of attaching one Receiver to its responding Channel.
  * We pass a DataDispatche's callback func to this Receiver so when a message is received,
  * it will be push to the `ChannelBuffer`, and `DataVisitor` will `Fetch` data and pass
  * to `Reader`'s callback func
- * 
+ *
  * @tparam MessageT Message Type.
  */
 template <typename MessageT>
@@ -171,7 +171,7 @@ class ReceiverManager {
 
   /**
    * @brief Get the Receiver object
-   * 
+   *
    * @param role_attr the attribute that the Receiver has
    * @return std::shared_ptr<transport::Receiver<MessageT>> result Receiver
    */
@@ -189,7 +189,7 @@ class ReceiverManager {
 
 /**
  * @brief Construct a new Receiver Manager< Message T>:: Receiver Manager object
- * 
+ *
  * @tparam MessageT param
  */
 template <typename MessageT>
