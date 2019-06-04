@@ -245,6 +245,10 @@ class MPCController : public Controller {
 
   const std::string name_;
 
+  double max_acceleration_when_stopped_ = 0.0;
+
+  double max_abs_speed_when_stopped_ = 0.0;
+
   double standstill_acceleration_ = 0.0;
 
   double throttle_lowerbound_ = 0.0;
