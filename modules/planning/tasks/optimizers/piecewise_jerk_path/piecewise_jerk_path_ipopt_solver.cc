@@ -256,7 +256,7 @@ bool PiecewiseJerkPathIpoptSolver::eval_jac_g(int n, const double* x,
   auto offset_v = num_of_points_;
   auto offset_a = 2 * num_of_points_;
 
-  if (values == NULL) {
+  if (values == nullptr) {
     int nz_index = 0;
     int constraint_index = 0;
 
