@@ -240,12 +240,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
     }
   }
 
-  if (pull_over_scenario) {
-    const auto& pull_over_status =
-        PlanningContext::Instance()->planning_status().pull_over();
-    pull_over_scenario = pull_over_status.is_feasible();
-  }
-
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
       if (pull_over_scenario) {
