@@ -71,8 +71,8 @@ class NodeChannelImpl {
 
   /**
    * @brief Construct a new Node Channel Impl object
-   * 
-   * @param node_name node name 
+   *
+   * @param node_name node name
    */
   explicit NodeChannelImpl(const std::string& node_name)
       : is_reality_mode_(true), node_name_(node_name) {
@@ -104,7 +104,7 @@ class NodeChannelImpl {
 
   /**
    * @brief get name of this node
-   * 
+   *
    * @return const std::string& actual node name
    */
   const std::string& NodeName() const { return node_name_; }

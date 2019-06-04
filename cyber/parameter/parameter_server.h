@@ -37,7 +37,7 @@ class Node;
  * If you want to set a key-value, and hope other nodes to get the value,
  * Routing, sensor internal/external references are set by Parameter Service
  * ParameterServer can set a parameter, and then you can get/list
- * paramter(s) by start a ParameterClient to send responding request 
+ * paramter(s) by start a ParameterClient to send responding request
  * @warning You should only have one ParameterServer works
  */
 class ParameterServer {

@@ -38,10 +38,10 @@ namespace cyber {
 /**
  * @class Client
  * @brief Client get `Response` from a responding `Service` by sending a Request
- * 
+ *
  * @tparam Request the `Service` request type
  * @tparam Response the `Service` response type
- * 
+ *
  * @warning One Client can only request one Service
  */
 template <typename Request, typename Response>
@@ -56,7 +56,7 @@ class Client : public ClientBase {
 
   /**
    * @brief Construct a new Client object
-   * 
+   *
    * @param node_name used to fill RoleAttribute
    * @param service_name service name the Client can request
    */
@@ -76,7 +76,7 @@ class Client : public ClientBase {
 
   /**
    * @brief Init the Client
-   * 
+   *
    * @return true if init successfully
    * @return false if init failed
    */
@@ -84,8 +84,8 @@ class Client : public ClientBase {
 
   /**
    * @brief Request the Service with a shared ptr Request type
-   * 
-   * @param request shared ptr of Request type 
+   *
+   * @param request shared ptr of Request type
    * @param timeout_s request timeout, if timeout, response will be empty
    * @return SharedResponse result of this request
    */
@@ -95,11 +95,11 @@ class Client : public ClientBase {
 
   /**
    * @brief Request the Service with a Request object
-   * 
+   *
    * @param request Request object
    * @param timeout_s request timeout, if timeout, response will be empty
    * @return SharedResponse result of this request
-   */  
+   */
   SharedResponse SendRequest(
       const Request& request,
       const std::chrono::seconds& timeout_s = std::chrono::seconds(5));
@@ -116,7 +116,7 @@ class Client : public ClientBase {
 
   /**
    * @brief Send Request shared ptr asynchronously and invoke `cb` after we get response
-   * 
+   *
    * @param request Request shared ptr
    * @param cb callback function after we get response
    * @return SharedFuture a `std::future` shared ptr
@@ -135,7 +135,7 @@ class Client : public ClientBase {
 
   /**
    * @brief wait for the connection with the Service established
-   * 
+   *
    * @tparam RatioT timeout unit, default is std::milli
    * @param timeout wait time in unit of `RatioT`
    * @return true if the connection established

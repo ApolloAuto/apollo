@@ -77,7 +77,7 @@ class TopologyManager {
 
   /**
    * @brief To observe the topology change, you can register a `ChangeFunc`
-   * 
+   *
    * @param func is the observe function
    * @return ChangeConnection is the connection that connected to `change_signal_`.
    * Used to Remove your observe function

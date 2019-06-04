@@ -42,7 +42,7 @@ class NodeServiceImpl {
 
   /**
    * @brief Construct a new Node Service Impl object
-   * 
+   *
    * @param node_name node name
    */
   explicit NodeServiceImpl(const std::string& node_name)
@@ -61,7 +61,7 @@ class NodeServiceImpl {
 
   /**
    * @brief Destroy the Node Service Impl object
-   * 
+   *
    */
   ~NodeServiceImpl() {}
 
