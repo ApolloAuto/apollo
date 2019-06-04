@@ -44,9 +44,6 @@ DEFINE_string(current_mode_db_key, "/apollo/hmi/status:current_mode",
 DEFINE_string(default_hmi_mode, "Mkz Standard Debug",
               "Default HMI Mode when there is no cache.");
 
-DEFINE_string(container_meta_ini, "/apollo/meta.ini",
-              "Container meta info file.");
-
 namespace apollo {
 namespace dreamview {
 namespace {
@@ -553,8 +550,8 @@ void HMIWorker::RecordAudio(const std::string& data) {
 }
 
 void HMIWorker::StatusUpdateThreadLoop() {
-  const size_t kLoopIntervalMs = 200;
   while (!stop_) {
+    static constexpr int kLoopIntervalMs = 200;
     std::this_thread::sleep_for(std::chrono::milliseconds(kLoopIntervalMs));
     bool status_changed = false;
     {
