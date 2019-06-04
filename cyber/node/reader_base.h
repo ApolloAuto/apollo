@@ -39,7 +39,7 @@ using apollo::cyber::event::TransPerf;
  * @class ReaderBase
  * @brief Base Class for Reader
  * Reader is identified by one apollo::cyber::proto::RoleAttribute,
- * it constains the channel_name, channel_id that we subscribe,
+ * it constrains the channel_name, channel_id that we subscribe,
  * and host_name, process_id and node that we are located,
  * and qos that describes our transportation quality.
  */

@@ -47,7 +47,7 @@ using apollo::cyber::proto::RoleAttributes;
  *
  * @tparam M0 the first message.
  * @tparam M1 the second message.
- * @tparam M2 the thrid message.
+ * @tparam M2 the third message.
  * @tparam M3 the fourth message.
  * @warning The Init & Proc functions need to be overloaded, but don't want to
  * be called. They are called by the CyberRT Frame.
