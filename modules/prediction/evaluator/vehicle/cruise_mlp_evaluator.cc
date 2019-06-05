@@ -130,7 +130,7 @@ bool CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       ModelInference(torch_inputs, torch_cutin_model_ptr_, lane_sequence_ptr);
     }
   }
-  return false;
+  return true;
 }
 
 void CruiseMLPEvaluator::ExtractFeatureValues(
