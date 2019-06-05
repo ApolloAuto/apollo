@@ -170,6 +170,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
 
   bool pull_over_scenario =
       (frame.reference_line_info().size() == 1 &&  // NO, while changing lane
+       adc_distance_to_dest >=
+           scenario_config.pull_over_min_distance_buffer() &&
        adc_distance_to_dest <=
            scenario_config.start_pull_over_scenario_distance());
 
@@ -177,7 +179,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
   if (pull_over_scenario) {
     const auto& pull_over_status =
         PlanningContext::Instance()->planning_status().pull_over();
-    if (adc_distance_to_dest < scenario_config.pull_over_min_buffer() &&
+    if (adc_distance_to_dest < scenario_config.max_distance_stop_search() &&
         !pull_over_status.is_feasible()) {
       pull_over_scenario = false;
     }
