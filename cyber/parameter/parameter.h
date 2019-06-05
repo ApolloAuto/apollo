@@ -136,7 +136,7 @@ class Parameter {
    * @brief Parse a cyber::proto::Param object to
    * cyber::parameter::Parameter object
    * @param param The cyber::proto::Param object parse from
-   * @param parameter A pointer to the target Parameter object
+   * A pointer to the target Parameter object
    * @return True if parse ok, otherwise False
    */
   void FromProtoParam(const Param& param);
