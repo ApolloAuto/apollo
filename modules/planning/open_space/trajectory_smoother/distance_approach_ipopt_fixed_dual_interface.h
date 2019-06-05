@@ -50,8 +50,8 @@
 namespace apollo {
 namespace planning {
 
-class DistanceApproachIPOPTFixedDualInterface :
-    public DistanceApproachInterface {
+class DistanceApproachIPOPTFixedDualInterface
+    : public DistanceApproachInterface {
  public:
   explicit DistanceApproachIPOPTFixedDualInterface(
       const size_t horizon, const double ts, const Eigen::MatrixXd& ego,

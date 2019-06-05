@@ -326,7 +326,7 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
       << "Failed to load open space config file "
       << FLAGS_planner_open_space_config_filename;
   AINFO << "FLAGS_planner_open_space_config_filename: "
-      << FLAGS_planner_open_space_config_filename;
+        << FLAGS_planner_open_space_config_filename;
 
   std::string flag_file_path = "/apollo/modules/planning/conf/planning.conf";
   google::SetCommandLineOption("flagfile", flag_file_path.c_str());

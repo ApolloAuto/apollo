@@ -444,8 +444,8 @@ int PathBoundsDecider::IsPointWithinPathBound(
   common::SLPoint point_sl;
   reference_line_info.reference_line().XYToSL({x, y}, &point_sl);
   if (point_sl.s() > std::get<0>(path_bound.back()) ||
-      point_sl.s() < std::get<0>(path_bound.front()) -
-          kPathBoundsDeciderResolution * 2) {
+      point_sl.s() <
+          std::get<0>(path_bound.front()) - kPathBoundsDeciderResolution * 2) {
     ADEBUG << "Longitudinally outside the boundary.";
     return -1;
   }
@@ -455,8 +455,9 @@ int PathBoundsDecider::IsPointWithinPathBound(
     ++idx_after;
   }
   ADEBUG << "The idx_after = " << idx_after;
-  ADEBUG << "The boundary is: " << "[" << std::get<1>(path_bound[idx_after])
-         << ", " << std::get<2>(path_bound[idx_after]) << "].";
+  ADEBUG << "The boundary is: "
+         << "[" << std::get<1>(path_bound[idx_after]) << ", "
+         << std::get<2>(path_bound[idx_after]) << "].";
   ADEBUG << "The point is at: " << point_sl.l();
   int idx_before = idx_after - 1;
   if (std::get<1>(path_bound[idx_before]) <= point_sl.l() &&
@@ -556,8 +557,8 @@ bool PathBoundsDecider::SearchPullOverPosition(
       const auto& reference_line = reference_line_info.reference_line();
       const auto& pull_over_point = path_bound[(i + j) / 2];
       const double pull_over_s = std::get<0>(pull_over_point);
-      const double pull_over_l = std::get<1>(pull_over_point) +
-          pull_over_space_width / 2.0;
+      const double pull_over_l =
+          std::get<1>(pull_over_point) + pull_over_space_width / 2.0;
       common::SLPoint pull_over_sl_point;
       pull_over_sl_point.set_s(pull_over_s);
       pull_over_sl_point.set_l(pull_over_l);
