@@ -270,7 +270,7 @@ function main(){
     docker pull ${PADDLE_VOLUME_IMAGE}
     docker run -it -d --rm --name ${PADDLE_VOLUME} ${PADDLE_VOLUME_IMAGE}
 
-    OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${PADDLE_VOLUME}"
+    OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCALIZATION_VOLUME} --volumes-from ${PADDLE_VOLUME}"
 
     local display=""
     if [[ -z ${DISPLAY} ]];then
@@ -302,6 +302,8 @@ function main(){
         USE_GPU=0
     fi
 
+    set -x
+
     ${DOCKER_CMD} run -it \
         -d \
         --privileged \
@@ -327,7 +329,7 @@ function main(){
         -v /dev/null:/dev/raw1394 \
         $IMG \
         /bin/bash
-
+    set +x
     if [ $? -ne 0 ];then
         error "Failed to start docker container \"${APOLLO_DEV}\" based on image: $IMG"
         exit 1
