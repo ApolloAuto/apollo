@@ -49,7 +49,13 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     PathData* const final_path_data) {
   const auto init_frenet_state = reference_line.ToFrenetFrame(init_point);
 
-  const auto& piecewise_jerk_path_config = config_.piecewise_jerk_path_config();
+  // Choose lane_change_path_config for lane-change cases
+  // Otherwise, choose default_path_config for normal path planning
+  const auto& piecewise_jerk_path_config =
+      reference_line_info_->IsChangeLanePath()
+          ? config_.piecewise_jerk_path_config().lane_change_path_config()
+          : config_.piecewise_jerk_path_config().default_path_config();
+
   std::array<double, 5> w = {
       piecewise_jerk_path_config.l_weight(),
       piecewise_jerk_path_config.dl_weight() *

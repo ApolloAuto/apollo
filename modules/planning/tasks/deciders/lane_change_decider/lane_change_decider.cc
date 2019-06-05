@@ -228,8 +228,8 @@ bool LaneChangeDecider::IsClearToChangeLane(
     // TODO(All) move to confs
     constexpr double kSafeTimeOnSameDirection = 3.0;
     constexpr double kSafeTimeOnOppositeDirection = 5.0;
-    constexpr double kForwardMinSafeDistanceOnSameDirection = 6.0;
-    constexpr double kBackwardMinSafeDistanceOnSameDirection = 8.0;
+    constexpr double kForwardMinSafeDistanceOnSameDirection = 3.0;
+    constexpr double kBackwardMinSafeDistanceOnSameDirection = 4.0;
     constexpr double kForwardMinSafeDistanceOnOppositeDirection = 50.0;
     constexpr double kBackwardMinSafeDistanceOnOppositeDirection = 1.0;
     constexpr double kDistanceBuffer = 0.5;

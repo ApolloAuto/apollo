@@ -14,10 +14,18 @@ standard_planning_config {
 default_task_config: {
   task_type: PIECEWISE_JERK_PATH_OPTIMIZER
   piecewise_jerk_path_config {
-    l_weight: 1.0
-    dl_weight: 20.0
-    ddl_weight: 1000.0
-    dddl_weight: 50000.0
+    default_path_config {
+      l_weight: 1.0
+      dl_weight: 20.0
+      ddl_weight: 1000.0
+      dddl_weight: 50000.0
+    }
+    lane_change_path_config {
+      l_weight: 1.0
+      dl_weight: 5.0
+      ddl_weight: 800.0
+      dddl_weight: 30000.0
+    }
   }
 }
 default_task_config: {
