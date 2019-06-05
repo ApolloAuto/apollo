@@ -102,7 +102,9 @@ class OpenSpaceRoiDecider : public Decider {
                           std::vector<std::vector<common::math::Vec2d>>
                               *const roi_parking_boundary);
 
-  bool GetPullOverBoundary(Frame *const frame, const hdmap::Path &nearby_path,
+  bool GetPullOverBoundary(Frame *const frame,
+                           const std::array<common::math::Vec2d, 4> &vertices,
+                           const hdmap::Path &nearby_path,
                            std::vector<std::vector<common::math::Vec2d>>
                                *const roi_parking_boundary);
 

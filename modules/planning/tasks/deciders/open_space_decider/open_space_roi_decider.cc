@@ -60,6 +60,9 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
 
   std::array<Vec2d, 4> spot_vertices;
   Path nearby_path;
+  // @brief vector of different obstacle consisting of vertice points.The
+  // obstacle and the vertices order are in counter-clockwise order
+  std::vector<std::vector<common::math::Vec2d>> roi_boundary;
 
   const auto &roi_type = config_.open_space_roi_decider_config().roi_type();
   if (roi_type == OpenSpaceRoiDeciderConfig::PARKING) {
@@ -84,6 +87,12 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
     SetOrigin(frame, spot_vertices);
 
     SetParkingSpotEndPose(frame, spot_vertices);
+
+    if (!GetParkingBoundary(frame, spot_vertices, nearby_path, &roi_boundary)) {
+      const std::string msg = "Fail to get parking boundary from map";
+      AERROR << msg;
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+    }
   } else if (roi_type == OpenSpaceRoiDeciderConfig::PULL_OVER) {
     if (!GetPullOverSpot(frame, &spot_vertices, &nearby_path)) {
       const std::string msg = "Fail to get parking boundary from map";
@@ -94,18 +103,16 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
     SetOrigin(frame, spot_vertices);
 
     SetPullOverSpotEndPose(frame);
+
+    if (!GetPullOverBoundary(frame, spot_vertices, nearby_path,
+                             &roi_boundary)) {
+      const std::string msg = "Fail to get parking boundary from map";
+      AERROR << msg;
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+    }
   } else {
     const std::string msg =
         "chosen open space roi secenario type not implemented";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
-
-  // @brief vector of different obstacle consisting of vertice points.The
-  // obstacle and the vertices order are in counter-clockwise order
-  std::vector<std::vector<common::math::Vec2d>> roi_boundary;
-  if (!GetParkingBoundary(frame, spot_vertices, nearby_path, &roi_boundary)) {
-    const std::string msg = "Fail to get parking boundary from map";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -559,8 +566,99 @@ bool OpenSpaceRoiDecider::GetParkingBoundary(
 }
 
 bool OpenSpaceRoiDecider::GetPullOverBoundary(
-    Frame *const frame, const hdmap::Path &nearby_path,
+    Frame *const frame, const std::array<common::math::Vec2d, 4> &vertices,
+    const hdmap::Path &nearby_path,
     std::vector<std::vector<common::math::Vec2d>> *const roi_parking_boundary) {
+  auto left_top = vertices[0];
+  auto left_down = vertices[1];
+  auto right_down = vertices[2];
+  auto right_top = vertices[3];
+
+  const auto &origin_point = frame->open_space_info().origin_point();
+  const auto &origin_heading = frame->open_space_info().origin_heading();
+
+  double left_top_s = 0.0;
+  double left_top_l = 0.0;
+  double right_top_s = 0.0;
+  double right_top_l = 0.0;
+  if (!(nearby_path.GetProjection(left_top, &left_top_s, &left_top_l) &&
+        nearby_path.GetProjection(right_top, &right_top_s, &right_top_l))) {
+    AERROR << "fail to get parking spot points' projections on reference line";
+    return false;
+  }
+
+  left_top -= origin_point;
+  left_top.SelfRotate(-origin_heading);
+  left_down -= origin_point;
+  left_down.SelfRotate(-origin_heading);
+  right_top -= origin_point;
+  right_top.SelfRotate(-origin_heading);
+  right_down -= origin_point;
+  right_down.SelfRotate(-origin_heading);
+
+  const double center_line_s = (left_top_s + right_top_s) / 2.0;
+  std::vector<Vec2d> left_lane_boundary;
+  std::vector<Vec2d> right_lane_boundary;
+  std::vector<Vec2d> center_lane_boundary;
+  std::vector<double> center_lane_s;
+  std::vector<double> left_lane_road_width;
+  std::vector<double> right_lane_road_width;
+
+  GetRoadBoundary(nearby_path, center_line_s, origin_point, origin_heading,
+                  &left_lane_boundary, &right_lane_boundary,
+                  &center_lane_boundary, &center_lane_s, &left_lane_road_width,
+                  &right_lane_road_width);
+
+  // Load boundary as line segments in counter-clockwise order
+  std::reverse(left_lane_boundary.begin(), left_lane_boundary.end());
+
+  std::vector<Vec2d> boundary_points;
+  std::copy(right_lane_boundary.begin(), right_lane_boundary.end(),
+            std::back_inserter(boundary_points));
+  std::copy(left_lane_boundary.begin(), left_lane_boundary.end(),
+            std::back_inserter(boundary_points));
+
+  size_t right_lane_boundary_last_index = right_lane_boundary.size() - 1;
+  for (size_t i = 0; i < right_lane_boundary_last_index; i++) {
+    std::vector<Vec2d> segment{right_lane_boundary[i],
+                               right_lane_boundary[i + 1]};
+    roi_parking_boundary->push_back(segment);
+  }
+
+  size_t left_lane_boundary_last_index = left_lane_boundary.size() - 1;
+  for (size_t i = left_lane_boundary_last_index; i > 0; i--) {
+    std::vector<Vec2d> segment{left_lane_boundary[i],
+                               left_lane_boundary[i - 1]};
+    roi_parking_boundary->push_back(segment);
+  }
+
+  // Fuse line segments into convex contraints
+  if (!FuseLineSegments(roi_parking_boundary)) {
+    return false;
+  }
+  // Get xy boundary
+  auto xminmax = std::minmax_element(
+      boundary_points.begin(), boundary_points.end(),
+      [](const Vec2d &a, const Vec2d &b) { return a.x() < b.x(); });
+  auto yminmax = std::minmax_element(
+      boundary_points.begin(), boundary_points.end(),
+      [](const Vec2d &a, const Vec2d &b) { return a.y() < b.y(); });
+  std::vector<double> ROI_xy_boundary{xminmax.first->x(), xminmax.second->x(),
+                                      yminmax.first->y(), yminmax.second->y()};
+  auto *xy_boundary =
+      frame->mutable_open_space_info()->mutable_ROI_xy_boundary();
+  xy_boundary->assign(ROI_xy_boundary.begin(), ROI_xy_boundary.end());
+
+  Vec2d vehicle_xy = Vec2d(vehicle_state_.x(), vehicle_state_.y());
+  vehicle_xy -= origin_point;
+  vehicle_xy.SelfRotate(-origin_heading);
+  if (vehicle_xy.x() < ROI_xy_boundary[0] ||
+      vehicle_xy.x() > ROI_xy_boundary[1] ||
+      vehicle_xy.y() < ROI_xy_boundary[2] ||
+      vehicle_xy.y() > ROI_xy_boundary[3]) {
+    AERROR << "vehicle outside of xy boundary of parking ROI";
+    return false;
+  }
   return true;
 }
 
