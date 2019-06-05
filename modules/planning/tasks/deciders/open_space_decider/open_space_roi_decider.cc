@@ -261,8 +261,9 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
         check_point_s != start_s && check_point_s != end_s) {
       index += 1.0;
       check_point_s =
+          start_s +
           index *
-          config_.open_space_roi_decider_config().roi_linesegment_length();
+              config_.open_space_roi_decider_config().roi_linesegment_length();
       check_point_s = check_point_s >= end_s ? end_s : check_point_s;
       last_check_point_heading = check_point_heading;
       continue;
@@ -292,8 +293,9 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
     }
     index += 1.0;
     check_point_s =
+        start_s +
         index *
-        config_.open_space_roi_decider_config().roi_linesegment_length();
+            config_.open_space_roi_decider_config().roi_linesegment_length();
     check_point_s = check_point_s >= end_s ? end_s : check_point_s;
     last_check_point_heading = check_point_heading;
   }
