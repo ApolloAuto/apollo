@@ -5,11 +5,10 @@ partners.
 
 ## Prerequisite
 
-1. Install and activate the corresponding Conda environment.
+1. Activate the Python 3 Conda environment.
 
    ```bash
-   conda env update -f conf/conda-py37.yaml
-   source activate fuel-proxy
+   source activate py37
    ```
 
 1. You should have your own S3-compatible cloud storage. Currently we support:
