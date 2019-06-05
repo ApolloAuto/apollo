@@ -131,6 +131,9 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
   }
 }
 
+// TODO(QiL): refactor and merge with CheckADCPullOver
+PullOverStatus CheckADCPullOverOpenSpace() { return PARK_FAIL; }
+
 }  // namespace util
 }  // namespace scenario
 }  // namespace planning

@@ -40,6 +40,8 @@ hdmap::PathOverlap* GetOverlapOnReferenceLine(
 PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
                                 const ScenarioPullOverConfig& scenario_config);
 
+PullOverStatus CheckADCPullOverOpenSpace();
+
 }  // namespace util
 }  // namespace scenario
 }  // namespace planning
