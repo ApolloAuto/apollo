@@ -225,13 +225,13 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
       // check neighbor lanes type: NONE/CITY_DRIVING/BIKING/SIDEWALK/PARKING
       bool rightmost_driving_lane = true;
       for (const auto& neighbor_lane_id :
-          lane->lane().right_neighbor_forward_lane_id()) {
+           lane->lane().right_neighbor_forward_lane_id()) {
         const auto hdmap_ptr = HDMapUtil::BaseMapPtr();
         CHECK_NOTNULL(hdmap_ptr);
         const auto neighbor_lane = hdmap_ptr->GetLaneById(neighbor_lane_id);
         if (neighbor_lane == nullptr) {
-          ADEBUG << "Failed to find neighbor lane["
-                 << neighbor_lane_id.id() << "]";
+          ADEBUG << "Failed to find neighbor lane[" << neighbor_lane_id.id()
+                 << "]";
           continue;
         }
         const auto& lane_type = neighbor_lane->lane().type();
