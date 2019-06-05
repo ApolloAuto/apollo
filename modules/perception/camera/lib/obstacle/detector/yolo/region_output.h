@@ -116,6 +116,11 @@ struct MinDims {
   float min_3d_width = 0.0f;
 };
 
+constexpr float minExpPower = -10.0f;
+constexpr float maxExpPower = 5.0f;
+constexpr int anchorSizeFactor = 2;
+constexpr int numScales = 3;
+
 __host__ __device__ float sigmoid_gpu(float x);
 __host__ __device__ float bbox_size_gpu(const float *bbox,
                                         const bool normalized);

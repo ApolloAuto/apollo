@@ -152,7 +152,7 @@ void YoloObstacleDetector::InitYoloBlob(const yolo::NetworkParam &net_param) {
   int output_width_scale1 = obj_blob_scale1->shape(2);
   int obj_size =
     output_height_scale1 * output_width_scale1 *
-    static_cast<int>(anchors_.size()) / 2;
+    static_cast<int>(anchors_.size()) / anchorSizeFactor;
   if (obj_blob_scale2) {
     int output_height_scale2 = obj_blob_scale2->shape(1);
     int output_width_scale2 = obj_blob_scale2->shape(2);
@@ -162,7 +162,7 @@ void YoloObstacleDetector::InitYoloBlob(const yolo::NetworkParam &net_param) {
       (output_height_scale1 * output_width_scale1 +
        output_height_scale2 * output_width_scale2 +
        output_height_scale3 * output_width_scale3) *
-      static_cast<int>(anchors_.size()) / 2 / 3;
+      static_cast<int>(anchors_.size()) / anchorSizeFactor / numScales;
   }
 
   yolo_blobs_.res_box_blob.reset(

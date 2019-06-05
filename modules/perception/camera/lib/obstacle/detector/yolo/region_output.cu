@@ -129,11 +129,12 @@ __global__ void get_object_kernel(int n,
     float scale = obj_data[loc_index];
     float cx = (w + sigmoid_gpu(loc_data[offset_loc + 0])) / width;
     float cy = (h + sigmoid_gpu(loc_data[offset_loc + 1])) / height;
-    float hw = exp(max(-10.0f, min(loc_data[offset_loc + 2], 5.0f))) *
-                   anchor_data[2 * c] / width * 0.5;
+    float hw = 
+        exp(max(minExpPower, min(loc_data[offset_loc + 2], maxExpPower))) *
+        anchor_data[2 * c] / width * 0.5;
     float hh =
-        exp(max(-10.0f, min(loc_data[offset_loc + 3], 5.0f))) *
-            anchor_data[2 * c + 1] / height * 0.5;
+        exp(max(minExpPower, min(loc_data[offset_loc + 3], maxExpPower))) *
+        anchor_data[2 * c + 1] / height * 0.5;
    
     float max_prob = 0.f;
     int max_index = 0;
@@ -458,7 +459,7 @@ void get_objects_gpu(const YoloBlobs &yolo_blobs,
   int num_anchor = yolo_blobs.anchor_blob->shape(2);
   int num_anchor_per_scale = num_anchor;
   if (multi_scale){
-    num_anchor_per_scale /= 3;
+    num_anchor_per_scale /= numScales;
   }
   CHECK_EQ(batch, 1) << "batch size should be 1!";
  
@@ -603,8 +604,9 @@ void get_objects_gpu(const YoloBlobs &yolo_blobs,
                   idx_sm,
                   stream);
     num_kept += indices[types[k]].size();
-    std::vector<float> conf_score(cpu_cls_data + k * all_scales_num_candidates,
-                            cpu_cls_data + (k + 1) * all_scales_num_candidates);
+    std::vector<float> conf_score(
+                         cpu_cls_data + k * all_scales_num_candidates,
+                         cpu_cls_data + (k + 1) * all_scales_num_candidates);
     conf_scores.insert(std::make_pair(types[k], conf_score));
     cudaStreamSynchronize(stream);
   }
