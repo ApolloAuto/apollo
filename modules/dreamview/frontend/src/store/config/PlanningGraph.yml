@@ -213,7 +213,7 @@ planningKappaGraph:
     properties:
         lines:
             Trajectory:
-                color: 'rgba(1, 209, 193, 0.8)' # turkish green
+                color: 'rgba(1, 209, 193, 0.8)' # Turkish green
                 borderWidth: 2
                 pointRadius: 0
                 fill: false
@@ -253,7 +253,7 @@ planningDkappaGraph:
     properties:
         lines:
             Trajectory:
-                color: 'rgba(1, 209, 193, 0.8)' # turkish green
+                color: 'rgba(1, 209, 193, 0.8)' # Turkish green
                 borderWidth: 2
                 pointRadius: 0
                 fill: false
@@ -297,7 +297,7 @@ planningThetaGraph:
     properties:
         lines:
             Trajectory:
-                color: 'rgba(1, 209, 193, 0.8)' # turkish green
+                color: 'rgba(1, 209, 193, 0.8)' # Turkish green
                 borderWidth: 2
                 pointRadius: 0
                 fill: false
