@@ -182,7 +182,7 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
   linear_acceleration->set_y(vec_acceleration(1));
   linear_acceleration->set_z(vec_acceleration(2));
 
-  vec_acceleration_vrf = quaternion.inverse() * vec_acceleration;
+  Eigen::Vector3d vec_acceleration_vrf = quaternion.inverse() * vec_acceleration;
 
   apollo::common::Point3D* linear_acceleration_vrf =
       posepb_loc->mutable_linear_acceleration_vrf();
