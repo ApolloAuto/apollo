@@ -233,8 +233,8 @@ void PiecewiseJerkProblem::CalculateAffineConstraint(
   for (int i = 0; i + 1 < N; ++i) {
     columns[2 * N + i].emplace_back(constraint_index, -1.0);
     columns[2 * N + i + 1].emplace_back(constraint_index, 1.0);
-    lower_bounds->at(constraint_index) = -dddx_bound_ * delta_s_;
-    upper_bounds->at(constraint_index) = dddx_bound_ * delta_s_;
+    lower_bounds->at(constraint_index) = dddx_bound_.first * delta_s_;
+    upper_bounds->at(constraint_index) = dddx_bound_.second * delta_s_;
     ++constraint_index;
   }
 
