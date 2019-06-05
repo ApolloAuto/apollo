@@ -263,7 +263,14 @@ function main(){
     docker pull ${LOCALIZATION_VOLUME_IMAGE}
     docker run -it -d --rm --name ${LOCALIZATION_VOLUME} ${LOCALIZATION_VOLUME_IMAGE}
 
-    OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCALIZATION_VOLUME}"
+    PADDLE_VOLUME=apollo_paddlepaddle_volume_$USER
+    docker stop ${PADDLE_VOLUME} > /dev/null 2>&1
+
+    PADDLE_VOLUME_IMAGE=${DOCKER_REPO}:paddlepaddle_volume-${ARCH}-latest
+    docker pull ${PADDLE_VOLUME_IMAGE}
+    docker run -it -d --rm --name ${PADDLE_VOLUME} ${PADDLE_VOLUME_IMAGE}
+
+    OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${PADDLE_VOLUME}"
 
     local display=""
     if [[ -z ${DISPLAY} ]];then
