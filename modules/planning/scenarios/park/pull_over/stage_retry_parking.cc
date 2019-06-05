@@ -53,7 +53,7 @@ Stage::StageStatus PullOverStageRetryParking::Process(
   }
 
   scenario::util::PullOverStatus status =
-      scenario::util::CheckADCPullOverOpenSpace();
+      scenario::util::CheckADCPullOverOpenSpace(scenario_config_);
   if (status == scenario::util::PASS_DESTINATION ||
       status == scenario::util::PARK_COMPLETE) {
     return FinishStage();
