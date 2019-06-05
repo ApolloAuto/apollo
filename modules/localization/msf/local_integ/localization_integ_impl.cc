@@ -166,8 +166,8 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
       integ_localization.pose().orientation();
   Eigen::Quaternion<double> quaternion(orientation.qw(), orientation.qx(),
                                        orientation.qy(), orientation.qz());
-  Eigen::Vector3d vec_acceleration = static_cast<Eigen::Vector3d>(
-      quaternion * orig_acceleration);
+  Eigen::Vector3d vec_acceleration =
+      static_cast<Eigen::Vector3d>(quaternion * orig_acceleration);
 
   // Remove gravity.
   // Gravity on the Earth's surface varies by around 0.7%.
@@ -182,7 +182,8 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
   linear_acceleration->set_y(vec_acceleration(1));
   linear_acceleration->set_z(vec_acceleration(2));
 
-  Eigen::Vector3d vec_acceleration_vrf = quaternion.inverse() * vec_acceleration;
+  Eigen::Vector3d vec_acceleration_vrf =
+      quaternion.inverse() * vec_acceleration;
 
   apollo::common::Point3D* linear_acceleration_vrf =
       posepb_loc->mutable_linear_acceleration_vrf();
