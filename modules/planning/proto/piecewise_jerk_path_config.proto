@@ -3,6 +3,10 @@ syntax = "proto2";
 package apollo.planning;
 
 message PiecewiseJerkPathConfig {
+  optional PiecewiseJerkPathWeights default_path_config = 1;
+  optional PiecewiseJerkPathWeights lane_change_path_config = 2;
+}
+message PiecewiseJerkPathWeights {
   optional double l_weight = 1 [default = 1.0];
   optional double dl_weight = 2 [default = 100.0];
   optional double ddl_weight = 3 [default = 1000.0];
