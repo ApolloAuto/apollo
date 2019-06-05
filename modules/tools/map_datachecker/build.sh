@@ -24,8 +24,8 @@ MAP_DATACHECKER_PROTO_PATH="${APOLLO_ROOT_PATH}/modules/tools/map_datachecker/pr
 
 WORK_PATH=$(pwd)
 # export LD_LIBRARY_PATH=${WORK_PATH}/../../../third_party/protobuf/lib:$LD_LIBRARY_PATH
-# export PYTHONPATH=${SCRIPT_PATH}:${PYTHONPATH}
-export PYTHONPATH=/home/yyj/.cache/bazel/_bazel_yyj/fc32bb8f580b2c0edf12f203675eb3f2/external/com_github_grpc_grpc/tools/distrib/python/grpcio_tools:${PYTHONPATH}
+export PYTHONPATH=${SCRIPT_PATH}:${PYTHONPATH}
+# export PYTHONPATH=/home/yyj/.cache/bazel/_bazel_yyj/fc32bb8f580b2c0edf12f203675eb3f2/external/com_github_grpc_grpc/tools/distrib/python/grpcio_tools:${PYTHONPATH}
 
 PROTOC="protoc"
 PROTO_OUT="${SCRIPT_PATH}/py_proto"
