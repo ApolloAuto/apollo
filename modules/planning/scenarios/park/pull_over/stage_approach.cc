@@ -38,7 +38,7 @@ PullOverStageApproach::PullOverStageApproach(
 
 Stage::StageStatus PullOverStageApproach::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
-  AERROR << "stage: Approach";
+  ADEBUG << "stage: Approach";
   CHECK_NOTNULL(frame);
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
