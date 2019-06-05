@@ -10,14 +10,17 @@ import { timestampMsToTimeString } from "utils/misc";
 export default class PlanningMonitor extends React.Component {
     generateStGraph(stGraph) {
         const graphs = [];
-        const names = ['DpStSpeedOptimizer', 'PiecewiseJerkSpeedOptimizer'];
-        for (const name of names) {
-            const graph = stGraph[name];
+        const displayNames = {
+            'DpStSpeedOptimizer': 'Speed Heuristic',
+            'PiecewiseJerkSpeedOptimizer': 'Planning S-T Graph',
+        };
+        for (const pathName in displayNames) {
+            const graph = stGraph[pathName];
             const polygons = graph ? graph.obstaclesBoundary : [];
             graphs.push(
                 <ScatterGraph
-                    key={'stGraph_' + name}
-                    title={name}
+                    key={'stGraph_' + pathName}
+                    title={displayNames[pathName]}
                     options={SETTING.stGraph.options}
                     properties={SETTING.stGraph.properties}
                     data={{ lines: graph, polygons: polygons }}
@@ -46,14 +49,17 @@ export default class PlanningMonitor extends React.Component {
                 })}
                 {generateScatterGraph(SETTING.speedGraph, data.speedGraph)}
                 {generateScatterGraph(SETTING.accelerationGraph, data.accelerationGraph)}
-                {generateScatterGraph(SETTING.thetaGraph, data.thetaGraph)}
-                {generateScatterGraph(SETTING.kappaGraph, data.kappaGraph)}
+                {generateScatterGraph(SETTING.planningThetaGraph, data.thetaGraph)}
+                {generateScatterGraph(SETTING.planningKappaGraph, data.kappaGraph)}
                 {this.generateStGraph(data.stGraph)}
                 {generateScatterGraph(
                     SETTING.stSpeedGraph,
                     data.stSpeedGraph.PiecewiseJerkSpeedOptimizer
                 )}
-                {generateScatterGraph(SETTING.dkappaGraph, data.dkappaGraph)}
+                {generateScatterGraph(SETTING.planningDkappaGraph, data.dkappaGraph)}
+                {generateScatterGraph(SETTING.referenceLineThetaGraph, data.thetaGraph)}
+                {generateScatterGraph(SETTING.referenceLineKappaGraph, data.kappaGraph)}
+                {generateScatterGraph(SETTING.referenceLineDkappaGraph, data.dkappaGraph)}
             </div>
         );
     }
