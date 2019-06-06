@@ -56,6 +56,8 @@ DEFINE_int32(prediction_offline_mode, 0,
              "5: dump data for tuning to datatuning.*.bin");
 DEFINE_bool(enable_multi_thread, true, "If enable multi-thread.");
 DEFINE_int32(max_thread_num, 8, "Maximal number of threads.");
+DEFINE_int32(max_caution_thread_num, 2,
+             "Maximal number of threads for caution obstacles.");
 
 // Bag replay timestamp gap
 DEFINE_double(replay_timestamp_gap, 10.0,
