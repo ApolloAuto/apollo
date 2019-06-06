@@ -43,6 +43,20 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
 PullOverStatus CheckADCPullOverOpenSpace(
     const ScenarioPullOverConfig& scenario_config);
 
+bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
+                               const ScenarioPullOverConfig& scenario_config,
+                               const common::math::Vec2d& adc_position,
+                               const double adc_theta,
+                               const common::math::Vec2d& target_position,
+                               const double target_theta);
+
+bool CheckPullOverPositionByDistance(
+    const ScenarioPullOverConfig& scenario_config,
+    const common::math::Vec2d& adc_position,
+    const double adc_theta,
+    const common::math::Vec2d& target_position,
+    const double target_theta);
+
 }  // namespace util
 }  // namespace scenario
 }  // namespace planning
