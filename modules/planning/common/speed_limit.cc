@@ -21,6 +21,7 @@
 #include "modules/planning/common/speed_limit.h"
 
 #include <algorithm>
+#include <limits>
 
 #include "cyber/common/log.h"
 
@@ -84,6 +85,15 @@ double SpeedLimit::GetSoftSpeedLimitByS(const double s) const {
     return (it_lower - 1)->second;
   }
   return it_lower->second;
+}
+
+double SpeedLimit::GetMinSpeedLimitV() const {
+  CHECK_GE(speed_limit_points_.size(), 2);
+  double min_v = std::numeric_limits<double>::infinity();
+  for (const std::pair<double, double>& point : speed_limit_points_) {
+    min_v = std::fmin(min_v, point.second);
+  }
+  return min_v;
 }
 
 double SpeedLimit::MinValidS() const {
