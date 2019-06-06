@@ -114,6 +114,9 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
                control_conf->mpc_controller_conf().brake_minimum_action());
 
   minimum_speed_protection_ = control_conf->minimum_speed_protection();
+  max_acceleration_when_stopped_ =
+      control_conf->max_acceleration_when_stopped();
+  max_abs_speed_when_stopped_ = vehicle_param_.max_abs_speed_when_stopped();
   standstill_acceleration_ =
       control_conf->mpc_controller_conf().standstill_acceleration();
 
@@ -434,15 +437,19 @@ Status MPCController::ComputeControlCommand(
   double acceleration_cmd = acc_feedback + debug->acceleration_reference();
   // TODO(QiL): add pitch angle feed forward to accommodate for 3D control
 
-  debug->set_is_full_stop(false);
-  if (std::fabs(debug->acceleration_reference()) <=
-          FLAGS_max_acceleration_when_stopped &&
-      std::fabs(debug->speed_reference()) <=
-          vehicle_param_.max_abs_speed_when_stopped()) {
-    acceleration_cmd = standstill_acceleration_;
-    AINFO << "Stop location reached";
+  if ((planning_published_trajectory->trajectory_type() ==
+       apollo::planning::ADCTrajectory::NORMAL) &&
+      (std::fabs(debug->acceleration_reference()) <=
+           max_acceleration_when_stopped_ &&
+       std::fabs(debug->speed_reference()) <= max_abs_speed_when_stopped_)) {
+    acceleration_cmd =
+        (chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)
+            ? std::max(acceleration_cmd, -standstill_acceleration_)
+            : std::min(acceleration_cmd, standstill_acceleration_);
+    ADEBUG << "Stop location reached";
     debug->set_is_full_stop(true);
   }
+  // TODO(Yu): study the necessity of path_remain and add it to MPC if needed
 
   debug->set_acceleration_cmd(acceleration_cmd);
 

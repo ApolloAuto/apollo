@@ -32,9 +32,9 @@ namespace cyber {
 
 /**
  * @class Writer<MessageT>
- * @brief The Channel Writer has only one function: publish message through the channel
- * pointed in its RoleAttributes
- * 
+ * @brief The Channel Writer has only one function: publish message through the
+ * channel pointed in its RoleAttributes
+ *
  * @tparam MessageT Message Type of the Writer handles
  */
 template <typename MessageT>
@@ -46,7 +46,7 @@ class Writer : public WriterBase {
 
   /**
    * @brief Construct a new Writer object
-   * 
+   *
    * @param role_attr we use RoleAttributes to identify a Writer
    */
   explicit Writer(const proto::RoleAttributes& role_attr);
@@ -54,7 +54,7 @@ class Writer : public WriterBase {
 
   /**
    * @brief Init the Writer
-   * 
+   *
    * @return true if init successfully
    * @return false if init failed
    */
@@ -67,7 +67,7 @@ class Writer : public WriterBase {
 
   /**
    * @brief Write a MessageT instance
-   * 
+   *
    * @param msg the message we want to write
    * @return true if write successfully
    * @return false if write failed
@@ -76,7 +76,7 @@ class Writer : public WriterBase {
 
   /**
    * @brief Write a shared ptr of MessageT
-   * 
+   *
    * @param msg_ptr the message shared ptr we want to write
    * @return true if write successfully
    * @return false if write failed
@@ -86,7 +86,7 @@ class Writer : public WriterBase {
   /**
    * @brief Is there any Reader that subscribes our Channel?
    * You can publish message when this return true
-   * 
+   *
    * @return true if the channel has reader
    * @return false if the channel has no reader
    */
@@ -94,7 +94,7 @@ class Writer : public WriterBase {
 
   /**
    * @brief Get all Readers that subscriber our writing channel
-   * 
+   *
    * @param readers vector result of RoleAttributes
    */
   void GetReaders(std::vector<proto::RoleAttributes>* readers) override;

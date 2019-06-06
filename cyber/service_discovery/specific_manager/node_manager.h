@@ -54,7 +54,7 @@ class NodeManager : public Manager {
 
   /**
    * @brief Checkout whether we have `node_name` in topology
-   * 
+   *
    * @param node_name Node's name we want to inquire
    * @return true if this node found
    * @return false if this node not exits
@@ -63,7 +63,7 @@ class NodeManager : public Manager {
 
   /**
    * @brief Get the Nodes object
-   * 
+   *
    * @param nodes result RoleAttr vector
    */
   void GetNodes(RoleAttrVec* nodes);

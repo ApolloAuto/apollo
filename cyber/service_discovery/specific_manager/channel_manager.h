@@ -60,14 +60,14 @@ class ChannelManager : public Manager {
 
   /**
    * @brief Get all channel names in the topology
-   * 
+   *
    * @param channels result vector
    */
   void GetChannelNames(std::vector<std::string>* channels);
 
   /**
    * @brief Get the Protocol Desc of `channel_name`
-   * 
+   *
    * @param channel_name channel name we want to inquire
    * @param proto_desc result string, empty if inquire failed
    */
@@ -75,15 +75,16 @@ class ChannelManager : public Manager {
 
   /**
    * @brief Get the Msg Type of `channel_name`
-   * 
+   *
    * @param channel_name channel name we want to inquire
    * @param msg_type result string, empty if inquire failed
    */
   void GetMsgType(const std::string& channel_name, std::string* msg_type);
 
   /**
-   * @brief Inquire if there is at least one Writer that publishes `channel_name`
-   * 
+   * @brief Inquire if there is at least one Writer that publishes
+   * `channel_name`
+   *
    * @param channel_name channel name we want to inquire
    * @return true if there is at least one Writer
    * @return false if there are no Writers
@@ -92,14 +93,14 @@ class ChannelManager : public Manager {
 
   /**
    * @brief Get All Writers object
-   * 
+   *
    * @param writers result RoleAttr vector
    */
   void GetWriters(RoleAttrVec* writers);
 
   /**
    * @brief Get the Writers Of Node object
-   * 
+   *
    * @param node_name node's name we want to inquire
    * @param writers result RoleAttribute vector
    */
@@ -107,7 +108,7 @@ class ChannelManager : public Manager {
 
   /**
    * @brief Get the Writers Of Channel object
-   * 
+   *
    * @param channel_name channel's name we want to inquire
    * @param writers result RoleAttribute vector
    */
@@ -115,8 +116,9 @@ class ChannelManager : public Manager {
                            RoleAttrVec* writers);
 
   /**
-   * @brief Inquire if there is at least one Reader that publishes `channel_name`
-   * 
+   * @brief Inquire if there is at least one Reader that publishes
+   * `channel_name`
+   *
    * @param channel_name channel name we want to inquire
    * @return true if there is at least one Reader
    * @return false if there are no Reader
@@ -125,14 +127,14 @@ class ChannelManager : public Manager {
 
   /**
    * @brief Get All Readers object
-   * 
+   *
    * @param readers result RoleAttr vector
    */
   void GetReaders(RoleAttrVec* readers);
 
   /**
    * @brief Get the Readers Of Node object
-   * 
+   *
    * @param node_name node's name we want to inquire
    * @param readers result RoleAttribute vector
    */
@@ -140,7 +142,7 @@ class ChannelManager : public Manager {
 
   /**
    * @brief Get the Readers Of Channel object
-   * 
+   *
    * @param channel_name channel's name we want to inquire
    * @param readers result RoleAttribute vector
    */
@@ -149,9 +151,10 @@ class ChannelManager : public Manager {
 
   /**
    * @brief Get the Upstream Of Node object.
-   * If Node A has writer that publishes channel-1, and Node B has reader that subscribes channel-1
-   * then A is B's Upstream node, and B is A's Downstream node
-   * 
+   * If Node A has writer that publishes channel-1, and Node B has reader that
+   * subscribes channel-1 then A is B's Upstream node, and B is A's Downstream
+   * node
+   *
    * @param node_name node's name we want to inquire
    * @param upstream_nodes result RoleAttribute vector
    */
@@ -160,9 +163,10 @@ class ChannelManager : public Manager {
 
   /**
    * @brief Get the Downstream Of Node object.
-   * If Node A has writer that publishes channel-1, and Node B has reader that subscribes channel-1
-   * then A is B's Upstream node, and B is A's Downstream node
-   * 
+   * If Node A has writer that publishes channel-1, and Node B has reader that
+   * subscribes channel-1 then A is B's Upstream node, and B is A's Downstream
+   * node
+   *
    * @param node_name node's name we want to inquire
    * @param downstream_nodes result RoleAttribute vector
    */
@@ -179,7 +183,7 @@ class ChannelManager : public Manager {
 
   /**
    * @brief Is `lhs` and `rhs` have same MessageType
-   * 
+   *
    * @param lhs the left message type to compare
    * @param rhs the right message type to compare
    * @return true if type matches

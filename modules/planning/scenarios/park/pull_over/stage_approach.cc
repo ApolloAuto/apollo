@@ -52,8 +52,7 @@ Stage::StageStatus PullOverStageApproach::Process(
   scenario::util::PullOverStatus status =
       scenario::util::CheckADCPullOver(reference_line_info, scenario_config_);
 
-  if (status == scenario::util::UNKNOWN ||
-      status == scenario::util::PASS_DESTINATION ||
+  if (status == scenario::util::PASS_DESTINATION ||
       status == scenario::util::PARK_COMPLETE) {
     return FinishStage(true);
   } else if (status == scenario::util::PARK_FAIL) {

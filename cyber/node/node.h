@@ -58,10 +58,10 @@ class Node {
 
   /**
    * @brief Create a Writer with specific message type.
-   * 
+   *
    * @tparam MessageT Message Type
    * @param role_attr is a protobuf message RoleAttributes, which includes the
-   * channel name and other info. 
+   * channel name and other info.
    * @return std::shared_ptr<Writer<MessageT>> result Writer Object
    */
   template <typename MessageT>
@@ -70,7 +70,7 @@ class Node {
 
   /**
    * @brief Create a Writer with specific message type.
-   * 
+   *
    * @tparam MessageT Message Type
    * @param channel_name the channel name to be published.
    * @return std::shared_ptr<Writer<MessageT>> result Writer Object
@@ -82,7 +82,7 @@ class Node {
   /**
    * @brief Create a Reader with specific message type with channel name
    * qos and other configs used will be default
-   * 
+   *
    * @tparam MessageT Message Type
    * @param channel_name the channel of the reader subscribed.
    * @param reader_func invoked when message receive
@@ -96,7 +96,7 @@ class Node {
 
   /**
    * @brief Create a Reader with specific message type with reader config
-   * 
+   *
    * @tparam MessageT Message Type
    * @param config instance of `ReaderConfig`,
    * include channel name, qos and pending queue size
@@ -110,12 +110,12 @@ class Node {
 
   /**
    * @brief Create a Reader object with `RoleAttributes`
-   * 
+   *
    * @tparam MessageT Message Type
    * @param role_attr instance of `RoleAttributes`,
    * includes channel name, qos, etc.
    * @param reader_func invoked when message receive
-   * @return std::shared_ptr<cyber::Reader<MessageT>> result Reader Object 
+   * @return std::shared_ptr<cyber::Reader<MessageT>> result Reader Object
    */
   template <typename MessageT>
   auto CreateReader(const proto::RoleAttributes& role_attr,
@@ -124,7 +124,7 @@ class Node {
 
   /**
    * @brief Create a Service object with specific `service_name`
-   * 
+   *
    * @tparam Request Message Type of the Request
    * @tparam Response Message Type of the Response
    * @param service_name specific service name to a serve
@@ -139,7 +139,7 @@ class Node {
 
   /**
    * @brief Create a Client object to request Service with `service_name`
-   * 
+   *
    * @tparam Request Message Type of the Request
    * @tparam Response Message Type of the Response
    * @param service_name specific service name to a Service
@@ -161,7 +161,7 @@ class Node {
 
   /**
    * @brief Get the Reader object that subscribe `channel_name`
-   * 
+   *
    * @tparam MessageT Message Type
    * @param channel_name channel name
    * @return std::shared_ptr<Reader<MessageT>> result reader

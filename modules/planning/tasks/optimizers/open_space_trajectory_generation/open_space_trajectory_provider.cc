@@ -108,7 +108,7 @@ Status OpenSpaceTrajectoryProvider::Process() {
     const double start_timestamp = Clock::NowInSeconds();
     stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
         vehicle_state, start_timestamp, planning_cycle_time,
-        FLAGS_open_space_trajectory_stitching_preserved_length,
+        FLAGS_open_space_trajectory_stitching_preserved_length, false,
         &last_frame_complete_trajectory, &replan_reason);
   } else {
     ADEBUG << "Replan due to fallback stop";

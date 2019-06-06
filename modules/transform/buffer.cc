@@ -105,7 +105,7 @@ void Buffer::SubscriptionCallbackImpl(
       setTransform(trans_stamped, authority, is_static);
     } catch (tf2::TransformException& ex) {
       std::string temp = ex.what();
-      AERROR << "Failure to set recieved transform:" << temp.c_str();
+      AERROR << "Failure to set received transform:" << temp.c_str();
     }
   }
 }

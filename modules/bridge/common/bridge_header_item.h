@@ -41,9 +41,9 @@ class HeaderItemBase {
 
  public:
   virtual char *SerializeItem(char *buf, size_t buf_size,
-    size_t *serialized_size) = 0;
+                              size_t *serialized_size) = 0;
   virtual const char *DiserializeItem(const char *buf,
-    size_t *diserialized_size) = 0;
+                                      size_t *diserialized_size) = 0;
   virtual HType GetType() const = 0;
 };
 
@@ -52,9 +52,9 @@ struct HeaderItem;
 
 template <enum HType t, typename T>
 char *SerializeItemImp(const HeaderItem<t, T> &item, char *buf, size_t buf_size,
-  size_t *serialized_size) {
+                       size_t *serialized_size) {
   if (!buf || buf_size == 0 || !serialized_size ||
-    buf_size < size_t(sizeof(t) + item.ValueSize() + 2) ) {
+      buf_size < size_t(sizeof(t) + item.ValueSize() + 2)) {
     return nullptr;
   }
   char *res = buf;
@@ -80,7 +80,7 @@ char *SerializeItemImp(const HeaderItem<t, T> &item, char *buf, size_t buf_size,
 
 template <enum HType t, typename T>
 const char *DiserializeItemImp(HeaderItem<t, T> *item, const char *buf,
-    size_t *diserialized_size) {
+                               size_t *diserialized_size) {
   if (!buf || !diserialized_size) {
     return nullptr;
   }
@@ -108,11 +108,11 @@ const char *DiserializeItemImp(HeaderItem<t, T> *item, const char *buf,
 }
 
 template <enum HType t, typename T>
-struct HeaderItem: public HeaderItemBase {
+struct HeaderItem : public HeaderItemBase {
   T value_;
 
-  operator T () { return value_; }
-  HeaderItem  &operator = (const T &val) {
+  operator T() { return value_; }
+  HeaderItem &operator=(const T &val) {
     value_ = val;
     return *this;
   }
@@ -127,12 +127,12 @@ struct HeaderItem: public HeaderItemBase {
   }
 
   char *SerializeItem(char *buf, size_t buf_size,
-    size_t *serialized_size) override {
+                      size_t *serialized_size) override {
     return SerializeItemImp(*this, buf, buf_size, serialized_size);
   }
 
   const char *DiserializeItem(const char *buf,
-    size_t *diserialized_size) override {
+                              size_t *diserialized_size) override {
     return DiserializeItemImp(this, buf, diserialized_size);
   }
 };
@@ -140,8 +140,8 @@ struct HeaderItem: public HeaderItemBase {
 template <enum HType t>
 struct HeaderItem<t, std::string> : public HeaderItemBase {
   std::string value_;
-  operator std::string () { return value_; }
-  HeaderItem  &operator = (const std::string &val) {
+  operator std::string() { return value_; }
+  HeaderItem &operator=(const std::string &val) {
     value_ = val;
     return *this;
   }
@@ -156,12 +156,12 @@ struct HeaderItem<t, std::string> : public HeaderItemBase {
   }
 
   char *SerializeItem(char *buf, size_t buf_size,
-    size_t *serialized_size) override {
+                      size_t *serialized_size) override {
     return SerializeItemImp(*this, buf, buf_size, serialized_size);
   }
 
   const char *DiserializeItem(const char *buf,
-    size_t *diserialized_size) override {
+                              size_t *diserialized_size) override {
     return DiserializeItemImp(this, buf, diserialized_size);
   }
 };

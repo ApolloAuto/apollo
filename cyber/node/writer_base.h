@@ -28,7 +28,8 @@ namespace cyber {
 
 /**
  * @class WriterBase
- * @brief Base class for a Writer. A Writer is an object to send messages through a 'Channel' 
+ * @brief Base class for a Writer. A Writer is an object to send messages
+ * through a 'Channel'
  * @warning One Writer can only write one channel.
  * But different writers can write through the same channel
  */
@@ -36,7 +37,7 @@ class WriterBase {
  public:
   /**
    * @brief Construct a new Writer Base object
-   * 
+   *
    * @param role_attr role attributes for this Writer
    */
   explicit WriterBase(const proto::RoleAttributes& role_attr)
@@ -45,7 +46,7 @@ class WriterBase {
 
   /**
    * @brief Init the Writer
-   * 
+   *
    * @return true if init success
    * @return false if init failed
    */
@@ -59,7 +60,7 @@ class WriterBase {
   /**
    * @brief Is there any Reader that subscribes our Channel?
    * You can publish message when this return true
-   * 
+   *
    * @return true if the channel has reader
    * @return false if the channel has no reader
    */
@@ -67,14 +68,14 @@ class WriterBase {
 
   /**
    * @brief Get all Readers that subscriber our writing channel
-   * 
+   *
    * @param readers result vector of RoleAttributes
    */
   virtual void GetReaders(std::vector<proto::RoleAttributes>* readers) {}
 
   /**
    * @brief Get Writer's Channel name
-   * 
+   *
    * @return const std::string& const reference to the channel name
    */
   const std::string& GetChannelName() const {
@@ -83,7 +84,7 @@ class WriterBase {
 
   /**
    * @brief Is Writer initialized?
-   * 
+   *
    * @return true if the Writer is inited
    * @return false if the Write is not inited
    */

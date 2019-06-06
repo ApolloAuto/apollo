@@ -56,7 +56,7 @@ class ServiceManager : public Manager {
 
   /**
    * @brief Inquire whether `service_name` exists in topology
-   * 
+   *
    * @param service_name the name we inquire
    * @return true if service exists
    * @return false if service not exists
@@ -65,14 +65,14 @@ class ServiceManager : public Manager {
 
   /**
    * @brief Get the All Server in the topology
-   * 
+   *
    * @param servers result RoleAttr vector
    */
   void GetServers(RoleAttrVec* servers);
 
   /**
    * @brief Get the Clients object that subscribes `service_name`
-   * 
+   *
    * @param service_name Name of service you want to get
    * @param clients result vector
    */

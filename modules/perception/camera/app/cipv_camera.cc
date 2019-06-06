@@ -26,9 +26,9 @@
 namespace apollo {
 namespace perception {
 
-Cipv::Cipv(void) {}
+Cipv::Cipv() {}
 
-Cipv::~Cipv(void) {}
+Cipv::~Cipv() {}
 
 bool Cipv::Init(const Eigen::Matrix3d &homography_im2car,
                 const float min_laneline_length_for_cipv,
@@ -193,7 +193,7 @@ bool Cipv::MakeVirtualEgoLaneFromYawRate(const float yaw_rate,
   left_lane_line->line_point.clear();
   right_lane_line->line_point.clear();
 
-  for (uint32_t i = 1; i < kMaxNumVirtualLanePoint; i += 1) {
+  for (uint32_t i = 1; i < kMaxNumVirtualLanePoint; ++i) {
     VehicleDynamics(i, yaw_rate, velocity, kAverageFrameRate, &x, &y);
     Point2Df left_point(x, y + offset_distance);
     left_lane_line->line_point.emplace_back(left_point);
@@ -338,7 +338,7 @@ bool Cipv::FindClosestObjectGround(const std::shared_ptr<base::Object> &object,
 
   double theta_ray = atan2(pos(0), pos(2));
   double theta = object->camera_supplement.alpha + theta_ray;
-  theta = theta - M_PI_2;
+  theta -=  M_PI_2;
 
   if (debug_level_ >= 3) {
     AINFO << "object->camera_supplement.box = base::RectF("

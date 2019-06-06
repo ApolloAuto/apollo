@@ -40,7 +40,6 @@ cc_library(
     ],
 )
 
-
 cc_library(
     name = "piecewise_jerk_path_ipopt_solver",
     srcs = [

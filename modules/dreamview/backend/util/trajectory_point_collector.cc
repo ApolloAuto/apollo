@@ -32,6 +32,7 @@ void TrajectoryPointCollector::Collect(const TrajectoryPoint &point,
     trajectory_point->set_speed(previous_.v());
     trajectory_point->set_speed_acceleration(previous_.a());
     trajectory_point->set_kappa(previous_.path_point().kappa());
+    trajectory_point->set_dkappa(previous_.path_point().dkappa());
     trajectory_point->set_heading(
         std::atan2(point.path_point().y() - previous_.path_point().y(),
                    point.path_point().x() - previous_.path_point().x()));

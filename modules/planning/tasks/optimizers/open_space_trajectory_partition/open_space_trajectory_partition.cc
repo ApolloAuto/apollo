@@ -557,6 +557,10 @@ bool OpenSpaceTrajectoryPartition::UseFailSafeSearch(
         failsafe_closest_point_on_trajs.top().first.first;
     *current_trajectory_point_index =
         failsafe_closest_point_on_trajs.top().first.second;
+    // Clear the traj history
+    PlanningContext::Instance()
+        ->mutable_open_space_info()
+        ->partitioned_trajectories_index_history.clear();
     return true;
   }
 }

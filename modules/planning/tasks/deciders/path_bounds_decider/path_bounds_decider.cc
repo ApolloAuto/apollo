@@ -331,6 +331,8 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(
   }
   // PathBoundsDebugString(*path_bound);
 
+  ConvertBoundaryAxesFromLaneCenterToRefLine(reference_line_info, path_bound);
+
   // 3. Fine-tune the boundary based on static obstacles
   PathBound temp_path_bound = *path_bound;
   std::string blocking_obstacle_id;
@@ -348,11 +350,12 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(
                                ->mutable_planning_status()
                                ->mutable_pull_over();
   // If already found a pull-over position, simply check if it's valid.
-  if (pull_over_status->is_feasible()) {
-    int curr_idx =
-        IsPointWithinPathBound(reference_line_info, pull_over_status->x(),
-                               pull_over_status->y(), *path_bound);
-    if (curr_idx > 0) {
+  if (pull_over_status->is_feasible() && pull_over_status->has_position()) {
+    int curr_idx = IsPointWithinPathBound(reference_line_info,
+                                          pull_over_status->position().x(),
+                                          pull_over_status->position().y(),
+                                          *path_bound);
+    if (curr_idx >= 0) {
       // Trim path-bound properly.
       while (static_cast<int>(path_bound->size()) - 1 >
              curr_idx + kNumExtraTailBoundPoint) {
@@ -364,7 +367,7 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(
         std::get<2>((*path_bound)[path_bound->size() - 1 - idx]) =
             std::get<2>((*path_bound)[curr_idx]);
       }
-      PathBoundsDebugString(*path_bound);
+      // PathBoundsDebugString(*path_bound);
       return "";
     }
   }
@@ -382,8 +385,11 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(
   // and trim the path-bound properly.
   pull_over_status->Clear();
   pull_over_status->set_is_feasible(true);
-  pull_over_status->set_x(std::get<0>(pull_over_configuration));
-  pull_over_status->set_y(std::get<1>(pull_over_configuration));
+  pull_over_status->mutable_position()->set_x(
+      std::get<0>(pull_over_configuration));
+  pull_over_status->mutable_position()->set_y(
+      std::get<1>(pull_over_configuration));
+  pull_over_status->mutable_position()->set_z(0.0);
   pull_over_status->set_theta(std::get<2>(pull_over_configuration));
   pull_over_status->set_length_front(FLAGS_obstacle_lon_start_buffer);
   pull_over_status->set_length_back(FLAGS_obstacle_lon_end_buffer);
@@ -391,6 +397,10 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(
       VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0);
   pull_over_status->set_width_right(
       VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0);
+
+  ADEBUG << "Pull Over: x[" << pull_over_status->position().x()
+         << "] y[" <<  pull_over_status->position().y()
+         << "] theta[" << pull_over_status->theta() << "]";
 
   while (static_cast<int>(path_bound->size()) - 1 >
          std::get<3>(pull_over_configuration) + kNumExtraTailBoundPoint) {
@@ -440,14 +450,21 @@ int PathBoundsDecider::IsPointWithinPathBound(
   common::SLPoint point_sl;
   reference_line_info.reference_line().XYToSL({x, y}, &point_sl);
   if (point_sl.s() > std::get<0>(path_bound.back()) ||
-      point_sl.s() < std::get<0>(path_bound.front())) {
-    return 0;
+      point_sl.s() <
+          std::get<0>(path_bound.front()) - kPathBoundsDeciderResolution * 2) {
+    ADEBUG << "Longitudinally outside the boundary.";
+    return -1;
   }
   int idx_after = 0;
   while (idx_after < static_cast<int>(path_bound.size()) &&
          std::get<0>(path_bound[idx_after]) < point_sl.s()) {
     ++idx_after;
   }
+  ADEBUG << "The idx_after = " << idx_after;
+  ADEBUG << "The boundary is: "
+         << "[" << std::get<1>(path_bound[idx_after]) << ", "
+         << std::get<2>(path_bound[idx_after]) << "].";
+  ADEBUG << "The point is at: " << point_sl.l();
   int idx_before = idx_after - 1;
   if (std::get<1>(path_bound[idx_before]) <= point_sl.l() &&
       std::get<2>(path_bound[idx_before]) >= point_sl.l() &&
@@ -455,7 +472,8 @@ int PathBoundsDecider::IsPointWithinPathBound(
       std::get<2>(path_bound[idx_after]) >= point_sl.l()) {
     return idx_after;
   }
-  return 0;
+  ADEBUG << "Laterally outside the boundary.";
+  return -1;
 }
 
 bool PathBoundsDecider::SearchPullOverPosition(
@@ -480,7 +498,6 @@ bool PathBoundsDecider::SearchPullOverPosition(
     ADEBUG << "Destination is too close to ADC. distance["
            << destination_s - adc_end_s << "]";
     return false;
-    // }
   }
 
   // Check if destination is within path-bounds searching scope.
@@ -546,7 +563,8 @@ bool PathBoundsDecider::SearchPullOverPosition(
       const auto& reference_line = reference_line_info.reference_line();
       const auto& pull_over_point = path_bound[(i + j) / 2];
       const double pull_over_s = std::get<0>(pull_over_point);
-      const double pull_over_l = std::get<1>(pull_over_point);
+      const double pull_over_l =
+          std::get<1>(pull_over_point) + pull_over_space_width / 2.0;
       common::SLPoint pull_over_sl_point;
       pull_over_sl_point.set_s(pull_over_s);
       pull_over_sl_point.set_l(pull_over_l);
@@ -645,11 +663,11 @@ bool PathBoundsDecider::InitPathBoundary(const ReferenceLine& reference_line,
   // Starting from ADC's current position, increment until the horizon, and
   // set lateral bounds to be infinite at every spot.
   for (double curr_s = adc_frenet_s_;
-       curr_s < std::fmin(adc_frenet_s_ +
-                          std::fmax(kPathBoundsDeciderHorizon,
-                                    FLAGS_default_cruise_speed *
-                                    FLAGS_trajectory_time_length),
-                         reference_line.Length());
+       curr_s <
+       std::fmin(adc_frenet_s_ + std::fmax(kPathBoundsDeciderHorizon,
+                                           FLAGS_default_cruise_speed *
+                                               FLAGS_trajectory_time_length),
+                 reference_line.Length());
        curr_s += kPathBoundsDeciderResolution) {
     path_bound->emplace_back(curr_s, std::numeric_limits<double>::lowest(),
                              std::numeric_limits<double>::max());
@@ -784,7 +802,7 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
 
     // 3. Calculate the proper boundary based on lane-width, ADC's position,
     //    and ADC's velocity.
-    constexpr double kMaxLateralAccelerations = 2.0;
+    constexpr double kMaxLateralAccelerations = 1.5;
     double offset_to_map = 0.0;
     reference_line.GetOffsetToMap(curr_s, &offset_to_map);
 
@@ -840,6 +858,19 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
   }
 
   return true;
+}
+
+void PathBoundsDecider::ConvertBoundaryAxesFromLaneCenterToRefLine(
+    const ReferenceLineInfo& reference_line_info, PathBound* const path_bound) {
+  const ReferenceLine& reference_line = reference_line_info.reference_line();
+  for (size_t i = 0; i < path_bound->size(); ++i) {
+    // 1. Get road boundary.
+    double curr_s = std::get<0>((*path_bound)[i]);
+    double refline_offset_to_lane_center = 0.0;
+    reference_line.GetOffsetToMap(curr_s, &refline_offset_to_lane_center);
+    std::get<1>((*path_bound)[i]) -= refline_offset_to_lane_center;
+    std::get<2>((*path_bound)[i]) -= refline_offset_to_lane_center;
+  }
 }
 
 // Currently, it processes each obstacle based on its frenet-frame

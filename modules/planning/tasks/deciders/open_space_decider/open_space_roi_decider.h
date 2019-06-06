@@ -70,6 +70,18 @@ class OpenSpaceRoiDecider : public Decider {
       Frame *const frame, const std::array<common::math::Vec2d, 4> &vertices);
 
   void SetPullOverSpotEndPose(Frame *const frame);
+
+  void GetRoadBoundary(const hdmap::Path &nearby_path,
+                       const double center_line_s,
+                       const common::math::Vec2d &origin_point,
+                       const double origin_heading,
+                       std::vector<common::math::Vec2d> *left_lane_boundary,
+                       std::vector<common::math::Vec2d> *right_lane_boundary,
+                       std::vector<common::math::Vec2d> *center_lane_boundary,
+                       std::vector<double> *center_lane_s,
+                       std::vector<double> *left_lane_road_width,
+                       std::vector<double> *right_lane_road_width);
+
   // @brief "Region of Interest", load map boundary for open space scenario
   // @param vertices is an array consisting four points describing the boundary
   // of spot in box. Four points are in sequence of left_top, left_down,
@@ -84,12 +96,17 @@ class OpenSpaceRoiDecider : public Decider {
   //                -                  -
   //                -                  -
   //                left_down-------right_down
+  bool GetParkingBoundary(Frame *const frame,
+                          const std::array<common::math::Vec2d, 4> &vertices,
+                          const hdmap::Path &nearby_path,
+                          std::vector<std::vector<common::math::Vec2d>>
+                              *const roi_parking_boundary);
 
-  bool GetBoundary(Frame *const frame,
-                   const std::array<common::math::Vec2d, 4> &vertices,
-                   const hdmap::Path &nearby_path,
-                   std::vector<std::vector<common::math::Vec2d>>
-                       *const roi_parking_boundary);
+  bool GetPullOverBoundary(Frame *const frame,
+                           const std::array<common::math::Vec2d, 4> &vertices,
+                           const hdmap::Path &nearby_path,
+                           std::vector<std::vector<common::math::Vec2d>>
+                               *const roi_parking_boundary);
 
   // @brief search target parking spot on the path by vehicle location, if
   // no return a nullptr in target_parking_spot

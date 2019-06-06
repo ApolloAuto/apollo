@@ -28,13 +28,13 @@ namespace cyber {
 /**
  * @class ClientBase
  * @brief Base class of Client
- * 
+ *
  */
 class ClientBase {
  public:
   /**
    * @brief Construct a new Client Base object
-   * 
+   *
    * @param service_name the service we can request
    */
   explicit ClientBase(const std::string& service_name)

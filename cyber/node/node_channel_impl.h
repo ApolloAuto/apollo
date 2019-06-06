@@ -49,7 +49,7 @@ struct ReaderConfig {  ///< configurations for a Reader
         qos_profile(other.qos_profile),
         pending_queue_size(other.pending_queue_size) {}
 
-  std::string channel_name;  //< channel reads
+  std::string channel_name;       //< channel reads
   proto::QosProfile qos_profile;  //< the qos configuration
   /**
    * @brief configuration for responding ChannelBuffer.
@@ -71,8 +71,8 @@ class NodeChannelImpl {
 
   /**
    * @brief Construct a new Node Channel Impl object
-   * 
-   * @param node_name node name 
+   *
+   * @param node_name node name
    */
   explicit NodeChannelImpl(const std::string& node_name)
       : is_reality_mode_(true), node_name_(node_name) {
@@ -104,7 +104,7 @@ class NodeChannelImpl {
 
   /**
    * @brief get name of this node
-   * 
+   *
    * @return const std::string& actual node name
    */
   const std::string& NodeName() const { return node_name_; }

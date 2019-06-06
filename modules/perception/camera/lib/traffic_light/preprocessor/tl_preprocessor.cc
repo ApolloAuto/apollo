@@ -50,10 +50,10 @@ bool TLPreprocessor::UpdateCameraSelection(
   selected_camera_name_.first = timestamp;
   selected_camera_name_.second = GetMaxFocalLenWorkingCameraName();
 
-  AINFO << "TLPreprocessor Got signal number:" << lights->size()
+  AINFO << "TLPreprocessor Got signal number: " << lights->size()
         << ", ts: " << std::to_string(timestamp);
-  if (lights->size() == 0) {
-    AINFO << "no signals, select camera with max focal length: "
+  if (lights->empty()) {
+    AINFO << "No signals, select camera with max focal length: "
           << selected_camera_name_.second;
     return true;
   }
@@ -113,8 +113,8 @@ bool TLPreprocessor::UpdateLightsProjection(
 
   AINFO << "clear lights_outside_image_ " << lights_outside_image_.size();
 
-  if (lights->size() == 0) {
-    AINFO << "not lights to be projected";
+  if (lights->empty()) {
+    AINFO << "No lights to be projected";
     return true;
   }
 
@@ -134,18 +134,16 @@ bool TLPreprocessor::UpdateLightsProjection(
 
   auto min_focal_len_working_camera = GetMinFocalLenWorkingCameraName();
   if (camera_name == min_focal_len_working_camera) {
-    return (lights_on_image_.size() > 0);
-  } else {
-    for (const base::TrafficLightPtr &light : lights_on_image_) {
-      if (OutOfValidRegion(light->region.projection_roi,
-                           projection_.getImageWidth(camera_name),
-                           projection_.getImageHeight(camera_name),
-                           option.image_borders_size->at(camera_name))) {
-        AINFO << "update_lights_projection"
-              << " light project out of image region, "
-              << "camera_name: " << camera_name;
-        return false;
-      }
+    return lights_on_image_.size() > 0;
+  }
+  for (const base::TrafficLightPtr &light : lights_on_image_) {
+    if (OutOfValidRegion(light->region.projection_roi,
+                         projection_.getImageWidth(camera_name),
+                         projection_.getImageHeight(camera_name),
+                         option.image_borders_size->at(camera_name))) {
+      AINFO << "update_lights_projection light project out of image region. "
+            << "camera_name: " << camera_name;
+      return false;
     }
   }
 
@@ -305,7 +303,7 @@ bool TLPreprocessor::ProjectLightsAndSelectCamera(
     }
   }
 
-  projections_outside_all_images_ = (lights->size() > 0);
+  projections_outside_all_images_ = !lights->empty();
   for (size_t cam_id = 0; cam_id < num_cameras_; ++cam_id) {
     projections_outside_all_images_ =
         projections_outside_all_images_ &&
@@ -341,7 +339,6 @@ std::string TLPreprocessor::GetMinFocalLenWorkingCameraName() const {
 }
 
 std::string TLPreprocessor::GetMaxFocalLenWorkingCameraName() const {
-  std::string max_focal_len_working_camera = "";
   const auto &camera_names = projection_.getCameraNamesByDescendingFocalLen();
   for (const auto &camera_name : camera_names) {
     bool is_working = false;

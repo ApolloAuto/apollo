@@ -246,4 +246,3 @@ Defined in ``cyber/time/time.h``
    :members:
    :project: Cyber RT Documents
 
-
