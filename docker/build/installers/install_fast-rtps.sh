@@ -22,15 +22,16 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 git clone https://github.com/eProsima/Fast-RTPS.git
 pushd Fast-RTPS
+
 git checkout origin/release/1.5.0
 git submodule init
 git submodule update
 patch -p1 < ../FastRTPS_1.5.0.patch
+
 mkdir -p build && cd build
 cmake -DTHIRDPARTY=ON -DCMAKE_INSTALL_PREFIX=./external/install ../
+cmake -DEPROSIMA_BUILD=ON -DCMAKE_INSTALL_PREFIX=/usr/local/fast-rtps ../
 make -j 8
 make install
-rm -rf /usr/local/fast-rtps
-mv ./external/install /usr/local/fast-rtps
-popd
 
+popd

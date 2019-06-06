@@ -21,16 +21,27 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-wget https://github.com/PointCloudLibrary/pcl/archive/pcl-1.7.2.tar.gz
+##wget https://github.com/PointCloudLibrary/pcl/archive/pcl-1.7.2.tar.gz
+##
+##tar xzvf pcl-1.7.2.tar.gz
+##
+##cd pcl-pcl-1.7.2/
+##mkdir build
+##cd build
+##cmake ..
+##make -j 2
+##make install
+##
+###clean up
+##cd ../../ && rm -rf pcl-1.7.2.tar.gz pcl-pcl-1.7.2
 
-tar xzvf pcl-1.7.2.tar.gz
+wget https://apollocache.blob.core.windows.net/apollo-cache/pcl.zip
+unzip pcl.zip
 
-cd pcl-pcl-1.7.2/
-mkdir build
-cd build
-cmake ..
-make -j 2
-make install
-
-#clean up
-cd ../../ && rm -rf pcl-1.7.2.tar.gz pcl-pcl-1.7.2
+pushd pcl/
+mkdir -p /usr/local/include/pcl-1.7/
+cd include
+cp -r pcl /usr/local/include/pcl-1.7/
+cd ../
+cp -r lib /usr/local/
+popd

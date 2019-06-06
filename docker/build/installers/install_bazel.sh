@@ -19,13 +19,17 @@
 # Fail on first error.
 set -e
 
-apt-get update -y
-apt-get install -y openjdk-8-jdk
-
-# Install Bazel.
-wget https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-installer-linux-x86_64.sh
-bash bazel-0.5.3-installer-linux-x86_64.sh
-
-# Clean up.
-apt-get clean && rm -rf /var/lib/apt/lists/*
-rm -fr bazel-0.5.3-installer-linux-x86_64.sh /etc/apt/sources.list.d/bazel.list
+##apt-get update -y
+##apt-get install -y openjdk-8-jdk
+##
+### Install Bazel.
+##wget https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-installer-linux-x86_64.sh
+##bash bazel-0.5.3-installer-linux-x86_64.sh
+##
+### Clean up.
+##apt-get clean && rm -rf /var/lib/apt/lists/*
+##rm -fr bazel-0.5.3-installer-linux-x86_64.sh /etc/apt/sources.list.d/bazel.list
+cd "$(dirname "${BASH_SOURCE[0]}")"
+wget https://apollocache.blob.core.windows.net/apollo-cache/bazel
+cp bazel /usr/local/bin/
+chmod a+x /usr/local/bin/bazel

@@ -26,7 +26,7 @@ tar xzf protobuf-cpp-3.3.0.tar.gz
 
 pushd protobuf-3.3.0
 ./configure --prefix=/usr
-make -j8
+make 
 make install
 popd
 
