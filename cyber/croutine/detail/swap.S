@@ -1,39 +1,37 @@
-.text
-.align 4
+/******************************************************************************
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
 .globl ctx_swap
-
+.type  ctx_swap, @function
 ctx_swap:
-	stp    x30,  x1, [sp,#-16]!
-	stp    x9,   x0, [sp,#-16]!
-	stp    x10,  x11, [sp,#-16]!
-	stp    x12,  x13, [sp,#-16]!
-	stp    x14,  x15, [sp,#-16]!
-	stp    x16,  x17, [sp,#-16]!
-	stp    x18,  x19, [sp,#-16]!
-	stp    x20,  x21, [sp,#-16]!
-	stp    x22,  x23, [sp,#-16]!
-	stp    x24,  x25, [sp,#-16]!
-	stp    x26,  x27, [sp,#-16]!
-	stp    x28,  x29, [sp,#-16]!
+      pushq %rdi
+      pushq %r12
+      pushq %r13
+      pushq %r14
+      pushq %r15
+      pushq %rbx
+      pushq %rbp
+      movq %rsp, (%rdi)
 
-    mov    x3,   sp
-	str    x3,   [x0]
-
-	ldr    x3,   [x1]
-	mov    sp,   x3
-
-	ldp    x28,  x29,  [sp]
-	ldp    x26,  x27,  [sp,#16]!
-	ldp    x24,  x25,  [sp,#16]!
-	ldp    x22,  x23,  [sp,#16]!
-	ldp    x20,  x21,  [sp,#16]!
-	ldp    x18,  x19,  [sp,#16]!
-	ldp    x16,  x17,  [sp,#16]!
-	ldp    x14,  x15,  [sp,#16]!
-	ldp    x12,  x13,  [sp,#16]!
-	ldp    x10,  x11,  [sp,#16]!
-	ldp    x9,  x0,  [sp,#16]!
-	ldp    x30,  x1,  [sp,#16]!
-	add    sp,   sp,  #16
-
-	ret
+      movq (%rsi), %rsp
+      popq %rbp
+      popq %rbx
+      popq %r15
+      popq %r14
+      popq %r13
+      popq %r12
+      popq %rdi
+      ret

@@ -54,7 +54,7 @@ cc_library(
 cc_library(
     name = "swap",
     srcs = [
-        "detail/swap.S",
+        "detail/swap_aarch64.S",
     ],
 )
 
