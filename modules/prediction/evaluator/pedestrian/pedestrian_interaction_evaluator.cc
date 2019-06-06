@@ -22,6 +22,7 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {
@@ -30,6 +31,23 @@ namespace prediction {
 using apollo::common::adapter::AdapterConfig;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
+
+void PedestrianInteractionEvaluator::Clear() {
+  auto ptr_obstacles_container =
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
+  std::vector<int> keys_to_delete;
+  for (const auto& item : obstacle_id_lstm_state_map_) {
+    int key = item.first;
+    if (obstacle_id_lstm_state_map_[key].timestamp + FLAGS_max_history_time <
+        ptr_obstacles_container->timestamp()) {
+      keys_to_delete.push_back(key);
+    }
+  }
+  for (const int key : keys_to_delete) {
+    obstacle_id_lstm_state_map_.erase(key);
+  }
+}
 
 bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Sanity checks.

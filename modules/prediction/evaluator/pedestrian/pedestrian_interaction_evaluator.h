@@ -21,8 +21,12 @@
 
 #pragma once
 
+#include <unordered_map>
 #include <string>
 #include <vector>
+
+#include "torch/script.h"
+#include "torch/torch.h"
 
 #include "modules/prediction/evaluator/evaluator.h"
 
@@ -65,6 +69,16 @@ class PedestrianInteractionEvaluator : public Evaluator {
   std::string GetName() override { return "PEDESTRIAN_INTERACTION_EVALUATOR"; }
 
  private:
+  struct LSTMState {
+    double timestamp;
+    torch::jit::IValue ct;
+    torch::jit::IValue ht;
+  };
+
+  void Clear();
+
+ private:
+  std::unordered_map<int, LSTMState> obstacle_id_lstm_state_map_;
 };
 
 }  // namespace prediction
