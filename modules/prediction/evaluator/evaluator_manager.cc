@@ -76,9 +76,16 @@ void GroupObstaclesByObstacleId(const int obstacle_id,
   if (feature.priority().priority() == ObstaclePriority::IGNORE) {
     ADEBUG << "Skip ignored obstacle [" << obstacle_id << "]";
     return;
+  } else if (feature.priority().priority() == ObstaclePriority::CAUTION) {
+    int id_mod = obstacle_id % FLAGS_max_caution_thread_num;
+    (*id_obstacle_map)[id_mod].push_back(obstacle_ptr);
+    ADEBUG << "Cautioned obstacle [" << obstacle_id << "] for thread" << id_mod;
+  } else {
+    int normal_thread_num = FLAGS_max_thread_num - FLAGS_max_caution_thread_num;
+    int id_mod = obstacle_id % normal_thread_num + FLAGS_max_caution_thread_num;
+    (*id_obstacle_map)[id_mod].push_back(obstacle_ptr);
+    ADEBUG << "Normal obstacle [" << obstacle_id << "] for thread" << id_mod;
   }
-  int id_mod = obstacle_id % FLAGS_max_thread_num;
-  (*id_obstacle_map)[id_mod].push_back(obstacle_ptr);
 }
 
 }  // namespace
