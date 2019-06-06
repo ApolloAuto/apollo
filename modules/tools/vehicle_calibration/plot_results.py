@@ -34,7 +34,7 @@ if len(sys.argv) < 2:
     sys.exit(0)
 
 with open(sys.argv[1], 'r') as f:
-   cmd_table = {}
+    cmd_table = {}
 
     for line in f:
         items = line.split(',')
