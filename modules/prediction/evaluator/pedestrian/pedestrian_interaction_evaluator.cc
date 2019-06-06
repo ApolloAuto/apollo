@@ -32,6 +32,9 @@ using apollo::common::adapter::AdapterConfig;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 
+PedestrianInteractionEvaluator::PedestrianInteractionEvaluator()
+    : device_(torch::kCPU) { }
+
 void PedestrianInteractionEvaluator::Clear() {
   auto ptr_obstacles_container =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
@@ -47,6 +50,18 @@ void PedestrianInteractionEvaluator::Clear() {
   for (const int key : keys_to_delete) {
     obstacle_id_lstm_state_map_.erase(key);
   }
+}
+
+void PedestrianInteractionEvaluator::LoadModel() {
+  torch::set_num_threads(1);
+  torch_position_embedding_ptr_ = torch::jit::load(
+      FLAGS_torch_pedestrian_interaction_position_embedding_file, device_);
+  torch_social_embedding_ptr_ = torch::jit::load(
+      FLAGS_torch_pedestrian_interaction_social_embedding_file, device_);
+  torch_single_lstm_ptr_ = torch::jit::load(
+      FLAGS_torch_pedestrian_interaction_single_lstm_file, device_);
+  torch_prediction_layer_ptr_ = torch::jit::load(
+      FLAGS_torch_pedestrian_interaction_prediction_layer_file, device_);
 }
 
 bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {

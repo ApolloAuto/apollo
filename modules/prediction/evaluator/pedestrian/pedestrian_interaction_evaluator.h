@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <memory>
 #include <unordered_map>
 #include <string>
 #include <vector>
@@ -42,7 +43,7 @@ class PedestrianInteractionEvaluator : public Evaluator {
   /**
    * @brief Constructor
    */
-  PedestrianInteractionEvaluator() = default;
+  PedestrianInteractionEvaluator();
 
   /**
    * @brief Destructor
@@ -77,8 +78,19 @@ class PedestrianInteractionEvaluator : public Evaluator {
 
   void Clear();
 
+  void LoadModel();
+
  private:
   std::unordered_map<int, LSTMState> obstacle_id_lstm_state_map_;
+  std::shared_ptr<torch::jit::script::Module>
+      torch_position_embedding_ptr_ = nullptr;
+  std::shared_ptr<torch::jit::script::Module>
+      torch_social_embedding_ptr_ = nullptr;
+  std::shared_ptr<torch::jit::script::Module>
+      torch_single_lstm_ptr_ = nullptr;
+  std::shared_ptr<torch::jit::script::Module>
+      torch_prediction_layer_ptr_ = nullptr;
+  torch::Device device_;
 };
 
 }  // namespace prediction
