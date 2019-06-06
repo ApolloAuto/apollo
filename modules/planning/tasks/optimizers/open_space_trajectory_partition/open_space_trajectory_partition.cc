@@ -300,7 +300,7 @@ bool OpenSpaceTrajectoryPartition::EncodeTrajectory(
   const std::string init_point_heading_encoding =
       std::to_string(static_cast<int>(init_path_point.theta() * 10000.0));
   const std::string last_point_x_encoding = std::to_string(
-      static_cast<int>((last_path_point.x() - encoding_origin_y) * 1000.0));
+      static_cast<int>((last_path_point.x() - encoding_origin_x) * 1000.0));
   const std::string last_point_y_encoding = std::to_string(
       static_cast<int>((last_path_point.y() - encoding_origin_y) * 1000.0));
   const std::string last_point_heading_encoding =
