@@ -24,7 +24,6 @@ message BosConfig {
 // principle of Least Privilege:
 // 1. Only grant access to this bucket.
 // 2. Only grant access to required paths.
-// 3. Grant ready-only access if there is no writing operation.
 message Storage {
   oneof storage_config {
     BosConfig bos = 1;
