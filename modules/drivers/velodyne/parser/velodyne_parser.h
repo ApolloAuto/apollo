@@ -104,7 +104,7 @@ static const uint16_t ROTATION_MAX_UNITS = 36001; /**< hundredths of degrees */
 static const float DISTANCE_MAX = 130.0f;        /**< meters */
 static const float DISTANCE_RESOLUTION = 0.002f; /**< meters */
 static const float DISTANCE_MAX_UNITS =
-    (DISTANCE_MAX / DISTANCE_RESOLUTION + 1.0);
+    (DISTANCE_MAX / DISTANCE_RESOLUTION + 1.0f);
 
 // laser_block_id
 static const uint16_t UPPER_BANK = 0xeeff;
