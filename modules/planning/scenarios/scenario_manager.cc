@@ -976,7 +976,8 @@ void ScenarioManager::UpdatePlanningContextPullOverScenario(
 
   const auto& pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
-  if (pull_over_status.has_x() && pull_over_status.has_y()) {
+  if (pull_over_status.has_position() && pull_over_status.position().has_x()
+      && pull_over_status.position().has_y()) {
     const auto& routing = frame.local_view().routing;
     if (routing->routing_request().waypoint_size() >= 2) {
       // keep pull-over stop fence if destination not changed
@@ -990,8 +991,9 @@ void ScenarioManager::UpdatePlanningContextPullOverScenario(
                             &dest_sl);
 
       common::SLPoint pull_over_sl;
-      reference_line.XYToSL({pull_over_status.x(), pull_over_status.y()},
-                            &pull_over_sl);
+      reference_line.XYToSL(
+          {pull_over_status.position().x(), pull_over_status.position().y()},
+          &pull_over_sl);
 
       constexpr double kDestMaxDelta = 30.0;  // meter
       if (std::fabs(dest_sl.s() - pull_over_sl.s()) > kDestMaxDelta) {

@@ -209,8 +209,8 @@ void OpenSpaceRoiDecider::SetParkingSpotEndPose(
 void OpenSpaceRoiDecider::SetPullOverSpotEndPose(Frame *const frame) {
   const auto &pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
-  const double pull_over_x = pull_over_status.x();
-  const double pull_over_y = pull_over_status.y();
+  const double pull_over_x = pull_over_status.position().x();
+  const double pull_over_y = pull_over_status.position().y();
   double pull_over_theta = pull_over_status.theta();
 
   // Normalize according to origin_point and origin_heading
@@ -761,7 +761,9 @@ bool OpenSpaceRoiDecider::GetPullOverSpot(
     hdmap::Path *nearby_path) {
   const auto &pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
-  if (!pull_over_status.has_x() || !pull_over_status.has_y() ||
+  if (!pull_over_status.has_position() ||
+      !pull_over_status.position().has_x() ||
+      !pull_over_status.position().has_y() ||
       !pull_over_status.has_theta()) {
     AERROR << "Pull over position not set in planning context";
     return false;
@@ -777,8 +779,8 @@ bool OpenSpaceRoiDecider::GetPullOverSpot(
       frame->reference_line_info().front().reference_line().GetMapPath();
 
   // Construct left_top, left_down, right_down, right_top points
-  double pull_over_x = pull_over_status.x();
-  double pull_over_y = pull_over_status.y();
+  double pull_over_x = pull_over_status.position().x();
+  double pull_over_y = pull_over_status.position().y();
   const double pull_over_theta = pull_over_status.theta();
   const double pull_over_length_front = pull_over_status.length_front();
   const double pull_over_length_back = pull_over_status.length_back();
