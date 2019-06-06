@@ -363,6 +363,7 @@ proto_library(
         ":planning_config_proto_lib",
         ":planning_proto_lib",
         "//modules/common/proto:drive_state_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
         "//modules/routing/proto:routing_proto_lib",
     ],

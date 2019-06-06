@@ -75,8 +75,11 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
   const auto& pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
 
-  if (!pull_over_status.is_feasible() || !pull_over_status.has_x() ||
-      !pull_over_status.has_y() || !pull_over_status.has_theta()) {
+  if (!pull_over_status.is_feasible() ||
+      !pull_over_status.has_position() ||
+      !pull_over_status.position().has_x() ||
+      !pull_over_status.position().has_y() ||
+      !pull_over_status.has_theta()) {
     ADEBUG << "pull_over status not set properly: "
            << pull_over_status.DebugString();
     return UNKNOWN;
@@ -84,8 +87,9 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
 
   common::SLPoint pull_over_sl;
   const auto& reference_line = reference_line_info.reference_line();
-  reference_line.XYToSL({pull_over_status.x(), pull_over_status.y()},
-                        &pull_over_sl);
+  reference_line.XYToSL(
+      {pull_over_status.position().x(), pull_over_status.position().y()},
+      &pull_over_sl);
   double distance = adc_front_edge_s - pull_over_sl.s();
   if (distance >= scenario_config.pass_destination_threshold()) {
     ADEBUG << "ADC passed pull-over spot: distance[" << distance << "]";
@@ -136,8 +140,11 @@ PullOverStatus CheckADCPullOverOpenSpace(
   const auto& pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
 
-  if (!pull_over_status.is_feasible() || !pull_over_status.has_x() ||
-      !pull_over_status.has_y() || !pull_over_status.has_theta()) {
+  if (!pull_over_status.is_feasible() ||
+      !pull_over_status.has_position() ||
+      !pull_over_status.position().has_x() ||
+      !pull_over_status.position().has_y() ||
+      !pull_over_status.has_theta()) {
     ADEBUG << "pull_over status not set properly: "
            << pull_over_status.DebugString();
     return UNKNOWN;
@@ -147,8 +154,8 @@ PullOverStatus CheckADCPullOverOpenSpace(
       common::VehicleStateProvider::Instance()->x(),
       common::VehicleStateProvider::Instance()->y()};
 
-  const common::math::Vec2d end_pose = {pull_over_status.x(),
-                                        pull_over_status.y()};
+  const common::math::Vec2d end_pose = {pull_over_status.position().x(),
+                                        pull_over_status.position().y()};
 
   const double distance_diff = adc_position.DistanceTo(end_pose);
 

@@ -97,11 +97,14 @@ common::Status PiecewiseJerkPathOptimizer::Process(
           PlanningContext::Instance()->planning_status().pull_over();
 
       // Set end lateral to be at the desired pull over destination
-      if (pull_over_status.has_x() && pull_over_status.has_y() &&
+      if (pull_over_status.has_position() &&
+          pull_over_status.position().has_x() &&
+          pull_over_status.position().has_y() &&
           path_boundary.label().find("pullover") != std::string::npos) {
         common::SLPoint pull_over_sl;
-        reference_line.XYToSL({pull_over_status.x(), pull_over_status.y()},
-                              &pull_over_sl);
+        reference_line.XYToSL(
+            {pull_over_status.position().x(), pull_over_status.position().y()},
+            &pull_over_sl);
         end_state[0] = pull_over_sl.l();
       }
     }
