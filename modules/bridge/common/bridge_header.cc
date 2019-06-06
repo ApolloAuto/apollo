@@ -34,10 +34,7 @@ bool BridgeHeader::Serialize(char *buf, size_t size) {
     cursor = header_item[i]->SerializeItem(cursor, size, &header_size_);
   }
 
-  if (!SerializeHeaderSize(p_header_size, size)) {
-    return false;
-  }
-  return true;
+  return SerializeHeaderSize(p_header_size, size);
 }
 
 bool BridgeHeader::Diserialize(const char *buf) {
@@ -60,12 +57,11 @@ bool BridgeHeader::Diserialize(const char *buf) {
       cursor += sizeof(size_t) + size + 2;
       i -= sizeof(HType) + sizeof(size_t) + size + 3;
       continue;
-    } else {
-      size_t value_size = 0;
-      for (int i = 0; i < Header_Tail; i++) {
-        if (type == header_item[i]->GetType()) {
-          cursor = header_item[i]->DiserializeItem(cursor, &value_size);
-        }
+    }
+    size_t value_size = 0;
+    for (int i = 0; i < Header_Tail; i++) {
+      if (type == header_item[i]->GetType()) {
+        cursor = header_item[i]->DiserializeItem(cursor, &value_size);
       }
       i -= value_size;
     }
@@ -77,10 +73,7 @@ bool BridgeHeader::IsAvailable(const char *buf) {
   if (!buf) {
     return false;
   }
-  if (memcmp(BRIDGE_HEADER_FLAG, buf, sizeof(BRIDGE_HEADER_FLAG) - 1) != 0) {
-    return false;
-  }
-  return true;
+  return memcmp(BRIDGE_HEADER_FLAG, buf, sizeof(BRIDGE_HEADER_FLAG) - 1) == 0;
 }
 
 char *BridgeHeader::SerializeHeaderFlag(char *buf, size_t size) {
