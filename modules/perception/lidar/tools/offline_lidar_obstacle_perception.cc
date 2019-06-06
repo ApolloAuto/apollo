@@ -51,6 +51,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+using apollo::common::util::StrCat;
 using cyber::common::GetFileName;
 
 class OfflineLidarObstaclePerception {
@@ -124,14 +125,15 @@ class OfflineLidarObstaclePerception {
       if (frame_->cloud == nullptr) {
         frame_->cloud = base::PointFCloudPool::Instance().Get();
       }
-      LoadPCLPCD(pcd_folder + "/" + file_name + ".pcd", frame_->cloud.get());
+      LoadPCLPCD(StrCat(pcd_folder, "/", file_name, ".pcd"),
+                 frame_->cloud.get());
       AINFO << "Read point cloud from " << pcd_file_names[i]
             << " with cloud size: " << frame_->cloud->size();
       if (pose_folder != "") {
-        std::string pose_file_name = pose_folder + "/" + file_name + ".pose";
+        std::string pose_file_name = StrCat(pose_folder, "/", file_name, ".pose");
         AINFO << "Pose file: " << pose_file_name;
         if (!apollo::cyber::common::PathExists(pose_file_name)) {
-          pose_file_name = pose_folder + "/" + file_name + ".pcd.pose";
+          pose_file_name = StrCat(pose_folder, "/", file_name, ".pcd.pose");
         }
         int idt = 0;
         if (common::ReadPoseFile(pose_file_name, &frame_->lidar2world_pose,
@@ -169,7 +171,7 @@ class OfflineLidarObstaclePerception {
                     [](const base::ObjectPtr& lhs, const base::ObjectPtr& rhs) {
                       return lhs->id < rhs->id;
                     });
-          for (std::size_t j = 0; j < objects.size(); ++j) {
+          for (size_t j = 0; j < objects.size(); ++j) {
             CHECK(objects[j]->id == result_objects[j]->id);
             objects[j]->track_id = result_objects[j]->track_id;
             objects[j]->tracking_time = result_objects[j]->tracking_time;
@@ -203,9 +205,7 @@ class OfflineLidarObstaclePerception {
         }
       }
       if (!WriteObjectsForNewBenchmark(
-              i, filtered_objects,
-              apollo::common::util::StrCat(output_path, "/", file_name,
-                                           ".pcd"))) {
+          i, filtered_objects, StrCat(output_path, "/", file_name, ".pcd"))) {
         return false;
       }
     }
@@ -218,7 +218,7 @@ class OfflineLidarObstaclePerception {
                                    const std::string& path) {
     std::ofstream fout(path);
     if (!fout.is_open()) {
-      AERROR << "Failed to open: " << path;
+      AERROR << "Failed to open file: " << path;
       return false;
     }
     fout << frame_id << " " << objects.size() << std::endl;
@@ -228,17 +228,19 @@ class OfflineLidarObstaclePerception {
            << object->lidar_supplement.is_background << " "
            << std::setprecision(8) << object->confidence << " ";
 
-      std::string type = "unknow";
-      if (object->type == base::ObjectType::UNKNOWN ||
-          object->type == base::ObjectType::UNKNOWN_MOVABLE ||
-          object->type == base::ObjectType::UNKNOWN_UNMOVABLE) {
-        // type is unknow in this case
-      } else if (object->type == base::ObjectType::PEDESTRIAN) {
-        type = "pedestrian";
-      } else if (object->type == base::ObjectType::VEHICLE) {
-        type = "smallMot";
-      } else if (object->type == base::ObjectType::BICYCLE) {
-        type = "nonMot";
+      const std::string type = "unknow";
+      switch (object->type) {
+        case base::ObjectType::PEDESTRIAN:
+          type = "pedestrian";
+        case base::ObjectType::VEHICLE:
+          type = "smallMot";
+        case base::ObjectType::BICYCLE:
+          type = "nonMot";
+        case base::ObjectType::UNKNOWN:
+        case base::ObjectType::UNKNOWN_MOVABLE:
+        case base::ObjectType::UNKNOWN_UNMOVABLE:
+        default:
+          break;
       }
 
       double yaw = atan2(object->direction(1), object->direction(0));
@@ -331,13 +333,13 @@ class OfflineLidarObstaclePerception {
 }  // namespace apollo
 
 int main(int argc, char** argv) {
-  FLAGS_alsologtostderr = 1;
+  FLAGS_alsologtostderr = true;
   google::ParseCommandLineFlags(&argc, &argv, true);
   google::InitGoogleLogging(argv[0]);
 
   apollo::perception::lidar::OfflineLidarObstaclePerception test;
   if (!test.setup()) {
-    AINFO << "Failed to setup OfflineLidarObstaclePerception";
+    AINFO << "Failed to setup OfflineLidarObstaclePerception.";
     return -1;
   }
   return test.run() ? 0 : -1;
