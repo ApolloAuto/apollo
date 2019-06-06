@@ -97,11 +97,14 @@ common::Status PiecewiseJerkPathOptimizer::Process(
           PlanningContext::Instance()->planning_status().pull_over();
 
       // Set end lateral to be at the desired pull over destination
-      if (pull_over_status.has_x() && pull_over_status.has_y() &&
+      if (pull_over_status.has_position() &&
+          pull_over_status.position().has_x() &&
+          pull_over_status.position().has_y() &&
           path_boundary.label().find("pullover") != std::string::npos) {
         common::SLPoint pull_over_sl;
-        reference_line.XYToSL({pull_over_status.x(), pull_over_status.y()},
-                              &pull_over_sl);
+        reference_line.XYToSL(
+            {pull_over_status.position().x(), pull_over_status.position().y()},
+            &pull_over_sl);
         end_state[0] = pull_over_sl.l();
       }
     }
@@ -167,6 +170,17 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
                                         FLAGS_lateral_derivative_bound_default);
   piecewise_jerk_problem.set_dddx_bound(FLAGS_lateral_jerk_bound);
 
+
+  /**
+  // Experimental code to be tested
+  // TODO(all): find the params in vehicle config
+  double axis_distance = 2.5;
+  double max_steering_rate = 1.0 / 6.0 * M_PI;
+  double jerk_bound = EstimateJerkBoundary(std::fmax(init_state[1], 1.0),
+      axis_distance, max_steering_rate);
+  piecewise_jerk_problem.set_dddx_bound(jerk_bound);
+  **/
+
   bool success = piecewise_jerk_problem.Optimize(max_iter);
 
   auto end_time = std::chrono::system_clock::now();
@@ -219,6 +233,12 @@ FrenetFramePath PiecewiseJerkPathOptimizer::ToPiecewiseJerkPath(
   }
 
   return FrenetFramePath(frenet_frame_path);
+}
+
+double PiecewiseJerkPathOptimizer::EstimateJerkBoundary(
+    const double vehicle_speed, const double axis_distance,
+    const double max_steering_rate) const {
+  return max_steering_rate / axis_distance / vehicle_speed;
 }
 
 }  // namespace planning

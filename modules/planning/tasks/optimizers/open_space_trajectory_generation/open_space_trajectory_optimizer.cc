@@ -71,6 +71,8 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
                   "trajectory generation");
   }
 
+  const auto start_timestamp = std::chrono::system_clock::now();
+
   // Initiate initial states
   stitching_trajectory_ = stitching_trajectory;
 
@@ -241,6 +243,11 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
   }
 
   LoadTrajectory(state_result_ds, control_result_ds, time_result_ds);
+
+  const auto end_timestamp = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff = end_timestamp - start_timestamp;
+  ADEBUG << "open space trajectory smoother total time: "
+         << diff.count() * 1000.0 << " ms.";
 
   return Status::OK();
 }

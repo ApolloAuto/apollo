@@ -32,12 +32,12 @@ using cyber::common::GetAbsolutePath;
 
 bool DenselineLanePostprocessor::Init(
     const LanePostprocessorInitOptions& options) {
-  // read detector config parameter
+  // Read detector config parameter
   denseline::DenselineParam denseline_param;
   const std::string& proto_path =
       GetAbsolutePath(options.detect_config_root, options.detect_config_name);
   if (!cyber::common::GetProtoFromFile(proto_path, &denseline_param)) {
-    AINFO << "load proto param failed, root dir: " << options.root_dir;
+    AERROR << "Failed to load proto param, root dir: " << options.root_dir;
     return false;
   }
   const auto& model_param = denseline_param.model_param();
@@ -52,7 +52,7 @@ bool DenselineLanePostprocessor::Init(
   const std::string& conf_file = options.conf_file;
   const std::string& postprocessor_config =
       GetAbsolutePath(root_dir, conf_file);
-  AINFO << "postprocessor_config:" << postprocessor_config;
+  AINFO << "postprocessor_config: " << postprocessor_config;
   if (!cyber::common::GetProtoFromFile(postprocessor_config,
                                        &lane_postprocessor_param_)) {
     AERROR << "Read config detect_param failed: " << postprocessor_config;
@@ -107,7 +107,7 @@ bool DenselineLanePostprocessor::Process2D(
                      line_pos_type_vec[line_index], line_index,
                      &(frame->lane_objects));
   }
-  AINFO << "[AfterProcess2D]lane_lines_num=" << frame->lane_objects.size();
+  AINFO << "[AfterProcess2D]lane_lines_num: " << frame->lane_objects.size();
 
   return true;
 }
@@ -144,7 +144,6 @@ void DenselineLanePostprocessor::ConvertImagePoint2Camera(CameraFrame* frame) {
       camera_point_set.push_back(camera_point);
     }
   }
-  return;
 }
 
 std::string DenselineLanePostprocessor::Name() const {
@@ -170,7 +169,7 @@ void DenselineLanePostprocessor::CalLaneMap(
       score_channel[1] = output_data[channel1_pos + x];
       score_channel[2] = output_data[channel2_pos + x];
       score_channel[3] = output_data[channel3_pos + x];
-      //  utilize softmax to get the probability
+      // Utilize softmax to get the probability
       float sum_score = 0.0f;
       for (int i = 0; i < 4; i++) {
         score_channel[i] = static_cast<float>(exp(score_channel[i]));
@@ -205,7 +204,6 @@ void DenselineLanePostprocessor::CalLaneMap(
       lane_output_[out_dim * 2 + pixel_pos] = max_score;
     }
   }
-  return;
 }
 
 // @brief infer the lane line points using lane center point information
@@ -237,7 +235,6 @@ void DenselineLanePostprocessor::InferPointSetFromLaneCenter(
     InferPointSetFromOneCC(lane_ccs[i], left_index, right_index,
                            lane_map_group_point_set);
   }
-  return;
 }
 
 // @brief infer the lane line points from one CC
@@ -296,7 +293,7 @@ void DenselineLanePostprocessor::InferPointSetFromOneCC(
   int ymin = bbox.ymin;
   for (int j = ymin; j <= ymax; j++) {
     int start_pos = j * lane_map_width_;
-    //  find the position with maximum value for left side
+    // Find the position with maximum value for left side
     if (left_index != -1) {
       float* score_left_pointer = score_left_vec + start_pos;
       float* x_left_pointer = x_left_vec + start_pos;
@@ -322,7 +319,6 @@ void DenselineLanePostprocessor::InferPointSetFromOneCC(
       }
     }
   }
-  return;
 }
 
 bool DenselineLanePostprocessor::MaxScorePoint(const float* score_pointer,
@@ -353,7 +349,7 @@ bool DenselineLanePostprocessor::SelectLanecenterCCs(
   select_lane_ccs->clear();
   int lane_ccs_num = static_cast<int>(lane_ccs.size());
   if (lane_ccs_num == 0) {
-    AINFO << "lane_ccs_num=0";
+    AINFO << "lane_ccs_num is 0.";
     return false;
   }
   //  select top 3 ccs with largest pixels size
@@ -363,14 +359,14 @@ bool DenselineLanePostprocessor::SelectLanecenterCCs(
   for (int i = 0; i < lane_ccs_num; i++) {
     const std::vector<base::Point2DI>& pixels = lane_ccs[i].GetPixels();
     if (static_cast<int>(pixels.size()) < valid_pixels_num) {
-      AINFO << "pixels_size < valid_pixels_num";
+      AINFO << "pixels_size < valid_pixels_num.";
       continue;
     }
     valid_lane_ccs.push_back(lane_ccs[i]);
   }
   int valid_ccs_num = static_cast<int>(valid_lane_ccs.size());
   if (valid_ccs_num == 0) {
-    AINFO << "valid_ccs_num=0";
+    AINFO << "valid_ccs_num is 0.";
     return false;
   }
   std::sort(valid_lane_ccs.begin(), valid_lane_ccs.end(), CompareCCSize);
@@ -584,7 +580,6 @@ void DenselineLanePostprocessor::ClassifyLanelinePosTypeInImage(
         base::LaneLinePositionType::ADJACENT_RIGHT;
     (*line_flag)[adj_right_index] = true;
   }
-  return;
 }
 
 // @brief: locate neighbor lane lines
@@ -647,8 +642,8 @@ void DenselineLanePostprocessor::Convert2OriginalCoord(
       (*image_group_point_set)[i].push_back(original_info);
     }
   }
-  return;
 }
+
 // @brief: add image lane line
 void DenselineLanePostprocessor::AddImageLaneline(
     const std::vector<LanePointInfo>& image_point_set,
@@ -725,7 +720,6 @@ void DenselineLanePostprocessor::AddImageLaneline(
   lane_mark.type = type;
   lane_mark.pos_type = pos_type;
   lane_marks->push_back(lane_mark);
-  return;
 }
 
 // @brief: fit camera lane line using polynomial
@@ -769,7 +763,6 @@ void DenselineLanePostprocessor::PolyFitCameraLaneline(CameraFrame* frame) {
     lane_objects[line_index].curve_car_coord.x_end = x_end;
     lane_objects[line_index].use_type = base::LaneLineUseType::REAL;
   }
-  return;
 }
 
 std::vector<std::vector<LanePointInfo> >
@@ -823,6 +816,7 @@ DenselineLanePostprocessor::GetAllInferLinePointSet() {
   }
   return image_laneline_point_set_;
 }
+
 void DenselineLanePostprocessor::GetLaneCCs(
     std::vector<unsigned char>* lane_map, int* lane_map_width,
     int* lane_map_height, std::vector<ConnectedComponent>* connected_components,
@@ -832,7 +826,6 @@ void DenselineLanePostprocessor::GetLaneCCs(
   *lane_map_height = lane_map_height_;
   *connected_components = lane_ccs_;
   *select_connected_components = select_lane_ccs_;
-  return;
 }
 
 REGISTER_LANE_POSTPROCESSOR(DenselineLanePostprocessor);

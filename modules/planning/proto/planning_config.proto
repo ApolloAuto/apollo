@@ -143,6 +143,7 @@ message ScenarioPullOverConfig {
   optional double max_theta_error_to_end_point = 7 [default = 0.2];
   optional double pass_destination_threshold = 8 [default = 10.0];
   optional double max_valid_stop_distance = 9 [default = 1.0];
+  optional double max_distance_error_to_end_point = 10 [default = 0.2];
 }
 
 message ScenarioValetParkingConfig {

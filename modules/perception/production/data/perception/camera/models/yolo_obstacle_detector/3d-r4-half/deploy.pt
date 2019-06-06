@@ -1542,7 +1542,7 @@ layer {
   name: "slice"
   type: "Slice"
   bottom: "conv_final_permute"
-  top: "loc_pred"
+  top: "detect1_loc_pred"
   top: "obj_perm"
   top: "cls_perm"
   slice_param {
@@ -1578,7 +1578,7 @@ layer {
   name: "cls_pred"
   type: "Reshape"
   bottom: "cls_pred_prob"
-  top: "cls_pred"
+  top: "detect1_cls_pred"
   reshape_param {
     shape {
       dim: 0
@@ -1592,7 +1592,7 @@ layer {
   name: "obj_pred"
   type: "Sigmoid"
   bottom: "obj_perm"
-  top: "obj_pred"
+  top: "detect1_obj_pred"
 }
 ###########################
 ######## BBOX3D ###########
@@ -1621,7 +1621,7 @@ layer {
   name: "ori_pred"
   type: "Permute"
   bottom: "ori_origin"
-  top: "ori_pred"
+  top: "detect1_ori_pred"
   permute_param {
     order: 0
     order: 2
@@ -1653,7 +1653,7 @@ layer {
   name: "dim_pred"
   type: "Permute"
   bottom: "dim_origin"
-  top: "dim_pred"
+  top: "detect1_dim_pred"
   permute_param {
     order: 0
     order: 2

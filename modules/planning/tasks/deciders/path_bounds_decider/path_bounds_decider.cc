@@ -350,10 +350,11 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(
                                ->mutable_planning_status()
                                ->mutable_pull_over();
   // If already found a pull-over position, simply check if it's valid.
-  if (pull_over_status->is_feasible()) {
-    int curr_idx =
-        IsPointWithinPathBound(reference_line_info, pull_over_status->x(),
-                               pull_over_status->y(), *path_bound);
+  if (pull_over_status->is_feasible() && pull_over_status->has_position()) {
+    int curr_idx = IsPointWithinPathBound(reference_line_info,
+                                          pull_over_status->position().x(),
+                                          pull_over_status->position().y(),
+                                          *path_bound);
     if (curr_idx >= 0) {
       // Trim path-bound properly.
       while (static_cast<int>(path_bound->size()) - 1 >
@@ -384,10 +385,11 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(
   // and trim the path-bound properly.
   pull_over_status->Clear();
   pull_over_status->set_is_feasible(true);
-  pull_over_status->set_x(std::get<0>(pull_over_configuration));
-  pull_over_status->set_y(std::get<1>(pull_over_configuration));
-  ADEBUG << "Pull-over x = " << pull_over_status->x();
-  ADEBUG << "Pull-over y = " << pull_over_status->y();
+  pull_over_status->mutable_position()->set_x(
+      std::get<0>(pull_over_configuration));
+  pull_over_status->mutable_position()->set_y(
+      std::get<1>(pull_over_configuration));
+  pull_over_status->mutable_position()->set_z(0.0);
   pull_over_status->set_theta(std::get<2>(pull_over_configuration));
   pull_over_status->set_length_front(FLAGS_obstacle_lon_start_buffer);
   pull_over_status->set_length_back(FLAGS_obstacle_lon_end_buffer);
@@ -395,6 +397,10 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(
       VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0);
   pull_over_status->set_width_right(
       VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0);
+
+  ADEBUG << "Pull Over: x[" << pull_over_status->position().x()
+         << "] y[" <<  pull_over_status->position().y()
+         << "] theta[" << pull_over_status->theta() << "]";
 
   while (static_cast<int>(path_bound->size()) - 1 >
          std::get<3>(pull_over_configuration) + kNumExtraTailBoundPoint) {

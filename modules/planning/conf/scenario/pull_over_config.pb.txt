@@ -8,6 +8,7 @@ pull_over_config: {
   max_l_error_to_end_point: 1.0
   max_theta_error_to_end_point: 0.2
   pass_destination_threshold: 15.0
+  max_distance_error_to_end_point: 0.2
 }
 
 stage_type: PULL_OVER_APPROACH

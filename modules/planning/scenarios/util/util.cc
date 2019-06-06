@@ -75,8 +75,11 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
   const auto& pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
 
-  if (!pull_over_status.is_feasible() || !pull_over_status.has_x() ||
-      !pull_over_status.has_y() || !pull_over_status.has_theta()) {
+  if (!pull_over_status.is_feasible() ||
+      !pull_over_status.has_position() ||
+      !pull_over_status.position().has_x() ||
+      !pull_over_status.position().has_y() ||
+      !pull_over_status.has_theta()) {
     ADEBUG << "pull_over status not set properly: "
            << pull_over_status.DebugString();
     return UNKNOWN;
@@ -84,8 +87,9 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
 
   common::SLPoint pull_over_sl;
   const auto& reference_line = reference_line_info.reference_line();
-  reference_line.XYToSL({pull_over_status.x(), pull_over_status.y()},
-                        &pull_over_sl);
+  reference_line.XYToSL(
+      {pull_over_status.position().x(), pull_over_status.position().y()},
+      &pull_over_sl);
   double distance = adc_front_edge_s - pull_over_sl.s();
   if (distance >= scenario_config.pass_destination_threshold()) {
     ADEBUG << "ADC passed pull-over spot: distance[" << distance << "]";
@@ -131,10 +135,49 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
   }
 }
 
-// TODO(QiL): refactor and merge with CheckADCPullOver
-PullOverStatus CheckADCPullOverOpenSpace() { return PARK_FAIL; }
+PullOverStatus CheckADCPullOverOpenSpace(
+    const ScenarioPullOverConfig& scenario_config) {
+  const auto& pull_over_status =
+      PlanningContext::Instance()->planning_status().pull_over();
 
+  if (!pull_over_status.is_feasible() ||
+      !pull_over_status.has_position() ||
+      !pull_over_status.position().has_x() ||
+      !pull_over_status.position().has_y() ||
+      !pull_over_status.has_theta()) {
+    ADEBUG << "pull_over status not set properly: "
+           << pull_over_status.DebugString();
+    return UNKNOWN;
+  }
+
+  const common::math::Vec2d adc_position = {
+      common::VehicleStateProvider::Instance()->x(),
+      common::VehicleStateProvider::Instance()->y()};
+
+  const common::math::Vec2d end_pose = {pull_over_status.position().x(),
+                                        pull_over_status.position().y()};
+
+  const double distance_diff = adc_position.DistanceTo(end_pose);
+
+  const double theta_diff = std::fabs(common::math::NormalizeAngle(
+      pull_over_status.theta() -
+      common::VehicleStateProvider::Instance()->heading()));
+
+  if (distance_diff <= scenario_config.max_distance_error_to_end_point() &&
+      theta_diff <= scenario_config.max_theta_error_to_end_point()) {
+    return PARK_COMPLETE;
+  } else {
+    ADEBUG << "distance_diff[" << distance_diff << "] while distance threshold["
+           << scenario_config.max_distance_error_to_end_point() << "]";
+    ADEBUG << "theta_diff is[" << theta_diff << "] while theta threshold["
+           << scenario_config.max_theta_error_to_end_point() << "]";
+    return PARK_FAIL;
+  }
+
+  return PARK_FAIL;
+}
 }  // namespace util
+
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
