@@ -72,15 +72,15 @@ class PedestrianInteractionEvaluator : public Evaluator {
  private:
   struct LSTMState {
     double timestamp;
-    torch::jit::IValue ct;
-    torch::jit::IValue ht;
+    torch::Tensor ct;
+    torch::Tensor ht;
   };
 
   void Clear();
 
   void LoadModel();
 
-  torch::jit::IValue GetSocialPooling();
+  torch::Tensor GetSocialPooling();
 
  private:
   std::unordered_map<int, LSTMState> obstacle_id_lstm_state_map_;
