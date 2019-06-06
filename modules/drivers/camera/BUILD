@@ -56,7 +56,7 @@ cc_library(
         "usb_cam.h",
         "util.h",
     ],
-    copts = ["-mavx2"],
+    #copts = ["-mavx2"],
     deps = [
         "//cyber",
         "//modules/drivers/camera/proto:camera_proto",
