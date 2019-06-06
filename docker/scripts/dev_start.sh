@@ -270,7 +270,16 @@ function main(){
     docker pull ${PADDLE_VOLUME_IMAGE}
     docker run -it -d --rm --name ${PADDLE_VOLUME} ${PADDLE_VOLUME_IMAGE}
 
-    OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCALIZATION_VOLUME} --volumes-from ${PADDLE_VOLUME}"
+    LOCAL_THIRD_PARTY_VOLUME=apollo_local_third_party_volume_$USER
+    docker stop ${LOCAL_THIRD_PARTY_VOLUME} > /dev/null 2>&1
+
+    LOCAL_THIRD_PARTY_VOLUME_IMAGE=${DOCKER_REPO}:local_third_party_volume-${ARCH}-latest
+    docker pull ${LOCAL_THIRD_PARTY_VOLUME_IMAGE}
+    docker run -it -d --rm --name ${LOCAL_THIRD_PARTY_VOLUME} ${LOCAL_THIRD_PARTY_VOLUME_IMAGE}
+
+    OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCALIZATION_VOLUME} "
+    OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${PADDLE_VOLUME}"
+    OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCAL_THIRD_PARTY_VOLUME}"
 
     local display=""
     if [[ -z ${DISPLAY} ]];then
