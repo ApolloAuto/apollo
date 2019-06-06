@@ -16,6 +16,7 @@
 
 #include "modules/prediction/evaluator/pedestrian/pedestrian_interaction_evaluator.h"
 
+#include <utility>
 #include <vector>
 
 #include "modules/prediction/common/feature_output.h"
@@ -64,7 +65,8 @@ void PedestrianInteractionEvaluator::LoadModel() {
       FLAGS_torch_pedestrian_interaction_prediction_layer_file, device_);
 }
 
-torch::jit::IValue PedestrianInteractionEvaluator::GetSocialPooling() {
+torch::Tensor PedestrianInteractionEvaluator::GetSocialPooling() {
+  // TODO(kechxu) implement more sophisticated logics
   return torch::zeros({1, kGridSize * kGridSize * kHiddenSize});
 }
 
@@ -90,14 +92,47 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     ADEBUG << "Saving extracted features for learning locally.";
     return true;
   }
-  // TODO(all) implement the online part.
   // Step 1 Get social embedding
+  torch::Tensor social_pooling = GetSocialPooling();
+  std::vector<torch::jit::IValue> social_embedding_inputs;
+  social_embedding_inputs.push_back(std::move(social_pooling));
+  torch::Tensor social_embedding = torch_social_embedding_ptr_
+      ->forward(social_embedding_inputs).toTensor().to(torch::kCPU);
 
   // Step 2 Get position embedding
+  double pos_x = feature_values[2];
+  double pos_y = feature_values[3];
+  torch::Tensor torch_position = torch::zeros({1, 2});
+  torch_position[0][0] = pos_x;
+  torch_position[0][1] = pos_y;
+  std::vector<torch::jit::IValue> position_embedding_inputs;
+  position_embedding_inputs.push_back(std::move(torch_position));
+  torch::Tensor position_embedding = torch_position_embedding_ptr_
+      ->forward(position_embedding_inputs).toTensor().to(torch::kCPU);
 
   // Step 3 Conduct single LSTM and update hidden states
+  torch::Tensor lstm_input =
+      torch::zeros({1, 2 * (kEmbeddingSize + kHiddenSize)});
+  for (int i = 0; i < kEmbeddingSize; ++i) {
+    lstm_input[0][i] = position_embedding[0][i];
+    lstm_input[0][kEmbeddingSize + i] = position_embedding[0][i];
+  }
+  // TODO(kechxu) if not found in the unordered_map, use h0 and c0
+  torch::Tensor curr_ht = obstacle_id_lstm_state_map_[id].ht;
+  torch::Tensor curr_ct = obstacle_id_lstm_state_map_[id].ct;
+  for (int i = 0; i < kHiddenSize; ++i) {
+    lstm_input[0][2 * kEmbeddingSize + i] = curr_ht[0][i];
+    lstm_input[0][2 * kEmbeddingSize + kHiddenSize + i] = curr_ht[0][i];
+  }
+  std::vector<torch::jit::IValue> lstm_inputs;
+  lstm_inputs.push_back(std::move(lstm_input));
+  auto lstm_out_tuple = torch_single_lstm_ptr_->forward(lstm_inputs).toTuple();
+  auto new_ht = lstm_out_tuple->elements()[0].toTensor();
+  auto new_ct = lstm_out_tuple->elements()[1].toTensor();
+  obstacle_id_lstm_state_map_[id].ht = new_ht;
+  obstacle_id_lstm_state_map_[id].ct = new_ct;
 
-  // Step 4 for-loop get a trajectory
+  // TODO(kechxu) Step 4 for-loop get a trajectory
 
   return true;
 }
