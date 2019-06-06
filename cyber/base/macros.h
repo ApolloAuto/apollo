@@ -50,7 +50,7 @@ inline void cpu_relax() {
 #if defined(__aarch64__)
   asm volatile("yield" ::: "memory");
 #else
-   asm volatile("rep; nop" ::: "memory");
+  asm volatile("rep; nop" ::: "memory");
 #endif
 }
 
