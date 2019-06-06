@@ -64,6 +64,10 @@ void PedestrianInteractionEvaluator::LoadModel() {
       FLAGS_torch_pedestrian_interaction_prediction_layer_file, device_);
 }
 
+torch::jit::IValue PedestrianInteractionEvaluator::GetSocialPooling() {
+  return torch::zeros({1, kGridSize * kGridSize * kHiddenSize});
+}
+
 bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Sanity checks.
   CHECK_NOTNULL(obstacle_ptr);
@@ -86,7 +90,15 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     ADEBUG << "Saving extracted features for learning locally.";
     return true;
   }
-  // TODO(jiacheng): once the model is trained, implement this online part.
+  // TODO(all) implement the online part.
+  // Step 1 Get social embedding
+
+  // Step 2 Get position embedding
+
+  // Step 3 Conduct single LSTM and update hidden states
+
+  // Step 4 for-loop get a trajectory
+
   return true;
 }
 
