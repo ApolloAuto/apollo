@@ -34,6 +34,7 @@ from common.message_manager import PbMessageManager
 g_message_manager = PbMessageManager()
 g_args = None
 
+
 def stat_planning(planning_msg):
     stats = {}
     if planning_msg.HasField("estop"):
@@ -48,7 +49,9 @@ def stat_planning(planning_msg):
     stats["other"] = stats["total_time"] - used_time
     return stats
 
+
 g_first_time = True
+
 
 def print_stat(msg, fhandle):
     if not msg:
@@ -80,9 +83,11 @@ def print_stat(msg, fhandle):
         fhandle.flush()
     output.close()
 
+
 def on_receive_planning(planning_msg):
     ss = stat_planning(planning_msg)
     print_stat(ss, g_args.report)
+
 
 def dump_bag(in_bag, msg_meta, fhandle):
     bag = rosbag.Bag(in_bag, 'r')
@@ -91,6 +96,7 @@ def dump_bag(in_bag, msg_meta, fhandle):
             continue
         ss = stat_planning(msg)
         print_stat(ss, g_args.report)
+
 
 def main(args):
     if not args.report:
@@ -113,10 +119,10 @@ def main(args):
     if args.report != sys.stdout:
         args.report.close()
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description="A tool to profile the runtime statistic of planning module"
-    )
+        description="A tool to profile the runtime statistic of planning module")
     parser.add_argument(
         "--rosbag", action="store", type=str, help="the input ros bag")
     parser.add_argument(

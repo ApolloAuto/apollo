@@ -171,7 +171,7 @@ class DataCollector(object):
         self.controlcmd.header.timestamp_sec = cyber_time.Time.now().to_sec()
         self.control_pub.write(self.controlcmd)
         self.write_file(self.controlcmd.header.timestamp_sec, 1)
-        if self.in_session == False:
+        if not self.in_session:
             self.file.close()
 
     def write_file(self, time, io):
@@ -180,10 +180,20 @@ class DataCollector(object):
         """
         self.file.write(
             "%.4f,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" %
-            (time, io, 1, self.controlcmd.brake, self.controlcmd.throttle,
-             self.controlcmd.gear_location, self.vehicle_speed, self.engine_rpm,
-             self.driving_mode, self.throttle_percentage, self.brake_percentage,
-             self.gear_location, self.acceleration))
+            (time,
+             io,
+             1,
+             self.controlcmd.brake,
+             self.controlcmd.throttle,
+             self.controlcmd.gear_location,
+             self.vehicle_speed,
+             self.engine_rpm,
+             self.driving_mode,
+             self.throttle_percentage,
+             self.brake_percentage,
+             self.gear_location,
+             self.acceleration))
+
 
 def main():
     """
@@ -229,6 +239,7 @@ def main():
                     print('File does not exist: %s' % date_collector.outfile)
         elif len(cmd) == 3:
             data_collector.run(cmd)
+
 
 if __name__ == '__main__':
     cyber.init()

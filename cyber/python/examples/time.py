@@ -73,6 +73,7 @@ def test_rate():
     print rt2
     print rt3
 
+
 if __name__ == '__main__':
     # cyber.init()
     print "test time", "-" * 50

@@ -230,19 +230,22 @@ class TrajectoryToSample(object):
 
                 if lane_id_j not in curr_lane_seq:
                     # If it's the first time, log new_lane_id
-                    if has_started_lane_change == False:
+                    if not has_started_lane_change:
                         has_started_lane_change = True
                         lane_change_start_time = time_span
                         new_lane_id = lane_id_j
                 else:
-                    # If it stepped into other lanes and now comes back, it's jittering!
+                    # If it stepped into other lanes and now comes back, it's
+                    # jittering!
                     if has_started_lane_change:
                         is_jittering = True
-                        # This is to let such data not be eliminated by label_file function
+                        # This is to let such data not be eliminated by
+                        # label_file function
                         fea.label_update_time_delta = param_fea['maximum_maneuver_finish_time']
                         break
 
-                # If roughly get to the center of another lane, label lane change to be finished.
+                # If roughly get to the center of another lane, label lane
+                # change to be finished.
                 left_bound = feature_sequence[j].lane.lane_feature.dist_to_left_boundary
                 right_bound = feature_sequence[j].lane.lane_feature.dist_to_right_boundary
                 if left_bound / (left_bound + right_bound) > (0.5 - param_fea['lane_change_finish_condition']) and \
@@ -252,7 +255,8 @@ class TrajectoryToSample(object):
                         lane_change_finish_time = time_span
                         # new_lane_id = lane_id_j
 
-                        # This is to let such data not be eliminated by label_file function
+                        # This is to let such data not be eliminated by
+                        # label_file function
                         fea.label_update_time_delta = param_fea['maximum_maneuver_finish_time']
                         break
                     else:
@@ -300,24 +304,29 @@ class TrajectoryToSample(object):
                         # Record this lane_sequence's lane_ids
                         current_lane_ids = []
                         for k in range(len(lane_sequence.lane_segment)):
-                            if lane_sequence.lane_segment[k].HasField('lane_id'):
+                            if lane_sequence.lane_segment[k].HasField(
+                                    'lane_id'):
                                 current_lane_ids.append(
                                     lane_sequence.lane_segment[k].lane_id)
 
                         is_following_this_lane = True
-                        for l_id in range(1, min(len(current_lane_ids), len(obs_actual_lane_ids))):
+                        for l_id in range(
+                            1, min(
+                                len(current_lane_ids), len(obs_actual_lane_ids))):
                             if current_lane_ids[l_id] != obs_actual_lane_ids[l_id]:
                                 is_following_this_lane = False
                                 break
 
                         # Obs is following this original lane:
                         if is_following_this_lane:
-                            # Obstacle is following this original lane and moved to lane-center
+                            # Obstacle is following this original lane and
+                            # moved to lane-center
                             if lane_change_finish_time is not None:
                                 lane_sequence.label = 4
                                 lane_sequence.time_to_lane_edge = -1.0
                                 lane_sequence.time_to_lane_center = lane_change_finish_time
-                            # Obstacle is following this original lane but is never at lane-center:
+                            # Obstacle is following this original lane but is
+                            # never at lane-center:
                             else:
                                 lane_sequence.label = 2
                                 lane_sequence.time_to_lane_edge = -1.0
@@ -354,7 +363,8 @@ class TrajectoryToSample(object):
                                 lane_sequence.label = 3
                                 lane_sequence.time_to_lane_edge = lane_change_start_time
                                 lane_sequence.time_to_lane_center = lane_change_finish_time
-                            # Obstacle started lane changing but haven't finished yet.
+                            # Obstacle started lane changing but haven't
+                            # finished yet.
                             else:
                                 lane_sequence.label = 1
                                 lane_sequence.time_to_lane_edge = lane_change_start_time
@@ -387,27 +397,30 @@ class TrajectoryToSample(object):
             # if fea.speed <= 1:
             #     continue
             heading = math.atan2(fea.raw_velocity.y, fea.raw_velocity.x)
-            # Construct dictionary of all exit with dict[exit_lane_id] = np.array(exit_position)
+            # Construct dictionary of all exit with dict[exit_lane_id] =
+            # np.array(exit_position)
             exit_dict = dict()
             exit_pos_dict = dict()
             for junction_exit in fea.junction_feature.junction_exit:
                 if junction_exit.HasField('exit_lane_id'):
                     exit_dict[junction_exit.exit_lane_id] = \
-                    BoundingRectangle(junction_exit.exit_position.x,
-                                      junction_exit.exit_position.y,
-                                      junction_exit.exit_heading,
-                                      0.01,
-                                      junction_exit.exit_width)
+                        BoundingRectangle(junction_exit.exit_position.x,
+                                          junction_exit.exit_position.y,
+                                          junction_exit.exit_heading,
+                                          0.01,
+                                          junction_exit.exit_width)
                     exit_pos_dict[junction_exit.exit_lane_id] = np.array(
                         [junction_exit.exit_position.x, junction_exit.exit_position.y])
             # Searching for up to 100 frames (10 seconds)
             for j in range(i, min(i + 100, traj_len)):
-                car_bounding = BoundingRectangle(trajectory[j].position.x,
-                                                 trajectory[j].position.y,
-                                                 math.atan2(trajectory[j].raw_velocity.y,
-                                                            trajectory[j].raw_velocity.x),
-                                                 trajectory[j].length,
-                                                 trajectory[j].width)
+                car_bounding = BoundingRectangle(
+                    trajectory[j].position.x,
+                    trajectory[j].position.y,
+                    math.atan2(
+                        trajectory[j].raw_velocity.y,
+                        trajectory[j].raw_velocity.x),
+                    trajectory[j].length,
+                    trajectory[j].width)
                 for key, value in exit_dict.items():
                     if car_bounding.overlap(value):
                         exit_pos = exit_pos_dict[key]
@@ -418,7 +431,7 @@ class TrajectoryToSample(object):
                         label = [0 for idx in range(12)]
                         label[d_idx] = 1
                         fea.junction_feature.junction_mlp_label.extend(label)
-                        break # actually break two level
+                        break  # actually break two level
                 else:
                     continue
                 break

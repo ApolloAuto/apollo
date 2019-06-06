@@ -16,14 +16,14 @@
 # -*- coding: utf-8 -*-
 """Module for test record."""
 
+from cyber.proto import record_pb2
+from modules.common.util.testdata.simple_pb2 import SimpleMessage
+from cyber_py import record
+from cyber_py import cyber
 import sys
 import unittest
 
 sys.path.append("../")
-from cyber_py import cyber
-from cyber_py import record
-from modules.common.util.testdata.simple_pb2 import SimpleMessage
-from cyber.proto import record_pb2
 
 TEST_RECORD_FILE = "test02.record"
 CHAN_1 = "channel/chatter"
@@ -86,6 +86,7 @@ class TestRecord(unittest.TestCase):
             self.assertTrue(msg.is_complete)
 
         cyber.shutdown()
+
 
 if __name__ == '__main__':
     unittest.main()

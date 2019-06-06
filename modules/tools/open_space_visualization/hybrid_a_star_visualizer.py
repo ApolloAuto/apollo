@@ -64,7 +64,7 @@ def HybridAStarPlan(visualize_flag):
         ey = -3.86443643718
         ephi = 1.581
         XYbounds = [-13.6406951857, 16.3591910364, -
-            5.15258191624, 5.61797800844]
+                    5.15258191624, 5.61797800844]
 
     x = (c_double * num_output_buffer)()
     y = (c_double * num_output_buffer)()
@@ -113,10 +113,25 @@ def HybridAStarPlan(visualize_flag):
             lefty = 1.043 * math.sin(phi_out[i] - math.pi)
             x_shift_leftbottom = x_out[i] + downx + leftx
             y_shift_leftbottom = y_out[i] + downy + lefty
-            car = patches.Rectangle((x_shift_leftbottom, y_shift_leftbottom), 3.89 + 1.043, 1.055*2,
-                                    angle=phi_out[i] * 180 / math.pi, linewidth=1, edgecolor='r', facecolor='none')
+            car = patches.Rectangle(
+                (x_shift_leftbottom,
+                 y_shift_leftbottom),
+                3.89 + 1.043,
+                1.055 * 2,
+                angle=phi_out[i] * 180 / math.pi,
+                linewidth=1,
+                edgecolor='r',
+                facecolor='none')
             arrow = patches.Arrow(
-                x_out[i], y_out[i], 0.25*math.cos(phi_out[i]), 0.25*math.sin(phi_out[i]), 0.2)
+                x_out[i],
+                y_out[i],
+                0.25 *
+                math.cos(
+                    phi_out[i]),
+                0.25 *
+                math.sin(
+                    phi_out[i]),
+                0.2)
             ax.add_patch(car)
             ax.add_patch(arrow)
         ax.plot(sx, sy, "s")
@@ -127,7 +142,8 @@ def HybridAStarPlan(visualize_flag):
             down_boundary_x = [0.0515703622475, 2.8237895441]
             down_boundary_y = [-5.15258191624, -5.15306980547]
             right_boundary_x = [2.8237895441, 2.7184833539, 16.3592013995]
-            right_boundary_y = [-5.15306980547, -0.0398078878812, -0.011889513383]
+            right_boundary_y = [-5.15306980547, -
+                                0.0398078878812, -0.011889513383]
             up_boundary_x = [16.3591910364, -13.6406951857]
             up_boundary_y = [5.60414234644, 5.61797800844]
             ax.plot(left_boundary_x, left_boundary_y, "k")
@@ -148,8 +164,8 @@ def HybridAStarPlan(visualize_flag):
         steer_graph.title.set_text('steering')
         steer_graph.plot(np.linspace(0, size[0], size[0]), steer_out)
         plt.show()
-    if not visualize_flag :
-        if success :
+    if not visualize_flag:
+        if success:
             HybridAStar.GetResult(x, y, phi, v, a, steer, size)
             for i in range(0, size[0]):
                 x_out.append(float(x[i]))
@@ -159,6 +175,7 @@ def HybridAStarPlan(visualize_flag):
                 a_out.append(float(a[i]))
                 steer_out.append(float(steer[i]))
         return success, x_out, y_out, phi_out, v_out, a_out, steer_out, planning_time
+
 
 if __name__ == '__main__':
     visualize_flag = True

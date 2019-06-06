@@ -31,8 +31,14 @@ from modules.prediction.proto import prediction_obstacle_pb2
 from lidar_endtoend_analyzer import LidarEndToEndAnalyzer
 
 
-def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
-            is_simulation, plot_planning_path, plot_planning_refpath, all_data):
+def process(
+        control_analyzer,
+        planning_analyzer,
+        lidar_endtoend_analyzer,
+        is_simulation,
+        plot_planning_path,
+        plot_planning_refpath,
+        all_data):
     is_auto_drive = False
 
     for msg in reader.read_messages():
@@ -47,7 +53,7 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
 
         if msg.topic == "/apollo/control":
             if (not is_auto_drive and not all_data) or \
-                is_simulation or plot_planning_path or plot_planning_refpath:
+                    is_simulation or plot_planning_path or plot_planning_refpath:
                 continue
             control_cmd = control_cmd_pb2.ControlCommand()
             control_cmd.ParseFromString(msg.message)
@@ -68,9 +74,9 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
                 planning_analyzer.plot_refpath(plt, adc_trajectory)
 
         if msg.topic == "/apollo/sensor/velodyne64/compensator/PointCloud2" or \
-            msg.topic == "/apollo/sensor/lidar128/compensator/PointCloud2":
+                msg.topic == "/apollo/sensor/lidar128/compensator/PointCloud2":
             if ((not is_auto_drive) and (not all_data)) or is_simulation or \
-                plot_planning_path or plot_planning_refpath:
+                    plot_planning_path or plot_planning_refpath:
                 continue
             point_cloud = pointcloud_pb2.PointCloud()
             point_cloud.ParseFromString(msg.message)
@@ -78,7 +84,7 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
 
         if msg.topic == "/apollo/perception/obstacles":
             if ((not is_auto_drive) and (not all_data)) or is_simulation or \
-                plot_planning_path or plot_planning_refpath:
+                    plot_planning_path or plot_planning_refpath:
                 continue
             perception = perception_obstacle_pb2.PerceptionObstacles()
             perception.ParseFromString(msg.message)
@@ -86,11 +92,12 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
 
         if msg.topic == "/apollo/prediction":
             if ((not is_auto_drive) and (not all_data)) or is_simulation or \
-                plot_planning_path or plot_planning_refpath:
+                    plot_planning_path or plot_planning_refpath:
                 continue
             prediction = prediction_obstacle_pb2.PredictionObstacles()
             prediction.ParseFromString(msg.message)
             lidar_endtoend_analyzer.put_pb('prediction', prediction)
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

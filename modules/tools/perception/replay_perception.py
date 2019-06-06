@@ -98,15 +98,19 @@ def load_descrptions(files):
                     trace = obstacle.get('trace', [])
                     for i in range(1, len(trace)):
                         if same_point(trace[i], trace[i - 1]):
-                            print('same trace point found in obstacle: %s' % obstacle["id"])
+                            print(
+                                'same trace point found in obstacle: %s' %
+                                obstacle["id"])
                             return None
                     objects.append(obstacle)
-            else: # Default case. handles only one obstacle
+            else:  # Default case. handles only one obstacle
                 obstacle = obstacles
                 trace = obstacle.get('trace', [])
                 for i in range(1, len(trace)):
                     if same_point(trace[i], trace[i - 1]):
-                        print('same trace point found in obstacle: %s' % obstacle["id"])
+                        print(
+                            'same trace point found in obstacle: %s' %
+                            obstacle["id"])
                         return None
                 objects.append(obstacle)
 
@@ -231,8 +235,12 @@ def linear_project_perception(description, prev_perception):
                                           trace[i][0] - trace[i - 1][0])
 
             perception.ClearField("polygon_point")
-            perception.polygon_point.extend(generate_polygon(perception.position, perception.theta,
-                                                             perception.length, perception.width))
+            perception.polygon_point.extend(
+                generate_polygon(
+                    perception.position,
+                    perception.theta,
+                    perception.length,
+                    perception.width))
             return perception
 
     return perception
@@ -282,15 +290,21 @@ def perception_publisher(perception_channel, files, period):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="create fake perception obstacles",
-                                     prog="replay_perception.py")
+    parser = argparse.ArgumentParser(
+        description="create fake perception obstacles",
+        prog="replay_perception.py")
     parser.add_argument("files", action="store", type=str, nargs="*",
                         help="obstacle description files")
     parser.add_argument("-c", "--channel", action="store", type=str,
                         default="/apollo/perception/obstacles",
                         help="set the perception channel")
-    parser.add_argument("-p", "--period", action="store", type=float, default=0.1,
-                        help="set the perception channel publish time duration")
+    parser.add_argument(
+        "-p",
+        "--period",
+        action="store",
+        type=float,
+        default=0.1,
+        help="set the perception channel publish time duration")
     args = parser.parse_args()
 
     perception_publisher(args.channel, args.files, args.period)

@@ -49,7 +49,7 @@ class ModuleConf(object):
         try:
             with open(APOLLO_ROOT + self.conf_file, 'r') as prototxt:
                 text_format.Parse(prototxt.read(), self.proto)
-        except:
+        except BaseException:
             self.found_conf = False
         return
 
@@ -287,7 +287,8 @@ class element(object):
         self.win.refresh()
 
         if self.descriptor.type == self.descriptor.TYPE_ENUM:
-            options = [value.name for value in self.descriptor.enum_type.values]
+            options = [
+                value.name for value in self.descriptor.enum_type.values]
             value, modified = self.get_input(options, self.value)
             if modified and value != self.value:
                 self.value = value

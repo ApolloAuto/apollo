@@ -16,11 +16,11 @@
 # -*- coding: utf-8 -*-
 """Module for example of listener."""
 
+from cyber.proto.unit_test_pb2 import ChatterBenchmark
+from cyber_py import cyber
 import sys
 
 sys.path.append("../")
-from cyber_py import cyber
-from cyber.proto.unit_test_pb2 import ChatterBenchmark
 
 
 def callback(data):
@@ -42,6 +42,7 @@ def test_listener_class():
     test_node.create_reader("channel/chatter",
                             ChatterBenchmark, callback)
     test_node.spin()
+
 
 if __name__ == '__main__':
     cyber.init()

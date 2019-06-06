@@ -59,7 +59,7 @@ def planning_callback(planning_pb):
 def add_listener():
     planning_sub = cyber.Node("st_plot")
     planning_sub.create_reader('/apollo/planning', planning_pb2.ADCTrajectory,
-                     planning_callback)
+                               planning_callback)
 
 
 def press_key(event):

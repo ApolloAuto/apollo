@@ -61,8 +61,7 @@ cNorm = mcolors.Normalize(vmin=0, vmax=values[-1])
 scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 
 cnt = 0
-cmds = cmd_table.keys()
-cmds.sort()
+cmds = sorted(cmd_table.keys())
 
 fig, ax = plt.subplots()
 for cmd in cmds:
@@ -70,8 +69,7 @@ for cmd in cmds:
     speed_table = cmd_table[cmd]
     X = []
     Y = []
-    speeds = speed_table.keys()
-    speeds.sort()
+    speeds = sorted(speed_table.keys())
     for speed in speeds:
         X.append(speed)
         Y.append(np.mean(speed_table[speed]))

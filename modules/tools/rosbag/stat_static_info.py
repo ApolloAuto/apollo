@@ -64,7 +64,7 @@ class StaticInfoCalculator(object):
                         print self.vehicle_name
                 if self.done():
                     return True
-        except:
+        except BaseException:
             return False
         print("Finished processing record file {}".format(record_file))
         return self.done()
@@ -99,6 +99,7 @@ class StaticInfoCalculator(object):
         # Currently we only care about vehicle name.
         return bool(self.vehicle_name)
 
+
 def main():
     """
     Process a path
@@ -117,6 +118,7 @@ def main():
     # Output result, which might be None
     print('vehicle_name: %s' % calc.vehicle_name)
     print('vehicle_vin: %s' % calc.vehicle_vin)
+
 
 if __name__ == '__main__':
     main()

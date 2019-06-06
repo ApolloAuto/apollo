@@ -24,6 +24,7 @@ import numpy as np
 import time
 import math
 
+
 def SmoothTrajectory(visualize_flag):
     # initialze object
     OpenSpacePlanner = DistancePlanner()
@@ -41,33 +42,33 @@ def SmoothTrajectory(visualize_flag):
         # obstacles for distance approach(vertices coords in clock wise order)
         ROI_distance_approach_parking_boundary = (
             c_double * 20)(*[-13.6407054776,
-                            0.0140634663703,
-                            0.0,
-                            0.0,
-                            0.0515703622475,
-                            -5.15258191624,
-                            0.0515703622475,
-                            -5.15258191624,
-                            2.8237895441,
-                            -5.15306980547,
-                            2.8237895441,
-                            -5.15306980547,
-                            2.7184833539,
-                            -0.0398078878812,
-                            16.3592013995,
-                            -0.011889513383,
-                            16.3591910364,
-                            5.60414234644,
-                            -13.6406951857,
-                            5.61797800844,
-                            ])
+                             0.0140634663703,
+                             0.0,
+                             0.0,
+                             0.0515703622475,
+                             -5.15258191624,
+                             0.0515703622475,
+                             -5.15258191624,
+                             2.8237895441,
+                             -5.15306980547,
+                             2.8237895441,
+                             -5.15306980547,
+                             2.7184833539,
+                             -0.0398078878812,
+                             16.3592013995,
+                             -0.011889513383,
+                             16.3591910364,
+                             5.60414234644,
+                             -13.6406951857,
+                             5.61797800844,
+                             ])
         OpenSpacePlanner.AddObstacle(
             ROI_distance_approach_parking_boundary)
         ex = 1.359
         ey = -3.86443643718
         ephi = 1.581
-        XYbounds = [-13.6406951857, 16.3591910364, -5.15258191624, 5.61797800844]
-
+        XYbounds = [-13.6406951857, 16.3591910364, -
+                    5.15258191624, 5.61797800844]
 
     x = (c_double * num_output_buffer)()
     y = (c_double * num_output_buffer)()
@@ -90,7 +91,8 @@ def SmoothTrajectory(visualize_flag):
     success = True
     start = time.time()
     print("planning start")
-    if not OpenSpacePlanner.DistancePlan(sx, sy, sphi, ex, ey, ephi, XYbounds_ctype):
+    if not OpenSpacePlanner.DistancePlan(
+            sx, sy, sphi, ex, ey, ephi, XYbounds_ctype):
         print("planning fail")
         success = False
     #   exit()
@@ -115,9 +117,23 @@ def SmoothTrajectory(visualize_flag):
 
     if visualize_flag and success:
         # load result
-        OpenSpacePlanner.DistanceGetResult(x, y, phi, v, a, steer, opt_x,
-                                        opt_y, opt_phi, opt_v, opt_a, opt_steer, opt_time,
-                                        opt_dual_l, opt_dual_n, size)
+        OpenSpacePlanner.DistanceGetResult(
+            x,
+            y,
+            phi,
+            v,
+            a,
+            steer,
+            opt_x,
+            opt_y,
+            opt_phi,
+            opt_v,
+            opt_a,
+            opt_steer,
+            opt_time,
+            opt_dual_l,
+            opt_dual_n,
+            size)
         for i in range(0, size[0]):
             x_out.append(float(x[i]))
             y_out.append(float(y[i]))
@@ -148,10 +164,27 @@ def SmoothTrajectory(visualize_flag):
             lefty = 1.043 * math.sin(phi_out[i] - math.pi)
             x_shift_leftbottom = x_out[i] + downx + leftx
             y_shift_leftbottom = y_out[i] + downy + lefty
-            warm_start_car = patches.Rectangle((x_shift_leftbottom, y_shift_leftbottom), 3.89 + 1.043, 1.055*2,
-                                            angle=phi_out[i] * 180 / math.pi, linewidth=1, edgecolor='r', facecolor='none')
+            warm_start_car = patches.Rectangle(
+                (x_shift_leftbottom,
+                 y_shift_leftbottom),
+                3.89 + 1.043,
+                1.055 * 2,
+                angle=phi_out[i] * 180 / math.pi,
+                linewidth=1,
+                edgecolor='r',
+                facecolor='none')
             warm_start_arrow = patches.Arrow(
-                x_out[i], y_out[i], 0.25*math.cos(phi_out[i]), 0.25*math.sin(phi_out[i]), 0.2, edgecolor='r',)
+                x_out[i],
+                y_out[i],
+                0.25 *
+                math.cos(
+                    phi_out[i]),
+                0.25 *
+                math.sin(
+                    phi_out[i]),
+                0.2,
+                edgecolor='r',
+            )
             # ax.add_patch(warm_start_car)
             ax.add_patch(warm_start_arrow)
             # distance approach
@@ -161,10 +194,27 @@ def SmoothTrajectory(visualize_flag):
             lefty = 1.043 * math.sin(opt_phi_out[i] - math.pi)
             x_shift_leftbottom = opt_x_out[i] + downx + leftx
             y_shift_leftbottom = opt_y_out[i] + downy + lefty
-            smoothing_car = patches.Rectangle((x_shift_leftbottom, y_shift_leftbottom), 3.89 + 1.043, 1.055*2,
-                                            angle=opt_phi_out[i] * 180 / math.pi, linewidth=1, edgecolor='y', facecolor='none')
+            smoothing_car = patches.Rectangle(
+                (x_shift_leftbottom,
+                 y_shift_leftbottom),
+                3.89 + 1.043,
+                1.055 * 2,
+                angle=opt_phi_out[i] * 180 / math.pi,
+                linewidth=1,
+                edgecolor='y',
+                facecolor='none')
             smoothing_arrow = patches.Arrow(
-                opt_x_out[i], opt_y_out[i], 0.25*math.cos(opt_phi_out[i]), 0.25*math.sin(opt_phi_out[i]), 0.2, edgecolor='y',)
+                opt_x_out[i],
+                opt_y_out[i],
+                0.25 *
+                math.cos(
+                    opt_phi_out[i]),
+                0.25 *
+                math.sin(
+                    opt_phi_out[i]),
+                0.2,
+                edgecolor='y',
+            )
             ax.add_patch(smoothing_car)
             ax.add_patch(smoothing_arrow)
 
@@ -176,7 +226,8 @@ def SmoothTrajectory(visualize_flag):
             down_boundary_x = [0.0515703622475, 2.8237895441]
             down_boundary_y = [-5.15258191624, -5.15306980547]
             right_boundary_x = [2.8237895441, 2.7184833539, 16.3592013995]
-            right_boundary_y = [-5.15306980547, -0.0398078878812, -0.011889513383]
+            right_boundary_y = [-5.15306980547, -
+                                0.0398078878812, -0.011889513383]
             up_boundary_x = [16.3591910364, -13.6406951857]
             up_boundary_y = [5.60414234644, 5.61797800844]
             ax.plot(left_boundary_x, left_boundary_y, "k")
@@ -207,18 +258,42 @@ def SmoothTrajectory(visualize_flag):
         fig3 = plt.figure(3)
         dual_l_graph = fig3.add_subplot(211)
         dual_l_graph.title.set_text('dual_l')
-        dual_l_graph.plot(np.linspace(0, size[0] * 6, size[0] * 6), opt_dual_l_out)
+        dual_l_graph.plot(
+            np.linspace(
+                0,
+                size[0] * 6,
+                size[0] * 6),
+            opt_dual_l_out)
         dual_n_graph = fig3.add_subplot(212)
         dual_n_graph.title.set_text('dual_n')
-        dual_n_graph.plot(np.linspace(0, size[0] * 16, size[0] * 16), opt_dual_n_out)
+        dual_n_graph.plot(
+            np.linspace(
+                0,
+                size[0] * 16,
+                size[0] * 16),
+            opt_dual_n_out)
         plt.show()
 
-    if not visualize_flag :
-        if success :
+    if not visualize_flag:
+        if success:
             # load result
-            OpenSpacePlanner.DistanceGetResult(x, y, phi, v, a, steer, opt_x,
-                                            opt_y, opt_phi, opt_v, opt_a, opt_steer, opt_time,
-                                            opt_dual_l, opt_dual_n, size)
+            OpenSpacePlanner.DistanceGetResult(
+                x,
+                y,
+                phi,
+                v,
+                a,
+                steer,
+                opt_x,
+                opt_y,
+                opt_phi,
+                opt_v,
+                opt_a,
+                opt_steer,
+                opt_time,
+                opt_dual_l,
+                opt_dual_n,
+                size)
             for i in range(0, size[0]):
                 x_out.append(float(x[i]))
                 y_out.append(float(y[i]))
@@ -234,6 +309,7 @@ def SmoothTrajectory(visualize_flag):
                 opt_steer_out.append(float(opt_steer[i]))
                 opt_time_out.append(float(opt_time[i]))
         return success, opt_x_out, opt_y_out, opt_phi_out, opt_v_out, opt_a_out, opt_steer_out, opt_time_out, planning_time
+
 
 if __name__ == '__main__':
     visualize_flag = True

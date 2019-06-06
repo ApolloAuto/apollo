@@ -56,7 +56,8 @@ def get_topodata(map_dir):
     print('Please wait for loading routing topo data...')
     topo_data_path = os.path.join(map_dir, 'routing_map.bin')
     print("File: %s" % )
-    return proto_utils.get_pb_from_bin_file(topo_data_path, topo_graph_pb2.Graph())
+    return proto_utils.get_pb_from_bin_file(
+        topo_data_path, topo_graph_pb2.Graph())
 
 
 def get_routingdata():
@@ -65,7 +66,8 @@ def get_routingdata():
         os.path.join(os.path.dirname(__file__), '../../../data/log'))
     route_data_path = os.path.join(log_dir, 'passage_region_debug.bin')
     print("File: %s" % route_data_path)
-    return proto_utils.get_pb_from_text_file(route_data_path, routing_pb2.RoutingResponse())
+    return proto_utils.get_pb_from_text_file(
+        route_data_path, routing_pb2.RoutingResponse())
 
 
 def onclick(event):

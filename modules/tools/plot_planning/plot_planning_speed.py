@@ -56,7 +56,7 @@ def callback(planning_pb):
         LAST_TRAJ_T_DATA = []
 
         CURRENT_TRAJ_DATA = []
-        CURRENT_TRAJ_T_DATA =[]
+        CURRENT_TRAJ_T_DATA = []
 
         INIT_V_DATA = []
         INIT_T_DATA = []
@@ -76,11 +76,13 @@ def callback(planning_pb):
     CURRENT_TRAJ_T_DATA = []
     for traj_point in planning_pb.trajectory_point:
         CURRENT_TRAJ_DATA.append(traj_point.v)
-        CURRENT_TRAJ_T_DATA.append(current_t - begin_t + traj_point.relative_time)
+        CURRENT_TRAJ_T_DATA.append(
+            current_t - begin_t + traj_point.relative_time)
 
     lock.release()
 
     last_t = current_t
+
 
 def listener():
     cyber.init()
@@ -119,14 +121,13 @@ if __name__ == '__main__':
     listener()
     fig, ax = plt.subplots()
     X = range(FLAGS.data_length)
-    Xs = [i * -1 for i in X]
-    Xs.sort()
+    Xs = sorted([i * -1 for i in X])
     init_data_line, = ax.plot(
         INIT_T_DATA, INIT_V_DATA, 'b', lw=2, alpha=0.7, label='init_point_v')
-    current_traj, = ax.plot(
-        CURRENT_TRAJ_T_DATA, CURRENT_TRAJ_DATA, 'r', lw=1, alpha=0.5, label='current_traj')
-    last_traj, = ax.plot(
-        LAST_TRAJ_T_DATA, LAST_TRAJ_DATA, 'g', lw=1, alpha=0.5, label='last_traj')
+    current_traj, = ax.plot(CURRENT_TRAJ_T_DATA, CURRENT_TRAJ_DATA,
+                            'r', lw=1, alpha=0.5, label='current_traj')
+    last_traj, = ax.plot(LAST_TRAJ_T_DATA, LAST_TRAJ_DATA,
+                         'g', lw=1, alpha=0.5, label='last_traj')
 
     #brake_text = ax.text(0.75, 0.85, '', transform=ax.transAxes)
     #throttle_text = ax.text(0.75, 0.90, '', transform=ax.transAxes)

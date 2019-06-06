@@ -16,15 +16,15 @@
 # -*- coding: utf-8 -*-
 """Module for example of record."""
 
+from cyber.proto.unit_test_pb2 import Chatter
+from modules.common.util.testdata.simple_pb2 import SimpleMessage
+from google.protobuf.descriptor_pb2 import FileDescriptorProto
+from cyber_py import record
+from cyber_py import cyber
 import time
 import sys
 
 sys.path.append("../")
-from cyber_py import cyber
-from cyber_py import record
-from google.protobuf.descriptor_pb2 import FileDescriptorProto
-from modules.common.util.testdata.simple_pb2 import SimpleMessage
-from cyber.proto.unit_test_pb2 import Chatter
 
 TEST_RECORD_FILE = "test02.record"
 MSG_TYPE = "apollo.common.util.test.SimpleMessage"
@@ -107,6 +107,7 @@ def test_record_reader(reader_path):
             msg_new = Chatter()
             msg_new.ParseFromString(msg)
             print(msg_new)
+
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:

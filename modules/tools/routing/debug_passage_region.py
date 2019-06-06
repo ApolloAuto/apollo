@@ -133,7 +133,7 @@ if __name__ == '__main__':
     g_central_curve_dict = {nd.lane_id: nd.central_curve for nd in graph.node}
 
     plt.ion()
-    while 1:
+    while True:
         print_help_command()
         print 'cmd>',
         instruction = raw_input()

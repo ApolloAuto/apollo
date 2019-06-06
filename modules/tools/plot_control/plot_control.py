@@ -84,8 +84,7 @@ if __name__ == '__main__':
     listener()
     fig, ax = plt.subplots()
     X = range(FLAGS.data_length)
-    Xs = [i * -1 for i in X]
-    Xs.sort()
+    Xs = sorted([i * -1 for i in X])
     steering_line, = ax.plot(
         Xs, [0] * FLAGS.data_length, 'b', lw=3, alpha=0.5, label='steering')
     throttle_line, = ax.plot(

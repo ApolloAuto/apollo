@@ -66,7 +66,7 @@ def GetDisks():
     try:
         selected = int(input('Which disk do you want to copy from: '))
         copy_from = disks[selected]
-    except:
+    except BaseException:
         print('Bad input')
         sys.exit(1)
 
@@ -76,7 +76,7 @@ def GetDisks():
     try:
         selected = int(input('Which disk do you want to copy to: '))
         copy_to = disks[selected]
-    except:
+    except BaseException:
         print('Bad input')
         sys.exit(1)
 
@@ -95,8 +95,8 @@ def CollectEvents(bags):
     cur_driving_mode = None
     for bag_file in bags:
         with Bag(bag_file, 'r') as bag:
-            for topic, msg, t in bag.read_messages(topics=[K_CHASSIS_TOPIC,
-                                                           K_DRIVE_EVENT_TOPIC]):
+            for topic, msg, t in bag.read_messages(
+                    topics=[K_CHASSIS_TOPIC, K_DRIVE_EVENT_TOPIC]):
                 # For disengagement, take the message time as event time.
                 if topic == K_CHASSIS_TOPIC:
                     if (cur_driving_mode == Chassis.COMPLETE_AUTO_DRIVE and
@@ -134,7 +134,8 @@ def SmartCopyBags(from_dir, to_dir):
                     continue
 
                 msg_sec = t.to_sec()
-                while next_event < len(events) and events[next_event] < msg_sec:
+                while next_event < len(
+                        events) and events[next_event] < msg_sec:
                     next_event += 1
                 # For large size topics, only copy when it's near an event.
                 if (next_event < len(events) and events[next_event] - msg_sec <
@@ -161,7 +162,7 @@ def SmartCopyDir(from_dir, to_dir):
 
         if f.endswith('.bag'):
             is_task_dir = True
-            break;
+            break
 
     if is_task_dir:
         SmartCopyBags(from_dir, to_dir)

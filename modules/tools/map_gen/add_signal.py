@@ -60,7 +60,7 @@ for stop_line in signal.stop_line:
     stop_line_string = LineString(stop_line_points)
     for lane_id, lane_string in lanes.items():
         p = stop_line_string.intersection(lane_string)
-        if type(p) == Point:
+        if isinstance(p, Point):
             s = lane_string.project(p)
             overlap = map.overlap.add()
             overlap.id.id = str(lane_id) + "_" + str(signal.id.id)

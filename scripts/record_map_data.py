@@ -58,6 +58,7 @@ MAP_COLLECTION_DATA_TOPICS = [
     '/apollo/sensor/velodyne64/velodyneScan',
 ]
 
+
 def shell_cmd(cmd, alert_on_failure=True):
     """Execute shell command and return (ret-code, stdout, stderr)."""
     print('SHELL > {}'.format(cmd))
@@ -77,21 +78,26 @@ class ArgManager(object):
     def __init__(self):
         self.parser = argparse.ArgumentParser(
             description="Manage apollo data recording.")
-        self.parser.add_argument('--start', default=False, action="store_true",
-                                 help='Start recorder. It is the default '
-                                 'action if no other actions are triggered. In '
-                                 'that case, the False value is ignored.')
+        self.parser.add_argument(
+            '--start',
+            default=False,
+            action="store_true",
+            help='Start recorder. It is the default '
+            'action if no other actions are triggered. In '
+            'that case, the False value is ignored.')
         self.parser.add_argument('--stop', default=False, action="store_true",
                                  help='Stop recorder.')
-        self.parser.add_argument('--split_duration', default="1m",
-                                 help='Duration to split bags, will be applied '
-                                 'as parameter to "rosbag record --duration".')
+        self.parser.add_argument(
+            '--split_duration',
+            default="1m",
+            help='Duration to split bags, will be applied '
+            'as parameter to "rosbag record --duration".')
         self._args = None
 
     def args(self):
         """Get parsed args."""
         if self._args is None:
-           self._args = self.parser.parse_args()
+            self._args = self.parser.parse_args()
         return self._args
 
 
@@ -181,6 +187,7 @@ def main():
         recorder.stop()
     else:
         recorder.start()
+
 
 if __name__ == '__main__':
     main()

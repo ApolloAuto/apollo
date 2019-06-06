@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
     for msg in reader.read_messages():
         timestamp = msg.timestamp / float(1e9)
-        if msg.topic == args.message and abs(timestamp - args.timestamp) <=1:
+        if msg.topic == args.message and abs(timestamp - args.timestamp) <= 1:
             if msg.topic == "/apollo/perception/obstacles":
                 perception_obstacles = \
                     perception_obstacle_pb2.PerceptionObstacles()

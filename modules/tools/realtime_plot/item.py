@@ -80,7 +80,7 @@ class Item(object):
         self.planningtime = time
         self.planningvalues = values
 
-        if self.planningavailable == False:
+        if not self.planningavailable:
             self.ax.set_xlim([time[0] - 1, time[-1] + 10])
             self.current_line = lines.Line2D(time, values, color='red', lw=1.5)
             self.ax.add_line(self.current_line)

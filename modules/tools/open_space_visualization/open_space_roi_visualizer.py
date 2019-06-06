@@ -40,10 +40,18 @@ end_pose = (c_double * num_output_buffer)()
 xy_boundary = (c_double * num_output_buffer)()
 origin_pose = (c_double * num_output_buffer)()
 
-if not open_space_roi.ROITest(lane_id, parking_id,
-                              unrotated_roi_boundary_x, unrotated_roi_boundary_y, roi_boundary_x, roi_boundary_y,
-                              parking_spot_x, parking_spot_y, end_pose,
-                              xy_boundary, origin_pose):
+if not open_space_roi.ROITest(
+        lane_id,
+        parking_id,
+        unrotated_roi_boundary_x,
+        unrotated_roi_boundary_y,
+        roi_boundary_x,
+        roi_boundary_y,
+        parking_spot_x,
+        parking_spot_y,
+        end_pose,
+        xy_boundary,
+        origin_pose):
     print("open_space_roi fail")
 result_unrotated_roi_boundary_x = []
 result_unrotated_roi_boundary_y = []

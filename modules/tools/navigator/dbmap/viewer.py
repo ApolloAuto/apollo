@@ -83,20 +83,21 @@ class DBMapViewer:
                     pass
                 with tag('script'):
                     doc.asis('\nvar map;\n')
-                    doc.asis("\nvar colors = ['#e6194b', '#3cb44b', '#ffe119', "
-                             "'#0082c8', '#f58231', '#911eb4', '#46f0f0', "
-                             "'#f032e6', '#d2f53c', '#fabebe', '#008080', "
-                             "'#e6beff', '#aa6e28', '#fffac8', '#800000', "
-                             "'#aaffc3', '#808000', '#ffd8b1', '#000080', "
-                             "'#808080', '#000000']\n")
+                    doc.asis(
+                        "\nvar colors = ['#e6194b', '#3cb44b', '#ffe119', "
+                        "'#0082c8', '#f58231', '#911eb4', '#46f0f0', "
+                        "'#f032e6', '#d2f53c', '#fabebe', '#008080', "
+                        "'#e6beff', '#aa6e28', '#fffac8', '#800000', "
+                        "'#aaffc3', '#808000', '#ffd8b1', '#000080', "
+                        "'#808080', '#000000']\n")
                     doc.asis('function initMap() {\n')
                     doc.asis("map = new google.maps.Map("
                              "document.getElementById('map'), {\n")
-                    doc.asis('center: {lat: ' + str(self.center_lat) + \
+                    doc.asis('center: {lat: ' + str(self.center_lat) +
                              ', lng: ' + str(self.center_lon) + '},\n')
                     doc.asis('zoom: 16\n')
                     doc.asis('});\n')
-                    doc.asis('var navi_lines = ' + \
+                    doc.asis('var navi_lines = ' +
                              json.dumps(self.navigation_lines) + ';\n')
                     doc.asis("""
                         for (var i = 0; i < navi_lines.length; i++) {

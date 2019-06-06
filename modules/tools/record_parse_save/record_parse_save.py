@@ -14,7 +14,10 @@ current implementation illustrates sample record file parsing for
 
 ###########################################################
 # import packages
-import sys, time, os, yaml
+import sys
+import time
+import os
+import yaml
 from importlib import import_module
 
 from cyber_py import cyber
@@ -23,6 +26,8 @@ from cyber_py import record
 os.system('clear')
 
 ###########################################################
+
+
 def read_parameters(yaml_file):
     """
     function to read YAML parameter file and define output destinations
@@ -43,22 +48,24 @@ def read_parameters(yaml_file):
     FOLDER_PREFIX = temp_path[1].replace("-", "")
 
     parse_dict = {"params": params,
-                    "parse_type": parse_type,
-                    "out_folder": OUT_FOLDER,
-                    "prefix": FOLDER_PREFIX,
-                    "record_folder": RECORD_FOLDER }
+                  "parse_type": parse_type,
+                  "out_folder": OUT_FOLDER,
+                  "prefix": FOLDER_PREFIX,
+                  "record_folder": RECORD_FOLDER}
 
     return parse_dict
 
 ###########################################################
+
+
 def define_destinations(parse_dict):
     """
     define destination for extracted files
     """
     dest_dict = {
-            "channel_name" : "",
-            "timestamp_file": "",
-            "destination_folder": ""
+        "channel_name": "",
+        "timestamp_file": "",
+        "destination_folder": ""
     }
 
     parse_type = parse_dict["parse_type"]
@@ -69,15 +76,19 @@ def define_destinations(parse_dict):
     parser_func = 'parse_' + parse_type
 
     dest_dict['channel_name'] = params[parse_type]['channel_name']
-    dest_dict['timestamp_file'] = dest_folder + prefix + params[parse_type]['timestamp_file_extn']
-    dest_dict['destination_folder'] = dest_folder + prefix + params[parse_type]['out_folder_extn'] + '/'
+    dest_dict['timestamp_file'] = dest_folder + \
+        prefix + params[parse_type]['timestamp_file_extn']
+    dest_dict['destination_folder'] = dest_folder + \
+        prefix + params[parse_type]['out_folder_extn'] + '/'
 
     if not os.path.exists(dest_dict["destination_folder"]):
-            os.makedirs(dest_dict["destination_folder"])
+        os.makedirs(dest_dict["destination_folder"])
 
     return dest_dict, parser_func
 
 ###########################################################
+
+
 def parse_apollo_record(parse_dict, dest_dict, parser_func):
     """
     """
@@ -87,18 +98,19 @@ def parse_apollo_record(parse_dict, dest_dict, parser_func):
     parse_timestamp = []
     parse_mod = import_module(parser_func)
 
-    print "=" *60
+    print "=" * 60
     print('--------- Parsing data for: ' + parse_type + ' ---------')
 
     for rfile in record_files:
-        print "=" *60
+        print "=" * 60
         print("parsing record file: %s" % rfile)
         freader = record.RecordReader(record_folder_path + rfile)
         time.sleep(.025)
 
         for channelname, msg, datatype, timestamp in freader.read_messages():
             if channelname == dest_dict["channel_name"]:
-                tstamp = parse_mod.parse_data(channelname, msg, dest_dict['destination_folder'])
+                tstamp = parse_mod.parse_data(
+                    channelname, msg, dest_dict['destination_folder'])
                 parse_timestamp.append(tstamp)
 
         # write radar-timestamp files
@@ -106,9 +118,11 @@ def parse_apollo_record(parse_dict, dest_dict, parser_func):
             for item in parse_timestamp:
                 f.write("%s\n" % item)
 
-    print "=" *60
-    print('DONE: records parsed and data saved to: \n  ' + dest_dict['destination_folder'])
-    print "=" *60
+    print "=" * 60
+    print(
+        'DONE: records parsed and data saved to: \n  ' +
+        dest_dict['destination_folder'])
+    print "=" * 60
 
 
 ###########################################################

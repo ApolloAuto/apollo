@@ -25,6 +25,7 @@ import math
 lib = cdll.LoadLibrary(
     '/apollo/bazel-bin/modules/planning/open_space/tools/distance_approach_problem_wrapper_lib.so')
 
+
 class DistancePlanner(object):
     def __init__(self):
         self.warm_start_planner = lib.CreateHybridAPtr()
@@ -36,11 +37,52 @@ class DistancePlanner(object):
             c_double)(ROI_distance_approach_parking_boundary))
 
     def DistancePlan(self, sx, sy, sphi, ex, ey, ephi, XYbounds):
-        return lib.DistancePlan(self.warm_start_planner, self.obstacles, self.result, c_double(sx),
-                                c_double(sy), c_double(sphi), c_double(ex), c_double(ey), c_double(ephi), POINTER(c_double)(XYbounds))
+        return lib.DistancePlan(
+            self.warm_start_planner,
+            self.obstacles,
+            self.result,
+            c_double(sx),
+            c_double(sy),
+            c_double(sphi),
+            c_double(ex),
+            c_double(ey),
+            c_double(ephi),
+            POINTER(c_double)(XYbounds))
 
-    def DistanceGetResult(self, x, y, phi, v, a, steer, opt_x, opt_y, opt_phi, opt_v, opt_a, opt_steer, opt_time, opt_dual_l, opt_dual_n, output_size):
-        lib.DistanceGetResult(self.result, self.obstacles, POINTER(c_double)(x), POINTER(c_double)(y),
-                              POINTER(c_double)(phi), POINTER(c_double)(v), POINTER(c_double)(a), POINTER(
-            c_double)(steer), POINTER(c_double)(opt_x), POINTER(c_double)(opt_y),
-            POINTER(c_double)(opt_phi), POINTER(c_double)(opt_v), POINTER(c_double)(opt_a), POINTER(c_double)(opt_steer), POINTER(c_double)(opt_time), POINTER(c_double)(opt_dual_l), POINTER(c_double)(opt_dual_n), POINTER(c_ushort)(output_size))
+    def DistanceGetResult(
+            self,
+            x,
+            y,
+            phi,
+            v,
+            a,
+            steer,
+            opt_x,
+            opt_y,
+            opt_phi,
+            opt_v,
+            opt_a,
+            opt_steer,
+            opt_time,
+            opt_dual_l,
+            opt_dual_n,
+            output_size):
+        lib.DistanceGetResult(
+            self.result,
+            self.obstacles,
+            POINTER(c_double)(x),
+            POINTER(c_double)(y),
+            POINTER(c_double)(phi),
+            POINTER(c_double)(v),
+            POINTER(c_double)(a),
+            POINTER(c_double)(steer),
+            POINTER(c_double)(opt_x),
+            POINTER(c_double)(opt_y),
+            POINTER(c_double)(opt_phi),
+            POINTER(c_double)(opt_v),
+            POINTER(c_double)(opt_a),
+            POINTER(c_double)(opt_steer),
+            POINTER(c_double)(opt_time),
+            POINTER(c_double)(opt_dual_l),
+            POINTER(c_double)(opt_dual_n),
+            POINTER(c_ushort)(output_size))

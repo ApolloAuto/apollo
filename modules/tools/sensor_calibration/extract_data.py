@@ -81,6 +81,7 @@ SMALL_TOPICS = [
 CYBER_PATH = os.environ['CYBER_PATH']
 CYBER_RECORD_HEADER_LENGTH = 2048
 
+
 def process_dir(path, operation):
     """Create or remove directory."""
     try:
@@ -99,11 +100,13 @@ def process_dir(path, operation):
 
     return True
 
+
 def get_sensor_channel_list(record_file):
     """Get the channel list of sensors for calibration."""
     record_reader = RecordReader(record_file)
     return set(channel_name for channel_name in record_reader.get_channellist()
                if 'sensor' in channel_name)
+
 
 def validate_channel_list(channels, dictionary):
     ret = True
@@ -115,21 +118,26 @@ def validate_channel_list(channels, dictionary):
 
     return ret
 
+
 def in_range(v, s, e):
     return True if v >= s and v <= e else False
+
 
 def build_parser(channel, output_path):
     parser = None
     if channel.endswith("/image"):
         parser = ImageParser(output_path=output_path, instance_saving=True)
     elif channel.endswith("/PointCloud2"):
-        parser = PointCloudParser(output_path=output_path, instance_saving=True)
+        parser = PointCloudParser(
+            output_path=output_path,
+            instance_saving=True)
     elif channel.endswith("/gnss/odometry"):
         parser = GpsParser(output_path=output_path, instance_saving=False)
     else:
-        raise ValueError("Not Support this channel type: %s" %channel)
+        raise ValueError("Not Support this channel type: %s" % channel)
 
     return parser
+
 
 def extract_data(record_files, output_path, channels,
                  start_timestamp, end_timestamp, extraction_rates):
@@ -146,7 +154,8 @@ def extract_data(record_files, output_path, channels,
         print('The input channel list is invalid.')
         return False
 
-    # Extract all the sensor channels if channel_list is empty(no input arguments).
+    # Extract all the sensor channels if channel_list is empty(no input
+    # arguments).
     print(sensor_channels)
     if len(channels) == 0:
         channels = sensor_channels
@@ -179,7 +188,10 @@ def extract_data(record_files, output_path, channels,
             if msg.topic in channels:
                 # Only care about messages in certain time intervals
                 msg_timestamp_sec = msg.timestamp / 1e9
-                if not in_range(msg_timestamp_sec, start_timestamp, end_timestamp):
+                if not in_range(
+                        msg_timestamp_sec,
+                        start_timestamp,
+                        end_timestamp):
                     continue
 
                 channel_occur_time[msg.topic] += 1
@@ -196,8 +208,9 @@ def extract_data(record_files, output_path, channels,
                         channel_success[msg.topic] = False
                         process_channel_failure_num += 1
                         process_channel_success_num -= 1
-                        print('Failed to extract data from channel: %s in record %s'
-                              % (msg.topic, record_file))
+                        print(
+                            'Failed to extract data from channel: %s in record %s' %
+                            (msg.topic, record_file))
 
     # traverse the dict, if any channel topic stored as a list
     # then save the list as a summary file, mostly binary file
@@ -210,17 +223,22 @@ def extract_data(record_files, output_path, channels,
     print('Successfully processed [%d] channels, and [%d] was failed.'
           % (process_channel_success_num, process_channel_failure_num))
     if process_msg_failure_num > 0:
-        print('Channel extraction failure number is [%d].' % process_msg_failure_num)
+        print(
+            'Channel extraction failure number is [%d].' %
+            process_msg_failure_num)
 
     return True
 
+
 def save_combined_messages_info(parser, channel):
     if not parser.save_messages_to_file():
-        raise ValueError("cannot save combined messages into single file for : %s " % channel)
-
+        raise ValueError(
+            "cannot save combined messages into single file for : %s " %
+            channel)
 
     if not parser.save_timestamps_to_file():
         raise ValueError("cannot save tiemstamp info for %s " % channel)
+
 
 def generate_compressed_file(input_path, input_name,
                              output_path, compressed_file='sensor_data'):
@@ -234,6 +252,7 @@ def generate_compressed_file(input_path, input_name,
                         root_dir=input_path,
                         base_dir=input_name)
     os.chdir(cwd_path)
+
 
 def generate_extraction_rate_dict(channels, large_topic_extraction_rate,
                                   small_topic_extraction_rate=1):
@@ -256,6 +275,7 @@ def generate_extraction_rate_dict(channels, large_topic_extraction_rate,
             rates[channel] = large_topic_extraction_rate
 
     return rates
+
 
 def validate_record(record_file):
     """Validate the record file."""
@@ -295,6 +315,7 @@ def validate_record(record_file):
 
     return True
 
+
 def validate_record_files(record_files, kword='.record.'):
 
     # load file list from directory if needs
@@ -314,7 +335,9 @@ def validate_record_files(record_files, kword='.record.'):
     else:
         for f in record_files:
             if not os.path.isfile(f):
-                raise ValueError("Input cyber record does not exist or not a regular file: %s" % f)
+                raise ValueError(
+                    "Input cyber record does not exist or not a regular file: %s" %
+                    f)
 
             if validate_record(f):
                 file_abs_paths.append(f)
@@ -334,9 +357,11 @@ def validate_record_files(record_files, kword='.record.'):
             print(default_sensor_channels)
             print('but sensor channel list in %s is: ' % file_abs_paths[i])
             print(sensor_channels)
-            raise ValueError("The record files should contain the same channel list")
+            raise ValueError(
+                "The record files should contain the same channel list")
 
     return file_abs_paths
+
 
 def parse_channel_config(channels):
     channel_list = set()
@@ -344,12 +369,15 @@ def parse_channel_config(channels):
 
     for channel in channels:
         if channel.name in channel_list:
-            raise ValueError("Duplicated channel config for : %s" % channel.name)
+            raise ValueError(
+                "Duplicated channel config for : %s" %
+                channel.name)
         else:
             channel_list.add(channel.name)
             extraction_rate_dict[channel.name] = channel.extraction_rate
 
     return channel_list, extraction_rate_dict
+
 
 def main():
     """
@@ -383,9 +411,14 @@ def main():
     #                     default=np.finfo(np.float32).max,
     #                     help="Specify the ending timestamp to extract data information.")
     # parser.add_argument("-r", "--extraction_rate", action="store", type=int,
-    #                     default=10, help="extraction rate for channel with large storage cost.")
-    parser.add_argument("--config", action="store", type=str, required=True, dest="config",
-                        help="protobuf text format configuration file abosolute path")
+    # default=10, help="extraction rate for channel with large storage cost.")
+    parser.add_argument(
+        "--config",
+        action="store",
+        type=str,
+        required=True,
+        dest="config",
+        help="protobuf text format configuration file abosolute path")
     args = parser.parse_args()
 
     config = extractor_config_pb2.DataExtractionConfig()
@@ -394,7 +427,7 @@ def main():
         text_format.Merge(proto_block, config)
 
     records = []
-    for r in  config.records.record_path:
+    for r in config.records.record_path:
         records.append(str(r))
 
     valid_record_list = validate_record_files(records, kword='.record.')
@@ -416,8 +449,11 @@ def main():
 
     # Create directory to save the extracted data
     # use time now() as folder name
-    output_relative_path = config.io_config.task_name + datetime.now().strftime("-%Y-%m-%d-%H-%M")
-    output_abs_path = os.path.join(config.io_config.output_path, output_relative_path)
+    output_relative_path = config.io_config.task_name + \
+        datetime.now().strftime("-%Y-%m-%d-%H-%M")
+    output_abs_path = os.path.join(
+        config.io_config.output_path,
+        output_relative_path)
 
     ret = process_dir(output_abs_path, 'create')
     if not ret:
@@ -436,6 +472,7 @@ def main():
 
     print('Data extraction is completed successfully!')
     sys.exit(0)
+
 
 if __name__ == '__main__':
     main()

@@ -52,5 +52,6 @@ def verify():
         print('Verify package failed!!!')
         sys.exit(1)
 
+
 if __name__ == "__main__":
     verify()

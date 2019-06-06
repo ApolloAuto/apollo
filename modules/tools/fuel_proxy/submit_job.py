@@ -41,7 +41,8 @@ class FuelJob(object):
 
     def __init__(self):
         self.job_config = None
-        self.ssl_cert = os.path.join(os.path.dirname(__file__), 'conf/cert.pem')
+        self.ssl_cert = os.path.join(
+            os.path.dirname(__file__), 'conf/cert.pem')
 
     def parse_input(self):
         """Parse and sanity check input data."""
@@ -86,6 +87,7 @@ def main(argv):
     job = FuelJob()
     if job.parse_input():
         job.send_request()
+
 
 if __name__ == '__main__':
     app.run(main)

@@ -129,6 +129,7 @@ class TestTopologyManager(object):
         for item in ret:
             print(item)
 
+
 if __name__ == "__main__":
     topology_manager_instance = TestTopologyManager()
     # topology_manager_instance.test_has_node("monitor")

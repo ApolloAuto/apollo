@@ -16,11 +16,11 @@
 # -*- coding: utf-8 -*-
 """Module for test init."""
 
+from cyber_py import cyber
 import sys
 import unittest
 
 sys.path.append("../")
-from cyber_py import cyber
 
 
 class TestInit(unittest.TestCase):
@@ -37,6 +37,7 @@ class TestInit(unittest.TestCase):
         self.assertTrue(cyber.ok())
         cyber.shutdown()
         self.assertTrue(cyber.is_shutdown())
+
 
 if __name__ == '__main__':
     unittest.main()

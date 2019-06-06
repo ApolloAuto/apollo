@@ -28,6 +28,7 @@ from modules.transform.proto import transform_pb2
 
 g_args = None
 
+
 def tf_stats(in_bag):
     """
     """
@@ -47,6 +48,7 @@ def tf_stats(in_bag):
             else:
                 stats[key] = 1
     print 'tf stats: {}'.format(stats)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

@@ -33,13 +33,32 @@ class HybridAStarPlanner(object):
         self.result = lib.CreateResultPtr()
 
     def AddVirtualObstacle(self, obstacle_x, obstacle_y, vertice_num):
-        lib.AddVirtualObstacle(self.obstacles, POINTER(c_double)(obstacle_x),
-                               POINTER(c_double)(obstacle_y), (c_int)(vertice_num))
+        lib.AddVirtualObstacle(
+            self.obstacles,
+            POINTER(c_double)(obstacle_x),
+            POINTER(c_double)(obstacle_y),
+            (c_int)(vertice_num))
 
     def Plan(self, sx, sy, sphi, ex, ey, ephi, XYbounds):
-        return lib.Plan(self.planner, self.obstacles, self.result, c_double(sx),
-                        c_double(sy), c_double(sphi), c_double(ex), c_double(ey), c_double(ephi), POINTER(c_double)(XYbounds))
+        return lib.Plan(
+            self.planner,
+            self.obstacles,
+            self.result,
+            c_double(sx),
+            c_double(sy),
+            c_double(sphi),
+            c_double(ex),
+            c_double(ey),
+            c_double(ephi),
+            POINTER(c_double)(XYbounds))
 
     def GetResult(self, x, y, phi, v, a, steer, output_size):
-        lib.GetResult(self.result, POINTER(c_double)(x), POINTER(c_double)(y),
-                      POINTER(c_double)(phi), POINTER(c_double)(v), POINTER(c_double)(a), POINTER(c_double)(steer), POINTER(c_ushort)(output_size))
+        lib.GetResult(
+            self.result,
+            POINTER(c_double)(x),
+            POINTER(c_double)(y),
+            POINTER(c_double)(phi),
+            POINTER(c_double)(v),
+            POINTER(c_double)(a),
+            POINTER(c_double)(steer),
+            POINTER(c_ushort)(output_size))

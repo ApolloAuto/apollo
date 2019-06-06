@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 
 import datetime
 import os
@@ -95,8 +95,8 @@ def gen_report_cpp(car_type, protocol, output_dir):
             func_impl_list.append(impl)
             proto_set_fmt = "  chassis->mutable_%s()->mutable_%s()->set_%s(%s(bytes, length));"
             func_name = var["name"]
-            proto_set = proto_set_fmt % (car_type, protocol["name"], var["name"],
-                                         func_name)
+            proto_set = proto_set_fmt % (
+                car_type, protocol["name"], var["name"], func_name)
             set_var_to_protocol_list.append(proto_set)
         fmt_val["set_var_to_protocol_list"] = "\n".join(
             set_var_to_protocol_list)
@@ -117,8 +117,8 @@ def gen_report_value_offset_precision(var, protocol):
 
     returntype = var["type"]
     if var["type"] == "enum":
-        returntype = protocol["name"].capitalize() + "::" + var["name"].capitalize(
-        ) + "Type"
+        returntype = protocol["name"].capitalize(
+        ) + "::" + var["name"].capitalize() + "Type"
     impl = impl + "\n  " + returntype + " ret = "
 
     if var["type"] == "enum":
@@ -238,7 +238,8 @@ def get_byte_info(var):
             left_len = left_len - info["len"]
             byte_idx = byte_idx + 1
             bit_start = 0
-        # byte_info is always construct with msb(most significant bit) byte to lsb byte
+        # byte_info is always construct with msb(most significant bit) byte to
+        # lsb byte
         byte_info.reverse()
     return byte_info
 
@@ -342,8 +343,8 @@ void %(classname)s::set_p_%(var_name)s(uint8_t* data,
     fmt_val["var_name"] = var["name"].lower()
     returntype = var["type"]
     if var["type"] == "enum":
-        returntype = protocol["name"].capitalize() + "::" + var["name"].capitalize(
-        ) + "Type"
+        returntype = protocol["name"].capitalize(
+        ) + "::" + var["name"].capitalize() + "Type"
     fmt_val["var_type"] = returntype
     fmt_val["config"] = str(var)
     impl = impl + fmt % fmt_val
@@ -457,15 +458,17 @@ def gen_protocols(protocol_conf_file, protocol_dir):
                 print "Unknown protocol_type:%s" % protocol["protocol_type"]
         gen_build_file(car_type, protocol_dir)
 
+
 def gen_esd_can_extended(str):
     """
         id string:
     """
-    int_id = int(str,16)
+    int_id = int(str, 16)
     int_id &= 0x1FFFFFFF
     int_id |= 0x20000000
     str = hex(int_id).replace('0x', '')
     return str
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

@@ -120,7 +120,7 @@ def plot_central_curve(central_curve, color):
             px, py = draw_line(curve.line_segment, color)
             node_x = node_x + px
             node_y = node_y + py
-        #if curve.HasField('arc'):
+        # if curve.HasField('arc'):
         #    draw_arc(curve.arc)
     return [node_x[len(node_x) / 2], node_y[len(node_y) / 2]]
 
@@ -140,7 +140,8 @@ def plot_edge(edge, midddle_point_map):
     """plot topology graph edge"""
     if edge.direction_type == topo_graph_pb2.Edge.FORWARD:
         return
-    # if lane change is allowed, draw an arrow from lane with from_id to lane with to_id
+    # if lane change is allowed, draw an arrow from lane with from_id to lane
+    # with to_id
     from_id = edge.from_lane_id
     from_pt = midddle_point_map[from_id]
     to_id = edge.to_lane_id
@@ -223,7 +224,7 @@ if __name__ == '__main__':
     print "version: %s" % graph.hdmap_version
 
     plt.ion()
-    while 1:
+    while True:
         print_help_command()
         print 'cmd>',
         instruction = raw_input()

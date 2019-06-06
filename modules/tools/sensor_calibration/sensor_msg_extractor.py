@@ -33,6 +33,7 @@ from modules.localization.proto import gps_pb2
 
 from data_file_object import *
 
+
 class SensorMessageParser(object):
     """Wrapper for cyber channel message extractor"""
 
@@ -49,10 +50,11 @@ class SensorMessageParser(object):
         self._init_parser()
         self._parsed_data = None
         self._output_path = output_path
-        self._timestamp_file = os.path.join(self._output_path, "timestamps.txt")
+        self._timestamp_file = os.path.join(
+            self._output_path, "timestamps.txt")
         self._instance_saving = instance_saving
 
-    #initalizing msg and proto parser
+    # initalizing msg and proto parser
     def _init_parser(self):
         raise NotImplementedError
 
@@ -69,23 +71,25 @@ class SensorMessageParser(object):
         return self._timestamps
 
     def save_timestamps_to_file(self):
-       timestamp_file_obj = TimestampFileObject(self._timestamp_file,
-                                                operation='write',
-                                                file_type='txt')
-       timestamp_file_obj.save_to_file(self._timestamps)
-       return True
+        timestamp_file_obj = TimestampFileObject(self._timestamp_file,
+                                                 operation='write',
+                                                 file_type='txt')
+        timestamp_file_obj.save_to_file(self._timestamps)
+        return True
+
 
 class GpsParser(SensorMessageParser):
     """
     class to parse GNSS odometry channel.
     saving this small topic as a whole.
     """
+
     def __init__(self, output_path, instance_saving=False):
         super(GpsParser, self).__init__(output_path, instance_saving)
         if not self._instance_saving:
             self._parsed_data = []
             self._odomotry_output_file =\
-             os.path.join(self._output_path, "Odometry.bin")
+                os.path.join(self._output_path, "Odometry.bin")
 
     def _init_parser(self):
         self._msg_parser = gps_pb2.Gps()
@@ -117,17 +121,20 @@ class GpsParser(SensorMessageParser):
 
     def save_messages_to_file(self):
         """save list of parsed Odometry messages to file"""
-        odometry_file_obj = OdometryFileObject(file_path=self._odomotry_output_file,
-                                               operation='write',
-                                               file_type='binary')
+        odometry_file_obj = OdometryFileObject(
+            file_path=self._odomotry_output_file,
+            operation='write',
+            file_type='binary')
         odometry_file_obj.save_to_file(self._parsed_data)
         return True
+
 
 class PointCloudParser(SensorMessageParser):
     """
     class to parse apollo/$(lidar)/PointCloud2 channels.
     saving seperately each parsed msg
     """
+
     def __init__(self, output_path, instance_saving=True):
         super(PointCloudParser, self).__init__(output_path, instance_saving)
 
@@ -136,7 +143,7 @@ class PointCloudParser(SensorMessageParser):
         for i, point in enumerate(xyz_i_t):
             # change timestamp to timestamp_sec
             arr[i] = (point.x, point.y, point.z,
-                      point.intensity, point.timestamp/1e9)
+                      point.intensity, point.timestamp / 1e9)
         return arr
 
     def make_xyzit_point_cloud(self, xyz_i_t):
@@ -173,7 +180,7 @@ class PointCloudParser(SensorMessageParser):
         return pc
 
     def save_pointcloud_meta_to_file(self, pc_meta, pcd_file):
-            pypcd.save_point_cloud_bin_compressed(pc_meta, pcd_file)
+        pypcd.save_point_cloud_bin_compressed(pc_meta, pcd_file)
 
     def _init_parser(self):
         self._msg_parser = pointcloud_pb2.PointCloud()
@@ -193,9 +200,11 @@ class PointCloudParser(SensorMessageParser):
         if self._instance_saving:
             file_name = "%06d.pcd" % self.get_msg_count()
             output_file = os.path.join(self._output_path, file_name)
-            self.save_pointcloud_meta_to_file(pc_meta=self._parsed_data, pcd_file=output_file)
+            self.save_pointcloud_meta_to_file(
+                pc_meta=self._parsed_data, pcd_file=output_file)
         else:
-            raise ValueError("not implement multiple message concatenation for PointCloud2 topic")
+            raise ValueError(
+                "not implement multiple message concatenation for PointCloud2 topic")
         # TODO(gchen-Apollo): add saint check
         return True
 
@@ -205,6 +214,7 @@ class ImageParser(SensorMessageParser):
     class to parse apollo/$(camera)/image channels.
     saving seperately each parsed msg
     """
+
     def __init__(self, output_path, instance_saving=True):
         super(ImageParser, self).__init__(output_path, instance_saving)
 
@@ -227,13 +237,15 @@ class ImageParser(SensorMessageParser):
         # if step * 3 is equal to width.
         if image.encoding == 'rgb8' or image.encoding == 'bgr8':
             if image.step != image.width * 3:
-                print('Image.step %d does not equal to Image.width %d * 3 for color image.'
-                      % (image.step, image.width))
+                print(
+                    'Image.step %d does not equal to Image.width %d * 3 for color image.' %
+                    (image.step, image.width))
                 return False
         elif image.encoding == 'gray' or image.encoding == 'y':
             if image.step != image.width:
-                print('Image.step %d does not equal to Image.width %d or gray image.'
-                      % (image.step, image.width))
+                print(
+                    'Image.step %d does not equal to Image.width %d or gray image.' %
+                    (image.step, image.width))
                 return False
         else:
             print('Unsupported image encoding type: %s.' % image.encoding)
@@ -248,7 +260,8 @@ class ImageParser(SensorMessageParser):
             output_file = os.path.join(self._output_path, file_name)
             self.save_image_mat_to_file(image_file=output_file)
         else:
-            raise ValueError("not implement multiple message concatenation for Image topic")
+            raise ValueError(
+                "not implement multiple message concatenation for Image topic")
 
         return True
 

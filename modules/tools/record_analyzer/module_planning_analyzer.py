@@ -35,6 +35,7 @@ from metrics.lon_acceleration import LonAcceleration
 from metrics.latency import Latency
 from metrics.reference_line import ReferenceLine
 
+
 class PlannigAnalyzer:
     """planning analyzer"""
 
@@ -60,7 +61,6 @@ class PlannigAnalyzer:
 
         self.bag_start_time_t = None
         self.print_acc = arguments.showacc
-
 
     def put(self, adc_trajectory):
         self.total_cycle_num += 1
@@ -133,7 +133,7 @@ class PlannigAnalyzer:
             pd = line.project(Point(p))
             if pd == distance:
                 return [
-                    LineString(coords[:i+1]),
+                    LineString(coords[:i + 1]),
                     LineString(coords[i:])]
             if pd > distance:
                 cp = line.interpolate(distance)
@@ -184,7 +184,7 @@ class PlannigAnalyzer:
         # jerk
         v2_results["acc_jerk"] = self.lon_acceleration_analyzer.get_acc_jerk()
         v2_results["dec_jerk"] = self.lon_acceleration_analyzer.get_dec_jerk()
-        
+
         # centripetal_jerk
         v2_results["lat_jerk"] = self.lat_acceleration_analyzer.get_jerk()
 

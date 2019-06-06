@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from cyber_py.record import RecordReader
 from modules.canbus.proto import chassis_pb2
 
+
 def process(reader):
     last_steering_percentage = None
     last_speed_mps = None
@@ -22,7 +23,7 @@ def process(reader):
             if chassis.driving_mode != chassis_pb2.Chassis.COMPLETE_AUTO_DRIVE:
                 last_steering_percentage = steering_percentage
                 last_speed_mps = speed_mps
-                last_timestamp_sec = timestamp_sec               
+                last_timestamp_sec = timestamp_sec
                 continue
 
             if last_timestamp_sec is None:
@@ -43,6 +44,7 @@ def process(reader):
 
     return speed_data, d_steering_data
 
+
 if __name__ == "__main__":
     fns = sys.argv[1:]
     fig, ax = plt.subplots()
@@ -53,5 +55,4 @@ if __name__ == "__main__":
         ax.scatter(speed_data, d_steering_data)
     ax.set_xlim(-5, 40)
     ax.set_ylim(-300, 300)
-    plt.show()    
-
+    plt.show()

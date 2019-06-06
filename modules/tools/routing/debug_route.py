@@ -97,7 +97,7 @@ if __name__ == '__main__':
         central_curves[nd.lane_id] = nd.central_curve
 
     plt.ion()
-    while 1:
+    while True:
         print_help_command()
         print 'cmd>',
         instruction = raw_input()

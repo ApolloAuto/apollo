@@ -33,6 +33,7 @@ optimal_file_path = "/apollo/modules/planning/conf/optimal_planner_open_space_co
 # tunning_object = "coarse_trajectory"
 tunning_object = "smooth_trajectory"
 
+
 def load_open_space_protobuf(filename):
     open_space_params = planner_open_space_config_pb2.PlannerOpenSpaceConfig()
     proto_utils.get_pb_from_text_file(filename, open_space_params)
@@ -87,10 +88,17 @@ def RandSampling(param_names_and_range, origin_open_space_params):
         rand_params.CopyFrom(origin_open_space_params)
         for param in param_names_and_range:
             exec("rand_params." +
-                 str(param[0]) + "=random.uniform(max(rand_params." +
-                 str(param[0])
-                 + " - " + str(param[1]) + ",0.0)"
-                 + " ,rand_params." + str(param[0]) + " + " + str(param[1]) + ")")
+                 str(param[0]) +
+                 "=random.uniform(max(rand_params." +
+                 str(param[0]) +
+                 " - " +
+                 str(param[1]) +
+                 ",0.0)" +
+                 " ,rand_params." +
+                 str(param[0]) +
+                 " + " +
+                 str(param[1]) +
+                 ")")
         params_lists.append(rand_params)
     return params_lists
 
@@ -138,11 +146,17 @@ def GetOptimalParams(params_lists, key_to_evaluations):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--InputConfig", help="original conf address to be tuned", type=str, default=original_file_path)
+        "--InputConfig",
+        help="original conf address to be tuned",
+        type=str,
+        default=original_file_path)
     parser.add_argument("--OutputConfig", help="tuned conf address",
                         type=str, default=optimal_file_path)
-    parser.add_argument("--TunningObject",
-                        help="algorithm to be tuned", type=str, default=tunning_object)
+    parser.add_argument(
+        "--TunningObject",
+        help="algorithm to be tuned",
+        type=str,
+        default=tunning_object)
     args = parser.parse_args()
     original_file_path = args.InputConfig
     optimal_file_path = args.OutputConfig

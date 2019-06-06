@@ -185,12 +185,12 @@ class RtkPlayer(object):
         self.sequence_num = self.sequence_num + 1
 
         self.logger.debug(
-            "publish_planningmsg: before adjust start: self.start=%s, self.end=%s"
-            % (self.start, self.end))
+            "publish_planningmsg: before adjust start: self.start=%s, self.end=%s" %
+            (self.start, self.end))
         if self.replan or self.sequence_num <= 1 or not self.automode:
             self.logger.info(
-                "trigger replan: self.replan=%s, self.sequence_num=%s, self.automode=%s"
-                % (self.replan, self.sequence_num, self.automode))
+                "trigger replan: self.replan=%s, self.sequence_num=%s, self.automode=%s" %
+                (self.replan, self.sequence_num, self.automode))
             self.restart()
         else:
             timepoint = self.closest_time()
@@ -209,8 +209,8 @@ class RtkPlayer(object):
             self.end = len(self.data) - 1
 
         self.logger.debug(
-            "publish_planningmsg: after adjust start: self.start=%s, self.end=%s"
-            % (self.start, self.end))
+            "publish_planningmsg: after adjust start: self.start=%s, self.end=%s" %
+            (self.start, self.end))
 
         planningdata.total_path_length = self.data['s'][self.end] - \
             self.data['s'][self.start]

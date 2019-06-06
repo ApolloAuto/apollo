@@ -80,9 +80,10 @@ def init():
     rospy.Subscriber('/apollo/sensor/mobileye',
                      mobileye_pb2.Mobileye,
                      mobileye_callback)
-    perception_pub = rospy.Publisher("/apollo/perception/obstacles",
-                                     perception_obstacle_pb2.PerceptionObstacles,
-                                     queue_size=1)
+    perception_pub = rospy.Publisher(
+        "/apollo/perception/obstacles",
+        perception_obstacle_pb2.PerceptionObstacles,
+        queue_size=1)
 
 
 if __name__ == '__main__':

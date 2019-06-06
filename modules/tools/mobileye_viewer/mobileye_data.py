@@ -61,9 +61,9 @@ class MobileyeData:
             rangex = self.mobileye_pb.next_76d[i].view_range
             for y in range(int(rangex)):
                 lane_y.append(y)
-                x = c3*(y*y*y) + c2*(y*y) + c1*y + c0
+                x = c3 * (y * y * y) + c2 * (y * y) + c1 * y + c0
                 lane_x.append(x)
-            #print rangex
+            # print rangex
             self.next_lanes_x.append(lane_x)
             self.next_lanes_y.append(lane_y)
         self.next_lane_data_lock.release()
@@ -86,7 +86,7 @@ class MobileyeData:
         self.lane_data_lock.acquire()
         for y in range(int(rrangex)):
             self.right_lane_y.append(y)
-            x = rc3*(y*y*y) + rc2*(y*y) + rc1*y + rc0
+            x = rc3 * (y * y * y) + rc2 * (y * y) + rc1 * y + rc0
             self.right_lane_x.append(x)
         self.lane_data_lock.release()
 
@@ -98,7 +98,7 @@ class MobileyeData:
         self.lane_data_lock.acquire()
         for y in range(int(lrangex)):
             self.left_lane_y.append(y)
-            x = lc3*(y * y * y) + lc2 * (y * y) + lc1 * y + lc0
+            x = lc3 * (y * y * y) + lc2 * (y * y) + lc1 * y + lc0
             self.left_lane_x.append(x)
         self.lane_data_lock.release()
 

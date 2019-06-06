@@ -157,7 +157,8 @@ class BodySensationCalculator(object):
                 acc_y = localization.pose.linear_acceleration.y
                 acc_z = localization.pose.linear_acceleration.z
 
-                if abs(acc_z) >= SPEED_UP_THRESHOLD_2 and diff_bump_time >= BUMP_TIME_THRESHOLD:
+                if abs(
+                        acc_z) >= SPEED_UP_THRESHOLD_2 and diff_bump_time >= BUMP_TIME_THRESHOLD:
                     self._bumps_rollback(t)
                     self._last_bump_time = t
 
@@ -172,8 +173,8 @@ class BodySensationCalculator(object):
                             continue
                         if acc_y <= SPEED_DOWN_THRESHOLD_2:
                             continue
-                        if self._speed_down_4_flag == 1 \
-                                and t - self._last_speed_down_4_time >= ACCELERATE_TIME_THRESHOLD:
+                        if self._speed_down_4_flag == 1 and t - \
+                                self._last_speed_down_4_time >= ACCELERATE_TIME_THRESHOLD:
                             self._last_speed_down_4_time = t
                             if self._check_status(t):
                                 self.auto_counts["speed_down_4"] += 1
@@ -196,8 +197,8 @@ class BodySensationCalculator(object):
                             continue
                         if acc_y >= SPEED_UP_THRESHOLD_2:
                             continue
-                        if self._speed_up_4_flag == 1 \
-                                and t - self._last_speed_up_4_time >= ACCELERATE_TIME_THRESHOLD:
+                        if self._speed_up_4_flag == 1 and t - \
+                                self._last_speed_up_4_time >= ACCELERATE_TIME_THRESHOLD:
                             self._last_speed_up_4_time = t
                             if self._check_status(t):
                                 self.auto_counts["speed_up_4"] += 1
@@ -233,7 +234,11 @@ if __name__ == '__main__':
         description="A tool to evaluate the body sensation. \
         It should be used like 'python body_sensation_evalution.py bag1 bag2 ...' ")
     parser.add_argument(
-        "in_rosbag", action="store", nargs='+', type=str, help="the input rosbag")
+        "in_rosbag",
+        action="store",
+        nargs='+',
+        type=str,
+        help="the input rosbag")
     args = parser.parse_args()
     bsc = BodySensationCalculator()
     for bag_file in args.in_rosbag:

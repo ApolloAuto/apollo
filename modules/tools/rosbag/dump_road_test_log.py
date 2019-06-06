@@ -46,7 +46,7 @@ class EventDumper(object):
         Calculate mileage
         """
         try:
-	    drive_event = drive_event_pb2.DriveEvent()
+            drive_event = drive_event_pb2.DriveEvent()
             reader = RecordReader(bag_file)
         except Exception:
             print('Cannot open bag file %s' % bag_file)
@@ -55,10 +55,12 @@ class EventDumper(object):
                 for msg in reader.read_messages():
                     if msg.topic == kEventTopic:
                         drive_event.ParseFromString(msg.message)
-                        msg_time = time.localtime(drive_event.header.timestamp_sec)
+                        msg_time = time.localtime(
+                            drive_event.header.timestamp_sec)
                         fp.write(time.strftime("%Y-%m-%d %H:%M:%S", msg_time))
                         fp.write(str(drive_event.type) + ':')
                         fp.write(drive_event.event.encode('utf-8') + '\n')
+
 
 def main():
     if len(sys.argv) < 2:
@@ -68,6 +70,7 @@ def main():
     ed = EventDumper()
     for bag_file in sys.argv[1:]:
         ed.calculate(bag_file)
+
 
 if __name__ == '__main__':
     main()

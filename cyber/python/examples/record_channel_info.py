@@ -22,6 +22,7 @@ from cyber_py import cyber
 from cyber_py import record
 from cyber.proto import record_pb2
 
+
 def print_channel_info(file_path):
     freader = record.RecordReader(file_path)
     channels = freader.get_channellist()
@@ -32,7 +33,8 @@ def print_channel_info(file_path):
 
     print('\n++++++++++++Begin Channel Info Statistics++++++++++++++')
     print('-' * 40)
-    print('record version: [%d:%d]' % (header.major_version, header.minor_version))
+    print('record version: [%d:%d]' %
+          (header.major_version, header.minor_version))
     print('record message_number: %s' % str(header.message_number))
     print('record file size(Byte): %s' % str(header.size))
     print('chunk_number: %d' % header.chunk_number)
@@ -42,9 +44,12 @@ def print_channel_info(file_path):
     for channel in channels:
         desc = freader.get_protodesc(channel)
         count += 1
-        print('Channel: %s, count: %d, desc size: %d' % (channel, count, len(desc)))
+        print(
+            'Channel: %s, count: %d, desc size: %d' %
+            (channel, count, len(desc)))
         # print desc
     print "++++++++++++Finish Channel Info Statistics++++++++++++++\n"
+
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:

@@ -18,6 +18,7 @@
 
 import numpy as np
 
+
 class LonAcceleration:
     def __init__(self):
         self.last_velocity = None
@@ -31,14 +32,16 @@ class LonAcceleration:
 
     def put(self, adc_trajectory):
         init_point = adc_trajectory.debug.planning_data.init_point
-        current_velocity_timestamp = adc_trajectory.header.timestamp_sec + init_point.relative_time
+        current_velocity_timestamp = adc_trajectory.header.timestamp_sec + \
+            init_point.relative_time
         current_velocity = init_point.v
 
         if self.last_velocity_timestamp is not None and self.last_velocity is not None:
             # acceleration
             duration = current_velocity_timestamp - self.last_velocity_timestamp
             if duration > 0.03:
-                current_acceleration = (current_velocity - self.last_velocity) / duration
+                current_acceleration = (
+                    current_velocity - self.last_velocity) / duration
                 if current_acceleration > 0:
                     self.acceleration_list.append(current_acceleration)
                 elif current_acceleration < 0:
@@ -48,14 +51,15 @@ class LonAcceleration:
                     # jerk
                     acc_duration = current_velocity_timestamp - self.last_acceleration_timestamp
                     if acc_duration > 0.03:
-                        current_jerk = (current_acceleration - self.last_acceleration) / acc_duration
+                        current_jerk = (
+                            current_acceleration - self.last_acceleration) / acc_duration
                         if current_acceleration > 0:
                             self.acc_jerk_list.append(current_jerk)
                         elif current_acceleration < 0:
                             self.dec_jerk_list.append(current_jerk)
 
                 self.last_acceleration = current_acceleration
-                self.last_acceleration_timestamp =  current_velocity_timestamp
+                self.last_acceleration_timestamp = current_velocity_timestamp
 
         self.last_velocity_timestamp = current_velocity_timestamp
         self.last_velocity = current_velocity
@@ -107,7 +111,8 @@ class LonAcceleration:
         lon_deceleration = {}
         if len(self.deceleration_list) > 0:
             lon_deceleration["max"] = abs(max(self.deceleration_list, key=abs))
-            lon_deceleration["avg"] = np.average(np.absolute(self.deceleration_list))
+            lon_deceleration["avg"] = np.average(
+                np.absolute(self.deceleration_list))
         else:
             lon_deceleration["max"] = 0.0
             lon_deceleration["avg"] = 0.0
@@ -131,7 +136,7 @@ class LonAcceleration:
 
         for jerk in self.acc_jerk_list:
             if JERK_M_LB_P <= jerk < JERK_M_UB_P or \
-                JERK_M_LB_N < jerk <= JERK_M_UB_N:
+                    JERK_M_LB_N < jerk <= JERK_M_UB_N:
                 jerk_medium_cnt += 1
             if jerk >= JERK_H_LB_P or jerk <= JERK_H_UB_N:
                 jerk_high_cnt += 1
@@ -164,7 +169,7 @@ class LonAcceleration:
 
         for jerk in self.dec_jerk_list:
             if JERK_M_LB_P <= jerk < JERK_M_UB_P or \
-                JERK_M_LB_N < jerk <= JERK_M_UB_N:
+                    JERK_M_LB_N < jerk <= JERK_M_UB_N:
                 jerk_medium_cnt += 1
             if jerk >= JERK_H_LB_P or jerk <= JERK_H_UB_N:
                 jerk_high_cnt += 1

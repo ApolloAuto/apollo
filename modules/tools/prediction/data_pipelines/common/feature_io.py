@@ -33,7 +33,7 @@ def readVarint32(stream):
     """
     mask = 0x80  # (1 << 7)
     raw_varint32 = []
-    while 1:
+    while True:
         b = stream.read(1)
         if b == "":
             break
@@ -61,7 +61,7 @@ def load_label_feature(filename):
             read_bytes, _ = decoder._DecodeVarint32(size, 0)
             data = f.read(read_bytes)
             if len(data) < read_bytes:
-                print ("Failed to load protobuf")
+                print("Failed to load protobuf")
                 break
             fea = feature_pb2.Feature()
             fea.ParseFromString(data)

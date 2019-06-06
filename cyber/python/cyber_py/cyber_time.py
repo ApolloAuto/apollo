@@ -233,7 +233,8 @@ class Rate(object):
         _CYBER_TIME.delete_PyRate(self.rate_)
 
     def __str__(self):
-        return "cycle_time = %s, exp_cycle_time = %s" % (str(self.get_cycle_time()), str(self.get_expected_cycle_time()))
+        return "cycle_time = %s, exp_cycle_time = %s" % (
+            str(self.get_cycle_time()), str(self.get_expected_cycle_time()))
 
     def sleep(self):
         """

@@ -29,12 +29,14 @@ g_args = None
 
 g_delta_t = 0.5  # 1 second approximate time match region.
 
+
 def write_to_file(file_path, topic_pb):
     """
     write pb message to file
     """
     with open(file_path, 'w') as fp:
         f.write(str(topic_pb))
+
 
 def dump_bag(in_bag, out_dir):
     """
@@ -65,12 +67,12 @@ def dump_bag(in_bag, out_dir):
             first_time = t
         if channel not in topic_name_map:
             continue
-        dt1 = datetime.utcfromtimestamp(t/1000000000)
-        dt2 = datetime.utcfromtimestamp(first_time/1000000000)
+        dt1 = datetime.utcfromtimestamp(t / 1000000000)
+        dt2 = datetime.utcfromtimestamp(first_time / 1000000000)
         relative_time = (dt1 - dt2).seconds - g_args.start_time
         print "relative_time", relative_time
         if ((g_args.time_duration > 0) and
-            (relative_time < 0 or relative_time > g_args.time_duration)):
+                (relative_time < 0 or relative_time > g_args.time_duration)):
             continue
         if channel == '/apollo/planning':
             seq += 1
@@ -79,10 +81,11 @@ def dump_bag(in_bag, out_dir):
             for t, name_pb in topic_name_map.iteritems():
                 if name_pb[1] is None:
                     continue
-                file_path = os.path.join(out_dir,
-                                         str(seq) + "_" + name_pb[0] + ".pb.txt")
+                file_path = os.path.join(
+                    out_dir, str(seq) + "_" + name_pb[0] + ".pb.txt")
                 write_to_file(file_path, name_pb[1])
         topic_name_map[channel][1] = msg
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

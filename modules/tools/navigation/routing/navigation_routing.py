@@ -67,7 +67,6 @@ def add_listener():
 
 
 @app.route('/routing', methods=["POST", "GET"])
-
 def request_routing(request_json):
     if "start_lat" not in request_json:
         return None
@@ -189,7 +188,7 @@ def load_drive_data():
             y = float(vals[1])
             ew.append((x, y))
         line_ew = LineString(ew)
-    except:
+    except BaseException:
         line_ew = None
 
     we = []
@@ -204,7 +203,7 @@ def load_drive_data():
             y = float(vals[1])
             we.append((x, y))
         line_we = LineString(we)
-    except:
+    except BaseException:
         line_ew = None
 
     revloop = []
@@ -219,7 +218,7 @@ def load_drive_data():
             y = float(vals[1])
             revloop.append((x, y))
         line_revloop = LineString(revloop)
-    except:
+    except BaseException:
         line_revloop = None
 
 

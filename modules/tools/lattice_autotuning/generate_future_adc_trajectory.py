@@ -45,10 +45,10 @@ def generate_future_pose_list(rosbag_in, period):
     # dedup trajectory by position
     ret = []
     remove_index_list = []
-    for i in range(len(total_adc_trajectory)-1):
+    for i in range(len(total_adc_trajectory) - 1):
         # pair wise
         curr_pose = total_adc_trajectory[i][1]
-        next_pose = total_adc_trajectory[i+1][1]
+        next_pose = total_adc_trajectory[i + 1][1]
         ds = math.sqrt(
             (curr_pose.position.x - next_pose.position.x) *
             (curr_pose.position.x - next_pose.position.x) +
@@ -91,10 +91,10 @@ def augment_future_traj(new_localization, ptr_start, ptr_end, pose_list):
     # Convert a list of pose to traj
     sum_s = 0.0
     relative_time = 0.0
-    for i in range(ptr_start, ptr_end-1):
+    for i in range(ptr_start, ptr_end - 1):
         trajectory_point = new_localization.trajectory_point.add()
         pose1 = pose_list[i][1]
-        pose2 = pose_list[i+1][1]
+        pose2 = pose_list[i + 1][1]
         trajectory_point.path_point.x = pose1.position.x
         trajectory_point.path_point.y = pose1.position.y
         trajectory_point.path_point.z = pose1.position.z
@@ -118,12 +118,12 @@ def augment_future_traj(new_localization, ptr_start, ptr_end, pose_list):
             (pose1.linear_acceleration.y - pose2.linear_acceleration.y) *
             (pose1.linear_acceleration.y - pose2.linear_acceleration.y))
         trajectory_point.relative_time = relative_time
-        relative_time += pose_list[i+1][0] - pose_list[i][0]
+        relative_time += pose_list[i + 1][0] - pose_list[i][0]
         # not setting dkappa
 
     # last point
     last_trajectory_point = new_localization.trajectory_point.add()
-    last_pose = pose_list[ptr_end-1][1]
+    last_pose = pose_list[ptr_end - 1][1]
     last_trajectory_point.path_point.x = last_pose.position.x
     last_trajectory_point.path_point.y = last_pose.position.y
     last_trajectory_point.path_point.z = last_pose.position.z

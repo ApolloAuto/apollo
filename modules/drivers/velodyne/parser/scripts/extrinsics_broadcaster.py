@@ -24,6 +24,7 @@ from subprocess import call
 import sys
 import yaml
 
+
 def main():
     """Main function.
 
@@ -53,6 +54,7 @@ def main():
         return call(command, shell=True)
     except OSError as e:
         print(e)
+
 
 if __name__ == '__main__':
     main()

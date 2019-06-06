@@ -43,7 +43,7 @@ class Stitem(object):
         """new planning"""
         max_time = max(time) + 1
         max_value = max(values) + 1
-        if self.planningavailable == False:
+        if not self.planningavailable:
             self.ax.set_xlim([0, max_time])
             self.ax.set_ylim([0, max_value])
             self.ymax = max_value

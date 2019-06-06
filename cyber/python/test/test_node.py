@@ -16,12 +16,12 @@
 # -*- coding: utf-8 -*-
 """Module for test node."""
 
+from modules.common.util.testdata.simple_pb2 import SimpleMessage
+from cyber_py import cyber
 import sys
 import unittest
 
 sys.path.append("../")
-from cyber_py import cyber
-from modules.common.util.testdata.simple_pb2 import SimpleMessage
 
 
 def callback(data):
@@ -75,6 +75,7 @@ class TestNode(unittest.TestCase):
         self.assertEqual(reader.data_type, SimpleMessage)
         self.assertEqual(SimpleMessage.DESCRIPTOR.full_name,
                          "apollo.common.util.test.SimpleMessage")
+
 
 if __name__ == '__main__':
     unittest.main()

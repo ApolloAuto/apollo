@@ -57,8 +57,9 @@ class RtkRecord(object):
             self.file_handler.close()
             sys.exit(1)
 
-        self.write("x,y,z,speed,acceleration,curvature,"
-                   "curvature_change_rate,time,theta,gear,s,throttle,brake,steering\n")
+        self.write(
+            "x,y,z,speed,acceleration,curvature,"
+            "curvature_change_rate,time,theta,gear,s,throttle,brake,steering\n")
 
         self.localization = localization_pb2.LocalizationEstimate()
         self.chassis = chassis_pb2.Chassis()

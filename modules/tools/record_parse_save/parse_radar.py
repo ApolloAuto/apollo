@@ -8,7 +8,9 @@ currently implementation for:
 
 """
 
-import sys, json, os
+import sys
+import json
+import os
 
 from cyber_py import cyber
 from cyber_py import record
@@ -30,6 +32,7 @@ class RadarMessageConti408(object):
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,
                           sort_keys=True, indent=4)
+
 
 class ContiRadarARS408Detection(object):
     def __init__(self):
@@ -56,6 +59,7 @@ class ContiRadarARS408Detection(object):
         self.length = None
         self.width = None
         self.obstacle_class = None
+
 
 def pull_conti_radar_detections(obs):
     """
@@ -112,18 +116,19 @@ def parse_data(channelname, msg, out_folder):
     radar_msg.radar_channel = channelname
 
     for i in range(len(msg_contiradar.contiobs)):
-        detections.append(pull_conti_radar_detections(msg_contiradar.contiobs[i]))
+        detections.append(
+            pull_conti_radar_detections(
+                msg_contiradar.contiobs[i]))
 
     radar_msg.radarDetectionList = detections
 
     json_data = radar_msg.toJSON()
-    tstamp = json_data.split()[-2].ljust(20,'0')
+    tstamp = json_data.split()[-2].ljust(20, '0')
 
     # write this scan to file
-    scan_filename = "radar_scan_" + tstamp.replace('.','_') + ".txt"
+    scan_filename = "radar_scan_" + tstamp.replace('.', '_') + ".txt"
     with open(out_folder + scan_filename, 'w') as outfile:
         outfile.write(json_data)
-
 
     return tstamp
 

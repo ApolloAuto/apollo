@@ -62,20 +62,20 @@ def load_Conv1dParameter(model, key, stride=1):
 
     model_pb = Conv1dParameter()
 
-    model_pb.shape.extend(list(model.state_dict()[key+'.weight'].shape))
+    model_pb.shape.extend(list(model.state_dict()[key + '.weight'].shape))
 
     model_pb.use_bias = True
 
     kernel_param = TensorParameter()
-    kernel_param.shape.extend(list(model.state_dict()[key+'.weight'].shape))
+    kernel_param.shape.extend(list(model.state_dict()[key + '.weight'].shape))
     kernel_param.data.extend(
-        list(model.state_dict()[key+'.weight'].numpy().reshape(-1)))
+        list(model.state_dict()[key + '.weight'].numpy().reshape(-1)))
     model_pb.kernel.CopyFrom(kernel_param)
 
     bias_param = TensorParameter()
-    bias_param.shape.extend(list(model.state_dict()[key+'.bias'].shape))
+    bias_param.shape.extend(list(model.state_dict()[key + '.bias'].shape))
     bias_param.data.extend(
-        list(model.state_dict()[key+'.bias'].numpy().reshape(-1)))
+        list(model.state_dict()[key + '.bias'].numpy().reshape(-1)))
     model_pb.bias.CopyFrom(bias_param)
 
     model_pb.stride = stride
@@ -91,15 +91,15 @@ def load_DenseParameter(model, key):
 
     weights_param = TensorParameter()
     weights_param.shape.extend(
-        list(model.state_dict()[key+'.weight'].numpy().T.shape))
+        list(model.state_dict()[key + '.weight'].numpy().T.shape))
     weights_param.data.extend(
-        list(model.state_dict()[key+'.weight'].numpy().T.reshape(-1)))
+        list(model.state_dict()[key + '.weight'].numpy().T.reshape(-1)))
     model_pb.weights.CopyFrom(weights_param)
 
     bias_param = TensorParameter()
     bias_param.shape.extend(
-        list(model.state_dict()[key+'.bias'].numpy().shape))
-    bias_param.data.extend(list(model.state_dict()[key+'.bias'].numpy()))
+        list(model.state_dict()[key + '.bias'].numpy().shape))
+    bias_param.data.extend(list(model.state_dict()[key + '.bias'].numpy()))
     model_pb.bias.CopyFrom(bias_param)
 
     model_pb.units = model_pb.bias.shape[0]
@@ -180,14 +180,24 @@ def loss_fn(c_pred, r_pred, target, balance):
     loss_R = nn.MSELoss()
 
     #loss = loss_C(c_pred, target[:,0].view(target.shape[0],1))
-    loss = 4 * loss_C(c_pred, target[:, 0].view(target.shape[0], 1)) + \
-        loss_R(((target[:, 2] > 0.0) * (target[:, 2] <= 3.0)).float().view(target.shape[0], 1) * r_pred +
-               ((target[:, 2] <= 0.0) + (target[:, 2] > 3.0)).float().view(
-                   target.shape[0], 1) * target[:, 2].view(target.shape[0], 1),
-               target[:, 2].view(target.shape[0], 1))
-        #loss_R((target[:,1] < 10.0).float().view(target.shape[0],1) * r_pred + \
-        #        (target[:,1] >= 10.0).float().view(target.shape[0],1) * target[:,1].view(target.shape[0],1), \
-        #        target[:,1].view(target.shape[0],1))
+    loss = 4 * loss_C(c_pred,
+                      target[:,
+                             0].view(target.shape[0],
+                                     1)) + loss_R(((target[:,
+                                                           2] > 0.0) * (target[:,
+                                                                               2] <= 3.0)).float().view(target.shape[0],
+                                                                                                        1) * r_pred + ((target[:,
+                                                                                                                               2] <= 0.0) + (target[:,
+                                                                                                                                                    2] > 3.0)).float().view(target.shape[0],
+                                                                                                                                                                            1) * target[:,
+                                                                                                                                                                                        2].view(target.shape[0],
+                                                                                                                                                                                                1),
+                                                  target[:,
+                                                         2].view(target.shape[0],
+                                                                 1))
+    # loss_R((target[:,1] < 10.0).float().view(target.shape[0],1) * r_pred + \
+    #        (target[:,1] >= 10.0).float().view(target.shape[0],1) * target[:,1].view(target.shape[0],1), \
+    #        target[:,1].view(target.shape[0],1))
     return loss
 
 
@@ -220,7 +230,13 @@ Print the distribution of data labels.
 def print_dist(label):
     unique_labels = np.unique(label)
     for l in unique_labels:
-        print ('Label = {}: {}%'.format(l, np.sum(label == l)/len(label)*100))
+        print(
+            'Label = {}: {}%'.format(
+                l,
+                np.sum(
+                    label == l) /
+                len(label) *
+                100))
 
 
 # ========================================================================
@@ -259,7 +275,6 @@ def load_npy_data(dir):
     '''
 
 
-
 def data_preprocessing(data):
     '''
     Preprocess the data.
@@ -271,10 +286,10 @@ def data_preprocessing(data):
     '''
     # Various input features separation
     X_obs_old_features = data[:, 0:23]
-    X_surround_obs = data[:, -dim_output-8:-dim_output]
+    X_surround_obs = data[:, -dim_output - 8:-dim_output]
     X_obs_now = data[:, 23:32]
     X_obs_hist_5 = data[:, 23:68]
-    X_lane = data[:, 68:-dim_output-8]
+    X_lane = data[:, 68:-dim_output - 8]
 
     # mask out those that don't have any history
     # mask5 = (data[:,53] != 100)
@@ -338,11 +353,11 @@ class TrainValidDataset(Dataset):
 
     def __getitem__(self, index):
         bin_idx = self.FindBin(index, 0, len(
-            self.data_size_until_this_file_)-1)
+            self.data_size_until_this_file_) - 1)
         with h5py.File(self.list_of_files_[bin_idx], 'r') as h5_file:
             idx_offset = self.data_size_until_this_file_[bin_idx] - \
                 h5_file[list(h5_file.keys())[0]].shape[0]
-            data = h5_file[list(h5_file.keys())[0]][index-idx_offset]
+            data = h5_file[list(h5_file.keys())[0]][index - idx_offset]
         label = data[-dim_output:]
         label[0] = (label[0] > 0.0).astype(float)
         return data[:-dim_output], label
@@ -352,9 +367,9 @@ class TrainValidDataset(Dataset):
         if (start == end):
             return start
 
-        mid = int((start+end)/2.0)
+        mid = int((start + end) / 2.0)
         if (self.data_size_until_this_file_[mid] <= index):
-            return self.FindBin(index, mid+1, end)
+            return self.FindBin(index, mid + 1, end)
         else:
             return self.FindBin(index, start, mid)
 # ========================================================================
@@ -368,19 +383,26 @@ Train the data. (vanilla version without dataloader)
 '''
 
 
-def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048, balance=1.0):
+def train_vanilla(
+        train_X,
+        train_y,
+        model,
+        optimizer,
+        epoch,
+        batch_size=2048,
+        balance=1.0):
     model.train()
 
     loss_history = []
-    logging.info('Epoch: {}'.format(epoch+1))
-    print ('Epoch: {}.'.format(epoch+1))
+    logging.info('Epoch: {}'.format(epoch + 1))
+    print('Epoch: {}.'.format(epoch + 1))
     num_of_data = train_X.shape[0]
     num_of_batch = int(num_of_data / batch_size) + 1
     pred_y = None
     for i in range(num_of_batch):
         optimizer.zero_grad()
-        X = train_X[i*batch_size: min(num_of_data, (i+1)*batch_size), ]
-        y = train_y[i*batch_size: min(num_of_data, (i+1)*batch_size), ]
+        X = train_X[i * batch_size: min(num_of_data, (i + 1) * batch_size), ]
+        y = train_y[i * batch_size: min(num_of_data, (i + 1) * batch_size), ]
         c_pred, r_pred = model(X)
         loss = loss_fn(c_pred, r_pred, y, balance)
         loss_history.append(loss.data)
@@ -389,13 +411,13 @@ def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048, ba
 
         c_pred = c_pred.data.cpu().numpy()
         c_pred = c_pred.reshape(c_pred.shape[0], 1)
-        pred_y = np.concatenate((pred_y, c_pred), axis=0) if pred_y is not None \
-            else c_pred
+        pred_y = np.concatenate(
+            (pred_y, c_pred), axis=0) if pred_y is not None else c_pred
 
         if (i > 0) and (i % 100 == 0):
             logging.info('Step: {}, train_loss: {}'.format(
                 i, np.mean(loss_history[-100:])))
-            print ("Step: {}, training loss: {}".format(
+            print("Step: {}, training loss: {}".format(
                 i, np.mean(loss_history[-100:])))
 
     pred_y = (pred_y > 0.0)
@@ -406,8 +428,8 @@ def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048, ba
     logging.info('Training loss: {}'.format(train_loss))
     logging.info('Training Accuracy: {}.'.format(training_accuracy))
 
-    print ('Training Loss: {}. Training Accuracy: {}'
-           .format(train_loss, training_accuracy))
+    print('Training Loss: {}. Training Accuracy: {}'
+          .format(train_loss, training_accuracy))
 
 
 '''
@@ -415,7 +437,13 @@ Validation (vanilla version without dataloader)
 '''
 
 
-def validate_vanilla(valid_X, valid_y, model, batch_size=2048, balance=1.0, pos_label=1.0):
+def validate_vanilla(
+        valid_X,
+        valid_y,
+        model,
+        batch_size=2048,
+        balance=1.0,
+        pos_label=1.0):
     model.eval()
 
     loss_history = []
@@ -423,8 +451,8 @@ def validate_vanilla(valid_X, valid_y, model, batch_size=2048, balance=1.0, pos_
     num_of_batch = int(num_of_data / batch_size) + 1
     pred_y = None
     for i in range(num_of_batch):
-        X = valid_X[i*batch_size: min(num_of_data, (i+1)*batch_size), ]
-        y = valid_y[i*batch_size: min(num_of_data, (i+1)*batch_size), ]
+        X = valid_X[i * batch_size: min(num_of_data, (i + 1) * batch_size), ]
+        y = valid_y[i * batch_size: min(num_of_data, (i + 1) * batch_size), ]
         c_pred, r_pred = model(X)
         valid_loss = loss_fn(c_pred, r_pred, y, balance)
         loss_history.append(valid_loss.data)
@@ -432,8 +460,8 @@ def validate_vanilla(valid_X, valid_y, model, batch_size=2048, balance=1.0, pos_
         c_pred = c_pred.data.cpu().numpy()
         c_pred = c_pred.reshape(c_pred.shape[0], 1)
 
-        pred_y = np.concatenate((pred_y, c_pred), axis=0) if pred_y is not None \
-            else c_pred
+        pred_y = np.concatenate(
+            (pred_y, c_pred), axis=0) if pred_y is not None else c_pred
 
     valid_y = valid_y.data.cpu().numpy()
     valid_auc = sklearn.metrics.roc_auc_score(
@@ -446,14 +474,18 @@ def validate_vanilla(valid_X, valid_y, model, batch_size=2048, balance=1.0, pos_
     valid_recall = sklearn.metrics.recall_score(
         valid_y[:, 0], pred_y.reshape(-1), pos_label=pos_label)
 
-    logging.info('Validation loss: {}. Accuracy: {}.\
-                  Precision: {}. Recall: {}. AUC: {}.'
-                 .format(np.mean(loss_history), valid_accuracy, valid_precision,
-                         valid_recall, valid_auc))
-    print ('Validation loss: {}. Accuracy: {}.\
+    logging.info(
+        'Validation loss: {}. Accuracy: {}.\
+                  Precision: {}. Recall: {}. AUC: {}.' .format(
+            np.mean(loss_history),
+            valid_accuracy,
+            valid_precision,
+            valid_recall,
+            valid_auc))
+    print('Validation loss: {}. Accuracy: {}.\
             Precision: {}. Recall: {}. AUC: {}.'
-           .format(np.mean(loss_history), valid_accuracy, valid_precision,
-                   valid_recall, valid_auc))
+          .format(np.mean(loss_history), valid_accuracy, valid_precision,
+                  valid_recall, valid_auc))
 
     return np.mean(loss_history)
 
@@ -478,7 +510,7 @@ def train_dataloader(train_loader, model, optimizer, epoch, balance=1.0):
             y = (targets).float().cuda()
         c_pred, r_pred = model(X)
         loss = loss_fn(c_pred, r_pred, y, balance)
-        #loss.data[0].cpu().numpy()
+        # loss.data[0].cpu().numpy()
         loss_history.append(loss.data)
         loss.backward()
         optimizer.step()
@@ -487,17 +519,17 @@ def train_dataloader(train_loader, model, optimizer, epoch, balance=1.0):
             np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) ==
                    y[:, 0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0], 1))
 
-        #if i > 100:
+        # if i > 100:
         #    break
         if i % 100 == 0:
             logging.info('Step: {}, train_loss: {}'.format(
                 i, np.mean(loss_history[-100:])))
-            print ("Step: {}, training loss: {}".format(
+            print("Step: {}, training loss: {}".format(
                 i, np.mean(loss_history[-100:])))
 
     train_loss = np.mean(loss_history)
     logging.info('Training loss: {}'.format(train_loss))
-    print ('Epoch: {}. Training Loss: {}'.format(epoch, train_loss))
+    print('Epoch: {}. Training Loss: {}'.format(epoch, train_loss))
 
 
 '''
@@ -527,8 +559,8 @@ def validate_dataloader(valid_loader, model, balance=1.0):
     valid_classification_accuracy = valid_correct_class / total_size
     logging.info('Validation loss: {}. Validation classification accuracy: {}'
                  .format(np.mean(loss_history), valid_classification_accuracy))
-    print ('Validation loss: {}. Classification accuracy: {}.'
-           .format(np.mean(loss_history), valid_classification_accuracy))
+    print('Validation loss: {}. Classification accuracy: {}.'
+          .format(np.mean(loss_history), valid_classification_accuracy))
 
     return valid_loss
 # ========================================================================
@@ -547,20 +579,23 @@ if __name__ == "__main__":
                         help='Specify which network to use:\n \
               \t 0: Fully connected neural network.\n \
               \t 1: 1D-CNN for lane feature extraction.')
-    parser.add_argument('-d', '--data-loader', action='store_true',
-                        help='Use the dataloader (when memory size is smaller than dataset size)')
+    parser.add_argument(
+        '-d',
+        '--data-loader',
+        action='store_true',
+        help='Use the dataloader (when memory size is smaller than dataset size)')
     parser.add_argument('-s', '--save-path', type=str, default='./',
                         help='Specify the directory to save trained models.')
     parser.add_argument('-g', '--go', action='store_true',
                         help='It is training lane-follow (go) cases.')
     parser.add_argument('-b', '--balance', type=float, default=1.0,
                         help='Specify the weight for positive predictions.')
-    #parser.add_argument('-g', '--gpu_num', type=int, default=0, \
+    # parser.add_argument('-g', '--gpu_num', type=int, default=0, \
     #    help='Specify which GPU to use.')
 
     args = parser.parse_args()
 
-    #os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID' #specifies the same order as nvidia-smi
+    # os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID' #specifies the same order as nvidia-smi
     #os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_num)
 
     if not args.data_loader:
@@ -570,14 +605,16 @@ if __name__ == "__main__":
         valid_file = args.valid_file
         train_data = load_data(train_file)
         valid_data = load_data(valid_file)
-        print ('Data loaded successfully.')
+        print('Data loaded successfully.')
         classes_train = np.asarray(train_data[:, -dim_output])
-        print ('Total number of training samples: {}'.format(len(classes_train)))
-        print ('Training set distribution:')
+        print('Total number of training samples: {}'.format(len(classes_train)))
+        print('Training set distribution:')
         print_dist(classes_train)
         classes_valid = np.asarray(valid_data[:, -dim_output])
-        print ('Total number of validation samples: {}'.format(len(classes_valid)))
-        print ('Validation set distribution:')
+        print(
+            'Total number of validation samples: {}'.format(
+                len(classes_valid)))
+        print('Validation set distribution:')
         print_dist(classes_valid)
 
         # Data preprocessing
@@ -590,8 +627,8 @@ if __name__ == "__main__":
             model = FullyConn_NN()
         elif args.network_structure == 1:
             model = FCNN_CNN1D()
-        print ("The model used is: ")
-        print (model)
+        print("The model used is: ")
+        print(model)
         learning_rate = 6.561e-4
         optimizer = optim.Adam(model.parameters(), lr=learning_rate)
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(
@@ -600,7 +637,7 @@ if __name__ == "__main__":
         # CUDA set-up:
         cuda_is_available = torch.cuda.is_available()
         if (cuda_is_available):
-            print ("Using CUDA to speed up training.")
+            print("Using CUDA to speed up training.")
             model.cuda()
             X_train = Variable(torch.FloatTensor(X_train).cuda())
             X_valid = Variable(torch.FloatTensor(X_valid).cuda())
@@ -616,12 +653,22 @@ if __name__ == "__main__":
             train_vanilla(X_train, y_train, model, optimizer,
                           epoch, balance=args.balance)
             valid_loss = validate_vanilla(
-                X_valid, y_valid, model, balance=args.balance, pos_label=pos_label)
+                X_valid,
+                y_valid,
+                model,
+                balance=args.balance,
+                pos_label=pos_label)
             scheduler.step(valid_loss)
             if valid_loss < best_valid_loss:
                 best_valid_loss = valid_loss
-                torch.save(model.state_dict(), args.save_path + 'cruise_model{}_epoch{}_valloss{:.6f}.pt'
-                           .format(args.network_structure, epoch+1, valid_loss))
+                torch.save(
+                    model.state_dict(),
+                    args.save_path +
+                    'cruise_model{}_epoch{}_valloss{:.6f}.pt' .format(
+                        args.network_structure,
+                        epoch +
+                        1,
+                        valid_loss))
 
     else:
         train_dir = args.train_file
@@ -639,8 +686,8 @@ if __name__ == "__main__":
         # "Flattening" the list of lists
         classes_train = [item for sublist in classes_train for item in sublist]
         classes_train = np.asarray(classes_train)
-        print ('Total number of training samples: {}'.format(len(classes_train)))
-        print ('Training set distribution:')
+        print('Total number of training samples: {}'.format(len(classes_train)))
+        print('Training set distribution:')
         print_dist(classes_train)
 
         classes_valid = []
@@ -651,8 +698,10 @@ if __name__ == "__main__":
         # "Flattening" the list of lists
         classes_valid = [item for sublist in classes_valid for item in sublist]
         classes_valid = np.asarray(classes_valid)
-        print ('Total number of validation samples: {}'.format(len(classes_valid)))
-        print ('Validation set distribution:')
+        print(
+            'Total number of validation samples: {}'.format(
+                len(classes_valid)))
+        print('Validation set distribution:')
         print_dist(classes_valid)
 
         #class_weights = class_weight.compute_class_weight('balanced', np.unique(classes_train), classes_train)
@@ -666,14 +715,18 @@ if __name__ == "__main__":
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(
             optimizer, factor=0.3, patience=2, min_lr=1e-8, verbose=1, mode='min')
         if (cuda_is_available):
-            print ('Using CUDA to speed up training.')
+            print('Using CUDA to speed up training.')
             model.cuda()
 
         train_dataset = TrainValidDataset(list_of_training_files)
         valid_dataset = TrainValidDataset(list_of_validation_files)
 
-        train_loader = DataLoader(train_dataset, batch_size=1024, num_workers=8,
-                                  pin_memory=True, shuffle=True)  # sampler=train_sampler)
+        train_loader = DataLoader(
+            train_dataset,
+            batch_size=1024,
+            num_workers=8,
+            pin_memory=True,
+            shuffle=True)  # sampler=train_sampler)
         valid_loader = DataLoader(
             valid_dataset, batch_size=1024, num_workers=8, pin_memory=True)
 

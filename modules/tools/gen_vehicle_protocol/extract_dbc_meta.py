@@ -103,10 +103,11 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
                             protocol["vars"].append(var_info)
                 else:
                     in_protocol = False
-                    if len(protocol) != 0 and len(protocol["vars"]) != 0 and len(
+                    if len(protocol) != 0 and len(
+                            protocol["vars"]) != 0 and len(
                             protocol["vars"]) < 65:
                         protocols[protocol["id"]] = protocol
-                        #print protocol
+                        # print protocol
                         protocol = {}
 
             if len(items) == 5 and items[0] == "CM_" and items[1] == "SG_":
@@ -126,7 +127,7 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
                         var["type"] = "enum"
                         var["enum"] = {}
                         for idx in range(3, len(items) - 1, 2):
-                            enumtype = re.sub('\W+', ' ', items[idx + 1])
+                            enumtype = re.sub(r'\W+', ' ', items[idx + 1])
                             enumtype = enumtype.strip().replace(" ",
                                                                 "_").upper()
                             enumtype = items[2].upper() + "_" + enumtype
@@ -138,7 +139,7 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
                 if var["name"].lower() in cpp_reserved_key_words:
                     var["name"] = "MY_" + var["name"]
 
-        #print protocols
+        # print protocols
         config = {}
         config["car_type"] = car_type
         config["protocols"] = protocols

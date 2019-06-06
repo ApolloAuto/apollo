@@ -70,6 +70,7 @@ def callback(chassis_pb):
     last_t = current_t
     last_v = current_v
 
+
 def listener():
     cyber.init()
     test_node = cyber.Node("chassis_acc_listener")
@@ -101,8 +102,7 @@ if __name__ == '__main__':
     listener()
     fig, ax = plt.subplots()
     X = range(FLAGS.data_length)
-    Xs = [i * -1 for i in X]
-    Xs.sort()
+    Xs = sorted([i * -1 for i in X])
     init_data_line, = ax.plot(
         INIT_T_DATA, INIT_ACC_DATA, 'b', lw=2, alpha=0.7, label='chassis acc')
 

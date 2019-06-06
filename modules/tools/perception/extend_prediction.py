@@ -51,8 +51,9 @@ def extend_prediction(prediction, min_length, min_time):
             points = trajectory.trajectory_point
             point_num = len(points)
             trajectory_length = get_trajectory_length(trajectory)
-            sys.stderr.write("obstacle_id :%s trajectory_id: %s length: %s\n" % (
-                obstacle.perception_obstacle.id, i, trajectory_length))
+            sys.stderr.write(
+                "obstacle_id :%s trajectory_id: %s length: %s\n" %
+                (obstacle.perception_obstacle.id, i, trajectory_length))
             i += 1
             if trajectory_length < min_length:
                 second_last = points[point_num - 2]
@@ -78,10 +79,20 @@ if __name__ == '__main__':
         description="extend prediction trajectory")
     parser.add_argument("prediction", action="store",
                         type=str, help="set the prediction file")
-    parser.add_argument("-p", "--period", action="store", type=float, default=10.0,
-                        help="set the prediction period")
-    parser.add_argument("-d", "--distance", action="store", type=float, default=70.0,
-                        help="set the prediction distance")
+    parser.add_argument(
+        "-p",
+        "--period",
+        action="store",
+        type=float,
+        default=10.0,
+        help="set the prediction period")
+    parser.add_argument(
+        "-d",
+        "--distance",
+        action="store",
+        type=float,
+        default=70.0,
+        help="set the prediction distance")
     args = parser.parse_args()
     prediction_data = proto_utils.get_pb_from_file(
         args.prediction, PredictionObstacles())

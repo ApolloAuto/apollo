@@ -42,6 +42,7 @@ def test_client_class():
         response = client.send_request(req)
         print "get Response [ ", response, " ]"
 
+
 if __name__ == '__main__':
     cyber.init()
     test_client_class()

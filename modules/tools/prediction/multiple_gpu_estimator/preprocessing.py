@@ -21,22 +21,23 @@ import numpy as np
 from glob import glob
 
 feature_dim = 62
-train_data = np.zeros([20000000, feature_dim+1], dtype=np.float32)
-test_data = np.zeros([2000000, feature_dim+1], dtype=np.float32)
-eval_data = np.zeros([2000000, feature_dim+1], dtype=np.float32)
+train_data = np.zeros([20000000, feature_dim + 1], dtype=np.float32)
+test_data = np.zeros([2000000, feature_dim + 1], dtype=np.float32)
+eval_data = np.zeros([2000000, feature_dim + 1], dtype=np.float32)
 train_idx, test_idx, eval_idx = 0, 0, 0
 filenames = glob('/tmp/data/feature_v1_bin/*/*.label.bin')
 for filename in filenames:
     print(filename)
     bin_data = np.fromfile(filename, dtype=np.float32)
     if bin_data.shape[0] % (feature_dim + 1) != 0:
-        raise ValueError('data size (%d) must be multiple of feature_dim + 1 (%d).' %
-                         (bin_data.shape[0], feature_dim + 1))
+        raise ValueError(
+            'data size (%d) must be multiple of feature_dim + 1 (%d).' %
+            (bin_data.shape[0], feature_dim + 1))
     num_examples = bin_data.shape[0] // (feature_dim + 1)
     for i in range(num_examples):
-        label = int(bin_data[i*(feature_dim + 1)+feature_dim])
-        data = bin_data[i*(feature_dim + 1):(i+1) *
-                        (feature_dim + 1)].reshape([1, (feature_dim+1)])
+        label = int(bin_data[i * (feature_dim + 1) + feature_dim])
+        data = bin_data[i * (feature_dim + 1):(i + 1) *
+                        (feature_dim + 1)].reshape([1, (feature_dim + 1)])
         if label == 2:
             times = 17
             new_data = np.repeat(data, times, axis=0)
@@ -48,13 +49,13 @@ for filename in filenames:
             new_data = data
 
         if i % 10 == 8:
-            test_data[test_idx:test_idx+times, :] = new_data
+            test_data[test_idx:test_idx + times, :] = new_data
             test_idx += times
         elif i % 10 == 9:
-            eval_data[eval_idx:eval_idx+times, :] = new_data
+            eval_data[eval_idx:eval_idx + times, :] = new_data
             eval_idx += times
         else:
-            train_data[train_idx:train_idx+times, :] = new_data
+            train_data[train_idx:train_idx + times, :] = new_data
             train_idx += times
 
 train_data = train_data[:train_idx, :]

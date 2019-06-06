@@ -65,7 +65,7 @@ class MlpDataSet(object):
             })
 
         image = features['data']
-        label = tf.cast(features['label'], tf.int32)+1
+        label = tf.cast(features['label'], tf.int32) + 1
         return image, label
 
     def make_batch(self, batch_size):

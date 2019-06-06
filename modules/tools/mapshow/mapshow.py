@@ -22,6 +22,7 @@ from libs.map import Map
 from libs.localization import Localization
 from libs.path import Path
 
+
 def draw(map):
     lane_ids = args.laneid
     if lane_ids is None:
@@ -35,6 +36,7 @@ def draw(map):
         map.draw_pnc_junctions(plt)
     if args.showcrosswalks:
         map.draw_crosswalks(plt)
+
 
 if __name__ == "__main__":
 

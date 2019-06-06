@@ -108,7 +108,8 @@ class Writer(object):
         """
         writer message string
         """
-        return _CYBER_NODE.PyWriter_write(self.writer, data.SerializeToString())
+        return _CYBER_NODE.PyWriter_write(
+            self.writer, data.SerializeToString())
 
 
 class Reader(object):
@@ -366,7 +367,8 @@ class ChannelUtils(object):
     # @return a human readable form of this message. For debugging and
     # other purposes.
     def get_debugstring_rawmsgdata(msg_type, rawmsgdata):
-        return _CYBER_NODE.PyChannelUtils_get_debugstring_by_msgtype_rawmsgdata(msg_type, rawmsgdata)
+        return _CYBER_NODE.PyChannelUtils_get_debugstring_by_msgtype_rawmsgdata(
+            msg_type, rawmsgdata)
 
     @staticmethod
     ##

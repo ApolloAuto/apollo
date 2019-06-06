@@ -56,6 +56,7 @@ def seq_publisher(seq_num, period):
                 messages[topic]["publisher"].publish(messages[topic]["value"])
         rate.sleep()
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="replay a set of pb files with the same sequence number")

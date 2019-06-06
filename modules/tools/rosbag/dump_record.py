@@ -32,12 +32,14 @@ from common.message_manager import PbMessageManager
 
 g_message_manager = PbMessageManager()
 
+
 def write_to_file(file_path, topic_pb):
     """
     Write pb message to file
     """
     with open(file_path, 'w') as fp:
         fp.write(str(topic_pb))
+
 
 def dump_record(in_record, out_dir, start_time, duration, filter_topic):
     freader = record.RecordReader()
@@ -76,10 +78,10 @@ def dump_record(in_record, out_dir, start_time, duration, filter_topic):
         seq += 1
     freader.close()
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description="A tool to dump the protobuf messages in a cyber record into text files"
-    )
+        description="A tool to dump the protobuf messages in a cyber record into text files")
     parser.add_argument(
         "in_record",
         action="store",

@@ -90,11 +90,14 @@ else:
 print('converting "' + xmlFile + '" to "' + yamlFile + '"')
 
 calibrationGood = True
+
+
 def xmlError(msg):
     'handle XML calibration error'
     global calibrationGood
     calibrationGood = False
     print('gen_calibration.py: ' + msg)
+
 
 db = None
 try:
@@ -111,6 +114,7 @@ if not calibrationGood:
 calibration = {'num_lasers': 0, 'lasers': []}
 cm2meters = 0.01                       # convert centimeters to meters
 
+
 def addLaserCalibration(laser_num, key, val):
     'Define key and corresponding value for laser_num'
     global calibration
@@ -119,11 +123,12 @@ def addLaserCalibration(laser_num, key, val):
     else:
         calibration['lasers'].append({key: val})
 
+
 # add enabled flags
 num_enabled = 0
 enabled_lasers = []
 enabled = db.find('DB/enabled_')
-if enabled == None:
+if enabled is None:
     print('no enabled tags found: assuming all 64 enabled')
     num_enabled = 64
     enabled_lasers = [True for i in xrange(num_enabled)]
@@ -142,7 +147,7 @@ print(str(num_enabled) + ' lasers')
 
 # add minimum laser intensities
 minIntensities = db.find('DB/minIntensity_')
-if minIntensities != None:
+if minIntensities is not None:
     index = 0
     for el in minIntensities:
         if el.tag == 'item':
@@ -154,7 +159,7 @@ if minIntensities != None:
 
 # add maximum laser intensities
 maxIntensities = db.find('DB/maxIntensity_')
-if maxIntensities != None:
+if maxIntensities is not None:
     index = 0
     for el in maxIntensities:
         if el.tag == 'item':
@@ -200,7 +205,9 @@ for el in db.find('DB/points_'):
                     addLaserCalibration(index, 'focal_distance',
                                         float(field.text) * cm2meters)
                 elif field.tag == 'focalSlope_':
-                    addLaserCalibration(index, 'focal_slope', float(field.text))
+                    addLaserCalibration(
+                        index, 'focal_slope', float(
+                            field.text))
 
 # validate input data
 if calibration['num_lasers'] <= 0:

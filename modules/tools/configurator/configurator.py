@@ -56,8 +56,8 @@ class Configurator(object):
                         proto_class == "#" or conf_file == '#':
                     pass
                 else:
-                    moduleconf = ModuleConf(module_name, proto_file,
-                                            proto_class, conf_file, self.stdscr)
+                    moduleconf = ModuleConf(
+                        module_name, proto_file, proto_class, conf_file, self.stdscr)
                     moduleconf.parse_from_file()
                     self.moduleconf.append(moduleconf)
 
@@ -118,9 +118,9 @@ class Configurator(object):
         self.stdscr.addstr(self.winy - 4, 2, "Red", curses.color_pair(1))
         self.stdscr.addstr(": change made but NOT saved to file yet")
         self.stdscr.addstr(
-            self.winy - 3, 2,
-            "Change will be lost if panel closed, or changing repeated item index"
-        )
+            self.winy - 3,
+            2,
+            "Change will be lost if panel closed, or changing repeated item index")
 
     def show(self):
         """

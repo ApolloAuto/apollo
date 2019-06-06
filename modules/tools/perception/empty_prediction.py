@@ -51,11 +51,22 @@ def prediction_publisher(prediction_channel, rate):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="create empty prediction message",
-                                     prog="replay_prediction.py")
-    parser.add_argument("-c", "--channel", action="store", type=str, default="/apollo/prediction",
-                        help="set the prediction channel")
-    parser.add_argument("-r", "--rate", action="store", type=int, default=10,
-                        help="set the prediction channel publish time duration")
+    parser = argparse.ArgumentParser(
+        description="create empty prediction message",
+        prog="replay_prediction.py")
+    parser.add_argument(
+        "-c",
+        "--channel",
+        action="store",
+        type=str,
+        default="/apollo/prediction",
+        help="set the prediction channel")
+    parser.add_argument(
+        "-r",
+        "--rate",
+        action="store",
+        type=int,
+        default=10,
+        help="set the prediction channel publish time duration")
     args = parser.parse_args()
     prediction_publisher(args.channel, args.rate)

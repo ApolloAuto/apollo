@@ -37,6 +37,7 @@ import sys
 
 import psutil
 
+
 def shell_cmd(cmd, alert_on_failure=True):
     """Execute shell command and return (ret-code, stdout, stderr)."""
     print('SHELL > {}'.format(cmd))
@@ -49,16 +50,21 @@ def shell_cmd(cmd, alert_on_failure=True):
         sys.stderr.write('{}\n'.format(stderr))
     return (ret, stdout, stderr)
 
+
 class ArgManager(object):
     """Arguments manager."""
+
     def __init__(self):
         """Init."""
         self.parser = argparse.ArgumentParser(
             description="Manage apollo data recording.")
-        self.parser.add_argument('--start', default=False, action="store_true",
-                                 help='Start recorder. It is the default '
-                                 'action if no other actions are triggered. In '
-                                 'that case, the False value is ignored.')
+        self.parser.add_argument(
+            '--start',
+            default=False,
+            action="store_true",
+            help='Start recorder. It is the default '
+            'action if no other actions are triggered. In '
+            'that case, the False value is ignored.')
         self.parser.add_argument('--stop', default=False, action="store_true",
                                  help='Stop recorder.')
         self._args = None
@@ -66,11 +72,13 @@ class ArgManager(object):
     def args(self):
         """Get parsed args."""
         if self._args is None:
-           self._args = self.parser.parse_args()
+            self._args = self.parser.parse_args()
         return self._args
+
 
 class DiskManager(object):
     """Disk manager."""
+
     def __init__(self):
         """Manage disks."""
         disks = []
@@ -96,6 +104,7 @@ class DiskManager(object):
 
 class Recorder(object):
     """Data recorder."""
+
     def __init__(self, args):
         """Init."""
         self.args = args
@@ -116,7 +125,7 @@ class Recorder(object):
 
     def record_task(self, disk):
         """
-        Save the full data into <disk>/data/bag/ReusedRecordsPool, 
+        Save the full data into <disk>/data/bag/ReusedRecordsPool,
         which will be cleared every time the smart recorder get started.
         Meanwhile restore the messages we are interested in to <disk>/data/bag/<task_id> directory.
         """
@@ -150,6 +159,7 @@ def main():
         recorder.stop()
     else:
         recorder.start()
+
 
 if __name__ == '__main__':
     main()

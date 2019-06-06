@@ -23,6 +23,7 @@ import os
 import sys
 import struct
 
+
 class FileObject(object):
     """Wrapper for file object"""
 
@@ -52,8 +53,10 @@ class FileObject(object):
     def save_to_file(self, data):
         raise NotImplementedError
 
+
 class TimestampFileObject(FileObject):
     """class to handle sensor timestamp for each Apollo sensor channel"""
+
     def __init__(self, file_path, operation='write', file_type='txt'):
         super(TimestampFileObject, self).__init__(file_path,
                                                   operation, file_type)
@@ -63,7 +66,8 @@ class TimestampFileObject(FileObject):
             raise ValueError("timestamps must be in a list")
 
         for i, ts in enumerate(data):
-            self._file_object.write("%06d %.6f\n" %(i, ts))
+            self._file_object.write("%06d %.6f\n" % (i, ts))
+
 
 class OdometryFileObject(FileObject):
     """class to handle gnss/odometry topic"""

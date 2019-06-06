@@ -104,7 +104,7 @@ if __name__ == '__main__':
             selected_file = int(str_input)
             if selected_file < 0 or selected_file > len(files):
                 print "%d is an invalid number" % selected_file
-        except:
+        except BaseException:
             print "%s is not a number" % str_input
         print "Will publish file[%d]: %s" % (selected_file,
                                              files[selected_file])

@@ -35,6 +35,7 @@ from cyber_py import cyber
 from cyber_py.record import RecordReader
 from cyber_py.record import RecordWriter
 
+
 class SamplePNC(object):
     """Sample bags to contain PNC related topics only."""
     TOPICS = [
@@ -87,6 +88,7 @@ class SamplePNC(object):
                 fwriter.write_channel(channelname, datatype, desc)
                 fwriter.write_message(channelname, msg, timestamp)
         print('----- Finish processing record -----')
+
 
 if __name__ == '__main__':
     cyber.init()

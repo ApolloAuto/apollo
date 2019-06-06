@@ -46,10 +46,12 @@ class DataPoint:
         self.pos_z = 0.0
         self.theta = 0.0  # heading
         self.dist_left = 0.0  # distance to left lane marking
-        # confidence of left lane marking (0/1: low confidence, -1/-2: high confidence)
+        # confidence of left lane marking (0/1: low confidence, -1/-2: high
+        # confidence)
         self.conf_left = 0
         self.dist_right = 0.0  # distance to right lane marking
-        # confidence of right lane marking (0/1: low confidence, -1/-2: high confidence)
+        # confidence of right lane marking (0/1: low confidence, -1/-2: high
+        # confidence)
         self.conf_right = 0
         self.width = 0.0  # lane width
         self.ratio = 0.0  # relative position within a lane (dist_left / width)
@@ -70,7 +72,8 @@ def interpolate_width(data, default_width):
     fill 'width' field of all data samples by interpolation
     """
 
-    # Collect a set of consecutive entries with low confidence on left OR right lane detection
+    # Collect a set of consecutive entries with low confidence on left OR
+    # right lane detection
     intervals = []
     interval_begin = -1
     interval_end = -1
@@ -119,7 +122,8 @@ def interpolate_ratio(data, default_ratio):
     fill 'ratio' field of all data samples by interpolation
     """
 
-    # Collect a set of consecutive entries with low confidence on left AND right lane detection
+    # Collect a set of consecutive entries with low confidence on left AND
+    # right lane detection
     intervals = []
     interval_begin = -1
     interval_end = -1
@@ -200,7 +204,8 @@ def sample_data(data, sample_distance):
         result.append(data[0])
 
         for entry in data[1:]:
-            if distance(last_x, last_y, entry.center_x, entry.center_y) > sample_distance:
+            if distance(last_x, last_y, entry.center_x,
+                        entry.center_y) > sample_distance:
                 result.append(entry)
                 last_x = entry.center_x
                 last_y = entry.center_y
@@ -646,7 +651,18 @@ def main():
             for row in data:
                 csvfile.write(
                     "%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s\n" %
-                    (row.pos_x, row.pos_y, row.pos_z, row.theta, row.dist_left, row.conf_left, row.dist_right, row.conf_right, row.width, row.ratio, row.center_x, row.center_y))
+                    (row.pos_x,
+                     row.pos_y,
+                     row.pos_z,
+                     row.theta,
+                     row.dist_left,
+                     row.conf_left,
+                     row.dist_right,
+                     row.conf_right,
+                     row.width,
+                     row.ratio,
+                     row.center_x,
+                     row.center_y))
 
     # Split data samples into lists with maximum length of max_lane_length
     list_data = split_data(data, max_lane_length)
@@ -696,7 +712,8 @@ def main():
     with open(map_file_name, "w") as f:
         f.write(mp.__str__())
 
-    # Create default end_way_point using the farthest point of last central lane
+    # Create default end_way_point using the farthest point of last central
+    # lane
     last_central_lane = lane_sets[-1][left_lanes]
 
     poi = POI()

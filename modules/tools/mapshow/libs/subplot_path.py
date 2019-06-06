@@ -84,7 +84,7 @@ class PathSubplot:
             self.ax.set_ylim(
                 localization.localization_pb.pose.position.y - self.map_width,
                 localization.localization_pb.pose.position.y + self.map_width)
-        except:
+        except BaseException:
             pass
         localization.localization_data_lock.release()
 

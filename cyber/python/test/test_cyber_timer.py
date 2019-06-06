@@ -25,6 +25,7 @@ from cyber_py import cyber_timer
 global count
 count = 0
 
+
 def func():
     global count
     print('Callback function is called [%d] times.' % count)
