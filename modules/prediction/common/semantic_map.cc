@@ -46,6 +46,9 @@ void SemanticMap::Init() {
 
 void SemanticMap::RunCurrFrame(
     const std::unordered_map<int, ObstacleHistory>& obstacle_id_history_map) {
+  if (obstacle_id_history_map.find(-1) == obstacle_id_history_map.end()) {
+    return;
+  }
   obstacle_id_history_map_ = obstacle_id_history_map;
   // TODO(Hongyi): moving all these magic numbers to conf
   const Feature& ego_feature = obstacle_id_history_map_.at(-1).feature(0);
