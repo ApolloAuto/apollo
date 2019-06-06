@@ -17,9 +17,23 @@
 ###############################################################################
 
 # Usage:
-#   ./build_cyber.sh ./cyber.x86_64.dockerfile
+#   ./build_cyber.sh ./cyber.x86_64.dockerfile [build|download]
+# Or
+#   ./build_cyber.sh ./cyber.aarch64.dockerfile [build|download]
 DOCKERFILE=$1
+INSTALL="download"
+if [ -n "$2" ]; then
+    INSTALL="$2"
+fi
 
+if [[ $INSTALL == "build" ]]; then
+    echo "build all dependencies from source code"
+elif [[ $INSTALL == "download" ]]; then
+    echo "optimize installation of some dependencies from prebuilt package"
+else
+    echo "$INSTALL mode not supported"
+    exit
+fi
 
 CONTEXT="$(dirname "${BASH_SOURCE[0]}")"
 
@@ -31,6 +45,12 @@ TAG="${REPO}:cyber-${ARCH}-18.04-${TIME}"
 
 # Fail on first error.
 set -e
-#docker build --no-cache=true -t ${TAG} -f ${DOCKERFILE} ${CONTEXT}
-docker build -t ${TAG} -f ${DOCKERFILE} ${CONTEXT}
+if [[ $DOCKERFILE == *$ARCH* ]]; then
+    echo "docker file gets matched"
+    docker build -t ${TAG} --build-arg INSTALL="$INSTALL" -f ${DOCKERFILE} ${CONTEXT}
+else
+    echo "docker file '$DOCKERFILE' doesn't match"
+    exit
+fi
+
 echo "Built new image ${TAG}"
