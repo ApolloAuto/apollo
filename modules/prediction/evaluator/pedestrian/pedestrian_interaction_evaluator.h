@@ -80,6 +80,8 @@ class PedestrianInteractionEvaluator : public Evaluator {
 
   void LoadModel();
 
+  torch::jit::IValue GetSocialPooling();
+
  private:
   std::unordered_map<int, LSTMState> obstacle_id_lstm_state_map_;
   std::shared_ptr<torch::jit::script::Module>
@@ -91,6 +93,10 @@ class PedestrianInteractionEvaluator : public Evaluator {
   std::shared_ptr<torch::jit::script::Module>
       torch_prediction_layer_ptr_ = nullptr;
   torch::Device device_;
+
+  static const int kGridSize = 2;
+  static const int kEmbeddingSize = 64;
+  static const int kHiddenSize = 128;
 };
 
 }  // namespace prediction
