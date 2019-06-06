@@ -300,8 +300,6 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
     last_check_point_heading = check_point_heading;
   }
 
-  DCHECK_EQ(right_lane_boundary->size(), left_lane_boundary->size());
-  DCHECK_EQ(center_lane_boundary->size(), left_lane_boundary->size());
   size_t point_size = right_lane_boundary->size();
   for (size_t i = 0; i < point_size; i++) {
     right_lane_boundary->at(i) -= origin_point;
