@@ -21,7 +21,7 @@ LOCAL_IMAGE="no"
 VERSION=""
 ARCH=$(uname -m)
 VERSION_X86_64="cyber-x86_64-18.04-20190531_1115"
-VERSION_AARCH64=""
+VERSION_AARCH64="cyber-aarch64-18.04-20190602_1217"
 VERSION_OPT=""
 
 # Check whether user has agreed license agreement
@@ -266,8 +266,12 @@ function main(){
         exit 1
     fi
 
-    if [ "${USER}" != "root" ]; then
-        docker exec $APOLLO_CYBER bash -c '/apollo/scripts/docker_adduser.sh'
+    if [ ${ARCH} == "x86_64" ]; then
+        if [ "${USER}" != "root" ]; then
+            docker exec $APOLLO_CYBER bash -c '/apollo/scripts/docker_adduser.sh'
+        fi
+    else
+        warning "!!! Due to the problem with 'docker exec' on Drive PX platform, please run '/apollo/scripts/docker_adduser.sh' for the first time when you get into the docker !!!"
     fi
 
     ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/cyber_into.sh"
