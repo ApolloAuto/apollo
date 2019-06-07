@@ -338,7 +338,7 @@ bool Cipv::FindClosestObjectGround(const std::shared_ptr<base::Object> &object,
 
   double theta_ray = atan2(pos(0), pos(2));
   double theta = object->camera_supplement.alpha + theta_ray;
-  theta -=  M_PI_2;
+  theta -= M_PI_2;
 
   if (debug_level_ >= 3) {
     AINFO << "object->camera_supplement.box = base::RectF("
