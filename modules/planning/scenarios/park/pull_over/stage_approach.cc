@@ -117,7 +117,7 @@ Stage::StageStatus PullOverStageApproach::Process(
           "PULL-OVER-scenario", frame,
           &(frame->mutable_reference_line_info()->front()));
 
-      AERROR << "Build a stop fence to pause ADC at a better position: id["
+      ADEBUG << "Build a stop fence to pause ADC at a better position: id["
              << virtual_obstacle_id << "] s[" << stop_line_s << "]";
 
       const double adc_front_edge_s =
