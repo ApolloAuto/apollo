@@ -18,7 +18,6 @@
 
 #include <algorithm>
 
-#include "IpIpoptApplication.hpp"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/time/time.h"
@@ -35,33 +34,7 @@ using apollo::common::time::Clock;
 
 DiscretePointsReferenceLineSmoother::DiscretePointsReferenceLineSmoother(
     const ReferenceLineSmootherConfig& config)
-    : ReferenceLineSmoother(config) {
-  const auto& cos_theta_config = config.discrete_points().cos_theta_smoothing();
-  const auto& fem_pos_config = config.discrete_points().fem_pos_smoothing();
-
-  use_cos_theta_ = cos_theta_config.use_cos_theta();
-  weight_cos_included_angle_ = cos_theta_config.weight_cos_included_angle();
-  weight_anchor_points_ = cos_theta_config.weight_anchor_points();
-  weight_length_ = cos_theta_config.weight_length();
-  print_level_ = cos_theta_config.print_level();
-  max_num_of_iterations_ = cos_theta_config.max_num_of_iterations();
-  acceptable_num_of_iterations_ =
-      cos_theta_config.acceptable_num_of_iterations();
-  tol_ = cos_theta_config.tol();
-  acceptable_tol_ = cos_theta_config.acceptable_tol();
-  use_automatic_differentiation_ =
-      cos_theta_config.ipopt_use_automatic_differentiation();
-
-  use_fem_pos_ = fem_pos_config.use_fem_pos();
-  weight_fem_pos_deviation_ = fem_pos_config.weight_fem_pose_deviation();
-  weight_ref_deviation_ = fem_pos_config.weight_ref_deviation();
-  weight_path_length_ = fem_pos_config.weight_path_length();
-  max_iter_ = fem_pos_config.max_iter();
-  time_limit_ = fem_pos_config.time_limit();
-  verbose_ = fem_pos_config.verbose();
-  scaled_termination_ = fem_pos_config.scaled_termination();
-  warm_start_ = fem_pos_config.warm_start();
-}
+    : ReferenceLineSmoother(config) {}
 
 bool DiscretePointsReferenceLineSmoother::Smooth(
     const ReferenceLine& raw_reference_line,
@@ -88,21 +61,20 @@ bool DiscretePointsReferenceLineSmoother::Smooth(
   const auto solver_start_timestamp = std::chrono::system_clock::now();
 
   bool status = false;
-  if (use_cos_theta_) {
-    status = CosThetaSmooth(raw_point2d, anchorpoints_lateralbound,
+
+  const auto& smoothing_method = config_.discrete_points().smoothing_method();
+  switch (smoothing_method) {
+    case DiscretePointsSmootherConfig::COS_THETA_SMOOTHING:
+      status = CosThetaSmooth(raw_point2d, anchorpoints_lateralbound,
+                              &smoothed_point2d);
+      break;
+    case DiscretePointsSmootherConfig::FEM_POS_DEVIATION_SMOOTHING:
+      status = FemPosSmooth(raw_point2d, anchorpoints_lateralbound,
                             &smoothed_point2d);
-  } else if (use_fem_pos_) {
-    // box contraints on pos are used in fem pos smoother, thus shrink the
-    // bounds by 1.0 / sqrt(2.0)
-    double box_ratio = 1.0 / std::sqrt(2.0);
-    for (auto& bound : anchorpoints_lateralbound) {
-      bound *= box_ratio;
-    }
-    status =
-        FemPosSmooth(raw_point2d, anchorpoints_lateralbound, &smoothed_point2d);
-  } else {
-    AERROR << "no smoothing method chosen";
-    return false;
+      break;
+    default:
+      AERROR << "Smoother type not defined";
+      return false;
   }
 
   if (!status) {
@@ -122,16 +94,19 @@ bool DiscretePointsReferenceLineSmoother::Smooth(
   GenerateRefPointProfile(raw_reference_line, smoothed_point2d, &ref_points);
 
   ReferencePoint::RemoveDuplicates(&ref_points);
+
   if (ref_points.size() < 2) {
     AERROR << "Fail to generate smoothed reference line.";
     return false;
   }
+
   *smoothed_reference_line = ReferenceLine(ref_points);
 
   const auto end_timestamp = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_timestamp - start_timestamp;
   ADEBUG << "discrete_points reference line smoother totoal time: "
          << diff.count() * 1000.0 << " ms.";
+
   return true;
 }
 
@@ -139,52 +114,19 @@ bool DiscretePointsReferenceLineSmoother::CosThetaSmooth(
     const std::vector<std::pair<double, double>>& scaled_point2d,
     const std::vector<double>& lateral_bounds,
     std::vector<std::pair<double, double>>* ptr_smoothed_point2d) {
-  CosThetaSmoother* smoother =
-      new CosThetaSmoother(scaled_point2d, lateral_bounds);
-  // auto smoother =
-  //     std::make_shared<CosThetaSmoother>(scaled_point2d, lateral_bounds);
-
-  smoother->set_weight_cos_included_angle(weight_cos_included_angle_);
-  smoother->set_weight_anchor_points(weight_anchor_points_);
-  smoother->set_weight_length(weight_length_);
-  smoother->set_automatic_differentiation_flag(use_automatic_differentiation_);
-
-  Ipopt::SmartPtr<Ipopt::TNLP> problem = smoother;
-
-  // Create an instance of the IpoptApplication
-  Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
-
-  app->Options()->SetIntegerValue("print_level",
-                                  static_cast<int>(print_level_));
-  app->Options()->SetIntegerValue("max_iter",
-                                  static_cast<int>(max_num_of_iterations_));
-  app->Options()->SetIntegerValue(
-      "acceptable_iter", static_cast<int>(acceptable_num_of_iterations_));
-  app->Options()->SetNumericValue("tol", tol_);
-  app->Options()->SetNumericValue("acceptable_tol", acceptable_tol_);
-
-  Ipopt::ApplicationReturnStatus status = app->Initialize();
-  if (status != Ipopt::Solve_Succeeded) {
-    AERROR << "*** Error during initialization!";
-    return false;
-  }
-
-  status = app->OptimizeTNLP(problem);
-
-  if (status == Ipopt::Solve_Succeeded ||
-      status == Ipopt::Solved_To_Acceptable_Level) {
-    // Retrieve some statistics about the solve
-    Ipopt::Index iter_count = app->Statistics()->IterationCount();
-    ADEBUG << "*** The problem solved in " << iter_count << " iterations!";
-  } else {
-    AERROR << "Solver fails with return code: " << static_cast<int>(status);
-    return false;
-  }
+  const auto& cos_theta_config =
+      config_.discrete_points().cos_theta_smoothing();
+  CosThetaSmoother smoother(cos_theta_config);
 
   std::vector<double> x;
   std::vector<double> y;
-  smoother->get_optimization_results(&x, &y);
-  // load the point position and estimated derivatives at each point
+  bool status = smoother.Solve(scaled_point2d, lateral_bounds, &x, &y);
+
+  if (!status) {
+    AERROR << "costheta reference line smoothing failed";
+    return false;
+  }
+
   if (x.size() < 2 || y.size() < 2) {
     AERROR << "Return by IPOPT is wrong. Size smaller than 2 ";
     return false;
@@ -201,20 +143,40 @@ bool DiscretePointsReferenceLineSmoother::FemPosSmooth(
     const std::vector<std::pair<double, double>>& ref_points,
     const std::vector<double>& lateral_bounds,
     std::vector<std::pair<double, double>>* ptr_smoothed_point2d) {
+  const auto& fem_pos_config =
+      config_.discrete_points().fem_pos_deviation_smoothing();
+  const double weight_fem_pos_deviation =
+      fem_pos_config.weight_fem_pose_deviation();
+  const double weight_ref_deviation = fem_pos_config.weight_ref_deviation();
+  const double weight_path_length = fem_pos_config.weight_path_length();
+  const size_t max_iter = fem_pos_config.max_iter();
+  const double time_limit = fem_pos_config.time_limit();
+  const bool verbose = fem_pos_config.verbose();
+  const bool scaled_termination = fem_pos_config.scaled_termination();
+  const bool warm_start = fem_pos_config.warm_start();
+
+  // box contraints on pos are used in fem pos smoother, thus shrink the
+  // bounds by 1.0 / sqrt(2.0)
+  std::vector<double> box_bounds = lateral_bounds;
+  double box_ratio = 1.0 / std::sqrt(2.0);
+  for (auto& bound : box_bounds) {
+    bound *= box_ratio;
+  }
+
   FemPosDeviationSmoother fem_pos_smoother;
   fem_pos_smoother.set_ref_points(ref_points);
-  fem_pos_smoother.set_x_bounds_around_refs(lateral_bounds);
-  fem_pos_smoother.set_y_bounds_around_refs(lateral_bounds);
-  fem_pos_smoother.set_weight_fem_pos_deviation(weight_fem_pos_deviation_);
-  fem_pos_smoother.set_weight_path_length(weight_path_length_);
-  fem_pos_smoother.set_weight_ref_deviation(weight_ref_deviation_);
+  fem_pos_smoother.set_x_bounds_around_refs(box_bounds);
+  fem_pos_smoother.set_y_bounds_around_refs(box_bounds);
+  fem_pos_smoother.set_weight_fem_pos_deviation(weight_fem_pos_deviation);
+  fem_pos_smoother.set_weight_path_length(weight_path_length);
+  fem_pos_smoother.set_weight_ref_deviation(weight_ref_deviation);
 
   FemPosDeviationOsqpSettings osqp_settings;
-  osqp_settings.max_iter = static_cast<int>(max_iter_);
-  osqp_settings.time_limit = time_limit_;
-  osqp_settings.verbose = verbose_;
-  osqp_settings.scaled_termination = scaled_termination_;
-  osqp_settings.warm_start = warm_start_;
+  osqp_settings.max_iter = static_cast<int>(max_iter);
+  osqp_settings.time_limit = time_limit;
+  osqp_settings.verbose = verbose;
+  osqp_settings.scaled_termination = scaled_termination;
+  osqp_settings.warm_start = warm_start;
 
   if (!fem_pos_smoother.Smooth(osqp_settings)) {
     return false;

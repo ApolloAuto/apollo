@@ -223,6 +223,10 @@ proto_library(
     srcs = [
         "reference_line_smoother_config.proto",
     ],
+    deps = [
+        ":cos_theta_smoother_config_proto_lib",
+        ":fem_pos_deviation_smoother_config_proto_lib",
+    ],
 )
 
 proto_library(
@@ -578,6 +582,34 @@ proto_library(
     name = "rule_based_stop_decider_config_proto_lib",
     srcs = [
         "rule_based_stop_decider_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "cos_theta_smoother_config_proto",
+    deps = [
+        ":cos_theta_smoother_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "cos_theta_smoother_config_proto_lib",
+    srcs = [
+        "cos_theta_smoother_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "fem_pos_deviation_smoother_config_proto",
+    deps = [
+        ":fem_pos_deviation_smoother_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "fem_pos_deviation_smoother_config_proto_lib",
+    srcs = [
+        "fem_pos_deviation_smoother_config.proto",
     ],
 )
 
