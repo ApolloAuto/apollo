@@ -574,7 +574,7 @@ bool IterativeAnchoringSmoother::CombinePathAndSpeed(
   CHECK_NOTNULL(discretized_trajectory);
   discretized_trajectory->clear();
   // TODO(Jinyun): move to confs
-  const double kDenseTimeResoltuion = 0.2;
+  const double kDenseTimeResoltuion = 0.1;
   const double time_horizon =
       speed_points.TotalTime() + kDenseTimeResoltuion * 1.0e-6;
   if (path_points.empty()) {
