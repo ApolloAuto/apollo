@@ -97,10 +97,13 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
 
  private:
   OpenSpaceTrajectoryPartitionConfig open_space_trajectory_partition_config_;
-  double distance_search_range_ = 0.0;
-  double distance_to_midpoint_ = 0.0;
   double heading_search_range_ = 0.0;
   double heading_track_range_ = 0.0;
+  double distance_search_range_ = 0.0;
+  double heading_offset_to_midpoint_ = 0.0;
+  double lateral_offset_to_midpoint_ = 0.0;
+  double longitudinal_offset_to_midpoint_ = 0.0;
+  double vehicle_box_iou_threshold_to_midpoint_ = 0.0;
 
   common::VehicleParam vehicle_param_;
   double ego_length_ = 0.0;
