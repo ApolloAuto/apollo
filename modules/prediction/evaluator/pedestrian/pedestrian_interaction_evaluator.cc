@@ -30,6 +30,7 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
+using apollo::common::Point3D;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 
@@ -122,7 +123,7 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   torch::Tensor curr_ct = obstacle_id_lstm_state_map_[id].ct;
   for (int i = 0; i < kHiddenSize; ++i) {
     lstm_input[0][2 * kEmbeddingSize + i] = curr_ht[0][i];
-    lstm_input[0][2 * kEmbeddingSize + kHiddenSize + i] = curr_ht[0][i];
+    lstm_input[0][2 * kEmbeddingSize + kHiddenSize + i] = curr_ct[0][i];
   }
   std::vector<torch::jit::IValue> lstm_inputs;
   lstm_inputs.push_back(std::move(lstm_input));
@@ -135,6 +136,44 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // TODO(kechxu) Step 4 for-loop get a trajectory
 
   return true;
+}
+
+Point3D PedestrianInteractionEvaluator::PredictNextPosition(
+    const int obstacle_id, const double pos_x, const double pos_y,
+    const torch::Tensor& social_embedding) {
+  Point3D point;
+  const auto& ht = obstacle_id_lstm_state_map_[obstacle_id].ht;
+  const auto& ct = obstacle_id_lstm_state_map_[obstacle_id].ct;
+  torch::Tensor torch_position = torch::zeros({1, 2});
+  torch_position[0][0] = pos_x;
+  torch_position[0][1] = pos_y;
+  std::vector<torch::jit::IValue> position_embedding_inputs;
+  position_embedding_inputs.push_back(std::move(torch_position));
+  torch::Tensor position_embedding = torch_position_embedding_ptr_
+      ->forward(position_embedding_inputs).toTensor().to(torch::kCPU);
+  torch::Tensor lstm_input =
+      torch::zeros({1, 2 * (kEmbeddingSize + kHiddenSize)});
+  for (int i = 0; i < kEmbeddingSize; ++i) {
+    lstm_input[0][i] = position_embedding[0][i];
+    lstm_input[0][kEmbeddingSize + i] = position_embedding[0][i];
+  }
+  for (int i = 0; i < kHiddenSize; ++i) {
+    lstm_input[0][2 * kEmbeddingSize + i] = ht[0][i];
+    lstm_input[0][2 * kEmbeddingSize + kHiddenSize + i] = ct[0][i];
+  }
+  std::vector<torch::jit::IValue> lstm_inputs;
+  lstm_inputs.push_back(std::move(lstm_input));
+  auto lstm_out_tuple = torch_single_lstm_ptr_->forward(lstm_inputs).toTuple();
+  auto new_ht = lstm_out_tuple->elements()[0].toTensor();
+  std::vector<torch::jit::IValue> prediction_inputs;
+  prediction_inputs.push_back(std::move(new_ht));
+  auto pred_out_tensor = torch_prediction_layer_ptr_
+      ->forward(prediction_inputs).toTensor().to(torch::kCPU);
+  auto pred_out = pred_out_tensor.accessor<float, 2>();
+  point.set_x(static_cast<double>(pred_out[0][0]));
+  point.set_y(static_cast<double>(pred_out[0][1]));
+
+  return point;
 }
 
 bool PedestrianInteractionEvaluator::ExtractFeatures(
