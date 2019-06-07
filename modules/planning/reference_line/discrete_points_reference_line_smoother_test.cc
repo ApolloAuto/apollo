@@ -36,9 +36,6 @@ namespace planning {
 class DiscretePointsReferenceLineSmootherTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.mutable_discrete_points()
-        ->mutable_fem_pos_smoothing()
-        ->set_use_fem_pos(true);
     smoother_.reset(new DiscretePointsReferenceLineSmoother(config_));
     hdmap_.LoadMapFromFile(map_file);
     const std::string lane_id = "1_-1";
