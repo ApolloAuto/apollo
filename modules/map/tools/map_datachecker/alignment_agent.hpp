@@ -102,8 +102,6 @@ class AlignmentAgent {
         std::thread alignment_thread([=](){
             _sp_alignment->set_start_time(unixtime_now());
             _thread_id = std::this_thread::get_id();
-            // _sp_alignment->set_start_time(_sp_conf->start_time_debug);
-            // set_state(AlignmentAgentState::RUNNING);
             AINFO << "set state RUNNING";
             while (!_need_stop && !apollo::cyber::IsShutdown()) {
                 std::shared_ptr<std::vector<FramePose>> sp_poses = get_poses();

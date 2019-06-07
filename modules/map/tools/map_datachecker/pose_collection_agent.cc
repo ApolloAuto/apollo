@@ -34,10 +34,11 @@ void PoseCollectionAgent::on_bestgnsspos_callback(
         _sp_pose_collection = std::make_shared<PoseCollection>(_sp_conf);
     }
 
-    double time_stamp = bestgnsspos->measurement_time();  // in seconds
+    double time_stamp = apollo::cyber::common::GpsToUnixSeconds(bestgnsspos->measurement_time());  // in seconds
     FramePose pose;
     if (_sp_conf->use_system_time) {
         pose.time_stamp = unixtime_now();
+        AINFO << "system time: " << std::to_string(pose.time_stamp);
     } else {
         pose.time_stamp = time_stamp;
     }

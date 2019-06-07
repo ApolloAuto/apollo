@@ -59,7 +59,6 @@ enum class State {
 
 struct JSonConf {
     std::vector<std::pair<std::string, double>> topic_list;
-    double start_time_debug;
     bool use_system_time;
     double topic_rate_tolerance;
 
@@ -137,8 +136,6 @@ inline std::shared_ptr<JSonConf> parse_json(std::string conf_path) {
     boost::property_tree::ptree pt;
     try {
         boost::property_tree::read_json(conf_path, pt);
-
-        conf->start_time_debug = pt.get<double>("start_time_debug");
         conf->use_system_time = pt.get<bool>("use_system_time");
         conf->topic_rate_tolerance = pt.get<double>("topic_rate_tolerance");
         boost::property_tree::ptree children2 = pt.get_child("topic_list");

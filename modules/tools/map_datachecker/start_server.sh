@@ -29,7 +29,7 @@ while [[ true ]]; do
   sleep 2
 done
 echo 'Stopping map-datachecker......'
-kill -INT ${PID} 
+kill -INT ${PID}
 
 
 

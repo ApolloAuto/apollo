@@ -6,18 +6,23 @@ client:
   <<: *grpc_host_port
 
 channel_check:
-  check_period: 60
+  check_period: 10
   stop_flag_file: "channel_check.stop"
   <<: *grpc_host_port
 
 static_align:
+  check_period: 1
   <<: *grpc_host_port
 
 eight_route:
+  check_period: 1
   <<: *grpc_host_port
 
-data_collect:
+time_flag_file: &time_flag_file
   time_flag_file: "collect.time"
+data_collect:
+  <<: *time_flag_file
 
 loops_check:
   <<: *grpc_host_port
+  <<: *time_flag_file

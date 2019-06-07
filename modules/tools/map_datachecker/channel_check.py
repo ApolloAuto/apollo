@@ -22,6 +22,7 @@ import logging
 import glob
 import grpc
 import threading
+import multiprocessing
 import yaml
 import time
 script_path = os.path.dirname(os.path.realpath(__file__))
@@ -29,6 +30,7 @@ sys.path.append(os.path.join(script_path, 'py_proto'))
 import collection_service_pb2_grpc
 import collection_service_pb2
 import collection_check_message_pb2
+import collection_error_code_pb2 as ErrorCode
 
 class ChannelChecker:
     def __init__(self, conf_file):
@@ -66,6 +68,8 @@ class ChannelChecker:
         logging.info("channel verify start request: " + str(request))
         response = self.stub.ChannelVerify(request)
         logging.info("channel verify start response: " + str(response))
+        print('[%s]' % str(type(response)))
+        print('[%s]' % str(type(response.code)))
         if response.code != ErrorCode.SUCCESS:
             return self._exception_handler(response.code)
         return 0
@@ -74,6 +78,7 @@ class ChannelChecker:
         request = collection_check_message_pb2.ChannelVerifyRequest(cmd=2)
         logging.info("channel verify check request: " + str(request))
         response = self.stub.ChannelVerify(request)
+       
         logging.info("channel verify check response: " + str(response))
         if response.code != ErrorCode.SUCCESS:
             return self._exception_handler(response.code)
@@ -96,6 +101,9 @@ class ChannelChecker:
                 break
             logging.info("channel checker sleep %d seconds" % self._conf["check_period"])
             time.sleep(self._conf["check_period"])
+        logging.info("detected stop flag file, periodically checking will exit")
+        
+
 
     def async_start(self, record_path):
         if not record_path or not os.path.exists(record_path):
@@ -118,8 +126,11 @@ class ChannelChecker:
         if ret != 0:
             logging.error("start check channel failed, record_path [%s]" % record_path)
             return -1
-        thread = threading.Thread(target=self._periodic_check)
-        thread.start()
+        # thread = threading.Thread(target=self._periodic_check)
+        # thread.start()
+        process = multiprocessing.Process(target=self._periodic_check)
+        process.start()
+        logging.info("async start checking thread, main thread will exit")
 
 #        import state_machine
 #        state_machine.StateMachine()
@@ -138,6 +149,7 @@ class ChannelChecker:
 #        self._stop()
 #        state_checker.state_flow('record_check_stop', 'stop', 'record_check_stop')
         open(os.path.join(script_path, self._conf["stop_flag_file"]), 'w').close()
+        self._stop()
         return 0
         
 if __name__ == "__main__":

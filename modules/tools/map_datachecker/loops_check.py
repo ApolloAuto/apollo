@@ -20,12 +20,13 @@ import os
 import sys
 import logging
 import yaml
-import math
+import grpc
 script_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(script_path, 'py_proto'))
 import collection_service_pb2_grpc
 import collection_service_pb2
 import collection_check_message_pb2
+import collection_error_code_pb2 as ErrorCode
 
 class LoopsChecker:
     def __init__(self, conf_file):
@@ -54,12 +55,35 @@ class LoopsChecker:
         return 0
         
     def _get_range(self):
-        pass
+        time_file = os.path.join(script_path, self._conf['time_flag_file'])
+        with open(time_file, "r") as fp:
+            lines = fp.readlines()
+            record_count = len(lines)
+            if ( record_count % 2 ) != 0:
+                logging.error("record_count should be even number")
+                return [-1, None]
+            time_range = []
+            for i in range(0, record_count, 2):
+                s = lines[i].strip().split()
+                start_time = float(s[0])
+                if s[1] != "start":
+                    logging.error("state machine was broken")
+                    return [-1, None]
+                s = lines[i+1].strip().split()
+                end_time = float(s[0])
+                if s[1] != "end":
+                    logging.error("state machine was broken")
+                    return [-1, None]
+                dic_range = {}
+                dic_range["start_time"] = start_time
+                dic_range["end_time"] = end_time
+                time_range.append(dic_range)
+        return [0, time_range]
 
-    def _start(self, range):
-        request = collection_check_message_pb2.LoopsVerifyRequest(cmd=1, type=DataType.MAP_MAKING, range=range)
+    def _start(self, time_range):
+        request = collection_check_message_pb2.LoopsVerifyRequest(cmd=1, type=collection_check_message_pb2.MAP_MAKING, range=time_range)
         logging.info("loops check start request: " + str(request))
-        response = self.stub.StaticAlign(request)
+        response = self.stub.LoopsVerify(request)
         logging.info("loops check start response: " + str(response))
         if response.code != ErrorCode.SUCCESS:
             return self._exception_handler(response.code)
@@ -68,7 +92,7 @@ class LoopsChecker:
     def _check(self):
         request = collection_check_message_pb2.LoopsVerifyRequest(cmd=2)
         logging.info("loops check check request: " + str(request))
-        response = self.stub.StaticAlign(request)
+        response = self.stub.LoopsVerify(request)
         logging.info("loops check check response: " + str(response))
         if response.code != ErrorCode.SUCCESS:
             ret = self._exception_handler(response.code)
@@ -79,7 +103,7 @@ class LoopsChecker:
     def _stop(self):
         request = collection_check_message_pb2.LoopsVerifyRequest(cmd=3)
         logging.info("loops check stop request: " + str(request))
-        response = self.stub.StaticAlign(request)
+        response = self.stub.LoopsVerify(request)
         logging.info("loops check stop response: " + str(response))
         if response.code != ErrorCode.SUCCESS:
             ret = self._exception_handler(response.code)
@@ -88,8 +112,11 @@ class LoopsChecker:
         return [0, response.progress]
 
     def sync_start(self):
-        range = self._get_range()
-        ret = self._start(range)
+        [ret, time_range] = self._get_range()
+        if ret != 0:
+            logging.error("get time range failed")
+            return -1
+        ret = self._start(time_range)
         if ret != 0:
             logging.error("loops check start failed")
             return -1
@@ -99,11 +126,11 @@ class LoopsChecker:
                 logging.error("loops check check failed")
                 break
             logging.info("loops check check progress: %f" % progress)
-            if math.abs(progress - 1.0) < 1e-8:
+            if abs(progress - 1.0) < 1e-8:
                 break
         if ret != 0:
             return -1
-        ret = self._stop()
+        [ret, _] = self._stop()
         if ret != 0:
             logging.error("loops check stop failed")
             return -1

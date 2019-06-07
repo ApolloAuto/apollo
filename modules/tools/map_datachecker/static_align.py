@@ -21,11 +21,14 @@ import sys
 import logging
 import yaml
 import math
+import time
+import grpc
 script_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(script_path, 'py_proto'))
 import collection_service_pb2_grpc
 import collection_service_pb2
 import collection_check_message_pb2
+import collection_error_code_pb2 as ErrorCode
 
 class StaticAlign:
     def __init__(self, conf_file):
@@ -48,6 +51,9 @@ class StaticAlign:
             logging.warn("ErrorCode.ERROR_REQUEST")
         elif error_code == ErrorCode.ERROR_GNSS_SIGNAL_FAIL:
             logging.error("ErrorCode.ERROR_GNSS_SIGNAL_FAIL")
+            return -1
+        elif error_code == ErrorCode.ERROR_VERIFY_NO_GNSSPOS:
+            logging.error("ErrorCode.ERROR_VERIFY_NO_GNSSPOS")
             return -1
         elif error_code == ErrorCode.ERROR_NOT_STATIC:
             logging.warn("ErrorCode.ERROR_NOT_STATIC")
@@ -81,6 +87,7 @@ class StaticAlign:
         response = self.stub.StaticAlign(request)
         logging.info("static align stop response: " + str(response))
         if response.code != ErrorCode.SUCCESS:
+            logging.info("abnormal response: [%s]" % str(response))
             ret = self._exception_handler(response.code)
             if ret != 0:
                 return [-1, 0.0]
@@ -97,11 +104,12 @@ class StaticAlign:
                 logging.error("static align check failed")
                 break
             logging.info("static align check progress: %f" % progress)
-            if math.abs(progress - 1.0) < 1e-8:
+            if abs(progress - 1.0) < 1e-8:
                 break
+            time.sleep(self._conf["check_period"])
         if ret != 0:
             return -1
-        ret = self._stop()
+        [ret, _] = self._stop()
         if ret != 0:
             logging.error("static align stop failed")
             return -1

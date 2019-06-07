@@ -19,11 +19,15 @@
 import os
 import sys
 import logging
+import time
+import grpc
+import yaml
 script_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(script_path, 'py_proto'))
 import collection_service_pb2_grpc
 import collection_service_pb2
 import collection_check_message_pb2
+import collection_error_code_pb2 as ErrorCode
 
 class EightRoute:
     def __init__(self, conf_file):
@@ -44,17 +48,17 @@ class EightRoute:
             logging.warn("ErrorCode.ERROR_CHECK_BEFORE_START")
         elif error_code == ErrorCode.ERROR_REQUEST:
             logging.warn("ErrorCode.ERROR_REQUEST")
-        # elif error_code == ErrorCode.ERROR_GNSS_SIGNAL_FAIL:
-        #     logging.error("ErrorCode.ERROR_GNSS_SIGNAL_FAIL")
-        #     return -1
+        elif error_code == ErrorCode.ERROR_VERIFY_NO_GNSSPOS:
+            logging.error("ErrorCode.ERROR_VERIFY_NO_GNSSPOS")
+            return -1
         elif error_code == ErrorCode.ERROR_NOT_STATIC:
             logging.warn("ErrorCode.ERROR_NOT_STATIC")
         else:
             logging.error("error error_code [%s]" % str(error_code))
         return 0
 
-    def start(self):
-        request = collection_check_message_pb2.StaticAlignRequest(cmd=1)
+    def _start(self):
+        request = collection_check_message_pb2.EightRouteRequest(cmd=1)
         logging.info("eight route start request: " + str(request))
         response = self.stub.EightRoute(request)
         logging.info("eight route start response: " + str(response))
@@ -62,8 +66,8 @@ class EightRoute:
             return self._exception_handler(response.code)
         return 0
  
-    def check(self):
-        request = collection_check_message_pb2.StaticAlignRequest(cmd=2)
+    def _check(self):
+        request = collection_check_message_pb2.EightRouteRequest(cmd=2)
         logging.info("eight route check request: " + str(request))
         response = self.stub.EightRoute(request)
         logging.info("eight route check response: " + str(response))
@@ -73,8 +77,8 @@ class EightRoute:
                 return [-1, 0.0]
         return [0, response.progress]
 
-    def stop(self):
-        request = collection_check_message_pb2.StaticAlignRequest(cmd=3)
+    def _stop(self):
+        request = collection_check_message_pb2.EightRouteRequest(cmd=3)
         logging.info("eight route stop request: " + str(request))
         response = self.stub.EightRoute(request)
         logging.info("eight route stop response: " + str(response))
@@ -95,17 +99,23 @@ class EightRoute:
                 logging.error("eight route check failed")
                 break
             logging.info("eight route check progress: %f" % progress)
-            if math.abs(progress - 1.0) < 1e-8:
+            if abs(progress - 1.0) < 1e-8:
                 break
+            time.sleep(self._conf["check_period"])
         if ret != 0:
             return -1
-        ret = self._stop()
+        [ret, _] = self._stop()
         if ret != 0:
             logging.error("eight route stop failed")
             return -1
         return 0
-
     
+    def sync_stop(self):
+        [ret, _] = self._stop()
+        if ret != 0:
+            logging.error("eight route stop failed")
+            return -1
+        return 0
 
 if __name__ == "__main__":
     eight_route = EightRoute("127.0.0.1", "50100", "client.yaml")

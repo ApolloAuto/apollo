@@ -4,8 +4,12 @@
 
 # Google infras.
 glog
-protobuf == 3.1
+protobuf == 3.3
 python-gflags
+gevent
+grpc
+grpcio == 1.14.2
+grpcio-tools == 1.14.2
 
 # Web utils.
 flask

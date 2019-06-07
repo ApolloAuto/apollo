@@ -2,8 +2,7 @@
     "topic_list": {
         "/apollo/sensor/gnss/best_pose": 0.9
     },
-    "start_time_debug": 0,
-    "use_system_time": false,
+    "use_system_time": true,
     "topic_rate_tolerance": 1.0,
     "channel_check_trigger_gap": 60,
 

@@ -25,7 +25,7 @@ import logging
 import glob
 import time
 script_path = os.path.dirname(os.path.realpath(__file__))
-
+logging.basicConfig(level = logging.INFO, format = '[%(asctime)s %(filename)s:%(lineno)s] %(message)s')
 def record_check(args):
     state = args.state
     record_path = args.record_path
@@ -33,6 +33,7 @@ def record_check(args):
     ChannelChecker = m_channel_check.ChannelChecker
     channel_chekcer = ChannelChecker(os.path.join(script_path, "client.yaml"))
     ret = 0
+    logging.info("state: " + state)
     if state == "start":
         ret = channel_chekcer.async_start(record_path)
     else:
@@ -40,7 +41,7 @@ def record_check(args):
     if ret != 0:
         logging.error("async_start failed, record_path [%s]" % record_path)
         return -1
-    logging.info("async_start succeed, you can move on to the next step")
+    logging.info("async operation succeed, you can move on to the next step")
     return 0
 
 def static_align(args):
@@ -59,7 +60,11 @@ def eight_route(args):
     import eight_route as m_eight_route
     EightRoute = m_eight_route.EightRoute
     eight_route = EightRoute(os.path.join(script_path, "client.yaml"))
-    ret = eight_route.sync_start()
+    ret = 0
+    if state == "satrt":
+        ret = eight_route.sync_start()
+    else:
+        ret = eight_route.sync_stop()
     if ret != 0:
         logging.info("eight_route failed")
         return -1
@@ -73,30 +78,33 @@ def data_collect(args):
     time_file = os.path.join(script_path, conf['data_collect']['time_flag_file'])
     if not os.path.exists(time_file):
         open(time_file, 'w').close()
-    with open(time_file, 'w') as fp:
+    with open(time_file, 'a+') as fp:
         lines = fp.readlines()
+        now = str(time.time())
         if state == "start":
             if len(lines) == 0:
-                fp.write("%s start\n" % str(time.time()))
+                fp.write("%s start\n" % now)
+                logging.info("write [%s start] to file [%s]" % (now, time_file))
             else:
                 the_last_line = lines[-1]
                 s = the_last_line.strip().split()
-                if s[0] == "start":
+                if s[1] == "start":
                     logging.info("already start, this command will be ignored")
                 else:
-                    fp.write("%s start\n" % str(time.time()))
+                    fp.write("%s start\n" % now)
+                    logging.info("write [%s start] to file [%s]" % (now, time_file))
         else:
             if len(lines) == 0:
                 logging.info("start first, this command will be ignored")
             else:
                 the_last_line = lines[-1]
                 s = the_last_line.strip().split()
-                if s[0] == "start":
-                    fp.write("%s end\n" % str(time.time()))
+                if s[1] == "start":
+                    fp.write("%s end\n" % now)
+                    logging.info("write [%s end] to file [%s]" % (now, time_file))
                 else:
                     logging.info("already end, this command will be ignored")
-
-        
+    return 0
 
 def loops_check(args):
     state = args.state
@@ -118,7 +126,7 @@ def state_machine(args):
     if os.path.exists(os.path.join(script_path, conf['data_collect']['time_flag_file'])):
         os.remove(os.path.join(script_path, conf['data_collect']['time_flag_file']))
     logging.info("state machine clean done")
-
+    return 0
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -143,7 +151,7 @@ if __name__ == "__main__":
 
     parser_loops_check = subparsers.add_parser('loops_check', help='loops_check help')
     parser_loops_check.add_argument('--state', required=True)
-    parser_loops_check.set_defaults(func=eight_route)
+    parser_loops_check.set_defaults(func=loops_check)
 
     parser_state_machine = subparsers.add_parser('state_machine', help='state mechine')
     parser_state_machine.add_argument('--action', required=True)
@@ -151,9 +159,12 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     ret = args.func(args)
-    print glob.glob(os.path.join(script_path, "client.py"))
+    # print args
+    # print args.func
+    # ret = record_check(args)
+    # print glob.glob(os.path.join(script_path, "client.py"))
     if ret != 0:
         logging.error("run %s failed!" % (' '.join(sys.argv)))
         sys.exit(-1)
-    
+    logging.error("run %s succeed!" % (' '.join(sys.argv)))
     sys.exit(0)
