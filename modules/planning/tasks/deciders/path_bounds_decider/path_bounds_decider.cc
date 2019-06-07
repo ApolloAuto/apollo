@@ -573,9 +573,21 @@ bool PathBoundsDecider::SearchPullOverPosition(
       const double pull_over_x = pull_over_xy_point.x();
       const double pull_over_y = pull_over_xy_point.y();
 
+      // set the pull over theta to be the nearest lane theta rather than
+      // reference line theta in case of reference line theta not aligned with
+      // the lane
       const auto& reference_point =
           reference_line.GetReferencePoint(pull_over_s);
-      const double pull_over_theta = reference_point.heading();
+      double pull_over_theta = reference_point.heading();
+      hdmap::LaneInfoConstPtr lane;
+      double s = 0.0;
+      double l = 0.0;
+      auto point = common::util::MakePointENU(pull_over_x, pull_over_y, 0.0);
+      HDMapUtil::BaseMap().GetNearestLaneWithHeading(
+          point, 5.0, pull_over_theta, M_PI_2, &lane, &s, &l);
+      pull_over_theta = lane->Heading(s);
+      AERROR << "reference line heading " << reference_point.heading();
+      AERROR << "pull_over_theta " << pull_over_theta;
 
       *pull_over_configuration = std::make_tuple(pull_over_x, pull_over_y,
                                                  pull_over_theta, (i + j) / 2);
