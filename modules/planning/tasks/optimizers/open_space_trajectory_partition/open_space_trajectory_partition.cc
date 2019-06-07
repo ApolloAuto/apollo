@@ -128,7 +128,9 @@ Status OpenSpaceTrajectoryPartition::Process() {
     flag_change_to_next = CheckReachTrajectoryEnd(
         trajectory, gear, trajectories_size, i, &current_trajectory_index,
         &current_trajectory_point_index);
-    if (flag_change_to_next) {
+    if (flag_change_to_next &&
+        !CheckTrajTraversed(trajectories_encodings[current_trajectory_index])) {
+      UpdateTrajHistory(trajectories_encodings[current_trajectory_index]);
       break;
     }
 
