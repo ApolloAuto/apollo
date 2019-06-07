@@ -108,7 +108,7 @@ bool IterativeAnchoringSmoother::Smooth(
   }
 
   // TODO(Jinyun): move to confs
-  const double default_bounds = 0.5;
+  const double default_bounds = 0.75;
   std::vector<double> bounds(interpolated_path_size, default_bounds);
 
   AdjustStartEndHeading(xWS, &interpolated_warm_start_path, &bounds);
@@ -276,7 +276,7 @@ bool IterativeAnchoringSmoother::ReAnchoring(
            *(std::max_element(colliding_point_index.begin(),
                               colliding_point_index.end())));
   // TODO(Jinyun): move to confs
-  const size_t reanchoring_trails_num = 10;
+  const size_t reanchoring_trails_num = 20;
   const double stddev = 0.25;
   std::random_device rd;
   std::default_random_engine gen = std::default_random_engine(rd());
@@ -351,7 +351,13 @@ bool IterativeAnchoringSmoother::SmoothPath(
   std::vector<size_t> colliding_point_index;
   std::vector<std::pair<double, double>> smoothed_point2d;
   size_t counter = 0;
+  const size_t max_iteration_num = 1000;
   while (!is_collision_free) {
+    if (counter > max_iteration_num) {
+      AERROR << "path smoother iteration num reach maximum in iterative "
+                "anchoring smoother";
+      return false;
+    }
     AdjustPathBounds(colliding_point_index, &flexible_bounds);
     fem_pos_smoother.set_ref_points(raw_point2d);
     fem_pos_smoother.set_x_bounds_around_refs(flexible_bounds);
