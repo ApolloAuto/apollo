@@ -206,9 +206,9 @@ DEFINE_double(lateral_jerk_bound, 4.0,
 
 DEFINE_double(dl_bound, 0.10,
               "The bound for derivative l in s-l coordinate system.");
-DEFINE_double(kappa_bound, 0.20, "The bound for trajectory curvature");
-DEFINE_double(dkappa_bound, 0.02,
-              "The bound for trajectory curvature change rate");
+DEFINE_double(kappa_bound, 0.1979, "The bound for trajectory curvature");
+DEFINE_double(dkappa_bound, 0.2081,
+              "The bound for trajectory curvature change rate, in 1/(m*sec)");
 
 // ST Boundary
 DEFINE_double(st_max_s, 100, "the maximum s of st boundary");
