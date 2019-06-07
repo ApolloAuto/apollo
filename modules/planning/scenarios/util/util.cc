@@ -71,10 +71,8 @@ hdmap::PathOverlap* GetOverlapOnReferenceLine(
  */
 PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
                                 const ScenarioPullOverConfig& scenario_config) {
-  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const auto& pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
-
   if (!pull_over_status.is_feasible() ||
       !pull_over_status.has_position() ||
       !pull_over_status.position().has_x() ||
@@ -85,11 +83,13 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
     return UNKNOWN;
   }
 
-  common::SLPoint pull_over_sl;
   const auto& reference_line = reference_line_info.reference_line();
+  common::SLPoint pull_over_sl;
   reference_line.XYToSL(
       {pull_over_status.position().x(), pull_over_status.position().y()},
       &pull_over_sl);
+
+  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   double distance = adc_front_edge_s - pull_over_sl.s();
   if (distance >= scenario_config.pass_destination_threshold()) {
     ADEBUG << "ADC passed pull-over spot: distance[" << distance << "]";
@@ -120,7 +120,40 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
       adc_position,
       common::VehicleStateProvider::Instance()->heading(),
       target_position,
-      pull_over_status.theta());
+      pull_over_status.theta(),
+      true);
+
+  return position_check ? PARK_COMPLETE : PARK_FAIL;
+}
+
+/**
+ * @brief: check path data to see  properly
+ */
+PullOverStatus CheckADCPullOverPathPoint(
+    const ReferenceLineInfo& reference_line_info,
+    const ScenarioPullOverConfig& scenario_config,
+    const common::PathPoint& path_point) {
+  const auto& pull_over_status =
+      PlanningContext::Instance()->planning_status().pull_over();
+  if (!pull_over_status.is_feasible() ||
+      !pull_over_status.has_position() ||
+      !pull_over_status.position().has_x() ||
+      !pull_over_status.position().has_y() ||
+      !pull_over_status.has_theta()) {
+    ADEBUG << "pull_over status not set properly: "
+           << pull_over_status.DebugString();
+    return UNKNOWN;
+  }
+
+  const common::math::Vec2d target_position = {
+      pull_over_status.position().x(), pull_over_status.position().y()};
+  const bool position_check = CheckPullOverPositionBySL(
+      reference_line_info, scenario_config,
+      {path_point.x(), path_point.y()},
+      path_point.theta(),
+      target_position,
+      pull_over_status.theta(),
+      false);  // check l + theta only
 
   return position_check ? PARK_COMPLETE : PARK_FAIL;
 }
@@ -129,7 +162,6 @@ PullOverStatus CheckADCPullOverOpenSpace(
     const ScenarioPullOverConfig& scenario_config) {
   const auto& pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
-
   if (!pull_over_status.is_feasible() ||
       !pull_over_status.has_position() ||
       !pull_over_status.position().has_x() ||
@@ -161,7 +193,8 @@ bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
                                const common::math::Vec2d& adc_position,
                                const double adc_theta,
                                const common::math::Vec2d& target_position,
-                               const double target_theta) {
+                               const double target_theta,
+                               const bool check_s) {
   const auto& reference_line = reference_line_info.reference_line();
   common::SLPoint target_sl;
   reference_line.XYToSL(target_position, &target_sl);
@@ -178,13 +211,14 @@ bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
          << "] l_diff[" << l_diff << "] theta_diff[" << theta_diff << "]";
 
   // check s/l/theta diff
-  if (s_diff >= 0 && s_diff <= scenario_config.max_s_error_to_end_point() &&
-      l_diff <= scenario_config.max_l_error_to_end_point() &&
-      theta_diff <= scenario_config.max_theta_error_to_end_point()) {
-    return true;
+  bool ret = (l_diff <= scenario_config.max_l_error_to_end_point() &&
+      theta_diff <= scenario_config.max_theta_error_to_end_point());
+  if (check_s) {
+    ret = (ret && s_diff >= 0 &&
+        s_diff <= scenario_config.max_s_error_to_end_point());
   }
 
-  return false;
+  return ret;
 }
 
 bool CheckPullOverPositionByDistance(
@@ -200,11 +234,8 @@ bool CheckPullOverPositionByDistance(
          << "] theta_diff[" << theta_diff << "]";
 
   // check distance/theta diff
-  if (distance_diff <= scenario_config.max_distance_error_to_end_point() &&
-      theta_diff <= scenario_config.max_theta_error_to_end_point()) {
-    return true;
-  }
-  return false;
+  return (distance_diff <= scenario_config.max_distance_error_to_end_point() &&
+      theta_diff <= scenario_config.max_theta_error_to_end_point());
 }
 
 }  // namespace util
