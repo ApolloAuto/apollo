@@ -264,6 +264,7 @@ DEFINE_double(virtual_stop_wall_length, 0.1,
 DEFINE_double(virtual_stop_wall_height, 2.0,
               "virtual stop wall height (meters)");
 
+// Path Deciders
 DEFINE_double(obstacle_lat_buffer, 0.4,
               "obstacle lateral buffer (meters) for deciding path boundaries");
 DEFINE_double(obstacle_lon_start_buffer, 3.0,
@@ -272,6 +273,13 @@ DEFINE_double(obstacle_lon_start_buffer, 3.0,
 DEFINE_double(obstacle_lon_end_buffer, 2.0,
               "obstacle longitudinal end buffer (meters) for deciding "
               "path boundaries");
+DEFINE_double(static_obstacle_speed_threshold, 0.5,
+              "The speed threshold to decide whether an obstacle is static "
+              "or not.");
+DEFINE_double(lane_borrow_max_speed, 5.0,
+              "The speed threshold for lane-borrow");
+DEFINE_int32(long_term_blocking_obstacle_cycle_threhold, 3,
+             "The cycle threhold for long-term blocking obstacle.");
 
 // Prediction Part
 DEFINE_double(prediction_total_time, 5.0, "Total prediction time");
