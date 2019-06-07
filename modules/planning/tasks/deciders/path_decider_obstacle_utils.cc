@@ -21,11 +21,10 @@
 
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/util.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
-
-constexpr double kStaticObstacleSpeedThreshold = 0.5;
 
 bool IsWithinPathDeciderScopeObstacle(const Obstacle& obstacle) {
   // Obstacle should be non-virtual.
@@ -39,7 +38,7 @@ bool IsWithinPathDeciderScopeObstacle(const Obstacle& obstacle) {
   }
   // Obstacle should not be moving obstacle.
   if (!obstacle.IsStatic() ||
-      obstacle.speed() > kStaticObstacleSpeedThreshold) {
+      obstacle.speed() > FLAGS_static_obstacle_speed_threshold) {
     return false;
   }
   // TODO(jiacheng):

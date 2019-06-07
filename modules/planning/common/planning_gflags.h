@@ -130,9 +130,13 @@ DECLARE_double(signal_light_min_pass_s_distance);
 DECLARE_double(signal_expire_time_sec);
 DECLARE_bool(enable_side_radar);
 
+// Path Deciders
 DECLARE_double(obstacle_lat_buffer);
 DECLARE_double(obstacle_lon_start_buffer);
 DECLARE_double(obstacle_lon_end_buffer);
+DECLARE_double(static_obstacle_speed_threshold);
+DECLARE_double(lane_borrow_max_speed);
+DECLARE_int32(long_term_blocking_obstacle_cycle_threhold);
 
 DECLARE_string(destination_obstacle_id);
 DECLARE_double(destination_check_distance);
