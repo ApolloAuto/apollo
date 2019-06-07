@@ -13,14 +13,8 @@ cc_library(
     deps = [
         "//modules/prediction/container:container_manager",
         "//modules/prediction/evaluator",
-    ] + select({
-        "//tools/platforms:use_gpu": [
-            "@pytorch",
-        ],
-        "//conditions:default": [
-            "@pytorch",
-        ],
-    }),
+        "@pytorch",  # TODO(kechxu) add gpu version if needed
+    ],
 )
 
 cc_test(
