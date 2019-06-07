@@ -97,6 +97,8 @@ class HybridAStar {
                                   const SpeedData& speed_data,
                                   HybridAStartResult* result);
 
+  bool InsertInterpolatePoint(HybridAStartResult* result);
+
  private:
   PlannerOpenSpaceConfig planner_open_space_config_;
   common::VehicleParam vehicle_param_ =

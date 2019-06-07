@@ -570,6 +570,12 @@ bool HybridAStar::TrajectoryPartition(
          << partitioned_result->size();
   // Retrieve v, a and steer from path
   for (auto& result : *partitioned_result) {
+    if (result.x.size() == 2) {
+      if (!InsertInterpolatePoint(&result)) {
+        AERROR << "InsertInterpolatePoint fail";
+        return false;
+      }
+    }
     if (FLAGS_use_s_curve_speed_smooth) {
       if (!GenerateSCurveSpeedAcceleration(&result)) {
         AERROR << "GenerateSCurveSpeedAcceleration fail";
@@ -753,5 +759,27 @@ bool HybridAStar::Plan(
          << Clock::NowInSeconds() - astar_start_time;
   return true;
 }
+
+bool HybridAStar::InsertInterpolatePoint(HybridAStartResult* result) {
+  if (result->x.size() != 2 || result->y.size() != 2 || result->v.size() != 2 ||
+      result->phi.size() != 2 || result->a.size() != 1 ||
+      result->steer.size() != 1) {
+    return false;
+  }
+
+  const double mid_phi =
+      common::math::AngleDiff(result->phi[1], result->phi[0]) * 0.5 +
+      result->phi[0];
+
+  result->x.insert(result->x.begin() + 1, (result->x[0] + result->x[1]) * 0.5);
+  result->y.insert(result->y.begin() + 1, (result->y[0] + result->y[1]) * 0.5);
+  result->phi.insert(result->phi.begin() + 1, mid_phi);
+  result->v.insert(result->v.begin() + 1, (result->v[0] + result->v[1]) * 0.5);
+  result->a.push_back(result->a[0]);
+  result->steer.push_back(result->steer[0]);
+
+  return true;
+}
+
 }  // namespace planning
 }  // namespace apollo
