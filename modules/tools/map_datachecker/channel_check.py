@@ -26,7 +26,9 @@ import multiprocessing
 import yaml
 import time
 script_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(script_path, 'py_proto'))
+apollo_root = os.path.join(script_path, "../../..")
+pb_path = os.path.join(apollo_root, "py_proto/modules/map/tools/map_datachecker/proto/")
+sys.path.append(pb_path)
 import collection_service_pb2_grpc
 import collection_service_pb2
 import collection_check_message_pb2
@@ -68,8 +70,6 @@ class ChannelChecker:
         logging.info("channel verify start request: " + str(request))
         response = self.stub.ChannelVerify(request)
         logging.info("channel verify start response: " + str(response))
-        print('[%s]' % str(type(response)))
-        print('[%s]' % str(type(response.code)))
         if response.code != ErrorCode.SUCCESS:
             return self._exception_handler(response.code)
         return 0
@@ -78,7 +78,6 @@ class ChannelChecker:
         request = collection_check_message_pb2.ChannelVerifyRequest(cmd=2)
         logging.info("channel verify check request: " + str(request))
         response = self.stub.ChannelVerify(request)
-       
         logging.info("channel verify check response: " + str(response))
         if response.code != ErrorCode.SUCCESS:
             return self._exception_handler(response.code)

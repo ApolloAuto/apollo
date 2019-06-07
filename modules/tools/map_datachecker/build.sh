@@ -19,8 +19,8 @@
 set -xeu
 SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 APOLLO_ROOT_PATH="${SCRIPT_PATH}/../../.."
-# MAP_DATACHECKER_PROTO_PATH="${APOLLO_ROOT_PATH}/modules/map/tools/map_datachecker/proto"
-MAP_DATACHECKER_PROTO_PATH="${APOLLO_ROOT_PATH}/modules/tools/map_datachecker/proto"
+MAP_DATACHECKER_PROTO_PATH="${APOLLO_ROOT_PATH}/modules/map/tools/map_datachecker/proto"
+#MAP_DATACHECKER_PROTO_PATH="${APOLLO_ROOT_PATH}/modules/tools/map_datachecker/proto"
 
 WORK_PATH=$(pwd)
 # export LD_LIBRARY_PATH=${WORK_PATH}/../../../third_party/protobuf/lib:$LD_LIBRARY_PATH

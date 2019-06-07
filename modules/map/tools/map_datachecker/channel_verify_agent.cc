@@ -1,13 +1,18 @@
 /******************************************************************************
- * Created on Wed Jan 09 2019
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
- * Copyright (c) 2019 Baidu.com, Inc. All Rights Reserved
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * @file: filename
- * @desc: description
- * @author: yuanyijun@baidu.com
-  *****************************************************************************/
-
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/map/tools/map_datachecker/channel_verify_agent.h"
 #include <thread>
 #include <chrono>
@@ -16,9 +21,8 @@
 #include <vector>
 #include <map>
 
-namespace adu {
-namespace workers {
-namespace collection {
+namespace apollo {
+namespace hdmap {
 
 ChannelVerifyAgent::ChannelVerifyAgent(std::shared_ptr<JSonConf> sp_conf) {
     _sp_conf = sp_conf;
@@ -110,10 +114,10 @@ void ChannelVerifyAgent::do_check(const std::string& records_path) {
 }
 
 int ChannelVerifyAgent::add_topic_lack(
-    adu::workers::collection::VerifyResult *result,
+    apollo::hdmap::VerifyResult *result,
     const std::string& record_path,
     std::vector<std::string> const& lack_channels) {
-    adu::workers::collection::TopicResult *topics = result->mutable_topics();
+    apollo::hdmap::TopicResult *topics = result->mutable_topics();
     for (size_t i = 0; i < lack_channels.size(); i++) {
         topics->add_topic_lack(lack_channels[i]);
         AINFO << record_path << " lack topic: " << lack_channels[i];
@@ -121,12 +125,12 @@ int ChannelVerifyAgent::add_topic_lack(
     return static_cast<int>(lack_channels.size());
 }
 
-::adu::workers::collection::FrameRate* ChannelVerifyAgent::find_rates(
-    adu::workers::collection::VerifyResult *result,
+::apollo::hdmap::FrameRate* ChannelVerifyAgent::find_rates(
+    apollo::hdmap::VerifyResult *result,
     const std::string& channel) {
     int rates_size = result->rates_size();
     for (int i = 0; i < rates_size; i++) {
-        const ::adu::workers::collection::FrameRate& rates = result->rates(i);
+        const ::apollo::hdmap::FrameRate& rates = result->rates(i);
         if (rates.topic() == channel) {
             return result->mutable_rates(i);
         }
@@ -135,7 +139,7 @@ int ChannelVerifyAgent::add_topic_lack(
 }
 
 int ChannelVerifyAgent::add_inadequate_rate(
-    adu::workers::collection::VerifyResult *result,
+    apollo::hdmap::VerifyResult *result,
     std::string const& record_path,
     std::map<std::string, std::pair<double, double>> const& inadequate_rate) {
     for (std::map<std::string, std::pair<double, double>>::const_iterator
@@ -143,7 +147,7 @@ int ChannelVerifyAgent::add_inadequate_rate(
         const std::string& channel = it->first;
         double expected_rate = it->second.first;
         double current_rate = it->second.second;
-        ::adu::workers::collection::FrameRate* rate =
+        ::apollo::hdmap::FrameRate* rate =
             find_rates(result, channel);
         if (rate == NULL) {
             rate = result->add_rates();
@@ -197,7 +201,7 @@ void ChannelVerifyAgent::check_result(
 
     print_sp_check_result();  // debug purpose
     response->set_code(ErrorCode::SUCCESS);
-    adu::workers::collection::VerifyResult *result = response->mutable_result();
+    apollo::hdmap::VerifyResult *result = response->mutable_result();
     for (CheckResultIterator it = _sp_check_result->begin();
         it != _sp_check_result->end(); it++) {
         int res = 0;
@@ -222,7 +226,7 @@ void ChannelVerifyAgent::stop_check(
     _need_stop = true;
     response->set_code(ErrorCode::SUCCESS);
     set_state(ChannelVerifyAgentState::IDLE);
-    adu::workers::collection::VerifyResult *result =
+    apollo::hdmap::VerifyResult *result =
         response->mutable_result();
     if (_sp_check_result == nullptr) {
         return;
@@ -252,6 +256,5 @@ ChannelVerifyAgentState ChannelVerifyAgent::get_state() {
     return _state;
 }
 
-}  // namespace collection
-}  // namespace workers
-}  // namespace adu
+}  // namespace hdmap
+}  // namespace apollo

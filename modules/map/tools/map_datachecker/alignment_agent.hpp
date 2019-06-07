@@ -1,14 +1,20 @@
 /******************************************************************************
- * Created on Fri Jan 11 2019
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
- * Copyright (c) 2019 Baidu.com, Inc. All Rights Reserved
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * @file: filename
- * @desc: description
- * @author: yuanyijun@baidu.com
-  *****************************************************************************/
-#ifndef _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_ALIGNMENT_AGENT_HPP
-#define _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_ALIGNMENT_AGENT_HPP
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+#ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_ALIGNMENT_AGENT_HPP
+#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_ALIGNMENT_AGENT_HPP
 #include <grpc++/grpc++.h>
 #include <chrono>
 #include <thread>
@@ -20,24 +26,19 @@
 #include "modules/map/tools/map_datachecker/proto/collection_error_code.pb.h"
 #include "modules/map/tools/map_datachecker/proto/collection_service.pb.h"
 
-namespace adu {
-namespace workers {
-namespace collection {
+namespace apollo {
+namespace hdmap {
 
 typedef State AlignmentAgentState;
 
-// using DYMAMIC_REQUEST_TYPE
-//     = const adu::workers::collection::DynamicAlignRequest;
-// using DYNAMIC_RESPONSE_TYPE
-//     = adu::workers::collection::DynamicAlignResponse;
 using STATIC_REQUEST_TYPE
-    = const adu::workers::collection::StaticAlignRequest;
+    = const apollo::hdmap::StaticAlignRequest;
 using STATIC_RESPONSE_TYPE
-    = adu::workers::collection::StaticAlignResponse;
+    = apollo::hdmap::StaticAlignResponse;
 using EIGHTROUTE_REQUEST_TYPE
-    = const adu::workers::collection::EightRouteRequest;
+    = const apollo::hdmap::EightRouteRequest;
 using EIGHTROUTE_RESPONSE_TYPE
-    = adu::workers::collection::EightRouteResponse;
+    = apollo::hdmap::EightRouteResponse;
 
 template<typename ALIGNMENT_TYPE, typename REQUEST_TYPE, typename RESPONSE_TYPE>
 class AlignmentAgent {
@@ -194,9 +195,8 @@ using STATIC_ALIGN_AGENT_TYPE
 using EIGHT_ROUTE_AGENT_TYPE
     = AlignmentAgent<EightRoute, EIGHTROUTE_REQUEST_TYPE,
     EIGHTROUTE_RESPONSE_TYPE>;
-}  // namespace collection
-}  // namespace workers
-}  // namespace adu
+}  // namespace hdmap 
+}  // namespace apollo
 
 
-#endif  // _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_ALIGNMENT_AGENT_HPP
+#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_ALIGNMENT_AGENT_HPP 

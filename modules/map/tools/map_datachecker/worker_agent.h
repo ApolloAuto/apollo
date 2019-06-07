@@ -1,13 +1,20 @@
 /******************************************************************************
- * Copyright (c) 2018 Baidu.com, Inc. All Rights Reserved
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
- * @file worker_agent.h
- * @desc A agent of MapDataChecker, dispatch process and memory.
- * @author Tong Wu<wutong14@baidu.com>, yuanyijun@baidu.com
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *****************************************************************************/
-
-#ifndef _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_WORKER_AGENT_H
-#define _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_WORKER_AGENT_H
+#ifndef MODULES_MAP_TOOLS_MAP_DATACHECKER_WORKER_AGENT_H
+#define MODULES_MAP_TOOLS_MAP_DATACHECKER_WORKER_AGENT_H
 #include <grpc++/grpc++.h>
 #include <vector>
 #include <utility>
@@ -21,9 +28,8 @@
 #include "modules/map/tools/map_datachecker/proto/collection_service.pb.h"
 #include "modules/map/tools/map_datachecker/proto/collection_service.grpc.pb.h"
 
-namespace adu {
-namespace workers {
-namespace collection {
+namespace apollo {
+namespace hdmap {
 
 class MapDataCheckerAgent final:
     public std::enable_shared_from_this<MapDataCheckerAgent>,
@@ -39,8 +45,8 @@ class MapDataCheckerAgent final:
 
     grpc::Status ChannelVerify(
         grpc::ServerContext*,
-        adu::workers::collection::CHANNEL_VERIFY_REQUEST_TYPE*,
-        adu::workers::collection::CHANNEL_VERIFY_RESPONSE_TYPE*);
+        apollo::hdmap::CHANNEL_VERIFY_REQUEST_TYPE*,
+        apollo::hdmap::CHANNEL_VERIFY_RESPONSE_TYPE*);
     grpc::Status StaticAlign(
         grpc::ServerContext *context,
         STATIC_REQUEST_TYPE *request,
@@ -64,8 +70,7 @@ class MapDataCheckerAgent final:
     std::shared_ptr<LoopsVerifyAgent> _sp_loops_verify_agent = nullptr;
 };
 
-}  // namespace collection
-}  // namespace workers
-}  // namespace adu
+}  // namespace hdmap 
+}  // namespace apollo
 
-#endif  // _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_WORKER_AGENT_H
+#endif  // MODULES_MAP_TOOLS_MAP_DATACHECKER_WORKER_AGENT_H

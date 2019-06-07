@@ -1,10 +1,3 @@
-/******************************************************************************
- * Copyright (c) 2018 Baidu.com, Inc. All Rights Reserved
- *
- * @file worker_cyber_node.cpp
- * @desc A cybertron node for demo-worker.
- * @author Tong Wu<wutong14@baidu.com>
- *****************************************************************************/
 #include "modules/map/tools/map_datachecker/worker_cyber_node.h"
 #include "modules/map/tools/map_datachecker/worker_agent.h"
 #include "modules/map/tools/map_datachecker/worker_gflags.h"
@@ -14,9 +7,8 @@
 constexpr double RADIANS_TO_DEGREES = 180.0 / M_PI;
 constexpr double DEGRESS_TO_RADIANS = M_PI / 180.0;
 
-namespace adu {
-namespace workers {
-namespace collection {
+namespace apollo {
+namespace hdmap {
 
 MapDataCheckerCyberNode::MapDataCheckerCyberNode(
     std::shared_ptr<MapDataCheckerAgent> agent, bool *init_success) {
@@ -62,6 +54,5 @@ int MapDataCheckerCyberNode::create_channel_subscriber() {
     return 0;
 }
 
-}  // namespace collection
-}  // namespace workers
-}  // namespace adu
+}  // namespace hdmap 
+}  // namespace apollo

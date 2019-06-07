@@ -1,21 +1,25 @@
 /******************************************************************************
- * Created on Thu Jan 17 2019
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
- * Copyright (c) 2019 Baidu.com, Inc. All Rights Reserved
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * @file: filename
- * @desc: description
- * @author: yuanyijun@baidu.com
-  *****************************************************************************/
-
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/map/tools/map_datachecker/loops_verify_agent.h"
 #include <limits>
 #include <utility>
 #include <vector>
 
-namespace adu {
-namespace workers {
-namespace collection {
+namespace apollo {
+namespace hdmap {
 
 LoopsVerifyAgent::LoopsVerifyAgent(
     std::shared_ptr<JSonConf> sp_conf,
@@ -101,7 +105,7 @@ void LoopsVerifyAgent::CheckVerify(
         double confidence = _sp_laps_checker->get_confidence();
         size_t lap = _sp_laps_checker->get_lap();
         AINFO << "aquired lap: " << lap << ", conf: " << confidence;
-        adu::workers::collection::LoopResult
+        apollo::hdmap::LoopResult
             *loop_result = response->mutable_loop_result();
 
         loop_result->set_loop_num(static_cast<double>(lap));
@@ -136,7 +140,7 @@ void LoopsVerifyAgent::StopVerify(
         double conf = _sp_laps_checker->get_confidence();
         size_t lap = _sp_laps_checker->get_lap();
         AINFO << "aquired lap: " << lap << ", conf: " << conf;
-        adu::workers::collection::LoopResult
+        apollo::hdmap::LoopResult
             *loop_result = response->mutable_loop_result();
         loop_result->set_loop_num(static_cast<double>(lap));
         bool is_reached = lap >= get_loops_to_check(request) ? true : false;
@@ -161,7 +165,7 @@ LoopsVerifyAgent::get_verify_range(LOOPS_VERIFY_REQUEST_TYPE *request) {
         sp_range(new std::vector<std::pair<double, double>>());
     int range_size = request->range_size();
     for (int i = 0; i < range_size; i++) {
-        const ::adu::workers::collection::VerifyRange
+        const ::apollo::hdmap::VerifyRange
             &range = request->range(i);
         sp_range->push_back(
             std::make_pair(range.start_time(), range.end_time()));
@@ -299,6 +303,5 @@ LoopsVerifyAgentState LoopsVerifyAgent::get_state() {
     return _state;
 }
 
-}  // namespace collection
-}  // namespace workers
-}  // namespace adu
+}  // namespace hdmap 
+}  // namespace apollo

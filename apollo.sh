@@ -272,6 +272,9 @@ function build_py_proto() {
       | grep -v node_modules \
       | xargs ${PROTOC} --python_out=py_proto
   find py_proto/* -type d -exec touch "{}/__init__.py" \;
+  find modules/map/tools/map_datachecker/proto -name "*service.proto" \
+      | grep -v node_modules \
+      | xargs python -m grpc_tools.protoc --python_out=py_proto --grpc_python_out=py_proto --proto_path="./"
 }
 
 function check() {

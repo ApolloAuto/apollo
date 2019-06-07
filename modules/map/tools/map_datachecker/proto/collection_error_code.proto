@@ -1,5 +1,5 @@
 syntax = "proto2";
-package adu.workers.collection;
+package apollo.hdmap;
 
 enum ErrorCode 
 {

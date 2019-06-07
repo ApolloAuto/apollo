@@ -1,14 +1,20 @@
 /******************************************************************************
- * Created on Thu Aug 16 2018
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
- * Copyright (c) 2018 Baidu.com, Inc. All Rights Reserved
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * @file: dynamic_align.h 
- * @desc: description
- * @author: yuanyijunj@baidu.com
-  *****************************************************************************/
-#ifndef _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_CHANNEL_CHECKER_H
-#define _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_CHANNEL_CHECKER_H
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+#ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_CHANNEL_CHECKER_H
+#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_CHANNEL_CHECKER_H 
 #include <vector>
 #include <string>
 #include <map>
@@ -18,9 +24,8 @@
 #include "modules/map/tools/map_datachecker/common.hpp"
 #include "modules/map/tools/map_datachecker/proto/collection_error_code.pb.h"
 
-namespace adu {
-namespace workers {
-namespace collection {
+namespace apollo {
+namespace hdmap {
 
 struct CyberRecordChannel {
     std::string channel_name;
@@ -74,8 +79,7 @@ class ChannelVerify {
     std::set<std::string> _checked_records;
 };
 
-}  // namespace collection
-}  // namespace workers
-}  // namespace adu
+}  // namespace hdmap 
+}  // namespace apollo
 
-#endif  // _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_CHANNEL_CHECKER_H
+#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_CHANNEL_CHECKER_H 

@@ -1,14 +1,20 @@
 /******************************************************************************
- * Created on Wed Jan 09 2019
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
- * Copyright (c) 2019 Baidu.com, Inc. All Rights Reserved
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * @file: filename
- * @desc: description
- * @author: yuanyijun@baidu.com
-  *****************************************************************************/
-#ifndef _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_CHANNEL_CHEKCER_AGENT_H
-#define _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_CHANNEL_CHEKCER_AGENT_H
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+#ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_CHANNEL_CHEKCER_AGENT_H
+#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_CHANNEL_CHEKCER_AGENT_H
 #include <grpc++/grpc++.h>
 #include <memory>
 #include <mutex>
@@ -20,9 +26,8 @@
 #include "modules/map/tools/map_datachecker/proto/collection_service.pb.h"
 #include "modules/map/tools/map_datachecker/proto/collection_error_code.pb.h"
 
-namespace adu {
-namespace workers {
-namespace collection {
+namespace apollo {
+namespace hdmap {
 
 enum class ChannelVerifyAgentState {
     IDLE,
@@ -30,9 +35,9 @@ enum class ChannelVerifyAgentState {
 };
 
 using CHANNEL_VERIFY_REQUEST_TYPE
-    = const adu::workers::collection::ChannelVerifyRequest;
+    = const apollo::hdmap::ChannelVerifyRequest;
 using CHANNEL_VERIFY_RESPONSE_TYPE
-    = adu::workers::collection::ChannelVerifyResponse;
+    = apollo::hdmap::ChannelVerifyResponse;
 
 class ChannelVerifyAgent {
  public:
@@ -58,16 +63,16 @@ class ChannelVerifyAgent {
     void set_state(ChannelVerifyAgentState state);
     ChannelVerifyAgentState get_state();
     int add_topic_lack(
-        adu::workers::collection::VerifyResult *result,
+        apollo::hdmap::VerifyResult *result,
         const std::string& record_path,
         std::vector<std::string> const& lack_channels);
     int add_inadequate_rate(
-        adu::workers::collection::VerifyResult *result,
+        apollo::hdmap::VerifyResult *result,
         std::string const & record_path,
         std::map<std::string,
         std::pair<double, double>> const& inadequate_rate);
-    ::adu::workers::collection::FrameRate* find_rates(
-        adu::workers::collection::VerifyResult *result,
+    ::apollo::hdmap::FrameRate* find_rates(
+        apollo::hdmap::VerifyResult *result,
         const std::string& channel);
 
  private:  // debug only
@@ -83,9 +88,8 @@ class ChannelVerifyAgent {
     std::thread::id _check_thread_id;
 };
 
-}  // namespace collection
-}  // namespace workers
-}  // namespace adu
+}  // namespace hdmap 
+}  // namespace apollo
 
 
-#endif  // _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_CHANNEL_CHEKCER_AGENT_H
+#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_CHANNEL_CHEKCER_AGENT_H 

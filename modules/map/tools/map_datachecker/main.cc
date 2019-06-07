@@ -1,11 +1,18 @@
 /******************************************************************************
- * Copyright (c) 2018 Baidu.com, Inc. All Rights Reserved
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
- * @file main.cpp
- * @desc The main function of demo-worker.
- * @author Tong Wu<wutong14@baidu.com>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *****************************************************************************/
-
 #include <google/protobuf/text_format.h>
 #include "cyber/cyber.h"
 #include "modules/map/tools/map_datachecker/worker.h"
@@ -26,7 +33,7 @@ int main(int argc, char** argv) {
     google::SetStderrLogging(FLAGS_minloglevel);
 
     AINFO << "starting worker";
-    adu::workers::collection::Mapdatachecker worker;
+    apollo::hdmap::Mapdatachecker worker;
     if (!worker.Start()) {
         AFATAL << "Start Mapdatachecker Failed!";
         return -1;

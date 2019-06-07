@@ -1,21 +1,27 @@
 /******************************************************************************
- * Copyright (c) 2018 Baidu.com, Inc. All Rights Reserved
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
- * @file worker_cyber_node.h
- * @desc A cybertron node for demo-worker.
- * @author Tong Wu<wutong14@baidu.com>, yuanyijun@baidu.com
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *****************************************************************************/
-
-#ifndef _MODULES_DATA_CHECKER_DEMO_WORKER_INCLUDE_WORKER_CYBER_NODE_H
-#define _MODULES_DATA_CHECKER_DEMO_WORKER_INCLUDE_WORKER_CYBER_NODE_H
+#ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_WORKER_CYBER_NODE_H
+#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_WORKER_CYBER_NODE_H
 
 #include <memory>
 #include "cyber/cyber.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 
-namespace adu {
-namespace workers {
-namespace collection {
+namespace apollo {
+namespace hdmap {
 
 class MapDataCheckerAgent;
 
@@ -42,8 +48,7 @@ class MapDataCheckerCyberNode:
     std::shared_ptr<MapDataCheckerAgent> _agent = nullptr;
 };
 
-}  // namespace collection
-}  // namespace workers
-}  // namespace adu
+}  // namespace hdmap
+}  // namespace apollo
 
-#endif  // _MODULES_DATA_CHECKER_DEMO_WORKER_INCLUDE_WORKER_CYBER_NODE_H
+#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_WORKER_CYBER_NODE_H

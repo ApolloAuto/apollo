@@ -1,14 +1,20 @@
 /******************************************************************************
- * Created on Thu Jan 17 2019
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
- * Copyright (c) 2019 Baidu.com, Inc. All Rights Reserved
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * @file: filename
- * @desc: description
- * @author: yuanyijun@baidu.com
-  *****************************************************************************/
-#ifndef _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_LOOPS_VERIFY_AGENT_H
-#define _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_LOOPS_VERIFY_AGENT_H
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+#ifndef MODULES_MAP_TOOLS_MAP_DATACHECKER_LOOPS_VERIFY_AGENT_H
+#define MODULES_MAP_TOOLS_MAP_DATACHECKER_LOOPS_VERIFY_AGENT_H
 #include <grpc++/grpc++.h>
 #include <memory>
 #include <utility>
@@ -17,18 +23,17 @@
 #include "modules/map/tools/map_datachecker/laps_checker.h"
 #include "modules/map/tools/map_datachecker/pose_collection_agent.h"
 
-namespace adu {
-namespace workers {
-namespace collection {
+namespace apollo {
+namespace hdmap {
 
 enum class LoopsVerifyAgentState {
     IDLE,
     RUNNING
 };
 using LOOPS_VERIFY_REQUEST_TYPE
-    = const adu::workers::collection::LoopsVerifyRequest;
+    = const apollo::hdmap::LoopsVerifyRequest;
 using LOOPS_VERIFY_RESPONSE_TYPE
-    = adu::workers::collection::LoopsVerifyResponse;
+    = apollo::hdmap::LoopsVerifyResponse;
 
 class LoopsVerifyAgent {
  public:
@@ -73,8 +78,7 @@ class LoopsVerifyAgent {
     LoopsVerifyAgentState _state;
 };
 
-}  // namespace collection
-}  // namespace workers
-}  // namespace adu
+}  // namespace hdmap 
+}  // namespace apollo
 
-#endif  // _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_LOOPS_VERIFY_AGENT_H
+#endif  // MODULES_MAP_TOOLS_MAP_DATACHECKER_LOOPS_VERIFY_AGENT_H
