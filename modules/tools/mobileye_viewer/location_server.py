@@ -192,10 +192,10 @@ def decode_polyline(polyline_str):
 
 
 if __name__ == "__main__":
-    with open(os.path.dirname(os.path.abspath(__file__)) +
-              "/location_server_key", 'r') as f:
-    for line in f:
-        API_KEY = line.replace('\n', "")
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+              '/location_server_key'), 'r') as f:
+        for line in f:
+            API_KEY = line.replace('\n', "")
 
     add_listener()
     # thread.start_new_thread(run_flask, ())
