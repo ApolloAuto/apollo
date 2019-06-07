@@ -98,11 +98,10 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     ADEBUG << "Saving extracted features for learning locally.";
     return true;
   }
-  AERROR << "Start evaluate";
   // Step 1 Get social embedding
   torch::Tensor social_pooling = GetSocialPooling();
   std::vector<torch::jit::IValue> social_embedding_inputs;
-  social_embedding_inputs.push_back(social_pooling);
+  social_embedding_inputs.push_back(std::move(social_pooling));
   torch::Tensor social_embedding = torch_social_embedding_ptr_
       ->forward(social_embedding_inputs).toTensor().to(torch::kCPU);
 
@@ -158,7 +157,6 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       FLAGS_prediction_trajectory_time_length /
       FLAGS_prediction_trajectory_time_resolution);
   for (int i = 1; i < num_trajectory_point; ++i) {
-    AERROR << "########### i = " << i;
     double prev_x = trajectory->trajectory_point(i - 1).path_point().x();
     double prev_y = trajectory->trajectory_point(i - 1).path_point().y();
     Point3D position =
@@ -174,8 +172,6 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
         FLAGS_prediction_trajectory_time_resolution * i));
   }
 
-  AERROR << "Finish step 4 for loop";
-
   return true;
 }
 
@@ -183,7 +179,8 @@ Point3D PedestrianInteractionEvaluator::PredictNextPosition(
     const int obstacle_id, const double pos_x, const double pos_y,
     const torch::Tensor& social_embedding) {
   Point3D point;
-  CHECK(obstacle_id_lstm_state_map_.find(obstacle_id) != obstacle_id_lstm_state_map_.end());
+  CHECK(obstacle_id_lstm_state_map_.find(obstacle_id) !=
+        obstacle_id_lstm_state_map_.end());
   const auto& ht = obstacle_id_lstm_state_map_[obstacle_id].ht;
   const auto& ct = obstacle_id_lstm_state_map_[obstacle_id].ct;
   torch::Tensor torch_position = torch::zeros({1, 2});
@@ -193,34 +190,27 @@ Point3D PedestrianInteractionEvaluator::PredictNextPosition(
   position_embedding_inputs.push_back(std::move(torch_position));
   torch::Tensor position_embedding = torch_position_embedding_ptr_
       ->forward(position_embedding_inputs).toTensor().to(torch::kCPU);
-      AERROR << "3";
   torch::Tensor lstm_input =
       torch::zeros({1, 2 * (kEmbeddingSize + kHiddenSize)});
   for (int i = 0; i < kEmbeddingSize; ++i) {
     lstm_input[0][i] = position_embedding[0][i];
     lstm_input[0][kEmbeddingSize + i] = social_embedding[0][i];
   }
-  AERROR << "3.5";
   for (int i = 0; i < kHiddenSize; ++i) {
-    lstm_input[0][2 * kEmbeddingSize + i] = ht[0][i];
-    AERROR << "haha";
-    lstm_input[0][2 * kEmbeddingSize + kHiddenSize + i] = ct[0][i];
+    lstm_input[0][2 * kEmbeddingSize + i] = ht[0][0][i];
+    lstm_input[0][2 * kEmbeddingSize + kHiddenSize + i] = ct[0][0][i];
   }
-  AERROR << "4";
   std::vector<torch::jit::IValue> lstm_inputs;
   lstm_inputs.push_back(std::move(lstm_input));
   auto lstm_out_tuple = torch_single_lstm_ptr_->forward(lstm_inputs).toTuple();
-  AERROR << "5";
-  auto new_ht = lstm_out_tuple->elements()[0].toTensor();
+  auto new_ht = lstm_out_tuple->elements()[0].toTensor()[0];
   std::vector<torch::jit::IValue> prediction_inputs;
   prediction_inputs.push_back(std::move(new_ht));
   auto pred_out_tensor = torch_prediction_layer_ptr_
       ->forward(prediction_inputs).toTensor().to(torch::kCPU);
-  AERROR << "6";
   auto pred_out = pred_out_tensor.accessor<float, 2>();
   point.set_x(static_cast<double>(pred_out[0][0]));
   point.set_y(static_cast<double>(pred_out[0][1]));
-  AERROR << "7";
   return point;
 }
 
