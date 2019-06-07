@@ -83,6 +83,10 @@ class PedestrianInteractionEvaluator : public Evaluator {
 
   torch::Tensor GetSocialPooling();
 
+  apollo::common::Point3D PredictNextPosition(const int obstacle_id,
+      const double pos_x, const double pos_y,
+      const torch::Tensor& social_embedding);
+
  private:
   std::unordered_map<int, LSTMState> obstacle_id_lstm_state_map_;
   std::shared_ptr<torch::jit::script::Module> torch_position_embedding_ptr_ =
