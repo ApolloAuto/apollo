@@ -84,8 +84,7 @@ int Destination::MakeDecisions(Frame* frame,
   if (FLAGS_enable_scenario_pull_over) {
     const auto& pull_over_status =
         PlanningContext::Instance()->planning_status().pull_over();
-    if (pull_over_status.is_feasible() &&
-        pull_over_status.has_position() &&
+    if (pull_over_status.is_feasible() && pull_over_status.has_position() &&
         pull_over_status.position().has_x() &&
         pull_over_status.position().has_y()) {
       // build stop decision based on pull-over position

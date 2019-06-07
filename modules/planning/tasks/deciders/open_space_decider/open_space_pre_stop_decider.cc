@@ -82,8 +82,7 @@ bool OpenSpacePreStopDecider::CheckPullOverPreStop(
   *target_s = 0.0;
   const auto& pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
-  if (pull_over_status.has_position() &&
-      pull_over_status.position().has_x() &&
+  if (pull_over_status.has_position() && pull_over_status.position().has_x() &&
       pull_over_status.position().has_y()) {
     common::SLPoint pull_over_sl;
     const auto& reference_line = reference_line_info->reference_line();
