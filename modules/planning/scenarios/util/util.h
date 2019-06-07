@@ -40,6 +40,11 @@ hdmap::PathOverlap* GetOverlapOnReferenceLine(
 PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
                                 const ScenarioPullOverConfig& scenario_config);
 
+PullOverStatus CheckADCPullOverPathPoint(
+    const ReferenceLineInfo& reference_line_info,
+    const ScenarioPullOverConfig& scenario_config,
+    const common::PathPoint& path_point);
+
 PullOverStatus CheckADCPullOverOpenSpace(
     const ScenarioPullOverConfig& scenario_config);
 
@@ -48,7 +53,8 @@ bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
                                const common::math::Vec2d& adc_position,
                                const double adc_theta,
                                const common::math::Vec2d& target_position,
-                               const double target_theta);
+                               const double target_theta,
+                               const bool check_s);
 
 bool CheckPullOverPositionByDistance(
     const ScenarioPullOverConfig& scenario_config,
