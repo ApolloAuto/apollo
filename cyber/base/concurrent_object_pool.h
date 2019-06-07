@@ -67,7 +67,7 @@ class CCObjectPool : public std::enable_shared_from_this<CCObjectPool<T>> {
   CCObjectPool &operator=(CCObjectPool &) = delete;
   bool FindFreeHead(Head *head);
   void ReleaseObject(T *);
- 
+
   std::atomic<Head> free_head_;
   Node *node_arena_ = nullptr;
   uint32_t capacity_ = 0;
