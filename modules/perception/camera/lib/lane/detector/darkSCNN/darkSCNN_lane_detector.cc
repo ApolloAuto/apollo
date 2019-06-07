@@ -112,7 +112,7 @@ bool DarkSCNNLaneDetector::Init(const LaneDetectorInitOptions &options) {
     AINFO << "net output blobs: " << name;
   }
 
-  // initilize caffe net
+  // initialize caffe net
   const auto &model_type = model_param.model_type();
   AINFO << "model_type: " << model_type;
   cnnadapter_lane_.reset(

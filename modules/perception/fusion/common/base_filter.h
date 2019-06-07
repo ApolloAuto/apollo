@@ -32,7 +32,7 @@ class BaseFilter {
   // @brief destructor
   virtual ~BaseFilter() {}
 
-  // @brief filter initilized
+  // @brief filter initialized
   // @params[IN] gloabl_states: a vector contains system states(
   //             position, velocity etc.)
   // @params[IN] global_uncertainty: a covariance matrix which

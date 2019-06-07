@@ -317,7 +317,7 @@ PyObject *cyber_PyRecordWriter_Close(PyObject *self, PyObject *args) {
   auto writer = (apollo::cyber::record::PyRecordWriter *)PyCapsule_GetPointer(
       pyobj_rec_writer, "apollo_cyber_record_pyrecordfilewriter");
   if (nullptr == writer) {
-    AERROR << "cyber_PyRecordWriterer_Close: writer is null!";
+    AERROR << "cyber_PyRecordWriter_Close: writer is null!";
     Py_INCREF(Py_None);
     return Py_None;
   }
