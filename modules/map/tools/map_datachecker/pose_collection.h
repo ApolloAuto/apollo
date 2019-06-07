@@ -42,6 +42,6 @@ class PoseCollection {
 };
 
 }  // namespace hdmap
-}  // namespace apollo 
+}  // namespace apollo
 
 #endif  // _MODULES_HMI_WORKERS_MAP_DATACHECKER_INCLUDE_POSE_COLLECTION_H

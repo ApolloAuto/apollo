@@ -33,6 +33,6 @@ class PJTransformer {
 };
 
 }  // namespace hdmap
-}  // namespace apollo 
+}  // namespace apollo
 
 #endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_PJ_TRANSFORMER_H

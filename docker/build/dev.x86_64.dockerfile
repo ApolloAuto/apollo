@@ -1,47 +1,46 @@
 FROM nvidia/cuda:8.0-cudnn7-devel-ubuntu14.04
 
 ENV DEBIAN_FRONTEND=noninteractive
-# ADD sources.list /etc/apt/
-ADD resolv.conf /etc/
-# RUN apt-get update -y && \
-#     apt-get install -y \
-#     apt-transport-https \
-#     bc \
-#     build-essential \
-#     cmake \
-#     cppcheck \
-#     curl \
-#     curlftpfs \
-#     debconf-utils \
-#     doxygen \
-#     gdb \
-#     git \
-#     google-perftools \
-#     graphviz \
-#     lcov \
-#     libblas-dev \
-#     libboost-all-dev \
-#     libcurl4-openssl-dev \
-#     libfreetype6-dev \
-#     liblapack-dev \
-#     libpcap-dev \
-#     libsqlite3-dev \
-#     libgtest-dev \
-#     locate \
-#     lsof \
-#     nfs-common \
-#     realpath \
-#     shellcheck \
-#     software-properties-common \
-#     sshfs \
-#     subversion \
-#     unzip \
-#     v4l-utils \
-#     vim \
-#     wget \
-#     zip && \
-#     apt-get clean && rm -rf /var/lib/apt/lists/* && \
-#     echo '\n\n\n' | ssh-keygen -t rsa
+
+RUN apt-get update -y && \
+    apt-get install -y \
+    apt-transport-https \
+    bc \
+    build-essential \
+    cmake \
+    cppcheck \
+    curl \
+    curlftpfs \
+    debconf-utils \
+    doxygen \
+    gdb \
+    git \
+    google-perftools \
+    graphviz \
+    lcov \
+    libblas-dev \
+    libboost-all-dev \
+    libcurl4-openssl-dev \
+    libfreetype6-dev \
+    liblapack-dev \
+    libpcap-dev \
+    libsqlite3-dev \
+    libgtest-dev \
+    locate \
+    lsof \
+    nfs-common \
+    realpath \
+    shellcheck \
+    software-properties-common \
+    sshfs \
+    subversion \
+    unzip \
+    v4l-utils \
+    vim \
+    wget \
+    zip && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* && \
+    echo '\n\n\n' | ssh-keygen -t rsa
 
 # Run installers.
 COPY installers /tmp/installers

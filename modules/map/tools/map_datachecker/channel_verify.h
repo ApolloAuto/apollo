@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_CHANNEL_CHECKER_H
-#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_CHANNEL_CHECKER_H 
+#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_CHANNEL_CHECKER_H
 #include <vector>
 #include <string>
 #include <map>
@@ -79,7 +79,7 @@ class ChannelVerify {
     std::set<std::string> _checked_records;
 };
 
-}  // namespace hdmap 
+}  // namespace hdmap
 }  // namespace apollo
 
-#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_CHANNEL_CHECKER_H 
+#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_CHANNEL_CHECKER_H

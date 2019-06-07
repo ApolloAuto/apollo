@@ -36,6 +36,6 @@ class Mapdatachecker {
 };
 
 }  // namespace hdmap
-}  // namespace apollo 
+}  // namespace apollo
 
 #endif  // MODULES_MAP_TOOLS_MAP_DATACHECKER_WORKER_H

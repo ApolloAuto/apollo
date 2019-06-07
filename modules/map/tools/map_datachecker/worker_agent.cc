@@ -91,4 +91,4 @@ MapDataCheckerAgent::LoopsVerify(
 }
 
 }  // namespace hdmap
-}  // namespace apollo 
+}  // namespace apollo

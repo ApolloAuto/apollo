@@ -45,7 +45,7 @@ class PoseCollectionAgent {
     std::shared_ptr<PJTransformer> _sp_pj_transformer = nullptr;
 };
 
-}  // namespace hdmap 
+}  // namespace hdmap
 }  // namespace apollo
 
 

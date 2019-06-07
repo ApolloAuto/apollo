@@ -419,4 +419,4 @@ ErrorCode LapsChecker::get_return_state() {
 }
 
 }  // namespace hdmap
-}  // namespace apollo 
+}  // namespace apollo

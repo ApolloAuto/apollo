@@ -303,5 +303,5 @@ LoopsVerifyAgentState LoopsVerifyAgent::get_state() {
     return _state;
 }
 
-}  // namespace hdmap 
+}  // namespace hdmap
 }  // namespace apollo

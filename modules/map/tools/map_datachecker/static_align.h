@@ -62,7 +62,7 @@ class StaticAlign: public Alignment {
     Centroid3D _dynamic_centroid;
 };
 
-}  // namespace hdmap 
+}  // namespace hdmap
 }  // namespace apollo
 
 #endif  // #ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_STATIC_ALIGN_H

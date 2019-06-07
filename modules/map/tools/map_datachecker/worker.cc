@@ -74,5 +74,5 @@ bool Mapdatachecker::Stop() {
 void Mapdatachecker::Report() {
 }
 
-}  // namespace hdmap 
+}  // namespace hdmap
 }  // namespace apollo

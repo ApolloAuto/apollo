@@ -44,7 +44,7 @@ class EightRoute: public Alignment {
     double _last_yaw;
 };
 
-}  // namespace hdmap 
+}  // namespace hdmap
 }  // namespace apollo
 
 #endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_EIGHT_ROUTE_H

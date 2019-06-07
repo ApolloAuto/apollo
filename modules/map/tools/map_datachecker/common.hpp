@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_COMMON_HPP
-#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_COMMON_HPP 
+#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_COMMON_HPP
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -245,7 +245,7 @@ inline double unixtime_now() {
     return apollo::cyber::Time::Now().ToSecond();
 }
 
-}  // namespace hdmap 
+}  // namespace hdmap
 }  // namespace apollo
 
-#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_COMMON_HPP 
+#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_COMMON_HPP

@@ -195,8 +195,8 @@ using STATIC_ALIGN_AGENT_TYPE
 using EIGHT_ROUTE_AGENT_TYPE
     = AlignmentAgent<EightRoute, EIGHTROUTE_REQUEST_TYPE,
     EIGHTROUTE_RESPONSE_TYPE>;
-}  // namespace hdmap 
+}  // namespace hdmap
 }  // namespace apollo
 
 
-#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_ALIGNMENT_AGENT_HPP 
+#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_ALIGNMENT_AGENT_HPP

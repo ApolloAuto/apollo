@@ -70,7 +70,7 @@ class MapDataCheckerAgent final:
     std::shared_ptr<LoopsVerifyAgent> _sp_loops_verify_agent = nullptr;
 };
 
-}  // namespace hdmap 
+}  // namespace hdmap
 }  // namespace apollo
 
 #endif  // MODULES_MAP_TOOLS_MAP_DATACHECKER_WORKER_AGENT_H

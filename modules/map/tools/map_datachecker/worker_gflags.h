@@ -29,7 +29,7 @@ DECLARE_string(map_datachecker_port);
 DECLARE_string(topic_bestgnsspos);
 DECLARE_string(conf_json);
 
-}  // namespace hdmap 
+}  // namespace hdmap
 }  // namespace apollo
 
 #endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_WORKER_GFLAGS_H

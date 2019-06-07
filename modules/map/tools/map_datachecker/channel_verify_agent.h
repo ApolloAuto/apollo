@@ -88,8 +88,7 @@ class ChannelVerifyAgent {
     std::thread::id _check_thread_id;
 };
 
-}  // namespace hdmap 
+}  // namespace hdmap
 }  // namespace apollo
 
-
-#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_CHANNEL_CHEKCER_AGENT_H 
+#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_CHANNEL_CHEKCER_AGENT_H

@@ -78,7 +78,7 @@ class LoopsVerifyAgent {
     LoopsVerifyAgentState _state;
 };
 
-}  // namespace hdmap 
+}  // namespace hdmap
 }  // namespace apollo
 
 #endif  // MODULES_MAP_TOOLS_MAP_DATACHECKER_LOOPS_VERIFY_AGENT_H

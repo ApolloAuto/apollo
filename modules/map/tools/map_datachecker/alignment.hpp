@@ -148,4 +148,4 @@ class Alignment {
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_ALIGNMENT_HPP 
+#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_ALIGNMENT_HPP

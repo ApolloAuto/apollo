@@ -229,5 +229,5 @@ ErrorCode ChannelVerify::get_return_state() {
     return _return_state;
 }
 
-}  // namespace hdmap 
+}  // namespace hdmap
 }  // namespace apollo

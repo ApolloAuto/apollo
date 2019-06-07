@@ -38,5 +38,5 @@ std::shared_ptr<std::vector<FramePose>> PoseCollection::get_poses() {
     return _sp_poses;
 }
 
-}  // namespace hdmap 
+}  // namespace hdmap
 }  // namespace apollo

@@ -39,5 +39,5 @@ DEFINE_string(
     "/apollo/modules/map/tools/map_datachecker/conf/map-datachecker.json",
     "configure file");
 
-}  // namespace hdmap 
+}  // namespace hdmap
 }  // namespace apollo

@@ -168,5 +168,5 @@ double EightRoute::get_progress() {
     return _progress;
 }
 
-}  // namespace hdmap 
+}  // namespace hdmap
 }  // namespace apollo
