@@ -239,6 +239,7 @@ class OfflineLidarObstaclePerception {
         case base::ObjectType::UNKNOWN:
         case base::ObjectType::UNKNOWN_MOVABLE:
         case base::ObjectType::UNKNOWN_UNMOVABLE:
+          break;
         default:
           break;
       }
