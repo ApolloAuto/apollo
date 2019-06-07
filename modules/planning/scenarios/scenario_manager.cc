@@ -976,8 +976,8 @@ void ScenarioManager::UpdatePlanningContextPullOverScenario(
 
   const auto& pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
-  if (pull_over_status.has_position() && pull_over_status.position().has_x()
-      && pull_over_status.position().has_y()) {
+  if (pull_over_status.has_position() && pull_over_status.position().has_x() &&
+      pull_over_status.position().has_y()) {
     const auto& routing = frame.local_view().routing;
     if (routing->routing_request().waypoint_size() >= 2) {
       // keep pull-over stop fence if destination not changed

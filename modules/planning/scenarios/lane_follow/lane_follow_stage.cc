@@ -285,7 +285,8 @@ void LaneFollowStage::PlanFallbackTrajectory(
   const double min_speed_limit_v =
       reference_line_info->st_graph_data().is_initialized()
           ? reference_line_info->st_graph_data()
-              .speed_limit().GetMinSpeedLimitV()
+                .speed_limit()
+                .GetMinSpeedLimitV()
           : std::numeric_limits<double>::infinity();
   const double curr_speed_distance =
       FLAGS_fallback_total_time *
