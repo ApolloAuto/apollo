@@ -80,7 +80,7 @@ export default class ControlData {
         const steeringAngle = adc.steeringAngle / vehicleParam.steerRatio;
         let R = null;
         if (Math.abs(Math.tan(steeringAngle)) > 0.0001) {
-            R = vehicleParam.length / Math.tan(steeringAngle);
+            R = vehicleParam.wheelBase / Math.tan(steeringAngle);
         } else {
             R = 100000;
         }

@@ -513,7 +513,7 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
   auto_driving_car->set_steering_angle(steering_angle);
 
   double kappa = std::tan(steering_angle / vehicle_param.steer_ratio()) /
-                 vehicle_param.length();
+                 vehicle_param.wheel_base();
   auto_driving_car->set_kappa(kappa);
 
   UpdateTurnSignal(chassis.signal(), auto_driving_car);
