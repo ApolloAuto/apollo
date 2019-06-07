@@ -40,7 +40,6 @@ namespace planning {
 class DistanceApproachProblem {
  public:
   explicit DistanceApproachProblem(
-
       const PlannerOpenSpaceConfig& planner_open_space_config);
 
   virtual ~DistanceApproachProblem() = default;

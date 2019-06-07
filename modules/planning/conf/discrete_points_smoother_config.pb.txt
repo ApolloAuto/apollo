@@ -9,20 +9,8 @@ wide_lane_shift_ratio : 0.5
 lateral_buffer : 0.2
 
 discrete_points {
-  cos_theta_smoothing {
-    use_cos_theta: false
-    weight_cos_included_angle: 1e5
-    weight_anchor_points: 1.0
-    weight_length: 1.0
-    print_level: 0
-    max_num_of_iterations: 500
-    acceptable_num_of_iterations: 15
-    tol: 1e-8
-    acceptable_tol: 1e-1
-    ipopt_use_automatic_differentiation: true
-  }
-  fem_pos_smoothing {
-    use_fem_pos: true
+  smoothing_method: FEM_POS_DEVIATION_SMOOTHING
+  fem_pos_deviation_smoothing {
     weight_fem_pose_deviation: 1e10
     weight_ref_deviation: 1.0
     weight_path_length: 1.0
