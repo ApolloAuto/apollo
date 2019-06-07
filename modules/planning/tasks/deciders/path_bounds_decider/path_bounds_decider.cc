@@ -351,10 +351,9 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(
                                ->mutable_pull_over();
   // If already found a pull-over position, simply check if it's valid.
   if (pull_over_status->is_feasible() && pull_over_status->has_position()) {
-    int curr_idx = IsPointWithinPathBound(reference_line_info,
-                                          pull_over_status->position().x(),
-                                          pull_over_status->position().y(),
-                                          *path_bound);
+    int curr_idx = IsPointWithinPathBound(
+        reference_line_info, pull_over_status->position().x(),
+        pull_over_status->position().y(), *path_bound);
     if (curr_idx >= 0) {
       // Trim path-bound properly.
       while (static_cast<int>(path_bound->size()) - 1 >
@@ -398,9 +397,9 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(
   pull_over_status->set_width_right(
       VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0);
 
-  ADEBUG << "Pull Over: x[" << pull_over_status->position().x()
-         << "] y[" <<  pull_over_status->position().y()
-         << "] theta[" << pull_over_status->theta() << "]";
+  ADEBUG << "Pull Over: x[" << pull_over_status->position().x() << "] y["
+         << pull_over_status->position().y() << "] theta["
+         << pull_over_status->theta() << "]";
 
   while (static_cast<int>(path_bound->size()) - 1 >
          std::get<3>(pull_over_configuration) + kNumExtraTailBoundPoint) {

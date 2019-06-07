@@ -170,7 +170,6 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
                                         FLAGS_lateral_derivative_bound_default);
   piecewise_jerk_problem.set_dddx_bound(FLAGS_lateral_jerk_bound);
 
-
   /**
   // Experimental code to be tested
   // TODO(all): find the params in vehicle config
