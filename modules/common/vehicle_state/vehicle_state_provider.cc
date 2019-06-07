@@ -45,8 +45,7 @@ Status VehicleStateProvider::Update(
   }
   if (localization.has_measurement_time()) {
     vehicle_state_.set_timestamp(localization.measurement_time());
-  } else if (localization.has_header()
-      && localization.header().has_timestamp_sec()) {
+  } else if (localization.header().has_timestamp_sec()) {
     vehicle_state_.set_timestamp(localization.header().timestamp_sec());
   } else if (chassis.has_header() && chassis.header().has_timestamp_sec()) {
     AERROR << "Unable to use location timestamp for vehicle state. Use chassis "
