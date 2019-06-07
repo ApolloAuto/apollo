@@ -145,6 +145,7 @@ stage_config: {
         task_type: OPEN_SPACE_ROI_DECIDER
         open_space_roi_decider_config {
             roi_type: PULL_OVER
+            perception_obstacle_buffer: 0.25
         }
     }
     task_config: {
