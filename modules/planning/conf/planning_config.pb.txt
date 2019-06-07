@@ -218,9 +218,11 @@ default_task_config: {
     initial_gear_check_horizon: 15
     heading_search_range: 0.79
     heading_track_range: 1.57
-    vehicle_box_iou_threshold: 0.9
     distance_search_range: 2.0
-    distance_to_midpoint: 0.1
+    heading_offset_to_midpoint: 0.79
+    lateral_offset_to_midpoint: 0.5
+    longitudinal_offset_to_midpoint: 0.2
+    vehicle_box_iou_threshold_to_midpoint: 0.9
   }
 }
 default_task_config: {
