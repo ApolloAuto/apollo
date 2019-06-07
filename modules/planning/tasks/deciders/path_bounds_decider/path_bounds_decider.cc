@@ -586,8 +586,6 @@ bool PathBoundsDecider::SearchPullOverPosition(
       HDMapUtil::BaseMap().GetNearestLaneWithHeading(
           point, 5.0, pull_over_theta, M_PI_2, &lane, &s, &l);
       pull_over_theta = lane->Heading(s);
-      AERROR << "reference line heading " << reference_point.heading();
-      AERROR << "pull_over_theta " << pull_over_theta;
 
       *pull_over_configuration = std::make_tuple(pull_over_x, pull_over_y,
                                                  pull_over_theta, (i + j) / 2);
