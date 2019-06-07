@@ -19,6 +19,7 @@
 #include <utility>
 #include <vector>
 
+#include "modules/common/math/vec2d.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
@@ -30,7 +31,9 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
+using apollo::common::math::Vec2d;
 using apollo::common::Point3D;
+using apollo::common::TrajectoryPoint;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 
@@ -133,7 +136,34 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   obstacle_id_lstm_state_map_[id].ht = new_ht;
   obstacle_id_lstm_state_map_[id].ct = new_ct;
 
-  // TODO(kechxu) Step 4 for-loop get a trajectory
+  // Step 4 for-loop get a trajectory
+  // Set the starting trajectory point
+  Trajectory* trajectory = latest_feature_ptr->add_predicted_trajectory();
+  trajectory->set_probability(1.0);
+  TrajectoryPoint* start_point = trajectory->add_trajectory_point();
+  start_point->mutable_path_point()->set_x(pos_x);
+  start_point->mutable_path_point()->set_y(pos_y);
+  start_point->mutable_path_point()->set_theta(latest_feature_ptr->theta());
+  start_point->set_v(latest_feature_ptr->speed());
+  start_point->set_relative_time(0.0);
+
+
+  int num_trajectory_point = static_cast<int>(
+      FLAGS_prediction_trajectory_time_length /
+      FLAGS_prediction_trajectory_time_resolution);
+  for (int i = 1; i < num_trajectory_point; ++i) {
+    double prev_x = trajectory->trajectory_point(i - 1).path_point().x();
+    double prev_y = trajectory->trajectory_point(i - 1).path_point().y();
+    Point3D position =
+        PredictNextPosition(id, prev_x, prev_y, social_embedding);
+    TrajectoryPoint* point = trajectory->add_trajectory_point();
+    point->mutable_path_point()->set_x(position.x());
+    point->mutable_path_point()->set_y(position.y());
+    Vec2d direction(position.x() - prev_x, position.y() - prev_y);
+    double distance = direction.Length();
+    point->set_v(distance / FLAGS_prediction_trajectory_time_resolution);
+    point->mutable_path_point()->set_theta(direction.Angle());
+  }
 
   return true;
 }
