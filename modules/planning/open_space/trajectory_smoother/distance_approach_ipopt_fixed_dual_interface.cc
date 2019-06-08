@@ -347,6 +347,14 @@ bool DistanceApproachIPOPTFixedDualInterface::get_starting_point(
         0.5 * (min_time_sample_scaling_ + max_time_sample_scaling_);
   }
 
+  // check initial states
+  if (distance_approach_config_.enable_check_initial_state()) {
+    int kM = m;
+    double g[kM];
+    eval_g(n, x, true, m, g);
+    check_g(n, x, m, g);
+  }
+
   ADEBUG << "get_starting_point out";
   return true;
 }
