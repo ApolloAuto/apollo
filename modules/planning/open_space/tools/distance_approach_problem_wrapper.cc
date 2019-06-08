@@ -220,6 +220,32 @@ void AddObstacle(ObstacleContainer* obstacles_ptr,
   obstacles_ptr->AddObstacle(ROI_distance_approach_parking_boundary);
 }
 
+double InterpolateUsingLinearApproximation(const double p0,
+                                           const double p1,
+                                           const double w) {
+  return p0 * (1.0 - w) + p1 * w;
+}
+
+std::vector<double> VectorLinearInterpolation(
+    const std::vector<double>& x, int extend_size) {
+  // interplation example:
+  // x: [x0, x1, x2], extend_size: 3
+  // output: [y0(x0), y1, y2, y3(x1), y4, y5, y6(x2)]
+  size_t origin_last = x.size() - 1;
+  std::vector<double> res(origin_last * extend_size + 1, 0.0);
+
+  for (size_t i = 0; i < origin_last * extend_size; ++i) {
+    size_t idx0 = i / extend_size;
+    size_t idx1 = idx0 + 1;
+    double w = static_cast<double>(i % extend_size) /
+        static_cast<double>(extend_size);
+    res[i] = InterpolateUsingLinearApproximation(x[idx0], x[idx1], w);
+  }
+
+  res.back() = x.back();
+  return res;
+}
+
 bool DistanceSmoothing(
     const apollo::planning::PlannerOpenSpaceConfig& planner_open_space_config,
     const ObstacleContainer& obstacles, double sx, double sy, double sphi,
@@ -229,20 +255,81 @@ bool DistanceSmoothing(
     Eigen::MatrixXd* dual_l_result_ds_, Eigen::MatrixXd* dual_n_result_ds_) {
   // load Warm Start result(horizon is the "N", not the size of step points)
   size_t horizon_ = hybrid_a_star_result->x.size() - 1;
+  // nominal sampling time
+  float ts_ = planner_open_space_config.delta_t();
+
+  Eigen::VectorXd x;
+  Eigen::VectorXd y;
+  Eigen::VectorXd phi;
+  Eigen::VectorXd v;
+  Eigen::VectorXd steer;
+  Eigen::VectorXd a;
+
+  // TODO(Runxin): extend logics in future
+  if (horizon_ <= 10 &&
+      horizon_ > 2 &&
+      planner_open_space_config.enable_linear_interpolation()) {
+    // TODO(Runxin): extend this number
+    int extend_size = 5;
+    // modify state and control vectors sizes
+    horizon_ = extend_size * horizon_;
+    // modify delta t
+    ts_ = ts_ / static_cast<float>(extend_size);
+
+    std::vector<double> x_extend =
+        VectorLinearInterpolation(hybrid_a_star_result->x, extend_size);
+    x = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+        x_extend.data(), horizon_ + 1);
+
+    std::vector<double> y_extend =
+        VectorLinearInterpolation(hybrid_a_star_result->y, extend_size);
+    y = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+        y_extend.data(), horizon_ + 1);
+
+    std::vector<double> phi_extend =
+        VectorLinearInterpolation(hybrid_a_star_result->phi, extend_size);
+    phi = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+        phi_extend.data(), horizon_ + 1);
+
+    std::vector<double> v_extend =
+        VectorLinearInterpolation(hybrid_a_star_result->v, extend_size);
+    v = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+        v_extend.data(), horizon_ + 1);
+
+    steer = Eigen::VectorXd(horizon_);
+    a = Eigen::VectorXd(horizon_);
+    for (size_t i = 0; i < static_cast<size_t>(horizon_); ++i) {
+      steer[i] = hybrid_a_star_result->steer[i / extend_size];
+      a[i] = hybrid_a_star_result->a[i / extend_size];
+    }
+    ADEBUG << "hybrid A x: ";
+    for (size_t i = 0; i < hybrid_a_star_result->x.size(); ++i) {
+      ADEBUG << "i: " << i << ", val: " << hybrid_a_star_result->x[i];
+    }
+    ADEBUG << "interpolated x: \n" << x;
+
+    ADEBUG << "hybrid A steer: ";
+    for (size_t i = 0; i < hybrid_a_star_result->steer.size(); ++i) {
+      ADEBUG << "i: " << i << ", val: " << hybrid_a_star_result->steer[i];
+    }
+    ADEBUG << "interpolated steer: \n" << steer;
+  } else {
+    x = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+        hybrid_a_star_result->x.data(), horizon_ + 1);
+    y = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+        hybrid_a_star_result->y.data(), horizon_ + 1);
+    phi = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+        hybrid_a_star_result->phi.data(), horizon_ + 1);
+    v = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+        hybrid_a_star_result->v.data(), horizon_ + 1);
+    steer = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+        hybrid_a_star_result->steer.data(), horizon_);
+    a = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
+        hybrid_a_star_result->a.data(), horizon_);
+  }
+
   Eigen::MatrixXd xWS = Eigen::MatrixXd::Zero(4, horizon_ + 1);
   Eigen::MatrixXd uWS = Eigen::MatrixXd::Zero(2, horizon_);
-  Eigen::VectorXd x = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-      hybrid_a_star_result->x.data(), horizon_ + 1);
-  Eigen::VectorXd y = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-      hybrid_a_star_result->y.data(), horizon_ + 1);
-  Eigen::VectorXd phi = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-      hybrid_a_star_result->phi.data(), horizon_ + 1);
-  Eigen::VectorXd v = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-      hybrid_a_star_result->v.data(), horizon_ + 1);
-  Eigen::VectorXd steer = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-      hybrid_a_star_result->steer.data(), horizon_);
-  Eigen::VectorXd a = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-      hybrid_a_star_result->a.data(), horizon_);
   xWS.row(0) = x;
   xWS.row(1) = y;
   xWS.row(2) = phi;
@@ -261,9 +348,6 @@ bool DistanceSmoothing(
 
   common::VehicleParam vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
-
-  // nominal sampling time
-  float ts_ = planner_open_space_config.delta_t();
 
   // load vehicle configuration
   Eigen::MatrixXd ego_(4, 1);
