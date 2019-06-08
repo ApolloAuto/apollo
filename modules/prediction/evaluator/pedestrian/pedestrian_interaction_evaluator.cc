@@ -38,7 +38,9 @@ using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 
 PedestrianInteractionEvaluator::PedestrianInteractionEvaluator()
-    : device_(torch::kCPU) { }
+    : device_(torch::kCPU) {
+  LoadModel();
+}
 
 void PedestrianInteractionEvaluator::Clear() {
   auto ptr_obstacles_container =
@@ -119,11 +121,15 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       torch::zeros({1, 2 * (kEmbeddingSize + kHiddenSize)});
   for (int i = 0; i < kEmbeddingSize; ++i) {
     lstm_input[0][i] = position_embedding[0][i];
-    lstm_input[0][kEmbeddingSize + i] = position_embedding[0][i];
+    lstm_input[0][kEmbeddingSize + i] = social_embedding[0][i];
   }
-  // TODO(kechxu) if not found in the unordered_map, use h0 and c0
-  torch::Tensor curr_ht = obstacle_id_lstm_state_map_[id].ht;
-  torch::Tensor curr_ct = obstacle_id_lstm_state_map_[id].ct;
+  torch::Tensor curr_ht = torch::zeros({1, kHiddenSize});
+  torch::Tensor curr_ct = torch::zeros({1, kHiddenSize});
+  if (obstacle_id_lstm_state_map_.find(id) !=
+      obstacle_id_lstm_state_map_.end()) {
+    curr_ht = obstacle_id_lstm_state_map_[id].ht;
+    curr_ct = obstacle_id_lstm_state_map_[id].ct;
+  }
   for (int i = 0; i < kHiddenSize; ++i) {
     lstm_input[0][2 * kEmbeddingSize + i] = curr_ht[0][i];
     lstm_input[0][2 * kEmbeddingSize + kHiddenSize + i] = curr_ct[0][i];
@@ -162,6 +168,8 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     double distance = direction.Length();
     point->set_v(distance / FLAGS_prediction_trajectory_time_resolution);
     point->mutable_path_point()->set_theta(direction.Angle());
+    point->set_relative_time(static_cast<double>(
+        FLAGS_prediction_trajectory_time_resolution * i));
   }
 
   return true;
@@ -171,6 +179,8 @@ Point3D PedestrianInteractionEvaluator::PredictNextPosition(
     const int obstacle_id, const double pos_x, const double pos_y,
     const torch::Tensor& social_embedding) {
   Point3D point;
+  CHECK(obstacle_id_lstm_state_map_.find(obstacle_id) !=
+        obstacle_id_lstm_state_map_.end());
   const auto& ht = obstacle_id_lstm_state_map_[obstacle_id].ht;
   const auto& ct = obstacle_id_lstm_state_map_[obstacle_id].ct;
   torch::Tensor torch_position = torch::zeros({1, 2});
@@ -184,16 +194,16 @@ Point3D PedestrianInteractionEvaluator::PredictNextPosition(
       torch::zeros({1, 2 * (kEmbeddingSize + kHiddenSize)});
   for (int i = 0; i < kEmbeddingSize; ++i) {
     lstm_input[0][i] = position_embedding[0][i];
-    lstm_input[0][kEmbeddingSize + i] = position_embedding[0][i];
+    lstm_input[0][kEmbeddingSize + i] = social_embedding[0][i];
   }
   for (int i = 0; i < kHiddenSize; ++i) {
-    lstm_input[0][2 * kEmbeddingSize + i] = ht[0][i];
-    lstm_input[0][2 * kEmbeddingSize + kHiddenSize + i] = ct[0][i];
+    lstm_input[0][2 * kEmbeddingSize + i] = ht[0][0][i];
+    lstm_input[0][2 * kEmbeddingSize + kHiddenSize + i] = ct[0][0][i];
   }
   std::vector<torch::jit::IValue> lstm_inputs;
   lstm_inputs.push_back(std::move(lstm_input));
   auto lstm_out_tuple = torch_single_lstm_ptr_->forward(lstm_inputs).toTuple();
-  auto new_ht = lstm_out_tuple->elements()[0].toTensor();
+  auto new_ht = lstm_out_tuple->elements()[0].toTensor()[0];
   std::vector<torch::jit::IValue> prediction_inputs;
   prediction_inputs.push_back(std::move(new_ht));
   auto pred_out_tensor = torch_prediction_layer_ptr_
@@ -201,7 +211,6 @@ Point3D PedestrianInteractionEvaluator::PredictNextPosition(
   auto pred_out = pred_out_tensor.accessor<float, 2>();
   point.set_x(static_cast<double>(pred_out[0][0]));
   point.set_y(static_cast<double>(pred_out[0][1]));
-
   return point;
 }
 
@@ -216,22 +225,12 @@ bool PedestrianInteractionEvaluator::ExtractFeatures(
   int id = obstacle_ptr->latest_feature().id();
   double pos_x = obstacle_ptr->latest_feature().position().x();
   double pos_y = obstacle_ptr->latest_feature().position().y();
-  auto ptr_ego_pose_container =
-      ContainerManager::Instance()->GetContainer<PoseContainer>(
-          AdapterConfig::LOCALIZATION);
-  CHECK_NOTNULL(ptr_ego_pose_container);
-  const PerceptionObstacle* ptr_ego_vehicle =
-      ptr_ego_pose_container->ToPerceptionObstacle();
-  double adc_x = ptr_ego_vehicle->position().x();
-  double adc_y = ptr_ego_vehicle->position().y();
 
   // Insert it into the feature_values.
   feature_values->push_back(timestamp);
   feature_values->push_back(id * 1.0);
   feature_values->push_back(pos_x);
   feature_values->push_back(pos_y);
-  feature_values->push_back(adc_x);
-  feature_values->push_back(adc_y);
 
   return true;
 }
