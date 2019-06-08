@@ -84,7 +84,7 @@ class MLPEvaluator : public Evaluator {
                             std::vector<double>* feature_values);
 
   /**
-   * @brief Load mode file
+   * @brief Load model file
    * @param Model file name
    */
   void LoadModel(const std::string& model_file);
