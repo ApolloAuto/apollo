@@ -8,9 +8,5 @@ cc_library(
         "lib/libpaddle_fluid.a",
         "lib/libpaddle_fluid.so",
     ],
-    hdrs = glob(["*.h"]),
     includes = ["include"],
-    linkopts = [
-      "-L/usr/local/apollo/libtorch/lib -lprotobuf",
-    ],
 )
