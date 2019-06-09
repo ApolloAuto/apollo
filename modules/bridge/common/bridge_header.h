@@ -35,11 +35,7 @@ class BridgeHeader {
   bool Diserialize(const char *buf);
   bool IsAvailable(const char *buf);
 
-<<<<<<< HEAD
   uint32_t GetHeaderVer() const { return header_ver_.value_; }
-=======
-  uint32_t GetHeaderVer() const { return header_ver_.value_;}
->>>>>>> Bridge: add header classes for udp frames
   size_t GetHeaderSize() const { return msg_size_.value_; }
   std::string GetMsgName() const { return msg_name_.value_; }
   uint32_t GetMsgID() const { return msg_id_.value_; }
@@ -64,19 +60,11 @@ class BridgeHeader {
       return nullptr;
     }
     header_size_ += S + 1;
-<<<<<<< HEAD
     char *res = buf;
     memcpy(res, value, S);
     res[S] = '\n';
     res += S + 1;
     return res;
-=======
-    char *p = buf;
-    memcpy(p, value, S);
-    p[S] = '\n';
-    p += S + 1;
-    return p;
->>>>>>> Bridge: add header classes for udp frames
   }
 
   template <typename T, size_t S>
@@ -84,15 +72,9 @@ class BridgeHeader {
     if (!buf) {
       return false;
     }
-<<<<<<< HEAD
     char temp[S] = {0};
     memcpy(temp, buf, S);
     *value = *(reinterpret_cast<T *>(temp));
-=======
-    char p[S] = {0};
-    memcpy(p, buf, S);
-    *value = *(reinterpret_cast<T *>(p));
->>>>>>> Bridge: add header classes for udp frames
     return true;
   }
 
@@ -110,19 +92,8 @@ class BridgeHeader {
   HeaderItem<Time_Stamp, double> time_stamp_;
   size_t header_size_ = 0;
   HeaderItemBase *header_item[Header_Tail] = {
-<<<<<<< HEAD
       &header_ver_,  &msg_name_,  &msg_id_, &msg_size_,
       &total_packs_, &pack_size_, &index_,  &time_stamp_,
-=======
-    &header_ver_,
-    &msg_name_,
-    &msg_id_,
-    &msg_size_,
-    &total_packs_,
-    &pack_size_,
-    &index_,
-    &time_stamp_,
->>>>>>> Bridge: add header classes for udp frames
   };
 };
 
