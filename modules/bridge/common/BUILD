@@ -32,6 +32,7 @@ cc_library(
     ],
     deps = [
         ":bridge_buffer",
+        ":macro",
     ],
 )
 
@@ -39,6 +40,13 @@ cc_library(
     name = "macro",
     hdrs = [
         "macro.h",
+    ],
+)
+
+cc_library(
+    name = "bridge_proto_buf",
+    hdrs = [
+        "bridge_proto_buf.h",
     ],
 )
 
