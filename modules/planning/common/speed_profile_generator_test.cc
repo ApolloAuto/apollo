@@ -28,8 +28,7 @@
 namespace apollo {
 namespace planning {
 
-TEST(SpeedProfileGeneratorTest, GenerateFallbackSpeedProfile) {
-}
+TEST(SpeedProfileGeneratorTest, GenerateFallbackSpeedProfile) {}
 
 }  // namespace planning
 }  // namespace apollo

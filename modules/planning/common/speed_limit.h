@@ -42,6 +42,8 @@ class SpeedLimit {
 
   double GetSoftSpeedLimitByS(const double s) const;
 
+  double GetMinSpeedLimitV() const;
+
   double MinValidS() const;
 
   void Clear();

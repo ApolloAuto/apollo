@@ -65,8 +65,8 @@ stage_config: {
     task_config: {
         task_type: RULE_BASED_STOP_DECIDER
     }
-
 }
+
 stage_config: {
     stage_type: VALET_PARKING_PARKING
     enabled: true

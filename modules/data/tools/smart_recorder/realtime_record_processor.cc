@@ -31,6 +31,7 @@
 #include "cyber/record/record_message.h"
 #include "cyber/record/record_viewer.h"
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/monitor/common/monitor_manager.h"
 
 #include "modules/data/tools/smart_recorder/channel_pool.h"
 #include "modules/data/tools/smart_recorder/interval_pool.h"
@@ -42,6 +43,7 @@ namespace {
 
 using apollo::common::Header;
 using apollo::common::util::StrCat;
+using apollo::monitor::MonitorManager;
 using cyber::CreateNode;
 using cyber::common::EnsureDirectory;
 using cyber::common::GetFileName;
@@ -142,6 +144,7 @@ bool RealtimeRecordProcessor::Process() {
   // Recorder goes first
   recorder_->Start();
   PublishStatus(RecordingState::RECORDING, "smart recorder started");
+  MonitorManager::Instance()->LogBuffer().INFO("SmartRecorder is recording...");
   std::shared_ptr<std::thread> monitor_thread =
       std::make_shared<std::thread>([this]() { this->MonitorStatus(); });
   // Now fast reader follows and reacts for any events
@@ -191,10 +194,15 @@ void RealtimeRecordProcessor::MonitorStatus() {
     }
   }
   recorder_->Stop();
-  AINFO << "wait for a while trying to complete the restore work";
-  std::this_thread::sleep_for(std::chrono::milliseconds(recorder_wait_time_));
   is_terminating_ = true;
-  PublishStatus(RecordingState::TERMINATING, "smart recorder terminating");
+  AINFO << "wait for a while trying to complete the restore work";
+  constexpr int kMessageInterval = 1000;
+  int interval_counter = 0;
+  while (++interval_counter * kMessageInterval < recorder_wait_time_) {
+    MonitorManager::Instance()->LogBuffer().WARN(
+        "SmartRecorder is terminating...");
+    std::this_thread::sleep_for(std::chrono::milliseconds(kMessageInterval));
+  }
 }
 
 void RealtimeRecordProcessor::PublishStatus(const RecordingState state,

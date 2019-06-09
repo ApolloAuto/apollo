@@ -29,6 +29,7 @@
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_cuda_interface.h"
+#include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_fixed_dual_interface.h"
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_fixed_ts_interface.h"
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_interface.h"
 #include "modules/planning/proto/planning.pb.h"
@@ -39,7 +40,6 @@ namespace planning {
 class DistanceApproachProblem {
  public:
   explicit DistanceApproachProblem(
-
       const PlannerOpenSpaceConfig& planner_open_space_config);
 
   virtual ~DistanceApproachProblem() = default;

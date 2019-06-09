@@ -6,7 +6,8 @@ use_preview_speed_for_table: false
 enable_input_timestamp_check: false
 max_localization_miss_num : 20
 max_planning_miss_num: 20
-max_acceleration_when_stopped : 0.01
+max_acceleration_when_stopped: 0.01
+max_path_remain_when_stopped: 0.3
 steer_angle_rate: 100
 enable_gain_scheduler: true
 set_steer_limit: true

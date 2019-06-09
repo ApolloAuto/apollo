@@ -82,20 +82,20 @@ bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   img_tensor[0][0] = img_tensor[0][0].sub(0.485).div(0.229);
   img_tensor[0][1] = img_tensor[0][1].sub(0.456).div(0.224);
   img_tensor[0][2] = img_tensor[0][2].sub(0.406).div(0.225);
-  torch_inputs.push_back(std::move(img_tensor));
   // Process junction_exit_mask
   torch::Tensor junction_exit_mask =
       torch::zeros({1, static_cast<int>(feature_values.size())});
   for (size_t i = 0; i < feature_values.size(); ++i) {
     junction_exit_mask[0][i] = static_cast<float>(feature_values[i]);
   }
-  torch_inputs.push_back(std::move(junction_exit_mask));
+  torch_inputs.push_back(torch::jit::Tuple::create(
+      {img_tensor.to(device_), junction_exit_mask.to(device_)}));
 
   // Compute probability
   std::vector<double> probability;
   CHECK_NOTNULL(torch_model_ptr_);
   at::Tensor torch_output_tensor =
-      torch_model_ptr_->forward(torch_inputs).toTensor();
+      torch_model_ptr_->forward(torch_inputs).toTensor().to(torch::kCPU);
   auto torch_output = torch_output_tensor.accessor<float, 2>();
   for (int i = 0; i < torch_output.size(1); ++i) {
     probability.push_back(static_cast<double>(torch_output[0][i]));
@@ -174,12 +174,12 @@ bool JunctionMapEvaluator::ExtractFeatureValues(
 void JunctionMapEvaluator::LoadModel() {
   // TODO(all) uncomment the following when cuda issue is resolved
   // if (torch::cuda::is_available()) {
-  //   ADEBUG << "CUDA is available";
+  //   ADEBUG << "CUDA is available for JunctionMapEvaluator!";
   //   device_ = torch::Device(torch::kCUDA);
   // }
   torch::set_num_threads(1);
   torch_model_ptr_ =
-      torch::jit::load(FLAGS_torch_vehicle_junction_mlp_file, device_);
+      torch::jit::load(FLAGS_torch_vehicle_junction_map_file, device_);
 }
 
 }  // namespace prediction

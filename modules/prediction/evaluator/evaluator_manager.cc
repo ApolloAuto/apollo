@@ -76,9 +76,16 @@ void GroupObstaclesByObstacleId(const int obstacle_id,
   if (feature.priority().priority() == ObstaclePriority::IGNORE) {
     ADEBUG << "Skip ignored obstacle [" << obstacle_id << "]";
     return;
+  } else if (feature.priority().priority() == ObstaclePriority::CAUTION) {
+    int id_mod = obstacle_id % FLAGS_max_caution_thread_num;
+    (*id_obstacle_map)[id_mod].push_back(obstacle_ptr);
+    ADEBUG << "Cautioned obstacle [" << obstacle_id << "] for thread" << id_mod;
+  } else {
+    int normal_thread_num = FLAGS_max_thread_num - FLAGS_max_caution_thread_num;
+    int id_mod = obstacle_id % normal_thread_num + FLAGS_max_caution_thread_num;
+    (*id_obstacle_map)[id_mod].push_back(obstacle_ptr);
+    ADEBUG << "Normal obstacle [" << obstacle_id << "] for thread" << id_mod;
   }
-  int id_mod = obstacle_id % FLAGS_max_thread_num;
-  (*id_obstacle_map)[id_mod].push_back(obstacle_ptr);
 }
 
 }  // namespace
@@ -227,11 +234,25 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
     case PerceptionObstacle::VEHICLE: {
       if (obstacle->HasJunctionFeatureWithExits() &&
           !obstacle->IsCloseToJunctionExit()) {
+        if (obstacle->latest_feature().priority().priority() ==
+            ObstaclePriority::CAUTION) {
+          evaluator = GetEvaluator(ObstacleConf::JUNCTION_MAP_EVALUATOR);
+          CHECK_NOTNULL(evaluator);
+          if (evaluator->Evaluate(obstacle)) {
+            break;
+          }
+        }
         evaluator = GetEvaluator(vehicle_in_junction_evaluator_);
         CHECK_NOTNULL(evaluator);
+        evaluator->Evaluate(obstacle);
       } else if (obstacle->IsOnLane()) {
         evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
         CHECK_NOTNULL(evaluator);
+        if (evaluator->GetName() == "LANE_SCANNING_EVALUATOR") {
+          evaluator->Evaluate(obstacle, dynamic_env);
+        } else {
+          evaluator->Evaluate(obstacle);
+        }
       } else {
         ADEBUG << "Obstacle: " << obstacle->id()
                << " is neither on lane, nor in junction. Skip evaluating.";
@@ -242,31 +263,24 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
       if (obstacle->IsOnLane()) {
         evaluator = GetEvaluator(cyclist_on_lane_evaluator_);
         CHECK_NOTNULL(evaluator);
+        evaluator->Evaluate(obstacle);
       }
       break;
     }
-    case PerceptionObstacle::PEDESTRIAN: {
-      evaluator = GetEvaluator(pedestrian_evaluator_);
-      CHECK_NOTNULL(evaluator);
-      break;
-    }
+    // TODO(kechxu) recover them when model error is fixed
+    // case PerceptionObstacle::PEDESTRIAN: {
+    //   evaluator = GetEvaluator(pedestrian_evaluator_);
+    //   CHECK_NOTNULL(evaluator);
+    //   evaluator->Evaluate(obstacle);
+    //   break;
+    // }
     default: {
       if (obstacle->IsOnLane()) {
         evaluator = GetEvaluator(default_on_lane_evaluator_);
         CHECK_NOTNULL(evaluator);
+        evaluator->Evaluate(obstacle);
       }
       break;
-    }
-  }
-
-  // Evaluate using the selected evaluator.
-  if (evaluator != nullptr) {
-    if (evaluator->GetName() == "LANE_SCANNING_EVALUATOR") {
-      // For evaluators that need surrounding obstacles' info.
-      evaluator->Evaluate(obstacle, dynamic_env);
-    } else {
-      // For evaluators that don't need surrounding info.
-      evaluator->Evaluate(obstacle);
     }
   }
 }

@@ -37,6 +37,7 @@ cc_library(
         "//cyber/record:record_viewer",
         "//cyber/tools/cyber_recorder:recorder",
         "//modules/data/tools/smart_recorder/proto:smart_recorder_status_proto",
+        "//modules/monitor/common:monitor_manager",
     ],
 )
 

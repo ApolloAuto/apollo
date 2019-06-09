@@ -47,7 +47,10 @@ class OpenSpacePreStopDecider : public Decider {
                             ReferenceLineInfo* const reference_line_info,
                             double* target_s);
 
-  void SetStopFence(const double target_s, Frame* const frame,
+  void SetParkingSpotStopFence(const double target_s, Frame* const frame,
+                    ReferenceLineInfo* const reference_line_info);
+
+  void SetPullOverStopFence(const double target_s, Frame* const frame,
                     ReferenceLineInfo* const reference_line_info);
 
  private:

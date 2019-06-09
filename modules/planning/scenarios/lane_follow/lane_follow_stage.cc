@@ -276,19 +276,26 @@ void LaneFollowStage::PlanFallbackTrajectory(
 
   AERROR << "Speed fallback due to algorithm failure";
   // TODO(Jiacheng): move this stop_path_threshold to a gflag
-  const double stop_path_distance =
+  const double path_stop_distance =
       reference_line_info->path_data().discretized_path().Length() - 5.0;
-  const double stop_speed_distance =
+  const double obstacle_stop_distance =
       reference_line_info->st_graph_data().is_initialized()
           ? reference_line_info->st_graph_data().min_s_on_st_boundaries()
           : std::numeric_limits<double>::infinity();
+  const double min_speed_limit_v =
+      reference_line_info->st_graph_data().is_initialized()
+          ? reference_line_info->st_graph_data()
+                .speed_limit()
+                .GetMinSpeedLimitV()
+          : std::numeric_limits<double>::infinity();
   const double curr_speed_distance =
       FLAGS_fallback_total_time *
-      std::min(FLAGS_default_cruise_speed,
-               reference_line_info->vehicle_state().linear_velocity());
+      std::min({FLAGS_default_cruise_speed,
+                reference_line_info->vehicle_state().linear_velocity(),
+                min_speed_limit_v});
   *reference_line_info->mutable_speed_data() =
       SpeedProfileGenerator::GenerateFallbackSpeed(std::min(
-          {curr_speed_distance, stop_path_distance, stop_speed_distance}));
+          {path_stop_distance, obstacle_stop_distance, curr_speed_distance}));
 
   if (reference_line_info->trajectory_type() != ADCTrajectory::PATH_FALLBACK) {
     reference_line_info->AddCost(kSpeedOptimizationFallbackCost);

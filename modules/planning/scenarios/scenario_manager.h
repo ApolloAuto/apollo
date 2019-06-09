@@ -110,9 +110,6 @@ class ScenarioManager final {
   std::unordered_map<ReferenceLineInfo::OverlapType, hdmap::PathOverlap,
                      std::hash<int>>
       first_encountered_overlap_map_;
-
-  // TODO(all): move to scenario conf later
-  const double signal_expire_time_sec_ = 5.0;  // sec
 };
 
 }  // namespace scenario

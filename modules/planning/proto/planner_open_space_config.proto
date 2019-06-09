@@ -15,6 +15,7 @@ enum DistanceApproachMode {
   DISTANCE_APPROACH_IPOPT = 0;
   DISTANCE_APPROACH_IPOPT_CUDA = 1;
   DISTANCE_APPROACH_IPOPT_FIXED_TS = 2;
+  DISTANCE_APPROACH_IPOPT_FIXED_DUAL = 3;
 }
 
 message PlannerOpenSpaceConfig {
@@ -33,6 +34,7 @@ message PlannerOpenSpaceConfig {
   optional double max_theta_error_to_end_point = 8 [default = 0.2];
   optional double is_near_destination_threshold = 9 [default = 0.001];
   optional bool enable_check_parallel_trajectory = 10 [default = false];
+  optional bool enable_linear_interpolation = 11 [default = false];
 }
 
 message ROIConfig {
@@ -101,6 +103,7 @@ message DistanceApproachConfig {
   optional bool enable_initial_final_check = 25 [default = false];
   optional DistanceApproachMode distance_approach_mode = 26;
   optional bool enable_jacobian_ad = 27 [default = false];
+  optional bool enable_check_initial_state = 28 [default = false];
 }
 
 message IpoptConfig {

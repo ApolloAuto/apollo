@@ -4,8 +4,8 @@ Introduction
 =============
 
 
-Apollo's Cyber RT is an open source runtime framework designed specifically 
-for autonomous driving scenarios. Based on a centralized computing model, 
+Apollo's Cyber RT is an open source runtime framework designed specifically
+for autonomous driving scenarios. Based on a centralized computing model,
 it is highly optimized for performance, latency, and data throughput.
 
 
@@ -20,7 +20,7 @@ it is highly optimized for performance, latency, and data throughput.
 .. toctree::
    :caption: TUTORIALS
    :maxdepth: 2
-   
+
    cyberrt_api_for_developers
    python_api_tutorial
    cyberrt_developer_tools
@@ -36,4 +36,5 @@ it is highly optimized for performance, latency, and data throughput.
    :maxdepth: 2
 
    api/cppapi_index
+   api/pythonapi_index
 

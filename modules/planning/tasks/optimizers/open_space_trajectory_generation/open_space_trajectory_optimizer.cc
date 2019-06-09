@@ -71,6 +71,8 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
                   "trajectory generation");
   }
 
+  const auto start_timestamp = std::chrono::system_clock::now();
+
   // Initiate initial states
   stitching_trajectory_ = stitching_trajectory;
 
@@ -143,13 +145,13 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
       LoadHybridAstarResultInEigen(&partition_trajectories[i], &xWS_vec[i],
                                    &uWS_vec[i]);
       // checking initial and ending points
-      if (config_.
-          planner_open_space_config().enable_check_parallel_trajectory()) {
+      if (config_.planner_open_space_config()
+              .enable_check_parallel_trajectory()) {
         AINFO << "trajectory id: " << i;
         AINFO << "trajectory partitioned size: " << xWS_vec[i].cols();
         AINFO << "initial point: " << xWS_vec[i].col(0).transpose();
         AINFO << "ending point: "
-            << xWS_vec[i].col(xWS_vec[i].cols() - 1).transpose();
+              << xWS_vec[i].col(xWS_vec[i].cols() - 1).transpose();
       }
 
       Eigen::MatrixXd last_time_u(2, 1);
@@ -241,6 +243,11 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
   }
 
   LoadTrajectory(state_result_ds, control_result_ds, time_result_ds);
+
+  const auto end_timestamp = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff = end_timestamp - start_timestamp;
+  ADEBUG << "open space trajectory smoother total time: "
+         << diff.count() * 1000.0 << " ms.";
 
   return Status::OK();
 }

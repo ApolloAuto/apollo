@@ -66,7 +66,15 @@ class PiecewiseJerkProblem {
   void set_ddx_bounds(const double ddx_lower_bound,
                       const double ddx_upper_bound);
 
-  void set_dddx_bound(const double dddx_bound) { dddx_bound_ = dddx_bound; }
+  void set_dddx_bound(const double dddx_bound) {
+    set_dddx_bound(-dddx_bound, dddx_bound);
+  }
+
+  void set_dddx_bound(const double dddx_lower_bound,
+                      const double dddx_upper_bound) {
+    dddx_bound_.first = dddx_lower_bound;
+    dddx_bound_.second = dddx_upper_bound;
+  }
 
   void set_weight_x(const double weight_x) { weight_x_ = weight_x; }
 
@@ -123,7 +131,7 @@ class PiecewiseJerkProblem {
   std::vector<std::pair<double, double>> x_bounds_;
   std::vector<std::pair<double, double>> dx_bounds_;
   std::vector<std::pair<double, double>> ddx_bounds_;
-  double dddx_bound_ = 0.0;
+  std::pair<double, double> dddx_bound_;
 
   double weight_x_ = 0.0;
   double weight_dx_ = 0.0;

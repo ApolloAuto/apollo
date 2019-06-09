@@ -31,9 +31,20 @@ namespace cyber {
 
 class Node;
 
+/**
+ * @class NodeServiceImpl
+ * @brief The implementation for Node to create Objects connected by Param.
+ * e.g. Param Server and Client
+ */
 class NodeServiceImpl {
  public:
   friend class Node;
+
+  /**
+   * @brief Construct a new Node Service Impl object
+   *
+   * @param node_name node name
+   */
   explicit NodeServiceImpl(const std::string& node_name)
       : node_name_(node_name) {
     attr_.set_host_name(common::GlobalData::Instance()->HostName());
@@ -43,15 +54,22 @@ class NodeServiceImpl {
     attr_.set_node_id(node_id);
   }
 
+  /**
+   * @brief Forbid default-constructor
+   */
   NodeServiceImpl() = delete;
 
+  /**
+   * @brief Destroy the Node Service Impl object
+   *
+   */
   ~NodeServiceImpl() {}
 
  private:
   template <typename Request, typename Response>
   auto CreateService(const std::string& service_name,
                      const typename Service<Request, Response>::ServiceCallback&
-                         service_calllback) ->
+                         service_callback) ->
       typename std::shared_ptr<Service<Request, Response>>;
 
   template <typename Request, typename Response>
@@ -68,10 +86,10 @@ template <typename Request, typename Response>
 auto NodeServiceImpl::CreateService(
     const std::string& service_name,
     const typename Service<Request, Response>::ServiceCallback&
-        service_calllback) ->
+        service_callback) ->
     typename std::shared_ptr<Service<Request, Response>> {
   auto service_ptr = std::make_shared<Service<Request, Response>>(
-      node_name_, service_name, service_calllback);
+      node_name_, service_name, service_callback);
   RETURN_VAL_IF(!service_ptr->Init(), nullptr);
 
   service_list_.emplace_back(service_ptr);

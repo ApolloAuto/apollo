@@ -136,6 +136,9 @@ DEFINE_string(evaluator_vehicle_rnn_file,
 DEFINE_string(torch_vehicle_junction_mlp_file,
               "/apollo/modules/prediction/data/junction_mlp_vehicle_model.pt",
               "Vehicle junction MLP model file");
+DEFINE_string(torch_vehicle_junction_map_file,
+              "/apollo/modules/prediction/data/junction_map_vehicle_model.pt",
+              "Vehicle junction map model file");
 DEFINE_string(torch_vehicle_cruise_go_file,
               "/apollo/modules/prediction/data/cruise_go_vehicle_model.pt",
               "Vehicle cruise go model file");
@@ -145,6 +148,22 @@ DEFINE_string(torch_vehicle_cruise_cutin_file,
 DEFINE_string(torch_vehicle_lane_scanning_file,
               "/apollo/modules/prediction/data/lane_scanning_vehicle_model.pt",
               "Vehicle lane scanning model file");
+DEFINE_string(torch_pedestrian_interaction_position_embedding_file,
+              "/apollo/modules/prediction/data/"
+              "pedestrian_interaction_position_embedding.pt",
+              "pedestrian interaction position embedding");
+DEFINE_string(torch_pedestrian_interaction_social_embedding_file,
+              "/apollo/modules/prediction/data/"
+              "pedestrian_interaction_social_embedding.pt",
+              "pedestrian interaction social embedding");
+DEFINE_string(torch_pedestrian_interaction_single_lstm_file,
+              "/apollo/modules/prediction/data/"
+              "pedestrian_interaction_single_lstm.pt",
+              "pedestrian interaction single lstm");
+DEFINE_string(torch_pedestrian_interaction_prediction_layer_file,
+              "/apollo/modules/prediction/data/"
+              "pedestrian_interaction_prediction_layer.pt",
+              "pedestrian interaction prediction layer");
 DEFINE_int32(max_num_obstacles, 300,
              "maximal number of obstacles stored in obstacles container.");
 DEFINE_double(valid_position_diff_threshold, 0.5,

@@ -27,6 +27,7 @@
 
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h"
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_path_problem.h"
 
@@ -48,12 +49,18 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     PathData* const final_path_data) {
   const auto init_frenet_state = reference_line.ToFrenetFrame(init_point);
 
-  const auto& piecewise_jerk_path_config = config_.piecewise_jerk_path_config();
+  // Choose lane_change_path_config for lane-change cases
+  // Otherwise, choose default_path_config for normal path planning
+  const auto& piecewise_jerk_path_config =
+      reference_line_info_->IsChangeLanePath()
+          ? config_.piecewise_jerk_path_config().lane_change_path_config()
+          : config_.piecewise_jerk_path_config().default_path_config();
+
   std::array<double, 5> w = {
       piecewise_jerk_path_config.l_weight(),
       piecewise_jerk_path_config.dl_weight() *
           std::fmax(init_frenet_state.first[1] * init_frenet_state.first[1],
-                    1.0),
+                    5.0),
       piecewise_jerk_path_config.ddl_weight(),
       piecewise_jerk_path_config.dddl_weight(), 0.0};
 
@@ -90,11 +97,14 @@ common::Status PiecewiseJerkPathOptimizer::Process(
           PlanningContext::Instance()->planning_status().pull_over();
 
       // Set end lateral to be at the desired pull over destination
-      if (pull_over_status.has_x() && pull_over_status.has_y() &&
+      if (pull_over_status.has_position() &&
+          pull_over_status.position().has_x() &&
+          pull_over_status.position().has_y() &&
           path_boundary.label().find("pullover") != std::string::npos) {
         common::SLPoint pull_over_sl;
-        reference_line.XYToSL({pull_over_status.x(), pull_over_status.y()},
-                              &pull_over_sl);
+        reference_line.XYToSL(
+            {pull_over_status.position().x(), pull_over_status.position().y()},
+            &pull_over_sl);
         end_state[0] = pull_over_sl.l();
       }
     }
@@ -160,6 +170,16 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
                                         FLAGS_lateral_derivative_bound_default);
   piecewise_jerk_problem.set_dddx_bound(FLAGS_lateral_jerk_bound);
 
+  /**
+  // Experimental code to be tested
+  // TODO(all): find the params in vehicle config
+  double axis_distance = 2.5;
+  double max_steering_rate = 1.0 / 6.0 * M_PI;
+  double jerk_bound = EstimateJerkBoundary(std::fmax(init_state[1], 1.0),
+      axis_distance, max_steering_rate);
+  piecewise_jerk_problem.set_dddx_bound(jerk_bound);
+  **/
+
   bool success = piecewise_jerk_problem.Optimize(max_iter);
 
   auto end_time = std::chrono::system_clock::now();
@@ -212,6 +232,12 @@ FrenetFramePath PiecewiseJerkPathOptimizer::ToPiecewiseJerkPath(
   }
 
   return FrenetFramePath(frenet_frame_path);
+}
+
+double PiecewiseJerkPathOptimizer::EstimateJerkBoundary(
+    const double vehicle_speed, const double axis_distance,
+    const double max_steering_rate) const {
+  return max_steering_rate / axis_distance / vehicle_speed;
 }
 
 }  // namespace planning

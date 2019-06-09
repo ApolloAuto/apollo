@@ -47,14 +47,20 @@ OpenSpaceTrajectoryPartition::OpenSpaceTrajectoryPartition(
     : TrajectoryOptimizer(config) {
   open_space_trajectory_partition_config_ =
       config_.open_space_trajectory_partition_config();
-  distance_search_range_ =
-      open_space_trajectory_partition_config_.distance_search_range();
-  distance_to_midpoint_ =
-      open_space_trajectory_partition_config_.distance_to_midpoint();
   heading_search_range_ =
       open_space_trajectory_partition_config_.heading_search_range();
   heading_track_range_ =
       open_space_trajectory_partition_config_.heading_track_range();
+  distance_search_range_ =
+      open_space_trajectory_partition_config_.distance_search_range();
+  heading_offset_to_midpoint_ =
+      open_space_trajectory_partition_config_.heading_offset_to_midpoint();
+  lateral_offset_to_midpoint_ =
+      open_space_trajectory_partition_config_.heading_offset_to_midpoint();
+  longitudinal_offset_to_midpoint_ =
+      open_space_trajectory_partition_config_.heading_offset_to_midpoint();
+  vehicle_box_iou_threshold_to_midpoint_ =
+      open_space_trajectory_partition_config_.heading_offset_to_midpoint();
 
   vehicle_param_ =
       common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
@@ -128,7 +134,9 @@ Status OpenSpaceTrajectoryPartition::Process() {
     flag_change_to_next = CheckReachTrajectoryEnd(
         trajectory, gear, trajectories_size, i, &current_trajectory_index,
         &current_trajectory_point_index);
-    if (flag_change_to_next) {
+    if (flag_change_to_next &&
+        !CheckTrajTraversed(trajectories_encodings[current_trajectory_index])) {
+      UpdateTrajHistory(trajectories_encodings[current_trajectory_index]);
       break;
     }
 
@@ -300,7 +308,7 @@ bool OpenSpaceTrajectoryPartition::EncodeTrajectory(
   const std::string init_point_heading_encoding =
       std::to_string(static_cast<int>(init_path_point.theta() * 10000.0));
   const std::string last_point_x_encoding = std::to_string(
-      static_cast<int>((last_path_point.x() - encoding_origin_y) * 1000.0));
+      static_cast<int>((last_path_point.x() - encoding_origin_x) * 1000.0));
   const std::string last_point_y_encoding = std::to_string(
       static_cast<int>((last_path_point.y() - encoding_origin_y) * 1000.0));
   const std::string last_point_heading_encoding =
@@ -453,10 +461,18 @@ bool OpenSpaceTrajectoryPartition::CheckReachTrajectoryEnd(
   const PathPoint& path_end_point = trajectory_end_point.path_point();
   const double path_end_point_x = path_end_point.x();
   const double path_end_point_y = path_end_point.y();
+  const Vec2d tracking_vector(ego_x_ - path_end_point_x,
+                              ego_y_ - path_end_point_y);
   const double path_end_point_theta = path_end_point.theta();
+  const double included_angle =
+      NormalizeAngle(path_end_point_theta - tracking_vector.Angle());
   const double distance_to_trajs_end =
       std::sqrt((path_end_point_x - ego_x_) * (path_end_point_x - ego_x_) +
                 (path_end_point_y - ego_y_) * (path_end_point_y - ego_y_));
+  const double lateral_offset =
+      std::abs(distance_to_trajs_end * std::sin(included_angle));
+  const double longitudinal_offset =
+      std::abs(distance_to_trajs_end * std::cos(included_angle));
   const double traj_end_point_moving_direction =
       gear == canbus::Chassis::GEAR_REVERSE
           ? NormalizeAngle(path_end_point_theta + M_PI)
@@ -467,8 +483,9 @@ bool OpenSpaceTrajectoryPartition::CheckReachTrajectoryEnd(
 
   // If close to the end point, start on the next trajectory
   double end_point_iou_ratio = 0.0;
-  if (distance_to_trajs_end < distance_to_midpoint_ &&
-      heading_search_to_trajs_end < heading_search_range_) {
+  if (lateral_offset < lateral_offset_to_midpoint_ &&
+      longitudinal_offset < longitudinal_offset_to_midpoint_ &&
+      heading_search_to_trajs_end < heading_offset_to_midpoint_) {
     // get vehicle box and path point box, compare with a threadhold in IOU
     Box2d path_end_point_box({path_end_point_x, path_end_point_y},
                              path_end_point_theta, ego_length_, ego_width_);
@@ -478,8 +495,7 @@ bool OpenSpaceTrajectoryPartition::CheckReachTrajectoryEnd(
     end_point_iou_ratio =
         Polygon2d(ego_box_).ComputeIoU(Polygon2d(path_end_point_box));
 
-    if (end_point_iou_ratio >
-        open_space_trajectory_partition_config_.vehicle_box_iou_threshold()) {
+    if (end_point_iou_ratio > vehicle_box_iou_threshold_to_midpoint_) {
       if (trajectories_index + 1 >= trajectories_size) {
         *current_trajectory_index = trajectories_size - 1;
         *current_trajectory_point_index = trajectory_size - 1;
@@ -493,15 +509,18 @@ bool OpenSpaceTrajectoryPartition::CheckReachTrajectoryEnd(
   }
 
   ADEBUG << "Vehicle did not reach end of a trajectory with conditions for "
-            "distance_check: "
-         << (distance_to_trajs_end < distance_to_midpoint_)
-         << " and actual distance: " << distance_to_trajs_end
+            "lateral distance_check: "
+         << (lateral_offset < lateral_offset_to_midpoint_)
+         << " and actual lateral distance: " << lateral_offset
+         << "Vehicle did not reach end of a trajectory with conditions for "
+            "longitudinal distance_check: "
+         << (longitudinal_offset < longitudinal_offset_to_midpoint_)
+         << " and actual longitudinal distance: " << longitudinal_offset
          << ", heading_check: "
-         << (heading_search_to_trajs_end < heading_search_range_)
+         << (heading_search_to_trajs_end < heading_offset_to_midpoint_)
          << " with actual heading: " << heading_search_to_trajs_end
          << ", iou_check: "
-         << (end_point_iou_ratio > open_space_trajectory_partition_config_
-                                       .vehicle_box_iou_threshold())
+         << (end_point_iou_ratio > vehicle_box_iou_threshold_to_midpoint_)
          << " with actual iou: " << end_point_iou_ratio;
   return false;
 }
@@ -557,6 +576,10 @@ bool OpenSpaceTrajectoryPartition::UseFailSafeSearch(
         failsafe_closest_point_on_trajs.top().first.first;
     *current_trajectory_point_index =
         failsafe_closest_point_on_trajs.top().first.second;
+    // Clear the traj history
+    PlanningContext::Instance()
+        ->mutable_open_space_info()
+        ->partitioned_trajectories_index_history.clear();
     return true;
   }
 }

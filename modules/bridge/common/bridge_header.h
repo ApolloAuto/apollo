@@ -35,7 +35,7 @@ class BridgeHeader {
   bool Diserialize(const char *buf);
   bool IsAvailable(const char *buf);
 
-  uint32_t GetHeaderVer() const { return header_ver_.value_;}
+  uint32_t GetHeaderVer() const { return header_ver_.value_; }
   size_t GetHeaderSize() const { return header_size_; }
   std::string GetMsgName() const { return msg_name_.value_; }
   uint32_t GetMsgID() const { return msg_id_.value_; }

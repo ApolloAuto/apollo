@@ -69,7 +69,7 @@ bool GuardianComponent::Proc() {
   }
 
   if (safety_mode_triggered) {
-    ADEBUG << "Safety mode triggered, enable safty mode";
+    ADEBUG << "Safety mode triggered, enable safety mode";
     TriggerSafetyMode();
   } else {
     ADEBUG << "Safety mode not triggered, bypass control command";

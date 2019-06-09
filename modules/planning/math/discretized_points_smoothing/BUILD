@@ -11,9 +11,24 @@ cc_library(
         "cos_theta_smoother.h",
     ],
     deps = [
+        ":cos_theta_ipopt_interface",
+        "//cyber/common:log",
+        "//modules/planning/proto:cos_theta_smoother_config_proto",
+        "@ipopt",
+    ],
+)
+
+cc_library(
+    name = "cos_theta_ipopt_interface",
+    srcs = [
+        "cos_theta_ipopt_interface.cc",
+    ],
+    hdrs = [
+        "cos_theta_ipopt_interface.h",
+    ],
+    deps = [
         "//cyber/common:log",
         "@adolc",
-        "@eigen",
         "@ipopt",
     ],
 )

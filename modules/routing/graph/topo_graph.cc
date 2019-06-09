@@ -80,7 +80,7 @@ bool TopoGraph::LoadGraph(const Graph& graph) {
     AERROR << "Failed to load edges from topology graph.";
     return false;
   }
-  AINFO << "Load Topo data succesful.";
+  AINFO << "Load Topo data successful.";
   return true;
 }
 

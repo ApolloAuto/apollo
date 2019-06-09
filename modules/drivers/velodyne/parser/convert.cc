@@ -25,7 +25,7 @@ using apollo::drivers::velodyne::VelodyneScan;
 
 void Convert::init(const Config& velodyne_config) {
   config_ = velodyne_config;
-  // we use beijing time by default
+  // we use Beijing time by default
 
   parser_.reset(VelodyneParserFactory::CreateParser(config_));
   if (parser_.get() == nullptr) {

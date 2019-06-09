@@ -74,7 +74,7 @@ DEFINE_int32(
     "if it is moving for consecutive movable_frames_count_threshold frames");
 DEFINE_int32(keep_radar_frames, 5, "number of delphi esr frames to keep");
 
-// TODO(QiL) : remove this temperary gflags
+// TODO(QiL) : remove this temporary gflags
 DEFINE_bool(use_conti_radar, true,
             "use conti or delphi radar, true is conti, false is delphi");
 

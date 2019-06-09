@@ -32,8 +32,6 @@ DECLARE_string(control_node_name);
 DECLARE_bool(is_control_test_mode);
 DECLARE_bool(use_preview_speed_for_table);
 
-DECLARE_double(max_acceleration_when_stopped);
-
 DECLARE_double(steer_angle_rate);
 DECLARE_bool(enable_gain_scheduler);
 DECLARE_bool(set_steer_limit);

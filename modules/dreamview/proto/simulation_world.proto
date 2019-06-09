@@ -68,7 +68,7 @@ message Decision {
   optional apollo.routing.ChangeLaneType change_lane_type = 12;
 }
 
-// Next-id: 35
+// Next-id: 36
 message Object {
   // ID
   optional string id = 1;  // primary identifier for each object
@@ -96,6 +96,7 @@ message Object {
   optional double spin_jerk = 16;
   optional double speed_heading = 17;
   optional double kappa = 18;
+  optional double dkappa = 35;
 
   // Signal Info
   // For objects with signals set and current signal such as Traffic Light,

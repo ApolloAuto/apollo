@@ -66,7 +66,7 @@ class JunctionMapEvaluator : public Evaluator {
 
  private:
   /**
-   * @brief Load mode file
+   * @brief Load model file
    */
   void LoadModel();
 

@@ -52,7 +52,7 @@ message RacobitRadarObs {
   // obstacle Radar Cross-Section; unit = dBsm
   optional double rcs = 8;
   // 0 = moving, 1 = stationary, 2 = oncoming, 3 = stationary candidate
-  // 4 = unkonwn, 5 = crossing stationary, 6 = crossing moving, 7 = stopped
+  // 4 = unknown, 5 = crossing stationary, 6 = crossing moving, 7 = stopped
   optional int32 dynprop = 9;
   // longitude distance standard deviation to the radar; (+) = forward; unit = m
   optional double longitude_dist_rms = 10;
@@ -63,7 +63,7 @@ message RacobitRadarObs {
   optional double longitude_vel_rms = 12;
   // lateral velocity standard deviation to the radar; (+) = left; unit = m/s
   optional double lateral_vel_rms = 13;
-  // obstacle probablity of existence
+  // obstacle probability of existence
   optional double probexist = 14;
 
   // The following is only valid for the track object message
