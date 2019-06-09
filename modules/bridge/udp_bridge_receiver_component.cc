@@ -121,9 +121,8 @@ bool UDPBridgeReceiverComponent<T>::MsgHandle() {
   }
 
   char *buf = proto_buf->GetBuf(header.GetFramePos());
-  bytes = static_cast<int>(session_->RecvFrom(buf, header.GetFrameSize(), 0,
-                                              (struct sockaddr *)&client_addr,
-                                              &sock_len));
+  bytes = static_cast<int>(session_->RecvFrom(buf, header.GetFrameSize(),
+    0, (struct sockaddr*)&client_addr, &sock_len));
   proto_buf->UpdateStatus(header.GetIndex());
   if (proto_buf->IsReadyDiserialize()) {
     auto pb_msg = std::make_shared<T>();

@@ -16,11 +16,11 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
 #include <vector>
-#include "modules/bridge/common/bridge_header.h"
+#include <string>
+#include <memory>
 #include "modules/bridge/common/macro.h"
+#include "modules/bridge/common/bridge_header.h"
 
 namespace apollo {
 namespace bridge {

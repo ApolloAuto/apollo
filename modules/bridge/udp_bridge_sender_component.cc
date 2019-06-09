@@ -18,6 +18,7 @@
 #include "modules/bridge/common/bridge_proto_buf.h"
 #include "modules/bridge/common/macro.h"
 #include "modules/bridge/common/util.h"
+#include "modules/bridge/common/bridge_proto_buf.h"
 
 namespace apollo {
 namespace bridge {

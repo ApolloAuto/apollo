@@ -13,6 +13,8 @@ cc_library(
         "//modules/bridge/common:bridge_proto_buf",
         "//modules/bridge/common:macro",
         "//modules/bridge/common:util",
+        "//modules/bridge/common:bridge_header",
+        "//modules/bridge/common:bridge_proto_buf",
         "//modules/bridge/proto:udp_bridge_remote_info_proto",
         "//modules/common",
         "//modules/common/adapters:adapter_gflags",

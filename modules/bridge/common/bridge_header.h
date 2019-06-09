@@ -96,8 +96,20 @@ class BridgeHeader {
   HeaderItem<Time_Stamp, double> time_stamp_;
   size_t header_size_ = 0;
   HeaderItemBase *header_item[Header_Tail] = {
+<<<<<<< HEAD
       &header_ver_, &msg_name_,  &msg_id_, &msg_size_,   &total_frames_,
       &frame_size_, &frame_pos_, &index_,  &time_stamp_,
+=======
+    &header_ver_,
+    &msg_name_,
+    &msg_id_,
+    &msg_size_,
+    &total_frames_,
+    &frame_size_,
+    &frame_pos_,
+    &index_,
+    &time_stamp_,
+>>>>>>> Bridge: fix a bug in sender
   };
 };
 
