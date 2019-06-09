@@ -41,17 +41,9 @@ bool BridgeHeader::Serialize(char *buf, size_t size) {
 }
 
 bool BridgeHeader::Diserialize(const char *buf) {
-  if (!IsAvailable(buf)) {
-    return false;
-  }
-  const char *cursor = buf + sizeof(BRIDGE_HEADER_FLAG) + 1;
+  const char *cursor = buf;
 
-  if (!DiserializeBasicType<size_t, sizeof(size_t)>(&header_size_, cursor)) {
-    return false;
-  }
-  cursor += sizeof(size_t) + 1;
-
-  size_t i = header_size_ - sizeof(BRIDGE_HEADER_FLAG) - sizeof(size_t) - 2;
+  size_t i = header_size_;
   while (i >= 0) {
     HType type = *(reinterpret_cast<const HType *>(cursor));
     if (type > Header_Tail || type < 0) {
@@ -62,9 +54,9 @@ bool BridgeHeader::Diserialize(const char *buf) {
       continue;
     } else {
       size_t value_size = 0;
-      for (int i = 0; i < Header_Tail; i++) {
-        if (type == header_item[i]->GetType()) {
-          cursor = header_item[i]->DiserializeItem(cursor, &value_size);
+      for (int j = 0; j < Header_Tail; j++) {
+        if (type == header_item[j]->GetType()) {
+          cursor = header_item[j]->DiserializeItem(cursor, &value_size);
         }
       }
       i -= value_size;
