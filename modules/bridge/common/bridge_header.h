@@ -36,19 +36,22 @@ class BridgeHeader {
   bool IsAvailable(const char *buf);
 
   uint32_t GetHeaderVer() const { return header_ver_.value_; }
-  size_t GetHeaderSize() const { return msg_size_.value_; }
+  size_t GetHeaderSize() const { return header_size_; }
   std::string GetMsgName() const { return msg_name_.value_; }
   uint32_t GetMsgID() const { return msg_id_.value_; }
-  uint32_t GetTotalPacks() const { return total_packs_.value_; }
+  uint32_t GetTotalFrames() const { return total_frames_.value_; }
   uint32_t GetIndex() const { return index_.value_; }
   double GetTimeStamp() const { return time_stamp_.value_; }
   size_t GetMsgSize() const { return msg_size_.value_; }
+  size_t GetFrameSize() const { return frame_size_.value_; }
+  size_t GetFramePos() const { return frame_pos_.value_; }
 
   void SetHeaderVer(uint32_t header_ver) { header_ver_ = header_ver; }
-  void SetHeaderSize(size_t header_size) { header_size_ = header_size; }
   void SetMsgName(const std::string &msg_name) { msg_name_ = msg_name; }
   void SetMsgID(uint32_t msg_id) { msg_id_ = msg_id; }
-  void SetTotalPacks(uint32_t total_packs) { total_packs_ = total_packs; }
+  void SetTotalFrames(uint32_t total_frames) { total_frames_ = total_frames; }
+  void SetFrameSize(size_t frame_size) { frame_size_ = frame_size; }
+  void SetFramePos(size_t frame_pos) { frame_pos_ = frame_pos; }
   void SetIndex(uint32_t index) { index_ = index; }
   void SetTimeStamp(double time_stamp) { time_stamp_ = time_stamp; }
   void SetMsgSize(size_t msg_size) { msg_size_ = msg_size; }
@@ -86,14 +89,22 @@ class BridgeHeader {
   HeaderItem<Msg_Name, std::string> msg_name_;
   HeaderItem<Msg_ID, uint32_t> msg_id_;
   HeaderItem<Msg_Size, size_t> msg_size_;
-  HeaderItem<Msg_Packs, uint32_t> total_packs_;
-  HeaderItem<Pack_Size, size_t> pack_size_;
-  HeaderItem<Msg_Index, uint32_t> index_;
+  HeaderItem<Msg_Frames, uint32_t> total_frames_;
+  HeaderItem<Frame_Size, size_t> frame_size_;
+  HeaderItem<Frame_Pos, size_t> frame_pos_;
+  HeaderItem<Frame_Index, uint32_t> index_;
   HeaderItem<Time_Stamp, double> time_stamp_;
   size_t header_size_ = 0;
   HeaderItemBase *header_item[Header_Tail] = {
-      &header_ver_,  &msg_name_,  &msg_id_, &msg_size_,
-      &total_packs_, &pack_size_, &index_,  &time_stamp_,
+    &header_ver_,
+    &msg_name_,
+    &msg_id_,
+    &msg_size_,
+    &total_frames_,
+    &frame_size_,
+    &frame_pos_,
+    &index_,
+    &time_stamp_,
   };
 };
 
