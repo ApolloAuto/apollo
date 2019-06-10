@@ -31,6 +31,7 @@
 #include "modules/common/filters/digital_filter.h"
 #include "modules/common/math/kalman_filter.h"
 #include "modules/map/hdmap/hdmap_common.h"
+#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/proto/feature.pb.h"
 
 /**

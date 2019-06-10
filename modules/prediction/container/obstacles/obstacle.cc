@@ -23,7 +23,6 @@
 #include <unordered_set>
 
 #include "modules/prediction/common/junction_analyzer.h"
-#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
 #include "modules/prediction/network/rnn_model/rnn_model.h"
 
