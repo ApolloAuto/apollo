@@ -50,17 +50,17 @@ cc_library(
     name = "camera",
     srcs = [
         "usb_cam.cc",
-        "util.cc",
+        ##"util.cc",
     ],
     hdrs = [
         "usb_cam.h",
-        "util.h",
+        ##"util.h",
     ],
     #copts = ["-mavx2"],
     deps = [
         "//cyber",
         "//modules/drivers/camera/proto:camera_proto",
-        "@adv_plat",
+        ##"@adv_plat",
     ],
 )
 
