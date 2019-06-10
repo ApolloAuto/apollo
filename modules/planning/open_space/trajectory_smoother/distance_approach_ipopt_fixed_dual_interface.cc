@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,11 +121,9 @@ bool DistanceApproachIPOPTFixedDualInterface::get_nlp_info(
   int n3 = horizon_ + 1;
   ADEBUG << "n3: " << n3;
   // n4 : dual multiplier associated with obstacle shape
-  lambda_horizon_ = obstacles_edges_num_.sum() * (horizon_ + 1);
-  ADEBUG << "lambda_horizon_: " << lambda_horizon_;
+  lambda_horizon_ = 0;
   // n5 : dual multipier associated with car shape, obstacles_num*4 * (N+1)
-  miu_horizon_ = obstacles_num_ * 4 * (horizon_ + 1);
-  ADEBUG << "miu_horizon_: " << miu_horizon_;
+  miu_horizon_ = 0;
 
   // m1 : dynamics constatins
   int m1 = 4 * horizon_;
@@ -677,19 +675,6 @@ void DistanceApproachIPOPTFixedDualInterface::eval_constraints(int n,
              cos(x[state_index + 2] + ts_ * x[time_index] * 0.5 *
                                           x[state_index + 3] *
                                           tan(x[control_index]) / wheelbase_));
-    // TODO(Jinyun): evaluate performance of different models
-    // g[constraint_index] =
-    //     x[state_index + 4] -
-    //     (x[state_index] +
-    //      ts_ * x[time_index] * x[state_index + 3] * cos(x[state_index + 2]));
-    // g[constraint_index] =
-    //     x[state_index + 4] -
-    //     ((xWS_(0, i) + ts_ * xWS_(3, i) * cos(xWS_(2, i))) +
-    //      (x[state_index] - xWS_(0, i)) +
-    //      (xWS_(3, i) * cos(xWS_(2, i))) * (ts_ * x[time_index] - ts_) +
-    //      (ts_ * cos(xWS_(2, i))) * (x[state_index + 3] - xWS_(3, i)) +
-    //      (-ts_ * xWS_(3, i) * sin(xWS_(2, i))) *
-    //          (x[state_index + 2] - xWS_(2, i)));
 
     // x2
     g[constraint_index + 1] =
@@ -701,18 +686,6 @@ void DistanceApproachIPOPTFixedDualInterface::eval_constraints(int n,
              sin(x[state_index + 2] + ts_ * x[time_index] * 0.5 *
                                           x[state_index + 3] *
                                           tan(x[control_index]) / wheelbase_));
-    // g[constraint_index + 1] =
-    //     x[state_index + 5] -
-    //     (x[state_index + 1] +
-    //      ts_ * x[time_index] * x[state_index + 3] * sin(x[state_index + 2]));
-    // g[constraint_index + 1] =
-    //     x[state_index + 5] -
-    //     ((xWS_(1, i) + ts_ * xWS_(3, i) * sin(xWS_(2, i))) +
-    //      (x[state_index + 1] - xWS_(1, i)) +
-    //      (xWS_(3, i) * sin(xWS_(2, i))) * (ts_ * x[time_index] - ts_) +
-    //      (ts_ * sin(xWS_(2, i))) * (x[state_index + 3] - xWS_(3, i)) +
-    //      (ts_ * xWS_(3, i) * cos(xWS_(2, i))) *
-    //          (x[state_index + 2] - xWS_(2, i)));
 
     // x3
     g[constraint_index + 2] =
@@ -722,32 +695,11 @@ void DistanceApproachIPOPTFixedDualInterface::eval_constraints(int n,
              (x[state_index + 3] +
               ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
              tan(x[control_index]) / wheelbase_);
-    // g[constraint_index + 2] =
-    //     x[state_index + 6] -
-    //     (x[state_index + 2] + ts_ * x[time_index] * x[state_index + 3] *
-    //                               tan(x[control_index]) / wheelbase_);
-    // g[constraint_index + 2] =
-    //     x[state_index + 6] -
-    //     ((xWS_(2, i) + ts_ * xWS_(3, i) * tan(uWS_(0, i)) / wheelbase_) +
-    //      (x[state_index + 2] - xWS_(2, i)) +
-    //      (xWS_(3, i) * tan(uWS_(0, i)) / wheelbase_) *
-    //          (ts_ * x[time_index] - ts_) +
-    //      (ts_ * tan(uWS_(0, i)) / wheelbase_) *
-    //          (x[state_index + 3] - xWS_(3, i)) +
-    //      (ts_ * xWS_(3, i) / cos(uWS_(0, i)) / cos(uWS_(0, i)) / wheelbase_)
-    //      *
-    //          (x[control_index] - uWS_(0, i)));
 
     // x4
     g[constraint_index + 3] =
         x[state_index + 7] -
         (x[state_index + 3] + ts_ * x[time_index] * x[control_index + 1]);
-    // g[constraint_index + 3] =
-    //     x[state_index + 7] -
-    //     ((xWS_(3, i) + ts_ * uWS_(1, i)) + (x[state_index + 3] - xWS_(3, i))
-    //     +
-    //      uWS_(1, i) * (ts_ * x[time_index] - ts_) +
-    //      ts_ * (x[control_index + 1] - uWS_(1, i)));
 
     control_index += 2;
     constraint_index += 4;
@@ -799,8 +751,6 @@ void DistanceApproachIPOPTFixedDualInterface::eval_constraints(int n,
   state_index = state_start_index_;
   control_index = control_start_index_;
   time_index = time_start_index_;
-  // l_index = l_start_index_;
-  // n_index = n_start_index_;
 
   // start configuration
   g[constraint_index] = x[state_index];
@@ -910,8 +860,6 @@ bool DistanceApproachIPOPTFixedDualInterface::check_g(int n, const double* x,
   AINFO << "end constraints to: " << m7;
   AINFO << "control bnd to: " << m8;
   AINFO << "time interval constraints to: " << m9;
-  // AINFO << "lambda constraints to: " << m10;
-  // AINFO << "miu constraints to: " << m11;
   AINFO << "total constraints: " << num_of_constraints_;
 
   for (int idx = 0; idx < m; ++idx) {
