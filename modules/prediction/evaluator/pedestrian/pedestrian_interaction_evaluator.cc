@@ -30,10 +30,10 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::math::Vec2d;
 using apollo::common::Point3D;
 using apollo::common::TrajectoryPoint;
+using apollo::common::adapter::AdapterConfig;
+using apollo::common::math::Vec2d;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 
@@ -102,8 +102,10 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   torch::Tensor social_pooling = GetSocialPooling();
   std::vector<torch::jit::IValue> social_embedding_inputs;
   social_embedding_inputs.push_back(std::move(social_pooling));
-  torch::Tensor social_embedding = torch_social_embedding_ptr_
-      ->forward(social_embedding_inputs).toTensor().to(torch::kCPU);
+  torch::Tensor social_embedding =
+      torch_social_embedding_ptr_->forward(social_embedding_inputs)
+          .toTensor()
+          .to(torch::kCPU);
 
   // Step 2 Get position embedding
   double pos_x = feature_values[2];
@@ -113,8 +115,10 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   torch_position[0][1] = pos_y;
   std::vector<torch::jit::IValue> position_embedding_inputs;
   position_embedding_inputs.push_back(std::move(torch_position));
-  torch::Tensor position_embedding = torch_position_embedding_ptr_
-      ->forward(position_embedding_inputs).toTensor().to(torch::kCPU);
+  torch::Tensor position_embedding =
+      torch_position_embedding_ptr_->forward(position_embedding_inputs)
+          .toTensor()
+          .to(torch::kCPU);
 
   // Step 3 Conduct single LSTM and update hidden states
   torch::Tensor lstm_input =
@@ -153,9 +157,9 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   start_point->set_v(latest_feature_ptr->speed());
   start_point->set_relative_time(0.0);
 
-  int num_trajectory_point = static_cast<int>(
-      FLAGS_prediction_trajectory_time_length /
-      FLAGS_prediction_trajectory_time_resolution);
+  int num_trajectory_point =
+      static_cast<int>(FLAGS_prediction_trajectory_time_length /
+                       FLAGS_prediction_trajectory_time_resolution);
   for (int i = 1; i < num_trajectory_point; ++i) {
     double prev_x = trajectory->trajectory_point(i - 1).path_point().x();
     double prev_y = trajectory->trajectory_point(i - 1).path_point().y();
@@ -168,8 +172,8 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     double distance = direction.Length();
     point->set_v(distance / FLAGS_prediction_trajectory_time_resolution);
     point->mutable_path_point()->set_theta(direction.Angle());
-    point->set_relative_time(static_cast<double>(
-        FLAGS_prediction_trajectory_time_resolution * i));
+    point->set_relative_time(
+        static_cast<double>(FLAGS_prediction_trajectory_time_resolution * i));
   }
 
   return true;
@@ -188,8 +192,10 @@ Point3D PedestrianInteractionEvaluator::PredictNextPosition(
   torch_position[0][1] = pos_y;
   std::vector<torch::jit::IValue> position_embedding_inputs;
   position_embedding_inputs.push_back(std::move(torch_position));
-  torch::Tensor position_embedding = torch_position_embedding_ptr_
-      ->forward(position_embedding_inputs).toTensor().to(torch::kCPU);
+  torch::Tensor position_embedding =
+      torch_position_embedding_ptr_->forward(position_embedding_inputs)
+          .toTensor()
+          .to(torch::kCPU);
   torch::Tensor lstm_input =
       torch::zeros({1, 2 * (kEmbeddingSize + kHiddenSize)});
   for (int i = 0; i < kEmbeddingSize; ++i) {
@@ -206,8 +212,9 @@ Point3D PedestrianInteractionEvaluator::PredictNextPosition(
   auto new_ht = lstm_out_tuple->elements()[0].toTensor()[0];
   std::vector<torch::jit::IValue> prediction_inputs;
   prediction_inputs.push_back(std::move(new_ht));
-  auto pred_out_tensor = torch_prediction_layer_ptr_
-      ->forward(prediction_inputs).toTensor().to(torch::kCPU);
+  auto pred_out_tensor = torch_prediction_layer_ptr_->forward(prediction_inputs)
+                             .toTensor()
+                             .to(torch::kCPU);
   auto pred_out = pred_out_tensor.accessor<float, 2>();
   point.set_x(static_cast<double>(pred_out[0][0]));
   point.set_y(static_cast<double>(pred_out[0][1]));
