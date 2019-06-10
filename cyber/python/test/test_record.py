@@ -19,11 +19,11 @@
 import sys
 import unittest
 
-sys.path.append("../")
-from cyber_py import cyber
-from cyber_py import record
-from modules.common.util.testdata.simple_pb2 import SimpleMessage
-from cyber.proto import record_pb2
+sys.path.append("/apollo/cyber/python")
+from cyber_py import cyber  # noqa
+from cyber_py import record  # noqa
+from modules.common.util.testdata.simple_pb2 import SimpleMessage  # noqa
+from cyber.proto import record_pb2  # noqa
 
 TEST_RECORD_FILE = "test02.record"
 CHAN_1 = "channel/chatter"

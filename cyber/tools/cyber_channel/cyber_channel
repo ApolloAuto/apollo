@@ -20,9 +20,9 @@ import os
 import time
 import math
 
-sys.path.append("../")
-from cyber_py import cyber
-from cyber_py import cyber_time
+sys.path.append("/apollo/cyber/python")
+from cyber_py import cyber  # noqa
+from cyber_py import cyber_time  # noqa
 
 
 def print_channel_type(channel_name):

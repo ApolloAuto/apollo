@@ -18,9 +18,9 @@
 
 import sys
 
-sys.path.append("../")
-from cyber_py import cyber
-from cyber_py import record
+sys.path.append("/apollo/cyber/python")
+from cyber_py import cyber  # noqa
+from cyber_py import record  # noqa
 
 TEST_RECORD_FILE = "trans_ret.record"
 

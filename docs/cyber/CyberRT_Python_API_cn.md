@@ -225,9 +225,9 @@ class Timer(object):
 
 ```
 import sys
-sys.path.append("../")
-from cyber_py import cyber
-from modules.common.util.testdata.simple_pb2 import SimpleMessage
+sys.path.append("/apollo/cyber/python")
+from cyber_py import cyber  # noqa
+from modules.common.util.testdata.simple_pb2 import SimpleMessage  # noqa
 
 def callback(data):
 
@@ -266,7 +266,8 @@ from cyber_py import cyber
 """Module for example of talker."""
 import time
 import sys
-sys.path.append("../")
+sys.path.append("/apollo/cyber/python")
+from cyber_py import cyber  # noqa
 
 def test_talker_class():
     """
@@ -302,11 +303,11 @@ if __name__ == '__main__':
 import time
 import sys
 
-sys.path.append("../")
-from cyber_py import cyber
-from cyber_py import record
-from google.protobuf.descriptor_pb2 import FileDescriptorProto
-from modules.common.util.testdata.simple_pb2 import SimpleMessage
+sys.path.append("/apollo/cyber/python")
+from cyber_py import cyber  # noqa
+from cyber_py import record  # noqa
+from google.protobuf.descriptor_pb2 import FileDescriptorProto  # noqa
+from modules.common.util.testdata.simple_pb2 import SimpleMessage  # noqa
 
 TEST_RECORD_FILE = "test02.record"
 CHAN_1 = "channel/chatter"
