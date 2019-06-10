@@ -80,15 +80,7 @@ class LaneAggregatingEvaluator : public Evaluator {
       std::vector<std::vector<double>>* feature_values,
       std::vector<int>* lane_sequence_idx_to_remove);
 
-  //  struct LSTMState {
-  //    double timestamp;
-  //    torch::Tensor ct;
-  //    torch::Tensor ht;
-  //  };
-
-  //  void Clear();
-
-  //  void LoadModel();
+  void LoadModel();
 
  private:
   //  std::unordered_map<int, LSTMState> obstacle_id_lstm_state_map_;
@@ -98,8 +90,8 @@ class LaneAggregatingEvaluator : public Evaluator {
   //      torch_social_embedding_ptr_ = nullptr;
   //  std::shared_ptr<torch::jit::script::Module>
   //      torch_single_lstm_ptr_ = nullptr;
-  //  std::shared_ptr<torch::jit::script::Module>
-  //      torch_prediction_layer_ptr_ = nullptr;
+  std::shared_ptr<torch::jit::script::Module>
+      torch_obstacle_encoding_ptr_ = nullptr;
   torch::Device device_;
 
   static const size_t OBSTACLE_FEATURE_SIZE = 20 * 9;\
