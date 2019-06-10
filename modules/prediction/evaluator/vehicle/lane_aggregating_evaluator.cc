@@ -130,6 +130,8 @@ bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   }
 
   // 3. Aggregate the lane features.
+  torch::Tensor aggregated_lane_encoding =
+      AggregateLaneEncodings(lane_encoding_list);
 
   // 4. Make prediction.
 
@@ -376,6 +378,58 @@ bool LaneAggregatingEvaluator::ExtractStaticEnvFeatures(
   }
 
   return true;
+}
+
+torch::Tensor LaneAggregatingEvaluator::AggregateLaneEncodings(
+    const std::vector<torch::Tensor>& lane_encoding_list) {
+  torch::Tensor output_tensor = torch::zeros(
+      {1, SINGLE_LANE_ENCODING_SIZE * 2});
+  torch::Tensor max_pooling_tensor =
+      LaneEncodingMaxPooling(lane_encoding_list);
+  torch::Tensor avg_pooling_tensor =
+      LaneEncodingAvgPooling(lane_encoding_list);
+  for (size_t i = 0; i < SINGLE_LANE_ENCODING_SIZE; ++i) {
+    output_tensor[0][i] = max_pooling_tensor[0][i];
+  }
+  for (size_t i = 0; i < SINGLE_LANE_ENCODING_SIZE; ++i) {
+    output_tensor[0][SINGLE_LANE_ENCODING_SIZE+i] =
+        avg_pooling_tensor[0][i];
+  }
+  return output_tensor;
+}
+
+torch::Tensor LaneAggregatingEvaluator::LaneEncodingMaxPooling(
+    const std::vector<torch::Tensor>& lane_encoding_list) {
+  CHECK(!lane_encoding_list.empty());
+  torch::Tensor output_tensor = lane_encoding_list[0];
+
+  for (size_t i = 1; i < lane_encoding_list.size(); ++i) {
+    for (size_t j = 0; j < SINGLE_LANE_ENCODING_SIZE; ++j) {
+      output_tensor[0][j] = torch::max(output_tensor[0][j],
+          lane_encoding_list[i][0][j]);
+    }
+  }
+  return output_tensor;
+}
+
+torch::Tensor LaneAggregatingEvaluator::LaneEncodingAvgPooling(
+    const std::vector<torch::Tensor>& lane_encoding_list) {
+  CHECK(!lane_encoding_list.empty());
+  torch::Tensor output_tensor = lane_encoding_list[0];
+
+  for (size_t i = 1; i < lane_encoding_list.size(); ++i) {
+    for (size_t j = 0; j < SINGLE_LANE_ENCODING_SIZE; ++j) {
+      output_tensor[0][j] += lane_encoding_list[i][0][j];
+    }
+  }
+
+  torch::Tensor lane_encoding_list_size = torch::zeros({1});
+  lane_encoding_list_size[0] = static_cast<float>(
+      lane_encoding_list.size());
+  for (size_t i = 0; i < SINGLE_LANE_ENCODING_SIZE; ++i) {
+    output_tensor[0][i] /= lane_encoding_list_size[0];
+  }
+  return output_tensor;
 }
 
 }  // namespace prediction
