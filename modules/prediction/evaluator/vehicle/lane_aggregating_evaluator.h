@@ -89,6 +89,9 @@ class LaneAggregatingEvaluator : public Evaluator {
   torch::Tensor LaneEncodingAvgPooling(
       const std::vector<torch::Tensor>& lane_encoding_list);
 
+  std::vector<double> StableSoftmax(
+      const std::vector<double>& prediction_scores);
+
   void LoadModel();
 
  private:

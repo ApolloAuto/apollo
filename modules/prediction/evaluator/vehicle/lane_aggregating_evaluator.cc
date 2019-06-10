@@ -165,8 +165,12 @@ bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     prediction_scores.push_back(static_cast<double>(prediction_score[0][0]));
   }
 
-  // Passs the predicted result to the predictor to plot trajectory.
-  // TODO(jiacheng): implement this.
+  // Pass the predicted result to the predictor to plot trajectory.
+  std::vector<double> output_probabilities = StableSoftmax(prediction_scores);
+  for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
+    lane_graph_ptr->mutable_lane_sequence(i)->set_probability(
+        output_probabilities[i]);
+  }
 
   return true;
 }
@@ -459,6 +463,26 @@ torch::Tensor LaneAggregatingEvaluator::LaneEncodingAvgPooling(
     output_tensor[0][i] /= lane_encoding_list_size[0];
   }
   return output_tensor;
+}
+
+std::vector<double> LaneAggregatingEvaluator::StableSoftmax(
+    const std::vector<double>& prediction_scores) {
+  double max_score = prediction_scores[0];
+  for (const auto& prediction_score : prediction_scores) {
+    max_score = std::fmax(max_score, prediction_score);
+  }
+  std::vector<double> output_probabilities;
+  for (const auto& prediction_score : prediction_scores) {
+    output_probabilities.push_back(std::exp(prediction_score - max_score));
+  }
+  double denominator = 0.0;
+  for (const auto& element : output_probabilities) {
+    denominator += element;
+  }
+  for (auto& element : output_probabilities) {
+    element = element / denominator;
+  }
+  return output_probabilities;
 }
 
 }  // namespace prediction
