@@ -168,7 +168,7 @@ template <typename T>
 typename std::enable_if<HasParseFromArray<T>::value, bool>::type ParseFromHC(
     const void* data, int size, T* message) {
   const auto header_size = sizeof(MessageHeader);
-  RETURN_VAL_IF(size < header_size, false);
+  RETURN_VAL_IF(size < (int)header_size, false);
   const MessageHeader* header = static_cast<const MessageHeader*>(data);
   RETURN_VAL_IF((size - header_size) < header->content_size(), false);
   SetTypeName(header->msg_type(), message);

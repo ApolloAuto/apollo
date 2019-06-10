@@ -485,7 +485,7 @@ int BufferCore::walkToTopParent(
     if (n > 0)
       frame_chain->erase(frame_chain->begin() + (n - 1), frame_chain->end());
 
-    if (m < reverse_frame_chain.size()) {
+    if (m < (int)reverse_frame_chain.size()) {
       for (int i = m; i >= 0; --i) {
         frame_chain->push_back(reverse_frame_chain[i]);
       }
