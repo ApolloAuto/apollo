@@ -19,6 +19,7 @@ cc_library(
         ":object_pool_types",
         ":omnidirectional_model",
         ":point_cloud",
+        ":point_cloud_util",
         ":polynomial",
         ":syncedmem",
         ":traffic_light",
@@ -338,6 +339,25 @@ cc_library(
     ],
     deps = [
         "@eigen",
+    ],
+)
+
+cc_library(
+    name = "point_cloud_util",
+    hdrs = [
+        "point_cloud_util.h",
+    ],
+    srcs = [
+        "point_cloud_util.cc",
+    ],
+    linkopts = [
+        "-lopencv_core",
+        "-lopencv_highgui",
+    ],
+    deps = [
+        "@eigen",
+        "//cyber",
+        ":point_cloud",
     ],
 )
 
