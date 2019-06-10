@@ -80,6 +80,15 @@ class LaneAggregatingEvaluator : public Evaluator {
       std::vector<std::vector<double>>* feature_values,
       std::vector<int>* lane_sequence_idx_to_remove);
 
+  torch::Tensor AggregateLaneEncodings(
+      const std::vector<torch::Tensor>& lane_encoding_list);
+
+  torch::Tensor LaneEncodingMaxPooling(
+      const std::vector<torch::Tensor>& lane_encoding_list);
+
+  torch::Tensor LaneEncodingAvgPooling(
+      const std::vector<torch::Tensor>& lane_encoding_list);
+
   void LoadModel();
 
  private:
@@ -100,6 +109,8 @@ class LaneAggregatingEvaluator : public Evaluator {
   static const size_t SINGLE_LANE_FEATURE_SIZE = 4;
   static const size_t LANE_POINTS_SIZE = 100;          // 50m
   static const size_t BACKWARD_LANE_POINTS_SIZE = 50;  // 25m
+
+  static const size_t SINGLE_LANE_ENCODING_SIZE = 128;
   //  static const int kGridSize = 2;
   //  static const int kEmbeddingSize = 64;
   //  static const int kHiddenSize = 128;
