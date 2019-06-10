@@ -164,6 +164,10 @@ DEFINE_string(torch_pedestrian_interaction_prediction_layer_file,
               "/apollo/modules/prediction/data/"
               "pedestrian_interaction_prediction_layer.pt",
               "pedestrian interaction prediction layer");
+DEFINE_string(torch_lane_aggregating_obstacle_encoding_file,
+              "/apollo/modules/prediction/data/"
+              "lane_aggregating_obstacle_encoding_layer.pt",
+              "");
 DEFINE_int32(max_num_obstacles, 300,
              "maximal number of obstacles stored in obstacles container.");
 DEFINE_double(valid_position_diff_threshold, 0.5,

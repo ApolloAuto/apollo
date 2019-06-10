@@ -40,7 +40,13 @@ using apollo::perception::PerceptionObstacles;
 
 LaneAggregatingEvaluator::LaneAggregatingEvaluator()
     : device_(torch::kCPU) {
-  // LoadModel();
+  LoadModel();
+}
+
+void LaneAggregatingEvaluator::LoadModel() {
+  torch::set_num_threads(1);
+  torch_obstacle_encoding_ptr_ = torch::jit::load(
+      FLAGS_torch_lane_aggregating_obstacle_encoding_file, device_);
 }
 
 bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
@@ -69,6 +75,35 @@ bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
          << " lane sequences to scan.";
 
   // Extract features, and do model inferencing.
+  // 1. Encode the obstacle features.
+  std::vector<double> obstacle_feature_values;
+  if (!ExtractObstacleFeatures(obstacle_ptr, &obstacle_feature_values)) {
+    ADEBUG << "Failed to extract obstacle features for obs_id = " << id;
+  }
+  if (obstacle_feature_values.size() != OBSTACLE_FEATURE_SIZE) {
+    ADEBUG << "Obstacle [" << id << "] has fewer than "
+           << "expected obstacle feature_values "
+           << obstacle_feature_values.size() << ".";
+    return false;
+  }
+  ADEBUG << "Obstacle feature size = " << obstacle_feature_values.size();
+  std::vector<torch::jit::IValue> obstacle_encoding_inputs;
+  torch::Tensor obstacle_encoding_inputs_tensor =
+      torch::zeros({1, static_cast<int>(obstacle_feature_values.size())});
+  for (size_t i = 0; i < obstacle_feature_values.size(); ++i) {
+    obstacle_encoding_inputs_tensor[0][i] = static_cast<float>(
+        obstacle_feature_values[i]);
+  }
+  obstacle_encoding_inputs.push_back(
+      std::move(obstacle_encoding_inputs_tensor));
+  torch::Tensor obstalce_encoding = torch_obstacle_encoding_ptr_
+      ->forward(obstacle_encoding_inputs).toTensor().to(torch::kCPU);
+
+  // 2. Encode the lane features.
+
+  // 3. Aggregate the lane features.
+
+  // 4. Make prediction.
 
   return true;
 }
