@@ -23,6 +23,7 @@
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/string_util.h"
+#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/pose/pose_container.h"
 
