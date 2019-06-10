@@ -19,12 +19,12 @@
 import time
 import sys
 
-sys.path.append("../")
-from cyber_py import cyber
-from cyber_py import record
-from google.protobuf.descriptor_pb2 import FileDescriptorProto
-from modules.common.util.testdata.simple_pb2 import SimpleMessage
-from cyber.proto.unit_test_pb2 import Chatter
+sys.path.append("/apollo/cyber/python")
+from cyber_py import cyber  # noqa
+from cyber_py import record  # noqa
+from google.protobuf.descriptor_pb2 import FileDescriptorProto  # noqa
+from modules.common.util.testdata.simple_pb2 import SimpleMessage  # noqa
+from cyber.proto.unit_test_pb2 import Chatter  # noqa
 
 TEST_RECORD_FILE = "test02.record"
 MSG_TYPE = "apollo.common.util.test.SimpleMessage"

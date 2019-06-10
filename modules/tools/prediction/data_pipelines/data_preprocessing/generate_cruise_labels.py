@@ -24,7 +24,7 @@ import logging
 
 sys.path.append('/apollo/modules/tools/prediction/data_pipelines/common/')
 
-from online_to_offline import LabelGenerator
+from online_to_offline import LabelGenerator  # noqa
 
 
 if __name__ == "__main__":

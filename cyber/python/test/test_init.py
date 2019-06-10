@@ -19,8 +19,8 @@
 import sys
 import unittest
 
-sys.path.append("../")
-from cyber_py import cyber
+sys.path.append("/apollo/cyber/python")
+from cyber_py import cyber  # noqa
 
 
 class TestInit(unittest.TestCase):

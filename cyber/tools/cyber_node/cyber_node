@@ -18,8 +18,8 @@
 import sys
 import os
 
-sys.path.append("../")
-from cyber_py import cyber
+sys.path.append("/apollo/cyber/python")
+from cyber_py import cyber  # noqa
 
 
 def print_node_info(node_name):

@@ -17,9 +17,9 @@
 """Module for example of topology manager."""
 
 import sys
-from cyber_py import topology_manager
 
-sys.path.append("../")
+sys.path.append("/apollo/cyber/python")
+from cyber_py import topology_manager  # noqa
 
 
 class TestTopologyManager(object):
