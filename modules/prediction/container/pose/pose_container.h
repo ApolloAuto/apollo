@@ -25,7 +25,6 @@
 
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/container.h"
 
 namespace apollo {
@@ -68,7 +67,6 @@ class PoseContainer : public Container {
   void Update(const localization::LocalizationEstimate& localization);
 
  public:
-  static const int ID = FLAGS_ego_vehicle_id;
   static const perception::PerceptionObstacle::Type type_ =
       perception::PerceptionObstacle::VEHICLE;
 
