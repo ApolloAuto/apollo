@@ -92,13 +92,6 @@ class LaneAggregatingEvaluator : public Evaluator {
   void LoadModel();
 
  private:
-  //  std::unordered_map<int, LSTMState> obstacle_id_lstm_state_map_;
-  //  std::shared_ptr<torch::jit::script::Module>
-  //      torch_position_embedding_ptr_ = nullptr;
-  //  std::shared_ptr<torch::jit::script::Module>
-  //      torch_social_embedding_ptr_ = nullptr;
-  //  std::shared_ptr<torch::jit::script::Module>
-  //      torch_single_lstm_ptr_ = nullptr;
   std::shared_ptr<torch::jit::script::Module>
       torch_obstacle_encoding_ptr_ = nullptr;
   std::shared_ptr<torch::jit::script::Module>
@@ -115,9 +108,6 @@ class LaneAggregatingEvaluator : public Evaluator {
   static const size_t OBSTACLE_ENCODING_SIZE = 128;
   static const size_t SINGLE_LANE_ENCODING_SIZE = 128;
   static const size_t AGGREGATED_ENCODING_SIZE = 256;
-  //  static const int kGridSize = 2;
-  //  static const int kEmbeddingSize = 64;
-  //  static const int kHiddenSize = 128;
 };
 
 }  // namespace prediction
