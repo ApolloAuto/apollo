@@ -193,22 +193,22 @@ def print_distance_error(error, error_lon, error_lat, error_alt):
     res = get_stat2_from_data(error)
     print('error    : %06f %06f %06f %06f %06f %06f %06d' % \
         (result[0], result[1], result[2],
-         result[3], result[4], result[5], res[2])
+         result[3], result[4], result[5], res[2]))
     result = get_stat_from_data(error_lon)
     res = get_stat2_from_data(error_lon)
     print('error lon: %06f %06f %06f %06f %06f %06f %06d' % \
         (result[0], result[1], result[2],
-         result[3], result[4], result[5], res[2])
+         result[3], result[4], result[5], res[2]))
     result = get_stat_from_data(error_lat)
     res = get_stat2_from_data(error_lat)
     print('error lat: %06f %06f %06f %06f %06f %06f %06d' % \
         (result[0], result[1], result[2],
-         result[3], result[4], result[5], res[2])
+         result[3], result[4], result[5], res[2]))
     result = get_stat_from_data(error_alt)
     res = get_stat2_from_data(error_alt)
     print('error alt: %06f %06f %06f %06f %06f %06f %06d' % \
         (result[0], result[1], result[2],
-         result[3], result[4], result[5], res[2])
+         result[3], result[4], result[5], res[2]))
 
 def print_angle_error(error_roll, error_pitch, error_yaw):
     print('criteria : mean     std      max      < 1.0d   < 0.6d   < 0.3d  con_frames(>1.0d)')
