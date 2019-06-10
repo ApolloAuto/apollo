@@ -92,6 +92,8 @@ class LaneAggregatingEvaluator : public Evaluator {
   //      torch_single_lstm_ptr_ = nullptr;
   std::shared_ptr<torch::jit::script::Module>
       torch_obstacle_encoding_ptr_ = nullptr;
+  std::shared_ptr<torch::jit::script::Module>
+      torch_lane_encoding_ptr_ = nullptr;
   torch::Device device_;
 
   static const size_t OBSTACLE_FEATURE_SIZE = 20 * 9;\
