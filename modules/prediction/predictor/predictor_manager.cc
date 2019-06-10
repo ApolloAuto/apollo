@@ -128,7 +128,9 @@ void PredictorManager::Init(const PredictionConf& config) {
         }
         break;
       }
-      default: { break; }
+      default: {
+        break;
+      }
     }
   }
 
@@ -361,7 +363,9 @@ std::unique_ptr<Predictor> PredictorManager::CreatePredictor(
       predictor_ptr.reset(new InteractionPredictor());
       break;
     }
-    default: { break; }
+    default: {
+      break;
+    }
   }
   return predictor_ptr;
 }

@@ -216,7 +216,7 @@ void ObstaclesContainer::InsertPerceptionObstacle(
            << perception_obstacle.id() << ", and prediction id: " << id;
   }
   curr_frame_id_perception_obstacle_map_[id] = perception_obstacle;
-  if (id < -1) {
+  if (id < FLAGS_ego_vehicle_id) {
     AERROR << "Invalid ID [" << id << "]";
     return;
   }
@@ -242,7 +242,7 @@ void ObstaclesContainer::InsertPerceptionObstacle(
     ADEBUG << "Insert obstacle [" << id << "]";
   }
 
-  if (id != -1) {
+  if (id != FLAGS_ego_vehicle_id) {
     curr_frame_movable_obstacle_ids_.push_back(id);
   }
   SetConsideredObstacleIds();
