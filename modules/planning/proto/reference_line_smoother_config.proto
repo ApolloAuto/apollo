@@ -50,7 +50,7 @@ message DiscretePointsSmootherConfig {
   }
 
   optional SmoothingMethod smoothing_method = 3 [default = FEM_POS_DEVIATION_SMOOTHING];
-  
+
   oneof SmootherConfig {
     CosThetaSmootherConfig cos_theta_smoothing = 4;
     FemPosDeviationSmootherConfig fem_pos_deviation_smoothing = 5;
