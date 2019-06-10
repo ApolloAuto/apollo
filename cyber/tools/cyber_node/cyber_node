@@ -17,14 +17,9 @@
 
 import sys
 import os
-import time
-import math
-import traceback
 
 sys.path.append("../")
 from cyber_py import cyber
-
-NAME = 'cyber_node'
 
 
 def print_node_info(node_name):
@@ -42,15 +37,13 @@ def print_node_info(node_name):
     print "hostname\t", msg.host_name
 
     print "[Reading Channels]:"
-    reader_channels = cyber.NodeUtils.get_readersofnode(node_name)
-    reader_channels.sort()
+    reader_channels = sorted(cyber.NodeUtils.get_readersofnode(node_name))
     for channel in reader_channels:
         print channel
     print ""
 
     print "[Writing Channels]:"
-    writer_channels = cyber.NodeUtils.get_writersofnode(node_name)
-    writer_channels.sort()
+    writer_channels = sorted(cyber.NodeUtils.get_writersofnode(node_name))
     for channel in writer_channels:
         print channel
     print ""
@@ -63,7 +56,7 @@ def _node_cmd_info(argv):
     args = argv[2:]
     from optparse import OptionParser
     parser = OptionParser(
-        usage="usage: %prog info channelname ", prog=NAME)
+        usage="usage: cyber_node info channelname ")
     parser.add_option("-a", "--all",
                       dest="all_channels", default=False,
                       action="store_true",
@@ -97,7 +90,7 @@ def _node_cmd_list(argv):
     args = argv[2:]
     from optparse import OptionParser
     parser = OptionParser(
-        usage="usage: %prog list", prog=NAME)
+        usage="usage: cyber_node list")
     (options, args) = parser.parse_args(args)
     if len(args) > 0:
         parser.error("param is too much")

@@ -19,13 +19,10 @@ import sys
 import os
 import time
 import math
-import traceback
 
 sys.path.append("../")
 from cyber_py import cyber
 from cyber_py import cyber_time
-
-NAME = 'cyber_channel'
 
 
 def print_channel_type(channel_name):
@@ -40,7 +37,7 @@ def _channel_cmd_type(argv):
     args = argv[2:]
     from optparse import OptionParser
     parser = OptionParser(
-        usage="usage: %prog type channelname", prog=NAME)
+        usage="usage: cyber_channel type channelname")
     (options, args) = parser.parse_args(args)
     if len(args) > 1:
         parser.error("you may only specify one input channel")
@@ -54,7 +51,6 @@ class CyberChannelBw(object):
     def __init__(self, window_size=100):
         import threading
         self.lock = threading.Lock()
-        self.last_printed_tn = 0
         self.sizes = []
         self.times = []
         self.window_size = window_size
@@ -64,20 +60,16 @@ class CyberChannelBw(object):
 
     def callback_bw(self, rawdata):
         with self.lock:
-            try:
-                t = time.time()
-                self.times.append(t)
-                self.sizes.append(len(rawdata))
-                assert(len(self.times) == len(self.sizes))
+            t = time.time()
+            self.times.append(t)
+            self.sizes.append(len(rawdata))
+            assert(len(self.times) == len(self.sizes))
 
-                if len(self.times) > self.window_size:
-                    self.times.pop(0)
-                    self.sizes.pop(0)
-            except:
-                traceback.print_exc()
+            if len(self.times) > self.window_size:
+                self.times.pop(0)
+                self.sizes.pop(0)
 
     def print_bw(self):
-        """print the average publishing rate to screen"""
         if len(self.times) < 2:
             return
         with self.lock:
@@ -89,7 +81,6 @@ class CyberChannelBw(object):
             bytes_per_s = total / (tn - t0)
             mean = total / n
 
-            # min and max
             max_s = max(self.sizes)
             min_s = min(self.sizes)
 
@@ -124,7 +115,7 @@ def _channel_cmd_bw(argv):
     args = argv[2:]
     from optparse import OptionParser
     parser = OptionParser(
-        usage="usage: %prog bw channelname", prog=NAME)
+        usage="usage: cyber_channel bw channelname")
     parser.add_option("-w", "--window",
                       dest="window_size", default=-1,
                       help="window size for calculating rate, max size is 50000")
@@ -138,7 +129,6 @@ def _channel_cmd_bw(argv):
     if len(args) > 1:
         parser.error("param is too much")
 
-    # check string
     try:
         if options.window_size != -1:
             import string
@@ -165,34 +155,29 @@ class CyberChannelHz(object):
         self.msg_tn = 0
         self.times = []
 
-        # can't have infinite window size due to memory restrictions
         if window_size <= 0 or window_size > 50000:
             window_size = 50000
         self.window_size = window_size
-        print "hz window_size: ",  window_size
+        print "hz window_size: ", window_size
 
     def callback_hz(self, m):
         with self.lock:
             curr_time = cyber_time.Time.now().to_sec()
-            # time reset
+
             if curr_time == 0:
                 if len(self.times) > 0:
-                    print("time has reset, resetting counters")
+                    print("reset times.")
                     self.times = []
                 return
 
-            curr = curr_time
-
-            if self.msg_t0 < 0 or self.msg_t0 > curr:
-                self.msg_t0 = curr
-                self.msg_tn = curr
+            if self.msg_t0 < 0 or self.msg_t0 > curr_time:
+                self.msg_t0 = curr_time
+                self.msg_tn = curr_time
                 self.times = []
             else:
-                self.times.append(curr - self.msg_tn)
-                self.msg_tn = curr
+                self.times.append(curr_time - self.msg_tn)
+                self.msg_tn = curr_time
 
-            # only keep statistics for the last 10000 messages so as not to run
-            # out of memory
             if len(self.times) > self.window_size - 1:
                 self.times.pop(0)
 
@@ -210,10 +195,8 @@ class CyberChannelHz(object):
             mean = sum(self.times) / n
             rate = 1. / mean if mean > 0. else 0
 
-            # std dev
             std_dev = math.sqrt(sum((x - mean) ** 2 for x in self.times) / n)
 
-            # min and max
             max_delta = max(self.times)
             min_delta = min(self.times)
 
@@ -239,7 +222,7 @@ def _channel_cmd_hz(argv):
     args = argv[2:]
     from optparse import OptionParser
     parser = OptionParser(
-        usage="usage: %prog hz channelname", prog=NAME)
+        usage="usage: cyber_channel hz channelname")
     parser.add_option("-w", "--window",
                       dest="window_size", default=-1,
                       help="window size for calculating rate, max size is 50000")
@@ -295,8 +278,7 @@ def channel_info(channel_name):
         for role_data in channlesinfo_dict[channel_name]:
             print_role(role_data)
     else:
-        channels = channlesinfo_dict.keys()
-        channels.sort()
+        channels = sorted(channlesinfo_dict.keys())
         print "The number of channels is: ", len(channels)
         for channel in channels:
             print channel
@@ -311,7 +293,7 @@ def _channel_cmd_info(argv):
     args = argv[2:]
     from optparse import OptionParser
     parser = OptionParser(
-        usage="usage: %prog info channelname ", prog=NAME)
+        usage="usage: cyber_channel info channelname ")
     parser.add_option("-a", "--all",
                       dest="all_channels", default=False,
                       action="store_true",
@@ -329,9 +311,8 @@ def _channel_cmd_info(argv):
 
 
 def print_channel_list():
-    channels = cyber.ChannelUtils.get_channels()
+    channels = sorted(cyber.ChannelUtils.get_channels())
     print "The number of channels is: ", len(channels)
-    channels.sort()
     for channel in channels:
         print channel
 
@@ -343,7 +324,7 @@ def _channel_cmd_list(argv):
     args = argv[2:]
     from optparse import OptionParser
     parser = OptionParser(
-        usage="usage: %prog list", prog=NAME)
+        usage="usage: cyber_channel list")
     (options, args) = parser.parse_args(args)
     if len(args) > 0:
         parser.error("param is too much")
@@ -386,7 +367,7 @@ def _channel_cmd_echo(argv):
     args = argv[2:]
     from optparse import OptionParser
     parser = OptionParser(
-        usage="usage: %prog echo channelname", prog=NAME)
+        usage="usage: cyber_channel echo channelname")
     (options, args) = parser.parse_args(args)
     if len(args) > 1:
         parser.error("you may only specify one input channel")
