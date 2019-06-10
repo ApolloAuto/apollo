@@ -49,6 +49,8 @@ void LaneAggregatingEvaluator::LoadModel() {
       FLAGS_torch_lane_aggregating_obstacle_encoding_file, device_);
   torch_lane_encoding_ptr_ = torch::jit::load(
       FLAGS_torch_lane_aggregating_lane_encoding_file, device_);
+  torch_prediction_layer_ptr_ = torch::jit::load(
+      FLAGS_torch_lane_aggregating_prediction_layer_file, device_);
 }
 
 bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
@@ -100,7 +102,6 @@ bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       std::move(obstacle_encoding_inputs_tensor));
   torch::Tensor obstalce_encoding = torch_obstacle_encoding_ptr_
       ->forward(obstacle_encoding_inputs).toTensor().to(torch::kCPU);
-
   // 2. Encode the lane features.
   std::vector<std::vector<double>> lane_feature_values;
   std::vector<int> lane_sequence_idx_to_remove;
@@ -128,12 +129,37 @@ bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
         ->forward(single_lane_encoding_inputs).toTensor().to(torch::kCPU);
     lane_encoding_list.push_back(std::move(single_lane_encoding));
   }
-
   // 3. Aggregate the lane features.
   torch::Tensor aggregated_lane_encoding =
       AggregateLaneEncodings(lane_encoding_list);
-
   // 4. Make prediction.
+  std::vector<double> prediction_scores;
+  for (size_t i = 0; i < lane_encoding_list.size(); ++i) {
+    std::vector<torch::jit::IValue> prediction_layer_inputs;
+    torch::Tensor prediction_layer_inputs_tensor =
+        torch::zeros({1, OBSTACLE_ENCODING_SIZE + SINGLE_LANE_ENCODING_SIZE +
+                          AGGREGATED_ENCODING_SIZE});
+    for (size_t j = 0; j < OBSTACLE_ENCODING_SIZE; ++j) {
+      prediction_layer_inputs_tensor[0][j] = obstalce_encoding[0][j];
+    }
+    for (size_t j = 0; j < SINGLE_LANE_ENCODING_SIZE; ++j) {
+      prediction_layer_inputs_tensor[0][OBSTACLE_ENCODING_SIZE+j] =
+          lane_encoding_list[i][0][j];
+    }
+    for (size_t j = 0; j < AGGREGATED_ENCODING_SIZE; ++j) {
+      prediction_layer_inputs_tensor[0][OBSTACLE_ENCODING_SIZE+
+          SINGLE_LANE_ENCODING_SIZE+j] = aggregated_lane_encoding[0][j];
+    }
+    prediction_layer_inputs.push_back(
+        std::move(prediction_layer_inputs_tensor));
+    torch::Tensor prediction_layer_output = torch_prediction_layer_ptr_
+        ->forward(prediction_layer_inputs).toTensor().to(torch::kCPU);
+    auto prediction_score = prediction_layer_output.accessor<float, 2>();
+    prediction_scores.push_back(static_cast<double>(prediction_score[0][0]));
+  }
+
+  // Passs the predicted result to the predictor to plot trajectory.
+  // TODO(jiacheng): implement this.
 
   return true;
 }
