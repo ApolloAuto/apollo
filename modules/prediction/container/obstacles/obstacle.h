@@ -325,7 +325,7 @@ class Obstacle {
       std::unordered_set<std::string>* const existing_lane_ids);
 
  private:
-  int id_ = -1;
+  int id_ = FLAGS_ego_vehicle_id;
 
   perception::PerceptionObstacle::Type type_ =
       perception::PerceptionObstacle::UNKNOWN_UNMOVABLE;
