@@ -31,15 +31,14 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::math::Vec2d;
 using apollo::common::Point3D;
 using apollo::common::TrajectoryPoint;
+using apollo::common::adapter::AdapterConfig;
+using apollo::common::math::Vec2d;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 
-LaneAggregatingEvaluator::LaneAggregatingEvaluator()
-    : device_(torch::kCPU) {
+LaneAggregatingEvaluator::LaneAggregatingEvaluator() : device_(torch::kCPU) {
   LoadModel();
 }
 
@@ -95,18 +94,21 @@ bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   torch::Tensor obstacle_encoding_inputs_tensor =
       torch::zeros({1, static_cast<int>(obstacle_feature_values.size())});
   for (size_t i = 0; i < obstacle_feature_values.size(); ++i) {
-    obstacle_encoding_inputs_tensor[0][i] = static_cast<float>(
-        obstacle_feature_values[i]);
+    obstacle_encoding_inputs_tensor[0][i] =
+        static_cast<float>(obstacle_feature_values[i]);
   }
   obstacle_encoding_inputs.push_back(
       std::move(obstacle_encoding_inputs_tensor));
-  torch::Tensor obstalce_encoding = torch_obstacle_encoding_ptr_
-      ->forward(obstacle_encoding_inputs).toTensor().to(torch::kCPU);
+  torch::Tensor obstalce_encoding =
+      torch_obstacle_encoding_ptr_->forward(obstacle_encoding_inputs)
+          .toTensor()
+          .to(torch::kCPU);
   // 2. Encode the lane features.
   std::vector<std::vector<double>> lane_feature_values;
   std::vector<int> lane_sequence_idx_to_remove;
   if (!ExtractStaticEnvFeatures(obstacle_ptr, lane_graph_ptr,
-          &lane_feature_values, &lane_sequence_idx_to_remove)) {
+                                &lane_feature_values,
+                                &lane_sequence_idx_to_remove)) {
     AERROR << "Failed to extract static environmental features around obs_id = "
            << id;
   }
@@ -120,13 +122,15 @@ bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     torch::Tensor single_lane_encoding_inputs_tensor =
         torch::zeros({1, static_cast<int>(single_lane_feature_values.size())});
     for (size_t i = 0; i < single_lane_feature_values.size(); ++i) {
-      single_lane_encoding_inputs_tensor[0][i] = static_cast<float>(
-        single_lane_feature_values[i]);
+      single_lane_encoding_inputs_tensor[0][i] =
+          static_cast<float>(single_lane_feature_values[i]);
     }
     single_lane_encoding_inputs.push_back(
         std::move(single_lane_encoding_inputs_tensor));
-    torch::Tensor single_lane_encoding = torch_lane_encoding_ptr_
-        ->forward(single_lane_encoding_inputs).toTensor().to(torch::kCPU);
+    torch::Tensor single_lane_encoding =
+        torch_lane_encoding_ptr_->forward(single_lane_encoding_inputs)
+            .toTensor()
+            .to(torch::kCPU);
     lane_encoding_list.push_back(std::move(single_lane_encoding));
   }
   // 3. Aggregate the lane features.
@@ -138,22 +142,25 @@ bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     std::vector<torch::jit::IValue> prediction_layer_inputs;
     torch::Tensor prediction_layer_inputs_tensor =
         torch::zeros({1, OBSTACLE_ENCODING_SIZE + SINGLE_LANE_ENCODING_SIZE +
-                          AGGREGATED_ENCODING_SIZE});
+                             AGGREGATED_ENCODING_SIZE});
     for (size_t j = 0; j < OBSTACLE_ENCODING_SIZE; ++j) {
       prediction_layer_inputs_tensor[0][j] = obstalce_encoding[0][j];
     }
     for (size_t j = 0; j < SINGLE_LANE_ENCODING_SIZE; ++j) {
-      prediction_layer_inputs_tensor[0][OBSTACLE_ENCODING_SIZE+j] =
+      prediction_layer_inputs_tensor[0][OBSTACLE_ENCODING_SIZE + j] =
           lane_encoding_list[i][0][j];
     }
     for (size_t j = 0; j < AGGREGATED_ENCODING_SIZE; ++j) {
-      prediction_layer_inputs_tensor[0][OBSTACLE_ENCODING_SIZE+
-          SINGLE_LANE_ENCODING_SIZE+j] = aggregated_lane_encoding[0][j];
+      prediction_layer_inputs_tensor[0][OBSTACLE_ENCODING_SIZE +
+                                        SINGLE_LANE_ENCODING_SIZE + j] =
+          aggregated_lane_encoding[0][j];
     }
     prediction_layer_inputs.push_back(
         std::move(prediction_layer_inputs_tensor));
-    torch::Tensor prediction_layer_output = torch_prediction_layer_ptr_
-        ->forward(prediction_layer_inputs).toTensor().to(torch::kCPU);
+    torch::Tensor prediction_layer_output =
+        torch_prediction_layer_ptr_->forward(prediction_layer_inputs)
+            .toTensor()
+            .to(torch::kCPU);
     auto prediction_score = prediction_layer_output.accessor<float, 2>();
     prediction_scores.push_back(static_cast<double>(prediction_score[0][0]));
   }
@@ -387,10 +394,10 @@ bool LaneAggregatingEvaluator::ExtractStaticEnvFeatures(
     while (count >= SINGLE_LANE_FEATURE_SIZE * 2 &&
            count < SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
       std::size_t s = curr_feature_values.size();
-      double relative_l_new = 2 * curr_feature_values[s - 4] -
-                              curr_feature_values[s - 8];
-      double relative_s_new = 2 * curr_feature_values[s - 3] -
-                              curr_feature_values[s - 7];
+      double relative_l_new =
+          2 * curr_feature_values[s - 4] - curr_feature_values[s - 8];
+      double relative_s_new =
+          2 * curr_feature_values[s - 3] - curr_feature_values[s - 7];
       double relative_ang_new = curr_feature_values[s - 2];
 
       curr_feature_values.push_back(relative_l_new);
@@ -408,18 +415,15 @@ bool LaneAggregatingEvaluator::ExtractStaticEnvFeatures(
 
 torch::Tensor LaneAggregatingEvaluator::AggregateLaneEncodings(
     const std::vector<torch::Tensor>& lane_encoding_list) {
-  torch::Tensor output_tensor = torch::zeros(
-      {1, SINGLE_LANE_ENCODING_SIZE * 2});
-  torch::Tensor max_pooling_tensor =
-      LaneEncodingMaxPooling(lane_encoding_list);
-  torch::Tensor avg_pooling_tensor =
-      LaneEncodingAvgPooling(lane_encoding_list);
+  torch::Tensor output_tensor =
+      torch::zeros({1, SINGLE_LANE_ENCODING_SIZE * 2});
+  torch::Tensor max_pooling_tensor = LaneEncodingMaxPooling(lane_encoding_list);
+  torch::Tensor avg_pooling_tensor = LaneEncodingAvgPooling(lane_encoding_list);
   for (size_t i = 0; i < SINGLE_LANE_ENCODING_SIZE; ++i) {
     output_tensor[0][i] = max_pooling_tensor[0][i];
   }
   for (size_t i = 0; i < SINGLE_LANE_ENCODING_SIZE; ++i) {
-    output_tensor[0][SINGLE_LANE_ENCODING_SIZE+i] =
-        avg_pooling_tensor[0][i];
+    output_tensor[0][SINGLE_LANE_ENCODING_SIZE + i] = avg_pooling_tensor[0][i];
   }
   return output_tensor;
 }
@@ -431,8 +435,8 @@ torch::Tensor LaneAggregatingEvaluator::LaneEncodingMaxPooling(
 
   for (size_t i = 1; i < lane_encoding_list.size(); ++i) {
     for (size_t j = 0; j < SINGLE_LANE_ENCODING_SIZE; ++j) {
-      output_tensor[0][j] = torch::max(output_tensor[0][j],
-          lane_encoding_list[i][0][j]);
+      output_tensor[0][j] =
+          torch::max(output_tensor[0][j], lane_encoding_list[i][0][j]);
     }
   }
   return output_tensor;
@@ -450,8 +454,7 @@ torch::Tensor LaneAggregatingEvaluator::LaneEncodingAvgPooling(
   }
 
   torch::Tensor lane_encoding_list_size = torch::zeros({1});
-  lane_encoding_list_size[0] = static_cast<float>(
-      lane_encoding_list.size());
+  lane_encoding_list_size[0] = static_cast<float>(lane_encoding_list.size());
   for (size_t i = 0; i < SINGLE_LANE_ENCODING_SIZE; ++i) {
     output_tensor[0][i] /= lane_encoding_list_size[0];
   }
