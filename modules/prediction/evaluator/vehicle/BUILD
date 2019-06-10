@@ -223,4 +223,25 @@ cc_library(
     }),
 )
 
+cc_library(
+    name = "lane_aggregating_evaluator",
+    srcs = [
+        "lane_aggregating_evaluator.cc",
+    ],
+    hdrs = [
+        "lane_aggregating_evaluator.h",
+    ],
+    deps = [
+        "//modules/prediction/container:container_manager",
+        "//modules/prediction/evaluator",
+    ] + select({
+        "//tools/platforms:use_gpu": [
+            "@pytorch",
+        ],
+        "//conditions:default": [
+            "@pytorch",
+        ],
+    }),
+)
+
 cpplint()
