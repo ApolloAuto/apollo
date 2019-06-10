@@ -96,7 +96,7 @@ if [ -e /proc/sys/kernel ]; then
     echo "/apollo/data/core/core_%e.%p" | sudo tee /proc/sys/kernel/core_pattern > /dev/null
 fi
 
-source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
+source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh CYBER_ONLY
 check_agreement
 check_host_environment
 

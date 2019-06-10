@@ -21,7 +21,7 @@ CMD=""
 
 APOLLO_ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 
-source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
+source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh CYBER_ONLY
 
 xhost +local:root 1>/dev/null 2>&1
 
