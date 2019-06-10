@@ -182,5 +182,138 @@ bool LaneAggregatingEvaluator::ExtractObstacleFeatures(
   return true;
 }
 
+bool LaneAggregatingEvaluator::ExtractStaticEnvFeatures(
+    const Obstacle* obstacle_ptr, const LaneGraph* lane_graph_ptr,
+    std::vector<std::vector<double>>* feature_values,
+    std::vector<int>* lane_sequence_idx_to_remove) {
+  // Sanity checks.
+  CHECK_NOTNULL(lane_graph_ptr);
+  feature_values->clear();
+
+  // Get obstacle's current position to set up the relative coord. system.
+  const Feature& obs_curr_feature = obstacle_ptr->latest_feature();
+  double obs_curr_heading = obs_curr_feature.velocity_heading();
+  std::pair<double, double> obs_curr_pos = std::make_pair(
+      obs_curr_feature.position().x(), obs_curr_feature.position().y());
+
+  // Go through every lane-sequence (ordered from left to right) and
+  // extract needed features.
+  for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
+    // Get all the properties of the current lane-sequence.
+    // Go through all the lane-points to fill up the feature_values.
+    const LaneSequence& lane_sequence = lane_graph_ptr->lane_sequence(i);
+    std::vector<double> curr_feature_values;
+
+    // Extract features from backward lane-points.
+    size_t count = 0;
+    std::vector<double> backward_feature_values;
+    for (int j = lane_sequence.adc_lane_segment_idx(); j >= 0; --j) {
+      if (count >= SINGLE_LANE_FEATURE_SIZE * BACKWARD_LANE_POINTS_SIZE) {
+        break;
+      }
+      const LaneSegment& lane_segment = lane_sequence.lane_segment(j);
+      int k_starting_idx = lane_segment.lane_point_size() - 1;
+      if (j == lane_sequence.adc_lane_segment_idx()) {
+        k_starting_idx = std::min(lane_segment.adc_lane_point_idx(),
+                                  lane_segment.lane_point_size() - 1);
+      }
+      for (int k = k_starting_idx; k >= 0; --k) {
+        if (count >= SINGLE_LANE_FEATURE_SIZE * BACKWARD_LANE_POINTS_SIZE) {
+          break;
+        }
+        const LanePoint& lane_point = lane_segment.lane_point(k);
+        std::pair<double, double> relative_s_l =
+            WorldCoordToObjCoord(std::make_pair(lane_point.position().x(),
+                                                lane_point.position().y()),
+                                 obs_curr_pos, obs_curr_heading);
+        double relative_ang =
+            WorldAngleToObjAngle(lane_point.heading(), obs_curr_heading);
+
+        backward_feature_values.push_back(lane_point.kappa());
+        backward_feature_values.push_back(relative_ang);
+        backward_feature_values.push_back(relative_s_l.first);
+        backward_feature_values.push_back(relative_s_l.second);
+
+        count += 4;
+      }
+    }
+    // If lane-points are not enough, then extrapolate linearly.
+    while (count >= SINGLE_LANE_FEATURE_SIZE * 2 &&
+           count < SINGLE_LANE_FEATURE_SIZE * BACKWARD_LANE_POINTS_SIZE) {
+      std::size_t s = backward_feature_values.size();
+      double relative_l_new =
+          2 * backward_feature_values[s - 1] - backward_feature_values[s - 5];
+      double relative_s_new =
+          2 * backward_feature_values[s - 2] - backward_feature_values[s - 6];
+      double relative_ang_new = backward_feature_values[s - 3];
+
+      backward_feature_values.push_back(0.0);
+      backward_feature_values.push_back(relative_ang_new);
+      backward_feature_values.push_back(relative_s_new);
+      backward_feature_values.push_back(relative_l_new);
+
+      count += 4;
+    }
+
+    for (int j = static_cast<int>(backward_feature_values.size()) - 1; j >= 0;
+         --j) {
+      curr_feature_values.push_back(backward_feature_values[j]);
+    }
+
+    // Extract features from forward lane-points.
+    count = 0;
+    for (int j = lane_sequence.adc_lane_segment_idx();
+         j < lane_sequence.lane_segment_size(); ++j) {
+      if (count >= SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
+        break;
+      }
+      const LaneSegment& lane_segment = lane_sequence.lane_segment(j);
+      int k_starting_idx = 0;
+      if (j == lane_sequence.adc_lane_segment_idx()) {
+        k_starting_idx = std::min(lane_segment.adc_lane_point_idx(),
+                                  lane_segment.lane_point_size() - 1);
+      }
+      for (int k = k_starting_idx; k < lane_segment.lane_point_size(); ++k) {
+        if (count >= SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
+          break;
+        }
+        const LanePoint& lane_point = lane_segment.lane_point(k);
+        std::pair<double, double> relative_s_l =
+            WorldCoordToObjCoord(std::make_pair(lane_point.position().x(),
+                                                lane_point.position().y()),
+                                 obs_curr_pos, obs_curr_heading);
+        double relative_ang =
+            WorldAngleToObjAngle(lane_point.heading(), obs_curr_heading);
+
+        curr_feature_values.push_back(relative_s_l.second);
+        curr_feature_values.push_back(relative_s_l.first);
+        curr_feature_values.push_back(relative_ang);
+        curr_feature_values.push_back(lane_point.kappa());
+        count += 4;
+      }
+    }
+    // If lane-points are not enough, then extrapolate linearly.
+    while (count >= SINGLE_LANE_FEATURE_SIZE * 2 &&
+           count < SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
+      std::size_t s = curr_feature_values.size();
+      double relative_l_new = 2 * curr_feature_values[s - 4] -
+                              curr_feature_values[s - 8];
+      double relative_s_new = 2 * curr_feature_values[s - 3] -
+                              curr_feature_values[s - 7];
+      double relative_ang_new = curr_feature_values[s - 2];
+
+      curr_feature_values.push_back(relative_l_new);
+      curr_feature_values.push_back(relative_s_new);
+      curr_feature_values.push_back(relative_ang_new);
+      curr_feature_values.push_back(0.0);
+      count += 4;
+    }
+
+    feature_values->push_back(curr_feature_values);
+  }
+
+  return true;
+}
+
 }  // namespace prediction
 }  // namespace apollo
