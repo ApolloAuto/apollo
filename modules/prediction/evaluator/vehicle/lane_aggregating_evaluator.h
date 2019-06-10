@@ -70,6 +70,16 @@ class LaneAggregatingEvaluator : public Evaluator {
   bool ExtractObstacleFeatures(const Obstacle* obstacle_ptr,
                                std::vector<double>* feature_values);
 
+  /**
+   * @brief Set lane feature vector
+   * @param Obstacle pointer
+   *        A vector of doubles to be filled up with extracted features
+   */
+  bool ExtractStaticEnvFeatures(const Obstacle* obstacle_ptr,
+      const LaneGraph* lane_graph_ptr,
+      std::vector<std::vector<double>>* feature_values,
+      std::vector<int>* lane_sequence_idx_to_remove);
+
   //  struct LSTMState {
   //    double timestamp;
   //    torch::Tensor ct;
@@ -80,7 +90,7 @@ class LaneAggregatingEvaluator : public Evaluator {
 
   //  void LoadModel();
 
-  // private:
+ private:
   //  std::unordered_map<int, LSTMState> obstacle_id_lstm_state_map_;
   //  std::shared_ptr<torch::jit::script::Module>
   //      torch_position_embedding_ptr_ = nullptr;
@@ -92,6 +102,10 @@ class LaneAggregatingEvaluator : public Evaluator {
   //      torch_prediction_layer_ptr_ = nullptr;
   torch::Device device_;
 
+  static const size_t OBSTACLE_FEATURE_SIZE = 20 * 9;\
+  static const size_t SINGLE_LANE_FEATURE_SIZE = 4;
+  static const size_t LANE_POINTS_SIZE = 100;          // 50m
+  static const size_t BACKWARD_LANE_POINTS_SIZE = 50;  // 25m
   //  static const int kGridSize = 2;
   //  static const int kEmbeddingSize = 64;
   //  static const int kHiddenSize = 128;
