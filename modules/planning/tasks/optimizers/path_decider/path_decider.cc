@@ -62,7 +62,7 @@ Status PathDecider::Process(const ReferenceLineInfo *reference_line_info,
 bool PathDecider::MakeObjectDecision(const PathData &path_data,
                                      const std::string &blocking_obstacle_id,
                                      PathDecision *const path_decision) {
-  DCHECK_NOTNULL(path_decision);
+  CHECK_NOTNULL(path_decision);
   if (!MakeStaticObstacleDecision(path_data, blocking_obstacle_id,
                                   path_decision)) {
     AERROR << "Failed to make decisions for static obstacles";
@@ -78,7 +78,7 @@ bool PathDecider::MakeStaticObstacleDecision(
     const PathData &path_data, const std::string &blocking_obstacle_id,
     PathDecision *const path_decision) {
   // Sanity checks and get important values.
-  DCHECK_NOTNULL(path_decision);
+  CHECK_NOTNULL(path_decision);
   const auto &frenet_path = path_data.frenet_frame_path();
   if (frenet_path.empty()) {
     AERROR << "Path is empty.";

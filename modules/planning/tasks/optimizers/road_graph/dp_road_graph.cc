@@ -204,10 +204,10 @@ bool DpRoadGraph::GenerateMinCostPath(
 }
 
 void DpRoadGraph::UpdateNode(const std::shared_ptr<RoadGraphMessage> &msg) {
-  DCHECK_NOTNULL(msg);
-  DCHECK_NOTNULL(msg->trajectory_cost);
-  DCHECK_NOTNULL(msg->front);
-  DCHECK_NOTNULL(msg->cur_node);
+  CHECK_NOTNULL(msg);
+  CHECK_NOTNULL(msg->trajectory_cost);
+  CHECK_NOTNULL(msg->front);
+  CHECK_NOTNULL(msg->cur_node);
   for (const auto &prev_dp_node : msg->prev_nodes) {
     const auto &prev_sl_point = prev_dp_node.sl_point;
     const auto &cur_point = msg->cur_node->sl_point;

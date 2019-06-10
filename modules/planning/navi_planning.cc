@@ -400,7 +400,7 @@ std::string NaviPlanning::GetCurrentLaneId() {
 
 void NaviPlanning::GetLeftNeighborLanesInfo(
     std::vector<std::pair<std::string, double>>* const lane_info_group) {
-  DCHECK_NOTNULL(lane_info_group);
+  CHECK_NOTNULL(lane_info_group);
   auto& ref_line_info_group = *frame_->mutable_reference_line_info();
   const auto& vehicle_state = frame_->vehicle_state();
   for (auto& ref_line_info : ref_line_info_group) {
@@ -428,7 +428,7 @@ void NaviPlanning::GetLeftNeighborLanesInfo(
 
 void NaviPlanning::GetRightNeighborLanesInfo(
     std::vector<std::pair<std::string, double>>* const lane_info_group) {
-  DCHECK_NOTNULL(lane_info_group);
+  CHECK_NOTNULL(lane_info_group);
   auto& ref_line_info_group = *frame_->mutable_reference_line_info();
   const auto& vehicle_state = frame_->vehicle_state();
   for (auto& ref_line_info : ref_line_info_group) {
