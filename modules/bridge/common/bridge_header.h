@@ -92,8 +92,14 @@ class BridgeHeader {
   HeaderItem<Time_Stamp, double> time_stamp_;
   size_t header_size_ = 0;
   HeaderItemBase *header_item[Header_Tail] = {
-      &header_ver_,  &msg_name_,  &msg_id_, &msg_size_,
-      &total_packs_, &pack_size_, &index_,  &time_stamp_,
+    &header_ver_,
+    &msg_name_,
+    &msg_id_,
+    &msg_size_,
+    &total_packs_,
+    &pack_size_,
+    &index_,
+    &time_stamp_,
   };
 };
 
