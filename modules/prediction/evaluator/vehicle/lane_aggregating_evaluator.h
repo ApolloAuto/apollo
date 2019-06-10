@@ -57,44 +57,44 @@ class LaneAggregatingEvaluator : public Evaluator {
   bool Evaluate(Obstacle* obstacle_ptr) override;
 
   /**
-   * @brief Extract features for learning model's input
-   * @param Obstacle pointer
-   * @param To be filled up with extracted features
-   */
-  bool ExtractFeatures(const Obstacle* obstacle_ptr,
-                       std::vector<double>* feature_values);
-
-  /**
    * @brief Get the name of evaluator.
    */
   std::string GetName() override { return "LANE_AGGREGATING_EVALUATOR"; }
 
- // private:
- //  struct LSTMState {
- //    double timestamp;
- //    torch::Tensor ct;
- //    torch::Tensor ht;
- //  };
+ private:
+  /**
+   * @brief Extract the features for obstacles
+   * @param Obstacle pointer
+   *        A vector of doubles to be filled up with extracted features
+   */
+  bool ExtractObstacleFeatures(const Obstacle* obstacle_ptr,
+                               std::vector<double>* feature_values);
 
- //  void Clear();
+  //  struct LSTMState {
+  //    double timestamp;
+  //    torch::Tensor ct;
+  //    torch::Tensor ht;
+  //  };
 
- //  void LoadModel();
+  //  void Clear();
 
- // private:
- //  std::unordered_map<int, LSTMState> obstacle_id_lstm_state_map_;
- //  std::shared_ptr<torch::jit::script::Module>
- //      torch_position_embedding_ptr_ = nullptr;
- //  std::shared_ptr<torch::jit::script::Module>
- //      torch_social_embedding_ptr_ = nullptr;
- //  std::shared_ptr<torch::jit::script::Module>
- //      torch_single_lstm_ptr_ = nullptr;
- //  std::shared_ptr<torch::jit::script::Module>
- //      torch_prediction_layer_ptr_ = nullptr;
+  //  void LoadModel();
+
+  // private:
+  //  std::unordered_map<int, LSTMState> obstacle_id_lstm_state_map_;
+  //  std::shared_ptr<torch::jit::script::Module>
+  //      torch_position_embedding_ptr_ = nullptr;
+  //  std::shared_ptr<torch::jit::script::Module>
+  //      torch_social_embedding_ptr_ = nullptr;
+  //  std::shared_ptr<torch::jit::script::Module>
+  //      torch_single_lstm_ptr_ = nullptr;
+  //  std::shared_ptr<torch::jit::script::Module>
+  //      torch_prediction_layer_ptr_ = nullptr;
   torch::Device device_;
 
- //  static const int kGridSize = 2;
- //  static const int kEmbeddingSize = 64;
- //  static const int kHiddenSize = 128;
+  //  static const int kGridSize = 2;
+  //  static const int kEmbeddingSize = 64;
+  //  static const int kHiddenSize = 128;
 };
 
 }  // namespace prediction
