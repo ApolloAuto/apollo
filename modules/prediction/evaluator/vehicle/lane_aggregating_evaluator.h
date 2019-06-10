@@ -103,6 +103,8 @@ class LaneAggregatingEvaluator : public Evaluator {
       torch_obstacle_encoding_ptr_ = nullptr;
   std::shared_ptr<torch::jit::script::Module>
       torch_lane_encoding_ptr_ = nullptr;
+  std::shared_ptr<torch::jit::script::Module>
+      torch_prediction_layer_ptr_ = nullptr;
   torch::Device device_;
 
   static const size_t OBSTACLE_FEATURE_SIZE = 20 * 9;\
@@ -110,7 +112,9 @@ class LaneAggregatingEvaluator : public Evaluator {
   static const size_t LANE_POINTS_SIZE = 100;          // 50m
   static const size_t BACKWARD_LANE_POINTS_SIZE = 50;  // 25m
 
+  static const size_t OBSTACLE_ENCODING_SIZE = 128;
   static const size_t SINGLE_LANE_ENCODING_SIZE = 128;
+  static const size_t AGGREGATED_ENCODING_SIZE = 256;
   //  static const int kGridSize = 2;
   //  static const int kEmbeddingSize = 64;
   //  static const int kHiddenSize = 128;

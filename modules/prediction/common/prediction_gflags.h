@@ -97,6 +97,7 @@ DECLARE_string(torch_pedestrian_interaction_single_lstm_file);
 DECLARE_string(torch_pedestrian_interaction_prediction_layer_file);
 DECLARE_string(torch_lane_aggregating_obstacle_encoding_file);
 DECLARE_string(torch_lane_aggregating_lane_encoding_file);
+DECLARE_string(torch_lane_aggregating_prediction_layer_file);
 DECLARE_string(evaluator_vehicle_rnn_file);
 DECLARE_string(evaluator_vehicle_cruise_mlp_file);
 DECLARE_int32(max_num_obstacles);

@@ -172,6 +172,10 @@ DEFINE_string(torch_lane_aggregating_lane_encoding_file,
               "/apollo/modules/prediction/data/"
               "lane_aggregating_lane_encoding_layer.pt",
               "lane aggregating lane encoding layer");
+DEFINE_string(torch_lane_aggregating_prediction_layer_file,
+              "/apollo/modules/prediction/data/"
+              "lane_aggregating_prediction_layer.pt",
+              "lane aggregating prediction layer");
 DEFINE_int32(max_num_obstacles, 300,
              "maximal number of obstacles stored in obstacles container.");
 DEFINE_double(valid_position_diff_threshold, 0.5,
