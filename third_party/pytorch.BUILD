@@ -19,8 +19,8 @@ cc_library(
     linkopts = [
         "-Llib",
     ],
+    linkstatic = False,
     deps = [
         "@python27",
     ],
-    linkstatic = False,
 )

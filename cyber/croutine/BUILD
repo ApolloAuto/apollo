@@ -56,10 +56,10 @@ cc_library(
     srcs = select({
         ":x86_mode": [
             "detail/swap_x86_64.S",
-	],
+        ],
         ":arm_mode": [
             "detail/swap_aarch64.S",
-	],
+        ],
     }),
 )
 
@@ -77,12 +77,12 @@ cc_test(
 
 config_setting(
     name = "x86_mode",
-    values = { "cpu": "k8" }
+    values = {"cpu": "k8"},
 )
 
 config_setting(
     name = "arm_mode",
-    values = { "cpu": "arm" }
+    values = {"cpu": "arm"},
 )
 
 cpplint()
