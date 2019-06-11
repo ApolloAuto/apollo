@@ -31,8 +31,8 @@
 #include "cyber/io/session.h"
 #include "cyber/scheduler/scheduler_factory.h"
 #include "modules/bridge/common/bridge_gflags.h"
-#include "modules/bridge/common/bridge_proto_buf.h"
 #include "modules/bridge/common/bridge_header.h"
+#include "modules/bridge/common/bridge_proto_buf.h"
 #include "modules/bridge/proto/udp_bridge_remote_info.pb.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 

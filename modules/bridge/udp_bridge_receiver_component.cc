@@ -68,7 +68,7 @@ bool UDPBridgeReceiverComponent<T>::InitSession(uint16_t port) {
   addr.sin_port = htons(port);
 
   session_->Socket(AF_INET, SOCK_DGRAM, 0);
-  if (session_->Bind((struct sockaddr*)&addr, sizeof(addr)) < 0) {
+  if (session_->Bind((struct sockaddr *)&addr, sizeof(addr)) < 0) {
     AINFO << "bind prot [" << port << "] failed";
     session_->Close();
     return false;
@@ -83,16 +83,17 @@ bool UDPBridgeReceiverComponent<T>::MsgHandle() {
   int bytes = 0;
 
   char header_flag[sizeof(BRIDGE_HEADER_FLAG) + 1] = {0};
-  bytes = static_cast<int>(session_->RecvFrom(header_flag,
-    sizeof(header_flag) + 1, 0, (struct sockaddr*)&client_addr,
-    &sock_len));
+  bytes = static_cast<int>(
+      session_->RecvFrom(header_flag, sizeof(header_flag) + 1, 0,
+                         (struct sockaddr *)&client_addr, &sock_len));
   if (bytes != sizeof(BRIDGE_HEADER_FLAG) + 1 ||
-    strcmp(header_flag, BRIDGE_HEADER_FLAG) != 0) {
+      strcmp(header_flag, BRIDGE_HEADER_FLAG) != 0) {
     return false;
   }
   char header_size_buf[sizeof(size_t) + 1] = {0};
-  bytes = static_cast<int>(session_->RecvFrom(header_size_buf,
-    sizeof(size_t) + 1, 0, (struct sockaddr*)&client_addr, &sock_len));
+  bytes = static_cast<int>(
+      session_->RecvFrom(header_size_buf, sizeof(size_t) + 1, 0,
+                         (struct sockaddr *)&client_addr, &sock_len));
   if (bytes != sizeof(size_t) + 1) {
     return false;
   }
@@ -101,9 +102,9 @@ bool UDPBridgeReceiverComponent<T>::MsgHandle() {
     return false;
   }
   char *header_buf = new char[header_size];
-  bytes = static_cast<int>(session_->RecvFrom(header_buf, header_size,
-    0, (struct sockaddr*)&client_addr, &sock_len));
-  if (bytes !=  header_size) {
+  bytes = static_cast<int>(session_->RecvFrom(
+      header_buf, header_size, 0, (struct sockaddr *)&client_addr, &sock_len));
+  if (bytes != header_size) {
     return false;
   }
 
@@ -120,8 +121,9 @@ bool UDPBridgeReceiverComponent<T>::MsgHandle() {
   }
 
   char *buf = proto_buf->GetBuf(header.GetFramePos());
-  bytes = static_cast<int>(session_->RecvFrom(buf, header.GetFrameSize(),
-    0, (struct sockaddr*)&client_addr, &sock_len));
+  bytes = static_cast<int>(session_->RecvFrom(buf, header.GetFrameSize(), 0,
+                                              (struct sockaddr *)&client_addr,
+                                              &sock_len));
   proto_buf->UpdateStatus(header.GetIndex());
   if (proto_buf->IsReadyDiserialize()) {
     auto pb_msg = std::make_shared<T>();
@@ -146,7 +148,7 @@ void UDPBridgeReceiverComponent<T>::MsgDispatcher() {
 
 template <typename T>
 BridgeProtoBuf<T> *UDPBridgeReceiverComponent<T>::CreateBridgeProtoBuf(
-  const BridgeHeader &header) {
+    const BridgeHeader &header) {
   for (auto proto : proto_list_) {
     if (proto->IsTheProto(header)) {
       return proto;

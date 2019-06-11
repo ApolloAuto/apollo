@@ -17,13 +17,13 @@
 #include <omp.h>
 #include <algorithm>
 #include <ctime>
+#include <functional>
 #include <queue>
 #include <stack>
-#include <unordered_map>
-#include <vector>
 #include <string>
+#include <unordered_map>
 #include <utility>
-#include <functional>
+#include <vector>
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
@@ -64,7 +64,7 @@ bool NCut::Init() {
   return true;
 }
 
-bool NCut::Configure(const std::string& param_file) {
+bool NCut::Configure(const std::string &param_file) {
   NCutParam ncut_param_;
   // get cnnseg params
   CHECK(GetProtoFromFile(param_file, &ncut_param_))
@@ -183,11 +183,9 @@ void NCut::PrecomputeAllSkeletonAndBbox() {
   }
 }
 
-void NCut::BuildAverageHeightMap(base::PointFCloudConstPtr cloud,
-                                 const FloodFill& ff_map,
-                                 cv::Mat *cv_height_map_in,
-                                 std::vector<gridIndex>
-                                 *point_pixel_indices_in) {
+void NCut::BuildAverageHeightMap(
+    base::PointFCloudConstPtr cloud, const FloodFill &ff_map,
+    cv::Mat *cv_height_map_in, std::vector<gridIndex> *point_pixel_indices_in) {
   cv::Mat &cv_height_map = *cv_height_map_in;
   std::vector<gridIndex> &point_pixel_indices = *point_pixel_indices_in;
   const int num_points = static_cast<int>(cloud->size());
@@ -226,7 +224,7 @@ void NCut::BuildAverageHeightMap(base::PointFCloudConstPtr cloud,
                 CV_8UC1);
 }
 
-void NCut::SampleByGrid(const std::vector<int>& point_gids,
+void NCut::SampleByGrid(const std::vector<int> &point_gids,
                         MatrixXf *skeleton_coords_in,
                         MatrixXf *skeleton_feature_in) {
   MatrixXf &skeleton_coords = *skeleton_coords_in;
@@ -236,7 +234,7 @@ void NCut::SampleByGrid(const std::vector<int>& point_gids,
       new base::PointFCloud(*_cloud_obstacles, point_gids));
   sampler.BuildGrid(pc);
   std::unordered_map<int, std::pair<base::PointF, float>> centroids;
-  const std::vector<int>& point_idx = sampler.GetPointIdxInGrid();
+  const std::vector<int> &point_idx = sampler.GetPointIdxInGrid();
   std::unordered_map<int, std::pair<base::PointF, float>>::iterator it;
   for (size_t i = 0; i < point_idx.size(); ++i) {
     it = centroids.find(point_idx[i]);
@@ -261,7 +259,7 @@ void NCut::SampleByGrid(const std::vector<int>& point_gids,
   GetPatchFeature(skeleton_coords, &skeleton_feature);
 }
 
-void NCut::GetPatchFeature(const MatrixXf& points, MatrixXf *features_in) {
+void NCut::GetPatchFeature(const MatrixXf &points, MatrixXf *features_in) {
   MatrixXf &features = *features_in;
   const int num_points = static_cast<int>(points.rows());
   const int dim = _patch_size * _patch_size;
@@ -292,7 +290,7 @@ void NCut::GetPatchFeature(const MatrixXf& points, MatrixXf *features_in) {
 }
 
 NCut::NcutBoundingBox NCut::ComputeClusterBoundingBox(
-    const std::vector<int>& point_gids) {
+    const std::vector<int> &point_gids) {
   // ! Note: do not perform rotation, so just some intuitive guess
   float x_max = -FLT_MAX;
   float y_max = -FLT_MAX;
@@ -319,7 +317,7 @@ NCut::NcutBoundingBox NCut::ComputeClusterBoundingBox(
   return box;
 }
 
-std::string NCut::GetPcLabel(const base::PointFCloudPtr& cloud) {
+std::string NCut::GetPcLabel(const base::PointFCloudPtr &cloud) {
   if (cloud->size() < OBSTACLE_MINIMUM_NUM_POINTS) {
     return "unknown";
   }
@@ -358,11 +356,11 @@ void NCut::NormalizedCut(float ncuts_threshold, bool use_classifier,
 #endif
   MatrixXf weights;
   ComputeSkeletonWeights(&weights);
-  std::vector<int>* curr = new std::vector<int>(num_clusters);
+  std::vector<int> *curr = new std::vector<int>(num_clusters);
   for (int i = 0; i < num_clusters; ++i) {
     (*curr)[i] = i;
   }
-  std::stack<std::vector<int>*> job_stack;
+  std::stack<std::vector<int> *> job_stack;
   job_stack.push(curr);
   while (!job_stack.empty()) {
     curr = job_stack.top();
@@ -386,8 +384,8 @@ void NCut::NormalizedCut(float ncuts_threshold, bool use_classifier,
       std::cout << " as a segment (" << seg_label << ")" << std::endl;
 #endif
     } else {
-      std::vector<int>* seg1 = new std::vector<int>();
-      std::vector<int>* seg2 = new std::vector<int>();
+      std::vector<int> *seg1 = new std::vector<int>();
+      std::vector<int> *seg2 = new std::vector<int>();
       MatrixXf my_weights(curr->size(), curr->size());
       for (size_t i = 0; i < curr->size(); ++i) {
         const int ci = curr->at(i);
@@ -497,9 +495,9 @@ void NCut::ComputeSkeletonWeights(Eigen::MatrixXf *weights_in) {
   }
 }
 
-float NCut::GetMinNcuts(const Eigen::MatrixXf& in_weights,
-                        const std::vector<int>* in_clusters,
-                        std::vector<int>* seg1, std::vector<int>* seg2) {
+float NCut::GetMinNcuts(const Eigen::MatrixXf &in_weights,
+                        const std::vector<int> *in_clusters,
+                        std::vector<int> *seg1, std::vector<int> *seg2) {
   // .0 initialization
   const int num_clusters = static_cast<int>(in_weights.rows());
   seg1->resize(num_clusters);
@@ -577,7 +575,7 @@ float NCut::GetMinNcuts(const Eigen::MatrixXf& in_weights,
   return opt_cost;
 }
 
-void NCut::LaplacianDecomposition(const Eigen::MatrixXf& weights,
+void NCut::LaplacianDecomposition(const Eigen::MatrixXf &weights,
                                   Eigen::MatrixXf *eigenvectors_in) {
 #ifdef DEBUG_NCUT
 // std::cout << "laplacian 0:\n " << weights << std::endl << std::endl;
@@ -646,10 +644,10 @@ void NCut::LaplacianDecomposition(const Eigen::MatrixXf& weights,
   }
 }
 
-bool NCut::ComputeSquaredSkeletonDistance(const Eigen::MatrixXf& in1_points,
-                                          const Eigen::MatrixXf& in1_features,
-                                          const Eigen::MatrixXf& in2_points,
-                                          const Eigen::MatrixXf& in2_features,
+bool NCut::ComputeSquaredSkeletonDistance(const Eigen::MatrixXf &in1_points,
+                                          const Eigen::MatrixXf &in1_features,
+                                          const Eigen::MatrixXf &in2_points,
+                                          const Eigen::MatrixXf &in2_features,
                                           float *dist_point,
                                           float *dist_feature) {
   if (!((in1_points.rows() == in1_features.rows()) &&
@@ -688,7 +686,7 @@ bool NCut::ComputeSquaredSkeletonDistance(const Eigen::MatrixXf& in1_points,
   return true;
 }
 
-bool NCut::IsMovableObstacle(const std::vector<int>& cluster_ids,
+bool NCut::IsMovableObstacle(const std::vector<int> &cluster_ids,
                              std::string *label) {
   NcutBoundingBox box;
   GetComponentBoundingBox(cluster_ids, &box);
@@ -707,7 +705,7 @@ bool NCut::IsMovableObstacle(const std::vector<int>& cluster_ids,
   return false;
 }
 
-std::string NCut::GetClustersLabel(const std::vector<int>& cluster_ids) {
+std::string NCut::GetClustersLabel(const std::vector<int> &cluster_ids) {
   std::vector<int> point_ids;
   GetClustersPids(cluster_ids, &point_ids);
   base::PointFCloudPtr cloud =
@@ -715,7 +713,7 @@ std::string NCut::GetClustersLabel(const std::vector<int>& cluster_ids) {
   return GetPcLabel(cloud);
 }
 
-void NCut::GetClustersPids(const std::vector<int>& cids,
+void NCut::GetClustersPids(const std::vector<int> &cids,
                            std::vector<int> *pids_in) {
   std::vector<int> &pids = *pids_in;
   int num_points = 0;
@@ -725,14 +723,14 @@ void NCut::GetClustersPids(const std::vector<int>& cids,
   pids.resize(num_points, -1);
   int offset = 0;
   for (size_t i = 0; i < cids.size(); ++i) {
-    const std::vector<int>& curr_pids = _cluster_points[cids[i]];
+    const std::vector<int> &curr_pids = _cluster_points[cids[i]];
     memcpy(pids.data() + offset, curr_pids.data(),
            sizeof(int) * curr_pids.size());
     offset += static_cast<int>(curr_pids.size());
   }
 }
 
-int NCut::GetComponentBoundingBox(const std::vector<int>& cluster_ids,
+int NCut::GetComponentBoundingBox(const std::vector<int> &cluster_ids,
                                   NcutBoundingBox *box_in) {
   NcutBoundingBox &box = *box_in;
   if (cluster_ids.size() == 0) {
@@ -765,7 +763,7 @@ int NCut::GetComponentBoundingBox(const std::vector<int>& cluster_ids,
   return num_points;
 }
 
-std::string NCut::GetPcRoughLabel(const base::PointFCloudPtr& cloud,
+std::string NCut::GetPcRoughLabel(const base::PointFCloudPtr &cloud,
                                   bool only_check_pedestrian) {
   if (cloud->size() < OBSTACLE_MINIMUM_NUM_POINTS) {
     return "unknown";
@@ -805,7 +803,7 @@ std::string NCut::GetPcRoughLabel(const base::PointFCloudPtr& cloud,
   return label;
 }
 
-void NCut::GetSegmentRoughSize(const base::PointFCloudPtr& cloud, float *length,
+void NCut::GetSegmentRoughSize(const base::PointFCloudPtr &cloud, float *length,
                                float *width, float *height) {
   float x_max = -FLT_MAX;
   float y_max = -FLT_MAX;

@@ -16,11 +16,11 @@
 
 #pragma once
 
-#include <vector>
-#include <string>
 #include <memory>
-#include "modules/bridge/common/macro.h"
+#include <string>
+#include <vector>
 #include "modules/bridge/common/bridge_header.h"
+#include "modules/bridge/common/macro.h"
 
 namespace apollo {
 namespace bridge {
@@ -78,7 +78,7 @@ BridgeProtoBuf<T>::~BridgeProtoBuf() {
 
 template <typename T>
 bool BridgeProtoBuf<T>::Serialize(const std::shared_ptr<T> &proto,
-  const std::string &msg_name) {
+                                  const std::string &msg_name) {
   size_t msg_len = proto->ByteSize();
   char *tmp = new char[msg_len];
   memset(tmp, 0, sizeof(char) * msg_len);
@@ -95,14 +95,14 @@ bool BridgeProtoBuf<T>::Serialize(const std::shared_ptr<T> &proto,
   header.SetTimeStamp(proto->header().timestamp_sec());
   header.SetMsgSize(msg_len);
 
-  uint32_t total_frames =
-    static_cast<uint32_t>(msg_len/FRAME_SIZE + (msg_len % FRAME_SIZE ? 0 : 1));
+  uint32_t total_frames = static_cast<uint32_t>(msg_len / FRAME_SIZE +
+                                                (msg_len % FRAME_SIZE ? 0 : 1));
   uint32_t frame_index = 0;
   header.SetTotalFrames(total_frames);
   header.SetFrameSize(FRAME_SIZE);
 
-  size_t header_size = header.GetHeaderSize() + sizeof(BRIDGE_HEADER_FLAG)
-    + sizeof(size_t) + 2;
+  size_t header_size =
+      header.GetHeaderSize() + sizeof(BRIDGE_HEADER_FLAG) + sizeof(size_t) + 2;
 
   while (offset < msg_len) {
     header.SetIndex(frame_index);
@@ -140,7 +140,7 @@ void BridgeProtoBuf<T>::UpdateStatus(size_t frame_index) {
 template <typename T>
 bool BridgeProtoBuf<T>::IsTheProto(const BridgeHeader &header) {
   if (strcmp(proto_name_.c_str(), header.GetMsgName().c_str()) == 0 &&
-    sequence_num_ == header.GetMsgID()) {
+      sequence_num_ == header.GetMsgID()) {
     return true;
   }
   return false;

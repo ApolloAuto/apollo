@@ -54,7 +54,7 @@ class NCutSegmentation : public BaseSegmentation {
 
   void ObstacleFilter(const base::PointFCloudPtr& in_cloud, float cell_size,
                       bool filter_pedestrian_only,
-                      base::PointFCloudPtr *out_cloud,
+                      base::PointFCloudPtr* out_cloud,
                       std::vector<base::ObjectPtr>* segments);
 
   bool IsOutlier(const base::PointFCloudPtr& in_cloud);
