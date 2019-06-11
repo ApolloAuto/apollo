@@ -50,19 +50,19 @@
   ALOG_MODULE_STREAM(log_severity)(module)
 #endif
 
-#define ALOG_MODULE_STREAM_INFO(module)                    \
+#define ALOG_MODULE_STREAM_INFO(module)                         \
   google::LogMessage(__FILE__, __LINE__, google::INFO).stream() \
       << LEFT_BRACKET << module << RIGHT_BRACKET
 
-#define ALOG_MODULE_STREAM_WARN(module)                       \
+#define ALOG_MODULE_STREAM_WARN(module)                            \
   google::LogMessage(__FILE__, __LINE__, google::WARNING).stream() \
       << LEFT_BRACKET << module << RIGHT_BRACKET
 
-#define ALOG_MODULE_STREAM_ERROR(module)                    \
+#define ALOG_MODULE_STREAM_ERROR(module)                         \
   google::LogMessage(__FILE__, __LINE__, google::ERROR).stream() \
       << LEFT_BRACKET << module << RIGHT_BRACKET
 
-#define ALOG_MODULE_STREAM_FATAL(module)                    \
+#define ALOG_MODULE_STREAM_FATAL(module)                         \
   google::LogMessage(__FILE__, __LINE__, google::FATAL).stream() \
       << LEFT_BRACKET << module << RIGHT_BRACKET
 
