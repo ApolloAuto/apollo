@@ -17,14 +17,16 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <opencv2/opencv.hpp>
 #include <Eigen/Core>
+
 #include <iostream>
 #include <map>
 #include <memory>
-#include <opencv2/opencv.hpp>
 #include <string>
 #include <tuple>
 #include <vector>
+
 #include "modules/perception/lidar/lib/segmentation/ncut/common/flood_fill.h"
 #include "modules/perception/lidar/lib/segmentation/ncut/common/lr_classifier.h"
 #include "modules/perception/lidar/lib/segmentation/ncut/proto/ncut_param.pb.h"
