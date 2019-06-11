@@ -13,9 +13,9 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/perception/base",
-        "//modules/perception/lidar/lib/segmentation/ncut/proto:ncut_param_proto",
         "//modules/perception/lidar/lib/segmentation/ncut/common:flood_fill",
         "//modules/perception/lidar/lib/segmentation/ncut/common:lr_classifier",
+        "//modules/perception/lidar/lib/segmentation/ncut/proto:ncut_param_proto",
     ],
 )
 
@@ -27,21 +27,21 @@ cc_library(
     hdrs = [
         "ncut_segmentation.h",
     ],
-    linkopts = [
-        "-lgomp",
-    ],
     copts = [
         "-fopenmp",
+    ],
+    linkopts = [
+        "-lgomp",
     ],
     deps = [
         ":ncut",
         "//cyber",
         "//modules/perception/base",
         "//modules/perception/lib/thread",
-        "//modules/perception/lidar/lib/segmentation/ncut/proto:ncut_param_proto",
+        "//modules/perception/lidar/lib/interface",
         "//modules/perception/lidar/lib/segmentation/ncut/common:flood_fill",
         "//modules/perception/lidar/lib/segmentation/ncut/common:lr_classifier",
-        "//modules/perception/lidar/lib/interface",
+        "//modules/perception/lidar/lib/segmentation/ncut/proto:ncut_param_proto",
     ],
 )
 

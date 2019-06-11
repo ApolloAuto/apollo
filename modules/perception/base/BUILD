@@ -344,20 +344,20 @@ cc_library(
 
 cc_library(
     name = "point_cloud_util",
-    hdrs = [
-        "point_cloud_util.h",
-    ],
     srcs = [
         "point_cloud_util.cc",
+    ],
+    hdrs = [
+        "point_cloud_util.h",
     ],
     linkopts = [
         "-lopencv_core",
         "-lopencv_highgui",
     ],
     deps = [
-        "@eigen",
-        "//cyber",
         ":point_cloud",
+        "//cyber",
+        "@eigen",
     ],
 )
 
