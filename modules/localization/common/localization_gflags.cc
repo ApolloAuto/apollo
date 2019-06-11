@@ -86,7 +86,7 @@ DEFINE_int32(lidar_filter_size, 17, "Lidar filter size");
 DEFINE_double(lidar_imu_max_delay_time, 0.4,
               "Lidar msg and imu msg max delay time");
 DEFINE_double(lidar_map_coverage_theshold, 0.9,
-              "Threshold to detect wether vehicle is out of map");
+              "Threshold to detect whether vehicle is out of map");
 DEFINE_bool(lidar_debug_log_flag, false, "Lidar Debug switch.");
 DEFINE_int32(point_cloud_step, 2, "Point cloud step");
 DEFINE_bool(if_use_avx, false,

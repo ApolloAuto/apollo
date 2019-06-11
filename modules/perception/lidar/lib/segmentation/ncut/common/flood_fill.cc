@@ -132,7 +132,7 @@ void FloodFill::GetSegments(base::PointFCloudConstPtr cloud,
                             std::vector<int>* num_cells_per_segment) {
   CHECK_NOTNULL(segments_indices);
   CHECK_NOTNULL(num_cells_per_segment);
-  // .1 buid grid
+  // .1 build grid
   BuildGrid(cloud);
   // .2 get connected components
   const int num_segments = GetConnectedComponents();
