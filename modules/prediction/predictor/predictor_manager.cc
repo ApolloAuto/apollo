@@ -313,10 +313,10 @@ void PredictorManager::PredictObstacle(
       CHECK_NOTNULL(adc_trajectory_container);
       predictor->TrimTrajectories(*adc_trajectory_container, obstacle);
     }
-    for (const auto& trajectory :
-         obstacle->latest_feature().predicted_trajectory()) {
-      prediction_obstacle->add_trajectory()->CopyFrom(trajectory);
-    }
+  }
+  for (const auto& trajectory :
+       obstacle->latest_feature().predicted_trajectory()) {
+    prediction_obstacle->add_trajectory()->CopyFrom(trajectory);
   }
   prediction_obstacle->set_timestamp(obstacle->timestamp());
   prediction_obstacle->mutable_priority()->CopyFrom(
