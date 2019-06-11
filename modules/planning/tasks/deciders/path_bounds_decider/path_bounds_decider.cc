@@ -33,7 +33,7 @@
 #include "modules/planning/common/path_boundary.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/tasks/deciders/path_decider_obstacle_utils.h"
+#include "modules/planning/tasks/deciders/utils/path_decider_obstacle_utils.h"
 
 namespace apollo {
 namespace planning {

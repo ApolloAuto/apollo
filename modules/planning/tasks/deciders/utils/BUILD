@@ -3,18 +3,15 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "decider_base",
+    name = "path_decider_obstacle_utils",
     srcs = [
-        "decider.cc",
+        "path_decider_obstacle_utils.cc",
     ],
     hdrs = [
-        "decider.h",
+        "path_decider_obstacle_utils.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//modules/common/status",
         "//modules/planning/common:frame",
-        "//modules/planning/tasks:task",
     ],
 )
 
