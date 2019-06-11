@@ -30,8 +30,9 @@
 #include "cyber/init.h"
 #include "cyber/io/session.h"
 #include "cyber/scheduler/scheduler_factory.h"
-#include "modules/bridge/common/bridge_buffer.h"
 #include "modules/bridge/common/bridge_gflags.h"
+#include "modules/bridge/common/bridge_proto_buf.h"
+#include "modules/bridge/common/bridge_header.h"
 #include "modules/bridge/proto/udp_bridge_remote_info.pb.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 
@@ -57,18 +58,20 @@ class UDPBridgeReceiverComponent final : public cyber::Component<> {
   bool InitSession(uint16_t port);
   bool MsgHandle();
   void MsgDispatcher();
+  bool IsProtoExist(const BridgeHeader &header);
+  BridgeProtoBuf<T> *CreateBridgeProtoBuf(const BridgeHeader &header);
 
  private:
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
   unsigned int bind_port_ = 0;
   std::string proto_name_ = "";
   std::string topic_name_ = "";
-  BridgeBuffer<char> buf_;
   std::shared_ptr<cyber::Writer<T>> writer_;
   std::mutex mutex_;
 
   std::shared_ptr<apollo::cyber::io::Session> session_ =
       std::make_shared<apollo::cyber::io::Session>();
+  std::vector<BridgeProtoBuf<T> *> proto_list_;
 };
 
 RECEIVER_BRIDGE_COMPONENT_REGISTER(canbus::Chassis)

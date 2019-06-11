@@ -22,4 +22,5 @@ cc_library(
     deps = [
         "@python27",
     ],
+    linkstatic = False,
 )

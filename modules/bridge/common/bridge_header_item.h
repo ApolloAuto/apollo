@@ -26,9 +26,10 @@ enum HType {
   Msg_Name,
   Msg_ID,
   Msg_Size,
-  Msg_Packs,
-  Pack_Size,
-  Msg_Index,
+  Msg_Frames,
+  Frame_Size,
+  Frame_Pos,
+  Frame_Index,
   Time_Stamp,
 
   Header_Tail,
@@ -37,7 +38,7 @@ enum HType {
 class HeaderItemBase {
  public:
   HeaderItemBase() = default;
-  virtual ~HeaderItemBase();
+  virtual ~HeaderItemBase() {}
 
  public:
   virtual char *SerializeItem(char *buf, size_t buf_size,
