@@ -136,6 +136,8 @@ class ArgManager(object):
                                  'that case, the False value is ignored.')
         self.parser.add_argument('--stop', default=False, action="store_true",
                                  help='Stop recorder.')
+        self.parser.add_argument('--stop_signal', default="SIGTERM",
+                                 help='Signal to stop the recorder.')
         self.parser.add_argument('--additional_topics', action='append',
                                  help='Record additional topics.')
         self.parser.add_argument('--all', default=False, action="store_true",
@@ -213,7 +215,8 @@ class Recorder(object):
 
     def stop(self):
         """Stop recording."""
-        shell_cmd('pkill -f "cyber_recorder record"')
+        shell_cmd('pkill --signal {} -f "cyber_recorder record"'.format(
+            self.args.stop_signal))
 
     def record_task(self, disk, topics, is_small_topic=False):
         """Record tasks into the <disk>/data/bag/<task_id> directory."""
