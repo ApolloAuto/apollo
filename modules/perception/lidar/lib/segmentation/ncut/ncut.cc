@@ -90,7 +90,7 @@ bool NCut::Configure(const std::string& param_file) {
 
 void NCut::Segment(base::PointFCloudConstPtr cloud) {
   // double start_t = omp_get_wtime();
-  // .0 clear everyting
+  // .0 clear everything
   _segment_pids.clear();
   _segment_labels.clear();
   _segment_bbox.clear();

@@ -202,8 +202,7 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
 
 #pragma omp parallel
   {
-#pragma omp for
-    for (size_t i = 0; i < cloud_components.size(); ++i) {
+#pragma omp for (size_t i = 0; i < cloud_components.size(); ++i) {
       cloud_outlier_flag[i] = IsOutlier(cloud_components[i]);
     }
   }
@@ -274,8 +273,7 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
       static_cast<int>(threads_segment_pcs[num_threads - 1].size()) +
       segment_offset[num_threads - 1];
   segments->resize(new_num_segments);
-#pragma omp parallel for
-  for (int i = 0; i < num_threads; ++i) {
+#pragma omp parallel for (int i = 0; i < num_threads; ++i) {
     int offset = segment_offset[i];
     for (size_t j = 0; j < threads_segment_pcs[i].size(); ++j) {
       base::ObjectPtr& obj_ptr = (*segments)[offset + j];
@@ -293,8 +291,7 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
       static_cast<int>(threads_outlier_pcs[num_threads - 1].size()) +
       outlier_offset[num_threads - 1];
   _outliers->resize(new_num_outliers);
-#pragma omp parallel for
-  for (int i = 0; i < num_threads; ++i) {
+#pragma omp parallel for (int i = 0; i < num_threads; ++i) {
     int offset = outlier_offset[i];
     for (size_t j = 0; j < threads_outlier_pcs[i].size(); ++j) {
       base::ObjectPtr& obj_ptr = (*_outliers)[offset + j];
