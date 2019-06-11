@@ -6,6 +6,7 @@ cc_library(
     name = "obstacles_prioritizer",
     srcs = ["obstacles_prioritizer.cc"],
     hdrs = ["obstacles_prioritizer.h"],
+    copts = ['-DMODULE_NAME=\\"prediction\\"'],
     deps = [
         "//modules/prediction/common:environment_features",
         "//modules/prediction/container:container_manager",
