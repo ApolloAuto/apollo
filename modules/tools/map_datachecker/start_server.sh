@@ -16,20 +16,24 @@
 # limitations under the License.
 ###############################################################################
 
-set -xue
+set -ue
 SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 APOLLO_ROOT_PATH="${SCRIPT_PATH}/../../.."
 MAP_DATACHECKER=${APOLLO_ROOT_PATH}/bazel-bin/modules/map/tools/map_datachecker/map_datachecker
 CONF=${APOLLO_ROOT_PATH}/modules/map/tools/map_datachecker/conf/map-datachecker.conf
 ${MAP_DATACHECKER} --flagfile=${CONF} > ${SCRIPT_PATH}/`date '+%Y-%m-%d--%H-%M-%S'`.log 2>&1 &
-
+echo 'Server has been started successfully'
+echo 'You can enter Ctrl+C to exit this server'
 PID=$!
-trap "break" INT
+trap "trap_func" INT
+function trap_func() {
+  echo 'Stopping map_datachecker......'
+  kill -INT ${PID}
+}
 while [[ true ]]; do
   sleep 2
 done
-echo 'Stopping map-datachecker......'
-kill -INT ${PID}
+
 
 
 

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,25 +27,25 @@ class MapDataCheckerAgent;
 
 // need to add cybertron node creater
 class MapDataCheckerCyberNode:
-    public std::enable_shared_from_this<MapDataCheckerCyberNode> {
+  public std::enable_shared_from_this<MapDataCheckerCyberNode> {
  public:
-    MapDataCheckerCyberNode(
-        std::shared_ptr<MapDataCheckerAgent> agent,
-        bool *init_success);
+  MapDataCheckerCyberNode(
+    std::shared_ptr<MapDataCheckerAgent> agent,
+    bool *init_success);
 
-    inline std::shared_ptr<MapDataCheckerCyberNode> get_worker_cyber_node() {
-        return shared_from_this();
-    }
-
- private:
-    int create_channel_subscriber();
+  inline std::shared_ptr<MapDataCheckerCyberNode> get_worker_cyber_node() {
+    return shared_from_this();
+  }
 
  private:
-    using GnssBestPose_t = apollo::drivers::gnss::GnssBestPose;
-    std::shared_ptr<apollo::cyber::Node> _node = nullptr;
-    std::shared_ptr<apollo::cyber::Reader<GnssBestPose_t>>
-        _bestgnsspos_reader = nullptr;
-    std::shared_ptr<MapDataCheckerAgent> _agent = nullptr;
+  int create_channel_subscriber();
+
+ private:
+  using GnssBestPose_t = apollo::drivers::gnss::GnssBestPose;
+  std::shared_ptr<apollo::cyber::Node> _node = nullptr;
+  std::shared_ptr<apollo::cyber::Reader<GnssBestPose_t>>
+    _bestgnsspos_reader = nullptr;
+  std::shared_ptr<MapDataCheckerAgent> _agent = nullptr;
 };
 
 }  // namespace hdmap

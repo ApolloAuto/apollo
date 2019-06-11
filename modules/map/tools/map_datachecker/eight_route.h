@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,20 +28,20 @@ namespace hdmap {
 
 class EightRoute: public Alignment {
  public:
-    explicit EightRoute(std::shared_ptr<JSonConf> sp_conf);
-    ErrorCode process(const std::vector<FramePose>& poses);
-    double get_progress();
+  explicit EightRoute(std::shared_ptr<JSonConf> sp_conf);
+  ErrorCode process(const std::vector<FramePose>& poses);
+  double get_progress();
 
  private:
-    void reset();
-    bool is_eight_route_pose(
-        const std::vector<FramePose> & poses, int pose_index);
-    double get_good_pose_during();
-    double get_eight_route_progress(const std::vector<FramePose> & poses);
+  void reset();
+  bool is_eight_route_pose(
+    const std::vector<FramePose> & poses, int pose_index);
+  double get_good_pose_during();
+  double get_eight_route_progress(const std::vector<FramePose> & poses);
 
  private:
-    double _progress;
-    double _last_yaw;
+  double _progress;
+  double _last_yaw;
 };
 
 }  // namespace hdmap

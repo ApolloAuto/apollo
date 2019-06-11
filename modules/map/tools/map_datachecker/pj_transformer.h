@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@ namespace hdmap {
 
 class PJTransformer {
  public:
-    explicit PJTransformer(int zone_id = 50);
-    ~PJTransformer();
-    int latlong_to_utm(
-        int64_t point_count, int point_offset, double *x, double *y, double *z);
+  explicit PJTransformer(int zone_id = 50);
+  ~PJTransformer();
+  int latlong_to_utm(
+    int64_t point_count, int point_offset, double *x, double *y, double *z);
  private:
-    projPJ _pj_latlong;
-    projPJ _pj_utm;
+  projPJ _pj_latlong;
+  projPJ _pj_utm;
 };
 
 }  // namespace hdmap

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,42 +32,42 @@ namespace apollo {
 namespace hdmap {
 
 class MapDataCheckerAgent final:
-    public std::enable_shared_from_this<MapDataCheckerAgent>,
-    public CollectionCheckerService::Service {
+  public std::enable_shared_from_this<MapDataCheckerAgent>,
+  public CollectionCheckerService::Service {
  public:
-    MapDataCheckerAgent();
-    inline std::shared_ptr<MapDataCheckerAgent> get_worker_agent() {
-        return shared_from_this();
-    }
-    void set_worker_cyber_node(
-        std::shared_ptr<MapDataCheckerCyberNode> cyber_node);
-    std::shared_ptr<PoseCollectionAgent> get_sp_pose_collection_agent();
+  MapDataCheckerAgent();
+  inline std::shared_ptr<MapDataCheckerAgent> get_worker_agent() {
+    return shared_from_this();
+  }
+  void set_worker_cyber_node(
+    std::shared_ptr<MapDataCheckerCyberNode> cyber_node);
+  std::shared_ptr<PoseCollectionAgent> get_sp_pose_collection_agent();
 
-    grpc::Status ChannelVerify(
-        grpc::ServerContext*,
-        apollo::hdmap::CHANNEL_VERIFY_REQUEST_TYPE*,
-        apollo::hdmap::CHANNEL_VERIFY_RESPONSE_TYPE*);
-    grpc::Status StaticAlign(
-        grpc::ServerContext *context,
-        STATIC_REQUEST_TYPE *request,
-        STATIC_RESPONSE_TYPE *response);
-    grpc::Status EightRoute(
-        grpc::ServerContext *context,
-        EIGHTROUTE_REQUEST_TYPE *request,
-        EIGHTROUTE_RESPONSE_TYPE *response);
-    grpc::Status LoopsVerify(
-        grpc::ServerContext *context,
-        LOOPS_VERIFY_REQUEST_TYPE *request,
-        LOOPS_VERIFY_RESPONSE_TYPE *response);
+  grpc::Status ChannelVerify(
+    grpc::ServerContext*,
+    apollo::hdmap::CHANNEL_VERIFY_REQUEST_TYPE*,
+    apollo::hdmap::CHANNEL_VERIFY_RESPONSE_TYPE*);
+  grpc::Status StaticAlign(
+    grpc::ServerContext *context,
+    STATIC_REQUEST_TYPE *request,
+    STATIC_RESPONSE_TYPE *response);
+  grpc::Status EightRoute(
+    grpc::ServerContext *context,
+    EIGHTROUTE_REQUEST_TYPE *request,
+    EIGHTROUTE_RESPONSE_TYPE *response);
+  grpc::Status LoopsVerify(
+    grpc::ServerContext *context,
+    LOOPS_VERIFY_REQUEST_TYPE *request,
+    LOOPS_VERIFY_RESPONSE_TYPE *response);
 
  private:
-    std::shared_ptr<MapDataCheckerCyberNode> _cyber_node = nullptr;
-    std::shared_ptr<JSonConf> _sp_conf = nullptr;
-    std::shared_ptr<PoseCollectionAgent> _sp_pose_collection_agent = nullptr;
-    std::shared_ptr<ChannelVerifyAgent> _sp_channel_checker_agent = nullptr;
-    std::shared_ptr<STATIC_ALIGN_AGENT_TYPE> _sp_static_align_agent = nullptr;
-    std::shared_ptr<EIGHT_ROUTE_AGENT_TYPE> _sp_eight_route_agent = nullptr;
-    std::shared_ptr<LoopsVerifyAgent> _sp_loops_verify_agent = nullptr;
+  std::shared_ptr<MapDataCheckerCyberNode> _cyber_node = nullptr;
+  std::shared_ptr<JSonConf> _sp_conf = nullptr;
+  std::shared_ptr<PoseCollectionAgent> _sp_pose_collection_agent = nullptr;
+  std::shared_ptr<ChannelVerifyAgent> _sp_channel_checker_agent = nullptr;
+  std::shared_ptr<STATIC_ALIGN_AGENT_TYPE> _sp_static_align_agent = nullptr;
+  std::shared_ptr<EIGHT_ROUTE_AGENT_TYPE> _sp_eight_route_agent = nullptr;
+  std::shared_ptr<LoopsVerifyAgent> _sp_loops_verify_agent = nullptr;
 };
 
 }  // namespace hdmap

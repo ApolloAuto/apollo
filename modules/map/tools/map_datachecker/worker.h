@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,16 +23,16 @@ namespace hdmap {
 
 class Mapdatachecker {
  public:
-    Mapdatachecker() {}
-    ~Mapdatachecker() {}
+  Mapdatachecker() {}
+  ~Mapdatachecker() {}
 
-    bool Init();
-    bool Start();
-    bool Stop();
-    void Report();
+  bool Init();
+  bool Start();
+  bool Stop();
+  void Report();
 
  private:
-    std::string _grpc_address;
+  std::string _grpc_address;
 };
 
 }  // namespace hdmap

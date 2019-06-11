@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,22 +23,22 @@ namespace apollo {
 namespace hdmap {
 
 enum class PoseCollectionState {
-    IDLE,
-    RUNNING
+  IDLE,
+  RUNNING
 };
 
 class PoseCollection {
  public:
-    explicit PoseCollection(std::shared_ptr<JSonConf> sp_conf);
-    void collect(const FramePose& pose);
-    std::shared_ptr<std::vector<FramePose>> get_poses();
+  explicit PoseCollection(std::shared_ptr<JSonConf> sp_conf);
+  void collect(const FramePose& pose);
+  std::shared_ptr<std::vector<FramePose>> get_poses();
 
  private:
-    void reset();
+  void reset();
 
  private:
-    std::shared_ptr<std::vector<FramePose>> _sp_poses = nullptr;
-    std::shared_ptr<JSonConf> _sp_conf = nullptr;
+  std::shared_ptr<std::vector<FramePose>> _sp_poses = nullptr;
+  std::shared_ptr<JSonConf> _sp_conf = nullptr;
 };
 
 }  // namespace hdmap

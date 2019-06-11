@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,23 +19,23 @@ namespace apollo {
 namespace hdmap {
 
 PoseCollection::PoseCollection(std::shared_ptr<JSonConf> sp_conf) {
-    _sp_conf = sp_conf;
-    reset();
+  _sp_conf = sp_conf;
+  reset();
 }
 
 void PoseCollection::reset() {
-    _sp_poses = std::make_shared<std::vector<FramePose>>();
+  _sp_poses = std::make_shared<std::vector<FramePose>>();
 }
 
 void PoseCollection::collect(const FramePose& pose) {
-    if (_sp_poses == nullptr) {
-        _sp_poses = std::make_shared<std::vector<FramePose>>();
-    }
-    _sp_poses->push_back(pose);
+  if (_sp_poses == nullptr) {
+    _sp_poses = std::make_shared<std::vector<FramePose>>();
+  }
+  _sp_poses->push_back(pose);
 }
 
 std::shared_ptr<std::vector<FramePose>> PoseCollection::get_poses() {
-    return _sp_poses;
+  return _sp_poses;
 }
 
 }  // namespace hdmap

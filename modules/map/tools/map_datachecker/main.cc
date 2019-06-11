@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,26 +19,26 @@
 
 
 int main(int argc, char** argv) {
-    fprintf(stderr, "parsing command lines\n");
-    google::ParseCommandLineFlags(&argc, &argv, true);
-    fprintf(stdout, "parsing command lines done\n");
+  fprintf(stderr, "parsing command lines\n");
+  google::ParseCommandLineFlags(&argc, &argv, true);
+  fprintf(stdout, "parsing command lines done\n");
 
-    fprintf(stderr, "init logger\n");
-    if (apollo::cyber::Init(argv[0])) {
-        AINFO << "init logger succeed";
-    } else {
-        fprintf(stderr, "init logger failed\n");
-    }
+  fprintf(stderr, "init logger\n");
+  if (apollo::cyber::Init(argv[0])) {
+    AINFO << "init logger succeed";
+  } else {
+    fprintf(stderr, "init logger failed\n");
+  }
 
-    google::SetStderrLogging(FLAGS_minloglevel);
+  google::SetStderrLogging(FLAGS_minloglevel);
 
-    AINFO << "starting worker";
-    apollo::hdmap::Mapdatachecker worker;
-    if (!worker.Start()) {
-        AFATAL << "Start Mapdatachecker Failed!";
-        return -1;
-    }
+  AINFO << "starting worker";
+  apollo::hdmap::Mapdatachecker worker;
+  if (!worker.Start()) {
+    AFATAL << "Start Mapdatachecker Failed!";
+    return -1;
+  }
 
-    apollo::cyber::WaitForShutdown();
-    return 0;
+  apollo::cyber::WaitForShutdown();
+  return 0;
 }

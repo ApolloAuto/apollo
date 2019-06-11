@@ -6,9 +6,6 @@
 glog
 protobuf == 3.3
 python-gflags
-gevent
-grpc
-grpcio == 1.14.2
 grpcio-tools == 1.14.2
 
 # Web utils.
@@ -20,6 +17,7 @@ simplejson
 # Python tools
 pyproj == 1.9.6
 shapely
+enum34
 
 # Data format
 PyYAML
