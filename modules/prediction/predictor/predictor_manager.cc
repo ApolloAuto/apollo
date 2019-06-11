@@ -25,6 +25,7 @@
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_thread_pool.h"
 #include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/predictor/empty/empty_predictor.h"
 #include "modules/prediction/predictor/extrapolation/extrapolation_predictor.h"
 #include "modules/prediction/predictor/free_move/free_move_predictor.h"
 #include "modules/prediction/predictor/interaction/interaction_predictor.h"
@@ -361,6 +362,10 @@ std::unique_ptr<Predictor> PredictorManager::CreatePredictor(
     }
     case ObstacleConf::INTERACTION_PREDICTOR: {
       predictor_ptr.reset(new InteractionPredictor());
+      break;
+    }
+    case ObstacleConf::EMPTY_PREDICTOR: {
+      predictor_ptr.reset(new EmptyPredictor());
       break;
     }
     default: {
