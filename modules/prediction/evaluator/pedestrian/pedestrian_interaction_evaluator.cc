@@ -127,16 +127,16 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     lstm_input[0][i] = position_embedding[0][i];
     lstm_input[0][kEmbeddingSize + i] = social_embedding[0][i];
   }
-  torch::Tensor curr_ht = torch::zeros({1, kHiddenSize});
-  torch::Tensor curr_ct = torch::zeros({1, kHiddenSize});
+  torch::Tensor curr_ht = torch::zeros({1, 1, kHiddenSize});
+  torch::Tensor curr_ct = torch::zeros({1, 1, kHiddenSize});
   if (obstacle_id_lstm_state_map_.find(id) !=
       obstacle_id_lstm_state_map_.end()) {
     curr_ht = obstacle_id_lstm_state_map_[id].ht;
     curr_ct = obstacle_id_lstm_state_map_[id].ct;
   }
   for (int i = 0; i < kHiddenSize; ++i) {
-    lstm_input[0][2 * kEmbeddingSize + i] = curr_ht[0][i];
-    lstm_input[0][2 * kEmbeddingSize + kHiddenSize + i] = curr_ct[0][i];
+    lstm_input[0][2 * kEmbeddingSize + i] = curr_ht[0][0][i];
+    lstm_input[0][2 * kEmbeddingSize + kHiddenSize + i] = curr_ct[0][0][i];
   }
   std::vector<torch::jit::IValue> lstm_inputs;
   lstm_inputs.push_back(std::move(lstm_input));
