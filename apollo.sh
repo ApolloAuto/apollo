@@ -24,7 +24,7 @@ function source_apollo_base() {
   DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
   cd "${DIR}"
 
-  source "${DIR}/scripts/apollo_base.sh"
+  source ${DIR}/scripts/apollo_base.sh $1
 }
 
 function apollo_check_system_config() {
@@ -709,6 +709,7 @@ function print_usage() {
 
 function main() {
   source_apollo_base
+
   check_machine_arch
   apollo_check_system_config
   check_esd_files
@@ -753,7 +754,12 @@ function main() {
         apollo_build_dbg $@
       fi
       ;;
+    clean_cyber)
+      export LD_PRELOAD=
+      clean
+      ;;
     build_cyber)
+      export LD_PRELOAD=
       BUILD_FILTER="cyber"
       if [ "$1" == "opt" ]; then
         shift
@@ -764,6 +770,7 @@ function main() {
       fi
       ;;
     build_drivers)
+      export LD_PRELOAD=
       BUILD_FILTER="drivers"
       if [ "$1" == "opt" ]; then
         shift
