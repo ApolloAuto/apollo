@@ -39,6 +39,7 @@ DECLARE_bool(enable_scenario_bare_intersection);
 DECLARE_bool(enable_scenario_pull_over);
 DECLARE_bool(enable_scenario_stop_sign);
 DECLARE_bool(enable_scenario_traffic_light);
+DECLARE_bool(enable_pull_over_exit);
 
 DECLARE_bool(enable_scenario_side_pass_multiple_parked_obstacles);
 DECLARE_bool(enable_force_pull_over_open_space_parking_test);
