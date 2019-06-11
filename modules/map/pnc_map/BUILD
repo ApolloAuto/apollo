@@ -11,7 +11,6 @@ cuda_library(
     hdrs = [
         "cuda_util.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         "//cyber",
         "@cuda",
