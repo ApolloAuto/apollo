@@ -19,7 +19,7 @@ proto_library(
         "vehicle_parameter.proto",
         "wey.proto",
         "zhongyun.proto",
-	"ch.proto",
+        "ch.proto",
     ],
     deps = [
         "//modules/common/configs/proto:vehicle_config_proto_lib",
