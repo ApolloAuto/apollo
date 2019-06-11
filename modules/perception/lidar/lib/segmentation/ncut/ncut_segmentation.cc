@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/lidar/lib/segmentation/ncut/ncut_segmentation.h"
+
 #include <omp.h>
+
 #include <algorithm>
 #include <map>
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-
-#include "modules/perception/lidar/lib/segmentation/ncut/ncut_segmentation.h"
 
 namespace apollo {
 namespace perception {
@@ -202,102 +204,109 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
 
 #pragma omp parallel
   {
-#pragma omp for (size_t i = 0; i < cloud_components.size(); ++i) {
-    cloud_outlier_flag[i] = IsOutlier(cloud_components[i]);
+#pragma omp for
+    for (size_t i = 0; i < cloud_components.size(); ++i) {
+      cloud_outlier_flag[i] = IsOutlier(cloud_components[i]);
+    }
   }
-}
 
-std::vector<int> cloud_outlier;
-std::vector<int> cloud_tbd;
-for (int i = 0; i < static_cast<int>(cloud_components.size()); ++i) {
-  if (cloud_outlier_flag[i]) {
-    cloud_outlier.push_back(i);
-  } else {
-    cloud_tbd.push_back(i);
+  std::vector<int> cloud_outlier;
+  std::vector<int> cloud_tbd;
+  for (int i = 0; i < static_cast<int>(cloud_components.size()); ++i) {
+    if (cloud_outlier_flag[i]) {
+      cloud_outlier.push_back(i);
+    } else {
+      cloud_tbd.push_back(i);
+    }
   }
-}
 
-// .5.1 outlier
-for (size_t i = 0; i < cloud_outlier.size(); ++i) {
-  base::PointFCloudPtr pc = cloud_components[cloud_outlier[i]];
-  base::ObjectPtr obj = std::make_shared<base::Object>();
-  obj->lidar_supplement.cloud = *pc;
-  _outliers->push_back(obj);
-}
-ADEBUG << "filter outlier, elapsed time: " << omp_get_wtime() - start_t;
-start_t = omp_get_wtime();
+  // .5.1 outlier
+  for (size_t i = 0; i < cloud_outlier.size(); ++i) {
+    base::PointFCloudPtr pc = cloud_components[cloud_outlier[i]];
+    base::ObjectPtr obj = std::make_shared<base::Object>();
+    obj->lidar_supplement.cloud = *pc;
+    _outliers->push_back(obj);
+  }
+  ADEBUG << "filter outlier, elapsed time: " << omp_get_wtime() - start_t;
+  start_t = omp_get_wtime();
 
-// .6 graph cut each
-std::vector<std::vector<base::PointFCloudPtr>> threads_segment_pcs(num_threads);
-std::vector<std::vector<std::string>> threads_segment_labels(num_threads);
-std::vector<std::vector<base::PointFCloudPtr>> threads_outlier_pcs(num_threads);
+  // .6 graph cut each
+  std::vector<std::vector<base::PointFCloudPtr>> threads_segment_pcs(
+      num_threads);
+  std::vector<std::vector<std::string>> threads_segment_labels(num_threads);
+  std::vector<std::vector<base::PointFCloudPtr>> threads_outlier_pcs(
+      num_threads);
 // .6.1 process each component in parallel
 #pragma omp parallel
-{
-  int tid = omp_get_thread_num();
-  std::shared_ptr<NCut> my_ncut = _segmentors[tid];
-  std::vector<base::PointFCloudPtr>& my_segment_pcs = threads_segment_pcs[tid];
-  std::vector<std::string>& my_segment_labels = threads_segment_labels[tid];
-  std::vector<base::PointFCloudPtr>& my_outlier_pcs = threads_outlier_pcs[tid];
+  {
+    int tid = omp_get_thread_num();
+    std::shared_ptr<NCut> my_ncut = _segmentors[tid];
+    std::vector<base::PointFCloudPtr>& my_segment_pcs =
+        threads_segment_pcs[tid];
+    std::vector<std::string>& my_segment_labels = threads_segment_labels[tid];
+    std::vector<base::PointFCloudPtr>& my_outlier_pcs =
+        threads_outlier_pcs[tid];
 #pragma omp for schedule(guided)
-  for (size_t i = 0; i < cloud_tbd.size(); ++i) {
-    my_ncut->Segment(cloud_components[cloud_tbd[i]]);
-    for (int j = 0; j < my_ncut->NumSegments(); ++j) {
-      base::PointFCloudPtr pc = my_ncut->GetSegmentPointCloud(j);
-      std::string label = my_ncut->GetSegmentLabel(j);
-      if (IsOutlier(pc)) {
-        my_outlier_pcs.push_back(pc);
-      } else {
-        my_segment_pcs.push_back(pc);
-        my_segment_labels.push_back(label);
+    for (size_t i = 0; i < cloud_tbd.size(); ++i) {
+      my_ncut->Segment(cloud_components[cloud_tbd[i]]);
+      for (int j = 0; j < my_ncut->NumSegments(); ++j) {
+        base::PointFCloudPtr pc = my_ncut->GetSegmentPointCloud(j);
+        std::string label = my_ncut->GetSegmentLabel(j);
+        if (IsOutlier(pc)) {
+          my_outlier_pcs.push_back(pc);
+        } else {
+          my_segment_pcs.push_back(pc);
+          my_segment_labels.push_back(label);
+        }
       }
     }
   }
-}
 
-ADEBUG << "parallel normalized cut, elapsed time: "
-       << omp_get_wtime() - start_t;
-start_t = omp_get_wtime();
-// .6.2 aggregate results
-std::vector<int> segment_offset(num_threads,
-                                static_cast<int>(segments->size()));
-for (int i = 1; i < num_threads; ++i) {
-  segment_offset[i] = segment_offset[i - 1] +
-                      static_cast<int>(threads_segment_pcs[i - 1].size());
+  ADEBUG << "parallel normalized cut, elapsed time: "
+         << omp_get_wtime() - start_t;
+  start_t = omp_get_wtime();
+  // .6.2 aggregate results
+  std::vector<int> segment_offset(num_threads,
+                                  static_cast<int>(segments->size()));
+  for (int i = 1; i < num_threads; ++i) {
+    segment_offset[i] = segment_offset[i - 1] +
+                        static_cast<int>(threads_segment_pcs[i - 1].size());
+  }
+  int new_num_segments =
+      static_cast<int>(threads_segment_pcs[num_threads - 1].size()) +
+      segment_offset[num_threads - 1];
+  segments->resize(new_num_segments);
+#pragma omp parallel for
+  for (int i = 0; i < num_threads; ++i) {
+    int offset = segment_offset[i];
+    for (size_t j = 0; j < threads_segment_pcs[i].size(); ++j) {
+      base::ObjectPtr& obj_ptr = (*segments)[offset + j];
+      obj_ptr.reset(new base::Object());
+      obj_ptr->lidar_supplement.cloud = *threads_segment_pcs[i][j];
+    }
+  }
+  std::vector<int> outlier_offset(num_threads,
+                                  static_cast<int>(_outliers->size()));
+  for (int i = 1; i < num_threads; ++i) {
+    outlier_offset[i] = outlier_offset[i - 1] +
+                        static_cast<int>(threads_outlier_pcs[i - 1].size());
+  }
+  int new_num_outliers =
+      static_cast<int>(threads_outlier_pcs[num_threads - 1].size()) +
+      outlier_offset[num_threads - 1];
+  _outliers->resize(new_num_outliers);
+#pragma omp parallel for
+  for (int i = 0; i < num_threads; ++i) {
+    int offset = outlier_offset[i];
+    for (size_t j = 0; j < threads_outlier_pcs[i].size(); ++j) {
+      base::ObjectPtr& obj_ptr = (*_outliers)[offset + j];
+      obj_ptr.reset(new base::Object);
+      obj_ptr->lidar_supplement.cloud = *threads_outlier_pcs[i][j];
+    }
+  }
+  ADEBUG << "aggregate results, elapsed time: " << omp_get_wtime() - start_t;
+  return true;
 }
-int new_num_segments =
-    static_cast<int>(threads_segment_pcs[num_threads - 1].size()) +
-    segment_offset[num_threads - 1];
-segments->resize(new_num_segments);
-#pragma omp parallel for (int i = 0; i < num_threads; ++i) {
-int offset = segment_offset[i];
-for (size_t j = 0; j < threads_segment_pcs[i].size(); ++j) {
-  base::ObjectPtr& obj_ptr = (*segments)[offset + j];
-  obj_ptr.reset(new base::Object());
-  obj_ptr->lidar_supplement.cloud = *threads_segment_pcs[i][j];
-}
-}  // namespace lidar
-std::vector<int> outlier_offset(num_threads,
-                                static_cast<int>(_outliers->size()));
-for (int i = 1; i < num_threads; ++i) {
-  outlier_offset[i] = outlier_offset[i - 1] +
-                      static_cast<int>(threads_outlier_pcs[i - 1].size());
-}
-int new_num_outliers =
-    static_cast<int>(threads_outlier_pcs[num_threads - 1].size()) +
-    outlier_offset[num_threads - 1];
-_outliers->resize(new_num_outliers);
-#pragma omp parallel for (int i = 0; i < num_threads; ++i) {
-int offset = outlier_offset[i];
-for (size_t j = 0; j < threads_outlier_pcs[i].size(); ++j) {
-  base::ObjectPtr& obj_ptr = (*_outliers)[offset + j];
-  obj_ptr.reset(new base::Object);
-  obj_ptr->lidar_supplement.cloud = *threads_outlier_pcs[i][j];
-}
-}  // namespace perception
-ADEBUG << "aggregate results, elapsed time: " << omp_get_wtime() - start_t;
-return true;
-}  // namespace apollo
 
 void NCutSegmentation::PartitionConnectedComponents(
     const base::PointFCloudPtr& in_cloud, float cell_size,
