@@ -11,6 +11,7 @@ cuda_library(
     hdrs = [
         "cuda_util.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         "//cyber",
         "@cuda",
@@ -39,6 +40,7 @@ cc_library(
     hdrs = [
         "path.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         "//modules/common/math",
         "//modules/map/hdmap",
@@ -56,6 +58,7 @@ cc_library(
     hdrs = [
         "route_segments.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/map/hdmap",
@@ -72,6 +75,7 @@ cc_library(
     hdrs = [
         "pnc_map.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         ":path",
         ":route_segments",

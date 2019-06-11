@@ -10,6 +10,9 @@ cc_library(
     hdrs = [
         "util.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         "//cyber/common:log",
         "//modules/common/util:map_util",

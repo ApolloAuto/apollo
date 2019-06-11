@@ -10,6 +10,9 @@ cc_library(
     hdrs = [
         "lattice_trajectory1d.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         "//cyber/common:log",
         "//modules/planning/math/curve1d",
@@ -70,6 +73,9 @@ cc_library(
     ],
     hdrs = [
         "trajectory_evaluator.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         "//modules/common",
@@ -145,6 +151,9 @@ cc_library(
     hdrs = [
         "lateral_qp_optimizer.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         "//cyber/common:log",
         "//modules/planning/common/trajectory1d:piecewise_jerk_trajectory1d",
@@ -158,6 +167,9 @@ cc_library(
     ],
     hdrs = [
         "lateral_osqp_optimizer.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         ":lateral_qp_optimizer",

@@ -20,6 +20,9 @@ cc_library(
     hdrs = [
         "discrete_points_math.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         "//cyber/common:log",
     ],
@@ -44,6 +47,9 @@ cc_library(
     ],
     hdrs = [
         "polynomial_xd.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         "//cyber/common:log",

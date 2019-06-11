@@ -8,6 +8,9 @@ cc_binary(
     linkopts = [
         "-lboost_filesystem",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/common:message_process",
     ],

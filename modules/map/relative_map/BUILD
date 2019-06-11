@@ -18,6 +18,7 @@ cc_library(
     data = [
         ":relative_map_conf",
     ],
+    copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         ":navigation_lane_lib",
         "//modules/common",
@@ -40,6 +41,7 @@ cc_library(
     hdrs = [
         "navigation_lane.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         "//cyber",
         "//modules/common/proto:pnc_point_proto",
@@ -60,6 +62,7 @@ cc_library(
     hdrs = [
         "relative_map_component.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         ":relative_map_lib",
         "//cyber",
@@ -72,6 +75,7 @@ cc_binary(
     name = "librelative_map_component.so",
     linkshared = True,
     linkstatic = False,
+    copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [":relative_map_component_lib"],
 )
 

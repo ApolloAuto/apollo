@@ -10,6 +10,9 @@ cc_library(
     hdrs = [
         "util.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         "//cyber/common:log",
         "//modules/common/util",
@@ -29,6 +32,9 @@ cc_library(
     ],
     hdrs = [
         "common.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         "//cyber/common:log",
