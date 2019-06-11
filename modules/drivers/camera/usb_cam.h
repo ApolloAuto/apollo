@@ -133,7 +133,8 @@ class UsbCam {
 
 #ifdef __aarch64__
   int convert_yuv_to_rgb_pixel(int y, int u, int v);
-  int convert_yuv_to_rgb_buffer(unsigned char *yuv, unsigned char *rgb, unsigned int width, unsigned int height);
+  int convert_yuv_to_rgb_buffer(unsigned char* yuv, unsigned char* rgb,
+                                unsigned int width, unsigned int height);
 #endif
 
   bool init_read(unsigned int buffer_size);

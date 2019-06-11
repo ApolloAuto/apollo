@@ -20,8 +20,8 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "modules/bridge/common/macro.h"
 #include "modules/bridge/common/bridge_buffer.h"
+#include "modules/bridge/common/macro.h"
 
 namespace apollo {
 namespace bridge {
@@ -48,7 +48,7 @@ bool RemoveItem(std::vector<T *> *list, const T *t) {
     return false;
   }
   typename std::vector<T *>::iterator itor = list->begin();
-  for (; itor != list->end(); ) {
+  for (; itor != list->end();) {
     if (*itor == t) {
       T *tmp = *itor;
       FREE_POINTER(tmp);
