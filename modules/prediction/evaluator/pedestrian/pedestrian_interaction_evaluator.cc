@@ -216,8 +216,8 @@ Point3D PedestrianInteractionEvaluator::PredictNextPosition(
                              .toTensor()
                              .to(torch::kCPU);
   auto pred_out = pred_out_tensor.accessor<float, 2>();
-  point.set_x(static_cast<double>(pred_out[0][0]));
-  point.set_y(static_cast<double>(pred_out[0][1]));
+  point.set_x(static_cast<double>(pred_out[0][0]) + pos_x);
+  point.set_y(static_cast<double>(pred_out[0][1]) + pos_y);
   return point;
 }
 
