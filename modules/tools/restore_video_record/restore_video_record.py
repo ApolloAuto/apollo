@@ -18,10 +18,12 @@
 
 """ Restore record file by replacing its video frames with image frames. """
 
+import datetime
 import errno
 import glob
 import os
 import shutil
+import time
 
 from absl import app
 from absl import flags
@@ -97,9 +99,8 @@ class VideoConverter(object):
 def restore_record(input_record, output_record):
     """Entrance of processing."""
     # Define working dirs that store intermediate results in the middle of processing
-    work_dir = 'work_dir'
-    if os.path.exists(work_dir):
-        shutil.rmtree(work_dir)
+    work_dir = 'restore_video_work_dir_{}'.format(
+        datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H-%M-%S'))
 
     # Decode videos
     converters = {}
