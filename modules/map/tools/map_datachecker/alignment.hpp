@@ -34,6 +34,8 @@ class Alignment {
   explicit Alignment(std::shared_ptr<JSonConf> sp_conf) {
     _return_state = ErrorCode::SUCCESS;
     _sp_conf = sp_conf;
+    _sp_good_pose_info = std::make_shared<BadOrGoodPoseInfo>();
+    _sp_bad_pose_info = std::make_shared<BadOrGoodPoseInfo>();
   }
   virtual ~Alignment() {}
   std::shared_ptr<JSonConf> _sp_conf = nullptr;

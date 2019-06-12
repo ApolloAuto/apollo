@@ -15,18 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-
+from __future__ import print_function
 import os
 import sys
 import logging
 import yaml
 import grpc
+import exception_handler
 script_path = os.path.dirname(os.path.realpath(__file__))
-apollo_root = os.path.join(script_path, "../../..")
+apollo_root = os.path.join(script_path, "../../../..")
 pb_path = os.path.join(apollo_root, "py_proto/modules/map/tools/map_datachecker/proto/")
 sys.path.append(pb_path)
 import collection_service_pb2_grpc
-import collection_service_pb2
 import collection_check_message_pb2
 import collection_error_code_pb2 as ErrorCode
 
@@ -39,22 +39,7 @@ class LoopsChecker:
             self._port = self._conf['grpc_port']
         channel = grpc.insecure_channel(self._host + ':' + self._port)
         self.stub = collection_service_pb2_grpc.CollectionCheckerServiceStub(channel)
-
-    def _exception_handler(self, error_code):
-        if error_code == ErrorCode.SUCCESS:
-            logging.info("ErrorCode.SUCCESS, ignore")
-        elif error_code == ErrorCode.ERROR_REPEATED_START:
-            logging.warn("ErrorCode.ERROR_REPEATED_START, ignore")
-        elif error_code == ErrorCode.ERROR_CHECK_BEFORE_START:
-            logging.warn("ErrorCode.ERROR_CHECK_BEFORE_START")
-        elif error_code == ErrorCode.ERROR_REQUEST:
-            logging.warn("ErrorCode.ERROR_REQUEST")
-        elif error_code == ErrorCode.ERROR_LOOPS_NOT_REACHED:
-            logging.error("ErrorCode.ERROR_LOOPS_NOT_REACHED")
-            return -1
-        else:
-            logging.error("error error_code [%s]" % str(error_code))
-        return 0
+        self._exception_handler = exception_handler.ExceptionHandler.exception_handler
         
     def _get_range(self):
         time_file = os.path.join(script_path, self._conf['time_flag_file'])
@@ -63,6 +48,7 @@ class LoopsChecker:
             record_count = len(lines)
             if ( record_count % 2 ) != 0:
                 logging.error("record_count should be even number")
+                print("The command start and stop should be appear in pairs", file=sys.stderr)
                 return [-1, None]
             time_range = []
             for i in range(0, record_count, 2):
@@ -70,11 +56,13 @@ class LoopsChecker:
                 start_time = float(s[0])
                 if s[1] != "start":
                     logging.error("state machine was broken")
+                    print("The command start and stop should be appear in pairs", file=sys.stderr)
                     return [-1, None]
                 s = lines[i+1].strip().split()
                 end_time = float(s[0])
-                if s[1] != "end":
+                if s[1] != "stop":
                     logging.error("state machine was broken")
+                    print("The command start and stop should be appear in pairs", file=sys.stderr)
                     return [-1, None]
                 dic_range = {}
                 dic_range["start_time"] = start_time
@@ -99,8 +87,8 @@ class LoopsChecker:
         if response.code != ErrorCode.SUCCESS:
             ret = self._exception_handler(response.code)
             if ret != 0:
-                return [-1, 0.0]
-        return [0, response.progress]
+                return [-1, None]
+        return [0, response]
 
     def _stop(self):
         request = collection_check_message_pb2.LoopsVerifyRequest(cmd=3)
@@ -122,21 +110,22 @@ class LoopsChecker:
         if ret != 0:
             logging.error("loops check start failed")
             return -1
+        result = None
         while True:
-            [ret, progress] = self._check()
+            [ret, result] = self._check()
             if ret != 0:
                 logging.error("loops check check failed")
                 break
-            logging.info("loops check check progress: %f" % progress)
-            if abs(progress - 1.0) < 1e-8:
+            logging.info("loops check check progress: %f" % result.progress)
+            if abs(result.progress - 1.0) < 1e-8:
                 break
         if ret != 0:
-            return -1
+            return [-1, None]
         [ret, _] = self._stop()
         if ret != 0:
             logging.error("loops check stop failed")
-            return -1
-        return 0
+            return [-1, None]
+        return [0, result]
 
 if __name__ == "__main__":
     loops_checker = LoopsChecker("127.0.0.1", "50100", "client.yaml")

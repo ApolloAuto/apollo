@@ -12,7 +12,7 @@
     "local_std_upper_limit": 0.15,
 
     "alignment_featch_pose_sleep": 1,
-    "static_align_duration": 300,
+    "static_align_duration": 30,
     "static_align_tolerance": 5,
     "static_align_dist_thresh": 0.15,
 

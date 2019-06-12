@@ -56,17 +56,20 @@ size_t LapsChecker::get_lap() {
 double LapsChecker::get_confidence() {
   double res = 0.0;
   _lap = _laps_to_check;
+  for (size_t i = 0; i < _confidence.size(); i++) {
+    AINFO << "confidence[" << i << "]: " << std::to_string(_confidence[i]);
+  }
+  AINFO << "laps to check: " << _laps_to_check;
   for (size_t i = _laps_to_check; i < _confidence.size(); i++) {
     res += _confidence[i];
   }
-  AINFO << "res: " << res
-      << ", conf.laps_rate_thresh:" << _sp_conf->laps_rate_thresh;
+  AINFO << "current confidence: " << res
+      << ", confidence thresh:" << _sp_conf->laps_rate_thresh;
   if (res < _sp_conf->laps_rate_thresh) {
     if (_confidence.size() == 0) {
       AINFO << "some problems induce lap problem";
       return 0.0;
     }
-    AINFO << "res < _conf.laps_rate_thresh" << _sp_conf->laps_rate_thresh;
     res = _confidence[0];
     _lap = 0;
     for (size_t i = 1; i < _confidence.size(); i++) {

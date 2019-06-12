@@ -15,7 +15,6 @@ proto_library(
         "collection_check_message.proto",
         "collection_data_message.proto",
         "collection_error_code.proto",
-        "collection_status_message.proto",
     ],
 )
 

@@ -67,7 +67,7 @@ bool EightRoute::is_eight_route_pose(
 }
 
 double EightRoute::get_good_pose_during() {
-  if (_sp_good_pose_info->start_time < 0
+  if (_sp_good_pose_info == nullptr || _sp_good_pose_info->start_time < 0
     || _sp_good_pose_info->end_time < 0) {
     return 0.0;
   }

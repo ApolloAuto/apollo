@@ -2,38 +2,8 @@ syntax = "proto2";
 package apollo.hdmap;
 
 import "modules/map/tools/map_datachecker/proto/collection_check_message.proto";
-import "modules/map/tools/map_datachecker/proto/collection_status_message.proto";
-import "modules/map/tools/map_datachecker/proto/collection_data_message.proto";
-
 // MAP
 service CollectionCheckerService {
-
-    rpc DynamicAlign (DynamicAlignRequest) returns (DynamicAlignResponse) {}
-
-    rpc StaticAlign (StaticAlignRequest) returns (StaticAlignResponse) {}
-
-    rpc EightRoute (EightRouteRequest) returns (EightRouteResponse) {}
-
-    rpc ChannelVerify (ChannelVerifyRequest) returns (ChannelVerifyResponse) {}
-
-    rpc LoopsVerify (LoopsVerifyRequest) returns (LoopsVerifyResponse) {}
-}
-
-// APP
-service CollectorService {
-    // collection message fetch api
-    rpc FetchCollectionInfo (FetchCollectionKeys) returns (FetchCollectionPackage) {}
-
-    // task-recorder controller
-    rpc TaskHandler (TaskRequest) returns (StatusResponse) {}
-
-    // notify data collection-task start/end
-    rpc LoopsCollection (LoopsCollectionRequest) returns (StatusResponse) {}
-
-    // car gpsbin file checker
-    rpc CheckGPSbin (CheckGPSbinRequest) returns (CheckGPSbinResponse) {}
-
-    rpc DiskFormat (DiskFormatRequest) returns (DiskFormatResponse) {}
 
     rpc DynamicAlign (DynamicAlignRequest) returns (DynamicAlignResponse) {}
 
