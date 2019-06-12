@@ -334,9 +334,11 @@ class PyNode {
     return nullptr;
   }
 
+  std::shared_ptr<apollo::cyber::Node> get_node() { return node_; }
+
  private:
   std::string node_name_;
-  std::unique_ptr<Node> node_ = nullptr;
+  std::shared_ptr<Node> node_ = nullptr;
 };
 
 class PyChannelUtils {
