@@ -152,6 +152,12 @@ class Obstacle {
   bool IsStill();
 
   /**
+   * @brief Check if the obstacle is slow.
+   * @return If the obstacle is slow.
+   */
+  bool IsSlow();
+
+  /**
    * @brief Check if the obstacle is on any lane.
    * @return If the obstacle is on any lane.
    */
