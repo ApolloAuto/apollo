@@ -100,6 +100,11 @@ bool Obstacle::IsStill() {
   return true;
 }
 
+bool Obstacle::IsSlow() {
+  const Feature& feature = latest_feature();
+  return feature.speed() < FLAGS_slow_obstacle_speed_threshold;
+}
+
 bool Obstacle::IsOnLane() const {
   if (feature_history_.size() > 0) {
     if (feature_history_.front().has_lane() &&

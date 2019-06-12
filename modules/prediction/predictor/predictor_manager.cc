@@ -270,7 +270,10 @@ void PredictorManager::PredictObstacle(
   } else {
     switch (obstacle->type()) {
       case PerceptionObstacle::VEHICLE: {
-        if (obstacle->HasJunctionFeatureWithExits() &&
+        if (obstacle->IsSlow()) {
+          predictor = GetPredictor(ObstacleConf::FREE_MOVE_PREDICTOR);
+          CHECK_NOTNULL(predictor);
+        } else if (obstacle->HasJunctionFeatureWithExits() &&
             !obstacle->IsCloseToJunctionExit()) {
           predictor = GetPredictor(vehicle_in_junction_predictor_);
           CHECK_NOTNULL(predictor);
