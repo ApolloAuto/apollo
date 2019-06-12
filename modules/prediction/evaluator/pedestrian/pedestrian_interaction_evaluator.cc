@@ -125,7 +125,6 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       torch::zeros({1, 2 * (kEmbeddingSize + kHiddenSize)});
   for (int i = 0; i < kEmbeddingSize; ++i) {
     lstm_input[0][i] = position_embedding[0][i];
-    lstm_input[0][kEmbeddingSize + i] = social_embedding[0][i];
   }
   torch::Tensor curr_ht = torch::zeros({1, 1, kHiddenSize});
   torch::Tensor curr_ct = torch::zeros({1, 1, kHiddenSize});
@@ -135,8 +134,8 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     curr_ct = obstacle_id_lstm_state_map_[id].ct;
   }
   for (int i = 0; i < kHiddenSize; ++i) {
-    lstm_input[0][2 * kEmbeddingSize + i] = curr_ht[0][0][i];
-    lstm_input[0][2 * kEmbeddingSize + kHiddenSize + i] = curr_ct[0][0][i];
+    lstm_input[0][kEmbeddingSize + i] = curr_ht[0][0][i];
+    lstm_input[0][kEmbeddingSize + kHiddenSize + i] = curr_ct[0][0][i];
   }
   std::vector<torch::jit::IValue> lstm_inputs;
   lstm_inputs.push_back(std::move(lstm_input));
@@ -197,14 +196,13 @@ Point3D PedestrianInteractionEvaluator::PredictNextPosition(
           .toTensor()
           .to(torch::kCPU);
   torch::Tensor lstm_input =
-      torch::zeros({1, 2 * (kEmbeddingSize + kHiddenSize)});
+      torch::zeros({1, kEmbeddingSize + 2 * kHiddenSize});
   for (int i = 0; i < kEmbeddingSize; ++i) {
     lstm_input[0][i] = position_embedding[0][i];
-    lstm_input[0][kEmbeddingSize + i] = social_embedding[0][i];
   }
   for (int i = 0; i < kHiddenSize; ++i) {
-    lstm_input[0][2 * kEmbeddingSize + i] = ht[0][0][i];
-    lstm_input[0][2 * kEmbeddingSize + kHiddenSize + i] = ct[0][0][i];
+    lstm_input[0][kEmbeddingSize + i] = ht[0][0][i];
+    lstm_input[0][kEmbeddingSize + kHiddenSize + i] = ct[0][0][i];
   }
   std::vector<torch::jit::IValue> lstm_inputs;
   lstm_inputs.push_back(std::move(lstm_input));
