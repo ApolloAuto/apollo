@@ -494,7 +494,7 @@ bool PathBoundsDecider::SearchPullOverPosition(
          << ", ADC is at s = " << adc_end_s;
   if (destination_s - adc_end_s < config_.path_bounds_decider_config()
                                       .pull_over_destination_to_adc_buffer()) {
-    ADEBUG << "Destination is too close to ADC. distance["
+    AERROR << "Destination is too close to ADC. distance["
            << destination_s - adc_end_s << "]";
     return false;
   }
@@ -505,7 +505,7 @@ bool PathBoundsDecider::SearchPullOverPosition(
           .pull_over_destination_to_pathend_buffer();
   if (destination_s + destination_to_pathend_buffer >=
       std::get<0>(path_bound.back())) {
-    ADEBUG << "Destination is not within path_bounds search scope";
+    AERROR << "Destination is not within path_bounds search scope";
     return false;
   }
 
@@ -541,13 +541,13 @@ bool PathBoundsDecider::SearchPullOverPosition(
           curr_s, &curr_road_left_width, &curr_road_right_width);
       if (curr_road_right_width - (curr_right_bound + adc_half_width) >
           config_.path_bounds_decider_config().pull_over_road_edge_buffer()) {
-        ADEBUG << "Not close enough to road-edge. Not feasible for pull-over.";
+        AERROR << "Not close enough to road-edge. Not feasible for pull-over.";
         is_feasible_window = false;
         break;
       }
       if (std::get<2>(path_bound[j]) - std::get<1>(path_bound[j]) <
           pull_over_space_width) {
-        ADEBUG << "Not wide enough to fit ADC. Not feasible for pull-over.";
+        AERROR << "Not wide enough to fit ADC. Not feasible for pull-over.";
         is_feasible_window = false;
         break;
       }
