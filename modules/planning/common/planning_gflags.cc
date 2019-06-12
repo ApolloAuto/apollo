@@ -200,7 +200,7 @@ DEFINE_double(lateral_acceleration_bound, 4.0,
 
 DEFINE_double(longitudinal_jerk_lower_bound, -4.0,
               "The lower bound of longitudinal jerk.");
-DEFINE_double(longitudinal_jerk_upper_bound, 4.0,
+DEFINE_double(longitudinal_jerk_upper_bound, 2.0,
               "The upper bound of longitudinal jerk.");
 DEFINE_double(longitudinal_jerk_bound, 4.0,
               "Bound of longitudinal jerk; symmetric for front and back");

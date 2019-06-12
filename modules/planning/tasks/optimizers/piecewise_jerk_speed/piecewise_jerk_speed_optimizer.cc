@@ -93,7 +93,8 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
                      st_graph_data.init_point().v()));
   piecewise_jerk_problem.set_ddx_bounds(veh_param.max_deceleration(),
                                         veh_param.max_acceleration());
-  piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_bound);
+  piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_lower_bound,
+                                        FLAGS_longitudinal_jerk_upper_bound);
 
   // TODO(Hongyi): delete this when ready to use vehicle_params
   piecewise_jerk_problem.set_ddx_bounds(-4.0, 2.0);
