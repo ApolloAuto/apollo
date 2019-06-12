@@ -23,7 +23,7 @@ cc_library(
         "//modules/perception/fusion/lib/data_association/hm_data_association:chi_squared_cdf",
         "//modules/perception/fusion/lib/data_association/hm_data_association:hm_tracks_objects_match",
         "//modules/perception/fusion/lib/data_association/hm_data_association:track_object_distance",
-        "//modules/perception/fusion/lib/data_fusion/existance_fusion/dst_existance_fusion",
+        "//modules/perception/fusion/lib/data_fusion/existence_fusion/dst_existence_fusion",
         "//modules/perception/fusion/lib/data_fusion/tracker/pbf_tracker",
         "//modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion",
         "//modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper",

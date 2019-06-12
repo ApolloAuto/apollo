@@ -27,16 +27,16 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "dst_existance_fusion_config_proto",
+    name = "dst_existence_fusion_config_proto",
     deps = [
-        ":dst_existance_fusion_config_proto_lib",
+        ":dst_existence_fusion_config_proto_lib",
     ],
 )
 
 proto_library(
-    name = "dst_existance_fusion_config_proto_lib",
+    name = "dst_existence_fusion_config_proto_lib",
     srcs = [
-        "dst_existance_fusion_config.proto",
+        "dst_existence_fusion_config.proto",
     ],
     deps = [
     ],

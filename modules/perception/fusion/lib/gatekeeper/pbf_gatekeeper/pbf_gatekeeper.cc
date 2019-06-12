@@ -55,8 +55,8 @@ bool PbfGatekeeper::Init() {
   params_.max_radar_confident_angle = params.max_radar_confident_angle();
   params_.min_camera_publish_distance = params.min_camera_publish_distance();
   params_.invisible_period_threshold = params.invisible_period_threshold();
-  params_.existance_threshold = params.existance_threshold();
-  params_.radar_existance_threshold = params.radar_existance_threshold();
+  params_.existence_threshold = params.existence_threshold();
+  params_.radar_existence_threshold = params.radar_existence_threshold();
   params_.toic_threshold = params.toic_threshold();
   params_.use_track_time_pub_strategy = params.use_track_time_pub_strategy();
   params_.pub_track_time_thresh = params.pub_track_time_thresh();
@@ -163,7 +163,7 @@ bool PbfGatekeeper::RadarAbleToPublish(const TrackPtr &track, bool is_night) {
       if (radar_object->GetBaseObject()->radar_supplement.range >
               params_.min_radar_confident_distance &&
           (radar_object->GetBaseObject()->velocity.norm() > 4.0 ||
-           track->GetExistanceProb() > params_.radar_existance_threshold)) {
+           track->GetExistanceProb() > params_.radar_existence_threshold)) {
         return true;
       }
     }
@@ -190,7 +190,7 @@ bool PbfGatekeeper::CameraAbleToPublish(const TrackPtr &track, bool is_night) {
            base::ObjectType::UNKNOWN_UNMOVABLE) &&
           (range >= params_.min_camera_publish_distance)))) {
       double exist_prob = track->GetExistanceProb();
-      if (exist_prob > params_.existance_threshold) {
+      if (exist_prob > params_.existence_threshold) {
         static int cnt_cam = 1;
         AINFO << "publish camera only object : cnt =  " << cnt_cam;
         cnt_cam++;

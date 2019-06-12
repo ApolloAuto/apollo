@@ -73,10 +73,10 @@ TEST(PbfTrackerTest, test_initialize) {
   EXPECT_FALSE(tracker.InitMethods());
 
   PbfTracker::s_motion_fusion_method_ = "KalmanMotionFusion";
-  PbfTracker::s_existance_fusion_method_ = "unknown";
+  PbfTracker::s_existence_fusion_method_ = "unknown";
   EXPECT_FALSE(tracker.InitMethods());
 
-  PbfTracker::s_existance_fusion_method_ = "DstExistanceFusion";
+  PbfTracker::s_existence_fusion_method_ = "DstExistanceFusion";
   PbfTracker::s_shape_fusion_method_ = "unknown";
   EXPECT_FALSE(tracker.InitMethods());
 

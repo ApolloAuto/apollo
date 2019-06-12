@@ -24,7 +24,7 @@
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/base/track_pool_types.h"
 #include "modules/perception/fusion/lib/data_association/hm_data_association/hm_tracks_objects_match.h"
-#include "modules/perception/fusion/lib/data_fusion/existance_fusion/dst_existance_fusion/dst_existance_fusion.h"
+#include "modules/perception/fusion/lib/data_fusion/existence_fusion/dst_existence_fusion/dst_existence_fusion.h"
 #include "modules/perception/fusion/lib/data_fusion/tracker/pbf_tracker/pbf_tracker.h"
 #include "modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion/dst_type_fusion.h"
 #include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/pbf_gatekeeper.h"

@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "modules/perception/fusion/common/dst_evidence.h"
-#include "modules/perception/fusion/lib/interface/base_existance_fusion.h"
+#include "modules/perception/fusion/lib/interface/base_existence_fusion.h"
 
 namespace apollo {
 namespace perception {
@@ -91,15 +91,15 @@ class DstExistanceFusion : public BaseExistanceFusion {
   void UpdateExistanceState();
 
  private:
-  double existance_score_ = 0.0;
+  double existence_score_ = 0.0;
   Dst fused_toic_;
-  Dst fused_existance_;
+  Dst fused_existence_;
   double toic_score_ = 0.0;
 
  private:
   static const char *name_;
   static const char *toic_name_;
-  static ExistanceDstMaps existance_dst_maps_;
+  static ExistanceDstMaps existence_dst_maps_;
   static ToicDstMaps toic_dst_maps_;
   static DstExistanceFusionOptions options_;
 };

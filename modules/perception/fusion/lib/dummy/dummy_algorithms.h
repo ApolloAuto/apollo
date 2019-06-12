@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "modules/perception/fusion/lib/interface/base_data_association.h"
-#include "modules/perception/fusion/lib/interface/base_existance_fusion.h"
+#include "modules/perception/fusion/lib/interface/base_existence_fusion.h"
 #include "modules/perception/fusion/lib/interface/base_fusion_system.h"
 #include "modules/perception/fusion/lib/interface/base_motion_fusion.h"
 #include "modules/perception/fusion/lib/interface/base_shape_fusion.h"
