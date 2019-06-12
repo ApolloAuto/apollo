@@ -20,8 +20,8 @@ INCHINA="no"
 LOCAL_IMAGE="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="cyber-x86_64-18.04-20190531_1115"
-VERSION_AARCH64="cyber-aarch64-18.04-20190602_1217"
+VERSION_X86_64="cyber-x86_64-18.04-20190612_0742"
+VERSION_AARCH64="cyber-aarch64-18.04-20190611_2033"
 VERSION_OPT=""
 
 # Check whether user has agreed license agreement
