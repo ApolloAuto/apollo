@@ -118,8 +118,6 @@ bool UDPBridgeReceiverComponent<T>::MsgHandle() {
   if (!proto_buf) {
     return false;
   }
-  FREE_ARRY(header_buf);
-  BridgeProtoBuf<T> *proto_buf = CreateBridgeProtoBuf(header);
 
   char *buf = proto_buf->GetBuf(header.GetFramePos());
   bytes = static_cast<int>(session_->RecvFrom(buf, header.GetFrameSize(),

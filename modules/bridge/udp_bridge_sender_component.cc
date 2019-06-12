@@ -15,7 +15,6 @@
  *****************************************************************************/
 
 #include "modules/bridge/udp_bridge_sender_component.h"
-#include "modules/bridge/common/bridge_proto_buf.h"
 #include "modules/bridge/common/macro.h"
 #include "modules/bridge/common/util.h"
 #include "modules/bridge/common/bridge_proto_serialized_buf.h"
