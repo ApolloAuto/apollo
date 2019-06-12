@@ -170,15 +170,15 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
                                         FLAGS_lateral_derivative_bound_default);
   piecewise_jerk_problem.set_dddx_bound(FLAGS_lateral_jerk_bound);
 
-  /**
-  // Experimental code to be tested
-  // TODO(all): find the params in vehicle config
-  double axis_distance = 2.5;
-  double max_steering_rate = 1.0 / 6.0 * M_PI;
+  // Estimate jerk boundary from vehicle_params
+  const auto& veh_param =
+      common::VehicleConfigHelper::GetConfig().vehicle_param();
+  double axis_distance = veh_param.wheel_base();
+  double max_steering_rate = veh_param.max_steer_angle_rate() /
+                             veh_param.steer_ratio();
   double jerk_bound = EstimateJerkBoundary(std::fmax(init_state[1], 1.0),
       axis_distance, max_steering_rate);
   piecewise_jerk_problem.set_dddx_bound(jerk_bound);
-  **/
 
   bool success = piecewise_jerk_problem.Optimize(max_iter);
 
