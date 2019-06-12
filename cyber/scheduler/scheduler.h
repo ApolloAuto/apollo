@@ -66,6 +66,8 @@ class Scheduler {
   uint32_t TaskPoolSize() { return task_pool_size_; }
 
   virtual bool RemoveTask(const std::string& name) = 0;
+
+  void ProcessLevelResourceControl();
   void SetInnerThreadAttr(const std::string& name, std::thread* thr);
 
   virtual bool DispatchTask(const std::shared_ptr<CRoutine>&) = 0;
@@ -91,6 +93,7 @@ class Scheduler {
 
   std::unordered_map<std::string, InnerThread> inner_thr_confs_;
 
+  std::string process_level_cpuset_;
   uint32_t proc_num_ = 0;
   uint32_t task_pool_size_ = 0;
   std::atomic<bool> stop_;

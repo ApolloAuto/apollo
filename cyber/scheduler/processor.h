@@ -43,7 +43,7 @@ class Processor {
   void Run();
   void Stop();
   void BindContext(const std::shared_ptr<ProcessorContext>& context);
-  void SetAffinity(const std::vector<int>&, const std::string&, int);
+  void SetSchedAffinity(const std::vector<int>&, const std::string&, int);
   void SetSchedPolicy(std::string spolicy, int sched_priority);
 
  private:
