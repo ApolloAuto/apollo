@@ -34,8 +34,8 @@
 namespace apollo {
 namespace canbus {
 namespace ch {
-using ::apollo::drivers::canbus::ProtocolData;
 using ::apollo::canbus::ChassisDetail;
+using ::apollo::drivers::canbus::ProtocolData;
 
 class ChMessageManagerTest : public ::testing::Test {
  public:
@@ -143,8 +143,8 @@ TEST_F(ChMessageManagerTest, Turnsignalcommand113) {
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Turnsignalcommand113::ID);
   EXPECT_TRUE(pd != nullptr);
-  EXPECT_EQ(static_cast<Turnsignalcommand113 *>
-  (pd)->ID, Turnsignalcommand113::ID);
+  EXPECT_EQ(static_cast<Turnsignalcommand113 *>(pd)->ID,
+            Turnsignalcommand113::ID);
 }
 
 TEST_F(ChMessageManagerTest, Turnsignalstatus513) {
@@ -152,8 +152,8 @@ TEST_F(ChMessageManagerTest, Turnsignalstatus513) {
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Turnsignalstatus513::ID);
   EXPECT_TRUE(pd != nullptr);
-  EXPECT_EQ(static_cast<Turnsignalstatus513 *>
-  (pd)->ID, Turnsignalstatus513::ID);
+  EXPECT_EQ(static_cast<Turnsignalstatus513 *>(pd)->ID,
+            Turnsignalstatus513::ID);
 }
 
 }  // namespace ch

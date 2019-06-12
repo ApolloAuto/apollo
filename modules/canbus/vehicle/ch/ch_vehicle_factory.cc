@@ -16,9 +16,9 @@
 
 #include "modules/canbus/vehicle/ch/ch_vehicle_factory.h"
 
+#include "cyber/common/log.h"
 #include "modules/canbus/vehicle/ch/ch_controller.h"
 #include "modules/canbus/vehicle/ch/ch_message_manager.h"
-#include "cyber/common/log.h"
 #include "modules/common/util/util.h"
 
 namespace apollo {

@@ -30,8 +30,8 @@ namespace ch {
 
 using ::apollo::drivers::canbus::MessageManager;
 
-class ChMessageManager :
-public MessageManager<::apollo::canbus::ChassisDetail> {
+class ChMessageManager
+    : public MessageManager<::apollo::canbus::ChassisDetail> {
  public:
   ChMessageManager();
   virtual ~ChMessageManager();
