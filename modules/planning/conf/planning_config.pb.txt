@@ -243,6 +243,7 @@ default_task_config: {
     roi_linesegment_length: 1.0
     perception_obstacle_filtering_distance: 1000.0
     perception_obstacle_buffer: 0.0
+    bound_width_change_ratio_uppper_limit: 0.1
   }
 }
 default_task_config: {
