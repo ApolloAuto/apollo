@@ -13,6 +13,7 @@ cc_library(
     linkopts = [
         "-lboost_thread",
     ],
+    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",

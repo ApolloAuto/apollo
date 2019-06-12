@@ -11,6 +11,7 @@ cc_library(
         "sim_control.h",
         "sim_control_interface.h",
     ],
+    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
