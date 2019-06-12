@@ -7,6 +7,7 @@ import "modules/common/proto/vehicle_signal.proto";
 import "modules/control/proto/pad_msg.proto";
 import "modules/common/proto/drive_state.proto";
 import "modules/common/proto/pnc_point.proto";
+import "modules/localization/proto/pose.proto";
 
 enum TurnSignal {
   TURN_NONE = 0;
@@ -224,6 +225,7 @@ message InputDebug {
   optional apollo.common.Header canbus_header = 2;
   optional apollo.common.Header trajectory_header = 3;
   optional apollo.common.Header latest_replan_trajectory_header = 4;
+  optional apollo.localization.Pose localization_pose = 5;
 }
 
 message Debug {

@@ -219,6 +219,10 @@ Status ControlComponent::ProduceControlCommand(
     auto debug = control_command->mutable_debug()->mutable_input_debug();
     debug->mutable_localization_header()->CopyFrom(
         local_view_.localization.header());
+    debug->mutable_localization_pose()->mutable_position()->CopyFrom(
+        local_view_.localization.pose().position());
+    debug->mutable_localization_pose()->set_heading(
+        local_view_.localization.pose().heading());
     debug->mutable_canbus_header()->CopyFrom(local_view_.chassis.header());
     debug->mutable_trajectory_header()->CopyFrom(
         local_view_.trajectory.header());
