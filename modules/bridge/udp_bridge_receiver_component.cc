@@ -108,12 +108,12 @@ bool UDPBridgeReceiverComponent<T>::MsgHandle() {
   }
 
   BridgeHeader header;
-  if (!header.Diserialize(header_buf)) {
+  if (!header.Diserialize(header_buf, header_size)) {
     FREE_ARRY(header_buf);
     return false;
   }
   FREE_ARRY(header_buf);
-  BridgeProtoBuf<T> *proto_buf = CreateBridgeProtoBuf(header);
+  BridgeProtoDiserializedBuf<T> *proto_buf = CreateBridgeProtoBuf(header);
 
   if (!proto_buf) {
     return false;
@@ -145,14 +145,14 @@ void UDPBridgeReceiverComponent<T>::MsgDispatcher() {
 }
 
 template <typename T>
-BridgeProtoBuf<T> *UDPBridgeReceiverComponent<T>::CreateBridgeProtoBuf(
-    const BridgeHeader &header) {
+BridgeProtoDiserializedBuf<T> *UDPBridgeReceiverComponent<T>::
+  CreateBridgeProtoBuf(const BridgeHeader &header) {
   for (auto proto : proto_list_) {
     if (proto->IsTheProto(header)) {
       return proto;
     }
   }
-  BridgeProtoBuf<T> *proto_buf = new BridgeProtoBuf<T>;
+  BridgeProtoDiserializedBuf<T> *proto_buf = new BridgeProtoDiserializedBuf<T>;
   if (!proto_buf) {
     return nullptr;
   }

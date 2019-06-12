@@ -31,7 +31,6 @@
 #include "cyber/init.h"
 #include "cyber/io/session.h"
 #include "cyber/scheduler/scheduler_factory.h"
-#include "modules/bridge/common/bridge_buffer.h"
 #include "modules/bridge/common/bridge_gflags.h"
 #include "modules/bridge/proto/udp_bridge_remote_info.pb.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
@@ -60,7 +59,6 @@ class UDPBridgeSenderComponent final : public cyber::Component<T> {
   unsigned int remote_port_ = 0;
   std::string remote_ip_ = "";
   std::string proto_name_ = "";
-  BridgeBuffer<char> buf_;
   std::mutex mutex_;
 };
 
