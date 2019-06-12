@@ -155,7 +155,6 @@ bool RealtimeRecordProcessor::Process() {
       break;
     }
     auto reader = std::make_shared<RecordReader>(record_path);
-    reader->SetFlushMode(true);
     RecordViewer viewer(reader, 0, UINT64_MAX,
                         ChannelPool::Instance()->GetAllChannels());
     AINFO << "checking " << record_path << ": " << viewer.begin_time() << " - "
@@ -253,11 +252,10 @@ void RealtimeRecordProcessor::RestoreMessage(const uint64_t message_time) {
     AINFO << "target restoring " << restore_path_ << ": "
           << restore_reader_time_ << " - " << target_end;
     auto reader = std::make_shared<RecordReader>(restore_path_);
-    reader->SetFlushMode(true);
     restore_reader_time_ =
-        std::max(restore_reader_time_, reader->header().begin_time());
+        std::max(restore_reader_time_, reader->GetHeader().begin_time());
     if (restore_reader_time_ > target_end ||
-        reader->header().begin_time() >= reader->header().end_time()) {
+        reader->GetHeader().begin_time() >= reader->GetHeader().end_time()) {
       AWARN << "record " << restore_path_ << " begin_time beyond target, exit";
       break;
     }
@@ -277,8 +275,8 @@ void RealtimeRecordProcessor::RestoreMessage(const uint64_t message_time) {
         writer_->WriteMessage(msg.channel_name, msg.content, msg.time);
       }
     }
-    restore_reader_time_ = std::min(reader->header().end_time(), target_end);
-    if (target_end >= reader->header().end_time()) {
+    restore_reader_time_ = std::min(reader->GetHeader().end_time(), target_end);
+    if (target_end >= reader->GetHeader().end_time()) {
       GetNextValidRecord(&restore_path_);
     }
   } while (restore_reader_time_ < target_end);

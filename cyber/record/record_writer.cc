@@ -213,6 +213,14 @@ const std::string& RecordWriter::GetProtoDesc(
   return null_type_;
 }
 
+std::set<std::string> RecordWriter::GetChannelList() const {
+  std::set<std::string> channel_list;
+  for (auto& item : channel_message_number_map_) {
+    channel_list.insert(item.first);
+  }
+  return channel_list;
+}
+
 }  // namespace record
 }  // namespace cyber
 }  // namespace apollo

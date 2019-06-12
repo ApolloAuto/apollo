@@ -73,14 +73,6 @@ bool RecordViewer::Update(RecordMessage* message) {
   return find;
 }
 
-uint64_t RecordViewer::begin_time() const { return begin_time_; }
-
-uint64_t RecordViewer::end_time() const { return end_time_; }
-
-std::set<std::string> RecordViewer::GetChannelList() const {
-  return channel_list_;
-}
-
 RecordViewer::Iterator RecordViewer::begin() { return Iterator(this); }
 
 RecordViewer::Iterator RecordViewer::end() { return Iterator(this, true); }
@@ -98,8 +90,8 @@ void RecordViewer::Init() {
   // Sort the readers
   std::sort(readers_.begin(), readers_.end(),
             [](const RecordReaderPtr& lhs, const RecordReaderPtr& rhs) {
-              const auto& lhs_header = lhs->header();
-              const auto& rhs_header = rhs->header();
+              const auto& lhs_header = lhs->GetHeader();
+              const auto& rhs_header = rhs->GetHeader();
               if (lhs_header.begin_time() == rhs_header.begin_time()) {
                 return lhs_header.end_time() < rhs_header.end_time();
               }
@@ -124,7 +116,7 @@ void RecordViewer::UpdateTime() {
     if (!reader->IsValid()) {
       continue;
     }
-    const auto& header = reader->header();
+    const auto& header = reader->GetHeader();
     if (min_begin_time > header.begin_time()) {
       min_begin_time = header.begin_time();
     }
@@ -154,7 +146,7 @@ bool RecordViewer::FillBuffer() {
 
     for (size_t i = 0; i < readers_.size(); ++i) {
       if (!readers_finished_[i] &&
-          readers_[i]->header().end_time() < this_begin_time) {
+          readers_[i]->GetHeader().end_time() < this_begin_time) {
         readers_finished_[i] = true;
         readers_[i]->Reset();
       }

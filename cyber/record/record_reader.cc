@@ -151,11 +151,7 @@ bool RecordReader::ReadNextChunk(uint64_t begin_time, uint64_t end_time) {
           break;
         }
 
-        // In Flush mode we release the buffer and create a new one
-        if (flush_mode_) {
-          chunk_.reset(new ChunkBody());
-        }
-
+        chunk_.reset(new ChunkBody());
         if (!file_reader_->ReadSection<ChunkBody>(section.size, chunk_.get())) {
           AERROR << "Failed to read chunk body section.";
           return false;
