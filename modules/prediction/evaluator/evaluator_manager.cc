@@ -151,9 +151,7 @@ void EvaluatorManager::Init(const PredictionConf& config) {
           }
           break;
         }
-        default: {
-          break;
-        }
+        default: { break; }
       }
     }
   }
@@ -396,9 +394,7 @@ std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
       evaluator_ptr.reset(new JunctionMapEvaluator());
       break;
     }
-    default: {
-      break;
-    }
+    default: { break; }
   }
   return evaluator_ptr;
 }
