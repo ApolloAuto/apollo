@@ -35,11 +35,11 @@ class ChVehicleFactoryTest : public ::testing::Test {
 };
 
 TEST_F(ChVehicleFactoryTest, InitVehicleController) {
-  EXPECT_TRUE(ch_factory_.CreateVehicleController() != nullptr);
+  EXPECT_NE(ch_factory_.CreateVehicleController(), nullptr);
 }
 
 TEST_F(ChVehicleFactoryTest, InitMessageManager) {
-  EXPECT_TRUE(ch_factory_.CreateMessageManager() != nullptr);
+  EXPECT_NE(ch_factory_.CreateMessageManager(), nullptr);
 }
 
 }  // namespace canbus
