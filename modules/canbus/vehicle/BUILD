@@ -48,6 +48,7 @@ cc_library(
     ],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
+        "//modules/canbus/vehicle/ch:ch_vehicle_factory",
         "//modules/canbus/vehicle/ge3:ge3_vehicle_factory",
         "//modules/canbus/vehicle/gem:gem_vehicle_factory",
         "//modules/canbus/vehicle/lexus:lexus_vehicle_factory",
@@ -55,7 +56,6 @@ cc_library(
         "//modules/canbus/vehicle/transit:transit_vehicle_factory",
         "//modules/canbus/vehicle/wey:wey_vehicle_factory",
         "//modules/canbus/vehicle/zhongyun:zhongyun_vehicle_factory",
-        "//modules/canbus/vehicle/ch:ch_vehicle_factory",
         "//modules/common/util:factory",
     ],
 )
