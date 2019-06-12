@@ -13,13 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/perception/lidar/lib/segmentation/ncut/ncut_segmentation.h"
+
 #include <omp.h>
-#include <map>
+
 #include <algorithm>
+#include <map>
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-
-#include "modules/perception/lidar/lib/segmentation/ncut/ncut_segmentation.h"
 
 namespace apollo {
 namespace perception {
@@ -324,7 +326,7 @@ void NCutSegmentation::PartitionConnectedComponents(
 void NCutSegmentation::ObstacleFilter(const base::PointFCloudPtr& in_cloud,
                                       float cell_size,
                                       bool filter_pedestrian_only,
-                                      base::PointFCloudPtr *out_cloud,
+                                      base::PointFCloudPtr* out_cloud,
                                       std::vector<base::ObjectPtr>* segments) {
   FloodFill FFfilter(grid_radius_, cell_size);
   std::vector<std::vector<int>> component_points;

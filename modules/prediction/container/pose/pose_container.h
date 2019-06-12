@@ -67,7 +67,6 @@ class PoseContainer : public Container {
   void Update(const localization::LocalizationEstimate& localization);
 
  public:
-  static const int ID = -1;
   static const perception::PerceptionObstacle::Type type_ =
       perception::PerceptionObstacle::VEHICLE;
 

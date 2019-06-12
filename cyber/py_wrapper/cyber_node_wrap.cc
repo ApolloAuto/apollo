@@ -752,6 +752,48 @@ PyObject *cyber_PyNodeUtils_get_writersofnode(PyObject *self, PyObject *args) {
 
   return pyobj_list;
 }
+
+PyObject *cyber_PyServiceUtils_get_active_services(PyObject *self,
+                                                   PyObject *args) {
+  unsigned char sleep_s = 0;
+  if (!PyArg_ParseTuple(
+          args,
+          const_cast<char *>("B:cyber_PyServiceUtils_get_active_services"),
+          &sleep_s)) {
+    AERROR << "cyber_PyServiceUtils_get_active_services failed!";
+    Py_INCREF(Py_None);
+    return Py_None;
+  }
+
+  std::vector<std::string> services_name =
+      apollo::cyber::PyServiceUtils::get_active_services(sleep_s);
+  PyObject *pyobj_list = PyList_New(services_name.size());
+  size_t pos = 0;
+  for (const std::string &name : services_name) {
+    PyList_SetItem(pyobj_list, pos, Py_BuildValue("s", name.c_str()));
+    pos++;
+  }
+
+  return pyobj_list;
+}
+
+PyObject *cyber_PyServiceUtils_get_service_attr(PyObject *self,
+                                                PyObject *args) {
+  char *srv_name = nullptr;
+  Py_ssize_t len = 0;
+  unsigned char sleep_s = 0;
+  if (!PyArg_ParseTuple(
+          args, const_cast<char *>("s#B:cyber_PyServiceUtils_get_service_attr"),
+          &srv_name, &len, &sleep_s)) {
+    AERROR << "cyber_PyServiceUtils_get_service_attr failed!";
+    Py_INCREF(Py_None);
+    return Py_None;
+  }
+  std::string name(srv_name, len);
+  std::string srv_attr =
+      apollo::cyber::PyServiceUtils::get_service_attr(name, sleep_s);
+  return PyString_FromStringAndSize(srv_attr.c_str(), srv_attr.size());
+}
 /////////////////////////////////////////////////////////////////////
 //// debug pyobject
 /////////////////////////////////////////////////////////////////////
@@ -874,6 +916,11 @@ static PyMethodDef _cyber_node_methods[] = {
     {"PyNodeUtils_get_readersofnode", cyber_PyNodeUtils_get_readersofnode,
      METH_VARARGS, ""},
     {"PyNodeUtils_get_writersofnode", cyber_PyNodeUtils_get_writersofnode,
+     METH_VARARGS, ""},
+
+    {"PyServiceUtils_get_active_services",
+     cyber_PyServiceUtils_get_active_services, METH_VARARGS, ""},
+    {"PyServiceUtils_get_service_attr", cyber_PyServiceUtils_get_service_attr,
      METH_VARARGS, ""},
 
     // for test

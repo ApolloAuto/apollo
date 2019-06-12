@@ -77,9 +77,9 @@ struct LidarFrame {
 
   void FilterPointCloud(base::PointCloud<base::PointF> *filtered_cloud,
                         const std::vector<uint32_t> &indices) {
-      if (cloud && filtered_cloud) {
-          filtered_cloud->CopyPointCloudExclude(*cloud, indices);
-      }
+    if (cloud && filtered_cloud) {
+      filtered_cloud->CopyPointCloudExclude(*cloud, indices);
+    }
   }
 };  // struct LidarFrame
 

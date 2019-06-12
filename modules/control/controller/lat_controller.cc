@@ -454,7 +454,7 @@ Status LatController::ComputeControlCommand(
                 steer_angle_feedback_augment;
 
   if (FLAGS_set_steer_limit) {
-    const double steer_limit = std::atan(max_lat_acc_ * min_turn_radius_ /
+    const double steer_limit = std::atan(max_lat_acc_ * wheelbase_ /
                                          (vehicle_state->linear_velocity() *
                                           vehicle_state->linear_velocity())) *
                                steer_ratio_ * 180 / M_PI /

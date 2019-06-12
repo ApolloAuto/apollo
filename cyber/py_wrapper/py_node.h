@@ -194,8 +194,8 @@ class PyService {
         data_type_(data_type),
         func_(nullptr) {
     auto f = [this](
-                 const std::shared_ptr<const message::PyMessageWrap>& request,
-                 std::shared_ptr<message::PyMessageWrap>& response) {
+        const std::shared_ptr<const message::PyMessageWrap>& request,
+        std::shared_ptr<message::PyMessageWrap>& response) {
       response = this->cb(request);
     };
     service_ =
@@ -529,6 +529,57 @@ class PyNodeUtils {
   }
 };
 
+class PyServiceUtils {
+ public:
+  static std::vector<std::string> get_active_services(uint8_t sleep_s = 2) {
+    auto topology =
+        apollo::cyber::service_discovery::TopologyManager::Instance();
+    sleep(sleep_s);
+    std::vector<std::string> srv_names;
+    std::vector<RoleAttributes> services;
+    topology->service_manager()->GetServers(&services);
+    if (services.empty()) {
+      AERROR << "no service found.";
+      return srv_names;
+    }
+
+    std::sort(services.begin(), services.end(),
+              [](const RoleAttributes& sa, const RoleAttributes& sb) -> bool {
+                if (sa.service_name().compare(sb.service_name()) <= 0) {
+                  return true;
+                } else {
+                  return false;
+                }
+              });
+    for (auto& service : services) {
+      srv_names.emplace_back(service.service_name());
+    }
+    return srv_names;
+  }
+
+  static std::string get_service_attr(const std::string& service_name,
+                                      uint8_t sleep_s = 2) {
+    auto topology =
+        apollo::cyber::service_discovery::TopologyManager::Instance();
+    sleep(sleep_s);
+
+    if (!topology->service_manager()->HasService(service_name)) {
+      AERROR << "no service: " << service_name;
+      return "";
+    }
+
+    std::vector<RoleAttributes> services;
+    topology->service_manager()->GetServers(&services);
+    std::string msgdata;
+    for (auto& service_attr : services) {
+      if (service_attr.service_name() == service_name) {
+        service_attr.SerializeToString(&msgdata);
+        return msgdata;
+      }
+    }
+    return "";
+  }
+};
 }  // namespace cyber
 }  // namespace apollo
 

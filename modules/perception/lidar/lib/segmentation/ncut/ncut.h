@@ -19,12 +19,14 @@
 #include <stdlib.h>
 #include <opencv2/opencv.hpp>
 #include <Eigen/Core>
+
 #include <iostream>
 #include <map>
+#include <memory>
+#include <string>
 #include <tuple>
 #include <vector>
-#include <string>
-#include <memory>
+
 #include "modules/perception/lidar/lib/segmentation/ncut/common/flood_fill.h"
 #include "modules/perception/lidar/lib/segmentation/ncut/common/lr_classifier.h"
 #include "modules/perception/lidar/lib/segmentation/ncut/proto/ncut_param.pb.h"
@@ -42,8 +44,8 @@ class NCut {
   int NumSegments() const { return static_cast<int>(_segment_pids.size()); }
   std::string GetSegmentLabel(int sid) const { return _segment_labels[sid]; }
 
-  void GetSegmentSize(int sid, float *length, float *width,
-                      float *height) const {
+  void GetSegmentSize(int sid, float* length, float* width,
+                      float* height) const {
     NcutBoundingBox box = _segment_bbox[sid];
     *length = std::get<1>(box) - std::get<0>(box);
     *width = std::get<3>(box) - std::get<2>(box);
@@ -61,8 +63,8 @@ class NCut {
   std::string GetPcRoughLabel(const base::PointFCloudPtr& cloud,
                               bool only_check_pedestrian);
 
-  void GetSegmentRoughSize(const base::PointFCloudPtr& cloud, float *length,
-                           float *width, float *height);
+  void GetSegmentRoughSize(const base::PointFCloudPtr& cloud, float* length,
+                           float* width, float* height);
 
  private:
   struct gridIndex {
@@ -109,8 +111,8 @@ class NCut {
   std::vector<std::vector<int>> _outlier_pids;
 
   void SampleByGrid(const std::vector<int>& point_gids,
-                    Eigen::MatrixXf *skeleton_coords,
-                    Eigen::MatrixXf *skeleton_feature);
+                    Eigen::MatrixXf* skeleton_coords,
+                    Eigen::MatrixXf* skeleton_feature);
 
   void PrecomputeAllSkeletonAndBbox();
 
@@ -118,16 +120,16 @@ class NCut {
 
   void SuperPixelsFloodFill(base::PointFCloudConstPtr cloud, float radius,
                             float cell_size,
-                            std::vector<std::vector<int>> *super_pixels);
+                            std::vector<std::vector<int>>* super_pixels);
 
   // super pixels
   void BuildAverageHeightMap(base::PointFCloudConstPtr cloud,
-                             const FloodFill& ff_map, cv::Mat *cv_height_map,
-                             std::vector<gridIndex> *point_pixel_indices);
+                             const FloodFill& ff_map, cv::Mat* cv_height_map,
+                             std::vector<gridIndex>* point_pixel_indices);
 
   // skeleton
   void GetPatchFeature(const Eigen::MatrixXf& points,
-                       Eigen::MatrixXf *features);
+                       Eigen::MatrixXf* features);
 
   // bounding box
   NcutBoundingBox ComputeClusterBoundingBox(const std::vector<int>& point_gids);
@@ -135,26 +137,26 @@ class NCut {
   std::string GetPcLabel(const base::PointFCloudPtr& cloud);
 
   void NormalizedCut(float ncuts_threshold, bool use_classifier,
-                     std::vector<std::vector<int>> *segment_clusters,
-                     std::vector<std::string> *segment_labels);
+                     std::vector<std::vector<int>>* segment_clusters,
+                     std::vector<std::string>* segment_labels);
 
-  void ComputeSkeletonWeights(Eigen::MatrixXf *weights);
+  void ComputeSkeletonWeights(Eigen::MatrixXf* weights);
 
   float GetMinNcuts(const Eigen::MatrixXf& in_weights,
                     const std::vector<int>* in_clusters, std::vector<int>* seg1,
                     std::vector<int>* seg2);
 
   void LaplacianDecomposition(const Eigen::MatrixXf& weights,
-                              Eigen::MatrixXf *eigenvectors);
+                              Eigen::MatrixXf* eigenvectors);
 
   bool ComputeSquaredSkeletonDistance(const Eigen::MatrixXf& in1_points,
                                       const Eigen::MatrixXf& in1_features,
                                       const Eigen::MatrixXf& in2_points,
                                       const Eigen::MatrixXf& in2_features,
-                                      float *dist_point, float *dist_feature);
+                                      float* dist_point, float* dist_feature);
 
   bool IsMovableObstacle(const std::vector<int>& cluster_ids,
-                         std::string *label);
+                         std::string* label);
 
   inline bool IsPotentialPedestrianSize(float length, float width) {
     return ((length > 0.5 && length < 1.5) && (width > 0.3 && width < 1));
@@ -171,7 +173,7 @@ class NCut {
   }
 
   int GetComponentBoundingBox(const std::vector<int>& cluster_ids,
-                              NcutBoundingBox *box);
+                              NcutBoundingBox* box);
 
   inline float GetBboxLength(const NcutBoundingBox& box) {
     return (std::get<1>(box) - std::get<0>(box));
@@ -187,7 +189,7 @@ class NCut {
 
   std::string GetClustersLabel(const std::vector<int>& cluster_ids);
 
-  void GetClustersPids(const std::vector<int>& cids, std::vector<int> *pids);
+  void GetClustersPids(const std::vector<int>& cids, std::vector<int>* pids);
 };
 
 }  // namespace lidar

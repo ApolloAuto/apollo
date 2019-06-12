@@ -63,7 +63,7 @@ message AdapterConfig {
     GNSS_HEADING = 56;
     RTCM_DATA = 57;
     RACOBIT_RADAR = 59;
-    // veldoyne fusion configs
+    // velodyne fusion configs
     POINT_CLOUD_DENSE = 60;
     POINT_CLOUD_DENSE_RAW = 61;
     VELODYNE_SCAN_DENSE = 62;

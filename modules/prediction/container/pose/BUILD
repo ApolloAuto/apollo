@@ -13,6 +13,7 @@ cc_library(
         "//modules/common/math:quaternion",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",
+        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container",
     ],
 )

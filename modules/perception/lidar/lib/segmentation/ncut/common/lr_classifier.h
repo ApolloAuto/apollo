@@ -18,13 +18,13 @@
 #include <math.h>
 #include <stdlib.h>
 #include <Eigen/Core>
+#include <algorithm>
 #include <iostream>
 #include <map>
+#include <string>
 #include <tuple>
 #include <unordered_set>
 #include <vector>
-#include <string>
-#include <algorithm>
 #include "modules/perception/base/point_cloud.h"
 
 namespace apollo {

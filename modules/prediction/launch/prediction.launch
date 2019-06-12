@@ -4,7 +4,4 @@
         <dag_conf>/apollo/modules/prediction/dag/prediction.dag</dag_conf>
         <process_name>prediction</process_name>
     </module>
-    <environment>
-        <LD_PRELOAD>libcaffe2_gpu.so libopencv_core.so</LD_PRELOAD>
-    </environment>
 </cyber>
