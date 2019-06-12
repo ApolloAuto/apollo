@@ -80,7 +80,8 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
                                         veh_param.max_acceleration());
   // TODO(Hongyi): Set back to vehicle_params when ready
   piecewise_jerk_problem.set_ddx_bounds(-4.0, 2.0);
-  piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_bound);
+  piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_lower_bound,
+                                        FLAGS_longitudinal_jerk_upper_bound);
 
   // Solve the problem
   if (!piecewise_jerk_problem.Optimize()) {
