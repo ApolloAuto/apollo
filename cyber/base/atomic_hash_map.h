@@ -40,25 +40,54 @@ template <typename K, typename V, std::size_t TableSize = 128,
 class AtomicHashMap {
  public:
   AtomicHashMap() : capacity_(TableSize), mode_num_(capacity_ - 1) {}
-  AtomicHashMap(const AtomicHashMap &other) = delete;
-  AtomicHashMap &operator=(const AtomicHashMap &other) = delete;
+  AtomicHashMap(const AtomicHashMap& other) = delete;
+  AtomicHashMap& operator=(const AtomicHashMap& other) = delete;
 
   bool Has(K key) {
     uint64_t index = key & mode_num_;
     return table_[index].Has(key);
   }
 
-  bool Get(K key, V **value) {
+  /**
+   * @brief Get value with the key
+   *
+   * @param key The key to be found
+   * @param value If key exists, value point to the address of the value stored
+   * in map
+   * @return true If the key exists
+   * @return false If the key does not exists
+   *
+   * @note This function is not thread safe. If one thread set the key with new
+   * value, the address will be deleted. This function can avoid copy the value,
+   * and it is faster in most cases. Use it carefully.
+   */
+  bool Get(K key, V** value) {
     uint64_t index = key & mode_num_;
-    return table_[index].Get(key, value);
-  }
-
-  bool Get(K key, V *value) {
-    uint64_t index = key & mode_num_;
-    V *val = nullptr;
+    ValueNode* val = nullptr;
     bool res = table_[index].Get(key, &val);
     if (res) {
-      *value = *val;
+      *value = &(val->value);
+      val->Release();
+    }
+    return res;
+  }
+
+  /**
+   * @brief Get value with the key
+   *
+   * @param key The key to be found
+   * @param value If key exists, value pointer to a copy of the value stored in
+   * map
+   * @return true If the key exists
+   * @return false If the key does not exists
+   */
+  bool Get(K key, V* value) {
+    uint64_t index = key & mode_num_;
+    ValueNode* val = nullptr;
+    bool res = table_[index].Get(key, &val);
+    if (res) {
+      *value = val->value;
+      val->Release();
     }
     return res;
   }
@@ -68,40 +97,52 @@ class AtomicHashMap {
     table_[index].Insert(key);
   }
 
-  void Set(K key, const V &value) {
+  void Set(K key, const V& value) {
     uint64_t index = key & mode_num_;
     table_[index].Insert(key, value);
   }
 
-  void Set(K key, V &&value) {
+  void Set(K key, V&& value) {
     uint64_t index = key & mode_num_;
     table_[index].Insert(key, std::forward<V>(value));
   }
 
  private:
+  struct ValueNode {
+    ValueNode() {}
+    explicit ValueNode(const V& value) : value(value) {}
+    explicit ValueNode(V&& value) : value(std::forward<V>(value)) {}
+    V value;
+    std::atomic<uint32_t> ref_count = {1};
+    void Release() {
+      if (ref_count.fetch_sub(1) == 1) {
+        delete this;
+      }
+    }
+  };
   struct Entry {
     Entry() {}
     explicit Entry(K key) : key(key) {
-      value_ptr.store(new V(), std::memory_order_release);
+      value_ptr.store(new ValueNode(), std::memory_order_release);
     }
-    Entry(K key, const V &value) : key(key) {
-      value_ptr.store(new V(value), std::memory_order_release);
+    Entry(K key, const V& value) : key(key) {
+      value_ptr.store(new ValueNode(value), std::memory_order_release);
     }
-    Entry(K key, V &&value) : key(key) {
+    Entry(K key, V&& value) : key(key) {
       value_ptr.store(new V(std::forward<V>(value)), std::memory_order_release);
     }
     ~Entry() { delete value_ptr.load(std::memory_order_acquire); }
 
     K key = 0;
-    std::atomic<V *> value_ptr = {nullptr};
-    std::atomic<Entry *> next = {nullptr};
+    std::atomic<ValueNode*> value_ptr = {nullptr};
+    std::atomic<Entry*> next = {nullptr};
   };
 
   class Bucket {
    public:
     Bucket() : head_(new Entry()) {}
     ~Bucket() {
-      Entry *ite = head_;
+      Entry* ite = head_;
       while (ite) {
         auto tmp = ite->next.load(std::memory_order_acquire);
         delete ite;
@@ -110,8 +151,8 @@ class AtomicHashMap {
     }
 
     bool Has(K key) {
-      Entry *m_target = head_->next.load(std::memory_order_acquire);
-      while (Entry *target = m_target) {
+      Entry* m_target = head_->next.load(std::memory_order_acquire);
+      while (Entry* target = m_target) {
         if (target->key < key) {
           m_target = target->next.load(std::memory_order_acquire);
           continue;
@@ -122,10 +163,10 @@ class AtomicHashMap {
       return false;
     }
 
-    bool Find(K key, Entry **prev_ptr, Entry **target_ptr) {
-      Entry *prev = head_;
-      Entry *m_target = head_->next.load(std::memory_order_acquire);
-      while (Entry *target = m_target) {
+    bool Find(K key, Entry** prev_ptr, Entry** target_ptr) {
+      Entry* prev = head_;
+      Entry* m_target = head_->next.load(std::memory_order_acquire);
+      while (Entry* target = m_target) {
         if (target->key == key) {
           *prev_ptr = prev;
           *target_ptr = target;
@@ -144,29 +185,28 @@ class AtomicHashMap {
       return false;
     }
 
-    void Insert(K key, const V &value) {
-      Entry *prev = nullptr;
-      Entry *target = nullptr;
-      Entry *new_entry = nullptr;
-      V *new_value = nullptr;
+    void Insert(K key, const V& value) {
+      Entry* prev = nullptr;
+      Entry* target = nullptr;
+      Entry* new_entry = nullptr;
+      ValueNode* new_value = nullptr;
       while (true) {
         if (Find(key, &prev, &target)) {
           // key exists, update value
           if (!new_value) {
-            new_value = new V(value);
+            new_value = new ValueNode(value);
           }
           auto old_val_ptr = target->value_ptr.load(std::memory_order_acquire);
-          if (target->value_ptr.compare_exchange_strong(
-                  old_val_ptr, new_value, std::memory_order_acq_rel,
-                  std::memory_order_relaxed)) {
-            delete old_val_ptr;
-            if (new_entry) {
-              delete new_entry;
-              new_entry = nullptr;
-            }
-            return;
+          while (!target->value_ptr.compare_exchange_weak(
+              old_val_ptr, new_value, std::memory_order_acq_rel,
+              std::memory_order_relaxed)) {
           }
-          continue;
+          old_val_ptr->Release();
+          if (new_entry) {
+            delete new_entry;
+            new_entry = nullptr;
+          }
+          return;
         } else {
           if (!new_entry) {
             new_entry = new Entry(key, value);
@@ -187,29 +227,28 @@ class AtomicHashMap {
       }
     }
 
-    void Insert(K key, V &&value) {
-      Entry *prev = nullptr;
-      Entry *target = nullptr;
-      Entry *new_entry = nullptr;
-      V *new_value = nullptr;
+    void Insert(K key, V&& value) {
+      Entry* prev = nullptr;
+      Entry* target = nullptr;
+      Entry* new_entry = nullptr;
+      ValueNode* new_value = nullptr;
       while (true) {
         if (Find(key, &prev, &target)) {
           // key exists, update value
           if (!new_value) {
-            new_value = new V(std::forward<V>(value));
+            new_value = new ValueNode(std::forward<V>(value));
           }
           auto old_val_ptr = target->value_ptr.load(std::memory_order_acquire);
-          if (target->value_ptr.compare_exchange_strong(
-                  old_val_ptr, new_value, std::memory_order_acq_rel,
-                  std::memory_order_relaxed)) {
-            delete old_val_ptr;
-            if (new_entry) {
-              delete new_entry;
-              new_entry = nullptr;
-            }
-            return;
+          while (!target->value_ptr.compare_exchange_weak(
+              old_val_ptr, new_value, std::memory_order_acq_rel,
+              std::memory_order_relaxed)) {
           }
-          continue;
+          old_val_ptr->Release();
+          if (new_entry) {
+            delete new_entry;
+            new_entry = nullptr;
+          }
+          return;
         } else {
           if (!new_entry) {
             new_entry = new Entry(key, value);
@@ -231,28 +270,27 @@ class AtomicHashMap {
     }
 
     void Insert(K key) {
-      Entry *prev = nullptr;
-      Entry *target = nullptr;
-      Entry *new_entry = nullptr;
-      V *new_value = nullptr;
+      Entry* prev = nullptr;
+      Entry* target = nullptr;
+      Entry* new_entry = nullptr;
+      ValueNode* new_value = nullptr;
       while (true) {
         if (Find(key, &prev, &target)) {
           // key exists, update value
           if (!new_value) {
-            new_value = new V();
+            new_value = new ValueNode();
           }
           auto old_val_ptr = target->value_ptr.load(std::memory_order_acquire);
-          if (target->value_ptr.compare_exchange_strong(
-                  old_val_ptr, new_value, std::memory_order_acq_rel,
-                  std::memory_order_relaxed)) {
-            delete old_val_ptr;
-            if (new_entry) {
-              delete new_entry;
-              new_entry = nullptr;
-            }
-            return;
+          while (!target->value_ptr.compare_exchange_weak(
+              old_val_ptr, new_value, std::memory_order_acq_rel,
+              std::memory_order_relaxed)) {
           }
-          continue;
+          old_val_ptr->Release();
+          if (new_entry) {
+            delete new_entry;
+            new_entry = nullptr;
+          }
+          return;
         } else {
           if (!new_entry) {
             new_entry = new Entry(key);
@@ -273,17 +311,28 @@ class AtomicHashMap {
       }
     }
 
-    bool Get(K key, V **value) {
-      Entry *prev = nullptr;
-      Entry *target = nullptr;
+    bool Get(K key, ValueNode** value) {
+      Entry* prev = nullptr;
+      Entry* target = nullptr;
       if (Find(key, &prev, &target)) {
         *value = target->value_ptr.load(std::memory_order_acquire);
+        ValueNode* value_node = nullptr;
+        do {
+          if (value_node) {
+            value_node->Release();
+          }
+          (*value)->ref_count.fetch_add(1, std::memory_order_release);
+          value_node = *value;
+        } while (!target->value_ptr.compare_exchange_weak(
+            value_node, value_node, std::memory_order_acq_rel,
+            std::memory_order_relaxed));
+
         return true;
       }
       return false;
     }
 
-    Entry *head_;
+    Entry* head_;
   };
 
  private:

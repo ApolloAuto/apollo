@@ -41,7 +41,8 @@ TEST(TimerTest, one_shot) {
   timer.Start();
   std::this_thread::sleep_for(std::chrono::milliseconds(90));
   EXPECT_EQ(0, count);
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  // Scheduling delay must be considered
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
   EXPECT_EQ(100, count);
   timer.Stop();
 }
