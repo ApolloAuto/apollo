@@ -16,11 +16,11 @@
 
 #pragma once
 
-#include <vector>
-#include <string>
 #include <memory>
-#include "modules/bridge/common/macro.h"
+#include <string>
+#include <vector>
 #include "modules/bridge/common/bridge_header.h"
+#include "modules/bridge/common/macro.h"
 
 namespace apollo {
 namespace bridge {
@@ -62,8 +62,8 @@ BridgeProtoSerializedBuf<T>::~BridgeProtoSerializedBuf() {
 }
 
 template <typename T>
-bool BridgeProtoSerializedBuf<T>::Serialize(const std::shared_ptr<T> &proto,
-  const std::string &msg_name) {
+bool BridgeProtoBuf<T>::Serialize(const std::shared_ptr<T> &proto,
+                                  const std::string &msg_name) {
   size_t msg_len = proto->ByteSize();
   char *tmp = new char[msg_len];
   memset(tmp, 0, sizeof(char) * msg_len);
