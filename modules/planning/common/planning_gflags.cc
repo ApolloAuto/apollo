@@ -70,9 +70,6 @@ DEFINE_bool(enable_scenario_bare_intersection, false,
 DEFINE_bool(enable_scenario_pull_over, false,
             "enable pull-over scenario in planning");
 
-DEFINE_bool(enable_pull_over_exit, false,
-            "allow pull-over scenario exit to lane follow in planning");
-
 DEFINE_bool(enable_scenario_side_pass_multiple_parked_obstacles, true,
             "enable ADC to side-pass multiple parked obstacles without"
             "worrying if the obstacles are blocked by others.");
