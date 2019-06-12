@@ -47,7 +47,7 @@ TAG="${REPO}:cyber-${ARCH}-18.04-${TIME}"
 set -e
 if [[ $DOCKERFILE == *$ARCH* ]]; then
     echo "docker file gets matched"
-    docker build -t ${TAG} --build-arg INSTALL="$INSTALL" -f ${DOCKERFILE} ${CONTEXT}
+    docker build -t ${TAG} --build-arg INSTALL_MODE="$INSTALL" -f ${DOCKERFILE} ${CONTEXT}
 else
     echo "docker file '$DOCKERFILE' doesn't match"
     exit

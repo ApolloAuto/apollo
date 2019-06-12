@@ -1,6 +1,6 @@
 FROM arm64v8/ubuntu:18.04
 
-ARG INSTALL
+ARG INSTALL_MODE
 
 LABEL version="1.0"
 
@@ -59,12 +59,12 @@ RUN ln -s /etc/alternatives/g++ /usr/bin/g++
 
 # Run installer [build|download]
 COPY installers /tmp/installers
-RUN bash /tmp/installers/install_bazel.sh $INSTALL
+RUN bash /tmp/installers/install_bazel.sh ${INSTALL_MODE}
 RUN bash /tmp/installers/install_gflags_glog.sh
 RUN bash /tmp/installers/install_protobuf.sh
 RUN bash /tmp/installers/install_bazel_packages.sh
 RUN bash /tmp/installers/install_google_styleguide.sh
-RUN bash /tmp/installers/install_osqp.sh $INSTALL
+RUN bash /tmp/installers/install_osqp.sh ${INSTALL_MODE}
 
 # Add Bionic source
 RUN echo "deb http://ports.ubuntu.com/ubuntu-ports/ bionic main restricted" > /etc/apt/sources.list
@@ -115,7 +115,7 @@ RUN ln -s /usr/lib/aarch64-linux-gnu/libboost_chrono.so.1.54.0 /usr/lib/aarch64-
 RUN ln -s /usr/lib/python2.7/dist-packages/vtk/libvtkRenderingPythonTkWidgets.aarch64-linux-gnu.so /usr/lib/aarch64-linux-gnu/libvtkRenderingPythonTkWidgets.so
 
 RUN bash /tmp/installers/install_fast-rtps.sh
-RUN bash /tmp/installers/install_pcl.sh $INSTALL
+RUN bash /tmp/installers/install_pcl.sh ${INSTALL_MODE}
 RUN rm -fr /tmp/*
 
 WORKDIR /apollo
