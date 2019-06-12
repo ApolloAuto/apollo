@@ -286,9 +286,9 @@ DEFINE_bool(use_bell_curve_for_cost_function, false,
 // interaction predictor
 DEFINE_double(collision_cost_time_resolution, 1.0,
               "The time resolution used to compute the collision cost");
-DEFINE_double(longitudinal_acceleration_cost_weight, 0.0,
+DEFINE_double(longitudinal_acceleration_cost_weight, 0.2,
               "The weight of longitudinal acceleration cost");
-DEFINE_double(centripedal_acceleration_cost_weight, 0.0,
+DEFINE_double(centripedal_acceleration_cost_weight, 0.1,
               "The weight of the cost related to centripedal acceleration");
 DEFINE_double(collision_cost_weight, 1.0,
               "The weight of the cost related to collision");
