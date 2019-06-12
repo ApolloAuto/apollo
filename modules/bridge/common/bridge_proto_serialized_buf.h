@@ -62,8 +62,8 @@ BridgeProtoSerializedBuf<T>::~BridgeProtoSerializedBuf() {
 }
 
 template <typename T>
-bool BridgeProtoBuf<T>::Serialize(const std::shared_ptr<T> &proto,
-                                  const std::string &msg_name) {
+bool BridgeProtoSerializedBuf<T>::Serialize(const std::shared_ptr<T> &proto,
+                                            const std::string &msg_name) {
   size_t msg_len = proto->ByteSize();
   char *tmp = new char[msg_len];
   memset(tmp, 0, sizeof(char) * msg_len);
