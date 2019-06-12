@@ -14,6 +14,12 @@ partners.
 1. Prepare a [job config](proto/job_config.proto) file. See the
    [example](conf/example_job.pb.txt).
 
+1. Build Apollo Python libs in /apollo.
+
+   ```bash
+   ./apollo.sh build_py
+   ```
+
 1. Activate the Python 3 Conda environment, and run the tool.
 
    ```bash
