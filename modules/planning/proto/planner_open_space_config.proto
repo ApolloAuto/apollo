@@ -16,6 +16,7 @@ enum DistanceApproachMode {
   DISTANCE_APPROACH_IPOPT_CUDA = 1;
   DISTANCE_APPROACH_IPOPT_FIXED_TS = 2;
   DISTANCE_APPROACH_IPOPT_FIXED_DUAL = 3;
+  DISTANCE_APPROACH_IPOPT_RELAX_END = 4;
 }
 
 message PlannerOpenSpaceConfig {
@@ -104,6 +105,7 @@ message DistanceApproachConfig {
   optional DistanceApproachMode distance_approach_mode = 26;
   optional bool enable_jacobian_ad = 27 [default = false];
   optional bool enable_check_initial_state = 28 [default = false];
+  optional double weight_end_state = 29 [default = 0.0];
 }
 
 message IpoptConfig {
