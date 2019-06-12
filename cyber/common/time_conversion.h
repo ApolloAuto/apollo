@@ -85,7 +85,7 @@ template <typename T>
 T GpsToUnixSeconds(T gps_seconds) {
   for (size_t i = 0; i < LEAP_SECONDS.size(); ++i) {
     T result = gps_seconds + (UNIX_GPS_DIFF - LEAP_SECONDS[i].second);
-    if (result >= LEAP_SECONDS[i].first) {
+    if ((int32_t)result >= LEAP_SECONDS[i].first) {
       return result;
     }
   }

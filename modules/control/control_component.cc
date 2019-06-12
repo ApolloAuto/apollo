@@ -371,7 +371,9 @@ Status ControlComponent::CheckInput(LocalView *local_view) {
   for (auto &trajectory_point :
        *local_view->trajectory.mutable_trajectory_point()) {
     if (std::abs(trajectory_point.v()) <
-        control_conf_.minimum_speed_resolution()) {
+            control_conf_.minimum_speed_resolution() &&
+        std::abs(trajectory_point.a()) <
+            control_conf_.max_acceleration_when_stopped()) {
       trajectory_point.set_v(0.0);
       trajectory_point.set_a(0.0);
     }

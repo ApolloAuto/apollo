@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message FemPosDeviationSmootherConfig {
+  optional double weight_fem_pose_deviation = 2 [default = 1.0e10];
+  optional double weight_ref_deviation = 3 [default = 1.0];
+  optional double weight_path_length = 4 [default = 1.0];
+  optional int32 max_iter = 5 [default = 500];
+  // time_limit set to be 0.0 meaning no time limit
+  optional double time_limit = 6 [default = 0.0];
+  optional bool verbose = 7 [default = false];
+  optional bool scaled_termination = 8 [default = true];
+  optional bool warm_start = 9 [default = true];
+}

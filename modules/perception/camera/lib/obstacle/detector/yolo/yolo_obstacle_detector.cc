@@ -150,19 +150,17 @@ void YoloObstacleDetector::InitYoloBlob(const yolo::NetworkParam &net_param) {
   auto obj_blob_scale3 = inference_->get_blob(net_param.det3_obj_blob());
   int output_height_scale1 = obj_blob_scale1->shape(1);
   int output_width_scale1 = obj_blob_scale1->shape(2);
-  int obj_size =
-    output_height_scale1 * output_width_scale1 *
-    static_cast<int>(anchors_.size()) / anchorSizeFactor;
+  int obj_size = output_height_scale1 * output_width_scale1 *
+                 static_cast<int>(anchors_.size()) / anchorSizeFactor;
   if (obj_blob_scale2) {
     int output_height_scale2 = obj_blob_scale2->shape(1);
     int output_width_scale2 = obj_blob_scale2->shape(2);
     int output_height_scale3 = obj_blob_scale3->shape(1);
     int output_width_scale3 = obj_blob_scale3->shape(2);
-    obj_size =
-      (output_height_scale1 * output_width_scale1 +
-       output_height_scale2 * output_width_scale2 +
-       output_height_scale3 * output_width_scale3) *
-      static_cast<int>(anchors_.size()) / anchorSizeFactor / numScales;
+    obj_size = (output_height_scale1 * output_width_scale1 +
+                output_height_scale2 * output_width_scale2 +
+                output_height_scale3 * output_width_scale3) *
+               static_cast<int>(anchors_.size()) / anchorSizeFactor / numScales;
   }
 
   yolo_blobs_.res_box_blob.reset(
@@ -341,8 +339,8 @@ bool YoloObstacleDetector::Detect(const ObstacleDetectorOptions &options,
 
   /////////////////////////// detection part ///////////////////////////
   inference_->Infer();
-  AINFO << "Network Forward: "
-        << static_cast<double>(timer.Toc()) * 0.001 << "ms";
+  AINFO << "Network Forward: " << static_cast<double>(timer.Toc()) * 0.001
+        << "ms";
   get_objects_gpu(yolo_blobs_, stream_, types_, nms_, yolo_param_.model_param(),
                   light_vis_conf_threshold_, light_swt_conf_threshold_,
                   overlapped_.get(), idx_sm_.get(), &(frame->detected_objects));

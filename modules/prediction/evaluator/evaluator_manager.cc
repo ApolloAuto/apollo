@@ -50,7 +50,7 @@ using IdObstacleListMap = std::unordered_map<int, std::list<Obstacle*>>;
 namespace {
 
 bool IsTrainable(const Feature& feature) {
-  if (feature.id() == -1) {
+  if (feature.id() == FLAGS_ego_vehicle_id) {
     return false;
   }
   if (feature.priority().priority() == ObstaclePriority::IGNORE ||
@@ -151,7 +151,9 @@ void EvaluatorManager::Init(const PredictionConf& config) {
           }
           break;
         }
-        default: { break; }
+        default: {
+          break;
+        }
       }
     }
   }
@@ -267,12 +269,13 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
       }
       break;
     }
-    case PerceptionObstacle::PEDESTRIAN: {
-      evaluator = GetEvaluator(pedestrian_evaluator_);
-      CHECK_NOTNULL(evaluator);
-      evaluator->Evaluate(obstacle);
-      break;
-    }
+    // TODO(kechxu) recover them when model error is fixed
+    // case PerceptionObstacle::PEDESTRIAN: {
+    //   evaluator = GetEvaluator(pedestrian_evaluator_);
+    //   CHECK_NOTNULL(evaluator);
+    //   evaluator->Evaluate(obstacle);
+    //   break;
+    // }
     default: {
       if (obstacle->IsOnLane()) {
         evaluator = GetEvaluator(default_on_lane_evaluator_);
@@ -301,7 +304,7 @@ void EvaluatorManager::BuildObstacleIdHistoryMap() {
   CHECK_NOTNULL(ego_pose_container);
   std::vector<int> obstacle_ids =
       obstacles_container->curr_frame_movable_obstacle_ids();
-  obstacle_ids.push_back(-1);
+  obstacle_ids.push_back(FLAGS_ego_vehicle_id);
   for (int id : obstacle_ids) {
     Obstacle* obstacle = obstacles_container->GetObstacle(id);
     if (obstacle == nullptr || obstacle->history_size() == 0) {
@@ -316,7 +319,7 @@ void EvaluatorManager::BuildObstacleIdHistoryMap() {
       feature.set_timestamp(obstacle_feature.timestamp());
       feature.mutable_position()->CopyFrom(obstacle_feature.position());
       feature.set_theta(obstacle_feature.velocity_heading());
-      if (obstacle_feature.id() != -1) {
+      if (obstacle_feature.id() != FLAGS_ego_vehicle_id) {
         feature.mutable_polygon_point()->CopyFrom(
             obstacle_feature.polygon_point());
         feature.set_length(obstacle_feature.length());
@@ -342,7 +345,7 @@ void EvaluatorManager::DumpCurrentFrameEnv() {
   curr_frame_env.set_timestamp(obstacles_container->timestamp());
   for (const auto obstacle_id_history_pair : obstacle_id_history_map_) {
     int id = obstacle_id_history_pair.first;
-    if (id != -1) {
+    if (id != FLAGS_ego_vehicle_id) {
       curr_frame_env.add_obstacles_history()->CopyFrom(
           obstacle_id_history_pair.second);
     } else {
@@ -393,7 +396,9 @@ std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
       evaluator_ptr.reset(new JunctionMapEvaluator());
       break;
     }
-    default: { break; }
+    default: {
+      break;
+    }
   }
   return evaluator_ptr;
 }

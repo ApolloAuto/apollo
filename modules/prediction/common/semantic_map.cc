@@ -23,6 +23,7 @@
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/string_util.h"
+#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/pose/pose_container.h"
 
@@ -46,12 +47,14 @@ void SemanticMap::Init() {
 
 void SemanticMap::RunCurrFrame(
     const std::unordered_map<int, ObstacleHistory>& obstacle_id_history_map) {
-  if (obstacle_id_history_map.find(-1) == obstacle_id_history_map.end()) {
+  if (obstacle_id_history_map.find(FLAGS_ego_vehicle_id) ==
+      obstacle_id_history_map.end()) {
     return;
   }
   obstacle_id_history_map_ = obstacle_id_history_map;
   // TODO(Hongyi): moving all these magic numbers to conf
-  const Feature& ego_feature = obstacle_id_history_map_.at(-1).feature(0);
+  const Feature& ego_feature =
+      obstacle_id_history_map_.at(FLAGS_ego_vehicle_id).feature(0);
   curr_timestamp_ = ego_feature.timestamp();
   curr_base_x_ = ego_feature.position().x() - config_.observation_range();
   curr_base_y_ = ego_feature.position().y() - config_.observation_range();
@@ -73,7 +76,7 @@ void SemanticMap::RunCurrFrame(
   // Crop ego_vehicle for demo
   if (false) {
     cv::Mat output_img;
-    if (GetMapById(-1, &output_img)) {
+    if (GetMapById(FLAGS_ego_vehicle_id, &output_img)) {
       cv::namedWindow("Demo window", cv::WINDOW_NORMAL);
       cv::imshow("Demo window", output_img);
       cv::waitKey();
@@ -123,7 +126,7 @@ void SemanticMap::DrawHistory(const ObstacleHistory& history,
     const Feature& feature = history.feature(i);
     double time_decay = 1.0 - curr_timestamp_ + feature.timestamp();
     cv::Scalar decay_color = color * time_decay;
-    if (feature.id() == -1) {
+    if (feature.id() == FLAGS_ego_vehicle_id) {
       DrawRect(feature, decay_color, img);
     } else {
       DrawPoly(feature, decay_color, img);

@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/bridge/udp_bridge_sender_component.h"
+#include "modules/bridge/common/bridge_proto_buf.h"
 #include "modules/bridge/common/macro.h"
 #include "modules/bridge/common/util.h"
 
@@ -75,10 +76,15 @@ bool UDPBridgeSenderComponent<T>::Proc(const std::shared_ptr<T> &pb_msg) {
 
         std::lock_guard<std::mutex> lg(mutex_);
         WriteToBuffer(&buf_, pb_msg);
-        if (session.Send(buf_, buf_.size(), 0) < 0) {
-          std::cout << "send message failed." << std::endl;
-          session.Close();
-          return;
+        BridgeProtoBuf<T> proto_buf;
+        proto_buf.Serialize(pb_msg, proto_name_);
+        for (size_t i = 0; i < proto_buf.GetSerializedBufCount(); i++) {
+          if (session.Send(proto_buf.GetSerializedBuf(i),
+                           proto_buf.GetSerializedBufSize(i), 0) < 0) {
+            std::cout << "send message failed." << std::endl;
+            session.Close();
+            return;
+          }
         }
         session.Close();
       },

@@ -450,27 +450,24 @@ Status LatController::ComputeControlCommand(
         leadlag_controller_.Control(-matrix_state_(0, 0), ts_) * 180 / M_PI *
         steer_ratio_ / steer_single_direction_max_degree_ * 100;
   }
-  steer_angle =
-      common::math::Clamp(steer_angle_feedback + steer_angle_feedforward +
-                              steer_angle_feedback_augment,
-                          -100.0, 100.0);
+  steer_angle = steer_angle_feedback + steer_angle_feedforward +
+                steer_angle_feedback_augment;
 
   if (FLAGS_set_steer_limit) {
-    const double steer_limit = std::atan(max_lat_acc_ * min_turn_radius_ /
+    const double steer_limit = std::atan(max_lat_acc_ * wheelbase_ /
                                          (vehicle_state->linear_velocity() *
                                           vehicle_state->linear_velocity())) *
                                steer_ratio_ * 180 / M_PI /
                                steer_single_direction_max_degree_ * 100;
 
-    // Clamp the steer angle
+    // Clamp the steer angle with steer limitations at current speed
     double steer_angle_limited =
         common::math::Clamp(steer_angle, -steer_limit, steer_limit);
-    steer_angle_limited = digital_filter_.Filter(steer_angle_limited);
     steer_angle = steer_angle_limited;
     debug->set_steer_angle_limited(steer_angle_limited);
-  } else {
-    steer_angle = digital_filter_.Filter(steer_angle);
   }
+  steer_angle = digital_filter_.Filter(steer_angle);
+  steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
 
   if (std::abs(vehicle_state->linear_velocity()) < FLAGS_lock_steer_speed &&
       (vehicle_state->gear() == canbus::Chassis::GEAR_DRIVE ||

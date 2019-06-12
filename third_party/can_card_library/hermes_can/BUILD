@@ -4,11 +4,26 @@ licenses(["notice"])
 
 cc_library(
     name = "hermes_can",
-    srcs = [
-        "lib/libbcan.so",
-    ],
+    srcs = select({
+        ":x86_mode": [
+            "lib_x86_64/libbcan.so",
+        ],
+        ":arm_mode": [
+            "lib_aarch64/libbcan.so",
+        ],
+    }),
     hdrs = [
         "include/bcan.h",
     ],
     include_prefix = "hermes_can",
+)
+
+config_setting(
+    name = "x86_mode",
+    values = {"cpu": "k8"},
+)
+
+config_setting(
+    name = "arm_mode",
+    values = {"cpu": "arm"},
 )

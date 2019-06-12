@@ -76,7 +76,7 @@ Stage::StageStatus PullOverStageApproach::Process(
 
       for (size_t i = path_data.discretized_path().size() - 1; i >= 0; --i) {
         if (path_data.frenet_frame_path().back().s() -
-            path_data.frenet_frame_path()[i].s() <
+                path_data.frenet_frame_path()[i].s() <
             kNumExtraTailBoundPoint * kPathBoundsDeciderResolution) {
           continue;
         }
@@ -106,18 +106,18 @@ Stage::StageStatus PullOverStageApproach::Process(
           {pull_over_status.position().x(), pull_over_status.position().y()},
           &pull_over_sl);
 
-      const double stop_line_s = pull_over_sl.s() -
+      const double stop_line_s =
+          pull_over_sl.s() -
           scenario_config_.s_distance_to_stop_for_open_space_parking();
       const std::string virtual_obstacle_id = "DEST_PULL_OVER_PREPARKING";
       const std::vector<std::string> wait_for_obstacle_ids;
       planning::util::BuildStopDecision(
           virtual_obstacle_id, stop_line_s, 1.0,
-          StopReasonCode::STOP_REASON_PREPARKING,
-          wait_for_obstacle_ids,
+          StopReasonCode::STOP_REASON_PREPARKING, wait_for_obstacle_ids,
           "PULL-OVER-scenario", frame,
           &(frame->mutable_reference_line_info()->front()));
 
-      AERROR << "Build a stop fence to pause ADC at a better position: id["
+      ADEBUG << "Build a stop fence to pause ADC at a better position: id["
              << virtual_obstacle_id << "] s[" << stop_line_s << "]";
 
       const double adc_front_edge_s =

@@ -31,6 +31,7 @@
 #include "modules/common/filters/digital_filter.h"
 #include "modules/common/math/kalman_filter.h"
 #include "modules/map/hdmap/hdmap_common.h"
+#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/proto/feature.pb.h"
 
 /**
@@ -325,7 +326,7 @@ class Obstacle {
       std::unordered_set<std::string>* const existing_lane_ids);
 
  private:
-  int id_ = -1;
+  int id_ = FLAGS_ego_vehicle_id;
 
   perception::PerceptionObstacle::Type type_ =
       perception::PerceptionObstacle::UNKNOWN_UNMOVABLE;

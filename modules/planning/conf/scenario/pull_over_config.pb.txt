@@ -93,7 +93,8 @@ stage_config: {
     task_config: {
         task_type: OPEN_SPACE_PRE_STOP_DECIDER
         open_space_pre_stop_decider_config {
-            stop_type: PARKING
+            stop_type: PULL_OVER
+            rightaway_stop_distance: 1.0
         }
     }
     task_config: {
@@ -153,6 +154,12 @@ stage_config: {
     }
     task_config: {
         task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+        open_space_trajectory_partition_config {
+            heading_offset_to_midpoint: 0.79
+            lateral_offset_to_midpoint: 1.0
+            longitudinal_offset_to_midpoint: 0.25
+            vehicle_box_iou_threshold_to_midpoint: 0.75
+        }
     }
     task_config: {
         task_type: OPEN_SPACE_FALLBACK_DECIDER

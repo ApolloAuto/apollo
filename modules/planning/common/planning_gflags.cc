@@ -70,6 +70,9 @@ DEFINE_bool(enable_scenario_bare_intersection, false,
 DEFINE_bool(enable_scenario_pull_over, false,
             "enable pull-over scenario in planning");
 
+DEFINE_bool(enable_pull_over_exit, false,
+            "allow pull-over scenario exit to lane follow in planning");
+
 DEFINE_bool(enable_scenario_side_pass_multiple_parked_obstacles, true,
             "enable ADC to side-pass multiple parked obstacles without"
             "worrying if the obstacles are blocked by others.");
@@ -207,8 +210,8 @@ DEFINE_double(lateral_jerk_bound, 4.0,
 DEFINE_double(dl_bound, 0.10,
               "The bound for derivative l in s-l coordinate system.");
 DEFINE_double(kappa_bound, 0.1979, "The bound for trajectory curvature");
-DEFINE_double(dkappa_bound, 0.2081,
-              "The bound for trajectory curvature change rate, in 1/(m*sec)");
+DEFINE_double(dkappa_bound, 0.02,
+              "The bound for trajectory curvature change rate");
 
 // ST Boundary
 DEFINE_double(st_max_s, 100, "the maximum s of st boundary");
@@ -264,6 +267,7 @@ DEFINE_double(virtual_stop_wall_length, 0.1,
 DEFINE_double(virtual_stop_wall_height, 2.0,
               "virtual stop wall height (meters)");
 
+// Path Deciders
 DEFINE_double(obstacle_lat_buffer, 0.4,
               "obstacle lateral buffer (meters) for deciding path boundaries");
 DEFINE_double(obstacle_lon_start_buffer, 3.0,
@@ -272,6 +276,13 @@ DEFINE_double(obstacle_lon_start_buffer, 3.0,
 DEFINE_double(obstacle_lon_end_buffer, 2.0,
               "obstacle longitudinal end buffer (meters) for deciding "
               "path boundaries");
+DEFINE_double(static_obstacle_speed_threshold, 0.5,
+              "The speed threshold to decide whether an obstacle is static "
+              "or not.");
+DEFINE_double(lane_borrow_max_speed, 5.0,
+              "The speed threshold for lane-borrow");
+DEFINE_int32(long_term_blocking_obstacle_cycle_threhold, 3,
+             "The cycle threhold for long-term blocking obstacle.");
 
 // Prediction Part
 DEFINE_double(prediction_total_time, 5.0, "Total prediction time");

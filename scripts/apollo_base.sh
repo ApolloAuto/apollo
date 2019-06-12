@@ -81,7 +81,11 @@ function check_in_docker() {
 }
 
 function set_lib_path() {
-  if [ "$RELEASE_DOCKER" == 1 ];then
+  local PRELOAD="libcaffe2_gpu.so libopencv_core.so"
+  if [ "$1" == "CYBER_ONLY" ]; then
+    PRELOAD=""
+  fi
+  if [ "$RELEASE_DOCKER" == 1 ]; then
     local CYBER_SETUP="/apollo/cyber/setup.bash"
     if [ -e "${CYBER_SETUP}" ]; then
       source "${CYBER_SETUP}"
@@ -92,7 +96,6 @@ function set_lib_path() {
     export LD_LIBRARY_PATH=/usr/local/fast-rtps/lib:$LD_LIBRARY_PATH
     export LD_LIBRARY_PATH=/usr/local/apollo/libtorch/lib:$LD_LIBRARY_PATH
     export LD_LIBRARY_PATH=/usr/local/apollo/libtorch_gpu/lib:$LD_LIBRARY_PATH
-    export LD_PRELOAD="libcaffe2_gpu.so libopencv_core.so"
     PY_LIB_PATH=/apollo/lib
     PY_TOOLS_PATH=/apollo/modules/tools
   else
@@ -107,8 +110,8 @@ function set_lib_path() {
     export LD_LIBRARY_PATH=/apollo/third_party/rss/lib:$LD_LIBRARY_PATH
     export LD_LIBRARY_PATH=/usr/local/apollo/libtorch/lib:$LD_LIBRARY_PATH
     export LD_LIBRARY_PATH=/usr/local/apollo/libtorch_gpu/lib:$LD_LIBRARY_PATH
-    export LD_PRELOAD="libcaffe2_gpu.so libopencv_core.so"
   fi
+  export LD_PRELOAD="$PRELOAD"
   export PYTHONPATH=/usr/local/lib/python2.7/dist-packages:${PY_LIB_PATH}:${PY_TOOLS_PATH}:${PYTHONPATH}
   if [ -e /usr/local/cuda-8.0/ ];then
     export PATH=/usr/local/cuda-8.0/bin:$PATH
@@ -447,12 +450,11 @@ CYBER_SETUP="/apollo/cyber/setup.bash"
 if [ -e "${CYBER_SETUP}" ]; then
     source "${CYBER_SETUP}"
 fi
-
 check_in_docker
 create_data_dir
 
 if [ -z $APOLLO_BASE_SOURCED ]; then
-  set_lib_path
+  set_lib_path $1
   determine_bin_prefix
   export APOLLO_BASE_SOURCED=1
 fi

@@ -129,13 +129,13 @@ __global__ void get_object_kernel(int n,
     float scale = obj_data[loc_index];
     float cx = (w + sigmoid_gpu(loc_data[offset_loc + 0])) / width;
     float cy = (h + sigmoid_gpu(loc_data[offset_loc + 1])) / height;
-    float hw = 
+    float hw =
         exp(max(minExpPower, min(loc_data[offset_loc + 2], maxExpPower))) *
         anchor_data[2 * c] / width * 0.5;
     float hh =
         exp(max(minExpPower, min(loc_data[offset_loc + 3], maxExpPower))) *
         anchor_data[2 * c + 1] / height * 0.5;
-   
+
     float max_prob = 0.f;
     int max_index = 0;
     for (int k = 0; k < num_classes; ++k) {
@@ -462,7 +462,7 @@ void get_objects_gpu(const YoloBlobs &yolo_blobs,
     num_anchor_per_scale /= numScales;
   }
   CHECK_EQ(batch, 1) << "batch size should be 1!";
- 
+
   std::vector<int> height_vec, width_vec, num_candidates_vec;
   height_vec.push_back(yolo_blobs.det1_obj_blob->shape(1));
   width_vec.push_back(yolo_blobs.det1_obj_blob->shape(2));
@@ -520,7 +520,7 @@ void get_objects_gpu(const YoloBlobs &yolo_blobs,
   const float *rtvis_data = get_gpu_data(with_lights, *yolo_blobs.rtvis_blob);
   const float *rtswt_data = get_gpu_data(with_lights, *yolo_blobs.rtswt_blob);
 
-  int all_scales_num_candidates = 0; 
+  int all_scales_num_candidates = 0;
   for (size_t i = 0; i < num_candidates_vec.size(); i++){
     all_scales_num_candidates += num_candidates_vec[i];
   }

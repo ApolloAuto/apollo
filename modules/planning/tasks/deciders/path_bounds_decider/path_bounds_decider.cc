@@ -33,7 +33,7 @@
 #include "modules/planning/common/path_boundary.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/tasks/deciders/path_decider_obstacle_utils.h"
+#include "modules/planning/tasks/deciders/utils/path_decider_obstacle_utils.h"
 
 namespace apollo {
 namespace planning {
@@ -351,10 +351,9 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(
                                ->mutable_pull_over();
   // If already found a pull-over position, simply check if it's valid.
   if (pull_over_status->is_feasible() && pull_over_status->has_position()) {
-    int curr_idx = IsPointWithinPathBound(reference_line_info,
-                                          pull_over_status->position().x(),
-                                          pull_over_status->position().y(),
-                                          *path_bound);
+    int curr_idx = IsPointWithinPathBound(
+        reference_line_info, pull_over_status->position().x(),
+        pull_over_status->position().y(), *path_bound);
     if (curr_idx >= 0) {
       // Trim path-bound properly.
       while (static_cast<int>(path_bound->size()) - 1 >
@@ -398,9 +397,9 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(
   pull_over_status->set_width_right(
       VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0);
 
-  ADEBUG << "Pull Over: x[" << pull_over_status->position().x()
-         << "] y[" <<  pull_over_status->position().y()
-         << "] theta[" << pull_over_status->theta() << "]";
+  ADEBUG << "Pull Over: x[" << pull_over_status->position().x() << "] y["
+         << pull_over_status->position().y() << "] theta["
+         << pull_over_status->theta() << "]";
 
   while (static_cast<int>(path_bound->size()) - 1 >
          std::get<3>(pull_over_configuration) + kNumExtraTailBoundPoint) {
@@ -495,7 +494,7 @@ bool PathBoundsDecider::SearchPullOverPosition(
          << ", ADC is at s = " << adc_end_s;
   if (destination_s - adc_end_s < config_.path_bounds_decider_config()
                                       .pull_over_destination_to_adc_buffer()) {
-    ADEBUG << "Destination is too close to ADC. distance["
+    AERROR << "Destination is too close to ADC. distance["
            << destination_s - adc_end_s << "]";
     return false;
   }
@@ -506,7 +505,7 @@ bool PathBoundsDecider::SearchPullOverPosition(
           .pull_over_destination_to_pathend_buffer();
   if (destination_s + destination_to_pathend_buffer >=
       std::get<0>(path_bound.back())) {
-    ADEBUG << "Destination is not within path_bounds search scope";
+    AERROR << "Destination is not within path_bounds search scope";
     return false;
   }
 
@@ -542,13 +541,13 @@ bool PathBoundsDecider::SearchPullOverPosition(
           curr_s, &curr_road_left_width, &curr_road_right_width);
       if (curr_road_right_width - (curr_right_bound + adc_half_width) >
           config_.path_bounds_decider_config().pull_over_road_edge_buffer()) {
-        ADEBUG << "Not close enough to road-edge. Not feasible for pull-over.";
+        AERROR << "Not close enough to road-edge. Not feasible for pull-over.";
         is_feasible_window = false;
         break;
       }
       if (std::get<2>(path_bound[j]) - std::get<1>(path_bound[j]) <
           pull_over_space_width) {
-        ADEBUG << "Not wide enough to fit ADC. Not feasible for pull-over.";
+        AERROR << "Not wide enough to fit ADC. Not feasible for pull-over.";
         is_feasible_window = false;
         break;
       }
@@ -574,9 +573,19 @@ bool PathBoundsDecider::SearchPullOverPosition(
       const double pull_over_x = pull_over_xy_point.x();
       const double pull_over_y = pull_over_xy_point.y();
 
+      // set the pull over theta to be the nearest lane theta rather than
+      // reference line theta in case of reference line theta not aligned with
+      // the lane
       const auto& reference_point =
           reference_line.GetReferencePoint(pull_over_s);
-      const double pull_over_theta = reference_point.heading();
+      double pull_over_theta = reference_point.heading();
+      hdmap::LaneInfoConstPtr lane;
+      double s = 0.0;
+      double l = 0.0;
+      auto point = common::util::MakePointENU(pull_over_x, pull_over_y, 0.0);
+      HDMapUtil::BaseMap().GetNearestLaneWithHeading(
+          point, 5.0, pull_over_theta, M_PI_2, &lane, &s, &l);
+      pull_over_theta = lane->Heading(s);
 
       *pull_over_configuration = std::make_tuple(pull_over_x, pull_over_y,
                                                  pull_over_theta, (i + j) / 2);
