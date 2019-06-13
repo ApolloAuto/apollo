@@ -144,16 +144,12 @@ bool DarkSCNNLaneDetector::Init(const LaneDetectorInitOptions &options) {
           << input_blob->height() << " " << input_blob->width();
   }
 
-  for (auto &output_blob_name : net_outputs_) {
-    auto output_blob = cnnadapter_lane_->get_blob(output_blob_name);
-    AINFO << output_blob_name << " : " << output_blob->channels() << " "
-          << output_blob->height() << " " << output_blob->width();
-    if (output_blob->height() > 1) {
-      lane_output_height_ = output_blob->height();
-      lane_output_width_ = output_blob->width();
-      num_lanes_ = output_blob->channels();
-    }
-  }
+  auto output_blob = cnnadapter_lane_->get_blob(net_outputs_[0]);
+  AINFO << net_outputs_[0] << " : " << output_blob->channels() << " "
+        << output_blob->height() << " " << output_blob->width();
+  lane_output_height_ = output_blob->height();
+  lane_output_width_ = output_blob->width();
+  num_lanes_ = output_blob->channels();
 
   if (net_outputs_.size() > 1) {
     vpt_mean_.push_back(model_param.vpt_mean_dx());

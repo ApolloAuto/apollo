@@ -80,7 +80,7 @@ layer {
   type: "Scale"
   bottom: "conv1"
   top: "conv1"
-  param {                                                                                                                                                                                     
+  param {
     lr_mult: 1
     decay_mult: 1
   }
@@ -168,7 +168,7 @@ layer {
   type: "Scale"
   bottom: "conv2"
   top: "conv2"
-  param {                                                                                                                                                                                      
+  param {
     lr_mult: 1
     decay_mult: 1
   }
@@ -256,7 +256,7 @@ layer {
   type: "Scale"
   bottom: "conv3_1"
   top: "conv3_1"
-  param {                                                                                                                                                                                      
+  param {
     lr_mult: 1
     decay_mult: 1
   }
@@ -331,7 +331,7 @@ layer {
   type: "Scale"
   bottom: "conv3_2"
   top: "conv3_2"
-  param {                                                                                                                                                                                      
+  param {
     lr_mult: 1
     decay_mult: 1
   }
@@ -395,7 +395,7 @@ layer {
   type: "Scale"
   bottom: "conv3_3"
   top: "conv3_3"
-  param {                                                                                                                                                                                      
+  param {
     lr_mult: 1
     decay_mult: 1
   }
@@ -472,7 +472,7 @@ layer {
   type: "Scale"
   bottom: "conv4_1"
   top: "conv4_1"
-  param {                                                                                                                                                                                      
+  param {
     lr_mult: 1
     decay_mult: 1
   }
@@ -536,7 +536,7 @@ layer {
   type: "Scale"
   bottom: "conv4_2"
   top: "conv4_2"
-  param {                                                                                                                                                                                      
+  param {
     lr_mult: 1
     decay_mult: 1
   }
@@ -600,7 +600,7 @@ layer {
   type: "Scale"
   bottom: "conv4_3"
   top: "conv4_3"
-  param {                                                                                                                                                                                      
+  param {
     lr_mult: 1
     decay_mult: 1
   }
@@ -677,7 +677,7 @@ layer {
   type: "Scale"
   bottom: "conv5_1"
   top: "conv5_1"
-  param {                                                                                                                                                                                      
+  param {
     lr_mult: 1
     decay_mult: 1
   }
@@ -741,7 +741,7 @@ layer {
   type: "Scale"
   bottom: "conv5_2"
   top: "conv5_2"
-  param {                                                                                                                                                                                      
+  param {
     lr_mult: 1
     decay_mult: 1
   }
@@ -805,7 +805,7 @@ layer {
   type: "Scale"
   bottom: "conv5_3"
   top: "conv5_3"
-  param {                                                                                                                                                                                      
+  param {
     lr_mult: 1
     decay_mult: 1
   }
@@ -869,7 +869,7 @@ layer {
   type: "Scale"
   bottom: "conv5_4"
   top: "conv5_4"
-  param {                                                                                                                                                                                      
+  param {
     lr_mult: 1
     decay_mult: 1
   }
@@ -933,7 +933,7 @@ layer {
   type: "Scale"
   bottom: "conv5_5"
   top: "conv5_5"
-  param {                                                                                                                                                                                      
+  param {
     lr_mult: 1
     decay_mult: 1
   }
@@ -1010,7 +1010,7 @@ layer {
   type: "Scale"
   bottom: "conv6_1"
   top: "conv6_1"
-  param {                                                                                                                                                                                      
+  param {
     lr_mult: 1
     decay_mult: 1
   }
@@ -1074,7 +1074,7 @@ layer {
   type: "Scale"
   bottom: "conv6_2"
   top: "conv6_2"
-  param {                                                                                                                                                                                      
+  param {
     lr_mult: 1
     decay_mult: 1
   }
@@ -1138,7 +1138,7 @@ layer {
   type: "Scale"
   bottom: "conv6_3"
   top: "conv6_3"
-  param {                                                                                                                                                                                      
+  param {
     lr_mult: 1
     decay_mult: 1
   }
@@ -1266,7 +1266,7 @@ layer {
   type: "Scale"
   bottom: "conv6_5"
   top: "conv6_5"
-  param {                                                                                                                                                                                      
+  param {
     lr_mult: 1
     decay_mult: 1
   }
@@ -1330,7 +1330,7 @@ layer {
   type: "Scale"
   bottom: "conv7_1"
   top: "conv7_1"
-  param {                                                                                                                                                                                      
+  param {
     lr_mult: 1
     decay_mult: 1
   }
@@ -1394,7 +1394,7 @@ layer {
   type: "Scale"
   bottom: "conv7_2"
   top: "conv7_2"
-  param {                                                                                                                                                                                      
+  param {
     lr_mult: 1
     decay_mult: 1
   }
@@ -1497,7 +1497,7 @@ layer {
     type: "Deconvolution"
     bottom: "reduce1_lane"
     top: "deconv1_lane"
-    param{
+    param {
         lr_mult: 1
         decay_mult: 1
     }
@@ -1507,7 +1507,7 @@ layer {
       num_output: 64 # {{C}} 
       #group: 48      # {{C}}
       pad: 0          # {{ceil((factor _ 1) / 2.)}} 2 _ 1 / 2
-      weight_filler: { type: "xavier" } 
+      weight_filler: {type: "xavier" } 
       bias_filler {
           type: "constant"
           value: 0
@@ -1590,9 +1590,9 @@ layer {
     bottom: "deconv1_lane"
     top: "concat4"
 
-    concat_param{
+    concat_param {
       axis: 1
-    }  
+    }
 }
 
 
@@ -1781,10 +1781,10 @@ layer {
   bottom: "slice1_1"
   top: "SCNN_D_1/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -1794,7 +1794,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -1818,10 +1818,10 @@ layer {
   bottom: "SCNN_D_2"
   top: "SCNN_D_2/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -1831,7 +1831,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -1855,10 +1855,10 @@ layer {
   bottom: "SCNN_D_3"
   top: "SCNN_D_3/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -1868,7 +1868,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -1892,10 +1892,10 @@ layer {
   bottom: "SCNN_D_4"
   top: "SCNN_D_4/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -1905,7 +1905,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -1929,10 +1929,10 @@ layer {
   bottom: "SCNN_D_5"
   top: "SCNN_D_5/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -1942,7 +1942,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -1966,10 +1966,10 @@ layer {
   bottom: "SCNN_D_6"
   top: "SCNN_D_6/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -1979,7 +1979,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2003,10 +2003,10 @@ layer {
   bottom: "SCNN_D_7"
   top: "SCNN_D_7/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2016,7 +2016,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2040,10 +2040,10 @@ layer {
   bottom: "SCNN_D_8"
   top: "SCNN_D_8/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2053,7 +2053,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2077,10 +2077,10 @@ layer {
   bottom: "SCNN_D_9"
   top: "SCNN_D_9/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2090,7 +2090,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2114,10 +2114,10 @@ layer {
   bottom: "SCNN_D_10"
   top: "SCNN_D_10/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2127,7 +2127,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2151,10 +2151,10 @@ layer {
   bottom: "SCNN_D_11"
   top: "SCNN_D_11/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2164,7 +2164,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2188,10 +2188,10 @@ layer {
   bottom: "SCNN_D_12"
   top: "SCNN_D_12/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2201,7 +2201,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2225,10 +2225,10 @@ layer {
   bottom: "SCNN_D_13"
   top: "SCNN_D_13/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2238,7 +2238,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2262,10 +2262,10 @@ layer {
   bottom: "SCNN_D_14"
   top: "SCNN_D_14/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2275,7 +2275,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2299,10 +2299,10 @@ layer {
   bottom: "SCNN_D_15"
   top: "SCNN_D_15/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2312,7 +2312,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2336,10 +2336,10 @@ layer {
   bottom: "SCNN_D_16"
   top: "SCNN_D_16/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2349,7 +2349,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2373,10 +2373,10 @@ layer {
   bottom: "SCNN_D_17"
   top: "SCNN_D_17/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2386,7 +2386,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2410,10 +2410,10 @@ layer {
   bottom: "SCNN_D_18"
   top: "SCNN_D_18/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2423,7 +2423,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2447,10 +2447,10 @@ layer {
   bottom: "SCNN_D_19"
   top: "SCNN_D_19/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2460,7 +2460,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2484,10 +2484,10 @@ layer {
   bottom: "SCNN_D_20"
   top: "SCNN_D_20/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2497,7 +2497,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2521,10 +2521,10 @@ layer {
   bottom: "SCNN_D_21"
   top: "SCNN_D_21/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2534,7 +2534,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2558,10 +2558,10 @@ layer {
   bottom: "SCNN_D_22"
   top: "SCNN_D_22/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2571,7 +2571,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2595,10 +2595,10 @@ layer {
   bottom: "SCNN_D_23"
   top: "SCNN_D_23/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2608,7 +2608,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2632,10 +2632,10 @@ layer {
   bottom: "SCNN_D_24"
   top: "SCNN_D_24/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2645,7 +2645,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2669,10 +2669,10 @@ layer {
   bottom: "SCNN_D_25"
   top: "SCNN_D_25/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2682,7 +2682,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2706,10 +2706,10 @@ layer {
   bottom: "SCNN_D_26"
   top: "SCNN_D_26/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2719,7 +2719,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2743,10 +2743,10 @@ layer {
   bottom: "SCNN_D_27"
   top: "SCNN_D_27/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2756,7 +2756,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2780,10 +2780,10 @@ layer {
   bottom: "SCNN_D_28"
   top: "SCNN_D_28/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2793,7 +2793,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2817,10 +2817,10 @@ layer {
   bottom: "SCNN_D_29"
   top: "SCNN_D_29/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2830,7 +2830,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2854,10 +2854,10 @@ layer {
   bottom: "SCNN_D_30"
   top: "SCNN_D_30/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2867,7 +2867,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2891,10 +2891,10 @@ layer {
   bottom: "SCNN_D_31"
   top: "SCNN_D_31/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2904,7 +2904,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2928,10 +2928,10 @@ layer {
   bottom: "SCNN_D_32"
   top: "SCNN_D_32/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2941,7 +2941,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -2965,10 +2965,10 @@ layer {
   bottom: "SCNN_D_33"
   top: "SCNN_D_33/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -2978,7 +2978,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3002,10 +3002,10 @@ layer {
   bottom: "SCNN_D_34"
   top: "SCNN_D_34/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3015,7 +3015,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3039,10 +3039,10 @@ layer {
   bottom: "SCNN_D_35"
   top: "SCNN_D_35/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3052,7 +3052,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3076,10 +3076,10 @@ layer {
   bottom: "SCNN_D_36"
   top: "SCNN_D_36/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3089,7 +3089,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3113,10 +3113,10 @@ layer {
   bottom: "SCNN_D_37"
   top: "SCNN_D_37/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3126,7 +3126,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3150,10 +3150,10 @@ layer {
   bottom: "SCNN_D_38"
   top: "SCNN_D_38/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3163,7 +3163,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3187,10 +3187,10 @@ layer {
   bottom: "SCNN_D_39"
   top: "SCNN_D_39/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3200,7 +3200,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3224,10 +3224,10 @@ layer {
   bottom: "SCNN_D_40"
   top: "SCNN_D_40/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3237,7 +3237,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3261,10 +3261,10 @@ layer {
   bottom: "SCNN_D_41"
   top: "SCNN_D_41/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3274,7 +3274,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3298,10 +3298,10 @@ layer {
   bottom: "SCNN_D_42"
   top: "SCNN_D_42/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3311,7 +3311,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3335,10 +3335,10 @@ layer {
   bottom: "SCNN_D_43"
   top: "SCNN_D_43/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3348,7 +3348,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3372,10 +3372,10 @@ layer {
   bottom: "SCNN_D_44"
   top: "SCNN_D_44/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3385,7 +3385,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3409,10 +3409,10 @@ layer {
   bottom: "SCNN_D_45"
   top: "SCNN_D_45/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3422,7 +3422,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3446,10 +3446,10 @@ layer {
   bottom: "SCNN_D_46"
   top: "SCNN_D_46/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3459,7 +3459,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3483,10 +3483,10 @@ layer {
   bottom: "SCNN_D_47"
   top: "SCNN_D_47/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3496,7 +3496,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3520,10 +3520,10 @@ layer {
   bottom: "SCNN_D_48"
   top: "SCNN_D_48/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3533,7 +3533,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3557,10 +3557,10 @@ layer {
   bottom: "SCNN_D_49"
   top: "SCNN_D_49/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3570,7 +3570,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3594,10 +3594,10 @@ layer {
   bottom: "SCNN_D_50"
   top: "SCNN_D_50/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3607,7 +3607,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3631,10 +3631,10 @@ layer {
   bottom: "SCNN_D_51"
   top: "SCNN_D_51/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3644,7 +3644,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3668,10 +3668,10 @@ layer {
   bottom: "SCNN_D_52"
   top: "SCNN_D_52/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3681,7 +3681,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3705,10 +3705,10 @@ layer {
   bottom: "SCNN_D_53"
   top: "SCNN_D_53/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3718,7 +3718,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3742,10 +3742,10 @@ layer {
   bottom: "SCNN_D_54"
   top: "SCNN_D_54/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3755,7 +3755,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3779,10 +3779,10 @@ layer {
   bottom: "SCNN_D_55"
   top: "SCNN_D_55/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3792,7 +3792,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3816,10 +3816,10 @@ layer {
   bottom: "SCNN_D_56"
   top: "SCNN_D_56/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3829,7 +3829,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3853,10 +3853,10 @@ layer {
   bottom: "SCNN_D_57"
   top: "SCNN_D_57/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3866,7 +3866,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3890,10 +3890,10 @@ layer {
   bottom: "SCNN_D_58"
   top: "SCNN_D_58/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3903,7 +3903,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3927,10 +3927,10 @@ layer {
   bottom: "SCNN_D_59"
   top: "SCNN_D_59/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_D_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3940,7 +3940,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -3964,10 +3964,10 @@ layer {
   bottom: "SCNN_D_60"
   top: "SCNN_U_60/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -3977,7 +3977,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4001,10 +4001,10 @@ layer {
   bottom: "SCNN_U_59"
   top: "SCNN_U_59/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4014,7 +4014,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4038,10 +4038,10 @@ layer {
   bottom: "SCNN_U_58"
   top: "SCNN_U_58/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4051,7 +4051,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4075,10 +4075,10 @@ layer {
   bottom: "SCNN_U_57"
   top: "SCNN_U_57/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4088,7 +4088,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4112,10 +4112,10 @@ layer {
   bottom: "SCNN_U_56"
   top: "SCNN_U_56/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4125,7 +4125,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4149,10 +4149,10 @@ layer {
   bottom: "SCNN_U_55"
   top: "SCNN_U_55/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4162,7 +4162,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4186,10 +4186,10 @@ layer {
   bottom: "SCNN_U_54"
   top: "SCNN_U_54/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4199,7 +4199,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4223,10 +4223,10 @@ layer {
   bottom: "SCNN_U_53"
   top: "SCNN_U_53/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4236,7 +4236,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4260,10 +4260,10 @@ layer {
   bottom: "SCNN_U_52"
   top: "SCNN_U_52/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4273,7 +4273,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4297,10 +4297,10 @@ layer {
   bottom: "SCNN_U_51"
   top: "SCNN_U_51/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4310,7 +4310,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4334,10 +4334,10 @@ layer {
   bottom: "SCNN_U_50"
   top: "SCNN_U_50/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4347,7 +4347,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4371,10 +4371,10 @@ layer {
   bottom: "SCNN_U_49"
   top: "SCNN_U_49/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4384,7 +4384,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4408,10 +4408,10 @@ layer {
   bottom: "SCNN_U_48"
   top: "SCNN_U_48/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4421,7 +4421,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4445,10 +4445,10 @@ layer {
   bottom: "SCNN_U_47"
   top: "SCNN_U_47/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4458,7 +4458,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4482,10 +4482,10 @@ layer {
   bottom: "SCNN_U_46"
   top: "SCNN_U_46/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4495,7 +4495,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4519,10 +4519,10 @@ layer {
   bottom: "SCNN_U_45"
   top: "SCNN_U_45/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4532,7 +4532,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4556,10 +4556,10 @@ layer {
   bottom: "SCNN_U_44"
   top: "SCNN_U_44/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4569,7 +4569,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4593,10 +4593,10 @@ layer {
   bottom: "SCNN_U_43"
   top: "SCNN_U_43/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4606,7 +4606,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4630,10 +4630,10 @@ layer {
   bottom: "SCNN_U_42"
   top: "SCNN_U_42/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4643,7 +4643,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4667,10 +4667,10 @@ layer {
   bottom: "SCNN_U_41"
   top: "SCNN_U_41/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4680,7 +4680,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4704,10 +4704,10 @@ layer {
   bottom: "SCNN_U_40"
   top: "SCNN_U_40/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4717,7 +4717,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4741,10 +4741,10 @@ layer {
   bottom: "SCNN_U_39"
   top: "SCNN_U_39/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4754,7 +4754,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4778,10 +4778,10 @@ layer {
   bottom: "SCNN_U_38"
   top: "SCNN_U_38/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4791,7 +4791,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4815,10 +4815,10 @@ layer {
   bottom: "SCNN_U_37"
   top: "SCNN_U_37/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4828,7 +4828,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4852,10 +4852,10 @@ layer {
   bottom: "SCNN_U_36"
   top: "SCNN_U_36/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4865,7 +4865,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4889,10 +4889,10 @@ layer {
   bottom: "SCNN_U_35"
   top: "SCNN_U_35/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4902,7 +4902,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4926,10 +4926,10 @@ layer {
   bottom: "SCNN_U_34"
   top: "SCNN_U_34/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4939,7 +4939,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -4963,10 +4963,10 @@ layer {
   bottom: "SCNN_U_33"
   top: "SCNN_U_33/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -4976,7 +4976,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5000,10 +5000,10 @@ layer {
   bottom: "SCNN_U_32"
   top: "SCNN_U_32/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5013,7 +5013,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5037,10 +5037,10 @@ layer {
   bottom: "SCNN_U_31"
   top: "SCNN_U_31/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5050,7 +5050,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5074,10 +5074,10 @@ layer {
   bottom: "SCNN_U_30"
   top: "SCNN_U_30/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5087,7 +5087,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5111,10 +5111,10 @@ layer {
   bottom: "SCNN_U_29"
   top: "SCNN_U_29/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5124,7 +5124,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5148,10 +5148,10 @@ layer {
   bottom: "SCNN_U_28"
   top: "SCNN_U_28/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5161,7 +5161,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5185,10 +5185,10 @@ layer {
   bottom: "SCNN_U_27"
   top: "SCNN_U_27/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5198,7 +5198,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5222,10 +5222,10 @@ layer {
   bottom: "SCNN_U_26"
   top: "SCNN_U_26/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5235,7 +5235,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5259,10 +5259,10 @@ layer {
   bottom: "SCNN_U_25"
   top: "SCNN_U_25/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5272,7 +5272,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5296,10 +5296,10 @@ layer {
   bottom: "SCNN_U_24"
   top: "SCNN_U_24/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5309,7 +5309,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5333,10 +5333,10 @@ layer {
   bottom: "SCNN_U_23"
   top: "SCNN_U_23/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5346,7 +5346,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5370,10 +5370,10 @@ layer {
   bottom: "SCNN_U_22"
   top: "SCNN_U_22/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5383,7 +5383,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5407,10 +5407,10 @@ layer {
   bottom: "SCNN_U_21"
   top: "SCNN_U_21/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5420,7 +5420,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5444,10 +5444,10 @@ layer {
   bottom: "SCNN_U_20"
   top: "SCNN_U_20/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5457,7 +5457,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5481,10 +5481,10 @@ layer {
   bottom: "SCNN_U_19"
   top: "SCNN_U_19/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5494,7 +5494,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5518,10 +5518,10 @@ layer {
   bottom: "SCNN_U_18"
   top: "SCNN_U_18/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5531,7 +5531,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5555,10 +5555,10 @@ layer {
   bottom: "SCNN_U_17"
   top: "SCNN_U_17/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5568,7 +5568,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5592,10 +5592,10 @@ layer {
   bottom: "SCNN_U_16"
   top: "SCNN_U_16/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5605,7 +5605,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5629,10 +5629,10 @@ layer {
   bottom: "SCNN_U_15"
   top: "SCNN_U_15/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5642,7 +5642,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5666,10 +5666,10 @@ layer {
   bottom: "SCNN_U_14"
   top: "SCNN_U_14/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5679,7 +5679,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5703,10 +5703,10 @@ layer {
   bottom: "SCNN_U_13"
   top: "SCNN_U_13/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5716,7 +5716,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5740,10 +5740,10 @@ layer {
   bottom: "SCNN_U_12"
   top: "SCNN_U_12/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5753,7 +5753,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5777,10 +5777,10 @@ layer {
   bottom: "SCNN_U_11"
   top: "SCNN_U_11/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5790,7 +5790,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5814,10 +5814,10 @@ layer {
   bottom: "SCNN_U_10"
   top: "SCNN_U_10/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5827,7 +5827,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5851,10 +5851,10 @@ layer {
   bottom: "SCNN_U_9"
   top: "SCNN_U_9/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5864,7 +5864,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5888,10 +5888,10 @@ layer {
   bottom: "SCNN_U_8"
   top: "SCNN_U_8/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5901,7 +5901,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5925,10 +5925,10 @@ layer {
   bottom: "SCNN_U_7"
   top: "SCNN_U_7/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5938,7 +5938,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5962,10 +5962,10 @@ layer {
   bottom: "SCNN_U_6"
   top: "SCNN_U_6/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -5975,7 +5975,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -5999,10 +5999,10 @@ layer {
   bottom: "SCNN_U_5"
   top: "SCNN_U_5/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -6012,7 +6012,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -6036,10 +6036,10 @@ layer {
   bottom: "SCNN_U_4"
   top: "SCNN_U_4/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -6049,7 +6049,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -6073,10 +6073,10 @@ layer {
   bottom: "SCNN_U_3"
   top: "SCNN_U_3/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -6086,7 +6086,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -6110,10 +6110,10 @@ layer {
   bottom: "SCNN_U_2"
   top: "SCNN_U_2/message"
   type: "Convolution"
-  param { 
+  param {
     name: "SCNN_U_w"
-    lr_mult: 1 
-    decay_mult: 1 
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
     num_output: 64
@@ -6123,7 +6123,7 @@ layer {
     pad_w: 2
     stride: 1
     bias_term: false
-    weight_filler { type: "gaussian" std: 0.03536 }
+    weight_filler {type: "gaussian" std: 0.03536 }
   }
 }
 layer {
@@ -6239,7 +6239,7 @@ layer {
     type: "Deconvolution"
     bottom: "conv6"
     top: "deconv_out"
-    param{
+    param {
         lr_mult: 1
         decay_mult: 0
     }
@@ -6249,7 +6249,7 @@ layer {
       num_output: 32 # {{C}} 
       #group: 64      # {{C}}
       pad: 4         # {{ceil((factor _ 1) / 2.)}} 2 _ 1 / 2
-      weight_filler: { type: "xavier" } 
+      weight_filler: {type: "xavier" } 
       bias_filler {
           type: "constant"
           value: 0
@@ -6289,7 +6289,6 @@ layer {
   bottom: "conv_out"
   top: "softmax"
 }
-
 
 ################ Vanishing point subnet ###############
 
@@ -6473,7 +6472,6 @@ layer {
     }
   }
 }
-
 layer {
   name: "fc1_bn"
   type: "BatchNorm"
