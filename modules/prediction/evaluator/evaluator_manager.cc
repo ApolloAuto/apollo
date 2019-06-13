@@ -123,6 +123,13 @@ void EvaluatorManager::Init(const PredictionConf& config) {
         case PerceptionObstacle::VEHICLE: {
           if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
             vehicle_on_lane_evaluator_ = obstacle_conf.evaluator_type();
+            if (obstacle_conf.priority_type() == ObstaclePriority::CAUTION) {
+              vehicle_on_lane_caution_evaluator_ =
+                  obstacle_conf.evaluator_type();
+            } else {
+              vehicle_on_lane_evaluator_ = obstacle_conf.evaluator_type();
+            }
+            // TODO(all): delete this offline hack when ready
             if (FLAGS_prediction_offline_mode ==
                 PredictionConstants::kDumpDataForLearning) {
               vehicle_on_lane_evaluator_ =
@@ -130,7 +137,12 @@ void EvaluatorManager::Init(const PredictionConf& config) {
             }
           }
           if (obstacle_conf.obstacle_status() == ObstacleConf::IN_JUNCTION) {
-            vehicle_in_junction_evaluator_ = obstacle_conf.evaluator_type();
+            if (obstacle_conf.priority_type() == ObstaclePriority::CAUTION) {
+              vehicle_in_junction_caution_evaluator_ =
+                  obstacle_conf.evaluator_type();
+            } else {
+              vehicle_in_junction_evaluator_ = obstacle_conf.evaluator_type();
+            }
           }
           break;
         }
@@ -141,8 +153,7 @@ void EvaluatorManager::Init(const PredictionConf& config) {
           break;
         }
         case PerceptionObstacle::PEDESTRIAN: {
-          pedestrian_evaluator_ =
-              ObstacleConf::PEDESTRIAN_INTERACTION_EVALUATOR;
+          pedestrian_evaluator_ = obstacle_conf.evaluator_type();
           break;
         }
         case PerceptionObstacle::UNKNOWN: {
@@ -238,7 +249,7 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
           !obstacle->IsCloseToJunctionExit()) {
         if (obstacle->latest_feature().priority().priority() ==
             ObstaclePriority::CAUTION) {
-          evaluator = GetEvaluator(ObstacleConf::JUNCTION_MAP_EVALUATOR);
+          evaluator = GetEvaluator(vehicle_in_junction_caution_evaluator_);
           CHECK_NOTNULL(evaluator);
           if (evaluator->Evaluate(obstacle)) {
             break;
