@@ -2,7 +2,7 @@
     "topic_list": {
         "/apollo/sensor/gnss/best_pose": 0.9
     },
-    "use_system_time": true,
+    "use_system_time": false,
     "topic_rate_tolerance": 1.0,
     "channel_check_trigger_gap": 60,
 
@@ -12,7 +12,7 @@
     "local_std_upper_limit": 0.15,
 
     "alignment_featch_pose_sleep": 1,
-    "static_align_duration": 30,
+    "static_align_duration": 300,
     "static_align_tolerance": 5,
     "static_align_dist_thresh": 0.15,
 
