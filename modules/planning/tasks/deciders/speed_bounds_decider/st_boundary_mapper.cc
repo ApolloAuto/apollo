@@ -117,6 +117,10 @@ Status STBoundaryMapper::CreateStBoundary(PathDecision* path_decision) const {
       // buffer is used.
       constexpr double stop_buff = 15.0;
       if (stop_s + stop_buff < adc_sl_boundary_.end_s()) {
+        if (obstacle->LongitudinalDecision().stop().reason_code() ==
+            StopReasonCode::STOP_REASON_DESTINATION) {
+          continue;
+        }
         AERROR << "Invalid stop decision. not stop at behind of current "
                   "position. stop_s : "
                << stop_s << ", and current adc_s is; "
