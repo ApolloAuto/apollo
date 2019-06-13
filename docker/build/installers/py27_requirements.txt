@@ -4,8 +4,9 @@
 
 # Google infras.
 glog
-protobuf == 3.3
+protobuf == 3.1
 python-gflags
+grpcio
 grpcio-tools == 1.14.2
 
 # Web utils.

@@ -21,4 +21,8 @@ SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 APOLLO_ROOT_PATH="${SCRIPT_PATH}/../../.."
 LOG_DIR=${APOLLO_ROOT_PATH}/modules/tools/map_datachecker/log
 PYTHON_SCRIPT_PATH=${SCRIPT_PATH}/python
+
+if [ ! -e ${LOG_DIR} ];then
+    mkdir -p ${LOG_DIR}
+fi
 python ${PYTHON_SCRIPT_PATH}/client.py $@ >> ${LOG_DIR}/client.log

@@ -25,7 +25,7 @@ import yaml
 import exception_handler
 script_path = os.path.dirname(os.path.realpath(__file__))
 apollo_root = os.path.join(script_path, "../../../..")
-pb_path = os.path.join(apollo_root, "py_proto/modules/map/tools/map_datachecker/proto/")
+pb_path = os.path.join(apollo_root, "modules/tools/map_datachecker/py_proto/")
 sys.path.append(pb_path)
 import collection_service_pb2_grpc
 import collection_check_message_pb2
