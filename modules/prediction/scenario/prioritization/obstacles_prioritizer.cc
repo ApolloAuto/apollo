@@ -196,7 +196,7 @@ void ObstaclesPrioritizer::AssignCautionLevelCruiseKeepLane() {
     AERROR << "Ego vehicle not found";
     return;
   }
-  if (ego_vehicle->history_size() < 2) {
+  if (ego_vehicle->history_size() == 0) {
     AERROR << "Ego vehicle has no history";
     return;
   }
