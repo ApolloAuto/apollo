@@ -25,7 +25,7 @@ import threading
 import multiprocessing
 import yaml
 import time
-from funcsigs import signature
+import exception_handler
 script_path = os.path.dirname(os.path.realpath(__file__))
 apollo_root = os.path.join(script_path, "../../../..")
 pb_path = os.path.join(apollo_root, "modules/tools/map_datachecker/py_proto/")
@@ -44,27 +44,7 @@ class ChannelChecker:
         logging.info("ChannelChecker grpc socket: " + self._host + ':' + self._port)
         self.channel = grpc.insecure_channel(self._host + ':' + self._port)
         self.stub = collection_service_pb2_grpc.CollectionCheckerServiceStub(self.channel)
-
-    def _exception_handler(self, error_code):
-        if error_code == ErrorCode.SUCCESS:
-            logging.info("ErrorCode.SUCCESS, ignore")
-        if error_code == ErrorCode.ERROR_REPEATED_START:
-            logging.warn("ErrorCode.ERROR_REPEATED_START, ignore")
-            return 0
-        if error_code == ErrorCode.ERROR_CHECK_BEFORE_START:
-            logging.warn("ErrorCode.ERROR_CHECK_BEFORE_START")
-            return 0
-        if error_code == ErrorCode.ERROR_VERIFY_NO_RECORDERS:
-            logging.error("ErrorCode.ERROR_VERIFY_NO_RECORDERS")
-            return -1
-        if error_code == ErrorCode.ERROR_CHANNEL_VERIFY_TOPIC_LACK:
-            logging.error("ErrorCode.ERROR_CHANNEL_VERIFY_TOPIC_LACK")
-            return -1
-        if error_code == ErrorCode.ERROR_CHANNEL_VERIFY_RATES_ABNORMAL:
-            logging.error("ErrorCode.ERROR_CHANNEL_VERIFY_RATES_ABNORMAL")
-            return -1
-        logging.error("error error_code [%s]" % str(error_code))
-        return -1
+        self._exception_handler = exception_handler.ExceptionHandler.exception_handler
 
     def _start(self, record_path):
         request = collection_check_message_pb2.ChannelVerifyRequest(cmd=1, path=record_path)
