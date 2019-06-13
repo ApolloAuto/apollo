@@ -96,8 +96,14 @@ class EvaluatorManager {
   ObstacleConf::EvaluatorType vehicle_on_lane_evaluator_ =
       ObstacleConf::CRUISE_MLP_EVALUATOR;
 
+  ObstacleConf::EvaluatorType vehicle_on_lane_caution_evaluator_ =
+      ObstacleConf::CRUISE_MLP_EVALUATOR;
+
   ObstacleConf::EvaluatorType vehicle_in_junction_evaluator_ =
       ObstacleConf::JUNCTION_MLP_EVALUATOR;
+
+  ObstacleConf::EvaluatorType vehicle_in_junction_caution_evaluator_ =
+      ObstacleConf::JUNCTION_MAP_EVALUATOR;
 
   ObstacleConf::EvaluatorType cyclist_on_lane_evaluator_ =
       ObstacleConf::CYCLIST_KEEP_LANE_EVALUATOR;

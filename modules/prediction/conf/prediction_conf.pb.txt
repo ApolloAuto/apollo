@@ -7,6 +7,14 @@ obstacle_conf {
 obstacle_conf {
   obstacle_type: VEHICLE
   obstacle_status: IN_JUNCTION
+  priority_type: CAUTION
+  evaluator_type: JUNCTION_MAP_EVALUATOR
+  predictor_type: INTERACTION_PREDICTOR
+}
+obstacle_conf {
+  obstacle_type: VEHICLE
+  obstacle_status: IN_JUNCTION
+  priority_type: NORMAL
   evaluator_type: JUNCTION_MLP_EVALUATOR
   predictor_type: INTERACTION_PREDICTOR
 }
@@ -17,6 +25,7 @@ obstacle_conf {
 }
 obstacle_conf {
   obstacle_type: PEDESTRIAN
+  evaluator_type: PEDESTRIAN_INTERACTION_EVALUATOR
   predictor_type: FREE_MOVE_PREDICTOR
 }
 obstacle_conf {
