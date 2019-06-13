@@ -102,7 +102,7 @@ DEFINE_double(still_pedestrian_speed_threshold, 0.2,
               "Speed threshold for still pedestrians");
 DEFINE_double(still_unknown_speed_threshold, 0.5,
               "Speed threshold for still unknown obstacles");
-DEFINE_double(still_obstacle_position_std, 1.0,
+DEFINE_double(still_obstacle_position_std, 0.5,
               "Position standard deviation for still obstacles");
 DEFINE_double(still_pedestrian_position_std, 0.5,
               "Position standard deviation for still pedestrians");
