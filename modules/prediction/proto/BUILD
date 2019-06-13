@@ -14,6 +14,7 @@ proto_library(
     ],
     deps = [
         "//modules/perception/proto:perception_proto_lib",
+        "//modules/prediction/proto:feature_proto_lib",
     ],
 )
 
