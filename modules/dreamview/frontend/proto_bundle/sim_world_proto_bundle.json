@@ -2857,6 +2857,73 @@
                 }
               }
             },
+            "CosThetaSmootherConfig": {
+              "fields": {
+                "weightCosIncludedAngle": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 10000
+                  }
+                },
+                "weightAnchorPoints": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "weightLength": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "printLevel": {
+                  "type": "int32",
+                  "id": 4,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "maxNumOfIterations": {
+                  "type": "int32",
+                  "id": 5,
+                  "options": {
+                    "default": 500
+                  }
+                },
+                "acceptableNumOfIterations": {
+                  "type": "int32",
+                  "id": 6,
+                  "options": {
+                    "default": 15
+                  }
+                },
+                "tol": {
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "default": 1e-8
+                  }
+                },
+                "acceptableTol": {
+                  "type": "double",
+                  "id": 8,
+                  "options": {
+                    "default": 0.1
+                  }
+                },
+                "ipoptUseAutomaticDifferentiation": {
+                  "type": "bool",
+                  "id": 9,
+                  "options": {
+                    "default": true
+                  }
+                }
+              }
+            },
             "CreepDeciderConfig": {
               "fields": {
                 "stopDistance": {
@@ -3556,6 +3623,66 @@
                 }
               }
             },
+            "FemPosDeviationSmootherConfig": {
+              "fields": {
+                "weightFemPoseDeviation": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 10000000000
+                  }
+                },
+                "weightRefDeviation": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "weightPathLength": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "maxIter": {
+                  "type": "int32",
+                  "id": 5,
+                  "options": {
+                    "default": 500
+                  }
+                },
+                "timeLimit": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "verbose": {
+                  "type": "bool",
+                  "id": 7,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "scaledTermination": {
+                  "type": "bool",
+                  "id": 8,
+                  "options": {
+                    "default": true
+                  }
+                },
+                "warmStart": {
+                  "type": "bool",
+                  "id": 9,
+                  "options": {
+                    "default": true
+                  }
+                }
+              }
+            },
             "LaneChangeDeciderConfig": {
               "fields": {
                 "enableLaneChangeUrgencyCheck": {
@@ -4209,25 +4336,36 @@
                   "type": "double",
                   "id": 7
                 },
-                "vehicleBoxIouThreshold": {
-                  "type": "double",
-                  "id": 8,
-                  "options": {
-                    "default": 0.95
-                  }
-                },
                 "distanceSearchRange": {
                   "type": "double",
-                  "id": 9,
+                  "id": 8,
                   "options": {
                     "default": 0.000001
                   }
                 },
-                "distanceToMidpoint": {
+                "headingOffsetToMidpoint": {
+                  "type": "double",
+                  "id": 9
+                },
+                "lateralOffsetToMidpoint": {
                   "type": "double",
                   "id": 10,
                   "options": {
                     "default": 0.1
+                  }
+                },
+                "longitudinalOffsetToMidpoint": {
+                  "type": "double",
+                  "id": 11,
+                  "options": {
+                    "default": 0.1
+                  }
+                },
+                "vehicleBoxIouThresholdToMidpoint": {
+                  "type": "double",
+                  "id": 12,
+                  "options": {
+                    "default": 0.95
                   }
                 }
               }
@@ -4782,7 +4920,8 @@
                 "DISTANCE_APPROACH_IPOPT": 0,
                 "DISTANCE_APPROACH_IPOPT_CUDA": 1,
                 "DISTANCE_APPROACH_IPOPT_FIXED_TS": 2,
-                "DISTANCE_APPROACH_IPOPT_FIXED_DUAL": 3
+                "DISTANCE_APPROACH_IPOPT_FIXED_DUAL": 3,
+                "DISTANCE_APPROACH_IPOPT_RELAX_END": 4
               }
             },
             "PlannerOpenSpaceConfig": {
@@ -4838,6 +4977,13 @@
                 "enableCheckParallelTrajectory": {
                   "type": "bool",
                   "id": 10,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "enableLinearInterpolation": {
+                  "type": "bool",
+                  "id": 11,
                   "options": {
                     "default": false
                   }
@@ -5125,6 +5271,20 @@
                   "id": 27,
                   "options": {
                     "default": false
+                  }
+                },
+                "enableCheckInitialState": {
+                  "type": "bool",
+                  "id": 28,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "weightEndState": {
+                  "type": "double",
+                  "id": 29,
+                  "options": {
+                    "default": 0
                   }
                 }
               }
@@ -5871,25 +6031,32 @@
                     "default": 0.2
                   }
                 },
-                "passDestinationThreshold": {
+                "maxDistanceErrorToEndPoint": {
                   "type": "double",
                   "id": 8,
+                  "options": {
+                    "default": 0.2
+                  }
+                },
+                "passDestinationThreshold": {
+                  "type": "double",
+                  "id": 9,
                   "options": {
                     "default": 10
                   }
                 },
                 "maxValidStopDistance": {
                   "type": "double",
-                  "id": 9,
+                  "id": 10,
                   "options": {
                     "default": 1
                   }
                 },
-                "maxDistanceErrorToEndPoint": {
+                "sDistanceToStopForOpenSpaceParking": {
                   "type": "double",
-                  "id": 10,
+                  "id": 11,
                   "options": {
-                    "default": 0.2
+                    "default": 7
                   }
                 }
               }
@@ -6724,141 +6891,39 @@
                 }
               }
             },
-            "CosThetaSmoothingConfig": {
-              "fields": {
-                "useCosTheta": {
-                  "type": "bool",
-                  "id": 1
-                },
-                "weightCosIncludedAngle": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 10000
-                  }
-                },
-                "weightAnchorPoints": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "weightLength": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "printLevel": {
-                  "type": "int32",
-                  "id": 5,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "maxNumOfIterations": {
-                  "type": "int32",
-                  "id": 6,
-                  "options": {
-                    "default": 10000
-                  }
-                },
-                "acceptableNumOfIterations": {
-                  "type": "int32",
-                  "id": 7,
-                  "options": {
-                    "default": 15
-                  }
-                },
-                "tol": {
-                  "type": "double",
-                  "id": 8,
-                  "options": {
-                    "default": 1e-8
-                  }
-                },
-                "acceptableTol": {
-                  "type": "double",
-                  "id": 9,
-                  "options": {
-                    "default": 0.000001
-                  }
-                },
-                "ipoptUseAutomaticDifferentiation": {
-                  "type": "bool",
-                  "id": 10,
-                  "options": {
-                    "default": false
-                  }
-                }
-              }
-            },
-            "FemPosSmoothingConfig": {
-              "fields": {
-                "useFemPos": {
-                  "type": "bool",
-                  "id": 1
-                },
-                "weightFemPoseDeviation": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 10000
-                  }
-                },
-                "weightRefDeviation": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "weightPathLength": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "maxIter": {
-                  "type": "int32",
-                  "id": 5,
-                  "options": {
-                    "default": 4000
-                  }
-                },
-                "timeLimit": {
-                  "type": "double",
-                  "id": 6,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "verbose": {
-                  "type": "bool",
-                  "id": 7
-                },
-                "scaledTermination": {
-                  "type": "bool",
-                  "id": 8
-                },
-                "warmStart": {
-                  "type": "bool",
-                  "id": 9
-                }
-              }
-            },
             "DiscretePointsSmootherConfig": {
+              "oneofs": {
+                "SmootherConfig": {
+                  "oneof": [
+                    "cosThetaSmoothing",
+                    "femPosDeviationSmoothing"
+                  ]
+                }
+              },
               "fields": {
-                "cosThetaSmoothing": {
-                  "type": "CosThetaSmoothingConfig",
-                  "id": 1
+                "smoothingMethod": {
+                  "type": "SmoothingMethod",
+                  "id": 3,
+                  "options": {
+                    "default": "FEM_POS_DEVIATION_SMOOTHING"
+                  }
                 },
-                "femPosSmoothing": {
-                  "type": "FemPosSmoothingConfig",
-                  "id": 2
+                "cosThetaSmoothing": {
+                  "type": "CosThetaSmootherConfig",
+                  "id": 4
+                },
+                "femPosDeviationSmoothing": {
+                  "type": "FemPosDeviationSmootherConfig",
+                  "id": 5
+                }
+              },
+              "nested": {
+                "SmoothingMethod": {
+                  "values": {
+                    "NOT_DEFINED": 0,
+                    "COS_THETA_SMOOTHING": 1,
+                    "FEM_POS_DEVIATION_SMOOTHING": 2
+                  }
                 }
               }
             },
