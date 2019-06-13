@@ -177,6 +177,36 @@ export default class ScatterGraph extends React.Component {
                         minRotation: 0,
                         maxRotation: 0,
                         stepSize: setting.stepSize,
+                        // Overwrite chartjs tick formatter to keep maximum 4 decimals
+                        // and avoid scientific notation
+                        callback: function(tickValue, index, ticks) {
+                            // If we have lots of ticks, don't use the ones
+                            let delta = ticks.length > 3
+                                ? ticks[2] - ticks[1]
+                                : ticks[1] - ticks[0];
+
+                            // If we have a number like 2.5 as the delta,
+                            // figure out how many decimal places we need
+                            if (Math.abs(delta) > 1) {
+                                if (tickValue !== Math.floor(tickValue)) {
+                                    // not an integer
+                                    delta = tickValue - Math.floor(tickValue);
+                                }
+                            }
+
+                            const logDelta = Math.log10(Math.abs(delta));
+                            let tickString = '';
+
+                            if (Math.abs(tickValue) >= 1e-4) {
+                                let numDecimal = -1 * Math.floor(logDelta);
+                                numDecimal = Math.max(Math.min(numDecimal, 4), 0);
+                                tickString = tickValue.toFixed(numDecimal);
+                            } else {
+                                tickString = '0'; // never show decimal places for 0
+                            }
+
+                            return tickString;
+                        },
                     },
                     gridLines: {
                         color: 'rgba(153, 153, 153, 0.5)',
