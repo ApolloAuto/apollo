@@ -84,20 +84,20 @@ cyber_modules {
   }
 }
 modules {
-  key: "SmartRecorder"
+  key: "Recorder"
   value: {
-    start_command: "/apollo/scripts/record_message.py --start"
-    stop_command: "/apollo/scripts/record_message.py --stop"
+    start_command: "/apollo/scripts/record_bag.py --start"
+    stop_command: "/apollo/scripts/record_bag.py --stop"
     process_monitor_config {
-      command_keywords: "smart_recorder"
+      command_keywords: "cyber_recorder record"
     }
   }
 }
 monitored_components {
-  key: "SmartRecorder"
+  key: "Recorder"
   value: {
     process {
-      command_keywords: "smart_recorder"
+      command_keywords: "cyber_recorder record"
     }
     resource {
       disk_spaces {
