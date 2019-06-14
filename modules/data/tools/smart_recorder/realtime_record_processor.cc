@@ -178,6 +178,7 @@ bool RealtimeRecordProcessor::Process() {
     monitor_thread = nullptr;
   }
   PublishStatus(RecordingState::STOPPED, "smart recorder stopped");
+  MonitorManager::Instance()->LogBuffer().INFO("SmartRecorder is stopped");
   return true;
 }
 
