@@ -156,8 +156,9 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   start_point->set_v(latest_feature_ptr->speed());
   start_point->set_relative_time(0.0);
 
+  constexpr double kShortTermPredictionTimeLength = 1.0;
   int num_trajectory_point =
-      static_cast<int>(FLAGS_prediction_trajectory_time_length /
+      static_cast<int>(kShortTermPredictionTimeLength /
                        FLAGS_prediction_trajectory_time_resolution);
   for (int i = 1; i < num_trajectory_point; ++i) {
     double prev_x = trajectory->trajectory_point(i - 1).path_point().x();
