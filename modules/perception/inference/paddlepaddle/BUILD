@@ -27,21 +27,8 @@ cc_library(
         "@snappystream",
         "@eigen",
         "@mklml",
-        "@mkldnn",
         "@cuda",
     ],
-    linkstatic=False,
 )
-
-#cc_test(
-#    name = "caffe_net_test",
-#    size = "small",
-#    srcs = ["caffe_net_test.cc"],
-#    deps = [
-#        ":caffe_net_lib",
-#        "//modules/perception/inference/utils:inference_util_lib",
-#        "@gtest//:main",
-#    ],
-#)
 
 cpplint()
