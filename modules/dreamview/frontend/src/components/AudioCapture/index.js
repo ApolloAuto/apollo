@@ -64,6 +64,11 @@ export default class AudioCapture extends React.Component {
         if (this.recorder) {
             this.handleStart();
         } else {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert('Browser does not support using media device.');
+                this.props.store.handleOptionToggle('enableAudioCapture');
+                return;
+            }
             navigator.mediaDevices.getUserMedia({audio: true})
                 .then(this.handleStream)
                 .catch(this.handleError);
