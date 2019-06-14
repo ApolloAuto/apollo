@@ -192,8 +192,8 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     prediction_inputs.push_back(ht[0]);
     auto pred_out_tensor =
         torch_prediction_layer_ptr_->forward(prediction_inputs)
-                                  .toTensor()
-                                  .to(torch::kCPU);
+            .toTensor()
+            .to(torch::kCPU);
     auto pred_out = pred_out_tensor.accessor<float, 2>();
     TrajectoryPoint* point = trajectory->add_trajectory_point();
     double curr_x = prev_x + static_cast<double>(pred_out[0][0]);

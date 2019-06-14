@@ -83,8 +83,7 @@ DistanceApproachIPOPTRelaxEndInterface::DistanceApproachIPOPTRelaxEndInterface(
       distance_approach_config_.weight_first_order_time();
   weight_second_order_time_ =
       distance_approach_config_.weight_second_order_time();
-  weight_end_state_ =
-      distance_approach_config_.weight_end_state();
+  weight_end_state_ = distance_approach_config_.weight_end_state();
   min_safety_distance_ = distance_approach_config_.min_safety_distance();
   max_steer_angle_ =
       vehicle_param_.max_steer_angle() / vehicle_param_.steer_ratio();
@@ -107,10 +106,9 @@ DistanceApproachIPOPTRelaxEndInterface::DistanceApproachIPOPTRelaxEndInterface(
   enable_jacobian_ad_ = true;
 }
 
-bool DistanceApproachIPOPTRelaxEndInterface::get_nlp_info(int& n, int& m,
-                                                  int& nnz_jac_g,
-                                                  int& nnz_h_lag,
-                                                  IndexStyleEnum& index_style) {
+bool DistanceApproachIPOPTRelaxEndInterface::get_nlp_info(
+    int& n, int& m, int& nnz_jac_g, int& nnz_h_lag,
+    IndexStyleEnum& index_style) {
   ADEBUG << "get_nlp_info";
   // n1 : states variables, 4 * (N+1)
   int n1 = 4 * (horizon_ + 1);
@@ -167,8 +165,9 @@ bool DistanceApproachIPOPTRelaxEndInterface::get_nlp_info(int& n, int& m,
 }
 
 bool DistanceApproachIPOPTRelaxEndInterface::get_bounds_info(int n, double* x_l,
-                                                     double* x_u, int m,
-                                                     double* g_l, double* g_u) {
+                                                             double* x_u, int m,
+                                                             double* g_l,
+                                                             double* g_u) {
   ADEBUG << "get_bounds_info";
   CHECK(XYbounds_.size() == 4)
       << "XYbounds_ size is not 4, but" << XYbounds_.size();
@@ -433,28 +432,33 @@ bool DistanceApproachIPOPTRelaxEndInterface::get_starting_point(
   return true;
 }
 
-bool DistanceApproachIPOPTRelaxEndInterface::eval_f(
-    int n, const double* x, bool new_x, double& obj_value) {
+bool DistanceApproachIPOPTRelaxEndInterface::eval_f(int n, const double* x,
+                                                    bool new_x,
+                                                    double& obj_value) {
   eval_obj(n, x, &obj_value);
   return true;
 }
 
-bool DistanceApproachIPOPTRelaxEndInterface::eval_grad_f(
-    int n, const double* x, bool new_x, double* grad_f) {
+bool DistanceApproachIPOPTRelaxEndInterface::eval_grad_f(int n, const double* x,
+                                                         bool new_x,
+                                                         double* grad_f) {
   gradient(tag_f, n, x, grad_f);
   return true;
 }
 
-bool DistanceApproachIPOPTRelaxEndInterface::eval_g(
-    int n, const double* x, bool new_x, int m, double* g) {
+bool DistanceApproachIPOPTRelaxEndInterface::eval_g(int n, const double* x,
+                                                    bool new_x, int m,
+                                                    double* g) {
   eval_constraints(n, x, m, g);
   // if (enable_constraint_check_) check_g(n, x, m, g);
   return true;
 }
 
-bool DistanceApproachIPOPTRelaxEndInterface::eval_jac_g(
-    int n, const double* x, bool new_x, int m, int nele_jac,
-    int* iRow, int* jCol, double* values) {
+bool DistanceApproachIPOPTRelaxEndInterface::eval_jac_g(int n, const double* x,
+                                                        bool new_x, int m,
+                                                        int nele_jac, int* iRow,
+                                                        int* jCol,
+                                                        double* values) {
   if (enable_jacobian_ad_) {
     if (values == nullptr) {
       // return the structure of the jacobian
@@ -477,16 +481,16 @@ bool DistanceApproachIPOPTRelaxEndInterface::eval_jac_g(
 }
 
 bool DistanceApproachIPOPTRelaxEndInterface::eval_jac_g_ser(
-    int n, const double* x, bool new_x, int m,
-    int nele_jac, int* iRow, int* jCol, double* values) {
+    int n, const double* x, bool new_x, int m, int nele_jac, int* iRow,
+    int* jCol, double* values) {
   AERROR << "NOT READY";
   return false;
 }
 
 bool DistanceApproachIPOPTRelaxEndInterface::eval_h(
-    int n, const double* x, bool new_x,
-    double obj_factor, int m, const double* lambda,
-    bool new_lambda, int nele_hess, int* iRow, int* jCol, double* values) {
+    int n, const double* x, bool new_x, double obj_factor, int m,
+    const double* lambda, bool new_lambda, int nele_hess, int* iRow, int* jCol,
+    double* values) {
   if (values == nullptr) {
     // return the structure. This is a symmetric matrix, fill the lower left
     // triangle only.
@@ -651,8 +655,8 @@ void DistanceApproachIPOPTRelaxEndInterface::get_optimization_results(
 
 //***************    start ADOL-C part ***********************************
 template <class T>
-void DistanceApproachIPOPTRelaxEndInterface::eval_obj(
-    int n, const T* x, T* obj_value) {
+void DistanceApproachIPOPTRelaxEndInterface::eval_obj(int n, const T* x,
+                                                      T* obj_value) {
   // Objective is :
   // min control inputs
   // min input rate
@@ -723,14 +727,14 @@ void DistanceApproachIPOPTRelaxEndInterface::eval_obj(
   // 6. end state constraints
   for (int i = 0; i < 4; ++i) {
     *obj_value += weight_end_state_ *
-        (x[state_start_index_ + 4 * horizon_ + i] - xf_(i, 0)) *
-        (x[state_start_index_ + 4 * horizon_ + i] - xf_(i, 0));
+                  (x[state_start_index_ + 4 * horizon_ + i] - xf_(i, 0)) *
+                  (x[state_start_index_ + 4 * horizon_ + i] - xf_(i, 0));
   }
 }
 
 template <class T>
-void DistanceApproachIPOPTRelaxEndInterface::eval_constraints(
-    int n, const T* x, int m, T* g) {
+void DistanceApproachIPOPTRelaxEndInterface::eval_constraints(int n, const T* x,
+                                                              int m, T* g) {
   // state start index
   int state_index = state_start_index_;
 
@@ -942,8 +946,8 @@ void DistanceApproachIPOPTRelaxEndInterface::eval_constraints(
   }
 }
 
-bool DistanceApproachIPOPTRelaxEndInterface::check_g(
-    int n, const double* x, int m, const double* g) {
+bool DistanceApproachIPOPTRelaxEndInterface::check_g(int n, const double* x,
+                                                     int m, const double* g) {
   int kN = n;
   int kM = m;
   double x_u_tmp[kN];
@@ -1021,8 +1025,9 @@ bool DistanceApproachIPOPTRelaxEndInterface::check_g(
   return true;
 }
 
-void DistanceApproachIPOPTRelaxEndInterface::generate_tapes(
-    int n, int m, int* nnz_jac_g, int* nnz_h_lag) {
+void DistanceApproachIPOPTRelaxEndInterface::generate_tapes(int n, int m,
+                                                            int* nnz_jac_g,
+                                                            int* nnz_h_lag) {
   std::vector<double> xp(n);
   std::vector<double> lamp(m);
   std::vector<double> zl(m);

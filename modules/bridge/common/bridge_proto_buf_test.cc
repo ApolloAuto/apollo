@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/bridge/common/bridge_proto_serialized_buf.h"
 #include "modules/bridge/common/bridge_proto_diserialized_buf.h"
+#include "modules/bridge/common/bridge_proto_serialized_buf.h"
 
 #include "modules/planning/proto/planning.pb.h"
 
@@ -54,7 +54,7 @@ TEST(BridgeProtoBufTest, Simple) {
     char header_size_buf[sizeof(size_t) + 1] = {0};
     const char *cursor = proto_buf.GetSerializedBuf(i) + offset;
     memcpy(header_size_buf, cursor, sizeof(size_t));
-    size_t header_size = *(reinterpret_cast<size_t*>(header_size_buf));
+    size_t header_size = *(reinterpret_cast<size_t *>(header_size_buf));
     EXPECT_EQ(header_size, 236);
     offset += sizeof(size_t) + 1;
 
@@ -79,17 +79,17 @@ TEST(BridgeProtoBufTest, Simple) {
   auto pb_msg = std::make_shared<planning::ADCTrajectory>();
   proto_recv_buf.Diserialized(pb_msg);
   EXPECT_EQ(pb_msg->header().sequence_num(),
-    adc_trajectory->header().sequence_num());
+            adc_trajectory->header().sequence_num());
   EXPECT_EQ(pb_msg->trajectory_point_size(),
-    adc_trajectory->trajectory_point_size());
+            adc_trajectory->trajectory_point_size());
 
   int traj_size = adc_trajectory->trajectory_point_size();
   EXPECT_EQ(traj_size, 100);
   for (int i = 0; i < traj_size; ++i) {
     EXPECT_EQ(adc_trajectory->trajectory_point(i).path_point().x(),
-      pb_msg->trajectory_point(i).path_point().x());
+              pb_msg->trajectory_point(i).path_point().x());
     EXPECT_EQ(adc_trajectory->trajectory_point(i).path_point().y(),
-      pb_msg->trajectory_point(i).path_point().x());
+              pb_msg->trajectory_point(i).path_point().x());
   }
 }
 

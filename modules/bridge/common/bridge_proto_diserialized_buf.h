@@ -16,11 +16,11 @@
 
 #pragma once
 
-#include <vector>
-#include <string>
 #include <memory>
-#include "modules/bridge/common/macro.h"
+#include <string>
+#include <vector>
 #include "modules/bridge/common/bridge_header.h"
+#include "modules/bridge/common/macro.h"
 
 namespace apollo {
 namespace bridge {
@@ -75,7 +75,7 @@ void BridgeProtoDiserializedBuf<T>::UpdateStatus(size_t frame_index) {
 template <typename T>
 bool BridgeProtoDiserializedBuf<T>::IsTheProto(const BridgeHeader &header) {
   if (strcmp(proto_name_.c_str(), header.GetMsgName().c_str()) == 0 &&
-    sequence_num_ == header.GetMsgID()) {
+      sequence_num_ == header.GetMsgID()) {
     return true;
   }
   return false;

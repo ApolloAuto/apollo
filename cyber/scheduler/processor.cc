@@ -36,7 +36,7 @@ Processor::Processor() { running_.exchange(true); }
 Processor::~Processor() { Stop(); }
 
 void Processor::SetSchedAffinity(const std::vector<int> &cpus,
-                            const std::string &affinity, int p) {
+                                 const std::string &affinity, int p) {
   cpu_set_t set;
   CPU_ZERO(&set);
 

@@ -31,8 +31,8 @@
 #include "cyber/io/session.h"
 #include "cyber/scheduler/scheduler_factory.h"
 #include "modules/bridge/common/bridge_gflags.h"
-#include "modules/bridge/common/bridge_proto_diserialized_buf.h"
 #include "modules/bridge/common/bridge_header.h"
+#include "modules/bridge/common/bridge_proto_diserialized_buf.h"
 #include "modules/bridge/proto/udp_bridge_remote_info.pb.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 
@@ -60,7 +60,7 @@ class UDPBridgeReceiverComponent final : public cyber::Component<> {
   void MsgDispatcher();
   bool IsProtoExist(const BridgeHeader &header);
   BridgeProtoDiserializedBuf<T> *CreateBridgeProtoBuf(
-    const BridgeHeader &header);
+      const BridgeHeader &header);
 
  private:
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
