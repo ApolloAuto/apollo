@@ -41,13 +41,11 @@ TEST(StGraphDataTest, basic_test) {
 
   SpeedLimit speed_limit;
   double path_data_length = 100.0;
-  double path_length_by_conf = 100.0;
   double total_time_by_conf = 7.0;
   planning_internal::STGraphDebug* st_graph_debug = nullptr;
   StGraphData st_graph_data;
   st_graph_data.LoadData(boundary_vec, 0.0, traj_point, speed_limit,
-                         path_data_length, path_length_by_conf,
-                         total_time_by_conf, st_graph_debug);
+                         path_data_length, total_time_by_conf, st_graph_debug);
   EXPECT_EQ(st_graph_data.st_boundaries().size(), 1);
   EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().x(), 1.1);
   EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().y(), 2.1);

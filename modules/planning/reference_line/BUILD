@@ -117,7 +117,7 @@ cc_library(
         "//modules/planning/math/discretized_points_smoothing:cos_theta_smoother",
         "//modules/planning/math/discretized_points_smoothing:fem_pos_deviation_smoother",
         "//modules/planning/proto:planning_proto",
-        "@ipopt",
+        "//modules/planning/proto:reference_line_smoother_config_proto",
     ],
 )
 

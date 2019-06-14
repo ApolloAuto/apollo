@@ -251,7 +251,7 @@ class Polygon2d {
    * @param other_polygon The target polygon. To compute its overlap with
    *        this polygon.
    * @param overlap_polygon The overlapped polygon.
-   * @param If there is a overlapped polygon.
+   * @param If there is an overlapped polygon.
    */
   bool ComputeOverlap(const Polygon2d &other_polygon,
                       Polygon2d *const overlap_polygon) const;
@@ -263,7 +263,7 @@ class Polygon2d {
    * between two convex polygons.
    * @param other_polygon The target polygon. To compute its overlap with
    *        this polygon.
-   * @return A value between 0.0 to 1.0, meaning no intersection to fully
+   * @return A value between 0.0 and 1.0, meaning no intersection to fully
    * overlaping
    */
   double ComputeIoU(const Polygon2d &other_polygon) const;

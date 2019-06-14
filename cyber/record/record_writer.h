@@ -72,10 +72,11 @@ class RecordWriter : public RecordBase {
   const std::string& GetProtoDesc(
       const std::string& channel_name) const override;
 
+  bool IsNewChannel(const std::string& channel_name) const;
+
  private:
   bool WriteMessage(const proto::SingleMessage& single_msg);
   bool SplitOutfile();
-  bool IsNewChannel(const std::string& channel_name);
   void OnNewChannel(const std::string& channel_name,
                     const std::string& message_type,
                     const std::string& proto_desc);

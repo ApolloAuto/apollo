@@ -43,9 +43,6 @@ DEFINE_string(scenario_pull_over_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/pull_over_config.pb.txt",
               "The pull_over scenario configuration file");
-DEFINE_string(scenario_side_pass_config_file,
-              "/apollo/modules/planning/conf/scenario/side_pass_config.pb.txt",
-              "side_pass scenario configuration file");
 DEFINE_string(scenario_stop_sign_unprotected_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/stop_sign_unprotected_config.pb.txt",
@@ -73,9 +70,9 @@ DEFINE_bool(enable_scenario_bare_intersection, false,
 DEFINE_bool(enable_scenario_pull_over, false,
             "enable pull-over scenario in planning");
 
-DEFINE_double(side_pass_min_signal_intersection_distance, 50.0,
-              "meter, for intersection has signal, ADC will enter side pass "
-              "scenario only when it is farther than this threshoold");
+DEFINE_bool(enable_pull_over_exit, false,
+            "allow pull-over scenario exit to lane follow in planning");
+
 DEFINE_bool(enable_scenario_side_pass_multiple_parked_obstacles, true,
             "enable ADC to side-pass multiple parked obstacles without"
             "worrying if the obstacles are blocked by others.");
@@ -203,7 +200,7 @@ DEFINE_double(lateral_acceleration_bound, 4.0,
 
 DEFINE_double(longitudinal_jerk_lower_bound, -4.0,
               "The lower bound of longitudinal jerk.");
-DEFINE_double(longitudinal_jerk_upper_bound, 4.0,
+DEFINE_double(longitudinal_jerk_upper_bound, 2.0,
               "The upper bound of longitudinal jerk.");
 DEFINE_double(longitudinal_jerk_bound, 4.0,
               "Bound of longitudinal jerk; symmetric for front and back");
@@ -212,7 +209,7 @@ DEFINE_double(lateral_jerk_bound, 4.0,
 
 DEFINE_double(dl_bound, 0.10,
               "The bound for derivative l in s-l coordinate system.");
-DEFINE_double(kappa_bound, 0.20, "The bound for trajectory curvature");
+DEFINE_double(kappa_bound, 0.1979, "The bound for trajectory curvature");
 DEFINE_double(dkappa_bound, 0.02,
               "The bound for trajectory curvature change rate");
 
@@ -270,6 +267,7 @@ DEFINE_double(virtual_stop_wall_length, 0.1,
 DEFINE_double(virtual_stop_wall_height, 2.0,
               "virtual stop wall height (meters)");
 
+// Path Deciders
 DEFINE_double(obstacle_lat_buffer, 0.4,
               "obstacle lateral buffer (meters) for deciding path boundaries");
 DEFINE_double(obstacle_lon_start_buffer, 3.0,
@@ -278,6 +276,13 @@ DEFINE_double(obstacle_lon_start_buffer, 3.0,
 DEFINE_double(obstacle_lon_end_buffer, 2.0,
               "obstacle longitudinal end buffer (meters) for deciding "
               "path boundaries");
+DEFINE_double(static_obstacle_speed_threshold, 0.5,
+              "The speed threshold to decide whether an obstacle is static "
+              "or not.");
+DEFINE_double(lane_borrow_max_speed, 5.0,
+              "The speed threshold for lane-borrow");
+DEFINE_int32(long_term_blocking_obstacle_cycle_threhold, 3,
+             "The cycle threhold for long-term blocking obstacle.");
 
 // Prediction Part
 DEFINE_double(prediction_total_time, 5.0, "Total prediction time");
@@ -480,6 +485,10 @@ DEFINE_bool(use_s_curve_speed_smooth, false,
             "speed/acceleration.");
 
 DEFINE_bool(
+    use_iterative_anchoring_smoother, false,
+    "Whether use iterative_anchoring_smoother for open space planning ");
+
+DEFINE_bool(
     enable_parallel_trajectory_smoothing, false,
     "Whether to partition the trajectory first and do smoothing in parallel");
 
@@ -510,26 +519,6 @@ DEFINE_double(smoother_stop_distance, 10.0,
               "(unit: meter) for ADC stop, if it is close to the stop point "
               "within this threshold, current planning will be smoothed.");
 
-DEFINE_double(side_pass_road_buffer, 0.05,
-              "(unit: meter) for side pass scenario ");
-DEFINE_double(side_pass_obstacle_l_buffer, 0.1,
-              "(unit: meter) for side pass scenario ");
-DEFINE_double(side_pass_obstacle_s_buffer, 2.0,
-              "(unit: meter) for side pass scenario ");
-DEFINE_double(side_pass_extra_road_buffer_during_turning, 0.1,
-              "(unit: meter) for side pass scenario ");
-DEFINE_double(side_pass_vehicle_buffer, 0.1,
-              "(unit: meter) for side pass scenario ");
-DEFINE_double(side_pass_off_road_center_threshold, 0.4,
-              "(unit: meter) for side pass scenario ");
-DEFINE_double(side_pass_trim_watch_window, 12.0,
-              "(unit: meter) for side pass scenario ");
-DEFINE_bool(side_pass_use_actual_laneinfo_for_path_generation, false,
-            "Whether to use the actual laneinfo for side-pass path generation,"
-            " or to use the planning starting-point's laneinfo all the time.");
-DEFINE_double(side_pass_driving_width_l_buffer, 0.1,
-              "(unit: meter) for side pass driving width l buffer");
-
 DEFINE_bool(enable_parallel_hybrid_a, false,
             "True to enable hybrid a* parallel implementation.");
 
@@ -554,3 +543,6 @@ DEFINE_double(short_path_length_threshold, 20.0,
 
 DEFINE_uint64(trajectory_stitching_preserved_length, 20,
               "preserved points number in trajectory stitching");
+
+DEFINE_double(side_pass_driving_width_l_buffer, 0.1,
+              "(unit: meter) for side pass driving width l buffer");

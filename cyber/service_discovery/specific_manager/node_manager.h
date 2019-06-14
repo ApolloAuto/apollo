@@ -31,6 +31,10 @@ namespace service_discovery {
 
 class TopologyManager;
 
+/**
+ * @class NodeManager
+ * @brief Topology Manager of Node related
+ */
 class NodeManager : public Manager {
   friend class TopologyManager;
 
@@ -38,10 +42,30 @@ class NodeManager : public Manager {
   using RoleAttrVec = std::vector<RoleAttributes>;
   using NodeWarehouse = SingleValueWarehouse;
 
+  /**
+   * @brief Construct a new Node Manager object
+   */
   NodeManager();
+
+  /**
+   * @brief Destroy the Node Manager object
+   */
   virtual ~NodeManager();
 
+  /**
+   * @brief Checkout whether we have `node_name` in topology
+   *
+   * @param node_name Node's name we want to inquire
+   * @return true if this node found
+   * @return false if this node not exits
+   */
   bool HasNode(const std::string& node_name);
+
+  /**
+   * @brief Get the Nodes object
+   *
+   * @param nodes result RoleAttr vector
+   */
   void GetNodes(RoleAttrVec* nodes);
 
  private:

@@ -94,7 +94,9 @@ double EvaluateQuinticPolynomial(const std::array<double, 6>& coeffs,
       case 1: {
         return end_v;
       }
-      default: { return 0.0; }
+      default: {
+        return 0.0;
+      }
     }
   }
   switch (order) {
@@ -148,7 +150,9 @@ double EvaluateQuarticPolynomial(const std::array<double, 5>& coeffs,
       case 1: {
         return end_v;
       }
-      default: { return 0.0; }
+      default: {
+        return 0.0;
+      }
     }
   }
   switch (order) {
@@ -190,7 +194,9 @@ double EvaluateCubicPolynomial(const std::array<double, 4>& coefs,
       case 1: {
         return end_v;
       }
-      default: { return 0.0; }
+      default: {
+        return 0.0;
+      }
     }
   }
 

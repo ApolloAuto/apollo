@@ -65,9 +65,10 @@ function compare_poses() {
 }
 
 cd $IN_FOLDER
-for item in $(ls -l *.record | awk '{print $9}')
+for item in $(ls -l *record.* | awk '{print $9}')
 do
-  DIR_NAME=$(echo $item | cut -d . -f 1)
+  SEGMENTS=$(echo $item | awk -F'.' '{print NF}')
+  DIR_NAME=$(echo $item | cut -d . -f ${SEGMENTS})
   if [ -d "${DIR_NAME}" ]; then
     rm -r ${DIR_NAME}
   fi

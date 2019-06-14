@@ -72,7 +72,7 @@ class MlfTracker {
   }
 
  protected:
-  // a single whole state filter or seperate state filters
+  // a single whole state filter or separate state filters
   std::vector<MlfBaseFilter*> filters_;
   // global track id
   int global_track_id_counter_ = 0;

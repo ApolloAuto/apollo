@@ -20,10 +20,16 @@
 
 #include "modules/planning/scenarios/park/pull_over/stage_approach.h"
 
+#include <string>
+#include <vector>
+
 #include "cyber/common/log.h"
 
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/util/common.h"
 #include "modules/planning/scenarios/util/util.h"
+#include "modules/planning/tasks/deciders/path_bounds_decider/path_bounds_decider.h"
 
 namespace apollo {
 namespace planning {
@@ -52,12 +58,76 @@ Stage::StageStatus PullOverStageApproach::Process(
   scenario::util::PullOverStatus status =
       scenario::util::CheckADCPullOver(reference_line_info, scenario_config_);
 
-  if (status == scenario::util::UNKNOWN ||
-      status == scenario::util::PASS_DESTINATION ||
+  if (status == scenario::util::PASS_DESTINATION ||
       status == scenario::util::PARK_COMPLETE) {
     return FinishStage(true);
   } else if (status == scenario::util::PARK_FAIL) {
     return FinishStage(false);
+  }
+
+  // chek path_data to fail sooner
+  bool path_fail = false;
+  const auto& candidate_path_data = reference_line_info.GetCandidatePathData();
+  if (!candidate_path_data.empty()) {
+    for (const auto& path_data : candidate_path_data) {
+      if (path_data.path_label().find("pullover") == std::string::npos) {
+        break;
+      }
+
+      for (size_t i = path_data.discretized_path().size() - 1; i >= 0; --i) {
+        if (path_data.frenet_frame_path().back().s() -
+                path_data.frenet_frame_path()[i].s() <
+            kNumExtraTailBoundPoint * kPathBoundsDeciderResolution) {
+          continue;
+        }
+        // check the last adc_position planned
+        const auto& path_point = path_data.discretized_path()[i];
+        scenario::util::PullOverStatus status =
+            scenario::util::CheckADCPullOverPathPoint(
+                reference_line_info, scenario_config_, path_point);
+        if (status == scenario::util::PARK_FAIL) {
+          path_fail = true;
+        }
+        break;
+      }
+    }
+  }
+
+  // add a stop fence for adc to pause at a better position
+  if (path_fail) {
+    const auto& pull_over_status =
+        PlanningContext::Instance()->planning_status().pull_over();
+    if (pull_over_status.has_position() &&
+        pull_over_status.position().has_x() &&
+        pull_over_status.position().has_y()) {
+      const auto& reference_line = reference_line_info.reference_line();
+      common::SLPoint pull_over_sl;
+      reference_line.XYToSL(
+          {pull_over_status.position().x(), pull_over_status.position().y()},
+          &pull_over_sl);
+
+      const double stop_line_s =
+          pull_over_sl.s() -
+          scenario_config_.s_distance_to_stop_for_open_space_parking();
+      const std::string virtual_obstacle_id = "DEST_PULL_OVER_PREPARKING";
+      const std::vector<std::string> wait_for_obstacle_ids;
+      planning::util::BuildStopDecision(
+          virtual_obstacle_id, stop_line_s, 1.0,
+          StopReasonCode::STOP_REASON_PREPARKING, wait_for_obstacle_ids,
+          "PULL-OVER-scenario", frame,
+          &(frame->mutable_reference_line_info()->front()));
+
+      ADEBUG << "Build a stop fence to pause ADC at a better position: id["
+             << virtual_obstacle_id << "] s[" << stop_line_s << "]";
+
+      const double adc_front_edge_s =
+          reference_line_info.AdcSlBoundary().end_s();
+      double distance = stop_line_s - adc_front_edge_s;
+      constexpr double kPreparkingStopDistance = 1.0;
+      if (distance <= kPreparkingStopDistance) {
+        return FinishStage(false);
+      }
+    }
   }
 
   return StageStatus::RUNNING;

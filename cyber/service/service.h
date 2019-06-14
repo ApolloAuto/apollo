@@ -30,11 +30,26 @@
 namespace apollo {
 namespace cyber {
 
+/**
+ * @class Service
+ * @brief Service handles `Request` from the Client, and send a `Response` to
+ * it.
+ *
+ * @tparam Request the request type
+ * @tparam Response the response type
+ */
 template <typename Request, typename Response>
 class Service : public ServiceBase {
  public:
   using ServiceCallback = std::function<void(const std::shared_ptr<Request>&,
                                              std::shared_ptr<Response>&)>;
+  /**
+   * @brief Construct a new Service object
+   *
+   * @param node_name used to fill RoleAttribute when join the topology
+   * @param service_name the service name we provide
+   * @param service_callback reference of `ServiceCallback` object
+   */
   Service(const std::string& node_name, const std::string& service_name,
           const ServiceCallback& service_callback)
       : ServiceBase(service_name),
@@ -43,6 +58,13 @@ class Service : public ServiceBase {
         request_channel_(service_name + SRV_CHANNEL_REQ_SUFFIX),
         response_channel_(service_name + SRV_CHANNEL_RES_SUFFIX) {}
 
+  /**
+   * @brief Construct a new Service object
+   *
+   * @param node_name used to fill RoleAttribute when join the topology
+   * @param service_name the service name we provide
+   * @param service_callback rvalue reference of `ServiceCallback` object
+   */
   Service(const std::string& node_name, const std::string& service_name,
           ServiceCallback&& service_callback)
       : ServiceBase(service_name),
@@ -51,7 +73,11 @@ class Service : public ServiceBase {
         request_channel_(service_name + SRV_CHANNEL_REQ_SUFFIX),
         response_channel_(service_name + SRV_CHANNEL_RES_SUFFIX) {}
 
+  /**
+   * @brief Forbid default constructing
+   */
   Service() = delete;
+
   ~Service() {
     inited_ = false;
     condition_.notify_all();
@@ -59,7 +85,15 @@ class Service : public ServiceBase {
       thread_.join();
     }
   }
+
+  /**
+   * @brief Init the Service
+   */
   bool Init();
+
+  /**
+   * @brief Destroy the Service
+   */
   void destroy();
 
  private:

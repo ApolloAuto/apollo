@@ -55,6 +55,7 @@ distance_approach_config {
   weight_a_stitching: 3.25
   weight_first_order_time: 4.25
   weight_second_order_time: 13.5
+  weight_end_state: 1.0
   min_safety_distance: 0.0
   max_speed_forward: 2.0
   max_speed_reverse: 1.0
@@ -82,6 +83,7 @@ distance_approach_config {
   enable_derivative_check: false
   enable_initial_final_check: false
   distance_approach_mode: DISTANCE_APPROACH_IPOPT
+  enable_check_initial_state: false
 }
 trajectory_partition_config {
   interpolated_pieces_num: 50
@@ -95,3 +97,5 @@ delta_t: 0.5
 max_position_error_to_end_point: 0.05
 max_theta_error_to_end_point: 0.05
 is_near_destination_threshold: 0.05
+enable_check_parallel_trajectory: false
+enable_linear_interpolation: false

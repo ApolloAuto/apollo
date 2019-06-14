@@ -33,6 +33,7 @@ TEST(TrajectoryPointCollectorTest, ThreePoints) {
     TrajectoryPoint point;
     point.mutable_path_point()->set_x(i * 100.0);
     point.mutable_path_point()->set_y(i * 100.0 + 100.0);
+    point.mutable_path_point()->set_theta(i * 0.1);
     point.set_relative_time(i * 1000.0);
     collector.Collect(point, base_time);
   }
@@ -44,7 +45,7 @@ TEST(TrajectoryPointCollectorTest, ThreePoints) {
     EXPECT_DOUBLE_EQ(0.0, point.position_x());
     EXPECT_DOUBLE_EQ(100.0, point.position_y());
     EXPECT_DOUBLE_EQ(1000.0, point.timestamp_sec());
-    EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
+    EXPECT_DOUBLE_EQ(0, point.heading());
   }
 
   {
@@ -52,7 +53,7 @@ TEST(TrajectoryPointCollectorTest, ThreePoints) {
     EXPECT_DOUBLE_EQ(100.0, point.position_x());
     EXPECT_DOUBLE_EQ(200.0, point.position_y());
     EXPECT_DOUBLE_EQ(2000.0, point.timestamp_sec());
-    EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
+    EXPECT_DOUBLE_EQ(0.1, point.heading());
   }
 
   {
@@ -60,7 +61,7 @@ TEST(TrajectoryPointCollectorTest, ThreePoints) {
     EXPECT_DOUBLE_EQ(200.0, point.position_x());
     EXPECT_DOUBLE_EQ(300.0, point.position_y());
     EXPECT_DOUBLE_EQ(3000.0, point.timestamp_sec());
-    EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
+    EXPECT_DOUBLE_EQ(0.2, point.heading());
   }
 }
 

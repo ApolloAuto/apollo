@@ -3,6 +3,7 @@ syntax = "proto2";
 package apollo.planning;
 
 import "modules/common/proto/drive_state.proto";
+import "modules/common/proto/geometry.proto";
 import "modules/common/proto/pnc_point.proto";
 import "modules/planning/proto/planning_config.proto";
 import "modules/routing/proto/routing.proto";
@@ -53,15 +54,15 @@ message PedestrianStatus {
 }
 
 message PullOverStatus {
-  optional bool is_feasible = 1 [default = true];
-  optional double x = 2 [default = 0.0];
-  optional double y = 3 [default = 0.0];
-  optional double theta = 4 [default = 0.0];
-  optional double length_front = 5 [default = 0.0];
-  optional double length_back = 6 [default = 0.0];
-  optional double width_left = 7 [default = 0.0];
-  optional double width_right = 8 [default = 0.0];
-  optional int32 idx = 9 [default = 0];
+  optional bool is_feasible = 1 [default = false];  // default must be false
+  optional apollo.common.PointENU position = 2;
+  optional double theta = 3;
+  optional double length_front = 4;
+  optional double length_back = 5;
+  optional double width_left = 6;
+  optional double width_right = 7;
+  optional int32 idx = 8;
+  optional bool is_in_pull_over_scenario = 9 [default = false];
 }
 
 message ReroutingStatus {

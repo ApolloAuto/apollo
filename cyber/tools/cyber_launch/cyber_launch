@@ -367,6 +367,9 @@ def start(launch_file=''):
 
     process_list = []
     root = tree.getroot()
+    for env in root.findall('environment'):
+        for var in env.getchildren():
+            os.environ[var.tag] = str(var.text)
     for module in root.findall('module'):
         module_name = module.find('name').text
         dag_conf = module.find('dag_conf').text

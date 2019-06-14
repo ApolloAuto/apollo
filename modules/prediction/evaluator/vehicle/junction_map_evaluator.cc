@@ -25,6 +25,7 @@
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
+#include "modules/prediction/common/semantic_map.h"
 
 namespace apollo {
 namespace prediction {
@@ -54,7 +55,6 @@ bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     ADEBUG << "Obstacle [" << id << "] has less than two junction_exits.";
     return false;
   }
-
   // Extract features of junction_exit_mask
   std::vector<double> feature_values;
   if (!ExtractFeatureValues(obstacle_ptr, &feature_values)) {
@@ -62,21 +62,40 @@ bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     return false;
   }
 
+  if (!FLAGS_enable_semantic_map) {
+    ADEBUG << "Not enable semantic map, exit junction_map_evaluator.";
+    return false;
+  }
+  cv::Mat feature_map;
+  if (!SemanticMap::Instance()->GetMapById(id, &feature_map)) {
+    return false;
+  }
+
   // Build input features for torch
   std::vector<torch::jit::IValue> torch_inputs;
-
+  // Process the feature_map
+  cv::cvtColor(feature_map, feature_map, CV_BGR2RGB);
+  cv::Mat img_float;
+  feature_map.convertTo(img_float, CV_32F, 1.0 / 255);
+  torch::Tensor img_tensor = torch::from_blob(img_float.data, {1, 224, 224, 3});
+  img_tensor = img_tensor.permute({0, 3, 1, 2});
+  img_tensor[0][0] = img_tensor[0][0].sub(0.485).div(0.229);
+  img_tensor[0][1] = img_tensor[0][1].sub(0.456).div(0.224);
+  img_tensor[0][2] = img_tensor[0][2].sub(0.406).div(0.225);
+  // Process junction_exit_mask
   torch::Tensor junction_exit_mask =
       torch::zeros({1, static_cast<int>(feature_values.size())});
   for (size_t i = 0; i < feature_values.size(); ++i) {
     junction_exit_mask[0][i] = static_cast<float>(feature_values[i]);
   }
-  torch_inputs.push_back(std::move(junction_exit_mask));
+  torch_inputs.push_back(torch::jit::Tuple::create(
+      {img_tensor.to(device_), junction_exit_mask.to(device_)}));
 
   // Compute probability
   std::vector<double> probability;
   CHECK_NOTNULL(torch_model_ptr_);
   at::Tensor torch_output_tensor =
-      torch_model_ptr_->forward(torch_inputs).toTensor();
+      torch_model_ptr_->forward(torch_inputs).toTensor().to(torch::kCPU);
   auto torch_output = torch_output_tensor.accessor<float, 2>();
   for (int i = 0; i < torch_output.size(1); ++i) {
     probability.push_back(static_cast<double>(torch_output[0][i]));
@@ -155,12 +174,12 @@ bool JunctionMapEvaluator::ExtractFeatureValues(
 void JunctionMapEvaluator::LoadModel() {
   // TODO(all) uncomment the following when cuda issue is resolved
   // if (torch::cuda::is_available()) {
-  //   ADEBUG << "CUDA is available";
+  //   ADEBUG << "CUDA is available for JunctionMapEvaluator!";
   //   device_ = torch::Device(torch::kCUDA);
   // }
   torch::set_num_threads(1);
   torch_model_ptr_ =
-      torch::jit::load(FLAGS_torch_vehicle_junction_mlp_file, device_);
+      torch::jit::load(FLAGS_torch_vehicle_junction_map_file, device_);
 }
 
 }  // namespace prediction

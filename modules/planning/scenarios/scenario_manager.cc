@@ -21,6 +21,8 @@
 #include <utility>
 #include <vector>
 
+#include "modules/map/proto/map_lane.pb.h"
+
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -39,6 +41,7 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 
+using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::PathOverlap;
 
 bool ScenarioManager::Init(
@@ -168,9 +171,19 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
   bool pull_over_scenario =
       (frame.reference_line_info().size() == 1 &&  // NO, while changing lane
        adc_distance_to_dest >=
-           scenario_config.max_pull_over_scenario_distance() &&
+           scenario_config.pull_over_min_distance_buffer() &&
        adc_distance_to_dest <=
            scenario_config.start_pull_over_scenario_distance());
+
+  // too close to destination + not found pull-over position
+  if (pull_over_scenario) {
+    const auto& pull_over_status =
+        PlanningContext::Instance()->planning_status().pull_over();
+    if (adc_distance_to_dest < scenario_config.max_distance_stop_search() &&
+        !pull_over_status.is_feasible()) {
+      pull_over_scenario = false;
+    }
+  }
 
   // check around junction
   if (pull_over_scenario) {
@@ -192,10 +205,49 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
     }
   }
 
+  // check rightmost driving lane along pull-over path
   if (pull_over_scenario) {
-    const auto& pull_over_status =
-        PlanningContext::Instance()->planning_status().pull_over();
-    pull_over_scenario = pull_over_status.is_feasible();
+    double check_s = adc_front_edge_s;
+    constexpr double kDistanceUnit = 5.0;
+    while (check_s < dest_sl.s()) {
+      check_s += kDistanceUnit;
+
+      std::vector<hdmap::LaneInfoConstPtr> lanes;
+      reference_line.GetLaneFromS(check_s, &lanes);
+      if (lanes.size() <= 0) {
+        ADEBUG << "check_s[" << check_s << "] can't find a lane";
+        continue;
+      }
+      const hdmap::LaneInfoConstPtr lane = lanes[0];
+      const std::string lane_id = lane->lane().id().id();
+      ADEBUG << "check_s[" << check_s << "] lane[" << lane_id << "]";
+
+      // check neighbor lanes type: NONE/CITY_DRIVING/BIKING/SIDEWALK/PARKING
+      bool rightmost_driving_lane = true;
+      for (const auto& neighbor_lane_id :
+           lane->lane().right_neighbor_forward_lane_id()) {
+        const auto hdmap_ptr = HDMapUtil::BaseMapPtr();
+        CHECK_NOTNULL(hdmap_ptr);
+        const auto neighbor_lane = hdmap_ptr->GetLaneById(neighbor_lane_id);
+        if (neighbor_lane == nullptr) {
+          ADEBUG << "Failed to find neighbor lane[" << neighbor_lane_id.id()
+                 << "]";
+          continue;
+        }
+        const auto& lane_type = neighbor_lane->lane().type();
+        if (lane_type == hdmap::Lane::CITY_DRIVING) {
+          ADEBUG << "lane[" << lane_id << "]'s right neighbor forward lane["
+                 << neighbor_lane_id.id() << "] type["
+                 << Lane_LaneType_Name(lane_type) << "] can't pull over";
+          rightmost_driving_lane = false;
+          break;
+        }
+      }
+      if (!rightmost_driving_lane) {
+        pull_over_scenario = false;
+        break;
+      }
+    }
   }
 
   switch (current_scenario_->scenario_type()) {
@@ -910,9 +962,46 @@ void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
 // update: pull_over status in PlanningContext
 void ScenarioManager::UpdatePlanningContextPullOverScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
-  if (scenario_type != ScenarioConfig::PULL_OVER) {
-    PlanningContext::Instance()->mutable_planning_status()->clear_pull_over();
+  if (scenario_type == ScenarioConfig::PULL_OVER) {
+    PlanningContext::Instance()
+        ->mutable_planning_status()
+        ->mutable_pull_over()
+        ->set_is_in_pull_over_scenario(true);
     return;
+  }
+  PlanningContext::Instance()
+      ->mutable_planning_status()
+      ->mutable_pull_over()
+      ->set_is_in_pull_over_scenario(false);
+
+  const auto& pull_over_status =
+      PlanningContext::Instance()->planning_status().pull_over();
+  if (pull_over_status.has_position() && pull_over_status.position().has_x() &&
+      pull_over_status.position().has_y()) {
+    const auto& routing = frame.local_view().routing;
+    if (routing->routing_request().waypoint_size() >= 2) {
+      // keep pull-over stop fence if destination not changed
+      const auto& reference_line_info = frame.reference_line_info().front();
+      const auto& reference_line = reference_line_info.reference_line();
+
+      common::SLPoint dest_sl;
+      const auto& routing_end =
+          *(routing->routing_request().waypoint().rbegin());
+      reference_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()},
+                            &dest_sl);
+
+      common::SLPoint pull_over_sl;
+      reference_line.XYToSL(
+          {pull_over_status.position().x(), pull_over_status.position().y()},
+          &pull_over_sl);
+
+      constexpr double kDestMaxDelta = 30.0;  // meter
+      if (std::fabs(dest_sl.s() - pull_over_sl.s()) > kDestMaxDelta) {
+        PlanningContext::Instance()
+            ->mutable_planning_status()
+            ->clear_pull_over();
+      }
+    }
   }
 }
 

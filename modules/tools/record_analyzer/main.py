@@ -52,7 +52,7 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
             control_cmd = control_cmd_pb2.ControlCommand()
             control_cmd.ParseFromString(msg.message)
             control_analyzer.put(control_cmd)
-            lidar_endtoend_analyzer.put_control(control_cmd)
+            lidar_endtoend_analyzer.put_pb('control', control_cmd)
 
         if msg.topic == "/apollo/planning":
             if (not is_auto_drive) and (not all_data):
@@ -60,7 +60,7 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
             adc_trajectory = planning_pb2.ADCTrajectory()
             adc_trajectory.ParseFromString(msg.message)
             planning_analyzer.put(adc_trajectory)
-            lidar_endtoend_analyzer.put_planning(adc_trajectory)
+            lidar_endtoend_analyzer.put_pb('planning', adc_trajectory)
 
             if plot_planning_path:
                 planning_analyzer.plot_path(plt, adc_trajectory)
@@ -82,6 +82,7 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
                 continue
             perception = perception_obstacle_pb2.PerceptionObstacles()
             perception.ParseFromString(msg.message)
+            lidar_endtoend_analyzer.put_pb('perception', perception)
 
         if msg.topic == "/apollo/prediction":
             if ((not is_auto_drive) and (not all_data)) or is_simulation or \
@@ -89,6 +90,7 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
                 continue
             prediction = prediction_obstacle_pb2.PredictionObstacles()
             prediction.ParseFromString(msg.message)
+            lidar_endtoend_analyzer.put_pb('prediction', prediction)
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

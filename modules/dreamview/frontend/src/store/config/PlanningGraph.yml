@@ -103,7 +103,7 @@ stGraph:
                 fill: false
                 showLine: false
 stSpeedGraph:
-    title: 'QP Speed - sv graph'
+    title: 'Planning V-T Graph'
     options:
         legend:
             display: true
@@ -158,19 +158,19 @@ speedGraph:
                 labelString: 'speed (m/s)'
     properties:
         lines:
-            finalSpeed:
+            VehicleSpeed:
                 color: 'rgba(255, 0, 0, 0.8)' # red
                 borderWidth: 1
                 pointRadius: 1
                 fill: false
                 showLine: false
-            DpStSpeedOptimizer:
+            SpeedHeuristic:
                 color: 'rgba(27, 249, 105, 0.5)' # green
                 borderWidth: 2
                 pointRadius: 0
                 fill: false
                 showLine: true
-            PiecewiseJerkSpeedOptimizer:
+            PlannedSpeed:
                 color: 'rgba(54, 162, 235, 1)' # blue
                 borderWidth: 2
                 pointRadius: 0
@@ -198,8 +198,28 @@ accelerationGraph:
                 pointRadius: 0
                 fill: false
                 showLine: ture
-kappaGraph:
+planningKappaGraph:
     title: 'Planning Kappa'
+    options:
+        legend:
+            display: true
+        axes:
+            x:
+                labelString: 't (sec)'
+            y:
+                min: -0.2
+                max: 0.2
+                labelString: 'kappa'
+    properties:
+        lines:
+            Trajectory:
+                color: 'rgba(1, 209, 193, 0.8)' # Turkish green
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: true
+referenceLineKappaGraph:
+    title: 'Reference Line Kappa'
     options:
         legend:
             display: true
@@ -218,8 +238,28 @@ kappaGraph:
                 pointRadius: 0
                 fill: false
                 showLine: true
-dkappaGraph:
-    title: 'Planning Dkappa'
+planningDkappaGraph:
+    title: 'Planning Kappa Derivative'
+    options:
+        legend:
+            display: true
+        axes:
+            x:
+                labelString: 't (sec)'
+            y:
+                min: -0.02
+                max: 0.02
+                labelString: 'dkappa'
+    properties:
+        lines:
+            Trajectory:
+                color: 'rgba(1, 209, 193, 0.8)' # Turkish green
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: true
+referenceLineDkappaGraph:
+    title: 'Reference Line Kappa Derivative'
     options:
         legend:
             display: true
@@ -238,14 +278,32 @@ dkappaGraph:
                 pointRadius: 0
                 fill: false
                 showLine: true
-            PiecewiseJerkSpeedOptimizer:
+            PlannedSpeed:
                 color: 'rgba(54, 162, 235, 1)' # blue
                 borderWidth: 5
                 pointRadius: 0
                 fill: false
                 showLine: true
-thetaGraph:
-    title: 'Planning theta'
+planningThetaGraph:
+    title: 'Planning Theta'
+    options:
+        legend:
+            display: true
+        axes:
+            x:
+                labelString: 't (sec)'
+            y:
+                labelString: 'theta'
+    properties:
+        lines:
+            Trajectory:
+                color: 'rgba(1, 209, 193, 0.8)' # Turkish green
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: true
+referenceLineThetaGraph:
+    title: 'Reference Line Theta'
     options:
         legend:
             display: true

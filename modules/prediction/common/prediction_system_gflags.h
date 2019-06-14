@@ -34,7 +34,9 @@ DECLARE_string(prediction_offline_bags);
 DECLARE_int32(prediction_offline_mode);
 DECLARE_bool(enable_multi_thread);
 DECLARE_int32(max_thread_num);
+DECLARE_int32(max_caution_thread_num);
 
 // Bag replay timestamp gap
 DECLARE_double(replay_timestamp_gap);
 DECLARE_int32(max_num_dump_feature);
+DECLARE_int32(max_num_dump_dataforlearn);

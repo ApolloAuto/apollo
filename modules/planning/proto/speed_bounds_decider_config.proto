@@ -3,19 +3,18 @@ syntax = "proto2";
 package apollo.planning;
 
 message SpeedBoundsDeciderConfig {
-  optional double total_path_length = 1 [default = 250];
-  optional double total_time = 2 [default = 7.0];
-  optional double boundary_buffer = 3 [default = 0.1];
-  optional double high_speed_centric_acceleration_limit = 4 [default = 1.2];
-  optional double low_speed_centric_acceleration_limit = 5 [default = 1.4];
-  optional double high_speed_threshold = 6 [default = 20.0];
-  optional double low_speed_threshold = 7 [default = 7.0];
-  optional double minimal_kappa = 8 [default = 0.00001];
-  optional double point_extension = 9 [default = 1.0];
-  optional double lowest_speed = 10 [default = 2.5];
-  optional uint32 num_points_to_avg_kappa = 11 [default = 4];
-  optional double collision_safety_range = 12 [default = 1.0];
-  optional double static_obs_nudge_speed_ratio = 13;
-  optional double dynamic_obs_nudge_speed_ratio = 14;
-  optional double centri_jerk_speed_coeff = 15;
+  optional double total_time = 1 [default = 7.0];
+  optional double boundary_buffer = 2 [default = 0.1];
+  optional double high_speed_centric_acceleration_limit = 3 [default = 1.2];
+  optional double low_speed_centric_acceleration_limit = 4 [default = 1.4];
+  optional double high_speed_threshold = 5 [default = 20.0];
+  optional double low_speed_threshold = 6 [default = 7.0];
+  optional double minimal_kappa = 7 [default = 0.00001];
+  optional double point_extension = 8 [default = 1.0];
+  optional double lowest_speed = 9 [default = 2.5];
+  optional uint32 num_points_to_avg_kappa = 10 [default = 4];
+  optional double collision_safety_range = 11 [default = 1.0];
+  optional double static_obs_nudge_speed_ratio = 12;
+  optional double dynamic_obs_nudge_speed_ratio = 13;
+  optional double centri_jerk_speed_coeff = 14;
 }

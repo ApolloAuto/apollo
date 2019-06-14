@@ -23,6 +23,7 @@ cc_library(
         "//modules/common/util:factory",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:planning_common",
+        "//modules/planning/common/util:common_lib",
         "//modules/planning/common/util:util_lib",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/scenarios:scenario",

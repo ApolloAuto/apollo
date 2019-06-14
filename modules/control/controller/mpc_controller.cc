@@ -114,6 +114,9 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
                control_conf->mpc_controller_conf().brake_minimum_action());
 
   minimum_speed_protection_ = control_conf->minimum_speed_protection();
+  max_acceleration_when_stopped_ =
+      control_conf->max_acceleration_when_stopped();
+  max_abs_speed_when_stopped_ = vehicle_param_.max_abs_speed_when_stopped();
   standstill_acceleration_ =
       control_conf->mpc_controller_conf().standstill_acceleration();
 
@@ -408,9 +411,6 @@ Status MPCController::ComputeControlCommand(
                        steer_angle_feedforwardterm_updated_ +
                        steer_angle_ff_compensation;
 
-  // Clamp the steer angle to -100.0 to 100.0
-  steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
-
   if (FLAGS_set_steer_limit) {
     const double steer_limit =
         std::atan(max_lat_acc_ * wheelbase_ /
@@ -418,31 +418,36 @@ Status MPCController::ComputeControlCommand(
                    VehicleStateProvider::Instance()->linear_velocity())) *
         steer_ratio_ * 180 / M_PI / steer_single_direction_max_degree_ * 100;
 
-    // Clamp the steer angle
+    // Clamp the steer angle with steer limitations at current speed
     double steer_angle_limited =
         common::math::Clamp(steer_angle, -steer_limit, steer_limit);
     steer_angle_limited = digital_filter_.Filter(steer_angle_limited);
-    cmd->set_steering_target(steer_angle_limited);
+    steer_angle = steer_angle_limited;
     debug->set_steer_angle_limited(steer_angle_limited);
-  } else {
-    steer_angle = digital_filter_.Filter(steer_angle);
-    cmd->set_steering_target(steer_angle);
   }
+  steer_angle = digital_filter_.Filter(steer_angle);
+  // Clamp the steer angle to -100.0 to 100.0
+  steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
+  cmd->set_steering_target(steer_angle);
 
   debug->set_acceleration_cmd_closeloop(acc_feedback);
 
   double acceleration_cmd = acc_feedback + debug->acceleration_reference();
   // TODO(QiL): add pitch angle feed forward to accommodate for 3D control
 
-  debug->set_is_full_stop(false);
-  if (std::fabs(debug->acceleration_reference()) <=
-          FLAGS_max_acceleration_when_stopped &&
-      std::fabs(debug->speed_reference()) <=
-          vehicle_param_.max_abs_speed_when_stopped()) {
-    acceleration_cmd = standstill_acceleration_;
-    AINFO << "Stop location reached";
+  if ((planning_published_trajectory->trajectory_type() ==
+       apollo::planning::ADCTrajectory::NORMAL) &&
+      (std::fabs(debug->acceleration_reference()) <=
+           max_acceleration_when_stopped_ &&
+       std::fabs(debug->speed_reference()) <= max_abs_speed_when_stopped_)) {
+    acceleration_cmd =
+        (chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)
+            ? std::max(acceleration_cmd, -standstill_acceleration_)
+            : std::min(acceleration_cmd, standstill_acceleration_);
+    ADEBUG << "Stop location reached";
     debug->set_is_full_stop(true);
   }
+  // TODO(Yu): study the necessity of path_remain and add it to MPC if needed
 
   debug->set_acceleration_cmd(acceleration_cmd);
 

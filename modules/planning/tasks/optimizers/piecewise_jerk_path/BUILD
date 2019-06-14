@@ -40,4 +40,20 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "piecewise_jerk_path_ipopt_solver",
+    srcs = [
+        "piecewise_jerk_path_ipopt_solver.cc",
+    ],
+    hdrs = [
+        "piecewise_jerk_path_ipopt_solver.h",
+    ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        "//cyber",
+        "@eigen",
+        "@ipopt",
+    ],
+)
+
 cpplint()

@@ -111,12 +111,17 @@ Status STBoundaryMapper::CreateStBoundary(PathDecision* path_decision) const {
 
     const auto& decision = obstacle->LongitudinalDecision();
     if (decision.has_stop()) {
-      const double stop_s = obstacle->PerceptionSLBoundary().start_s() +
-                            decision.stop().distance_s();
+      common::SLPoint stop_sl;
+      reference_line_.XYToSL(decision.stop().stop_point(), &stop_sl);
+      const double stop_s = stop_sl.s();
       // this is a rough estimation based on reference line s, so that a large
       // buffer is used.
       constexpr double stop_buff = 15.0;
       if (stop_s + stop_buff < adc_sl_boundary_.end_s()) {
+        if (obstacle->LongitudinalDecision().stop().reason_code() ==
+            StopReasonCode::STOP_REASON_DESTINATION) {
+          continue;
+        }
         AERROR << "Invalid stop decision. not stop at behind of current "
                   "position. stop_s : "
                << stop_s << ", and current adc_s is; "
@@ -157,15 +162,15 @@ bool STBoundaryMapper::MapStopDecision(
     Obstacle* stop_obstacle, const ObjectDecisionType& stop_decision) const {
   DCHECK(stop_decision.has_stop()) << "Must have stop decision";
 
-  if (stop_obstacle->PerceptionSLBoundary().start_s() >
-      adc_sl_boundary_.end_s() + planning_distance_) {
+  common::SLPoint stop_sl;
+  reference_line_.XYToSL(stop_decision.stop().stop_point(), &stop_sl);
+
+  if (stop_sl.s() > adc_sl_boundary_.end_s() + planning_distance_) {
     return true;
   }
 
   double st_stop_s = 0.0;
-  const double stop_ref_s = stop_obstacle->PerceptionSLBoundary().start_s() +
-                            stop_decision.stop().distance_s() -
-                            vehicle_param_.front_edge_to_center();
+  const double stop_ref_s = stop_sl.s() - vehicle_param_.front_edge_to_center();
 
   if (stop_ref_s > path_data_.frenet_frame_path().back().s()) {
     st_stop_s = path_data_.discretized_path().back().s() +
@@ -256,9 +261,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
       if (CheckOverlap(curr_point_on_path, obs_box,
                        speed_bounds_config_.boundary_buffer())) {
         const double backward_distance = -vehicle_param_.front_edge_to_center();
-        const double forward_distance = vehicle_param_.length() +
-                                        vehicle_param_.width() +
-                                        obs_box.length() + obs_box.width();
+        const double forward_distance = obs_box.length();
         double low_s =
             std::fmax(0.0, curr_point_on_path.s() + backward_distance);
         double high_s = std::fmin(planning_distance_,

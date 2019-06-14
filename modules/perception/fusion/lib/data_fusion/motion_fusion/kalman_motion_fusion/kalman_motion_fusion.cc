@@ -181,7 +181,7 @@ void KalmanMotionFusion::UpdateWithMeasurement(
     if (filter_init_) {
       if (lidar_ptr != nullptr) {
         // measurement is camera, has history lidar
-        // use fused postion, use fused velocity
+        // use fused position, use fused velocity
         fused_anchor_point_(0) = kalman_filter_.GetStates()(0);
         fused_anchor_point_(1) = kalman_filter_.GetStates()(1);
         fused_velocity_(0) = kalman_filter_.GetStates()(2);

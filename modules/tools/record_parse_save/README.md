@@ -28,7 +28,7 @@ The files/functions provided are as follows:
 
 * It is assumed that the user is within Apollo docker environment and has successfully built it. Please check documentation on [Build Apollo](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md) if required.
 * Modify parameters specified within `parser_params.yaml` to serve your purpose.
-* After crrect parameters are specified in the YAML file, run parser function using:
+* After correct parameters are specified in the YAML file, run parser function using:
 
 `python record_parse_save.py`
 

@@ -81,8 +81,9 @@ static constexpr double kAngleThreshold = 0.1;
 
 namespace {
 
-double CalculateAcceleration(const Point3D &acceleration,
-                             const Point3D &velocity) {
+double CalculateAcceleration(
+    const Point3D &acceleration, const Point3D &velocity,
+    const apollo::canbus::Chassis_GearPosition &gear_location) {
   // Calculates the dot product of acceleration and velocity. The sign
   // of this projection indicates whether this is acceleration or
   // deceleration.
@@ -92,7 +93,16 @@ double CalculateAcceleration(const Point3D &acceleration,
   // Calculates the magnitude of the acceleration. Negate the value if
   // it is indeed a deceleration.
   double magnitude = std::hypot(acceleration.x(), acceleration.y());
-  return std::signbit(projection) ? -magnitude : magnitude;
+  if (std::signbit(projection)) {
+    magnitude = -magnitude;
+  }
+
+  // Negate the value if gear is reverse
+  if (gear_location == Chassis::GEAR_REVERSE) {
+    magnitude = -magnitude;
+  }
+
+  return magnitude;
 }
 
 Object::DisengageType DeduceDisengageType(const Chassis &chassis) {
@@ -440,7 +450,7 @@ void SimulationWorldService::UpdateSimulationWorld(
 
   // Updates acceleration with the input localization message.
   auto_driving_car->set_speed_acceleration(CalculateAcceleration(
-      pose.linear_acceleration(), pose.linear_velocity()));
+      pose.linear_acceleration(), pose.linear_velocity(), gear_location_));
 
   // Updates the timestamp with the timestamp inside the localization
   // message header. It is done on both the SimulationWorld object
@@ -483,7 +493,8 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
   Object *auto_driving_car = world_.mutable_auto_driving_car();
 
   double speed = chassis.speed_mps();
-  if (chassis.gear_location() == Chassis::GEAR_REVERSE) {
+  gear_location_ = chassis.gear_location();
+  if (gear_location_ == Chassis::GEAR_REVERSE) {
     speed = -speed;
   }
   auto_driving_car->set_speed(speed);
@@ -502,7 +513,7 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
   auto_driving_car->set_steering_angle(steering_angle);
 
   double kappa = std::tan(steering_angle / vehicle_param.steer_ratio()) /
-                 vehicle_param.length();
+                 vehicle_param.wheel_base();
   auto_driving_car->set_kappa(kappa);
 
   UpdateTurnSignal(chassis.signal(), auto_driving_car);
@@ -1096,6 +1107,10 @@ void SimulationWorldService::UpdateSimulationWorld(
       }
       if (simple_lat.has_lateral_error()) {
         control_data->set_lateral_error(simple_lat.lateral_error());
+      }
+      if (simple_lat.has_current_target_point()) {
+        control_data->mutable_current_target_point()->CopyFrom(
+            simple_lat.current_target_point());
       }
     } else if (debug.has_simple_mpc_debug()) {
       auto &simple_mpc = debug.simple_mpc_debug();

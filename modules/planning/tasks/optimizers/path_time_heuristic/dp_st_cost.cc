@@ -148,7 +148,7 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
           s_upper + config_.safe_distance()) {  // or calculated from velocity
         continue;
       } else {
-        auto s_diff = config_.safe_time_buffer() + s_upper - s;
+        auto s_diff = config_.safe_distance() + s_upper - s;
         cost += config_.obstacle_weight() * config_.default_obstacle_cost() *
                 s_diff * s_diff;
       }

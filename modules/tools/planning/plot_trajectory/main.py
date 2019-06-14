@@ -123,7 +123,7 @@ def plot_vehicle(localization_pb, ax):
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("usage: %s <planning.pb.txt> <localization.pb.txt>" % sys.argv[0])
-        sys.exit(1)
+        sys.exit(0)
 
     planning_pb_file = sys.argv[1]
     localization_pb_file = sys.argv[2]

@@ -23,7 +23,6 @@
 #include <unordered_set>
 
 #include "modules/prediction/common/junction_analyzer.h"
-#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
 #include "modules/prediction/network/rnn_model/rnn_model.h"
 
@@ -99,6 +98,11 @@ bool Obstacle::IsStill() {
     return feature_history_.front().is_still();
   }
   return true;
+}
+
+bool Obstacle::IsSlow() {
+  const Feature& feature = latest_feature();
+  return feature.speed() < FLAGS_slow_obstacle_speed_threshold;
 }
 
 bool Obstacle::IsOnLane() const {
@@ -1083,9 +1087,8 @@ void Obstacle::SetLaneSequenceStopSign(LaneSequence* lane_sequence_ptr) {
 }
 
 void Obstacle::GetNeighborLaneSegments(
-    std::shared_ptr<const LaneInfo> center_lane_info,
-    bool is_left, int recursion_depth,
-    std::list<std::string>* const lane_ids_ordered,
+    std::shared_ptr<const LaneInfo> center_lane_info, bool is_left,
+    int recursion_depth, std::list<std::string>* const lane_ids_ordered,
     std::unordered_set<std::string>* const existing_lane_ids) {
   // Exit recursion if reached max num of allowed search depth.
   if (recursion_depth <= 0) {
@@ -1152,7 +1155,7 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
     return;
   }
   // double speed = feature->speed();
-  double road_graph_search_distance = 60.0;  // (45mph for 3sec)
+  double road_graph_search_distance = 50.0 * 0.95;  // (45mph for 3sec)
   // std::fmax(speed * FLAGS_prediction_trajectory_time_length +
   //               0.5 * FLAGS_vehicle_max_linear_acc *
   //               FLAGS_prediction_trajectory_time_length *
@@ -1168,12 +1171,12 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
       PredictionMap::LaneById(feature->lane().lane_feature().lane_id());
   std::list<std::string> lane_ids_ordered_list;
   std::unordered_set<std::string> existing_lane_ids;
-  GetNeighborLaneSegments(
-      center_lane_info, true, 2, &lane_ids_ordered_list, &existing_lane_ids);
+  GetNeighborLaneSegments(center_lane_info, true, 2, &lane_ids_ordered_list,
+                          &existing_lane_ids);
   lane_ids_ordered_list.push_back(feature->lane().lane_feature().lane_id());
   existing_lane_ids.insert(feature->lane().lane_feature().lane_id());
-  GetNeighborLaneSegments(
-      center_lane_info, false, 2, &lane_ids_ordered_list, &existing_lane_ids);
+  GetNeighborLaneSegments(center_lane_info, false, 2, &lane_ids_ordered_list,
+                          &existing_lane_ids);
 
   const std::vector<std::string> lane_ids_ordered(lane_ids_ordered_list.begin(),
                                                   lane_ids_ordered_list.end());
@@ -1188,8 +1191,8 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
         PredictionMap::LaneById(lane_id);
     const LaneGraph& local_lane_graph =
         ObstacleClusters::GetLaneGraphWithoutMemorizing(
-            feature->lane().lane_feature().lane_s(),
-            road_graph_search_distance, true, curr_lane_info);
+            feature->lane().lane_feature().lane_s(), road_graph_search_distance,
+            true, curr_lane_info);
     // Update it into the Feature proto
     for (const auto& lane_seq : local_lane_graph.lane_sequence()) {
       LaneSequence* lane_seq_ptr = feature->mutable_lane()
@@ -1207,7 +1210,7 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
 
   // Build lane_points.
   if (feature->lane().has_lane_graph_ordered()) {
-    SetLanePoints(feature, 0.5, 120,
+    SetLanePoints(feature, 0.5, 100, true,
                   feature->mutable_lane()->mutable_lane_graph_ordered());
     SetLaneSequencePath(feature->mutable_lane()->mutable_lane_graph_ordered());
   }
@@ -1218,7 +1221,7 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
 // FLAGS_target_lane_gap.
 void Obstacle::SetLanePoints(Feature* feature) {
   LaneGraph* lane_graph = feature->mutable_lane()->mutable_lane_graph();
-  SetLanePoints(feature, FLAGS_target_lane_gap, FLAGS_max_num_lane_point,
+  SetLanePoints(feature, FLAGS_target_lane_gap, FLAGS_max_num_lane_point, false,
                 lane_graph);
 }
 
@@ -1226,6 +1229,7 @@ void Obstacle::SetLanePoints(Feature* feature) {
 void Obstacle::SetLanePoints(const Feature* feature,
                              const double lane_point_spacing,
                              const uint64_t max_num_lane_point,
+                             const bool is_bidirection,
                              LaneGraph* const lane_graph) {
   ADEBUG << "Spacing = " << lane_point_spacing;
   // Sanity checks.
@@ -1244,34 +1248,95 @@ void Obstacle::SetLanePoints(const Feature* feature,
     if (lane_sequence->lane_segment_size() <= 0) {
       continue;
     }
-    int lane_index = 0;
-    LaneSegment* lane_segment = lane_sequence->mutable_lane_segment(lane_index);
-    double start_s = lane_sequence->lane_segment(lane_index).start_s();
+    // TODO(jiacheng): can refactor the following two parts into one to
+    //                 make it more elegant.
+
+    // If building bidirectionally, then build backward lane-points as well.
+    if (is_bidirection) {
+      int lane_index = 0;
+      double lane_seg_s = lane_sequence->lane_segment(lane_index).start_s();
+      while (lane_index < lane_sequence->lane_segment_size()) {
+        // Go through lane_segment one by one sequentially.
+        LaneSegment* lane_segment =
+            lane_sequence->mutable_lane_segment(lane_index);
+
+        // End-condition: reached the current ADC's location.
+        if (lane_index == lane_sequence->adc_lane_segment_idx() &&
+            lane_seg_s > lane_segment->adc_s()) {
+          lane_segment->set_adc_lane_point_idx(lane_segment->lane_point_size());
+          break;
+        }
+
+        if (lane_seg_s > lane_segment->end_s()) {
+          // If already exceeds the current lane_segment, then go to the
+          // next following one.
+          ADEBUG << "Move on to the next lane-segment.";
+          lane_seg_s = lane_seg_s - lane_segment->end_s();
+          ++lane_index;
+        } else {
+          // Otherwise, update lane_graph:
+          // 1. Sanity checks.
+          std::string lane_id = lane_segment->lane_id();
+          lane_segment->set_lane_turn_type(
+              PredictionMap::LaneTurnType(lane_id));
+          ADEBUG << "Currently on " << lane_id;
+          auto lane_info = PredictionMap::LaneById(lane_id);
+          if (lane_info == nullptr) {
+            break;
+          }
+          // 2. Get the closeset lane_point
+          ADEBUG << "Lane-segment s = " << lane_seg_s;
+          Eigen::Vector2d lane_point_pos =
+              PredictionMap::PositionOnLane(lane_info, lane_seg_s);
+          double lane_point_heading =
+              PredictionMap::HeadingOnLane(lane_info, lane_seg_s);
+          double lane_point_width =
+              PredictionMap::LaneTotalWidth(lane_info, lane_seg_s);
+          double lane_point_angle_diff =
+              common::math::AngleDiff(lane_point_heading, heading);
+          // 3. Update it into the lane_graph
+          ADEBUG << lane_point_pos[0] << "    " << lane_point_pos[1];
+          LanePoint lane_point;
+          lane_point.mutable_position()->set_x(lane_point_pos[0]);
+          lane_point.mutable_position()->set_y(lane_point_pos[1]);
+          lane_point.set_heading(lane_point_heading);
+          lane_point.set_width(lane_point_width);
+          lane_point.set_angle_diff(lane_point_angle_diff);
+          // Update into lane_segment.
+          lane_segment->add_lane_point()->CopyFrom(lane_point);
+          lane_seg_s += lane_point_spacing;
+        }
+      }
+    }
+
+    // Build lane-point in the forward direction.
+    int lane_index = lane_sequence->adc_lane_segment_idx();
     double total_s = 0.0;
-    double lane_seg_s = start_s;
+    double lane_seg_s = lane_sequence->lane_segment(lane_index).adc_s();
+    if (!is_bidirection) {
+      lane_index = 0;
+      lane_seg_s = lane_sequence->lane_segment(0).start_s();
+    }
     std::size_t count_point = 0;
-    // Go through lane_segment one by one sequentially.
     while (lane_index < lane_sequence->lane_segment_size() &&
            count_point < max_num_lane_point) {
+      // Go through lane_segment one by one sequentially.
+      LaneSegment* lane_segment =
+          lane_sequence->mutable_lane_segment(lane_index);
+
       if (lane_seg_s > lane_segment->end_s()) {
         // If already exceeds the current lane_segment, then go to the
         // next following one.
         ADEBUG << "Move on to the next lane-segment.";
-        start_s = lane_seg_s - lane_segment->end_s();
-        lane_seg_s = start_s;
+        lane_seg_s = lane_seg_s - lane_segment->end_s();
         ++lane_index;
-        if (lane_index < lane_sequence->lane_segment_size()) {
-          lane_segment = lane_sequence->mutable_lane_segment(lane_index);
-        } else {
-          lane_segment = nullptr;
-        }
       } else {
         // Otherwise, update lane_graph:
         // 1. Sanity checks.
         std::string lane_id = lane_segment->lane_id();
+        lane_segment->set_lane_turn_type(PredictionMap::LaneTurnType(lane_id));
         ADEBUG << "Currently on " << lane_id;
-        std::shared_ptr<const LaneInfo> lane_info =
-            PredictionMap::LaneById(lane_id);
+        auto lane_info = PredictionMap::LaneById(lane_id);
         if (lane_info == nullptr) {
           break;
         }
@@ -1285,19 +1350,20 @@ void Obstacle::SetLanePoints(const Feature* feature,
             PredictionMap::LaneTotalWidth(lane_info, lane_seg_s);
         double lane_point_angle_diff =
             common::math::AngleDiff(lane_point_heading, heading);
-
         // 3. Update it into the lane_graph
         ADEBUG << lane_point_pos[0] << "    " << lane_point_pos[1];
         LanePoint lane_point;
+        // Update direct information.
         lane_point.mutable_position()->set_x(lane_point_pos[0]);
         lane_point.mutable_position()->set_y(lane_point_pos[1]);
         lane_point.set_heading(lane_point_heading);
         lane_point.set_width(lane_point_width);
+        lane_point.set_angle_diff(lane_point_angle_diff);
+        // Update deducted information.
         double lane_l = feature->lane().lane_feature().lane_l();
         lane_point.set_relative_s(total_s);
         lane_point.set_relative_l(0.0 - lane_l);
-        lane_point.set_angle_diff(lane_point_angle_diff);
-        lane_segment->set_lane_turn_type(PredictionMap::LaneTurnType(lane_id));
+        // Update into lane_segment.
         lane_segment->add_lane_point()->CopyFrom(lane_point);
         ++count_point;
         total_s += lane_point_spacing;

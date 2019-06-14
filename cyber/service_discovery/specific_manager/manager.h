@@ -43,6 +43,11 @@ using proto::OperateType;
 using proto::RoleAttributes;
 using proto::RoleType;
 
+/**
+ * @class Manager
+ * @brief Base class for management of Topology elements.
+ * Manager can Join/Leave the Topology, and Listen the topology change
+ */
 class Manager {
  public:
   using ChangeSignal = base::Signal<const ChangeMsg&>;
@@ -53,20 +58,81 @@ class Manager {
   using RtpsPublisherAttr = eprosima::fastrtps::PublisherAttributes;
   using RtpsSubscriberAttr = eprosima::fastrtps::SubscriberAttributes;
 
+  /**
+   * @brief Construct a new Manager object
+   */
   Manager();
+
+  /**
+   * @brief Destroy the Manager object
+   */
   virtual ~Manager();
 
+  /**
+   * @brief Startup topology discovery
+   *
+   * @param participant is used to create rtps Publisher and Subscriber
+   * @return true if start successfully
+   * @return false if start fail
+   */
   bool StartDiscovery(RtpsParticipant* participant);
+
+  /**
+   * @brief Stop topology discovery
+   */
   void StopDiscovery();
+
+  /**
+   * @brief Shutdown module
+   */
   virtual void Shutdown();
 
+  /**
+   * @brief Join the topology
+   *
+   * @param attr is the attributes that will be sent to other Manager(include
+   * ourselves)
+   * @param role is one of RoleType enum
+   * @param need_publish Is need to publish out?
+   * @return true if Join topology successfully
+   * @return false if Join topology failed
+   */
   bool Join(const RoleAttributes& attr, RoleType role,
             bool need_publish = true);
+
+  /**
+   * @brief Leave the topology
+   *
+   * @param attr is the attributes that will be sent to other Manager(include
+   * ourselves)
+   * @param role if one of RoleType enum.
+   * @return true if Leave topology successfully
+   * @return false if Leave topology failed
+   */
   bool Leave(const RoleAttributes& attr, RoleType role);
 
+  /**
+   * @brief Add topology change listener, when topology changed, func will be
+   * called.
+   *
+   * @param func the callback function
+   * @return ChangeConnection Store it to use when you want to stop listening.
+   */
   ChangeConnection AddChangeListener(const ChangeFunc& func);
+
+  /**
+   * @brief Remove our listener for topology change.
+   *
+   * @param conn is the return value of `AddChangeListener`
+   */
   void RemoveChangeListener(const ChangeConnection& conn);
 
+  /**
+   * @brief Called when a process' topology manager instance leave
+   *
+   * @param host_name is the process's host's name
+   * @param process_id is the process' id
+   */
   virtual void OnTopoModuleLeave(const std::string& host_name,
                                  int process_id) = 0;
 

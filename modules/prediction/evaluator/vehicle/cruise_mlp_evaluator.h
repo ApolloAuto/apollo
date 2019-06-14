@@ -92,7 +92,7 @@ class CruiseMLPEvaluator : public Evaluator {
                             std::vector<double>* feature_values);
 
   /**
-   * @brief Load mode files
+   * @brief Load model files
    */
   void LoadModels();
 

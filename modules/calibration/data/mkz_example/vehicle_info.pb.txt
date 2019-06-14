@@ -1,6 +1,6 @@
 name : "MKZ"
 brand : LINCOLN
 model : MKZ
-license {
+vehicle_id {
     vin : "<VIN>"
 }

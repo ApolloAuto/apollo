@@ -271,11 +271,17 @@ Status LonController::ComputeControlCommand(
   if ((trajectory_message_->trajectory_type() ==
        apollo::planning::ADCTrajectory::NORMAL) &&
       ((std::fabs(debug->preview_acceleration_reference()) <=
-            FLAGS_max_acceleration_when_stopped &&
+            control_conf_->max_acceleration_when_stopped() &&
         std::fabs(debug->preview_speed_reference()) <=
             vehicle_param_.max_abs_speed_when_stopped()) ||
-       std::abs(debug->path_remain()) < 0.3)) {
-    acceleration_cmd = lon_controller_conf.standstill_acceleration();
+       std::abs(debug->path_remain()) <
+           control_conf_->max_path_remain_when_stopped())) {
+    acceleration_cmd =
+        (chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)
+            ? std::max(acceleration_cmd,
+                       -lon_controller_conf.standstill_acceleration())
+            : std::min(acceleration_cmd,
+                       lon_controller_conf.standstill_acceleration());
     ADEBUG << "Stop location reached";
     debug->set_is_full_stop(true);
   }

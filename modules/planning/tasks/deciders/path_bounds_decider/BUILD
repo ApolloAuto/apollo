@@ -16,7 +16,7 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/tasks/deciders:decider_base",
-        "//modules/planning/tasks/deciders:path_decider_obstacle_utils",
+        "//modules/planning/tasks/deciders/utils:path_decider_obstacle_utils",
     ],
 )
 

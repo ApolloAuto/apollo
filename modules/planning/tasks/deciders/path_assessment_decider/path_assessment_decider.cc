@@ -19,13 +19,14 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <utility>
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/tasks/deciders/path_bounds_decider/path_bounds_decider.h"
-#include "modules/planning/tasks/deciders/path_decider_obstacle_utils.h"
+#include "modules/planning/tasks/deciders/utils/path_decider_obstacle_utils.h"
 
 namespace apollo {
 namespace planning {
@@ -90,7 +91,9 @@ Status PathAssessmentDecider::Process(
     SetPathInfo(*reference_line_info, &curr_path_data);
     // Trim all the lane-borrowing paths so that it ends with an in-lane
     // position.
-    TrimTailingOutLanePoints(&curr_path_data);
+    if (curr_path_data.path_label().find("pullover") == std::string::npos) {
+      TrimTailingOutLanePoints(&curr_path_data);
+    }
     // TODO(jiacheng): remove empty path_data.
 
     // RecordDebugInfo(curr_path_data, curr_path_data.path_label(),
@@ -228,7 +231,7 @@ Status PathAssessmentDecider::Process(
       new_candidate_path_data.push_back(curr_path_data);
     }
   }
-  reference_line_info->SetCandidatePathData(new_candidate_path_data);
+  reference_line_info->SetCandidatePathData(std::move(new_candidate_path_data));
 
   // 4. Update necessary info for lane-borrow decider's future uses.
   // Update front static obstacle's info.

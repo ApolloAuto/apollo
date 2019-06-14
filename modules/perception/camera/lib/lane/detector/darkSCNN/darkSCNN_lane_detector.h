@@ -81,7 +81,8 @@ class DarkSCNNLaneDetector : public BaseLaneDetector {
   uint16_t resize_height_;
   uint16_t resize_width_;
   int image_mean_[3];
-
+  std::vector<float> vpt_mean_;
+  std::vector<float> vpt_std_;
   // parameters for network output
   float confidence_threshold_lane_;
   int lane_output_height_;

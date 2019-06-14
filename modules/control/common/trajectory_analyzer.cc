@@ -26,6 +26,7 @@
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/search.h"
+#include "modules/control/common/control_gflags.h"
 
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
@@ -169,11 +170,15 @@ TrajectoryPoint TrajectoryAnalyzer::QueryNearestPointByRelativeTime(
     return trajectory_points_.back();
   }
 
-  auto it_lower = it_low - 1;
-  if (it_low->relative_time() - t < t - it_lower->relative_time()) {
+  if (FLAGS_query_forward_time_point_only) {
     return *it_low;
+  } else {
+    auto it_lower = it_low - 1;
+    if (it_low->relative_time() - t < t - it_lower->relative_time()) {
+      return *it_low;
+    }
+    return *it_lower;
   }
-  return *it_lower;
 }
 
 TrajectoryPoint TrajectoryAnalyzer::QueryNearestPointByPosition(

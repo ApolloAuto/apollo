@@ -8,12 +8,12 @@ navigation_lane {
   min_lane_marker_quality: 0.49
   lane_source: OFFLINE_GENERATED
   max_len_from_navigation_line: 250.0
-  min_len_for_navigation_lane: 150.0 
-  max_len_for_navigation_lane: 250.0 
-  ratio_navigation_lane_len_to_speed: 8.0 
-  max_distance_to_navigation_line: 15.0 
-  min_view_range_to_use_lane_marker: 0.5 
-  min_lane_half_width: 1.5 
-  max_lane_half_width: 2.0 
+  min_len_for_navigation_lane: 150.0
+  max_len_for_navigation_lane: 250.0
+  ratio_navigation_lane_len_to_speed: 8.0
+  max_distance_to_navigation_line: 15.0
+  min_view_range_to_use_lane_marker: 0.5
+  min_lane_half_width: 1.5
+  max_lane_half_width: 2.0
   lane_marker_weight: 0.1
 }

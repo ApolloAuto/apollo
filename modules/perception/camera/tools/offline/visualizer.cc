@@ -97,7 +97,7 @@ bool Visualizer::Init(const std::vector<std::string> &camera_names,
   }
   world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3, cv::Scalar(0, 0, 0));
   color_cipv_ = cv::Scalar(255, 255, 255);
-
+  virtual_lane_color_ = cv::Scalar(0, 0, 255);
   return true;
 }
 
@@ -358,6 +358,7 @@ bool Visualizer::reset_key() {
   show_camera_box2d_ = true;
   show_camera_box3d_ = true;
   show_camera_bdv_ = true;
+  show_virtual_egolane_ = true;
   show_radar_pc_ = true;
   show_fusion_ = false;
   show_associate_color_ = false;
@@ -889,7 +890,6 @@ void Visualizer::Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame) {
     //          world_point_to_bigimg(v_2d), color_cipv_, line_thickness_);
   }
   last_timestamp_ = frame.timestamp;
-  camera_image_[frame.data_provider->sensor_name()] = image;
   cv::resize(image, camera_image_[frame.data_provider->sensor_name()],
              cv::Size(small_w_, small_h_));
 }
@@ -907,8 +907,8 @@ void Visualizer::ShowResult(const cv::Mat &img, const CameraFrame &frame) {
     world_image_.copyTo(bigimg(cv::Rect(small_w_, 0, wide_pixel_, world_h_)));
     if (write_out_img_) {
       char path[1000];
-      snprintf(path, sizeof(path), "%s/%06d.jpg", path_.c_str(),
-               frame.frame_id);
+      static int k = 0;
+      snprintf(path, sizeof(path), "%s/%06d.jpg", path_.c_str(), k++);
       AINFO << "A snapshot of visualizer saved at " << path;
       cv::imwrite(path, bigimg);
     }
@@ -1192,6 +1192,70 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
     }
   }
 
+  // Draw virtual ego lanes
+  if (show_virtual_egolane_) {
+    EgoLane virtual_egolane_ground;
+    virtual_egolane_ground.left_line.line_point.clear();
+    virtual_egolane_ground.right_line.line_point.clear();
+    CipvOptions cipv_options;
+    if (motion_buffer->size() == 0) {
+      AWARN << "motion_buffer_ is empty";
+      cipv_options.velocity = 5.0f;
+      cipv_options.yaw_rate = 0.0f;
+    } else {
+      cipv_options.velocity = motion_buffer->back().velocity;
+      cipv_options.yaw_rate = motion_buffer->back().yaw_rate;
+    }
+    Cipv::MakeVirtualEgoLaneFromYawRate(cipv_options.yaw_rate,
+                                        cipv_options.velocity,
+                                        kMaxVehicleWidthInMeter * 0.5,
+                                        &virtual_egolane_ground.left_line,
+                                        &virtual_egolane_ground.right_line);
+    // Left ego lane
+    Eigen::Vector2d p_prev_ground;
+    p_prev_ground(0) = virtual_egolane_ground.left_line.line_point[0](0);
+    p_prev_ground(1) = virtual_egolane_ground.left_line.line_point[0](1);
+    cv::Point p_prev = ground2image(p_prev_ground);
+    AINFO << "[Left] p_prev_ground: " << p_prev_ground << ", "
+          << "p_prev: " << p_prev;
+    for (unsigned i = 1;
+         i < virtual_egolane_ground.left_line.line_point.size(); i++) {
+      Eigen::Vector2d p_cur_ground;
+      p_cur_ground(0) = virtual_egolane_ground.left_line.line_point[i](0);
+      p_cur_ground(1) = virtual_egolane_ground.left_line.line_point[i](1);
+      cv::Point p_cur = ground2image(p_cur_ground);
+      AINFO << "[Left] p_cur_ground: " << p_cur_ground
+            << ", " << "p_cur: " << p_prev;
+      if (p_cur.x > 0 && p_cur.y > 0 && p_prev.x > 0 && p_prev.y > 0) {
+        cv::line(image_3D, p_prev, p_cur, virtual_lane_color_, line_thickness_);
+      }
+      cv::line(world_image_, world_point_to_bigimg(p_prev_ground),
+               world_point_to_bigimg(p_cur_ground), virtual_lane_color_, 2);
+      p_prev = p_cur;
+      p_prev_ground = p_cur_ground;
+    }
+
+    // Right ego lane
+    p_prev_ground(0) = virtual_egolane_ground.right_line.line_point[0](0);
+    p_prev_ground(1) = virtual_egolane_ground.right_line.line_point[0](1);
+    p_prev = ground2image(p_prev_ground);
+    for (unsigned i = 1;
+         i < virtual_egolane_ground.right_line.line_point.size(); i++) {
+      Eigen::Vector2d p_cur_ground;
+      p_cur_ground(0) = virtual_egolane_ground.right_line.line_point[i](0);
+      p_cur_ground(1) = virtual_egolane_ground.right_line.line_point[i](1);
+      cv::Point p_cur = ground2image(p_cur_ground);
+
+      if (p_cur.x > 0 && p_cur.y > 0 && p_prev.x > 0 && p_prev.y > 0) {
+        cv::line(image_3D, p_prev, p_cur, virtual_lane_color_, line_thickness_);
+      }
+      cv::line(world_image_, world_point_to_bigimg(p_prev_ground),
+               world_point_to_bigimg(p_cur_ground), virtual_lane_color_, 2);
+      p_prev = p_cur;
+      p_prev_ground = p_cur_ground;
+    }
+  }
+
   last_timestamp_ = frame.timestamp;
   camera_image_[frame.data_provider->sensor_name() + "_2D"] = image_2D;
   cv::resize(image_2D,
@@ -1249,6 +1313,14 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
               cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
               cv::Scalar(0, 0, 255), 3);
 
+  // plot predicted vanishing point
+  if (frame.pred_vpt.size() > 0) {
+    cv::circle(image,
+               cv::Point(static_cast<int>(frame.pred_vpt[0]),
+                  static_cast<int>(frame.pred_vpt[1])),
+               5, cv::Scalar(0, 255, 0), 3);
+  }
+
   for (const auto &object : frame.tracked_objects) {
     if (object->b_cipv) {
       line_pos += 50;
@@ -1278,8 +1350,9 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
   // output visualization panel
   if (write_out_img_) {
     char path[1000];
-    snprintf(path, sizeof(path), "%s/%06d.jpg", path_.c_str(), frame.frame_id);
-    AINFO << path;
+    static int k = 0;
+    snprintf(path, sizeof(path), "%s/%06d.jpg", path_.c_str(), k++);
+    AINFO << "snapshot is saved at " << path;
     cv::imwrite(path, bigimg);
   }
 

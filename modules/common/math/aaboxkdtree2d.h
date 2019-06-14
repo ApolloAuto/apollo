@@ -417,7 +417,7 @@ class AABoxKDTree2d {
   using ObjectPtr = const ObjectType *;
 
   /**
-   * @brief Contructor which takes a vector of objects and parameters.
+   * @brief Constructor which takes a vector of objects and parameters.
    * @param params Parameters to build the KD-tree.
    */
   AABoxKDTree2d(const std::vector<ObjectType> &objects,

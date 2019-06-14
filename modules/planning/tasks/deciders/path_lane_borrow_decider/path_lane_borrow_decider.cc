@@ -20,13 +20,13 @@
 
 #include "modules/planning/common/obstacle_blocking_analyzer.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
 
-constexpr double kLaneBorrowMaxSpeed = 5.0;
 constexpr double kIntersectionClearanceDist = 20.0;
 constexpr double kJunctionClearanceDist = 15.0;
 
@@ -100,13 +100,14 @@ bool PathLaneBorrowDecider::HasSingleReferenceLine(const Frame& frame) {
 }
 
 bool PathLaneBorrowDecider::IsWithinSidePassingSpeedADC(const Frame& frame) {
-  return frame.PlanningStartPoint().v() < kLaneBorrowMaxSpeed;
+  return frame.PlanningStartPoint().v() < FLAGS_lane_borrow_max_speed;
 }
 
 bool PathLaneBorrowDecider::IsLongTermBlockingObstacle() {
   if (PlanningContext::Instance()
           ->path_decider_info()
-          .front_static_obstacle_cycle_counter() >= 3) {
+          .front_static_obstacle_cycle_counter() >=
+      FLAGS_long_term_blocking_obstacle_cycle_threhold) {
     ADEBUG << "The blocking obstacle is long-term existing.";
     return true;
   } else {

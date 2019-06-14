@@ -71,7 +71,11 @@ bool Timer::InitTimerTask() {
       auto end = Time::MonoTime().ToNanosecond();
       uint64_t execute_time_ns = end - start;
       uint64_t execute_time_ms =
+#if defined(__aarch64__)
+          ::llround(static_cast<double>(execute_time_ns) / 1000000);
+#else
           std::llround(static_cast<double>(execute_time_ns) / 1000000);
+#endif
       auto task = task_weak_ptr.lock();
       if (task) {
         if (this->last_execute_time_ns_ == 0) {
@@ -88,7 +92,11 @@ bool Timer::InitTimerTask() {
         if (execute_time_ms >= task->interval_ms) {
           task->next_fire_duration_ms = 1;
         } else {
+#if defined(__aarch64__)
+          int64_t accumulated_error_ms = ::llround(
+#else
           int64_t accumulated_error_ms = std::llround(
+#endif
               static_cast<double>(this->accumulated_error_ns_) / 1000000);
           if (static_cast<int64_t>(task->interval_ms - execute_time_ms - 1) >=
               accumulated_error_ms) {

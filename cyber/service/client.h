@@ -35,6 +35,15 @@
 namespace apollo {
 namespace cyber {
 
+/**
+ * @class Client
+ * @brief Client get `Response` from a responding `Service` by sending a Request
+ *
+ * @tparam Request the `Service` request type
+ * @tparam Response the `Service` response type
+ *
+ * @warning One Client can only request one Service
+ */
 template <typename Request, typename Response>
 class Client : public ClientBase {
  public:
@@ -45,6 +54,12 @@ class Client : public ClientBase {
   using SharedFuture = std::shared_future<SharedResponse>;
   using CallbackType = std::function<void(SharedFuture)>;
 
+  /**
+   * @brief Construct a new Client object
+   *
+   * @param node_name used to fill RoleAttribute
+   * @param service_name service name the Client can request
+   */
   Client(const std::string& node_name, const std::string& service_name)
       : ClientBase(service_name),
         node_name_(node_name),
@@ -52,26 +67,81 @@ class Client : public ClientBase {
         response_channel_(service_name + SRV_CHANNEL_RES_SUFFIX),
         sequence_number_(0) {}
 
+  /**
+   * @brief forbid Constructing a new Client object with empty params
+   */
   Client() = delete;
 
   virtual ~Client() {}
 
+  /**
+   * @brief Init the Client
+   *
+   * @return true if init successfully
+   * @return false if init failed
+   */
   bool Init();
 
+  /**
+   * @brief Request the Service with a shared ptr Request type
+   *
+   * @param request shared ptr of Request type
+   * @param timeout_s request timeout, if timeout, response will be empty
+   * @return SharedResponse result of this request
+   */
   SharedResponse SendRequest(
       SharedRequest request,
       const std::chrono::seconds& timeout_s = std::chrono::seconds(5));
+
+  /**
+   * @brief Request the Service with a Request object
+   *
+   * @param request Request object
+   * @param timeout_s request timeout, if timeout, response will be empty
+   * @return SharedResponse result of this request
+   */
   SharedResponse SendRequest(
       const Request& request,
       const std::chrono::seconds& timeout_s = std::chrono::seconds(5));
 
+  /**
+   * @brief Send Request shared ptr asynchronously
+   */
   SharedFuture AsyncSendRequest(SharedRequest request);
+
+  /**
+   * @brief Send Request object asynchronously
+   */
   SharedFuture AsyncSendRequest(const Request& request);
+
+  /**
+   * @brief Send Request shared ptr asynchronously and invoke `cb` after we get
+   * response
+   *
+   * @param request Request shared ptr
+   * @param cb callback function after we get response
+   * @return SharedFuture a `std::future` shared ptr
+   */
   SharedFuture AsyncSendRequest(SharedRequest request, CallbackType&& cb);
 
+  /**
+   * @brief Is the Service is ready?
+   */
   bool ServiceIsReady() const;
+
+  /**
+   * @brief destroy this Client
+   */
   void Destroy();
 
+  /**
+   * @brief wait for the connection with the Service established
+   *
+   * @tparam RatioT timeout unit, default is std::milli
+   * @param timeout wait time in unit of `RatioT`
+   * @return true if the connection established
+   * @return false if timeout
+   */
   template <typename RatioT = std::milli>
   bool WaitForService(std::chrono::duration<int64_t, RatioT> timeout =
                           std::chrono::duration<int64_t, RatioT>(-1)) {

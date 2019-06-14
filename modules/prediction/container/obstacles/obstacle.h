@@ -31,6 +31,7 @@
 #include "modules/common/filters/digital_filter.h"
 #include "modules/common/math/kalman_filter.h"
 #include "modules/map/hdmap/hdmap_common.h"
+#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/proto/feature.pb.h"
 
 /**
@@ -149,6 +150,12 @@ class Obstacle {
    * @return If the obstacle is still.
    */
   bool IsStill();
+
+  /**
+   * @brief Check if the obstacle is slow.
+   * @return If the obstacle is slow.
+   */
+  bool IsSlow();
 
   /**
    * @brief Check if the obstacle is on any lane.
@@ -289,12 +296,16 @@ class Obstacle {
 
   void SetLaneSequenceStopSign(LaneSequence* lane_sequence_ptr);
 
+  /** @brief This functions updates the lane-points into the lane-segments
+   *        based on the given lane_point_spacing.
+   */
   void SetLanePoints(Feature* feature);
-
   void SetLanePoints(const Feature* feature, const double lane_point_spacing,
                      const uint64_t max_num_lane_point,
-                     LaneGraph* const lane_graph);
+                     const bool is_bidirection, LaneGraph* const lane_graph);
 
+  /** @brief This functions is mainly for lane-sequence kappa calculation.
+   */
   void SetLaneSequencePath(LaneGraph* const lane_graph);
 
   void InitKFPedestrianTracker(const Feature& feature);
@@ -321,7 +332,7 @@ class Obstacle {
       std::unordered_set<std::string>* const existing_lane_ids);
 
  private:
-  int id_ = -1;
+  int id_ = FLAGS_ego_vehicle_id;
 
   perception::PerceptionObstacle::Type type_ =
       perception::PerceptionObstacle::UNKNOWN_UNMOVABLE;
