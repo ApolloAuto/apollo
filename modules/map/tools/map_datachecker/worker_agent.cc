@@ -56,36 +56,36 @@ MapDataCheckerAgent::get_sp_pose_collection_agent() {
 
 grpc::Status
 MapDataCheckerAgent::ChannelVerify(
-  grpc::ServerContext *context,
-  CHANNEL_VERIFY_REQUEST_TYPE *request,
-  CHANNEL_VERIFY_RESPONSE_TYPE *response) {
+    grpc::ServerContext *context,
+    CHANNEL_VERIFY_REQUEST_TYPE *request,
+    CHANNEL_VERIFY_RESPONSE_TYPE *response) {
   return _sp_channel_checker_agent->process_grpc_request(
     context, request, response);
 }
 
 grpc::Status
 MapDataCheckerAgent::StaticAlign(
-  grpc::ServerContext *context,
-  STATIC_REQUEST_TYPE *request,
-  STATIC_RESPONSE_TYPE *response) {
+    grpc::ServerContext *context,
+    STATIC_REQUEST_TYPE *request,
+    STATIC_RESPONSE_TYPE *response) {
   return _sp_static_align_agent->process_grpc_request(
     context, request, response);
 }
 
 grpc::Status
 MapDataCheckerAgent::EightRoute(
-  grpc::ServerContext *context,
-  EIGHTROUTE_REQUEST_TYPE *request,
-  EIGHTROUTE_RESPONSE_TYPE *response) {
+    grpc::ServerContext *context,
+    EIGHTROUTE_REQUEST_TYPE *request,
+    EIGHTROUTE_RESPONSE_TYPE *response) {
   return _sp_eight_route_agent->process_grpc_request(
     context, request, response);
 }
 
 grpc::Status
 MapDataCheckerAgent::LoopsVerify(
-  grpc::ServerContext *context,
-  LOOPS_VERIFY_REQUEST_TYPE *request,
-  LOOPS_VERIFY_RESPONSE_TYPE *response) {
+    grpc::ServerContext *context,
+    LOOPS_VERIFY_REQUEST_TYPE *request,
+    LOOPS_VERIFY_RESPONSE_TYPE *response) {
   return _sp_loops_verify_agent->process_grpc_request(
     context, request, response);
 }

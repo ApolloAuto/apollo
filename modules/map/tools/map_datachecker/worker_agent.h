@@ -15,6 +15,10 @@
  *****************************************************************************/
 #ifndef MODULES_MAP_TOOLS_MAP_DATACHECKER_WORKER_AGENT_H
 #define MODULES_MAP_TOOLS_MAP_DATACHECKER_WORKER_AGENT_H
+#include <grpc++/grpc++.h>
+#include <vector>
+#include <utility>
+#include <memory>
 #include "modules/map/tools/map_datachecker/alignment_agent.hpp"
 #include "modules/map/tools/map_datachecker/common.hpp"
 #include "modules/map/tools/map_datachecker/worker_cyber_node.h"
@@ -23,10 +27,6 @@
 #include "modules/map/tools/map_datachecker/loops_verify_agent.h"
 #include "modules/map/tools/map_datachecker/proto/collection_service.pb.h"
 #include "modules/map/tools/map_datachecker/proto/collection_service.grpc.pb.h"
-#include <grpc++/grpc++.h>
-#include <vector>
-#include <utility>
-#include <memory>
 
 namespace apollo {
 namespace hdmap {

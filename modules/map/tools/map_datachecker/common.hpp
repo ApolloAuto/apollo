@@ -70,60 +70,47 @@ struct JSonConf {
   std::set<unsigned int> position_type_range;
   std::pair<float, float> diff_age_range;
   double local_std_upper_limit;
-  // double local_err;
 
-  /*channel检查触发周期，单位是秒*/
+  /*Period of channel check trigger. The unit is seconds.*/
   int channel_check_trigger_gap;
-  /*对准检查周期，单位是秒。绕八字也归入对准过程*/
+  /*Period of alignment, The unit is seconds.
+  Eight route maneuver is also included in the alignment process.*/
   int alignment_featch_pose_sleep;
-  /*static alignment 对准必须持续的时间，单位是秒*/
+  /*the time that static alignment must last. The unit is seconds.*/
   double static_align_duration;
-  /*static alignment 容忍的连续bad pose持续时间，单位是秒*/
+  /*the maximum time that bad pose included in static alignment.
+  The unit is seconds.*/
   double static_align_tolerance;
-  /**/
+  /*Maximum Motion Distance Tolerated by Static Alignment*/
   double static_align_dist_thresh;
 
-  /*转弯最小角度阈值，单位是度。超过该阈值认为车辆在转弯*/
-  double dynamic_align_turn_angle;
-  /*动态对齐的角度偏差阈值，单位是度*/
-  double dynamic_align_straight_angle;
-  /*动态对准必须达到的最低速度，单位是m/s*/
-  double dynamic_align_vel;
-  /*动态对准必须持续的时间，单位是秒*/
-  double dynamic_align_duration;
-  /*动态对准错误pose容忍度，单位是帧*/
-  int dynamic_align_bad_pose_tolerance;
-  /*动态对准允许分段数*/
-  int dynamic_align_segment;
-  /*动态对准每段最小长度，单位是米*/
-  double dynamic_align_dist_per_segment;
-
-
-  /*绕八字解算相邻帧之间的角度阈值，单位是度*/
+  /*Angle threshold between adjacent frames in eight route. The unit is degree*/
   double eight_angle;
-  /*绕八字的最短时间要求，单位是秒*/
+  /*the time that eight route must last，The unit is seconds.*/
   double eight_duration;
-  /*绕八字时应达到的最低速度*/
+  /*Minimum speed should be achieved in eight route*/
   double eight_vel;
-  /*绕八字错误pose容忍度，单位是帧*/
+  /*The tolerance of bad pose in eight route. The unit is frame*/
   int eight_bad_pose_tolerance;
 
-
-  /*采集多圈的最低帧数阈值*/
+  /*Minimum frame number threshold for acquisition of multiple loops*/
   int laps_frames_thresh;
-  /*同一条轨迹上相邻帧pose的角度误差不应该大于alpha_err_thresh，单位是度*/
+  /*The angle error of adjacent poses on the same trajectory should not be
+  greater than alpha_err_thresh. The unit is degree*/
   double laps_alpha_err_thresh;
-  /*同一条轨迹上相邻帧pose的时间戳间隔不应该大于time_err_thresh，单位是分钟*/
+  /*The time stamp interval of adjacent poses on the same track should not be
+  greater than time_err_thresh. The unit is minutes.*/
   double laps_time_err_thresh;
-  /*圈数检查时搜索的正方形区域的直径*/
+  /*The diameter of the searched square area*/
   int laps_search_diameter;
-  /*要求采集的圈数*/
+  /*loops to check*/
   size_t laps_number;
-  /*校验圈数*/
+  /*addtional loops to check*/
   int laps_number_additional;
-  /*圈数检查中所有符合要求的点的比例阈值*/
+  /*Proportional thresholds for all required points
+  in acquisition cycle checking*/
   double laps_rate_thresh;
-  /*采样频率*/
+  /*sampling frequency*/
   int laps_inspva_downsample_freq;
 };
 
@@ -177,21 +164,6 @@ inline std::shared_ptr<JSonConf> parse_json(std::string conf_path) {
       = pt.get<double>("static_align_tolerance");
     conf->static_align_dist_thresh
       = pt.get<double>("static_align_dist_thresh");
-
-    conf->dynamic_align_turn_angle
-      = pt.get<double>("dynamic_align_turn_angle");
-    conf->dynamic_align_straight_angle
-      = pt.get<double>("dynamic_align_straight_angle");
-    conf->dynamic_align_vel
-      = pt.get<double>("dynamic_align_vel");
-    conf->dynamic_align_duration
-      = pt.get<double>("dynamic_align_duration");
-    conf->dynamic_align_bad_pose_tolerance
-      = pt.get<int>("dynamic_align_bad_pose_tolerance");
-    conf->dynamic_align_segment
-      = pt.get<int>("dynamic_align_segment");
-    conf->dynamic_align_dist_per_segment
-      = pt.get<double>("dynamic_align_dist_per_segment");
 
     conf->eight_angle
       = pt.get<double>("eight_angle");

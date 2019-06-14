@@ -33,7 +33,7 @@ void PoseCollectionAgent::reset() {
 }
 
 void PoseCollectionAgent::on_bestgnsspos_callback(
-  const std::shared_ptr<const apollo::drivers::gnss::GnssBestPose>
+    const std::shared_ptr<const apollo::drivers::gnss::GnssBestPose>
     &bestgnsspos) {
   if (_sp_pose_collection == nullptr) {
     _sp_pose_collection = std::make_shared<PoseCollection>(_sp_conf);
