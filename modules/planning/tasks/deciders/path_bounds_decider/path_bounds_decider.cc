@@ -322,6 +322,9 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(
     AERROR << msg;
     return msg;
   }
+  // PathBoundsDebugString(*path_bound);
+
+  ConvertBoundaryAxesFromLaneCenterToRefLine(reference_line_info, path_bound);
   if (adc_frenet_l_ < std::get<1>(path_bound->front()) ||
       adc_frenet_l_ > std::get<2>(path_bound->front())) {
     const std::string msg =
@@ -329,9 +332,6 @@ std::string PathBoundsDecider::GeneratePullOverPathBound(
     AERROR << msg;
     return msg;
   }
-  // PathBoundsDebugString(*path_bound);
-
-  ConvertBoundaryAxesFromLaneCenterToRefLine(reference_line_info, path_bound);
 
   // 3. Fine-tune the boundary based on static obstacles
   PathBound temp_path_bound = *path_bound;
