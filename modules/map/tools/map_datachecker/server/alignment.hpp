@@ -76,7 +76,7 @@ class Alignment {
         || pose_index <= 0
         || pose_index >= static_cast<int>(poses.size())) {
       AINFO << "params error. poses size:" << poses.size()
-          << ",pose_index:" << pose_index;
+            << ",pose_index:" << pose_index;
       return true;
     }
 
