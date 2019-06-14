@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include "modules/planning/common/frame.h"
 #include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/proto/decider_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -34,7 +35,7 @@ class SpeedBoundsDecider : public Decider {
   explicit SpeedBoundsDecider(const TaskConfig& config);
 
  private:
-  apollo::common::Status Process(
+  common::Status Process(
       Frame* const frame,
       ReferenceLineInfo* const reference_line_info) override;
 

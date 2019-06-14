@@ -63,7 +63,7 @@ void PathDecision::SetSTBoundary(const std::string &id,
     AERROR << "Failed to find obstacle : " << id;
     return;
   } else {
-    obstacle->SetStBoundary(boundary);
+    obstacle->set_path_st_boundary(boundary);
   }
 }
 
