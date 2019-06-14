@@ -143,6 +143,7 @@ void TranslatePoint(const double translate_x, const double translate_y,
  * @param state matrix
  * @param transition matrix
  * @param heading
+ * @param start time
  * @param total number of generated trajectory points required
  * @param trajectory point interval period
  * @param generated trajectory points
@@ -150,7 +151,7 @@ void TranslatePoint(const double translate_x, const double translate_y,
 void GenerateFreeMoveTrajectoryPoints(
     Eigen::Matrix<double, 6, 1>* state,
     const Eigen::Matrix<double, 6, 6>& transition, double theta,
-    const std::size_t num, const double period,
+    const double start_time, const std::size_t num, const double period,
     std::vector<common::TrajectoryPoint>* points);
 
 /**
