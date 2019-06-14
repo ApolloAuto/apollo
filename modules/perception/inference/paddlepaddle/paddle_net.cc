@@ -69,45 +69,25 @@ bool PaddleNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
     input_t->copy_from_cpu(input_data[index].data());
     index += 1;
   }
-  AINFO << input_shape[0];
-  AINFO << input_shape[1];
-  AINFO << input_shape[2];
-  AINFO << input_shape[3];
   CHECK(predictor_->ZeroCopyRun());
   for (auto name : output_names_) {
     AINFO << name;
     if (name_map_.find(name) == name_map_.end()) {
       continue;
     }
-    AINFO << name;
     auto paddle_blob = predictor_->GetOutputTensor(name_map_[name]);
-    AINFO << name;
     std::shared_ptr<apollo::perception::base::Blob<float>> blob;
-    AINFO << name;
     blob.reset(new apollo::perception::base::Blob<float>(paddle_blob->shape()));
-    AINFO << name;
-    AINFO << name_map_[name];
-    AINFO << paddle_blob->shape()[0];
-    AINFO << paddle_blob->shape()[1];
-    AINFO << paddle_blob->shape()[2];
-    AINFO << paddle_blob->shape()[3];
     blobs_.insert(std::make_pair(name, blob));
-    AINFO << name;
   }
   for (auto name : input_names_) {
-    AINFO << name;
     auto paddle_blob = predictor_->GetInputTensor(name_map_[name]);
-    AINFO << name;
     if (paddle_blob == nullptr) {
       continue;
     }
-    AINFO << name;
     std::shared_ptr<apollo::perception::base::Blob<float>> blob;
-    AINFO << name;
     blob.reset(new apollo::perception::base::Blob<float>(paddle_blob->shape()));
-    AINFO << name;
     blobs_.insert(std::make_pair(name, blob));
-    AINFO << name;
   }
   return true;
 }
@@ -161,15 +141,10 @@ void PaddleNet::Infer() {
   // `out_blob->gpu_data()` will set HEAD to SYNCED,
   // then no copy happends after `enqueue`.
   for (auto name : output_names_) {
-    AINFO << "check2";
-    AINFO << name;
     auto blob = get_blob(name);
     if (blob != nullptr) {
-      AINFO << "check3";
       blob->gpu_data();
-      AINFO << "check3";
     }
-    AINFO << "check4";
   }
 
   predictor_->ZeroCopyRun();
@@ -177,7 +152,6 @@ void PaddleNet::Infer() {
     if (name_map_.find(name) == name_map_.end()) {
       continue;
     }
-    AINFO << name;
     auto blob = get_blob(name);
     auto paddle_blob = predictor_->GetOutputTensor(name_map_[name]);
     if (paddle_blob != nullptr && blob != nullptr) {
@@ -188,19 +162,12 @@ void PaddleNet::Infer() {
                                   paddle_blob_shape.end(),
                                   1,
                                   std::multiplies<int>());
-       AINFO << name;
-       AINFO << name_map_[name];
-       AINFO << paddle_blob_shape[0];
-       AINFO << paddle_blob_shape[1];
-       AINFO << paddle_blob_shape[2];
-       AINFO << paddle_blob_shape[3];
       //int output_size;
       //paddle::PaddlePlace* place;
       cudaMemcpy(blob->mutable_gpu_data(),
                  paddle_blob->mutable_data<float>(paddle::PaddlePlace::kGPU),
                                           //&output_size),
                  count * sizeof(float), cudaMemcpyDeviceToDevice);
-      AINFO << name;
     }
   }
 }

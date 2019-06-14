@@ -69,7 +69,7 @@ class PaddleNet : public Inference {
 
   std::unordered_map<std::string, std::string> name_map_ = {
     {"data", "input"},
-    {"detect1_obj_pred", "save_infer_model/scale_13"},
+    {"detect1_obj_pred", "save_infer_model/scale_0"},
     {"detect1_cls_pred", "save_infer_model/scale_1"},
     {"detect1_ori_pred", "save_infer_model/scale_2"},
     {"detect1_dim_pred", "save_infer_model/scale_3"},
@@ -82,8 +82,17 @@ class PaddleNet : public Inference {
 //    {"vis_pred", "save_infer_model/scale_10"},
 //    {"area_id_perm_reshape", "save_infer_model/scale_11"},
 //    {"cut_pred", "save_infer_model/scale_12"},
-    {"detect1_loc_pred", "save_infer_model/scale_0"},
-    {"conv3_3", "save_infer_model/scale_14"}
+    {"detect1_loc_pred", "save_infer_model/scale_13"},
+    {"conv3_3", "save_infer_model/scale_14"},
+    // lane line
+    {"softmax", "save_infer_model/scale_0"},
+    // lidar cnn_seg
+    {"confidence_score", "save_infer_model/scale_0"},
+    {"class_score", "save_infer_model/scale_1"},
+    {"category_score", "save_infer_model/scale_2"},
+    {"instance_pt", "save_infer_model/scale_3"},
+    {"heading_pt", "save_infer_model/scale_4"},
+    {"height_pt", "save_infer_model/scale_5"}
     };
 };
 
