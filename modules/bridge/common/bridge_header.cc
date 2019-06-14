@@ -31,7 +31,7 @@ bool BridgeHeader::Serialize(char *buf, size_t size) {
   p_header_size = cursor;
   cursor += sizeof(size_t) + 1;
   for (int i = 0; i < Header_Tail; i++) {
-    cursor = header_item[i]->SerializeItem(cursor, size, &header_size_);
+    cursor = header_item[i]->SerializeItem(cursor, size);
   }
 
   if (!SerializeHeaderSize(p_header_size, size)) {
@@ -40,19 +40,11 @@ bool BridgeHeader::Serialize(char *buf, size_t size) {
   return true;
 }
 
-bool BridgeHeader::Diserialize(const char *buf) {
-  if (!IsAvailable(buf)) {
-    return false;
-  }
-  const char *cursor = buf + sizeof(BRIDGE_HEADER_FLAG) + 1;
+bool BridgeHeader::Diserialize(const char *buf, size_t buf_size) {
+  const char *cursor = buf;
 
-  if (!DiserializeBasicType<size_t, sizeof(size_t)>(&header_size_, cursor)) {
-    return false;
-  }
-  cursor += sizeof(size_t) + 1;
-
-  size_t i = header_size_ - sizeof(BRIDGE_HEADER_FLAG) - sizeof(size_t) - 2;
-  while (i >= 0) {
+  size_t i = buf_size;
+  while (i > 0) {
     HType type = *(reinterpret_cast<const HType *>(cursor));
     if (type > Header_Tail || type < 0) {
       cursor += sizeof(HType) + 1;
@@ -60,15 +52,15 @@ bool BridgeHeader::Diserialize(const char *buf) {
       cursor += sizeof(size_t) + size + 2;
       i -= sizeof(HType) + sizeof(size_t) + size + 3;
       continue;
-    } else {
-      size_t value_size = 0;
-      for (int i = 0; i < Header_Tail; i++) {
-        if (type == header_item[i]->GetType()) {
-          cursor = header_item[i]->DiserializeItem(cursor, &value_size);
-        }
-      }
-      i -= value_size;
     }
+    size_t value_size = 0;
+    for (int j = 0; j < Header_Tail; j++) {
+      if (type == header_item[j]->GetType()) {
+        cursor = header_item[j]->DiserializeItem(cursor, &value_size);
+        break;
+      }
+    }
+    i -= value_size;
   }
   return true;
 }
@@ -92,7 +84,8 @@ char *BridgeHeader::SerializeHeaderFlag(char *buf, size_t size) {
 }
 
 char *BridgeHeader::SerializeHeaderSize(char *buf, size_t size) {
-  return SerializeBasicType<size_t, sizeof(size_t)>(&header_size_, buf, size);
+  size_t header_size = GetHeaderSize();
+  return SerializeBasicType<size_t, sizeof(size_t)>(&header_size, buf, size);
 }
 
 }  // namespace bridge

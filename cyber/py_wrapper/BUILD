@@ -97,6 +97,24 @@ cc_library(
 )
 
 cc_binary(
+    name = "_cyber_parameter.so",
+    linkshared = True,
+    deps = [
+        ":py_parameter",
+    ],
+)
+
+cc_library(
+    name = "py_parameter",
+    srcs = ["cyber_parameter_wrap.cc"],
+    hdrs = ["py_parameter.h", "py_node.h"],
+    deps = [
+        "//cyber:cyber_core",
+        "@python27",
+    ],
+)
+
+cc_binary(
     name = "_cyber_topology_manager.so",
     linkshared = True,
     linkstatic = False,

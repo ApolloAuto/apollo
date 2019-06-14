@@ -170,15 +170,15 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
                                         FLAGS_lateral_derivative_bound_default);
   piecewise_jerk_problem.set_dddx_bound(FLAGS_lateral_jerk_bound);
 
-  /**
-  // Experimental code to be tested
-  // TODO(all): find the params in vehicle config
-  double axis_distance = 2.5;
-  double max_steering_rate = 1.0 / 6.0 * M_PI;
-  double jerk_bound = EstimateJerkBoundary(std::fmax(init_state[1], 1.0),
-      axis_distance, max_steering_rate);
+  // Estimate jerk boundary from vehicle_params
+  const auto& veh_param =
+      common::VehicleConfigHelper::GetConfig().vehicle_param();
+  const double axis_distance = veh_param.wheel_base();
+  const double max_yaw_rate = veh_param.max_steer_angle_rate() /
+                              veh_param.steer_ratio();
+  const double jerk_bound = EstimateJerkBoundary(std::fmax(init_state[1], 1.0),
+      axis_distance, max_yaw_rate);
   piecewise_jerk_problem.set_dddx_bound(jerk_bound);
-  **/
 
   bool success = piecewise_jerk_problem.Optimize(max_iter);
 
@@ -236,8 +236,8 @@ FrenetFramePath PiecewiseJerkPathOptimizer::ToPiecewiseJerkPath(
 
 double PiecewiseJerkPathOptimizer::EstimateJerkBoundary(
     const double vehicle_speed, const double axis_distance,
-    const double max_steering_rate) const {
-  return max_steering_rate / axis_distance / vehicle_speed;
+    const double max_yaw_rate) const {
+  return max_yaw_rate / axis_distance / vehicle_speed;
 }
 
 }  // namespace planning

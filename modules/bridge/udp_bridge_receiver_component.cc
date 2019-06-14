@@ -33,12 +33,14 @@ UDPBridgeReceiverComponent<T>::~UDPBridgeReceiverComponent() {
   if (session_) {
     session_->Close();
   }
+  for (auto proto : proto_list_) {
+    FREE_POINTER(proto);
+  }
 }
 
 template <typename T>
 bool UDPBridgeReceiverComponent<T>::Init() {
   AINFO << "UDP bridge receiver init, startin..";
-  buf_.reset(_1K);
   apollo::bridge::UDPBridgeReceiverRemoteInfo udp_bridge_remote;
   if (!this->GetProtoConfig(&udp_bridge_remote)) {
     AINFO << "load udp bridge component proto param failed";
@@ -66,7 +68,7 @@ bool UDPBridgeReceiverComponent<T>::InitSession(uint16_t port) {
   addr.sin_port = htons(port);
 
   session_->Socket(AF_INET, SOCK_DGRAM, 0);
-  if (session_->Bind((struct sockaddr*)&addr, sizeof(addr)) < 0) {
+  if (session_->Bind((struct sockaddr *)&addr, sizeof(addr)) < 0) {
     AINFO << "bind prot [" << port << "] failed";
     session_->Close();
     return false;
@@ -79,30 +81,54 @@ bool UDPBridgeReceiverComponent<T>::MsgHandle() {
   struct sockaddr_in client_addr;
   socklen_t sock_len = static_cast<socklen_t>(sizeof(client_addr));
   int bytes = 0;
-  buf_.reset(_1K);
 
-  char header_size[sizeof(size_t)] = {0};
-  bytes = static_cast<int>(session_->RecvFrom(header_size, sizeof(header_size),
-                                              0, (struct sockaddr*)&client_addr,
-                                              &sock_len));
-  if (bytes <= 0) {
+  char header_flag[sizeof(BRIDGE_HEADER_FLAG) + 1] = {0};
+  bytes = static_cast<int>(session_->RecvFrom(header_flag,
+    sizeof(header_flag) + 1, 0, (struct sockaddr*)&client_addr,
+    &sock_len));
+  if (bytes != sizeof(BRIDGE_HEADER_FLAG) + 1 ||
+    strcmp(header_flag, BRIDGE_HEADER_FLAG) != 0) {
     return false;
   }
-  int msg_len = GetProtoSize(header_size, sizeof(size_t));
-  if (msg_len <= 0) {
+  char header_size_buf[sizeof(size_t) + 1] = {0};
+  bytes = static_cast<int>(session_->RecvFrom(header_size_buf,
+    sizeof(size_t) + 1, 0, (struct sockaddr*)&client_addr, &sock_len));
+  if (bytes != sizeof(size_t) + 1) {
+    return false;
+  }
+  size_t header_size = *reinterpret_cast<size_t *>(header_size_buf);
+  if (header_size == 0) {
+    return false;
+  }
+  char *header_buf = new char[header_size];
+  bytes = static_cast<int>(session_->RecvFrom(header_buf, header_size,
+    0, (struct sockaddr*)&client_addr, &sock_len));
+  if (bytes !=  header_size) {
     return false;
   }
 
-  buf_.reset(msg_len);
-  bytes = static_cast<int>(session_->RecvFrom(
-      buf_, buf_.capacity(), 0, (struct sockaddr*)&client_addr, &sock_len));
-  if (bytes <= 0 || bytes != msg_len) {
+  BridgeHeader header;
+  if (!header.Diserialize(header_buf, header_size)) {
+    FREE_ARRY(header_buf);
+    return false;
+  }
+  FREE_ARRY(header_buf);
+  BridgeProtoDiserializedBuf<T> *proto_buf = CreateBridgeProtoBuf(header);
+
+  if (!proto_buf) {
     return false;
   }
 
-  auto pb_msg = std::make_shared<T>();
-  pb_msg->ParseFromArray(buf_, msg_len);
-  writer_->Write(pb_msg);
+  char *buf = proto_buf->GetBuf(header.GetFramePos());
+  bytes = static_cast<int>(session_->RecvFrom(buf, header.GetFrameSize(),
+    0, (struct sockaddr*)&client_addr, &sock_len));
+  proto_buf->UpdateStatus(header.GetIndex());
+  if (proto_buf->IsReadyDiserialize()) {
+    auto pb_msg = std::make_shared<T>();
+    proto_buf->Diserialized(pb_msg);
+    writer_->Write(pb_msg);
+    RemoveItem(&proto_list_, proto_buf);
+  }
   return true;
 }
 
@@ -116,6 +142,33 @@ void UDPBridgeReceiverComponent<T>::MsgDispatcher() {
         session_->Close();
       },
       "bridge_server");
+}
+
+template <typename T>
+BridgeProtoDiserializedBuf<T> *UDPBridgeReceiverComponent<T>::
+  CreateBridgeProtoBuf(const BridgeHeader &header) {
+  for (auto proto : proto_list_) {
+    if (proto->IsTheProto(header)) {
+      return proto;
+    }
+  }
+  BridgeProtoDiserializedBuf<T> *proto_buf = new BridgeProtoDiserializedBuf<T>;
+  if (!proto_buf) {
+    return nullptr;
+  }
+  proto_buf->Initialize(header);
+  proto_list_.push_back(proto_buf);
+  return proto_buf;
+}
+
+template <typename T>
+bool UDPBridgeReceiverComponent<T>::IsProtoExist(const BridgeHeader &header) {
+  for (auto proto : proto_list_) {
+    if (proto->IsTheProto(header)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 BRIDGE_RECV_IMPL(canbus::Chassis);

@@ -106,6 +106,17 @@ void Scheduler::ParseCpuset(const std::string& str, std::vector<int>* cpuset) {
   }
 }
 
+void Scheduler::ProcessLevelResourceControl() {
+  std::vector<int> cpus;
+  ParseCpuset(process_level_cpuset_, &cpus);
+  cpu_set_t set;
+  CPU_ZERO(&set);
+  for (const auto cpu : cpus) {
+    CPU_SET(cpu, &set);
+  }
+  pthread_setaffinity_np(pthread_self(), sizeof(set), &set);
+}
+
 void Scheduler::SetInnerThreadAttr(const std::string& name, std::thread* thr) {
   if (thr != nullptr && inner_thr_confs_.find(name) != inner_thr_confs_.end()) {
     auto th_conf = inner_thr_confs_[name];

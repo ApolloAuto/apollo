@@ -16,7 +16,8 @@ message SchedulerConf {
   optional string policy = 1;
   optional uint32 routine_num = 2;
   optional uint32 default_proc_num = 3;
-  repeated InnerThread threads = 4;
-  optional ClassicConf classic_conf = 5;
-  optional ChoreographyConf choreography_conf = 6;
+  optional string process_level_cpuset = 4;
+  repeated InnerThread threads = 5;
+  optional ClassicConf classic_conf = 6;
+  optional ChoreographyConf choreography_conf = 7;
 }

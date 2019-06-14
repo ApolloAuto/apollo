@@ -53,9 +53,14 @@ cc_library(
 
 cc_library(
     name = "swap",
-    srcs = [
-        "detail/swap.S",
-    ],
+    srcs = select({
+        ":x86_mode": [
+            "detail/swap_x86_64.S",
+        ],
+        ":arm_mode": [
+            "detail/swap_aarch64.S",
+        ],
+    }),
 )
 
 cc_test(
@@ -68,6 +73,16 @@ cc_test(
         "//cyber",
         "@gtest//:main",
     ],
+)
+
+config_setting(
+    name = "x86_mode",
+    values = {"cpu": "k8"},
+)
+
+config_setting(
+    name = "arm_mode",
+    values = {"cpu": "arm"},
 )
 
 cpplint()

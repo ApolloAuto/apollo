@@ -220,14 +220,13 @@ void AddObstacle(ObstacleContainer* obstacles_ptr,
   obstacles_ptr->AddObstacle(ROI_distance_approach_parking_boundary);
 }
 
-double InterpolateUsingLinearApproximation(const double p0,
-                                           const double p1,
+double InterpolateUsingLinearApproximation(const double p0, const double p1,
                                            const double w) {
   return p0 * (1.0 - w) + p1 * w;
 }
 
-std::vector<double> VectorLinearInterpolation(
-    const std::vector<double>& x, int extend_size) {
+std::vector<double> VectorLinearInterpolation(const std::vector<double>& x,
+                                              int extend_size) {
   // interplation example:
   // x: [x0, x1, x2], extend_size: 3
   // output: [y0(x0), y1, y2, y3(x1), y4, y5, y6(x2)]
@@ -237,8 +236,8 @@ std::vector<double> VectorLinearInterpolation(
   for (size_t i = 0; i < origin_last * extend_size; ++i) {
     size_t idx0 = i / extend_size;
     size_t idx1 = idx0 + 1;
-    double w = static_cast<double>(i % extend_size) /
-        static_cast<double>(extend_size);
+    double w =
+        static_cast<double>(i % extend_size) / static_cast<double>(extend_size);
     res[i] = InterpolateUsingLinearApproximation(x[idx0], x[idx1], w);
   }
 
@@ -266,8 +265,7 @@ bool DistanceSmoothing(
   Eigen::VectorXd a;
 
   // TODO(Runxin): extend logics in future
-  if (horizon_ <= 10 &&
-      horizon_ > 2 &&
+  if (horizon_ <= 10 && horizon_ > 2 &&
       planner_open_space_config.enable_linear_interpolation()) {
     // TODO(Runxin): extend this number
     int extend_size = 5;
@@ -278,23 +276,23 @@ bool DistanceSmoothing(
 
     std::vector<double> x_extend =
         VectorLinearInterpolation(hybrid_a_star_result->x, extend_size);
-    x = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-        x_extend.data(), horizon_ + 1);
+    x = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(x_extend.data(),
+                                                      horizon_ + 1);
 
     std::vector<double> y_extend =
         VectorLinearInterpolation(hybrid_a_star_result->y, extend_size);
-    y = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-        y_extend.data(), horizon_ + 1);
+    y = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(y_extend.data(),
+                                                      horizon_ + 1);
 
     std::vector<double> phi_extend =
         VectorLinearInterpolation(hybrid_a_star_result->phi, extend_size);
-    phi = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-        phi_extend.data(), horizon_ + 1);
+    phi = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(phi_extend.data(),
+                                                        horizon_ + 1);
 
     std::vector<double> v_extend =
         VectorLinearInterpolation(hybrid_a_star_result->v, extend_size);
-    v = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-        v_extend.data(), horizon_ + 1);
+    v = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(v_extend.data(),
+                                                      horizon_ + 1);
 
     steer = Eigen::VectorXd(horizon_);
     a = Eigen::VectorXd(horizon_);

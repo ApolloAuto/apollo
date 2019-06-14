@@ -16,7 +16,6 @@ import "modules/planning/proto/path_lane_borrow_decider_config.proto";
 import "modules/planning/proto/piecewise_jerk_path_config.proto";
 import "modules/planning/proto/piecewise_jerk_speed_config.proto";
 import "modules/planning/proto/proceed_with_caution_speed_config.proto";
-import "modules/planning/proto/planner_open_space_config.proto";
 import "modules/planning/proto/rule_based_stop_decider_config.proto";
 import "modules/planning/proto/speed_bounds_decider_config.proto";
 import "modules/planning/proto/navi_path_decider_config.proto";

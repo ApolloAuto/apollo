@@ -3,7 +3,7 @@ options:
         display: true
     axes:
         x:
-            labelString: 'timestampe (sec)'
+            labelString: 'timestamp (sec)'
         y:
             labelString: 'latency (ms)'
 properties:

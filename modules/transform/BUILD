@@ -13,6 +13,7 @@ cc_library(
     ],
     deps = [
         "//cyber",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/transform/proto:transform_proto",
     ],
 )
@@ -27,6 +28,7 @@ cc_library(
     ],
     deps = [
         "//cyber",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/transform/proto:transform_proto",
     ],
 )
@@ -42,6 +44,7 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"static_transform\\"'],
     deps = [
         "//cyber",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/transform/proto:static_transform_conf_proto",
         "//modules/transform/proto:transform_proto",
         "@yaml_cpp//:yaml",

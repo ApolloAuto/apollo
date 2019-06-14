@@ -27,10 +27,7 @@ git submodule init
 git submodule update
 patch -p1 < ../FastRTPS_1.5.0.patch
 mkdir -p build && cd build
-cmake -DTHIRDPARTY=ON -DCMAKE_INSTALL_PREFIX=./external/install ../
+cmake -DEPROSIMA_BUILD=ON -DCMAKE_INSTALL_PREFIX=/usr/local/fast-rtps ../
 make -j 8
 make install
-rm -rf /usr/local/fast-rtps
-mv ./external/install /usr/local/fast-rtps
 popd
-

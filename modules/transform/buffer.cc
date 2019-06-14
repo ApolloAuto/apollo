@@ -17,6 +17,7 @@
 #include "modules/transform/buffer.h"
 
 #include "cyber/cyber.h"
+#include "modules/common/adapters/adapter_gflags.h"
 
 namespace apollo {
 namespace transform {
@@ -37,7 +38,7 @@ int Buffer::Init() {
       });
 
   apollo::cyber::proto::RoleAttributes attr_static;
-  attr_static.set_channel_name("/tf_static");
+  attr_static.set_channel_name(FLAGS_tf_static_topic);
   attr_static.mutable_qos_profile()->CopyFrom(
       apollo::cyber::transport::QosProfileConf::QOS_PROFILE_TF_STATIC);
   message_subscriber_tf_static_ = node_->CreateReader<TransformStampeds>(

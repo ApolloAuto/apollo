@@ -16,6 +16,8 @@
 
 #include "modules/transform/transform_broadcaster.h"
 
+#include "modules/common/adapters/adapter_gflags.h"
+
 namespace apollo {
 namespace transform {
 
@@ -23,7 +25,7 @@ TransformBroadcaster::TransformBroadcaster(
     const std::shared_ptr<cyber::Node>& node)
     : node_(node) {
   cyber::proto::RoleAttributes attr;
-  attr.set_channel_name("/tf");
+  attr.set_channel_name(FLAGS_tf_topic);
   writer_ = node_->CreateWriter<TransformStampeds>(attr);
 }
 

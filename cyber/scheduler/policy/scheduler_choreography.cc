@@ -52,6 +52,12 @@ SchedulerChoreography::SchedulerChoreography() {
     for (auto& thr : cfg.scheduler_conf().threads()) {
       inner_thr_confs_[thr.name()] = thr;
     }
+
+    if (cfg.scheduler_conf().has_process_level_cpuset()) {
+      process_level_cpuset_ = cfg.scheduler_conf().process_level_cpuset();
+      ProcessLevelResourceControl();
+    }
+
     const apollo::cyber::proto::ChoreographyConf& choreography_conf =
         cfg.scheduler_conf().choreography_conf();
     proc_num_ = choreography_conf.choreography_processor_num();
@@ -94,7 +100,7 @@ void SchedulerChoreography::CreateProcessor() {
     auto ctx = std::make_shared<ChoreographyContext>();
 
     proc->BindContext(ctx);
-    proc->SetAffinity(choreography_cpuset_, choreography_affinity_, i);
+    proc->SetSchedAffinity(choreography_cpuset_, choreography_affinity_, i);
     proc->SetSchedPolicy(choreography_processor_policy_,
                          choreography_processor_prio_);
     pctxs_.emplace_back(ctx);
@@ -106,7 +112,7 @@ void SchedulerChoreography::CreateProcessor() {
     auto ctx = std::make_shared<ClassicContext>();
 
     proc->BindContext(ctx);
-    proc->SetAffinity(pool_cpuset_, pool_affinity_, i);
+    proc->SetSchedAffinity(pool_cpuset_, pool_affinity_, i);
     proc->SetSchedPolicy(pool_processor_policy_, pool_processor_prio_);
     pctxs_.emplace_back(ctx);
     processors_.emplace_back(proc);

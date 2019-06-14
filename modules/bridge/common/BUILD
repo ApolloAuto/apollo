@@ -32,6 +32,7 @@ cc_library(
     ],
     deps = [
         ":bridge_buffer",
+        ":macro",
     ],
 )
 
@@ -39,6 +40,20 @@ cc_library(
     name = "macro",
     hdrs = [
         "macro.h",
+    ],
+)
+
+cc_library(
+    name = "bridge_proto_serialized_buf",
+    hdrs = [
+        "bridge_proto_serialized_buf.h",
+    ],
+)
+
+cc_library(
+    name = "bridge_proto_diserialized_buf",
+    hdrs = [
+        "bridge_proto_diserialized_buf.h",
     ],
 )
 
@@ -63,6 +78,19 @@ cc_test(
         ":bridge_buffer",
         "@gtest//:main",
     ],
+)
+
+cc_test(
+    name = "bridge_proto_buf_test",
+    size = "small",
+    srcs = [
+        "bridge_proto_buf_test.cc",
+    ],
+    deps = [
+        "//modules/bridge:udp_bridge",
+        "@gtest//:main",
+    ],
+
 )
 
 cpplint()

@@ -48,10 +48,10 @@ class OpenSpacePreStopDecider : public Decider {
                             double* target_s);
 
   void SetParkingSpotStopFence(const double target_s, Frame* const frame,
-                    ReferenceLineInfo* const reference_line_info);
+                               ReferenceLineInfo* const reference_line_info);
 
   void SetPullOverStopFence(const double target_s, Frame* const frame,
-                    ReferenceLineInfo* const reference_line_info);
+                            ReferenceLineInfo* const reference_line_info);
 
  private:
   static constexpr const char* OPEN_SPACE_STOP_ID = "OPEN_SPACE_PRE_STOP";

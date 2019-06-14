@@ -411,9 +411,6 @@ Status MPCController::ComputeControlCommand(
                        steer_angle_feedforwardterm_updated_ +
                        steer_angle_ff_compensation;
 
-  // Clamp the steer angle to -100.0 to 100.0
-  steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
-
   if (FLAGS_set_steer_limit) {
     const double steer_limit =
         std::atan(max_lat_acc_ * wheelbase_ /
@@ -421,16 +418,17 @@ Status MPCController::ComputeControlCommand(
                    VehicleStateProvider::Instance()->linear_velocity())) *
         steer_ratio_ * 180 / M_PI / steer_single_direction_max_degree_ * 100;
 
-    // Clamp the steer angle
+    // Clamp the steer angle with steer limitations at current speed
     double steer_angle_limited =
         common::math::Clamp(steer_angle, -steer_limit, steer_limit);
     steer_angle_limited = digital_filter_.Filter(steer_angle_limited);
-    cmd->set_steering_target(steer_angle_limited);
+    steer_angle = steer_angle_limited;
     debug->set_steer_angle_limited(steer_angle_limited);
-  } else {
-    steer_angle = digital_filter_.Filter(steer_angle);
-    cmd->set_steering_target(steer_angle);
   }
+  steer_angle = digital_filter_.Filter(steer_angle);
+  // Clamp the steer angle to -100.0 to 100.0
+  steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
+  cmd->set_steering_target(steer_angle);
 
   debug->set_acceleration_cmd_closeloop(acc_feedback);
 

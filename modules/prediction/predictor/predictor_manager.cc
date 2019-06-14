@@ -25,6 +25,7 @@
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_thread_pool.h"
 #include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/predictor/empty/empty_predictor.h"
 #include "modules/prediction/predictor/extrapolation/extrapolation_predictor.h"
 #include "modules/prediction/predictor/free_move/free_move_predictor.h"
 #include "modules/prediction/predictor/interaction/interaction_predictor.h"
@@ -128,7 +129,9 @@ void PredictorManager::Init(const PredictionConf& config) {
         }
         break;
       }
-      default: { break; }
+      default: {
+        break;
+      }
     }
   }
 
@@ -267,7 +270,10 @@ void PredictorManager::PredictObstacle(
   } else {
     switch (obstacle->type()) {
       case PerceptionObstacle::VEHICLE: {
-        if (obstacle->HasJunctionFeatureWithExits() &&
+        if (obstacle->IsSlow()) {
+          predictor = GetPredictor(ObstacleConf::FREE_MOVE_PREDICTOR);
+          CHECK_NOTNULL(predictor);
+        } else if (obstacle->HasJunctionFeatureWithExits() &&
             !obstacle->IsCloseToJunctionExit()) {
           predictor = GetPredictor(vehicle_in_junction_predictor_);
           CHECK_NOTNULL(predictor);
@@ -311,10 +317,10 @@ void PredictorManager::PredictObstacle(
       CHECK_NOTNULL(adc_trajectory_container);
       predictor->TrimTrajectories(*adc_trajectory_container, obstacle);
     }
-    for (const auto& trajectory :
-         obstacle->latest_feature().predicted_trajectory()) {
-      prediction_obstacle->add_trajectory()->CopyFrom(trajectory);
-    }
+  }
+  for (const auto& trajectory :
+       obstacle->latest_feature().predicted_trajectory()) {
+    prediction_obstacle->add_trajectory()->CopyFrom(trajectory);
   }
   prediction_obstacle->set_timestamp(obstacle->timestamp());
   prediction_obstacle->mutable_priority()->CopyFrom(
@@ -361,7 +367,13 @@ std::unique_ptr<Predictor> PredictorManager::CreatePredictor(
       predictor_ptr.reset(new InteractionPredictor());
       break;
     }
-    default: { break; }
+    case ObstacleConf::EMPTY_PREDICTOR: {
+      predictor_ptr.reset(new EmptyPredictor());
+      break;
+    }
+    default: {
+      break;
+    }
   }
   return predictor_ptr;
 }

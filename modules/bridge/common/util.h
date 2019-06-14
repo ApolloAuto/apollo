@@ -19,7 +19,9 @@
 #include <cstring>
 #include <memory>
 #include <string>
+#include <vector>
 #include "modules/bridge/common/bridge_buffer.h"
+#include "modules/bridge/common/macro.h"
 
 namespace apollo {
 namespace bridge {
@@ -40,6 +42,23 @@ void WriteToBuffer(BridgeBuffer<char> *buf, const std::shared_ptr<T> &pb_msg) {
                            static_cast<int>(msg_len));
 }
 
+template <typename T>
+bool RemoveItem(std::vector<T *> *list, const T *t) {
+  if (!list) {
+    return false;
+  }
+  typename std::vector<T *>::iterator itor = list->begin();
+  for (; itor != list->end();) {
+    if (*itor == t) {
+      T *tmp = *itor;
+      FREE_POINTER(tmp);
+      itor = list->erase(itor);
+      continue;
+    }
+    ++itor;
+  }
+  return true;
+}
 int GetProtoSize(const char *buf, size_t size);
 
 }  // namespace bridge

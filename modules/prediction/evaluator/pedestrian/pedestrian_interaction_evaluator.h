@@ -22,8 +22,8 @@
 #pragma once
 
 #include <memory>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "torch/script.h"
@@ -82,20 +82,15 @@ class PedestrianInteractionEvaluator : public Evaluator {
 
   torch::Tensor GetSocialPooling();
 
-  apollo::common::Point3D PredictNextPosition(const int obstacle_id,
-      const double pos_x, const double pos_y,
-      const torch::Tensor& social_embedding);
-
  private:
   std::unordered_map<int, LSTMState> obstacle_id_lstm_state_map_;
-  std::shared_ptr<torch::jit::script::Module>
-      torch_position_embedding_ptr_ = nullptr;
-  std::shared_ptr<torch::jit::script::Module>
-      torch_social_embedding_ptr_ = nullptr;
-  std::shared_ptr<torch::jit::script::Module>
-      torch_single_lstm_ptr_ = nullptr;
-  std::shared_ptr<torch::jit::script::Module>
-      torch_prediction_layer_ptr_ = nullptr;
+  std::shared_ptr<torch::jit::script::Module> torch_position_embedding_ptr_ =
+      nullptr;
+  std::shared_ptr<torch::jit::script::Module> torch_social_embedding_ptr_ =
+      nullptr;
+  std::shared_ptr<torch::jit::script::Module> torch_single_lstm_ptr_ = nullptr;
+  std::shared_ptr<torch::jit::script::Module> torch_prediction_layer_ptr_ =
+      nullptr;
   torch::Device device_;
 
   static const int kGridSize = 2;

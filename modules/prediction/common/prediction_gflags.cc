@@ -102,12 +102,14 @@ DEFINE_double(still_pedestrian_speed_threshold, 0.2,
               "Speed threshold for still pedestrians");
 DEFINE_double(still_unknown_speed_threshold, 0.5,
               "Speed threshold for still unknown obstacles");
-DEFINE_double(still_obstacle_position_std, 1.0,
+DEFINE_double(still_obstacle_position_std, 0.5,
               "Position standard deviation for still obstacles");
 DEFINE_double(still_pedestrian_position_std, 0.5,
               "Position standard deviation for still pedestrians");
 DEFINE_double(still_unknown_position_std, 0.5,
               "Position standard deviation for still unknown obstacles");
+DEFINE_double(slow_obstacle_speed_threshold, 2.0,
+              "Speed threshold for slow obstacles");
 DEFINE_double(max_history_time, 7.0, "Obstacles' maximal historical time.");
 DEFINE_double(target_lane_gap, 2.0, "Gap between two lane points.");
 DEFINE_double(dense_lane_gap, 0.2,
@@ -164,6 +166,18 @@ DEFINE_string(torch_pedestrian_interaction_prediction_layer_file,
               "/apollo/modules/prediction/data/"
               "pedestrian_interaction_prediction_layer.pt",
               "pedestrian interaction prediction layer");
+DEFINE_string(torch_lane_aggregating_obstacle_encoding_file,
+              "/apollo/modules/prediction/data/"
+              "lane_aggregating_obstacle_encoding_layer.pt",
+              "lane aggregating obstacle encoding layer");
+DEFINE_string(torch_lane_aggregating_lane_encoding_file,
+              "/apollo/modules/prediction/data/"
+              "lane_aggregating_lane_encoding_layer.pt",
+              "lane aggregating lane encoding layer");
+DEFINE_string(torch_lane_aggregating_prediction_layer_file,
+              "/apollo/modules/prediction/data/"
+              "lane_aggregating_prediction_layer.pt",
+              "lane aggregating prediction layer");
 DEFINE_int32(max_num_obstacles, 300,
              "maximal number of obstacles stored in obstacles container.");
 DEFINE_double(valid_position_diff_threshold, 0.5,
@@ -274,9 +288,9 @@ DEFINE_bool(use_bell_curve_for_cost_function, false,
 // interaction predictor
 DEFINE_double(collision_cost_time_resolution, 1.0,
               "The time resolution used to compute the collision cost");
-DEFINE_double(longitudinal_acceleration_cost_weight, 0.0,
+DEFINE_double(longitudinal_acceleration_cost_weight, 0.2,
               "The weight of longitudinal acceleration cost");
-DEFINE_double(centripedal_acceleration_cost_weight, 0.0,
+DEFINE_double(centripedal_acceleration_cost_weight, 0.1,
               "The weight of the cost related to centripedal acceleration");
 DEFINE_double(collision_cost_weight, 1.0,
               "The weight of the cost related to collision");

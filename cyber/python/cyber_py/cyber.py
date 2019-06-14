@@ -444,3 +444,27 @@ class NodeUtils(object):
     # @return node's writer channel names.
     def get_writersofnode(node_name, sleep_s=2):
         return _CYBER_NODE.PyNodeUtils_get_writersofnode(node_name, sleep_s)
+
+
+class ServiceUtils(object):
+
+    @staticmethod
+    ##
+    # @brief Get all active service names.
+    #
+    # @param sleep_s wait time for topo discovery.
+    #
+    # @return all active service names.
+    def get_services(sleep_s=2):
+        return _CYBER_NODE.PyServiceUtils_get_active_services(sleep_s)
+
+    @staticmethod
+    ##
+    # @brief Get service attribute by the service name.
+    #
+    # @param node_name service name.
+    # @param sleep_s wait time for topo discovery.
+    #
+    # @return the service's attribute.
+    def get_service_attr(service_name, sleep_s=2):
+        return _CYBER_NODE.PyServiceUtils_get_service_attr(service_name, sleep_s)

@@ -70,6 +70,9 @@ DEFINE_bool(enable_scenario_bare_intersection, false,
 DEFINE_bool(enable_scenario_pull_over, false,
             "enable pull-over scenario in planning");
 
+DEFINE_bool(enable_pull_over_exit, false,
+            "allow pull-over scenario exit to lane follow in planning");
+
 DEFINE_bool(enable_scenario_side_pass_multiple_parked_obstacles, true,
             "enable ADC to side-pass multiple parked obstacles without"
             "worrying if the obstacles are blocked by others.");
@@ -197,7 +200,7 @@ DEFINE_double(lateral_acceleration_bound, 4.0,
 
 DEFINE_double(longitudinal_jerk_lower_bound, -4.0,
               "The lower bound of longitudinal jerk.");
-DEFINE_double(longitudinal_jerk_upper_bound, 4.0,
+DEFINE_double(longitudinal_jerk_upper_bound, 2.0,
               "The upper bound of longitudinal jerk.");
 DEFINE_double(longitudinal_jerk_bound, 4.0,
               "Bound of longitudinal jerk; symmetric for front and back");

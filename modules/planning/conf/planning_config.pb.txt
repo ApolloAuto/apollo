@@ -173,6 +173,7 @@ default_task_config: {
           weight_a_stitching: 3.25
           weight_first_order_time: 4.25
           weight_second_order_time: 13.5
+          weight_end_state: 1.0
           min_safety_distance: 0.01
           max_speed_forward: 2.0
           max_speed_reverse: 1.0
@@ -198,12 +199,17 @@ default_task_config: {
           enable_constraint_check: false
           enable_initial_final_check: false
           enable_jacobian_ad: false
+          enable_hand_derivative: false
+          enable_derivative_check: false
+          distance_approach_mode: DISTANCE_APPROACH_IPOPT
+          enable_check_initial_state: false
         }
         delta_t: 0.5
         max_position_error_to_end_point: 0.05
         max_theta_error_to_end_point: 0.05
         is_near_destination_threshold: 0.05
         enable_check_parallel_trajectory: false
+        enable_linear_interpolation: false
       }
     }
   }
@@ -237,6 +243,7 @@ default_task_config: {
     roi_linesegment_length: 1.0
     perception_obstacle_filtering_distance: 1000.0
     perception_obstacle_buffer: 0.0
+    bound_width_change_ratio_uppper_limit: 0.5
   }
 }
 default_task_config: {

@@ -45,7 +45,6 @@ RUN apt update -y && \
     libopenni2-0 \
     libopenni2-dev \
     software-properties-common
-    #rm -fr /var/lib/apt/lists/*
 
 #install gcc 4.8.5
 RUN rm -f /usr/bin/gcc

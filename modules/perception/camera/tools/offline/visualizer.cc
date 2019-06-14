@@ -1313,6 +1313,14 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
               cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
               cv::Scalar(0, 0, 255), 3);
 
+  // plot predicted vanishing point
+  if (frame.pred_vpt.size() > 0) {
+    cv::circle(image,
+               cv::Point(static_cast<int>(frame.pred_vpt[0]),
+                  static_cast<int>(frame.pred_vpt[1])),
+               5, cv::Scalar(0, 255, 0), 3);
+  }
+
   for (const auto &object : frame.tracked_objects) {
     if (object->b_cipv) {
       line_pos += 50;

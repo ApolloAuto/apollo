@@ -281,6 +281,7 @@ TEST_F(SimulationWorldServiceTest, UpdatePlanningTrajectory) {
     TrajectoryPoint* point = planning_trajectory.add_trajectory_point();
     point->mutable_path_point()->set_x(i * 10);
     point->mutable_path_point()->set_y(i * 10 + 10);
+    point->mutable_path_point()->set_theta(i * 0.1);
   }
 
   // Commit the update.
@@ -295,7 +296,7 @@ TEST_F(SimulationWorldServiceTest, UpdatePlanningTrajectory) {
     const Object point = world.planning_trajectory(0);
     EXPECT_DOUBLE_EQ(0.0, point.position_x());
     EXPECT_DOUBLE_EQ(10.0, point.position_y());
-    EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
+    EXPECT_DOUBLE_EQ(0, point.heading());
   }
 
   // Check last point.
@@ -304,7 +305,7 @@ TEST_F(SimulationWorldServiceTest, UpdatePlanningTrajectory) {
         world.planning_trajectory(world.planning_trajectory_size() - 1);
     EXPECT_DOUBLE_EQ(280.0, point.position_x());
     EXPECT_DOUBLE_EQ(290.0, point.position_y());
-    EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
+    EXPECT_DOUBLE_EQ(2.8, point.heading());
   }
 }
 
