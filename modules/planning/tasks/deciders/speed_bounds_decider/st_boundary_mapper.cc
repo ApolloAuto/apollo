@@ -85,9 +85,9 @@ Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
 
     const auto& decision = ptr_obstacle->LongitudinalDecision();
     if (decision.has_stop()) {
+      // TODO(all): store ref. s value in stop decision; refine the code then.
       common::SLPoint stop_sl_point;
-      const auto& stop_cartesian_point = decision.stop().stop_point();
-      reference_line_.XYToSL({stop_cartesian_point.x(), stop_cartesian_point.y()}, &stop_sl_point);
+      reference_line_.XYToSL(decision.stop().stop_point(), &stop_sl_point);
       const double stop_s = stop_sl_point.s();
 
       if (stop_s < min_stop_s) {
@@ -119,13 +119,10 @@ bool STBoundaryMapper::MapStopDecision(
     Obstacle* stop_obstacle, const ObjectDecisionType& stop_decision) const {
   DCHECK(stop_decision.has_stop()) << "Must have stop decision";
   common::SLPoint stop_sl_point;
-  reference_line_.XYToSL(
-      { stop_decision.stop().stop_point().x(),
-          stop_decision.stop().stop_point().y() }, &stop_sl_point);
+  reference_line_.XYToSL(stop_decision.stop().stop_point(), &stop_sl_point);
 
   double st_stop_s = 0.0;
-  const double stop_ref_s = stop_sl_point.s() +
-                            stop_decision.stop().distance_s();
+  const double stop_ref_s = stop_sl_point.s();
 
   if (stop_ref_s > path_data_.frenet_frame_path().back().s()) {
     st_stop_s = path_data_.discretized_path().back().s() +
@@ -139,14 +136,14 @@ bool STBoundaryMapper::MapStopDecision(
   }
 
   const double s_min = std::fmax(0.0, st_stop_s);
-  const double s_max =
-      std::fmax(s_min, std::fmax(planning_max_distance_, reference_line_.Length()));
+  const double s_max = std::fmax(s_min,
+      std::fmax(planning_max_distance_, reference_line_.Length()));
 
   std::vector<std::pair<STPoint, STPoint>> point_pairs;
   point_pairs.emplace_back(STPoint(s_min, 0.0), STPoint(s_max, 0.0));
-  point_pairs.emplace_back(
-      STPoint(s_min, planning_max_time_),
-      STPoint(s_max + speed_bounds_config_.boundary_buffer(), planning_max_time_));
+  point_pairs.emplace_back(STPoint(s_min, planning_max_time_),
+      STPoint(s_max + speed_bounds_config_.boundary_buffer(),
+          planning_max_time_));
   auto boundary = STBoundary(point_pairs);
   boundary.SetBoundaryType(STBoundary::BoundaryType::STOP);
   boundary.SetCharacteristicLength(speed_bounds_config_.boundary_buffer());

@@ -23,6 +23,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "modules/planning/common/frame.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/proto/dp_st_speed_config.pb.h"
 #include "modules/planning/tasks/task.h"
