@@ -80,8 +80,7 @@ TEST_F(StBoundaryMapperTest, check_overlap_test) {
   SpeedBoundsDeciderConfig config;
   double planning_distance = 70.0;
   double planning_time = 10.0;
-  SLBoundary adc_sl_boundary;
-  STBoundaryMapper mapper(adc_sl_boundary, config, *reference_line_, path_data_,
+  STBoundaryMapper mapper(config, *reference_line_, path_data_,
                           planning_distance, planning_time);
   common::PathPoint path_point;
   path_point.set_x(1.0);

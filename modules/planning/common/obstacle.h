@@ -148,7 +148,7 @@ class Obstacle {
 
   const STBoundary& reference_line_st_boundary() const;
 
-  const STBoundary& st_boundary() const;
+  const STBoundary& path_st_boundary() const;
 
   const std::vector<std::string>& decider_tags() const;
 
@@ -161,7 +161,7 @@ class Obstacle {
                           const ObjectDecisionType& decision);
   bool HasLateralDecision() const;
 
-  void SetStBoundary(const STBoundary& boundary);
+  void set_path_st_boundary(const STBoundary& boundary);
 
   void SetStBoundaryType(const STBoundary::BoundaryType type);
 
@@ -250,7 +250,7 @@ class Obstacle {
   SLBoundary sl_boundary_;
 
   STBoundary reference_line_st_boundary_;
-  STBoundary st_boundary_;
+  STBoundary path_st_boundary_;
 
   ObjectDecisionType lateral_decision_;
   ObjectDecisionType longitudinal_decision_;
