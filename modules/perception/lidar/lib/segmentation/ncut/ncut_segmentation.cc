@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/lidar/lib/segmentation/ncut/ncut_segmentation.h"
 
 #include <omp.h>
 #include <algorithm>
