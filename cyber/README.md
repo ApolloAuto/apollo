@@ -21,7 +21,7 @@ Key benefits of using Apollo Cyber RT:
 
 # Documents
 
-* ***New!!*** [Apollo Cyber RT Docker Dev Environment](https://github.com/ApolloAuto/apollo/tree/master/docs/cyber/CyberRT_Docker.md): Official docker image for Cyber RT development, which is easiest way to build and play with Cyber RT.
+* ***New!!*** [How to Develop Cyber RT Inside Docker Environment on Both x86 and arm platform](https://github.com/ApolloAuto/apollo/tree/master/docs/cyber/CyberRT_Docker.md): Official docker image for Cyber RT development, which is easiest way to build and play with Cyber RT. On top of that, we officially support development of Cyber RT on both x86 and arm platform.
 
 * [Apollo Cyber RT Quick Start](https://github.com/ApolloAuto/apollo/tree/master/docs/cyber/CyberRT_Quick_Start.md): Everything you need to know about how to start developing your first application module on top of Apollo Cyber RT.
 

@@ -1,9 +1,11 @@
 
-# How to Develop Cyber RT inside Docker Environment
+# How to Develop Cyber RT Inside Docker Environment on Both x86 and arm platform
 
 To make life easier, Apollo Cyber RT has released a docker image and a number of scripts to help developers to build and play with Cyber RT.
 
 The official Cyber RT docker image is built based on Ubuntu 18.04. It comes with the full support for building Cyber RT and the drivers on top of it. So if you are interested in Cyber RT only, that would be the ideal point to start with.
+
+**Note: arm platform support has added recently fully integrated with Apollo development environment. You will be able to develop Cyber RT on both x86 and arm platform with the same set of scripts. However, since arm platfrom has only been verified on Nvdia Drive PX, so if you are trying on some dev board other than Drive PX. Please let us know if you run into any issues**
 
 The following sections will show to how to start and play with Cyber RT docker and also how to build your own docker image from scratch.
 
@@ -44,17 +46,47 @@ To build drivers on Cyber RT only:
 ./apollo.sh build_drivers
 ```
 
+
+**Note: start of instructions for arm platform only**
+
+Due to some limitation of docker on Drive PX platform, you need to follow the steps below on top of the procedure above.
+
+For the first time after running cyber_into.sh to get into the Cyber RT container, please run the following two commands: 
+
+```bash
+/apollo/scripts/docker_adduser.sh
+su nvidia
+```
+
+To exit, please use 'ctrl+p ctrl+q' instead of 'exit'. Otherwise, you will lose your current running container.
+ 
+**Note: end instructions for arm platform only**
+
 ## Build Cyber RT Docker Image
 
-To build your owner docker image for Cyber RT, please run the following commands:
+To build your owner docker image for Cyber RT, please run the following commands on x86 platform:
 
 ```bash
 cd docker/build/
 ./build_cyber.sh cyber.x86_64.dockerfile 
 ```
 
+For arm platform,
+
+```bash
+cd docker/build/
+./build_cyber.sh cyber.aarch64.dockerfile 
+```
+
+To save your time due to the performance of building on arm platform, you can run add the following option to download some prebuilt packages. 
+
+```bash
+cd docker/build/
+./build_cyber.sh cyber.aarch64.dockerfile download
+```
+
 If you would like to save your docker image for long term, use the following commands
-to save it in your own docker registry:
+as example to save it in your own docker registry, please use "dockder images" to find the name of your own image.
 
 ```bash
 docker push [YOUR_OWN_DOCKER_REGISTRY]:cyber-x86_64-18.04-20190531_1115

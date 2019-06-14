@@ -108,7 +108,7 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
   steer_single_direction_max_degree_ =
       vehicle_param_.max_steer_angle() / M_PI * 180;
   max_lat_acc_ = control_conf->lat_controller_conf().max_lateral_acceleration();
-  min_turn_radius_ = vehicle_param_.min_turn_radius();
+  low_speed_bound_ = control_conf_->lon_controller_conf().switch_speed();
 
   const double mass_fl = control_conf->lat_controller_conf().mass_fl();
   const double mass_fr = control_conf->lat_controller_conf().mass_fr();
@@ -446,9 +446,13 @@ Status LatController::ComputeControlCommand(
   bool enable_leadlag = control_conf_->lat_controller_conf()
                             .enable_reverse_leadlag_compensation();
   if (enable_leadlag) {
-    steer_angle_feedback_augment =
-        leadlag_controller_.Control(-matrix_state_(0, 0), ts_) * 180 / M_PI *
-        steer_ratio_ / steer_single_direction_max_degree_ * 100;
+    if (FLAGS_enable_feedback_augment_on_high_speed ||
+        std::fabs(vehicle_state->linear_velocity()) <= low_speed_bound_ ||
+        vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) {
+      steer_angle_feedback_augment =
+          leadlag_controller_.Control(-matrix_state_(0, 0), ts_) * 180 / M_PI *
+          steer_ratio_ / steer_single_direction_max_degree_ * 100;
+    }
   }
   steer_angle = steer_angle_feedback + steer_angle_feedforward +
                 steer_angle_feedback_augment;
@@ -547,8 +551,7 @@ void LatController::UpdateState(SimpleLateralDebug *debug) {
   // State matrix update;
   // First four elements are fixed;
   if (control_conf_->lat_controller_conf().enable_look_ahead_back_control() &&
-      std::fabs(vehicle_state->linear_velocity()) <=
-          control_conf_->lon_controller_conf().switch_speed()) {
+      std::fabs(vehicle_state->linear_velocity()) <= low_speed_bound_) {
     matrix_state_(0, 0) = debug->lateral_error_feedback();
     matrix_state_(2, 0) = debug->heading_error_feedback();
   } else {
