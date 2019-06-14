@@ -39,11 +39,11 @@ void ChannelVerifyAgent::reset() {
 }
 
 grpc::Status ChannelVerifyAgent::process_grpc_request(
-  grpc::ServerContext *context,
-  CHANNEL_VERIFY_REQUEST_TYPE *request,
-  CHANNEL_VERIFY_RESPONSE_TYPE *response) {
+    grpc::ServerContext *context,
+    CHANNEL_VERIFY_REQUEST_TYPE *request,
+    CHANNEL_VERIFY_RESPONSE_TYPE *response) {
   AINFO << "ChannelVerifyAgent Request: "
-      << request->DebugString();
+        << request->DebugString();
   switch (request->cmd()) {
   case CmdType::START:
     AINFO << "ChannelVerifyAgent start";
@@ -65,10 +65,9 @@ grpc::Status ChannelVerifyAgent::process_grpc_request(
   return grpc::Status::OK;
 }
 
-void ChannelVerifyAgent::start_check(
-  CHANNEL_VERIFY_REQUEST_TYPE *request,
-  CHANNEL_VERIFY_RESPONSE_TYPE *response) {
-  if ( get_state() == ChannelVerifyAgentState::RUNNING ) {
+void ChannelVerifyAgent::start_check(CHANNEL_VERIFY_REQUEST_TYPE *request,
+                                     CHANNEL_VERIFY_RESPONSE_TYPE *response) {
+  if (get_state() == ChannelVerifyAgentState::RUNNING) {
     AINFO << "ChannelVerify is RUNNING, do not need start again";
     response->set_code(ErrorCode::ERROR_REPEATED_START);
     return;
@@ -118,18 +117,18 @@ int ChannelVerifyAgent::add_topic_lack(
   const std::string& record_path,
   std::vector<std::string> const& lack_channels) {
   apollo::hdmap::TopicResult *topics = result->mutable_topics();
-  for (size_t i = 0; i < lack_channels.size(); i++) {
+  for (size_t i = 0; i < lack_channels.size(); ++i) {
     topics->add_topic_lack(lack_channels[i]);
     AINFO << record_path << " lack topic: " << lack_channels[i];
   }
   return static_cast<int>(lack_channels.size());
 }
 
-::apollo::hdmap::FrameRate* ChannelVerifyAgent::find_rates(
-  apollo::hdmap::VerifyResult *result,
-  const std::string& channel) {
+apollo::hdmap::FrameRate* ChannelVerifyAgent::find_rates(
+    apollo::hdmap::VerifyResult *result,
+    const std::string& channel) {
   int rates_size = result->rates_size();
-  for (int i = 0; i < rates_size; i++) {
+  for (int i = 0; i < rates_size; ++i) {
     const ::apollo::hdmap::FrameRate& rates = result->rates(i);
     if (rates.topic() == channel) {
       return result->mutable_rates(i);
@@ -139,16 +138,15 @@ int ChannelVerifyAgent::add_topic_lack(
 }
 
 int ChannelVerifyAgent::add_inadequate_rate(
-  apollo::hdmap::VerifyResult *result,
-  std::string const& record_path,
-  std::map<std::string, std::pair<double, double>> const& inadequate_rate) {
+    apollo::hdmap::VerifyResult *result,
+    std::string const& record_path,
+    std::map<std::string, std::pair<double, double>> const& inadequate_rate) {
   for (std::map<std::string, std::pair<double, double>>::const_iterator
-    it = inadequate_rate.begin(); it != inadequate_rate.end(); ++it) {
+       it = inadequate_rate.begin(); it != inadequate_rate.end(); ++it) {
     const std::string& channel = it->first;
     double expected_rate = it->second.first;
     double current_rate = it->second.second;
-    ::apollo::hdmap::FrameRate* rate =
-      find_rates(result, channel);
+    apollo::hdmap::FrameRate* rate = find_rates(result, channel);
     if (rate == NULL) {
       rate = result->add_rates();
       rate->add_bad_record_name(record_path);
@@ -163,25 +161,8 @@ int ChannelVerifyAgent::add_inadequate_rate(
   return result->rates_size();
 }
 
-void ChannelVerifyAgent::print_sp_check_result() {
-/*  fprintf(stderr, "print_sp_check_result\n");
-  for( CheckResultIterator it = _sp_check_result->begin(); it != _sp_check_result->end(); it++ ) {
-    fprintf(stderr, "%s\n", it->record_path.c_str());
-    std::vector<std::string>& lack_channels = it->lack_channels;
-    for(int i = 0; i < lack_channels.size(); i++) {
-      fprintf(stderr, "-->[lack]%s\n", lack_channels[i].c_str());
-    }
-    std::map<std::string, std::pair<double, double>> & inadequate_rate = it->inadequate_rate;
-    for( std::map<std::string, std::pair<double, double>>::iterator it1 = inadequate_rate.begin(); it1 != inadequate_rate.end(); it1++ ) {
-      fprintf(stderr, "-->[inadequate_rate]%s expected_rate:%lf actual_rate:%lf\n", it1->first.c_str(), it1->second.first, it1->second.second);
-    }
-  }*/
-}
-
-
-void ChannelVerifyAgent::check_result(
-  CHANNEL_VERIFY_REQUEST_TYPE *request,
-  CHANNEL_VERIFY_RESPONSE_TYPE *response) {
+void ChannelVerifyAgent::check_result(CHANNEL_VERIFY_REQUEST_TYPE *request,
+                                      CHANNEL_VERIFY_RESPONSE_TYPE *response) {
   if (get_state() == ChannelVerifyAgentState::IDLE) {
     AINFO << "ChannelVerify is not RUNNING, it should start first";
     response->set_code(ErrorCode::ERROR_CHECK_BEFORE_START);
@@ -194,20 +175,18 @@ void ChannelVerifyAgent::check_result(
     return;
   }
 
-  if ( _sp_channel_checker->get_return_state() != ErrorCode::SUCCESS ) {
+  if (_sp_channel_checker->get_return_state() != ErrorCode::SUCCESS) {
     response->set_code(_sp_channel_checker->get_return_state());
     return;
   }
 
-  print_sp_check_result();  // debug purpose
   response->set_code(ErrorCode::SUCCESS);
   apollo::hdmap::VerifyResult *result = response->mutable_result();
   for (CheckResultIterator it = _sp_check_result->begin();
-    it != _sp_check_result->end(); it++) {
+       it != _sp_check_result->end(); ++it) {
     int res = 0;
     // write rate
-    res =
-      add_inadequate_rate(result, it->record_path, it->inadequate_rate);
+    res = add_inadequate_rate(result, it->record_path, it->inadequate_rate);
     if (res > 0) {
       response->set_code(ErrorCode::ERROR_CHANNEL_VERIFY_RATES_ABNORMAL);
     }
@@ -219,9 +198,8 @@ void ChannelVerifyAgent::check_result(
   }
 }
 
-void ChannelVerifyAgent::stop_check(
-  CHANNEL_VERIFY_REQUEST_TYPE *request,
-  CHANNEL_VERIFY_RESPONSE_TYPE *response) {
+void ChannelVerifyAgent::stop_check(CHANNEL_VERIFY_REQUEST_TYPE *request,
+                                    CHANNEL_VERIFY_RESPONSE_TYPE *response) {
   std::lock_guard<std::mutex> guard(_stop_mutex);
   _need_stop = true;
   response->set_code(ErrorCode::SUCCESS);
@@ -232,11 +210,10 @@ void ChannelVerifyAgent::stop_check(
     return;
   }
   for (CheckResultIterator it = _sp_check_result->begin();
-    it != _sp_check_result->end(); it++) {
+    it != _sp_check_result->end(); ++it) {
     int res = 0;
     // write rate
-    res =
-      add_inadequate_rate(result, it->record_path, it->inadequate_rate);
+    res = add_inadequate_rate(result, it->record_path, it->inadequate_rate);
     if (res > 0) {
       response->set_code(ErrorCode::ERROR_CHANNEL_VERIFY_RATES_ABNORMAL);
     }

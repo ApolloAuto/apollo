@@ -34,10 +34,8 @@ enum class ChannelVerifyAgentState {
   RUNNING
 };
 
-using CHANNEL_VERIFY_REQUEST_TYPE
-  = const apollo::hdmap::ChannelVerifyRequest;
-using CHANNEL_VERIFY_RESPONSE_TYPE
-  = apollo::hdmap::ChannelVerifyResponse;
+using CHANNEL_VERIFY_REQUEST_TYPE = const apollo::hdmap::ChannelVerifyRequest;
+using CHANNEL_VERIFY_RESPONSE_TYPE = apollo::hdmap::ChannelVerifyResponse;
 
 class ChannelVerifyAgent {
  public:
@@ -71,12 +69,9 @@ class ChannelVerifyAgent {
     std::string const & record_path,
     std::map<std::string,
     std::pair<double, double>> const& inadequate_rate);
-  ::apollo::hdmap::FrameRate* find_rates(
+  apollo::hdmap::FrameRate* find_rates(
     apollo::hdmap::VerifyResult *result,
     const std::string& channel);
-
- private:  // debug only
-  void print_sp_check_result();
 
  private:
   ChannelVerifyAgentState _state;

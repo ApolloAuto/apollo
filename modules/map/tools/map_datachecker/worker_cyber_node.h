@@ -25,13 +25,11 @@ namespace hdmap {
 
 class MapDataCheckerAgent;
 
-// need to add cybertron node creater
 class MapDataCheckerCyberNode:
   public std::enable_shared_from_this<MapDataCheckerCyberNode> {
  public:
-  MapDataCheckerCyberNode(
-    std::shared_ptr<MapDataCheckerAgent> agent,
-    bool *init_success);
+  MapDataCheckerCyberNode(std::shared_ptr<MapDataCheckerAgent> agent,
+                          bool *init_success);
 
   inline std::shared_ptr<MapDataCheckerCyberNode> get_worker_cyber_node() {
     return shared_from_this();

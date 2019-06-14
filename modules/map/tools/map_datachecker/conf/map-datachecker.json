@@ -1,6 +1,6 @@
 {
     "topic_list": {
-        "/apollo/sensor/gnss/best_pose": 0.9
+        "/apollo/sensor/gnss/best_pose": 2.0
     },
     "use_system_time": false,
     "topic_rate_tolerance": 1.0,

@@ -55,13 +55,13 @@ grpc::Status LoopsVerifyAgent::process_grpc_request(
 void LoopsVerifyAgent::StartVerify(
   LOOPS_VERIFY_REQUEST_TYPE *request,
   LOOPS_VERIFY_RESPONSE_TYPE *response) {
-  AINFO << "call StartVerify";
+  AINFO << "Call StartVerify";
   if (get_state() == LoopsVerifyAgentState::RUNNING) {
-    AINFO << "verify is working, do not need start again";
+    AINFO << "Verify is working, do not need start again";
     response->set_progress(0.0);
     response->set_code(ErrorCode::ERROR_REPEATED_START);
   }
-  // reset();
+
   std::shared_ptr<std::vector<std::pair<double, double>>>
     sp_range = get_verify_range(request);
   double loops_to_check = static_cast<double>(get_loops_to_check(request));
@@ -77,9 +77,9 @@ void LoopsVerifyAgent::StartVerify(
 void LoopsVerifyAgent::CheckVerify(
   LOOPS_VERIFY_REQUEST_TYPE *request,
   LOOPS_VERIFY_RESPONSE_TYPE *response) {
-  AINFO << "call CheckVerify";
+  AINFO << "Call CheckVerify";
   if (get_state() == LoopsVerifyAgentState::IDLE) {
-    AINFO << "verify is not work, start first";
+    AINFO << "Verify is not work, start first";
     response->set_progress(0.0);
     response->set_code(ErrorCode::ERROR_CHECK_BEFORE_START);
     return;
@@ -164,7 +164,7 @@ LoopsVerifyAgent::get_verify_range(LOOPS_VERIFY_REQUEST_TYPE *request) {
   std::shared_ptr<std::vector<std::pair<double, double>>>
     sp_range(new std::vector<std::pair<double, double>>());
   int range_size = request->range_size();
-  for (int i = 0; i < range_size; i++) {
+  for (int i = 0; i < range_size; ++i) {
     const ::apollo::hdmap::VerifyRange
       &range = request->range(i);
     sp_range->push_back(
@@ -199,7 +199,7 @@ double LoopsVerifyAgent::get_range_index(
   size_t size = range.size();
   double min_time = std::numeric_limits<double>::max();
   double max_time = std::numeric_limits<double>::min();
-  for (size_t i = 0; i < size; i++) {
+  for (size_t i = 0; i < size; ++i) {
     if (range[i].first >= range[i].second) {
       AINFO << "range error, [" << std::to_string(range[i].first)
           << "," << std::to_string(range[i].second) << "]";
@@ -229,10 +229,10 @@ double LoopsVerifyAgent::get_range_index(
     AINFO << "time range vector size > 0";
     int index_size = static_cast<int>(max_time - min_time + 1);
     range_index.resize(index_size, false);
-    for (int i = 0; i < static_cast<int>(size); i++) {
+    for (int i = 0; i < static_cast<int>(size); ++i) {
       int start_time = static_cast<int>(range[i].first - min_time);
       int end_time = static_cast<int>(range[i].second - min_time);
-      for (int j = start_time; j <= end_time; j++) {
+      for (int j = start_time; j <= end_time; ++j) {
         range_index[j] = true;
       }
     }
@@ -268,7 +268,7 @@ int LoopsVerifyAgent::get_poses_to_check(
   size_t range_size = range_index.size();
   std::vector<FramePose> & poses = *sp_poses;
   poses.clear();
-  for (size_t i = 0; i < pose_size; i++) {
+  for (size_t i = 0; i < pose_size; ++i) {
     int time = static_cast<int>(vec_poses[i].time_stamp - min_time);
     if (time >= static_cast<int>(range_size)) {
       break;

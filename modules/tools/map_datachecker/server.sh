@@ -48,7 +48,7 @@ function start_server() {
   if [ ! -e "${LOG_DIR}" ];then
     mkdir -p ${LOG_DIR}
   fi
-  server_count=`ps -ef | grep map_datachecker | wc -l`
+  server_count=`ps -ef | grep map_datachecker | grep -v grep | wc -l`
   if [ ${server_count} -ne 0 ];then
     echo 'Start server failed, there is already a process called map_datachecker'
     echo 'You can kill the preceding map_datachecker and rerun this command'

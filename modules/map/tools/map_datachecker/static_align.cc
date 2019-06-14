@@ -30,7 +30,6 @@ void StaticAlign::reset() {
   _progress = 0.0, _last_progress = 0.0;
   _start_time = _end_time = -1.0;
   _start_index = _end_index = -1;
-  // _bad_pose_info = _good_pose_info = BadOrGoodPoseInfo();
   _sp_bad_pose_info = std::make_shared<BadOrGoodPoseInfo>();
   _sp_good_pose_info = std::make_shared<BadOrGoodPoseInfo>();
   _dynamic_centroid = Centroid3D();
@@ -48,7 +47,7 @@ bool StaticAlign::is_static_pose(const FramePose& pose) {
     + move_dist_y * move_dist_y
     + move_dist_z * move_dist_z);
   AINFO << "dist thresh: " << _sp_conf->static_align_dist_thresh
-      << ", dist: " << move_dist;
+        << ", dist: " << move_dist;
   if (move_dist <= _sp_conf->static_align_dist_thresh) {
     return true;
   }
@@ -63,12 +62,12 @@ void StaticAlign::update_dynamic_centroid(const FramePose& pose) {
     _dynamic_centroid.end_time = pose.time_stamp;
   }
   AINFO << "cetroid start: " << _dynamic_centroid.start_time
-      << ", end: " << _dynamic_centroid.end_time;
+        << ", end: " << _dynamic_centroid.end_time;
 
   double x = _dynamic_centroid.center.x * count + pose.tx;
   double y = _dynamic_centroid.center.y * count + pose.ty;
   double z = _dynamic_centroid.center.z * count + pose.tz;
-  count++;
+  ++count;
 
   _dynamic_centroid.count = count;
   _dynamic_centroid.center.x = x / count;
@@ -92,7 +91,7 @@ double StaticAlign::static_align_dynamic_centroid(
   int start_index = time_to_index(poses, _start_time);
   AINFO << "start_index:" << start_index << ",pose size:" << poses.size();
   _dynamic_centroid = Centroid3D();
-  for (int i = start_index + 1; i < static_cast<int>(poses.size()); i++) {
+  for (int i = start_index + 1; i < static_cast<int>(poses.size()); ++i) {
     if (!is_good_pose(poses, i)) {
       AINFO << "not good pose";
       _return_state = ErrorCode::ERROR_GNSS_SIGNAL_FAIL;
@@ -104,7 +103,6 @@ double StaticAlign::static_align_dynamic_centroid(
       return 0.0;
     }
     update_good_pose_info(poses[i]);
-    // clear_bad_pose_info();
     _return_state = ErrorCode::SUCCESS;
   }
 

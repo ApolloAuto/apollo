@@ -49,10 +49,6 @@ MapDataCheckerCyberNode::MapDataCheckerCyberNode(
   AINFO << "map-datachecker cyber node create successfully";
 }
 
-// MapDataCheckerCyberNode::~MapDataCheckerCyberNode() {
-//   //delete _pj_transformer;
-// }
-
 int MapDataCheckerCyberNode::create_channel_subscriber() {
   AINFO << "create bestgnsspos reader, topic: " << FLAGS_topic_bestgnsspos;
   _bestgnsspos_reader = _node->CreateReader<GnssBestPose_t> (

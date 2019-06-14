@@ -60,7 +60,6 @@ bool Mapdatachecker::Start() {
   builder.AddListeningPort(_grpc_address, grpc::InsecureServerCredentials());
   builder.RegisterService(agent.get());
   std::unique_ptr<Server> server(builder.BuildAndStart());
-  // server->Wait();
   AINFO << "Server listening on " << _grpc_address;
   apollo::cyber::WaitForShutdown();
   apollo::cyber::Clear();

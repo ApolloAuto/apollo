@@ -29,15 +29,14 @@ LapsChecker::LapsChecker(const std::vector<FramePose> &poses,
   int laps_to_check,
   std::shared_ptr<JSonConf> sp_conf)
   :_poses(poses), _sp_conf(sp_conf) {
-  AINFO << "LapsChecker construct function";
   _laps_to_check = laps_to_check;
-  AINFO << "instance has " << poses.size() << " poses";
   _maxx = _maxy = _minx = _miny = 0.0;
   _possible_max_laps = (_laps_to_check + 1) * 10;
-  AINFO << "confidence size: " << _possible_max_laps + 1;
   _confidence.resize(_possible_max_laps + 1, 0.0);
   finished = false;
   _return_state = ErrorCode::SUCCESS;
+  AINFO << "instance has " << poses.size() << " poses";
+  AINFO << "confidence size: " << _possible_max_laps + 1;
 }
 
 int LapsChecker::set_progress(double p) {
@@ -82,10 +81,6 @@ double LapsChecker::get_confidence() {
        }
      }
   }
-  // for debug
-  // for(size_t i = 0; i < _confidence.size(); i++) {
-  //   AINFO << "(laps, conf): (" << i << ", " << _confidence[i] << ")";
-  // }
   return res;
 }
 
@@ -163,7 +158,7 @@ int LapsChecker::check_laps() {
     AINFO << "_grids_map size error. width = " << width;
     return -1;
   }
-  // double all = 0, valid = 0;
+
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       Grid &grid = _grids_map[y][x];
@@ -257,14 +252,18 @@ int LapsChecker::get_min_max() {
   AINFO << "get_min_max pose size: " << size;
   for (size_t i = 0; i < size; i++) {
     double tx = _poses[i].tx, ty = _poses[i].ty;
-    if (tx < _minx)
+    if (tx < _minx) {
       _minx = tx;
-    if (tx > _maxx)
+    }
+    if (tx > _maxx) {
       _maxx = tx;
-    if (ty < _miny)
+    }
+    if (ty < _miny) {
       _miny = ty;
-    if (ty > _maxy)
+    }
+    if (ty > _maxy) {
       _maxy = ty;
+    }
   }
 
   return 0;
@@ -274,13 +273,13 @@ int LapsChecker::do_setup_grids_map() {
   size_t width = size_t(_maxx - _minx + 1);
   size_t height = size_t(_maxy - _miny + 1);
   AINFO << "grid map width: " << width
-      << ", height: " << height;
+        << ", height: " << height;
   size_t size = _poses.size();
-  if (1 >= size || 0 == height || 0 == width ||
-    height > 1000000 || width > 1000000) {
+  if (1 >= size || 0 == height || 0 == width
+      || height > 1000000 || width > 1000000) {
     AINFO << "pose size: " << size
-        << ", height: " << height
-        << ", width: " << width;
+          << ", height: " << height
+          << ", width: " << width;
     AINFO << "pose size error or grid map size error";
     return -1;
   }
@@ -329,7 +328,7 @@ int LapsChecker::put_pose_to_grid(int pose_index, int grid_y, int grid_x) {
       return 0;
     }
   }
-  // 没有找到可以当前pose的gridmeta
+
   GridMeta gm;
   gm.alpha = alpha;
   gm.idxs = {pose_index};
@@ -345,7 +344,6 @@ int LapsChecker::put_pose_to_neighbor_grid(int pose_index) {
 
   std::vector<int> x, y;
   get_passed_grid(pose_index, &x, &y);
-  // AINFO << "pose " << pose_index << " has " << x.size() << " passed grid";
   for (size_t i = 0; i < x.size(); i++) {
     put_pose_to_grid(pose_index, y[i], x[i]);
   }

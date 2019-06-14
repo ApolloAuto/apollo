@@ -143,7 +143,7 @@ inline std::shared_ptr<JSonConf> parse_json(std::string conf_path) {
     conf->use_system_time = pt.get<bool>("use_system_time");
     conf->topic_rate_tolerance = pt.get<double>("topic_rate_tolerance");
     boost::property_tree::ptree children2 = pt.get_child("topic_list");
-    for (auto it = children2.begin(); it != children2.end(); it++) {
+    for (auto it = children2.begin(); it != children2.end(); ++it) {
       conf->topic_list.push_back(
         std::make_pair(it->first, it->second.get_value<double>()));
     }
@@ -152,7 +152,7 @@ inline std::shared_ptr<JSonConf> parse_json(std::string conf_path) {
 
     boost::property_tree::ptree
       position_type = pt.get_child("position_type");
-    for (auto it = position_type.begin(); it != position_type.end(); it++) {
+    for (auto it = position_type.begin(); it != position_type.end(); ++it) {
       conf->position_type_range.insert(
         it->second.get_value<unsigned int>());
     }
@@ -163,7 +163,7 @@ inline std::shared_ptr<JSonConf> parse_json(std::string conf_path) {
     {
       auto it = diff_age.begin();
       conf->diff_age_range.first = it->second.get_value<float>();
-      it++;
+      ++it;
       conf->diff_age_range.second = it->second.get_value<float>();
     }
 
@@ -225,7 +225,6 @@ inline std::shared_ptr<JSonConf> parse_json(std::string conf_path) {
   catch(const std::exception& e) {
     std::cerr << e.what() << '\n';
   }
-
   return conf;
 }
 
@@ -233,9 +232,8 @@ inline std::shared_ptr<JSonConf> parse_json(std::string conf_path) {
 inline double get_yaw(double from_x, double from_y, double to_x, double to_y) {
   double vecx = to_x - from_x;
   double vecy = to_y - from_y;
-
   double alpha = acos(vecy / sqrt(vecx * vecx + vecy * vecy));
-  if ( vecx < 0 ) {
+  if (vecx < 0) {
     alpha = 2 * M_PI - alpha;
   }
   return RADIANS_TO_DEGREES * alpha;

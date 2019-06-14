@@ -63,18 +63,14 @@ class LapsChecker  {
     std::vector<double> * sp_stamps,
     double alpha, int center_x, int center_y);
   inline int set_progress(double p);
-  // debug related
-  int print_grid_map_to_file();
 
  public:
   const std::vector<FramePose>& _poses;
   double _maxx, _maxy, _minx, _miny;
-  // std::shared_ptr<std::vector<std::vector<Grid>>> _grids_map;
   std::vector<std::vector<Grid>> _grids_map;
   bool finished;
 
  private:
-  // std::shared_ptr<std::vector<double>> _confidence;
   std::vector<double> _confidence;
   double _progress;
   size_t _laps_to_check;

@@ -60,8 +60,7 @@ class ChannelVerify {
  public:
   explicit ChannelVerify(std::shared_ptr<JSonConf> sp_conf);
   ErrorCode check(std::string record_dir_or_record_full_path);
-  std::shared_ptr<std::vector<OneRecordChannelCheckResult>>
-    get_check_result();
+  std::shared_ptr<std::vector<OneRecordChannelCheckResult>> get_check_result();
   ErrorCode get_return_state();
  private:
   bool is_record_file(std::string path);

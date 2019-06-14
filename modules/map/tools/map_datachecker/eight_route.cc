@@ -31,10 +31,10 @@ void EightRoute::reset() {
 bool EightRoute::is_eight_route_pose(
   const std::vector<FramePose> & poses, int pose_index) {
   if (poses.size() == 0 ||
-    pose_index <= 0 ||
-    pose_index >= static_cast<int>(poses.size())) {
+      pose_index <= 0 ||
+      pose_index >= static_cast<int>(poses.size())) {
     AINFO << "params error, poses size: " << poses.size()
-        << ", pose_index: " << pose_index;
+          << ", pose_index: " << pose_index;
     return true;
   }
 
@@ -56,10 +56,10 @@ bool EightRoute::is_eight_route_pose(
   }
   double vel = dist / during;
   AINFO << std::to_string(poses[pose_index].time_stamp)
-      << ", yaw_diff:" << yaw_diff
-      << ", dist: " << dist
-      << ", during: " << during
-      << ", vel: " << vel;
+        << ", yaw_diff:" << yaw_diff
+        << ", dist: " << dist
+        << ", during: " << during
+        << ", vel: " << vel;
   if (yaw_diff > _sp_conf->eight_angle && vel > _sp_conf->eight_vel) {
     return true;
   }
@@ -67,8 +67,9 @@ bool EightRoute::is_eight_route_pose(
 }
 
 double EightRoute::get_good_pose_during() {
-  if (_sp_good_pose_info == nullptr || _sp_good_pose_info->start_time < 0
-    || _sp_good_pose_info->end_time < 0) {
+  if (_sp_good_pose_info == nullptr
+      || _sp_good_pose_info->start_time < 0
+      || _sp_good_pose_info->end_time < 0) {
     return 0.0;
   }
   return _sp_good_pose_info->end_time - _sp_good_pose_info->start_time;
@@ -76,23 +77,22 @@ double EightRoute::get_good_pose_during() {
 
 double EightRoute::get_eight_route_progress(
   const std::vector<FramePose> & poses) {
-  // double hz = get_hz(poses);
   int size = static_cast<int>(poses.size());
   int start_index = time_to_index(poses, _start_time);
   // select first good pose
   while (start_index < size) {
-    if (is_good_pose(poses, start_index) &&
-      is_eight_route_pose(poses, start_index)) {
+    if (is_good_pose(poses, start_index)
+        && is_eight_route_pose(poses, start_index)) {
       AINFO << "find first good pose.index:" << start_index;
       break;
     }
-    start_index++;
+    ++start_index;
   }
   if (start_index >= size) {
     AINFO << "not find first good pose, start_time: "
-        << std::to_string(_start_time)
-        << ", start_index: "<< start_index
-        << ", pose size: " << size;
+          << std::to_string(_start_time)
+          << ", start_index: "<< start_index
+          << ", pose size: " << size;
     return 0.0;
   }
   if (start_index + 1 >= size) {
@@ -105,13 +105,13 @@ double EightRoute::get_eight_route_progress(
     poses[start_index+1].ty);
 
   int not_eight_count = 0;
-  for (int i = start_index + 2; i < size; i++) {
+  for (int i = start_index + 2; i < size; ++i) {
     if (!is_good_pose(poses, i)) {
       AINFO << "not good pose";
       return 0.0;
     }
     if (!is_eight_route_pose(poses, i)) {
-      not_eight_count++;
+      ++not_eight_count;
       AINFO << "not eight route pose";
       if (not_eight_count > _sp_conf->eight_bad_pose_tolerance) {
         AINFO << "not-eight pose count reached upper limitation";

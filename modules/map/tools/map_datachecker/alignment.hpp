@@ -72,9 +72,9 @@ class Alignment {
 
   virtual bool is_good_pose(
     const std::vector<FramePose> & poses, int pose_index) {
-    if ( poses.size() < 0
-      || pose_index <= 0
-      || pose_index >= static_cast<int>(poses.size()) ) {
+    if (poses.size() < 0
+        || pose_index <= 0
+        || pose_index >= static_cast<int>(poses.size())) {
       AINFO << "params error. poses size:" << poses.size()
           << ",pose_index:" << pose_index;
       return true;
@@ -84,11 +84,11 @@ class Alignment {
     float diff_age = poses[pose_index].diff_age;
     double local_std = poses[pose_index].local_std;
 
-    if ( _sp_conf->position_type_range.find(position_type)
-       != _sp_conf->position_type_range.end()
-       && diff_age >= _sp_conf->diff_age_range.first
-       && diff_age <= _sp_conf->diff_age_range.second
-       && local_std <= _sp_conf->local_std_upper_limit ) {
+    if (_sp_conf->position_type_range.find(position_type)
+        != _sp_conf->position_type_range.end()
+        && diff_age >= _sp_conf->diff_age_range.first
+        && diff_age <= _sp_conf->diff_age_range.second
+        && local_std <= _sp_conf->local_std_upper_limit) {
       return true;
     }
     return false;
@@ -102,14 +102,14 @@ class Alignment {
   void update_pose_info(const FramePose& pose,
     std::shared_ptr<BadOrGoodPoseInfo> sp_pose_info) {
     BadOrGoodPoseInfo &pose_info = *sp_pose_info;
-    if ( pose_info.pose_count == 0 ) {
+    if (pose_info.pose_count == 0) {
       pose_info.start_time = pose.time_stamp;
-      pose_info.pose_count++;
+      ++pose_info.pose_count;
       fprintf(stderr, "update start time:%lf,pose count:%d\n",
         pose_info.start_time, pose_info.pose_count);
     } else {
       pose_info.end_time = pose.time_stamp;
-      pose_info.pose_count++;
+      ++pose_info.pose_count;
       fprintf(stderr, "update end time:%lf,pose count:%d\n",
         pose_info.end_time, pose_info.pose_count);
     }
@@ -121,15 +121,14 @@ class Alignment {
     pose_info.pose_count = 0;
   }
 
-  int time_to_index(std::vector<FramePose> poses, double time) {
-    // int res = -1;
+  int time_to_index(const std::vector<FramePose>& poses, double time) {
     size_t size = poses.size();
-    if ( size == 0 || time <= 0 ) {
+    if (size == 0 || time <= 0) {
       return -1;
     }
 
     for (size_t i = 0; i < size; i++) {
-      if ( poses[i].time_stamp >= time ) {
+      if (poses[i].time_stamp >= time) {
         return static_cast<int>(i);
       }
     }

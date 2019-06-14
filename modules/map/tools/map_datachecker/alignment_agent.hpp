@@ -43,8 +43,7 @@ using EIGHTROUTE_RESPONSE_TYPE
 template<typename ALIGNMENT_TYPE, typename REQUEST_TYPE, typename RESPONSE_TYPE>
 class AlignmentAgent {
  public:
-  AlignmentAgent(
-    std::shared_ptr<JSonConf> sp_conf,
+  AlignmentAgent(std::shared_ptr<JSonConf> sp_conf,
     std::shared_ptr<PoseCollectionAgent> sp_pose_collection_agent) {
     _sp_conf = sp_conf;
     _sp_pose_collection_agent = sp_pose_collection_agent;
@@ -53,14 +52,12 @@ class AlignmentAgent {
   void reset() {
     _sp_alignment = std::make_shared<ALIGNMENT_TYPE>(_sp_conf);
     _state = AlignmentAgentState::IDLE;
-    // _have_result = false;
     _need_stop = false;
   }
 
-  grpc::Status process_grpc_request(
-    grpc::ServerContext *context,
-    REQUEST_TYPE *request,
-    RESPONSE_TYPE *response) {
+  grpc::Status process_grpc_request(grpc::ServerContext *context,
+                                    REQUEST_TYPE *request,
+                                    RESPONSE_TYPE *response) {
     AINFO << "AlignmentAgent request: " << request->DebugString();
     switch (request->cmd()) {
     case CmdType::START:
@@ -106,7 +103,7 @@ class AlignmentAgent {
       AINFO << "set state RUNNING";
       while (!_need_stop && !apollo::cyber::IsShutdown()) {
         std::shared_ptr<std::vector<FramePose>> sp_poses = get_poses();
-        if ( sp_poses == nullptr ) {
+        if (sp_poses == nullptr) {
           AINFO << "error, pose pointer is null";
           return;
         }
@@ -116,17 +113,13 @@ class AlignmentAgent {
           AINFO << "alignment progress reached 1.0, thread exit";
           break;
         }
-        AINFO << "sleep " << _sp_conf->alignment_featch_pose_sleep
-            << " sec";
+        AINFO << "sleep " << _sp_conf->alignment_featch_pose_sleep << " sec";
         std::this_thread::sleep_for(
           std::chrono::seconds(
             _sp_conf->alignment_featch_pose_sleep));
       }
       _stopped = true;
       AINFO << "Align thread complete";
-      // if (_thread_id == std::this_thread::get_id()) {
-      //   AINFO << "set state IDLE";
-      // }
     });
     alignment_thread.detach();
     return 0;
