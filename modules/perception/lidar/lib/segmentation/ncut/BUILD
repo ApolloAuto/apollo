@@ -20,7 +20,7 @@ cc_library(
 )
 
 cc_library(
-    name = "ncutsegmentation",
+    name = "ncut_segmentation",
     srcs = [
         "ncut_segmentation.cc",
     ],
@@ -29,6 +29,7 @@ cc_library(
     ],
     copts = [
         "-fopenmp",
+        "-DDEBUG_NCUT",
     ],
     linkopts = [
         "-lgomp",
@@ -42,6 +43,10 @@ cc_library(
         "//modules/perception/lidar/lib/segmentation/ncut/common:flood_fill",
         "//modules/perception/lidar/lib/segmentation/ncut/common:lr_classifier",
         "//modules/perception/lidar/lib/segmentation/ncut/proto:ncut_param_proto",
+        "//modules/perception/lib/config_manager",
+        "//modules/perception/lidar/common:pcl_util",
+        "@pcl",
+        "@vtk",
     ],
 )
 
