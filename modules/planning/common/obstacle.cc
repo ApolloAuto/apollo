@@ -515,7 +515,9 @@ const STBoundary& Obstacle::reference_line_st_boundary() const {
   return reference_line_st_boundary_;
 }
 
-const STBoundary& Obstacle::path_st_boundary() const { return path_st_boundary_; }
+const STBoundary& Obstacle::path_st_boundary() const {
+  return path_st_boundary_;
+}
 
 const std::vector<std::string>& Obstacle::decider_tags() const {
   return decider_tags_;
