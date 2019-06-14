@@ -49,9 +49,8 @@ using Eigen::MatrixXf;
 NCut::NCut() {}
 NCut::~NCut() { ADEBUG << "NCut destructor done"; }
 
-bool NCut::Init() {
-  std::string file("");
-  if (!Configure(file)) {
+bool NCut::Init(const NCutParam& param) {
+  if (!Configure(param)) {
     AERROR << "failed to load ncut config.";
     return false;
   }
@@ -64,12 +63,7 @@ bool NCut::Init() {
   return true;
 }
 
-bool NCut::Configure(const std::string &param_file) {
-  NCutParam ncut_param_;
-  // get cnnseg params
-  CHECK(GetProtoFromFile(param_file, &ncut_param_))
-      << "Failed to parse CNNSegParam config file." << param_file;
-
+bool NCut::Configure(const NCutParam& ncut_param_) {
   _grid_radius = ncut_param_.grid_radius();
   _connect_radius = ncut_param_.connect_radius();
   _super_pixel_cell_size = ncut_param_.super_pixel_cell_size();
@@ -89,8 +83,8 @@ bool NCut::Configure(const std::string &param_file) {
 }
 
 void NCut::Segment(base::PointFCloudConstPtr cloud) {
-  // double start_t = omp_get_wtime();
-  // .0 clear everything
+  double start_t = omp_get_wtime();
+  // .0 clear everyting
   _segment_pids.clear();
   _segment_labels.clear();
   _segment_bbox.clear();
@@ -117,33 +111,33 @@ void NCut::Segment(base::PointFCloudConstPtr cloud) {
   // visualize_segments_from_points(_cluster_points);
   ADEBUG << "super pixels " << _cluster_points.size();
 #endif
-  // LOG_DEBUG << "super pixels done " << omp_get_wtime() - start_t;
-  // start_t = omp_get_wtime();
+  ADEBUG << "super pixels done " << omp_get_wtime() - start_t;
+  start_t = omp_get_wtime();
   // .2 precompute skeleton and bbox
   PrecomputeAllSkeletonAndBbox();
   // LOG_DEBUG << "precompute skeleton and bbox done " << omp_get_wtime() -
   // start_t;
-  // start_t = omp_get_wtime();
+  start_t = omp_get_wtime();
   // .3 grach cut
-  // std::vector< std::vector<int> > segment_clusters;
-  // std::vector< std::string > segment_labels;
-  // NormalizedCut(_ncuts_stop_threshold, true, segment_clusters,
-  // segment_labels);
-  // LOG_DEBUG << "normalized_cut done, #segments " << segment_clusters.size()
-  //        << ", time: " << omp_get_wtime() - start_t;
-  // start_t = omp_get_wtime();
+  std::vector< std::vector<int> > segment_clusters;
+  std::vector< std::string > segment_labels;
+  NormalizedCut(_ncuts_stop_threshold, true,
+                &segment_clusters, &segment_labels);
+  ADEBUG << "normalized_cut done, #segments " << segment_clusters.size()
+          << ", time: " << omp_get_wtime() - start_t;
+  start_t = omp_get_wtime();
   // .4 _segment_pids;
-  // for (size_t i = 0; i < segment_clusters.size(); ++i) {
-  //    std::vector<int> pids;
-  //    GetClustersPids(segment_clusters[i], pids);
-  //   if (pids.size() > 0) {
-  //        _segment_pids.push_back(pids);
-  //        _segment_labels.push_back(segment_labels[i]);
-  //        NcutBoundingBox box;
-  //        get_component_bounding_box(segment_clusters[i], box);
-  //        _segment_bbox.push_back(box);
-  //    }
-  // }
+  for (size_t i = 0; i < segment_clusters.size(); ++i) {
+      std::vector<int> pids;
+      GetClustersPids(segment_clusters[i], &pids);
+      if (pids.size() > 0) {
+          _segment_pids.push_back(pids);
+          _segment_labels.push_back(segment_labels[i]);
+          NcutBoundingBox box;
+          GetComponentBoundingBox(segment_clusters[i], &box);
+          _segment_bbox.push_back(box);
+      }
+  }
 }
 
 void NCut::SuperPixelsFloodFill(base::PointFCloudConstPtr cloud, float radius,

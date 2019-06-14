@@ -1248,11 +1248,13 @@ bool PlaneFitGroundDetector::Detect(const float *point_cloud,
   unsigned int r = 0;
   unsigned int c = 0;
   // Filter to generate plane fitting candidates
-  // int nr_candis = Filter();
+  // int nr_candis =
+  Filter();
   // std::cout << "# of plane candidates: " << nr_candis << std::endl;
   //  Fit local plane using ransac
   // nr_valid_grid = Fit();
-  // int nr_valid_grid = FitInOrder();
+  // int nr_valid_grid =
+  FitInOrder();
   // std::cout << "# of valid plane geometry (fitting): " << nr_valid_grid <<
   // std::endl;
   // Smooth plane using neighborhood information:

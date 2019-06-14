@@ -24,6 +24,11 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
+typedef pcl::PointXYZRGB CPoint;
+typedef pcl::PointCloud<CPoint> CPointCloud;
+typedef pcl::PointCloud<CPoint>::Ptr CPointCloudPtr;
+typedef pcl::PointCloud<CPoint>::ConstPtr CPointCloudConstPtr;
+
 struct PCLPointXYZIT {
   float x;
   float y;

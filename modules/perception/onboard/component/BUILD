@@ -131,6 +131,7 @@ cc_library(
         "//modules/perception/lidar/lib/scene_manager/ground_service",
         "//modules/perception/lidar/lib/scene_manager/roi_service",
         "//modules/perception/lidar/lib/segmentation/cnnseg:cnn_segmentation",
+        "//modules/perception/lidar/lib/segmentation/ncut:ncut_segmentation",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_engine",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_track_object_matcher",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_tracker",
