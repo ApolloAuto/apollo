@@ -117,7 +117,6 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
   // set lattice planning target speed limit;
   SetCruiseSpeed(FLAGS_default_cruise_speed);
 
-  is_safe_to_change_lane_ = CheckChangeLane();
   return true;
 }
 
@@ -323,50 +322,6 @@ ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
     }
   }
   return ADCTrajectory::UNPROTECTED;
-}
-
-bool ReferenceLineInfo::CheckChangeLane() const {
-  if (!IsChangeLanePath()) {
-    ADEBUG << "Not a change lane path.";
-    return false;
-  }
-
-  for (const auto* obstacle : path_decision_.obstacles().Items()) {
-    const auto& sl_boundary = obstacle->PerceptionSLBoundary();
-
-    constexpr float kLateralShift = 2.5f;
-    if (sl_boundary.end_l() < -kLateralShift ||
-        sl_boundary.start_l() > kLateralShift) {
-      continue;
-    }
-    constexpr double kChangeLaneIgnoreDistance = 50.0;
-    if ((obstacle->IsVirtual() || obstacle->IsStatic()) &&
-        sl_boundary.start_s() < sl_boundary_info_.adc_sl_boundary_.end_s() +
-                                    kChangeLaneIgnoreDistance &&
-        sl_boundary.start_s() > sl_boundary_info_.adc_sl_boundary_.end_s()) {
-      return false;
-    }
-
-    constexpr float kSafeTime = 3.0f;
-    constexpr float kForwardMinSafeDistance = 6.0f;
-    constexpr float kBackwardMinSafeDistance = 8.0f;
-
-    const float kForwardSafeDistance = std::max(
-        kForwardMinSafeDistance,
-        static_cast<float>((adc_planning_point_.v() - obstacle->speed()) *
-                           kSafeTime));
-    const float kBackwardSafeDistance = std::max(
-        kBackwardMinSafeDistance,
-        static_cast<float>((obstacle->speed() - adc_planning_point_.v()) *
-                           kSafeTime));
-    if (sl_boundary.end_s() > sl_boundary_info_.adc_sl_boundary_.start_s() -
-                                  kBackwardSafeDistance &&
-        sl_boundary.start_s() <
-            sl_boundary_info_.adc_sl_boundary_.end_s() + kForwardSafeDistance) {
-      return false;
-    }
-  }
-  return true;
 }
 
 const hdmap::RouteSegments& ReferenceLineInfo::Lanes() const { return lanes_; }

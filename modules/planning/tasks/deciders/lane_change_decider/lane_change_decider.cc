@@ -179,7 +179,7 @@ bool LaneChangeDecider::IsClearToChangeLane(
   double ego_v =
       std::abs(reference_line_info->vehicle_state().linear_velocity());
 
-  for (auto* obstacle :
+  for (const auto* obstacle :
        reference_line_info->path_decision()->obstacles().Items()) {
     if (obstacle->IsVirtual() || obstacle->IsStatic()) {
       ADEBUG << "skip one virtual or static obstacle";
