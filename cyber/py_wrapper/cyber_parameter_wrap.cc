@@ -35,7 +35,7 @@ T PyObjectToPtr(PyObject* pyobj, const std::string& type_ptr) {
 PyObject* cyber_new_PyParameter_noparam(PyObject* self, PyObject* args) {
   apollo::cyber::PyParameter* pyparameter = new apollo::cyber::PyParameter();
   PyObject* pyobj_param =
-      PyCapsule_New(pyparameter, "apollo_cybertron_pyparameter", NULL);
+      PyCapsule_New(pyparameter, "apollo_cybertron_pyparameter", nullptr);
   return pyobj_param;
 }
 
@@ -74,7 +74,7 @@ PyObject* cyber_new_PyParameter_int(PyObject* self, PyObject* args) {
   apollo::cyber::PyParameter* pyparameter =
       new apollo::cyber::PyParameter(std::string(name, len), int_value);
   PyObject* pyobj_param =
-      PyCapsule_New(pyparameter, "apollo_cybertron_pyparameter", NULL);
+      PyCapsule_New(pyparameter, "apollo_cybertron_pyparameter", nullptr);
   return pyobj_param;
 }
 
@@ -93,7 +93,7 @@ PyObject* cyber_new_PyParameter_double(PyObject* self, PyObject* args) {
   apollo::cyber::PyParameter* pyparameter =
       new apollo::cyber::PyParameter(std::string(name, len), double_value);
   PyObject* pyobj_param =
-      PyCapsule_New(pyparameter, "apollo_cybertron_pyparameter", NULL);
+      PyCapsule_New(pyparameter, "apollo_cybertron_pyparameter", nullptr);
   return pyobj_param;
 }
 
@@ -111,7 +111,7 @@ PyObject* cyber_new_PyParameter_string(PyObject* self, PyObject* args) {
   apollo::cyber::PyParameter* pyparameter = new apollo::cyber::PyParameter(
       std::string(name), std::string(string_param));
   PyObject* pyobj_param =
-      PyCapsule_New(pyparameter, "apollo_cybertron_pyparameter", NULL);
+      PyCapsule_New(pyparameter, "apollo_cybertron_pyparameter", nullptr);
   return pyobj_param;
 }
 
@@ -285,7 +285,7 @@ PyObject* cyber_new_PyParameterClient(PyObject* self, PyObject* args) {
       new apollo::cyber::PyParameterClient(node,
                                            std::string(service_node_name, len));
   PyObject* pyobj_param = PyCapsule_New(
-      pyparameter_clt, "apollo_cybertron_pyparameterclient", NULL);
+      pyparameter_clt, "apollo_cybertron_pyparameterclient", nullptr);
   return pyobj_param;
 }
 
@@ -382,7 +382,7 @@ PyObject* cyber_PyParameter_clt_get_parameter(PyObject* self, PyObject* args) {
   apollo::cyber::PyParameter* pyparameter =
       new apollo::cyber::PyParameter(param);
   PyObject* pyobj_param =
-      PyCapsule_New(pyparameter, "apollo_cybertron_pyparameter", NULL);
+      PyCapsule_New(pyparameter, "apollo_cybertron_pyparameter", nullptr);
 
   return pyobj_param;
 }
@@ -417,7 +417,7 @@ PyObject* cyber_PyParameter_clt_get_parameter_list(PyObject* self,
     apollo::cyber::PyParameter* pyparameter =
         new apollo::cyber::PyParameter(param_ptr);
     PyObject* pyobj_param =
-        PyCapsule_New(pyparameter, "apollo_cybertron_pyparameter", NULL);
+        PyCapsule_New(pyparameter, "apollo_cybertron_pyparameter", nullptr);
     PyList_SetItem(pyobj_list, pos, pyobj_param);
     pos++;
   }
@@ -454,7 +454,7 @@ PyObject* cyber_new_PyParameterServer(PyObject* self, PyObject* args) {
   apollo::cyber::PyParameterServer* pyparameter_srv =
       new apollo::cyber::PyParameterServer(node);
   PyObject* pyobj_param = PyCapsule_New(
-      pyparameter_srv, "apollo_cybertron_pyparameterserver", NULL);
+      pyparameter_srv, "apollo_cybertron_pyparameterserver", nullptr);
   return pyobj_param;
 }
 
@@ -553,7 +553,7 @@ PyObject* cyber_PyParameter_srv_get_parameter(PyObject* self, PyObject* args) {
   apollo::cyber::PyParameter* pyparameter =
       new apollo::cyber::PyParameter(param);
   PyObject* pyobj_param =
-      PyCapsule_New(pyparameter, "apollo_cybertron_pyparameter", NULL);
+      PyCapsule_New(pyparameter, "apollo_cybertron_pyparameter", nullptr);
 
   return pyobj_param;
 }
@@ -588,7 +588,7 @@ PyObject* cyber_PyParameter_srv_get_parameter_list(PyObject* self,
     apollo::cyber::PyParameter* pyparameter =
         new apollo::cyber::PyParameter(param_ptr);
     PyObject* pyobj_param =
-        PyCapsule_New(pyparameter, "apollo_cybertron_pyparameter", NULL);
+        PyCapsule_New(pyparameter, "apollo_cybertron_pyparameter", nullptr);
     PyList_SetItem(pyobj_list, pos, pyobj_param);
     pos++;
   }
