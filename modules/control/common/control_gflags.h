@@ -56,3 +56,5 @@ DECLARE_bool(enable_maximum_steer_rate_limit);
 
 DECLARE_bool(query_time_nearest_point_only);
 DECLARE_bool(query_forward_time_point_only);
+
+DECLARE_bool(enable_feedback_augment_on_high_speed);
