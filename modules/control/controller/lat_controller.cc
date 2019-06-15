@@ -373,6 +373,8 @@ Status LatController::ComputeControlCommand(
   } else {
     cf_ = control_conf_->lat_controller_conf().cf();
     cr_ = control_conf_->lat_controller_conf().cr();
+    matrix_a_(0, 1) = 1.0;
+    matrix_a_coeff_(0, 2) = 0.0;
   }
   matrix_a_(1, 2) = (cf_ + cr_) / mass_;
   matrix_a_(3, 2) = (lf_ * cf_ - lr_ * cr_) / iz_;
@@ -596,6 +598,7 @@ void LatController::UpdateMatrix() {
   } else {
     v = std::max(VehicleStateProvider::Instance()->linear_velocity(),
                  minimum_speed_protection_);
+    matrix_a_(0, 2) = 0.0;
   }
   matrix_a_(1, 1) = matrix_a_coeff_(1, 1) / v;
   matrix_a_(1, 3) = matrix_a_coeff_(1, 3) / v;
