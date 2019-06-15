@@ -209,7 +209,8 @@ new_local_repository(
 new_http_archive(
     name = "proj4",
     build_file = "third_party/proj4.BUILD",
-    strip_prefix = "proj.4-4.9.3",
+    strip_prefix = "PROJ-4.9.3",
+    sha256 = "9d6d845ae77928441631882e25177117534dbe4311b823ee35eb100d3b69a78e",
     url = "file:///home/tmp/proj.4-4.9.3.zip",
 )
 
