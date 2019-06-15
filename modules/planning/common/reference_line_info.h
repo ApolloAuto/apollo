@@ -148,8 +148,6 @@ class ReferenceLineInfo {
 
   void ExportEngageAdvice(common::EngageAdvice* engage_advice) const;
 
-  bool IsSafeToChangeLane() const { return is_safe_to_change_lane_; }
-
   const hdmap::RouteSegments& Lanes() const;
   const std::list<hdmap::Id> TargetLaneId() const;
 
@@ -301,8 +299,6 @@ class ReferenceLineInfo {
   hdmap::RouteSegments lanes_;
 
   bool is_on_reference_line_ = false;
-
-  bool is_safe_to_change_lane_ = false;
 
   bool is_path_lane_borrow_ = false;
 

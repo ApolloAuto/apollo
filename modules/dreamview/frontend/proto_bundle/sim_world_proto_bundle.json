@@ -4293,6 +4293,13 @@
                 "perceptionObstacleBuffer": {
                   "type": "double",
                   "id": 10
+                },
+                "boundWidthChangeRatioUppperLimit": {
+                  "type": "double",
+                  "id": 11,
+                  "options": {
+                    "default": 1
+                  }
                 }
               },
               "nested": {
