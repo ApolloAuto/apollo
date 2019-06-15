@@ -61,6 +61,11 @@ void PedestrianInteractionEvaluator::Clear() {
 
 void PedestrianInteractionEvaluator::LoadModel() {
   torch::set_num_threads(1);
+  // TODO(all) uncomment the following when cuda issue is resolved
+  // if (torch::cuda::is_available()) {
+  //   AERROR << "CUDA is available for PedestrianInteractionEvaluator!";
+  //   device_ = torch::Device(torch::kCUDA);
+  // }
   torch_position_embedding_ptr_ = torch::jit::load(
       FLAGS_torch_pedestrian_interaction_position_embedding_file, device_);
   torch_social_embedding_ptr_ = torch::jit::load(
@@ -101,7 +106,7 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Step 1 Get social embedding
   torch::Tensor social_pooling = GetSocialPooling();
   std::vector<torch::jit::IValue> social_embedding_inputs;
-  social_embedding_inputs.push_back(std::move(social_pooling));
+  social_embedding_inputs.push_back(social_pooling.to(device_));
   torch::Tensor social_embedding =
       torch_social_embedding_ptr_->forward(social_embedding_inputs)
           .toTensor()
@@ -114,7 +119,7 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   torch_position[0][0] = pos_x;
   torch_position[0][1] = pos_y;
   std::vector<torch::jit::IValue> position_embedding_inputs;
-  position_embedding_inputs.push_back(std::move(torch_position));
+  position_embedding_inputs.push_back(torch_position.to(device_));
   torch::Tensor position_embedding =
       torch_position_embedding_ptr_->forward(position_embedding_inputs)
           .toTensor()
@@ -138,7 +143,7 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     lstm_input[0][kEmbeddingSize + kHiddenSize + i] = curr_ct[0][0][i];
   }
   std::vector<torch::jit::IValue> lstm_inputs;
-  lstm_inputs.push_back(std::move(lstm_input));
+  lstm_inputs.push_back(lstm_input.to(device_));
   auto lstm_out_tuple = torch_single_lstm_ptr_->forward(lstm_inputs).toTuple();
   auto ht = lstm_out_tuple->elements()[0].toTensor();
   auto ct = lstm_out_tuple->elements()[1].toTensor();
@@ -169,7 +174,7 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     torch_position[0][0] = prev_x;
     torch_position[0][1] = prev_y;
     std::vector<torch::jit::IValue> position_embedding_inputs;
-    position_embedding_inputs.push_back(std::move(torch_position));
+    position_embedding_inputs.push_back(torch_position.to(device_));
     torch::Tensor position_embedding =
         torch_position_embedding_ptr_->forward(position_embedding_inputs)
             .toTensor()
@@ -184,13 +189,13 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       lstm_input[0][kEmbeddingSize + kHiddenSize + i] = ct[0][0][i];
     }
     std::vector<torch::jit::IValue> lstm_inputs;
-    lstm_inputs.push_back(std::move(lstm_input));
+    lstm_inputs.push_back(lstm_input.to(device_));
     auto lstm_out_tuple =
         torch_single_lstm_ptr_->forward(lstm_inputs).toTuple();
     ht = lstm_out_tuple->elements()[0].toTensor();
     ct = lstm_out_tuple->elements()[1].toTensor();
     std::vector<torch::jit::IValue> prediction_inputs;
-    prediction_inputs.push_back(ht[0]);
+    prediction_inputs.push_back(ht[0].to(device_));
     auto pred_out_tensor =
         torch_prediction_layer_ptr_->forward(prediction_inputs)
                                   .toTensor()
