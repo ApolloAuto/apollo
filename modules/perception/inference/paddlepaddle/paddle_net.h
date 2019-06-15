@@ -24,10 +24,9 @@
 #include <numeric>
 #include <iostream>
 #include <chrono>
-#include <glog/logging.h>
 #include <unordered_map>
 
-#include "paddle_inference_api.h"
+#include "paddle/paddle_inference_api.h"
 
 #include "modules/perception/inference/inference.h"
 
@@ -37,7 +36,7 @@ namespace inference {
 
 typedef std::shared_ptr<apollo::perception::base::Blob<float>> BlobPtr;
 
-constexpr uint64_t MemoryPoolInitSizeMb=100;
+constexpr uint64_t MemoryPoolInitSizeMb = 100;
 
 class PaddleNet : public Inference {
  public:
@@ -68,6 +67,7 @@ class PaddleNet : public Inference {
   BlobMap blobs_;
 
   std::unordered_map<std::string, std::string> name_map_ = {
+    // object detection
     {"data", "input"},
     {"detect1_obj_pred", "save_infer_model/scale_0"},
     {"detect1_cls_pred", "save_infer_model/scale_1"},
@@ -79,9 +79,6 @@ class PaddleNet : public Inference {
     {"brswt_pred", "save_infer_model/scale_7"},
     {"ltswt_pred", "save_infer_model/scale_8"},
     {"rtswt_pred", "save_infer_model/scale_9"},
-//    {"vis_pred", "save_infer_model/scale_10"},
-//    {"area_id_perm_reshape", "save_infer_model/scale_11"},
-//    {"cut_pred", "save_infer_model/scale_12"},
     {"detect1_loc_pred", "save_infer_model/scale_13"},
     {"conv3_3", "save_infer_model/scale_14"},
     // lane line
