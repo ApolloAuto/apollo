@@ -72,5 +72,5 @@ DEFINE_bool(query_time_nearest_point_only, false,
 DEFINE_bool(query_forward_time_point_only, false,
             "only use the trajectory point in future");
 
-DEFINE_bool(enable_feedback_augment_on_high_speed, true,
+DEFINE_bool(enable_feedback_augment_on_high_speed, false,
             "Enable augmented control on lateral error on high speed");
