@@ -38,8 +38,7 @@ namespace planning {
 
 class SpeedLimitDecider {
  public:
-  SpeedLimitDecider(const SLBoundary& adc_sl_boundary,
-                    const SpeedBoundsDeciderConfig& config,
+  SpeedLimitDecider(const SpeedBoundsDeciderConfig& config,
                     const ReferenceLine& reference_line,
                     const PathData& path_data);
 
@@ -57,7 +56,6 @@ class SpeedLimitDecider {
                    std::vector<double>* kappa) const;
 
  private:
-  const SLBoundary& adc_sl_boundary_;
   const SpeedBoundsDeciderConfig& speed_bounds_config_;
   const ReferenceLine& reference_line_;
   const PathData& path_data_;

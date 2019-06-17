@@ -52,7 +52,6 @@ SpeedBoundsDecider::SpeedBoundsDecider(const TaskConfig &config)
 Status SpeedBoundsDecider::Process(
     Frame *const frame, ReferenceLineInfo *const reference_line_info) {
   // retrieve data from frame and reference_line_info
-  const SLBoundary &adc_sl_boundary = reference_line_info->AdcSlBoundary();
   const PathData &path_data = reference_line_info->path_data();
   const TrajectoryPoint &init_point = frame->PlanningStartPoint();
   const ReferenceLine &reference_line = reference_line_info->reference_line();
@@ -88,7 +87,7 @@ Status SpeedBoundsDecider::Process(
   const double min_s_on_st_boundaries = SetSpeedFallbackDistance(path_decision);
 
   // 2. Create speed limit along path
-  SpeedLimitDecider speed_limit_decider(adc_sl_boundary, speed_bounds_config_,
+  SpeedLimitDecider speed_limit_decider(speed_bounds_config_,
                                         reference_line, path_data);
 
   SpeedLimit speed_limit;

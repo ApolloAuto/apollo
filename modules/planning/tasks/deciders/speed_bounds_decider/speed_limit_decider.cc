@@ -36,12 +36,10 @@ namespace planning {
 
 using apollo::common::Status;
 
-SpeedLimitDecider::SpeedLimitDecider(const SLBoundary& adc_sl_boundary,
-                                     const SpeedBoundsDeciderConfig& config,
+SpeedLimitDecider::SpeedLimitDecider(const SpeedBoundsDeciderConfig& config,
                                      const ReferenceLine& reference_line,
                                      const PathData& path_data)
-    : adc_sl_boundary_(adc_sl_boundary),
-      speed_bounds_config_(config),
+    : speed_bounds_config_(config),
       reference_line_(reference_line),
       path_data_(path_data),
       vehicle_param_(common::VehicleConfigHelper::GetConfig().vehicle_param()) {
