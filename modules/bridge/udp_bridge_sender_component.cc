@@ -57,36 +57,29 @@ bool UDPBridgeSenderComponent<T>::Proc(const std::shared_ptr<T> &pb_msg) {
     return false;
   }
 
-  apollo::cyber::scheduler::Instance()->CreateTask(
-      [this, &pb_msg]() {
-        struct sockaddr_in server_addr;
-        server_addr.sin_addr.s_addr = inet_addr(remote_ip_.c_str());
-        server_addr.sin_family = AF_INET;
-        server_addr.sin_port = htons((uint16_t)remote_port_);
+  struct sockaddr_in server_addr;
+  server_addr.sin_addr.s_addr = inet_addr(remote_ip_.c_str());
+  server_addr.sin_family = AF_INET;
+  server_addr.sin_port = htons(static_cast<uint16_t>(remote_port_));
+  int sock_fd = socket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, 0);
 
-        Session session;
-        session.Socket(AF_INET, SOCK_DGRAM, 0);
-        if (session.Connect((struct sockaddr *)&server_addr,
-                            sizeof(server_addr)) < 0) {
-          std::cout << "connect to server failed, " << strerror(errno)
-                    << std::endl;
-          return;
-        }
+  int res = connect(sock_fd, (struct sockaddr *)&server_addr,
+      sizeof(server_addr));
+  if (res < 0) {
+    close(sock_fd);
+    return false;
+  }
 
-        std::lock_guard<std::mutex> lg(mutex_);
-        BridgeProtoSerializedBuf<T> proto_buf;
-        proto_buf.Serialize(pb_msg, proto_name_);
-        for (size_t i = 0; i < proto_buf.GetSerializedBufCount(); i++) {
-          if (session.Send(proto_buf.GetSerializedBuf(i),
-                           proto_buf.GetSerializedBufSize(i), 0) < 0) {
-            std::cout << "send message failed." << std::endl;
-            session.Close();
-            return;
-          }
-        }
-        session.Close();
-      },
-      "bridge_client");
+  BridgeProtoSerializedBuf<T> proto_buf;
+  proto_buf.Serialize(pb_msg, proto_name_);
+  for (size_t j = 0; j < proto_buf.GetSerializedBufCount(); j++) {
+    ssize_t nbytes = send(sock_fd, proto_buf.GetSerializedBuf(j),
+      proto_buf.GetSerializedBufSize(j), 0);
+    if (nbytes != static_cast<ssize_t>(proto_buf.GetSerializedBufSize(j))) {
+      break;
+    }
+  }
+  close(sock_fd);
 
   return true;
 }
