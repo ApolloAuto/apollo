@@ -39,13 +39,13 @@ class SpeedDecider : public Task {
                          ReferenceLineInfo* reference_line_info) override;
 
  private:
-  enum StPosition {
+  enum STLocation {
     ABOVE = 1,
     BELOW = 2,
     CROSS = 3,
   };
 
-  StPosition GetStPosition(const PathDecision* const path_decision,
+  STLocation GetSTLocation(const PathDecision* const path_decision,
                            const SpeedData& speed_profile,
                            const STBoundary& st_boundary) const;
 
