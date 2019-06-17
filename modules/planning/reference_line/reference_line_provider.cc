@@ -777,7 +777,7 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
   auto ref_point = reference_line.GetReferencePoint(s);
   if (ref_point.lane_waypoints().empty()) {
     anchor.path_point = ref_point.ToPathPoint(s);
-    anchor.lateral_bound = smoother_config_.lateral_boundary_bound();
+    anchor.lateral_bound = smoother_config_.max_lateral_boundary_bound();
     return anchor;
   }
 
@@ -797,7 +797,8 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
   safe_lane_width -= adc_width;
   bool is_lane_width_safe = true;
   if (safe_lane_width < kEpislon) {
-    AERROR << "lane width smaller than adc width";
+    AERROR << "lane width [" << left_width + right_width << "] "
+           << "is smaller than adc width [" << adc_width << "]";
     effective_width = kEpislon;
     is_lane_width_safe = false;
   }
@@ -815,7 +816,7 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
     safe_lane_width -= smoother_config_.curb_shift();
     center_shift += 0.5 * smoother_config_.curb_shift();
     if (safe_lane_width < kEpislon) {
-      AERROR << "lane width smaller than adc width and left curb shift";
+      AERROR << "lane width smaller than adc width and right curb shift";
       effective_width = kEpislon;
       is_lane_width_safe = false;
     }
@@ -849,8 +850,9 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
 
   ref_point += left_vec * center_shift;
   anchor.path_point = ref_point.ToPathPoint(s);
-  anchor.lateral_bound =
-      std::min(smoother_config_.lateral_boundary_bound(), effective_width);
+  anchor.lateral_bound = common::math::Clamp(
+      effective_width, smoother_config_.min_lateral_boundary_bound(),
+      smoother_config_.max_lateral_boundary_bound());
   return anchor;
 }
 

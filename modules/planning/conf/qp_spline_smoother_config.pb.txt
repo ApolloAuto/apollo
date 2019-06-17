@@ -1,6 +1,6 @@
 max_constraint_interval : 5.0
 longitudinal_boundary_bound : 2.0
-lateral_boundary_bound : 0.5
+max_lateral_boundary_bound : 0.5
 num_of_total_points : 500
 curb_shift : 0.2
 driving_side : RIGHT
