@@ -5,6 +5,7 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "navigation_dummy",
     srcs = ["navigation_dummy.cc"],
+    copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         "//cyber",
         "//modules/common",
@@ -17,6 +18,7 @@ cc_binary(
 cc_binary(
     name = "navigator",
     srcs = ["navigator.cc"],
+    copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         "//cyber",
         "//modules/common",

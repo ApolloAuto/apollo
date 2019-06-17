@@ -10,6 +10,9 @@ cc_library(
     hdrs = [
         "piecewise_jerk_problem.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         "//cyber/common:log",
         "//modules/planning/common:planning_gflags",

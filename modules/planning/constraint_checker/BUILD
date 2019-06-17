@@ -10,6 +10,9 @@ cc_library(
     hdrs = [
         "constraint_checker.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         "//cyber/common:log",
         "//modules/common/proto:pnc_point_proto",
@@ -27,6 +30,9 @@ cc_library(
     hdrs = [
         "constraint_checker1d.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         "//cyber/common:log",
         "//modules/planning/common:frame",
@@ -43,6 +49,9 @@ cc_library(
     ],
     hdrs = [
         "collision_checker.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         "//cyber/common:log",

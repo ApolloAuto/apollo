@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "edge_creator.h",
     ],
+    copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
         "//modules/routing/common:routing_gflags",
         "//modules/routing/proto:routing_proto",
@@ -24,6 +25,7 @@ cc_library(
     hdrs = [
         "graph_creator.h",
     ],
+    copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
         ":edge_creator",
         ":node_creator",
@@ -52,6 +54,7 @@ cc_library(
     hdrs = [
         "node_creator.h",
     ],
+    copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
         "//modules/routing/proto:routing_proto",
     ],
@@ -60,6 +63,7 @@ cc_library(
 cc_binary(
     name = "topo_creator",
     srcs = ["topo_creator.cc"],
+    copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
         ":graph_creator",
         "//modules/map/hdmap:hdmap_util",

@@ -6,6 +6,9 @@ cc_library(
     name = "predictor_manager",
     srcs = ["predictor_manager.cc"],
     hdrs = ["predictor_manager.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/common:feature_output",
         "//modules/prediction/common:prediction_thread_pool",
@@ -41,6 +44,9 @@ cc_library(
     name = "predictor",
     srcs = ["predictor.cc"],
     hdrs = ["predictor.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
         "//modules/prediction/container/obstacles:obstacle",
