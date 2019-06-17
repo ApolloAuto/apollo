@@ -68,7 +68,7 @@ TEST(BridgeProtoBufTest, Simple) {
     proto_recv_buf.Initialize(header);
     char *buf = proto_recv_buf.GetBuf(header.GetFramePos());
     cursor = proto_buf.GetSerializedBuf(i) + header_size;
-    memcpy(buf, cursor, proto_buf.GetSerializedBufSize(i) - header_size);
+    memcpy(buf, cursor, header.GetFrameSize());
     proto_recv_buf.UpdateStatus(header.GetIndex());
     if (i < frame_count - 1) {
       EXPECT_FALSE(proto_recv_buf.IsReadyDiserialize());

@@ -28,14 +28,13 @@
 #include "cyber/component/component.h"
 #include "cyber/cyber.h"
 #include "cyber/init.h"
-#include "cyber/io/session.h"
 #include "cyber/scheduler/scheduler_factory.h"
 #include "modules/bridge/common/bridge_gflags.h"
 #include "modules/bridge/common/bridge_proto_diserialized_buf.h"
 #include "modules/bridge/common/bridge_header.h"
 #include "modules/bridge/proto/udp_bridge_remote_info.pb.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
-
+#include "modules/bridge/common/udp_listener.h"
 #include "modules/canbus/proto/chassis.pb.h"
 
 namespace apollo {
@@ -53,14 +52,15 @@ class UDPBridgeReceiverComponent final : public cyber::Component<> {
   bool Init() override;
 
   std::string Name() const { return FLAGS_bridge_module_name; }
+  bool MsgHandle(int fd);
 
  private:
   bool InitSession(uint16_t port);
-  bool MsgHandle();
   void MsgDispatcher();
   bool IsProtoExist(const BridgeHeader &header);
   BridgeProtoDiserializedBuf<T> *CreateBridgeProtoBuf(
     const BridgeHeader &header);
+  bool IsTimeout(double time_stamp);
 
  private:
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
@@ -70,8 +70,9 @@ class UDPBridgeReceiverComponent final : public cyber::Component<> {
   std::shared_ptr<cyber::Writer<T>> writer_;
   std::mutex mutex_;
 
-  std::shared_ptr<apollo::cyber::io::Session> session_ =
-      std::make_shared<apollo::cyber::io::Session>();
+  std::shared_ptr<UDPListener<UDPBridgeReceiverComponent<T>>> listener_ =
+    std::make_shared<UDPListener<UDPBridgeReceiverComponent<T>>>();
+
   std::vector<BridgeProtoDiserializedBuf<T> *> proto_list_;
 };
 

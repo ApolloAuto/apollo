@@ -49,6 +49,7 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"bridge\\"'],
     deps = [
         ":udp_bridge",
+        "//modules/bridge/common:udp_listener",
     ],
 )
 

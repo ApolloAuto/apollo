@@ -58,6 +58,13 @@ cc_library(
 )
 
 cc_library(
+    name = "udp_listener",
+    hdrs = [
+        "udp_listener.h",
+    ],
+)
+
+cc_library(
     name = "bridge_header",
     srcs = [
         "bridge_header.cc",
