@@ -462,7 +462,7 @@ class ServiceUtils(object):
     ##
     # @brief Get service attribute by the service name.
     #
-    # @param node_name service name.
+    # @param service_name service name.
     # @param sleep_s wait time for topo discovery.
     #
     # @return the service's attribute.

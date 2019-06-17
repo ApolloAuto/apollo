@@ -246,3 +246,62 @@ Defined in ``cyber/time/time.h``
    :members:
    :project: Cyber RT Documents
 
+
+cyber/record/header_builder.h
+=================================
+
+Defined in ``cyber/record/header_builder.h``
+
+.. doxygenclass:: apollo::cyber::record::HeaderBuilder
+   :members:
+   :project: Cyber RT Documents
+
+
+cyber/record/record_base.h
+=================================
+
+Defined in ``cyber/record/record_base.h``
+
+.. doxygenclass:: apollo::cyber::record::RecordBase
+   :members:
+   :project: Cyber RT Documents
+
+
+cyber/record/record_message.h
+=================================
+
+Defined in ``cyber/record/record_message.h``
+
+.. doxygenstruct:: apollo::cyber::record::RecordMessage
+   :members:
+   :project: Cyber RT Documents
+
+
+cyber/record/record_reader.h
+=================================
+
+Defined in ``cyber/record/record_reader.h``
+
+.. doxygenclass:: apollo::cyber::record::RecordReader
+   :members:
+   :project: Cyber RT Documents
+
+
+cyber/record/record_writer.h
+=================================
+
+Defined in ``cyber/record/record_writer.h``
+
+.. doxygenclass:: apollo::cyber::record::RecordWriter
+   :members:
+   :project: Cyber RT Documents
+
+
+cyber/record/record_viewer.h
+=================================
+
+Defined in ``cyber/record/record_viewer.h``
+
+.. doxygenclass:: apollo::cyber::record::RecordViewer
+   :members:
+   :project: Cyber RT Documents
