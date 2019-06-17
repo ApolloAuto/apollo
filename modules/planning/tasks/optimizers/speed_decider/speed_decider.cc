@@ -63,14 +63,15 @@ common::Status SpeedDecider::Execute(Frame* frame,
   return Status::OK();
 }
 
-SpeedDecider::StPosition SpeedDecider::GetStPosition(
+SpeedDecider::STLocation SpeedDecider::GetSTLocation(
     const PathDecision* const path_decision, const SpeedData& speed_profile,
     const STBoundary& st_boundary) const {
-  StPosition st_position = BELOW;
+
   if (st_boundary.IsEmpty()) {
-    return st_position;
+    return BELOW;
   }
 
+  STLocation st_location = BELOW;
   bool st_position_set = false;
   const double start_t = st_boundary.min_t();
   const double end_t = st_boundary.max_t();
@@ -87,12 +88,12 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
     common::math::LineSegment2d speed_line(curr_st, next_st);
     if (st_boundary.HasOverlap(speed_line)) {
       ADEBUG << "speed profile cross st_boundaries.";
-      st_position = CROSS;
+      st_location = CROSS;
 
       if (st_boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
         if (!CheckKeepClearCrossable(path_decision, speed_profile,
                                      st_boundary)) {
-          st_position = BELOW;
+          st_location = BELOW;
         }
       }
       break;
@@ -104,12 +105,12 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
       if (start_t < next_st.t() && curr_st.t() < end_t) {
         STPoint bd_point_front = st_boundary.upper_points().front();
         double side = common::math::CrossProd(bd_point_front, curr_st, next_st);
-        st_position = side < 0.0 ? ABOVE : BELOW;
+        st_location = side < 0.0 ? ABOVE : BELOW;
         st_position_set = true;
       }
     }
   }
-  return st_position;
+  return st_location;
 }
 
 bool SpeedDecider::CheckKeepClearCrossable(
@@ -228,10 +229,10 @@ Status SpeedDecider::MakeObjectDecision(
       continue;
     }
 
-    auto position = GetStPosition(path_decision, speed_profile, boundary);
+    auto location = GetSTLocation(path_decision, speed_profile, boundary);
     if (boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
       if (CheckKeepClearBlocked(path_decision, *obstacle)) {
-        position = BELOW;
+        location = BELOW;
       }
     }
 
@@ -240,7 +241,7 @@ Status SpeedDecider::MakeObjectDecision(
     reference_line_->XYToSL({box.center_x(), box.center_y()}, &start_sl_point);
     double start_abs_l = std::abs(start_sl_point.l());
 
-    switch (position) {
+    switch (location) {
       case BELOW:
         if (boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
           ObjectDecisionType stop_decision;
@@ -307,7 +308,7 @@ Status SpeedDecider::MakeObjectDecision(
         }
         break;
       default:
-        AERROR << "Unknown position:" << position;
+        AERROR << "Unknown position:" << location;
     }
     AppendIgnoreDecision(mutable_obstacle);
   }
