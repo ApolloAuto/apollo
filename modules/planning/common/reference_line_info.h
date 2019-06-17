@@ -158,7 +158,7 @@ class ReferenceLineInfo {
 
   ADCTrajectory::RightOfWayStatus GetRightOfWayStatus() const;
 
-  const hdmap::Lane::LaneTurn& GetPathTurnType(const double s) const;
+  const hdmap::Lane::LaneTurn GetPathTurnType(const double s) const;
 
   const bool GetIntersectionRightofWayStatus(
       const hdmap::PathOverlap& pnc_junction_overlap) const;
