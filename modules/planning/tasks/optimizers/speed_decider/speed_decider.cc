@@ -339,7 +339,7 @@ void SpeedDecider::AppendIgnoreDecision(Obstacle* obstacle) const {
 bool SpeedDecider::CreateStopDecision(const Obstacle& obstacle,
                                       ObjectDecisionType* const stop_decision,
                                       double stop_distance) const {
-  DCHECK_NOTNULL(stop_decision);
+  CHECK_NOTNULL(stop_decision);
 
   const auto& boundary = obstacle.st_boundary();
   double fence_s = adc_sl_boundary_.end_s() + boundary.min_s() + stop_distance;
@@ -377,7 +377,7 @@ bool SpeedDecider::CreateStopDecision(const Obstacle& obstacle,
 
 bool SpeedDecider::CreateFollowDecision(
     const Obstacle& obstacle, ObjectDecisionType* const follow_decision) const {
-  DCHECK_NOTNULL(follow_decision);
+  CHECK_NOTNULL(follow_decision);
 
   const double follow_speed = init_point_.v();
   const double follow_distance_s = -std::fmax(
@@ -413,7 +413,7 @@ bool SpeedDecider::CreateFollowDecision(
 
 bool SpeedDecider::CreateYieldDecision(
     const Obstacle& obstacle, ObjectDecisionType* const yield_decision) const {
-  DCHECK_NOTNULL(yield_decision);
+  CHECK_NOTNULL(yield_decision);
 
   PerceptionObstacle::Type obstacle_type = obstacle.Perception().type();
   double yield_distance = FLAGS_yield_distance;
@@ -450,7 +450,7 @@ bool SpeedDecider::CreateYieldDecision(
 bool SpeedDecider::CreateOvertakeDecision(
     const Obstacle& obstacle,
     ObjectDecisionType* const overtake_decision) const {
-  DCHECK_NOTNULL(overtake_decision);
+  CHECK_NOTNULL(overtake_decision);
 
   constexpr double kOvertakeTimeBuffer = 3.0;    // in seconds
   constexpr double kMinOvertakeDistance = 10.0;  // in meters
