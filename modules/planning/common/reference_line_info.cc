@@ -837,7 +837,7 @@ void ReferenceLineInfo::MakeEStopDecision(
   }
 }
 
-const hdmap::Lane::LaneTurn& ReferenceLineInfo::GetPathTurnType(
+const hdmap::Lane::LaneTurn ReferenceLineInfo::GetPathTurnType(
     const double s) const {
   const double forward_buffer = 20.0;
   double route_s = 0.0;
