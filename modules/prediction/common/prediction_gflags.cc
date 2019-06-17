@@ -168,15 +168,15 @@ DEFINE_string(torch_pedestrian_interaction_prediction_layer_file,
               "pedestrian interaction prediction layer");
 DEFINE_string(torch_lane_aggregating_obstacle_encoding_file,
               "/apollo/modules/prediction/data/"
-              "lane_aggregating_obstacle_encoding_layer.pt",
+              "traced_online_obs_enc.pt",
               "lane aggregating obstacle encoding layer");
 DEFINE_string(torch_lane_aggregating_lane_encoding_file,
               "/apollo/modules/prediction/data/"
-              "lane_aggregating_lane_encoding_layer.pt",
+              "traced_online_lane_enc.pt",
               "lane aggregating lane encoding layer");
 DEFINE_string(torch_lane_aggregating_prediction_layer_file,
               "/apollo/modules/prediction/data/"
-              "lane_aggregating_prediction_layer.pt",
+              "traced_online_pred_layer.pt",
               "lane aggregating prediction layer");
 DEFINE_int32(max_num_obstacles, 300,
              "maximal number of obstacles stored in obstacles container.");
