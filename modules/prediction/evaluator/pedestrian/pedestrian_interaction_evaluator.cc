@@ -114,12 +114,11 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 
   double rel_x = 0.0;
   double rel_y = 0.0;
-  size_t history_size = obstacle_ptr->history_size();
   if (obstacle_ptr->history_size() > 1) {
     rel_x = obstacle_ptr->latest_feature().position().x() -
-            obstacle_ptr->feature(history_size - 1).position().x();
+            obstacle_ptr->earliest_feature().position().x();
     rel_y = obstacle_ptr->latest_feature().position().y() -
-            obstacle_ptr->feature(history_size - 1).position().y();
+            obstacle_ptr->earliest_feature().position().y();
   }
 
   // Step 2 Get position embedding
