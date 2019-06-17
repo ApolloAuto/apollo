@@ -546,9 +546,11 @@ void PathAssessmentDecider::SetPathPointType(
                     ego_center_shift_distance * std::sin(ego_theta)};
     ego_box.Shift(shift_vec);
     SLBoundary ego_sl_boundary;
-    reference_line_info.reference_line().GetSLBoundary(ego_box,
-                                                       &ego_sl_boundary);
-
+    if (!reference_line_info.reference_line().GetSLBoundary(ego_box,
+            &ego_sl_boundary)) {
+      ADEBUG << "Unable to get SL-boundary of ego-vehicle.";
+      continue;
+    }
     double lane_left_width = 0.0;
     double lane_right_width = 0.0;
     double middle_s =
