@@ -1,5 +1,5 @@
-Cyber RT Developer Tools
-========
+Apollo Cyber RT Developer Tools
+==================================
 
 Apollo Cyber RT framework comes with a collection of useful tools for daily development, including one visualization tool cyber_visualizer and two command line tools cyber_monitor and cyber_recorder.
 
@@ -50,14 +50,14 @@ As shown in figure below, three cameras' channel data on the buttom sections and
    You can also modify the camera information directly in the dialog box to change the camera's observation status in the point cloud scene. And the "Step" item is the step value from the dialog box.
 
    Place the mouse on the image of the camera channel, you can double-click the left button to highlight the corresponding data channel on the left menu bar. Right click on the image to bring up menu for deleting the camera channel.
-   
+
    Play and Pause buttons: when clicking the `Play` button, all channels will be showed. While when clicking the `Pause` button, all channels will stop showing on the tool.
 
 ## Cyber_monitor
 
 ### Install and run
 
-The command line tool `cyber_monitor` provides a clear view of the list of real time channel information Apollo Cyber RT in the terminal. 
+The command line tool `cyber_monitor` provides a clear view of the list of real time channel information Apollo Cyber RT in the terminal.
 
 ```bash
 username@computername:~$: source /your-path-to-apollo-install-dir/cyber/setup.bash
@@ -119,7 +119,7 @@ t | T ----- Display channel message type
 Space ----- Close|Open channel (only valid for channels with data arrival; yellow color after channel is closed)
 ```
 
-#### Commands only for channel 
+#### Commands only for channel
 
 ```
 i | I ----- Display channel Reader and Writer information
@@ -187,14 +187,14 @@ usage: cyber_recorder play [options]
     -a, --all				play all
     -c, --white-channel <name>		only play the specified channel
     -k, --black-channel <name>		not play the specified channel
-    -l, --loop				loop play  
-    -r, --rate <1.0>			multiply the play rate by FACTOR  
-    -b, --begin <2018-07-01 00:00:00>	play the record begin at  
-    -e, --end <2018-07-01 00:01:00>	play the record end at  
-    -s, --start <seconds>		play started at n seconds  
-    -d, --delay <seconds>		play delayed n seconds  
-    -p, --preload <seconds>		play after trying to preload n second(s)  
-    -h, --help				show help message  
+    -l, --loop				loop play
+    -r, --rate <1.0>			multiply the play rate by FACTOR
+    -b, --begin <2018-07-01 00:00:00>	play the record begin at
+    -e, --end <2018-07-01 00:01:00>	play the record end at
+    -s, --start <seconds>		play started at n seconds
+    -d, --delay <seconds>		play delayed n seconds
+    -p, --preload <seconds>		play after trying to preload n second(s)
+    -h, --help				show help message
 ```
 
 - To split a record file:
@@ -219,7 +219,7 @@ usage: cyber_recorder recover [options]
     -o, --output <file>                output record file
 ```
 
-### Examples of using cyber_recorder 
+### Examples of using cyber_recorder
 
 #### Check the details of a record file
 
@@ -319,7 +319,7 @@ Usage:
 ```
 
 ### Example
- 
+
 We can convert [Apollo2.5 demo bag](https://github.com/ApolloAuto/apollo/releases/download/v2.5.0/demo_2.5.bag) to record file.
 
 ```bash
