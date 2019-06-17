@@ -728,7 +728,7 @@ void CosThetaIpoptInterface::generate_tapes(int n, int m, int* nnz_jac_g,
   double sig;
   adouble obj_value;
 
-  double dummy;
+  double dummy = 0.0;
   obj_lam_.clear();
   obj_lam_.resize(m + 1, 0.0);
   get_starting_point(n, 1, &xp[0], 0, &zl[0], &zu[0], m, 0, &lamp[0]);
