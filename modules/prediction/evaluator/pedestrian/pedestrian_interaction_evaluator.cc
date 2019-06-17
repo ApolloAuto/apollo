@@ -112,12 +112,22 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
           .toTensor()
           .to(torch::kCPU);
 
+  double rel_x = 0.0;
+  double rel_y = 0.0;
+  size_t history_size = obstacle_ptr->history_size();
+  if (obstacle_ptr->history_size() > 1) {
+    rel_x = obstacle_ptr->latest_feature().position().x() -
+            obstacle_ptr->feature(history_size - 1).position().x();
+    rel_y = obstacle_ptr->latest_feature().position().y() -
+            obstacle_ptr->feature(history_size - 1).position().y();
+  }
+
   // Step 2 Get position embedding
   double pos_x = feature_values[2];
   double pos_y = feature_values[3];
   torch::Tensor torch_position = torch::zeros({1, 2});
-  torch_position[0][0] = pos_x;
-  torch_position[0][1] = pos_y;
+  torch_position[0][0] = rel_x;
+  torch_position[0][1] = rel_y;
   std::vector<torch::jit::IValue> position_embedding_inputs;
   position_embedding_inputs.push_back(torch_position.to(device_));
   torch::Tensor position_embedding =
@@ -150,6 +160,14 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   obstacle_id_lstm_state_map_[id].ht = ht.clone();
   obstacle_id_lstm_state_map_[id].ct = ct.clone();
 
+  std::vector<torch::jit::IValue> prediction_inputs;
+  prediction_inputs.push_back(ht[0].to(device_));
+  auto pred_out_tensor =
+      torch_prediction_layer_ptr_->forward(prediction_inputs)
+                                .toTensor()
+                                .to(torch::kCPU);
+  auto pred_out = pred_out_tensor.accessor<float, 2>();
+
   // Step 4 for-loop get a trajectory
   // Set the starting trajectory point
   Trajectory* trajectory = latest_feature_ptr->add_predicted_trajectory();
@@ -165,45 +183,12 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   int num_trajectory_point =
       static_cast<int>(kShortTermPredictionTimeLength /
                        FLAGS_prediction_trajectory_time_resolution);
-  for (int i = 1; i < num_trajectory_point; ++i) {
+  for (int i = 1; i <= num_trajectory_point; ++i) {
     double prev_x = trajectory->trajectory_point(i - 1).path_point().x();
     double prev_y = trajectory->trajectory_point(i - 1).path_point().y();
-    CHECK(obstacle_id_lstm_state_map_.find(id) !=
-          obstacle_id_lstm_state_map_.end());
-    torch::Tensor torch_position = torch::zeros({1, 2});
-    torch_position[0][0] = prev_x;
-    torch_position[0][1] = prev_y;
-    std::vector<torch::jit::IValue> position_embedding_inputs;
-    position_embedding_inputs.push_back(torch_position.to(device_));
-    torch::Tensor position_embedding =
-        torch_position_embedding_ptr_->forward(position_embedding_inputs)
-            .toTensor()
-            .to(torch::kCPU);
-    torch::Tensor lstm_input =
-        torch::zeros({1, kEmbeddingSize + 2 * kHiddenSize});
-    for (int i = 0; i < kEmbeddingSize; ++i) {
-      lstm_input[0][i] = position_embedding[0][i];
-    }
-    for (int i = 0; i < kHiddenSize; ++i) {
-      lstm_input[0][kEmbeddingSize + i] = ht[0][0][i];
-      lstm_input[0][kEmbeddingSize + kHiddenSize + i] = ct[0][0][i];
-    }
-    std::vector<torch::jit::IValue> lstm_inputs;
-    lstm_inputs.push_back(lstm_input.to(device_));
-    auto lstm_out_tuple =
-        torch_single_lstm_ptr_->forward(lstm_inputs).toTuple();
-    ht = lstm_out_tuple->elements()[0].toTensor();
-    ct = lstm_out_tuple->elements()[1].toTensor();
-    std::vector<torch::jit::IValue> prediction_inputs;
-    prediction_inputs.push_back(ht[0].to(device_));
-    auto pred_out_tensor =
-        torch_prediction_layer_ptr_->forward(prediction_inputs)
-                                  .toTensor()
-                                  .to(torch::kCPU);
-    auto pred_out = pred_out_tensor.accessor<float, 2>();
     TrajectoryPoint* point = trajectory->add_trajectory_point();
-    double curr_x = prev_x + static_cast<double>(pred_out[0][0]);
-    double curr_y = prev_y + static_cast<double>(pred_out[0][1]);
+    double curr_x = prev_x + static_cast<double>(pred_out[0][5 * i]);
+    double curr_y = prev_y + static_cast<double>(pred_out[0][5 * i + 1]);
     point->mutable_path_point()->set_x(curr_x);
     point->mutable_path_point()->set_y(curr_y);
     Vec2d direction(curr_x - prev_x, curr_y - prev_y);
