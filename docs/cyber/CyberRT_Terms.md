@@ -1,4 +1,4 @@
-# Apollo Cyber RT Terminologies 
+# Apollo Cyber RT Terminologies
 
 This page describes the definitions of the most commonly used terminologies in Cyber RT.
 
@@ -14,11 +14,11 @@ Channels are used to manage data communication in Cyber RT. Users can publish/su
 
 Task is the abstract description of an asynchronous computation task in Cyber RT.
 
-## Node 
+## Node
 
-Node is the fundamental building block of Cyber RT; every module contains and communicates through the node. A module can have different types of communication by defining read/write and/or service/client in a node. 
+Node is the fundamental building block of Cyber RT; every module contains and communicates through the node. A module can have different types of communication by defining read/write and/or service/client in a node.
 
-## Reader/Writer 
+## Reader/Writer
 
 Message read/write class from/to channel. Reader/Writer are normally created within a node as the major message transfer interface in Cyber RT.
 

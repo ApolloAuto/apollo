@@ -29,7 +29,7 @@ class Node:
     """
     Class for cyber Node wrapper.
     """
-    
+
     def create_writer(self, name, data_type, qos_depth=1):
         """
         create a topic writer for send message to topic.
@@ -54,7 +54,7 @@ class Node:
 	"""
 	"""
 	def create_service(self, name, req_data_type, res_data_type, callback, args=None):
-        
+
     def spin(self):
         """
         spin in wait and process message.
@@ -76,7 +76,7 @@ Read from record：
 
 1. Create a RecordReader;
 2. Read messages from Record;
-  
+
 Write to record：
 
   1. Create a RecordWriter
@@ -147,28 +147,28 @@ class RecordWriter(object):
         """
         return filesegment size.
         """
-    
+
     def set_intervaltime_fileseg(self, time_sec):
         """
         return file interval time.
         """
-    
+
     def get_messagenumber(self, channel_name):
         """
         return message count.
         """
-    
+
     def get_messagetype(self, channel_name):
         """
         return message type.
         """
-    
+
     def get_protodesc(self, channel_name):
         """
         return message protodesc.
         """
-    
-``` 
+
+```
 ### 3.3 Time Interfaces
 
 ```
@@ -208,20 +208,20 @@ class Timer(object):
         oneshot 1: perform the callback only after the first timing cycle
                 0:perform the callback every timed period
         '''
-        
+
 
     def start(self):
-        
+
 
     def stop(self):
-        
+
 
 ```
 
 
 ## 4. Examples
 ### 4.1 Read from Channel (in cyber/python/examples/listener.py)
- 
+
 ```
 import sys
 sys.path.append("../")
@@ -368,4 +368,4 @@ if __name__ == '__main__':
     cyber.shutdown()
 
 ```
- 
+

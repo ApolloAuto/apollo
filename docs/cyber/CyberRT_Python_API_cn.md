@@ -1,12 +1,12 @@
 ## 1. 背景
    Cyber核心代码是由C++开发，同时为了方便开发者，提供了Python接口。
-   
+
 ## 2. CyberRT Python接口实现思路
    Cyber Python接口的实现思路是在Cyber C++实现的基础上，做了一层Python的封装，由Python来调用C++的实现函数。Cyber Python Wrapper的实现没有使用swig等第三方工具，完全自主实现，以此保证代码的高可维护性和可读性。
 
 ## 3. 主要接口
    目前提供的主要接口包括：
-   
+
 * channel读、写
 * server/client通信
 * record信息查询
@@ -30,7 +30,7 @@ class Node:
     """
     Class for cyber Node wrapper.
     """
-    
+
     def create_writer(self, name, data_type, qos_depth=1):
         """
         create a topic writer for send message to topic.
@@ -55,7 +55,7 @@ class Node:
 	"""
 	"""
 	def create_service(self, name, req_data_type, res_data_type, callback, args=None):
-        
+
     def spin(self):
         """
         spin in wait and process message.
@@ -144,27 +144,27 @@ class RecordWriter(object):
         """
         writer msg:channelname,data,time,is data raw
         """
-	
+
 	def set_size_fileseg(self, size_kilobytes):
         """
         return filesegment size.
         """
-    
+
     def set_intervaltime_fileseg(self, time_sec):
         """
         return file interval time.
         """
-    
+
     def get_messagenumber(self, channel_name):
         """
         return message count.
         """
-    
+
     def get_messagetype(self, channel_name):
         """
         return message type.
         """
-    
+
     def get_protodesc(self, channel_name):
         """
         return message protodesc.
@@ -210,13 +210,13 @@ class Timer(object):
         oneshot 1: perform the callback only after the first timing cycle
                 0:perform the callback every timed period
         '''
-        
+
 
     def start(self):
-        
+
 
     def stop(self):
-        
+
 
 ```
 
@@ -369,4 +369,3 @@ if __name__ == '__main__':
     cyber.shutdown()
 
 ```
- 
