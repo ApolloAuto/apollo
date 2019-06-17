@@ -1,6 +1,9 @@
 ![image alt text](docs/demo_guide/images/Apollo_logo.png)
 
 [![Build Status](https://travis-ci.com/ApolloAuto/apollo.svg?branch=master)](https://travis-ci.com/ApolloAuto/apollo) [![Simulation Status](https://azure.apollo.auto/dailybuildstatus.svg)](https://azure.apollo.auto/daily-build/all)
+<a href="http://180.76.142.62:8111/viewType.html?buildTypeId=ApolloPublic_Build&guest=1 ">
+<img src="http://180.76.142.62:8111/app/rest/builds/buildType:(id:ApolloPublic_Build)/statusIcon"/>
+</a>
 
 ```
 
