@@ -78,6 +78,11 @@ const Feature& Obstacle::latest_feature() const {
   return feature_history_.front();
 }
 
+const Feature& Obstacle::earliest_feature() const {
+  CHECK(!feature_history_.empty());
+  return feature_history_.back();
+}
+
 Feature* Obstacle::mutable_latest_feature() {
   CHECK(!feature_history_.empty());
   return &(feature_history_.front());

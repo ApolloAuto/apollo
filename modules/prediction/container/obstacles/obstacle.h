@@ -116,6 +116,12 @@ class Obstacle {
   const Feature& latest_feature() const;
 
   /**
+   * @brief Get the earliest feature.
+   * @return The earliest feature.
+   */
+  const Feature& earliest_feature() const;
+
+  /**
    * @brief Get a pointer to the latest feature.
    * @return A pointer to the latest feature.
    */
