@@ -41,7 +41,10 @@ void SemanticMap::Init() {
   }
   const std::string config_path = apollo::common::util::StrCat(
       FLAGS_map_dir, "/semantic_map_config.pb.txt");
-  cyber::common::GetProtoFromFile(config_path, &config_);
+  if (!cyber::common::GetProtoFromFile(config_path, &config_)) {
+    AERROR << "Failed to load config file: " << config_path;
+    return;
+  }
   curr_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
 }
 
