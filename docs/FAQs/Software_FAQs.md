@@ -61,7 +61,7 @@ Should you see this error while building Apollo, please confirm the following:
 
 ---
 
-## Build error: docker: Error response from daemon: failed to copy files: userspace copy failed: 
+## Build error "docker: Error response from daemon: failed to copy files: userspace copy failed": 
 
 An error message like this means that your system does not have enough space to build Apollo and the build process will fail. To resolve this issue, run the following to free up some space:
 ```
