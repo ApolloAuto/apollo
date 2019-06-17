@@ -547,14 +547,14 @@ Currently, the only different output behavior from default glog is that differen
 ### Key concepts
 #### 1. Component
 
-The component is the base class that Cyber-RT provides to build application modules. Each specific application module can inherit the Component class and define its own `Init` and `Proc` functions so that it can be loaded into the Cyber framework.
+The component is the base class that Cyber RT provides to build application modules. Each specific application module can inherit the Component class and define its own `Init` and `Proc` functions so that it can be loaded into the Cyber framework.
 
 #### 2. Binary vs Component
 
-There are two options to use Cyber-RT framework for applications:
+There are two options to use Cyber RT framework for applications:
 
 - Binary based: the application is compiled separately into a binary, which communicates with other cyber modules by creating its own `Reader` and `Writer`.
-- Component based: the application is compiled into a Shared Library. By inheriting the Component class and writing the corresponding dag description file, the Cyber-RT framework will load and run the application dynamically.
+- Component based: the application is compiled into a Shared Library. By inheriting the Component class and writing the corresponding dag description file, the Cyber RT framework will load and run the application dynamically.
 
 
 ##### The essential Component interface
@@ -720,7 +720,7 @@ If you use a namespace when registering, you also need to add a namespace when y
 
 ## Launch
 
-**cyber_launch** is the launcher of the Cyber-RT framework. It starts multiple mainboards according to the launch file, and loads different components into different mainboards according to the dag file.
+**cyber_launch** is the launcher of the Cyber RT framework. It starts multiple mainboards according to the launch file, and loads different components into different mainboards according to the dag file.
 cyber_launch supports two scenarios for dynamically loading components or starting Binary programs in a child process.
 
 ### Launch File Format
