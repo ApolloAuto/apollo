@@ -14,19 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/map/tools/map_datachecker/server/channel_verify.h"
-#include <boost/filesystem.hpp>
-#include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/filesystem.hpp>
 #include <unordered_map>
 #include "cyber/cyber.h"
-#include "cyber/record/record_viewer.h"
 #include "cyber/proto/record.pb.h"
+#include "cyber/record/record_viewer.h"
 
 namespace apollo {
 namespace hdmap {
 
-ChannelVerify::ChannelVerify(std::shared_ptr<JSonConf> sp_conf) {
-  _sp_conf = sp_conf;
+ChannelVerify::ChannelVerify(std::shared_ptr<JSonConf> sp_conf)
+    : _sp_conf(sp_conf) {
   reset();
 }
 
@@ -37,9 +37,10 @@ void ChannelVerify::reset() {
     std::make_shared<std::vector<OneRecordChannelCheckResult>>();
 }
 
-ErrorCode ChannelVerify::check(std::string record_dir_or_record_full_path) {
-  std::vector<std::string> records_path =
-    get_records_path(record_dir_or_record_full_path);
+ErrorCode ChannelVerify::check(
+    const std::string& record_dir_or_record_full_path) {
+  std::vector<std::string> records_path;
+  records_path = get_records_path(record_dir_or_record_full_path);
   if (records_path.size() == 0) {
     AINFO << "have no data file to check";
     _return_state = ErrorCode::ERROR_VERIFY_NO_RECORDERS;
@@ -51,11 +52,11 @@ ErrorCode ChannelVerify::check(std::string record_dir_or_record_full_path) {
 }
 
 std::shared_ptr<std::vector<OneRecordChannelCheckResult>>
-  ChannelVerify::get_check_result() {
+  ChannelVerify::get_check_result() const {
   return _sp_vec_check_result;
 }
 
-int ChannelVerify::incremental_check(std::vector<std::string> records_path) {
+int ChannelVerify::incremental_check(std::vector<std::string>& records_path) {
   // 1.
   std::vector<std::string> not_check_records_path;
   AINFO << "all records path:";
@@ -78,7 +79,7 @@ int ChannelVerify::incremental_check(std::vector<std::string> records_path) {
   return 0;
 }
 
-bool ChannelVerify::is_record_file(std::string record_path) {
+bool ChannelVerify::is_record_file(const std::string& record_path) const {
   if (!boost::filesystem::exists(record_path)) {
     AINFO << "path [" << record_path << "] is not exist";
     return false;
@@ -97,8 +98,8 @@ bool ChannelVerify::is_record_file(std::string record_path) {
   return true;
 }
 
-std::vector<std::string> ChannelVerify::get_records_path(
-  std::string record_dir_or_record_full_path) {
+std::vector<std::string> ChannelVerify::get_records_path(const
+  std::string& record_dir_or_record_full_path) const {
   // record_dir_or_record_full_path is record fullpath or
   // directory which contains some records
   std::vector<std::string> records_path;
@@ -125,7 +126,7 @@ std::vector<std::string> ChannelVerify::get_records_path(
   return records_path;
 }
 
-bool ChannelVerify::is_record_checked(std::string record_path) {
+bool ChannelVerify::is_record_checked(const std::string& record_path) {
   if (_checked_records.find(record_path) == _checked_records.end()) {
     _checked_records.insert(record_path);
     return false;
@@ -134,21 +135,19 @@ bool ChannelVerify::is_record_checked(std::string record_path) {
   }
 }
 
-std::shared_ptr<CyberRecordInfo> ChannelVerify::get_record_info(
-  std::string record_path) {
+std::shared_ptr<CyberRecordInfo> ChannelVerify::get_record_info(const
+  std::string& record_path) const {
   if (!is_record_file(record_path)) {
     AINFO << "get_record_info failed.["
-        << record_path
-        << "] is not record file";
+          << record_path
+          << "] is not record file";
     return nullptr;
   }
   std::shared_ptr<CyberRecordInfo> sp_record_info(new CyberRecordInfo);
-  std::shared_ptr<apollo::cyber::record::RecordReader> sp_reader(
-    new apollo::cyber::record::RecordReader(record_path));
+  std::shared_ptr<apollo::cyber::record::RecordReader> sp_reader
+    = std::make_shared<apollo::cyber::record::RecordReader>(record_path);
   if (sp_reader == nullptr || !sp_reader->IsValid()) {
-    AINFO << "open record ["
-          << record_path
-          << "] failed";
+    AINFO << "open record [" << record_path << "] failed";
     return nullptr;
   }
   std::shared_ptr<apollo::cyber::record::RecordViewer> sp_viewer(
@@ -173,8 +172,8 @@ std::shared_ptr<CyberRecordInfo> ChannelVerify::get_record_info(
   return sp_record_info;
 }
 
-OneRecordChannelCheckResult ChannelVerify::check_record_channels(
-  std::string record_path) {
+OneRecordChannelCheckResult ChannelVerify::check_record_channels(const
+  std::string& record_path) {
   std::shared_ptr<CyberRecordInfo> sp_record_info =
     get_record_info(record_path);
   std::vector<CyberRecordChannel>& channels = sp_record_info->channels;
@@ -220,7 +219,7 @@ OneRecordChannelCheckResult ChannelVerify::check_record_channels(
   return check_result;
 }
 
-ErrorCode ChannelVerify::get_return_state() {
+ErrorCode ChannelVerify::get_return_state() const {
   return _return_state;
 }
 

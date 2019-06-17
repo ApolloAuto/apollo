@@ -16,16 +16,16 @@
 #ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_COMMON_HPP
 #define _MODULES_MAP_TOOLS_MAP_DATACHECKER_COMMON_HPP
 #include <boost/filesystem.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
-#include <vector>
+#include <boost/property_tree/ptree.hpp>
+#include <cmath>
+#include <ctime>
+#include <iostream>
+#include <memory>
 #include <set>
 #include <string>
 #include <utility>
-#include <cmath>
-#include <ctime>
-#include <memory>
-#include <iostream>
+#include <vector>
 #include "cyber/cyber.h"
 
 namespace apollo {
@@ -110,16 +110,13 @@ struct JSonConf {
   /*Proportional thresholds for all required points
   in acquisition cycle checking*/
   double laps_rate_thresh;
-  /*sampling frequency*/
-  int laps_inspva_downsample_freq;
 };
 
 inline std::shared_ptr<JSonConf> parse_json(std::string conf_path) {
-  std::cerr << "parsing json config" << std::endl;
+  AINFO << "parsing json config";
   boost::filesystem::path path(conf_path);
   if (!boost::filesystem::exists(path)) {
-    std::cerr << "json config file "
-          << conf_path << " is not exist" << std::endl;
+    AERROR << "json config file " << conf_path << " is not exist";
     return nullptr;
   }
 
@@ -137,11 +134,9 @@ inline std::shared_ptr<JSonConf> parse_json(std::string conf_path) {
 
     conf->solution_status = pt.get<unsigned int>("solution_status");
 
-    boost::property_tree::ptree
-      position_type = pt.get_child("position_type");
+    boost::property_tree::ptree position_type = pt.get_child("position_type");
     for (auto it = position_type.begin(); it != position_type.end(); ++it) {
-      conf->position_type_range.insert(
-        it->second.get_value<unsigned int>());
+      conf->position_type_range.insert(it->second.get_value<unsigned int>());
     }
 
     conf->local_std_upper_limit = pt.get<double>("local_std_upper_limit");
@@ -154,48 +149,32 @@ inline std::shared_ptr<JSonConf> parse_json(std::string conf_path) {
       conf->diff_age_range.second = it->second.get_value<float>();
     }
 
-    conf->channel_check_trigger_gap
-      = pt.get<int>("channel_check_trigger_gap");
+    conf->channel_check_trigger_gap = pt.get<int>("channel_check_trigger_gap");
     conf->alignment_featch_pose_sleep
       = pt.get<int>("alignment_featch_pose_sleep");
-    conf->static_align_duration
-      = pt.get<double>("static_align_duration");
-    conf->static_align_tolerance
-      = pt.get<double>("static_align_tolerance");
+    conf->static_align_duration = pt.get<double>("static_align_duration");
+    conf->static_align_tolerance = pt.get<double>("static_align_tolerance");
     conf->static_align_dist_thresh
       = pt.get<double>("static_align_dist_thresh");
 
-    conf->eight_angle
-      = pt.get<double>("eight_angle");
-    conf->eight_duration
-      = pt.get<double>("eight_duration");
-    conf->eight_vel
-      = pt.get<double>("eight_vel");
-    conf->eight_bad_pose_tolerance
-      = pt.get<int>("eight_bad_pose_tolerance");
+    conf->eight_angle = pt.get<double>("eight_angle");
+    conf->eight_duration = pt.get<double>("eight_duration");
+    conf->eight_vel = pt.get<double>("eight_vel");
+    conf->eight_bad_pose_tolerance = pt.get<int>("eight_bad_pose_tolerance");
 
-    conf->laps_frames_thresh
-      = pt.get<int>("laps_frames_thresh");
-    conf->laps_alpha_err_thresh
-      = pt.get<double>("laps_alpha_err_thresh");
-    conf->laps_time_err_thresh
-      = pt.get<double>("laps_time_err_thresh");
-    conf->laps_search_diameter
-      = pt.get<int>("laps_search_diameter");
-    conf->laps_number
-      = pt.get<int>("laps_number");
-    conf->laps_number_additional
-      = pt.get<int>("laps_number_additional");
-    conf->laps_rate_thresh
-      = pt.get<double>("laps_rate_thresh");
-    conf->laps_inspva_downsample_freq
-      = pt.get<int>("laps_inspva_downsample_freq");
+    conf->laps_frames_thresh = pt.get<int>("laps_frames_thresh");
+    conf->laps_alpha_err_thresh = pt.get<double>("laps_alpha_err_thresh");
+    conf->laps_time_err_thresh = pt.get<double>("laps_time_err_thresh");
+    conf->laps_search_diameter = pt.get<int>("laps_search_diameter");
+    conf->laps_number = pt.get<int>("laps_number");
+    conf->laps_number_additional = pt.get<int>("laps_number_additional");
+    conf->laps_rate_thresh = pt.get<double>("laps_rate_thresh");
   }
   catch(const boost::property_tree::json_parser_error& e) {
-    std::cerr << e.what() << '\n';
+    AERROR << e.what();
   }
   catch(const std::exception& e) {
-    std::cerr << e.what() << '\n';
+    AERROR << e.what();
   }
   return conf;
 }

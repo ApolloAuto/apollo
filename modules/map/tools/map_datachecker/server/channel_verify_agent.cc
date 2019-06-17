@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/map/tools/map_datachecker/server/channel_verify_agent.h"
-#include <thread>
 #include <chrono>
-#include <utility>
-#include <string>
-#include <vector>
 #include <map>
+#include <string>
+#include <thread>
+#include <utility>
+#include <vector>
 
 namespace apollo {
 namespace hdmap {
@@ -141,8 +141,7 @@ int ChannelVerifyAgent::add_inadequate_rate(
     apollo::hdmap::VerifyResult *result,
     std::string const& record_path,
     std::map<std::string, std::pair<double, double>> const& inadequate_rate) {
-  for (std::map<std::string, std::pair<double, double>>::const_iterator
-       it = inadequate_rate.begin(); it != inadequate_rate.end(); ++it) {
+  for (auto it = inadequate_rate.begin(); it != inadequate_rate.end(); ++it) {
     const std::string& channel = it->first;
     double expected_rate = it->second.first;
     double current_rate = it->second.second;
@@ -229,7 +228,7 @@ void ChannelVerifyAgent::set_state(ChannelVerifyAgentState state) {
   _state = state;
 }
 
-ChannelVerifyAgentState ChannelVerifyAgent::get_state() {
+ChannelVerifyAgentState ChannelVerifyAgent::get_state() const {
   return _state;
 }
 

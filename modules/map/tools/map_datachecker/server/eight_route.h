@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_EIGHT_ROUTE_H
-#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_EIGHT_ROUTE_H
+#ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_EIGHT_ROUTE_H
+#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_EIGHT_ROUTE_H
 #include <grpc++/grpc++.h>
 #include <memory>
 #include <vector>
+#include "cyber/cyber.h"
+#include "modules/map/tools/map_datachecker/server/alignment.hpp"
 #include "modules/map/tools/map_datachecker/server/common.hpp"
 #include "modules/map/tools/map_datachecker/server/worker_gflags.h"
-#include "modules/map/tools/map_datachecker/server/alignment.hpp"
-#include "cyber/cyber.h"
 
 namespace apollo {
 namespace hdmap {
-
+// TODO(yuanyijun): change EightRoute to FigureEight
 class EightRoute: public Alignment {
  public:
   explicit EightRoute(std::shared_ptr<JSonConf> sp_conf);
   ErrorCode process(const std::vector<FramePose>& poses);
-  double get_progress();
+  double get_progress() const;
 
  private:
   void reset();
@@ -47,4 +47,4 @@ class EightRoute: public Alignment {
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_EIGHT_ROUTE_H
+#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_EIGHT_ROUTE_H

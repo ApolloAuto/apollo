@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_ALIGNMENT_AGENT_HPP
-#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_ALIGNMENT_AGENT_HPP
+#ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_ALIGNMENT_AGENT_HPP
+#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_ALIGNMENT_AGENT_HPP
 #include <grpc++/grpc++.h>
 #include <chrono>
-#include <thread>
 #include <memory>
+#include <thread>
 #include <vector>
-#include "modules/map/tools/map_datachecker/server/static_align.h"
-#include "modules/map/tools/map_datachecker/server/eight_route.h"
-#include "modules/map/tools/map_datachecker/server/pose_collection_agent.h"
 #include "modules/map/tools/map_datachecker/proto/collection_error_code.pb.h"
 #include "modules/map/tools/map_datachecker/proto/collection_service.pb.h"
+#include "modules/map/tools/map_datachecker/server/eight_route.h"
+#include "modules/map/tools/map_datachecker/server/pose_collection_agent.h"
+#include "modules/map/tools/map_datachecker/server/static_align.h"
 
 namespace apollo {
 namespace hdmap {
@@ -32,18 +32,19 @@ namespace hdmap {
 typedef State AlignmentAgentState;
 
 using STATIC_REQUEST_TYPE
-  = const apollo::hdmap::StaticAlignRequest;
+    = const apollo::hdmap::StaticAlignRequest;
 using STATIC_RESPONSE_TYPE
-  = apollo::hdmap::StaticAlignResponse;
+    = apollo::hdmap::StaticAlignResponse;
 using EIGHTROUTE_REQUEST_TYPE
-  = const apollo::hdmap::EightRouteRequest;
+    = const apollo::hdmap::EightRouteRequest;
 using EIGHTROUTE_RESPONSE_TYPE
-  = apollo::hdmap::EightRouteResponse;
+    = apollo::hdmap::EightRouteResponse;
 
 template<typename ALIGNMENT_TYPE, typename REQUEST_TYPE, typename RESPONSE_TYPE>
 class AlignmentAgent {
  public:
-  AlignmentAgent(std::shared_ptr<JSonConf> sp_conf,
+  AlignmentAgent(
+    std::shared_ptr<JSonConf> sp_conf,
     std::shared_ptr<PoseCollectionAgent> sp_pose_collection_agent) {
     _sp_conf = sp_conf;
     _sp_pose_collection_agent = sp_pose_collection_agent;
@@ -109,14 +110,14 @@ class AlignmentAgent {
         }
         _sp_alignment->process(*sp_poses);
         AINFO << "get progress:" << _sp_alignment->get_progress();
-        if (std::abs(1 - _sp_alignment->get_progress()) < 1e-8) {
+        if (fabs(1 - _sp_alignment->get_progress()) < 1e-8) {
           AINFO << "alignment progress reached 1.0, thread exit";
           break;
         }
         AINFO << "sleep " << _sp_conf->alignment_featch_pose_sleep << " sec";
-        std::this_thread::sleep_for(
-          std::chrono::seconds(
-            _sp_conf->alignment_featch_pose_sleep));
+        auto seconds = std::chrono::seconds(
+            _sp_conf->alignment_featch_pose_sleep);
+        std::this_thread::sleep_for(seconds);
       }
       _stopped = true;
       AINFO << "Align thread complete";
@@ -125,7 +126,7 @@ class AlignmentAgent {
     return 0;
   }
 
-  std::shared_ptr<std::vector<FramePose>> get_poses() {
+  std::shared_ptr<std::vector<FramePose>> get_poses() const {
     if (_sp_pose_collection_agent == nullptr) {
       return nullptr;
     }
@@ -168,7 +169,7 @@ class AlignmentAgent {
     _state = state;
   }
 
-  AlignmentAgentState get_state() {
+  AlignmentAgentState get_state() const {
     return _state;
   }
 
@@ -184,10 +185,10 @@ class AlignmentAgent {
 };
 
 using STATIC_ALIGN_AGENT_TYPE
-  = AlignmentAgent<StaticAlign, STATIC_REQUEST_TYPE, STATIC_RESPONSE_TYPE>;
+    = AlignmentAgent<StaticAlign, STATIC_REQUEST_TYPE, STATIC_RESPONSE_TYPE>;
 using EIGHT_ROUTE_AGENT_TYPE
-  = AlignmentAgent<EightRoute, EIGHTROUTE_REQUEST_TYPE,
-  EIGHTROUTE_RESPONSE_TYPE>;
+    = AlignmentAgent<EightRoute, EIGHTROUTE_REQUEST_TYPE,
+                     EIGHTROUTE_RESPONSE_TYPE>;
 }  // namespace hdmap
 }  // namespace apollo
 

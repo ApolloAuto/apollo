@@ -13,36 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_ALIGNMENT_HPP
-#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_ALIGNMENT_HPP
+#ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_ALIGNMENT_HPP
+#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_ALIGNMENT_HPP
 #include <memory>
 #include <vector>
-#include "modules/map/tools/map_datachecker/server/common.hpp"
 #include "modules/map/tools/map_datachecker/proto/collection_error_code.pb.h"
+#include "modules/map/tools/map_datachecker/server/common.hpp"
 
 namespace apollo {
 namespace hdmap {
 
 typedef struct BadOrGoodPoseInfo {
   BadOrGoodPoseInfo(): start_time(-1.0), end_time(-1.0), pose_count(0) {}
-  double start_time, end_time;
+  double start_time;
+  double end_time;
   int pose_count;
 } BadOrGoodPoseInfo;
 
 class Alignment {
  public:
-  explicit Alignment(std::shared_ptr<JSonConf> sp_conf) {
-    _return_state = ErrorCode::SUCCESS;
-    _sp_conf = sp_conf;
-    _sp_good_pose_info = std::make_shared<BadOrGoodPoseInfo>();
-    _sp_bad_pose_info = std::make_shared<BadOrGoodPoseInfo>();
-  }
+  explicit Alignment(std::shared_ptr<JSonConf> sp_conf)
+    : _return_state(ErrorCode::SUCCESS),
+      _sp_conf(sp_conf),
+      _sp_good_pose_info(std::make_shared<BadOrGoodPoseInfo>()),
+      _sp_bad_pose_info(std::make_shared<BadOrGoodPoseInfo>()) {}
+
   virtual ~Alignment() {}
-  std::shared_ptr<JSonConf> _sp_conf = nullptr;
   virtual ErrorCode process(const std::vector<FramePose>& poses) = 0;
   virtual void reset() = 0;
 
-  virtual double get_progress() {
+  virtual double get_progress() const {
     return _progress;
   }
 
@@ -94,30 +94,31 @@ class Alignment {
     return false;
   }
 
-  ErrorCode get_return_state() {
+  ErrorCode get_return_state() const {
     return _return_state;
   }
 
  protected:
   void update_pose_info(const FramePose& pose,
-    std::shared_ptr<BadOrGoodPoseInfo> sp_pose_info) {
+                        std::shared_ptr<BadOrGoodPoseInfo> sp_pose_info) {
     BadOrGoodPoseInfo &pose_info = *sp_pose_info;
     if (pose_info.pose_count == 0) {
       pose_info.start_time = pose.time_stamp;
       ++pose_info.pose_count;
-      fprintf(stderr, "update start time:%lf,pose count:%d\n",
-        pose_info.start_time, pose_info.pose_count);
+      AINFO << "update start time: " << std::to_string(pose_info.start_time)
+            << ",pose count: " << pose_info.pose_count;
     } else {
       pose_info.end_time = pose.time_stamp;
       ++pose_info.pose_count;
-      fprintf(stderr, "update end time:%lf,pose count:%d\n",
-        pose_info.end_time, pose_info.pose_count);
+      AINFO << "update start time: " << std::to_string(pose_info.start_time)
+            << ",pose count: " << pose_info.pose_count;
     }
   }
 
   void clear_pose_info(std::shared_ptr<BadOrGoodPoseInfo> sp_pose_info) {
     BadOrGoodPoseInfo &pose_info = *sp_pose_info;
-    pose_info.start_time = pose_info.end_time = -1.0;
+    pose_info.start_time = -1.0;
+    pose_info.end_time = -1.0;
     pose_info.pose_count = 0;
   }
 
@@ -127,7 +128,7 @@ class Alignment {
       return -1;
     }
 
-    for (size_t i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; ++i) {
       if (poses[i].time_stamp >= time) {
         return static_cast<int>(i);
       }
@@ -137,13 +138,17 @@ class Alignment {
 
 
  protected:
-  double _progress, _last_progress;
-  double _start_time, _end_time;
-  int _start_index, _end_index;
-  // BadOrGoodPoseInfo _bad_pose_info, _good_pose_info;
-  std::shared_ptr<BadOrGoodPoseInfo> _sp_bad_pose_info = nullptr;
-  std::shared_ptr<BadOrGoodPoseInfo> _sp_good_pose_info = nullptr;
+  double _progress;
+  double _last_progress;
+  double _start_time;
+  double _end_time;
+  int _start_index;
+  double _end_index;
   ErrorCode _return_state;
+  std::shared_ptr<JSonConf> _sp_conf = nullptr;
+  // BadOrGoodPoseInfo _bad_pose_info, _good_pose_info;
+  std::shared_ptr<BadOrGoodPoseInfo> _sp_good_pose_info = nullptr;
+  std::shared_ptr<BadOrGoodPoseInfo> _sp_bad_pose_info = nullptr;
 };
 
 }  // namespace hdmap

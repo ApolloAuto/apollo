@@ -38,9 +38,9 @@ bool EightRoute::is_eight_route_pose(
     return true;
   }
 
-  double yaw = get_yaw(poses[pose_index-1].tx,
-    poses[pose_index-1].ty, poses[pose_index].tx, poses[pose_index].ty);
-  double yaw_diff = std::abs(_last_yaw - yaw);
+  double yaw = get_yaw(poses[pose_index - 1].tx, poses[pose_index-1].ty,
+                       poses[pose_index].tx, poses[pose_index].ty);
+  double yaw_diff = fabs(_last_yaw - yaw);
   _last_yaw = yaw;
   yaw_diff = yaw_diff < 180 ? yaw_diff : 360 - yaw_diff;
 
@@ -164,7 +164,7 @@ ErrorCode EightRoute::process(const std::vector<FramePose>& poses) {
   return _return_state;
 }
 
-double EightRoute::get_progress() {
+double EightRoute::get_progress() const {
   return _progress;
 }
 

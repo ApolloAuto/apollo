@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_CHANNEL_CHEKCER_AGENT_H
-#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_CHANNEL_CHEKCER_AGENT_H
+#ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_CHANNEL_CHEKCER_AGENT_H
+#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_CHANNEL_CHEKCER_AGENT_H
 #include <grpc++/grpc++.h>
+#include <map>
 #include <memory>
 #include <mutex>
-#include <utility>
 #include <string>
+#include <utility>
 #include <vector>
-#include <map>
-#include "modules/map/tools/map_datachecker/server/channel_verify.h"
-#include "modules/map/tools/map_datachecker/proto/collection_service.pb.h"
 #include "modules/map/tools/map_datachecker/proto/collection_error_code.pb.h"
+#include "modules/map/tools/map_datachecker/proto/collection_service.pb.h"
+#include "modules/map/tools/map_datachecker/server/channel_verify.h"
 
 namespace apollo {
 namespace hdmap {
@@ -59,7 +59,7 @@ class ChannelVerifyAgent {
     CHANNEL_VERIFY_RESPONSE_TYPE *response);
   void reset();
   void set_state(ChannelVerifyAgentState state);
-  ChannelVerifyAgentState get_state();
+  ChannelVerifyAgentState get_state() const;
   int add_topic_lack(
     apollo::hdmap::VerifyResult *result,
     const std::string& record_path,
@@ -76,7 +76,8 @@ class ChannelVerifyAgent {
  private:
   ChannelVerifyAgentState _state;
   std::mutex _stop_mutex;
-  bool _need_stop, _stopped;
+  bool _need_stop;
+  bool _stopped;
   std::shared_ptr<JSonConf> _sp_conf = nullptr;
   std::shared_ptr<ChannelVerify> _sp_channel_checker = nullptr;
   CheckResult _sp_check_result = nullptr;
