@@ -77,7 +77,10 @@ bool IsRecordValid(const std::string& record_path) {
     return false;
   }
   const std::unique_ptr<RecordFileReader> file_reader(new RecordFileReader());
-  file_reader->Open(record_path);
+  if (!file_reader->Open(record_path)) {
+    AERROR << "failed to open record file for checking header: " << record_path;
+    return false;
+  }
   const bool is_complete = file_reader->GetHeader().is_complete();
   file_reader->Close();
   return is_complete;
