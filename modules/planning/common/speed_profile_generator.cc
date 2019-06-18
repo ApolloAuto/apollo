@@ -152,39 +152,6 @@ SpeedData SpeedProfileGenerator::GenerateStopProfile(const double init_speed,
   return speed_data;
 }
 
-SpeedData SpeedProfileGenerator::GenerateStopProfile(
-    const double init_speed, const double init_acc,
-    const double stop_distance) {
-  AERROR << "Slowing down the car within a stop distance with fallback "
-            "stopping profile.";
-  SpeedData speed_data;
-
-  constexpr double kEpsilon = 1.0e-8;
-  const double unit_t = FLAGS_fallback_time_unit;
-  double pre_s = 0.0;
-  double pre_v = init_speed;
-  double buffered_stop_distance =
-      stop_distance > 0.0 ? stop_distance : kEpsilon;
-  buffered_stop_distance = stop_distance - FLAGS_fallback_distance_buffer > 0.0
-                               ? stop_distance - FLAGS_fallback_distance_buffer
-                               : stop_distance;
-  double acc = -(init_speed * init_speed) / (2.0 * buffered_stop_distance);
-  double max_t = std::abs(init_speed / acc);
-
-  for (double t = 0.0; t < max_t; t += unit_t) {
-    double s = 0.0;
-    double v = 0.0;
-    s = std::fmax(pre_s,
-                  pre_s + 0.5 * (pre_v + (pre_v + unit_t * acc)) * unit_t);
-    v = std::fmax(0.0, pre_v + unit_t * acc);
-    speed_data.AppendSpeedPoint(s, t, v, acc, 0.0);
-    pre_s = s;
-    pre_v = v;
-  }
-  FillEnoughSpeedPoints(&speed_data);
-  return speed_data;
-}
-
 SpeedData SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(
     const double distance, const double max_speed) {
   constexpr double kConstDeceleration = -0.8;  // (~3sec to fully stop)

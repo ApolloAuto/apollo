@@ -134,6 +134,10 @@ void ObstaclesPrioritizer::AssignIgnoreLevel() {
       obstacles_container->curr_frame_movable_obstacle_ids();
   for (const int obstacle_id : obstacle_ids) {
     Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
+    if (obstacle_ptr == nullptr) {
+      AERROR << "Null obstacle pointer found.";
+      continue;
+    }
     if (obstacle_ptr->history_size() == 0) {
       AERROR << "Obstacle [" << obstacle_ptr->id() << "] has no feature.";
       continue;
@@ -377,6 +381,10 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
   for (const int obstacle_id :
        obstacles_container->curr_frame_movable_obstacle_ids()) {
     Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
+    if (obstacle_ptr == nullptr) {
+      AERROR << "Null obstacle pointer found.";
+      continue;
+    }
     if (obstacle_ptr->history_size() == 0) {
       AERROR << "Obstacle [" << obstacle_ptr->id() << "] has no feature.";
       continue;

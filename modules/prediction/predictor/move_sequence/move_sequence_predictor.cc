@@ -151,7 +151,7 @@ bool MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
 
   // Get ready for the for-loop:
   // project the obstacle's position onto the lane's Frenet coordinates.
-  int lane_segment_index = 0;
+  int lane_segment_index = lane_sequence.adc_lane_segment_idx();
   std::string lane_id =
       lane_sequence.lane_segment(lane_segment_index).lane_id();
   std::shared_ptr<const LaneInfo> lane_info = PredictionMap::LaneById(lane_id);

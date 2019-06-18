@@ -499,6 +499,7 @@ bool ReferenceLineInfo::CombinePathAndSpeedProfile(
   const double kDenseTimeResoltuion = FLAGS_trajectory_time_min_interval;
   const double kSparseTimeResolution = FLAGS_trajectory_time_max_interval;
   const double kDenseTimeSec = FLAGS_trajectory_time_high_density_period;
+
   if (path_data_.discretized_path().empty()) {
     AERROR << "path data is empty";
     return false;

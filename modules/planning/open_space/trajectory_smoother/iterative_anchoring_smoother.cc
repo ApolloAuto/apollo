@@ -20,6 +20,8 @@
 
 #include "modules/planning/open_space/trajectory_smoother/iterative_anchoring_smoother.h"
 
+#include <algorithm>
+
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
@@ -108,7 +110,7 @@ bool IterativeAnchoringSmoother::Smooth(
   }
 
   // TODO(Jinyun): move to confs
-  const double default_bounds = 0.75;
+  const double default_bounds = 1.0;
   std::vector<double> bounds(interpolated_path_size, default_bounds);
 
   AdjustStartEndHeading(xWS, &interpolated_warm_start_path, &bounds);
@@ -347,18 +349,27 @@ bool IterativeAnchoringSmoother::SmoothPath(
   osqp_settings.scaled_termination = true;
   osqp_settings.warm_start = true;
 
+  // TODO(Jinyun): move to confs
+  const size_t max_iteration_num = 1000;
+  const size_t max_curvature_iteration_num = 10;
+
   bool is_collision_free = false;
+  bool is_curvature_satisfied = false;
   std::vector<size_t> colliding_point_index;
+  std::vector<size_t> curvature_exceeding_point_index;
   std::vector<std::pair<double, double>> smoothed_point2d;
   size_t counter = 0;
-  const size_t max_iteration_num = 1000;
-  while (!is_collision_free) {
+
+  while (!(is_collision_free && is_curvature_satisfied)) {
     if (counter > max_iteration_num) {
       AERROR << "path smoother iteration num reach maximum in iterative "
                 "anchoring smoother";
       return false;
     }
-    AdjustPathBounds(colliding_point_index, &flexible_bounds);
+
+    AdjustPathBounds(colliding_point_index, curvature_exceeding_point_index,
+                     &flexible_bounds);
+
     fem_pos_smoother.set_ref_points(raw_point2d);
     fem_pos_smoother.set_x_bounds_around_refs(flexible_bounds);
     fem_pos_smoother.set_y_bounds_around_refs(flexible_bounds);
@@ -390,6 +401,15 @@ bool IterativeAnchoringSmoother::SmoothPath(
 
     is_collision_free =
         CheckCollisionAvoidance(*smoothed_path_points, &colliding_point_index);
+
+    if (counter > max_curvature_iteration_num) {
+      is_curvature_satisfied = true;
+      curvature_exceeding_point_index.clear();
+    } else {
+      is_curvature_satisfied = CheckCurvatureConstraint(*smoothed_path_points,
+                                       &curvature_exceeding_point_index);
+    }
+
     ADEBUG << "loop iteration number is " << counter;
     ++counter;
   }
@@ -433,19 +453,50 @@ bool IterativeAnchoringSmoother::CheckCollisionAvoidance(
   return true;
 }
 
+bool IterativeAnchoringSmoother::CheckCurvatureConstraint(
+    const DiscretizedPath& path_points,
+    std::vector<size_t>* curvature_exceeding_point_index) {
+  CHECK_NOTNULL(curvature_exceeding_point_index);
+  curvature_exceeding_point_index->clear();
+  // TODO(Jinyun): move to confs
+  const double max_curvature = 0.2;
+
+  size_t path_points_size = path_points.size();
+  for (size_t i = 0; i < path_points_size; ++i) {
+    if (std::abs(path_points[i].kappa()) > max_curvature) {
+      curvature_exceeding_point_index->push_back(i);
+    }
+  }
+
+  if (!curvature_exceeding_point_index->empty()) {
+    return false;
+  }
+  return true;
+}
+
 void IterativeAnchoringSmoother::AdjustPathBounds(
     const std::vector<size_t>& colliding_point_index,
+    const std::vector<size_t>& curvature_exceeding_point_index,
     std::vector<double>* bounds) {
   CHECK_NOTNULL(bounds);
-  if (colliding_point_index.empty()) {
+
+  if (colliding_point_index.empty() &&
+      curvature_exceeding_point_index.empty()) {
     return;
   }
-  CHECK_GT(bounds->size(), *(std::max_element(colliding_point_index.begin(),
-                                              colliding_point_index.end())));
+
   // TODO(Jinyun): move to confs
-  const double decrease_ratio = 0.5;
+  const double min_bound = 1.0e-2;
+  const double curvature_decrease_ratio = 0.5;
+  const double collision_decrease_ratio = 0.5;
+
+  for (const auto index : curvature_exceeding_point_index) {
+    bounds->at(index) =
+        std::max(bounds->at(index) * curvature_decrease_ratio, min_bound);
+  }
+
   for (const auto index : colliding_point_index) {
-    bounds->at(index) *= decrease_ratio;
+    bounds->at(index) *= collision_decrease_ratio;
   }
 }
 

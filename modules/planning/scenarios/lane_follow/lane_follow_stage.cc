@@ -37,9 +37,9 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
 #include "modules/planning/tasks/deciders/lane_change_decider/lane_change_decider.h"
-#include "modules/planning/tasks/optimizers/path_decider/path_decider.h"
+#include "modules/planning/tasks/deciders/path_decider/path_decider.h"
+#include "modules/planning/tasks/deciders/speed_decider/speed_decider.h"
 #include "modules/planning/tasks/optimizers/path_time_heuristic/path_time_heuristic_optimizer.h"
-#include "modules/planning/tasks/optimizers/speed_decider/speed_decider.h"
 
 namespace apollo {
 namespace planning {
@@ -275,24 +275,23 @@ void LaneFollowStage::PlanFallbackTrajectory(
   }
 
   AERROR << "Speed fallback due to algorithm failure";
+  // TODO(Hongyi): refine the fall-back handling here.
+  // To use piecewise jerk speed fallback, stop distance here
+  // is an upper bound of s, not a target.
   // TODO(Jiacheng): move this stop_path_threshold to a gflag
   const double path_stop_distance =
-      reference_line_info->path_data().discretized_path().Length() - 5.0;
+      reference_line_info->path_data().discretized_path().Length();
+
   const double obstacle_stop_distance =
       reference_line_info->st_graph_data().is_initialized()
           ? reference_line_info->st_graph_data().min_s_on_st_boundaries()
           : std::numeric_limits<double>::infinity();
-  const double min_speed_limit_v =
-      reference_line_info->st_graph_data().is_initialized()
-          ? reference_line_info->st_graph_data()
-                .speed_limit()
-                .GetMinSpeedLimitV()
-          : std::numeric_limits<double>::infinity();
+
   const double curr_speed_distance =
       FLAGS_fallback_total_time *
       std::min({FLAGS_default_cruise_speed,
-                reference_line_info->vehicle_state().linear_velocity(),
-                min_speed_limit_v});
+                reference_line_info->vehicle_state().linear_velocity()});
+
   *reference_line_info->mutable_speed_data() =
       SpeedProfileGenerator::GenerateFallbackSpeed(std::min(
           {path_stop_distance, obstacle_stop_distance, curr_speed_distance}));

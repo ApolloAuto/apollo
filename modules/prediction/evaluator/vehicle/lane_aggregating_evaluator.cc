@@ -181,6 +181,7 @@ bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     ADEBUG << output_probabilities[i];
   }
 
+  *(latest_feature_ptr->mutable_lane()->mutable_lane_graph()) = *lane_graph_ptr;
   return true;
 }
 

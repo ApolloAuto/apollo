@@ -77,7 +77,7 @@ common::Status AutotuningRawFeatureGenerator::EvaluateSpeedPoint(
   speed_feature->set_j(speed_point.da());
 
   // get speed limit at certain s();
-  if (speed_limit_.MinValidS() > s) {
+  if (speed_limit_.speed_limit_points().front().first > s) {
     speed_feature->set_speed_limit(kDefaultSpeedLimit);
   } else {
     double cur_speed_limit = speed_limit_.GetSpeedLimitByS(s);
