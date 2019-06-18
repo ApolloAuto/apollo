@@ -44,7 +44,7 @@ class SpeedLimitDecider {
 
   virtual ~SpeedLimitDecider() = default;
 
-  virtual apollo::common::Status GetSpeedLimits(
+  virtual common::Status GetSpeedLimits(
       const IndexedList<std::string, Obstacle>& obstacles,
       SpeedLimit* const speed_limit_data) const;
 

@@ -124,7 +124,6 @@ class ReferenceLineInfo {
       DiscretizedTrajectory* discretized_trajectory);
 
   const SLBoundary& AdcSlBoundary() const;
-  const SLBoundary& VehicleSlBoundary() const;
   std::string PathSpeedDebugString() const;
 
   /**
@@ -280,18 +279,11 @@ class ReferenceLineInfo {
 
   RSSInfo rss_info_;
 
-  struct {
-    /**
-     * @brief SL boundary of stitching point (starting point of plan trajectory)
-     * relative to the reference line
-     */
-    SLBoundary adc_sl_boundary_;
-    /**
-     * @brief SL boundary of vehicle realtime state relative to the reference
-     * line
-     */
-    SLBoundary vehicle_sl_boundary_;
-  } sl_boundary_info_;
+  /**
+   * @brief SL boundary of stitching point (starting point of plan trajectory)
+   * relative to the reference line
+   */
+  SLBoundary adc_sl_boundary_;
 
   planning_internal::Debug debug_;
   LatencyStats latency_stats_;
