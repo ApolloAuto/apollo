@@ -122,7 +122,8 @@ bool STBoundaryMapper::MapStopDecision(
   reference_line_.XYToSL(stop_decision.stop().stop_point(), &stop_sl_point);
 
   double st_stop_s = 0.0;
-  const double stop_ref_s = stop_sl_point.s();
+  const double stop_ref_s = stop_sl_point.s() -
+                            vehicle_param_.front_edge_to_center();
 
   if (stop_ref_s > path_data_.frenet_frame_path().back().s()) {
     st_stop_s = path_data_.discretized_path().back().s() +
