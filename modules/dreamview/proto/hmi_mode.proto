@@ -69,6 +69,7 @@ message CyberModule {
   repeated string dag_files = 1;
   optional bool required_for_safety = 2 [default = true];
   optional string process_group = 3;
+  optional string pre_commands = 4;
 }
 
 message HMIMode {

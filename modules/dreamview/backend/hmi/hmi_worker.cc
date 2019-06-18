@@ -185,8 +185,10 @@ HMIMode HMIWorker::LoadMode(const std::string& mode_config_path) {
     module.set_required_for_safety(cyber_module.required_for_safety());
 
     // Construct start_command:
+    //     <pre_commands>
     //     nohup mainboard -p <process_group> -d <dag> ... &
-    module.set_start_command("nohup mainboard");
+    module.set_start_command(StrCat(
+        cyber_module.pre_commands(), "\n", "nohup mainboard"));
     const auto& process_group = cyber_module.process_group();
     if (!process_group.empty()) {
       StrAppend(module.mutable_start_command(), " -p ", process_group);
