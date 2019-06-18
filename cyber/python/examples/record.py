@@ -89,7 +89,7 @@ def test_record_reader(reader_path):
     print('+++ Begin to read +++')
     count = 0
     for channel_name, msg, datatype, timestamp in freader.read_messages():
-        cout += 1
+        count += 1
         print('=' * 80)
         print('read [%d] messages' % count)
         print('chnanel_name -> %s' % channel_name)
