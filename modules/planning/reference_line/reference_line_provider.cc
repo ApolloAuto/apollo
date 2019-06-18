@@ -797,7 +797,7 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
   safe_lane_width -= adc_width;
   bool is_lane_width_safe = true;
   if (safe_lane_width < kEpislon) {
-    AERROR << "lane width [" << left_width + right_width << "] "
+    ADEBUG << "lane width [" << left_width + right_width << "] "
            << "is smaller than adc width [" << adc_width << "]";
     effective_width = kEpislon;
     is_lane_width_safe = false;
@@ -807,7 +807,7 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
     safe_lane_width -= smoother_config_.curb_shift();
     center_shift -= 0.5 * smoother_config_.curb_shift();
     if (safe_lane_width < kEpislon) {
-      AERROR << "lane width smaller than adc width and left curb shift";
+      ADEBUG << "lane width smaller than adc width and left curb shift";
       effective_width = kEpislon;
       is_lane_width_safe = false;
     }
@@ -816,7 +816,7 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
     safe_lane_width -= smoother_config_.curb_shift();
     center_shift += 0.5 * smoother_config_.curb_shift();
     if (safe_lane_width < kEpislon) {
-      AERROR << "lane width smaller than adc width and right curb shift";
+      ADEBUG << "lane width smaller than adc width and right curb shift";
       effective_width = kEpislon;
       is_lane_width_safe = false;
     }
