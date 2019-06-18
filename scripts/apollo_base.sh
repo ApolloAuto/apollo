@@ -446,15 +446,16 @@ function run() {
   run_customized_path $module $module "$@"
 }
 
-CYBER_SETUP="/apollo/cyber/setup.bash"
-if [ -e "${CYBER_SETUP}" ]; then
-    source "${CYBER_SETUP}"
-fi
 check_in_docker
-create_data_dir
-
-if [ -z $APOLLO_BASE_SOURCED ]; then
-  set_lib_path $1
-  determine_bin_prefix
-  export APOLLO_BASE_SOURCED=1
+if [ $APOLLO_IN_DOCKER = "true" ]; then
+  CYBER_SETUP="/apollo/cyber/setup.bash"
+  if [ -e "${CYBER_SETUP}" ]; then
+    source "${CYBER_SETUP}"
+  fi
+  create_data_dir
+  if [ -z $APOLLO_BASE_SOURCED ]; then
+    set_lib_path $1
+    determine_bin_prefix
+    export APOLLO_BASE_SOURCED=1
+  fi
 fi
