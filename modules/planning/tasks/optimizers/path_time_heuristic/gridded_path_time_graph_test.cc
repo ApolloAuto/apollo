@@ -73,10 +73,6 @@ class DpStGraphTest : public ::testing::Test {
     for (double s = 0; s < 200.0; s += 1.0) {
       speed_limit_.AppendSpeedLimit(s, 25.0);
     }
-    // soft_speed_limit:
-    for (double s = 0; s < 200.0; s += 1.0) {
-      speed_limit_.AppendSoftSpeedLimit(s, 25.0);
-    }
   }
 
   virtual void TearDown() {}
