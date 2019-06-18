@@ -367,7 +367,11 @@ bool SequencePredictor::GetLongitudinalPolynomial(
   if (FLAGS_enable_lane_sequence_acc && lane_sequence.has_acceleration()) {
     a = lane_sequence.acceleration();
   }
-  double lane_heading = lane_sequence.lane_segment(0).lane_point(0).heading();
+  int lane_seg_start_idx = lane_sequence.adc_lane_segment_idx();
+  int lane_point_start_idx = lane_sequence.lane_segment(lane_seg_start_idx)
+      .adc_lane_point_idx();
+  double lane_heading = lane_sequence.lane_segment(lane_seg_start_idx)
+      .lane_point(lane_point_start_idx).heading();
 
   // Set the initial conditions for the diff. eqn.
   double s0 = 0.0;
@@ -406,8 +410,11 @@ bool SequencePredictor::GetLateralPolynomial(
   double theta = feature.velocity_heading();
   double v = feature.speed();
   Point3D position = feature.position();
-  const LanePoint& start_lane_point =
-      lane_sequence.lane_segment(0).lane_point(0);
+  int lane_seg_start_idx = lane_sequence.adc_lane_segment_idx();
+  int lane_point_start_idx = lane_sequence.lane_segment(lane_seg_start_idx)
+      .adc_lane_point_idx();
+  const LanePoint& start_lane_point = lane_sequence
+      .lane_segment(lane_seg_start_idx).lane_point(lane_point_start_idx);
 
   // Get lane info.
   double pos_delta_x = position.x() - start_lane_point.position().x();
