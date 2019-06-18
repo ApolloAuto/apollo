@@ -10,6 +10,9 @@ cc_library(
     hdrs = [
         "net_util.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//cyber",
         "//modules/prediction/proto:network_model_proto",
@@ -25,6 +28,9 @@ cc_library(
     hdrs = [
         "net_layer.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/network:net_util",
     ],
@@ -37,6 +43,9 @@ cc_library(
     ],
     hdrs = [
         "net_model.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
         "//modules/common/util",

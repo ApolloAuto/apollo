@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "websocket_handler.h",
     ],
+    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
         "//modules/common",
         "//modules/common/time",
@@ -33,6 +34,7 @@ cc_library(
         "-lopencv_highgui",
         "-lopencv_imgproc",
     ],
+    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",

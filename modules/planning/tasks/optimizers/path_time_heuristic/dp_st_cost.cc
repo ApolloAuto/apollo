@@ -37,7 +37,7 @@ DpStCost::DpStCost(const DpStSpeedConfig& config, const double total_time,
     : config_(config), obstacles_(obstacles), init_point_(init_point) {
   int index = 0;
   for (const auto& obstacle : obstacles) {
-    boundary_map_[obstacle->st_boundary().id()] = index++;
+    boundary_map_[obstacle->path_st_boundary().id()] = index++;
   }
   unit_t_ = total_time / config_.matrix_dimension_t();
 
@@ -54,16 +54,16 @@ DpStCost::DpStCost(const DpStSpeedConfig& config, const double total_time,
 void DpStCost::AddToKeepClearRange(
     const std::vector<const Obstacle*>& obstacles) {
   for (const auto& obstacle : obstacles) {
-    if (obstacle->st_boundary().IsEmpty()) {
+    if (obstacle->path_st_boundary().IsEmpty()) {
       continue;
     }
-    if (obstacle->st_boundary().boundary_type() !=
+    if (obstacle->path_st_boundary().boundary_type() !=
         STBoundary::BoundaryType::KEEP_CLEAR) {
       continue;
     }
 
-    double start_s = obstacle->st_boundary().min_s();
-    double end_s = obstacle->st_boundary().max_s();
+    double start_s = obstacle->path_st_boundary().min_s();
+    double end_s = obstacle->path_st_boundary().max_s();
     keep_clear_range_.emplace_back(start_s, end_s);
   }
   SortAndMergeRange(&keep_clear_range_);
@@ -109,7 +109,7 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
       continue;
     }
 
-    auto boundary = obstacle->st_boundary();
+    auto boundary = obstacle->path_st_boundary();
 
     if (boundary.min_s() > FLAGS_speed_lon_decision_horizon) {
       continue;

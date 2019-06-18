@@ -6,6 +6,9 @@ cc_library(
     name = "autotuning_speed_feature_builder",
     srcs = ["autotuning_speed_feature_builder.cc"],
     hdrs = ["autotuning_speed_feature_builder.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         "//cyber/common:log",
         "//modules/common/proto:error_code_proto",

@@ -36,6 +36,7 @@
 #include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/junction_map_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
+#include "modules/prediction/evaluator/vehicle/lane_aggregating_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/lane_scanning_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/rnn_evaluator.h"
@@ -100,6 +101,7 @@ void EvaluatorManager::RegisterEvaluators() {
   RegisterEvaluator(ObstacleConf::JUNCTION_MLP_EVALUATOR);
   RegisterEvaluator(ObstacleConf::CYCLIST_KEEP_LANE_EVALUATOR);
   RegisterEvaluator(ObstacleConf::LANE_SCANNING_EVALUATOR);
+  RegisterEvaluator(ObstacleConf::LANE_AGGREGATING_EVALUATOR);
   RegisterEvaluator(ObstacleConf::PEDESTRIAN_INTERACTION_EVALUATOR);
   RegisterEvaluator(ObstacleConf::JUNCTION_MAP_EVALUATOR);
 }
@@ -397,6 +399,10 @@ std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
     }
     case ObstacleConf::LANE_SCANNING_EVALUATOR: {
       evaluator_ptr.reset(new LaneScanningEvaluator());
+      break;
+    }
+    case ObstacleConf::LANE_AGGREGATING_EVALUATOR: {
+      evaluator_ptr.reset(new LaneAggregatingEvaluator());
       break;
     }
     case ObstacleConf::PEDESTRIAN_INTERACTION_EVALUATOR: {

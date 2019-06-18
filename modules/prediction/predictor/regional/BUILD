@@ -6,6 +6,9 @@ cc_library(
     name = "regional_predictor",
     srcs = ["regional_predictor.cc"],
     hdrs = ["regional_predictor.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/common:prediction_util",
         "//modules/prediction/predictor",

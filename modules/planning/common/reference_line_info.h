@@ -124,7 +124,6 @@ class ReferenceLineInfo {
       DiscretizedTrajectory* discretized_trajectory);
 
   const SLBoundary& AdcSlBoundary() const;
-  const SLBoundary& VehicleSlBoundary() const;
   std::string PathSpeedDebugString() const;
 
   /**
@@ -148,8 +147,6 @@ class ReferenceLineInfo {
 
   void ExportEngageAdvice(common::EngageAdvice* engage_advice) const;
 
-  bool IsSafeToChangeLane() const { return is_safe_to_change_lane_; }
-
   const hdmap::RouteSegments& Lanes() const;
   const std::list<hdmap::Id> TargetLaneId() const;
 
@@ -160,7 +157,7 @@ class ReferenceLineInfo {
 
   ADCTrajectory::RightOfWayStatus GetRightOfWayStatus() const;
 
-  const hdmap::Lane::LaneTurn& GetPathTurnType(const double s) const;
+  const hdmap::Lane::LaneTurn GetPathTurnType(const double s) const;
 
   const bool GetIntersectionRightofWayStatus(
       const hdmap::PathOverlap& pnc_junction_overlap) const;
@@ -282,18 +279,11 @@ class ReferenceLineInfo {
 
   RSSInfo rss_info_;
 
-  struct {
-    /**
-     * @brief SL boundary of stitching point (starting point of plan trajectory)
-     * relative to the reference line
-     */
-    SLBoundary adc_sl_boundary_;
-    /**
-     * @brief SL boundary of vehicle realtime state relative to the reference
-     * line
-     */
-    SLBoundary vehicle_sl_boundary_;
-  } sl_boundary_info_;
+  /**
+   * @brief SL boundary of stitching point (starting point of plan trajectory)
+   * relative to the reference line
+   */
+  SLBoundary adc_sl_boundary_;
 
   planning_internal::Debug debug_;
   LatencyStats latency_stats_;
@@ -301,8 +291,6 @@ class ReferenceLineInfo {
   hdmap::RouteSegments lanes_;
 
   bool is_on_reference_line_ = false;
-
-  bool is_safe_to_change_lane_ = false;
 
   bool is_path_lane_borrow_ = false;
 

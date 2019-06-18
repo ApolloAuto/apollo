@@ -23,8 +23,9 @@
 #include <string>
 #include <unordered_map>
 
+#include "modules/planning/common/frame.h"
+#include "modules/planning/common/obstacle.h"
 #include "modules/planning/proto/dp_st_speed_config.pb.h"
-
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {
@@ -38,13 +39,13 @@ class SpeedDecider : public Task {
                          ReferenceLineInfo* reference_line_info) override;
 
  private:
-  enum StPosition {
+  enum STLocation {
     ABOVE = 1,
     BELOW = 2,
     CROSS = 3,
   };
 
-  StPosition GetStPosition(const PathDecision* const path_decision,
+  STLocation GetSTLocation(const PathDecision* const path_decision,
                            const SpeedData& speed_profile,
                            const STBoundary& st_boundary) const;
 

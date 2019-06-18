@@ -2809,7 +2809,7 @@ void DistanceApproachIPOPTCUDAInterface::generate_tapes(int n, int m,
   double sig;
   adouble obj_value;
 
-  double dummy;
+  double dummy = 0.0;
 
   obj_lam = new double[m + 1];
 

@@ -40,6 +40,9 @@ cc_test(
     srcs = [
         "quartic_polynomial_curve1d_test.cc",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         ":cubic_polynomial_curve1d",
         ":quartic_polynomial_curve1d",
@@ -72,6 +75,9 @@ cc_library(
     hdrs = [
         "cubic_polynomial_curve1d.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         ":polynomial_curve1d",
         ":quartic_polynomial_curve1d",
@@ -103,6 +109,9 @@ cc_library(
         "quintic_spiral_path.h",
         "quintic_spiral_path_with_derivation.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         ":quintic_polynomial_curve1d",
         "//cyber/common:log",
@@ -119,6 +128,9 @@ cc_library(
     hdrs = [
         "piecewise_quintic_spiral_path.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         ":quintic_spiral_path",
         "//cyber/common:log",
@@ -133,6 +145,9 @@ cc_test(
     srcs = [
         "quintic_polynomial_curve1d_test.cc",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         ":quartic_polynomial_curve1d",
         ":quintic_polynomial_curve1d",
@@ -146,6 +161,9 @@ cc_test(
     size = "small",
     srcs = [
         "piecewise_quintic_spiral_path_test.cc",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         ":piecewise_quintic_spiral_path",

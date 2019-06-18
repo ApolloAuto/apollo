@@ -30,9 +30,6 @@ UDPBridgeReceiverComponent<T>::UDPBridgeReceiverComponent()
 
 template <typename T>
 UDPBridgeReceiverComponent<T>::~UDPBridgeReceiverComponent() {
-  if (session_) {
-    session_->Close();
-  }
   for (auto proto : proto_list_) {
     FREE_POINTER(proto);
   }
@@ -56,97 +53,41 @@ bool UDPBridgeReceiverComponent<T>::Init() {
   if (!InitSession((uint16_t)bind_port_)) {
     return false;
   }
+  AINFO << "initialize session successful.";
   MsgDispatcher();
   return true;
 }
 
 template <typename T>
 bool UDPBridgeReceiverComponent<T>::InitSession(uint16_t port) {
-  struct sockaddr_in addr;
-  addr.sin_family = AF_INET;
-  addr.sin_addr.s_addr = htons(INADDR_ANY);
-  addr.sin_port = htons(port);
-
-  session_->Socket(AF_INET, SOCK_DGRAM, 0);
-  if (session_->Bind((struct sockaddr *)&addr, sizeof(addr)) < 0) {
-    AINFO << "bind prot [" << port << "] failed";
-    session_->Close();
-    return false;
-  }
-  return true;
-}
-
-template <typename T>
-bool UDPBridgeReceiverComponent<T>::MsgHandle() {
-  struct sockaddr_in client_addr;
-  socklen_t sock_len = static_cast<socklen_t>(sizeof(client_addr));
-  int bytes = 0;
-
-  char header_flag[sizeof(BRIDGE_HEADER_FLAG) + 1] = {0};
-  bytes = static_cast<int>(session_->RecvFrom(header_flag,
-    sizeof(header_flag) + 1, 0, (struct sockaddr*)&client_addr,
-    &sock_len));
-  if (bytes != sizeof(BRIDGE_HEADER_FLAG) + 1 ||
-    strcmp(header_flag, BRIDGE_HEADER_FLAG) != 0) {
-    return false;
-  }
-  char header_size_buf[sizeof(size_t) + 1] = {0};
-  bytes = static_cast<int>(session_->RecvFrom(header_size_buf,
-    sizeof(size_t) + 1, 0, (struct sockaddr*)&client_addr, &sock_len));
-  if (bytes != sizeof(size_t) + 1) {
-    return false;
-  }
-  size_t header_size = *reinterpret_cast<size_t *>(header_size_buf);
-  if (header_size == 0) {
-    return false;
-  }
-  char *header_buf = new char[header_size];
-  bytes = static_cast<int>(session_->RecvFrom(header_buf, header_size,
-    0, (struct sockaddr*)&client_addr, &sock_len));
-  if (bytes !=  header_size) {
-    return false;
-  }
-
-  BridgeHeader header;
-  if (!header.Diserialize(header_buf, header_size)) {
-    FREE_ARRY(header_buf);
-    return false;
-  }
-  FREE_ARRY(header_buf);
-  BridgeProtoDiserializedBuf<T> *proto_buf = CreateBridgeProtoBuf(header);
-
-  if (!proto_buf) {
-    return false;
-  }
-
-  char *buf = proto_buf->GetBuf(header.GetFramePos());
-  bytes = static_cast<int>(session_->RecvFrom(buf, header.GetFrameSize(),
-    0, (struct sockaddr*)&client_addr, &sock_len));
-  proto_buf->UpdateStatus(header.GetIndex());
-  if (proto_buf->IsReadyDiserialize()) {
-    auto pb_msg = std::make_shared<T>();
-    proto_buf->Diserialized(pb_msg);
-    writer_->Write(pb_msg);
-    RemoveItem(&proto_list_, proto_buf);
-  }
-  return true;
+  return listener_->Initialize(this,
+    &UDPBridgeReceiverComponent<T>::MsgHandle, port);
 }
 
 template <typename T>
 void UDPBridgeReceiverComponent<T>::MsgDispatcher() {
-  apollo::cyber::scheduler::Instance()->CreateTask(
-      [this]() {
-        while (true) {
-          MsgHandle();
-        }
-        session_->Close();
-      },
-      "bridge_server");
+  AINFO << "msg dispatcher start successful.";
+  listener_->Listen();
 }
 
 template <typename T>
 BridgeProtoDiserializedBuf<T> *UDPBridgeReceiverComponent<T>::
   CreateBridgeProtoBuf(const BridgeHeader &header) {
+  if (IsTimeout(header.GetTimeStamp())) {
+    typename std::vector<BridgeProtoDiserializedBuf<T> *>::iterator itor =
+      proto_list_.begin();
+    for (; itor != proto_list_.end();) {
+      if ((*itor)->IsTheProto(header)) {
+        BridgeProtoDiserializedBuf<T> *tmp = *itor;
+        FREE_POINTER(tmp);
+        itor = proto_list_.erase(itor);
+        break;
+      }
+      ++itor;
+    }
+    return nullptr;
+  }
+
   for (auto proto : proto_list_) {
     if (proto->IsTheProto(header)) {
       return proto;
@@ -169,6 +110,80 @@ bool UDPBridgeReceiverComponent<T>::IsProtoExist(const BridgeHeader &header) {
     }
   }
   return false;
+}
+
+template<typename T>
+bool UDPBridgeReceiverComponent<T>::IsTimeout(double time_stamp) {
+  double cur_time = apollo::common::time::Clock::NowInSeconds();
+  if (cur_time < time_stamp) {
+    return true;
+  }
+  if (FLAGS_timeout < cur_time - time_stamp) {
+    return true;
+  }
+  return false;
+}
+
+template <typename T>
+bool UDPBridgeReceiverComponent<T>::MsgHandle(int fd) {
+  struct sockaddr_in client_addr;
+  socklen_t sock_len = static_cast<socklen_t>(sizeof(client_addr));
+  int bytes = 0;
+  int total_recv = 2 * FRAME_SIZE;
+  char total_buf[2 * FRAME_SIZE] = {0};
+  bytes = static_cast<int>(recvfrom(fd, total_buf,
+    total_recv, 0, (struct sockaddr*)&client_addr, &sock_len));
+  AINFO << "total recv " << bytes;
+  if (bytes <= 0 || bytes > total_recv) {
+    return false;
+  }
+  char header_flag[sizeof(BRIDGE_HEADER_FLAG) + 1] = {0};
+  size_t offset = 0;
+  memcpy(header_flag, total_buf, HEADER_FLAG_SIZE);
+  if (strcmp(header_flag, BRIDGE_HEADER_FLAG) != 0) {
+    return false;
+  }
+  offset += sizeof(BRIDGE_HEADER_FLAG) + 1;
+
+  char header_size_buf[sizeof(size_t) + 1] = {0};
+  const char *cursor = total_buf + offset;
+  memcpy(header_size_buf, cursor, sizeof(size_t));
+  size_t header_size = *(reinterpret_cast<size_t*>(header_size_buf));
+  if (header_size > FRAME_SIZE) {
+    return false;
+  }
+  offset += sizeof(size_t) + 1;
+
+  BridgeHeader header;
+  size_t buf_size = header_size - offset;
+  cursor = total_buf + offset;
+  if (!header.Diserialize(cursor, buf_size)) {
+    return false;
+  }
+
+  AINFO << "proto name : " << header.GetMsgName().c_str();
+  AINFO << "proto sequence num: " << header.GetMsgID();
+  AINFO << "proto total frames: " << header.GetTotalFrames();
+  AINFO << "proto frame index: " << header.GetIndex();
+
+  std::lock_guard<std::mutex> lock(mutex_);
+  BridgeProtoDiserializedBuf<T> *proto_buf = CreateBridgeProtoBuf(header);
+  if (!proto_buf) {
+    return false;
+  }
+
+  cursor = total_buf + header_size;
+  char *buf = proto_buf->GetBuf(header.GetFramePos());
+  memcpy(buf, cursor, header.GetFrameSize());
+  proto_buf->UpdateStatus(header.GetIndex());
+  if (proto_buf->IsReadyDiserialize()) {
+    auto pb_msg = std::make_shared<T>();
+    proto_buf->Diserialized(pb_msg);
+    AINFO << "pb data1 : " <<pb_msg->engine_rpm();
+    writer_->Write(pb_msg);
+    RemoveItem(&proto_list_, proto_buf);
+  }
+  return true;
 }
 
 BRIDGE_RECV_IMPL(canbus::Chassis);

@@ -52,7 +52,6 @@ SpeedBoundsDecider::SpeedBoundsDecider(const TaskConfig &config)
 Status SpeedBoundsDecider::Process(
     Frame *const frame, ReferenceLineInfo *const reference_line_info) {
   // retrieve data from frame and reference_line_info
-  const SLBoundary &adc_sl_boundary = reference_line_info->AdcSlBoundary();
   const PathData &path_data = reference_line_info->path_data();
   const TrajectoryPoint &init_point = frame->PlanningStartPoint();
   const ReferenceLine &reference_line = reference_line_info->reference_line();
@@ -60,11 +59,11 @@ Status SpeedBoundsDecider::Process(
 
   // 1. Map obstacles into st graph
   STBoundaryMapper boundary_mapper(
-      adc_sl_boundary, speed_bounds_config_, reference_line, path_data,
+      speed_bounds_config_, reference_line, path_data,
       path_data.discretized_path().Length(), speed_bounds_config_.total_time());
 
   path_decision->EraseStBoundaries();
-  if (boundary_mapper.CreateStBoundary(path_decision).code() ==
+  if (boundary_mapper.ComputeSTBoundary(path_decision).code() ==
       ErrorCode::PLANNING_ERROR) {
     const std::string msg = "Mapping obstacle failed.";
     AERROR << msg;
@@ -74,7 +73,7 @@ Status SpeedBoundsDecider::Process(
   std::vector<const STBoundary *> boundaries;
   for (auto *obstacle : path_decision->obstacles().Items()) {
     const auto &id = obstacle->Id();
-    const auto &st_boundary = obstacle->st_boundary();
+    const auto &st_boundary = obstacle->path_st_boundary();
     if (!st_boundary.IsEmpty()) {
       if (st_boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
         path_decision->Find(id)->SetBlockingObstacle(false);
@@ -88,7 +87,7 @@ Status SpeedBoundsDecider::Process(
   const double min_s_on_st_boundaries = SetSpeedFallbackDistance(path_decision);
 
   // 2. Create speed limit along path
-  SpeedLimitDecider speed_limit_decider(adc_sl_boundary, speed_bounds_config_,
+  SpeedLimitDecider speed_limit_decider(speed_bounds_config_,
                                         reference_line, path_data);
 
   SpeedLimit speed_limit;
@@ -136,7 +135,7 @@ double SpeedBoundsDecider::SetSpeedFallbackDistance(
   double side_pass_stop_s = std::numeric_limits<double>::infinity();
 
   for (auto *obstacle : path_decision->obstacles().Items()) {
-    const auto &st_boundary = obstacle->st_boundary();
+    const auto &st_boundary = obstacle->path_st_boundary();
 
     if (st_boundary.IsEmpty()) {
       continue;

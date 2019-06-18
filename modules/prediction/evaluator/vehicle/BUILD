@@ -10,6 +10,9 @@ cc_library(
     hdrs = [
         "mlp_evaluator.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/common:feature_output",
         "//modules/prediction/common:prediction_util",
@@ -45,6 +48,9 @@ cc_library(
     hdrs = [
         "rnn_evaluator.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/evaluator",
     ],
@@ -75,6 +81,9 @@ cc_library(
     ],
     hdrs = [
         "cost_evaluator.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
         "//modules/prediction/common:prediction_util",
@@ -107,6 +116,9 @@ cc_library(
     ],
     hdrs = [
         "junction_mlp_evaluator.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
         "//modules/common/math:geometry",
@@ -150,6 +162,9 @@ cc_library(
     hdrs = [
         "junction_map_evaluator.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/common:prediction_util",
         "//modules/prediction/common:semantic_map",
@@ -171,6 +186,9 @@ cc_library(
     ],
     hdrs = [
         "cruise_mlp_evaluator.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
         "//modules/prediction/common:prediction_util",
@@ -210,6 +228,9 @@ cc_library(
     hdrs = [
         "lane_scanning_evaluator.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/container:container_manager",
         "//modules/prediction/evaluator",
@@ -230,6 +251,9 @@ cc_library(
     ],
     hdrs = [
         "lane_aggregating_evaluator.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
         "//modules/prediction/container:container_manager",

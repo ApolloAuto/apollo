@@ -25,8 +25,6 @@
 namespace apollo {
 namespace bridge {
 
-constexpr size_t FRAME_SIZE = 1024;
-
 template <typename T>
 class BridgeProtoSerializedBuf {
  public:

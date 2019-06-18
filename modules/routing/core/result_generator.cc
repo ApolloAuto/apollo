@@ -274,7 +274,7 @@ double CalculateDistance(const std::vector<NodeWithRange>& nodes) {
   for (size_t i = 1; i < nodes.size(); ++i) {
     auto edge =
         nodes.at(i - 1).GetTopoNode()->GetOutEdgeTo(nodes.at(i).GetTopoNode());
-    if (edge->Type() != TET_FORWARD) {
+    if (edge == nullptr || edge->Type() != TET_FORWARD) {
       continue;
     }
     distance += nodes.at(i).EndS() - nodes.at(i).StartS();

@@ -515,7 +515,9 @@ const STBoundary& Obstacle::reference_line_st_boundary() const {
   return reference_line_st_boundary_;
 }
 
-const STBoundary& Obstacle::st_boundary() const { return st_boundary_; }
+const STBoundary& Obstacle::path_st_boundary() const {
+  return path_st_boundary_;
+}
 
 const std::vector<std::string>& Obstacle::decider_tags() const {
   return decider_tags_;
@@ -690,15 +692,15 @@ const SLBoundary& Obstacle::PerceptionSLBoundary() const {
   return sl_boundary_;
 }
 
-void Obstacle::SetStBoundary(const STBoundary& boundary) {
-  st_boundary_ = boundary;
+void Obstacle::set_path_st_boundary(const STBoundary& boundary) {
+  path_st_boundary_ = boundary;
 }
 
 void Obstacle::SetStBoundaryType(const STBoundary::BoundaryType type) {
-  st_boundary_.SetBoundaryType(type);
+  path_st_boundary_.SetBoundaryType(type);
 }
 
-void Obstacle::EraseStBoundary() { st_boundary_ = STBoundary(); }
+void Obstacle::EraseStBoundary() { path_st_boundary_ = STBoundary(); }
 
 void Obstacle::SetReferenceLineStBoundary(const STBoundary& boundary) {
   reference_line_st_boundary_ = boundary;

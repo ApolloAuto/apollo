@@ -104,6 +104,10 @@ std::string PostRecordProcessor::GetDefaultOutputFile() const {
 
 void PostRecordProcessor::LoadSourceRecords() {
   DIR* dirp = opendir(source_record_dir_.c_str());
+  if (dirp == nullptr) {
+    AERROR << "failed to open source dir: " << source_record_dir_;
+    return;
+  }
   struct dirent* dp = nullptr;
   while ((dp = readdir(dirp)) != nullptr) {
     const std::string file_name = dp->d_name;
@@ -112,6 +116,7 @@ void PostRecordProcessor::LoadSourceRecords() {
       source_record_files_.push_back(file_name);
     }
   }
+  closedir(dirp);
   std::sort(source_record_files_.begin(), source_record_files_.end());
 }
 

@@ -21,6 +21,8 @@ Tool to modify configuration files
 import curses
 import os
 import traceback
+import six
+from six.moves import xrange  # pylint: disable=redefined-builtin
 
 from ModuleConf import ModuleConf
 
@@ -98,8 +100,8 @@ class Configurator(object):
             self.stdscr.addstr(lidx, 10, self.moduleconf[idx].proto_file)
             self.stdscr.addstr(lidx, 50, self.moduleconf[idx].proto_class)
             self.stdscr.addstr(lidx, 65, self.moduleconf[idx].conf_file,
-                               curses.color_pair(1 if self.moduleconf[idx]
-                                                 .found_conf == False else 2))
+                               curses.color_pair(1 if not self.moduleconf[idx]
+                                                 .found_conf else 2))
 
         if self.select == len(self.moduleconf):
             self.stdscr.addstr(

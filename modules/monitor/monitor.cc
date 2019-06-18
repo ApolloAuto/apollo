@@ -52,8 +52,6 @@ bool Monitor::Init() {
   runners_.emplace_back(new ChannelMonitor());
   // Monitor if resources are sufficient.
   runners_.emplace_back(new ResourceMonitor());
-  // Monitor if recorder is recording.
-  runners_.emplace_back(new RecorderMonitor());
 
   // Monitor all changes made by each sub-monitor, and summarize to a final
   // overall status.

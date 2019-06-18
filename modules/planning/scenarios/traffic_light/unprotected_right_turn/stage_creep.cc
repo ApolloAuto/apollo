@@ -99,7 +99,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
     traffic_light = current_traffic_light_overlap;
   }
 
-  if (traffic_light_all_green) {
+  if (traffic_light_all_green || traffic_light == nullptr) {
     return FinishStage();
   }
 

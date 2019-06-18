@@ -13,6 +13,7 @@ cc_library(
     linkopts = [
         "-lboost_thread",
     ],
+    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
         "//modules/common/util:json_util",
         "//modules/dreamview/proto:simulation_world_proto",

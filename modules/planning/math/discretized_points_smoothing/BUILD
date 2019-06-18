@@ -10,6 +10,9 @@ cc_library(
     hdrs = [
         "cos_theta_smoother.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         ":cos_theta_ipopt_interface",
         "//cyber/common:log",
@@ -26,6 +29,9 @@ cc_library(
     hdrs = [
         "cos_theta_ipopt_interface.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         "//cyber/common:log",
         "@adolc",
@@ -40,6 +46,9 @@ cc_library(
     ],
     hdrs = [
         "fem_pos_deviation_smoother.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         "//cyber/common:log",

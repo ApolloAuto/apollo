@@ -10,6 +10,9 @@ cc_library(
     hdrs = [
         "cyclist_keep_lane_evaluator.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/evaluator",
     ],

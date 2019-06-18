@@ -63,14 +63,15 @@ common::Status SpeedDecider::Execute(Frame* frame,
   return Status::OK();
 }
 
-SpeedDecider::StPosition SpeedDecider::GetStPosition(
+SpeedDecider::STLocation SpeedDecider::GetSTLocation(
     const PathDecision* const path_decision, const SpeedData& speed_profile,
     const STBoundary& st_boundary) const {
-  StPosition st_position = BELOW;
+
   if (st_boundary.IsEmpty()) {
-    return st_position;
+    return BELOW;
   }
 
+  STLocation st_location = BELOW;
   bool st_position_set = false;
   const double start_t = st_boundary.min_t();
   const double end_t = st_boundary.max_t();
@@ -87,12 +88,12 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
     common::math::LineSegment2d speed_line(curr_st, next_st);
     if (st_boundary.HasOverlap(speed_line)) {
       ADEBUG << "speed profile cross st_boundaries.";
-      st_position = CROSS;
+      st_location = CROSS;
 
       if (st_boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
         if (!CheckKeepClearCrossable(path_decision, speed_profile,
                                      st_boundary)) {
-          st_position = BELOW;
+          st_location = BELOW;
         }
       }
       break;
@@ -104,12 +105,12 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
       if (start_t < next_st.t() && curr_st.t() < end_t) {
         STPoint bd_point_front = st_boundary.upper_points().front();
         double side = common::math::CrossProd(bd_point_front, curr_st, next_st);
-        st_position = side < 0.0 ? ABOVE : BELOW;
+        st_location = side < 0.0 ? ABOVE : BELOW;
         st_position_set = true;
       }
     }
   }
-  return st_position;
+  return st_location;
 }
 
 bool SpeedDecider::CheckKeepClearCrossable(
@@ -170,7 +171,7 @@ bool SpeedDecider::IsFollowTooClose(const Obstacle& obstacle) const {
     return false;
   }
 
-  if (obstacle.st_boundary().min_t() > 0.0) {
+  if (obstacle.path_st_boundary().min_t() > 0.0) {
     return false;
   }
   const double obs_speed = obstacle.speed();
@@ -179,7 +180,7 @@ bool SpeedDecider::IsFollowTooClose(const Obstacle& obstacle) const {
     return false;
   }
   const double distance =
-      obstacle.st_boundary().min_s() - FLAGS_min_stop_distance_obstacle;
+      obstacle.path_st_boundary().min_s() - FLAGS_min_stop_distance_obstacle;
   constexpr double decel = 1.0;
   return distance < std::pow((ego_speed - obs_speed), 2) * 0.5 / decel;
 }
@@ -204,7 +205,7 @@ Status SpeedDecider::MakeObjectDecision(
 
   for (const auto* obstacle : path_decision->obstacles().Items()) {
     auto* mutable_obstacle = path_decision->Find(obstacle->Id());
-    const auto& boundary = mutable_obstacle->st_boundary();
+    const auto& boundary = mutable_obstacle->path_st_boundary();
 
     if (boundary.IsEmpty() || boundary.max_s() < 0.0 ||
         boundary.max_t() < 0.0 ||
@@ -228,10 +229,10 @@ Status SpeedDecider::MakeObjectDecision(
       continue;
     }
 
-    auto position = GetStPosition(path_decision, speed_profile, boundary);
+    auto location = GetSTLocation(path_decision, speed_profile, boundary);
     if (boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
       if (CheckKeepClearBlocked(path_decision, *obstacle)) {
-        position = BELOW;
+        location = BELOW;
       }
     }
 
@@ -240,7 +241,7 @@ Status SpeedDecider::MakeObjectDecision(
     reference_line_->XYToSL({box.center_x(), box.center_y()}, &start_sl_point);
     double start_abs_l = std::abs(start_sl_point.l());
 
-    switch (position) {
+    switch (location) {
       case BELOW:
         if (boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
           ObjectDecisionType stop_decision;
@@ -307,7 +308,7 @@ Status SpeedDecider::MakeObjectDecision(
         }
         break;
       default:
-        AERROR << "Unknown position:" << position;
+        AERROR << "Unknown position:" << location;
     }
     AppendIgnoreDecision(mutable_obstacle);
   }
@@ -341,7 +342,11 @@ bool SpeedDecider::CreateStopDecision(const Obstacle& obstacle,
                                       double stop_distance) const {
   DCHECK_NOTNULL(stop_decision);
 
-  const auto& boundary = obstacle.st_boundary();
+  const auto& boundary = obstacle.path_st_boundary();
+
+  // TODO(all): this is a bug! Cannot mix reference s and path s!
+  // Replace boundary.min_s() with computed reference line s
+  // fence is set according to reference line s.
   double fence_s = adc_sl_boundary_.end_s() + boundary.min_s() + stop_distance;
   if (boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
     fence_s = obstacle.PerceptionSLBoundary().start_s();
@@ -383,7 +388,7 @@ bool SpeedDecider::CreateFollowDecision(
   const double follow_distance_s = -std::fmax(
       follow_speed * FLAGS_follow_time_buffer, FLAGS_follow_min_distance);
 
-  const auto& boundary = obstacle.st_boundary();
+  const auto& boundary = obstacle.path_st_boundary();
   const double reference_s =
       adc_sl_boundary_.end_s() + boundary.min_s() + follow_distance_s;
   const double main_stop_s =
@@ -418,7 +423,7 @@ bool SpeedDecider::CreateYieldDecision(
   PerceptionObstacle::Type obstacle_type = obstacle.Perception().type();
   double yield_distance = FLAGS_yield_distance;
 
-  const auto& obstacle_boundary = obstacle.st_boundary();
+  const auto& obstacle_boundary = obstacle.path_st_boundary();
   const double yield_distance_s =
       std::max(-obstacle_boundary.min_s(), -yield_distance);
 
@@ -464,7 +469,7 @@ bool SpeedDecider::CreateOvertakeDecision(
       std::fmax(init_point_.v(), obstacle_speed) * kOvertakeTimeBuffer,
       kMinOvertakeDistance);
 
-  const auto& boundary = obstacle.st_boundary();
+  const auto& boundary = obstacle.path_st_boundary();
   const double reference_line_fence_s =
       adc_sl_boundary_.end_s() + boundary.min_s() + overtake_distance_s;
   const double main_stop_s =
@@ -525,7 +530,7 @@ bool SpeedDecider::CheckStopForPedestrian(
   constexpr double kSDistanceStartTimer = 10.0;
   constexpr double kMaxStopSpeed = 0.3;
   constexpr double kPedestrianStopTimeout = 4.0;
-  if (obstacle.st_boundary().min_s() < kSDistanceStartTimer) {
+  if (obstacle.path_st_boundary().min_s() < kSDistanceStartTimer) {
     const auto obstacle_speed = std::hypot(perception_obstacle.velocity().x(),
                                            perception_obstacle.velocity().y());
     if (obstacle_speed > kMaxStopSpeed) {
