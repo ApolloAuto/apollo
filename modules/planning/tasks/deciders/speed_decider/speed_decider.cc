@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/tasks/optimizers/speed_decider/speed_decider.h"
+#include "modules/planning/tasks/deciders/speed_decider/speed_decider.h"
 
 #include <algorithm>
 #include <string>

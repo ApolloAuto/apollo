@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/tasks/optimizers/path_decider/path_decider.h"
+#include "modules/planning/tasks/deciders/path_decider/path_decider.h"
 
 #include <string>
 
