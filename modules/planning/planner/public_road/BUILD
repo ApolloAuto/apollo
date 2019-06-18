@@ -30,11 +30,11 @@ cc_library(
         "//modules/planning/reference_line",
         "//modules/planning/reference_line:qp_spline_reference_line_smoother",
         "//modules/planning/tasks:task",
+        "//modules/planning/tasks/deciders/path_decider",
+        "//modules/planning/tasks/deciders/speed_decider",
         "//modules/planning/tasks/optimizers:path_optimizer",
         "//modules/planning/tasks/optimizers:speed_optimizer",
-        "//modules/planning/tasks/optimizers/path_decider",
         "//modules/planning/tasks/optimizers/path_time_heuristic:path_time_heuristic_optimizer",
-        "//modules/planning/tasks/optimizers/speed_decider",
         "@eigen",
     ],
 )
