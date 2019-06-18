@@ -104,6 +104,7 @@ DEFAULT_MAPS=(
   sunnyvale_big_loop
   sunnyvale_loop
   sunnyvale_with_two_offices
+  sunnyvale
   san_mateo
 )
 DEFAULT_TEST_MAPS=(
