@@ -50,7 +50,11 @@ bool RecordWriter::Open(const std::string& file) {
     AERROR << "Failed to open output record file: " << path_;
     return false;
   }
-  file_writer_->WriteHeader(header_);
+  if (!file_writer_->WriteHeader(header_)) {
+    AERROR << "Failed to write header: " << path_;
+    file_writer_->Close();
+    return false;
+  }
   is_opened_ = true;
   return is_opened_;
 }
