@@ -243,7 +243,7 @@ void GriddedPathTimeGraph::CalculateCostAt(
   const double speed_limit =
       st_graph_data_.speed_limit().GetSpeedLimitByS(unit_s_ * r);
 
-  // TODO (all): fix here; remove soft_speed_limit
+  // TODO(all): fix here; remove soft_speed_limit
   const double soft_speed_limit = speed_limit;
 
   if (c == 1) {

@@ -275,6 +275,9 @@ void LaneFollowStage::PlanFallbackTrajectory(
   }
 
   AERROR << "Speed fallback due to algorithm failure";
+  // TODO(Hongyi): refine the fall-back handling here.
+  // To use piecewise jerk speed fallback, stop distance here
+  // is an upper bound of s, not a target.
   // TODO(Jiacheng): move this stop_path_threshold to a gflag
   const double path_stop_distance =
       reference_line_info->path_data().discretized_path().Length();
