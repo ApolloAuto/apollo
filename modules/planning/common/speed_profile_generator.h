@@ -42,12 +42,7 @@ class SpeedProfileGenerator {
 
   static SpeedData GenerateFixedDistanceCreepProfile(const double distance,
                                                      const double max_speed);
-
  private:
-//  static SpeedData GenerateStopProfile(const double init_speed,
-//                                       const double init_acc,
-//                                       const double stop_distance);
-
   static SpeedData GenerateStopProfile(const double init_speed,
                                        const double init_acc);
 };
