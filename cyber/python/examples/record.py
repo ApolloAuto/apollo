@@ -92,7 +92,7 @@ def test_record_reader(reader_path):
         count += 1
         print('=' * 80)
         print('read [%d] messages' % count)
-        print('chnanel_name -> %s' % channel_name)
+        print('channel_name -> %s' % channel_name)
         print('msgtime -> %d' % timestamp)
         print('msgnum -> %d' % freader.get_messagenumber(channel_name))
         print('msgtype -> %s' % datatype)
