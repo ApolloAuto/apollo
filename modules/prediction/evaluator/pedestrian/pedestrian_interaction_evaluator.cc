@@ -140,13 +140,14 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   for (int i = 0; i < kEmbeddingSize; ++i) {
     lstm_input[0][i] = position_embedding[0][i];
   }
-  torch::Tensor curr_ht = torch::zeros({1, 1, kHiddenSize});
-  torch::Tensor curr_ct = torch::zeros({1, 1, kHiddenSize});
-  if (obstacle_id_lstm_state_map_.find(id) !=
+  if (obstacle_id_lstm_state_map_.find(id) ==
       obstacle_id_lstm_state_map_.end()) {
-    curr_ht = obstacle_id_lstm_state_map_[id].ht;
-    curr_ct = obstacle_id_lstm_state_map_[id].ct;
+    obstacle_id_lstm_state_map_[id].ht = torch::zeros({1, 1, kHiddenSize});
+    obstacle_id_lstm_state_map_[id].ct = torch::zeros({1, 1, kHiddenSize});
+    obstacle_id_lstm_state_map_[id].timestamp = obstacle_ptr->timestamp();
   }
+  torch::Tensor curr_ht = obstacle_id_lstm_state_map_[id].ht;
+  torch::Tensor curr_ct = obstacle_id_lstm_state_map_[id].ct;
   for (int i = 0; i < kHiddenSize; ++i) {
     lstm_input[0][kEmbeddingSize + i] = curr_ht[0][0][i];
     lstm_input[0][kEmbeddingSize + kHiddenSize + i] = curr_ct[0][0][i];
