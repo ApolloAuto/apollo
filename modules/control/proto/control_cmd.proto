@@ -103,6 +103,9 @@ message SimpleLongitudinalDebug {
   optional double jerk_reference = 29;
   optional double current_jerk = 30;
   optional double jerk_error = 31;
+  optional apollo.common.TrajectoryPoint current_matched_point = 32;
+  optional apollo.common.TrajectoryPoint current_reference_point = 33;
+  optional apollo.common.TrajectoryPoint preview_reference_point = 34;
 }
 
 message SimpleLateralDebug {
