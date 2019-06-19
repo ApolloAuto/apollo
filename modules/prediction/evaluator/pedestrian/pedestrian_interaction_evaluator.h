@@ -74,6 +74,7 @@ class PedestrianInteractionEvaluator : public Evaluator {
     double timestamp;
     torch::Tensor ct;
     torch::Tensor ht;
+    int frame_count = 0;
   };
 
   void Clear();

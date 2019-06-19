@@ -103,6 +103,11 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     ADEBUG << "Saving extracted features for learning locally.";
     return true;
   }
+
+  constexpr double kShortTermPredictionTimeResolution = 0.4;
+  constexpr int kShortTermPredictionPointNum = 5;
+  constexpr int kHiddenStateUpdateCycle = 4;
+
   // Step 1 Get social embedding
   torch::Tensor social_pooling = GetSocialPooling();
   std::vector<torch::jit::IValue> social_embedding_inputs;
@@ -117,11 +122,11 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   double pos_y = feature_values[3];
   double rel_x = 0.0;
   double rel_y = 0.0;
-  if (obstacle_ptr->history_size() > 1) {
+  if (obstacle_ptr->history_size() > kHiddenStateUpdateCycle - 1) {
     rel_x = obstacle_ptr->latest_feature().position().x() -
-            obstacle_ptr->feature(1).position().x();
+            obstacle_ptr->feature(3).position().x();
     rel_y = obstacle_ptr->latest_feature().position().y() -
-            obstacle_ptr->feature(1).position().y();
+            obstacle_ptr->feature(3).position().y();
   }
 
   torch::Tensor torch_position = torch::zeros({1, 2});
@@ -146,22 +151,29 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     obstacle_id_lstm_state_map_[id].ht = torch::zeros({1, 1, kHiddenSize});
     obstacle_id_lstm_state_map_[id].ct = torch::zeros({1, 1, kHiddenSize});
     obstacle_id_lstm_state_map_[id].timestamp = obstacle_ptr->timestamp();
+    obstacle_id_lstm_state_map_[id].frame_count = 0;
   }
   torch::Tensor curr_ht = obstacle_id_lstm_state_map_[id].ht;
   torch::Tensor curr_ct = obstacle_id_lstm_state_map_[id].ct;
+  int curr_frame_count = obstacle_id_lstm_state_map_[id].frame_count;
 
-  for (int i = 0; i < kHiddenSize; ++i) {
-    lstm_input[0][kEmbeddingSize + i] = curr_ht[0][0][i];
-    lstm_input[0][kEmbeddingSize + kHiddenSize + i] = curr_ct[0][0][i];
+  if (curr_frame_count == kHiddenStateUpdateCycle - 1) {
+    for (int i = 0; i < kHiddenSize; ++i) {
+      lstm_input[0][kEmbeddingSize + i] = curr_ht[0][0][i];
+      lstm_input[0][kEmbeddingSize + kHiddenSize + i] = curr_ct[0][0][i];
+    }
+
+    std::vector<torch::jit::IValue> lstm_inputs;
+    lstm_inputs.push_back(lstm_input.to(device_));
+    auto lstm_out_tuple =
+        torch_single_lstm_ptr_->forward(lstm_inputs).toTuple();
+    auto ht = lstm_out_tuple->elements()[0].toTensor();
+    auto ct = lstm_out_tuple->elements()[1].toTensor();
+    obstacle_id_lstm_state_map_[id].ht = ht.clone();
+    obstacle_id_lstm_state_map_[id].ct = ct.clone();
   }
-
-  std::vector<torch::jit::IValue> lstm_inputs;
-  lstm_inputs.push_back(lstm_input.to(device_));
-  auto lstm_out_tuple = torch_single_lstm_ptr_->forward(lstm_inputs).toTuple();
-  auto ht = lstm_out_tuple->elements()[0].toTensor();
-  auto ct = lstm_out_tuple->elements()[1].toTensor();
-  obstacle_id_lstm_state_map_[id].ht = ht.clone();
-  obstacle_id_lstm_state_map_[id].ct = ct.clone();
+  obstacle_id_lstm_state_map_[id].frame_count =
+      (curr_frame_count + 1) % kHiddenStateUpdateCycle;
 
   // Step 4 for-loop get a trajectory
   // Set the starting trajectory point
@@ -174,11 +186,7 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   start_point->set_v(latest_feature_ptr->speed());
   start_point->set_relative_time(0.0);
 
-  constexpr double kShortTermPredictionTimeLength = 0.5;
-  int num_trajectory_point =
-      static_cast<int>(kShortTermPredictionTimeLength /
-                       FLAGS_prediction_trajectory_time_resolution);
-  for (int i = 1; i < num_trajectory_point; ++i) {
+  for (int i = 1; i <= kShortTermPredictionPointNum; ++i) {
     double prev_x = trajectory->trajectory_point(i - 1).path_point().x();
     double prev_y = trajectory->trajectory_point(i - 1).path_point().y();
     CHECK(obstacle_id_lstm_state_map_.find(id) !=
@@ -205,6 +213,10 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     for (int i = 0; i < kEmbeddingSize; ++i) {
       lstm_input[0][i] = position_embedding[0][i];
     }
+
+    auto ht = obstacle_id_lstm_state_map_[id].ht.clone();
+    auto ct = obstacle_id_lstm_state_map_[id].ct.clone();
+
     for (int i = 0; i < kHiddenSize; ++i) {
       lstm_input[0][kEmbeddingSize + i] = ht[0][0][i];
       lstm_input[0][kEmbeddingSize + kHiddenSize + i] = ct[0][0][i];
@@ -230,8 +242,8 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     point->set_v(latest_feature_ptr->speed());
     point->mutable_path_point()->set_theta(
         latest_feature_ptr->velocity_heading());
-    point->set_relative_time(
-        static_cast<double>(FLAGS_prediction_trajectory_time_resolution * i));
+    point->set_relative_time(kShortTermPredictionTimeResolution *
+                             static_cast<double>(i));
   }
 
   return true;
