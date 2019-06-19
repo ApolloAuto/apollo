@@ -29,7 +29,10 @@ using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 
 OpenSpaceFallbackDecider::OpenSpaceFallbackDecider(const TaskConfig& config)
-    : Decider(config) {}
+    : Decider(config) {
+  CHECK(config.has_open_space_fallback_decider_config());
+  SetName("OpenSpaceFallbackDecider");
+}
 
 bool OpenSpaceFallbackDecider::QuardraticFormulaLowerSolution(const double a,
                                                               const double b,
@@ -281,7 +284,8 @@ bool OpenSpaceFallbackDecider::IsCollisionFreeTrajectory(
   auto trajectory_pb = trajectory_gear_pair.first;
   const size_t point_size = trajectory_pb.NumOfPoints();
   // TODO(SHU): find a proper buffer time
-  const double kCollisionTimeBuffer = 100 * FLAGS_trajectory_time_resolution;
+  //   const double kCollisionTimeBuffer = 100 *
+  //   FLAGS_trajectory_time_resolution;
   *current_index = trajectory_pb.QueryLowerBoundPoint(0.0);
 
   for (size_t i = *current_index; i < point_size; ++i) {
@@ -304,7 +308,8 @@ bool OpenSpaceFallbackDecider::IsCollisionFreeTrajectory(
           if (std::abs(trajectory_point.relative_time() -
                        static_cast<double>(j) *
                            FLAGS_trajectory_time_resolution) <
-              kCollisionTimeBuffer) {
+              config_.open_space_fallback_decider_config()
+                  .open_space_fallback_collision_time_buffer()) {
             *first_collision_index = i;
             return false;
           }
