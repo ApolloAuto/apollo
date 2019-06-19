@@ -384,7 +384,7 @@ layer {
   type: "BatchNorm"
   bottom: "conv3_3"
   top: "conv3_3"
- 
+
   batch_norm_param {
     use_global_stats: 1
     eps: 1e-06
@@ -461,7 +461,7 @@ layer {
   type: "BatchNorm"
   bottom: "conv4_1"
   top: "conv4_1"
- 
+
   batch_norm_param {
     use_global_stats: 1
     eps: 1e-06
@@ -525,7 +525,7 @@ layer {
   type: "BatchNorm"
   bottom: "conv4_2"
   top: "conv4_2"
-  
+
   batch_norm_param {
     use_global_stats: 1
     eps: 1e-06
@@ -589,7 +589,7 @@ layer {
   type: "BatchNorm"
   bottom: "conv4_3"
   top: "conv4_3"
-  
+
   batch_norm_param {
     use_global_stats: 1
     eps: 1e-06
@@ -666,7 +666,7 @@ layer {
   type: "BatchNorm"
   bottom: "conv5_1"
   top: "conv5_1"
-  
+
   batch_norm_param {
     use_global_stats: 1
     eps: 1e-06
@@ -730,7 +730,7 @@ layer {
   type: "BatchNorm"
   bottom: "conv5_2"
   top: "conv5_2"
- 
+
   batch_norm_param {
     use_global_stats: 1
     eps: 1e-06
@@ -794,7 +794,7 @@ layer {
   type: "BatchNorm"
   bottom: "conv5_3"
   top: "conv5_3"
-  
+
   batch_norm_param {
     use_global_stats: 1
     eps: 1e-06
@@ -858,7 +858,7 @@ layer {
   type: "BatchNorm"
   bottom: "conv5_4"
   top: "conv5_4"
- 
+
   batch_norm_param {
     use_global_stats: 1
     eps: 1e-06
@@ -922,7 +922,7 @@ layer {
   type: "BatchNorm"
   bottom: "conv5_5"
   top: "conv5_5"
-  
+
   batch_norm_param {
     use_global_stats: 1
     eps: 1e-06
@@ -999,7 +999,7 @@ layer {
   type: "BatchNorm"
   bottom: "conv6_1"
   top: "conv6_1"
-  
+
   batch_norm_param {
     use_global_stats: 1
     eps: 1e-06
@@ -1063,7 +1063,7 @@ layer {
   type: "BatchNorm"
   bottom: "conv6_2"
   top: "conv6_2"
- 
+
   batch_norm_param {
     use_global_stats: 1
     eps: 1e-06
@@ -1127,7 +1127,7 @@ layer {
   type: "BatchNorm"
   bottom: "conv6_3"
   top: "conv6_3"
-  
+
   batch_norm_param {
     use_global_stats: 1
     eps: 1e-06
@@ -1191,7 +1191,7 @@ layer {
   type: "BatchNorm"
   bottom: "conv6_4"
   top: "conv6_4"
-  
+
   batch_norm_param {
     use_global_stats: 1
     eps: 1e-06
@@ -1255,7 +1255,7 @@ layer {
   type: "BatchNorm"
   bottom: "conv6_5"
   top: "conv6_5"
-  
+
   batch_norm_param {
     use_global_stats: 1
     eps: 1e-06
@@ -1319,7 +1319,7 @@ layer {
   type: "BatchNorm"
   bottom: "conv7_1"
   top: "conv7_1"
-  
+
   batch_norm_param {
     use_global_stats: 1
     eps: 1e-06
@@ -1383,7 +1383,7 @@ layer {
   type: "BatchNorm"
   bottom: "conv7_2"
   top: "conv7_2"
-  
+
   batch_norm_param {
     use_global_stats: 1
     eps: 1e-06
@@ -1504,10 +1504,10 @@ layer {
     convolution_param {
       kernel_size: 2  # {{2 * factor _ factor % 2}}  2 * 2 _ 0
       stride: 2       # {{factor}}
-      num_output: 64 # {{C}} 
+      num_output: 64 # {{C}}
       #group: 48      # {{C}}
       pad: 0          # {{ceil((factor _ 1) / 2.)}} 2 _ 1 / 2
-      weight_filler: {type: "xavier" } 
+      weight_filler: {type: "xavier" }
       bias_filler {
           type: "constant"
           value: 0
@@ -6246,10 +6246,10 @@ layer {
     convolution_param {
       kernel_size: 16  # {{2 * factor _ factor % 2}}  2 * 2 _ 0
       stride: 8       # {{factor}}
-      num_output: 32 # {{C}} 
+      num_output: 32 # {{C}}
       #group: 64      # {{C}}
       pad: 4         # {{ceil((factor _ 1) / 2.)}} 2 _ 1 / 2
-      weight_filler: {type: "xavier" } 
+      weight_filler: {type: "xavier" }
       bias_filler {
           type: "constant"
           value: 0
