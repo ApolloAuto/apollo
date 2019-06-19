@@ -363,7 +363,9 @@ bool IterativeAnchoringSmoother::SmoothPath(
   while (!(is_collision_free && is_curvature_satisfied)) {
     if (counter > max_iteration_num) {
       AERROR << "path smoother iteration num reach maximum in iterative "
-                "anchoring smoother";
+                "anchoring smoother. ";
+      AERROR << "Collision free status: " << is_collision_free
+             << " curvature satisfaction status: " << is_curvature_satisfied;
       return false;
     }
 
