@@ -107,7 +107,7 @@ class RecordWriter : public RecordBase {
                     const std::string& proto_desc = "");
 
   /**
-  * @brief Set max size (KB) to segement record file
+  * @brief Set max size (KB) to segment record file
   *
   * @param size_kilobytes
   *
@@ -116,7 +116,7 @@ class RecordWriter : public RecordBase {
   bool SetSizeOfFileSegmentation(uint64_t size_kilobytes);
 
   /**
-  * @brief Set max interval (Second) to segement record file.
+  * @brief Set max interval (Second) to segment record file.
   *
   * @param time_sec
   *
