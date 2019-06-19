@@ -498,6 +498,12 @@ void IterativeAnchoringSmoother::AdjustPathBounds(
   for (const auto index : colliding_point_index) {
     bounds->at(index) *= collision_decrease_ratio;
   }
+
+  // Anchor the end points to enforce the initial end end heading continuity
+  bounds->at(0) = 0.0;
+  bounds->at(1) = 0.0;
+  bounds->at(bounds->size() - 1) = 0.0;
+  bounds->at(bounds->size() - 2) = 0.0;
 }
 
 bool IterativeAnchoringSmoother::SetPathProfile(
