@@ -26,11 +26,10 @@ namespace apollo {
 namespace planning {
 
 CosThetaIpoptInterface::CosThetaIpoptInterface(
-    std::vector<std::pair<double, double>> points,
-    std::vector<double> lateral_bounds) {
+    std::vector<std::pair<double, double>> points, std::vector<double> bounds) {
   init_points_ = std::move(points);
   num_of_points_ = init_points_.size();
-  lateral_bounds_ = std::move(lateral_bounds);
+  bounds_ = std::move(bounds);
   CHECK_GT(num_of_points_, 1);
 }
 
@@ -95,12 +94,11 @@ bool CosThetaIpoptInterface::get_bounds_info(int n, double* x_l, double* x_u,
     double x_upper = 0.0;
     double y_lower = 0.0;
     double y_upper = 0.0;
-    double bound_square = lateral_bounds_[i] / std::sqrt(2.0);
 
-    x_lower = init_points_[i].first - bound_square;
-    x_upper = init_points_[i].first + bound_square;
-    y_lower = init_points_[i].second - bound_square;
-    y_upper = init_points_[i].second + bound_square;
+    x_lower = init_points_[i].first - bounds_[i];
+    x_upper = init_points_[i].first + bounds_[i];
+    y_lower = init_points_[i].second - bounds_[i];
+    y_upper = init_points_[i].second + bounds_[i];
 
     // x
     g_l[index] = x_lower;
