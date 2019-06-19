@@ -1,3 +1,6 @@
+fallback_config{
+  open_space_fallback_collision_time_buffer: 10.0
+}
 roi_config {
   roi_longitudinal_range: 15.0
   parking_start_range: 12.0
