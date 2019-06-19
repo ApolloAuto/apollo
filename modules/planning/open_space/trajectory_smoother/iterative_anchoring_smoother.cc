@@ -337,17 +337,19 @@ bool IterativeAnchoringSmoother::SmoothPath(
   }
   flexible_bounds = bounds;
 
-  FemPosDeviationSmoother fem_pos_smoother;
   // TODO(Jinyun): move to confs
-  fem_pos_smoother.set_weight_fem_pos_deviation(1.0e8);
-  fem_pos_smoother.set_weight_path_length(1.0);
-  fem_pos_smoother.set_weight_ref_deviation(1.0);
-  FemPosDeviationOsqpSettings osqp_settings;
-  osqp_settings.max_iter = static_cast<int>(500);
-  osqp_settings.time_limit = 0.0;
-  osqp_settings.verbose = false;
-  osqp_settings.scaled_termination = true;
-  osqp_settings.warm_start = true;
+  FemPosDeviationSmootherConfig config;
+  config.set_weight_fem_pos_deviation(1.0e8);
+  config.set_weight_path_length(1.0);
+  config.set_weight_ref_deviation(1.0);
+  config.set_apply_curvature_constraint(false);
+  config.set_max_iter(500);
+  config.set_time_limit(0.0);
+  config.set_verbose(false);
+  config.set_scaled_termination(true);
+  config.set_warm_start(true);
+
+  FemPosDeviationSmoother fem_pos_smoother(config);
 
   // TODO(Jinyun): move to confs
   const size_t max_iteration_num = 1000;
@@ -372,16 +374,12 @@ bool IterativeAnchoringSmoother::SmoothPath(
     AdjustPathBounds(colliding_point_index, curvature_exceeding_point_index,
                      &flexible_bounds);
 
-    fem_pos_smoother.set_ref_points(raw_point2d);
-    fem_pos_smoother.set_x_bounds_around_refs(flexible_bounds);
-    fem_pos_smoother.set_y_bounds_around_refs(flexible_bounds);
-    if (!fem_pos_smoother.Smooth(osqp_settings)) {
+    std::vector<double> opt_x;
+    std::vector<double> opt_y;
+    if (!fem_pos_smoother.Solve(raw_point2d, flexible_bounds, &opt_x, &opt_y)) {
       AERROR << "Smoothing path fails";
       return false;
     }
-
-    const auto& opt_x = fem_pos_smoother.opt_x();
-    const auto& opt_y = fem_pos_smoother.opt_y();
 
     if (opt_x.size() < 2 || opt_y.size() < 2) {
       AERROR << "Return by fem_pos_smoother is wrong. Size smaller than 2 ";

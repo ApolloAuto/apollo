@@ -39,11 +39,10 @@ DiscretePointsReferenceLineSmoother::DiscretePointsReferenceLineSmoother(
 bool DiscretePointsReferenceLineSmoother::Smooth(
     const ReferenceLine& raw_reference_line,
     ReferenceLine* const smoothed_reference_line) {
-  std::vector<std::pair<double, double>> smoothed_point2d;
+  const auto start_timestamp = std::chrono::system_clock::now();
+
   std::vector<std::pair<double, double>> raw_point2d;
   std::vector<double> anchorpoints_lateralbound;
-
-  const auto start_timestamp = std::chrono::system_clock::now();
 
   for (const auto& anchor_point : anchor_points_) {
     raw_point2d.emplace_back(anchor_point.path_point.x(),
@@ -63,6 +62,7 @@ bool DiscretePointsReferenceLineSmoother::Smooth(
   bool status = false;
 
   const auto& smoothing_method = config_.discrete_points().smoothing_method();
+  std::vector<std::pair<double, double>> smoothed_point2d;
   switch (smoothing_method) {
     case DiscretePointsSmootherConfig::COS_THETA_SMOOTHING:
       status = CosThetaSmooth(raw_point2d, anchorpoints_lateralbound,
@@ -111,91 +111,84 @@ bool DiscretePointsReferenceLineSmoother::Smooth(
 }
 
 bool DiscretePointsReferenceLineSmoother::CosThetaSmooth(
-    const std::vector<std::pair<double, double>>& scaled_point2d,
-    const std::vector<double>& lateral_bounds,
+    const std::vector<std::pair<double, double>>& raw_point2d,
+    const std::vector<double>& bounds,
     std::vector<std::pair<double, double>>* ptr_smoothed_point2d) {
   const auto& cos_theta_config =
       config_.discrete_points().cos_theta_smoothing();
+
   CosThetaSmoother smoother(cos_theta_config);
 
-  std::vector<double> x;
-  std::vector<double> y;
-  bool status = smoother.Solve(scaled_point2d, lateral_bounds, &x, &y);
+  // box contraints on pos are used in cos theta smoother, thus shrink the
+  // bounds by 1.0 / sqrt(2.0)
+  std::vector<double> box_bounds = bounds;
+  const double box_ratio = 1.0 / std::sqrt(2.0);
+  for (auto& bound : box_bounds) {
+    bound *= box_ratio;
+  }
+
+  std::vector<double> opt_x;
+  std::vector<double> opt_y;
+  bool status = smoother.Solve(raw_point2d, box_bounds, &opt_x, &opt_y);
 
   if (!status) {
-    AERROR << "costheta reference line smoothing failed";
+    AERROR << "Costheta reference line smoothing failed";
     return false;
   }
 
-  if (x.size() < 2 || y.size() < 2) {
-    AERROR << "Return by IPOPT is wrong. Size smaller than 2 ";
+  if (opt_x.size() < 2 || opt_y.size() < 2) {
+    AERROR << "Return by Costheta smoother is wrong. Size smaller than 2 ";
     return false;
   }
 
-  for (size_t i = 0; i < x.size(); ++i) {
-    ptr_smoothed_point2d->emplace_back(x[i], y[i]);
+  CHECK_EQ(opt_x.size(), opt_y.size()) << "x and y result size not equal";
+
+  size_t point_size = opt_x.size();
+  for (size_t i = 0; i < point_size; ++i) {
+    ptr_smoothed_point2d->emplace_back(opt_x[i], opt_y[i]);
   }
 
   return true;
 }
 
 bool DiscretePointsReferenceLineSmoother::FemPosSmooth(
-    const std::vector<std::pair<double, double>>& ref_points,
-    const std::vector<double>& lateral_bounds,
+    const std::vector<std::pair<double, double>>& raw_point2d,
+    const std::vector<double>& bounds,
     std::vector<std::pair<double, double>>* ptr_smoothed_point2d) {
   const auto& fem_pos_config =
       config_.discrete_points().fem_pos_deviation_smoothing();
-  const double weight_fem_pos_deviation =
-      fem_pos_config.weight_fem_pose_deviation();
-  const double weight_ref_deviation = fem_pos_config.weight_ref_deviation();
-  const double weight_path_length = fem_pos_config.weight_path_length();
-  const size_t max_iter = fem_pos_config.max_iter();
-  const double time_limit = fem_pos_config.time_limit();
-  const bool verbose = fem_pos_config.verbose();
-  const bool scaled_termination = fem_pos_config.scaled_termination();
-  const bool warm_start = fem_pos_config.warm_start();
+
+  FemPosDeviationSmoother smoother(fem_pos_config);
 
   // box contraints on pos are used in fem pos smoother, thus shrink the
   // bounds by 1.0 / sqrt(2.0)
-  std::vector<double> box_bounds = lateral_bounds;
-  double box_ratio = 1.0 / std::sqrt(2.0);
+  std::vector<double> box_bounds = bounds;
+  const double box_ratio = 1.0 / std::sqrt(2.0);
   for (auto& bound : box_bounds) {
     bound *= box_ratio;
   }
 
-  FemPosDeviationSmoother fem_pos_smoother;
-  fem_pos_smoother.set_ref_points(ref_points);
-  fem_pos_smoother.set_x_bounds_around_refs(box_bounds);
-  fem_pos_smoother.set_y_bounds_around_refs(box_bounds);
-  fem_pos_smoother.set_weight_fem_pos_deviation(weight_fem_pos_deviation);
-  fem_pos_smoother.set_weight_path_length(weight_path_length);
-  fem_pos_smoother.set_weight_ref_deviation(weight_ref_deviation);
+  std::vector<double> opt_x;
+  std::vector<double> opt_y;
+  bool status = smoother.Solve(raw_point2d, box_bounds, &opt_x, &opt_y);
 
-  FemPosDeviationOsqpSettings osqp_settings;
-  osqp_settings.max_iter = static_cast<int>(max_iter);
-  osqp_settings.time_limit = time_limit;
-  osqp_settings.verbose = verbose;
-  osqp_settings.scaled_termination = scaled_termination;
-  osqp_settings.warm_start = warm_start;
-
-  if (!fem_pos_smoother.Smooth(osqp_settings)) {
+  if (!status) {
+    AERROR << "Fem Pos reference line smoothing failed";
     return false;
   }
-
-  const auto& opt_x = fem_pos_smoother.opt_x();
-  const auto& opt_y = fem_pos_smoother.opt_y();
 
   if (opt_x.size() < 2 || opt_y.size() < 2) {
-    AERROR << "Return by IPOPT is wrong. Size smaller than 2 ";
+    AERROR << "Return by fem pos smoother is wrong. Size smaller than 2 ";
     return false;
   }
 
-  CHECK_EQ(opt_x.size(), opt_y.size());
+  CHECK_EQ(opt_x.size(), opt_y.size()) << "x and y result size not equal";
 
   size_t point_size = opt_x.size();
   for (size_t i = 0; i < point_size; ++i) {
     ptr_smoothed_point2d->emplace_back(opt_x[i], opt_y[i]);
   }
+
   return true;
 }
 
