@@ -167,17 +167,18 @@ Status SpeedLimitDecider::GetSpeedLimits(
       const double frenet_point_l = frenet_path.at(i).l();
 
       // obstacle is on the right of ego vehicle (at path point i)
-      bool is_close_on_left = (nudge_decision.type() == ObjectNudge::LEFT_NUDGE)
-          && (frenet_point_l - vehicle_param_.right_edge_to_center()
-              - collision_safety_range
-              < ptr_obstacle->PerceptionSLBoundary().end_l());
+      bool is_close_on_left =
+          (nudge_decision.type() == ObjectNudge::LEFT_NUDGE) &&
+          (frenet_point_l - vehicle_param_.right_edge_to_center() -
+               collision_safety_range <
+           ptr_obstacle->PerceptionSLBoundary().end_l());
 
       // obstacle is on the left of ego vehicle (at path point i)
-      bool is_close_on_right = (nudge_decision.type()
-          == ObjectNudge::RIGHT_NUDGE)
-          && (ptr_obstacle->PerceptionSLBoundary().start_l()
-              - collision_safety_range
-              < frenet_point_l + vehicle_param_.left_edge_to_center());
+      bool is_close_on_right =
+          (nudge_decision.type() == ObjectNudge::RIGHT_NUDGE) &&
+          (ptr_obstacle->PerceptionSLBoundary().start_l() -
+               collision_safety_range <
+           frenet_point_l + vehicle_param_.left_edge_to_center());
 
       // TODO(all): dynamic obstacles do not have nudge decision
       if (is_close_on_left || is_close_on_right) {
@@ -189,8 +190,8 @@ Status SpeedLimitDecider::GetSpeedLimits(
           nudge_speed_ratio =
               speed_bounds_config_.dynamic_obs_nudge_speed_ratio();
         }
-        speed_limit_from_nearby_obstacles = nudge_speed_ratio
-            * speed_limit_from_reference_line;
+        speed_limit_from_nearby_obstacles =
+            nudge_speed_ratio * speed_limit_from_reference_line;
         break;
       }
     }

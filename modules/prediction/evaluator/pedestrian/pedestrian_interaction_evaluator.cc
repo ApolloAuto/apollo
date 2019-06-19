@@ -119,9 +119,9 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   double rel_y = 0.0;
   if (obstacle_ptr->history_size() > 1) {
     rel_x = obstacle_ptr->latest_feature().position().x() -
-        obstacle_ptr->feature(1).position().x();
+            obstacle_ptr->feature(1).position().x();
     rel_y = obstacle_ptr->latest_feature().position().y() -
-        obstacle_ptr->feature(1).position().y();
+            obstacle_ptr->feature(1).position().y();
   }
 
   torch::Tensor torch_position = torch::zeros({1, 2});
@@ -187,10 +187,10 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     double curr_rel_x = rel_x;
     double curr_rel_y = rel_y;
     if (i > 1) {
-      curr_rel_x = prev_x -
-          trajectory->trajectory_point(i - 2).path_point().x();
-      curr_rel_y = prev_y -
-          trajectory->trajectory_point(i - 2).path_point().y();
+      curr_rel_x =
+          prev_x - trajectory->trajectory_point(i - 2).path_point().x();
+      curr_rel_y =
+          prev_y - trajectory->trajectory_point(i - 2).path_point().y();
     }
     torch_position[0][0] = curr_rel_x;
     torch_position[0][1] = curr_rel_y;
@@ -219,8 +219,8 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     prediction_inputs.push_back(ht[0]);
     auto pred_out_tensor =
         torch_prediction_layer_ptr_->forward(prediction_inputs)
-                                  .toTensor()
-                                  .to(torch::kCPU);
+            .toTensor()
+            .to(torch::kCPU);
     auto pred_out = pred_out_tensor.accessor<float, 2>();
     TrajectoryPoint* point = trajectory->add_trajectory_point();
     double curr_x = prev_x + static_cast<double>(pred_out[0][0]);

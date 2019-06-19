@@ -16,16 +16,16 @@
 
 #pragma once
 
-#include <netinet/in.h>
-#include <sys/socket.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
+#include <netinet/in.h>
+#include <pthread.h>
 #include <sys/epoll.h>
 #include <sys/resource.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <pthread.h>
 
 namespace apollo {
 namespace bridge {
@@ -102,8 +102,8 @@ bool UDPListener<T>::Initialize(T *receiver, func msg_handle, uint16_t port) {
   serv_addr.sin_family = PF_INET;
   serv_addr.sin_port = htons((uint16_t)listened_port_);
   serv_addr.sin_addr.s_addr = INADDR_ANY;
-  if (bind(listener_sock_, (struct sockaddr *) &serv_addr,
-    sizeof(struct sockaddr)) == -1) {
+  if (bind(listener_sock_, (struct sockaddr *)&serv_addr,
+           sizeof(struct sockaddr)) == -1) {
     close(listener_sock_);
     return false;
   }
@@ -141,8 +141,8 @@ bool UDPListener<T>::Listen() {
         par->fd_ = events[i].data.fd;
         par->listener_ = this;
         if (pthread_create(&thread, &attr,
-          &UDPListener<T>::pthread_handle_message,
-          reinterpret_cast<void*>(par))) {
+                           &UDPListener<T>::pthread_handle_message,
+                           reinterpret_cast<void *>(par))) {
           res = false;
           return res;
         }
@@ -153,7 +153,7 @@ bool UDPListener<T>::Listen() {
   return res;
 }
 
-template<typename T>
+template <typename T>
 bool UDPListener<T>::setnonblocking(int sockfd) {
   if (fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFD, 0) | O_NONBLOCK) == -1) {
     return false;
@@ -161,7 +161,7 @@ bool UDPListener<T>::setnonblocking(int sockfd) {
   return true;
 }
 
-template<typename T>
+template <typename T>
 void *UDPListener<T>::pthread_handle_message(void *param) {
   Param *par = static_cast<Param *>(param);
   int fd = par->fd_;

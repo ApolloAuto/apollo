@@ -114,8 +114,9 @@ bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   }
   std::vector<torch::Tensor> lane_encoding_list;
   for (const auto& single_lane_feature_values : lane_feature_values) {
-    if (single_lane_feature_values.size() != SINGLE_LANE_FEATURE_SIZE * (
-            LANE_POINTS_SIZE + BACKWARD_LANE_POINTS_SIZE)) {
+    if (single_lane_feature_values.size() !=
+        SINGLE_LANE_FEATURE_SIZE *
+            (LANE_POINTS_SIZE + BACKWARD_LANE_POINTS_SIZE)) {
       AERROR << "Obstacle [" << id << "] has incorrect lane feature size.";
       return false;
     }
@@ -123,9 +124,9 @@ bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     torch::Tensor single_lane_encoding_inputs_tensor =
         torch::zeros({1, SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE});
     for (size_t i = 0; i < SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE; ++i) {
-      single_lane_encoding_inputs_tensor[0][i] =
-          static_cast<float>(single_lane_feature_values[
-              i + SINGLE_LANE_FEATURE_SIZE * BACKWARD_LANE_POINTS_SIZE]);
+      single_lane_encoding_inputs_tensor[0][i] = static_cast<float>(
+          single_lane_feature_values[i + SINGLE_LANE_FEATURE_SIZE *
+                                             BACKWARD_LANE_POINTS_SIZE]);
     }
     single_lane_encoding_inputs.push_back(
         std::move(single_lane_encoding_inputs_tensor));
@@ -142,9 +143,8 @@ bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   std::vector<double> prediction_scores;
   for (size_t i = 0; i < lane_encoding_list.size(); ++i) {
     std::vector<torch::jit::IValue> prediction_layer_inputs;
-    torch::Tensor prediction_layer_inputs_tensor =
-        torch::zeros({1, OBSTACLE_ENCODING_SIZE + SINGLE_LANE_ENCODING_SIZE +
-                             1});
+    torch::Tensor prediction_layer_inputs_tensor = torch::zeros(
+        {1, OBSTACLE_ENCODING_SIZE + SINGLE_LANE_ENCODING_SIZE + 1});
     for (size_t j = 0; j < OBSTACLE_ENCODING_SIZE; ++j) {
       prediction_layer_inputs_tensor[0][j] = obstalce_encoding[0][j];
     }
@@ -153,11 +153,11 @@ bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
           lane_encoding_list[i][0][j];
     }
     prediction_layer_inputs_tensor[0][OBSTACLE_ENCODING_SIZE +
-        SINGLE_LANE_ENCODING_SIZE-1] = static_cast<float>(
-            lane_feature_values[i][
-                SINGLE_LANE_FEATURE_SIZE * BACKWARD_LANE_POINTS_SIZE]);
+                                      SINGLE_LANE_ENCODING_SIZE - 1] =
+        static_cast<float>(lane_feature_values[i][SINGLE_LANE_FEATURE_SIZE *
+                                                  BACKWARD_LANE_POINTS_SIZE]);
     prediction_layer_inputs_tensor[0][OBSTACLE_ENCODING_SIZE +
-        SINGLE_LANE_ENCODING_SIZE] = 0.0;
+                                      SINGLE_LANE_ENCODING_SIZE] = 0.0;
     // for (size_t j = 0; j < AGGREGATED_ENCODING_SIZE; ++j) {
     //   prediction_layer_inputs_tensor[0][OBSTACLE_ENCODING_SIZE +
     //                                     SINGLE_LANE_ENCODING_SIZE + j] =
