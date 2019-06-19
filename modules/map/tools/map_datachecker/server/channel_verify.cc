@@ -34,7 +34,7 @@ void ChannelVerify::reset() {
   _return_state = ErrorCode::SUCCESS;
   _checked_records.clear();
   _sp_vec_check_result =
-    std::make_shared<std::vector<OneRecordChannelCheckResult>>();
+      std::make_shared<std::vector<OneRecordChannelCheckResult>>();
 }
 
 ErrorCode ChannelVerify::check(
@@ -52,11 +52,12 @@ ErrorCode ChannelVerify::check(
 }
 
 std::shared_ptr<std::vector<OneRecordChannelCheckResult>>
-  ChannelVerify::get_check_result() const {
+ChannelVerify::get_check_result() const {
   return _sp_vec_check_result;
 }
 
-int ChannelVerify::incremental_check(std::vector<std::string>& records_path) {
+int ChannelVerify::incremental_check(
+    const std::vector<std::string>& records_path) {
   // 1.
   std::vector<std::string> not_check_records_path;
   AINFO << "all records path:";
@@ -72,7 +73,7 @@ int ChannelVerify::incremental_check(std::vector<std::string>& records_path) {
   for (size_t i = 0; i < not_check_records_path.size(); ++i) {
     AINFO << "[" << i << "]: " << not_check_records_path[i];
     OneRecordChannelCheckResult check_result =
-      check_record_channels(not_check_records_path[i]);
+        check_record_channels(not_check_records_path[i]);
     _sp_vec_check_result->push_back(check_result);
   }
 
@@ -98,16 +99,15 @@ bool ChannelVerify::is_record_file(const std::string& record_path) const {
   return true;
 }
 
-std::vector<std::string> ChannelVerify::get_records_path(const
-  std::string& record_dir_or_record_full_path) const {
+std::vector<std::string> ChannelVerify::get_records_path(
+    const std::string& record_dir_or_record_full_path) const {
   // record_dir_or_record_full_path is record fullpath or
   // directory which contains some records
   std::vector<std::string> records_path;
   // 1. check record_dir_or_record_full_path is valid or not
   boost::filesystem::path path(record_dir_or_record_full_path);
   if (!boost::filesystem::exists(path)) {
-    AINFO << "record path ["
-          << record_dir_or_record_full_path
+    AINFO << "record path [" << record_dir_or_record_full_path
           << "] is not exist";
     return records_path;
   }
@@ -135,31 +135,31 @@ bool ChannelVerify::is_record_checked(const std::string& record_path) {
   }
 }
 
-std::shared_ptr<CyberRecordInfo> ChannelVerify::get_record_info(const
-  std::string& record_path) const {
+std::shared_ptr<CyberRecordInfo> ChannelVerify::get_record_info(
+    const std::string& record_path) const {
   if (!is_record_file(record_path)) {
-    AINFO << "get_record_info failed.["
-          << record_path
+    AINFO << "get_record_info failed.[" << record_path
           << "] is not record file";
     return nullptr;
   }
   std::shared_ptr<CyberRecordInfo> sp_record_info(new CyberRecordInfo);
-  std::shared_ptr<apollo::cyber::record::RecordReader> sp_reader
-    = std::make_shared<apollo::cyber::record::RecordReader>(record_path);
+  std::shared_ptr<apollo::cyber::record::RecordReader> sp_reader =
+      std::make_shared<apollo::cyber::record::RecordReader>(record_path);
   if (sp_reader == nullptr || !sp_reader->IsValid()) {
     AINFO << "open record [" << record_path << "] failed";
     return nullptr;
   }
   std::shared_ptr<apollo::cyber::record::RecordViewer> sp_viewer(
-    new apollo::cyber::record::RecordViewer(sp_reader));
+      new apollo::cyber::record::RecordViewer(sp_reader));
   sp_record_info->path = record_path;
   sp_record_info->start_time = sp_viewer->begin_time();
   sp_record_info->end_time = sp_viewer->end_time();
-  sp_record_info->duration = static_cast<double>(
-    (sp_viewer->end_time() - sp_viewer->begin_time())) / 1e9;
+  sp_record_info->duration =
+      static_cast<double>((sp_viewer->end_time() - sp_viewer->begin_time())) /
+      1e9;
 
   using ChannelInfoMap =
-    std::unordered_map<std::string, apollo::cyber::proto::ChannelCache>;
+      std::unordered_map<std::string, apollo::cyber::proto::ChannelCache>;
   ChannelInfoMap channel_info = sp_reader->channel_info();
   for (ChannelInfoMap::iterator it = channel_info.begin();
        it != channel_info.end(); ++it) {
@@ -172,13 +172,13 @@ std::shared_ptr<CyberRecordInfo> ChannelVerify::get_record_info(const
   return sp_record_info;
 }
 
-OneRecordChannelCheckResult ChannelVerify::check_record_channels(const
-  std::string& record_path) {
+OneRecordChannelCheckResult ChannelVerify::check_record_channels(
+    const std::string& record_path) {
   std::shared_ptr<CyberRecordInfo> sp_record_info =
-    get_record_info(record_path);
+      get_record_info(record_path);
   std::vector<CyberRecordChannel>& channels = sp_record_info->channels;
-  std::vector<std::pair<std::string, double>> &topic_list =
-    _sp_conf->topic_list;
+  std::vector<std::pair<std::string, double>>& topic_list =
+      _sp_conf->topic_list;
 
   OneRecordChannelCheckResult check_result;
   check_result.record_path = record_path;
@@ -187,8 +187,7 @@ OneRecordChannelCheckResult ChannelVerify::check_record_channels(const
     std::string& channel_in_list = topic_list[i].first;
     double channel_expected_rate = topic_list[i].second;
     bool channel_in_list_found = false;
-    size_t j = 0;
-    for (j = 0; j < channels.size(); ++j) {
+    for (size_t j = 0; j < channels.size(); ++j) {
       std::string& channel_in_record = channels[j].channel_name;
       if (channel_in_record == channel_in_list) {
         channel_in_list_found = true;
@@ -196,11 +195,11 @@ OneRecordChannelCheckResult ChannelVerify::check_record_channels(const
       }
     }
     if (!channel_in_list_found) {  // topic
-      AINFO << record_path << " lacks [" <<  channel_in_list << "]";
+      AINFO << record_path << " lacks [" << channel_in_list << "]";
       check_result.lack_channels.push_back(channel_in_list);
     } else {  // rate
-      double actual_rate = static_cast<double>((channels[j].msgnum))
-        / sp_record_info->duration;
+      double actual_rate =
+          static_cast<double>((channels[j].msgnum)) / sp_record_info->duration;
       if (actual_rate < 1e-8) {
         actual_rate = 0.0;
         AINFO << "msgnum:" << channels[j].msgnum
@@ -210,18 +209,16 @@ OneRecordChannelCheckResult ChannelVerify::check_record_channels(const
             << "] expected rate: " << channel_expected_rate
             << ", actual rate: " << actual_rate;
       if (actual_rate <
-        channel_expected_rate * _sp_conf->topic_rate_tolerance) {
+          channel_expected_rate * _sp_conf->topic_rate_tolerance) {
         check_result.inadequate_rate[channel_in_list] =
-          std::make_pair(channel_expected_rate, actual_rate);
+            std::make_pair(channel_expected_rate, actual_rate);
       }
     }
   }
   return check_result;
 }
 
-ErrorCode ChannelVerify::get_return_state() const {
-  return _return_state;
-}
+ErrorCode ChannelVerify::get_return_state() const { return _return_state; }
 
 }  // namespace hdmap
 }  // namespace apollo

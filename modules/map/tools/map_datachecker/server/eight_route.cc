@@ -20,46 +20,41 @@
 namespace apollo {
 namespace hdmap {
 
-EightRoute::EightRoute(std::shared_ptr<JSonConf> sp_conf): Alignment(sp_conf) {
+EightRoute::EightRoute(std::shared_ptr<JSonConf> sp_conf) : Alignment(sp_conf) {
   reset();
 }
 
-void EightRoute::reset() {
-  _progress = 0.0, _last_progress = 0;
-}
+void EightRoute::reset() { _progress = 0.0, _last_progress = 0; }
 
-bool EightRoute::is_eight_route_pose(
-  const std::vector<FramePose> & poses, int pose_index) {
-  if (poses.size() == 0 ||
-      pose_index <= 0 ||
+bool EightRoute::is_eight_route_pose(const std::vector<FramePose>& poses,
+                                     int pose_index) {
+  if (poses.size() == 0 || pose_index <= 0 ||
       pose_index >= static_cast<int>(poses.size())) {
     AINFO << "params error, poses size: " << poses.size()
           << ", pose_index: " << pose_index;
     return true;
   }
 
-  double yaw = get_yaw(poses[pose_index - 1].tx, poses[pose_index-1].ty,
+  double yaw = get_yaw(poses[pose_index - 1].tx, poses[pose_index - 1].ty,
                        poses[pose_index].tx, poses[pose_index].ty);
   double yaw_diff = fabs(_last_yaw - yaw);
   _last_yaw = yaw;
   yaw_diff = yaw_diff < 180 ? yaw_diff : 360 - yaw_diff;
 
-  double xdiff = poses[pose_index].tx - poses[pose_index-1].tx;
-  double ydiff = poses[pose_index].ty - poses[pose_index-1].ty;
-  double zdiff = poses[pose_index].tz - poses[pose_index-1].tz;
+  double xdiff = poses[pose_index].tx - poses[pose_index - 1].tx;
+  double ydiff = poses[pose_index].ty - poses[pose_index - 1].ty;
+  double zdiff = poses[pose_index].tz - poses[pose_index - 1].tz;
   double dist = std::sqrt(xdiff * xdiff + ydiff * ydiff + zdiff * zdiff);
   double during =
-    poses[pose_index].time_stamp - poses[pose_index-1].time_stamp;
+      poses[pose_index].time_stamp - poses[pose_index - 1].time_stamp;
   if (during < 0) {
     AINFO << "skip back pose is bad pose";
     return false;
   }
   double vel = dist / during;
   AINFO << std::to_string(poses[pose_index].time_stamp)
-        << ", yaw_diff:" << yaw_diff
-        << ", dist: " << dist
-        << ", during: " << during
-        << ", vel: " << vel;
+        << ", yaw_diff:" << yaw_diff << ", dist: " << dist
+        << ", during: " << during << ", vel: " << vel;
   if (yaw_diff > _sp_conf->eight_angle && vel > _sp_conf->eight_vel) {
     return true;
   }
@@ -67,22 +62,21 @@ bool EightRoute::is_eight_route_pose(
 }
 
 double EightRoute::get_good_pose_during() {
-  if (_sp_good_pose_info == nullptr
-      || _sp_good_pose_info->start_time < 0
-      || _sp_good_pose_info->end_time < 0) {
+  if (_sp_good_pose_info == nullptr || _sp_good_pose_info->start_time < 0 ||
+      _sp_good_pose_info->end_time < 0) {
     return 0.0;
   }
   return _sp_good_pose_info->end_time - _sp_good_pose_info->start_time;
 }
 
 double EightRoute::get_eight_route_progress(
-  const std::vector<FramePose> & poses) {
+    const std::vector<FramePose>& poses) {
   int size = static_cast<int>(poses.size());
   int start_index = time_to_index(poses, _start_time);
   // select first good pose
   while (start_index < size) {
-    if (is_good_pose(poses, start_index)
-        && is_eight_route_pose(poses, start_index)) {
+    if (is_good_pose(poses, start_index) &&
+        is_eight_route_pose(poses, start_index)) {
       AINFO << "find first good pose.index:" << start_index;
       break;
     }
@@ -90,8 +84,7 @@ double EightRoute::get_eight_route_progress(
   }
   if (start_index >= size) {
     AINFO << "not find first good pose, start_time: "
-          << std::to_string(_start_time)
-          << ", start_index: "<< start_index
+          << std::to_string(_start_time) << ", start_index: " << start_index
           << ", pose size: " << size;
     return 0.0;
   }
@@ -99,10 +92,8 @@ double EightRoute::get_eight_route_progress(
     AINFO << "not have enough poses, wait for a moment";
     return 0.0;
   }
-  _last_yaw = get_yaw(poses[start_index].tx,
-    poses[start_index].ty,
-    poses[start_index+1].tx,
-    poses[start_index+1].ty);
+  _last_yaw = get_yaw(poses[start_index].tx, poses[start_index].ty,
+                      poses[start_index + 1].tx, poses[start_index + 1].ty);
 
   int not_eight_count = 0;
   for (int i = start_index + 2; i < size; ++i) {
@@ -123,12 +114,12 @@ double EightRoute::get_eight_route_progress(
     }
     AINFO << "good pose";
     update_good_pose_info(poses[i]);
-  //  clear_bad_pose_info();
+    //  clear_bad_pose_info();
   }
   double eight_route_during = get_good_pose_during();
   if (eight_route_during < 1e-8) {
     AINFO << "num of eight route good pose too small, during: "
-        << eight_route_during;
+          << eight_route_during;
     _return_state = ErrorCode::SUCCESS;
     return 0.0;
   }
@@ -164,9 +155,7 @@ ErrorCode EightRoute::process(const std::vector<FramePose>& poses) {
   return _return_state;
 }
 
-double EightRoute::get_progress() const {
-  return _progress;
-}
+double EightRoute::get_progress() const { return _progress; }
 
 }  // namespace hdmap
 }  // namespace apollo

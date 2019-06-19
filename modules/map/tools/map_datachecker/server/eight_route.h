@@ -26,7 +26,7 @@
 namespace apollo {
 namespace hdmap {
 // TODO(yuanyijun): change EightRoute to FigureEight
-class EightRoute: public Alignment {
+class EightRoute : public Alignment {
  public:
   explicit EightRoute(std::shared_ptr<JSonConf> sp_conf);
   ErrorCode process(const std::vector<FramePose>& poses);
@@ -34,10 +34,9 @@ class EightRoute: public Alignment {
 
  private:
   void reset();
-  bool is_eight_route_pose(
-    const std::vector<FramePose> & poses, int pose_index);
+  bool is_eight_route_pose(const std::vector<FramePose>& poses, int pose_index);
   double get_good_pose_during();
-  double get_eight_route_progress(const std::vector<FramePose> & poses);
+  double get_eight_route_progress(const std::vector<FramePose>& poses);
 
  private:
   double _progress;

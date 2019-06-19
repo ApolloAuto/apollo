@@ -31,21 +31,18 @@ namespace hdmap {
 
 typedef State AlignmentAgentState;
 
-using STATIC_REQUEST_TYPE
-    = const apollo::hdmap::StaticAlignRequest;
-using STATIC_RESPONSE_TYPE
-    = apollo::hdmap::StaticAlignResponse;
-using EIGHTROUTE_REQUEST_TYPE
-    = const apollo::hdmap::EightRouteRequest;
-using EIGHTROUTE_RESPONSE_TYPE
-    = apollo::hdmap::EightRouteResponse;
+using STATIC_REQUEST_TYPE = const apollo::hdmap::StaticAlignRequest;
+using STATIC_RESPONSE_TYPE = apollo::hdmap::StaticAlignResponse;
+using EIGHTROUTE_REQUEST_TYPE = const apollo::hdmap::EightRouteRequest;
+using EIGHTROUTE_RESPONSE_TYPE = apollo::hdmap::EightRouteResponse;
 
-template<typename ALIGNMENT_TYPE, typename REQUEST_TYPE, typename RESPONSE_TYPE>
+template <typename ALIGNMENT_TYPE, typename REQUEST_TYPE,
+          typename RESPONSE_TYPE>
 class AlignmentAgent {
  public:
   AlignmentAgent(
-    std::shared_ptr<JSonConf> sp_conf,
-    std::shared_ptr<PoseCollectionAgent> sp_pose_collection_agent) {
+      std::shared_ptr<JSonConf> sp_conf,
+      std::shared_ptr<PoseCollectionAgent> sp_pose_collection_agent) {
     _sp_conf = sp_conf;
     _sp_pose_collection_agent = sp_pose_collection_agent;
   }
@@ -61,22 +58,22 @@ class AlignmentAgent {
                                     RESPONSE_TYPE *response) {
     AINFO << "AlignmentAgent request: " << request->DebugString();
     switch (request->cmd()) {
-    case CmdType::START:
-      AINFO << "AlignmentAgent start";
-      alignment_start(request, response);
-      break;
-    case CmdType::CHECK:
-      AINFO << "AlignmentAgent check";
-      alignment_check(request, response);
-      break;
-    case CmdType::STOP:
-      AINFO << "AlignmentAgent stop";
-      alignment_stop(request, response);
-      break;
-    default:
-      response->set_code(ErrorCode::ERROR_REQUEST);
-      response->set_progress(_sp_alignment->get_progress());
-      AERROR << "command error";
+      case CmdType::START:
+        AINFO << "AlignmentAgent start";
+        alignment_start(request, response);
+        break;
+      case CmdType::CHECK:
+        AINFO << "AlignmentAgent check";
+        alignment_check(request, response);
+        break;
+      case CmdType::STOP:
+        AINFO << "AlignmentAgent stop";
+        alignment_stop(request, response);
+        break;
+      default:
+        response->set_code(ErrorCode::ERROR_REQUEST);
+        response->set_progress(_sp_alignment->get_progress());
+        AERROR << "command error";
     }
     AINFO << "AlignmentAgent progress: " << response->progress();
     return grpc::Status::OK;
@@ -98,7 +95,7 @@ class AlignmentAgent {
 
   int async_start_alignment() {
     set_state(AlignmentAgentState::RUNNING);
-    std::thread alignment_thread([=](){
+    std::thread alignment_thread([=]() {
       _sp_alignment->set_start_time(unixtime_now());
       _thread_id = std::this_thread::get_id();
       AINFO << "set state RUNNING";
@@ -109,14 +106,20 @@ class AlignmentAgent {
           return;
         }
         _sp_alignment->process(*sp_poses);
+        ErrorCode code = _sp_alignment->get_return_state();
+        if (code == ErrorCode::ERROR_VERIFY_NO_GNSSPOS ||
+            code == ErrorCode::ERROR_GNSS_SIGNAL_FAIL) {
+          AERROR << "Some error occured, while loop will exit";
+          break;
+        }
         AINFO << "get progress:" << _sp_alignment->get_progress();
         if (fabs(1 - _sp_alignment->get_progress()) < 1e-8) {
           AINFO << "alignment progress reached 1.0, thread exit";
           break;
         }
         AINFO << "sleep " << _sp_conf->alignment_featch_pose_sleep << " sec";
-        auto seconds = std::chrono::seconds(
-            _sp_conf->alignment_featch_pose_sleep);
+        auto seconds =
+            std::chrono::seconds(_sp_conf->alignment_featch_pose_sleep);
         std::this_thread::sleep_for(seconds);
       }
       _stopped = true;
@@ -147,9 +150,16 @@ class AlignmentAgent {
       return 0;
     }
 
+    ErrorCode code = _sp_alignment->get_return_state();
     double progress = _sp_alignment->get_progress();
-    response->set_code(_sp_alignment->get_return_state());
+    response->set_code(code);
     response->set_progress(progress);
+    if (code == ErrorCode::ERROR_VERIFY_NO_GNSSPOS ||
+        code == ErrorCode::ERROR_GNSS_SIGNAL_FAIL) {
+      _stopped = true;
+      set_state(AlignmentAgentState::IDLE);
+      return -1;
+    }
     return 0;
   }
 
@@ -165,32 +175,27 @@ class AlignmentAgent {
     return 0;
   }
 
-  void set_state(AlignmentAgentState state) {
-    _state = state;
-  }
+  void set_state(AlignmentAgentState state) { _state = state; }
 
-  AlignmentAgentState get_state() const {
-    return _state;
-  }
+  AlignmentAgentState get_state() const { return _state; }
 
  private:
   std::shared_ptr<JSonConf> _sp_conf = nullptr;
   std::shared_ptr<ALIGNMENT_TYPE> _sp_alignment = nullptr;
   std::shared_ptr<PoseCollectionAgent> _sp_pose_collection_agent = nullptr;
   AlignmentAgentState _state;
-  bool _need_stop, _stopped;
+  bool _need_stop;
+  bool _stopped;
   std::vector<ErrorCode> error_code_map;
   std::thread::id _thread_id;
-  // bool _have_result;
 };
 
-using STATIC_ALIGN_AGENT_TYPE
-    = AlignmentAgent<StaticAlign, STATIC_REQUEST_TYPE, STATIC_RESPONSE_TYPE>;
-using EIGHT_ROUTE_AGENT_TYPE
-    = AlignmentAgent<EightRoute, EIGHTROUTE_REQUEST_TYPE,
-                     EIGHTROUTE_RESPONSE_TYPE>;
+using STATIC_ALIGN_AGENT_TYPE =
+    AlignmentAgent<StaticAlign, STATIC_REQUEST_TYPE, STATIC_RESPONSE_TYPE>;
+using EIGHT_ROUTE_AGENT_TYPE =
+    AlignmentAgent<EightRoute, EIGHTROUTE_REQUEST_TYPE,
+                   EIGHTROUTE_RESPONSE_TYPE>;
 }  // namespace hdmap
 }  // namespace apollo
-
 
 #endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_ALIGNMENT_AGENT_HPP

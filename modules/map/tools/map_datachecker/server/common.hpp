@@ -55,11 +55,7 @@ struct FramePose {
   double local_std;
 };
 
-enum class State {
-  IDLE,
-  RUNNING
-};
-
+enum class State { IDLE, RUNNING };
 
 struct JSonConf {
   std::vector<std::pair<std::string, double>> topic_list;
@@ -129,7 +125,7 @@ inline std::shared_ptr<JSonConf> parse_json(std::string conf_path) {
     boost::property_tree::ptree children2 = pt.get_child("topic_list");
     for (auto it = children2.begin(); it != children2.end(); ++it) {
       conf->topic_list.push_back(
-        std::make_pair(it->first, it->second.get_value<double>()));
+          std::make_pair(it->first, it->second.get_value<double>()));
     }
 
     conf->solution_status = pt.get<unsigned int>("solution_status");
@@ -150,12 +146,11 @@ inline std::shared_ptr<JSonConf> parse_json(std::string conf_path) {
     }
 
     conf->channel_check_trigger_gap = pt.get<int>("channel_check_trigger_gap");
-    conf->alignment_featch_pose_sleep
-      = pt.get<int>("alignment_featch_pose_sleep");
+    conf->alignment_featch_pose_sleep =
+        pt.get<int>("alignment_featch_pose_sleep");
     conf->static_align_duration = pt.get<double>("static_align_duration");
     conf->static_align_tolerance = pt.get<double>("static_align_tolerance");
-    conf->static_align_dist_thresh
-      = pt.get<double>("static_align_dist_thresh");
+    conf->static_align_dist_thresh = pt.get<double>("static_align_dist_thresh");
 
     conf->eight_angle = pt.get<double>("eight_angle");
     conf->eight_duration = pt.get<double>("eight_duration");
@@ -169,16 +164,15 @@ inline std::shared_ptr<JSonConf> parse_json(std::string conf_path) {
     conf->laps_number = pt.get<int>("laps_number");
     conf->laps_number_additional = pt.get<int>("laps_number_additional");
     conf->laps_rate_thresh = pt.get<double>("laps_rate_thresh");
-  }
-  catch(const boost::property_tree::json_parser_error& e) {
+  } catch (const boost::property_tree::json_parser_error& e) {
     AERROR << e.what();
-  }
-  catch(const std::exception& e) {
+    return nullptr;
+  } catch (const std::exception& e) {
     AERROR << e.what();
+    return nullptr;
   }
   return conf;
 }
-
 
 inline double get_yaw(double from_x, double from_y, double to_x, double to_y) {
   double vecx = to_x - from_x;
@@ -190,9 +184,7 @@ inline double get_yaw(double from_x, double from_y, double to_x, double to_y) {
   return RADIANS_TO_DEGREES * alpha;
 }
 
-inline double unixtime_now() {
-  return apollo::cyber::Time::Now().ToSecond();
-}
+inline double unixtime_now() { return apollo::cyber::Time::Now().ToSecond(); }
 
 }  // namespace hdmap
 }  // namespace apollo
