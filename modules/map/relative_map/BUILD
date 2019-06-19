@@ -15,10 +15,10 @@ cc_library(
     hdrs = [
         "relative_map.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"map\\\""],
     data = [
         ":relative_map_conf",
     ],
-    copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         ":navigation_lane_lib",
         "//modules/common",
@@ -73,9 +73,9 @@ cc_library(
 
 cc_binary(
     name = "librelative_map_component.so",
+    copts = ["-DMODULE_NAME=\\\"map\\\""],
     linkshared = True,
     linkstatic = False,
-    copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [":relative_map_component_lib"],
 )
 

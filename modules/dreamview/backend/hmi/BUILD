@@ -60,10 +60,10 @@ cc_library(
     name = "hmi_worker",
     srcs = ["hmi_worker.cc"],
     hdrs = ["hmi_worker.h"],
+    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     linkopts = [
         "-lboost_thread",
     ],
-    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
         ":vehicle_manager",
         "//cyber",

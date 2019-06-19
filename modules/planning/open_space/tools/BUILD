@@ -34,11 +34,11 @@ cc_binary(
     srcs = [
         "open_space_roi_wrapper.cc",
     ],
-    linkshared = True,
-    linkstatic = False,
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
+    linkshared = True,
+    linkstatic = False,
     deps = [
         "//cyber/common:log",
         "//modules/common/math",

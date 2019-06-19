@@ -2,7 +2,6 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-
 cc_binary(
     name = "bridge_receiver_test",
     srcs = ["bridge_receiver_test.cc"],
