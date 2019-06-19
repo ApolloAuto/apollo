@@ -165,8 +165,8 @@ Status OpenSpaceTrajectoryProvider::Process() {
         // sync debug instance
         frame_->mutable_open_space_info()->sync_debug_instance();
       }
-      trajectory_updated_.store(false);
       data_ready_.store(false);
+      trajectory_updated_.store(false);
       return Status::OK();
     }
 
