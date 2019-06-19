@@ -787,22 +787,24 @@ bash setup_host.sh
 因此如果只做循迹方案，只需要`gnss_params`目录，`vehicle_params`目录，`vehicle_info.pb.txt`文件，其他文件并不需要。
 保证这些文件正确，重新编译，启动`bootstrap`, 就可以在`dreamview`下选择酷黑小车`ch`车辆，进行下面的循迹操作了。
 
-除了车辆相关配置外，还需要注意canbus和control模块的配置。分别介绍如下：  
-`modules/canbus/conf/canbus_conf.pb.txt` 修改如下：  
-`brand: CH` （默认LINCOLN_MKZ)  
-`enable_debug_mode:true`  
-`enable_receiver_log:true`  
-`enable_sender_log: true` （这三行用于打开debug信息）  
+除了车辆相关配置外，还需要注意canbus和control模块的配置。分别介绍如下:
 
-`modules/canbus/conf/canbus.conf:`  
-`enable_chassis_detail_pub` （打开canbus_detail消息）  
-`noreceive_guardian` （不接受guardian消息）  
+1. `modules/canbus/conf/canbus_conf.pb.txt` 修改如下：
+```
+brand:CH
+enable_debug_mode:true
+enable_receiver_log:true
+enable_sender_log: true
+```
+第一行将默认的LINCOLN_MKZ改为CH，后三行用于打开debug信息。
 
-`modules/control/conf/control.conf:`  
-`--control_conf_file=modules/control/conf/ch.pb.txt`  ( ch.pb.txt为车辆控制参数和标定表，提前做好并放到这个目录 )  
+2. `modules/canbus/conf/canbus.conf` 修改如下:
+```
+enable_chassis_detail_pub
+noreceive_guardian
+```
+第一行打开/apollo/canbus/chassis_detail消息，第二行关闭guardian模块。
 
-`modules/common/data/global_flagfile.txt:`  
-`--vehicle_config_path=/apollo/modules/common/data/ch_config.pb.txt` (ch_config.pb.txt是酷黑车辆配置文件)  
 
 ## 循迹操作说明
 
