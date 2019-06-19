@@ -601,7 +601,6 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
   const double kEpislon = 1.0e-4;
   const double sEpislon = 1.0e-1;
   for (size_t i = 1; i < num_of_knots; ++i) {
-    AERROR << s[i];
     if (s[i - 1] - s[i] > kEpislon) {
       AERROR << "unexpected decreasing s in speed smoothing at time "
              << static_cast<double>(i) * delta_t << "with total time "
