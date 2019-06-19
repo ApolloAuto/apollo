@@ -29,10 +29,7 @@ using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 
 OpenSpaceFallbackDecider::OpenSpaceFallbackDecider(const TaskConfig& config)
-    : Decider(config) {
-  CHECK(config.has_open_space_fallback_decider_config());
-  SetName("OpenSpaceFallbackDecider");
-}
+    : Decider(config) {}
 
 bool OpenSpaceFallbackDecider::QuardraticFormulaLowerSolution(const double a,
                                                               const double b,
