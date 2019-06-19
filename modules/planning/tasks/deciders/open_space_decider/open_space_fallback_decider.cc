@@ -105,11 +105,17 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
                        0.0);
 
     ADEBUG << "stop distance : " << stop_distance;
+    double stop_deceleration = 0.0;
 
-    // TODO(SHU): deceleration is positive during reverse gear
-    const double stop_deceleration = -fallback_start_point.v() *
-                                     fallback_start_point.v() /
-                                     (2.0 * (stop_distance + 1e-6));
+    if (fallback_trajectory_pair_candidate.second ==
+        canbus::Chassis::GEAR_REVERSE) {
+      stop_deceleration = fallback_start_point.v() * fallback_start_point.v() /
+                          (2.0 * (stop_distance + 1e-6));
+    } else {
+      stop_deceleration = -fallback_start_point.v() * fallback_start_point.v() /
+                          (2.0 * (stop_distance + 1e-6));
+    }
+
     ADEBUG << "stop_deceleration: " << stop_deceleration;
 
     // Search stop index in chosen trajectory by distance
