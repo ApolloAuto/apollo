@@ -97,7 +97,6 @@ cc_test(
         "//modules/bridge:udp_bridge",
         "@gtest//:main",
     ],
-
 )
 
 cpplint()

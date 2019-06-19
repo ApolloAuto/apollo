@@ -10,10 +10,10 @@ cc_library(
     hdrs = [
         "map_service.h",
     ],
+    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     linkopts = [
         "-lboost_thread",
     ],
-    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
         "//modules/common/util:json_util",
         "//modules/dreamview/proto:simulation_world_proto",

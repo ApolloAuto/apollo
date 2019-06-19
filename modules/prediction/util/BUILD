@@ -9,11 +9,11 @@ cc_library(
     hdrs = [
         "data_extraction.h",
     ],
-    linkopts = [
-        "-lboost_filesystem",
-    ],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
+    linkopts = [
+        "-lboost_filesystem",
     ],
     deps = [
         "//cyber",
