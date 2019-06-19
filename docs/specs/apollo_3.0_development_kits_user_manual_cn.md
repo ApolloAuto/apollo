@@ -3,34 +3,35 @@
 
 # 目录
       
- - 概览
- - 工控机系统安装
-	 - 工控机硬件安装
+ - [概览](#概览)
+ - [工控机系统安装](#工控机系统安装)
+    - [工控机硬件安装](#工控机硬件安装)
 
-	 - 工控机软件系统安装
+    - [工控机软件系统安装](#工控机软件系统安装)
 	 
- - 感知硬件集成
-	 - 概览
+ - [感知硬件集成](#感知硬件集成)
+    - [概览](#概览)
 	
-	 - 导航设备安装与配置
+    - [GPS导航设备安装](#GPS导航设备安装)
 	 
-	 - 摄像头安装与配置
+    - [摄像头安装配置与数据验证](#摄像头安装配置与数据验证)
 	 
-	 - 毫米波雷达安装与配置
+    - [毫米波雷达安装配置与数据验证](#毫米波雷达安装配置与数据验证)
 	 
-	 - 激光雷达安装与配置
+    - [激光雷达安装与数据验证](#激光雷达安装与数据验证)
 
 	     
- - 油门刹车标定
-	 - 标定原理介绍
+ - [油门刹车标定](#油门刹车标定)
+    - [标定原理介绍](#标定原理介绍)
 	 
-	 - 标定流程说明
+    - [标定流程说明](#标定流程说明)
 
- - 启动循迹
-	 - 系统文件配置
+ - [启动循迹](#启动循迹)
+    - [系统文件配置](#系统文件配置)
 	 
-	 - 循迹操作说明
- - 调试与常见问题
+    - [循迹操作说明](#循迹操作说明)
+    
+ - [调试与常见问题](#调试与常见问题)
 
 
 
@@ -525,7 +526,7 @@ rostopic echo /apollo/sensor/camera/traffic/image_short
 
 ### 毫米波雷达的安装固定
  - 传感器应安装在车前方中心处，当人正向面对车辆正前方时，传感器的正面朝向人，传感器的连接口朝向人的右手边，如下图所示：
- 
+ ![图片](images/radar_install_look.jpeg)
  ![图片](images/radar_install_position.png)
  
  - 毫米波雷达要牢靠固定在车身上，连接到毫米波雷达的接头要牢靠接插。离地面高0.5米，不能向下倾斜，向上仰`0~2`度以内，高度误差±0.2米，俯仰角误差`0~2`度（向上仰小于2度，不能向下倾斜），翻滚角误差±2度（radar左右两侧的平齐程度），航向角误差±2度（radar是否正对前方）。
@@ -584,14 +585,15 @@ rostopic echo /apollo/sensor/camera/traffic/image_short
 
 ### 激光雷达与车辆的接线
 
- - 激光雷达的接口盒有三个接口，分别为数据口(以太网接口)、12V电源接口、GPS授时接口，如下图所示：
+ - 配套的激光雷达线束为1拖3线缆。其中一端有三个接口，分别为数据口(网线接口)、12V电源接口、GPS授时接口，如下图所示：
  
-![图片](images/lidar_socket.jpeg)
+![图片](images/lidar_three_slots.jpeg)
 
- - 数据口：通过以太网线缆将接口盒连接到IPC。
- - 12V电源接口：可以使用雷达自带的12V适配器进行供电或者使用自己的电源线连接12V电源供电。
- - GPS授时接口：需要将GPS的授时接口与激光雷达接口盒的授时接口进行连接。
- 
+ - 数据口：通过以太网线缆与IPC连接。
+ - 12V电源接口：与12V电源接口连接，接口具备防反插功能。
+ - GPS授时接口：与GPS的授时接口连接，接口具备防反插功能。
+线缆的另一端为航插接头，与激光雷达连接，如下图所示： 
+![图片](images/lidar_install_slot.jpeg)
 ### 激光雷达的配置及启动
  - 激光雷达的相关参数配置：雷达出厂默认ip地址为192.168.1.201，在浏览器中输入激光雷达ip地址，打开配置界面，将激光雷达的ip地址修改为与IPC的ip地址处于相同号段， 将`NetWork(Sensor)`选项卡下的`Data Port`修改为2369，将`Telemetry Port`修改为8309，点击`set` 按键、`Save Configuration`按键使配置生效。
 ![图片](images/lidar_config.png)
@@ -785,6 +787,25 @@ bash setup_host.sh
 因此如果只做循迹方案，只需要`gnss_params`目录，`vehicle_params`目录，`vehicle_info.pb.txt`文件，其他文件并不需要。
 保证这些文件正确，重新编译，启动`bootstrap`, 就可以在`dreamview`下选择酷黑小车`ch`车辆，进行下面的循迹操作了。
 
+除了车辆相关配置外，还需要注意canbus和control模块的配置。分别介绍如下:
+
+1. `modules/canbus/conf/canbus_conf.pb.txt` 修改如下：
+```
+brand:CH
+enable_debug_mode:true
+enable_receiver_log:true
+enable_sender_log: true
+```
+第一行将默认的LINCOLN_MKZ改为CH，后三行用于打开debug信息。
+
+2. `modules/canbus/conf/canbus.conf` 修改如下:
+```
+enable_chassis_detail_pub
+noreceive_guardian
+```
+第一行打开/apollo/canbus/chassis_detail消息，第二行关闭guardian模块。
+
+
 ## 循迹操作说明
 
 当gps安装配置好以后，就可以进行循迹测试，所谓的循迹测试是对车辆底盘线控改造的一个综合测试（ 对油门刹车档位等的控制 ），以及对apollo控制算法和传感器集成的综合测试。下面按时间先后对循迹测试的步骤做说明。以下所说的操作都是在apollo docker内部。
@@ -975,7 +996,7 @@ rostopic echo /apollo/sensor/gnss/imu
 
 ![图片](images/debug_ch.png) 
 
-![图片](images/debug_turn_on_localization.png) 
+![图片](images/debug_rtk.png) 
  
  
 #### 打开传感器 
@@ -1107,7 +1128,7 @@ CANBUS正确配置接通的情况下，前述提到可以执行rostopic echo /ap
 
 ### apollo系统第一次搭建完毕，Teleop测试发转角车辆实际转角不对
 
-   例如下发转向角10%，但是转动角度远超过转向最大角度的10%。可以通过diagnostics.sh工具或者rostopic echo /apollo/canbus/chassis及时观察底盘信号，apollo默认是Lincoln车型，如果使用者第一次搭建好apollo，还没有选择车型那么默认会按照lincoln车的最大转向角乘以百分比去执行。运行bootstrap.sh脚本，在dreamview中选择对应的车型，例如ch酷黑小车。然后点击界面上的reset all，再点击setup。 
+   例如下发转向角10%，但是转动角度远超过转向最大角度的10%。可以通过diagnostics.sh工具或者rostopic echo /apollo/canbus/chassis及时观察底盘信号，apollo默认是Lincoln车型，如果使用者第一次搭建好apollo，还没有选择车型那么默认会按照lincoln车的最大转向角乘以百分比去执行。解决方法如下：检查modules/canbus/conf/canbus_conf.pb.txt中的配置，brand设置为正确的车型（例如ch），重启canbus，再尝试。如何仍然未解决，请运行bootstrap.sh脚本，在dreamview中选择对应的车型，例如ch酷黑小车。然后点击界面上的reset all，再点击setup。 
 
 
 ### gps.sh打开后不正常，log提示Unable to load gnss conf file
