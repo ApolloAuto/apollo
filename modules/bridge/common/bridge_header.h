@@ -39,7 +39,8 @@ class BridgeHeader {
 
   uint32_t GetHeaderVer() const { return header_ver_.value_; }
   size_t GetHeaderSize() const {
-    return header_body_size_ + HEADER_FLAG_SIZE + sizeof(size_t) + 2; }
+    return header_body_size_ + HEADER_FLAG_SIZE + sizeof(size_t) + 2;
+  }
   size_t GetHeaderBodySize() const { return header_body_size_; }
   std::string GetMsgName() const { return msg_name_.value_; }
   uint32_t GetMsgID() const { return msg_id_.value_; }

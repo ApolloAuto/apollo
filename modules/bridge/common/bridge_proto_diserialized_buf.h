@@ -16,12 +16,12 @@
 
 #pragma once
 
-#include <vector>
-#include <string>
 #include <memory>
+#include <string>
+#include <vector>
 #include "cyber/cyber.h"
-#include "modules/bridge/common/macro.h"
 #include "modules/bridge/common/bridge_header.h"
+#include "modules/bridge/common/macro.h"
 
 namespace apollo {
 namespace bridge {
@@ -68,8 +68,8 @@ template <typename T>
 void BridgeProtoDiserializedBuf<T>::UpdateStatus(size_t frame_index) {
   status |= (1 << frame_index);
   is_ready_diser = false;
-    AINFO << "status is " << status;
-    AINFO << "((1 << total_frames_) - 1)) = "<< ((1 << total_frames_) - 1);
+  AINFO << "status is " << status;
+  AINFO << "((1 << total_frames_) - 1)) = " << ((1 << total_frames_) - 1);
   if (status == ((1 << total_frames_) - 1)) {
     AINFO << "diserialized is ready";
     is_ready_diser = true;
@@ -79,7 +79,7 @@ void BridgeProtoDiserializedBuf<T>::UpdateStatus(size_t frame_index) {
 template <typename T>
 bool BridgeProtoDiserializedBuf<T>::IsTheProto(const BridgeHeader &header) {
   if (strcmp(proto_name_.c_str(), header.GetMsgName().c_str()) == 0 &&
-    sequence_num_ == header.GetMsgID()) {
+      sequence_num_ == header.GetMsgID()) {
     return true;
   }
   return false;

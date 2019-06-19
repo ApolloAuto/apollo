@@ -129,9 +129,7 @@ void PredictorManager::Init(const PredictionConf& config) {
         }
         break;
       }
-      default: {
-        break;
-      }
+      default: { break; }
     }
   }
 
@@ -274,7 +272,7 @@ void PredictorManager::PredictObstacle(
           predictor = GetPredictor(ObstacleConf::FREE_MOVE_PREDICTOR);
           CHECK_NOTNULL(predictor);
         } else if (obstacle->HasJunctionFeatureWithExits() &&
-            !obstacle->IsCloseToJunctionExit()) {
+                   !obstacle->IsCloseToJunctionExit()) {
           predictor = GetPredictor(vehicle_in_junction_predictor_);
           CHECK_NOTNULL(predictor);
         } else if (obstacle->IsOnLane()) {
@@ -371,9 +369,7 @@ std::unique_ptr<Predictor> PredictorManager::CreatePredictor(
       predictor_ptr.reset(new EmptyPredictor());
       break;
     }
-    default: {
-      break;
-    }
+    default: { break; }
   }
   return predictor_ptr;
 }

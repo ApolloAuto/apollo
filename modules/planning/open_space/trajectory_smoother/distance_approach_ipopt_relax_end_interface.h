@@ -50,8 +50,8 @@
 namespace apollo {
 namespace planning {
 
-class DistanceApproachIPOPTRelaxEndInterface :
-    public DistanceApproachInterface {
+class DistanceApproachIPOPTRelaxEndInterface
+    : public DistanceApproachInterface {
  public:
   explicit DistanceApproachIPOPTRelaxEndInterface(
       const size_t horizon, const double ts, const Eigen::MatrixXd& ego,

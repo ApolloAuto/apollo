@@ -32,83 +32,83 @@ namespace cyber {
 namespace record {
 
 /**
-* @brief The record reader.
-*/
+ * @brief The record reader.
+ */
 class RecordReader : public RecordBase {
  public:
   using FileReaderPtr = std::unique_ptr<RecordFileReader>;
   using ChannelInfoMap = std::unordered_map<std::string, proto::ChannelCache>;
 
   /**
-  * @brief The constructor with record file path as parameter.
-  *
-  * @param file
-  */
+   * @brief The constructor with record file path as parameter.
+   *
+   * @param file
+   */
   explicit RecordReader(const std::string& file);
 
   /**
-  * @brief The destructor.
-  */
+   * @brief The destructor.
+   */
   virtual ~RecordReader();
 
   /**
-  * @brief Is this record reader is valid.
-  *
-  * @return True for valid, false for not.
-  */
+   * @brief Is this record reader is valid.
+   *
+   * @return True for valid, false for not.
+   */
   bool IsValid() const { return is_valid_; }
 
   /**
-  * @brief Read one message from reader.
-  *
-  * @param message
-  * @param begin_time
-  * @param end_time
-  *
-  * @return True for success, flase for not.
-  */
+   * @brief Read one message from reader.
+   *
+   * @param message
+   * @param begin_time
+   * @param end_time
+   *
+   * @return True for success, flase for not.
+   */
   bool ReadMessage(RecordMessage* message, uint64_t begin_time = 0,
                    uint64_t end_time = UINT64_MAX);
 
   /**
-  * @brief Reset the message index of record reader.
-  */
+   * @brief Reset the message index of record reader.
+   */
   void Reset();
 
   /**
-  * @brief Get message number by channel name.
-  *
-  * @param channel_name
-  *
-  * @return Message number.
-  */
+   * @brief Get message number by channel name.
+   *
+   * @param channel_name
+   *
+   * @return Message number.
+   */
   uint64_t GetMessageNumber(const std::string& channel_name) const override;
 
   /**
-  * @brief Get message type by channel name.
-  *
-  * @param channel_name
-  *
-  * @return Message type.
-  */
+   * @brief Get message type by channel name.
+   *
+   * @param channel_name
+   *
+   * @return Message type.
+   */
   const std::string& GetMessageType(
       const std::string& channel_name) const override;
 
   /**
-  * @brief Get proto descriptor string by channel name.
-  *
-  * @param channel_name
-  *
-  * @return Proto descriptor string by channel name.
-  */
+   * @brief Get proto descriptor string by channel name.
+   *
+   * @param channel_name
+   *
+   * @return Proto descriptor string by channel name.
+   */
   const std::string& GetProtoDesc(
       const std::string& channel_name) const override;
 
   /**
-  * @brief Get channel list.
-  *
-  * @return List container with all channel name string.
-  */
+   * @brief Get channel list.
+   *
+   * @return List container with all channel name string.
+   */
   std::set<std::string> GetChannelList() const override;
 
  private:

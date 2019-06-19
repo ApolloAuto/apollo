@@ -52,9 +52,9 @@ struct HeaderItem;
 
 template <enum HType t, typename T>
 char *SerializeItemImp(const HeaderItem<t, T> &item, char *buf,
-  size_t buf_size) {
+                       size_t buf_size) {
   if (!buf || buf_size == 0 ||
-     buf_size < size_t(sizeof(t) + item.ValueSize() + 2)) {
+      buf_size < size_t(sizeof(t) + item.ValueSize() + 2)) {
     return nullptr;
   }
   char *res = buf;

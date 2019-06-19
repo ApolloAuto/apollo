@@ -17,8 +17,8 @@
 
 #include <math.h>
 #include <stdlib.h>
-#include <opencv2/opencv.hpp>
 #include <Eigen/Core>
+#include <opencv2/opencv.hpp>
 
 #include <iostream>
 #include <map>

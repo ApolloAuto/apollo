@@ -71,12 +71,12 @@ bool BridgeProtoSerializedBuf<T>::Serialize(const std::shared_ptr<T> &proto,
   }
   size_t offset = 0;
   uint32_t frame_index = 0;
-  uint32_t total_frames =
-    static_cast<uint32_t>(msg_len/FRAME_SIZE + (msg_len % FRAME_SIZE ? 1 : 0));
+  uint32_t total_frames = static_cast<uint32_t>(msg_len / FRAME_SIZE +
+                                                (msg_len % FRAME_SIZE ? 1 : 0));
 
   while (offset < msg_len) {
     size_t left = msg_len - frame_index * FRAME_SIZE;
-    size_t cpy_size = (left > FRAME_SIZE) ? FRAME_SIZE: left;
+    size_t cpy_size = (left > FRAME_SIZE) ? FRAME_SIZE : left;
 
     BridgeHeader header;
     header.SetHeaderVer(0);

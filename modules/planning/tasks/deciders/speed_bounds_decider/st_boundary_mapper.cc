@@ -74,7 +74,7 @@ Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
   ObjectDecisionType stop_decision;
   double min_stop_s = std::numeric_limits<double>::max();
 
-  for (const auto* ptr_obstacle_item :  path_decision->obstacles().Items()) {
+  for (const auto* ptr_obstacle_item : path_decision->obstacles().Items()) {
     Obstacle* ptr_obstacle = path_decision->Find(ptr_obstacle_item->Id());
     CHECK(ptr_obstacle != nullptr);
 
@@ -122,8 +122,8 @@ bool STBoundaryMapper::MapStopDecision(
   reference_line_.XYToSL(stop_decision.stop().stop_point(), &stop_sl_point);
 
   double st_stop_s = 0.0;
-  const double stop_ref_s = stop_sl_point.s() -
-                            vehicle_param_.front_edge_to_center();
+  const double stop_ref_s =
+      stop_sl_point.s() - vehicle_param_.front_edge_to_center();
 
   if (stop_ref_s > path_data_.frenet_frame_path().back().s()) {
     st_stop_s = path_data_.discretized_path().back().s() +
@@ -137,14 +137,15 @@ bool STBoundaryMapper::MapStopDecision(
   }
 
   const double s_min = std::fmax(0.0, st_stop_s);
-  const double s_max = std::fmax(s_min,
-      std::fmax(planning_max_distance_, reference_line_.Length()));
+  const double s_max = std::fmax(
+      s_min, std::fmax(planning_max_distance_, reference_line_.Length()));
 
   std::vector<std::pair<STPoint, STPoint>> point_pairs;
   point_pairs.emplace_back(STPoint(s_min, 0.0), STPoint(s_max, 0.0));
-  point_pairs.emplace_back(STPoint(s_min, planning_max_time_),
+  point_pairs.emplace_back(
+      STPoint(s_min, planning_max_time_),
       STPoint(s_max + speed_bounds_config_.boundary_buffer(),
-          planning_max_time_));
+              planning_max_time_));
   auto boundary = STBoundary(point_pairs);
   boundary.SetBoundaryType(STBoundary::BoundaryType::STOP);
   boundary.SetCharacteristicLength(speed_bounds_config_.boundary_buffer());

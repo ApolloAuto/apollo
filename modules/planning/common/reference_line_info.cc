@@ -70,8 +70,7 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
   Box2d vehicle_box(vehicle_center, vehicle_state_.heading(), param.length(),
                     param.width());
 
-  if (!reference_line_.GetSLBoundary(box,
-                                     &adc_sl_boundary_)) {
+  if (!reference_line_.GetSLBoundary(box, &adc_sl_boundary_)) {
     AERROR << "Failed to get ADC boundary from box: " << box.DebugString();
     return false;
   }
@@ -80,8 +79,7 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
 
   if (adc_sl_boundary_.end_s() < 0 ||
       adc_sl_boundary_.start_s() > reference_line_.Length()) {
-    AWARN << "Vehicle SL "
-          << adc_sl_boundary_.ShortDebugString()
+    AWARN << "Vehicle SL " << adc_sl_boundary_.ShortDebugString()
           << " is not on reference line:[0, " << reference_line_.Length()
           << "]";
   }
@@ -91,8 +89,7 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
     AERROR << "Ego vehicle is too far away from reference line.";
     return false;
   }
-  is_on_reference_line_ =
-      reference_line_.IsOnLane(adc_sl_boundary_);
+  is_on_reference_line_ = reference_line_.IsOnLane(adc_sl_boundary_);
   if (!AddObstacles(obstacles)) {
     AERROR << "Failed to add obstacles to reference line";
     return false;
@@ -305,8 +302,7 @@ ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
   for (const auto& overlap : reference_line_.map_path().junction_overlaps()) {
     if (overlap.end_s < adc_sl_boundary_.start_s()) {
       junction_right_of_way->erase(overlap.object_id);
-    } else if (WithinOverlap(overlap,
-                             adc_sl_boundary_.end_s())) {
+    } else if (WithinOverlap(overlap, adc_sl_boundary_.end_s())) {
       auto is_protected = (*junction_right_of_way)[overlap.object_id];
       if (is_protected) {
         return ADCTrajectory::PROTECTED;
@@ -389,8 +385,8 @@ Obstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
     ADEBUG << "NO build reference line st boundary. id:" << obstacle->Id();
   } else {
     ADEBUG << "build reference line st boundary. id:" << obstacle->Id();
-    mutable_obstacle->BuildReferenceLineStBoundary(
-        reference_line_, adc_sl_boundary_.start_s());
+    mutable_obstacle->BuildReferenceLineStBoundary(reference_line_,
+                                                   adc_sl_boundary_.start_s());
 
     ADEBUG << "reference line st boundary: t["
            << mutable_obstacle->reference_line_st_boundary().min_t() << ", "
@@ -782,8 +778,8 @@ void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
     prev_advice->set_reason("Not on reference line");
   } else {
     // check heading
-    auto ref_point = reference_line_.GetReferencePoint(
-        adc_sl_boundary_.end_s());
+    auto ref_point =
+        reference_line_.GetReferencePoint(adc_sl_boundary_.end_s());
     if (common::math::AngleDiff(vehicle_state_.heading(), ref_point.heading()) >
         kMaxAngleDiff) {
       if (prev_advice->advice() == EngageAdvice::DISALLOW_ENGAGE) {
