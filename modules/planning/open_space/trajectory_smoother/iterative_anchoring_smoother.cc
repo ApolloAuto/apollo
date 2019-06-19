@@ -550,11 +550,13 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
                                              const double path_length,
                                              SpeedData* smoothed_speeds) {
   // TODO(Jinyun): move to confs
-  const double max_v = 1.0;
-  const double max_acc = 1.0;
-  const double max_acc_jerk = 3.0;
+  const double max_forward_v = 2.0;
+  const double max_reverse_v = 1.0;
+  const double max_forward_acc = 1.0;
+  const double max_reverse_acc = 1.0;
+  const double max_acc_jerk = 2.0;
   const double delta_t = 0.2;
-  // TODO(Jinyun): refine the hueristic
+  // TODO(Jinyun): add the time length hueristic
   const double total_t = 60.0;
   const size_t num_of_knots = static_cast<size_t>(total_t / delta_t) + 1;
 
@@ -564,6 +566,10 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
   // set end constraints
   std::vector<std::pair<double, double>> x_bounds(num_of_knots,
                                                   {0.0, path_length});
+
+  const double max_v = gear_ ? max_forward_v : max_reverse_v;
+  const double max_acc = gear_ ? max_forward_acc : max_reverse_acc;
+
   const auto upper_dx = std::fmax(max_v, std::abs(init_v));
   std::vector<std::pair<double, double>> dx_bounds(num_of_knots,
                                                    {0.0, upper_dx});
