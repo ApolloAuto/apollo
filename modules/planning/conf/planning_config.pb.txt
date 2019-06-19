@@ -248,8 +248,9 @@ default_task_config: {
   task_type: OPEN_SPACE_FALLBACK_DECIDER
   open_space_fallback_decider_config {
     open_space_prediction_time_period: 5.0
-    open_space_fall_back_collision_distance: 5.0
-    open_space_fall_back_stop_distance: 2.0
+    open_space_fallback_collision_distance: 5.0
+    open_space_fallback_stop_distance: 2.0
+    open_space_fallback_collision_time_buffer: 10.0
   }
 }
 default_task_config: {

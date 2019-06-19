@@ -62,9 +62,6 @@ class OpenSpaceFallbackDecider : public Decider {
 
   bool QuardraticFormulaLowerSolution(const double a, const double b,
                                       const double c, double* sol);
-
- private:
-  OpenSpaceFallBackDeciderConfig open_space_fallback_decider_config_;
 };
 
 }  // namespace planning
