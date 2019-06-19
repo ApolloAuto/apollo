@@ -35,9 +35,8 @@ class SpeedBoundsDecider : public Decider {
   explicit SpeedBoundsDecider(const TaskConfig& config);
 
  private:
-  common::Status Process(
-      Frame* const frame,
-      ReferenceLineInfo* const reference_line_info) override;
+  common::Status Process(Frame* const frame,
+                         ReferenceLineInfo* const reference_line_info) override;
 
   double SetSpeedFallbackDistance(PathDecision* const path_decision);
 

@@ -547,7 +547,7 @@ void PathAssessmentDecider::SetPathPointType(
     ego_box.Shift(shift_vec);
     SLBoundary ego_sl_boundary;
     if (!reference_line_info.reference_line().GetSLBoundary(ego_box,
-            &ego_sl_boundary)) {
+                                                            &ego_sl_boundary)) {
       ADEBUG << "Unable to get SL-boundary of ego-vehicle.";
       continue;
     }

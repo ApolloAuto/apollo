@@ -29,12 +29,12 @@ cc_library(
     hdrs = [
         "image_handler.h",
     ],
+    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     linkopts = [
         "-lopencv_core",
         "-lopencv_highgui",
         "-lopencv_imgproc",
     ],
-    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",

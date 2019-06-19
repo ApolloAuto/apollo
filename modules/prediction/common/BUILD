@@ -250,13 +250,13 @@ cc_library(
     name = "semantic_map",
     srcs = ["semantic_map.cc"],
     hdrs = ["semantic_map.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     linkopts = [
         "-lopencv_core",
         "-lopencv_highgui",
         "-lopencv_imgproc",
-    ],
-    copts = [
-        "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
         ":prediction_gflags",

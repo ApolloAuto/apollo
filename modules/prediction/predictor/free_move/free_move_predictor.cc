@@ -64,8 +64,8 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
     SetEqualProbability(1.0, 0, obstacle);
   } else {
     for (int i = 0; i < feature.predicted_trajectory_size(); ++i) {
-      Trajectory* trajectory = obstacle->mutable_latest_feature()
-                                       ->mutable_predicted_trajectory(i);
+      Trajectory* trajectory =
+          obstacle->mutable_latest_feature()->mutable_predicted_trajectory(i);
       int traj_size = trajectory->trajectory_point_size();
       if (traj_size == 0) {
         AERROR << "Empty predicted trajectory found";

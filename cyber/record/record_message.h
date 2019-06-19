@@ -25,38 +25,38 @@ namespace cyber {
 namespace record {
 
 /**
-* @brief Basic data struct of record message.
-*/
+ * @brief Basic data struct of record message.
+ */
 struct RecordMessage {
   /**
-  * @brief The constructor.
-  */
+   * @brief The constructor.
+   */
   RecordMessage() {}
 
   /**
-  * @brief The constructor.
-  *
-  * @param name
-  * @param message
-  * @param msg_time
-  */
+   * @brief The constructor.
+   *
+   * @param name
+   * @param message
+   * @param msg_time
+   */
   RecordMessage(const std::string& name, const std::string& message,
                 uint64_t msg_time)
       : channel_name(name), content(message), time(msg_time) {}
 
   /**
-  * @brief The channel name of the message.
-  */
+   * @brief The channel name of the message.
+   */
   std::string channel_name;
 
   /**
-  * @brief The content of the message.
-  */
+   * @brief The content of the message.
+   */
   std::string content;
 
   /**
-  * @brief The time (nanosecond) of the message.
-  */
+   * @brief The time (nanosecond) of the message.
+   */
   uint64_t time;
 };
 

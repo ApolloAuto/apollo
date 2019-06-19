@@ -77,8 +77,7 @@ class SpeedLimitDeciderTest : public ::testing::Test {
 
 TEST_F(SpeedLimitDeciderTest, get_centric_acc_limit) {
   SpeedBoundsDeciderConfig config;
-  SpeedLimitDecider speed_limit_decider(config, *reference_line_,
-                                        path_data_);
+  SpeedLimitDecider speed_limit_decider(config, *reference_line_, path_data_);
 
   double kappa = 0.0001;
   while (kappa < 0.2) {

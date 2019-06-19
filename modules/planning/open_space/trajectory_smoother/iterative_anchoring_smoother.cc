@@ -406,8 +406,8 @@ bool IterativeAnchoringSmoother::SmoothPath(
       is_curvature_satisfied = true;
       curvature_exceeding_point_index.clear();
     } else {
-      is_curvature_satisfied = CheckCurvatureConstraint(*smoothed_path_points,
-                                       &curvature_exceeding_point_index);
+      is_curvature_satisfied = CheckCurvatureConstraint(
+          *smoothed_path_points, &curvature_exceeding_point_index);
     }
 
     ADEBUG << "loop iteration number is " << counter;
@@ -550,11 +550,13 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
                                              const double path_length,
                                              SpeedData* smoothed_speeds) {
   // TODO(Jinyun): move to confs
-  const double max_v = 1.0;
-  const double max_acc = 1.0;
-  const double max_acc_jerk = 3.0;
+  const double max_forward_v = 2.0;
+  const double max_reverse_v = 1.0;
+  const double max_forward_acc = 1.0;
+  const double max_reverse_acc = 1.0;
+  const double max_acc_jerk = 2.0;
   const double delta_t = 0.2;
-  // TODO(Jinyun): refine the hueristic
+  // TODO(Jinyun): add the time length hueristic
   const double total_t = 60.0;
   const size_t num_of_knots = static_cast<size_t>(total_t / delta_t) + 1;
 
@@ -564,6 +566,10 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
   // set end constraints
   std::vector<std::pair<double, double>> x_bounds(num_of_knots,
                                                   {0.0, path_length});
+
+  const double max_v = gear_ ? max_forward_v : max_reverse_v;
+  const double max_acc = gear_ ? max_forward_acc : max_reverse_acc;
+
   const auto upper_dx = std::fmax(max_v, std::abs(init_v));
   std::vector<std::pair<double, double>> dx_bounds(num_of_knots,
                                                    {0.0, upper_dx});
@@ -574,8 +580,6 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
   dx_bounds[num_of_knots - 1] = std::make_pair(0.0, 0.0);
   ddx_bounds[num_of_knots - 1] = std::make_pair(0.0, 0.0);
 
-  // piecewise_jerk_problem.set_end_state_ref({1e5, 0.0, 0.0}, {path_length,
-  // 0.0, 0.0});
   std::vector<double> x_ref(num_of_knots, path_length);
   piecewise_jerk_problem.set_x_ref(1.0, x_ref);
 
@@ -600,27 +604,22 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
 
   // Assign speed point by gear
   smoothed_speeds->AppendSpeedPoint(s[0], 0.0, ds[0], dds[0], 0.0);
-  const double kEpislon = 1.0e-2;
+  const double kEpislon = 1.0e-4;
+  const double sEpislon = 1.0e-1;
   for (size_t i = 1; i < num_of_knots; ++i) {
-    if (s[i] < s[i - 1]) {
-      if (path_length - s[i] < kEpislon) {
-        break;
-      } else {
-        AERROR << "unexpected decreasing s in speed smoothing";
-        return false;
-      }
-    }
-    // Cut the speed data when it is about to meet end condition
-    if ((path_length - s[i] < kEpislon && ds[i] < kEpislon &&
-         dds[i] < kEpislon)) {
-      smoothed_speeds->AppendSpeedPoint(s[i], delta_t * static_cast<double>(i),
-                                        ds[i], dds[i],
-                                        (dds[i] - dds[i - 1]) / delta_t);
-      break;
+    if (s[i - 1] - s[i] > kEpislon) {
+      AERROR << "unexpected decreasing s in speed smoothing at time "
+             << static_cast<double>(i) * delta_t << "with total time "
+             << total_t;
+      return false;
     }
     smoothed_speeds->AppendSpeedPoint(s[i], delta_t * static_cast<double>(i),
                                       ds[i], dds[i],
                                       (dds[i] - dds[i - 1]) / delta_t);
+    // Cut the speed data when it is about to meet end condition
+    if (path_length - s[i] < sEpislon) {
+      break;
+    }
   }
   return true;
 }

@@ -407,6 +407,19 @@ void LonController::ComputeLongitudinalErrors(
       trajectory_analyzer->QueryNearestPointByAbsoluteTime(
           preview_control_time);
 
+  debug->mutable_current_matched_point()->mutable_path_point()->set_x(
+      matched_point.x());
+  debug->mutable_current_matched_point()->mutable_path_point()->set_y(
+      matched_point.y());
+  debug->mutable_current_reference_point()->mutable_path_point()->set_x(
+      reference_point.path_point().x());
+  debug->mutable_current_reference_point()->mutable_path_point()->set_y(
+      reference_point.path_point().y());
+  debug->mutable_preview_reference_point()->mutable_path_point()->set_x(
+      preview_point.path_point().x());
+  debug->mutable_preview_reference_point()->mutable_path_point()->set_y(
+      preview_point.path_point().y());
+
   ADEBUG << "matched point:" << matched_point.DebugString();
   ADEBUG << "reference point:" << reference_point.DebugString();
   ADEBUG << "preview point:" << preview_point.DebugString();

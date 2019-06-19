@@ -10,10 +10,10 @@ cc_library(
     hdrs = [
         "point_cloud_updater.h",
     ],
+    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     linkopts = [
         "-lboost_thread",
     ],
-    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",

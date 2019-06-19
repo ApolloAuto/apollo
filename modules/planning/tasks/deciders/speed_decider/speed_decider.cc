@@ -66,7 +66,6 @@ common::Status SpeedDecider::Execute(Frame* frame,
 SpeedDecider::STLocation SpeedDecider::GetSTLocation(
     const PathDecision* const path_decision, const SpeedData& speed_profile,
     const STBoundary& st_boundary) const {
-
   if (st_boundary.IsEmpty()) {
     return BELOW;
   }

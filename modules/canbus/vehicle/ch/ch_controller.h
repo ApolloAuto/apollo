@@ -19,10 +19,10 @@
 #include <memory>
 #include <thread>
 
-#include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
+#include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
@@ -45,9 +45,9 @@ class ChController final : public VehicleController {
 
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
-      CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail>
-      *const message_manager) override;
+      CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
+      MessageManager<::apollo::canbus::ChassisDetail>* const message_manager)
+      override;
 
   bool Start() override;
 
@@ -137,4 +137,3 @@ class ChController final : public VehicleController {
 }  // namespace ch
 }  // namespace canbus
 }  // namespace apollo
-

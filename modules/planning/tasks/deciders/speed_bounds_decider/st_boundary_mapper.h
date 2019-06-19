@@ -70,7 +70,7 @@ class STBoundaryMapper {
                        const ObjectDecisionType& decision) const;
 
   void ComputeSTBoundaryWithDecision(Obstacle* obstacle,
-                                 const ObjectDecisionType& decision) const;
+                                     const ObjectDecisionType& decision) const;
 
  private:
   const SpeedBoundsDeciderConfig& speed_bounds_config_;

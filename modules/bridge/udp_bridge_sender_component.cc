@@ -15,9 +15,9 @@
  *****************************************************************************/
 
 #include "modules/bridge/udp_bridge_sender_component.h"
+#include "modules/bridge/common/bridge_proto_serialized_buf.h"
 #include "modules/bridge/common/macro.h"
 #include "modules/bridge/common/util.h"
-#include "modules/bridge/common/bridge_proto_serialized_buf.h"
 
 namespace apollo {
 namespace bridge {
@@ -63,8 +63,8 @@ bool UDPBridgeSenderComponent<T>::Proc(const std::shared_ptr<T> &pb_msg) {
   server_addr.sin_port = htons(static_cast<uint16_t>(remote_port_));
   int sock_fd = socket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, 0);
 
-  int res = connect(sock_fd, (struct sockaddr *)&server_addr,
-      sizeof(server_addr));
+  int res =
+      connect(sock_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
   if (res < 0) {
     close(sock_fd);
     return false;
@@ -74,7 +74,7 @@ bool UDPBridgeSenderComponent<T>::Proc(const std::shared_ptr<T> &pb_msg) {
   proto_buf.Serialize(pb_msg, proto_name_);
   for (size_t j = 0; j < proto_buf.GetSerializedBufCount(); j++) {
     ssize_t nbytes = send(sock_fd, proto_buf.GetSerializedBuf(j),
-      proto_buf.GetSerializedBufSize(j), 0);
+                          proto_buf.GetSerializedBufSize(j), 0);
     if (nbytes != static_cast<ssize_t>(proto_buf.GetSerializedBufSize(j))) {
       break;
     }

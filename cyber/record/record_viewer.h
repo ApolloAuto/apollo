@@ -32,67 +32,67 @@ namespace cyber {
 namespace record {
 
 /**
-* @brief The record viewer.
-*/
+ * @brief The record viewer.
+ */
 class RecordViewer {
  public:
   using RecordReaderPtr = std::shared_ptr<RecordReader>;
 
   /**
-  * @brief The constructor with single reader.
-  *
-  * @param reader
-  * @param begin_time
-  * @param end_time
-  * @param channels
-  */
+   * @brief The constructor with single reader.
+   *
+   * @param reader
+   * @param begin_time
+   * @param end_time
+   * @param channels
+   */
   RecordViewer(const RecordReaderPtr& reader, uint64_t begin_time = 0,
                uint64_t end_time = UINT64_MAX,
                const std::set<std::string>& channels = std::set<std::string>());
 
   /**
-  * @brief The constructor with multiple readers.
-  *
-  * @param readers
-  * @param begin_time
-  * @param end_time
-  * @param channels
-  */
+   * @brief The constructor with multiple readers.
+   *
+   * @param readers
+   * @param begin_time
+   * @param end_time
+   * @param channels
+   */
   RecordViewer(const std::vector<RecordReaderPtr>& readers,
                uint64_t begin_time = 0, uint64_t end_time = UINT64_MAX,
                const std::set<std::string>& channels = std::set<std::string>());
 
   /**
-  * @brief Is this record reader is valid.
-  *
-  * @return True for valid, false for not.
-  */
+   * @brief Is this record reader is valid.
+   *
+   * @return True for valid, false for not.
+   */
   bool IsValid() const;
 
   /**
-  * @brief Get begin time.
-  *
-  * @return Begin time (nanoseconds).
-  */
+   * @brief Get begin time.
+   *
+   * @return Begin time (nanoseconds).
+   */
   uint64_t begin_time() const { return begin_time_; }
 
   /**
-  * @brief Get end time.
-  *
-  * @return end time (nanoseconds).
-  */
+   * @brief Get end time.
+   *
+   * @return end time (nanoseconds).
+   */
   uint64_t end_time() const { return end_time_; }
 
   /**
-  * @brief Get channel list.
-  *
-  * @return List container with all channel name string.
-  */
+   * @brief Get channel list.
+   *
+   * @return List container with all channel name string.
+   */
   std::set<std::string> GetChannelList() const { return channel_list_; }
 
   /**
-  * @brief The iterator.
-  */
+   * @brief The iterator.
+   */
   class Iterator {
    public:
     using iterator_category = std::input_iterator_tag;
@@ -102,66 +102,66 @@ class RecordViewer {
     using reference = RecordMessage&;
 
     /**
-    * @brief The constructor of iterator with viewer.
-    *
-    * @param viewer
-    * @param end
-    */
+     * @brief The constructor of iterator with viewer.
+     *
+     * @param viewer
+     * @param end
+     */
     explicit Iterator(RecordViewer* viewer, bool end = false);
 
     /**
-    * @brief The default constructor of iterator.
-    */
+     * @brief The default constructor of iterator.
+     */
     Iterator() {}
 
     /**
-    * @brief The default destructor of iterator.
-    */
+     * @brief The default destructor of iterator.
+     */
     virtual ~Iterator() {}
 
     /**
-    * @brief Overloading operator ==.
-    *
-    * @param other
-    *
-    * @return The result.
-    */
+     * @brief Overloading operator ==.
+     *
+     * @param other
+     *
+     * @return The result.
+     */
     bool operator==(Iterator const& other) const;
 
     /**
-    * @brief Overloading operator !=.
-    *
-    * @param other
-    *
-    * @return The result.
-    */
+     * @brief Overloading operator !=.
+     *
+     * @param other
+     *
+     * @return The result.
+     */
     bool operator!=(const Iterator& rhs) const;
 
     /**
-    * @brief Overloading operator ++.
-    *
-    * @param other
-    *
-    * @return The result.
-    */
+     * @brief Overloading operator ++.
+     *
+     * @param other
+     *
+     * @return The result.
+     */
     void operator++();
 
     /**
-    * @brief Overloading operator ->.
-    *
-    * @param other
-    *
-    * @return The result.
-    */
+     * @brief Overloading operator ->.
+     *
+     * @param other
+     *
+     * @return The result.
+     */
     pointer operator->();
 
     /**
-    * @brief Overloading operator *.
-    *
-    * @param other
-    *
-    * @return The result.
-    */
+     * @brief Overloading operator *.
+     *
+     * @param other
+     *
+     * @return The result.
+     */
     reference operator*();
 
    private:
@@ -172,17 +172,17 @@ class RecordViewer {
   };
 
   /**
-  * @brief Get the begin iterator.
-  *
-  * @return The begin iterator.
-  */
+   * @brief Get the begin iterator.
+   *
+   * @return The begin iterator.
+   */
   Iterator begin();
 
   /**
-  * @brief Get the end iterator.
-  *
-  * @return The end iterator.
-  */
+   * @brief Get the end iterator.
+   *
+   * @return The end iterator.
+   */
   Iterator end();
 
  private:

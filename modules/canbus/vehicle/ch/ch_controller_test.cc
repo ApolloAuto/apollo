@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ch/ch_controller.h"
-#include "gtest/gtest.h"
 #include "cyber/common/file.h"
+#include "gtest/gtest.h"
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"

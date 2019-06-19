@@ -165,8 +165,8 @@ Status OpenSpaceTrajectoryProvider::Process() {
         // sync debug instance
         frame_->mutable_open_space_info()->sync_debug_instance();
       }
-      trajectory_updated_.store(false);
       data_ready_.store(false);
+      trajectory_updated_.store(false);
       return Status::OK();
     }
 
@@ -281,6 +281,7 @@ bool OpenSpaceTrajectoryProvider::IsVehicleNearDestination(
 
   if (distance_to_vehicle < config_.open_space_trajectory_provider_config()
                                 .open_space_trajectory_optimizer_config()
+                                .planner_open_space_config()
                                 .is_near_destination_threshold()) {
     ADEBUG << "vehicle reach end_pose";
     frame_->mutable_open_space_info()->set_destination_reached(true);

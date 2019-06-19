@@ -254,19 +254,17 @@ bool DarkSCNNLaneDetector::Detect(const LaneDetectorOptions &options,
     std::vector<float> v_point(2, 0);
     std::copy(vpt_blob->cpu_data(), vpt_blob->cpu_data() + 2, v_point.begin());
     // compute coordinate in net input image
-    v_point[0] =
-        v_point[0] * vpt_std_[0] + vpt_mean_[0] +
-        (static_cast<float>(blob_width) / 2);
-    v_point[1] =
-        v_point[1] * vpt_std_[1] + vpt_mean_[1] +
-        (static_cast<float>(blob_height) / 2);
+    v_point[0] = v_point[0] * vpt_std_[0] + vpt_mean_[0] +
+                 (static_cast<float>(blob_width) / 2);
+    v_point[1] = v_point[1] * vpt_std_[1] + vpt_mean_[1] +
+                 (static_cast<float>(blob_height) / 2);
     // compute coordinate in original image
-    v_point[0] =
-        v_point[0] / static_cast<float>(blob_width) *
-        static_cast<float>(crop_width_) + static_cast<float>(input_offset_x_);
-    v_point[1] =
-        v_point[1] / static_cast<float>(blob_height) *
-        static_cast<float>(crop_height_) + static_cast<float>(input_offset_y_);
+    v_point[0] = v_point[0] / static_cast<float>(blob_width) *
+                     static_cast<float>(crop_width_) +
+                 static_cast<float>(input_offset_x_);
+    v_point[1] = v_point[1] / static_cast<float>(blob_height) *
+                     static_cast<float>(crop_height_) +
+                 static_cast<float>(input_offset_y_);
 
     ADEBUG << "vanishing point: " << v_point[0] << " " << v_point[1];
     if (v_point[0] > 0 && v_point[0] < static_cast<float>(input_width_) &&

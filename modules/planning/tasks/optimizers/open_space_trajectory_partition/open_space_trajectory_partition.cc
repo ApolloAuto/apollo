@@ -56,11 +56,12 @@ OpenSpaceTrajectoryPartition::OpenSpaceTrajectoryPartition(
   heading_offset_to_midpoint_ =
       open_space_trajectory_partition_config_.heading_offset_to_midpoint();
   lateral_offset_to_midpoint_ =
-      open_space_trajectory_partition_config_.heading_offset_to_midpoint();
+      open_space_trajectory_partition_config_.lateral_offset_to_midpoint();
   longitudinal_offset_to_midpoint_ =
-      open_space_trajectory_partition_config_.heading_offset_to_midpoint();
+      open_space_trajectory_partition_config_.longitudinal_offset_to_midpoint();
   vehicle_box_iou_threshold_to_midpoint_ =
-      open_space_trajectory_partition_config_.heading_offset_to_midpoint();
+      open_space_trajectory_partition_config_
+          .vehicle_box_iou_threshold_to_midpoint();
 
   vehicle_param_ =
       common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
