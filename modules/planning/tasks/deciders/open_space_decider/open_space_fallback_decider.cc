@@ -106,6 +106,7 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
 
     ADEBUG << "stop distance : " << stop_distance;
 
+    // TODO(SHU): deceleration is positive during reverse gear
     const double stop_deceleration = -fallback_start_point.v() *
                                      fallback_start_point.v() /
                                      (2.0 * (stop_distance + 1e-6));
@@ -142,6 +143,8 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
       AINFO << "Stop distance within safety buffer, stop now!";
       fallback_start_point.set_v(0.0);
       fallback_start_point.set_a(0.0);
+      fallback_trajectory_pair_candidate.first[stop_index].set_v(0.0);
+      fallback_trajectory_pair_candidate.first[stop_index].set_a(0.0);
 
       // 2. Trim all trajectory points after stop index
       fallback_trajectory_pair_candidate.first.erase(
@@ -277,6 +280,8 @@ bool OpenSpaceFallbackDecider::IsCollisionFreeTrajectory(
   double ego_width = vehicle_config.vehicle_param().width();
   auto trajectory_pb = trajectory_gear_pair.first;
   const size_t point_size = trajectory_pb.NumOfPoints();
+  // TODO(SHU): find a proper buffer time
+  const double kCollisionTimeBuffer = 100 * FLAGS_trajectory_time_resolution;
   *current_index = trajectory_pb.QueryLowerBoundPoint(0.0);
 
   for (size_t i = *current_index; i < point_size; ++i) {
@@ -299,7 +304,7 @@ bool OpenSpaceFallbackDecider::IsCollisionFreeTrajectory(
           if (std::abs(trajectory_point.relative_time() -
                        static_cast<double>(j) *
                            FLAGS_trajectory_time_resolution) <
-              FLAGS_trajectory_time_resolution) {
+              kCollisionTimeBuffer) {
             *first_collision_index = i;
             return false;
           }
