@@ -57,6 +57,9 @@ class IterativeAnchoringSmoother {
   bool ReAnchoring(const std::vector<size_t>& colliding_point_index,
                    DiscretizedPath* path_points);
 
+  bool GenerateInitialBounds(const DiscretizedPath& path_points,
+                             std::vector<double>* initial_bounds);
+
   bool SmoothPath(const DiscretizedPath& raw_path_points,
                   const std::vector<double>& bounds,
                   DiscretizedPath* smoothed_path_points);
