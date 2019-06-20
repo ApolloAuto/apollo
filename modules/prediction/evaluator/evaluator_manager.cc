@@ -280,13 +280,12 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
       }
       break;
     }
-    // TODO(kechxu) recover them when model error is fixed
-    // case PerceptionObstacle::PEDESTRIAN: {
-    //   evaluator = GetEvaluator(pedestrian_evaluator_);
-    //   CHECK_NOTNULL(evaluator);
-    //   evaluator->Evaluate(obstacle);
-    //   break;
-    // }
+    case PerceptionObstacle::PEDESTRIAN: {
+      evaluator = GetEvaluator(pedestrian_evaluator_);
+      CHECK_NOTNULL(evaluator);
+      evaluator->Evaluate(obstacle);
+      break;
+    }
     default: {
       if (obstacle->IsOnLane()) {
         evaluator = GetEvaluator(default_on_lane_evaluator_);
