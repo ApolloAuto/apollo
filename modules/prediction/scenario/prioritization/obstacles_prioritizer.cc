@@ -181,8 +181,8 @@ void ObstaclesPrioritizer::AssignIgnoreLevel() {
 }
 
 void ObstaclesPrioritizer::AssignCautionLevel() {
-  // TODO(kechxu): integrate change lane when ready to check change lane
   AssignCautionLevelCruiseKeepLane();
+  AssignCautionLevelCruiseChangeLane();
   AssignCautionLevelByEgoReferenceLine();
 }
 
