@@ -21,4 +21,5 @@ message OpenSpaceTrajectoryPartitionConfig{
     optional double lateral_offset_to_midpoint = 10 [default = 0.1];
     optional double longitudinal_offset_to_midpoint = 11 [default = 0.1];
     optional double vehicle_box_iou_threshold_to_midpoint = 12 [default = 0.95];
+    optional double linear_velocity_threshold_on_ego = 13 [default = 0.2];
 }
