@@ -27,10 +27,11 @@ namespace planning {
 
 CosThetaIpoptInterface::CosThetaIpoptInterface(
     std::vector<std::pair<double, double>> points, std::vector<double> bounds) {
-  init_points_ = std::move(points);
-  num_of_points_ = init_points_.size();
+  CHECK_GT(points.size(), 1);
+  CHECK_GT(bounds.size(), 1);
   bounds_ = std::move(bounds);
-  CHECK_GT(num_of_points_, 1);
+  ref_points_ = std::move(points);
+  num_of_points_ = ref_points_.size();
 }
 
 void CosThetaIpoptInterface::get_optimization_results(
@@ -95,10 +96,10 @@ bool CosThetaIpoptInterface::get_bounds_info(int n, double* x_l, double* x_u,
     double y_lower = 0.0;
     double y_upper = 0.0;
 
-    x_lower = init_points_[i].first - bounds_[i];
-    x_upper = init_points_[i].first + bounds_[i];
-    y_lower = init_points_[i].second - bounds_[i];
-    y_upper = init_points_[i].second + bounds_[i];
+    x_lower = ref_points_[i].first - bounds_[i];
+    x_upper = ref_points_[i].first + bounds_[i];
+    y_lower = ref_points_[i].second - bounds_[i];
+    y_upper = ref_points_[i].second + bounds_[i];
 
     // x
     g_l[index] = x_lower;
@@ -122,8 +123,8 @@ bool CosThetaIpoptInterface::get_starting_point(int n, bool init_x, double* x,
   std::normal_distribution<> dis{0, 0.05};
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
-    x[index] = init_points_[i].first + dis(gen);
-    x[index + 1] = init_points_[i].second + dis(gen);
+    x[index] = ref_points_[i].first + dis(gen);
+    x[index + 1] = ref_points_[i].second + dis(gen);
   }
   return true;
 }
@@ -139,10 +140,10 @@ bool CosThetaIpoptInterface::eval_f(int n, const double* x, bool new_x,
   obj_value = 0.0;
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
-    obj_value += (x[index] - init_points_[i].first) *
-                     (x[index] - init_points_[i].first) +
-                 (x[index + 1] - init_points_[i].second) *
-                     (x[index + 1] - init_points_[i].second);
+    obj_value +=
+        (x[index] - ref_points_[i].first) * (x[index] - ref_points_[i].first) +
+        (x[index + 1] - ref_points_[i].second) *
+            (x[index + 1] - ref_points_[i].second);
   }
   for (size_t i = 0; i < num_of_points_ - 2; i++) {
     size_t findex = i << 1;
@@ -174,8 +175,8 @@ bool CosThetaIpoptInterface::eval_grad_f(int n, const double* x, bool new_x,
   std::fill(grad_f, grad_f + n, 0.0);
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
-    grad_f[index] = x[index] * 2 - init_points_[i].first * 2;
-    grad_f[index + 1] = x[index + 1] * 2 - init_points_[i].second * 2;
+    grad_f[index] = x[index] * 2 - ref_points_[i].first * 2;
+    grad_f[index + 1] = x[index + 1] * 2 - ref_points_[i].second * 2;
   }
 
   for (size_t i = 0; i < num_of_points_ - 2; ++i) {
@@ -600,10 +601,10 @@ bool CosThetaIpoptInterface::eval_obj(int n, const T* x, T* obj_value) {
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
     *obj_value +=
-        weight_anchor_points_ * ((x[index] - init_points_[i].first) *
-                                     (x[index] - init_points_[i].first) +
-                                 (x[index + 1] - init_points_[i].second) *
-                                     (x[index + 1] - init_points_[i].second));
+        weight_anchor_points_ *
+        ((x[index] - ref_points_[i].first) * (x[index] - ref_points_[i].first) +
+         (x[index + 1] - ref_points_[i].second) *
+             (x[index + 1] - ref_points_[i].second));
   }
   for (size_t i = 0; i < num_of_points_ - 2; ++i) {
     size_t findex = i << 1;
@@ -634,14 +635,14 @@ bool CosThetaIpoptInterface::eval_obj(int n, const T* x, T* obj_value) {
     //      ((x[mindex + 1] - x[findex + 1]) * (x[lindex + 1] - x[mindex +
     //      1])))
     //      /
-    //     (sqrt((init_points_[i + 1].first - init_points_[i].first) *
-    //               (init_points_[i + 1].first - init_points_[i].first) +
-    //           (init_points_[i + 1].second - init_points_[i].second) *
-    //               (init_points_[i + 1].second - init_points_[i].second)) *
-    //      sqrt((init_points_[i + 2].first - init_points_[i + 1].first) *
-    //               (init_points_[i + 2].first - init_points_[i + 1].first) +
-    //           (init_points_[i + 2].second - init_points_[i + 1].second) *
-    //               (init_points_[i + 2].second - init_points_[i +
+    //     (sqrt((ref_points_[i + 1].first - ref_points_[i].first) *
+    //               (ref_points_[i + 1].first - ref_points_[i].first) +
+    //           (ref_points_[i + 1].second - ref_points_[i].second) *
+    //               (ref_points_[i + 1].second - ref_points_[i].second)) *
+    //      sqrt((ref_points_[i + 2].first - ref_points_[i + 1].first) *
+    //               (ref_points_[i + 2].first - ref_points_[i + 1].first) +
+    //           (ref_points_[i + 2].second - ref_points_[i + 1].second) *
+    //               (ref_points_[i + 2].second - ref_points_[i +
     //               1].second)));
 
     // Denominator numerically protected

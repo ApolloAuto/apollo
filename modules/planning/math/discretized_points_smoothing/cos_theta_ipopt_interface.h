@@ -122,7 +122,7 @@ class CosThetaIpoptInterface : public Ipopt::TNLP {
   //***************    end   ADOL-C part ***********************************
 
  private:
-  std::vector<std::pair<double, double>> init_points_;
+  std::vector<std::pair<double, double>> ref_points_;
 
   std::vector<double> bounds_;
 
@@ -177,8 +177,8 @@ class CosThetaIpoptInterface : public Ipopt::TNLP {
   unsigned int* cind_L_; /* column indices */
   double* hessval_;      /* values */
 
-  int nnz_jac_;
-  int nnz_L_;
+  int nnz_jac_ = 0;
+  int nnz_L_ = 0;
   int options_g_[4];
   int options_L_[4];
 

@@ -23,6 +23,7 @@
 #include <limits>
 
 #include "cyber/common/log.h"
+#include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_ipopt_interface.h"
 #include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_osqp_interface.h"
 
 namespace apollo {
