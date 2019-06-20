@@ -41,7 +41,9 @@ TEST(TimerTest, one_shot) {
   timer.Start();
   std::this_thread::sleep_for(std::chrono::milliseconds(90));
   EXPECT_EQ(0, count);
-  std::this_thread::sleep_for(std::chrono::milliseconds(200));
+  // Here we need to consider the scheduling delay, up to 500ms, make sure the
+  // unit test passes.
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
   EXPECT_EQ(100, count);
   timer.Stop();
 }
