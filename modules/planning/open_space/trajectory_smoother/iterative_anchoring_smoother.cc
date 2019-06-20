@@ -21,6 +21,7 @@
 #include "modules/planning/open_space/trajectory_smoother/iterative_anchoring_smoother.h"
 
 #include <algorithm>
+#include <limits>
 
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -110,8 +111,11 @@ bool IterativeAnchoringSmoother::Smooth(
   }
 
   // TODO(Jinyun): move to confs
-  const double default_bounds = 2.0;
-  std::vector<double> bounds(interpolated_path_size, default_bounds);
+  std::vector<double> bounds;
+  if (!GenerateInitialBounds(interpolated_warm_start_path, &bounds)) {
+    AERROR << "Generate initial bounds failed, path point to close to obstacle";
+    return false;
+  }
 
   AdjustStartEndHeading(xWS, &interpolated_warm_start_path, &bounds);
 
@@ -323,6 +327,31 @@ bool IterativeAnchoringSmoother::ReAnchoring(
              << "can't be successfully reanchored";
       return false;
     }
+  }
+  return true;
+}
+
+bool IterativeAnchoringSmoother::GenerateInitialBounds(
+    const DiscretizedPath& path_points, std::vector<double>* initial_bounds) {
+  CHECK_NOTNULL(initial_bounds);
+  // TODO(Jinyun): Move to confs
+  const double vehicle_shortest_dimension = 1.04;
+  const double kEpislon = 1e-8;
+
+  for (const auto& path_point : path_points) {
+    double min_bound = std::numeric_limits<double>::infinity();
+    for (const auto& obstacle_linesegments : obstacles_linesegments_vec_) {
+      for (const LineSegment2d& linesegment : obstacle_linesegments) {
+        min_bound =
+            std::min(min_bound,
+                     linesegment.DistanceTo({path_point.x(), path_point.y()}));
+      }
+    }
+    min_bound -= vehicle_shortest_dimension;
+    if (min_bound < kEpislon) {
+      return false;
+    }
+    initial_bounds->push_back(min_bound);
   }
   return true;
 }
