@@ -363,7 +363,9 @@ bool IterativeAnchoringSmoother::SmoothPath(
   while (!(is_collision_free && is_curvature_satisfied)) {
     if (counter > max_iteration_num) {
       AERROR << "path smoother iteration num reach maximum in iterative "
-                "anchoring smoother";
+                "anchoring smoother.";
+      AERROR << "Collision free status: " << is_collision_free
+             << " curvature satisfaction status: " << is_curvature_satisfied;
       return false;
     }
 
@@ -437,6 +439,8 @@ bool IterativeAnchoringSmoother::CheckCollisionAvoidance(
       for (const LineSegment2d& linesegment : obstacle_linesegments) {
         if (ego_box.HasOverlap(linesegment)) {
           colliding_point_index->push_back(i);
+          AERROR << "collsion happened with LineSegment "
+                 << linesegment.DebugString();
           is_colliding = true;
           break;
         }
@@ -498,6 +502,12 @@ void IterativeAnchoringSmoother::AdjustPathBounds(
   for (const auto index : colliding_point_index) {
     bounds->at(index) *= collision_decrease_ratio;
   }
+
+  // Anchor the end points to enforce the initial end end heading continuity
+  bounds->at(0) = 0.0;
+  bounds->at(1) = 0.0;
+  bounds->at(bounds->size() - 1) = 0.0;
+  bounds->at(bounds->size() - 2) = 0.0;
 }
 
 bool IterativeAnchoringSmoother::SetPathProfile(
@@ -551,13 +561,14 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
                                              SpeedData* smoothed_speeds) {
   // TODO(Jinyun): move to confs
   const double max_forward_v = 2.0;
-  const double max_reverse_v = 1.0;
-  const double max_forward_acc = 1.0;
-  const double max_reverse_acc = 1.0;
-  const double max_acc_jerk = 2.0;
+  const double max_reverse_v = 2.0;
+  const double max_forward_acc = 3.0;
+  const double max_reverse_acc = 2.0;
+  const double max_acc_jerk = 4.0;
   const double delta_t = 0.2;
-  // TODO(Jinyun): add the time length hueristic
-  const double total_t = 60.0;
+
+  const double total_t = 2 * path_length / max_reverse_acc * 10;
+  ADEBUG << "total_t is : " << total_t;
   const size_t num_of_knots = static_cast<size_t>(total_t / delta_t) + 1;
 
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(
@@ -581,7 +592,7 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
   ddx_bounds[num_of_knots - 1] = std::make_pair(0.0, 0.0);
 
   std::vector<double> x_ref(num_of_knots, path_length);
-  piecewise_jerk_problem.set_x_ref(1.0, x_ref);
+  piecewise_jerk_problem.set_x_ref(10.0, x_ref);
 
   // TODO(Jinyun): tune the params and move to a config
   piecewise_jerk_problem.set_weight_ddx(1.0);

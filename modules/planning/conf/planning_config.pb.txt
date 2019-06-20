@@ -89,7 +89,7 @@ default_task_config: {
     total_time: 7.0
     boundary_buffer: 0.25
     high_speed_centric_acceleration_limit: 2.0
-    low_speed_centric_acceleration_limit: 2.0
+    low_speed_centric_acceleration_limit: 1.5
     high_speed_threshold: 12.58
     low_speed_threshold: 7.5
     minimal_kappa: 0.00001
@@ -107,7 +107,7 @@ default_task_config: {
     total_time: 7.0
     boundary_buffer: 0.1
     high_speed_centric_acceleration_limit: 2.0
-    low_speed_centric_acceleration_limit: 2.0
+    low_speed_centric_acceleration_limit: 1.5
     high_speed_threshold: 12.58
     low_speed_threshold: 7.5
     minimal_kappa: 0.00001
@@ -241,15 +241,16 @@ default_task_config: {
     roi_linesegment_length: 1.0
     perception_obstacle_filtering_distance: 1000.0
     perception_obstacle_buffer: 0.0
-    bound_width_change_ratio_uppper_limit: 0.5
+    bound_width_change_ratio_uppper_limit: 0.2
   }
 }
 default_task_config: {
   task_type: OPEN_SPACE_FALLBACK_DECIDER
   open_space_fallback_decider_config {
     open_space_prediction_time_period: 5.0
-    open_space_fall_back_collision_distance: 5.0
-    open_space_fall_back_stop_distance: 2.0
+    open_space_fallback_collision_distance: 5.0
+    open_space_fallback_stop_distance: 2.0
+    open_space_fallback_collision_time_buffer: 10.0
   }
 }
 default_task_config: {
