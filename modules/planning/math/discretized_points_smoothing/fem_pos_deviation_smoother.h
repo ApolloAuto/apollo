@@ -20,6 +20,9 @@
 
 #pragma once
 
+#include <utility>
+#include <vector>
+
 #include "modules/planning/proto/fem_pos_deviation_smoother_config.pb.h"
 
 namespace apollo {

@@ -7,6 +7,8 @@ message FemPosDeviationSmootherConfig {
   optional double weight_ref_deviation = 3 [default = 1.0];
   optional double weight_path_length = 4 [default = 1.0];
   optional bool apply_curvature_constraint = 5 [default = false];
+  optional double weight_curvature_constraint_slack_var = 6 [default = 1.0e2];
+  optional double curvature_constraint = 7 [default = 0.2];
   optional int32 max_iter = 10 [default = 500];
   // time_limit set to be 0.0 meaning no time limit
   optional double time_limit = 11 [default = 0.0];
