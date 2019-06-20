@@ -120,7 +120,7 @@ To configure the DAG dependency file (common.dag), specify the following items a
 
 ```bash
 # Define all coms in DAG streaming.
-    component_config {
+component_config {
     component_library : "/apollo/bazel-bin/cyber/examples/common_component_example/libcommon_component_example.so"
     components {
         class_name : "CommonComponentSample"
@@ -133,8 +133,8 @@ To configure the DAG dependency file (common.dag), specify the following items a
                 channel: "/apollo/test"
             }
         }
-      }
     }
+}
 ```
 
 ### Configure the launch file

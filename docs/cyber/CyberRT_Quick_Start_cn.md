@@ -119,7 +119,7 @@ cpplint()
 
 ```bash
 # Define all coms in DAG streaming.
-    component_config {
+component_config {
     component_library : "/apollo/bazel-bin/cyber/examples/common_component_example/libcommon_component_example.so"
     components {
         class_name : "CommonComponentSample"
@@ -132,8 +132,8 @@ cpplint()
                 channel: "/apollo/test"
             }
         }
-      }
     }
+}
 ```
 
 ### 配置launch启动文件
