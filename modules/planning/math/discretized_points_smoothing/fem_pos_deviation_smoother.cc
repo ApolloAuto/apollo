@@ -22,6 +22,9 @@
 
 #include <limits>
 
+#include "IpIpoptApplication.hpp"
+#include "IpSolveStatistics.hpp"
+
 #include "cyber/common/log.h"
 #include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_ipopt_interface.h"
 #include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_osqp_interface.h"
@@ -78,16 +81,50 @@ bool FemPosDeviationSmoother::SolveWithIpopt(
     const std::vector<std::pair<double, double>>& raw_point2d,
     const std::vector<double>& bounds, std::vector<double>* opt_x,
     std::vector<double>* opt_y) {
-  // const double weight_fem_pos_deviation =
-  // config_.weight_fem_pos_deviation();
-  // const double weight_ref_deviation = config_.weight_ref_deviation();
-  // const double weight_path_length = config_.weight_path_length();
-  // const int max_iter = config_.max_iter();
-  // const double time_limit = config_.time_limit();
-  // const bool verbose = config_.verbose();
-  // const bool scaled_termination = config_.scaled_termination();
-  // const bool warm_start = config_.warm_start();
-  return false;
+  FemPosDeviationIpoptInterface* smoother =
+      new FemPosDeviationIpoptInterface(raw_point2d, bounds);
+
+  smoother->set_weight_fem_pos_deviation(config_.weight_fem_pos_deviation());
+  smoother->set_weight_path_length(config_.weight_path_length());
+  smoother->set_weight_ref_deviation(config_.weight_ref_deviation());
+  smoother->set_weight_curvature_constraint_slack_var(
+      config_.weight_curvature_constraint_slack_var());
+  smoother->set_curvature_constraint(config_.curvature_constraint());
+
+  Ipopt::SmartPtr<Ipopt::TNLP> problem = smoother;
+
+  // Create an instance of the IpoptApplication
+  Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
+
+  app->Options()->SetIntegerValue("print_level",
+                                  static_cast<int>(config_.print_level()));
+  app->Options()->SetIntegerValue(
+      "max_iter", static_cast<int>(config_.max_num_of_iterations()));
+  app->Options()->SetIntegerValue(
+      "acceptable_iter",
+      static_cast<int>(config_.acceptable_num_of_iterations()));
+  app->Options()->SetNumericValue("tol", config_.tol());
+  app->Options()->SetNumericValue("acceptable_tol", config_.acceptable_tol());
+
+  Ipopt::ApplicationReturnStatus status = app->Initialize();
+  if (status != Ipopt::Solve_Succeeded) {
+    AERROR << "*** Error during initialization!";
+    return false;
+  }
+
+  status = app->OptimizeTNLP(problem);
+
+  if (status == Ipopt::Solve_Succeeded ||
+      status == Ipopt::Solved_To_Acceptable_Level) {
+    // Retrieve some statistics about the solve
+    Ipopt::Index iter_count = app->Statistics()->IterationCount();
+    ADEBUG << "*** The problem solved in " << iter_count << " iterations!";
+  } else {
+    AERROR << "Solver fails with return code: " << static_cast<int>(status);
+    return false;
+  }
+  smoother->get_optimization_results(opt_x, opt_y);
+  return true;
 }
 
 }  // namespace planning

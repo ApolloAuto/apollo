@@ -424,5 +424,5 @@ void FemPosDeviationIpoptInterface::generate_tapes(int n, int m, int* nnz_jac_g,
               options_L_);
   *nnz_h_lag = nnz_L_;
 }
-}
-}
+}  // namespace planning
+}  // namespace apollo

@@ -610,83 +610,16 @@ bool CosThetaIpoptInterface::eval_obj(int n, const T* x, T* obj_value) {
     size_t findex = i << 1;
     size_t mindex = findex + 2;
     size_t lindex = mindex + 2;
-
-    // TODO(Jinyun): Numerically Evaluate the performance of different smoothing
-    // objectives
-
-    // Costheta term
-    // *obj_value -=
-    //     weight_cos_included_angle_ *
-    //     (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
-    //      ((x[mindex + 1] - x[findex + 1]) * (x[lindex + 1] - x[mindex +
-    //      1])))
-    //      /
-    //     (sqrt((x[mindex] - x[findex]) * (x[mindex] - x[findex]) +
-    //           (x[mindex + 1] - x[findex + 1]) *
-    //               (x[mindex + 1] - x[findex + 1])) *
-    //      sqrt((x[lindex] - x[mindex]) * (x[lindex] - x[mindex]) +
-    //           (x[lindex + 1] - x[mindex + 1]) *
-    //               (x[lindex + 1] - x[mindex + 1])));
-
-    // Use last iteration in Denomiator of costheta term
-    // *obj_value -=
-    //     weight_cos_included_angle_ *
-    //     (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
-    //      ((x[mindex + 1] - x[findex + 1]) * (x[lindex + 1] - x[mindex +
-    //      1])))
-    //      /
-    //     (sqrt((ref_points_[i + 1].first - ref_points_[i].first) *
-    //               (ref_points_[i + 1].first - ref_points_[i].first) +
-    //           (ref_points_[i + 1].second - ref_points_[i].second) *
-    //               (ref_points_[i + 1].second - ref_points_[i].second)) *
-    //      sqrt((ref_points_[i + 2].first - ref_points_[i + 1].first) *
-    //               (ref_points_[i + 2].first - ref_points_[i + 1].first) +
-    //           (ref_points_[i + 2].second - ref_points_[i + 1].second) *
-    //               (ref_points_[i + 2].second - ref_points_[i +
-    //               1].second)));
-
-    // Denominator numerically protected
-    // *obj_value +=
-    //     weight_cos_included_angle_ *
-    //     acos(
-    //         (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
-    //          ((x[mindex + 1] - x[findex + 1]) *
-    //           (x[lindex + 1] - x[mindex + 1]))) /
-    //         (1e-8 + sqrt((x[mindex] - x[findex]) * (x[mindex] -
-    //         x[findex]) +
-    //                      (x[mindex + 1] - x[findex + 1]) *
-    //                          (x[mindex + 1] - x[findex + 1])) *
-    //                     sqrt((x[lindex] - x[mindex]) * (x[lindex] -
-    //                     x[mindex]) +
-    //                          (x[lindex + 1] - x[mindex + 1]) *
-    //                              (x[lindex + 1] - x[mindex + 1]))));
-
-    // InnerProd
-    // *obj_value -=
-    //     weight_cos_included_angle_ *
-    //     (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
-    //      ((x[mindex + 1] - x[findex + 1]) * (x[lindex + 1] - x[mindex +
-    //      1])));
-
-    // CrossProd
-    // *obj_value += weight_cos_included_angle_ *
-    //              (((x[findex] - x[mindex]) * (x[lindex + 1] - x[mindex +
-    //              1]))
-    //              -
-    //               ((x[lindex] - x[mindex]) * (x[findex + 1] - x[mindex +
-    //               1]))) *
-    //              (((x[findex] - x[mindex]) * (x[lindex + 1] - x[mindex +
-    //              1]))
-    //              -
-    //               ((x[lindex] - x[mindex]) * (x[findex + 1] - x[mindex +
-    //               1])));
-
-    // Midpoint distance
-    *obj_value += weight_cos_included_angle_ *
-                  (((x[findex] + x[lindex]) / 2.0 - x[mindex]) *
-                       ((x[findex] + x[lindex]) / 2.0 - x[mindex]) +
-                   ((x[findex + 1] + x[lindex + 1]) / 2.0 - x[mindex + 1]) *
-                       ((x[findex + 1] + x[lindex + 1]) / 2.0 - x[mindex + 1]));
+    *obj_value -=
+        weight_cos_included_angle_ *
+        (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
+         ((x[mindex + 1] - x[findex + 1]) * (x[lindex + 1] - x[mindex + 1]))) /
+        (sqrt((x[mindex] - x[findex]) * (x[mindex] - x[findex]) +
+              (x[mindex + 1] - x[findex + 1]) *
+                  (x[mindex + 1] - x[findex + 1])) *
+         sqrt((x[lindex] - x[mindex]) * (x[lindex] - x[mindex]) +
+              (x[lindex + 1] - x[mindex + 1]) *
+                  (x[lindex + 1] - x[mindex + 1])));
   }
 
   // Total length

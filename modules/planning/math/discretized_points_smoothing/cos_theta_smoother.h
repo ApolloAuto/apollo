@@ -19,9 +19,6 @@
 #include <utility>
 #include <vector>
 
-#include "IpIpoptApplication.hpp"
-#include "IpSolveStatistics.hpp"
-
 #include "modules/planning/proto/cos_theta_smoother_config.pb.h"
 
 namespace apollo {
