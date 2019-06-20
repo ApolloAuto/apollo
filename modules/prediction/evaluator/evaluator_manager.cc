@@ -155,8 +155,10 @@ void EvaluatorManager::Init(const PredictionConf& config) {
           break;
         }
         case PerceptionObstacle::PEDESTRIAN: {
-          pedestrian_evaluator_ = obstacle_conf.evaluator_type();
-          break;
+          if (obstacle_conf.priority_type() == ObstaclePriority::CAUTION) {
+            pedestrian_evaluator_ = obstacle_conf.evaluator_type();
+            break;
+          }
         }
         case PerceptionObstacle::UNKNOWN: {
           if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
@@ -281,10 +283,13 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
       break;
     }
     case PerceptionObstacle::PEDESTRIAN: {
-      evaluator = GetEvaluator(pedestrian_evaluator_);
-      CHECK_NOTNULL(evaluator);
-      evaluator->Evaluate(obstacle);
-      break;
+      if (obstacle->latest_feature().priority().priority() ==
+          ObstaclePriority::CAUTION) {
+        evaluator = GetEvaluator(pedestrian_evaluator_);
+        CHECK_NOTNULL(evaluator);
+        evaluator->Evaluate(obstacle);
+        break;
+      }
     }
     default: {
       if (obstacle->IsOnLane()) {
