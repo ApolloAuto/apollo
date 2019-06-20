@@ -452,7 +452,7 @@ bool IterativeAnchoringSmoother::CheckCollisionAvoidance(
   }
 
   if (!colliding_point_index->empty()) {
-    //  return false;
+    return false;
   }
   return true;
 }
@@ -561,13 +561,14 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
                                              SpeedData* smoothed_speeds) {
   // TODO(Jinyun): move to confs
   const double max_forward_v = 2.0;
-  const double max_reverse_v = 1.0;
-  const double max_forward_acc = 1.0;
-  const double max_reverse_acc = 1.0;
-  const double max_acc_jerk = 2.0;
+  const double max_reverse_v = 2.0;
+  const double max_forward_acc = 3.0;
+  const double max_reverse_acc = 2.0;
+  const double max_acc_jerk = 4.0;
   const double delta_t = 0.2;
-  // TODO(Jinyun): add the time length hueristic
-  const double total_t = 60.0;
+
+  const double total_t = 2 * path_length / max_reverse_acc * 10;
+  ADEBUG << "total_t is : " << total_t;
   const size_t num_of_knots = static_cast<size_t>(total_t / delta_t) + 1;
 
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(
@@ -591,7 +592,7 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
   ddx_bounds[num_of_knots - 1] = std::make_pair(0.0, 0.0);
 
   std::vector<double> x_ref(num_of_knots, path_length);
-  piecewise_jerk_problem.set_x_ref(1.0, x_ref);
+  piecewise_jerk_problem.set_x_ref(10.0, x_ref);
 
   // TODO(Jinyun): tune the params and move to a config
   piecewise_jerk_problem.set_weight_ddx(1.0);
