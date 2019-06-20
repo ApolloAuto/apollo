@@ -339,11 +339,11 @@ bool IterativeAnchoringSmoother::SmoothPath(
 
   // TODO(Jinyun): move to confs
   FemPosDeviationSmootherConfig config;
-  config.set_weight_fem_pos_deviation(1e5);
+  config.set_weight_fem_pos_deviation(1e7);
   config.set_weight_path_length(1.0);
-  config.set_weight_ref_deviation(1.0);
+  config.set_weight_ref_deviation(1e3);
   config.set_apply_curvature_constraint(true);
-  config.set_weight_curvature_constraint_slack_var(1e6);
+  config.set_weight_curvature_constraint_slack_var(1e8);
   config.set_curvature_constraint(0.2);
   config.set_max_iter(500);
   config.set_time_limit(0.0);
@@ -354,7 +354,7 @@ bool IterativeAnchoringSmoother::SmoothPath(
   FemPosDeviationSmoother fem_pos_smoother(config);
 
   // TODO(Jinyun): move to confs
-  const size_t max_iteration_num = 1000;
+  const size_t max_iteration_num = 500;
 
   bool is_collision_free = false;
   std::vector<size_t> colliding_point_index;
@@ -363,6 +363,7 @@ bool IterativeAnchoringSmoother::SmoothPath(
 
   while (!is_collision_free) {
     if (counter > max_iteration_num) {
+      AERROR << "Smoothing path fails because of reaching maximum iteration";
       return false;
     }
 
