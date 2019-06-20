@@ -49,15 +49,6 @@ class FemPosDeviationIpoptInterface : public Ipopt::TNLP {
 
   virtual ~FemPosDeviationIpoptInterface() = default;
 
-  void set_ref_points(
-      const std::vector<std::pair<double, double>>& ref_points) {
-    ref_points_ = ref_points;
-  }
-
-  void set_bounds_around_refs(const std::vector<double>& bounds_around_refs) {
-    bounds_around_refs_ = bounds_around_refs;
-  }
-
   void set_weight_fem_pos_deviation(const double weight_fem_pos_deviation) {
     weight_fem_pos_deviation_ = weight_fem_pos_deviation;
   }
