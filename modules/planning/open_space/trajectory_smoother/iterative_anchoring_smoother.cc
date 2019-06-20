@@ -439,7 +439,7 @@ bool IterativeAnchoringSmoother::CheckCollisionAvoidance(
       for (const LineSegment2d& linesegment : obstacle_linesegments) {
         if (ego_box.HasOverlap(linesegment)) {
           colliding_point_index->push_back(i);
-          AERROR << "collsion happened with LineSegment "
+          ADEBUG << "collsion happened with LineSegment "
                  << linesegment.DebugString();
           is_colliding = true;
           break;
