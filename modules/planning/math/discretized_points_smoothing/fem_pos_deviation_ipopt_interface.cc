@@ -117,8 +117,8 @@ bool FemPosDeviationIpoptInterface::get_bounds_info(int n, double* x_l,
   auto pre_point = ref_points_.front();
   for (size_t i = 1; i < num_of_points_; ++i) {
     auto cur_point = ref_points_[i];
-    double x_diff = (cur_point.first - pre_point.first);
-    double y_diff = (cur_point.second - pre_point.second);
+    double x_diff = cur_point.first - pre_point.first;
+    double y_diff = cur_point.second - pre_point.second;
     ref_total_length += std::sqrt(x_diff * x_diff + y_diff * y_diff);
     pre_point = cur_point;
   }
@@ -230,9 +230,6 @@ bool FemPosDeviationIpoptInterface::eval_h(int n, const double* x, bool new_x,
     for (int idx = 0; idx < m; idx++) {
       obj_lam_[1 + idx] = lambda[idx];
     }
-    // auto* rind_L = &rind_L_[0];
-    // auto* cind_L = &cind_L_[0];
-    // auto* hessval = &hessval_[0];
     set_param_vec(tag_L, m + 1, &obj_lam_[0]);
     sparse_hess(tag_L, n, 1, const_cast<double*>(x), &nnz_L_, &rind_L_,
                 &cind_L_, &hessval_, options_L_);

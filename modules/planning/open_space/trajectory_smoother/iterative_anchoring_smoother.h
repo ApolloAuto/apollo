@@ -64,14 +64,8 @@ class IterativeAnchoringSmoother {
   bool CheckCollisionAvoidance(const DiscretizedPath& path_points,
                                std::vector<size_t>* colliding_point_index);
 
-  bool CheckCurvatureConstraint(
-      const DiscretizedPath& path_points,
-      std::vector<size_t>* curvature_exceeding_point_index);
-
-  void AdjustPathBounds(
-      const std::vector<size_t>& colliding_point_index,
-      const std::vector<size_t>& curvature_exceeding_point_index,
-      std::vector<double>* bounds);
+  void AdjustPathBounds(const std::vector<size_t>& colliding_point_index,
+                        std::vector<double>* bounds);
 
   bool SetPathProfile(const std::vector<std::pair<double, double>>& point2d,
                       DiscretizedPath* raw_path_points);
