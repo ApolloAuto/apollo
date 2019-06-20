@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_COMMON_HPP
-#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_COMMON_HPP
+#ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_COMMON_HPP
+#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_COMMON_HPP
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -189,4 +189,4 @@ inline double unixtime_now() { return apollo::cyber::Time::Now().ToSecond(); }
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_COMMON_HPP
+#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_COMMON_HPP

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_CHANNEL_CHECKER_H
-#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_CHANNEL_CHECKER_H
+#ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_CHANNEL_CHECKER_H
+#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_CHANNEL_CHECKER_H
 #include <map>
 #include <memory>
 #include <set>
@@ -86,4 +86,4 @@ class ChannelVerify {
 }  // namespace hdmap
 }  // namespace apollo
 
-#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_CHANNEL_CHECKER_H
+#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_CHANNEL_CHECKER_H

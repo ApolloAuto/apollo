@@ -63,7 +63,7 @@ int ChannelVerify::incremental_check(
   AINFO << "all records path:";
   for (size_t i = 0; i < records_path.size(); ++i) {
     AINFO << "[" << i << "]: " << records_path[i];
-    if (!is_record_checked(records_path[i])) {
+    if (is_record_file(records_path) && !is_record_checked(records_path[i])) {
       not_check_records_path.push_back(records_path[i]);
     }
   }
@@ -74,6 +74,9 @@ int ChannelVerify::incremental_check(
     AINFO << "[" << i << "]: " << not_check_records_path[i];
     OneRecordChannelCheckResult check_result =
         check_record_channels(not_check_records_path[i]);
+    if (check_result.record_path.empty()) {
+      continue;
+    }
     _sp_vec_check_result->push_back(check_result);
   }
 
@@ -89,11 +92,6 @@ bool ChannelVerify::is_record_file(const std::string& record_path) const {
     AINFO << "path [" << record_path << "] is not a regular file";
     return false;
   }
-  if (boost::filesystem::extension(record_path) != ".record") {
-    AINFO << "path [" << record_path << "] extension is not record";
-    return false;
-  }
-  // TODO(yuanyijun): check if record_path is a real record file
   // To avoid disk overhead caused by opening files twice, the real
   // file checking is placed in the function [ChannelVerify::get_record_info]
   return true;
@@ -174,13 +172,15 @@ std::shared_ptr<CyberRecordInfo> ChannelVerify::get_record_info(
 
 OneRecordChannelCheckResult ChannelVerify::check_record_channels(
     const std::string& record_path) {
+  OneRecordChannelCheckResult check_result;
   std::shared_ptr<CyberRecordInfo> sp_record_info =
       get_record_info(record_path);
+  if (sp_record_info == nullptr) {
+    return check_result;
+  }
   std::vector<CyberRecordChannel>& channels = sp_record_info->channels;
   std::vector<std::pair<std::string, double>>& topic_list =
       _sp_conf->topic_list;
-
-  OneRecordChannelCheckResult check_result;
   check_result.record_path = record_path;
   check_result.start_time = sp_record_info->start_time;
   for (size_t i = 0; i < topic_list.size(); ++i) {
