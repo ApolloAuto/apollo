@@ -268,32 +268,46 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
     // For the road boundary, only add start_point, end_point as well as the
     // road_bound where the reference line heading angle or the left/right road
     // width change abnormally
-    if (std::abs(common::math::NormalizeAngle(check_point_heading -
+    const bool is_reference_line_heading_has_sudden_change =
+        std::abs(common::math::NormalizeAngle(check_point_heading -
                                               last_check_point_heading)) >
-            config_.open_space_roi_decider_config()
-                .roi_linesegment_min_angle() ||
+        config_.open_space_roi_decider_config().roi_linesegment_min_angle();
+    const bool is_left_road_width_changes =
         std::abs(point_left_road_width - last_left_road_width) >
             road_bound_width_change_upper_limit ||
+        check_point_s == start_s || check_point_s == end_s ||
+        is_reference_line_heading_has_sudden_change;
+    const bool is_right_road_width_changes =
         std::abs(point_right_road_width - last_right_road_width) >
             road_bound_width_change_upper_limit ||
-        check_point_s == start_s || check_point_s == end_s) {
-      double point_right_vec_cos = std::cos(check_point_heading - M_PI / 2.0);
-      double point_right_vec_sin = std::sin(check_point_heading - M_PI / 2.0);
-      double point_left_vec_cos = std::cos(check_point_heading + M_PI / 2.0);
-      double point_left_vec_sin = std::sin(check_point_heading + M_PI / 2.0);
-      Vec2d right_lane_point =
-          Vec2d(point_right_road_width * point_right_vec_cos,
-                point_right_road_width * point_right_vec_sin);
-      right_lane_point = right_lane_point + check_point;
-      Vec2d left_lane_point = Vec2d(point_left_road_width * point_left_vec_cos,
-                                    point_left_road_width * point_left_vec_sin);
-      left_lane_point = left_lane_point + check_point;
-      right_lane_boundary->push_back(right_lane_point);
-      left_lane_boundary->push_back(left_lane_point);
+        check_point_s == start_s || check_point_s == end_s ||
+        is_reference_line_heading_has_sudden_change;
+
+    if (is_left_road_width_changes || is_right_road_width_changes) {
+      if (is_left_road_width_changes) {
+        double point_left_vec_cos = std::cos(check_point_heading + M_PI / 2.0);
+        double point_left_vec_sin = std::sin(check_point_heading + M_PI / 2.0);
+        Vec2d left_lane_point =
+            Vec2d(point_left_road_width * point_left_vec_cos,
+                  point_left_road_width * point_left_vec_sin);
+        left_lane_point = left_lane_point + check_point;
+        left_lane_boundary->push_back(left_lane_point);
+        left_lane_road_width->push_back(point_left_road_width);
+        last_left_road_width = point_left_road_width;
+      }
+      if (is_right_road_width_changes) {
+        double point_right_vec_cos = std::cos(check_point_heading - M_PI / 2.0);
+        double point_right_vec_sin = std::sin(check_point_heading - M_PI / 2.0);
+        Vec2d right_lane_point =
+            Vec2d(point_right_road_width * point_right_vec_cos,
+                  point_right_road_width * point_right_vec_sin);
+        right_lane_point = right_lane_point + check_point;
+        right_lane_boundary->push_back(right_lane_point);
+        right_lane_road_width->push_back(point_right_road_width);
+        last_right_road_width = point_right_road_width;
+      }
       center_lane_boundary->push_back(check_point);
       center_lane_s->push_back(check_point_s);
-      left_lane_road_width->push_back(point_left_road_width);
-      right_lane_road_width->push_back(point_right_road_width);
     }
     if (check_point_s == end_s) {
       break;
@@ -305,16 +319,17 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
             config_.open_space_roi_decider_config().roi_linesegment_length();
     check_point_s = check_point_s >= end_s ? end_s : check_point_s;
     last_check_point_heading = check_point_heading;
-    last_left_road_width = point_left_road_width;
-    last_right_road_width = point_right_road_width;
   }
 
-  size_t point_size = right_lane_boundary->size();
-  for (size_t i = 0; i < point_size; i++) {
-    right_lane_boundary->at(i) -= origin_point;
-    right_lane_boundary->at(i).SelfRotate(-origin_heading);
+  size_t left_point_size = left_lane_boundary->size();
+  size_t right_point_size = right_lane_boundary->size();
+  for (size_t i = 0; i < left_point_size; i++) {
     left_lane_boundary->at(i) -= origin_point;
     left_lane_boundary->at(i).SelfRotate(-origin_heading);
+  }
+  for (size_t i = 0; i < right_point_size; i++) {
+    right_lane_boundary->at(i) -= origin_point;
+    right_lane_boundary->at(i).SelfRotate(-origin_heading);
   }
 }
 
