@@ -48,8 +48,9 @@ class IterativeAnchoringSmoother {
               DiscretizedTrajectory* discretized_trajectory);
 
  private:
-  void AdjustStartEndHeading(const Eigen::MatrixXd& xWS, DiscretizedPath* path,
-                             std::vector<double>* bounds);
+  void AdjustStartEndHeading(
+      const Eigen::MatrixXd& xWS,
+      std::vector<std::pair<double, double>>* const point2d);
 
   bool ReAnchoring(const std::vector<size_t>& colliding_point_index,
                    DiscretizedPath* path_points);
