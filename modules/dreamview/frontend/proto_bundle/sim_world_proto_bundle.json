@@ -2919,7 +2919,7 @@
                   "type": "bool",
                   "id": 9,
                   "options": {
-                    "default": true
+                    "default": false
                   }
                 }
               }
@@ -3625,7 +3625,7 @@
             },
             "FemPosDeviationSmootherConfig": {
               "fields": {
-                "weightFemPoseDeviation": {
+                "weightFemPosDeviation": {
                   "type": "double",
                   "id": 2,
                   "options": {
@@ -3646,39 +3646,95 @@
                     "default": 1
                   }
                 },
+                "applyCurvatureConstraint": {
+                  "type": "bool",
+                  "id": 5,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "weightCurvatureConstraintSlackVar": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 100
+                  }
+                },
+                "curvatureConstraint": {
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "default": 0.2
+                  }
+                },
                 "maxIter": {
                   "type": "int32",
-                  "id": 5,
+                  "id": 10,
                   "options": {
                     "default": 500
                   }
                 },
                 "timeLimit": {
                   "type": "double",
-                  "id": 6,
+                  "id": 11,
                   "options": {
                     "default": 0
                   }
                 },
                 "verbose": {
                   "type": "bool",
-                  "id": 7,
+                  "id": 12,
                   "options": {
                     "default": false
                   }
                 },
                 "scaledTermination": {
                   "type": "bool",
-                  "id": 8,
+                  "id": 13,
                   "options": {
                     "default": true
                   }
                 },
                 "warmStart": {
                   "type": "bool",
-                  "id": 9,
+                  "id": 14,
                   "options": {
                     "default": true
+                  }
+                },
+                "printLevel": {
+                  "type": "int32",
+                  "id": 20,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "maxNumOfIterations": {
+                  "type": "int32",
+                  "id": 21,
+                  "options": {
+                    "default": 500
+                  }
+                },
+                "acceptableNumOfIterations": {
+                  "type": "int32",
+                  "id": 22,
+                  "options": {
+                    "default": 15
+                  }
+                },
+                "tol": {
+                  "type": "double",
+                  "id": 23,
+                  "options": {
+                    "default": 1e-8
+                  }
+                },
+                "acceptableTol": {
+                  "type": "double",
+                  "id": 24,
+                  "options": {
+                    "default": 0.1
                   }
                 }
               }
@@ -4380,6 +4436,13 @@
                   "id": 12,
                   "options": {
                     "default": 0.95
+                  }
+                },
+                "linearVelocityThresholdOnEgo": {
+                  "type": "double",
+                  "id": 13,
+                  "options": {
+                    "default": 0.2
                   }
                 }
               }
