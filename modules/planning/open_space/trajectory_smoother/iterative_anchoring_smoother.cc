@@ -250,18 +250,25 @@ bool IterativeAnchoringSmoother::ReAnchoring(
                               colliding_point_index.end())));
 
   for (const auto index : colliding_point_index) {
-    if (index == 0 || index == 1 || index == path_points->size() - 2 ||
-        index == path_points->size() - 1) {
-      AERROR << "Initial and end points shouldn't be reanchored";
+    if (index == 0 || index == path_points->size() - 1) {
+      AERROR << "Initial and end points collision avoid condition failed.";
       return false;
     }
+    if (index == 1 || index == path_points->size() - 2) {
+      AERROR << "second to last point or second point pos reanchored. Heading "
+                "discontinuity might "
+                "happen";
+    }
   }
+
   // TODO(Jinyun): move to confs
-  const size_t reanchoring_trails_num = 50;
-  const double stddev = 0.25;
+  const size_t reanchoring_trails_num = 200;
+  const double pos_stddev = 0.25;
+  const double length_stddev = 0.5;
   std::random_device rd;
   std::default_random_engine gen = std::default_random_engine(rd());
-  std::normal_distribution<> dis{0, stddev};
+  std::normal_distribution<> pos_dis{0, pos_stddev};
+  std::normal_distribution<> length_dis{0, length_stddev};
 
   for (const auto index : colliding_point_index) {
     bool reanchoring_success = false;
@@ -289,30 +296,48 @@ bool IterativeAnchoringSmoother::ReAnchoring(
       }
       if (is_colliding) {
         // Adjust the point by randomly move around the original points
-        double rand_dev =
-            common::math::Clamp(dis(gen), 2.0 * stddev, -2.0 * stddev);
-        path_points->at(index).set_x(path_points->at(index).x() + rand_dev);
-        path_points->at(index).set_y(path_points->at(index).y() + rand_dev);
+        if (index == 1) {
+          const double adjust_theta = path_points->at(index).theta();
+          const double delta_s = std::abs(path_points->at(index).s() -
+                                          path_points->at(index - 1).s());
+          double rand_dev = common::math::Clamp(std::abs(length_dis(gen)),
+                                                2.0 * length_stddev, 0.0);
+          double adjusted_delta_s = delta_s * (1.0 + rand_dev);
+          path_points->at(index).set_x(path_points->at(index - 1).x() +
+                                       adjusted_delta_s *
+                                           std::cos(adjust_theta));
+          path_points->at(index).set_y(path_points->at(index - 1).y() +
+                                       adjusted_delta_s *
+                                           std::sin(adjust_theta));
+        } else if (index == path_points->size() - 2) {
+          const double adjust_theta =
+              NormalizeAngle(path_points->at(index).theta() + M_PI);
+          const double delta_s = std::abs(path_points->at(index + 1).s() -
+                                          path_points->at(index).s());
+          double rand_dev = common::math::Clamp(std::abs(length_dis(gen)),
+                                                2.0 * length_stddev, 0.0);
+          double adjusted_delta_s = delta_s * (1.0 + rand_dev);
+          path_points->at(index).set_x(path_points->at(index + 1).x() +
+                                       adjusted_delta_s *
+                                           std::cos(adjust_theta));
+          path_points->at(index).set_y(path_points->at(index + 1).y() +
+                                       adjusted_delta_s *
+                                           std::sin(adjust_theta));
+        } else {
+          double rand_dev_x = common::math::Clamp(
+              pos_dis(gen), 2.0 * pos_stddev, -2.0 * pos_stddev);
+          double rand_dev_y = common::math::Clamp(
+              pos_dis(gen), 2.0 * pos_stddev, -2.0 * pos_stddev);
+          path_points->at(index).set_x(path_points->at(index).x() + rand_dev_x);
+          path_points->at(index).set_y(path_points->at(index).y() + rand_dev_y);
+        }
 
         // Adjust heading accordingly
         // TODO(Jinyun): refactor into math module
-        // Get finite difference approximated dx and dy for heading calculation
-        double dx = 0.0;
-        double dy = 0.0;
-        if (index == 0) {
-          dx = path_points->at(index + 1).x() - path_points->at(index).x();
-          dy = path_points->at(index + 1).y() - path_points->at(index).y();
-        } else if (index == path_points->size() - 1) {
-          dx = path_points->at(index).x() - path_points->at(index - 1).x();
-          dy = path_points->at(index).y() - path_points->at(index - 1).y();
-        } else {
-          dx = 0.5 * (path_points->at(index + 1).x() -
-                      path_points->at(index - 1).x());
-          dy = 0.5 * (path_points->at(index + 1).y() -
-                      path_points->at(index - 1).y());
+        // current point heading adjustment
+        for (size_t i = index - 1; i < index + 2; ++i) {
+          path_points->at(i).set_theta(CalcHeadings(*path_points, i));
         }
-        const double heading = std::atan2(dy, dx);
-        path_points->at(index).set_theta(heading);
       } else {
         reanchoring_success = true;
         break;
@@ -740,5 +765,22 @@ bool IterativeAnchoringSmoother::IsValidPolynomialProfile(
   return true;
 }
 
+double IterativeAnchoringSmoother::CalcHeadings(
+    const DiscretizedPath& path_points, const size_t index) {
+  CHECK_GT(path_points.size(), 2);
+  double dx = 0.0;
+  double dy = 0.0;
+  if (index == 0) {
+    dx = path_points[index + 1].x() - path_points[index].x();
+    dy = path_points[index + 1].y() - path_points[index].y();
+  } else if (index == path_points.size() - 1) {
+    dx = path_points[index].x() - path_points[index - 1].x();
+    dy = path_points[index].y() - path_points[index - 1].y();
+  } else {
+    dx = 0.5 * (path_points[index + 1].x() - path_points[index - 1].x());
+    dy = 0.5 * (path_points[index + 1].y() - path_points[index - 1].y());
+  }
+  return std::atan2(dy, dx);
+}
 }  // namespace planning
 }  // namespace apollo

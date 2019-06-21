@@ -89,6 +89,9 @@ class IterativeAnchoringSmoother {
 
   bool IsValidPolynomialProfile(const QuinticPolynomialCurve1d& curve);
 
+  // @brief: a helper function on discrete point heading adjustment
+  double CalcHeadings(const DiscretizedPath& path_points, const size_t index);
+
  private:
   // vehicle_param
   double ego_length_ = 0.0;
