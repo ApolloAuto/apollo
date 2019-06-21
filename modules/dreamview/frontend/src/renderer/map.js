@@ -44,7 +44,7 @@ export const stopSignScales = {
 };
 
 const EPSILON = 1e-9;
-const Z_OFFSET = 0.5;
+const Z_OFFSET_FACTOR = 1;
 
 export default class Map {
     constructor() {
@@ -87,31 +87,31 @@ export default class Map {
         switch (laneType) {
             case "DOTTED_YELLOW":
                 return drawDashedLineFromPoints(
-                    points, colorMapping.YELLOW, 4, 3, 3, Z_OFFSET, 1, false);
+                    points, colorMapping.YELLOW, 4, 3, 3, Z_OFFSET_FACTOR, 1, false);
             case "DOTTED_WHITE":
                 return drawDashedLineFromPoints(
-                    points, colorMapping.WHITE, 2, 0.5, 0.25, Z_OFFSET, 0.4, false);
+                    points, colorMapping.WHITE, 2, 0.5, 0.25, Z_OFFSET_FACTOR, 0.4, false);
             case "SOLID_YELLOW":
                 return drawSegmentsFromPoints(
-                    points, colorMapping.YELLOW, 3, Z_OFFSET, false);
+                    points, colorMapping.YELLOW, 3, Z_OFFSET_FACTOR, false);
             case "SOLID_WHITE":
                 return drawSegmentsFromPoints(
-                    points, colorMapping.WHITE, 3, Z_OFFSET, false);
+                    points, colorMapping.WHITE, 3, Z_OFFSET_FACTOR, false);
             case "DOUBLE_YELLOW":
                 const left = drawSegmentsFromPoints(
-                    points, colorMapping.YELLOW, 2, Z_OFFSET, false);
+                    points, colorMapping.YELLOW, 2, Z_OFFSET_FACTOR, false);
                 const right = drawSegmentsFromPoints(
                     points.map(point =>
                         new THREE.Vector3(point.x + 0.3, point.y + 0.3, point.z)),
-                    colorMapping.YELLOW, 3, Z_OFFSET, false);
+                    colorMapping.YELLOW, 3, Z_OFFSET_FACTOR, false);
                 left.add(right);
                 return left;
             case "CURB":
                 return drawSegmentsFromPoints(
-                    points, colorMapping.CORAL, 3, Z_OFFSET, false);
+                    points, colorMapping.CORAL, 3, Z_OFFSET_FACTOR, false);
             default:
                 return drawSegmentsFromPoints(
-                    points, colorMapping.DEFAULT, 3, Z_OFFSET, false);
+                    points, colorMapping.DEFAULT, 3, Z_OFFSET_FACTOR, false);
         }
     }
 
@@ -122,7 +122,7 @@ export default class Map {
         centralLine.forEach(segment => {
             const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
             const centerLine =
-                drawSegmentsFromPoints(points, colorMapping.GREEN, 1, Z_OFFSET, false);
+                drawSegmentsFromPoints(points, colorMapping.GREEN, 1, Z_OFFSET_FACTOR, false);
             centerLine.name = "CentralLine-" + lane.id.id;
             scene.add(centerLine);
             drewObjects.push(centerLine);
@@ -206,7 +206,7 @@ export default class Map {
         border.push(border[0]);
 
         const mesh = drawSegmentsFromPoints(
-            border, color, 2, Z_OFFSET, true, false, 1.0);
+            border, color, 2, Z_OFFSET_FACTOR, true, false, 1.0);
         scene.add(mesh);
         drewObjects.push(mesh);
 
@@ -253,7 +253,7 @@ export default class Map {
         drewObjects.push(zoneShape);
 
         const mesh = drawSegmentsFromPoints(
-            border, color, 2, Z_OFFSET, true, false, 1.0);
+            border, color, 2, Z_OFFSET_FACTOR, true, false, 1.0);
         scene.add(mesh);
         drewObjects.push(mesh);
 
@@ -265,7 +265,7 @@ export default class Map {
         lines.forEach(line => {
             line.segment.forEach(segment => {
                 const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
-                const mesh = drawSegmentsFromPoints(points, color, 5, Z_OFFSET + 1, false);
+                const mesh = drawSegmentsFromPoints(points, color, 5, Z_OFFSET_FACTOR + 1, false);
                 scene.add(mesh);
                 drewObjects.push(mesh);
             });
@@ -564,11 +564,7 @@ export default class Map {
 
     shouldDrawTextOfThisElementKind(kind) {
         // showMapLaneId option controls both laneId and parkingSpaceId
-        if (STORE.options['showMapLaneId']
-            && ['parkingSpace', 'lane'].includes(kind)) {
-                return true;
-            }
-        return false;
+        return STORE.options['showMapLaneId'] && ['parkingSpace', 'lane'].includes(kind);
     }
 
     updateText() {
