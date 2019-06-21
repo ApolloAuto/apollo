@@ -93,10 +93,8 @@ bool IterativeAnchoringSmoother::Smooth(
     warm_start_path.push_back(std::move(path_point));
     last_path_point = cur_path_point;
   }
-
   // TODO(Jinyun): move to confs
   const double interpolated_delta_s = 0.1;
-
   std::vector<std::pair<double, double>> interpolated_warm_start_point2ds;
   double path_length = warm_start_path.Length();
   double delta_s = path_length / std::ceil(path_length / interpolated_delta_s);
@@ -105,8 +103,15 @@ bool IterativeAnchoringSmoother::Smooth(
     const auto point2d = warm_start_path.Evaluate(s);
     interpolated_warm_start_point2ds.emplace_back(point2d.x(), point2d.y());
   }
+  if (interpolated_warm_start_point2ds.size() < 4) {
+    AERROR << "interpolated_warm_start_path smaller than 4";
+    return false;
+  }
 
-  // Reset path profile
+  // Adjust heading to ensure heading continuity
+  AdjustStartEndHeading(xWS, &interpolated_warm_start_point2ds);
+
+  // Reset path profile by discrete point heading and curvature estimation
   DiscretizedPath interpolated_warm_start_path;
   if (!SetPathProfile(interpolated_warm_start_point2ds,
                       &interpolated_warm_start_path)) {
@@ -114,30 +119,21 @@ bool IterativeAnchoringSmoother::Smooth(
     return false;
   }
 
-  const size_t interpolated_path_size = interpolated_warm_start_path.size();
-  if (interpolated_path_size < 4) {
-    AERROR << "interpolated_warm_start_path smaller than 4";
-    return false;
-  }
-
-  // TODO(Jinyun): move to confs
+  // Generate feasible bounds for each path point
   std::vector<double> bounds;
   if (!GenerateInitialBounds(interpolated_warm_start_path, &bounds)) {
     AERROR << "Generate initial bounds failed, path point to close to obstacle";
     return false;
   }
 
-  AdjustStartEndHeading(xWS, &interpolated_warm_start_path, &bounds);
-
   // Check initial path collision avoidance, if it fails, smoother assumption
-  // fails
+  // fails. Try reanchoring
   std::vector<size_t> colliding_point_index;
   if (!CheckCollisionAvoidance(interpolated_warm_start_path,
                                &colliding_point_index)) {
-    ADEBUG << "Interpolated warm start trajectory colliding with obstacle";
+    AERROR << "Interpolated warm start trajectory colliding with obstacle";
     if (!ReAnchoring(colliding_point_index, &interpolated_warm_start_path)) {
-      AERROR << "Fail to reanchor colliding interpolated warm start trajectory "
-                "in reasonable range";
+      AERROR << "Fail to reanchor colliding interpolated warm start trajectory";
       return false;
     }
   }
@@ -197,13 +193,12 @@ bool IterativeAnchoringSmoother::Smooth(
 }
 
 void IterativeAnchoringSmoother::AdjustStartEndHeading(
-    const Eigen::MatrixXd& xWS, DiscretizedPath* path,
-    std::vector<double>* bounds) {
+    const Eigen::MatrixXd& xWS,
+    std::vector<std::pair<double, double>>* const point2d) {
   // Sanity check
-  CHECK_NOTNULL(path);
-  CHECK_NOTNULL(bounds);
+  CHECK_NOTNULL(point2d);
   CHECK_GT(xWS.cols(), 1);
-  CHECK_GT(path->size(), 3);
+  CHECK_GT(point2d->size(), 3);
 
   // Set initial heading and bounds
   const double initial_heading = xWS(2, 0);
@@ -212,37 +207,33 @@ void IterativeAnchoringSmoother::AdjustStartEndHeading(
   // Adjust the point position to have heading by finite element difference of
   // the point and the other point equal to the given warm start initial or end
   // heading
-  const double first_to_second_s = std::abs(path->at(1).s() - path->at(0).s());
-  Vec2d first_point(path->at(0).x(), path->at(0).y());
+  const double first_to_second_dx = point2d->at(1).first - point2d->at(0).first;
+  const double first_to_second_dy =
+      point2d->at(1).second - point2d->at(0).second;
+  const double first_to_second_s =
+      std::sqrt(first_to_second_dx * first_to_second_dx +
+                first_to_second_dy * first_to_second_dy);
+  Vec2d first_point(point2d->at(0).first, point2d->at(0).second);
   Vec2d initial_vec(first_to_second_s, 0);
   initial_vec.SelfRotate(gear_ ? initial_heading
                                : NormalizeAngle(initial_heading + M_PI));
   initial_vec += first_point;
-  PathPoint second_path_point;
-  second_path_point.set_x(initial_vec.x());
-  second_path_point.set_y(initial_vec.y());
-  second_path_point.set_theta(path->at(1).theta());
-  second_path_point.set_s(path->at(1).s());
-  path->at(1) = std::move(second_path_point);
+  point2d->at(1) = std::make_pair(initial_vec.x(), initial_vec.y());
 
-  const size_t path_size = path->size();
+  const size_t path_size = point2d->size();
+  const double second_last_to_last_dx =
+      point2d->at(path_size - 1).first - point2d->at(path_size - 2).first;
+  const double second_last_to_last_dy =
+      point2d->at(path_size - 1).second - point2d->at(path_size - 2).second;
   const double second_last_to_last_s =
-      std::abs(path->at(path_size - 1).s() - path->at(path_size - 2).s());
-  Vec2d last_point(path->at(path_size - 1).x(), path->at(path_size - 1).y());
+      std::sqrt(second_last_to_last_dx * second_last_to_last_dx +
+                second_last_to_last_dy * second_last_to_last_dy);
+  Vec2d last_point(point2d->at(path_size - 1).first,
+                   point2d->at(path_size - 1).second);
   Vec2d end_vec(second_last_to_last_s, 0);
   end_vec.SelfRotate(gear_ ? NormalizeAngle(end_heading + M_PI) : end_heading);
   end_vec += last_point;
-  PathPoint second_to_last_path_point;
-  second_to_last_path_point.set_x(end_vec.x());
-  second_to_last_path_point.set_y(end_vec.y());
-  second_to_last_path_point.set_theta(path->at(path_size - 2).theta());
-  second_to_last_path_point.set_s(path->at(path_size - 2).s());
-  path->at(path_size - 2) = std::move(second_to_last_path_point);
-
-  bounds->at(0) = 0.0;
-  bounds->at(1) = 0.0;
-  bounds->at(path_size - 1) = 0.0;
-  bounds->at(path_size - 2) = 0.0;
+  point2d->at(path_size - 2) = std::make_pair(end_vec.x(), end_vec.y());
 }
 
 bool IterativeAnchoringSmoother::ReAnchoring(
@@ -253,9 +244,18 @@ bool IterativeAnchoringSmoother::ReAnchoring(
     ADEBUG << "no point needs to be re-anchored";
     return true;
   }
+
   CHECK_GT(path_points->size(),
            *(std::max_element(colliding_point_index.begin(),
                               colliding_point_index.end())));
+
+  for (const auto index : colliding_point_index) {
+    if (index == 0 || index == 1 || index == path_points->size() - 2 ||
+        index == path_points->size() - 1) {
+      AERROR << "Initial and end points shouldn't be reanchored";
+      return false;
+    }
+  }
   // TODO(Jinyun): move to confs
   const size_t reanchoring_trails_num = 50;
   const double stddev = 0.25;
@@ -295,8 +295,7 @@ bool IterativeAnchoringSmoother::ReAnchoring(
         path_points->at(index).set_y(path_points->at(index).y() + rand_dev);
 
         // Adjust heading accordingly
-        // TODO(Jinyun): change heading on adjacent points and refactor into
-        // math module
+        // TODO(Jinyun): refactor into math module
         // Get finite difference approximated dx and dy for heading calculation
         double dx = 0.0;
         double dy = 0.0;
@@ -332,6 +331,8 @@ bool IterativeAnchoringSmoother::ReAnchoring(
 bool IterativeAnchoringSmoother::GenerateInitialBounds(
     const DiscretizedPath& path_points, std::vector<double>* initial_bounds) {
   CHECK_NOTNULL(initial_bounds);
+  initial_bounds->clear();
+
   // TODO(Jinyun): Move to confs
   const bool estimate_bound = false;
   const double default_bound = 2.0;
@@ -340,6 +341,10 @@ bool IterativeAnchoringSmoother::GenerateInitialBounds(
 
   if (!estimate_bound) {
     std::vector<double> default_bounds(path_points.size(), default_bound);
+    default_bounds[0] = 0.0;
+    default_bounds[1] = 0.0;
+    default_bounds[path_points.size() - 2] = 0.0;
+    default_bounds[path_points.size() - 1] = 0.0;
     *initial_bounds = std::move(default_bounds);
     return true;
   }
@@ -360,6 +365,10 @@ bool IterativeAnchoringSmoother::GenerateInitialBounds(
     }
     initial_bounds->push_back(min_bound);
   }
+  initial_bounds->at(0) = 0.0;
+  initial_bounds->at(1) = 0.0;
+  initial_bounds->at(path_points.size() - 2) = 0.0;
+  initial_bounds->at(path_points.size() - 1) = 0.0;
   return true;
 }
 
@@ -375,17 +384,23 @@ bool IterativeAnchoringSmoother::SmoothPath(
 
   // TODO(Jinyun): move to confs
   FemPosDeviationSmootherConfig config;
-  config.set_weight_fem_pos_deviation(1e7);
-  config.set_weight_path_length(1.0);
-  config.set_weight_ref_deviation(1e3);
+  config.set_weight_fem_pos_deviation(1e8);
+  config.set_weight_path_length(10.0);
+  config.set_weight_ref_deviation(1.0);
   config.set_apply_curvature_constraint(false);
-  config.set_weight_curvature_constraint_slack_var(1e8);
-  config.set_curvature_constraint(0.2);
   config.set_max_iter(500);
   config.set_time_limit(0.0);
   config.set_verbose(false);
   config.set_scaled_termination(true);
   config.set_warm_start(true);
+
+  // TODO(Jinyun): param for enable curvature constraints, need further tunning
+  // config.set_weight_fem_pos_deviation(1e7);
+  // config.set_weight_path_length(1.0);
+  // config.set_weight_ref_deviation(1e3);
+  // config.set_apply_curvature_constraint(true);
+  // config.set_weight_curvature_constraint_slack_var(1e8);
+  // config.set_curvature_constraint(0.2);
 
   FemPosDeviationSmoother fem_pos_smoother(config);
 
