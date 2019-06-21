@@ -121,10 +121,9 @@ bool IterativeAnchoringSmoother::Smooth(
 
   // Check initial path collision avoidance, if it fails, smoother assumption
   // fails
-  // TODO(Jinyun): Fix initial interpolating collision
   std::vector<size_t> colliding_point_index;
-  if (!CheckInputValidity(interpolated_warm_start_path,
-                          &colliding_point_index)) {
+  if (!CheckCollisionAvoidance(interpolated_warm_start_path,
+                               &colliding_point_index)) {
     ADEBUG << "Interpolated warm start trajectory colliding with obstacle";
     if (!ReAnchoring(colliding_point_index, &interpolated_warm_start_path)) {
       AERROR << "Fail to reanchor colliding interpolated warm start trajectory "
@@ -234,40 +233,6 @@ void IterativeAnchoringSmoother::AdjustStartEndHeading(
   bounds->at(1) = 0.0;
   bounds->at(path_size - 1) = 0.0;
   bounds->at(path_size - 2) = 0.0;
-}
-
-bool IterativeAnchoringSmoother::CheckInputValidity(
-    const DiscretizedPath& path_points,
-    std::vector<size_t>* colliding_point_index) {
-  CHECK_NOTNULL(colliding_point_index);
-  colliding_point_index->clear();
-
-  const size_t path_points_size = path_points.size();
-  for (size_t i = 0; i < path_points_size; ++i) {
-    const double heading = path_points[i].theta();
-    Box2d ego_box(
-        {path_points[i].x() + center_shift_distance_ * std::cos(heading),
-         path_points[i].y() + center_shift_distance_ * std::sin(heading)},
-        heading, ego_length_, ego_width_);
-
-    bool is_colliding = false;
-    for (const auto& obstacle_linesegments : obstacles_linesegments_vec_) {
-      for (const LineSegment2d& linesegment : obstacle_linesegments) {
-        if (ego_box.HasOverlap(linesegment)) {
-          colliding_point_index->push_back(i);
-          is_colliding = true;
-          break;
-        }
-      }
-      if (is_colliding) {
-        break;
-      }
-    }
-  }
-  if (!colliding_point_index->empty()) {
-    return false;
-  }
-  return true;
 }
 
 bool IterativeAnchoringSmoother::ReAnchoring(
@@ -383,7 +348,7 @@ bool IterativeAnchoringSmoother::SmoothPath(
   FemPosDeviationSmoother fem_pos_smoother(config);
 
   // TODO(Jinyun): move to confs
-  const size_t max_iteration_num = 500;
+  const size_t max_iteration_num = 200;
 
   bool is_collision_free = false;
   std::vector<size_t> colliding_point_index;
@@ -453,7 +418,7 @@ bool IterativeAnchoringSmoother::CheckCollisionAvoidance(
       for (const LineSegment2d& linesegment : obstacle_linesegments) {
         if (ego_box.HasOverlap(linesegment)) {
           colliding_point_index->push_back(i);
-          ADEBUG << "collsion happened with LineSegment "
+          ADEBUG << "point at " << i << "collied with LineSegment "
                  << linesegment.DebugString();
           is_colliding = true;
           break;
