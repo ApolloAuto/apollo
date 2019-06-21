@@ -63,7 +63,7 @@ int ChannelVerify::incremental_check(
   AINFO << "all records path:";
   for (size_t i = 0; i < records_path.size(); ++i) {
     AINFO << "[" << i << "]: " << records_path[i];
-    if (is_record_file(records_path) && !is_record_checked(records_path[i])) {
+    if (is_record_file(records_path[i]) && !is_record_checked(records_path[i])) {
       not_check_records_path.push_back(records_path[i]);
     }
   }
@@ -156,10 +156,10 @@ std::shared_ptr<CyberRecordInfo> ChannelVerify::get_record_info(
       static_cast<double>((sp_viewer->end_time() - sp_viewer->begin_time())) /
       1e9;
 
-  using ChannelInfoMap =
-      std::unordered_map<std::string, apollo::cyber::proto::ChannelCache>;
-  ChannelInfoMap channel_info = sp_reader->channel_info();
-  for (ChannelInfoMap::iterator it = channel_info.begin();
+  // using ChannelInfoMap =
+  //     std::unordered_map<std::string, apollo::cyber::proto::ChannelCache>;
+  auto channel_info = sp_reader->channel_info();
+  for (auto it = channel_info.begin();
        it != channel_info.end(); ++it) {
     CyberRecordChannel channel;
     channel.channel_name = it->second.name();
@@ -187,7 +187,8 @@ OneRecordChannelCheckResult ChannelVerify::check_record_channels(
     std::string& channel_in_list = topic_list[i].first;
     double channel_expected_rate = topic_list[i].second;
     bool channel_in_list_found = false;
-    for (size_t j = 0; j < channels.size(); ++j) {
+    size_t j = 0;
+    for (j = 0; j < channels.size(); ++j) {
       std::string& channel_in_record = channels[j].channel_name;
       if (channel_in_record == channel_in_list) {
         channel_in_list_found = true;

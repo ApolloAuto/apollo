@@ -62,11 +62,10 @@ class Alignment {
 
   virtual bool is_good_pose(const std::vector<FramePose>& poses,
                             int pose_index) {
-    if (poses.size() < 0 || pose_index <= 0 ||
-        pose_index >= static_cast<int>(poses.size())) {
+    if (pose_index <= 0 || pose_index >= static_cast<int>(poses.size())) {
       AINFO << "params error. poses size:" << poses.size()
             << ",pose_index:" << pose_index;
-      return true;
+      return false;
     }
 
     unsigned int position_type = poses[pose_index].position_type;
