@@ -261,7 +261,12 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
         CHECK_NOTNULL(evaluator);
         evaluator->Evaluate(obstacle);
       } else if (obstacle->IsOnLane()) {
-        evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
+        if (obstacle->latest_feature().priority().priority() ==
+            ObstaclePriority::CAUTION) {
+          evaluator = GetEvaluator(vehicle_on_lane_caution_evaluator_);
+        } else {
+          evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
+        }
         CHECK_NOTNULL(evaluator);
         if (evaluator->GetName() == "LANE_SCANNING_EVALUATOR") {
           evaluator->Evaluate(obstacle, dynamic_env);
