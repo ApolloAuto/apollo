@@ -267,7 +267,9 @@ bool IterativeAnchoringSmoother::ReAnchoring(
     bool reanchoring_success = false;
     for (size_t i = 0; i < reanchoring_trails_num; ++i) {
       // Get ego box for collision check on collision point index
-      const double heading = path_points->at(index).theta();
+      const double heading =
+          gear_ ? path_points->at(index).theta()
+                : NormalizeAngle(path_points->at(index).theta() + M_PI);
       Box2d ego_box({path_points->at(index).x() +
                          center_shift_distance_ * std::cos(heading),
                      path_points->at(index).y() +
@@ -291,6 +293,27 @@ bool IterativeAnchoringSmoother::ReAnchoring(
             common::math::Clamp(dis(gen), 2.0 * stddev, -2.0 * stddev);
         path_points->at(index).set_x(path_points->at(index).x() + rand_dev);
         path_points->at(index).set_y(path_points->at(index).y() + rand_dev);
+
+        // Adjust heading accordingly
+        // TODO(Jinyun): change heading on adjacent points and refactor into
+        // math module
+        // Get finite difference approximated dx and dy for heading calculation
+        double dx = 0.0;
+        double dy = 0.0;
+        if (index == 0) {
+          dx = path_points->at(index + 1).x() - path_points->at(index).x();
+          dy = path_points->at(index + 1).y() - path_points->at(index).y();
+        } else if (index == path_points->size() - 1) {
+          dx = path_points->at(index).x() - path_points->at(index - 1).x();
+          dy = path_points->at(index).y() - path_points->at(index - 1).y();
+        } else {
+          dx = 0.5 * (path_points->at(index + 1).x() -
+                      path_points->at(index - 1).x());
+          dy = 0.5 * (path_points->at(index + 1).y() -
+                      path_points->at(index - 1).y());
+        }
+        const double heading = std::atan2(dy, dx);
+        path_points->at(index).set_theta(heading);
       } else {
         reanchoring_success = true;
         break;
