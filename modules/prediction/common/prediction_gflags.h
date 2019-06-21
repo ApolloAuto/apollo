@@ -46,6 +46,7 @@ DECLARE_int32(road_graph_max_search_horizon);
 DECLARE_double(junction_distance_threshold);
 DECLARE_bool(enable_all_junction);
 DECLARE_double(caution_search_distance_ahead);
+DECLARE_double(caution_search_distance_backward);
 DECLARE_double(caution_search_distance_backward_for_merge);
 DECLARE_double(caution_search_distance_backward_for_overlap);
 DECLARE_double(caution_pedestrian_approach_time);
