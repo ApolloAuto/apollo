@@ -351,6 +351,7 @@ void ObstaclesContainer::BuildLaneGraph() {
         PredictionConstants::kDumpDataForLearning) {
       ADEBUG << "Building Lane Graph.";
       obstacle_ptr->BuildLaneGraph();
+      obstacle_ptr->BuildLaneGraphFromLeftToRight();
     } else {
       ADEBUG << "Building ordered Lane Graph.";
       obstacle_ptr->BuildLaneGraphFromLeftToRight();
