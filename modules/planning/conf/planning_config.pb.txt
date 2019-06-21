@@ -226,7 +226,7 @@ default_task_config: {
     heading_offset_to_midpoint: 0.79
     lateral_offset_to_midpoint: 0.5
     longitudinal_offset_to_midpoint: 0.2
-    vehicle_box_iou_threshold_to_midpoint: 0.9
+    vehicle_box_iou_threshold_to_midpoint: 0.75
   }
 }
 default_task_config: {
