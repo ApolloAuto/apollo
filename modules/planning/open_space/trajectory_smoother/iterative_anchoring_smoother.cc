@@ -257,7 +257,7 @@ bool IterativeAnchoringSmoother::ReAnchoring(
            *(std::max_element(colliding_point_index.begin(),
                               colliding_point_index.end())));
   // TODO(Jinyun): move to confs
-  const size_t reanchoring_trails_num = 20;
+  const size_t reanchoring_trails_num = 50;
   const double stddev = 0.25;
   std::random_device rd;
   std::default_random_engine gen = std::default_random_engine(rd());
