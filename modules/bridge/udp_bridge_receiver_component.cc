@@ -46,6 +46,7 @@ bool UDPBridgeReceiverComponent<T>::Init() {
   bind_port_ = udp_bridge_remote.bind_port();
   proto_name_ = udp_bridge_remote.proto_name();
   topic_name_ = udp_bridge_remote.topic_name();
+  enable_timeout_ = udp_bridge_remote.enable_timeout();
   AINFO << "UDP Bridge remote port is: " << bind_port_;
   AINFO << "UDP Bridge for Proto is: " << proto_name_;
   writer_ = node_->CreateWriter<T>(topic_name_.c_str());
@@ -115,6 +116,9 @@ bool UDPBridgeReceiverComponent<T>::IsProtoExist(const BridgeHeader &header) {
 
 template <typename T>
 bool UDPBridgeReceiverComponent<T>::IsTimeout(double time_stamp) {
+  if (enable_timeout_ == false) {
+    return false;
+  }
   double cur_time = apollo::common::time::Clock::NowInSeconds();
   if (cur_time < time_stamp) {
     return true;

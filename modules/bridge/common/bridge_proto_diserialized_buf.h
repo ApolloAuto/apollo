@@ -26,6 +26,7 @@
 namespace apollo {
 namespace bridge {
 
+constexpr uint32_t INT_BITS = static_cast<uint32_t>(sizeof(uint32_t) * 8);
 template <typename T>
 class BridgeProtoDiserializedBuf {
  public:
@@ -34,7 +35,7 @@ class BridgeProtoDiserializedBuf {
 
   bool Diserialized(std::shared_ptr<T> proto);
   bool IsReadyDiserialize() const { return is_ready_diser; }
-  void UpdateStatus(size_t frame_index);
+  void UpdateStatus(uint32_t frame_index);
   bool IsTheProto(const BridgeHeader &header);
 
   bool Initialize(const BridgeHeader &header);
@@ -44,7 +45,7 @@ class BridgeProtoDiserializedBuf {
   size_t total_frames_ = 0;
   size_t total_size_ = 0;
   std::string proto_name_ = "";
-  uint32_t status = 0;
+  std::vector<uint32_t> status_list_;
   char *proto_buf_ = nullptr;
   bool is_ready_diser = false;
   uint32_t sequence_num_ = 0;
@@ -65,14 +66,31 @@ bool BridgeProtoDiserializedBuf<T>::Diserialized(std::shared_ptr<T> proto) {
 }
 
 template <typename T>
-void BridgeProtoDiserializedBuf<T>::UpdateStatus(size_t frame_index) {
-  status |= (1 << frame_index);
-  is_ready_diser = false;
-  AINFO << "status is " << status;
-  AINFO << "((1 << total_frames_) - 1)) = " << ((1 << total_frames_) - 1);
-  if (status == ((1 << total_frames_) - 1)) {
-    AINFO << "diserialized is ready";
-    is_ready_diser = true;
+void BridgeProtoDiserializedBuf<T>::UpdateStatus(uint32_t frame_index) {
+  size_t status_size = status_list_.size();
+  if (status_size == 0) {
+    is_ready_diser = false;
+    return;
+  }
+
+  uint32_t status_index = frame_index / INT_BITS;
+  status_list_[status_index] |= (1 << (frame_index % INT_BITS));
+  for (size_t i = 0; i< status_size; i++) {
+    if (i == status_size - 1) {
+      if (status_list_[i] == ((1 << total_frames_ % INT_BITS) - 1)) {
+        AINFO << "diserialized is ready";
+        is_ready_diser = true;
+      } else {
+        is_ready_diser = false;
+        break;
+      }
+    } else {
+      if (status_list_[i] != 0xffffffff) {
+        is_ready_diser = false;
+        break;
+      }
+      is_ready_diser = true;
+    }
   }
 }
 
@@ -89,6 +107,17 @@ template <typename T>
 bool BridgeProtoDiserializedBuf<T>::Initialize(const BridgeHeader &header) {
   total_size_ = header.GetMsgSize();
   total_frames_ = header.GetTotalFrames();
+  if (total_frames_ == 0) {
+    return false;
+  }
+  int status_size = static_cast<int>(total_frames_ / INT_BITS +
+    ((total_frames_ % INT_BITS) ? 1: 0));
+  if (status_list_.size() == 0) {
+    for (int i = 0; i< status_size; i++) {
+      status_list_.push_back(0);
+    }
+  }
+
   if (!proto_buf_) {
     proto_buf_ = new char[total_size_];
   }
