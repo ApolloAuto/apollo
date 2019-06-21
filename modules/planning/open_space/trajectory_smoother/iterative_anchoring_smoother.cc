@@ -94,14 +94,24 @@ bool IterativeAnchoringSmoother::Smooth(
     last_path_point = cur_path_point;
   }
 
-  DiscretizedPath interpolated_warm_start_path;
   // TODO(Jinyun): move to confs
   const double interpolated_delta_s = 0.1;
+
+  std::vector<std::pair<double, double>> interpolated_warm_start_point2ds;
   double path_length = warm_start_path.Length();
   double delta_s = path_length / std::ceil(path_length / interpolated_delta_s);
   path_length += delta_s * 1.0e-6;
   for (double s = 0; s < path_length; s += delta_s) {
-    interpolated_warm_start_path.push_back(warm_start_path.Evaluate(s));
+    const auto point2d = warm_start_path.Evaluate(s);
+    interpolated_warm_start_point2ds.emplace_back(point2d.x(), point2d.y());
+  }
+
+  // Reset path profile
+  DiscretizedPath interpolated_warm_start_path;
+  if (!SetPathProfile(interpolated_warm_start_point2ds,
+                      &interpolated_warm_start_path)) {
+    AERROR << "Set path profile fails";
+    return false;
   }
 
   const size_t interpolated_path_size = interpolated_warm_start_path.size();
@@ -472,6 +482,7 @@ bool IterativeAnchoringSmoother::SetPathProfile(
     const std::vector<std::pair<double, double>>& point2d,
     DiscretizedPath* raw_path_points) {
   CHECK_NOTNULL(raw_path_points);
+  raw_path_points->clear();
   // Compute path profile
   std::vector<double> headings;
   std::vector<double> kappas;
@@ -488,7 +499,6 @@ bool IterativeAnchoringSmoother::SetPathProfile(
 
   // Load into path point
   size_t points_size = point2d.size();
-  raw_path_points->clear();
   for (size_t i = 0; i < points_size; ++i) {
     PathPoint path_point;
     path_point.set_x(point2d[i].first);
