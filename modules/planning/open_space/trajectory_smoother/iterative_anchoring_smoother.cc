@@ -300,9 +300,18 @@ bool IterativeAnchoringSmoother::GenerateInitialBounds(
     const DiscretizedPath& path_points, std::vector<double>* initial_bounds) {
   CHECK_NOTNULL(initial_bounds);
   // TODO(Jinyun): Move to confs
+  const bool estimate_bound = false;
+  const double default_bound = 2.0;
   const double vehicle_shortest_dimension = 1.04;
   const double kEpislon = 1e-8;
 
+  if (!estimate_bound) {
+    std::vector<double> default_bounds(path_points.size(), default_bound);
+    *initial_bounds = std::move(default_bounds);
+    return true;
+  }
+
+  // TODO(Jinyun): refine obstacle formulation and speed it up
   for (const auto& path_point : path_points) {
     double min_bound = std::numeric_limits<double>::infinity();
     for (const auto& obstacle_linesegments : obstacles_linesegments_vec_) {
@@ -336,7 +345,7 @@ bool IterativeAnchoringSmoother::SmoothPath(
   config.set_weight_fem_pos_deviation(1e7);
   config.set_weight_path_length(1.0);
   config.set_weight_ref_deviation(1e3);
-  config.set_apply_curvature_constraint(true);
+  config.set_apply_curvature_constraint(false);
   config.set_weight_curvature_constraint_slack_var(1e8);
   config.set_curvature_constraint(0.2);
   config.set_max_iter(500);
@@ -503,7 +512,6 @@ bool IterativeAnchoringSmoother::CheckGear(const Eigen::MatrixXd& xWS) {
          M_PI_2;
 }
 
-// TODO(Jinyun): add monotonic and end constraints in PiecewiseJerkSpeedProblem
 bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
                                              const double init_v,
                                              const double path_length,
