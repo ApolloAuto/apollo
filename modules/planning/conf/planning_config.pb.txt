@@ -227,6 +227,7 @@ default_task_config: {
     lateral_offset_to_midpoint: 0.5
     longitudinal_offset_to_midpoint: 0.2
     vehicle_box_iou_threshold_to_midpoint: 0.75
+    linear_velocity_threshold_on_ego: 0.2
   }
 }
 default_task_config: {
