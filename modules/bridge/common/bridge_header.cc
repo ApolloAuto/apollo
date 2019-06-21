@@ -29,7 +29,7 @@ bool BridgeHeader::Serialize(char *buf, size_t size) {
   char *p_header_size = nullptr;
   cursor = SerializeHeaderFlag(cursor, size);
   p_header_size = cursor;
-  cursor += sizeof(size_t) + 1;
+  cursor += sizeof(hsize) + 1;
   for (int i = 0; i < Header_Tail; i++) {
     cursor = header_item[i]->SerializeItem(cursor, size);
   }
@@ -48,9 +48,9 @@ bool BridgeHeader::Diserialize(const char *buf, size_t buf_size) {
     HType type = *(reinterpret_cast<const HType *>(cursor));
     if (type > Header_Tail || type < 0) {
       cursor += sizeof(HType) + 1;
-      size_t size = *(reinterpret_cast<const size_t *>(cursor));
-      cursor += sizeof(size_t) + size + 2;
-      i -= sizeof(HType) + sizeof(size_t) + size + 3;
+      bsize size = *(reinterpret_cast<const bsize *>(cursor));
+      cursor += sizeof(bsize) + size + 2;
+      i -= sizeof(HType) + sizeof(bsize) + size + 3;
       continue;
     }
     size_t value_size = 0;
@@ -84,8 +84,8 @@ char *BridgeHeader::SerializeHeaderFlag(char *buf, size_t size) {
 }
 
 char *BridgeHeader::SerializeHeaderSize(char *buf, size_t size) {
-  size_t header_size = GetHeaderSize();
-  return SerializeBasicType<size_t, sizeof(size_t)>(&header_size, buf, size);
+  hsize header_size = GetHeaderSize();
+  return SerializeBasicType<hsize, sizeof(hsize)>(&header_size, buf, size);
 }
 
 }  // namespace bridge

@@ -21,6 +21,8 @@
 namespace apollo {
 namespace bridge {
 
+typedef uint32_t bsize;
+
 enum HType {
   Header_Ver,
   Msg_Name,
@@ -66,8 +68,8 @@ char *SerializeItemImp(const HeaderItem<t, T> &item, char *buf,
   res = res + sizeof(HType) + 1;
 
   memcpy(res, &item_size, sizeof(size_t));
-  res[sizeof(size_t)] = ':';
-  res = res + sizeof(size_t) + 1;
+  res[sizeof(bsize)] = ':';
+  res = res + sizeof(bsize) + 1;
 
   memcpy(res, item.GetValuePtr(), item.ValueSize());
   res[item.ValueSize()] = '\n';
@@ -92,11 +94,11 @@ const char *DiserializeItemImp(HeaderItem<t, T> *item, const char *buf,
   res += sizeof(HType) + 1;
   *diserialized_size += sizeof(HType) + 1;
 
-  char p_size[sizeof(size_t)] = {0};
-  memcpy(p_size, res, sizeof(size_t));
-  size_t size = *(reinterpret_cast<size_t *>(p_size));
-  res += sizeof(size_t) + 1;
-  *diserialized_size += sizeof(size_t) + 1;
+  char p_size[sizeof(bsize)] = {0};
+  memcpy(p_size, res, sizeof(bsize));
+  bsize size = *(reinterpret_cast<bsize *>(p_size));
+  res += sizeof(bsize) + 1;
+  *diserialized_size += sizeof(bsize) + 1;
 
   item->SetValue(res);
   res += size + 1;
