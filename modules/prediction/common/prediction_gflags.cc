@@ -62,6 +62,8 @@ DEFINE_bool(enable_all_junction, false,
             "If consider all junction with junction_mlp_model.");
 DEFINE_double(caution_search_distance_ahead, 50.0,
               "The distance ahead to search caution-level obstacles");
+DEFINE_double(caution_search_distance_backward, 50.0,
+              "The distance backward to search caution-level obstacles");
 DEFINE_double(caution_search_distance_backward_for_merge, 60.0,
               "The distance backward to search caution-lebel obstacles "
               "in the case of merging");

@@ -21,6 +21,7 @@
 #include "modules/planning/open_space/trajectory_smoother/iterative_anchoring_smoother.h"
 
 #include <algorithm>
+#include <limits>
 
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -93,14 +94,24 @@ bool IterativeAnchoringSmoother::Smooth(
     last_path_point = cur_path_point;
   }
 
-  DiscretizedPath interpolated_warm_start_path;
   // TODO(Jinyun): move to confs
   const double interpolated_delta_s = 0.1;
+
+  std::vector<std::pair<double, double>> interpolated_warm_start_point2ds;
   double path_length = warm_start_path.Length();
   double delta_s = path_length / std::ceil(path_length / interpolated_delta_s);
   path_length += delta_s * 1.0e-6;
   for (double s = 0; s < path_length; s += delta_s) {
-    interpolated_warm_start_path.push_back(warm_start_path.Evaluate(s));
+    const auto point2d = warm_start_path.Evaluate(s);
+    interpolated_warm_start_point2ds.emplace_back(point2d.x(), point2d.y());
+  }
+
+  // Reset path profile
+  DiscretizedPath interpolated_warm_start_path;
+  if (!SetPathProfile(interpolated_warm_start_point2ds,
+                      &interpolated_warm_start_path)) {
+    AERROR << "Set path profile fails";
+    return false;
   }
 
   const size_t interpolated_path_size = interpolated_warm_start_path.size();
@@ -110,17 +121,19 @@ bool IterativeAnchoringSmoother::Smooth(
   }
 
   // TODO(Jinyun): move to confs
-  const double default_bounds = 2.0;
-  std::vector<double> bounds(interpolated_path_size, default_bounds);
+  std::vector<double> bounds;
+  if (!GenerateInitialBounds(interpolated_warm_start_path, &bounds)) {
+    AERROR << "Generate initial bounds failed, path point to close to obstacle";
+    return false;
+  }
 
   AdjustStartEndHeading(xWS, &interpolated_warm_start_path, &bounds);
 
   // Check initial path collision avoidance, if it fails, smoother assumption
   // fails
-  // TODO(Jinyun): Fix initial interpolating collision
   std::vector<size_t> colliding_point_index;
-  if (!CheckInputValidity(interpolated_warm_start_path,
-                          &colliding_point_index)) {
+  if (!CheckCollisionAvoidance(interpolated_warm_start_path,
+                               &colliding_point_index)) {
     ADEBUG << "Interpolated warm start trajectory colliding with obstacle";
     if (!ReAnchoring(colliding_point_index, &interpolated_warm_start_path)) {
       AERROR << "Fail to reanchor colliding interpolated warm start trajectory "
@@ -232,40 +245,6 @@ void IterativeAnchoringSmoother::AdjustStartEndHeading(
   bounds->at(path_size - 2) = 0.0;
 }
 
-bool IterativeAnchoringSmoother::CheckInputValidity(
-    const DiscretizedPath& path_points,
-    std::vector<size_t>* colliding_point_index) {
-  CHECK_NOTNULL(colliding_point_index);
-  colliding_point_index->clear();
-
-  const size_t path_points_size = path_points.size();
-  for (size_t i = 0; i < path_points_size; ++i) {
-    const double heading = path_points[i].theta();
-    Box2d ego_box(
-        {path_points[i].x() + center_shift_distance_ * std::cos(heading),
-         path_points[i].y() + center_shift_distance_ * std::sin(heading)},
-        heading, ego_length_, ego_width_);
-
-    bool is_colliding = false;
-    for (const auto& obstacle_linesegments : obstacles_linesegments_vec_) {
-      for (const LineSegment2d& linesegment : obstacle_linesegments) {
-        if (ego_box.HasOverlap(linesegment)) {
-          colliding_point_index->push_back(i);
-          is_colliding = true;
-          break;
-        }
-      }
-      if (is_colliding) {
-        break;
-      }
-    }
-  }
-  if (!colliding_point_index->empty()) {
-    return false;
-  }
-  return true;
-}
-
 bool IterativeAnchoringSmoother::ReAnchoring(
     const std::vector<size_t>& colliding_point_index,
     DiscretizedPath* path_points) {
@@ -278,7 +257,7 @@ bool IterativeAnchoringSmoother::ReAnchoring(
            *(std::max_element(colliding_point_index.begin(),
                               colliding_point_index.end())));
   // TODO(Jinyun): move to confs
-  const size_t reanchoring_trails_num = 20;
+  const size_t reanchoring_trails_num = 50;
   const double stddev = 0.25;
   std::random_device rd;
   std::default_random_engine gen = std::default_random_engine(rd());
@@ -288,7 +267,9 @@ bool IterativeAnchoringSmoother::ReAnchoring(
     bool reanchoring_success = false;
     for (size_t i = 0; i < reanchoring_trails_num; ++i) {
       // Get ego box for collision check on collision point index
-      const double heading = path_points->at(index).theta();
+      const double heading =
+          gear_ ? path_points->at(index).theta()
+                : NormalizeAngle(path_points->at(index).theta() + M_PI);
       Box2d ego_box({path_points->at(index).x() +
                          center_shift_distance_ * std::cos(heading),
                      path_points->at(index).y() +
@@ -312,6 +293,27 @@ bool IterativeAnchoringSmoother::ReAnchoring(
             common::math::Clamp(dis(gen), 2.0 * stddev, -2.0 * stddev);
         path_points->at(index).set_x(path_points->at(index).x() + rand_dev);
         path_points->at(index).set_y(path_points->at(index).y() + rand_dev);
+
+        // Adjust heading accordingly
+        // TODO(Jinyun): change heading on adjacent points and refactor into
+        // math module
+        // Get finite difference approximated dx and dy for heading calculation
+        double dx = 0.0;
+        double dy = 0.0;
+        if (index == 0) {
+          dx = path_points->at(index + 1).x() - path_points->at(index).x();
+          dy = path_points->at(index + 1).y() - path_points->at(index).y();
+        } else if (index == path_points->size() - 1) {
+          dx = path_points->at(index).x() - path_points->at(index - 1).x();
+          dy = path_points->at(index).y() - path_points->at(index - 1).y();
+        } else {
+          dx = 0.5 * (path_points->at(index + 1).x() -
+                      path_points->at(index - 1).x());
+          dy = 0.5 * (path_points->at(index + 1).y() -
+                      path_points->at(index - 1).y());
+        }
+        const double heading = std::atan2(dy, dx);
+        path_points->at(index).set_theta(heading);
       } else {
         reanchoring_success = true;
         break;
@@ -323,6 +325,40 @@ bool IterativeAnchoringSmoother::ReAnchoring(
              << "can't be successfully reanchored";
       return false;
     }
+  }
+  return true;
+}
+
+bool IterativeAnchoringSmoother::GenerateInitialBounds(
+    const DiscretizedPath& path_points, std::vector<double>* initial_bounds) {
+  CHECK_NOTNULL(initial_bounds);
+  // TODO(Jinyun): Move to confs
+  const bool estimate_bound = false;
+  const double default_bound = 2.0;
+  const double vehicle_shortest_dimension = 1.04;
+  const double kEpislon = 1e-8;
+
+  if (!estimate_bound) {
+    std::vector<double> default_bounds(path_points.size(), default_bound);
+    *initial_bounds = std::move(default_bounds);
+    return true;
+  }
+
+  // TODO(Jinyun): refine obstacle formulation and speed it up
+  for (const auto& path_point : path_points) {
+    double min_bound = std::numeric_limits<double>::infinity();
+    for (const auto& obstacle_linesegments : obstacles_linesegments_vec_) {
+      for (const LineSegment2d& linesegment : obstacle_linesegments) {
+        min_bound =
+            std::min(min_bound,
+                     linesegment.DistanceTo({path_point.x(), path_point.y()}));
+      }
+    }
+    min_bound -= vehicle_shortest_dimension;
+    if (min_bound < kEpislon) {
+      return false;
+    }
+    initial_bounds->push_back(min_bound);
   }
   return true;
 }
@@ -339,11 +375,11 @@ bool IterativeAnchoringSmoother::SmoothPath(
 
   // TODO(Jinyun): move to confs
   FemPosDeviationSmootherConfig config;
-  config.set_weight_fem_pos_deviation(1e5);
+  config.set_weight_fem_pos_deviation(1e7);
   config.set_weight_path_length(1.0);
-  config.set_weight_ref_deviation(1.0);
-  config.set_apply_curvature_constraint(true);
-  config.set_weight_curvature_constraint_slack_var(1e6);
+  config.set_weight_ref_deviation(1e3);
+  config.set_apply_curvature_constraint(false);
+  config.set_weight_curvature_constraint_slack_var(1e8);
   config.set_curvature_constraint(0.2);
   config.set_max_iter(500);
   config.set_time_limit(0.0);
@@ -354,7 +390,7 @@ bool IterativeAnchoringSmoother::SmoothPath(
   FemPosDeviationSmoother fem_pos_smoother(config);
 
   // TODO(Jinyun): move to confs
-  const size_t max_iteration_num = 1000;
+  const size_t max_iteration_num = 200;
 
   bool is_collision_free = false;
   std::vector<size_t> colliding_point_index;
@@ -363,6 +399,7 @@ bool IterativeAnchoringSmoother::SmoothPath(
 
   while (!is_collision_free) {
     if (counter > max_iteration_num) {
+      AERROR << "Smoothing path fails because of reaching maximum iteration";
       return false;
     }
 
@@ -423,7 +460,7 @@ bool IterativeAnchoringSmoother::CheckCollisionAvoidance(
       for (const LineSegment2d& linesegment : obstacle_linesegments) {
         if (ego_box.HasOverlap(linesegment)) {
           colliding_point_index->push_back(i);
-          ADEBUG << "collsion happened with LineSegment "
+          ADEBUG << "point at " << i << "collied with LineSegment "
                  << linesegment.DebugString();
           is_colliding = true;
           break;
@@ -468,6 +505,7 @@ bool IterativeAnchoringSmoother::SetPathProfile(
     const std::vector<std::pair<double, double>>& point2d,
     DiscretizedPath* raw_path_points) {
   CHECK_NOTNULL(raw_path_points);
+  raw_path_points->clear();
   // Compute path profile
   std::vector<double> headings;
   std::vector<double> kappas;
@@ -484,7 +522,6 @@ bool IterativeAnchoringSmoother::SetPathProfile(
 
   // Load into path point
   size_t points_size = point2d.size();
-  raw_path_points->clear();
   for (size_t i = 0; i < points_size; ++i) {
     PathPoint path_point;
     path_point.set_x(point2d[i].first);
@@ -508,7 +545,6 @@ bool IterativeAnchoringSmoother::CheckGear(const Eigen::MatrixXd& xWS) {
          M_PI_2;
 }
 
-// TODO(Jinyun): add monotonic and end constraints in PiecewiseJerkSpeedProblem
 bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
                                              const double init_v,
                                              const double path_length,
