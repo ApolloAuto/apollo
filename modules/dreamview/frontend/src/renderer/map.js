@@ -213,6 +213,29 @@ export default class Map {
         return drewObjects;
     }
 
+    addParkingSpaceId(parkingSpace, coordinates, scene) {
+        const text = this.textRender.drawText(parkingSpace.id.id, scene, colorMapping.WHITE);
+        const points = _.get(parkingSpace, 'polygon.point');
+        if (points && points.length >= 3 && text) {
+            const point1 = points[0];
+            const point2 = points[1];
+            const point3 = points[2];
+            let textPosition = {
+                x: (point1.x + point3.x) / 2,
+                y: (point1.y + point3.y) / 2,
+                z: 0.04
+            };
+            textPosition = coordinates.applyOffset(textPosition);
+            const textRotationZ = Math.atan2(point2.y - point1.y, point2.x - point1.x);
+
+            text.position.set(textPosition.x, textPosition.y, textPosition.z);
+            text.rotation.set(0, 0, textRotationZ);
+            text.visible = false;
+            scene.add(text);
+        }
+        return text;
+    }
+
     addZone(zone, color, coordinates, scene) {
         const drewObjects = [];
 
@@ -428,7 +451,6 @@ export default class Map {
 
     removeExpiredElements(elementIds, scene) {
         const newData = {};
-
         for (const kind in this.data) {
             const drawThisKind = this.shouldDrawObjectOfThisElementKind(kind);
             newData[kind] = [];
@@ -514,7 +536,8 @@ export default class Map {
                     case "parkingSpace":
                         this.data[kind].push(Object.assign(newData[kind][i], {
                             drewObjects: this.addBorder(
-                                newData[kind][i], colorMapping.YELLOW, coordinates, scene)
+                                newData[kind][i], colorMapping.YELLOW, coordinates, scene),
+                            text: this.addParkingSpaceId(newData[kind][i], coordinates, scene)
                         }));
                         break;
                     case "speedBump":
@@ -540,11 +563,12 @@ export default class Map {
     }
 
     shouldDrawTextOfThisElementKind(kind) {
-        // Ex: mapping 'lane' to 'showMapLaneId' option
-        const optionName = `showMap${kind[0].toUpperCase()}${kind.slice(1)}Id`;
-
-        // NOTE: return false if the option is not found
-        return STORE.options[optionName] === true;
+        // showMapLaneId option controls both laneId and parkingSpaceId
+        if (STORE.options['showMapLaneId']
+            && ['parkingSpace', 'lane'].includes(kind)) {
+                return true;
+            }
+        return false;
     }
 
     updateText() {
