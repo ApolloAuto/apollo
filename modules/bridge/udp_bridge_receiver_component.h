@@ -67,6 +67,7 @@ class UDPBridgeReceiverComponent final : public cyber::Component<> {
   unsigned int bind_port_ = 0;
   std::string proto_name_ = "";
   std::string topic_name_ = "";
+  bool enable_timeout_ = true;
   std::shared_ptr<cyber::Writer<T>> writer_;
   std::mutex mutex_;
 
