@@ -143,23 +143,26 @@ bool UDPBridgeReceiverComponent<T>::MsgHandle(int fd) {
   size_t offset = 0;
   memcpy(header_flag, total_buf, HEADER_FLAG_SIZE);
   if (strcmp(header_flag, BRIDGE_HEADER_FLAG) != 0) {
+    AINFO << "header flag not match!";
     return false;
   }
   offset += sizeof(BRIDGE_HEADER_FLAG) + 1;
 
-  char header_size_buf[sizeof(size_t) + 1] = {0};
+  char header_size_buf[sizeof(hsize) + 1] = {0};
   const char *cursor = total_buf + offset;
-  memcpy(header_size_buf, cursor, sizeof(size_t));
-  size_t header_size = *(reinterpret_cast<size_t *>(header_size_buf));
+  memcpy(header_size_buf, cursor, sizeof(hsize));
+  hsize header_size = *(reinterpret_cast<hsize *>(header_size_buf));
   if (header_size > FRAME_SIZE) {
+    AINFO << "header size is more than FRAME_SIZE!";
     return false;
   }
-  offset += sizeof(size_t) + 1;
+  offset += sizeof(hsize) + 1;
 
   BridgeHeader header;
   size_t buf_size = header_size - offset;
   cursor = total_buf + offset;
   if (!header.Diserialize(cursor, buf_size)) {
+    AINFO << "header diserialize failed!";
     return false;
   }
 
@@ -181,7 +184,6 @@ bool UDPBridgeReceiverComponent<T>::MsgHandle(int fd) {
   if (proto_buf->IsReadyDiserialize()) {
     auto pb_msg = std::make_shared<T>();
     proto_buf->Diserialized(pb_msg);
-    AINFO << "pb data1 : " << pb_msg->engine_rpm();
     writer_->Write(pb_msg);
     RemoveItem(&proto_list_, proto_buf);
   }
