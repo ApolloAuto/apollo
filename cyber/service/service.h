@@ -80,6 +80,10 @@ class Service : public ServiceBase {
 
   ~Service() {
     inited_ = false;
+    {
+      std::lock_guard<std::mutex> lg(queue_mutex_);
+      tasks_.clear();
+    }
     condition_.notify_all();
     if (thread_.joinable()) {
       thread_.join();
@@ -128,6 +132,10 @@ class Service : public ServiceBase {
 template <typename Request, typename Response>
 void Service<Request, Response>::destroy() {
   inited_ = false;
+  {
+    std::lock_guard<std::mutex> lg(queue_mutex_);
+    this->tasks_.clear();
+  }
   condition_.notify_all();
   if (thread_.joinable()) {
     thread_.join();
