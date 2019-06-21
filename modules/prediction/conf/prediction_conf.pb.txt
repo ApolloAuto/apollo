@@ -1,6 +1,14 @@
 obstacle_conf {
   obstacle_type: VEHICLE
   obstacle_status: ON_LANE
+  priority_type: CAUTION
+  evaluator_type: CRUISE_MLP_EVALUATOR
+  predictor_type: MOVE_SEQUENCE_PREDICTOR
+}
+obstacle_conf {
+  obstacle_type: VEHICLE
+  obstacle_status: ON_LANE
+  priority_type: NORMAL
   evaluator_type: CRUISE_MLP_EVALUATOR
   predictor_type: MOVE_SEQUENCE_PREDICTOR
 }
