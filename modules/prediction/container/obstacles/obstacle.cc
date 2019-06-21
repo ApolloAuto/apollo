@@ -1155,7 +1155,7 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
     ADEBUG << "Don't build lane graph for non-moving obstacle.";
     return;
   }
-  if (feature->lane().lane_graph_ordered().lane_sequence_size() > 0) {
+  if (feature->lane().lane_graph().lane_sequence_size() > 0) {
     ADEBUG << "Don't build lane graph for an old obstacle.";
     return;
   }
@@ -1201,7 +1201,7 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
     // Update it into the Feature proto
     for (const auto& lane_seq : local_lane_graph.lane_sequence()) {
       LaneSequence* lane_seq_ptr = feature->mutable_lane()
-                                       ->mutable_lane_graph_ordered()
+                                       ->mutable_lane_graph()
                                        ->add_lane_sequence();
       lane_seq_ptr->CopyFrom(lane_seq);
       lane_seq_ptr->set_lane_sequence_id(seq_id++);
@@ -1214,10 +1214,10 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
   }
 
   // Build lane_points.
-  if (feature->lane().has_lane_graph_ordered()) {
+  if (feature->lane().has_lane_graph()) {
     SetLanePoints(feature, 0.5, 100, true,
-                  feature->mutable_lane()->mutable_lane_graph_ordered());
-    SetLaneSequencePath(feature->mutable_lane()->mutable_lane_graph_ordered());
+                  feature->mutable_lane()->mutable_lane_graph());
+    SetLaneSequencePath(feature->mutable_lane()->mutable_lane_graph());
   }
   ADEBUG << "Obstacle [" << id_ << "] set lane graph features.";
 }

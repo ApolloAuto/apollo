@@ -63,12 +63,12 @@ bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
   CHECK_NOTNULL(latest_feature_ptr);
   if (!latest_feature_ptr->has_lane() ||
-      !latest_feature_ptr->lane().has_lane_graph_ordered()) {
+      !latest_feature_ptr->lane().has_lane_graph()) {
     AERROR << "Obstacle [" << id << "] has no lane graph.";
     return false;
   }
   LaneGraph* lane_graph_ptr =
-      latest_feature_ptr->mutable_lane()->mutable_lane_graph_ordered();
+      latest_feature_ptr->mutable_lane()->mutable_lane_graph();
   CHECK_NOTNULL(lane_graph_ptr);
   if (lane_graph_ptr->lane_sequence_size() == 0) {
     AERROR << "Obstacle [" << id << "] has no lane sequences.";
@@ -181,7 +181,6 @@ bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     ADEBUG << output_probabilities[i];
   }
 
-  *(latest_feature_ptr->mutable_lane()->mutable_lane_graph()) = *lane_graph_ptr;
   return true;
 }
 
