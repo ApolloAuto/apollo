@@ -32,8 +32,7 @@ constexpr double ImageHandler::kImageScale;
 
 template <>
 void ImageHandler::OnImage(const std::shared_ptr<Image> &image) {
-  if (requests_ == 0 ||
-      compressed_image->format() == "h265" /* skip video format */) {
+  if (requests_ == 0) {
     return;
   }
 
