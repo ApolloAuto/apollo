@@ -34,6 +34,7 @@ message PlannerOpenSpaceConfig {
   optional double is_near_destination_threshold = 9 [default = 0.001];
   optional bool enable_check_parallel_trajectory = 10 [default = false];
   optional bool enable_linear_interpolation = 11 [default = false];
+  optional double is_near_destination_theta_threshold = 12 [default = 0.05];
 }
 
 message ROIConfig {

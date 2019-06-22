@@ -124,7 +124,12 @@ Stage::StageStatus PullOverStageApproach::Process(
           reference_line_info.AdcSlBoundary().end_s();
       double distance = stop_line_s - adc_front_edge_s;
       constexpr double kPreparkingStopDistance = 1.0;
-      if (distance <= kPreparkingStopDistance) {
+      constexpr double kPreparkingAngleDiff = 0.2;
+      auto ref_point = reference_line.GetReferencePoint(adc_front_edge_s);
+      double angle = common::math::AngleDiff(pull_over_status.theta(),
+                                             ref_point.heading());
+      if (distance <= kPreparkingStopDistance &&
+          angle <= kPreparkingAngleDiff) {
         return FinishStage(false);
       }
     }
