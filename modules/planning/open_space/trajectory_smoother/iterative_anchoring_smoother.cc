@@ -286,7 +286,7 @@ bool IterativeAnchoringSmoother::ReAnchoring(
                       heading, ego_length_, ego_width_);
         for (const auto& obstacle_linesegments : obstacles_linesegments_vec_) {
           for (const LineSegment2d& linesegment : obstacle_linesegments) {
-            if (ego_box.HasOverlap(linesegment) {
+            if (ego_box.HasOverlap(linesegment)) {
               is_colliding = true;
               break;
             }
@@ -303,7 +303,7 @@ bool IterativeAnchoringSmoother::ReAnchoring(
       if (is_colliding) {
         // Adjust the point by randomly move around the original points
         if (index == 1) {
-          const double adjust_theta = path_points->at(index).theta();
+          const double adjust_theta = path_points->at(index - 1).theta();
           const double delta_s = std::abs(path_points->at(index).s() -
                                           path_points->at(index - 1).s());
           double rand_dev = common::math::Clamp(length_dis(gen), 1.0, -1.0);
@@ -316,7 +316,7 @@ bool IterativeAnchoringSmoother::ReAnchoring(
                                            std::sin(adjust_theta));
         } else if (index == path_points->size() - 2) {
           const double adjust_theta =
-              NormalizeAngle(path_points->at(index).theta() + M_PI);
+              NormalizeAngle(path_points->at(index + 1).theta() + M_PI);
           const double delta_s = std::abs(path_points->at(index + 1).s() -
                                           path_points->at(index).s());
           double rand_dev = common::math::Clamp(length_dis(gen), 1.0, -1.0);
