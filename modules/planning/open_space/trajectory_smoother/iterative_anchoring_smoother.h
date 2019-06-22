@@ -101,9 +101,6 @@ class IterativeAnchoringSmoother {
   std::vector<std::vector<common::math::LineSegment2d>>
       obstacles_linesegments_vec_;
 
-  // TODO(Jinyun): move to confs
-  double collision_violation_tol_ = 0.01;
-
   // gear DRIVE as true and gear REVERSE as false
   bool gear_ = false;
 };
