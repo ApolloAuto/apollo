@@ -597,7 +597,7 @@ void OpenSpaceTrajectoryOptimizer::LoadHybridAstarResultInEigen(
   uWS->row(1) = std::move(a);
 }
 
-void OpenSpaceTrajectoryOptimizer::CombineTrajectories(
+bool OpenSpaceTrajectoryOptimizer::CombineTrajectories(
     const std::vector<Eigen::MatrixXd>& xWS_vec,
     const std::vector<Eigen::MatrixXd>& uWS_vec,
     const std::vector<Eigen::MatrixXd>& state_result_ds_vec,
@@ -693,7 +693,8 @@ void OpenSpaceTrajectoryOptimizer::CombineTrajectories(
   }
   xWS_.col(counter) = xWS_vec.back().col(xWS_vec.back().cols() - 1);
   ++counter;
-  CHECK_EQ(counter, warm_start_state_size);
+  AERROR_IF(counter != warm_start_state_size) << "warm_start_state_size wrong";
+  return false;
 
   counter = 0;
   for (size_t i = 0; i < traj_size; ++i) {
@@ -704,7 +705,9 @@ void OpenSpaceTrajectoryOptimizer::CombineTrajectories(
       ++counter;
     }
   }
-  CHECK_EQ(counter, warm_start_control_size);
+  AERROR_IF(counter != warm_start_control_size)
+      << "warm_start_control_size wrong";
+  return false;
 
   counter = 0;
   for (size_t i = 0; i < traj_size; ++i) {
@@ -718,7 +721,8 @@ void OpenSpaceTrajectoryOptimizer::CombineTrajectories(
   state_result_ds_.col(counter) =
       state_result_ds_vec.back().col(state_result_ds_vec.back().cols() - 1);
   ++counter;
-  CHECK_EQ(counter, smoothed_state_size);
+  AERROR_IF(counter != smoothed_state_size) << "smoothed_state_size wrong";
+  return false;
 
   counter = 0;
   for (size_t i = 0; i < traj_size; ++i) {
@@ -729,7 +733,8 @@ void OpenSpaceTrajectoryOptimizer::CombineTrajectories(
       ++counter;
     }
   }
-  CHECK_EQ(counter, smoothed_control_size);
+  AERROR_IF(counter != smoothed_control_size) << "smoothed_control_size wrong";
+  return false;
 
   counter = 0;
   for (size_t i = 0; i < traj_size; ++i) {
@@ -740,7 +745,8 @@ void OpenSpaceTrajectoryOptimizer::CombineTrajectories(
       ++counter;
     }
   }
-  CHECK_EQ(counter, time_size);
+  AERROR_IF(counter != time_size) << "time_size wrong";
+  return false;
 
   counter = 0;
   for (size_t i = 0; i < traj_size; ++i) {
@@ -751,7 +757,8 @@ void OpenSpaceTrajectoryOptimizer::CombineTrajectories(
       ++counter;
     }
   }
-  CHECK_EQ(counter, l_warm_start_size);
+  AERROR_IF(counter != l_warm_start_size) << "l_warm_start_size wrong";
+  return false;
 
   counter = 0;
   for (size_t i = 0; i < traj_size; ++i) {
@@ -762,7 +769,8 @@ void OpenSpaceTrajectoryOptimizer::CombineTrajectories(
       ++counter;
     }
   }
-  CHECK_EQ(counter, n_warm_start_size);
+  AERROR_IF(counter != n_warm_start_size) << "n_warm_start_size wrong";
+  return false;
 
   counter = 0;
   for (size_t i = 0; i < traj_size; ++i) {
@@ -773,7 +781,8 @@ void OpenSpaceTrajectoryOptimizer::CombineTrajectories(
       ++counter;
     }
   }
-  CHECK_EQ(counter, l_smoothed_size);
+  AERROR_IF(counter != l_smoothed_size) << "l_smoothed_size wrong";
+  return false;
 
   counter = 0;
   for (size_t i = 0; i < traj_size; ++i) {
@@ -784,7 +793,8 @@ void OpenSpaceTrajectoryOptimizer::CombineTrajectories(
       ++counter;
     }
   }
-  CHECK_EQ(counter, n_smoothed_size);
+  AERROR_IF(counter != n_smoothed_size) << "n_smoothed_size wrong";
+  return false;
 
   *xWS = std::move(xWS_);
   *uWS = std::move(uWS_);
@@ -795,6 +805,8 @@ void OpenSpaceTrajectoryOptimizer::CombineTrajectories(
   *n_warm_up = std::move(n_warm_up_);
   *dual_l_result_ds = std::move(dual_l_result_ds_);
   *dual_n_result_ds = std::move(dual_n_result_ds_);
+
+  return true;
 }
 
 bool OpenSpaceTrajectoryOptimizer::GenerateDecoupledTraj(
