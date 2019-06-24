@@ -275,7 +275,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
   double curr_speed_limit = speed_limit;
   if (c == 2) {
     for (uint32_t r_pre = r_low; r_pre <= r; ++r_pre) {
-      curr_speed_limit = std::fmin(curr_speed_limit,
+      curr_speed_limit = std::fmin(
+          curr_speed_limit,
           st_graph_data_.speed_limit().GetSpeedLimitByS(unit_s_ * r_pre));
       const double acc =
           (r * unit_s_ - 2 * r_pre * unit_s_) / (unit_t_ * unit_t_);
@@ -289,10 +290,10 @@ void GriddedPathTimeGraph::CalculateCostAt(
         continue;
       }
 
-      const double cost =
-          cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
-          CalculateEdgeCostForThirdCol(r, r_pre, curr_speed_limit,
-                                       soft_speed_limit);
+      const double cost = cost_cr.obstacle_cost() +
+                          pre_col[r_pre].total_cost() +
+                          CalculateEdgeCostForThirdCol(
+                              r, r_pre, curr_speed_limit, soft_speed_limit);
 
       if (cost < cost_cr.total_cost()) {
         cost_cr.SetTotalCost(cost);
@@ -307,7 +308,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
       continue;
     }
 
-    curr_speed_limit = std::fmin(curr_speed_limit,
+    curr_speed_limit = std::fmin(
+        curr_speed_limit,
         st_graph_data_.speed_limit().GetSpeedLimitByS(unit_s_ * r_pre));
     const double curr_a = (cost_cr.index_s() * unit_s_ +
                            pre_col[r_pre].pre_point()->index_s() * unit_s_ -
@@ -335,10 +337,10 @@ void GriddedPathTimeGraph::CalculateCostAt(
     const STPoint& prepre_point = prepre_graph_point.point();
     const STPoint& pre_point = pre_col[r_pre].point();
     const STPoint& curr_point = cost_cr.point();
-    double cost = cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
-                  CalculateEdgeCost(triple_pre_point, prepre_point, pre_point,
-                                    curr_point, curr_speed_limit,
-                                    soft_speed_limit);
+    double cost =
+        cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
+        CalculateEdgeCost(triple_pre_point, prepre_point, pre_point, curr_point,
+                          curr_speed_limit, soft_speed_limit);
 
     if (cost < cost_cr.total_cost()) {
       cost_cr.SetTotalCost(cost);

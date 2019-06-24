@@ -42,7 +42,7 @@ class BridgeHeader {
   uint32_t GetHeaderVer() const { return header_ver_.value_; }
   hsize GetHeaderSize() const {
     return static_cast<hsize>(header_body_size_ + HEADER_FLAG_SIZE +
-      sizeof(hsize) + 2);
+                              sizeof(hsize) + 2);
   }
   bsize GetHeaderBodySize() const { return header_body_size_; }
   std::string GetMsgName() const { return msg_name_.value_; }
@@ -56,48 +56,48 @@ class BridgeHeader {
 
   void SetHeaderVer(uint32_t header_ver) {
     header_ver_ = header_ver;
-    header_body_size_ += static_cast<hsize>(Item_Header_Size + 1 +
-      sizeof(uint32_t));
+    header_body_size_ +=
+        static_cast<hsize>(Item_Header_Size + 1 + sizeof(uint32_t));
   }
   void SetMsgName(const std::string &msg_name) {
     msg_name_ = msg_name;
-    header_body_size_ += static_cast<hsize>(Item_Header_Size + 1 +
-      msg_name.length() + 1);
+    header_body_size_ +=
+        static_cast<hsize>(Item_Header_Size + 1 + msg_name.length() + 1);
   }
   void SetMsgID(uint32_t msg_id) {
     msg_id_ = msg_id;
-    header_body_size_ += static_cast<hsize>(Item_Header_Size + 1 +
-      sizeof(uint32_t));
+    header_body_size_ +=
+        static_cast<hsize>(Item_Header_Size + 1 + sizeof(uint32_t));
   }
   void SetTotalFrames(uint32_t total_frames) {
     total_frames_ = total_frames;
-    header_body_size_ += static_cast<hsize>(Item_Header_Size + 1 +
-      sizeof(uint32_t));
+    header_body_size_ +=
+        static_cast<hsize>(Item_Header_Size + 1 + sizeof(uint32_t));
   }
   void SetFrameSize(bsize frame_size) {
     frame_size_ = frame_size;
-    header_body_size_ += static_cast<hsize>(Item_Header_Size + 1 +
-      sizeof(bsize));
+    header_body_size_ +=
+        static_cast<hsize>(Item_Header_Size + 1 + sizeof(bsize));
   }
   void SetFramePos(bsize frame_pos) {
     frame_pos_ = frame_pos;
-    header_body_size_ += static_cast<hsize>(Item_Header_Size + 1 +
-      sizeof(bsize));
+    header_body_size_ +=
+        static_cast<hsize>(Item_Header_Size + 1 + sizeof(bsize));
   }
   void SetIndex(uint32_t index) {
     index_ = index;
-    header_body_size_ += static_cast<hsize>(Item_Header_Size + 1 +
-      sizeof(uint32_t));
+    header_body_size_ +=
+        static_cast<hsize>(Item_Header_Size + 1 + sizeof(uint32_t));
   }
   void SetTimeStamp(double time_stamp) {
     time_stamp_ = time_stamp;
-    header_body_size_ += static_cast<hsize>(Item_Header_Size + 1 +
-      sizeof(double));
+    header_body_size_ +=
+        static_cast<hsize>(Item_Header_Size + 1 + sizeof(double));
   }
   void SetMsgSize(bsize msg_size) {
     msg_size_ = msg_size;
-    header_body_size_ += static_cast<hsize>(Item_Header_Size + 1 +
-      sizeof(bsize));
+    header_body_size_ +=
+        static_cast<hsize>(Item_Header_Size + 1 + sizeof(bsize));
   }
 
  private:
