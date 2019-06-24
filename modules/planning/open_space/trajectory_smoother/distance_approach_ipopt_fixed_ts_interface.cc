@@ -66,7 +66,7 @@ DistanceApproachIPOPTFixedTsInterface::DistanceApproachIPOPTFixedTsInterface(
   l_start_index_ = time_start_index_;
   n_start_index_ = l_start_index_ + obstacles_edges_sum_ * (horizon_ + 1);
 
-  planner_open_space_config_.CopyFrom(planner_open_space_config);
+  planner_open_space_config_ = planner_open_space_config;
   distance_approach_config_ =
       planner_open_space_config_.distance_approach_config();
   weight_state_x_ = distance_approach_config_.weight_x();

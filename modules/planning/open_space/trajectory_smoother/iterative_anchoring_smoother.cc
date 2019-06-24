@@ -49,7 +49,7 @@ IterativeAnchoringSmoother::IterativeAnchoringSmoother(
   ego_width_ = vehicle_param.width();
   center_shift_distance_ =
       ego_length_ / 2.0 - vehicle_param.back_edge_to_center();
-  planner_open_space_config_.CopyFrom(planner_open_space_config);
+  planner_open_space_config_ = planner_open_space_config;
 }
 
 bool IterativeAnchoringSmoother::Smooth(
