@@ -268,18 +268,15 @@ void PredictorManager::PredictObstacle(
   } else {
     switch (obstacle->type()) {
       case PerceptionObstacle::VEHICLE: {
-        if (obstacle->IsSlow()) {
-          predictor = GetPredictor(ObstacleConf::FREE_MOVE_PREDICTOR);
+        if (!obstacle->IsOnLane()) {
+          predictor = GetPredictor(vehicle_off_lane_predictor_);
           CHECK_NOTNULL(predictor);
         } else if (obstacle->HasJunctionFeatureWithExits() &&
                    !obstacle->IsCloseToJunctionExit()) {
           predictor = GetPredictor(vehicle_in_junction_predictor_);
           CHECK_NOTNULL(predictor);
-        } else if (obstacle->IsOnLane()) {
-          predictor = GetPredictor(vehicle_on_lane_predictor_);
-          CHECK_NOTNULL(predictor);
         } else {
-          predictor = GetPredictor(vehicle_off_lane_predictor_);
+          predictor = GetPredictor(vehicle_on_lane_predictor_);
           CHECK_NOTNULL(predictor);
         }
         break;
