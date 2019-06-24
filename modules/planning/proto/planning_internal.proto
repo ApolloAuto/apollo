@@ -13,6 +13,7 @@ import "modules/perception/proto/traffic_light_detection.proto";
 import "modules/planning/proto/sl_boundary.proto";
 import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning_config.proto";
+import "modules/planning/proto/planning_status.proto";
 
 message Debug {
   optional PlanningData planning_data = 2;
@@ -170,7 +171,7 @@ message SmootherDebug {
   optional string reason = 3;
 }
 
-// next ID: 29
+// next ID: 30
 message PlanningData {
   // input
   optional apollo.localization.LocalizationEstimate adc_position = 7;
@@ -198,6 +199,8 @@ message PlanningData {
   optional ScenarioDebug scenario = 26;
   optional OpenSpaceDebug open_space = 27;
   optional SmootherDebug smoother = 28;
+
+  optional apollo.planning.PullOverStatus pull_over_status = 29;
 }
 
 message LatticeStPixel {
