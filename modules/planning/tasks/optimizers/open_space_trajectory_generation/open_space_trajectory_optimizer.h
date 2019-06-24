@@ -138,7 +138,7 @@ class OpenSpaceTrajectoryOptimizer {
                   Eigen::MatrixXd* control_result_dc,
                   Eigen::MatrixXd* time_result_dc);
 
-  void CombineTrajectories(
+  bool CombineTrajectories(
       const std::vector<Eigen::MatrixXd>& xWS_vec,
       const std::vector<Eigen::MatrixXd>& uWS_vec,
       const std::vector<Eigen::MatrixXd>& state_result_ds_vec,
