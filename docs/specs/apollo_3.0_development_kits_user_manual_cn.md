@@ -174,7 +174,6 @@ b.执行软件更新器（Software Updater）更新最新软件包，或在终�
 
 ```
 sudo apt-get update
-sudo apt-get upgrade
 ```
     
 c.打开终端，输入以下命令，安装Linux 4.4 内核：
@@ -197,7 +196,7 @@ https://github.com/ApolloAuto/apollo-kernel/releases
 b.安装包下载完成后，解压后安装:
 
 ```
-tar zxvf linux-4.4.32-apollo-1.0.0.tar.gz
+tar zxvf linux-4.4.32-apollo-1.5.5.tar.gz
 cd install
 sudo bash install_kernel.sh
 ```
@@ -251,6 +250,7 @@ a.获取Apollo源代码
 ```
 cd ~
 git clone https://github.com/ApolloAuto/apollo.git
+git checkout -b r3.0.0 origin/r3.0.0
 ```
 
 下载完成后的代码在～/apollo目录下
@@ -282,7 +282,7 @@ bash docker/scripts/dev_into.sh
 ```
 
 e.编译apollo
-在终端输入以下命令，等待编译完成。
+在终端输入以下命令，等待编译完成，整个编译过程大约耗时20分钟。
 
 ```
 bash apollo.sh build
@@ -391,7 +391,7 @@ rosbag play -l docs/demo_guide/demo_2.5.bag
 如上图所示：后天线在M2主机X轴的正向0.2m处，则X轴偏移x_offset的值为0.2；后天线在M2主机Y轴的负向0.1m处，则Y轴偏移y_offset的值为-0.1；后天线在M2主机Z轴的正向0.8m处，则Z轴偏移z_offset的值为0.8。
 
 ### 配置GPS和主机
-下面展现了配置GPS和主机的方法。当设备正确接入系统后，在/dev/下面有名为ttyACM0的设备，即表示M2已经被正确的加载了。配置设备时，需要将设备的串口线连接上电脑的串口才可以对设备进行配置，也就是说，用来配置设备的电脑主机需要拥有串口。Windows下可以通过串口助手、串口猎人或者COMCenter等工具进行配置，Linux下可以通过Minicom、Cutecom等工具进行配置。
+下面展现了配置GPS和主机的方法。当设备正确接入系统后，在/dev/下面有名为ttyACM0的设备，即表示M2已经被正确的加载了。配置设备时，需要将设备的串口线连接上电脑的串口才可以对设备进行配置，也就是说，用来配置设备的电脑主机需要拥有串口。Windows下可以通过串口助手、串口猎人或者COMCenter等工具进行配置，Linux下可以通过Minicom、Cutecom等工具进行配置。linux下建议使用Cutecom软件，请在终端中使用`sudo cutecom`命令打开该软件。
 
 #### 杆臂配置
 车尾天线（后天线，通常是主天线，也就是Primary）杆臂配置：
@@ -621,6 +621,7 @@ rostopic echo /apollo/sensor/camera/traffic/image_short
 
 
 油门刹车标定是车辆纵向精准控制的前提。用户可以使用系统预先标定好的参数，也可以按照手册说明重新进行标定。
+注意：完成本标定后，才可以启动循迹！
 
 ## 标定原理介绍
 在Apollo系统中，控制模块会请求加速度量值。通过车辆标定表，控制模块便能找到准确产生所需加速度量值对应的油门、刹车踏板开合度控制命令，之后下发给车辆底盘。车辆标定表提供一个描述车辆速度、油门／刹车踏板开合度、加速度量之间关系的映射表。油门刹车标定过程便是生成车辆标定表的过程。
@@ -638,7 +639,7 @@ Apollo系统为教学小车提供了一份默认的标定表。如用户期望�
   在`modules/canbus/conf/canbus_conf.pb.txt`中，设置驾驶模式为 `AUTO_SPEED_ONLY`。
 
 ### 选择测试地点
-  理想的测试地点是平坦的长直路。
+  理想的测试地点是平坦的长直路，且两边没有高大的建筑物遮挡。
 
 以上准备工作完成后, 在`modules/tools/calibration`中按顺序完成如下工作：
 
@@ -652,9 +653,20 @@ Apollo系统为教学小车提供了一份默认的标定表。如用户期望�
 
 
 ### 采集数据
-1. 运行 modules/tools/calibration/  下的 `python data_collector.py`, 之后输入参数x y z, x 代表加速踏板开合度（百分比正值）, y 代表了速度限值(米／秒), z 代表刹车踏板开合度（百分比负值）。输入参数后，车辆即开始以x加速踏板值加速至y速度限值，之后再以z刹车踏板值减速直至车辆停止。
-2. 产生对应x y z 参数的csv文件。 比如输出指令 `15 5.2 -10`,将会生成名为`t15b-10r0_recorded.csv`的文件。
-3. 根据车辆反应情况选取合适的x y z 参数，如加速踏板过小不能启动或者刹车踏板过小不能停车，需要相应调整命令参数。
+
+1. 在采集数据之前，请先进入docker在终端中打开canbus模块，gps模块和localization模块，命令如下：
+```
+bash /scripts/canbus.sh
+bash /scripts/gps.sh
+bash /scripts/localization.sh
+```
+在依次输入完以上三个命令后，可用遥控器开着车走一小段距离，过两分钟之后，在diagnostic中可以看到以上三者都有信号时，便可以进行下面的操作了。 
+
+2. 运行 modules/tools/calibration/  下的 `python data_collector.py`, 之后输入参数x y z, x 代表加速踏板开合度（百分比正值）, y 代表了速度限值(米／秒), z 代表刹车踏板开合度（百分比负值）。输入参数后，车辆即开始以x加速踏板值加速至y速度限值，之后再以z刹车踏板值减速直至车辆停止。  
+
+3. 产生对应x y z 参数的csv文件。 比如输出指令 `15 5.2 -10`,将会生成名为`t15b-10r0_recorded.csv`的文件。  
+
+4. 根据车辆反应情况选取合适的x y z 参数，如加速踏板过小不能启动或者刹车踏板过小不能停车，需要相应调整命令参数。
 
 ![CSV文件样例图](images/calibration_excel.png)
 
@@ -712,7 +724,9 @@ x y z参数组合取值建议：
 
 # 启动循迹
 
-在完成以上软硬件安装，标定以及系统文件配置后，用户可以通过Dreamview界面录制车辆轨迹并回放，完成第一个循迹演示。本部分主要分为系统文件配置和循迹操作说明两个方面。
+在完成以上软硬件安装，标定以及系统文件配置后，用户可以通过Dreamview界面录制车辆轨迹并回放，完成第一个循迹演示。
+注意：车辆启动循迹之前一定要先完成标定！
+本部分主要分为系统文件配置和循迹操作说明两个方面。
 
 ## 系统文件配置
 
@@ -800,8 +814,8 @@ enable_sender_log: true
 
 2. `modules/canbus/conf/canbus.conf` 修改如下:
 ```
-enable_chassis_detail_pub
-noreceive_guardian
+--enable_chassis_detail_pub
+--noreceive_guardian
 ```
 第一行打开/apollo/canbus/chassis_detail消息，第二行关闭guardian模块。
 
