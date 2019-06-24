@@ -32,12 +32,14 @@
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
+#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace planning {
 class IterativeAnchoringSmoother {
  public:
-  IterativeAnchoringSmoother();
+  IterativeAnchoringSmoother(
+      const PlannerOpenSpaceConfig& planner_open_space_config);
 
   ~IterativeAnchoringSmoother() = default;
 
@@ -105,6 +107,8 @@ class IterativeAnchoringSmoother {
 
   // gear DRIVE as true and gear REVERSE as false
   bool gear_ = false;
+
+  PlannerOpenSpaceConfig planner_open_space_config_;
 };
 }  // namespace planning
 }  // namespace apollo
