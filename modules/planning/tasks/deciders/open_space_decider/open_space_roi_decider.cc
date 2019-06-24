@@ -276,16 +276,21 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
         std::abs(common::math::NormalizeAngle(check_point_heading -
                                               last_check_point_heading)) >
         config_.open_space_roi_decider_config().roi_linesegment_min_angle();
+
+    ADEBUG << "is is_reference_line_heading_has_sudden_change: "
+           << is_reference_line_heading_has_sudden_change;
     const bool is_left_road_width_changes =
         std::abs(point_left_road_width - last_left_road_width) >
             road_bound_width_change_upper_limit ||
         check_point_s == start_s || check_point_s == end_s ||
         is_reference_line_heading_has_sudden_change;
+    ADEBUG << "is left road width change: " << is_left_road_width_changes;
     const bool is_right_road_width_changes =
         std::abs(point_right_road_width - last_right_road_width) >
             road_bound_width_change_upper_limit ||
         check_point_s == start_s || check_point_s == end_s ||
         is_reference_line_heading_has_sudden_change;
+    ADEBUG << "is is_right_road_width_changes: " << is_right_road_width_changes;
     // If (the left road width changes || reference_line heading changes ||
     // start point || end point)
     // Then add a new point to the left road boundary
@@ -441,6 +446,7 @@ bool OpenSpaceRoiDecider::GetParkingBoundary(
   if (average_l < 0) {
     // if average_l is lower than zero, the parking spot is on the right
     // lane boundary and assume that the lane half width is average_l
+    ADEBUG << "average_l is less than 0 in OpenSpaceROI";
     size_t point_size = right_lane_boundary.size();
     for (size_t i = 0; i < point_size; i++) {
       right_lane_boundary[i].SelfRotate(origin_heading);
@@ -528,6 +534,7 @@ bool OpenSpaceRoiDecider::GetParkingBoundary(
   } else {
     // if average_l is higher than zero, the parking spot is on the left
     // lane boundary and assume that the lane half width is average_l
+    ADEBUG << "average_l is greater than 0 in OpenSpaceROI";
     size_t point_size = left_lane_boundary.size();
     for (size_t i = 0; i < point_size; i++) {
       left_lane_boundary[i].SelfRotate(origin_heading);
@@ -616,6 +623,7 @@ bool OpenSpaceRoiDecider::GetParkingBoundary(
 
   // Fuse line segments into convex contraints
   if (!FuseLineSegments(roi_parking_boundary)) {
+    AERROR << "FuseLineSegments failed in parking ROI";
     return false;
   }
   // Get xy boundary
