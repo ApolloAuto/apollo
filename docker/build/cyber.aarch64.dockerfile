@@ -81,6 +81,7 @@ RUN echo "deb http://ports.ubuntu.com/ubuntu-ports/ trusty universe" >> /etc/apt
 RUN echo "deb http://ports.ubuntu.com/ubuntu-ports/ xenial main" >> /etc/apt/sources.list
 RUN echo "deb http://ports.ubuntu.com/ubuntu-ports/ xenial universe" >> /etc/apt/sources.list
 RUN apt update -y
+RUN apt remove --purge openmpi-common=2.1.1-8
 RUN apt install -y --allow-downgrades \
     libboost-system1.54.0 \
     libboost-thread1.54.0 \
@@ -94,10 +95,21 @@ RUN apt install -y --allow-downgrades \
     libopencv-core-dev=2.4.8+dfsg1-2ubuntu1 \
     libopencv-imgproc-dev=2.4.8+dfsg1-2ubuntu1 \
     libopencv-highgui-dev=2.4.8+dfsg1-2ubuntu1 \
+    openmpi-common=1.10.2-8ubuntu1 \
+    openmpi-bin=1.10.2-8ubuntu1 \
+    libopenmpi1.10 \
+    libopenmpi-dev=1.10.2-8ubuntu1 \
     libgdal-dev \
-    libvtk6-dev \
-    libvtk6.3 \
-    vtk6 \
+    libvtk6.2 \
+    vtk6=6.2.0+dfsg1-10build1 \
+    libvtk6-java=6.2.0+dfsg1-10build1 \
+    libxdmf-dev=2.1.dfsg.1-13 \
+    mpi-default-dev=1.4 \
+    mpi-default-bin=1.4 \
+    python-mpi4py=1.3.1+hg20131106-2ubuntu5 \
+    python-vtk6=6.2.0+dfsg1-10build1 \
+    tcl-vtk6=6.2.0+dfsg1-10build1 \
+    libvtk6-dev=6.2.0+dfsg1-10build1 \
     libpocofoundation9v5
 
 RUN rm -f /usr/lib/libPocoFoundation.so
@@ -112,6 +124,7 @@ RUN ln -s /usr/lib/aarch64-linux-gnu/libboost_system.so.1.54.0 /usr/lib/aarch64-
 RUN ln -s /usr/lib/aarch64-linux-gnu/libboost_thread.so.1.54.0 /usr/lib/aarch64-linux-gnu/libboost_thread.so
 RUN ln -s /usr/lib/aarch64-linux-gnu/libboost_wserialization.so.1.65.1 /usr/lib/aarch64-linux-gnu/libboost_wserialization.so
 RUN ln -s /usr/lib/aarch64-linux-gnu/libboost_chrono.so.1.54.0 /usr/lib/aarch64-linux-gnu/libboost_chrono.so
+RUN ln -s /usr/lib/libgl2ps.so.0 /usr/lib/libgl2ps.so
 RUN ln -s /usr/lib/python2.7/dist-packages/vtk/libvtkRenderingPythonTkWidgets.aarch64-linux-gnu.so /usr/lib/aarch64-linux-gnu/libvtkRenderingPythonTkWidgets.so
 
 RUN bash /tmp/installers/install_fast-rtps.sh
