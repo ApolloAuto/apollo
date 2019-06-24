@@ -127,6 +127,8 @@ Status PathBoundsDecider::Process(
       reference_line_info->SetCandidatePathBoundaries(
           std::move(candidate_path_boundaries));
       ADEBUG << "Completed pullover and fallback path boundaries generation.";
+      *(reference_line_info->mutable_debug()->mutable_planning_data()->
+          mutable_pull_over_status()) = *pull_over_status;
       return Status::OK();
     }
   }
