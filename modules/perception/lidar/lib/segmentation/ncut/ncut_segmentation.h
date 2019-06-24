@@ -19,8 +19,13 @@
 #include <string>
 #include <vector>
 
+#ifdef DEBUG_NCUT
+#include <pcl/visualization/pcl_visualizer.h>
+#endif
+
 #include "modules/perception/base/object.h"
 #include "modules/perception/lib/thread/thread_worker.h"
+#include "modules/perception/lidar/common/pcl_util.h"
 #include "modules/perception/lidar/lib/interface/base_ground_detector.h"
 #include "modules/perception/lidar/lib/interface/base_roi_filter.h"
 #include "modules/perception/lidar/lib/interface/base_segmentation.h"
@@ -59,6 +64,8 @@ class NCutSegmentation : public BaseSegmentation {
 
   bool IsOutlier(const base::PointFCloudPtr& in_cloud);
 
+  bool GetConfigs(std::string* ncut_file);
+
   // ground detector for background segmentation
   std::unique_ptr<BaseGroundDetector> ground_detector_;
   // roi filter for background segmentation
@@ -90,6 +97,19 @@ class NCutSegmentation : public BaseSegmentation {
   bool remove_roi_ = true;
   std::string ground_detector_str_;
   std::string roi_filter_str_;
+  NCutParam ncut_param_;
+
+#ifdef DEBUG_NCUT
+  pcl::visualization::PCLVisualizer::Ptr _viewer;
+  CPointCloudPtr _rgb_cloud;
+  char _viewer_id[128];
+  int _viewer_count;
+  void VisualizePointCloud(const base::PointFCloudPtr& cloud);
+  void VisualizeSegments(const std::vector<base::ObjectPtr>& segments);
+  void VisualizeComponents(
+      const base::PointFCloudPtr& cloud,
+      const std::vector<std::vector<int>>& component_points);
+#endif
 };  // class NCutSegmentation
 
 }  // namespace lidar

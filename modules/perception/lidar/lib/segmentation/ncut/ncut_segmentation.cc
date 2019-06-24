@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/perception/lidar/lib/segmentation/ncut/ncut_segmentation.h"
 
 #include <omp.h>
-
 #include <algorithm>
 #include <map>
-
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/lidar/lib/segmentation/ncut/ncut_segmentation.h"
 
 namespace apollo {
 namespace perception {
@@ -32,7 +31,11 @@ using apollo::cyber::common::GetProtoFromFile;
 using Eigen::MatrixXf;
 
 bool NCutSegmentation::Init(const SegmentationInitOptions& options) {
-  if (!Configure("NCutSegmentation")) {
+  std::string param_file;
+  CHECK(GetConfigs(&param_file));
+  AINFO << "--    param_file: " << param_file;
+
+  if (!Configure(param_file)) {
     AERROR << "failed to load ncut config.";
     return false;
   }
@@ -58,13 +61,15 @@ bool NCutSegmentation::Init(const SegmentationInitOptions& options) {
     AERROR << "Failed to reset outliers.";
     return false;
   }
-  int num_threads = 0;
-#pragma omp parallel
-  { num_threads = omp_get_num_threads(); }
+  int num_threads = 1;
+  /*#pragma omp parallel
+    { num_threads = omp_get_num_threads(); }
+  */
+  AINFO << "number threads " << num_threads;
   _segmentors.resize(num_threads);
   for (int i = 0; i < num_threads; ++i) {
     _segmentors[i].reset(new NCut);
-    if (!(_segmentors[i]->Init())) {
+    if (!(_segmentors[i]->Init(ncut_param_))) {
       AERROR << "failed to init NormalizedCut " << i << ".";
       return false;
     }
@@ -94,6 +99,9 @@ bool NCutSegmentation::Init(const SegmentationInitOptions& options) {
     }
     lidar_frame_ref_->cloud = roi_cloud_;
     lidar_frame_ref_->world_cloud = roi_world_cloud_;
+    AINFO << "lidar 2 world pose " << lidar_frame_ref_->lidar2world_pose(0, 3)
+          << " " << lidar_frame_ref_->lidar2world_pose(1, 3) << " "
+          << lidar_frame_ref_->lidar2world_pose(2, 3);
     GroundDetectorOptions ground_detector_options;
     ground_detector_->Detect(ground_detector_options, lidar_frame_ref_);
     return true;
@@ -101,28 +109,60 @@ bool NCutSegmentation::Init(const SegmentationInitOptions& options) {
 
   worker_.Start();
 
+#ifdef DEBUG_NCUT
+  _viewer = pcl::visualization::PCLVisualizer::Ptr(
+      new pcl::visualization::PCLVisualizer("3D Viewer"));
+  _viewer->setBackgroundColor(0, 0, 0);
+  _viewer->addCoordinateSystem(1.0);
+  _viewer->initCameraParameters();
+  _viewer_count = 0;
+  _rgb_cloud = CPointCloudPtr(new CPointCloud);
+#endif
+
   AINFO << "NCutSegmentation init success, num_threads: " << num_threads;
   return true;
 }
 
 bool NCutSegmentation::Configure(std::string param_file) {
-  NCutSegmentationParam ncut_param_;
+  NCutSegmentationParam seg_param_;
   // get cnnseg params
-  CHECK(GetProtoFromFile(param_file, &ncut_param_))
+  CHECK(GetProtoFromFile(param_file, &seg_param_))
       << "Failed to parse CNNSegParam config file." << param_file;
-  grid_radius_ = ncut_param_.grid_radius();
-  height_threshold_ = ncut_param_.height_threshold();
-  partition_cell_size_ = ncut_param_.partition_cell_size();
-  vehicle_filter_cell_size_ = ncut_param_.vehicle_filter_cell_size();
-  pedestrian_filter_cell_size_ = ncut_param_.pedestrian_filter_cell_size();
-  outlier_length_ = ncut_param_.outlier_length();
-  outlier_width_ = ncut_param_.outlier_width();
-  outlier_height_ = ncut_param_.outlier_height();
-  outlier_min_num_points_ = ncut_param_.outlier_min_num_points();
-  remove_ground_ = ncut_param_.remove_ground_points();
-  remove_roi_ = ncut_param_.remove_roi();
-  ground_detector_str_ = ncut_param_.ground_detector();
-  roi_filter_str_ = ncut_param_.roi_filter();
+  grid_radius_ = seg_param_.grid_radius();
+  height_threshold_ = seg_param_.height_threshold();
+  partition_cell_size_ = seg_param_.partition_cell_size();
+  vehicle_filter_cell_size_ = seg_param_.vehicle_filter_cell_size();
+  pedestrian_filter_cell_size_ = seg_param_.pedestrian_filter_cell_size();
+  outlier_length_ = seg_param_.outlier_length();
+  outlier_width_ = seg_param_.outlier_width();
+  outlier_height_ = seg_param_.outlier_height();
+  outlier_min_num_points_ = seg_param_.outlier_min_num_points();
+  remove_ground_ = seg_param_.remove_ground_points();
+  remove_roi_ = seg_param_.remove_roi();
+  ground_detector_str_ = seg_param_.ground_detector();
+  roi_filter_str_ = seg_param_.roi_filter();
+  ncut_param_ = seg_param_.ncut_param();
+  return true;
+}
+
+bool NCutSegmentation::GetConfigs(std::string* param_file) {
+  auto config_manager = lib::ConfigManager::Instance();
+  const lib::ModelConfig* model_config = nullptr;
+  CHECK(config_manager->GetModelConfig("NCutSegmentation", &model_config))
+      << "Failed to get model config: CNNSegmentation";
+
+  const std::string& work_root = config_manager->work_root();
+  std::string root_path;
+  CHECK(model_config->get_value("root_path", &root_path))
+      << "Failed to get value of root_path.";
+  std::string config_file;
+  config_file = GetAbsolutePath(work_root, root_path);
+  config_file = GetAbsolutePath(config_file, "ncut.conf");
+
+  NCutConfig config;
+  CHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config))
+      << "Failed to parse CNNSeg config file";
+  *param_file = GetAbsolutePath(work_root, config.param_file());
   return true;
 }
 
@@ -158,8 +198,14 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
   std::vector<base::ObjectPtr>* segments = &(frame->segmented_objects);
   double start_t = omp_get_wtime();
   int num_threads = 1;
-#pragma omp parallel
+/*#pragma omp parallel
   { num_threads = omp_get_num_threads(); }
+*/
+
+#ifdef DEBUG_NCUT
+  AINFO << "input point cloud: " << original_cloud_->size() << " points";
+  VisualizePointCloud(original_cloud_);
+#endif
 
   if (remove_roi_) {
     AINFO << "remove roi and remove ground for ncut segmentation";
@@ -169,6 +215,7 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
 
   base::PointFCloudPtr cloud_above_ground(new base::PointFCloud);
   if (remove_ground_) {
+    AINFO << "remove ground";
     cloud_above_ground->CopyPointCloud(*lidar_frame_ref_->cloud,
                                        lidar_frame_ref_->non_ground_indices);
   }
@@ -176,6 +223,10 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
   // filter_by_ground(cloud, non_ground_indices, &cloud_above_ground);
   ADEBUG << "filter ground, elapsed time: " << omp_get_wtime() - start_t;
   start_t = omp_get_wtime();
+#ifdef DEBUG_NCUT
+  AINFO << "filter ground: " << cloud_above_ground->size() << " points left";
+  VisualizePointCloud(cloud_above_ground);
+#endif
 
   // .3 filter vehicle
   base::PointFCloudPtr cloud_after_car_filter;
@@ -183,14 +234,26 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
                  &cloud_after_car_filter, segments);
   ADEBUG << "filter vehicle, elapsed time: " << omp_get_wtime() - start_t;
   start_t = omp_get_wtime();
+#ifdef DEBUG_NCUT
+  AINFO << "filter vehicle: " << cloud_after_car_filter->size()
+        << " points left";
+  VisualizePointCloud(cloud_after_car_filter);
+#endif
 
   // .4 filter pedestrian
   base::PointFCloudPtr cloud_after_people_filter;
   ObstacleFilter(cloud_after_car_filter, pedestrian_filter_cell_size_, true,
                  &cloud_after_people_filter, segments);
 
-  // ADEBUG << "filter pedestrian, elapsed time: " << omp_get_wtime() - start_t;
-  // start_t = omp_get_wtime();
+  ADEBUG << "filter pedestrian, elapsed time: " << omp_get_wtime() - start_t;
+  start_t = omp_get_wtime();
+#ifdef DEBUG_NCUT
+  AINFO << "filter pedestrian: " << cloud_after_people_filter->size()
+        << " points left";
+  VisualizePointCloud(cloud_after_people_filter);
+  ADEBUG << "after filter car/pedestrian #segments " << segments->size();
+  VisualizeSegments(*segments);
+#endif
 
   // .5 partition into small regions
   std::vector<base::PointFCloudPtr> cloud_components;
@@ -199,6 +262,13 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
   ADEBUG << "partition small regions, elapsed time: "
          << omp_get_wtime() - start_t;
   start_t = omp_get_wtime();
+
+#ifdef DEBUG_NCUT
+  // ADEBUG << "partition " << cloud_components.size() << " components";
+  for (size_t i = 0; i < cloud_components.size(); ++i) {
+    VisualizePointCloud(cloud_components[i]);
+  }
+#endif
 
   std::vector<bool> cloud_outlier_flag(cloud_components.size());
 
@@ -305,6 +375,13 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
     }
   }
   ADEBUG << "aggregate results, elapsed time: " << omp_get_wtime() - start_t;
+
+#ifdef DEBUG_NCUT
+  AINFO << "final #segments " << segments->size();
+  VisualizeSegments(*segments);
+  AINFO << "final #outliers " << _outliers->size();
+  VisualizeSegments(*_outliers);
+#endif
   return true;
 }
 
@@ -332,6 +409,12 @@ void NCutSegmentation::ObstacleFilter(const base::PointFCloudPtr& in_cloud,
   std::vector<std::vector<int>> component_points;
   std::vector<int> num_cells_per_components;
   FFfilter.GetSegments(in_cloud, &component_points, &num_cells_per_components);
+
+#ifdef DEBUG_NCUT
+  AINFO << "flood fill: " << component_points.size() << " components";
+  VisualizeComponents(in_cloud, component_points);
+#endif
+
   const unsigned int min_num_points = 50;
   const int num_components = static_cast<int>(component_points.size());
   std::vector<std::string> component_labels(num_components, "unknown");
@@ -418,6 +501,105 @@ bool NCutSegmentation::IsOutlier(const base::PointFCloudPtr& in_cloud) {
   //}
   return false;
 }
+
+#ifdef DEBUG_NCUT
+void NCutSegmentation::VisualizePointCloud(const base::PointFCloudPtr& cloud) {
+  // _viewer->removePointCloud(_viewer_id, 0);
+  _viewer->removeAllPointClouds(0);
+  _viewer->removeAllShapes(0);
+  _rgb_cloud->clear();
+  for (size_t i = 0; i < cloud->size(); ++i) {
+    CPoint pt;
+    pt.x = (*cloud)[i].x;
+    pt.y = (*cloud)[i].y;
+    pt.z = (*cloud)[i].z;
+    pt.r = 255;
+    pt.g = 255;
+    pt.b = 255;
+    _rgb_cloud->push_back(pt);
+  }
+  snprintf(_viewer_id, sizeof(_viewer_id), "vis%06d", _viewer_count++);
+  _viewer->addPointCloud(_rgb_cloud, _viewer_id, 0);
+  _viewer->spin();
+}
+
+void NCutSegmentation::VisualizeSegments(
+    const std::vector<base::ObjectPtr>& segments) {
+  // _viewer->removePointCloud(_viewer_id, 0);
+  unsigned int seed;
+  _viewer->removeAllPointClouds(0);
+  _viewer->removeAllShapes(0);
+  _rgb_cloud->clear();
+  for (size_t i = 0; i < segments.size(); ++i) {
+    int red = 50 + rand_r(&seed) % 206;
+    int green = 50 + rand_r(&seed) % 206;
+    int blue = 50 + rand_r(&seed) % 206;
+    const base::PointFCloud& pc = segments[i]->lidar_supplement.cloud;
+    for (size_t j = 0; j < pc.size(); ++j) {
+      CPoint pt;
+      pt.x = pc[j].x;
+      pt.y = pc[j].y;
+      pt.z = pc[j].z;
+      pt.r = static_cast<uint8_t>(red);
+      pt.g = static_cast<uint8_t>(green);
+      pt.b = static_cast<uint8_t>(blue);
+      _rgb_cloud->push_back(pt);
+    }
+  }
+  snprintf(_viewer_id, sizeof(_viewer_id), "vis%06d", _viewer_count++);
+  _viewer->addPointCloud(_rgb_cloud, _viewer_id, 0);
+  _viewer->spin();
+}
+
+void NCutSegmentation::VisualizeComponents(
+    const base::PointFCloudPtr& cloud,
+    const std::vector<std::vector<int>>& component_points) {
+  // _viewer->removePointCloud(_viewer_id, 0);
+  unsigned int seed;
+  _viewer->removeAllPointClouds(0);
+  _viewer->removeAllShapes(0);
+  _rgb_cloud->clear();
+  std::vector<CPoint> centers(component_points.size());
+  for (size_t i = 0; i < component_points.size(); ++i) {
+    int red = 50 + rand_r(&seed) % 206;
+    int green = 50 + rand_r(&seed) % 206;
+    int blue = 50 + rand_r(&seed) % 206;
+    const int num_points = static_cast<int>(component_points[i].size());
+    CPoint center;
+    center.x = 0.f;
+    center.y = 0.f;
+    center.z = 0.f;
+    for (size_t j = 0; j < component_points[i].size(); ++j) {
+      CPoint pt;
+      int pid = component_points[i][j];
+      pt.x = (*cloud)[pid].x;
+      pt.y = (*cloud)[pid].y;
+      pt.z = (*cloud)[pid].z;
+      pt.r = static_cast<uint8_t>(red);
+      pt.g = static_cast<uint8_t>(green);
+      pt.b = static_cast<uint8_t>(blue);
+      _rgb_cloud->push_back(pt);
+      center.x += pt.x;
+      center.y += pt.y;
+      center.z += pt.z;
+    }
+    center.x /= static_cast<float>(num_points);
+    center.y /= static_cast<float>(num_points);
+    center.z /= static_cast<float>(num_points);
+    centers[i] = center;
+  }
+  snprintf(_viewer_id, sizeof(_viewer_id), "vis%06d", _viewer_count++);
+  _viewer->addPointCloud(_rgb_cloud, _viewer_id, 0);
+  for (size_t i = 0; i < component_points.size(); ++i) {
+    char text[256];
+    char text_id[256];
+    snprintf(text, sizeof(text), "%lu", i);
+    snprintf(text_id, sizeof(text_id), "c%lu", i);
+    _viewer->addText3D(text, centers[i], 0.3, 1.0, 1.0, 1.0, text_id, 0);
+  }
+  _viewer->spin();
+}
+#endif
 
 PERCEPTION_REGISTER_SEGMENTATION(NCutSegmentation);
 

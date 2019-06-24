@@ -81,28 +81,28 @@ bool HybridAStar::RSPCheck(
 }
 
 bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node) {
+  CHECK_NOTNULL(node);
+  CHECK_GT(node->GetStepSize(), 0);
+
   if (obstacles_linesegments_vec_.empty()) {
     return true;
   }
+
   size_t node_step_size = node->GetStepSize();
-  size_t last_check_index = 0;
-  std::vector<double> traversed_x;
-  std::vector<double> traversed_y;
-  std::vector<double> traversed_phi;
-  traversed_x = node->GetXs();
-  traversed_y = node->GetYs();
-  traversed_phi = node->GetPhis();
-  std::reverse(traversed_x.begin(), traversed_x.end());
-  std::reverse(traversed_y.begin(), traversed_y.end());
-  std::reverse(traversed_phi.begin(), traversed_phi.end());
+  const auto& traversed_x = node->GetXs();
+  const auto& traversed_y = node->GetYs();
+  const auto& traversed_phi = node->GetPhis();
+
   // The first {x, y, phi} is collision free unless they are start and end
   // configuration of search problem
+  size_t check_start_index = 0;
   if (node_step_size == 1) {
-    last_check_index = 1;
+    check_start_index = 0;
   } else {
-    last_check_index = node_step_size - 1;
+    check_start_index = 1;
   }
-  for (size_t i = 0; i < last_check_index; ++i) {
+
+  for (size_t i = check_start_index; i < node_step_size; ++i) {
     if (traversed_x[i] > XYbounds_[1] || traversed_x[i] < XYbounds_[0] ||
         traversed_y[i] > XYbounds_[3] || traversed_y[i] < XYbounds_[2]) {
       return false;
