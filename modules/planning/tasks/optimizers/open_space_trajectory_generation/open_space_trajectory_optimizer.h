@@ -160,6 +160,7 @@ class OpenSpaceTrajectoryOptimizer {
   std::unique_ptr<HybridAStar> warm_start_;
   std::unique_ptr<DistanceApproachProblem> distance_approach_;
   std::unique_ptr<DualVariableWarmStartProblem> dual_variable_warm_start_;
+  std::unique_ptr<IterativeAnchoringSmoother> iterative_anchoring_smoother_;
 
   std::vector<common::TrajectoryPoint> stitching_trajectory_;
   DiscretizedTrajectory optimized_trajectory_;
