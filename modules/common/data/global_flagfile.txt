@@ -12,3 +12,5 @@
 --use_navigation_mode=false
 
 --map_dir=/apollo/modules/map/data/sunnyvale_with_two_offices
+
+--map_dir=/apollo/modules/map/data/san_mateo
