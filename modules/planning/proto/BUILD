@@ -415,6 +415,7 @@ proto_library(
     ],
     deps = [
         ":piecewise_jerk_speed_config_proto_lib",
+        ":fem_pos_deviation_smoother_config_proto_lib",
     ],
 )
 
