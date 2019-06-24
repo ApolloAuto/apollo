@@ -44,6 +44,10 @@ OpenSpaceTrajectoryOptimizer::OpenSpaceTrajectoryOptimizer(
   // Initialize distance approach trajectory smootherclass pointer
   distance_approach_.reset(
       new DistanceApproachProblem(config.planner_open_space_config()));
+
+  // Initialize iterative anchoring smoother config class pointer
+  iterative_anchoring_smoother_.reset(
+      new IterativeAnchoringSmoother(config.planner_open_space_config()));
 }
 
 common::Status OpenSpaceTrajectoryOptimizer::Plan(
@@ -798,9 +802,8 @@ bool OpenSpaceTrajectoryOptimizer::GenerateDecoupledTraj(
     const std::vector<std::vector<common::math::Vec2d>>& obstacles_vertices_vec,
     Eigen::MatrixXd* state_result_dc, Eigen::MatrixXd* control_result_dc,
     Eigen::MatrixXd* time_result_dc) {
-  IterativeAnchoringSmoother iterative_anchoring_smoother;
   DiscretizedTrajectory smoothed_trajectory;
-  if (!iterative_anchoring_smoother.Smooth(
+  if (!iterative_anchoring_smoother_->Smooth(
           xWS, init_a, init_v, obstacles_vertices_vec, &smoothed_trajectory)) {
     return false;
   }
