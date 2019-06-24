@@ -360,8 +360,7 @@ Status LatController::ComputeControlCommand(
         vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) ||
        (FLAGS_trajectory_transform_to_com_drive &&
         vehicle_state->gear() == canbus::Chassis::GEAR_DRIVE)) &&
-      (std::fabs(vehicle_state->linear_velocity()) <=
-       control_conf_->lon_controller_conf().switch_speed())) {
+      (std::fabs(vehicle_state->linear_velocity()) <= low_speed_bound_)) {
     trajectory_analyzer_.TrajectoryTransformToCOM(lr_);
   }
 
@@ -449,8 +448,7 @@ Status LatController::ComputeControlCommand(
                             .enable_reverse_leadlag_compensation();
   if (enable_leadlag) {
     if (FLAGS_enable_feedback_augment_on_high_speed ||
-        std::fabs(vehicle_state->linear_velocity()) <= low_speed_bound_ ||
-        vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) {
+        std::fabs(vehicle_state->linear_velocity()) <= low_speed_bound_) {
       steer_angle_feedback_augment =
           leadlag_controller_.Control(-matrix_state_(0, 0), ts_) * 180 / M_PI *
           steer_ratio_ / steer_single_direction_max_degree_ * 100;

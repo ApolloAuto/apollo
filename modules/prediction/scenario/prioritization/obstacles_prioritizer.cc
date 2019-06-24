@@ -59,7 +59,8 @@ int NearestFrontObstacleIdOnLaneSequence(const LaneSequence& lane_sequence) {
   int nearest_front_obstacle_id = std::numeric_limits<int>::min();
   double smallest_relative_s = std::numeric_limits<double>::max();
   for (const auto& nearby_obs : lane_sequence.nearby_obstacle()) {
-    if (nearby_obs.s() < 0.0) {
+    if (nearby_obs.s() < 0.0 ||
+        nearby_obs.s() > FLAGS_caution_search_distance_ahead) {
       continue;
     }
     if (nearby_obs.s() < smallest_relative_s) {
@@ -74,7 +75,8 @@ int NearestBackwardObstacleIdOnLaneSequence(const LaneSequence& lane_sequence) {
   int nearest_backward_obstacle_id = std::numeric_limits<int>::min();
   double smallest_relative_s = std::numeric_limits<double>::max();
   for (const auto& nearby_obs : lane_sequence.nearby_obstacle()) {
-    if (nearby_obs.s() > 0.0) {
+    if (nearby_obs.s() > 0.0 ||
+        nearby_obs.s() < -FLAGS_caution_search_distance_backward) {
       continue;
     }
     if (-nearby_obs.s() < smallest_relative_s) {
@@ -181,8 +183,8 @@ void ObstaclesPrioritizer::AssignIgnoreLevel() {
 }
 
 void ObstaclesPrioritizer::AssignCautionLevel() {
-  // TODO(kechxu): integrate change lane when ready to check change lane
   AssignCautionLevelCruiseKeepLane();
+  AssignCautionLevelCruiseChangeLane();
   AssignCautionLevelByEgoReferenceLine();
 }
 

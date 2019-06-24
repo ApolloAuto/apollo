@@ -583,10 +583,10 @@ bool PathBoundsDecider::SearchPullOverPosition(
       double s = 0.0;
       double l = 0.0;
       auto point = common::util::MakePointENU(pull_over_x, pull_over_y, 0.0);
-      HDMapUtil::BaseMap().GetNearestLaneWithHeading(
-          point, 5.0, pull_over_theta, M_PI_2, &lane, &s, &l);
-      pull_over_theta = lane->Heading(s);
-
+      if (HDMapUtil::BaseMap().GetNearestLaneWithHeading(
+              point, 5.0, pull_over_theta, M_PI_2, &lane, &s, &l) == 0) {
+        pull_over_theta = lane->Heading(s);
+      }
       *pull_over_configuration = std::make_tuple(pull_over_x, pull_over_y,
                                                  pull_over_theta, (i + j) / 2);
       break;

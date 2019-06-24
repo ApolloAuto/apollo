@@ -41,20 +41,35 @@
 namespace apollo {
 namespace planning {
 
-class CosThetaIpoptInterface : public Ipopt::TNLP {
+class FemPosDeviationIpoptInterface : public Ipopt::TNLP {
  public:
-  explicit CosThetaIpoptInterface(std::vector<std::pair<double, double>> points,
-                                  std::vector<double> bounds);
+  explicit FemPosDeviationIpoptInterface(
+      std::vector<std::pair<double, double>> points,
+      std::vector<double> bounds);
 
-  virtual ~CosThetaIpoptInterface() = default;
+  virtual ~FemPosDeviationIpoptInterface() = default;
 
-  void set_weight_cos_included_angle(const double weight_cos_included_angle);
+  void set_weight_fem_pos_deviation(const double weight_fem_pos_deviation) {
+    weight_fem_pos_deviation_ = weight_fem_pos_deviation;
+  }
 
-  void set_weight_anchor_points(const double weight_anchor_points);
+  void set_weight_path_length(const double weight_path_length) {
+    weight_path_length_ = weight_path_length;
+  }
 
-  void set_weight_length(const double weight_length);
+  void set_weight_ref_deviation(const double weight_ref_deviation) {
+    weight_ref_deviation_ = weight_ref_deviation;
+  }
 
-  void set_automatic_differentiation_flag(const bool use_ad);
+  void set_weight_curvature_constraint_slack_var(
+      const double weight_curvature_constraint_slack_var) {
+    weight_curvature_constraint_slack_var_ =
+        weight_curvature_constraint_slack_var;
+  }
+
+  void set_curvature_constraint(const double curvature_constraint) {
+    curvature_constraint_ = curvature_constraint;
+  }
 
   void get_optimization_results(std::vector<double>* ptr_x,
                                 std::vector<double>* ptr_y) const;
@@ -122,52 +137,46 @@ class CosThetaIpoptInterface : public Ipopt::TNLP {
   //***************    end   ADOL-C part ***********************************
 
  private:
+  // Reference points and deviation bounds
   std::vector<std::pair<double, double>> ref_points_;
+  std::vector<double> bounds_around_refs_;
 
-  std::vector<double> bounds_;
+  // Weights in optimization cost function
+  double weight_fem_pos_deviation_ = 1.0e8;
+  double weight_path_length_ = 1.0;
+  double weight_ref_deviation_ = 1.0;
+  double weight_curvature_constraint_slack_var_ = 1.0e2;
 
-  std::vector<double> opt_x_;
-
-  std::vector<double> opt_y_;
+  double curvature_constraint_ = 0.2;
 
   size_t num_of_variables_ = 0;
-
   size_t num_of_constraints_ = 0;
-
   size_t nnz_jac_g_ = 0;
-
   size_t nnz_h_lag_ = 0;
-
   size_t num_of_points_ = 0;
+  size_t num_of_slack_var_ = 0;
+  size_t num_of_curvature_constr_ = 0;
+  size_t num_of_slack_constr_ = 0;
 
-  std::map<std::pair<size_t, size_t>, size_t> idx_map_;
+  size_t slack_var_start_index_ = 0;
+  size_t slack_var_end_index_ = 0;
+  size_t curvature_constr_start_index_ = 0;
+  size_t curvature_constr_end_index_ = 0;
+  size_t slack_constr_start_index_ = 0;
+  size_t slack_constr_end_index_ = 0;
 
-  void hessian_strcuture();
-
-  double weight_cos_included_angle_ = 0.0;
-
-  double weight_anchor_points_ = 0.0;
-
-  double weight_length_ = 0.0;
+  std::vector<double> opt_x_;
+  std::vector<double> opt_y_;
 
   //***************    start ADOL-C part ***********************************
 
-  bool use_automatic_differentiation_ = false;
   /**@name Methods to block default compiler methods.
    */
-  CosThetaIpoptInterface(const CosThetaIpoptInterface&);
-  CosThetaIpoptInterface& operator=(const CosThetaIpoptInterface&);
+  FemPosDeviationIpoptInterface(const FemPosDeviationIpoptInterface&);
+  FemPosDeviationIpoptInterface& operator=(
+      const FemPosDeviationIpoptInterface&);
 
   std::vector<double> obj_lam_;
-
-  // TODO(Jinyun): Not changed to std::vector yet, need further debug
-  //** variables for sparsity exploitation
-  // std::vector<unsigned int> rind_g_; /* row indices    */
-  // std::vector<unsigned int> cind_g_; /* column indices */
-  // std::vector<double> jacval_;       /* values         */
-  // std::vector<unsigned int> rind_L_; /* row indices    */
-  // std::vector<unsigned int> cind_L_; /* column indices */
-  // std::vector<double> hessval_;      /* values */
 
   //** variables for sparsity exploitation
   unsigned int* rind_g_; /* row indices    */

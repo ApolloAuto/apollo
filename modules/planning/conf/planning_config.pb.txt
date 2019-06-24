@@ -208,6 +208,7 @@ default_task_config: {
         is_near_destination_threshold: 0.1
         enable_check_parallel_trajectory: false
         enable_linear_interpolation: false
+        is_near_destination_theta_threshold: 0.05
       }
     }
   }
@@ -226,7 +227,8 @@ default_task_config: {
     heading_offset_to_midpoint: 0.79
     lateral_offset_to_midpoint: 0.5
     longitudinal_offset_to_midpoint: 0.2
-    vehicle_box_iou_threshold_to_midpoint: 0.9
+    vehicle_box_iou_threshold_to_midpoint: 0.75
+    linear_velocity_threshold_on_ego: 0.2
   }
 }
 default_task_config: {
@@ -241,7 +243,7 @@ default_task_config: {
     roi_linesegment_length: 1.0
     perception_obstacle_filtering_distance: 1000.0
     perception_obstacle_buffer: 0.0
-    bound_width_change_ratio_uppper_limit: 0.2
+    curb_heading_tangent_change_uppper_limit: 0.2
   }
 }
 default_task_config: {
@@ -250,7 +252,7 @@ default_task_config: {
     open_space_prediction_time_period: 5.0
     open_space_fallback_collision_distance: 5.0
     open_space_fallback_stop_distance: 2.0
-    open_space_fallback_collision_time_buffer: 10.0
+    open_space_fallback_collision_time_buffer: 5.0
   }
 }
 default_task_config: {

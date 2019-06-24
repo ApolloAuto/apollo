@@ -152,6 +152,21 @@ DEFINE_string(camera_right_fisheye_compressed_topic,
 DEFINE_string(camera_rear_6mm_compressed_topic,
               "/apollo/sensor/camera/rear_6mm/image/compressed",
               "front 6mm camera compressed topic name");
+DEFINE_string(camera_front_6mm_video_compressed_topic,
+              "/apollo/sensor/camera/front_6mm/video/compressed",
+              "front 6mm camera video compressed topic name");
+DEFINE_string(camera_front_12mm_video_compressed_topic,
+              "/apollo/sensor/camera/front_12mm/video/compressed",
+              "front 12mm camera video compressed topic name");
+DEFINE_string(camera_left_fisheye_video_compressed_topic,
+              "/apollo/sensor/camera/left_fisheye/video/compressed",
+              "left fisheye camera video compressed topic name");
+DEFINE_string(camera_right_fisheye_video_compressed_topic,
+              "/apollo/sensor/camera/right_fisheye/video/compressed",
+              "right fisheye camera video compressed topic name");
+DEFINE_string(camera_rear_6mm_video_compressed_topic,
+              "/apollo/sensor/camera/rear_6mm/video/compressed",
+              "front 6mm camera video compressed topic name");
 DEFINE_string(gnss_rtk_obs_topic, "/apollo/sensor/gnss/rtk_obs",
               "Gnss rtk observation topic name");
 DEFINE_string(gnss_rtk_eph_topic, "/apollo/sensor/gnss/rtk_eph",

@@ -273,16 +273,37 @@ bool OpenSpaceTrajectoryProvider::IsVehicleNearDestination(
   end_pose_to_world_frame.SelfRotate(rotate_angle);
   end_pose_to_world_frame += translate_origin;
 
+  double end_theta_to_world_frame = end_pose[2];
+  end_theta_to_world_frame += rotate_angle;
+
   double distance_to_vehicle =
       std::sqrt((vehicle_state.x() - end_pose_to_world_frame.x()) *
                     (vehicle_state.x() - end_pose_to_world_frame.x()) +
                 (vehicle_state.y() - end_pose_to_world_frame.y()) *
                     (vehicle_state.y() - end_pose_to_world_frame.y()));
 
+  double theta_to_vehicle = common::math::AngleDiff(vehicle_state.heading(),
+                                                    end_theta_to_world_frame);
+  ADEBUG << "theta_to_vehicle" << theta_to_vehicle << "end_theta_to_world_frame"
+         << end_theta_to_world_frame << "rotate_angle" << rotate_angle;
+  ADEBUG << "is_near_destination_threshold"
+         << config_.open_space_trajectory_provider_config()
+                .open_space_trajectory_optimizer_config()
+                .planner_open_space_config()
+                .is_near_destination_threshold();  // which config file
+  ADEBUG << "is_near_destination_theta_threshold"
+         << config_.open_space_trajectory_provider_config()
+                .open_space_trajectory_optimizer_config()
+                .planner_open_space_config()
+                .is_near_destination_theta_threshold();
   if (distance_to_vehicle < config_.open_space_trajectory_provider_config()
                                 .open_space_trajectory_optimizer_config()
                                 .planner_open_space_config()
-                                .is_near_destination_threshold()) {
+                                .is_near_destination_threshold() &&
+      theta_to_vehicle < config_.open_space_trajectory_provider_config()
+                             .open_space_trajectory_optimizer_config()
+                             .planner_open_space_config()
+                             .is_near_destination_theta_threshold()) {
     ADEBUG << "vehicle reach end_pose";
     frame_->mutable_open_space_info()->set_destination_reached(true);
     return true;

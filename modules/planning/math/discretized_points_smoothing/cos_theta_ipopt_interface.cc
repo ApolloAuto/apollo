@@ -26,12 +26,12 @@ namespace apollo {
 namespace planning {
 
 CosThetaIpoptInterface::CosThetaIpoptInterface(
-    std::vector<std::pair<double, double>> points,
-    std::vector<double> lateral_bounds) {
-  init_points_ = std::move(points);
-  num_of_points_ = init_points_.size();
-  lateral_bounds_ = std::move(lateral_bounds);
-  CHECK_GT(num_of_points_, 1);
+    std::vector<std::pair<double, double>> points, std::vector<double> bounds) {
+  CHECK_GT(points.size(), 1);
+  CHECK_GT(bounds.size(), 1);
+  bounds_ = std::move(bounds);
+  ref_points_ = std::move(points);
+  num_of_points_ = ref_points_.size();
 }
 
 void CosThetaIpoptInterface::get_optimization_results(
@@ -95,12 +95,11 @@ bool CosThetaIpoptInterface::get_bounds_info(int n, double* x_l, double* x_u,
     double x_upper = 0.0;
     double y_lower = 0.0;
     double y_upper = 0.0;
-    double bound_square = lateral_bounds_[i] / std::sqrt(2.0);
 
-    x_lower = init_points_[i].first - bound_square;
-    x_upper = init_points_[i].first + bound_square;
-    y_lower = init_points_[i].second - bound_square;
-    y_upper = init_points_[i].second + bound_square;
+    x_lower = ref_points_[i].first - bounds_[i];
+    x_upper = ref_points_[i].first + bounds_[i];
+    y_lower = ref_points_[i].second - bounds_[i];
+    y_upper = ref_points_[i].second + bounds_[i];
 
     // x
     g_l[index] = x_lower;
@@ -124,8 +123,8 @@ bool CosThetaIpoptInterface::get_starting_point(int n, bool init_x, double* x,
   std::normal_distribution<> dis{0, 0.05};
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
-    x[index] = init_points_[i].first + dis(gen);
-    x[index + 1] = init_points_[i].second + dis(gen);
+    x[index] = ref_points_[i].first + dis(gen);
+    x[index + 1] = ref_points_[i].second + dis(gen);
   }
   return true;
 }
@@ -141,10 +140,10 @@ bool CosThetaIpoptInterface::eval_f(int n, const double* x, bool new_x,
   obj_value = 0.0;
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
-    obj_value += (x[index] - init_points_[i].first) *
-                     (x[index] - init_points_[i].first) +
-                 (x[index + 1] - init_points_[i].second) *
-                     (x[index + 1] - init_points_[i].second);
+    obj_value +=
+        (x[index] - ref_points_[i].first) * (x[index] - ref_points_[i].first) +
+        (x[index + 1] - ref_points_[i].second) *
+            (x[index + 1] - ref_points_[i].second);
   }
   for (size_t i = 0; i < num_of_points_ - 2; i++) {
     size_t findex = i << 1;
@@ -176,8 +175,8 @@ bool CosThetaIpoptInterface::eval_grad_f(int n, const double* x, bool new_x,
   std::fill(grad_f, grad_f + n, 0.0);
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
-    grad_f[index] = x[index] * 2 - init_points_[i].first * 2;
-    grad_f[index + 1] = x[index + 1] * 2 - init_points_[i].second * 2;
+    grad_f[index] = x[index] * 2 - ref_points_[i].first * 2;
+    grad_f[index + 1] = x[index + 1] * 2 - ref_points_[i].second * 2;
   }
 
   for (size_t i = 0; i < num_of_points_ - 2; ++i) {
@@ -602,92 +601,25 @@ bool CosThetaIpoptInterface::eval_obj(int n, const T* x, T* obj_value) {
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
     *obj_value +=
-        weight_anchor_points_ * ((x[index] - init_points_[i].first) *
-                                     (x[index] - init_points_[i].first) +
-                                 (x[index + 1] - init_points_[i].second) *
-                                     (x[index + 1] - init_points_[i].second));
+        weight_anchor_points_ *
+        ((x[index] - ref_points_[i].first) * (x[index] - ref_points_[i].first) +
+         (x[index + 1] - ref_points_[i].second) *
+             (x[index + 1] - ref_points_[i].second));
   }
   for (size_t i = 0; i < num_of_points_ - 2; ++i) {
     size_t findex = i << 1;
     size_t mindex = findex + 2;
     size_t lindex = mindex + 2;
-
-    // TODO(Jinyun): Numerically Evaluate the performance of different smoothing
-    // objectives
-
-    // Costheta term
-    // *obj_value -=
-    //     weight_cos_included_angle_ *
-    //     (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
-    //      ((x[mindex + 1] - x[findex + 1]) * (x[lindex + 1] - x[mindex +
-    //      1])))
-    //      /
-    //     (sqrt((x[mindex] - x[findex]) * (x[mindex] - x[findex]) +
-    //           (x[mindex + 1] - x[findex + 1]) *
-    //               (x[mindex + 1] - x[findex + 1])) *
-    //      sqrt((x[lindex] - x[mindex]) * (x[lindex] - x[mindex]) +
-    //           (x[lindex + 1] - x[mindex + 1]) *
-    //               (x[lindex + 1] - x[mindex + 1])));
-
-    // Use last iteration in Denomiator of costheta term
-    // *obj_value -=
-    //     weight_cos_included_angle_ *
-    //     (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
-    //      ((x[mindex + 1] - x[findex + 1]) * (x[lindex + 1] - x[mindex +
-    //      1])))
-    //      /
-    //     (sqrt((init_points_[i + 1].first - init_points_[i].first) *
-    //               (init_points_[i + 1].first - init_points_[i].first) +
-    //           (init_points_[i + 1].second - init_points_[i].second) *
-    //               (init_points_[i + 1].second - init_points_[i].second)) *
-    //      sqrt((init_points_[i + 2].first - init_points_[i + 1].first) *
-    //               (init_points_[i + 2].first - init_points_[i + 1].first) +
-    //           (init_points_[i + 2].second - init_points_[i + 1].second) *
-    //               (init_points_[i + 2].second - init_points_[i +
-    //               1].second)));
-
-    // Denominator numerically protected
-    // *obj_value +=
-    //     weight_cos_included_angle_ *
-    //     acos(
-    //         (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
-    //          ((x[mindex + 1] - x[findex + 1]) *
-    //           (x[lindex + 1] - x[mindex + 1]))) /
-    //         (1e-8 + sqrt((x[mindex] - x[findex]) * (x[mindex] -
-    //         x[findex]) +
-    //                      (x[mindex + 1] - x[findex + 1]) *
-    //                          (x[mindex + 1] - x[findex + 1])) *
-    //                     sqrt((x[lindex] - x[mindex]) * (x[lindex] -
-    //                     x[mindex]) +
-    //                          (x[lindex + 1] - x[mindex + 1]) *
-    //                              (x[lindex + 1] - x[mindex + 1]))));
-
-    // InnerProd
-    // *obj_value -=
-    //     weight_cos_included_angle_ *
-    //     (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
-    //      ((x[mindex + 1] - x[findex + 1]) * (x[lindex + 1] - x[mindex +
-    //      1])));
-
-    // CrossProd
-    // *obj_value += weight_cos_included_angle_ *
-    //              (((x[findex] - x[mindex]) * (x[lindex + 1] - x[mindex +
-    //              1]))
-    //              -
-    //               ((x[lindex] - x[mindex]) * (x[findex + 1] - x[mindex +
-    //               1]))) *
-    //              (((x[findex] - x[mindex]) * (x[lindex + 1] - x[mindex +
-    //              1]))
-    //              -
-    //               ((x[lindex] - x[mindex]) * (x[findex + 1] - x[mindex +
-    //               1])));
-
-    // Midpoint distance
-    *obj_value += weight_cos_included_angle_ *
-                  (((x[findex] + x[lindex]) / 2.0 - x[mindex]) *
-                       ((x[findex] + x[lindex]) / 2.0 - x[mindex]) +
-                   ((x[findex + 1] + x[lindex + 1]) / 2.0 - x[mindex + 1]) *
-                       ((x[findex + 1] + x[lindex + 1]) / 2.0 - x[mindex + 1]));
+    *obj_value -=
+        weight_cos_included_angle_ *
+        (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
+         ((x[mindex + 1] - x[findex + 1]) * (x[lindex + 1] - x[mindex + 1]))) /
+        (sqrt((x[mindex] - x[findex]) * (x[mindex] - x[findex]) +
+              (x[mindex + 1] - x[findex + 1]) *
+                  (x[mindex + 1] - x[findex + 1])) *
+         sqrt((x[lindex] - x[mindex]) * (x[lindex] - x[mindex]) +
+              (x[lindex + 1] - x[mindex + 1]) *
+                  (x[lindex + 1] - x[mindex + 1])));
   }
 
   // Total length

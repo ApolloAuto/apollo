@@ -22,287 +22,108 @@
 
 #include <limits>
 
+#include "IpIpoptApplication.hpp"
+#include "IpSolveStatistics.hpp"
+
 #include "cyber/common/log.h"
+#include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_ipopt_interface.h"
+#include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_osqp_interface.h"
 
 namespace apollo {
 namespace planning {
-bool FemPosDeviationSmoother::Smooth(
-    const FemPosDeviationOsqpSettings& solver_settings) {
-  // Sanity Check
-  if (ref_points_.empty()) {
-    AERROR << "reference points empty, smoother early terminates";
-    return false;
+FemPosDeviationSmoother::FemPosDeviationSmoother(
+    const FemPosDeviationSmootherConfig& config)
+    : config_(config) {}
+
+bool FemPosDeviationSmoother::Solve(
+    const std::vector<std::pair<double, double>>& raw_point2d,
+    const std::vector<double>& bounds, std::vector<double>* opt_x,
+    std::vector<double>* opt_y) {
+  if (config_.apply_curvature_constraint()) {
+    return SolveWithIpopt(raw_point2d, bounds, opt_x, opt_y);
+  } else {
+    return SolveWithOsqp(raw_point2d, bounds, opt_x, opt_y);
   }
-
-  if (ref_points_.size() != x_bounds_around_refs_.size() ||
-      x_bounds_around_refs_.size() != y_bounds_around_refs_.size()) {
-    AERROR << "ref_points and bounds size not equal, smoother early terminates";
-    return false;
-  }
-
-  if (ref_points_.size() < 3) {
-    AERROR << "ref_points size smaller than 3, smoother early terminates";
-    return false;
-  }
-
-  // Calculate optimization states definitions
-  if (ref_points_.size() > std::numeric_limits<int>::max()) {
-    AERROR << "ref_points size too large, smoother early terminates";
-    return false;
-  }
-
-  num_of_points_ = static_cast<int>(ref_points_.size());
-  num_of_variables_ = num_of_points_ * 2;
-  num_of_constraints_ = num_of_variables_;
-
-  // Calculate kernel
-  std::vector<c_float> P_data;
-  std::vector<c_int> P_indices;
-  std::vector<c_int> P_indptr;
-  CalculateKernel(&P_data, &P_indices, &P_indptr);
-
-  // Calculate affine constraints
-  std::vector<c_float> A_data;
-  std::vector<c_int> A_indices;
-  std::vector<c_int> A_indptr;
-  std::vector<c_float> lower_bounds;
-  std::vector<c_float> upper_bounds;
-  CalculateAffineConstraint(&A_data, &A_indices, &A_indptr, &lower_bounds,
-                            &upper_bounds);
-
-  // Calculate offset
-  std::vector<c_float> q;
-  CalculateOffset(&q);
-
-  // Set primal warm start
-  std::vector<c_float> primal_warm_start;
-  SetPrimalWarmStart(&primal_warm_start);
-
-  OSQPData* data = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
-  OSQPSettings* settings =
-      reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
-
-  // Define Solver settings
-  osqp_set_default_settings(settings);
-  settings->max_iter = solver_settings.max_iter;
-  settings->time_limit = solver_settings.time_limit;
-  settings->verbose = solver_settings.verbose;
-  settings->scaled_termination = solver_settings.scaled_termination;
-  settings->warm_start = solver_settings.warm_start;
-
-  OSQPWorkspace* work = nullptr;
-
-  bool res = OptimizeWithOsqp(num_of_variables_, lower_bounds.size(), &P_data,
-                              &P_indices, &P_indptr, &A_data, &A_indices,
-                              &A_indptr, &lower_bounds, &upper_bounds, &q,
-                              &primal_warm_start, data, &work, settings);
-  if (res == false || work == nullptr || work->solution == nullptr) {
-    AERROR << "Failed to find solution.";
-    // Cleanup
-    osqp_cleanup(work);
-    c_free(data->A);
-    c_free(data->P);
-    c_free(data);
-    c_free(settings);
-
-    return false;
-  }
-
-  // Extract primal results
-  x_.resize(num_of_points_);
-  y_.resize(num_of_points_);
-  for (int i = 0; i < num_of_points_; ++i) {
-    int index = i * 2;
-    x_.at(i) = work->solution->x[index];
-    y_.at(i) = work->solution->x[index + 1];
-  }
-
-  // Cleanup
-  osqp_cleanup(work);
-  c_free(data->A);
-  c_free(data->P);
-  c_free(data);
-  c_free(settings);
-
   return true;
 }
 
-void FemPosDeviationSmoother::CalculateKernel(std::vector<c_float>* P_data,
-                                              std::vector<c_int>* P_indices,
-                                              std::vector<c_int>* P_indptr) {
-  CHECK_GT(num_of_variables_, 4);
+bool FemPosDeviationSmoother::SolveWithOsqp(
+    const std::vector<std::pair<double, double>>& raw_point2d,
+    const std::vector<double>& bounds, std::vector<double>* opt_x,
+    std::vector<double>* opt_y) {
+  CHECK_NOTNULL(opt_x);
+  CHECK_NOTNULL(opt_y);
 
-  // Three quadratic penalties are involved:
-  // 1. Penalty x on distance between middle point and point by finite element
-  // estimate;
-  // 2. Penalty y on path length;
-  // 3. Penalty z on difference between points and reference points
+  FemPosDeviationOsqpInterface solver;
 
-  // General formulation of P matrix is as below(with 6 points as an example):
-  // I is a two by two identity matrix, X, Y, Z represents x * I, y * I, z * I
-  // 0 is a two by two zero matrix
-  // |X+Y+Z, -2X-Y,   X,       0,       0,       0    |
-  // |0,     5X+2Y+Z, -4X-Y,   X,       0,       0    |
-  // |0,     0,       6X+2Y+Z, -4X-Y,   X,       0    |
-  // |0,     0,       0,       6X+2Y+Z, -4X-Y,   X    |
-  // |0,     0,       0,       0,       5X+2Y+Z, -2X-Y|
-  // |0,     0,       0,       0,       0,       X+Y+Z|
+  solver.set_weight_fem_pos_deviation(config_.weight_fem_pos_deviation());
+  solver.set_weight_path_length(config_.weight_path_length());
+  solver.set_weight_ref_deviation(config_.weight_ref_deviation());
+  solver.set_max_iter(config_.max_iter());
+  solver.set_time_limit(config_.time_limit());
+  solver.set_verbose(config_.verbose());
+  solver.set_scaled_termination(config_.scaled_termination());
+  solver.set_warm_start(config_.warm_start());
 
-  // Only upper triangle is filled
-  std::vector<std::vector<std::pair<c_int, c_float>>> columns;
-  columns.resize(num_of_variables_);
-  int col_num = 0;
+  solver.set_ref_points(raw_point2d);
+  solver.set_bounds_around_refs(bounds);
 
-  for (int col = 0; col < 2; ++col) {
-    columns[col].emplace_back(col, weight_fem_pos_deviation_ +
-                                       weight_path_length_ +
-                                       weight_ref_deviation_);
-    ++col_num;
-  }
-
-  for (int col = 2; col < 4; ++col) {
-    columns[col].emplace_back(
-        col - 2, -2.0 * weight_fem_pos_deviation_ - weight_path_length_);
-    columns[col].emplace_back(col, 5.0 * weight_fem_pos_deviation_ +
-                                       2.0 * weight_path_length_ +
-                                       weight_ref_deviation_);
-    ++col_num;
-  }
-
-  int second_point_from_last_index = num_of_points_ - 2;
-  for (int point_index = 2; point_index < second_point_from_last_index;
-       ++point_index) {
-    int col_index = point_index * 2;
-    for (int col = 0; col < 2; ++col) {
-      col_index += col;
-      columns[col_index].emplace_back(col_index - 4, weight_fem_pos_deviation_);
-      columns[col_index].emplace_back(
-          col_index - 2,
-          -4.0 * weight_fem_pos_deviation_ - weight_path_length_);
-      columns[col_index].emplace_back(
-          col_index, 6.0 * weight_fem_pos_deviation_ +
-                         2.0 * weight_path_length_ + weight_ref_deviation_);
-      ++col_num;
-    }
-  }
-
-  int second_point_col_from_last_col = num_of_variables_ - 4;
-  int last_point_col_from_last_col = num_of_variables_ - 2;
-  for (int col = second_point_col_from_last_col;
-       col < last_point_col_from_last_col; ++col) {
-    columns[col].emplace_back(col - 4, weight_fem_pos_deviation_);
-    columns[col].emplace_back(
-        col - 2, -4.0 * weight_fem_pos_deviation_ - weight_path_length_);
-    columns[col].emplace_back(col, 5.0 * weight_fem_pos_deviation_ +
-                                       2.0 * weight_path_length_ +
-                                       weight_ref_deviation_);
-    ++col_num;
-  }
-
-  for (int col = last_point_col_from_last_col; col < num_of_variables_; ++col) {
-    columns[col].emplace_back(col - 4, weight_fem_pos_deviation_);
-    columns[col].emplace_back(
-        col - 2, -2.0 * weight_fem_pos_deviation_ - weight_path_length_);
-    columns[col].emplace_back(col, weight_fem_pos_deviation_ +
-                                       weight_path_length_ +
-                                       weight_ref_deviation_);
-    ++col_num;
-  }
-
-  CHECK_EQ(col_num, num_of_variables_);
-
-  int ind_p = 0;
-  for (int i = 0; i < col_num; ++i) {
-    P_indptr->push_back(ind_p);
-    for (const auto& row_data_pair : columns[i]) {
-      // Rescale by 2.0 as the quadratic term in osqp default qp problem setup
-      // is set as (1/2) * x' * P * x
-      P_data->push_back(row_data_pair.second * 2.0);
-      P_indices->push_back(row_data_pair.first);
-      ++ind_p;
-    }
-  }
-  P_indptr->push_back(ind_p);
-}
-
-void FemPosDeviationSmoother::CalculateOffset(std::vector<c_float>* q) {
-  for (int i = 0; i < num_of_points_; ++i) {
-    const auto& ref_point_xy = ref_points_[i];
-    q->push_back(-2.0 * weight_ref_deviation_ * ref_point_xy.first);
-    q->push_back(-2.0 * weight_ref_deviation_ * ref_point_xy.second);
-  }
-}
-
-void FemPosDeviationSmoother::CalculateAffineConstraint(
-    std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
-    std::vector<c_int>* A_indptr, std::vector<c_float>* lower_bounds,
-    std::vector<c_float>* upper_bounds) {
-  int ind_A = 0;
-  for (int i = 0; i < num_of_variables_; ++i) {
-    A_data->push_back(1.0);
-    A_indices->push_back(i);
-    A_indptr->push_back(ind_A);
-    ++ind_A;
-  }
-  A_indptr->push_back(ind_A);
-
-  for (int i = 0; i < num_of_points_; ++i) {
-    const auto& ref_point_xy = ref_points_[i];
-    upper_bounds->push_back(ref_point_xy.first + x_bounds_around_refs_[i]);
-    upper_bounds->push_back(ref_point_xy.second + y_bounds_around_refs_[i]);
-    lower_bounds->push_back(ref_point_xy.first - x_bounds_around_refs_[i]);
-    lower_bounds->push_back(ref_point_xy.second - y_bounds_around_refs_[i]);
-  }
-}
-
-void FemPosDeviationSmoother::SetPrimalWarmStart(
-    std::vector<c_float>* primal_warm_start) {
-  CHECK_EQ(ref_points_.size(), num_of_points_);
-  for (const auto& ref_point_xy : ref_points_) {
-    primal_warm_start->push_back(ref_point_xy.first);
-    primal_warm_start->push_back(ref_point_xy.second);
-  }
-}
-
-bool FemPosDeviationSmoother::OptimizeWithOsqp(
-    const size_t kernel_dim, const size_t num_affine_constraint,
-    std::vector<c_float>* P_data, std::vector<c_int>* P_indices,
-    std::vector<c_int>* P_indptr, std::vector<c_float>* A_data,
-    std::vector<c_int>* A_indices, std::vector<c_int>* A_indptr,
-    std::vector<c_float>* lower_bounds, std::vector<c_float>* upper_bounds,
-    std::vector<c_float>* q, std::vector<c_float>* primal_warm_start,
-    OSQPData* data, OSQPWorkspace** work, OSQPSettings* settings) {
-  CHECK_EQ(lower_bounds->size(), upper_bounds->size());
-
-  data->n = kernel_dim;
-  data->m = num_affine_constraint;
-  data->P = csc_matrix(data->n, data->n, P_data->size(), P_data->data(),
-                       P_indices->data(), P_indptr->data());
-  data->q = q->data();
-  data->A = csc_matrix(data->m, data->n, A_data->size(), A_data->data(),
-                       A_indices->data(), A_indptr->data());
-  data->l = lower_bounds->data();
-  data->u = upper_bounds->data();
-
-  *work = osqp_setup(data, settings);
-
-  osqp_warm_start_x(*work, primal_warm_start->data());
-
-  // Solve Problem
-  osqp_solve(*work);
-
-  auto status = (*work)->info->status_val;
-
-  if (status < 0) {
-    AERROR << "failed optimization status:\t" << (*work)->info->status;
+  if (!solver.Solve()) {
     return false;
   }
 
-  if (status != 1 && status != 2) {
-    AERROR << "failed optimization status:\t" << (*work)->info->status;
+  *opt_x = solver.opt_x();
+  *opt_y = solver.opt_y();
+  return true;
+}
+
+bool FemPosDeviationSmoother::SolveWithIpopt(
+    const std::vector<std::pair<double, double>>& raw_point2d,
+    const std::vector<double>& bounds, std::vector<double>* opt_x,
+    std::vector<double>* opt_y) {
+  FemPosDeviationIpoptInterface* smoother =
+      new FemPosDeviationIpoptInterface(raw_point2d, bounds);
+
+  smoother->set_weight_fem_pos_deviation(config_.weight_fem_pos_deviation());
+  smoother->set_weight_path_length(config_.weight_path_length());
+  smoother->set_weight_ref_deviation(config_.weight_ref_deviation());
+  smoother->set_weight_curvature_constraint_slack_var(
+      config_.weight_curvature_constraint_slack_var());
+  smoother->set_curvature_constraint(config_.curvature_constraint());
+
+  Ipopt::SmartPtr<Ipopt::TNLP> problem = smoother;
+
+  // Create an instance of the IpoptApplication
+  Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
+
+  app->Options()->SetIntegerValue("print_level",
+                                  static_cast<int>(config_.print_level()));
+  app->Options()->SetIntegerValue(
+      "max_iter", static_cast<int>(config_.max_num_of_iterations()));
+  app->Options()->SetIntegerValue(
+      "acceptable_iter",
+      static_cast<int>(config_.acceptable_num_of_iterations()));
+  app->Options()->SetNumericValue("tol", config_.tol());
+  app->Options()->SetNumericValue("acceptable_tol", config_.acceptable_tol());
+
+  Ipopt::ApplicationReturnStatus status = app->Initialize();
+  if (status != Ipopt::Solve_Succeeded) {
+    AERROR << "*** Error during initialization!";
     return false;
   }
 
+  status = app->OptimizeTNLP(problem);
+
+  if (status == Ipopt::Solve_Succeeded ||
+      status == Ipopt::Solved_To_Acceptable_Level) {
+    // Retrieve some statistics about the solve
+    Ipopt::Index iter_count = app->Statistics()->IterationCount();
+    ADEBUG << "*** The problem solved in " << iter_count << " iterations!";
+  } else {
+    AERROR << "Solver fails with return code: " << static_cast<int>(status);
+    return false;
+  }
+  smoother->get_optimization_results(opt_x, opt_y);
   return true;
 }
 

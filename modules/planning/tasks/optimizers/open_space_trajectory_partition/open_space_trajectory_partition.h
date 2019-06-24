@@ -104,6 +104,7 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
   double lateral_offset_to_midpoint_ = 0.0;
   double longitudinal_offset_to_midpoint_ = 0.0;
   double vehicle_box_iou_threshold_to_midpoint_ = 0.0;
+  double linear_velocity_threshold_on_ego_ = 0.0;
 
   common::VehicleParam vehicle_param_;
   double ego_length_ = 0.0;
@@ -114,6 +115,7 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
   double ego_theta_ = 0.0;
   double ego_x_ = 0.0;
   double ego_y_ = 0.0;
+  double ego_v_ = 0.0;
   common::math::Box2d ego_box_;
   double vehicle_moving_direction_ = 0.0;
 

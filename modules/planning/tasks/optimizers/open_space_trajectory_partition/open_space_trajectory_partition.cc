@@ -62,6 +62,8 @@ OpenSpaceTrajectoryPartition::OpenSpaceTrajectoryPartition(
   vehicle_box_iou_threshold_to_midpoint_ =
       open_space_trajectory_partition_config_
           .vehicle_box_iou_threshold_to_midpoint();
+  linear_velocity_threshold_on_ego_ = open_space_trajectory_partition_config_
+                                          .linear_velocity_threshold_on_ego();
 
   vehicle_param_ =
       common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
@@ -280,6 +282,7 @@ void OpenSpaceTrajectoryPartition::UpdateVehicleInfo() {
   ego_theta_ = vehicle_state.heading();
   ego_x_ = vehicle_state.x();
   ego_y_ = vehicle_state.y();
+  ego_v_ = vehicle_state.linear_velocity();
   Box2d box({ego_x_, ego_y_}, ego_theta_, ego_length_, ego_width_);
   ego_box_ = std::move(box);
   Vec2d ego_shift_vec{shift_distance_ * std::cos(ego_theta_),
@@ -486,7 +489,8 @@ bool OpenSpaceTrajectoryPartition::CheckReachTrajectoryEnd(
   double end_point_iou_ratio = 0.0;
   if (lateral_offset < lateral_offset_to_midpoint_ &&
       longitudinal_offset < longitudinal_offset_to_midpoint_ &&
-      heading_search_to_trajs_end < heading_offset_to_midpoint_) {
+      heading_search_to_trajs_end < heading_offset_to_midpoint_ &&
+      std::abs(ego_v_) < linear_velocity_threshold_on_ego_) {
     // get vehicle box and path point box, compare with a threadhold in IOU
     Box2d path_end_point_box({path_end_point_x, path_end_point_y},
                              path_end_point_theta, ego_length_, ego_width_);
@@ -513,14 +517,15 @@ bool OpenSpaceTrajectoryPartition::CheckReachTrajectoryEnd(
             "lateral distance_check: "
          << (lateral_offset < lateral_offset_to_midpoint_)
          << " and actual lateral distance: " << lateral_offset
-         << "Vehicle did not reach end of a trajectory with conditions for "
-            "longitudinal distance_check: "
+         << "; longitudinal distance_check: "
          << (longitudinal_offset < longitudinal_offset_to_midpoint_)
          << " and actual longitudinal distance: " << longitudinal_offset
-         << ", heading_check: "
+         << "; heading_check: "
          << (heading_search_to_trajs_end < heading_offset_to_midpoint_)
          << " with actual heading: " << heading_search_to_trajs_end
-         << ", iou_check: "
+         << "; velocity_check: "
+         << (std::abs(ego_v_) < linear_velocity_threshold_on_ego_)
+         << " with actual linear velocity: " << ego_v_ << "; iou_check: "
          << (end_point_iou_ratio > vehicle_box_iou_threshold_to_midpoint_)
          << " with actual iou: " << end_point_iou_ratio;
   return false;

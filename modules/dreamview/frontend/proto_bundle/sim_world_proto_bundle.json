@@ -2919,7 +2919,7 @@
                   "type": "bool",
                   "id": 9,
                   "options": {
-                    "default": true
+                    "default": false
                   }
                 }
               }
@@ -3625,7 +3625,7 @@
             },
             "FemPosDeviationSmootherConfig": {
               "fields": {
-                "weightFemPoseDeviation": {
+                "weightFemPosDeviation": {
                   "type": "double",
                   "id": 2,
                   "options": {
@@ -3646,39 +3646,95 @@
                     "default": 1
                   }
                 },
+                "applyCurvatureConstraint": {
+                  "type": "bool",
+                  "id": 5,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "weightCurvatureConstraintSlackVar": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 100
+                  }
+                },
+                "curvatureConstraint": {
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "default": 0.2
+                  }
+                },
                 "maxIter": {
                   "type": "int32",
-                  "id": 5,
+                  "id": 10,
                   "options": {
                     "default": 500
                   }
                 },
                 "timeLimit": {
                   "type": "double",
-                  "id": 6,
+                  "id": 11,
                   "options": {
                     "default": 0
                   }
                 },
                 "verbose": {
                   "type": "bool",
-                  "id": 7,
+                  "id": 12,
                   "options": {
                     "default": false
                   }
                 },
                 "scaledTermination": {
                   "type": "bool",
-                  "id": 8,
+                  "id": 13,
                   "options": {
                     "default": true
                   }
                 },
                 "warmStart": {
                   "type": "bool",
-                  "id": 9,
+                  "id": 14,
                   "options": {
                     "default": true
+                  }
+                },
+                "printLevel": {
+                  "type": "int32",
+                  "id": 20,
+                  "options": {
+                    "default": 0
+                  }
+                },
+                "maxNumOfIterations": {
+                  "type": "int32",
+                  "id": 21,
+                  "options": {
+                    "default": 500
+                  }
+                },
+                "acceptableNumOfIterations": {
+                  "type": "int32",
+                  "id": 22,
+                  "options": {
+                    "default": 15
+                  }
+                },
+                "tol": {
+                  "type": "double",
+                  "id": 23,
+                  "options": {
+                    "default": 1e-8
+                  }
+                },
+                "acceptableTol": {
+                  "type": "double",
+                  "id": 24,
+                  "options": {
+                    "default": 0.1
                   }
                 }
               }
@@ -4183,18 +4239,25 @@
                     "default": 5
                   }
                 },
-                "openSpaceFallBackCollisionDistance": {
+                "openSpaceFallbackCollisionDistance": {
                   "type": "double",
                   "id": 2,
                   "options": {
                     "default": 5
                   }
                 },
-                "openSpaceFallBackStopDistance": {
+                "openSpaceFallbackStopDistance": {
                   "type": "double",
                   "id": 3,
                   "options": {
                     "default": 2
+                  }
+                },
+                "openSpaceFallbackCollisionTimeBuffer": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 10
                   }
                 }
               }
@@ -4373,6 +4436,13 @@
                   "id": 12,
                   "options": {
                     "default": 0.95
+                  }
+                },
+                "linearVelocityThresholdOnEgo": {
+                  "type": "double",
+                  "id": 13,
+                  "options": {
+                    "default": 0.2
                   }
                 }
               }
@@ -4958,20 +5028,6 @@
                   "id": 6,
                   "options": {
                     "default": 1
-                  }
-                },
-                "maxPositionErrorToEndPoint": {
-                  "type": "double",
-                  "id": 7,
-                  "options": {
-                    "default": 0.5
-                  }
-                },
-                "maxThetaErrorToEndPoint": {
-                  "type": "double",
-                  "id": 8,
-                  "options": {
-                    "default": 0.2
                   }
                 },
                 "isNearDestinationThreshold": {
@@ -6959,58 +7015,65 @@
                     "default": 1
                   }
                 },
-                "lateralBoundaryBound": {
+                "maxLateralBoundaryBound": {
                   "type": "double",
                   "id": 3,
                   "options": {
-                    "default": 0.1
+                    "default": 0.5
+                  }
+                },
+                "minLateralBoundaryBound": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 0.2
                   }
                 },
                 "numOfTotalPoints": {
                   "type": "uint32",
-                  "id": 4,
+                  "id": 5,
                   "options": {
                     "default": 500
                   }
                 },
                 "curbShift": {
                   "type": "double",
-                  "id": 5,
+                  "id": 6,
                   "options": {
                     "default": 0.2
                   }
                 },
                 "drivingSide": {
                   "type": "DrivingSide",
-                  "id": 6,
+                  "id": 7,
                   "options": {
                     "default": "RIGHT"
                   }
                 },
                 "wideLaneThresholdFactor": {
                   "type": "double",
-                  "id": 7,
+                  "id": 8,
                   "options": {
                     "default": 2
                   }
                 },
                 "wideLaneShiftRatio": {
                   "type": "double",
-                  "id": 8,
+                  "id": 9,
                   "options": {
                     "default": 0.25
                   }
                 },
                 "lateralBuffer": {
                   "type": "double",
-                  "id": 9,
+                  "id": 10,
                   "options": {
                     "default": 0.2
                   }
                 },
                 "resolution": {
                   "type": "double",
-                  "id": 10,
+                  "id": 11,
                   "options": {
                     "default": 0.02
                   }

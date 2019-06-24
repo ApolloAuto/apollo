@@ -30,5 +30,5 @@ message OpenSpaceRoiDeciderConfig{
   // buffer distance for perception obstacle
   optional double perception_obstacle_buffer = 10;
   // tolerance limit for road_bound_width abnormal changes
-  optional double bound_width_change_ratio_uppper_limit = 11 [default = 1.0];
+  optional double curb_heading_tangent_change_uppper_limit = 11 [default = 1.0];
 }

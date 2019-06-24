@@ -46,20 +46,20 @@ TEST(BridgeProtoBufTest, Simple) {
   size_t frame_count = proto_buf.GetSerializedBufCount();
   for (size_t i = 0; i < frame_count; i++) {
     char header_flag[sizeof(BRIDGE_HEADER_FLAG) + 1] = {0};
-    size_t offset = 0;
+    bsize offset = 0;
     memcpy(header_flag, proto_buf.GetSerializedBuf(i), HEADER_FLAG_SIZE);
     EXPECT_STREQ(header_flag, BRIDGE_HEADER_FLAG);
-    offset += sizeof(BRIDGE_HEADER_FLAG) + 1;
+    offset += static_cast<bsize>(sizeof(BRIDGE_HEADER_FLAG) + 1);
 
-    char header_size_buf[sizeof(size_t) + 1] = {0};
+    char header_size_buf[sizeof(hsize) + 1] = {0};
     const char *cursor = proto_buf.GetSerializedBuf(i) + offset;
-    memcpy(header_size_buf, cursor, sizeof(size_t));
-    size_t header_size = *(reinterpret_cast<size_t *>(header_size_buf));
-    EXPECT_EQ(header_size, 236);
-    offset += sizeof(size_t) + 1;
+    memcpy(header_size_buf, cursor, sizeof(hsize));
+    hsize header_size = *(reinterpret_cast<hsize *>(header_size_buf));
+    EXPECT_EQ(header_size, 184);
+    offset += static_cast<bsize>(sizeof(hsize) + 1);
 
     BridgeHeader header;
-    size_t buf_size = header_size - offset;
+    bsize buf_size = header_size - offset;
     cursor = proto_buf.GetSerializedBuf(i) + offset;
     EXPECT_TRUE(header.Diserialize(cursor, buf_size));
     EXPECT_STREQ(header.GetMsgName().c_str(), "planning::ADCTrajectory");
