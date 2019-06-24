@@ -796,29 +796,33 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
   double safe_lane_width = left_width + right_width;
   safe_lane_width -= adc_width;
   bool is_lane_width_safe = true;
+
   if (safe_lane_width < kEpislon) {
     ADEBUG << "lane width [" << left_width + right_width << "] "
            << "is smaller than adc width [" << adc_width << "]";
     effective_width = kEpislon;
     is_lane_width_safe = false;
   }
+
   double center_shift = 0.0;
-  if (hdmap::LeftBoundaryType(waypoint) == hdmap::LaneBoundaryType::CURB) {
-    safe_lane_width -= smoother_config_.curb_shift();
-    center_shift -= 0.5 * smoother_config_.curb_shift();
-    if (safe_lane_width < kEpislon) {
-      ADEBUG << "lane width smaller than adc width and left curb shift";
-      effective_width = kEpislon;
-      is_lane_width_safe = false;
-    }
-  }
   if (hdmap::RightBoundaryType(waypoint) == hdmap::LaneBoundaryType::CURB) {
     safe_lane_width -= smoother_config_.curb_shift();
-    center_shift += 0.5 * smoother_config_.curb_shift();
     if (safe_lane_width < kEpislon) {
       ADEBUG << "lane width smaller than adc width and right curb shift";
       effective_width = kEpislon;
       is_lane_width_safe = false;
+    } else {
+      center_shift += 0.5 * smoother_config_.curb_shift();
+    }
+  }
+  if (hdmap::LeftBoundaryType(waypoint) == hdmap::LaneBoundaryType::CURB) {
+    safe_lane_width -= smoother_config_.curb_shift();
+    if (safe_lane_width < kEpislon) {
+      ADEBUG << "lane width smaller than adc width and left curb shift";
+      effective_width = kEpislon;
+      is_lane_width_safe = false;
+    } else {
+      center_shift -= 0.5 * smoother_config_.curb_shift();
     }
   }
 
@@ -829,23 +833,8 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
       buffered_width < kEpislon ? safe_lane_width : buffered_width;
 
   // shift center depending on the road width
-  double shifted_left_width = 0.5 * safe_lane_width;
   if (is_lane_width_safe) {
-    if (smoother_config_.wide_lane_threshold_factor() > 0 &&
-        safe_lane_width >
-            adc_width * smoother_config_.wide_lane_threshold_factor()) {
-      if (smoother_config_.driving_side() ==
-          ReferenceLineSmootherConfig::RIGHT) {
-        shifted_left_width *= smoother_config_.wide_lane_shift_ratio();
-      } else {
-        shifted_left_width =
-            safe_lane_width -
-            shifted_left_width * smoother_config_.wide_lane_shift_ratio();
-      }
-      center_shift -= (shifted_left_width - 0.5 * safe_lane_width);
-    }
-    auto shifted_right_width = safe_lane_width - shifted_left_width;
-    effective_width = std::min(shifted_left_width, shifted_right_width);
+    effective_width = 0.5 * safe_lane_width;
   }
 
   ref_point += left_vec * center_shift;
