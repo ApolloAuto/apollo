@@ -101,6 +101,8 @@ class IterativeAnchoringSmoother {
   std::vector<std::vector<common::math::LineSegment2d>>
       obstacles_linesegments_vec_;
 
+  std::vector<size_t> input_colliding_point_index_;
+
   // gear DRIVE as true and gear REVERSE as false
   bool gear_ = false;
 };

@@ -128,14 +128,13 @@ bool IterativeAnchoringSmoother::Smooth(
 
   // Check initial path collision avoidance, if it fails, smoother assumption
   // fails. Try reanchoring
-  std::vector<size_t> colliding_point_index;
   if (!CheckCollisionAvoidance(interpolated_warm_start_path,
-                               &colliding_point_index)) {
+                               &input_colliding_point_index_)) {
     AERROR << "Interpolated input path points colliding with obstacle";
-    if (!ReAnchoring(colliding_point_index, &interpolated_warm_start_path)) {
-      AERROR << "Fail to reanchor colliding input path points";
-      return false;
-    }
+    // if (!ReAnchoring(colliding_point_index, &interpolated_warm_start_path)) {
+    //   AERROR << "Fail to reanchor colliding input path points";
+    //   return false;
+    // }
   }
 
   const auto path_smooth_start_timestamp = std::chrono::system_clock::now();
@@ -491,6 +490,18 @@ bool IterativeAnchoringSmoother::CheckCollisionAvoidance(
   colliding_point_index->clear();
   size_t path_points_size = path_points.size();
   for (size_t i = 0; i < path_points_size; ++i) {
+    // Skip checking collision for thoese points colliding originally
+    bool skip_checking = false;
+    for (const auto index : input_colliding_point_index_) {
+      if (i == index) {
+        skip_checking = true;
+        break;
+      }
+    }
+    if (skip_checking) {
+      continue;
+    }
+
     const double heading = gear_
                                ? path_points[i].theta()
                                : NormalizeAngle(path_points[i].theta() + M_PI);
