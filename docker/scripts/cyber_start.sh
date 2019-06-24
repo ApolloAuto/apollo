@@ -21,7 +21,7 @@ LOCAL_IMAGE="no"
 VERSION=""
 ARCH=$(uname -m)
 VERSION_X86_64="cyber-x86_64-18.04-20190613_1540"
-VERSION_AARCH64="cyber-aarch64-18.04-20190611_2033"
+VERSION_AARCH64="cyber-aarch64-18.04-20190621_1606"
 VERSION_OPT=""
 
 # Check whether user has agreed license agreement
