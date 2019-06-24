@@ -40,13 +40,16 @@ using apollo::common::math::LineSegment2d;
 using apollo::common::math::NormalizeAngle;
 using apollo::common::math::Vec2d;
 
-IterativeAnchoringSmoother::IterativeAnchoringSmoother() {
+IterativeAnchoringSmoother::IterativeAnchoringSmoother(
+    const PlannerOpenSpaceConfig& planner_open_space_config) {
+  // TODO(Jinyun, Yu): refactor after stablized.
   const auto& vehicle_param =
       common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
   ego_length_ = vehicle_param.length();
   ego_width_ = vehicle_param.width();
   center_shift_distance_ =
       ego_length_ / 2.0 - vehicle_param.back_edge_to_center();
+  planner_open_space_config_.CopyFrom(planner_open_space_config);
 }
 
 bool IterativeAnchoringSmoother::Smooth(
@@ -93,8 +96,10 @@ bool IterativeAnchoringSmoother::Smooth(
     warm_start_path.push_back(std::move(path_point));
     last_path_point = cur_path_point;
   }
-  // TODO(Jinyun): move to confs
-  const double interpolated_delta_s = 0.1;
+
+  const double interpolated_delta_s =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .interpolated_delta_s();
   std::vector<std::pair<double, double>> interpolated_warm_start_point2ds;
   double path_length = warm_start_path.Length();
   double delta_s = path_length / std::ceil(path_length / interpolated_delta_s);
@@ -261,13 +266,19 @@ bool IterativeAnchoringSmoother::ReAnchoring(
   }
 
   // TODO(Jinyun): move to confs
-  const size_t reanchoring_trails_num = 200;
-  const double pos_stddev = 0.25;
-  const double length_stddev = 1.0;
+  const size_t reanchoring_trails_num = static_cast<size_t>(
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .reanchoring_trails_num());
+  const double reanchoring_pos_stddev =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .reanchoring_pos_stddev();
+  const double reanchoring_length_stddev =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .reanchoring_length_stddev();
   std::random_device rd;
   std::default_random_engine gen = std::default_random_engine(rd());
-  std::normal_distribution<> pos_dis{0, pos_stddev};
-  std::normal_distribution<> length_dis{0, length_stddev};
+  std::normal_distribution<> pos_dis{0, reanchoring_pos_stddev};
+  std::normal_distribution<> length_dis{0, reanchoring_length_stddev};
 
   for (const auto index : colliding_point_index) {
     bool reanchoring_success = false;
@@ -327,10 +338,12 @@ bool IterativeAnchoringSmoother::ReAnchoring(
                                        adjusted_delta_s *
                                            std::sin(adjust_theta));
         } else {
-          double rand_dev_x = common::math::Clamp(
-              pos_dis(gen), 2.0 * pos_stddev, -2.0 * pos_stddev);
-          double rand_dev_y = common::math::Clamp(
-              pos_dis(gen), 2.0 * pos_stddev, -2.0 * pos_stddev);
+          double rand_dev_x =
+              common::math::Clamp(pos_dis(gen), 2.0 * reanchoring_pos_stddev,
+                                  -2.0 * reanchoring_pos_stddev);
+          double rand_dev_y =
+              common::math::Clamp(pos_dis(gen), 2.0 * reanchoring_pos_stddev,
+                                  -2.0 * reanchoring_pos_stddev);
           path_points->at(index).set_x(path_points->at(index).x() + rand_dev_x);
           path_points->at(index).set_y(path_points->at(index).y() + rand_dev_y);
         }
@@ -361,10 +374,15 @@ bool IterativeAnchoringSmoother::GenerateInitialBounds(
   CHECK_NOTNULL(initial_bounds);
   initial_bounds->clear();
 
-  // TODO(Jinyun): Move to confs
-  const bool estimate_bound = false;
-  const double default_bound = 2.0;
-  const double vehicle_shortest_dimension = 1.04;
+  const bool estimate_bound =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .estimate_bound();
+  const double default_bound =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .default_bound();
+  const double vehicle_shortest_dimension =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .vehicle_shortest_dimension();
   const double kEpislon = 1e-8;
 
   if (!estimate_bound) {
@@ -410,27 +428,9 @@ bool IterativeAnchoringSmoother::SmoothPath(
   }
   flexible_bounds = bounds;
 
-  // TODO(Jinyun): move to confs
-  FemPosDeviationSmootherConfig config;
-  config.set_weight_fem_pos_deviation(1e8);
-  config.set_weight_path_length(10.0);
-  config.set_weight_ref_deviation(1.0);
-  config.set_apply_curvature_constraint(false);
-  config.set_max_iter(500);
-  config.set_time_limit(0.0);
-  config.set_verbose(false);
-  config.set_scaled_termination(true);
-  config.set_warm_start(true);
-
-  // TODO(Jinyun): param for enable curvature constraints, need further tunning
-  // config.set_weight_fem_pos_deviation(1e7);
-  // config.set_weight_path_length(1.0);
-  // config.set_weight_ref_deviation(1e3);
-  // config.set_apply_curvature_constraint(true);
-  // config.set_weight_curvature_constraint_slack_var(1e8);
-  // config.set_curvature_constraint(0.2);
-
-  FemPosDeviationSmoother fem_pos_smoother(config);
+  FemPosDeviationSmoother fem_pos_smoother(
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .fem_pos_deviation_smoother_config());
 
   // TODO(Jinyun): move to confs
   const size_t max_iteration_num = 1000;
@@ -543,7 +543,9 @@ void IterativeAnchoringSmoother::AdjustPathBounds(
   }
 
   // TODO(Jinyun): move to confs
-  const double collision_decrease_ratio = 0.9;
+  const double collision_decrease_ratio =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .collision_decrease_ratio();
 
   for (const auto index : colliding_point_index) {
     bounds->at(index) *= collision_decrease_ratio;
@@ -604,13 +606,24 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
                                              const double init_v,
                                              const double path_length,
                                              SpeedData* smoothed_speeds) {
-  // TODO(Jinyun): move to confs
-  const double max_forward_v = 2.0;
-  const double max_reverse_v = 2.0;
-  const double max_forward_acc = 3.0;
-  const double max_reverse_acc = 2.0;
-  const double max_acc_jerk = 4.0;
-  const double delta_t = 0.2;
+  const double max_forward_v =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .max_forward_v();
+  const double max_reverse_v =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .max_reverse_v();
+  const double max_forward_acc =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .max_forward_acc();
+  const double max_reverse_acc =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .max_reverse_acc();
+  const double max_acc_jerk =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .max_acc_jerk();
+  const double delta_t =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .delta_t();
 
   const double total_t = 2 * path_length / max_reverse_acc * 10;
   ADEBUG << "total_t is : " << total_t;
