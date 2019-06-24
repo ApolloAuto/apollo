@@ -306,7 +306,7 @@ bool IterativeAnchoringSmoother::ReAnchoring(
           const double adjust_theta = path_points->at(index - 1).theta();
           const double delta_s = std::abs(path_points->at(index).s() -
                                           path_points->at(index - 1).s());
-          double rand_dev = common::math::Clamp(length_dis(gen), 1.0, -1.0);
+          double rand_dev = common::math::Clamp(length_dis(gen), 0.8, -0.8);
           double adjusted_delta_s = delta_s * (1.0 + rand_dev);
           path_points->at(index).set_x(path_points->at(index - 1).x() +
                                        adjusted_delta_s *
@@ -319,7 +319,7 @@ bool IterativeAnchoringSmoother::ReAnchoring(
               NormalizeAngle(path_points->at(index + 1).theta() + M_PI);
           const double delta_s = std::abs(path_points->at(index + 1).s() -
                                           path_points->at(index).s());
-          double rand_dev = common::math::Clamp(length_dis(gen), 1.0, -1.0);
+          double rand_dev = common::math::Clamp(length_dis(gen), 0.8, -0.8);
           double adjusted_delta_s = delta_s * (1.0 + rand_dev);
           path_points->at(index).set_x(path_points->at(index + 1).x() +
                                        adjusted_delta_s *
