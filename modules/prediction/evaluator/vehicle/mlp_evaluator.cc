@@ -42,7 +42,10 @@ double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
 
 }  // namespace
 
-MLPEvaluator::MLPEvaluator() { LoadModel(FLAGS_evaluator_vehicle_mlp_file); }
+MLPEvaluator::MLPEvaluator() {
+  evaluator_type_ = ObstacleConf::MLP_EVALUATOR;
+  LoadModel(FLAGS_evaluator_vehicle_mlp_file);
+}
 
 void MLPEvaluator::Clear() {}
 
@@ -50,6 +53,8 @@ bool MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   Clear();
   CHECK_NOTNULL(obstacle_ptr);
   CHECK_LE(LANE_FEATURE_SIZE, 4 * FLAGS_max_num_lane_point);
+
+  obstacle_ptr->SetEvaluatorType(evaluator_type_);
 
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {

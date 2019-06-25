@@ -31,6 +31,7 @@ namespace apollo {
 namespace prediction {
 
 JunctionMapEvaluator::JunctionMapEvaluator() : device_(torch::kCPU) {
+  evaluator_type_ = ObstacleConf::JUNCTION_MAP_EVALUATOR;
   LoadModel();
 }
 
@@ -39,6 +40,9 @@ void JunctionMapEvaluator::Clear() {}
 bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Sanity checks.
   omp_set_num_threads(1);
+
+  obstacle_ptr->SetEvaluatorType(evaluator_type_);
+
   Clear();
   CHECK_NOTNULL(obstacle_ptr);
   int id = obstacle_ptr->id();

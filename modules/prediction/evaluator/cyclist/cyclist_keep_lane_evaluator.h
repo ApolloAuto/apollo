@@ -37,7 +37,7 @@ class CyclistKeepLaneEvaluator : public Evaluator {
   /**
    * @brief Constructor
    */
-  CyclistKeepLaneEvaluator() = default;
+  CyclistKeepLaneEvaluator();
 
   /**
    * @brief Destructor

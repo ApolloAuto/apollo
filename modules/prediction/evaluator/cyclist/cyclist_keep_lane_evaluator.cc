@@ -19,8 +19,15 @@
 namespace apollo {
 namespace prediction {
 
+CyclistKeepLaneEvaluator::CyclistKeepLaneEvaluator() {
+  evaluator_type_ = ObstacleConf::CYCLIST_KEEP_LANE_EVALUATOR;
+}
+
 bool CyclistKeepLaneEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   CHECK_NOTNULL(obstacle_ptr);
+
+  obstacle_ptr->SetEvaluatorType(evaluator_type_);
+
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
     AERROR << "Obstacle [" << id << "] has no latest feature.";

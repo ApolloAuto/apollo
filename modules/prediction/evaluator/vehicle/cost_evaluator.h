@@ -28,7 +28,7 @@ class CostEvaluator : public Evaluator {
   /**
    * @brief Constructor
    */
-  CostEvaluator() = default;
+  CostEvaluator();
 
   /**
    * @brief Destructor
