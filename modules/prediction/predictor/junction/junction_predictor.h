@@ -34,7 +34,7 @@ class JunctionPredictor : public Predictor {
   /**
    * @brief Constructor
    */
-  JunctionPredictor() = default;
+  JunctionPredictor();
 
   /**
    * @brief Destructor

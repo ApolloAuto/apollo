@@ -1631,5 +1631,15 @@ void Obstacle::SetCaution() {
   feature->mutable_priority()->set_priority(ObstaclePriority::CAUTION);
 }
 
+void Obstacle::SetEvaluatorType(
+    const ObstacleConf::EvaluatorType& evaluator_type) {
+  obstacle_conf_.set_evaluator_type(evaluator_type);
+}
+
+void Obstacle::SetPredictorType(
+    const ObstacleConf::PredictorType& predictor_type) {
+  obstacle_conf_.set_predictor_type(predictor_type);
+}
+
 }  // namespace prediction
 }  // namespace apollo

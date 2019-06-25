@@ -245,6 +245,10 @@ class Obstacle {
    */
   void SetCaution();
 
+  void SetEvaluatorType(const ObstacleConf::EvaluatorType& evaluator_type);
+
+  void SetPredictorType(const ObstacleConf::PredictorType& predictor_type);
+
  private:
   Obstacle() = default;
 
