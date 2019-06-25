@@ -42,7 +42,7 @@ using apollo::common::math::Vec2d;
 
 IterativeAnchoringSmoother::IterativeAnchoringSmoother(
     const PlannerOpenSpaceConfig& planner_open_space_config) {
-  // TODO(Jinyun, Yu): refactor after stablized.
+  // TODO(Jinyun, Yu): refactor after stabilized.
   const auto& vehicle_param =
       common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
   ego_length_ = vehicle_param.length();
