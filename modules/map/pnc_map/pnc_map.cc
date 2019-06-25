@@ -138,7 +138,8 @@ void PncMap::UpdateRoutingRange(int adc_index) {
     range_end_ = range_start_;
   }
   while (range_start_ + 1 < adc_index) {
-    range_lane_ids_.erase(route_indices_[range_start_].segment.lane->id().id());
+    // TODO(Hongyi): Delete this when confirmed
+    // range_lane_ids_.erase(route_indices_[range_start_].segment.lane->id().id());
     ++range_start_;
   }
   while (range_end_ < static_cast<int>(route_indices_.size())) {
