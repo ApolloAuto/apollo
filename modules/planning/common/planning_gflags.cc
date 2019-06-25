@@ -524,6 +524,9 @@ DEFINE_bool(enable_parallel_hybrid_a, false,
 
 DEFINE_double(vehicle_low_speed_threshold, 1.0, "Vehicle low speed threshold.");
 
+DEFINE_double(open_space_standstill_acceleration, 0.0,
+              "(unit: meter/sec^2) for open space stand still at destination");
+
 DEFINE_bool(enable_cuda, false, "True to enable cuda parallel implementation.");
 
 DEFINE_bool(enable_nonscenario_side_pass, false,
