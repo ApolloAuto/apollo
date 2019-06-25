@@ -6189,14 +6189,14 @@
                 },
                 "maxAdcStopSpeed": {
                   "type": "double",
-                  "id": 5,
+                  "id": 4,
                   "options": {
                     "default": 0.1
                   }
                 },
                 "maxSErrorToEndPoint": {
                   "type": "double",
-                  "id": 6,
+                  "id": 5,
                   "options": {
                     "default": 0.2
                   }
