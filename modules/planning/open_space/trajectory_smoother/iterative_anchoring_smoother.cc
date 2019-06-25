@@ -434,7 +434,7 @@ bool IterativeAnchoringSmoother::SmoothPath(
           .fem_pos_deviation_smoother_config());
 
   // TODO(Jinyun): move to confs
-  const size_t max_iteration_num = 1000;
+  const size_t max_iteration_num = 50;
 
   bool is_collision_free = false;
   std::vector<size_t> colliding_point_index;
