@@ -29,8 +29,8 @@
 
 #include "modules/perception/lidar/lib/segmentation/ncut/common/flood_fill.h"
 #include "modules/perception/lidar/lib/segmentation/ncut/common/lr_classifier.h"
-#include "modules/perception/lidar/lib/segmentation/ncut/proto/ncut_param.pb.h"
 #include "modules/perception/lidar/lib/segmentation/ncut/proto/ncut_config.pb.h"
+#include "modules/perception/lidar/lib/segmentation/ncut/proto/ncut_param.pb.h"
 
 namespace apollo {
 namespace perception {

@@ -117,8 +117,8 @@ bool SpatioTemporalGroundDetector::Detect(const GroundDetectorOptions& options,
     num_points = frame->world_cloud->size();
   }
 
-  ADEBUG << "spatial temporal seg: use roi " << use_roi_
-         << " num points " << num_points;
+  ADEBUG << "spatial temporal seg: use roi " << use_roi_ << " num points "
+         << num_points;
 
   // reallocate memory if points num > the preallocated size
   num_points_all = num_points;
