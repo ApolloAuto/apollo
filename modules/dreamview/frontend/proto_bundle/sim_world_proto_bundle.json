@@ -4357,7 +4357,7 @@
                   "type": "double",
                   "id": 10
                 },
-                "boundWidthChangeRatioUppperLimit": {
+                "curbHeadingTangentChangeUppperLimit": {
                   "type": "double",
                   "id": 11,
                   "options": {
@@ -5019,36 +5019,47 @@
                   "type": "DistanceApproachConfig",
                   "id": 4
                 },
+                "iterativeAnchoringSmootherConfig": {
+                  "type": "IterativeAnchoringConfig",
+                  "id": 5
+                },
                 "trajectoryPartitionConfig": {
                   "type": "TrajectoryPartitionConfig",
-                  "id": 5
+                  "id": 6
                 },
                 "deltaT": {
                   "type": "float",
-                  "id": 6,
+                  "id": 7,
                   "options": {
                     "default": 1
                   }
                 },
                 "isNearDestinationThreshold": {
                   "type": "double",
-                  "id": 9,
+                  "id": 8,
                   "options": {
                     "default": 0.001
                   }
                 },
                 "enableCheckParallelTrajectory": {
                   "type": "bool",
-                  "id": 10,
+                  "id": 9,
                   "options": {
                     "default": false
                   }
                 },
                 "enableLinearInterpolation": {
                   "type": "bool",
-                  "id": 11,
+                  "id": 10,
                   "options": {
                     "default": false
+                  }
+                },
+                "isNearDestinationThetaThreshold": {
+                  "type": "double",
+                  "id": 11,
+                  "options": {
+                    "default": 0.05
                   }
                 }
               }
@@ -5403,6 +5414,112 @@
                   "id": 12,
                   "options": {
                     "default": 0.1
+                  }
+                }
+              }
+            },
+            "IterativeAnchoringConfig": {
+              "fields": {
+                "interpolatedDeltaS": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 0.1
+                  }
+                },
+                "reanchoringTrailsNum": {
+                  "type": "int32",
+                  "id": 2,
+                  "options": {
+                    "default": 50
+                  }
+                },
+                "reanchoringPosStddev": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 0.25
+                  }
+                },
+                "reanchoringLengthStddev": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "estimateBound": {
+                  "type": "bool",
+                  "id": 5,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "defaultBound": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 2
+                  }
+                },
+                "vehicleShortestDimension": {
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "default": 1.04
+                  }
+                },
+                "femPosDeviationSmootherConfig": {
+                  "type": "FemPosDeviationSmootherConfig",
+                  "id": 8
+                },
+                "collisionDecreaseRatio": {
+                  "type": "double",
+                  "id": 9,
+                  "options": {
+                    "default": 0.9
+                  }
+                },
+                "maxForwardV": {
+                  "type": "double",
+                  "id": 10,
+                  "options": {
+                    "default": 2
+                  }
+                },
+                "maxReverseV": {
+                  "type": "double",
+                  "id": 11,
+                  "options": {
+                    "default": 2
+                  }
+                },
+                "maxForwardAcc": {
+                  "type": "double",
+                  "id": 12,
+                  "options": {
+                    "default": 3
+                  }
+                },
+                "maxReverseAcc": {
+                  "type": "double",
+                  "id": 13,
+                  "options": {
+                    "default": 2
+                  }
+                },
+                "maxAccJerk": {
+                  "type": "double",
+                  "id": 14,
+                  "options": {
+                    "default": 4
+                  }
+                },
+                "deltaT": {
+                  "type": "double",
+                  "id": 15,
+                  "options": {
+                    "default": 0.2
                   }
                 }
               }
@@ -8349,6 +8466,10 @@
                 "smoother": {
                   "type": "SmootherDebug",
                   "id": 28
+                },
+                "pullOverStatus": {
+                  "type": "apollo.planning.PullOverStatus",
+                  "id": 29
                 }
               }
             },
