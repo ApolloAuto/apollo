@@ -133,13 +133,13 @@ default_task_config: {
           xy_grid_resolution: 0.3
           phi_grid_resolution: 0.1
           next_node_num: 10
-          step_size: 0.5
+          step_size: 0.25
           traj_forward_penalty: 1.0
           traj_back_penalty: 1.0
           traj_gear_switch_penalty: 10.0
           traj_steer_penalty: 0.0
           traj_steer_change_penalty: 0.0
-          grid_a_star_xy_resolution: 0.5
+          grid_a_star_xy_resolution: 0.25
           node_radius: 0.5
         }
         dual_variable_warm_start_config {
@@ -214,11 +214,11 @@ default_task_config: {
           vehicle_shortest_dimension: 1.04
           fem_pos_deviation_smoother_config {
             weight_fem_pos_deviation: 1e7
-            weight_path_length: 1.0
+            weight_path_length: 0.0
             weight_ref_deviation: 1e3
             apply_curvature_constraint: true
             weight_curvature_constraint_slack_var: 1e8
-            curvature_constraint: 0.2
+            curvature_constraint: 0.18
             max_iter: 500
             time_limit: 0.0
             verbose: false
