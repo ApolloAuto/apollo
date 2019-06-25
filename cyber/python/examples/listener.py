@@ -18,7 +18,7 @@
 
 import sys
 
-sys.path.append("/apollo/cyber/python")
+sys.path.append("../..")
 from cyber_py import cyber  # noqa
 from cyber.proto.unit_test_pb2 import ChatterBenchmark  # noqa
 

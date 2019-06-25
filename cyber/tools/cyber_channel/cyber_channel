@@ -20,7 +20,7 @@ import os
 import time
 import math
 
-sys.path.append("/apollo/cyber/python")
+sys.path.append("../../python")
 from cyber_py import cyber  # noqa
 from cyber_py import cyber_time  # noqa
 

@@ -19,7 +19,7 @@
 import sys
 import unittest
 
-sys.path.append("/apollo/cyber/python")
+sys.path.append("../..")
 from cyber_py import cyber  # noqa
 from cyber_py import record  # noqa
 from modules.common.util.testdata.simple_pb2 import SimpleMessage  # noqa

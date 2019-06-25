@@ -19,7 +19,7 @@
 import sys
 import unittest
 
-sys.path.append("/apollo/cyber/python")
+sys.path.append("../..")
 from cyber_py import cyber  # noqa
 
 

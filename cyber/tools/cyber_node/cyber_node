@@ -18,7 +18,7 @@
 import sys
 import os
 
-sys.path.append("/apollo/cyber/python")
+sys.path.append("../../python")
 from cyber_py import cyber  # noqa
 
 
