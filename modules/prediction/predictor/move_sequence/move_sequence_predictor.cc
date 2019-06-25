@@ -32,11 +32,17 @@ using ::apollo::prediction::math_util::EvaluateCubicPolynomial;
 using ::apollo::prediction::math_util::EvaluateQuarticPolynomial;
 using ::apollo::prediction::math_util::SolveQuadraticEquation;
 
+MoveSequencePredictor::MoveSequencePredictor() {
+  predictor_type_ = ObstacleConf::MOVE_SEQUENCE_PREDICTOR;
+}
+
 void MoveSequencePredictor::Predict(Obstacle* obstacle) {
   Clear();
 
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
+
+  obstacle->SetPredictorType(predictor_type_);
 
   const Feature& feature = obstacle->latest_feature();
 

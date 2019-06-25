@@ -29,11 +29,17 @@ using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::hdmap::LaneInfo;
 
+SingleLanePredictor::SingleLanePredictor() {
+  predictor_type_ = ObstacleConf::SINGLE_LANE_PREDICTOR;
+}
+
 void SingleLanePredictor::Predict(Obstacle* obstacle) {
   Clear();
 
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
+
+  obstacle->SetPredictorType(predictor_type_);
 
   const Feature& feature = obstacle->latest_feature();
 

@@ -41,6 +41,7 @@ using apollo::hdmap::LaneInfo;
 using apollo::prediction::math_util::GetSByConstantAcceleration;
 
 InteractionPredictor::InteractionPredictor() {
+  predictor_type_ = ObstacleConf::INTERACTION_PREDICTOR;
   BuildADCTrajectory(FLAGS_collision_cost_time_resolution);
 }
 
@@ -49,6 +50,8 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
 
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
+
+  obstacle->SetPredictorType(predictor_type_);
 
   Feature* feature_ptr = obstacle->mutable_latest_feature();
 

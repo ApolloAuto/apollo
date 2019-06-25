@@ -31,7 +31,7 @@ class SingleLanePredictor : public SequencePredictor {
   /**
    * @brief Constructor
    */
-  SingleLanePredictor() = default;
+  SingleLanePredictor();
 
   /**
    * @brief Destructor
