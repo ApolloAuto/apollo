@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_map/pyramid_map/base_map/base_map_node.h"
+#include <zlib.h>
 #include <cstdio>
 #include <string>
 #include <vector>
@@ -291,7 +292,10 @@ size_t BaseMapNode::LoadBodyBinary(std::vector<unsigned char>* buf) {
     return map_matrix_handler_->LoadBinary(&(*buf)[0], map_matrix_);
   }
   std::vector<unsigned char> buf_uncompressed;
-  compression_strategy_->Decode(buf, &buf_uncompressed);
+  if (compression_strategy_->Decode(buf, &buf_uncompressed) != Z_OK) {
+    std::cerr << "Fail to decode body binary" << std::endl;
+    return map_matrix_handler_->LoadBinary(&(*buf)[0], map_matrix_);
+  }
   uncompressed_file_body_size_ = buf_uncompressed.size();
   std::cout << "map node compress ratio: "
             << static_cast<float>(buf->size()) /
