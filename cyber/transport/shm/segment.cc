@@ -67,6 +67,7 @@ bool Segment::AcquireBlockToWrite(std::size_t msg_size,
   writable_block->index = index;
   writable_block->block = &blocks_[index];
   writable_block->buf = block_buf_addrs_[index];
+  acquired_write_lock_[index] = true;
   return true;
 }
 
@@ -76,6 +77,7 @@ void Segment::ReleaseWrittenBlock(const WritableBlock& writable_block) {
     return;
   }
   blocks_[index].ReleaseWriteLock();
+  acquired_write_lock_[index] = false;
 }
 
 bool Segment::AcquireBlockToRead(ReadableBlock* readable_block) {
@@ -106,6 +108,7 @@ bool Segment::AcquireBlockToRead(ReadableBlock* readable_block) {
   }
   readable_block->block = blocks_ + index;
   readable_block->buf = block_buf_addrs_[index];
+  acquired_read_lock_[index] = true;
   return true;
 }
 
@@ -115,6 +118,7 @@ void Segment::ReleaseReadBlock(const ReadableBlock& readable_block) {
     return;
   }
   blocks_[index].ReleaseReadLock();
+  acquired_read_lock_[index] = false;
 }
 
 bool Segment::Init() {
@@ -217,6 +221,9 @@ bool Segment::OpenOrCreate() {
   }
 
   state_->IncreaseReferenceCounts();
+  acquired_read_lock_.resize(conf_.block_num(), false);
+  acquired_write_lock_.resize(conf_.block_num(), false);
+
   init_ = true;
   ADEBUG << "open or create true.";
   return true;
@@ -294,6 +301,8 @@ bool Segment::OpenOnly() {
   }
 
   state_->IncreaseReferenceCounts();
+  acquired_read_lock_.resize(conf_.block_num(), false);
+  acquired_write_lock_.resize(conf_.block_num(), false);
   init_ = true;
   ADEBUG << "open only true.";
   return true;
@@ -317,6 +326,20 @@ bool Segment::Destroy() {
   init_ = false;
 
   try {
+    WritableBlock block;
+    for (uint32_t i = 0; i < acquired_read_lock_.size(); ++i) {
+      if (acquired_read_lock_[i]) {
+        block.index = i;
+        ReleaseReadBlock(block);
+      }
+    }
+    for (uint32_t i = 0; i < acquired_write_lock_.size(); ++i) {
+      if (acquired_write_lock_[i]) {
+        block.index = i;
+        ReleaseWrittenBlock(block);
+      }
+    }
+
     state_->DecreaseReferenceCounts();
     uint32_t reference_counts = state_->reference_counts();
     if (reference_counts == 0) {
@@ -342,6 +365,8 @@ void Segment::Reset() {
     shmdt(managed_shm_);
     managed_shm_ = nullptr;
   }
+  acquired_read_lock_.clear();
+  acquired_write_lock_.clear();
 }
 
 bool Segment::Remap() {

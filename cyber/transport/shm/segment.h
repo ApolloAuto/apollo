@@ -26,6 +26,7 @@
 #include <mutex>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "cyber/transport/shm/block.h"
 #include "cyber/transport/shm/shm_conf.h"
@@ -83,6 +84,9 @@ class Segment final {
   void* managed_shm_;
   std::mutex block_buf_lock_;
   std::unordered_map<uint32_t, uint8_t*> block_buf_addrs_;
+
+  std::vector<bool> acquired_read_lock_;
+  std::vector<bool> acquired_write_lock_;
 };
 
 }  // namespace transport
