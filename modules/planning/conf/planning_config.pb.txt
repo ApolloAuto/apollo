@@ -235,9 +235,9 @@ default_task_config: {
           collision_decrease_ratio: 0.8
           max_forward_v: 1.0
           max_reverse_v: 1.0
-          max_forward_acc: 2.0
+          max_forward_acc: 0.5
           max_reverse_acc: 1.0
-          max_acc_jerk: 2.0
+          max_acc_jerk: 0.5
           delta_t: 0.2
         }
         delta_t: 0.5
