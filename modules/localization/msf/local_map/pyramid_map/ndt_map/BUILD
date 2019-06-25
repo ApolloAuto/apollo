@@ -9,7 +9,9 @@ cc_library(
         "ndt_map_matrix_handler.cc",
         "ndt_map_matrix.cc",
         "ndt_map_node_config.cc",
-        "ndt_map_node.cc"
+        "ndt_map_node.cc",
+        "ndt_map_pool.cc",
+        "ndt_map.cc"
     ],
     hdrs = glob(["*.h"]),
     copts= ["-g"],
@@ -35,6 +37,21 @@ cc_test(
     srcs = ["ndt_map_config_test.cc"],
     deps = [
         "//cyber",
+        "//modules/localization/msf/local_map/pyramid_map/ndt_map:localization_msf_ndt_map",
+        "@eigen",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "localization_msf_ndt_map_test",
+    size = "small",
+    timeout = "short",
+    srcs = ["ndt_map_test.cc"],
+    data = [":localization_msf_ndt_map_test_data"],
+    deps = [
+        "//cyber",
+        "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/local_map/pyramid_map/ndt_map:localization_msf_ndt_map",
         "@eigen",
         "@gtest//:main",
