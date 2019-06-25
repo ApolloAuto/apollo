@@ -35,6 +35,13 @@ namespace apollo {
 namespace drivers {
 namespace conti_radar {
 
+using Clock = apollo::common::time::Clock;
+using micros = std::chrono::microseconds;
+using apollo::cyber::Writer;
+using apollo::drivers::canbus::CanClient;
+using apollo::drivers::canbus::ProtocolData;
+using apollo::drivers::canbus::SenderMessage;
+
 ContiRadarMessageManager::ContiRadarMessageManager(
     const std::shared_ptr<Writer<ContiRadar>> &writer)
     : conti_radar_writer_(writer) {

@@ -21,6 +21,9 @@
 #include "Eigen/Geometry"
 
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/drivers/canbus/can_client/can_client_factory.h"
+#include "modules/drivers/canbus/can_comm/can_sender.h"
+#include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/drivers/radar/conti_radar/conti_radar_canbus_component.h"
 #include "modules/drivers/radar/conti_radar/conti_radar_message_manager.h"
@@ -32,6 +35,12 @@
 namespace apollo {
 namespace drivers {
 namespace conti_radar {
+
+using apollo::common::ErrorCode;
+using apollo::drivers::canbus::CanClientFactory;
+using apollo::drivers::canbus::SenderMessage;
+using apollo::drivers::canbus::SensorCanbusConf;
+using apollo::localization::LocalizationEstimate;
 
 ContiRadarCanbusComponent::ContiRadarCanbusComponent()
     : monitor_logger_buffer_(
