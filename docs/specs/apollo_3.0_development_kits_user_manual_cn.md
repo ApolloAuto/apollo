@@ -149,7 +149,7 @@
 ### 安装Ubuntu Linux
 Apollo软件系统依赖于Linux操作系统而运行，而Linux操作系统种类繁多，且又分为服务器版本和桌面版本，这里我们选择当下比较流行的Ubuntu桌面操作系统的64位版本。安装Ubuntu Linux的操作系统的步骤如下：
 #### 创建引导盘
-创建一个可以引导启动的Ubantu Linux USB闪存驱动器，下载Ubuntu（或Xubuntu等分支版本），并按照在线说明创建可引导启动的USB闪存驱动器。
+创建一个可以引导启动的Ubuntu Linux USB闪存驱动器，下载Ubuntu（或Xubuntu等分支版本），并按照在线说明创建可引导启动的USB闪存驱动器。
 
 ![tip_icon](images/tip_icon.png) 推荐使用 **Ubuntu 14.04.3**.
 
