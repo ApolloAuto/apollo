@@ -633,6 +633,10 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(
       num_of_knots, delta_t, {0.0, std::abs(init_v), std::abs(init_a)});
 
+  auto s_curve_config =
+      planner_open_space_config_.iterative_anchoring_smoother_config()
+          .s_curve_config();
+
   // set end constraints
   std::vector<std::pair<double, double>> x_bounds(num_of_knots,
                                                   {0.0, path_length});
@@ -651,14 +655,12 @@ bool IterativeAnchoringSmoother::SmoothSpeed(const double init_a,
   ddx_bounds[num_of_knots - 1] = std::make_pair(0.0, 0.0);
 
   std::vector<double> x_ref(num_of_knots, path_length);
-  piecewise_jerk_problem.set_x_ref(10.0, x_ref);
-
-  // TODO(Jinyun): tune the params and move to a config
-  piecewise_jerk_problem.set_weight_ddx(1.0);
-  piecewise_jerk_problem.set_weight_dddx(1.0);
-  piecewise_jerk_problem.set_x_bounds(x_bounds);
-  piecewise_jerk_problem.set_dx_bounds(dx_bounds);
-  piecewise_jerk_problem.set_ddx_bounds(ddx_bounds);
+  piecewise_jerk_problem.set_x_ref(s_curve_config.ref_s_weight(), x_ref);
+  piecewise_jerk_problem.set_weight_ddx(s_curve_config.acc_weight());
+  piecewise_jerk_problem.set_weight_dddx(s_curve_config.jerk_weight());
+  piecewise_jerk_problem.set_x_bounds(std::move(x_bounds));
+  piecewise_jerk_problem.set_dx_bounds(std::move(dx_bounds));
+  piecewise_jerk_problem.set_ddx_bounds(std::move(ddx_bounds));
   piecewise_jerk_problem.set_dddx_bound(max_acc_jerk);
 
   // Solve the problem
