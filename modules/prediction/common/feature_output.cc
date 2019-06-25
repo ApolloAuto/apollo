@@ -116,7 +116,8 @@ void FeatureOutput::InsertDataForLearning(
 }
 
 void FeatureOutput::InsertPredictionResult(
-    const int obstacle_id, const PredictionObstacle& prediction_obstacle) {
+    const int obstacle_id, const PredictionObstacle& prediction_obstacle,
+    const ObstacleConf& obstacle_conf) {
   PredictionResult* prediction_result =
       list_prediction_result_.add_prediction_result();
   prediction_result->set_id(obstacle_id);
@@ -124,6 +125,7 @@ void FeatureOutput::InsertPredictionResult(
   for (int i = 0; i < prediction_obstacle.trajectory_size(); ++i) {
     prediction_result->add_trajectory()->CopyFrom(
         prediction_obstacle.trajectory(i));
+    prediction_result->mutable_obstacle_conf()->CopyFrom(obstacle_conf);
   }
 }
 

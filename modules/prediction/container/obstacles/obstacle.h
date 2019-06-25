@@ -249,6 +249,8 @@ class Obstacle {
 
   void SetPredictorType(const ObstacleConf::PredictorType& predictor_type);
 
+  const ObstacleConf& obstacle_conf() { return obstacle_conf_; }
+
  private:
   Obstacle() = default;
 

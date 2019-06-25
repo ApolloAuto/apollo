@@ -21,6 +21,7 @@
 #include <unordered_map>
 
 #include "modules/prediction/common/feature_output.h"
+#include "modules/prediction/common/prediction_constants.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_thread_pool.h"
@@ -321,8 +322,10 @@ void PredictorManager::PredictObstacle(
   prediction_obstacle->mutable_priority()->CopyFrom(
       obstacle->latest_feature().priority());
   prediction_obstacle->set_is_static(obstacle->IsStill());
-  if (FLAGS_prediction_offline_mode == 3) {
-    FeatureOutput::InsertPredictionResult(obstacle->id(), *prediction_obstacle);
+  if (FLAGS_prediction_offline_mode ==
+      PredictionConstants::kDumpPredictionResult) {
+    FeatureOutput::InsertPredictionResult(obstacle->id(), *prediction_obstacle,
+                                          obstacle->obstacle_conf());
   }
 }
 
