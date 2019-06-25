@@ -133,6 +133,7 @@ bool IterativeAnchoringSmoother::Smooth(
 
   // Check initial path collision avoidance, if it fails, smoother assumption
   // fails. Try reanchoring
+  input_colliding_point_index_.clear();
   if (!CheckCollisionAvoidance(interpolated_warm_start_path,
                                &input_colliding_point_index_)) {
     AERROR << "Interpolated input path points colliding with obstacle";

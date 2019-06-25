@@ -209,14 +209,14 @@ default_task_config: {
           reanchoring_trails_num: 50
           reanchoring_pos_stddev: 0.25
           reanchoring_length_stddev: 1.0
-          estimate_bound: false
+          estimate_bound: true
           default_bound: 2.0
           vehicle_shortest_dimension: 1.04
           fem_pos_deviation_smoother_config {
-            weight_fem_pos_deviation: 1e8
+            weight_fem_pos_deviation: 1e7
             weight_path_length: 1.0
-            weight_ref_deviation: 1.0
-            apply_curvature_constraint: false
+            weight_ref_deviation: 1e3
+            apply_curvature_constraint: true
             weight_curvature_constraint_slack_var: 1e8
             curvature_constraint: 0.2
             max_iter: 500
@@ -225,7 +225,7 @@ default_task_config: {
             scaled_termination: true
             warm_start: true
           }
-          collision_decrease_ratio: 0.9
+          collision_decrease_ratio: 0.8
           max_forward_v: 1.0
           max_reverse_v: 1.0
           max_forward_acc: 2.0
