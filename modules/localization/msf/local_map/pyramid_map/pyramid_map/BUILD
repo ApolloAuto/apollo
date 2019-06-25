@@ -6,12 +6,16 @@ cc_library(
     name = "localization_msf_pyramid_map",
     srcs = ["pyramid_map_config.cc",
             "pyramid_map_matrix.cc",
-            "pyramid_map_matrix_handler.cc"],
+            "pyramid_map_matrix_handler.cc",
+            "pyramid_map_node_config.cc",
+            "pyramid_map_node.cc"],
 
     hdrs = ["aligned_matrix.h",
             "pyramid_map_config.h",
             "pyramid_map_matrix.h",
-            "pyramid_map_matrix_handler.h"],
+            "pyramid_map_matrix_handler.h",
+            "pyramid_map_node_config.h",
+            "pyramid_map_node.h"],
            
     linkopts = [
         "-lopencv_core",
@@ -58,5 +62,17 @@ cc_test (
         ":localization_msf_pyramid_map",
     ],
 )
+
+cc_test (
+    name = "pyramid_map_node_test",
+    srcs = ["pyramid_map_node_test.cc"],
+    size = "medium",
+    timeout = "short",
+    deps = [
+        "@gtest//:main",
+        ":localization_msf_pyramid_map",
+    ],
+)
+
 
 cpplint()
