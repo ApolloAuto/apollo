@@ -9,7 +9,7 @@ warm_start_config {
   next_node_num: 10
   step_size: 0.5
   traj_forward_penalty: 1.0
-  traj_back_penalty: 1.5
+  traj_back_penalty: 1.0
   traj_gear_switch_penalty: 10.0
   traj_steer_penalty: 0.0
   traj_steer_change_penalty: 0.0
