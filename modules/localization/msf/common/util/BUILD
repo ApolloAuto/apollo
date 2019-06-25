@@ -31,6 +31,21 @@ cc_library(
 )
 
 cc_library(
+    name = "localization_msf_common_util_file_utility",
+    srcs = ["file_utility.cc"],
+    hdrs = ["file_utility.h"],
+    linkopts = [
+        "-lboost_filesystem",
+        "-lboost_system",
+    ],
+    deps = [
+        "//modules/common",
+        "@eigen",
+        "@fastrtps",
+    ],
+)
+
+cc_library(
     name = "localization_msf_common_util_frame_transform",
     srcs = ["frame_transform.cc"],
     hdrs = ["frame_transform.h"],
