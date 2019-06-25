@@ -17,6 +17,7 @@
 #include <grpc++/grpc++.h>
 #include <yaml-cpp/yaml.h>
 #include <boost/algorithm/string.hpp>
+#include <utility>
 namespace apollo {
 namespace hdmap {
 LoopsChecker::LoopsChecker(const std::string& time_flag_file)
@@ -29,7 +30,7 @@ LoopsChecker::LoopsChecker(const std::string& time_flag_file)
   _service_stub = CollectionCheckerService::NewStub(
       grpc::CreateChannel(server_addr, grpc::InsecureChannelCredentials()));
 }
-int LoopsChecker::sync_start(bool& reached) {
+int LoopsChecker::sync_start(bool* reached) {
   std::vector<std::pair<double, double>> time_ranges = get_time_ranges();
   size_t pair_count = time_ranges.size();
   if (pair_count == 0) {
@@ -44,11 +45,11 @@ int LoopsChecker::sync_start(bool& reached) {
   }
   return periodic_check(reached);
 }
-int LoopsChecker::periodic_check(bool& reached) {
+int LoopsChecker::periodic_check(bool* reached) {
   int ret = 0;
   while (true) {
     double progress = 0.0;
-    ret = check(progress, reached);
+    ret = check(&progress, reached);
     if (ret != 0) {
       AERROR << "loops check failed";
       break;
@@ -107,17 +108,17 @@ std::vector<std::pair<double, double>> LoopsChecker::get_time_ranges() {
   }
   return result;
 }
-int LoopsChecker::grpc_stub(LOOPS_VERIFY_REQUEST_TYPE& request,
-                            LOOPS_VERIFY_RESPONSE_TYPE& response) {
+int LoopsChecker::grpc_stub(LOOPS_VERIFY_REQUEST_TYPE* request,
+                            LOOPS_VERIFY_RESPONSE_TYPE* response) {
   grpc::ClientContext context;
   grpc::Status status;
-  status = _service_stub->LoopsVerify(&context, request, &response);
+  status = _service_stub->LoopsVerify(&context, *request, response);
   if (status.error_code() == grpc::StatusCode::UNAVAILABLE) {
     AERROR << "FATAL Error. Map grpc service is UNAVAILABLE.";
     fprintf(USER_STREAM, "You should start server first\n");
     return -1;
   }
-  ErrorCode error_code = response.code();
+  ErrorCode error_code = response->code();
   if (error_code != ErrorCode::SUCCESS) {
     return ExceptionHandler::exception_handler(error_code);
   }
@@ -135,18 +136,18 @@ int LoopsChecker::start(
           << "," << std::to_string(time_ranges[i].second) << "]";
   }
   LOOPS_VERIFY_RESPONSE_TYPE response;
-  return grpc_stub(request, response);
+  return grpc_stub(&request, &response);
 }
-int LoopsChecker::check(double& progress, bool& reached) {
+int LoopsChecker::check(double* progress, bool* reached) {
   LOOPS_VERIFY_REQUEST_TYPE request;
   request.set_cmd(CmdType::CHECK);
   AINFO << "loops check request: "
         << "cmd: [" << request.cmd() << "]";
   LOOPS_VERIFY_RESPONSE_TYPE response;
-  int ret = grpc_stub(request, response);
-  progress = response.progress();
+  int ret = grpc_stub(&request, &response);
+  *progress = response.progress();
   if (response.has_loop_result() && response.loop_result().has_is_reached()) {
-    reached = response.loop_result().is_reached();
+    *reached = response.loop_result().is_reached();
   }
   return ret;
 }
@@ -156,7 +157,7 @@ int LoopsChecker::stop() {
   AINFO << "loops check request: "
         << "cmd: [" << request.cmd() << "]";
   LOOPS_VERIFY_RESPONSE_TYPE response;
-  return grpc_stub(request, response);
+  return grpc_stub(&request, &response);
 }
 
 }  // namespace hdmap

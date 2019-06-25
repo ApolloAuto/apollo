@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/map/tools/map_datachecker/server/laps_checker.h"
-#include <algorithm>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <iostream>

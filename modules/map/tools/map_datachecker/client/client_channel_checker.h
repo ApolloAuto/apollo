@@ -27,18 +27,18 @@ using CHANNEL_VERIFY_RESPONSE_TYPE = apollo::hdmap::ChannelVerifyResponse;
 
 class ChannelChecker {
  public:
-  ChannelChecker(const std::string& stop_flag_file);
-  int sync_start(std::string& record_path);
+  explicit ChannelChecker(const std::string& stop_flag_file);
+  int sync_start(const std::string& record_path);
   int sync_stop();
   int periodic_check();
-  int grpc_stub(CHANNEL_VERIFY_REQUEST_TYPE& request,
-                CHANNEL_VERIFY_RESPONSE_TYPE& response);
+  int grpc_stub(CHANNEL_VERIFY_REQUEST_TYPE* request,
+                CHANNEL_VERIFY_RESPONSE_TYPE* response);
 
  private:
-  int start(std::string& record_path);
+  int start(const std::string& record_path);
   int check();
   int stop();
-  int process_abnormal(CHANNEL_VERIFY_RESPONSE_TYPE& response);
+  int process_abnormal(CHANNEL_VERIFY_RESPONSE_TYPE* response);
 
  private:
   std::unique_ptr<CollectionCheckerService::Stub> _service_stub;

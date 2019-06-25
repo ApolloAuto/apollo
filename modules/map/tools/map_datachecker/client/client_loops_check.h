@@ -17,6 +17,7 @@
 #define _MODULES_MAP_TOOLS_MAP_DATACHECKER_CLIENT_LOOPS_CHECKER_H
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 #include "cyber/cyber.h"
 #include "modules/map/tools/map_datachecker/client/client_common.h"
@@ -31,16 +32,16 @@ using LOOPS_VERIFY_RESPONSE_TYPE = apollo::hdmap::LoopsVerifyResponse;
 
 class LoopsChecker {
  public:
-  LoopsChecker(const std::string& time_flag_file);
-  int sync_start(bool& reached);
+  explicit LoopsChecker(const std::string& time_flag_file);
+  int sync_start(bool* reached);
 
  private:
   std::vector<std::pair<double, double>> get_time_ranges();
-  int periodic_check(bool& reached);
-  int grpc_stub(LOOPS_VERIFY_REQUEST_TYPE& request,
-                LOOPS_VERIFY_RESPONSE_TYPE& response);
+  int periodic_check(bool* reached);
+  int grpc_stub(LOOPS_VERIFY_REQUEST_TYPE* request,
+                LOOPS_VERIFY_RESPONSE_TYPE* response);
   int start(const std::vector<std::pair<double, double>>& time_ranges);
-  int check(double& progress, bool& reached);
+  int check(double* progress, bool* reached);
   int stop();
 
  private:

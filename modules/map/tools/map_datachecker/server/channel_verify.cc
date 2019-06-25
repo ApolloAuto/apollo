@@ -63,7 +63,8 @@ int ChannelVerify::incremental_check(
   AINFO << "all records path:";
   for (size_t i = 0; i < records_path.size(); ++i) {
     AINFO << "[" << i << "]: " << records_path[i];
-    if (is_record_file(records_path[i]) && !is_record_checked(records_path[i])) {
+    if (is_record_file(records_path[i]) &&
+        !is_record_checked(records_path[i])) {
       not_check_records_path.push_back(records_path[i]);
     }
   }
@@ -157,7 +158,7 @@ std::shared_ptr<CyberRecordInfo> ChannelVerify::get_record_info(
       1e9;
 
   std::set<std::string> channel_list = sp_reader->GetChannelList();
-  for(auto it = channel_list.begin(); it != channel_list.end(); ++it) {
+  for (auto it = channel_list.begin(); it != channel_list.end(); ++it) {
     const std::string& channel_name = *it;
     CyberRecordChannel channel;
     channel.channel_name = channel_name;

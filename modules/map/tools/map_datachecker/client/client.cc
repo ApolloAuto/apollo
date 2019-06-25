@@ -18,6 +18,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <string>
+#include <vector>
 #include "cyber/cyber.h"
 #include "modules/map/tools/map_datachecker/client/client_alignment.h"
 #include "modules/map/tools/map_datachecker/client/client_channel_checker.h"
@@ -212,7 +213,7 @@ int Client::data_collect() {
 int Client::loops_check() {
   LoopsChecker loops_checker(_data_collect_time_flag_file);
   bool reached = false;
-  int ret = loops_checker.sync_start(reached);
+  int ret = loops_checker.sync_start(&reached);
   if (ret != 0) {
     AINFO << "loops_check failed";
     return -1;

@@ -16,6 +16,8 @@
 #ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_CLIENT_CLIENT_MICRO_H
 #define _MODULES_MAP_TOOLS_MAP_DATACHECKER_CLIENT_CLIENT_MICRO_H
 #include <grpc++/grpc++.h>
+#include <string>
+#include <vector>
 #include "cyber/cyber.h"
 namespace apollo {
 namespace hdmap {

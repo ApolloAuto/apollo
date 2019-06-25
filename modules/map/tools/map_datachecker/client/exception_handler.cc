@@ -105,3 +105,4 @@ int ExceptionHandler::exception_handler(ErrorCode error_code) {
 
 }  // namespace hdmap
 }  // namespace apollo
+

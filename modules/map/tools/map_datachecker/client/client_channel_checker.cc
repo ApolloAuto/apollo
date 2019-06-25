@@ -40,7 +40,7 @@ ChannelChecker::ChannelChecker(const std::string& stop_flag_file)
       grpc::CreateChannel(server_addr, grpc::InsecureChannelCredentials()));
 }
 
-int ChannelChecker::sync_start(std::string& record_path) {
+int ChannelChecker::sync_start(const std::string& record_path) {
   if (!boost::filesystem::exists(record_path)) {
     AERROR << "record_path [" << record_path << "]is not exist";
     return -1;
@@ -83,24 +83,24 @@ int ChannelChecker::periodic_check() {
   return ret;
 }
 
-int ChannelChecker::grpc_stub(CHANNEL_VERIFY_REQUEST_TYPE& request,
-                              CHANNEL_VERIFY_RESPONSE_TYPE& response) {
+int ChannelChecker::grpc_stub(CHANNEL_VERIFY_REQUEST_TYPE* request,
+                              CHANNEL_VERIFY_RESPONSE_TYPE* response) {
   grpc::ClientContext context;
   grpc::Status status;
-  status = _service_stub->ChannelVerify(&context, request, &response);
+  status = _service_stub->ChannelVerify(&context, *request, response);
   if (status.error_code() == grpc::StatusCode::UNAVAILABLE) {
     AERROR << "FATAL Error. Map grpc service is UNAVAILABLE.";
     fprintf(USER_STREAM, "You should start server first\n");
     return -1;
   }
-  ErrorCode error_code = response.code();
+  ErrorCode error_code = response->code();
   if (error_code != ErrorCode::SUCCESS) {
     return ExceptionHandler::exception_handler(error_code);
   }
   return 0;
 }
 
-int ChannelChecker::start(std::string& record_path) {
+int ChannelChecker::start(const std::string& record_path) {
   CHANNEL_VERIFY_REQUEST_TYPE request;
   request.set_path(record_path);
   request.set_cmd(CmdType::START);
@@ -108,7 +108,7 @@ int ChannelChecker::start(std::string& record_path) {
         << "record_path: [" << request.path() << "], "
         << "cmd: [" << request.cmd() << "]";
   CHANNEL_VERIFY_RESPONSE_TYPE response;
-  return grpc_stub(request, response);
+  return grpc_stub(&request, &response);
 }
 
 int ChannelChecker::check() {
@@ -117,9 +117,9 @@ int ChannelChecker::check() {
   AINFO << "channel check request: "
         << "cmd: [" << request.cmd() << "]";
   CHANNEL_VERIFY_RESPONSE_TYPE response;
-  int ret = grpc_stub(request, response);
+  int ret = grpc_stub(&request, &response);
   if (ret != 0) {
-    process_abnormal(response);
+    process_abnormal(&response);
   }
   return ret;
 }
@@ -130,14 +130,14 @@ int ChannelChecker::stop() {
   AINFO << "channel check request: "
         << "cmd: [" << request.cmd() << "]";
   CHANNEL_VERIFY_RESPONSE_TYPE response;
-  return grpc_stub(request, response);
+  return grpc_stub(&request, &response);
 }
 
-int ChannelChecker::process_abnormal(CHANNEL_VERIFY_RESPONSE_TYPE& response) {
-  ErrorCode code = response.code();
+int ChannelChecker::process_abnormal(CHANNEL_VERIFY_RESPONSE_TYPE* response) {
+  ErrorCode code = response->code();
   if (code == ErrorCode::ERROR_CHANNEL_VERIFY_RATES_ABNORMAL) {
-    if (response.has_result()) {
-      const VerifyResult& result = response.result();
+    if (response->has_result()) {
+      const VerifyResult& result = response->result();
       for (int i = 0; i < result.rates_size(); ++i) {
         const FrameRate& rate = result.rates(i);
         fprintf(USER_STREAM, "Channels with insufficient frame rate:%s\n",
@@ -154,8 +154,8 @@ int ChannelChecker::process_abnormal(CHANNEL_VERIFY_RESPONSE_TYPE& response) {
       return -1;
     }
   } else if (code == ErrorCode::ERROR_CHANNEL_VERIFY_TOPIC_LACK) {
-    if (response.has_result() && response.result().has_topics()) {
-      const TopicResult& topics = response.result().topics();
+    if (response->has_result() && response->result().has_topics()) {
+      const TopicResult& topics = response->result().topics();
       fprintf(USER_STREAM, "Missing channel(s):\n");
       for (int i = 0; i < topics.topic_lack_size(); ++i) {
         fprintf(USER_STREAM, "-%s:\n", topics.topic_lack(i).c_str());

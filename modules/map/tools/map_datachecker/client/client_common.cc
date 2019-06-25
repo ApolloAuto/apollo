@@ -18,6 +18,7 @@
 #include <boost/algorithm/string.hpp>
 #include <fstream>
 #include <string>
+#include <vector>
 #include "modules/map/tools/map_datachecker/client/exception_handler.h"
 namespace apollo {
 namespace hdmap {
@@ -34,3 +35,4 @@ std::vector<std::string> get_file_lines(const std::string& path) {
 
 }  // namespace hdmap
 }  // namespace apollo
+

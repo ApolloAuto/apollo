@@ -64,7 +64,7 @@ class Alignment {
     int ret = 0;
     while (true) {
       double progress = 0.0;
-      ret = _check(progress);
+      ret = _check(&progress);
       if (ret != 0) {
         AERROR << "alignment check failed";
         break;
@@ -88,16 +88,16 @@ class Alignment {
     return 0;
   }
 
-  int grpc_stub(REQUEST_TYPE& request, RESPONSE_TYPE& response) {
+  int grpc_stub(REQUEST_TYPE* request, RESPONSE_TYPE* response) {
     grpc::Status status = grpc_alignment_stub(request, response);
     if (status.error_code() == grpc::StatusCode::UNAVAILABLE) {
       AERROR << "FATAL Error. Map grpc service is UNAVAILABLE.";
       fprintf(USER_STREAM, "You should start server first\n");
       return -1;
     }
-    AINFO << "response error code: " << response.code();
-    if (response.code() != ErrorCode::SUCCESS) {
-      return ExceptionHandler::exception_handler(response.code());
+    AINFO << "response error code: " << response->code();
+    if (response->code() != ErrorCode::SUCCESS) {
+      return ExceptionHandler::exception_handler(response->code());
     }
     return 0;
   }
@@ -109,17 +109,17 @@ class Alignment {
     AINFO << "alignment request: "
           << "cmd: [" << request.cmd() << "]";
     RESPONSE_TYPE response;
-    return grpc_stub(request, response);
+    return grpc_stub(&request, &response);
   }
 
-  int _check(double& progress) {
+  int _check(double* progress) {
     REQUEST_TYPE request;
     request.set_cmd(CmdType::CHECK);
     AINFO << "alignment request: "
           << "cmd: [" << request.cmd() << "]";
     RESPONSE_TYPE response;
-    int ret = grpc_stub(request, response);
-    progress = response.progress();
+    int ret = grpc_stub(&request, &response);
+    *progress = response.progress();
     return ret;
   }
 
@@ -129,7 +129,7 @@ class Alignment {
     AINFO << "alignment request: "
           << "cmd: [" << request.cmd() << "]";
     RESPONSE_TYPE response;
-    return grpc_stub(request, response);
+    return grpc_stub(&request, &response);
   }
 
  private:
@@ -137,25 +137,25 @@ class Alignment {
 
  protected:
   std::unique_ptr<CollectionCheckerService::Stub> _service_stub;
-  virtual grpc::Status grpc_alignment_stub(REQUEST_TYPE& request,
-                                           RESPONSE_TYPE& response) = 0;
+  virtual grpc::Status grpc_alignment_stub(REQUEST_TYPE* request,
+                                           RESPONSE_TYPE* response) = 0;
 };
 
 class StaticAlign
     : public Alignment<STATIC_REQUEST_TYPE, STATIC_RESPONSE_TYPE> {
-  grpc::Status grpc_alignment_stub(STATIC_REQUEST_TYPE& request,
-                                   STATIC_RESPONSE_TYPE& response) {
+  grpc::Status grpc_alignment_stub(STATIC_REQUEST_TYPE* request,
+                                   STATIC_RESPONSE_TYPE* response) {
     grpc::ClientContext context;
-    return _service_stub->StaticAlign(&context, request, &response);
+    return _service_stub->StaticAlign(&context, *request, response);
   }
 };
 
 class EightRoute
     : public Alignment<EIGHTROUTE_REQUEST_TYPE, EIGHTROUTE_RESPONSE_TYPE> {
-  grpc::Status grpc_alignment_stub(EIGHTROUTE_REQUEST_TYPE& request,
-                                   EIGHTROUTE_RESPONSE_TYPE& response) {
+  grpc::Status grpc_alignment_stub(EIGHTROUTE_REQUEST_TYPE* request,
+                                   EIGHTROUTE_RESPONSE_TYPE* response) {
     grpc::ClientContext context;
-    return _service_stub->EightRoute(&context, request, &response);
+    return _service_stub->EightRoute(&context, *request, response);
   }
 };
 
