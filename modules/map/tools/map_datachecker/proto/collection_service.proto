@@ -1,0 +1,17 @@
+syntax = "proto2";
+package apollo.hdmap;
+
+import "modules/map/tools/map_datachecker/proto/collection_check_message.proto";
+// MAP
+service CollectionCheckerService {
+
+    rpc DynamicAlign (DynamicAlignRequest) returns (DynamicAlignResponse) {}
+
+    rpc StaticAlign (StaticAlignRequest) returns (StaticAlignResponse) {}
+
+    rpc EightRoute (EightRouteRequest) returns (EightRouteResponse) {}
+
+    rpc ChannelVerify (ChannelVerifyRequest) returns (ChannelVerifyResponse) {}
+
+    rpc LoopsVerify (LoopsVerifyRequest) returns (LoopsVerifyResponse) {}
+}
