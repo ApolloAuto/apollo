@@ -225,6 +225,13 @@ default_task_config: {
             scaled_termination: true
             warm_start: true
           }
+          s_curve_config {
+            acc_weight: 1.0
+            jerk_weight: 1.0
+            kappa_penalty_weight: 100.0
+            ref_s_weight: 10.0
+            ref_v_weight: 0.0
+          }
           collision_decrease_ratio: 0.8
           max_forward_v: 1.0
           max_reverse_v: 1.0
