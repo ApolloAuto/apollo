@@ -414,8 +414,8 @@ proto_library(
         "planner_open_space_config.proto",
     ],
     deps = [
-        ":piecewise_jerk_speed_config_proto_lib",
         ":fem_pos_deviation_smoother_config_proto_lib",
+        ":piecewise_jerk_speed_config_proto_lib",
     ],
 )
 
