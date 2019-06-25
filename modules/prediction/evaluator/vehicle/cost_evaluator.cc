@@ -22,8 +22,15 @@ namespace prediction {
 
 using apollo::prediction::math_util::Sigmoid;
 
+CostEvaluator::CostEvaluator() {
+  evaluator_type_ = ObstacleConf::COST_EVALUATOR;
+}
+
 bool CostEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   CHECK_NOTNULL(obstacle_ptr);
+
+  obstacle_ptr->SetEvaluatorType(evaluator_type_);
+
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
     AERROR << "Obstacle [" << id << "] has no latest feature.";

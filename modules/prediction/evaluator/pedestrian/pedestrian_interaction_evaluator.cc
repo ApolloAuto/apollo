@@ -39,6 +39,7 @@ using apollo::perception::PerceptionObstacles;
 
 PedestrianInteractionEvaluator::PedestrianInteractionEvaluator()
     : device_(torch::kCPU) {
+  evaluator_type_ = ObstacleConf::PEDESTRIAN_INTERACTION_EVALUATOR;
   LoadModel();
 }
 
@@ -84,6 +85,9 @@ torch::Tensor PedestrianInteractionEvaluator::GetSocialPooling() {
 bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Sanity checks.
   CHECK_NOTNULL(obstacle_ptr);
+
+  obstacle_ptr->SetEvaluatorType(evaluator_type_);
+
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
     AERROR << "Obstacle [" << id << "] has no latest feature.";

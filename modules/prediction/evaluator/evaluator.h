@@ -122,6 +122,9 @@ class Evaluator {
     CHECK_EQ(input_index, end_index);
     return output_matrix;
   }
+
+ protected:
+  ObstacleConf::EvaluatorType evaluator_type_;
 };
 
 }  // namespace prediction

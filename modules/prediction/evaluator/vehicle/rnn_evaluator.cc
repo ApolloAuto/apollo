@@ -28,11 +28,16 @@ namespace prediction {
 
 using apollo::hdmap::LaneInfo;
 
-RNNEvaluator::RNNEvaluator() { LoadModel(FLAGS_evaluator_vehicle_rnn_file); }
+RNNEvaluator::RNNEvaluator() {
+  evaluator_type_ = ObstacleConf::RNN_EVALUATOR;
+  LoadModel(FLAGS_evaluator_vehicle_rnn_file);
+}
 
 bool RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   Clear();
   CHECK_NOTNULL(obstacle_ptr);
+
+  obstacle_ptr->SetEvaluatorType(evaluator_type_);
 
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
