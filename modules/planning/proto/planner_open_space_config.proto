@@ -145,6 +145,7 @@ message IterativeAnchoringConfig {
   optional double max_reverse_acc = 13 [default = 2.0];
   optional double max_acc_jerk = 14 [default = 4.0];
   optional double delta_t = 15 [default = 0.2];
+  optional PiecewiseJerkSpeedConfig s_curve_config = 16;
 }
 
 message TrajectoryPartitionConfig {
