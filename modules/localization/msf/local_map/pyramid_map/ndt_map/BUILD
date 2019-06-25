@@ -7,7 +7,9 @@ cc_library(
     srcs = [
         "ndt_map_config.cc",
         "ndt_map_matrix_handler.cc",
-        "ndt_map_matrix.cc"
+        "ndt_map_matrix.cc",
+        "ndt_map_node_config.cc",
+        "ndt_map_node.cc"
     ],
     hdrs = glob(["*.h"]),
     copts= ["-g"],
