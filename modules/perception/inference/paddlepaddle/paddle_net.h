@@ -69,17 +69,17 @@ class PaddleNet : public Inference {
   std::unordered_map<std::string, std::string> name_map_ = {
     // object detection
     {"data", "input"},
-    {"detect1_obj_pred", "save_infer_model/scale_0"},
-    {"detect1_cls_pred", "save_infer_model/scale_1"},
-    {"detect1_ori_pred", "save_infer_model/scale_2"},
-    {"detect1_dim_pred", "save_infer_model/scale_3"},
+    {"obj_pred", "save_infer_model/scale_0"},
+    {"cls_pred", "save_infer_model/scale_1"},
+    {"ori_pred", "save_infer_model/scale_2"},
+    {"dim_pred", "save_infer_model/scale_3"},
     {"brvis_pred", "save_infer_model/scale_4"},
     {"ltvis_pred", "save_infer_model/scale_5"},
     {"rtvis_pred", "save_infer_model/scale_6"},
     {"brswt_pred", "save_infer_model/scale_7"},
     {"ltswt_pred", "save_infer_model/scale_8"},
     {"rtswt_pred", "save_infer_model/scale_9"},
-    {"detect1_loc_pred", "save_infer_model/scale_13"},
+    {"loc_pred", "save_infer_model/scale_13"},
     {"conv3_3", "save_infer_model/scale_14"},
     // lane line
     {"softmax", "save_infer_model/scale_0"},
