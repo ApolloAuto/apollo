@@ -96,6 +96,7 @@ proto_library(
     deps = [
         "//modules/common/proto:pnc_point_proto_lib",
         "//modules/prediction/proto:feature_proto_lib",
+        "//modules/prediction/proto:prediction_conf_proto_lib",
         "//modules/prediction/proto:prediction_proto_lib",
     ],
 )

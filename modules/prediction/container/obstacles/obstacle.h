@@ -33,6 +33,7 @@
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/proto/feature.pb.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
 
 /**
  * @namespace apollo::prediction
@@ -354,6 +355,8 @@ class Obstacle {
   std::vector<Eigen::MatrixXf> rnn_states_;
 
   bool rnn_enabled_ = false;
+
+  ObstacleConf obstacle_conf_;
 };
 
 }  // namespace prediction
