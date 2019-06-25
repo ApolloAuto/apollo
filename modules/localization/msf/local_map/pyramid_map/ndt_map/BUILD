@@ -6,6 +6,8 @@ cc_library(
     name = "localization_msf_ndt_map",
     srcs = [
         "ndt_map_config.cc",
+        "ndt_map_matrix_handler.cc",
+        "ndt_map_matrix.cc"
     ],
     hdrs = glob(["*.h"]),
     copts= ["-g"],
