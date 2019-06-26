@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/map/tools/map_datachecker/server/laps_checker.h"
+
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <algorithm>
@@ -27,55 +28,55 @@ namespace hdmap {
 
 LapsChecker::LapsChecker(const std::vector<FramePose> &poses, int laps_to_check,
                          std::shared_ptr<JSonConf> sp_conf)
-    : _poses(poses), _sp_conf(sp_conf) {
-  _laps_to_check = laps_to_check;
-  _maxx = 0.0;
-  _maxy = 0.0;
-  _minx = 0.0;
-  _miny = 0.0;
-  _possible_max_laps = (_laps_to_check + 1) * 10;
-  _confidence.resize(_possible_max_laps + 1, 0.0);
-  _finished = false;
-  _return_state = ErrorCode::SUCCESS;
+    : poses_(poses), sp_conf_(sp_conf) {
+  laps_to_check_ = laps_to_check;
+  maxx_ = 0.0;
+  maxy_ = 0.0;
+  minx_ = 0.0;
+  miny_ = 0.0;
+  possible_max_laps_ = (laps_to_check_ + 1) * 10;
+  confidence_.resize(possible_max_laps_ + 1, 0.0);
+  finished_ = false;
+  return_state_ = ErrorCode::SUCCESS;
   AINFO << "instance has " << poses.size() << " poses";
-  AINFO << "confidence size: " << _possible_max_laps + 1;
+  AINFO << "confidence size: " << possible_max_laps_ + 1;
 }
 
 int LapsChecker::set_progress(double p) {
-  _progress = p;
+  progress_ = p;
   return 0;
 }
 
-double LapsChecker::get_progress() const { return _progress; }
+double LapsChecker::get_progress() const { return progress_; }
 
-size_t LapsChecker::get_lap() const { return _lap; }
+size_t LapsChecker::get_lap() const { return lap_; }
 
 double LapsChecker::get_confidence() {
   double res = 0.0;
-  _lap = _laps_to_check;
-  for (size_t i = 0; i < _confidence.size(); ++i) {
-    AINFO << "confidence[" << i << "]: " << std::to_string(_confidence[i]);
+  lap_ = laps_to_check_;
+  for (size_t i = 0; i < confidence_.size(); ++i) {
+    AINFO << "confidence[" << i << "]: " << std::to_string(confidence_[i]);
   }
-  AINFO << "laps to check: " << _laps_to_check;
-  for (size_t i = _laps_to_check; i < _confidence.size(); ++i) {
-    res += _confidence[i];
+  AINFO << "laps to check: " << laps_to_check_;
+  for (size_t i = laps_to_check_; i < confidence_.size(); ++i) {
+    res += confidence_[i];
   }
   AINFO << "current confidence: " << res
-        << ", confidence thresh:" << _sp_conf->laps_rate_thresh;
-  if (res < _sp_conf->laps_rate_thresh) {
-    if (_confidence.size() == 0) {
+        << ", confidence thresh:" << sp_conf_->laps_rate_thresh;
+  if (res < sp_conf_->laps_rate_thresh) {
+    if (confidence_.size() == 0) {
       AINFO << "some problems induce lap problem";
       return 0.0;
     }
-    res = _confidence[0];
-    _lap = 0;
-    for (size_t i = 1; i < _confidence.size(); ++i) {
-      if (i == _laps_to_check) {
+    res = confidence_[0];
+    lap_ = 0;
+    for (size_t i = 1; i < confidence_.size(); ++i) {
+      if (i == laps_to_check_) {
         continue;
       }
-      if (_confidence[i] > res) {
-        _lap = i;
-        res = _confidence[i];
+      if (confidence_[i] > res) {
+        lap_ = i;
+        res = confidence_[i];
       }
     }
   }
@@ -83,13 +84,13 @@ double LapsChecker::get_confidence() {
 }
 
 ErrorCode LapsChecker::check() {
-  if (_poses.size() == 0) {
-    _return_state = ErrorCode::ERROR_VERIFY_NO_GNSSPOS;
-    return _return_state;
+  if (poses_.size() == 0) {
+    return_state_ = ErrorCode::ERROR_VERIFY_NO_GNSSPOS;
+    return return_state_;
   }
   do_check();
-  _finished = true;
-  return _return_state;
+  finished_ = true;
+  return return_state_;
 }
 
 void LapsChecker::do_check() {
@@ -123,8 +124,8 @@ void LapsChecker::do_check() {
 }
 
 int LapsChecker::check_params() {
-  int n_pose = static_cast<int>(_poses.size());
-  if (n_pose < _sp_conf->laps_frames_thresh) {
+  int n_pose = static_cast<int>(poses_.size());
+  if (n_pose < sp_conf_->laps_frames_thresh) {
     return -1;
   }
   return 0;
@@ -144,21 +145,21 @@ int LapsChecker::setup_grids_map() {
 }
 
 int LapsChecker::check_laps() {
-  int height = static_cast<int>(_grids_map.size());
+  int height = static_cast<int>(grids_map_.size());
   if (height <= 2 || height > 1000000) {
-    AINFO << "_grids_map size error. height = " << height;
+    AINFO << "grids_map_ size error. height = " << height;
     return -1;
   }
 
-  int width = static_cast<int>(_grids_map[0].size());
+  int width = static_cast<int>(grids_map_[0].size());
   if (width <= 2 || width >= 1000000) {
-    AINFO << "_grids_map size error. width = " << width;
+    AINFO << "grids_map_ size error. width = " << width;
     return -1;
   }
 
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
-      Grid &grid = _grids_map[y][x];
+      Grid &grid = grids_map_[y][x];
       size_t t_size = grid.size();
       if (t_size == 0) {
         continue;
@@ -170,31 +171,31 @@ int LapsChecker::check_laps() {
           continue;
         }
         std::sort(stamps.begin(), stamps.end());
-        double thresh_in_sec = _sp_conf->laps_time_err_thresh * 60;
+        double thresh_in_sec = sp_conf_->laps_time_err_thresh * 60;
         size_t segment = 1;
         for (size_t j = 1; j < stamps.size(); ++j) {
           if (stamps[j] - stamps[j - 1] > thresh_in_sec) {
             segment++;
           }
         }
-        if (segment <= _possible_max_laps) {
-          _confidence[segment] += 1;
+        if (segment <= possible_max_laps_) {
+          confidence_[segment] += 1;
         }
       }
     }
   }
 
   double all = 0.0;
-  for (size_t i = 0; i < _confidence.size(); ++i) {
-    all += _confidence[i];
+  for (size_t i = 0; i < confidence_.size(); ++i) {
+    all += confidence_[i];
   }
   if (all == 0.0) {
     AINFO << "there seems no poses";
     return -1;
   }
-  AINFO << "confidence size: " << _confidence.size();
-  for (size_t i = 0; i < _confidence.size(); ++i) {
-    _confidence[i] /= all;
+  AINFO << "confidence size: " << confidence_.size();
+  for (size_t i = 0; i < confidence_.size(); ++i) {
+    confidence_[i] /= all;
   }
 
   return 0;
@@ -202,13 +203,13 @@ int LapsChecker::check_laps() {
 
 int LapsChecker::gather_timestamps(std::vector<double> *sp_stamps, double alpha,
                                    int center_x, int center_y) {
-  int search_d = _sp_conf->laps_search_diameter;
+  int search_d = sp_conf_->laps_search_diameter;
   if ((search_d & 1) == 0) {
     AINFO << "laps_search_diameter should be an odd";
     return -1;
   }
   int search_r = (search_d >> 1);
-  size_t height = _grids_map.size(), width = _grids_map[0].size();
+  size_t height = grids_map_.size(), width = grids_map_[0].size();
   std::vector<double> &stamps = *sp_stamps;
   stamps.clear();
   const size_t start_y = std::max(0, center_y - search_r);
@@ -219,16 +220,16 @@ int LapsChecker::gather_timestamps(std::vector<double> *sp_stamps, double alpha,
       std::min(static_cast<int>(width) - 1, center_x + search_r);
   for (size_t y = start_y; y <= end_y; y++) {
     for (size_t x = start_x; x <= end_x; x++) {
-      Grid &grid = _grids_map[y][x];
+      Grid &grid = grids_map_[y][x];
       for (size_t i = 0; i < grid.size(); ++i) {
-        if (std::abs(alpha - grid[i].alpha) < _sp_conf->laps_alpha_err_thresh) {
+        if (std::abs(alpha - grid[i].alpha) < sp_conf_->laps_alpha_err_thresh) {
           std::vector<int> &idxs = grid[i].idxs;
           for (size_t j = 0; j < idxs.size(); ++j) {
-            if (idxs[j] >= static_cast<int>(_poses.size())) {
+            if (idxs[j] >= static_cast<int>(poses_.size())) {
               AINFO << "index error, index: " << idxs[j]
-                    << ", pose size: " << _poses.size();
+                    << ", pose size: " << poses_.size();
             } else {
-              stamps.push_back(_poses[idxs[j]].time_stamp);
+              stamps.push_back(poses_[idxs[j]].time_stamp);
             }
           }
         }
@@ -240,33 +241,35 @@ int LapsChecker::gather_timestamps(std::vector<double> *sp_stamps, double alpha,
 }
 
 int LapsChecker::get_min_max() {
-  _minx = _miny = std::numeric_limits<double>::max();
-  _maxx = _maxy = std::numeric_limits<double>::min();
-  size_t size = _poses.size();
+  minx_ = std::numeric_limits<double>::max();
+  miny_ = std::numeric_limits<double>::max();
+  maxx_ = std::numeric_limits<double>::min();
+  maxy_ = std::numeric_limits<double>::min();
+  size_t size = poses_.size();
   AINFO << "get_min_max pose size: " << size;
   for (size_t i = 0; i < size; ++i) {
-    double tx = _poses[i].tx, ty = _poses[i].ty;
-    if (tx < _minx) {
-      _minx = tx;
+    double tx = poses_[i].tx, ty = poses_[i].ty;
+    if (tx < minx_) {
+      minx_ = tx;
     }
-    if (tx > _maxx) {
-      _maxx = tx;
+    if (tx > maxx_) {
+      maxx_ = tx;
     }
-    if (ty < _miny) {
-      _miny = ty;
+    if (ty < miny_) {
+      miny_ = ty;
     }
-    if (ty > _maxy) {
-      _maxy = ty;
+    if (ty > maxy_) {
+      maxy_ = ty;
     }
   }
   return 0;
 }
 
 int LapsChecker::do_setup_grids_map() {
-  size_t width = size_t(_maxx - _minx + 1);
-  size_t height = size_t(_maxy - _miny + 1);
+  size_t width = size_t(maxx_ - minx_ + 1);
+  size_t height = size_t(maxy_ - miny_ + 1);
   AINFO << "grid map width: " << width << ", height: " << height;
-  size_t size = _poses.size();
+  size_t size = poses_.size();
   if (1 >= size || 0 == height || 0 == width || height > 1000000 ||
       width > 1000000) {
     AINFO << "pose size: " << size << ", height: " << height
@@ -275,14 +278,14 @@ int LapsChecker::do_setup_grids_map() {
     return -1;
   }
 
-  _grids_map.resize(height);
+  grids_map_.resize(height);
   for (size_t i = 0; i < height; ++i) {
-    _grids_map[i].resize(width);
+    grids_map_[i].resize(width);
   }
   // first pose can not be used
   for (size_t i = 1; i < size; ++i) {
-    int x = static_cast<int>(_poses[i].tx - _minx);
-    int y = static_cast<int>(_poses[i].ty - _miny);
+    int x = static_cast<int>(poses_[i].tx - minx_);
+    int y = static_cast<int>(poses_[i].ty - miny_);
     put_pose_to_grid(static_cast<int>(i), y, x);
     put_pose_to_neighbor_grid(static_cast<int>(i));
   }
@@ -290,8 +293,8 @@ int LapsChecker::do_setup_grids_map() {
 }
 
 double LapsChecker::calc_alpha(int pose_index) {
-  double vecx = _poses[pose_index].tx - _poses[pose_index - 1].tx;
-  double vecy = _poses[pose_index].ty - _poses[pose_index - 1].ty;
+  double vecx = poses_[pose_index].tx - poses_[pose_index - 1].tx;
+  double vecy = poses_[pose_index].ty - poses_[pose_index - 1].ty;
   double alpha = acos(vecx / sqrt(vecx * vecx + vecy * vecy)) * 180 / M_PI;
   if (alpha > 0) {
     return alpha;
@@ -309,10 +312,10 @@ int LapsChecker::put_pose_to_grid(int pose_index, int grid_y, int grid_x) {
     return 0;
   }
 
-  Grid &grid = _grids_map[grid_y][grid_x];
+  Grid &grid = grids_map_[grid_y][grid_x];
   size_t t_size = grid.size();
   for (size_t j = 0; j < t_size; ++j) {
-    if (std::abs(alpha - grid[j].alpha) < _sp_conf->laps_alpha_err_thresh) {
+    if (std::abs(alpha - grid[j].alpha) < sp_conf_->laps_alpha_err_thresh) {
       grid[j].idxs.push_back(pose_index);
       grid[j].alpha = (grid[j].alpha + alpha) / 2;
       return 0;
@@ -347,11 +350,11 @@ int LapsChecker::get_passed_grid(int pose_index, std::vector<int> *sp_grid_x,
   std::vector<int> &grid_y = *sp_grid_y;
   grid_x.clear();
   grid_y.clear();
-  double x = _poses[pose_index].tx - _minx;
-  double y = _poses[pose_index].ty - _miny;
-  double last_x = _poses[pose_index - 1].tx - _minx;
-  double last_y = _poses[pose_index - 1].ty - _miny;
-  if (std::abs(x - last_x) < 1e-6) {  // current trace is verticalx
+  double x = poses_[pose_index].tx - minx_;
+  double y = poses_[pose_index].ty - miny_;
+  double last_x = poses_[pose_index - 1].tx - minx_;
+  double last_y = poses_[pose_index - 1].ty - miny_;
+  if (std::abs(x - last_x) < 1e-6) {  // current trace is vertical
     int start_y = static_cast<int>(std::min(y, last_y)) + 1;
     int end_y = static_cast<int>(std::max(y, last_y));
     int start_x = static_cast<int>(x);
@@ -401,7 +404,7 @@ double LapsChecker::slope(double x1, double y1, double x2, double y2) {
   return (y2 - y1) / (x2 - x1);
 }
 
-ErrorCode LapsChecker::get_return_state() { return _return_state; }
+ErrorCode LapsChecker::get_return_state() { return return_state_; }
 
 }  // namespace hdmap
 }  // namespace apollo

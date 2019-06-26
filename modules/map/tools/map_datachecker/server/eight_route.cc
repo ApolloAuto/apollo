@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/map/tools/map_datachecker/server/eight_route.h"
+
 #include <cmath>
 #include <vector>
 
@@ -24,7 +25,10 @@ EightRoute::EightRoute(std::shared_ptr<JSonConf> sp_conf) : Alignment(sp_conf) {
   reset();
 }
 
-void EightRoute::reset() { _progress = 0.0, _last_progress = 0; }
+void EightRoute::reset() {
+  progress_ = 0.0;
+  last_progress_ = 0;
+}
 
 bool EightRoute::is_eight_route_pose(const std::vector<FramePose>& poses,
                                      int pose_index) {
@@ -37,8 +41,8 @@ bool EightRoute::is_eight_route_pose(const std::vector<FramePose>& poses,
 
   double yaw = get_yaw(poses[pose_index - 1].tx, poses[pose_index - 1].ty,
                        poses[pose_index].tx, poses[pose_index].ty);
-  double yaw_diff = fabs(_last_yaw - yaw);
-  _last_yaw = yaw;
+  double yaw_diff = fabs(last_yaw_ - yaw);
+  last_yaw_ = yaw;
   yaw_diff = yaw_diff < 180 ? yaw_diff : 360 - yaw_diff;
 
   double xdiff = poses[pose_index].tx - poses[pose_index - 1].tx;
@@ -55,24 +59,24 @@ bool EightRoute::is_eight_route_pose(const std::vector<FramePose>& poses,
   AINFO << std::to_string(poses[pose_index].time_stamp)
         << ", yaw_diff:" << yaw_diff << ", dist: " << dist
         << ", during: " << during << ", vel: " << vel;
-  if (yaw_diff > _sp_conf->eight_angle && vel > _sp_conf->eight_vel) {
+  if (yaw_diff > sp_conf_->eight_angle && vel > sp_conf_->eight_vel) {
     return true;
   }
   return false;
 }
 
 double EightRoute::get_good_pose_during() {
-  if (_sp_good_pose_info == nullptr || _sp_good_pose_info->start_time < 0 ||
-      _sp_good_pose_info->end_time < 0) {
+  if (sp_good_pose_info_ == nullptr || sp_good_pose_info_->start_time < 0 ||
+      sp_good_pose_info_->end_time < 0) {
     return 0.0;
   }
-  return _sp_good_pose_info->end_time - _sp_good_pose_info->start_time;
+  return sp_good_pose_info_->end_time - sp_good_pose_info_->start_time;
 }
 
 double EightRoute::get_eight_route_progress(
     const std::vector<FramePose>& poses) {
   int size = static_cast<int>(poses.size());
-  int start_index = time_to_index(poses, _start_time);
+  int start_index = time_to_index(poses, start_time_);
   // select first good pose
   while (start_index < size) {
     if (is_good_pose(poses, start_index) &&
@@ -84,7 +88,7 @@ double EightRoute::get_eight_route_progress(
   }
   if (start_index >= size) {
     AINFO << "not find first good pose, start_time: "
-          << std::to_string(_start_time) << ", start_index: " << start_index
+          << std::to_string(start_time_) << ", start_index: " << start_index
           << ", pose size: " << size;
     return 0.0;
   }
@@ -92,7 +96,7 @@ double EightRoute::get_eight_route_progress(
     AINFO << "not have enough poses, wait for a moment";
     return 0.0;
   }
-  _last_yaw = get_yaw(poses[start_index].tx, poses[start_index].ty,
+  last_yaw_ = get_yaw(poses[start_index].tx, poses[start_index].ty,
                       poses[start_index + 1].tx, poses[start_index + 1].ty);
 
   int not_eight_count = 0;
@@ -104,9 +108,9 @@ double EightRoute::get_eight_route_progress(
     if (!is_eight_route_pose(poses, i)) {
       ++not_eight_count;
       AINFO << "not eight route pose";
-      if (not_eight_count > _sp_conf->eight_bad_pose_tolerance) {
+      if (not_eight_count > sp_conf_->eight_bad_pose_tolerance) {
         AINFO << "not-eight pose count reached upper limitation";
-        _return_state = ErrorCode::ERROR_NOT_EIGHT_ROUTE;
+        return_state_ = ErrorCode::ERROR_NOT_EIGHT_ROUTE;
         return 0.0;
       }
     } else {
@@ -120,11 +124,11 @@ double EightRoute::get_eight_route_progress(
   if (eight_route_during < 1e-8) {
     AINFO << "num of eight route good pose too small, during: "
           << eight_route_during;
-    _return_state = ErrorCode::SUCCESS;
+    return_state_ = ErrorCode::SUCCESS;
     return 0.0;
   }
-  _return_state = ErrorCode::SUCCESS;
-  double progress = eight_route_during / _sp_conf->eight_duration;
+  return_state_ = ErrorCode::SUCCESS;
+  double progress = eight_route_during / sp_conf_->eight_duration;
   if (progress >= 1.0) {
     progress = 1.0;
   }
@@ -136,26 +140,26 @@ ErrorCode EightRoute::process(const std::vector<FramePose>& poses) {
   AINFO << "[EightRoute::process] begin";
   size_t size = poses.size();
   if (size <= 1) {
-    _return_state = ErrorCode::ERROR_VERIFY_NO_GNSSPOS;
-    return _return_state;
+    return_state_ = ErrorCode::ERROR_VERIFY_NO_GNSSPOS;
+    return return_state_;
   }
 
-  _progress = get_eight_route_progress(poses);
-  if (_return_state != ErrorCode::SUCCESS) {
+  progress_ = get_eight_route_progress(poses);
+  if (return_state_ != ErrorCode::SUCCESS) {
     AINFO << "get_eight_route_progress failed.";
-    return _return_state;
+    return return_state_;
   }
-  if (_progress < _last_progress) {
-    _return_state = ErrorCode::ERROR_NOT_EIGHT_ROUTE;
-    return _return_state;
+  if (progress_ < last_progress_) {
+    return_state_ = ErrorCode::ERROR_NOT_EIGHT_ROUTE;
+    return return_state_;
   }
 
-  AINFO << "[EightRoute::process] end, progress:" << _progress;
-  _return_state = ErrorCode::SUCCESS;
-  return _return_state;
+  AINFO << "[EightRoute::process] end, progress:" << progress_;
+  return_state_ = ErrorCode::SUCCESS;
+  return return_state_;
 }
 
-double EightRoute::get_progress() const { return _progress; }
+double EightRoute::get_progress() const { return progress_; }
 
 }  // namespace hdmap
 }  // namespace apollo

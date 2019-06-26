@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_CHANNEL_CHEKCER_AGENT_H
-#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_CHANNEL_CHEKCER_AGENT_H
+#pragma once
+
 #include <grpc++/grpc++.h>
 #include <map>
 #include <memory>
@@ -22,6 +22,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "modules/map/tools/map_datachecker/proto/collection_error_code.pb.h"
 #include "modules/map/tools/map_datachecker/proto/collection_service.pb.h"
 #include "modules/map/tools/map_datachecker/server/channel_verify.h"
@@ -31,25 +32,22 @@ namespace hdmap {
 
 enum class ChannelVerifyAgentState { IDLE, RUNNING };
 
-using CHANNEL_VERIFY_REQUEST_TYPE = const apollo::hdmap::ChannelVerifyRequest;
-using CHANNEL_VERIFY_RESPONSE_TYPE = apollo::hdmap::ChannelVerifyResponse;
-
 class ChannelVerifyAgent {
  public:
   explicit ChannelVerifyAgent(std::shared_ptr<JSonConf> sp_conf);
   grpc::Status process_grpc_request(grpc::ServerContext *context,
-                                    CHANNEL_VERIFY_REQUEST_TYPE *request,
-                                    CHANNEL_VERIFY_RESPONSE_TYPE *response);
+                                    ChannelVerifyRequest *request,
+                                    ChannelVerifyResponse *response);
 
  private:
-  void start_check(CHANNEL_VERIFY_REQUEST_TYPE *request,
-                   CHANNEL_VERIFY_RESPONSE_TYPE *response);
+  void start_check(ChannelVerifyRequest *request,
+                   ChannelVerifyResponse *response);
   void async_check(const std::string &records_path);
   void do_check(const std::string &records_path);
-  void check_result(CHANNEL_VERIFY_REQUEST_TYPE *request,
-                    CHANNEL_VERIFY_RESPONSE_TYPE *response);
-  void stop_check(CHANNEL_VERIFY_REQUEST_TYPE *request,
-                  CHANNEL_VERIFY_RESPONSE_TYPE *response);
+  void check_result(ChannelVerifyRequest *request,
+                    ChannelVerifyResponse *response);
+  void stop_check(ChannelVerifyRequest *request,
+                  ChannelVerifyResponse *response);
   void reset();
   void set_state(ChannelVerifyAgentState state);
   ChannelVerifyAgentState get_state() const;
@@ -63,17 +61,15 @@ class ChannelVerifyAgent {
                                        const std::string &channel);
 
  private:
-  ChannelVerifyAgentState _state;
-  std::mutex _stop_mutex;
-  bool _need_stop;
-  bool _stopped;
-  std::shared_ptr<JSonConf> _sp_conf = nullptr;
-  std::shared_ptr<ChannelVerify> _sp_channel_checker = nullptr;
-  CheckResult _sp_check_result = nullptr;
-  std::thread::id _check_thread_id;
+  ChannelVerifyAgentState state_;
+  std::mutex stop_mutex_;
+  bool need_stop_;
+  bool stopped_;
+  std::shared_ptr<JSonConf> sp_conf_ = nullptr;
+  std::shared_ptr<ChannelVerify> sp_channel_checker_ = nullptr;
+  CheckResult sp_check_result_ = nullptr;
+  std::thread::id check_thread_id_;
 };
 
 }  // namespace hdmap
 }  // namespace apollo
-
-#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_CHANNEL_CHEKCER_AGENT_H

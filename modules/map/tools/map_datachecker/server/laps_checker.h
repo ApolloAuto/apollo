@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_LAPS_CHECKER_H
-#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_LAPS_CHECKER_H
+#pragma once
 
 #include <map>
 #include <memory>
 #include <utility>
 #include <vector>
+
 #include "modules/map/tools/map_datachecker/proto/collection_error_code.pb.h"
-#include "modules/map/tools/map_datachecker/server/common.hpp"
+#include "modules/map/tools/map_datachecker/server/common.h"
 
 namespace apollo {
 namespace hdmap {
@@ -60,22 +60,20 @@ class LapsChecker {
   inline int set_progress(double p);
 
  public:
-  const std::vector<FramePose>& _poses;
-  double _maxx, _maxy, _minx, _miny;
-  std::vector<std::vector<Grid>> _grids_map;
-  bool _finished;
+  const std::vector<FramePose>& poses_;
+  double maxx_, maxy_, minx_, miny_;
+  std::vector<std::vector<Grid>> grids_map_;
+  bool finished_;
 
  private:
-  std::vector<double> _confidence;
-  double _progress;
-  size_t _laps_to_check;
-  size_t _possible_max_laps;
-  size_t _lap;
-  std::shared_ptr<JSonConf> _sp_conf;
-  ErrorCode _return_state;
+  std::vector<double> confidence_;
+  double progress_;
+  size_t laps_to_check_;
+  size_t possible_max_laps_;
+  size_t lap_;
+  std::shared_ptr<JSonConf> sp_conf_;
+  ErrorCode return_state_;
 };
 
 }  // namespace hdmap
 }  // namespace apollo
-
-#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_LAPS_CHECKER_H

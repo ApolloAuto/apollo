@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/map/tools/map_datachecker/server/channel_verify_agent.h"
+
 #include <chrono>
 #include <map>
 #include <string>
@@ -25,23 +26,23 @@ namespace apollo {
 namespace hdmap {
 
 ChannelVerifyAgent::ChannelVerifyAgent(std::shared_ptr<JSonConf> sp_conf) {
-  _sp_conf = sp_conf;
-  _sp_channel_checker = nullptr;
-  _sp_check_result = nullptr;
+  sp_conf_ = sp_conf;
+  sp_channel_checker_ = nullptr;
+  sp_check_result_ = nullptr;
 }
 
 void ChannelVerifyAgent::reset() {
-  std::lock_guard<std::mutex> guard(_stop_mutex);
-  _need_stop = false;
-  _stopped = false;
-  _sp_channel_checker = std::make_shared<ChannelVerify>(_sp_conf);
-  _sp_check_result = nullptr;
+  std::lock_guard<std::mutex> guard(stop_mutex_);
+  need_stop_ = false;
+  stopped_ = false;
+  sp_channel_checker_ = std::make_shared<ChannelVerify>(sp_conf_);
+  sp_check_result_ = nullptr;
   set_state(ChannelVerifyAgentState::IDLE);
 }
 
 grpc::Status ChannelVerifyAgent::process_grpc_request(
-    grpc::ServerContext *context, CHANNEL_VERIFY_REQUEST_TYPE *request,
-    CHANNEL_VERIFY_RESPONSE_TYPE *response) {
+    grpc::ServerContext *context, ChannelVerifyRequest *request,
+    ChannelVerifyResponse *response) {
   AINFO << "ChannelVerifyAgent Request: " << request->DebugString();
   switch (request->cmd()) {
     case CmdType::START:
@@ -64,8 +65,8 @@ grpc::Status ChannelVerifyAgent::process_grpc_request(
   return grpc::Status::OK;
 }
 
-void ChannelVerifyAgent::start_check(CHANNEL_VERIFY_REQUEST_TYPE *request,
-                                     CHANNEL_VERIFY_RESPONSE_TYPE *response) {
+void ChannelVerifyAgent::start_check(ChannelVerifyRequest *request,
+                                     ChannelVerifyResponse *response) {
   if (get_state() == ChannelVerifyAgentState::RUNNING) {
     AINFO << "ChannelVerify is RUNNING, do not need start again";
     response->set_code(ErrorCode::ERROR_REPEATED_START);
@@ -80,35 +81,35 @@ void ChannelVerifyAgent::start_check(CHANNEL_VERIFY_REQUEST_TYPE *request,
 void ChannelVerifyAgent::async_check(const std::string &records_path) {
   set_state(ChannelVerifyAgentState::RUNNING);
   std::thread doctor_strange([=]() {
-    _check_thread_id = std::this_thread::get_id();
-    int wait_sec = _sp_conf->channel_check_trigger_gap;
+    check_thread_id_ = std::this_thread::get_id();
+    int wait_sec = sp_conf_->channel_check_trigger_gap;
     while (true) {
       {
-        std::lock_guard<std::mutex> guard(_stop_mutex);
-        if (_need_stop) {
+        std::lock_guard<std::mutex> guard(stop_mutex_);
+        if (need_stop_) {
           break;
         }
         do_check(records_path);
         AINFO << "thread check done";
       }
       std::this_thread::sleep_for(std::chrono::seconds(wait_sec));
-      if (std::this_thread::get_id() != _check_thread_id) {
+      if (std::this_thread::get_id() != check_thread_id_) {
         break;
       }
     }
-    _stopped = true;
+    stopped_ = true;
   });
   doctor_strange.detach();
   AINFO << "ChannelVerifyAgent::async_check exit";
 }
 
 void ChannelVerifyAgent::do_check(const std::string &records_path) {
-  if (_sp_channel_checker == nullptr) {
-    _sp_channel_checker = std::make_shared<ChannelVerify>(_sp_conf);
+  if (sp_channel_checker_ == nullptr) {
+    sp_channel_checker_ = std::make_shared<ChannelVerify>(sp_conf_);
   }
   set_state(ChannelVerifyAgentState::RUNNING);
-  _sp_channel_checker->check(records_path);
-  _sp_check_result = _sp_channel_checker->get_check_result();
+  sp_channel_checker_->check(records_path);
+  sp_check_result_ = sp_channel_checker_->get_check_result();
 }
 
 int ChannelVerifyAgent::add_topic_lack(
@@ -156,29 +157,29 @@ int ChannelVerifyAgent::add_inadequate_rate(
   return result->rates_size();
 }
 
-void ChannelVerifyAgent::check_result(CHANNEL_VERIFY_REQUEST_TYPE *request,
-                                      CHANNEL_VERIFY_RESPONSE_TYPE *response) {
+void ChannelVerifyAgent::check_result(ChannelVerifyRequest *request,
+                                      ChannelVerifyResponse *response) {
   if (get_state() == ChannelVerifyAgentState::IDLE) {
     AINFO << "ChannelVerify is not RUNNING, it should start first";
     response->set_code(ErrorCode::ERROR_CHECK_BEFORE_START);
     return;
   }
 
-  if (_sp_channel_checker == nullptr || _sp_check_result == nullptr) {
+  if (sp_channel_checker_ == nullptr || sp_check_result_ == nullptr) {
     AINFO << "check result is null. check later";
     response->set_code(ErrorCode::SUCCESS);
     return;
   }
 
-  if (_sp_channel_checker->get_return_state() != ErrorCode::SUCCESS) {
-    response->set_code(_sp_channel_checker->get_return_state());
+  if (sp_channel_checker_->get_return_state() != ErrorCode::SUCCESS) {
+    response->set_code(sp_channel_checker_->get_return_state());
     return;
   }
 
   response->set_code(ErrorCode::SUCCESS);
   apollo::hdmap::VerifyResult *result = response->mutable_result();
-  for (CheckResultIterator it = _sp_check_result->begin();
-       it != _sp_check_result->end(); ++it) {
+  for (CheckResultIterator it = sp_check_result_->begin();
+       it != sp_check_result_->end(); ++it) {
     int res = 0;
     // write rate
     res = add_inadequate_rate(result, it->record_path, it->inadequate_rate);
@@ -193,18 +194,18 @@ void ChannelVerifyAgent::check_result(CHANNEL_VERIFY_REQUEST_TYPE *request,
   }
 }
 
-void ChannelVerifyAgent::stop_check(CHANNEL_VERIFY_REQUEST_TYPE *request,
-                                    CHANNEL_VERIFY_RESPONSE_TYPE *response) {
-  std::lock_guard<std::mutex> guard(_stop_mutex);
-  _need_stop = true;
+void ChannelVerifyAgent::stop_check(ChannelVerifyRequest *request,
+                                    ChannelVerifyResponse *response) {
+  std::lock_guard<std::mutex> guard(stop_mutex_);
+  need_stop_ = true;
   response->set_code(ErrorCode::SUCCESS);
   set_state(ChannelVerifyAgentState::IDLE);
   apollo::hdmap::VerifyResult *result = response->mutable_result();
-  if (_sp_check_result == nullptr) {
+  if (sp_check_result_ == nullptr) {
     return;
   }
-  for (CheckResultIterator it = _sp_check_result->begin();
-       it != _sp_check_result->end(); ++it) {
+  for (CheckResultIterator it = sp_check_result_->begin();
+       it != sp_check_result_->end(); ++it) {
     int res = 0;
     // write rate
     res = add_inadequate_rate(result, it->record_path, it->inadequate_rate);
@@ -220,10 +221,10 @@ void ChannelVerifyAgent::stop_check(CHANNEL_VERIFY_REQUEST_TYPE *request,
 }
 
 void ChannelVerifyAgent::set_state(ChannelVerifyAgentState state) {
-  _state = state;
+  state_ = state;
 }
 
-ChannelVerifyAgentState ChannelVerifyAgent::get_state() const { return _state; }
+ChannelVerifyAgentState ChannelVerifyAgent::get_state() const { return state_; }
 
 }  // namespace hdmap
 }  // namespace apollo

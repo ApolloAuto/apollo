@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_CHANNEL_CHECKER_H
-#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_CHANNEL_CHECKER_H
+#pragma once
+
 #include <map>
 #include <memory>
 #include <set>
 #include <string>
 #include <utility>
 #include <vector>
+
 #include "modules/map/tools/map_datachecker/proto/collection_error_code.pb.h"
-#include "modules/map/tools/map_datachecker/server/common.hpp"
+#include "modules/map/tools/map_datachecker/server/common.h"
 
 namespace apollo {
 namespace hdmap {
@@ -35,13 +36,9 @@ struct CyberRecordChannel {
 
 struct CyberRecordInfo {
   std::string path;
-  // std::string version;
-  double duration;  // int sec
+  double duration;  // the unit is seconds
   uint64_t start_time;
   uint64_t end_time;
-  // int msgnum;
-  // int chunknum;
-  // uint64_t size; //bytes
   std::vector<CyberRecordChannel> channels;
 };
 
@@ -49,7 +46,7 @@ struct OneRecordChannelCheckResult {
   std::string record_path;
   uint64_t start_time;
   std::vector<std::string> lack_channels;
-  // inadequate_rate: channel_name <------> (expected_rate, actual_rate)
+  // inadequate_rate: channel_name <---> (expected_rate, actual_rate)
   std::map<std::string, std::pair<double, double>> inadequate_rate;
 };
 
@@ -77,13 +74,11 @@ class ChannelVerify {
   void reset();
 
  private:
-  std::shared_ptr<JSonConf> _sp_conf = nullptr;
-  CheckResult _sp_vec_check_result = nullptr;
-  ErrorCode _return_state;
-  std::set<std::string> _checked_records;
+  std::shared_ptr<JSonConf> sp_conf_ = nullptr;
+  CheckResult sp_vec_check_result_ = nullptr;
+  ErrorCode return_state_;
+  std::set<std::string> checked_records_;
 };
 
 }  // namespace hdmap
 }  // namespace apollo
-
-#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_CHANNEL_CHECKER_H

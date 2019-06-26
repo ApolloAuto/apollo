@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_EIGHT_ROUTE_H
-#define _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_EIGHT_ROUTE_H
+#pragma once
+
 #include <grpc++/grpc++.h>
 #include <memory>
 #include <vector>
+
 #include "cyber/cyber.h"
-#include "modules/map/tools/map_datachecker/server/alignment.hpp"
-#include "modules/map/tools/map_datachecker/server/common.hpp"
+#include "modules/map/tools/map_datachecker/server/alignment.h"
+#include "modules/map/tools/map_datachecker/server/common.h"
 #include "modules/map/tools/map_datachecker/server/worker_gflags.h"
 
 namespace apollo {
@@ -39,11 +40,9 @@ class EightRoute : public Alignment {
   double get_eight_route_progress(const std::vector<FramePose>& poses);
 
  private:
-  double _progress;
-  double _last_yaw;
+  double progress_;
+  double last_yaw_;
 };
 
 }  // namespace hdmap
 }  // namespace apollo
-
-#endif  // _MODULES_MAP_TOOLS_MAP_DATACHECKER_SERVER_EIGHT_ROUTE_H
