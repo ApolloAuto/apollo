@@ -39,6 +39,7 @@ cc_binary(
         "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
         "//modules/perception/common/io:io_util",
     ],
+    linkstatic=False,
 )
 
 cpplint()
