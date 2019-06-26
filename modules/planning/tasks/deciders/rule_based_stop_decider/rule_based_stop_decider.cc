@@ -128,8 +128,8 @@ void RuleBasedStopDecider::AddPathEndStop(
     util::BuildStopDecision(
         stop_wall_id,
         reference_line_info->path_data().frenet_frame_path().back().s() - 5.0,
-        0.0, StopReasonCode::STOP_REASON_LANE_CHANGE_URGENCY,
-        wait_for_obstacles, "RuleBasedStopDecider", frame, reference_line_info);
+        0.0, StopReasonCode::STOP_REASON_REFERENCE_END, wait_for_obstacles,
+        "RuleBasedStopDecider", frame, reference_line_info);
   }
 }
 

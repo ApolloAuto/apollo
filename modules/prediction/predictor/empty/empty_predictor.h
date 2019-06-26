@@ -30,7 +30,7 @@ class EmptyPredictor : public Predictor {
   /**
    * @brief Constructor
    */
-  EmptyPredictor() = default;
+  EmptyPredictor();
 
   /**
    * @brief Destructor

@@ -33,6 +33,7 @@
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/proto/feature.pb.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
 
 /**
  * @namespace apollo::prediction
@@ -244,6 +245,12 @@ class Obstacle {
    */
   void SetCaution();
 
+  void SetEvaluatorType(const ObstacleConf::EvaluatorType& evaluator_type);
+
+  void SetPredictorType(const ObstacleConf::PredictorType& predictor_type);
+
+  const ObstacleConf& obstacle_conf() { return obstacle_conf_; }
+
  private:
   Obstacle() = default;
 
@@ -354,6 +361,8 @@ class Obstacle {
   std::vector<Eigen::MatrixXf> rnn_states_;
 
   bool rnn_enabled_ = false;
+
+  ObstacleConf obstacle_conf_;
 };
 
 }  // namespace prediction

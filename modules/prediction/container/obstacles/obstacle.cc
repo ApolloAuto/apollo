@@ -111,15 +111,20 @@ bool Obstacle::IsSlow() {
 }
 
 bool Obstacle::IsOnLane() const {
-  if (feature_history_.size() > 0) {
-    if (feature_history_.front().has_lane() &&
-        feature_history_.front().lane().current_lane_feature_size() > 0) {
-      ADEBUG << "Obstacle [" << id_ << "] is on lane.";
-      return true;
+  if (feature_history_.empty() ||
+      !latest_feature().has_lane() ||
+      latest_feature().lane().current_lane_feature().empty()) {
+    return false;
+  }
+  for (const auto& curr_lane :
+       latest_feature().lane().current_lane_feature()) {
+    if (curr_lane.lane_type() != hdmap::Lane::CITY_DRIVING) {
+      return false;
     }
   }
-  ADEBUG << "Obstacle [" << id_ << "] is not on lane.";
-  return false;
+
+  ADEBUG << "Obstacle [" << id_ << "] is on lane.";
+  return true;
 }
 
 bool Obstacle::ToIgnore() {
@@ -1624,6 +1629,16 @@ void Obstacle::SetCaution() {
   CHECK_GT(feature_history_.size(), 0);
   Feature* feature = mutable_latest_feature();
   feature->mutable_priority()->set_priority(ObstaclePriority::CAUTION);
+}
+
+void Obstacle::SetEvaluatorType(
+    const ObstacleConf::EvaluatorType& evaluator_type) {
+  obstacle_conf_.set_evaluator_type(evaluator_type);
+}
+
+void Obstacle::SetPredictorType(
+    const ObstacleConf::PredictorType& predictor_type) {
+  obstacle_conf_.set_predictor_type(predictor_type);
 }
 
 }  // namespace prediction

@@ -71,16 +71,17 @@ class OpenSpaceRoiDecider : public Decider {
 
   void SetPullOverSpotEndPose(Frame *const frame);
 
-  void GetRoadBoundary(const hdmap::Path &nearby_path,
-                       const double center_line_s,
-                       const common::math::Vec2d &origin_point,
-                       const double origin_heading,
-                       std::vector<common::math::Vec2d> *left_lane_boundary,
-                       std::vector<common::math::Vec2d> *right_lane_boundary,
-                       std::vector<common::math::Vec2d> *center_lane_boundary,
-                       std::vector<double> *center_lane_s,
-                       std::vector<double> *left_lane_road_width,
-                       std::vector<double> *right_lane_road_width);
+  void GetRoadBoundary(
+      const hdmap::Path &nearby_path, const double center_line_s,
+      const common::math::Vec2d &origin_point, const double origin_heading,
+      std::vector<common::math::Vec2d> *left_lane_boundary,
+      std::vector<common::math::Vec2d> *right_lane_boundary,
+      std::vector<common::math::Vec2d> *center_lane_boundary_left,
+      std::vector<common::math::Vec2d> *center_lane_boundary_right,
+      std::vector<double> *center_lane_s_left,
+      std::vector<double> *center_lane_s_right,
+      std::vector<double> *left_lane_road_width,
+      std::vector<double> *right_lane_road_width);
 
   // @brief "Region of Interest", load map boundary for open space scenario
   // @param vertices is an array consisting four points describing the boundary

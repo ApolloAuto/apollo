@@ -47,6 +47,7 @@ double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
 }
 
 CruiseMLPEvaluator::CruiseMLPEvaluator() : device_(torch::kCPU) {
+  evaluator_type_ = ObstacleConf::CRUISE_MLP_EVALUATOR;
   LoadModels();
 }
 
@@ -57,6 +58,9 @@ bool CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   omp_set_num_threads(1);
   Clear();
   CHECK_NOTNULL(obstacle_ptr);
+
+  obstacle_ptr->SetEvaluatorType(evaluator_type_);
+
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
     AERROR << "Obstacle [" << id << "] has no latest feature.";

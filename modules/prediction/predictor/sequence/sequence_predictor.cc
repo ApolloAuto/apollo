@@ -370,10 +370,10 @@ bool SequencePredictor::GetLongitudinalPolynomial(
   int lane_seg_start_idx = lane_sequence.adc_lane_segment_idx();
   int lane_point_start_idx =
       lane_sequence.lane_segment(lane_seg_start_idx).adc_lane_point_idx();
-  if (lane_point_start_idx >= lane_sequence.lane_segment(lane_seg_start_idx)
-      .lane_point_size()) {
-    lane_point_start_idx = lane_sequence.lane_segment(lane_seg_start_idx)
-        .lane_point_size() - 1;
+  if (lane_point_start_idx >=
+      lane_sequence.lane_segment(lane_seg_start_idx).lane_point_size()) {
+    lane_point_start_idx =
+        lane_sequence.lane_segment(lane_seg_start_idx).lane_point_size() - 1;
   }
   double lane_heading = lane_sequence.lane_segment(lane_seg_start_idx)
                             .lane_point(lane_point_start_idx)
@@ -419,10 +419,10 @@ bool SequencePredictor::GetLateralPolynomial(
   int lane_seg_start_idx = lane_sequence.adc_lane_segment_idx();
   int lane_point_start_idx =
       lane_sequence.lane_segment(lane_seg_start_idx).adc_lane_point_idx();
-  if (lane_point_start_idx >= lane_sequence.lane_segment(lane_seg_start_idx)
-      .lane_point_size()) {
-    lane_point_start_idx = lane_sequence.lane_segment(lane_seg_start_idx)
-        .lane_point_size() - 1;
+  if (lane_point_start_idx >=
+      lane_sequence.lane_segment(lane_seg_start_idx).lane_point_size()) {
+    lane_point_start_idx =
+        lane_sequence.lane_segment(lane_seg_start_idx).lane_point_size() - 1;
   }
   const LanePoint& start_lane_point =
       lane_sequence.lane_segment(lane_seg_start_idx)

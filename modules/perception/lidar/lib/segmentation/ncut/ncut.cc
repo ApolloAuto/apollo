@@ -49,7 +49,7 @@ using Eigen::MatrixXf;
 NCut::NCut() {}
 NCut::~NCut() { ADEBUG << "NCut destructor done"; }
 
-bool NCut::Init(const NCutParam& param) {
+bool NCut::Init(const NCutParam &param) {
   if (!Configure(param)) {
     AERROR << "failed to load ncut config.";
     return false;
@@ -63,7 +63,7 @@ bool NCut::Init(const NCutParam& param) {
   return true;
 }
 
-bool NCut::Configure(const NCutParam& ncut_param_) {
+bool NCut::Configure(const NCutParam &ncut_param_) {
   _grid_radius = ncut_param_.grid_radius();
   _connect_radius = ncut_param_.connect_radius();
   _super_pixel_cell_size = ncut_param_.super_pixel_cell_size();
@@ -84,7 +84,7 @@ bool NCut::Configure(const NCutParam& ncut_param_) {
 
 void NCut::Segment(base::PointFCloudConstPtr cloud) {
   double start_t = omp_get_wtime();
-  // .0 clear everyting
+  // .0 clear everything
   _segment_pids.clear();
   _segment_labels.clear();
   _segment_bbox.clear();
@@ -119,24 +119,24 @@ void NCut::Segment(base::PointFCloudConstPtr cloud) {
   // start_t;
   start_t = omp_get_wtime();
   // .3 grach cut
-  std::vector< std::vector<int> > segment_clusters;
-  std::vector< std::string > segment_labels;
-  NormalizedCut(_ncuts_stop_threshold, true,
-                &segment_clusters, &segment_labels);
+  std::vector<std::vector<int>> segment_clusters;
+  std::vector<std::string> segment_labels;
+  NormalizedCut(_ncuts_stop_threshold, true, &segment_clusters,
+                &segment_labels);
   ADEBUG << "normalized_cut done, #segments " << segment_clusters.size()
-          << ", time: " << omp_get_wtime() - start_t;
+         << ", time: " << omp_get_wtime() - start_t;
   start_t = omp_get_wtime();
   // .4 _segment_pids;
   for (size_t i = 0; i < segment_clusters.size(); ++i) {
-      std::vector<int> pids;
-      GetClustersPids(segment_clusters[i], &pids);
-      if (pids.size() > 0) {
-          _segment_pids.push_back(pids);
-          _segment_labels.push_back(segment_labels[i]);
-          NcutBoundingBox box;
-          GetComponentBoundingBox(segment_clusters[i], &box);
-          _segment_bbox.push_back(box);
-      }
+    std::vector<int> pids;
+    GetClustersPids(segment_clusters[i], &pids);
+    if (pids.size() > 0) {
+      _segment_pids.push_back(pids);
+      _segment_labels.push_back(segment_labels[i]);
+      NcutBoundingBox box;
+      GetComponentBoundingBox(segment_clusters[i], &box);
+      _segment_bbox.push_back(box);
+    }
   }
 }
 

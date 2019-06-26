@@ -75,7 +75,7 @@ void BridgeProtoDiserializedBuf<T>::UpdateStatus(uint32_t frame_index) {
 
   uint32_t status_index = frame_index / INT_BITS;
   status_list_[status_index] |= (1 << (frame_index % INT_BITS));
-  for (size_t i = 0; i< status_size; i++) {
+  for (size_t i = 0; i < status_size; i++) {
     if (i == status_size - 1) {
       if (status_list_[i] == ((1 << total_frames_ % INT_BITS) - 1)) {
         AINFO << "diserialized is ready";
@@ -111,9 +111,9 @@ bool BridgeProtoDiserializedBuf<T>::Initialize(const BridgeHeader &header) {
     return false;
   }
   int status_size = static_cast<int>(total_frames_ / INT_BITS +
-    ((total_frames_ % INT_BITS) ? 1: 0));
+                                     ((total_frames_ % INT_BITS) ? 1 : 0));
   if (status_list_.size() == 0) {
-    for (int i = 0; i< status_size; i++) {
+    for (int i = 0; i < status_size; i++) {
       status_list_.push_back(0);
     }
   }

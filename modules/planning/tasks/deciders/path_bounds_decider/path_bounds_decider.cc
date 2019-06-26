@@ -127,6 +127,9 @@ Status PathBoundsDecider::Process(
       reference_line_info->SetCandidatePathBoundaries(
           std::move(candidate_path_boundaries));
       ADEBUG << "Completed pullover and fallback path boundaries generation.";
+      *(reference_line_info->mutable_debug()
+            ->mutable_planning_data()
+            ->mutable_pull_over_status()) = *pull_over_status;
       return Status::OK();
     }
   }
@@ -560,7 +563,7 @@ bool PathBoundsDecider::SearchPullOverPosition(
     if (is_feasible_window) {
       has_a_feasible_window = true;
       const auto& reference_line = reference_line_info.reference_line();
-      const auto& pull_over_point = path_bound[(i + j) / 2];
+      const auto& pull_over_point = path_bound[(i + 2 * j) / 3];
       const double pull_over_s = std::get<0>(pull_over_point);
       const double pull_over_l =
           std::get<1>(pull_over_point) + pull_over_space_width / 2.0;

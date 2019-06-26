@@ -33,7 +33,7 @@ class FreeMovePredictor : public Predictor {
   /**
    * @brief Constructor
    */
-  FreeMovePredictor() = default;
+  FreeMovePredictor();
 
   /**
    * @brief Destructor

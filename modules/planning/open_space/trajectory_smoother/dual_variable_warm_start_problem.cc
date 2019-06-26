@@ -31,7 +31,7 @@ namespace planning {
 
 DualVariableWarmStartProblem::DualVariableWarmStartProblem(
     const PlannerOpenSpaceConfig& planner_open_space_config) {
-  planner_open_space_config_.CopyFrom(planner_open_space_config);
+  planner_open_space_config_ = planner_open_space_config;
 }
 
 bool DualVariableWarmStartProblem::Solve(

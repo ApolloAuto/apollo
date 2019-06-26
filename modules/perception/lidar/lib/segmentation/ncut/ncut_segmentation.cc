@@ -14,13 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/lidar/lib/segmentation/ncut/ncut_segmentation.h"
 #include <omp.h>
 #include <algorithm>
 #include <map>
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lidar/lib/segmentation/ncut/ncut_segmentation.h"
 
 namespace apollo {
 namespace perception {
@@ -198,9 +198,9 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
   std::vector<base::ObjectPtr>* segments = &(frame->segmented_objects);
   double start_t = omp_get_wtime();
   int num_threads = 1;
-/*#pragma omp parallel
-  { num_threads = omp_get_num_threads(); }
-*/
+  /*#pragma omp parallel
+    { num_threads = omp_get_num_threads(); }
+  */
 
 #ifdef DEBUG_NCUT
   AINFO << "input point cloud: " << original_cloud_->size() << " points";

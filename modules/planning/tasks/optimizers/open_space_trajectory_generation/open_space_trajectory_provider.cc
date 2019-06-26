@@ -125,6 +125,13 @@ Status OpenSpaceTrajectoryProvider::Process() {
 
     if (is_generation_thread_stop_) {
       GenerateStopTrajectory(trajectory_data);
+      double standstill_acceleration =
+          vehicle_state.linear_velocity() >= -0.00001
+              ? -FLAGS_open_space_standstill_acceleration
+              : FLAGS_open_space_standstill_acceleration;
+      for (size_t i = 0; i < trajectory_data->size(); i++) {
+        trajectory_data->data()[i].set_a(standstill_acceleration);
+      }
       return Status(ErrorCode::OK, "Parking finished");
     }
 
@@ -149,6 +156,13 @@ Status OpenSpaceTrajectoryProvider::Process() {
             open_space_info.origin_heading(), open_space_info.origin_point())) {
       GenerateStopTrajectory(trajectory_data);
       is_generation_thread_stop_.store(true);
+      double standstill_acceleration =
+          vehicle_state.linear_velocity() >= -0.00001
+              ? -FLAGS_open_space_standstill_acceleration
+              : FLAGS_open_space_standstill_acceleration;
+      for (size_t i = 0; i < trajectory_data->size(); i++) {
+        trajectory_data->data()[i].set_a(standstill_acceleration);
+      }
       return Status(ErrorCode::OK, "Vehicle is near to destination");
     }
 
@@ -213,6 +227,13 @@ Status OpenSpaceTrajectoryProvider::Process() {
     if (IsVehicleNearDestination(vehicle_state, end_pose, rotate_angle,
                                  translate_origin)) {
       GenerateStopTrajectory(trajectory_data);
+      double standstill_acceleration =
+          vehicle_state.linear_velocity() >= -0.00001
+              ? -FLAGS_open_space_standstill_acceleration
+              : FLAGS_open_space_standstill_acceleration;
+      for (size_t i = 0; i < trajectory_data->size(); i++) {
+        trajectory_data->data()[i].set_a(standstill_acceleration);
+      }
       return Status(ErrorCode::OK, "Vehicle is near to destination");
     }
 

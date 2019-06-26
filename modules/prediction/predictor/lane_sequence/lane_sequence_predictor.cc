@@ -22,6 +22,7 @@
 
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/validation_checker.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -30,11 +31,17 @@ using common::PathPoint;
 using common::TrajectoryPoint;
 using hdmap::LaneInfo;
 
+LaneSequencePredictor::LaneSequencePredictor() {
+  predictor_type_ = ObstacleConf::LANE_SEQUENCE_PREDICTOR;
+}
+
 void LaneSequencePredictor::Predict(Obstacle* obstacle) {
   Clear();
 
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
+
+  obstacle->SetPredictorType(predictor_type_);
 
   const Feature& feature = obstacle->latest_feature();
 
