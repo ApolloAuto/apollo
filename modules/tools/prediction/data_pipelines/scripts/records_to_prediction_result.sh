@@ -27,7 +27,7 @@ source /apollo/cyber/setup.bash
 sudo mkdir -p ${TARGET_DIR}
 
 if [ -z "$3" ]; then
-    MAP_DIR="sunnyvale_with_two_offices"
+    MAP_DIR="sunnyvale"
 else
     MAP_DIR=$3
 fi
@@ -37,4 +37,5 @@ fi
     --map_dir=/apollo/modules/map/data/${MAP_DIR} \
     --prediction_offline_mode=3 \
     --prediction_offline_bags=${SRC_DIR} \
+    --noenable_multi_thread \
     --prediction_data_dir=${TARGET_DIR}
