@@ -43,10 +43,10 @@ bool BridgeHeader::Serialize(char *buf, size_t size) {
 bool BridgeHeader::Diserialize(const char *buf, size_t buf_size) {
   const char *cursor = buf;
 
-  size_t i = buf_size;
+  int i = static_cast<int>(buf_size);
   while (i > 0) {
     HType type = *(reinterpret_cast<const HType *>(cursor));
-    if (type > Header_Tail || type < 0) {
+    if (type >= Header_Tail || type < 0) {
       cursor += sizeof(HType) + 1;
       bsize size = *(reinterpret_cast<const bsize *>(cursor));
       cursor += sizeof(bsize) + size + 2;
@@ -60,7 +60,7 @@ bool BridgeHeader::Diserialize(const char *buf, size_t buf_size) {
         break;
       }
     }
-    i -= value_size;
+    i -= static_cast<int>(value_size);
   }
   return true;
 }
