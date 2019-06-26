@@ -105,6 +105,8 @@ class IterativeAnchoringSmoother {
 
   std::vector<size_t> input_colliding_point_index_;
 
+  bool enforce_initial_kappa_ = true;
+
   // gear DRIVE as true and gear REVERSE as false
   bool gear_ = false;
 
