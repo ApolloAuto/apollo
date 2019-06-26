@@ -36,12 +36,43 @@ from modules.drivers.proto.sensor_image_pb2 import CompressedImage
 flags.DEFINE_string('from_record', None, 'The source record file that needs to be restored.')
 flags.DEFINE_string('to_record', None, 'The restored record file.')
 
-VIDEO_CHANNELS = {
-    '/apollo/sensor/camera/front_12mm/image/compressed': 'front12mm',
-    '/apollo/sensor/camera/front_6mm/image/compressed': 'front6mm',
-    '/apollo/sensor/camera/left_fisheye/image/compressed': 'left_fisheye',
-    '/apollo/sensor/camera/right_fisheye/image/compressed': 'right_fisheye',
-    '/apollo/sensor/camera/rear_6mm/image/compressed': 'rear6mm',
+# The compressed channels that have videos we need to decode
+IMAGE_FRONT_6MM_CHANNEL = '/apollo/sensor/camera/front_6mm/image/compressed'
+IMAGE_FRONT_12MM_CHANNEL = '/apollo/sensor/camera/front_12mm/image/compressed'
+IMAGE_REAR_6MM_CHANNEL = '/apollo/sensor/camera/rear_6mm/image/compressed'
+IMAGE_LEFT_FISHEYE_CHANNEL = '/apollo/sensor/camera/left_fisheye/image/compressed'
+IMAGE_RIGHT_FISHEYE_CHANNEL = '/apollo/sensor/camera/right_fisheye/image/compressed'
+
+VIDEO_FRONT_6MM_CHANNEL = '/apollo/sensor/camera/front_6mm/video/compressed'
+VIDEO_FRONT_12MM_CHANNEL = '/apollo/sensor/camera/front_12mm/video/compressed'
+VIDEO_REAR_6MM_CHANNEL = '/apollo/sensor/camera/rear_6mm/video/compressed'
+VIDEO_LEFT_FISHEYE_CHANNEL = '/apollo/sensor/camera/left_fisheye/video/compressed'
+VIDEO_RIGHT_FISHEYE_CHANNEL = '/apollo/sensor/camera/right_fisheye/video/compressed'
+
+VIDEO_CHANNELS = [
+    IMAGE_FRONT_6MM_CHANNEL,
+    IMAGE_FRONT_12MM_CHANNEL,
+    IMAGE_REAR_6MM_CHANNEL,
+    IMAGE_LEFT_FISHEYE_CHANNEL,
+    IMAGE_RIGHT_FISHEYE_CHANNEL,
+    VIDEO_FRONT_6MM_CHANNEL,
+    VIDEO_FRONT_12MM_CHANNEL,
+    VIDEO_REAR_6MM_CHANNEL,
+    VIDEO_LEFT_FISHEYE_CHANNEL,
+    VIDEO_RIGHT_FISHEYE_CHANNEL,
+]
+
+VIDEO_IMAGE_MAP = {
+    IMAGE_FRONT_6MM_CHANNEL: IMAGE_FRONT_6MM_CHANNEL,
+    IMAGE_FRONT_12MM_CHANNEL: IMAGE_FRONT_12MM_CHANNEL,
+    IMAGE_REAR_6MM_CHANNEL: IMAGE_REAR_6MM_CHANNEL,
+    IMAGE_LEFT_FISHEYE_CHANNEL: IMAGE_LEFT_FISHEYE_CHANNEL,
+    IMAGE_RIGHT_FISHEYE_CHANNEL: IMAGE_RIGHT_FISHEYE_CHANNEL, 
+    VIDEO_FRONT_6MM_CHANNEL: IMAGE_FRONT_6MM_CHANNEL,
+    VIDEO_FRONT_12MM_CHANNEL: IMAGE_FRONT_12MM_CHANNEL,
+    VIDEO_REAR_6MM_CHANNEL: IMAGE_REAR_6MM_CHANNEL,
+    VIDEO_LEFT_FISHEYE_CHANNEL: IMAGE_LEFT_FISHEYE_CHANNEL,
+    VIDEO_RIGHT_FISHEYE_CHANNEL: IMAGE_RIGHT_FISHEYE_CHANNEL, 
 }
 
 class VideoConverter(object):
@@ -127,17 +158,19 @@ def restore_record(input_record, output_record):
     reader = RecordReader(input_record)
     for message in reader.read_messages():
         message_content = message.message
+        message_topic = message.topic
         if message.topic in VIDEO_CHANNELS:
             message_content = retrieve_image(image_dir, message)
+            message_topic = VIDEO_IMAGE_MAP[message.topic]
             if not message_content:
                 continue
         counter += 1
         if counter % 1000 == 0:
             logging.info('rewriting {} th message to record {}'.format(counter, output_record))
-        writer.write_message(message.topic, message_content, message.timestamp)
-        if message.topic not in topic_descs:
-            topic_descs[message.topic] = reader.get_protodesc(message.topic)
-            writer.write_channel(message.topic, message.data_type, topic_descs[message.topic])
+        writer.write_message(message_topic, message_content, message.timestamp)
+        if message_topic not in topic_descs:
+            topic_descs[message_topic] = reader.get_protodesc(message_topic)
+            writer.write_channel(message_topic, message.data_type, topic_descs[message_topic])
     writer.close()
 
     logging.info('All Done, converted record: {}'.format(output_record))
