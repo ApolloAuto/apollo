@@ -58,3 +58,5 @@ DECLARE_bool(query_time_nearest_point_only);
 DECLARE_bool(query_forward_time_point_only);
 
 DECLARE_bool(enable_feedback_augment_on_high_speed);
+
+DECLARE_bool(enable_gear_dirve_negative_speed_protection);
