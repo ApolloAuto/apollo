@@ -41,6 +41,7 @@ Apollo 3.0 Hardware Development Platform provides 2 types of evaluation for our 
 - [LiDAR Calibration CN](lidar_calibration_cn.pdf)
 
 ## HMI
+- [Introducing Dreamland](Dreamland_introduction.md)
 - [Dreamview usage table](dreamview_usage_table.md)
 - [Dreamview usage table CN](dreamview_usage_table_cn.md)
 
