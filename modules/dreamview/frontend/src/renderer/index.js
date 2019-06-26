@@ -8,6 +8,7 @@ import Ground from "renderer/ground";
 import TileGround from "renderer/tileground";
 import Map from "renderer/map";
 import PlanningTrajectory from "renderer/trajectory.js";
+import PlanningStatus from "renderer/status.js";
 import PerceptionObstacles from "renderer/obstacles.js";
 import Decision from "renderer/decision.js";
 import Prediction from "renderer/prediction.js";
@@ -54,6 +55,9 @@ class Renderer {
 
         // The planning trajectory.
         this.planningTrajectory = new PlanningTrajectory();
+
+        // The planning status
+        this.planningStatus = new PlanningStatus();
 
         // The perception obstacles.
         this.perceptionObstacles = new PerceptionObstacles();
@@ -359,6 +363,7 @@ class Renderer {
         this.adc.updateRssMarker(world.isRssSafe);
         this.ground.update(world, this.coordinates, this.scene);
         this.planningTrajectory.update(world, world.planningData, this.coordinates, this.scene);
+        this.planningStatus.update(world.planningData, this.coordinates, this.scene);
 
         const isBirdView = ['Overhead', 'Map'].includes(_.get(this, 'options.cameraAngle'));
         this.perceptionObstacles.update(world, this.coordinates, this.scene, isBirdView);
