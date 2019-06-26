@@ -104,7 +104,8 @@ bool DarkSCNNLaneDetector::Init(const LaneDetectorInitOptions &options) {
   const auto net_param = darkscnn_param_.net_param();
   net_inputs_.push_back(net_param.input_blob());
   net_outputs_.push_back(net_param.seg_blob());
-  if (net_param.has_vpt_blob() && net_param.vpt_blob().size() > 0) {
+  if (model_param.model_type() == "CaffeNet" &&
+      net_param.has_vpt_blob() && net_param.vpt_blob().size() > 0) {
     net_outputs_.push_back(net_param.vpt_blob());
   }
 
