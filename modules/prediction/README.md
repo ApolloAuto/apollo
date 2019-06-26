@@ -37,7 +37,7 @@ Currently, we have two defined scenarios:
 
 ### Obstacles
 
-- **Ignore**: these obstacles will not affect ego car trajectory and can be safely ignored (E.g. the obstacle is too far away)
+- **Ignore**: these obstacles will not affect the ego car's trajectory and can be safely ignored (E.g. the obstacle is too far away)
 - **Caution**: these obstacles have a high possibility of interacting with the ego car
 - **Normal**: the obstacles that do not fall under ignore or caution are placed by default under normal
 
