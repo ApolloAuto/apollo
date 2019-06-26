@@ -6,7 +6,7 @@ The previous versions of Apollo, including Apollo 3.0 currently use the same con
 
 ## Driving Scenarios
 
-There are 3 main driving scenarios that we will focus on in Apollo 5.0, namely:
+There are 3 main driving scenarios that we will focus on, namely:
 
 ### Lane Follow - Default
 
