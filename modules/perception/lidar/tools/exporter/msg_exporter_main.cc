@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/perception/lidar/tools/exporter/msg_exporter.h"
 #include <fstream>
 #include <memory>
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 #include "modules/common/util/string_util.h"
+#include "modules/perception/lidar/tools/exporter/msg_exporter.h"
 
 namespace apollo {
 namespace perception {
@@ -68,8 +68,8 @@ int main(int argc, char** argv) {
   }
   // apollo::cyber::Logger::Init(argv[0]);
   apollo::cyber::Init(argv[0]);  // cybertron init function
-  std::shared_ptr<apollo::cyber::Node>
-      node(apollo::cyber::CreateNode("export_node"));
+  std::shared_ptr<apollo::cyber::Node> node(
+      apollo::cyber::CreateNode("export_node"));
   if (!node) {
     std::cout << "Failed to create export node." << std::endl;
     return -1;
