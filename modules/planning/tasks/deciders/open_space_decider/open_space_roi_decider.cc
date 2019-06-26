@@ -267,6 +267,8 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
       config_.open_space_roi_decider_config()
           .curb_heading_tangent_change_uppper_limit() *
       config_.open_space_roi_decider_config().roi_linesegment_length();
+  // TODO(Jiaxuan): will deprecate this param on later boundary versions
+  const int point_heading_checking_period = 5;
   while (check_point_s <= end_s) {
     hdmap::MapPathPoint check_point = nearby_path.GetSmoothPoint(check_point_s);
     double check_point_heading = check_point.heading();
@@ -276,24 +278,28 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
     // For the road boundary, only add start_point, end_point as well as the
     // road_bound where the reference line heading angle or the left/right road
     // width change abnormally
-    const bool is_reference_line_heading_has_sudden_change =
-        std::abs(common::math::NormalizeAngle(check_point_heading -
-                                              last_check_point_heading)) >
-        config_.open_space_roi_decider_config().roi_linesegment_min_angle();
+    bool is_check_point_heading_change = false;
+    if (static_cast<int>(index) % point_heading_checking_period == 0) {
+      is_check_point_heading_change =
+          std::abs(common::math::NormalizeAngle(check_point_heading -
+                                                last_check_point_heading)) >
+          config_.open_space_roi_decider_config().roi_linesegment_min_angle();
+      last_check_point_heading = check_point_heading;
+    }
 
-    ADEBUG << "is is_reference_line_heading_has_sudden_change: "
-           << is_reference_line_heading_has_sudden_change;
+    ADEBUG << "is is_check_point_heading_change: "
+           << is_check_point_heading_change;
     const bool is_left_road_width_changes =
         std::abs(point_left_road_width - last_left_road_width) >
             road_bound_width_change_upper_limit ||
         check_point_s == start_s || check_point_s == end_s ||
-        is_reference_line_heading_has_sudden_change;
+        is_check_point_heading_change;
     ADEBUG << "is left road width change: " << is_left_road_width_changes;
     const bool is_right_road_width_changes =
         std::abs(point_right_road_width - last_right_road_width) >
             road_bound_width_change_upper_limit ||
         check_point_s == start_s || check_point_s == end_s ||
-        is_reference_line_heading_has_sudden_change;
+        is_check_point_heading_change;
     ADEBUG << "is is_right_road_width_changes: " << is_right_road_width_changes;
     // If (the left road width changes || reference_line heading changes ||
     // start point || end point)
@@ -336,8 +342,7 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
       last_left_road_width = point_left_road_width;
       center_lane_boundary_left->push_back(check_point);
       center_lane_s_left->push_back(check_point_s);
-      is_last_left_anchor_point_removable =
-          !is_reference_line_heading_has_sudden_change;
+      is_last_left_anchor_point_removable = !is_check_point_heading_change;
     }
     // If (the right road width changes || reference_line heading changes ||
     // start point || end point)
@@ -379,8 +384,7 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
       last_right_road_width = point_right_road_width;
       center_lane_boundary_right->push_back(check_point);
       center_lane_s_right->push_back(check_point_s);
-      is_last_right_anchor_point_removable =
-          !is_reference_line_heading_has_sudden_change;
+      is_last_right_anchor_point_removable = !is_check_point_heading_change;
     }
 
     if (check_point_s == end_s) {
@@ -392,7 +396,6 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
         index *
             config_.open_space_roi_decider_config().roi_linesegment_length();
     check_point_s = check_point_s >= end_s ? end_s : check_point_s;
-    last_check_point_heading = check_point_heading;
   }
 
   size_t left_point_size = left_lane_boundary->size();
