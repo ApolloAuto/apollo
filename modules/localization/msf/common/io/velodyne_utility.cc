@@ -43,7 +43,7 @@ void LoadPcds(const std::string& file_path, const unsigned int frame_index,
   pcl::PointCloud<PointXYZIT>::Ptr cloud(new pcl::PointCloud<PointXYZIT>);
   if (pcl::io::loadPCDFile(file_path, *cloud) >= 0) {
     if (cloud->height == 1 || cloud->width == 1) {
-      AERROR << "Un-organized-point-cloud";
+      AINFO << "Un-organized-point-cloud";
       for (unsigned int i = 0; i < cloud->size(); ++i) {
         Eigen::Vector3d pt3d;
         pt3d[0] = (*cloud)[i].x;
@@ -151,7 +151,7 @@ void LoadPosesAndStds(const std::string& file_path,
       timestamps->push_back(timestamp);
 
       Eigen::Vector3d std;
-      std << std_x, std_y, std_z;
+      AINFO << std_x, std_y, std_z;
       stds->push_back(std);
     }
     fclose(file);
