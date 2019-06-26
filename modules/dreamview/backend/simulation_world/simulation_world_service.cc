@@ -947,6 +947,12 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   for (auto &path : data.path()) {
     DownsamplePath(path, planning_data->add_path());
   }
+
+  // Update pull over status
+  if (data.has_pull_over_status()) {
+    planning_data->clear_pull_over_status();
+    planning_data->mutable_pull_over_status()->CopyFrom(data.pull_over_status());
+  }
 }
 
 template <>
