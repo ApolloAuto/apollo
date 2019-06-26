@@ -303,8 +303,8 @@ bool OpenSpaceTrajectoryProvider::IsVehicleNearDestination(
                 (vehicle_state.y() - end_pose_to_world_frame.y()) *
                     (vehicle_state.y() - end_pose_to_world_frame.y()));
 
-  double theta_to_vehicle = common::math::AngleDiff(vehicle_state.heading(),
-                                                    end_theta_to_world_frame);
+  double theta_to_vehicle = std::abs(common::math::AngleDiff(
+      vehicle_state.heading(), end_theta_to_world_frame));
   ADEBUG << "theta_to_vehicle" << theta_to_vehicle << "end_theta_to_world_frame"
          << end_theta_to_world_frame << "rotate_angle" << rotate_angle;
   ADEBUG << "is_near_destination_threshold"
