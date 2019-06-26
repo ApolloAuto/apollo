@@ -828,9 +828,14 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
   GroundPlaneLiDAR plane;
   int kNr_iter =
       param_.nr_ransac_iter_threshold + static_cast<int>(neighbors.size());
+  //  check hypothesis initialized correct or not
+  if (kNr_iter < 1) {
+    return (0);
+  }
   GroundPlaneLiDAR hypothesis[kNr_iter];
+
   float ptp_dist = 0.0f;
-  int best = -1;
+  int best = 0;
   int nr_inliers = 0;
   int nr_inliers_best = -1;
   float angle_best = FLT_MAX;
