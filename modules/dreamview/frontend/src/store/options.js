@@ -80,13 +80,12 @@ export default class Options {
         }
     }
 
-    @action addCustomizedToggle(toggle) {
+    @action setCustomizedToggles(toggles) {
         // Set additional toggle in observable map
-        this.customizedToggles.set(toggle, true);
-    }
-
-    @action deleteCustomizedToggle(toggle) {
-        this.customizedToggles.delete(toggle);
+        this.customizedToggles.clear();
+        if (toggles) {
+            this.customizedToggles.merge(toggles);
+        }
     }
 
     isSideBarButtonDisabled(option, enableHMIButtonsOnly, inNavigationMode) {
