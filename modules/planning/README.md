@@ -48,11 +48,25 @@ Note: The team is working to add additional driving scenarios into our planner. 
 
 #### Traffic Light
 
+In order to safely and smoothly through a traffic light, we created three scenarios  
+
 - Protected
 - Unprotected Left
 - Unprotected Right
 
+In a traffic light scenario, the following steps are performed:
+
+- Stop/Approach: if a stop is required, ADV stops in front of traffic light stop line
+- Move forward slightly (Creep): Check to see if any other car is moving or in the case of unprotected stop, check to see if there are any oncoming vehicles on either side of the lane
+- Safely move through the intersection
+
 #### Bare Intersection
+
+Bare intersection is an scenario to handle intersection without traffic lights or stop sign. In this scenario, the following steps are performed:
+
+- Approach: reach the intersection 
+- Move forward slightly (Creep): Check to see if any other car is moving or in the case of unprotected stop, check to see if there are any oncoming vehicles on either side of the lane
+- Safely move through the intersection
 
 ### Park
 
