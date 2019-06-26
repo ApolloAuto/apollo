@@ -6,7 +6,7 @@ The previous versions of Apollo, including Apollo 3.0 currently use the same con
 
 ## Driving Scenarios
 
-There are 3 main driving scenarios that we will focus on in Apollo 3.5, namely:
+There are 3 main driving scenarios that we will focus on, namely:
 
 ### Lane Follow - Default
 
@@ -14,20 +14,14 @@ As seen in the figure below, the lane-follow scenario, our default driving scena
 
    ![](images/Planning_default.png)
 
+```
+Note: Side Pass
+While the functionality of side pass still exists, it has now been made universal rather than limiting it to a type of scenario. The side-pass feature is incorporated as part of the path-bounds decider task. You can choose to turn it on or off by properly configuring the path-lane-borrow decider task. For example, if you want the vehicle to be agile, then turn side-pass on for all scenarios; if you feel it not safe to side-pass in intersections, then turn it off for those related scenarios.
+```
 
-### Side Pass
+### Intersection 
 
-In this scenario, if there is a static vehicle or a static obstacle in the lane of our car, and the car is unable to pass safely through the lane without touching the obstacle, we perform the following steps:
-- Check the neighboring lane for approaching traffic
-- If all is clear, make a side pass that overshoots the current lane into the side lane
-- Once the obstacle has been safely passed, move back into the lane
-
-![](images/sidepass.png)
-
-
-
-
-### STOP Sign
+#### STOP Sign
 
 There are two separate driving scenarios for STOP signs:
 
@@ -52,6 +46,19 @@ In order to safely pass through a STOP sign, both protected and unprotected, the
 Note: The team is working to add additional driving scenarios into our planner. One such example is handling Traffic Lights.
 ```
 
+#### Traffic Light
+
+- Protected
+- Unprotected Left
+- Unprotected Right
+
+#### Bare Intersection
+
+### Park
+
+- Pull Over
+- Valet
+
 ## Planning Module Architecture
 
 The architecture of the planning module has changed in Apollo 3.5 to reflect our modular approach towards different driving scenarios.
@@ -60,11 +67,11 @@ Each driving scenario has its set of driving parameters that are unique to that 
 
 Some of the key features include:
 
-- Apollo FSM: A finite state machine that determines the vehicle state given its location and routing together with HD Map.
-- Planning Dispatcher: Call an appropriate planner given the vehicle's state and some other relevant information
-- Planner: Obtain the required context data and other information, decide a corresponding vehicle intention, execute the required planning tasks for this intention and generate the planning trajectory. It will also update the context for future jobs.
-- Deciders & Optimizers: A set of stateless libraries that implement decision tasks and various optimizations. Optimizers specifically optimize the vehicle's trajectory and speed. Deciders are rule-based decision makers that advise on when to change lane, when to stop, creep or when the creep is complete.
-- Yellow box: These boxes are included for future scenarios and/or developers to contribute their own scenarios based on real-world driving use cases
+- **Apollo FSM**: A finite state machine that determines the vehicle state given its location and routing together with HD Map.
+- **Planning Dispatcher**: Call an appropriate planner given the vehicle's state and some other relevant information
+- **Planner**: Obtain the required context data and other information, decide a corresponding vehicle intention, execute the required planning tasks for this intention and generate the planning trajectory. It will also update the context for future jobs.
+- **Deciders & Optimizers**: A set of stateless libraries that implement decision tasks and various optimizations. Optimizers specifically optimize the vehicle's trajectory and speed. Deciders are rule-based decision makers that advise on when to change lane, when to stop, creep or when the creep is complete.
+- **Yellow box**: These boxes are included for future scenarios and/or developers to contribute their own scenarios based on real-world driving use cases
 
 ```
 Note:

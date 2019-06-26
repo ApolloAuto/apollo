@@ -210,13 +210,14 @@ Status ControlComponent::ProduceControlCommand(
                     local_view_.trajectory.header().ShortDebugString();
   }
 
-  //   chassis::gear_drive &&trajectory point speed is negative
-  const double kEpsilon = 0.001;
-  auto first_trajectory_point = local_view_.trajectory.trajectory_point(0);
-  if (local_view_.chassis.gear_location() == Chassis::GEAR_DRIVE &&
-      first_trajectory_point.v() < -1 * kEpsilon) {
-    estop_ = true;
-    estop_reason_ = "estop for negative speed when gear_drive";
+  if (FLAGS_enable_gear_dirve_negative_speed_protection) {
+    const double kEpsilon = 0.001;
+    auto first_trajectory_point = local_view_.trajectory.trajectory_point(0);
+    if (local_view_.chassis.gear_location() == Chassis::GEAR_DRIVE &&
+        first_trajectory_point.v() < -1 * kEpsilon) {
+      estop_ = true;
+      estop_reason_ = "estop for negative speed when gear_drive";
+    }
   }
 
   if (!estop_) {

@@ -289,7 +289,7 @@ TEST_F(SimulationWorldServiceTest, UpdatePlanningTrajectory) {
 
   // Check the update result.
   const SimulationWorld& world = sim_world_service_->world();
-  EXPECT_EQ(29, world.planning_trajectory_size());
+  EXPECT_EQ(30, world.planning_trajectory_size());
 
   // Check first point.
   {
@@ -303,9 +303,9 @@ TEST_F(SimulationWorldServiceTest, UpdatePlanningTrajectory) {
   {
     const Object point =
         world.planning_trajectory(world.planning_trajectory_size() - 1);
-    EXPECT_DOUBLE_EQ(280.0, point.position_x());
-    EXPECT_DOUBLE_EQ(290.0, point.position_y());
-    EXPECT_DOUBLE_EQ(2.8, point.heading());
+    EXPECT_DOUBLE_EQ(290.0, point.position_x());
+    EXPECT_DOUBLE_EQ(300.0, point.position_y());
+    EXPECT_DOUBLE_EQ(2.9, point.heading());
   }
 }
 

@@ -26,7 +26,6 @@ cc_library(
         "//modules/control/proto:control_proto",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/map:map_service",
-        "//modules/dreamview/backend/util:trajectory_point_collector",
         "//modules/dreamview/proto:simulation_world_proto",
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:localization_proto",

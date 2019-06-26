@@ -32,7 +32,6 @@
 #include "modules/common/util/util.h"
 
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
-#include "modules/dreamview/backend/util/trajectory_point_collector.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
 
 namespace apollo {
@@ -612,14 +611,20 @@ void SimulationWorldService::UpdateSimulationWorld(
 void SimulationWorldService::UpdatePlanningTrajectory(
     const ADCTrajectory &trajectory) {
   // Collect trajectory
-  util::TrajectoryPointCollector collector(&world_);
+  world_.clear_planning_trajectory();
+  const double base_time = trajectory.header().timestamp_sec();
   for (const TrajectoryPoint &point : trajectory.trajectory_point()) {
-    collector.Collect(point, trajectory.header().timestamp_sec());
-  }
-  for (int i = 0; i < world_.planning_trajectory_size(); ++i) {
-    auto traj_pt = world_.mutable_planning_trajectory(i);
-    traj_pt->set_position_x(traj_pt->position_x() + map_service_->GetXOffset());
-    traj_pt->set_position_y(traj_pt->position_y() + map_service_->GetYOffset());
+    Object *trajectory_point = world_.add_planning_trajectory();
+    trajectory_point->set_timestamp_sec(point.relative_time() + base_time);
+    trajectory_point->set_position_x(point.path_point().x() +
+                                     map_service_->GetXOffset());
+    trajectory_point->set_position_y(point.path_point().y() +
+                                     map_service_->GetYOffset());
+    trajectory_point->set_speed(point.v());
+    trajectory_point->set_speed_acceleration(point.a());
+    trajectory_point->set_kappa(point.path_point().kappa());
+    trajectory_point->set_dkappa(point.path_point().dkappa());
+    trajectory_point->set_heading(point.path_point().theta());
   }
 
   // Update engage advice.
@@ -941,6 +946,13 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   planning_data->clear_path();
   for (auto &path : data.path()) {
     DownsamplePath(path, planning_data->add_path());
+  }
+
+  // Update pull over status
+  planning_data->clear_pull_over_status();
+  if (data.has_pull_over_status()) {
+    planning_data->mutable_pull_over_status()->CopyFrom(
+      data.pull_over_status());
   }
 }
 
