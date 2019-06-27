@@ -27,8 +27,9 @@ namespace inference {
 PaddleNet::PaddleNet(const std::string &model_file,
                      const std::string &param_file,
                      const std::vector<std::string> &outputs)
-    : model_file_(model_file), param_file_(param_file), output_names_(outputs)
-{}
+    : model_file_(model_file),
+      param_file_(param_file),
+      output_names_(outputs) {}
 
 bool PaddleNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
   paddle::AnalysisConfig config;
@@ -48,16 +49,14 @@ bool PaddleNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
   std::vector<int> input_shape;
   for (auto name_shape : shapes) {
     std::shared_ptr<paddle::ZeroCopyTensor> blob =
-      predictor_->GetInputTensor(name_map_[name_shape.first]);
+        predictor_->GetInputTensor(name_map_[name_shape.first]);
     if (blob != nullptr) {
       blob->Reshape(name_shape.second);
     }
     input_shape = name_shape.second;
   }
   /////////////////
-  int input_num = std::accumulate(input_shape.begin(),
-                                  input_shape.end(),
-                                  1,
+  int input_num = std::accumulate(input_shape.begin(), input_shape.end(), 1,
                                   std::multiplies<int>());
   std::vector<std::vector<float>> input_data(1);
   input_data[0].resize(input_num);
@@ -67,7 +66,7 @@ bool PaddleNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
   // Prepare inputs
   auto input_names = predictor_->GetInputNames();
   int index = 0;
-  for (auto& name : input_names) {
+  for (auto &name : input_names) {
     auto input_t = predictor_->GetInputTensor(name);
     input_t->Reshape(input_shape);
     input_t->copy_from_cpu(input_data[index].data());
@@ -99,10 +98,10 @@ PaddleNet::PaddleNet(const std::string &model_file,
                      const std::string &param_file,
                      const std::vector<std::string> &outputs,
                      const std::vector<std::string> &inputs)
-                    : model_file_(model_file),
-                      param_file_(param_file),
-                      output_names_(outputs),
-                      input_names_(inputs) {}
+    : model_file_(model_file),
+      param_file_(param_file),
+      output_names_(outputs),
+      input_names_(inputs) {}
 
 std::shared_ptr<apollo::perception::base::Blob<float>> PaddleNet::get_blob(
     const std::string &name) {
@@ -120,13 +119,12 @@ bool PaddleNet::reshape() {
     if (paddle_blob != nullptr && blob != nullptr) {
       paddle_blob->Reshape(blob->shape());
       std::vector<int> paddle_blob_shape = paddle_blob->shape();
-      int count = std::accumulate(paddle_blob_shape.begin(),
-                                  paddle_blob_shape.end(),
-                                  1,
-                                  std::multiplies<int>());
+      int count =
+          std::accumulate(paddle_blob_shape.begin(), paddle_blob_shape.end(), 1,
+                          std::multiplies<int>());
       cudaMemcpy(paddle_blob->mutable_data<float>(paddle::PaddlePlace::kGPU),
-                 blob->gpu_data(),
-                 count * sizeof(float), cudaMemcpyDeviceToDevice);
+                 blob->gpu_data(), count * sizeof(float),
+                 cudaMemcpyDeviceToDevice);
     }
   }
 
@@ -160,10 +158,9 @@ void PaddleNet::Infer() {
       blob->Reshape(paddle_blob->shape());
       // TODO(KaWai) : use the output_size as the count;
       std::vector<int> paddle_blob_shape = paddle_blob->shape();
-      int count = std::accumulate(paddle_blob_shape.begin(),
-                                  paddle_blob_shape.end(),
-                                  1,
-                                  std::multiplies<int>());
+      int count =
+          std::accumulate(paddle_blob_shape.begin(), paddle_blob_shape.end(), 1,
+                          std::multiplies<int>());
       // int output_size;
       // paddle::PaddlePlace* place;
       cudaMemcpy(blob->mutable_gpu_data(),
@@ -176,21 +173,19 @@ void PaddleNet::Infer() {
 bool PaddleNet::shape(const std::string &name, std::vector<int> *res) {
   bool in_input = false;
   bool in_output = false;
-  if (std::find(input_names_.begin(),
-                input_names_.end(),
-                name) != input_names_.end()) {
+  if (std::find(input_names_.begin(), input_names_.end(), name) !=
+      input_names_.end()) {
     in_input = true;
-  } else if (std::find(output_names_.begin(),
-                       output_names_.end(),
-                       name) != output_names_.end()) {
+  } else if (std::find(output_names_.begin(), output_names_.end(), name) !=
+             output_names_.end()) {
     in_output = true;
   }
   if (~in_input && ~in_output) {
     return false;
   }
 
-  auto blob = in_input? predictor_->GetInputTensor(name_map_[name]):
-                        predictor_->GetOutputTensor(name_map_[name]);
+  auto blob = in_input ? predictor_->GetInputTensor(name_map_[name])
+                       : predictor_->GetOutputTensor(name_map_[name]);
   if (blob == nullptr) {
     return false;
   }

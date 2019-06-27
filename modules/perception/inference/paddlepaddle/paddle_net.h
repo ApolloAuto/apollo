@@ -16,15 +16,15 @@
 
 #pragma once
 
+#include <chrono>
+#include <iostream>
 #include <map>
 #include <memory>
+#include <numeric>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
-#include <numeric>
-#include <iostream>
-#include <chrono>
-#include <unordered_map>
 
 #include "paddle/paddle_inference_api.h"
 
@@ -41,11 +41,11 @@ constexpr uint64_t MemoryPoolInitSizeMb = 100;
 class PaddleNet : public Inference {
  public:
   PaddleNet(const std::string &model_file, const std::string &param_file,
-           const std::vector<std::string> &outputs);
+            const std::vector<std::string> &outputs);
 
   PaddleNet(const std::string &model_file, const std::string &param_file,
-           const std::vector<std::string> &outputs,
-           const std::vector<std::string> &inputs);
+            const std::vector<std::string> &outputs,
+            const std::vector<std::string> &inputs);
 
   virtual ~PaddleNet() {}
 
@@ -67,30 +67,29 @@ class PaddleNet : public Inference {
   BlobMap blobs_;
 
   std::unordered_map<std::string, std::string> name_map_ = {
-    // object detection
-    {"data", "input"},
-    {"obj_pred", "save_infer_model/scale_0"},
-    {"cls_pred", "save_infer_model/scale_1"},
-    {"ori_pred", "save_infer_model/scale_2"},
-    {"dim_pred", "save_infer_model/scale_3"},
-    {"brvis_pred", "save_infer_model/scale_4"},
-    {"ltvis_pred", "save_infer_model/scale_5"},
-    {"rtvis_pred", "save_infer_model/scale_6"},
-    {"brswt_pred", "save_infer_model/scale_7"},
-    {"ltswt_pred", "save_infer_model/scale_8"},
-    {"rtswt_pred", "save_infer_model/scale_9"},
-    {"loc_pred", "save_infer_model/scale_13"},
-    {"conv3_3", "save_infer_model/scale_14"},
-    // lane line
-    {"softmax", "save_infer_model/scale_0"},
-    // lidar cnn_seg
-    {"confidence_score", "save_infer_model/scale_0"},
-    {"class_score", "save_infer_model/scale_1"},
-    {"category_score", "save_infer_model/scale_2"},
-    {"instance_pt", "save_infer_model/scale_3"},
-    {"heading_pt", "save_infer_model/scale_4"},
-    {"height_pt", "save_infer_model/scale_5"}
-    };
+      // object detection
+      {"data", "input"},
+      {"obj_pred", "save_infer_model/scale_0"},
+      {"cls_pred", "save_infer_model/scale_1"},
+      {"ori_pred", "save_infer_model/scale_2"},
+      {"dim_pred", "save_infer_model/scale_3"},
+      {"brvis_pred", "save_infer_model/scale_4"},
+      {"ltvis_pred", "save_infer_model/scale_5"},
+      {"rtvis_pred", "save_infer_model/scale_6"},
+      {"brswt_pred", "save_infer_model/scale_7"},
+      {"ltswt_pred", "save_infer_model/scale_8"},
+      {"rtswt_pred", "save_infer_model/scale_9"},
+      {"loc_pred", "save_infer_model/scale_13"},
+      {"conv3_3", "save_infer_model/scale_14"},
+      // lane line
+      {"softmax", "save_infer_model/scale_0"},
+      // lidar cnn_seg
+      {"confidence_score", "save_infer_model/scale_0"},
+      {"class_score", "save_infer_model/scale_1"},
+      {"category_score", "save_infer_model/scale_2"},
+      {"instance_pt", "save_infer_model/scale_3"},
+      {"heading_pt", "save_infer_model/scale_4"},
+      {"height_pt", "save_infer_model/scale_5"}};
 };
 
 }  // namespace inference

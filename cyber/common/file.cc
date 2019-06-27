@@ -18,14 +18,14 @@
 
 #include <dirent.h>
 #include <errno.h>
-#include <glob.h>
-#include <stddef.h>
-#include <unistd.h>
 #include <fcntl.h>
+#include <glob.h>
 #include <limits.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <stddef.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include <fstream>
 #include <string>
 
@@ -331,7 +331,7 @@ std::string GetCurrentPath() {
   return getcwd(tmp, sizeof(tmp)) ? std::string(tmp) : std::string("");
 }
 
-bool GetType(const string& filename, FileType* type) {
+bool GetType(const string &filename, FileType *type) {
   struct stat stat_buf;
   if (lstat(filename.c_str(), &stat_buf) != 0) {
     return false;
@@ -347,7 +347,7 @@ bool GetType(const string& filename, FileType* type) {
   return true;
 }
 
-bool DeleteFile(const string& filename) {
+bool DeleteFile(const string &filename) {
   if (!PathExists(filename)) {
     return true;
   }
@@ -362,12 +362,12 @@ bool DeleteFile(const string& filename) {
     }
     return true;
   }
-  DIR* dir = opendir(filename.c_str());
+  DIR *dir = opendir(filename.c_str());
   if (dir == nullptr) {
     AWARN << "failed to opendir: " << filename;
     return false;
   }
-  dirent* dir_info = nullptr;
+  dirent *dir_info = nullptr;
   while ((dir_info = readdir(dir)) != nullptr) {
     if (strcmp(dir_info->d_name, ".") == 0 ||
         strcmp(dir_info->d_name, "..") == 0) {
@@ -390,7 +390,7 @@ bool DeleteFile(const string& filename) {
   return true;
 }
 
-bool CreateDir(const string& dir) {
+bool CreateDir(const string &dir) {
   int ret = mkdir(dir.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
   if (ret != 0) {
     AWARN << "failed to create dir. [dir: " << dir
