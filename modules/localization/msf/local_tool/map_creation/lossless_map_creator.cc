@@ -81,8 +81,7 @@ bool ParseCommandLine(int argc, char* argv[],
     }
     boost::program_options::notify(*vm);
   } catch (std::exception& e) {
-    AERROR << "Error" << e.what();
-    AERROR << desc;
+    AERROR << "Error: " << e.what() << " " << desc;
     return false;
   } catch (...) {
     AERROR << "Unknown error!";
@@ -246,8 +245,7 @@ int main(int argc, char** argv) {
     }
     fclose(file);
   } else {
-    AERROR << "Can't open file: "
-           << "./lossless_map/config.txt";
+    AERROR << "Can't open file: " << file_buf;
   }
 
   LosslessMapNodePool lossless_map_node_pool(25, 8);
@@ -323,14 +321,14 @@ int main(int argc, char** argv) {
         std::vector<unsigned int> layer_counts;
         map.GetCountSafe(pt3d, zone_id, resolution_id, &layer_counts);
         if (layer_counts.empty()) {
-          AINFO << "No ground layer, skip.";
+          ADEBUG << "No ground layer, skip.";
           continue;
         }
         if (layer_counts[layer_id] > 0) {
           std::vector<float> layer_alts;
           map.GetAltSafe(pt3d, zone_id, resolution_id, &layer_alts);
           if (layer_alts.empty()) {
-            AINFO << "No ground points, skip.";
+            ADEBUG << "No ground points, skip.";
             continue;
           }
           float alt = layer_alts[layer_id];

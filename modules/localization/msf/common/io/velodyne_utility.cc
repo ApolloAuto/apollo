@@ -151,7 +151,7 @@ void LoadPosesAndStds(const std::string& file_path,
       timestamps->push_back(timestamp);
 
       Eigen::Vector3d std;
-      AINFO << std_x, std_y, std_z;
+      std << std_x, std_y, std_z;
       stds->push_back(std);
     }
     fclose(file);

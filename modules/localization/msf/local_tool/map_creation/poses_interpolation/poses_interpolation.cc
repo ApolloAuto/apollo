@@ -160,7 +160,7 @@ void PosesInterpolation::PoseInterpolationByTime(
       AWARN << "[WARN] No more poses. Exit now.";
       break;
     }
-    AINFO << "Frame_id: " << i;
+    ADEBUG << "Frame_id: " << i;
   }
 }
 

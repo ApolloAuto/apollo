@@ -49,7 +49,7 @@ MapNodeIndex GetMapIndexFromMapFolder(const std::string& map_folder) {
   if (zone == "south") {
     index.zone_id_ = -index.zone_id_;
   }
-  AINFO << index;
+  ADEBUG << index;
   return index;
 }
 
@@ -185,7 +185,7 @@ int main(int argc, char** argv) {
     LosslessMapNode* lossless_node =
         static_cast<LosslessMapNode*>(lossless_map.GetMapNodeSafe(*itr));
     if (lossless_node == nullptr) {
-      AINFO << "index: " << index << " is a nullptr pointer!";
+      AWARN << "index: " << index << " is a nullptr pointer!";
       continue;
     }
     LosslessMapMatrix& lossless_matrix =
