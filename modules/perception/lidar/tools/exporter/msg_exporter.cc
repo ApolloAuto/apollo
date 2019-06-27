@@ -14,11 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/tools/exporter/msg_exporter.h"
+
+#include <opencv2/opencv.hpp>
 #include <pcl/io/pcd_io.h>
+
 #include <fstream>
 #include <memory>
-#include <opencv2/opencv.hpp>
 #include <vector>
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/util/string_util.h"
