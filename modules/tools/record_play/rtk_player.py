@@ -135,7 +135,7 @@ class RtkPlayer(object):
                          (self.start, self.closestpoint))
 
         self.closestpoint = self.closest_dist()
-        self.start = max(self.closestpoint - 100, 0)
+        self.start = max(self.closestpoint - 1, 0)
         self.starttime = cyber_time.Time.now().to_sec()
         self.end = min(self.start + 1000, len(self.data) - 1)
         self.logger.info("finish replan at time %s, self.closestpoint=%s" %
@@ -206,7 +206,7 @@ class RtkPlayer(object):
             timepoint = self.closest_time()
             distpoint = self.closest_dist()
             gear_switch_point = self.fist_gear_switch_time()
-            self.start = max(min(timepoint, distpoint) - 100, 0)
+            self.start = max(min(timepoint, distpoint) - 1, 0)
             self.end = min(max(timepoint, distpoint) + 900, gear_switch_point)
 
             xdiff_sqr = (self.data['x'][timepoint] - self.carx)**2
