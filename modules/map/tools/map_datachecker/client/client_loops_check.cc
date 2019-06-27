@@ -32,6 +32,7 @@ LoopsChecker::LoopsChecker(const std::string& time_flag_file)
   service_stub_ = CollectionCheckerService::NewStub(
       grpc::CreateChannel(server_addr, grpc::InsecureChannelCredentials()));
 }
+
 int LoopsChecker::SyncStart(bool* reached) {
   std::vector<std::pair<double, double>> time_ranges = GetTimeRanges();
   size_t pair_count = time_ranges.size();
@@ -47,6 +48,7 @@ int LoopsChecker::SyncStart(bool* reached) {
   }
   return PeriodicCheck(reached);
 }
+
 int LoopsChecker::PeriodicCheck(bool* reached) {
   int ret = 0;
   while (true) {
@@ -73,6 +75,7 @@ int LoopsChecker::PeriodicCheck(bool* reached) {
   }
   return 0;
 }
+
 std::vector<std::pair<double, double>> LoopsChecker::GetTimeRanges() {
   std::vector<std::pair<double, double>> result;
   std::vector<std::pair<double, double>> empty;
@@ -110,8 +113,9 @@ std::vector<std::pair<double, double>> LoopsChecker::GetTimeRanges() {
   }
   return result;
 }
+
 int LoopsChecker::GrpcStub(LoopsVerifyRequest* request,
-                            LoopsVerifyResponse* response) {
+                           LoopsVerifyResponse* response) {
   grpc::ClientContext context;
   grpc::Status status;
   status = service_stub_->ServiceLoopsVerify(&context, *request, response);
@@ -126,6 +130,7 @@ int LoopsChecker::GrpcStub(LoopsVerifyRequest* request,
   }
   return 0;
 }
+
 int LoopsChecker::Start(
     const std::vector<std::pair<double, double>>& time_ranges) {
   LoopsVerifyRequest request;
@@ -153,6 +158,7 @@ int LoopsChecker::Check(double* progress, bool* reached) {
   }
   return ret;
 }
+
 int LoopsChecker::Stop() {
   LoopsVerifyRequest request;
   request.set_cmd(CmdType::STOP);

@@ -135,12 +135,12 @@ class Alignment {
  protected:
   std::unique_ptr<CollectionCheckerService::Stub> service_stub_;
   virtual grpc::Status GrpcAlignmentStub(REQUEST_TYPE* request,
-                                           RESPONSE_TYPE* response) = 0;
+                                         RESPONSE_TYPE* response) = 0;
 };
 
 class StaticAlign : public Alignment<StaticAlignRequest, StaticAlignResponse> {
   grpc::Status GrpcAlignmentStub(StaticAlignRequest* request,
-                                   StaticAlignResponse* response) {
+                                 StaticAlignResponse* response) {
     grpc::ClientContext context;
     return service_stub_->ServiceStaticAlign(&context, *request, response);
   }
@@ -148,7 +148,7 @@ class StaticAlign : public Alignment<StaticAlignRequest, StaticAlignResponse> {
 
 class EightRoute : public Alignment<EightRouteRequest, EightRouteResponse> {
   grpc::Status GrpcAlignmentStub(EightRouteRequest* request,
-                                   EightRouteResponse* response) {
+                                 EightRouteResponse* response) {
     grpc::ClientContext context;
     return service_stub_->ServiceEightRoute(&context, *request, response);
   }
