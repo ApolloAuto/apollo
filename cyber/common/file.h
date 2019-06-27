@@ -195,11 +195,11 @@ std::string GetFileName(const std::string &path,
 std::string GetCurrentPath();
 
 // delete file including file or directory
-bool DeleteFile(const std::string& filename);
+bool DeleteFile(const std::string &filename);
 
-bool GetType(const std::string& filename, FileType* type);
+bool GetType(const std::string &filename, FileType *type);
 
-bool CreateDir(const std::string& dir);
+bool CreateDir(const std::string &dir);
 }  // namespace common
 }  // namespace cyber
 }  // namespace apollo
