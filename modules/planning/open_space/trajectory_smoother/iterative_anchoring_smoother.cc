@@ -108,9 +108,18 @@ bool IterativeAnchoringSmoother::Smooth(
     const auto point2d = warm_start_path.Evaluate(s);
     interpolated_warm_start_point2ds.emplace_back(point2d.x(), point2d.y());
   }
-  if (interpolated_warm_start_point2ds.size() < 4) {
-    AERROR << "interpolated_warm_start_path smaller than 4";
+
+  const size_t interpolated_size = interpolated_warm_start_point2ds.size();
+  if (interpolated_size < 4) {
+    AERROR << "interpolated_warm_start_path smaller than 4, can't enforce "
+              "heading continuity";
     return false;
+  } else if (interpolated_size < 6) {
+    ADEBUG << "interpolated_warm_start_path smaller than 4, can't enforce "
+              "initial zero kappa";
+    enforce_initial_kappa_ = false;
+  } else {
+    enforce_initial_kappa_ = true;
   }
 
   // Adjust heading to ensure heading continuity
@@ -388,10 +397,6 @@ bool IterativeAnchoringSmoother::GenerateInitialBounds(
 
   if (!estimate_bound) {
     std::vector<double> default_bounds(path_points.size(), default_bound);
-    default_bounds[0] = 0.0;
-    default_bounds[1] = 0.0;
-    default_bounds[path_points.size() - 2] = 0.0;
-    default_bounds[path_points.size() - 1] = 0.0;
     *initial_bounds = std::move(default_bounds);
     return true;
   }
@@ -407,15 +412,9 @@ bool IterativeAnchoringSmoother::GenerateInitialBounds(
       }
     }
     min_bound -= vehicle_shortest_dimension;
-    if (min_bound < kEpislon) {
-      return false;
-    }
+    min_bound = min_bound < kEpislon ? 0.0 : min_bound;
     initial_bounds->push_back(min_bound);
   }
-  initial_bounds->at(0) = 0.0;
-  initial_bounds->at(1) = 0.0;
-  initial_bounds->at(path_points.size() - 2) = 0.0;
-  initial_bounds->at(path_points.size() - 1) = 0.0;
   return true;
 }
 
@@ -539,11 +538,6 @@ void IterativeAnchoringSmoother::AdjustPathBounds(
     std::vector<double>* bounds) {
   CHECK_NOTNULL(bounds);
 
-  if (colliding_point_index.empty()) {
-    return;
-  }
-
-  // TODO(Jinyun): move to confs
   const double collision_decrease_ratio =
       planner_open_space_config_.iterative_anchoring_smoother_config()
           .collision_decrease_ratio();
@@ -552,11 +546,15 @@ void IterativeAnchoringSmoother::AdjustPathBounds(
     bounds->at(index) *= collision_decrease_ratio;
   }
 
-  // Anchor the end points to enforce the initial end end heading continuity
+  // Anchor the end points to enforce the initial end end heading continuity and
+  // zero kappa
   bounds->at(0) = 0.0;
   bounds->at(1) = 0.0;
   bounds->at(bounds->size() - 1) = 0.0;
   bounds->at(bounds->size() - 2) = 0.0;
+  if (enforce_initial_kappa_) {
+    bounds->at(2) = 0.0;
+  }
 }
 
 bool IterativeAnchoringSmoother::SetPathProfile(

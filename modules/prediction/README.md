@@ -32,8 +32,14 @@ inputs are **_perception obstacles_**, **_vehicle localization_** and **_vehicle
 
 The Scenario sub-module analyzes scenarios that includes the ego vehicle.
 Currently, we have two defined scenarios:
-- **Cruise** : this scenario includes Lane keeping and following.
-- **Junction** : this scenario involves junctions. Junctions can either have traffic lights and/or STOP signs.
+- **Cruise** : this scenario includes Lane keeping and following
+- **Junction** : this scenario involves junctions. Junctions can either have traffic lights and/or STOP signs
+
+### Obstacles
+
+- **Ignore**: these obstacles will not affect the ego car's trajectory and can be safely ignored (E.g. the obstacle is too far away)
+- **Caution**: these obstacles have a high possibility of interacting with the ego car
+- **Normal**: the obstacles that do not fall under ignore or caution are placed by default under normal
 
 
 ### Evaluator
@@ -54,6 +60,10 @@ There exists 5 types of evaluators, two of which were added in Apollo 3.5. As Cr
 
 * **Junction MLP evaluator**: probability is calculated using an MLP model for junction scenario
 
+* **Junction Map evaluator**: probability is calculated using an semantic map-based CNN model for junction scenario. This evaluator was created for caution level obstacles
+
+* **Social Interaction evaluator**: this model is used for pedestrians, for short term trajectory prediction. It uses social LSTM. This evaluator was created for caution level obstacles
+
 
 ### Predictor
 
@@ -66,6 +76,7 @@ Predictor generates predicted trajectories for obstacles. Currently, the support
 * **Free movement**: obstacle moves freely
 * **Regional movement**: obstacle moves in a possible region
 * **Junction**: Obstacles move toward junction exits with high probabilities
+* **Interaction predictor**: compute the likelihood to create posterior prediction results after all evaluators have run. This predictor was created for caution level obstacles
 
 ## Prediction Architecture
 

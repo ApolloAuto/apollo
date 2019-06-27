@@ -54,8 +54,7 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
   bool EncodeTrajectory(const DiscretizedTrajectory& trajectory,
                         std::string* const encoding);
 
-  bool CheckTrajTraversed(
-      const std::string& trajectory_encoding_to_check) const;
+  bool CheckTrajTraversed(const std::string& trajectory_encoding_to_check);
 
   void UpdateTrajHistory(const std::string& chosen_trajectory_encoding);
 
@@ -77,6 +76,7 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
 
   bool UseFailSafeSearch(
       const std::vector<TrajGearPair>& paritioned_trajectories,
+      const std::vector<std::string>& trajectories_encodings,
       size_t* current_trajectory_index, size_t* current_trajectory_point_index);
 
   bool InsertGearShiftTrajectory(

@@ -19,6 +19,7 @@ cc_binary(
         "//modules/perception/common/io:io_util",
         "@gtest",
     ],
+    linkstatic=False,
 )
 
 cpplint()

@@ -10,4 +10,5 @@ cc_library(
     hdrs = glob([
         "include/*.h",
     ]),
+    includes = ["include"],
 )

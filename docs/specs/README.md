@@ -27,6 +27,7 @@ Apollo 3.0 Hardware Development Platform provides 2 types of evaluation for our 
 
 
 ## Perception
+- [Perception Apollo 5.0](perception_apollo_5.0.md)
 - [Perception Apollo 3.0](perception_apollo_3.0.md)
 - [Guideline Sensor Installation Apollo 3.0](Guideline_sensor_Installation_apollo_3.0.md)
 - [Perception Apollo 2.5](perception_apollo_2.5.md)
@@ -41,6 +42,7 @@ Apollo 3.0 Hardware Development Platform provides 2 types of evaluation for our 
 - [LiDAR Calibration CN](lidar_calibration_cn.pdf)
 
 ## HMI
+- [Introducing Dreamland](Dreamland_introduction.md)
 - [Dreamview usage table](dreamview_usage_table.md)
 - [Dreamview usage table CN](dreamview_usage_table_cn.md)
 
