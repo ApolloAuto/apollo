@@ -276,7 +276,7 @@ default_task_config: {
     enable_perception_obstacles: true
     parking_depth_buffer: 0.2
     roi_linesegment_min_angle: 0.15
-    roi_linesegment_length: 0.1
+    roi_linesegment_length: 1.0
     perception_obstacle_filtering_distance: 1000.0
     perception_obstacle_buffer: 0.0
     curb_heading_tangent_change_uppper_limit: 0.4
