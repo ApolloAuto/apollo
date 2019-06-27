@@ -88,6 +88,10 @@ class Alignment {
  protected:
   void UpdatePoseInfo(const FramePose& pose,
                         std::shared_ptr<BadOrGoodPoseInfo> sp_pose_info) {
+    if (sp_pose_info == nullptr) {
+      AERROR << "sp_pose_info is nullptr";
+      return;
+    }
     BadOrGoodPoseInfo& pose_info = *sp_pose_info;
     if (pose_info.pose_count == 0) {
       pose_info.start_time = pose.time_stamp;
@@ -103,6 +107,10 @@ class Alignment {
   }
 
   void ClearPoseInfo(std::shared_ptr<BadOrGoodPoseInfo> sp_pose_info) {
+    if (sp_pose_info == nullptr) {
+      AERROR << "sp_pose_info is nullptr";
+      return;   
+    }
     BadOrGoodPoseInfo& pose_info = *sp_pose_info;
     pose_info.start_time = -1.0;
     pose_info.end_time = -1.0;
