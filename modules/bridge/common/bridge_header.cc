@@ -50,7 +50,7 @@ bool BridgeHeader::Diserialize(const char *buf, size_t buf_size) {
       cursor += sizeof(HType) + 1;
       bsize size = *(reinterpret_cast<const bsize *>(cursor));
       cursor += sizeof(bsize) + size + 2;
-      i -= sizeof(HType) + sizeof(bsize) + size + 3;
+      i -= static_cast<int>(sizeof(HType) + sizeof(bsize) + size + 3);
       continue;
     }
     size_t value_size = 0;

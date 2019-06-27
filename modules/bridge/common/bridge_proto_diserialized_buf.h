@@ -40,6 +40,7 @@ class BridgeProtoDiserializedBuf {
 
   bool Initialize(const BridgeHeader &header);
   char *GetBuf(size_t offset) { return proto_buf_ + offset; }
+  uint32_t GetMsgID() const { return sequence_num_; }
 
  private:
   size_t total_frames_ = 0;
