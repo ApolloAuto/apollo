@@ -215,6 +215,7 @@ Status ObjectsXmlParser::ParsePNCJunctions(
     const tinyxml2::XMLElement& xml_node,
     std::vector<PbPNCJunction>* pnc_junctions) {
   CHECK_NOTNULL(pnc_junctions);
+
   const tinyxml2::XMLElement* sub_node = xml_node.FirstChildElement("object");
   while (sub_node) {
     std::string object_type;
@@ -238,10 +239,127 @@ Status ObjectsXmlParser::ParsePNCJunctions(
         return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
       }
       RETURN_IF_ERROR(UtilXmlParser::ParseOutline(*outline_node, polygon));
+
+      RETURN_IF_ERROR(ParsePassageGroup(*sub_node, &pnc_junction));
+
       pnc_junctions->emplace_back(pnc_junction);
     }
+
     sub_node = sub_node->NextSiblingElement("object");
   }
+
+  return Status::OK();
+}
+
+Status ObjectsXmlParser::ParsePassageGroup(const tinyxml2::XMLElement& xml_node,
+                                           PbPNCJunction* pnc_junction) {
+  CHECK_NOTNULL(pnc_junction);
+
+  auto sub_node = xml_node.FirstChildElement("passageGroup");
+  while (sub_node) {
+    std::string object_id;
+    std::string object_type;
+    PbPassageGroup *passage_group = pnc_junction->add_passage_group();
+    int checker =
+      UtilXmlParser::QueryStringAttribute(*sub_node, "id", &object_id);
+    if (checker != tinyxml2::XML_SUCCESS) {
+      std::string err_msg = "Error parse object type.";
+      return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+    }
+    passage_group->mutable_id()->set_id(object_id);
+
+    RETURN_IF_ERROR(ParsePassage(*sub_node, passage_group));
+
+    sub_node  = sub_node->NextSiblingElement("passageGroup");
+  }
+
+  return Status::OK();
+}
+
+Status ObjectsXmlParser::ParsePassage(const tinyxml2::XMLElement& xml_node,
+                                      PbPassageGroup* passage_group) {
+  CHECK_NOTNULL(passage_group);
+
+  auto sub_node = xml_node.FirstChildElement("passage");
+  while (sub_node) {
+    std::string object_type;
+    int checker =
+      UtilXmlParser::QueryStringAttribute(*sub_node, "type", &object_type);
+    if (checker != tinyxml2::XML_SUCCESS) {
+      std::string err_msg = "Error parse object type.";
+      return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+    }
+
+    auto passage = passage_group->add_passage();
+    PbPassageType pb_passage_type;
+    RETURN_IF_ERROR(ToPassageType(object_type, &pb_passage_type));
+    passage->set_type(pb_passage_type);
+
+    std::vector<std::string> passage_node_ids;
+    RETURN_IF_ERROR(ParsePassageIds(*sub_node, "laneID", &passage_node_ids));
+    for (auto id : passage_node_ids) {
+        passage->add_lane_id()->set_id(id);
+    }
+
+    RETURN_IF_ERROR(ParsePassageIds(*sub_node, "signalID", &passage_node_ids));
+    for (auto id : passage_node_ids) {
+        passage->add_signal_id()->set_id(id);
+    }
+
+    RETURN_IF_ERROR(ParsePassageIds(*sub_node, "yieldlID", &passage_node_ids));
+    for (auto id : passage_node_ids) {
+        passage->add_yield_id()->set_id(id);
+    }
+
+    RETURN_IF_ERROR(ParsePassageIds(*sub_node, "stopSignID",
+                                  &passage_node_ids));
+    for (auto id : passage_node_ids) {
+        passage->add_stop_sign_id()->set_id(id);
+    }
+
+    sub_node  = sub_node->NextSiblingElement("passage");
+  }
+
+  return Status::OK();
+}
+
+Status ObjectsXmlParser::ParsePassageIds(
+    const tinyxml2::XMLElement& xml_node,
+    const std::string& child_node_name,
+    std::vector<std::string> *passage_node_ids) {
+  CHECK_NOTNULL(passage_node_ids);
+
+  passage_node_ids->clear();
+  auto sub_node = xml_node.FirstChildElement(child_node_name.c_str());
+  while (sub_node) {
+    std::string object_id;
+    int checker =
+      UtilXmlParser::QueryStringAttribute(*sub_node, "id", &object_id);
+    if (checker != tinyxml2::XML_SUCCESS) {
+      std::string err_msg = "Error parse passage lane id.";
+      return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+    }
+    passage_node_ids->push_back(object_id);
+
+    sub_node = sub_node->NextSiblingElement(child_node_name.c_str());
+  }
+
+  return Status::OK();
+}
+
+Status ObjectsXmlParser::ToPassageType(const std::string& type,
+                                       PbPassageType* passage_type) {
+  CHECK_NOTNULL(passage_type);
+
+  std::string upper_str = UtilXmlParser::ToUpper(type);
+  if (upper_str == "ENTRANCE") {
+    *passage_type = apollo::hdmap::Passage_PassageType_ENTRANCE;
+  } else if (upper_str == "EXIT") {
+    *passage_type = apollo::hdmap::Passage_PassageType_EXIT;
+  } else {
+    *passage_type = apollo::hdmap::Passage_PassageType_UNKNOWN;
+  }
+
   return Status::OK();
 }
 
