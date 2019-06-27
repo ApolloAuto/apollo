@@ -15,6 +15,7 @@ limitations under the License.
 #pragma once
 
 #include <vector>
+#include <string>
 
 #include "tinyxml2/tinyxml2.h"
 
@@ -39,6 +40,16 @@ class ObjectsXmlParser {
                                    std::vector<PbParkingSpace>* parking_spaces);
   static Status ParsePNCJunctions(const tinyxml2::XMLElement& xml_node,
                                   std::vector<PbPNCJunction>* pnc_junctions);
+  static Status ParsePassageGroup(const tinyxml2::XMLElement& xml_node,
+                                  PbPNCJunction* pnc_junction);
+
+  static Status ParsePassage(const tinyxml2::XMLElement& xml_node,
+                             PbPassageGroup* passage_group);
+  static Status ParsePassageIds(const tinyxml2::XMLElement& xml_node,
+                                const std::string& child_node_name,
+                                std::vector<std::string>* passage_node_ids);
+  static Status ToPassageType(const std::string& type,
+                              PbPassageType* passage_type);
 };
 
 }  // namespace adapter
