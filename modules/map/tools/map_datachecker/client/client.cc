@@ -47,20 +47,21 @@ Client::Client() {
 int Client::Run() {
   std::string stage = FLAGS_stage;
   AINFO << "stage [" << stage << "]";
+  int ret = 0;
   if ("record_check" == stage) {
-    RecordCheckStage();
+    ret = RecordCheckStage();
   } else if ("static_align" == stage) {
-    StaticAlignStage();
+    ret = StaticAlignStage();
   } else if ("eight_route" == stage) {
-    EightRouteStage();
+    ret = EightRouteStage();
   } else if ("data_collect" == stage) {
-    DataCollectStage();
+    ret = DataCollectStage();
   } else if ("loops_check" == stage) {
-    LoopsCheckStage();
+    ret = LoopsCheckStage();
   } else if ("clean" == stage) {
-    CleanStage();
+    ret = CleanStage();
   }
-  return 0;
+  return ret;
 }
 
 int Client::RecordCheckStage() {
