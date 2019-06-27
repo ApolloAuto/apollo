@@ -170,18 +170,30 @@ class DreamviewStore {
     }
 
     updateCustomizedToggles(world) {
-        if (world.planningData && world.planningData.path) {
+        const newToggles = {};
+        if (world.planningData) {
             // Add customized toggles for planning paths
-            world.planningData.path.forEach((path) => {
-                const pathName = path.name;
-                if (!this.options.customizedToggles.has(pathName)) {
-                    this.options.addCustomizedToggle(pathName);
+            if (world.planningData.path) {
+                world.planningData.path.forEach((path) => {
+                    const pathName = path.name;
+                    if (this.options.customizedToggles.has(pathName)) {
+                        newToggles[pathName] = this.options.customizedToggles.get(pathName);
+                    } else {
+                        newToggles[pathName] = true;
+                    }
+                });
+            }
+            // Add pull over status toggle
+            if (world.planningData.pullOverStatus) {
+                const keyword = 'pullOverStatus';
+                if (this.options.customizedToggles.has(keyword)) {
+                    newToggles[keyword] = this.options.customizedToggles.get(keyword);
+                } else {
+                    newToggles[keyword] = true;
                 }
-            });
-        } else if (this.options.customizedToggles.size > 0) {
-            // Clean the planning paths
-            this.options.customizedToggles.clear();
+            }
         }
+        this.options.setCustomizedToggles(newToggles);
     }
 
     handleDrivingModeChange(wasAutoMode, isAutoMode) {

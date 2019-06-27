@@ -33,7 +33,7 @@ default_task_config: {
   piecewise_jerk_speed_config {
     acc_weight: 1.0
     jerk_weight: 3.0
-    kappa_penalty_weight: 2000.0
+    dkappa_penalty_weight: 2000.0
     ref_s_weight: 10.0
     ref_v_weight: 10.0
   }
@@ -133,13 +133,13 @@ default_task_config: {
           xy_grid_resolution: 0.3
           phi_grid_resolution: 0.1
           next_node_num: 10
-          step_size: 0.5
+          step_size: 0.25
           traj_forward_penalty: 1.0
           traj_back_penalty: 1.0
           traj_gear_switch_penalty: 10.0
           traj_steer_penalty: 0.0
           traj_steer_change_penalty: 0.0
-          grid_a_star_xy_resolution: 0.5
+          grid_a_star_xy_resolution: 0.25
           node_radius: 0.5
         }
         dual_variable_warm_start_config {
@@ -214,11 +214,11 @@ default_task_config: {
           vehicle_shortest_dimension: 1.04
           fem_pos_deviation_smoother_config {
             weight_fem_pos_deviation: 1e7
-            weight_path_length: 1.0
+            weight_path_length: 0.0
             weight_ref_deviation: 1e3
             apply_curvature_constraint: true
             weight_curvature_constraint_slack_var: 1e8
-            curvature_constraint: 0.2
+            curvature_constraint: 0.18
             max_iter: 500
             time_limit: 0.0
             verbose: false
@@ -228,16 +228,16 @@ default_task_config: {
           s_curve_config {
             acc_weight: 1.0
             jerk_weight: 1.0
-            kappa_penalty_weight: 100.0
+            dkappa_penalty_weight: 100.0
             ref_s_weight: 10.0
             ref_v_weight: 0.0
           }
           collision_decrease_ratio: 0.8
           max_forward_v: 1.0
           max_reverse_v: 1.0
-          max_forward_acc: 2.0
+          max_forward_acc: 0.5
           max_reverse_acc: 1.0
-          max_acc_jerk: 2.0
+          max_acc_jerk: 0.5
           delta_t: 0.2
         }
         delta_t: 0.5
@@ -276,10 +276,10 @@ default_task_config: {
     enable_perception_obstacles: true
     parking_depth_buffer: 0.2
     roi_linesegment_min_angle: 0.15
-    roi_linesegment_length: 1.0
+    roi_linesegment_length: 0.1
     perception_obstacle_filtering_distance: 1000.0
     perception_obstacle_buffer: 0.0
-    curb_heading_tangent_change_uppper_limit: 0.2
+    curb_heading_tangent_change_uppper_limit: 0.4
   }
 }
 default_task_config: {

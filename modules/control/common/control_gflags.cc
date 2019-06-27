@@ -74,3 +74,7 @@ DEFINE_bool(query_forward_time_point_only, false,
 
 DEFINE_bool(enable_feedback_augment_on_high_speed, false,
             "Enable augmented control on lateral error on high speed");
+
+DEFINE_bool(
+    enable_gear_dirve_negative_speed_protection, false,
+    "Enable estop to prevent following negative speed during gear drive");

@@ -31,11 +31,6 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-enum PositioningMethod {
-  GROUND = 0,
-  HOMOGRAPHY = 1,
-};
-
 class Visualizer {
  public:
   bool Init(const std::vector<std::string> &camera_names,
@@ -186,6 +181,7 @@ class Visualizer {
   bool show_text_ = false;
   bool show_help_text_ = false;
   bool manual_calibration_mode_ = false;
+  bool show_homography_object_ = false;
   std::string help_str_;
   // color
   cv::Scalar color_cipv_ = cv::Scalar(255, 255, 255);

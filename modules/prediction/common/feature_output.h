@@ -74,7 +74,8 @@ class FeatureOutput {
    * @param prediction_obstacle
    */
   static void InsertPredictionResult(
-      const int obstacle_id, const PredictionObstacle& prediction_obstacle);
+      const int obstacle_id, const PredictionObstacle& prediction_obstacle,
+      const ObstacleConf& obstacle_conf);
 
   /**
    * @brief Insert a frame env

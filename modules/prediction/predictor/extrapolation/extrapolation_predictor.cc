@@ -19,11 +19,17 @@
 namespace apollo {
 namespace prediction {
 
+ExtrapolationPredictor::ExtrapolationPredictor() {
+  predictor_type_ = ObstacleConf::EXTRAPOLATION_PREDICTOR;
+}
+
 void ExtrapolationPredictor::Predict(Obstacle* obstacle) {
   Clear();
 
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
+
+  obstacle->SetPredictorType(predictor_type_);
 
   const Feature& feature = obstacle->latest_feature();
 

@@ -282,8 +282,8 @@ bool OpenSpaceTrajectoryProvider::IsVehicleNearDestination(
                 (vehicle_state.y() - end_pose_to_world_frame.y()) *
                     (vehicle_state.y() - end_pose_to_world_frame.y()));
 
-  double theta_to_vehicle = common::math::AngleDiff(vehicle_state.heading(),
-                                                    end_theta_to_world_frame);
+  double theta_to_vehicle = std::abs(common::math::AngleDiff(
+      vehicle_state.heading(), end_theta_to_world_frame));
   ADEBUG << "theta_to_vehicle" << theta_to_vehicle << "end_theta_to_world_frame"
          << end_theta_to_world_frame << "rotate_angle" << rotate_angle;
   ADEBUG << "is_near_destination_threshold"
@@ -332,6 +332,11 @@ void OpenSpaceTrajectoryProvider::GenerateStopTrajectory(
   // TODO(Jinyun) Move to conf
   constexpr int stop_trajectory_length = 10;
   constexpr double relative_stop_time = 0.1;
+  constexpr double vEpsilon = 0.00001;
+  double standstill_acceleration =
+      frame_->vehicle_state().linear_velocity() >= -vEpsilon
+          ? -FLAGS_open_space_standstill_acceleration
+          : FLAGS_open_space_standstill_acceleration;
   trajectory_data->clear();
   for (size_t i = 0; i < stop_trajectory_length; i++) {
     TrajectoryPoint point;
@@ -342,7 +347,7 @@ void OpenSpaceTrajectoryProvider::GenerateStopTrajectory(
     point.mutable_path_point()->set_kappa(0.0);
     point.set_relative_time(relative_time);
     point.set_v(0.0);
-    point.set_a(0.0);
+    point.set_a(standstill_acceleration);
     trajectory_data->emplace_back(point);
     relative_time += relative_stop_time;
   }

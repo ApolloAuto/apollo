@@ -213,7 +213,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
     }
 
     if (use_fail_safe_search) {
-      if (!UseFailSafeSearch(*paritioned_trajectories,
+      if (!UseFailSafeSearch(*paritioned_trajectories, trajectories_encodings,
                              &current_trajectory_index,
                              &current_trajectory_point_index)) {
         std::string msg("Fail to find nearest trajectory point to follow");
@@ -330,7 +330,7 @@ bool OpenSpaceTrajectoryPartition::EncodeTrajectory(
 }
 
 bool OpenSpaceTrajectoryPartition::CheckTrajTraversed(
-    const std::string& trajectory_encoding_to_check) const {
+    const std::string& trajectory_encoding_to_check) {
   const auto& index_history = PlanningContext::Instance()
                                   ->open_space_info()
                                   .partitioned_trajectories_index_history;
@@ -533,6 +533,7 @@ bool OpenSpaceTrajectoryPartition::CheckReachTrajectoryEnd(
 
 bool OpenSpaceTrajectoryPartition::UseFailSafeSearch(
     const std::vector<TrajGearPair>& paritioned_trajectories,
+    const std::vector<std::string>& trajectories_encodings,
     size_t* current_trajectory_index, size_t* current_trajectory_point_index) {
   AERROR << "Trajectory paritition fail, using failsafe search";
   const size_t trajectories_size = paritioned_trajectories.size();
@@ -578,14 +579,25 @@ bool OpenSpaceTrajectoryPartition::UseFailSafeSearch(
   if (failsafe_closest_point_on_trajs.empty()) {
     return false;
   } else {
-    *current_trajectory_index =
-        failsafe_closest_point_on_trajs.top().first.first;
-    *current_trajectory_point_index =
-        failsafe_closest_point_on_trajs.top().first.second;
-    // Clear the traj history
-    PlanningContext::Instance()
-        ->mutable_open_space_info()
-        ->partitioned_trajectories_index_history.clear();
+    bool closest_and_not_repeated_traj_found = false;
+    while (!failsafe_closest_point_on_trajs.empty()) {
+      *current_trajectory_index =
+          failsafe_closest_point_on_trajs.top().first.first;
+      *current_trajectory_point_index =
+          failsafe_closest_point_on_trajs.top().first.second;
+      if (CheckTrajTraversed(
+              trajectories_encodings[*current_trajectory_index])) {
+        failsafe_closest_point_on_trajs.pop();
+      } else {
+        closest_and_not_repeated_traj_found = true;
+        UpdateTrajHistory(trajectories_encodings[*current_trajectory_index]);
+        return true;
+      }
+    }
+    if (!closest_and_not_repeated_traj_found) {
+      return false;
+    }
+
     return true;
   }
 }

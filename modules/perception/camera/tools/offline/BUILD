@@ -63,6 +63,7 @@ cc_binary(
         "//modules/perception/camera/lib/lane/postprocessor/darkSCNN:darkSCNN_lane_postprocessor",
         "//modules/perception/lib/utils",
     ],
+    linkstatic=False,
 )
 
 cpplint()

@@ -135,7 +135,7 @@ class RtkPlayer(object):
                          (self.start, self.closestpoint))
 
         self.closestpoint = self.closest_dist()
-        self.start = max(self.closestpoint - 100, 0)
+        self.start = max(self.closestpoint - 1, 0)
         self.starttime = cyber_time.Time.now().to_sec()
         self.end = min(self.start + 1000, len(self.data) - 1)
         self.logger.info("finish replan at time %s, self.closestpoint=%s" %
@@ -168,6 +168,16 @@ class RtkPlayer(object):
 
         return closest_time
 
+    def fist_gear_switch_time(self):
+        for i in range(0, len(self.data) - 1):
+            # trajectory with gear switch
+            # include gear_neutral at the beginning of a trajectory
+            if((self.data['gear'][i] == 1 or self.data['gear'][i] == 2)
+                    and (self.data['gear'][i + 1] != self.data['gear'][i]) ):
+                return i
+        # trajectory without gear switch
+        return len(self.data) - 1
+
     def publish_planningmsg(self):
         """
         Generate New Path
@@ -195,8 +205,10 @@ class RtkPlayer(object):
         else:
             timepoint = self.closest_time()
             distpoint = self.closest_dist()
-            self.start = max(min(timepoint, distpoint) - 100, 0)
-            self.end = min(max(timepoint, distpoint) + 900, len(self.data) - 1)
+
+            gear_switch_point = self.fist_gear_switch_time()
+            self.start = max(min(timepoint, distpoint) - 1, 0)
+            self.end = min(max(timepoint, distpoint) + 900, gear_switch_point)
 
             xdiff_sqr = (self.data['x'][timepoint] - self.carx)**2
             ydiff_sqr = (self.data['y'][timepoint] - self.cary)**2

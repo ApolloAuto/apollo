@@ -1050,8 +1050,10 @@ bool UsbCam::wait_for_device() {
     close_device();
     return false;
   }
+#ifndef __aarch64__
   // will continue when trigger failed for self-trigger camera
   set_adv_trigger();
+#endif
   return true;
 }
 

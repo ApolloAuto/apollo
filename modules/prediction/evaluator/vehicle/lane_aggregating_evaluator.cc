@@ -39,6 +39,7 @@ using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 
 LaneAggregatingEvaluator::LaneAggregatingEvaluator() : device_(torch::kCPU) {
+  evaluator_type_ = ObstacleConf::LANE_AGGREGATING_EVALUATOR;
   LoadModel();
 }
 
@@ -55,6 +56,9 @@ void LaneAggregatingEvaluator::LoadModel() {
 bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Sanity checks.
   CHECK_NOTNULL(obstacle_ptr);
+
+  obstacle_ptr->SetEvaluatorType(evaluator_type_);
+
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
     AERROR << "Obstacle [" << id << "] has no latest feature.";

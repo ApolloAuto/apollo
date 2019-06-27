@@ -146,7 +146,7 @@ stage_config: {
         task_type: OPEN_SPACE_ROI_DECIDER
         open_space_roi_decider_config {
             roi_type: PULL_OVER
-            perception_obstacle_buffer: 0.4
+            perception_obstacle_buffer: 0.5
         }
     }
     task_config: {
@@ -158,7 +158,7 @@ stage_config: {
             heading_offset_to_midpoint: 0.79
             lateral_offset_to_midpoint: 1.0
             longitudinal_offset_to_midpoint: 0.25
-            vehicle_box_iou_threshold_to_midpoint: 0.75
+            vehicle_box_iou_threshold_to_midpoint: 0.6
         }
     }
     task_config: {

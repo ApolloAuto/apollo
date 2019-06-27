@@ -35,7 +35,7 @@ class MoveSequencePredictor : public SequencePredictor {
   /**
    * @brief Constructor
    */
-  MoveSequencePredictor() = default;
+  MoveSequencePredictor();
 
   /**
    * @brief Destructor

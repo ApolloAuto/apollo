@@ -41,6 +41,7 @@ using apollo::common::math::Vec2d;
 using apollo::cyber::common::GetProtoFromFile;
 
 LaneScanningEvaluator::LaneScanningEvaluator() : device_(torch::kCPU) {
+  evaluator_type_ = ObstacleConf::LANE_SCANNING_EVALUATOR;
   LoadModel();
 }
 
@@ -55,6 +56,9 @@ bool LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
   // Sanity checks.
   omp_set_num_threads(1);
   CHECK_NOTNULL(obstacle_ptr);
+
+  obstacle_ptr->SetEvaluatorType(evaluator_type_);
+
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
     AERROR << "Obstacle [" << id << "] has no latest feature.";

@@ -197,7 +197,7 @@ message Notification {
   optional apollo.common.monitor.MonitorMessageItem item = 2;
 }
 
-// Next-id: 25
+// Next-id: 27
 message SimulationWorld {
   // Timestamp in milliseconds
   optional double timestamp = 1;

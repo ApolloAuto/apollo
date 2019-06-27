@@ -32,7 +32,7 @@ class LaneSequencePredictor : public SequencePredictor {
   /**
    * @brief Constructor
    */
-  LaneSequencePredictor() = default;
+  LaneSequencePredictor();
 
   /**
    * @brief Destructor

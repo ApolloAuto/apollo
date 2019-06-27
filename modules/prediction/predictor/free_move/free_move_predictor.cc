@@ -20,6 +20,7 @@
 
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -27,11 +28,17 @@ namespace prediction {
 using ::apollo::common::TrajectoryPoint;
 using ::apollo::perception::PerceptionObstacle;
 
+FreeMovePredictor::FreeMovePredictor() {
+  predictor_type_ = ObstacleConf::FREE_MOVE_PREDICTOR;
+}
+
 void FreeMovePredictor::Predict(Obstacle* obstacle) {
   Clear();
 
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
+
+  obstacle->SetPredictorType(predictor_type_);
 
   const Feature& feature = obstacle->latest_feature();
 

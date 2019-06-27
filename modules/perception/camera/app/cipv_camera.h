@@ -42,7 +42,7 @@ struct CipvOptions {
 };
 
 constexpr float kMinVelocity = 15.0f;  // in m/s
-constexpr float kMaxDistObjectToLaneInMeter = 7.0f;
+constexpr float kMaxDistObjectToLaneInMeter = 70.0f;
 constexpr float kMaxDistObjectToLaneInPixel = 10.0f;
 const std::size_t kDropsHistorySize = 20;
 const std::size_t kMaxObjectNum = 100;
