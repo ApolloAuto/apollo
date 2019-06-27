@@ -77,8 +77,8 @@ int Client::RecordCheckStage() {
     int ret = 0;
     ret = channel_checker.SyncStart(record_path);
     if (ret != 0) {
-      AERROR << "SyncStart channel chacker failed, record_path ["
-             << record_path << "]";
+      AERROR << "SyncStart channel chacker failed, record_path [" << record_path
+             << "]";
       return -1;
     }
   } else {

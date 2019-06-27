@@ -87,7 +87,7 @@ int ChannelChecker::PeriodicCheck() {
 }
 
 int ChannelChecker::GrpcStub(ChannelVerifyRequest* request,
-                              ChannelVerifyResponse* response) {
+                             ChannelVerifyResponse* response) {
   grpc::ClientContext context;
   grpc::Status status;
   status = service_stub_->ServiceChannelVerify(&context, *request, response);
