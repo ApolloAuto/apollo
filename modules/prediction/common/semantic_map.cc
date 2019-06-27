@@ -55,7 +55,6 @@ void SemanticMap::RunCurrFrame(
     return;
   }
   obstacle_id_history_map_ = obstacle_id_history_map;
-  // TODO(Hongyi): moving all these magic numbers to conf
   const Feature& ego_feature =
       obstacle_id_history_map_.at(FLAGS_ego_vehicle_id).feature(0);
   curr_timestamp_ = ego_feature.timestamp();
@@ -65,8 +64,7 @@ void SemanticMap::RunCurrFrame(
                                  config_.resolution()),
                 static_cast<int>(config_.dim_y() -
                                  (curr_base_y_ - config_.base_point().y()) /
-                                     config_.resolution()) -
-                    2000,
+                                     config_.resolution()) - 2000,
                 2000, 2000);
   base_img_(rect).copyTo(curr_img_);
 
