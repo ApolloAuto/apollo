@@ -31,6 +31,11 @@ Some features include:
 - **PCameraDetector**: Object detection from a camera
 - **PlaneDetector**: Lane line detection from a camera
 
+#### Using PaddlePaddle Features
+
+1. To use the PaddlePaddle model for Camera Obstacle Detector, set `camera_obstacle_perception_conf_file` to `obstacle_paddle.pt` in the following [configuration file](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/production/conf/perception/camera/fusion_camera_detection_component.pb.txt)
+
+2. To use the PaddlePaddle model for LiDAR Obstacle Detector, set `use_paddle` to `true` in the following [configuration file](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/production/data/perception/lidar/models/cnnseg/velodyne128/cnnseg.conf)
 
 ### Online sensor calibration service
 
@@ -46,7 +51,8 @@ The process of manual calibration can be seen below:
 
 ### Closest In-Path Object (CIPO) Detection
 
-The CIPO includes detection of key objects on the road for longitudinal control. It utilizes the object and ego-lane line detection output. It creates a virtual ego lane line using the vehicle's ego motion prediction. Any vehcile model including Sphere model, Bicycle model and 4-wheel tire model can be used for the ego motion prediction. Some examples of CIPO using Pseudo lane lines can be seen below:
+The CIPO includes detection of key objects on the road for longitudinal control. It utilizes the object and ego-lane line detection output. It creates a virtual ego lane line using the vehicle's ego motion prediction. Any vehicle model including Sphere model, Bicycle model and 4-wheel tire model can be used for the ego motion prediction. Based on the vehicle model using the translation of velocity and angular velocity, the length and curvature of the pseudo lanes are determined.
+Some examples of CIPO using Pseudo lane lines can be seen below:
 
 1. CIPO used for curved roads
 ![](images/CIPO_1.png)
@@ -54,6 +60,30 @@ The CIPO includes detection of key objects on the road for longitudinal control.
 2. CIPO for a street with no lane lines
 ![](images/CIPO_2.png)
 
+
+### Vanishing Point Detection
+
+In Apollo 5.0, an additional branch of network is attached to the end of the lane encoder to detect the vanishing point. This branch is composed of convolutional layers and fully connected layers, where convolutional layers translate lane features for the vanishing point task and fully connected layers make a global summary of the whole image to output the vanishing point location. Instead of giving an output in `x`, `y` coordinate directly, the output of vanishing point is in the form of `dx`, `dy` which indicate its distances to the image center in `x`, `y` coordinates. The new branch of network is trained separately by using pre-trained lane features directly, where the model weights with respect to the lane line network is fixed. The Flow Diagram is included below, note that the red color denotes the flow of the vanishing point detection algorithm.
+
+![](images/Vpt.png)
+
+Two challenging visual examples of our vanishing point detection with lane network output are shown below:
+1. Illustrates the case that vanishing point can be detected when there is obstacle blocking the view:
+
+	![](images/Vpt1.png)
+
+
+2. Illustrates the case of turning road with altitude changes:
+
+	![](images/Vpt2.png)
+
+
+#### Key Features
+
+- Regression to `(dx, dy)` rather than `(x, y)` reduces the search space
+- Additional convolution layer is needed for feature translation which casts CNN features for vanishing point purpose
+- Fully Connected layer is applied for holistic spatial summary of information, which is required for vanishing point estimation
+- The branch design supports diverse training strategies, e.g. fine tune pre-trained laneline model, only train the subnet with direct use of laneline features, co-train of multi-task network
 
 ## Output of Perception
 The input of Planning and Control modules will be quite different with that of the previous Lidar-based system for Apollo 3.0.
@@ -69,5 +99,5 @@ The input of Planning and Control modules will be quite different with that of t
 	- Classification type: car, truck, bike, pedestrian
 	- Drops: trajectory of an object
 
-The world coordinate systen is used as ego-coordinate in 3D where the rear center axle is an origin.
+The world coordinate system is used as ego-coordinate in 3D where the rear center axle is an origin.
 
