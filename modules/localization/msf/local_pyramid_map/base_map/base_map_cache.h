@@ -113,12 +113,12 @@ bool LRUCache<Key, Element>::GetSilent(const Key& key, Element** value) {
 
 template <class Key, class Element>
 Element* LRUCache<Key, Element>::Put(const Key& key, Element* value) {
-  if (value == NULL) {
+  if (value == nullptr) {
     AINFO << "LRUCache Warning: put a NULL";
-    return NULL;
+    return nullptr;
   }
 
-  Element* node_remove = NULL;
+  Element* node_remove = nullptr;
   MapIterator found_iter = map_.find(key);
   if (found_iter != map_.end()) {
     // key exists in the list
@@ -128,7 +128,7 @@ Element* LRUCache<Key, Element>::Put(const Key& key, Element* value) {
 
     node_remove = found_iter->second->second;
     if (node_remove == value) {
-      return NULL;
+      return nullptr;
     }
 
     if (Destroy(node_remove)) {
@@ -157,7 +157,7 @@ Element* LRUCache<Key, Element>::Put(const Key& key, Element* value) {
 
 template <class Key, class Element>
 Element* LRUCache<Key, Element>::Remove(const Key& key) {
-  Element* node_remove = NULL;
+  Element* node_remove = nullptr;
   MapIterator found_iter = map_.find(key);
 
   if (found_iter != map_.end() &&
@@ -173,7 +173,7 @@ Element* LRUCache<Key, Element>::Remove(const Key& key) {
 
 template <class Key, class Element>
 Element* LRUCache<Key, Element>::ClearOne() {
-  Element* node_remove = NULL;
+  Element* node_remove = nullptr;
   ListReverseIterator ritr = list_.rbegin();
   while (ritr != list_.rend()) {
     if (Destroy(ritr->second)) {
