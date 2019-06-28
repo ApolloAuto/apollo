@@ -168,16 +168,6 @@ class RtkPlayer(object):
 
         return closest_time
 
-    def fist_gear_switch_time(self, start, end):
-        for i in range(start, end + 1):
-            # trajectory with gear switch
-            # include gear_neutral at the beginning of a trajectory
-            if((self.data['gear'][i] == 1 or self.data['gear'][i] == 2)
-                    and (self.data['gear'][i + 1] != self.data['gear'][i]) ):
-                return i
-        # trajectory without gear switch
-        return end
-
     def publish_planningmsg(self):
         """
         Generate New Path
@@ -208,14 +198,6 @@ class RtkPlayer(object):
 
             self.start = max(min(timepoint, distpoint) - 1, 0)
             self.end = min(max(timepoint, distpoint) + 900, len(self.data) - 1)
-            gear_switch_point = self.fist_gear_switch_time(self.start, self.end)
-            self.end = gear_switch_point
-            # check if empty trajectory
-            if self.end == self.start:
-                self.start = self.end
-                self.end = min(max(timepoint, distpoint) + 900, len(self.data) - 1)
-                gear_switch_point = self.fist_gear_switch_time(self.start, self.end)
-                self.end = gear_switch_point
 
             xdiff_sqr = (self.data['x'][timepoint] - self.carx)**2
             ydiff_sqr = (self.data['y'][timepoint] - self.cary)**2
