@@ -245,7 +245,7 @@ void LocalizationIntegProcess::GetResult(IntegState *state, InsPva *sins_pva,
   return;
 }
 
-void LocalizationIntegProcess::GetRemoveBiasImu(ImuData *imu_data) {
+void LocalizationIntegProcess::GetCorrectedImu(ImuData *imu_data) {
   CHECK_NOTNULL(imu_data);
 
   *imu_data = corrected_imu_;
