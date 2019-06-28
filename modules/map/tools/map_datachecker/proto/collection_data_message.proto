@@ -1,0 +1,85 @@
+// Define Collection Cybertron Service messages
+syntax = "proto2";
+package apollo.hdmap; 
+
+import "modules/map/tools/map_datachecker/proto/collection_error_code.proto";
+import "modules/map/tools/map_datachecker/proto/collection_check_message.proto";
+
+// task query interface:/collector/data-status
+message DataManagerRequest {
+    // 1. request.
+    // --collector_task_query_sql={"cmd":"list", "condition":"recorder_group=\"hdmap_init_collect\" and recorder_rules like \"%%%s%%\" and status in (\"recorder_complete\", \"recorder_ongoing\")"}
+    // 2. clear(todo).
+    // --collector_task_clear_sql={"cmd":"update", "data":{"status","cleanup_complete"}, "condition":"recorder_group=\"hdmap_init_collect\" and recorder_rules like \"%%%s%%\"}
+
+    optional string data = 1;
+}
+
+message DataManagerResponse {
+    required ErrorCode code = 1;
+    repeated string task_path = 2;  // path of tasks
+    optional string data = 3;       // task infos in json-format
+}
+
+// interface:/collector/data-task
+message DataTaskRequest {
+    enum Type {
+        START = 0;
+        STOP = 1;
+    }
+
+    optional string collect_id = 1;
+    optional Type type = 2;
+    optional DataType data_type = 3;
+}
+
+message DataTaskResponse
+{
+    optional ErrorCode errcode = 1;
+    optional string errmsg = 2;
+}
+
+// disk interface：/collector/disk-info
+// DiskFormat API also used DiskInfoRequest
+message DiskInfoRequest {
+    optional string message = 1;
+}
+
+message DiskInfo {
+    optional bool is_mounted = 1;
+    optional uint64 size = 2;
+    optional uint64 used = 3;
+}
+
+message DiskInfoResponse {
+    optional ErrorCode errcode = 1;
+    optional DiskInfo info = 2;
+}
+
+enum Result {
+    PASS = 1;
+    FAIL = 2;
+    ON_GOING = 3;
+}
+
+// disk format interface:/collector/disk-format
+message DiskFormatRequest {
+    optional string message = 1;
+}
+
+message DiskFormatResponse {
+    required ErrorCode code = 1;
+    optional string errmsg = 2;
+    optional Result result = 3;
+}
+
+// gpsbin checking interface:/collector/check-gpsbin
+message CheckGPSbinRequest {
+    optional string message = 1;
+}
+
+message CheckGPSbinResponse {
+    required ErrorCode code = 1;
+    optional string errmsg = 2;
+    optional Result result = 3;
+}
