@@ -1,12 +1,11 @@
 # How to Build and Release your Docker Container
 
 * [1. Install Docker](#install-docker)
-* [2. Git LFS](#install-git-lfs)
-* [3. Build Apollo](#build-apollo)
-* [4. What's next](#what's-next)
-* [5. Build in VSCode](#build-in-visual-studio-code)
-* [6. Test](#test)
-* [7. Legal Disclaimer](#legal-disclaimer)
+* [2. Build Apollo](#build-apollo)
+* [3. What's next](#what's-next)
+* [4. Build in VSCode](#build-in-visual-studio-code)
+* [5. Test](#test)
+* [6. Legal Disclaimer](#legal-disclaimer)
 
 ## Install Docker
 The system requirement for building Apollo is Ubuntu 14.04. Using a Docker container is the simplest way to set up the build environment for Apollo project. A Detailed docker tutorial can be found [here](https://docs.docker.com/).
@@ -15,25 +14,6 @@ To install docker, you may refer to
 [Official guide to install the Docker-ce](https://docs.docker.com/install/linux/docker-ce/ubuntu).
 Don't forget to test it using 
 [post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall).
-
-## Install Git LFS
-
-We now leverage [git-lfs](https://git-lfs.github.com) to manage large files in Apollo. Please make sure you installed the plugin by following the steps on its webpage or refer to [the Migration Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_migrate_to_the_updated_apollo_master_from_old_versions.md) for additional information
-
-```bash
-# Required for Ubuntu 14.04 / 16.04.
-curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
-
-# Ubuntu 14.04 / 16.04 / 18.04.
-sudo apt-get install -y git-lfs
-```
-
-For latest Git versions, the lfs plugin works automatically and transparently
-along with the commands you are familiar with, such as `git clone` and `git pull`.
-
-But for old versions like Git 1.x, you may need to call it explicitly with
-`git lfs clone` and `git lfs pull`.
-
 
 ## Build Apollo
 
