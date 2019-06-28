@@ -60,7 +60,7 @@ class LocalizationIntegProcess {
   void GetResult(IntegState *state, LocalizationEstimate *localization);
   void GetResult(IntegState *state, InsPva *sins_pva,
                  double pva_covariance[9][9]);
-  void GetRemoveBiasImu(ImuData *imu_data);
+  void GetCorrectedImu(ImuData *imu_data);
   void GetEarthParameter(InertialParameter *earth_param);
 
   // itegration measure data process

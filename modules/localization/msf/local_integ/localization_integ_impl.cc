@@ -145,7 +145,7 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
   LocalizationEstimate integ_localization;
   integ_process_->GetResult(&state, &integ_localization);
   ImuData corrected_imu;
-  integ_process_->GetRemoveBiasImu(&corrected_imu);
+  integ_process_->GetCorrectedImu(&corrected_imu);
   InertialParameter earth_param;
   integ_process_->GetEarthParameter(&earth_param);
   // check msf running status and set msf_status in integ_localization
