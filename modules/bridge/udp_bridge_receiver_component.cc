@@ -189,7 +189,27 @@ bool UDPBridgeReceiverComponent<T>::MsgHandle(int fd) {
     auto pb_msg = std::make_shared<T>();
     proto_buf->Diserialized(pb_msg);
     writer_->Write(pb_msg);
+    RemoveInvalidBuf(proto_buf->GetMsgID());
     RemoveItem(&proto_list_, proto_buf);
+  }
+  return true;
+}
+
+template <typename T>
+bool UDPBridgeReceiverComponent<T>::RemoveInvalidBuf(uint32_t msg_id) {
+  if (msg_id == 0) {
+    return false;
+  }
+  typename std::vector<BridgeProtoDiserializedBuf<T> *>::iterator itor =
+    proto_list_.begin();
+  for (; itor != proto_list_.end();) {
+    if ((*itor)->GetMsgID() < msg_id) {
+      BridgeProtoDiserializedBuf<T> *tmp = *itor;
+      FREE_POINTER(tmp);
+      itor = proto_list_.erase(itor);
+      continue;
+    }
+    ++itor;
   }
   return true;
 }

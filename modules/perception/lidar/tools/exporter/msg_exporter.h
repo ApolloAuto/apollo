@@ -16,8 +16,8 @@
 #pragma once
 
 #include <Eigen/Dense>
-#include <string>
 #include <memory>
+#include <string>
 #include <vector>
 #include "cyber/cyber.h"
 #include "modules/drivers/proto/pointcloud.pb.h"

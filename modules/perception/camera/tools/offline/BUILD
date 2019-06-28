@@ -53,6 +53,7 @@ cc_binary(
         "-lopencv_highgui",
         "-lboost_system",
     ],
+    linkstatic = False,
     deps = [
         ":transform_server",
         ":visualizer",
@@ -63,7 +64,6 @@ cc_binary(
         "//modules/perception/camera/lib/lane/postprocessor/darkSCNN:darkSCNN_lane_postprocessor",
         "//modules/perception/lib/utils",
     ],
-    linkstatic=False,
 )
 
 cpplint()

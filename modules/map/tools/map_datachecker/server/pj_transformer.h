@@ -24,8 +24,8 @@ class PJTransformer {
  public:
   explicit PJTransformer(int zone_id = 50);
   ~PJTransformer();
-  int LatlongToUtm(int64_t point_count, int point_offset, double *x,
-                     double *y, double *z);
+  int LatlongToUtm(int64_t point_count, int point_offset, double *x, double *y,
+                   double *z);
 
  private:
   projPJ pj_latlong_;

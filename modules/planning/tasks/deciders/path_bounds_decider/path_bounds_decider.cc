@@ -534,9 +534,8 @@ bool PathBoundsDecider::SearchPullOverPosition(
              pull_over_space_length) {
     int j = i;
     bool is_feasible_window = true;
-    while (j >= 0 &&
-           std::get<0>(path_bound[i]) - std::get<0>(path_bound[j]) <
-               pull_over_space_length) {
+    while (j >= 0 && std::get<0>(path_bound[i]) - std::get<0>(path_bound[j]) <
+                         pull_over_space_length) {
       double curr_s = std::get<0>(path_bound[j]);
       double curr_right_bound = std::fabs(std::get<1>(path_bound[j]));
       double curr_road_left_width = 0;

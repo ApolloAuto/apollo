@@ -55,7 +55,6 @@ void SemanticMap::RunCurrFrame(
     return;
   }
   obstacle_id_history_map_ = obstacle_id_history_map;
-  // TODO(Hongyi): moving all these magic numbers to conf
   const Feature& ego_feature =
       obstacle_id_history_map_.at(FLAGS_ego_vehicle_id).feature(0);
   curr_timestamp_ = ego_feature.timestamp();

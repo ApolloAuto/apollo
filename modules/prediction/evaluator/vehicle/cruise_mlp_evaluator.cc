@@ -22,6 +22,7 @@
 
 #include "cyber/common/file.h"
 #include "modules/prediction/common/feature_output.h"
+#include "modules/prediction/common/prediction_constants.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
@@ -99,7 +100,8 @@ bool CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     }
 
     // Insert features to DataForLearning
-    if (FLAGS_prediction_offline_mode == 2) {
+    if (FLAGS_prediction_offline_mode ==
+        PredictionConstants::kDumpDataForLearning) {
       std::vector<double> interaction_feature_values;
       SetInteractionFeatureValues(obstacle_ptr, lane_sequence_ptr,
                                   &interaction_feature_values);

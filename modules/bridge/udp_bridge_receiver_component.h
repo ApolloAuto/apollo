@@ -61,6 +61,7 @@ class UDPBridgeReceiverComponent final : public cyber::Component<> {
   BridgeProtoDiserializedBuf<T> *CreateBridgeProtoBuf(
       const BridgeHeader &header);
   bool IsTimeout(double time_stamp);
+  bool RemoveInvalidBuf(uint32_t msg_id);
 
  private:
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
