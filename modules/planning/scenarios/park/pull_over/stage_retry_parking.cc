@@ -23,6 +23,7 @@
 #include "cyber/common/log.h"
 
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
@@ -52,6 +53,13 @@ Stage::StageStatus PullOverStageRetryParking::Process(
     return StageStatus::ERROR;
   }
 
+  *(frame->mutable_open_space_info()
+        ->mutable_debug()
+        ->mutable_planning_data()
+        ->mutable_pull_over_status()) =
+      PlanningContext::Instance()->planning_status().pull_over();
+  frame->mutable_open_space_info()->sync_debug_instance();
+
   scenario::util::PullOverStatus status =
       scenario::util::CheckADCPullOverOpenSpace(scenario_config_);
   if ((status == scenario::util::PASS_DESTINATION ||
@@ -59,7 +67,6 @@ Stage::StageStatus PullOverStageRetryParking::Process(
       FLAGS_enable_pull_over_exit) {
     return FinishStage();
   }
-
   return StageStatus::RUNNING;
 }
 
