@@ -13,13 +13,13 @@ cc_binary(
         "-lopencv_imgproc",
         "-lopencv_highgui",
     ],
+    linkstatic = False,
     deps = [
         "//modules/perception/base",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/common/io:io_util",
         "@gtest",
     ],
-    linkstatic=False,
 )
 
 cpplint()

@@ -27,6 +27,7 @@ cc_binary(
         "-lopencv_imgproc",
         "-lopencv_highgui",
     ],
+    linkstatic = False,
     deps = [
         ":lane_common",
         "//cyber",
@@ -39,7 +40,6 @@ cc_binary(
         "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
         "//modules/perception/common/io:io_util",
     ],
-    linkstatic=False,
 )
 
 cpplint()

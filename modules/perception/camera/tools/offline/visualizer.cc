@@ -790,7 +790,8 @@ bool Visualizer::key_handler(const std::string &camera_name, const int key) {
 bool Visualizer::DrawTrajectories(
   const base::ObjectPtr &object,
   const base::MotionBufferPtr motion_buffer) {
-  if (object->drop_num == 0 || motion_buffer->size() == 0) {
+  if (object->drop_num == 0 || motion_buffer == nullptr ||
+      motion_buffer->size() == 0) {
     return false;
   }
   std::size_t count = std::min(object->drop_num, motion_buffer->size());
@@ -1200,7 +1201,7 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
     virtual_egolane_ground.left_line.line_point.clear();
     virtual_egolane_ground.right_line.line_point.clear();
     CipvOptions cipv_options;
-    if (motion_buffer->size() == 0) {
+    if (motion_buffer == nullptr || motion_buffer->size() == 0) {
       AWARN << "motion_buffer_ is empty";
       cipv_options.velocity = 5.0f;
       cipv_options.yaw_rate = 0.0f;
@@ -1295,25 +1296,29 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
               cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
               cv::Scalar(0, 0, 255), 3);
   line_pos += 50;
-  cv::putText(image,
-              "yaw rate: " + std::to_string(motion_buffer->back().yaw_rate),
-              cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
-              cv::Scalar(0, 0, 255), 3);
-  line_pos += 50;
-  cv::putText(image,
-              "pitch rate: " + std::to_string(motion_buffer->back().pitch_rate),
-              cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
-              cv::Scalar(0, 0, 255), 3);
-  line_pos += 50;
-  cv::putText(image,
-              "roll rate: " + std::to_string(motion_buffer->back().roll_rate),
-              cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
-              cv::Scalar(0, 0, 255), 3);
-  line_pos += 50;
-  cv::putText(image,
-              "velocity: " + std::to_string(motion_buffer->back().velocity),
-              cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
-              cv::Scalar(0, 0, 255), 3);
+  if (motion_buffer != nullptr) {
+    cv::putText(image,
+                "yaw rate: " + std::to_string(motion_buffer->back().yaw_rate),
+                cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
+                cv::Scalar(0, 0, 255), 3);
+    line_pos += 50;
+    cv::putText(
+      image,
+      "pitch rate: " + std::to_string(motion_buffer->back().pitch_rate),
+      cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
+      cv::Scalar(0, 0, 255), 3);
+    line_pos += 50;
+    cv::putText(
+      image,
+      "roll rate: " + std::to_string(motion_buffer->back().roll_rate),
+      cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
+      cv::Scalar(0, 0, 255), 3);
+    line_pos += 50;
+    cv::putText(image,
+                "velocity: " + std::to_string(motion_buffer->back().velocity),
+                cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
+                cv::Scalar(0, 0, 255), 3);
+  }
 
   // plot predicted vanishing point
   if (frame.pred_vpt.size() > 0) {

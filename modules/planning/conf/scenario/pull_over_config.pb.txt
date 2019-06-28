@@ -156,9 +156,9 @@ stage_config: {
         task_type: OPEN_SPACE_TRAJECTORY_PARTITION
         open_space_trajectory_partition_config {
             heading_offset_to_midpoint: 0.79
-            lateral_offset_to_midpoint: 1.0
-            longitudinal_offset_to_midpoint: 0.25
-            vehicle_box_iou_threshold_to_midpoint: 0.6
+            lateral_offset_to_midpoint: 0.5
+            longitudinal_offset_to_midpoint: 0.2
+            vehicle_box_iou_threshold_to_midpoint: 0.8
         }
     }
     task_config: {

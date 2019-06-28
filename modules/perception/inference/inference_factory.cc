@@ -17,8 +17,8 @@
 #include "modules/perception/inference/inference_factory.h"
 
 #include "modules/perception/inference/caffe/caffe_net.h"
-#include "modules/perception/inference/tensorrt/rt_net.h"
 #include "modules/perception/inference/paddlepaddle/paddle_net.h"
+#include "modules/perception/inference/tensorrt/rt_net.h"
 
 namespace apollo {
 namespace perception {

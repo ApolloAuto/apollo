@@ -144,6 +144,10 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
   IntegState state;
   LocalizationEstimate integ_localization;
   integ_process_->GetResult(&state, &integ_localization);
+  ImuData corrected_imu;
+  integ_process_->GetCorrectedImu(&corrected_imu);
+  InertialParameter earth_param;
+  integ_process_->GetEarthParameter(&earth_param);
   // check msf running status and set msf_status in integ_localization
 
   LocalizationIntegStatus integ_status;
@@ -160,8 +164,8 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
   }
 
   // set linear acceleration
-  Eigen::Vector3d orig_acceleration(imu_data.fb[0], imu_data.fb[1],
-                                    imu_data.fb[2]);
+  Eigen::Vector3d orig_acceleration(corrected_imu.fb[0], corrected_imu.fb[1],
+                                    corrected_imu.fb[2]);
   const apollo::common::Quaternion& orientation =
       integ_localization.pose().orientation();
   Eigen::Quaternion<double> quaternion(orientation.qw(), orientation.qx(),
@@ -170,11 +174,7 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
       static_cast<Eigen::Vector3d>(quaternion * orig_acceleration);
 
   // Remove gravity.
-  // Gravity on the Earth's surface varies by around 0.7%.
-  // From 9.7639 m/s2 on the Nevado Huascaran mountain in Peru
-  // to 9.8337 m/s2 at the surface of the Arctic Ocean
-  // Here we simply subtract a standard gravity, by definition, 9.80665.
-  vec_acceleration(2) -= 9.80665;
+  vec_acceleration(2) -= earth_param.g;
 
   apollo::common::Point3D* linear_acceleration =
       posepb_loc->mutable_linear_acceleration();
@@ -192,8 +192,9 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
   linear_acceleration_vrf->set_z(vec_acceleration_vrf(2));
 
   // set angular velocity
-  Eigen::Vector3d orig_angular_velocity(imu_data.wibb[0], imu_data.wibb[1],
-                                        imu_data.wibb[2]);
+  Eigen::Vector3d orig_angular_velocity(corrected_imu.wibb[0],
+                                        corrected_imu.wibb[1],
+                                        corrected_imu.wibb[2]);
   Eigen::Vector3d vec_angular_velocity = static_cast<Eigen::Vector3d>(
       quaternion.toRotationMatrix() * orig_angular_velocity);
   apollo::common::Point3D* angular_velocity =
@@ -204,9 +205,9 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
 
   apollo::common::Point3D* angular_velocity_vrf =
       posepb_loc->mutable_angular_velocity_vrf();
-  angular_velocity_vrf->set_x(imu_data.wibb[0]);
-  angular_velocity_vrf->set_y(imu_data.wibb[1]);
-  angular_velocity_vrf->set_z(imu_data.wibb[2]);
+  angular_velocity_vrf->set_x(corrected_imu.wibb[0]);
+  angular_velocity_vrf->set_y(corrected_imu.wibb[1]);
+  angular_velocity_vrf->set_z(corrected_imu.wibb[2]);
 
   lastest_integ_localization_ =
       LocalizationResult(LocalizationMeasureState(static_cast<int>(state)),
