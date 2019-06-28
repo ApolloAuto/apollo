@@ -48,6 +48,9 @@ class DataCollector(object):
         self.canmsg_received = False
         self.localization_received = False
 
+        self.case = 'a'
+        self.in_session = False
+
         self.outfile = ""
 
     def run(self, cmd):

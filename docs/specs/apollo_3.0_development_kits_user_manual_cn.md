@@ -3,34 +3,35 @@
 
 # 目录
       
- - 概览
- - 工控机系统安装
-	 - 工控机硬件安装
+ - [概览](#概览)
+ - [工控机系统安装](#工控机系统安装)
+    - [工控机硬件安装](#工控机硬件安装)
 
-	 - 工控机软件系统安装
+    - [工控机软件系统安装](#工控机软件系统安装)
 	 
- - 感知硬件集成
-	 - 概览
+ - [感知硬件集成](#感知硬件集成)
+    - [概览](#概览)
 	
-	 - 导航设备安装与配置
+    - [GPS导航设备安装](#GPS导航设备安装)
 	 
-	 - 摄像头安装与配置
+    - [摄像头安装配置与数据验证](#摄像头安装配置与数据验证)
 	 
-	 - 毫米波雷达安装与配置
+    - [毫米波雷达安装配置与数据验证](#毫米波雷达安装配置与数据验证)
 	 
-	 - 激光雷达安装与配置
+    - [激光雷达安装与数据验证](#激光雷达安装与数据验证)
 
 	     
- - 油门刹车标定
-	 - 标定原理介绍
+ - [油门刹车标定](#油门刹车标定)
+    - [标定原理介绍](#标定原理介绍)
 	 
-	 - 标定流程说明
+    - [标定流程说明](#标定流程说明)
 
- - 启动循迹
-	 - 系统文件配置
+ - [启动循迹](#启动循迹)
+    - [系统文件配置](#系统文件配置)
 	 
-	 - 循迹操作说明
- - 调试与常见问题
+    - [循迹操作说明](#循迹操作说明)
+    
+ - [调试与常见问题](#调试与常见问题)
 
 
 
@@ -148,7 +149,7 @@
 ### 安装Ubuntu Linux
 Apollo软件系统依赖于Linux操作系统而运行，而Linux操作系统种类繁多，且又分为服务器版本和桌面版本，这里我们选择当下比较流行的Ubuntu桌面操作系统的64位版本。安装Ubuntu Linux的操作系统的步骤如下：
 #### 创建引导盘
-创建一个可以引导启动的Ubantu Linux USB闪存驱动器，下载Ubuntu（或Xubuntu等分支版本），并按照在线说明创建可引导启动的USB闪存驱动器。
+创建一个可以引导启动的Ubuntu Linux USB闪存驱动器，下载Ubuntu（或Xubuntu等分支版本），并按照在线说明创建可引导启动的USB闪存驱动器。
 
 ![tip_icon](images/tip_icon.png) 推荐使用 **Ubuntu 14.04.3**.
 
@@ -173,7 +174,6 @@ b.执行软件更新器（Software Updater）更新最新软件包，或在终�
 
 ```
 sudo apt-get update
-sudo apt-get upgrade
 ```
     
 c.打开终端，输入以下命令，安装Linux 4.4 内核：
@@ -196,7 +196,7 @@ https://github.com/ApolloAuto/apollo-kernel/releases
 b.安装包下载完成后，解压后安装:
 
 ```
-tar zxvf linux-4.4.32-apollo-1.0.0.tar.gz
+tar zxvf linux-4.4.32-apollo-1.5.5.tar.gz
 cd install
 sudo bash install_kernel.sh
 ```
@@ -250,6 +250,7 @@ a.获取Apollo源代码
 ```
 cd ~
 git clone https://github.com/ApolloAuto/apollo.git
+git checkout -b r3.0.0 origin/r3.0.0
 ```
 
 下载完成后的代码在～/apollo目录下
@@ -281,7 +282,7 @@ bash docker/scripts/dev_into.sh
 ```
 
 e.编译apollo
-在终端输入以下命令，等待编译完成。
+在终端输入以下命令，等待编译完成，整个编译过程大约耗时20分钟。
 
 ```
 bash apollo.sh build
@@ -390,7 +391,7 @@ rosbag play -l docs/demo_guide/demo_2.5.bag
 如上图所示：后天线在M2主机X轴的正向0.2m处，则X轴偏移x_offset的值为0.2；后天线在M2主机Y轴的负向0.1m处，则Y轴偏移y_offset的值为-0.1；后天线在M2主机Z轴的正向0.8m处，则Z轴偏移z_offset的值为0.8。
 
 ### 配置GPS和主机
-下面展现了配置GPS和主机的方法。当设备正确接入系统后，在/dev/下面有名为ttyACM0的设备，即表示M2已经被正确的加载了。配置设备时，需要将设备的串口线连接上电脑的串口才可以对设备进行配置，也就是说，用来配置设备的电脑主机需要拥有串口。Windows下可以通过串口助手、串口猎人或者COMCenter等工具进行配置，Linux下可以通过Minicom、Cutecom等工具进行配置。
+下面展现了配置GPS和主机的方法。当设备正确接入系统后，在/dev/下面有名为ttyACM0的设备，即表示M2已经被正确的加载了。配置设备时，需要将设备的串口线连接上电脑的串口才可以对设备进行配置，也就是说，用来配置设备的电脑主机需要拥有串口。Windows下可以通过串口助手、串口猎人或者COMCenter等工具进行配置，Linux下可以通过Minicom、Cutecom等工具进行配置。linux下建议使用Cutecom软件，请在终端中使用`sudo cutecom`命令打开该软件。
 
 #### 杆臂配置
 车尾天线（后天线，通常是主天线，也就是Primary）杆臂配置：
@@ -525,7 +526,7 @@ rostopic echo /apollo/sensor/camera/traffic/image_short
 
 ### 毫米波雷达的安装固定
  - 传感器应安装在车前方中心处，当人正向面对车辆正前方时，传感器的正面朝向人，传感器的连接口朝向人的右手边，如下图所示：
- 
+ ![图片](images/radar_install_look.jpeg)
  ![图片](images/radar_install_position.png)
  
  - 毫米波雷达要牢靠固定在车身上，连接到毫米波雷达的接头要牢靠接插。离地面高0.5米，不能向下倾斜，向上仰`0~2`度以内，高度误差±0.2米，俯仰角误差`0~2`度（向上仰小于2度，不能向下倾斜），翻滚角误差±2度（radar左右两侧的平齐程度），航向角误差±2度（radar是否正对前方）。
@@ -584,14 +585,15 @@ rostopic echo /apollo/sensor/camera/traffic/image_short
 
 ### 激光雷达与车辆的接线
 
- - 激光雷达的接口盒有三个接口，分别为数据口(以太网接口)、12V电源接口、GPS授时接口，如下图所示：
+ - 配套的激光雷达线束为1拖3线缆。其中一端有三个接口，分别为数据口(网线接口)、12V电源接口、GPS授时接口，如下图所示：
  
-![图片](images/lidar_socket.jpeg)
+![图片](images/lidar_three_slots.jpeg)
 
- - 数据口：通过以太网线缆将接口盒连接到IPC。
- - 12V电源接口：可以使用雷达自带的12V适配器进行供电或者使用自己的电源线连接12V电源供电。
- - GPS授时接口：需要将GPS的授时接口与激光雷达接口盒的授时接口进行连接。
- 
+ - 数据口：通过以太网线缆与IPC连接。
+ - 12V电源接口：与12V电源接口连接，接口具备防反插功能。
+ - GPS授时接口：与GPS的授时接口连接，接口具备防反插功能。
+线缆的另一端为航插接头，与激光雷达连接，如下图所示： 
+![图片](images/lidar_install_slot.jpeg)
 ### 激光雷达的配置及启动
  - 激光雷达的相关参数配置：雷达出厂默认ip地址为192.168.1.201，在浏览器中输入激光雷达ip地址，打开配置界面，将激光雷达的ip地址修改为与IPC的ip地址处于相同号段， 将`NetWork(Sensor)`选项卡下的`Data Port`修改为2369，将`Telemetry Port`修改为8309，点击`set` 按键、`Save Configuration`按键使配置生效。
 ![图片](images/lidar_config.png)
@@ -619,6 +621,7 @@ rostopic echo /apollo/sensor/camera/traffic/image_short
 
 
 油门刹车标定是车辆纵向精准控制的前提。用户可以使用系统预先标定好的参数，也可以按照手册说明重新进行标定。
+注意：完成本标定后，才可以启动循迹！
 
 ## 标定原理介绍
 在Apollo系统中，控制模块会请求加速度量值。通过车辆标定表，控制模块便能找到准确产生所需加速度量值对应的油门、刹车踏板开合度控制命令，之后下发给车辆底盘。车辆标定表提供一个描述车辆速度、油门／刹车踏板开合度、加速度量之间关系的映射表。油门刹车标定过程便是生成车辆标定表的过程。
@@ -636,7 +639,7 @@ Apollo系统为教学小车提供了一份默认的标定表。如用户期望�
   在`modules/canbus/conf/canbus_conf.pb.txt`中，设置驾驶模式为 `AUTO_SPEED_ONLY`。
 
 ### 选择测试地点
-  理想的测试地点是平坦的长直路。
+  理想的测试地点是平坦的长直路，且两边没有高大的建筑物遮挡。
 
 以上准备工作完成后, 在`modules/tools/calibration`中按顺序完成如下工作：
 
@@ -650,9 +653,20 @@ Apollo系统为教学小车提供了一份默认的标定表。如用户期望�
 
 
 ### 采集数据
-1. 运行 modules/tools/calibration/  下的 `python data_collector.py`, 之后输入参数x y z, x 代表加速踏板开合度（百分比正值）, y 代表了速度限值(米／秒), z 代表刹车踏板开合度（百分比负值）。输入参数后，车辆即开始以x加速踏板值加速至y速度限值，之后再以z刹车踏板值减速直至车辆停止。
-2. 产生对应x y z 参数的csv文件。 比如输出指令 `15 5.2 -10`,将会生成名为`t15b-10r0_recorded.csv`的文件。
-3. 根据车辆反应情况选取合适的x y z 参数，如加速踏板过小不能启动或者刹车踏板过小不能停车，需要相应调整命令参数。
+
+1. 在采集数据之前，请先进入docker在终端中打开canbus模块，gps模块和localization模块，命令如下：
+```
+bash /scripts/canbus.sh
+bash /scripts/gps.sh
+bash /scripts/localization.sh
+```
+在依次输入完以上三个命令后，可用遥控器开着车走一小段距离，过两分钟之后，在diagnostic中可以看到以上三者都有信号时，便可以进行下面的操作了。 
+
+2. 运行 modules/tools/calibration/  下的 `python data_collector.py`, 之后输入参数x y z, x 代表加速踏板开合度（百分比正值）, y 代表了速度限值(米／秒), z 代表刹车踏板开合度（百分比负值）。输入参数后，车辆即开始以x加速踏板值加速至y速度限值，之后再以z刹车踏板值减速直至车辆停止。  
+
+3. 产生对应x y z 参数的csv文件。 比如输出指令 `15 5.2 -10`,将会生成名为`t15b-10r0_recorded.csv`的文件。  
+
+4. 根据车辆反应情况选取合适的x y z 参数，如加速踏板过小不能启动或者刹车踏板过小不能停车，需要相应调整命令参数。
 
 ![CSV文件样例图](images/calibration_excel.png)
 
@@ -710,7 +724,9 @@ x y z参数组合取值建议：
 
 # 启动循迹
 
-在完成以上软硬件安装，标定以及系统文件配置后，用户可以通过Dreamview界面录制车辆轨迹并回放，完成第一个循迹演示。本部分主要分为系统文件配置和循迹操作说明两个方面。
+在完成以上软硬件安装，标定以及系统文件配置后，用户可以通过Dreamview界面录制车辆轨迹并回放，完成第一个循迹演示。
+注意：车辆启动循迹之前一定要先完成标定！
+本部分主要分为系统文件配置和循迹操作说明两个方面。
 
 ## 系统文件配置
 
@@ -784,6 +800,25 @@ bash setup_host.sh
 
 因此如果只做循迹方案，只需要`gnss_params`目录，`vehicle_params`目录，`vehicle_info.pb.txt`文件，其他文件并不需要。
 保证这些文件正确，重新编译，启动`bootstrap`, 就可以在`dreamview`下选择酷黑小车`ch`车辆，进行下面的循迹操作了。
+
+除了车辆相关配置外，还需要注意canbus和control模块的配置。分别介绍如下:
+
+1. `modules/canbus/conf/canbus_conf.pb.txt` 修改如下：
+```
+brand:CH
+enable_debug_mode:true
+enable_receiver_log:true
+enable_sender_log: true
+```
+第一行将默认的LINCOLN_MKZ改为CH，后三行用于打开debug信息。
+
+2. `modules/canbus/conf/canbus.conf` 修改如下:
+```
+--enable_chassis_detail_pub
+--noreceive_guardian
+```
+第一行打开/apollo/canbus/chassis_detail消息，第二行关闭guardian模块。
+
 
 ## 循迹操作说明
 
@@ -975,7 +1010,7 @@ rostopic echo /apollo/sensor/gnss/imu
 
 ![图片](images/debug_ch.png) 
 
-![图片](images/debug_turn_on_localization.png) 
+![图片](images/debug_rtk.png) 
  
  
 #### 打开传感器 
@@ -1107,7 +1142,7 @@ CANBUS正确配置接通的情况下，前述提到可以执行rostopic echo /ap
 
 ### apollo系统第一次搭建完毕，Teleop测试发转角车辆实际转角不对
 
-   例如下发转向角10%，但是转动角度远超过转向最大角度的10%。可以通过diagnostics.sh工具或者rostopic echo /apollo/canbus/chassis及时观察底盘信号，apollo默认是Lincoln车型，如果使用者第一次搭建好apollo，还没有选择车型那么默认会按照lincoln车的最大转向角乘以百分比去执行。运行bootstrap.sh脚本，在dreamview中选择对应的车型，例如ch酷黑小车。然后点击界面上的reset all，再点击setup。 
+   例如下发转向角10%，但是转动角度远超过转向最大角度的10%。可以通过diagnostics.sh工具或者rostopic echo /apollo/canbus/chassis及时观察底盘信号，apollo默认是Lincoln车型，如果使用者第一次搭建好apollo，还没有选择车型那么默认会按照lincoln车的最大转向角乘以百分比去执行。解决方法如下：检查modules/canbus/conf/canbus_conf.pb.txt中的配置，brand设置为正确的车型（例如ch），重启canbus，再尝试。如何仍然未解决，请运行bootstrap.sh脚本，在dreamview中选择对应的车型，例如ch酷黑小车。然后点击界面上的reset all，再点击setup。 
 
 
 ### gps.sh打开后不正常，log提示Unable to load gnss conf file
