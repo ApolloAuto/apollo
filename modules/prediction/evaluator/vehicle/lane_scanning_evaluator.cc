@@ -90,7 +90,8 @@ bool LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
   ExtractStringFeatures(*lane_graph_ptr, &string_feature_values);
 
   std::vector<double> labels = {0.0};
-  if (FLAGS_prediction_offline_mode == 2) {
+  if (FLAGS_prediction_offline_mode ==
+      PredictionConstants::kDumpDataForLearning) {
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
                                          string_feature_values, "cruise",
                                          nullptr);

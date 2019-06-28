@@ -25,6 +25,7 @@
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/junction_analyzer.h"
+#include "modules/prediction/common/prediction_constants.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/validation_checker.h"
@@ -145,7 +146,7 @@ void MessageProcess::OnPerception(
   RightOfWay::Analyze();
 
   // Insert features to FeatureOutput for offline_mode
-  if (FLAGS_prediction_offline_mode == 1) {
+  if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpFeatureProto) {
     for (const int id :
          ptr_obstacles_container->curr_frame_movable_obstacle_ids()) {
       Obstacle* obstacle_ptr = ptr_obstacles_container->GetObstacle(id);
@@ -172,10 +173,9 @@ void MessageProcess::OnPerception(
 
   // Make evaluations
   EvaluatorManager::Instance()->Run();
-  // TODO(kechxu): Reorder the offline mode indices.
-  // TODO(kechxu): Use prediction constants to name the magic numbers.
-  if (FLAGS_prediction_offline_mode == 2 ||
-      FLAGS_prediction_offline_mode == 4) {
+  if (FLAGS_prediction_offline_mode ==
+          PredictionConstants::kDumpDataForLearning ||
+      FLAGS_prediction_offline_mode == PredictionConstants::kDumpFrameEnv) {
     return;
   }
   // Make predictions

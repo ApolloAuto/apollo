@@ -26,6 +26,7 @@
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/prediction/common/feature_output.h"
+#include "modules/prediction/common/prediction_constants.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
@@ -88,7 +89,8 @@ bool JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   ExtractFeatureValues(obstacle_ptr, &feature_values);
 
   // Insert features to DataForLearning
-  if (FLAGS_prediction_offline_mode == 2) {
+  if (FLAGS_prediction_offline_mode ==
+      PredictionConstants::kDumpDataForLearning) {
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
                                          "junction", nullptr);
     ADEBUG << "Save extracted features for learning locally.";
