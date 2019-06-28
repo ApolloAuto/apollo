@@ -67,7 +67,7 @@ def callback(planning_pb):
         last_t = None
         last_v = None
 
-    if last_t is not None and last_v is not None:
+    if last_t is not None and last_v is not None and current_t > last_t:
         INIT_T_DATA.append(current_t - begin_t)
         INIT_V_DATA.append((current_v - last_v) / (current_t - last_t))
 

@@ -162,7 +162,7 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print "Usage:\npython %s your_car_parse_config_file.yml" % sys.argv[0]
-        sys.exit(1)
+        sys.exit(0)
     with open(sys.argv[1], 'r') as fp:
         conf = yaml.load(fp)
     dbc_file = conf["dbc_file"]

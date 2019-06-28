@@ -17,3 +17,4 @@
 #include "modules/bridge/common/bridge_gflags.h"
 
 DEFINE_string(bridge_module_name, "Bridge", "Bridge module name");
+DEFINE_double(timeout, 1.0, "receive/send proto msg time out");

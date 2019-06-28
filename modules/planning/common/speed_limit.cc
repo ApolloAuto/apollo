@@ -21,6 +21,7 @@
 #include "modules/planning/common/speed_limit.h"
 
 #include <algorithm>
+#include <limits>
 
 #include "cyber/common/log.h"
 
@@ -34,21 +35,9 @@ void SpeedLimit::AppendSpeedLimit(const double s, const double v) {
   speed_limit_points_.emplace_back(s, v);
 }
 
-void SpeedLimit::AppendSoftSpeedLimit(const double s, const double v) {
-  if (!soft_speed_limit_points_.empty()) {
-    DCHECK_GE(s, soft_speed_limit_points_.back().first);
-  }
-  soft_speed_limit_points_.emplace_back(s, v);
-}
-
 const std::vector<std::pair<double, double>>& SpeedLimit::speed_limit_points()
     const {
   return speed_limit_points_;
-}
-
-const std::vector<std::pair<double, double>>&
-SpeedLimit::soft_speed_limit_points() const {
-  return soft_speed_limit_points_;
 }
 
 double SpeedLimit::GetSpeedLimitByS(const double s) const {
@@ -68,33 +57,7 @@ double SpeedLimit::GetSpeedLimitByS(const double s) const {
   return it_lower->second;
 }
 
-double SpeedLimit::GetSoftSpeedLimitByS(const double s) const {
-  CHECK_GE(soft_speed_limit_points_.size(), 2);
-  DCHECK_GE(s, soft_speed_limit_points_.front().first);
-
-  auto compare_s = [](const std::pair<double, double>& point, const double s) {
-    return point.first < s;
-  };
-
-  auto it_lower =
-      std::lower_bound(soft_speed_limit_points_.begin(),
-                       soft_speed_limit_points_.end(), s, compare_s);
-
-  if (it_lower == soft_speed_limit_points_.end()) {
-    return (it_lower - 1)->second;
-  }
-  return it_lower->second;
-}
-
-double SpeedLimit::MinValidS() const {
-  CHECK_GE(speed_limit_points_.size(), 2);
-  return speed_limit_points_.front().first;
-}
-
-void SpeedLimit::Clear() {
-  speed_limit_points_.clear();
-  soft_speed_limit_points_.clear();
-}
+void SpeedLimit::Clear() { speed_limit_points_.clear(); }
 
 }  // namespace planning
 }  // namespace apollo

@@ -31,7 +31,9 @@
 #include "modules/common/filters/digital_filter.h"
 #include "modules/common/math/kalman_filter.h"
 #include "modules/map/hdmap/hdmap_common.h"
+#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/proto/feature.pb.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
 
 /**
  * @namespace apollo::prediction
@@ -115,6 +117,12 @@ class Obstacle {
   const Feature& latest_feature() const;
 
   /**
+   * @brief Get the earliest feature.
+   * @return The earliest feature.
+   */
+  const Feature& earliest_feature() const;
+
+  /**
    * @brief Get a pointer to the latest feature.
    * @return A pointer to the latest feature.
    */
@@ -149,6 +157,12 @@ class Obstacle {
    * @return If the obstacle is still.
    */
   bool IsStill();
+
+  /**
+   * @brief Check if the obstacle is slow.
+   * @return If the obstacle is slow.
+   */
+  bool IsSlow();
 
   /**
    * @brief Check if the obstacle is on any lane.
@@ -231,6 +245,12 @@ class Obstacle {
    */
   void SetCaution();
 
+  void SetEvaluatorType(const ObstacleConf::EvaluatorType& evaluator_type);
+
+  void SetPredictorType(const ObstacleConf::PredictorType& predictor_type);
+
+  const ObstacleConf& obstacle_conf() { return obstacle_conf_; }
+
  private:
   Obstacle() = default;
 
@@ -289,12 +309,16 @@ class Obstacle {
 
   void SetLaneSequenceStopSign(LaneSequence* lane_sequence_ptr);
 
+  /** @brief This functions updates the lane-points into the lane-segments
+   *        based on the given lane_point_spacing.
+   */
   void SetLanePoints(Feature* feature);
-
   void SetLanePoints(const Feature* feature, const double lane_point_spacing,
                      const uint64_t max_num_lane_point,
-                     LaneGraph* const lane_graph);
+                     const bool is_bidirection, LaneGraph* const lane_graph);
 
+  /** @brief This functions is mainly for lane-sequence kappa calculation.
+   */
   void SetLaneSequencePath(LaneGraph* const lane_graph);
 
   void InitKFPedestrianTracker(const Feature& feature);
@@ -321,7 +345,7 @@ class Obstacle {
       std::unordered_set<std::string>* const existing_lane_ids);
 
  private:
-  int id_ = -1;
+  int id_ = FLAGS_ego_vehicle_id;
 
   perception::PerceptionObstacle::Type type_ =
       perception::PerceptionObstacle::UNKNOWN_UNMOVABLE;
@@ -337,6 +361,8 @@ class Obstacle {
   std::vector<Eigen::MatrixXf> rnn_states_;
 
   bool rnn_enabled_ = false;
+
+  ObstacleConf obstacle_conf_;
 };
 
 }  // namespace prediction

@@ -6,6 +6,9 @@ cc_library(
     name = "empty_predictor",
     srcs = ["empty_predictor.cc"],
     hdrs = ["empty_predictor.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/predictor",
     ],

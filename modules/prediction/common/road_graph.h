@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <list>
 #include <memory>
 #include <string>
 #include <vector>
@@ -47,6 +48,8 @@ class RoadGraph {
    */
   common::Status BuildLaneGraph(LaneGraph* const lane_graph);
 
+  common::Status BuildLaneGraphBidirection(LaneGraph* const lane_graph_ptr);
+
   /**
    * @brief Check if a lane with an s is on the lane graph
    * @param Lane ID
@@ -58,12 +61,19 @@ class RoadGraph {
                      const LaneGraph& lane_graph);
 
  private:
+  /** @brief Combine the lane-graph of forward direction and that of backward
+   *        direction together.
+   */
+  LaneGraph CombineLaneGraphs(const LaneGraph& lane_graph_predecessor,
+                              const LaneGraph& lane_graph_successor);
+
   /**
    * @brief
-   * @param The accumulated s starting from the obstacle's position.
-   * @param The starting s of the lane_segment to compute lane_sequence,
-   *        this should be start_s_ for the first time, and zero for
-   *        subsequent recursions.
+   * @param Whether it is searching in the forward direction or backward.
+   * @param The accumulated s-distance starting from the obstacle's position
+   *        up until the beginning of current lane-segment.
+   * @param The s_diff of the current position w.r.t. the start_s of the
+   *        current lane-segment, regardless of the search direction.
    * @param The LaneInfo the current lane segment we are looking at.
    * @param The max. number of recursive calls (so that it won't recurse
    *        for too many times when given unreasonable speed info. etc.)
@@ -71,12 +81,22 @@ class RoadGraph {
    * @param The vector of lane_segments visited (DFS).
    * @param The LaneGraph that we need to write in.
    */
-  void ComputeLaneSequence(const double accumulated_s, const double start_s,
-                           std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
-                           const int graph_search_horizon,
-                           const bool consider_divide,
-                           std::vector<LaneSegment>* const lane_segments,
-                           LaneGraph* const lane_graph_ptr) const;
+  void ConstructLaneSequence(
+      const bool search_forward_direction, const double accumulated_s,
+      const double curr_lane_seg_s,
+      std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
+      const int graph_search_horizon, const bool consider_lane_split,
+      std::list<LaneSegment>* const lane_segments,
+      LaneGraph* const lane_graph_ptr) const;
+
+  /** @brief If direction unspecified, by default construct forward direction.
+   */
+  void ConstructLaneSequence(
+      const double accumulated_s, const double curr_lane_seg_s,
+      std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
+      const int graph_search_horizon, const bool consider_lane_split,
+      std::list<LaneSegment>* const lane_segments,
+      LaneGraph* const lane_graph_ptr) const;
 
   /**
    * @brief Get the pointer to the lane with the smallest average curvature

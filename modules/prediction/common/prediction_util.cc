@@ -244,7 +244,7 @@ void TranslatePoint(const double translate_x, const double translate_y,
 void GenerateFreeMoveTrajectoryPoints(
     Eigen::Matrix<double, 6, 1>* state,
     const Eigen::Matrix<double, 6, 6>& transition, double theta,
-    const std::size_t num, const double period,
+    const double start_time, const std::size_t num, const double period,
     std::vector<TrajectoryPoint>* points) {
   double x = (*state)(0, 0);
   double y = (*state)(1, 0);
@@ -303,7 +303,8 @@ void GenerateFreeMoveTrajectoryPoints(
     trajectory_point.mutable_path_point()->CopyFrom(path_point);
     trajectory_point.set_v(speed);
     trajectory_point.set_a(acc);
-    trajectory_point.set_relative_time(static_cast<double>(i) * period);
+    trajectory_point.set_relative_time(start_time +
+                                       static_cast<double>(i) * period);
     points->emplace_back(std::move(trajectory_point));
 
     // Update position, velocity and acceleration

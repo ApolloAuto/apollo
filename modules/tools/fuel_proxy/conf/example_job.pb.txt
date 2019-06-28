@@ -1,0 +1,11 @@
+job_type: VEHICLE_CALIBRATION
+partner_id: "my-id"
+storage {
+  bos {
+    bucket: "my-bucket"
+    access_key: "my-access"
+    secret_key: "my-secret"
+    region: bj
+  }
+}
+input_data_path: "path/to/records-and-conf"

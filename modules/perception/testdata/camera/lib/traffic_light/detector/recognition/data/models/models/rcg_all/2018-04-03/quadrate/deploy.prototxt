@@ -38,7 +38,7 @@ layer {
 #  }
 #}
 
-layer{ 
+layer{
     name: "conv1"
     type: "Convolution"
     bottom: "data"
@@ -106,7 +106,7 @@ layer {
     cmp_out_shape_floor_as_conv: true
   }
 }
-layer{ 
+layer{
     name: "conv2"
     type: "Convolution"
     bottom: "pool1"
@@ -174,7 +174,7 @@ layer {
     cmp_out_shape_floor_as_conv: true
   }
 }
-layer{ 
+layer{
     name: "conv3"
     type: "Convolution"
     bottom: "pool2"
@@ -242,7 +242,7 @@ layer {
     cmp_out_shape_floor_as_conv: true
   }
 }
-layer{ 
+layer{
     name: "conv4"
     type: "Convolution"
     bottom: "pool3"
@@ -310,7 +310,7 @@ layer {
     cmp_out_shape_floor_as_conv: true
   }
 }
-layer{ 
+layer{
     name: "conv5"
     type: "Convolution"
     bottom: "pool4"

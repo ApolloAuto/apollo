@@ -1,11 +1,11 @@
 {
     "name": "dreamview",
-    "version": "2.0.0",
+    "version": "5.0.0",
     "description": "Visualization of the Apollo simulator.",
     "main": "app.js",
     "author": "adu-sim",
     "license": "Apache-2.0",
-    "engines" : {
+    "engines": {
         "npm": ">=5.6.0",
         "node": ">=8.11.1"
     },
@@ -50,7 +50,7 @@
         "babel-preset-stage-0": "^6.24.1",
         "copy-webpack-plugin": "^4.2.0",
         "css-loader": "^0.28.2",
-        "eslint": "^3.19.0",
+        "eslint": "^4.18.2",
         "eslint-loader": "^2.0.0",
         "eslint-plugin-react": "^7.0.1",
         "file-loader": "^1.1.11",
@@ -64,10 +64,13 @@
         "url-loader": "^0.5.8",
         "webapp-webpack-plugin": "^2.6.0",
         "webpack": "^4.0.0",
-        "webpack-bundle-analyzer": "^3.0.3",
+        "webpack-bundle-analyzer": "^3.3.2",
         "webpack-cli": "^3.2.3",
         "webpack-dev-server": "^3.1.14",
         "worker-loader": "^1.1.0",
         "yaml-loader": "^0.4.0"
+    },
+    "resolutions": {
+        "js-yaml": "^3.13.1"
     }
 }

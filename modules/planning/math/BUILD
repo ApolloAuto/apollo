@@ -12,6 +12,22 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "discrete_points_math",
+    srcs = [
+        "discrete_points_math.cc",
+    ],
+    hdrs = [
+        "discrete_points_math.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+        "//cyber/common:log",
+    ],
+)
+
 cc_test(
     name = "curve_math_test",
     size = "small",
@@ -31,6 +47,9 @@ cc_library(
     ],
     hdrs = [
         "polynomial_xd.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         "//cyber/common:log",

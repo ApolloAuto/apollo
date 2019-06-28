@@ -17,8 +17,15 @@ trajectoryGraph:
     properties:
         cars:
             pose:
-                color: 'rgba(0, 255, 0, 1)' # green
+                color: 'rgba(0, 255, 0, 0.55)' # green
         lines:
+            currentTargetPoint:
+                color: 'rgba(360, 0, 0, 1)' # red
+                borderWidth: 0
+                pointRadius: 7
+                fill: false
+                showLine: false
+                pointStyle: 'crossRot'
             real:
                 color: 'rgba(0, 106, 255, 1)' # blue
                 borderWidth: 2
@@ -33,10 +40,10 @@ trajectoryGraph:
                 showLine: true
             plan:
                 color: 'rgba(1, 209, 193, 0.65)' # green
-                borderWidth: 3
-                pointRadius: 0
+                borderWidth: 0
+                pointRadius: 1
                 fill: false
-                showLine: true
+                showLine: false
             target:
                 color: 'rgba(180, 255, 180, 0.7)' # light green
                 borderWidth: 3
@@ -69,10 +76,10 @@ speedGraph:
                 showLine: ture
             plan:
                 color: 'rgba(1, 209, 193, 0.65)' # green
-                borderWidth: 3
-                pointRadius: 0
+                borderWidth: 0
+                pointRadius: 2
                 fill: false
-                showLine: true
+                showLine: false
             target:
                 color: 'rgba(180, 255, 180, 0.7)' # light green
                 borderWidth: 3
@@ -105,10 +112,10 @@ curvatureGraph:
                 showLine: ture
             plan:
                 color: 'rgba(1, 209, 193, 0.65)' # green
-                borderWidth: 3
-                pointRadius: 0
+                borderWidth: 0
+                pointRadius: 2
                 fill: false
-                showLine: true
+                showLine: false
             target:
                 color: 'rgba(180, 255, 180, 0.7)' # light green
                 borderWidth: 3
@@ -141,10 +148,10 @@ accelerationGraph:
                 showLine: ture
             plan:
                 color: 'rgba(1, 209, 193, 0.65)' # green
-                borderWidth: 3
-                pointRadius: 0
+                borderWidth: 0
+                pointRadius: 2
                 fill: false
-                showLine: true
+                showLine: false
             target:
                 color: 'rgba(180, 255, 180, 0.7)' # light green
                 borderWidth: 3

@@ -44,14 +44,14 @@ class LaneScanningEvaluator : public Evaluator {
    * @brief Override Evaluate
    * @param Obstacle pointer
    */
-  void Evaluate(Obstacle* obstacle_ptr) override;
+  bool Evaluate(Obstacle* obstacle_ptr) override;
 
   /**
    * @brief Override Evaluate
    * @param Obstacle pointer
    * @param vector of all Obstacles
    */
-  void Evaluate(Obstacle* obstacle_ptr,
+  bool Evaluate(Obstacle* obstacle_ptr,
                 std::vector<Obstacle*> dynamic_env) override;
 
   /**
@@ -94,7 +94,8 @@ class LaneScanningEvaluator : public Evaluator {
    */
   bool ExtractStaticEnvFeatures(const Obstacle* obstacle_ptr,
                                 const LaneGraph* lane_graph_ptr,
-                                std::vector<double>* feature_values);
+                                std::vector<double>* feature_values,
+                                std::vector<int>* lane_sequence_idx_to_remove);
 
   void ModelInference(
       const std::vector<torch::jit::IValue>& torch_inputs,
@@ -105,7 +106,8 @@ class LaneScanningEvaluator : public Evaluator {
   static const size_t OBSTACLE_FEATURE_SIZE = 20 * 9;
   static const size_t INTERACTION_FEATURE_SIZE = 8;
   static const size_t SINGLE_LANE_FEATURE_SIZE = 4;
-  static const size_t LANE_POINTS_SIZE = 100;  // (100 * 0.5m = 50m)
+  static const size_t LANE_POINTS_SIZE = 100;          // 50m
+  static const size_t BACKWARD_LANE_POINTS_SIZE = 50;  // 25m
   static const size_t MAX_NUM_LANE = 10;
   static const size_t SHORT_TERM_TRAJECTORY_SIZE = 10;
 

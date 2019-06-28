@@ -66,7 +66,7 @@ DistanceApproachIPOPTFixedTsInterface::DistanceApproachIPOPTFixedTsInterface(
   l_start_index_ = time_start_index_;
   n_start_index_ = l_start_index_ + obstacles_edges_sum_ * (horizon_ + 1);
 
-  planner_open_space_config_.CopyFrom(planner_open_space_config);
+  planner_open_space_config_ = planner_open_space_config;
   distance_approach_config_ =
       planner_open_space_config_.distance_approach_config();
   weight_state_x_ = distance_approach_config_.weight_x();
@@ -965,7 +965,7 @@ void DistanceApproachIPOPTFixedTsInterface::generate_tapes(int n, int m,
 
   double sig;
   adouble obj_value;
-  double dummy;
+  double dummy = 0.0;
   obj_lam = new double[m + 1];
   get_starting_point(n, 1, &xp[0], 0, &zl[0], &zu[0], m, 0, &lamp[0]);
 

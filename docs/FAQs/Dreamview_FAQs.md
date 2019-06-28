@@ -206,7 +206,15 @@ And finally restart Dreamview using
 
 ## I want to plot my own graphs for my algorithms, where should I go?
 
-See PnC Monitor section in [Dreamview Doc](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/dreamview_usage_table.md).
+Go to the PnC Monitor section in [Dreamview Doc](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/dreamview_usage_table.md).
+
+--- 
+
+## What is Dreamland?
+
+Dreamland is Apollo's web-based simulation platform. Based on an enormous amount of driving scenario data and large-scale cloud computing capacity, Apollo simulation engine creates a powerful testing environment for the development of an autonomous driving system, from algorithms to grading, and then back to improved algorithms. It enables the developers and start-ups to run millions of miles of simulation daily, which dramatically accelerates the development cycle.
+
+To access Dreamland, please visit [our Simulation website](http://apollo.auto/platform/simulation.html) and join now!
 
 ---
 **More DreamView FAQs to follow.**

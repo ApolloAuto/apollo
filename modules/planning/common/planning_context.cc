@@ -21,7 +21,6 @@
 namespace apollo {
 namespace planning {
 
-
 PlanningContext::PlanningContext() {}
 
 void PlanningContext::Init() {}

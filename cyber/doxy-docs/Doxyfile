@@ -1,0 +1,17 @@
+PROJECT_NAME      = "Cyber RT Documents"
+XML_OUTPUT        = xml
+INPUT             =  ../cyber.h ../init.h ../node ../record ../time ../timer ../component ../logger ../parameter ../service ../service_discovery ../python
+FILE_PATTERNS     = *.h *.py
+RECURSIVE         = YES
+GENERATE_LATEX    = NO
+GENERATE_MAN      = NO
+GENERATE_RTF      = NO
+CASE_SENSE_NAMES  = NO
+GENERATE_HTML     = NO
+GENERATE_XML      = YES
+RECURSIVE         = YES
+QUIET             = YES
+JAVADOC_AUTOBRIEF = YES
+WARN_IF_UNDOCUMENTED = NO
+MACRO_EXPANSION = YES
+PREDEFINED = IN_DOXYGEN

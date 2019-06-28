@@ -27,9 +27,6 @@ DEFINE_bool(is_control_test_mode, false, "True to run control in test mode");
 DEFINE_bool(use_preview_speed_for_table, false,
             "True to use preview speed for table lookup");
 
-DEFINE_double(max_acceleration_when_stopped, 0.01,
-              "max acceleration can be observed when vehicle is stopped");
-
 DEFINE_double(steer_angle_rate, 100.0,
               "Steer angle change rate in percentage.");
 DEFINE_bool(enable_gain_scheduler, false,
@@ -65,3 +62,19 @@ DEFINE_bool(
     trajectory_transform_to_com_drive, false,
     "Enable planning trajectory coordinate transformation from center of "
     "rear-axis to center of mass, during forward driving");
+
+DEFINE_bool(enable_maximum_steer_rate_limit, false,
+            "Enable steer rate limit obtained from vehicle_param.pb.txt");
+
+DEFINE_bool(query_time_nearest_point_only, false,
+            "only use the trajectory point at nearest time as target point");
+
+DEFINE_bool(query_forward_time_point_only, false,
+            "only use the trajectory point in future");
+
+DEFINE_bool(enable_feedback_augment_on_high_speed, false,
+            "Enable augmented control on lateral error on high speed");
+
+DEFINE_bool(
+    enable_gear_dirve_negative_speed_protection, false,
+    "Enable estop to prevent following negative speed during gear drive");

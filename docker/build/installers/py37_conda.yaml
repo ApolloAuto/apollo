@@ -1,0 +1,11 @@
+name: py37
+dependencies:
+  - python = 3.7
+  - pip
+
+  # Google open infra
+  - absl-py
+  - protobuf
+
+  # Web
+  - requests

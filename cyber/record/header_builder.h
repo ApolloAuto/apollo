@@ -26,12 +26,40 @@ namespace record {
 using ::apollo::cyber::proto::CompressType;
 using ::apollo::cyber::proto::Header;
 
+/**
+ * @brief The builder of record header.
+ */
 class HeaderBuilder {
  public:
+  /**
+   * @brief Build a record header with customized max interval time (ns) and max
+   * raw size (byte) for segment.
+   *
+   * @param segment_interval
+   * @param segment_raw_size
+   *
+   * @return A customized record header.
+   */
   static Header GetHeaderWithSegmentParams(const uint64_t segment_interval,
                                            const uint64_t segment_raw_size);
+
+  /**
+   * @brief Build a record header with customized max interval time (ns) and max
+   * raw size (byte) for chunk.
+   *
+   * @param chunk_interval
+   * @param chunk_raw_size
+   *
+   * @return A customized record header.
+   */
   static Header GetHeaderWithChunkParams(const uint64_t chunk_interval,
                                          const uint64_t chunk_raw_size);
+
+  /**
+   * @brief Build a default record header.
+   *
+   * @return A default record header.
+   */
   static Header GetHeader();
 
  private:

@@ -1,12 +1,28 @@
 obstacle_conf {
   obstacle_type: VEHICLE
   obstacle_status: ON_LANE
+  priority_type: CAUTION
+  evaluator_type: CRUISE_MLP_EVALUATOR
+  predictor_type: MOVE_SEQUENCE_PREDICTOR
+}
+obstacle_conf {
+  obstacle_type: VEHICLE
+  obstacle_status: ON_LANE
+  priority_type: NORMAL
   evaluator_type: CRUISE_MLP_EVALUATOR
   predictor_type: MOVE_SEQUENCE_PREDICTOR
 }
 obstacle_conf {
   obstacle_type: VEHICLE
   obstacle_status: IN_JUNCTION
+  priority_type: CAUTION
+  evaluator_type: JUNCTION_MAP_EVALUATOR
+  predictor_type: INTERACTION_PREDICTOR
+}
+obstacle_conf {
+  obstacle_type: VEHICLE
+  obstacle_status: IN_JUNCTION
+  priority_type: NORMAL
   evaluator_type: JUNCTION_MLP_EVALUATOR
   predictor_type: INTERACTION_PREDICTOR
 }
@@ -17,10 +33,11 @@ obstacle_conf {
 }
 obstacle_conf {
   obstacle_type: PEDESTRIAN
+  evaluator_type: PEDESTRIAN_INTERACTION_EVALUATOR
   predictor_type: FREE_MOVE_PREDICTOR
 }
 obstacle_conf {
-  obstacle_type: BICYCLE 
+  obstacle_type: BICYCLE
   obstacle_status: ON_LANE
   evaluator_type: CYCLIST_KEEP_LANE_EVALUATOR
   predictor_type: LANE_SEQUENCE_PREDICTOR

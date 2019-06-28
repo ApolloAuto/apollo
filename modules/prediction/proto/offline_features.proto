@@ -2,7 +2,9 @@ syntax = "proto2";
 
 package apollo.prediction;
 
+import "modules/common/proto/pnc_point.proto";
 import "modules/prediction/proto/feature.proto";
+import "modules/prediction/proto/prediction_conf.proto";
 
 message CNNFeatures {
   optional uint32 dim0 = 1;
@@ -36,6 +38,7 @@ message PredictionResult {
   optional int32 id = 1;
   optional double timestamp = 2;
   repeated Trajectory trajectory = 3;
+  optional ObstacleConf obstacle_conf = 4;
 }
 
 message ListPredictionResult {
@@ -58,6 +61,8 @@ message DataForTuning {
   repeated double real_cost_value = 5;
   // The lane sequence id if associated with a lane
   optional int32 lane_sequence_id = 6;
+  // The associated adc trajectory
+  repeated apollo.common.TrajectoryPoint adc_trajectory_point = 7;
 }
 
 message ListDataForTuning {

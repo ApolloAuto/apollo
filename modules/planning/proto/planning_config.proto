@@ -16,7 +16,6 @@ import "modules/planning/proto/path_lane_borrow_decider_config.proto";
 import "modules/planning/proto/piecewise_jerk_path_config.proto";
 import "modules/planning/proto/piecewise_jerk_speed_config.proto";
 import "modules/planning/proto/proceed_with_caution_speed_config.proto";
-import "modules/planning/proto/planner_open_space_config.proto";
 import "modules/planning/proto/rule_based_stop_decider_config.proto";
 import "modules/planning/proto/speed_bounds_decider_config.proto";
 import "modules/planning/proto/navi_path_decider_config.proto";
@@ -130,15 +129,21 @@ message ScenarioTrafficLightUnprotectedRightTurnConfig {
   optional double min_pass_s_distance = 5 [default = 3.0];  // meter
   optional float red_light_right_turn_stop_duration_sec = 6 [default = 3.0];  // sec
   optional float creep_timeout_sec = 7 [default = 10.0];  // sec
-
 }
 
 message ScenarioPullOverConfig {
   optional double start_pull_over_scenario_distance = 1 [default = 50.0];  // meter
-  optional double max_adc_stop_speed = 2 [default = 0.1];  // m/s
-  optional double max_position_error_to_end_point = 3 [default = 0.5];
-  optional double max_theta_error_to_end_point = 4 [default = 0.2];
-  optional double pass_destination_threshold = 5 [default = 10.0];
+  optional double pull_over_min_distance_buffer = 2 [default = 10.0];  // meter
+  // keep the same value as pull_over_destination_to_adc_buffer in PathBoundsDeciderConfig
+  optional double max_distance_stop_search = 3 [default = 25.0];  // meter
+  optional double max_adc_stop_speed = 4 [default = 0.1];  // m/s
+  optional double max_s_error_to_end_point = 5 [default = 0.2];
+  optional double max_l_error_to_end_point = 6 [default = 0.5];
+  optional double max_theta_error_to_end_point = 7 [default = 0.2];
+  optional double max_distance_error_to_end_point = 8 [default = 0.2];
+  optional double pass_destination_threshold = 9 [default = 10.0];
+  optional double max_valid_stop_distance = 10 [default = 1.0];
+  optional double s_distance_to_stop_for_open_space_parking = 11 [default = 7.0];
 }
 
 message ScenarioValetParkingConfig {
@@ -205,7 +210,8 @@ message ScenarioConfig {
 
     // pull_over scenario
     PULL_OVER_APPROACH = 500;
-    PULL_OVER_RETRY_PARKING = 501;
+    PULL_OVER_RETRY_APPROACH_PARKING = 501;
+    PULL_OVER_RETRY_PARKING = 502;
 
     // valet parking scenario
     VALET_PARKING_APPROACHING_PARKING_SPOT = 510;

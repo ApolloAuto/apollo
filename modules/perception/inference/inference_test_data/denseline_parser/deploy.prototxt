@@ -20,7 +20,7 @@ name: "lane line detection"
 #      road_num: 3
 #      center_line_mask_ratio: 0.3
 #      debug: false
-#      single_thread: false 
+#      single_thread: false
 #      label_height_reverse: true
 #  }
 #  image_data_param {
@@ -300,7 +300,7 @@ layer {
     param {
         lr_mult: 1
         decay_mult: 1
-    } 
+    }
     convolution_param {
         num_output: 64
         kernel_size: 3
@@ -348,7 +348,7 @@ layer {
     param {
         lr_mult: 1
         decay_mult: 1
-    } 
+    }
     convolution_param {
         num_output: 64
         kernel_size: 3
@@ -2259,13 +2259,13 @@ layer {
     param{
         lr_mult: 1
         decay_mult: 1
-    } 
+    }
     convolution_param {
       kernel_size: 2  # {{2 * factor _ factor % 2}}  2 * 2 _ 0
       stride: 2       # {{factor}}
-      num_output: 324 # {{C}} 
+      num_output: 324 # {{C}}
       pad: 0          # {{ceil((factor _ 1) / 2.)}} 2 _ 1 / 2
-      weight_filler: { type: "xavier" } 
+      weight_filler: { type: "xavier" }
     bias_term: false
     }
 }
@@ -2314,9 +2314,9 @@ layer {
     convolution_param {
       kernel_size: 2  # {{2 * factor _ factor % 2}}  2 * 2 _ 0
       stride: 2       # {{factor}}
-      num_output: 216 # {{C}} 
+      num_output: 216 # {{C}}
       pad: 0          # {{ceil((factor _ 1) / 2.)}} 2 _ 1 / 2
-      weight_filler: { type: "xavier" } 
+      weight_filler: { type: "xavier" }
       bias_term: false
     }
 }
@@ -2365,9 +2365,9 @@ layer {
     convolution_param {
       kernel_size: 2  # {{2 * factor _ factor % 2}}  2 * 2 _ 0
       stride: 2       # {{factor}}
-      num_output: 144 # {{C}} 
+      num_output: 144 # {{C}}
       pad: 0          # {{ceil((factor _ 1) / 2.)}} 2 _ 1 / 2
-      weight_filler: { type: "xavier" } 
+      weight_filler: { type: "xavier" }
       bias_term: false
     }
 }
@@ -2416,9 +2416,9 @@ layer {
     convolution_param {
       kernel_size: 2  # {{2 * factor _ factor % 2}}  2 * 2 _ 0
       stride: 2       # {{factor}}
-      num_output: 96 # {{C}} 
+      num_output: 96 # {{C}}
       pad: 0          # {{ceil((factor _ 1) / 2.)}} 2 _ 1 / 2
-      weight_filler: { type: "xavier" } 
+      weight_filler: { type: "xavier" }
       bias_term: false
     }
 }
@@ -2546,7 +2546,7 @@ layer {
 #    slice_point: 5
 #    slice_point: 7
 #  }
-#  
+#
 #}
 #
 #
@@ -2570,12 +2570,12 @@ layer {
 #  bottom: "label_lane"
 #  top: "label_center"
 #  top: "label_cx"
-#  top: "label_left_right" 
-#  top: "label_ignore" #road type 
+#  top: "label_left_right"
+#  top: "label_ignore" #road type
 #  slice_param {
 #      axis: 1
 #      slice_point: 1
-#      slice_point: 2 
+#      slice_point: 2
 #      slice_point: 4
 #    }
 #}

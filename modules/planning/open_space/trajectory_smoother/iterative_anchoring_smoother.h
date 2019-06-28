@@ -25,16 +25,21 @@
 
 #include "Eigen/Eigen"
 
+#include "modules/common/math/box2d.h"
+#include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/path/discretized_path.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/math/curve1d/quintic_polynomial_curve1d.h"
+#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace planning {
 class IterativeAnchoringSmoother {
  public:
-  IterativeAnchoringSmoother() = default;
+  IterativeAnchoringSmoother(
+      const PlannerOpenSpaceConfig& planner_open_space_config);
 
   ~IterativeAnchoringSmoother() = default;
 
@@ -45,21 +50,27 @@ class IterativeAnchoringSmoother {
               DiscretizedTrajectory* discretized_trajectory);
 
  private:
+  void AdjustStartEndHeading(
+      const Eigen::MatrixXd& xWS,
+      std::vector<std::pair<double, double>>* const point2d);
+
+  bool ReAnchoring(const std::vector<size_t>& colliding_point_index,
+                   DiscretizedPath* path_points);
+
+  bool GenerateInitialBounds(const DiscretizedPath& path_points,
+                             std::vector<double>* initial_bounds);
+
   bool SmoothPath(const DiscretizedPath& raw_path_points,
                   const std::vector<double>& bounds,
-                  const std::vector<std::vector<common::math::Vec2d>>&
-                      obstacles_vertices_vec,
                   DiscretizedPath* smoothed_path_points);
 
-  bool CheckCollision(const DiscretizedPath& path_points,
-                      const std::vector<std::vector<common::math::Vec2d>>&
-                          obstacles_vertices_vec,
-                      std::vector<size_t>* colliding_point_index);
+  bool CheckCollisionAvoidance(const DiscretizedPath& path_points,
+                               std::vector<size_t>* colliding_point_index);
 
   void AdjustPathBounds(const std::vector<size_t>& colliding_point_index,
                         std::vector<double>* bounds);
 
-  void SetPathProfile(const std::vector<std::pair<double, double>>& point2d,
+  bool SetPathProfile(const std::vector<std::pair<double, double>>& point2d,
                       DiscretizedPath* raw_path_points);
 
   bool CheckGear(const Eigen::MatrixXd& xWS);
@@ -67,13 +78,39 @@ class IterativeAnchoringSmoother {
   bool SmoothSpeed(const double init_a, const double init_v,
                    const double path_length, SpeedData* smoothed_speeds);
 
-  bool CombinePathAndSpeed(const DiscretizedPath& raw_path_points,
-                           const SpeedData& smoothed_speeds,
+  bool CombinePathAndSpeed(const DiscretizedPath& path_points,
+                           const SpeedData& speed_points,
                            DiscretizedTrajectory* discretized_trajectory);
 
+  void AdjustPathAndSpeedByGear(DiscretizedTrajectory* discretized_trajectory);
+
+  bool GenerateStopProfileFromPolynomial(const double init_acc,
+                                         const double init_speed,
+                                         const double stop_distance,
+                                         SpeedData* smoothed_speeds);
+
+  bool IsValidPolynomialProfile(const QuinticPolynomialCurve1d& curve);
+
+  // @brief: a helper function on discrete point heading adjustment
+  double CalcHeadings(const DiscretizedPath& path_points, const size_t index);
+
  private:
+  // vehicle_param
+  double ego_length_ = 0.0;
+  double ego_width_ = 0.0;
+  double center_shift_distance_ = 0.0;
+
+  std::vector<std::vector<common::math::LineSegment2d>>
+      obstacles_linesegments_vec_;
+
+  std::vector<size_t> input_colliding_point_index_;
+
+  bool enforce_initial_kappa_ = true;
+
   // gear DRIVE as true and gear REVERSE as false
   bool gear_ = false;
+
+  PlannerOpenSpaceConfig planner_open_space_config_;
 };
 }  // namespace planning
 }  // namespace apollo

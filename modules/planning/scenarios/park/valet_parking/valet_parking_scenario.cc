@@ -101,7 +101,7 @@ bool ValetParkingScenario::GetScenarioConfig() {
 
 bool ValetParkingScenario::IsTransferable(const Frame& frame,
                                           const double parking_start_range) {
-  // TODO(all) Implement avaliable parking spot detection by preception results
+  // TODO(all) Implement available parking spot detection by preception results
   std::string target_parking_spot_id;
   if (frame.local_view().routing->routing_request().has_parking_space() &&
       frame.local_view().routing->routing_request().parking_space().has_id()) {

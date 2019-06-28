@@ -60,50 +60,57 @@ bool Timer::InitTimerTask() {
   task_.reset(new TimerTask(timer_id_));
   task_->interval_ms = timer_opt_.period;
   task_->next_fire_duration_ms = task_->interval_ms;
-
   if (timer_opt_.oneshot) {
-    task_->callback = [this]() { this->timer_opt_.callback(); };
+    task_->callback = timer_opt_.callback;
   } else {
     std::weak_ptr<TimerTask> task_weak_ptr = task_;
-    task_->callback = [this, task_weak_ptr]() {
+    task_->callback = [callback = this->timer_opt_.callback, task_weak_ptr]() {
+      auto task = task_weak_ptr.lock();
+      if (!task) {
+        return;
+      }
       auto start = Time::MonoTime().ToNanosecond();
-      this->timer_opt_.callback();
+      callback();
       auto end = Time::MonoTime().ToNanosecond();
       uint64_t execute_time_ns = end - start;
       uint64_t execute_time_ms =
+#if defined(__aarch64__)
+          ::llround(static_cast<double>(execute_time_ns) / 1000000);
+#else
           std::llround(static_cast<double>(execute_time_ns) / 1000000);
-      auto task = task_weak_ptr.lock();
-      if (task) {
-        if (this->last_execute_time_ns_ == 0) {
-          this->last_execute_time_ns_ = start;
-        } else {
-          this->accumulated_error_ns_ +=
-              start - this->last_execute_time_ns_ - task->interval_ms * 1000000;
-        }
-        ADEBUG << "start: " << start
-               << "\t last: " << this->last_execute_time_ns_
-               << "\t execut time:" << execute_time_ms
-               << "\t accumulated_error_ns: " << this->accumulated_error_ns_;
-        this->last_execute_time_ns_ = start;
-        if (execute_time_ms >= task->interval_ms) {
-          task->next_fire_duration_ms = 1;
-        } else {
-          int64_t accumulated_error_ms = std::llround(
-              static_cast<double>(this->accumulated_error_ns_) / 1000000);
-          if (static_cast<int64_t>(task->interval_ms - execute_time_ms - 1) >=
-              accumulated_error_ms) {
-            task->next_fire_duration_ms =
-                task->interval_ms - execute_time_ms - accumulated_error_ms;
-          } else {
-            task->next_fire_duration_ms = 1;
-          }
-          ADEBUG << "error ms: " << accumulated_error_ms
-                 << "  execute time: " << execute_time_ms
-                 << " next fire: " << task->next_fire_duration_ms
-                 << " error ns: " << this->accumulated_error_ns_;
-        }
-        this->timing_wheel_->AddTask(task);
+#endif
+      if (task->last_execute_time_ns_ == 0) {
+        task->last_execute_time_ns_ = start;
+      } else {
+        task->accumulated_error_ns_ +=
+            start - task->last_execute_time_ns_ - task->interval_ms * 1000000;
       }
+      ADEBUG << "start: " << start << "\t last: " << task->last_execute_time_ns_
+             << "\t execut time:" << execute_time_ms
+             << "\t accumulated_error_ns: " << task->accumulated_error_ns_;
+      task->last_execute_time_ns_ = start;
+      if (execute_time_ms >= task->interval_ms) {
+        task->next_fire_duration_ms = 1;
+      } else {
+#if defined(__aarch64__)
+        int64_t accumulated_error_ms = ::llround(
+#else
+        int64_t accumulated_error_ms = std::llround(
+#endif
+            static_cast<double>(task->accumulated_error_ns_) / 1000000);
+        if (static_cast<int64_t>(task->interval_ms - execute_time_ms - 1) >=
+            accumulated_error_ms) {
+          task->next_fire_duration_ms =
+              task->interval_ms - execute_time_ms - accumulated_error_ms;
+        } else {
+          task->next_fire_duration_ms = 1;
+        }
+        ADEBUG << "error ms: " << accumulated_error_ms
+               << "  execute time: " << execute_time_ms
+               << " next fire: " << task->next_fire_duration_ms
+               << " error ns: " << task->accumulated_error_ns_;
+      }
+      TimingWheel::Instance()->AddTask(task);
     };
   }
   return true;
@@ -125,8 +132,6 @@ void Timer::Stop() {
   if (started_.exchange(false)) {
     ADEBUG << "stop timer ";
     task_.reset();
-    accumulated_error_ns_ = 0;
-    last_execute_time_ns_ = 0;
   }
 }
 

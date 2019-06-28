@@ -21,8 +21,13 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
+
+#include "torch/script.h"
+#include "torch/torch.h"
 
 #include "modules/prediction/evaluator/evaluator.h"
 
@@ -38,7 +43,7 @@ class PedestrianInteractionEvaluator : public Evaluator {
   /**
    * @brief Constructor
    */
-  PedestrianInteractionEvaluator() = default;
+  PedestrianInteractionEvaluator();
 
   /**
    * @brief Destructor
@@ -49,7 +54,7 @@ class PedestrianInteractionEvaluator : public Evaluator {
    * @brief Override Evaluate
    * @param Obstacle pointer
    */
-  void Evaluate(Obstacle* obstacle_ptr) override;
+  bool Evaluate(Obstacle* obstacle_ptr) override;
 
   /**
    * @brief Extract features for learning model's input
@@ -65,6 +70,33 @@ class PedestrianInteractionEvaluator : public Evaluator {
   std::string GetName() override { return "PEDESTRIAN_INTERACTION_EVALUATOR"; }
 
  private:
+  struct LSTMState {
+    double timestamp;
+    torch::Tensor ct;
+    torch::Tensor ht;
+    int frame_count = 0;
+  };
+
+  void Clear();
+
+  void LoadModel();
+
+  torch::Tensor GetSocialPooling();
+
+ private:
+  std::unordered_map<int, LSTMState> obstacle_id_lstm_state_map_;
+  std::shared_ptr<torch::jit::script::Module> torch_position_embedding_ptr_ =
+      nullptr;
+  std::shared_ptr<torch::jit::script::Module> torch_social_embedding_ptr_ =
+      nullptr;
+  std::shared_ptr<torch::jit::script::Module> torch_single_lstm_ptr_ = nullptr;
+  std::shared_ptr<torch::jit::script::Module> torch_prediction_layer_ptr_ =
+      nullptr;
+  torch::Device device_;
+
+  static const int kGridSize = 2;
+  static const int kEmbeddingSize = 64;
+  static const int kHiddenSize = 128;
 };
 
 }  // namespace prediction

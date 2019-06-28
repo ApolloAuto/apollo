@@ -30,6 +30,8 @@ enum LaneLinePositionType {
     THIRD_RIGHT = 3;
     FOURTH_RIGHT = 4;
     BOLLARD_RIGHT = 5;
+    OTHER = 6;   //!< other types of lane
+    UNKNOWN = 7;  //!< background
 }
 
 enum LaneLineUseType {

@@ -7,7 +7,7 @@ Apollo Cyber 运行时框架(Apollo Cyber RT Framework) 是基于组件概念来
 
 - 初如化组件的文件结构
 - 实现组件类
-- 设置配置文件 
+- 设置配置文件
 - 启动组件
 
 下面的例子展示了如何创建，编译，运行一个组件，并观察组件在屏幕上的输出。 如果想更深入的探索Apollo Cyber RT框架, 可以在这个目录`/apollo/cyber/examples/`找到很多例子，这些例子详细展示了如何使用Cyber框架的各种功能。
@@ -107,7 +107,7 @@ cc_library(
 
 cpplint()
 ```
-## 设置配置文件 
+## 设置配置文件
 
 ### 配置DAG依赖文件
 
@@ -119,7 +119,7 @@ cpplint()
 
 ```bash
 # Define all coms in DAG streaming.
-    component_config {
+component_config {
     component_library : "/apollo/bazel-bin/cyber/examples/common_component_example/libcommon_component_example.so"
     components {
         class_name : "CommonComponentSample"
@@ -132,8 +132,8 @@ cpplint()
                 channel: "/apollo/test"
             }
         }
-      }
     }
+}
 ```
 
 ### 配置launch启动文件

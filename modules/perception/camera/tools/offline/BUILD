@@ -18,6 +18,7 @@ cc_library(
     ],
     deps = [
         ":transform_server",
+        "//modules/perception/camera/app:cipv_camera",
         "//modules/perception/camera/common",
         "//modules/perception/onboard/proto:motion_service_proto",
         "//modules/perception/proto:perception_proto",
@@ -52,6 +53,7 @@ cc_binary(
         "-lopencv_highgui",
         "-lboost_system",
     ],
+    linkstatic = False,
     deps = [
         ":transform_server",
         ":visualizer",

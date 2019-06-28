@@ -31,7 +31,7 @@ namespace planning {
 
 DualVariableWarmStartProblem::DualVariableWarmStartProblem(
     const PlannerOpenSpaceConfig& planner_open_space_config) {
-  planner_open_space_config_.CopyFrom(planner_open_space_config);
+  planner_open_space_config_ = planner_open_space_config;
 }
 
 bool DualVariableWarmStartProblem::Solve(
@@ -160,7 +160,7 @@ bool DualVariableWarmStartProblem::Solve(
     ptop->get_optimization_results(l_warm_up, n_warm_up);
 
     solver_flag = (status == Ipopt::Solve_Succeeded ||
-        status == Ipopt::Solved_To_Acceptable_Level);
+                   status == Ipopt::Solved_To_Acceptable_Level);
   } else if (planner_open_space_config_.dual_variable_warm_start_config()
                  .qp_format() == IPOPT) {
     DualVariableWarmStartIPOPTInterface* ptop =
@@ -253,7 +253,7 @@ bool DualVariableWarmStartProblem::Solve(
     ptop->get_optimization_results(l_warm_up, n_warm_up);
 
     solver_flag = (status == Ipopt::Solve_Succeeded ||
-        status == Ipopt::Solved_To_Acceptable_Level);
+                   status == Ipopt::Solved_To_Acceptable_Level);
   } else {  // debug mode
     DualVariableWarmStartOSQPInterface* ptop_osqp =
         new DualVariableWarmStartOSQPInterface(

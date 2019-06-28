@@ -44,9 +44,6 @@ DEFINE_string(current_mode_db_key, "/apollo/hmi/status:current_mode",
 DEFINE_string(default_hmi_mode, "Mkz Standard Debug",
               "Default HMI Mode when there is no cache.");
 
-DEFINE_string(container_meta_ini, "/apollo/meta.ini",
-              "Container meta info file.");
-
 namespace apollo {
 namespace dreamview {
 namespace {
@@ -100,7 +97,7 @@ Map<std::string, std::string> ListFilesAsDict(const std::string& dir,
   Map<std::string, std::string> result;
   const std::string pattern = StrCat(dir, "/*", extension);
   for (const std::string& file_path : cyber::common::Glob(pattern)) {
-    // Remove the extention and convert to title case as the file title.
+    // Remove the extension and convert to title case as the file title.
     const std::string filename = cyber::common::GetFileName(file_path);
     const std::string file_title =
         TitleCase(filename.substr(0, filename.length() - extension.length()));
@@ -373,7 +370,7 @@ void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
                                  const bool is_reportable) {
   std::shared_ptr<DriveEvent> drive_event = std::make_shared<DriveEvent>();
   apollo::common::util::FillHeader("HMI", drive_event.get());
-  // TODO(xiaoxq): Here we reuse the header time field as the event occuring
+  // TODO(xiaoxq): Here we reuse the header time field as the event occurring
   // time. A better solution might be adding the field to DriveEvent proto to
   // make it clear.
   drive_event->mutable_header()->set_timestamp_sec(
@@ -553,8 +550,8 @@ void HMIWorker::RecordAudio(const std::string& data) {
 }
 
 void HMIWorker::StatusUpdateThreadLoop() {
-  const size_t kLoopIntervalMs = 200;
   while (!stop_) {
+    static constexpr int kLoopIntervalMs = 200;
     std::this_thread::sleep_for(std::chrono::milliseconds(kLoopIntervalMs));
     bool status_changed = false;
     {

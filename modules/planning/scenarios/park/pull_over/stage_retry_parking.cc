@@ -43,16 +43,20 @@ Stage::StageStatus PullOverStageRetryParking::Process(
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
-  bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
+  // Open space planning doesn't use planning_init_point from upstream because
+  // of different stitching strategy
+  frame->mutable_open_space_info()->set_is_on_open_space_trajectory(true);
+  bool plan_ok = ExecuteTaskOnOpenSpace(frame);
   if (!plan_ok) {
     AERROR << "PullOverStageRetryParking planning error";
+    return StageStatus::ERROR;
   }
 
-  const auto& reference_line_info = frame->reference_line_info().front();
   scenario::util::PullOverStatus status =
-      scenario::util::CheckADCPullOver(reference_line_info, scenario_config_);
-  if (status == scenario::util::PASS_DESTINATION ||
-      status == scenario::util::PARK_COMPLETE) {
+      scenario::util::CheckADCPullOverOpenSpace(scenario_config_);
+  if ((status == scenario::util::PASS_DESTINATION ||
+       status == scenario::util::PARK_COMPLETE) &&
+      FLAGS_enable_pull_over_exit) {
     return FinishStage();
   }
 

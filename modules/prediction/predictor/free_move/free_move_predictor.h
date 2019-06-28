@@ -33,7 +33,7 @@ class FreeMovePredictor : public Predictor {
   /**
    * @brief Constructor
    */
-  FreeMovePredictor() = default;
+  FreeMovePredictor();
 
   /**
    * @brief Destructor
@@ -53,13 +53,14 @@ class FreeMovePredictor : public Predictor {
    * @param Velocity
    * @param Acceleration
    * @param Kalman Filter
+   * @param start time
    * @param Total time
    * @param Generated trajectory points
    */
   void DrawFreeMoveTrajectoryPoints(
       const Eigen::Vector2d& position, const Eigen::Vector2d& velocity,
-      const Eigen::Vector2d& acc, const double theta, const double total_time,
-      const double period,
+      const Eigen::Vector2d& acc, const double theta, const double start_time,
+      const double total_time, const double period,
       std::vector<apollo::common::TrajectoryPoint>* points);
 };
 

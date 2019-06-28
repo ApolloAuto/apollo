@@ -44,6 +44,9 @@ namespace apollo {
 namespace cyber {
 namespace common {
 
+// file type: file or directory
+enum FileType { TYPE_FILE, TYPE_DIR };
+
 bool SetProtoToASCIIFile(const google::protobuf::Message &message,
                          int file_descriptor);
 /**
@@ -191,6 +194,12 @@ std::string GetFileName(const std::string &path,
 
 std::string GetCurrentPath();
 
+// delete file including file or directory
+bool DeleteFile(const std::string &filename);
+
+bool GetType(const std::string &filename, FileType *type);
+
+bool CreateDir(const std::string &dir);
 }  // namespace common
 }  // namespace cyber
 }  // namespace apollo

@@ -97,21 +97,22 @@ cc_library(
 )
 
 cc_binary(
-    name = "_cyber_topology_manager.so",
+    name = "_cyber_parameter.so",
     linkshared = True,
-    linkstatic = False,
     deps = [
-        ":py_topology_manager",
+        ":py_parameter",
     ],
 )
 
 cc_library(
-    name = "py_topology_manager",
-    srcs = ["cyber_topology_manager_wrap.cc"],
-    hdrs = ["py_topology_manager.h"],
+    name = "py_parameter",
+    srcs = ["cyber_parameter_wrap.cc"],
+    hdrs = [
+        "py_node.h",
+        "py_parameter.h",
+    ],
     deps = [
         "//cyber:cyber_core",
-        "//cyber/service_discovery:topology_manager",
         "@python27",
     ],
 )

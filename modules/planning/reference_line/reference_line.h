@@ -192,7 +192,7 @@ class ReferenceLine {
    * @param p1 the second anchor point for interpolation
    * @param s1 the longitutial distance (s) of p1 on current reference line.
    * s1
-   * @param s identifies the the middle point that is going to be
+   * @param s identifies the middle point that is going to be
    * interpolated.
    * s >= s0 && s <= s1
    * @return The interpolated ReferencePoint.

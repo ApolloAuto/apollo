@@ -28,16 +28,21 @@ namespace prediction {
 
 using apollo::hdmap::LaneInfo;
 
-RNNEvaluator::RNNEvaluator() { LoadModel(FLAGS_evaluator_vehicle_rnn_file); }
+RNNEvaluator::RNNEvaluator() {
+  evaluator_type_ = ObstacleConf::RNN_EVALUATOR;
+  LoadModel(FLAGS_evaluator_vehicle_rnn_file);
+}
 
-void RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   Clear();
   CHECK_NOTNULL(obstacle_ptr);
+
+  obstacle_ptr->SetEvaluatorType(evaluator_type_);
 
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
     ADEBUG << "Obstacle [" << id << "] has no latest feature.";
-    return;
+    return false;
   }
 
   Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
@@ -45,7 +50,7 @@ void RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   if (!latest_feature_ptr->has_lane() ||
       !latest_feature_ptr->lane().has_lane_graph()) {
     ADEBUG << "Obstacle [" << id << "] has no lane graph.";
-    return;
+    return false;
   }
 
   LaneGraph* lane_graph_ptr =
@@ -53,7 +58,7 @@ void RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   CHECK_NOTNULL(lane_graph_ptr);
   if (lane_graph_ptr->lane_sequence_size() == 0) {
     ADEBUG << "Obstacle [" << id << "] has no lane sequences.";
-    return;
+    return false;
   }
 
   Eigen::MatrixXf obstacle_feature_mat;
@@ -61,12 +66,12 @@ void RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   if (ExtractFeatureValues(obstacle_ptr, &obstacle_feature_mat,
                            &lane_feature_mats) != 0) {
     ADEBUG << "Fail to extract feature from obstacle";
-    return;
+    return false;
   }
   if (obstacle_feature_mat.rows() != 1 ||
       obstacle_feature_mat.size() != DIM_OBSTACLE_FEATURE) {
     ADEBUG << "Dim of obstacle feature is wrong!";
-    return;
+    return true;
   }
 
   Eigen::MatrixXf pred_mat;
@@ -105,6 +110,7 @@ void RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   }
   model_ptr_->State(&states);
   obstacle_ptr->SetRNNStates(states);
+  return true;
 }
 
 void RNNEvaluator::Clear() {}

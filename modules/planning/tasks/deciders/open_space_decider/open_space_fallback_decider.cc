@@ -47,7 +47,6 @@ bool OpenSpaceFallbackDecider::QuardraticFormulaLowerSolution(const double a,
   if (tmp < kEpsilon) {
     return false;
   }
-
   double sol1 = (-b + std::sqrt(tmp)) / (2.0 * a);
   double sol2 = (-b - std::sqrt(tmp)) / (2.0 * a);
 
@@ -94,8 +93,12 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
     *(frame_->mutable_open_space_info()->mutable_future_collision_point()) =
         future_collision_point;
 
+    // min stop distance: (max_acc)
+    double min_stop_distance =
+        0.5 * fallback_start_point.v() * fallback_start_point.v() / 4.0;
+
     // TODO(QiL): move 1.0 to configs
-    const double stop_distance =
+    double stop_distance =
         fallback_trajectory_pair_candidate.second == canbus::Chassis::GEAR_DRIVE
             ? std::max(future_collision_point.path_point().s() -
                            fallback_start_point.path_point().s() - 1.0,
@@ -105,10 +108,28 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
                        0.0);
 
     ADEBUG << "stop distance : " << stop_distance;
+    // const auto& vehicle_config =
+    //     common::VehicleConfigHelper::Instance()->GetConfig();
+    const double vehicle_max_acc = 4.0;   // vehicle_config.max_acceleration();
+    const double vehicle_max_dec = -4.0;  // vehicle_config.max_deceleration();
 
-    const double stop_deceleration = -fallback_start_point.v() *
-                                     fallback_start_point.v() /
-                                     (2.0 * (stop_distance + 1e-6));
+    double stop_deceleration = 0.0;
+
+    if (fallback_trajectory_pair_candidate.second ==
+        canbus::Chassis::GEAR_REVERSE) {
+      stop_deceleration =
+          std::min(fallback_start_point.v() * fallback_start_point.v() /
+                       (2.0 * (stop_distance + 1e-6)),
+                   vehicle_max_acc);
+      stop_distance = std::min(-1 * min_stop_distance, stop_distance);
+    } else {
+      stop_deceleration =
+          std::max(-fallback_start_point.v() * fallback_start_point.v() /
+                       (2.0 * (stop_distance + 1e-6)),
+                   vehicle_max_dec);
+      stop_distance = std::max(min_stop_distance, stop_distance);
+    }
+
     ADEBUG << "stop_deceleration: " << stop_deceleration;
 
     // Search stop index in chosen trajectory by distance
@@ -130,7 +151,7 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
     for (size_t i = 0; i < fallback_start_index; ++i) {
       fallback_trajectory_pair_candidate.first[i].set_v(
           fallback_start_point.v());
-      fallback_trajectory_pair_candidate.first[i].set_a(0.0);
+      fallback_trajectory_pair_candidate.first[i].set_a(stop_deceleration);
     }
 
     // TODO(QiL): refine the logic and remove redundant code, change 0.5 to from
@@ -142,6 +163,8 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
       AINFO << "Stop distance within safety buffer, stop now!";
       fallback_start_point.set_v(0.0);
       fallback_start_point.set_a(0.0);
+      fallback_trajectory_pair_candidate.first[stop_index].set_v(0.0);
+      fallback_trajectory_pair_candidate.first[stop_index].set_a(0.0);
 
       // 2. Trim all trajectory points after stop index
       fallback_trajectory_pair_candidate.first.erase(
@@ -180,16 +203,25 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
       double temp_v = 0.0;
       double c =
           -2.0 * fallback_trajectory_pair_candidate.first[i].path_point().s();
+
       if (QuardraticFormulaLowerSolution(stop_deceleration,
                                          2.0 * fallback_start_point.v(), c,
                                          &new_relative_time) &&
           std::abs(
               fallback_trajectory_pair_candidate.first[i].path_point().s()) <=
               std::abs(stop_distance)) {
+        ADEBUG << "new_relative_time" << new_relative_time;
         temp_v =
             fallback_start_point.v() + stop_deceleration * new_relative_time;
-        fallback_trajectory_pair_candidate.first[i].set_v(temp_v);
+        // speed limit
+        if (std::abs(temp_v) < 1.0) {
+          fallback_trajectory_pair_candidate.first[i].set_v(temp_v);
+        } else {
+          fallback_trajectory_pair_candidate.first[i].set_v(
+              temp_v / std::abs(temp_v) * 1.0);
+        }
         fallback_trajectory_pair_candidate.first[i].set_a(stop_deceleration);
+
         fallback_trajectory_pair_candidate.first[i].set_relative_time(
             new_relative_time);
       } else {
@@ -216,8 +248,8 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
     ADEBUG << "fallback start point after changes: "
            << fallback_start_point.DebugString();
 
-    AERROR << "stop index: " << stop_index;
-    AERROR << "fallback start index: " << fallback_start_index;
+    ADEBUG << "stop index: " << stop_index;
+    ADEBUG << "fallback start index: " << fallback_start_index;
 
     // 2. Erase afterwards
     fallback_trajectory_pair_candidate.first.erase(
@@ -277,6 +309,7 @@ bool OpenSpaceFallbackDecider::IsCollisionFreeTrajectory(
   double ego_width = vehicle_config.vehicle_param().width();
   auto trajectory_pb = trajectory_gear_pair.first;
   const size_t point_size = trajectory_pb.NumOfPoints();
+
   *current_index = trajectory_pb.QueryLowerBoundPoint(0.0);
 
   for (size_t i = *current_index; i < point_size; ++i) {
@@ -294,12 +327,17 @@ bool OpenSpaceFallbackDecider::IsCollisionFreeTrajectory(
     for (size_t j = 0; j < predicted_time_horizon; j++) {
       for (const auto& obstacle_box : predicted_bounding_rectangles[j]) {
         if (ego_box.HasOverlap(obstacle_box)) {
+          ADEBUG << "HasOverlap(obstacle_box) [" << i << "]";
           const auto& vehicle_state = frame_->vehicle_state();
           Vec2d vehicle_vec({vehicle_state.x(), vehicle_state.y()});
+          // remove points in previous trajectory
           if (std::abs(trajectory_point.relative_time() -
                        static_cast<double>(j) *
                            FLAGS_trajectory_time_resolution) <
-              FLAGS_trajectory_time_resolution) {
+                  config_.open_space_fallback_decider_config()
+                      .open_space_fallback_collision_time_buffer() &&
+              trajectory_point.relative_time() > 0.0) {
+            ADEBUG << "first_collision_index: [" << i << "]";
             *first_collision_index = i;
             return false;
           }

@@ -43,9 +43,6 @@ DEFINE_string(scenario_pull_over_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/pull_over_config.pb.txt",
               "The pull_over scenario configuration file");
-DEFINE_string(scenario_side_pass_config_file,
-              "/apollo/modules/planning/conf/scenario/side_pass_config.pb.txt",
-              "side_pass scenario configuration file");
 DEFINE_string(scenario_stop_sign_unprotected_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/stop_sign_unprotected_config.pb.txt",
@@ -71,11 +68,11 @@ DEFINE_bool(enable_scenario_bare_intersection, false,
             "enable bare_intersection scenarios in planning");
 
 DEFINE_bool(enable_scenario_pull_over, false,
-            "enable side pass scenario in planning");
+            "enable pull-over scenario in planning");
 
-DEFINE_double(side_pass_min_signal_intersection_distance, 50.0,
-              "meter, for intersection has signal, ADC will enter side pass "
-              "scenario only when it is farther than this threshoold");
+DEFINE_bool(enable_pull_over_exit, false,
+            "allow pull-over scenario exit to lane follow in planning");
+
 DEFINE_bool(enable_scenario_side_pass_multiple_parked_obstacles, true,
             "enable ADC to side-pass multiple parked obstacles without"
             "worrying if the obstacles are blocked by others.");
@@ -85,6 +82,9 @@ DEFINE_bool(enable_scenario_stop_sign, true,
 
 DEFINE_bool(enable_scenario_traffic_light, true,
             "enable traffic_light scenarios in planning");
+
+DEFINE_bool(enable_force_pull_over_open_space_parking_test, false,
+            "enable force_pull_over_open_space_parking_test");
 
 DEFINE_string(traffic_rule_config_filename,
               "/apollo/modules/planning/conf/traffic_rule_config.pb.txt",
@@ -119,9 +119,6 @@ DEFINE_double(look_forward_extend_distance, 50,
 DEFINE_double(reference_line_stitch_overlap_distance, 20,
               "The overlap distance with the existing reference line when "
               "stitching the existing reference line");
-DEFINE_double(reference_line_lateral_buffer, 0.5,
-              "When creating reference line, the minimum distance with road "
-              "curb for a vehicle driving on this line.");
 
 DEFINE_bool(enable_smooth_reference_line, true,
             "enable smooth the map reference line");
@@ -203,7 +200,7 @@ DEFINE_double(lateral_acceleration_bound, 4.0,
 
 DEFINE_double(longitudinal_jerk_lower_bound, -4.0,
               "The lower bound of longitudinal jerk.");
-DEFINE_double(longitudinal_jerk_upper_bound, 4.0,
+DEFINE_double(longitudinal_jerk_upper_bound, 2.0,
               "The upper bound of longitudinal jerk.");
 DEFINE_double(longitudinal_jerk_bound, 4.0,
               "Bound of longitudinal jerk; symmetric for front and back");
@@ -212,7 +209,7 @@ DEFINE_double(lateral_jerk_bound, 4.0,
 
 DEFINE_double(dl_bound, 0.10,
               "The bound for derivative l in s-l coordinate system.");
-DEFINE_double(kappa_bound, 0.20, "The bound for trajectory curvature");
+DEFINE_double(kappa_bound, 0.1979, "The bound for trajectory curvature");
 DEFINE_double(dkappa_bound, 0.02,
               "The bound for trajectory curvature change rate");
 
@@ -238,7 +235,7 @@ DEFINE_double(max_stop_distance_obstacle, 10.0,
 DEFINE_double(min_stop_distance_obstacle, 6.0,
               "min stop distance from in-lane obstacle (meters)");
 DEFINE_double(nudge_distance_obstacle, 0.3,
-              "minimum distance to nudge a obstacle (meters)");
+              "minimum distance to nudge an obstacle (meters)");
 DEFINE_double(follow_min_distance, 3.0,
               "min follow distance for vehicles/bicycles/moving objects");
 DEFINE_double(follow_min_obs_lateral_distance, 2.5,
@@ -270,6 +267,7 @@ DEFINE_double(virtual_stop_wall_length, 0.1,
 DEFINE_double(virtual_stop_wall_height, 2.0,
               "virtual stop wall height (meters)");
 
+// Path Deciders
 DEFINE_double(obstacle_lat_buffer, 0.4,
               "obstacle lateral buffer (meters) for deciding path boundaries");
 DEFINE_double(obstacle_lon_start_buffer, 3.0,
@@ -278,6 +276,13 @@ DEFINE_double(obstacle_lon_start_buffer, 3.0,
 DEFINE_double(obstacle_lon_end_buffer, 2.0,
               "obstacle longitudinal end buffer (meters) for deciding "
               "path boundaries");
+DEFINE_double(static_obstacle_speed_threshold, 0.5,
+              "The speed threshold to decide whether an obstacle is static "
+              "or not.");
+DEFINE_double(lane_borrow_max_speed, 5.0,
+              "The speed threshold for lane-borrow");
+DEFINE_int32(long_term_blocking_obstacle_cycle_threhold, 3,
+             "The cycle threhold for long-term blocking obstacle.");
 
 // Prediction Part
 DEFINE_double(prediction_total_time, 5.0, "Total prediction time");
@@ -316,7 +321,7 @@ DEFINE_double(perception_confidence_threshold, 0.4,
               "this threshold.");
 
 // QpSt optimizer
-DEFINE_double(slowdown_profile_deceleration, -1.0,
+DEFINE_double(slowdown_profile_deceleration, -4.0,
               "The deceleration to generate slowdown profile. unit: m/s^2.");
 DEFINE_bool(enable_follow_accel_constraint, true,
             "Enable follow acceleration constraint.");
@@ -340,8 +345,8 @@ DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
 DEFINE_double(trajectory_space_resolution, 1.0,
               "Trajectory space resolution in planning");
-DEFINE_double(decision_horizon, 200.0,
-              "Longitudinal horizon for decision making");
+DEFINE_double(speed_lon_decision_horizon, 200.0,
+              "Longitudinal horizon for speed decision making (meter)");
 DEFINE_uint64(num_velocity_sample, 6,
               "The number of velocity samples in end condition sampler.");
 DEFINE_bool(enable_backup_trajectory, true,
@@ -423,7 +428,7 @@ DEFINE_double(nudge_buffer, 0.3, "buffer to nudge for lateral optimization");
 DEFINE_bool(use_planning_fallback, true,
             "Use fallback trajectory for planning.");
 DEFINE_double(fallback_total_time, 3.0, "total fallback trajectory time");
-DEFINE_double(fallback_time_unit, 0.02,
+DEFINE_double(fallback_time_unit, 0.1,
               "fallback trajectory unit time in seconds");
 DEFINE_double(
     fallback_distance_buffer, 0.5,
@@ -479,20 +484,10 @@ DEFINE_bool(use_s_curve_speed_smooth, false,
             "Whether use s-curve (piecewise_jerk) for smoothing Hybrid Astar "
             "speed/acceleration.");
 
-// pull-over
-DEFINE_double(destination_to_adc_buffer, 10.0,
-              "If the destination is within this distance from ADC, "
-              "then don't search for pull-over position.");
+DEFINE_bool(
+    use_iterative_anchoring_smoother, false,
+    "Whether use iterative_anchoring_smoother for open space planning ");
 
-DEFINE_double(destination_to_pathend_buffer, 10.0,
-              "If the destination is within this distance to path-end, "
-              "then don't search for pull-over position. Wait until "
-              "destination gets closer.");
-
-DEFINE_double(pull_over_road_edge_buffer, 0.15,
-              "If the available path boundary's edge is not within this "
-              "distance from the road edge, then this position is not "
-              "qualified for being a pull-over position.");
 DEFINE_bool(
     enable_parallel_trajectory_smoothing, false,
     "Whether to partition the trajectory first and do smoothing in parallel");
@@ -524,38 +519,18 @@ DEFINE_double(smoother_stop_distance, 10.0,
               "(unit: meter) for ADC stop, if it is close to the stop point "
               "within this threshold, current planning will be smoothed.");
 
-DEFINE_double(side_pass_road_buffer, 0.05,
-              "(unit: meter) for side pass scenario ");
-DEFINE_double(side_pass_obstacle_l_buffer, 0.1,
-              "(unit: meter) for side pass scenario ");
-DEFINE_double(side_pass_obstacle_s_buffer, 2.0,
-              "(unit: meter) for side pass scenario ");
-DEFINE_double(side_pass_extra_road_buffer_during_turning, 0.1,
-              "(unit: meter) for side pass scenario ");
-DEFINE_double(side_pass_vehicle_buffer, 0.1,
-              "(unit: meter) for side pass scenario ");
-DEFINE_double(side_pass_off_road_center_threshold, 0.4,
-              "(unit: meter) for side pass scenario ");
-DEFINE_double(side_pass_trim_watch_window, 12.0,
-              "(unit: meter) for side pass scenario ");
-DEFINE_bool(side_pass_use_actual_laneinfo_for_path_generation, false,
-            "Whether to use the actual laneinfo for side-pass path generation,"
-            " or to use the planning starting-point's laneinfo all the time.");
-DEFINE_double(side_pass_driving_width_l_buffer, 0.1,
-              "(unit: meter) for side pass driving width l buffer");
-
 DEFINE_bool(enable_parallel_hybrid_a, false,
             "True to enable hybrid a* parallel implementation.");
 
 DEFINE_double(vehicle_low_speed_threshold, 1.0, "Vehicle low speed threshold.");
 
+DEFINE_double(open_space_standstill_acceleration, 0.0,
+              "(unit: meter/sec^2) for open space stand still at destination");
+
 DEFINE_bool(enable_cuda, false, "True to enable cuda parallel implementation.");
 
 DEFINE_bool(enable_nonscenario_side_pass, false,
             "True to enable side pass without scenario management");
-
-DEFINE_bool(enable_soft_speed_limit, false,
-            "True to set soft speed limit guided by path optimization result");
 
 DEFINE_bool(enable_dp_reference_speed, true,
             "True to penalize dp result towards default cruise speed");
@@ -568,3 +543,6 @@ DEFINE_double(short_path_length_threshold, 20.0,
 
 DEFINE_uint64(trajectory_stitching_preserved_length, 20,
               "preserved points number in trajectory stitching");
+
+DEFINE_double(side_pass_driving_width_l_buffer, 0.1,
+              "(unit: meter) for side pass driving width l buffer");

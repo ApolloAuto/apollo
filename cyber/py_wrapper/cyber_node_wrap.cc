@@ -665,6 +665,135 @@ static PyObject *cyber_PyChannelUtils_get_channels_info(PyObject *self,
   }
   return pyobj_channelinfo_dict;
 }
+
+PyObject *cyber_PyNodeUtils_get_active_nodes(PyObject *self, PyObject *args) {
+  unsigned char sleep_s = 0;
+  if (!PyArg_ParseTuple(
+          args, const_cast<char *>("B:cyber_PyNodeUtils_get_active_nodes"),
+          &sleep_s)) {
+    AERROR << "cyber_PyNodeUtils_get_active_nodes failed!";
+    Py_INCREF(Py_None);
+    return Py_None;
+  }
+
+  std::vector<std::string> nodes_name =
+      apollo::cyber::PyNodeUtils::get_active_nodes(sleep_s);
+  PyObject *pyobj_list = PyList_New(nodes_name.size());
+  size_t pos = 0;
+  for (const std::string &name : nodes_name) {
+    PyList_SetItem(pyobj_list, pos, Py_BuildValue("s", name.c_str()));
+    pos++;
+  }
+
+  return pyobj_list;
+}
+
+PyObject *cyber_PyNodeUtils_get_node_attr(PyObject *self, PyObject *args) {
+  char *node_name = nullptr;
+  Py_ssize_t len = 0;
+  unsigned char sleep_s = 0;
+  if (!PyArg_ParseTuple(
+          args, const_cast<char *>("s#B:cyber_PyNodeUtils_get_node_attr"),
+          &node_name, &len, &sleep_s)) {
+    AERROR << "cyber_PyNodeUtils_get_node_attr failed!";
+    Py_INCREF(Py_None);
+    return Py_None;
+  }
+  std::string name(node_name, len);
+  std::string node_attr =
+      apollo::cyber::PyNodeUtils::get_node_attr(name, sleep_s);
+  return PyString_FromStringAndSize(node_attr.c_str(), node_attr.size());
+}
+
+PyObject *cyber_PyNodeUtils_get_readersofnode(PyObject *self, PyObject *args) {
+  char *node_name = nullptr;
+  Py_ssize_t len = 0;
+  unsigned char sleep_s = 0;
+  if (!PyArg_ParseTuple(
+          args, const_cast<char *>("s#B:cyber_PyNodeUtils_get_readersofnode"),
+          &node_name, &len, &sleep_s)) {
+    AERROR << "cyber_PyNodeUtils_get_readersofnode failed!";
+    Py_INCREF(Py_None);
+    return Py_None;
+  }
+  std::string name(node_name, len);
+  std::vector<std::string> readers_channel =
+      apollo::cyber::PyNodeUtils::get_readersofnode(name, sleep_s);
+  PyObject *pyobj_list = PyList_New(readers_channel.size());
+  size_t pos = 0;
+  for (const std::string &channel : readers_channel) {
+    PyList_SetItem(pyobj_list, pos, Py_BuildValue("s", channel.c_str()));
+    pos++;
+  }
+
+  return pyobj_list;
+}
+
+PyObject *cyber_PyNodeUtils_get_writersofnode(PyObject *self, PyObject *args) {
+  char *node_name = nullptr;
+  Py_ssize_t len = 0;
+  unsigned char sleep_s = 0;
+  if (!PyArg_ParseTuple(
+          args, const_cast<char *>("s#B:cyber_PyNodeUtils_get_writersofnode"),
+          &node_name, &len, &sleep_s)) {
+    AERROR << "cyber_PyNodeUtils_get_writersofnode failed!";
+    Py_INCREF(Py_None);
+    return Py_None;
+  }
+  std::string name(node_name, len);
+  std::vector<std::string> writers_channel =
+      apollo::cyber::PyNodeUtils::get_writersofnode(name, sleep_s);
+  PyObject *pyobj_list = PyList_New(writers_channel.size());
+  size_t pos = 0;
+  for (const std::string &channel : writers_channel) {
+    PyList_SetItem(pyobj_list, pos, Py_BuildValue("s", channel.c_str()));
+    pos++;
+  }
+
+  return pyobj_list;
+}
+
+PyObject *cyber_PyServiceUtils_get_active_services(PyObject *self,
+                                                   PyObject *args) {
+  unsigned char sleep_s = 0;
+  if (!PyArg_ParseTuple(
+          args,
+          const_cast<char *>("B:cyber_PyServiceUtils_get_active_services"),
+          &sleep_s)) {
+    AERROR << "cyber_PyServiceUtils_get_active_services failed!";
+    Py_INCREF(Py_None);
+    return Py_None;
+  }
+
+  std::vector<std::string> services_name =
+      apollo::cyber::PyServiceUtils::get_active_services(sleep_s);
+  PyObject *pyobj_list = PyList_New(services_name.size());
+  size_t pos = 0;
+  for (const std::string &name : services_name) {
+    PyList_SetItem(pyobj_list, pos, Py_BuildValue("s", name.c_str()));
+    pos++;
+  }
+
+  return pyobj_list;
+}
+
+PyObject *cyber_PyServiceUtils_get_service_attr(PyObject *self,
+                                                PyObject *args) {
+  char *srv_name = nullptr;
+  Py_ssize_t len = 0;
+  unsigned char sleep_s = 0;
+  if (!PyArg_ParseTuple(
+          args, const_cast<char *>("s#B:cyber_PyServiceUtils_get_service_attr"),
+          &srv_name, &len, &sleep_s)) {
+    AERROR << "cyber_PyServiceUtils_get_service_attr failed!";
+    Py_INCREF(Py_None);
+    return Py_None;
+  }
+  std::string name(srv_name, len);
+  std::string srv_attr =
+      apollo::cyber::PyServiceUtils::get_service_attr(name, sleep_s);
+  return PyString_FromStringAndSize(srv_attr.c_str(), srv_attr.size());
+}
 /////////////////////////////////////////////////////////////////////
 //// debug pyobject
 /////////////////////////////////////////////////////////////////////
@@ -778,6 +907,20 @@ static PyMethodDef _cyber_node_methods[] = {
     {"PyChannelUtils_get_active_channels",
      cyber_PyChannelUtils_get_active_channels, METH_VARARGS, ""},
     {"PyChannelUtils_get_channels_info", cyber_PyChannelUtils_get_channels_info,
+     METH_VARARGS, ""},
+
+    {"PyNodeUtils_get_active_nodes", cyber_PyNodeUtils_get_active_nodes,
+     METH_VARARGS, ""},
+    {"PyNodeUtils_get_node_attr", cyber_PyNodeUtils_get_node_attr, METH_VARARGS,
+     ""},
+    {"PyNodeUtils_get_readersofnode", cyber_PyNodeUtils_get_readersofnode,
+     METH_VARARGS, ""},
+    {"PyNodeUtils_get_writersofnode", cyber_PyNodeUtils_get_writersofnode,
+     METH_VARARGS, ""},
+
+    {"PyServiceUtils_get_active_services",
+     cyber_PyServiceUtils_get_active_services, METH_VARARGS, ""},
+    {"PyServiceUtils_get_service_attr", cyber_PyServiceUtils_get_service_attr,
      METH_VARARGS, ""},
 
     // for test

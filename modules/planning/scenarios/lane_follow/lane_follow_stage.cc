@@ -37,9 +37,9 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
 #include "modules/planning/tasks/deciders/lane_change_decider/lane_change_decider.h"
-#include "modules/planning/tasks/optimizers/path_decider/path_decider.h"
+#include "modules/planning/tasks/deciders/path_decider/path_decider.h"
+#include "modules/planning/tasks/deciders/speed_decider/speed_decider.h"
 #include "modules/planning/tasks/optimizers/path_time_heuristic/path_time_heuristic_optimizer.h"
-#include "modules/planning/tasks/optimizers/speed_decider/speed_decider.h"
 
 namespace apollo {
 namespace planning {
@@ -275,20 +275,26 @@ void LaneFollowStage::PlanFallbackTrajectory(
   }
 
   AERROR << "Speed fallback due to algorithm failure";
+  // TODO(Hongyi): refine the fall-back handling here.
+  // To use piecewise jerk speed fallback, stop distance here
+  // is an upper bound of s, not a target.
   // TODO(Jiacheng): move this stop_path_threshold to a gflag
-  const double stop_path_distance =
-      reference_line_info->path_data().discretized_path().Length() - 5.0;
-  const double stop_speed_distance =
+  const double path_stop_distance =
+      reference_line_info->path_data().discretized_path().Length();
+
+  const double obstacle_stop_distance =
       reference_line_info->st_graph_data().is_initialized()
           ? reference_line_info->st_graph_data().min_s_on_st_boundaries()
           : std::numeric_limits<double>::infinity();
+
   const double curr_speed_distance =
       FLAGS_fallback_total_time *
-      std::min(FLAGS_default_cruise_speed,
-               reference_line_info->vehicle_state().linear_velocity());
+      std::min({FLAGS_default_cruise_speed,
+                reference_line_info->vehicle_state().linear_velocity()});
+
   *reference_line_info->mutable_speed_data() =
       SpeedProfileGenerator::GenerateFallbackSpeed(std::min(
-          {curr_speed_distance, stop_path_distance, stop_speed_distance}));
+          {path_stop_distance, obstacle_stop_distance, curr_speed_distance}));
 
   if (reference_line_info->trajectory_type() != ADCTrajectory::PATH_FALLBACK) {
     reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
@@ -298,28 +304,54 @@ void LaneFollowStage::PlanFallbackTrajectory(
 
 void LaneFollowStage::GenerateFallbackPathProfile(
     const ReferenceLineInfo* reference_line_info, PathData* path_data) {
-  auto adc_point = EgoInfo::Instance()->start_point();
-  double adc_s = reference_line_info->AdcSlBoundary().end_s();
-  const double max_s = 150.0;
   const double unit_s = 1.0;
+  const auto& reference_line = reference_line_info->reference_line();
 
-  // projection of adc point onto reference line
-  const auto& adc_ref_point =
-      reference_line_info->reference_line().GetReferencePoint(adc_s);
-
+  auto adc_point = EgoInfo::Instance()->start_point();
   DCHECK(adc_point.has_path_point());
-  const double dx = adc_point.path_point().x() - adc_ref_point.x();
-  const double dy = adc_point.path_point().y() - adc_ref_point.y();
+  const auto adc_point_x = adc_point.path_point().x();
+  const auto adc_point_y = adc_point.path_point().y();
+
+  common::SLPoint adc_point_s_l;
+  if (!reference_line.XYToSL({adc_point_x, adc_point_y}, &adc_point_s_l)) {
+    AERROR << "Fail to project ADC to reference line when calculating path "
+              "fallback. Straight forward path is generated";
+    const auto adc_point_heading = adc_point.path_point().theta();
+    const auto adc_point_kappa = adc_point.path_point().kappa();
+    const auto adc_point_dkappa = adc_point.path_point().dkappa();
+    std::vector<common::PathPoint> path_points;
+    double adc_traversed_x = adc_point_x;
+    double adc_traversed_y = adc_point_y;
+
+    const double max_s = 100.0;
+    for (double s = 0; s < max_s; s += unit_s) {
+      common::PathPoint path_point = common::util::MakePathPoint(
+          adc_traversed_x, adc_traversed_y, 0.0, adc_point_heading,
+          adc_point_kappa, adc_point_dkappa, 0.0);
+      path_point.set_s(s);
+      path_points.push_back(std::move(path_point));
+      adc_traversed_x += unit_s * std::cos(adc_point_heading);
+      adc_traversed_y += unit_s * std::sin(adc_point_heading);
+    }
+    path_data->SetDiscretizedPath(DiscretizedPath(std::move(path_points)));
+    return;
+  }
+
+  // Generate a fallback path along the reference line direction
+  const auto adc_s = adc_point_s_l.s();
+  const auto& adc_ref_point =
+      reference_line.GetReferencePoint(adc_point_x, adc_point_y);
+  const double dx = adc_point_x - adc_ref_point.x();
+  const double dy = adc_point_y - adc_ref_point.y();
 
   std::vector<common::PathPoint> path_points;
+  const double max_s = reference_line.Length();
   for (double s = adc_s; s < max_s; s += unit_s) {
-    const auto& ref_point =
-        reference_line_info->reference_line().GetReferencePoint(adc_s);
+    const auto& ref_point = reference_line.GetReferencePoint(s);
     common::PathPoint path_point = common::util::MakePathPoint(
         ref_point.x() + dx, ref_point.y() + dy, 0.0, ref_point.heading(),
         ref_point.kappa(), ref_point.dkappa(), 0.0);
-    path_point.set_s(s);
-
+    path_point.set_s(s - adc_s);
     path_points.push_back(std::move(path_point));
   }
   path_data->SetDiscretizedPath(DiscretizedPath(std::move(path_points)));

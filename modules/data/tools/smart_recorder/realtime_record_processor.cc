@@ -31,6 +31,7 @@
 #include "cyber/record/record_message.h"
 #include "cyber/record/record_viewer.h"
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/monitor/common/monitor_manager.h"
 
 #include "modules/data/tools/smart_recorder/channel_pool.h"
 #include "modules/data/tools/smart_recorder/interval_pool.h"
@@ -42,10 +43,12 @@ namespace {
 
 using apollo::common::Header;
 using apollo::common::util::StrCat;
+using apollo::monitor::MonitorManager;
 using cyber::CreateNode;
 using cyber::common::EnsureDirectory;
 using cyber::common::GetFileName;
 using cyber::common::PathExists;
+using cyber::common::RemoveAllFiles;
 using cyber::record::HeaderBuilder;
 using cyber::record::Recorder;
 using cyber::record::RecordFileReader;
@@ -74,7 +77,10 @@ bool IsRecordValid(const std::string& record_path) {
     return false;
   }
   const std::unique_ptr<RecordFileReader> file_reader(new RecordFileReader());
-  file_reader->Open(record_path);
+  if (!file_reader->Open(record_path)) {
+    AERROR << "failed to open record file for checking header: " << record_path;
+    return false;
+  }
   const bool is_complete = file_reader->GetHeader().is_complete();
   file_reader->Close();
   return is_complete;
@@ -102,6 +108,10 @@ bool RealtimeRecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
       !EnsureDirectory(restored_output_dir_)) {
     AERROR << "unable to init input/output dir: " << source_record_dir_ << "/"
            << restored_output_dir_;
+    return false;
+  }
+  if (!RemoveAllFiles(source_record_dir_)) {
+    AERROR << "unable to clear input dir: " << source_record_dir_;
     return false;
   }
   // Init recorder
@@ -137,7 +147,8 @@ bool RealtimeRecordProcessor::Process() {
   // Recorder goes first
   recorder_->Start();
   PublishStatus(RecordingState::RECORDING, "smart recorder started");
-  std::shared_ptr<std::thread> monitor_thread_ =
+  MonitorManager::Instance()->LogBuffer().INFO("SmartRecorder is recording...");
+  std::shared_ptr<std::thread> monitor_thread =
       std::make_shared<std::thread>([this]() { this->MonitorStatus(); });
   // Now fast reader follows and reacts for any events
   std::string record_path;
@@ -146,8 +157,9 @@ bool RealtimeRecordProcessor::Process() {
       AINFO << "record reader " << record_path << " reached end, exit now";
       break;
     }
-    RecordViewer viewer(std::make_shared<RecordReader>(record_path), 0,
-                        UINT64_MAX, ChannelPool::Instance()->GetAllChannels());
+    auto reader = std::make_shared<RecordReader>(record_path);
+    RecordViewer viewer(reader, 0, UINT64_MAX,
+                        ChannelPool::Instance()->GetAllChannels());
     AINFO << "checking " << record_path << ": " << viewer.begin_time() << " - "
           << viewer.end_time();
     if (restore_reader_time_ == 0) {
@@ -164,11 +176,12 @@ bool RealtimeRecordProcessor::Process() {
   } while (!is_terminating_);
   // Try restore the rest of messages one last time
   RestoreMessage(UINT64_MAX);
-  if (monitor_thread_ && monitor_thread_->joinable()) {
-    monitor_thread_->join();
-    monitor_thread_ = nullptr;
+  if (monitor_thread && monitor_thread->joinable()) {
+    monitor_thread->join();
+    monitor_thread = nullptr;
   }
   PublishStatus(RecordingState::STOPPED, "smart recorder stopped");
+  MonitorManager::Instance()->LogBuffer().INFO("SmartRecorder is stopped");
   return true;
 }
 
@@ -184,10 +197,15 @@ void RealtimeRecordProcessor::MonitorStatus() {
     }
   }
   recorder_->Stop();
-  AINFO << "wait for a while trying to complete the restore work";
-  std::this_thread::sleep_for(std::chrono::milliseconds(recorder_wait_time_));
   is_terminating_ = true;
-  PublishStatus(RecordingState::RECORDING, "smart recorder terminating");
+  AINFO << "wait for a while trying to complete the restore work";
+  constexpr int kMessageInterval = 1000;
+  int interval_counter = 0;
+  while (++interval_counter * kMessageInterval < recorder_wait_time_) {
+    MonitorManager::Instance()->LogBuffer().WARN(
+        "SmartRecorder is terminating...");
+    std::this_thread::sleep_for(std::chrono::milliseconds(kMessageInterval));
+  }
 }
 
 void RealtimeRecordProcessor::PublishStatus(const RecordingState state,
@@ -239,9 +257,9 @@ void RealtimeRecordProcessor::RestoreMessage(const uint64_t message_time) {
           << restore_reader_time_ << " - " << target_end;
     auto reader = std::make_shared<RecordReader>(restore_path_);
     restore_reader_time_ =
-        std::max(restore_reader_time_, reader->header().begin_time());
+        std::max(restore_reader_time_, reader->GetHeader().begin_time());
     if (restore_reader_time_ > target_end ||
-        reader->header().begin_time() >= reader->header().end_time()) {
+        reader->GetHeader().begin_time() >= reader->GetHeader().end_time()) {
       AWARN << "record " << restore_path_ << " begin_time beyond target, exit";
       break;
     }
@@ -253,14 +271,16 @@ void RealtimeRecordProcessor::RestoreMessage(const uint64_t message_time) {
       if ((!small_channels_only && msg.time >= interval.begin_time &&
            msg.time <= interval.end_time) ||
           ShouldRestore(msg)) {
-        writer_->WriteChannel(msg.channel_name,
-                              reader->GetMessageType(msg.channel_name),
-                              reader->GetProtoDesc(msg.channel_name));
+        if (writer_->IsNewChannel(msg.channel_name)) {
+          writer_->WriteChannel(msg.channel_name,
+                                reader->GetMessageType(msg.channel_name),
+                                reader->GetProtoDesc(msg.channel_name));
+        }
         writer_->WriteMessage(msg.channel_name, msg.content, msg.time);
       }
     }
-    restore_reader_time_ = std::min(reader->header().end_time(), target_end);
-    if (target_end >= reader->header().end_time()) {
+    restore_reader_time_ = std::min(reader->GetHeader().end_time(), target_end);
+    if (target_end >= reader->GetHeader().end_time()) {
       GetNextValidRecord(&restore_path_);
     }
   } while (restore_reader_time_ < target_end);

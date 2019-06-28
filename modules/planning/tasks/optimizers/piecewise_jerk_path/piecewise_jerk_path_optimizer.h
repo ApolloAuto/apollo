@@ -53,6 +53,10 @@ class PiecewiseJerkPathOptimizer : public PathOptimizer {
                                       const std::vector<double>& ddl,
                                       const double delta_s,
                                       const double start_s) const;
+
+  double EstimateJerkBoundary(const double vehicle_speed,
+                              const double axis_distance,
+                              const double max_steering_rate) const;
 };
 
 }  // namespace planning

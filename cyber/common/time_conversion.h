@@ -85,7 +85,7 @@ template <typename T>
 T GpsToUnixSeconds(T gps_seconds) {
   for (size_t i = 0; i < LEAP_SECONDS.size(); ++i) {
     T result = gps_seconds + (UNIX_GPS_DIFF - LEAP_SECONDS[i].second);
-    if (result >= LEAP_SECONDS[i].first) {
+    if ((int32_t)result >= LEAP_SECONDS[i].first) {
       return result;
     }
   }
@@ -115,11 +115,11 @@ inline uint64_t GpsToUnixNanoseconds(uint64_t gps_nanoseconds) {
 inline uint64_t StringToUnixSeconds(
     const std::string& time_str,
     const std::string& format_str = "%Y-%m-%d %H:%M:%S") {
-  struct tm* tmp_time = (struct tm*)malloc(sizeof(struct tm));
-  strptime(time_str.c_str(), format_str.c_str(), tmp_time);
-  time_t time = mktime(tmp_time);
-  free(tmp_time);
-  return (uint64_t)time;
+  tm tmp_time;
+  strptime(time_str.c_str(), format_str.c_str(), &tmp_time);
+  tmp_time.tm_isdst = -1;
+  time_t time = mktime(&tmp_time);
+  return static_cast<uint64_t>(time);
 }
 
 inline std::string UnixSecondsToString(

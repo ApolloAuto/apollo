@@ -1,4 +1,4 @@
-sudo update-alternatives --remove-all gcc 
+sudo update-alternatives --remove-all gcc
 sudo update-alternatives --remove-all g++
 
 sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 50

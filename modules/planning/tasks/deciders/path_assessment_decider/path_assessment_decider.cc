@@ -19,13 +19,14 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <utility>
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/tasks/deciders/path_bounds_decider/path_bounds_decider.h"
-#include "modules/planning/tasks/deciders/path_decider_obstacle_utils.h"
+#include "modules/planning/tasks/deciders/utils/path_decider_obstacle_utils.h"
 
 namespace apollo {
 namespace planning {
@@ -90,7 +91,9 @@ Status PathAssessmentDecider::Process(
     SetPathInfo(*reference_line_info, &curr_path_data);
     // Trim all the lane-borrowing paths so that it ends with an in-lane
     // position.
-    TrimTailingOutLanePoints(&curr_path_data);
+    if (curr_path_data.path_label().find("pullover") == std::string::npos) {
+      TrimTailingOutLanePoints(&curr_path_data);
+    }
     // TODO(jiacheng): remove empty path_data.
 
     // RecordDebugInfo(curr_path_data, curr_path_data.path_label(),
@@ -107,8 +110,7 @@ Status PathAssessmentDecider::Process(
   ADEBUG << "There are " << valid_path_data.size() << " valid path data.";
   const auto& end_time2 = std::chrono::system_clock::now();
   diff = end_time2 - end_time1;
-  ADEBUG << "Time for path info labeling: " << diff.count() * 1000
-         << " msec.";
+  ADEBUG << "Time for path info labeling: " << diff.count() * 1000 << " msec.";
 
   // 3. Pick the optimal path.
   std::sort(valid_path_data.begin(), valid_path_data.end(),
@@ -181,7 +183,7 @@ Status PathAssessmentDecider::Process(
                 return lhs_on_reverse < rhs_on_reverse;
               }
               // If same length, both neighbor lane are forward,
-              // then select the one that returns back to in-lane earlier.
+              // then select the one that returns to in-lane earlier.
               constexpr double kBackToSelfLaneComparisonTolerance = 20.0;
               int lhs_back_idx =
                   GetBackToInLaneIndex(lhs.path_point_decision_guide());
@@ -229,7 +231,7 @@ Status PathAssessmentDecider::Process(
       new_candidate_path_data.push_back(curr_path_data);
     }
   }
-  reference_line_info->SetCandidatePathData(new_candidate_path_data);
+  reference_line_info->SetCandidatePathData(std::move(new_candidate_path_data));
 
   // 4. Update necessary info for lane-borrow decider's future uses.
   // Update front static obstacle's info.
@@ -305,8 +307,7 @@ Status PathAssessmentDecider::Process(
   }
   const auto& end_time4 = std::chrono::system_clock::now();
   diff = end_time4 - end_time3;
-  ADEBUG << "Time for FSM state updating: " << diff.count() * 1000
-         << " msec.";
+  ADEBUG << "Time for FSM state updating: " << diff.count() * 1000 << " msec.";
 
   // Plot the path in simulator for debug purpose.
   RecordDebugInfo(reference_line_info->path_data(), "Planning PathData",
@@ -366,9 +367,11 @@ void PathAssessmentDecider::SetPathInfo(
   //  - distance to the closest obstacle.
   std::vector<PathPointDecision> path_decision;
   InitPathPointDecision(*path_data, &path_decision);
-  SetPathPointType(reference_line_info, *path_data, &path_decision);
-  SetObstacleDistance(reference_line_info, *path_data, &path_decision);
-
+  if (path_data->path_label().find("fallback") == std::string::npos &&
+      path_data->path_label().find("self") == std::string::npos) {
+    SetPathPointType(reference_line_info, *path_data, &path_decision);
+  }
+  // SetObstacleDistance(reference_line_info, *path_data, &path_decision);
   path_data->SetPathPointDecisionGuide(path_decision);
 }
 
@@ -543,9 +546,11 @@ void PathAssessmentDecider::SetPathPointType(
                     ego_center_shift_distance * std::sin(ego_theta)};
     ego_box.Shift(shift_vec);
     SLBoundary ego_sl_boundary;
-    reference_line_info.reference_line().GetSLBoundary(ego_box,
-                                                       &ego_sl_boundary);
-
+    if (!reference_line_info.reference_line().GetSLBoundary(ego_box,
+                                                            &ego_sl_boundary)) {
+      ADEBUG << "Unable to get SL-boundary of ego-vehicle.";
+      continue;
+    }
     double lane_left_width = 0.0;
     double lane_right_width = 0.0;
     double middle_s =

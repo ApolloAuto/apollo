@@ -49,7 +49,7 @@ class JunctionMLPEvaluator : public Evaluator {
    * @brief Override Evaluate
    * @param Obstacle pointer
    */
-  void Evaluate(Obstacle* obstacle_ptr) override;
+  bool Evaluate(Obstacle* obstacle_ptr) override;
 
   /**
    * @brief Extract feature vector
@@ -90,12 +90,12 @@ class JunctionMLPEvaluator : public Evaluator {
                                 std::vector<double>* const feature_values);
 
   /**
-   * @brief Load mode file
+   * @brief Load model file
    */
   void LoadModel();
 
  private:
-  // obstacle feature with 4 basic features and 5 frames of history posotion
+  // obstacle feature with 4 basic features and 5 frames of history position
   static const size_t OBSTACLE_FEATURE_SIZE = 4 + 2 * 5;
   // ego vehicle feature of position and velocity
   static const size_t EGO_VEHICLE_FEATURE_SIZE = 4;

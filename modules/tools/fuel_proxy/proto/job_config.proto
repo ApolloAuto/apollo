@@ -1,0 +1,47 @@
+syntax = "proto2";
+
+package apollo.tools;
+
+// Baidu BOS is an S3-compatible object storage.
+// For more information, please visit https://cloud.baidu.com/doc/BOS/index.html
+message BosConfig {
+  optional string bucket = 1;
+  optional string access_key = 2;
+  optional string secret_key = 3;
+
+  // It's required to provide correct BOS region. Please read the document
+  // https://cloud.baidu.com/doc/BOS/S3.html#.E6.9C.8D.E5.8A.A1.E5.9F.9F.E5.90.8D
+  // and check your configuration.
+  enum Region {
+    bj = 0;
+    gz = 1;
+    su = 2;
+  }
+  optional Region region = 4 [default = bj];
+}
+
+// Accept exactly one storage access config. And we highly recommend the
+// principle of Least Privilege:
+// 1. Only grant access to this bucket.
+// 2. Only grant access to required paths.
+message Storage {
+  oneof storage_config {
+    BosConfig bos = 1;
+  }
+}
+
+message JobConfig {
+  enum JobType {
+    UNKNOWN = 0;
+    VEHICLE_CALIBRATION = 1;
+  }
+  optional JobType job_type = 1;
+  // You must have an assigned partner ID to use the service. Contact our BD
+  // department for more information.
+  optional string partner_id = 2;
+
+  optional Storage storage = 3;
+  // 1. For object storage like BOS and S3, the path should be a key.
+  // 2. If not provided, we'll take the storage root as data path.
+  optional string input_data_path = 4;
+}

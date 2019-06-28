@@ -41,14 +41,16 @@ struct CipvOptions {
   float yaw_angle = 0.0f;
 };
 
-constexpr float kMaxDistObjectToLaneInMeter = 20.0f;
-constexpr uint32_t kMaxNumVirtualLanePoint = 25;
-const std::size_t kDropsHistorySize = 100;
+constexpr float kMinVelocity = 15.0f;  // in m/s
+constexpr float kMaxDistObjectToLaneInMeter = 70.0f;
+constexpr float kMaxDistObjectToLaneInPixel = 10.0f;
+const std::size_t kDropsHistorySize = 20;
 const std::size_t kMaxObjectNum = 100;
 const std::size_t kMaxAllowedSkipObject = 10;
 
+static constexpr uint32_t kMaxNumVirtualLanePoint = 25;
 // TODO(All) average image frame rate should come from other header file.
-const float kAverageFrameRate = 0.05f;
+static constexpr float kAverageFrameRate = 0.05f;
 
 class Cipv {
   // Member functions
@@ -73,7 +75,18 @@ class Cipv {
 
   // Collect drops for tailgating
   bool CollectDrops(const base::MotionBufferPtr &motion_buffer,
+                    const Eigen::Affine3d &world2camera,
                     std::vector<std::shared_ptr<base::Object>> *objects);
+
+  static float VehicleDynamics(const uint32_t tick, const float yaw_rate,
+                               const float velocity, const float time_unit,
+                               float *x, float *y);
+  // Make a virtual lane line using a yaw_rate
+  static bool MakeVirtualEgoLaneFromYawRate(const float yaw_rate,
+                                            const float velocity,
+                                            const float offset_distance,
+                                            LaneLineSimple *left_lane_line,
+                                            LaneLineSimple *right_lane_line);
 
  private:
   // Distance from a point to a line segment
@@ -92,11 +105,14 @@ class Cipv {
                        const bool b_left_valid, const bool b_right_valid,
                        const float yaw_rate, const float velocity,
                        EgoLane *egolane_image, EgoLane *egolane_ground);
+  bool CreateVirtualEgoLane(const float yaw_rate, const float velocity,
+                            EgoLane *egolane_ground);
 
   // Get closest edge of an object in image coordinate
   bool FindClosestObjectImage(const std::shared_ptr<base::Object> &object,
                               const EgoLane &egolane_image,
-                              LineSegment2Df *closted_object_edge);
+                              LineSegment2Df *closted_object_edge,
+                              float *distance);
 
   // Get closest edge of an object in ground coordinate
   bool FindClosestObjectGround(const std::shared_ptr<base::Object> &object,
@@ -144,15 +160,6 @@ class Cipv {
                        const float yaw_rate, const float offset_distance,
                        LaneLineSimple *virtual_lane_line);
 
-  float VehicleDynamics(const uint32_t tick, const float yaw_rate,
-                        const float velocity, const float time_unit, float *x,
-                        float *y);
-  // Make a virtual lane line using a yaw_rate
-  bool MakeVirtualEgoLaneFromYawRate(const float yaw_rate, const float velocity,
-                                     const float offset_distance,
-                                     LaneLineSimple *left_lane_line,
-                                     LaneLineSimple *right_lane_line);
-
   // transform point to another using motion
   bool TranformPoint(const Eigen::VectorXf &in,
                      const Eigen::Matrix4f &motion_matrix,
@@ -178,7 +185,8 @@ class Cipv {
   float half_virtual_egolane_width_in_meter_ =
       single_virtual_egolane_width_in_meter_ * 0.5f;
   float half_vehicle_width_in_meter_ = kMaxVehicleWidthInMeter * 0.5f;
-  float max_dist_object_to_lane_in_meter = kMaxDistObjectToLaneInMeter;
+  float max_dist_object_to_lane_in_meter_ = kMaxDistObjectToLaneInMeter;
+  float max_dist_object_to_lane_in_pixel_ = kMaxDistObjectToLaneInPixel;
   float MAX_VEHICLE_WIDTH_METER = 5.0f;
   float EPSILON = 1.0e-6f;
   std::size_t kDropsHistorySize = 100;

@@ -22,10 +22,15 @@ message ModelParam {
     optional uint32 mean_r = 12 [default = 96];
     optional bool is_bgr = 13 [default = true];
     optional float confidence_threshold = 14 [default = 0.5];
-    optional string model_type = 15 [default = "CaffeNet"];
+    optional float vpt_mean_dx = 15 [default = 0.0];
+    optional float vpt_mean_dy = 16 [default = -77.284];
+    optional float vpt_std_dx = 17 [default = 103.109];
+    optional float vpt_std_dy = 18 [default = 95.273];
+    optional string model_type = 19 [default = "CaffeNet"];
 }
 
 message NetworkParam {
     optional string seg_blob = 1 [default = "softmax"];
-    optional string input_blob = 2 [default = "data"];
+    optional string vpt_blob = 2 [default = "fc_out"];
+    optional string input_blob = 3 [default = "data"];
 }

@@ -6,6 +6,9 @@ cc_library(
     name = "single_lane_predictor",
     srcs = ["single_lane_predictor.cc"],
     hdrs = ["single_lane_predictor.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/predictor/sequence:sequence_predictor",
     ],

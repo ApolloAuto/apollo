@@ -20,6 +20,7 @@
 
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -27,11 +28,17 @@ namespace prediction {
 using ::apollo::common::TrajectoryPoint;
 using ::apollo::perception::PerceptionObstacle;
 
+FreeMovePredictor::FreeMovePredictor() {
+  predictor_type_ = ObstacleConf::FREE_MOVE_PREDICTOR;
+}
+
 void FreeMovePredictor::Predict(Obstacle* obstacle) {
   Clear();
 
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
+
+  obstacle->SetPredictorType(predictor_type_);
 
   const Feature& feature = obstacle->latest_feature();
 
@@ -42,30 +49,64 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
     return;
   }
 
-  Eigen::Vector2d position(feature.position().x(), feature.position().y());
-  Eigen::Vector2d velocity(feature.velocity().x(), feature.velocity().y());
-  Eigen::Vector2d acc(feature.acceleration().x(), feature.acceleration().y());
-  double theta = feature.velocity_heading();
-
-  std::vector<TrajectoryPoint> points(0);
   double prediction_total_time = FLAGS_prediction_trajectory_time_length;
   if (obstacle->type() == PerceptionObstacle::PEDESTRIAN) {
     prediction_total_time = FLAGS_prediction_trajectory_time_length;
   }
-  DrawFreeMoveTrajectoryPoints(
-      position, velocity, acc, theta, prediction_total_time,
-      FLAGS_prediction_trajectory_time_resolution, &points);
 
-  Trajectory trajectory = GenerateTrajectory(points);
-  obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
-      trajectory);
-  SetEqualProbability(1.0, 0, obstacle);
+  if (feature.predicted_trajectory().empty()) {
+    std::vector<TrajectoryPoint> points;
+    Eigen::Vector2d position(feature.position().x(), feature.position().y());
+    Eigen::Vector2d velocity(feature.velocity().x(), feature.velocity().y());
+    Eigen::Vector2d acc(feature.acceleration().x(), feature.acceleration().y());
+    double theta = feature.velocity_heading();
+
+    DrawFreeMoveTrajectoryPoints(
+        position, velocity, acc, theta, 0.0, prediction_total_time,
+        FLAGS_prediction_trajectory_time_resolution, &points);
+
+    Trajectory trajectory = GenerateTrajectory(points);
+    obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
+        trajectory);
+    SetEqualProbability(1.0, 0, obstacle);
+  } else {
+    for (int i = 0; i < feature.predicted_trajectory_size(); ++i) {
+      Trajectory* trajectory =
+          obstacle->mutable_latest_feature()->mutable_predicted_trajectory(i);
+      int traj_size = trajectory->trajectory_point_size();
+      if (traj_size == 0) {
+        AERROR << "Empty predicted trajectory found";
+        continue;
+      }
+      std::vector<TrajectoryPoint> points;
+      const TrajectoryPoint& last_point =
+          trajectory->trajectory_point(traj_size - 1);
+      double theta = last_point.path_point().theta();
+      Eigen::Vector2d position(last_point.path_point().x(),
+                               last_point.path_point().y());
+      Eigen::Vector2d velocity(last_point.v() * std::cos(theta),
+                               last_point.v() * std::sin(theta));
+      Eigen::Vector2d acc(last_point.a() * std::cos(theta),
+                          last_point.a() * std::sin(theta));
+      double last_relative_time = last_point.relative_time();
+      DrawFreeMoveTrajectoryPoints(
+          position, velocity, acc, theta, last_relative_time,
+          prediction_total_time - last_relative_time,
+          FLAGS_prediction_trajectory_time_resolution, &points);
+      // The following for-loop starts from index 1 because the vector points
+      // includes the last point in the existing predicted trajectory
+      for (size_t i = 1; i < points.size(); ++i) {
+        trajectory->add_trajectory_point()->CopyFrom(points[i]);
+      }
+    }
+  }
 }
 
 void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
     const Eigen::Vector2d& position, const Eigen::Vector2d& velocity,
-    const Eigen::Vector2d& acc, const double theta, const double total_time,
-    const double period, std::vector<TrajectoryPoint>* points) {
+    const Eigen::Vector2d& acc, const double theta, const double start_time,
+    const double total_time, const double period,
+    std::vector<TrajectoryPoint>* points) {
   Eigen::Matrix<double, 6, 1> state;
   state.setZero();
   state(0, 0) = 0.0;
@@ -88,7 +129,7 @@ void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(
 
   size_t num = static_cast<size_t>(total_time / period);
   ::apollo::prediction::predictor_util::GenerateFreeMoveTrajectoryPoints(
-      &state, transition, theta, num, period, points);
+      &state, transition, theta, start_time, num, period, points);
 
   for (size_t i = 0; i < points->size(); ++i) {
     ::apollo::prediction::predictor_util::TranslatePoint(

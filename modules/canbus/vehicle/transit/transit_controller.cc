@@ -228,12 +228,15 @@ Chassis TransitController::chassis() {
       case Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_LEFT:
         chassis_.mutable_signal()->set_turn_signal(
             common::VehicleSignal::TURN_LEFT);
+        break;
       case Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_RIGHT:
         chassis_.mutable_signal()->set_turn_signal(
             common::VehicleSignal::TURN_RIGHT);
+        break;
       case Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_NONE:
         chassis_.mutable_signal()->set_turn_signal(
             common::VehicleSignal::TURN_NONE);
+        break;
       default:
         break;
     }
@@ -597,7 +600,7 @@ void TransitController::SecurityDogThreadFunc() {
 }
 
 bool TransitController::CheckResponse() {
-  // TODO(Udelv): Add seperate indicators
+  // TODO(Udelv): Add separate indicators
   ChassisDetail chassis_detail;
   if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
     AERROR_EVERY(100) << "get chassis detail failed.";

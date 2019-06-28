@@ -198,7 +198,7 @@ bool DualVariableWarmStartOSQPInterface::optimize() {
   // check state
   if (work->info->status_val != 1 && work->info->status_val != 2) {
     AWARN << "OSQP dual warm up unsuccess, "
-           << "return status: " << work->info->status;
+          << "return status: " << work->info->status;
     succ = false;
   }
 

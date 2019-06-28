@@ -65,8 +65,8 @@ stage_config: {
     task_config: {
         task_type: RULE_BASED_STOP_DECIDER
     }
-
 }
+
 stage_config: {
     stage_type: VALET_PARKING_PARKING
     enabled: true
@@ -78,6 +78,7 @@ stage_config: {
         task_type: OPEN_SPACE_ROI_DECIDER
         open_space_roi_decider_config {
             roi_type: PARKING
+            perception_obstacle_buffer: 0.2
         }
     }
     task_config: {
@@ -85,6 +86,13 @@ stage_config: {
     }
     task_config: {
         task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+        open_space_trajectory_partition_config {
+            heading_offset_to_midpoint: 0.79
+            lateral_offset_to_midpoint: 0.5
+            longitudinal_offset_to_midpoint: 0.2
+            vehicle_box_iou_threshold_to_midpoint: 0.6
+            linear_velocity_threshold_on_ego: 0.1
+        }
     }
     task_config: {
         task_type: OPEN_SPACE_FALLBACK_DECIDER

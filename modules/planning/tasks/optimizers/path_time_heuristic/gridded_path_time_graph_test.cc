@@ -73,10 +73,6 @@ class DpStGraphTest : public ::testing::Test {
     for (double s = 0; s < 200.0; s += 1.0) {
       speed_limit_.AppendSpeedLimit(s, 25.0);
     }
-    // soft_speed_limit:
-    for (double s = 0; s < 200.0; s += 1.0) {
-      speed_limit_.AppendSoftSpeedLimit(s, 25.0);
-    }
   }
 
   virtual void TearDown() {}
@@ -112,10 +108,10 @@ TEST_F(DpStGraphTest, simple) {
   point_pairs.emplace_back(lower_points[0], upper_points[0]);
   point_pairs.emplace_back(lower_points[1], upper_points[1]);
 
-  obstacle_list_.back().SetStBoundary(STBoundary(point_pairs));
+  obstacle_list_.back().set_path_st_boundary(STBoundary(point_pairs));
 
   std::vector<const STBoundary*> boundaries;
-  boundaries.push_back(&(obstacles_.back()->st_boundary()));
+  boundaries.push_back(&(obstacles_.back()->path_st_boundary()));
 
   init_point_.mutable_path_point()->set_x(0.0);
   init_point_.mutable_path_point()->set_y(0.0);
@@ -124,13 +120,11 @@ TEST_F(DpStGraphTest, simple) {
   init_point_.set_v(10.0);
   init_point_.set_a(0.0);
 
-  const double path_data_length = 120.0;
-
   planning_internal::STGraphDebug st_graph_debug;
 
   st_graph_data_ = StGraphData();
-  st_graph_data_.LoadData(boundaries, 30.0, init_point_, speed_limit_,
-                          path_data_length, 120, 7.0, &st_graph_debug);
+  st_graph_data_.LoadData(boundaries, 30.0, init_point_, speed_limit_, 120.0,
+                          7.0, &st_graph_debug);
 
   GriddedPathTimeGraph dp_st_graph(st_graph_data_, dp_config_, obstacles_,
                                    init_point_);

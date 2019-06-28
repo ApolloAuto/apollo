@@ -19,20 +19,34 @@
 # Fail on first error.
 set -e
 
-# Install Java8.
-add-apt-repository -y ppa:webupd8team/java
-echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | sudo debconf-set-selections
-echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
-curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
-
-apt-get update -y
-apt-get install -y oracle-java8-installer
-
-# Install Bazel.
 cd "$(dirname "${BASH_SOURCE[0]}")"
-wget https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-installer-linux-x86_64.sh
-bash bazel-0.5.3-installer-linux-x86_64.sh
 
-# Clean up.
-apt-get clean && rm -rf /var/lib/apt/lists/*
-rm -fr bazel-0.5.3-installer-linux-x86_64.sh /etc/apt/sources.list.d/bazel.list
+ARCH=$(uname -m)
+
+if [ "$ARCH" == "x86_64" ]; then
+  apt-get update -y
+  apt-get install -y openjdk-8-jdk
+  wget https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-installer-linux-x86_64.sh
+  bash bazel-0.5.3-installer-linux-x86_64.sh
+elif [ "$ARCH" == "aarch64" ]; then
+  BUILD=$1
+  shift
+  if [ "$BUILD" == "build" ]; then
+    mkdir -p bazel
+    pushd bazel
+    wget https://github.com/bazelbuild/bazel/releases/download/0.5.3/bazel-0.5.3-dist.zip
+    unzip bazel-0.5.3-dist.zip
+    chmod a+w src/java_tools/buildjar/java/com/google/devtools/build/buildjar/javac/plugins/errorprone/ErrorPronePlugin.java
+    wget https://apollocache.blob.core.windows.net/apollo-cache/ErrorPronePlugin.java.patch
+    patch -p0 < ./ErrorPronePlugin.java.patch
+    env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
+    mv /tmp/installers/bazel/output/bazel /usr/local/bin/
+    popd
+  else
+    wget https://apollocache.blob.core.windows.net/apollo-cache/bazel
+    cp bazel /usr/local/bin/
+    chmod a+x /usr/local/bin/bazel
+  fi
+else
+    echo "not support $ARCH"
+fi

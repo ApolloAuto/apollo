@@ -18,7 +18,7 @@ warm_start_config {
   s_curve_config {
     acc_weight: 1.0
     jerk_weight: 0.0
-    kappa_penalty_weight: 100.0
+    dkappa_penalty_weight: 100.0
     ref_s_weight: 0.1
     ref_v_weight: 0.0
   }
@@ -55,6 +55,7 @@ distance_approach_config {
   weight_a_stitching: 3.25
   weight_first_order_time: 4.25
   weight_second_order_time: 13.5
+  weight_end_state: 1.0
   min_safety_distance: 0.0
   max_speed_forward: 2.0
   max_speed_reverse: 1.0
@@ -82,6 +83,7 @@ distance_approach_config {
   enable_derivative_check: false
   enable_initial_final_check: false
   distance_approach_mode: DISTANCE_APPROACH_IPOPT
+  enable_check_initial_state: false
 }
 trajectory_partition_config {
   interpolated_pieces_num: 50
@@ -91,7 +93,43 @@ trajectory_partition_config {
   gear_shift_max_t: 3.0
   gear_shift_unit_t: 0.02
 }
+iterative_anchoring_smoother_config {
+  interpolated_delta_s: 0.1
+  reanchoring_trails_num: 50
+  reanchoring_pos_stddev: 0.25
+  reanchoring_length_stddev: 1.0
+  estimate_bound: false
+  default_bound: 2.0
+  vehicle_shortest_dimension: 1.04
+  fem_pos_deviation_smoother_config {
+     weight_fem_pos_deviation: 1e8
+     weight_path_length: 1.0
+     weight_ref_deviation: 1e3
+     apply_curvature_constraint: false
+     weight_curvature_constraint_slack_var: 1e8
+     curvature_constraint: 0.2
+     max_iter: 500
+     time_limit: 0.0
+     verbose: false
+     scaled_termination: true
+     warm_start: true
+  }
+  collision_decrease_ratio: 0.9
+  max_forward_v: 2.0
+  max_reverse_v: 2.0
+  max_forward_acc: 3.0
+  max_reverse_acc: 2.0
+  max_acc_jerk: 4.0
+  delta_t: 0.2
+  s_curve_config {
+    acc_weight: 1.0
+    jerk_weight: 1.0
+    dkappa_penalty_weight: 100.0
+    ref_s_weight: 10.0
+    ref_v_weight: 0.0
+  }
+}
 delta_t: 0.5
-max_position_error_to_end_point: 0.05
-max_theta_error_to_end_point: 0.05
 is_near_destination_threshold: 0.05
+enable_check_parallel_trajectory: false
+enable_linear_interpolation: false

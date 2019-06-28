@@ -10,6 +10,9 @@ cc_library(
     hdrs = [
         "mlp_evaluator.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/common:feature_output",
         "//modules/prediction/common:prediction_util",
@@ -45,6 +48,9 @@ cc_library(
     hdrs = [
         "rnn_evaluator.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/evaluator",
     ],
@@ -75,6 +81,9 @@ cc_library(
     ],
     hdrs = [
         "cost_evaluator.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
         "//modules/prediction/common:prediction_util",
@@ -107,6 +116,9 @@ cc_library(
     ],
     hdrs = [
         "junction_mlp_evaluator.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
         "//modules/common/math:geometry",
@@ -143,12 +155,40 @@ cc_test(
 )
 
 cc_library(
+    name = "junction_map_evaluator",
+    srcs = [
+        "junction_map_evaluator.cc",
+    ],
+    hdrs = [
+        "junction_map_evaluator.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
+    deps = [
+        "//modules/prediction/common:prediction_util",
+        "//modules/prediction/common:semantic_map",
+        "//modules/prediction/evaluator",
+    ] + select({
+        "//tools/platforms:use_gpu": [
+            "@pytorch",
+        ],
+        "//conditions:default": [
+            "@pytorch",
+        ],
+    }),
+)
+
+cc_library(
     name = "cruise_mlp_evaluator",
     srcs = [
         "cruise_mlp_evaluator.cc",
     ],
     hdrs = [
         "cruise_mlp_evaluator.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
         "//modules/prediction/common:prediction_util",
@@ -187,6 +227,33 @@ cc_library(
     ],
     hdrs = [
         "lane_scanning_evaluator.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
+    deps = [
+        "//modules/prediction/container:container_manager",
+        "//modules/prediction/evaluator",
+    ] + select({
+        "//tools/platforms:use_gpu": [
+            "@pytorch",
+        ],
+        "//conditions:default": [
+            "@pytorch",
+        ],
+    }),
+)
+
+cc_library(
+    name = "lane_aggregating_evaluator",
+    srcs = [
+        "lane_aggregating_evaluator.cc",
+    ],
+    hdrs = [
+        "lane_aggregating_evaluator.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
         "//modules/prediction/container:container_manager",

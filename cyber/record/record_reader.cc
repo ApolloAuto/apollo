@@ -32,6 +32,7 @@ RecordReader::RecordReader(const std::string& file) {
     AERROR << "Failed to open record file: " << file;
     return;
   }
+  chunk_.reset(new ChunkBody());
   is_valid_ = true;
   header_ = file_reader_->GetHeader();
   if (file_reader_->ReadIndex()) {
@@ -57,7 +58,7 @@ void RecordReader::Reset() {
   file_reader_->Reset();
   reach_end_ = false;
   message_index_ = 0;
-  chunk_ = ChunkBody();
+  chunk_.reset(new ChunkBody());
 }
 
 std::set<std::string> RecordReader::GetChannelList() const {
@@ -78,8 +79,8 @@ bool RecordReader::ReadMessage(RecordMessage* message, uint64_t begin_time,
     return false;
   }
 
-  while (message_index_ < chunk_.messages_size()) {
-    const auto& next_message = chunk_.messages(message_index_);
+  while (message_index_ < chunk_->messages_size()) {
+    const auto& next_message = chunk_->messages(message_index_);
     uint64_t time = next_message.time();
     if (time > end_time) {
       return false;
@@ -149,7 +150,9 @@ bool RecordReader::ReadNextChunk(uint64_t begin_time, uint64_t end_time) {
           skip_next_chunk_body = false;
           break;
         }
-        if (!file_reader_->ReadSection<ChunkBody>(section.size, &chunk_)) {
+
+        chunk_.reset(new ChunkBody());
+        if (!file_reader_->ReadSection<ChunkBody>(section.size, chunk_.get())) {
           AERROR << "Failed to read chunk body section.";
           return false;
         }

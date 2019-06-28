@@ -28,7 +28,7 @@ class CostEvaluator : public Evaluator {
   /**
    * @brief Constructor
    */
-  CostEvaluator() = default;
+  CostEvaluator();
 
   /**
    * @brief Destructor
@@ -39,7 +39,7 @@ class CostEvaluator : public Evaluator {
    * @brief Override Evaluate
    * @param Obstacle pointer
    */
-  void Evaluate(Obstacle* obstacle_ptr) override;
+  bool Evaluate(Obstacle* obstacle_ptr) override;
 
   /**
    * @brief Get the name of evaluator.

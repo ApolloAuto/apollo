@@ -77,7 +77,7 @@ common::Status AutotuningRawFeatureGenerator::EvaluateSpeedPoint(
   speed_feature->set_j(speed_point.da());
 
   // get speed limit at certain s();
-  if (speed_limit_.MinValidS() > s) {
+  if (speed_limit_.speed_limit_points().front().first > s) {
     speed_feature->set_speed_limit(kDefaultSpeedLimit);
   } else {
     double cur_speed_limit = speed_limit_.GetSpeedLimitByS(s);
@@ -150,9 +150,9 @@ void AutotuningRawFeatureGenerator::GenerateSTBoundaries(
   for (auto* obstacle : path_decision.obstacles().Items()) {
     auto id = obstacle->Id();
     const double speed = obstacle->speed();
-    if (!obstacle->st_boundary().IsEmpty()) {
+    if (!obstacle->path_st_boundary().IsEmpty()) {
       // fill discretized boundary info
-      ConvertToDiscretizedBoundaries(obstacle->st_boundary(), speed);
+      ConvertToDiscretizedBoundaries(obstacle->path_st_boundary(), speed);
     }
   }
 }

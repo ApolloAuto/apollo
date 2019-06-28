@@ -11,6 +11,7 @@ proto_library(
     name = "canbus_proto_lib",
     srcs = [
         "canbus_conf.proto",
+        "ch.proto",
         "chassis.proto",
         "chassis_detail.proto",
         "ge3.proto",

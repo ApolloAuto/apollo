@@ -28,7 +28,6 @@ DECLARE_string(scenario_bare_intersection_unprotected_config_file);
 DECLARE_string(scenario_lane_follow_config_file);
 DECLARE_string(scenario_narrow_street_u_turn_config_file);
 DECLARE_string(scenario_pull_over_config_file);
-DECLARE_string(scenario_side_pass_config_file);
 DECLARE_string(scenario_stop_sign_unprotected_config_file);
 DECLARE_string(scenario_traffic_light_protected_config_file);
 DECLARE_string(scenario_traffic_light_unprotected_left_turn_config_file);
@@ -38,10 +37,12 @@ DECLARE_string(scenario_valet_parking_config_file);
 
 DECLARE_bool(enable_scenario_bare_intersection);
 DECLARE_bool(enable_scenario_pull_over);
-DECLARE_double(side_pass_min_signal_intersection_distance);
-DECLARE_bool(enable_scenario_side_pass_multiple_parked_obstacles);
 DECLARE_bool(enable_scenario_stop_sign);
 DECLARE_bool(enable_scenario_traffic_light);
+DECLARE_bool(enable_pull_over_exit);
+
+DECLARE_bool(enable_scenario_side_pass_multiple_parked_obstacles);
+DECLARE_bool(enable_force_pull_over_open_space_parking_test);
 
 DECLARE_string(traffic_rule_config_filename);
 DECLARE_string(smoother_config_filename);
@@ -53,7 +54,6 @@ DECLARE_double(rtk_trajectory_resolution);
 DECLARE_bool(enable_reference_line_stitching);
 DECLARE_double(look_forward_extend_distance);
 DECLARE_double(reference_line_stitch_overlap_distance);
-DECLARE_double(reference_line_lateral_buffer);
 
 DECLARE_bool(enable_smooth_reference_line);
 
@@ -131,9 +131,13 @@ DECLARE_double(signal_light_min_pass_s_distance);
 DECLARE_double(signal_expire_time_sec);
 DECLARE_bool(enable_side_radar);
 
+// Path Deciders
 DECLARE_double(obstacle_lat_buffer);
 DECLARE_double(obstacle_lon_start_buffer);
 DECLARE_double(obstacle_lon_end_buffer);
+DECLARE_double(static_obstacle_speed_threshold);
+DECLARE_double(lane_borrow_max_speed);
+DECLARE_int32(long_term_blocking_obstacle_cycle_threhold);
 
 DECLARE_string(destination_obstacle_id);
 DECLARE_double(destination_check_distance);
@@ -170,7 +174,7 @@ DECLARE_bool(enable_auto_tuning);
 DECLARE_double(trajectory_time_resolution);
 DECLARE_double(trajectory_space_resolution);
 DECLARE_double(lateral_acceleration_bound);
-DECLARE_double(decision_horizon);
+DECLARE_double(speed_lon_decision_horizon);
 DECLARE_uint64(num_velocity_sample);
 DECLARE_bool(enable_backup_trajectory);
 DECLARE_double(backup_trajectory_cost);
@@ -238,12 +242,8 @@ DECLARE_bool(use_gear_shift_trajectory);
 DECLARE_uint64(open_space_trajectory_stitching_preserved_length);
 DECLARE_bool(enable_smoother_failsafe);
 DECLARE_bool(use_s_curve_speed_smooth);
+DECLARE_bool(use_iterative_anchoring_smoother);
 DECLARE_bool(enable_parallel_trajectory_smoothing);
-
-// pull-over
-DECLARE_double(destination_to_adc_buffer);
-DECLARE_double(destination_to_pathend_buffer);
-DECLARE_double(pull_over_road_edge_buffer);
 
 DECLARE_bool(use_osqp_optimizer_for_reference_line);
 DECLARE_bool(enable_osqp_debug);
@@ -260,24 +260,16 @@ DECLARE_double(rss_max_front_obstacle_distance);
 DECLARE_bool(enable_planning_smoother);
 DECLARE_double(smoother_stop_distance);
 
-DECLARE_double(side_pass_road_buffer);
-DECLARE_double(side_pass_obstacle_l_buffer);
-DECLARE_double(side_pass_obstacle_s_buffer);
-DECLARE_double(side_pass_extra_road_buffer_during_turning);
-DECLARE_double(side_pass_vehicle_buffer);
-DECLARE_double(side_pass_off_road_center_threshold);
-DECLARE_double(side_pass_trim_watch_window);
-DECLARE_bool(side_pass_use_actual_laneinfo_for_path_generation);
 DECLARE_double(side_pass_driving_width_l_buffer);
 
 DECLARE_bool(enable_parallel_hybrid_a);
 
 DECLARE_double(vehicle_low_speed_threshold);
+DECLARE_double(open_space_standstill_acceleration);
 
 DECLARE_bool(enable_cuda);
 
 DECLARE_bool(enable_nonscenario_side_pass);
-DECLARE_bool(enable_soft_speed_limit);
 DECLARE_bool(enable_dp_reference_speed);
 
 DECLARE_double(message_latency_threshold);

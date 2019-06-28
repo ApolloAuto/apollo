@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "map_service.h",
     ],
+    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     linkopts = [
         "-lboost_thread",
     ],

@@ -6,6 +6,9 @@ cc_library(
     name = "lane_sequence_predictor",
     srcs = ["lane_sequence_predictor.cc"],
     hdrs = ["lane_sequence_predictor.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/common:validation_checker",
         "//modules/prediction/predictor/sequence:sequence_predictor",

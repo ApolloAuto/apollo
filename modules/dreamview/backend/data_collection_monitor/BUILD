@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "data_collection_monitor.h",
     ],
+    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
         "//cyber",
         "//modules/canbus/proto:canbus_proto",

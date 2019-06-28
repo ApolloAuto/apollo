@@ -44,7 +44,7 @@ class CruiseMLPEvaluator : public Evaluator {
    * @brief Override Evaluate
    * @param Obstacle pointer
    */
-  void Evaluate(Obstacle* obstacle_ptr) override;
+  bool Evaluate(Obstacle* obstacle_ptr) override;
 
   /**
    * @brief Extract feature vector
@@ -92,7 +92,7 @@ class CruiseMLPEvaluator : public Evaluator {
                             std::vector<double>* feature_values);
 
   /**
-   * @brief Load mode files
+   * @brief Load model files
    */
   void LoadModels();
 

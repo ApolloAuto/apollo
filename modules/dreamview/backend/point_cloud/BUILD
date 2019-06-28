@@ -10,6 +10,7 @@ cc_library(
     hdrs = [
         "point_cloud_updater.h",
     ],
+    copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     linkopts = [
         "-lboost_thread",
     ],

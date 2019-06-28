@@ -23,11 +23,12 @@
 #include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/software/summary_monitor.h"
 
-DEFINE_string(recorder_monitor_name, "RecorderMonitor",
-              "Name of the recorder monitor.");
-DEFINE_double(recorder_monitor_interval, 5,
-              "Recorder status checking interval (s).");
-DEFINE_string(recorder_component_name, "Recorder", "Recorder component name.");
+DEFINE_string(smart_recorder_monitor_name, "SmartRecorderMonitor",
+              "Name of the smart recorder monitor.");
+DEFINE_double(smart_recorder_monitor_interval, 5,
+              "Smart recorder status checking interval (s).");
+DEFINE_string(smart_recorder_component_name, "SmartRecorder",
+              "Smart recorder component name.");
 
 namespace apollo {
 namespace monitor {
@@ -37,16 +38,16 @@ using apollo::data::RecordingState;
 using apollo::data::SmartRecorderStatus;
 
 RecorderMonitor::RecorderMonitor()
-    : RecurrentRunner(FLAGS_recorder_monitor_name,
-                      FLAGS_recorder_monitor_interval) {}
+    : RecurrentRunner(FLAGS_smart_recorder_monitor_name,
+                      FLAGS_smart_recorder_monitor_interval) {}
 
 void RecorderMonitor::RunOnce(const double current_time) {
   auto manager = MonitorManager::Instance();
   auto* component = apollo::common::util::FindOrNull(
       *manager->GetStatus()->mutable_components(),
-      FLAGS_recorder_component_name);
+      FLAGS_smart_recorder_component_name);
   if (component == nullptr) {
-    // Recorder is not monitored in current mode, skip.
+    // SmartRecorder is not monitored in current mode, skip.
     return;
   }
 

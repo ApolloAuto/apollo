@@ -25,6 +25,7 @@
 namespace apollo {
 namespace prediction {
 
+using apollo::common::TrajectoryPoint;
 using apollo::common::util::StrCat;
 
 Features FeatureOutput::features_;
@@ -115,7 +116,8 @@ void FeatureOutput::InsertDataForLearning(
 }
 
 void FeatureOutput::InsertPredictionResult(
-    const int obstacle_id, const PredictionObstacle& prediction_obstacle) {
+    const int obstacle_id, const PredictionObstacle& prediction_obstacle,
+    const ObstacleConf& obstacle_conf) {
   PredictionResult* prediction_result =
       list_prediction_result_.add_prediction_result();
   prediction_result->set_id(obstacle_id);
@@ -123,6 +125,7 @@ void FeatureOutput::InsertPredictionResult(
   for (int i = 0; i < prediction_obstacle.trajectory_size(); ++i) {
     prediction_result->add_trajectory()->CopyFrom(
         prediction_obstacle.trajectory(i));
+    prediction_result->mutable_obstacle_conf()->CopyFrom(obstacle_conf);
   }
 }
 
@@ -132,7 +135,8 @@ void FeatureOutput::InsertFrameEnv(const FrameEnv& frame_env) {
 
 void FeatureOutput::InsertDataForTuning(
     const Feature& feature, const std::vector<double>& feature_values,
-    const std::string& category, const LaneSequence& lane_sequence) {
+    const std::string& category, const LaneSequence& lane_sequence,
+    const std::vector<TrajectoryPoint>& adc_trajectory) {
   DataForTuning* data_for_tuning = list_data_for_tuning_.add_data_for_tuning();
   data_for_tuning->set_id(feature.id());
   data_for_tuning->set_timestamp(feature.timestamp());
@@ -142,6 +146,9 @@ void FeatureOutput::InsertDataForTuning(
   ADEBUG << "Insert [" << category
          << "] data for tuning with size = " << feature_values.size();
   data_for_tuning->set_lane_sequence_id(lane_sequence.lane_sequence_id());
+  for (const auto& adc_traj_point : adc_trajectory) {
+    data_for_tuning->add_adc_trajectory_point()->CopyFrom(adc_traj_point);
+  }
 }
 
 void FeatureOutput::WriteFeatureProto() {

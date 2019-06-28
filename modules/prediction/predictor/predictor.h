@@ -71,6 +71,12 @@ class Predictor {
   void TrimTrajectories(const ADCTrajectoryContainer& adc_trajectory_container,
                         Obstacle* obstacle);
 
+  /**
+   * @brief get the predictor type
+   * @return the predictor type
+   */
+  const ObstacleConf::PredictorType& predictor_type();
+
  protected:
   /**
    * @brief Generate trajectory from trajectory points
@@ -109,6 +115,9 @@ class Predictor {
    */
   bool SupposedToStop(const Feature& feature, const double stop_distance,
                       double* acceleration);
+
+ protected:
+  ObstacleConf::PredictorType predictor_type_;
 };
 
 }  // namespace prediction

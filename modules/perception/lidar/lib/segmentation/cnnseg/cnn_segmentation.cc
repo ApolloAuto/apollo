@@ -350,6 +350,9 @@ void CNNSegmentation::GetObjectsFromSppEngine(
   objects->clear();
   base::ObjectPool::Instance().BatchGet(clusters.size(), objects);
   size_t valid = 0;
+
+  std::vector<int> cluster_pts;
+
   for (int i = 0; i < static_cast<int>(clusters.size()); ++i) {
     if (clusters[i]->points.size() <= cnnseg_param_.min_pts_num() &&
         clusters[i]->pixels.size() < cnnseg_param_.min_pts_num()) {
@@ -367,6 +370,12 @@ void CNNSegmentation::GetObjectsFromSppEngine(
                                                   cluster->point_ids);
     object->lidar_supplement.cloud_world.CopyPointCloud(*original_world_cloud_,
                                                         cluster->point_ids);
+
+    // for miss detection, try to fill recall with ncut
+    // if (cnnseg_param_.fill_recall_with_ncut()) {
+    //     cluster_pts.append(cluster->point_ids);
+    //}
+
     // for (auto& id : cluster->point_ids) {
     //  original_cloud_->points_label(id)
     //    = static_cast<uint8_t>(LidarPointLabel::OBJECT);
@@ -399,6 +408,13 @@ void CNNSegmentation::GetObjectsFromSppEngine(
                         std::max_element(object->type_probs.begin(),
                                          object->type_probs.end())));
     }
+
+    // doing normalized cut for the rest of the points
+    // if (cnnseg_param_.fill_recall_with_ncut()) {
+    //    base::PointCloud<base::PointF> cloud;
+    //    lidar_frame_ref_.FilterPointCloud(cloud, cluster_pts);
+    //}
+
     if (cnnseg_param_.do_heading()) {
       // object->theta = cluster->yaw;
       // object->direction[0] = cos(cluster->yaw);
@@ -415,6 +431,9 @@ void CNNSegmentation::GetObjectsFromSppEngine(
     ++valid;
   }
   objects->resize(valid);
+
+  // add additional object seg logic with ncut if cnnseg miss detects
+
   collect_time_ = timer.toc(true);
 }
 
@@ -439,9 +458,15 @@ bool CNNSegmentation::GetConfigs(std::string* param_file,
   CNNSegConfig config;
   CHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config))
       << "Failed to parse CNNSeg config file";
-  *param_file = GetAbsolutePath(work_root, config.param_file());
-  *proto_file = GetAbsolutePath(work_root, config.proto_file());
-  *weight_file = GetAbsolutePath(work_root, config.weight_file());
+  if (config.use_paddle()) {
+    *proto_file = GetAbsolutePath(work_root, config.paddle_proto_file());
+    *weight_file = GetAbsolutePath(work_root, config.paddle_weight_file());
+    *param_file = GetAbsolutePath(work_root, config.paddle_param_file());
+  } else {
+    *proto_file = GetAbsolutePath(work_root, config.proto_file());
+    *weight_file = GetAbsolutePath(work_root, config.weight_file());
+    *param_file = GetAbsolutePath(work_root, config.param_file());
+  }
   *engine_file = GetAbsolutePath(work_root, config.engine_file());
 
   return true;

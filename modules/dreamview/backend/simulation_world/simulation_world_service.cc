@@ -32,7 +32,6 @@
 #include "modules/common/util/util.h"
 
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
-#include "modules/dreamview/backend/util/trajectory_point_collector.h"
 #include "modules/dreamview/proto/simulation_world.pb.h"
 
 namespace apollo {
@@ -81,8 +80,9 @@ static constexpr double kAngleThreshold = 0.1;
 
 namespace {
 
-double CalculateAcceleration(const Point3D &acceleration,
-                             const Point3D &velocity) {
+double CalculateAcceleration(
+    const Point3D &acceleration, const Point3D &velocity,
+    const apollo::canbus::Chassis_GearPosition &gear_location) {
   // Calculates the dot product of acceleration and velocity. The sign
   // of this projection indicates whether this is acceleration or
   // deceleration.
@@ -92,7 +92,16 @@ double CalculateAcceleration(const Point3D &acceleration,
   // Calculates the magnitude of the acceleration. Negate the value if
   // it is indeed a deceleration.
   double magnitude = std::hypot(acceleration.x(), acceleration.y());
-  return std::signbit(projection) ? -magnitude : magnitude;
+  if (std::signbit(projection)) {
+    magnitude = -magnitude;
+  }
+
+  // Negate the value if gear is reverse
+  if (gear_location == Chassis::GEAR_REVERSE) {
+    magnitude = -magnitude;
+  }
+
+  return magnitude;
 }
 
 Object::DisengageType DeduceDisengageType(const Chassis &chassis) {
@@ -440,7 +449,7 @@ void SimulationWorldService::UpdateSimulationWorld(
 
   // Updates acceleration with the input localization message.
   auto_driving_car->set_speed_acceleration(CalculateAcceleration(
-      pose.linear_acceleration(), pose.linear_velocity()));
+      pose.linear_acceleration(), pose.linear_velocity(), gear_location_));
 
   // Updates the timestamp with the timestamp inside the localization
   // message header. It is done on both the SimulationWorld object
@@ -483,7 +492,8 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
   Object *auto_driving_car = world_.mutable_auto_driving_car();
 
   double speed = chassis.speed_mps();
-  if (chassis.gear_location() == Chassis::GEAR_REVERSE) {
+  gear_location_ = chassis.gear_location();
+  if (gear_location_ == Chassis::GEAR_REVERSE) {
     speed = -speed;
   }
   auto_driving_car->set_speed(speed);
@@ -502,7 +512,7 @@ void SimulationWorldService::UpdateSimulationWorld(const Chassis &chassis) {
   auto_driving_car->set_steering_angle(steering_angle);
 
   double kappa = std::tan(steering_angle / vehicle_param.steer_ratio()) /
-                 vehicle_param.length();
+                 vehicle_param.wheel_base();
   auto_driving_car->set_kappa(kappa);
 
   UpdateTurnSignal(chassis.signal(), auto_driving_car);
@@ -601,14 +611,20 @@ void SimulationWorldService::UpdateSimulationWorld(
 void SimulationWorldService::UpdatePlanningTrajectory(
     const ADCTrajectory &trajectory) {
   // Collect trajectory
-  util::TrajectoryPointCollector collector(&world_);
+  world_.clear_planning_trajectory();
+  const double base_time = trajectory.header().timestamp_sec();
   for (const TrajectoryPoint &point : trajectory.trajectory_point()) {
-    collector.Collect(point, trajectory.header().timestamp_sec());
-  }
-  for (int i = 0; i < world_.planning_trajectory_size(); ++i) {
-    auto traj_pt = world_.mutable_planning_trajectory(i);
-    traj_pt->set_position_x(traj_pt->position_x() + map_service_->GetXOffset());
-    traj_pt->set_position_y(traj_pt->position_y() + map_service_->GetYOffset());
+    Object *trajectory_point = world_.add_planning_trajectory();
+    trajectory_point->set_timestamp_sec(point.relative_time() + base_time);
+    trajectory_point->set_position_x(point.path_point().x() +
+                                     map_service_->GetXOffset());
+    trajectory_point->set_position_y(point.path_point().y() +
+                                     map_service_->GetYOffset());
+    trajectory_point->set_speed(point.v());
+    trajectory_point->set_speed_acceleration(point.a());
+    trajectory_point->set_kappa(point.path_point().kappa());
+    trajectory_point->set_dkappa(point.path_point().dkappa());
+    trajectory_point->set_heading(point.path_point().theta());
   }
 
   // Update engage advice.
@@ -931,6 +947,13 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   for (auto &path : data.path()) {
     DownsamplePath(path, planning_data->add_path());
   }
+
+  // Update pull over status
+  planning_data->clear_pull_over_status();
+  if (data.has_pull_over_status()) {
+    planning_data->mutable_pull_over_status()->CopyFrom(
+        data.pull_over_status());
+  }
 }
 
 template <>
@@ -1096,6 +1119,10 @@ void SimulationWorldService::UpdateSimulationWorld(
       }
       if (simple_lat.has_lateral_error()) {
         control_data->set_lateral_error(simple_lat.lateral_error());
+      }
+      if (simple_lat.has_current_target_point()) {
+        control_data->mutable_current_target_point()->CopyFrom(
+            simple_lat.current_target_point());
       }
     } else if (debug.has_simple_mpc_debug()) {
       auto &simple_mpc = debug.simple_mpc_debug();

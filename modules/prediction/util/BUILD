@@ -9,6 +9,9 @@ cc_library(
     hdrs = [
         "data_extraction.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     linkopts = [
         "-lboost_filesystem",
     ],

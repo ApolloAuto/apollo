@@ -58,8 +58,13 @@ modules/data/conf/task_info_template.pb.txt
 modules/tools/ota/update.ini
 modules/tools/ota/vehicle_info.pb.txt
 
+# Localization
+modules/localization/msf/local_map/test_data/ndt_map/map_data/
+
 # Doxygen
 docs/doxygen
+cyber/doxy-docs/build/
+cyber/doxy-docs/xml/
 
 # Esd can lib
 third_party/can_card_library/esd_can/include

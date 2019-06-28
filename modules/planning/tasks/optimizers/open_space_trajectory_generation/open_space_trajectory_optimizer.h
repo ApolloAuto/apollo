@@ -133,33 +133,6 @@ class OpenSpaceTrajectoryOptimizer {
       Eigen::MatrixXd* state_result_dc, Eigen::MatrixXd* control_result_dc,
       Eigen::MatrixXd* time_result_dc);
 
-  bool SmoothPath(const DiscretizedPath& raw_path_points,
-                  const std::vector<double>& bounds,
-                  const std::vector<std::vector<common::math::Vec2d>>&
-                      obstacles_vertices_vec,
-                  DiscretizedPath* smoothed_path_points);
-
-  bool CheckCollision(const DiscretizedPath& path_points,
-                      const std::vector<std::vector<common::math::Vec2d>>&
-                          obstacles_vertices_vec,
-                      std::vector<size_t>* colliding_point_index);
-
-  void AdjustPathBounds(const std::vector<size_t>& colliding_point_index,
-                        std::vector<double>* bounds);
-
-  void SetPathProfile(const bool gear,
-                      const std::vector<std::pair<double, double>>& point2d,
-                      DiscretizedPath* raw_path_points);
-
-  bool CheckGear(const DiscretizedPath& path_points);
-
-  bool SmoothSpeed(const Eigen::MatrixXd& last_time_u, const double init_v,
-                   const double path_length, SpeedData* smoothed_speeds);
-
-  bool CombinePathAndSpeed(const DiscretizedPath& raw_path_points,
-                           const SpeedData& smoothed_speeds,
-                           DiscretizedTrajectory* discretized_trajectory);
-
   void LoadResult(const DiscretizedTrajectory& discretized_trajectory,
                   Eigen::MatrixXd* state_result_dc,
                   Eigen::MatrixXd* control_result_dc,
@@ -187,6 +160,7 @@ class OpenSpaceTrajectoryOptimizer {
   std::unique_ptr<HybridAStar> warm_start_;
   std::unique_ptr<DistanceApproachProblem> distance_approach_;
   std::unique_ptr<DualVariableWarmStartProblem> dual_variable_warm_start_;
+  std::unique_ptr<IterativeAnchoringSmoother> iterative_anchoring_smoother_;
 
   std::vector<common::TrajectoryPoint> stitching_trajectory_;
   DiscretizedTrajectory optimized_trajectory_;

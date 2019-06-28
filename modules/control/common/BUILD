@@ -131,6 +131,7 @@ cc_library(
     ],
     copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
+        ":control_gflags",
         "//cyber",
         "//modules/common/math:linear_interpolation",
         "//modules/common/math:search",

@@ -27,7 +27,7 @@ namespace planning {
 
 DistanceApproachProblem::DistanceApproachProblem(
     const PlannerOpenSpaceConfig& planner_open_space_config) {
-  planner_open_space_config_.CopyFrom(planner_open_space_config);
+  planner_open_space_config_ = planner_open_space_config;
 }
 
 bool DistanceApproachProblem::Solve(
@@ -62,6 +62,20 @@ bool DistanceApproachProblem::Solve(
   } else if (planner_open_space_config_.distance_approach_config()
                  .distance_approach_mode() == DISTANCE_APPROACH_IPOPT_CUDA) {
     ptop = new DistanceApproachIPOPTCUDAInterface(
+        horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u,
+        XYbounds, obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b,
+        planner_open_space_config_);
+  } else if (planner_open_space_config_.distance_approach_config()
+                 .distance_approach_mode() ==
+             DISTANCE_APPROACH_IPOPT_FIXED_DUAL) {
+    ptop = new DistanceApproachIPOPTFixedDualInterface(
+        horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u,
+        XYbounds, obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b,
+        planner_open_space_config_);
+  } else if (planner_open_space_config_.distance_approach_config()
+                 .distance_approach_mode() ==
+             DISTANCE_APPROACH_IPOPT_RELAX_END) {
+    ptop = new DistanceApproachIPOPTRelaxEndInterface(
         horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u,
         XYbounds, obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b,
         planner_open_space_config_);

@@ -22,12 +22,19 @@ namespace prediction {
 
 using apollo::prediction::math_util::Sigmoid;
 
-void CostEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+CostEvaluator::CostEvaluator() {
+  evaluator_type_ = ObstacleConf::COST_EVALUATOR;
+}
+
+bool CostEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   CHECK_NOTNULL(obstacle_ptr);
+
+  obstacle_ptr->SetEvaluatorType(evaluator_type_);
+
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
     AERROR << "Obstacle [" << id << "] has no latest feature.";
-    return;
+    return false;
   }
 
   Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
@@ -35,7 +42,7 @@ void CostEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   if (!latest_feature_ptr->has_lane() ||
       !latest_feature_ptr->lane().has_lane_graph()) {
     ADEBUG << "Obstacle [" << id << "] has no lane graph.";
-    return;
+    return false;
   }
 
   double obstacle_length = 0.0;
@@ -52,7 +59,7 @@ void CostEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   CHECK_NOTNULL(lane_graph_ptr);
   if (lane_graph_ptr->lane_sequence_size() == 0) {
     AERROR << "Obstacle [" << id << "] has no lane sequences.";
-    return;
+    return false;
   }
 
   for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
@@ -62,6 +69,7 @@ void CostEvaluator::Evaluate(Obstacle* obstacle_ptr) {
         ComputeProbability(obstacle_length, obstacle_width, *lane_sequence_ptr);
     lane_sequence_ptr->set_probability(probability);
   }
+  return true;
 }
 
 double CostEvaluator::ComputeProbability(const double obstacle_length,

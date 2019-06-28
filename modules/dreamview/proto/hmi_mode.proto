@@ -20,7 +20,7 @@ message ChannelMonitorConfig {
 message ResourceMonitorConfig {
   message DiskSpace {
     // Path to monitor space. Support wildcards like ? and *.
-    // If the path doens't exist, raise UNKNWON which will be ignored.
+    // If the path does't exist, raise UNKNWON which will be ignored.
     optional string path = 1;
     optional int32 insufficient_space_warning = 2;  // In GB.
     optional int32 insufficient_space_error = 3;

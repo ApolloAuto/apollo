@@ -70,6 +70,9 @@ cc_library(
     hdrs = [
         "spline_seg_kernel.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         "//cyber/common:log",
         "//cyber/common:macros",
@@ -315,6 +318,9 @@ cc_library(
     hdrs = [
         "piecewise_linear_constraint.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         "//cyber/common:log",
         "@eigen",
@@ -328,6 +334,9 @@ cc_library(
     ],
     hdrs = [
         "piecewise_linear_kernel.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         "//cyber/common:log",

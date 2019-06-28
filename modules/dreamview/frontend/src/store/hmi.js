@@ -17,13 +17,14 @@ export default class HMI {
     };
     vehicleParam = {
         frontEdgeToCenter: 3.89,
-        backEdgeToCenter: 1.04,
+        backEdgeToCenter: 1.043,
         leftEdgeToCenter: 1.055,
         rightEdgeToCenter: 1.055,
         height: 1.48,
         width: 2.11,
         length: 4.933,
         steerRatio: 16,
+        wheelBase: 2.8448,
     };
 
     maps = [];

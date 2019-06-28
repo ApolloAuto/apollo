@@ -1,0 +1,6 @@
+syntax = "proto2";
+package apollo.perception.lidar;
+
+message NCutConfig {
+  optional string param_file = 1 [default = "./data/models/ncut/param.conf"];
+}

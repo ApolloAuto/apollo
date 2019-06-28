@@ -23,16 +23,22 @@ from modules.map.proto import map_overlap_pb2
 from google.protobuf import text_format
 from shapely.geometry import LineString, Point
 
-fmap = sys.argv[1]
-fsignal = sys.argv[2]
+if len(sys.argv) < 3:
+    print('Usage: %s [map_file] [signal_file]' % sys.argv[0])
+    sys.exit(0)
 
-map_data = open(fmap, 'r').read()
-map = map_pb2.Map()
-text_format.Parse(map_data, map)
+map_file = sys.argv[1]
+signal_file = sys.argv[2]
 
-signal_data = open(fsignal, 'r').read()
-signal = map_signal_pb2.Signal()
-text_format.Parse(signal_data, signal)
+with open(map_file, 'r') as fmap:
+    map_data = fmap.read()
+    map = map_pb2.Map()
+    text_format.Parse(map_data, map)
+
+with open(signal_file, 'r') as fsignal:
+    signal_data = fsignal.read()
+    signal = map_signal_pb2.Signal()
+    text_format.Parse(signal_data, signal)
 
 lanes = {}
 lanes_map = {}
@@ -46,7 +52,6 @@ for lane in map.lane:
     lanes[lane.id.id] = lane_string
 
 lines = {}
-
 for stop_line in signal.stop_line:
     stop_line_points = []
     for segment in stop_line.segment:
@@ -72,6 +77,6 @@ for stop_line in signal.stop_line:
             signal.overlap_id.add().id = overlap.id.id
             lanes_map[lane_id].overlap_id.add().id = overlap.id.id
 map.signal.add().CopyFrom(signal)
-fmap = open(fmap + "_" + fsignal, 'w')
-fmap.write(str(map))
-fmap.close()
+
+with open(map_file + "_" + fsignal_file, 'w') as fmap:
+    fmap.write(str(map))

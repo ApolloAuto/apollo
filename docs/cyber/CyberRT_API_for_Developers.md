@@ -41,7 +41,7 @@ std::unique_ptr<Node> apollo::cyber::CreateNode(const std::string& node_name, co
 
 - Parameters:
     - node_name: name of the node, globally unique identifier
-    - name_space: name of the space where the node is located 
+    - name_space: name of the space where the node is located
     ```
     name_space is empty by default. It is the name of the space concatenated with node_name. The format is /namespace/node_name
     ```
@@ -73,19 +73,19 @@ The reader is the basic facility used in cyber to receive messages. Reader has t
 The reader is created by the `CreateReader` interface of the node class. The interfaces are listed as below:
 
 ```C
-   template <typename MessageT>
-   auto CreateReader(const std::string& channel_name, const std::function<void(const std::shared_ptr<MessageT>&)>& reader_func)
-       -> std::shared_ptr<Reader<MessageT>>;
-       
-   template <typename MessageT>
-   auto CreateReader(const ReaderConfig& config,
-                     const CallbackFunc<MessageT>& reader_func = nullptr)
-       -> std::shared_ptr<cyber::Reader<MessageT>>;
-   
-   template <typename MessageT>
-   auto CreateReader(const proto::RoleAttributes& role_attr,
-                     const CallbackFunc<MessageT>& reader_func = nullptr)
-   -> std::shared_ptr<cyber::Reader<MessageT>>;
+template <typename MessageT>
+auto CreateReader(const std::string& channel_name, const std::function<void(const std::shared_ptr<MessageT>&)>& reader_func)
+    -> std::shared_ptr<Reader<MessageT>>;
+
+template <typename MessageT>
+auto CreateReader(const ReaderConfig& config,
+                  const CallbackFunc<MessageT>& reader_func = nullptr)
+    -> std::shared_ptr<cyber::Reader<MessageT>>;
+
+template <typename MessageT>
+auto CreateReader(const proto::RoleAttributes& role_attr,
+                  const CallbackFunc<MessageT>& reader_func = nullptr)
+-> std::shared_ptr<cyber::Reader<MessageT>>;
 ```
 - Parameters:
     - MessageT: The type of message to read
@@ -142,7 +142,7 @@ void MessageCallback(
 }
 int main(int argc, char *argv[]) {
   // init cyber framework
-  apollo::cyber::Init(argv[0]);  
+  apollo::cyber::Init(argv[0]);
   // create listener node
   auto listener_node = apollo::cyber::CreateNode("listener");
   // create listener
@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 #### Bazel BUILD file(cyber/samples/BUILD)
-```bazel 
+```bazel
 cc_binary(
     name = "talker",
     srcs = [ "talker.cc", ],
@@ -175,10 +175,10 @@ cc_binary(
 ```
 #### Build and Run
 - Build: bazel build cyber/examples/…
-- Run talker/listener in different terminals:   
+- Run talker/listener in different terminals:
 	- ./bazel-bin/cyber/examples/talker
 	- ./bazel-bin/cyber/examples/listener
-- Examine the results: you should see message printing out on listener. 
+- Examine the results: you should see message printing out on listener.
 
 ## Service Creation and Use
 
@@ -228,7 +228,7 @@ int main(int argc, char* argv[]) {
         ++id;
         response->set_msg_id(id);
         response->set_timestamp(0);
-      }); 
+      });
   auto client = node->CreateClient<Driver, Driver>("test_server");
   auto driver_msg = std::make_shared<Driver>();
   driver_msg->set_msg_id(0);
@@ -239,7 +239,7 @@ int main(int argc, char* argv[]) {
       AINFO << "client: responese: " << res->ShortDebugString();
     } else {
       AINFO << "client: service may not ready.";
-    }   
+    }
     sleep(1);
   }
 
@@ -263,9 +263,9 @@ cc_binary(
 #### Build and run
 - Build service/client: bazel build cyber/examples/…
 - Run: ./bazel-bin/cyber/examples/service
-- Examining result: you should see content below in apollo/data/log/service.INFO 
+- Examining result: you should see content below in apollo/data/log/service.INFO
 
-``` 
+```
 I1124 16:36:44.568845 14965 service.cc:30] [service] server: i am driver server
 I1124 16:36:44.569031 14949 service.cc:43] [service] client: responese: msg_id: 1 timestamp: 0
 I1124 16:36:45.569514 14966 service.cc:30] [service] server: i am driver server
@@ -290,7 +290,7 @@ The Parameter Service is used for shared data between nodes, and provides basic 
 ### Parameter Object
 
 #### Supported Data types
-All parameters passed through cyber are `apollo::cyber::Parameter` objects, the table below lists the 5 supported parameter types.  
+All parameters passed through cyber are `apollo::cyber::Parameter` objects, the table below lists the 5 supported parameter types.
 
 Parameter type | C++ data type | protobuf data type
 ------------- | ------------- | --------------
@@ -299,7 +299,7 @@ apollo::cyber::proto::ParamType::DOUBLE | double | double
 apollo::cyber::proto::ParamType::BOOL   | bool |bool
 apollo::cyber::proto::ParamType::STRING  | std::string | string
 apollo::cyber::proto::ParamType::PROTOBUF  | std::string | string
-apollo::cyber::proto::ParamType::NOT_SET | - | - 
+apollo::cyber::proto::ParamType::NOT_SET | - | -
 
 
 Besides the 5 types above, Parameter also supports interface with protobuf object as incoming parameter. Post performing serialization processes the object and converts it to the STRING type for transfer.
@@ -309,19 +309,19 @@ Besides the 5 types above, Parameter also supports interface with protobuf objec
 Supported constructors:
 
 ```C
-  Parameter();  // Name is empty, type is NOT_SET
-  explicit Parameter(const Parameter& parameter);
-  explicit Parameter(const std::string& name);  // type为NOT_SET
-  Parameter(const std::string& name, const bool bool_value);  
-  Parameter(const std::string& name, const int int_value);
-  Parameter(const std::string& name, const int64_t int_value);
-  Parameter(const std::string& name, const float double_value);
-  Parameter(const std::string& name, const double double_value);
-  Parameter(const std::string& name, const std::string& string_value);
-  Parameter(const std::string& name, const char* string_value);
-  Parameter(const std::string& name, const std::string& msg_str,
-            const std::string& full_name, const std::string& proto_desc);
-  Parameter(const std::string& name, const google::protobuf::Message& msg);
+Parameter();  // Name is empty, type is NOT_SET
+explicit Parameter(const Parameter& parameter);
+explicit Parameter(const std::string& name);  // type为NOT_SET
+Parameter(const std::string& name, const bool bool_value);
+Parameter(const std::string& name, const int int_value);
+Parameter(const std::string& name, const int64_t int_value);
+Parameter(const std::string& name, const float double_value);
+Parameter(const std::string& name, const double double_value);
+Parameter(const std::string& name, const std::string& string_value);
+Parameter(const std::string& name, const char* string_value);
+Parameter(const std::string& name, const std::string& msg_str,
+          const std::string& full_name, const std::string& proto_desc);
+Parameter(const std::string& name, const google::protobuf::Message& msg);
 ```
   Sample code of using Parameter object:
 
@@ -346,45 +346,45 @@ Supported constructors:
 Interface list:
 
 ```C
-  inline ParamType type() const;
-  inline std::string TypeName() const;
-  inline std::string Descriptor() const;
-  inline const std::string Name() const;
-  inline bool AsBool() const;
-  inline int64_t AsInt64() const;
-  inline double AsDouble() const;
-  inline const std::string AsString() const;
-  std::string DebugString() const;
-  template <typename Type>
-  typename std::enable_if<std::is_base_of<google::protobuf::Message, Type>::value, Type>::type
-  value() const;
-  template <typename Type>
-  typename std::enable_if<std::is_integral<Type>::value && !std::is_same<Type, bool>::value, Type>::type
-  value() const;
-  template <typename Type>
-  typename std::enable_if<std::is_floating_point<Type>::value, Type>::type
-  value() const;
-  template <typename Type>
-  typename std::enable_if<std::is_convertible<Type, std::string>::value, const std::string&>::type
-  value() const;
-  template <typename Type>
-  typename std::enable_if<std::is_same<Type, bool>::value, bool>::type 
-  value() const;
+inline ParamType type() const;
+inline std::string TypeName() const;
+inline std::string Descriptor() const;
+inline const std::string Name() const;
+inline bool AsBool() const;
+inline int64_t AsInt64() const;
+inline double AsDouble() const;
+inline const std::string AsString() const;
+std::string DebugString() const;
+template <typename Type>
+typename std::enable_if<std::is_base_of<google::protobuf::Message, Type>::value, Type>::type
+value() const;
+template <typename Type>
+typename std::enable_if<std::is_integral<Type>::value && !std::is_same<Type, bool>::value, Type>::type
+value() const;
+template <typename Type>
+typename std::enable_if<std::is_floating_point<Type>::value, Type>::type
+value() const;
+template <typename Type>
+typename std::enable_if<std::is_convertible<Type, std::string>::value, const std::string&>::type
+value() const;
+template <typename Type>
+typename std::enable_if<std::is_same<Type, bool>::value, bool>::type
+value() const;
 ```
 
 An example of how to use those interfaces:
 
 ```C
-  Parameter a("int", 10);
-  a.Name();  // return int
-  a.Type();  // return apollo::cyber::proto::ParamType::INT
-  a.TypeName();  // return string: INT
-  a.DebugString();  // return string: {name: "int", type: "INT", value: 10}
-  int x = a.AsInt64();  // x = 10
-  x = a.value<int64_t>();  // x = 10
-  x = a.AsString();  // Undefined behavior, error log prompt
-  f.TypeName();  // return string: chatter
-  auto chatter = f.value<Chatter>();
+Parameter a("int", 10);
+a.Name();  // return int
+a.Type();  // return apollo::cyber::proto::ParamType::INT
+a.TypeName();  // return string: INT
+a.DebugString();  // return string: {name: "int", type: "INT", value: 10}
+int x = a.AsInt64();  // x = 10
+x = a.value<int64_t>();  // x = 10
+x = a.AsString();  // Undefined behavior, error log prompt
+f.TypeName();  // return string: chatter
+auto chatter = f.value<Chatter>();
 ```
 
 ### Parameter Service
@@ -393,11 +393,11 @@ If a node wants to provide a Parameter Service to other nodes, then you need to 
 
 ```C
 /**
-   * @brief Construct a new ParameterService object
-   * 
-   * @param node shared_ptr of the node handler
-   */
-  explicit ParameterService(const std::shared_ptr<Node>& node);
+ * @brief Construct a new ParameterService object
+ *
+ * @param node shared_ptr of the node handler
+ */
+explicit ParameterService(const std::shared_ptr<Node>& node);
 ```
 
 
@@ -406,38 +406,38 @@ Since all parameters are stored in the parameter service object, the parameters 
 **Setting parameters:**
 
 ```C
- /**
-  * @brief Set the Parameter object
-  *
-  * @param parameter parameter to be set
-  */
-  void SetParameter(const Parameter& parameter);
+/**
+ * @brief Set the Parameter object
+ *
+ * @param parameter parameter to be set
+ */
+void SetParameter(const Parameter& parameter);
 ```
 **Getting parameters:**
 
 ```C
-  /**
-   * @brief Get the Parameter object
-   * 
-   * @param param_name 
-   * @param parameter the pointer to store 
-   * @return true 
-   * @return false call service fail or timeout
-   */
-  bool GetParameter(const std::string& param_name, Parameter* parameter);
+/**
+ * @brief Get the Parameter object
+ *
+ * @param param_name
+ * @param parameter the pointer to store
+ * @return true
+ * @return false call service fail or timeout
+ */
+bool GetParameter(const std::string& param_name, Parameter* parameter);
 ```
 
 **Getting the list of parameters:**
 
 ```C
- /**
-   * @brief Get all the Parameter objects
-   *
-   * @param parameters pointer of vector to store all the parameters
-   * @return true
-   * @return false call service fail or timeout
-   */
-  bool ListParameters(std::vector<Parameter>* parameters);
+/**
+ * @brief Get all the Parameter objects
+ *
+ * @param parameters pointer of vector to store all the parameters
+ * @return true
+ * @return false call service fail or timeout
+ */
+bool ListParameters(std::vector<Parameter>* parameters);
 ```
 
 ### Parameter Client
@@ -446,12 +446,12 @@ If a node wants to use parameter services of other nodes, you need to create a `
 
 ```C
 /**
-   * @brief Construct a new ParameterClient object
-   *
-   * @param node shared_ptr of the node handler
-   * @param service_node_name node name which provide a param services
-   */
-  ParameterClient(const std::shared_ptr<Node>& node, const std::string& service_node_name);
+ * @brief Construct a new ParameterClient object
+ *
+ * @param node shared_ptr of the node handler
+ * @param service_node_name node name which provide a param services
+ */
+ParameterClient(const std::shared_ptr<Node>& node, const std::string& service_node_name);
 ```
 
 You could also perform `SetParameter`, `GetParameter` and `ListParameters` mentioned under [Parameter Service](#Parameter-Service).
@@ -489,7 +489,7 @@ int main(int argc, char** argv) {
 - Build: bazel build cyber/examples/…
 - Run: ./bazel-bin/cyber/examples/paramserver
 
-## Log API 
+## Log API
 
 ### Log library
 
@@ -518,7 +518,7 @@ export GLOG_minloglevel=0
 Call the Init method at the code entry to initialize the log:
 
 ```c++
-apollo::cyber::cyber::Init(argv[0]) is initialized. 
+apollo::cyber::cyber::Init(argv[0]) is initialized.
 If no macro definition is made in the previous component, the corresponding log is printed to the binary log.
 ```
 
@@ -547,14 +547,14 @@ Currently, the only different output behavior from default glog is that differen
 ### Key concepts
 #### 1. Component
 
-The component is the base class that Cyber-RT provides to build application modules. Each specific application module can inherit the Component class and define its own `Init` and `Proc` functions so that it can be loaded into the Cyber framework.
+The component is the base class that Cyber RT provides to build application modules. Each specific application module can inherit the Component class and define its own `Init` and `Proc` functions so that it can be loaded into the Cyber framework.
 
 #### 2. Binary vs Component
 
-There are two options to use Cyber-RT framework for applications:
-  
+There are two options to use Cyber RT framework for applications:
+
 - Binary based: the application is compiled separately into a binary, which communicates with other cyber modules by creating its own `Reader` and `Writer`.
-- Component based: the application is compiled into a Shared Library. By inheriting the Component class and writing the corresponding dag description file, the Cyber-RT framework will load and run the application dynamically.
+- Component based: the application is compiled into a Shared Library. By inheriting the Component class and writing the corresponding dag description file, the Cyber RT framework will load and run the application dynamically.
 
 
 ##### The essential Component interface
@@ -574,8 +574,8 @@ There are two options to use Cyber-RT framework for applications:
 An example dag file:
 
 ```
-  # Define all coms in DAG streaming.
-    module_config {
+# Define all coms in DAG streaming.
+module_config {
     module_library : "lib/libperception_component.so"
     components {
         class_name : "PerceptionComponent"
@@ -593,7 +593,7 @@ An example dag file:
             interval : 100
         }
     }
-    }
+}
 ```
 - **module_library**: If you want to load the .so library the root directory is the working directory of cyber (the same directory of `setup.bash`)
 - **components & timer_component**: Select the base component class type that needs to be loaded.
@@ -720,7 +720,7 @@ If you use a namespace when registering, you also need to add a namespace when y
 
 ## Launch
 
-**cyber_launch** is the launcher of the Cyber-RT framework. It starts multiple mainboards according to the launch file, and loads different components into different mainboards according to the dag file.
+**cyber_launch** is the launcher of the Cyber RT framework. It starts multiple mainboards according to the launch file, and loads different components into different mainboards according to the dag file.
 cyber_launch supports two scenarios for dynamically loading components or starting Binary programs in a child process.
 
 ### Launch File Format
@@ -754,7 +754,7 @@ Each loaded component or binary is a module
 - **dag_conf** is the name of the corresponding dag file of the component
 - **process_name** is the name of the mainboard process once started, and the same component of process_name will be loaded and run in the same process.
 - **exception_handler** is the handler method when the exception occurs in the process. The value can be exit or respawn listed below.
-    - exit, which means that the entire process needs to stop running when the current process exits abnormally. 
+    - exit, which means that the entire process needs to stop running when the current process exits abnormally.
     - respawn, the current process needs to be restarted after abnormal exit. Start this process. If there is no such thing as it is empty, it means no treatment. Can be controlled by the user according to the specific conditions of the process
 
 ## Timer
@@ -764,14 +764,14 @@ Timer can be used to create a timed task to run on a periodic basis, or to run o
 ### Timer Interface
 ```C
 /**
-   * @brief Construct a new Timer object
-   *
-   * @param period The period of the timer, unit is ms
-   * @param callback The tasks that the timer needs to perform
-   * @param oneshot True: perform the callback only after the first timing cycle
-   *                False: perform the callback every timed period
-   */
-  Timer(uint32_t period, std::function<void()> callback, bool oneshot);
+ * @brief Construct a new Timer object
+ *
+ * @param period The period of the timer, unit is ms
+ * @param callback The tasks that the timer needs to perform
+ * @param oneshot True: perform the callback only after the first timing cycle
+ *                False: perform the callback every timed period
+ */
+Timer(uint32_t period, std::function<void()> callback, bool oneshot);
 ```
 
 Or you could encapsulate the parameters into a timer option as follows:
@@ -784,11 +784,11 @@ struct TimerOption {
                  // False: perform the callback every timed period
 };
 /**
-   * @brief Construct a new Timer object
-   * 
-   * @param opt Timer option
-   */
-  explicit Timer(TimerOption opt);
+ * @brief Construct a new Timer object
+ *
+ * @param opt Timer option
+ */
+explicit Timer(TimerOption opt);
 ```
 
 ### Start Timer
@@ -827,7 +827,7 @@ The time interfaces are as follows:
 Time(uint64_t nanoseconds); //uint64_t, in nanoseconds
 Time(int nanoseconds); // int type, unit: nanoseconds
 Time(double seconds); // double, in seconds
-Time(uint32_t seconds, uint32_t nanoseconds); 
+Time(uint32_t seconds, uint32_t nanoseconds);
 // seconds seconds + nanoseconds nanoseconds
 Static Time Now(); // Get the current time
 Double ToSecond() const; // convert to seconds
@@ -898,7 +898,7 @@ void test_write(const std::string &writefile) {
   writer.WriteChannel(CHANNEL_NAME_1, MESSAGE_TYPE_1, PROTO_DESC);
   for (uint32_t i = 0; i < 100; ++i) {
     auto msg = std::make_shared<RawMessage>("abc" + std::to_string(i));
-    writer.WriteMessage(CHANNEL_NAME_1, msg, 888 + i); 
+    writer.WriteMessage(CHANNEL_NAME_1, msg, 888 + i);
   }
   writer.Close();
 }
@@ -962,30 +962,30 @@ For additional information and examples, refer to [Node](#node)
 
 ```C
 //create writer with user-define attr and message type
-  auto CreateWriter(const proto::RoleAttributes& role_attr)
-      -> std::shared_ptr<transport::Writer<MessageT>>;
-  //create reader with user-define attr, callback and message type
-  auto CreateReader(const proto::RoleAttributes& role_attr,
-      const croutine::CRoutineFunc<MessageT>& reader_func)
-      -> std::shared_ptr<transport::Reader<MessageT>>;
-  //create writer with specific channel name and message type
-  auto CreateWriter(const std::string& channel_name)
-      -> std::shared_ptr<transport::Writer<MessageT>>;
-  //create reader with specific channel name, callback and message type
-  auto CreateReader(const std::string& channel_name,
-      const croutine::CRoutineFunc<MessageT>& reader_func)
-      -> std::shared_ptr<transport::Reader<MessageT>>;
-  //create reader with user-define config, callback and message type
-  auto CreateReader(const ReaderConfig& config,
-                    const CallbackFunc<MessageT>& reader_func)
-      -> std::shared_ptr<cybertron::Reader<MessageT>>;
-  //create service with name and specific callback
-  auto CreateService(const std::string& service_name,
-      const typename service::Service<Request, Response>::ServiceCallback& service_calllback)
-      -> std::shared_ptr<service::Service<Request, Response>>;
-  //create client with name to send request to server
-  auto CreateClient(const std::string& service_name)
-      -> std::shared_ptr<service::Client<Request, Response>>;
+auto CreateWriter(const proto::RoleAttributes& role_attr)
+    -> std::shared_ptr<transport::Writer<MessageT>>;
+//create reader with user-define attr, callback and message type
+auto CreateReader(const proto::RoleAttributes& role_attr,
+    const croutine::CRoutineFunc<MessageT>& reader_func)
+    -> std::shared_ptr<transport::Reader<MessageT>>;
+//create writer with specific channel name and message type
+auto CreateWriter(const std::string& channel_name)
+    -> std::shared_ptr<transport::Writer<MessageT>>;
+//create reader with specific channel name, callback and message type
+auto CreateReader(const std::string& channel_name,
+    const croutine::CRoutineFunc<MessageT>& reader_func)
+    -> std::shared_ptr<transport::Reader<MessageT>>;
+//create reader with user-define config, callback and message type
+auto CreateReader(const ReaderConfig& config,
+                  const CallbackFunc<MessageT>& reader_func)
+    -> std::shared_ptr<cybertron::Reader<MessageT>>;
+//create service with name and specific callback
+auto CreateService(const std::string& service_name,
+    const typename service::Service<Request, Response>::ServiceCallback& service_calllback)
+    -> std::shared_ptr<service::Service<Request, Response>>;
+//create client with name to send request to server
+auto CreateClient(const std::string& service_name)
+    -> std::shared_ptr<service::Client<Request, Response>>;
 
 ```
 
@@ -994,7 +994,7 @@ For additional information and examples, refer to [Writer](#writer)
 
 ### API List
 
-```C 
+```C
 bool Write(const std::shared_ptr<MessageT>& message);
 ```
 
@@ -1003,10 +1003,11 @@ For additional information and examples, refer to [Client](#service-creation-and
 
 ### API List
 
-```C 
+```C
 SharedResponse SendRequest(SharedRequest request,
-const std::chrono::seconds& timeout_s = std::chrono::seconds(5));SharedResponse SendRequest(const Request& request,
-const std::chrono::seconds& timeout_s = std::chrono::seconds(5));
+                           const std::chrono::seconds& timeout_s = std::chrono::seconds(5));
+SharedResponse SendRequest(const Request& request,
+                           const std::chrono::seconds& timeout_s = std::chrono::seconds(5));
 ```
 
 ## Parameter API
@@ -1022,68 +1023,67 @@ For additional information and examples, refer to [Parameter](##param-parameter-
 
 ### API List - Setting parameters
 
-```C 
- Parameter();  // Name is empty, type is NOT_SET
-  explicit Parameter(const Parameter& parameter);
-  explicit Parameter(const std::string& name);  // Type is NOT_SET
-  Parameter(const std::string& name, const bool bool_value);  
-  Parameter(const std::string& name, const int int_value);
-  Parameter(const std::string& name, const int64_t int_value);
-  Parameter(const std::string& name, const float double_value);
-  Parameter(const std::string& name, const double double_value);
-  Parameter(const std::string& name, const std::string& string_value);
-  Parameter(const std::string& name, const char* string_value);
-  Parameter(const std::string& name, const std::string& msg_str,
-            const std::string& full_name, const std::string& proto_desc);
-  Parameter(const std::string& name, const google::protobuf::Message& msg);
+```C
+Parameter();  // Name is empty, type is NOT_SET
+explicit Parameter(const Parameter& parameter);
+explicit Parameter(const std::string& name);  // Type is NOT_SET
+Parameter(const std::string& name, const bool bool_value);
+Parameter(const std::string& name, const int int_value);
+Parameter(const std::string& name, const int64_t int_value);
+Parameter(const std::string& name, const float double_value);
+Parameter(const std::string& name, const double double_value);
+Parameter(const std::string& name, const std::string& string_value);
+Parameter(const std::string& name, const char* string_value);
+Parameter(const std::string& name, const std::string& msg_str,
+          const std::string& full_name, const std::string& proto_desc);
+Parameter(const std::string& name, const google::protobuf::Message& msg);
 ```
 
 ### API List - Reading parameters
 
-```C 
-  inline ParamType type() const;
-  inline std::string TypeName() const;
-  inline std::string Descriptor() const;
-  inline const std::string Name() const;
-  inline bool AsBool() const;
-  inline int64_t AsInt64() const;
-  inline double AsDouble() const;
-  inline const std::string AsString() const;
-  std::string DebugString() const;
-  template <typename Type>
-  typename std::enable_if<std::is_base_of<google::protobuf::Message, Type>::value, Type>::type
-  value() const;
-  template <typename Type>
-  typename std::enable_if<std::is_integral<Type>::value && !std::is_same<Type, bool>::value, Type>::type
-  value() const;
-  template <typename Type>
-  typename std::enable_if<std::is_floating_point<Type>::value, Type>::type
-  value() const;
-  template <typename Type>
-  typename std::enable_if<std::is_convertible<Type, std::string>::value, const std::string&>::type
-  value() const;
-  template <typename Type>
-  typename std::enable_if<std::is_same<Type, bool>::value, bool>::type 
-  value() const;
+```C
+inline ParamType type() const;
+inline std::string TypeName() const;
+inline std::string Descriptor() const;
+inline const std::string Name() const;
+inline bool AsBool() const;
+inline int64_t AsInt64() const;
+inline double AsDouble() const;
+inline const std::string AsString() const;
+std::string DebugString() const;
+template <typename Type>
+typename std::enable_if<std::is_base_of<google::protobuf::Message, Type>::value, Type>::type
+value() const;
+template <typename Type>
+typename std::enable_if<std::is_integral<Type>::value && !std::is_same<Type, bool>::value, Type>::type
+value() const;
+template <typename Type>
+typename std::enable_if<std::is_floating_point<Type>::value, Type>::type
+value() const;
+template <typename Type>
+typename std::enable_if<std::is_convertible<Type, std::string>::value, const std::string&>::type
+value() const;
+template <typename Type>
+typename std::enable_if<std::is_same<Type, bool>::value, bool>::type
+value() const;
 ```
 
 ### API List - Creating parameter service
 
-```C 
-  explicit ParameterService(const std::shared_ptr<Node>& node);
-  void SetParameter(const Parameter& parameter);
-  bool GetParameter(const std::string& param_name, Parameter* parameter);
-  bool ListParameters(std::vector<Parameter>* parameters);
-
+```C
+explicit ParameterService(const std::shared_ptr<Node>& node);
+void SetParameter(const Parameter& parameter);
+bool GetParameter(const std::string& param_name, Parameter* parameter);
+bool ListParameters(std::vector<Parameter>* parameters);
 ```
 
 ### API List - Creating parameter client
 
-```C 
- ParameterClient(const std::shared_ptr<Node>& node, const std::string& service_node_name);
-  bool SetParameter(const Parameter& parameter);
-  bool GetParameter(const std::string& param_name, Parameter* parameter);
-  bool ListParameters(std::vector<Parameter>* parameters);
+```C
+ParameterClient(const std::shared_ptr<Node>& node, const std::string& service_node_name);
+bool SetParameter(const Parameter& parameter);
+bool GetParameter(const std::string& param_name, Parameter* parameter);
+bool ListParameters(std::vector<Parameter>* parameters);
 ```
 
 
@@ -1093,35 +1093,35 @@ For additional information and examples, refer to [Timer](#timer)
 
 ### API List
 
-```C 
- Timer(uint32_t period, std::function<void()> callback, bool oneshot);
-  Timer(TimerOption opt);
-  void SetTimerOption(TimerOption opt);
-  void Start();
-  void Stop();
-  ```
+```C
+Timer(uint32_t period, std::function<void()> callback, bool oneshot);
+Timer(TimerOption opt);
+void SetTimerOption(TimerOption opt);
+void Start();
+void Stop();
+```
 
 ## Time API
 For additional information and examples, refer to [Time](#use-of-time)
 
 ### API List
 
-```C 
-  static const Time MAX;
-  static const Time MIN;
-  Time() {}
-  explicit Time(uint64_t nanoseconds);
-  explicit Time(int nanoseconds);
-  explicit Time(double seconds);
-  Time(uint32_t seconds, uint32_t nanoseconds);
-  Time(const Time& other);
-  static Time Now();
-  static Time MonoTime();
-  static void SleepUntil(const Time& time);
-  double ToSecond() const;
-  uint64_t ToNanosecond() const;
-  std::string ToString() const;
-  bool IsZero() const;
+```C
+static const Time MAX;
+static const Time MIN;
+Time() {}
+explicit Time(uint64_t nanoseconds);
+explicit Time(int nanoseconds);
+explicit Time(double seconds);
+Time(uint32_t seconds, uint32_t nanoseconds);
+Time(const Time& other);
+static Time Now();
+static Time MonoTime();
+static void SleepUntil(const Time& time);
+double ToSecond() const;
+uint64_t ToNanosecond() const;
+std::string ToString() const;
+bool IsZero() const;
 ```
 
 ## Duration API
@@ -1129,33 +1129,33 @@ Interval-related interface, used to indicate the time interval, can be initializ
 
 ### API List
 
-```C 
-  Duration() {}
-  Duration(int64_t nanoseconds);
-  Duration(int nanoseconds);
-  Duration(double seconds);
-  Duration(uint32_t seconds, uint32_t nanoseconds);
-  Duration(const Rate& rate);
-  Duration(const Duration& other);
-  double ToSecond() const;
-  int64_t ToNanosecond() const;
-  bool IsZero() const;
-  void Sleep() const;
-  ```
+```C
+Duration() {}
+Duration(int64_t nanoseconds);
+Duration(int nanoseconds);
+Duration(double seconds);
+Duration(uint32_t seconds, uint32_t nanoseconds);
+Duration(const Rate& rate);
+Duration(const Duration& other);
+double ToSecond() const;
+int64_t ToNanosecond() const;
+bool IsZero() const;
+void Sleep() const;
+```
 
 ## Rate API
 The frequency interface is generally used to initialize the time of the sleep frequency after the object is initialized according to the specified frequency.
 
 ### API List
 
-```C 
-  Rate(double frequency);
-  Rate(uint64_t nanoseconds);
-  Rate(const Duration&);
-  void Sleep();
-  void Reset();
-  Duration CycleTime() const;
-  Duration ExpectedCycleTime() const { return expected_cycle_time_; }
+```C
+Rate(double frequency);
+Rate(uint64_t nanoseconds);
+Rate(const Duration&);
+void Sleep();
+void Reset();
+Duration CycleTime() const;
+Duration ExpectedCycleTime() const { return expected_cycle_time_; }
 ```
 
 ## RecordReader API
@@ -1163,33 +1163,33 @@ The interface for reading the record file is used to read the message and channe
 
 ### API List
 
-```C 
-  RecordReader();
-  bool Open(const std::string& filename, uint64_t begin_time = 0,
-            uint64_t end_time = UINT64_MAX);
-  void Close();
-  bool ReadMessage();
-  bool EndOfFile();
-  const std::string& CurrentMessageChannelName();
-  std::shared_ptr<RawMessage> CurrentRawMessage();
-  uint64_t CurrentMessageTime();
-  ```
+```C
+RecordReader();
+bool Open(const std::string& filename, uint64_t begin_time = 0,
+          uint64_t end_time = UINT64_MAX);
+void Close();
+bool ReadMessage();
+bool EndOfFile();
+const std::string& CurrentMessageChannelName();
+std::shared_ptr<RawMessage> CurrentRawMessage();
+uint64_t CurrentMessageTime();
+```
 
 ## RecordWriter API
 The interface for writing the record file, used to record the message and channel information into the record file.
 
 ### API List
 
-```C 
- RecordWriter();
-  bool Open(const std::string& file);
-  void Close();
-  bool WriteChannel(const std::string& name, const std::string& type,
-                    const std::string& proto_desc);
-  template <typename MessageT>
-  bool WriteMessage(const std::string& channel_name, const MessageT& message,
-                    const uint64_t time_nanosec,
-                    const std::string& proto_desc = "");
-  bool SetSizeOfFileSegmentation(uint64_t size_kilobytes);
-  bool SetIntervalOfFileSegmentation(uint64_t time_sec);
-  ```
+```C
+RecordWriter();
+bool Open(const std::string& file);
+void Close();
+bool WriteChannel(const std::string& name, const std::string& type,
+                  const std::string& proto_desc);
+template <typename MessageT>
+bool WriteMessage(const std::string& channel_name, const MessageT& message,
+                  const uint64_t time_nanosec,
+                  const std::string& proto_desc = "");
+bool SetSizeOfFileSegmentation(uint64_t size_kilobytes);
+bool SetIntervalOfFileSegmentation(uint64_t time_sec);
+```

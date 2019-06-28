@@ -4,6 +4,12 @@ import { parseChartDataFromProtoBuf } from 'utils/chart';
 
 const MAX_SCENARIO_LENGTH = 5;
 
+const PATH_DISPLAY_NAME = {
+  'planning_reference_line': 'ReferenceLine',
+  'DpStSpeedOptimizer': 'SpeedHeuristic',
+  'PiecewiseJerkSpeedOptimizer': 'PlannedSpeed',
+};
+
 export default class PlanningData {
   @observable planningTime = null;
 
@@ -160,12 +166,13 @@ export default class PlanningData {
     const graph = this.data.speedGraph;
     if (speedPlans) {
       for (const plan of speedPlans) {
-        graph[plan.name] = this.extractDataPoints(plan.speedPoint, 't', 'v');
+        const name = PATH_DISPLAY_NAME[plan.name] || plan.name;
+        graph[name] = this.extractDataPoints(plan.speedPoint, 't', 'v');
       }
     }
 
     if (trajectory) {
-      graph.finalSpeed = this.extractDataPoints(
+      graph.VehicleSpeed = this.extractDataPoints(
         trajectory, 'timestampSec', 'speed', false /* loop back */, -this.planningTime);
     }
   }
@@ -178,27 +185,48 @@ export default class PlanningData {
     }
   }
 
-  updateThetaGraph(paths) {
+  updatePathThetaGraph(paths) {
     for (const path of paths) {
-      const name = path.name === "planning_reference_line" ? "ReferenceLine" : path.name;
+      const name = PATH_DISPLAY_NAME[path.name] || path.name;
       this.data.thetaGraph[name] =
         this.extractDataPoints(path.pathPoint, 's', 'theta');
     }
   }
 
-  updateKappaGraph(paths) {
+  updateTrajectoryThetaGraph(trajectory) {
+    if (trajectory) {
+      this.data.thetaGraph['Trajectory'] =
+        this.extractDataPoints(trajectory, 'timestampSec', 'heading');
+    }
+  }
+
+  updatePathKappaGraph(paths) {
     for (const path of paths) {
-      const name = path.name === "planning_reference_line" ? "ReferenceLine" : path.name;
+      const name = PATH_DISPLAY_NAME[path.name] || path.name;
       this.data.kappaGraph[name] =
         this.extractDataPoints(path.pathPoint, 's', 'kappa');
     }
   }
 
-  updateDkappaGraph(paths) {
+  updateTrajectoryKappaGraph(trajectory) {
+    if (trajectory) {
+      this.data.kappaGraph['Trajectory'] =
+        this.extractDataPoints(trajectory, 'timestampSec', 'kappa');
+    }
+  }
+
+  updatePathDkappaGraph(paths) {
     for (const path of paths) {
-      const name = path.name === "planning_reference_line" ? "ReferenceLine" : path.name;
+      const name = PATH_DISPLAY_NAME[path.name] || path.name;
       this.data.dkappaGraph[name] =
         this.extractDataPoints(path.pathPoint, 's', 'dkappa');
+    }
+  }
+
+  updateTrajectoryDkappaGraph(trajectory) {
+    if (trajectory) {
+      this.data.dkappaGraph['Trajectory'] =
+        this.extractDataPoints(trajectory, 'timestampSec', 'dkappa');
     }
   }
 
@@ -264,12 +292,15 @@ export default class PlanningData {
 
       if (world.planningTrajectory) {
         this.updateAccelerationGraph(world.planningTrajectory);
+        this.updateTrajectoryThetaGraph(world.planningTrajectory);
+        this.updateTrajectoryKappaGraph(world.planningTrajectory);
+        this.updateTrajectoryDkappaGraph(world.planningTrajectory);
       }
 
       if (planningData.path) {
-        this.updateKappaGraph(planningData.path);
-        this.updateDkappaGraph(planningData.path);
-        this.updateThetaGraph(planningData.path);
+        this.updatePathKappaGraph(planningData.path);
+        this.updatePathDkappaGraph(planningData.path);
+        this.updatePathThetaGraph(planningData.path);
       }
 
       this.updatePlanningTime(newPlanningTime);

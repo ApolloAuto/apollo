@@ -35,6 +35,13 @@ namespace apollo {
 namespace drivers {
 namespace conti_radar {
 
+using Clock = apollo::common::time::Clock;
+using micros = std::chrono::microseconds;
+using apollo::cyber::Writer;
+using apollo::drivers::canbus::CanClient;
+using apollo::drivers::canbus::ProtocolData;
+using apollo::drivers::canbus::SenderMessage;
+
 ContiRadarMessageManager::ContiRadarMessageManager(
     const std::shared_ptr<Writer<ContiRadar>> &writer)
     : conti_radar_writer_(writer) {
@@ -90,11 +97,11 @@ void ContiRadarMessageManager::Parse(const uint32_t message_id,
 
     if (sensor_data_.contiobs_size() <=
         sensor_data_.object_list_status().nof_objects()) {
-      // maybe lost a object_list_status msg
+      // maybe lost an object_list_status msg
       conti_radar_writer_->Write(std::make_shared<ContiRadar>(sensor_data_));
     }
     sensor_data_.Clear();
-    // fill header when recieve the general info message
+    // fill header when receive the general info message
     common::util::FillHeader("conti_radar", &sensor_data_);
   }
 

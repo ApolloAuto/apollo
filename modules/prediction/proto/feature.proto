@@ -4,6 +4,7 @@ package apollo.prediction;
 
 import "modules/common/proto/geometry.proto";
 import "modules/common/proto/pnc_point.proto";
+import "modules/map/proto/map_lane.proto";
 import "modules/perception/proto/perception_obstacle.proto";
 import "modules/prediction/proto/lane_graph.proto";
 import "modules/prediction/proto/prediction_point.proto";
@@ -35,6 +36,7 @@ message LaneFeature {
   optional double dist_to_left_boundary = 6;
   optional double dist_to_right_boundary = 7;
   optional double lane_heading = 8;
+  optional apollo.hdmap.Lane.LaneType lane_type = 9;
 }
 
 message JunctionExit {
@@ -120,7 +122,7 @@ message Feature {
   // Obstacle predicted trajectories
   repeated Trajectory predicted_trajectory = 33;
 
-  // ADC trajectory in the same frame
+  // ADC trajectory at the same frame
   repeated common.TrajectoryPoint adc_trajectory_point = 34;
 }
 

@@ -98,8 +98,10 @@ cc_library(
     ],
     deps = [
         ":distance_approach_ipopt_cuda_interface",
+        ":distance_approach_ipopt_fixed_dual_interface",
         ":distance_approach_ipopt_fixed_ts_interface",
         ":distance_approach_ipopt_interface",
+        ":distance_approach_ipopt_relax_end_interface",
         "//cyber/common:log",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
@@ -115,6 +117,60 @@ cc_library(
     hdrs = [
         "distance_approach_interface.h",
         "distance_approach_ipopt_fixed_ts_interface.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+        "-fopenmp",
+    ],
+    deps = [
+        "//cyber/common:log",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/math",
+        "//modules/common/util",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/proto:planner_open_space_config_proto",
+        "//modules/planning/proto:planning_proto",
+        "@adolc",
+        "@eigen",
+        "@ipopt",
+    ],
+)
+
+cc_library(
+    name = "distance_approach_ipopt_fixed_dual_interface",
+    srcs = [
+        "distance_approach_ipopt_fixed_dual_interface.cc",
+    ],
+    hdrs = [
+        "distance_approach_interface.h",
+        "distance_approach_ipopt_fixed_dual_interface.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+        "-fopenmp",
+    ],
+    deps = [
+        "//cyber/common:log",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/math",
+        "//modules/common/util",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/proto:planner_open_space_config_proto",
+        "//modules/planning/proto:planning_proto",
+        "@adolc",
+        "@eigen",
+        "@ipopt",
+    ],
+)
+
+cc_library(
+    name = "distance_approach_ipopt_relax_end_interface",
+    srcs = [
+        "distance_approach_ipopt_relax_end_interface.cc",
+    ],
+    hdrs = [
+        "distance_approach_interface.h",
+        "distance_approach_ipopt_relax_end_interface.h",
     ],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
@@ -194,7 +250,7 @@ cc_library(
     ],
 )
 
-cc_library (
+cc_library(
     name = "iterative_anchoring_smoother",
     srcs = [
         "iterative_anchoring_smoother.cc",
@@ -203,10 +259,13 @@ cc_library (
         "iterative_anchoring_smoother.h",
     ],
     deps = [
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
+        "//modules/planning/common:speed_profile_generator",
         "//modules/planning/common/path:discretized_path",
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/math:discrete_points_math",
         "//modules/planning/math/discretized_points_smoothing:fem_pos_deviation_smoother",
         "@eigen",
     ],
@@ -313,7 +372,5 @@ cc_test(
         "@gtest//:main",
     ],
 )
-
-
 
 cpplint()

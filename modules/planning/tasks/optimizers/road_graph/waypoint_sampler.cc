@@ -31,6 +31,7 @@
 #include "modules/planning/common/path/frenet_frame_path.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/tasks/deciders/lane_change_decider/lane_change_decider.h"
 
 namespace apollo {
 namespace planning {
@@ -72,33 +73,6 @@ bool WaypointSampler::SamplePathWaypoints(
   double accumulated_s = init_sl_point_.s();
   double prev_s = accumulated_s;
 
-  /* TODO(all): remove once new impl of pull-over is done
-  auto *status = PlanningContext::Instance()->mutable_planning_status();
-  if (status->pull_over().in_pull_over()) {
-    status->mutable_pull_over()->set_status(PullOverStatus::IN_OPERATION);
-    const auto &start_point = status->pull_over().start_point();
-    SLPoint start_point_sl;
-    if (!reference_line_info_->reference_line().XYToSL(start_point,
-                                                       &start_point_sl)) {
-      AERROR << "Fail to change xy to sl.";
-      return false;
-    }
-
-    if (init_sl_point_.s() > start_point_sl.s()) {
-      const auto &stop_point = status->pull_over().stop_point();
-      SLPoint stop_point_sl;
-      if (!reference_line_info_->reference_line().XYToSL(stop_point,
-                                                         &stop_point_sl)) {
-        AERROR << "Fail to change xy to sl.";
-        return false;
-      }
-      std::vector<common::SLPoint> level_points(1, stop_point_sl);
-      points->emplace_back(level_points);
-      return true;
-    }
-  }
-  */
-
   constexpr size_t kNumLevel = 3;
   for (size_t i = 0; i < kNumLevel && accumulated_s < total_length; ++i) {
     accumulated_s += level_distance;
@@ -129,7 +103,7 @@ bool WaypointSampler::SamplePathWaypoints(
 
     double kDefaultUnitL = kChangeLaneDeltaL / (num_sample_per_level - 1);
     if (reference_line_info_->IsChangeLanePath() &&
-        !reference_line_info_->IsSafeToChangeLane()) {
+        LaneChangeDecider::IsClearToChangeLane(reference_line_info_)) {
       kDefaultUnitL = 1.0;
     }
     const double sample_l_range = kDefaultUnitL * (num_sample_per_level - 1);
@@ -157,7 +131,7 @@ bool WaypointSampler::SamplePathWaypoints(
 
     std::vector<double> sample_l;
     if (reference_line_info_->IsChangeLanePath() &&
-        !reference_line_info_->IsSafeToChangeLane()) {
+        LaneChangeDecider::IsClearToChangeLane(reference_line_info_)) {
       sample_l.push_back(reference_line_info_->OffsetToOtherReferenceLine());
     } else {
       common::util::uniform_slice(

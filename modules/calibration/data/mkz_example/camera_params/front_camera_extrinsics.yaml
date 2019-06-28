@@ -1,4 +1,4 @@
-#MKZ8
+#MKZ
 header:
     seq: 0
     stamp:
@@ -8,12 +8,12 @@ header:
 child_frame_id: onsemi_obstacle
 transform:
     rotation:
-        x: 0.4984705
-        y: -0.4984705
-        z: 0.5015248
-        w: -0.5015248
+        x:  0.4917522
+        y: -0.4917522
+        z: 0.5081139
+        w: -0.5081139
     translation:
-        x: 1.269
-        y: -0.028
-        z: 1.786   # when Z=0 is ground
-#        z: 1.476  # when Z=0 is the rear wheel axle
+        x: 1.895
+        y: -0.235
+        z: 1.256   # when Z=0 is ground
+#        z: 0.956  # when Z=0 is the rear wheel axle

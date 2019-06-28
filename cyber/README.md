@@ -21,14 +21,16 @@ Key benefits of using Apollo Cyber RT:
 
 # Documents
 
+* ***New!!*** [How to Develop Cyber RT inside Docker Environment on Both x86 and ARM Platform](https://github.com/ApolloAuto/apollo/tree/master/docs/cyber/CyberRT_Docker.md): Official docker image for Cyber RT development, which is easiest way to build and play with Cyber RT. On top of that, we officially support development of Cyber RT on both x86 and ARM platform.
+
 * [Apollo Cyber RT Quick Start](https://github.com/ApolloAuto/apollo/tree/master/docs/cyber/CyberRT_Quick_Start.md): Everything you need to know about how to start developing your first application module on top of Apollo Cyber RT.
 
 * [Apollo Cyber RT Developer Tools](https://github.com/ApolloAuto/apollo/tree/master/docs/cyber/CyberRT_Developer_Tools.md): Detailed guidance on how to use the developer tools from Apollo Cyber RT.
 
 * [Apollo Cyber RT API for Developers](https://github.com/ApolloAuto/apollo/tree/master/docs/cyber/CyberRT_API_for_Developers.md): A comprehensive guide to explore all the APIs of Apollo Cyber RT, with many concrete examples in source code.
 
-* [Apollo Cyber RT FAQs](https://github.com/ApolloAuto/apollo/tree/master/docs/FAQs/CyberRT_FAQs.md): Answers to the most frequently asked questions about Apollo Cyber RT.
+* [Apollo Cyber RT FAQs](https://github.com/ApolloAuto/apollo/tree/master/docs/cyber/CyberRT_FAQs.md): Answers to the most frequently asked questions about Apollo Cyber RT.
 
-* [Apollo Cyber RT Terms](CyberRT_Terms.md): Commonly used terminologies in Cyber RT documentation and code.
+* [Apollo Cyber RT Terms](https://github.com/ApolloAuto/apollo/tree/master/docs/cyber/CyberRT_Terms.md): Commonly used terminologies in Cyber RT documentation and code.
 
 More documents to come soon!

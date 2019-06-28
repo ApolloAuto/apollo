@@ -20,6 +20,9 @@ cc_library(
     name = "prediction_util",
     srcs = ["prediction_util.cc"],
     hdrs = ["prediction_util.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         ":prediction_gflags",
         ":prediction_map",
@@ -40,6 +43,9 @@ cc_library(
     name = "prediction_map",
     srcs = ["prediction_map.cc"],
     hdrs = ["prediction_map.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         ":prediction_gflags",
         "//modules/map/pnc_map",
@@ -65,6 +71,9 @@ cc_library(
     name = "feature_output",
     srcs = ["feature_output.cc"],
     hdrs = ["feature_output.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/common/util",
         "//modules/prediction/common:prediction_gflags",
@@ -87,6 +96,9 @@ cc_library(
     name = "road_graph",
     srcs = ["road_graph.cc"],
     hdrs = ["road_graph.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         ":prediction_map",
         "//modules/prediction/common:prediction_constants",
@@ -166,6 +178,9 @@ cc_library(
     name = "junction_analyzer",
     srcs = ["junction_analyzer.cc"],
     hdrs = ["junction_analyzer.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         ":prediction_map",
         "//modules/prediction/proto:feature_proto",
@@ -193,6 +208,9 @@ cc_library(
     hdrs = [
         "message_process.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         ":semantic_map",
         "//cyber/common:file",
@@ -209,6 +227,9 @@ cc_library(
     name = "prediction_thread_pool",
     srcs = ["prediction_thread_pool.cc"],
     hdrs = ["prediction_thread_pool.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//cyber/base",
         "//cyber/common",
@@ -229,6 +250,9 @@ cc_library(
     name = "semantic_map",
     srcs = ["semantic_map.cc"],
     hdrs = ["semantic_map.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     linkopts = [
         "-lopencv_core",
         "-lopencv_highgui",

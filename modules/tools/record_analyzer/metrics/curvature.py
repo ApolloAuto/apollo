@@ -25,8 +25,8 @@ class Curvature:
 
     def put(self, adc_trajectory):
         init_point = adc_trajectory.debug.planning_data.init_point
-        self.curvature.append(abs(init_point.path_point.kappa))
-        self.curvature_derivative.append(abs(init_point.path_point.dkappa))
+        self.curvature_list.append(abs(init_point.path_point.kappa))
+        self.curvature_derivative_list.append(abs(init_point.path_point.dkappa))
 
     def get_curvature(self):
         curvature = {}

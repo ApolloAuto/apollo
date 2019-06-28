@@ -15,8 +15,11 @@ message OpenSpaceTrajectoryPartitionConfig{
     // @brief heading_track_range is the range to filter out too large
     // angle difference between vehicle heading and vehicle to pathpoint vector
     optional double heading_track_range = 7;
+    optional double distance_search_range = 8 [default = 1.0e-6];
     // @brief IOU, intersection over union
-    optional double vehicle_box_iou_threshold = 8 [default = 0.95];
-    optional double distance_search_range = 9 [default = 1.0e-6];
-    optional double distance_to_midpoint = 10 [default = 0.1];
+    optional double heading_offset_to_midpoint = 9;
+    optional double lateral_offset_to_midpoint = 10 [default = 0.1];
+    optional double longitudinal_offset_to_midpoint = 11 [default = 0.1];
+    optional double vehicle_box_iou_threshold_to_midpoint = 12 [default = 0.95];
+    optional double linear_velocity_threshold_on_ego = 13 [default = 0.2];
 }

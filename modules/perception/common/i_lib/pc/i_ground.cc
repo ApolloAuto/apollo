@@ -621,7 +621,7 @@ int PlaneFitGroundDetector::FitGrid(const float *point_cloud,
   groundplane->ForceInvalid();
   // not enough samples, failed and return
   if (candi->Size() < param_.nr_inliers_min_threshold) {
-    return (0);
+    return 0;
   }
   GroundPlaneLiDAR plane;
   float ptp_dist = 0.0f;
@@ -698,12 +698,12 @@ int PlaneFitGroundDetector::FitGrid(const float *point_cloud,
   }
   // check if meet the inlier number requirement
   if (!groundplane->IsValid()) {
-    return (0);
+    return 0;
   }
   if (groundplane->GetNrSupport() <
       static_cast<int>(param_.nr_inliers_min_threshold)) {
     groundplane->ForceInvalid();
-    return (0);
+    return 0;
   }
   // iterate samples and check if the point to plane distance is within
   // threshold
@@ -726,7 +726,7 @@ int PlaneFitGroundDetector::FitGrid(const float *point_cloud,
   // std::cout << groundplane->GetDegreeNormalToZ() << std::endl;
   if (groundplane->GetDegreeNormalToZ() > param_.planefit_orien_threshold) {
     groundplane->ForceInvalid();
-    return (0);
+    return 0;
   }
   return nr_inliers;
 }
@@ -822,15 +822,20 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
   FilterCandidates(r, c, point_cloud, &candi, &neighbors, nr_point_element);
 
   if (candi.Size() < param_.nr_inliers_min_threshold) {
-    return (0);
+    return 0;
   }
 
   GroundPlaneLiDAR plane;
   int kNr_iter =
       param_.nr_ransac_iter_threshold + static_cast<int>(neighbors.size());
+  //  check hypothesis initialized correct or not
+  if (kNr_iter < 1) {
+    return 0;
+  }
   GroundPlaneLiDAR hypothesis[kNr_iter];
+
   float ptp_dist = 0.0f;
-  int best = -1;
+  int best = 0;
   int nr_inliers = 0;
   int nr_inliers_best = -1;
   float angle_best = FLT_MAX;
@@ -934,12 +939,12 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
 
   // check if meet the inlier number requirement
   if (!groundplane->IsValid()) {
-    return (0);
+    return 0;
   }
   if (groundplane->GetNrSupport() <
       static_cast<int>(param_.nr_inliers_min_threshold)) {
     groundplane->ForceInvalid();
-    return (0);
+    return 0;
   }
   // iterate samples and check if the point to plane distance is within
   // threshold
@@ -966,7 +971,7 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
 
   if (groundplane->GetDegreeNormalToZ() > param_.planefit_orien_threshold) {
     groundplane->ForceInvalid();
-    return (0);
+    return 0;
   }
 
   const auto &voxel_cur = (*vg_coarse_)(r, c);
@@ -1248,11 +1253,13 @@ bool PlaneFitGroundDetector::Detect(const float *point_cloud,
   unsigned int r = 0;
   unsigned int c = 0;
   // Filter to generate plane fitting candidates
-  // int nr_candis = Filter();
+  // int nr_candis =
+  Filter();
   // std::cout << "# of plane candidates: " << nr_candis << std::endl;
   //  Fit local plane using ransac
   // nr_valid_grid = Fit();
-  // int nr_valid_grid = FitInOrder();
+  // int nr_valid_grid =
+  FitInOrder();
   // std::cout << "# of valid plane geometry (fitting): " << nr_valid_grid <<
   // std::endl;
   // Smooth plane using neighborhood information:
@@ -1297,7 +1304,7 @@ const unsigned int PlaneFitGroundDetector::GetGridDimY() const {
   return vg_coarse_->NrVoxelY();
 }
 
-float PlaneFitGroundDetector::GetUnknownHeight() { return (FLT_MAX); }
+float PlaneFitGroundDetector::GetUnknownHeight() { return FLT_MAX; }
 
 PlaneFitPointCandIndices **PlaneFitGroundDetector::GetCandis() const {
   return local_candis_;

@@ -42,15 +42,15 @@ struct NaviSpeedTsConstraints {
   double t_min = 0.0;
   // The maximum speed of the point.
   double v_max = std::numeric_limits<double>::max();
-  // The preffered speed of the point.
+  // The preferred speed of the point.
   double v_preffered = std::numeric_limits<double>::max();
   // The maximum acceleration of the point.
   double a_max = std::numeric_limits<double>::max();
-  // The preffered acceleration of the point.
+  // The preferred acceleration of the point.
   double a_preffered = std::numeric_limits<double>::max();
   // The maximum deceleration of the point.
   double b_max = std::numeric_limits<double>::max();
-  // The preffered deceleration of the point.
+  // The preferred deceleration of the point.
   double b_preffered = std::numeric_limits<double>::max();
   // TODO(all): ignore
   double da_max = std::numeric_limits<double>::max();
@@ -73,7 +73,7 @@ struct NaviSpeedTsPoint {
 /**
  * @class NaviSpeedTsGraph
  * @brief NaviSpeedTsGraph is used to generate a t-s graph with some limits
- * and preffered.
+ * and preferred.
  */
 class NaviSpeedTsGraph {
  public:

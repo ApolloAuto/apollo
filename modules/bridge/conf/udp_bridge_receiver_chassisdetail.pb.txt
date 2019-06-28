@@ -1,0 +1,3 @@
+topic_name: "/apollo/canbus/Chassis"
+bind_port: 8900
+proto_name: "Chassis"

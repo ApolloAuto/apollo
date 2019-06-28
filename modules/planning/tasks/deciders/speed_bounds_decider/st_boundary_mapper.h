@@ -27,6 +27,7 @@
 #include "modules/planning/proto/speed_bounds_decider_config.pb.h"
 
 #include "modules/common/status/status.h"
+#include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed/st_boundary.h"
@@ -38,15 +39,14 @@ namespace planning {
 
 class STBoundaryMapper {
  public:
-  STBoundaryMapper(const SLBoundary& adc_sl_boundary,
-                   const SpeedBoundsDeciderConfig& config,
+  STBoundaryMapper(const SpeedBoundsDeciderConfig& config,
                    const ReferenceLine& reference_line,
                    const PathData& path_data, const double planning_distance,
                    const double planning_time);
 
   virtual ~STBoundaryMapper() = default;
 
-  common::Status CreateStBoundary(PathDecision* path_decision) const;
+  common::Status ComputeSTBoundary(PathDecision* path_decision) const;
 
  private:
   FRIEND_TEST(StBoundaryMapperTest, check_overlap_test);
@@ -64,22 +64,21 @@ class STBoundaryMapper {
       const Obstacle& obstacle, std::vector<STPoint>* upper_points,
       std::vector<STPoint>* lower_points) const;
 
-  common::Status MapWithoutDecision(Obstacle* obstacle) const;
+  void ComputeSTBoundary(Obstacle* obstacle) const;
 
   bool MapStopDecision(Obstacle* stop_obstacle,
                        const ObjectDecisionType& decision) const;
 
-  common::Status MapWithDecision(Obstacle* obstacle,
-                                 const ObjectDecisionType& decision) const;
+  void ComputeSTBoundaryWithDecision(Obstacle* obstacle,
+                                     const ObjectDecisionType& decision) const;
 
  private:
-  const SLBoundary& adc_sl_boundary_;
   const SpeedBoundsDeciderConfig& speed_bounds_config_;
   const ReferenceLine& reference_line_;
   const PathData& path_data_;
   const common::VehicleParam& vehicle_param_;
-  const double planning_distance_;
-  const double planning_time_;
+  const double planning_max_distance_;
+  const double planning_max_time_;
 };
 
 }  // namespace planning

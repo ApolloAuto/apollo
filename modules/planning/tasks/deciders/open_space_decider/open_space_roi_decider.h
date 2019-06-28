@@ -70,10 +70,33 @@ class OpenSpaceRoiDecider : public Decider {
       Frame *const frame, const std::array<common::math::Vec2d, 4> &vertices);
 
   void SetPullOverSpotEndPose(Frame *const frame);
+
+  // @brief Get road boundaries of both sides
+  void GetRoadBoundary(
+      const hdmap::Path &nearby_path, const double center_line_s,
+      const common::math::Vec2d &origin_point, const double origin_heading,
+      std::vector<common::math::Vec2d> *left_lane_boundary,
+      std::vector<common::math::Vec2d> *right_lane_boundary,
+      std::vector<common::math::Vec2d> *center_lane_boundary_left,
+      std::vector<common::math::Vec2d> *center_lane_boundary_right,
+      std::vector<double> *center_lane_s_left,
+      std::vector<double> *center_lane_s_right,
+      std::vector<double> *left_lane_road_width,
+      std::vector<double> *right_lane_road_width);
+
+  // @brief Check single-side curb and add key points to the boundary
+  void AddBoundaryKeyPoint(
+      const hdmap::Path &nearby_path, const double check_point_s,
+      const double start_s, const double end_s, const bool is_anchor_point,
+      const bool is_left_curb,
+      std::vector<common::math::Vec2d> *center_lane_boundary,
+      std::vector<common::math::Vec2d> *curb_lane_boundary,
+      std::vector<double> *center_lane_s, std::vector<double> *road_width);
+
   // @brief "Region of Interest", load map boundary for open space scenario
-  // @param vertices is an array consisting four points describing the boundary
-  // of spot in box. Four points are in sequence of left_top, left_down,
-  // right_down, right_top
+  // @param vertices is an array consisting four points describing the
+  // boundary of spot in box. Four points are in sequence of left_top,
+  // left_down, right_down, right_top
   // ------------------------------------------------------------------
   //
   //                     --> lane_direction
@@ -84,12 +107,17 @@ class OpenSpaceRoiDecider : public Decider {
   //                -                  -
   //                -                  -
   //                left_down-------right_down
+  bool GetParkingBoundary(Frame *const frame,
+                          const std::array<common::math::Vec2d, 4> &vertices,
+                          const hdmap::Path &nearby_path,
+                          std::vector<std::vector<common::math::Vec2d>>
+                              *const roi_parking_boundary);
 
-  bool GetBoundary(Frame *const frame,
-                   const std::array<common::math::Vec2d, 4> &vertices,
-                   const hdmap::Path &nearby_path,
-                   std::vector<std::vector<common::math::Vec2d>>
-                       *const roi_parking_boundary);
+  bool GetPullOverBoundary(Frame *const frame,
+                           const std::array<common::math::Vec2d, 4> &vertices,
+                           const hdmap::Path &nearby_path,
+                           std::vector<std::vector<common::math::Vec2d>>
+                               *const roi_parking_boundary);
 
   // @brief search target parking spot on the path by vehicle location, if
   // no return a nullptr in target_parking_spot

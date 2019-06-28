@@ -50,27 +50,40 @@ message ModelParam {
 }
 
 message NetworkParam {
-    optional string loc_blob = 1 [default = "loc_pred"];
-    optional string obj_blob = 2 [default = "obj_pred"];
-    optional string cls_blob = 3 [default = "cls_pred"];
-    optional string ori_blob = 4 [default = "ori_pred"];
-    optional string dim_blob = 5 [default = "dim_pred"];
-    optional string lof_blob = 6 [default = "lof_pred"];
-    optional string lor_blob = 7 [default = "lor_pred"];
-    optional string input_blob = 8 [default = "data"];
-    optional string rois_blob = 10 [default = "rois_pred"];
-    optional string feat_blob = 11 [default = "conv_feat"];
-    optional string box_blob = 13 [default = "box_pred"];
-    optional string iou_blob = 14 [default = "iou_pred"];
-    optional string brvis_blob = 15 [default = "brvis_pred"];
-    optional string brswt_blob = 16 [default = "brswt_pred"];
-    optional string ltvis_blob = 17 [default = "ltvis_pred"];
-    optional string ltswt_blob = 18 [default = "ltswt_pred"];
-    optional string rtvis_blob = 19 [default = "rtvis_pred"];
-    optional string rtswt_blob = 20 [default = "rtswt_pred"];
-    optional string area_id_blob = 23 [default = "area_id_pred"];
-    optional string visible_ratio_blob = 21 [default = "vis_pred"];
-    optional string cut_off_ratio_blob = 22 [default = "cut_pred"];
+    optional string det1_loc_blob = 1 [default = "detect1_loc_pred"];
+    optional string det1_obj_blob = 2 [default = "detect1_obj_pred"];
+    optional string det1_cls_blob = 3 [default = "detect1_cls_pred"];
+    optional string det1_ori_blob = 4 [default = "detect1_ori_pred"];
+    optional string det1_ori_conf_blob = 5 [default = "detect1_ori_conf_pred"];
+    optional string det1_dim_blob = 6 [default = "detect1_dim_pred"];
+    optional string det2_loc_blob = 7 [default = "detect2_loc_pred"];
+    optional string det2_obj_blob = 8 [default = "detect2_obj_pred"];
+    optional string det2_cls_blob = 9 [default = "detect2_cls_pred"];
+    optional string det2_ori_blob = 10 [default = "detect2_ori_pred"];
+    optional string det2_ori_conf_blob = 11 [default = "detect2_ori_conf_pred"];
+    optional string det2_dim_blob = 12 [default = "detect2_dim_pred"];
+    optional string det3_loc_blob = 13 [default = "detect3_loc_pred"];
+    optional string det3_obj_blob = 14 [default = "detect3_obj_pred"];
+    optional string det3_cls_blob = 15 [default = "detect3_cls_pred"];
+    optional string det3_ori_blob = 16 [default = "detect3_ori_pred"];
+    optional string det3_ori_conf_blob = 17 [default = "detect3_ori_conf_pred"];
+    optional string det3_dim_blob = 18 [default = "detect3_dim_pred"];
+    optional string lof_blob = 19 [default = "lof_pred"];
+    optional string lor_blob = 20 [default = "lor_pred"];
+    optional string input_blob = 21 [default = "data"];
+    optional string rois_blob = 22 [default = "rois_pred"];
+    optional string feat_blob = 23 [default = "conv_feat"];
+    optional string box_blob = 24 [default = "box_pred"];
+    optional string iou_blob = 25 [default = "iou_pred"];
+    optional string brvis_blob = 26 [default = "brvis_pred"];
+    optional string brswt_blob = 27 [default = "brswt_pred"];
+    optional string ltvis_blob = 28 [default = "ltvis_pred"];
+    optional string ltswt_blob = 29 [default = "ltswt_pred"];
+    optional string rtvis_blob = 30 [default = "rtvis_pred"];
+    optional string rtswt_blob = 31 [default = "rtswt_pred"];
+    optional string area_id_blob = 32 [default = "area_id_pred"];
+    optional string visible_ratio_blob = 33 [default = "vis_pred"];
+    optional string cut_off_ratio_blob = 34 [default = "cut_pred"];
 }
 
 message NMSParam {

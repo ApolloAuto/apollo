@@ -33,7 +33,7 @@ from modules.localization.proto import localization_pb2
 
 if len(sys.argv) < 3:
     print("Usage: %s <filename> <fbags>" % sys.argv[0])
-    sys.exit(1)
+    sys.exit(0)
 
 filename = sys.argv[1]
 fbags = sys.argv[2:]

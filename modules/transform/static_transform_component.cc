@@ -18,6 +18,8 @@
 
 #include "yaml-cpp/yaml.h"
 
+#include "modules/common/adapters/adapter_gflags.h"
+
 namespace apollo {
 namespace transform {
 
@@ -27,7 +29,7 @@ bool StaticTransformComponent::Init() {
     return false;
   }
   cyber::proto::RoleAttributes attr;
-  attr.set_channel_name("/tf_static");
+  attr.set_channel_name(FLAGS_tf_static_topic);
   attr.mutable_qos_profile()->CopyFrom(
       cyber::transport::QosProfileConf::QOS_PROFILE_TF_STATIC);
   writer_ = node_->CreateWriter<TransformStampeds>(attr);

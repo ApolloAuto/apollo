@@ -6,6 +6,9 @@ cc_library(
     name = "evaluator_manager",
     srcs = ["evaluator_manager.cc"],
     hdrs = ["evaluator_manager.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
         "//modules/prediction/common:feature_output",
@@ -16,7 +19,9 @@ cc_library(
         "//modules/prediction/evaluator/pedestrian:pedestrian_interaction_evaluator",
         "//modules/prediction/evaluator/vehicle:cost_evaluator",
         "//modules/prediction/evaluator/vehicle:cruise_mlp_evaluator",
+        "//modules/prediction/evaluator/vehicle:junction_map_evaluator",
         "//modules/prediction/evaluator/vehicle:junction_mlp_evaluator",
+        "//modules/prediction/evaluator/vehicle:lane_aggregating_evaluator",
         "//modules/prediction/evaluator/vehicle:lane_scanning_evaluator",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "//modules/prediction/evaluator/vehicle:rnn_evaluator",

@@ -70,7 +70,7 @@ class SenderMessage {
    * @param protocol_data A pointer of ProtocolData
    *        which contains the content to send.
    * @param init_with_one If it is true, then initialize all bits in
-   *        the protocal data as one.
+   *        the protocol data as one.
    */
   SenderMessage(const uint32_t message_id,
                 ProtocolData<SensorType> *protocol_data, bool init_with_one);
@@ -155,7 +155,7 @@ class CanSender {
    * @param protocol_data A pointer of ProtocolData
    *        which contains the content to send.
    * @param init_with_one If it is true, then initialize all bits in
-   *        the protocal data as one. By default, it is false.
+   *        the protocol data as one. By default, it is false.
    */
   void AddMessage(uint32_t message_id, ProtocolData<SensorType> *protocol_data,
                   bool init_one = false);

@@ -955,7 +955,7 @@ bool TrafficLightsPerceptionComponent::TransformDebugMessage(
       pose.GetCameraPose("front_6mm", &cam_pose);
       light_debug->set_distance_to_stop_line(stopline_distance(cam_pose));
     } else {
-      AERROR << "error occured in calc distance to stop line";
+      AERROR << "error occurred in calc distance to stop line";
     }
   }
 

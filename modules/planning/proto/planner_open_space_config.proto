@@ -1,20 +1,23 @@
 syntax = "proto2";
 
 import "modules/planning/proto/piecewise_jerk_speed_config.proto";
+import "modules/planning/proto/fem_pos_deviation_smoother_config.proto";
 
 package apollo.planning;
 
 enum DualWarmUpMode {
-    IPOPT = 0;
-    IPOPTQP = 1;
-    OSQP = 2;
-    DEBUG = 3;
+  IPOPT = 0;
+  IPOPTQP = 1;
+  OSQP = 2;
+  DEBUG = 3;
 }
 
 enum DistanceApproachMode {
   DISTANCE_APPROACH_IPOPT = 0;
   DISTANCE_APPROACH_IPOPT_CUDA = 1;
   DISTANCE_APPROACH_IPOPT_FIXED_TS = 2;
+  DISTANCE_APPROACH_IPOPT_FIXED_DUAL = 3;
+  DISTANCE_APPROACH_IPOPT_RELAX_END = 4;
 }
 
 message PlannerOpenSpaceConfig {
@@ -26,12 +29,15 @@ message PlannerOpenSpaceConfig {
   optional DualVariableWarmStartConfig dual_variable_warm_start_config = 3;
   // Distance Approach Configs
   optional DistanceApproachConfig distance_approach_config = 4;
+  // Iterative Anchoring Configs
+  optional IterativeAnchoringConfig iterative_anchoring_smoother_config = 5;
   // Trajectory PartitionConfig Configs
-  optional TrajectoryPartitionConfig trajectory_partition_config = 5;
-  optional float delta_t = 6 [default = 1.0];
-  optional double max_position_error_to_end_point = 7 [default = 0.5];
-  optional double max_theta_error_to_end_point = 8 [default = 0.2];
-  optional double is_near_destination_threshold = 9 [default = 0.001];
+  optional TrajectoryPartitionConfig trajectory_partition_config = 6;
+  optional float delta_t = 7 [default = 1.0];
+  optional double is_near_destination_threshold = 8 [default = 0.001];
+  optional bool enable_check_parallel_trajectory = 9 [default = false];
+  optional bool enable_linear_interpolation = 10 [default = false];
+  optional double is_near_destination_theta_threshold = 11 [default = 0.05];
 }
 
 message ROIConfig {
@@ -100,6 +106,8 @@ message DistanceApproachConfig {
   optional bool enable_initial_final_check = 25 [default = false];
   optional DistanceApproachMode distance_approach_mode = 26;
   optional bool enable_jacobian_ad = 27 [default = false];
+  optional bool enable_check_initial_state = 28 [default = false];
+  optional double weight_end_state = 29 [default = 0.0];
 }
 
 message IpoptConfig {
@@ -119,11 +127,32 @@ message IpoptConfig {
   // ipopt barrier parameter, default 0.1
 }
 
+message IterativeAnchoringConfig {
+  // Ipopt configs
+  optional double interpolated_delta_s = 1 [default = 0.1];
+  optional int32 reanchoring_trails_num = 2 [default = 50];
+  optional double reanchoring_pos_stddev = 3 [default = 0.25];
+  optional double reanchoring_length_stddev = 4 [default = 1.0];
+  optional bool estimate_bound = 5 [default = false];
+  optional double default_bound = 6 [default = 2.0];
+  optional double vehicle_shortest_dimension = 7 [default = 1.04];
+  optional FemPosDeviationSmootherConfig fem_pos_deviation_smoother_config = 8;
+  optional double collision_decrease_ratio = 9 [default = 0.9];
+  // TODO(QiL, Jinyun): Merge following with overall config for open space
+  optional double max_forward_v = 10 [default = 2.0];
+  optional double max_reverse_v = 11 [default = 2.0];
+  optional double max_forward_acc = 12 [default = 3.0];
+  optional double max_reverse_acc = 13 [default = 2.0];
+  optional double max_acc_jerk = 14 [default = 4.0];
+  optional double delta_t = 15 [default = 0.2];
+  optional PiecewiseJerkSpeedConfig s_curve_config = 16;
+}
+
 message TrajectoryPartitionConfig {
- optional uint64 interpolated_pieces_num = 1 [default = 50];
- optional uint64 initial_gear_check_horizon = 2 [default = 3];
- optional double heading_searching_range = 3 [default = 0.3];
- optional double gear_shift_period_duration = 4 [default = 2.0];
- optional double gear_shift_max_t = 5 [default = 3.0];
- optional double gear_shift_unit_t = 6 [default = 0.02];
+  optional uint64 interpolated_pieces_num = 1 [default = 50];
+  optional uint64 initial_gear_check_horizon = 2 [default = 3];
+  optional double heading_searching_range = 3 [default = 0.3];
+  optional double gear_shift_period_duration = 4 [default = 2.0];
+  optional double gear_shift_max_t = 5 [default = 3.0];
+  optional double gear_shift_unit_t = 6 [default = 0.02];
 }

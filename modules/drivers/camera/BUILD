@@ -48,20 +48,49 @@ cc_library(
 
 cc_library(
     name = "camera",
-    srcs = [
-        "usb_cam.cc",
-        "util.cc",
-    ],
-    hdrs = [
-        "usb_cam.h",
-        "util.h",
-    ],
-    copts = ["-mavx2"],
-    deps = [
-        "//cyber",
-        "//modules/drivers/camera/proto:camera_proto",
-        "@adv_plat",
-    ],
+    srcs = select({
+        ":x86_mode": [
+            "usb_cam.cc",
+            "util.cc",
+        ],
+        ":arm_mode": [
+            "usb_cam.cc",
+        ],
+    }),
+    hdrs = select({
+        ":x86_mode": [
+            "usb_cam.h",
+            "util.h",
+        ],
+        ":arm_mode": [
+            "usb_cam.h",
+        ],
+    }),
+    copts = select({
+        ":x86_mode": ["-mavx2"],
+        ":arm_mode": [""],
+    }),
+    deps = select({
+        ":x86_mode": [
+            "//cyber",
+            "//modules/drivers/camera/proto:camera_proto",
+            "@adv_plat",
+        ],
+        ":arm_mode": [
+            "//cyber",
+            "//modules/drivers/camera/proto:camera_proto",
+        ],
+    }),
+)
+
+config_setting(
+    name = "x86_mode",
+    values = {"cpu": "k8"},
+)
+
+config_setting(
+    name = "arm_mode",
+    values = {"cpu": "arm"},
 )
 
 cpplint()

@@ -27,6 +27,7 @@
 
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h"
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_path_problem.h"
 
@@ -48,12 +49,18 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     PathData* const final_path_data) {
   const auto init_frenet_state = reference_line.ToFrenetFrame(init_point);
 
-  const auto& piecewise_jerk_path_config = config_.piecewise_jerk_path_config();
+  // Choose lane_change_path_config for lane-change cases
+  // Otherwise, choose default_path_config for normal path planning
+  const auto& piecewise_jerk_path_config =
+      reference_line_info_->IsChangeLanePath()
+          ? config_.piecewise_jerk_path_config().lane_change_path_config()
+          : config_.piecewise_jerk_path_config().default_path_config();
+
   std::array<double, 5> w = {
       piecewise_jerk_path_config.l_weight(),
       piecewise_jerk_path_config.dl_weight() *
           std::fmax(init_frenet_state.first[1] * init_frenet_state.first[1],
-                    1.0),
+                    5.0),
       piecewise_jerk_path_config.ddl_weight(),
       piecewise_jerk_path_config.dddl_weight(), 0.0};
 
@@ -82,14 +89,24 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     std::vector<double> opt_dl;
     std::vector<double> opt_ddl;
 
-    const auto& pull_over_info =
-        PlanningContext::Instance()->planning_status().pull_over();
-
     std::array<double, 3> end_state = {0.0, 0.0, 0.0};
-    // Set end lateral to be at the desired pull over destination if enter into
-    // pull over scenario.
-    if (pull_over_info.exist_pull_over_position()) {
-      end_state[0] = pull_over_info.pull_over_l();
+
+    if (!FLAGS_enable_force_pull_over_open_space_parking_test) {
+      // pull over scenario.
+      const auto& pull_over_status =
+          PlanningContext::Instance()->planning_status().pull_over();
+
+      // Set end lateral to be at the desired pull over destination
+      if (pull_over_status.has_position() &&
+          pull_over_status.position().has_x() &&
+          pull_over_status.position().has_y() &&
+          path_boundary.label().find("pullover") != std::string::npos) {
+        common::SLPoint pull_over_sl;
+        reference_line.XYToSL(
+            {pull_over_status.position().x(), pull_over_status.position().y()},
+            &pull_over_sl);
+        end_state[0] = pull_over_sl.l();
+      }
     }
 
     bool res_opt = OptimizePath(
@@ -97,7 +114,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
         path_boundary.boundary(), w, &opt_l, &opt_dl, &opt_ddl, max_iter);
 
     if (res_opt) {
-      for (size_t i = 0; i < path_boundary.boundary().size(); i+=4) {
+      for (size_t i = 0; i < path_boundary.boundary().size(); i += 4) {
         ADEBUG << "for s[" << static_cast<double>(i) * path_boundary.delta_s()
                << "], l = " << opt_l[i] << ", dl = " << opt_dl[i];
       }
@@ -153,6 +170,16 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
                                         FLAGS_lateral_derivative_bound_default);
   piecewise_jerk_problem.set_dddx_bound(FLAGS_lateral_jerk_bound);
 
+  // Estimate jerk boundary from vehicle_params
+  const auto& veh_param =
+      common::VehicleConfigHelper::GetConfig().vehicle_param();
+  const double axis_distance = veh_param.wheel_base();
+  const double max_yaw_rate =
+      veh_param.max_steer_angle_rate() / veh_param.steer_ratio() / 2.0;
+  const double jerk_bound = EstimateJerkBoundary(std::fmax(init_state[1], 1.0),
+                                                 axis_distance, max_yaw_rate);
+  piecewise_jerk_problem.set_dddx_bound(jerk_bound);
+
   bool success = piecewise_jerk_problem.Optimize(max_iter);
 
   auto end_time = std::chrono::system_clock::now();
@@ -167,6 +194,7 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   *x = piecewise_jerk_problem.opt_x();
   *dx = piecewise_jerk_problem.opt_dx();
   *ddx = piecewise_jerk_problem.opt_ddx();
+
   return true;
 }
 
@@ -204,6 +232,12 @@ FrenetFramePath PiecewiseJerkPathOptimizer::ToPiecewiseJerkPath(
   }
 
   return FrenetFramePath(frenet_frame_path);
+}
+
+double PiecewiseJerkPathOptimizer::EstimateJerkBoundary(
+    const double vehicle_speed, const double axis_distance,
+    const double max_yaw_rate) const {
+  return max_yaw_rate / axis_distance / vehicle_speed;
 }
 
 }  // namespace planning

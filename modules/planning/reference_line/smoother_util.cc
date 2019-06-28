@@ -192,7 +192,7 @@ class SmootherUtil {
       anchor.path_point.set_s(s);
       anchor.path_point.set_theta(ref_point.heading());
       anchor.path_point.set_kappa(ref_point.kappa());
-      anchor.lateral_bound = config_.lateral_boundary_bound();
+      anchor.lateral_bound = config_.max_lateral_boundary_bound();
       anchor.longitudinal_bound = config_.longitudinal_boundary_bound();
       anchor_points.emplace_back(anchor);
     }

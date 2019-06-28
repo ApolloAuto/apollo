@@ -184,6 +184,27 @@ new_local_repository(
     path = "/usr/local/apollo/local_integ",
 )
 
+# paddlepaddle
+new_local_repository(
+    name = "paddlepaddle",
+    build_file = "third_party/paddlepaddle.BUILD",
+    path = "/usr/local/apollo/paddlepaddle",
+)
+
+# mkldnn
+new_local_repository(
+    name = "mkldnn",
+    build_file = "third_party/mkldnn.BUILD",
+    path = "/usr/local/apollo/local_third_party/mkldnn",
+)
+
+# mklml
+new_local_repository(
+    name = "mklml",
+    build_file = "third_party/mklml.BUILD",
+    path = "/usr/local/apollo/local_third_party/mklml",
+)
+
 # Proj.4
 new_http_archive(
     name = "proj4",
@@ -212,6 +233,20 @@ new_local_repository(
     name = "jsoncpp",
     build_file = "third_party/jsoncpp.BUILD",
     path = "/usr/local/apollo/jsoncpp/",
+)
+
+#xxhash
+new_local_repository(
+    name = "xxhash",
+    build_file = "third_party/xxhash.BUILD",
+    path = "/usr/local/apollo/paddlepaddle_dep/xxhash",
+)
+
+#snappystream
+new_local_repository(
+    name = "snappystream",
+    build_file = "third_party/snappystream.BUILD",
+    path = "/usr/local/apollo/paddlepaddle_dep/snappystream",
 )
 
 #adv_plat

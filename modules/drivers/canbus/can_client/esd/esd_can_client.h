@@ -42,7 +42,7 @@ namespace can {
 
 /**
  * @class EsdCanClient
- * @brief The class which defines a ESD CAN client which inherits CanClient.
+ * @brief The class which defines an ESD CAN client which inherits CanClient.
  */
 class EsdCanClient : public CanClient {
  public:

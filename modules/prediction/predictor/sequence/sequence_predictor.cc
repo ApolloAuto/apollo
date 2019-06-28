@@ -74,12 +74,17 @@ void SequencePredictor::FilterLaneSequences(
    */
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = lane_graph.lane_sequence(i);
+    if (sequence.lane_type() == apollo::hdmap::Lane::PARKING) {
+      (*enable_lane_sequence)[i] = false;
+      ADEBUG << "Ignore lane sequence [" << ToString(sequence) << "].";
+      continue;
+    }
     lane_change_type[i] = GetLaneChangeType(lane_id, sequence);
 
     if (lane_change_type[i] != LaneChangeType::LEFT &&
         lane_change_type[i] != LaneChangeType::RIGHT &&
         lane_change_type[i] != LaneChangeType::ONTO_LANE) {
-      ADEBUG "Ignore lane sequence [" << ToString(sequence) << "].";
+      ADEBUG << "Ignore lane sequence [" << ToString(sequence) << "].";
       continue;
     }
 
@@ -362,7 +367,17 @@ bool SequencePredictor::GetLongitudinalPolynomial(
   if (FLAGS_enable_lane_sequence_acc && lane_sequence.has_acceleration()) {
     a = lane_sequence.acceleration();
   }
-  double lane_heading = lane_sequence.lane_segment(0).lane_point(0).heading();
+  int lane_seg_start_idx = lane_sequence.adc_lane_segment_idx();
+  int lane_point_start_idx =
+      lane_sequence.lane_segment(lane_seg_start_idx).adc_lane_point_idx();
+  if (lane_point_start_idx >=
+      lane_sequence.lane_segment(lane_seg_start_idx).lane_point_size()) {
+    lane_point_start_idx =
+        lane_sequence.lane_segment(lane_seg_start_idx).lane_point_size() - 1;
+  }
+  double lane_heading = lane_sequence.lane_segment(lane_seg_start_idx)
+                            .lane_point(lane_point_start_idx)
+                            .heading();
 
   // Set the initial conditions for the diff. eqn.
   double s0 = 0.0;
@@ -401,8 +416,17 @@ bool SequencePredictor::GetLateralPolynomial(
   double theta = feature.velocity_heading();
   double v = feature.speed();
   Point3D position = feature.position();
+  int lane_seg_start_idx = lane_sequence.adc_lane_segment_idx();
+  int lane_point_start_idx =
+      lane_sequence.lane_segment(lane_seg_start_idx).adc_lane_point_idx();
+  if (lane_point_start_idx >=
+      lane_sequence.lane_segment(lane_seg_start_idx).lane_point_size()) {
+    lane_point_start_idx =
+        lane_sequence.lane_segment(lane_seg_start_idx).lane_point_size() - 1;
+  }
   const LanePoint& start_lane_point =
-      lane_sequence.lane_segment(0).lane_point(0);
+      lane_sequence.lane_segment(lane_seg_start_idx)
+          .lane_point(lane_point_start_idx);
 
   // Get lane info.
   double pos_delta_x = position.x() - start_lane_point.position().x();

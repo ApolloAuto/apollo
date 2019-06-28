@@ -35,7 +35,7 @@ class ExtrapolationPredictor : public SequencePredictor {
   /**
    * @brief Constructor
    */
-  ExtrapolationPredictor() = default;
+  ExtrapolationPredictor();
 
   /**
    * @brief Destructor

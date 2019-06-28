@@ -271,11 +271,17 @@ Status LonController::ComputeControlCommand(
   if ((trajectory_message_->trajectory_type() ==
        apollo::planning::ADCTrajectory::NORMAL) &&
       ((std::fabs(debug->preview_acceleration_reference()) <=
-            FLAGS_max_acceleration_when_stopped &&
+            control_conf_->max_acceleration_when_stopped() &&
         std::fabs(debug->preview_speed_reference()) <=
             vehicle_param_.max_abs_speed_when_stopped()) ||
-       std::abs(debug->path_remain()) < 0.3)) {
-    acceleration_cmd = lon_controller_conf.standstill_acceleration();
+       std::abs(debug->path_remain()) <
+           control_conf_->max_path_remain_when_stopped())) {
+    acceleration_cmd =
+        (chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)
+            ? std::max(acceleration_cmd,
+                       -lon_controller_conf.standstill_acceleration())
+            : std::min(acceleration_cmd,
+                       lon_controller_conf.standstill_acceleration());
     ADEBUG << "Stop location reached";
     debug->set_is_full_stop(true);
   }
@@ -400,6 +406,19 @@ void LonController::ComputeLongitudinalErrors(
   TrajectoryPoint preview_point =
       trajectory_analyzer->QueryNearestPointByAbsoluteTime(
           preview_control_time);
+
+  debug->mutable_current_matched_point()->mutable_path_point()->set_x(
+      matched_point.x());
+  debug->mutable_current_matched_point()->mutable_path_point()->set_y(
+      matched_point.y());
+  debug->mutable_current_reference_point()->mutable_path_point()->set_x(
+      reference_point.path_point().x());
+  debug->mutable_current_reference_point()->mutable_path_point()->set_y(
+      reference_point.path_point().y());
+  debug->mutable_preview_reference_point()->mutable_path_point()->set_x(
+      preview_point.path_point().x());
+  debug->mutable_preview_reference_point()->mutable_path_point()->set_y(
+      preview_point.path_point().y());
 
   ADEBUG << "matched point:" << matched_point.DebugString();
   ADEBUG << "reference point:" << reference_point.DebugString();

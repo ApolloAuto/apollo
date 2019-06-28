@@ -23,6 +23,7 @@
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/string_util.h"
+#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/pose/pose_container.h"
 
@@ -40,14 +41,22 @@ void SemanticMap::Init() {
   }
   const std::string config_path = apollo::common::util::StrCat(
       FLAGS_map_dir, "/semantic_map_config.pb.txt");
-  cyber::common::GetProtoFromFile(config_path, &config_);
+  if (!cyber::common::GetProtoFromFile(config_path, &config_)) {
+    AERROR << "Failed to load config file: " << config_path;
+    return;
+  }
   curr_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
 }
 
 void SemanticMap::RunCurrFrame(
     const std::unordered_map<int, ObstacleHistory>& obstacle_id_history_map) {
-  // TODO(Hongyi): moving all these magic numbers to conf
-  const Feature& ego_feature = obstacle_id_history_map.at(-1).feature(0);
+  if (obstacle_id_history_map.find(FLAGS_ego_vehicle_id) ==
+      obstacle_id_history_map.end()) {
+    return;
+  }
+  obstacle_id_history_map_ = obstacle_id_history_map;
+  const Feature& ego_feature =
+      obstacle_id_history_map_.at(FLAGS_ego_vehicle_id).feature(0);
   curr_timestamp_ = ego_feature.timestamp();
   curr_base_x_ = ego_feature.position().x() - config_.observation_range();
   curr_base_y_ = ego_feature.position().y() - config_.observation_range();
@@ -55,23 +64,25 @@ void SemanticMap::RunCurrFrame(
                                  config_.resolution()),
                 static_cast<int>(config_.dim_y() -
                                  (curr_base_y_ - config_.base_point().y()) /
-                                     config_.resolution()) -
-                    2000,
+                                     config_.resolution()) - 2000,
                 2000, 2000);
   base_img_(rect).copyTo(curr_img_);
 
   // Draw all obstacles_history
-  for (const auto obstacle_id_history_pair : obstacle_id_history_map) {
+  for (const auto obstacle_id_history_pair : obstacle_id_history_map_) {
     DrawHistory(obstacle_id_history_pair.second, cv::Scalar(0, 255, 255),
                 &curr_img_);
   }
 
   // Crop ego_vehicle for demo
-  cv::Mat output_img =
-      CropByHistory(obstacle_id_history_map.at(-1), cv::Scalar(0, 0, 255));
-  cv::namedWindow("Demo window", cv::WINDOW_NORMAL);
-  cv::imshow("Demo window", output_img);
-  cv::waitKey();
+  if (false) {
+    cv::Mat output_img;
+    if (GetMapById(FLAGS_ego_vehicle_id, &output_img)) {
+      cv::namedWindow("Demo window", cv::WINDOW_NORMAL);
+      cv::imshow("Demo window", output_img);
+      cv::waitKey();
+    }
+  }
 }
 
 void SemanticMap::DrawRect(const Feature& feature, const cv::Scalar& color,
@@ -116,7 +127,7 @@ void SemanticMap::DrawHistory(const ObstacleHistory& history,
     const Feature& feature = history.feature(i);
     double time_decay = 1.0 - curr_timestamp_ + feature.timestamp();
     cv::Scalar decay_color = color * time_decay;
-    if (feature.id() == -1) {
+    if (feature.id() == FLAGS_ego_vehicle_id) {
       DrawRect(feature, decay_color, img);
     } else {
       DrawPoly(feature, decay_color, img);
@@ -145,6 +156,17 @@ cv::Mat SemanticMap::CropByHistory(const ObstacleHistory& history,
   cv::Point2i center_point =
       GetTransPoint(curr_feature.position().x(), curr_feature.position().y());
   return CropArea(feature_map, center_point, curr_feature.theta());
+}
+
+bool SemanticMap::GetMapById(const int obstacle_id, cv::Mat* feature_map) {
+  if (obstacle_id_history_map_.find(obstacle_id) ==
+      obstacle_id_history_map_.end()) {
+    return false;
+  }
+  cv::Mat output_img = CropByHistory(obstacle_id_history_map_[obstacle_id],
+                                     cv::Scalar(0, 0, 255));
+  output_img.copyTo(*feature_map);
+  return true;
 }
 
 }  // namespace prediction

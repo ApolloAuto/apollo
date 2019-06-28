@@ -27,6 +27,7 @@ cc_binary(
         "-lopencv_imgproc",
         "-lopencv_highgui",
     ],
+    linkstatic = False,
     deps = [
         ":lane_common",
         "//cyber",

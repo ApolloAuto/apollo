@@ -134,7 +134,7 @@ double TrajectoryEvaluator::Evaluate(
 
   // decides the longitudinal evaluation horizon for lateral trajectories.
   double evaluation_horizon =
-      std::min(FLAGS_decision_horizon,
+      std::min(FLAGS_speed_lon_decision_horizon,
                lon_trajectory->Evaluate(0, lon_trajectory->ParamLength()));
   std::vector<double> s_values;
   for (double s = 0.0; s < evaluation_horizon;

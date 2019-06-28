@@ -20,15 +20,37 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
+ARCH=$(uname -m)
+if [ "$ARCH" == "aarch64" ]; then
+  BUILD=$1
+  shift
+fi
 
-wget https://github.com/PointCloudLibrary/pcl/archive/pcl-1.7.2.tar.gz
+if [ "$BUILD" == "build" ] || [ "$ARCH" == "x86_64" ]; then
+  wget https://github.com/PointCloudLibrary/pcl/archive/pcl-1.7.2.tar.gz
 
-tar xzvf pcl-1.7.2.tar.gz
+  tar xzvf pcl-1.7.2.tar.gz
 
-cd pcl-pcl-1.7.2/
+  pushd pcl-pcl-1.7.2/
+  echo "add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)" > temp
+  cat CMakeLists.txt >> temp
+  mv temp CMakeLists.txt
+  mkdir build
+  cd build
+  cmake ..
+  make -j2
+  make install
+  popd
+else
+  # aarch64 prebuilt package
+  wget https://apollocache.blob.core.windows.net/apollo-cache/pcl.zip
+  unzip pcl.zip
 
-export TASK=build
-export CC=gcc
-bash .travis.sh
-cd build
-sudo make install
+  pushd pcl/
+  mkdir -p /usr/local/include/pcl-1.7/
+  cd include
+  cp -r pcl /usr/local/include/pcl-1.7/
+  cd ../
+  cp -r lib /usr/local/
+  popd
+fi

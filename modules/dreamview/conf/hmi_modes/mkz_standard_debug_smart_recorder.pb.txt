@@ -1,0 +1,148 @@
+cyber_modules {
+  key: "Camera"
+  value: {
+    dag_files: "/apollo/modules/drivers/camera/dag/camera.dag"
+    dag_files: "/apollo/modules/drivers/video/dag/video.dag"
+  }
+}
+cyber_modules {
+  key: "Canbus"
+  value: {
+    dag_files: "/apollo/modules/canbus/dag/canbus.dag"
+  }
+}
+cyber_modules {
+  key: "Control"
+  value: {
+    dag_files: "/apollo/modules/control/dag/control.dag"
+  }
+}
+cyber_modules {
+  key: "GPS"
+  value: {
+    dag_files: "/apollo/modules/drivers/gnss/dag/gnss.dag"
+  }
+}
+cyber_modules {
+  key: "Guardian"
+  value: {
+    dag_files: "/apollo/modules/guardian/dag/guardian.dag"
+  }
+}
+cyber_modules {
+  key: "Localization"
+  value: {
+    dag_files: "/apollo/modules/localization/dag/dag_streaming_msf_localization.dag"
+  }
+}
+cyber_modules {
+  key: "Perception"
+  value: {
+    dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception.dag"
+  }
+}
+cyber_modules {
+  key: "Traffic Light"
+  value: {
+    dag_files: "/apollo/modules/perception/production/dag/dag_streaming_perception_trafficlights.dag"
+  }
+}
+cyber_modules {
+  key: "Planning"
+  value: {
+    dag_files: "/apollo/modules/planning/dag/planning.dag"
+  }
+}
+cyber_modules {
+  key: "Prediction"
+  value: {
+    dag_files: "/apollo/modules/prediction/dag/prediction.dag"
+  }
+}
+cyber_modules {
+  key: "Radar"
+  value: {
+    dag_files: "/apollo/modules/drivers/radar/conti_radar/dag/conti_radar.dag"
+  }
+}
+cyber_modules {
+  key: "Routing"
+  value: {
+    dag_files: "/apollo/modules/routing/dag/routing.dag"
+  }
+}
+cyber_modules {
+  key: "Transform"
+  value: {
+    dag_files: "/apollo/modules/transform/dag/static_transform.dag"
+  }
+}
+cyber_modules {
+  key: "Velodyne"
+  value: {
+    dag_files: "/apollo/modules/drivers/velodyne/dag/velodyne.dag"
+  }
+}
+modules {
+  key: "SmartRecorder"
+  value: {
+    start_command: "/apollo/scripts/record_message.py --start"
+    stop_command: "/apollo/scripts/record_message.py --stop"
+    process_monitor_config {
+      command_keywords: "smart_recorder"
+    }
+  }
+}
+monitored_components {
+  key: "SmartRecorder"
+  value: {
+    process {
+      command_keywords: "smart_recorder"
+    }
+    resource {
+      disk_spaces {
+        # For logs.
+        path: "/apollo/data"
+        insufficient_space_warning: 8
+        insufficient_space_error: 2
+      }
+      disk_spaces {
+        # For records.
+        path: "/media/apollo/internal_nvme"
+        insufficient_space_warning: 128
+        insufficient_space_error: 32
+      }
+    }
+  }
+}
+monitored_components {
+  key: "GPS"
+  value: {
+    process {
+      command_keywords: "mainboard"
+      command_keywords: "/apollo/modules/drivers/gnss/dag/gnss.dag"
+    }
+    # We also have a special GPSMonitor to check message status.
+  }
+}
+monitored_components {
+  key: "Localization"
+  value: {
+    # Special LocalizationMonitor.
+  }
+}
+# Disbale ESD-CAN for a while as in some cars we are using B-CAN.
+# monitored_components {
+#   key: "ESD-CAN"
+#   value: {
+#     # Special EsdCanMonitor.
+#   }
+# }
+monitored_components {
+  key: "Lidar 128"
+  value: {
+    channel {
+      name: "/apollo/sensor/lidar128/compensator/PointCloud2"
+    }
+  }
+}

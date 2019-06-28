@@ -22,7 +22,7 @@ FAST_BUILD_MODE="no"
 FAST_TEST_MODE="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20190413_1615"
+VERSION_X86_64="dev-x86_64-20190617_1100"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
 
@@ -263,7 +263,23 @@ function main(){
     docker pull ${LOCALIZATION_VOLUME_IMAGE}
     docker run -it -d --rm --name ${LOCALIZATION_VOLUME} ${LOCALIZATION_VOLUME_IMAGE}
 
-    OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCALIZATION_VOLUME}"
+    PADDLE_VOLUME=apollo_paddlepaddle_volume_$USER
+    docker stop ${PADDLE_VOLUME} > /dev/null 2>&1
+
+    PADDLE_VOLUME_IMAGE=${DOCKER_REPO}:paddlepaddle_volume-${ARCH}-latest
+    docker pull ${PADDLE_VOLUME_IMAGE}
+    docker run -it -d --rm --name ${PADDLE_VOLUME} ${PADDLE_VOLUME_IMAGE}
+
+    LOCAL_THIRD_PARTY_VOLUME=apollo_local_third_party_volume_$USER
+    docker stop ${LOCAL_THIRD_PARTY_VOLUME} > /dev/null 2>&1
+
+    LOCAL_THIRD_PARTY_VOLUME_IMAGE=${DOCKER_REPO}:local_third_party_volume-${ARCH}-latest
+    docker pull ${LOCAL_THIRD_PARTY_VOLUME_IMAGE}
+    docker run -it -d --rm --name ${LOCAL_THIRD_PARTY_VOLUME} ${LOCAL_THIRD_PARTY_VOLUME_IMAGE}
+
+    OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCALIZATION_VOLUME} "
+    OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${PADDLE_VOLUME}"
+    OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCAL_THIRD_PARTY_VOLUME}"
 
     local display=""
     if [[ -z ${DISPLAY} ]];then
@@ -295,6 +311,8 @@ function main(){
         USE_GPU=0
     fi
 
+    set -x
+
     ${DOCKER_CMD} run -it \
         -d \
         --privileged \
@@ -320,7 +338,7 @@ function main(){
         -v /dev/null:/dev/raw1394 \
         $IMG \
         /bin/bash
-
+    set +x
     if [ $? -ne 0 ];then
         error "Failed to start docker container \"${APOLLO_DEV}\" based on image: $IMG"
         exit 1

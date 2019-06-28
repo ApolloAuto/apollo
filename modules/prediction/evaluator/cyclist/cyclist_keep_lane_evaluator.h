@@ -37,7 +37,7 @@ class CyclistKeepLaneEvaluator : public Evaluator {
   /**
    * @brief Constructor
    */
-  CyclistKeepLaneEvaluator() = default;
+  CyclistKeepLaneEvaluator();
 
   /**
    * @brief Destructor
@@ -48,7 +48,7 @@ class CyclistKeepLaneEvaluator : public Evaluator {
    * @brief Override Evaluate
    * @param Obstacle pointer
    */
-  void Evaluate(Obstacle* obstacle_ptr) override;
+  bool Evaluate(Obstacle* obstacle_ptr) override;
 
   /**
    * @brief Get the name of evaluator.

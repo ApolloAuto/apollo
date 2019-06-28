@@ -392,6 +392,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
                   target_lane_pair.first)) {
       // take the id of the first adjacent lane on the left of adc as
       // the nearest_neighbor_lane_id
+      lane_change_type = routing::LEFT;
       nearest_neighbor_lane_id =
           adc_lane_way_point.lane->lane().left_neighbor_forward_lane_id(0).id();
     } else if (right_neighbor_lane_ids.end() !=
@@ -401,6 +402,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
       // target lane on the right of adc
       // take the id  of the first adjacent lane on the right of adc as
       // the nearest_neighbor_lane_id
+      lane_change_type = routing::RIGHT;
       nearest_neighbor_lane_id = adc_lane_way_point.lane->lane()
                                      .right_neighbor_forward_lane_id(0)
                                      .id();
@@ -775,56 +777,71 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
   auto ref_point = reference_line.GetReferencePoint(s);
   if (ref_point.lane_waypoints().empty()) {
     anchor.path_point = ref_point.ToPathPoint(s);
-    anchor.lateral_bound = smoother_config_.lateral_boundary_bound();
+    anchor.lateral_bound = smoother_config_.max_lateral_boundary_bound();
     return anchor;
   }
+
   const double adc_width =
       VehicleConfigHelper::GetConfig().vehicle_param().width();
-  const double adc_half_width = adc_width / 2.0;
   const Vec2d left_vec =
       Vec2d::CreateUnitVec2d(ref_point.heading() + M_PI / 2.0);
   auto waypoint = ref_point.lane_waypoints().front();
-  // shift to center
   double left_width = 0.0;
   double right_width = 0.0;
   waypoint.lane->GetWidth(waypoint.s, &left_width, &right_width);
-  double total_width = left_width + right_width;
-  // only need to track left side width shift
-  double shifted_left_width = total_width / 2.0;
+  const double kEpislon = 1e-8;
+  double effective_width = 0.0;
 
-  // shift to left (or right) on wide lanes
-  if (smoother_config_.wide_lane_threshold_factor() > 0 &&
-      total_width > adc_width * smoother_config_.wide_lane_threshold_factor()) {
-    if (smoother_config_.driving_side() == ReferenceLineSmootherConfig::RIGHT) {
-      shifted_left_width =
-          adc_half_width +
-          adc_width * smoother_config_.wide_lane_shift_remain_factor();
+  // shrink width by vehicle width, curb
+  double safe_lane_width = left_width + right_width;
+  safe_lane_width -= adc_width;
+  bool is_lane_width_safe = true;
+
+  if (safe_lane_width < kEpislon) {
+    ADEBUG << "lane width [" << left_width + right_width << "] "
+           << "is smaller than adc width [" << adc_width << "]";
+    effective_width = kEpislon;
+    is_lane_width_safe = false;
+  }
+
+  double center_shift = 0.0;
+  if (hdmap::RightBoundaryType(waypoint) == hdmap::LaneBoundaryType::CURB) {
+    safe_lane_width -= smoother_config_.curb_shift();
+    if (safe_lane_width < kEpislon) {
+      ADEBUG << "lane width smaller than adc width and right curb shift";
+      effective_width = kEpislon;
+      is_lane_width_safe = false;
     } else {
-      shifted_left_width = std::fmax(
-          adc_half_width,
-          total_width -
-              (adc_half_width +
-               adc_width * smoother_config_.wide_lane_shift_remain_factor()));
+      center_shift += 0.5 * smoother_config_.curb_shift();
+    }
+  }
+  if (hdmap::LeftBoundaryType(waypoint) == hdmap::LaneBoundaryType::CURB) {
+    safe_lane_width -= smoother_config_.curb_shift();
+    if (safe_lane_width < kEpislon) {
+      ADEBUG << "lane width smaller than adc width and left curb shift";
+      effective_width = kEpislon;
+      is_lane_width_safe = false;
+    } else {
+      center_shift -= 0.5 * smoother_config_.curb_shift();
     }
   }
 
-  // shift away from curb boundary
-  auto left_type = hdmap::LeftBoundaryType(waypoint);
-  if (left_type == hdmap::LaneBoundaryType::CURB) {
-    shifted_left_width += smoother_config_.curb_shift();
-  }
-  auto right_type = hdmap::RightBoundaryType(waypoint);
-  if (right_type == hdmap::LaneBoundaryType::CURB) {
-    shifted_left_width -= smoother_config_.curb_shift();
+  //  apply buffer if possible
+  const double buffered_width =
+      safe_lane_width - 2.0 * smoother_config_.lateral_buffer();
+  safe_lane_width =
+      buffered_width < kEpislon ? safe_lane_width : buffered_width;
+
+  // shift center depending on the road width
+  if (is_lane_width_safe) {
+    effective_width = 0.5 * safe_lane_width;
   }
 
-  ref_point += left_vec * (left_width - shifted_left_width);
-  auto shifted_right_width = total_width - shifted_left_width;
+  ref_point += left_vec * center_shift;
   anchor.path_point = ref_point.ToPathPoint(s);
-  double effective_width = std::min(shifted_left_width, shifted_right_width) -
-                           adc_half_width - FLAGS_reference_line_lateral_buffer;
-  anchor.lateral_bound =
-      std::max(smoother_config_.lateral_boundary_bound(), effective_width);
+  anchor.lateral_bound = common::math::Clamp(
+      effective_width, smoother_config_.min_lateral_boundary_bound(),
+      smoother_config_.max_lateral_boundary_bound());
   return anchor;
 }
 

@@ -3,6 +3,7 @@ syntax = "proto2";
 package apollo.prediction;
 
 import "modules/perception/proto/perception_obstacle.proto";
+import "modules/prediction/proto/feature.proto";
 
 message ObstacleConf {
   enum ObstacleStatus {
@@ -22,6 +23,8 @@ message ObstacleConf {
     CYCLIST_KEEP_LANE_EVALUATOR = 5;
     LANE_SCANNING_EVALUATOR = 6;
     PEDESTRIAN_INTERACTION_EVALUATOR = 7;
+    JUNCTION_MAP_EVALUATOR = 8;
+    LANE_AGGREGATING_EVALUATOR = 9;
   }
 
   enum PredictorType {
@@ -38,6 +41,7 @@ message ObstacleConf {
 
   optional apollo.perception.PerceptionObstacle.Type obstacle_type = 1;
   optional ObstacleStatus obstacle_status = 2;
+  optional ObstaclePriority.Priority priority_type = 5;
   optional EvaluatorType evaluator_type = 3;
   optional PredictorType predictor_type = 4;
 }

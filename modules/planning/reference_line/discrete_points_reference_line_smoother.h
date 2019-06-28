@@ -21,7 +21,7 @@
 #include <utility>
 #include <vector>
 
-#include "modules/planning/proto/planning.pb.h"
+#include "modules/planning/proto/reference_line_smoother_config.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_point.h"
@@ -43,13 +43,13 @@ class DiscretePointsReferenceLineSmoother : public ReferenceLineSmoother {
 
  private:
   bool CosThetaSmooth(
-      const std::vector<std::pair<double, double>>& point2d,
-      const std::vector<double>& lateral_bounds,
+      const std::vector<std::pair<double, double>>& raw_point2d,
+      const std::vector<double>& bounds,
       std::vector<std::pair<double, double>>* ptr_smoothed_point2d);
 
   bool FemPosSmooth(
-      const std::vector<std::pair<double, double>>& point2d,
-      const std::vector<double>& lateral_bounds,
+      const std::vector<std::pair<double, double>>& raw_point2d,
+      const std::vector<double>& bounds,
       std::vector<std::pair<double, double>>* ptr_smoothed_point2d);
 
   void NormalizePoints(std::vector<std::pair<double, double>>* xy_points);
@@ -66,46 +66,6 @@ class DiscretePointsReferenceLineSmoother : public ReferenceLineSmoother {
   double zero_x_ = 0.0;
 
   double zero_y_ = 0.0;
-
-  // cos_theta smoothing parameters
-  bool use_cos_theta_ = false;
-
-  double weight_cos_included_angle_ = 0.0;
-
-  double weight_anchor_points_ = 0.0;
-
-  double weight_length_ = 0.0;
-
-  size_t print_level_ = 0;
-
-  size_t max_num_of_iterations_ = 500;
-
-  size_t acceptable_num_of_iterations_ = 15;
-
-  double tol_ = 1e-8;
-
-  double acceptable_tol_ = 1e-6;
-
-  bool use_automatic_differentiation_ = false;
-
-  // fem_pos smoothing parameters
-  bool use_fem_pos_ = false;
-
-  double weight_fem_pos_deviation_ = 0.0;
-
-  double weight_ref_deviation_ = 0.0;
-
-  double weight_path_length_ = 0.0;
-
-  size_t max_iter_ = 0;
-
-  double time_limit_ = 0.0;
-
-  bool verbose_ = false;
-
-  bool scaled_termination_ = false;
-
-  bool warm_start_ = false;
 };
 
 }  // namespace planning

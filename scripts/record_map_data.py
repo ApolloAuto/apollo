@@ -54,6 +54,9 @@ MAP_COLLECTION_DATA_TOPICS = [
     '/apollo/sensor/lidar16/front/up/compensator/PointCloud2',
     '/apollo/sensor/lidar128/PointCloud2',
     '/apollo/sensor/lidar128/compensator/PointCloud2',
+    '/apollo/sensor/velodyne64/PointCloud2',
+    '/apollo/sensor/velodyne64/compensator/PointCloud2',
+    '/apollo/sensor/velodyne64/VelodyneScan',
 ]
 
 def shell_cmd(cmd, alert_on_failure=True):
@@ -152,8 +155,7 @@ class Recorder(object):
         log_file = '/apollo/data/log/apollo_record.out'
         topics_str = ' -c '.join(topics)
 
-        if not os.path.exists(task_dir):
-            os.makedirs(task_dir)
+        os.makedirs(task_dir)
         cmd = '''
             cd "{}"
             source /apollo/scripts/apollo_base.sh

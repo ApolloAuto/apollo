@@ -6,6 +6,9 @@ cc_library(
     name = "obstacles_container",
     srcs = ["obstacles_container.cc"],
     hdrs = ["obstacles_container.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/common:environment_features",
         "//modules/prediction/common:feature_output",
@@ -19,11 +22,15 @@ cc_library(
     name = "obstacle",
     srcs = ["obstacle.cc"],
     hdrs = ["obstacle.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/common/filters:digital_filter",
         "//modules/prediction/common:junction_analyzer",
         "//modules/prediction/container/obstacles:obstacle_clusters",
         "//modules/prediction/network/rnn_model",
+        "//modules/prediction/proto:prediction_conf_proto",
         "//modules/prediction/proto:prediction_proto",
     ],
 )
@@ -69,6 +76,9 @@ cc_library(
     ],
     hdrs = [
         "obstacle_clusters.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
         "//modules/prediction/common:road_graph",

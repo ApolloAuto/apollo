@@ -212,11 +212,11 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
 
   // 2. control variables, 2 * [0, horizon_-1]
   for (int i = 0; i < horizon_; ++i) {
-    // u1
+    // steer
     x_l[variable_index] = -2e19;
     x_u[variable_index] = 2e19;
 
-    // u2
+    // a
     x_l[variable_index + 1] = -2e19;
     x_u[variable_index + 1] = 2e19;
 
@@ -446,7 +446,7 @@ bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
 bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
                                             int m, double* g) {
   eval_constraints(n, x, m, g);
-  if (enable_constraint_check_) check_g(n, x, m, g);
+  // if (enable_constraint_check_) check_g(n, x, m, g);
   return true;
 }
 
@@ -1894,7 +1894,7 @@ void DistanceApproachIPOPTInterface::generate_tapes(int n, int m,
 
   double sig;
   adouble obj_value;
-  double dummy;
+  double dummy = 0.0;
   obj_lam = new double[m + 1];
   get_starting_point(n, 1, &xp[0], 0, &zl[0], &zu[0], m, 0, &lamp[0]);
 

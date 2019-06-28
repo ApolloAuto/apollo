@@ -46,7 +46,7 @@ class GatedHungarianMatcher {
    * costs of matching. it could & need be updated outside the matcher,
    * before each matching. use it carefully, and make sure all the
    * elements of the global_costs is updated as you presumed. resize it
-   * and update it completly is STRONG RECOMMENDED!! P.S. resizing SecureMat
+   * and update it completely is STRONG RECOMMENDED!! P.S. resizing SecureMat
    * would not alloc new memory, if the resizing size is smaller than the
    * size reserved. */
   const SecureMat<T>& global_costs() const { return global_costs_; }
@@ -97,7 +97,7 @@ class GatedHungarianMatcher {
   void OptimizeAdapter(
       std::vector<std::pair<size_t, size_t>>* local_assignments);
 
-  /* hungarian optimizer */
+  /* Hungarian optimizer */
   HungarianOptimizer<T> optimizer_;
 
   /* global costs matrix */

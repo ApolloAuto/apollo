@@ -19,7 +19,13 @@
 namespace apollo {
 namespace prediction {
 
-void EmptyPredictor::Predict(Obstacle* obstacle) {}
+EmptyPredictor::EmptyPredictor() {
+  predictor_type_ = ObstacleConf::EMPTY_PREDICTOR;
+}
+
+void EmptyPredictor::Predict(Obstacle* obstacle) {
+  obstacle->SetPredictorType(predictor_type_);
+}
 
 }  // namespace prediction
 }  // namespace apollo

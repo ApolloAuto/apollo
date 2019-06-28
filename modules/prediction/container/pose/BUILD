@@ -6,10 +6,14 @@ cc_library(
     name = "pose_container",
     srcs = ["pose_container.cc"],
     hdrs = ["pose_container.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/common/math:quaternion",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",
+        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container",
     ],
 )

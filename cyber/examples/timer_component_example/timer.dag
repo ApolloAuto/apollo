@@ -6,5 +6,5 @@ module_config {
             name : "timer"
             interval : 10
         }
-    }    
+    }
 }

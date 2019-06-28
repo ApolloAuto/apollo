@@ -22,6 +22,59 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "util",
+    srcs = [
+        "util.cc",
+    ],
+    hdrs = [
+        "util.h",
+    ],
+    deps = [
+        ":bridge_buffer",
+        ":macro",
+    ],
+)
+
+cc_library(
+    name = "macro",
+    hdrs = [
+        "macro.h",
+    ],
+)
+
+cc_library(
+    name = "bridge_proto_serialized_buf",
+    hdrs = [
+        "bridge_proto_serialized_buf.h",
+    ],
+)
+
+cc_library(
+    name = "bridge_proto_diserialized_buf",
+    hdrs = [
+        "bridge_proto_diserialized_buf.h",
+    ],
+)
+
+cc_library(
+    name = "udp_listener",
+    hdrs = [
+        "udp_listener.h",
+    ],
+)
+
+cc_library(
+    name = "bridge_header",
+    srcs = [
+        "bridge_header.cc",
+    ],
+    hdrs = [
+        "bridge_header.h",
+        "bridge_header_item.h",
+    ],
+)
+
 cc_test(
     name = "bridge_buffer_test",
     size = "small",
@@ -29,7 +82,19 @@ cc_test(
         "bridge_buffer_test.cc",
     ],
     deps = [
-        "bridge_buffer",
+        ":bridge_buffer",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "bridge_proto_buf_test",
+    size = "small",
+    srcs = [
+        "bridge_proto_buf_test.cc",
+    ],
+    deps = [
+        "//modules/bridge:udp_bridge",
         "@gtest//:main",
     ],
 )

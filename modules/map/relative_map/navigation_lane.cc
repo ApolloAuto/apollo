@@ -53,7 +53,7 @@ namespace {
  * markings are used here.
  * @param hdmap The output single lane map in high-definition map format in the
  * relative map.
- * @param navigation_path The ouput navigation path map in the relative map.
+ * @param navigation_path The output navigation path map in the relative map.
  * @return True if the map is created; false otherwise.
  */
 bool CreateSingleLaneMap(
@@ -572,7 +572,7 @@ ProjIndexPair NavigationLane::UpdateProjectionIndex(const common::Path &path,
     current_project_index = std::max(0, item_iter->second.first);
   }
 
-  // A lambda expression for checking the distance between the vehicle's inital
+  // A lambda expression for checking the distance between the vehicle's initial
   // position and the starting point of  the current navigation line.
   auto check_distance_func = [this, &path, &path_size](
                                  const int project_index,

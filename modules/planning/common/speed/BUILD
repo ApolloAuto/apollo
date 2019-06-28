@@ -24,6 +24,9 @@ cc_library(
     hdrs = [
         "st_boundary.h",
     ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
     deps = [
         ":st_point",
         "//cyber/common:log",
@@ -38,6 +41,9 @@ cc_test(
     size = "small",
     srcs = [
         "st_boundary_test.cc",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         ":st_boundary",

@@ -59,7 +59,8 @@ int NearestFrontObstacleIdOnLaneSequence(const LaneSequence& lane_sequence) {
   int nearest_front_obstacle_id = std::numeric_limits<int>::min();
   double smallest_relative_s = std::numeric_limits<double>::max();
   for (const auto& nearby_obs : lane_sequence.nearby_obstacle()) {
-    if (nearby_obs.s() < 0.0) {
+    if (nearby_obs.s() < 0.0 ||
+        nearby_obs.s() > FLAGS_caution_search_distance_ahead) {
       continue;
     }
     if (nearby_obs.s() < smallest_relative_s) {
@@ -74,7 +75,8 @@ int NearestBackwardObstacleIdOnLaneSequence(const LaneSequence& lane_sequence) {
   int nearest_backward_obstacle_id = std::numeric_limits<int>::min();
   double smallest_relative_s = std::numeric_limits<double>::max();
   for (const auto& nearby_obs : lane_sequence.nearby_obstacle()) {
-    if (nearby_obs.s() > 0.0) {
+    if (nearby_obs.s() > 0.0 ||
+        nearby_obs.s() < -FLAGS_caution_search_distance_backward) {
       continue;
     }
     if (-nearby_obs.s() < smallest_relative_s) {
@@ -134,6 +136,10 @@ void ObstaclesPrioritizer::AssignIgnoreLevel() {
       obstacles_container->curr_frame_movable_obstacle_ids();
   for (const int obstacle_id : obstacle_ids) {
     Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
+    if (obstacle_ptr == nullptr) {
+      AERROR << "Null obstacle pointer found.";
+      continue;
+    }
     if (obstacle_ptr->history_size() == 0) {
       AERROR << "Obstacle [" << obstacle_ptr->id() << "] has no feature.";
       continue;
@@ -177,8 +183,8 @@ void ObstaclesPrioritizer::AssignIgnoreLevel() {
 }
 
 void ObstaclesPrioritizer::AssignCautionLevel() {
-  // TODO(kechxu): integrate change lane when ready to check change lane
   AssignCautionLevelCruiseKeepLane();
+  AssignCautionLevelCruiseChangeLane();
   AssignCautionLevelByEgoReferenceLine();
 }
 
@@ -196,7 +202,7 @@ void ObstaclesPrioritizer::AssignCautionLevelCruiseKeepLane() {
     AERROR << "Ego vehicle not found";
     return;
   }
-  if (ego_vehicle->history_size() < 2) {
+  if (ego_vehicle->history_size() == 0) {
     AERROR << "Ego vehicle has no history";
     return;
   }
@@ -377,6 +383,10 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
   for (const int obstacle_id :
        obstacles_container->curr_frame_movable_obstacle_ids()) {
     Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
+    if (obstacle_ptr == nullptr) {
+      AERROR << "Null obstacle pointer found.";
+      continue;
+    }
     if (obstacle_ptr->history_size() == 0) {
       AERROR << "Obstacle [" << obstacle_ptr->id() << "] has no feature.";
       continue;

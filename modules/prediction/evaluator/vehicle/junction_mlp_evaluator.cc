@@ -55,20 +55,24 @@ double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
 }  // namespace
 
 JunctionMLPEvaluator::JunctionMLPEvaluator() : device_(torch::kCPU) {
+  evaluator_type_ = ObstacleConf::JUNCTION_MLP_EVALUATOR;
   LoadModel();
 }
 
 void JunctionMLPEvaluator::Clear() {}
 
-void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Sanity checks.
   omp_set_num_threads(1);
   Clear();
   CHECK_NOTNULL(obstacle_ptr);
+
+  obstacle_ptr->SetEvaluatorType(evaluator_type_);
+
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
     AERROR << "Obstacle [" << id << "] has no latest feature.";
-    return;
+    return false;
   }
   Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
   CHECK_NOTNULL(latest_feature_ptr);
@@ -77,7 +81,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   if (!latest_feature_ptr->has_junction_feature() ||
       latest_feature_ptr->junction_feature().junction_exit_size() < 1) {
     ADEBUG << "Obstacle [" << id << "] has no junction_exit.";
-    return;
+    return false;
   }
 
   std::vector<double> feature_values;
@@ -88,7 +92,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
                                          "junction", nullptr);
     ADEBUG << "Save extracted features for learning locally.";
-    return;  // Skip Compute probability for offline mode
+    return false;  // Skip Compute probability for offline mode
   }
   std::vector<torch::jit::IValue> torch_inputs;
   int input_dim = static_cast<int>(
@@ -102,7 +106,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   if (latest_feature_ptr->junction_feature().junction_exit_size() > 1) {
     CHECK_NOTNULL(torch_model_ptr_);
     at::Tensor torch_output_tensor =
-        torch_model_ptr_->forward(torch_inputs).toTensor();
+        torch_model_ptr_->forward(torch_inputs).toTensor().to(torch::kCPU);
     auto torch_output = torch_output_tensor.accessor<float, 2>();
     for (int i = 0; i < torch_output.size(1); ++i) {
       probability.push_back(static_cast<double>(torch_output[0][i]));
@@ -123,7 +127,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   CHECK_NOTNULL(lane_graph_ptr);
   if (lane_graph_ptr->lane_sequence_size() == 0) {
     AERROR << "Obstacle [" << id << "] has no lane sequences.";
-    return;
+    return false;
   }
 
   std::unordered_map<std::string, double> junction_exit_prob;
@@ -156,6 +160,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       }
     }
   }
+  return true;
 }
 
 void JunctionMLPEvaluator::ExtractFeatureValues(
@@ -358,7 +363,7 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
 void JunctionMLPEvaluator::LoadModel() {
   // TODO(all) uncomment the following when cuda issue is resolved
   // if (torch::cuda::is_available()) {
-  //   ADEBUG << "CUDA is available";
+  //   ADEBUG << "CUDA is available for JunctionMLPEvaluator!";
   //   device_ = torch::Device(torch::kCUDA);
   // }
   torch::set_num_threads(1);

@@ -104,6 +104,10 @@ bool DarkSCNNLaneDetector::Init(const LaneDetectorInitOptions &options) {
   const auto net_param = darkscnn_param_.net_param();
   net_inputs_.push_back(net_param.input_blob());
   net_outputs_.push_back(net_param.seg_blob());
+  if (model_param.model_type() == "CaffeNet" && net_param.has_vpt_blob() &&
+      net_param.vpt_blob().size() > 0) {
+    net_outputs_.push_back(net_param.vpt_blob());
+  }
 
   for (auto name : net_inputs_) {
     AINFO << "net input blobs: " << name;
@@ -112,7 +116,7 @@ bool DarkSCNNLaneDetector::Init(const LaneDetectorInitOptions &options) {
     AINFO << "net output blobs: " << name;
   }
 
-  // initilize caffe net
+  // initialize caffe net
   const auto &model_type = model_param.model_type();
   AINFO << "model_type: " << model_type;
   cnnadapter_lane_.reset(
@@ -140,14 +144,19 @@ bool DarkSCNNLaneDetector::Init(const LaneDetectorInitOptions &options) {
     AINFO << input_blob_name << ": " << input_blob->channels() << " "
           << input_blob->height() << " " << input_blob->width();
   }
-  // assume there is only one network output for now
-  for (auto &output_blob_name : net_outputs_) {
-    auto output_blob = cnnadapter_lane_->get_blob(output_blob_name);
-    AINFO << output_blob_name << " : " << output_blob->channels() << " "
-          << output_blob->height() << " " << output_blob->width();
-    lane_output_height_ = output_blob->height();
-    lane_output_width_ = output_blob->width();
-    num_lanes_ = output_blob->channels();
+
+  auto output_blob = cnnadapter_lane_->get_blob(net_outputs_[0]);
+  AINFO << net_outputs_[0] << " : " << output_blob->channels() << " "
+        << output_blob->height() << " " << output_blob->width();
+  lane_output_height_ = output_blob->height();
+  lane_output_width_ = output_blob->width();
+  num_lanes_ = output_blob->channels();
+
+  if (net_outputs_.size() > 1) {
+    vpt_mean_.push_back(model_param.vpt_mean_dx());
+    vpt_mean_.push_back(model_param.vpt_mean_dy());
+    vpt_std_.push_back(model_param.vpt_std_dx());
+    vpt_std_.push_back(model_param.vpt_std_dy());
   }
 
   std::vector<int> lane_shape = {1, 1, lane_output_height_, lane_output_width_};
@@ -238,6 +247,32 @@ bool DarkSCNNLaneDetector::Detect(const LaneDetectorOptions &options,
   // Don't use this way to copy data, it will modify data
   // lane_blob_->set_cpu_data((float*)mask_color.data);
   frame->lane_detected_blob = lane_blob_;
+
+  // retrieve vanishing point network output
+  if (net_outputs_.size() > 1) {
+    const auto vpt_blob = cnnadapter_lane_->get_blob(net_outputs_[1]);
+    ADEBUG << "vpt_blob: " << vpt_blob->shape_string();
+    std::vector<float> v_point(2, 0);
+    std::copy(vpt_blob->cpu_data(), vpt_blob->cpu_data() + 2, v_point.begin());
+    // compute coordinate in net input image
+    v_point[0] = v_point[0] * vpt_std_[0] + vpt_mean_[0] +
+                 (static_cast<float>(blob_width) / 2);
+    v_point[1] = v_point[1] * vpt_std_[1] + vpt_mean_[1] +
+                 (static_cast<float>(blob_height) / 2);
+    // compute coordinate in original image
+    v_point[0] = v_point[0] / static_cast<float>(blob_width) *
+                     static_cast<float>(crop_width_) +
+                 static_cast<float>(input_offset_x_);
+    v_point[1] = v_point[1] / static_cast<float>(blob_height) *
+                     static_cast<float>(crop_height_) +
+                 static_cast<float>(input_offset_y_);
+
+    ADEBUG << "vanishing point: " << v_point[0] << " " << v_point[1];
+    if (v_point[0] > 0 && v_point[0] < static_cast<float>(input_width_) &&
+        v_point[1] > 0 && v_point[0] < static_cast<float>(input_height_)) {
+      frame->pred_vpt = v_point;
+    }
+  }
 
   auto elapsed_2 = std::chrono::high_resolution_clock::now() - start;
   int64_t microseconds_2 =

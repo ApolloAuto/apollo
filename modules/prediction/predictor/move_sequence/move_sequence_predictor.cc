@@ -32,11 +32,17 @@ using ::apollo::prediction::math_util::EvaluateCubicPolynomial;
 using ::apollo::prediction::math_util::EvaluateQuarticPolynomial;
 using ::apollo::prediction::math_util::SolveQuadraticEquation;
 
+MoveSequencePredictor::MoveSequencePredictor() {
+  predictor_type_ = ObstacleConf::MOVE_SEQUENCE_PREDICTOR;
+}
+
 void MoveSequencePredictor::Predict(Obstacle* obstacle) {
   Clear();
 
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
+
+  obstacle->SetPredictorType(predictor_type_);
 
   const Feature& feature = obstacle->latest_feature();
 
@@ -151,7 +157,7 @@ bool MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
 
   // Get ready for the for-loop:
   // project the obstacle's position onto the lane's Frenet coordinates.
-  int lane_segment_index = 0;
+  int lane_segment_index = lane_sequence.adc_lane_segment_idx();
   std::string lane_id =
       lane_sequence.lane_segment(lane_segment_index).lane_id();
   std::shared_ptr<const LaneInfo> lane_info = PredictionMap::LaneById(lane_id);

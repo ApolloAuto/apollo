@@ -42,7 +42,7 @@ class RNNEvaluator : public Evaluator {
    * @brief Override Evaluate
    * @param Obstacle pointer
    */
-  void Evaluate(Obstacle* obstacle_ptr) override;
+  bool Evaluate(Obstacle* obstacle_ptr) override;
 
   /**
    * @brief Extract feature vector
@@ -66,7 +66,7 @@ class RNNEvaluator : public Evaluator {
 
  private:
   /**
-   * @brief Load mode file
+   * @brief Load model file
    * @param Model file name
    */
   void LoadModel(const std::string& model_file);

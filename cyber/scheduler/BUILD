@@ -170,7 +170,7 @@ cc_test(
     deps = [
         "//cyber",
         "//cyber/scheduler:scheduler_factory",
-	"@gtest//:main",
+        "@gtest//:main",
     ],
 )
 

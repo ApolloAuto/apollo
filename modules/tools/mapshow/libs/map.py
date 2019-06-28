@@ -45,7 +45,7 @@ class Map:
 
     def load(self, map_file_name):
         res = proto_utils.get_pb_from_file(map_file_name, self.map_pb)
-        return res != None
+        return res is not None
 
     def draw_roads(self, ax):
         cnt = 1

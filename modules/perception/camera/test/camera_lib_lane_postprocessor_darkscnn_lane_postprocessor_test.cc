@@ -161,7 +161,7 @@ TEST(darkSCNNLanePostprocessor, camera_lane_postprocessor_point_test) {
   frame.data_provider = &data_provider;
   base::MotionBufferPtr motion_buffer;
 
-  // initilize visualizer and set homography for lane_postprocessor
+  // initialize visualizer and set homography for lane_postprocessor
   Visualizer visualize_;
   double pitch_adj = 0;
   double yaw_adj = 0;

@@ -476,8 +476,8 @@ int BufferCore::walkToTopParent(
   if (frame_chain) {
     // Pruning: Compare the chains starting at the parent (end) until they
     // differ
-    int m = reverse_frame_chain.size() - 1;
-    int n = frame_chain->size() - 1;
+    unsigned int m = reverse_frame_chain.size() - 1;
+    unsigned int n = frame_chain->size() - 1;
     for (; m >= 0 && n >= 0; --m, --n) {
       if ((*frame_chain)[n] != reverse_frame_chain[m]) break;
     }
@@ -485,7 +485,7 @@ int BufferCore::walkToTopParent(
     if (n > 0)
       frame_chain->erase(frame_chain->begin() + (n - 1), frame_chain->end());
 
-    if (m < reverse_frame_chain.size()) {
+    if (m < (int)reverse_frame_chain.size()) {
       for (int i = m; i >= 0; --i) {
         frame_chain->push_back(reverse_frame_chain[i]);
       }

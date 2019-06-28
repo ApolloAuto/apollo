@@ -15,6 +15,7 @@ cc_library(
         "hdmap_impl.h",
         "hdmap_util.h",
     ],
+    copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         "//modules/common/configs:config_gflags",
         "//modules/common/math",
@@ -31,6 +32,7 @@ cc_library(
     name = "hdmap_util",
     srcs = ["hdmap_util.cc"],
     hdrs = ["hdmap_util.h"],
+    copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         ":hdmap",
         "//cyber",

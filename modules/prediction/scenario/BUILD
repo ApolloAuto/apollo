@@ -6,6 +6,9 @@ cc_library(
     name = "scenario_manager",
     srcs = ["scenario_manager.cc"],
     hdrs = ["scenario_manager.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/scenario/analyzer:scenario_analyzer",
         "//modules/prediction/scenario/feature_extractor",

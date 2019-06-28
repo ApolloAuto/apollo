@@ -47,6 +47,22 @@ using proto::RoleType;
 
 const uint32_t DEFAULT_PENDING_QUEUE_SIZE = 1;
 
+/**
+ * @class Reader
+ * @brief Reader subscribes a channel, it has two main functions:
+ * 1. You can pass a `CallbackFunc` to handle the message then it arrived
+ * 2. You can Observe messages that Blocker cached. Reader automatically push
+ * the message to Blocker's `PublishQueue`, and we can use `Observe` to fetch
+ * messages from `PublishQueue` to `ObserveQueue`. But, if you have set
+ * CallbackFunc, you can ignore this. One Reader uses one `ChannelBuffer`, the
+ * message we are handling is stored in ChannelBuffer Reader will Join the
+ * topology when init and Leave the topology when shutdown
+ * @warning To save resource, `ChannelBuffer` has limited length,
+ * it's passed through the `pending_queue_size` param. pending_queue_size is
+ * default set to 1, So, If you handle slower than writer sending, older
+ * messages that are not handled will be lost. You can increase
+ * `pending_queue_size` to resolve this problem.
+ */
 template <typename MessageT>
 class Reader : public ReaderBase {
  public:
@@ -57,29 +73,136 @@ class Reader : public ReaderBase {
   using Iterator =
       typename std::list<std::shared_ptr<MessageT>>::const_iterator;
 
+  /**
+   * Constructor a Reader object.
+   * @param role_attr is a protobuf message RoleAttributes, which includes the
+   * channel name and other info.
+   * @param reader_func is the callback function, when the message is received.
+   * @param pending_queue_size is the max depth of message cache queue.
+   * @warning the received messages is enqueue a queue,the queue's depth is
+   * pending_queue_size
+   */
   explicit Reader(const proto::RoleAttributes& role_attr,
                   const CallbackFunc<MessageT>& reader_func = nullptr,
                   uint32_t pending_queue_size = DEFAULT_PENDING_QUEUE_SIZE);
   virtual ~Reader();
 
+  /**
+   * @brief Init Reader
+   *
+   * @return true if init successfully
+   * @return false if init failed
+   */
   bool Init() override;
+
+  /**
+   * @brief Shutdown Reader
+   */
   void Shutdown() override;
+
+  /**
+   * @brief Get All data that `Blocker` stores
+   */
   void Observe() override;
+
+  /**
+   * @brief Clear `Blocker`'s data
+   */
   void ClearData() override;
+
+  /**
+   * @brief Query whether we have received data since last clear
+   *
+   * @return true if the reader has received data
+   * @return false if the reader has not received data
+   */
   bool HasReceived() const override;
+
+  /**
+   * @brief Query whether the Reader has data to be handled
+   *
+   * @return true if blocker is empty
+   * @return false if blocker has data
+   */
   bool Empty() const override;
+
+  /**
+   * @brief Get time interval of since last receive message
+   *
+   * @return double seconds delay
+   */
   double GetDelaySec() const override;
+
+  /**
+   * @brief Get pending_queue_size configuration
+   *
+   * @return uint32_t the value of pending queue size
+   */
   uint32_t PendingQueueSize() const override;
 
+  /**
+   * @brief Push `msg` to Blocker's `PublishQueue`
+   *
+   * @param msg message ptr to be pushed
+   */
   virtual void Enqueue(const std::shared_ptr<MessageT>& msg);
+
+  /**
+   * @brief Set Blocker's `PublishQueue`'s capacity to `depth`
+   *
+   * @param depth the value you  want to set
+   */
   virtual void SetHistoryDepth(const uint32_t& depth);
+
+  /**
+   * @brief Get Blocker's `PublishQueue`'s capacity
+   *
+   * @return uint32_t depth of the history
+   */
   virtual uint32_t GetHistoryDepth() const;
+
+  /**
+   * @brief Get the latest message we `Observe`
+   *
+   * @return std::shared_ptr<MessageT> the latest message
+   */
   virtual std::shared_ptr<MessageT> GetLatestObserved() const;
+
+  /**
+   * @brief Get the oldest message we `Observe`
+   *
+   * @return std::shared_ptr<MessageT> the oldest message
+   */
   virtual std::shared_ptr<MessageT> GetOldestObserved() const;
+
+  /**
+   * @brief Get the begin iterator of `ObserveQueue`, used to traverse
+   *
+   * @return Iterator begin iterator
+   */
   virtual Iterator Begin() const { return blocker_->ObservedBegin(); }
+
+  /**
+   * @brief Get the end iterator of `ObserveQueue`, used to traverse
+   *
+   * @return Iterator begin iterator
+   */
   virtual Iterator End() const { return blocker_->ObservedEnd(); }
 
+  /**
+   * @brief Is there is at least one writer publish the channel that we
+   * subscribes?
+   *
+   * @return true if the channel has writer
+   * @return false if the channel has no writer
+   */
   bool HasWriter() override;
+
+  /**
+   * @brief Get all writers pushlish the channel we subscribes
+   *
+   * @param writers result vector of RoleAttributes
+   */
   void GetWriters(std::vector<proto::RoleAttributes>* writers) override;
 
  protected:
