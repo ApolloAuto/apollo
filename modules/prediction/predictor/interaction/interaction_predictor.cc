@@ -24,6 +24,7 @@
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/prediction/common/feature_output.h"
+#include "modules/prediction/common/prediction_constants.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
@@ -256,7 +257,8 @@ double InteractionPredictor::ComputeTrajectoryCost(
   }
   total_cost += FLAGS_collision_cost_weight * collision_cost;
 
-  if (FLAGS_prediction_offline_mode == 5) {
+  if (FLAGS_prediction_offline_mode ==
+      PredictionConstants::kDumpDataForTuning) {
     std::vector<double> cost_values = {lon_acc_cost, centri_acc_cost,
                                        collision_cost};
     FeatureOutput::InsertDataForTuning(obstacle.latest_feature(), cost_values,
