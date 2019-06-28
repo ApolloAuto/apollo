@@ -13,7 +13,6 @@ proto_library(
     name = "map_datachecker_proto_lib",
     srcs = [
         "collection_check_message.proto",
-        "collection_data_message.proto",
         "collection_error_code.proto",
     ],
 )
