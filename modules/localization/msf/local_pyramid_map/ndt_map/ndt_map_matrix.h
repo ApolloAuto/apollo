@@ -53,7 +53,7 @@ class NdtMapSingleCell {
 
   /**@brief Add an sample to the single 3d map cell. */
   inline void AddSample(const float intensity, const float altitude,
-                        const Eigen::Vector3f centroid, bool is_road = false);
+                        const Eigen::Vector3f& centroid, bool is_road = false);
 
   /**@brief Merge two cells. */
   inline void MergeCell(const float intensity, const float intensity_var,
@@ -97,7 +97,7 @@ class NdtMapCells {
   void Reset();
   /**@brief Add an sample. */
   int AddSample(const float intensity, const float altitude,
-                const float resolution, const Eigen::Vector3f centroid,
+                const float resolution, const Eigen::Vector3f& centroid,
                 bool is_road = false);
 
   /**@brief Load the map cell from a binary chunk.
@@ -209,7 +209,7 @@ inline void NdtMapSingleCell::Reset() {
 
 inline void NdtMapSingleCell::AddSample(const float intensity,
                                         const float altitude,
-                                        const Eigen::Vector3f centroid,
+                                        const Eigen::Vector3f& centroid,
                                         bool is_road) {
   ++count_;
   float v1 = intensity - intensity_;

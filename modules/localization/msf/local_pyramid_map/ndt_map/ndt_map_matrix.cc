@@ -163,7 +163,7 @@ void NdtMapCells::Reset() {
 
 int NdtMapCells::AddSample(const float intensity, const float altitude,
                            const float resolution,
-                           const Eigen::Vector3f centroid, bool is_road) {
+                           const Eigen::Vector3f& centroid, bool is_road) {
   int altitude_index = CalAltitudeIndex(resolution, altitude);
   NdtMapSingleCell& cell = cells_[altitude_index];
   cell.AddSample(intensity, altitude, centroid, is_road);
