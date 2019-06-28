@@ -58,13 +58,13 @@
 
 参考下述IPC配置：
 
-- 华硕 GTX1080 GPU-A8G-Gaming 显卡
+- Nuvo-6108GC-GTX1080-E3-1275
 
-- 32GB DDR4 内存
+- DDR4-16GB-ECC
 
-- PO-280W-OW 280W AC/DC 电源适配器
+- 三星 SSD 256GB
 
-- 2.5" SATA磁盘 1TB 7200转/秒
+- PA-280W-OW
 
   ![IPC-6108GC-front-side](images/ipc_hardware_before_cover.jpeg)
   
@@ -73,7 +73,7 @@
 参考下述步骤：
 
 #### 准备好CAN卡并进行安装
-在Neousys Nuvo-6108GC中，华硕GTX1080 GPU-A8G-Gaming显卡被预先安装在一个PCI插槽中，我们需要将CAN卡安装在另外一个PCI插槽中。
+在Nuvo-6108GC中，GTX1080显卡被预先安装在一个PCI插槽中，我们需要将CAN卡安装在另外一个PCI插槽中。
 
    a. 找到并拧下机器边上的8个螺丝（显示在棕色方框内或棕色箭头指向的区域）
 
@@ -87,13 +87,13 @@
    
   ![Before installing the CAN card](images/ipc_hardware_slot1.png)
   
-   c. 【可选】设置CAN卡的终端跳线：将红色的跳线帽从原位置移除（下图所示）并放置在终端位置
+   c. 设置CAN卡的终端跳线：将4个红色的跳线帽从原位置移除并放置在终端位置，如下图所示：
 
    ![prepare_can_card2](images/ipc_hardware_slot2.png)
 
    ![warning_icon](images/warning_icon.png)**WARNING**：如果终端跳线没有被正确设置，CAN卡将不能正确工作。
 
-   d. 【可选】将CAN卡插入到一个PCI插槽中
+   d. 将CAN卡插入到一个PCI插槽中
 
    ![installed CAN](images/ipc_hardware_slot3.png)
 
@@ -105,7 +105,7 @@
 
    a. 将电源线接入到为IPC配置的电源连接器（接线板）
    
-   ![warning_icon](images/warning_icon.png)**WARNING**：确保电源线的正极（标记为 **R** 表示红色）和负极（标记为  **B** 表示黑色）接入到了IPC接线板的正确接口，如下图所示：
+   ![warning_icon](images/warning_icon.png)**WARNING**：确保电源线的正极（标记为 **R** 表示红色）和负极（标记为 **B** 表示黑色）接入到了IPC接线板的正确接口，如下图所示：
 
    ![ipc_power_RB](images/ipc_hardware_rb.png)
    
@@ -149,14 +149,14 @@
 ### 安装Ubuntu Linux
 Apollo软件系统依赖于Linux操作系统而运行，而Linux操作系统种类繁多，且又分为服务器版本和桌面版本，这里我们选择当下比较流行的Ubuntu桌面操作系统的64位版本。安装Ubuntu Linux的操作系统的步骤如下：
 #### 创建引导盘
-创建一个可以引导启动的Ubuntu Linux USB闪存驱动器，下载Ubuntu（或Xubuntu等分支版本），并按照在线说明创建可引导启动的USB闪存驱动器。
+创建一个可以引导启动的Ubuntu Linux USB闪存驱动器，下载Ubuntu，并按照在线说明创建可引导启动的USB闪存驱动器。
 
 ![tip_icon](images/tip_icon.png) 推荐使用 **Ubuntu 14.04.3**.
 
-![tip_icon](images/tip_icon.png)开机按 F2 进入 BIOS 设置菜单，建议禁用BIOS中的快速启动和静默启动，以便捕捉引导启动过程中的问题。 建议您在BIOS中禁用“快速启动”和“安静启动”，以便了解启动过程中遇到的问题。
+![tip_icon](images/tip_icon.png)开机按F2进入BIOS设置菜单，建议禁用BIOS中的快速启动和静默启动，以便捕捉引导启动过程中的问题。建议您在BIOS中禁用“快速启动”和“安静启动”，以便了解启动过程中遇到的问题。
 
 获取更多Ubuntu信息，可访问: 
-![online_icon](images/link.png) Ubuntu 桌面站点:
+![online_icon](images/link.png)Ubuntu桌面站点:
 
 [https://www.ubuntu.com/desktop](https://www.ubuntu.com/desktop)
 
@@ -170,13 +170,12 @@ b.按照屏幕上的说明安装Linux。
 
 a.安装完成，重启进入Linux。
 
-b.执行软件更新器（Software Updater）更新最新软件包，或在终端执行以下命令完成更新。
+b.在终端执行以下命令完成最新软件包的更新：
 
 ```
 sudo apt-get update
 ```
-    
-c.打开终端，输入以下命令，安装Linux 4.4 内核：
+c.打开终端，输入以下命令，安装Linux4.4内核：
 
 ```
 sudo apt-get install linux-generic-lts-xenial
@@ -185,14 +184,13 @@ sudo apt-get install linux-generic-lts-xenial
 
 ### 安装Apollo内核
 
-车上运行Apollo需要 [Apollo Kernel](https://github.com/ApolloAuto/apollo-kernel). 你可以依照如下步骤获取、安装预编译的内核：
+车上运行Apollo需要[Apollo Kernel](https://github.com/ApolloAuto/apollo-kernel). 你可以依照如下步骤获取、安装预编译的内核：
 
 a.从realease文件夹下载发布的包
 
 ```
 https://github.com/ApolloAuto/apollo-kernel/releases
 ```
-
 b.安装包下载完成后，解压后安装:
 
 ```
@@ -200,8 +198,7 @@ tar zxvf linux-4.4.32-apollo-1.5.5.tar.gz
 cd install
 sudo bash install_kernel.sh
 ```
-
-c.使用 `reboot`命令重新启动计算机；
+c.使用`reboot`命令重新启动计算机。
 
 
 ### 安装GPU驱动
@@ -240,20 +237,18 @@ d.CAN卡驱动esdcan-pcie402.ko可以在/lib/modules/4.4.32-apollo-2-RT/extra/�
 
 ### 安装Docker
 
-在docker的官网下载deb安装包，双击deb安装包，在Software Center进行安装后，然后重新启动计算机即可。
+在docker的官网下载deb安装包，双击deb安装包，在Software Center进行安装后，重新启动计算机即可。
 
 ### 编译Apollo源代码
 
 a.获取Apollo源代码
 可以在github上下载，在终端中输入以下命令：
-
 ```
 cd ~
 git clone https://github.com/ApolloAuto/apollo.git
-git checkout -b r3.0.0 origin/r3.0.0
 ```
-
-下载完成后的代码在～/apollo目录下
+代码下载的时间视网速的快慢而有所区别，请耐心等待；
+下载完成后的代码在～/apollo目录下，然后执行`git checkout -b r3.0.0 origin/r3.0.0`将代码切换到我们所需要的工作分支r3.0.0上。
 
 b.设置环境变量
 在终端输入以下命令：
@@ -693,9 +688,9 @@ x y z参数组合取值建议：
 ![标定可视化示例](images/calibration_plot.png)
 
 ### 转换结果为`Protobuf`格式
-如果一切正常，运行`result2pb.sh {dir}/result.csv`, 其中dir为result.csv所在目录，把校准结果result.csv转换成控制模块定义的`Protobuf`格式。运行命令后生成control_conf_pb.txt文件。该文件里面的calibration_table段落是我们需要的，我们将该calibration_table段替换放到文件/modules/control/conf/lincoln.pb.txt下对应的calibration_table段。
+如果一切正常，运行`result2pb.sh {dir}/result.csv`, 其中dir为result.csv所在目录，把校准结果result.csv转换成控制模块定义的`Protobuf`格式。运行命令后生成control_conf_pb.txt文件。该文件里面的lon_controller_conf字段下面的calibration_table段落是我们需要的，我们将该calibration_table段替换放到文件/modules/calibration/data/ch/calibration_table.pb.txt下对应的lon_controller_conf字段下面的calibration_table段。
 
-最后，把前面实验获取的启动车辆的最小 x 值和能制动车辆的最小 z 值替换 /modules/control/conf/lincoln.pb.txt 文件里的 throttle_deadzone、brake_deadzone 字段。
+最后，把前面实验获取的启动车辆的最小 x 值和能制动车辆的最小 z 值替换 /modules/calibration/data/ch/calibration_table.pb.txt 文件里的lon_controller_conf字段下面的 throttle_deadzone、brake_deadzone 字段。
 
 注：Calibration_table 片段示例
 
