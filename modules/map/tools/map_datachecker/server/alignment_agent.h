@@ -104,7 +104,7 @@ class AlignmentAgent {
         ErrorCode code = sp_alignment_->GetReturnState();
         if (code == ErrorCode::ERROR_VERIFY_NO_GNSSPOS ||
             code == ErrorCode::ERROR_GNSS_SIGNAL_FAIL) {
-          AERROR << "Some error occured, while loop will exit";
+          AERROR << "Some error occurred, while loop will exit";
           break;
         }
         AINFO << "get progress:" << sp_alignment_->GetProgress();
