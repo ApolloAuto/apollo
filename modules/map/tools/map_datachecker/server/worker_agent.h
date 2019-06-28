@@ -27,7 +27,6 @@
 #include "modules/map/tools/map_datachecker/server/common.h"
 #include "modules/map/tools/map_datachecker/server/loops_verify_agent.h"
 #include "modules/map/tools/map_datachecker/server/pose_collection.h"
-#include "modules/map/tools/map_datachecker/server/worker_cyber_node.h"
 
 namespace apollo {
 namespace hdmap {
@@ -46,8 +45,6 @@ class MapDataCheckerAgent final
   inline std::shared_ptr<MapDataCheckerAgent> GetWorkerAgent() {
     return shared_from_this();
   }
-  void set_worker_cyber_node(
-      std::shared_ptr<MapDataCheckerCyberNode> cyber_node);
   std::shared_ptr<PoseCollectionAgent> GetSpPoseCollectionAgent();
 
   grpc::Status ServiceChannelVerify(grpc::ServerContext *context,
@@ -64,7 +61,6 @@ class MapDataCheckerAgent final
                                   LoopsVerifyResponse *response);
 
  private:
-  std::shared_ptr<MapDataCheckerCyberNode> cyber_node_ = nullptr;
   std::shared_ptr<JSonConf> sp_conf_ = nullptr;
   std::shared_ptr<PoseCollectionAgent> sp_pose_collection_agent_ = nullptr;
   std::shared_ptr<ChannelVerifyAgent> sp_channel_checker_agent_ = nullptr;

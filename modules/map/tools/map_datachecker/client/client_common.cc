@@ -21,8 +21,6 @@
 #include <string>
 #include <vector>
 
-#include "modules/map/tools/map_datachecker/client/exception_handler.h"
-
 namespace apollo {
 namespace hdmap {
 std::vector<std::string> GetFileLines(const std::string& path) {

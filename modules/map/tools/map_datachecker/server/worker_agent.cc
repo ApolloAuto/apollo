@@ -36,16 +36,6 @@ MapDataCheckerAgent::MapDataCheckerAgent() {
   AINFO << "MapDataCheckerAgent create successfully";
 }
 
-void MapDataCheckerAgent::set_worker_cyber_node(
-    std::shared_ptr<MapDataCheckerCyberNode> cyber_node) {
-  if (!cyber_node) {
-    AFATAL << "Error in create MapDataCheckerCyberNode";
-    apollo::cyber::WaitForShutdown();
-    apollo::cyber::Clear();
-  }
-  cyber_node_ = cyber_node->GetWorkerCyberNode();
-}
-
 std::shared_ptr<PoseCollectionAgent>
 MapDataCheckerAgent::GetSpPoseCollectionAgent() {
   return sp_pose_collection_agent_;
