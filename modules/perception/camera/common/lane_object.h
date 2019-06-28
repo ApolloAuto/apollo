@@ -36,7 +36,7 @@ constexpr uint32_t kMinLaneLineLengthForCIPV = 2;
 // Average width of lane
 constexpr float kAverageLaneWidthInMeter = 3.7f;
 // Maximum vehicle width
-constexpr float kMaxVehicleWidthInMeter = 2.5f;
+constexpr float kMaxVehicleWidthInMeter = 1.87f;
 // Margin from a virtual car lane to actual lane
 constexpr float kMarginVehicleToLane =
     (kAverageLaneWidthInMeter - kMaxVehicleWidthInMeter) / 2.0f;

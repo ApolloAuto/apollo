@@ -208,7 +208,7 @@ bool Cipv::ElongateEgoLane(const std::vector<base::LaneLine> &lane_objects,
                            const bool b_left_valid, const bool b_right_valid,
                            const float yaw_rate, const float velocity,
                            EgoLane *egolane_image, EgoLane *egolane_ground) {
-  float offset_distance = half_virtual_egolane_width_in_meter_;
+  float offset_distance = half_vehicle_width_in_meter_;
   // When left lane line is available
   if (b_left_valid && b_right_valid) {
     // elongate both lanes or do nothing
@@ -676,13 +676,16 @@ bool Cipv::IsObjectInTheLaneImage(const std::shared_ptr<base::Object> &object,
 bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
                                    const EgoLane &egolane_ground,
                                    const Eigen::Affine3d world2camera,
+                                   const bool b_virtual,
                                    float *object_distance) {
   LineSegment2Df closted_object_edge;
   bool b_left_lane_clear = false;
   bool b_right_lane_clear = false;
   float shortest_distance = 0.0f;
   float distance = 0.0f;
-
+  float max_dist_object_to_lane_in_meter =
+      b_virtual ? max_dist_object_to_virtual_lane_in_meter_ :
+                  max_dist_object_to_lane_in_meter_;
   int closest_index = -1;
   // Find closest edge of a given object bounding box
   float b_valid_object = FindClosestObjectGround(
@@ -734,7 +737,7 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
             closted_object_edge.end_point,
             egolane_ground.left_line.line_point[closest_index],
             egolane_ground.left_line.line_point[closest_index + 1]) &&
-        shortest_distance < max_dist_object_to_lane_in_meter_) {
+        shortest_distance < max_dist_object_to_lane_in_meter) {
       b_left_lane_clear = true;
     }
   }
@@ -776,7 +779,7 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
             closted_object_edge.start_point,
             egolane_ground.right_line.line_point[closest_index],
             egolane_ground.right_line.line_point[closest_index + 1]) &&
-        shortest_distance < max_dist_object_to_lane_in_meter_) {
+        shortest_distance < max_dist_object_to_lane_in_meter) {
       b_right_lane_clear = true;
     }
   }
@@ -789,12 +792,13 @@ bool Cipv::IsObjectInTheLane(const std::shared_ptr<base::Object> &object,
                              const EgoLane &egolane_image,
                              const EgoLane &egolane_ground,
                              const Eigen::Affine3d world2camera,
+                             const bool b_virtual,
                              float *distance) {
   if (b_image_based_cipv_) {
     return IsObjectInTheLaneImage(object, egolane_image, distance);
   }
   return IsObjectInTheLaneGround(object, egolane_ground, world2camera,
-                                 distance);
+                                 b_virtual, distance);
 }
 
 // =====================================================================
@@ -840,9 +844,9 @@ bool Cipv::DetermineCipv(const std::vector<base::LaneLine> &lane_objects,
       AINFO << "objects[" << i << "]->track_id: " << (*objects)[i]->track_id;
     }
     if (IsObjectInTheLane((*objects)[i], egolane_image, egolane_ground,
-                          world2camera, &distance) ||
+                          world2camera, false, &distance) ||
         IsObjectInTheLane((*objects)[i], egolane_image, virtual_egolane_ground,
-                          world2camera, &distance)) {
+                          world2camera, true, &distance)) {
       if (cipv_index < 0 || distance < min_distance) {
         cipv_index = i;
         cipv_track_id = (*objects)[i]->track_id;
