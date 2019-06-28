@@ -177,6 +177,7 @@ void OnlineCalibrationService::Update(CameraFrame *frame) {
   AINFO << "pitch_angle: " << iter->second.pitch_angle * 180.0 / M_PI
         << " degree.";
   // CHECK(BuildIndex());
+  is_service_ready_ = true;
 }
 
 void OnlineCalibrationService::SetCameraHeightAndPitch(
