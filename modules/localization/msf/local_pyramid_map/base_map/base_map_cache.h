@@ -71,7 +71,7 @@ class LRUCache {
   /**@brief return cache's in use. */
   unsigned int Size() { return list_.size(); }
   /**@brief return cache's max capacity. */
-  unsigned  Capacity() { return capacity_; }
+  unsigned Capacity() { return capacity_; }
 
  protected:
   /**@brief do something before remove an element from cache.
@@ -160,8 +160,7 @@ Element* LRUCache<Key, Element>::Remove(const Key& key) {
   Element* node_remove = nullptr;
   MapIterator found_iter = map_.find(key);
 
-  if (found_iter != map_.end() &&
-      Destroy(found_iter->second->second)) {
+  if (found_iter != map_.end() && Destroy(found_iter->second->second)) {
     // try to destruct element
     node_remove = found_iter->second->second;
     list_.erase(found_iter->second);

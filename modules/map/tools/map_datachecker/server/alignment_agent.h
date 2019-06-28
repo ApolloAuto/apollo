@@ -50,8 +50,8 @@ class AlignmentAgent {
   }
 
   grpc::Status ProcessGrpcRequest(grpc::ServerContext *context,
-                                    REQUEST_TYPE *request,
-                                    RESPONSE_TYPE *response) {
+                                  REQUEST_TYPE *request,
+                                  RESPONSE_TYPE *response) {
     AINFO << "AlignmentAgent request: " << request->DebugString();
     switch (request->cmd()) {
       case CmdType::START:

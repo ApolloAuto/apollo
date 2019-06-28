@@ -51,7 +51,7 @@ PJTransformer::~PJTransformer() {
   }
 }
 int PJTransformer::LatlongToUtm(int64_t point_count, int point_offset,
-                                  double *x, double *y, double *z) {
+                                double *x, double *y, double *z) {
   if (!pj_latlong_ || !pj_utm_) {
     AERROR << "pj_latlong_:" << pj_latlong_ << "pj_utm_:" << pj_utm_
            << std::endl;
