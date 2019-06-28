@@ -315,7 +315,6 @@ function main(){
 
     ${DOCKER_CMD} run -it \
         -d \
-        -p 8900:8900 \
         --privileged \
         --name $APOLLO_DEV \
         ${MAP_VOLUME_CONF} \
