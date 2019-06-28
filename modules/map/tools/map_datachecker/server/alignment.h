@@ -61,8 +61,7 @@ class Alignment {
 
   virtual void ClearGoodPoseInfo() { ClearPoseInfo(sp_good_pose_info_); }
 
-  virtual bool IsGoodPose(const std::vector<FramePose>& poses,
-                            int pose_index) {
+  virtual bool IsGoodPose(const std::vector<FramePose>& poses, int pose_index) {
     if (pose_index <= 0 || pose_index >= static_cast<int>(poses.size())) {
       AINFO << "params error. poses size:" << poses.size()
             << ",pose_index:" << pose_index;
@@ -87,7 +86,7 @@ class Alignment {
 
  protected:
   void UpdatePoseInfo(const FramePose& pose,
-                        std::shared_ptr<BadOrGoodPoseInfo> sp_pose_info) {
+                      std::shared_ptr<BadOrGoodPoseInfo> sp_pose_info) {
     if (sp_pose_info == nullptr) {
       AERROR << "sp_pose_info is nullptr";
       return;

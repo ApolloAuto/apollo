@@ -60,13 +60,11 @@ ChannelVerify::get_check_result() const {
 
 int ChannelVerify::IncrementalCheck(
     const std::vector<std::string>& records_path) {
-
   std::vector<std::string> not_check_records_path;
   AINFO << "all records path:";
   for (size_t i = 0; i < records_path.size(); ++i) {
     AINFO << "[" << i << "]: " << records_path[i];
-    if (IsRecordFile(records_path[i]) &&
-        !IsRecordChecked(records_path[i])) {
+    if (IsRecordFile(records_path[i]) && !IsRecordChecked(records_path[i])) {
       not_check_records_path.push_back(records_path[i]);
     }
   }
@@ -168,8 +166,7 @@ std::shared_ptr<CyberRecordInfo> ChannelVerify::GetRecordInfo(
 OneRecordChannelCheckResult ChannelVerify::CheckRecordChannels(
     const std::string& record_path) {
   OneRecordChannelCheckResult check_result;
-  std::shared_ptr<CyberRecordInfo> sp_record_info =
-      GetRecordInfo(record_path);
+  std::shared_ptr<CyberRecordInfo> sp_record_info = GetRecordInfo(record_path);
   if (sp_record_info == nullptr) {
     return check_result;
   }

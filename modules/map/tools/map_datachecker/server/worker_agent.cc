@@ -55,28 +55,25 @@ grpc::Status MapDataCheckerAgent::ServiceChannelVerify(
     grpc::ServerContext *context, ChannelVerifyRequest *request,
     ChannelVerifyResponse *response) {
   return sp_channel_checker_agent_->ProcessGrpcRequest(context, request,
-                                                         response);
+                                                       response);
 }
 
 grpc::Status MapDataCheckerAgent::ServiceStaticAlign(
     grpc::ServerContext *context, StaticAlignRequest *request,
     StaticAlignResponse *response) {
-  return sp_static_align_agent_->ProcessGrpcRequest(context, request,
-                                                      response);
+  return sp_static_align_agent_->ProcessGrpcRequest(context, request, response);
 }
 
 grpc::Status MapDataCheckerAgent::ServiceEightRoute(
     grpc::ServerContext *context, EightRouteRequest *request,
     EightRouteResponse *response) {
-  return sp_eight_route_agent_->ProcessGrpcRequest(context, request,
-                                                     response);
+  return sp_eight_route_agent_->ProcessGrpcRequest(context, request, response);
 }
 
 grpc::Status MapDataCheckerAgent::ServiceLoopsVerify(
     grpc::ServerContext *context, LoopsVerifyRequest *request,
     LoopsVerifyResponse *response) {
-  return sp_loops_verify_agent_->ProcessGrpcRequest(context, request,
-                                                      response);
+  return sp_loops_verify_agent_->ProcessGrpcRequest(context, request, response);
 }
 
 }  // namespace hdmap

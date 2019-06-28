@@ -53,10 +53,10 @@ class LapsChecker {
   int PutPoseToGrid(int pose_index, int grid_y, int grid_x);
   int PutPoseToNeighborGrid(int pose_index);
   int GetPassedGrid(int pose_index, std::vector<int>* sp_grid_x,
-                      std::vector<int>* sp_grid_y);
+                    std::vector<int>* sp_grid_y);
   double Slope(double x1, double y1, double x2, double y2);
   int GatherTimestamps(std::vector<double>* sp_stamps, double alpha,
-                        int center_x, int center_y);
+                       int center_x, int center_y);
   inline int SetProgress(double p);
 
  public:

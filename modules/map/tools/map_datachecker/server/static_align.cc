@@ -109,8 +109,7 @@ double StaticAlign::StaticAlignDynamicCentroid(
     return_state_ = ErrorCode::SUCCESS;
   }
 
-  double progress =
-      GetCentroidTimeDuring() / sp_conf_->static_align_duration;
+  double progress = GetCentroidTimeDuring() / sp_conf_->static_align_duration;
   if (progress > 1.0) {
     progress = 1.0;
   }
