@@ -42,8 +42,7 @@ class BaseMapNodeConfig {
    * @param <buf, buf_size> The buffer and its size.
    * @param <return> The required or the used size.
    */
-  virtual unsigned int CreateBinary(unsigned char *buf,
-                                    size_t buf_size) const;
+  virtual unsigned int CreateBinary(unsigned char *buf, size_t buf_size) const;
   /**@brief Get the size of the config in bytes. */
   virtual unsigned int GetBinarySize() const;
 

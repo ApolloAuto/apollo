@@ -90,14 +90,14 @@ MapNodeIndex MapNodeIndex::GetMapNodeIndex(const BaseMapConfig& option,
   MapNodeIndex index;
   index.resolution_id_ = resolution_id;
   index.zone_id_ = zone_id;
-  unsigned int n = static_cast<int>(
-      (coordinate[0] - option.map_range_.GetMinX()) /
-      (static_cast<float>(option.map_node_size_x_) *
-       option.map_resolutions_[resolution_id]));
-  unsigned int m = static_cast<int>(
-      (coordinate[1] - option.map_range_.GetMinY()) /
-      (static_cast<float>(option.map_node_size_y_) *
-       option.map_resolutions_[resolution_id]));
+  unsigned int n =
+      static_cast<int>((coordinate[0] - option.map_range_.GetMinX()) /
+                       (static_cast<float>(option.map_node_size_x_) *
+                        option.map_resolutions_[resolution_id]));
+  unsigned int m =
+      static_cast<int>((coordinate[1] - option.map_range_.GetMinY()) /
+                       (static_cast<float>(option.map_node_size_y_) *
+                        option.map_resolutions_[resolution_id]));
   if (n >= 0 && m >= 0 && n < GetMapIndexRangeEast(option, resolution_id) &&
       m < GetMapIndexRangeNorth(option, resolution_id)) {
     index.m_ = m;
