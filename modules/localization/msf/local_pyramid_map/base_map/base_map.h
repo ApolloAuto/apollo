@@ -115,6 +115,8 @@ class BaseMap {
   /**@brief Load map node by index, thread_safety. */
   void LoadMapNodeThreadSafety(const MapNodeIndex& index,
                                bool is_reserved = false);
+  /**@brief Check map node in L2 Cache.*/
+  void CheckAndUpdateCache(std::set<MapNodeIndex>* map_ids);
 
   /**@brief The map settings. */
   BaseMapConfig* map_config_ = nullptr;
