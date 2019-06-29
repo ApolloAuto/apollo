@@ -10,6 +10,7 @@ Apollo 5.0 is an effort to support volume production for Geo-Fenced Autonomous D
 * Scenario - Based Planning with a new planning algorithm, Open Space Planner and new scenarios supported
     * Intersection - STOP Sign, Traffic Light, Bare Intersection
     * Park - Valet, Pull Over
+* Control-in-loop Simulation
 * Map Data Verification tool
 * Prediction Evaluators
 * Simulation web platform - Dreamland
