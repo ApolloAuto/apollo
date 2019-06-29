@@ -62,7 +62,7 @@ double LapsChecker::GetConfidence() {
     res += confidence_[i];
   }
   AINFO << "current confidence: " << res
-        << ", confidence thresh:" << sp_conf_->laps_rate_thresh;
+        << ",confidence thresh:" << sp_conf_->laps_rate_thresh;
   if (res < sp_conf_->laps_rate_thresh) {
     if (confidence_.size() == 0) {
       AINFO << "some problems induce lap problem";
