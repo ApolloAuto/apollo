@@ -33,7 +33,7 @@ class NdtMapSingleCell {
   /**@brief The default constructor. */
   NdtMapSingleCell();
   /**@brief Reset to default value. */
-  inline void Reset();
+  void Reset();
   /**@brief Load the map cell from a binary chunk.
    * @param <return> The size read (the real size of object).
    */
@@ -52,19 +52,18 @@ class NdtMapSingleCell {
   static void Reduce(NdtMapSingleCell* cell, const NdtMapSingleCell& cell_new);
 
   /**@brief Add an sample to the single 3d map cell. */
-  inline void AddSample(const float intensity, const float altitude,
-                        const Eigen::Vector3f& centroid, bool is_road = false);
+  void AddSample(const float intensity, const float altitude,
+                 const Eigen::Vector3f& centroid, bool is_road = false);
 
   /**@brief Merge two cells. */
-  inline void MergeCell(const float intensity, const float intensity_var,
-                        const unsigned int road_pt_count,
-                        const unsigned int count,
-                        const Eigen::Vector3f& centroid,
-                        const Eigen::Matrix3f& centroid_cov);
+  void MergeCell(const float intensity, const float intensity_var,
+                 const unsigned int road_pt_count, const unsigned int count,
+                 const Eigen::Vector3f& centroid,
+                 const Eigen::Matrix3f& centroid_cov);
 
-  inline void MergeCell(const NdtMapSingleCell& cell_new);
+  void MergeCell(const NdtMapSingleCell& cell_new);
 
-  inline void CentroidEigenSolver(const Eigen::Matrix3f& centroid_cov);
+  void CentroidEigenSolver(const Eigen::Matrix3f& centroid_cov);
 
  public:
   /**@brief The average intensity value. */
@@ -159,8 +158,7 @@ class NdtMapMatrix : public BaseMapMatrix {
    * @param <buf, buf_size> The buffer and its size.
    * @param <return> The required or the used size of is returned.
    */
-  virtual size_t CreateBinary(unsigned char* buf,
-                              size_t buf_size) const;
+  virtual size_t CreateBinary(unsigned char* buf, size_t buf_size) const;
   /**@brief Get the binary size of the object. */
   virtual size_t GetBinarySize() const;
 
@@ -195,104 +193,6 @@ class NdtMapMatrix : public BaseMapMatrix {
   /**@brief The matrix data structure. */
   NdtMapCells* map3d_cells_;
 };
-
-inline void NdtMapSingleCell::Reset() {
-  intensity_ = 0.0;
-  intensity_var_ = 0.0;
-  road_pt_count_ = 0;
-  count_ = 0;
-  centroid_ = Eigen::Vector3f::Zero();
-  centroid_average_cov_ = Eigen::Matrix3f::Zero();
-  centroid_icov_ = Eigen::Matrix3f::Identity();
-  is_icov_available_ = false;
-}
-
-inline void NdtMapSingleCell::AddSample(const float intensity,
-                                        const float altitude,
-                                        const Eigen::Vector3f& centroid,
-                                        bool is_road) {
-  ++count_;
-  float v1 = intensity - intensity_;
-  intensity_ += v1 / static_cast<float>(count_);
-  float v2 = intensity - intensity_;
-  intensity_var_ = (static_cast<float>(count_ - 1) * intensity_var_ + v1 * v2) /
-                   static_cast<float>(count_);
-
-  if (is_road) {
-    ++road_pt_count_;
-  }
-
-  Eigen::Vector3f v3 = centroid - centroid_;
-  centroid_ += v3 / static_cast<float>(count_);
-  Eigen::Matrix3f v4 = centroid * centroid.transpose() - centroid_average_cov_;
-  centroid_average_cov_ += v4 / static_cast<float>(count_);
-  CentroidEigenSolver(centroid_average_cov_);
-}
-
-inline void NdtMapSingleCell::MergeCell(const float intensity,
-                                        const float intensity_var,
-                                        const unsigned int road_pt_count,
-                                        const unsigned int count,
-                                        const Eigen::Vector3f& centroid,
-                                        const Eigen::Matrix3f& centroid_cov) {
-  unsigned int new_count = count_ + count;
-  float p0 = static_cast<float>(count_) / static_cast<float>(new_count);
-  float p1 = static_cast<float>(count) / static_cast<float>(new_count);
-  float intensity_diff = intensity_ - intensity;
-
-  intensity_ = intensity_ * p0 + intensity * p1;
-  intensity_var_ = intensity_var_ * p0 + intensity_var * p1 +
-                   intensity_diff * intensity_diff * p0 * p1;
-
-  centroid_[0] = centroid_[0] * p0 + centroid[0] * p1;
-  centroid_[1] = centroid_[1] * p0 + centroid[1] * p1;
-  centroid_[2] = centroid_[2] * p0 + centroid[2] * p1;
-
-  count_ = new_count;
-  road_pt_count_ += road_pt_count;
-}
-
-inline void NdtMapSingleCell::MergeCell(const NdtMapSingleCell& cell_new) {
-  MergeCell(cell_new.intensity_, cell_new.intensity_var_,
-            cell_new.road_pt_count_, cell_new.count_, cell_new.centroid_,
-            cell_new.centroid_average_cov_);
-}
-
-inline void NdtMapSingleCell::CentroidEigenSolver(
-    const Eigen::Matrix3f& centroid_cov) {
-  // Contain more than five points, we calculate the eigen vector/value of cov.
-  // [Magnusson 2009]
-  if (count_ >= minimum_points_threshold_) {
-    Eigen::Matrix3f cov = centroid_cov - centroid_ * centroid_.transpose();
-    cov *= static_cast<float>((count_ - 1.0) / count_);
-    Eigen::SelfAdjointEigenSolver<Eigen::Matrix3f> eigen_solver;
-    eigen_solver.compute(cov);
-    Eigen::Matrix3f eigen_val = eigen_solver.eigenvalues().asDiagonal();
-    Eigen::Matrix3f centroid_evecs = eigen_solver.eigenvectors();
-    if (eigen_val(0, 0) < 0 || eigen_val(1, 1) < 0 || eigen_val(2, 2) <= 0) {
-      is_icov_available_ = 0;
-      return;
-    }
-    // Avoid matrices near singularities (eq 6.11) [Magnusson 2009].
-    float min_covar_eigvalue = 0.01f * eigen_val(2, 2);
-    if (eigen_val(0, 0) < min_covar_eigvalue) {
-      eigen_val(0, 0) = min_covar_eigvalue;
-      if (eigen_val(1, 1) < min_covar_eigvalue) {
-        eigen_val(1, 1) = min_covar_eigvalue;
-      }
-    }
-    // Calculate inverse covariance
-    centroid_icov_ =
-        (centroid_evecs * eigen_val * centroid_evecs.inverse()).inverse();
-    if (centroid_icov_.maxCoeff() == std::numeric_limits<float>::infinity() ||
-        centroid_icov_.minCoeff() == -std::numeric_limits<float>::infinity()) {
-      is_icov_available_ = 0;
-      return;
-    }
-    // Set icov available
-    is_icov_available_ = 1;
-  }
-}
 
 }  // namespace msf
 }  // namespace localization
