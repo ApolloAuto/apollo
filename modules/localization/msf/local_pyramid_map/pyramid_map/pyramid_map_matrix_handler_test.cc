@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_matrix_handler.h"
+#include <memory>
 #include <gtest/gtest.h>
+#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_matrix_handler.h"
 #include "modules/localization/msf/local_map/base_map/base_map_matrix_handler.h"
 #include "modules/localization/msf/local_map/pyramid_map/pyramid_map_matrix.h"
 
@@ -42,10 +43,11 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, LossyMapFullAltMatrixHandler) {
           MapVersion::LOSSY_FULL_ALT_MAP);
 
   // create pyramid map matrix
-  PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
+  std::unique_ptr<PyramidMapConfig> config(
+      new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
   config->resolution_num_ = 1;
-  PyramidMapMatrix* pm_matrix = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
 
   // set matrix data
@@ -60,13 +62,11 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, LossyMapFullAltMatrixHandler) {
   pm_matrix->SetCountMatrix(uint_data, 4, 0);
 
   // normal case: check get/create/load
-  size_t expect_size =
-      sizeof(unsigned int) * 2 + sizeof(float) * 4;
-  expect_size +=
-      pm_matrix->GetRowsSafe() * pm_matrix->GetColsSafe() *
-      (sizeof(unsigned char) + sizeof(unsigned char) + sizeof(uint16_t) +
-       sizeof(uint16_t) + sizeof(uint16_t));
-  unsigned char* buf = new unsigned char[expect_size];
+  size_t expect_size = sizeof(unsigned int) * 2 + sizeof(float) * 4;
+  expect_size += pm_matrix->GetRowsSafe() * pm_matrix->GetColsSafe() *
+                 (sizeof(unsigned char) + sizeof(unsigned char) +
+                  sizeof(uint16_t) + sizeof(uint16_t) + sizeof(uint16_t));
+  std::unique_ptr<unsigned char> buf(new unsigned char[expect_size]);
   EXPECT_EQ(handler->GetBinarySize(pm_matrix), expect_size);
   EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size - 1), 0);
   EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size), expect_size);
@@ -90,22 +90,9 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, LossyMapFullAltMatrixHandler) {
   EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size), expect_size);
   EXPECT_EQ(handler->LoadBinary(buf, pm_matrix), expect_size);
 
-  if (pm_matrix != nullptr) {
-    delete pm_matrix;
-    pm_matrix = nullptr;
-  }
-
-  if (config != nullptr) {
-    delete config;
-    config = nullptr;
-  }
   if (handler != nullptr) {
     delete handler;
     handler = nullptr;
-  }
-  if (buf != nullptr) {
-    delete[] buf;
-    buf = nullptr;
   }
 }
 
@@ -116,10 +103,10 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, LosslessMapMatrixHandler) {
           MapVersion::LOSSLESS_MAP);
 
   // create pyramid map matrix
-  PyramidMapConfig* config = new PyramidMapConfig("lossy_map");
+  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_map"));
   config->SetMapNodeSize(2, 2);
   config->resolution_num_ = 1;
-  PyramidMapMatrix* pm_matrix = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
 
   // set matrix data
@@ -134,7 +121,7 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, LosslessMapMatrixHandler) {
   pm_matrix->SetCountMatrix(uint_data, 4, 0);
 
   // normal case: check get/create/load
-  unsigned char* buf = new unsigned char[200];
+  std::unique_ptr<unsigned char> buf(new unsigned char[200]);
   unsigned int expect_size = 184;
   EXPECT_EQ(handler->GetBinarySize(pm_matrix), expect_size);
   EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size - 1), 0);
@@ -147,7 +134,7 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, LosslessMapMatrixHandler) {
   // bad case 1: no point in ground
   unsigned int uint_ground_data[] = {0, 0, 0, 0};
   pm_matrix->SetGroundCountMatrix(uint_ground_data, 4, 0);
-  unsigned char* ground_buf = new unsigned char[200];
+  std::unique_ptr<unsigned char> ground_buf(new unsigned char[200]);
   expect_size = 104;
   EXPECT_EQ(handler->GetBinarySize(pm_matrix), expect_size);
   EXPECT_EQ(handler->CreateBinary(pm_matrix, ground_buf, expect_size - 1), 0);
@@ -170,25 +157,9 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, LosslessMapMatrixHandler) {
   EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size), expect_size);
   EXPECT_EQ(handler->LoadBinary(buf, pm_matrix), expect_size);
 
-  if (pm_matrix != nullptr) {
-    delete pm_matrix;
-    pm_matrix = nullptr;
-  }
-  if (config != nullptr) {
-    delete config;
-    config = nullptr;
-  }
   if (handler != nullptr) {
     delete handler;
     handler = nullptr;
-  }
-  if (buf != nullptr) {
-    delete[] buf;
-    buf = nullptr;
-  }
-  if (ground_buf != nullptr) {
-    delete[] ground_buf;
-    ground_buf = nullptr;
   }
 }
 
@@ -199,10 +170,11 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, PyramidLossyMapMatrixHandler) {
           MapVersion::PYRAMID_LOSSY_MAP);
 
   // create pyramid map matrix
-  PyramidMapConfig* config = new PyramidMapConfig("pyramid_lossy_map");
+  std::unique_ptr<PyramidMapConfig> config(
+      new PyramidMapConfig("pyramid_lossy_map"));
   config->SetMapNodeSize(2, 2);
   config->resolution_num_ = 1;
-  PyramidMapMatrix* pm_matrix = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
 
   // set matrix data
@@ -217,7 +189,7 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, PyramidLossyMapMatrixHandler) {
   pm_matrix->SetCountMatrix(uint_data, 4, 0);
 
   // normal case: check get/create/load
-  unsigned char* buf = new unsigned char[100];
+  std::unique_ptr<unsigned char> buf(new unsigned char[100]);
   unsigned int expect_size = 72;
   EXPECT_EQ(handler->GetBinarySize(pm_matrix), expect_size);
   EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size - 1), 0);
@@ -242,21 +214,9 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, PyramidLossyMapMatrixHandler) {
   EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size), expect_size);
   EXPECT_EQ(handler->LoadBinary(buf, pm_matrix), expect_size);
 
-  if (pm_matrix != nullptr) {
-    delete pm_matrix;
-    pm_matrix = nullptr;
-  }
-  if (config != nullptr) {
-    delete config;
-    config = nullptr;
-  }
   if (handler != nullptr) {
     delete handler;
     handler = nullptr;
-  }
-  if (buf != nullptr) {
-    delete[] buf;
-    buf = nullptr;
   }
 }
 
@@ -267,10 +227,11 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, PyramidLosslessMapMatrixHandler) {
           MapVersion::PYRAMID_LOSSLESS_MAP);
 
   // create pyramid map matrix
-  PyramidMapConfig* config = new PyramidMapConfig("pyramid_lossless_map");
+  std::unique_ptr<PyramidMapConfig> config(
+      new PyramidMapConfig("pyramid_lossless_map"));
   config->SetMapNodeSize(2, 2);
   config->resolution_num_ = 1;
-  PyramidMapMatrix* pm_matrix = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
 
   // set matrix data
@@ -285,7 +246,7 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, PyramidLosslessMapMatrixHandler) {
   pm_matrix->SetCountMatrix(uint_data, 4, 0);
 
   // normal case: check get/create/load
-  unsigned char* buf = new unsigned char[200];
+  std::unique_ptr<unsigned char> buf(new unsigned char[200]);
   unsigned int expect_size = 132;
   EXPECT_EQ(handler->GetBinarySize(pm_matrix), expect_size);
   EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size - 1), 0);
@@ -310,21 +271,9 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, PyramidLosslessMapMatrixHandler) {
   EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size), expect_size);
   EXPECT_EQ(handler->LoadBinary(buf, pm_matrix), expect_size);
 
-  if (pm_matrix != nullptr) {
-    delete pm_matrix;
-    pm_matrix = nullptr;
-  }
-  if (config != nullptr) {
-    delete config;
-    config = nullptr;
-  }
   if (handler != nullptr) {
     delete handler;
     handler = nullptr;
-  }
-  if (buf != nullptr) {
-    delete[] buf;
-    buf = nullptr;
   }
 }
 

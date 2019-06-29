@@ -77,16 +77,14 @@ void PyramidMapMatrix::Init(unsigned int rows, unsigned int cols,
 
   // resolution_num should greater than 0
   if (resolution_num < 1) {
-    std::cerr
-        << "PyramidMapMatrix: [init] The resolution_num should greater than 0."
-        << std::endl;
+    AERROR
+        << "PyramidMapMatrix: [init] The resolution_num should greater than 0.";
     return;
   }
 
   // ratio should greater than 0
   if (ratio < 1) {
-    std::cerr << "PyramidMapMatrix: [init] The ratio should greater than 0."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [init] The ratio should greater than 0.";
     return;
   }
 
@@ -98,9 +96,8 @@ void PyramidMapMatrix::Init(unsigned int rows, unsigned int cols,
     unsigned int cols_remainder = cols_tem % ratio;
 
     if (rows_remainder != 0 || cols_remainder != 0) {
-      std::cerr << "PyramidMapMatrix: [init] "
-                << "Rows and cols in each level should be divisible by ratio."
-                << std::endl;
+      AERROR << "PyramidMapMatrix: [init] "
+             << "Rows and cols in each level should be divisible by ratio.";
       return;
     }
 
@@ -183,8 +180,7 @@ void PyramidMapMatrix::Init(unsigned int rows, unsigned int cols,
 
 void PyramidMapMatrix::Reset(unsigned int level) {
   if (level >= resolution_num_) {
-    std::cerr << "PyramidMapMatrix: [reset] The level id is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [reset] The level id is illegal.";
     return;
   }
 
@@ -214,16 +210,14 @@ void PyramidMapMatrix::Reset(unsigned int level) {
 void PyramidMapMatrix::ResetCells(unsigned int start_id, unsigned int end_id,
                                   unsigned int level) {
   if (level >= resolution_num_) {
-    std::cerr << "PyramidMapMatrix: [ResetCells] The level id is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [ResetCells] The level id is illegal.";
     return;
   }
 
   unsigned int length = rows_mr_[level] * cols_mr_[level];
   if (start_id >= length || end_id >= length) {
-    std::cerr
-        << "PyramidMapMatrix: [ResetCell] The start_id or end_id is illegal."
-        << std::endl;
+    AERROR
+        << "PyramidMapMatrix: [ResetCell] The start_id or end_id is illegal.";
     return;
   }
 
@@ -285,14 +279,12 @@ bool PyramidMapMatrix::GetIntensityImg(cv::Mat* intensity_img) const {
 bool PyramidMapMatrix::GetIntensityImg(unsigned int level,
                                        cv::Mat* intensity_img) const {
   if (!has_intensity_ || resolution_num_ < 1) {
-    std::cerr << "PyramidMapMatrix: [GetIntensityImg] No intensity data."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [GetIntensityImg] No intensity data.";
     return false;
   }
 
   if (level >= resolution_num_) {
-    std::cerr << "PyramidMapMatrix: [GetIntensityImg] The level id is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [GetIntensityImg] The level id is illegal.";
     return false;
   }
 
@@ -321,14 +313,12 @@ bool PyramidMapMatrix::GetAltitudeImg(cv::Mat* altitude_img) const {
 bool PyramidMapMatrix::GetAltitudeImg(unsigned int level,
                                       cv::Mat* altitude_img) const {
   if (!has_altitude_ || resolution_num_ < 1) {
-    std::cerr << "PyramidMapMatrix: [GetAltitudeImg] No altitude data."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [GetAltitudeImg] No altitude data.";
     return false;
   }
 
   if (level >= resolution_num_) {
-    std::cerr << "PyramidMapMatrix: [GetAltitudeImg] The level id is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [GetAltitudeImg] The level id is illegal.";
     return false;
   }
 
@@ -372,7 +362,7 @@ bool PyramidMapMatrix::GetAltitudeImg(unsigned int level,
 
 void PyramidMapMatrix::BottomUpSafe() {
   if (!has_count_) {
-    std::cerr << "PyramidMapMatrix: [bottom_up] Has no count." << std::endl;
+    AERROR << "PyramidMapMatrix: [bottom_up] Has no count.";
     return;
   }
 
@@ -387,13 +377,13 @@ void PyramidMapMatrix::BottomUpSafe() {
           for (unsigned int cl = c0; cl < c0 + ratio_; ++cl) {
             const unsigned int& count = count_matrixes_[i - 1][rl][cl];
             if (count > 0) {
-              float* intensity = NULL;
-              float* intensity_var = NULL;
-              float* altitude = NULL;
-              float* altitude_var = NULL;
-              float* ground_altitude = NULL;
-              unsigned int* count = NULL;
-              unsigned int* ground_count = NULL;
+              float* intensity = nullptr;
+              float* intensity_var = nullptr;
+              float* altitude = nullptr;
+              float* altitude_var = nullptr;
+              float* ground_altitude = nullptr;
+              unsigned int* count = nullptr;
+              unsigned int* ground_count = nullptr;
 
               GetMapCellSafe(&intensity, &intensity_var, &altitude,
                              &altitude_var, &ground_altitude, &count,
@@ -420,10 +410,10 @@ void PyramidMapMatrix::BottomUpBase() {
           for (unsigned int cl = c0; cl < c0 + ratio_; ++cl) {
             const unsigned int& count = count_matrixes_[i - 1][rl][cl];
             if (count > 0) {
-              float* intensity = NULL;
-              float* intensity_var = NULL;
-              float* altitude = NULL;
-              unsigned int* count = NULL;
+              float* intensity = nullptr;
+              float* intensity_var = nullptr;
+              float* altitude = nullptr;
+              unsigned int* count = nullptr;
 
               GetMapCellBase(&intensity, &intensity_var, &altitude, &count, rl,
                              cl, i - 1);
@@ -467,15 +457,13 @@ const float* PyramidMapMatrix::GetIntensitySafe(unsigned int row,
                                                 unsigned int col,
                                                 unsigned int level) const {
   if (!has_intensity_) {
-    std::cerr << "PyramidMapMatrix: [GetIntensitySafe] Has no intensity."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetIntensitySafe] Has no intensity.";
+    return nullptr;
   }
 
   if (!CheckLegalityForGetData(row, col, level)) {
-    std::cerr << "PyramidMapMatrix: [GetIntensitySafe] Params is illegal."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetIntensitySafe] Params is illegal.";
+    return nullptr;
   }
 
   return &intensity_matrixes_[level][row][col];
@@ -485,15 +473,13 @@ const float* PyramidMapMatrix::GetIntensityVarSafe(unsigned int row,
                                                    unsigned int col,
                                                    unsigned int level) const {
   if (!has_intensity_var_) {
-    std::cerr << "PyramidMapMatrix: [GetIntensityVarSafe] Has no intensity_var."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetIntensityVarSafe] Has no intensity_var.";
+    return nullptr;
   }
 
   if (!CheckLegalityForGetData(row, col, level)) {
-    std::cerr << "PyramidMapMatrix: [GetIntensityVarSafe] Params is illegal."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetIntensityVarSafe] Params is illegal.";
+    return nullptr;
   }
 
   return &intensity_var_matrixes_[level][row][col];
@@ -503,15 +489,13 @@ const float* PyramidMapMatrix::GetAltitudeSafe(unsigned int row,
                                                unsigned int col,
                                                unsigned int level) const {
   if (!has_altitude_) {
-    std::cerr << "PyramidMapMatrix: [GetAltitudeSafe] Has no altitude."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetAltitudeSafe] Has no altitude.";
+    return nullptr;
   }
 
   if (!CheckLegalityForGetData(row, col, level)) {
-    std::cerr << "PyramidMapMatrix: [GetAltitudeSafe] Params is illegal."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetAltitudeSafe] Params is illegal.";
+    return nullptr;
   }
 
   return &altitude_matrixes_[level][row][col];
@@ -521,15 +505,13 @@ const float* PyramidMapMatrix::GetAltitudeVarSafe(unsigned int row,
                                                   unsigned int col,
                                                   unsigned int level) const {
   if (!has_altitude_var_) {
-    std::cerr << "PyramidMapMatrix: [GetAltitudeVarSafe] Has no altitude_var."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetAltitudeVarSafe] Has no altitude_var.";
+    return nullptr;
   }
 
   if (!CheckLegalityForGetData(row, col, level)) {
-    std::cerr << "PyramidMapMatrix: [get_altitude_var] Params is illegal."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [get_altitude_var] Params is illegal.";
+    return nullptr;
   }
 
   return &altitude_var_matrixes_[level][row][col];
@@ -539,16 +521,14 @@ const float* PyramidMapMatrix::GetGroundAltitudeSafe(unsigned int row,
                                                      unsigned int col,
                                                      unsigned int level) const {
   if (!has_ground_altitude_) {
-    std::cerr
-        << "PyramidMapMatrix: [GetGroundAltitudeSafe] Has no ground_altitude."
-        << std::endl;
-    return NULL;
+    AERROR
+        << "PyramidMapMatrix: [GetGroundAltitudeSafe] Has no ground_altitude.";
+    return nullptr;
   }
 
   if (!CheckLegalityForGetData(row, col, level)) {
-    std::cerr << "PyramidMapMatrix: [GetGroundAltitudeSafe] Params is illegal."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetGroundAltitudeSafe] Params is illegal.";
+    return nullptr;
   }
 
   return &ground_altitude_matrixes_[level][row][col];
@@ -558,14 +538,13 @@ const unsigned int* PyramidMapMatrix::GetCountSafe(unsigned int row,
                                                    unsigned int col,
                                                    unsigned int level) const {
   if (!has_count_) {
-    std::cerr << "PyramidMapMatrix: [GetCountSafe] Has no count." << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetCountSafe] Has no count.";
+    return nullptr;
   }
 
   if (!CheckLegalityForGetData(row, col, level)) {
-    std::cerr << "PyramidMapMatrix: [GetCountSafe] Params is illegal."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetCountSafe] Params is illegal.";
+    return nullptr;
   }
 
   return &count_matrixes_[level][row][col];
@@ -574,15 +553,13 @@ const unsigned int* PyramidMapMatrix::GetCountSafe(unsigned int row,
 const unsigned int* PyramidMapMatrix::GetGroundCountSafe(
     unsigned int row, unsigned int col, unsigned int level) const {
   if (!has_ground_count_) {
-    std::cerr << "PyramidMapMatrix: [GetGroundCountSafe] Has no ground_count."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetGroundCountSafe] Has no ground_count.";
+    return nullptr;
   }
 
   if (!CheckLegalityForGetData(row, col, level)) {
-    std::cerr << "PyramidMapMatrix: [GetGroundCountSafe] Params is illegal."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetGroundCountSafe] Params is illegal.";
+    return nullptr;
   }
 
   return &ground_count_matrixes_[level][row][col];
@@ -596,8 +573,7 @@ void PyramidMapMatrix::GetMapCellSafe(float** intensity, float** intensity_var,
                                       unsigned int row, unsigned int col,
                                       unsigned int level) {
   if (!CheckLegalityForGetData(row, col, level)) {
-    std::cerr << "PyramidMapMatrix: [GetMapCellSafe] Params is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [GetMapCellSafe] Params is illegal.";
     return;
   }
 
@@ -632,16 +608,14 @@ void PyramidMapMatrix::GetMapCellSafe(float** intensity, float** intensity_var,
 
 FloatMatrix* PyramidMapMatrix::GetIntensityMatrixSafe(unsigned int level) {
   if (!has_intensity_) {
-    std::cerr << "PyramidMapMatrix: [GetIntensityMatrixSafe] Has no intensity."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetIntensityMatrixSafe] Has no intensity.";
+    return nullptr;
   }
 
   if (level >= resolution_num_) {
-    std::cerr
-        << "PyramidMapMatrix: [GetIntensityMatrixSafe] The level id is illegal."
-        << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetIntensityMatrixSafe] The level id is "
+              "illegal.";
+    return nullptr;
   }
 
   return &intensity_matrixes_[level];
@@ -649,17 +623,15 @@ FloatMatrix* PyramidMapMatrix::GetIntensityMatrixSafe(unsigned int level) {
 
 FloatMatrix* PyramidMapMatrix::GetIntensityVarMatrixSafe(unsigned int level) {
   if (!has_intensity_var_) {
-    std::cerr
-        << "PyramidMapMatrix: [GetIntensityVarMatrixSafe] Has no intensity_var."
-        << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetIntensityVarMatrixSafe] Has no "
+              "intensity_var.";
+    return nullptr;
   }
 
   if (level >= resolution_num_) {
-    std::cerr << "PyramidMapMatrix: [GetIntensityVarMatrixSafe] The level id "
-                 "is illegal."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetIntensityVarMatrixSafe] The level id "
+              "is illegal.";
+    return nullptr;
   }
 
   return &intensity_var_matrixes_[level];
@@ -667,16 +639,14 @@ FloatMatrix* PyramidMapMatrix::GetIntensityVarMatrixSafe(unsigned int level) {
 
 FloatMatrix* PyramidMapMatrix::GetAltitudeMatrixSafe(unsigned int level) {
   if (!has_altitude_) {
-    std::cerr << "PyramidMapMatrix: [GetAltitudeMatrixSafe] Has no altitude."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetAltitudeMatrixSafe] Has no altitude.";
+    return nullptr;
   }
 
   if (level >= resolution_num_) {
-    std::cerr
-        << "PyramidMapMatrix: [GetAltitudeMatrixSafe] The level id is illegal."
-        << std::endl;
-    return NULL;
+    AERROR
+        << "PyramidMapMatrix: [GetAltitudeMatrixSafe] The level id is illegal.";
+    return nullptr;
   }
 
   return &altitude_matrixes_[level];
@@ -684,17 +654,15 @@ FloatMatrix* PyramidMapMatrix::GetAltitudeMatrixSafe(unsigned int level) {
 
 FloatMatrix* PyramidMapMatrix::GetAltitudeVarMatrixSafe(unsigned int level) {
   if (!has_altitude_var_) {
-    std::cerr
-        << "PyramidMapMatrix: [GetAltitudeVarMatrixSafe] Has no altitude_var."
-        << std::endl;
-    return NULL;
+    AERROR
+        << "PyramidMapMatrix: [GetAltitudeVarMatrixSafe] Has no altitude_var.";
+    return nullptr;
   }
 
   if (level >= resolution_num_) {
-    std::cerr << "PyramidMapMatrix: [GetAltitudeVarMatrixSafe] The level id is "
-                 "illegal."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetAltitudeVarMatrixSafe] The level id is "
+              "illegal.";
+    return nullptr;
   }
 
   return &altitude_var_matrixes_[level];
@@ -702,17 +670,15 @@ FloatMatrix* PyramidMapMatrix::GetAltitudeVarMatrixSafe(unsigned int level) {
 
 FloatMatrix* PyramidMapMatrix::GetGroundAltitudeMatrixSafe(unsigned int level) {
   if (!has_ground_altitude_) {
-    std::cerr << "PyramidMapMatrix: [GetGroundAltitudeMatrixSafe] Has no "
-                 "ground_altitude."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetGroundAltitudeMatrixSafe] Has no "
+              "ground_altitude.";
+    return nullptr;
   }
 
   if (level >= resolution_num_) {
-    std::cerr << "PyramidMapMatrix: [GetGroundAltitudeMatrixSafe] The level id "
-                 "is illegal."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetGroundAltitudeMatrixSafe] The level id "
+              "is illegal.";
+    return nullptr;
   }
 
   return &ground_altitude_matrixes_[level];
@@ -720,16 +686,13 @@ FloatMatrix* PyramidMapMatrix::GetGroundAltitudeMatrixSafe(unsigned int level) {
 
 UIntMatrix* PyramidMapMatrix::GetCountMatrixSafe(unsigned int level) {
   if (!has_count_) {
-    std::cerr << "PyramidMapMatrix: [GetCountMatrixSafe] Has no count."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetCountMatrixSafe] Has no count.";
+    return nullptr;
   }
 
   if (level >= resolution_num_) {
-    std::cerr
-        << "PyramidMapMatrix: [GetCountMatrixSafe] The level id is illegal."
-        << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetCountMatrixSafe] The level id is illegal.";
+    return nullptr;
   }
 
   return &count_matrixes_[level];
@@ -737,17 +700,15 @@ UIntMatrix* PyramidMapMatrix::GetCountMatrixSafe(unsigned int level) {
 
 UIntMatrix* PyramidMapMatrix::GetGroundCountMatrixSafe(unsigned int level) {
   if (!has_ground_count_) {
-    std::cerr
-        << "PyramidMapMatrix: [GetGroundCountMatrixSafe] Has no ground_count."
-        << std::endl;
-    return NULL;
+    AERROR
+        << "PyramidMapMatrix: [GetGroundCountMatrixSafe] Has no ground_count.";
+    return nullptr;
   }
 
   if (level >= resolution_num_) {
-    std::cerr << "PyramidMapMatrix: [GetGroundCountMatrixSafe] The level id is "
-                 "illegal."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetGroundCountMatrixSafe] The level id is "
+              "illegal.";
+    return nullptr;
   }
 
   return &ground_count_matrixes_[level];
@@ -756,16 +717,14 @@ UIntMatrix* PyramidMapMatrix::GetGroundCountMatrixSafe(unsigned int level) {
 const FloatMatrix* PyramidMapMatrix::GetIntensityMatrixSafe(
     unsigned int level) const {
   if (!has_intensity_) {
-    std::cerr << "PyramidMapMatrix: [GetIntensityMatrixSafe] Has no intensity."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetIntensityMatrixSafe] Has no intensity.";
+    return nullptr;
   }
 
   if (level >= resolution_num_) {
-    std::cerr
-        << "PyramidMapMatrix: [GetIntensityMatrixSafe] The level id is illegal."
-        << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetIntensityMatrixSafe] The level id is "
+              "illegal.";
+    return nullptr;
   }
 
   return &intensity_matrixes_[level];
@@ -774,17 +733,15 @@ const FloatMatrix* PyramidMapMatrix::GetIntensityMatrixSafe(
 const FloatMatrix* PyramidMapMatrix::GetIntensityVarMatrixSafe(
     unsigned int level) const {
   if (!has_intensity_var_) {
-    std::cerr
-        << "PyramidMapMatrix: [GetIntensityVarMatrixSafe] Has no intensity_var."
-        << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetIntensityVarMatrixSafe] Has no "
+              "intensity_var.";
+    return nullptr;
   }
 
   if (level >= resolution_num_) {
-    std::cerr << "PyramidMapMatrix: [GetIntensityVarMatrixSafe] The level id "
-                 "is illegal."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetIntensityVarMatrixSafe] The level id "
+              "is illegal.";
+    return nullptr;
   }
 
   return &intensity_var_matrixes_[level];
@@ -793,16 +750,14 @@ const FloatMatrix* PyramidMapMatrix::GetIntensityVarMatrixSafe(
 const FloatMatrix* PyramidMapMatrix::GetAltitudeMatrixSafe(
     unsigned int level) const {
   if (!has_altitude_) {
-    std::cerr << "PyramidMapMatrix: [GetAltitudeMatrixSafe] Has no altitude."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetAltitudeMatrixSafe] Has no altitude.";
+    return nullptr;
   }
 
   if (level >= resolution_num_) {
-    std::cerr
-        << "PyramidMapMatrix: [GetAltitudeMatrixSafe] The level id is illegal."
-        << std::endl;
-    return NULL;
+    AERROR
+        << "PyramidMapMatrix: [GetAltitudeMatrixSafe] The level id is illegal.";
+    return nullptr;
   }
 
   return &altitude_matrixes_[level];
@@ -811,17 +766,15 @@ const FloatMatrix* PyramidMapMatrix::GetAltitudeMatrixSafe(
 const FloatMatrix* PyramidMapMatrix::GetAltitudeVarMatrixSafe(
     unsigned int level) const {
   if (!has_altitude_var_) {
-    std::cerr
-        << "PyramidMapMatrix: [GetAltitudeVarMatrixSafe] Has no altitude_var."
-        << std::endl;
-    return NULL;
+    AERROR
+        << "PyramidMapMatrix: [GetAltitudeVarMatrixSafe] Has no altitude_var.";
+    return nullptr;
   }
 
   if (level >= resolution_num_) {
-    std::cerr << "PyramidMapMatrix: [GetAltitudeVarMatrixSafe] The level id is "
-                 "illegal."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetAltitudeVarMatrixSafe] The level id is "
+              "illegal.";
+    return nullptr;
   }
 
   return &altitude_var_matrixes_[level];
@@ -830,17 +783,15 @@ const FloatMatrix* PyramidMapMatrix::GetAltitudeVarMatrixSafe(
 const FloatMatrix* PyramidMapMatrix::GetGroundAltitudeMatrixSafe(
     unsigned int level) const {
   if (!has_ground_altitude_) {
-    std::cerr << "PyramidMapMatrix: [GetGroundAltitudeMatrixSafe] Has no "
-                 "ground_altitude."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetGroundAltitudeMatrixSafe] Has no "
+              "ground_altitude.";
+    return nullptr;
   }
 
   if (level >= resolution_num_) {
-    std::cerr << "PyramidMapMatrix: [GetGroundAltitudeMatrixSafe] The level id "
-                 "is illegal."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetGroundAltitudeMatrixSafe] The level id "
+              "is illegal.";
+    return nullptr;
   }
 
   return &ground_altitude_matrixes_[level];
@@ -849,16 +800,13 @@ const FloatMatrix* PyramidMapMatrix::GetGroundAltitudeMatrixSafe(
 const UIntMatrix* PyramidMapMatrix::GetCountMatrixSafe(
     unsigned int level) const {
   if (!has_count_) {
-    std::cerr << "PyramidMapMatrix: [GetCountMatrixSafe] Has no count."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetCountMatrixSafe] Has no count.";
+    return nullptr;
   }
 
   if (level >= resolution_num_) {
-    std::cerr
-        << "PyramidMapMatrix: [GetCountMatrixSafe] The level id is illegal."
-        << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetCountMatrixSafe] The level id is illegal.";
+    return nullptr;
   }
 
   return &count_matrixes_[level];
@@ -867,17 +815,15 @@ const UIntMatrix* PyramidMapMatrix::GetCountMatrixSafe(
 const UIntMatrix* PyramidMapMatrix::GetGroundCountMatrixSafe(
     unsigned int level) const {
   if (!has_ground_count_) {
-    std::cerr
-        << "PyramidMapMatrix: [GetGroundCountMatrixSafe] Has no ground_count."
-        << std::endl;
-    return NULL;
+    AERROR
+        << "PyramidMapMatrix: [GetGroundCountMatrixSafe] Has no ground_count.";
+    return nullptr;
   }
 
   if (level >= resolution_num_) {
-    std::cerr << "PyramidMapMatrix: [GetGroundCountMatrixSafe] The level id is "
-                 "illegal."
-              << std::endl;
-    return NULL;
+    AERROR << "PyramidMapMatrix: [GetGroundCountMatrixSafe] The level id is "
+              "illegal.";
+    return nullptr;
   }
 
   return &ground_count_matrixes_[level];
@@ -887,14 +833,12 @@ void PyramidMapMatrix::SetIntensityMatrix(const float* input, unsigned int size,
                                           unsigned int start_index,
                                           unsigned int level) {
   if (!has_intensity_) {
-    std::cerr << "PyramidMapMatrix: [SetIntensityMatrix] Has no intensity."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetIntensityMatrix] Has no intensity.";
     return;
   }
 
   if (!CheckLegalityForSetData(level, start_index, size)) {
-    std::cerr << "PyramidMapMatrix: [SetIntensityMatrix] Params is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetIntensityMatrix] Params is illegal.";
     return;
   }
 
@@ -906,16 +850,13 @@ void PyramidMapMatrix::SetIntensityVarMatrix(const float* input,
                                              unsigned int start_index,
                                              unsigned int level) {
   if (!has_intensity_var_) {
-    std::cerr
-        << "PyramidMapMatrix: [set_intensity_var_matrix] Has no intensity_var."
-        << std::endl;
+    AERROR
+        << "PyramidMapMatrix: [set_intensity_var_matrix] Has no intensity_var.";
     return;
   }
 
   if (!CheckLegalityForSetData(level, start_index, size)) {
-    std::cerr
-        << "PyramidMapMatrix: [set_intensity_var_matrix] Params is illegal."
-        << std::endl;
+    AERROR << "PyramidMapMatrix: [set_intensity_var_matrix] Params is illegal.";
     return;
   }
 
@@ -926,14 +867,12 @@ void PyramidMapMatrix::SetAltitudeMatrix(const float* input, unsigned int size,
                                          unsigned int start_index,
                                          unsigned int level) {
   if (!has_altitude_) {
-    std::cerr << "PyramidMapMatrix: [SetAltitudeMatrix] Has no altitude."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetAltitudeMatrix] Has no altitude.";
     return;
   }
 
   if (!CheckLegalityForSetData(level, start_index, size)) {
-    std::cerr << "PyramidMapMatrix: [SetAltitudeMatrix] Params is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetAltitudeMatrix] Params is illegal.";
     return;
   }
 
@@ -945,14 +884,12 @@ void PyramidMapMatrix::SetAltitudeVarMatrix(const float* input,
                                             unsigned int start_index,
                                             unsigned int level) {
   if (!has_altitude_var_) {
-    std::cerr << "PyramidMapMatrix: [SetAltitudeVarMatrix] Has no altitude_var."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetAltitudeVarMatrix] Has no altitude_var.";
     return;
   }
 
   if (!CheckLegalityForSetData(level, start_index, size)) {
-    std::cerr << "PyramidMapMatrix: [SetAltitudeVarMatrix] Params is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetAltitudeVarMatrix] Params is illegal.";
     return;
   }
 
@@ -964,16 +901,13 @@ void PyramidMapMatrix::SetGroundAltitudeMatrix(const float* input,
                                                unsigned int start_index,
                                                unsigned int level) {
   if (!has_ground_altitude_) {
-    std::cerr
-        << "PyramidMapMatrix: [SetGroundAltitudeMatrix] Has no ground_altitude."
-        << std::endl;
+    AERROR << "PyramidMapMatrix: [SetGroundAltitudeMatrix] Has no "
+              "ground_altitude.";
     return;
   }
 
   if (!CheckLegalityForSetData(level, start_index, size)) {
-    std::cerr
-        << "PyramidMapMatrix: [SetGroundAltitudeMatrix] Params is illegal."
-        << std::endl;
+    AERROR << "PyramidMapMatrix: [SetGroundAltitudeMatrix] Params is illegal.";
     return;
   }
 
@@ -985,14 +919,12 @@ void PyramidMapMatrix::SetCountMatrix(const unsigned int* input,
                                       unsigned int start_index,
                                       unsigned int level) {
   if (!has_count_) {
-    std::cerr << "PyramidMapMatrix: [SetCountMatrix] Has no count."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetCountMatrix] Has no count.";
     return;
   }
 
   if (!CheckLegalityForSetData(level, start_index, size)) {
-    std::cerr << "PyramidMapMatrix: [SetCountMatrix] Params is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetCountMatrix] Params is illegal.";
     return;
   }
 
@@ -1004,14 +936,12 @@ void PyramidMapMatrix::SetGroundCountMatrix(const unsigned int* input,
                                             unsigned int start_index,
                                             unsigned int level) {
   if (!has_ground_count_) {
-    std::cerr << "PyramidMapMatrix: [SetGroundCountMatrix] Has no ground count."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetGroundCountMatrix] Has no ground count.";
     return;
   }
 
   if (!CheckLegalityForSetData(level, start_index, size)) {
-    std::cerr << "PyramidMapMatrix: [SetGroundCountMatrix] Params is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetGroundCountMatrix] Params is illegal.";
     return;
   }
 
@@ -1023,48 +953,40 @@ void PyramidMapMatrix::SetFloatMatrixRoi(const FloatMatrix* source_matrix,
                                          const Rect2D<unsigned int>& target_roi,
                                          unsigned int type,
                                          unsigned int level) {
-  if (source_matrix == NULL) {
-    std::cerr << "PyramidMapMatrix: [SetFloatMatrixRoi] Source matrix is null."
-              << std::endl;
+  if (source_matrix == nullptr) {
+    AERROR << "PyramidMapMatrix: [SetFloatMatrixRoi] Source matrix is nullptr.";
     return;
   }
 
   switch (type) {
     case 0:
       if (!has_intensity_) {
-        std::cerr << "PyramidMapMatrix: [SetFloatMatrixRoi] Has no intensity."
-                  << std::endl;
+        AERROR << "PyramidMapMatrix: [SetFloatMatrixRoi] Has no intensity.";
         return;
       }
       break;
     case 1:
       if (!has_intensity_var_) {
-        std::cerr
-            << "PyramidMapMatrix: [SetFloatMatrixRoi] Has no intensity var."
-            << std::endl;
+        AERROR << "PyramidMapMatrix: [SetFloatMatrixRoi] Has no intensity var.";
         return;
       }
       break;
     case 2:
       if (!has_altitude_) {
-        std::cerr << "PyramidMapMatrix: [SetFloatMatrixRoi] Has no altitude."
-                  << std::endl;
+        AERROR << "PyramidMapMatrix: [SetFloatMatrixRoi] Has no altitude.";
         return;
       }
       break;
     case 3:
       if (!has_altitude_var_) {
-        std::cerr
-            << "PyramidMapMatrix: [SetFloatMatrixRoi] Has no altitude var."
-            << std::endl;
+        AERROR << "PyramidMapMatrix: [SetFloatMatrixRoi] Has no altitude var.";
         return;
       }
       break;
     case 4:
       if (!has_ground_altitude_) {
-        std::cerr
-            << "PyramidMapMatrix: [SetFloatMatrixRoi] Has no ground altitude."
-            << std::endl;
+        AERROR
+            << "PyramidMapMatrix: [SetFloatMatrixRoi] Has no ground altitude.";
         return;
       }
       break;
@@ -1074,8 +996,7 @@ void PyramidMapMatrix::SetFloatMatrixRoi(const FloatMatrix* source_matrix,
           level, static_cast<unsigned int>(source_matrix->GetRow()),
           static_cast<unsigned int>(source_matrix->GetCol()), source_roi,
           target_roi)) {
-    std::cerr << "PyramidMapMatrix: [SetFloatMatrixRoi] Params is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetFloatMatrixRoi] Params is illegal.";
     return;
   }
 
@@ -1122,24 +1043,21 @@ void PyramidMapMatrix::SetUintMatrixRoi(const UIntMatrix* source_matrix,
                                         const Rect2D<unsigned int>& source_roi,
                                         const Rect2D<unsigned int>& target_roi,
                                         unsigned int type, unsigned int level) {
-  if (source_matrix == NULL) {
-    std::cerr << "PyramidMapMatrix: [SetUintMatrixRoi] Source matrix is null."
-              << std::endl;
+  if (source_matrix == nullptr) {
+    AERROR << "PyramidMapMatrix: [SetUintMatrixRoi] Source matrix is nullptr.";
     return;
   }
 
   switch (type) {
     case 0:
       if (!has_count_) {
-        std::cerr << "PyramidMapMatrix: [SetUintMatrixRoi] Has no count."
-                  << std::endl;
+        AERROR << "PyramidMapMatrix: [SetUintMatrixRoi] Has no count.";
         return;
       }
       break;
     case 1:
       if (!has_ground_count_) {
-        std::cerr << "PyramidMapMatrix: [SetUintMatrixRoi] Has no ground count."
-                  << std::endl;
+        AERROR << "PyramidMapMatrix: [SetUintMatrixRoi] Has no ground count.";
         return;
       }
       break;
@@ -1149,22 +1067,18 @@ void PyramidMapMatrix::SetUintMatrixRoi(const UIntMatrix* source_matrix,
           level, static_cast<unsigned int>(source_matrix->GetRow()),
           static_cast<unsigned int>(source_matrix->GetCol()), source_roi,
           target_roi)) {
-    std::cerr << "PyramidMapMatrix: [SetUintMatrixRoi] Params is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetUintMatrixRoi] Params is illegal.";
     return;
   }
 
   const unsigned int& source_roi_min_x = source_roi.GetMinX();
   const unsigned int& source_roi_min_y = source_roi.GetMinY();
-  // const unsigned int &source_roi_max_x = source_roi.GetMaxX();
-  // const unsigned int &source_roi_max_y = source_roi.GetMaxY();
 
   const unsigned int& target_roi_min_x = target_roi.GetMinX();
   const unsigned int& target_roi_min_y = target_roi.GetMinY();
   const unsigned int& target_roi_max_x = target_roi.GetMaxX();
   const unsigned int& target_roi_max_y = target_roi.GetMaxY();
 
-  // unsigned int roi_rows = target_roi_max_y - target_roi_min_y + 1;
   unsigned int roi_cols = target_roi_max_x - target_roi_min_x + 1;
 
   unsigned int inc = 0;
@@ -1189,14 +1103,12 @@ void PyramidMapMatrix::SetUintMatrixRoi(const UIntMatrix* source_matrix,
 void PyramidMapMatrix::SetIntensitySafe(float intensity, unsigned int row,
                                         unsigned int col, unsigned int level) {
   if (!has_intensity_) {
-    std::cerr << "PyramidMapMatrix: [SetIntensitySafe] Has no intensity."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetIntensitySafe] Has no intensity.";
     return;
   }
 
   if (!CheckLegalityForGetData(row, col, level)) {
-    std::cerr << "PyramidMapMatrix: [SetIntensitySafe] Params is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetIntensitySafe] Params is illegal.";
     return;
   }
 
@@ -1207,14 +1119,12 @@ void PyramidMapMatrix::SetIntensityVarSafe(float intensity_var,
                                            unsigned int row, unsigned int col,
                                            unsigned int level) {
   if (!has_intensity_var_) {
-    std::cerr << "PyramidMapMatrix: [SetIntensityVarSafe] Has no intensity_var."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetIntensityVarSafe] Has no intensity_var.";
     return;
   }
 
   if (!CheckLegalityForGetData(row, col, level)) {
-    std::cerr << "PyramidMapMatrix: [SetIntensityVarSafe] Params is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetIntensityVarSafe] Params is illegal.";
     return;
   }
 
@@ -1224,14 +1134,12 @@ void PyramidMapMatrix::SetIntensityVarSafe(float intensity_var,
 void PyramidMapMatrix::SetAltitudeSafe(float altitude, unsigned int row,
                                        unsigned int col, unsigned int level) {
   if (!has_altitude_) {
-    std::cerr << "PyramidMapMatrix: [SetAltitudeSafe] Has no altitude."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetAltitudeSafe] Has no altitude.";
     return;
   }
 
   if (!CheckLegalityForGetData(row, col, level)) {
-    std::cerr << "PyramidMapMatrix: [SetAltitudeSafe] Params is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetAltitudeSafe] Params is illegal.";
     return;
   }
 
@@ -1242,14 +1150,12 @@ void PyramidMapMatrix::SetAltitudeVarSafe(float altitude_var, unsigned int row,
                                           unsigned int col,
                                           unsigned int level) {
   if (!has_altitude_var_) {
-    std::cerr << "PyramidMapMatrix: [SetAltitudeVarSafe] Has no altitude var."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetAltitudeVarSafe] Has no altitude var.";
     return;
   }
 
   if (!CheckLegalityForGetData(row, col, level)) {
-    std::cerr << "PyramidMapMatrix: [SetAltitudeVarSafe] Params is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetAltitudeVarSafe] Params is illegal.";
     return;
   }
 
@@ -1260,15 +1166,13 @@ void PyramidMapMatrix::SetGroundAltitudeSafe(float ground_altitude,
                                              unsigned int row, unsigned int col,
                                              unsigned int level) {
   if (!has_ground_altitude_) {
-    std::cerr
-        << "PyramidMapMatrix: [SetGroundAltitudeSafe] Has no ground altitude."
-        << std::endl;
+    AERROR
+        << "PyramidMapMatrix: [SetGroundAltitudeSafe] Has no ground altitude.";
     return;
   }
 
   if (!CheckLegalityForGetData(row, col, level)) {
-    std::cerr << "PyramidMapMatrix: [SetGroundAltitudeSafe] Params is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetGroundAltitudeSafe] Params is illegal.";
     return;
   }
 
@@ -1278,13 +1182,12 @@ void PyramidMapMatrix::SetGroundAltitudeSafe(float ground_altitude,
 void PyramidMapMatrix::SetCountSafe(unsigned int count, unsigned int row,
                                     unsigned int col, unsigned int level) {
   if (!has_count_) {
-    std::cerr << "PyramidMapMatrix: [SetCountSafe] Has no count." << std::endl;
+    AERROR << "PyramidMapMatrix: [SetCountSafe] Has no count.";
     return;
   }
 
   if (!CheckLegalityForGetData(row, col, level)) {
-    std::cerr << "PyramidMapMatrix: [SetCountSafe] Params is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetCountSafe] Params is illegal.";
     return;
   }
 
@@ -1295,14 +1198,12 @@ void PyramidMapMatrix::SetGroundCountSafe(unsigned int ground_count,
                                           unsigned int row, unsigned int col,
                                           unsigned int level) {
   if (!has_ground_count_) {
-    std::cerr << "PyramidMapMatrix: [SetGroundCountSafe] Has no ground count."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetGroundCountSafe] Has no ground count.";
     return;
   }
 
   if (!CheckLegalityForGetData(row, col, level)) {
-    std::cerr << "PyramidMapMatrix: [SetGroundCountSafe] Params is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetGroundCountSafe] Params is illegal.";
     return;
   }
 
@@ -1313,20 +1214,17 @@ void PyramidMapMatrix::SetValueSafe(unsigned char intensity, float altitude,
                                     unsigned int row, unsigned int col,
                                     unsigned int level) {
   if (!has_intensity_) {
-    std::cerr << "PyramidMapMatrix: [SetValueSafe] Has no intensity."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetValueSafe] Has no intensity.";
     return;
   }
 
   if (!has_altitude_) {
-    std::cerr << "PyramidMapMatrix: [SetValueSafe] Has no altitude."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetValueSafe] Has no altitude.";
     return;
   }
 
   if (!CheckLegalityForGetData(row, col, level)) {
-    std::cerr << "PyramidMapMatrix: [SetValueSafe] Params is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [SetValueSafe] Params is illegal.";
     return;
   }
 
@@ -1340,12 +1238,11 @@ void PyramidMapMatrix::MergeCellSafe(
     const unsigned int* count, const unsigned int* ground_count,
     unsigned int row, unsigned int col, unsigned int level) {
   if (!CheckLegalityForGetData(row, col, level)) {
-    std::cerr << "PyramidMapMatrix: [MergeCellSafe] Params is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [MergeCellSafe] Params is illegal.";
     return;
   }
 
-  if (count == NULL || !has_count_) {
+  if (count == nullptr || !has_count_) {
     return;
   }
 
@@ -1355,13 +1252,13 @@ void PyramidMapMatrix::MergeCellSafe(
   float p1 = static_cast<float>(*count) / static_cast<float>(new_count);
 
   float intensity_diff = 0.0f;
-  if (intensity != NULL && has_intensity_) {
+  if (intensity != nullptr && has_intensity_) {
     intensity_diff = intensity_matrixes_[level][row][col] - *intensity;
     intensity_matrixes_[level][row][col] =
         intensity_matrixes_[level][row][col] * p0 + *intensity * p1;
   }
 
-  if (intensity != NULL && has_intensity_ && intensity_var != NULL &&
+  if (intensity != nullptr && has_intensity_ && intensity_var != nullptr &&
       has_intensity_var_) {
     intensity_var_matrixes_[level][row][col] =
         intensity_var_matrixes_[level][row][col] * p0 + *intensity_var * p1 +
@@ -1369,13 +1266,13 @@ void PyramidMapMatrix::MergeCellSafe(
   }
 
   float altitude_diff = 0.0f;
-  if (altitude != NULL && has_altitude_) {
+  if (altitude != nullptr && has_altitude_) {
     altitude_diff = altitude_matrixes_[level][row][col] - *altitude;
     altitude_matrixes_[level][row][col] =
         altitude_matrixes_[level][row][col] * p0 + *altitude * p1;
   }
 
-  if (altitude != NULL && has_altitude_ && altitude_var != NULL &&
+  if (altitude != nullptr && has_altitude_ && altitude_var != nullptr &&
       has_altitude_var_) {
     altitude_var_matrixes_[level][row][col] =
         altitude_var_matrixes_[level][row][col] * p0 + *altitude_var * p1 +
@@ -1385,7 +1282,7 @@ void PyramidMapMatrix::MergeCellSafe(
   count_matrixes_[level][row][col] = new_count;
 
   // for points on ground
-  if (ground_count == NULL || !has_ground_count_) {
+  if (ground_count == nullptr || !has_ground_count_) {
     return;
   }
 
@@ -1393,10 +1290,9 @@ void PyramidMapMatrix::MergeCellSafe(
       ground_count_matrixes_[level][row][col] + *ground_count;
   p0 = static_cast<float>(ground_count_matrixes_[level][row][col]) /
        static_cast<float>(new_ground_count);
-  p1 = static_cast<float>(*ground_count) /
-       static_cast<float>(new_ground_count);
+  p1 = static_cast<float>(*ground_count) / static_cast<float>(new_ground_count);
 
-  if (ground_altitude != NULL && has_ground_altitude_) {
+  if (ground_altitude != nullptr && has_ground_altitude_) {
     ground_altitude_matrixes_[level][row][col] =
         ground_altitude_matrixes_[level][row][col] * p0 + *ground_altitude * p1;
   }
@@ -1408,23 +1304,18 @@ bool PyramidMapMatrix::CheckLegalityForGetData(unsigned int row,
                                                unsigned int col,
                                                unsigned int level) const {
   if (level >= resolution_num_) {
-    std::cerr << "PyramidMapMatrix: [CheckLegalityForGetData] The level id is "
-                 "illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [CheckLegalityForGetData] The level id is "
+              "illegal.";
     return false;
   }
 
   if (row >= rows_mr_[level]) {
-    std::cerr
-        << "PyramidMapMatrix: [CheckLegalityForGetData] The row is illegal."
-        << std::endl;
+    AERROR << "PyramidMapMatrix: [CheckLegalityForGetData] The row is illegal.";
     return false;
   }
 
   if (col >= cols_mr_[level]) {
-    std::cerr
-        << "PyramidMapMatrix: [CheckLegalityForGetData] The col is illegal."
-        << std::endl;
+    AERROR << "PyramidMapMatrix: [CheckLegalityForGetData] The col is illegal.";
     return false;
   }
 
@@ -1435,16 +1326,14 @@ bool PyramidMapMatrix::CheckLegalityForSetData(unsigned int level,
                                                unsigned int start_id,
                                                unsigned int size) const {
   if (level >= resolution_num_) {
-    std::cerr << "PyramidMapMatrix: [CheckLegalityForSetData] The level id is "
-                 "illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [CheckLegalityForSetData] The level id is "
+              "illegal.";
     return false;
   }
 
   if (start_id + size > rows_mr_[level] * cols_mr_[level]) {
-    std::cerr << "PyramidMapMatrix: [CheckLegalityForSetData] The start_id or "
-                 "size is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [CheckLegalityForSetData] The start_id or "
+              "size is illegal.";
     return false;
   }
 
@@ -1456,9 +1345,8 @@ bool PyramidMapMatrix::CheckLegalityForSetDataRoi(
     unsigned int source_matrix_cols, const Rect2D<unsigned int>& source_roi,
     const Rect2D<unsigned int>& target_roi) const {
   if (level >= resolution_num_) {
-    std::cerr << "PyramidMapMatrix: [CheckLegalityForSetDataRoi] The level id "
-                 "is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [CheckLegalityForSetDataRoi] The level id "
+              "is illegal.";
     return false;
   }
 
@@ -1484,9 +1372,8 @@ bool PyramidMapMatrix::CheckLegalityForSetDataRoi(
           target_roi_max_x - target_roi_min_x ||
       source_roi_max_y - source_roi_min_y !=
           target_roi_max_y - target_roi_min_y) {
-    std::cerr << "PyramidMapMatrix: [CheckLegalityForSetDataRoi]"
-                 " The source_roi or target_roi is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [CheckLegalityForSetDataRoi]"
+              " The source_roi or target_roi is illegal.";
     return false;
   }
 
@@ -1497,8 +1384,7 @@ void PyramidMapMatrix::AddSampleSafe(float intensity, float altitude,
                                      unsigned int row, unsigned int col,
                                      unsigned int level) {
   if (!CheckLegalityForGetData(row, col, level)) {
-    std::cerr << "PyramidMapMatrix: [AddSampleSafe] Params is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [AddSampleSafe] Params is illegal.";
     return;
   }
 
@@ -1543,8 +1429,7 @@ void PyramidMapMatrix::AddSampleSafe(float intensity, float altitude,
 void PyramidMapMatrix::AddGroundSample(float ground_altitude, unsigned int row,
                                        unsigned int col, unsigned int level) {
   if (!CheckLegalityForGetData(row, col, level)) {
-    std::cerr << "PyramidMapMatrix: [AddGroundSample] Params is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [AddGroundSample] Params is illegal.";
     return;
   }
 
@@ -1563,21 +1448,18 @@ void PyramidMapMatrix::AddGroundSample(float ground_altitude, unsigned int row,
 
 double PyramidMapMatrix::ComputeMeanIntensity(unsigned int level) {
   if (!has_count_) {
-    std::cerr << "PyramidMapMatrix: [ComputeMeanIntensity] Has no count."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [ComputeMeanIntensity] Has no count.";
     return 0.0;
   }
 
   if (!has_intensity_ || resolution_num_ < 1) {
-    std::cerr << "PyramidMapMatrix: [ComputeMeanIntensity] No intensity data."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [ComputeMeanIntensity] No intensity data.";
     return 0.0;
   }
 
   if (level >= resolution_num_) {
-    std::cerr
-        << "PyramidMapMatrix: [ComputeMeanIntensity] The level id is illegal."
-        << std::endl;
+    AERROR
+        << "PyramidMapMatrix: [ComputeMeanIntensity] The level id is illegal.";
     return 0.0;
   }
 
@@ -1600,14 +1482,12 @@ void PyramidMapMatrix::Reduce(PyramidMapMatrix* cells,
                               const PyramidMapMatrix& new_cells,
                               unsigned int level, unsigned int new_level) {
   if (level >= cells->resolution_num_) {
-    std::cerr << "PyramidMapMatrix: [Reduce] The level id is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [Reduce] The level id is illegal.";
     return;
   }
 
   if (new_level >= new_cells.resolution_num_) {
-    std::cerr << "PyramidMapMatrix: [Reduce] The new level id is illegal."
-              << std::endl;
+    AERROR << "PyramidMapMatrix: [Reduce] The new level id is illegal.";
     return;
   }
 
