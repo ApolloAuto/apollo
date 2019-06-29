@@ -1,6 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
 
-
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
@@ -15,36 +14,36 @@ cc_library(
     srcs = [
         "main.cc",
     ],
-    deps = [
-        ":client",
-        ":client_gflags",
-    ],
     linkopts = [
         "-lboost_filesystem",
         "-lgrpc++",
+    ],
+    deps = [
+        ":client",
+        ":client_gflags",
     ],
 )
 
 cc_library(
     name = "client",
     srcs = [
-        "client.cc"
+        "client.cc",
     ],
     hdrs = [
         "client.h",
         "client_alignment.h",
     ],
-    deps = [
-        ":client_gflags",
-        ":client_channel_checker",
-        ":client_common",
-        ":client_loops_check",
-        "@yaml_cpp//:yaml",
-        "//cyber:cyber",
-    ],
     linkopts = [
         "-lboost_filesystem",
         "-lgrpc++",
+    ],
+    deps = [
+        ":client_channel_checker",
+        ":client_common",
+        ":client_gflags",
+        ":client_loops_check",
+        "//cyber",
+        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -56,17 +55,17 @@ cc_library(
     hdrs = [
         "client_channel_checker.h",
     ],
-    deps = [
-        ":client_gflags",
-        ":client_common",
-        ":exception_handler",
-        "//cyber:cyber",
-        "//modules/map/tools/map_datachecker/proto:map_datachecker_grpc",
-        "@yaml_cpp//:yaml",
-    ],
     linkopts = [
         "-lboost_filesystem",
         "-lgrpc++",
+    ],
+    deps = [
+        ":client_common",
+        ":client_gflags",
+        ":exception_handler",
+        "//cyber",
+        "//modules/map/tools/map_datachecker/proto:map_datachecker_grpc",
+        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -78,12 +77,12 @@ cc_library(
     hdrs = [
         "client_common.h",
     ],
-    deps = [
-        "//cyber:cyber",
-    ],
     linkopts = [
         "-lboost_filesystem",
         "-lgrpc++",
+    ],
+    deps = [
+        "//cyber",
     ],
 )
 
@@ -98,9 +97,6 @@ cc_library(
     deps = [
         "//external:gflags",
     ],
-    linkopts = [
-       
-    ],
 )
 
 cc_library(
@@ -111,17 +107,17 @@ cc_library(
     hdrs = [
         "client_loops_check.h",
     ],
+    linkopts = [
+        "-lboost_filesystem",
+        "-lgrpc++",
+    ],
     deps = [
         ":client_common",
         ":client_gflags",
         ":exception_handler",
-        "//cyber:cyber",
+        "//cyber",
         "//modules/map/tools/map_datachecker/proto:map_datachecker_grpc",
         "@yaml_cpp//:yaml",
-    ],
-    linkopts = [
-        "-lboost_filesystem",
-        "-lgrpc++",
     ],
 )
 
@@ -135,11 +131,8 @@ cc_library(
     ],
     deps = [
         ":client_common",
-        "//cyber:cyber",
+        "//cyber",
         "//modules/map/tools/map_datachecker/proto:map_datachecker_proto",
-    ],
-    linkopts = [
-       
     ],
 )
 
