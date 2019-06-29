@@ -255,7 +255,7 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
   double check_point_s = start_s;
 
   // For the road boundary, add key points to left/right side boundary
-  // seperately. Iterate s_value to check key points at a step of
+  // separately. Iterate s_value to check key points at a step of
   // roi_linesegment_length. Key points include: start_point, end_point, points
   // where path curvature is large, points near left/right road-curb corners
   while (check_point_s <= end_s) {

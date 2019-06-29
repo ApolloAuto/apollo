@@ -919,7 +919,10 @@ void Visualizer::ShowResult(const cv::Mat &img, const CameraFrame &frame) {
     }
 
     if (cv_imshow_img_) {
-      cv::imshow("", bigimg);
+      cv::namedWindow("Apollo Visualizer", CV_WINDOW_NORMAL);
+      cv::setWindowProperty("Apollo Visualizer", CV_WND_PROP_FULLSCREEN,
+          CV_WINDOW_FULLSCREEN);
+      cv::imshow("Apollo Visualizer", bigimg);
       int key = cvWaitKey(30);
       key_handler(camera_name, key);
     }
@@ -1364,7 +1367,10 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
   }
 
   if (cv_imshow_img_) {
-    cv::imshow("", bigimg);
+    cv::namedWindow("Apollo Visualizer", CV_WINDOW_NORMAL);
+    cv::setWindowProperty("Apollo Visualizer", CV_WND_PROP_FULLSCREEN,
+        CV_WINDOW_FULLSCREEN);
+    cv::imshow("Apollo Visualizer", bigimg);
     int key = cvWaitKey(30);
     key_handler(camera_name, key);
   }

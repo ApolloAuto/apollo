@@ -356,6 +356,8 @@ Status LatController::ComputeControlCommand(
   trajectory_analyzer_ =
       std::move(TrajectoryAnalyzer(&target_tracking_trajectory));
 
+  // Transform the coordinate of the planning trajectory from the center of the
+  // rear-axis to the center of mass, if conditions matched
   if (((FLAGS_trajectory_transform_to_com_reverse &&
         vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) ||
        (FLAGS_trajectory_transform_to_com_drive &&
@@ -364,6 +366,9 @@ Status LatController::ComputeControlCommand(
     trajectory_analyzer_.TrajectoryTransformToCOM(lr_);
   }
 
+  // Re-build the vehicle dynamic models at reverse driving (in particular,
+  // replace the lateral translational motion dynamics with the corresponding
+  // kinematic models)
   if (vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) {
     cf_ = -control_conf_->lat_controller_conf().cf();
     cr_ = -control_conf_->lat_controller_conf().cr();
@@ -446,6 +451,7 @@ Status LatController::ComputeControlCommand(
   double steer_angle_feedback_augment = 0.0;
   bool enable_leadlag = control_conf_->lat_controller_conf()
                             .enable_reverse_leadlag_compensation();
+  // Augment the feedback control on lateral error at the desired speed domain
   if (enable_leadlag) {
     if (FLAGS_enable_feedback_augment_on_high_speed ||
         std::fabs(vehicle_state->linear_velocity()) <= low_speed_bound_) {
@@ -457,6 +463,7 @@ Status LatController::ComputeControlCommand(
   steer_angle = steer_angle_feedback + steer_angle_feedforward +
                 steer_angle_feedback_augment;
 
+  // Limit the steering command with the given maximum lateral acceleration
   if (FLAGS_set_steer_limit) {
     const double steer_limit = std::atan(max_lat_acc_ * wheelbase_ /
                                          (vehicle_state->linear_velocity() *
@@ -541,6 +548,8 @@ void LatController::UpdateState(SimpleLateralDebug *debug) {
         vehicle_state->angular_velocity(), vehicle_state->linear_acceleration(),
         trajectory_analyzer_, debug);
   } else {
+    // Transform the coordinate of the vehicle states from the center of the
+    // rear-axis to the center of mass, if conditions matched
     const auto &com = vehicle_state->ComputeCOMPosition(lr_);
     ComputeLateralErrors(
         com.x(), com.y(), driving_orientation_,
@@ -588,6 +597,8 @@ void LatController::UpdateState(SimpleLateralDebug *debug) {
 
 void LatController::UpdateMatrix() {
   double v;
+  // At reverse driving, replace the lateral translational motion dynamics with
+  // the corresponding kinematic models
   if (VehicleStateProvider::Instance()->gear() ==
       canbus::Chassis::GEAR_REVERSE) {
     v = std::min(VehicleStateProvider::Instance()->linear_velocity(),
@@ -624,7 +635,8 @@ double LatController::ComputeFeedForward(double ref_curvature) const {
   const double kv =
       lr_ * mass_ / 2 / cf_ / wheelbase_ - lf_ * mass_ / 2 / cr_ / wheelbase_;
 
-  // then change it from rad to %
+  // Calculate the feedforward term of the lateral controller; then change it
+  // from rad to %
   const double v = VehicleStateProvider::Instance()->linear_velocity();
   double steer_angle_feedforwardterm;
   if (VehicleStateProvider::Instance()->gear() ==
@@ -691,6 +703,8 @@ void LatController::ComputeLateralErrors(
   }
   debug->set_heading_error(heading_error);
 
+  // Estimate the heading error with look-ahead/look-back windows as feedback
+  // signal for special driving scenarios
   double heading_error_feedback;
   if (VehicleStateProvider::Instance()->gear() ==
       canbus::Chassis::GEAR_REVERSE) {
@@ -706,6 +720,8 @@ void LatController::ComputeLateralErrors(
   }
   debug->set_heading_error_feedback(heading_error_feedback);
 
+  // Estimate the lateral error with look-ahead/look-back windows as feedback
+  // signal for special driving scenarios
   double lateral_error_feedback;
   if (VehicleStateProvider::Instance()->gear() ==
       canbus::Chassis::GEAR_REVERSE) {

@@ -6,6 +6,7 @@
 - [Apollo 3.5 Software Architecture](Apollo_3.5_Software_Architecture.md)
 - [Class Architecture Planning](Class_Architecture_Planning.md)
 - [Control Calibration](calibration_table/control_calibration.md)
+- [Control-in-loop simulation](dynamic_model.md)
 
 ### Chinese documents
 

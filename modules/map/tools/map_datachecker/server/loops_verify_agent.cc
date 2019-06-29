@@ -101,7 +101,7 @@ void LoopsVerifyAgent::CheckVerify(LoopsVerifyRequest *request,
   if (std::abs(1.0 - progress) < 1e-8) {
     double confidence = sp_laps_checker_->GetConfidence();
     size_t lap = sp_laps_checker_->GetLap();
-    AINFO << "aquired lap: " << lap << ", conf: " << confidence;
+    AINFO << "acquired lap: " << lap << ", conf: " << confidence;
     LoopResult *loop_result = response->mutable_loop_result();
 
     loop_result->set_loop_num(static_cast<double>(lap));
@@ -136,7 +136,7 @@ void LoopsVerifyAgent::StopVerify(LoopsVerifyRequest *request,
   if (std::abs(1.0 - sp_laps_checker_->GetProgress()) < 1e-8) {
     double conf = sp_laps_checker_->GetConfidence();
     size_t lap = sp_laps_checker_->GetLap();
-    AINFO << "aquired lap: " << lap << ", conf: " << conf;
+    AINFO << "acquired lap: " << lap << ", conf: " << conf;
     LoopResult *loop_result = response->mutable_loop_result();
     loop_result->set_loop_num(static_cast<double>(lap));
     bool is_reached = lap >= GetLoopsToCheck(request) ? true : false;

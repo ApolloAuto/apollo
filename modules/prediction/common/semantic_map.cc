@@ -64,7 +64,8 @@ void SemanticMap::RunCurrFrame(
                                  config_.resolution()),
                 static_cast<int>(config_.dim_y() -
                                  (curr_base_y_ - config_.base_point().y()) /
-                                     config_.resolution()) - 2000,
+                                     config_.resolution()) -
+                    2000,
                 2000, 2000);
   base_img_(rect).copyTo(curr_img_);
 

@@ -67,6 +67,7 @@
 - [How to understand Apollo's core architecture and workflow](how_to_understand_architecture_and_workflow.md)
 
 ## Helper tools and optimization
+- [How to run the Map Data Verification Tool](how_to_run_map_verification_tool.md)
 - [How to run offline perception visualizer](how_to_run_offline_perception_visualizer.md)
 - [How to run offline sequential obstacle perception visualizer](how_to_run_offline_sequential_obstacle_perception_visualizer.md)
 - [How to run perception module on your local computer](how_to_run_perception_module_on_your_local_computer.md)

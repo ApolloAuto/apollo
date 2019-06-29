@@ -295,7 +295,9 @@ class OpenSpaceInfo {
     return &debug_instance_;
   }
 
-  void sync_debug_instance() { debug_instance_ = *debug_; }
+  void sync_debug_instance() {
+    debug_instance_.MergeFrom(*debug_);
+  }
 
   void RecordDebug(apollo::planning_internal::Debug *ptr_debug);
 

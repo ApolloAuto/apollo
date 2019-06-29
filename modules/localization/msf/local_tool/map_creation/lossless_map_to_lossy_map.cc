@@ -17,6 +17,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
+#include "cyber/common/log.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_config.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_matrix.h"
@@ -48,7 +49,7 @@ MapNodeIndex GetMapIndexFromMapFolder(const std::string& map_folder) {
   if (zone == "south") {
     index.zone_id_ = -index.zone_id_;
   }
-  std::cout << index << std::endl;
+  ADEBUG << index;
   return index;
 }
 
@@ -123,7 +124,7 @@ int main(int argc, char** argv) {
 
   if (boost_args.count("help") || !boost_args.count("srcdir") ||
       !boost_args.count("dstdir")) {
-    std::cout << boost_desc << std::endl;
+    AERROR << boost_desc;
     return 0;
   }
 
@@ -139,7 +140,7 @@ int main(int argc, char** argv) {
   lossless_map.InitMapNodeCaches(12, 24);
   lossless_map.AttachMapNodePool(&lossless_map_node_pool);
   if (!lossless_map.SetMapFolderPath(src_map_folder)) {
-    std::cerr << "Reflectance map folder is invalid!" << std::endl;
+    AERROR << "Reflectance map folder is invalid!";
     return -1;
   }
 
@@ -151,14 +152,14 @@ int main(int argc, char** argv) {
 
   std::list<MapNodeIndex> buf;
   GetAllMapIndex(src_map_folder, dst_map_folder, &buf);
-  std::cout << "index size: " << buf.size() << std::endl;
+  AINFO << "index size: " << buf.size();
 
   LosslessMapConfig config_transform_lossy("lossless_map");
   config_transform_lossy.Load(src_map_folder + "config.xml");
   config_transform_lossy.map_version_ = "lossy_map";
   config_transform_lossy.Save(dst_map_folder + "config.xml");
 
-  std::cout << "lossy map directory structure has built." << std::endl;
+  AINFO << "lossy map directory structure has built.";
 
   LossyMapConfig lossy_config("lossy_map");
   LossyMapNodePool lossy_map_node_pool(25, 8);
@@ -167,7 +168,7 @@ int main(int argc, char** argv) {
   lossy_map.InitMapNodeCaches(12, 24);
   lossy_map.AttachMapNodePool(&lossy_map_node_pool);
   if (!lossy_map.SetMapFolderPath(dst_map_folder)) {
-    std::cout << "lossy_map config xml not exist" << std::endl;
+    AINFO << "lossy_map config xml not exist";
   }
 
   int index = 0;
@@ -184,7 +185,7 @@ int main(int argc, char** argv) {
     LosslessMapNode* lossless_node =
         static_cast<LosslessMapNode*>(lossless_map.GetMapNodeSafe(*itr));
     if (lossless_node == nullptr) {
-      std::cerr << "index: " << index << " is a nullptr pointer!" << std::endl;
+      AWARN << "index: " << index << " is a nullptr pointer!";
       continue;
     }
     LosslessMapMatrix& lossless_matrix =
