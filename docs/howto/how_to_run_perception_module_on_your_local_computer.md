@@ -41,10 +41,23 @@ http://localhost:8888/
     ```
     cyber_launch start /apollo/modules/perception/production/launch/perception_camera.launch
     ```
+            
+    If you want to visualize camera-based results overlaid on the captured image and in bird view, mark `enable_visualization: true` in `‘modules/perception/production/conf/perception/camera/fusion_camera_detection_component.pb.txt` befor executing the above command. It will pop up when you play recorded data in point 9
+    Also, If you want to enable CIPO, add ‘enable_cipv: true’ as a new line in the same file
 
-9. If you want to visualize camera-based results overlaid on the captured image and in bird view, mark `enable_visualization: true` in `modules/perception/production/conf/perception/camera/fusion_camera_detection_component`
+     - If you want to test lane detection alone use
+    ```
+    mainboard -d ./modules/perception/production/dag/dag_streaming_perception_lane.dag
+    ```
+    If you want to visualize lane results overlaid on the captured image and in bird view, mark `enable_visualization: true` in `modules/perception/production/conf/perception/camera/lane_detection_component.config` before executing the above command. It will pop up when you play recorded data in point 9
 
-10. Play your recorded bag
+    - If you want to test traffic light detection module alone use
+    ```
+    cyber_launch start /apollo/modules/perception/production/launch/perception_trafficlight.launch
+    ```
+    If you want to visualize the traffic light detection results overlaid on the captured image, mark `—start_visualizer=true` in `apollo/modules/perception/production/conf/perception/perception_common.flag` before executing the above command. It will pop up when you play recorded data in point 9
+
+9. Play your recorded bag
     ```
     cyber_recorder play -f /apollo/data/bag/anybag -r 0.2
     ```
