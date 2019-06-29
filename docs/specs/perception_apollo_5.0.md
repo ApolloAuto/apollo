@@ -101,3 +101,5 @@ The input of Planning and Control modules will be quite different with that of t
 
 The world coordinate system is used as ego-coordinate in 3D where the rear center axle is an origin.
 
+If you want to try our perception modules and their associated visualizer, please refer to the [following document](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_run_perception_module_on_your_local_computer.md)
+
