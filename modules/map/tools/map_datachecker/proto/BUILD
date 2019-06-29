@@ -1,5 +1,6 @@
 load("//tools:cpplint.bzl", "cpplint")
 load("//tools:grpc_library.bzl", "cc_grpc_library")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
@@ -27,7 +28,7 @@ cc_grpc_library(
     ],
     deps = [
         ":map_datachecker_proto_lib",
-    ]
+    ],
 )
 
 cpplint()
