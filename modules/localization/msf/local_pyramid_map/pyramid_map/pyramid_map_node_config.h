@@ -26,7 +26,7 @@ class PyramidMapNodeConfig : public BaseMapNodeConfig {
   PyramidMapNodeConfig();
   ~PyramidMapNodeConfig();
 
-  virtual BaseMapNodeConfig* Clone();
+  virtual std::shared_ptr<BaseMapNodeConfig> Clone();
 };
 
 }  // namespace msf
