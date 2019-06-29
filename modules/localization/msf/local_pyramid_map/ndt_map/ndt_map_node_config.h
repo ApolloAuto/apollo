@@ -27,7 +27,7 @@ class NdtMapNodeConfig : public BaseMapNodeConfig {
   NdtMapNodeConfig();
   ~NdtMapNodeConfig();
 
-  BaseMapNodeConfig *Clone();
+  std::shared_ptr<BaseMapNodeConfig> Clone();
 };
 
 }  // namespace msf
