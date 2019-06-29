@@ -33,7 +33,7 @@ class BaseMapNodeConfig {
   /**@brief Alloc a new map node config.*/
   // virtual BaseMapNodeConfig* alloc_new_map_node_config();
   /**@brief Clone a new map node config.*/
-  virtual BaseMapNodeConfig *Clone();
+  virtual std::shared_ptr<BaseMapNodeConfig> Clone();
   /**@brief Load the map node config from a binary chunk.
    * @param <return> The size read (the real size of config).
    */
