@@ -27,11 +27,11 @@ BaseMapMatrix::~BaseMapMatrix() {}
 BaseMapMatrix::BaseMapMatrix(const BaseMapMatrix& map_matrix) {}
 
 bool BaseMapMatrix::GetIntensityImg(cv::Mat* intensity_img) const {
-    return false;
+  return false;
 }
-  /**@brief get altitude image of node. */
+/**@brief get altitude image of node. */
 bool BaseMapMatrix::GetAltitudeImg(cv::Mat* altitude_img) const {
-    return false;
+  return false;
 }
 
 }  // namespace msf

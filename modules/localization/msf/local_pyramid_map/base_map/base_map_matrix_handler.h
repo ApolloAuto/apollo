@@ -29,14 +29,13 @@ class BaseMapMatrixHandler {
    * @param <return> The size read (the real size of object).
    */
   virtual size_t LoadBinary(const unsigned char* buf,
-                                       BaseMapMatrix* matrix) = 0;
+                            BaseMapMatrix* matrix) = 0;
   /**@brief Create the binary. Serialization of the object.
    * @param <buf, buf_size> The buffer and its size.
    * @param <return> The required or the used size of is returned.
    */
-  virtual size_t CreateBinary(const BaseMapMatrix* matrix,
-                                         unsigned char* buf,
-                                         size_t buf_size) = 0;
+  virtual size_t CreateBinary(const BaseMapMatrix* matrix, unsigned char* buf,
+                              size_t buf_size) = 0;
   /**@brief Get the binary size of the object. */
   virtual size_t GetBinarySize(const BaseMapMatrix* matrix) = 0;
 };

@@ -17,8 +17,8 @@
 
 #include <assert.h>
 #include <vector>
-#include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
 #include "opencv2/opencv.hpp"
+#include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
 
 namespace apollo {
 namespace localization {
@@ -35,8 +35,6 @@ class BaseMapMatrix {
   explicit BaseMapMatrix(const BaseMapMatrix& map_matrix);
   /**@brief Initialize the map matrix. */
   virtual void Init(const BaseMapConfig& config) = 0;
-  /**@brief Reset map cells data. */
-  //    virtual void Reset(const BaseMapConfig* config) = 0;
   /**@brief Reset map cells data. */
   virtual void Reset() = 0;
   /**@brief get intensity image of node. */
