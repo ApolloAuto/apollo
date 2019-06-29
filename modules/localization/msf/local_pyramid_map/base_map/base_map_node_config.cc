@@ -24,8 +24,8 @@ BaseMapNodeConfig::BaseMapNodeConfig() {}
 
 BaseMapNodeConfig::~BaseMapNodeConfig() {}
 
-BaseMapNodeConfig *BaseMapNodeConfig::Clone() {
-  BaseMapNodeConfig *map_node_config = new BaseMapNodeConfig();
+std::shared_ptr<BaseMapNodeConfig> BaseMapNodeConfig::Clone() {
+  std::shared_ptr<BaseMapNodeConfig> map_node_config(new BaseMapNodeConfig());
   map_node_config->node_index_ = node_index_;
   map_node_config->map_version_ = map_version_;
   memcpy(map_node_config->body_md5_, body_md5_, sizeof(body_md5_));
