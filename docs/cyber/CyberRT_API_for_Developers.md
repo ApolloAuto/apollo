@@ -711,7 +711,7 @@ Use timertestcomponent as example:
 - Component needs to be registered to load the class through SharedLibrary. The registration interface looks like:
 
 ```C
-CYBER_REGISTER_CLASS(DriverComponent)
+CYBER_REGISTER_COMPONENT(DriverComponent)
 ```
 
 If you use a namespace when registering, you also need to add a namespace when you define it in the dag file.
