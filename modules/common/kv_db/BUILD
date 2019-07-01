@@ -14,7 +14,7 @@ cc_library(
         "-lsqlite3",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
         "//external:gflags",
         "//modules/common/util",
     ],

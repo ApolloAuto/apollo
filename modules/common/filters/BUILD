@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         ":digital_filter_coefficients",
-        "//cyber",
+        "//cyber/common:log",
     ],
 )
 
@@ -25,7 +25,7 @@ cc_library(
         "mean_filter.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
     ],
 )
 
