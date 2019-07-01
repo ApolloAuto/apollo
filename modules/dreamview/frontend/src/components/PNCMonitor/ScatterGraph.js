@@ -58,7 +58,7 @@ Chart.plugins.register({
                 chart.ctx.translate(position.x, position.y);
                 chart.ctx.rotate(-rotationInPixels); // ChartJS's rotation is clockwise
                 chart.ctx.fillStyle = dataset.borderColor;
-                chart.ctx.fillText("➡", 0, 0);
+                chart.ctx.fillText('\u27A1︎\uFE0E' /* ➡ */, 0, 0);
 
                 chart.ctx.restore();
             }
