@@ -37,6 +37,9 @@ cc_test(
         ":map_service",
         "@gtest//:main",
     ],
+    linkopts = [
+        "-lboost_system",
+    ],
 )
 
 cpplint()

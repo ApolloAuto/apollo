@@ -10,6 +10,7 @@ cc_binary(
     linkshared = True,
     linkstatic = False,
     deps = [
+        "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util",
         "//modules/prediction/proto:prediction_proto",
