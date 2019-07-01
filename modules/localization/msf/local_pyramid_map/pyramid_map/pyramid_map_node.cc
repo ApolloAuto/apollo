@@ -31,7 +31,7 @@ PyramidMapNode::~PyramidMapNode() {}
 void PyramidMapNode::Init(const BaseMapConfig* map_config) {
   map_config_ = map_config;
 
-  map_node_config_ = new PyramidMapNodeConfig();
+  map_node_config_.reset(new PyramidMapNodeConfig());
   map_node_config_->map_version_ = map_config_->GetMapVersion();
   if (map_node_config_->map_version_ == MapVersion::LOSSY_FULL_ALT_MAP ||
       map_node_config_->map_version_ == MapVersion::LOSSLESS_MAP) {
@@ -46,18 +46,19 @@ void PyramidMapNode::Init(const BaseMapConfig* map_config) {
   data_is_ready_ = false;
   is_changed_ = false;
 
-  map_matrix_ = new PyramidMapMatrix();
-  map_matrix_handler_ =
+  map_matrix_.reset(new PyramidMapMatrix());
+  map_matrix_handler_.reset(
       PyramidMapMatrixHandlerSelector::AllocPyramidMapMatrixHandler(
-          map_node_config_->map_version_);
-  compression_strategy_ = new ZlibStrategy();
+          map_node_config_->map_version_));
+  compression_strategy_.reset(new ZlibStrategy());
 
   const PyramidMapConfig* pm_map_config =
       dynamic_cast<const PyramidMapConfig*>(map_config_);
   resolutions_mr_.resize(pm_map_config->resolution_num_, 0);
   for (unsigned int i = 0; i < resolutions_mr_.size(); ++i) {
-    resolutions_mr_[i] = static_cast<float>(pm_map_config->map_resolutions_[0] *
-                         std::pow(pm_map_config->resolution_ratio_, i));
+    resolutions_mr_[i] =
+        static_cast<float>(pm_map_config->map_resolutions_[0] *
+                           std::pow(pm_map_config->resolution_ratio_, i));
   }
 
   InitMapMatrix(map_config_);
@@ -67,7 +68,7 @@ void PyramidMapNode::Init(const BaseMapConfig* map_config,
                           const MapNodeIndex& index, bool create_map_cells) {
   map_config_ = map_config;
 
-  map_node_config_ = new PyramidMapNodeConfig();
+  map_node_config_.reset(new PyramidMapNodeConfig());
   map_node_config_->node_index_ = index;
   map_node_config_->map_version_ = map_config_->GetMapVersion();
   if (map_node_config_->map_version_ == MapVersion::LOSSY_FULL_ALT_MAP ||
@@ -85,11 +86,11 @@ void PyramidMapNode::Init(const BaseMapConfig* map_config,
   data_is_ready_ = false;
   is_changed_ = false;
 
-  map_matrix_ = new PyramidMapMatrix();
-  map_matrix_handler_ =
+  map_matrix_.reset(new PyramidMapMatrix());
+  map_matrix_handler_.reset(
       PyramidMapMatrixHandlerSelector::AllocPyramidMapMatrixHandler(
-          map_node_config_->map_version_);
-  compression_strategy_ = new ZlibStrategy();
+          map_node_config_->map_version_));
+  compression_strategy_.reset(new ZlibStrategy());
 
   if (create_map_cells) {
     InitMapMatrix(map_config_);
@@ -97,12 +98,14 @@ void PyramidMapNode::Init(const BaseMapConfig* map_config,
 }
 
 void PyramidMapNode::BottomUpBase() {
-  PyramidMapMatrix* map_matrix = dynamic_cast<PyramidMapMatrix*>(map_matrix_);
+  std::shared_ptr<PyramidMapMatrix> map_matrix =
+      std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
   map_matrix->BottomUpBase();
 }
 
 void PyramidMapNode::BottomUpSafe() {
-  PyramidMapMatrix* map_matrix = dynamic_cast<PyramidMapMatrix*>(map_matrix_);
+  std::shared_ptr<PyramidMapMatrix> map_matrix =
+      std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
   map_matrix->BottomUpSafe();
 }
 
@@ -115,10 +118,10 @@ bool PyramidMapNode::AddValueIfInBound(const Eigen::Vector3d& coordinate,
   unsigned int y = 0;
   bool is_success = GetCoordinate(coord2d, level, &x, &y);
   if (is_success) {
-    PyramidMapMatrix* map_matrix = dynamic_cast<PyramidMapMatrix*>(map_matrix_);
+    std::shared_ptr<PyramidMapMatrix> map_matrix =
+        std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     map_matrix->AddSampleBase(static_cast<float>(intensity),
-                              static_cast<float>(coordinate[2]),
-                              y, x, level);
+                              static_cast<float>(coordinate[2]), y, x, level);
     return true;
   } else {
     return false;
@@ -140,8 +143,8 @@ void PyramidMapNode::AddValueIfInBound(
 bool PyramidMapNode::GetCoordinate(const Eigen::Vector2d& coordinate,
                                    unsigned int level, unsigned int* x,
                                    unsigned int* y) const {
-  const PyramidMapMatrix* map_matrix =
-      dynamic_cast<PyramidMapMatrix*>(map_matrix_);
+  std::shared_ptr<PyramidMapMatrix> map_matrix =
+      std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
 
   const float& current_resolution = resolutions_mr_[level];
 
@@ -166,8 +169,8 @@ Eigen::Vector2d PyramidMapNode::GetCoordinate(unsigned int level,
       dynamic_cast<const PyramidMapConfig*>(map_config_);
 
   float current_resolution =
-    static_cast<float>(map_config->map_resolutions_[0] *
-    std::pow(map_config->resolution_ratio_, level));
+      static_cast<float>(map_config->map_resolutions_[0] *
+                         std::pow(map_config->resolution_ratio_, level));
 
   Eigen::Vector2d coord;
   coord[0] = left_top_corner_[0] + current_resolution * static_cast<float>(x);
@@ -198,7 +201,8 @@ float PyramidMapNode::GetIntensitySafe(const Eigen::Vector3d& coordinate,
 
   float intensity = 0.0;
   if (is_success) {
-    PyramidMapMatrix* map_matrix = dynamic_cast<PyramidMapMatrix*>(map_matrix_);
+    std::shared_ptr<PyramidMapMatrix> map_matrix =
+        std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const float* intensity_ptr = map_matrix->GetIntensitySafe(y, x, level);
 
     if (intensity_ptr != NULL) {
@@ -218,7 +222,8 @@ float PyramidMapNode::GetIntensityVarSafe(const Eigen::Vector3d& coordinate,
 
   float intensity_var = 0.0;
   if (is_success) {
-    PyramidMapMatrix* map_matrix = dynamic_cast<PyramidMapMatrix*>(map_matrix_);
+    std::shared_ptr<PyramidMapMatrix> map_matrix =
+        std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const float* intensity_var_ptr =
         map_matrix->GetIntensityVarSafe(y, x, level);
 
@@ -239,7 +244,8 @@ float PyramidMapNode::GetAltitudeSafe(const Eigen::Vector3d& coordinate,
 
   float altitude = 0.0;
   if (is_success) {
-    PyramidMapMatrix* map_matrix = dynamic_cast<PyramidMapMatrix*>(map_matrix_);
+    std::shared_ptr<PyramidMapMatrix> map_matrix =
+        std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const float* altitude_ptr = map_matrix->GetAltitudeSafe(y, x, level);
 
     if (altitude_ptr != NULL) {
@@ -259,7 +265,8 @@ float PyramidMapNode::GetAltitudeVarSafe(const Eigen::Vector3d& coordinate,
 
   float altitude_var = 0.0;
   if (is_success) {
-    PyramidMapMatrix* map_matrix = dynamic_cast<PyramidMapMatrix*>(map_matrix_);
+    std::shared_ptr<PyramidMapMatrix> map_matrix =
+        std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const float* altitude_var_ptr = map_matrix->GetAltitudeVarSafe(y, x, level);
 
     if (altitude_var_ptr != NULL) {
@@ -279,7 +286,8 @@ float PyramidMapNode::GetGroundAltitudeSafe(const Eigen::Vector3d& coordinate,
 
   float ground_altitude = 0.0;
   if (is_success) {
-    PyramidMapMatrix* map_matrix = dynamic_cast<PyramidMapMatrix*>(map_matrix_);
+    std::shared_ptr<PyramidMapMatrix> map_matrix =
+        std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const float* ground_altitude_ptr =
         map_matrix->GetGroundAltitudeSafe(y, x, level);
 
@@ -300,7 +308,8 @@ unsigned int PyramidMapNode::GetCountSafe(const Eigen::Vector3d& coordinate,
 
   unsigned int count = 0;
   if (is_success) {
-    PyramidMapMatrix* map_matrix = dynamic_cast<PyramidMapMatrix*>(map_matrix_);
+    std::shared_ptr<PyramidMapMatrix> map_matrix =
+        std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const unsigned int* count_ptr = map_matrix->GetCountSafe(y, x, level);
 
     if (count_ptr != NULL) {
@@ -320,7 +329,8 @@ unsigned int PyramidMapNode::GetGroundCountSafe(
 
   unsigned int ground_count = 0;
   if (is_success) {
-    PyramidMapMatrix* map_matrix = dynamic_cast<PyramidMapMatrix*>(map_matrix_);
+    std::shared_ptr<PyramidMapMatrix> map_matrix =
+        std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const unsigned int* ground_count_ptr =
         map_matrix->GetGroundCountSafe(y, x, level);
 
@@ -341,7 +351,8 @@ float PyramidMapNode::GetIntensity(const Eigen::Vector3d& coordinate,
 
   float intensity = 0.0;
   if (is_success) {
-    PyramidMapMatrix* map_matrix = dynamic_cast<PyramidMapMatrix*>(map_matrix_);
+    std::shared_ptr<PyramidMapMatrix> map_matrix =
+        std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const float* intensity_ptr = map_matrix->GetIntensity(y, x, level);
 
     if (intensity_ptr != NULL) {
@@ -361,7 +372,8 @@ float PyramidMapNode::GetIntensityVar(const Eigen::Vector3d& coordinate,
 
   float intensity_var = 0.0;
   if (is_success) {
-    PyramidMapMatrix* map_matrix = dynamic_cast<PyramidMapMatrix*>(map_matrix_);
+    std::shared_ptr<PyramidMapMatrix> map_matrix =
+        std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const float* intensity_var_ptr = map_matrix->GetIntensityVar(y, x, level);
 
     if (intensity_var_ptr != NULL) {
@@ -381,7 +393,8 @@ float PyramidMapNode::GetAltitude(const Eigen::Vector3d& coordinate,
 
   float altitude = 0.0;
   if (is_success) {
-    PyramidMapMatrix* map_matrix = dynamic_cast<PyramidMapMatrix*>(map_matrix_);
+    std::shared_ptr<PyramidMapMatrix> map_matrix =
+        std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const float* altitude_ptr = map_matrix->GetAltitude(y, x, level);
 
     if (altitude_ptr != NULL) {
@@ -401,7 +414,8 @@ float PyramidMapNode::GetAltitudeVar(const Eigen::Vector3d& coordinate,
 
   float altitude_var = 0.0;
   if (is_success) {
-    PyramidMapMatrix* map_matrix = dynamic_cast<PyramidMapMatrix*>(map_matrix_);
+    std::shared_ptr<PyramidMapMatrix> map_matrix =
+        std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const float* altitude_var_ptr = map_matrix->GetAltitudeVar(y, x, level);
 
     if (altitude_var_ptr != NULL) {
@@ -421,7 +435,8 @@ float PyramidMapNode::GetGroundAltitude(const Eigen::Vector3d& coordinate,
 
   float ground_altitude = 0.0;
   if (is_success) {
-    PyramidMapMatrix* map_matrix = dynamic_cast<PyramidMapMatrix*>(map_matrix_);
+    std::shared_ptr<PyramidMapMatrix> map_matrix =
+        std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const float* ground_altitude_ptr =
         map_matrix->GetGroundAltitude(y, x, level);
 
@@ -442,7 +457,8 @@ unsigned int PyramidMapNode::GetCount(const Eigen::Vector3d& coordinate,
 
   unsigned int count = 0;
   if (is_success) {
-    PyramidMapMatrix* map_matrix = dynamic_cast<PyramidMapMatrix*>(map_matrix_);
+    std::shared_ptr<PyramidMapMatrix> map_matrix =
+        std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const unsigned int* count_ptr = map_matrix->GetCount(y, x, level);
 
     if (count_ptr != NULL) {
@@ -462,7 +478,8 @@ unsigned int PyramidMapNode::GetGroundCount(const Eigen::Vector3d& coordinate,
 
   unsigned int ground_count = 0;
   if (is_success) {
-    PyramidMapMatrix* map_matrix = dynamic_cast<PyramidMapMatrix*>(map_matrix_);
+    std::shared_ptr<PyramidMapMatrix> map_matrix =
+        std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const unsigned int* ground_count_ptr =
         map_matrix->GetGroundCount(y, x, level);
 
@@ -475,7 +492,8 @@ unsigned int PyramidMapNode::GetGroundCount(const Eigen::Vector3d& coordinate,
 }
 
 double PyramidMapNode::ComputeMeanIntensity(unsigned int level) {
-  PyramidMapMatrix* map_matrix = dynamic_cast<PyramidMapMatrix*>(map_matrix_);
+  std::shared_ptr<PyramidMapMatrix> map_matrix =
+      std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
   return map_matrix->ComputeMeanIntensity(level);
 }
 
