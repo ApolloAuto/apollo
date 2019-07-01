@@ -188,11 +188,11 @@ class BaseMapNode {
   Eigen::Vector2d left_top_corner_;
 
   /**@brief The map node config. */
-  BaseMapNodeConfig* map_node_config_ = nullptr;
+  std::shared_ptr<BaseMapNodeConfig> map_node_config_ = nullptr;
   /**@brief The data structure of the map datas, which is a matrix. */
-  BaseMapMatrix* map_matrix_ = nullptr;
+  std::shared_ptr<BaseMapMatrix> map_matrix_ = nullptr;
   /**@brief The class to load and create map matrix binary. */
-  BaseMapMatrixHandler* map_matrix_handler_ = nullptr;
+  std::shared_ptr<BaseMapMatrixHandler> map_matrix_handler_ = nullptr;
   /**@brief If the node is reserved in map. */
   bool is_reserved_ = false;
   /**@brief Has the map node been changed. */
@@ -204,7 +204,7 @@ class BaseMapNode {
 
   mutable size_t uncompressed_file_body_size_ = 0;
   /**@bried The compression strategy. */
-  CompressionStrategy* compression_strategy_ = nullptr;
+  std::shared_ptr<CompressionStrategy> compression_strategy_ = nullptr;
 };
 
 }  // namespace msf

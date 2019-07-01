@@ -50,23 +50,7 @@ BaseMapNode::BaseMapNode(BaseMapMatrix* matrix, CompressionStrategy* strategy)
   file_body_binary_size_ = 0;
 }
 
-BaseMapNode::~BaseMapNode() {
-  if (map_node_config_ != NULL) {
-    delete map_node_config_;
-  }
-
-  if (map_matrix_ != NULL) {
-    delete map_matrix_;
-  }
-
-  if (map_matrix_handler_ != NULL) {
-    delete map_matrix_handler_;
-  }
-
-  if (compression_strategy_ != NULL) {
-    delete compression_strategy_;
-  }
-}
+BaseMapNode::~BaseMapNode() {}
 
 void BaseMapNode::InitMapMatrix(const BaseMapConfig* map_config) {
   map_config_ = map_config;
