@@ -43,13 +43,13 @@ class PyramidMapPoolTestSuite : public ::testing::Test {
 
 TEST_F(PyramidMapPoolTestSuite, pyramid_map_pool_fixed) {
   // init config
-  PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
+  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
   config->resolution_num_ = 1;
   config->map_folder_path_ = "test_map_pool";
 
-  PyramidMapNodePool* pool = new PyramidMapNodePool(2, 3);
-  pool->Initial(config);
+  std::unique_ptr<PyramidMapNodePool> pool(new PyramidMapNodePool(2, 3));
+  pool->Initial(config.get());
   EXPECT_EQ(pool->GetPoolSize(), 2);
 
   // alloc map node
@@ -65,26 +65,17 @@ TEST_F(PyramidMapPoolTestSuite, pyramid_map_pool_fixed) {
   // Release
   pool->Release();
   EXPECT_EQ(pool->GetPoolSize(), 0);
-
-  if (pool != NULL) {
-    delete pool;
-    pool = NULL;
-  }
-  if (config != NULL) {
-    delete config;
-    config = NULL;
-  }
 }
 
 TEST_F(PyramidMapPoolTestSuite, pyramid_map_pool_not_fixed) {
   // init config
-  PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
+  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
   config->resolution_num_ = 1;
   config->map_folder_path_ = "test_map_pool";
 
-  PyramidMapNodePool* pool = new PyramidMapNodePool(2, 3);
-  pool->Initial(config, false);
+  std::unique_ptr<PyramidMapNodePool> pool(new PyramidMapNodePool(2, 3));
+  pool->Initial(config.get(), false);
   EXPECT_EQ(pool->GetPoolSize(), 2);
 
   // alloc map node
@@ -100,15 +91,6 @@ TEST_F(PyramidMapPoolTestSuite, pyramid_map_pool_not_fixed) {
   // Release
   pool->Release();
   EXPECT_EQ(pool->GetPoolSize(), 0);
-
-  if (pool != NULL) {
-    delete pool;
-    pool = NULL;
-  }
-  if (config != NULL) {
-    delete config;
-    config = NULL;
-  }
 }
 
 }  // namespace msf
