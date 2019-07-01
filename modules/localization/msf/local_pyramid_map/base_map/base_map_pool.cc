@@ -43,7 +43,7 @@ void BaseMapNodePool::Initial(const BaseMapConfig* map_config,
 
 void BaseMapNodePool::Release() {
   if (node_reset_workers_.valid()) {
-      node_reset_workers_.get();
+    node_reset_workers_.get();
   }
   typename std::list<BaseMapNode*>::iterator i = free_list_.begin();
   while (i != free_list_.end()) {
@@ -65,7 +65,7 @@ void BaseMapNodePool::Release() {
 BaseMapNode* BaseMapNodePool::AllocMapNode() {
   if (free_list_.empty()) {
     if (node_reset_workers_.valid()) {
-        node_reset_workers_.wait();
+      node_reset_workers_.wait();
     }
   }
   boost::unique_lock<boost::mutex> lock(mutex_);
@@ -75,7 +75,7 @@ BaseMapNode* BaseMapNodePool::AllocMapNode() {
     }
     BaseMapNode* node = AllocNewMapNode();
     InitNewMapNode(node);
-    pool_size_++;
+    ++pool_size_;
     busy_nodes_.insert(node);
     return node;
   } else {
@@ -88,7 +88,7 @@ BaseMapNode* BaseMapNodePool::AllocMapNode() {
 
 void BaseMapNodePool::FreeMapNode(BaseMapNode* map_node) {
   node_reset_workers_ =
-    cyber::Async(&BaseMapNodePool::FreeMapNodeTask, this, map_node);
+      cyber::Async(&BaseMapNodePool::FreeMapNodeTask, this, map_node);
 }
 
 void BaseMapNodePool::FreeMapNodeTask(BaseMapNode* map_node) {
@@ -110,11 +110,23 @@ void BaseMapNodePool::InitNewMapNode(BaseMapNode* node) {
   return;
 }
 
-void BaseMapNodePool::FinalizeMapNode(BaseMapNode* node) { node->Finalize(); }
+void BaseMapNodePool::FinalizeMapNode(BaseMapNode* node) {
+  if (node != nullptr) {
+    node->Finalize();
+  }
+}
 
-void BaseMapNodePool::DellocMapNode(BaseMapNode* node) { delete node; }
+void BaseMapNodePool::DellocMapNode(BaseMapNode* node) {
+  if (node != nullptr) {
+    delete node;
+  }
+}
 
-void BaseMapNodePool::ResetMapNode(BaseMapNode* node) { node->ResetMapNode(); }
+void BaseMapNodePool::ResetMapNode(BaseMapNode* node) {
+  if (node != nullptr) {
+    node->ResetMapNode();
+  }
+}
 
 }  // namespace msf
 }  // namespace localization

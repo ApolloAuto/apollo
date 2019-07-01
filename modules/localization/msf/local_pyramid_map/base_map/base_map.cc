@@ -31,32 +31,13 @@ BaseMap::BaseMap(BaseMapConfig* config)
       map_node_cache_lvl2_(nullptr),
       map_node_pool_(nullptr) {}
 
-BaseMap::~BaseMap() {
-  if (map_node_cache_lvl1_) {
-    delete map_node_cache_lvl1_;
-    map_node_cache_lvl1_ = nullptr;
-  }
-  if (map_node_cache_lvl2_) {
-    delete map_node_cache_lvl2_;
-    map_node_cache_lvl2_ = nullptr;
-  }
-}
+BaseMap::~BaseMap() {}
 
 void BaseMap::InitMapNodeCaches(int cacheL1_size, int cahceL2_size) {
-  if (map_node_cache_lvl1_ != nullptr) {
-    delete map_node_cache_lvl1_;
-    map_node_cache_lvl1_ == nullptr;
-  }
-
-  if (map_node_cache_lvl2_ != nullptr) {
-    delete map_node_cache_lvl2_;
-    map_node_cache_lvl2_ == nullptr;
-  }
-
-  map_node_cache_lvl1_ =
-      new MapNodeCacheL1<MapNodeIndex, BaseMapNode>(cacheL1_size);
-  map_node_cache_lvl2_ =
-      new MapNodeCacheL2<MapNodeIndex, BaseMapNode>(cahceL2_size);
+  map_node_cache_lvl1_.reset(
+      new MapNodeCacheL1<MapNodeIndex, BaseMapNode>(cacheL1_size));
+  map_node_cache_lvl2_.reset(
+      new MapNodeCacheL2<MapNodeIndex, BaseMapNode>(cahceL2_size));
 }
 
 void BaseMap::AttachMapNodePool(BaseMapNodePool* map_node_pool) {
