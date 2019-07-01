@@ -37,9 +37,9 @@ class PyramidMapMatrixTestSuite : public ::testing::Test {
 
 TEST_F(PyramidMapMatrixTestSuite, constructor_and_init) {
   // map config
-  PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
+  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(1024, 1024);
-  PyramidMapMatrix* pm_matrix = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
 
   EXPECT_EQ(pm_matrix->rows_mr_[0], 1024);
@@ -55,7 +55,7 @@ TEST_F(PyramidMapMatrixTestSuite, constructor_and_init) {
   EXPECT_EQ(pm_matrix->ratio_, 2);
 
   // check operator =
-  PyramidMapMatrix* pm_matrix2 = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix2(new PyramidMapMatrix());
   config->SetMapNodeSize(2, 2);
   pm_matrix2->Init(*config);
   EXPECT_EQ(pm_matrix2->rows_mr_[0], 2);
@@ -69,30 +69,18 @@ TEST_F(PyramidMapMatrixTestSuite, constructor_and_init) {
   EXPECT_NE(pm_matrix2->GetRowsSafe(1), 1024);
 
   // check constructor
-  PyramidMapMatrix* pm_matrix3 = new PyramidMapMatrix(*pm_matrix2);
-  if (pm_matrix3 != NULL) {
-    delete pm_matrix3;
-    pm_matrix3 = NULL;
-  }
-  if (pm_matrix != NULL) {
-    delete pm_matrix;
-    pm_matrix = NULL;
-  }
-  if (config != NULL) {
-    delete config;
-    config = NULL;
-  }
+  std::unique_ptr<PyramidMapMatrix> pm_matrix3(new PyramidMapMatrix(*pm_matrix2));
 }
 
 TEST_F(PyramidMapMatrixTestSuite, get_and_set_intensity) {
   // map config
-  PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
+  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
-  PyramidMapMatrix* pm_matrix = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
   // check getter safe before initializtion
-  EXPECT_TRUE(pm_matrix->GetIntensityMatrixSafe() == NULL);
-  EXPECT_TRUE(pm_matrix->GetIntensitySafe(0, 0) == NULL);
+  EXPECT_TRUE(pm_matrix->GetIntensityMatrixSafe() == nullptr);
+  EXPECT_TRUE(pm_matrix->GetIntensitySafe(0, 0) == nullptr);
 
   cv::Mat mat_intensity;
   EXPECT_FALSE(pm_matrix->GetIntensityImg(&mat_intensity));
@@ -116,7 +104,7 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_intensity) {
   EXPECT_FLOAT_EQ(*pm_matrix->GetIntensity(0, 0), 0.f);
   EXPECT_FLOAT_EQ(*pm_matrix->GetIntensity(1, 1), -1.f);
 
-  EXPECT_TRUE(pm_matrix->GetIntensitySafe(1, 2) == NULL);
+  EXPECT_TRUE(pm_matrix->GetIntensitySafe(1, 2) == nullptr);
   EXPECT_FLOAT_EQ(*pm_matrix->GetIntensitySafe(1, 1), -1.f);
 
   pm_matrix->SetIntensitySafe(129.f, 0, 0, 1024);
@@ -125,7 +113,7 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_intensity) {
 
   FloatMatrix* intensity_got_matrix = pm_matrix->GetIntensityMatrixSafe();
   EXPECT_FLOAT_EQ((*intensity_got_matrix)[0][0], 129.f);
-  EXPECT_TRUE(pm_matrix->GetIntensityMatrixSafe(1024) == NULL);
+  EXPECT_TRUE(pm_matrix->GetIntensityMatrixSafe(1024) == nullptr);
 
   intensity_got_matrix = pm_matrix->GetIntensityMatrix();
   EXPECT_FLOAT_EQ((*intensity_got_matrix)[1][1], -1.f);
@@ -134,26 +122,17 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_intensity) {
   EXPECT_EQ(mat_intensity.at<unsigned char>(0, 1), 255);
   EXPECT_EQ(mat_intensity.at<unsigned char>(1, 1), 0);
   EXPECT_FALSE(pm_matrix->GetIntensityImg(1024, &mat_intensity));
-
-  if (pm_matrix != NULL) {
-    delete pm_matrix;
-    pm_matrix = NULL;
-  }
-  if (config != NULL) {
-    delete config;
-    config = NULL;
-  }
 }
 
 TEST_F(PyramidMapMatrixTestSuite, get_and_set_intensity_var) {
   // map config
-  PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
+  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
-  PyramidMapMatrix* pm_matrix = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
   // check getter safe before initializtion
-  EXPECT_TRUE(pm_matrix->GetIntensityVarMatrixSafe() == NULL);
-  EXPECT_TRUE(pm_matrix->GetIntensityVarSafe(0, 0) == NULL);
+  EXPECT_TRUE(pm_matrix->GetIntensityVarMatrixSafe() == nullptr);
+  EXPECT_TRUE(pm_matrix->GetIntensityVarSafe(0, 0) == nullptr);
 
   float intensity_var_data[] = {0.f, 255.f, 128.f, 1.f};
   pm_matrix->SetIntensityVarMatrix(intensity_var_data, 4, 0, 1024);
@@ -172,7 +151,7 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_intensity_var) {
   EXPECT_FLOAT_EQ(*pm_matrix->GetIntensityVar(0, 0), 0.f);
   EXPECT_FLOAT_EQ(*pm_matrix->GetIntensityVar(1, 1), 1.f);
 
-  EXPECT_TRUE(pm_matrix->GetIntensityVarSafe(1, 2) == NULL);
+  EXPECT_TRUE(pm_matrix->GetIntensityVarSafe(1, 2) == nullptr);
   EXPECT_FLOAT_EQ(*pm_matrix->GetIntensityVarSafe(1, 1), 1.f);
 
   pm_matrix->SetIntensityVarSafe(129.f, 0, 0, 1024);
@@ -184,30 +163,21 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_intensity_var) {
   EXPECT_FLOAT_EQ((*intensity_var_got_matrix)[0][0], 129.f);
   FloatMatrix* intensity_var_got_matrix_level =
       pm_matrix->GetIntensityVarMatrixSafe(1024);
-  EXPECT_TRUE(intensity_var_got_matrix_level == NULL);
+  EXPECT_TRUE(intensity_var_got_matrix_level == nullptr);
 
   intensity_var_got_matrix = pm_matrix->GetIntensityVarMatrix();
   EXPECT_FLOAT_EQ((*intensity_var_got_matrix)[1][1], 1.f);
-
-  if (pm_matrix != NULL) {
-    delete pm_matrix;
-    pm_matrix = NULL;
-  }
-  if (config != NULL) {
-    delete config;
-    config = NULL;
-  }
 }
 
 TEST_F(PyramidMapMatrixTestSuite, get_and_set_altitude) {
   // map config
-  PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
+  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
-  PyramidMapMatrix* pm_matrix = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
   // check getter safe before initializtion
-  EXPECT_TRUE(pm_matrix->GetAltitudeMatrixSafe() == NULL);
-  EXPECT_TRUE(pm_matrix->GetAltitudeSafe(0, 0) == NULL);
+  EXPECT_TRUE(pm_matrix->GetAltitudeMatrixSafe() == nullptr);
+  EXPECT_TRUE(pm_matrix->GetAltitudeSafe(0, 0) == nullptr);
 
   cv::Mat mat_altitude;
   EXPECT_FALSE(pm_matrix->GetAltitudeImg(&mat_altitude));
@@ -229,7 +199,7 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_altitude) {
   EXPECT_FLOAT_EQ(*pm_matrix->GetAltitude(0, 0), 0.f);
   EXPECT_FLOAT_EQ(*pm_matrix->GetAltitude(1, 1), 1.f);
 
-  EXPECT_TRUE(pm_matrix->GetAltitudeSafe(1, 2) == NULL);
+  EXPECT_TRUE(pm_matrix->GetAltitudeSafe(1, 2) == nullptr);
   EXPECT_FLOAT_EQ(*pm_matrix->GetAltitudeSafe(1, 1), 1.f);
 
   pm_matrix->SetAltitudeSafe(2.f, 0, 0, 1024);
@@ -240,7 +210,7 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_altitude) {
   EXPECT_FLOAT_EQ((*altitude_got_matrix)[0][0], 2.f);
   FloatMatrix* altitude_got_matrix_level =
       pm_matrix->GetAltitudeMatrixSafe(1024);
-  EXPECT_TRUE(altitude_got_matrix_level == NULL);
+  EXPECT_TRUE(altitude_got_matrix_level == nullptr);
 
   altitude_got_matrix = pm_matrix->GetAltitudeMatrix();
   EXPECT_FLOAT_EQ((*altitude_got_matrix)[1][1], 1.f);
@@ -262,26 +232,17 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_altitude) {
   EXPECT_EQ(mat_altitude.at<unsigned char>(1, 0), 0);
   EXPECT_EQ(mat_altitude.at<unsigned char>(1, 1), 127);
   EXPECT_FALSE(pm_matrix->GetAltitudeImg(1024, &mat_altitude));
-
-  if (pm_matrix != NULL) {
-    delete pm_matrix;
-    pm_matrix = NULL;
-  }
-  if (config != NULL) {
-    delete config;
-    config = NULL;
-  }
 }
 
 TEST_F(PyramidMapMatrixTestSuite, get_and_set_altitude_var) {
   // map config
-  PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
+  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
-  PyramidMapMatrix* pm_matrix = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
   // check getter safe before initializtion
-  EXPECT_TRUE(pm_matrix->GetAltitudeVarMatrixSafe() == NULL);
-  EXPECT_TRUE(pm_matrix->GetAltitudeVarSafe(0, 0) == NULL);
+  EXPECT_TRUE(pm_matrix->GetAltitudeVarMatrixSafe() == nullptr);
+  EXPECT_TRUE(pm_matrix->GetAltitudeVarSafe(0, 0) == nullptr);
 
   float altitude_var_data[] = {0.f, 256.f, 128.f, 1.f};
   pm_matrix->SetAltitudeVarMatrix(altitude_var_data, 4, 0, 1024);
@@ -301,7 +262,7 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_altitude_var) {
   EXPECT_FLOAT_EQ(*pm_matrix->GetAltitudeVar(0, 0), 0.f);
   EXPECT_FLOAT_EQ(*pm_matrix->GetAltitudeVar(1, 1), 1.f);
 
-  EXPECT_TRUE(pm_matrix->GetAltitudeVarSafe(1, 2) == NULL);
+  EXPECT_TRUE(pm_matrix->GetAltitudeVarSafe(1, 2) == nullptr);
   EXPECT_FLOAT_EQ(*pm_matrix->GetAltitudeVarSafe(1, 1), 1.f);
 
   pm_matrix->SetAltitudeVarSafe(129.f, 0, 0, 1024);
@@ -312,30 +273,21 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_altitude_var) {
   EXPECT_FLOAT_EQ((*altitude_var_got_matrix)[0][0], 129.f);
   FloatMatrix* altitude_var_got_matrix_level =
       pm_matrix->GetAltitudeVarMatrixSafe(1024);
-  EXPECT_TRUE(altitude_var_got_matrix_level == NULL);
+  EXPECT_TRUE(altitude_var_got_matrix_level == nullptr);
 
   altitude_var_got_matrix = pm_matrix->GetAltitudeVarMatrix();
   EXPECT_FLOAT_EQ((*altitude_var_got_matrix)[1][1], 1.f);
-
-  if (pm_matrix != NULL) {
-    delete pm_matrix;
-    pm_matrix = NULL;
-  }
-  if (config != NULL) {
-    delete config;
-    config = NULL;
-  }
 }
 
 TEST_F(PyramidMapMatrixTestSuite, get_and_set_ground_altitude) {
   // map config
-  PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
+  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
-  PyramidMapMatrix* pm_matrix = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
   // check getter safe before initializtion
-  EXPECT_TRUE(pm_matrix->GetGroundAltitudeMatrixSafe() == NULL);
-  EXPECT_TRUE(pm_matrix->GetGroundAltitudeSafe(0, 0) == NULL);
+  EXPECT_TRUE(pm_matrix->GetGroundAltitudeMatrixSafe() == nullptr);
+  EXPECT_TRUE(pm_matrix->GetGroundAltitudeSafe(0, 0) == nullptr);
 
   float ground_altitude_data[] = {0.f, 1.f, 1.f, 1.f};
   pm_matrix->SetGroundAltitudeMatrix(ground_altitude_data, 4, 0, 1024);
@@ -355,7 +307,7 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_ground_altitude) {
   EXPECT_FLOAT_EQ(*pm_matrix->GetGroundAltitude(0, 0), 0.f);
   EXPECT_FLOAT_EQ(*pm_matrix->GetGroundAltitude(1, 1), 1.f);
 
-  EXPECT_TRUE(pm_matrix->GetGroundAltitudeSafe(1, 2) == NULL);
+  EXPECT_TRUE(pm_matrix->GetGroundAltitudeSafe(1, 2) == nullptr);
   EXPECT_FLOAT_EQ(*pm_matrix->GetGroundAltitudeSafe(1, 1), 1.f);
 
   pm_matrix->SetGroundAltitudeSafe(2.f, 0, 0, 1024);
@@ -367,30 +319,21 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_ground_altitude) {
   EXPECT_FLOAT_EQ((*ground_altitude_got_matrix)[0][0], 2.f);
   FloatMatrix* ground_altitude_got_matrix_level =
       pm_matrix->GetGroundAltitudeMatrixSafe(1024);
-  EXPECT_TRUE(ground_altitude_got_matrix_level == NULL);
+  EXPECT_TRUE(ground_altitude_got_matrix_level == nullptr);
 
   ground_altitude_got_matrix = pm_matrix->GetGroundAltitudeMatrix();
   EXPECT_FLOAT_EQ((*ground_altitude_got_matrix)[1][1], 1.f);
-
-  if (pm_matrix != NULL) {
-    delete pm_matrix;
-    pm_matrix = NULL;
-  }
-  if (config != NULL) {
-    delete config;
-    config = NULL;
-  }
 }
 
 TEST_F(PyramidMapMatrixTestSuite, get_and_set_count) {
   // map config
-  PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
+  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
-  PyramidMapMatrix* pm_matrix = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
   // check getter safe before initializtion
-  EXPECT_TRUE(pm_matrix->GetCountMatrixSafe() == NULL);
-  EXPECT_TRUE(pm_matrix->GetCountSafe(0, 0) == NULL);
+  EXPECT_TRUE(pm_matrix->GetCountMatrixSafe() == nullptr);
+  EXPECT_TRUE(pm_matrix->GetCountSafe(0, 0) == nullptr);
 
   unsigned int count_data[] = {0, 1, 1, 1};
   pm_matrix->SetCountMatrix(count_data, 4, 0, 1024);
@@ -410,7 +353,7 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_count) {
   EXPECT_EQ(*pm_matrix->GetCount(0, 0), 0);
   EXPECT_EQ(*pm_matrix->GetCount(1, 1), 1);
 
-  EXPECT_TRUE(pm_matrix->GetCountSafe(1, 2) == NULL);
+  EXPECT_TRUE(pm_matrix->GetCountSafe(1, 2) == nullptr);
   EXPECT_EQ(*pm_matrix->GetCountSafe(1, 1), 1);
 
   pm_matrix->SetCountSafe(2, 0, 0, 1024);
@@ -420,30 +363,21 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_count) {
   UIntMatrix* count_got_matrix = pm_matrix->GetCountMatrixSafe();
   EXPECT_EQ((*count_got_matrix)[0][0], 2);
   UIntMatrix* count_got_matrix_level = pm_matrix->GetCountMatrixSafe(1024);
-  EXPECT_TRUE(count_got_matrix_level == NULL);
+  EXPECT_TRUE(count_got_matrix_level == nullptr);
 
   count_got_matrix = pm_matrix->GetCountMatrix();
   EXPECT_EQ((*count_got_matrix)[1][1], 1);
-
-  if (pm_matrix != NULL) {
-    delete pm_matrix;
-    pm_matrix = NULL;
-  }
-  if (config != NULL) {
-    delete config;
-    config = NULL;
-  }
 }
 
 TEST_F(PyramidMapMatrixTestSuite, get_and_set_ground_count) {
   // map config
-  PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
+  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
-  PyramidMapMatrix* pm_matrix = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
   // check getter safe before initializtion
-  EXPECT_TRUE(pm_matrix->GetGroundCountMatrixSafe() == NULL);
-  EXPECT_TRUE(pm_matrix->GetGroundCountSafe(0, 0) == NULL);
+  EXPECT_TRUE(pm_matrix->GetGroundCountMatrixSafe() == nullptr);
+  EXPECT_TRUE(pm_matrix->GetGroundCountSafe(0, 0) == nullptr);
 
   unsigned int ground_count_data[] = {0, 1, 1, 1};
   pm_matrix->SetGroundCountMatrix(ground_count_data, 4, 0, 1024);
@@ -463,7 +397,7 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_ground_count) {
   EXPECT_EQ(*pm_matrix->GetGroundCount(0, 0), 0);
   EXPECT_EQ(*pm_matrix->GetGroundCount(1, 1), 1);
 
-  EXPECT_TRUE(pm_matrix->GetGroundCountSafe(1, 2) == NULL);
+  EXPECT_TRUE(pm_matrix->GetGroundCountSafe(1, 2) == nullptr);
   EXPECT_EQ(*pm_matrix->GetGroundCountSafe(1, 1), 1);
 
   pm_matrix->SetGroundCountSafe(2, 0, 0, 1024);
@@ -474,26 +408,17 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_ground_count) {
   EXPECT_EQ((*ground_count_got_matrix)[0][0], 2);
   UIntMatrix* ground_count_got_matrix_level =
       pm_matrix->GetGroundCountMatrixSafe(1024);
-  EXPECT_TRUE(ground_count_got_matrix_level == NULL);
+  EXPECT_TRUE(ground_count_got_matrix_level == nullptr);
 
   ground_count_got_matrix = pm_matrix->GetGroundCountMatrix();
   EXPECT_EQ((*ground_count_got_matrix)[1][1], 1);
-
-  if (pm_matrix != NULL) {
-    delete pm_matrix;
-    pm_matrix = NULL;
-  }
-  if (config != NULL) {
-    delete config;
-    config = NULL;
-  }
 }
 
 TEST_F(PyramidMapMatrixTestSuite, set_and_reset_and_roi) {
   // map config
-  PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
+  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(3, 3);
-  PyramidMapMatrix* pm_matrix = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
 
   EXPECT_EQ(pm_matrix->rows_mr_[0], 3);
@@ -591,22 +516,13 @@ TEST_F(PyramidMapMatrixTestSuite, set_and_reset_and_roi) {
 
   // bad case: compute mean intensity
   EXPECT_DOUBLE_EQ(pm_matrix->ComputeMeanIntensity(0), 0.0);
-
-  if (pm_matrix != NULL) {
-    delete pm_matrix;
-    pm_matrix = NULL;
-  }
-  if (config != NULL) {
-    delete config;
-    config = NULL;
-  }
 }
 
 TEST_F(PyramidMapMatrixTestSuite, merge_and_add_and_reduce) {
   // map config
-  PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
+  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(3, 3);
-  PyramidMapMatrix* pm_matrix = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
 
   EXPECT_EQ(pm_matrix->rows_mr_[0], 3);
@@ -685,7 +601,7 @@ TEST_F(PyramidMapMatrixTestSuite, merge_and_add_and_reduce) {
   pm_matrix->SetGroundCountMatrix(uint_data, 9, 0);
   pm_matrix->SetCountMatrix(uint_data, 9, 0);
 
-  PyramidMapMatrix* pm_matrix2 = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix2(new PyramidMapMatrix());
   pm_matrix2->Init(*config);
   pm_matrix2->SetIntensityMatrix(float_data, 9, 0);
   pm_matrix2->SetIntensityVarMatrix(float_data, 9, 0);
@@ -706,27 +622,13 @@ TEST_F(PyramidMapMatrixTestSuite, merge_and_add_and_reduce) {
 
   PyramidMapMatrix::Reduce(pm_matrix, *pm_matrix2, 1, 0);
   PyramidMapMatrix::Reduce(pm_matrix, *pm_matrix2, 0, 1);
-
-  if (pm_matrix2 != NULL) {
-    delete pm_matrix2;
-    pm_matrix2 = NULL;
-  }
-
-  if (pm_matrix != NULL) {
-    delete pm_matrix;
-    pm_matrix = NULL;
-  }
-  if (config != NULL) {
-    delete config;
-    config = NULL;
-  }
 }
 
 TEST_F(PyramidMapMatrixTestSuite, add_merge_get_base) {
   // map config
-  PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
+  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(3, 3);
-  PyramidMapMatrix* pm_matrix = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
 
   EXPECT_EQ(pm_matrix->rows_mr_[0], 3);
@@ -744,10 +646,10 @@ TEST_F(PyramidMapMatrixTestSuite, add_merge_get_base) {
   pm_matrix->SetCountMatrix(uint_data, 9, 0);
 
   // get
-  float* intensity = NULL;
-  float* intensity_var = NULL;
-  float* altitude = NULL;
-  unsigned int* count = NULL;
+  float* intensity = nullptr;
+  float* intensity_var = nullptr;
+  float* altitude = nullptr;
+  unsigned int* count = nullptr;
   pm_matrix->GetMapCellBase(&intensity, &intensity_var, &altitude, &count, 1, 1,
                             0);
   EXPECT_FLOAT_EQ(*intensity, 10);
@@ -762,23 +664,14 @@ TEST_F(PyramidMapMatrixTestSuite, add_merge_get_base) {
   EXPECT_FLOAT_EQ(*pm_matrix->GetAltitudeSafe(1, 1), 10.f);
   // EXPECT_FLOAT_EQ(*pm_matrix->GetAltitudeVarSafe(1, 1), 9.090909f);
   EXPECT_EQ(*pm_matrix->GetCountSafe(1, 1), 11);
-
-  if (pm_matrix != NULL) {
-    delete pm_matrix;
-    pm_matrix = NULL;
-  }
-  if (config != NULL) {
-    delete config;
-    config = NULL;
-  }
 }
 
 TEST_F(PyramidMapMatrixTestSuite, BottomUp) {
   // map config
-  PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
+  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(4, 4);
   config->resolution_num_ = 2;
-  PyramidMapMatrix* pm_matrix = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
 
   EXPECT_EQ(pm_matrix->rows_mr_[0], 4);
@@ -815,27 +708,18 @@ TEST_F(PyramidMapMatrixTestSuite, BottomUp) {
   pm_matrix->BottomUpBase();
 
   // check check_legality_for_get_data
-  EXPECT_TRUE(pm_matrix->GetIntensitySafe(10000, 1, 1) == NULL);
-  EXPECT_TRUE(pm_matrix->GetIntensitySafe(1, 10000, 1) == NULL);
-  EXPECT_TRUE(pm_matrix->GetIntensitySafe(1, 1, 10000) == NULL);
+  EXPECT_TRUE(pm_matrix->GetIntensitySafe(10000, 1, 1) == nullptr);
+  EXPECT_TRUE(pm_matrix->GetIntensitySafe(1, 10000, 1) == nullptr);
+  EXPECT_TRUE(pm_matrix->GetIntensitySafe(1, 1, 10000) == nullptr);
 
   // check check_legality_for_set_data
   pm_matrix->SetIntensityMatrix(float_data, 16, 10000);
   pm_matrix->SetIntensityMatrix(float_data, 100000, 1);
-
-  if (pm_matrix != NULL) {
-    delete pm_matrix;
-    pm_matrix = NULL;
-  }
-  if (config != NULL) {
-    delete config;
-    config = NULL;
-  }
 }
 
 TEST_F(PyramidMapMatrixTestSuite, flags_are_false_and_resolution_are_two) {
   // map config
-  PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
+  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(4, 4);
   config->resolution_num_ = 2;
   config->has_intensity_ = false;
@@ -845,7 +729,7 @@ TEST_F(PyramidMapMatrixTestSuite, flags_are_false_and_resolution_are_two) {
   config->has_ground_altitude_ = false;
   config->has_count_ = false;
   config->has_ground_count_ = false;
-  PyramidMapMatrix* pm_matrix = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
 
   // bottom up safe
@@ -854,23 +738,14 @@ TEST_F(PyramidMapMatrixTestSuite, flags_are_false_and_resolution_are_two) {
   // reset
   pm_matrix->Reset(0);
   pm_matrix->ResetCells(1, 2);
-
-  if (pm_matrix != NULL) {
-    delete pm_matrix;
-    pm_matrix = NULL;
-  }
-  if (config != NULL) {
-    delete config;
-    config = NULL;
-  }
 }
 
 TEST_F(PyramidMapMatrixTestSuite, check_const_matrix) {
   // normal case
-  PyramidMapConfig* config = new PyramidMapConfig("lossy_full_alt");
+  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
   config->resolution_num_ = 1;
-  PyramidMapMatrix* pm_matrix = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
 
   const PyramidMapMatrix const_matrix(*pm_matrix);
@@ -890,26 +765,17 @@ TEST_F(PyramidMapMatrixTestSuite, check_const_matrix) {
   EXPECT_EQ((*const_matrix.GetCountMatrix(0))[0][0], 0);
   EXPECT_EQ((*const_matrix.GetGroundCountMatrix(0))[0][0], 0);
 
-  if (pm_matrix != NULL) {
-    delete pm_matrix;
-    pm_matrix = NULL;
-  }
-
   // bad case 1: resolution is 1024
-  PyramidMapMatrix* pm_matrix2 = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix2(new PyramidMapMatrix());
   pm_matrix2->Init(*config);
   const PyramidMapMatrix const_matrix2(*pm_matrix2);
-  EXPECT_TRUE(const_matrix2.GetIntensityMatrixSafe(1024) == NULL);
-  EXPECT_TRUE(const_matrix2.GetIntensityVarMatrixSafe(1024) == NULL);
-  EXPECT_TRUE(const_matrix2.GetAltitudeMatrixSafe(1024) == NULL);
-  EXPECT_TRUE(const_matrix2.GetAltitudeVarMatrixSafe(1024) == NULL);
-  EXPECT_TRUE(const_matrix2.GetGroundAltitudeMatrixSafe(1024) == NULL);
-  EXPECT_TRUE(const_matrix2.GetCountMatrixSafe(1024) == NULL);
-  EXPECT_TRUE(const_matrix2.GetGroundCountMatrixSafe(1024) == NULL);
-  if (pm_matrix2 != NULL) {
-    delete pm_matrix2;
-    pm_matrix2 = NULL;
-  }
+  EXPECT_TRUE(const_matrix2.GetIntensityMatrixSafe(1024) == nullptr);
+  EXPECT_TRUE(const_matrix2.GetIntensityVarMatrixSafe(1024) == nullptr);
+  EXPECT_TRUE(const_matrix2.GetAltitudeMatrixSafe(1024) == nullptr);
+  EXPECT_TRUE(const_matrix2.GetAltitudeVarMatrixSafe(1024) == nullptr);
+  EXPECT_TRUE(const_matrix2.GetGroundAltitudeMatrixSafe(1024) == nullptr);
+  EXPECT_TRUE(const_matrix2.GetCountMatrixSafe(1024) == nullptr);
+  EXPECT_TRUE(const_matrix2.GetGroundCountMatrixSafe(1024) == nullptr);
 
   // bad case 2: resolution is 1, flags are false
   config->resolution_num_ = 1;
@@ -920,25 +786,16 @@ TEST_F(PyramidMapMatrixTestSuite, check_const_matrix) {
   config->has_ground_altitude_ = false;
   config->has_count_ = false;
   config->has_ground_count_ = false;
-  PyramidMapMatrix* pm_matrix3 = new PyramidMapMatrix();
+  std::unique_ptr<PyramidMapMatrix> pm_matrix3(new PyramidMapMatrix());
   pm_matrix3->Init(*config);
   const PyramidMapMatrix const_matrix3(*pm_matrix3);
-  EXPECT_TRUE(const_matrix3.GetIntensityMatrixSafe(0) == NULL);
-  EXPECT_TRUE(const_matrix3.GetIntensityVarMatrixSafe(0) == NULL);
-  EXPECT_TRUE(const_matrix3.GetAltitudeMatrixSafe(0) == NULL);
-  EXPECT_TRUE(const_matrix3.GetAltitudeVarMatrixSafe(0) == NULL);
-  EXPECT_TRUE(const_matrix3.GetGroundAltitudeMatrixSafe(0) == NULL);
-  EXPECT_TRUE(const_matrix3.GetCountMatrixSafe(0) == NULL);
-  EXPECT_TRUE(const_matrix3.GetGroundCountMatrixSafe(0) == NULL);
-  if (pm_matrix3 != NULL) {
-    delete pm_matrix3;
-    pm_matrix3 = NULL;
-  }
-
-  if (config != NULL) {
-    delete config;
-    config = NULL;
-  }
+  EXPECT_TRUE(const_matrix3.GetIntensityMatrixSafe(0) == nullptr);
+  EXPECT_TRUE(const_matrix3.GetIntensityVarMatrixSafe(0) == nullptr);
+  EXPECT_TRUE(const_matrix3.GetAltitudeMatrixSafe(0) == nullptr);
+  EXPECT_TRUE(const_matrix3.GetAltitudeVarMatrixSafe(0) == nullptr);
+  EXPECT_TRUE(const_matrix3.GetGroundAltitudeMatrixSafe(0) == nullptr);
+  EXPECT_TRUE(const_matrix3.GetCountMatrixSafe(0) == nullptr);
+  EXPECT_TRUE(const_matrix3.GetGroundCountMatrixSafe(0) == nullptr);
 }
 
 }  // namespace msf
