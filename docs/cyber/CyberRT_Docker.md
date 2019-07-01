@@ -15,14 +15,12 @@ To start the official Cyber RT docker, you need to run the command below first:
 **Note**: Running this command for the first time could take a while because you will be downloading the full docker image, depending on your network bandwidth.
 
 **Note**:  You will lose all your previous changes in the docker if you have ran this command before. Unless you would like to start a fresh docker environment.
-```
 
 ```bash
 ./docker/scripts/cyber_start.sh
 ```
 
 To enter the docker you just started:
-```
 
 **Note**: you can enter and exit multiple times whenever you like, the docker environment will stay there until the next time you start the docker again.
 
