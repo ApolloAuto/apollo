@@ -122,9 +122,11 @@ class BaseMap {
   BaseMapConfig* map_config_ = nullptr;
 
   /**@brief The cache for map node preload. */
-  MapNodeCacheL1<MapNodeIndex, BaseMapNode>* map_node_cache_lvl1_ = nullptr;
+  std::unique_ptr<MapNodeCacheL1<MapNodeIndex, BaseMapNode>>
+      map_node_cache_lvl1_ = nullptr;
   /**brief The dynamic map node preloading thread pool pointer. */
-  MapNodeCacheL2<MapNodeIndex, BaseMapNode>* map_node_cache_lvl2_ = nullptr;
+  std::unique_ptr<MapNodeCacheL2<MapNodeIndex, BaseMapNode>>
+      map_node_cache_lvl2_ = nullptr;
   /**@brief The map node memory pool pointer. */
   BaseMapNodePool* map_node_pool_ = nullptr;
   /**@bried Keep the index of preloading nodes. */
