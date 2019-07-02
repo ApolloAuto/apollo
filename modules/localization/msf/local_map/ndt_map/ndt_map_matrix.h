@@ -18,6 +18,7 @@
 
 #include <Eigen/Eigenvalues>
 #include <limits>
+#include <memory>
 #include <unordered_map>
 #include <vector>
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
