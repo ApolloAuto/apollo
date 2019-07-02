@@ -125,10 +125,9 @@ int ChannelVerifyAgent::AddTopicLack(
 
 FrameRate *ChannelVerifyAgent::FindRates(VerifyResult *result,
                                          const std::string &channel) {
-  int rates_size = result->rates_size();
-  for (const FrameRate &rates : result) {
-    if (rates.topic() == channel) {
-      return result->mutable_rates(i);
+  for (FrameRate &rate : *result->mutable_rates()) {
+    if (rate.topic() == channel) {
+      return &rate;
     }
   }
   return nullptr;

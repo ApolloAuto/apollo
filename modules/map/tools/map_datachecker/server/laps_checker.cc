@@ -15,9 +15,10 @@
  *****************************************************************************/
 #include "modules/map/tools/map_datachecker/server/laps_checker.h"
 
-#include <algorithm>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+
+#include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -62,7 +63,7 @@ double LapsChecker::GetConfidence() {
     res += confidence_[i];
   }
   AINFO << "current confidence: " << res
-        << ", confidence thresh:" << sp_conf_->laps_rate_thresh;
+        << ",confidence thresh:" << sp_conf_->laps_rate_thresh;
   if (res < sp_conf_->laps_rate_thresh) {
     if (confidence_.size() == 0) {
       AINFO << "some problems induce lap problem";

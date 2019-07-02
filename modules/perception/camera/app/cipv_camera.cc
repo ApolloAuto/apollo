@@ -684,8 +684,8 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
   float shortest_distance = 0.0f;
   float distance = 0.0f;
   float max_dist_object_to_lane_in_meter =
-      b_virtual ? max_dist_object_to_virtual_lane_in_meter_ :
-                  max_dist_object_to_lane_in_meter_;
+      b_virtual ? max_dist_object_to_virtual_lane_in_meter_
+                : max_dist_object_to_lane_in_meter_;
   int closest_index = -1;
   // Find closest edge of a given object bounding box
   float b_valid_object = FindClosestObjectGround(

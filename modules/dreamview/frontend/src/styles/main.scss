@@ -1389,8 +1389,7 @@ body {
                 width: 60px;
             }
 
-
-            p {
+            .tip-popup {
                 position: absolute;
                 top: 120%;
                 right: 15px;
@@ -1399,31 +1398,30 @@ body {
                 padding: 20px;
 
                 background-color: #FFFFFF;
-                color: #999999;
+                color: #555555;
                 text-align: left;
                 white-space: pre-wrap;
 
                 @include small-screen {
                     right: 5px;
                 }
-            }
 
-            p:before {
-                position: absolute;
-                top: -20px;
-                right: 13px;
-                content: '';
-
-                border-style: solid;
-                border-width: 0px 20px 20px 20px;
-                border-color: rgba(0, 0, 0, 0) rgba(0, 0, 0, 0) #FFFFFF rgba(0, 0, 0, 0);
-
-                @-moz-document url-prefix() {
-                    top: -38px;
+                .title {
+                    padding-bottom: 10px;
+                    font-size: 16px;
+                    font-weight: bold;
                 }
 
-                @include small-screen {
-                    right: 8px;
+                table {
+                    border-collapse: collapse;
+                    th, td {
+                        border: 1px solid #D9D9D9;
+                        padding: 10px;
+                    }
+
+                    th {
+                        text-align: center;
+                    }
                 }
             }
         }

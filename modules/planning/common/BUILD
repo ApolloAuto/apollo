@@ -24,6 +24,9 @@ cc_test(
     srcs = [
         "indexed_list_test.cc",
     ],
+    linkopts = [
+        "-lboost_system",
+    ],
     deps = [
         ":indexed_list",
         "//modules/common/util",
@@ -99,6 +102,9 @@ cc_test(
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
         "@gtest//:main",
+    ],
+    linkopts = [
+        "-lboost_system",
     ],
 )
 
@@ -469,6 +475,9 @@ cc_test(
     size = "small",
     srcs = [
         "open_space_info_test.cc",
+    ],
+    linkopts = [
+        "-lboost_system",
     ],
     deps = [
         "open_space_info",

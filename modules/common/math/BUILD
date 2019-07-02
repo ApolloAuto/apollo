@@ -42,7 +42,7 @@ cc_library(
         "vec2d.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/util:string_util",
         "@eigen",
         "@osqp",
@@ -116,7 +116,7 @@ cc_library(
         "matrix_operations.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
         "@eigen",
     ],
 )
@@ -139,7 +139,7 @@ cc_library(
         "kalman_filter.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/math:matrix_operations",
         "@eigen",
     ],
@@ -151,7 +151,7 @@ cc_library(
         "extended_kalman_filter.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/math:matrix_operations",
         "@eigen",
     ],
@@ -243,7 +243,7 @@ cc_library(
         "integral.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
     ],
 )
 
@@ -256,7 +256,7 @@ cc_library(
         "linear_quadratic_regulator.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
         "@eigen",
     ],
 )
@@ -270,7 +270,7 @@ cc_library(
         "mpc_solver.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
         "@eigen",
@@ -287,7 +287,7 @@ cc_library(
     ],
     deps = [
         ":geometry",
-        "//cyber",
+        "//cyber/common:log",
         "@eigen",
     ],
 )
@@ -298,7 +298,7 @@ cc_library(
         "hermite_spline.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
     ],
 )
 
@@ -336,7 +336,7 @@ cc_test(
     ],
     deps = [
         ":linear_interpolation",
-        "//cyber",
+        "//cyber/common:log",
         "@eigen",
         "@gtest//:main",
     ],

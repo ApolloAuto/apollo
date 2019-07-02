@@ -11,7 +11,7 @@ cc_library(
         "vehicle_model.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:file",
         "//modules/common/configs:config_gflags",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/vehicle_model/proto:vehicle_model_config_proto",

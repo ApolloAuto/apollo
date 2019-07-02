@@ -16,6 +16,7 @@
 
 #include <fstream>
 
+#include "cyber/common/log.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 #include "modules/localization/msf/local_tool/map_creation/poses_interpolation/poses_interpolation.h"
 
@@ -35,7 +36,7 @@ bool PosesInterpolation::Init(const std::string &input_poses_path,
 
   bool success = velodyne::LoadExtrinsic(extrinsic_path_, &velodyne_extrinsic_);
   if (!success) {
-    std::cerr << "Load lidar extrinsic failed." << std::endl;
+    AERROR << "Load lidar extrinsic failed.";
     return false;
   }
 
@@ -72,7 +73,7 @@ void PosesInterpolation::LoadPCDTimestamp() {
     }
     fclose(file);
   } else {
-    std::cerr << "Can't open file to read: " << ref_timestamps_path_;
+    AINFO << "Can't open file to read: " << ref_timestamps_path_;
   }
 }
 
@@ -101,7 +102,7 @@ void PosesInterpolation::WritePCDPoses() {
 
     fout.close();
   } else {
-    std::cerr << "Can't open file to write: " << out_poses_path_ << std::endl;
+    AERROR << "Can't open file to write: " << out_poses_path_ << std::endl;
   }
 }  // namespace msf
 
@@ -156,10 +157,10 @@ void PosesInterpolation::PoseInterpolationByTime(
         out_timestamps->push_back(ref_timestamp);
       }
     } else {
-      std::cerr << "[ERROR] No more poses. Exit now." << std::endl;
+      AWARN << "[WARN] No more poses. Exit now.";
       break;
     }
-    std::cout << "Frame_id: " << i << std::endl;
+    ADEBUG << "Frame_id: " << i;
   }
 }
 

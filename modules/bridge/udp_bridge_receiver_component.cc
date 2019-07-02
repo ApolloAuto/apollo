@@ -201,7 +201,7 @@ bool UDPBridgeReceiverComponent<T>::RemoveInvalidBuf(uint32_t msg_id) {
     return false;
   }
   typename std::vector<BridgeProtoDiserializedBuf<T> *>::iterator itor =
-    proto_list_.begin();
+      proto_list_.begin();
   for (; itor != proto_list_.end();) {
     if ((*itor)->GetMsgID() < msg_id) {
       BridgeProtoDiserializedBuf<T> *tmp = *itor;
