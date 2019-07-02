@@ -34,8 +34,8 @@
 namespace apollo {
 namespace canbus {
 namespace ch {
-using ::apollo::drivers::canbus::ProtocolData;
 using ::apollo::canbus::ChassisDetail;
+using ::apollo::drivers::canbus::ProtocolData;
 
 class ChMessageManagerTest : public ::testing::Test {
  public:
@@ -46,7 +46,7 @@ TEST_F(ChMessageManagerTest, Brakecommand111) {
   ChMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Brakecommand111::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Brakecommand111 *>(pd)->ID, Brakecommand111::ID);
 }
 
@@ -54,7 +54,7 @@ TEST_F(ChMessageManagerTest, Brakestatus511) {
   ChMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Brakestatus511::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Brakestatus511 *>(pd)->ID, Brakestatus511::ID);
 }
 
@@ -62,7 +62,7 @@ TEST_F(ChMessageManagerTest, Controlcommand115) {
   ChMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Controlcommand115::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Controlcommand115 *>(pd)->ID, Controlcommand115::ID);
 }
 
@@ -70,7 +70,7 @@ TEST_F(ChMessageManagerTest, Ecustatus1515) {
   ChMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Ecustatus1515::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Ecustatus1515 *>(pd)->ID, Ecustatus1515::ID);
 }
 
@@ -78,7 +78,7 @@ TEST_F(ChMessageManagerTest, Ecustatus2516) {
   ChMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Ecustatus2516::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Ecustatus2516 *>(pd)->ID, Ecustatus2516::ID);
 }
 
@@ -86,7 +86,7 @@ TEST_F(ChMessageManagerTest, Ecustatus3517) {
   ChMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Ecustatus3517::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Ecustatus3517 *>(pd)->ID, Ecustatus3517::ID);
 }
 
@@ -94,7 +94,7 @@ TEST_F(ChMessageManagerTest, Gearcommand114) {
   ChMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Gearcommand114::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Gearcommand114 *>(pd)->ID, Gearcommand114::ID);
 }
 
@@ -102,7 +102,7 @@ TEST_F(ChMessageManagerTest, Gearstatus514) {
   ChMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Gearstatus514::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Gearstatus514 *>(pd)->ID, Gearstatus514::ID);
 }
 
@@ -110,7 +110,7 @@ TEST_F(ChMessageManagerTest, Steercommand112) {
   ChMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Steercommand112::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Steercommand112 *>(pd)->ID, Steercommand112::ID);
 }
 
@@ -118,7 +118,7 @@ TEST_F(ChMessageManagerTest, Steerstatus512) {
   ChMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Steerstatus512::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Steerstatus512 *>(pd)->ID, Steerstatus512::ID);
 }
 
@@ -126,7 +126,7 @@ TEST_F(ChMessageManagerTest, Throttlecommand110) {
   ChMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Throttlecommand110::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Throttlecommand110 *>(pd)->ID, Throttlecommand110::ID);
 }
 
@@ -134,7 +134,7 @@ TEST_F(ChMessageManagerTest, Throttlestatus510) {
   ChMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Throttlestatus510::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Throttlestatus510 *>(pd)->ID, Throttlestatus510::ID);
 }
 
@@ -142,18 +142,18 @@ TEST_F(ChMessageManagerTest, Turnsignalcommand113) {
   ChMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Turnsignalcommand113::ID);
-  EXPECT_TRUE(pd != nullptr);
-  EXPECT_EQ(static_cast<Turnsignalcommand113 *>
-  (pd)->ID, Turnsignalcommand113::ID);
+  EXPECT_NE(pd, nullptr);
+  EXPECT_EQ(static_cast<Turnsignalcommand113 *>(pd)->ID,
+            Turnsignalcommand113::ID);
 }
 
 TEST_F(ChMessageManagerTest, Turnsignalstatus513) {
   ChMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Turnsignalstatus513::ID);
-  EXPECT_TRUE(pd != nullptr);
-  EXPECT_EQ(static_cast<Turnsignalstatus513 *>
-  (pd)->ID, Turnsignalstatus513::ID);
+  EXPECT_NE(pd, nullptr);
+  EXPECT_EQ(static_cast<Turnsignalstatus513 *>(pd)->ID,
+            Turnsignalstatus513::ID);
 }
 
 }  // namespace ch

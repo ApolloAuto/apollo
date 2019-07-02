@@ -16,10 +16,9 @@
 
 #include "modules/canbus/vehicle/vehicle_factory.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
+#include "modules/canbus/vehicle/ch/ch_vehicle_factory.h"
 #include "modules/canbus/vehicle/gem/gem_vehicle_factory.h"
 #include "modules/canbus/vehicle/lincoln/lincoln_vehicle_factory.h"
-#include "modules/canbus/vehicle/ch/ch_vehicle_factory.h"
-
 namespace apollo {
 namespace canbus {
 
@@ -43,6 +42,8 @@ std::unique_ptr<AbstractVehicleFactory> VehicleFactory::CreateVehicle(
            << vehicle_parameter.DebugString();
   } else {
     abstract_factory->SetVehicleParameter(vehicle_parameter);
+    AINFO << "successfully created vehicle factory with "
+          << vehicle_parameter.DebugString();
   }
   return abstract_factory;
 }

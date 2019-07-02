@@ -531,6 +531,8 @@ void LincolnController::Throttle(double pedal) {
   throttle_62_->set_pedal(pedal);
 }
 
+void LincolnController::Acceleration(double acc) {}
+
 // lincoln default, -470 ~ 470, left:+, right:-
 // need to be compatible with control module, so reverse
 // steering with old angle speed
