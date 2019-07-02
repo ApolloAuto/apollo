@@ -29,10 +29,10 @@ using apollo::cyber::croutine::RoutineState;
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 
-GRP_WQ_MUTEX ClassicContext::mtx_wq_;
-GRP_WQ_CV ClassicContext::cv_wq_;
-RQ_LOCK_GROUP ClassicContext::rq_locks_;
-CR_GROUP ClassicContext::cr_group_;
+alignas(CACHELINE_SIZE) GRP_WQ_MUTEX ClassicContext::mtx_wq_;
+alignas(CACHELINE_SIZE) GRP_WQ_CV ClassicContext::cv_wq_;
+alignas(CACHELINE_SIZE) RQ_LOCK_GROUP ClassicContext::rq_locks_;
+alignas(CACHELINE_SIZE) CR_GROUP ClassicContext::cr_group_;
 
 ClassicContext::ClassicContext() { InitGroup(DEFAULT_GROUP_NAME); }
 
