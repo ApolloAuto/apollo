@@ -35,6 +35,8 @@ void Throttlestatus510::Parse(const std::uint8_t* bytes, int32_t length,
       ->set_throttle_pedal_en_sts(throttle_pedal_en_sts(bytes, length));
   chassis->mutable_ch()->mutable_throttle_status__510()->set_throttle_pedal_sts(
       throttle_pedal_sts(bytes, length));
+  chassis->mutable_check_response()->set_is_vcu_online(
+      throttle_pedal_en_sts(bytes, length) == 1);
 }
 
 // config detail: {'description': 'throttle pedal enable bit(Status)', 'enum':

@@ -18,13 +18,15 @@
 
 #include <memory>
 #include <thread>
-#include "modules/canbus/vehicle/vehicle_controller.h"
+
+#include "modules/common/macro.h"
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
-#include "modules/common/macro.h"
+#include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
+
 #include "modules/canbus/vehicle/ch/protocol/brake_command_111.h"
 #include "modules/canbus/vehicle/ch/protocol/control_command_115.h"
 #include "modules/canbus/vehicle/ch/protocol/gear_command_114.h"
@@ -44,9 +46,9 @@ class ChController final : public VehicleController {
 
   ::apollo::common::ErrorCode Init(
       const VehicleParameter& params,
-      CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
-      MessageManager<::apollo::canbus::ChassisDetail>
-      *const message_manager) override;
+      CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
+      MessageManager<::apollo::canbus::ChassisDetail>* const message_manager)
+      override;
 
   bool Start() override;
 
@@ -83,6 +85,8 @@ class ChController final : public VehicleController {
   // drive with old acceleration
   // gas:0.00~99.99 unit:
   void Throttle(double throttle) override;
+
+  void Acceleration(double acc) override;
 
   // steering with old angle speed
   // angle:-99.99~0.00~99.99, unit:, left:+, right:-
@@ -134,4 +138,3 @@ class ChController final : public VehicleController {
 }  // namespace ch
 }  // namespace canbus
 }  // namespace apollo
-

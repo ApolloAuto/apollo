@@ -62,7 +62,7 @@ void Brakecommand111::set_p_brake_pedal_en_ctrl(
   int x = brake_pedal_en_ctrl;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 0, 8);
+  to_set.set_value(static_cast<uint8_t>(x), 0, 8);
 }
 
 Brakecommand111* Brakecommand111::set_brake_pedal_cmd(int brake_pedal_cmd) {
@@ -80,7 +80,7 @@ void Brakecommand111::set_p_brake_pedal_cmd(uint8_t* data,
   int x = brake_pedal_cmd;
 
   Byte to_set(data + 1);
-  to_set.set_value(x, 0, 8);
+  to_set.set_value(static_cast<uint8_t>(x), 0, 8);
 }
 
 }  // namespace ch

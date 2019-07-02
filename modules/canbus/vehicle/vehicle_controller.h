@@ -19,8 +19,7 @@
  * @brief The class of VehicleController
  */
 
-#ifndef MODULES_CANBUS_VEHICLE_CONTROLLER_H_
-#define MODULES_CANBUS_VEHICLE_CONTROLLER_H_
+#pragma once
 
 #include <unordered_map>
 
@@ -128,6 +127,12 @@ class VehicleController {
   virtual void Throttle(double throttle) = 0;
 
   /*
+   * @brief drive with new acceleration/deceleration:-7.0~7.0, unit:m/s^2,
+   * acc:-7.0~7.0, unit:m/s^2
+   */
+  virtual void Acceleration(double acc) = 0;
+
+  /*
    * @brief steering with old angle speed angle:-99.99~0.00~99.99, unit:%,
    * left:+, right:-
    */
@@ -147,6 +152,8 @@ class VehicleController {
   virtual void SetHorn(const control::ControlCommand &command) = 0;
   virtual void SetTurningSignal(const control::ControlCommand &command) = 0;
 
+  virtual void SetLimits() {}
+
  protected:
   virtual Chassis::DrivingMode driving_mode();
   virtual void set_driving_mode(const Chassis::DrivingMode &driving_mode);
@@ -164,5 +171,3 @@ class VehicleController {
 
 }  // namespace canbus
 }  // namespace apollo
-
-#endif  // MODULES_CANBUS_VEHICLE_CONTROLLER_H_
