@@ -84,6 +84,11 @@ class PiecewiseJerkProblem {
 
   void set_weight_dddx(const double weight_dddx) { weight_dddx_ = weight_dddx; }
 
+  void set_x_ref(const double weight_x_ref, std::vector<double> x_ref);
+
+  void set_end_state_ref(const std::array<double, 3>& weight_end_state,
+                         const std::array<double, 3>& end_state_ref);
+
   virtual bool Optimize(const int max_iter = 4000);
 
   const std::vector<double>& opt_x() const { return x_; }
@@ -139,6 +144,14 @@ class PiecewiseJerkProblem {
   double weight_dddx_ = 0.0;
 
   double delta_s_ = 1.0;
+
+  bool has_x_ref_ = false;
+  double weight_x_ref_ = 0.0;
+  std::vector<double> x_ref_;
+
+  bool has_end_state_ref_ = false;
+  std::array<double, 3> weight_end_state_ = {{0.0, 0.0, 0.0}};
+  std::array<double, 3> end_state_ref_;
 };
 
 }  // namespace planning

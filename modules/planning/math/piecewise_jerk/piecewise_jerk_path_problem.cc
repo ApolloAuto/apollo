@@ -29,22 +29,6 @@ PiecewiseJerkPathProblem::PiecewiseJerkPathProblem(
     const std::array<double, 3>& x_init)
     : PiecewiseJerkProblem(num_of_knots, delta_s, x_init) {}
 
-void PiecewiseJerkPathProblem::set_x_ref(const double weight_x_ref,
-                                         std::vector<double> x_ref) {
-  CHECK_EQ(x_ref.size(), num_of_knots_);
-  weight_x_ref_ = weight_x_ref;
-  x_ref_ = std::move(x_ref);
-  has_x_ref_ = true;
-}
-
-void PiecewiseJerkPathProblem::set_end_state_ref(
-    const std::array<double, 3>& weight_end_state,
-    const std::array<double, 3>& end_state_ref) {
-  weight_end_state_ = weight_end_state;
-  end_state_ref_ = end_state_ref;
-  has_end_state_ref_ = true;
-}
-
 void PiecewiseJerkPathProblem::CalculateKernel(std::vector<c_float>* P_data,
                                                std::vector<c_int>* P_indices,
                                                std::vector<c_int>* P_indptr) {
