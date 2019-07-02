@@ -29,7 +29,7 @@ NdtMapNode::~NdtMapNode() {}
 void NdtMapNode::Init(const BaseMapConfig* map_config) {
   map_config_ = map_config;
 
-  map_node_config_ = new NdtMapNodeConfig();
+  map_node_config_.reset(new NdtMapNodeConfig());
   map_node_config_->map_version_ = map_config_->GetMapVersion();
   map_node_config_->has_map_version_ = false;
   map_node_config_->has_body_md5_ = false;
@@ -39,16 +39,16 @@ void NdtMapNode::Init(const BaseMapConfig* map_config) {
   num_valid_cells_ = 0;
   num_valid_single_cells_ = 0;
 
-  map_matrix_ = new NdtMapMatrix();
-  map_matrix_handler_ = NdtMapMatrixHandlerSelector::AllocNdtMapMatrixHandler();
-  compression_strategy_ = new ZlibStrategy();
+  map_matrix_.reset(new NdtMapMatrix());
+  map_matrix_handler_.reset(NdtMapMatrixHandlerSelector::AllocNdtMapMatrixHandler());
+  compression_strategy_.reset(new ZlibStrategy());
   InitMapMatrix(map_config_);
 }
 void NdtMapNode::Init(const BaseMapConfig* map_config,
                       const MapNodeIndex& index, bool create_map_cells) {
   map_config_ = map_config;
 
-  map_node_config_ = new NdtMapNodeConfig();
+  map_node_config_.reset(new NdtMapNodeConfig());
   map_node_config_->node_index_ = index;
   map_node_config_->map_version_ = map_config_->GetMapVersion();
   left_top_corner_ =
@@ -61,9 +61,9 @@ void NdtMapNode::Init(const BaseMapConfig* map_config,
   num_valid_cells_ = 0;
   num_valid_single_cells_ = 0;
 
-  map_matrix_ = new NdtMapMatrix();
-  map_matrix_handler_ = NdtMapMatrixHandlerSelector::AllocNdtMapMatrixHandler();
-  compression_strategy_ = new ZlibStrategy();
+  map_matrix_.reset(new NdtMapMatrix());
+  map_matrix_handler_.reset(NdtMapMatrixHandlerSelector::AllocNdtMapMatrixHandler());
+  compression_strategy_.reset(new ZlibStrategy());
   if (create_map_cells) {
     InitMapMatrix(map_config_);
   }
@@ -114,7 +114,7 @@ void NdtMapNode::Reduce(NdtMapNode* map_node, const NdtMapNode& map_node_new) {
   assert(map_node->index_.resolution_id_ == map_node_new.index_.resolution_id_);
   assert(map_node->index_.zone_id_ == map_node_new.index_.zone_id_);
   NdtMapMatrix::Reduce(
-      static_cast<NdtMapMatrix*>(map_node->map_matrix_),
+      static_cast<NdtMapMatrix*>(map_node->map_matrix_.get()),
       static_cast<const NdtMapMatrix&>(*map_node_new.map_matrix_));
 }
 
