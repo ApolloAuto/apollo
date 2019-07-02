@@ -414,11 +414,7 @@ NdtMapMatrix::NdtMapMatrix() {
   map3d_cells_ = nullptr;
 }
 
-NdtMapMatrix::~NdtMapMatrix() {
-  if (map3d_cells_) {
-    delete[] map3d_cells_;
-  }
-}
+NdtMapMatrix::~NdtMapMatrix() {}
 
 NdtMapMatrix::NdtMapMatrix(const NdtMapMatrix& cells) {
   Init(cells.rows_, cells.cols_);
@@ -439,11 +435,7 @@ void NdtMapMatrix::Init(const BaseMapConfig& config) {
 void NdtMapMatrix::Reset() { Reset(rows_, cols_); }
 
 void NdtMapMatrix::Init(unsigned int rows, unsigned int cols) {
-  if (map3d_cells_) {
-    delete[] map3d_cells_;
-  }
-  map3d_cells_ = nullptr;
-  map3d_cells_ = new NdtMapCells[rows * cols];
+  map3d_cells_.reset(new NdtMapCells[rows * cols]);
   rows_ = rows;
   cols_ = cols;
 }

@@ -191,7 +191,7 @@ class NdtMapMatrix : public BaseMapMatrix {
   /**@brief The number of columns. */
   unsigned int cols_;
   /**@brief The matrix data structure. */
-  NdtMapCells* map3d_cells_;
+  std::unique_ptr<NdtMapCells[]> map3d_cells_;
 };
 
 }  // namespace msf
