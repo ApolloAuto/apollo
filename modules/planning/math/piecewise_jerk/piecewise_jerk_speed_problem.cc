@@ -32,14 +32,6 @@ PiecewiseJerkSpeedProblem::PiecewiseJerkSpeedProblem(
   penalty_dx_.resize(num_of_knots_, 0.0);
 }
 
-void PiecewiseJerkSpeedProblem::set_x_ref(const double weight_x_ref,
-                                          std::vector<double> x_ref) {
-  CHECK_EQ(x_ref.size(), num_of_knots_);
-  x_ref_ = std::move(x_ref);
-  weight_x_ref_ = weight_x_ref;
-  has_x_ref_ = true;
-}
-
 void PiecewiseJerkSpeedProblem::set_dx_ref(const double weight_dx_ref,
                                            const double dx_ref) {
   weight_dx_ref_ = weight_dx_ref;
@@ -50,14 +42,6 @@ void PiecewiseJerkSpeedProblem::set_dx_ref(const double weight_dx_ref,
 void PiecewiseJerkSpeedProblem::set_penalty_dx(std::vector<double> penalty_dx) {
   CHECK_EQ(penalty_dx.size(), num_of_knots_);
   penalty_dx_ = std::move(penalty_dx);
-}
-
-void PiecewiseJerkSpeedProblem::set_end_state_ref(
-    const std::array<double, 3>& weight_end_state,
-    const std::array<double, 3>& end_state_ref) {
-  weight_end_state_ = weight_end_state;
-  end_state_ref_ = end_state_ref;
-  has_end_state_ref_ = true;
 }
 
 void PiecewiseJerkSpeedProblem::CalculateKernel(std::vector<c_float>* P_data,

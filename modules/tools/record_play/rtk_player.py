@@ -43,7 +43,7 @@ from modules.common.configs.proto import vehicle_config_pb2
 import common.proto_utils as proto_utils
 
 APOLLO_ROOT = os.path.join(os.path.dirname(__file__), '../../../')
-SEARCH_INTERVAL = 1000
+SEARCH_INTERVAL = 5000
 CHANGE_TO_COM = False
 
 
@@ -135,22 +135,32 @@ class RtkPlayer(object):
                          (self.start, self.closestpoint))
 
         self.closestpoint = self.closest_dist()
+        self.logger.debug("replan!")
         self.start = max(self.closestpoint - 1, 0)
+        self.logger.debug("replan_start:", self.start)
         self.starttime = cyber_time.Time.now().to_sec()
-        self.end = min(self.start + 1000, len(self.data) - 1)
+        self.logger.debug("at time", self.starttime)
+        # self.end = min(self.start + 1000, len(self.data) - 1)
+        self.end = self.next_gear_switch_time(self.start, len(self.data))
+        self.logger.debug("replan_end:", self.end)
+
         self.logger.info("finish replan at time %s, self.closestpoint=%s" %
                          (self.starttime, self.closestpoint))
 
     def closest_dist(self):
         shortest_dist_sqr = float('inf')
         self.logger.info("before closest self.start=%s" % (self.start))
+        self.logger.debug("before closest self.start=%s" % (self.start))
         search_start = max(self.start - SEARCH_INTERVAL / 2, 0)
         search_end = min(self.start + SEARCH_INTERVAL / 2, len(self.data))
+        self.logger.debug("search_start:", search_start)
+        self.logger.debug("search_end:", search_end)
         start = self.start
+        self.logger.debug("self.start:", self.start)
         for i in range(search_start, search_end):
             dist_sqr = (self.carx - self.data['x'][i]) ** 2 + \
                 (self.cary - self.data['y'][i]) ** 2
-            if dist_sqr <= shortest_dist_sqr:
+            if dist_sqr <= shortest_dist_sqr and self.data['gear'][i] == self.chassis.gear_location:
                 start = i
                 shortest_dist_sqr = dist_sqr
         return start
@@ -167,6 +177,25 @@ class RtkPlayer(object):
                 self.data['time'][self.closestpoint]
 
         return closest_time
+
+    def next_gear_switch_time(self, start, end):
+        for i in range(start, end):
+            # trajectory with gear switch
+            # include gear_neutral at the beginning of a trajectory
+            if((self.data['gear'][i] == 1 or self.data['gear'][i] == 2)
+                    and (self.data['gear'][i + 1] != self.data['gear'][i]) ):
+                self.logger.debug("enter i in while loop: [ %s ]" % i)
+                self.logger.debug("self.data['gear'][i] != 1: %s" % self.data['gear'][i])
+                self.logger.debug("self.data['gear'][i] != 2: %s" % self.data['gear'][i])
+                # find next gear = 1 or 2
+                i += 1
+                while i < end and (self.data['gear'][i] != 1) and (self.data['gear'][i] != 2):
+                    i += 1
+                self.logger.debug("i in while loop: [ %s ]" % i)
+                return i - 1
+        # trajectory without gear switch
+        self.logger.debug("i at end: [ %s ]" % i)
+        return min(i, end - 1)
 
     def publish_planningmsg(self):
         """
@@ -196,8 +225,22 @@ class RtkPlayer(object):
             timepoint = self.closest_time()
             distpoint = self.closest_dist()
 
-            self.start = max(min(timepoint, distpoint) - 1, 0)
-            self.end = min(max(timepoint, distpoint) + 900, len(self.data) - 1)
+            if self.data['gear'][timepoint] == self.data['gear'][distpoint]:
+                self.start = max(min(timepoint, distpoint), 0)
+            elif self.data['gear'][timepoint] == self.chassis.gear_location:
+                self.start = timepoint
+            else:
+                self.start = distpoint
+
+            self.logger.debug("timepoint:[%s]" % timepoint)
+            self.logger.debug("distpoint:[%s]" % distpoint)
+            self.logger.debug(
+                "trajectory start point: [%s], gear is [%s]" % (self.start, self.data['gear'][self.start]))
+
+            self.end = self.next_gear_switch_time(self.start, len(self.data))
+            self.logger.debug("len of data: ", len(self.data))
+            self.logger.debug("trajectory end point: [%s], gear is [%s]" %
+                              (self.end, self.data['gear'][self.end]))
 
             xdiff_sqr = (self.data['x'][timepoint] - self.carx)**2
             ydiff_sqr = (self.data['y'][timepoint] - self.cary)**2
@@ -215,6 +258,7 @@ class RtkPlayer(object):
 
         planningdata.total_path_length = self.data['s'][self.end] - \
             self.data['s'][self.start]
+        self.logger.info("total number of planning data point: %d" % (self.end - self.start))
         planningdata.total_path_time = self.data['time'][self.end] - \
             self.data['time'][self.start]
         planningdata.gear = int(self.data['gear'][self.closest_time()])

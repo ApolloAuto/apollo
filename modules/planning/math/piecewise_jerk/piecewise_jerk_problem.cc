@@ -132,6 +132,22 @@ void PiecewiseJerkProblem::set_ddx_bounds(const double ddx_lower_bound,
   }
 }
 
+void PiecewiseJerkProblem::set_x_ref(const double weight_x_ref,
+                                     std::vector<double> x_ref) {
+  CHECK_EQ(x_ref.size(), num_of_knots_);
+  weight_x_ref_ = weight_x_ref;
+  x_ref_ = std::move(x_ref);
+  has_x_ref_ = true;
+}
+
+void PiecewiseJerkProblem::set_end_state_ref(
+    const std::array<double, 3>& weight_end_state,
+    const std::array<double, 3>& end_state_ref) {
+  weight_end_state_ = weight_end_state;
+  end_state_ref_ = end_state_ref;
+  has_end_state_ref_ = true;
+}
+
 bool PiecewiseJerkProblem::Optimize(const int max_iter) {
   // calculate kernel
   std::vector<c_float> P_data;

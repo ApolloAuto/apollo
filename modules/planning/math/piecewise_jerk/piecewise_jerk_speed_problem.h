@@ -53,14 +53,9 @@ class PiecewiseJerkSpeedProblem : public PiecewiseJerkProblem {
 
   virtual ~PiecewiseJerkSpeedProblem() = default;
 
-  void set_x_ref(const double weight_x_ref, std::vector<double> x_ref);
-
   void set_dx_ref(const double weight_dx_ref, const double dx_ref);
 
   void set_penalty_dx(std::vector<double> penalty_dx);
-
-  void set_end_state_ref(const std::array<double, 3>& weight_end_state,
-                         const std::array<double, 3>& end_state_ref);
 
  protected:
   // naming convention follows osqp solver.
@@ -72,19 +67,11 @@ class PiecewiseJerkSpeedProblem : public PiecewiseJerkProblem {
 
   OSQPSettings* SolverDefaultSettings() override;
 
-  bool has_x_ref_ = false;
-  double weight_x_ref_ = 0.0;
-  std::vector<double> x_ref_;
-
   bool has_dx_ref_ = false;
   double weight_dx_ref_ = 0.0;
   double dx_ref_ = 0.0;
 
   std::vector<double> penalty_dx_;
-
-  bool has_end_state_ref_ = false;
-  std::array<double, 3> weight_end_state_ = {{0.0, 0.0, 0.0}};
-  std::array<double, 3> end_state_ref_;
 };
 
 }  // namespace planning
