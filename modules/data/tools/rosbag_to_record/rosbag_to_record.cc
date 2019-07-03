@@ -236,6 +236,9 @@ int main(int argc, char **argv) {
     } else if (channel_name == "/apollo/routing_response") {
       auto pb_msg = m.instantiate<apollo::routing::RoutingResponse>();
       pb_msg->SerializeToString(&serialized_str);
+    } else if (channel_name == "/apollo/routing_response_history") {
+      auto pb_msg = m.instantiate<apollo::routing::RoutingResponse>();
+      pb_msg->SerializeToString(&serialized_str);
     } else if (channel_name == "/tf" || channel_name == "/tf_static") {
       auto rawdata = m.instantiate<tf2_msgs::TFMessage>();
       auto proto = std::make_shared<apollo::transform::TransformStampeds>();
