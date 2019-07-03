@@ -84,6 +84,10 @@ class PiecewiseJerkProblem {
 
   void set_weight_dddx(const double weight_dddx) { weight_dddx_ = weight_dddx; }
 
+  void set_scale_factor(const std::array<double, 3>& scale_factor) {
+    scale_factor_ = scale_factor;
+  }
+
   void set_x_ref(const double weight_x_ref, std::vector<double> x_ref);
 
   void set_end_state_ref(const std::array<double, 3>& weight_end_state,
@@ -132,6 +136,7 @@ class PiecewiseJerkProblem {
   std::vector<double> ddx_;
 
   std::array<double, 3> x_init_;
+  std::array<double, 3> scale_factor_ = {{1.0, 1.0, 1.0}};
 
   std::vector<std::pair<double, double>> x_bounds_;
   std::vector<std::pair<double, double>> dx_bounds_;
