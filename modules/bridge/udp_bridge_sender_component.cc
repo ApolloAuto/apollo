@@ -30,7 +30,7 @@ using apollo::localization::LocalizationEstimate;
 
 template <typename T>
 bool UDPBridgeSenderComponent<T>::Init() {
-  AINFO << "UDP bridge sender init...";
+  AINFO << "UDP bridge sender init, startin...";
   apollo::bridge::UDPBridgeSenderRemoteInfo udp_bridge_remote;
   if (!this->GetProtoConfig(&udp_bridge_remote)) {
     AINFO << "load udp bridge component proto param failed";
