@@ -37,7 +37,7 @@ UDPBridgeReceiverComponent<T>::~UDPBridgeReceiverComponent() {
 
 template <typename T>
 bool UDPBridgeReceiverComponent<T>::Init() {
-  AINFO << "UDP bridge receiver init...";
+  AINFO << "UDP bridge receiver init, startin...";
   apollo::bridge::UDPBridgeReceiverRemoteInfo udp_bridge_remote;
   if (!this->GetProtoConfig(&udp_bridge_remote)) {
     AINFO << "load udp bridge component proto param failed";
