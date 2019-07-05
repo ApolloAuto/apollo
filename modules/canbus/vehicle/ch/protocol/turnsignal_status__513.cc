@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include "modules/canbus/vehicle/ch/protocol/turnsignal_status__513.h"
-#include "glog/logging.h"
+
 #include "modules/drivers/canbus/common/byte.h"
 #include "modules/drivers/canbus/common/canbus_consts.h"
 
@@ -45,9 +45,7 @@ Turnsignalstatus513::turn_signal_sts(const std::uint8_t* bytes,
   Byte t0(bytes + 0);
   int32_t x = t0.get_byte(0, 8);
 
-  Turnsignal_status__513::Turn_signal_stsType ret =
-      static_cast<Turnsignal_status__513::Turn_signal_stsType>(x);
-  return ret;
+  return static_cast<Turnsignal_status__513::Turn_signal_stsType>(x);
 }
 }  // namespace ch
 }  // namespace canbus

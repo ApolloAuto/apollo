@@ -1,23 +1,24 @@
-/* Copyright 2019 The Apollo Authors. All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-==============================================================================*/
+/******************************************************************************
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #include "modules/canbus/vehicle/ch/ch_controller.h"
-#include "modules/common/proto/vehicle_signal.pb.h"
+#include "modules/common/log.h"
 #include "modules/canbus/vehicle/ch/ch_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
-#include "modules/common/log.h"
+#include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
@@ -33,6 +34,7 @@ namespace {
 const int32_t kMaxFailAttempt = 10;
 const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
+
 }  // namespace
 
 ErrorCode ChController::Init(
@@ -160,7 +162,8 @@ Chassis ChController::chassis() {
   // 5 ch has no wheel spd.
   if (chassis_detail.ch().has_ecu_status_1_515() &&
       chassis_detail.ch().ecu_status_1_515().has_speed()) {
-    chassis_.set_speed_mps(chassis_detail.ch().ecu_status_1_515().speed());
+    chassis_.set_speed_mps(
+        static_cast<float>(chassis_detail.ch().ecu_status_1_515().speed()));
   } else {
     chassis_.set_speed_mps(0);
   }
@@ -172,16 +175,16 @@ Chassis ChController::chassis() {
   // 8 throttle
   if (chassis_detail.ch().has_throttle_status__510() &&
       chassis_detail.ch().throttle_status__510().has_throttle_pedal_sts()) {
-    chassis_.set_throttle_percentage(
-        chassis_detail.ch().throttle_status__510().throttle_pedal_sts());
+    chassis_.set_throttle_percentage(static_cast<float>(
+        chassis_detail.ch().throttle_status__510().throttle_pedal_sts()));
   } else {
     chassis_.set_throttle_percentage(0);
   }
   // 9 brake
   if (chassis_detail.ch().has_brake_status__511() &&
       chassis_detail.ch().brake_status__511().has_brake_pedal_sts()) {
-    chassis_.set_brake_percentage(
-        chassis_detail.ch().brake_status__511().brake_pedal_sts());
+    chassis_.set_brake_percentage(static_cast<float>(
+        chassis_detail.ch().brake_status__511().brake_pedal_sts()));
   } else {
     chassis_.set_brake_percentage(0);
   }
@@ -215,10 +218,9 @@ Chassis ChController::chassis() {
   // 11 steering
   if (chassis_detail.ch().has_steer_status__512() &&
       chassis_detail.ch().steer_status__512().has_steer_angle_sts()) {
-    // * 100.0 /vehicle_params_.max_steer_angle()*M_PI / 180);
-    chassis_.set_steering_percentage(
+    chassis_.set_steering_percentage(static_cast<float>(
         chassis_detail.ch().steer_status__512().steer_angle_sts() * 100.0 /
-        vehicle_params_.max_steer_angle());
+        vehicle_params_.max_steer_angle()));
   } else {
     chassis_.set_steering_percentage(0);
   }
@@ -227,8 +229,6 @@ Chassis ChController::chassis() {
   if (chassis_error_mask_) {
     chassis_.set_chassis_error_mask(chassis_error_mask_);
   }
-  // 6d, 6e, 6f, if gps valid is availiable, assume all gps related field
-  // available
 
   if (chassis_detail.has_surround()) {
     chassis_.mutable_surround()->CopyFrom(chassis_detail.surround());
@@ -258,8 +258,6 @@ ErrorCode ChController::EnableAutoMode() {
     AINFO << "already in COMPLETE_AUTO_DRIVE mode";
     return ErrorCode::OK;
   }
-  // ADD YOUR OWN CAR CHASSIS OPERATION
-  // control_command_115_->set_ctrl_cmd(Control_command_115::CTRL_CMD_UNDER_CONTROL);
 
   brake_command_111_->set_brake_pedal_en_ctrl(
       Brake_command_111::BRAKE_PEDAL_EN_CTRL_ENABLE);
@@ -344,9 +342,7 @@ void ChController::Gear(Chassis::GearPosition gear_position) {
 // acceleration:0.00~99.99, unit:
 // acceleration:0.0 ~ 7.0, unit:m/s^2
 // acceleration_spd:60 ~ 100, suggest: 90
-// -> pedal
 void ChController::Brake(double pedal) {
-  // double real_value = params_.max_acc() * acceleration / 100;
   // Update brake value based on mode
   if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
         driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
@@ -354,22 +350,24 @@ void ChController::Brake(double pedal) {
     return;
   }
   // ADD YOUR OWN CAR CHASSIS OPERATION
-  brake_command_111_->set_brake_pedal_cmd(pedal);
+  brake_command_111_->set_brake_pedal_cmd(static_cast<int>(pedal));
 }
 
 // drive with old acceleration
 // gas:0.00~99.99 unit:
 void ChController::Throttle(double pedal) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
   // ADD YOUR OWN CAR CHASSIS OPERATION
-  throttle_command_110_->set_throttle_pedal_cmd(pedal);
+  throttle_command_110_->set_throttle_pedal_cmd(static_cast<int>(pedal));
 }
 
-// ch default, -470 ~ 470, left:+, right:-
+void ChController::Acceleration(double acc) {}
+
+// ch default, -23 ~ 23, left:+, right:-
 // need to be compatible with control module, so reverse
 // steering with old angle speed
 // angle:-99.99~0.00~99.99, unit:, left:-, right:+
@@ -395,51 +393,21 @@ void ChController::Steer(double angle, double angle_spd) {
     return;
   }
   // ADD YOUR OWN CAR CHASSIS OPERATION
-  const double real_angle =
-      // vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
-      vehicle_params_.max_steer_angle() * angle / 100.0;
-  const double real_angle_spd =
-      ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
-          vehicle_params_.min_steer_angle_rate() / M_PI * 180,
-          vehicle_params_.max_steer_angle_rate() / M_PI * 180,
-          vehicle_params_.max_steer_angle_rate() / M_PI * 180 * angle_spd /
-              100.0);
+  const double real_angle = vehicle_params_.max_steer_angle() * angle / 100.0;
   steer_command_112_->set_steer_angle_cmd(real_angle);
 }
 
-void ChController::SetEpbBreak(const ControlCommand& command) {
-  if (command.parking_brake()) {
-    // None
-  } else {
-    // None
-  }
-}
+void ChController::SetEpbBreak(const ControlCommand& command) {}
 
-void ChController::SetBeam(const ControlCommand& command) {
-  if (command.signal().high_beam()) {
-    // None
-  } else if (command.signal().low_beam()) {
-    // None
-  } else {
-    // None
-  }
-}
+void ChController::SetBeam(const ControlCommand& command) {}
 
-void ChController::SetHorn(const ControlCommand& command) {
-  if (command.signal().horn()) {
-    // None
-  } else {
-    // None
-  }
-}
+void ChController::SetHorn(const ControlCommand& command) {}
 
 void ChController::SetTurningSignal(const ControlCommand& command) {}
 
 void ChController::ResetProtocol() { message_manager_->ResetSendMessages(); }
 
-bool ChController::CheckChassisError() {
-  return false;
-}
+bool ChController::CheckChassisError() { return false; }
 
 void ChController::SecurityDogThreadFunc() {
   int32_t vertical_ctrl_fail = 0;

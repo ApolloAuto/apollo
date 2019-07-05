@@ -398,6 +398,8 @@ void GemController::Throttle(double pedal) {
   accel_cmd_67_->set_accel_cmd(pedal / 100.0);
 }
 
+void GemController::Acceleration(double acc) {}
+
 // gem default, -470 ~ 470, left:+, right:-
 // need to be compatible with control module, so reverse
 // steering with old angle speed

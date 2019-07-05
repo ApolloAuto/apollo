@@ -40,13 +40,6 @@ void Ecustatus1515::Parse(const std::uint8_t* bytes, int32_t length,
       chassis_sts(bytes, length));
   chassis->mutable_ch()->mutable_ecu_status_1_515()->set_chassis_err(
       chassis_err(bytes, length));
-
-  chassis->mutable_check_response()->set_is_esp_online(
-      chassis_sts(bytes, length) == 1);
-  chassis->mutable_check_response()->set_is_eps_online(
-      chassis_sts(bytes, length) == 1);
-  chassis->mutable_check_response()->set_is_vcu_online(
-      chassis_sts(bytes, length) == 1);
 }
 
 // config detail: {'description': 'Current speed (Steering status)', 'offset':

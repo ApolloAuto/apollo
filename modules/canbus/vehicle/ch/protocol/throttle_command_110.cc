@@ -63,7 +63,7 @@ void Throttlecommand110::set_p_throttle_pedal_en_ctrl(
   int x = throttle_pedal_en_ctrl;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 0, 8);
+  to_set.set_value(static_cast<uint8_t>(x), 0, 8);
 }
 
 Throttlecommand110* Throttlecommand110::set_throttle_pedal_cmd(
@@ -82,7 +82,7 @@ void Throttlecommand110::set_p_throttle_pedal_cmd(uint8_t* data,
   int x = throttle_pedal_cmd;
 
   Byte to_set(data + 1);
-  to_set.set_value(x, 0, 8);
+  to_set.set_value(static_cast<uint8_t>(x), 0, 8);
 }
 
 }  // namespace ch

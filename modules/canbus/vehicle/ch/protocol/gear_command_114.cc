@@ -59,7 +59,7 @@ void Gearcommand114::set_p_gear_cmd(uint8_t* data,
   int x = gear_cmd;
 
   Byte to_set(data + 0);
-  to_set.set_value(x, 0, 8);
+  to_set.set_value(static_cast<uint8_t>(x), 0, 8);
 }
 
 }  // namespace ch
