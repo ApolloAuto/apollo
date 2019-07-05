@@ -34,6 +34,8 @@ void Brakestatus511::Parse(const std::uint8_t* bytes, int32_t length,
       brake_pedal_en_sts(bytes, length));
   chassis->mutable_ch()->mutable_brake_status__511()->set_brake_pedal_sts(
       brake_pedal_sts(bytes, length));
+  chassis->mutable_check_response()->set_is_esp_online(
+      brake_pedal_en_sts(bytes, length) == 1);
 }
 
 // config detail: {'description': 'brake pedal enable bit(Status)', 'enum': {0:
