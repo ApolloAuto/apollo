@@ -68,4 +68,4 @@ Note:
 如果您希望包括您自己的驾驶场景，请参考现有方案作为参考。我们目前没有用于编写您自己的规划场景的模板。
 ```
 
-![](images/planning_architecture.png)
+![](images/architecture.png)
