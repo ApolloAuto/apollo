@@ -12,12 +12,12 @@ message Passage {
   repeated Id stop_sign_id = 4;
   repeated Id lane_id = 5;
 
-  enum PassageType {
+  enum Type {
     UNKNOWN = 0;
     ENTRANCE = 1;
     EXIT = 2;
   };
-  optional PassageType type = 6;
+  optional Type type = 6;
 
 };
 
@@ -35,5 +35,4 @@ message PNCJunction {
   repeated Id overlap_id = 3;
 
   repeated PassageGroup passage_group = 4;
-
 }

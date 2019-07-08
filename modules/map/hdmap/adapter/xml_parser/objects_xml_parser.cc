@@ -353,11 +353,11 @@ Status ObjectsXmlParser::ToPassageType(const std::string& type,
 
   std::string upper_str = UtilXmlParser::ToUpper(type);
   if (upper_str == "ENTRANCE") {
-    *passage_type = apollo::hdmap::Passage_PassageType_ENTRANCE;
+    *passage_type = apollo::hdmap::Passage_Type_ENTRANCE;
   } else if (upper_str == "EXIT") {
-    *passage_type = apollo::hdmap::Passage_PassageType_EXIT;
+    *passage_type = apollo::hdmap::Passage_Type_EXIT;
   } else {
-    *passage_type = apollo::hdmap::Passage_PassageType_UNKNOWN;
+    *passage_type = apollo::hdmap::Passage_Type_UNKNOWN;
   }
 
   return Status::OK();
