@@ -82,6 +82,12 @@ class Cipv {
   static float VehicleDynamics(const uint32_t tick, const float yaw_rate,
                                const float velocity, const float time_unit,
                                float *x, float *y);
+  static float VehicleDynamics(const uint32_t tick, const float yaw_rate,
+                               const float velocity, const float time_unit,
+                               const float vehicle_half_width,
+                               float *center_x, float *ceneter_y,
+                               float *left_x, float *left_y,
+                               float *right_x, float *right_y);
   // Make a virtual lane line using a yaw_rate
   static bool MakeVirtualEgoLaneFromYawRate(const float yaw_rate,
                                             const float velocity,
