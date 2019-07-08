@@ -117,15 +117,7 @@ class PiecewiseJerkProblem {
 
   virtual OSQPSettings* SolverDefaultSettings();
 
-  bool OptimizeWithOsqp(
-      const size_t kernel_dim, const size_t num_affine_constraint,
-      std::vector<c_float>& P_data, std::vector<c_int>& P_indices,    // NOLINT
-      std::vector<c_int>& P_indptr, std::vector<c_float>& A_data,     // NOLINT
-      std::vector<c_int>& A_indices, std::vector<c_int>& A_indptr,    // NOLINT
-      std::vector<c_float>& lower_bounds,                             // NOLINT
-      std::vector<c_float>& upper_bounds,                             // NOLINT
-      std::vector<c_float>& q, OSQPData* data, OSQPWorkspace** work,  // NOLINT
-      OSQPSettings* settings);
+  OSQPData* FormulateProblem();
 
  protected:
   size_t num_of_knots_ = 0;
