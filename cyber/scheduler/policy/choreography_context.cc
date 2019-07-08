@@ -40,10 +40,9 @@ std::shared_ptr<CRoutine> ChoreographyContext::NextRoutine() {
   }
 
   ReadLockGuard<AtomicRWLock> lock(rq_lk_);
-  for (auto it = cr_queue_.begin(); it != cr_queue_.end();) {
-    auto cr = it->second;
+  for (auto it : cr_queue_) {
+    auto cr = it.second;
     if (!cr->Acquire()) {
-      ++it;
       continue;
     }
 
@@ -54,7 +53,6 @@ std::shared_ptr<CRoutine> ChoreographyContext::NextRoutine() {
     }
 
     cr->Release();
-    ++it;
   }
 
   notified_.clear();
