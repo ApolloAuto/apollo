@@ -1,12 +1,7 @@
 import * as THREE from "three";
 
-import WS from "store/websocket";
-import { loadTexture, loadObject } from "utils/models";
-import trafficLightMaterial from "assets/models/traffic_light.mtl";
-import trafficLightObject from "assets/models/traffic_light.obj";
-import stopSignMaterial from "assets/models/stop_sign.mtl";
-import stopSignObject from "assets/models/stop_sign.obj";
-import { trafficLightScales, stopSignScales } from "renderer/map";
+import { loadTexture } from "utils/models";
+import RENDERER from "renderer";
 
 function diffTiles(newTiles, currentTiles) {
     const difference = new Set(newTiles);
@@ -27,8 +22,7 @@ export default class TileGround {
 
         this.hash = -1;
         this.currentTiles = {};
-        this.currentSignal = {};
-        this.currentStopSign = {};
+        this.currentItems = [];
         this.initialized = false;
 
         this.range = PARAMETERS.ground.defaults.tileRange;
@@ -72,8 +66,8 @@ export default class TileGround {
     }
 
     // append signal and stopSign within current range
-    appendItems(row, col, key, coordinates, scene, totalItemsInMap, currentItems,
-        material, object, scales) {
+    appendItems(row, col, key, totalItemsInMap, type) {
+        const newItems = [];
         totalItemsInMap.forEach((item) => {
             if (isNaN(item.x) || isNaN(item.y) || isNaN(item.heading)) {
                 return;
@@ -82,28 +76,11 @@ export default class TileGround {
             if (i !== row || j !== col) {
                 return;
             }
-            const itemPos = coordinates.applyOffset({
-                x: item.x,
-                y: item.y,
-                z: 0,
-            });
-            loadObject(material, object, scales,
-                mesh => {
-                    mesh.rotation.x = Math.PI / 2;
-                    mesh.rotation.y = item.heading;
-                    mesh.position.set(itemPos.x, itemPos.y, itemPos.z);
-                    if (item.id) {
-                        // store signal id as name in mesh
-                        mesh.name = item.id;
-                    }
-                    mesh.matrixAutoUpdate = false;
-                    mesh.updateMatrix();
-
-                    // a tile may have multiple signal or stopSign
-                    currentItems[`${key}_${item.x}_${item.y}`] = mesh;
-                    scene.add(mesh);
-                });
+            item.type = type;
+            newItems.push(item);
+            this.currentItems.push(`${key}_${type}_${item.id}`);
         });
+        return newItems;
     }
 
     appendTiles(row, col, key, coordinates, scene) {
@@ -143,14 +120,14 @@ export default class TileGround {
                 this.removeDrewObject(key, this.currentTiles, scene);
             }
         }
-        Object.keys(this.currentSignal).filter(signal => !newTiles.has(signal.split('_')[0]))
-            .forEach((signal) => {
-                this.removeDrewObject(signal, this.currentSignal, scene);
+
+        const currentItemIds = { 'signal': [], 'stopSign': [] };
+        this.currentItems.filter(item => newTiles.has(item.split('_')[0]))
+            .forEach((item) => {
+                const [ , type, id ] = item.split('_');
+                currentItemIds[type].push(id);
             });
-        Object.keys(this.currentStopSign).filter(stopSign => !newTiles.has(stopSign.split('_')[0]))
-            .forEach((stopSign) => {
-                this.removeDrewObject(stopSign, this.currentStopSign, scene);
-            });
+        RENDERER.removeTrafficControl(currentItemIds);
     }
 
     updateIndex(hash, newTiles, coordinates, scene) {
@@ -170,15 +147,19 @@ export default class TileGround {
                         continue;
                     }
                     this.appendTiles(row, col, key, coordinates, scene);
+
+                    let newItems = [];
                     if (this.totalSignals) {
-                        this.appendItems(row, col, key, coordinates, scene, this.totalSignals,
-                            this.currentSignal, trafficLightMaterial, trafficLightObject,
-                            trafficLightScales);
+                        newItems = newItems.concat(
+                            this.appendItems(row, col, key, this.totalSignals, 'signal')
+                        );
                     }
                     if (this.totalStopSigns) {
-                        this.appendItems(row, col, key, coordinates, scene, this.totalStopSigns,
-                            this.currentStopSign, stopSignMaterial, stopSignObject, stopSignScales);
+                        newItems = newItems.concat(
+                            this.appendItems(row, col, key, this.totalStopSigns, 'stopSign')
+                        );
                     }
+                    RENDERER.addTrafficControl(newItems);
                 }
             }
         }
