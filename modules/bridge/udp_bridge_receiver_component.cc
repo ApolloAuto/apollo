@@ -37,7 +37,7 @@ UDPBridgeReceiverComponent<T>::~UDPBridgeReceiverComponent() {
 
 template <typename T>
 bool UDPBridgeReceiverComponent<T>::Init() {
-  AINFO << "UDP bridge receiver init, startin..";
+  AINFO << "UDP bridge receiver init, startin...";
   apollo::bridge::UDPBridgeReceiverRemoteInfo udp_bridge_remote;
   if (!this->GetProtoConfig(&udp_bridge_remote)) {
     AINFO << "load udp bridge component proto param failed";
@@ -47,14 +47,14 @@ bool UDPBridgeReceiverComponent<T>::Init() {
   proto_name_ = udp_bridge_remote.proto_name();
   topic_name_ = udp_bridge_remote.topic_name();
   enable_timeout_ = udp_bridge_remote.enable_timeout();
-  AINFO << "UDP Bridge remote port is: " << bind_port_;
-  AINFO << "UDP Bridge for Proto is: " << proto_name_;
+  ADEBUG << "UDP Bridge remote port is: " << bind_port_;
+  ADEBUG << "UDP Bridge for Proto is: " << proto_name_;
   writer_ = node_->CreateWriter<T>(topic_name_.c_str());
 
   if (!InitSession((uint16_t)bind_port_)) {
     return false;
   }
-  AINFO << "initialize session successful.";
+  ADEBUG << "initialize session successful.";
   MsgDispatcher();
   return true;
 }
@@ -67,7 +67,7 @@ bool UDPBridgeReceiverComponent<T>::InitSession(uint16_t port) {
 
 template <typename T>
 void UDPBridgeReceiverComponent<T>::MsgDispatcher() {
-  AINFO << "msg dispatcher start successful.";
+  ADEBUG << "msg dispatcher start successful.";
   listener_->Listen();
 }
 
@@ -139,7 +139,7 @@ bool UDPBridgeReceiverComponent<T>::MsgHandle(int fd) {
   bytes =
       static_cast<int>(recvfrom(fd, total_buf, total_recv, 0,
                                 (struct sockaddr *)&client_addr, &sock_len));
-  AINFO << "total recv " << bytes;
+  ADEBUG << "total recv " << bytes;
   if (bytes <= 0 || bytes > total_recv) {
     return false;
   }
@@ -170,10 +170,10 @@ bool UDPBridgeReceiverComponent<T>::MsgHandle(int fd) {
     return false;
   }
 
-  AINFO << "proto name : " << header.GetMsgName().c_str();
-  AINFO << "proto sequence num: " << header.GetMsgID();
-  AINFO << "proto total frames: " << header.GetTotalFrames();
-  AINFO << "proto frame index: " << header.GetIndex();
+  ADEBUG << "proto name : " << header.GetMsgName().c_str();
+  ADEBUG << "proto sequence num: " << header.GetMsgID();
+  ADEBUG << "proto total frames: " << header.GetTotalFrames();
+  ADEBUG << "proto frame index: " << header.GetIndex();
 
   std::lock_guard<std::mutex> lock(mutex_);
   BridgeProtoDiserializedBuf<T> *proto_buf = CreateBridgeProtoBuf(header);
