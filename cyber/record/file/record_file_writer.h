@@ -123,7 +123,10 @@ bool RecordFileWriter::WriteSection(const T& message) {
     AERROR << "Do not support this template typename.";
     return false;
   }
-  Section section = {type, message.ByteSize()};
+  Section section;
+  /// zero out whole struct even if padded
+  memset(&section, 0, sizeof(section));
+  section = {type, message.ByteSize()};
   ssize_t count = write(fd_, &section, sizeof(section));
   if (count < 0) {
     AERROR << "Write fd failed, fd: " << fd_ << ", errno: " << errno;
@@ -135,9 +138,10 @@ bool RecordFileWriter::WriteSection(const T& message) {
            << ", actual count: " << count;
     return false;
   }
-  ZeroCopyOutputStream* raw_output = new FileOutputStream(fd_);
-  message.SerializeToZeroCopyStream(raw_output);
-  delete raw_output;
+  {
+    FileOutputStream raw_output(fd_);
+    message.SerializeToZeroCopyStream(&raw_output);
+  }
   if (type == SectionType::SECTION_HEADER) {
     static char blank[HEADER_LENGTH] = {'0'};
     count = write(fd_, &blank, HEADER_LENGTH - message.ByteSize());
