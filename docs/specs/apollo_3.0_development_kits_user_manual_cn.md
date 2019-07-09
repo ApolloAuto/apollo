@@ -184,7 +184,7 @@ sudo apt-get install linux-generic-lts-xenial
 
 ### 安装Apollo内核
 
-车上运行Apollo需要[Apollo Kernel](https://github.com/ApolloAuto/apollo-kernel). 你可以依照如下步骤获取、安装预编译的内核：
+车上运行Apollo需要[Apollo Kernel](https://github.com/ApolloAuto/apollo-kernel)。你可以依照如下步骤获取、安装预编译的内核：
 
 a.从realease文件夹下载发布的包
 
@@ -250,39 +250,30 @@ git clone https://github.com/ApolloAuto/apollo.git
 代码下载的时间视网速的快慢而有所区别，请耐心等待；
 下载完成后的代码在～/apollo目录下，然后执行`git checkout -b r3.0.0 origin/r3.0.0`将代码切换到我们所需要的工作分支r3.0.0上。
 
-b.设置环境变量
-在终端输入以下命令：
+b.设置环境变量，在终端输入以下命令：
 
 ```
 echo "export APOLLO_HOME=$(pwd)" >> ~/.bashrc && source ~/.bashrc
 source ~/.bashrc
 ```
 
-c.加载Apollo Docker镜像文件
-
-可以在线下载image，但因为image镜像较大，10G左右，建议在网速好的时候下载，然后cd到镜像所在的目录，一一Load所有镜像。
-Load镜像在终端输入以下命令：
-
-```
-docker load -i xxx.tar
-```
-
-d.启动并进入docker容器
-在终端输入以下命令：
+c.启动并进入docker容器，在终端输入以下命令：
 
 ```
 cd ~/apollo
 bash docker/scripts/dev_start.sh -C
+```
+
+其中，参数`-C`是可选的，这是拉取中国的镜像，请根据自己的网络情况选择。第一次进入docker时或者image镜像有更新时会自动下载apollo所需的image镜像文件，下载镜像文件的过程会很长，请耐心等待；这个过程完成后，请输入以下命令以进入docker环境中：
+```
 bash docker/scripts/dev_into.sh
 ```
 
-e.编译apollo
-在终端输入以下命令，等待编译完成，整个编译过程大约耗时20分钟。
+d.编译apollo，在终端输入以下命令，等待编译完成，整个编译过程大约耗时20分钟：
 
 ```
 bash apollo.sh build
 ```
-
 
 ### 运行DreamView
 
@@ -314,13 +305,13 @@ b.回放数据包
 在终端输入以下命令下载数据包：
 
 ```
-bash docs/demo_guide/rosbag_helper.sh download
+python docs/demo_guide/rosbag_helper.py demo_2.0.bag 
 ```
 
 输入以下命令可以回放数据包，在浏览器DreamView中可以看到回放画面。
 
 ```
-rosbag play -l docs/demo_guide/demo_2.5.bag
+rosbag play -l docs/demo_guide/demo_2.0.bag
 ```
 
 
