@@ -40,40 +40,42 @@ void PiecewiseJerkPathProblem::CalculateKernel(std::vector<c_float>* P_data,
 
   // x(i)^2 * (w_x + w_x_ref)
   for (int i = 0; i < n - 1; ++i) {
-    columns[i].emplace_back(i,
-        (weight_x_ + weight_x_ref_) / (scale_factor_[0] * scale_factor_[0]));
+    columns[i].emplace_back(
+        i, (weight_x_ + weight_x_ref_) / (scale_factor_[0] * scale_factor_[0]));
     ++value_index;
   }
   // x(n-1)^2 * (w_x + w_x_ref + w_end_x)
-  columns[n - 1].emplace_back(n - 1,
-      (weight_x_ + weight_x_ref_ + weight_end_state_[0]) /
-      (scale_factor_[0] * scale_factor_[0]));
+  columns[n - 1].emplace_back(
+      n - 1, (weight_x_ + weight_x_ref_ + weight_end_state_[0]) /
+                 (scale_factor_[0] * scale_factor_[0]));
   ++value_index;
 
   // x(i)'^2 * w_dx
   for (int i = 0; i < n - 1; ++i) {
-    columns[n + i].emplace_back(n + i, weight_dx_ /
-        (scale_factor_[1] * scale_factor_[1]));
+    columns[n + i].emplace_back(
+        n + i, weight_dx_ / (scale_factor_[1] * scale_factor_[1]));
     ++value_index;
   }
   // x(n-1)'^2 * (w_dx + w_end_dx)
   columns[2 * n - 1].emplace_back(2 * n - 1,
-      (weight_dx_ + weight_end_state_[1]) / (scale_factor_[1] * scale_factor_[1]));
+                                  (weight_dx_ + weight_end_state_[1]) /
+                                      (scale_factor_[1] * scale_factor_[1]));
   ++value_index;
 
   auto delta_s_square = delta_s_ * delta_s_;
   // x(i)''^2 * (w_ddx + 2 * w_dddx / delta_s^2)
   columns[2 * n].emplace_back(2 * n,
-      (weight_ddx_ + weight_dddx_ / delta_s_square) /
-      (scale_factor_[2] * scale_factor_[2]));
+                              (weight_ddx_ + weight_dddx_ / delta_s_square) /
+                                  (scale_factor_[2] * scale_factor_[2]));
   ++value_index;
   for (int i = 1; i < n - 1; ++i) {
-    columns[2 * n + i].emplace_back(2 * n + i,
-        (weight_ddx_ + 2.0 * weight_dddx_ / delta_s_square) /
-        (scale_factor_[2] * scale_factor_[2]));
+    columns[2 * n + i].emplace_back(
+        2 * n + i, (weight_ddx_ + 2.0 * weight_dddx_ / delta_s_square) /
+                       (scale_factor_[2] * scale_factor_[2]));
     ++value_index;
   }
-  columns[3 * n - 1].emplace_back(3 * n - 1,
+  columns[3 * n - 1].emplace_back(
+      3 * n - 1,
       (weight_ddx_ + weight_dddx_ / delta_s_square + weight_end_state_[2]) /
           (scale_factor_[2] * scale_factor_[2]));
   ++value_index;
@@ -81,7 +83,8 @@ void PiecewiseJerkPathProblem::CalculateKernel(std::vector<c_float>* P_data,
   // -2 * w_dddx / delta_s^2 * x(i)'' * x(i + 1)''
   for (int i = 0; i < n - 1; ++i) {
     columns[2 * n + i].emplace_back(2 * n + i + 1,
-        (-2.0 * weight_dddx_ / delta_s_square) / (scale_factor_[2] * scale_factor_[2]));
+                                    (-2.0 * weight_dddx_ / delta_s_square) /
+                                        (scale_factor_[2] * scale_factor_[2]));
     ++value_index;
   }
 
@@ -112,12 +115,12 @@ void PiecewiseJerkPathProblem::CalculateOffset(std::vector<c_float>* q) {
   }
 
   if (has_end_state_ref_) {
-    q->at(n - 1) += -2.0 * weight_end_state_[0] * end_state_ref_[0] /
-                    scale_factor_[0];
-    q->at(2 * n - 1) += -2.0 * weight_end_state_[1] * end_state_ref_[1] /
-                        scale_factor_[1];
-    q->at(3 * n - 1) += -2.0 * weight_end_state_[2] * end_state_ref_[2] /
-                        scale_factor_[2];
+    q->at(n - 1) +=
+        -2.0 * weight_end_state_[0] * end_state_ref_[0] / scale_factor_[0];
+    q->at(2 * n - 1) +=
+        -2.0 * weight_end_state_[1] * end_state_ref_[1] / scale_factor_[1];
+    q->at(3 * n - 1) +=
+        -2.0 * weight_end_state_[2] * end_state_ref_[2] / scale_factor_[2];
   }
 }
 
