@@ -77,13 +77,12 @@ OSQPData* PiecewiseJerkProblem::FormulateProblem() {
 
   data->n = kernel_dim;
   data->m = num_affine_constraint;
-  data->P = csc_matrix(kernel_dim, kernel_dim,
-                       P_data.size(), CopyData(P_data),
+  data->P = csc_matrix(kernel_dim, kernel_dim, P_data.size(), CopyData(P_data),
                        CopyData(P_indices), CopyData(P_indptr));
   data->q = CopyData(q);
-  data->A = csc_matrix(num_affine_constraint, kernel_dim,
-                       A_data.size(), CopyData(A_data),
-                       CopyData(A_indices), CopyData(A_indptr));
+  data->A =
+      csc_matrix(num_affine_constraint, kernel_dim, A_data.size(),
+                 CopyData(A_data), CopyData(A_indices), CopyData(A_indptr));
   data->l = CopyData(lower_bounds);
   data->u = CopyData(upper_bounds);
   return data;
@@ -120,10 +119,8 @@ bool PiecewiseJerkProblem::Optimize(const int max_iter) {
   dx_.resize(num_of_knots_);
   ddx_.resize(num_of_knots_);
   for (size_t i = 0; i < num_of_knots_; ++i) {
-    x_.at(i) =
-        osqp_work->solution->x[i] / scale_factor_[0];
-    dx_.at(i) =
-        osqp_work->solution->x[i + num_of_knots_] / scale_factor_[1];
+    x_.at(i) = osqp_work->solution->x[i] / scale_factor_[0];
+    dx_.at(i) = osqp_work->solution->x[i + num_of_knots_] / scale_factor_[1];
     ddx_.at(i) =
         osqp_work->solution->x[i + 2 * num_of_knots_] / scale_factor_[2];
   }
@@ -148,23 +145,31 @@ void PiecewiseJerkProblem::CalculateAffineConstraint(
   lower_bounds->resize(num_of_constraints);
   upper_bounds->resize(num_of_constraints);
 
-  std::vector<std::vector<std::pair<c_int, c_float>>> variables(num_of_variables);
+  std::vector<std::vector<std::pair<c_int, c_float>>> variables(
+      num_of_variables);
 
   int constraint_index = 0;
   // set x, x', x'' bounds
   for (int i = 0; i < num_of_variables; ++i) {
     if (i < n) {
       variables[i].emplace_back(constraint_index, 1.0);
-      lower_bounds->at(constraint_index) = x_bounds_[i].first * scale_factor_[0];
-      upper_bounds->at(constraint_index) = x_bounds_[i].second * scale_factor_[0];
+      lower_bounds->at(constraint_index) =
+          x_bounds_[i].first * scale_factor_[0];
+      upper_bounds->at(constraint_index) =
+          x_bounds_[i].second * scale_factor_[0];
     } else if (i < 2 * n) {
       variables[i].emplace_back(constraint_index, 1.0);
-      lower_bounds->at(constraint_index) = dx_bounds_[i - n].first * scale_factor_[1];
-      upper_bounds->at(constraint_index) = dx_bounds_[i - n].second * scale_factor_[1];
+
+      lower_bounds->at(constraint_index) =
+          dx_bounds_[i - n].first * scale_factor_[1];
+      upper_bounds->at(constraint_index) =
+          dx_bounds_[i - n].second * scale_factor_[1];
     } else {
       variables[i].emplace_back(constraint_index, 1.0);
-      lower_bounds->at(constraint_index) = ddx_bounds_[i - 2 * n].first * scale_factor_[2];
-      upper_bounds->at(constraint_index) = ddx_bounds_[i - 2 * n].second * scale_factor_[2];
+      lower_bounds->at(constraint_index) =
+          ddx_bounds_[i - 2 * n].first * scale_factor_[2];
+      upper_bounds->at(constraint_index) =
+          ddx_bounds_[i - 2 * n].second * scale_factor_[2];
     }
     ++constraint_index;
   }
@@ -174,8 +179,10 @@ void PiecewiseJerkProblem::CalculateAffineConstraint(
   for (int i = 0; i + 1 < n; ++i) {
     variables[2 * n + i].emplace_back(constraint_index, -1.0);
     variables[2 * n + i + 1].emplace_back(constraint_index, 1.0);
-    lower_bounds->at(constraint_index) = dddx_bound_.first * delta_s_ * scale_factor_[2];
-    upper_bounds->at(constraint_index) = dddx_bound_.second * delta_s_ * scale_factor_[2];
+    lower_bounds->at(constraint_index) =
+        dddx_bound_.first * delta_s_ * scale_factor_[2];
+    upper_bounds->at(constraint_index) =
+        dddx_bound_.second * delta_s_ * scale_factor_[2];
     ++constraint_index;
   }
 
@@ -196,13 +203,18 @@ void PiecewiseJerkProblem::CalculateAffineConstraint(
   // - 1/3 * delta_s^2 * x(i)'' - 1/6 * *delta_s^2 * x(i)''
   auto delta_s_sq_ = delta_s_ * delta_s_;
   for (int i = 0; i + 1 < n; ++i) {
-    variables[i].emplace_back(constraint_index, -1.0 * scale_factor_[1] * scale_factor_[2]);
-    variables[i + 1].emplace_back(constraint_index, 1.0 * scale_factor_[1] * scale_factor_[2]);
-    variables[n + i].emplace_back(constraint_index, -delta_s_ * scale_factor_[0] * scale_factor_[2]);
-    variables[2 * n + i].emplace_back(constraint_index,
-                                      -delta_s_sq_ / 3.0 * scale_factor_[0] * scale_factor_[1]);
-    variables[2 * n + i + 1].emplace_back(constraint_index,
-                                          -delta_s_sq_ / 6.0 * scale_factor_[0] * scale_factor_[1]);
+    variables[i].emplace_back(constraint_index,
+                              -1.0 * scale_factor_[1] * scale_factor_[2]);
+    variables[i + 1].emplace_back(constraint_index,
+                                  1.0 * scale_factor_[1] * scale_factor_[2]);
+    variables[n + i].emplace_back(
+        constraint_index, -delta_s_ * scale_factor_[0] * scale_factor_[2]);
+    variables[2 * n + i].emplace_back(
+        constraint_index,
+        -delta_s_sq_ / 3.0 * scale_factor_[0] * scale_factor_[1]);
+    variables[2 * n + i + 1].emplace_back(
+        constraint_index,
+        -delta_s_sq_ / 6.0 * scale_factor_[0] * scale_factor_[1]);
 
     lower_bounds->at(constraint_index) = 0.0;
     upper_bounds->at(constraint_index) = 0.0;
@@ -249,7 +261,7 @@ OSQPSettings* PiecewiseJerkProblem::SolverDefaultSettings() {
       reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
   osqp_set_default_settings(settings);
   settings->polish = true;
-  settings->verbose = true;
+  settings->verbose = FLAGS_enable_osqp_debug;
   settings->scaled_termination = true;
   return settings;
 }
@@ -313,17 +325,17 @@ void PiecewiseJerkProblem::set_end_state_ref(
 }
 
 void PiecewiseJerkProblem::FreeData(OSQPData* data) {
-  delete []data->q;
-  delete []data->l;
-  delete []data->u;
+  delete[] data->q;
+  delete[] data->l;
+  delete[] data->u;
 
-  delete []data->P->i;
-  delete []data->P->p;
-  delete []data->P->x;
+  delete[] data->P->i;
+  delete[] data->P->p;
+  delete[] data->P->x;
 
-  delete []data->A->i;
-  delete []data->A->p;
-  delete []data->A->x;
+  delete[] data->A->i;
+  delete[] data->A->p;
+  delete[] data->A->x;
 }
 
 }  // namespace planning
