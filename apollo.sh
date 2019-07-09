@@ -20,6 +20,8 @@
 #                   Utils
 #=================================================
 
+DISABLED_CYBER_MODULES="except //cyber/record:record_file_integration_test"
+
 function source_apollo_base() {
   DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
   cd "${DIR}"
@@ -92,7 +94,7 @@ function check_esd_files() {
 }
 
 function generate_build_targets() {
-  COMMON_TARGETS="//cyber/... union //modules/common/kv_db/... union //modules/dreamview/..."
+  COMMON_TARGETS="//cyber/... union //modules/common/kv_db/... union //modules/dreamview/... $DISABLED_CYBER_MODULES"
   case $BUILD_FILTER in
   cyber)
     BUILD_TARGETS=`bazel query //cyber/...`
@@ -116,10 +118,7 @@ function generate_build_targets() {
     BUILD_TARGETS=`bazel query //modules/... except //modules/perception/... union //cyber/...`
     ;;
   *)
-#    BUILD_TARGETS=`bazel query //modules/... union //cyber/...`
-    # FIXME(all): temporarily disable modules doesn't compile in 18.04
-    BUILD_TARGETS=`bazel query //modules/... union //cyber/... except //modules/tools/visualizer/... except //modules/data/tools/rosbag_to_record/...  except //modules/v2x/... except //modules/map/tools/map_datachecker/... `
-
+    BUILD_TARGETS=`bazel query //modules/... union //cyber/... $DISABLED_CYBER_MODULES`
   esac
 
   if [ $? -ne 0 ]; then
@@ -539,7 +538,7 @@ function citest_extended() {
   source cyber/setup.bash
 
   BUILD_TARGETS="
-    `bazel query //modules/planning/... union //modules/common/... union //cyber/...`
+    `bazel query //modules/planning/... union //modules/common/... union //cyber/... $DISABLED_CYBER_MODULES`
     `bazel query //modules/prediction/... union //modules/control/...`
   "
 
