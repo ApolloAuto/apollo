@@ -78,17 +78,180 @@ OSQPData* PiecewiseJerkProblem::FormulateProblem() {
   data->n = kernel_dim;
   data->m = num_affine_constraint;
   data->P = csc_matrix(kernel_dim, kernel_dim,
-                       P_data.size(), P_data.data(),
-                       P_indices.data(), P_indptr.data());
-  data->q = q.data();
+                       P_data.size(), CopyData(P_data),
+                       CopyData(P_indices), CopyData(P_indptr));
+  data->q = CopyData(q);
   data->A = csc_matrix(num_affine_constraint, kernel_dim,
-                       A_data.size(), A_data.data(),
-                       A_indices.data(), A_indptr.data());
-  data->l = lower_bounds.data();
-  data->u = upper_bounds.data();
-
-  AERROR << "done for problem formulation";
+                       A_data.size(), CopyData(A_data),
+                       CopyData(A_indices), CopyData(A_indptr));
+  data->l = CopyData(lower_bounds);
+  data->u = CopyData(upper_bounds);
   return data;
+}
+
+bool PiecewiseJerkProblem::Optimize(const int max_iter) {
+  OSQPData* data = FormulateProblem();
+
+  OSQPSettings* settings = SolverDefaultSettings();
+  settings->max_iter = max_iter;
+
+  OSQPWorkspace* osqp_work = osqp_setup(data, settings);
+
+  osqp_solve(osqp_work);
+
+  auto status = osqp_work->info->status_val;
+
+  if (status < 0 || (status != 1 && status != 2)) {
+    AERROR << "failed optimization status:\t" << osqp_work->info->status;
+    osqp_cleanup(osqp_work);
+    FreeData(data);
+    c_free(settings);
+    return false;
+  } else if (osqp_work->solution == nullptr) {
+    AERROR << "The solution from OSQP is nullptr";
+    osqp_cleanup(osqp_work);
+    FreeData(data);
+    c_free(settings);
+    return false;
+  }
+
+  // extract primal results
+  x_.resize(num_of_knots_);
+  dx_.resize(num_of_knots_);
+  ddx_.resize(num_of_knots_);
+  for (size_t i = 0; i < num_of_knots_; ++i) {
+    x_.at(i) =
+        osqp_work->solution->x[i] / scale_factor_[0];
+    dx_.at(i) =
+        osqp_work->solution->x[i + num_of_knots_] / scale_factor_[1];
+    ddx_.at(i) =
+        osqp_work->solution->x[i + 2 * num_of_knots_] / scale_factor_[2];
+  }
+
+  // Cleanup
+  osqp_cleanup(osqp_work);
+  FreeData(data);
+  c_free(settings);
+  return true;
+}
+
+void PiecewiseJerkProblem::CalculateAffineConstraint(
+    std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
+    std::vector<c_int>* A_indptr, std::vector<c_float>* lower_bounds,
+    std::vector<c_float>* upper_bounds) {
+  // 3N params bounds on x, x', x''
+  // 3(N-1) constraints on x, x', x''
+  // 3 constraints on x_init_
+  const int n = static_cast<int>(num_of_knots_);
+  const int num_of_variables = 3 * n;
+  const int num_of_constraints = num_of_variables + 3 * (n - 1) + 3;
+  lower_bounds->resize(num_of_constraints);
+  upper_bounds->resize(num_of_constraints);
+
+  std::vector<std::vector<std::pair<c_int, c_float>>> variables(num_of_variables);
+
+  int constraint_index = 0;
+  // set x, x', x'' bounds
+  for (int i = 0; i < num_of_variables; ++i) {
+    if (i < n) {
+      variables[i].emplace_back(constraint_index, 1.0);
+      lower_bounds->at(constraint_index) = x_bounds_[i].first * scale_factor_[0];
+      upper_bounds->at(constraint_index) = x_bounds_[i].second * scale_factor_[0];
+    } else if (i < 2 * n) {
+      variables[i].emplace_back(constraint_index, 1.0);
+      lower_bounds->at(constraint_index) = dx_bounds_[i - n].first * scale_factor_[1];
+      upper_bounds->at(constraint_index) = dx_bounds_[i - n].second * scale_factor_[1];
+    } else {
+      variables[i].emplace_back(constraint_index, 1.0);
+      lower_bounds->at(constraint_index) = ddx_bounds_[i - 2 * n].first * scale_factor_[2];
+      upper_bounds->at(constraint_index) = ddx_bounds_[i - 2 * n].second * scale_factor_[2];
+    }
+    ++constraint_index;
+  }
+  CHECK_EQ(constraint_index, num_of_variables);
+
+  // x(i->i+1)''' = (x(i+1)'' - x(i)'') / delta_s
+  for (int i = 0; i + 1 < n; ++i) {
+    variables[2 * n + i].emplace_back(constraint_index, -1.0);
+    variables[2 * n + i + 1].emplace_back(constraint_index, 1.0);
+    lower_bounds->at(constraint_index) = dddx_bound_.first * delta_s_ * scale_factor_[2];
+    upper_bounds->at(constraint_index) = dddx_bound_.second * delta_s_ * scale_factor_[2];
+    ++constraint_index;
+  }
+
+  // x(i+1)' - x(i)' - 0.5 * delta_s * x(i)'' - 0.5 * delta_s * x(i+1)'' = 0
+  for (int i = 0; i + 1 < n; ++i) {
+    variables[n + i].emplace_back(constraint_index, -1.0 * scale_factor_[2]);
+    variables[n + i + 1].emplace_back(constraint_index, 1.0 * scale_factor_[2]);
+    variables[2 * n + i].emplace_back(constraint_index,
+                                      -0.5 * delta_s_ * scale_factor_[1]);
+    variables[2 * n + i + 1].emplace_back(constraint_index,
+                                          -0.5 * delta_s_ * scale_factor_[1]);
+    lower_bounds->at(constraint_index) = 0.0;
+    upper_bounds->at(constraint_index) = 0.0;
+    ++constraint_index;
+  }
+
+  // x(i+1) - x(i) - delta_s * x(i)'
+  // - 1/3 * delta_s^2 * x(i)'' - 1/6 * *delta_s^2 * x(i)''
+  auto delta_s_sq_ = delta_s_ * delta_s_;
+  for (int i = 0; i + 1 < n; ++i) {
+    variables[i].emplace_back(constraint_index, -1.0 * scale_factor_[1] * scale_factor_[2]);
+    variables[i + 1].emplace_back(constraint_index, 1.0 * scale_factor_[1] * scale_factor_[2]);
+    variables[n + i].emplace_back(constraint_index, -delta_s_ * scale_factor_[0] * scale_factor_[2]);
+    variables[2 * n + i].emplace_back(constraint_index,
+                                      -delta_s_sq_ / 3.0 * scale_factor_[0] * scale_factor_[1]);
+    variables[2 * n + i + 1].emplace_back(constraint_index,
+                                          -delta_s_sq_ / 6.0 * scale_factor_[0] * scale_factor_[1]);
+
+    lower_bounds->at(constraint_index) = 0.0;
+    upper_bounds->at(constraint_index) = 0.0;
+    ++constraint_index;
+  }
+
+  // constrain on x_init
+  variables[0].emplace_back(constraint_index, 1.0);
+  lower_bounds->at(constraint_index) = x_init_[0] * scale_factor_[0];
+  upper_bounds->at(constraint_index) = x_init_[0] * scale_factor_[0];
+  ++constraint_index;
+
+  variables[n].emplace_back(constraint_index, 1.0);
+  lower_bounds->at(constraint_index) = x_init_[1] * scale_factor_[1];
+  upper_bounds->at(constraint_index) = x_init_[1] * scale_factor_[1];
+  ++constraint_index;
+
+  variables[2 * n].emplace_back(constraint_index, 1.0);
+  lower_bounds->at(constraint_index) = x_init_[2] * scale_factor_[2];
+  upper_bounds->at(constraint_index) = x_init_[2] * scale_factor_[2];
+  ++constraint_index;
+
+  CHECK_EQ(constraint_index, num_of_constraints);
+
+  int ind_p = 0;
+  for (int i = 0; i < num_of_variables; ++i) {
+    A_indptr->push_back(ind_p);
+    for (const auto& variable_nz : variables[i]) {
+      // coefficient
+      A_data->push_back(variable_nz.second);
+
+      // constraint index
+      A_indices->push_back(variable_nz.first);
+      ++ind_p;
+    }
+  }
+  // TODO(all): need this?
+  A_indptr->push_back(ind_p);
+}
+
+OSQPSettings* PiecewiseJerkProblem::SolverDefaultSettings() {
+  // Define Solver default settings
+  OSQPSettings* settings =
+      reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
+  osqp_set_default_settings(settings);
+  settings->polish = true;
+  settings->verbose = true;
+  settings->scaled_termination = true;
+  return settings;
 }
 
 void PiecewiseJerkProblem::set_x_bounds(
@@ -149,175 +312,18 @@ void PiecewiseJerkProblem::set_end_state_ref(
   has_end_state_ref_ = true;
 }
 
-bool PiecewiseJerkProblem::Optimize(const int max_iter) {
-  AERROR << "In optimize function";
-  OSQPData* data = FormulateProblem();;
+void PiecewiseJerkProblem::FreeData(OSQPData* data) {
+  delete []data->q;
+  delete []data->l;
+  delete []data->u;
 
-  OSQPSettings* settings = SolverDefaultSettings();
-  settings->max_iter = max_iter;
+  delete []data->P->i;
+  delete []data->P->p;
+  delete []data->P->x;
 
-  OSQPWorkspace* work = osqp_setup(data, settings);
-
-  osqp_solve(work);
-
-  auto status = work->info->status_val;
-
-  if (status < 0 || (status != 1 && status != 2)) {
-    AERROR << "failed optimization status:\t" << work->info->status;
-    osqp_cleanup(work);
-    c_free(data->A);
-    c_free(data->P);
-    c_free(data);
-    c_free(settings);
-    return false;
-  } else if (work->solution == nullptr) {
-    AERROR << "The solution from OSQP is nullptr";
-    osqp_cleanup(work);
-    c_free(data->A);
-    c_free(data->P);
-    c_free(data);
-    c_free(settings);
-    return false;
-  }
-
-  // extract primal results
-  x_.resize(num_of_knots_);
-  dx_.resize(num_of_knots_);
-  ddx_.resize(num_of_knots_);
-  for (size_t i = 0; i < num_of_knots_; ++i) {
-    x_.at(i) = work->solution->x[i] / scale_factor_[0];
-    dx_.at(i) = work->solution->x[i + num_of_knots_] / scale_factor_[1];
-    ddx_.at(i) = work->solution->x[i + 2 * num_of_knots_] / scale_factor_[2];
-  }
-
-  // Cleanup
-  osqp_cleanup(work);
-  c_free(data->A);
-  c_free(data->P);
-  c_free(data);
-  c_free(settings);
-  return true;
-}
-
-void PiecewiseJerkProblem::CalculateAffineConstraint(
-    std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
-    std::vector<c_int>* A_indptr, std::vector<c_float>* lower_bounds,
-    std::vector<c_float>* upper_bounds) {
-  AERROR << "In CalculateAffineConstraint";
-  // 3N params bounds on x, x', x''
-  // 3(N-1) constraints on x, x', x''
-  // 3 constraints on x_init_
-  const int n = static_cast<int>(num_of_knots_);
-  const int num_of_variables = 3 * n;
-  const int num_of_constraints = num_of_variables + 3 * (n - 1) + 3;
-  lower_bounds->resize(num_of_constraints);
-  upper_bounds->resize(num_of_constraints);
-
-  std::vector<std::vector<std::pair<c_int, c_float>>> variables(num_of_variables);
-
-  int constraint_index = 0;
-  // set x, x', x'' bounds
-  for (int i = 0; i < num_of_variables; ++i) {
-    if (i < n) {
-      variables[i].emplace_back(constraint_index, 1.0 / scale_factor_[0]);
-      lower_bounds->at(constraint_index) = x_bounds_[i].first;
-      upper_bounds->at(constraint_index) = x_bounds_[i].second;
-    } else if (i < 2 * n) {
-      variables[i].emplace_back(constraint_index, 1.0 / scale_factor_[1]);
-      lower_bounds->at(constraint_index) = dx_bounds_[i - n].first;
-      upper_bounds->at(constraint_index) = dx_bounds_[i - n].second;
-    } else {
-      variables[i].emplace_back(constraint_index, 1.0 / scale_factor_[2]);
-      lower_bounds->at(constraint_index) = ddx_bounds_[i - 2 * n].first;
-      upper_bounds->at(constraint_index) = ddx_bounds_[i - 2 * n].second;
-    }
-    ++constraint_index;
-  }
-  CHECK_EQ(constraint_index, num_of_variables);
-
-  // x(i->i+1)''' = (x(i+1)'' - x(i)'') / delta_s
-  for (int i = 0; i + 1 < n; ++i) {
-    variables[2 * n + i].emplace_back(constraint_index, -1.0 / scale_factor_[2]);
-    variables[2 * n + i + 1].emplace_back(constraint_index,
-                                        1.0 / scale_factor_[2]);
-    lower_bounds->at(constraint_index) = dddx_bound_.first * delta_s_;
-    upper_bounds->at(constraint_index) = dddx_bound_.second * delta_s_;
-    ++constraint_index;
-  }
-
-  // x(i+1)' - x(i)' - 0.5 * delta_s * x(i)'' - 0.5 * delta_s * x(i+1)'' = 0
-  for (int i = 0; i + 1 < n; ++i) {
-    variables[n + i].emplace_back(constraint_index, -1.0 / scale_factor_[1]);
-    variables[n + i + 1].emplace_back(constraint_index, 1.0 / scale_factor_[1]);
-    variables[2 * n + i].emplace_back(constraint_index,
-                                    -0.5 * delta_s_ / scale_factor_[2]);
-    variables[2 * n + i + 1].emplace_back(constraint_index,
-                                        -0.5 * delta_s_ / scale_factor_[2]);
-    lower_bounds->at(constraint_index) = 0.0;
-    upper_bounds->at(constraint_index) = 0.0;
-    ++constraint_index;
-  }
-
-  // x(i+1) - x(i) - delta_s * x(i)'
-  // - 1/3 * delta_s^2 * x(i)'' - 1/6 * *delta_s^2 * x(i)''
-  auto delta_s_sq_ = delta_s_ * delta_s_;
-  for (int i = 0; i + 1 < n; ++i) {
-    variables[i].emplace_back(constraint_index, -1.0 / scale_factor_[0]);
-    variables[i + 1].emplace_back(constraint_index, 1.0 / scale_factor_[0]);
-    variables[n + i].emplace_back(constraint_index, -delta_s_ / scale_factor_[1]);
-    variables[2 * n + i].emplace_back(constraint_index,
-                                    -delta_s_sq_ / 3.0 / scale_factor_[2]);
-    variables[2 * n + i + 1].emplace_back(constraint_index,
-                                        -delta_s_sq_ / 6.0 / scale_factor_[2]);
-
-    lower_bounds->at(constraint_index) = 0.0;
-    upper_bounds->at(constraint_index) = 0.0;
-    ++constraint_index;
-  }
-
-  // constrain on x_init
-  variables[0].emplace_back(constraint_index, 1.0 / scale_factor_[0]);
-  lower_bounds->at(constraint_index) = x_init_[0];
-  upper_bounds->at(constraint_index) = x_init_[0];
-  ++constraint_index;
-
-  variables[n].emplace_back(constraint_index, 1.0 / scale_factor_[1]);
-  lower_bounds->at(constraint_index) = x_init_[1];
-  upper_bounds->at(constraint_index) = x_init_[1];
-  ++constraint_index;
-
-  variables[2 * n].emplace_back(constraint_index, 1.0 / scale_factor_[2]);
-  lower_bounds->at(constraint_index) = x_init_[2];
-  upper_bounds->at(constraint_index) = x_init_[2];
-  ++constraint_index;
-
-  CHECK_EQ(constraint_index, num_of_constraints);
-
-  int ind_p = 0;
-  for (int i = 0; i < num_of_variables; ++i) {
-    A_indptr->push_back(ind_p);
-    for (const auto& variable_nz : variables[i]) {
-      // coefficient
-      A_data->push_back(variable_nz.second);
-
-      // constraint index
-      A_indices->push_back(variable_nz.first);
-      ++ind_p;
-    }
-  }
-  // TODO(all): need this?
-  A_indptr->push_back(ind_p);
-}
-
-OSQPSettings* PiecewiseJerkProblem::SolverDefaultSettings() {
-  // Define Solver default settings
-  OSQPSettings* settings =
-      reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
-  osqp_set_default_settings(settings);
-  settings->polish = true;
-  settings->verbose = true;
-  settings->scaled_termination = true;
-  return settings;
+  delete []data->A->i;
+  delete []data->A->p;
+  delete []data->A->x;
 }
 
 }  // namespace planning
