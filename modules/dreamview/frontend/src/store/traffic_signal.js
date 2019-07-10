@@ -4,8 +4,8 @@ export default class TrafficSignal {
     @observable color = "";
 
     @action update(world) {
-        if (world.planningSignal !== undefined) {
-            this.color = world.planningSignal;
+        if (world.trafficSignal !== undefined) {
+            this.color = world.trafficSignal.currentSignal;
         }
     }
 }

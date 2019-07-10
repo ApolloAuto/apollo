@@ -414,7 +414,7 @@ class Renderer {
             this.shadowAdc.update(this.coordinates, shadowAdcPose);
         }
 
-        this.trafficControl.updateTrafficLightStatus(world.trafficSignal);
+        this.trafficControl.updateTrafficLightStatus(world.perceivedSignal);
     }
 
     updateRouting(routingTime, routePath) {
@@ -499,12 +499,12 @@ class Renderer {
         return names;
     }
 
-    addTrafficControl(elements) {
-        this.trafficControl.addTrafficControl(elements, this.coordinates, this.scene);
+    addTrafficControl(type, elements) {
+        this.trafficControl.addTrafficControl(type, elements, this.coordinates, this.scene);
     }
 
-    removeTrafficControl(elementIds) {
-        this.trafficControl.removeTrafficControl(elementIds, this.scene);
+    removeTrafficControl(type, elementIds) {
+        this.trafficControl.removeTrafficControl(type, elementIds, this.scene);
     }
 }
 

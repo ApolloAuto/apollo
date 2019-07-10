@@ -598,9 +598,9 @@ void SimulationWorldService::UpdateSimulationWorld(
 template <>
 void SimulationWorldService::UpdateSimulationWorld(
     const TrafficLightDetection &traffic_light_detection) {
-  world_.clear_traffic_signal();
+  world_.clear_perceived_signal();
   for (const auto &traffic_light : traffic_light_detection.traffic_light()) {
-    Object *signal = world_.add_traffic_signal();
+    Object *signal = world_.add_perceived_signal();
     signal->set_id(traffic_light.id());
     signal->set_current_signal(
       apollo::perception::TrafficLight_Color_Name(traffic_light.color()));
@@ -955,14 +955,13 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   }
 
   // Update planning signal
-  world_.clear_planning_signal();
-  if (data.has_signal_light()) {
-    const int size = data.signal_light().signal_size();
-    if (size > 0) {
-      world_.set_planning_signal(
-        apollo::perception::TrafficLight_Color_Name(
-          data.signal_light().signal(0).color()));
-    }
+  // TODO(zhangqian): check with planning to decide a reasonable signal
+  world_.clear_traffic_signal();
+  if (data.has_signal_light() &&
+      data.signal_light().signal_size() > 0) {
+    world_.mutable_traffic_signal()->set_current_signal(
+      apollo::perception::TrafficLight_Color_Name(
+        data.signal_light().signal(0).color()));
   }
 }
 
