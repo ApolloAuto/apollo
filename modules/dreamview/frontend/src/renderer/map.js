@@ -10,6 +10,7 @@ import {
 } from "utils/draw";
 import Text3D, { TEXT_ALIGN } from "renderer/text3d";
 import RENDERER from "renderer";
+import { TRAFFIC_LIGHT, STOP_SIGN } from "renderer/traffic_control";
 
 const colorMapping = {
     YELLOW: 0XDAA520,
@@ -354,9 +355,7 @@ export default class Map {
                             drewObjects: this.addStopLine(
                                 newData[kind][i].stopLine, coordinates, scene)
                         }));
-
-                        newData[kind][i].type = kind;
-                        RENDERER.addTrafficControl([newData[kind][i]]);
+                        RENDERER.addTrafficControl(kind, [newData[kind][i]]);
                         break;
                     case "road":
                         const road = newData[kind][i];
@@ -426,12 +425,14 @@ export default class Map {
                 this.hash = hash;
                 this.elementKindsDrawn = newElementKindsDrawn;
                 const diff = this.diffMapElements(elementIds, this.data);
-                this.removeExpiredElements(elementIds, scene);
-                RENDERER.removeTrafficControl(elementIds);
                 if (!_.isEmpty(diff) || !this.initialized) {
                     MAP_WS.requestMapData(diff);
                     this.initialized = true;
                 }
+
+                this.removeExpiredElements(elementIds, scene);
+                RENDERER.removeTrafficControl(TRAFFIC_LIGHT, elementIds[TRAFFIC_LIGHT]);
+                RENDERER.removeTrafficControl(STOP_SIGN, elementIds[STOP_SIGN]);
             }
         }
     }

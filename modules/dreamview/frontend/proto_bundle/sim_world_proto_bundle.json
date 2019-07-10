@@ -491,7 +491,6 @@
                   "id": 4
                 },
                 "trafficSignal": {
-                  "rule": "repeated",
                   "type": "Object",
                   "id": 5
                 },
@@ -593,8 +592,9 @@
                   "type": "Object",
                   "id": 26
                 },
-                "planningSignal": {
-                  "type": "string",
+                "perceivedSignal": {
+                  "rule": "repeated",
+                  "type": "Object",
                   "id": 27
                 }
               }

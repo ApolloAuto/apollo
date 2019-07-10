@@ -2,6 +2,7 @@ import * as THREE from "three";
 
 import { loadTexture } from "utils/models";
 import RENDERER from "renderer";
+import { TRAFFIC_LIGHT, STOP_SIGN } from "renderer/traffic_control";
 
 function diffTiles(newTiles, currentTiles) {
     const difference = new Set(newTiles);
@@ -22,7 +23,7 @@ export default class TileGround {
 
         this.hash = -1;
         this.currentTiles = {};
-        this.currentItems = [];
+        this.currentItems = {};
         this.initialized = false;
 
         this.range = PARAMETERS.ground.defaults.tileRange;
@@ -65,8 +66,8 @@ export default class TileGround {
         delete items[key];
     }
 
-    // append signal and stopSign within current range
-    appendItems(row, col, key, totalItemsInMap, type) {
+    // get signal and stopSign within current range
+    getItems(row, col, key, totalItemsInMap, type) {
         const newItems = [];
         totalItemsInMap.forEach((item) => {
             if (isNaN(item.x) || isNaN(item.y) || isNaN(item.heading)) {
@@ -78,7 +79,11 @@ export default class TileGround {
             }
             item.type = type;
             newItems.push(item);
-            this.currentItems.push(`${key}_${type}_${item.id}`);
+
+            if (!this.currentItems[type]) {
+                this.currentItems[type] = [];
+            }
+            this.currentItems[type].push(`${key}_${item.id}`);
         });
         return newItems;
     }
@@ -121,13 +126,16 @@ export default class TileGround {
             }
         }
 
-        const currentItemIds = { 'signal': [], 'stopSign': [] };
-        this.currentItems.filter(item => newTiles.has(item.split('_')[0]))
-            .forEach((item) => {
-                const [ , type, id ] = item.split('_');
-                currentItemIds[type].push(id);
+        Object.keys(this.currentItems).forEach((type) => {
+            const newItemIds = [];
+            this.currentItems[type].forEach((item) => {
+                const [key, id] = item.split('_');
+                if (newTiles.has(key)) {
+                    newItemIds.push(id);
+                }
             });
-        RENDERER.removeTrafficControl(currentItemIds);
+            RENDERER.removeTrafficControl(type, newItemIds);
+        });
     }
 
     updateIndex(hash, newTiles, coordinates, scene) {
@@ -148,18 +156,18 @@ export default class TileGround {
                     }
                     this.appendTiles(row, col, key, coordinates, scene);
 
-                    let newItems = [];
                     if (this.totalSignals) {
-                        newItems = newItems.concat(
-                            this.appendItems(row, col, key, this.totalSignals, 'signal')
+                        RENDERER.addTrafficControl(
+                            TRAFFIC_LIGHT,
+                            this.getItems(row, col, key, this.totalSignals, TRAFFIC_LIGHT)
                         );
                     }
                     if (this.totalStopSigns) {
-                        newItems = newItems.concat(
-                            this.appendItems(row, col, key, this.totalStopSigns, 'stopSign')
+                        RENDERER.addTrafficControl(
+                            STOP_SIGN,
+                            this.getItems(row, col, key, this.totalStopSigns, STOP_SIGN)
                         );
                     }
-                    RENDERER.addTrafficControl(newItems);
                 }
             }
         }
