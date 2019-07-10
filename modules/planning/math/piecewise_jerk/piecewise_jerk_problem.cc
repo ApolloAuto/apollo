@@ -200,7 +200,7 @@ void PiecewiseJerkProblem::CalculateAffineConstraint(
   }
 
   // x(i+1) - x(i) - delta_s * x(i)'
-  // - 1/3 * delta_s^2 * x(i)'' - 1/6 * *delta_s^2 * x(i)''
+  // - 1/3 * delta_s^2 * x(i)'' - 1/6 * delta_s^2 * x(i+1)''
   auto delta_s_sq_ = delta_s_ * delta_s_;
   for (int i = 0; i + 1 < n; ++i) {
     variables[i].emplace_back(constraint_index,
