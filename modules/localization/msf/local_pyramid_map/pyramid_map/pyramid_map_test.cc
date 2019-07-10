@@ -57,9 +57,9 @@ void CreateTestMapNode(unsigned int m, unsigned int n,
       static_cast<unsigned char>(m * config->map_node_size_x_ + n), 0));
   EXPECT_TRUE(node->Save());
 
-  if (node != NULL) {
+  if (node != nullptr) {
     delete node;
-    node = NULL;
+    node = nullptr;
   }
 }
 
@@ -175,9 +175,9 @@ TEST_F(PyramidMapTestSuite, pyramid_map_function) {
   // reset the caches and pool
   pyramid_map.InitMapNodeCaches(6, 16);
 
-  if (config != NULL) {
+  if (config != nullptr) {
     delete config;
-    config = NULL;
+    config = nullptr;
   }
 }
 

@@ -268,7 +268,7 @@ size_t BaseMapNode::GetHeaderBinarySize() const {
 }
 
 size_t BaseMapNode::LoadBodyBinary(std::vector<unsigned char>* buf) {
-  if (compression_strategy_ == NULL) {
+  if (compression_strategy_ == nullptr) {
     return map_matrix_handler_->LoadBinary(&(*buf)[0], map_matrix_);
   }
   std::vector<unsigned char> buf_uncompressed;
@@ -282,7 +282,7 @@ size_t BaseMapNode::LoadBodyBinary(std::vector<unsigned char>* buf) {
 }
 
 size_t BaseMapNode::CreateBodyBinary(std::vector<unsigned char>* buf) const {
-  if (compression_strategy_ == NULL) {
+  if (compression_strategy_ == nullptr) {
     size_t body_size = GetBodyBinarySize();
     buf->resize(body_size);
     file_body_binary_size_ =
