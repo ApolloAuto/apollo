@@ -24,7 +24,8 @@ PyramidMapNodeConfig::PyramidMapNodeConfig() {}
 PyramidMapNodeConfig::~PyramidMapNodeConfig() {}
 
 std::shared_ptr<BaseMapNodeConfig> PyramidMapNodeConfig::Clone() {
-  std::shared_ptr<PyramidMapNodeConfig> map_node_config(new PyramidMapNodeConfig());
+  std::shared_ptr<PyramidMapNodeConfig> map_node_config(
+      new PyramidMapNodeConfig());
   map_node_config->node_index_ = node_index_;
   map_node_config->map_version_ = map_version_;
   memcpy(map_node_config->body_md5_, body_md5_, sizeof(body_md5_));

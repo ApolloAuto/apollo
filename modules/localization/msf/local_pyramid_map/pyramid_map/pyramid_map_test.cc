@@ -52,9 +52,8 @@ void CreateTestMapNode(unsigned int m, unsigned int n,
   double data[] = {node->GetLeftTopCorner()[0] + 0.125,
                    node->GetLeftTopCorner()[1] + 0.125, 1.0};
   Eigen::Vector3d vec3d(data);
-  EXPECT_TRUE(
-      node->AddValueIfInBound(vec3d,
-      static_cast<unsigned char>(m * config->map_node_size_x_ + n), 0));
+  EXPECT_TRUE(node->AddValueIfInBound(
+      vec3d, static_cast<unsigned char>(m * config->map_node_size_x_ + n), 0));
   EXPECT_TRUE(node->Save());
 
   if (node != nullptr) {
@@ -106,9 +105,8 @@ TEST_F(PyramidMapTestSuite, pyramid_map_function) {
   Eigen::Vector3d loc(data);
   EXPECT_FLOAT_EQ(
       pm_node->GetIntensitySafe(loc),
-      static_cast<float>(indexes.begin()->m_ *
-        config->map_node_size_x_ +
-        indexes.begin()->n_));
+      static_cast<float>(indexes.begin()->m_ * config->map_node_size_x_ +
+                         indexes.begin()->n_));
   EXPECT_TRUE(pyramid_map.IsMapNodeExist(*indexes.begin()));
   EXPECT_FALSE(pyramid_map.IsMapNodeExist(*(indexes.begin() + 1)));
 
@@ -160,7 +158,7 @@ TEST_F(PyramidMapTestSuite, pyramid_map_function) {
 
   // test PyramidMap function: access specific coordinate
   EXPECT_FLOAT_EQ(pyramid_map.GetIntensitySafe(loc, 50, 0),
-      1.f * static_cast<float>(config->map_node_size_x_) + 1.f);
+                  1.f * static_cast<float>(config->map_node_size_x_) + 1.f);
   EXPECT_FLOAT_EQ(pyramid_map.GetIntensityVarSafe(loc, 50, 0), 0.f);
   EXPECT_FLOAT_EQ(pyramid_map.GetAltitudeSafe(loc, 50, 0), 1.f);
   EXPECT_FLOAT_EQ(pyramid_map.GetAltitudeVarSafe(loc, 50, 0), 0.f);

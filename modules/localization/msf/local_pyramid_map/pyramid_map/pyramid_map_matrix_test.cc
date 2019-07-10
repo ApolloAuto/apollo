@@ -37,7 +37,8 @@ class PyramidMapMatrixTestSuite : public ::testing::Test {
 
 TEST_F(PyramidMapMatrixTestSuite, constructor_and_init) {
   // map config
-  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
+  std::unique_ptr<PyramidMapConfig> config(
+      new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(1024, 1024);
   std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
@@ -69,12 +70,14 @@ TEST_F(PyramidMapMatrixTestSuite, constructor_and_init) {
   EXPECT_NE(pm_matrix2->GetRowsSafe(1), 1024);
 
   // check constructor
-  std::unique_ptr<PyramidMapMatrix> pm_matrix3(new PyramidMapMatrix(*pm_matrix2));
+  std::unique_ptr<PyramidMapMatrix> pm_matrix3(
+      new PyramidMapMatrix(*pm_matrix2));
 }
 
 TEST_F(PyramidMapMatrixTestSuite, get_and_set_intensity) {
   // map config
-  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
+  std::unique_ptr<PyramidMapConfig> config(
+      new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
   std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
@@ -126,7 +129,8 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_intensity) {
 
 TEST_F(PyramidMapMatrixTestSuite, get_and_set_intensity_var) {
   // map config
-  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
+  std::unique_ptr<PyramidMapConfig> config(
+      new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
   std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
@@ -171,7 +175,8 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_intensity_var) {
 
 TEST_F(PyramidMapMatrixTestSuite, get_and_set_altitude) {
   // map config
-  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
+  std::unique_ptr<PyramidMapConfig> config(
+      new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
   std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
@@ -236,7 +241,8 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_altitude) {
 
 TEST_F(PyramidMapMatrixTestSuite, get_and_set_altitude_var) {
   // map config
-  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
+  std::unique_ptr<PyramidMapConfig> config(
+      new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
   std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
@@ -281,7 +287,8 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_altitude_var) {
 
 TEST_F(PyramidMapMatrixTestSuite, get_and_set_ground_altitude) {
   // map config
-  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
+  std::unique_ptr<PyramidMapConfig> config(
+      new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
   std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
@@ -327,7 +334,8 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_ground_altitude) {
 
 TEST_F(PyramidMapMatrixTestSuite, get_and_set_count) {
   // map config
-  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
+  std::unique_ptr<PyramidMapConfig> config(
+      new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
   std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
@@ -371,7 +379,8 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_count) {
 
 TEST_F(PyramidMapMatrixTestSuite, get_and_set_ground_count) {
   // map config
-  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
+  std::unique_ptr<PyramidMapConfig> config(
+      new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
   std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
 
@@ -416,7 +425,8 @@ TEST_F(PyramidMapMatrixTestSuite, get_and_set_ground_count) {
 
 TEST_F(PyramidMapMatrixTestSuite, set_and_reset_and_roi) {
   // map config
-  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
+  std::unique_ptr<PyramidMapConfig> config(
+      new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(3, 3);
   std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
@@ -520,7 +530,8 @@ TEST_F(PyramidMapMatrixTestSuite, set_and_reset_and_roi) {
 
 TEST_F(PyramidMapMatrixTestSuite, merge_and_add_and_reduce) {
   // map config
-  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
+  std::unique_ptr<PyramidMapConfig> config(
+      new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(3, 3);
   std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
@@ -626,7 +637,8 @@ TEST_F(PyramidMapMatrixTestSuite, merge_and_add_and_reduce) {
 
 TEST_F(PyramidMapMatrixTestSuite, add_merge_get_base) {
   // map config
-  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
+  std::unique_ptr<PyramidMapConfig> config(
+      new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(3, 3);
   std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
   pm_matrix->Init(*config);
@@ -668,7 +680,8 @@ TEST_F(PyramidMapMatrixTestSuite, add_merge_get_base) {
 
 TEST_F(PyramidMapMatrixTestSuite, BottomUp) {
   // map config
-  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
+  std::unique_ptr<PyramidMapConfig> config(
+      new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(4, 4);
   config->resolution_num_ = 2;
   std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
@@ -719,7 +732,8 @@ TEST_F(PyramidMapMatrixTestSuite, BottomUp) {
 
 TEST_F(PyramidMapMatrixTestSuite, flags_are_false_and_resolution_are_two) {
   // map config
-  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
+  std::unique_ptr<PyramidMapConfig> config(
+      new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(4, 4);
   config->resolution_num_ = 2;
   config->has_intensity_ = false;
@@ -742,7 +756,8 @@ TEST_F(PyramidMapMatrixTestSuite, flags_are_false_and_resolution_are_two) {
 
 TEST_F(PyramidMapMatrixTestSuite, check_const_matrix) {
   // normal case
-  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
+  std::unique_ptr<PyramidMapConfig> config(
+      new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
   config->resolution_num_ = 1;
   std::unique_ptr<PyramidMapMatrix> pm_matrix(new PyramidMapMatrix());
