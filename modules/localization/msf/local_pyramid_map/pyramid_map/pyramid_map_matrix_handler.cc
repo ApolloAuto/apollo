@@ -40,7 +40,7 @@ PyramidMapMatrixHandlerSelector::AllocPyramidMapMatrixHandler(
     default:
       AINFO << "Unknown map version!";
   }
-  return NULL;
+  return nullptr;
 }
 
 // =================LossyMapMatrixHandler=================
@@ -330,7 +330,7 @@ size_t LossyMapFullAltMatrixHandler::CreateBinary(
     for (unsigned int r = 0; r < rows; ++r) {
       for (unsigned int c = 0; c < cols; ++c) {
         const unsigned int* count = matrix->GetCountSafe(r, c);
-        unsigned int ct = (count != NULL) ? *count : 0;
+        unsigned int ct = (count != nullptr) ? *count : 0;
         uc_p[r * cols + c] = EncodeCount(ct, count_range_);
       }
     }
@@ -342,7 +342,7 @@ size_t LossyMapFullAltMatrixHandler::CreateBinary(
       for (unsigned int c = 0; c < cols; ++c) {
         const float* intensity =
             static_cast<const float*>(matrix->GetIntensitySafe(r, c));
-        float ity = (intensity != NULL) ? *intensity : 0.0f;
+        float ity = (intensity != nullptr) ? *intensity : 0.0f;
         uc_p[r * cols + c] = EncodeIntensity(ity);
       }
     }
@@ -356,7 +356,7 @@ size_t LossyMapFullAltMatrixHandler::CreateBinary(
       for (unsigned int c = 0; c < cols; ++c) {
         const float* intensity_var =
             static_cast<const float*>(matrix->GetIntensityVarSafe(r, c));
-        float iv = (intensity_var != NULL) ? *intensity_var : 0.0f;
+        float iv = (intensity_var != nullptr) ? *intensity_var : 0.0f;
         uint16_t var = EncodeIntensityVar(iv);
         p_high[r * cols + c] = static_cast<uint8_t>(var / 256);
         p_low[r * cols + c] = static_cast<uint8_t>(var % 256);
@@ -371,7 +371,7 @@ size_t LossyMapFullAltMatrixHandler::CreateBinary(
     for (unsigned int r = 0; r < rows; ++r) {
       for (unsigned int c = 0; c < cols; ++c) {
         const float* altitude = matrix->GetAltitudeSafe(r, c);
-        float a = (altitude != NULL) ? *altitude : 0.0f;
+        float a = (altitude != nullptr) ? *altitude : 0.0f;
         uint16_t alt = EncodeAltitude(a, alt_avg_min_, alt_avg_interval_);
         p_high[r * cols + c] = static_cast<unsigned char>(alt / 256);
         p_low[r * cols + c] = static_cast<unsigned char>(alt % 256);
@@ -386,7 +386,7 @@ size_t LossyMapFullAltMatrixHandler::CreateBinary(
     for (unsigned int r = 0; r < rows; ++r) {
       for (unsigned int c = 0; c < cols; ++c) {
         const float* ground_altitude = matrix->GetGroundAltitudeSafe(r, c);
-        float ga = (ground_altitude != NULL) ? *ground_altitude : 0.0f;
+        float ga = (ground_altitude != nullptr) ? *ground_altitude : 0.0f;
         uint16_t alt =
             EncodeAltitude(ga, ground_alt_min_, ground_alt_interval_);
         p_high[r * cols + c] = static_cast<unsigned char>(alt / 256);
@@ -539,16 +539,16 @@ size_t LosslessMapMatrixHandler::CreateBinary(const BaseMapMatrix* base_matrix,
             const unsigned int* count = matrix->GetCountSafe(y, x);
 
             float* float_p = reinterpret_cast<float*>(uint_p);
-            *float_p = (intensity != NULL) ? *intensity : 0.0f;
+            *float_p = (intensity != nullptr) ? *intensity : 0.0f;
             ++float_p;
-            *float_p = (intensity_var != NULL) ? *intensity_var : 0.0f;
+            *float_p = (intensity_var != nullptr) ? *intensity_var : 0.0f;
             ++float_p;
-            *float_p = (altitude != NULL) ? *altitude : 0.0f;
+            *float_p = (altitude != nullptr) ? *altitude : 0.0f;
             ++float_p;
-            *float_p = (altitude_var != NULL) ? *altitude_var : 0.0f;
+            *float_p = (altitude_var != nullptr) ? *altitude_var : 0.0f;
             ++float_p;
             uint_p = reinterpret_cast<unsigned int*>(float_p);
-            *uint_p = (count != NULL) ? *count : 0;
+            *uint_p = (count != nullptr) ? *count : 0;
             ++uint_p;
           } else if (i == 1) {  // ground points layer
             const float* ground_altitude = matrix->GetGroundAltitudeSafe(y, x);
@@ -559,12 +559,12 @@ size_t LosslessMapMatrixHandler::CreateBinary(const BaseMapMatrix* base_matrix,
             ++float_p;
             *float_p = 0.0f;
             ++float_p;
-            *float_p = (ground_altitude != NULL) ? *ground_altitude : 0.0f;
+            *float_p = (ground_altitude != nullptr) ? *ground_altitude : 0.0f;
             ++float_p;
             *float_p = 0.0f;
             ++float_p;
             uint_p = reinterpret_cast<unsigned int*>(float_p);
-            *uint_p = (ground_count != NULL) ? *ground_count : 0;
+            *uint_p = (ground_count != nullptr) ? *ground_count : 0;
             ++uint_p;
           }
 
