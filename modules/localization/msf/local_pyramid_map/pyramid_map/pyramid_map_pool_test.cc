@@ -56,7 +56,7 @@ TEST_F(PyramidMapPoolTestSuite, pyramid_map_pool_fixed) {
   BaseMapNode* node1 = pool->AllocMapNode();
   BaseMapNode* node2 = pool->AllocMapNode();
   BaseMapNode* node3 = pool->AllocMapNode();
-  EXPECT_TRUE(node3 == nullptr);
+  EXPECT_EQ(node3, nullptr);
 
   // free node
   pool->FreeMapNode(node2);
@@ -82,7 +82,7 @@ TEST_F(PyramidMapPoolTestSuite, pyramid_map_pool_not_fixed) {
   BaseMapNode* node1 = pool->AllocMapNode();
   BaseMapNode* node2 = pool->AllocMapNode();
   BaseMapNode* node3 = pool->AllocMapNode();
-  EXPECT_TRUE(node3 != nullptr);
+  EXPECT_NE(node3, nullptr);
   EXPECT_EQ(pool->GetPoolSize(), 3);
 
   pool->FreeMapNode(node2);
