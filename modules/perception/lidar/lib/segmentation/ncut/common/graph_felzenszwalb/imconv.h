@@ -121,8 +121,8 @@ Image<uint32_t> *image_uchar2long(Image<uchar> *input) {
   }
   return output;
 }
-Image<uchar> *image_long2uchar(Image<uint32_t> *input,
-                               uint32_t min, uint32_t max) {
+Image<uchar> *image_long2uchar(Image<uint32_t> *input, uint32_t min,
+                               uint32_t max) {
   int width = input->width();
   int height = input->height();
   Image<uchar> *output = new Image<uchar>(width, height, false);
@@ -143,8 +143,8 @@ Image<uchar> *image_long2uchar(Image<uint32_t> *input) {
   min_max(input, &min, &max);
   return image_long2uchar(input, min, max);
 }
-Image<uchar> *image_short2uchar(Image<uint16_t> *input,
-                                uint16_t min, uint16_t max) {
+Image<uchar> *image_short2uchar(Image<uint16_t> *input, uint16_t min,
+                                uint16_t max) {
   int width = input->width();
   int height = input->height();
   Image<uchar> *output = new Image<uchar>(width, height, false);

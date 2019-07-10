@@ -84,9 +84,8 @@ class Cipv {
                                float *x, float *y);
   static float VehicleDynamics(const uint32_t tick, const float yaw_rate,
                                const float velocity, const float time_unit,
-                               const float vehicle_half_width,
-                               float *center_x, float *ceneter_y,
-                               float *left_x, float *left_y,
+                               const float vehicle_half_width, float *center_x,
+                               float *ceneter_y, float *left_x, float *left_y,
                                float *right_x, float *right_y);
   // Make a virtual lane line using a yaw_rate
   static bool MakeVirtualEgoLaneFromYawRate(const float yaw_rate,
@@ -148,16 +147,14 @@ class Cipv {
   bool IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
                                const EgoLane &egolane_ground,
                                const Eigen::Affine3d world2camera,
-                               const bool b_virtual,
-                               float *distance);
+                               const bool b_virtual, float *distance);
 
   // Check if the object is in the lane in ego-ground space
   bool IsObjectInTheLane(const std::shared_ptr<base::Object> &object,
                          const EgoLane &egolane_image,
                          const EgoLane &egolane_ground,
                          const Eigen::Affine3d world2camera,
-                         const bool b_virtual,
-                         float *distance);
+                         const bool b_virtual, float *distance);
 
   // Check if a point is left of a line segment
   bool IsPointLeftOfLine(const Point2Df &point,

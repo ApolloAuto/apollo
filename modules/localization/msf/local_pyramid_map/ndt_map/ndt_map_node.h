@@ -33,7 +33,7 @@ class NdtMapNode : public BaseMapNode {
 
   void Init(const BaseMapConfig* map_config);
   void Init(const BaseMapConfig* map_config, const MapNodeIndex& index,
-                    bool create_map_cells = true);
+            bool create_map_cells = true);
 
   /**@brief Get the resolution of this map nodex. */
   inline float GetMapResolutionZ() const {

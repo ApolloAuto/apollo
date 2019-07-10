@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
 #include "modules/localization/msf/local_map/pyramid_map/pyramid_map_config.h"
+#include <gtest/gtest.h>
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 
 int main(int argc, char** argv) {

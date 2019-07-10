@@ -43,7 +43,8 @@ class PyramidMapPoolTestSuite : public ::testing::Test {
 
 TEST_F(PyramidMapPoolTestSuite, pyramid_map_pool_fixed) {
   // init config
-  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
+  std::unique_ptr<PyramidMapConfig> config(
+      new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
   config->resolution_num_ = 1;
   config->map_folder_path_ = "test_map_pool";
@@ -69,7 +70,8 @@ TEST_F(PyramidMapPoolTestSuite, pyramid_map_pool_fixed) {
 
 TEST_F(PyramidMapPoolTestSuite, pyramid_map_pool_not_fixed) {
   // init config
-  std::unique_ptr<PyramidMapConfig> config(new PyramidMapConfig("lossy_full_alt"));
+  std::unique_ptr<PyramidMapConfig> config(
+      new PyramidMapConfig("lossy_full_alt"));
   config->SetMapNodeSize(2, 2);
   config->resolution_num_ = 1;
   config->map_folder_path_ = "test_map_pool";

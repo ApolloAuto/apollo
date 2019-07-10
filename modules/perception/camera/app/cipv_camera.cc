@@ -185,9 +185,8 @@ float Cipv::VehicleDynamics(const uint32_t tick, const float yaw_rate,
 // Provide vehicle dynamics considersing vehicle size
 float Cipv::VehicleDynamics(const uint32_t tick, const float yaw_rate,
                             const float velocity, const float time_unit,
-                            const float half_vehicle_width,
-                            float *center_x, float *center_y,
-                            float *left_x, float *left_y,
+                            const float half_vehicle_width, float *center_x,
+                            float *center_y, float *left_x, float *left_y,
                             float *right_x, float *right_y) {
   // Option 1. Straight model;
   // *x = time_unit * velocity * static_cast<float>(tick);
@@ -203,21 +202,18 @@ float Cipv::VehicleDynamics(const uint32_t tick, const float yaw_rate,
   if (theta < 0) {
     offset = -half_vehicle_width;
   }
-  *left_x = (displacement + offset) * static_cast<float>(cos(theta))
-          - offset;
-  *left_y = (displacement + offset) * static_cast<float>(sin(theta))
-          + half_vehicle_width;
-  *right_x = (displacement - offset) * static_cast<float>(cos(theta))
-          + offset;
-  *right_y = (displacement - offset) * static_cast<float>(sin(theta))
-          - half_vehicle_width;
+  *left_x = (displacement + offset) * static_cast<float>(cos(theta)) - offset;
+  *left_y = (displacement + offset) * static_cast<float>(sin(theta)) +
+            half_vehicle_width;
+  *right_x = (displacement - offset) * static_cast<float>(cos(theta)) + offset;
+  *right_y = (displacement - offset) * static_cast<float>(sin(theta)) -
+             half_vehicle_width;
 
   // Option 3. Bicycle model
   // TODO(techoe): Apply bicycle model for vehicle dynamics (need wheel base)
 
   return true;
 }
-
 
 // Make a virtual lane line using a yaw_rate
 bool Cipv::MakeVirtualEgoLaneFromYawRate(const float yaw_rate,
@@ -236,7 +232,7 @@ bool Cipv::MakeVirtualEgoLaneFromYawRate(const float yaw_rate,
 
   for (uint32_t i = 1; i < kMaxNumVirtualLanePoint; ++i) {
     VehicleDynamics(i, yaw_rate, velocity, kAverageFrameRate, offset_distance,
-        &center_x, &center_y, &left_x, &left_y, &right_x, &right_y);
+                    &center_x, &center_y, &left_x, &left_y, &right_x, &right_y);
     Point2Df left_point(left_x, left_y);
     left_lane_line->line_point.emplace_back(left_point);
     Point2Df right_point(right_x, right_y);
@@ -834,8 +830,7 @@ bool Cipv::IsObjectInTheLane(const std::shared_ptr<base::Object> &object,
                              const EgoLane &egolane_image,
                              const EgoLane &egolane_ground,
                              const Eigen::Affine3d world2camera,
-                             const bool b_virtual,
-                             float *distance) {
+                             const bool b_virtual, float *distance) {
   if (b_image_based_cipv_) {
     return IsObjectInTheLaneImage(object, egolane_image, distance);
   }

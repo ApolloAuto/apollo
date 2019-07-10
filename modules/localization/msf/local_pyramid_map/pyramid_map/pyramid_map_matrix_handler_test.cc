@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <memory>
-#include <gtest/gtest.h>
 #include "modules/localization/msf/local_map/pyramid_map/pyramid_map_matrix_handler.h"
+#include <gtest/gtest.h>
+#include <memory>
 #include "modules/localization/msf/local_map/base_map/base_map_matrix_handler.h"
 #include "modules/localization/msf/local_map/pyramid_map/pyramid_map_matrix.h"
 
