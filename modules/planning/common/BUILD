@@ -97,14 +97,14 @@ cc_test(
     data = [
         "//modules/planning/common:common_testdata",
     ],
+    linkopts = [
+        "-lboost_system",
+    ],
     deps = [
         ":obstacle",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
         "@gtest//:main",
-    ],
-    linkopts = [
-        "-lboost_system",
     ],
 )
 
