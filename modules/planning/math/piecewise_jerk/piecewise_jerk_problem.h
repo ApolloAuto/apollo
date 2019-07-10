@@ -84,6 +84,10 @@ class PiecewiseJerkProblem {
 
   void set_weight_dddx(const double weight_dddx) { weight_dddx_ = weight_dddx; }
 
+  void set_scale_factor(const std::array<double, 3>& scale_factor) {
+    scale_factor_ = scale_factor;
+  }
+
   void set_x_ref(const double weight_x_ref, std::vector<double> x_ref);
 
   void set_end_state_ref(const std::array<double, 3>& weight_end_state,
@@ -113,15 +117,16 @@ class PiecewiseJerkProblem {
 
   virtual OSQPSettings* SolverDefaultSettings();
 
-  bool OptimizeWithOsqp(
-      const size_t kernel_dim, const size_t num_affine_constraint,
-      std::vector<c_float>& P_data, std::vector<c_int>& P_indices,    // NOLINT
-      std::vector<c_int>& P_indptr, std::vector<c_float>& A_data,     // NOLINT
-      std::vector<c_int>& A_indices, std::vector<c_int>& A_indptr,    // NOLINT
-      std::vector<c_float>& lower_bounds,                             // NOLINT
-      std::vector<c_float>& upper_bounds,                             // NOLINT
-      std::vector<c_float>& q, OSQPData* data, OSQPWorkspace** work,  // NOLINT
-      OSQPSettings* settings);
+  OSQPData* FormulateProblem();
+
+  void FreeData(OSQPData* data);
+
+  template <typename T>
+  T* CopyData(const std::vector<T>& vec) {
+    T* data = new T[vec.size()];
+    memcpy(data, vec.data(), sizeof(T) * vec.size());
+    return data;
+  }
 
  protected:
   size_t num_of_knots_ = 0;
@@ -132,6 +137,7 @@ class PiecewiseJerkProblem {
   std::vector<double> ddx_;
 
   std::array<double, 3> x_init_;
+  std::array<double, 3> scale_factor_ = {{1.0, 1.0, 1.0}};
 
   std::vector<std::pair<double, double>> x_bounds_;
   std::vector<std::pair<double, double>> dx_bounds_;
