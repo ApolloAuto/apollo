@@ -7,8 +7,6 @@ import trafficLightObject from "assets/models/traffic_light.obj";
 import stopSignMaterial from "assets/models/stop_sign.mtl";
 import stopSignObject from "assets/models/stop_sign.obj";
 
-export const TRAFFIC_LIGHT = 'signal';
-export const STOP_SIGN = 'stopSign';
 const TRAFFIC_LIGHT_SCALE = 0.009;
 const STOP_SIGN_SCALE = 0.01;
 
@@ -167,36 +165,30 @@ export default class TrafficControl {
         }
     }
 
+    static getMapObjectParams(item, coordinates, getPosAndHeading) {
+        const params = {};
+        if (OFFLINE_PLAYBACK) {
+            params.heading = item.heading;
+            params.position = coordinates.applyOffset({
+                x: item.x,
+                y: item.y,
+                z: 0,
+            });
+            params.id = item.id;
+        } else {
+            const posAndHeading = getPosAndHeading(item, coordinates);
+            params.heading = posAndHeading.heading;
+            params.position = posAndHeading.pos;
+            params.id = item.id.id;
+        }
+        return params;
+    }
+
     constructor() {
         this.hash = -1;
-        this.mesh = {
-            [TRAFFIC_LIGHT]: {},
-            [STOP_SIGN]: {},
-        };
+        this.trafficLight = {};
+        this.stopSign = {};
         this.shiningSubsignals = [];
-
-        this.CONFIG = {
-            [TRAFFIC_LIGHT]: {
-                material: trafficLightMaterial,
-                object: trafficLightObject,
-                scales: {
-                    x: TRAFFIC_LIGHT_SCALE,
-                    y: TRAFFIC_LIGHT_SCALE,
-                    z: TRAFFIC_LIGHT_SCALE
-                },
-                posAndHeading: TrafficControl.getSignalPositionAndHeading,
-            },
-            [STOP_SIGN]: {
-                material: stopSignMaterial,
-                object: stopSignObject,
-                scales: {
-                    x: STOP_SIGN_SCALE,
-                    y: STOP_SIGN_SCALE,
-                    z: STOP_SIGN_SCALE
-                },
-                posAndHeading: TrafficControl.getStopSignPositionAndHeading,
-            },
-        };
 
         // Prepare materials for red/yellow/green light
         loadMaterial(trafficLightMaterial, materials => {
@@ -226,52 +218,74 @@ export default class TrafficControl {
         });
     }
 
-    addTrafficControl(type, items, coordinates, scene) {
+    addTrafficLight(items, coordinates, scene) {
         if (!items || items.length === 0) {
             return;
         }
 
         items.forEach((item) => {
             const config = {
-                material: this.CONFIG[type].material,
-                object: this.CONFIG[type].object,
-                scales: this.CONFIG[type].scales,
+                material: trafficLightMaterial,
+                object: trafficLightObject,
+                scales: {
+                    x: TRAFFIC_LIGHT_SCALE,
+                    y: TRAFFIC_LIGHT_SCALE,
+                    z: TRAFFIC_LIGHT_SCALE
+                },
             };
 
-            if (OFFLINE_PLAYBACK) {
-                config.heading = item.heading;
-                config.position = coordinates.applyOffset({
-                    x: item.x,
-                    y: item.y,
-                    z: 0,
-                });
-                config.id = item.id;
-            } else {
-                const posAndHeading = this.CONFIG[type].posAndHeading(item, coordinates);
-                config.heading = posAndHeading.heading;
-                config.position = posAndHeading.pos;
-                config.id = item.id.id;
-            }
+            Object.assign(config, TrafficControl.getMapObjectParams(
+                item, coordinates, TrafficControl.getSignalPositionAndHeading));
 
             TrafficControl.loadMapObject(config, (err, mesh) => {
-                    if (err) {
-                        return;
-                    }
+                if (err) {
+                    return;
+                }
 
-                    this.mesh[type][config.id] = mesh;
-                    scene.add(mesh);
-                });
+                this.trafficLight[config.id] = mesh;
+                scene.add(mesh);
+            });
         });
     }
 
-    removeTrafficControl(type, currentItemIds, scene) {
-        if (!type || !this.mesh[type] || !currentItemIds) {
+    addStopSign(items, coordinates, scene) {
+        if (!items || items.length === 0) {
+            return;
+        }
+
+        items.forEach((item) => {
+            const config = {
+                material: stopSignMaterial,
+                object: stopSignObject,
+                scales: {
+                    x: STOP_SIGN_SCALE,
+                    y: STOP_SIGN_SCALE,
+                    z: STOP_SIGN_SCALE
+                },
+            };
+
+            Object.assign(config, TrafficControl.getMapObjectParams(
+                item, coordinates, TrafficControl.getStopSignPositionAndHeading));
+
+            TrafficControl.loadMapObject(config, (err, mesh) => {
+                if (err) {
+                    return;
+                }
+
+                this.stopSign[config.id] = mesh;
+                scene.add(mesh);
+            });
+        });
+    }
+
+    removeTrafficLight(currentItemIds, scene) {
+        if (!this.trafficLight || !currentItemIds) {
             return;
         }
 
         const currentItems = {};
-        for (const id in this.mesh[type]) {
-            const mesh = this.mesh[type][id];
+        for (const id in this.trafficLight) {
+            const mesh = this.trafficLight[id];
             if (!currentItemIds.includes(id)) {
                 TrafficControl.removeMapObject(mesh, scene);
             } else {
@@ -279,7 +293,25 @@ export default class TrafficControl {
             }
         }
 
-        this.mesh[type] = currentItems;
+        this.trafficLight = currentItems;
+    }
+
+    removeStopSign(currentItemIds, scene) {
+        if (!this.stopSign || !currentItemIds) {
+            return;
+        }
+
+        const currentItems = {};
+        for (const id in this.stopSign) {
+            const mesh = this.stopSign[id];
+            if (!currentItemIds.includes(id)) {
+                TrafficControl.removeMapObject(mesh, scene);
+            } else {
+                currentItems[id] = mesh;
+            }
+        }
+
+        this.stopSign = currentItems;
     }
 
     clearTrafficLightStatus() {
@@ -301,14 +333,14 @@ export default class TrafficControl {
 
         this.clearTrafficLightStatus();
 
-        if (trafficSignal && this.mesh[TRAFFIC_LIGHT]) {
+        if (trafficSignal && this.trafficLight) {
             const signalId2Color = {};
             trafficSignal.forEach(signal => signalId2Color[signal.id] = signal.currentSignal);
 
-            Object.keys(this.mesh[TRAFFIC_LIGHT])
+            Object.keys(this.trafficLight)
                 .filter(id => id in signalId2Color)
                 .forEach((id) => {
-                    const mesh = this.mesh[TRAFFIC_LIGHT][id];
+                    const mesh = this.trafficLight[id];
                     if (mesh) {
                         const subsignal = signalId2Color[id];
                         const index = SUBSIGNAL_TO_INDEX[subsignal];
@@ -316,10 +348,11 @@ export default class TrafficControl {
                             const lightMaterial = _.get(
                                 this.SUBSIGNAL_MATERIALS, `${subsignal}.LIGHT`);
 
-                            mesh.children[index].material = lightMaterial;
-                            mesh.children[index].subsignal = subsignal;
+                            const subsignalMesh = mesh.children[index];
+                            subsignalMesh.material = lightMaterial;
+                            subsignalMesh.subsignal = subsignal;
 
-                            this.shiningSubsignals.push(mesh.children[index]);
+                            this.shiningSubsignals.push(subsignalMesh);
                         }
                     }
             });

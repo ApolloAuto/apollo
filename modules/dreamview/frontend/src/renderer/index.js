@@ -16,7 +16,6 @@ import Routing from "renderer/routing.js";
 import RoutingEditor from "renderer/routing_editor.js";
 import Gnss from "renderer/gnss.js";
 import PointCloud from "renderer/point_cloud.js";
-import TrafficControl from "renderer/traffic_control.js";
 
 const _ = require('lodash');
 
@@ -93,8 +92,6 @@ class Renderer {
 
         // Geolocation of the mouse
         this.geolocation = { x: 0, y: 0 };
-
-        this.trafficControl = new TrafficControl();
     }
 
     initialize(canvasId, width, height, options) {
@@ -393,6 +390,7 @@ class Renderer {
         this.prediction.update(world, this.coordinates, this.scene);
         this.updateRouting(world.routingTime, world.routePath);
         this.gnss.update(world, this.coordinates, this.scene);
+        this.map.update(world);
 
         const planningAdcPose = _.get(world, 'planningData.initPoint.pathPoint');
         if (this.planningAdc && planningAdcPose) {
@@ -413,8 +411,6 @@ class Renderer {
             };
             this.shadowAdc.update(this.coordinates, shadowAdcPose);
         }
-
-        this.trafficControl.updateTrafficLightStatus(world.perceivedSignal);
     }
 
     updateRouting(routingTime, routePath) {
@@ -497,14 +493,6 @@ class Renderer {
         const intersects = raycaster.intersectObjects(objects);
         const names = intersects.map(intersect => intersect.object.name);
         return names;
-    }
-
-    addTrafficControl(type, elements) {
-        this.trafficControl.addTrafficControl(type, elements, this.coordinates, this.scene);
-    }
-
-    removeTrafficControl(type, elementIds) {
-        this.trafficControl.removeTrafficControl(type, elementIds, this.scene);
     }
 }
 
