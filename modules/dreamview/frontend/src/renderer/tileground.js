@@ -1,12 +1,7 @@
 import * as THREE from "three";
 
-import WS from "store/websocket";
-import { loadTexture, loadObject } from "utils/models";
-import trafficLightMaterial from "assets/models/traffic_light.mtl";
-import trafficLightObject from "assets/models/traffic_light.obj";
-import stopSignMaterial from "assets/models/stop_sign.mtl";
-import stopSignObject from "assets/models/stop_sign.obj";
-import { trafficLightScales, stopSignScales } from "renderer/map";
+import { loadTexture } from "utils/models";
+import TrafficControl from "renderer/traffic_control";
 
 function diffTiles(newTiles, currentTiles) {
     const difference = new Set(newTiles);
@@ -27,14 +22,16 @@ export default class TileGround {
 
         this.hash = -1;
         this.currentTiles = {};
-        this.currentSignal = {};
-        this.currentStopSign = {};
+        this.currentTrafficLight = [];
+        this.currentStopSign = [];
         this.initialized = false;
 
         this.range = PARAMETERS.ground.defaults.tileRange;
         this.metadata = null;
         this.mapId = null;
         this.mapUrlPrefix = null;
+
+        this.trafficControl = new TrafficControl();
     }
 
     initialize(serverUrl, metadata) {
@@ -71,9 +68,9 @@ export default class TileGround {
         delete items[key];
     }
 
-    // append signal and stopSign within current range
-    appendItems(row, col, key, coordinates, scene, totalItemsInMap, currentItems,
-        material, object, scales) {
+    // get signal and stopSign within current range
+    getItems(row, col, totalItemsInMap) {
+        const newItems = [];
         totalItemsInMap.forEach((item) => {
             if (isNaN(item.x) || isNaN(item.y) || isNaN(item.heading)) {
                 return;
@@ -82,28 +79,9 @@ export default class TileGround {
             if (i !== row || j !== col) {
                 return;
             }
-            const itemPos = coordinates.applyOffset({
-                x: item.x,
-                y: item.y,
-                z: 0,
-            });
-            loadObject(material, object, scales,
-                mesh => {
-                    mesh.rotation.x = Math.PI / 2;
-                    mesh.rotation.y = item.heading;
-                    mesh.position.set(itemPos.x, itemPos.y, itemPos.z);
-                    if (item.id) {
-                        // store signal id as name in mesh
-                        mesh.name = item.id;
-                    }
-                    mesh.matrixAutoUpdate = false;
-                    mesh.updateMatrix();
-
-                    // a tile may have multiple signal or stopSign
-                    currentItems[`${key}_${item.x}_${item.y}`] = mesh;
-                    scene.add(mesh);
-                });
+            newItems.push(item);
         });
+        return newItems;
     }
 
     appendTiles(row, col, key, coordinates, scene) {
@@ -143,14 +121,24 @@ export default class TileGround {
                 this.removeDrewObject(key, this.currentTiles, scene);
             }
         }
-        Object.keys(this.currentSignal).filter(signal => !newTiles.has(signal.split('_')[0]))
-            .forEach((signal) => {
-                this.removeDrewObject(signal, this.currentSignal, scene);
-            });
-        Object.keys(this.currentStopSign).filter(stopSign => !newTiles.has(stopSign.split('_')[0]))
-            .forEach((stopSign) => {
-                this.removeDrewObject(stopSign, this.currentStopSign, scene);
-            });
+
+        const currentTrafficLightIds = [];
+        this.currentTrafficLight.forEach((item) => {
+            const { key, id } = item;
+            if (newTiles.has(key)) {
+                currentTrafficLightIds.push(id);
+            }
+        });
+        this.trafficControl.removeTrafficLight(currentTrafficLightIds, scene);
+
+        const currentStopSignIds = [];
+        this.currentStopSign.forEach((item) => {
+            const { key, id } = item;
+            if (newTiles.has(key)) {
+                currentStopSignIds.push(id);
+            }
+        });
+        this.trafficControl.removeStopSign(currentStopSignIds, scene);
     }
 
     updateIndex(hash, newTiles, coordinates, scene) {
@@ -170,14 +158,23 @@ export default class TileGround {
                         continue;
                     }
                     this.appendTiles(row, col, key, coordinates, scene);
+
                     if (this.totalSignals) {
-                        this.appendItems(row, col, key, coordinates, scene, this.totalSignals,
-                            this.currentSignal, trafficLightMaterial, trafficLightObject,
-                            trafficLightScales);
+                        const newItems = this.getItems(row, col, this.totalSignals);
+                        this.trafficControl.addTrafficLight(newItems, coordinates, scene);
+                        this.currentTrafficLight = [
+                            ...this.currentTrafficLight,
+                            ...newItems.map(item => ({ key, id: item.id }))
+                        ];
                     }
+
                     if (this.totalStopSigns) {
-                        this.appendItems(row, col, key, coordinates, scene, this.totalStopSigns,
-                            this.currentStopSign, stopSignMaterial, stopSignObject, stopSignScales);
+                        const newItems = this.getItems(row, col, this.totalStopSigns);
+                        this.trafficControl.addStopSign(newItems, coordinates, scene);
+                        this.currentStopSign = [
+                            ...this.currentStopSign,
+                            ...newItems.map(item => ({ key, id: item.id }))
+                        ];
                     }
                 }
             }
@@ -210,5 +207,6 @@ export default class TileGround {
         }
 
         this.updateIndex(newHash, newTiles, coordinates, scene);
+        this.trafficControl.updateTrafficLightStatus(world.perceivedSignal);
     }
 }

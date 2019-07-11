@@ -197,7 +197,7 @@ message Notification {
   optional apollo.common.monitor.MonitorMessageItem item = 2;
 }
 
-// Next-id: 27
+// Next-id: 28
 message SimulationWorld {
   // Timestamp in milliseconds
   optional double timestamp = 1;
@@ -211,7 +211,7 @@ message SimulationWorld {
   // Autonomous driving cars
   optional Object auto_driving_car = 4;
 
-  // Traffic light status
+  // Planning signal
   optional Object traffic_signal = 5;
 
   // Routing paths
@@ -267,4 +267,7 @@ message SimulationWorld {
 
   // Shadow localization
   optional Object shadow_localization = 26;
+
+  // Perception detected signals
+  repeated Object perceived_signal = 27;
 }

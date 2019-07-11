@@ -591,6 +591,11 @@
                 "shadowLocalization": {
                   "type": "Object",
                   "id": 26
+                },
+                "perceivedSignal": {
+                  "rule": "repeated",
+                  "type": "Object",
+                  "id": 27
                 }
               }
             },

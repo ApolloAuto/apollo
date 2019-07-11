@@ -71,7 +71,7 @@ BaseMapNode* BaseMapNodePool::AllocMapNode() {
   boost::unique_lock<boost::mutex> lock(mutex_);
   if (free_list_.empty()) {
     if (is_fixed_size_) {
-      return NULL;
+      return nullptr;
     }
     BaseMapNode* node = AllocNewMapNode();
     InitNewMapNode(node);

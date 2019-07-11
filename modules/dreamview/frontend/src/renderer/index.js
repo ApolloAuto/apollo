@@ -390,6 +390,7 @@ class Renderer {
         this.prediction.update(world, this.coordinates, this.scene);
         this.updateRouting(world.routingTime, world.routePath);
         this.gnss.update(world, this.coordinates, this.scene);
+        this.map.update(world);
 
         const planningAdcPose = _.get(world, 'planningData.initPoint.pathPoint');
         if (this.planningAdc && planningAdcPose) {

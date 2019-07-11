@@ -205,7 +205,7 @@ float PyramidMapNode::GetIntensitySafe(const Eigen::Vector3d& coordinate,
         std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const float* intensity_ptr = map_matrix->GetIntensitySafe(y, x, level);
 
-    if (intensity_ptr != NULL) {
+    if (intensity_ptr != nullptr) {
       intensity = *intensity_ptr;
     }
   }
@@ -227,7 +227,7 @@ float PyramidMapNode::GetIntensityVarSafe(const Eigen::Vector3d& coordinate,
     const float* intensity_var_ptr =
         map_matrix->GetIntensityVarSafe(y, x, level);
 
-    if (intensity_var_ptr != NULL) {
+    if (intensity_var_ptr != nullptr) {
       intensity_var = *intensity_var_ptr;
     }
   }
@@ -248,7 +248,7 @@ float PyramidMapNode::GetAltitudeSafe(const Eigen::Vector3d& coordinate,
         std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const float* altitude_ptr = map_matrix->GetAltitudeSafe(y, x, level);
 
-    if (altitude_ptr != NULL) {
+    if (altitude_ptr != nullptr) {
       altitude = *altitude_ptr;
     }
   }
@@ -269,7 +269,7 @@ float PyramidMapNode::GetAltitudeVarSafe(const Eigen::Vector3d& coordinate,
         std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const float* altitude_var_ptr = map_matrix->GetAltitudeVarSafe(y, x, level);
 
-    if (altitude_var_ptr != NULL) {
+    if (altitude_var_ptr != nullptr) {
       altitude_var = *altitude_var_ptr;
     }
   }
@@ -291,7 +291,7 @@ float PyramidMapNode::GetGroundAltitudeSafe(const Eigen::Vector3d& coordinate,
     const float* ground_altitude_ptr =
         map_matrix->GetGroundAltitudeSafe(y, x, level);
 
-    if (ground_altitude_ptr != NULL) {
+    if (ground_altitude_ptr != nullptr) {
       ground_altitude = *ground_altitude_ptr;
     }
   }
@@ -312,7 +312,7 @@ unsigned int PyramidMapNode::GetCountSafe(const Eigen::Vector3d& coordinate,
         std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const unsigned int* count_ptr = map_matrix->GetCountSafe(y, x, level);
 
-    if (count_ptr != NULL) {
+    if (count_ptr != nullptr) {
       count = *count_ptr;
     }
   }
@@ -334,7 +334,7 @@ unsigned int PyramidMapNode::GetGroundCountSafe(
     const unsigned int* ground_count_ptr =
         map_matrix->GetGroundCountSafe(y, x, level);
 
-    if (ground_count_ptr != NULL) {
+    if (ground_count_ptr != nullptr) {
       ground_count = *ground_count_ptr;
     }
   }
@@ -355,7 +355,7 @@ float PyramidMapNode::GetIntensity(const Eigen::Vector3d& coordinate,
         std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const float* intensity_ptr = map_matrix->GetIntensity(y, x, level);
 
-    if (intensity_ptr != NULL) {
+    if (intensity_ptr != nullptr) {
       intensity = *intensity_ptr;
     }
   }
@@ -376,7 +376,7 @@ float PyramidMapNode::GetIntensityVar(const Eigen::Vector3d& coordinate,
         std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const float* intensity_var_ptr = map_matrix->GetIntensityVar(y, x, level);
 
-    if (intensity_var_ptr != NULL) {
+    if (intensity_var_ptr != nullptr) {
       intensity_var = *intensity_var_ptr;
     }
   }
@@ -397,7 +397,7 @@ float PyramidMapNode::GetAltitude(const Eigen::Vector3d& coordinate,
         std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const float* altitude_ptr = map_matrix->GetAltitude(y, x, level);
 
-    if (altitude_ptr != NULL) {
+    if (altitude_ptr != nullptr) {
       altitude = *altitude_ptr;
     }
   }
@@ -418,7 +418,7 @@ float PyramidMapNode::GetAltitudeVar(const Eigen::Vector3d& coordinate,
         std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const float* altitude_var_ptr = map_matrix->GetAltitudeVar(y, x, level);
 
-    if (altitude_var_ptr != NULL) {
+    if (altitude_var_ptr != nullptr) {
       altitude_var = *altitude_var_ptr;
     }
   }
@@ -440,7 +440,7 @@ float PyramidMapNode::GetGroundAltitude(const Eigen::Vector3d& coordinate,
     const float* ground_altitude_ptr =
         map_matrix->GetGroundAltitude(y, x, level);
 
-    if (ground_altitude_ptr != NULL) {
+    if (ground_altitude_ptr != nullptr) {
       ground_altitude = *ground_altitude_ptr;
     }
   }
@@ -461,7 +461,7 @@ unsigned int PyramidMapNode::GetCount(const Eigen::Vector3d& coordinate,
         std::dynamic_pointer_cast<PyramidMapMatrix>(map_matrix_);
     const unsigned int* count_ptr = map_matrix->GetCount(y, x, level);
 
-    if (count_ptr != NULL) {
+    if (count_ptr != nullptr) {
       count = *count_ptr;
     }
   }
@@ -483,7 +483,7 @@ unsigned int PyramidMapNode::GetGroundCount(const Eigen::Vector3d& coordinate,
     const unsigned int* ground_count_ptr =
         map_matrix->GetGroundCount(y, x, level);
 
-    if (ground_count_ptr != NULL) {
+    if (ground_count_ptr != nullptr) {
       ground_count = *ground_count_ptr;
     }
   }

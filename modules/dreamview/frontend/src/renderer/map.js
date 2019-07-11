@@ -9,14 +9,8 @@ import {
     drawShapeFromPoints
 } from "utils/draw";
 import Text3D, { TEXT_ALIGN } from "renderer/text3d";
-
-import stopSignMaterial from "assets/models/stop_sign.mtl";
-import stopSignObject from "assets/models/stop_sign.obj";
-
-import trafficLightMaterial from "assets/models/traffic_light.mtl";
-import trafficLightObject from "assets/models/traffic_light.obj";
-
-import { loadObject } from "utils/models";
+import RENDERER from "renderer";
+import TrafficControl from "renderer/traffic_control";
 
 const colorMapping = {
     YELLOW: 0XDAA520,
@@ -29,21 +23,6 @@ const colorMapping = {
     DEFAULT: 0xC0C0C0
 };
 
-const TRAFFIC_LIGHT_SCALE = 0.006;
-export const trafficLightScales = {
-    x: TRAFFIC_LIGHT_SCALE,
-    y: TRAFFIC_LIGHT_SCALE,
-    z: TRAFFIC_LIGHT_SCALE
-};
-
-const STOP_SIGN_SCALE = 0.01;
-export const stopSignScales = {
-    x: STOP_SIGN_SCALE,
-    y: STOP_SIGN_SCALE,
-    z: STOP_SIGN_SCALE
-};
-
-const EPSILON = 1e-9;
 const Z_OFFSET_FACTOR = 1;
 
 export default class Map {
@@ -53,6 +32,8 @@ export default class Map {
         this.data = {};
         this.initialized = false;
         this.elementKindsDrawn = '';
+
+        this.trafficControl = new TrafficControl();
     }
 
     // The result will be the all the elements in current but not in data.
@@ -273,154 +254,9 @@ export default class Map {
         return drewObjects;
     }
 
-    getHeadingFromStopLine(object) {
-        const stopLine = object.stopLine[0].segment[0].lineSegment.point;
-        const len = stopLine.length;
-        if (len >= 2) {
-            const stopLineDirection = Math.atan2(stopLine[len - 1].y - stopLine[0].y,
-                stopLine[len - 1].x - stopLine[0].x);
-            return Math.PI * 1.5 + stopLineDirection;
-        }
-        return NaN;
-    }
-
-    // use the signal real direction to decide its heading
-    // but the signal could either face towards or away from the stop line
-    // so use the intersection of signal's orthiogonal line and stop line to decide
-    getHeadingFromStopLineAndTrafficLightBoundary(signal) {
-        // find the plane of the signal
-        const boundaryPoints = signal.boundary.point;
-        if (boundaryPoints.length < 3) {
-            console.warn("Cannot get three points from boundary, signal_id: " + signal.id.id);
-            return this.getHeadingFromStopLine(signal);
-        }
-        const boundary1 = boundaryPoints[0];
-        const boundary2 = boundaryPoints[1];
-        const boundary3 = boundaryPoints[2];
-        // get an orthogonal line of the plane (only need its projection on XY coordinate system)
-        // construct ax+by+c=0 ==> orthogonalX*x+orthogonalY*y+constant=0
-        const orthogonalX = (boundary2.x - boundary1.x) * (boundary3.z - boundary1.z)
-            - (boundary3.x - boundary1.x) * (boundary2.z - boundary1.z);
-        const orthogonalY = (boundary2.y - boundary1.y) * (boundary3.z - boundary1.z)
-            - (boundary3.y - boundary1.y) * (boundary2.z - boundary1.z);
-        const orthogonalConstant = -orthogonalX * boundary1.x - orthogonalY * boundary1.y;
-        // get the stop line
-        const stopLine = _.get(signal, 'stopLine[0].segment[0].lineSegment.point', '');
-        const len = stopLine.length;
-        if (len < 2) {
-            console.warn("Cannot get any stop line, signal_id: " + signal.id.id);
-            return NaN;
-        }
-        // construct ax+by+c=0 ==> stopLineX*x+stopLineY*y+constant=0
-        const stopLineX = stopLine[len - 1].y - stopLine[0].y;
-        const stopLineY = stopLine[0].x - stopLine[len - 1].x;
-        const stopLineConstant = -stopLineX * stopLine[0].x - stopLineY * stopLine[0].y;
-        // calculate the intersection
-        if (Math.abs(stopLineX * orthogonalY - orthogonalX * stopLineY) < EPSILON) {
-            console.warn("The signal orthogonal direction is parallel to the stop line,",
-                "signal_id: " + signal.id.id);
-            return this.getHeadingFromStopLine(signal);
-        }
-        const intersectX = (stopLineY * orthogonalConstant - orthogonalY * stopLineConstant)
-            / (stopLineX * orthogonalY - orthogonalX * stopLineY);
-        const intersectY = stopLineY !== 0 ?
-            (-stopLineX * intersectX - stopLineConstant) / stopLineY
-            : (-orthogonalX * intersectX - orthogonalConstant) / orthogonalY;
-        let direction = Math.atan2(- orthogonalX, orthogonalY);
-        // if the direction is not towards to intersection point, turn around
-        if ((direction < 0 && intersectY > boundary1.y) ||
-            (direction > 0 && intersectY < boundary1.y)) {
-            direction += Math.PI;
-        }
-        return direction;
-    }
-
-    getSignalPositionAndHeading(signal, coordinates) {
-        const locations = [];
-        signal.subsignal.forEach(subsignal => {
-            if (subsignal.location) {
-                locations.push(subsignal.location);
-            }
-        });
-        if (locations.length === 0) {
-            console.warn("Subsignal locations not found, use signal boundary instead.");
-            locations.push(signal.boundary.point);
-        }
-        if (locations.length === 0) {
-            console.warn("Unable to determine signal location, skip.");
-            return null;
-        }
-        const heading = this.getHeadingFromStopLineAndTrafficLightBoundary(signal);
-        if (!isNaN(heading)) {
-            let position = new THREE.Vector3(0, 0, 0);
-            position.x = _.meanBy(_.values(locations), l => l.x);
-            position.y = _.meanBy(_.values(locations), l => l.y);
-            position = coordinates.applyOffset(position);
-            return { "pos": position, "heading": heading };
-        } else {
-            console.error('Error loading traffic light. Unable to determine heading.');
-            return null;
-        }
-    }
-
-    addTrafficLight(signal, coordinates, scene) {
-        // Draw stop line
+    addStopLine(stopLine, coordinates, scene) {
         const drewObjects = this.addCurve(
-            signal.stopLine, colorMapping.PURE_WHITE, coordinates, scene);
-
-        // Add traffic light object
-        const posAndHeading = this.getSignalPositionAndHeading(signal, coordinates);
-        if (posAndHeading) {
-            loadObject(trafficLightMaterial, trafficLightObject,
-                trafficLightScales,
-                mesh => {
-                    mesh.rotation.x = Math.PI / 2;
-                    mesh.rotation.y = posAndHeading.heading;
-                    mesh.position.set(posAndHeading.pos.x, posAndHeading.pos.y, 0);
-                    mesh.matrixAutoUpdate = false;
-                    mesh.updateMatrix();
-
-                    scene.add(mesh);
-                    drewObjects.push(mesh);
-                });
-        }
-        return drewObjects;
-    }
-
-    getStopSignPositionAndHeading(stopSign, coordinates) {
-        const heading = this.getHeadingFromStopLine(stopSign);
-
-        if (!isNaN(heading)) {
-            const stopLinePoint = _.last(stopSign.stopLine[0].segment[0].lineSegment.point);
-            let position = new THREE.Vector3(stopLinePoint.x, stopLinePoint.y, 0);
-            position = coordinates.applyOffset(position);
-
-            return { "pos": position, "heading": heading };
-        } else {
-            console.error('Error loading stop sign. Unable to determine heading.');
-            return null;
-        }
-    }
-
-    addStopSign(stopSign, coordinates, scene) {
-        // Draw stop line
-        const drewObjects = this.addCurve(
-            stopSign.stopLine, colorMapping.PURE_WHITE, coordinates, scene);
-
-        // Add stop sign object
-        const posAndHeading = this.getStopSignPositionAndHeading(stopSign, coordinates);
-        if (posAndHeading) {
-            loadObject(stopSignMaterial, stopSignObject, stopSignScales,
-                mesh => {
-                    mesh.rotation.x = Math.PI / 2;
-                    mesh.rotation.y = posAndHeading.heading - Math.PI / 2;
-                    mesh.position.set(posAndHeading.pos.x, posAndHeading.pos.y, 0);
-                    mesh.matrixAutoUpdate = false;
-                    mesh.updateMatrix();
-                    scene.add(mesh);
-                    drewObjects.push(mesh);
-                });
-        }
+            stopLine, colorMapping.PURE_WHITE, coordinates, scene);
         return drewObjects;
     }
 
@@ -517,15 +353,17 @@ export default class Map {
                         break;
                     case "signal":
                         this.data[kind].push(Object.assign(newData[kind][i], {
-                            drewObjects: this.addTrafficLight(
-                                newData[kind][i], coordinates, scene)
+                            drewObjects: this.addStopLine(
+                                newData[kind][i].stopLine, coordinates, scene)
                         }));
+                        this.trafficControl.addTrafficLight([newData[kind][i]], coordinates, scene);
                         break;
                     case "stopSign":
                         this.data[kind].push(Object.assign(newData[kind][i], {
-                            drewObjects: this.addStopSign(
-                                newData[kind][i], coordinates, scene)
+                            drewObjects: this.addStopLine(
+                                newData[kind][i].stopLine, coordinates, scene)
                         }));
+                        this.trafficControl.addStopSign([newData[kind][i]], coordinates, scene);
                         break;
                     case "road":
                         const road = newData[kind][i];
@@ -595,13 +433,26 @@ export default class Map {
                 this.hash = hash;
                 this.elementKindsDrawn = newElementKindsDrawn;
                 const diff = this.diffMapElements(elementIds, this.data);
-                this.removeExpiredElements(elementIds, scene);
                 if (!_.isEmpty(diff) || !this.initialized) {
                     MAP_WS.requestMapData(diff);
                     this.initialized = true;
                 }
+
+                this.removeExpiredElements(elementIds, scene);
+
+                if (elementIds['signal']) {
+                    this.trafficControl.removeTrafficLight(elementIds['signal'], scene);
+                }
+
+                if (elementIds['stopSign']) {
+                    this.trafficControl.removeStopSign(elementIds['stopSign'], scene);
+                }
             }
         }
+    }
+
+    update(world) {
+        this.trafficControl.updateTrafficLightStatus(world.perceivedSignal);
     }
 }
 

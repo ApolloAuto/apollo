@@ -19,34 +19,63 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 
-#include "cyber/io/session.h"
 #include "cyber/scheduler/scheduler_factory.h"
+#include "cyber/common/log.h"
 #include "modules/bridge/common/bridge_proto_serialized_buf.h"
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common/time/time.h"
 
-bool send(const std::string &remote_ip, uint16_t remote_port) {
-  for (int i = 0; i < 100; i++) {
+using apollo::common::time::Clock;
+
+bool send(const std::string &remote_ip, uint16_t remote_port, uint32_t count) {
+  if (count == 0) {
+    count = 10000;
+  }
+  float total = static_cast<float>(count);
+  float hundred = 100.00;
+  for (uint32_t i = 0; i < count; i++) {
+    double timestamp_ = Clock::NowInSeconds() - 2.0;
+    float coefficient = static_cast<float>(i);
     auto pb_msg = std::make_shared<apollo::canbus::Chassis>();
+    pb_msg->mutable_header()->set_sequence_num(i);
+    pb_msg->mutable_header()->set_timestamp_sec(timestamp_);
     pb_msg->set_engine_started(true);
-    pb_msg->set_engine_rpm(static_cast<float>(i * 2.0));
+    pb_msg->set_engine_rpm(static_cast<float>(coefficient * 2.0));
+    pb_msg->set_odometer_m(coefficient);
+    pb_msg->set_fuel_range_m(100);
+    pb_msg->set_throttle_percentage(coefficient * hundred / total);
+    pb_msg->set_brake_percentage(coefficient * hundred / total);
+    pb_msg->set_steering_percentage(coefficient * hundred / total);
+    pb_msg->set_steering_torque_nm(coefficient);
+    pb_msg->set_parking_brake(i % 2 ? true: false);
+    pb_msg->set_high_beam_signal(false);
+    pb_msg->set_low_beam_signal(true);
+    pb_msg->set_left_turn_signal(false);
+    pb_msg->set_right_turn_signal(false);
+    pb_msg->set_horn(false);
+    pb_msg->set_wiper(false);
+    pb_msg->set_disengage_status(false);
+    pb_msg->set_driving_mode(apollo::canbus::Chassis::COMPLETE_MANUAL);
+    pb_msg->set_error_code(apollo::canbus::Chassis::NO_ERROR);
+    pb_msg->set_gear_location(apollo::canbus::Chassis::GEAR_NEUTRAL);
+
     struct sockaddr_in server_addr;
     server_addr.sin_addr.s_addr = inet_addr(remote_ip.c_str());
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(remote_port);
 
-    std::cout << "connecting to server... " << std::endl;
+    ADEBUG << "connecting to server... ";
 
     int sock_fd = socket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, 0);
 
     int res =
         connect(sock_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
     if (res < 0) {
-      std::cout << "connected server failed " << std::endl;
+      ADEBUG << "connected server failed ";
       continue;
     }
 
-    std::cout << "connected to server success. port [" << remote_port << "]"
-              << std::endl;
+    ADEBUG << "connected to server success. port [" << remote_port << "]";
 
     apollo::bridge::BridgeProtoSerializedBuf<apollo::canbus::Chassis> proto_buf;
     proto_buf.Serialize(pb_msg, "Chassis");
@@ -54,10 +83,10 @@ bool send(const std::string &remote_ip, uint16_t remote_port) {
       ssize_t nbytes = send(sock_fd, proto_buf.GetSerializedBuf(j),
                             proto_buf.GetSerializedBufSize(j), 0);
       if (nbytes != static_cast<ssize_t>(proto_buf.GetSerializedBufSize(j))) {
-        std::cout << "sent msg failed " << std::endl;
+        ADEBUG << "sent msg failed ";
         break;
       }
-      std::cout << "sent " << nbytes << "bytes to server" << std::endl;
+      ADEBUG << "sent " << nbytes << "bytes to server";
     }
     close(sock_fd);
   }
@@ -65,6 +94,12 @@ bool send(const std::string &remote_ip, uint16_t remote_port) {
 }
 
 int main(int argc, char *argv[]) {
-  send("127.0.0.1", 8900);
+  uint32_t count = 0;
+  if (argc < 2) {
+    count = 10000;
+  } else {
+    count = atoi(argv[1]);
+  }
+  send("127.0.0.1", 8900, count);
   return 0;
 }

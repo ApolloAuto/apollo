@@ -30,9 +30,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 */
 /* simple filters */
 #pragma once
+#include <algorithm>
 #include <cmath>
 #include <vector>
-#include <algorithm>
 #include "modules/perception/lidar/segmentation/ncut/common/graph_felzenszwalb/convolve.h"
 #include "modules/perception/lidar/segmentation/ncut/common/graph_felzenszwalb/image.h"
 #include "modules/perception/lidar/segmentation/ncut/common/graph_felzenszwalb/imconv.h"
@@ -56,15 +56,15 @@ void normalize(std::vector<float> *mask_input) {
   }
 }
 /* make filters */
-#define MAKE_FILTER(name, fun)                  \
-  std::vector<float> make_##name(float sigma) { \
-    sigma = std::max(sigma, 0.01F);             \
-    int len = static_cast<int>(ceil(sigma * WIDTH)) + 1;     \
-    std::vector<float> mask(len);               \
-    for (int i = 0; i < len; i++) {             \
-      mask[i] = fun;                            \
-    }                                           \
-    return mask;                                \
+#define MAKE_FILTER(name, fun)                           \
+  std::vector<float> make_##name(float sigma) {          \
+    sigma = std::max(sigma, 0.01F);                      \
+    int len = static_cast<int>(ceil(sigma * WIDTH)) + 1; \
+    std::vector<float> mask(len);                        \
+    for (int i = 0; i < len; i++) {                      \
+      mask[i] = fun;                                     \
+    }                                                    \
+    return mask;                                         \
   }
 MAKE_FILTER(fgauss, exp(-0.5 * square(i / sigma)));
 /* convolve image with gaussian filter */

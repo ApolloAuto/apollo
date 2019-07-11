@@ -430,8 +430,7 @@ inline void PyramidMapMatrix::MergeCellBase(const float* intensity,
   unsigned int new_count = count_matrixes_[level][row][col] + *count;
   float p0 = static_cast<float>(count_matrixes_[level][row][col]) /
              static_cast<float>(new_count);
-  float p1 = static_cast<float>(*count) /
-             static_cast<float>(new_count);
+  float p1 = static_cast<float>(*count) / static_cast<float>(new_count);
 
   float intensity_diff = 0.0f;
   intensity_diff = intensity_matrixes_[level][row][col] - *intensity;

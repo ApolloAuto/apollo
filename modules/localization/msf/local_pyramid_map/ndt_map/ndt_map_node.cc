@@ -40,7 +40,8 @@ void NdtMapNode::Init(const BaseMapConfig* map_config) {
   num_valid_single_cells_ = 0;
 
   map_matrix_.reset(new NdtMapMatrix());
-  map_matrix_handler_.reset(NdtMapMatrixHandlerSelector::AllocNdtMapMatrixHandler());
+  map_matrix_handler_.reset(
+      NdtMapMatrixHandlerSelector::AllocNdtMapMatrixHandler());
   compression_strategy_.reset(new ZlibStrategy());
   InitMapMatrix(map_config_);
 }
@@ -62,7 +63,8 @@ void NdtMapNode::Init(const BaseMapConfig* map_config,
   num_valid_single_cells_ = 0;
 
   map_matrix_.reset(new NdtMapMatrix());
-  map_matrix_handler_.reset(NdtMapMatrixHandlerSelector::AllocNdtMapMatrixHandler());
+  map_matrix_handler_.reset(
+      NdtMapMatrixHandlerSelector::AllocNdtMapMatrixHandler());
   compression_strategy_.reset(new ZlibStrategy());
   if (create_map_cells) {
     InitMapMatrix(map_config_);

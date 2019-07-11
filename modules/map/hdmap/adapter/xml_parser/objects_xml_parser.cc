@@ -259,9 +259,9 @@ Status ObjectsXmlParser::ParsePassageGroup(const tinyxml2::XMLElement& xml_node,
   while (sub_node) {
     std::string object_id;
     std::string object_type;
-    PbPassageGroup *passage_group = pnc_junction->add_passage_group();
+    PbPassageGroup* passage_group = pnc_junction->add_passage_group();
     int checker =
-      UtilXmlParser::QueryStringAttribute(*sub_node, "id", &object_id);
+        UtilXmlParser::QueryStringAttribute(*sub_node, "id", &object_id);
     if (checker != tinyxml2::XML_SUCCESS) {
       std::string err_msg = "Error parse object type.";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -270,7 +270,7 @@ Status ObjectsXmlParser::ParsePassageGroup(const tinyxml2::XMLElement& xml_node,
 
     RETURN_IF_ERROR(ParsePassage(*sub_node, passage_group));
 
-    sub_node  = sub_node->NextSiblingElement("passageGroup");
+    sub_node = sub_node->NextSiblingElement("passageGroup");
   }
 
   return Status::OK();
@@ -284,7 +284,7 @@ Status ObjectsXmlParser::ParsePassage(const tinyxml2::XMLElement& xml_node,
   while (sub_node) {
     std::string object_type;
     int checker =
-      UtilXmlParser::QueryStringAttribute(*sub_node, "type", &object_type);
+        UtilXmlParser::QueryStringAttribute(*sub_node, "type", &object_type);
     if (checker != tinyxml2::XML_SUCCESS) {
       std::string err_msg = "Error parse object type.";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -298,35 +298,34 @@ Status ObjectsXmlParser::ParsePassage(const tinyxml2::XMLElement& xml_node,
     std::vector<std::string> passage_node_ids;
     RETURN_IF_ERROR(ParsePassageIds(*sub_node, "laneID", &passage_node_ids));
     for (auto id : passage_node_ids) {
-        passage->add_lane_id()->set_id(id);
+      passage->add_lane_id()->set_id(id);
     }
 
     RETURN_IF_ERROR(ParsePassageIds(*sub_node, "signalID", &passage_node_ids));
     for (auto id : passage_node_ids) {
-        passage->add_signal_id()->set_id(id);
+      passage->add_signal_id()->set_id(id);
     }
 
     RETURN_IF_ERROR(ParsePassageIds(*sub_node, "yieldlID", &passage_node_ids));
     for (auto id : passage_node_ids) {
-        passage->add_yield_id()->set_id(id);
+      passage->add_yield_id()->set_id(id);
     }
 
-    RETURN_IF_ERROR(ParsePassageIds(*sub_node, "stopSignID",
-                                  &passage_node_ids));
+    RETURN_IF_ERROR(
+        ParsePassageIds(*sub_node, "stopSignID", &passage_node_ids));
     for (auto id : passage_node_ids) {
-        passage->add_stop_sign_id()->set_id(id);
+      passage->add_stop_sign_id()->set_id(id);
     }
 
-    sub_node  = sub_node->NextSiblingElement("passage");
+    sub_node = sub_node->NextSiblingElement("passage");
   }
 
   return Status::OK();
 }
 
 Status ObjectsXmlParser::ParsePassageIds(
-    const tinyxml2::XMLElement& xml_node,
-    const std::string& child_node_name,
-    std::vector<std::string> *passage_node_ids) {
+    const tinyxml2::XMLElement& xml_node, const std::string& child_node_name,
+    std::vector<std::string>* passage_node_ids) {
   CHECK_NOTNULL(passage_node_ids);
 
   passage_node_ids->clear();
@@ -334,7 +333,7 @@ Status ObjectsXmlParser::ParsePassageIds(
   while (sub_node) {
     std::string object_id;
     int checker =
-      UtilXmlParser::QueryStringAttribute(*sub_node, "id", &object_id);
+        UtilXmlParser::QueryStringAttribute(*sub_node, "id", &object_id);
     if (checker != tinyxml2::XML_SUCCESS) {
       std::string err_msg = "Error parse passage lane id.";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);

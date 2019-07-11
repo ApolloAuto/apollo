@@ -160,8 +160,7 @@ class BaseMapNode {
    * @param <buf, buf_size> The buffer and its size.
    * @param <return> The required or the used size of is returned.
    */
-  virtual size_t CreateHeaderBinary(unsigned char* buf,
-                                          size_t buf_size) const;
+  virtual size_t CreateHeaderBinary(unsigned char* buf, size_t buf_size) const;
   /**@brief Get the size of the header in bytes. */
   virtual size_t GetHeaderBinarySize() const;
 
