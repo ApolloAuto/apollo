@@ -154,6 +154,8 @@ message ScenarioValetParkingConfig {
 
 message ScenarioNarrowStreetUTurnConfig {}
 
+message ScenarioHailingConfig {}
+
 // scenario configs
 message ScenarioConfig {
   enum ScenarioType {
@@ -175,6 +177,7 @@ message ScenarioConfig {
 
     // misc
     NARROW_STREET_U_TURN = 12;
+    HAILING = 13;
   }
 
   // StageType is a superset of stages from all scenarios.
@@ -238,11 +241,12 @@ message ScenarioConfig {
     ScenarioPullOverConfig pull_over_config = 9;
     ScenarioValetParkingConfig valet_parking_config = 10;
     ScenarioNarrowStreetUTurnConfig narrow_street_u_turn_config = 11;
+    ScenarioHailingConfig hailing_config = 12;
   }
   // a list of stages that are used at runtime.  The first one is default stage.
-  repeated StageType stage_type = 12;
+  repeated StageType stage_type = 13;
   // an unordered list of stage configs.
-  repeated StageConfig stage_config = 13;
+  repeated StageConfig stage_config = 14;
 }
 
 message PlannerPublicRoadConfig {
