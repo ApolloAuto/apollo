@@ -9,6 +9,16 @@ import stopSignObject from "assets/models/stop_sign.obj";
 
 const TRAFFIC_LIGHT_SCALE = 0.009;
 const STOP_SIGN_SCALE = 0.01;
+const trafficLightScales = {
+    x: TRAFFIC_LIGHT_SCALE,
+    y: TRAFFIC_LIGHT_SCALE,
+    z: TRAFFIC_LIGHT_SCALE,
+};
+const stopSignScales = {
+    x: STOP_SIGN_SCALE,
+    y: STOP_SIGN_SCALE,
+    z: STOP_SIGN_SCALE,
+};
 
 const SUBSIGNAL_TO_INDEX = {
     GREEN: 4,
@@ -129,7 +139,7 @@ export default class TrafficControl {
         }
     }
 
-    static loadMapObject({ material, object, scales, position, heading }, callback) {
+    static loadMapObject(material, object, scales, position, heading, callback) {
         if (!heading || !position) {
             return callback('Invalid parameters.');
         }
@@ -224,25 +234,16 @@ export default class TrafficControl {
         }
 
         items.forEach((item) => {
-            const config = {
-                material: trafficLightMaterial,
-                object: trafficLightObject,
-                scales: {
-                    x: TRAFFIC_LIGHT_SCALE,
-                    y: TRAFFIC_LIGHT_SCALE,
-                    z: TRAFFIC_LIGHT_SCALE
-                },
-            };
+            const { position, heading, id } = TrafficControl.getMapObjectParams(
+                item, coordinates, TrafficControl.getSignalPositionAndHeading);
 
-            Object.assign(config, TrafficControl.getMapObjectParams(
-                item, coordinates, TrafficControl.getSignalPositionAndHeading));
-
-            TrafficControl.loadMapObject(config, (err, mesh) => {
+            TrafficControl.loadMapObject(trafficLightMaterial, trafficLightObject,
+                trafficLightScales, position, heading, (err, mesh) => {
                 if (err) {
                     return;
                 }
 
-                this.trafficLight[config.id] = mesh;
+                this.trafficLight[id] = mesh;
                 scene.add(mesh);
             });
         });
@@ -254,25 +255,16 @@ export default class TrafficControl {
         }
 
         items.forEach((item) => {
-            const config = {
-                material: stopSignMaterial,
-                object: stopSignObject,
-                scales: {
-                    x: STOP_SIGN_SCALE,
-                    y: STOP_SIGN_SCALE,
-                    z: STOP_SIGN_SCALE
-                },
-            };
+            const { position, heading, id } = TrafficControl.getMapObjectParams(
+                item, coordinates, TrafficControl.getStopSignPositionAndHeading);
 
-            Object.assign(config, TrafficControl.getMapObjectParams(
-                item, coordinates, TrafficControl.getStopSignPositionAndHeading));
-
-            TrafficControl.loadMapObject(config, (err, mesh) => {
+            TrafficControl.loadMapObject(stopSignMaterial, stopSignObject,
+                stopSignScales, position, heading, (err, mesh) => {
                 if (err) {
                     return;
                 }
 
-                this.stopSign[config.id] = mesh;
+                this.stopSign[id] = mesh;
                 scene.add(mesh);
             });
         });
