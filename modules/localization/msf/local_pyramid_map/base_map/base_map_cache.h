@@ -71,10 +71,10 @@ class LRUCache {
   /**@brief return cache's in use. */
   unsigned int Size() { return list_.size(); }
   /**@brief return cache's max capacity. */
-  unsigned  Capacity() { return capacity_; }
+  unsigned Capacity() { return capacity_; }
 
  protected:
-  /**@brief do something before remove a element from cache.
+  /**@brief do something before remove an element from cache.
    * Return true if the element can be removed. Return false if the element
    * can't be removed. Then the cache will try to find another element to
    * remove. */
@@ -83,7 +83,7 @@ class LRUCache {
  private:
   /**@brief The max capacity of LRUCache. */
   unsigned int capacity_;
-  /**@brief Increse the search speed in queue. */
+  /**@brief Increase the search speed in queue. */
   std::map<Key, ListIterator> map_;
   /**@brief The least recently used queue. */
   std::list<std::pair<Key, Element*>> list_;
@@ -113,12 +113,12 @@ bool LRUCache<Key, Element>::GetSilent(const Key& key, Element** value) {
 
 template <class Key, class Element>
 Element* LRUCache<Key, Element>::Put(const Key& key, Element* value) {
-  if (value == NULL) {
+  if (value == nullptr) {
     AINFO << "LRUCache Warning: put a NULL";
-    return NULL;
+    return nullptr;
   }
 
-  Element* node_remove = NULL;
+  Element* node_remove = nullptr;
   MapIterator found_iter = map_.find(key);
   if (found_iter != map_.end()) {
     // key exists in the list
@@ -128,7 +128,7 @@ Element* LRUCache<Key, Element>::Put(const Key& key, Element* value) {
 
     node_remove = found_iter->second->second;
     if (node_remove == value) {
-      return NULL;
+      return nullptr;
     }
 
     if (Destroy(node_remove)) {
@@ -157,11 +157,10 @@ Element* LRUCache<Key, Element>::Put(const Key& key, Element* value) {
 
 template <class Key, class Element>
 Element* LRUCache<Key, Element>::Remove(const Key& key) {
-  Element* node_remove = NULL;
+  Element* node_remove = nullptr;
   MapIterator found_iter = map_.find(key);
 
-  if (found_iter != map_.end() &&
-      Destroy(found_iter->second->second)) {
+  if (found_iter != map_.end() && Destroy(found_iter->second->second)) {
     // try to destruct element
     node_remove = found_iter->second->second;
     list_.erase(found_iter->second);
@@ -173,7 +172,7 @@ Element* LRUCache<Key, Element>::Remove(const Key& key) {
 
 template <class Key, class Element>
 Element* LRUCache<Key, Element>::ClearOne() {
-  Element* node_remove = NULL;
+  Element* node_remove = nullptr;
   ListReverseIterator ritr = list_.rbegin();
   while (ritr != list_.rend()) {
     if (Destroy(ritr->second)) {
@@ -211,7 +210,7 @@ class MapNodeCacheL1 : public LRUCache<Key, MapNode> {
   explicit MapNodeCacheL1(int capacity) : LRUCache<Key, MapNode>(capacity) {}
 
  protected:
-  /**@brief do something before remove a element from cache.
+  /**@brief do something before remove an element from cache.
    * Return true if the element can be removed. Return false if the element
    * can't be removed. Then the cache will try to find another element to
    * remove. */
@@ -231,7 +230,7 @@ class MapNodeCacheL2 : public LRUCache<Key, MapNode> {
   explicit MapNodeCacheL2(int capacity) : LRUCache<Key, MapNode>(capacity) {}
 
  protected:
-  /**@brief do something before remove a element from cache.
+  /**@brief do something before remove an element from cache.
    * Return true if the element can be removed. Return false if the element
    * can't be removed. Then the cache will try to find another element to
    * remove. */

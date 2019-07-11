@@ -35,7 +35,6 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         ":hdmap",
-        "//cyber",
         "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/common/util:string_util",

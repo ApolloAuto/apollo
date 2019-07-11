@@ -29,11 +29,9 @@ For business and partnership, please visit [our website](http://apollo.auto).
 4. [Installation](#installation)
 5. [Documents](#documents)
 
-
-
 ## Getting Started
 
-Apollo 3.5 is loaded with new modules and features, but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding on Apollo's core technology and platform. 
+Apollo 5.0 is loaded with new modules and features, but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding on Apollo's core technology and platform. 
 
 **[Attention]** The Apollo team has decided to retire Git LFS which might impact your development. For details please refer to:
 [migration guide](docs/howto/how_to_migrate_to_the_updated_apollo_master_from_old_versions.md).
@@ -46,7 +44,7 @@ Apollo 3.5 is loaded with new modules and features, but needs to be calibrated a
 
 * Vehicle equipped with by-wire system, including but not limited to brake by-wire, steering by-wire, throttle by-wire and shift by-wire (Apollo is currently tested on Lincoln MKZ)
 
-* A machine with a 4-core processor and 8GB memory minimum (16GB for Apollo 3.5)
+* A machine with a 4-core processor and 8GB memory minimum (16GB for Apollo 3.5 and above)
 
 * Ubuntu 14.04
 
@@ -63,7 +61,7 @@ Apollo 3.5 is loaded with new modules and features, but needs to be calibrated a
 
 The following diagram highlights the scope and features of each Apollo release:
 
-![](docs/demo_guide/images/Apollo_Timeline.png)
+![](docs/demo_guide/images/Apollo_Roadmap.png)
 
 [**Apollo 1.0:**](docs/quickstart/apollo_1_0_hardware_system_installation_guide.md) 
 
@@ -205,6 +203,30 @@ Apollo 3.5 is capable of navigating through complex driving scenarios such as re
 * Runtime Framework
     * Cyber RT
 
+[**Apollo 5.0:**](docs/quickstart/apollo_3_5_quick_start.md)
+
+Apollo 5.0 is an effort to support volume production for Geo-Fenced Autonomous Driving.
+The car now has 360-degree visibility, along with upgraded perception deep learning model to handle the changing conditions of complex road scenarios, making the car more secure and aware. Scenario-based planning has been enhanced to support additional scenarios like pull over and crossing bare intersections. 
+
+![](docs/demo_guide/images/Apollo_5_0_diagram1.png)
+
+**For Setup:**
+
+* Hardware:
+
+    * Same as Apollo 3.5
+
+* Software: 
+
+    * [Data Pipeline](https://github.com/ApolloAuto/apollo/tree/master/modules/tools/fuel_proxy)
+    * Perception
+    * Planning
+    * Control
+    * Prediction
+    * Map Engine
+    * Simulation
+
+
 ## Architecture
 
 * **Hardware/ Vehicle Overview**
@@ -242,6 +264,8 @@ Congratulations! You have successfully built out Apollo without Hardware. If you
 * [Apollo 3.0 QuickStart Guide](docs/quickstart/apollo_3_0_quick_start.md)
 
 * [Apollo 3.5 QuickStart Guide](docs/quickstart/apollo_3_5_quick_start.md)
+
+* [Apollo 5.0 QuickStart Guide](docs/quickstart/apollo_5_0_quick_start.md)
 
 ## Documents
 

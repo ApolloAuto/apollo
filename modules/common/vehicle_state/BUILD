@@ -11,7 +11,7 @@ cc_library(
         "vehicle_state_provider.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common:log",
         "//modules/common/configs:config_gflags",
         "//modules/common/math:geometry",
         "//modules/common/math:quaternion",

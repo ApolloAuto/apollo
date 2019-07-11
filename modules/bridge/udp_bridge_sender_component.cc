@@ -30,7 +30,7 @@ using apollo::localization::LocalizationEstimate;
 
 template <typename T>
 bool UDPBridgeSenderComponent<T>::Init() {
-  AINFO << "UDP bridge init, startin..";
+  AINFO << "UDP bridge sender init, startin...";
   apollo::bridge::UDPBridgeSenderRemoteInfo udp_bridge_remote;
   if (!this->GetProtoConfig(&udp_bridge_remote)) {
     AINFO << "load udp bridge component proto param failed";
@@ -39,9 +39,9 @@ bool UDPBridgeSenderComponent<T>::Init() {
   remote_ip_ = udp_bridge_remote.remote_ip();
   remote_port_ = udp_bridge_remote.remote_port();
   proto_name_ = udp_bridge_remote.proto_name();
-  AINFO << "UDP Bridge remote ip is: " << remote_ip_;
-  AINFO << "UDP Bridge remote port is: " << remote_port_;
-  AINFO << "UDP Bridge for Proto is: " << proto_name_;
+  ADEBUG << "UDP Bridge remote ip is: " << remote_ip_;
+  ADEBUG << "UDP Bridge remote port is: " << remote_port_;
+  ADEBUG << "UDP Bridge for Proto is: " << proto_name_;
   return true;
 }
 

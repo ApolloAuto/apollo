@@ -33,6 +33,9 @@ cc_test(
     data = [
         "//modules/dreamview/backend/testdata",
     ],
+    linkopts = [
+        "-lboost_system",
+    ],
     deps = [
         ":map_service",
         "@gtest//:main",

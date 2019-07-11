@@ -49,7 +49,6 @@ bool Mapdatachecker::Start() {
     apollo::cyber::Clear();
     return false;
   }
-  agent->set_worker_cyber_node(cyber_node);
 
   AINFO << "register service";
   grpc::ServerBuilder builder;

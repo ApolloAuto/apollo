@@ -79,6 +79,8 @@ bool NCut::Configure(const NCutParam &ncut_param_) {
   _felzenszwalb_sigma = ncut_param_.felzenszwalb_sigma();
   _felzenszwalb_k = ncut_param_.felzenszwalb_k();
   _felzenszwalb_min_size = ncut_param_.felzenszwalb_min_size();
+
+  AINFO << "NCut Parameters" << ncut_param_.DebugString();
   return true;
 }
 
@@ -98,6 +100,8 @@ void NCut::Segment(base::PointFCloudConstPtr cloud) {
     pids[i] = static_cast<int>(i);
   }
   _cloud_obstacles = base::PointFCloudPtr(new base::PointFCloud(*cloud, pids));
+  AINFO << "cloud obstacle size in ncut segment is "
+        << _cloud_obstacles->size();
 #ifdef DEBUG_NCUT
   ADEBUG << "segment enter ... input cloud size " << cloud->size();
 // visualize_points(pids);
@@ -111,20 +115,20 @@ void NCut::Segment(base::PointFCloudConstPtr cloud) {
   // visualize_segments_from_points(_cluster_points);
   ADEBUG << "super pixels " << _cluster_points.size();
 #endif
-  ADEBUG << "super pixels done " << omp_get_wtime() - start_t;
+  AINFO << "super pixels " << _cluster_points.size();
+  AINFO << "super pixels done " << omp_get_wtime() - start_t;
   start_t = omp_get_wtime();
   // .2 precompute skeleton and bbox
   PrecomputeAllSkeletonAndBbox();
-  // LOG_DEBUG << "precompute skeleton and bbox done " << omp_get_wtime() -
-  // start_t;
+  AINFO << "precompute skeleton and bbox done " << omp_get_wtime() - start_t;
   start_t = omp_get_wtime();
   // .3 grach cut
   std::vector<std::vector<int>> segment_clusters;
   std::vector<std::string> segment_labels;
   NormalizedCut(_ncuts_stop_threshold, true, &segment_clusters,
                 &segment_labels);
-  ADEBUG << "normalized_cut done, #segments " << segment_clusters.size()
-         << ", time: " << omp_get_wtime() - start_t;
+  AINFO << "normalized_cut done, #segments " << segment_clusters.size()
+        << ", time: " << omp_get_wtime() - start_t;
   start_t = omp_get_wtime();
   // .4 _segment_pids;
   for (size_t i = 0; i < segment_clusters.size(); ++i) {
@@ -359,8 +363,9 @@ void NCut::NormalizedCut(float ncuts_threshold, bool use_classifier,
   while (!job_stack.empty()) {
     curr = job_stack.top();
     job_stack.pop();
+    AINFO << "curr size " << curr->size();
 #ifdef DEBUG_NCUT
-    LOG_DEBUG << "curr size " << curr->size();
+    DEBUG << "curr size " << curr->size();
 // visualize_cluster(curr);
 #endif
     std::string seg_label;
@@ -388,10 +393,12 @@ void NCut::NormalizedCut(float ncuts_threshold, bool use_classifier,
           my_weights.coeffRef(i, j) = weights.coeffRef(ci, cj);
         }
       }
+      AINFO << "before get mincuts ";
       double cost = GetMinNcuts(my_weights, curr, seg1, seg2);
+      AINFO << "after get mincuts";
 #ifdef DEBUG_NCUT
-      LOG_DEBUG << "N cut cost is " << cost << ", seg1 size " << seg1->size()
-                << ", seg2 size " << seg2->size();
+      AINFO << "N cut cost is " << cost << ", seg1 size " << seg1->size()
+            << ", seg2 size " << seg2->size();
       if (curr->size() < 50) {
         std::cout << "seg1: ";
         for (size_t i = 0; i < seg1->size(); ++i) {

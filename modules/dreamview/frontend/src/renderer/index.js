@@ -122,6 +122,13 @@ class Renderer {
         const directionalLight = new THREE.DirectionalLight(0xffeedd);
         directionalLight.position.set(0, 0, 1).normalize();
 
+        // The orbit axis of the OrbitControl depends on camera's up vector
+        // and can only be set during creation of the controls. Thus,
+        // setting camera up here. Note: it's okay if the camera.up doesn't
+        // match the point of view setting, the value will be adjusted during
+        // each update cycle.
+        this.camera.up.set(0, 0, 1);
+
         // Orbit control for moving map
         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enable = false;
@@ -153,22 +160,34 @@ class Renderer {
         this.dimension.height = height;
     }
 
-    enableOrbitControls() {
+    enableOrbitControls(enableRotate) {
+        // update camera
         const carPosition = this.adc.mesh.position;
-        this.controls.enabled = true;
-        this.controls.enableRotate = false;
-        this.controls.reset();
-        this.controls.minDistance = 4;
-        this.controls.maxDistance = 4000;
-        this.controls.target.set(carPosition.x, carPosition.y, 0);
-
         this.camera.position.set(carPosition.x, carPosition.y, 50);
         if (this.coordinates.systemName === "FLU") {
             this.camera.up.set(1, 0, 0);
         } else {
-            this.camera.up.set(0, 1, 0);
+            this.camera.up.set(0, 0, 1);
         }
-        this.camera.lookAt(carPosition.x, carPosition.y, 0);
+        const lookAtPosition = new THREE.Vector3(carPosition.x, carPosition.y, 0);
+        this.camera.lookAt(lookAtPosition);
+
+        // update control reset values to match current camera's
+        this.controls.target0 = lookAtPosition.clone();
+        this.controls.position0 = this.camera.position.clone();
+        this.controls.zoom0 = this.camera.zoom;
+
+        // set distance control
+        this.controls.minDistance = 4;
+        this.controls.maxDistance = 4000;
+
+        // set vertical angle control
+        this.controls.minPolarAngle = 0;
+        this.controls.maxPolarAngle = Math.PI / 2;
+
+        this.controls.enabled = true;
+        this.controls.enableRotate = enableRotate;
+        this.controls.reset();
     }
 
     adjustCamera(target, pov) {
@@ -242,7 +261,7 @@ class Renderer {
             break;
         case "Map":
             if (!this.controls.enabled) {
-                this.enableOrbitControls();
+                this.enableOrbitControls(true);
             }
             break;
         }
@@ -250,7 +269,7 @@ class Renderer {
     }
 
     enableRouteEditing() {
-        this.enableOrbitControls();
+        this.enableOrbitControls(false);
         this.routingEditor.enableEditingMode(this.camera, this.adc);
 
         document.getElementById(this.canvasId).addEventListener('mousedown',

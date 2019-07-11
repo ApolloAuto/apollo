@@ -192,9 +192,8 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
   linear_acceleration_vrf->set_z(vec_acceleration_vrf(2));
 
   // set angular velocity
-  Eigen::Vector3d orig_angular_velocity(corrected_imu.wibb[0],
-                                        corrected_imu.wibb[1],
-                                        corrected_imu.wibb[2]);
+  Eigen::Vector3d orig_angular_velocity(
+      corrected_imu.wibb[0], corrected_imu.wibb[1], corrected_imu.wibb[2]);
   Eigen::Vector3d vec_angular_velocity = static_cast<Eigen::Vector3d>(
       quaternion.toRotationMatrix() * orig_angular_velocity);
   apollo::common::Point3D* angular_velocity =

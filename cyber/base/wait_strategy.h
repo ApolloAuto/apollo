@@ -46,7 +46,7 @@ class BlockWaitStrategy : public WaitStrategy {
     return true;
   }
 
-  void BreakAllWait() { cv_.notify_all(); }
+  void BreakAllWait() override { cv_.notify_all(); }
 
  private:
   std::mutex mutex_;
@@ -103,7 +103,7 @@ class TimeoutBlockWaitStrategy : public WaitStrategy {
     return true;
   }
 
-  void BreakAllWait() { cv_.notify_all(); }
+  void BreakAllWait() override { cv_.notify_all(); }
 
   void SetTimeout(uint64_t timeout) {
     time_out_ = std::chrono::milliseconds(timeout);

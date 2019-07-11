@@ -50,8 +50,8 @@ class AlignmentAgent {
   }
 
   grpc::Status ProcessGrpcRequest(grpc::ServerContext *context,
-                                    REQUEST_TYPE *request,
-                                    RESPONSE_TYPE *response) {
+                                  REQUEST_TYPE *request,
+                                  RESPONSE_TYPE *response) {
     AINFO << "AlignmentAgent request: " << request->DebugString();
     switch (request->cmd()) {
       case CmdType::START:
@@ -104,7 +104,7 @@ class AlignmentAgent {
         ErrorCode code = sp_alignment_->GetReturnState();
         if (code == ErrorCode::ERROR_VERIFY_NO_GNSSPOS ||
             code == ErrorCode::ERROR_GNSS_SIGNAL_FAIL) {
-          AERROR << "Some error occured, while loop will exit";
+          AERROR << "Some error occurred, while loop will exit";
           break;
         }
         AINFO << "get progress:" << sp_alignment_->GetProgress();

@@ -17,6 +17,7 @@
 
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+
 #include <algorithm>
 #include <cmath>
 #include <fstream>
@@ -62,7 +63,7 @@ double LapsChecker::GetConfidence() {
     res += confidence_[i];
   }
   AINFO << "current confidence: " << res
-        << ", confidence thresh:" << sp_conf_->laps_rate_thresh;
+        << ",confidence thresh:" << sp_conf_->laps_rate_thresh;
   if (res < sp_conf_->laps_rate_thresh) {
     if (confidence_.size() == 0) {
       AINFO << "some problems induce lap problem";
@@ -202,7 +203,7 @@ int LapsChecker::CheckLaps() {
 }
 
 int LapsChecker::GatherTimestamps(std::vector<double> *sp_stamps, double alpha,
-                                   int center_x, int center_y) {
+                                  int center_x, int center_y) {
   int search_d = sp_conf_->laps_search_diameter;
   if ((search_d & 1) == 0) {
     AINFO << "laps_search_diameter should be an odd";
@@ -342,7 +343,7 @@ int LapsChecker::PutPoseToNeighborGrid(int pose_index) {
 }
 
 int LapsChecker::GetPassedGrid(int pose_index, std::vector<int> *sp_grid_x,
-                                 std::vector<int> *sp_grid_y) {
+                               std::vector<int> *sp_grid_y) {
   if (pose_index <= 0) {
     return 0;
   }

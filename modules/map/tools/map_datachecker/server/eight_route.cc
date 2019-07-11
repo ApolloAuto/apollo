@@ -31,7 +31,7 @@ void EightRoute::Reset() {
 }
 
 bool EightRoute::IsEightRoutePose(const std::vector<FramePose>& poses,
-                                     int pose_index) {
+                                  int pose_index) {
   if (poses.size() == 0 || pose_index <= 0 ||
       pose_index >= static_cast<int>(poses.size())) {
     AINFO << "params error, poses size: " << poses.size()
@@ -40,7 +40,7 @@ bool EightRoute::IsEightRoutePose(const std::vector<FramePose>& poses,
   }
 
   double yaw = GetYaw(poses[pose_index - 1].tx, poses[pose_index - 1].ty,
-                       poses[pose_index].tx, poses[pose_index].ty);
+                      poses[pose_index].tx, poses[pose_index].ty);
   double yaw_diff = fabs(last_yaw_ - yaw);
   last_yaw_ = yaw;
   yaw_diff = yaw_diff < 180 ? yaw_diff : 360 - yaw_diff;
@@ -73,8 +73,7 @@ double EightRoute::GetGoodPoseDuring() {
   return sp_good_pose_info_->end_time - sp_good_pose_info_->start_time;
 }
 
-double EightRoute::GetEightRouteProgress(
-    const std::vector<FramePose>& poses) {
+double EightRoute::GetEightRouteProgress(const std::vector<FramePose>& poses) {
   int size = static_cast<int>(poses.size());
   int start_index = TimeToIndex(poses, start_time_);
   // select first good pose
@@ -97,7 +96,7 @@ double EightRoute::GetEightRouteProgress(
     return 0.0;
   }
   last_yaw_ = GetYaw(poses[start_index].tx, poses[start_index].ty,
-                      poses[start_index + 1].tx, poses[start_index + 1].ty);
+                     poses[start_index + 1].tx, poses[start_index + 1].ty);
 
   int not_eight_count = 0;
   for (int i = start_index + 2; i < size; ++i) {

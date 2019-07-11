@@ -99,15 +99,15 @@ AlignedMatrix<Scalar, aligned_len>::~AlignedMatrix() {
   if (raw_ptr_) {
     free(raw_ptr_);
     raw_size_ = 0;
-    raw_ptr_ = NULL;
+    raw_ptr_ = nullptr;
   }
 
   if (row_data_) {
     free(row_data_);
-    row_data_ = NULL;
+    row_data_ = nullptr;
   }
 
-  data_ = NULL;
+  data_ = nullptr;
   raw_size_ = 0;
 }
 
@@ -116,12 +116,12 @@ void AlignedMatrix<Scalar, aligned_len>::Init(int rows, int cols) {
   if (raw_ptr_) {
     free(raw_ptr_);
     raw_size_ = 0;
-    raw_ptr_ = NULL;
+    raw_ptr_ = nullptr;
   }
 
   if (row_data_) {
     free(row_data_);
-    row_data_ = NULL;
+    row_data_ = nullptr;
   }
 
   rows_ = rows;
@@ -191,12 +191,12 @@ operator=(const AlignedMatrix<Scalar, aligned_len>& matrix) {
   if (raw_ptr_) {
     free(raw_ptr_);
     raw_size_ = 0;
-    raw_ptr_ = NULL;
+    raw_ptr_ = nullptr;
   }
 
   if (row_data_) {
     free(row_data_);
-    row_data_ = NULL;
+    row_data_ = nullptr;
   }
 
   rows_ = matrix.rows_;

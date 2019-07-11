@@ -18,6 +18,7 @@
 
 #include <Eigen/Eigenvalues>
 #include <limits>
+#include <memory>
 #include <unordered_map>
 #include <vector>
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
@@ -193,7 +194,7 @@ class NdtMapMatrix : public BaseMapMatrix {
   /**@brief The number of columns. */
   unsigned int cols_;
   /**@brief The matrix data structure. */
-  NdtMapCells* map3d_cells_;
+  std::unique_ptr<NdtMapCells[]> map3d_cells_;
 };
 
 inline void NdtMapSingleCell::Reset() {

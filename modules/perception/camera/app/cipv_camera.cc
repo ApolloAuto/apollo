@@ -182,22 +182,60 @@ float Cipv::VehicleDynamics(const uint32_t tick, const float yaw_rate,
   return true;
 }
 
+// Provide vehicle dynamics considersing vehicle size
+float Cipv::VehicleDynamics(const uint32_t tick, const float yaw_rate,
+                            const float velocity, const float time_unit,
+                            const float half_vehicle_width, float *center_x,
+                            float *center_y, float *left_x, float *left_y,
+                            float *right_x, float *right_y) {
+  // Option 1. Straight model;
+  // *x = time_unit * velocity * static_cast<float>(tick);
+  // *y = 0.0f;
+
+  // Option 2. Sphere model
+  float adjusted_velocity = std::max(kMinVelocity, velocity);
+  float theta = static_cast<float>(tick) * time_unit * yaw_rate;
+  float displacement = static_cast<float>(tick) * time_unit * adjusted_velocity;
+  float offset = half_vehicle_width;
+  *center_x = displacement * static_cast<float>(cos(theta));
+  *center_y = displacement * static_cast<float>(sin(theta));
+  if (theta < 0) {
+    offset = -half_vehicle_width;
+  }
+  *left_x = (displacement + offset) * static_cast<float>(cos(theta)) - offset;
+  *left_y = (displacement + offset) * static_cast<float>(sin(theta)) +
+            half_vehicle_width;
+  *right_x = (displacement - offset) * static_cast<float>(cos(theta)) + offset;
+  *right_y = (displacement - offset) * static_cast<float>(sin(theta)) -
+             half_vehicle_width;
+
+  // Option 3. Bicycle model
+  // TODO(techoe): Apply bicycle model for vehicle dynamics (need wheel base)
+
+  return true;
+}
+
 // Make a virtual lane line using a yaw_rate
 bool Cipv::MakeVirtualEgoLaneFromYawRate(const float yaw_rate,
                                          const float velocity,
                                          const float offset_distance,
                                          LaneLineSimple *left_lane_line,
                                          LaneLineSimple *right_lane_line) {
-  float x = 0.0f;
-  float y = 0.0f;
+  float center_x = 0.0f;
+  float center_y = 0.0f;
+  float left_x = 0.0f;
+  float left_y = 0.0f;
+  float right_x = 0.0f;
+  float right_y = 0.0f;
   left_lane_line->line_point.clear();
   right_lane_line->line_point.clear();
 
   for (uint32_t i = 1; i < kMaxNumVirtualLanePoint; ++i) {
-    VehicleDynamics(i, yaw_rate, velocity, kAverageFrameRate, &x, &y);
-    Point2Df left_point(x, y + offset_distance);
+    VehicleDynamics(i, yaw_rate, velocity, kAverageFrameRate, offset_distance,
+                    &center_x, &center_y, &left_x, &left_y, &right_x, &right_y);
+    Point2Df left_point(left_x, left_y);
     left_lane_line->line_point.emplace_back(left_point);
-    Point2Df right_point(x, y - offset_distance);
+    Point2Df right_point(right_x, right_y);
     right_lane_line->line_point.emplace_back(right_point);
   }
   return true;
@@ -241,7 +279,7 @@ bool Cipv::ElongateEgoLane(const std::vector<base::LaneLine> &lane_objects,
 // Create virtual lane line
 bool Cipv::CreateVirtualEgoLane(const float yaw_rate, const float velocity,
                                 EgoLane *egolane_ground) {
-  float offset_distance = half_virtual_egolane_width_in_meter_;
+  float offset_distance = half_vehicle_width_in_meter_;
   // Generate new egolane using yaw-rate velocity
   MakeVirtualEgoLaneFromYawRate(yaw_rate, velocity, offset_distance,
                                 &egolane_ground->left_line,
@@ -676,13 +714,16 @@ bool Cipv::IsObjectInTheLaneImage(const std::shared_ptr<base::Object> &object,
 bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
                                    const EgoLane &egolane_ground,
                                    const Eigen::Affine3d world2camera,
+                                   const bool b_virtual,
                                    float *object_distance) {
   LineSegment2Df closted_object_edge;
   bool b_left_lane_clear = false;
   bool b_right_lane_clear = false;
   float shortest_distance = 0.0f;
   float distance = 0.0f;
-
+  float max_dist_object_to_lane_in_meter =
+      b_virtual ? max_dist_object_to_virtual_lane_in_meter_
+                : max_dist_object_to_lane_in_meter_;
   int closest_index = -1;
   // Find closest edge of a given object bounding box
   float b_valid_object = FindClosestObjectGround(
@@ -734,7 +775,7 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
             closted_object_edge.end_point,
             egolane_ground.left_line.line_point[closest_index],
             egolane_ground.left_line.line_point[closest_index + 1]) &&
-        shortest_distance < max_dist_object_to_lane_in_meter_) {
+        shortest_distance < max_dist_object_to_lane_in_meter) {
       b_left_lane_clear = true;
     }
   }
@@ -776,7 +817,7 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
             closted_object_edge.start_point,
             egolane_ground.right_line.line_point[closest_index],
             egolane_ground.right_line.line_point[closest_index + 1]) &&
-        shortest_distance < max_dist_object_to_lane_in_meter_) {
+        shortest_distance < max_dist_object_to_lane_in_meter) {
       b_right_lane_clear = true;
     }
   }
@@ -789,12 +830,12 @@ bool Cipv::IsObjectInTheLane(const std::shared_ptr<base::Object> &object,
                              const EgoLane &egolane_image,
                              const EgoLane &egolane_ground,
                              const Eigen::Affine3d world2camera,
-                             float *distance) {
+                             const bool b_virtual, float *distance) {
   if (b_image_based_cipv_) {
     return IsObjectInTheLaneImage(object, egolane_image, distance);
   }
   return IsObjectInTheLaneGround(object, egolane_ground, world2camera,
-                                 distance);
+                                 b_virtual, distance);
 }
 
 // =====================================================================
@@ -840,9 +881,9 @@ bool Cipv::DetermineCipv(const std::vector<base::LaneLine> &lane_objects,
       AINFO << "objects[" << i << "]->track_id: " << (*objects)[i]->track_id;
     }
     if (IsObjectInTheLane((*objects)[i], egolane_image, egolane_ground,
-                          world2camera, &distance) ||
+                          world2camera, false, &distance) ||
         IsObjectInTheLane((*objects)[i], egolane_image, virtual_egolane_ground,
-                          world2camera, &distance)) {
+                          world2camera, true, &distance)) {
       if (cipv_index < 0 || distance < min_distance) {
         cipv_index = i;
         cipv_track_id = (*objects)[i]->track_id;

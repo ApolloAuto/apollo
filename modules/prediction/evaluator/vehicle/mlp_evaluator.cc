@@ -20,6 +20,7 @@
 
 #include "cyber/common/file.h"
 #include "modules/prediction/common/feature_output.h"
+#include "modules/prediction/common/prediction_constants.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
@@ -108,7 +109,9 @@ bool MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
                           lane_feature_values.end());
 
     // Insert features to DataForLearning
-    if (FLAGS_prediction_offline_mode == 2 && !obstacle_ptr->IsNearJunction()) {
+    if (FLAGS_prediction_offline_mode ==
+            PredictionConstants::kDumpDataForLearning &&
+        !obstacle_ptr->IsNearJunction()) {
       FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
                                            "mlp", lane_sequence_ptr);
       ADEBUG << "Save extracted features for learning locally.";

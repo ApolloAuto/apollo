@@ -1,8 +1,6 @@
 vehicle_param {
   brand: LINCOLN_MKZ
-  vehicle_id {
-    other_unique_id: "mkz7"
-  }
+
   front_edge_to_center: 3.89
   back_edge_to_center: 1.043
   left_edge_to_center: 1.055

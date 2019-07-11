@@ -36,16 +36,6 @@ MapDataCheckerAgent::MapDataCheckerAgent() {
   AINFO << "MapDataCheckerAgent create successfully";
 }
 
-void MapDataCheckerAgent::set_worker_cyber_node(
-    std::shared_ptr<MapDataCheckerCyberNode> cyber_node) {
-  if (!cyber_node) {
-    AFATAL << "Error in create MapDataCheckerCyberNode";
-    apollo::cyber::WaitForShutdown();
-    apollo::cyber::Clear();
-  }
-  cyber_node_ = cyber_node->GetWorkerCyberNode();
-}
-
 std::shared_ptr<PoseCollectionAgent>
 MapDataCheckerAgent::GetSpPoseCollectionAgent() {
   return sp_pose_collection_agent_;
@@ -55,28 +45,25 @@ grpc::Status MapDataCheckerAgent::ServiceChannelVerify(
     grpc::ServerContext *context, ChannelVerifyRequest *request,
     ChannelVerifyResponse *response) {
   return sp_channel_checker_agent_->ProcessGrpcRequest(context, request,
-                                                         response);
+                                                       response);
 }
 
 grpc::Status MapDataCheckerAgent::ServiceStaticAlign(
     grpc::ServerContext *context, StaticAlignRequest *request,
     StaticAlignResponse *response) {
-  return sp_static_align_agent_->ProcessGrpcRequest(context, request,
-                                                      response);
+  return sp_static_align_agent_->ProcessGrpcRequest(context, request, response);
 }
 
 grpc::Status MapDataCheckerAgent::ServiceEightRoute(
     grpc::ServerContext *context, EightRouteRequest *request,
     EightRouteResponse *response) {
-  return sp_eight_route_agent_->ProcessGrpcRequest(context, request,
-                                                     response);
+  return sp_eight_route_agent_->ProcessGrpcRequest(context, request, response);
 }
 
 grpc::Status MapDataCheckerAgent::ServiceLoopsVerify(
     grpc::ServerContext *context, LoopsVerifyRequest *request,
     LoopsVerifyResponse *response) {
-  return sp_loops_verify_agent_->ProcessGrpcRequest(context, request,
-                                                      response);
+  return sp_loops_verify_agent_->ProcessGrpcRequest(context, request, response);
 }
 
 }  // namespace hdmap

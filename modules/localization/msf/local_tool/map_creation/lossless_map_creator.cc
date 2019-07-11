@@ -17,6 +17,7 @@
 #include "boost/filesystem.hpp"
 #include "boost/program_options.hpp"
 
+#include "cyber/common/log.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 #include "modules/localization/msf/common/util/extract_ground_plane.h"
 #include "modules/localization/msf/common/util/system_utility.h"
@@ -75,16 +76,15 @@ bool ParseCommandLine(int argc, char* argv[],
     boost::program_options::store(
         boost::program_options::parse_command_line(argc, argv, desc), *vm);
     if (vm->count("help")) {
-      std::cerr << desc << std::endl;
+      AERROR << desc;
       return false;
     }
     boost::program_options::notify(*vm);
   } catch (std::exception& e) {
-    std::cerr << "Error" << e.what() << std::endl;
-    std::cerr << desc << std::endl;
+    AERROR << "Error: " << e.what() << " " << desc;
     return false;
   } catch (...) {
-    std::cerr << "Unknown error!" << std::endl;
+    AERROR << "Unknown error!";
     return false;
   }
   return true;
@@ -104,7 +104,7 @@ int main(int argc, char** argv) {
 
   boost::program_options::variables_map boost_args;
   if (!ParseCommandLine(argc, argv, &boost_args)) {
-    std::cerr << "Parse input command line failed." << std::endl;
+    AERROR << "Parse input command line failed.";
     return -1;
   }
 
@@ -113,8 +113,7 @@ int main(int argc, char** argv) {
   const std::vector<std::string> pose_files =
       boost_args["pose_files"].as<std::vector<std::string>>();
   if (pcd_folder_paths.size() != pose_files.size()) {
-    std::cerr << "The count of pcd folders is not equal pose files"
-              << std::endl;
+    AERROR << "The count of pcd folders is not equal pose files";
     return -1;
   }
 
@@ -128,14 +127,14 @@ int main(int argc, char** argv) {
       boost_args["coordinate_type"].as<std::string>();
   if (strcasecmp(coordinate_type.c_str(), "UTM") != 0 &&
       strcasecmp(coordinate_type.c_str(), "LTM") != 0) {
-    std::cerr << "Coordinate type invalid. (UTM or LTM)" << std::endl;
+    AERROR << "Coordinate type invalid. (UTM or LTM)";
     return -1;
   }
   const std::string map_resolution_type =
       boost_args["map_resolution_type"].as<std::string>();
   if (strcasecmp(map_resolution_type.c_str(), "single") != 0 &&
       strcasecmp(map_resolution_type.c_str(), "multi") != 0) {
-    std::cerr << "Map resolution type invalid. (single or multi)" << std::endl;
+    AERROR << "Map resolution type invalid. (single or multi)";
     return -1;
   }
 
@@ -150,17 +149,17 @@ int main(int argc, char** argv) {
       fabs(single_resolution_map - 4.0) < 1e-8 &&
       fabs(single_resolution_map - 8.0) < 1e-8 &&
       fabs(single_resolution_map - 16.0) < 1e-8) {
-    std::cerr << "Map resolution can only be: 0.03125, "
-              << "0.0625, 0.125, 0.25, 0.5, 1.0, 2.0, "
-              << "4.0, 8.0 or 16.0." << std::endl;
+    AWARN << "Map resolution can only be: 0.03125, "
+          << "0.0625, 0.125, 0.25, 0.5, 1.0, 2.0, "
+          << "4.0, 8.0 or 16.0.";
   }
 
   const size_t num_trials = pcd_folder_paths.size();
 
   // load all poses
-  std::cerr << "Pcd folders are as follows:" << std::endl;
+  AINFO << "Pcd folders are as follows:";
   for (size_t i = 0; i < num_trials; ++i) {
-    std::cerr << pcd_folder_paths[i] << std::endl;
+    AINFO << pcd_folder_paths[i];
   }
   std::vector<std::vector<Eigen::Affine3d>> ieout_poses(num_trials);
   std::vector<std::vector<double>> time_stamps(num_trials);
@@ -246,8 +245,7 @@ int main(int argc, char** argv) {
     }
     fclose(file);
   } else {
-    std::cerr << "Can't open file: "
-              << "./lossless_map/config.txt" << std::endl;
+    AERROR << "Can't open file: " << file_buf;
   }
 
   LosslessMapNodePool lossless_map_node_pool(25, 8);
@@ -268,9 +266,9 @@ int main(int argc, char** argv) {
       const Eigen::Affine3d& pcd_pose = poses[trial_frame_idx];
       apollo::localization::msf::velodyne::LoadPcds(
           pcd_file_path, trial_frame_idx, pcd_pose, &velodyne_frame, false);
-      AERROR << "Loaded " << velodyne_frame.pt3ds.size()
-             << "3D Points at Trial: " << trial << " Frame: " << trial_frame_idx
-             << ".";
+      AINFO << "Loaded " << velodyne_frame.pt3ds.size()
+            << "3D Points at Trial: " << trial << " Frame: " << trial_frame_idx
+            << ".";
 
       for (size_t i = 0; i < velodyne_frame.pt3ds.size(); ++i) {
         Eigen::Vector3d& pt3d_local = velodyne_frame.pt3ds[i];
@@ -323,14 +321,14 @@ int main(int argc, char** argv) {
         std::vector<unsigned int> layer_counts;
         map.GetCountSafe(pt3d, zone_id, resolution_id, &layer_counts);
         if (layer_counts.empty()) {
-          AERROR << "No ground layer, skip.";
+          ADEBUG << "No ground layer, skip.";
           continue;
         }
         if (layer_counts[layer_id] > 0) {
           std::vector<float> layer_alts;
           map.GetAltSafe(pt3d, zone_id, resolution_id, &layer_alts);
           if (layer_alts.empty()) {
-            AERROR << "No ground points, skip.";
+            ADEBUG << "No ground points, skip.";
             continue;
           }
           float alt = layer_alts[layer_id];
@@ -355,6 +353,6 @@ int main(int argc, char** argv) {
       static_cast<float>(mean_height_diff);
   std::string config_path = map.GetConfig().map_folder_path_ + "/config.xml";
   map.GetConfig().Save(config_path);
-  ADEBUG << "Mean: " << mean_height_diff << ", Var: " << var_height_diff << ".";
+  AINFO << "Mean: " << mean_height_diff << ", Var: " << var_height_diff << ".";
   return 0;
 }

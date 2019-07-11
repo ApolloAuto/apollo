@@ -10,6 +10,7 @@ cc_library(
         ":third_party_perception_conversion",
         ":third_party_perception_filter",
         ":third_party_perception_fusion",
+        "//cyber",
         "//modules/common/adapters:adapter_gflags",
     ],
 )

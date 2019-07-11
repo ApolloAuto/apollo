@@ -51,7 +51,7 @@ function check_agreement() {
 }
 
 function check_host_environment() {
-  echo 'Host evvironment checking done.'
+  echo 'Host environment checking done.'
 }
 
 function show_usage()

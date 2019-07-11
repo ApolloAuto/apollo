@@ -41,8 +41,9 @@ struct CipvOptions {
   float yaw_angle = 0.0f;
 };
 
-constexpr float kMinVelocity = 15.0f;  // in m/s
+constexpr float kMinVelocity = 10.0f;  // in m/s
 constexpr float kMaxDistObjectToLaneInMeter = 70.0f;
+constexpr float kMaxDistObjectToVirtualLaneInMeter = 10.0f;
 constexpr float kMaxDistObjectToLaneInPixel = 10.0f;
 const std::size_t kDropsHistorySize = 20;
 const std::size_t kMaxObjectNum = 100;
@@ -81,6 +82,11 @@ class Cipv {
   static float VehicleDynamics(const uint32_t tick, const float yaw_rate,
                                const float velocity, const float time_unit,
                                float *x, float *y);
+  static float VehicleDynamics(const uint32_t tick, const float yaw_rate,
+                               const float velocity, const float time_unit,
+                               const float vehicle_half_width, float *center_x,
+                               float *ceneter_y, float *left_x, float *left_y,
+                               float *right_x, float *right_y);
   // Make a virtual lane line using a yaw_rate
   static bool MakeVirtualEgoLaneFromYawRate(const float yaw_rate,
                                             const float velocity,
@@ -141,13 +147,14 @@ class Cipv {
   bool IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
                                const EgoLane &egolane_ground,
                                const Eigen::Affine3d world2camera,
-                               float *distance);
+                               const bool b_virtual, float *distance);
 
   // Check if the object is in the lane in ego-ground space
   bool IsObjectInTheLane(const std::shared_ptr<base::Object> &object,
                          const EgoLane &egolane_image,
                          const EgoLane &egolane_ground,
-                         const Eigen::Affine3d world2camera, float *distance);
+                         const Eigen::Affine3d world2camera,
+                         const bool b_virtual, float *distance);
 
   // Check if a point is left of a line segment
   bool IsPointLeftOfLine(const Point2Df &point,
@@ -186,6 +193,8 @@ class Cipv {
       single_virtual_egolane_width_in_meter_ * 0.5f;
   float half_vehicle_width_in_meter_ = kMaxVehicleWidthInMeter * 0.5f;
   float max_dist_object_to_lane_in_meter_ = kMaxDistObjectToLaneInMeter;
+  float max_dist_object_to_virtual_lane_in_meter_ =
+      kMaxDistObjectToVirtualLaneInMeter;
   float max_dist_object_to_lane_in_pixel_ = kMaxDistObjectToLaneInPixel;
   float MAX_VEHICLE_WIDTH_METER = 5.0f;
   float EPSILON = 1.0e-6f;

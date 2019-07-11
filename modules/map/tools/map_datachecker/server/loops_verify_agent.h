@@ -35,8 +35,8 @@ class LoopsVerifyAgent {
       std::shared_ptr<JSonConf> sp_conf,
       std::shared_ptr<PoseCollectionAgent> sp_pose_collection_agent);
   grpc::Status ProcessGrpcRequest(grpc::ServerContext *context,
-                                    LoopsVerifyRequest *request,
-                                    LoopsVerifyResponse *response);
+                                  LoopsVerifyRequest *request,
+                                  LoopsVerifyResponse *response);
 
  private:
   void StartVerify(LoopsVerifyRequest *request, LoopsVerifyResponse *response);
