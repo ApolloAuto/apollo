@@ -10,7 +10,7 @@ import {
 } from "utils/draw";
 import Text3D, { TEXT_ALIGN } from "renderer/text3d";
 import RENDERER from "renderer";
-import { TRAFFIC_LIGHT, STOP_SIGN } from "renderer/traffic_control";
+import TrafficControl from "renderer/traffic_control";
 
 const colorMapping = {
     YELLOW: 0XDAA520,
@@ -32,6 +32,8 @@ export default class Map {
         this.data = {};
         this.initialized = false;
         this.elementKindsDrawn = '';
+
+        this.trafficControl = new TrafficControl();
     }
 
     // The result will be the all the elements in current but not in data.
@@ -350,12 +352,18 @@ export default class Map {
                         }));
                         break;
                     case "signal":
+                        this.data[kind].push(Object.assign(newData[kind][i], {
+                            drewObjects: this.addStopLine(
+                                newData[kind][i].stopLine, coordinates, scene)
+                        }));
+                        this.trafficControl.addTrafficLight([newData[kind][i]], coordinates, scene);
+                        break;
                     case "stopSign":
                         this.data[kind].push(Object.assign(newData[kind][i], {
                             drewObjects: this.addStopLine(
                                 newData[kind][i].stopLine, coordinates, scene)
                         }));
-                        RENDERER.addTrafficControl(kind, [newData[kind][i]]);
+                        this.trafficControl.addStopSign([newData[kind][i]], coordinates, scene);
                         break;
                     case "road":
                         const road = newData[kind][i];
@@ -431,10 +439,20 @@ export default class Map {
                 }
 
                 this.removeExpiredElements(elementIds, scene);
-                RENDERER.removeTrafficControl(TRAFFIC_LIGHT, elementIds[TRAFFIC_LIGHT]);
-                RENDERER.removeTrafficControl(STOP_SIGN, elementIds[STOP_SIGN]);
+
+                if (elementIds['signal']) {
+                    this.trafficControl.removeTrafficLight(elementIds['signal'], scene);
+                }
+
+                if (elementIds['stopSign']) {
+                    this.trafficControl.removeStopSign(elementIds['stopSign'], scene);
+                }
             }
         }
+    }
+
+    update(world) {
+        this.trafficControl.updateTrafficLightStatus(world.perceivedSignal);
     }
 }
 
