@@ -7,7 +7,7 @@ import trafficLightObject from "assets/models/traffic_light.obj";
 import stopSignMaterial from "assets/models/stop_sign.mtl";
 import stopSignObject from "assets/models/stop_sign.obj";
 
-const TRAFFIC_LIGHT_SCALE = 0.009;
+const TRAFFIC_LIGHT_SCALE = 2.8;
 const STOP_SIGN_SCALE = 0.01;
 const trafficLightScales = {
     x: TRAFFIC_LIGHT_SCALE,
@@ -21,9 +21,9 @@ const stopSignScales = {
 };
 
 const SUBSIGNAL_TO_INDEX = {
-    GREEN: 4,
+    GREEN: 6,
     YELLOW: 5,
-    RED: 6,
+    RED: 4,
 };
 const SUBSIGNAL_TO_LIGHT = {
     GREEN: 0x17f470,
@@ -271,14 +271,14 @@ export default class TrafficControl {
     }
 
     removeTrafficLight(currentItemIds, scene) {
-        if (!this.trafficLight || !currentItemIds) {
+        if (!this.trafficLight) {
             return;
         }
 
         const currentItems = {};
         for (const id in this.trafficLight) {
             const mesh = this.trafficLight[id];
-            if (!currentItemIds.includes(id)) {
+            if (!currentItemIds || !currentItemIds.includes(id)) {
                 TrafficControl.removeMapObject(mesh, scene);
             } else {
                 currentItems[id] = mesh;
@@ -289,14 +289,14 @@ export default class TrafficControl {
     }
 
     removeStopSign(currentItemIds, scene) {
-        if (!this.stopSign || !currentItemIds) {
+        if (!this.stopSign) {
             return;
         }
 
         const currentItems = {};
         for (const id in this.stopSign) {
             const mesh = this.stopSign[id];
-            if (!currentItemIds.includes(id)) {
+            if (!currentItemIds || !currentItemIds.includes(id)) {
                 TrafficControl.removeMapObject(mesh, scene);
             } else {
                 currentItems[id] = mesh;
