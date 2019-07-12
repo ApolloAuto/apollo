@@ -137,43 +137,42 @@ ReferencePoint ReferenceLine::GetNearestReferencePoint(
   return reference_points_[min_index];
 }
 
-bool ReferenceLine::Shrink(const common::math::Vec2d& point,
-                           double look_backward, double look_forward) {
+bool ReferenceLine::Segment(const common::math::Vec2d& point,
+                            const double look_backward,
+                            const double look_forward) {
   common::SLPoint sl;
   if (!XYToSL(point, &sl)) {
     AERROR << "Failed to project point: " << point.DebugString();
     return false;
   }
-  return Shrink(sl.s(), look_backward, look_forward);
+  return Segment(sl.s(), look_backward, look_forward);
 }
 
-bool ReferenceLine::Shrink(const double s, double look_backward,
-                           double look_forward) {
+bool ReferenceLine::Segment(const double s, const double look_backward,
+                            const double look_forward) {
   const auto& accumulated_s = map_path_.accumulated_s();
-  size_t start_index = 0;
-  if (s > look_backward) {
-    auto it_lower = std::lower_bound(accumulated_s.begin(), accumulated_s.end(),
-                                     s - look_backward);
-    start_index = std::distance(accumulated_s.begin(), it_lower);
-  }
-  size_t end_index = reference_points_.size();
-  if (s + look_forward < Length()) {
-    auto start_it = accumulated_s.begin();
-    std::advance(start_it, start_index);
-    auto it_higher =
-        std::upper_bound(start_it, accumulated_s.end(), s + look_forward);
-    end_index = std::distance(accumulated_s.begin(), it_higher);
-  }
-  reference_points_.erase(reference_points_.begin() + end_index,
-                          reference_points_.end());
-  reference_points_.erase(reference_points_.begin(),
-                          reference_points_.begin() + start_index);
-  if (reference_points_.size() < 2) {
+
+  // inclusive
+  auto start_index = std::distance(accumulated_s.begin(),
+      std::lower_bound(
+          accumulated_s.begin(), accumulated_s.end(), s - look_backward));
+
+  // exclusive
+  auto end_index = std::distance(accumulated_s.begin(),
+      std::upper_bound(
+          accumulated_s.begin(), accumulated_s.end(), s + look_forward));
+
+  if (end_index - start_index < 2) {
     AERROR << "Too few reference points after shrinking.";
     return false;
   }
-  map_path_ = MapPath(std::move(std::vector<hdmap::MapPathPoint>(
-      reference_points_.begin(), reference_points_.end())));
+
+  reference_points_ = std::vector<ReferencePoint>(
+      reference_points_.begin() + start_index,
+      reference_points_.begin() + end_index);
+
+  map_path_ = MapPath(std::vector<hdmap::MapPathPoint>(
+      reference_points_.begin(), reference_points_.end()));
   return true;
 }
 
