@@ -221,8 +221,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     return;
   }
 
-  if (FLAGS_estimate_current_vehicle_state &&
-      start_timestamp - vehicle_state_timestamp <
+  if (start_timestamp - vehicle_state_timestamp <
           FLAGS_message_latency_threshold) {
     vehicle_state = AlignTimeStamp(vehicle_state, start_timestamp);
   }
