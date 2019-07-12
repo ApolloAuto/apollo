@@ -1,11 +1,10 @@
 import { observable, action } from "mobx";
+import _ from 'lodash';
 
 export default class TrafficSignal {
     @observable color = "";
 
     @action update(world) {
-        if (world.trafficSignal !== undefined) {
-            this.color = world.trafficSignal.currentSignal;
-        }
+        this.color = _.get(world, 'trafficSignal.currentSignal');
     }
 }

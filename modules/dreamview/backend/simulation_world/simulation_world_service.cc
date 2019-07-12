@@ -60,6 +60,7 @@ using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using apollo::perception::TrafficLightDetection;
+using apollo::perception::TrafficLight;
 using apollo::planning::ADCTrajectory;
 using apollo::planning::DecisionResult;
 using apollo::planning::StopReasonCode;
@@ -603,7 +604,7 @@ void SimulationWorldService::UpdateSimulationWorld(
     Object *signal = world_.add_perceived_signal();
     signal->set_id(traffic_light.id());
     signal->set_current_signal(
-      apollo::perception::TrafficLight_Color_Name(traffic_light.color()));
+      TrafficLight_Color_Name(traffic_light.color()));
   }
 }
 
@@ -955,13 +956,33 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   }
 
   // Update planning signal
-  // TODO(zhangqian): check with planning to decide a reasonable signal
   world_.clear_traffic_signal();
   if (data.has_signal_light() &&
       data.signal_light().signal_size() > 0) {
+    TrafficLight::Color current_signal = TrafficLight::UNKNOWN;
+    int green_light_count = 0;
+
+    for (auto &signal : data.signal_light().signal()) {
+      switch (signal.color()) {
+        case TrafficLight::RED:
+        case TrafficLight::YELLOW:
+        case TrafficLight::BLACK:
+          current_signal = signal.color();
+          break;
+        case TrafficLight::GREEN:
+          green_light_count++;
+          break;
+        default:
+          break;
+      }
+    }
+
+    if (green_light_count == data.signal_light().signal_size()) {
+      current_signal = TrafficLight::GREEN;
+    }
+
     world_.mutable_traffic_signal()->set_current_signal(
-      apollo::perception::TrafficLight_Color_Name(
-        data.signal_light().signal(0).color()));
+      TrafficLight_Color_Name(current_signal));
   }
 }
 
