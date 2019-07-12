@@ -9879,6 +9879,60 @@
                 }
               }
             },
+            "Passage": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "signalId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 2
+                },
+                "yieldId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 3
+                },
+                "stopSignId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 4
+                },
+                "laneId": {
+                  "rule": "repeated",
+                  "type": "Id",
+                  "id": 5
+                },
+                "type": {
+                  "type": "Type",
+                  "id": 6
+                }
+              },
+              "nested": {
+                "Type": {
+                  "values": {
+                    "UNKNOWN": 0,
+                    "ENTRANCE": 1,
+                    "EXIT": 2
+                  }
+                }
+              }
+            },
+            "PassageGroup": {
+              "fields": {
+                "id": {
+                  "type": "Id",
+                  "id": 1
+                },
+                "passage": {
+                  "rule": "repeated",
+                  "type": "Passage",
+                  "id": 2
+                }
+              }
+            },
             "PNCJunction": {
               "fields": {
                 "id": {
@@ -9893,6 +9947,11 @@
                   "rule": "repeated",
                   "type": "Id",
                   "id": 3
+                },
+                "passageGroup": {
+                  "rule": "repeated",
+                  "type": "PassageGroup",
+                  "id": 4
                 }
               }
             },
