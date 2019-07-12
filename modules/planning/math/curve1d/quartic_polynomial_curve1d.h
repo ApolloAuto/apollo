@@ -88,7 +88,7 @@ class QuarticPolynomialCurve1d : public PolynomialCurve1d {
 
   double Coef(const size_t order) const override;
 
-  size_t Order() const { return 4; }
+  size_t Order() const override { return 4; }
 
  private:
   void ComputeCoefficients(const double x0, const double dx0, const double ddx0,
