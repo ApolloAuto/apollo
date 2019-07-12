@@ -142,6 +142,7 @@ bool NCutSegmentation::Configure(std::string param_file) {
   ground_detector_str_ = seg_param_.ground_detector();
   roi_filter_str_ = seg_param_.roi_filter();
   ncut_param_ = seg_param_.ncut_param();
+  do_classification_ = seg_param_.do_classification();
   AINFO << "NCut Segmentation " << seg_param_.DebugString();
   return true;
 }
@@ -218,13 +219,17 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
     AINFO << "remove ground";
     cloud_above_ground->CopyPointCloud(*lidar_frame_ref_->cloud,
                                        lidar_frame_ref_->non_ground_indices);
+  } else {
+    // if used as secondary segmentor, got from cloud directly
+    cloud_above_ground->CopyPointCloud(*lidar_frame_ref_->cloud,
+                                       lidar_frame_ref_->secondary_indices);
   }
 
-  // filter_by_ground(cloud, non_ground_indices, &cloud_above_ground);
-  AINFO << "filter ground, elapsed time: " << omp_get_wtime() - start_t;
-  start_t = omp_get_wtime();
 #ifdef DEBUG_NCUT
-  AINFO << "filter ground: " << cloud_above_ground->size() << " points left";
+  // filter_by_ground(cloud, non_ground_indices, &cloud_above_ground);
+  AINFO << "filter ground, elapsed time: " << omp_get_wtime() - start_t
+        << cloud_above_ground->size() << " points left";
+  start_t = omp_get_wtime();
   VisualizePointCloud(cloud_above_ground);
 #endif
 
@@ -232,11 +237,11 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
   base::PointFCloudPtr cloud_after_car_filter;
   ObstacleFilter(cloud_above_ground, vehicle_filter_cell_size_, false,
                  &cloud_after_car_filter, segments);
-  AINFO << "filter vehicle, elapsed time: " << omp_get_wtime() - start_t;
-  start_t = omp_get_wtime();
 #ifdef DEBUG_NCUT
-  AINFO << "filter vehicle: " << cloud_after_car_filter->size()
+  AINFO << "filter vehicle, elapsed time: " << omp_get_wtime() - start_t
+        << "filter vehicle: " << cloud_after_car_filter->size()
         << " points left";
+  start_t = omp_get_wtime();
   VisualizePointCloud(cloud_after_car_filter);
 #endif
 
@@ -245,9 +250,9 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
   ObstacleFilter(cloud_after_car_filter, pedestrian_filter_cell_size_, true,
                  &cloud_after_people_filter, segments);
 
+#ifdef DEBUG_NCUT
   AINFO << "filter pedestrian, elapsed time: " << omp_get_wtime() - start_t;
   start_t = omp_get_wtime();
-#ifdef DEBUG_NCUT
   AINFO << "filter pedestrian: " << cloud_after_people_filter->size()
         << " points left";
   VisualizePointCloud(cloud_after_people_filter);
@@ -259,11 +264,11 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
   std::vector<base::PointFCloudPtr> cloud_components;
   PartitionConnectedComponents(cloud_after_people_filter, partition_cell_size_,
                                &cloud_components);
+
+#ifdef DEBUG_NCUT
   AINFO << "partition small regions, elapsed time: "
         << omp_get_wtime() - start_t;
   start_t = omp_get_wtime();
-
-#ifdef DEBUG_NCUT
   AINFO << "partition " << cloud_components.size() << " components";
 #endif
 
@@ -294,9 +299,10 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
     obj->lidar_supplement.cloud = *pc;
     _outliers->push_back(obj);
   }
+#ifdef DEBUG_NCUT
   AINFO << "filter outlier, elapsed time: " << omp_get_wtime() - start_t;
   start_t = omp_get_wtime();
-
+#endif
   // .6 graph cut each
   std::vector<std::vector<base::PointFCloudPtr>> threads_segment_pcs(
       num_threads);
@@ -316,9 +322,8 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
 
 #pragma omp for schedule(guided)
     for (size_t i = 0; i < cloud_tbd.size(); ++i) {
-      AINFO << "before segment";
       my_ncut->Segment(cloud_components[cloud_tbd[i]]);
-      AINFO << "after segment with num segments" << my_ncut->NumSegments();
+      ADEBUG << "after segment with num segments" << my_ncut->NumSegments();
       for (int j = 0; j < my_ncut->NumSegments(); ++j) {
         base::PointFCloudPtr pc = my_ncut->GetSegmentPointCloud(j);
         std::string label = my_ncut->GetSegmentLabel(j);
@@ -331,10 +336,11 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
       }
     }
   }
-
-  AINFO << "parallel normalized cut, elapsed time: "
-        << omp_get_wtime() - start_t;
+#ifdef DEBUG_NCUT
+  ADEBUG << "parallel normalized cut, elapsed time: "
+         << omp_get_wtime() - start_t;
   start_t = omp_get_wtime();
+#endif
   // .6.2 aggregate results
   std::vector<int> segment_offset(num_threads,
                                   static_cast<int>(segments->size()));
@@ -353,6 +359,10 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
       base::ObjectPtr& obj_ptr = (*segments)[offset + j];
       obj_ptr.reset(new base::Object());
       obj_ptr->lidar_supplement.cloud = *threads_segment_pcs[i][j];
+
+      if (do_classification_) {
+        obj_ptr->type = Label2Type(threads_segment_labels[i][j]);
+      }
     }
   }
   std::vector<int> outlier_offset(num_threads,
@@ -382,7 +392,24 @@ bool NCutSegmentation::Segment(const SegmentationOptions& options,
   VisualizeSegments(*segments);
   VisualizeSegments(*_outliers);
 #endif
+
   return true;
+}
+
+base::ObjectType NCutSegmentation::Label2Type(const std::string& label) {
+  if (label == "unknown") {
+    return base::ObjectType::UNKNOWN;
+  }
+  if (label == "nonMot") {
+    return base::ObjectType::BICYCLE;
+  }
+  if (label == "pedestrian") {
+    return base::ObjectType::PEDESTRIAN;
+  }
+  if (label == "smallMot") {
+    return base::ObjectType::VEHICLE;
+  }
+  return base::ObjectType::UNKNOWN;
 }
 
 void NCutSegmentation::PartitionConnectedComponents(

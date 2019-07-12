@@ -77,6 +77,10 @@ class CloudMask {
       const base::AttributePointCloud<base::PointF>& source_cloud,
       base::AttributePointCloud<base::PointF>* target_cloud) const;
 
+  // @brief; get valid indices from mask
+  // @param [in]: indices vector
+  void GetValidIndices(base::PointIndices *indices);
+
   // @brief: flip the mask data, positive to zero and zero to one
   // @brief: note, flip twice is not guaranteed to recover the original mask
   void Flip();
@@ -123,6 +127,8 @@ class CloudMask {
   // @param [in]: source value
   // @param [in]: target value
   void ResetValue(int source_value, int target_value);
+
+  std::vector<int> GetValidIndices();
 
  private:
   // @brief mask data

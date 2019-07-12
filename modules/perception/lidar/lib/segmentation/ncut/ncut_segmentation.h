@@ -50,6 +50,11 @@ class NCutSegmentation : public BaseSegmentation {
 
   std::string Name() const override { return "NCutSegmentation"; }
 
+  void ByPassROIService() {
+      remove_roi_ = false;
+      remove_ground_ = false;
+  }
+
  private:
   bool Configure(std::string model_name);
 
@@ -65,6 +70,8 @@ class NCutSegmentation : public BaseSegmentation {
   bool IsOutlier(const base::PointFCloudPtr& in_cloud);
 
   bool GetConfigs(std::string* ncut_file);
+
+  base::ObjectType Label2Type(const std::string &label);
 
   // ground detector for background segmentation
   std::unique_ptr<BaseGroundDetector> ground_detector_;
@@ -95,6 +102,7 @@ class NCutSegmentation : public BaseSegmentation {
   int outlier_min_num_points_ = 10;
   bool remove_ground_ = true;
   bool remove_roi_ = true;
+  bool do_classification_ = true;
   std::string ground_detector_str_;
   std::string roi_filter_str_;
   NCutParam ncut_param_;

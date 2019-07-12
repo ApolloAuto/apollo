@@ -85,7 +85,9 @@ bool NCut::Configure(const NCutParam &ncut_param_) {
 }
 
 void NCut::Segment(base::PointFCloudConstPtr cloud) {
+#ifdef DEBUG_NCUT
   double start_t = omp_get_wtime();
+#endif
   // .0 clear everything
   _segment_pids.clear();
   _segment_labels.clear();
@@ -114,22 +116,26 @@ void NCut::Segment(base::PointFCloudConstPtr cloud) {
 #ifdef DEBUG_NCUT
   // visualize_segments_from_points(_cluster_points);
   ADEBUG << "super pixels " << _cluster_points.size();
-#endif
-  AINFO << "super pixels " << _cluster_points.size();
   AINFO << "super pixels done " << omp_get_wtime() - start_t;
   start_t = omp_get_wtime();
+#endif
+
   // .2 precompute skeleton and bbox
   PrecomputeAllSkeletonAndBbox();
+#ifdef DEBUG_NCUT
   AINFO << "precompute skeleton and bbox done " << omp_get_wtime() - start_t;
   start_t = omp_get_wtime();
+#endif
   // .3 grach cut
   std::vector<std::vector<int>> segment_clusters;
   std::vector<std::string> segment_labels;
   NormalizedCut(_ncuts_stop_threshold, true, &segment_clusters,
                 &segment_labels);
+#ifdef DEBUG_NCUT
   AINFO << "normalized_cut done, #segments " << segment_clusters.size()
         << ", time: " << omp_get_wtime() - start_t;
   start_t = omp_get_wtime();
+#endif
   // .4 _segment_pids;
   for (size_t i = 0; i < segment_clusters.size(); ++i) {
     std::vector<int> pids;
@@ -363,9 +369,8 @@ void NCut::NormalizedCut(float ncuts_threshold, bool use_classifier,
   while (!job_stack.empty()) {
     curr = job_stack.top();
     job_stack.pop();
-    AINFO << "curr size " << curr->size();
 #ifdef DEBUG_NCUT
-    DEBUG << "curr size " << curr->size();
+    AINFO << "curr size " << curr->size();
 // visualize_cluster(curr);
 #endif
     std::string seg_label;
@@ -393,9 +398,7 @@ void NCut::NormalizedCut(float ncuts_threshold, bool use_classifier,
           my_weights.coeffRef(i, j) = weights.coeffRef(ci, cj);
         }
       }
-      AINFO << "before get mincuts ";
       double cost = GetMinNcuts(my_weights, curr, seg1, seg2);
-      AINFO << "after get mincuts";
 #ifdef DEBUG_NCUT
       AINFO << "N cut cost is " << cost << ", seg1 size " << seg1->size()
             << ", seg2 size " << seg2->size();
