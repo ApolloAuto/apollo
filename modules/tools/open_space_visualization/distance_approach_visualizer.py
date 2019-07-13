@@ -24,15 +24,17 @@ import numpy as np
 import time
 import math
 
-def SmoothTrajectory(visualize_flag):
+# def SmoothTrajectory(visualize_flag):
+def SmoothTrajectory(visualize_flag, sx, sy):
     # initialze object
     OpenSpacePlanner = DistancePlanner()
 
     # parameter(except max, min and car size is defined in proto)
     num_output_buffer = 10000
-    sx = -8
-    sy = 1.5
-    sphi = 0.5
+    # sx = -8
+    # sy = 1.5
+    # sphi = 0.5
+    sphi = 0.0
 
     scenario = "backward"
     # scenario = "parallel"
@@ -237,4 +239,21 @@ def SmoothTrajectory(visualize_flag):
 
 if __name__ == '__main__':
     visualize_flag = True
-    SmoothTrajectory(visualize_flag)
+    # SmoothTrajectory(visualize_flag)
+
+    visualize_flag = False
+    planning_time_stats = []
+    test_count = 0
+    success_count = 0
+    for sx in np.arange(-9, -6, 0.5) : 
+        for sy in np.arange(2, 4, 0.25):
+            print("sx is "+ str(sx) + " and sy is " + str(sy))
+            test_count += 1
+            result = SmoothTrajectory(visualize_flag, sx, sy)
+            if result[0] :
+                success_count += 1
+                planning_time_stats.append(result[-1])
+    print("success rate is "+ str(success_count / test_count))            
+    print("min is " + str(min(planning_time_stats)))
+    print("max is " + str(max(planning_time_stats)))
+    print("average is " + str(sum(planning_time_stats) / len(planning_time_stats)))

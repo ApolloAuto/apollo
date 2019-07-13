@@ -51,6 +51,7 @@ message DualVariableConfig {
   optional DualVariableMode qp_format = 3;
   optional double min_safety_distance = 4 [default = 0.0];
   optional bool debug_osqp = 5 [default = false];
+  optional double beta = 6 [default = 1.0];
 }
 
 // Distance approach trajectory smoothing configs

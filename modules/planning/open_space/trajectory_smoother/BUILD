@@ -16,6 +16,7 @@ cc_library(
         ":dual_variable_warm_start_ipopt_interface",
         ":dual_variable_warm_start_ipopt_qp_interface",
         ":dual_variable_warm_start_osqp_interface",
+        ":dual_variable_warm_start_slack_osqp_interface",
     ],
 )
 
@@ -70,6 +71,27 @@ cc_library(
     ],
     hdrs = [
         "dual_variable_warm_start_osqp_interface.h",
+    ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/math",
+        "//modules/common/util",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/proto:planner_open_space_config_proto",
+        "//modules/planning/proto:planning_proto",
+        "@eigen",
+        "@osqp",
+    ],
+)
+
+cc_library(
+    name = "dual_variable_warm_start_slack_osqp_interface",
+    srcs = [
+        "dual_variable_warm_start_slack_osqp_interface.cc",
+    ],
+    hdrs = [
+        "dual_variable_warm_start_slack_osqp_interface.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [

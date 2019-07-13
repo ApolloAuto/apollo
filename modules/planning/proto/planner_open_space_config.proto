@@ -10,6 +10,7 @@ enum DualWarmUpMode {
   IPOPTQP = 1;
   OSQP = 2;
   DEBUG = 3;
+  SLACKQP = 4;
 }
 
 enum DistanceApproachMode {
@@ -73,6 +74,7 @@ message DualVariableWarmStartConfig {
   optional DualWarmUpMode qp_format = 3;
   optional double min_safety_distance = 4 [default = 0.0];
   optional bool debug_osqp = 5 [default = false];
+  optional double beta = 6 [default = 1.0];
 }
 
 message DistanceApproachConfig {

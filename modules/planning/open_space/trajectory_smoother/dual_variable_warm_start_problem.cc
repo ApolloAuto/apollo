@@ -66,6 +66,28 @@ bool DualVariableWarmStartProblem::Solve(
       solver_flag = false;
     }
   } else if (planner_open_space_config_.dual_variable_warm_start_config()
+          .qp_format() == SLACKQP) {
+    DualVariableWarmStartSlackOSQPInterface* ptop =
+        new DualVariableWarmStartSlackOSQPInterface(
+            horizon, ts, ego, obstacles_edges_num, obstacles_num, obstacles_A,
+            obstacles_b, xWS, planner_open_space_config_);
+    bool succ = ptop->optimize();
+
+    if (succ) {
+      ADEBUG << "dual warm up done.";
+      ptop->get_optimization_results(l_warm_up, n_warm_up);
+
+      auto t_end = cyber::Time::Now().ToSecond();
+      ADEBUG << "Dual variable warm start solving time in second : "
+             << t_end - t_start;
+
+      solver_flag = true;
+    } else {
+      AWARN << "dual warm up fail.";
+      ptop->get_optimization_results(l_warm_up, n_warm_up);
+      solver_flag = false;
+    }
+  } else if (planner_open_space_config_.dual_variable_warm_start_config()
                  .qp_format() == IPOPTQP) {
     DualVariableWarmStartIPOPTQPInterface* ptop =
         new DualVariableWarmStartIPOPTQPInterface(
