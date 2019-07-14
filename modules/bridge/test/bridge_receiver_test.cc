@@ -49,8 +49,8 @@ void *pthread_handle_message(void *pfd) {
   int total_recv = 2 * FRAME_SIZE;
   char total_buf[2 * FRAME_SIZE] = {0};
   bytes =
-      static_cast<int>(recvfrom(*static_cast<int *>(pfd), total_buf, total_recv, 0,
-                                (struct sockaddr *)&client_addr, &sock_len));
+      static_cast<int>(recvfrom(*static_cast<int *>(pfd), total_buf,
+            total_recv, 0, (struct sockaddr *)&client_addr, &sock_len));
   ADEBUG << "total recv " << bytes;
   if (bytes <= 0 || bytes > total_recv) {
     pthread_exit(nullptr);
@@ -128,7 +128,8 @@ bool receive(uint16_t port) {
   }
   int opt = SO_REUSEADDR;
   setsockopt(listener_sock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-  if (fcntl(listener_sock, F_SETFL, fcntl(listener_sock, F_GETFD, 0) | O_NONBLOCK) == -1) {
+  if (fcntl(listener_sock, F_SETFL,
+      fcntl(listener_sock, F_GETFD, 0) | O_NONBLOCK) == -1) {
     ADEBUG << "set nonblocking failed";
     return false;
   }
