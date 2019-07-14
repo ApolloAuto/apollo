@@ -18,6 +18,7 @@
 #include <netinet/in.h>
 #include <stdlib.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
 #include "cyber/common/log.h"
 #include "cyber/scheduler/scheduler_factory.h"
@@ -86,9 +87,12 @@ bool send(const std::string &remote_ip, uint16_t remote_port, uint32_t count) {
         ADEBUG << "sent msg failed ";
         break;
       }
-      ADEBUG << "sent " << nbytes << "bytes to server";
+      AINFO << "sent " << nbytes << " bytes to server with sequence num " << i;
     }
     close(sock_fd);
+
+    // 1000Hz
+    usleep(1000);
   }
   return true;
 }
