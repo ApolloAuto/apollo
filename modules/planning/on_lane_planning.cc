@@ -134,8 +134,8 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
       hdmap::PncMap::LookForwardDistance(vehicle_state.linear_velocity());
 
   for (auto& ref_line : reference_lines) {
-    if (!ref_line.Shrink(Vec2d(vehicle_state.x(), vehicle_state.y()),
-                         FLAGS_look_backward_distance, forword_limit)) {
+    if (!ref_line.Segment(Vec2d(vehicle_state.x(), vehicle_state.y()),
+                          FLAGS_look_backward_distance, forword_limit)) {
       std::string msg = "Fail to shrink reference line.";
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }

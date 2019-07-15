@@ -439,14 +439,8 @@ export default class Map {
                 }
 
                 this.removeExpiredElements(elementIds, scene);
-
-                if (elementIds['signal']) {
-                    this.trafficControl.removeTrafficLight(elementIds['signal'], scene);
-                }
-
-                if (elementIds['stopSign']) {
-                    this.trafficControl.removeStopSign(elementIds['stopSign'], scene);
-                }
+                this.trafficControl.removeTrafficLight(elementIds['signal'], scene);
+                this.trafficControl.removeStopSign(elementIds['stopSign'], scene);
             }
         }
     }

@@ -1016,16 +1016,13 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
       cv::rectangle(image_2D, r, color_cipv_, cipv_line_thickness_);
     }
     cv::rectangle(image_2D, r, color, 2);
-    cv::putText(image_2D, std::to_string(object->track_id),
-                cv::Point(static_cast<int>(rect.x), static_cast<int>(rect.y)),
-                cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar(0, 0, 255), 2);
 
     cv::putText(
         image_2D,
         // type_to_string(object->type) + "->" +
         sub_type_to_string(object->sub_type),
         cv::Point(static_cast<int>(rect.x), static_cast<int>(rect.y) + 30),
-        cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar(255, 0, 0), 1);
+        cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar(0, 0, 255), 1);
 
     // compute 8 vetices in camera coodinates
     Eigen::Vector3d pos;
@@ -1070,6 +1067,16 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
     ADEBUG << "theta: " << theta * 180 / M_PI << " = "
           << object->camera_supplement.alpha * 180 / M_PI << " + "
           << theta_ray * 180 / M_PI;
+
+    float distance =
+        static_cast<float>(sqrt(c_2D_l(0) * c_2D_l(0) + c_2D_l(1) * c_2D_l(1)));
+    char dist_string[100];
+    snprintf(dist_string, sizeof(dist_string), "%.1fm", distance);
+    // Show distance
+    cv::putText(
+        image_2D, dist_string,
+        cv::Point(static_cast<int>(rect.x), static_cast<int>(rect.y - 10)),
+        cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar(0, 255, 0), 2);
 
     // plot projected 3D box on image_3D
     Eigen::Matrix3d rotate_ry;
