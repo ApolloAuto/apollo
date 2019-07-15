@@ -734,7 +734,7 @@ bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
   }
   if (need_shrink) {
     if (!reference_line->Segment(sl.s(), new_backward_distance,
-                                new_forward_distance)) {
+                                 new_forward_distance)) {
       AWARN << "Failed to shrink reference line";
     }
     if (!segments->Shrink(sl.s(), new_backward_distance,

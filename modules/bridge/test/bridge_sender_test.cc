@@ -19,8 +19,8 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 
-#include "cyber/scheduler/scheduler_factory.h"
 #include "cyber/common/log.h"
+#include "cyber/scheduler/scheduler_factory.h"
 #include "modules/bridge/common/bridge_proto_serialized_buf.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/time/time.h"
@@ -47,7 +47,7 @@ bool send(const std::string &remote_ip, uint16_t remote_port, uint32_t count) {
     pb_msg->set_brake_percentage(coefficient * hundred / total);
     pb_msg->set_steering_percentage(coefficient * hundred / total);
     pb_msg->set_steering_torque_nm(coefficient);
-    pb_msg->set_parking_brake(i % 2 ? true: false);
+    pb_msg->set_parking_brake(i % 2 ? true : false);
     pb_msg->set_high_beam_signal(false);
     pb_msg->set_low_beam_signal(true);
     pb_msg->set_left_turn_signal(false);
