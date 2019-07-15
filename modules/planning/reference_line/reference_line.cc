@@ -153,23 +153,25 @@ bool ReferenceLine::Segment(const double s, const double look_backward,
   const auto& accumulated_s = map_path_.accumulated_s();
 
   // inclusive
-  auto start_index = std::distance(accumulated_s.begin(),
-      std::lower_bound(
-          accumulated_s.begin(), accumulated_s.end(), s - look_backward));
+  auto start_index =
+      std::distance(accumulated_s.begin(),
+                    std::lower_bound(accumulated_s.begin(), accumulated_s.end(),
+                                     s - look_backward));
 
   // exclusive
-  auto end_index = std::distance(accumulated_s.begin(),
-      std::upper_bound(
-          accumulated_s.begin(), accumulated_s.end(), s + look_forward));
+  auto end_index =
+      std::distance(accumulated_s.begin(),
+                    std::upper_bound(accumulated_s.begin(), accumulated_s.end(),
+                                     s + look_forward));
 
   if (end_index - start_index < 2) {
     AERROR << "Too few reference points after shrinking.";
     return false;
   }
 
-  reference_points_ = std::vector<ReferencePoint>(
-      reference_points_.begin() + start_index,
-      reference_points_.begin() + end_index);
+  reference_points_ =
+      std::vector<ReferencePoint>(reference_points_.begin() + start_index,
+                                  reference_points_.begin() + end_index);
 
   map_path_ = MapPath(std::vector<hdmap::MapPathPoint>(
       reference_points_.begin(), reference_points_.end()));
