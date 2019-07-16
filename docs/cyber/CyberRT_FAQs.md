@@ -79,5 +79,18 @@ You can refer the sample code:
 - talker: https://github.com/gruminions/apollo/blob/record/cyber/examples/talker.cc
 - listener: https://github.com/gruminions/apollo/blob/record/cyber/examples/listener.cc
 
+## How to configure multiple hosts communication?
+
+Make sure the two(or more) hosts under the same network segment of the local area network, Like `192.168.10.6` and `192.168.10.7`.
+
+You just need to modify `CYBER_IP` of `/apollo/cyber/setup.bash`
+
+```bash
+export CYBER_IP=127.0.0.1
+```
+
+Suppose you have two hosts A and B，the ip of A is `192.168.10.6`, and the ip of B is `192.168.10.7`. Then set `CYBER_IP` to `192.168.10.6` on host A, and set `CYBER_IP` to `192.168.10.7` on host B. Now host A can communicate with host B.
+
+
 ---
 More FAQs to follow...
