@@ -86,7 +86,7 @@ bool send(const std::string &remote_ip, uint16_t remote_port, uint32_t count) {
         ADEBUG << "sent msg failed ";
         break;
       }
-      AINFO << "sent " << nbytes << " bytes to server with sequence num " << i;
+      ADEBUG << "sent " << nbytes << " bytes to server with sequence num " << i;
     }
     close(sock_fd);
 

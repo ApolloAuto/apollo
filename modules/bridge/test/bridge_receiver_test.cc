@@ -59,7 +59,7 @@ void *pthread_handle_message(void *pfd) {
   size_t offset = 0;
   memcpy(header_flag, total_buf, HEADER_FLAG_SIZE);
   if (strcmp(header_flag, BRIDGE_HEADER_FLAG) != 0) {
-    AINFO << "header flag not match!";
+    ADEBUG << "header flag not match!";
     pthread_exit(nullptr);
   }
   offset += sizeof(BRIDGE_HEADER_FLAG) + 1;
@@ -69,7 +69,7 @@ void *pthread_handle_message(void *pfd) {
   memcpy(header_size_buf, cursor, sizeof(hsize));
   hsize header_size = *(reinterpret_cast<hsize *>(header_size_buf));
   if (header_size > FRAME_SIZE) {
-    AINFO << "header size is more than FRAME_SIZE!";
+    ADEBUG << "header size is more than FRAME_SIZE!";
     pthread_exit(nullptr);
   }
   offset += sizeof(hsize) + 1;
@@ -78,14 +78,14 @@ void *pthread_handle_message(void *pfd) {
   size_t buf_size = header_size - offset;
   cursor = total_buf + offset;
   if (!header.Diserialize(cursor, buf_size)) {
-    AINFO << "header diserialize failed!";
+    ADEBUG << "header diserialize failed!";
     pthread_exit(nullptr);
   }
 
-  AINFO << "proto name : " << header.GetMsgName().c_str();
-  AINFO << "proto sequence num: " << header.GetMsgID();
-  AINFO << "proto total frames: " << header.GetTotalFrames();
-  AINFO << "proto frame index: " << header.GetIndex();
+  ADEBUG << "proto name : " << header.GetMsgName().c_str();
+  ADEBUG << "proto sequence num: " << header.GetMsgID();
+  ADEBUG << "proto total frames: " << header.GetTotalFrames();
+  ADEBUG << "proto frame index: " << header.GetIndex();
 
   BPDBChassis *proto_buf = new BPDBChassis();
   proto_buf->Initialize(header);
@@ -100,15 +100,15 @@ void *pthread_handle_message(void *pfd) {
   if (proto_buf->IsReadyDiserialize()) {
     auto pb_msg = std::make_shared<Chassis>();
     proto_buf->Diserialized(pb_msg);
-    AINFO << "sequence num: " << pb_msg->header().sequence_num();
-    AINFO << "timestamp sec: " << pb_msg->header().timestamp_sec();
-    AINFO << "engine rpm: " << pb_msg->engine_rpm();
-    AINFO << "odometer m: " << pb_msg->odometer_m();
-    AINFO << "throttle percentage: " << pb_msg->throttle_percentage();
-    AINFO << "brake percentage: " << pb_msg->brake_percentage();
-    AINFO << "steering percentage: " << pb_msg->steering_percentage();
-    AINFO << "steering torque nm: " << pb_msg->steering_torque_nm();
-    AINFO << "parking brake: " << pb_msg->parking_brake();
+    ADEBUG << "sequence num: " << pb_msg->header().sequence_num();
+    ADEBUG << "timestamp sec: " << pb_msg->header().timestamp_sec();
+    ADEBUG << "engine rpm: " << pb_msg->engine_rpm();
+    ADEBUG << "odometer m: " << pb_msg->odometer_m();
+    ADEBUG << "throttle percentage: " << pb_msg->throttle_percentage();
+    ADEBUG << "brake percentage: " << pb_msg->brake_percentage();
+    ADEBUG << "steering percentage: " << pb_msg->steering_percentage();
+    ADEBUG << "steering torque nm: " << pb_msg->steering_torque_nm();
+    ADEBUG << "parking brake: " << pb_msg->parking_brake();
   }
   pthread_exit(nullptr);
 }
@@ -154,7 +154,7 @@ bool receive(uint16_t port) {
     return false;
   }
 
-  AINFO << "Ready!";
+  ADEBUG << "Ready!";
 
   int nfds = -1;
   bool res = true;
