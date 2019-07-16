@@ -96,14 +96,14 @@ Status OpenSpaceTrajectoryPartition::Process() {
   InterpolateTrajectory(stitched_trajectory_result,
                         interpolated_trajectory_result_ptr);
 
-  auto* paritioned_trajectories =
-      open_space_info_ptr->mutable_paritioned_trajectories();
+  auto* partitioned_trajectories =
+      open_space_info_ptr->mutable_partitioned_trajectories();
 
   PartitionTrajectory(*interpolated_trajectory_result_ptr,
-                      paritioned_trajectories);
+                      partitioned_trajectories);
 
   // Choose the one to follow based on the closest partitioned trajectory
-  size_t trajectories_size = paritioned_trajectories->size();
+  size_t trajectories_size = partitioned_trajectories->size();
 
   size_t current_trajectory_index = 0;
   size_t current_trajectory_point_index = 0;
@@ -119,7 +119,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
 
   std::vector<std::string> trajectories_encodings;
   for (size_t i = 0; i < trajectories_size; ++i) {
-    const auto& trajectory = paritioned_trajectories->at(i).first;
+    const auto& trajectory = partitioned_trajectories->at(i).first;
     std::string trajectory_encoding;
     if (!EncodeTrajectory(trajectory, &trajectory_encoding)) {
       return Status(ErrorCode::PLANNING_ERROR,
@@ -129,8 +129,8 @@ Status OpenSpaceTrajectoryPartition::Process() {
   }
 
   for (size_t i = 0; i < trajectories_size; ++i) {
-    const auto& gear = paritioned_trajectories->at(i).second;
-    const auto& trajectory = paritioned_trajectories->at(i).first;
+    const auto& gear = partitioned_trajectories->at(i).second;
+    const auto& trajectory = partitioned_trajectories->at(i).first;
     size_t trajectory_size = trajectory.size();
     CHECK_GT(trajectory_size, 0);
 
@@ -213,7 +213,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
     }
 
     if (use_fail_safe_search) {
-      if (!UseFailSafeSearch(*paritioned_trajectories, trajectories_encodings,
+      if (!UseFailSafeSearch(*partitioned_trajectories, trajectories_encodings,
                              &current_trajectory_index,
                              &current_trajectory_point_index)) {
         std::string msg("Fail to find nearest trajectory point to follow");
@@ -223,23 +223,31 @@ Status OpenSpaceTrajectoryPartition::Process() {
     }
   }
 
-  auto* chosen_paritioned_trajectory =
-      open_space_info_ptr->mutable_chosen_paritioned_trajectory();
+  auto* chosen_partitioned_trajectory =
+      open_space_info_ptr->mutable_chosen_partitioned_trajectory();
+
+  auto trajectory = &(chosen_partitioned_trajectory->first);
+
+  ADEBUG << "chosen_partitioned_trajectory [" << trajectory->size() << "]";
 
   if (FLAGS_use_gear_shift_trajectory) {
     if (InsertGearShiftTrajectory(flag_change_to_next, current_trajectory_index,
-                                  open_space_info.paritioned_trajectories(),
-                                  chosen_paritioned_trajectory)) {
+                                  open_space_info.partitioned_trajectories(),
+                                  chosen_partitioned_trajectory) &&
+        chosen_partitioned_trajectory->first.size() != 0) {
+      trajectory = &(chosen_partitioned_trajectory->first);
+      ADEBUG << "After InsertGearShiftTrajectory [" << trajectory->size()
+             << "]";
       return Status::OK();
     }
   }
 
   auto* mutable_trajectory =
       open_space_info_ptr->mutable_stitched_trajectory_result();
-  AdjustRelativeTimeAndS(open_space_info.paritioned_trajectories(),
+  AdjustRelativeTimeAndS(open_space_info.partitioned_trajectories(),
                          current_trajectory_index,
                          current_trajectory_point_index, mutable_trajectory,
-                         chosen_paritioned_trajectory);
+                         chosen_partitioned_trajectory);
   return Status::OK();
 }
 
@@ -363,14 +371,14 @@ void OpenSpaceTrajectoryPartition::UpdateTrajHistory(
 
 void OpenSpaceTrajectoryPartition::PartitionTrajectory(
     const DiscretizedTrajectory& raw_trajectory,
-    std::vector<TrajGearPair>* paritioned_trajectories) {
-  CHECK_NOTNULL(paritioned_trajectories);
+    std::vector<TrajGearPair>* partitioned_trajectories) {
+  CHECK_NOTNULL(partitioned_trajectories);
 
   size_t horizon = raw_trajectory.size();
 
-  paritioned_trajectories->clear();
-  paritioned_trajectories->emplace_back();
-  TrajGearPair* current_trajectory_gear = &(paritioned_trajectories->back());
+  partitioned_trajectories->clear();
+  partitioned_trajectories->emplace_back();
+  TrajGearPair* current_trajectory_gear = &(partitioned_trajectories->back());
 
   auto* trajectory = &(current_trajectory_gear->first);
   auto* gear = &(current_trajectory_gear->second);
@@ -414,8 +422,8 @@ void OpenSpaceTrajectoryPartition::PartitionTrajectory(
       LoadTrajectoryPoint(trajectory_point, *gear, &last_pos_vec, &distance_s,
                           trajectory);
 
-      paritioned_trajectories->emplace_back();
-      current_trajectory_gear = &(paritioned_trajectories->back());
+      partitioned_trajectories->emplace_back();
+      current_trajectory_gear = &(partitioned_trajectories->back());
       current_trajectory_gear->second = cur_gear;
       distance_s = 0.0;
     }
@@ -532,17 +540,17 @@ bool OpenSpaceTrajectoryPartition::CheckReachTrajectoryEnd(
 }
 
 bool OpenSpaceTrajectoryPartition::UseFailSafeSearch(
-    const std::vector<TrajGearPair>& paritioned_trajectories,
+    const std::vector<TrajGearPair>& partitioned_trajectories,
     const std::vector<std::string>& trajectories_encodings,
     size_t* current_trajectory_index, size_t* current_trajectory_point_index) {
-  AERROR << "Trajectory paritition fail, using failsafe search";
-  const size_t trajectories_size = paritioned_trajectories.size();
+  AERROR << "Trajectory partition fail, using failsafe search";
+  const size_t trajectories_size = partitioned_trajectories.size();
   std::priority_queue<std::pair<std::pair<size_t, size_t>, double>,
                       std::vector<std::pair<std::pair<size_t, size_t>, double>>,
                       pair_comp_>
       failsafe_closest_point_on_trajs;
   for (size_t i = 0; i < trajectories_size; ++i) {
-    const auto& trajectory = paritioned_trajectories.at(i).first;
+    const auto& trajectory = partitioned_trajectories.at(i).first;
     size_t trajectory_size = trajectory.size();
     CHECK_GT(trajectory_size, 0);
     std::priority_queue<std::pair<size_t, double>,
@@ -604,7 +612,7 @@ bool OpenSpaceTrajectoryPartition::UseFailSafeSearch(
 
 bool OpenSpaceTrajectoryPartition::InsertGearShiftTrajectory(
     const bool flag_change_to_next, const size_t current_trajectory_index,
-    const std::vector<TrajGearPair>& paritioned_trajectories,
+    const std::vector<TrajGearPair>& partitioned_trajectories,
     TrajGearPair* gear_switch_idle_time_trajectory) {
   const auto* last_frame = FrameHistory::Instance()->Latest();
   const auto& last_gear_status =
@@ -618,7 +626,7 @@ bool OpenSpaceTrajectoryPartition::InsertGearShiftTrajectory(
     if (current_gear_status->gear_shift_period_started) {
       current_gear_status->gear_shift_start_time = Clock::NowInSeconds();
       current_gear_status->gear_shift_position =
-          paritioned_trajectories.at(current_trajectory_index).second;
+          partitioned_trajectories.at(current_trajectory_index).second;
       current_gear_status->gear_shift_period_started = false;
     }
     if (current_gear_status->gear_shift_period_time >
@@ -645,40 +653,38 @@ void OpenSpaceTrajectoryPartition::GenerateGearShiftTrajectory(
       open_space_trajectory_partition_config_.gear_shift_max_t();
   const double gear_shift_unit_t =
       open_space_trajectory_partition_config_.gear_shift_unit_t();
-  const double vehicle_x = frame_->vehicle_state().x();
-  const double vehicle_y = frame_->vehicle_state().y();
-  const double vehicle_heading = frame_->vehicle_state().heading();
-  const double vehicle_kappa = frame_->vehicle_state().kappa();
+  // TrajectoryPoint point;
   for (double t = 0.0; t < gear_shift_max_t; t += gear_shift_unit_t) {
-    gear_switch_idle_time_trajectory->first.emplace_back();
-    auto* trajectory_point = &(gear_switch_idle_time_trajectory->first.back());
-    auto* path_point = trajectory_point->mutable_path_point();
-    path_point->set_x(vehicle_x);
-    path_point->set_y(vehicle_y);
-    path_point->set_theta(vehicle_heading);
-    path_point->set_kappa(vehicle_kappa);
-    path_point->set_s(0.0);
-    trajectory_point->set_v(0.0);
-    trajectory_point->set_a(0.0);
-    trajectory_point->set_relative_time(t);
+    TrajectoryPoint point;
+    point.mutable_path_point()->set_x(frame_->vehicle_state().x());
+    point.mutable_path_point()->set_y(frame_->vehicle_state().y());
+    point.mutable_path_point()->set_theta(frame_->vehicle_state().heading());
+    point.mutable_path_point()->set_s(0.0);
+    point.mutable_path_point()->set_kappa(frame_->vehicle_state().kappa());
+    point.set_relative_time(t);
+    point.set_v(0.0);
+    point.set_a(0.0);
+    gear_switch_idle_time_trajectory->first.emplace_back(point);
   }
+  ADEBUG << "gear_switch_idle_time_trajectory"
+         << gear_switch_idle_time_trajectory->first.size();
   gear_switch_idle_time_trajectory->second = gear_position;
 }
 
 void OpenSpaceTrajectoryPartition::AdjustRelativeTimeAndS(
-    const std::vector<TrajGearPair>& paritioned_trajectories,
+    const std::vector<TrajGearPair>& partitioned_trajectories,
     const size_t current_trajectory_index,
     const size_t closest_trajectory_point_index,
     DiscretizedTrajectory* unpartitioned_trajectory_result,
-    TrajGearPair* current_paritioned_trajectory) {
-  const size_t paritioned_trajectories_size = paritioned_trajectories.size();
-  CHECK_GT(paritioned_trajectories_size, current_trajectory_index);
+    TrajGearPair* current_partitioned_trajectory) {
+  const size_t partitioned_trajectories_size = partitioned_trajectories.size();
+  CHECK_GT(partitioned_trajectories_size, current_trajectory_index);
 
   // Reassign relative time and relative s to have the closest point as origin
   // point
-  *(current_paritioned_trajectory) =
-      paritioned_trajectories.at(current_trajectory_index);
-  auto trajectory = &(current_paritioned_trajectory->first);
+  *(current_partitioned_trajectory) =
+      partitioned_trajectories.at(current_trajectory_index);
+  auto trajectory = &(current_partitioned_trajectory->first);
   double time_shift =
       trajectory->at(closest_trajectory_point_index).relative_time();
   double s_shift =
@@ -700,7 +706,7 @@ void OpenSpaceTrajectoryPartition::AdjustRelativeTimeAndS(
       unpartitioned_trajectory_result->size();
   size_t index_estimate = 0;
   for (size_t i = 0; i < current_trajectory_index; ++i) {
-    index_estimate += paritioned_trajectories.at(i).first.size();
+    index_estimate += partitioned_trajectories.at(i).first.size();
   }
   index_estimate += closest_trajectory_point_index;
   index_estimate /= interpolated_pieces_num;
