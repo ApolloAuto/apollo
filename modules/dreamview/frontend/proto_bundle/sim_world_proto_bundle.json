@@ -6278,6 +6278,9 @@
             "ScenarioNarrowStreetUTurnConfig": {
               "fields": {}
             },
+            "ScenarioHailingConfig": {
+              "fields": {}
+            },
             "ScenarioConfig": {
               "oneofs": {
                 "scenarioConfig": {
@@ -6290,7 +6293,8 @@
                     "trafficLightUnprotectedLeftTurnConfig",
                     "pullOverConfig",
                     "valetParkingConfig",
-                    "narrowStreetUTurnConfig"
+                    "narrowStreetUTurnConfig",
+                    "hailingConfig"
                   ]
                 }
               },
@@ -6335,10 +6339,14 @@
                   "type": "ScenarioNarrowStreetUTurnConfig",
                   "id": 11
                 },
+                "hailingConfig": {
+                  "type": "ScenarioHailingConfig",
+                  "id": 12
+                },
                 "stageType": {
                   "rule": "repeated",
                   "type": "StageType",
-                  "id": 12,
+                  "id": 13,
                   "options": {
                     "packed": false
                   }
@@ -6346,7 +6354,7 @@
                 "stageConfig": {
                   "rule": "repeated",
                   "type": "StageConfig",
-                  "id": 13
+                  "id": 14
                 }
               },
               "nested": {
@@ -6363,7 +6371,8 @@
                     "YIELD_SIGN_UNPROTECTED": 9,
                     "PULL_OVER": 10,
                     "VALET_PARKING": 11,
-                    "NARROW_STREET_U_TURN": 12
+                    "NARROW_STREET_U_TURN": 12,
+                    "HAILING": 13
                   }
                 },
                 "StageType": {
