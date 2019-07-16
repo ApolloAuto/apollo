@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import STORE from "store";
-import { drawThickBandFromPoints } from "utils/draw";
+import { drawThickBandFromPoints, drawDashedLineFromPoints } from "utils/draw";
 
 function normalizePlanningTrajectory(trajectory, coordinates) {
     if (!trajectory) {
@@ -46,8 +46,8 @@ export default class PlanningTrajectory {
         let width = null;
         if (!world.autoDrivingCar.width) {
             console.warn("Unable to get the auto driving car's width, " +
-                         "planning line width has been set to default: " +
-                         `${PARAMETERS.planning.defaults.width} m.`);
+                "planning line width has been set to default: " +
+                `${PARAMETERS.planning.defaults.width} m.`);
             width = PARAMETERS.planning.defaults.width;
         } else {
             width = world.autoDrivingCar.width;
@@ -70,7 +70,7 @@ export default class PlanningTrajectory {
         let propertyIndex = 0;
         const totalPaths = _.union(Object.keys(this.paths), Object.keys(newPaths));
         totalPaths.forEach((name) => {
-            const optionName = name === 'trajectory' ? 'showPlanningTrajectory': name;
+            const optionName = name === 'trajectory' ? 'showPlanningTrajectory' : name;
             if (!STORE.options[optionName] && !STORE.options.customizedToggles.get(optionName)) {
                 if (this.paths[name]) {
                     this.paths[name].visible = false;
@@ -82,16 +82,24 @@ export default class PlanningTrajectory {
                     oldPath.geometry.dispose();
                     oldPath.material.dispose();
                 }
-                if (propertyIndex >= PARAMETERS.planning.pathProperties.length) {
-                    console.error("No enough property to render the planning path, " +
-                                  "use a duplicated property instead.");
-                    propertyIndex = 0;
+
+                let property = PARAMETERS.planning.pathProperties[name];
+                if (!property) {
+                    console.warn('No properties found for', name,
+                        '. Use default properties instead.');
+                    property = PARAMETERS.planning.pathProperties.default;
                 }
-                const property = PARAMETERS.planning.pathProperties[propertyIndex];
+
                 if (newPaths[name]) {
                     const points = normalizePlanningTrajectory(newPaths[name], coordinates);
-                    this.paths[name] = drawThickBandFromPoints(points,
-                        width * property.width, property.color, property.opacity, property.zOffset);
+                    if (property.style === 'dash') {
+                        this.paths[name] = drawDashedLineFromPoints(points, property.color,
+                            width * property.width, 2 /* dash size */, 1 /* gapSize */,
+                            property.zOffset, property.opacity);
+                    } else {
+                        this.paths[name] = drawThickBandFromPoints(points, width * property.width,
+                            property.color, property.opacity, property.zOffset);
+                    }
                     scene.add(this.paths[name]);
                 }
             }
