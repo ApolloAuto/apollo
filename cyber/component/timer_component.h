@@ -46,6 +46,7 @@ class TimerComponent : public ComponentBase {
    */
   bool Initialize(const TimerComponentConfig& config) override;
   bool Process();
+  uint64_t GetInterval() const;
 
  private:
   /**
