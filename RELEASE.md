@@ -14,7 +14,8 @@ Apollo 5.0 is an effort to support volume production for Geo-Fenced Autonomous D
 * Prediction Evaluators
 * Simulation web platform - Dreamland
     * Scenario Editor
-    * Control-in-loop Simulation
+    * Control-in-loop Simulation 
+* Apollo Synthetic Data Set
 
 ## Autonomous Drive Capabilities
 Vehicles with this version can drive autonomously in complex urban road conditions including both residential and downtown areas. **BE CAUTIOUS WHEN DRIVING AUTONOMOUSLY, ESPECIALLY AT NIGHT OR IN POOR VISION ENVIRONMENT. URBAN DRIVING INVOLVES NAVIGATING HIGH RISK ZONES LIKE SCHOOLS, PLEASE TEST APOLLO 5.0 WITH THE SUPPORT FROM APOLLO ENGINEERING TEAM, PLEASE AVOID DRIVING THE VEHICLE ON THE HIGHWAY OR AT SPEEDS THAT ARE ABOVE OUR SUPPORTED THRESHOLD**.
