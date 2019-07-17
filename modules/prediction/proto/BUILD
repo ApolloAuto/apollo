@@ -98,6 +98,7 @@ proto_library(
         "//modules/prediction/proto:feature_proto_lib",
         "//modules/prediction/proto:prediction_conf_proto_lib",
         "//modules/prediction/proto:prediction_proto_lib",
+        "//modules/prediction/proto:scenario_proto_lib",
     ],
 )
 

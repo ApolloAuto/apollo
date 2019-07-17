@@ -116,16 +116,23 @@ void FeatureOutput::InsertDataForLearning(
 }
 
 void FeatureOutput::InsertPredictionResult(
-    const int obstacle_id, const PredictionObstacle& prediction_obstacle,
-    const ObstacleConf& obstacle_conf) {
+    const Obstacle* obstacle, const PredictionObstacle& prediction_obstacle,
+    const ObstacleConf& obstacle_conf, const Scenario& scenario) {
   PredictionResult* prediction_result =
       list_prediction_result_.add_prediction_result();
-  prediction_result->set_id(obstacle_id);
+  prediction_result->set_id(obstacle->id());
   prediction_result->set_timestamp(prediction_obstacle.timestamp());
   for (int i = 0; i < prediction_obstacle.trajectory_size(); ++i) {
     prediction_result->add_trajectory()->CopyFrom(
         prediction_obstacle.trajectory(i));
     prediction_result->mutable_obstacle_conf()->CopyFrom(obstacle_conf);
+  }
+  // Insert the scenario that the single obstacle is in
+  if (scenario.type() == Scenario::JUNCTION &&
+      obstacle->IsInJunction(scenario.junction_id())) {
+    prediction_result->mutable_scenario()->set_type(Scenario::JUNCTION);
+  } else if (obstacle->IsOnLane()) {
+    prediction_result->mutable_scenario()->set_type(Scenario::CRUISE);
   }
 }
 

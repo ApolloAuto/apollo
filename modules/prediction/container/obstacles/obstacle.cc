@@ -223,7 +223,7 @@ bool Obstacle::InsertFeature(const Feature& feature) {
   return true;
 }
 
-bool Obstacle::IsInJunction(const std::string& junction_id) {
+bool Obstacle::IsInJunction(const std::string& junction_id) const {
   // TODO(all) Consider if need to use vehicle front rather than position
   if (feature_history_.empty()) {
     AERROR << "Obstacle [" << id_ << "] has no history";

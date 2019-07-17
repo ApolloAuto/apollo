@@ -35,6 +35,7 @@
 #include "modules/prediction/predictor/move_sequence/move_sequence_predictor.h"
 #include "modules/prediction/predictor/regional/regional_predictor.h"
 #include "modules/prediction/predictor/single_lane/single_lane_predictor.h"
+#include "modules/prediction/scenario/scenario_manager.h"
 
 namespace apollo {
 namespace prediction {
@@ -324,8 +325,9 @@ void PredictorManager::PredictObstacle(
   prediction_obstacle->set_is_static(obstacle->IsStill());
   if (FLAGS_prediction_offline_mode ==
       PredictionConstants::kDumpPredictionResult) {
-    FeatureOutput::InsertPredictionResult(obstacle->id(), *prediction_obstacle,
-                                          obstacle->obstacle_conf());
+    const Scenario& scenario = ScenarioManager::Instance()->scenario();
+    FeatureOutput::InsertPredictionResult(obstacle, *prediction_obstacle,
+                                          obstacle->obstacle_conf(), scenario);
   }
 }
 
