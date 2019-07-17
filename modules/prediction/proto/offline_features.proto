@@ -5,6 +5,7 @@ package apollo.prediction;
 import "modules/common/proto/pnc_point.proto";
 import "modules/prediction/proto/feature.proto";
 import "modules/prediction/proto/prediction_conf.proto";
+import "modules/prediction/proto/scenario.proto";
 
 message CNNFeatures {
   optional uint32 dim0 = 1;
@@ -39,6 +40,7 @@ message PredictionResult {
   optional double timestamp = 2;
   repeated Trajectory trajectory = 3;
   optional ObstacleConf obstacle_conf = 4;
+  optional Scenario scenario = 5;
 }
 
 message ListPredictionResult {

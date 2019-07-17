@@ -187,7 +187,7 @@ class Obstacle {
    * @param junction ID
    * @return If the obstacle is in a junction.
    */
-  bool IsInJunction(const std::string& junction_id);
+  bool IsInJunction(const std::string& junction_id) const;
 
   /**
    * @brief Check if the obstacle is close to a junction exit.
