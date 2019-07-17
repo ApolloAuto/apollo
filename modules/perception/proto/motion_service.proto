@@ -38,5 +38,5 @@ message VehicleStatus {
 
 message Motion_Service {
   repeated VehicleStatus vehicle_status = 1;  // An array of vehicle_information stored for previous timestamps
-  optional common.Header header = 2;                    // Header
+  optional apollo.common.Header header = 2;                    // Header
 }

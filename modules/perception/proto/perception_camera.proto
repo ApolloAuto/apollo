@@ -49,8 +49,8 @@ message LaneLineCubicCurve {
 }
 
 message EndPoints {
-    optional common.Point2D start = 1;
-    optional common.Point2D end = 2;
+    optional apollo.common.Point2D start = 1;
+    optional apollo.common.Point2D end = 2;
 }
 
 message CameraLaneLine {
@@ -61,9 +61,9 @@ message CameraLaneLine {
     // @brief image coordinate system
     optional LaneLineCubicCurve curve_image_coord = 4;
     // @brief curve camera point set
-    repeated common.Point3D curve_camera_point_set = 5;
+    repeated apollo.common.Point3D curve_camera_point_set = 5;
     // @brief curve image point set
-    repeated common.Point2D curve_image_point_set = 6;
+    repeated apollo.common.Point2D curve_image_point_set = 6;
 
     // @brief image end point set
     repeated EndPoints image_end_point_set = 7;
@@ -95,15 +95,15 @@ message CameraObstacle {
 
     optional CameraType type = 21;      // obstacle type
     repeated float type_probs = 22;     // obstacle type
-    optional common.Point2D upper_left = 23;   // upper left corner of 2D bbox
-    optional common.Point2D lower_right = 24;  // lower right corner of 2D bbox
-    repeated common.Point2D key_points = 25;   // 2D key points
+    optional apollo.common.Point2D upper_left = 23;   // upper left corner of 2D bbox
+    optional apollo.common.Point2D lower_right = 24;  // lower right corner of 2D bbox
+    repeated apollo.common.Point2D key_points = 25;   // 2D key points
     repeated string debug_message = 26; // debug message
 }
 
 //
 message CameraDebug {
-    optional common.Header header = 1;                   // header
+    optional apollo.common.Header header = 1;                   // header
     optional string source_topic = 2;                               // which topic to get the frame
     optional CameraErrorCode error_code = 3 [default = ERROR_NONE]; // error code
     optional CameraCalibrator camera_calibrator = 4;
