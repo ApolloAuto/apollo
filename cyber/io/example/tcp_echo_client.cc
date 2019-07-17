@@ -67,9 +67,9 @@ int main(int argc, char* argv[]) {
           if (user_input.empty()) {
             continue;
           }
-					if (!apollo::cyber::OK()) {
-						break;
-					}
+          if (!apollo::cyber::OK()) {
+            break;
+          }
 
           if (session.Send(user_input.c_str(), user_input.length(), 0) < 0) {
             std::cout << "send message failed." << std::endl;
