@@ -27,13 +27,13 @@ message SensorMeasurement {
   optional string sensor_id = 1;
   optional int32 id = 2;
 
-  optional common.Point3D position = 3;
+  optional apollo.common.Point3D position = 3;
   optional double theta = 4;
   optional double length = 5;
   optional double width = 6;
   optional double height = 7;
 
-  optional common.Point3D velocity = 8;
+  optional apollo.common.Point3D velocity = 8;
 
   optional PerceptionObstacle.Type type = 9;
   optional PerceptionObstacle.SubType sub_type = 10;
@@ -45,17 +45,17 @@ message PerceptionObstacle {
   optional int32 id = 1;  // obstacle ID.
 
   // obstacle position in the world coordinate system.
-  optional common.Point3D position = 2;
+  optional apollo.common.Point3D position = 2;
 
   optional double theta = 3;  // heading in the world coordinate system.
-  optional common.Point3D velocity = 4;  // obstacle velocity.
+  optional apollo.common.Point3D velocity = 4;  // obstacle velocity.
 
   // Size of obstacle bounding box.
   optional double length = 5;  // obstacle length.
   optional double width = 6;   // obstacle width.
   optional double height = 7;  // obstacle height.
 
-  repeated common.Point3D polygon_point = 8;  // obstacle corner points.
+  repeated apollo.common.Point3D polygon_point = 8;  // obstacle corner points.
 
   // duration of an obstacle since detection in s.
   optional double tracking_time = 9;
@@ -83,14 +83,14 @@ message PerceptionObstacle {
   };
   optional ConfidenceType confidence_type = 14 [deprecated = true];
   // trajectory of object.
-  repeated common.Point3D drops = 15 [deprecated = true];
+  repeated apollo.common.Point3D drops = 15 [deprecated = true];
 
   // The following fields are new added in Apollo 4.0
-  optional common.Point3D acceleration = 16;  // obstacle acceleration
+  optional apollo.common.Point3D acceleration = 16;  // obstacle acceleration
 
   // a stable obstacle point in the world coordinate system
   // position defined above is the obstacle bounding box ground center
-  optional common.Point3D anchor_point = 17;
+  optional apollo.common.Point3D anchor_point = 17;
   optional BBox2D bbox2d = 18;
 
   enum SubType {
@@ -154,8 +154,8 @@ message CIPVInfo {
 
 message PerceptionObstacles {
   repeated PerceptionObstacle perception_obstacle = 1;  // An array of obstacles
-  optional common.Header header = 2;                    // Header
-  optional common.ErrorCode error_code = 3 [default = OK];
+  optional apollo.common.Header header = 2;                    // Header
+  optional apollo.common.ErrorCode error_code = 3 [default = OK];
   optional LaneMarkers lane_marker = 4;
   optional CIPVInfo cipv_info = 5;  // Closest In Path Vehicle (CIPV)
 }

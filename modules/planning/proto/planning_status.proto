@@ -68,7 +68,7 @@ message PullOverStatus {
 message ReroutingStatus {
   optional double last_rerouting_time = 1;
   optional bool need_rerouting = 2 [default = false];
-  optional routing.RoutingRequest routing_request = 3;
+  optional apollo.routing.RoutingRequest routing_request = 3;
 }
 
 message RightOfWayStatus {

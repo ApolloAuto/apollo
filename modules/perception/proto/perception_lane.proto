@@ -6,7 +6,7 @@ import "modules/common/proto/header.proto";
 import "modules/perception/proto/perception_camera.proto";
 
 message PerceptionLanes {
-    optional common.Header header = 1;                   // header
+    optional apollo.common.Header header = 1;                   // header
     optional string source_topic = 2;                               // which topic to get the frame
     optional camera.CameraErrorCode error_code = 3 [default = ERROR_NONE]; // error code
     optional camera.CameraCalibrator camera_calibrator = 4;

@@ -8,11 +8,11 @@ import "modules/common/proto/geometry.proto";
 message ImpendingCollisionEdge {
   optional int32 id = 1;                                // edge ID.
   repeated int32 cone_id_list = 2 [deprecated = true];  // cone ID.
-  repeated common.Point3D point = 3;
+  repeated apollo.common.Point3D point = 3;
   optional double tracking_time = 4;  // tracking time since detected in s
 }
 
 message ImpendingCollisionEdges {
   repeated ImpendingCollisionEdge impending_collision_edge = 1;  // obstacles
-  optional common.Header header = 2;                             // Header
+  optional apollo.common.Header header = 2;                             // Header
 }
