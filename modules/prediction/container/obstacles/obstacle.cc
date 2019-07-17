@@ -443,10 +443,6 @@ void Obstacle::SetType(const PerceptionObstacle& perception_obstacle,
 void Obstacle::SetTimestamp(const PerceptionObstacle& perception_obstacle,
                             const double timestamp, Feature* feature) {
   double ts = timestamp;
-  if (perception_obstacle.has_timestamp() &&
-      perception_obstacle.timestamp() > 0.0) {
-    ts = perception_obstacle.timestamp();
-  }
   feature->set_timestamp(ts);
 
   ADEBUG << "Obstacle [" << id_ << "] has timestamp [" << std::fixed

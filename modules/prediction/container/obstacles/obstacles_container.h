@@ -94,6 +94,8 @@ class ObstaclesContainer : public Container {
    */
   void Clear();
 
+  void CleanUp();
+
   size_t NumOfObstacles() { return ptr_obstacles_.size(); }
 
   const apollo::perception::PerceptionObstacle& GetPerceptionObstacle(

@@ -145,6 +145,11 @@ void EvaluatorManager::Init(const PredictionConf& config) {
             } else {
               vehicle_in_junction_evaluator_ = obstacle_conf.evaluator_type();
             }
+            if (FLAGS_prediction_offline_mode ==
+                PredictionConstants::kDumpDataForLearning) {
+              vehicle_in_junction_evaluator_ =
+                  ObstacleConf::LANE_SCANNING_EVALUATOR;
+            }
           }
           break;
         }
@@ -222,10 +227,6 @@ void EvaluatorManager::Run() {
         });
   } else {
     for (int id : obstacles_container->curr_frame_considered_obstacle_ids()) {
-      if (id < 0) {
-        ADEBUG << "The obstacle has invalid id [" << id << "].";
-        continue;
-      }
       Obstacle* obstacle = obstacles_container->GetObstacle(id);
 
       if (obstacle == nullptr) {

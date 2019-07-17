@@ -92,9 +92,12 @@ bool LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
   std::vector<double> labels = {0.0};
   if (FLAGS_prediction_offline_mode ==
       PredictionConstants::kDumpDataForLearning) {
+    std::string learning_data_tag = "cruise";
+    if (latest_feature_ptr->has_junction_feature()) {
+      learning_data_tag = "junction";
+    }
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
-                                         string_feature_values, "cruise",
-                                         nullptr);
+        string_feature_values, learning_data_tag, nullptr);
     ADEBUG << "Save extracted features for learning locally.";
     return true;
   }
