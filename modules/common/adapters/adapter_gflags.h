@@ -117,3 +117,6 @@ DECLARE_string(tf_static_topic);
 
 // Recorder status topic
 DECLARE_string(recorder_status_topic);
+
+// simulation clock topic
+DECLARE_string(tick_topic);
