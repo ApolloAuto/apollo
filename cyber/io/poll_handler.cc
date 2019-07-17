@@ -17,6 +17,7 @@
 #include "cyber/io/poll_handler.h"
 #include "cyber/common/log.h"
 #include "cyber/io/poller.h"
+#include "cyber/scheduler/scheduler_factory.h"
 
 namespace apollo {
 namespace cyber {
@@ -105,7 +106,7 @@ void PollHandler::ResponseCallback(const PollResponse& rsp) {
   response_ = rsp;
 
   if (routine_->state() == RoutineState::IO_WAIT) {
-    routine_->SetUpdateFlag();
+    scheduler::Instance()->NotifyTask(routine_->id());
   }
 }
 
