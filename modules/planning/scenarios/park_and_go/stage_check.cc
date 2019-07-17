@@ -14,31 +14,42 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
+#include "modules/planning/scenarios/park_and_go/stage_check.h"
 
-#pragma once
+#include <string>
+#include <vector>
 
-#include <memory>
+#include "cyber/common/log.h"
 
-#include "modules/planning/scenarios/scenario.h"
+#include "modules/planning/common/frame.h"
+#include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/util/common.h"
+#include "modules/planning/scenarios/util/util.h"
+#include "modules/planning/tasks/deciders/path_bounds_decider/path_bounds_decider.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace hailing {
+namespace park_and_go {
 
-class HailingScenario : public Scenario {
- public:
-  HailingScenario(const ScenarioConfig& config, const ScenarioContext* context)
-      : Scenario(config, context) {}
+using common::TrajectoryPoint;
 
-  std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config) override;
-};
+Stage::StageStatus ParkAndGoStageCheck::Process(
+    const TrajectoryPoint& planning_init_point, Frame* frame) {
+  return FinishStage(true);
+}
 
-}  // namespace hailing
+Stage::StageStatus ParkAndGoStageCheck::FinishStage(const bool success) {
+  if (success) {
+    next_stage_ = ScenarioConfig::PARK_AND_GO_CRUISE;
+  } else {
+    next_stage_ = ScenarioConfig::PARK_AND_GO_ADJUST;
+  }
+  // TODO(SHU) add implementation
+  return Stage::FINISHED;
+}
+
+}  // namespace park_and_go
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
