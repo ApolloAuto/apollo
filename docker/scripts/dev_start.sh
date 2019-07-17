@@ -194,6 +194,7 @@ fi
 IMG=${DOCKER_REPO}:$VERSION
 
 function local_volumes() {
+    set +x
     # Apollo root and bazel cache dirs are required.
     volumes="-v $APOLLO_ROOT_DIR:/apollo \
              -v $HOME/.cache:${DOCKER_HOME}/.cache"
@@ -212,6 +213,7 @@ function local_volumes() {
             ;;
     esac
     echo "${volumes}"
+    set -x
 }
 
 function main(){
@@ -338,11 +340,11 @@ function main(){
         -v /dev/null:/dev/raw1394 \
         $IMG \
         /bin/bash
+    set +x
     if [ $? -ne 0 ];then
         error "Failed to start docker container \"${APOLLO_DEV}\" based on image: $IMG"
         exit 1
     fi
-    set +x
 
     if [ "${USER}" != "root" ]; then
         docker exec $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
