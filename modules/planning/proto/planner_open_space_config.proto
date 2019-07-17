@@ -75,6 +75,7 @@ message DualVariableWarmStartConfig {
   optional double min_safety_distance = 4 [default = 0.0];
   optional bool debug_osqp = 5 [default = false];
   optional double beta = 6 [default = 1.0];
+  optional OSQPConfig osqp_config = 7;
 }
 
 message DistanceApproachConfig {
@@ -127,6 +128,15 @@ message IpoptConfig {
   optional string ipopt_recalc_y = 11;
   optional double ipopt_mu_init = 12 [default = 0.1];
   // ipopt barrier parameter, default 0.1
+}
+
+// Dual variable configs for OSQP
+message OSQPConfig {
+  optional double alpha = 1 [default = 1.0];
+  optional double eps_abs = 2 [default = 1.0e-3];
+  optional double eps_rel = 3 [default = 1.0e-3];
+  optional int32 max_iter = 4 [default = 10000];
+  optional bool polish = 5 [default = true];
 }
 
 message IterativeAnchoringConfig {

@@ -42,6 +42,13 @@ dual_variable_warm_start_config {
   min_safety_distance: 0.0
   debug_osqp: false
   beta: 1.0
+  osqp_config {
+    alpha: 1.0
+    eps_abs: 1.0e-3
+    eps_rel: 1.0e-3
+    max_iter: 10000
+    polish: true
+  }
 }
 distance_approach_config {
   weight_steer: 0.3
