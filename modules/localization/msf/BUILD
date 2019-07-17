@@ -38,7 +38,7 @@ cc_library(
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_integ:localization_msf_local_integ",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
-        "//modules/localization/msf/local_map/lossy_map:localization_msf_lossy_map",
+        "//modules/localization/msf/local_map/pyramid_map:localization_msf_pyramid_map",
         "//modules/localization/proto:gnss_pnt_result_proto",
         "//modules/localization/proto:localization_config_proto",
         "//modules/localization/proto:localization_proto",

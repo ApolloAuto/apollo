@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,16 +24,15 @@ BaseMapMatrix::BaseMapMatrix() {}
 
 BaseMapMatrix::~BaseMapMatrix() {}
 
-BaseMapMatrix::BaseMapMatrix(const BaseMapMatrix& cells) {}
+BaseMapMatrix::BaseMapMatrix(const BaseMapMatrix& map_matrix) {}
 
-unsigned int BaseMapMatrix::LoadBinary(unsigned char* buf) { return 0; }
-
-unsigned int BaseMapMatrix::CreateBinary(unsigned char* buf,
-                                         unsigned int buf_size) const {
-  return 0;
+bool BaseMapMatrix::GetIntensityImg(cv::Mat* intensity_img) const {
+  return false;
 }
-
-unsigned int BaseMapMatrix::GetBinarySize() const { return 0; }
+/**@brief get altitude image of node. */
+bool BaseMapMatrix::GetAltitudeImg(cv::Mat* altitude_img) const {
+  return false;
+}
 
 }  // namespace msf
 }  // namespace localization

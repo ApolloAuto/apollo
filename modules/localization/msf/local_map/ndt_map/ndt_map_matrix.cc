@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_map/ndt_map/ndt_map_matrix.h"
+
 #include "modules/localization/msf/local_map/ndt_map/ndt_map_config.h"
 
 namespace apollo {
@@ -32,19 +33,30 @@ NdtMapSingleCell::NdtMapSingleCell() {
   is_icov_available_ = 0;
 }
 
-unsigned int NdtMapSingleCell::LoadBinary(unsigned char* buf) {
-  float* f_buf = reinterpret_cast<float*>(buf);
+void NdtMapSingleCell::Reset() {
+  intensity_ = 0.0;
+  intensity_var_ = 0.0;
+  road_pt_count_ = 0;
+  count_ = 0;
+  centroid_ = Eigen::Vector3f::Zero();
+  centroid_average_cov_ = Eigen::Matrix3f::Zero();
+  centroid_icov_ = Eigen::Matrix3f::Identity();
+  is_icov_available_ = false;
+}
+
+size_t NdtMapSingleCell::LoadBinary(const unsigned char* buf) {
+  const float* f_buf = reinterpret_cast<const float*>(buf);
   intensity_ = *f_buf;
   ++f_buf;
   intensity_var_ = *f_buf;
   ++f_buf;
-  unsigned int* ui_buf =
-      reinterpret_cast<unsigned int*>(reinterpret_cast<void*>(f_buf));
+  const unsigned int* ui_buf = reinterpret_cast<const unsigned int*>(
+      reinterpret_cast<const void*>(f_buf));
   road_pt_count_ = *ui_buf;
   ++ui_buf;
   count_ = *ui_buf;
   ++ui_buf;
-  f_buf = reinterpret_cast<float*>(reinterpret_cast<void*>(ui_buf));
+  f_buf = reinterpret_cast<const float*>(reinterpret_cast<const void*>(ui_buf));
   centroid_[0] = *f_buf;
   ++f_buf;
   centroid_[1] = *f_buf;
@@ -65,7 +77,7 @@ unsigned int NdtMapSingleCell::LoadBinary(unsigned char* buf) {
       }
     }
     ++f_buf;
-    unsigned char* uc_buf = reinterpret_cast<unsigned char*>(f_buf);
+    const unsigned char* uc_buf = reinterpret_cast<const unsigned char*>(f_buf);
     is_icov_available_ = *uc_buf;
   } else {
     centroid_icov_ = Eigen::Matrix3f::Identity();
@@ -74,9 +86,9 @@ unsigned int NdtMapSingleCell::LoadBinary(unsigned char* buf) {
   return GetBinarySize();
 }
 
-unsigned int NdtMapSingleCell::CreateBinary(unsigned char* buf,
-                                            unsigned int buf_size) const {
-  unsigned int target_size = GetBinarySize();
+size_t NdtMapSingleCell::CreateBinary(unsigned char* buf,
+                                      size_t buf_size) const {
+  size_t target_size = GetBinarySize();
   if (buf_size >= target_size) {
     float* p = reinterpret_cast<float*>(buf);
     *p = intensity_;
@@ -117,13 +129,11 @@ unsigned int NdtMapSingleCell::CreateBinary(unsigned char* buf,
   return target_size;
 }
 
-unsigned int NdtMapSingleCell::GetBinarySize() const {
-  unsigned int sz =
-      static_cast<unsigned int>(sizeof(float) * 2 + sizeof(unsigned int) * 2 +
-                                sizeof(float) * 3 + sizeof(float) * 9);
+size_t NdtMapSingleCell::GetBinarySize() const {
+  size_t sz = sizeof(float) * 2 + sizeof(unsigned int) * 2 + sizeof(float) * 3 +
+              sizeof(float) * 9;
   if (count_ >= minimum_points_threshold_) {
-    sz += static_cast<unsigned int>(sizeof(float) * 9 +
-                                    sizeof(unsigned char) * 1);
+    sz += sizeof(float) * 9 + sizeof(unsigned char) * 1;
   }
   return sz;
 }
@@ -145,6 +155,92 @@ void NdtMapSingleCell::Reduce(NdtMapSingleCell* cell,
   cell->MergeCell(cell_new);
 }
 
+void NdtMapSingleCell::AddSample(const float intensity, const float altitude,
+                                 const Eigen::Vector3f& centroid,
+                                 bool is_road) {
+  ++count_;
+  float v1 = intensity - intensity_;
+  intensity_ += v1 / static_cast<float>(count_);
+  float v2 = intensity - intensity_;
+  intensity_var_ = (static_cast<float>(count_ - 1) * intensity_var_ + v1 * v2) /
+                   static_cast<float>(count_);
+
+  if (is_road) {
+    ++road_pt_count_;
+  }
+
+  Eigen::Vector3f v3 = centroid - centroid_;
+  centroid_ += v3 / static_cast<float>(count_);
+  Eigen::Matrix3f v4 = centroid * centroid.transpose() - centroid_average_cov_;
+  centroid_average_cov_ += v4 / static_cast<float>(count_);
+  CentroidEigenSolver(centroid_average_cov_);
+}
+
+void NdtMapSingleCell::MergeCell(const float intensity,
+                                 const float intensity_var,
+                                 const unsigned int road_pt_count,
+                                 const unsigned int count,
+                                 const Eigen::Vector3f& centroid,
+                                 const Eigen::Matrix3f& centroid_cov) {
+  unsigned int new_count = count_ + count;
+  float p0 = static_cast<float>(count_) / static_cast<float>(new_count);
+  float p1 = static_cast<float>(count) / static_cast<float>(new_count);
+  float intensity_diff = intensity_ - intensity;
+
+  intensity_ = intensity_ * p0 + intensity * p1;
+  intensity_var_ = intensity_var_ * p0 + intensity_var * p1 +
+                   intensity_diff * intensity_diff * p0 * p1;
+
+  centroid_[0] = centroid_[0] * p0 + centroid[0] * p1;
+  centroid_[1] = centroid_[1] * p0 + centroid[1] * p1;
+  centroid_[2] = centroid_[2] * p0 + centroid[2] * p1;
+
+  count_ = new_count;
+  road_pt_count_ += road_pt_count;
+}
+
+void NdtMapSingleCell::MergeCell(const NdtMapSingleCell& cell_new) {
+  MergeCell(cell_new.intensity_, cell_new.intensity_var_,
+            cell_new.road_pt_count_, cell_new.count_, cell_new.centroid_,
+            cell_new.centroid_average_cov_);
+}
+
+void NdtMapSingleCell::CentroidEigenSolver(
+    const Eigen::Matrix3f& centroid_cov) {
+  // Contain more than five points, we calculate the eigen vector/value of cov.
+  // [Magnusson 2009]
+  if (count_ >= minimum_points_threshold_) {
+    Eigen::Matrix3f cov = centroid_cov - centroid_ * centroid_.transpose();
+    cov *= static_cast<float>((count_ - 1.0) / count_);
+    Eigen::SelfAdjointEigenSolver<Eigen::Matrix3f> eigen_solver;
+    eigen_solver.compute(cov);
+    Eigen::Matrix3f eigen_val = eigen_solver.eigenvalues().asDiagonal();
+    Eigen::Matrix3f centroid_evecs = eigen_solver.eigenvectors();
+    if (eigen_val(0, 0) < 0 || eigen_val(1, 1) < 0 || eigen_val(2, 2) <= 0) {
+      is_icov_available_ = 0;
+      return;
+    }
+    // Avoid matrices near singularities (eq 6.11) [Magnusson 2009].
+    float min_covar_eigvalue = 0.01f * eigen_val(2, 2);
+    if (eigen_val(0, 0) < min_covar_eigvalue) {
+      eigen_val(0, 0) = min_covar_eigvalue;
+      if (eigen_val(1, 1) < min_covar_eigvalue) {
+        eigen_val(1, 1) = min_covar_eigvalue;
+      }
+    }
+    // Calculate inverse covariance
+    centroid_icov_ =
+        (centroid_evecs * eigen_val * centroid_evecs.inverse()).inverse();
+    if (centroid_icov_.maxCoeff() == std::numeric_limits<float>::infinity() ||
+        centroid_icov_.minCoeff() == -std::numeric_limits<float>::infinity()) {
+      is_icov_available_ = 0;
+      return;
+    }
+    // Set icov available
+    is_icov_available_ = 1;
+  }
+}
+
 NdtMapCells::NdtMapCells() {
   max_altitude_index_ = static_cast<int>(-1e10);
   min_altitude_index_ = static_cast<int>(1e10);
@@ -159,7 +255,7 @@ void NdtMapCells::Reset() {
 
 int NdtMapCells::AddSample(const float intensity, const float altitude,
                            const float resolution,
-                           const Eigen::Vector3f centroid, bool is_road) {
+                           const Eigen::Vector3f& centroid, bool is_road) {
   int altitude_index = CalAltitudeIndex(resolution, altitude);
   NdtMapSingleCell& cell = cells_[altitude_index];
   cell.AddSample(intensity, altitude, centroid, is_road);
@@ -180,33 +276,33 @@ int NdtMapCells::AddSample(const float intensity, const float altitude,
   return altitude_index;
 }
 
-unsigned int NdtMapCells::LoadBinary(unsigned char* buf) {
-  unsigned int* p = reinterpret_cast<unsigned int*>(buf);
+size_t NdtMapCells::LoadBinary(const unsigned char* buf) {
+  const unsigned int* p = reinterpret_cast<const unsigned int*>(buf);
   unsigned int size = *p;
   ++p;
 
-  unsigned char* pp = reinterpret_cast<unsigned char*>(p);
+  const unsigned char* pp = reinterpret_cast<const unsigned char*>(p);
   for (unsigned int i = 0; i < size; ++i) {
-    int* ppp = reinterpret_cast<int*>(pp);
+    const int* ppp = reinterpret_cast<const int*>(pp);
     int altitude_index = *ppp;
     ++ppp;
-    pp = reinterpret_cast<unsigned char*>(ppp);
+    pp = reinterpret_cast<const unsigned char*>(ppp);
     NdtMapSingleCell cell;
-    unsigned int processed_size = cell.LoadBinary(pp);
+    size_t processed_size = cell.LoadBinary(pp);
     cells_[altitude_index] = cell;
     pp += processed_size;
   }
 
-  int* ppp = reinterpret_cast<int*>(pp);
+  const int* ppp = reinterpret_cast<const int*>(pp);
   max_altitude_index_ = *ppp;
   ++ppp;
   min_altitude_index_ = *ppp;
   ++ppp;
 
-  p = reinterpret_cast<unsigned int*>(ppp);
+  p = reinterpret_cast<const unsigned int*>(ppp);
   size = *p;
   ++p;
-  ppp = reinterpret_cast<int*>(p);
+  ppp = reinterpret_cast<const int*>(p);
   for (unsigned int i = 0; i < size; ++i) {
     int index = *ppp;
     ++ppp;
@@ -216,9 +312,8 @@ unsigned int NdtMapCells::LoadBinary(unsigned char* buf) {
   return GetBinarySize();
 }
 
-unsigned int NdtMapCells::CreateBinary(unsigned char* buf,
-                                       unsigned int buf_size) const {
-  unsigned int target_size = GetBinarySize();
+size_t NdtMapCells::CreateBinary(unsigned char* buf, size_t buf_size) const {
+  size_t target_size = GetBinarySize();
   if (buf_size >= target_size) {
     unsigned int* p = reinterpret_cast<unsigned int*>(buf);
     *p = static_cast<unsigned int>(cells_.size());
@@ -232,7 +327,7 @@ unsigned int NdtMapCells::CreateBinary(unsigned char* buf,
       *ppp = altitude_index;
       ++ppp;
       pp = reinterpret_cast<unsigned char*>(ppp);
-      unsigned int processed_size = cell.CreateBinary(pp, buf_size);
+      size_t processed_size = cell.CreateBinary(pp, buf_size);
       assert(buf_size >= processed_size);
       buf_size -= processed_size;
       pp += processed_size;
@@ -244,9 +339,9 @@ unsigned int NdtMapCells::CreateBinary(unsigned char* buf,
     *ppp = min_altitude_index_;
     ++ppp;
 
-    unsigned int size = static_cast<unsigned int>(road_cell_indices_.size());
+    size_t size = road_cell_indices_.size();
     p = reinterpret_cast<unsigned int*>(ppp);
-    *p = size;
+    *p = static_cast<unsigned int>(size);
     ++p;
     ppp = reinterpret_cast<int*>(p);
     for (unsigned int i = 0; i < size; ++i) {
@@ -257,19 +352,16 @@ unsigned int NdtMapCells::CreateBinary(unsigned char* buf,
   return target_size;
 }
 
-unsigned int NdtMapCells::GetBinarySize() const {
-  unsigned int target_size = sizeof(unsigned int);
+size_t NdtMapCells::GetBinarySize() const {
+  size_t target_size = sizeof(unsigned int);
   for (auto it = cells_.begin(); it != cells_.end(); ++it) {
-    target_size += static_cast<unsigned int>(sizeof(int));
+    target_size += sizeof(int);
     const NdtMapSingleCell& cell = it->second;
     target_size += cell.GetBinarySize();
   }
-
-  target_size += static_cast<unsigned int>(sizeof(int) * 2);
-  target_size += static_cast<unsigned int>(sizeof(unsigned int));
-  target_size +=
-      static_cast<unsigned int>(sizeof(int) * road_cell_indices_.size());
-
+  target_size += sizeof(int) * 2;
+  target_size += sizeof(unsigned int);
+  target_size += sizeof(int) * road_cell_indices_.size();
   return target_size;
 }
 
@@ -335,14 +427,12 @@ NdtMapMatrix::NdtMapMatrix(const NdtMapMatrix& cells) {
   }
 }
 
-void NdtMapMatrix::Init(const BaseMapConfig* config) {
-  Init(config->map_node_size_y_, config->map_node_size_x_);
+void NdtMapMatrix::Init(const BaseMapConfig& config) {
+  Init(config.map_node_size_y_, config.map_node_size_x_);
   return;
 }
 
-void NdtMapMatrix::Reset(const BaseMapConfig* config) {
-  Reset(config->map_node_size_y_, config->map_node_size_x_);
-}
+void NdtMapMatrix::Reset() { Reset(rows_, cols_); }
 
 void NdtMapMatrix::Init(unsigned int rows, unsigned int cols) {
   map3d_cells_.reset(new NdtMapCells[rows * cols]);
@@ -357,27 +447,26 @@ void NdtMapMatrix::Reset(unsigned int rows, unsigned int cols) {
   }
 }
 
-unsigned int NdtMapMatrix::LoadBinary(unsigned char* buf) {
-  unsigned int* p = reinterpret_cast<unsigned int*>(buf);
+size_t NdtMapMatrix::LoadBinary(const unsigned char* buf) {
+  const unsigned int* p = reinterpret_cast<const unsigned int*>(buf);
   rows_ = *p;
   ++p;
   cols_ = *p;
   ++p;
   Init(rows_, cols_);
-  unsigned char* pp = reinterpret_cast<unsigned char*>(p);
+  const unsigned char* pp = reinterpret_cast<const unsigned char*>(p);
   for (unsigned int y = 0; y < rows_; ++y) {
     for (unsigned int x = 0; x < cols_; ++x) {
       NdtMapCells& cell = GetMapCell(y, x);
-      unsigned int processed_size = cell.LoadBinary(pp);
+      size_t processed_size = cell.LoadBinary(pp);
       pp += processed_size;
     }
   }
   return GetBinarySize();
 }
 
-unsigned int NdtMapMatrix::CreateBinary(unsigned char* buf,
-                                        unsigned int buf_size) const {
-  unsigned int target_size = GetBinarySize();
+size_t NdtMapMatrix::CreateBinary(unsigned char* buf, size_t buf_size) const {
+  size_t target_size = GetBinarySize();
   if (buf_size >= target_size) {
     unsigned int* p = reinterpret_cast<unsigned int*>(buf);
     *p = rows_;
@@ -389,7 +478,7 @@ unsigned int NdtMapMatrix::CreateBinary(unsigned char* buf,
     for (unsigned int y = 0; y < rows_; ++y) {
       for (unsigned int x = 0; x < cols_; ++x) {
         const NdtMapCells& cell = GetMapCell(y, x);
-        unsigned int processed_size = cell.CreateBinary(pp, buf_size);
+        size_t processed_size = cell.CreateBinary(pp, buf_size);
         assert(buf_size >= processed_size);
         buf_size -= processed_size;
         pp += processed_size;
@@ -399,9 +488,8 @@ unsigned int NdtMapMatrix::CreateBinary(unsigned char* buf,
   return target_size;
 }
 
-unsigned int NdtMapMatrix::GetBinarySize() const {
-  unsigned int target_size =
-      static_cast<unsigned int>(sizeof(unsigned int) * 2);
+size_t NdtMapMatrix::GetBinarySize() const {
+  size_t target_size = sizeof(unsigned int) * 2;
   for (unsigned int y = 0; y < rows_; ++y) {
     for (unsigned int x = 0; x < cols_; ++x) {
       const NdtMapCells& cell = GetMapCell(y, x);
@@ -421,7 +509,7 @@ void NdtMapMatrix::Reduce(NdtMapMatrix* cells, const NdtMapMatrix& cells_new) {
   }
 }
 
-void NdtMapMatrix::GetIntensityImg(cv::Mat* intensity_img) const {
+bool NdtMapMatrix::GetIntensityImg(cv::Mat* intensity_img) const {
   *intensity_img = cv::Mat(cv::Size(cols_, rows_), CV_8UC1);
   for (unsigned int y = 0; y < rows_; ++y) {
     for (unsigned int x = 0; x < cols_; ++x) {
@@ -433,6 +521,7 @@ void NdtMapMatrix::GetIntensityImg(cv::Mat* intensity_img) const {
                               .intensity_);
     }
   }
+  return true;
 }
 
 }  // namespace msf

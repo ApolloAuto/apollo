@@ -199,7 +199,7 @@ class PyramidMapMatrix : public BaseMapMatrix {
   double ComputeMeanIntensity(unsigned int level = 0);
 
   /**@brief Combine two PyramidMapMatrix instances (Reduce). */
-  static void Reduce(PyramidMapMatrix* cells, const PyramidMapMatrix& new_cells,
+  static void Reduce(std::shared_ptr<PyramidMapMatrix> cells, const PyramidMapMatrix& new_cells,
                      unsigned int level = 0, unsigned int new_level = 0);
 
   inline bool HasIntensity() const;

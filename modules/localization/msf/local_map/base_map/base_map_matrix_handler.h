@@ -15,41 +15,32 @@
  *****************************************************************************/
 #pragma once
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
+#include "modules/localization/msf/local_map/base_map/base_map_matrix.h"
+
+#include <memory>
 
 namespace apollo {
 namespace localization {
 namespace msf {
 
-typedef Eigen::Matrix4f Matrix4f;
-typedef Eigen::Matrix3f Matrix3f;
-typedef Eigen::Affine3f Affine3f;
-typedef Eigen::Vector3f Vector3f;
-typedef Eigen::Vector2f Vector2f;
-
-typedef Eigen::Matrix4d Matrix4d;
-typedef Eigen::Matrix3d Matrix3d;
-typedef Eigen::Affine3d Affine3d;
-typedef Eigen::Vector3d Vector3d;
-typedef Eigen::Vector2d Vector2d;
-
-/**@brief The options of the reflectance map. */
-class BaseMapConfig;
-
-/**@brief The data structure of the base map. */
-class BaseMap;
-
-/**@brief The data structure of the map cells in a map node. */
-class BaseMapMatrix;
-
-/**@brief The data structure of a Node in the map. */
-class BaseMapNode;
-
-class MapNodeIndex;
-
-/**@brief The memory pool for the data structure of BaseMapNode. */
-class BaseMapNodePool;
+class BaseMapMatrixHandler {
+ public:
+  BaseMapMatrixHandler() {}
+  virtual ~BaseMapMatrixHandler() {}
+  /**@brief Load the map cell from a binary chunk.
+   * @param <return> The size read (the real size of object).
+   */
+  virtual size_t LoadBinary(const unsigned char* buf,
+                            std::shared_ptr<BaseMapMatrix> matrix) = 0;
+  /**@brief Create the binary. Serialization of the object.
+   * @param <buf, buf_size> The buffer and its size.
+   * @param <return> The required or the used size of is returned.
+   */
+  virtual size_t CreateBinary(const std::shared_ptr<BaseMapMatrix> matrix, unsigned char* buf,
+                              size_t buf_size) = 0;
+  /**@brief Get the binary size of the object. */
+  virtual size_t GetBinarySize(const std::shared_ptr<BaseMapMatrix> matrix) = 0;
+};
 
 }  // namespace msf
 }  // namespace localization

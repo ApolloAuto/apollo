@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,20 +23,6 @@ namespace msf {
 NdtMap::NdtMap(NdtMapConfig* config) : BaseMap(config) {}
 
 NdtMap::~NdtMap() {}
-
-void NdtMap::PreloadMapArea(const Eigen::Vector3d& location,
-                            const Eigen::Vector3d& trans_diff,
-                            unsigned int resolution_id, unsigned int zone_id) {
-  BaseMap::PreloadMapArea(location, trans_diff, resolution_id, zone_id);
-}
-
-bool NdtMap::LoadMapArea(const Eigen::Vector3d& seed_pt3d,
-                         unsigned int resolution_id, unsigned int zone_id,
-                         int filter_size_x, int filter_size_y) {
-  BaseMap::LoadMapArea(seed_pt3d, resolution_id, zone_id, filter_size_x,
-                       filter_size_y);
-  return true;
-}
 
 }  // namespace msf
 }  // namespace localization

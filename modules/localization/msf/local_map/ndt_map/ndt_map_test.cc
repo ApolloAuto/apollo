@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 #include <gtest/gtest.h>
 #include <string>
 #include <vector>
-
 #include "cyber/common/file.h"
 #include "modules/common/util/string_util.h"
 #include "modules/localization/msf/common/io/pcl_point_types.h"

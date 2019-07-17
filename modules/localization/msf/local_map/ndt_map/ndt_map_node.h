@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 #pragma once
 
 #include <Eigen/Core>
-#include "modules/localization/msf/common/util/system_utility.h"
+#include "modules/localization/msf/common/util/file_utility.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node.h"
 #include "modules/localization/msf/local_map/ndt_map/ndt_map_config.h"
 #include "modules/localization/msf/local_map/ndt_map/ndt_map_matrix.h"
@@ -30,6 +30,10 @@ class NdtMapNode : public BaseMapNode {
  public:
   NdtMapNode();
   ~NdtMapNode();
+
+  void Init(const BaseMapConfig* map_config);
+  void Init(const BaseMapConfig* map_config, const MapNodeIndex& index,
+            bool create_map_cells = true);
 
   /**@brief Get the resolution of this map nodex. */
   inline float GetMapResolutionZ() const {

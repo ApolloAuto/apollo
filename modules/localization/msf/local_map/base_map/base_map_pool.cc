@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 #include "modules/localization/msf/local_map/base_map/base_map_pool.h"
 
-#include "cyber/common/log.h"
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
@@ -76,7 +75,7 @@ BaseMapNode* BaseMapNodePool::AllocMapNode() {
     }
     BaseMapNode* node = AllocNewMapNode();
     InitNewMapNode(node);
-    pool_size_++;
+    ++pool_size_;
     busy_nodes_.insert(node);
     return node;
   } else {
@@ -98,22 +97,36 @@ void BaseMapNodePool::FreeMapNodeTask(BaseMapNode* map_node) {
   {
     boost::unique_lock<boost::mutex> lock(mutex_);
     typename std::set<BaseMapNode*>::iterator f = busy_nodes_.find(map_node);
-    DCHECK(f != busy_nodes_.end());
+    if (f == busy_nodes_.end()) {
+      throw "[BaseMapNodePool::free_map_node_task] f == busy_nodes_.end()";
+    }
     free_list_.push_back(*f);
     busy_nodes_.erase(f);
   }
 }
 
 void BaseMapNodePool::InitNewMapNode(BaseMapNode* node) {
-  node->InitMapMatrix(map_config_);
+  node->Init(map_config_);
   return;
 }
 
-void BaseMapNodePool::FinalizeMapNode(BaseMapNode* node) { node->Finalize(); }
+void BaseMapNodePool::FinalizeMapNode(BaseMapNode* node) {
+  if (node != nullptr) {
+    node->Finalize();
+  }
+}
 
-void BaseMapNodePool::DellocMapNode(BaseMapNode* node) { delete node; }
+void BaseMapNodePool::DellocMapNode(BaseMapNode* node) {
+  if (node != nullptr) {
+    delete node;
+  }
+}
 
-void BaseMapNodePool::ResetMapNode(BaseMapNode* node) { node->ResetMapNode(); }
+void BaseMapNodePool::ResetMapNode(BaseMapNode* node) {
+  if (node != nullptr) {
+    node->ResetMapNode();
+  }
+}
 
 }  // namespace msf
 }  // namespace localization

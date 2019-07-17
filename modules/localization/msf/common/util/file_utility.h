@@ -13,40 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
 #pragma once
 
+#include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <cstdio>
+#include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
-#include "modules/localization/msf/local_map/base_map/base_map_config.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
 
-/**@brief The options of the reflectance map. */
-class NdtMapConfig : public BaseMapConfig {
+class FileUtility {
  public:
-  /**@brief The constructor gives the default map settings. */
-  explicit NdtMapConfig(std::string map_version = "0.1");
-  ~NdtMapConfig() {}
-
-  /**@brief Set single resolutions. */
-  void SetSingleResolutionZ(float resolution = 1.0f);
-  /**@brief Set multi resolutions. */
-  void SetMultiResolutionsZ();
-
-  /**@brief The resolution of z-axis. */
-  std::vector<float> map_resolutions_z_;
-
-  /**@brief Enable the compression. */
-  bool map_is_compression_;
-
- protected:
-  /**@brief Create the XML structure. */
-  virtual bool CreateXml(boost::property_tree::ptree* config) const;
-  /**@brief Load the map options from a XML structure. */
-  virtual bool LoadXml(boost::property_tree::ptree* config);
+  static const size_t UCHAR_MD5LENTH = 16;
+  static const size_t CHAR_MD5LENTH = 33;
+  /**@brief Compute file md5 given a file path. */
+  static void ComputeFileMd5(const std::string& file_path,
+                             unsigned char res[UCHAR_MD5LENTH]);
+  static void ComputeFileMd5(const std::string& file_path,
+                             char res[CHAR_MD5LENTH]);
+  /**@brief Compute file md5 given a binary chunk. */
+  static void ComputeBinaryMd5(const unsigned char* binary, size_t size,
+                               unsigned char res[UCHAR_MD5LENTH]);
+  static void ComputeBinaryMd5(const unsigned char* binary, size_t size,
+                               char res[CHAR_MD5LENTH]);
 };
 
 }  // namespace msf

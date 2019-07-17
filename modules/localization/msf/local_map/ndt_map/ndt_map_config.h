@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,9 +44,9 @@ class NdtMapConfig : public BaseMapConfig {
 
  protected:
   /**@brief Create the XML structure. */
-  virtual void CreateXml(boost::property_tree::ptree* config) const;
+  virtual bool CreateXml(boost::property_tree::ptree* config) const;
   /**@brief Load the map options from a XML structure. */
-  virtual void LoadXml(boost::property_tree::ptree* config);
+  virtual bool LoadXml(boost::property_tree::ptree* config);
 };
 
 }  // namespace msf

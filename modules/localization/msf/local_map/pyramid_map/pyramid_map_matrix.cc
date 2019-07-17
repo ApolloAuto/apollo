@@ -16,6 +16,7 @@
 #include "modules/localization/msf/local_map/pyramid_map/pyramid_map_matrix.h"
 
 #include <algorithm>
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace localization {
@@ -1478,7 +1479,7 @@ double PyramidMapMatrix::ComputeMeanIntensity(unsigned int level) {
   return avg;
 }
 
-void PyramidMapMatrix::Reduce(PyramidMapMatrix* cells,
+void PyramidMapMatrix::Reduce(std::shared_ptr<PyramidMapMatrix> cells,
                               const PyramidMapMatrix& new_cells,
                               unsigned int level, unsigned int new_level) {
   if (level >= cells->resolution_num_) {
