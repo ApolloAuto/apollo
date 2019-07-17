@@ -15,6 +15,7 @@
  *****************************************************************************/
 #pragma once
 
+#include <memory>
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 #include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
 

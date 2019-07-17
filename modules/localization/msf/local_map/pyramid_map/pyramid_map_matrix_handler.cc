@@ -16,6 +16,7 @@
  *****************************************************************************/
 #include "modules/localization/msf/local_map/pyramid_map/pyramid_map_matrix_handler.h"
 
+#include <memory>
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -137,9 +138,10 @@ LossyMapFullAltMatrixHandler::LossyMapFullAltMatrixHandler() {}
 
 LossyMapFullAltMatrixHandler::~LossyMapFullAltMatrixHandler() {}
 
-size_t LossyMapFullAltMatrixHandler::LoadBinary(const unsigned char* buf,
-                                                std::shared_ptr<BaseMapMatrix> base_matrix) {
-  std::shared_ptr<PyramidMapMatrix> matrix = std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
+size_t LossyMapFullAltMatrixHandler::LoadBinary(
+    const unsigned char* buf, std::shared_ptr<BaseMapMatrix> base_matrix) {
+  std::shared_ptr<PyramidMapMatrix> matrix =
+      std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
 
   size_t binary_size = sizeof(unsigned int) * 2;
   const unsigned int* uint_p = reinterpret_cast<const unsigned int*>(buf);
@@ -250,7 +252,8 @@ size_t LossyMapFullAltMatrixHandler::LoadBinary(const unsigned char* buf,
 }
 
 size_t LossyMapFullAltMatrixHandler::CreateBinary(
-    const std::shared_ptr<BaseMapMatrix> base_matrix, unsigned char* buf, size_t buf_size) {
+    const std::shared_ptr<BaseMapMatrix> base_matrix, unsigned char* buf,
+    size_t buf_size) {
   const std::shared_ptr<PyramidMapMatrix> matrix =
       std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
 
@@ -431,9 +434,10 @@ LosslessMapMatrixHandler::LosslessMapMatrixHandler() {}
 
 LosslessMapMatrixHandler::~LosslessMapMatrixHandler() {}
 
-size_t LosslessMapMatrixHandler::LoadBinary(const unsigned char* buf,
-                                            std::shared_ptr<BaseMapMatrix> base_matrix) {
-  std::shared_ptr<PyramidMapMatrix> matrix = std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
+size_t LosslessMapMatrixHandler::LoadBinary(
+    const unsigned char* buf, std::shared_ptr<BaseMapMatrix> base_matrix) {
+  std::shared_ptr<PyramidMapMatrix> matrix =
+      std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
 
   size_t binary_size = sizeof(unsigned int) * 2;  // rows and cols
 
@@ -500,9 +504,9 @@ size_t LosslessMapMatrixHandler::LoadBinary(const unsigned char* buf,
   return binary_size;
 }
 
-size_t LosslessMapMatrixHandler::CreateBinary(const std::shared_ptr<BaseMapMatrix> base_matrix,
-                                              unsigned char* buf,
-                                              size_t buf_size) {
+size_t LosslessMapMatrixHandler::CreateBinary(
+    const std::shared_ptr<BaseMapMatrix> base_matrix, unsigned char* buf,
+    size_t buf_size) {
   const std::shared_ptr<PyramidMapMatrix> matrix =
       std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
 
@@ -615,9 +619,10 @@ PyramidLossyMapMatrixHandler::PyramidLossyMapMatrixHandler() {}
 
 PyramidLossyMapMatrixHandler::~PyramidLossyMapMatrixHandler() {}
 
-size_t PyramidLossyMapMatrixHandler::LoadBinary(const unsigned char* buf,
-                                                std::shared_ptr<BaseMapMatrix> base_matrix) {
-  std::shared_ptr<PyramidMapMatrix> matrix = std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
+size_t PyramidLossyMapMatrixHandler::LoadBinary(
+    const unsigned char* buf, std::shared_ptr<BaseMapMatrix> base_matrix) {
+  std::shared_ptr<PyramidMapMatrix> matrix =
+      std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
 
   size_t binary_size = sizeof(unsigned int) * 4;
   const unsigned int* uint_p =
@@ -771,7 +776,8 @@ size_t PyramidLossyMapMatrixHandler::LoadBinary(const unsigned char* buf,
 }
 
 size_t PyramidLossyMapMatrixHandler::CreateBinary(
-    const std::shared_ptr<BaseMapMatrix> base_matrix, unsigned char* buf, size_t buf_size) {
+    const std::shared_ptr<BaseMapMatrix> base_matrix, unsigned char* buf,
+    size_t buf_size) {
   const std::shared_ptr<PyramidMapMatrix> matrix =
       std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
 
@@ -1027,9 +1033,10 @@ PyramidLosslessMapMatrixHandler::PyramidLosslessMapMatrixHandler() {}
 
 PyramidLosslessMapMatrixHandler::~PyramidLosslessMapMatrixHandler() {}
 
-size_t PyramidLosslessMapMatrixHandler::LoadBinary(const unsigned char* buf,
-                                                   std::shared_ptr<BaseMapMatrix> base_matrix) {
-  std::shared_ptr<PyramidMapMatrix> matrix = std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
+size_t PyramidLosslessMapMatrixHandler::LoadBinary(
+    const unsigned char* buf, std::shared_ptr<BaseMapMatrix> base_matrix) {
+  std::shared_ptr<PyramidMapMatrix> matrix =
+      std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
 
   size_t binary_size = sizeof(unsigned int) * 4;
   const unsigned int* uint_p =
@@ -1125,7 +1132,8 @@ size_t PyramidLosslessMapMatrixHandler::LoadBinary(const unsigned char* buf,
 }
 
 size_t PyramidLosslessMapMatrixHandler::CreateBinary(
-    const std::shared_ptr<BaseMapMatrix> base_matrix, unsigned char* buf, size_t buf_size) {
+    const std::shared_ptr<BaseMapMatrix> base_matrix, unsigned char* buf,
+    size_t buf_size) {
   const std::shared_ptr<PyramidMapMatrix> matrix =
       std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
 

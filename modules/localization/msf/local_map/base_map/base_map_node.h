@@ -16,6 +16,7 @@
 #pragma once
 
 #include <Eigen/Core>
+#include <memory>
 #include <string>
 #include <vector>
 #include "modules/localization/msf/common/util/compression.h"

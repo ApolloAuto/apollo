@@ -239,7 +239,8 @@ void LocalizationLidar::RefineAltitudeFromMap(Eigen::Affine3d* pose) {
   // Read the altitude from the map
   MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(
       map_.GetMapConfig(), lidar_trans, resolution_id_, zone_id_);
-  PyramidMapNode* node = static_cast<PyramidMapNode*>(map_.GetMapNodeSafe(index));
+  PyramidMapNode* node =
+      static_cast<PyramidMapNode*>(map_.GetMapNodeSafe(index));
   PyramidMapMatrix& matrix =
       static_cast<PyramidMapMatrix&>(node->GetMapCellMatrix());
 
@@ -367,13 +368,13 @@ void LocalizationLidar::ComposeMapNode(const Eigen::Vector3d& trans) {
         for (int x = 0; x < range_x; ++x) {
           int dst_idx = dst_base_x + x;
           lidar_map_node_->intensities[dst_idx] =
-            (*intensity_matrix)[src_y + y][src_x + x];
+              (*intensity_matrix)[src_y + y][src_x + x];
           lidar_map_node_->intensities_var[dst_idx] =
-            (*intensity_var_matrix)[src_y + y][src_x + x];
+              (*intensity_var_matrix)[src_y + y][src_x + x];
           lidar_map_node_->altitudes[dst_idx] =
-            (*altitude_matrix)[src_y + y][src_x + x];
+              (*altitude_matrix)[src_y + y][src_x + x];
           lidar_map_node_->count[dst_idx] =
-            (*count_matrix)[src_y + y][src_x + x];
+              (*count_matrix)[src_y + y][src_x + x];
         }
       }
     }

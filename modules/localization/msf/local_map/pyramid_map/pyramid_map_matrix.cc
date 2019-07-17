@@ -16,6 +16,7 @@
 #include "modules/localization/msf/local_map/pyramid_map/pyramid_map_matrix.h"
 
 #include <algorithm>
+#include <memory>
 #include "cyber/common/log.h"
 
 namespace apollo {

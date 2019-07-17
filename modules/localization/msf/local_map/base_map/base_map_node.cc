@@ -17,6 +17,7 @@
 #include "modules/localization/msf/local_map/base_map/base_map_node.h"
 
 #include <cstdio>
+#include <memory>
 #include <string>
 #include <vector>
 #include "cyber/common/file.h"

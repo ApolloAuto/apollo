@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/localization/msf/local_map/ndt_map/ndt_map_node_config.h"
 
+#include <memory>
+
 namespace apollo {
 namespace localization {
 namespace msf {

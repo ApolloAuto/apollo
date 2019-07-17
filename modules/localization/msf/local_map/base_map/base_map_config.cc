@@ -16,10 +16,10 @@
 
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 
-#include "cyber/common/log.h"
 #include <boost/foreach.hpp>
 #include <exception>
 #include <iostream>
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace localization {
@@ -157,7 +157,7 @@ bool BaseMapConfig::LoadXml(const boost::property_tree::ptree &config) {
 
   auto resolutions = config.get_child_optional("map.map_config.resolutions");
   if (resolutions) {
-    BOOST_FOREACH (const boost::property_tree::ptree::value_type &v,
+    BOOST_FOREACH(const boost::property_tree::ptree::value_type &v,
                    *resolutions) {
       map_resolutions_.push_back(
           static_cast<float>(atof(v.second.data().c_str())));
@@ -169,7 +169,7 @@ bool BaseMapConfig::LoadXml(const boost::property_tree::ptree &config) {
 
   auto datasets = config.get_child_optional("map.map_record.datasets");
   if (datasets) {
-    BOOST_FOREACH (const boost::property_tree::ptree::value_type &v,
+    BOOST_FOREACH(const boost::property_tree::ptree::value_type &v,
                    *datasets) {
       map_datasets_.push_back(v.second.data());
       AINFO << "Dataset: " << v.second.data();
@@ -179,7 +179,7 @@ bool BaseMapConfig::LoadXml(const boost::property_tree::ptree &config) {
   // load md5 check info
   auto nodes = config.get_child_optional("map.check_info.nodes");
   if (nodes) {
-    BOOST_FOREACH (const boost::property_tree::ptree::value_type &v, *nodes) {
+    BOOST_FOREACH(const boost::property_tree::ptree::value_type &v, *nodes) {
       const boost::property_tree::ptree &child = v.second;
       auto path = child.get_optional<std::string>("path");
       auto md5 = child.get_optional<std::string>("md5");

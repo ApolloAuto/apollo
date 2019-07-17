@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/localization/msf/local_map/pyramid_map/pyramid_map_node.h"
 
+#include <memory>
 #include <vector>
 #include "modules/localization/msf/local_map/pyramid_map/pyramid_map_matrix.h"
 #include "modules/localization/msf/local_map/pyramid_map/pyramid_map_matrix_handler.h"

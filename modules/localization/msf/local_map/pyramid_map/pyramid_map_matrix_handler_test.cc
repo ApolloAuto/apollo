@@ -121,12 +121,13 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, LosslessMapMatrixHandler) {
   pm_matrix->SetCountMatrix(uint_data, 4, 0);
 
   // normal case: check get/create/load
-  unsigned char* buf = new unsigned char[200];
+  std::shared_ptr<unsigned char> buf(new unsigned char[200]);
   unsigned int expect_size = 184;
   EXPECT_EQ(handler->GetBinarySize(pm_matrix), expect_size);
-  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size - 1), 0);
-  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size), expect_size);
-  EXPECT_EQ(handler->LoadBinary(buf, pm_matrix), expect_size);
+  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf.get(), expect_size - 1), 0);
+  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf.get(), expect_size),
+            expect_size);
+  EXPECT_EQ(handler->LoadBinary(buf.get(), pm_matrix), expect_size);
 
   // check the matrix after save and load
   EXPECT_FLOAT_EQ(*pm_matrix->GetIntensitySafe(0, 1), 256.f);
@@ -134,13 +135,14 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, LosslessMapMatrixHandler) {
   // bad case 1: no point in ground
   unsigned int uint_ground_data[] = {0, 0, 0, 0};
   pm_matrix->SetGroundCountMatrix(uint_ground_data, 4, 0);
-  unsigned char* ground_buf = new unsigned char[200];
+  std::shared_ptr<unsigned char> ground_buf(new unsigned char[200]);
   expect_size = 104;
   EXPECT_EQ(handler->GetBinarySize(pm_matrix), expect_size);
-  EXPECT_EQ(handler->CreateBinary(pm_matrix, ground_buf, expect_size - 1), 0);
-  EXPECT_EQ(handler->CreateBinary(pm_matrix, ground_buf, expect_size),
+  EXPECT_EQ(handler->CreateBinary(pm_matrix, ground_buf.get(), expect_size - 1),
+            0);
+  EXPECT_EQ(handler->CreateBinary(pm_matrix, ground_buf.get(), expect_size),
             expect_size);
-  EXPECT_EQ(handler->LoadBinary(ground_buf, pm_matrix), expect_size);
+  EXPECT_EQ(handler->LoadBinary(ground_buf.get(), pm_matrix), expect_size);
 
   // bad case 2: flags are false
   config->has_intensity_ = false;
@@ -153,9 +155,10 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, LosslessMapMatrixHandler) {
   pm_matrix->Init(*config);
   expect_size = 104;
   EXPECT_EQ(handler->GetBinarySize(pm_matrix), expect_size);
-  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size - 1), 0);
-  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size), expect_size);
-  EXPECT_EQ(handler->LoadBinary(buf, pm_matrix), expect_size);
+  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf.get(), expect_size - 1), 0);
+  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf.get(), expect_size),
+            expect_size);
+  EXPECT_EQ(handler->LoadBinary(buf.get(), pm_matrix), expect_size);
 
   if (handler != nullptr) {
     delete handler;
@@ -189,12 +192,13 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, PyramidLossyMapMatrixHandler) {
   pm_matrix->SetCountMatrix(uint_data, 4, 0);
 
   // normal case: check get/create/load
-  unsigned char* buf = new unsigned char[100];
+  std::shared_ptr<unsigned char> buf(new unsigned char[100]);
   unsigned int expect_size = 72;
   EXPECT_EQ(handler->GetBinarySize(pm_matrix), expect_size);
-  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size - 1), 0);
-  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size), expect_size);
-  EXPECT_EQ(handler->LoadBinary(buf, pm_matrix), expect_size);
+  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf.get(), expect_size - 1), 0);
+  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf.get(), expect_size),
+            expect_size);
+  EXPECT_EQ(handler->LoadBinary(buf.get(), pm_matrix), expect_size);
 
   // check the matrix after save and load
   EXPECT_FLOAT_EQ(*pm_matrix->GetIntensitySafe(0, 1), 255.f);
@@ -210,9 +214,10 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, PyramidLossyMapMatrixHandler) {
   pm_matrix->Init(*config);
   expect_size = 28;
   EXPECT_EQ(handler->GetBinarySize(pm_matrix), expect_size);
-  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size - 1), 0);
-  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size), expect_size);
-  EXPECT_EQ(handler->LoadBinary(buf, pm_matrix), expect_size);
+  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf.get(), expect_size - 1), 0);
+  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf.get(), expect_size),
+            expect_size);
+  EXPECT_EQ(handler->LoadBinary(buf.get(), pm_matrix), expect_size);
 
   if (handler != nullptr) {
     delete handler;
@@ -246,12 +251,13 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, PyramidLosslessMapMatrixHandler) {
   pm_matrix->SetCountMatrix(uint_data, 4, 0);
 
   // normal case: check get/create/load
-  unsigned char* buf = new unsigned char[200];
+  std::shared_ptr<unsigned char> buf(new unsigned char[200]);
   unsigned int expect_size = 132;
   EXPECT_EQ(handler->GetBinarySize(pm_matrix), expect_size);
-  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size - 1), 0);
-  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size), expect_size);
-  EXPECT_EQ(handler->LoadBinary(buf, pm_matrix), expect_size);
+  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf.get(), expect_size - 1), 0);
+  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf.get(), expect_size),
+            expect_size);
+  EXPECT_EQ(handler->LoadBinary(buf.get(), pm_matrix), expect_size);
 
   // check the matrix after save and load
   EXPECT_FLOAT_EQ(*pm_matrix->GetIntensitySafe(0, 1), 256.f);
@@ -267,9 +273,10 @@ TEST_F(PyramidMapMatrixHandlerTestSuite, PyramidLosslessMapMatrixHandler) {
   pm_matrix->Init(*config);
   expect_size = 20;
   EXPECT_EQ(handler->GetBinarySize(pm_matrix), expect_size);
-  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size - 1), 0);
-  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf, expect_size), expect_size);
-  EXPECT_EQ(handler->LoadBinary(buf, pm_matrix), expect_size);
+  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf.get(), expect_size - 1), 0);
+  EXPECT_EQ(handler->CreateBinary(pm_matrix, buf.get(), expect_size),
+            expect_size);
+  EXPECT_EQ(handler->LoadBinary(buf.get(), pm_matrix), expect_size);
 
   if (handler != nullptr) {
     delete handler;

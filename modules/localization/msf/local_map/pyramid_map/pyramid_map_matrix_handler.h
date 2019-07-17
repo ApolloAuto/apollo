@@ -15,6 +15,7 @@
  *****************************************************************************/
 #pragma once
 
+#include <memory>
 #include "modules/localization/msf/local_map/base_map/base_map_matrix_handler.h"
 #include "modules/localization/msf/local_map/pyramid_map/pyramid_map_matrix.h"
 
@@ -62,9 +63,10 @@ class LossyMapFullAltMatrixHandler : public LossyMapMatrixHandler {
   LossyMapFullAltMatrixHandler();
   ~LossyMapFullAltMatrixHandler();
 
-  virtual size_t LoadBinary(const unsigned char* buf, std::shared_ptr<BaseMapMatrix> matrix);
-  virtual size_t CreateBinary(const std::shared_ptr<BaseMapMatrix> matrix, unsigned char* buf,
-                              size_t buf_size);
+  virtual size_t LoadBinary(const unsigned char* buf,
+                            std::shared_ptr<BaseMapMatrix> matrix);
+  virtual size_t CreateBinary(const std::shared_ptr<BaseMapMatrix> matrix,
+                              unsigned char* buf, size_t buf_size);
   virtual size_t GetBinarySize(const std::shared_ptr<BaseMapMatrix> matrix);
 };
 
@@ -72,9 +74,10 @@ class LosslessMapMatrixHandler : public BaseMapMatrixHandler {
  public:
   LosslessMapMatrixHandler();
   ~LosslessMapMatrixHandler();
-  virtual size_t LoadBinary(const unsigned char* buf, std::shared_ptr<BaseMapMatrix> matrix);
-  virtual size_t CreateBinary(const std::shared_ptr<BaseMapMatrix> matrix, unsigned char* buf,
-                              size_t buf_size);
+  virtual size_t LoadBinary(const unsigned char* buf,
+                            std::shared_ptr<BaseMapMatrix> matrix);
+  virtual size_t CreateBinary(const std::shared_ptr<BaseMapMatrix> matrix,
+                              unsigned char* buf, size_t buf_size);
   virtual size_t GetBinarySize(const std::shared_ptr<BaseMapMatrix> matrix);
 };
 
@@ -82,9 +85,10 @@ class PyramidLossyMapMatrixHandler : public LossyMapMatrixHandler {
  public:
   PyramidLossyMapMatrixHandler();
   ~PyramidLossyMapMatrixHandler();
-  virtual size_t LoadBinary(const unsigned char* buf, std::shared_ptr<BaseMapMatrix> matrix);
-  virtual size_t CreateBinary(const std::shared_ptr<BaseMapMatrix> matrix, unsigned char* buf,
-                              size_t buf_size);
+  virtual size_t LoadBinary(const unsigned char* buf,
+                            std::shared_ptr<BaseMapMatrix> matrix);
+  virtual size_t CreateBinary(const std::shared_ptr<BaseMapMatrix> matrix,
+                              unsigned char* buf, size_t buf_size);
   virtual size_t GetBinarySize(const std::shared_ptr<BaseMapMatrix> matrix);
 };
 
@@ -92,9 +96,10 @@ class PyramidLosslessMapMatrixHandler : public BaseMapMatrixHandler {
  public:
   PyramidLosslessMapMatrixHandler();
   ~PyramidLosslessMapMatrixHandler();
-  virtual size_t LoadBinary(const unsigned char* buf, std::shared_ptr<BaseMapMatrix> matrix);
-  virtual size_t CreateBinary(const std::shared_ptr<BaseMapMatrix> matrix, unsigned char* buf,
-                              size_t buf_size);
+  virtual size_t LoadBinary(const unsigned char* buf,
+                            std::shared_ptr<BaseMapMatrix> matrix);
+  virtual size_t CreateBinary(const std::shared_ptr<BaseMapMatrix> matrix,
+                              unsigned char* buf, size_t buf_size);
   virtual size_t GetBinarySize(const std::shared_ptr<BaseMapMatrix> matrix);
 };
 

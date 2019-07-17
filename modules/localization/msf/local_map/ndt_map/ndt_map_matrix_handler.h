@@ -15,6 +15,7 @@
  *****************************************************************************/
 #pragma once
 
+#include <memory>
 #include "modules/localization/msf/local_map/base_map/base_map_matrix_handler.h"
 #include "modules/localization/msf/local_map/ndt_map/ndt_map_matrix.h"
 
@@ -35,13 +36,14 @@ class NdtMapMatrixHandler : public BaseMapMatrixHandler {
   NdtMapMatrixHandler();
   virtual ~NdtMapMatrixHandler();
 
-  size_t LoadBinary(const unsigned char* buf, std::shared_ptr<BaseMapMatrix> matrix);
+  size_t LoadBinary(const unsigned char* buf,
+                    std::shared_ptr<BaseMapMatrix> matrix);
   /**@brief Create the binary. Serialization of the object.
    * @param <buf, buf_size> The buffer and its size.
    * @param <return> The required or the used size of is returned.
    */
-  size_t CreateBinary(const std::shared_ptr<BaseMapMatrix> matrix, unsigned char* buf,
-                      size_t buf_size);
+  size_t CreateBinary(const std::shared_ptr<BaseMapMatrix> matrix,
+                      unsigned char* buf, size_t buf_size);
   /**@brief Get the binary size of the object. */
   size_t GetBinarySize(const std::shared_ptr<BaseMapMatrix> matrix);
 };

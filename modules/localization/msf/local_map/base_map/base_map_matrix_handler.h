@@ -36,8 +36,8 @@ class BaseMapMatrixHandler {
    * @param <buf, buf_size> The buffer and its size.
    * @param <return> The required or the used size of is returned.
    */
-  virtual size_t CreateBinary(const std::shared_ptr<BaseMapMatrix> matrix, unsigned char* buf,
-                              size_t buf_size) = 0;
+  virtual size_t CreateBinary(const std::shared_ptr<BaseMapMatrix> matrix,
+                              unsigned char* buf, size_t buf_size) = 0;
   /**@brief Get the binary size of the object. */
   virtual size_t GetBinarySize(const std::shared_ptr<BaseMapMatrix> matrix) = 0;
 };
