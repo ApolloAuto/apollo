@@ -16,6 +16,8 @@
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 
+#include <iomanip>
+#include <limits>
 #include <unordered_set>
 #include <utility>
 
@@ -37,16 +39,18 @@ ObstaclesContainer::ObstaclesContainer()
     : ptr_obstacles_(FLAGS_max_num_obstacles),
       id_mapping_(FLAGS_max_num_obstacles) {}
 
-// This is called by Perception module at every frame to insert all
-// detected obstacles.
-void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
+void ObstaclesContainer::CleanUp() {
   // Clean up the history and get the PerceptionObstacles
   curr_frame_id_mapping_.clear();
   curr_frame_movable_obstacle_ids_.clear();
   curr_frame_unmovable_obstacle_ids_.clear();
   curr_frame_considered_obstacle_ids_.clear();
   curr_frame_id_perception_obstacle_map_.clear();
+}
 
+// This is called by Perception module at every frame to insert all
+// detected obstacles.
+void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   PerceptionObstacles perception_obstacles;
   perception_obstacles.CopyFrom(
       dynamic_cast<const PerceptionObstacles&>(message));
@@ -56,7 +60,6 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   //   obstacle history.
   // - If it's not a valid time (earlier than history), continue.
   // - Also consider the offline_mode case.
-
   double timestamp = 0.0;
   if (perception_obstacles.has_header() &&
       perception_obstacles.header().has_timestamp_sec()) {
@@ -116,7 +119,8 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   }
 
   timestamp_ = timestamp;
-  ADEBUG << "Current timestamp is [" << timestamp_ << "]";
+  ADEBUG << "Current timestamp is [" << std::fixed << std::setprecision(6)
+         << timestamp_ << "]";
 
   // Prediction tracking adaptation
   if (FLAGS_enable_tracking_adaptation) {
@@ -136,7 +140,8 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
     ADEBUG << "Perception obstacle [" << perception_obstacle.id() << "] "
            << "was inserted";
   }
-  // 3. Sort the Obstacles
+
+  SetConsideredObstacleIds();
   ObstacleClusters::SortObstacles();
 }
 
@@ -230,6 +235,8 @@ void ObstaclesContainer::InsertPerceptionObstacle(
   // Insert the obstacle and also update the LRUCache.
   auto obstacle_ptr = GetObstacleWithLRUUpdate(id);
   if (obstacle_ptr != nullptr) {
+    ADEBUG << "Current time = " << std::fixed << std::setprecision(6)
+           << timestamp;
     obstacle_ptr->Insert(perception_obstacle, timestamp, id);
     ADEBUG << "Refresh obstacle [" << id << "]";
   } else {
@@ -242,10 +249,11 @@ void ObstaclesContainer::InsertPerceptionObstacle(
     ADEBUG << "Insert obstacle [" << id << "]";
   }
 
-  if (id != FLAGS_ego_vehicle_id) {
+  if (FLAGS_prediction_offline_mode ==
+          PredictionConstants::kDumpDataForLearning ||
+      id != FLAGS_ego_vehicle_id) {
     curr_frame_movable_obstacle_ids_.push_back(id);
   }
-  SetConsideredObstacleIds();
 }
 
 void ObstaclesContainer::InsertFeatureProto(const Feature& feature) {
@@ -354,6 +362,7 @@ void ObstaclesContainer::BuildLaneGraph() {
       obstacle_ptr->BuildLaneGraphFromLeftToRight();
     } else {
       ADEBUG << "Building ordered Lane Graph.";
+      ADEBUG << "Building lane graph for id = " << id;
       obstacle_ptr->BuildLaneGraphFromLeftToRight();
     }
     obstacle_ptr->SetNearbyObstacles();
