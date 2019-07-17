@@ -106,7 +106,6 @@ void PollHandler::ResponseCallback(const PollResponse& rsp) {
   response_ = rsp;
 
   if (routine_->state() == RoutineState::IO_WAIT) {
-    routine_->SetUpdateFlag();
     scheduler::Instance()->NotifyTask(routine_->id());
   }
 }
