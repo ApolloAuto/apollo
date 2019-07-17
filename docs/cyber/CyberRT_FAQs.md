@@ -81,7 +81,7 @@ You can refer the sample code:
 
 ## How to configure multiple hosts communication?
 
-Make sure the two(or more) hosts under the same network segment of the local area network, Like `192.168.10.6` and `192.168.10.7`.
+Make sure the two hosts(or more) are under the same network segment of the local area network, Like `192.168.10.6` and `192.168.10.7`.
 
 You just need to modify `CYBER_IP` of `/apollo/cyber/setup.bash`
 
