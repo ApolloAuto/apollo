@@ -50,18 +50,18 @@ class DualVariableWarmStartSlackOSQPInterface {
 
   bool optimize();
 
-  void assemble_P(std::vector<c_float>* P_data, std::vector<c_int>* P_indices,
-                  std::vector<c_int>* P_indptr);
+  void assembleP(std::vector<c_float>* P_data, std::vector<c_int>* P_indices,
+                 std::vector<c_int>* P_indptr);
 
-  void assemble_constraint(std::vector<c_float>* A_data,
-                           std::vector<c_int>* A_indices,
-                           std::vector<c_int>* A_indptr);
+  void assembleConstraint(std::vector<c_float>* A_data,
+                          std::vector<c_int>* A_indices,
+                          std::vector<c_int>* A_indptr);
 
   void assembleA(const int r, const int c, const std::vector<c_float>& P_data,
                  const std::vector<c_int>& P_indices,
                  const std::vector<c_int>& P_indptr);
 
-  void check_solution(const Eigen::MatrixXd& l_warm_up,
+  void checkSolution(const Eigen::MatrixXd& l_warm_up,
                       const Eigen::MatrixXd& n_warm_up);
 
   void printMatrix(const int r, const int c,
@@ -70,6 +70,8 @@ class DualVariableWarmStartSlackOSQPInterface {
       const std::vector<c_int>& P_indptr);
 
  private:
+  OSQPConfig osqp_config_;
+
   int num_of_variables_;
   int num_of_constraints_;
   int horizon_;

@@ -17,9 +17,9 @@
 /*
  * @file
  */
-#include <algorithm>
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_slack_osqp_interface.h"
 
+#include <algorithm>
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
@@ -78,6 +78,8 @@ DualVariableWarmStartSlackOSQPInterface::
   check_mode_ =
       planner_open_space_config.dual_variable_warm_start_config().debug_osqp();
   beta_ = planner_open_space_config.dual_variable_warm_start_config().beta();
+  osqp_config_ = planner_open_space_config.
+      dual_variable_warm_start_config().osqp_config();
 }
 
 void DualVariableWarmStartSlackOSQPInterface::printMatrix(
@@ -125,22 +127,23 @@ void DualVariableWarmStartSlackOSQPInterface::assembleA(
 }
 
 bool DualVariableWarmStartSlackOSQPInterface::optimize() {
-  int kNumParam = num_of_variables_;
-  int kNumConst = num_of_constraints_;
+  // int kNumParam = num_of_variables_;
+  // int kNumConst = num_of_constraints_;
 
   bool succ = true;
   // assemble P, quadratic term in objective
   std::vector<c_float> P_data;
   std::vector<c_int> P_indices;
   std::vector<c_int> P_indptr;
-  assemble_P(&P_data, &P_indices, &P_indptr);
+  assembleP(&P_data, &P_indices, &P_indptr);
   if (check_mode_) {
     AINFO << "print P_data in whole: ";
-    printMatrix(kNumParam, kNumParam, P_data, P_indices, P_indptr);
+    printMatrix(num_of_variables_, num_of_variables_,
+        P_data, P_indices, P_indptr);
   }
   // assemble q, linear term in objective, \sum{beta * slacks}
-  c_float q[kNumParam];
-  for (int i = 0; i < kNumParam; ++i) {
+  c_float q[num_of_variables_];  // NOLINT
+  for (int i = 0; i < num_of_variables_; ++i) {
     q[i] = 0.0;
     if (i >= s_start_index_) {
       q[i] = beta_;
@@ -151,18 +154,20 @@ bool DualVariableWarmStartSlackOSQPInterface::optimize() {
   std::vector<c_float> A_data;
   std::vector<c_int> A_indices;
   std::vector<c_int> A_indptr;
-  assemble_constraint(&A_data, &A_indices, &A_indptr);
+  assembleConstraint(&A_data, &A_indices, &A_indptr);
   if (check_mode_) {
     AINFO << "print A_data in whole: ";
-    printMatrix(kNumConst, kNumParam, A_data, A_indices, A_indptr);
-    assembleA(kNumConst, kNumParam, A_data, A_indices, A_indptr);
+    printMatrix(
+        num_of_constraints_, num_of_variables_, A_data, A_indices, A_indptr);
+    assembleA(
+        num_of_constraints_, num_of_variables_, A_data, A_indices, A_indptr);
   }
 
   // assemble lb & ub, slack_variable <= 0
-  c_float lb[kNumConst];
-  c_float ub[kNumConst];
-  int slack_indx = kNumConst - slack_horizon_;
-  for (int i = 0; i < kNumConst; ++i) {
+  c_float lb[num_of_constraints_];  // NOLINT
+  c_float ub[num_of_constraints_];  // NOLINT
+  int slack_indx = num_of_constraints_ - slack_horizon_;
+  for (int i = 0; i < num_of_constraints_; ++i) {
     lb[i] = 0.0;
     if (i >= slack_indx) {
       lb[i] = -2e19;
@@ -183,17 +188,16 @@ bool DualVariableWarmStartSlackOSQPInterface::optimize() {
 
   // Define Solver settings as default
   osqp_set_default_settings(settings);
-  settings->alpha = 1.0;  // Change alpha parameter
-  settings->eps_abs = 1.0e-03;
-  settings->eps_rel = 1.0e-03;
-  settings->max_iter = 10000;
-  settings->polish = true;
-  settings->verbose = FLAGS_enable_osqp_debug;
+  settings->alpha = osqp_config_.alpha();  // Change alpha parameter
+  settings->eps_abs = osqp_config_.eps_abs();
+  settings->eps_rel = osqp_config_.eps_rel();
+  settings->max_iter = osqp_config_.max_iter();
+  settings->polish = osqp_config_.polish();
 
   // Populate data
   OSQPData* data = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
-  data->n = kNumParam;
-  data->m = kNumConst;
+  data->n = num_of_variables_;
+  data->m = num_of_constraints_;
   data->P = csc_matrix(data->n, data->n, P_data.size(), P_data.data(),
                        P_indices.data(), P_indptr.data());
   data->q = q;
@@ -254,13 +258,13 @@ bool DualVariableWarmStartSlackOSQPInterface::optimize() {
   return succ;
 }
 
-void DualVariableWarmStartSlackOSQPInterface::check_solution(
+void DualVariableWarmStartSlackOSQPInterface::checkSolution(
     const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up) {
   // TODO(Runxin): extend
   return;
 }
 
-void DualVariableWarmStartSlackOSQPInterface::assemble_P(
+void DualVariableWarmStartSlackOSQPInterface::assembleP(
     std::vector<c_float>* P_data, std::vector<c_int>* P_indices,
     std::vector<c_int>* P_indptr) {
   // the objective function is norm(A' * lambda)
@@ -323,7 +327,7 @@ void DualVariableWarmStartSlackOSQPInterface::assemble_P(
   CHECK_EQ(P_indptr->size(), num_of_variables_ + 1);
 }
 
-void DualVariableWarmStartSlackOSQPInterface::assemble_constraint(
+void DualVariableWarmStartSlackOSQPInterface::assembleConstraint(
     std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
     std::vector<c_int>* A_indptr) {
   /*
@@ -468,8 +472,8 @@ void DualVariableWarmStartSlackOSQPInterface::get_optimization_results(
     }
   }
 
-  LOG(INFO) << "max_s: " << std::to_string(max_s);
-  LOG(INFO) << "min_s: " << std::to_string(min_s);
+  ADEBUG << "max_s: " << std::to_string(max_s);
+  ADEBUG << "min_s: " << std::to_string(min_s);
 }
 }  // namespace planning
 }  // namespace apollo

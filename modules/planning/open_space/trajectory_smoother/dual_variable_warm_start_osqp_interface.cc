@@ -72,6 +72,8 @@ DualVariableWarmStartOSQPInterface::DualVariableWarmStartOSQPInterface(
           .min_safety_distance();
   check_mode_ =
       planner_open_space_config.dual_variable_warm_start_config().debug_osqp();
+  osqp_config_ = planner_open_space_config.
+      dual_variable_warm_start_config().osqp_config();
 }
 
 void printMatrix(const int r, const int c, const std::vector<c_float>& P_data,
@@ -170,12 +172,11 @@ bool DualVariableWarmStartOSQPInterface::optimize() {
 
   // Define Solver settings as default
   osqp_set_default_settings(settings);
-  settings->alpha = 1.0;  // Change alpha parameter
-  settings->eps_abs = 1.0e-03;
-  settings->eps_rel = 1.0e-03;
-  settings->max_iter = 10000;
-  settings->polish = true;
-  settings->verbose = FLAGS_enable_osqp_debug;
+  settings->alpha = osqp_config_.alpha();  // Change alpha parameter
+  settings->eps_abs = osqp_config_.eps_abs();
+  settings->eps_rel = osqp_config_.eps_rel();
+  settings->max_iter = osqp_config_.max_iter();
+  settings->polish = osqp_config_.polish();
 
   // Populate data
   OSQPData* data = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
