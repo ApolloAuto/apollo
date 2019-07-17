@@ -154,7 +154,7 @@ message ScenarioValetParkingConfig {
 
 message ScenarioNarrowStreetUTurnConfig {}
 
-message ScenarioHailingConfig {}
+message ScenarioParkAndGoConfig {}
 
 // scenario configs
 message ScenarioConfig {
@@ -177,7 +177,7 @@ message ScenarioConfig {
 
     // misc
     NARROW_STREET_U_TURN = 12;
-    HAILING = 13;
+    PARK_AND_GO = 13;
   }
 
   // StageType is a superset of stages from all scenarios.
@@ -219,6 +219,11 @@ message ScenarioConfig {
     // valet parking scenario
     VALET_PARKING_APPROACHING_PARKING_SPOT = 510;
     VALET_PARKING_PARKING = 511;
+
+    // park_and_go scenario
+    PARK_AND_GO_CHECK = 601;
+    PARK_AND_GO_CRUISE = 602;
+    PARK_AND_GO_ADJUST = 603;
   };
 
   message StageConfig {
@@ -228,7 +233,7 @@ message ScenarioConfig {
     repeated TaskConfig.TaskType task_type = 3;
     // an unordered task configurations
     repeated TaskConfig task_config = 4;
-  }
+  } 
 
   optional ScenarioType scenario_type = 1;
   oneof scenario_config {
@@ -241,7 +246,7 @@ message ScenarioConfig {
     ScenarioPullOverConfig pull_over_config = 9;
     ScenarioValetParkingConfig valet_parking_config = 10;
     ScenarioNarrowStreetUTurnConfig narrow_street_u_turn_config = 11;
-    ScenarioHailingConfig hailing_config = 12;
+    ScenarioParkAndGoConfig park_and_go_config = 12;
   }
   // a list of stages that are used at runtime.  The first one is default stage.
   repeated StageType stage_type = 13;

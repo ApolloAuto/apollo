@@ -63,10 +63,10 @@ DEFINE_string(scenario_valet_parking_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/valet_parking_config.pb.txt",
               "valet_parking scenario config file");
-DEFINE_string(scenario_hailing_config_file,
+DEFINE_string(scenario_park_and_go_config_file,
               "/apollo/modules/planning/conf/"
-              "scenario/hailing_config.pb.txt",
-              "hailing scenario config file");
+              "scenario/park_and_go_config.pb.txt",
+              "park_and_go scenario config file");
 
 DEFINE_bool(enable_scenario_bare_intersection, false,
             "enable bare_intersection scenarios in planning");
@@ -89,6 +89,9 @@ DEFINE_bool(enable_scenario_traffic_light, true,
 
 DEFINE_bool(enable_force_pull_over_open_space_parking_test, false,
             "enable force_pull_over_open_space_parking_test");
+
+DEFINE_bool(enable_scenario_park_and_go, false,
+            "enable park-and-go scenario in planning");
 
 DEFINE_string(traffic_rule_config_filename,
               "/apollo/modules/planning/conf/traffic_rule_config.pb.txt",
