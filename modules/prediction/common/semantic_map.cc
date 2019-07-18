@@ -177,9 +177,16 @@ void SemanticMap::DrawLanes(const common::PointENU& center_point,
         double theta = atan2(segment.line_segment().point(i + 1).y() -
                                  segment.line_segment().point(i).y(),
                              segment.line_segment().point(i + 1).x() -
-                                 segment.line_segment().point(i).x()) /
-                       (2 * M_PI);
-        double H = theta >= 0 ? theta : theta + 1;
+                                 segment.line_segment().point(i).x());
+        double H = theta >= 0 ? theta / (2 * M_PI) : theta / (2 * M_PI) + 1;
+        // // Original cv::cvtColor() is 4 times slower than HSVtoRGB()
+        // cv::Mat hsv(1, 1, CV_32FC3, cv::Scalar(H * 360.0, 1.0, 1.0));
+        // cv::Mat rgb;
+        // cv::cvtColor(hsv, rgb, cv::COLOR_HSV2RGB);
+        // cv::Scalar c =
+        //     cv::Scalar(rgb.at<float>(0, 0) * 255, rgb.at<float>(0, 1) * 255,
+        //                rgb.at<float>(0, 2) * 255);
+
         cv::line(base_img_, p0, p1, HSVtoRGB(H), 4);
       }
     }
@@ -213,8 +220,25 @@ void SemanticMap::DrawLanes(const common::PointENU& center_point,
 }
 
 cv::Scalar SemanticMap::HSVtoRGB(double H, double S, double V) {
-  // TODO(Hongyi): implement
-  return cv::Scalar(255, 255, 255);
+  int I = static_cast<int>(floor(H * 6.0));
+  double F = H * 6.0 - floor(H * 6.0);
+  double M = V * (1.0 - S);
+  double N = V * (1.0 - S * F);
+  double K = V * (1.0 - S * (1.0 - F));
+  switch (I) {
+    case 0:
+      return cv::Scalar(V, K, M) * 255.0;
+    case 1:
+      return cv::Scalar(N, V, M) * 255.0;
+    case 2:
+      return cv::Scalar(M, V, K) * 255.0;
+    case 3:
+      return cv::Scalar(M, N, V) * 255.0;
+    case 4:
+      return cv::Scalar(K, M, V) * 255.0;
+    default:
+      return cv::Scalar(V, M, N) * 255.0;
+  }
 }
 
 void SemanticMap::DrawRect(const Feature& feature, const cv::Scalar& color,
