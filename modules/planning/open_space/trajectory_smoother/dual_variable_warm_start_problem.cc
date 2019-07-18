@@ -39,7 +39,7 @@ bool DualVariableWarmStartProblem::Solve(
     size_t obstacles_num, const Eigen::MatrixXi& obstacles_edges_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     const Eigen::MatrixXd& xWS, Eigen::MatrixXd* l_warm_up,
-    Eigen::MatrixXd* n_warm_up) {
+    Eigen::MatrixXd* n_warm_up, Eigen::MatrixXd* s_warm_up) {
   auto t_start = cyber::Time::Now().ToSecond();
   bool solver_flag = false;
 
@@ -73,7 +73,7 @@ bool DualVariableWarmStartProblem::Solve(
 
     if (ptop.optimize()) {
       ADEBUG << "dual warm up done.";
-      ptop.get_optimization_results(l_warm_up, n_warm_up);
+      ptop.get_optimization_results(l_warm_up, n_warm_up, s_warm_up);
 
       auto t_end = cyber::Time::Now().ToSecond();
       ADEBUG << "Dual variable warm start solving time in second : "
@@ -82,7 +82,7 @@ bool DualVariableWarmStartProblem::Solve(
       solver_flag = true;
     } else {
       AWARN << "dual warm up fail.";
-      ptop.get_optimization_results(l_warm_up, n_warm_up);
+      ptop.get_optimization_results(l_warm_up, n_warm_up, s_warm_up);
       solver_flag = false;
     }
   } else if (planner_open_space_config_.dual_variable_warm_start_config()

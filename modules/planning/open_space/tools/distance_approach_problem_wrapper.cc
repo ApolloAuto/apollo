@@ -358,6 +358,8 @@ bool DistanceSmoothing(
   // result for distance approach problem
   Eigen::MatrixXd l_warm_up;
   Eigen::MatrixXd n_warm_up;
+  Eigen::MatrixXd s_warm_up =
+      Eigen::MatrixXd::Zero(obstacles.GetObstaclesNum(), horizon_ + 1);
 
   DualVariableWarmStartProblem* dual_variable_warm_start_ptr =
       new DualVariableWarmStartProblem(planner_open_space_config);
@@ -366,7 +368,7 @@ bool DistanceSmoothing(
     bool dual_variable_warm_start_status = dual_variable_warm_start_ptr->Solve(
         horizon_, ts_, ego_, obstacles.GetObstaclesNum(),
         obstacles.GetObstaclesEdgesNum(), obstacles.GetAMatrix(),
-        obstacles.GetbMatrix(), xWS, &l_warm_up, &n_warm_up);
+        obstacles.GetbMatrix(), xWS, &l_warm_up, &n_warm_up, &s_warm_up);
 
     if (dual_variable_warm_start_status) {
       AINFO << "Dual variable problem solved successfully!";
@@ -385,7 +387,8 @@ bool DistanceSmoothing(
       new DistanceApproachProblem(planner_open_space_config);
 
   bool status = distance_approach_ptr->Solve(
-      x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS, l_warm_up, n_warm_up,
+      x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS,
+      l_warm_up, n_warm_up, s_warm_up,
       XYbounds, obstacles.GetObstaclesNum(), obstacles.GetObstaclesEdgesNum(),
       obstacles.GetAMatrix(), obstacles.GetbMatrix(), state_result_ds_,
       control_result_ds_, time_result_ds_, dual_l_result_ds_,

@@ -165,6 +165,7 @@ default_task_config: {
             eps_rel: 1.0e-3
             max_iter: 10000
             polish: true
+            osqp_debug_log: false
           }
         }
         distance_approach_config {
@@ -181,6 +182,7 @@ default_task_config: {
           weight_first_order_time: 4.25
           weight_second_order_time: 13.5
           weight_end_state: 1.0
+          weight_slack: 1.0
           min_safety_distance: 0.01
           max_speed_forward: 2.0
           max_speed_reverse: 1.0
@@ -208,7 +210,7 @@ default_task_config: {
           enable_jacobian_ad: false
           enable_hand_derivative: false
           enable_derivative_check: false
-          distance_approach_mode: DISTANCE_APPROACH_IPOPT
+          distance_approach_mode: DISTANCE_APPROACH_IPOPT_RELAX_END_SLACK
           enable_check_initial_state: false
         }
         iterative_anchoring_smoother_config {

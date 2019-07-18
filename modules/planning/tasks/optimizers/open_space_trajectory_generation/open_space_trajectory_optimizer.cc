@@ -534,11 +534,15 @@ bool OpenSpaceTrajectoryOptimizer::GenerateDistanceApproachTraj(
   // Get timestep delta t
   double ts = config_.planner_open_space_config().delta_t();
 
+  // slack_warm_up, temp usage
+  Eigen::MatrixXd s_warm_up =
+      Eigen::MatrixXd::Zero(obstacles_num, horizon + 1);
+
   // Dual variable warm start for distance approach problem
   if (FLAGS_use_dual_variable_warm_start) {
     if (dual_variable_warm_start_->Solve(
             horizon, ts, ego, obstacles_num, obstacles_edges_num, obstacles_A,
-            obstacles_b, xWS, l_warm_up, n_warm_up)) {
+            obstacles_b, xWS, l_warm_up, n_warm_up, &s_warm_up)) {
       ADEBUG << "Dual variable problem solved successfully!";
     } else {
       ADEBUG << "Dual variable problem failed to solve";
@@ -553,9 +557,9 @@ bool OpenSpaceTrajectoryOptimizer::GenerateDistanceApproachTraj(
   // Distance approach trajectory smoothing
   if (distance_approach_->Solve(
           x0, xF, last_time_u, horizon, ts, ego, xWS, uWS, *l_warm_up,
-          *n_warm_up, XYbounds, obstacles_num, obstacles_edges_num, obstacles_A,
-          obstacles_b, state_result_ds, control_result_ds, time_result_ds,
-          dual_l_result_ds, dual_n_result_ds)) {
+          *n_warm_up, s_warm_up, XYbounds, obstacles_num, obstacles_edges_num,
+          obstacles_A, obstacles_b, state_result_ds, control_result_ds,
+          time_result_ds, dual_l_result_ds, dual_n_result_ds)) {
     ADEBUG << "Distance approach problem solved successfully!";
   } else {
     ADEBUG << "Distance approach problem failed to solve";

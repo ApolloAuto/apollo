@@ -35,8 +35,9 @@ bool DistanceApproachProblem::Solve(
     const Eigen::MatrixXd& last_time_u, const size_t horizon, const double ts,
     const Eigen::MatrixXd& ego, const Eigen::MatrixXd& xWS,
     const Eigen::MatrixXd& uWS, const Eigen::MatrixXd& l_warm_up,
-    const Eigen::MatrixXd& n_warm_up, const std::vector<double>& XYbounds,
-    const size_t obstacles_num, const Eigen::MatrixXi& obstacles_edges_num,
+    const Eigen::MatrixXd& n_warm_up, const Eigen::MatrixXd& s_warm_up,
+    const std::vector<double>& XYbounds, const size_t obstacles_num,
+    const Eigen::MatrixXi& obstacles_edges_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     Eigen::MatrixXd* state_result, Eigen::MatrixXd* control_result,
     Eigen::MatrixXd* time_result, Eigen::MatrixXd* dual_l_result,
@@ -79,6 +80,14 @@ bool DistanceApproachProblem::Solve(
         horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u,
         XYbounds, obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b,
         planner_open_space_config_);
+  } else if (planner_open_space_config_.distance_approach_config()
+                 .distance_approach_mode() ==
+             DISTANCE_APPROACH_IPOPT_RELAX_END_SLACK) {
+    AERROR << "aaaaa";
+    ptop = new DistanceApproachIPOPTRelaxEndSlackInterface(
+        horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, s_warm_up,
+        x0, xF, last_time_u, XYbounds, obstacles_edges_num, obstacles_num,
+        obstacles_A, obstacles_b, planner_open_space_config_);
   }
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
