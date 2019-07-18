@@ -44,8 +44,9 @@ void RTKLocalization::InitConfig(const rtk_config::Config &config) {
 
 void RTKLocalization::GpsCallback(
     const std::shared_ptr<localization::Gps> &gps_msg) {
-  double time_delay =
-      common::time::ToSecond(Clock::Now()) - last_received_timestamp_sec_;
+  double time_delay = last_received_timestamp_sec_ ?
+      common::time::ToSecond(Clock::Now()) - last_received_timestamp_sec_
+      : last_received_timestamp_sec_;
   if (time_delay > gps_time_delay_tolerance_) {
     std::stringstream ss;
     ss << "GPS message time interval: " << time_delay;
@@ -80,6 +81,8 @@ void RTKLocalization::GpsCallback(
   PrepareLocalizationMsg(*gps_msg, &last_localization_result_,
                          &last_localization_status_result_);
   service_started_ = true;
+  if (service_started_time == 0.0)
+      service_started_time = common::time::ToSecond(Clock::Now());
 
   // watch dog
   RunWatchDog(gps_msg->header().timestamp_sec());
@@ -130,11 +133,14 @@ void RTKLocalization::RunWatchDog(double gps_timestamp) {
 
   // check GPS time stamp against system time
   double gps_delay_sec = common::time::ToSecond(Clock::Now()) - gps_timestamp;
+  double gps_service_delay = common::time::ToSecond(Clock::Now())
+                             - service_started_time;
   int64_t gps_delay_cycle_cnt =
       static_cast<int64_t>(gps_delay_sec * localization_publish_freq_);
 
   bool msg_delay = false;
-  if (gps_delay_cycle_cnt > report_threshold_err_num_) {
+  if ((gps_delay_cycle_cnt > report_threshold_err_num_)
+       && (static_cast<int>(gps_service_delay) > service_delay_threshold)) {
     msg_delay = true;
     std::stringstream ss;
     ss << "Raw GPS Message Delay. GPS message is " << gps_delay_cycle_cnt
@@ -150,7 +156,8 @@ void RTKLocalization::RunWatchDog(double gps_timestamp) {
       common::time::ToSecond(Clock::Now()) - imu_msg.header().timestamp_sec();
   int64_t imu_delay_cycle_cnt =
       static_cast<int64_t>(imu_delay_sec * localization_publish_freq_);
-  if (imu_delay_cycle_cnt > report_threshold_err_num_) {
+  if ((imu_delay_cycle_cnt > report_threshold_err_num_)
+      && (static_cast<int>(gps_service_delay) > service_delay_threshold)) {
     msg_delay = true;
     std::stringstream ss;
     ss << "Raw IMU Message Delay. IMU message is " << imu_delay_cycle_cnt
@@ -412,13 +419,13 @@ bool RTKLocalization::InterpolateIMU(const CorrectedImu &imu1,
   }
   if (timestamp_sec - imu1.header().timestamp_sec() <
       std::numeric_limits<double>::min()) {
-    AERROR << "[InterpolateIMU]: the given time stamp[" << timestamp_sec
+    AERROR << "[InterpolateIMU1]: the given time stamp[" << timestamp_sec
            << "] is older than the 1st message["
            << imu1.header().timestamp_sec() << "]";
     *imu_msg = imu1;
   } else if (timestamp_sec - imu2.header().timestamp_sec() >
              std::numeric_limits<double>::min()) {
-    AERROR << "[InterpolateIMU]: the given time stamp[" << timestamp_sec
+    AERROR << "[InterpolateIMU2]: the given time stamp[" << timestamp_sec
            << "] is newer than the 2nd message["
            << imu2.header().timestamp_sec() << "]";
     *imu_msg = imu1;
