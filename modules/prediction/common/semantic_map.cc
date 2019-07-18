@@ -58,9 +58,7 @@ void SemanticMap::RunCurrFrame(
     return;
   }
   obstacle_id_history_map_ = obstacle_id_history_map;
-  const Feature& ego_feature =
-      obstacle_id_history_map_.at(FLAGS_ego_vehicle_id).feature(0);
-  curr_timestamp_ = ego_feature.timestamp();
+  ego_feature_ = obstacle_id_history_map_.at(FLAGS_ego_vehicle_id).feature(0);
   // curr_base_x_ = ego_feature.position().x() - config_.observation_range();
   // curr_base_y_ = ego_feature.position().y() - config_.observation_range();
   // cv::Rect rect(static_cast<int>((curr_base_x_ - config_.base_point().x()) /
@@ -72,7 +70,7 @@ void SemanticMap::RunCurrFrame(
   //               2000, 2000);
   // base_img_(rect).copyTo(curr_img_);
   // TODO(all): move to somewhere else
-  DrawBaseMap(ego_feature.position().x(), ego_feature.position().y());
+  DrawBaseMap();
   base_img_.copyTo(curr_img_);
 
   // Draw all obstacles_history
@@ -92,7 +90,9 @@ void SemanticMap::RunCurrFrame(
   }
 }
 
-void SemanticMap::DrawBaseMap(const double x, const double y) {
+void SemanticMap::DrawBaseMap() {
+  double x = ego_feature_.position().x();
+  double y = ego_feature_.position().y();
   base_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
   curr_base_x_ = x - 100.0;
   curr_base_y_ = y - 100.0;
@@ -257,7 +257,7 @@ void SemanticMap::DrawHistory(const ObstacleHistory& history,
                               const cv::Scalar& color, cv::Mat* img) {
   for (int i = history.feature_size() - 1; i >= 0; --i) {
     const Feature& feature = history.feature(i);
-    double time_decay = 1.0 - curr_timestamp_ + feature.timestamp();
+    double time_decay = 1.0 - ego_feature_.timestamp() + feature.timestamp();
     cv::Scalar decay_color = color * time_decay;
     if (feature.id() == FLAGS_ego_vehicle_id) {
       DrawRect(feature, decay_color, img);

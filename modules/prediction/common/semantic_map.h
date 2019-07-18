@@ -44,7 +44,7 @@ class SemanticMap {
                        static_cast<int>(2000 - (y - curr_base_y_) / 0.1));
   }
 
-  void DrawBaseMap(const double x, const double y);
+  void DrawBaseMap();
 
   void DrawRoads(const common::PointENU& center_point,
                  const cv::Scalar& color = cv::Scalar(64, 64, 64));
@@ -80,7 +80,7 @@ class SemanticMap {
   std::unordered_map<int, ObstacleHistory> obstacle_id_history_map_;
   double curr_base_x_ = 0.0;
   double curr_base_y_ = 0.0;
-  double curr_timestamp_ = 0.0;
+  Feature ego_feature_;
 
   DECLARE_SINGLETON(SemanticMap)
 };
