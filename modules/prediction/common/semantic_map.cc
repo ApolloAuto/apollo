@@ -16,6 +16,7 @@
 
 #include "modules/prediction/common/semantic_map.h"
 
+#include <cmath>
 #include <string>
 #include <vector>
 
@@ -98,11 +99,8 @@ void SemanticMap::DrawBaseMap(const double x, const double y) {
   common::PointENU center_point = common::util::MakePointENU(x, y, 0.0);
   DrawRoads(center_point);
   DrawJunctions(center_point);
-  std::vector<apollo::hdmap::CrosswalkInfoConstPtr> crosswalks;
-  apollo::hdmap::HDMapUtil::BaseMap().GetCrosswalks(center_point, 141.4,
-                                                    &crosswalks);
-  std::vector<apollo::hdmap::LaneInfoConstPtr> lanes;
-  apollo::hdmap::HDMapUtil::BaseMap().GetLanes(center_point, 141.4, &lanes);
+  DrawCrosswalks(center_point);
+  DrawLanes(center_point);
 }
 
 void SemanticMap::DrawRoads(const common::PointENU& center_point,
@@ -113,13 +111,13 @@ void SemanticMap::DrawRoads(const common::PointENU& center_point,
     for (const auto& section : road->road().section()) {
       std::vector<cv::Point> polygon;
       for (const auto& edge : section.boundary().outer_polygon().edge()) {
-        if (edge.type() == 2) {
+        if (edge.type() == 2) {  // left edge
           for (const auto& segment : edge.curve().segment()) {
             for (const auto& point : segment.line_segment().point()) {
               polygon.push_back(GetTransPoint(point.x(), point.y()));
             }
           }
-        } else if (edge.type() == 3) {
+        } else if (edge.type() == 3) {  // right edge
           for (const auto& segment : edge.curve().segment()) {
             for (const auto& point : segment.line_segment().point()) {
               polygon.insert(polygon.begin(),
@@ -141,12 +139,82 @@ void SemanticMap::DrawJunctions(const common::PointENU& center_point,
                                                    &junctions);
   for (const auto& junction : junctions) {
     std::vector<cv::Point> polygon;
-    for (auto& polygon_point : junction->junction().polygon().point()) {
-      polygon.push_back(GetTransPoint(polygon_point.x(), polygon_point.y()));
+    for (const auto& point : junction->junction().polygon().point()) {
+      polygon.push_back(GetTransPoint(point.x(), point.y()));
     }
     cv::fillPoly(base_img_, std::vector<std::vector<cv::Point>>({polygon}),
                  color);
   }
+}
+
+void SemanticMap::DrawCrosswalks(const common::PointENU& center_point,
+                                 const cv::Scalar& color) {
+  std::vector<apollo::hdmap::CrosswalkInfoConstPtr> crosswalks;
+  apollo::hdmap::HDMapUtil::BaseMap().GetCrosswalks(center_point, 141.4,
+                                                    &crosswalks);
+  for (const auto& crosswalk : crosswalks) {
+    std::vector<cv::Point> polygon;
+    for (const auto& point : crosswalk->crosswalk().polygon().point()) {
+      polygon.push_back(GetTransPoint(point.x(), point.y()));
+    }
+    cv::fillPoly(base_img_, std::vector<std::vector<cv::Point>>({polygon}),
+                 color);
+  }
+}
+
+void SemanticMap::DrawLanes(const common::PointENU& center_point,
+                            const cv::Scalar& color) {
+  std::vector<apollo::hdmap::LaneInfoConstPtr> lanes;
+  apollo::hdmap::HDMapUtil::BaseMap().GetLanes(center_point, 141.4, &lanes);
+  for (const auto& lane : lanes) {
+    // Draw lane_central first
+    for (const auto& segment : lane->lane().central_curve().segment()) {
+      for (int i = 0; i < segment.line_segment().point_size() - 1; ++i) {
+        const auto& p0 = GetTransPoint(segment.line_segment().point(i).x(),
+                                       segment.line_segment().point(i).y());
+        const auto& p1 = GetTransPoint(segment.line_segment().point(i + 1).x(),
+                                       segment.line_segment().point(i + 1).y());
+        double theta = atan2(segment.line_segment().point(i + 1).y() -
+                                 segment.line_segment().point(i).y(),
+                             segment.line_segment().point(i + 1).x() -
+                                 segment.line_segment().point(i).x()) /
+                       (2 * M_PI);
+        double H = theta >= 0 ? theta : theta + 1;
+        cv::line(base_img_, p0, p1, HSVtoRGB(H), 4);
+      }
+    }
+    // Not drawing boundary for virtual city_driving lane
+    if (lane->lane().type() == 2 && lane->lane().left_boundary().virtual_() &&
+        lane->lane().right_boundary().virtual_()) {
+      continue;
+    }
+    // Draw lane's left_boundary
+    for (const auto& segment : lane->lane().left_boundary().curve().segment()) {
+      for (int i = 0; i < segment.line_segment().point_size() - 1; ++i) {
+        const auto& p0 = GetTransPoint(segment.line_segment().point(i).x(),
+                                       segment.line_segment().point(i).y());
+        const auto& p1 = GetTransPoint(segment.line_segment().point(i + 1).x(),
+                                       segment.line_segment().point(i + 1).y());
+        cv::line(base_img_, p0, p1, color, 2);
+      }
+    }
+    // Draw lane's right_boundary
+    for (const auto& segment :
+         lane->lane().right_boundary().curve().segment()) {
+      for (int i = 0; i < segment.line_segment().point_size() - 1; ++i) {
+        const auto& p0 = GetTransPoint(segment.line_segment().point(i).x(),
+                                       segment.line_segment().point(i).y());
+        const auto& p1 = GetTransPoint(segment.line_segment().point(i + 1).x(),
+                                       segment.line_segment().point(i + 1).y());
+        cv::line(base_img_, p0, p1, color, 2);
+      }
+    }
+  }
+}
+
+cv::Scalar SemanticMap::HSVtoRGB(double H, double S, double V) {
+  // TODO(Hongyi): implement
+  return cv::Scalar(255, 255, 255);
 }
 
 void SemanticMap::DrawRect(const Feature& feature, const cv::Scalar& color,
