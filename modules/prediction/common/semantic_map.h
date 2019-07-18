@@ -39,10 +39,18 @@ class SemanticMap {
   bool GetMapById(const int obstacle_id, cv::Mat* feature_map);
 
  private:
-  cv::Point2i GetTransPoint(double x, double y) {
+  cv::Point2i GetTransPoint(const double x, const double y) {
     return cv::Point2i(static_cast<int>((x - curr_base_x_) / 0.1),
                        static_cast<int>(2000 - (y - curr_base_y_) / 0.1));
   }
+
+  void DrawBaseMap(const double x, const double y);
+
+  void DrawRoads(const common::PointENU& center_point,
+                 const cv::Scalar& color = cv::Scalar(64, 64, 64));
+
+  void DrawJunctions(const common::PointENU& center_point,
+                     const cv::Scalar& color = cv::Scalar(128, 128, 128));
 
   void DrawRect(const Feature& feature, const cv::Scalar& color, cv::Mat* img);
 

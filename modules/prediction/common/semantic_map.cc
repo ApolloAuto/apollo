@@ -23,6 +23,8 @@
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/string_util.h"
+#include "modules/common/util/util.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/pose/pose_container.h"
@@ -58,16 +60,19 @@ void SemanticMap::RunCurrFrame(
   const Feature& ego_feature =
       obstacle_id_history_map_.at(FLAGS_ego_vehicle_id).feature(0);
   curr_timestamp_ = ego_feature.timestamp();
-  curr_base_x_ = ego_feature.position().x() - config_.observation_range();
-  curr_base_y_ = ego_feature.position().y() - config_.observation_range();
-  cv::Rect rect(static_cast<int>((curr_base_x_ - config_.base_point().x()) /
-                                 config_.resolution()),
-                static_cast<int>(config_.dim_y() -
-                                 (curr_base_y_ - config_.base_point().y()) /
-                                     config_.resolution()) -
-                    2000,
-                2000, 2000);
-  base_img_(rect).copyTo(curr_img_);
+  // curr_base_x_ = ego_feature.position().x() - config_.observation_range();
+  // curr_base_y_ = ego_feature.position().y() - config_.observation_range();
+  // cv::Rect rect(static_cast<int>((curr_base_x_ - config_.base_point().x()) /
+  //                                config_.resolution()),
+  //               static_cast<int>(config_.dim_y() -
+  //                                (curr_base_y_ - config_.base_point().y()) /
+  //                                    config_.resolution()) -
+  //                   2000,
+  //               2000, 2000);
+  // base_img_(rect).copyTo(curr_img_);
+  // TODO(all): move to somewhere else
+  DrawBaseMap(ego_feature.position().x(), ego_feature.position().y());
+  base_img_.copyTo(curr_img_);
 
   // Draw all obstacles_history
   for (const auto obstacle_id_history_pair : obstacle_id_history_map_) {
@@ -83,6 +88,64 @@ void SemanticMap::RunCurrFrame(
       cv::imshow("Demo window", output_img);
       cv::waitKey();
     }
+  }
+}
+
+void SemanticMap::DrawBaseMap(const double x, const double y) {
+  base_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
+  curr_base_x_ = x - 100.0;
+  curr_base_y_ = y - 100.0;
+  common::PointENU center_point = common::util::MakePointENU(x, y, 0.0);
+  DrawRoads(center_point);
+  DrawJunctions(center_point);
+  std::vector<apollo::hdmap::CrosswalkInfoConstPtr> crosswalks;
+  apollo::hdmap::HDMapUtil::BaseMap().GetCrosswalks(center_point, 141.4,
+                                                    &crosswalks);
+  std::vector<apollo::hdmap::LaneInfoConstPtr> lanes;
+  apollo::hdmap::HDMapUtil::BaseMap().GetLanes(center_point, 141.4, &lanes);
+}
+
+void SemanticMap::DrawRoads(const common::PointENU& center_point,
+                            const cv::Scalar& color) {
+  std::vector<apollo::hdmap::RoadInfoConstPtr> roads;
+  apollo::hdmap::HDMapUtil::BaseMap().GetRoads(center_point, 141.4, &roads);
+  for (const auto& road : roads) {
+    for (const auto& section : road->road().section()) {
+      std::vector<cv::Point> polygon;
+      for (const auto& edge : section.boundary().outer_polygon().edge()) {
+        if (edge.type() == 2) {
+          for (const auto& segment : edge.curve().segment()) {
+            for (const auto& point : segment.line_segment().point()) {
+              polygon.push_back(GetTransPoint(point.x(), point.y()));
+            }
+          }
+        } else if (edge.type() == 3) {
+          for (const auto& segment : edge.curve().segment()) {
+            for (const auto& point : segment.line_segment().point()) {
+              polygon.insert(polygon.begin(),
+                             GetTransPoint(point.x(), point.y()));
+            }
+          }
+        }
+      }
+      cv::fillPoly(base_img_, std::vector<std::vector<cv::Point>>({polygon}),
+                   color);
+    }
+  }
+}
+
+void SemanticMap::DrawJunctions(const common::PointENU& center_point,
+                                const cv::Scalar& color) {
+  std::vector<apollo::hdmap::JunctionInfoConstPtr> junctions;
+  apollo::hdmap::HDMapUtil::BaseMap().GetJunctions(center_point, 141.4,
+                                                   &junctions);
+  for (const auto& junction : junctions) {
+    std::vector<cv::Point> polygon;
+    for (auto& polygon_point : junction->junction().polygon().point()) {
+      polygon.push_back(GetTransPoint(polygon_point.x(), polygon_point.y()));
+    }
+    cv::fillPoly(base_img_, std::vector<std::vector<cv::Point>>({polygon}),
+                 color);
   }
 }
 
