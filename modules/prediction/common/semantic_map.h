@@ -52,6 +52,14 @@ class SemanticMap {
   void DrawJunctions(const common::PointENU& center_point,
                      const cv::Scalar& color = cv::Scalar(128, 128, 128));
 
+  void DrawCrosswalks(const common::PointENU& center_point,
+                      const cv::Scalar& color = cv::Scalar(192, 192, 192));
+
+  void DrawLanes(const common::PointENU& center_point,
+                 const cv::Scalar& color = cv::Scalar(255, 255, 255));
+
+  cv::Scalar HSVtoRGB(double H = 1.0, double S = 1.0, double V = 1.0);
+
   void DrawRect(const Feature& feature, const cv::Scalar& color, cv::Mat* img);
 
   void DrawPoly(const Feature& feature, const cv::Scalar& color, cv::Mat* img);
