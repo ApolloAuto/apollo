@@ -103,7 +103,7 @@ class LaneScanningEvaluator : public Evaluator {
       Feature* feature_ptr);
 
  private:
-  static const size_t OBSTACLE_FEATURE_SIZE = 20 * 9;
+  static const size_t OBSTACLE_FEATURE_SIZE = 20 * (9 + 40);
   static const size_t INTERACTION_FEATURE_SIZE = 8;
   static const size_t SINGLE_LANE_FEATURE_SIZE = 4;
   static const size_t LANE_POINTS_SIZE = 100;          // 50m
