@@ -19,6 +19,7 @@ enum DistanceApproachMode {
   DISTANCE_APPROACH_IPOPT_FIXED_TS = 2;
   DISTANCE_APPROACH_IPOPT_FIXED_DUAL = 3;
   DISTANCE_APPROACH_IPOPT_RELAX_END = 4;
+  DISTANCE_APPROACH_IPOPT_RELAX_END_SLACK = 5;
 }
 
 message PlannerOpenSpaceConfig {
@@ -111,6 +112,7 @@ message DistanceApproachConfig {
   optional bool enable_jacobian_ad = 27 [default = false];
   optional bool enable_check_initial_state = 28 [default = false];
   optional double weight_end_state = 29 [default = 0.0];
+  optional double weight_slack = 30 [default = 0.0];
 }
 
 message IpoptConfig {
@@ -137,6 +139,7 @@ message OSQPConfig {
   optional double eps_rel = 3 [default = 1.0e-3];
   optional int32 max_iter = 4 [default = 10000];
   optional bool polish = 5 [default = true];
+  optional bool osqp_debug_log = 6 [default = false];
 }
 
 message IterativeAnchoringConfig {

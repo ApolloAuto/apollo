@@ -60,7 +60,7 @@ DualVariableWarmStartSlackOSQPInterface::
 
   l_warm_up_ = Eigen::MatrixXd::Zero(obstacles_edges_sum_, horizon_ + 1);
   n_warm_up_ = Eigen::MatrixXd::Zero(4 * obstacles_num_, horizon_ + 1);
-  slacks_ = Eigen::MatrixXd::Zero(obstacles_edges_sum_, horizon_ + 1);
+  slacks_ = Eigen::MatrixXd::Zero(obstacles_num_, horizon_ + 1);
 
   // get_nlp_info
   lambda_horizon_ = obstacles_edges_sum_ * (horizon_ + 1);
@@ -193,6 +193,7 @@ bool DualVariableWarmStartSlackOSQPInterface::optimize() {
   settings->eps_rel = osqp_config_.eps_rel();
   settings->max_iter = osqp_config_.max_iter();
   settings->polish = osqp_config_.polish();
+  settings->verbose = osqp_config_.osqp_debug_log();
 
   // Populate data
   OSQPData* data = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
@@ -458,9 +459,11 @@ void DualVariableWarmStartSlackOSQPInterface::assembleConstraint(
 }
 
 void DualVariableWarmStartSlackOSQPInterface::get_optimization_results(
-    Eigen::MatrixXd* l_warm_up, Eigen::MatrixXd* n_warm_up) const {
+    Eigen::MatrixXd* l_warm_up, Eigen::MatrixXd* n_warm_up,
+    Eigen::MatrixXd* s_warm_up) const {
   *l_warm_up = l_warm_up_;
   *n_warm_up = n_warm_up_;
+  *s_warm_up = slacks_;
   // debug mode check slack values
   double max_s = slacks_(0, 0);
   double min_s = slacks_(0, 0);

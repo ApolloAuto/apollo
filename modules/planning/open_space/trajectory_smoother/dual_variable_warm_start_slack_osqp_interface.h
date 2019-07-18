@@ -46,7 +46,8 @@ class DualVariableWarmStartSlackOSQPInterface {
   virtual ~DualVariableWarmStartSlackOSQPInterface() = default;
 
   void get_optimization_results(Eigen::MatrixXd* l_warm_up,
-                                Eigen::MatrixXd* n_warm_up) const;
+                                Eigen::MatrixXd* n_warm_up,
+                                Eigen::MatrixXd* s_warm_up) const;
 
   bool optimize();
 
@@ -62,7 +63,7 @@ class DualVariableWarmStartSlackOSQPInterface {
                  const std::vector<c_int>& P_indptr);
 
   void checkSolution(const Eigen::MatrixXd& l_warm_up,
-                      const Eigen::MatrixXd& n_warm_up);
+                     const Eigen::MatrixXd& n_warm_up);
 
   void printMatrix(const int r, const int c,
       const std::vector<c_float>& P_data,
