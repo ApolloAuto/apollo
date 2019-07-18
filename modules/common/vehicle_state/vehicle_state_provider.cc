@@ -127,10 +127,17 @@ bool VehicleStateProvider::ConstructExceptLinearVelocity(
     vehicle_state_.set_linear_acceleration(
         localization.pose().linear_acceleration_vrf().y());
   } else {
-    CHECK(localization.pose().has_angular_velocity());
+    if (!localization.pose().has_angular_velocity()) {
+      AERROR << "localization.pose() has no angular velocity.";
+      return false;
+    }
     vehicle_state_.set_angular_velocity(
         localization.pose().angular_velocity().z());
-    CHECK(localization.pose().has_linear_acceleration());
+
+    if (!localization.pose().has_linear_acceleration()) {
+      AERROR << "localization.pose() has no linear acceleration.";
+      return false;
+    }
     vehicle_state_.set_linear_acceleration(
         localization.pose().linear_acceleration().y());
   }
