@@ -29,7 +29,7 @@ cc_library(
     ],
     copts = [
         "-fopenmp",
-        "-DDEBUG_NCUT",
+        #"-DDEBUG_NCUT",
     ],
     linkopts = [
         "-lgomp",
