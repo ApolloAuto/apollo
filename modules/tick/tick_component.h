@@ -32,10 +32,6 @@ class TickComponent final : public apollo::cyber::Component<> {
   ~TickComponent() = default;
 
   bool Init() override;
-  bool TickCallBack(const std::shared_ptr<tick::Tick> tick_msg);
-  bool LocalizationEstimateCallback(
-    const std::shared_ptr<localization::LocalizationEstimate>
-                                        localization_estimate_msg);
 
  private:
   apollo::tick::Conf conf_;

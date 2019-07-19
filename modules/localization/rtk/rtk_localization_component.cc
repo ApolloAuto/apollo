@@ -26,7 +26,6 @@ RTKLocalizationComponent::RTKLocalizationComponent()
     : localization_(new RTKLocalization()) {}
 
 bool RTKLocalizationComponent::Init() {
-  Clock::SetMode(Clock::CYBER);
   tf2_broadcaster_.reset(new apollo::transform::TransformBroadcaster(node_));
   if (!InitConfig()) {
     AERROR << "Init Config falseed.";

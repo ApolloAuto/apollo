@@ -30,7 +30,6 @@ using apollo::common::time::Clock;
 MSFLocalizationComponent::MSFLocalizationComponent() {}
 
 bool MSFLocalizationComponent::Init() {
-  Clock::SetMode(Clock::CYBER);
   publisher_.reset(new LocalizationMsgPublisher(this->node_));
 
   if (!InitConfig()) {
