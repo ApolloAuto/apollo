@@ -16,13 +16,13 @@
 
 #pragma once
 
+#include <future>
 #include <unordered_map>
 
 #include "opencv2/opencv.hpp"
 
 #include "cyber/common/macros.h"
 #include "modules/prediction/proto/feature.pb.h"
-#include "modules/prediction/proto/semantic_map_config.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -75,12 +75,13 @@ class SemanticMap {
 
  private:
   cv::Mat base_img_;
-  SemanticMapConfig config_;
   cv::Mat curr_img_;
   std::unordered_map<int, ObstacleHistory> obstacle_id_history_map_;
   double curr_base_x_ = 0.0;
   double curr_base_y_ = 0.0;
   Feature ego_feature_;
+
+  std::future<void> task_future_;
 
   DECLARE_SINGLETON(SemanticMap)
 };

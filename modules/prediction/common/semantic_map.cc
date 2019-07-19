@@ -22,11 +22,13 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "cyber/task/task.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/pose/pose_container.h"
 
@@ -36,19 +38,11 @@ namespace prediction {
 SemanticMap::SemanticMap() {}
 
 void SemanticMap::Init() {
-  const std::string semantic_map_path =
-      apollo::common::util::StrCat(FLAGS_map_dir, "/semantic_map.png");
-  if (cyber::common::PathExists(semantic_map_path)) {
-    base_img_ = cv::imread(semantic_map_path, CV_LOAD_IMAGE_COLOR);
-    AINFO << "Load semantic_map from: " << semantic_map_path;
-  }
-  const std::string config_path = apollo::common::util::StrCat(
-      FLAGS_map_dir, "/semantic_map_config.pb.txt");
-  if (!cyber::common::GetProtoFromFile(config_path, &config_)) {
-    AERROR << "Failed to load config file: " << config_path;
-    return;
-  }
   curr_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
+
+  if (FLAGS_enable_async_draw_base_image) {
+    task_future_ = cyber::Async(&SemanticMap::DrawBaseMap, this);
+  }
 }
 
 void SemanticMap::RunCurrFrame(
@@ -59,18 +53,10 @@ void SemanticMap::RunCurrFrame(
   }
   obstacle_id_history_map_ = obstacle_id_history_map;
   ego_feature_ = obstacle_id_history_map_.at(FLAGS_ego_vehicle_id).feature(0);
-  // curr_base_x_ = ego_feature.position().x() - config_.observation_range();
-  // curr_base_y_ = ego_feature.position().y() - config_.observation_range();
-  // cv::Rect rect(static_cast<int>((curr_base_x_ - config_.base_point().x()) /
-  //                                config_.resolution()),
-  //               static_cast<int>(config_.dim_y() -
-  //                                (curr_base_y_ - config_.base_point().y()) /
-  //                                    config_.resolution()) -
-  //                   2000,
-  //               2000, 2000);
-  // base_img_(rect).copyTo(curr_img_);
   // TODO(all): move to somewhere else
-  DrawBaseMap();
+  if (!FLAGS_enable_async_draw_base_image) {
+    DrawBaseMap();
+  }
   base_img_.copyTo(curr_img_);
 
   // Draw all obstacles_history
