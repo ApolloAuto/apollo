@@ -233,7 +233,7 @@ message ScenarioConfig {
     repeated TaskConfig.TaskType task_type = 3;
     // an unordered task configurations
     repeated TaskConfig task_config = 4;
-  } 
+  }
 
   optional ScenarioType scenario_type = 1;
   oneof scenario_config {
