@@ -30,26 +30,28 @@ bool TickComponent::Init() {
                                         : Clock::ClockMode::SYSTEM);
     return true;
   }
+
   if (!GetProtoConfig(&conf_)) {
     AERROR << "Parse conf file failed, " << ConfigFilePath();
     return false;
   }
+
+  Clock::SetMode(Clock::ClockMode::MOCK);
   if (conf_.whole_stack_sim()) {
     tick_listener_ = node_->CreateReader<Tick>(
       FLAGS_tick_topic,
-      [this](const std::shared_ptr<Tick> tick) {
+      [this](const std::shared_ptr<Tick>& tick) {
         Clock::SetNowInSeconds(tick->header().timestamp_sec());
       });
   } else {
     localization_estimate_listener_ =
       node_->CreateReader<LocalizationEstimate>(
       FLAGS_localization_topic,
-      [this](const std::shared_ptr<LocalizationEstimate>
+      [this](const std::shared_ptr<LocalizationEstimate>&
                                    localization_estimate) {
         Clock::SetNowInSeconds(localization_estimate->header().timestamp_sec());
       });
   }
-  Clock::SetMode(Clock::ClockMode::MOCK);
   return true;
 }
 
