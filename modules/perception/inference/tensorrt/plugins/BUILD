@@ -11,6 +11,7 @@ cc_library(
         ":perception_inference_tensorrt_plugins_argmax_cuda",
         ":perception_inference_tensorrt_plugins_slice_cuda",
         ":perception_inference_tensorrt_plugins_softmax_cuda",
+        ":perception_inference_tensorrt_plugins_leakyrelu_cuda",
     ],
     hdrs = glob([
         "*.h",
@@ -66,6 +67,21 @@ cuda_library(
     ],
 )
 
+cuda_library(
+    name = "perception_inference_tensorrt_plugins_leakyrelu_cuda",
+    srcs = [
+        "leakyReLU_plugin.cu",
+    ],
+    hdrs = [
+        "leakyReLU_plugin.h",
+    ],
+    deps = [
+        "//modules/perception/inference/tensorrt:rt_common",
+        "@cuda",
+        "@eigen",
+        "@tensorrt",
+    ],
+)
 cc_test(
     name = "slice_plugin_test",
     size = "small",
