@@ -34,14 +34,15 @@ int main(int argc, char** argv) {
   module_args.ParseArgument(argc, argv);
 
   // initialize cyber
-  if (argc < 3) {
+  std::string module_name;
+  for (auto& dag : module_args.GetDAGConfList()) {
+    auto pos = dag.find('.');
+    module_name.append(dag.substr(0, pos));
+  }
+  if (module_name.empty()) {
     apollo::cyber::Init(argv[0]);
   } else {
-    size_t len = strlen(argv[2]);
-    char ch = argv[2][len - 4];
-    argv[2][len - 4] = '\0';
-    apollo::cyber::Init(argv[2]);
-    argv[2][len - 4] = ch;
+    apollo::cyber::Init(module_name.c_str());
   }
 
   // start module
