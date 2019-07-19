@@ -23,6 +23,8 @@ from matplotlib import animation
 import numpy as np
 import time
 import math
+result_file = "/tmp/open_space_osqp_ipopt.csv"
+
 
 # def SmoothTrajectory(visualize_flag):
 def SmoothTrajectory(visualize_flag, sx, sy):
@@ -271,6 +273,10 @@ if __name__ == '__main__':
     print("min is " + str(min(planning_time_stats)))
     print("max is " + str(max(planning_time_stats)))
     print("average is " + str(sum(planning_time_stats) / len(planning_time_stats)))
+
+    module_timing = np.asarray([hybrid_time_stats, dual_time_stats, ipopt_time_stats])
+    np.savetxt(result_file, module_timing, delimiter=",")
+
     print("average hybird time: %4.4f, with max: %4.4f, min: %4.4f" % (
         sum(hybrid_time_stats) / len(hybrid_time_stats), max(hybrid_time_stats),
         min(hybrid_time_stats)))
