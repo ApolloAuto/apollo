@@ -16,7 +16,8 @@ message NCutSegmentationParam {
     optional string roi_filter = 11 [default = "HdmapROIFilter"];
     optional bool remove_ground_points = 12 [default = true];
     optional bool remove_roi = 13 [default = true];
-    optional NCutParam ncut_param = 14;
+    optional bool do_classification = 14 [default = true];
+    optional NCutParam ncut_param = 15;
 }
 
 message NCutParam {

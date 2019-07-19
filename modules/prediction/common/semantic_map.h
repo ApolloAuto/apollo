@@ -39,10 +39,26 @@ class SemanticMap {
   bool GetMapById(const int obstacle_id, cv::Mat* feature_map);
 
  private:
-  cv::Point2i GetTransPoint(double x, double y) {
+  cv::Point2i GetTransPoint(const double x, const double y) {
     return cv::Point2i(static_cast<int>((x - curr_base_x_) / 0.1),
                        static_cast<int>(2000 - (y - curr_base_y_) / 0.1));
   }
+
+  void DrawBaseMap();
+
+  void DrawRoads(const common::PointENU& center_point,
+                 const cv::Scalar& color = cv::Scalar(64, 64, 64));
+
+  void DrawJunctions(const common::PointENU& center_point,
+                     const cv::Scalar& color = cv::Scalar(128, 128, 128));
+
+  void DrawCrosswalks(const common::PointENU& center_point,
+                      const cv::Scalar& color = cv::Scalar(192, 192, 192));
+
+  void DrawLanes(const common::PointENU& center_point,
+                 const cv::Scalar& color = cv::Scalar(255, 255, 255));
+
+  cv::Scalar HSVtoRGB(double H = 1.0, double S = 1.0, double V = 1.0);
 
   void DrawRect(const Feature& feature, const cv::Scalar& color, cv::Mat* img);
 
@@ -64,7 +80,7 @@ class SemanticMap {
   std::unordered_map<int, ObstacleHistory> obstacle_id_history_map_;
   double curr_base_x_ = 0.0;
   double curr_base_y_ = 0.0;
-  double curr_timestamp_ = 0.0;
+  Feature ego_feature_;
 
   DECLARE_SINGLETON(SemanticMap)
 };

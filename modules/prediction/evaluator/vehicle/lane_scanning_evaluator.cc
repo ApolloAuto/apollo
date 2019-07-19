@@ -92,9 +92,12 @@ bool LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
   std::vector<double> labels = {0.0};
   if (FLAGS_prediction_offline_mode ==
       PredictionConstants::kDumpDataForLearning) {
+    std::string learning_data_tag = "vehicle_cruise";
+    if (latest_feature_ptr->has_junction_feature()) {
+      learning_data_tag = "vehicle_junction";
+    }
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
-                                         string_feature_values, "cruise",
-                                         nullptr);
+        string_feature_values, learning_data_tag, nullptr);
     ADEBUG << "Save extracted features for learning locally.";
     return true;
   }
@@ -178,6 +181,7 @@ bool LaneScanningEvaluator::ExtractObstacleFeatures(
   CHECK_NOTNULL(obstacle_ptr);
   feature_values->clear();
   FLAGS_cruise_historical_frame_length = 20;
+  int max_num_poly_pt = 20;
   std::vector<double> has_history(FLAGS_cruise_historical_frame_length, 1.0);
   std::vector<std::pair<double, double>> pos_history(
       FLAGS_cruise_historical_frame_length, std::make_pair(0.0, 0.0));
@@ -189,6 +193,10 @@ bool LaneScanningEvaluator::ExtractObstacleFeatures(
                                           0.0);
   std::vector<double> vel_heading_changing_rate_history(
       FLAGS_cruise_historical_frame_length, 0.0);
+  std::vector<std::vector<std::pair<double, double>>> polygon_points_history(
+      FLAGS_cruise_historical_frame_length,
+      std::vector<std::pair<double, double>>(
+          max_num_poly_pt, std::make_pair(0.0, 0.0)));
 
   // Get obstacle's current position to set up the relative coord. system.
   const Feature& obs_curr_feature = obstacle_ptr->latest_feature();
@@ -258,6 +266,14 @@ bool LaneScanningEvaluator::ExtractObstacleFeatures(
     } else {
       has_history[i] = 0.0;
     }
+    // Extract polygon-point info.
+    for (int j = 0; j < feature.polygon_point_size(); ++j) {
+      if (j >= max_num_poly_pt) {
+        break;
+      }
+      polygon_points_history[i][j].first = feature.polygon_point(j).x();
+      polygon_points_history[i][j].second = feature.polygon_point(j).y();
+    }
   }
 
   for (std::size_t i = obstacle_ptr->history_size();
@@ -276,6 +292,10 @@ bool LaneScanningEvaluator::ExtractObstacleFeatures(
     feature_values->push_back(acc_history[i].second);
     feature_values->push_back(vel_heading_history[i]);
     feature_values->push_back(vel_heading_changing_rate_history[i]);
+    for (int j = 0; j < max_num_poly_pt; ++j) {
+      feature_values->push_back(polygon_points_history[i][j].first);
+      feature_values->push_back(polygon_points_history[i][j].second);
+    }
   }
 
   return true;

@@ -49,6 +49,8 @@ struct LidarFrame {
   base::PointIndices roi_indices;
   // point cloud non ground indices
   base::PointIndices non_ground_indices;
+  // secondary segmentor indices
+  base::PointIndices secondary_indices;
   // sensor info
   base::SensorInfo sensor_info;
   // reserve string
@@ -73,6 +75,7 @@ struct LidarFrame {
     tracked_objects.clear();
     roi_indices.indices.clear();
     non_ground_indices.indices.clear();
+    secondary_indices.indices.clear();
   }
 
   void FilterPointCloud(base::PointCloud<base::PointF> *filtered_cloud,

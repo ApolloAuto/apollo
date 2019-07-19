@@ -223,7 +223,7 @@ bool Obstacle::InsertFeature(const Feature& feature) {
   return true;
 }
 
-bool Obstacle::IsInJunction(const std::string& junction_id) {
+bool Obstacle::IsInJunction(const std::string& junction_id) const {
   // TODO(all) Consider if need to use vehicle front rather than position
   if (feature_history_.empty()) {
     AERROR << "Obstacle [" << id_ << "] has no history";
@@ -237,16 +237,20 @@ bool Obstacle::IsInJunction(const std::string& junction_id) {
 }
 
 void Obstacle::BuildJunctionFeature() {
+  // If obstacle has no history at all, then exit.
   if (feature_history_.empty()) {
     AERROR << "Obstacle [" << id_ << "] has no history";
     return;
   }
+  // If obstacle is not in the given junction, then exit.
   const std::string& junction_id = JunctionAnalyzer::GetJunctionId();
   if (!IsInJunction(junction_id)) {
     ADEBUG << "Obstacle [" << id_ << "] is not in junction [" << junction_id
            << "]";
     return;
   }
+
+  // Set the junction features by calling SetJunctionFeatureWithoutEnterLane.
   Feature* latest_feature_ptr = mutable_latest_feature();
   if (feature_history_.size() == 1) {
     SetJunctionFeatureWithoutEnterLane(latest_feature_ptr);
@@ -295,10 +299,14 @@ void Obstacle::SetJunctionFeatureWithEnterLane(const std::string& enter_lane_id,
 }
 
 void Obstacle::SetJunctionFeatureWithoutEnterLane(Feature* const feature_ptr) {
+  // Sanity checks.
   if (!feature_ptr->has_lane()) {
     ADEBUG << "Obstacle [" << id_ << "] has no lane.";
     return;
   }
+
+  // Get the possible lanes that the obstalce is on and their neighbor
+  // lanes and treat them as the starting-lane-segments.
   std::vector<std::string> start_lane_ids;
   if (feature_ptr->lane().current_lane_feature_size() > 0) {
     for (const auto& lane_feature :
@@ -435,10 +443,6 @@ void Obstacle::SetType(const PerceptionObstacle& perception_obstacle,
 void Obstacle::SetTimestamp(const PerceptionObstacle& perception_obstacle,
                             const double timestamp, Feature* feature) {
   double ts = timestamp;
-  if (perception_obstacle.has_timestamp() &&
-      perception_obstacle.timestamp() > 0.0) {
-    ts = perception_obstacle.timestamp();
-  }
   feature->set_timestamp(ts);
 
   ADEBUG << "Obstacle [" << id_ << "] has timestamp [" << std::fixed

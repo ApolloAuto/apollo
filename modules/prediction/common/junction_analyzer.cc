@@ -32,7 +32,9 @@ using apollo::hdmap::LaneInfo;
 using ConstLaneInfoPtr = std::shared_ptr<const LaneInfo>;
 
 std::shared_ptr<const JunctionInfo> JunctionAnalyzer::junction_info_ptr_;
+// Maps exit lane-id to JunctionExit info.
 std::unordered_map<std::string, JunctionExit> JunctionAnalyzer::junction_exits_;
+// Maps starting lane-id to JunctionFeature info.
 std::unordered_map<std::string, JunctionFeature>
     JunctionAnalyzer::junction_features_;
 
@@ -55,11 +57,14 @@ void JunctionAnalyzer::Clear() {
 
 void JunctionAnalyzer::SetAllJunctionExits() {
   CHECK_NOTNULL(junction_info_ptr_);
+  // Go through everything that the junction overlaps with.
   for (const auto& overlap_id : junction_info_ptr_->junction().overlap_id()) {
     auto overlap_info_ptr = PredictionMap::OverlapById(overlap_id.id());
     if (overlap_info_ptr == nullptr) {
       continue;
     }
+    // Find the lane-segments that are overlapping, yet also extends out of
+    // the junction area. Those are the junction-exit-lanes.
     for (const auto& object : overlap_info_ptr->overlap().object()) {
       if (object.has_lane_overlap_info()) {
         const std::string& lane_id = object.id().id();
@@ -90,18 +95,22 @@ std::vector<JunctionExit> JunctionAnalyzer::GetJunctionExits(
   std::vector<JunctionExit> junction_exits;
   std::queue<std::pair<ConstLaneInfoPtr, int>> lane_info_queue;
   lane_info_queue.emplace(PredictionMap::LaneById(start_lane_id), 0);
+  std::unordered_set<std::string> visited_exit_lanes;
+  // Perform a BFS to find all exit lanes that can be connected through
+  // this start_lane_id.
   while (!lane_info_queue.empty()) {
     ConstLaneInfoPtr curr_lane = lane_info_queue.front().first;
     int level = lane_info_queue.front().second;
     lane_info_queue.pop();
     const std::string& curr_lane_id = curr_lane->id().id();
-    std::unordered_set<std::string> visited_exit_lanes;
+    // Stop if this is already an exit lane.
     if (IsExitLane(curr_lane_id) &&
         visited_exit_lanes.find(curr_lane_id) == visited_exit_lanes.end()) {
       junction_exits.push_back(junction_exits_[curr_lane_id]);
       visited_exit_lanes.insert(curr_lane_id);
       continue;
     }
+    // Stop if reached max-search-level.
     if (level >= max_search_level) {
       continue;
     }
@@ -122,6 +131,7 @@ const JunctionFeature& JunctionAnalyzer::GetJunctionFeature(
   JunctionFeature junction_feature;
   junction_feature.set_junction_id(GetJunctionId());
   junction_feature.set_junction_range(ComputeJunctionRange());
+  // Find all junction-exit-lanes that are successors of the start_lane_id.
   std::vector<JunctionExit> junction_exits = GetJunctionExits(start_lane_id);
 
   for (const auto& junction_exit : junction_exits) {

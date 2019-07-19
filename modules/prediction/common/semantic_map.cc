@@ -16,6 +16,7 @@
 
 #include "modules/prediction/common/semantic_map.h"
 
+#include <cmath>
 #include <string>
 #include <vector>
 
@@ -23,6 +24,8 @@
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/string_util.h"
+#include "modules/common/util/util.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/pose/pose_container.h"
@@ -55,19 +58,20 @@ void SemanticMap::RunCurrFrame(
     return;
   }
   obstacle_id_history_map_ = obstacle_id_history_map;
-  const Feature& ego_feature =
-      obstacle_id_history_map_.at(FLAGS_ego_vehicle_id).feature(0);
-  curr_timestamp_ = ego_feature.timestamp();
-  curr_base_x_ = ego_feature.position().x() - config_.observation_range();
-  curr_base_y_ = ego_feature.position().y() - config_.observation_range();
-  cv::Rect rect(static_cast<int>((curr_base_x_ - config_.base_point().x()) /
-                                 config_.resolution()),
-                static_cast<int>(config_.dim_y() -
-                                 (curr_base_y_ - config_.base_point().y()) /
-                                     config_.resolution()) -
-                    2000,
-                2000, 2000);
-  base_img_(rect).copyTo(curr_img_);
+  ego_feature_ = obstacle_id_history_map_.at(FLAGS_ego_vehicle_id).feature(0);
+  // curr_base_x_ = ego_feature.position().x() - config_.observation_range();
+  // curr_base_y_ = ego_feature.position().y() - config_.observation_range();
+  // cv::Rect rect(static_cast<int>((curr_base_x_ - config_.base_point().x()) /
+  //                                config_.resolution()),
+  //               static_cast<int>(config_.dim_y() -
+  //                                (curr_base_y_ - config_.base_point().y()) /
+  //                                    config_.resolution()) -
+  //                   2000,
+  //               2000, 2000);
+  // base_img_(rect).copyTo(curr_img_);
+  // TODO(all): move to somewhere else
+  DrawBaseMap();
+  base_img_.copyTo(curr_img_);
 
   // Draw all obstacles_history
   for (const auto obstacle_id_history_pair : obstacle_id_history_map_) {
@@ -83,6 +87,157 @@ void SemanticMap::RunCurrFrame(
       cv::imshow("Demo window", output_img);
       cv::waitKey();
     }
+  }
+}
+
+void SemanticMap::DrawBaseMap() {
+  double x = ego_feature_.position().x();
+  double y = ego_feature_.position().y();
+  base_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
+  curr_base_x_ = x - 100.0;
+  curr_base_y_ = y - 100.0;
+  common::PointENU center_point = common::util::MakePointENU(x, y, 0.0);
+  DrawRoads(center_point);
+  DrawJunctions(center_point);
+  DrawCrosswalks(center_point);
+  DrawLanes(center_point);
+}
+
+void SemanticMap::DrawRoads(const common::PointENU& center_point,
+                            const cv::Scalar& color) {
+  std::vector<apollo::hdmap::RoadInfoConstPtr> roads;
+  apollo::hdmap::HDMapUtil::BaseMap().GetRoads(center_point, 141.4, &roads);
+  for (const auto& road : roads) {
+    for (const auto& section : road->road().section()) {
+      std::vector<cv::Point> polygon;
+      for (const auto& edge : section.boundary().outer_polygon().edge()) {
+        if (edge.type() == 2) {  // left edge
+          for (const auto& segment : edge.curve().segment()) {
+            for (const auto& point : segment.line_segment().point()) {
+              polygon.push_back(GetTransPoint(point.x(), point.y()));
+            }
+          }
+        } else if (edge.type() == 3) {  // right edge
+          for (const auto& segment : edge.curve().segment()) {
+            for (const auto& point : segment.line_segment().point()) {
+              polygon.insert(polygon.begin(),
+                             GetTransPoint(point.x(), point.y()));
+            }
+          }
+        }
+      }
+      cv::fillPoly(base_img_, std::vector<std::vector<cv::Point>>({polygon}),
+                   color);
+    }
+  }
+}
+
+void SemanticMap::DrawJunctions(const common::PointENU& center_point,
+                                const cv::Scalar& color) {
+  std::vector<apollo::hdmap::JunctionInfoConstPtr> junctions;
+  apollo::hdmap::HDMapUtil::BaseMap().GetJunctions(center_point, 141.4,
+                                                   &junctions);
+  for (const auto& junction : junctions) {
+    std::vector<cv::Point> polygon;
+    for (const auto& point : junction->junction().polygon().point()) {
+      polygon.push_back(GetTransPoint(point.x(), point.y()));
+    }
+    cv::fillPoly(base_img_, std::vector<std::vector<cv::Point>>({polygon}),
+                 color);
+  }
+}
+
+void SemanticMap::DrawCrosswalks(const common::PointENU& center_point,
+                                 const cv::Scalar& color) {
+  std::vector<apollo::hdmap::CrosswalkInfoConstPtr> crosswalks;
+  apollo::hdmap::HDMapUtil::BaseMap().GetCrosswalks(center_point, 141.4,
+                                                    &crosswalks);
+  for (const auto& crosswalk : crosswalks) {
+    std::vector<cv::Point> polygon;
+    for (const auto& point : crosswalk->crosswalk().polygon().point()) {
+      polygon.push_back(GetTransPoint(point.x(), point.y()));
+    }
+    cv::fillPoly(base_img_, std::vector<std::vector<cv::Point>>({polygon}),
+                 color);
+  }
+}
+
+void SemanticMap::DrawLanes(const common::PointENU& center_point,
+                            const cv::Scalar& color) {
+  std::vector<apollo::hdmap::LaneInfoConstPtr> lanes;
+  apollo::hdmap::HDMapUtil::BaseMap().GetLanes(center_point, 141.4, &lanes);
+  for (const auto& lane : lanes) {
+    // Draw lane_central first
+    for (const auto& segment : lane->lane().central_curve().segment()) {
+      for (int i = 0; i < segment.line_segment().point_size() - 1; ++i) {
+        const auto& p0 = GetTransPoint(segment.line_segment().point(i).x(),
+                                       segment.line_segment().point(i).y());
+        const auto& p1 = GetTransPoint(segment.line_segment().point(i + 1).x(),
+                                       segment.line_segment().point(i + 1).y());
+        double theta = atan2(segment.line_segment().point(i + 1).y() -
+                                 segment.line_segment().point(i).y(),
+                             segment.line_segment().point(i + 1).x() -
+                                 segment.line_segment().point(i).x());
+        double H = theta >= 0 ? theta / (2 * M_PI) : theta / (2 * M_PI) + 1;
+        // // Original cv::cvtColor() is 4 times slower than HSVtoRGB()
+        // cv::Mat hsv(1, 1, CV_32FC3, cv::Scalar(H * 360.0, 1.0, 1.0));
+        // cv::Mat rgb;
+        // cv::cvtColor(hsv, rgb, cv::COLOR_HSV2RGB);
+        // cv::Scalar c =
+        //     cv::Scalar(rgb.at<float>(0, 0) * 255, rgb.at<float>(0, 1) * 255,
+        //                rgb.at<float>(0, 2) * 255);
+
+        cv::line(base_img_, p0, p1, HSVtoRGB(H), 4);
+      }
+    }
+    // Not drawing boundary for virtual city_driving lane
+    if (lane->lane().type() == 2 && lane->lane().left_boundary().virtual_() &&
+        lane->lane().right_boundary().virtual_()) {
+      continue;
+    }
+    // Draw lane's left_boundary
+    for (const auto& segment : lane->lane().left_boundary().curve().segment()) {
+      for (int i = 0; i < segment.line_segment().point_size() - 1; ++i) {
+        const auto& p0 = GetTransPoint(segment.line_segment().point(i).x(),
+                                       segment.line_segment().point(i).y());
+        const auto& p1 = GetTransPoint(segment.line_segment().point(i + 1).x(),
+                                       segment.line_segment().point(i + 1).y());
+        cv::line(base_img_, p0, p1, color, 2);
+      }
+    }
+    // Draw lane's right_boundary
+    for (const auto& segment :
+         lane->lane().right_boundary().curve().segment()) {
+      for (int i = 0; i < segment.line_segment().point_size() - 1; ++i) {
+        const auto& p0 = GetTransPoint(segment.line_segment().point(i).x(),
+                                       segment.line_segment().point(i).y());
+        const auto& p1 = GetTransPoint(segment.line_segment().point(i + 1).x(),
+                                       segment.line_segment().point(i + 1).y());
+        cv::line(base_img_, p0, p1, color, 2);
+      }
+    }
+  }
+}
+
+cv::Scalar SemanticMap::HSVtoRGB(double H, double S, double V) {
+  int I = static_cast<int>(floor(H * 6.0));
+  double F = H * 6.0 - floor(H * 6.0);
+  double M = V * (1.0 - S);
+  double N = V * (1.0 - S * F);
+  double K = V * (1.0 - S * (1.0 - F));
+  switch (I) {
+    case 0:
+      return cv::Scalar(V, K, M) * 255.0;
+    case 1:
+      return cv::Scalar(N, V, M) * 255.0;
+    case 2:
+      return cv::Scalar(M, V, K) * 255.0;
+    case 3:
+      return cv::Scalar(M, N, V) * 255.0;
+    case 4:
+      return cv::Scalar(K, M, V) * 255.0;
+    default:
+      return cv::Scalar(V, M, N) * 255.0;
   }
 }
 
@@ -126,7 +281,7 @@ void SemanticMap::DrawHistory(const ObstacleHistory& history,
                               const cv::Scalar& color, cv::Mat* img) {
   for (int i = history.feature_size() - 1; i >= 0; --i) {
     const Feature& feature = history.feature(i);
-    double time_decay = 1.0 - curr_timestamp_ + feature.timestamp();
+    double time_decay = 1.0 - ego_feature_.timestamp() + feature.timestamp();
     cv::Scalar decay_color = color * time_decay;
     if (feature.id() == FLAGS_ego_vehicle_id) {
       DrawRect(feature, decay_color, img);

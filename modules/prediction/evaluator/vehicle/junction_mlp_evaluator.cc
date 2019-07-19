@@ -94,7 +94,7 @@ bool JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
                                          "junction", nullptr);
     ADEBUG << "Save extracted features for learning locally.";
-    return false;  // Skip Compute probability for offline mode
+    return true;  // Skip Compute probability for offline mode
   }
   std::vector<torch::jit::IValue> torch_inputs;
   int input_dim = static_cast<int>(

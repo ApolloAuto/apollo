@@ -87,6 +87,14 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   steer_single_direction_max_degree_ =
       vehicle_param_.max_steer_angle() * 180 / M_PI;
   max_lat_acc_ = control_conf->mpc_controller_conf().max_lateral_acceleration();
+
+  // TODO(Shu, Qi, Yu): add sanity check for conf values
+  // steering ratio should be positive
+  constexpr double kEpsilon = 1e-6;
+  if (std::isnan(steer_ratio_) || steer_ratio_ < kEpsilon) {
+    AERROR << "[MPCController] steer_ratio = 0";
+    return false;
+  }
   wheel_single_direction_max_degree_ =
       steer_single_direction_max_degree_ / steer_ratio_ / 180 * M_PI;
   max_acceleration_ = vehicle_param_.max_acceleration();

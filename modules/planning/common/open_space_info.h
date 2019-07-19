@@ -220,13 +220,13 @@ class OpenSpaceInfo {
     return &interpolated_trajectory_result_;
   }
 
-  const std::vector<TrajGearPair> &paritioned_trajectories() const {
+  const std::vector<TrajGearPair> &partitioned_trajectories() const {
     // TODO(Runxin): export to chart
-    return paritioned_trajectories_;
+    return partitioned_trajectories_;
   }
 
-  std::vector<TrajGearPair> *mutable_paritioned_trajectories() {
-    return &paritioned_trajectories_;
+  std::vector<TrajGearPair> *mutable_partitioned_trajectories() {
+    return &partitioned_trajectories_;
   }
 
   const GearSwitchStates &gear_switch_states() const {
@@ -237,13 +237,13 @@ class OpenSpaceInfo {
     return &gear_switch_states_;
   }
 
-  const TrajGearPair &chosen_paritioned_trajectory() const {
+  const TrajGearPair &chosen_partitioned_trajectory() const {
     // TODO(Runxin): export to chart
-    return chosen_paritioned_trajectory_;
+    return chosen_partitioned_trajectory_;
   }
 
-  TrajGearPair *mutable_chosen_paritioned_trajectory() {
-    return &chosen_paritioned_trajectory_;
+  TrajGearPair *mutable_chosen_partitioned_trajectory() {
+    return &chosen_partitioned_trajectory_;
   }
 
   bool fallback_flag() const { return fallback_flag_; }
@@ -354,11 +354,11 @@ class OpenSpaceInfo {
 
   DiscretizedTrajectory interpolated_trajectory_result_;
 
-  std::vector<TrajGearPair> paritioned_trajectories_;
+  std::vector<TrajGearPair> partitioned_trajectories_;
 
   GearSwitchStates gear_switch_states_;
 
-  TrajGearPair chosen_paritioned_trajectory_;
+  TrajGearPair chosen_partitioned_trajectory_;
 
   bool fallback_flag_ = true;
 

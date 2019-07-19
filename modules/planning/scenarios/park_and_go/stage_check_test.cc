@@ -17,19 +17,33 @@
 /**
  * @file
  **/
-#include "modules/planning/scenarios/hailing/hailing_scenario.h"
+#include "modules/planning/scenarios/park_and_go/stage_check.h"
+
+#include "gtest/gtest.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace hailing {
+namespace park_and_go {
 
-std::unique_ptr<Stage> HailingScenario::CreateStage(
-    const ScenarioConfig::StageConfig& stage_config) {
-  return nullptr;
+class ParkAndGoStageCheckTest : public ::testing::Test {
+ public:
+  virtual void SetUp() {
+    config_.set_stage_type(ScenarioConfig::PARK_AND_GO_CHECK);
+  }
+
+ protected:
+  ScenarioConfig::StageConfig config_;
+};
+
+TEST_F(ParkAndGoStageCheckTest, Init) {
+  ParkAndGoStageCheck park_and_go_stage_check(config_);
+  EXPECT_EQ(park_and_go_stage_check.Name(),
+            ScenarioConfig::StageType_Name(config_.stage_type()));
 }
 
-}  // namespace hailing
+}  // namespace park_and_go
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

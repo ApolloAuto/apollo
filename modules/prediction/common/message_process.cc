@@ -17,6 +17,8 @@
 #include "modules/prediction/common/message_process.h"
 
 #include <algorithm>
+#include <iomanip>
+#include <limits>
 #include <vector>
 
 #include "cyber/common/file.h"
@@ -94,6 +96,7 @@ void MessageProcess::OnPerception(
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
   CHECK_NOTNULL(ptr_obstacles_container);
+  ptr_obstacles_container->CleanUp();
 
   // Get pose_container
   auto ptr_ego_pose_container =
@@ -111,8 +114,17 @@ void MessageProcess::OnPerception(
   const PerceptionObstacle* ptr_ego_vehicle =
       ptr_ego_pose_container->ToPerceptionObstacle();
   if (ptr_ego_vehicle != nullptr) {
+    double perception_obs_timestamp = ptr_ego_vehicle->timestamp();
+    if (perception_obstacles.has_header() &&
+        perception_obstacles.header().has_timestamp_sec()) {
+      ADEBUG << "Correcting " << std::fixed << std::setprecision(6)
+             << ptr_ego_vehicle->timestamp() << " to "
+             << std::fixed << std::setprecision(6)
+             << perception_obstacles.header().timestamp_sec();
+      perception_obs_timestamp = perception_obstacles.header().timestamp_sec();
+    }
     ptr_obstacles_container->InsertPerceptionObstacle(
-        *ptr_ego_vehicle, ptr_ego_vehicle->timestamp());
+        *ptr_ego_vehicle, perception_obs_timestamp);
     double x = ptr_ego_vehicle->position().x();
     double y = ptr_ego_vehicle->position().y();
     ADEBUG << "Get ADC position [" << std::fixed << std::setprecision(6) << x

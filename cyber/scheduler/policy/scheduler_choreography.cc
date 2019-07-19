@@ -258,7 +258,8 @@ bool SchedulerChoreography::NotifyProcessor(uint64_t crid) {
     auto it = id_cr_.find(crid);
     if (it != id_cr_.end()) {
       cr = it->second;
-      if (cr->state() == RoutineState::DATA_WAIT) {
+      if (cr->state() == RoutineState::DATA_WAIT ||
+          cr->state() == RoutineState::IO_WAIT) {
         cr->SetUpdateFlag();
       }
     } else {

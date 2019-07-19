@@ -225,6 +225,7 @@ The car now has 360-degree visibility, along with upgraded perception deep learn
     * Prediction
     * Map Engine
     * Simulation
+    * [Apollo Synthetic Data Set](http://apollo.auto/synthetic.html)
 
 
 ## Architecture

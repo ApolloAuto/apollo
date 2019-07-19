@@ -64,6 +64,9 @@ int main(int argc, char* argv[]) {
           std::cout << "please enter a message (enter Ctrl+C to exit):"
                     << std::endl;
           std::getline(std::cin, user_input);
+          if (!apollo::cyber::OK()) {
+            break;
+          }
           if (user_input.empty()) {
             continue;
           }
@@ -103,4 +106,5 @@ int main(int argc, char* argv[]) {
       "echo_client");
 
   apollo::cyber::WaitForShutdown();
+  return 0;
 }

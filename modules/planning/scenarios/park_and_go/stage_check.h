@@ -14,38 +14,39 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
+#pragma once
 
-#include "modules/planning/scenarios/hailing/hailing_scenario.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
-#include "gtest/gtest.h"
-
-#include "cyber/common/file.h"
-#include "cyber/common/log.h"
-#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
+#include "modules/planning/scenarios/stage.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace hailing {
+namespace park_and_go {
 
-class HailingTest : public ::testing::Test {
+struct ParkAndGoContext;
+
+class ParkAndGoStageCheck : public Stage {
  public:
-  virtual void SetUp() {}
+  explicit ParkAndGoStageCheck(const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
 
- protected:
-  std::unique_ptr<HailingScenario> scenario_;
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame) override;
+
+  ParkAndGoContext* GetContext() {
+    return Stage::GetContextAs<ParkAndGoContext>();
+  }
+
+  Stage::StageStatus FinishStage(const bool success);
+
+ private:
+  ScenarioParkAndGoConfig scenario_config_;
 };
 
-TEST_F(HailingTest, VerifyConf) {
-  ScenarioConfig config;
-  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_hailing_config_file, &config));
-}
-
-}  // namespace hailing
+}  // namespace park_and_go
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
