@@ -118,13 +118,13 @@ void MessageProcess::OnPerception(
     if (perception_obstacles.has_header() &&
         perception_obstacles.header().has_timestamp_sec()) {
       ADEBUG << "Correcting " << std::fixed << std::setprecision(6)
-             << ptr_ego_vehicle->timestamp() << " to "
-             << std::fixed << std::setprecision(6)
+             << ptr_ego_vehicle->timestamp() << " to " << std::fixed
+             << std::setprecision(6)
              << perception_obstacles.header().timestamp_sec();
       perception_obs_timestamp = perception_obstacles.header().timestamp_sec();
     }
-    ptr_obstacles_container->InsertPerceptionObstacle(
-        *ptr_ego_vehicle, perception_obs_timestamp);
+    ptr_obstacles_container->InsertPerceptionObstacle(*ptr_ego_vehicle,
+                                                      perception_obs_timestamp);
     double x = ptr_ego_vehicle->position().x();
     double y = ptr_ego_vehicle->position().y();
     ADEBUG << "Get ADC position [" << std::fixed << std::setprecision(6) << x

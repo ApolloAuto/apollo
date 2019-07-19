@@ -55,9 +55,7 @@ bool TimerComponent::Initialize(const TimerComponentConfig& config) {
   return true;
 }
 
-uint64_t TimerComponent::GetInterval() const {
-  return interval_;
-}
+uint64_t TimerComponent::GetInterval() const { return interval_; }
 
 }  // namespace cyber
 }  // namespace apollo
