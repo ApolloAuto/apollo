@@ -23,9 +23,7 @@
 
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/time/time_util.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
-#include "modules/perception/lib/utils/time_util.h"
 
 namespace apollo {
 namespace perception {

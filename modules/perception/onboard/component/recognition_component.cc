@@ -17,7 +17,6 @@
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/lib/utils/perf.h"
-#include "modules/perception/lib/utils/time_util.h"
 #include "modules/perception/lidar/common/lidar_error_code.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 // #include "modules/perception/onboard/component/lidar_common_flags.h"
@@ -46,7 +45,7 @@ bool RecognitionComponent::Proc(
     const std::shared_ptr<LidarFrameMessage>& message) {
   AINFO << "Enter Tracking component, message timestamp: "
         << std::to_string(message->timestamp_) << " current timestamp: "
-        << std::to_string(lib::TimeUtil::GetCurrentTime());
+        << std::to_string(cyber::Time::Now().ToSecond());
 
   std::shared_ptr<SensorFrameMessage> out_message =
       std::make_shared<SensorFrameMessage>();
@@ -118,7 +117,7 @@ bool RecognitionComponent::InternalProc(
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name,
                                            "recognition_2::fill_out_message");
 
-  const double end_timestamp = lib::TimeUtil::GetCurrentTime();
+  const double end_timestamp = cyber::Time::Now().ToSecond();
   const double end_latency = (end_timestamp - in_message->timestamp_) * 1e3;
   AINFO << "FRAME_STATISTICS:Lidar:End:msg_time["
         << std::to_string(in_message->timestamp_) << "]:cur_time["
