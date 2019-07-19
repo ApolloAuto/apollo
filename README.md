@@ -33,16 +33,16 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 Apollo 5.0 is loaded with new modules and features, but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding on Apollo's core technology and platform. 
 
-**[Attention]** The Apollo team has decided to retire Git LFS which might impact your development. For details please refer to:
+**[Attention]** The Apollo team has decided to retire Git LFS, which might impact your development. For details, please refer to:
 [migration guide](docs/howto/how_to_migrate_to_the_updated_apollo_master_from_old_versions.md).
 
-[Want to contribute to our code?](CONTRIBUTING.md) follow this guide.
+[Want to contribute to our code?](CONTRIBUTING.md) Follow this guide.
 
 ## Prerequisites
 
 #### Basic Requirements:
 
-* Vehicle equipped with by-wire system, including but not limited to brake by-wire, steering by-wire, throttle by-wire and shift by-wire (Apollo is currently tested on Lincoln MKZ)
+* The vehicle equipped with by-wire system, including but not limited to brake-by-wire, steering-by-wire, throttle-by-wire and shift-by-wire (Apollo is currently tested on Lincoln MKZ)
 
 * A machine with a 4-core processor and 8GB memory minimum (16GB for Apollo 3.5 and above)
 
@@ -288,7 +288,7 @@ Apollo is provided under the [Apache-2.0 license](https://github.com/ApolloAuto/
 
 ## Disclaimer
 
-Please refer the Disclaimer of Apollo in [Apollo's official website](http://apollo.auto/docs/disclaimer.html).
+Please refer to the Disclaimer of Apollo in [Apollo's official website](http://apollo.auto/docs/disclaimer.html).
 
 ## Connect with us 
 * [Have suggestions for our GitHub page?](https://github.com/ApolloAuto/apollo/issues)
