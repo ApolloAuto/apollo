@@ -92,7 +92,7 @@ distance_approach_config {
   enable_hand_derivative: false
   enable_derivative_check: false
   enable_initial_final_check: false
-  distance_approach_mode: DISTANCE_APPROACH_IPOPT_RELAX_END_SLACK
+  distance_approach_mode: DISTANCE_APPROACH_IPOPT
   enable_check_initial_state: false
 }
 trajectory_partition_config {

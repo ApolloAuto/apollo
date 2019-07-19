@@ -17,7 +17,7 @@
 /**
  * @file
  **/
-
+#include <ctime>
 #include "cyber/common/file.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.h"
@@ -185,6 +185,9 @@ class ResultContainer {
   Eigen::MatrixXd* PrepareTimeResult() { return &time_result_ds_; }
   Eigen::MatrixXd* PrepareLResult() { return &dual_l_result_ds_; }
   Eigen::MatrixXd* PrepareNResult() { return &dual_n_result_ds_; }
+  double* GetHybridTime() { return &hybrid_time_;}
+  double* GetDualTime() { return &dual_time_; }
+  double* GetIpoptTime() { return &ipopt_time_; }
 
  private:
   HybridAStartResult result_;
@@ -199,6 +202,9 @@ class ResultContainer {
   Eigen::MatrixXd time_result_ds_;
   Eigen::MatrixXd dual_l_result_ds_;
   Eigen::MatrixXd dual_n_result_ds_;
+  double hybrid_time_;
+  double dual_time_;
+  double ipopt_time_;
 };
 
 extern "C" {
@@ -251,7 +257,8 @@ bool DistanceSmoothing(
     double ex, double ey, double ephi, const std::vector<double>& XYbounds,
     HybridAStartResult* hybrid_a_star_result, Eigen::MatrixXd* state_result_ds_,
     Eigen::MatrixXd* control_result_ds_, Eigen::MatrixXd* time_result_ds_,
-    Eigen::MatrixXd* dual_l_result_ds_, Eigen::MatrixXd* dual_n_result_ds_) {
+    Eigen::MatrixXd* dual_l_result_ds_, Eigen::MatrixXd* dual_n_result_ds_,
+    double& dual_time, double& ipopt_time) {
   // load Warm Start result(horizon is the "N", not the size of step points)
   size_t horizon_ = hybrid_a_star_result->x.size() - 1;
   // nominal sampling time
@@ -364,6 +371,7 @@ bool DistanceSmoothing(
   DualVariableWarmStartProblem* dual_variable_warm_start_ptr =
       new DualVariableWarmStartProblem(planner_open_space_config);
 
+  const auto t1 = std::chrono::system_clock::now();
   if (FLAGS_use_dual_variable_warm_start) {
     bool dual_variable_warm_start_status = dual_variable_warm_start_ptr->Solve(
         horizon_, ts_, ego_, obstacles.GetObstaclesNum(),
@@ -377,11 +385,13 @@ bool DistanceSmoothing(
       return false;
     }
   } else {
-    l_warm_up = 0.5 * Eigen::MatrixXd::Ones(
-                          obstacles.GetObstaclesEdgesNum().sum(), horizon_ + 1);
-    n_warm_up = 0.5 * Eigen::MatrixXd::Ones(4 * obstacles.GetObstaclesNum(),
-                                            horizon_ + 1);
+    l_warm_up = Eigen::MatrixXd::Zero(
+        obstacles.GetObstaclesEdgesNum().sum(), horizon_ + 1);
+    n_warm_up = Eigen::MatrixXd::Zero(4 * obstacles.GetObstaclesNum(),
+                                      horizon_ + 1);
   }
+  const auto t2 = std::chrono::system_clock::now();
+  dual_time = std::chrono::duration<double>(t2 - t1).count() * 1000;
 
   DistanceApproachProblem* distance_approach_ptr =
       new DistanceApproachProblem(planner_open_space_config);
@@ -393,6 +403,8 @@ bool DistanceSmoothing(
       obstacles.GetAMatrix(), obstacles.GetbMatrix(), state_result_ds_,
       control_result_ds_, time_result_ds_, dual_l_result_ds_,
       dual_n_result_ds_);
+  const auto t3 = std::chrono::system_clock::now();
+  ipopt_time = std::chrono::duration<double>(t3 -t2).count() * 1000;
 
   if (!status) {
     AERROR << "Distance fail";
@@ -413,17 +425,27 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
   AINFO << "FLAGS_planner_open_space_config_filename: "
         << FLAGS_planner_open_space_config_filename;
 
+  double hybrid_total = 0.0;
+  double dual_total = 0.0;
+  double ipopt_total = 0.0;
+
   std::string flag_file_path = "/apollo/modules/planning/conf/planning.conf";
   google::SetCommandLineOption("flagfile", flag_file_path.c_str());
 
   HybridAStartResult hybrid_astar_result;
   std::vector<double> XYbounds_(XYbounds, XYbounds + 4);
+
+  const auto start_timestamp = std::chrono::system_clock::now();
   if (!hybridA_ptr->Plan(sx, sy, sphi, ex, ey, ephi, XYbounds_,
                          obstacles_ptr->GetObstacleVec(),
                          &hybrid_astar_result)) {
     AINFO << "Hybrid A Star fails";
     return false;
   }
+  const auto end_timestamp = std::chrono::system_clock::now();
+  std::chrono::duration<double> time_diff =
+      end_timestamp - start_timestamp;
+  hybrid_total = time_diff.count() * 1000;
 
   if (FLAGS_enable_parallel_trajectory_smoothing) {
     std::vector<HybridAStartResult> partition_trajectories;
@@ -477,6 +499,8 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
     // }
 
     // In for loop
+    double dual_tmp = 0.0;
+    double ipopt_tmp = 0.0;
     for (size_t i = 0; i < size; ++i) {
       double piece_wise_sx = partition_trajectories[i].x.front();
       double piece_wise_sy = partition_trajectories[i].y.front();
@@ -496,9 +520,11 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
                              XYbounds_, &partition_trajectories[i],
                              &state_result_ds_vec[i], &control_result_ds_vec[i],
                              &time_result_ds_vec[i], &dual_l_result_ds_vec[i],
-                             &dual_n_result_ds_vec[i])) {
+                             &dual_n_result_ds_vec[i], dual_tmp, ipopt_tmp)) {
         return false;
       }
+      dual_total += dual_tmp;
+      ipopt_total += ipopt_tmp;
     }
 
     // Retrieve result in one single trajectory
@@ -561,6 +587,9 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
     *(result_ptr->PrepareStateResult()) = state_result_ds;
     *(result_ptr->PrepareControlResult()) = control_result_ds;
     *(result_ptr->PrepareTimeResult()) = time_result_ds;
+    *(result_ptr->GetHybridTime())  = hybrid_total;
+    *(result_ptr->GetDualTime()) = dual_total;
+    *(result_ptr->GetIpoptTime()) = ipopt_total;
   } else {
     Eigen::MatrixXd state_result_ds;
     Eigen::MatrixXd control_result_ds;
@@ -571,7 +600,7 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
                            sphi, ex, ey, ephi, XYbounds_, &hybrid_astar_result,
                            &state_result_ds, &control_result_ds,
                            &time_result_ds, &dual_l_result_ds,
-                           &dual_n_result_ds)) {
+                           &dual_n_result_ds, dual_total, ipopt_total)) {
       return false;
     }
     *(result_ptr->PrepareHybridAResult()) = hybrid_astar_result;
@@ -580,6 +609,9 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
     *(result_ptr->PrepareTimeResult()) = time_result_ds;
     *(result_ptr->PrepareLResult()) = dual_l_result_ds;
     *(result_ptr->PrepareNResult()) = dual_n_result_ds;
+    *(result_ptr->GetHybridTime())  = hybrid_total;
+    *(result_ptr->GetDualTime()) = dual_total;
+    *(result_ptr->GetIpoptTime()) = ipopt_total;
   }
   return true;
 }
@@ -590,7 +622,8 @@ void DistanceGetResult(ResultContainer* result_ptr,
                        double* opt_x, double* opt_y, double* opt_phi,
                        double* opt_v, double* opt_a, double* opt_steer,
                        double* opt_time, double* opt_dual_l, double* opt_dual_n,
-                       size_t* output_size) {
+                       size_t* output_size, double* hybrid_time,
+                       double* dual_time, double* ipopt_time) {
   result_ptr->LoadHybridAResult();
   size_t size = result_ptr->GetX()->size();
   size_t size_by_distance = result_ptr->PrepareStateResult()->cols();
@@ -640,6 +673,10 @@ void DistanceGetResult(ResultContainer* result_ptr,
     opt_a[i] = (*(result_ptr->PrepareControlResult()))(0, i);
     opt_steer[i] = (*(result_ptr->PrepareControlResult()))(1, i);
   }
+
+  hybrid_time[0] = *(result_ptr->GetHybridTime());
+  dual_time[0] = *(result_ptr->GetDualTime());
+  ipopt_time[0] = *(result_ptr->GetIpoptTime());
 }
 };
 
