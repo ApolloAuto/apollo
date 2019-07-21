@@ -25,7 +25,6 @@
 #include "modules/common/time/time_util.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
-#include "modules/perception/lib/utils/time_util.h"
 #include "modules/perception/onboard/common_flags/common_flags.h"
 #include "modules/perception/onboard/component/camera_perception_viz_message.h"
 
@@ -277,7 +276,7 @@ void FusionCameraDetectionComponent::OnReceiveImage(
 
   // for e2e lantency statistics
   {
-    const double cur_time = lib::TimeUtil::GetCurrentTime();
+    const double cur_time = cyber::Time::Now().ToSecond();
     const double start_latency = (cur_time - message->measurement_time()) * 1e3;
     AINFO << "FRAME_STATISTICS:Camera:Start:msg_time[" << camera_name << "-"
           << GLOG_TIMESTAMP(message->measurement_time()) << "]:cur_time["
@@ -317,8 +316,7 @@ void FusionCameraDetectionComponent::OnReceiveImage(
   }
   // for e2e lantency statistics
   {
-    const double end_timestamp =
-        apollo::perception::lib::TimeUtil::GetCurrentTime();
+    const double end_timestamp = cyber::Time::Now().ToSecond();
     const double end_latency =
         (end_timestamp - message->measurement_time()) * 1e3;
     AINFO << "FRAME_STATISTICS:Camera:End:msg_time[" << camera_name << "-"
