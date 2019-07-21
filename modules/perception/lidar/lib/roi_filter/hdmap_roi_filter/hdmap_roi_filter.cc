@@ -111,13 +111,10 @@ bool HdmapROIFilter::Filter(const ROIFilterOptions& options,
 
   // set roi points label
   if (ret) {
-    /*
-     TODO(all) fix this block
-     for (auto index : frame->roi_indices.indices) {
-        auto& pt_label = frame->cloud->points_label().at(index);
-        pt_label = static_cast<uint8_t>(LidarPointLabel::ROI);
+    for (auto index : frame->roi_indices.indices) {
+      auto& pt_label = frame->cloud->mutable_points_label()->at(index);
+      pt_label = static_cast<uint8_t>(LidarPointLabel::ROI);
     }
-    */
   }
 
   // set roi service
@@ -175,9 +172,9 @@ bool HdmapROIFilter::FilterWithPolygonMask(
   }
   bitmap_.SetUp(major_dir);
 
-  DrawPolygonsMask<double>(raw_polygons, &bitmap_, extend_dist_,
-                           no_edge_table_);
-  return Bitmap2dFilter(cloud, bitmap_, roi_indices);
+  return DrawPolygonsMask<double>(raw_polygons, &bitmap_,
+                                  extend_dist_, no_edge_table_) &&
+         Bitmap2dFilter(cloud, bitmap_, roi_indices);
 }
 
 void HdmapROIFilter::TransformFrame(
