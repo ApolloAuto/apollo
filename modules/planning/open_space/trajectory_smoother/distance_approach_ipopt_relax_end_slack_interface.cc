@@ -24,15 +24,15 @@ namespace planning {
 
 DistanceApproachIPOPTRelaxEndSlackInterface::
     DistanceApproachIPOPTRelaxEndSlackInterface(
-    const size_t horizon, const double ts, const Eigen::MatrixXd& ego,
-    const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
-    const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
-    const Eigen::MatrixXd& s_warm_up,
-    const Eigen::MatrixXd& x0, const Eigen::MatrixXd& xf,
-    const Eigen::MatrixXd& last_time_u, const std::vector<double>& XYbounds,
-    const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
-    const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-    const PlannerOpenSpaceConfig& planner_open_space_config)
+        const size_t horizon, const double ts, const Eigen::MatrixXd& ego,
+        const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
+        const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
+        const Eigen::MatrixXd& s_warm_up, const Eigen::MatrixXd& x0,
+        const Eigen::MatrixXd& xf, const Eigen::MatrixXd& last_time_u,
+        const std::vector<double>& XYbounds,
+        const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
+        const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
+        const PlannerOpenSpaceConfig& planner_open_space_config)
     : ts_(ts),
       ego_(ego),
       xWS_(xWS),
@@ -148,8 +148,8 @@ bool DistanceApproachIPOPTRelaxEndSlackInterface::get_nlp_info(
   // m4 : obstacle constraints
   int m4 = 4 * obstacles_num_ * (horizon_ + 1);
 
-  num_of_variables_ = n1 + n2 + n3 + lambda_horizon_
-      + miu_horizon_ + slack_horizon_;
+  num_of_variables_ =
+      n1 + n2 + n3 + lambda_horizon_ + miu_horizon_ + slack_horizon_;
   num_of_constraints_ =
       m1 + m2 + m3 + m4 + (num_of_variables_ - (horizon_ + 1) + 2);
 
@@ -167,8 +167,7 @@ bool DistanceApproachIPOPTRelaxEndSlackInterface::get_nlp_info(
 }
 
 bool DistanceApproachIPOPTRelaxEndSlackInterface::get_bounds_info(
-    int n, double* x_l, double* x_u, int m,
-    double* g_l, double* g_u) {
+    int n, double* x_l, double* x_u, int m, double* g_l, double* g_u) {
   ADEBUG << "get_bounds_info";
   CHECK(XYbounds_.size() == 4)
       << "XYbounds_ size is not 4, but" << XYbounds_.size();
@@ -458,28 +457,32 @@ bool DistanceApproachIPOPTRelaxEndSlackInterface::get_starting_point(
   return true;
 }
 
-bool DistanceApproachIPOPTRelaxEndSlackInterface::eval_f(
-    int n, const double* x, bool new_x, double& obj_value) {
+bool DistanceApproachIPOPTRelaxEndSlackInterface::eval_f(int n, const double* x,
+                                                         bool new_x,
+                                                         double& obj_value) {
   eval_obj(n, x, &obj_value);
   return true;
 }
 
-bool DistanceApproachIPOPTRelaxEndSlackInterface::eval_grad_f(
-    int n, const double* x, bool new_x, double* grad_f) {
+bool DistanceApproachIPOPTRelaxEndSlackInterface::eval_grad_f(int n,
+                                                              const double* x,
+                                                              bool new_x,
+                                                              double* grad_f) {
   gradient(tag_f, n, x, grad_f);
   return true;
 }
 
-bool DistanceApproachIPOPTRelaxEndSlackInterface::eval_g(
-    int n, const double* x, bool new_x, int m, double* g) {
+bool DistanceApproachIPOPTRelaxEndSlackInterface::eval_g(int n, const double* x,
+                                                         bool new_x, int m,
+                                                         double* g) {
   eval_constraints(n, x, m, g);
   // if (enable_constraint_check_) check_g(n, x, m, g);
   return true;
 }
 
 bool DistanceApproachIPOPTRelaxEndSlackInterface::eval_jac_g(
-    int n, const double* x, bool new_x, int m,
-    int nele_jac, int* iRow, int* jCol, double* values) {
+    int n, const double* x, bool new_x, int m, int nele_jac, int* iRow,
+    int* jCol, double* values) {
   if (enable_jacobian_ad_) {
     if (values == nullptr) {
       // return the structure of the jacobian
@@ -690,7 +693,7 @@ void DistanceApproachIPOPTRelaxEndSlackInterface::get_optimization_results(
 //***************    start ADOL-C part ***********************************
 template <class T>
 void DistanceApproachIPOPTRelaxEndSlackInterface::eval_obj(int n, const T* x,
-                                                      T* obj_value) {
+                                                           T* obj_value) {
   // Objective is :
   // min control inputs
   // min input rate
@@ -772,8 +775,10 @@ void DistanceApproachIPOPTRelaxEndSlackInterface::eval_obj(int n, const T* x,
 }
 
 template <class T>
-void DistanceApproachIPOPTRelaxEndSlackInterface::eval_constraints(
-    int n, const T* x, int m, T* g) {
+void DistanceApproachIPOPTRelaxEndSlackInterface::eval_constraints(int n,
+                                                                   const T* x,
+                                                                   int m,
+                                                                   T* g) {
   // state start index
   int state_index = state_start_index_;
 
@@ -994,8 +999,10 @@ void DistanceApproachIPOPTRelaxEndSlackInterface::eval_constraints(
   }
 }
 
-bool DistanceApproachIPOPTRelaxEndSlackInterface::check_g(
-    int n, const double* x, int m, const double* g) {
+bool DistanceApproachIPOPTRelaxEndSlackInterface::check_g(int n,
+                                                          const double* x,
+                                                          int m,
+                                                          const double* g) {
   int kN = n;
   int kM = m;
   double x_u_tmp[kN];
@@ -1077,9 +1084,8 @@ bool DistanceApproachIPOPTRelaxEndSlackInterface::check_g(
   return true;
 }
 
-void DistanceApproachIPOPTRelaxEndSlackInterface::generate_tapes(int n, int m,
-                                                            int* nnz_jac_g,
-                                                            int* nnz_h_lag) {
+void DistanceApproachIPOPTRelaxEndSlackInterface::generate_tapes(
+    int n, int m, int* nnz_jac_g, int* nnz_h_lag) {
   std::vector<double> xp(n);
   std::vector<double> lamp(m);
   std::vector<double> zl(m);

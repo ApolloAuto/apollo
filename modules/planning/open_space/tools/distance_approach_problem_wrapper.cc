@@ -387,12 +387,11 @@ bool DistanceSmoothing(
       new DistanceApproachProblem(planner_open_space_config);
 
   bool status = distance_approach_ptr->Solve(
-      x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS,
-      l_warm_up, n_warm_up, s_warm_up,
-      XYbounds, obstacles.GetObstaclesNum(), obstacles.GetObstaclesEdgesNum(),
-      obstacles.GetAMatrix(), obstacles.GetbMatrix(), state_result_ds_,
-      control_result_ds_, time_result_ds_, dual_l_result_ds_,
-      dual_n_result_ds_);
+      x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS, l_warm_up, n_warm_up,
+      s_warm_up, XYbounds, obstacles.GetObstaclesNum(),
+      obstacles.GetObstaclesEdgesNum(), obstacles.GetAMatrix(),
+      obstacles.GetbMatrix(), state_result_ds_, control_result_ds_,
+      time_result_ds_, dual_l_result_ds_, dual_n_result_ds_);
 
   if (!status) {
     AERROR << "Distance fail";
