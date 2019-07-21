@@ -57,15 +57,12 @@ From the dropdown box selet "Navigation" mode.
 
 ### Replay demo rosbag
 
-To see if the system works, use the demo 'bag' which feeds the system.
+To see if the system works, use the demo recording which feeds the system.
+ ```
+     cyber_recorder play -f docs/demo_guide/demo_3.5.record --loop
+ ```
+ The `--loop` option enables record to keep playing the bag in a loop playback mode.
 
-```
-# get rosbag note that the command download is required
-python ./docs/demo_guide/rosbag_helper.py demo_2.5.bag
-
-# You can now replay this demo "bag" in a loop with the '-l' flag
-rosbag play -l demo_2.5.bag
-```
 
 Dreamview should show a running vehicle now. (The following image might be different due to changes in frontend.)
 
