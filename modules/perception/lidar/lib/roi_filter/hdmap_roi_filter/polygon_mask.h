@@ -62,9 +62,8 @@ bool DrawPolygonMask(const typename PolygonScanCvter<T>::Polygon& polygon,
   const Eigen::Vector2d& bitmap_min_range = bitmap->min_range();
   const Eigen::Vector2d& bitmap_max_range = bitmap->max_range();
   const Eigen::Vector2d& cell_size = bitmap->cell_size();
-  // TODO(...) maybe confused
-  int major_dir = static_cast<int>(bitmap->dir_major());
-  int op_major_dir = static_cast<int>(bitmap->op_dir_major());
+  const int major_dir = bitmap->dir_major();
+  const int op_major_dir = bitmap->op_dir_major();
 
   // check major x range
   IntervalIn valid_range;
