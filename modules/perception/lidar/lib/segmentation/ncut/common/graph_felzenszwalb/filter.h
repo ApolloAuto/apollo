@@ -35,7 +35,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #include <vector>
 #include "modules/perception/lidar/segmentation/ncut/common/graph_felzenszwalb/convolve.h"
 #include "modules/perception/lidar/segmentation/ncut/common/graph_felzenszwalb/image.h"
-#include "modules/perception/lidar/segmentation/ncut/common/graph_felzenszwalb/imconv.h"
+#include "modules/perception/lidar/segmentation/ncut/common/graph_felzenszwalb/inconv.h"
 #include "modules/perception/lidar/segmentation/ncut/common/graph_felzenszwalb/misc.h"
 
 namespace apollo {
