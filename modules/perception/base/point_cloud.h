@@ -150,7 +150,7 @@ class PointCloud {
     points_.resize(rhs.size() - indices.size());
     std::vector<bool> mask(false, rhs.size());
     for (size_t i = 0; i < indices.size(); ++i) {
-      mask[i] = true;
+      mask[indices[i]] = true;
     }
     for (size_t i = 0; i < rhs.size(); ++i) {
       if (!mask[i]) {

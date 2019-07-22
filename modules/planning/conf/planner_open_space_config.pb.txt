@@ -41,6 +41,15 @@ dual_variable_warm_start_config {
   qp_format: OSQP
   min_safety_distance: 0.0
   debug_osqp: false
+  beta: 1.0
+  osqp_config {
+    alpha: 1.0
+    eps_abs: 1.0e-3
+    eps_rel: 1.0e-3
+    max_iter: 10000
+    polish: true
+    osqp_debug_log: false
+  }
 }
 distance_approach_config {
   weight_steer: 0.3
@@ -56,6 +65,7 @@ distance_approach_config {
   weight_first_order_time: 4.25
   weight_second_order_time: 13.5
   weight_end_state: 1.0
+  weight_slack: 1.0
   min_safety_distance: 0.0
   max_speed_forward: 2.0
   max_speed_reverse: 1.0

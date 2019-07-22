@@ -16,6 +16,7 @@ cc_library(
         ":dual_variable_warm_start_ipopt_interface",
         ":dual_variable_warm_start_ipopt_qp_interface",
         ":dual_variable_warm_start_osqp_interface",
+        ":dual_variable_warm_start_slack_osqp_interface",
     ],
 )
 
@@ -85,6 +86,27 @@ cc_library(
 )
 
 cc_library(
+    name = "dual_variable_warm_start_slack_osqp_interface",
+    srcs = [
+        "dual_variable_warm_start_slack_osqp_interface.cc",
+    ],
+    hdrs = [
+        "dual_variable_warm_start_slack_osqp_interface.h",
+    ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/math",
+        "//modules/common/util",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/proto:planner_open_space_config_proto",
+        "//modules/planning/proto:planning_proto",
+        "@eigen",
+        "@osqp",
+    ],
+)
+
+cc_library(
     name = "distance_approach_problem",
     srcs = [
         "distance_approach_problem.cc",
@@ -102,6 +124,7 @@ cc_library(
         ":distance_approach_ipopt_fixed_ts_interface",
         ":distance_approach_ipopt_interface",
         ":distance_approach_ipopt_relax_end_interface",
+        ":distance_approach_ipopt_relax_end_slack_interface",
         "//cyber/common:log",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
@@ -171,6 +194,33 @@ cc_library(
     hdrs = [
         "distance_approach_interface.h",
         "distance_approach_ipopt_relax_end_interface.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+        "-fopenmp",
+    ],
+    deps = [
+        "//cyber/common:log",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/math",
+        "//modules/common/util",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/proto:planner_open_space_config_proto",
+        "//modules/planning/proto:planning_proto",
+        "@adolc",
+        "@eigen",
+        "@ipopt",
+    ],
+)
+
+cc_library(
+    name = "distance_approach_ipopt_relax_end_slack_interface",
+    srcs = [
+        "distance_approach_ipopt_relax_end_slack_interface.cc",
+    ],
+    hdrs = [
+        "distance_approach_interface.h",
+        "distance_approach_ipopt_relax_end_slack_interface.h",
     ],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",

@@ -33,6 +33,7 @@
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_fixed_ts_interface.h"
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_interface.h"
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_relax_end_interface.h"
+#include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_relax_end_slack_interface.h"
 #include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
@@ -50,6 +51,7 @@ class DistanceApproachProblem {
              const double ts, const Eigen::MatrixXd& ego,
              const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
              const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
+             const Eigen::MatrixXd& s_warm_up,
              const std::vector<double>& XYbounds, const size_t obstacles_num,
              const Eigen::MatrixXi& obstacles_edges_num,
              const Eigen::MatrixXd& obstacles_A,
