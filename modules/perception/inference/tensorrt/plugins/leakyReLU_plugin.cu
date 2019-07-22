@@ -14,14 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <vector>
 #include "modules/perception/inference/tensorrt/plugins/leakyReLU_plugin.h"
+
+#include <vector>
 
 namespace apollo {
 namespace perception {
 namespace inference {
-
-typedef int8_t int8;
 
 template<typename Dtype>
 __global__ void ReLU(const int nthreads, const Dtype *in_data,
