@@ -112,8 +112,10 @@ bool HdmapROIFilter::Filter(const ROIFilterOptions& options,
   // set roi points label
   if (ret) {
     for (auto index : frame->roi_indices.indices) {
-      auto& pt_label = frame->cloud->mutable_points_label()->at(index);
-      pt_label = static_cast<uint8_t>(LidarPointLabel::ROI);
+      frame->cloud->mutable_points_label()->at(index) =
+                    static_cast<uint8_t>(LidarPointLabel::ROI);
+      frame->world_cloud->mutable_points_label()->at(index) =
+                    static_cast<uint8_t>(LidarPointLabel::ROI);
     }
   }
 
@@ -128,6 +130,10 @@ bool HdmapROIFilter::Filter(const ROIFilterOptions& options,
       roi_service_content_.major_dir_ =
           static_cast<ROIServiceContent::DirectionMajor>(bitmap_.dir_major());
       roi_service_content_.transform_ = frame->lidar2world_pose.translation();
+      if (!ret) {
+        std::fill(roi_service_content_.bitmap_.begin(),
+                  roi_service_content_.bitmap_.end(), -1);
+      }
       roi_service->UpdateServiceContent(roi_service_content_);
     } else {
       AINFO << "Failed to find roi service and cannot update.";
