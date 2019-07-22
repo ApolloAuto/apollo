@@ -39,11 +39,7 @@ namespace prediction {
 SemanticMap::SemanticMap() {}
 
 void SemanticMap::Init() {
-  curr_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
-
-  if (FLAGS_enable_async_draw_base_image) {
-    task_future_ = cyber::Async(&SemanticMap::DrawBaseMapThread, this);
-  }
+  curr_base_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
 }
 
 void SemanticMap::RunCurrFrame(
@@ -56,15 +52,23 @@ void SemanticMap::RunCurrFrame(
   ego_feature_ = obstacle_id_history_map_.at(FLAGS_ego_vehicle_id).feature(0);
   // TODO(all): move to somewhere else
   if (!FLAGS_enable_async_draw_base_image) {
-    DrawBaseMap(ego_feature_.position().x(), ego_feature_.position().y(),
-                curr_base_x_, curr_base_y_);
+    double x = ego_feature_.position().x();
+    double y = ego_feature_.position().y();
+    curr_base_x_ = x - 100.0;
+    curr_base_y_ = y - 100.0;
+    DrawBaseMap(x, y, curr_base_x_, curr_base_y_);
+    base_img_.copyTo(curr_base_img_);
+  } else {
+    base_img_.copyTo(curr_base_img_);
+    curr_base_x_ = base_x_;
+    curr_base_y_ = base_y_;
+    task_future_ = cyber::Async(&SemanticMap::DrawBaseMapThread, this);
   }
-  base_img_.copyTo(curr_img_);
 
   // Draw all obstacles_history
   for (const auto obstacle_id_history_pair : obstacle_id_history_map_) {
     DrawHistory(obstacle_id_history_pair.second, cv::Scalar(0, 255, 255),
-                 curr_base_x_, curr_base_y_, &curr_img_);
+                 curr_base_x_, curr_base_y_, &curr_base_img_);
   }
 
   // Crop ego_vehicle for demo
@@ -81,8 +85,6 @@ void SemanticMap::RunCurrFrame(
 void SemanticMap::DrawBaseMap(const double x, const double y,
                               const double base_x, const double base_y) {
   base_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
-  // curr_base_x_ = x - 100.0;
-  // curr_base_y_ = y - 100.0;
   common::PointENU center_point = common::util::MakePointENU(x, y, 0.0);
   DrawRoads(center_point, base_x, base_y);
   DrawJunctions(center_point, base_x, base_y);
@@ -91,7 +93,11 @@ void SemanticMap::DrawBaseMap(const double x, const double y,
 }
 
 void SemanticMap::DrawBaseMapThread() {
-  // TODO(kechxu): implement
+  double x = ego_feature_.position().x();
+  double y = ego_feature_.position().y();
+  base_x_ = x - 100.0;
+  base_y_ = y - 100.0;
+  DrawBaseMap(x, y, base_x_, base_y_);
 }
 
 void SemanticMap::DrawRoads(const common::PointENU& center_point,
@@ -320,7 +326,7 @@ cv::Mat SemanticMap::CropArea(const cv::Mat& input_img,
 cv::Mat SemanticMap::CropByHistory(const ObstacleHistory& history,
                                    const cv::Scalar& color,
                                    const double base_x, const double base_y) {
-  cv::Mat feature_map = curr_img_.clone();
+  cv::Mat feature_map = curr_base_img_.clone();
   DrawHistory(history, color, base_x, base_y, &feature_map);
   const Feature& curr_feature = history.feature(0);
   cv::Point2i center_point =
