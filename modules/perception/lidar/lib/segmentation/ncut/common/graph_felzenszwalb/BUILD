@@ -9,7 +9,7 @@ cc_library(
         "disjoint_set.h",
         "filter.h",
         "image.h",
-        "imconv.h",
+        "inconv.h",
         "imutil.h",
         "misc.h",
         "segment_graph.h",
