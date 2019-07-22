@@ -20,11 +20,12 @@
 #include <map>
 #include <utility>
 #include "boost/thread.hpp"
-#include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_fwd.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 /**@brief The data structure of the LRUCache. */
 template <class Key, class Element>
@@ -242,6 +243,7 @@ bool MapNodeCacheL2<Key, MapNode>::Destroy(MapNode* value) {
   return !(value->GetIsReserved());
 }
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
