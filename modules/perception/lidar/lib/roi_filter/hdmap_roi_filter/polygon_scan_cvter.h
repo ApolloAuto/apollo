@@ -139,8 +139,6 @@ void PolygonScanCvter<T>::Init(const Polygon& polygon) {
   is_singular_.resize(2);
   segments_.resize(2);
   ks_.resize(2);
-  ParsePolygon(DirectionMajor::XMAJOR);
-  ParsePolygon(DirectionMajor::YMAJOR);
 }
 
 template <typename T>
@@ -264,19 +262,18 @@ void PolygonScanCvter<T>::ScansCvt(
   }
 }
 
-// note, there exits problem when input T=double
 template <typename T>
 void PolygonScanCvter<T>::DisturbPolygon(const DirectionMajor dir_major) {
   for (auto& pt : polygon_disturbed_) {
-    double& x = pt[dir_major];
+    T& x = pt[dir_major];
     double d_x = (x - bottom_x_) / step_;
     int int_d_x = static_cast<int>(std::round(d_x));
     double delta_x = d_x - int_d_x;
     if (std::abs(delta_x) < s_epsilon_) {
       if (delta_x > 0) {
-        x = (int_d_x + s_epsilon_) * step_ + bottom_x_;
+        x = static_cast<T>((int_d_x + s_epsilon_) * step_ + bottom_x_);
       } else {
-        x = (int_d_x - s_epsilon_) * step_ + bottom_x_;
+        x = static_cast<T>((int_d_x - s_epsilon_) * step_ + bottom_x_);
       }
     }
   }
@@ -307,7 +304,6 @@ void PolygonScanCvter<T>::ParsePolygon(const DirectionMajor dir_major,
         polygon_disturbed_[(i + vertices_size - 1) % vertices_size];
     const Point& vertex = polygon_disturbed_[i];
     const Point& nex_vertex = polygon_disturbed_[(i + 1) % vertices_size];
-    // TODO(..) maybe confused, is not reasonable
     T pre_x = pre_vertex[dir_major];
     T x = vertex[dir_major];
     T y = vertex[op_dir_major];
@@ -316,23 +312,23 @@ void PolygonScanCvter<T>::ParsePolygon(const DirectionMajor dir_major,
 
     // get segment
     Segment line_seg(vertex, nex_vertex);
-    double x_diff = (nex_x - x);
-    double y_diff = (nex_y - y);
+    double x_diff = nex_x - x;
+    double y_diff = nex_y - y;
 
     // get k
     segments.push_back(line_seg);
-    std::abs(x - nex_x) < s_epsilon_ ? ks.push_back(s_inf_)
-                                     : ks.push_back(y_diff / x_diff);
-    double pre_x_diff = (pre_x - x);
+    std::abs(x_diff) < s_epsilon_ ? ks.push_back(s_inf_)
+                                  : ks.push_back(y_diff / x_diff);
+    double pre_x_diff = x - pre_x;
 
     // get singular property
     // ensure fill edge
     // case for zero
-    if (std::abs(x - nex_x) < s_epsilon_ || std::abs(pre_x_diff) < s_epsilon_) {
+    if (std::abs(x_diff) < s_epsilon_ || std::abs(pre_x_diff) < s_epsilon_) {
       is_singular.push_back(true);
     } else {
-      pre_x_diff* x_diff > 0 ? is_singular.push_back(true)
-                             : is_singular.push_back(false);
+      pre_x_diff * x_diff < 0 ? is_singular.push_back(true)
+                              : is_singular.push_back(false);
     }
   }
 }
