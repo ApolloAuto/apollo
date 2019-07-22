@@ -8,17 +8,22 @@ It is possible, so the serialized packets need to be fragmented, and each slice 
 The receiver receives all the frames and then combines and deserializes them.
 In order to conveniently distinguish each frame of data, to facilitate subsequent combination and deserialization,
 it is necessary to add frame header information at the head of each frame of data, as shown in the following figure:
+```
     +-----+------------+------------+-------+-----------+
     |Flag |Header Size |Header Item |... ...|Header Item|
     +-----+------------+------------+-------+-----------+
+```
 As shown in the figure above, the Header divides three segments: Flag, Size, and Items, where the segment is separated by '\n'.
 Flag: The sign of this agreement, currently a string "ApolloBridgeHeader";
 Size: the length of the entire Items section (unit: byte)
 Items: The specific content of the header, where each item has three components, each of which is divided by ':'. The specific schematic is shown in the figure below.
+```
     +----------+----------+-------------+
     |Item Type |Item Size | Item Content|
     +----------+----------+-------------+
+```
 The Item Type is defined as follows:
+```
 Enum HType {
 Header_Ver, // header version number, type: uint32_t
 Msg_Name,   //proto name, such as Chassis, type: std::string
@@ -31,3 +36,4 @@ Frame_Index,// The sequence number of the current frame in the total number of f
 Time_Stamp, // timestamp, type: double
 Header_Tail,// indicates the maximum value of the currently supported Type, always at the end of the enum
 }
+```
