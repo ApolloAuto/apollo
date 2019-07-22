@@ -79,7 +79,7 @@ class CloudMask {
 
   // @brief; get valid indices from mask
   // @param [in]: indices vector
-  void GetValidIndices(base::PointIndices *indices);
+  void GetValidIndices(base::PointIndices* indices);
 
   // @brief: flip the mask data, positive to zero and zero to one
   // @brief: note, flip twice is not guaranteed to recover the original mask
