@@ -15,49 +15,40 @@
  *****************************************************************************/
 
 /**
- * @file park_and_go_scenario.h
+ * @file stage_cruise_test.cc
  */
-#pragma once
 
-#include <memory>
+#include "modules/planning/scenarios/park_and_go/stage_cruise.h"
 
-#include "modules/planning/scenarios/scenario.h"
+#include "gtest/gtest.h"
+
+#include "cyber/common/file.h"
+#include "cyber/common/log.h"
+#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace park_and_go {
 
-// stage context
-struct ParkAndGoContext {
-  ScenarioParkAndGoConfig scenario_config;
-};
-
-class ParkAndGoScenario : public Scenario {
+class ParkAndGoStageCruiseTest : public ::testing::Test {
  public:
-  ParkAndGoScenario(const ScenarioConfig& config,
-                    const ScenarioContext* context)
-      : Scenario(config, context) {}
+  virtual void SetUp() {
+    apollo::cyber::common::GetProtoFromFile(
+        FLAGS_scenario_park_and_go_config_file, &park_and_go_config_);
+  }
 
-  void Init() override;
-
-  std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config) override;
-
-  ParkAndGoContext* GetContext() { return &context_; }
-
- private:
-  static void RegisterStages();
-  bool GetScenarioConfig();
-
- private:
-  static apollo::common::util::Factory<
-      ScenarioConfig::StageType, Stage,
-      Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
-      s_stage_factory_;
-  bool init_ = false;
-  ParkAndGoContext context_;
+ protected:
+  ScenarioConfig park_and_go_config_;
 };
+
+TEST_F(ParkAndGoStageCruiseTest, Init) {
+  ParkAndGoStageCruise park_and_go_stage_cruise(
+      park_and_go_config_.stage_config(2));
+  EXPECT_EQ(park_and_go_stage_cruise.stage_type(),
+            ScenarioConfig::PARK_AND_GO_CRUISE);
+}
 
 }  // namespace park_and_go
 }  // namespace scenario
