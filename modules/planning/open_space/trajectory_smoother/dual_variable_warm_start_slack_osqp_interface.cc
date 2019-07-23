@@ -219,29 +219,70 @@ bool DualVariableWarmStartSlackOSQPInterface::optimize() {
     succ = false;
   }
 
+  // transfer to make lambda's norm under 1
+  std::vector<double> lambda_norm;
+  int l_index = l_start_index_;
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    int edges_counter = 0;
+    for (int j = 0; j < obstacles_num_; ++j) {
+      int current_edges_num = obstacles_edges_num_(j, 0);
+      Eigen::MatrixXd Aj =
+          obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
+
+      double tmp1 = 0;
+      double tmp2 = 0;
+      for (int k = 0; k < current_edges_num; ++k) {
+        tmp1 += Aj(k, 0) * work->solution->x[l_index + k];
+        tmp2 += Aj(k, 1) * work->solution->x[l_index + k];
+      }
+
+      // norm(A * lambda)
+      double tmp_norm = tmp1 * tmp1 + tmp2 * tmp2;
+      if (tmp_norm >= 1e-5) {
+        lambda_norm.push_back(0.75 / std::sqrt(tmp_norm));
+      } else {
+        lambda_norm.push_back(0.0);
+      }
+
+      edges_counter += current_edges_num;
+      l_index += current_edges_num;
+    }
+  }
+
   // extract primal results
   int variable_index = 0;
   // 1. lagrange constraint l, [0, obstacles_edges_sum_ - 1] * [0,
   // horizon_l
   for (int i = 0; i < horizon_ + 1; ++i) {
-    for (int j = 0; j < obstacles_edges_sum_; ++j) {
-      l_warm_up_(j, i) = work->solution->x[variable_index];
-      ++variable_index;
+    int r_index = 0;
+    for (int j = 0; j < obstacles_num_; ++j) {
+      for (int k = 0; k < obstacles_edges_num_(j, 0); ++k) {
+        l_warm_up_(r_index, i) = lambda_norm[i * obstacles_num_ + j]
+            * work->solution->x[variable_index];
+        ++variable_index;
+        ++r_index;
+      }
     }
   }
 
   // 2. lagrange constraint n, [0, 4*obstacles_num-1] * [0, horizon_]
   for (int i = 0; i < horizon_ + 1; ++i) {
-    for (int j = 0; j < 4 * obstacles_num_; ++j) {
-      n_warm_up_(j, i) = work->solution->x[variable_index];
-      ++variable_index;
+    int r_index = 0;
+    for (int j = 0; j < obstacles_num_; ++j) {
+      for (int k = 0; k < 4; ++k) {
+        n_warm_up_(r_index, i) = lambda_norm[i * obstacles_num_ + j]
+            * work->solution->x[variable_index];
+        ++r_index;
+        ++variable_index;
+      }
     }
   }
 
   // 3. slack variables
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < obstacles_num_; ++j) {
-      slacks_(j, i) = work->solution->x[variable_index];
+      slacks_(j, i) = lambda_norm[i * obstacles_num_ + j]
+          * work->solution->x[variable_index];
       ++variable_index;
     }
   }
