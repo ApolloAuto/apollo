@@ -43,6 +43,9 @@ class ParkAndGoStageCheck : public Stage {
   Stage::StageStatus FinishStage(const bool success);
 
  private:
+  bool CheckObstacle(const ReferenceLineInfo& reference_line_info);
+
+ private:
   ScenarioParkAndGoConfig scenario_config_;
 };
 
