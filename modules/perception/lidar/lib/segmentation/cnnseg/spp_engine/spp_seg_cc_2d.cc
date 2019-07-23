@@ -192,15 +192,17 @@ void SppCCDetector::Traverse(SppCCDetector::Node* x) {
 
 SppCCDetector::Node* SppCCDetector::DisjointSetFindLoop(Node* x) {
   Node* root = x;
-  while (nodes_[0] + root->parent != root) {
-    root = nodes_[0] + root->parent;
-  }
-  Node* w = x;
-  while (nodes_[0] + w->parent != w) {
-    Node* temp = nodes_[0] + w->parent;
-    w->parent = root->parent;
-    w = temp;
-  }
+  Node* p = x;
+  do {
+    root = p;
+    p = nodes_[0] + root->parent;
+  } while (p != root);
+  p = x;
+  do {
+    x = p;
+    x->parent = root->parent;
+    p = nodes_[0] + x->parent;
+  } while (p != x);
   return root;
 }
 
