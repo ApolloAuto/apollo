@@ -14,49 +14,36 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file park_and_go_scenario.h
- */
 #pragma once
 
-#include <memory>
+#include "modules/planning/proto/planning_config.pb.h"
 
-#include "modules/planning/scenarios/scenario.h"
+#include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
+#include "modules/planning/scenarios/stage.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace park_and_go {
 
-// stage context
-struct ParkAndGoContext {
-  ScenarioParkAndGoConfig scenario_config;
-};
+struct ParkAndGoContext;
 
-class ParkAndGoScenario : public Scenario {
+class ParkAndGoStageCruise : public Stage {
  public:
-  ParkAndGoScenario(const ScenarioConfig& config,
-                    const ScenarioContext* context)
-      : Scenario(config, context) {}
+  explicit ParkAndGoStageCruise(const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
 
-  void Init() override;
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame) override;
 
-  std::unique_ptr<Stage> CreateStage(
-      const ScenarioConfig::StageConfig& stage_config) override;
+  ParkAndGoContext* GetContext() {
+    return Stage::GetContextAs<ParkAndGoContext>();
+  }
 
-  ParkAndGoContext* GetContext() { return &context_; }
-
- private:
-  static void RegisterStages();
-  bool GetScenarioConfig();
+  Stage::StageStatus FinishStage();
 
  private:
-  static apollo::common::util::Factory<
-      ScenarioConfig::StageType, Stage,
-      Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
-      s_stage_factory_;
-  bool init_ = false;
-  ParkAndGoContext context_;
+  ScenarioParkAndGoConfig scenario_config_;
 };
 
 }  // namespace park_and_go
