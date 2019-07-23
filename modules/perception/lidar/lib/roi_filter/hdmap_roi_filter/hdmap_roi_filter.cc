@@ -113,9 +113,9 @@ bool HdmapROIFilter::Filter(const ROIFilterOptions& options,
   if (ret) {
     for (auto index : frame->roi_indices.indices) {
       frame->cloud->mutable_points_label()->at(index) =
-                    static_cast<uint8_t>(LidarPointLabel::ROI);
+          static_cast<uint8_t>(LidarPointLabel::ROI);
       frame->world_cloud->mutable_points_label()->at(index) =
-                    static_cast<uint8_t>(LidarPointLabel::ROI);
+          static_cast<uint8_t>(LidarPointLabel::ROI);
     }
   }
 
@@ -178,8 +178,8 @@ bool HdmapROIFilter::FilterWithPolygonMask(
   }
   bitmap_.SetUp(major_dir);
 
-  return DrawPolygonsMask<double>(raw_polygons, &bitmap_,
-                                  extend_dist_, no_edge_table_) &&
+  return DrawPolygonsMask<double>(raw_polygons, &bitmap_, extend_dist_,
+                                  no_edge_table_) &&
          Bitmap2dFilter(cloud, bitmap_, roi_indices);
 }
 

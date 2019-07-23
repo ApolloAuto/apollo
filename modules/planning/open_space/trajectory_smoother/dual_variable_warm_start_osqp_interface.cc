@@ -72,8 +72,8 @@ DualVariableWarmStartOSQPInterface::DualVariableWarmStartOSQPInterface(
           .min_safety_distance();
   check_mode_ =
       planner_open_space_config.dual_variable_warm_start_config().debug_osqp();
-  osqp_config_ = planner_open_space_config.
-      dual_variable_warm_start_config().osqp_config();
+  osqp_config_ =
+      planner_open_space_config.dual_variable_warm_start_config().osqp_config();
 }
 
 void printMatrix(const int r, const int c, const std::vector<c_float>& P_data,

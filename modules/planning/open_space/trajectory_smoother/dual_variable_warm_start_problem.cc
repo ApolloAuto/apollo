@@ -65,7 +65,7 @@ bool DualVariableWarmStartProblem::Solve(
       solver_flag = false;
     }
   } else if (planner_open_space_config_.dual_variable_warm_start_config()
-          .qp_format() == SLACKQP) {
+                 .qp_format() == SLACKQP) {
     DualVariableWarmStartSlackOSQPInterface ptop =
         DualVariableWarmStartSlackOSQPInterface(
             horizon, ts, ego, obstacles_edges_num, obstacles_num, obstacles_A,
