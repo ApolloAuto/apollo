@@ -31,11 +31,11 @@ namespace planning {
 
 DualVariableWarmStartSlackOSQPInterface::
     DualVariableWarmStartSlackOSQPInterface(
-    size_t horizon, double ts, const Eigen::MatrixXd& ego,
-    const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
-    const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-    const Eigen::MatrixXd& xWS,
-    const PlannerOpenSpaceConfig& planner_open_space_config)
+        size_t horizon, double ts, const Eigen::MatrixXd& ego,
+        const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
+        const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
+        const Eigen::MatrixXd& xWS,
+        const PlannerOpenSpaceConfig& planner_open_space_config)
     : ts_(ts),
       ego_(ego),
       obstacles_edges_num_(obstacles_edges_num),
@@ -78,14 +78,13 @@ DualVariableWarmStartSlackOSQPInterface::
   check_mode_ =
       planner_open_space_config.dual_variable_warm_start_config().debug_osqp();
   beta_ = planner_open_space_config.dual_variable_warm_start_config().beta();
-  osqp_config_ = planner_open_space_config.
-      dual_variable_warm_start_config().osqp_config();
+  osqp_config_ =
+      planner_open_space_config.dual_variable_warm_start_config().osqp_config();
 }
 
 void DualVariableWarmStartSlackOSQPInterface::printMatrix(
     const int r, const int c, const std::vector<c_float>& P_data,
-    const std::vector<c_int>& P_indices,
-    const std::vector<c_int>& P_indptr) {
+    const std::vector<c_int>& P_indices, const std::vector<c_int>& P_indptr) {
   Eigen::MatrixXf tmp = Eigen::MatrixXf::Zero(r, c);
 
   for (size_t i = 0; i < P_indptr.size() - 1; ++i) {
@@ -138,8 +137,8 @@ bool DualVariableWarmStartSlackOSQPInterface::optimize() {
   assembleP(&P_data, &P_indices, &P_indptr);
   if (check_mode_) {
     AINFO << "print P_data in whole: ";
-    printMatrix(num_of_variables_, num_of_variables_,
-        P_data, P_indices, P_indptr);
+    printMatrix(num_of_variables_, num_of_variables_, P_data, P_indices,
+                P_indptr);
   }
   // assemble q, linear term in objective, \sum{beta * slacks}
   c_float q[num_of_variables_];  // NOLINT
@@ -157,10 +156,10 @@ bool DualVariableWarmStartSlackOSQPInterface::optimize() {
   assembleConstraint(&A_data, &A_indices, &A_indptr);
   if (check_mode_) {
     AINFO << "print A_data in whole: ";
-    printMatrix(
-        num_of_constraints_, num_of_variables_, A_data, A_indices, A_indptr);
-    assembleA(
-        num_of_constraints_, num_of_variables_, A_data, A_indices, A_indptr);
+    printMatrix(num_of_constraints_, num_of_variables_, A_data, A_indices,
+                A_indptr);
+    assembleA(num_of_constraints_, num_of_variables_, A_data, A_indices,
+              A_indptr);
   }
 
   // assemble lb & ub, slack_variable <= 0
