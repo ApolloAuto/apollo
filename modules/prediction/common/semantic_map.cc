@@ -41,6 +41,7 @@ SemanticMap::SemanticMap() {}
 void SemanticMap::Init() {
   curr_base_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
   curr_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
+  obstacle_id_history_map_.clear();
 }
 
 void SemanticMap::RunCurrFrame(
@@ -50,14 +51,13 @@ void SemanticMap::RunCurrFrame(
     return;
   }
 
-  obstacle_id_history_map_ = obstacle_id_history_map;
-  ego_feature_ = obstacle_id_history_map_.at(FLAGS_ego_vehicle_id).feature(0);
+  ego_feature_ = obstacle_id_history_map.at(FLAGS_ego_vehicle_id).feature(0);
   // TODO(all): move to somewhere else
   if (!FLAGS_enable_async_draw_base_image) {
     double x = ego_feature_.position().x();
     double y = ego_feature_.position().y();
-    curr_base_x_ = x - 100.0;
-    curr_base_y_ = y - 100.0;
+    curr_base_x_ = x - FLAGS_base_image_half_range;
+    curr_base_y_ = y - FLAGS_base_image_half_range;
     DrawBaseMap(x, y, curr_base_x_, curr_base_y_);
     base_img_.copyTo(curr_base_img_);
   } else {
@@ -74,10 +74,12 @@ void SemanticMap::RunCurrFrame(
   curr_base_img_.copyTo(curr_img_);
 
   // Draw all obstacles_history
-  for (const auto obstacle_id_history_pair : obstacle_id_history_map_) {
+  for (const auto obstacle_id_history_pair : obstacle_id_history_map) {
     DrawHistory(obstacle_id_history_pair.second, cv::Scalar(0, 255, 255),
                  curr_base_x_, curr_base_y_, &curr_img_);
   }
+
+  obstacle_id_history_map_ = obstacle_id_history_map;
 
   // Crop ego_vehicle for demo
   if (true) {
@@ -105,8 +107,8 @@ void SemanticMap::DrawBaseMap(const double x, const double y,
 void SemanticMap::DrawBaseMapThread() {
   double x = ego_feature_.position().x();
   double y = ego_feature_.position().y();
-  base_x_ = x - 100.0;
-  base_y_ = y - 100.0;
+  base_x_ = x - FLAGS_base_image_half_range;
+  base_y_ = y - FLAGS_base_image_half_range;
   DrawBaseMap(x, y, base_x_, base_y_);
 }
 

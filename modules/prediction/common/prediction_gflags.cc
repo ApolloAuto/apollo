@@ -54,6 +54,9 @@ DEFINE_double(pedestrian_nearby_lane_search_radius, 5.0,
 DEFINE_int32(road_graph_max_search_horizon, 20,
              "Maximal search depth for building road graph");
 
+// Semantic Map
+DEFINE_double(base_image_half_range, 100.0, "The half range of base image.");
+
 // Scenario
 DEFINE_double(junction_distance_threshold, 10.0,
               "Distance threshold "
