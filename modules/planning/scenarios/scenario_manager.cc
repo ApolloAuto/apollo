@@ -265,16 +265,17 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
         return ScenarioConfig::PULL_OVER;
       }
       break;
-    case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
+    case ScenarioConfig::CHANGE_LANE:
+    case ScenarioConfig::PARK_AND_GO:
+    case ScenarioConfig::PULL_OVER:
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
-    case ScenarioConfig::YIELD_SIGN_UNPROTECTED:
-    case ScenarioConfig::PULL_OVER:
     case ScenarioConfig::VALET_PARKING:
+    case ScenarioConfig::YIELD_SIGN_UNPROTECTED:
       if (current_scenario_->GetStatus() !=
           Scenario::ScenarioStatus::STATUS_DONE) {
         return current_scenario_->scenario_type();
@@ -310,6 +311,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
+    case ScenarioConfig::PARK_AND_GO:
     case ScenarioConfig::PULL_OVER:
       if (stop_sign_scenario) {
         return stop_sign_all_way ? ScenarioConfig::STOP_SIGN_PROTECTED
@@ -404,6 +406,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
+    case ScenarioConfig::PARK_AND_GO:
     case ScenarioConfig::PULL_OVER:
       if (traffic_light_scenario) {
         const auto& turn_type = reference_line_info.GetPathTurnType(
@@ -478,6 +481,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectBareIntersectionScenario(
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
+    case ScenarioConfig::PARK_AND_GO:
     case ScenarioConfig::PULL_OVER:
       if (bare_junction_scenario) {
         return ScenarioConfig::BARE_INTERSECTION_UNPROTECTED;
