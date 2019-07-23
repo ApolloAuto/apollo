@@ -29,6 +29,7 @@
 #include "modules/planning/common/util/util.h"
 #include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
+#include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
 #include "modules/planning/scenarios/park/pull_over/pull_over_scenario.h"
 #include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
 #include "modules/planning/scenarios/stop_sign/unprotected/stop_sign_unprotected_scenario.h"
@@ -58,14 +59,22 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
   std::unique_ptr<Scenario> ptr;
 
   switch (scenario_type) {
-    case ScenarioConfig::LANE_FOLLOW:
-      ptr.reset(new lane_follow::LaneFollowScenario(config_map_[scenario_type],
-                                                    &scenario_context_));
-      break;
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
       ptr.reset(
           new scenario::bare_intersection::BareIntersectionUnprotectedScenario(
               config_map_[scenario_type], &scenario_context_));
+      break;
+    case ScenarioConfig::LANE_FOLLOW:
+      ptr.reset(new lane_follow::LaneFollowScenario(config_map_[scenario_type],
+                                                    &scenario_context_));
+      break;
+    case ScenarioConfig::PARK_AND_GO:
+      ptr.reset(new scenario::park_and_go::ParkAndGoScenario(
+          config_map_[scenario_type], &scenario_context_));
+      break;
+    case ScenarioConfig::PULL_OVER:
+      ptr.reset(new scenario::pull_over::PullOverScenario(
+          config_map_[scenario_type], &scenario_context_));
       break;
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
       ptr.reset(new scenario::stop_sign::StopSignUnprotectedScenario(
@@ -84,10 +93,6 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
       ptr.reset(
           new scenario::traffic_light::TrafficLightUnprotectedRightTurnScenario(
               config_map_[scenario_type], &scenario_context_));
-      break;
-    case ScenarioConfig::PULL_OVER:
-      ptr.reset(new scenario::pull_over::PullOverScenario(
-          config_map_[scenario_type], &scenario_context_));
       break;
     case ScenarioConfig::VALET_PARKING:
       ptr.reset(new scenario::valet_parking::ValetParkingScenario(
@@ -113,6 +118,14 @@ void ScenarioManager::RegisterScenarios() {
       FLAGS_scenario_bare_intersection_unprotected_config_file,
       &config_map_[ScenarioConfig::BARE_INTERSECTION_UNPROTECTED]));
 
+  // park_and_go
+  CHECK(Scenario::LoadConfig(FLAGS_scenario_park_and_go_config_file,
+                             &config_map_[ScenarioConfig::PARK_AND_GO]));
+
+  // pull_over
+  CHECK(Scenario::LoadConfig(FLAGS_scenario_pull_over_config_file,
+                             &config_map_[ScenarioConfig::PULL_OVER]));
+
   // stop_sign
   CHECK(Scenario::LoadConfig(
       FLAGS_scenario_stop_sign_unprotected_config_file,
@@ -128,10 +141,6 @@ void ScenarioManager::RegisterScenarios() {
   CHECK(Scenario::LoadConfig(
       FLAGS_scenario_traffic_light_unprotected_right_turn_config_file,
       &config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN]));
-
-  // pull_over
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_pull_over_config_file,
-                             &config_map_[ScenarioConfig::PULL_OVER]));
 
   // valet parking
   CHECK(Scenario::LoadConfig(FLAGS_scenario_valet_parking_config_file,
