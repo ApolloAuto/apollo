@@ -40,6 +40,7 @@ SemanticMap::SemanticMap() {}
 
 void SemanticMap::Init() {
   curr_base_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
+  curr_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
 }
 
 void SemanticMap::RunCurrFrame(
@@ -48,6 +49,7 @@ void SemanticMap::RunCurrFrame(
       obstacle_id_history_map.end()) {
     return;
   }
+
   obstacle_id_history_map_ = obstacle_id_history_map;
   ego_feature_ = obstacle_id_history_map_.at(FLAGS_ego_vehicle_id).feature(0);
   // TODO(all): move to somewhere else
@@ -65,14 +67,20 @@ void SemanticMap::RunCurrFrame(
     task_future_ = cyber::Async(&SemanticMap::DrawBaseMapThread, this);
   }
 
+  if (!base_img_drawn_) {
+    return;
+  }
+
+  curr_base_img_.copyTo(curr_img_);
+
   // Draw all obstacles_history
   for (const auto obstacle_id_history_pair : obstacle_id_history_map_) {
     DrawHistory(obstacle_id_history_pair.second, cv::Scalar(0, 255, 255),
-                 curr_base_x_, curr_base_y_, &curr_base_img_);
+                 curr_base_x_, curr_base_y_, &curr_img_);
   }
 
   // Crop ego_vehicle for demo
-  if (false) {
+  if (true) {
     cv::Mat output_img;
     if (GetMapById(FLAGS_ego_vehicle_id, &output_img)) {
       cv::namedWindow("Demo window", cv::WINDOW_NORMAL);
@@ -84,12 +92,14 @@ void SemanticMap::RunCurrFrame(
 
 void SemanticMap::DrawBaseMap(const double x, const double y,
                               const double base_x, const double base_y) {
+  base_img_drawn_ = false;
   base_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
   common::PointENU center_point = common::util::MakePointENU(x, y, 0.0);
   DrawRoads(center_point, base_x, base_y);
   DrawJunctions(center_point, base_x, base_y);
   DrawCrosswalks(center_point, base_x, base_y);
   DrawLanes(center_point, base_x, base_y);
+  base_img_drawn_ = true;
 }
 
 void SemanticMap::DrawBaseMapThread() {
@@ -113,7 +123,7 @@ void SemanticMap::DrawRoads(const common::PointENU& center_point,
           for (const auto& segment : edge.curve().segment()) {
             for (const auto& point : segment.line_segment().point()) {
               polygon.push_back(std::move(GetTransPoint(point.x(), point.y(),
-                                                         base_x, base_y)));
+                                                        base_x, base_y)));
             }
           }
         } else if (edge.type() == 3) {  // right edge
@@ -326,12 +336,12 @@ cv::Mat SemanticMap::CropArea(const cv::Mat& input_img,
 cv::Mat SemanticMap::CropByHistory(const ObstacleHistory& history,
                                    const cv::Scalar& color,
                                    const double base_x, const double base_y) {
-  cv::Mat feature_map = curr_base_img_.clone();
+  cv::Mat feature_map = curr_img_.clone();
   DrawHistory(history, color, base_x, base_y, &feature_map);
   const Feature& curr_feature = history.feature(0);
   cv::Point2i center_point =
       GetTransPoint(curr_feature.position().x(), curr_feature.position().y(),
-                     base_x, base_y);
+                    base_x, base_y);
   return CropArea(feature_map, center_point, curr_feature.theta());
 }
 
