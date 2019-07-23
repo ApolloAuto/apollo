@@ -1,5 +1,5 @@
-# Bridge Header Protocal
-This document provides the details about bridge header protocal.
+# Bridge Header Protocol
+This document provides the details about bridge header protocol.
 
 ## Introduction
 Bridge is responsible for forwarding the proto message specified in Apollo to the external module in UDP mode, and receiving the proto message from the external module.
