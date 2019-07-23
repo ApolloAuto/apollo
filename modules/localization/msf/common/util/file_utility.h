@@ -34,18 +34,18 @@ namespace msf {
 
 class FileUtility {
  public:
-  static const size_t UCHAR_MD5LENTH = 16;
-  static const size_t CHAR_MD5LENTH = 33;
+  static const size_t kUcharMd5Length = 16;
+  static const size_t kCharMd5Lenth = 33;
   /**@brief Compute file md5 given a file path. */
   static void ComputeFileMd5(const std::string& file_path,
-                             unsigned char res[UCHAR_MD5LENTH]);
+                             unsigned char res[kUcharMd5Length]);
   static void ComputeFileMd5(const std::string& file_path,
-                             char res[CHAR_MD5LENTH]);
+                             char res[kCharMd5Lenth]);
   /**@brief Compute file md5 given a binary chunk. */
   static void ComputeBinaryMd5(const unsigned char* binary, size_t size,
-                               unsigned char res[UCHAR_MD5LENTH]);
+                               unsigned char res[kUcharMd5Length]);
   static void ComputeBinaryMd5(const unsigned char* binary, size_t size,
-                               char res[CHAR_MD5LENTH]);
+                               char res[kCharMd5Lenth]);
 };
 
 }  // namespace msf

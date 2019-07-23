@@ -27,6 +27,7 @@ cc_library(
     deps = [
         "//modules/common",
         "@eigen",
+        "@glog",
         "@fastrtps",
     ],
 )
