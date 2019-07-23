@@ -3,14 +3,6 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "park_and_go",
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
-    deps = [
-        ":park_and_go_scenario",
-    ],
-)
-
-cc_library(
     name = "park_and_go_scenario",
     srcs = [
         "park_and_go_scenario.cc",
@@ -46,7 +38,7 @@ cc_test(
         "//modules/planning:planning_conf",
     ],
     deps = [
-        ":park_and_go",
+        ":park_and_go_scenario",
         "@gtest//:main",
     ],
 )
@@ -61,7 +53,7 @@ cc_test(
         "//modules/planning:planning_conf",
     ],
     deps = [
-        ":park_and_go",
+        ":park_and_go_scenario",
         "@gtest//:main",
     ],
 )
