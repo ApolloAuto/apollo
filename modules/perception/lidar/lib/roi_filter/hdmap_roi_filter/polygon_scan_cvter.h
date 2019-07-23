@@ -319,7 +319,7 @@ void PolygonScanCvter<T>::ParsePolygon(const DirectionMajor dir_major,
     segments.push_back(line_seg);
     std::abs(x_diff) < s_epsilon_ ? ks.push_back(s_inf_)
                                   : ks.push_back(y_diff / x_diff);
-    double pre_x_diff = x - pre_x;
+    double pre_x_diff = pre_x - x;
 
     // get singular property
     // ensure fill edge
@@ -327,7 +327,7 @@ void PolygonScanCvter<T>::ParsePolygon(const DirectionMajor dir_major,
     if (std::abs(x_diff) < s_epsilon_ || std::abs(pre_x_diff) < s_epsilon_) {
       is_singular.push_back(true);
     } else {
-      pre_x_diff * x_diff < 0 ? is_singular.push_back(true)
+      pre_x_diff * x_diff > 0 ? is_singular.push_back(true)
                               : is_singular.push_back(false);
     }
   }
