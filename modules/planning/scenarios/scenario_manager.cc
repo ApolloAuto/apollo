@@ -499,12 +499,22 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectValetParkingScenario(
   const auto& scenario_config =
       config_map_[ScenarioConfig::VALET_PARKING].valet_parking_config();
 
-  // TODO(All) triger valet parking by route message definition as of now
+  // TODO(All) trigger valet parking by route message definition as of now
   double parking_spot_range_to_start =
       scenario_config.parking_spot_range_to_start();
   if (scenario::valet_parking::ValetParkingScenario::IsTransferable(
           frame, parking_spot_range_to_start)) {
     return ScenarioConfig::VALET_PARKING;
+  }
+
+  return default_scenario_type_;
+}
+
+ScenarioConfig::ScenarioType ScenarioManager::SelectParkAndGoScenario(
+    const Frame& frame) {
+  // TODO(all)
+  if (0) {
+    return ScenarioConfig::PARK_AND_GO;
   }
 
   return default_scenario_type_;
@@ -586,6 +596,7 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
     case ScenarioConfig::PULL_OVER:
       break;
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
+    case ScenarioConfig::PARK_AND_GO:
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
@@ -600,6 +611,14 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
       break;
     default:
       break;
+  }
+
+  ////////////////////////////////////////
+  // ParkAndGo / starting scenario
+  if (scenario_type == default_scenario_type_) {
+    if (FLAGS_enable_scenario_park_and_go) {
+      scenario_type = SelectParkAndGoScenario(frame);
+    }
   }
 
   ////////////////////////////////////////
