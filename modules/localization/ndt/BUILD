@@ -15,11 +15,6 @@ cc_library(
         "ndt_localization_component.h",
     ],
     copts = ["-DMODULE_NAME=\\\"NDTlocalization\\\""],
-    linkopts = [
-        "-lboost_filesystem",
-        "-lboost_system",
-        "-lboost_program_options",
-    ],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
@@ -38,6 +33,7 @@ cc_library(
         "//modules/localization/proto:localization_proto",
         "//modules/transform:tf2_buffer_lib",
         "//modules/transform:transform_broadcaster_lib",
+        "@boost",
         "@eigen",
         "@glog",
         "@yaml_cpp//:yaml",

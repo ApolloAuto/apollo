@@ -56,6 +56,9 @@ cc_test(
     timeout = "short",
     srcs = ["ndt_solver_test.cc"],
     data = [":ndt_lidar_locator_test_data"],
+    linkopts = [
+        "-llz4",
+    ],
     deps = [
         "//cyber",
         "//modules/localization/msf/common/io:localization_msf_common_io",
