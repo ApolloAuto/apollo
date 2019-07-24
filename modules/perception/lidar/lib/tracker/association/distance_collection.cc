@@ -59,7 +59,7 @@ float LocationDistance(const TrackedObjectConstPtr& last_object,
                 ref_dir(1) * measure_predict_diff(1);
     double dy = ref_o_dir(0) * measure_predict_diff(0) +
                 ref_o_dir(1) * measure_predict_diff(1);
-    location_dist = static_cast<float>(sqrt(dx * dx * 0.5 + dy * dy * 2));
+    location_dist = static_cast<float>(sqrt(dx * dx + dy * dy));
   }
 
   return location_dist;
