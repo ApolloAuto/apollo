@@ -257,8 +257,8 @@ bool DualVariableWarmStartSlackOSQPInterface::optimize() {
     int r_index = 0;
     for (int j = 0; j < obstacles_num_; ++j) {
       for (int k = 0; k < obstacles_edges_num_(j, 0); ++k) {
-        l_warm_up_(r_index, i) = lambda_norm[i * obstacles_num_ + j]
-            * work->solution->x[variable_index];
+        l_warm_up_(r_index, i) = lambda_norm[i * obstacles_num_ + j] *
+                                 work->solution->x[variable_index];
         ++variable_index;
         ++r_index;
       }
@@ -270,8 +270,8 @@ bool DualVariableWarmStartSlackOSQPInterface::optimize() {
     int r_index = 0;
     for (int j = 0; j < obstacles_num_; ++j) {
       for (int k = 0; k < 4; ++k) {
-        n_warm_up_(r_index, i) = lambda_norm[i * obstacles_num_ + j]
-            * work->solution->x[variable_index];
+        n_warm_up_(r_index, i) = lambda_norm[i * obstacles_num_ + j] *
+                                 work->solution->x[variable_index];
         ++r_index;
         ++variable_index;
       }
@@ -281,8 +281,8 @@ bool DualVariableWarmStartSlackOSQPInterface::optimize() {
   // 3. slack variables
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < obstacles_num_; ++j) {
-      slacks_(j, i) = lambda_norm[i * obstacles_num_ + j]
-          * work->solution->x[variable_index];
+      slacks_(j, i) = lambda_norm[i * obstacles_num_ + j] *
+                      work->solution->x[variable_index];
       ++variable_index;
     }
   }

@@ -93,7 +93,6 @@ DEFINE_bool(enable_scenario_traffic_light, true,
 DEFINE_bool(enable_force_pull_over_open_space_parking_test, false,
             "enable force_pull_over_open_space_parking_test");
 
-
 DEFINE_string(traffic_rule_config_filename,
               "/apollo/modules/planning/conf/traffic_rule_config.pb.txt",
               "Traffic rule config filename");
