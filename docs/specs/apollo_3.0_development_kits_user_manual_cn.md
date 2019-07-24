@@ -241,6 +241,8 @@ d.CAN卡驱动esdcan-pcie402.ko可以在/lib/modules/4.4.32-apollo-2-RT/extra/�
 
 ### 编译Apollo源代码
 
+![warning_icon](images/warning_icon.png)**WARNING**：在本模块及以下的操作中，如非本文档或操作系统要求，禁用一切`sudo`操作，切记！
+
 a.获取Apollo源代码
 可以在github上下载，在终端中输入以下命令：
 ```
@@ -354,7 +356,7 @@ rosbag play -l docs/demo_guide/demo_2.0.bag
 执行如下步骤将主机和天线连接到Apollo系统：
 
 - 将两根射频线的TNC公头连接上卫星天线的TNC母口
-- 将射频线的SMA母口连接上主机的SMA公口
+- 将射频线的SMA母口连接上IMU主机的SMA公口，车尾天线为主天线，将其连接在IMU的Primary接口上
 - 将数据/电源线缆的公口和主机的母口连接
 - 将数据/电源线缆的串口母头连接上IPC的串口公口
 - 将数据/电源线缆的网线母头和有线网的水晶头相连接
@@ -487,7 +489,6 @@ log com3 gprmc ontime 1 0.25
  - 分别执行如下指令，确认以下的`topic`都能正常输出数据：
  
 ```
-rostopic echo /apollo/sensor/camera/obstacle/front_6mm
 rostopic echo /apollo/sensor/camera/traffic/image_long
 rostopic echo /apollo/sensor/camera/traffic/image_short
 ```
@@ -519,7 +520,7 @@ rostopic echo /apollo/sensor/camera/traffic/image_short
  
 ### 毫米波雷达的配置及启动
 
- - 传感器参数的配置：该传感器配置文件位于`/apollo/modules/drivers/radar/conti_radar_conf/`目录下的`conti_radar.conf`和`conti_radar_conf.pb.txt`文件中，可根据实际情况进行配置。
+ - 传感器参数的配置：该传感器配置文件位于`/apollo/modules/drivers/radar/conti_radar/conf/`目录下的`conti_radar.conf`和`conti_radar_conf.pb.txt`文件中，可根据实际情况进行配置。
  
  - 正确启动Apollo及DreamView，选择车辆型号及运行模式，并打开`Radar`模块开关，如下图所示：
  
