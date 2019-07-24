@@ -11,9 +11,6 @@ cc_library(
         "-DMODULE_NAME=\\\"localization\\\"",
     ],
     linkopts = [
-        "-lboost_system",
-        "-lboost_thread",
-        "-lboost_program_options",
         "-lopencv_core",
         "-lopencv_highgui",
         "-lopencv_imgproc",
@@ -37,6 +34,7 @@ cc_library(
         "//modules/localization/proto:measure_proto",
         "//modules/localization/proto:pose_proto",
         "//modules/localization/proto:sins_pva_proto",
+        "@boost",
         "@eigen",
         "@glog",
         "@local_integ",
