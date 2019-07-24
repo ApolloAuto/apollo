@@ -18,9 +18,6 @@ cc_library(
         "-DENABLE_DEBUG_LIB",
         "-DENABLE_OPENCV",
     ],
-    linkopts = [
-        "-lboost_system",
-    ],
     deps = [
         "//cyber",
         "//modules/common",
@@ -46,6 +43,7 @@ cc_library(
         "//modules/localization/proto:measure_proto",
         "//modules/localization/proto:sins_pva_proto",
         "//modules/transform:transform_broadcaster_lib",
+        "@boost",
         "@glog",
         "@gtest",
         "@yaml_cpp//:yaml",
