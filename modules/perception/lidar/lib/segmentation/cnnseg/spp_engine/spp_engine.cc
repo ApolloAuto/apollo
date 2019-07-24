@@ -132,14 +132,14 @@ size_t SppEngine::ProcessForegroundSegmentation(
 size_t SppEngine::RemoveGroundPointsInForegroundCluster(
     const base::PointFCloudConstPtr full_point_cloud,
     const base::PointIndices& roi_indices,
-    const base::PointIndices& roi_non_ground_indices) {
+    const base::PointIndices& non_ground_indices) {
   mask_.Set(full_point_cloud->size(), 0);
-  mask_.AddIndices(roi_indices);
-  mask_.RemoveIndicesOfIndices(roi_indices, roi_non_ground_indices);
-  mask_.Flip();
-  // at this time, all ground points has mask value 0
+  mask_.AddIndices(roi_indices, non_ground_indices);
+  // at this time, all non roi points or ground points has mask value 0
   for (size_t i = 0; i < clusters_.size(); ++i) {
     clusters_[static_cast<int>(i)]->RemovePoints(mask_);
+    clusters_[static_cast<int>(i)]->points_in_roi =
+      clusters_[static_cast<int>(i)]->points.size();
   }
   clusters_.RemoveEmptyClusters();
   return clusters_.size();
