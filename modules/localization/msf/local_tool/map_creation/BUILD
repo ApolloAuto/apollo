@@ -8,9 +8,7 @@ cc_binary(
         "lossless_map_creator.cc",
     ],
     linkopts = [
-        "-lboost_filesystem",
-        "-lboost_system",
-        "-lboost_program_options",
+        "-llz4",
     ],
     linkstatic = 0,
     deps = [
@@ -19,6 +17,7 @@ cc_binary(
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
         "//modules/localization/msf/local_map/lossless_map:localization_msf_lossless_map",
+        "@boost",
         "@eigen",
     ],
 )
@@ -28,11 +27,6 @@ cc_binary(
     srcs = [
         "lossless_map_to_lossy_map.cc",
     ],
-    linkopts = [
-        "-lboost_filesystem",
-        "-lboost_system",
-        "-lboost_program_options",
-    ],
     linkstatic = 0,
     deps = [
         "//cyber",
@@ -41,6 +35,7 @@ cc_binary(
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
         "//modules/localization/msf/local_map/lossless_map:localization_msf_lossless_map",
         "//modules/localization/msf/local_map/lossy_map:localization_msf_lossy_map",
+        "@boost",
         "@eigen",
     ],
 )
@@ -50,14 +45,10 @@ cc_binary(
     srcs = [
         "poses_interpolator.cc",
     ],
-    linkopts = [
-        "-lboost_filesystem",
-        "-lboost_system",
-        "-lboost_program_options",
-    ],
     linkstatic = 0,
     deps = [
         "//modules/localization/msf/local_tool/map_creation/poses_interpolation:poses_interpolation_lib",
+        "@boost",
         "@eigen",
     ],
 )
