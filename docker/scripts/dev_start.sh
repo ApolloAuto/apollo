@@ -268,7 +268,7 @@ function main(){
     PADDLE_VOLUME=apollo_paddlepaddle_volume_$USER
     docker stop ${PADDLE_VOLUME} > /dev/null 2>&1
 
-    PADDLE_VOLUME_IMAGE=${DOCKER_REPO}:paddlepaddle_volume-${ARCH}-latest
+    PADDLE_VOLUME_IMAGE=${DOCKER_REPO}:paddlepaddle_volume-${ARCH}-2.0.0
     docker pull ${PADDLE_VOLUME_IMAGE}
     docker run -it -d --rm --name ${PADDLE_VOLUME} ${PADDLE_VOLUME_IMAGE}
 
