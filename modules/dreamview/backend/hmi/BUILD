@@ -61,9 +61,6 @@ cc_library(
     srcs = ["hmi_worker.cc"],
     hdrs = ["hmi_worker.h"],
     copts = ['-DMODULE_NAME=\\"dreamview\\"'],
-    linkopts = [
-        "-lboost_thread",
-    ],
     deps = [
         ":vehicle_manager",
         "//cyber",
@@ -79,6 +76,7 @@ cc_library(
         "//modules/dreamview/proto:hmi_config_proto",
         "//modules/dreamview/proto:hmi_mode_proto",
         "//modules/dreamview/proto:hmi_status_proto",
+        "@boost",
         "@com_google_protobuf//:protobuf",
     ],
 )
