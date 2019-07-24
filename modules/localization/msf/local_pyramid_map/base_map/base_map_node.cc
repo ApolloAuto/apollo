@@ -14,18 +14,20 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/localization/msf/local_map/base_map/base_map_node.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_node.h"
 
 #include <cstdio>
+#include <memory>
 #include <string>
 #include <vector>
 #include "cyber/common/file.h"
 #include "modules/localization/msf/common/util/file_utility.h"
-#include "modules/localization/msf/local_map/base_map/base_map_matrix.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_matrix.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 BaseMapNode::BaseMapNode()
     : map_config_(NULL),
@@ -517,6 +519,7 @@ bool BaseMapNode::SaveAltitudeImage(const std::string& path) const {
   return success;
 }
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

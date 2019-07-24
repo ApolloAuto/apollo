@@ -20,11 +20,12 @@
 #include <set>
 #include "boost/thread.hpp"
 #include "cyber/task/task.h"
-#include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_fwd.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 /**@brief The memory pool for the data structure of BaseMapNode. */
 class BaseMapNodePool {
@@ -87,6 +88,7 @@ class BaseMapNodePool {
   const BaseMapConfig* map_config_ = nullptr;
 };
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

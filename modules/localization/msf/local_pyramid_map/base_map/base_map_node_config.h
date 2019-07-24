@@ -15,12 +15,14 @@
  *****************************************************************************/
 #pragma once
 
-#include "modules/localization/msf/local_map/base_map/base_map_config.h"
-#include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
+#include <memory>
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_node_index.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 #define MD5LENTH 16
 
@@ -55,6 +57,7 @@ class BaseMapNodeConfig {
   bool has_body_md5_ = true;
 };
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
