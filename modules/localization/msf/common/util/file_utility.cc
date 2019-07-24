@@ -23,8 +23,8 @@
 #undef BOOST_NO_CXX11_SCOPED_ENUMS
 #include <algorithm>
 #include <iostream>
-#include "fastrtps/TopicDataType.h"
 #include "cyber/common/log.h"
+#include "fastrtps/TopicDataType.h"
 
 namespace apollo {
 namespace localization {

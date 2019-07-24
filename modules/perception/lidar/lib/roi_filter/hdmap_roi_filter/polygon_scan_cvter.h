@@ -327,8 +327,8 @@ void PolygonScanCvter<T>::ParsePolygon(const DirectionMajor dir_major,
     if (std::abs(x_diff) < s_epsilon_ || std::abs(pre_x_diff) < s_epsilon_) {
       is_singular.push_back(true);
     } else {
-      pre_x_diff * x_diff > 0 ? is_singular.push_back(true)
-                              : is_singular.push_back(false);
+      pre_x_diff* x_diff > 0 ? is_singular.push_back(true)
+                             : is_singular.push_back(false);
     }
   }
 }

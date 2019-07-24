@@ -41,9 +41,7 @@ class ReLUPlugin : public nvinfer1::IPlugin {
   ~ReLUPlugin() {}
   virtual int initialize() { return 0; }
   virtual void terminate() {}
-  int getNbOutputs() const override {
-    return 1;
-  }
+  int getNbOutputs() const override { return 1; }
 
   nvinfer1::Dims getOutputDimensions(int index, const nvinfer1::Dims *inputs,
                                      int nbInputDims) override {
