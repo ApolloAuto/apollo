@@ -12,6 +12,7 @@ cc_binary(
     data = [
         ":frontend",
     ],
+    linkopts = [ "-lopencv_imgcodecs" ],
     deps = [
         "//modules/dreamview/backend",
     ],
