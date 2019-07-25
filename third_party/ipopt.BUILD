@@ -4,14 +4,14 @@ licenses(["notice"])
 
 cc_library(
     name = "ipopt",
-    copts = ["-fPIC"],
     includes = ["."],
+    copts = [ "-fPIC"],
     linkopts = [
         "-L/usr/local/ipopt/lib -lipopt",
         "-L/usr/local/ipopt/lib -lcoinmumps",
         "-lblas",
         "-llapack",
         "-ldl",
-        "-lgfortran",
+        "-L/usr/lib/gcc/x86_64-linux-gnu/7/ -lgfortran",
     ],
 )
