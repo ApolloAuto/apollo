@@ -7,18 +7,13 @@ cc_binary(
     srcs = [
         "obstacle_detection.cc",
     ],
-    linkopts = [
-        "-lboost_system",
-        "-lopencv_core",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
-    ],
-    linkstatic = False,
     deps = [
         "//modules/perception/base",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/common/io:io_util",
+        "@boost",
         "@gtest",
+        "@opencv",
     ],
 )
 
