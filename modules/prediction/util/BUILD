@@ -12,11 +12,9 @@ cc_library(
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
-    linkopts = [
-        "-lboost_filesystem",
-    ],
     deps = [
         "//cyber",
+        "@boost",
     ],
 )
 
