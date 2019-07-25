@@ -10,11 +10,9 @@ cc_library(
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
-    linkopts = [
-        "-lboost_thread",
-    ],
     deps = [
         "//modules/common/util:map_util",
+        "@boost",
     ],
 )
 
@@ -24,12 +22,10 @@ cc_test(
     srcs = [
         "indexed_list_test.cc",
     ],
-    linkopts = [
-        "-lboost_system",
-    ],
     deps = [
         ":indexed_list",
         "//modules/common/util",
+        "@boost",
         "@gtest//:main",
     ],
 )
@@ -97,13 +93,11 @@ cc_test(
     data = [
         "//modules/planning/common:common_testdata",
     ],
-    linkopts = [
-        "-lboost_system",
-    ],
     deps = [
         ":obstacle",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
+        "@boost",
         "@gtest//:main",
     ],
 )
@@ -471,11 +465,9 @@ cc_test(
     srcs = [
         "open_space_info_test.cc",
     ],
-    linkopts = [
-        "-lboost_system",
-    ],
     deps = [
         "open_space_info",
+        "@boost",
         "@gtest//:main",
     ],
 )
