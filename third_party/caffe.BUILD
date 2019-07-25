@@ -15,8 +15,6 @@ cc_library(
         "-lpthread",
         "-lblas",
         "-lcblas",
-        "-lhdf5_hl",
-        "-lhdf5",
         "-lz",
         "-ldl",
         "-lm",
