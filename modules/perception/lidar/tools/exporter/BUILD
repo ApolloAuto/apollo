@@ -15,6 +15,7 @@ cc_library(
         "//modules/perception/lidar/common:pcl_util",
         "//modules/perception/onboard/transform_wrapper",
         "//modules/transform/proto:transform_proto",
+        "@opencv",
     ],
 )
 

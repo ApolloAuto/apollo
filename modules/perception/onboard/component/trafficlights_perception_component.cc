@@ -971,7 +971,7 @@ void TrafficLightsPerceptionComponent::Visualize(
     const camera::CameraFrame& frame,
     const std::vector<base::TrafficLightPtr>& lights) const {
   char str[100];
-  cv::string tl_string;
+  std::string tl_string;
   cv::Scalar tl_color;
 
   if (lights.empty()) {
