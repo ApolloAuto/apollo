@@ -6,11 +6,13 @@ cc_library(
     name = "caffe_net_lib",
     srcs = ["caffe_net.cc"],
     hdrs = ["caffe_net.h"],
-    linkopts = ["-lopencv_core -lnvinfer_plugin -lboost_system -lopencv_imgproc -lopencv_highgui"],
+    linkopts = ["-lnvinfer_plugin"],
     deps = [
         "//modules/perception/inference:inference_lib",
+        "@boost",
         "@caffe",
         "@com_google_protobuf//:protobuf",
+        "@opencv",
     ],
 )
 
