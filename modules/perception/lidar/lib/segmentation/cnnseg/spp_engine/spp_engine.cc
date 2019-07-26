@@ -139,7 +139,7 @@ size_t SppEngine::RemoveGroundPointsInForegroundCluster(
   for (size_t i = 0; i < clusters_.size(); ++i) {
     clusters_[static_cast<int>(i)]->RemovePoints(mask_);
     clusters_[static_cast<int>(i)]->points_in_roi =
-      clusters_[static_cast<int>(i)]->points.size();
+        clusters_[static_cast<int>(i)]->points.size();
   }
   clusters_.RemoveEmptyClusters();
   return clusters_.size();
