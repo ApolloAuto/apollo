@@ -184,15 +184,22 @@ fi
 
 IMG=${DOCKER_REPO}:$VERSION
 
+
 function local_volumes() {
-    set +x
     # Apollo root and bazel cache dirs are required.
     volumes="-v $APOLLO_ROOT_DIR:/apollo \
              -v $HOME/.cache:${DOCKER_HOME}/.cache"
     case "$(uname -s)" in
         Linux)
-            volumes="${volumes} -v /dev:/dev \
-                                -v /media:/media \
+            case "$(lsb_release -r | cut -f2)" in
+                14.04)
+                    volumes="${volumes} "
+                    ;;
+                *)
+                    volumes="${volumes} -v /dev:/dev "
+                    ;;
+            esac
+            volumes="${volumes} -v /media:/media \
                                 -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
                                 -v /etc/localtime:/etc/localtime:ro \
                                 -v /usr/src:/usr/src \
@@ -204,8 +211,8 @@ function local_volumes() {
             ;;
     esac
     echo "${volumes}"
-    set -x
 }
+
 
 function main(){
 
