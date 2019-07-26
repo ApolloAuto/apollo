@@ -85,18 +85,12 @@ function set_lib_path() {
   if [ "$1" == "CYBER_ONLY" ]; then
     PRELOAD=""
   fi
+  export LD_LIBRARY_PATH=/usr/lib:/usr/lib/x86_64-linux-gnu
   if [ "$RELEASE_DOCKER" == 1 ]; then
     local CYBER_SETUP="/apollo/cyber/setup.bash"
     if [ -e "${CYBER_SETUP}" ]; then
       source "${CYBER_SETUP}"
     fi
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib:/usr/local/apollo/local_integ/lib
-    export LD_LIBRARY_PATH=/usr/local/adolc/lib64:$LD_LIBRARY_PATH
-    export LD_LIBRARY_PATH=/usr/local/Qt5.5.1/5.5/gcc_64/lib:$LD_LIBRARY_PATH
-    export LD_LIBRARY_PATH=/usr/local/fast-rtps/lib:$LD_LIBRARY_PATH
-    export LD_LIBRARY_PATH=/usr/local/apollo/libtorch/lib:$LD_LIBRARY_PATH
-    export LD_LIBRARY_PATH=/usr/local/apollo/libtorch_gpu/lib:$LD_LIBRARY_PATH
-    export LD_LIBRARY_PATH=/usr/local/apollo/boost/lib:$LD_LIBRARY_PATH
     PY_LIB_PATH=/apollo/lib
     PY_TOOLS_PATH=/apollo/modules/tools
   else
@@ -107,12 +101,15 @@ function set_lib_path() {
     PY_LIB_PATH=${APOLLO_ROOT_DIR}/py_proto
     PY_TOOLS_PATH=${APOLLO_ROOT_DIR}/modules/tools
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib:/apollo/bazel-genfiles/external/caffe/lib
-    export LD_LIBRARY_PATH=/usr/local/adolc/lib64:$LD_LIBRARY_PATH
-    export LD_LIBRARY_PATH=/apollo/third_party/rss/lib:$LD_LIBRARY_PATH
-    export LD_LIBRARY_PATH=/usr/local/apollo/libtorch/lib:$LD_LIBRARY_PATH
-    export LD_LIBRARY_PATH=/usr/local/apollo/libtorch_gpu/lib:$LD_LIBRARY_PATH
-    export LD_LIBRARY_PATH=/usr/local/apollo/boost/lib:$LD_LIBRARY_PATH
   fi
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/apollo/lib:/usr/local/apollo/local_integ/lib
+  export LD_LIBRARY_PATH=/usr/local/adolc/lib64:$LD_LIBRARY_PATH
+  export LD_LIBRARY_PATH=/usr/local/Qt5.5.1/5.5/gcc_64/lib:$LD_LIBRARY_PATH
+  export LD_LIBRARY_PATH=/usr/local/fast-rtps/lib:$LD_LIBRARY_PATH
+  export LD_LIBRARY_PATH=/usr/local/apollo/libtorch/lib:$LD_LIBRARY_PATH
+  export LD_LIBRARY_PATH=/usr/local/apollo/libtorch_gpu/lib:$LD_LIBRARY_PATH
+  export LD_LIBRARY_PATH=/usr/local/apollo/boost/lib:$LD_LIBRARY_PATH
+  export LD_LIBRARY_PATH=/usr/local/apollo/paddlepaddle_dep/mkldnn/lib/:$LD_LIBRARY_PATH
   export LD_PRELOAD="$PRELOAD"
   export PYTHONPATH=/usr/local/lib/python2.7/dist-packages:${PY_LIB_PATH}:${PY_TOOLS_PATH}:${PYTHONPATH}
   if [ -e /usr/local/cuda-8.0/ ];then
@@ -455,8 +452,8 @@ if [ $APOLLO_IN_DOCKER = "true" ]; then
     source "${CYBER_SETUP}"
   fi
   create_data_dir
+  set_lib_path $1
   if [ -z $APOLLO_BASE_SOURCED ]; then
-    set_lib_path $1
     determine_bin_prefix
     export APOLLO_BASE_SOURCED=1
   fi
