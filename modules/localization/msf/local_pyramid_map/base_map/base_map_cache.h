@@ -20,6 +20,7 @@
 #include <map>
 #include <utility>
 #include "boost/thread.hpp"
+
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map_fwd.h"
 
 namespace apollo {
