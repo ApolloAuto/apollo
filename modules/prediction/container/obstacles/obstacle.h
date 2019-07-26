@@ -344,6 +344,9 @@ class Obstacle {
       std::list<std::string>* const lane_ids_ordered,
       std::unordered_set<std::string>* const existing_lane_ids);
 
+  bool HasJunctionExitLane(const LaneSequence& lane_sequence,
+    const std::unordered_set<std::string>& exit_lane_id_set);
+
  private:
   int id_ = FLAGS_ego_vehicle_id;
 
