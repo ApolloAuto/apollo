@@ -300,7 +300,7 @@ void MlfMotionFilter::OnlineCovarianceEstimation(
           Eigen::Vector3d::Identity() * noise_maximum_ * noise_maximum_;
     }
     ++cur_obj_pair;
-    object->belief_velocity_online_covariance.block<2, 2>(0, 0) =
+    object->belief_velocity_online_covariance.block<2, 2>(0, 0) +=
         velocity_resisual.head<2>() * velocity_resisual.head<2>().transpose();
   }
   object->belief_velocity_online_covariance /=
@@ -323,7 +323,7 @@ void MlfMotionFilter::ConvergenceEstimationAndBoostUp(
   // -1 means first object without measure velocity not considered
   size_t window_size = 1 + track_data->history_objects_.size() - 1;
 
-  // Boostup convergence when its confidence is samll than minimum
+  // Boostup convergence when its confidence is small than minimum
   ComputeConvergenceConfidence(track_data, new_object, true);
   UpdateConverged(track_data, new_object);
 
