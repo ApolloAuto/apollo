@@ -27,10 +27,17 @@ namespace util {
 
 enum PullOverStatus {
   UNKNOWN = 0,
-  APPOACHING = 1,
+  APPROACHING = 1,
   PARK_COMPLETE = 2,
   PARK_FAIL = 3,
   PASS_DESTINATION = 4,
+};
+
+enum ParkAndGoStatus {
+  CRUISING = 1,
+  CRUISE_COMPLETE = 2,
+  ADJUST = 2,
+  FAIL = 3,
 };
 
 hdmap::PathOverlap* GetOverlapOnReferenceLine(
@@ -47,6 +54,10 @@ PullOverStatus CheckADCPullOverPathPoint(
 
 PullOverStatus CheckADCPullOverOpenSpace(
     const ScenarioPullOverConfig& scenario_config);
+
+ParkAndGoStatus CheckADCParkAndGoOpenSpace(
+    const ReferenceLineInfo& reference_line_info,
+    const ScenarioParkAndGoConfig& scenario_config);
 
 bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
                                const ScenarioPullOverConfig& scenario_config,
