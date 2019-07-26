@@ -195,6 +195,7 @@ IMG=${DOCKER_REPO}:$VERSION
 
 
 function local_volumes() {
+    set +x
     # Apollo root and bazel cache dirs are required.
     volumes="-v $APOLLO_ROOT_DIR:/apollo \
              -v $HOME/.cache:${DOCKER_HOME}/.cache"
