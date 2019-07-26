@@ -67,6 +67,11 @@ void CloudMask::AddIndices(const base::PointIndices& indices, int value) {
   AddIndices(indices.indices, value);
 }
 
+void CloudMask::AddIndices(const base::PointIndices& indices0,
+                           const base::PointIndices& indices1) {
+  AddIndices(indices0.indices, indices1.indices);
+}
+
 void CloudMask::AddIndicesOfIndices(
     const base::PointIndices& indices,
     const base::PointIndices& indices_of_indices, int value) {

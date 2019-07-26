@@ -28,9 +28,9 @@ namespace park_and_go {
 
 struct ParkAndGoContext;
 
-class ParkAndGoStageCheck : public Stage {
+class ParkAndGoStageCruise : public Stage {
  public:
-  explicit ParkAndGoStageCheck(const ScenarioConfig::StageConfig& config)
+  explicit ParkAndGoStageCruise(const ScenarioConfig::StageConfig& config)
       : Stage(config) {}
 
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
@@ -40,10 +40,7 @@ class ParkAndGoStageCheck : public Stage {
     return Stage::GetContextAs<ParkAndGoContext>();
   }
 
-  Stage::StageStatus FinishStage(const bool success);
-
- private:
-  bool CheckObstacle(const ReferenceLineInfo& reference_line_info);
+  Stage::StageStatus FinishStage();
 
  private:
   ScenarioParkAndGoConfig scenario_config_;

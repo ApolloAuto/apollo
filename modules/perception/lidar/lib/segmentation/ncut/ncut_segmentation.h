@@ -51,8 +51,8 @@ class NCutSegmentation : public BaseSegmentation {
   std::string Name() const override { return "NCutSegmentation"; }
 
   void ByPassROIService() {
-      remove_roi_ = false;
-      remove_ground_ = false;
+    remove_roi_ = false;
+    remove_ground_ = false;
   }
 
  private:
@@ -71,7 +71,7 @@ class NCutSegmentation : public BaseSegmentation {
 
   bool GetConfigs(std::string* ncut_file);
 
-  base::ObjectType Label2Type(const std::string &label);
+  base::ObjectType Label2Type(const std::string& label);
 
   // ground detector for background segmentation
   std::unique_ptr<BaseGroundDetector> ground_detector_;

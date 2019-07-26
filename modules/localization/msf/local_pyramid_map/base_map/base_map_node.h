@@ -16,18 +16,21 @@
 #pragma once
 
 #include <Eigen/Core>
+#include <memory>
 #include <string>
 #include <vector>
+
 #include "modules/localization/msf/common/util/compression.h"
-#include "modules/localization/msf/local_map/base_map/base_map_config.h"
-#include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
-#include "modules/localization/msf/local_map/base_map/base_map_matrix_handler.h"
-#include "modules/localization/msf/local_map/base_map/base_map_node_config.h"
-#include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_fwd.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_matrix_handler.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_node_config.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_node_index.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 /**@brief The data structure of a Node in the map. */
 class BaseMapNode {
@@ -206,6 +209,7 @@ class BaseMapNode {
   std::shared_ptr<CompressionStrategy> compression_strategy_ = nullptr;
 };
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

@@ -346,6 +346,9 @@ void CNNSegmentation::GetObjectsFromSppEngine(
   memcpy(&original_world_cloud_->mutable_points_height()->at(0),
          &original_cloud_->points_height().at(0),
          sizeof(float) * original_cloud_->size());
+  memcpy(&original_world_cloud_->mutable_points_label()->at(0),
+         &original_cloud_->points_label().at(0),
+         sizeof(uint8_t) * original_cloud_->size());
   if (cnnseg_param_.remove_ground_points()) {
     num_foreground = spp_engine_.RemoveGroundPointsInForegroundCluster(
         original_cloud_, lidar_frame_ref_->roi_indices,

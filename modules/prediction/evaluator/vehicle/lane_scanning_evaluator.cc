@@ -97,7 +97,8 @@ bool LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
       learning_data_tag = "vehicle_junction";
     }
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
-        string_feature_values, learning_data_tag, nullptr);
+                                         string_feature_values,
+                                         learning_data_tag, nullptr);
     ADEBUG << "Save extracted features for learning locally.";
     return true;
   }
@@ -195,8 +196,8 @@ bool LaneScanningEvaluator::ExtractObstacleFeatures(
       FLAGS_cruise_historical_frame_length, 0.0);
   std::vector<std::vector<std::pair<double, double>>> polygon_points_history(
       FLAGS_cruise_historical_frame_length,
-      std::vector<std::pair<double, double>>(
-          max_num_poly_pt, std::make_pair(0.0, 0.0)));
+      std::vector<std::pair<double, double>>(max_num_poly_pt,
+                                             std::make_pair(0.0, 0.0)));
 
   // Get obstacle's current position to set up the relative coord. system.
   const Feature& obs_curr_feature = obstacle_ptr->latest_feature();

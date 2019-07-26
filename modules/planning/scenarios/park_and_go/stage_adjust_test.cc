@@ -14,40 +14,36 @@
  * limitations under the License.
  *****************************************************************************/
 
-#pragma once
+/**
+ * @file
+ **/
+#include "modules/planning/scenarios/park_and_go/stage_adjust.h"
 
+#include "gtest/gtest.h"
 #include "modules/planning/proto/planning_config.pb.h"
-
-#include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
-#include "modules/planning/scenarios/stage.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace park_and_go {
 
-struct ParkAndGoContext;
-
-class ParkAndGoStageCheck : public Stage {
+class ParkAndGoStageAdjustTest : public ::testing::Test {
  public:
-  explicit ParkAndGoStageCheck(const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
-
-  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame) override;
-
-  ParkAndGoContext* GetContext() {
-    return Stage::GetContextAs<ParkAndGoContext>();
+  virtual void SetUp() {
+    apollo::cyber::common::GetProtoFromFile(
+        FLAGS_scenario_park_and_go_config_file, &park_and_go_config_);
   }
 
-  Stage::StageStatus FinishStage(const bool success);
-
- private:
-  bool CheckObstacle(const ReferenceLineInfo& reference_line_info);
-
- private:
-  ScenarioParkAndGoConfig scenario_config_;
+ protected:
+  ScenarioConfig park_and_go_config_;
 };
+
+TEST_F(ParkAndGoStageAdjustTest, Init) {
+  ParkAndGoStageAdjust park_and_go_stage_adjust(
+      park_and_go_config_.stage_config(1));
+  EXPECT_EQ(park_and_go_stage_adjust.stage_type(),
+            ScenarioConfig::PARK_AND_GO_ADJUST);
+}
 
 }  // namespace park_and_go
 }  // namespace scenario

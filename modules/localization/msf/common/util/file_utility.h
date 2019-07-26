@@ -15,37 +15,39 @@
  *****************************************************************************/
 #pragma once
 
-#include <assert.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <cstdio>
+#include <fstream>
+#include <sstream>
+#include <string>
 #include <vector>
-#include "opencv2/opencv.hpp"
-
-#include "modules/localization/msf/local_pyramid_map/base_map/base_map_fwd.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
-namespace pyramid_map {
 
-/**@brief The data structure of the map cells in a map node. */
-class BaseMapMatrix {
+class FileUtility {
  public:
-  /**@brief The default constructor. */
-  BaseMapMatrix();
-  /**@brief The deconstructor. */
-  virtual ~BaseMapMatrix();
-  /**@brief The copy constructor. */
-  explicit BaseMapMatrix(const BaseMapMatrix& map_matrix);
-  /**@brief Initialize the map matrix. */
-  virtual void Init(const BaseMapConfig& config) = 0;
-  /**@brief Reset map cells data. */
-  virtual void Reset() = 0;
-  /**@brief get intensity image of node. */
-  virtual bool GetIntensityImg(cv::Mat* intensity_img) const;
-  /**@brief get altitude image of node. */
-  virtual bool GetAltitudeImg(cv::Mat* altitude_img) const;
+  static const size_t kUcharMd5Length = 16;
+  static const size_t kCharMd5Lenth = 33;
+  /**@brief Compute file md5 given a file path. */
+  static void ComputeFileMd5(const std::string& file_path,
+                             unsigned char res[kUcharMd5Length]);
+  static void ComputeFileMd5(const std::string& file_path,
+                             char res[kCharMd5Lenth]);
+  /**@brief Compute file md5 given a binary chunk. */
+  static void ComputeBinaryMd5(const unsigned char* binary, size_t size,
+                               unsigned char res[kUcharMd5Length]);
+  static void ComputeBinaryMd5(const unsigned char* binary, size_t size,
+                               char res[kCharMd5Lenth]);
 };
 
-}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

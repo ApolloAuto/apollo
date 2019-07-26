@@ -79,7 +79,7 @@ class CloudMask {
 
   // @brief; get valid indices from mask
   // @param [in]: indices vector
-  void GetValidIndices(base::PointIndices *indices);
+  void GetValidIndices(base::PointIndices* indices);
 
   // @brief: flip the mask data, positive to zero and zero to one
   // @brief: note, flip twice is not guaranteed to recover the original mask
@@ -95,6 +95,21 @@ class CloudMask {
   // @param [in]: value
   template <typename IntegerType>
   void AddIndices(const std::vector<IntegerType>& indices, int value = 1);
+
+  // @brief: add point indices, cross set of indices0 and indices1,
+  //                                    base::PointIndices version
+  // @param [in]: indices0
+  // @param [in]: indices1
+  void AddIndices(const base::PointIndices& indices0,
+                  const base::PointIndices& indices1);
+
+  // @brief: add point indices, cross set of indices0 and indices1,
+  //                              std::vector<IntegerType> version
+  // @param [in]: indices0
+  // @param [in]: indices1
+  template <typename IntegerType>
+  void AddIndices(const std::vector<IntegerType>& indices0,
+                  const std::vector<IntegerType>& indices1);
 
   // @brief: add point indices of indices
   // @param [in]: indices
@@ -142,6 +157,26 @@ template <typename IntegerType>
 void CloudMask::AddIndices(const std::vector<IntegerType>& indices, int value) {
   for (auto& id : indices) {
     mask_[id] = value;
+  }
+}
+
+template <typename IntegerType>
+void CloudMask::AddIndices(const std::vector<IntegerType>& indices0,
+                           const std::vector<IntegerType>& indices1) {
+  if (indices0.size() > indices1.size()) {
+    AddIndices(indices1, indices0);
+    return;
+  }
+  for (auto& id : indices0) {
+    mask_[id] = 1;
+  }
+  for (auto& id : indices1) {
+    if (mask_[id]) {
+      mask_[id] = 2;
+    }
+  }
+  for (auto& id : indices0) {
+    --mask_[id];
   }
 }
 

@@ -73,6 +73,7 @@ cc_library(
         "//modules/planning/scenarios/lane_follow",
         "//modules/planning/scenarios/park/pull_over:pull_over_scenario",
         "//modules/planning/scenarios/park/valet_parking",
+        "//modules/planning/scenarios/park_and_go:park_and_go_scenario",
         "//modules/planning/scenarios/stop_sign/unprotected:stop_sign_unprotected_scenario",
         "//modules/planning/scenarios/traffic_light/protected:traffic_light_protected_scenario",
         "//modules/planning/scenarios/traffic_light/unprotected_left_turn:traffic_light_unprotected_left_turn_scenario",

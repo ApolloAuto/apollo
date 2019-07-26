@@ -18,27 +18,27 @@
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <pthread.h>
+#include <stdlib.h>
 #include <sys/epoll.h>
 #include <sys/resource.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <stdlib.h>
 
 #include "cyber/common/log.h"
 #include "modules/bridge/common/bridge_proto_diserialized_buf.h"
-#include "modules/bridge/common/udp_listener.h"
 #include "modules/bridge/common/macro.h"
+#include "modules/bridge/common/udp_listener.h"
 #include "modules/bridge/common/util.h"
 #include "modules/canbus/proto/chassis.pb.h"
 
-using apollo::bridge::hsize;
-using apollo::bridge::MAXEPOLLSIZE;
-using apollo::bridge::FRAME_SIZE;
-using apollo::bridge::HEADER_FLAG_SIZE;
 using apollo::bridge::BRIDGE_HEADER_FLAG;
 using apollo::bridge::BridgeHeader;
+using apollo::bridge::FRAME_SIZE;
+using apollo::bridge::HEADER_FLAG_SIZE;
+using apollo::bridge::hsize;
+using apollo::bridge::MAXEPOLLSIZE;
 using apollo::canbus::Chassis;
 using BPDBChassis = apollo::bridge::BridgeProtoDiserializedBuf<Chassis>;
 
@@ -49,8 +49,8 @@ void *pthread_handle_message(void *pfd) {
   int total_recv = 2 * FRAME_SIZE;
   char total_buf[2 * FRAME_SIZE] = {0};
   bytes =
-      static_cast<int>(recvfrom(*static_cast<int *>(pfd), total_buf,
-            total_recv, 0, (struct sockaddr *)&client_addr, &sock_len));
+      static_cast<int>(recvfrom(*static_cast<int *>(pfd), total_buf, total_recv,
+                                0, (struct sockaddr *)&client_addr, &sock_len));
   ADEBUG << "total recv " << bytes;
   if (bytes <= 0 || bytes > total_recv) {
     pthread_exit(nullptr);
@@ -129,7 +129,7 @@ bool receive(uint16_t port) {
   int opt = SO_REUSEADDR;
   setsockopt(listener_sock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
   if (fcntl(listener_sock, F_SETFL,
-      fcntl(listener_sock, F_GETFD, 0) | O_NONBLOCK) == -1) {
+            fcntl(listener_sock, F_GETFD, 0) | O_NONBLOCK) == -1) {
     ADEBUG << "set nonblocking failed";
     return false;
   }
@@ -174,8 +174,7 @@ bool receive(uint16_t port) {
         pthread_attr_init(&attr);
         pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
         pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-        if (pthread_create(&thread, &attr,
-                           &pthread_handle_message,
+        if (pthread_create(&thread, &attr, &pthread_handle_message,
                            reinterpret_cast<void *>(&events[i].data.fd))) {
           ADEBUG << "message handler creation failed";
           res = false;

@@ -208,22 +208,16 @@ void SppLabelImage::CalculateClusterClass(const float* class_map,
 }
 
 void SppLabelImage::CalculateClusterHeading(const float* heading_map) {
-  std::vector<std::pair<float, float>> directions(clusters_.size(),
-                                                  std::make_pair(0.f, 0.f));
   const float* heading_map_x_ptr = heading_map;
   const float* heading_map_y_ptr = heading_map + width_ * height_;
 
   for (size_t n = 0; n < clusters_.size(); ++n) {
-    for (auto& pixel : clusters_[n]->pixels) {
-      directions[n].first += heading_map_x_ptr[pixel];
+    float heading_x = 0.f, heading_y = 0.f;
+    for (auto pixel : clusters_[n]->pixels) {
+      heading_x += heading_map_x_ptr[pixel];
+      heading_y += heading_map_y_ptr[pixel];
     }
-  }
-  for (size_t n = 0; n < clusters_.size(); ++n) {
-    for (auto& pixel : clusters_[n]->pixels) {
-      directions[n].second += heading_map_y_ptr[pixel];
-    }
-    clusters_[n]->yaw =
-        std::atan2(directions[n].second, directions[n].first) * 0.5f;
+    clusters_[n]->yaw = std::atan2(heading_y, heading_x) * 0.5f;
   }
 }
 

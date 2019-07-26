@@ -14,15 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/localization/msf/local_map/base_map/base_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
 
 #include <boost/foreach.hpp>
 #include <exception>
 #include <iostream>
 
+#include "cyber/common/log.h"
+
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 BaseMapConfig::BaseMapConfig(const std::string &map_version) {
   map_version_ = map_version;
@@ -156,7 +159,7 @@ bool BaseMapConfig::LoadXml(const boost::property_tree::ptree &config) {
 
   auto resolutions = config.get_child_optional("map.map_config.resolutions");
   if (resolutions) {
-    BOOST_FOREACH (const boost::property_tree::ptree::value_type &v,
+    BOOST_FOREACH(const boost::property_tree::ptree::value_type &v,
                    *resolutions) {
       map_resolutions_.push_back(
           static_cast<float>(atof(v.second.data().c_str())));
@@ -168,7 +171,7 @@ bool BaseMapConfig::LoadXml(const boost::property_tree::ptree &config) {
 
   auto datasets = config.get_child_optional("map.map_record.datasets");
   if (datasets) {
-    BOOST_FOREACH (const boost::property_tree::ptree::value_type &v,
+    BOOST_FOREACH(const boost::property_tree::ptree::value_type &v,
                    *datasets) {
       map_datasets_.push_back(v.second.data());
       AINFO << "Dataset: " << v.second.data();
@@ -178,7 +181,7 @@ bool BaseMapConfig::LoadXml(const boost::property_tree::ptree &config) {
   // load md5 check info
   auto nodes = config.get_child_optional("map.check_info.nodes");
   if (nodes) {
-    BOOST_FOREACH (const boost::property_tree::ptree::value_type &v, *nodes) {
+    BOOST_FOREACH(const boost::property_tree::ptree::value_type &v, *nodes) {
       const boost::property_tree::ptree &child = v.second;
       auto path = child.get_optional<std::string>("path");
       auto md5 = child.get_optional<std::string>("md5");
@@ -204,9 +207,8 @@ void BaseMapConfig::ResizeMapRange() {
   double max_x = 0;
   double max_y = 0;
 
-  double max_resolutions = 0.0;
   double max_resolutions =
-      std::max_element(map_resolutions_.begin(), map_resolutions_.end());
+      *std::max_element(map_resolutions_.begin(), map_resolutions_.end());
   int n = 0;
   while (min_x >= map_range_.GetMinX()) {
     ++n;
@@ -292,6 +294,7 @@ MapVersion BaseMapConfig::GetMapVersion() const {
   return MapVersion::UNKNOWN;
 }
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

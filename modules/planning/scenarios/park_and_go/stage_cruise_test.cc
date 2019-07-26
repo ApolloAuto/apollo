@@ -14,40 +14,41 @@
  * limitations under the License.
  *****************************************************************************/
 
-#pragma once
+/**
+ * @file stage_cruise_test.cc
+ */
 
+#include "modules/planning/scenarios/park_and_go/stage_cruise.h"
+
+#include "gtest/gtest.h"
+
+#include "cyber/common/file.h"
+#include "cyber/common/log.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planning_config.pb.h"
-
-#include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
-#include "modules/planning/scenarios/stage.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace park_and_go {
 
-struct ParkAndGoContext;
-
-class ParkAndGoStageCheck : public Stage {
+class ParkAndGoStageCruiseTest : public ::testing::Test {
  public:
-  explicit ParkAndGoStageCheck(const ScenarioConfig::StageConfig& config)
-      : Stage(config) {}
-
-  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame) override;
-
-  ParkAndGoContext* GetContext() {
-    return Stage::GetContextAs<ParkAndGoContext>();
+  virtual void SetUp() {
+    apollo::cyber::common::GetProtoFromFile(
+        FLAGS_scenario_park_and_go_config_file, &park_and_go_config_);
   }
 
-  Stage::StageStatus FinishStage(const bool success);
-
- private:
-  bool CheckObstacle(const ReferenceLineInfo& reference_line_info);
-
- private:
-  ScenarioParkAndGoConfig scenario_config_;
+ protected:
+  ScenarioConfig park_and_go_config_;
 };
+
+TEST_F(ParkAndGoStageCruiseTest, Init) {
+  ParkAndGoStageCruise park_and_go_stage_cruise(
+      park_and_go_config_.stage_config(2));
+  EXPECT_EQ(park_and_go_stage_cruise.stage_type(),
+            ScenarioConfig::PARK_AND_GO_CRUISE);
+}
 
 }  // namespace park_and_go
 }  // namespace scenario

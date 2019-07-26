@@ -185,7 +185,7 @@ class ResultContainer {
   Eigen::MatrixXd* PrepareTimeResult() { return &time_result_ds_; }
   Eigen::MatrixXd* PrepareLResult() { return &dual_l_result_ds_; }
   Eigen::MatrixXd* PrepareNResult() { return &dual_n_result_ds_; }
-  double* GetHybridTime() { return &hybrid_time_;}
+  double* GetHybridTime() { return &hybrid_time_; }
   double* GetDualTime() { return &dual_time_; }
   double* GetIpoptTime() { return &ipopt_time_; }
 
@@ -385,10 +385,10 @@ bool DistanceSmoothing(
       return false;
     }
   } else {
-    l_warm_up = Eigen::MatrixXd::Zero(
-        obstacles.GetObstaclesEdgesNum().sum(), horizon_ + 1);
-    n_warm_up = Eigen::MatrixXd::Zero(4 * obstacles.GetObstaclesNum(),
+    l_warm_up = Eigen::MatrixXd::Zero(obstacles.GetObstaclesEdgesNum().sum(),
                                       horizon_ + 1);
+    n_warm_up =
+        Eigen::MatrixXd::Zero(4 * obstacles.GetObstaclesNum(), horizon_ + 1);
   }
   const auto t2 = std::chrono::system_clock::now();
   dual_time = std::chrono::duration<double>(t2 - t1).count() * 1000;
@@ -397,14 +397,13 @@ bool DistanceSmoothing(
       new DistanceApproachProblem(planner_open_space_config);
 
   bool status = distance_approach_ptr->Solve(
-      x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS,
-      l_warm_up, n_warm_up, s_warm_up,
-      XYbounds, obstacles.GetObstaclesNum(), obstacles.GetObstaclesEdgesNum(),
-      obstacles.GetAMatrix(), obstacles.GetbMatrix(), state_result_ds_,
-      control_result_ds_, time_result_ds_, dual_l_result_ds_,
-      dual_n_result_ds_);
+      x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS, l_warm_up, n_warm_up,
+      s_warm_up, XYbounds, obstacles.GetObstaclesNum(),
+      obstacles.GetObstaclesEdgesNum(), obstacles.GetAMatrix(),
+      obstacles.GetbMatrix(), state_result_ds_, control_result_ds_,
+      time_result_ds_, dual_l_result_ds_, dual_n_result_ds_);
   const auto t3 = std::chrono::system_clock::now();
-  ipopt_time = std::chrono::duration<double>(t3 -t2).count() * 1000;
+  ipopt_time = std::chrono::duration<double>(t3 - t2).count() * 1000;
 
   if (!status) {
     AERROR << "Distance fail";
@@ -443,8 +442,7 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
     return false;
   }
   const auto end_timestamp = std::chrono::system_clock::now();
-  std::chrono::duration<double> time_diff =
-      end_timestamp - start_timestamp;
+  std::chrono::duration<double> time_diff = end_timestamp - start_timestamp;
   hybrid_total = time_diff.count() * 1000;
 
   if (FLAGS_enable_parallel_trajectory_smoothing) {
@@ -587,7 +585,7 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
     *(result_ptr->PrepareStateResult()) = state_result_ds;
     *(result_ptr->PrepareControlResult()) = control_result_ds;
     *(result_ptr->PrepareTimeResult()) = time_result_ds;
-    *(result_ptr->GetHybridTime())  = hybrid_total;
+    *(result_ptr->GetHybridTime()) = hybrid_total;
     *(result_ptr->GetDualTime()) = dual_total;
     *(result_ptr->GetIpoptTime()) = ipopt_total;
   } else {
@@ -609,7 +607,7 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
     *(result_ptr->PrepareTimeResult()) = time_result_ds;
     *(result_ptr->PrepareLResult()) = dual_l_result_ds;
     *(result_ptr->PrepareNResult()) = dual_n_result_ds;
-    *(result_ptr->GetHybridTime())  = hybrid_total;
+    *(result_ptr->GetHybridTime()) = hybrid_total;
     *(result_ptr->GetDualTime()) = dual_total;
     *(result_ptr->GetIpoptTime()) = ipopt_total;
   }
