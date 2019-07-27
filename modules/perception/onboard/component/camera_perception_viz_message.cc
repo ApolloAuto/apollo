@@ -22,7 +22,7 @@ namespace onboard {
 CameraPerceptionVizMessage::CameraPerceptionVizMessage(
     const std::string& camera_name, const double msg_timestamp,
     const Eigen::Matrix4d& pose_camera_to_world,
-    const std::shared_ptr<base::Blob<uint8_t> >& image_blob,
+    const std::shared_ptr<base::Blob<uint8_t>>& image_blob,
     const std::vector<base::ObjectPtr>& camera_objects,
     const std::vector<base::LaneLine>& lane_objects,
     const apollo::common::ErrorCode& error_code)
