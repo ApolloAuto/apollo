@@ -25,8 +25,8 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "cyber/time/time.h"
 #include "modules/common/math/math_utils.h"
+#include "modules/common/time/time.h"
 #include "modules/common/time/time_util.h"
 #include "modules/perception/camera/common/data_provider.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
@@ -305,13 +305,13 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
     const std::shared_ptr<apollo::drivers::Image> msg,
     const std::string& camera_name) {
   std::lock_guard<std::mutex> lck(mutex_);
-  double receive_img_timestamp = cyber::Time::Now().ToSecond();
+  double receive_img_timestamp = apollo::common::time::Clock::NowInSeconds();
   double image_msg_ts = msg->measurement_time();
   image_msg_ts += image_timestamp_offset_;
   last_sub_camera_image_ts_[camera_name] = image_msg_ts;
 
   {
-    const double cur_time = cyber::Time::Now().ToSecond();
+    const double cur_time = apollo::common::time::Clock::NowInSeconds();
     const double start_latency = (cur_time - msg->measurement_time()) * 1e3;
     AINFO << "FRAME_STATISTICS:TrafficLights:Start:msg_time["
           << GLOG_TIMESTAMP(msg->measurement_time()) << "]:cur_time["
@@ -405,7 +405,7 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
   const auto verify_lights_projection_time =
       PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(perf_indicator,
                                                "VerifyLightsProjection");
-  last_proc_image_ts_ = cyber::Time::Now().ToSecond();
+  last_proc_image_ts_ = apollo::common::time::Clock::NowInSeconds();
 
   AINFO << "start proc.";
   traffic_light_pipeline_->Perception(camera_perception_options_, &frame_);
@@ -437,7 +437,8 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
       PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(perf_indicator, "SendMessage");
 
   const auto total_time = static_cast<int64_t>(
-      (cyber::Time::Now().ToSecond() - receive_img_timestamp) * 1e3);
+      (apollo::common::time::Clock::NowInSeconds() - receive_img_timestamp) *
+      1e3);
   AINFO << "TrafficLightsPerception perf_info."
         << " number_of_lights: " << frame_.traffic_lights.size()
         << " check_camera_status_time: " << check_camera_status_time << " ms."
@@ -453,7 +454,7 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
         << " total: " << total_time << " ms.";
   AINFO << out_msg->DebugString();
   {
-    const double end_timestamp = cyber::Time::Now().ToSecond();
+    const double end_timestamp = apollo::common::time::Clock::NowInSeconds();
     const double end_latency = (end_timestamp - msg->measurement_time()) * 1e3;
     AINFO << "FRAME_STATISTICS:TrafficLights:End:msg_time["
           << GLOG_TIMESTAMP(msg->measurement_time()) << "]:cur_time["
@@ -566,7 +567,7 @@ bool TrafficLightsPerceptionComponent::UpdateCameraSelection(
     double timestamp, const camera::TLPreprocessorOption& option,
     camera::CameraFrame* frame) {
   PERCEPTION_PERF_FUNCTION();
-  const double current_ts = cyber::Time::Now().ToSecond();
+  const double current_ts = apollo::common::time::Clock::NowInSeconds();
   if (last_query_tf_ts_ > 0.0 &&
       current_ts - last_query_tf_ts_ < query_tf_interval_seconds_) {
     AINFO << "skip current tf msg, img_ts: " << std::to_string(timestamp)
@@ -723,7 +724,7 @@ bool TrafficLightsPerceptionComponent::TransformOutputMessage(
 
   auto& lights = frame->traffic_lights;
   auto* header = (*out_msg)->mutable_header();
-  double publish_time = apollo::cyber::Time::Now().ToSecond();
+  double publish_time = apollo::common::time::Clock::NowInSeconds();
   header->set_timestamp_sec(publish_time);  // message publishing time
   AINFO << "set header time sec:" << std::to_string(frame->timestamp);
 

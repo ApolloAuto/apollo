@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/onboard/component/radar_detection_component.h"
+
+#include "modules/common/time/time.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/lib/utils/perf.h"
 
@@ -59,7 +61,7 @@ bool RadarDetectionComponent::Init() {
 bool RadarDetectionComponent::Proc(const std::shared_ptr<ContiRadar>& message) {
   AINFO << "Enter radar preprocess, message timestamp: "
         << std::to_string(message->header().timestamp_sec())
-        << " current timestamp " << cyber::Time::Now().ToSecond();
+        << " current timestamp " << apollo::common::time::Clock::NowInSeconds();
   std::shared_ptr<SensorFrameMessage> out_message(new (std::nothrow)
                                                       SensorFrameMessage);
   if (!InternalProc(message, out_message)) {
@@ -104,7 +106,7 @@ bool RadarDetectionComponent::InternalProc(
     ++seq_num_;
   }
   double timestamp = in_message->header().timestamp_sec();
-  const double cur_time = cyber::Time::Now().ToSecond();
+  const double cur_time = apollo::common::time::Clock::NowInSeconds();
   const double start_latency = (cur_time - timestamp) * 1e3;
   AINFO << "FRAME_STATISTICS:Radar:Start:msg_time[" << std::to_string(timestamp)
         << "]:cur_time[" << std::to_string(cur_time) << "]:cur_latency["
@@ -184,7 +186,7 @@ bool RadarDetectionComponent::InternalProc(
   out_message->frame_->sensor2world_pose = radar_trans;
   out_message->frame_->objects = radar_objects;
 
-  const double end_timestamp = cyber::Time::Now().ToSecond();
+  const double end_timestamp = apollo::common::time::Clock::NowInSeconds();
   const double end_latency =
       (end_timestamp - in_message->header().timestamp_sec()) * 1e3;
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name,

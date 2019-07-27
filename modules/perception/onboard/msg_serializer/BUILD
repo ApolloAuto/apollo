@@ -12,6 +12,7 @@ cc_library(
     ],
     deps = [
         "//cyber",
+        "//modules/common/time",
         "//modules/perception/base",
         "//modules/perception/lib/utils",
         "//modules/perception/onboard/common_flags",

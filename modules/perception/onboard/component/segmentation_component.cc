@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/onboard/component/segmentation_component.h"
 
+#include "modules/common/time/time.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/lib/utils/perf.h"
 #include "modules/perception/lidar/common/lidar_error_code.h"
@@ -55,7 +56,8 @@ bool SegmentationComponent::Proc(
     const std::shared_ptr<drivers::PointCloud>& message) {
   AINFO << "Enter segmentation component, message timestamp: "
         << std::to_string(message->measurement_time()) << " current timestamp: "
-        << std::to_string(cyber::Time::Now().ToSecond());
+        << std::to_string(apollo::common::time::Clock::NowInSeconds());
+
 
   std::shared_ptr<LidarFrameMessage> out_message(new (std::nothrow)
                                                      LidarFrameMessage);
@@ -101,7 +103,7 @@ bool SegmentationComponent::InternalProc(
     s_seq_num_++;
   }
   const double timestamp = in_message->measurement_time();
-  const double cur_time = cyber::Time::Now().ToSecond();
+  const double cur_time = apollo::common::time::Clock::NowInSeconds();
   const double start_latency = (cur_time - timestamp) * 1e3;
   AINFO << "FRAME_STATISTICS:Lidar:Start:msg_time[" << std::to_string(timestamp)
         << sensor_name_ << ":Start:msg_time["
