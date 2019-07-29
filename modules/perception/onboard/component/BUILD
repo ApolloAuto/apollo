@@ -169,6 +169,7 @@ cc_library(
         "//modules/transform/proto:transform_proto",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cpplint()

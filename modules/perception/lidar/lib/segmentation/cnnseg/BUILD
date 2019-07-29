@@ -32,6 +32,7 @@ cc_library(
         "//modules/perception/lidar/lib/segmentation/ncut:ncut_segmentation",
         "//modules/perception/proto:perception_config_schema_proto",
     ],
+    alwayslink = True,
 )
 
 cc_library(

@@ -114,6 +114,9 @@ cc_library(
     hdrs = [
         "connected_component_analysis.h",
     ],
+    srcs = [
+        "connected_component_analysis.cc",
+    ],
     deps = [
         "//cyber",
     ],
