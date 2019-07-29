@@ -20,17 +20,8 @@
 
 #pragma once
 
-#include <algorithm>
-#include <string>
-#include <unordered_map>
-#include <vector>
-
 #include "cyber/common/macros.h"
 
-#include "modules/common/proto/pnc_point.pb.h"
-#include "modules/map/pnc_map/path.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
-#include "modules/planning/common/path/path_data.h"
 #include "modules/planning/proto/path_decider_info.pb.h"
 #include "modules/planning/proto/planning_status.pb.h"
 

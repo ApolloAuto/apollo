@@ -16,8 +16,6 @@
 
 #include "modules/planning/common/planning_context.h"
 
-#include "modules/planning/common/planning_gflags.h"
-
 namespace apollo {
 namespace planning {
 
