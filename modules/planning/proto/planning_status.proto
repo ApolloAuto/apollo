@@ -86,7 +86,8 @@ message ScenarioStatus {
 }
 
 message SidePassStatus {
-  optional string front_blocking_obstacle_id = 1;
+  optional apollo.common.PathPoint change_lane_stop_path_point = 1;
+  optional bool check_clear_flag = 2;
 }
 
 message StopSignStatus {
@@ -98,11 +99,6 @@ message StopSignStatus {
 message TrafficLightStatus {
   repeated string current_traffic_light_overlap_id = 1;
   repeated string done_traffic_light_overlap_id = 2;
-}
-
-message SidePassStopStatus {
-  optional apollo.common.PathPoint change_lane_stop_path_point = 1;
-  optional bool check_clear_flag = 2;
 }
 
 message PlanningStatus {
@@ -120,5 +116,4 @@ message PlanningStatus {
   optional SidePassStatus side_pass = 12;
   optional StopSignStatus stop_sign = 13;
   optional TrafficLightStatus traffic_light = 14;
-  optional SidePassStopStatus side_pass_stop = 15;
 }
