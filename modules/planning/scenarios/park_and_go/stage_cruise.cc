@@ -41,7 +41,7 @@ Stage::StageStatus ParkAndGoStageCruise::Process(
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
-  // cruise w/o refernce line
+  // cruise w/o reference line
   frame->mutable_open_space_info()->set_is_on_open_space_trajectory(true);
   bool plan_ok = ExecuteTaskOnOpenSpace(frame);
   if (!plan_ok) {
@@ -52,7 +52,7 @@ Stage::StageStatus ParkAndGoStageCruise::Process(
   const ReferenceLineInfo& reference_line_info =
       frame->reference_line_info().front();
   // check ADC status:
-  // 1. At routing begining: stage finished
+  // 1. At routing beginning: stage finished
   scenario::util::ParkAndGoStatus status =
       scenario::util::CheckADCParkAndGoOpenSpace(reference_line_info,
                                                  scenario_config_);
