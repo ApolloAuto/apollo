@@ -17,8 +17,9 @@
 
 #include <assert.h>
 #include <vector>
-#include "modules/localization/msf/local_pyramid_map/base_map/base_map_fwd.h"
 #include "opencv2/opencv.hpp"
+
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_fwd.h"
 
 namespace apollo {
 namespace localization {

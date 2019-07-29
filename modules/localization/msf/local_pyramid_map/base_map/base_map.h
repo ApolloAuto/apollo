@@ -16,20 +16,23 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <set>
 #include <string>
 #include <vector>
+
 #include "cyber/task/task.h"
-#include "modules/localization/msf/local_map/base_map/base_map_cache.h"
-#include "modules/localization/msf/local_map/base_map/base_map_config.h"
-#include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
-#include "modules/localization/msf/local_map/base_map/base_map_node.h"
-#include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
-#include "modules/localization/msf/local_map/base_map/base_map_pool.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_cache.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_fwd.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_node.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_node_index.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_pool.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 /**@brief The data structure of the base map. */
 class BaseMap {
@@ -142,6 +145,7 @@ class BaseMap {
   std::vector<std::string> all_map_node_md5s_;
 };
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

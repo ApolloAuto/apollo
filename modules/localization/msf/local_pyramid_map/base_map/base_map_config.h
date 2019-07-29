@@ -20,6 +20,7 @@
 #include <map>
 #include <string>
 #include <vector>
+
 #include "modules/localization/msf/common/util/rect2d.h"
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map_fwd.h"
 

@@ -157,8 +157,8 @@ void RTNet::addActiveLayer(const LayerParameter &layer_param,
                            TensorModifyMap *tensor_modify_map) {
   if (layer_param.type() == "ReLU") {
     std::shared_ptr<ReLUPlugin> relu_plugin;
-    relu_plugin.reset(new ReLUPlugin(layer_param.relu_param(),
-                                     inputs[0]->getDimensions()));
+    relu_plugin.reset(
+        new ReLUPlugin(layer_param.relu_param(), inputs[0]->getDimensions()));
     nvinfer1::IPluginLayer *ReLU_Layer =
         net->addPlugin(inputs, nbInputs, *relu_plugin);
     relu_plugins_.push_back(relu_plugin);
@@ -171,7 +171,7 @@ void RTNet::addActiveLayer(const LayerParameter &layer_param,
       type = pair->second;
     }
     nvinfer1::IActivationLayer *reluLayer =
-      net->addActivation(*inputs[0], type);
+        net->addActivation(*inputs[0], type);
     reluLayer->setName(layer_param.name().c_str());
 
     ConstructMap(layer_param, reluLayer, tensor_map, tensor_modify_map);
@@ -422,8 +422,8 @@ void RTNet::addLayer(const LayerParameter &layer_param,
                    tensor_modify_map);
   } else if (layer_param.type() == "Sigmoid" || layer_param.type() == "TanH" ||
              layer_param.type() == "ReLU") {
-    addActiveLayer(layer_param, inputs, nbInputs, net,
-      tensor_map, tensor_modify_map);
+    addActiveLayer(layer_param, inputs, nbInputs, net, tensor_map,
+                   tensor_modify_map);
   } else if (layer_param.type() == "Concat") {
     addConcatLayer(layer_param, inputs, nbInputs, net, tensor_map,
                    tensor_modify_map);
