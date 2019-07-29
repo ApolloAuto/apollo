@@ -43,14 +43,6 @@ namespace planning {
 
 class PlanningContext {
  public:
-  struct FallBackInfo {
-    std::string last_successful_path_label;
-  };
-
-  const FallBackInfo& fallback_info() { return fallback_info_; }
-
-  FallBackInfo* mutable_fallback_info() { return &fallback_info_; }
-
   struct OpenSpaceInfo {
     std::vector<std::string> partitioned_trajectories_index_history;
   };
@@ -73,7 +65,6 @@ class PlanningContext {
 
  private:
   PlanningStatus planning_status_;
-  FallBackInfo fallback_info_;
   OpenSpaceInfo open_space_info_;
   PathDeciderInfo path_decider_info_;
 
