@@ -53,7 +53,6 @@ void InitLogger(const char* binary_name) {
   } else {
     ::apollo::cyber::Binary::SetName(binary_name);
   }
-  CHECK_NOTNULL(common::GlobalData::Instance());
 
   // Init glog
   google::InitGoogleLogging(binary_name);
@@ -66,6 +65,9 @@ void InitLogger(const char* binary_name) {
       google::base::GetLogger(FLAGS_minloglevel), 2 * 1024 * 1024);
   google::base::SetLogger(FLAGS_minloglevel, async_logger);
   async_logger->Start();
+  
+  // Get Instance after glog initialization
+  CHECK_NOTNULL(common::GlobalData::Instance());
 }
 
 void StopLogger() {
