@@ -49,6 +49,10 @@ message DestinationStatus {
   optional bool has_passed_destination = 1 [default = false];
 }
 
+message OpenSpaceStatus {
+  repeated string partitioned_trajectories_index_history = 1;
+}
+
 message PedestrianStatus {
   repeated StopTime stop_time = 1;
 }
@@ -107,13 +111,14 @@ message PlanningStatus {
   optional CrosswalkStatus crosswalk = 3;
   optional DestinationStatus destination = 4;
   optional apollo.common.EngageAdvice engage_advice = 5;
-  optional PedestrianStatus pedestrian = 6;
-  optional PullOverStatus pull_over = 7;
-  optional ReroutingStatus rerouting = 8;
-  optional RightOfWayStatus right_of_way = 9;
-  optional ScenarioStatus scenario = 10;
-  optional SidePassStatus side_pass = 11;
-  optional StopSignStatus stop_sign = 12;
-  optional TrafficLightStatus traffic_light = 13;
-  optional SidePassStopStatus side_pass_stop = 14;
+  optional OpenSpaceStatus open_space = 6;
+  optional PedestrianStatus pedestrian = 7;
+  optional PullOverStatus pull_over = 8;
+  optional ReroutingStatus rerouting = 9;
+  optional RightOfWayStatus right_of_way = 10;
+  optional ScenarioStatus scenario = 11;
+  optional SidePassStatus side_pass = 12;
+  optional StopSignStatus stop_sign = 13;
+  optional TrafficLightStatus traffic_light = 14;
+  optional SidePassStopStatus side_pass_stop = 15;
 }
