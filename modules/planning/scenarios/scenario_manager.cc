@@ -23,6 +23,7 @@
 
 #include "modules/map/proto/map_lane.pb.h"
 
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -42,6 +43,7 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 
+using apollo::common::VehicleState;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::PathOverlap;
 
@@ -525,8 +527,25 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectValetParkingScenario(
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectParkAndGoScenario(
     const Frame& frame) {
-  // TODO(all)
-  if (0) {
+  bool park_and_go = false;
+  common::VehicleState vehicle_state =
+      common::VehicleStateProvider::Instance()->vehicle_state();
+  auto adc_point = common::util::MakePointENU(
+      vehicle_state.x(), vehicle_state.y(), vehicle_state.z());
+  double s = 0.0;
+  double l = 0.0;
+  hdmap::LaneInfoConstPtr lane;
+  if (HDMapUtil::BaseMap().GetNearestLaneWithHeading(
+      adc_point, 2.0, vehicle_state.heading(),
+      M_PI / 3.0, &lane, &s, &l) != 0) {
+    park_and_go = true;
+  } else {
+    if (lane->lane().type() != hdmap::Lane::CITY_DRIVING) {
+      park_and_go = true;
+    }
+  }
+
+  if (park_and_go) {
     return ScenarioConfig::PARK_AND_GO;
   }
 
