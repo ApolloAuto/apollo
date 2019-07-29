@@ -16,6 +16,7 @@
 #include "modules/perception/fusion/base/sensor_data_manager.h"
 
 #include <utility>
+#include <algorithm>
 
 #include "cyber/common/log.h"
 
@@ -108,13 +109,10 @@ void SensorDataManager::GetLatestFrames(
     return;
   }
 
-  for (size_t i = 0; i < frames->size() - 1; ++i) {
-    for (size_t j = i + 1; j < frames->size(); ++j) {
-      if ((*frames)[j]->GetTimestamp() < (*frames)[i]->GetTimestamp()) {
-        std::swap((*frames)[j], (*frames)[i]);
-      }
-    }
-  }
+  std::sort(frames->begin(), frames->end(),
+            [](const SensorFramePtr& p1, const SensorFramePtr& p2) {
+              return p1->GetTimestamp() < p2->GetTimestamp();
+            });
 }
 
 bool SensorDataManager::GetPose(const std::string& sensor_id, double timestamp,
