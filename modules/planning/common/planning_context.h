@@ -43,29 +43,16 @@ namespace planning {
 
 class PlanningContext {
  public:
-  struct OpenSpaceInfo {
-    std::vector<std::string> partitioned_trajectories_index_history;
-  };
-
-  const OpenSpaceInfo& open_space_info() { return open_space_info_; }
-
-  OpenSpaceInfo* mutable_open_space_info() { return &open_space_info_; }
-
   void Clear();
-
   void Init();
 
   const PlanningStatus& planning_status() { return planning_status_; }
-
   PlanningStatus* mutable_planning_status() { return &planning_status_; }
-
   const PathDeciderInfo& path_decider_info() { return path_decider_info_; }
-
   PathDeciderInfo* mutable_path_decider_info() { return &path_decider_info_; }
 
  private:
   PlanningStatus planning_status_;
-  OpenSpaceInfo open_space_info_;
   PathDeciderInfo path_decider_info_;
 
   // this is a singleton class

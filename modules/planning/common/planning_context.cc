@@ -27,7 +27,6 @@ void PlanningContext::Init() {}
 
 void PlanningContext::Clear() {
   planning_status_.Clear();
-  open_space_info_ = {};
 }
 
 }  // namespace planning
