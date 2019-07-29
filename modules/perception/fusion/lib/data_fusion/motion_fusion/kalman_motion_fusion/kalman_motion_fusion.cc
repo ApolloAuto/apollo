@@ -330,6 +330,10 @@ void KalmanMotionFusion::MotionFusionWithMeasurement(
 
 void KalmanMotionFusion::UpdateMotionState() {
   base::ObjectPtr obj = track_ref_->GetFusedObject()->GetBaseObject();
+  obj->anchor_point = fused_anchor_point_.cast<double>();
+  // it seems that it is the only place to update the FusedObject's `center`
+  // who will be used in CollectFusedObjects
+  obj->center = obj->anchor_point;
   obj->velocity = fused_velocity_.cast<float>();
   obj->acceleration = fused_acceleration_.cast<float>();
   // Previously, obj velocity uncertainty would be updated according to the
