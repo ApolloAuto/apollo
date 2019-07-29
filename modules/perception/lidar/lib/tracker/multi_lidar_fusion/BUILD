@@ -31,6 +31,7 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_tracker",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_proto",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -50,6 +51,7 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_motion_refiner",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_proto",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -65,6 +67,7 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/common:tracked_object",
         "//modules/perception/lidar/lib/tracker/measurement:measurement_collection",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -82,6 +85,7 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_proto",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -100,6 +104,7 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_base_filter",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_proto",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -118,6 +123,7 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/common:tracked_object",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_proto",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -139,6 +145,7 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_track_object_distance",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_proto",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -161,6 +168,7 @@ cc_library(
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_shape_filter",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto:multi_lidar_fusion_config_proto",
     ],
+    alwayslink = True,
 )
 
 cpplint()

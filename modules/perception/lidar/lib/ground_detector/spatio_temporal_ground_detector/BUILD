@@ -29,6 +29,7 @@ cc_library(
         "//modules/perception/lidar/lib/scene_manager/ground_service",
         "//modules/perception/proto:perception_config_schema_proto",
     ],
+    alwayslink = True,
 )
 
 cc_test(

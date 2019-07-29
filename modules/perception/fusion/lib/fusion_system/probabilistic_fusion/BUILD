@@ -35,6 +35,7 @@ cc_library(
         "//modules/perception/proto:probabilistic_fusion_config_proto",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cc_test(
