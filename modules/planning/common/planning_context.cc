@@ -27,7 +27,6 @@ void PlanningContext::Init() {}
 
 void PlanningContext::Clear() {
   planning_status_.Clear();
-  fallback_info_ = {};
   open_space_info_ = {};
 }
 
