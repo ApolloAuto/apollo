@@ -98,13 +98,13 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
       common::VehicleStateProvider::Instance()->linear_velocity();
   if (adc_speed > scenario_config.max_adc_stop_speed()) {
     ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
-    return APPOACHING;
+    return APPROACHING;
   }
 
   constexpr double kStartParkCheckRange = 3.0;  // meter
   if (distance <= -kStartParkCheckRange) {
     ADEBUG << "ADC still far: distance[" << distance << "]";
-    return APPOACHING;
+    return APPROACHING;
   }
 
   const common::math::Vec2d adc_position = {
@@ -172,6 +172,32 @@ PullOverStatus CheckADCPullOverOpenSpace(
       pull_over_status.theta());
 
   return position_check ? PARK_COMPLETE : PARK_FAIL;
+}
+
+ParkAndGoStatus CheckADCParkAndGoOpenSpace(
+    const ReferenceLineInfo& reference_line_info,
+    const ScenarioParkAndGoConfig& scenario_config) {
+  const double kLBuffer = 0.1;
+  const double kHeadingBuffer = 0.05;
+  // check if vehicle in reference line
+  const auto& reference_line = reference_line_info.reference_line();
+  // get vehicle s,l info
+  const common::math::Vec2d adc_position = {
+      common::VehicleStateProvider::Instance()->x(),
+      common::VehicleStateProvider::Instance()->y()};
+  const double adc_heading =
+      common::VehicleStateProvider::Instance()->heading();
+  common::SLPoint adc_position_sl;
+  reference_line.XYToSL(adc_position, &adc_position_sl);
+  // reference line heading angle at s
+  const auto reference_point =
+      reference_line.GetReferencePoint(adc_position_sl.s());
+  const auto path_point = reference_point.ToPathPoint(adc_position_sl.s());
+  if (std::fabs(adc_position_sl.l() < kLBuffer) &&
+      std::fabs(adc_heading - path_point.theta()) < kHeadingBuffer) {
+    return CRUISE_COMPLETE;
+  }
+  return CRUISING;
 }
 
 bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
