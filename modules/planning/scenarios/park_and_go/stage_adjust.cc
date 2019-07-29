@@ -47,9 +47,9 @@ Stage::StageStatus ParkAndGoStageAdjust::Process(
     AERROR << "ParkAndGoStageAdjust planning error";
     return StageStatus::ERROR;
   }
-  // TODO(SHU) add implementation
-  bool open_space_planner_complete = true;
-  if (open_space_planner_complete) {
+  scenario::util::ParkAndGoStatus status =
+      scenario::util::CheckADCSurroundObstacles(frame, scenario_config_);
+  if (status == scenario::util::ADJUST_COMPLETE) {
     return FinishStage();
   }
   return StageStatus::RUNNING;
