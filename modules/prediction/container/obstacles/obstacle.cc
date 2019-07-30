@@ -1028,7 +1028,7 @@ void Obstacle::BuildLaneGraph() {
   double road_graph_search_distance = std::fmax(
       estimated_move_distance, FLAGS_min_prediction_trajectory_spatial_length);
 
-  bool is_in_junction = feature->has_junction_feature();
+  bool is_in_junction = HasJunctionFeatureWithExits();
   std::unordered_set<std::string> exit_lane_id_set;
   if (is_in_junction) {
     for (const auto& exit : feature->junction_feature().junction_exit()) {
@@ -1212,7 +1212,7 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
     return;
   }
 
-  bool is_in_junction = feature->has_junction_feature();
+  bool is_in_junction = HasJunctionFeatureWithExits();
   std::unordered_set<std::string> exit_lane_id_set;
   if (is_in_junction) {
     for (const auto& exit : feature->junction_feature().junction_exit()) {
