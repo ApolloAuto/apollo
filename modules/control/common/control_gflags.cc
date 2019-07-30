@@ -78,3 +78,5 @@ DEFINE_bool(enable_feedback_augment_on_high_speed, false,
 DEFINE_bool(
     enable_gear_dirve_negative_speed_protection, false,
     "Enable estop to prevent following negative speed during gear drive");
+
+DEFINE_bool(use_osqp_solver, false, "use OSQP as MPC solver");

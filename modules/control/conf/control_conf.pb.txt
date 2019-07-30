@@ -6678,7 +6678,7 @@ mpc_controller_conf {
   brake_minimum_action: 0.0
   throttle_minimum_action: 0.0
   enable_mpc_feedforward_compensation: false
-  unconstraint_control_diff_limit: 5.0
+  unconstrained_control_diff_limit: 5.0
   lat_err_gain_scheduler {
     scheduler {
       speed: 4.0

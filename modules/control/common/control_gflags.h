@@ -36,6 +36,7 @@ DECLARE_double(steer_angle_rate);
 DECLARE_bool(enable_gain_scheduler);
 DECLARE_bool(set_steer_limit);
 DECLARE_bool(enable_slope_offset);
+DECLARE_bool(use_osqp_solver);
 
 DECLARE_double(lock_steer_speed);
 

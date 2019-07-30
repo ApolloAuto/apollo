@@ -88,6 +88,7 @@ cc_library(
         "//modules/common/math:euler_angles_zxy",
         "//modules/common/math:geometry",
         "//modules/common/math:lqr",
+        "//modules/common/math:mpc_osqp",
         "//modules/common/proto:geometry_proto",
         "//modules/common/status",
         "//modules/common/time",

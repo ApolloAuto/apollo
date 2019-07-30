@@ -278,6 +278,21 @@ cc_library(
 )
 
 cc_library(
+    name = "mpc_osqp",
+    srcs = [
+        "mpc_osqp.cc",
+    ],
+    hdrs = [
+        "mpc_osqp.h",
+    ],
+    deps = [
+        "//cyber/common:log",
+        "@eigen",
+        "@osqp"
+    ],
+)
+
+cc_library(
     name = "cartesian_frenet_conversion",
     srcs = [
         "cartesian_frenet_conversion.cc",
