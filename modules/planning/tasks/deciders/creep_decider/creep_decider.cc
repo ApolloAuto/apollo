@@ -32,8 +32,8 @@
 namespace apollo {
 namespace planning {
 
-using common::Status;
-using hdmap::PathOverlap;
+using apollo::common::Status;
+using apollo::hdmap::PathOverlap;
 
 uint32_t CreepDecider::creep_clear_counter_ = 0;
 

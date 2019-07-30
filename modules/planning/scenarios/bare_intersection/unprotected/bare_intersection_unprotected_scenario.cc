@@ -33,7 +33,7 @@ namespace planning {
 namespace scenario {
 namespace bare_intersection {
 
-using hdmap::HDMapUtil;
+using apollo::hdmap::HDMapUtil;
 
 void BareIntersectionUnprotectedScenario::Init() {
   if (init_) {

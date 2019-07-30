@@ -37,10 +37,10 @@ DEFINE_double(smooth_length, 200, "Smooth this amount of length ");
 namespace apollo {
 namespace planning {
 
-using common::math::LineSegment2d;
-using common::math::Vec2d;
-using common::util::DistanceXY;
-using hdmap::MapPathPoint;
+using apollo::common::math::LineSegment2d;
+using apollo::common::math::Vec2d;
+using apollo::common::util::DistanceXY;
+using apollo::hdmap::MapPathPoint;
 
 class SmootherUtil {
  public:

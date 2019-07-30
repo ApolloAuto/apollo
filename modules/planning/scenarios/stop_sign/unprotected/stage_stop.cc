@@ -38,13 +38,13 @@ namespace planning {
 namespace scenario {
 namespace stop_sign {
 
-using common::TrajectoryPoint;
-using common::time::Clock;
-using hdmap::HDMapUtil;
-using hdmap::LaneInfoConstPtr;
-using hdmap::OverlapInfoConstPtr;
-using hdmap::PathOverlap;
-using perception::PerceptionObstacle;
+using apollo::common::TrajectoryPoint;
+using apollo::common::time::Clock;
+using apollo::hdmap::HDMapUtil;
+using apollo::hdmap::LaneInfoConstPtr;
+using apollo::hdmap::OverlapInfoConstPtr;
+using apollo::hdmap::PathOverlap;
+using apollo::perception::PerceptionObstacle;
 
 using StopSignLaneVehicles =
     std::unordered_map<std::string, std::vector<std::string>>;

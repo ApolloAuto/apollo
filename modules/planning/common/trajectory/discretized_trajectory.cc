@@ -29,7 +29,7 @@
 namespace apollo {
 namespace planning {
 
-using common::TrajectoryPoint;
+using apollo::common::TrajectoryPoint;
 
 DiscretizedTrajectory::DiscretizedTrajectory(
     const std::vector<TrajectoryPoint>& trajectory_points)
