@@ -53,6 +53,14 @@ message OpenSpaceStatus {
   repeated string partitioned_trajectories_index_history = 1;
 }
 
+message PathDeciderStatus {
+  optional int32 front_static_obstacle_cycle_counter = 1 [default = 0];
+  optional int32 able_to_use_self_lane_counter = 2 [default = 0];
+  optional bool is_in_path_lane_borrow_scenario = 3 [default = false];
+  optional string front_static_obstacle_id = 4 [default = ""];
+  optional int32 decided_side_pass_direction = 5 [default = 0];
+}
+
 message PedestrianStatus {
   repeated StopTime stop_time = 1;
 }
@@ -109,11 +117,12 @@ message PlanningStatus {
   optional apollo.common.EngageAdvice engage_advice = 5;
   optional OpenSpaceStatus open_space = 6;
   optional PedestrianStatus pedestrian = 7;
-  optional PullOverStatus pull_over = 8;
-  optional ReroutingStatus rerouting = 9;
-  optional RightOfWayStatus right_of_way = 10;
-  optional ScenarioStatus scenario = 11;
-  optional SidePassStatus side_pass = 12;
-  optional StopSignStatus stop_sign = 13;
-  optional TrafficLightStatus traffic_light = 14;
+  optional PathDeciderStatus path_decider = 8;
+  optional PullOverStatus pull_over = 9;
+  optional ReroutingStatus rerouting = 10;
+  optional RightOfWayStatus right_of_way = 11;
+  optional ScenarioStatus scenario = 12;
+  optional SidePassStatus side_pass = 13;
+  optional StopSignStatus stop_sign = 14;
+  optional TrafficLightStatus traffic_light = 15;
 }

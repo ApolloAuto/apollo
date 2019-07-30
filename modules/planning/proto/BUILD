@@ -559,20 +559,6 @@ cc_proto_library(
 )
 
 cc_proto_library(
-    name = "path_decider_info_proto",
-    deps = [
-        ":path_decider_info_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "path_decider_info_proto_lib",
-    srcs = [
-        "path_decider_info.proto",
-    ],
-)
-
-cc_proto_library(
     name = "rule_based_stop_decider_config_proto",
     deps = [
         ":rule_based_stop_decider_config_proto_lib",
