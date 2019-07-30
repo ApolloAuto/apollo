@@ -223,9 +223,8 @@ bool LaneScanningEvaluator::ExtractObstacleFeatures(
     }
     // Extract normalized position info.
     if (feature.has_position()) {
-      pos_history[i] = WorldCoordToObjCoord(
-          std::make_pair(feature.position().x(), feature.position().y()),
-          obs_curr_pos, obs_curr_heading);
+      pos_history[i] = std::make_pair(
+          feature.position().x(), feature.position().y());
     } else {
       has_history[i] = 0.0;
     }
@@ -256,8 +255,7 @@ bool LaneScanningEvaluator::ExtractObstacleFeatures(
     }
     // Extract velocity heading info.
     if (feature.has_velocity_heading()) {
-      vel_heading_history[i] =
-          WorldAngleToObjAngle(feature.velocity_heading(), obs_curr_heading);
+      vel_heading_history[i] = feature.velocity_heading();
       if (i != 0) {
         vel_heading_changing_rate_history[i] =
             (vel_heading_history[i] - vel_heading_history[i - 1]) /
