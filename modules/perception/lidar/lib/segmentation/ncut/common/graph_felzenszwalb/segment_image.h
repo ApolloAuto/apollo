@@ -51,7 +51,7 @@ inline float diff(Image<float> *I, int x1, int y1, int x2, int y2) {
  *
  * im: image to segment.
  * sigma: to smooth the image.
- * c: constant for treshold function.
+ * c: constant for threshold function.
  * min_size: minimum component size (enforced by post-processing stage).
  * num_ccs: number of connected components in the segmentation.
  */

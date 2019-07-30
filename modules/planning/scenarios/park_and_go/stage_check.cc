@@ -36,7 +36,35 @@ using common::TrajectoryPoint;
 
 Stage::StageStatus ParkAndGoStageCheck::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
-  return FinishStage(true);
+  ADEBUG << "stage: Check";
+  CHECK_NOTNULL(frame);
+
+  scenario_config_.CopyFrom(GetContext()->scenario_config);
+
+  const ReferenceLineInfo& reference_line_info =
+      frame->reference_line_info().front();
+  bool success = CheckObstacle(reference_line_info);
+  return FinishStage(success);
+}
+
+// TODO(SHU): reverse_driving;
+// check front obstacle:
+// a. no obstacle;
+// b. obstacle is half vehicle length away
+bool ParkAndGoStageCheck::CheckObstacle(
+    const ReferenceLineInfo& reference_line_info) {
+  const double kClearance = 2.0;
+  const auto& reference_line = reference_line_info.reference_line();
+  const auto& path_decision = reference_line_info.path_decision();
+  const auto& adc_sl_boundary = reference_line_info.AdcSlBoundary();
+  for (const auto* obstacle : path_decision.obstacles().Items()) {
+    if (reference_line.IsOnLane(obstacle->PerceptionSLBoundary()) &&
+        obstacle->PerceptionSLBoundary().start_s() <
+            adc_sl_boundary.end_s() + kClearance) {
+      return false;
+    }
+  }
+  return true;
 }
 
 Stage::StageStatus ParkAndGoStageCheck::FinishStage(const bool success) {
@@ -45,7 +73,6 @@ Stage::StageStatus ParkAndGoStageCheck::FinishStage(const bool success) {
   } else {
     next_stage_ = ScenarioConfig::PARK_AND_GO_ADJUST;
   }
-  // TODO(SHU) add implementation
   return Stage::FINISHED;
 }
 

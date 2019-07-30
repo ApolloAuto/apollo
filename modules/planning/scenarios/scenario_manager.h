@@ -65,6 +65,8 @@ class ScenarioManager final {
   ScenarioConfig::ScenarioType SelectYieldSignScenario(
       const Frame& frame, const hdmap::PathOverlap& yield_sign_overlap);
 
+  ScenarioConfig::ScenarioType SelectParkAndGoScenario(const Frame& frame);
+
   // functions for scenario voter implementation
   // do NOT delete the code yet
   // void ScenarioSelfVote(const common::TrajectoryPoint& ego_point,

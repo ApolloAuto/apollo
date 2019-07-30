@@ -535,8 +535,7 @@ bool OpenSpaceTrajectoryOptimizer::GenerateDistanceApproachTraj(
   double ts = config_.planner_open_space_config().delta_t();
 
   // slack_warm_up, temp usage
-  Eigen::MatrixXd s_warm_up =
-      Eigen::MatrixXd::Zero(obstacles_num, horizon + 1);
+  Eigen::MatrixXd s_warm_up = Eigen::MatrixXd::Zero(obstacles_num, horizon + 1);
 
   // Dual variable warm start for distance approach problem
   if (FLAGS_use_dual_variable_warm_start) {

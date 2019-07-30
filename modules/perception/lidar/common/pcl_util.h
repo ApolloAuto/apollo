@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#pragma once
+
 #include <string>
 
 #include "pcl/io/pcd_io.h"

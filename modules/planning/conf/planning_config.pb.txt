@@ -210,7 +210,7 @@ default_task_config: {
           enable_jacobian_ad: false
           enable_hand_derivative: false
           enable_derivative_check: false
-          distance_approach_mode: DISTANCE_APPROACH_IPOPT_RELAX_END_SLACK
+          distance_approach_mode: DISTANCE_APPROACH_IPOPT
           enable_check_initial_state: false
         }
         iterative_anchoring_smoother_config {

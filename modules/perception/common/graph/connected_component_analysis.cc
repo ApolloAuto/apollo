@@ -21,7 +21,8 @@ namespace common {
 
 void ConnectedComponentAnalysis(const std::vector<std::vector<int>>& graph,
                                 std::vector<std::vector<int>>* components) {
-  int num_item = graph.size();
+  CHECK_NOTNULL(components);
+  int num_item = static_cast<int>(graph.size());
   std::vector<int> visited;
   visited.resize(num_item, 0);
   std::queue<int> que;

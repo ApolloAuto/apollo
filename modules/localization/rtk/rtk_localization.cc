@@ -39,14 +39,14 @@ void RTKLocalization::InitConfig(const rtk_config::Config &config) {
   map_offset_[0] = config.map_offset_x();
   map_offset_[1] = config.map_offset_y();
   map_offset_[2] = config.map_offset_z();
-  return;
 }
 
 void RTKLocalization::GpsCallback(
     const std::shared_ptr<localization::Gps> &gps_msg) {
-  double time_delay = last_received_timestamp_sec_ ?
-      common::time::ToSecond(Clock::Now()) - last_received_timestamp_sec_
-      : last_received_timestamp_sec_;
+  double time_delay =
+      last_received_timestamp_sec_
+          ? common::time::Clock::NowInSeconds() - last_received_timestamp_sec_
+          : last_received_timestamp_sec_;
   if (time_delay > gps_time_delay_tolerance_) {
     std::stringstream ss;
     ss << "GPS message time interval: " << time_delay;
@@ -81,14 +81,14 @@ void RTKLocalization::GpsCallback(
   PrepareLocalizationMsg(*gps_msg, &last_localization_result_,
                          &last_localization_status_result_);
   service_started_ = true;
-  if (service_started_time == 0.0)
-      service_started_time = common::time::ToSecond(Clock::Now());
+  if (service_started_time == 0.0) {
+    service_started_time = common::time::Clock::NowInSeconds();
+  }
 
   // watch dog
   RunWatchDog(gps_msg->header().timestamp_sec());
 
-  last_received_timestamp_sec_ = common::time::ToSecond(Clock::Now());
-  return;
+  last_received_timestamp_sec_ = common::time::Clock::NowInSeconds();
 }
 
 void RTKLocalization::GpsStatusCallback(
@@ -111,14 +111,12 @@ void RTKLocalization::ImuCallback(
     imu_list_.pop_front();
     imu_list_.push_back(*imu_msg);
   }
-  return;
 }
 
 bool RTKLocalization::IsServiceStarted() { return service_started_; }
 
 void RTKLocalization::GetLocalization(LocalizationEstimate *localization) {
   *localization = last_localization_result_;
-  return;
 }
 
 void RTKLocalization::GetLocalizationStatus(
@@ -132,15 +130,15 @@ void RTKLocalization::RunWatchDog(double gps_timestamp) {
   }
 
   // check GPS time stamp against system time
-  double gps_delay_sec = common::time::ToSecond(Clock::Now()) - gps_timestamp;
-  double gps_service_delay = common::time::ToSecond(Clock::Now())
-                             - service_started_time;
+  double gps_delay_sec = common::time::Clock::NowInSeconds() - gps_timestamp;
+  double gps_service_delay =
+      common::time::Clock::NowInSeconds() - service_started_time;
   int64_t gps_delay_cycle_cnt =
       static_cast<int64_t>(gps_delay_sec * localization_publish_freq_);
 
   bool msg_delay = false;
-  if ((gps_delay_cycle_cnt > report_threshold_err_num_)
-       && (static_cast<int>(gps_service_delay) > service_delay_threshold)) {
+  if (gps_delay_cycle_cnt > report_threshold_err_num_ &&
+      static_cast<int>(gps_service_delay) > service_delay_threshold) {
     msg_delay = true;
     std::stringstream ss;
     ss << "Raw GPS Message Delay. GPS message is " << gps_delay_cycle_cnt
@@ -153,11 +151,11 @@ void RTKLocalization::RunWatchDog(double gps_timestamp) {
   auto imu_msg = imu_list_.back();
   lock.unlock();
   double imu_delay_sec =
-      common::time::ToSecond(Clock::Now()) - imu_msg.header().timestamp_sec();
+      common::time::Clock::NowInSeconds() - imu_msg.header().timestamp_sec();
   int64_t imu_delay_cycle_cnt =
       static_cast<int64_t>(imu_delay_sec * localization_publish_freq_);
-  if ((imu_delay_cycle_cnt > report_threshold_err_num_)
-      && (static_cast<int>(gps_service_delay) > service_delay_threshold)) {
+  if (imu_delay_cycle_cnt > report_threshold_err_num_ &&
+      static_cast<int>(gps_service_delay) > service_delay_threshold) {
     msg_delay = true;
     std::stringstream ss;
     ss << "Raw IMU Message Delay. IMU message is " << imu_delay_cycle_cnt
@@ -167,13 +165,11 @@ void RTKLocalization::RunWatchDog(double gps_timestamp) {
 
   // to prevent it from beeping continuously
   if (msg_delay && (last_reported_timestamp_sec_ < 1. ||
-                    common::time::ToSecond(Clock::Now()) >
+                    common::time::Clock::NowInSeconds() >
                         last_reported_timestamp_sec_ + 1.)) {
     AERROR << "gps/imu frame Delay!";
-    last_reported_timestamp_sec_ = common::time::ToSecond(Clock::Now());
+    last_reported_timestamp_sec_ = common::time::Clock::NowInSeconds();
   }
-
-  return;
 }
 
 void RTKLocalization::PrepareLocalizationMsg(
@@ -188,7 +184,6 @@ void RTKLocalization::PrepareLocalizationMsg(
   drivers::gnss::InsStat gps_status;
   FindNearestGpsStatus(gps_time_stamp, &gps_status);
   FillLocalizationStatusMsg(gps_status, localization_status);
-  return;
 }
 
 void RTKLocalization::FillLocalizationMsgHeader(
@@ -200,8 +195,6 @@ void RTKLocalization::FillLocalizationMsgHeader(
   header->set_module_name(module_name_);
   header->set_timestamp_sec(timestamp);
   header->set_sequence_num(static_cast<unsigned int>(++localization_seq_num_));
-
-  return;
 }
 
 void RTKLocalization::FillLocalizationStatusMsg(
@@ -319,8 +312,7 @@ void RTKLocalization::ComposeLocalizationMsg(
         mutable_pose->mutable_angular_velocity_vrf()->CopyFrom(
             imu.angular_velocity());
       } else {
-        AERROR << "[PrepareLocalizationMsg]: "
-               << "fail to convert angular_velocity";
+        AERROR << "[PrepareLocalizationMsg]: fail to convert angular_velocity";
       }
     }
 
@@ -329,7 +321,6 @@ void RTKLocalization::ComposeLocalizationMsg(
       mutable_pose->mutable_euler_angles()->CopyFrom(imu.euler_angles());
     }
   }
-  return;
 }
 
 bool RTKLocalization::FindMatchingIMU(const double gps_timestamp_sec,
@@ -397,8 +388,7 @@ bool RTKLocalization::FindMatchingIMU(const double gps_timestamp_sec,
     if (std::fabs(imu_msg->header().timestamp_sec() - gps_timestamp_sec) >
         gps_imu_time_diff_threshold_) {
       // 20ms threshold to report error
-      AERROR << "Cannot find Matching IMU. "
-             << "IMU messages too old"
+      AERROR << "Cannot find Matching IMU. IMU messages too old. "
              << "Newest timestamp[" << imu_list.back().header().timestamp_sec()
              << "], GPS timestamp[" << gps_timestamp_sec << "]";
     }
@@ -412,8 +402,8 @@ bool RTKLocalization::InterpolateIMU(const CorrectedImu &imu1,
                                      const double timestamp_sec,
                                      CorrectedImu *imu_msg) {
   DCHECK_NOTNULL(imu_msg);
-  if (!(imu1.has_header() && imu1.header().has_timestamp_sec() &&
-        imu2.has_header() && imu2.header().has_timestamp_sec())) {
+  if (!(imu1.header().has_timestamp_sec() &&
+        imu2.header().has_timestamp_sec())) {
     AERROR << "imu1 and imu2 has no header or no timestamp_sec in header";
     return false;
   }
@@ -439,22 +429,21 @@ bool RTKLocalization::InterpolateIMU(const CorrectedImu &imu1,
       double frac1 =
           (timestamp_sec - imu1.header().timestamp_sec()) / time_diff;
 
-      if (imu1.has_imu() && imu1.imu().has_angular_velocity() &&
-          imu2.has_imu() && imu2.imu().has_angular_velocity()) {
+      if (imu1.imu().has_angular_velocity() &&
+          imu2.imu().has_angular_velocity()) {
         auto val = InterpolateXYZ(imu1.imu().angular_velocity(),
                                   imu2.imu().angular_velocity(), frac1);
         imu_msg->mutable_imu()->mutable_angular_velocity()->CopyFrom(val);
       }
 
-      if (imu1.has_imu() && imu1.imu().has_linear_acceleration() &&
-          imu2.has_imu() && imu2.imu().has_linear_acceleration()) {
+      if (imu1.imu().has_linear_acceleration() &&
+          imu2.imu().has_linear_acceleration()) {
         auto val = InterpolateXYZ(imu1.imu().linear_acceleration(),
                                   imu2.imu().linear_acceleration(), frac1);
         imu_msg->mutable_imu()->mutable_linear_acceleration()->CopyFrom(val);
       }
 
-      if (imu1.has_imu() && imu1.imu().has_euler_angles() && imu2.has_imu() &&
-          imu2.imu().has_euler_angles()) {
+      if (imu1.imu().has_euler_angles() && imu2.imu().has_euler_angles()) {
         auto val = InterpolateXYZ(imu1.imu().euler_angles(),
                                   imu2.imu().euler_angles(), frac1);
         imu_msg->mutable_imu()->mutable_euler_angles()->CopyFrom(val);

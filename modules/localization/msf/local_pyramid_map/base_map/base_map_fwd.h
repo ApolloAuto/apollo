@@ -21,6 +21,7 @@
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 typedef Eigen::Matrix4f Matrix4f;
 typedef Eigen::Matrix3f Matrix3f;
@@ -51,6 +52,7 @@ class MapNodeIndex;
 /**@brief The memory pool for the data structure of BaseMapNode. */
 class BaseMapNodePool;
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

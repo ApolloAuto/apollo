@@ -19,6 +19,7 @@
 
 #include "cyber/common/log.h"
 
+#include "modules/common/time/time.h"
 #include "modules/perception/onboard/common_flags/common_flags.h"
 
 namespace apollo {
@@ -29,7 +30,7 @@ bool MsgSerializer::SerializeMsg(double timestamp, int seq_num,
                                  const std::vector<base::ObjectPtr> &objects,
                                  const apollo::common::ErrorCode &error_code,
                                  PerceptionObstacles *obstacles) {
-  double publish_time = cyber::Time::Now().ToSecond();
+  double publish_time = apollo::common::time::Clock::NowInSeconds();
   ::apollo::common::Header *header = obstacles->mutable_header();
   header->set_timestamp_sec(publish_time);
   header->set_module_name("perception_obstacle");

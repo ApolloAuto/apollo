@@ -14,15 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/localization/msf/local_map/base_map/base_map_pool.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_pool.h"
 
-#include "modules/localization/msf/local_map/base_map/base_map_config.h"
-#include "modules/localization/msf/local_map/base_map/base_map_node.h"
-#include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_node.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_node_index.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 BaseMapNodePool::BaseMapNodePool(unsigned int pool_size,
                                  unsigned int thread_size)
@@ -128,6 +129,7 @@ void BaseMapNodePool::ResetMapNode(BaseMapNode* node) {
   }
 }
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

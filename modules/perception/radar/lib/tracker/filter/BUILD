@@ -27,6 +27,7 @@ cc_library(
         "//modules/perception/radar/lib/interface:base_filter",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cpplint()

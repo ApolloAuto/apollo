@@ -114,13 +114,13 @@ bool ProbabilisticFusion::Fuse(const FusionOptions& options,
   // 1. save frame data
   {
     std::lock_guard<std::mutex> data_lock(data_mutex_);
-    if (sensor_data_manager->IsLidar(sensor_frame) && !params_.use_lidar) {
+    if (!params_.use_lidar && sensor_data_manager->IsLidar(sensor_frame)) {
       return true;
     }
-    if (sensor_data_manager->IsRadar(sensor_frame) && !params_.use_radar) {
+    if (!params_.use_radar && sensor_data_manager->IsRadar(sensor_frame)) {
       return true;
     }
-    if (sensor_data_manager->IsCamera(sensor_frame) && !params_.use_camera) {
+    if (!params_.use_camera && sensor_data_manager->IsCamera(sensor_frame)) {
       return true;
     }
 

@@ -50,11 +50,11 @@ class SppEngine {
   // @brief: remove ground points in foreground cluster
   // @param [in]: point cloud
   // @param [in]: roi indices of point cloud
-  // @param [in]: non ground indices in roi of point cloud
+  // @param [in]: non ground indices of point cloud
   size_t RemoveGroundPointsInForegroundCluster(
       const base::PointFCloudConstPtr full_point_cloud,
       const base::PointIndices& roi_indices,
-      const base::PointIndices& roi_non_ground_indices);
+      const base::PointIndices& non_ground_indices);
   // @brief: get cluster list, const version
   // @return: cluster list
   inline const SppClusterList& clusters() const { return clusters_; }

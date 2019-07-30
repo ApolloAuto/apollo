@@ -19,6 +19,7 @@
  */
 
 #pragma once
+#include <math.h>
 
 #include <limits>
 #include <utility>
@@ -65,10 +66,9 @@ class DualVariableWarmStartSlackOSQPInterface {
   void checkSolution(const Eigen::MatrixXd& l_warm_up,
                      const Eigen::MatrixXd& n_warm_up);
 
-  void printMatrix(const int r, const int c,
-      const std::vector<c_float>& P_data,
-      const std::vector<c_int>& P_indices,
-      const std::vector<c_int>& P_indptr);
+  void printMatrix(const int r, const int c, const std::vector<c_float>& P_data,
+                   const std::vector<c_int>& P_indices,
+                   const std::vector<c_int>& P_indptr);
 
  private:
   OSQPConfig osqp_config_;

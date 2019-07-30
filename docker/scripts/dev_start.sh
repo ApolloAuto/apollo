@@ -349,6 +349,7 @@ function main(){
     if [ "${USER}" != "root" ]; then
         docker exec $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
     fi
+    docker exec $APOLLO_DEV bash -c '/apollo/docker/scripts/container_setup.sh'
 
     ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/dev_into.sh"
     ok "Enjoy!"

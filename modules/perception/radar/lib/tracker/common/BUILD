@@ -38,6 +38,7 @@ cc_library(
         ":radar_track",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -55,6 +56,7 @@ cc_library(
         "//modules/perception/radar/lib/tracker/filter:adaptive_kalman_filter",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cpplint()

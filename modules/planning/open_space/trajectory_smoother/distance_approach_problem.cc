@@ -83,11 +83,10 @@ bool DistanceApproachProblem::Solve(
   } else if (planner_open_space_config_.distance_approach_config()
                  .distance_approach_mode() ==
              DISTANCE_APPROACH_IPOPT_RELAX_END_SLACK) {
-    AERROR << "aaaaa";
     ptop = new DistanceApproachIPOPTRelaxEndSlackInterface(
-        horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, s_warm_up,
-        x0, xF, last_time_u, XYbounds, obstacles_edges_num, obstacles_num,
-        obstacles_A, obstacles_b, planner_open_space_config_);
+        horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, s_warm_up, x0, xF,
+        last_time_u, XYbounds, obstacles_edges_num, obstacles_num, obstacles_A,
+        obstacles_b, planner_open_space_config_);
   }
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;

@@ -47,6 +47,7 @@ cc_library(
         "//modules/perception/lidar/common:object_sequence",
         "//modules/perception/proto:ccrf_type_fusion_config_proto",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -66,6 +67,7 @@ cc_library(
         "//modules/perception/lidar/lib/interface:base_classifier",
         "//modules/perception/proto:fused_classifier_config_proto",
     ],
+    alwayslink = True,
 )
 
 cc_library(

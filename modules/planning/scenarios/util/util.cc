@@ -27,6 +27,9 @@ namespace planning {
 namespace scenario {
 namespace util {
 
+using apollo::common::math::Box2d;
+using apollo::common::math::Polygon2d;
+using apollo::common::math::Vec2d;
 using common::VehicleConfigHelper;
 using common::util::DistanceXY;
 using hdmap::PathOverlap;
@@ -98,13 +101,13 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
       common::VehicleStateProvider::Instance()->linear_velocity();
   if (adc_speed > scenario_config.max_adc_stop_speed()) {
     ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
-    return APPOACHING;
+    return APPROACHING;
   }
 
   constexpr double kStartParkCheckRange = 3.0;  // meter
   if (distance <= -kStartParkCheckRange) {
     ADEBUG << "ADC still far: distance[" << distance << "]";
-    return APPOACHING;
+    return APPROACHING;
   }
 
   const common::math::Vec2d adc_position = {
@@ -172,6 +175,63 @@ PullOverStatus CheckADCPullOverOpenSpace(
       pull_over_status.theta());
 
   return position_check ? PARK_COMPLETE : PARK_FAIL;
+}
+
+ParkAndGoStatus CheckADCParkAndGoOpenSpace(
+    const ReferenceLineInfo& reference_line_info,
+    const ScenarioParkAndGoConfig& scenario_config) {
+  const double kLBuffer = 0.1;
+  const double kHeadingBuffer = 0.05;
+  // check if vehicle in reference line
+  const auto& reference_line = reference_line_info.reference_line();
+  // get vehicle s,l info
+  const common::math::Vec2d adc_position = {
+      common::VehicleStateProvider::Instance()->x(),
+      common::VehicleStateProvider::Instance()->y()};
+  const double adc_heading =
+      common::VehicleStateProvider::Instance()->heading();
+  common::SLPoint adc_position_sl;
+  reference_line.XYToSL(adc_position, &adc_position_sl);
+  // reference line heading angle at s
+  const auto reference_point =
+      reference_line.GetReferencePoint(adc_position_sl.s());
+  const auto path_point = reference_point.ToPathPoint(adc_position_sl.s());
+  if (std::fabs(adc_position_sl.l() < kLBuffer) &&
+      std::fabs(adc_heading - path_point.theta()) < kHeadingBuffer) {
+    return CRUISE_COMPLETE;
+  }
+  return CRUISING;
+}
+
+ParkAndGoStatus CheckADCSurroundObstacles(
+    Frame* frame, const ScenarioParkAndGoConfig& scenario_config) {
+  common::math::Vec2d adc_position = {
+      common::VehicleStateProvider::Instance()->x(),
+      common::VehicleStateProvider::Instance()->y()};
+  const auto& vehicle_config =
+      common::VehicleConfigHelper::Instance()->GetConfig();
+  const double adc_length = vehicle_config.vehicle_param().length();
+  const double adc_width = vehicle_config.vehicle_param().width();
+  const double adc_heading =
+      common::VehicleStateProvider::Instance()->heading();
+
+  // ADC box
+  Box2d adc_box(adc_position, adc_heading, adc_length, adc_width);
+  double shift_distance =
+      adc_length / 2.0 - vehicle_config.vehicle_param().back_edge_to_center();
+  Vec2d shift_vec{shift_distance * std::cos(adc_heading),
+                  shift_distance * std::sin(adc_heading)};
+  adc_box.Shift(shift_vec);
+  const auto& adc_polygon = Polygon2d(adc_box);
+  // obstacle boxes
+  auto obstacles = frame->obstacles();
+  for (const auto& obstacle : obstacles) {
+    const auto& obstacle_polygon = obstacle->PerceptionPolygon();
+    if (adc_polygon.HasOverlap(obstacle_polygon)) {
+      return ADJUST;
+    }
+  }
+  return ADJUST_COMPLETE;
 }
 
 bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,

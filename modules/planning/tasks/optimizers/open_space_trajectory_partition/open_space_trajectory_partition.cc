@@ -339,15 +339,18 @@ bool OpenSpaceTrajectoryPartition::EncodeTrajectory(
 
 bool OpenSpaceTrajectoryPartition::CheckTrajTraversed(
     const std::string& trajectory_encoding_to_check) {
-  const auto& index_history = PlanningContext::Instance()
-                                  ->open_space_info()
-                                  .partitioned_trajectories_index_history;
-  const size_t index_history_length = index_history.size();
-  if (index_history_length <= 1) {
+  const auto& open_space_status =
+      PlanningContext::Instance()->planning_status().open_space();
+  const int index_history_size =
+      open_space_status.partitioned_trajectories_index_history_size();
+
+  if (index_history_size <= 1) {
     return false;
   }
-  for (size_t i = 0; i < index_history_length - 1; ++i) {
-    if (index_history[i] == trajectory_encoding_to_check) {
+  for (int i = 0; i < index_history_size - 1; i++) {
+    const auto& index_history =
+        open_space_status.partitioned_trajectories_index_history(i);
+    if (index_history == trajectory_encoding_to_check) {
       return true;
     }
   }
@@ -356,17 +359,24 @@ bool OpenSpaceTrajectoryPartition::CheckTrajTraversed(
 
 void OpenSpaceTrajectoryPartition::UpdateTrajHistory(
     const std::string& chosen_trajectory_encoding) {
-  auto* trajectory_history = &(PlanningContext::Instance()
-                                   ->mutable_open_space_info()
-                                   ->partitioned_trajectories_index_history);
-  if (trajectory_history->empty()) {
-    trajectory_history->push_back(chosen_trajectory_encoding);
+  auto* open_space_status = PlanningContext::Instance()
+                                ->mutable_planning_status()
+                                ->mutable_open_space();
+
+  const auto& trajectory_history =
+      PlanningContext::Instance()->planning_status()
+                                 .open_space()
+                                 .partitioned_trajectories_index_history();
+  if (trajectory_history.empty()) {
+    open_space_status->add_partitioned_trajectories_index_history(
+        chosen_trajectory_encoding);
     return;
   }
-  if (trajectory_history->back() == chosen_trajectory_encoding) {
+  if (*(trajectory_history.rbegin()) == chosen_trajectory_encoding) {
     return;
   }
-  trajectory_history->push_back(chosen_trajectory_encoding);
+  open_space_status->add_partitioned_trajectories_index_history(
+      chosen_trajectory_encoding);
 }
 
 void OpenSpaceTrajectoryPartition::PartitionTrajectory(

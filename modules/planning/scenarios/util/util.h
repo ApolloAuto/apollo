@@ -18,6 +18,7 @@
 
 #include <string>
 
+#include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
 
 namespace apollo {
@@ -27,10 +28,18 @@ namespace util {
 
 enum PullOverStatus {
   UNKNOWN = 0,
-  APPOACHING = 1,
+  APPROACHING = 1,
   PARK_COMPLETE = 2,
   PARK_FAIL = 3,
   PASS_DESTINATION = 4,
+};
+
+enum ParkAndGoStatus {
+  CRUISING = 1,
+  CRUISE_COMPLETE = 2,
+  ADJUST = 3,
+  ADJUST_COMPLETE = 4,
+  FAIL = 5,
 };
 
 hdmap::PathOverlap* GetOverlapOnReferenceLine(
@@ -47,6 +56,13 @@ PullOverStatus CheckADCPullOverPathPoint(
 
 PullOverStatus CheckADCPullOverOpenSpace(
     const ScenarioPullOverConfig& scenario_config);
+
+ParkAndGoStatus CheckADCParkAndGoOpenSpace(
+    const ReferenceLineInfo& reference_line_info,
+    const ScenarioParkAndGoConfig& scenario_config);
+
+ParkAndGoStatus CheckADCSurroundObstacles(
+    Frame* frame, const ScenarioParkAndGoConfig& scenario_config);
 
 bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
                                const ScenarioPullOverConfig& scenario_config,

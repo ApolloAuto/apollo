@@ -14,16 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/localization/msf/local_map/base_map/base_map.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map.h"
 
 #include <set>
 #include <string>
 #include "boost/filesystem.hpp"
+
 #include "modules/localization/msf/common/util/file_utility.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 BaseMap::BaseMap(BaseMapConfig* config)
     : map_config_(config),
@@ -516,7 +518,7 @@ void BaseMap::ComputeMd5ForAllMapNodes() {
   GetAllMapIndexAndPath();
   for (unsigned int i = 0; i < all_map_node_paths_.size(); ++i) {
     std::string path = map_config_->map_folder_path_ + all_map_node_paths_[i];
-    char md5[FileUtility::CHAR_MD5LENTH];
+    char md5[FileUtility::kCharMd5Lenth];
     FileUtility::ComputeFileMd5(path, md5);
     all_map_node_md5s_.push_back(md5);
   }
@@ -546,6 +548,7 @@ bool BaseMap::CheckMapStrictly() {
   return true;
 }
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

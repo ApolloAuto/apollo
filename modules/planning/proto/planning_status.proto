@@ -49,6 +49,18 @@ message DestinationStatus {
   optional bool has_passed_destination = 1 [default = false];
 }
 
+message OpenSpaceStatus {
+  repeated string partitioned_trajectories_index_history = 1;
+}
+
+message PathDeciderStatus {
+  optional int32 front_static_obstacle_cycle_counter = 1 [default = 0];
+  optional int32 able_to_use_self_lane_counter = 2 [default = 0];
+  optional bool is_in_path_lane_borrow_scenario = 3 [default = false];
+  optional string front_static_obstacle_id = 4 [default = ""];
+  optional int32 decided_side_pass_direction = 5 [default = 0];
+}
+
 message PedestrianStatus {
   repeated StopTime stop_time = 1;
 }
@@ -82,7 +94,8 @@ message ScenarioStatus {
 }
 
 message SidePassStatus {
-  optional string front_blocking_obstacle_id = 1;
+  optional apollo.common.PathPoint change_lane_stop_path_point = 1;
+  optional bool check_clear_flag = 2;
 }
 
 message StopSignStatus {
@@ -96,24 +109,20 @@ message TrafficLightStatus {
   repeated string done_traffic_light_overlap_id = 2;
 }
 
-message SidePassStopStatus {
-  optional apollo.common.PathPoint change_lane_stop_path_point = 1;
-  optional bool check_clear_flag = 2;
-}
-
 message PlanningStatus {
   optional BareIntersectionStatus bare_intersection = 1;
   optional ChangeLaneStatus change_lane = 2;
   optional CrosswalkStatus crosswalk = 3;
   optional DestinationStatus destination = 4;
   optional apollo.common.EngageAdvice engage_advice = 5;
-  optional PedestrianStatus pedestrian = 6;
-  optional PullOverStatus pull_over = 7;
-  optional ReroutingStatus rerouting = 8;
-  optional RightOfWayStatus right_of_way = 9;
-  optional ScenarioStatus scenario = 10;
-  optional SidePassStatus side_pass = 11;
-  optional StopSignStatus stop_sign = 12;
-  optional TrafficLightStatus traffic_light = 13;
-  optional SidePassStopStatus side_pass_stop = 14;
+  optional OpenSpaceStatus open_space = 6;
+  optional PedestrianStatus pedestrian = 7;
+  optional PathDeciderStatus path_decider = 8;
+  optional PullOverStatus pull_over = 9;
+  optional ReroutingStatus rerouting = 10;
+  optional RightOfWayStatus right_of_way = 11;
+  optional ScenarioStatus scenario = 12;
+  optional SidePassStatus side_pass = 13;
+  optional StopSignStatus stop_sign = 14;
+  optional TrafficLightStatus traffic_light = 15;
 }
