@@ -33,10 +33,10 @@
 namespace apollo {
 namespace planning {
 
-using common::SLPoint;
-using common::SpeedPoint;
-using common::TrajectoryPoint;
-using common::math::Vec2d;
+using apollo::common::math::Vec2d;
+using apollo::common::SLPoint;
+using apollo::common::SpeedPoint;
+using apollo::common::TrajectoryPoint;
 
 SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
     const double stop_distance) {

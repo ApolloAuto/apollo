@@ -36,12 +36,12 @@
 namespace apollo {
 namespace planning {
 
-using common::ErrorCode;
-using common::Status;
-using common::VehicleConfigHelper;
-using common::math::Vec2d;
-using common::time::Clock;
-using perception::PerceptionObstacle;
+using apollo::common::ErrorCode;
+using apollo::common::Status;
+using apollo::common::VehicleConfigHelper;
+using apollo::common::math::Vec2d;
+using apollo::common::time::Clock;
+using apollo::perception::PerceptionObstacle;
 
 SpeedDecider::SpeedDecider(const TaskConfig& config) : Task(config) {
   SetName("SpeedDecider");

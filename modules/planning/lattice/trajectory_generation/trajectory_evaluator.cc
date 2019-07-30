@@ -33,14 +33,14 @@
 namespace apollo {
 namespace planning {
 
-using Trajectory1d = Curve1d;
+using apollo::common::math::PathMatcher;
 using apollo::common::PathPoint;
 using apollo::common::SpeedPoint;
-using apollo::common::math::PathMatcher;
+
+using Trajectory1d = Curve1d;
+using PtrTrajectory1d = std::shared_ptr<Trajectory1d>;
 using Trajectory1dPair =
     std::pair<std::shared_ptr<Curve1d>, std::shared_ptr<Curve1d>>;
-
-using PtrTrajectory1d = std::shared_ptr<Trajectory1d>;
 
 TrajectoryEvaluator::TrajectoryEvaluator(
     const std::array<double, 3>& init_s, const PlanningTarget& planning_target,

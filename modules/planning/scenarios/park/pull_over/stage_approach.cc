@@ -36,7 +36,7 @@ namespace planning {
 namespace scenario {
 namespace pull_over {
 
-using common::TrajectoryPoint;
+using apollo::common::TrajectoryPoint;
 
 PullOverStageApproach::PullOverStageApproach(
     const ScenarioConfig::StageConfig& config)

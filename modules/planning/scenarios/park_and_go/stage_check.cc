@@ -32,7 +32,7 @@ namespace planning {
 namespace scenario {
 namespace park_and_go {
 
-using common::TrajectoryPoint;
+using apollo::common::TrajectoryPoint;
 
 Stage::StageStatus ParkAndGoStageCheck::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
