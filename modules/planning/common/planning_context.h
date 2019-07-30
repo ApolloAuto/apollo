@@ -22,7 +22,6 @@
 
 #include "cyber/common/macros.h"
 
-#include "modules/planning/proto/path_decider_info.pb.h"
 #include "modules/planning/proto/planning_status.pb.h"
 
 /**
@@ -37,14 +36,15 @@ class PlanningContext {
   void Clear();
   void Init();
 
+  /*
+   * please put all status info inside PlanningStatus for easy maintenance.
+   * do NOT create new struct at this level.
+   * */
   const PlanningStatus& planning_status() { return planning_status_; }
   PlanningStatus* mutable_planning_status() { return &planning_status_; }
-  const PathDeciderInfo& path_decider_info() { return path_decider_info_; }
-  PathDeciderInfo* mutable_path_decider_info() { return &path_decider_info_; }
 
  private:
   PlanningStatus planning_status_;
-  PathDeciderInfo path_decider_info_;
 
   // this is a singleton class
   DECLARE_SINGLETON(PlanningContext)
