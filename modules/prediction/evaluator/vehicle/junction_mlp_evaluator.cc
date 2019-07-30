@@ -144,11 +144,7 @@ bool JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
                                       latest_feature_ptr->raw_velocity().x());
     double d_idx = (angle / (2.0 * M_PI) + 1.0 / 24.0) * 12.0;
     int idx = static_cast<int>(floor(d_idx >= 0 ? d_idx : d_idx + 12));
-    int prev_idx = idx == 0 ? 11 : idx - 1;
-    int post_idx = idx == 11 ? 0 : idx + 1;
-    junction_exit_prob[junction_exit.exit_lane_id()] =
-        probability[idx] * 0.5 + probability[prev_idx] * 0.25 +
-        probability[post_idx] * 0.25;
+    junction_exit_prob[junction_exit.exit_lane_id()] = probability[idx];
   }
 
   for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {

@@ -90,7 +90,7 @@ void JunctionAnalyzer::SetAllJunctionExits() {
 std::vector<JunctionExit> JunctionAnalyzer::GetJunctionExits(
     const std::string& start_lane_id) {
   // TODO(hongyi) make this a gflag
-  int max_search_level = 5;
+  int max_search_level = 6;
 
   std::vector<JunctionExit> junction_exits;
   std::queue<std::pair<ConstLaneInfoPtr, int>> lane_info_queue;
