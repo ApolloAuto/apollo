@@ -26,6 +26,7 @@
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
+#include "modules/common/math/mpc_osqp.h"
 #include "modules/common/math/mpc_solver.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/string_util.h"
@@ -372,41 +373,57 @@ Status MPCController::ComputeControlCommand(
   double control_gain_truncation_ratio = 0.0;
   double unconstraint_control = 0.0;
   const double v = VehicleStateProvider::Instance()->linear_velocity();
-  if (!common::math::SolveLinearMPC(matrix_ad_, matrix_bd_, matrix_cd_,
-                                    matrix_q_updated_, matrix_r_updated_,
-                                    lower_bound, upper_bound, matrix_state_,
-                                    reference, mpc_eps_, mpc_max_iteration_,
-                                    &control, &control_gain, &addition_gain)) {
-    AERROR << "MPC solver failed";
-  } else {
-    ADEBUG << "MPC problem solved! ";
-    steer_angle_feedback = Wheel2SteerPct(control[0](0, 0));
-    acc_feedback = control[0](1, 0);
-    for (int i = 0; i < basic_state_size_; ++i) {
-      unconstraint_control += control_gain[0](0, i) * matrix_state_(i, 0);
-    }
-    unconstraint_control += addition_gain[0](0, 0) * v * debug->curvature();
-    if (enable_mpc_feedforward_compensation_) {
-      unconstraint_control_diff =
-          Wheel2SteerPct(control[0](0, 0) - unconstraint_control);
-      if (fabs(unconstraint_control_diff) <= unconstraint_control_diff_limit_) {
-        steer_angle_ff_compensation =
-            Wheel2SteerPct(debug->curvature() *
-                           (control_gain[0](0, 2) *
-                                (lr_ - lf_ / cr_ * mass_ * v * v / wheelbase_) -
-                            addition_gain[0](0, 0) * v));
-      } else {
-        control_gain_truncation_ratio = control[0](0, 0) / unconstraint_control;
-        steer_angle_ff_compensation =
-            Wheel2SteerPct(debug->curvature() *
-                           (control_gain[0](0, 2) *
-                                (lr_ - lf_ / cr_ * mass_ * v * v / wheelbase_) -
-                            addition_gain[0](0, 0) * v) *
-                           control_gain_truncation_ratio);
-      }
+
+  std::vector<double> *control_cmd;
+  if (FLAGS_use_osqp_solver) {
+    apollo::common::math::MpcOsqp mpc_osqp(
+        matrix_ad_, matrix_bd_, matrix_q_updated_, matrix_r_updated_,
+        lower_bound, upper_bound, matrix_state_, mpc_max_iteration_);
+    if (!mpc_osqp.MpcOsqpSolver(control_cmd)) {
+      AERROR << "MPC OSQP solver failed";
     } else {
-      steer_angle_ff_compensation = 0.0;
+      AINFO << "MPC OSQP problem solved! ";
+      control[0](0, 0) = control_cmd->at(0);
+      control[0](1, 0) = control_cmd->at(1);
     }
+  } else {
+    if (!common::math::SolveLinearMPC(
+            matrix_ad_, matrix_bd_, matrix_cd_, matrix_q_updated_,
+            matrix_r_updated_, lower_bound, upper_bound, matrix_state_,
+            reference, mpc_eps_, mpc_max_iteration_, &control, &control_gain,
+            &addition_gain)) {
+      AERROR << "MPC solver failed";
+    } else {
+      ADEBUG << "MPC problem solved! ";
+    }
+  }
+
+  steer_angle_feedback = Wheel2SteerPct(control[0](0, 0));
+  acc_feedback = control[0](1, 0);
+  for (int i = 0; i < basic_state_size_; ++i) {
+    unconstraint_control += control_gain[0](0, i) * matrix_state_(i, 0);
+  }
+  unconstraint_control += addition_gain[0](0, 0) * v * debug->curvature();
+  if (enable_mpc_feedforward_compensation_) {
+    unconstraint_control_diff =
+        Wheel2SteerPct(control[0](0, 0) - unconstraint_control);
+    if (fabs(unconstraint_control_diff) <= unconstraint_control_diff_limit_) {
+      steer_angle_ff_compensation =
+          Wheel2SteerPct(debug->curvature() *
+                         (control_gain[0](0, 2) *
+                              (lr_ - lf_ / cr_ * mass_ * v * v / wheelbase_) -
+                          addition_gain[0](0, 0) * v));
+    } else {
+      control_gain_truncation_ratio = control[0](0, 0) / unconstraint_control;
+      steer_angle_ff_compensation =
+          Wheel2SteerPct(debug->curvature() *
+                         (control_gain[0](0, 2) *
+                              (lr_ - lf_ / cr_ * mass_ * v * v / wheelbase_) -
+                          addition_gain[0](0, 0) * v) *
+                         control_gain_truncation_ratio);
+    }
+  } else {
+    steer_angle_ff_compensation = 0.0;
   }
 
   double mpc_end_timestamp = Clock::NowInSeconds();
