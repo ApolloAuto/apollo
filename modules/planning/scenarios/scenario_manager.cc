@@ -536,8 +536,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectParkAndGoScenario(
   double l = 0.0;
   hdmap::LaneInfoConstPtr lane;
   if (HDMapUtil::BaseMap().GetNearestLaneWithHeading(
-      adc_point, 2.0, vehicle_state.heading(),
-      M_PI / 3.0, &lane, &s, &l) != 0) {
+          adc_point, 2.0, vehicle_state.heading(), M_PI / 3.0, &lane, &s, &l) !=
+      0) {
     park_and_go = true;
   } else {
     if (lane->lane().type() != hdmap::Lane::CITY_DRIVING) {

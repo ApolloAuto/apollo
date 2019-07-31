@@ -231,14 +231,13 @@ Status PathAssessmentDecider::Process(
       new_candidate_path_data.push_back(curr_path_data);
     }
   }
-  reference_line_info->SetCandidatePathData(
-      std::move(new_candidate_path_data));
+  reference_line_info->SetCandidatePathData(std::move(new_candidate_path_data));
 
   // 4. Update necessary info for lane-borrow decider's future uses.
   // Update front static obstacle's info.
-  auto *mutable_path_decider_status = PlanningContext::Instance()
-                                     ->mutable_planning_status()
-                                     ->mutable_path_decider();
+  auto* mutable_path_decider_status = PlanningContext::Instance()
+                                          ->mutable_planning_status()
+                                          ->mutable_path_decider();
   if (!(reference_line_info->GetBlockingObstacleId()).empty()) {
     int front_static_obstacle_cycle_counter =
         mutable_path_decider_status->front_static_obstacle_cycle_counter();
@@ -246,9 +245,9 @@ Status PathAssessmentDecider::Process(
       front_static_obstacle_cycle_counter = 0;
     }
     mutable_path_decider_status->set_front_static_obstacle_id(
-            reference_line_info->GetBlockingObstacleId());
+        reference_line_info->GetBlockingObstacleId());
     mutable_path_decider_status->set_front_static_obstacle_cycle_counter(
-            std::min(front_static_obstacle_cycle_counter + 1, 10));
+        std::min(front_static_obstacle_cycle_counter + 1, 10));
   } else {
     mutable_path_decider_status->set_front_static_obstacle_cycle_counter(0);
   }
@@ -266,7 +265,7 @@ Status PathAssessmentDecider::Process(
       able_to_use_self_lane_counter = 0;
     }
     mutable_path_decider_status->set_able_to_use_self_lane_counter(
-            std::min(able_to_use_self_lane_counter + 1, 10));
+        std::min(able_to_use_self_lane_counter + 1, 10));
   } else {
     mutable_path_decider_status->set_able_to_use_self_lane_counter(0);
   }

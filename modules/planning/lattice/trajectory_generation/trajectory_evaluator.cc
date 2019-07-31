@@ -33,9 +33,9 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::math::PathMatcher;
 using apollo::common::PathPoint;
 using apollo::common::SpeedPoint;
+using apollo::common::math::PathMatcher;
 
 using Trajectory1d = Curve1d;
 using PtrTrajectory1d = std::shared_ptr<Trajectory1d>;

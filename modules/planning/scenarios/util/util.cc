@@ -27,10 +27,10 @@ namespace planning {
 namespace scenario {
 namespace util {
 
+using apollo::common::VehicleConfigHelper;
 using apollo::common::math::Box2d;
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
-using apollo::common::VehicleConfigHelper;
 using apollo::common::util::DistanceXY;
 using apollo::hdmap::PathOverlap;
 

@@ -138,11 +138,10 @@ Status PathBoundsDecider::Process(
   std::vector<LaneBorrowInfo> lane_borrow_info_list;
   if (reference_line_info->is_path_lane_borrow()) {
     // Try borrowing from left and from right neighbor lane.
-    const int decided_side_pass_direction =
-        PlanningContext::Instance()
-                        ->planning_status()
-                        .path_decider()
-                        .decided_side_pass_direction();
+    const int decided_side_pass_direction = PlanningContext::Instance()
+                                                ->planning_status()
+                                                .path_decider()
+                                                .decided_side_pass_direction();
     switch (decided_side_pass_direction) {
       case 0:
         lane_borrow_info_list = {LaneBorrowInfo::LEFT_BORROW,
