@@ -21,7 +21,7 @@ namespace routing {
 
 namespace {
 
-using hdmap::Curve;
+using apollo::hdmap::Curve;
 
 void AddCurve(Curve* curve) {
   auto* curve_segment = curve->add_segment();

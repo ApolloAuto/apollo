@@ -32,11 +32,11 @@ DEFINE_double(default_lane_width, 3.048, "default lane width is about 10 feet");
 namespace apollo {
 namespace hdmap {
 
-using common::math::Box2d;
-using common::math::kMathEpsilon;
-using common::math::LineSegment2d;
-using common::math::Sqr;
-using common::math::Vec2d;
+using apollo::common::math::Box2d;
+using apollo::common::math::kMathEpsilon;
+using apollo::common::math::LineSegment2d;
+using apollo::common::math::Sqr;
+using apollo::common::math::Vec2d;
 using std::placeholders::_1;
 
 namespace {
