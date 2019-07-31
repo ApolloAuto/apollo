@@ -97,7 +97,7 @@ void Dispatcher::AddListener(const RoleAttributes& self_attr,
     handler =
         std::dynamic_pointer_cast<ListenerHandler<MessageT>>(*handler_base);
     if (handler == nullptr) {
-      AERROR << "please ensure that readers with the same channel["
+      AFATAL << "please ensure that readers with the same channel["
              << self_attr.channel_name()
              << "] in the same process have the same message type";
       return;
@@ -126,7 +126,7 @@ void Dispatcher::AddListener(const RoleAttributes& self_attr,
     handler =
         std::dynamic_pointer_cast<ListenerHandler<MessageT>>(*handler_base);
     if (handler == nullptr) {
-      AERROR << "please ensure that readers with the same channel["
+      AFATAL << "please ensure that readers with the same channel["
              << self_attr.channel_name()
              << "] in the same process have the same message type";
       return;

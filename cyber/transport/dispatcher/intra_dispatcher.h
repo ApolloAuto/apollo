@@ -68,13 +68,28 @@ void IntraDispatcher::OnMessage(uint64_t channel_id,
       auto handler =
           std::dynamic_pointer_cast<ListenerHandler<MessageT>>(*handler_base);
       if (handler == nullptr) {
-        AERROR << "please ensure that readers with the same channel["
+        AFATAL << "please ensure that readers with the same channel["
                << common::GlobalData::GetChannelById(channel_id)
                << "] in the same process have the same message type";
         return;
       }
       handler->Run(message, message_info);
     }
+  }
+}
+
+template <>
+inline void IntraDispatcher::OnMessage<message::RawMessage>(
+    uint64_t channel_id, const std::shared_ptr<message::RawMessage>& message,
+    const MessageInfo& message_info) {
+  if (is_shutdown_.load()) {
+    return;
+  }
+  ADEBUG << "intra on message, channel:"
+         << common::GlobalData::GetChannelById(channel_id);
+  ListenerHandlerBasePtr* handler_base = nullptr;
+  if (msg_listeners_.Get(channel_id, &handler_base)) {
+    (*handler_base)->RunRaw(message, message_info);
   }
 }
 

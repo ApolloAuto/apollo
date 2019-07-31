@@ -28,6 +28,12 @@
 #include "cyber/message/raw_message.h"
 #include "cyber/transport/message/message_info.h"
 
+namespace google {
+namespace protobuf {
+class Message;
+}  // namespace protobuf
+}  // namespace google
+
 namespace apollo {
 namespace cyber {
 namespace transport {
@@ -47,13 +53,15 @@ class ListenerHandlerBase {
   virtual void Disconnect(uint64_t self_id) = 0;
   virtual void Disconnect(uint64_t self_id, uint64_t oppo_id) = 0;
   inline bool IsRawMessage() const { return is_raw_message_; }
+  virtual void RunRaw(const std::shared_ptr<message::RawMessage>& message,
+                      const MessageInfo& msg_info) = 0;
 
  protected:
   bool is_raw_message_ = false;
 };
 
 template <typename MessageT>
-class ListenerHandler : public ListenerHandlerBase {
+class ListenerHandlerCore : public ListenerHandlerBase {
  public:
   using Message = std::shared_ptr<MessageT>;
   using MessageSignal = base::Signal<const Message&, const MessageInfo&>;
@@ -63,8 +71,8 @@ class ListenerHandler : public ListenerHandlerBase {
       base::Connection<const Message&, const MessageInfo&>;
   using ConnectionMap = std::unordered_map<uint64_t, MessageConnection>;
 
-  ListenerHandler() {}
-  virtual ~ListenerHandler() {}
+  ListenerHandlerCore() {}
+  virtual ~ListenerHandlerCore() {}
 
   void Connect(uint64_t self_id, const Listener& listener);
   void Connect(uint64_t self_id, uint64_t oppo_id, const Listener& listener);
@@ -89,14 +97,44 @@ class ListenerHandler : public ListenerHandlerBase {
   base::AtomicRWLock rw_lock_;
 };
 
+template <typename MessageT,
+          bool = std::is_base_of<google::protobuf::Message, MessageT>::value>
+class ListenerHandler : public ListenerHandlerCore<MessageT> {
+  inline void RunRaw(const std::shared_ptr<message::RawMessage>& message,
+                     const MessageInfo& msg_info) override {
+    AFATAL << typeid(MessageT).name() << " not supported.";
+  }
+};
+
+template <typename MessageT>
+class ListenerHandler<MessageT, true> : public ListenerHandlerCore<MessageT> {
+  inline void RunRaw(const std::shared_ptr<message::RawMessage>& message,
+                     const MessageInfo& msg_info) override {
+    auto protobuf_msg = std::make_shared<MessageT>();
+    CHECK(protobuf_msg->ParseFromString(message->message))
+        << "failed to parse \"" << message->message << "\" into "
+        << typeid(MessageT).name();
+    this->Run(protobuf_msg, msg_info);
+  }
+};
+
 template <>
-inline ListenerHandler<message::RawMessage>::ListenerHandler() {
+class ListenerHandler<message::RawMessage, false>
+    : public ListenerHandlerCore<message::RawMessage> {
+  inline void RunRaw(const std::shared_ptr<message::RawMessage>& message,
+                     const MessageInfo& msg_info) override {
+    this->Run(message, msg_info);
+  }
+};
+
+template <>
+inline ListenerHandlerCore<message::RawMessage>::ListenerHandlerCore() {
   is_raw_message_ = true;
 }
 
 template <typename MessageT>
-void ListenerHandler<MessageT>::Connect(uint64_t self_id,
-                                        const Listener& listener) {
+void ListenerHandlerCore<MessageT>::Connect(uint64_t self_id,
+                                            const Listener& listener) {
   auto connection = signal_.Connect(listener);
   if (!connection.IsConnected()) {
     return;
@@ -107,8 +145,8 @@ void ListenerHandler<MessageT>::Connect(uint64_t self_id,
 }
 
 template <typename MessageT>
-void ListenerHandler<MessageT>::Connect(uint64_t self_id, uint64_t oppo_id,
-                                        const Listener& listener) {
+void ListenerHandlerCore<MessageT>::Connect(uint64_t self_id, uint64_t oppo_id,
+                                            const Listener& listener) {
   WriteLockGuard<AtomicRWLock> lock(rw_lock_);
   if (signals_.find(oppo_id) == signals_.end()) {
     signals_[oppo_id] = std::make_shared<MessageSignal>();
@@ -128,7 +166,7 @@ void ListenerHandler<MessageT>::Connect(uint64_t self_id, uint64_t oppo_id,
 }
 
 template <typename MessageT>
-void ListenerHandler<MessageT>::Disconnect(uint64_t self_id) {
+void ListenerHandlerCore<MessageT>::Disconnect(uint64_t self_id) {
   WriteLockGuard<AtomicRWLock> lock(rw_lock_);
   if (signal_conns_.find(self_id) == signal_conns_.end()) {
     return;
@@ -139,7 +177,8 @@ void ListenerHandler<MessageT>::Disconnect(uint64_t self_id) {
 }
 
 template <typename MessageT>
-void ListenerHandler<MessageT>::Disconnect(uint64_t self_id, uint64_t oppo_id) {
+void ListenerHandlerCore<MessageT>::Disconnect(uint64_t self_id,
+                                               uint64_t oppo_id) {
   WriteLockGuard<AtomicRWLock> lock(rw_lock_);
   if (signals_conns_.find(oppo_id) == signals_conns_.end()) {
     return;
@@ -154,8 +193,8 @@ void ListenerHandler<MessageT>::Disconnect(uint64_t self_id, uint64_t oppo_id) {
 }
 
 template <typename MessageT>
-void ListenerHandler<MessageT>::Run(const Message& msg,
-                                    const MessageInfo& msg_info) {
+void ListenerHandlerCore<MessageT>::Run(const Message& msg,
+                                        const MessageInfo& msg_info) {
   signal_(msg, msg_info);
   uint64_t oppo_id = msg_info.sender_id().HashValue();
   ReadLockGuard<AtomicRWLock> lock(rw_lock_);
