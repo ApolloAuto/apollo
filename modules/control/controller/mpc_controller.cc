@@ -67,7 +67,7 @@ MPCController::MPCController() : name_("MPC Controller") {
     mpc_log_file_ << std::setprecision(6);
     WriteHeaders(mpc_log_file_);
   }
-  AINFO << "Using " << name_;
+  ADEBUG << "Using " << name_;
 }
 
 MPCController::~MPCController() { CloseLogFile(); }
@@ -136,7 +136,7 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
       control_conf->mpc_controller_conf().unconstraint_control_diff_limit();
 
   LoadControlCalibrationTable(control_conf->mpc_controller_conf());
-  AINFO << "MPC conf loaded";
+  ADEBUG << "MPC conf loaded";
   return true;
 }
 
@@ -146,12 +146,12 @@ void MPCController::ProcessLogs(const SimpleMPCDebug *debug,
 }
 
 void MPCController::LogInitParameters() {
-  AINFO << name_ << " begin.";
-  AINFO << "[MPCController parameters]"
-        << " mass_: " << mass_ << ","
-        << " iz_: " << iz_ << ","
-        << " lf_: " << lf_ << ","
-        << " lr_: " << lr_;
+  ADEBUG << name_ << " begin.";
+  ADEBUG << "[MPCController parameters]"
+         << " mass_: " << mass_ << ","
+         << " iz_: " << iz_ << ","
+         << " lf_: " << lf_ << ","
+         << " lr_: " << lr_;
 }
 
 void MPCController::InitializeFilters(const ControlConf *control_conf) {
@@ -235,7 +235,7 @@ Status MPCController::Init(const ControlConf *control_conf) {
   InitializeFilters(control_conf);
   LoadMPCGainScheduler(control_conf->mpc_controller_conf());
   LogInitParameters();
-  AINFO << "[MPCController] init done!";
+  ADEBUG << "[MPCController] init done!";
   return Status::OK();
 }
 
@@ -263,7 +263,7 @@ void MPCController::LoadMPCGainScheduler(
       mpc_controller_conf.feedforwardterm_gain_scheduler();
   const auto &steer_weight_gain_scheduler =
       mpc_controller_conf.steer_weight_gain_scheduler();
-  AINFO << "MPC control gain scheduler loaded";
+  ADEBUG << "MPC control gain scheduler loaded";
   Interpolation1D::DataType xy1, xy2, xy3, xy4;
   for (const auto &scheduler : lat_err_gain_scheduler.scheduler()) {
     xy1.push_back(std::make_pair(scheduler.speed(), scheduler.ratio()));
@@ -374,17 +374,17 @@ Status MPCController::ComputeControlCommand(
   double unconstraint_control = 0.0;
   const double v = VehicleStateProvider::Instance()->linear_velocity();
 
-  std::vector<double> *control_cmd;
+  std::vector<double> control_cmd(2, 0);
   if (FLAGS_use_osqp_solver) {
     apollo::common::math::MpcOsqp mpc_osqp(
         matrix_ad_, matrix_bd_, matrix_q_updated_, matrix_r_updated_,
         lower_bound, upper_bound, matrix_state_, mpc_max_iteration_);
-    if (!mpc_osqp.MpcOsqpSolver(control_cmd)) {
+    if (!mpc_osqp.MpcOsqpSolver(&control_cmd)) {
       AERROR << "MPC OSQP solver failed";
     } else {
-      AINFO << "MPC OSQP problem solved! ";
-      control[0](0, 0) = control_cmd->at(0);
-      control[0](1, 0) = control_cmd->at(1);
+      ADEBUG << "MPC OSQP problem solved! ";
+      control[0](0, 0) = control_cmd.at(0);
+      control[0](1, 0) = control_cmd.at(1);
     }
   } else {
     if (!common::math::SolveLinearMPC(
@@ -534,9 +534,9 @@ Status MPCController::Reset() {
 void MPCController::LoadControlCalibrationTable(
     const MPCControllerConf &mpc_controller_conf) {
   const auto &control_table = mpc_controller_conf.calibration_table();
-  AINFO << "Control calibration table loaded";
-  AINFO << "Control calibration table size is "
-        << control_table.calibration_size();
+  ADEBUG << "Control calibration table loaded";
+  ADEBUG << "Control calibration table size is "
+         << control_table.calibration_size();
   Interpolation2D::DataType xyz;
   for (const auto &calibration : control_table.calibration()) {
     xyz.push_back(std::make_tuple(calibration.speed(),

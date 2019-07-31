@@ -44,8 +44,8 @@ void MpcOsqp::CalculateKernel(std::vector<c_float> *P_data,
   columns.resize(num_param_);
   int value_index = 0;
   // state and terminal state
-  for (int i = 0; i <= horizon_; ++i) {
-    for (int j = 0; j < state_dim_; ++j) {
+  for (size_t i = 0; i <= horizon_; ++i) {
+    for (size_t j = 0; j < state_dim_; ++j) {
       // (row, val)
       columns[i * state_dim_ + j].emplace_back(i * state_dim_ + j,
                                                matrix_q_(j, j));
@@ -53,9 +53,9 @@ void MpcOsqp::CalculateKernel(std::vector<c_float> *P_data,
     }
   }
   // control
-  const int state_total_dim = state_dim_ * (horizon_ + 1);
-  for (int i = 0; i < horizon_; ++i) {
-    for (int j = 0; j < control_dim_; ++j) {
+  const size_t state_total_dim = state_dim_ * (horizon_ + 1);
+  for (size_t i = 0; i < horizon_; ++i) {
+    for (size_t j = 0; j < control_dim_; ++j) {
       // (row, val)
       columns[i * control_dim_ + j + state_total_dim].emplace_back(
           state_total_dim + i * control_dim_ + j, matrix_r_(j, j));
@@ -65,20 +65,20 @@ void MpcOsqp::CalculateKernel(std::vector<c_float> *P_data,
   CHECK_EQ(value_index, num_param_);
 
   int ind_p = 0;
-  for (int i = 0; i < num_param_; ++i) {
+  for (size_t i = 0; i < num_param_; ++i) {
     // TODO(SHU) Check this
-    P_indptr->push_back(ind_p);
+    P_indptr->emplace_back(ind_p);
     for (const auto &row_data_pair : columns[i]) {
-      P_data->push_back(row_data_pair.second);    // val
-      P_indices->push_back(row_data_pair.first);  // row
+      P_data->emplace_back(row_data_pair.second);    // val
+      P_indices->emplace_back(row_data_pair.first);  // row
       ++ind_p;
     }
   }
-  P_indptr->push_back(ind_p);
+  P_indptr->emplace_back(ind_p);
 }
 
 // reference is always zero
-void MpcOsqp::castMPCToQPGradient() {
+void MpcOsqp::CalculateGradient() {
   // populate the gradient vector
   gradient_ = Eigen::VectorXd::Zero(
       state_dim_ * (horizon_ + 1) + control_dim_ * horizon_, 1);
@@ -88,23 +88,63 @@ void MpcOsqp::castMPCToQPGradient() {
 void MpcOsqp::CalculateEqualityConstraint(std::vector<c_float> *A_data,
                                           std::vector<c_int> *A_indices,
                                           std::vector<c_int> *A_indptr) {
-  // TODO(SHU): in process
+  constexpr double kEpsilon = 1e-6;
+  // block matrix
+  Eigen::MatrixXd matrix_constraint(
+      state_dim_ * (horizon_ + 1) + state_dim_ * (horizon_ + 1) +
+          control_dim_ * horizon_,
+      state_dim_ * (horizon_ + 1) + control_dim_ * horizon_);
+  Eigen::MatrixXd state_identity_mat = Eigen::MatrixXd::Identity(
+      state_dim_ * (horizon_ + 1), state_dim_ * (horizon_ + 1));
+
+  matrix_constraint.block(0, 0, state_dim_ * (horizon_ + 1),
+                          state_dim_ * (horizon_ + 1)) =
+      -1 * state_identity_mat;
+
+  Eigen::MatrixXd control_identity_mat(control_dim_, control_dim_);
+
+  for (size_t i = 0; i < horizon_; i++) {
+    matrix_constraint.block((i + 1) * state_dim_, i * state_dim_, state_dim_,
+                            state_dim_) = matrix_a_;
+  }
+
+  for (size_t i = 0; i < horizon_; i++) {
+    matrix_constraint.block((i + 1) * state_dim_,
+                            i * control_dim_ + (horizon_ + 1) * state_dim_,
+                            state_dim_, control_dim_) = matrix_b_;
+  }
+  Eigen::MatrixXd all_identity_mat =
+      Eigen::MatrixXd::Identity(num_param_, num_param_);
+
+  matrix_constraint.block(state_dim_ * (horizon_ + 1), 0, num_param_,
+                          num_param_) = all_identity_mat;
+
   std::vector<std::vector<std::pair<c_int, c_float>>> columns;
-  columns.resize(num_param_);
+  columns.resize(num_param_ + 1);  // TODO(SHU): double check
   int value_index = 0;
   // state and terminal state
-  for (int i = 0; i <= horizon_; ++i) {
-    for (int j = 0; j < state_dim_; ++j) {  // row
-      for (int k = 0; k < state_dim_; ++k)  // col
+  for (size_t i = 0; i < num_param_; ++i) {  // col
+    for (size_t j = 0; j < num_param_ + state_dim_ * (horizon_ + 1);
+         ++j)  // row
+      if (std::fabs(matrix_constraint(i, j)) > kEpsilon) {
         // (row, val)
-        columns[i * state_dim_ + j].emplace_back(i * state_dim_ + j,
-                                                 matrix_a_(j, k));
-      ++value_index;
+        columns[i].emplace_back(j, matrix_constraint(i, j));
+        ++value_index;
+      }
+  }
+  int ind_A = 0;
+  for (size_t i = 0; i < num_param_; ++i) {
+    A_indptr->emplace_back(ind_A);
+    for (const auto &row_data_pair : columns[i]) {
+      A_data->emplace_back(row_data_pair.second);    // value
+      A_indices->emplace_back(row_data_pair.first);  // row
+      ++ind_A;
     }
   }
+  A_indptr->emplace_back(ind_A);
 }
 
-void MpcOsqp::castMPCToQPConstraintVectors() {
+void MpcOsqp::CalculateConstraintVectors() {
   // evaluate the lower and the upper inequality vectors
   Eigen::Matrix<double, 4, 1> xMax =
       Eigen::MatrixXd::Constant(state_dim_, 1, 100.0);
@@ -112,11 +152,11 @@ void MpcOsqp::castMPCToQPConstraintVectors() {
       state_dim_ * (horizon_ + 1) + control_dim_ * horizon_, 1);
   Eigen::VectorXd upperInequality = Eigen::MatrixXd::Zero(
       state_dim_ * (horizon_ + 1) + control_dim_ * horizon_, 1);
-  for (int i = 0; i < horizon_ + 1; i++) {
+  for (size_t i = 0; i < horizon_ + 1; i++) {
     lowerInequality.block(state_dim_ * i, 0, state_dim_, 1) = -1.0 * xMax;
     upperInequality.block(state_dim_ * i, 0, state_dim_, 1) = xMax;
   }
-  for (int i = 0; i < horizon_; i++) {
+  for (size_t i = 0; i < horizon_; i++) {
     lowerInequality.block(control_dim_ * i + state_dim_ * (horizon_ + 1), 0,
                           control_dim_, 1) = matrix_lower_;
     upperInequality.block(control_dim_ * i + state_dim_ * (horizon_ + 1), 0,
@@ -198,8 +238,8 @@ void MpcOsqp::FreeData(OSQPData *data) {
 
 bool MpcOsqp::MpcOsqpSolver(std::vector<double> *control_cmd) {
   // cast the MPC problem as QP problem
-  castMPCToQPGradient();
-  castMPCToQPConstraintVectors();
+  CalculateGradient();
+  CalculateConstraintVectors();
 
   OSQPData *data = Data();
   OSQPSettings *settings = Settings();
@@ -222,8 +262,8 @@ bool MpcOsqp::MpcOsqpSolver(std::vector<double> *control_cmd) {
     return false;
   }
 
-  int first_control = state_dim_ * (horizon_ + 1);
-  for (int i = 0; i < control_dim_; ++i) {
+  size_t first_control = state_dim_ * (horizon_ + 1);
+  for (size_t i = 0; i < control_dim_; ++i) {
     control_cmd->at(i) = osqp_workspace->solution->x[i + first_control];
   }
 

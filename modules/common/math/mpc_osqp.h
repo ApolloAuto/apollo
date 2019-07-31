@@ -57,9 +57,8 @@ class MpcOsqp {
   void CalculateEqualityConstraint(std::vector<c_float> *A_data,
                                    std::vector<c_int> *A_indices,
                                    std::vector<c_int> *A_indptr);
-  void castMPCToQPGradient();
-  void castMPCToQPConstraintMatrix();
-  void castMPCToQPConstraintVectors();
+  void CalculateGradient();
+  void CalculateConstraintVectors();
   OSQPSettings *Settings();
   OSQPData *Data();
   void FreeData(OSQPData *data);
@@ -78,10 +77,10 @@ class MpcOsqp {
   Eigen::MatrixXd matrix_r_;
   int max_iteration_;
   int num_constraint_;
-  int num_param_;
-  int state_dim_;
-  int horizon_;
-  int control_dim_;
+  size_t num_param_;
+  size_t state_dim_;
+  size_t horizon_;
+  size_t control_dim_;
   Eigen::VectorXd gradient_;
   Eigen::VectorXd lowerBound_;
   Eigen::VectorXd upperBound_;
