@@ -111,11 +111,11 @@ cc_test(
 
 cc_library(
     name = "connected_component_analysis",
-    hdrs = [
-        "connected_component_analysis.h",
-    ],
     srcs = [
         "connected_component_analysis.cc",
+    ],
+    hdrs = [
+        "connected_component_analysis.h",
     ],
     deps = [
         "//cyber",
