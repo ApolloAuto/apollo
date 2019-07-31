@@ -359,7 +359,7 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
 
   // get path lengh
   size_t path_points_size = result->x.size();
-  AERROR << "path_points_size " << path_points_size;
+
   double accumulated_s = 0.0;
   result->accumulated_s.clear();
   auto last_x = result->x.front();
@@ -372,7 +372,6 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
     last_x = result->x[i];
     last_y = result->y[i];
   }
-  AERROR << "accumulated_s" << accumulated_s;
   // assume static initial state
   const double init_v = 0.0;
   const double init_a = 0.0;
@@ -384,15 +383,22 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   const double max_forward_acc = 2.0;
   const double max_reverse_acc = 1.0;
   const double max_acc_jerk = 0.5;
-  const double delta_t = 0.1;
+  const double delta_t = 0.2;
 
   SpeedData speed_data;
 
   // TODO(Jinyun): explore better time horizon heuristic
-  const double total_t = 25.0;
-  const size_t num_of_knots = static_cast<size_t>(total_t / delta_t) + 1;
   const double path_length = result->accumulated_s.back();
-  AERROR << "path length is " << path_length;
+  const double total_t = std::max(gear
+                                      ? 1.5 * (max_forward_v * max_forward_v +
+                                               path_length * max_forward_acc) /
+                                            (max_forward_acc * max_forward_v)
+                                      : 1.5 * (max_reverse_v * max_reverse_v +
+                                               path_length * max_reverse_acc) /
+                                            (max_reverse_acc * max_reverse_v),
+                                  10.0);
+
+  const size_t num_of_knots = static_cast<size_t>(total_t / delta_t) + 1;
 
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(
       num_of_knots, delta_t, {0.0, std::abs(init_v), std::abs(init_a)});
@@ -416,7 +422,7 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
 
   // TODO(Jinyun): move to confs
   std::vector<double> x_ref(num_of_knots, path_length);
-  piecewise_jerk_problem.set_x_ref(100000.0, x_ref);
+  piecewise_jerk_problem.set_x_ref(10000.0, x_ref);
   piecewise_jerk_problem.set_weight_ddx(10.0);
   piecewise_jerk_problem.set_weight_dddx(10.0);
   piecewise_jerk_problem.set_x_bounds(std::move(x_bounds));
@@ -437,14 +443,14 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
 
   // assign speed point by gear
   speed_data.AppendSpeedPoint(s[0], 0.0, ds[0], dds[0], 0.0);
-  const double kEpislon = 1.0e-4;
-  const double sEpislon = 1.0e-1;
+  const double kEpislon = 1.0e-6;
+  const double sEpislon = 1.0e-6;
   for (size_t i = 1; i < num_of_knots; ++i) {
     if (s[i - 1] - s[i] > kEpislon) {
-      AERROR << "unexpected decreasing s in speed smoothing at time "
+      ADEBUG << "unexpected decreasing s in speed smoothing at time "
              << static_cast<double>(i) * delta_t << "with total time "
              << total_t;
-      return false;
+      break;
     }
     speed_data.AppendSpeedPoint(s[i], delta_t * static_cast<double>(i), ds[i],
                                 dds[i], (dds[i] - dds[i - 1]) / delta_t);
@@ -475,7 +481,6 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
     AERROR << "path data is empty";
     return false;
   }
-  AERROR << "speed_points.TotalTime() " << speed_data.TotalTime();
   for (double cur_rel_time = 0.0; cur_rel_time < time_horizon;
        cur_rel_time += kDenseTimeResoltuion) {
     common::SpeedPoint speed_point;
@@ -502,28 +507,12 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
       combined_result.a.push_back(speed_point.a());
     }
   }
-  AERROR << "path length before combine " << path_data.Length();
 
-  // As the  a output of hybrid astar is one less dimension, pop the back
-  // of a
   combined_result.a.pop_back();
 
   // recalc step size
   path_points_size = combined_result.x.size();
-  AERROR << "path_points_size " << path_points_size;
 
-  // // load accumulated s
-  // double accumulated_distance = 0.0;
-  // combined_result.accumulated_s.push_back(accumulated_distance);
-  // for (size_t i = 1; i < path_points_size; ++i) {
-  //   double x_diff = result->x[i] - result->x[i - 1];
-  //   double y_diff = result->y[i] - result->y[i - 1];
-  //   accumulated_distance += std::sqrt(x_diff * x_diff + y_diff * y_diff);
-  //   combined_result.accumulated_s.push_back(accumulated_distance);
-  // }
-
-  AERROR << "trajectory length after combine "
-         << combined_result.accumulated_s.back();
   // load steering from phi
   for (size_t i = 0; i + 1 < path_points_size; ++i) {
     double discrete_steer =
@@ -584,9 +573,6 @@ bool HybridAStar::TrajectoryPartition(
   current_traj->y.push_back(y.back());
   current_traj->phi.push_back(phi.back());
 
-  AERROR << "size of partitioned result in HybridAStar: "
-         << partitioned_result->size();
-
   const auto start_timestamp = std::chrono::system_clock::now();
 
   // Retrieve v, a and steer from path
@@ -606,7 +592,7 @@ bool HybridAStar::TrajectoryPartition(
 
   const auto end_timestamp = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_timestamp - start_timestamp;
-  AERROR << "speed profile total time: " << diff.count() * 1000.0 << " ms.";
+  ADEBUG << "speed profile total time: " << diff.count() * 1000.0 << " ms.";
   return true;
 }
 
@@ -618,9 +604,6 @@ bool HybridAStar::GetTemporalProfile(HybridAStartResult* result) {
   }
   HybridAStartResult stitched_result;
   for (const auto& result : partitioned_results) {
-    AERROR << "v size is " << result.v.size();
-    AERROR << "x size is " << result.x.size();
-    AERROR << "steer size is " << result.steer.size();
     std::copy(result.x.begin(), result.x.end() - 1,
               std::back_inserter(stitched_result.x));
     std::copy(result.y.begin(), result.y.end() - 1,

@@ -17,11 +17,11 @@
 /**
  * @file
  **/
+#include "modules/planning/open_space/trajectory_smoother/distance_approach_problem.h"
 #include <ctime>
 #include "cyber/common/file.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.h"
-#include "modules/planning/open_space/trajectory_smoother/distance_approach_problem.h"
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_problem.h"
 
 namespace apollo {
@@ -668,8 +668,8 @@ void DistanceGetResult(ResultContainer* result_ptr,
     }
   }
   for (size_t i = 0; i + 1 < size_by_distance; ++i) {
-    opt_a[i] = (*(result_ptr->PrepareControlResult()))(0, i);
-    opt_steer[i] = (*(result_ptr->PrepareControlResult()))(1, i);
+    opt_a[i] = (*(result_ptr->PrepareControlResult()))(1, i);
+    opt_steer[i] = (*(result_ptr->PrepareControlResult()))(0, i);
   }
 
   hybrid_time[0] = *(result_ptr->GetHybridTime());
