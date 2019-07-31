@@ -223,8 +223,8 @@ bool LaneScanningEvaluator::ExtractObstacleFeatures(
     }
     // Extract normalized position info.
     if (feature.has_position()) {
-      pos_history[i] = std::make_pair(
-          feature.position().x(), feature.position().y());
+      pos_history[i] =
+          std::make_pair(feature.position().x(), feature.position().y());
     } else {
       has_history[i] = 0.0;
     }

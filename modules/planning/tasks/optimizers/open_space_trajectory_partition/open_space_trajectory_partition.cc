@@ -364,9 +364,10 @@ void OpenSpaceTrajectoryPartition::UpdateTrajHistory(
                                 ->mutable_open_space();
 
   const auto& trajectory_history =
-      PlanningContext::Instance()->planning_status()
-                                 .open_space()
-                                 .partitioned_trajectories_index_history();
+      PlanningContext::Instance()
+          ->planning_status()
+          .open_space()
+          .partitioned_trajectories_index_history();
   if (trajectory_history.empty()) {
     open_space_status->add_partitioned_trajectories_index_history(
         chosen_trajectory_encoding);

@@ -52,9 +52,9 @@ Status PathLaneBorrowDecider::Process(
 
 bool PathLaneBorrowDecider::IsNecessaryToBorrowLane(
     const Frame& frame, const ReferenceLineInfo& reference_line_info) {
-  auto *mutable_path_decider_status = PlanningContext::Instance()
-                                     ->mutable_planning_status()
-                                     ->mutable_path_decider();
+  auto* mutable_path_decider_status = PlanningContext::Instance()
+                                          ->mutable_planning_status()
+                                          ->mutable_path_decider();
   if (mutable_path_decider_status->is_in_path_lane_borrow_scenario()) {
     // If originally borrowing neighbor lane:
     if (mutable_path_decider_status->able_to_use_self_lane_counter() >= 6) {
@@ -108,7 +108,7 @@ bool PathLaneBorrowDecider::IsLongTermBlockingObstacle() {
 
 bool PathLaneBorrowDecider::IsBlockingObstacleWithinDestination(
     const ReferenceLineInfo& reference_line_info) {
-  const auto &path_decider_status =
+  const auto& path_decider_status =
       PlanningContext::Instance()->planning_status().path_decider();
   const std::string blocking_obstacle_id =
       path_decider_status.front_static_obstacle_id();
@@ -140,7 +140,7 @@ bool PathLaneBorrowDecider::IsBlockingObstacleWithinDestination(
 
 bool PathLaneBorrowDecider::IsBlockingObstacleFarFromIntersection(
     const ReferenceLineInfo& reference_line_info) {
-  const auto &path_decider_status =
+  const auto& path_decider_status =
       PlanningContext::Instance()->planning_status().path_decider();
   const std::string blocking_obstacle_id =
       path_decider_status.front_static_obstacle_id();
@@ -195,7 +195,7 @@ bool PathLaneBorrowDecider::IsBlockingObstacleFarFromIntersection(
 
 bool PathLaneBorrowDecider::IsSidePassableObstacle(
     const ReferenceLineInfo& reference_line_info) {
-  const auto &path_decider_status =
+  const auto& path_decider_status =
       PlanningContext::Instance()->planning_status().path_decider();
   const std::string blocking_obstacle_id =
       path_decider_status.front_static_obstacle_id();
