@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_matrix.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_matrix.h"
 
 #include <algorithm>
+#include <memory>
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 PyramidMapMatrix::PyramidMapMatrix() { Clear(); }
 
@@ -1478,7 +1481,7 @@ double PyramidMapMatrix::ComputeMeanIntensity(unsigned int level) {
   return avg;
 }
 
-void PyramidMapMatrix::Reduce(PyramidMapMatrix* cells,
+void PyramidMapMatrix::Reduce(std::shared_ptr<PyramidMapMatrix> cells,
                               const PyramidMapMatrix& new_cells,
                               unsigned int level, unsigned int new_level) {
   if (level >= cells->resolution_num_) {
@@ -1515,6 +1518,7 @@ void PyramidMapMatrix::Reduce(PyramidMapMatrix* cells,
   }
 }
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
