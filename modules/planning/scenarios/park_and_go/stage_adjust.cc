@@ -47,9 +47,9 @@ Stage::StageStatus ParkAndGoStageAdjust::Process(
     AERROR << "ParkAndGoStageAdjust planning error";
     return StageStatus::ERROR;
   }
-  scenario::util::ParkAndGoStatus status =
+  bool path_clear =
       scenario::util::CheckADCSurroundObstacles(frame, scenario_config_);
-  if (status == scenario::util::ADJUST_COMPLETE) {
+  if (path_clear) {
     return FinishStage();
   }
   return StageStatus::RUNNING;

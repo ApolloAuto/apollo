@@ -61,8 +61,8 @@ ParkAndGoStatus CheckADCParkAndGoOpenSpace(
     const ReferenceLineInfo& reference_line_info,
     const ScenarioParkAndGoConfig& scenario_config);
 
-ParkAndGoStatus CheckADCSurroundObstacles(
-    Frame* frame, const ScenarioParkAndGoConfig& scenario_config);
+bool CheckADCSurroundObstacles(Frame* frame,
+                               const ScenarioParkAndGoConfig& scenario_config);
 
 bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
                                const ScenarioPullOverConfig& scenario_config,
