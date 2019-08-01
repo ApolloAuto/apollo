@@ -28,6 +28,7 @@ TEST(MPCOSQPSolverTest, MPCOSQP) {
   int controls = 2;
   const int horizon = 10;
   const int max_iter = 100;
+  const double eps = 0.01;
 
   Eigen::MatrixXd A(states, states);
   A << 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1;
@@ -42,18 +43,90 @@ TEST(MPCOSQPSolverTest, MPCOSQP) {
   R << 1, 0, 0, 1;
 
   Eigen::MatrixXd lower_bound(controls, 1);
-  lower_bound << -10, -10;
+  lower_bound << -5, -5;
 
   Eigen::MatrixXd upper_bound(controls, 1);
-  upper_bound << 10, 10;
+  upper_bound << 5, 5;
 
   Eigen::MatrixXd initial_state(states, 1);
   initial_state << 20, 0, 0, 0;
   std::vector<double> control_cmd(2, 0);
   MpcOsqp mpc_osqp_solver(A, B, Q, R, lower_bound, upper_bound, initial_state,
-                          max_iter, horizon);
+                          max_iter, horizon, eps);
   mpc_osqp_solver.Solve(&control_cmd);
   EXPECT_FLOAT_EQ(0, control_cmd[0]);
+}
+
+TEST(MPCOSQPSolverTest, NonFullRankMatrix) {
+  const int states = 2;
+  int controls = 1;
+  const int horizon = 2;
+  const int max_iter = 100;
+  const double eps = 0.01;
+
+  Eigen::MatrixXd A(states, states);
+  A << 0, 2, 0, 0;
+
+  Eigen::MatrixXd B(states, controls);
+  B << 0, 3;
+
+  Eigen::MatrixXd Q(states, states);
+  Q << 1, 0, 0, 0;
+
+  Eigen::MatrixXd R(controls, controls);
+  R << 1;
+
+  Eigen::MatrixXd lower_bound(controls, 1);
+  lower_bound << -10;
+
+  Eigen::MatrixXd upper_bound(controls, 1);
+  upper_bound << 10;
+
+  Eigen::MatrixXd initial_state(states, 1);
+  initial_state << 3, 0;
+
+  std::vector<double> control_cmd(2, 0);
+
+  MpcOsqp mpc_osqp_solver(A, B, Q, R, lower_bound, upper_bound, initial_state,
+                          max_iter, horizon, eps);
+  mpc_osqp_solver.Solve(&control_cmd);
+  EXPECT_FLOAT_EQ(0, control_cmd[0]);
+}
+
+TEST(MPCOSQPSolverTest, NullMatrix) {
+  const int states = 2;
+  int controls = 1;
+  const int horizon = 2;
+  const int max_iter = 100;
+  const double eps = 0.01;
+
+  Eigen::MatrixXd A(states, states);
+  A << 0, 0, 0, 0;
+
+  Eigen::MatrixXd B(states, controls);
+  B << 0, 3;
+
+  Eigen::MatrixXd Q(states, states);
+  Q << 1, 0, 0, 0;
+
+  Eigen::MatrixXd R(controls, controls);
+  R << 1;
+
+  Eigen::MatrixXd lower_bound(controls, 1);
+  lower_bound << -10;
+
+  Eigen::MatrixXd upper_bound(controls, 1);
+  upper_bound << 10;
+
+  Eigen::MatrixXd initial_state(states, 1);
+  initial_state << 3, 0;
+
+  std::vector<double> control_cmd(2, 0);
+
+  MpcOsqp mpc_osqp_solver(A, B, Q, R, lower_bound, upper_bound, initial_state,
+                          max_iter, horizon, eps);
+  mpc_osqp_solver.Solve(&control_cmd);
+  EXPECT_NEAR(0.0, control_cmd[0], 1e-7);
 }
 }  // namespace math
 }  // namespace common

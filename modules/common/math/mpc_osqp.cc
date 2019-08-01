@@ -19,7 +19,6 @@
 namespace apollo {
 namespace common {
 namespace math {
-
 MpcOsqp::MpcOsqp(const Eigen::MatrixXd &matrix_a,
                  const Eigen::MatrixXd &matrix_b,
                  const Eigen::MatrixXd &matrix_q,
@@ -27,26 +26,21 @@ MpcOsqp::MpcOsqp(const Eigen::MatrixXd &matrix_a,
                  const Eigen::MatrixXd &matrix_lower,
                  const Eigen::MatrixXd &matrix_upper,
                  const Eigen::MatrixXd &matrix_initial_state,
-                 const int max_iter, const int horizon) {
-  ADEBUG << "in MpcOsqp" << state_dim_;
-  matrix_a_ = matrix_a;
-  matrix_b_ = matrix_b;
-  matrix_q_ = matrix_q;
-  matrix_r_ = matrix_r;
-  matrix_lower_ = matrix_lower;
-  //   for (int i = 0; i < matrix_lower.rows(); ++i) {
-  //     for (int j = 0; j < matrix_lower.cols(); ++j) {
-  //       ADEBUG << "i" << i << "j" << j << matrix_lower(i, j);
-  //     }
-  //   }
-  matrix_upper_ = matrix_upper;
-  matrix_initial_state_ = matrix_initial_state;
-  max_iteration_ = max_iter;
+                 const int max_iter, const int horizon, const double eps_abs)
+    : matrix_a_(matrix_a),
+      matrix_b_(matrix_b),
+      matrix_q_(matrix_q),
+      matrix_r_(matrix_r),
+      matrix_initial_state_(matrix_initial_state),
+      matrix_lower_(matrix_lower),
+      matrix_upper_(matrix_upper),
+      max_iteration_(max_iter),
+      horizon_(horizon),
+      eps_abs_(eps_abs) {
   state_dim_ = matrix_b.rows();
   control_dim_ = matrix_b.cols();
   ADEBUG << "state_dim" << state_dim_;
   ADEBUG << "control_dim_" << control_dim_;
-  horizon_ = horizon;
   num_param_ = state_dim_ * (horizon_ + 1) + control_dim_ * horizon_;
 }
 
@@ -144,7 +138,7 @@ void MpcOsqp::CalculateEqualityConstraint(std::vector<c_float> *A_data,
   ADEBUG << matrix_constraint;
 
   std::vector<std::vector<std::pair<c_int, c_float>>> columns;
-  columns.resize(num_param_ + 1);  // TODO(SHU): double check
+  columns.resize(num_param_ + 1);
   int value_index = 0;
   // state and terminal state
   for (size_t i = 0; i < num_param_; ++i) {  // col
@@ -217,7 +211,8 @@ OSQPSettings *MpcOsqp::Settings() {
   settings->scaled_termination = true;
   settings->verbose = true;
   settings->max_iter = max_iteration_;
-  settings->warm_start = true;
+  settings->eps_abs = eps_abs_;
+  settings->warm_start = false;
   return settings;
 }
 
@@ -250,24 +245,15 @@ OSQPData *MpcOsqp::Data() {
                  kernel_dim, A_data.size(), CopyData(A_data),
                  CopyData(A_indices), CopyData(A_indptr));
   ADEBUG << "Get A matrix";
-
   data->l = lowerBound_.data();
   data->u = upperBound_.data();
   return data;
 }
 
 void MpcOsqp::FreeData(OSQPData *data) {
-  delete[] data->q;
-  delete[] data->l;
-  delete[] data->u;
-
-  delete[] data->P->i;
-  delete[] data->P->p;
-  delete[] data->P->x;
-
-  delete[] data->A->i;
-  delete[] data->A->p;
-  delete[] data->A->x;
+  c_free(data->A);
+  c_free(data->P);
+  c_free(data);
 }
 
 bool MpcOsqp::Solve(std::vector<double> *control_cmd) {
@@ -304,10 +290,14 @@ bool MpcOsqp::Solve(std::vector<double> *control_cmd) {
   if (status < 0 || (status != 1 && status != 2)) {
     AERROR << "failed optimization status:\t" << osqp_workspace->info->status;
     osqp_cleanup(osqp_workspace);
+    FreeData(data);
+    c_free(settings);
     return false;
   } else if (osqp_workspace->solution == nullptr) {
     AERROR << "The solution from OSQP is nullptr";
     osqp_cleanup(osqp_workspace);
+    FreeData(data);
+    c_free(settings);
     return false;
   }
 
@@ -319,6 +309,8 @@ bool MpcOsqp::Solve(std::vector<double> *control_cmd) {
 
   // Cleanup
   osqp_cleanup(osqp_workspace);
+  FreeData(data);
+  c_free(settings);
   return true;
 }
 

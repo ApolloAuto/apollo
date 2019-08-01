@@ -324,8 +324,7 @@ cc_test(
         "mpc_osqp_test.cc",
     ],
     deps = [
-        ":mpc",
-        "//modules/common/math:mpc_osqp",
+        ":mpc_osqp",
         "@gtest//:main",
     ],
 )
