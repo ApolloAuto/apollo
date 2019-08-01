@@ -30,6 +30,7 @@ if [ -e "/apollo/scripts/apollo_base.sh" ]; then
   source /apollo/scripts/apollo_base.sh
 fi
 
+unset OMP_NUM_THREADS
 ulimit -c unlimited
 ' >> "/home/${DOCKER_USER}/.bashrc"
 
