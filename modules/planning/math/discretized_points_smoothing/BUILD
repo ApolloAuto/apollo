@@ -53,6 +53,7 @@ cc_library(
     deps = [
         ":fem_pos_deviation_ipopt_interface",
         ":fem_pos_deviation_osqp_interface",
+        ":fem_pos_deviation_sqp_osqp_interface",
         "//cyber/common:log",
         "//modules/planning/proto:fem_pos_deviation_smoother_config_proto",
         "@ipopt",
@@ -84,6 +85,23 @@ cc_library(
     ],
     hdrs = [
         "fem_pos_deviation_osqp_interface.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+        "//cyber/common:log",
+        "@osqp",
+    ],
+)
+
+cc_library(
+    name = "fem_pos_deviation_sqp_osqp_interface",
+    srcs = [
+        "fem_pos_deviation_sqp_osqp_interface.cc",
+    ],
+    hdrs = [
+        "fem_pos_deviation_sqp_osqp_interface.h",
     ],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
