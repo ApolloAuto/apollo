@@ -84,8 +84,6 @@ Dreamland platform offers a number of features that you could explore to help yo
 
         ![](images/form.png)
 
-    
-
         You should receive the following activation confirmation via email:
 
         ![](images/email.png)
