@@ -67,6 +67,12 @@ class FemPosDeviationSqpOsqpInterface {
 
   void set_warm_start(const bool warm_start) { warm_start_ = warm_start; }
 
+  void set_sqp_max_iter(const int sqp_max_iter) {
+    sqp_max_iter_ = sqp_max_iter;
+  }
+
+  void set_sqp_jtol(const int sqp_jtol) { sqp_jtol_ = sqp_jtol; }
+
   bool Solve();
 
   const std::vector<double>& opt_x() const { return x_; }
@@ -86,16 +92,18 @@ class FemPosDeviationSqpOsqpInterface {
                                  std::vector<c_float>* lower_bounds,
                                  std::vector<c_float>* upper_bounds);
 
+  void UpdateAffineConstraint(std::vector<c_float>* A_data,
+                              std::vector<c_int>* A_indices,
+                              std::vector<c_int>* A_indptr,
+                              std::vector<c_float>* lower_bounds,
+                              std::vector<c_float>* upper_bounds);
+
   void SetPrimalWarmStart(std::vector<c_float>* primal_warm_start);
 
-  bool OptimizeWithOsqp(
-      const size_t kernel_dim, const size_t num_affine_constraint,
-      std::vector<c_float>* P_data, std::vector<c_int>* P_indices,
-      std::vector<c_int>* P_indptr, std::vector<c_float>* A_data,
-      std::vector<c_int>* A_indices, std::vector<c_int>* A_indptr,
-      std::vector<c_float>* lower_bounds, std::vector<c_float>* upper_bounds,
-      std::vector<c_float>* q, std::vector<c_float>* primal_warm_start,
-      OSQPData* data, OSQPWorkspace** work, OSQPSettings* settings);
+  void UpdatePrimalWarmStart(std::vector<c_float>* primal_warm_start);
+
+  bool OptimizeWithOsqp(const std::vector<c_float>& primal_warm_start,
+                        OSQPWorkspace** work);
 
  private:
   // Reference points and deviation bounds
@@ -113,6 +121,10 @@ class FemPosDeviationSqpOsqpInterface {
   bool verbose_ = false;
   bool scaled_termination_ = true;
   bool warm_start_ = true;
+
+  // Settings of sqp
+  int sqp_max_iter_ = 100;
+  double sqp_jtol_ = 1e-2;
 
   // Optimization problem definitions
   int num_of_points_ = 0;

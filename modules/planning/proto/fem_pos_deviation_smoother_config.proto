@@ -11,19 +11,20 @@ message FemPosDeviationSmootherConfig {
   optional double curvature_constraint = 7 [default = 0.2];
   optional bool use_sqp = 8 [default = false];
   optional double sqp_jtol = 9 [default = 1e-2];
+  optional int32 sqp_max_ter = 10 [default = 10];
 
   // osqp settings
-  optional int32 max_iter = 10 [default = 500];
+  optional int32 max_iter = 100 [default = 500];
   // time_limit set to be 0.0 meaning no time limit
-  optional double time_limit = 11 [default = 0.0];
-  optional bool verbose = 12 [default = false];
-  optional bool scaled_termination = 13 [default = true];
-  optional bool warm_start = 14 [default = true];
+  optional double time_limit = 101 [default = 0.0];
+  optional bool verbose = 102 [default = false];
+  optional bool scaled_termination = 103 [default = true];
+  optional bool warm_start = 104 [default = true];
 
   // ipopt settings
-  optional int32 print_level = 20 [default = 0];
-  optional int32 max_num_of_iterations = 21 [default = 500];
-  optional int32 acceptable_num_of_iterations = 22 [default = 15];
-  optional double tol = 23 [default = 1e-8];
-  optional double acceptable_tol = 24 [default = 1e-1];
+  optional int32 print_level = 200 [default = 0];
+  optional int32 max_num_of_iterations = 201 [default = 500];
+  optional int32 acceptable_num_of_iterations = 202 [default = 15];
+  optional double tol = 203 [default = 1e-8];
+  optional double acceptable_tol = 204 [default = 1e-1];
 }
