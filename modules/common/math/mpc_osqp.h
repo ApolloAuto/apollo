@@ -46,7 +46,7 @@ class MpcOsqp {
           const Eigen::MatrixXd &matrix_lower,
           const Eigen::MatrixXd &matrix_upper,
           const Eigen::MatrixXd &matrix_initial_state, const int max_iter,
-          const int horizon);
+          const int horizon, const double eps_abs);
 
   // control vector
   bool Solve(std::vector<double> *control_cmd);
@@ -76,18 +76,19 @@ class MpcOsqp {
   Eigen::MatrixXd matrix_b_;
   Eigen::MatrixXd matrix_q_;
   Eigen::MatrixXd matrix_r_;
-  int max_iteration_;
-  int num_constraint_;
-  size_t num_param_;
-  size_t state_dim_;
-  size_t horizon_;
-  size_t control_dim_;
-  Eigen::VectorXd gradient_;
-  Eigen::VectorXd lowerBound_;
-  Eigen::VectorXd upperBound_;
   Eigen::MatrixXd matrix_initial_state_;
   Eigen::MatrixXd matrix_lower_;
   Eigen::MatrixXd matrix_upper_;
+  int max_iteration_;
+  size_t horizon_;
+  double eps_abs_;
+  size_t state_dim_;
+  size_t control_dim_;
+  size_t num_param_;
+  int num_constraint_;
+  Eigen::VectorXd gradient_;
+  Eigen::VectorXd lowerBound_;
+  Eigen::VectorXd upperBound_;
 };
 }  // namespace math
 }  // namespace common

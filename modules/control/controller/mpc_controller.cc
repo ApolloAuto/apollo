@@ -378,7 +378,8 @@ Status MPCController::ComputeControlCommand(
   if (FLAGS_use_osqp_solver) {
     apollo::common::math::MpcOsqp mpc_osqp(
         matrix_ad_, matrix_bd_, matrix_q_updated_, matrix_r_updated_,
-        lower_bound, upper_bound, matrix_state_, mpc_max_iteration_, horizon_);
+        lower_bound, upper_bound, matrix_state_, mpc_max_iteration_, horizon_,
+        mpc_eps_);
     if (!mpc_osqp.Solve(&control_cmd)) {
       AERROR << "MPC OSQP solver failed";
     } else {
