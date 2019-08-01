@@ -318,6 +318,19 @@ cc_library(
 )
 
 cc_test(
+    name = "mpc_osqp_test",
+    size = "small",
+    srcs = [
+        "mpc_osqp_test.cc",
+    ],
+    deps = [
+        ":mpc",
+        "//modules/common/math:mpc_osqp",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
     name = "mpc_test",
     size = "small",
     srcs = [

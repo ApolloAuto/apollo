@@ -45,10 +45,11 @@ class MpcOsqp {
           const Eigen::MatrixXd &matrix_q, const Eigen::MatrixXd &matrix_r,
           const Eigen::MatrixXd &matrix_lower,
           const Eigen::MatrixXd &matrix_upper,
-          const Eigen::MatrixXd &matrix_initial_state, const int max_iter);
+          const Eigen::MatrixXd &matrix_initial_state, const int max_iter,
+          const int horizon);
 
   // control vector
-  bool MpcOsqpSolver(std::vector<double> *control_cmd);
+  bool Solve(std::vector<double> *control_cmd);
 
  private:
   void CalculateKernel(std::vector<c_float> *P_data,
