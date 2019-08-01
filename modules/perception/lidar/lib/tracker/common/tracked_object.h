@@ -56,6 +56,7 @@ struct TrackedObject {
 
   void ToObject(base::ObjectPtr obj_ptr) const;
 
+  float GetVelThreshold(base::ObjectPtr obj) const;
   // ***************************************************
   // self information from match
   // ***************************************************
