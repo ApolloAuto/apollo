@@ -20,19 +20,33 @@ namespace apollo {
 namespace common {
 namespace math {
 
-MpcOsqp::MpcOsqp(
-    const Eigen::MatrixXd &matrix_a, const Eigen::MatrixXd &matrix_b,
-    const Eigen::MatrixXd &matrix_q, const Eigen::MatrixXd &matrix_r,
-    const Eigen::MatrixXd &matrix_lower, const Eigen::MatrixXd &matrix_upper,
-    const Eigen::MatrixXd &matrix_initial_state, const int max_iter) {
+MpcOsqp::MpcOsqp(const Eigen::MatrixXd &matrix_a,
+                 const Eigen::MatrixXd &matrix_b,
+                 const Eigen::MatrixXd &matrix_q,
+                 const Eigen::MatrixXd &matrix_r,
+                 const Eigen::MatrixXd &matrix_lower,
+                 const Eigen::MatrixXd &matrix_upper,
+                 const Eigen::MatrixXd &matrix_initial_state,
+                 const int max_iter, const int horizon) {
+  ADEBUG << "in MpcOsqp" << state_dim_;
   matrix_a_ = matrix_a;
   matrix_b_ = matrix_b;
   matrix_q_ = matrix_q;
   matrix_r_ = matrix_r;
   matrix_lower_ = matrix_lower;
+  //   for (int i = 0; i < matrix_lower.rows(); ++i) {
+  //     for (int j = 0; j < matrix_lower.cols(); ++j) {
+  //       ADEBUG << "i" << i << "j" << j << matrix_lower(i, j);
+  //     }
+  //   }
   matrix_upper_ = matrix_upper;
   matrix_initial_state_ = matrix_initial_state;
   max_iteration_ = max_iter;
+  state_dim_ = matrix_b.rows();
+  control_dim_ = matrix_b.cols();
+  ADEBUG << "state_dim" << state_dim_;
+  ADEBUG << "control_dim_" << control_dim_;
+  horizon_ = horizon;
   num_param_ = state_dim_ * (horizon_ + 1) + control_dim_ * horizon_;
 }
 
@@ -96,28 +110,38 @@ void MpcOsqp::CalculateEqualityConstraint(std::vector<c_float> *A_data,
       state_dim_ * (horizon_ + 1) + control_dim_ * horizon_);
   Eigen::MatrixXd state_identity_mat = Eigen::MatrixXd::Identity(
       state_dim_ * (horizon_ + 1), state_dim_ * (horizon_ + 1));
+  ADEBUG << "state_identity_mat" << state_identity_mat;
 
   matrix_constraint.block(0, 0, state_dim_ * (horizon_ + 1),
                           state_dim_ * (horizon_ + 1)) =
       -1 * state_identity_mat;
+  ADEBUG << "matrix_constraint" << matrix_constraint;
 
-  Eigen::MatrixXd control_identity_mat(control_dim_, control_dim_);
+  Eigen::MatrixXd control_identity_mat =
+      Eigen::MatrixXd::Identity(control_dim_, control_dim_);
 
   for (size_t i = 0; i < horizon_; i++) {
     matrix_constraint.block((i + 1) * state_dim_, i * state_dim_, state_dim_,
                             state_dim_) = matrix_a_;
   }
+  ADEBUG << "matrix_constraint with A";
+  ADEBUG << matrix_constraint;
 
   for (size_t i = 0; i < horizon_; i++) {
     matrix_constraint.block((i + 1) * state_dim_,
                             i * control_dim_ + (horizon_ + 1) * state_dim_,
                             state_dim_, control_dim_) = matrix_b_;
   }
+  ADEBUG << "matrix_constraint with B";
+  ADEBUG << matrix_constraint;
+
   Eigen::MatrixXd all_identity_mat =
       Eigen::MatrixXd::Identity(num_param_, num_param_);
 
   matrix_constraint.block(state_dim_ * (horizon_ + 1), 0, num_param_,
                           num_param_) = all_identity_mat;
+  ADEBUG << "matrix_constraint with I";
+  ADEBUG << matrix_constraint;
 
   std::vector<std::vector<std::pair<c_int, c_float>>> columns;
   columns.resize(num_param_ + 1);  // TODO(SHU): double check
@@ -126,12 +150,14 @@ void MpcOsqp::CalculateEqualityConstraint(std::vector<c_float> *A_data,
   for (size_t i = 0; i < num_param_; ++i) {  // col
     for (size_t j = 0; j < num_param_ + state_dim_ * (horizon_ + 1);
          ++j)  // row
-      if (std::fabs(matrix_constraint(i, j)) > kEpsilon) {
+      if (std::fabs(matrix_constraint(j, i)) > kEpsilon) {
         // (row, val)
-        columns[i].emplace_back(j, matrix_constraint(i, j));
+        columns[i].emplace_back(j, matrix_constraint(j, i));
         ++value_index;
       }
   }
+  ADEBUG << "value_index";
+  ADEBUG << value_index;
   int ind_A = 0;
   for (size_t i = 0; i < num_param_; ++i) {
     A_indptr->emplace_back(ind_A);
@@ -146,21 +172,22 @@ void MpcOsqp::CalculateEqualityConstraint(std::vector<c_float> *A_data,
 
 void MpcOsqp::CalculateConstraintVectors() {
   // evaluate the lower and the upper inequality vectors
-  Eigen::Matrix<double, 4, 1> xMax =
-      Eigen::MatrixXd::Constant(state_dim_, 1, 100.0);
   Eigen::VectorXd lowerInequality = Eigen::MatrixXd::Zero(
       state_dim_ * (horizon_ + 1) + control_dim_ * horizon_, 1);
   Eigen::VectorXd upperInequality = Eigen::MatrixXd::Zero(
       state_dim_ * (horizon_ + 1) + control_dim_ * horizon_, 1);
-  for (size_t i = 0; i < horizon_ + 1; i++) {
-    lowerInequality.block(state_dim_ * i, 0, state_dim_, 1) = -1.0 * xMax;
-    upperInequality.block(state_dim_ * i, 0, state_dim_, 1) = xMax;
-  }
   for (size_t i = 0; i < horizon_; i++) {
     lowerInequality.block(control_dim_ * i + state_dim_ * (horizon_ + 1), 0,
                           control_dim_, 1) = matrix_lower_;
     upperInequality.block(control_dim_ * i + state_dim_ * (horizon_ + 1), 0,
                           control_dim_, 1) = matrix_upper_;
+  }
+  Eigen::MatrixXd state_bound = Eigen::MatrixXd::Ones(state_dim_, 1);
+  double max = std::numeric_limits<double>::max();
+  for (size_t i = 0; i < horizon_ + 1; i++) {
+    lowerInequality.block(state_dim_ * i, 0, state_dim_, 1) =
+        -1 * max * state_bound;
+    upperInequality.block(state_dim_ * i, 0, state_dim_, 1) = max * state_bound;
   }
 
   // evaluate the lower and the upper equality vectors
@@ -188,7 +215,7 @@ OSQPSettings *MpcOsqp::Settings() {
   osqp_set_default_settings(settings);
   settings->polish = true;
   settings->scaled_termination = true;
-  settings->verbose = false;
+  settings->verbose = true;
   settings->max_iter = max_iteration_;
   settings->warm_start = true;
   return settings;
@@ -204,18 +231,25 @@ OSQPData *MpcOsqp::Data() {
   std::vector<c_float> P_data;
   std::vector<c_int> P_indices;
   std::vector<c_int> P_indptr;
+  ADEBUG << "before CalculateKernel";
   CalculateKernel(&P_data, &P_indices, &P_indptr);
+  ADEBUG << "CalculateKernel done";
   data->P = csc_matrix(kernel_dim, kernel_dim, P_data.size(), CopyData(P_data),
                        CopyData(P_indices), CopyData(P_indptr));
-  //   createOsqpSparseMatrix(hessian_, &(data->P));
+  ADEBUG << "Get P matrix";
   data->q = gradient_.data();
+  ADEBUG << "before CalculateEqualityConstraint";
   std::vector<c_float> A_data;
   std::vector<c_int> A_indices;
   std::vector<c_int> A_indptr;
   CalculateEqualityConstraint(&A_data, &A_indices, &A_indptr);
-  data->A = csc_matrix(kernel_dim, kernel_dim, P_data.size(), CopyData(P_data),
-                       CopyData(P_indices), CopyData(P_indptr));
-  //   createOsqpSparseMatrix(matrix_constraint_, &(data->A));
+  ADEBUG << "CalculateEqualityConstraint done";
+  data->A =
+      csc_matrix(state_dim_ * (horizon_ + 1) + state_dim_ * (horizon_ + 1) +
+                     control_dim_ * horizon_,
+                 kernel_dim, A_data.size(), CopyData(A_data),
+                 CopyData(A_indices), CopyData(A_indptr));
+  ADEBUG << "Get A matrix";
 
   data->l = lowerBound_.data();
   data->u = upperBound_.data();
@@ -236,43 +270,58 @@ void MpcOsqp::FreeData(OSQPData *data) {
   delete[] data->A->x;
 }
 
-bool MpcOsqp::MpcOsqpSolver(std::vector<double> *control_cmd) {
-  // cast the MPC problem as QP problem
+bool MpcOsqp::Solve(std::vector<double> *control_cmd) {
   CalculateGradient();
   CalculateConstraintVectors();
+  ADEBUG << "MPC2Matrix";
 
   OSQPData *data = Data();
-  OSQPSettings *settings = Settings();
-  OSQPWorkspace *osqp_workspace = osqp_setup(data, settings);
-  osqp_solve(osqp_workspace);
-  auto status = osqp_workspace->info->status_val;
+  ADEBUG << "OSQP data done";
+  ADEBUG << "OSQP data n" << data->n;
+  ADEBUG << "OSQP data m" << data->m;
+  for (int i = 0; i < data->n; ++i) {
+    ADEBUG << "OSQP data q" << i << ":" << (data->q)[i];
+  }
+  ADEBUG << "OSQP data l" << data->l;
+  for (int i = 0; i < data->m; ++i) {
+    ADEBUG << "OSQP data l" << i << ":" << (data->l)[i];
+  }
+  ADEBUG << "OSQP data u" << data->u;
+  for (int i = 0; i < data->m; ++i) {
+    ADEBUG << "OSQP data u" << i << ":" << (data->u)[i];
+  }
 
+  OSQPSettings *settings = Settings();
+  ADEBUG << "OSQP setting done";
+  OSQPWorkspace *osqp_workspace = osqp_setup(data, settings);
+  ADEBUG << "before solve";
+  ADEBUG << "osqp result status:" << osqp_solve(osqp_workspace);
+  ADEBUG << "after solve";
+
+  auto status = osqp_workspace->info->status_val;
+  ADEBUG << "status:" << status;
   // check status
   if (status < 0 || (status != 1 && status != 2)) {
     AERROR << "failed optimization status:\t" << osqp_workspace->info->status;
     osqp_cleanup(osqp_workspace);
-    FreeData(data);
-    c_free(settings);
     return false;
   } else if (osqp_workspace->solution == nullptr) {
     AERROR << "The solution from OSQP is nullptr";
     osqp_cleanup(osqp_workspace);
-    FreeData(data);
-    c_free(settings);
     return false;
   }
 
   size_t first_control = state_dim_ * (horizon_ + 1);
   for (size_t i = 0; i < control_dim_; ++i) {
     control_cmd->at(i) = osqp_workspace->solution->x[i + first_control];
+    ADEBUG << "control_cmd:" << i << ":" << control_cmd->at(i);
   }
 
   // Cleanup
   osqp_cleanup(osqp_workspace);
-  FreeData(data);
-  c_free(settings);
   return true;
-}  // namespace math
+}
+
 }  // namespace math
 }  // namespace common
 }  // namespace apollo
