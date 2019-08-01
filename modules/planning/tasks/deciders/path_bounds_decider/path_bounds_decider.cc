@@ -158,6 +158,8 @@ Status PathBoundsDecider::Process(
         lane_borrow_info_list = {LaneBorrowInfo::LEFT_BORROW,
                                  LaneBorrowInfo::NO_BORROW};
         break;
+      default:
+        lane_borrow_info_list = {LaneBorrowInfo::NO_BORROW};
     }
   } else {
     // Only use self-lane with no lane borrowing
@@ -260,7 +262,7 @@ void PathBoundsDecider::InitPathBoundsDecider(
 
 std::string PathBoundsDecider::GenerateRegularPathBound(
     const ReferenceLineInfo& reference_line_info,
-    const LaneBorrowInfo lane_borrow_info, PathBound* const path_bound,
+    const LaneBorrowInfo& lane_borrow_info, PathBound* const path_bound,
     std::string* const blocking_obstacle_id,
     std::string* const borrow_lane_type) {
   // 1. Initialize the path boundaries to be an indefinitely large area.
@@ -759,7 +761,7 @@ bool PathBoundsDecider::GetBoundaryFromRoads(
 
 bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
     const ReferenceLineInfo& reference_line_info,
-    const LaneBorrowInfo lane_borrow_info, double ADC_buffer,
+    const LaneBorrowInfo& lane_borrow_info, double ADC_buffer,
     PathBound* const path_bound, std::string* const borrow_lane_type) {
   // Sanity checks.
   CHECK_NOTNULL(path_bound);

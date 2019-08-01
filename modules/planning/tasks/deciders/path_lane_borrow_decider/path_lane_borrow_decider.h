@@ -51,6 +51,9 @@ class PathLaneBorrowDecider : public Decider {
       const ReferenceLineInfo& reference_line_info);
 
   bool IsSidePassableObstacle(const ReferenceLineInfo& reference_line_info);
+
+  bool CheckLaneBorrow(const ReferenceLineInfo& reference_line_info,
+                       const bool check_left);
 };
 
 }  // namespace planning

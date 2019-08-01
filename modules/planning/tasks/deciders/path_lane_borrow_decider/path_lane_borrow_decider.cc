@@ -16,6 +16,7 @@
 
 #include "modules/planning/tasks/deciders/path_lane_borrow_decider/path_lane_borrow_decider.h"
 
+#include <algorithm>
 #include <string>
 
 #include "modules/planning/common/obstacle_blocking_analyzer.h"
@@ -75,6 +76,40 @@ bool PathLaneBorrowDecider::IsNecessaryToBorrowLane(
         IsSidePassableObstacle(reference_line_info)) {
       // Satisfying the above condition will it switch to lane-borrowing.
       mutable_path_decider_status->set_is_in_path_lane_borrow_scenario(true);
+
+      int decided_side_pass_direction = PlanningContext::Instance()
+                                            ->planning_status()
+                                            .path_decider()
+                                            .decided_side_pass_direction();
+
+      // TODO(all): optimize on data type of decided_side_pass_direction soon
+      const bool left_neighbor_lane_borrow =
+          CheckLaneBorrow(reference_line_info, true);
+      const bool right_neighbor_lane_borrow =
+          CheckLaneBorrow(reference_line_info, false);
+
+      if (decided_side_pass_direction == 0) {
+        if (!left_neighbor_lane_borrow && !right_neighbor_lane_borrow) {
+          decided_side_pass_direction = 2;  // NO_BORROW
+        } else if (!left_neighbor_lane_borrow) {
+          decided_side_pass_direction = -1;  // RIGHT_BORROW + NO_BORROW
+        } else if (!right_neighbor_lane_borrow) {
+          decided_side_pass_direction = 1;  // LEFT_BORROW + NO_BORROW
+        }
+      } else if (decided_side_pass_direction == -1) {
+        if (!right_neighbor_lane_borrow) {
+          decided_side_pass_direction = 2;  // NO_BORROW
+        }
+      } else if (decided_side_pass_direction == 1) {
+        if (!left_neighbor_lane_borrow) {
+          decided_side_pass_direction = 2;  // NO_BORROW
+        }
+      }
+      auto *path_decider_status =
+          PlanningContext::Instance()->mutable_planning_status()
+                                     ->mutable_path_decider();
+      path_decider_status->set_decided_side_pass_direction(
+          decided_side_pass_direction);
       AINFO << "Switch from SELF-LANE path to LANE-BORROW path.";
     }
   }
@@ -212,6 +247,42 @@ bool PathLaneBorrowDecider::IsSidePassableObstacle(
   }
 
   return IsNonmovableObstacle(reference_line_info, *blocking_obstacle);
+}
+
+bool PathLaneBorrowDecider::CheckLaneBorrow(
+    const ReferenceLineInfo& reference_line_info,
+    const bool check_left) {
+  const ReferenceLine& reference_line = reference_line_info.reference_line();
+
+  constexpr double kLookforwardDistance = 100.0;
+  double check_s = reference_line_info.AdcSlBoundary().end_s();
+  const double lookforward_distance = std::min(check_s + kLookforwardDistance,
+                                               reference_line.Length());
+  while (check_s < lookforward_distance) {
+    auto ref_point = reference_line.GetNearestReferencePoint(check_s);
+    if (ref_point.lane_waypoints().empty()) {
+      return false;
+    }
+    const auto waypoint = ref_point.lane_waypoints().front();
+    hdmap::LaneBoundaryType::Type lane_boundary_type;
+    if (check_left) {
+      lane_boundary_type = hdmap::LeftBoundaryType(waypoint);
+      ADEBUG << "s[" << check_s << "] left_lane_boundary_type["
+             << LaneBoundaryType_Type_Name(lane_boundary_type) << "]";
+    } else {
+      lane_boundary_type = hdmap::RightBoundaryType(waypoint);
+      ADEBUG << "s[" << check_s << "] right_lane_boundary_type["
+             << LaneBoundaryType_Type_Name(lane_boundary_type) <<"]";
+    }
+
+    if (lane_boundary_type == hdmap::LaneBoundaryType::SOLID_YELLOW ||
+        lane_boundary_type == hdmap::LaneBoundaryType::SOLID_WHITE) {
+      return false;
+    }
+
+    check_s += 2.0;
+  }
+  return true;
 }
 
 }  // namespace planning
