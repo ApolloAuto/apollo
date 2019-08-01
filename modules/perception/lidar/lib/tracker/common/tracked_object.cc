@@ -17,6 +17,7 @@
 
 #include "cyber/common/log.h"
 #include "modules/perception/base/point.h"
+#include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/common/point_cloud_processing/common.h"
 #include "modules/perception/lidar/common/feature_descriptor.h"
@@ -183,6 +184,13 @@ void TrackedObject::CopyFrom(TrackedObjectPtr rhs, bool is_deep) {
   }
 }
 
+float TrackedObject::GetVelThreshold(base::ObjectPtr obj) const {
+  if (obj->type == base::ObjectType::VEHICLE) {
+    return 0.99f;
+  }
+  return 0.0f;
+}
+
 void TrackedObject::ToObject(base::ObjectPtr obj) const {
   *obj = *object_ptr;
   // obj id keep default
@@ -208,7 +216,7 @@ void TrackedObject::ToObject(base::ObjectPtr obj) const {
   obj->velocity_uncertainty = output_velocity_uncertainty.cast<float>();
   obj->velocity_converged = converged;
   obj->tracking_time = tracking_time;
-  if (obj->velocity.norm() > 0) {
+  if (obj->velocity.norm() > GetVelThreshold(obj)) {
     obj->theta = std::atan2(obj->velocity[1], obj->velocity[0]);
   } else {
     obj->theta = std::atan2(obj->direction[1], obj->direction[0]);
