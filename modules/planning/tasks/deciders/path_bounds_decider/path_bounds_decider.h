@@ -87,7 +87,7 @@ class PathBoundsDecider : public Decider {
    */
   std::string GenerateRegularPathBound(
       const ReferenceLineInfo& reference_line_info,
-      const LaneBorrowInfo lane_borrow_info,
+      const LaneBorrowInfo& lane_borrow_info,
       std::vector<std::tuple<double, double, double>>* const path_bound,
       std::string* const blocking_obstacle_id,
       std::string* const borrow_lane_type);
@@ -162,7 +162,7 @@ class PathBoundsDecider : public Decider {
    */
   bool GetBoundaryFromLanesAndADC(
       const ReferenceLineInfo& reference_line_info,
-      const LaneBorrowInfo lane_borrow_info, double ADC_buffer,
+      const LaneBorrowInfo& lane_borrow_info, double ADC_buffer,
       std::vector<std::tuple<double, double, double>>* const path_bound,
       std::string* const borrow_lane_type);
 
