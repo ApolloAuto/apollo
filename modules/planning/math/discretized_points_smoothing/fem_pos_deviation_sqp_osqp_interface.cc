@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_osqp_interface.h"
+#include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_sqp_osqp_interface.h"
 
 #include <limits>
 
@@ -27,7 +27,7 @@
 namespace apollo {
 namespace planning {
 
-bool FemPosDeviationOsqpInterface::Solve() {
+bool FemPosDeviationSqpOsqpInterface::Solve() {
   // Sanity Check
   if (ref_points_.empty()) {
     AERROR << "reference points empty, solver early terminates";
@@ -126,7 +126,7 @@ bool FemPosDeviationOsqpInterface::Solve() {
   return true;
 }
 
-void FemPosDeviationOsqpInterface::CalculateKernel(
+void FemPosDeviationSqpOsqpInterface::CalculateKernel(
     std::vector<c_float>* P_data, std::vector<c_int>* P_indices,
     std::vector<c_int>* P_indptr) {
   CHECK_GT(num_of_variables_, 4);
@@ -224,7 +224,7 @@ void FemPosDeviationOsqpInterface::CalculateKernel(
   P_indptr->push_back(ind_p);
 }
 
-void FemPosDeviationOsqpInterface::CalculateOffset(std::vector<c_float>* q) {
+void FemPosDeviationSqpOsqpInterface::CalculateOffset(std::vector<c_float>* q) {
   for (int i = 0; i < num_of_points_; ++i) {
     const auto& ref_point_xy = ref_points_[i];
     q->push_back(-2.0 * weight_ref_deviation_ * ref_point_xy.first);
@@ -232,7 +232,7 @@ void FemPosDeviationOsqpInterface::CalculateOffset(std::vector<c_float>* q) {
   }
 }
 
-void FemPosDeviationOsqpInterface::CalculateAffineConstraint(
+void FemPosDeviationSqpOsqpInterface::CalculateAffineConstraint(
     std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
     std::vector<c_int>* A_indptr, std::vector<c_float>* lower_bounds,
     std::vector<c_float>* upper_bounds) {
@@ -254,7 +254,7 @@ void FemPosDeviationOsqpInterface::CalculateAffineConstraint(
   }
 }
 
-void FemPosDeviationOsqpInterface::SetPrimalWarmStart(
+void FemPosDeviationSqpOsqpInterface::SetPrimalWarmStart(
     std::vector<c_float>* primal_warm_start) {
   CHECK_EQ(ref_points_.size(), num_of_points_);
   for (const auto& ref_point_xy : ref_points_) {
@@ -263,7 +263,7 @@ void FemPosDeviationOsqpInterface::SetPrimalWarmStart(
   }
 }
 
-bool FemPosDeviationOsqpInterface::OptimizeWithOsqp(
+bool FemPosDeviationSqpOsqpInterface::OptimizeWithOsqp(
     const size_t kernel_dim, const size_t num_affine_constraint,
     std::vector<c_float>* P_data, std::vector<c_int>* P_indices,
     std::vector<c_int>* P_indptr, std::vector<c_float>* A_data,
