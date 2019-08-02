@@ -42,7 +42,7 @@ class LogFileObject : public google::base::Logger {
   void Flush() override;
 
   // It is the actual file length for the system loggers
-  virtual uint32_t LogSize() {
+  uint32_t LogSize() override {
     std::lock_guard<std::mutex> lock(lock_);
     return file_length_;
   }
