@@ -282,7 +282,8 @@ Status PathAssessmentDecider::Process(
           reference_line_info->path_data().path_label().find("left") !=
               std::string::npos) {
         left_borrow = true;
-      } else if (lane_borrow_direction == PathDeciderStatus::RIGHT_BORROW &&
+      }
+      if (lane_borrow_direction == PathDeciderStatus::RIGHT_BORROW &&
           reference_line_info->path_data().path_label().find("right") !=
               std::string::npos) {
         right_borrow = true;
@@ -294,10 +295,10 @@ Status PathAssessmentDecider::Process(
                                             ->mutable_path_decider();
     mutable_path_decider_status->clear_decided_side_pass_direction();
     if (right_borrow) {
-      // prefer right borrow over left borrow
       mutable_path_decider_status->add_decided_side_pass_direction(
           PathDeciderStatus::RIGHT_BORROW);
-    } else if (left_borrow) {
+    }
+    if (left_borrow) {
       mutable_path_decider_status->add_decided_side_pass_direction(
           PathDeciderStatus::LEFT_BORROW);
     }
