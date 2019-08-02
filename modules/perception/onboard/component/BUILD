@@ -70,6 +70,7 @@ cc_library(
         "//modules/v2x/proto:v2x_traffic_light_proto",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cc_binary(
