@@ -52,8 +52,14 @@ bool FemPosDeviationSqpOsqpInterface::Solve() {
 
   // Calculate optimization states definitions
   num_of_points_ = static_cast<int>(ref_points_.size());
-  num_of_variables_ = num_of_points_ * 2;
-  num_of_constraints_ = num_of_variables_;
+  num_of_pos_variables_ = num_of_points_ * 2;
+  num_of_slack_variables_ = num_of_points_ - 2;
+  num_of_variables_ = num_of_pos_variables_ + num_of_slack_variables_;
+
+  num_of_variable_constraints_ = num_of_variables_;
+  num_of_curvature_constraints_ = num_of_points_ - 2;
+  num_of_constraints_ =
+      num_of_variable_constraints_ + num_of_curvature_constraints_;
 
   // Calculate kernel
   std::vector<c_float> P_data;
@@ -170,7 +176,7 @@ bool FemPosDeviationSqpOsqpInterface::Solve() {
 void FemPosDeviationSqpOsqpInterface::CalculateKernel(
     std::vector<c_float>* P_data, std::vector<c_int>* P_indices,
     std::vector<c_int>* P_indptr) {
-  CHECK_GT(num_of_variables_, 4);
+  CHECK_GT(num_of_points_, 2);
 
   // Three quadratic penalties are involved:
   // 1. Penalty x on distance between middle point and point by finite element
@@ -181,13 +187,16 @@ void FemPosDeviationSqpOsqpInterface::CalculateKernel(
   // General formulation of P matrix is as below(with 6 points as an example):
   // I is a two by two identity matrix, X, Y, Z represents x * I, y * I, z * I
   // 0 is a two by two zero matrix
-  // |X+Y+Z, -2X-Y,   X,       0,       0,       0    |
-  // |0,     5X+2Y+Z, -4X-Y,   X,       0,       0    |
-  // |0,     0,       6X+2Y+Z, -4X-Y,   X,       0    |
-  // |0,     0,       0,       6X+2Y+Z, -4X-Y,   X    |
-  // |0,     0,       0,       0,       5X+2Y+Z, -2X-Y|
-  // |0,     0,       0,       0,       0,       X+Y+Z|
-
+  // |X+Y+Z, -2X-Y,   X,       0,       0,       0,       ...|
+  // |0,     5X+2Y+Z, -4X-Y,   X,       0,       0,       ...|
+  // |0,     0,       6X+2Y+Z, -4X-Y,   X,       0,       ...|
+  // |0,     0,       0,       6X+2Y+Z, -4X-Y,   X        ...|
+  // |0,     0,       0,       0,       5X+2Y+Z, -2X-Y    ...|
+  // |0,     0,       0,       0,       0,       X+Y+Z    ...|
+  // |0,     0,       0,       0,       0,       0,       0,       ...|
+  // |0,     0,       0,       0,       0,       0,       0, 0,       ...|
+  // |0,     0,       0,       0,       0,       0,       0, 0, 0,       ...|
+  // |0,     0,       0,       0,       0,       0,       0, 0, 0, 0,       ...|
   // Only upper triangle needs to be filled
   std::vector<std::vector<std::pair<c_int, c_float>>> columns;
   columns.resize(num_of_variables_);
@@ -226,8 +235,8 @@ void FemPosDeviationSqpOsqpInterface::CalculateKernel(
     }
   }
 
-  int second_point_col_from_last_col = num_of_variables_ - 4;
-  int last_point_col_from_last_col = num_of_variables_ - 2;
+  int second_point_col_from_last_col = num_of_pos_variables_ - 4;
+  int last_point_col_from_last_col = num_of_pos_variables_ - 2;
   for (int col = second_point_col_from_last_col;
        col < last_point_col_from_last_col; ++col) {
     columns[col].emplace_back(col - 4, weight_fem_pos_deviation_);
@@ -239,7 +248,8 @@ void FemPosDeviationSqpOsqpInterface::CalculateKernel(
     ++col_num;
   }
 
-  for (int col = last_point_col_from_last_col; col < num_of_variables_; ++col) {
+  for (int col = last_point_col_from_last_col; col < num_of_pos_variables_;
+       ++col) {
     columns[col].emplace_back(col - 4, weight_fem_pos_deviation_);
     columns[col].emplace_back(
         col - 2, -2.0 * weight_fem_pos_deviation_ - weight_path_length_);
@@ -249,7 +259,7 @@ void FemPosDeviationSqpOsqpInterface::CalculateKernel(
     ++col_num;
   }
 
-  CHECK_EQ(col_num, num_of_variables_);
+  CHECK_EQ(col_num, num_of_pos_variables_);
 
   int ind_p = 0;
   for (int i = 0; i < col_num; ++i) {
@@ -266,10 +276,14 @@ void FemPosDeviationSqpOsqpInterface::CalculateKernel(
 }
 
 void FemPosDeviationSqpOsqpInterface::CalculateOffset(std::vector<c_float>* q) {
+  q->resize(num_of_variables_);
   for (int i = 0; i < num_of_points_; ++i) {
     const auto& ref_point_xy = ref_points_[i];
-    q->push_back(-2.0 * weight_ref_deviation_ * ref_point_xy.first);
-    q->push_back(-2.0 * weight_ref_deviation_ * ref_point_xy.second);
+    (*q)[2 * i] = -2.0 * weight_ref_deviation_ * ref_point_xy.first;
+    (*q)[2 * i + 1] = -2.0 * weight_ref_deviation_ * ref_point_xy.second;
+  }
+  for (int i = 0; i < num_of_slack_variables_; ++i) {
+    (*q)[num_of_pos_variables_ + i] = weight_curvature_constraint_slack_var_;
   }
 }
 
@@ -286,12 +300,21 @@ void FemPosDeviationSqpOsqpInterface::CalculateAffineConstraint(
   }
   A_indptr->push_back(ind_A);
 
+  lower_bounds->resize(num_of_constraints_);
+  upper_bounds->resize(num_of_constraints_);
+
   for (int i = 0; i < num_of_points_; ++i) {
     const auto& ref_point_xy = ref_points_[i];
-    upper_bounds->push_back(ref_point_xy.first + bounds_around_refs_[i]);
-    upper_bounds->push_back(ref_point_xy.second + bounds_around_refs_[i]);
-    lower_bounds->push_back(ref_point_xy.first - bounds_around_refs_[i]);
-    lower_bounds->push_back(ref_point_xy.second - bounds_around_refs_[i]);
+    (*upper_bounds)[i * 2] = ref_point_xy.first + bounds_around_refs_[i];
+    (*upper_bounds)[i * 2 + 1] = ref_point_xy.second + bounds_around_refs_[i];
+    (*lower_bounds)[i * 2] = ref_point_xy.first - bounds_around_refs_[i];
+    (*lower_bounds)[i * 2 + 1] = ref_point_xy.second - bounds_around_refs_[i];
+  }
+
+  for (int i = 0; i < num_of_slack_variables_; ++i) {
+    // add constant part of linearization equation
+    (*upper_bounds)[i] = 1.0;
+    (*lower_bounds)[i] = -1e20;
   }
 }
 

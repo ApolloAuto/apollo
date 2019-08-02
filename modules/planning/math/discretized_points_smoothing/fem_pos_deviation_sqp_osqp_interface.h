@@ -55,6 +55,12 @@ class FemPosDeviationSqpOsqpInterface {
     weight_ref_deviation_ = weight_ref_deviation;
   }
 
+  void set_weight_curvature_constraint_slack_var(
+      const double weight_curvature_constraint_slack_var) {
+    weight_curvature_constraint_slack_var_ =
+        weight_curvature_constraint_slack_var;
+  }
+
   void set_max_iter(const int max_iter) { max_iter_ = max_iter; }
 
   void set_time_limit(const double time_limit) { time_limit_ = time_limit; }
@@ -114,6 +120,7 @@ class FemPosDeviationSqpOsqpInterface {
   double weight_fem_pos_deviation_ = 1.0e5;
   double weight_path_length_ = 1.0;
   double weight_ref_deviation_ = 1.0;
+  double weight_curvature_constraint_slack_var_ = 1.0e5;
 
   // Settings of osqp
   int max_iter_ = 4000;
@@ -128,7 +135,11 @@ class FemPosDeviationSqpOsqpInterface {
 
   // Optimization problem definitions
   int num_of_points_ = 0;
+  int num_of_pos_variables_ = 0;
+  int num_of_slack_variables_ = 0;
   int num_of_variables_ = 0;
+  int num_of_variable_constraints_ = 0;
+  int num_of_curvature_constraints_ = 0;
   int num_of_constraints_ = 0;
 
   // Optimized_result
