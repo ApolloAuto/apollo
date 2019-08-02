@@ -41,9 +41,9 @@ Stage::StageStatus ParkAndGoStageCheck::Process(
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
-  bool clear_path =
-      scenario::util::CheckADCSurroundObstacles(frame, scenario_config_);
-  return FinishStage(clear_path);
+  bool ready_to_cruise =
+      scenario::util::CheckADCReadyToCruise(frame, scenario_config_);
+  return FinishStage(ready_to_cruise);
 }
 
 Stage::StageStatus ParkAndGoStageCheck::FinishStage(const bool success) {

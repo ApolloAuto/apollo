@@ -57,13 +57,6 @@ PullOverStatus CheckADCPullOverPathPoint(
 PullOverStatus CheckADCPullOverOpenSpace(
     const ScenarioPullOverConfig& scenario_config);
 
-ParkAndGoStatus CheckADCParkAndGoOpenSpace(
-    const ReferenceLineInfo& reference_line_info,
-    const ScenarioParkAndGoConfig& scenario_config);
-
-bool CheckADCSurroundObstacles(Frame* frame,
-                               const ScenarioParkAndGoConfig& scenario_config);
-
 bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
                                const ScenarioPullOverConfig& scenario_config,
                                const common::math::Vec2d& adc_position,
@@ -75,6 +68,23 @@ bool CheckPullOverPositionByDistance(
     const ScenarioPullOverConfig& scenario_config,
     const common::math::Vec2d& adc_position, const double adc_theta,
     const common::math::Vec2d& target_position, const double target_theta);
+
+/* park_and_go */
+ParkAndGoStatus CheckADCParkAndGoCruiseCompleted(
+    const ReferenceLineInfo& reference_line_info,
+    const ScenarioParkAndGoConfig& scenario_config);
+
+bool CheckADCReadyToCruise(Frame* frame,
+                           const ScenarioParkAndGoConfig& scenario_config);
+
+bool CheckADCSurroundObstacles(const common::math::Vec2d adc_position,
+                               const double adc_heading, Frame* frame,
+                               const ScenarioParkAndGoConfig& scenario_config);
+
+bool CheckADCHeading(const common::math::Vec2d adc_position,
+                     const double adc_heading,
+                     const ReferenceLineInfo& reference_line_info,
+                     const ScenarioParkAndGoConfig& scenario_config);
 
 }  // namespace util
 }  // namespace scenario
