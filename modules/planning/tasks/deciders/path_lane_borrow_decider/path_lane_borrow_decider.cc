@@ -87,20 +87,20 @@ bool PathLaneBorrowDecider::IsNecessaryToBorrowLane(
         left_borrowable = CheckLaneBorrow(reference_line_info,
                                           PathDeciderStatus::LEFT_BORROW);
         right_borrowable = CheckLaneBorrow(reference_line_info,
-                                          PathDeciderStatus::RIGHT_BORROW);
+                                           PathDeciderStatus::RIGHT_BORROW);
       } else {
         // existing value
         for (const auto& lane_borrow_direction :
-            path_decider_status.decided_side_pass_direction()) {
-            // repeated enum becomes int
-            if (lane_borrow_direction == PathDeciderStatus::LEFT_BORROW) {
-              left_borrowable = CheckLaneBorrow(
-                  reference_line_info, PathDeciderStatus::LEFT_BORROW);
-            }
-            if (lane_borrow_direction == PathDeciderStatus::RIGHT_BORROW) {
-              right_borrowable = CheckLaneBorrow(
-                  reference_line_info, PathDeciderStatus::RIGHT_BORROW);
-            }
+             path_decider_status.decided_side_pass_direction()) {
+          // repeated enum becomes int
+          if (lane_borrow_direction == PathDeciderStatus::LEFT_BORROW) {
+            left_borrowable = CheckLaneBorrow(reference_line_info,
+                                              PathDeciderStatus::LEFT_BORROW);
+          }
+          if (lane_borrow_direction == PathDeciderStatus::RIGHT_BORROW) {
+            right_borrowable = CheckLaneBorrow(reference_line_info,
+                                               PathDeciderStatus::RIGHT_BORROW);
+          }
         }
       }
 
@@ -260,8 +260,8 @@ bool PathLaneBorrowDecider::CheckLaneBorrow(
 
   constexpr double kLookforwardDistance = 100.0;
   double check_s = reference_line_info.AdcSlBoundary().end_s();
-  const double lookforward_distance = std::min(check_s + kLookforwardDistance,
-                                               reference_line.Length());
+  const double lookforward_distance =
+      std::min(check_s + kLookforwardDistance, reference_line.Length());
   while (check_s < lookforward_distance) {
     auto ref_point = reference_line.GetNearestReferencePoint(check_s);
     if (ref_point.lane_waypoints().empty()) {
@@ -276,7 +276,7 @@ bool PathLaneBorrowDecider::CheckLaneBorrow(
     } else if (lane_borrow_direction == PathDeciderStatus::RIGHT_BORROW) {
       lane_boundary_type = hdmap::RightBoundaryType(waypoint);
       ADEBUG << "s[" << check_s << "] right_lane_boundary_type["
-             << LaneBoundaryType_Type_Name(lane_boundary_type) <<"]";
+             << LaneBoundaryType_Type_Name(lane_boundary_type) << "]";
     }
 
     if (lane_boundary_type == hdmap::LaneBoundaryType::SOLID_YELLOW ||

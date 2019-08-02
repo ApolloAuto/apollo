@@ -277,7 +277,7 @@ Status PathAssessmentDecider::Process(
     const auto& path_decider_status =
         PlanningContext::Instance()->planning_status().path_decider();
     for (const auto& lane_borrow_direction :
-        path_decider_status.decided_side_pass_direction()) {
+         path_decider_status.decided_side_pass_direction()) {
       if (lane_borrow_direction == PathDeciderStatus::LEFT_BORROW &&
           reference_line_info->path_data().path_label().find("left") !=
               std::string::npos) {

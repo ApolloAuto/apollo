@@ -389,13 +389,14 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
 
   // TODO(Jinyun): explore better time horizon heuristic
   const double path_length = result->accumulated_s.back();
-  const double total_t = std::max(gear
-                                      ? 1.5 * (max_forward_v * max_forward_v +
-                                               path_length * max_forward_acc) /
-                                            (max_forward_acc * max_forward_v)
-                                      : 1.5 * (max_reverse_v * max_reverse_v +
-                                               path_length * max_reverse_acc) /
-                                            (max_reverse_acc * max_reverse_v),
+  const double total_t = std::max(gear ? 1.5 *
+                                             (max_forward_v * max_forward_v +
+                                              path_length * max_forward_acc) /
+                                             (max_forward_acc * max_forward_v)
+                                       : 1.5 *
+                                             (max_reverse_v * max_reverse_v +
+                                              path_length * max_reverse_acc) /
+                                             (max_reverse_acc * max_reverse_v),
                                   10.0);
 
   const size_t num_of_knots = static_cast<size_t>(total_t / delta_t) + 1;
@@ -517,8 +518,9 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   for (size_t i = 0; i + 1 < path_points_size; ++i) {
     double discrete_steer =
         (combined_result.phi[i + 1] - combined_result.phi[i]) *
-        vehicle_param_.wheel_base() / (combined_result.accumulated_s[i + 1] -
-                                       combined_result.accumulated_s[i]);
+        vehicle_param_.wheel_base() /
+        (combined_result.accumulated_s[i + 1] -
+         combined_result.accumulated_s[i]);
     discrete_steer =
         gear ? std::atan(discrete_steer) : std::atan(-discrete_steer);
     combined_result.steer.push_back(discrete_steer);
