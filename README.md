@@ -65,7 +65,7 @@ The following diagram highlights the scope and features of each Apollo release:
 
 [**Apollo 1.0:**](docs/quickstart/apollo_1_0_hardware_system_installation_guide.md) 
 
-Apollo 1.0, also referred to as the Automatic GPS Waypoint Following works in an enclosed venue such as a test track or parking lot. This installation is necessary to ensure that Apollo works perfectly with your vehicle. The diagram below lists the various modules in Apollo 1.0.
+Apollo 1.0, also referred to as the Automatic GPS Waypoint Following, works in an enclosed venue such as a test track or parking lot. This installation is necessary to ensure that Apollo works perfectly with your vehicle. The diagram below lists the various modules in Apollo 1.0.
 
 ![image alt text](docs/demo_guide/images/Apollo_1.png)
 
@@ -93,7 +93,7 @@ Apollo 1.0, also referred to as the Automatic GPS Waypoint Following works in an
 
 [**Apollo 1.5:**](docs/quickstart/apollo_1_5_hardware_system_installation_guide.md) 
 
-Apollo 1.5 is meant for fixed lane cruising. With the addition of LiDAR, vehicles with this version now have a better perception of its surroundings and can better map its current position and plan its trajectory for safer maneuvering on its lane. Please note, the modules highlighted in Yellow are additions or upgrades for version 1.5.
+Apollo 1.5 is meant for fixed lane cruising. With the addition of LiDAR, vehicles with this version now have better perception of its surroundings and can better map its current position and plan its trajectory for safer maneuvering on its lane. Please note, the modules highlighted in Yellow are additions or upgrades for version 1.5.
 
 ![image alt text](docs/demo_guide/images/Apollo_1_5.png)	
 
