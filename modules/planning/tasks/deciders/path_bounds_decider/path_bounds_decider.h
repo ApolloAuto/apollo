@@ -230,6 +230,10 @@ class PathBoundsDecider : public Decider {
   void PathBoundsDebugString(
       const std::vector<std::tuple<double, double, double>>& path_boundaries);
 
+  bool CheckLaneBoundaryType(const ReferenceLineInfo& reference_line_info,
+                             const double check_s,
+                             const LaneBorrowInfo& lane_borrow_info);
+
  private:
   double adc_frenet_s_ = 0.0;
   double adc_frenet_sd_ = 0.0;

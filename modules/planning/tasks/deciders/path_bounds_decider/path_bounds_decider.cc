@@ -780,35 +780,42 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
     }
 
     // 2. Get the neighbor lane widths at the current point.
+
     double curr_neighbor_lane_width = 0.0;
-    hdmap::Id neighbor_lane_id;
-    if (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW) {
-      // Borrowing left neighbor lane.
-      if (reference_line_info.GetNeighborLaneInfo(LaneType::LeftForward, curr_s,
-                                                  &neighbor_lane_id,
-                                                  &curr_neighbor_lane_width)) {
-        ADEBUG << "Borrowing left forward neighbor lane.";
-      } else if (reference_line_info.GetNeighborLaneInfo(
-                     LaneType::LeftReverse, curr_s, &neighbor_lane_id,
-                     &curr_neighbor_lane_width)) {
-        borrowing_reverse_lane = true;
-        ADEBUG << "Borrowing left reverse neighbor lane.";
-      } else {
-        ADEBUG << "There is no left neighbor lane.";
-      }
-    } else if (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW) {
-      // Borrowing right neighbor lane.
-      if (reference_line_info.GetNeighborLaneInfo(LaneType::RightForward,
-                                                  curr_s, &neighbor_lane_id,
-                                                  &curr_neighbor_lane_width)) {
-        ADEBUG << "Borrowing right forward neighbor lane.";
-      } else if (reference_line_info.GetNeighborLaneInfo(
-                     LaneType::RightReverse, curr_s, &neighbor_lane_id,
-                     &curr_neighbor_lane_width)) {
-        borrowing_reverse_lane = true;
-        ADEBUG << "Borrowing right reverse neighbor lane.";
-      } else {
-        ADEBUG << "There is no right neighbor lane.";
+    if (CheckLaneBoundaryType(reference_line_info, curr_s, lane_borrow_info)) {
+      hdmap::Id neighbor_lane_id;
+      if (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW) {
+        // Borrowing left neighbor lane.
+        if (reference_line_info.GetNeighborLaneInfo(
+                LaneType::LeftForward, curr_s,
+                &neighbor_lane_id,
+                &curr_neighbor_lane_width)) {
+          ADEBUG << "Borrow left forward neighbor lane.";
+        } else if (reference_line_info.GetNeighborLaneInfo(
+                       LaneType::LeftReverse, curr_s,
+                       &neighbor_lane_id,
+                       &curr_neighbor_lane_width)) {
+          borrowing_reverse_lane = true;
+          ADEBUG << "Borrow left reverse neighbor lane.";
+        } else {
+          ADEBUG << "There is no left neighbor lane.";
+        }
+      } else if (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW) {
+        // Borrowing right neighbor lane.
+        if (reference_line_info.GetNeighborLaneInfo(
+                LaneType::RightForward, curr_s,
+                &neighbor_lane_id,
+                &curr_neighbor_lane_width)) {
+          ADEBUG << "Borrow right forward neighbor lane.";
+        } else if (reference_line_info.GetNeighborLaneInfo(
+                       LaneType::RightReverse, curr_s,
+                       &neighbor_lane_id,
+                       &curr_neighbor_lane_width)) {
+          borrowing_reverse_lane = true;
+          ADEBUG << "Borrow right reverse neighbor lane.";
+        } else {
+          ADEBUG << "There is no right neighbor lane.";
+        }
       }
     }
 
@@ -1319,6 +1326,30 @@ void PathBoundsDecider::PathBoundsDebugString(
           << "; l_min = " << std::get<1>(path_boundaries[i])
           << "; l_max = " << std::get<2>(path_boundaries[i]);
   }
+}
+
+bool PathBoundsDecider::CheckLaneBoundaryType(
+    const ReferenceLineInfo& reference_line_info,
+    const double check_s,
+    const LaneBorrowInfo& lane_borrow_info) {
+  const ReferenceLine& reference_line = reference_line_info.reference_line();
+  auto ref_point = reference_line.GetNearestReferencePoint(check_s);
+  if (ref_point.lane_waypoints().empty()) {
+    return false;
+  }
+
+  const auto waypoint = ref_point.lane_waypoints().front();
+  hdmap::LaneBoundaryType::Type lane_boundary_type;
+  if (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW) {
+    lane_boundary_type = hdmap::LeftBoundaryType(waypoint);
+  } else if (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW) {
+    lane_boundary_type = hdmap::RightBoundaryType(waypoint);
+  }
+  if (lane_boundary_type == hdmap::LaneBoundaryType::SOLID_YELLOW ||
+      lane_boundary_type == hdmap::LaneBoundaryType::SOLID_WHITE) {
+    return false;
+  }
+  return true;
 }
 
 }  // namespace planning
