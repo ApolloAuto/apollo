@@ -99,6 +99,56 @@ bool SpeedData::EvaluateByTime(const double t,
   return true;
 }
 
+bool SpeedData::EvaluateByS(const double s,
+                            common::SpeedPoint* const speed_point) const {
+  if (size() < 2) {
+    return false;
+  }
+  if (!(front().s() < s + 1.0e-6 && s - 1.0e-6 < back().s())) {
+    return false;
+  }
+
+  auto comp = [](const common::SpeedPoint& sp, const double s) {
+    return sp.s() < s;
+  };
+
+  auto it_lower = std::lower_bound(begin(), end(), s, comp);
+  if (it_lower == end()) {
+    *speed_point = back();
+  } else if (it_lower == begin()) {
+    *speed_point = front();
+  } else {
+    const auto& p0 = *(it_lower - 1);
+    const auto& p1 = *it_lower;
+    double s0 = p0.s();
+    double s1 = p1.s();
+
+    common::SpeedPoint res;
+    res.set_s(s);
+
+    double t = common::math::lerp(p0.t(), s0, p1.t(), s1, s);
+    res.set_t(t);
+
+    if (p0.has_v() && p1.has_v()) {
+      double v = common::math::lerp(p0.v(), s0, p1.v(), s1, s);
+      res.set_v(v);
+    }
+
+    if (p0.has_a() && p1.has_a()) {
+      double a = common::math::lerp(p0.a(), s0, p1.a(), s1, s);
+      res.set_a(a);
+    }
+
+    if (p0.has_da() && p1.has_da()) {
+      double da = common::math::lerp(p0.da(), s0, p1.da(), s1, s);
+      res.set_da(da);
+    }
+
+    *speed_point = res;
+  }
+  return true;
+}
+
 double SpeedData::TotalTime() const {
   if (empty()) {
     return 0.0;
@@ -106,13 +156,19 @@ double SpeedData::TotalTime() const {
   return back().t() - front().t();
 }
 
+double SpeedData::TotalLength() const {
+  if (empty()) {
+    return 0.0;
+  }
+  return back().s() - front().s();
+}
+
 std::string SpeedData::DebugString() const {
   const auto limit = std::min(
       size(), static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
   return apollo::common::util::StrCat(
-      "[\n",
-      apollo::common::util::PrintDebugStringIter(begin(), begin() + limit,
-                                                 ",\n"),
+      "[\n", apollo::common::util::PrintDebugStringIter(begin(),
+                                                        begin() + limit, ",\n"),
       "]\n");
 }
 

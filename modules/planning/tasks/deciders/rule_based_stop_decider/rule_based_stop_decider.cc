@@ -140,8 +140,8 @@ void RuleBasedStopDecider::StopOnSidePass(
   const auto &side_pass_status =
       PlanningContext::Instance()->planning_status().side_pass();
   auto *mutable_side_pass_status = PlanningContext::Instance()
-                                     ->mutable_planning_status()
-                                     ->mutable_side_pass();
+                                       ->mutable_planning_status()
+                                       ->mutable_side_pass();
 
   if (path_data.path_label().find("self") != std::string::npos) {
     mutable_side_pass_status->set_check_clear_flag(false);

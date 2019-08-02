@@ -231,14 +231,13 @@ Status PathAssessmentDecider::Process(
       new_candidate_path_data.push_back(curr_path_data);
     }
   }
-  reference_line_info->SetCandidatePathData(
-      std::move(new_candidate_path_data));
+  reference_line_info->SetCandidatePathData(std::move(new_candidate_path_data));
 
   // 4. Update necessary info for lane-borrow decider's future uses.
   // Update front static obstacle's info.
-  auto *mutable_path_decider_status = PlanningContext::Instance()
-                                     ->mutable_planning_status()
-                                     ->mutable_path_decider();
+  auto* mutable_path_decider_status = PlanningContext::Instance()
+                                          ->mutable_planning_status()
+                                          ->mutable_path_decider();
   if (!(reference_line_info->GetBlockingObstacleId()).empty()) {
     int front_static_obstacle_cycle_counter =
         mutable_path_decider_status->front_static_obstacle_cycle_counter();
@@ -246,9 +245,9 @@ Status PathAssessmentDecider::Process(
       front_static_obstacle_cycle_counter = 0;
     }
     mutable_path_decider_status->set_front_static_obstacle_id(
-            reference_line_info->GetBlockingObstacleId());
+        reference_line_info->GetBlockingObstacleId());
     mutable_path_decider_status->set_front_static_obstacle_cycle_counter(
-            std::min(front_static_obstacle_cycle_counter + 1, 10));
+        std::min(front_static_obstacle_cycle_counter + 1, 10));
   } else {
     mutable_path_decider_status->set_front_static_obstacle_cycle_counter(0);
   }
@@ -266,20 +265,42 @@ Status PathAssessmentDecider::Process(
       able_to_use_self_lane_counter = 0;
     }
     mutable_path_decider_status->set_able_to_use_self_lane_counter(
-            std::min(able_to_use_self_lane_counter + 1, 10));
+        std::min(able_to_use_self_lane_counter + 1, 10));
   } else {
     mutable_path_decider_status->set_able_to_use_self_lane_counter(0);
   }
 
   // Update side-pass direction.
-  if (mutable_path_decider_status->is_in_path_lane_borrow_scenario() &&
-      mutable_path_decider_status->decided_side_pass_direction() == 0) {
-    if (reference_line_info->path_data().path_label().find("left") !=
-        std::string::npos) {
-      mutable_path_decider_status->set_decided_side_pass_direction(1);
-    } else if (reference_line_info->path_data().path_label().find("right") !=
-               std::string::npos) {
-      mutable_path_decider_status->set_decided_side_pass_direction(-1);
+  if (mutable_path_decider_status->is_in_path_lane_borrow_scenario()) {
+    bool left_borrow = false;
+    bool right_borrow = false;
+    const auto& path_decider_status =
+        PlanningContext::Instance()->planning_status().path_decider();
+    for (const auto& lane_borrow_direction :
+        path_decider_status.decided_side_pass_direction()) {
+      if (lane_borrow_direction == PathDeciderStatus::LEFT_BORROW &&
+          reference_line_info->path_data().path_label().find("left") !=
+              std::string::npos) {
+        left_borrow = true;
+      }
+      if (lane_borrow_direction == PathDeciderStatus::RIGHT_BORROW &&
+          reference_line_info->path_data().path_label().find("right") !=
+              std::string::npos) {
+        right_borrow = true;
+      }
+    }
+
+    auto* mutable_path_decider_status = PlanningContext::Instance()
+                                            ->mutable_planning_status()
+                                            ->mutable_path_decider();
+    mutable_path_decider_status->clear_decided_side_pass_direction();
+    if (right_borrow) {
+      mutable_path_decider_status->add_decided_side_pass_direction(
+          PathDeciderStatus::RIGHT_BORROW);
+    }
+    if (left_borrow) {
+      mutable_path_decider_status->add_decided_side_pass_direction(
+          PathDeciderStatus::LEFT_BORROW);
     }
   }
   const auto& end_time4 = std::chrono::system_clock::now();

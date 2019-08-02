@@ -25,7 +25,7 @@ DEFINE_double(prediction_trajectory_time_length, 8.0,
               "Time length of predicted trajectory (in seconds)");
 DEFINE_double(prediction_trajectory_time_resolution, 0.1,
               "Time resolution of predicted trajectory (in seconds");
-DEFINE_double(min_prediction_trajectory_spatial_length, 20.0,
+DEFINE_double(min_prediction_trajectory_spatial_length, 100.0,
               "Minimal spatial length of predicted trajectory");
 DEFINE_bool(enable_trajectory_validation_check, false,
             "If check the validity of prediction trajectory.");

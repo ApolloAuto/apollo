@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/tick/tick_component.h"
 
-/**
- * @file
- **/
-
-#include "modules/planning/traffic_rules/object_priority.h"
+#include "cyber/init.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
-namespace planning {
+namespace tick {
 
-using apollo::common::Status;
-
-ObjectPriority::ObjectPriority(const TrafficRuleConfig& config)
-    : TrafficRule(config) {}
-
-Status ObjectPriority::ApplyRule(Frame* const frame,
-                                 ReferenceLineInfo* const reference_line_info) {
-  return Status::OK();
+TEST(TickComponentTest, Init) {
+  cyber::Init("tick_component_test");
+  TickComponent component;
 }
 
-}  // namespace planning
+}  // namespace tick
 }  // namespace apollo

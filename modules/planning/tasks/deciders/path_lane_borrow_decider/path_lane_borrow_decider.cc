@@ -16,6 +16,7 @@
 
 #include "modules/planning/tasks/deciders/path_lane_borrow_decider/path_lane_borrow_decider.h"
 
+#include <algorithm>
 #include <string>
 
 #include "modules/planning/common/obstacle_blocking_analyzer.h"
@@ -52,16 +53,16 @@ Status PathLaneBorrowDecider::Process(
 
 bool PathLaneBorrowDecider::IsNecessaryToBorrowLane(
     const Frame& frame, const ReferenceLineInfo& reference_line_info) {
-  auto *mutable_path_decider_status = PlanningContext::Instance()
-                                     ->mutable_planning_status()
-                                     ->mutable_path_decider();
+  auto* mutable_path_decider_status = PlanningContext::Instance()
+                                          ->mutable_planning_status()
+                                          ->mutable_path_decider();
   if (mutable_path_decider_status->is_in_path_lane_borrow_scenario()) {
     // If originally borrowing neighbor lane:
     if (mutable_path_decider_status->able_to_use_self_lane_counter() >= 6) {
       // If have been able to use self-lane for some time, then switch to
       // non-lane-borrowing.
       mutable_path_decider_status->set_is_in_path_lane_borrow_scenario(false);
-      mutable_path_decider_status->set_decided_side_pass_direction(0);
+      mutable_path_decider_status->clear_decided_side_pass_direction();
       AINFO << "Switch from LANE-BORROW path to SELF-LANE path.";
     }
   } else {
@@ -75,6 +76,44 @@ bool PathLaneBorrowDecider::IsNecessaryToBorrowLane(
         IsSidePassableObstacle(reference_line_info)) {
       // Satisfying the above condition will it switch to lane-borrowing.
       mutable_path_decider_status->set_is_in_path_lane_borrow_scenario(true);
+
+      // set side-pass direction
+      bool left_borrowable = false;
+      bool right_borrowable = false;
+      const auto& path_decider_status =
+          PlanningContext::Instance()->planning_status().path_decider();
+      if (path_decider_status.decided_side_pass_direction_size() <= 0) {
+        // first time init
+        left_borrowable = CheckLaneBorrow(reference_line_info,
+                                          PathDeciderStatus::LEFT_BORROW);
+        right_borrowable = CheckLaneBorrow(reference_line_info,
+                                          PathDeciderStatus::RIGHT_BORROW);
+      } else {
+        // existing value
+        for (const auto& lane_borrow_direction :
+            path_decider_status.decided_side_pass_direction()) {
+            // repeated enum becomes int
+            if (lane_borrow_direction == PathDeciderStatus::LEFT_BORROW) {
+              left_borrowable = CheckLaneBorrow(
+                  reference_line_info, PathDeciderStatus::LEFT_BORROW);
+            }
+            if (lane_borrow_direction == PathDeciderStatus::RIGHT_BORROW) {
+              right_borrowable = CheckLaneBorrow(
+                  reference_line_info, PathDeciderStatus::RIGHT_BORROW);
+            }
+        }
+      }
+
+      mutable_path_decider_status->clear_decided_side_pass_direction();
+      if (left_borrowable) {
+        mutable_path_decider_status->add_decided_side_pass_direction(
+            PathDeciderStatus::LEFT_BORROW);
+      }
+      if (right_borrowable) {
+        mutable_path_decider_status->add_decided_side_pass_direction(
+            PathDeciderStatus::RIGHT_BORROW);
+      }
+
       AINFO << "Switch from SELF-LANE path to LANE-BORROW path.";
     }
   }
@@ -108,7 +147,7 @@ bool PathLaneBorrowDecider::IsLongTermBlockingObstacle() {
 
 bool PathLaneBorrowDecider::IsBlockingObstacleWithinDestination(
     const ReferenceLineInfo& reference_line_info) {
-  const auto &path_decider_status =
+  const auto& path_decider_status =
       PlanningContext::Instance()->planning_status().path_decider();
   const std::string blocking_obstacle_id =
       path_decider_status.front_static_obstacle_id();
@@ -140,7 +179,7 @@ bool PathLaneBorrowDecider::IsBlockingObstacleWithinDestination(
 
 bool PathLaneBorrowDecider::IsBlockingObstacleFarFromIntersection(
     const ReferenceLineInfo& reference_line_info) {
-  const auto &path_decider_status =
+  const auto& path_decider_status =
       PlanningContext::Instance()->planning_status().path_decider();
   const std::string blocking_obstacle_id =
       path_decider_status.front_static_obstacle_id();
@@ -195,7 +234,7 @@ bool PathLaneBorrowDecider::IsBlockingObstacleFarFromIntersection(
 
 bool PathLaneBorrowDecider::IsSidePassableObstacle(
     const ReferenceLineInfo& reference_line_info) {
-  const auto &path_decider_status =
+  const auto& path_decider_status =
       PlanningContext::Instance()->planning_status().path_decider();
   const std::string blocking_obstacle_id =
       path_decider_status.front_static_obstacle_id();
@@ -212,6 +251,42 @@ bool PathLaneBorrowDecider::IsSidePassableObstacle(
   }
 
   return IsNonmovableObstacle(reference_line_info, *blocking_obstacle);
+}
+
+bool PathLaneBorrowDecider::CheckLaneBorrow(
+    const ReferenceLineInfo& reference_line_info,
+    const PathDeciderStatus::LaneBorrowDirection& lane_borrow_direction) {
+  const ReferenceLine& reference_line = reference_line_info.reference_line();
+
+  constexpr double kLookforwardDistance = 100.0;
+  double check_s = reference_line_info.AdcSlBoundary().end_s();
+  const double lookforward_distance = std::min(check_s + kLookforwardDistance,
+                                               reference_line.Length());
+  while (check_s < lookforward_distance) {
+    auto ref_point = reference_line.GetNearestReferencePoint(check_s);
+    if (ref_point.lane_waypoints().empty()) {
+      return false;
+    }
+    const auto waypoint = ref_point.lane_waypoints().front();
+    hdmap::LaneBoundaryType::Type lane_boundary_type;
+    if (lane_borrow_direction == PathDeciderStatus::LEFT_BORROW) {
+      lane_boundary_type = hdmap::LeftBoundaryType(waypoint);
+      ADEBUG << "s[" << check_s << "] left_lane_boundary_type["
+             << LaneBoundaryType_Type_Name(lane_boundary_type) << "]";
+    } else if (lane_borrow_direction == PathDeciderStatus::RIGHT_BORROW) {
+      lane_boundary_type = hdmap::RightBoundaryType(waypoint);
+      ADEBUG << "s[" << check_s << "] right_lane_boundary_type["
+             << LaneBoundaryType_Type_Name(lane_boundary_type) <<"]";
+    }
+
+    if (lane_boundary_type == hdmap::LaneBoundaryType::SOLID_YELLOW ||
+        lane_boundary_type == hdmap::LaneBoundaryType::SOLID_WHITE) {
+      return false;
+    }
+
+    check_s += 2.0;
+  }
+  return true;
 }
 
 }  // namespace planning

@@ -136,34 +136,21 @@ Status PathBoundsDecider::Process(
 
   // Generate regular path boundaries.
   std::vector<LaneBorrowInfo> lane_borrow_info_list;
+  lane_borrow_info_list.push_back(LaneBorrowInfo::NO_BORROW);
+
   if (reference_line_info->is_path_lane_borrow()) {
-    // Try borrowing from left and from right neighbor lane.
-    const int decided_side_pass_direction =
-        PlanningContext::Instance()
-                        ->planning_status()
-                        .path_decider()
-                        .decided_side_pass_direction();
-    switch (decided_side_pass_direction) {
-      case 0:
-        lane_borrow_info_list = {LaneBorrowInfo::LEFT_BORROW,
-                                 LaneBorrowInfo::RIGHT_BORROW,
-                                 LaneBorrowInfo::NO_BORROW};
-        break;
-
-      case -1:
-        lane_borrow_info_list = {LaneBorrowInfo::RIGHT_BORROW,
-                                 LaneBorrowInfo::NO_BORROW};
-        break;
-
-      case 1:
-        lane_borrow_info_list = {LaneBorrowInfo::LEFT_BORROW,
-                                 LaneBorrowInfo::NO_BORROW};
-        break;
+    const auto& path_decider_status =
+        PlanningContext::Instance()->planning_status().path_decider();
+    for (const auto& lane_borrow_direction :
+        path_decider_status.decided_side_pass_direction()) {
+      if (lane_borrow_direction == PathDeciderStatus::LEFT_BORROW) {
+        lane_borrow_info_list.push_back(LaneBorrowInfo::LEFT_BORROW);
+      } else if (lane_borrow_direction == PathDeciderStatus::RIGHT_BORROW) {
+        lane_borrow_info_list.push_back(LaneBorrowInfo::RIGHT_BORROW);
+      }
     }
-  } else {
-    // Only use self-lane with no lane borrowing
-    lane_borrow_info_list = {LaneBorrowInfo::NO_BORROW};
   }
+
   // Try every possible lane-borrow option:
   // PathBound regular_self_path_bound;
   // bool exist_self_path_bound = false;
@@ -261,7 +248,7 @@ void PathBoundsDecider::InitPathBoundsDecider(
 
 std::string PathBoundsDecider::GenerateRegularPathBound(
     const ReferenceLineInfo& reference_line_info,
-    const LaneBorrowInfo lane_borrow_info, PathBound* const path_bound,
+    const LaneBorrowInfo& lane_borrow_info, PathBound* const path_bound,
     std::string* const blocking_obstacle_id,
     std::string* const borrow_lane_type) {
   // 1. Initialize the path boundaries to be an indefinitely large area.
@@ -760,7 +747,7 @@ bool PathBoundsDecider::GetBoundaryFromRoads(
 
 bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
     const ReferenceLineInfo& reference_line_info,
-    const LaneBorrowInfo lane_borrow_info, double ADC_buffer,
+    const LaneBorrowInfo& lane_borrow_info, double ADC_buffer,
     PathBound* const path_bound, std::string* const borrow_lane_type) {
   // Sanity checks.
   CHECK_NOTNULL(path_bound);

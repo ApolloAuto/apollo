@@ -46,11 +46,11 @@ namespace planning {
 namespace scenario {
 namespace lane_follow {
 
-using common::ErrorCode;
-using common::SLPoint;
-using common::Status;
-using common::TrajectoryPoint;
-using common::time::Clock;
+using apollo::common::ErrorCode;
+using apollo::common::SLPoint;
+using apollo::common::Status;
+using apollo::common::TrajectoryPoint;
+using apollo::common::time::Clock;
 
 namespace {
 constexpr double kPathOptimizationFallbackCost = 2e4;

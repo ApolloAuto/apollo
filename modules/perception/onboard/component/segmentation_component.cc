@@ -58,7 +58,6 @@ bool SegmentationComponent::Proc(
         << std::to_string(message->measurement_time()) << " current timestamp: "
         << std::to_string(apollo::common::time::Clock::NowInSeconds());
 
-
   std::shared_ptr<LidarFrameMessage> out_message(new (std::nothrow)
                                                      LidarFrameMessage);
 

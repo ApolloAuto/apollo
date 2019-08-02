@@ -46,9 +46,9 @@ namespace apollo {
 namespace hdmap {
 
 using apollo::common::PointENU;
+using apollo::common::util::MakePointENU;
 using apollo::common::VehicleState;
 using apollo::routing::RoutingResponse;
-using common::util::MakePointENU;
 
 namespace {
 
@@ -154,7 +154,7 @@ void PncMap::UpdateRoutingRange(int adc_index) {
 
 bool PncMap::UpdateVehicleState(const VehicleState &vehicle_state) {
   if (!ValidateRouting(routing_)) {
-    AERROR << "The routing is invalid when updatting vehicle state.";
+    AERROR << "The routing is invalid when updating vehicle state.";
     return false;
   }
   if (!adc_state_.has_x() ||

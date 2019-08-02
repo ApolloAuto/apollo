@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,34 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
-
 #pragma once
 
-#include "modules/planning/traffic_rules/traffic_rule.h"
+#include <memory>
+
+#include "cyber/component/component.h"
+#include "modules/localization/proto/localization.pb.h"
+#include "modules/tick/proto/tick_conf.pb.h"
+#include "modules/tick/proto/tick.pb.h"
 
 namespace apollo {
-namespace planning {
+namespace tick {
 
-class ObjectPriority : public TrafficRule {
+class TickComponent final : public apollo::cyber::Component<> {
  public:
-  explicit ObjectPriority(const TrafficRuleConfig& config);
-  virtual ~ObjectPriority() = default;
+  TickComponent() = default;
+  ~TickComponent() = default;
 
-  common::Status ApplyRule(Frame* const frame,
-                           ReferenceLineInfo* const reference_line_info);
+  bool Init() override;
+
+ private:
+  apollo::tick::Conf conf_;
+
+  std::shared_ptr<cyber::Reader<localization::LocalizationEstimate>>
+      localization_estimate_listener_ = nullptr;
+  std::shared_ptr<cyber::Reader<tick::Tick>> tick_listener_ = nullptr;
 };
 
-}  // namespace planning
+CYBER_REGISTER_COMPONENT(TickComponent)
+
+}  // namespace tick
 }  // namespace apollo

@@ -220,6 +220,7 @@ def SmoothTrajectory(visualize_flag, sx, sy):
         dual_n_graph.title.set_text('dual_n')
         dual_n_graph.plot(np.linspace(0, size[0] * 16, size[0] * 16), opt_dual_n_out)
         plt.show()
+        return True
 
     if not visualize_flag :
         if success :
@@ -244,6 +245,7 @@ def SmoothTrajectory(visualize_flag, sx, sy):
                 opt_time_out.append(float(opt_time[i]))
         return [success, opt_x_out, opt_y_out, opt_phi_out, opt_v_out, opt_a_out, opt_steer_out, opt_time_out, \
             hybrid_time, dual_time, ipopt_time, planning_time]
+    return False
 
 if __name__ == '__main__':
     # visualize_flag = True
@@ -254,14 +256,15 @@ if __name__ == '__main__':
     hybrid_time_stats = []
     dual_time_stats = []
     ipopt_time_stats = []
+
+
     test_count = 0
     success_count = 0
-    for sx in np.arange(-9, -6, 0.25): 
-        for sy in np.arange(2, 4, 0.25):
+    for sx in np.arange(-10, 10, 1.0): 
+        for sy in np.arange(2, 4, 0.5):
             print("sx is "+ str(sx) + " and sy is " + str(sy))
             test_count += 1
             result = SmoothTrajectory(visualize_flag, sx, sy)
-            # print (result)
             if result[0] :
                 success_count += 1
                 planning_time_stats.append(result[-1])
@@ -269,10 +272,11 @@ if __name__ == '__main__':
                 dual_time_stats.append(result[-3][0])
                 hybrid_time_stats.append(result[-4][0])
 
-    print("success rate is "+ str(success_count / test_count))            
+    print("success rate is "+ str(float(success_count) / float(test_count)))            
     print("min is " + str(min(planning_time_stats)))
     print("max is " + str(max(planning_time_stats)))
     print("average is " + str(sum(planning_time_stats) / len(planning_time_stats)))
+
 
     module_timing = np.asarray([hybrid_time_stats, dual_time_stats, ipopt_time_stats])
     np.savetxt(result_file, module_timing, delimiter=",")

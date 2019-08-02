@@ -988,6 +988,22 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
   }
 }
 
+bool Obstacle::HasJunctionExitLane(const LaneSequence& lane_sequence,
+    const std::unordered_set<std::string>& exit_lane_id_set) {
+  const Feature& feature = latest_feature();
+  if (!feature.has_junction_feature()) {
+    AERROR << "Obstacle [" << id_ << "] has no junction feature.";
+    return false;
+  }
+  for (const LaneSegment& lane_segment : lane_sequence.lane_segment()) {
+    if (exit_lane_id_set.find(lane_segment.lane_id()) !=
+        exit_lane_id_set.end()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void Obstacle::BuildLaneGraph() {
   // Sanity checks.
   if (history_size() == 0) {
@@ -1012,6 +1028,14 @@ void Obstacle::BuildLaneGraph() {
   double road_graph_search_distance = std::fmax(
       estimated_move_distance, FLAGS_min_prediction_trajectory_spatial_length);
 
+  bool is_in_junction = HasJunctionFeatureWithExits();
+  std::unordered_set<std::string> exit_lane_id_set;
+  if (is_in_junction) {
+    for (const auto& exit : feature->junction_feature().junction_exit()) {
+      exit_lane_id_set.insert(exit.exit_lane_id());
+    }
+  }
+
   // BuildLaneGraph for current lanes:
   // Go through all the LaneSegments in current_lane,
   // construct up to max_num_current_lane of them.
@@ -1026,6 +1050,9 @@ void Obstacle::BuildLaneGraph() {
       ++curr_lane_count;
     }
     for (const auto& lane_seq : lane_graph.lane_sequence()) {
+      if (is_in_junction && !HasJunctionExitLane(lane_seq, exit_lane_id_set)) {
+        continue;
+      }
       LaneSequence* lane_seq_ptr =
           feature->mutable_lane()->mutable_lane_graph()->add_lane_sequence();
       lane_seq_ptr->CopyFrom(lane_seq);
@@ -1054,6 +1081,9 @@ void Obstacle::BuildLaneGraph() {
       ++nearby_lane_count;
     }
     for (const auto& lane_seq : lane_graph.lane_sequence()) {
+      if (is_in_junction && !HasJunctionExitLane(lane_seq, exit_lane_id_set)) {
+        continue;
+      }
       LaneSequence* lane_seq_ptr =
           feature->mutable_lane()->mutable_lane_graph()->add_lane_sequence();
       lane_seq_ptr->CopyFrom(lane_seq);
@@ -1181,6 +1211,15 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
   if (!feature->has_lane() || !feature->lane().has_lane_feature()) {
     return;
   }
+
+  bool is_in_junction = HasJunctionFeatureWithExits();
+  std::unordered_set<std::string> exit_lane_id_set;
+  if (is_in_junction) {
+    for (const auto& exit : feature->junction_feature().junction_exit()) {
+      exit_lane_id_set.insert(exit.exit_lane_id());
+    }
+  }
+
   std::shared_ptr<const LaneInfo> center_lane_info =
       PredictionMap::LaneById(feature->lane().lane_feature().lane_id());
   std::list<std::string> lane_ids_ordered_list;
@@ -1209,6 +1248,9 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
             true, curr_lane_info);
     // Update it into the Feature proto
     for (const auto& lane_seq : local_lane_graph.lane_sequence()) {
+      if (is_in_junction && !HasJunctionExitLane(lane_seq, exit_lane_id_set)) {
+        continue;
+      }
       LaneSequence* lane_seq_ptr = feature->mutable_lane()
                                        ->mutable_lane_graph_ordered()
                                        ->add_lane_sequence();

@@ -27,12 +27,12 @@ namespace planning {
 namespace scenario {
 namespace util {
 
+using apollo::common::VehicleConfigHelper;
 using apollo::common::math::Box2d;
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
-using common::VehicleConfigHelper;
-using common::util::DistanceXY;
-using hdmap::PathOverlap;
+using apollo::common::util::DistanceXY;
+using apollo::hdmap::PathOverlap;
 
 hdmap::PathOverlap* GetOverlapOnReferenceLine(
     const ReferenceLineInfo& reference_line_info, const std::string& overlap_id,
@@ -125,7 +125,7 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
 }
 
 /**
- * @brief: check path data to see  properly
+ * @brief: check path data to see properly
  */
 PullOverStatus CheckADCPullOverPathPoint(
     const ReferenceLineInfo& reference_line_info,
@@ -203,8 +203,8 @@ ParkAndGoStatus CheckADCParkAndGoOpenSpace(
   return CRUISING;
 }
 
-ParkAndGoStatus CheckADCSurroundObstacles(
-    Frame* frame, const ScenarioParkAndGoConfig& scenario_config) {
+bool CheckADCSurroundObstacles(Frame* frame,
+                               const ScenarioParkAndGoConfig& scenario_config) {
   common::math::Vec2d adc_position = {
       common::VehicleStateProvider::Instance()->x(),
       common::VehicleStateProvider::Instance()->y()};
@@ -228,10 +228,10 @@ ParkAndGoStatus CheckADCSurroundObstacles(
   for (const auto& obstacle : obstacles) {
     const auto& obstacle_polygon = obstacle->PerceptionPolygon();
     if (adc_polygon.HasOverlap(obstacle_polygon)) {
-      return ADJUST;
+      return true;
     }
   }
-  return ADJUST_COMPLETE;
+  return false;
 }
 
 bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
