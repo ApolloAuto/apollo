@@ -74,44 +74,33 @@ bool PathLaneBorrowDecider::IsNecessaryToBorrowLane(
         IsLongTermBlockingObstacle() &&
         IsBlockingObstacleWithinDestination(reference_line_info) &&
         IsSidePassableObstacle(reference_line_info)) {
-      // Satisfying the above condition will it switch to lane-borrowing.
-      mutable_path_decider_status->set_is_in_path_lane_borrow_scenario(true);
-
+      // switch to lane-borrowing
       // set side-pass direction
-      bool left_borrowable = false;
-      bool right_borrowable = false;
       const auto& path_decider_status =
           PlanningContext::Instance()->planning_status().path_decider();
       if (path_decider_status.decided_side_pass_direction_size() <= 0) {
-        // first time init
-        left_borrowable = CheckLaneBorrow(reference_line_info,
-                                          PathDeciderStatus::LEFT_BORROW);
-        right_borrowable = CheckLaneBorrow(reference_line_info,
-                                           PathDeciderStatus::RIGHT_BORROW);
-      } else {
-        // existing value
-        for (const auto& lane_borrow_direction :
-             path_decider_status.decided_side_pass_direction()) {
-          // repeated enum becomes int
-          if (lane_borrow_direction == PathDeciderStatus::LEFT_BORROW) {
-            left_borrowable = CheckLaneBorrow(reference_line_info,
-                                              PathDeciderStatus::LEFT_BORROW);
+        // first time init decided_side_pass_direction
+        bool left_borrowable =
+            CheckLaneBorrow(reference_line_info,
+                            PathDeciderStatus::LEFT_BORROW);
+        bool right_borrowable =
+            CheckLaneBorrow(reference_line_info,
+                            PathDeciderStatus::RIGHT_BORROW);
+        if (!left_borrowable && !right_borrowable) {
+          mutable_path_decider_status->
+              set_is_in_path_lane_borrow_scenario(false);
+        } else {
+          mutable_path_decider_status->
+              set_is_in_path_lane_borrow_scenario(true);
+          if (left_borrowable) {
+            mutable_path_decider_status->add_decided_side_pass_direction(
+                PathDeciderStatus::LEFT_BORROW);
           }
-          if (lane_borrow_direction == PathDeciderStatus::RIGHT_BORROW) {
-            right_borrowable = CheckLaneBorrow(reference_line_info,
-                                               PathDeciderStatus::RIGHT_BORROW);
+          if (right_borrowable) {
+            mutable_path_decider_status->add_decided_side_pass_direction(
+                PathDeciderStatus::RIGHT_BORROW);
           }
         }
-      }
-
-      mutable_path_decider_status->clear_decided_side_pass_direction();
-      if (left_borrowable) {
-        mutable_path_decider_status->add_decided_side_pass_direction(
-            PathDeciderStatus::LEFT_BORROW);
-      }
-      if (right_borrowable) {
-        mutable_path_decider_status->add_decided_side_pass_direction(
-            PathDeciderStatus::RIGHT_BORROW);
       }
 
       AINFO << "Switch from SELF-LANE path to LANE-BORROW path.";
