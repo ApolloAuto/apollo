@@ -20,8 +20,8 @@
 
 #include "cyber/component/component.h"
 #include "modules/localization/proto/localization.pb.h"
-#include "modules/tick/proto/tick_conf.pb.h"
 #include "modules/tick/proto/tick.pb.h"
+#include "modules/tick/proto/tick_conf.pb.h"
 
 namespace apollo {
 namespace tick {

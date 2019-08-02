@@ -142,7 +142,7 @@ Status PathBoundsDecider::Process(
     const auto& path_decider_status =
         PlanningContext::Instance()->planning_status().path_decider();
     for (const auto& lane_borrow_direction :
-        path_decider_status.decided_side_pass_direction()) {
+         path_decider_status.decided_side_pass_direction()) {
       if (lane_borrow_direction == PathDeciderStatus::LEFT_BORROW) {
         lane_borrow_info_list.push_back(LaneBorrowInfo::LEFT_BORROW);
       } else if (lane_borrow_direction == PathDeciderStatus::RIGHT_BORROW) {

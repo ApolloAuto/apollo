@@ -46,8 +46,8 @@ namespace apollo {
 namespace hdmap {
 
 using apollo::common::PointENU;
-using apollo::common::util::MakePointENU;
 using apollo::common::VehicleState;
+using apollo::common::util::MakePointENU;
 using apollo::routing::RoutingResponse;
 
 namespace {

@@ -167,8 +167,9 @@ std::string SpeedData::DebugString() const {
   const auto limit = std::min(
       size(), static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
   return apollo::common::util::StrCat(
-      "[\n", apollo::common::util::PrintDebugStringIter(begin(),
-                                                        begin() + limit, ",\n"),
+      "[\n",
+      apollo::common::util::PrintDebugStringIter(begin(), begin() + limit,
+                                                 ",\n"),
       "]\n");
 }
 

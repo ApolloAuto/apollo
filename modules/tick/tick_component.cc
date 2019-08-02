@@ -39,18 +39,17 @@ bool TickComponent::Init() {
   Clock::SetMode(Clock::ClockMode::MOCK);
   if (conf_.whole_stack_sim()) {
     tick_listener_ = node_->CreateReader<Tick>(
-      FLAGS_tick_topic,
-      [this](const std::shared_ptr<Tick>& tick) {
-        Clock::SetNowInSeconds(tick->header().timestamp_sec());
-      });
+        FLAGS_tick_topic, [this](const std::shared_ptr<Tick>& tick) {
+          Clock::SetNowInSeconds(tick->header().timestamp_sec());
+        });
   } else {
-    localization_estimate_listener_ =
-      node_->CreateReader<LocalizationEstimate>(
-      FLAGS_localization_topic,
-      [this](const std::shared_ptr<LocalizationEstimate>&
-                                   localization_estimate) {
-        Clock::SetNowInSeconds(localization_estimate->header().timestamp_sec());
-      });
+    localization_estimate_listener_ = node_->CreateReader<LocalizationEstimate>(
+        FLAGS_localization_topic,
+        [this](const std::shared_ptr<LocalizationEstimate>&
+                   localization_estimate) {
+          Clock::SetNowInSeconds(
+              localization_estimate->header().timestamp_sec());
+        });
   }
   return true;
 }
