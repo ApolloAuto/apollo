@@ -80,12 +80,10 @@ bool PathLaneBorrowDecider::IsNecessaryToBorrowLane(
           PlanningContext::Instance()->planning_status().path_decider();
       if (path_decider_status.decided_side_pass_direction_size() <= 0) {
         // first time init decided_side_pass_direction
-        bool left_borrowable =
-            CheckLaneBorrow(reference_line_info,
-                            PathDeciderStatus::LEFT_BORROW);
-        bool right_borrowable =
-            CheckLaneBorrow(reference_line_info,
-                            PathDeciderStatus::RIGHT_BORROW);
+        bool left_borrowable;
+        bool right_borrowable;
+        CheckLaneBorrow(reference_line_info,
+                        &left_borrowable, &right_borrowable);
         if (!left_borrowable && !right_borrowable) {
           mutable_path_decider_status->
               set_is_in_path_lane_borrow_scenario(false);
@@ -242,10 +240,14 @@ bool PathLaneBorrowDecider::IsSidePassableObstacle(
   return IsNonmovableObstacle(reference_line_info, *blocking_obstacle);
 }
 
-bool PathLaneBorrowDecider::CheckLaneBorrow(
+void PathLaneBorrowDecider::CheckLaneBorrow(
     const ReferenceLineInfo& reference_line_info,
-    const PathDeciderStatus::LaneBorrowDirection& lane_borrow_direction) {
+    bool *left_neighbor_lane_borrowable,
+    bool *right_neighbor_lane_borrowable) {
   const ReferenceLine& reference_line = reference_line_info.reference_line();
+
+  *left_neighbor_lane_borrowable = true;
+  *right_neighbor_lane_borrowable = true;
 
   constexpr double kLookforwardDistance = 100.0;
   double check_s = reference_line_info.AdcSlBoundary().end_s();
@@ -254,28 +256,34 @@ bool PathLaneBorrowDecider::CheckLaneBorrow(
   while (check_s < lookforward_distance) {
     auto ref_point = reference_line.GetNearestReferencePoint(check_s);
     if (ref_point.lane_waypoints().empty()) {
-      return false;
+      *left_neighbor_lane_borrowable = false;
+      *right_neighbor_lane_borrowable = false;
+      return;
     }
+
     const auto waypoint = ref_point.lane_waypoints().front();
     hdmap::LaneBoundaryType::Type lane_boundary_type;
-    if (lane_borrow_direction == PathDeciderStatus::LEFT_BORROW) {
+
+    if (*left_neighbor_lane_borrowable) {
       lane_boundary_type = hdmap::LeftBoundaryType(waypoint);
+      if (lane_boundary_type == hdmap::LaneBoundaryType::SOLID_YELLOW ||
+          lane_boundary_type == hdmap::LaneBoundaryType::SOLID_WHITE) {
+        *left_neighbor_lane_borrowable = false;
+      }
       ADEBUG << "s[" << check_s << "] left_lane_boundary_type["
              << LaneBoundaryType_Type_Name(lane_boundary_type) << "]";
-    } else if (lane_borrow_direction == PathDeciderStatus::RIGHT_BORROW) {
+    }
+    if (*right_neighbor_lane_borrowable) {
       lane_boundary_type = hdmap::RightBoundaryType(waypoint);
-      ADEBUG << "s[" << check_s << "] right_lane_boundary_type["
+      if (lane_boundary_type == hdmap::LaneBoundaryType::SOLID_YELLOW ||
+          lane_boundary_type == hdmap::LaneBoundaryType::SOLID_WHITE) {
+        *right_neighbor_lane_borrowable = false;
+      }
+      ADEBUG << "s[" << check_s << "] right_neighbor_lane_borrowable["
              << LaneBoundaryType_Type_Name(lane_boundary_type) << "]";
     }
-
-    if (lane_boundary_type == hdmap::LaneBoundaryType::SOLID_YELLOW ||
-        lane_boundary_type == hdmap::LaneBoundaryType::SOLID_WHITE) {
-      return false;
-    }
-
     check_s += 2.0;
   }
-  return true;
 }
 
 }  // namespace planning
