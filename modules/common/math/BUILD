@@ -191,7 +191,7 @@ cc_library(
     deps = [
         "//cyber/common:log",
         "@eigen",
-        "@osqp"
+        "@osqp",
     ],
 )
 
