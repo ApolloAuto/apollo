@@ -600,6 +600,7 @@ rostopic echo /apollo/sensor/camera/traffic/image_short
 ![图片](images/lidar_picture.png)
 
  - 在Apollo启动后，在`docker`环境内，启动`dreamview`后，执行`bash /apollo/scripts/velodyne_16.sh`，出现如下图所示的`topic`，如下图所示，打印这三个`topic`，如果数据能正常输出，则代表激光雷达运行正常。
+ I print these three topics, but there is not any information out. All the steps mentioned before have been done correctly and get good result, so what's wrong with this step?
  
 ![图片](images/lidar_topic.png)
 
