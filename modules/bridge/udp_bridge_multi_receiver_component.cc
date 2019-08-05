@@ -32,11 +32,8 @@ bool UDPBridgeMultiReceiverComponent::Init() {
     return false;
   }
   bind_port_ = udp_bridge_remote.bind_port();
-  proto_name_ = udp_bridge_remote.proto_name();
-  topic_name_ = udp_bridge_remote.topic_name();
   enable_timeout_ = udp_bridge_remote.enable_timeout();
   ADEBUG << "UDP Bridge remote port is: " << bind_port_;
-  ADEBUG << "UDP Bridge for Proto is: " << proto_name_;
 
   if (!InitSession((uint16_t)bind_port_)) {
     return false;
@@ -85,7 +82,7 @@ ProtoDiserializedBufBase
   if (!proto_buf) {
     return nullptr;
   }
-  proto_buf->Initialize(header, node_, topic_name_);
+  proto_buf->Initialize(header, node_);
   proto_list_.push_back(proto_buf);
   return proto_buf;
 }
