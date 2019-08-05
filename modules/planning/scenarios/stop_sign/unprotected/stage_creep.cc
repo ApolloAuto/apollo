@@ -40,9 +40,9 @@ namespace planning {
 namespace scenario {
 namespace stop_sign {
 
-using common::TrajectoryPoint;
-using common::time::Clock;
-using hdmap::PathOverlap;
+using apollo::common::TrajectoryPoint;
+using apollo::common::time::Clock;
+using apollo::hdmap::PathOverlap;
 
 Stage::StageStatus StopSignUnprotectedStageCreep::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {

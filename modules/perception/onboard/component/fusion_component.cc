@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/onboard/component/fusion_component.h"
 
+#include "modules/common/time/time.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/lib/utils/perf.h"
 #include "modules/perception/onboard/common_flags/common_flags.h"
@@ -183,7 +184,7 @@ bool FusionComponent::InternalProc(
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
       std::string("fusion_serialize_message"), in_message->sensor_id_);
 
-  const double cur_time = cyber::Time::Now().ToSecond();
+  const double cur_time = apollo::common::time::Clock::NowInSeconds();
   const double latency = (cur_time - timestamp) * 1e3;
   AINFO << "FRAME_STATISTICS:Obstacle:End:msg_time["
         << std::to_string(timestamp) << "]:cur_time["

@@ -56,13 +56,6 @@ class TimerComponent : public ComponentBase {
    */
   virtual bool Proc() = 0;
 
-  /**
-   * @brief The init of your component, which called by the CyberRT frame.
-   *
-   * @return returns true if successful, otherwise returns false
-   */
-  virtual bool Init() = 0;
-
   uint64_t interval_ = 0;
   std::unique_ptr<Timer> timer_;
 };

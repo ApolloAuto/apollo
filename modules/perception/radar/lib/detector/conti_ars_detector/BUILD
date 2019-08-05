@@ -34,6 +34,7 @@ cc_library(
         "//modules/perception/radar/lib/interface:base_detector",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cpplint()

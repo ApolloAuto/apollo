@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_config.h"
 
 #include <string>
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 PyramidMapConfig::PyramidMapConfig(const std::string& map_version)
     : BaseMapConfig(map_version) {}
@@ -129,6 +130,7 @@ bool PyramidMapConfig::LoadXml(const boost::property_tree::ptree& config) {
   return false;
 }
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

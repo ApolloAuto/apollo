@@ -73,6 +73,7 @@ inline void FindModuleName(std::string* log_message, std::string* module_name) {
     }
   }
   if (module_name->empty()) {
+    CHECK_NOTNULL(common::GlobalData::Instance());
     *module_name = common::GlobalData::Instance()->ProcessGroup();
   }
 }

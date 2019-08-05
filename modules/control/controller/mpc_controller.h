@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include "modules/common/math/mpc_osqp.h"
+
 #include <fstream>
 #include <memory>
 #include <string>

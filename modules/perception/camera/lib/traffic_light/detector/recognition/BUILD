@@ -51,6 +51,7 @@ cc_library(
         "//modules/perception/camera/lib/interface",
         "//modules/perception/inference:inference_lib",
     ],
+    alwayslink = True,
 )
 
 cpplint()

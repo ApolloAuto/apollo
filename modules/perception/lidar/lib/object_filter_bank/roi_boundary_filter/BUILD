@@ -19,6 +19,7 @@ cc_library(
         "//modules/perception/proto:roi_boundary_filter_config_proto",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cc_test(

@@ -111,6 +111,9 @@ cc_test(
 
 cc_library(
     name = "connected_component_analysis",
+    srcs = [
+        "connected_component_analysis.cc",
+    ],
     hdrs = [
         "connected_component_analysis.h",
     ],

@@ -35,14 +35,14 @@ double GridSearch::EuclidDistance(const double x1, const double y1,
 }
 
 bool GridSearch::CheckConstraints(std::shared_ptr<Node2d> node) {
-  if (obstacles_linesegments_vec_.empty()) {
-    return true;
-  }
-  double node_grid_x = node->GetGridX();
-  double node_grid_y = node->GetGridY();
+  const double node_grid_x = node->GetGridX();
+  const double node_grid_y = node->GetGridY();
   if (node_grid_x > max_grid_x_ || node_grid_x < 0 ||
       node_grid_y > max_grid_y_ || node_grid_y < 0) {
     return false;
+  }
+  if (obstacles_linesegments_vec_.empty()) {
+    return true;
   }
   for (const auto& obstacle_linesegments : obstacles_linesegments_vec_) {
     for (const common::math::LineSegment2d& linesegment :

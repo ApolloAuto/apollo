@@ -32,7 +32,7 @@ namespace planning {
 namespace scenario {
 namespace park_and_go {
 
-using common::TrajectoryPoint;
+using apollo::common::TrajectoryPoint;
 
 Stage::StageStatus ParkAndGoStageCruise::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -43,12 +43,19 @@ Stage::StageStatus ParkAndGoStageCruise::Process(
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "Park and Go Stage Cruise plan error";
+    AERROR << "ParkAndGoStageCruise planning error";
   }
 
-  // TODO(SHU): add implementation
-  bool stage_done = true;
-  if (stage_done) {
+  const ReferenceLineInfo& reference_line_info =
+      frame->reference_line_info().front();
+  // check ADC status:
+  // 1. At routing beginning: stage finished
+  scenario::util::ParkAndGoStatus status =
+      scenario::util::CheckADCParkAndGoCruiseCompleted(reference_line_info,
+                                                 scenario_config_);
+
+  // reach reference line
+  if ((status == scenario::util::CRUISE_COMPLETE)) {
     return FinishStage();
   }
   return Stage::RUNNING;

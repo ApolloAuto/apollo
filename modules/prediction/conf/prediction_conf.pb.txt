@@ -24,7 +24,7 @@ obstacle_conf {
   obstacle_status: IN_JUNCTION
   priority_type: NORMAL
   evaluator_type: JUNCTION_MLP_EVALUATOR
-  predictor_type: INTERACTION_PREDICTOR
+  predictor_type: LANE_SEQUENCE_PREDICTOR
 }
 obstacle_conf {
   obstacle_type: VEHICLE

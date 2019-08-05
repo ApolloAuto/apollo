@@ -39,6 +39,7 @@ cc_library(
         "//modules/perception/lidar/lib/scene_manager/roi_service",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 #cc_test(

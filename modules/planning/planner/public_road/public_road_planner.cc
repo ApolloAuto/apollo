@@ -23,8 +23,8 @@
 namespace apollo {
 namespace planning {
 
-using common::Status;
-using common::TrajectoryPoint;
+using apollo::common::Status;
+using apollo::common::TrajectoryPoint;
 
 Status PublicRoadPlanner::Init(const PlanningConfig& config) {
   config_ = config;

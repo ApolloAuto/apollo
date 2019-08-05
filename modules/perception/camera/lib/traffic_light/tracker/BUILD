@@ -29,6 +29,7 @@ cc_library(
         "//cyber/common:file",
         "//modules/perception/camera/lib/interface",
     ],
+    alwayslink = True,
 )
 
 cpplint()

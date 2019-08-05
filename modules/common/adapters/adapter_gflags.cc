@@ -224,3 +224,4 @@ DEFINE_string(tf_topic, "/tf", "Transform topic.");
 DEFINE_string(tf_static_topic, "/tf_static", "Transform static topic.");
 DEFINE_string(recorder_status_topic, "/apollo/data/recorder/status",
               "Recorder status topic.");
+DEFINE_string(tick_topic, "/clock", "Tick topic.");

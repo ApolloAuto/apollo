@@ -27,8 +27,8 @@
 namespace apollo {
 namespace planning {
 
-using common::math::LineSegment2d;
-using common::math::Vec2d;
+using apollo::common::math::LineSegment2d;
+using apollo::common::math::Vec2d;
 
 STBoundary::STBoundary(
     const std::vector<std::pair<STPoint, STPoint>>& point_pairs) {

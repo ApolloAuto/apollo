@@ -28,10 +28,10 @@ namespace apollo {
 namespace planning {
 namespace util {
 
-using common::VehicleState;
-using hdmap::PathOverlap;
-using perception::TrafficLight;
-using routing::RoutingResponse;
+using apollo::common::VehicleState;
+using apollo::hdmap::PathOverlap;
+using apollo::perception::TrafficLight;
+using apollo::routing::RoutingResponse;
 
 bool IsVehicleStateValid(const VehicleState& vehicle_state) {
   if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||

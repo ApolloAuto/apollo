@@ -32,7 +32,7 @@ namespace planning {
 namespace scenario {
 namespace park_and_go {
 
-using common::TrajectoryPoint;
+using apollo::common::TrajectoryPoint;
 
 Stage::StageStatus ParkAndGoStageCheck::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -41,30 +41,9 @@ Stage::StageStatus ParkAndGoStageCheck::Process(
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
-  const ReferenceLineInfo& reference_line_info =
-      frame->reference_line_info().front();
-  bool success = CheckObstacle(reference_line_info);
-  return FinishStage(success);
-}
-
-// TODO(SHU): reverse_driving;
-// check front obstacle:
-// a. no obstacle;
-// b. obstacle is half vehicle length away
-bool ParkAndGoStageCheck::CheckObstacle(
-    const ReferenceLineInfo& reference_line_info) {
-  const double kClearance = 2.0;
-  const auto& reference_line = reference_line_info.reference_line();
-  const auto& path_decision = reference_line_info.path_decision();
-  const auto& adc_sl_boundary = reference_line_info.AdcSlBoundary();
-  for (const auto* obstacle : path_decision.obstacles().Items()) {
-    if (reference_line.IsOnLane(obstacle->PerceptionSLBoundary()) &&
-        obstacle->PerceptionSLBoundary().start_s() <
-            adc_sl_boundary.end_s() + kClearance) {
-      return false;
-    }
-  }
-  return true;
+  bool ready_to_cruise =
+      scenario::util::CheckADCReadyToCruise(frame, scenario_config_);
+  return FinishStage(ready_to_cruise);
 }
 
 Stage::StageStatus ParkAndGoStageCheck::FinishStage(const bool success) {
