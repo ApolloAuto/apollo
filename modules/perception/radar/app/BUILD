@@ -26,6 +26,7 @@ cc_library(
         "//modules/perception/radar/lib/interface:base_tracker",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cpplint()

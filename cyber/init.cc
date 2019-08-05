@@ -53,7 +53,6 @@ void InitLogger(const char* binary_name) {
   } else {
     ::apollo::cyber::Binary::SetName(binary_name);
   }
-  CHECK_NOTNULL(common::GlobalData::Instance());
 
   // Init glog
   google::InitGoogleLogging(binary_name);

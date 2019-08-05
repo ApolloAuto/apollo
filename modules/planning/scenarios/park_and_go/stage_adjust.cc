@@ -32,7 +32,7 @@ namespace planning {
 namespace scenario {
 namespace park_and_go {
 
-using common::TrajectoryPoint;
+using apollo::common::TrajectoryPoint;
 
 Stage::StageStatus ParkAndGoStageAdjust::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -47,9 +47,9 @@ Stage::StageStatus ParkAndGoStageAdjust::Process(
     AERROR << "ParkAndGoStageAdjust planning error";
     return StageStatus::ERROR;
   }
-  // TODO(SHU) add implementation
-  bool open_space_planner_complete = true;
-  if (open_space_planner_complete) {
+  bool ready_to_cruise =
+      scenario::util::CheckADCReadyToCruise(frame, scenario_config_);
+  if (ready_to_cruise) {
     return FinishStage();
   }
   return StageStatus::RUNNING;

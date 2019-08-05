@@ -27,9 +27,12 @@ namespace planning {
 namespace scenario {
 namespace util {
 
-using common::VehicleConfigHelper;
-using common::util::DistanceXY;
-using hdmap::PathOverlap;
+using apollo::common::VehicleConfigHelper;
+using apollo::common::math::Box2d;
+using apollo::common::math::Polygon2d;
+using apollo::common::math::Vec2d;
+using apollo::common::util::DistanceXY;
+using apollo::hdmap::PathOverlap;
 
 hdmap::PathOverlap* GetOverlapOnReferenceLine(
     const ReferenceLineInfo& reference_line_info, const std::string& overlap_id,
@@ -122,7 +125,7 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
 }
 
 /**
- * @brief: check path data to see  properly
+ * @brief: check path data to see properly
  */
 PullOverStatus CheckADCPullOverPathPoint(
     const ReferenceLineInfo& reference_line_info,
@@ -174,32 +177,6 @@ PullOverStatus CheckADCPullOverOpenSpace(
   return position_check ? PARK_COMPLETE : PARK_FAIL;
 }
 
-ParkAndGoStatus CheckADCParkAndGoOpenSpace(
-    const ReferenceLineInfo& reference_line_info,
-    const ScenarioParkAndGoConfig& scenario_config) {
-  const double kLBuffer = 0.1;
-  const double kHeadingBuffer = 0.05;
-  // check if vehicle in reference line
-  const auto& reference_line = reference_line_info.reference_line();
-  // get vehicle s,l info
-  const common::math::Vec2d adc_position = {
-      common::VehicleStateProvider::Instance()->x(),
-      common::VehicleStateProvider::Instance()->y()};
-  const double adc_heading =
-      common::VehicleStateProvider::Instance()->heading();
-  common::SLPoint adc_position_sl;
-  reference_line.XYToSL(adc_position, &adc_position_sl);
-  // reference line heading angle at s
-  const auto reference_point =
-      reference_line.GetReferencePoint(adc_position_sl.s());
-  const auto path_point = reference_point.ToPathPoint(adc_position_sl.s());
-  if (std::fabs(adc_position_sl.l() < kLBuffer) &&
-      std::fabs(adc_heading - path_point.theta()) < kHeadingBuffer) {
-    return CRUISE_COMPLETE;
-  }
-  return CRUISING;
-}
-
 bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
                                const ScenarioPullOverConfig& scenario_config,
                                const common::math::Vec2d& adc_position,
@@ -245,6 +222,107 @@ bool CheckPullOverPositionByDistance(
   // check distance/theta diff
   return (distance_diff <= scenario_config.max_distance_error_to_end_point() &&
           theta_diff <= scenario_config.max_theta_error_to_end_point());
+}
+
+ParkAndGoStatus CheckADCParkAndGoCruiseCompleted(
+    const ReferenceLineInfo& reference_line_info,
+    const ScenarioParkAndGoConfig& scenario_config) {
+  const double kLBuffer = 0.1;
+  const double kHeadingBuffer = 0.05;
+  // check if vehicle in reference line
+  const auto& reference_line = reference_line_info.reference_line();
+  // get vehicle s,l info
+  const common::math::Vec2d adc_position = {
+      common::VehicleStateProvider::Instance()->x(),
+      common::VehicleStateProvider::Instance()->y()};
+  const double adc_heading =
+      common::VehicleStateProvider::Instance()->heading();
+  common::SLPoint adc_position_sl;
+  reference_line.XYToSL(adc_position, &adc_position_sl);
+  // reference line heading angle at s
+  const auto reference_point =
+      reference_line.GetReferencePoint(adc_position_sl.s());
+  const auto path_point = reference_point.ToPathPoint(adc_position_sl.s());
+  if (std::fabs(adc_position_sl.l() < kLBuffer) &&
+      std::fabs(adc_heading - path_point.theta()) < kHeadingBuffer) {
+    return CRUISE_COMPLETE;
+  }
+  return CRUISING;
+}
+
+bool CheckADCReadyToCruise(Frame* frame,
+                           const ScenarioParkAndGoConfig& scenario_config) {
+  common::math::Vec2d adc_position = {
+      common::VehicleStateProvider::Instance()->x(),
+      common::VehicleStateProvider::Instance()->y()};
+  const double adc_heading =
+      common::VehicleStateProvider::Instance()->heading();
+  const ReferenceLineInfo& reference_line_info =
+      frame->reference_line_info().front();
+  bool no_near_front_obstacle = CheckADCSurroundObstacles(
+      adc_position, adc_heading, frame, scenario_config);
+  bool heading_align_w_reference_line = CheckADCHeading(
+      adc_position, adc_heading, reference_line_info, scenario_config);
+  if (no_near_front_obstacle && heading_align_w_reference_line) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * @brief: front obstacle is far enough before PardAndGo cruise stage
+ *(adc_position: center of rear wheel)
+ */
+bool CheckADCSurroundObstacles(const common::math::Vec2d adc_position,
+                               const double adc_heading, Frame* frame,
+                               const ScenarioParkAndGoConfig& scenario_config) {
+  // TODO(SHU): move to config
+  const double kFrontBuffer = 2.0;  // safe cruise distance
+  const auto& vehicle_config =
+      common::VehicleConfigHelper::Instance()->GetConfig();
+  const double adc_length = vehicle_config.vehicle_param().length();
+  const double adc_width = vehicle_config.vehicle_param().width();
+  // ADC box
+  Box2d adc_box(adc_position, adc_heading, adc_length, adc_width);
+  double shift_distance =
+      kFrontBuffer + vehicle_config.vehicle_param().back_edge_to_center();
+  Vec2d shift_vec{shift_distance * std::cos(adc_heading),
+                  shift_distance * std::sin(adc_heading)};
+  adc_box.Shift(shift_vec);
+  const auto& adc_polygon = Polygon2d(adc_box);
+  // obstacle boxes
+  auto obstacles = frame->obstacles();
+  for (const auto& obstacle : obstacles) {
+    const auto& obstacle_polygon = obstacle->PerceptionPolygon();
+    if (adc_polygon.HasOverlap(obstacle_polygon)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * @brief Park_and_go: heading angle should be close to reference line before
+ * PardAndGo cruise stage
+ */
+bool CheckADCHeading(const common::math::Vec2d adc_position,
+                     const double adc_heading,
+                     const ReferenceLineInfo& reference_line_info,
+                     const ScenarioParkAndGoConfig& scenario_config) {
+  // TODO(SHU): move to config
+  const double kThetaDiffToReferenceLine = 0.5;
+  const auto& reference_line = reference_line_info.reference_line();
+  common::SLPoint adc_position_sl;
+  reference_line.XYToSL(adc_position, &adc_position_sl);
+  // reference line heading angle at s
+  const auto reference_point =
+      reference_line.GetReferencePoint(adc_position_sl.s());
+  const auto path_point = reference_point.ToPathPoint(adc_position_sl.s());
+  if (std::fabs(common::math::NormalizeAngle(
+          adc_heading - path_point.theta())) < kThetaDiffToReferenceLine) {
+    return true;
+  }
+  return false;
 }
 
 }  // namespace util

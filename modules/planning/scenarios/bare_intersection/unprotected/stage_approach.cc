@@ -34,8 +34,8 @@ namespace planning {
 namespace scenario {
 namespace bare_intersection {
 
-using common::TrajectoryPoint;
-using hdmap::PathOverlap;
+using apollo::common::TrajectoryPoint;
+using apollo::hdmap::PathOverlap;
 
 uint32_t BareIntersectionUnprotectedStageApproach::clear_counter_ = 0;
 

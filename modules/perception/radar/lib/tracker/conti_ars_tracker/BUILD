@@ -47,6 +47,7 @@ cc_library(
         "//modules/perception/radar/lib/tracker/matcher:hm_matcher",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cpplint()

@@ -110,6 +110,30 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
+  } else if (roi_type == OpenSpaceRoiDeciderConfig::PARK_AND_GO_ADJUST) {
+    // Get parking spot boundary
+    // TODO(SHU): add implementation
+    bool get_parking_spot = true;
+    if (!get_parking_spot) {
+      const std::string msg = "Fail to get current parking boundary from map";
+      AERROR << msg;
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+    }
+
+    SetOrigin(frame, spot_vertices);
+
+    // set ParkAndGo adjust end pose
+    // TODO(SHU): add implementation
+    // SetParkAndGoAdjustEndPose(frame);
+
+    // get ParkAndGo adjust Boundary
+    // TODO(SHU): add implementation
+    bool get_adjust_boundary = true;
+    if (!get_adjust_boundary) {
+      const std::string msg = "Fail to get adjust boundary from map";
+      AERROR << msg;
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+    }
   } else {
     const std::string msg =
         "chosen open space roi secenario type not implemented";
@@ -351,7 +375,7 @@ void OpenSpaceRoiDecider::AddBoundaryKeyPoint(
       is_left_curb ? nearby_path.GetRoadLeftWidth(check_point_s)
                    : nearby_path.GetRoadRightWidth(check_point_s);
   // If the current center-lane checking point is an anchor point, then add
-  // current left/right curb boudanry point as a key point
+  // current left/right curb boundary point as a key point
   if (is_anchor_point) {
     double point_vec_cos =
         is_left_curb ? std::cos(current_check_point_heading + M_PI / 2.0)
@@ -380,12 +404,12 @@ void OpenSpaceRoiDecider::AddBoundaryKeyPoint(
       (current_road_width - previous_road_width) / previous_distance_s;
   double next_segment_angle =
       (next_road_width - current_road_width) / next_distance_s;
-  double currrent_curb_point_delta_theta =
+  double current_curb_point_delta_theta =
       next_segment_angle - previous_curb_segment_angle;
   // If the delta angle between the previous curb segment and the next curb
   // segment is large (near a curb corner), then add current curb_lane_point as
   // a key point.
-  if (std::abs(currrent_curb_point_delta_theta) >
+  if (std::abs(current_curb_point_delta_theta) >
       config_.open_space_roi_decider_config()
           .curb_heading_tangent_change_uppper_limit()) {
     double point_vec_cos =
@@ -470,7 +494,7 @@ bool OpenSpaceRoiDecider::GetParkingBoundary(
   std::vector<Vec2d> boundary_points;
 
   // TODO(jiaxuan): Write a half-boundary formation function and call it twice
-  // to avoid deplicated manipulations on the left and right sides
+  // to avoid duplicated manipulations on the left and right sides
   if (average_l < 0) {
     // if average_l is lower than zero, the parking spot is on the right
     // lane boundary and assume that the lane half width is average_l

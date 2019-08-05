@@ -161,8 +161,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   // differs only a small amount (20ms). When the different is too large, the
   // estimation is invalid.
   DCHECK_GE(start_timestamp, vehicle_state.timestamp());
-  if (FLAGS_estimate_current_vehicle_state &&
-      start_timestamp - vehicle_state.timestamp() < 0.020) {
+  if (start_timestamp - vehicle_state.timestamp() <
+      FLAGS_message_latency_threshold) {
     auto future_xy = VehicleStateProvider::Instance()->EstimateFuturePosition(
         start_timestamp - vehicle_state.timestamp());
     vehicle_state.set_x(future_xy.x());

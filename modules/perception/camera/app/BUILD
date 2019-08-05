@@ -84,6 +84,7 @@ cc_library(
         "//modules/perception/camera/lib/traffic_light/tracker:semantic_decision",
         "//modules/perception/lib/utils",
     ],
+    alwayslink = True,
 )
 
 cc_library(

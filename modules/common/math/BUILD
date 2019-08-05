@@ -180,6 +180,21 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "mpc_osqp",
+    srcs = [
+        "mpc_osqp.cc",
+    ],
+    hdrs = [
+        "mpc_osqp.h",
+    ],
+    deps = [
+        "//cyber/common:log",
+        "@eigen",
+        "@osqp",
+    ],
+)
+
 cc_test(
     name = "angle_test",
     size = "small",
@@ -299,6 +314,18 @@ cc_library(
     ],
     deps = [
         "//cyber/common:log",
+    ],
+)
+
+cc_test(
+    name = "mpc_osqp_test",
+    size = "small",
+    srcs = [
+        "mpc_osqp_test.cc",
+    ],
+    deps = [
+        ":mpc_osqp",
+        "@gtest//:main",
     ],
 )
 

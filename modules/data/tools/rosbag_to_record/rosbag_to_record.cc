@@ -296,8 +296,11 @@ int main(int argc, char **argv) {
       auto pb_msg = m.instantiate<apollo::drivers::gnss::EpochObservation>();
       pb_msg->SerializeToString(&serialized_str);
     } else if (channel_name ==
-                   "/apollo/sensor/velodyne64/compensator/PointCloud2" &&
-               !small_channels_only) {
+               "/apollo/sensor/velodyne64/compensator/PointCloud2") {
+      if (small_channels_only) {
+        // Skip large channels silently.
+        continue;
+      }
       auto ros_msg = m.instantiate<sensor_msgs::PointCloud2>();
       auto pb_msg = std::make_shared<apollo::drivers::PointCloud>();
       if (!convert_PointCloud(pb_msg, ros_msg)) {

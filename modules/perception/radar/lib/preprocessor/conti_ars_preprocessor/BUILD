@@ -32,6 +32,7 @@ cc_library(
         "//modules/perception/radar/lib/interface:base_preprocessor",
         "@eigen",
     ],
+    alwayslink = True,
 )
 
 cpplint()

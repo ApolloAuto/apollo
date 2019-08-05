@@ -15,14 +15,15 @@
  *****************************************************************************/
 #pragma once
 
-#include "modules/localization/msf/local_map/base_map/base_map_config.h"
-#include "modules/localization/msf/local_map/base_map/base_map_pool.h"
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_matrix.h"
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_node.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_pool.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_matrix.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_node.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 class PyramidMapNodePool : public BaseMapNodePool {
  public:
@@ -38,6 +39,7 @@ class PyramidMapNodePool : public BaseMapNodePool {
   virtual BaseMapNode* AllocNewMapNode();
 };
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

@@ -31,7 +31,7 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 ## Getting Started
 
-Apollo 5.0 is loaded with new modules and features, but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding on Apollo's core technology and platform. 
+Apollo 5.0 is loaded with new modules and features but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding of Apollo's core technology and platform. 
 
 **[Attention]** The Apollo team has decided to retire Git LFS, which might impact your development. For details, please refer to:
 [migration guide](docs/howto/how_to_migrate_to_the_updated_apollo_master_from_old_versions.md).
@@ -42,7 +42,7 @@ Apollo 5.0 is loaded with new modules and features, but needs to be calibrated a
 
 #### Basic Requirements:
 
-* The vehicle equipped with by-wire system, including but not limited to brake-by-wire, steering-by-wire, throttle-by-wire and shift-by-wire (Apollo is currently tested on Lincoln MKZ)
+* The vehicle equipped with the by-wire system, including but not limited to brake-by-wire, steering-by-wire, throttle-by-wire and shift-by-wire (Apollo is currently tested on Lincoln MKZ)
 
 * A machine with a 4-core processor and 8GB memory minimum (16GB for Apollo 3.5 and above)
 
@@ -55,7 +55,7 @@ Apollo 5.0 is loaded with new modules and features, but needs to be calibrated a
  **1.0 > whichever version you would like to test out**.
  The reason behind this recommendation is that you need to confirm whether individual hardware components 
  and modules are functioning correctly and clear various version test cases,
- before progressing to a higher more capable version for your safety and the safety of those around you.
+ before progressing to a higher, more capable version for your safety and the safety of those around you.
 
 #### Individual Version Requirements:
 
@@ -65,7 +65,7 @@ The following diagram highlights the scope and features of each Apollo release:
 
 [**Apollo 1.0:**](docs/quickstart/apollo_1_0_hardware_system_installation_guide.md) 
 
-Apollo 1.0 also referred to as the Automatic GPS Waypoint Following, works in an enclosed venue such as a test track or parking lot. This installation is necessary to ensure that Apollo works perfectly with your vehicle. The diagram below lists the various modules in Apollo 1.0.
+Apollo 1.0, also referred to as the Automatic GPS Waypoint Following, works in an enclosed venue such as a test track or parking lot. This installation is necessary to ensure that Apollo works perfectly with your vehicle. The diagram below lists the various modules in Apollo 1.0.
 
 ![image alt text](docs/demo_guide/images/Apollo_1.png)
 
@@ -113,7 +113,7 @@ Apollo 1.5 is meant for fixed lane cruising. With the addition of LiDAR, vehicle
 
 [**Apollo 2.0:**](docs/quickstart/apollo_2_0_hardware_system_installation_guide_v1.md#key-hardware-components)
 
-Apollo 2.0 supports vehicles autonomously driving on simple urban roads. Vehicles are able to cruise on roads safely, avoid collisions with obstacles, stop at traffic lights and change lanes if needed to reach their destination.  Please note, the modules highlighted in Red are additions or upgrades for version 2.0.
+Apollo 2.0 supports vehicles autonomously driving on simple urban roads. Vehicles are able to cruise on roads safely, avoid collisions with obstacles, stop at traffic lights, and change lanes if needed to reach their destination.  Please note, the modules highlighted in Red are additions or upgrades for version 2.0.
 
 ![image alt text](docs/demo_guide/images/Apollo_2.png)
 
@@ -159,7 +159,7 @@ and we want to ensure Apollo 2.5 was integrated correctly with your vehicle befo
 
 [**Apollo 3.0:**](docs/quickstart/apollo_3_0_quick_start.md)
 
-Apollo 3.0's main focus is to provide a platform for developers to build upon in a closed venue low-speed environment. Vehicles are able to maintain lane control, cruise and avoid collisions with vehicles ahead of them. 
+Apollo 3.0's primary focus is to provide a platform for developers to build upon in a closed venue low-speed environment. Vehicles are able to maintain lane control, cruise and avoid collisions with vehicles ahead of them. 
 
 ![image alt text](docs/demo_guide/images/Apollo_3.0_diagram.png)
 
@@ -179,7 +179,7 @@ Apollo 3.0's main focus is to provide a platform for developers to build upon in
 
 [**Apollo 3.5:**](docs/quickstart/apollo_3_5_quick_start.md)
 
-Apollo 3.5 is capable of navigating through complex driving scenarios such as residential and downtown areas. The car now has 360-degree visibility, along with upgraded perception algorithms to handle the changing conditions of urban roads, making the car more secure and aware. Scenario-based planning can navigate through complex scenarios including unprotected turns and narrow streets often found in residential areas and roads with stop signs. 
+Apollo 3.5 is capable of navigating through complex driving scenarios such as residential and downtown areas. The car now has 360-degree visibility, along with upgraded perception algorithms to handle the changing conditions of urban roads, making the car more secure and aware. Scenario-based planning can navigate through complex scenarios, including unprotected turns and narrow streets often found in residential areas and roads with stop signs. 
 
 ![image alt text](docs/demo_guide/images/Apollo_3_5_Architecture.png)
 

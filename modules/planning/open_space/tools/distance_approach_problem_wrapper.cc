@@ -668,8 +668,8 @@ void DistanceGetResult(ResultContainer* result_ptr,
     }
   }
   for (size_t i = 0; i + 1 < size_by_distance; ++i) {
-    opt_a[i] = (*(result_ptr->PrepareControlResult()))(0, i);
-    opt_steer[i] = (*(result_ptr->PrepareControlResult()))(1, i);
+    opt_a[i] = (*(result_ptr->PrepareControlResult()))(1, i);
+    opt_steer[i] = (*(result_ptr->PrepareControlResult()))(0, i);
   }
 
   hybrid_time[0] = *(result_ptr->GetHybridTime());

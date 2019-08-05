@@ -130,6 +130,7 @@ function main() {
             "mkdir -p '${DATA_DIR}'; chmod a+rw -R '${DATA_DIR}'"
       done
     fi
+    docker exec apollo_release bash -c '/apollo/docker/scripts/container_setup.sh'
     docker exec -u ${USER} -it apollo_release "/apollo/scripts/bootstrap.sh"
 }
 

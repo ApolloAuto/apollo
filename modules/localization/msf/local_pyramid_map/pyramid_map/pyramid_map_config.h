@@ -16,11 +16,12 @@
 #pragma once
 
 #include <string>
-#include "modules/localization/msf/local_map/base_map/base_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 class PyramidMapConfig : public BaseMapConfig {
  public:
@@ -53,6 +54,7 @@ class PyramidMapConfig : public BaseMapConfig {
   virtual bool LoadXml(const boost::property_tree::ptree& config);
 };
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

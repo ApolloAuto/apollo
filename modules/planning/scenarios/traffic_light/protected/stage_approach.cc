@@ -34,9 +34,9 @@ namespace planning {
 namespace scenario {
 namespace traffic_light {
 
-using common::TrajectoryPoint;
-using hdmap::PathOverlap;
-using perception::TrafficLight;
+using apollo::common::TrajectoryPoint;
+using apollo::hdmap::PathOverlap;
+using apollo::perception::TrafficLight;
 
 Stage::StageStatus TrafficLightProtectedStageApproach::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
