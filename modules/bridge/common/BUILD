@@ -58,6 +58,13 @@ cc_library(
 )
 
 cc_library(
+    name = "bridge_proto_diser_buf_factory",
+    hdrs = [
+        "bridge_proto_diser_buf_factory.h",
+    ],
+)
+
+cc_library(
     name = "udp_listener",
     hdrs = [
         "udp_listener.h",

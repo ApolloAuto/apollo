@@ -27,20 +27,43 @@ namespace apollo {
 namespace bridge {
 
 constexpr uint32_t INT_BITS = static_cast<uint32_t>(sizeof(uint32_t) * 8);
+
+class ProtoDiserializedBufBase {
+ public:
+  ProtoDiserializedBufBase() {}
+  virtual  ~ProtoDiserializedBufBase() {}
+
+  virtual bool Initialize(const BridgeHeader &header,
+    std::shared_ptr<cyber::Node> node, const std::string &topic_name) = 0;
+
+  virtual bool DiserializedAndPub() = 0;
+  virtual bool IsReadyDiserialize() const = 0;
+  virtual bool IsTheProto(const BridgeHeader &header) = 0;
+  virtual void UpdateStatus(uint32_t frame_index) = 0;
+  virtual uint32_t GetMsgID() const = 0;
+  virtual std::string GetMsgName() const  = 0;
+  virtual char *GetBuf(size_t offset) = 0;
+};
+
 template <typename T>
-class BridgeProtoDiserializedBuf {
+class BridgeProtoDiserializedBuf : public ProtoDiserializedBufBase {
  public:
   BridgeProtoDiserializedBuf() {}
-  ~BridgeProtoDiserializedBuf();
+  virtual ~BridgeProtoDiserializedBuf();
 
-  bool Diserialized(std::shared_ptr<T> proto);
-  bool IsReadyDiserialize() const { return is_ready_diser; }
-  void UpdateStatus(uint32_t frame_index);
-  bool IsTheProto(const BridgeHeader &header);
+  virtual bool DiserializedAndPub();
+  virtual bool Initialize(const BridgeHeader &header,
+    std::shared_ptr<cyber::Node> node, const std::string &topic_name);
+
+  virtual bool IsReadyDiserialize() const { return is_ready_diser; }
+  virtual void UpdateStatus(uint32_t frame_index);
+  virtual bool IsTheProto(const BridgeHeader &header);
 
   bool Initialize(const BridgeHeader &header);
-  char *GetBuf(size_t offset) { return proto_buf_ + offset; }
-  uint32_t GetMsgID() const { return sequence_num_; }
+  bool Diserialized(std::shared_ptr<T> proto);
+  virtual char *GetBuf(size_t offset) { return proto_buf_ + offset; }
+  virtual uint32_t GetMsgID() const { return sequence_num_; }
+  virtual std::string GetMsgName() const { return proto_name_; }
 
  private:
   size_t total_frames_ = 0;
@@ -50,6 +73,7 @@ class BridgeProtoDiserializedBuf {
   char *proto_buf_ = nullptr;
   bool is_ready_diser = false;
   uint32_t sequence_num_ = 0;
+  std::shared_ptr<cyber::Writer<T>> writer_;
 };
 
 template <typename T>
@@ -122,6 +146,24 @@ bool BridgeProtoDiserializedBuf<T>::Initialize(const BridgeHeader &header) {
   if (!proto_buf_) {
     proto_buf_ = new char[total_size_];
   }
+  return true;
+}
+
+template <typename T>
+bool BridgeProtoDiserializedBuf<T>::Initialize(
+  const BridgeHeader &header, std::shared_ptr<cyber::Node> node,
+  const std::string &topic_name) {
+  writer_ = node->CreateWriter<T>(topic_name.c_str());
+  return Initialize(header);
+}
+
+template <typename T>
+bool BridgeProtoDiserializedBuf<T>::DiserializedAndPub() {
+  auto pb_msg = std::make_shared<T>();
+  if (!Diserialized(pb_msg)) {
+    return false;
+  }
+  writer_->Write(pb_msg);
   return true;
 }
 
