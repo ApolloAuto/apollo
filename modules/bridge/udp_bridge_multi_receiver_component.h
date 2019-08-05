@@ -62,8 +62,6 @@ class UDPBridgeMultiReceiverComponent final : public cyber::Component<> {
       std::make_shared<UDPListener<UDPBridgeMultiReceiverComponent>>();
   unsigned int bind_port_ = 0;
   bool enable_timeout_ = true;
-  std::string proto_name_ = "";
-  std::string topic_name_ = "";
   std::mutex mutex_;
   std::vector<ProtoDiserializedBufBase *> proto_list_;
 };

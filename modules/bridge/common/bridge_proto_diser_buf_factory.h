@@ -19,6 +19,7 @@
 #include <string>
 #include "modules/bridge/common/bridge_proto_diserialized_buf.h"
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common/adapters/adapter_gflags.h"
 
 namespace apollo {
 namespace bridge {
@@ -28,7 +29,8 @@ class ProtoDiserializedBufBaseFactory {
   static ProtoDiserializedBufBase *CreateObj(const BridgeHeader &header) {
     ProtoDiserializedBufBase *obj = nullptr;
     if (strcmp("Chassis", header.GetMsgName().c_str()) == 0) {
-      obj = new BridgeProtoDiserializedBuf<canbus::Chassis>;
+      obj = new BridgeProtoDiserializedBuf<canbus::Chassis>(
+        FLAGS_chassis_topic);
     }
     return obj;
   }
