@@ -52,7 +52,7 @@ Stage::StageStatus ParkAndGoStageCruise::Process(
   // 1. At routing beginning: stage finished
   scenario::util::ParkAndGoStatus status =
       scenario::util::CheckADCParkAndGoCruiseCompleted(reference_line_info,
-                                                 scenario_config_);
+                                                       scenario_config_);
 
   // reach reference line
   if ((status == scenario::util::CRUISE_COMPLETE)) {

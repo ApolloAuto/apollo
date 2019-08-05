@@ -787,13 +787,11 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
       if (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW) {
         // Borrowing left neighbor lane.
         if (reference_line_info.GetNeighborLaneInfo(
-                LaneType::LeftForward, curr_s,
-                &neighbor_lane_id,
+                LaneType::LeftForward, curr_s, &neighbor_lane_id,
                 &curr_neighbor_lane_width)) {
           ADEBUG << "Borrow left forward neighbor lane.";
         } else if (reference_line_info.GetNeighborLaneInfo(
-                       LaneType::LeftReverse, curr_s,
-                       &neighbor_lane_id,
+                       LaneType::LeftReverse, curr_s, &neighbor_lane_id,
                        &curr_neighbor_lane_width)) {
           borrowing_reverse_lane = true;
           ADEBUG << "Borrow left reverse neighbor lane.";
@@ -803,13 +801,11 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
       } else if (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW) {
         // Borrowing right neighbor lane.
         if (reference_line_info.GetNeighborLaneInfo(
-                LaneType::RightForward, curr_s,
-                &neighbor_lane_id,
+                LaneType::RightForward, curr_s, &neighbor_lane_id,
                 &curr_neighbor_lane_width)) {
           ADEBUG << "Borrow right forward neighbor lane.";
         } else if (reference_line_info.GetNeighborLaneInfo(
-                       LaneType::RightReverse, curr_s,
-                       &neighbor_lane_id,
+                       LaneType::RightReverse, curr_s, &neighbor_lane_id,
                        &curr_neighbor_lane_width)) {
           borrowing_reverse_lane = true;
           ADEBUG << "Borrow right reverse neighbor lane.";
@@ -1329,8 +1325,7 @@ void PathBoundsDecider::PathBoundsDebugString(
 }
 
 bool PathBoundsDecider::CheckLaneBoundaryType(
-    const ReferenceLineInfo& reference_line_info,
-    const double check_s,
+    const ReferenceLineInfo& reference_line_info, const double check_s,
     const LaneBorrowInfo& lane_borrow_info) {
   const ReferenceLine& reference_line = reference_line_info.reference_line();
   auto ref_point = reference_line.GetNearestReferencePoint(check_s);
