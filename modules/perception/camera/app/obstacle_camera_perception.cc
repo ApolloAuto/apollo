@@ -149,7 +149,7 @@ bool ObstacleCameraPerception::Init(
       options.lane_calibration_working_sensor_name;
 
   // Init lane
-  InitLane(work_root, model, perception_param_);
+  InitLane(work_root, perception_param_);
 
   // Init calibration service
   InitCalibrationService(work_root, model, perception_param_);
@@ -180,7 +180,7 @@ bool ObstacleCameraPerception::Init(
 }
 
 void ObstacleCameraPerception::InitLane(
-    const std::string &work_root, const base::BaseCameraModelPtr model,
+    const std::string &work_root,
     const app::PerceptionParam &perception_param) {
   // Init lane
   CHECK(perception_param.has_lane_param()) << "Failed to include lane_param.";
@@ -198,6 +198,8 @@ void ObstacleCameraPerception::InitLane(
     lane_detector_init_options.root_dir =
         GetAbsolutePath(work_root, lane_detector_plugin_param.root_dir());
     lane_detector_init_options.gpu_id = perception_param_.gpu_id();
+    base::BaseCameraModelPtr model = common::SensorManager::Instance()->
+               GetUndistortCameraModel(lane_detector_param.camera_name());
     lane_detector_init_options.base_camera_model = model;
     AINFO << "lane_detector_name: " << lane_detector_plugin_param.name();
     lane_detector_.reset(BaseLaneDetectorRegisterer::GetInstanceByName(
