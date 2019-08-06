@@ -46,7 +46,8 @@ class UDPBridgeMultiReceiverComponent final : public cyber::Component<> {
 
   bool Init() override;
   std::string Name() const { return FLAGS_bridge_module_name; }
-  ProtoDiserializedBufBase *CreateBridgeProtoBuf(const BridgeHeader &header);
+  std::shared_ptr<ProtoDiserializedBufBase> CreateBridgeProtoBuf(
+    const BridgeHeader &header);
   bool IsProtoExist(const BridgeHeader &header);
   bool IsTimeout(double time_stamp);
   void MsgDispatcher();
@@ -63,7 +64,7 @@ class UDPBridgeMultiReceiverComponent final : public cyber::Component<> {
   unsigned int bind_port_ = 0;
   bool enable_timeout_ = true;
   std::mutex mutex_;
-  std::vector<ProtoDiserializedBufBase *> proto_list_;
+  std::vector<std::shared_ptr<ProtoDiserializedBufBase>> proto_list_;
 };
 
 }  // namespace bridge

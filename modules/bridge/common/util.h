@@ -59,6 +59,23 @@ bool RemoveItem(std::vector<T *> *list, const T *t) {
   }
   return true;
 }
+
+template <typename T>
+bool RemoveItem(std::vector<std::shared_ptr<T>> *list, std::shared_ptr<T> t) {
+  if (!list) {
+    return false;
+  }
+  typename std::vector<std::shared_ptr<T>>::iterator itor = list->begin();
+  for (; itor != list->end();) {
+    if (itor->get() == t.get()) {
+      itor = list->erase(itor);
+      continue;
+    }
+    ++itor;
+  }
+  return true;
+}
+
 int GetProtoSize(const char *buf, size_t size);
 
 }  // namespace bridge
