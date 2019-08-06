@@ -16,7 +16,6 @@
 # limitations under the License.
 ###############################################################################
 
-INCHINA="no"
 LOCAL_IMAGE="no"
 FAST_BUILD_MODE="no"
 FAST_TEST_MODE="no"
@@ -57,7 +56,6 @@ function show_usage()
 cat <<EOF
 Usage: $(basename $0) [options] ...
 OPTIONS:
-    -C                     Pull docker image from China mirror.
     -b, --fast-build       Light mode for building without pulling all the map volumes
     -f, --fast-test        Light mode for testing without pulling limited set of map volumes
     -h, --help             Display this help and exit.
@@ -116,9 +114,6 @@ OTHER_VOLUME_CONF=""
 while [ $# -gt 0 ]
 do
     case "$1" in
-    -C|--docker-cn-mirror)
-        INCHINA="yes"
-        ;;
     -image)
         echo -e "\033[093mWarning\033[0m: This option has been replaced by \"-t\" and \"--tag\", please use the new one.\n"
         show_usage
@@ -180,10 +175,6 @@ fi
 
 if [ -z "${DOCKER_REPO}" ]; then
     DOCKER_REPO=apolloauto/apollo
-fi
-
-if [ "$INCHINA" == "yes" ]; then
-    DOCKER_REPO=registry.docker-cn.com/apolloauto/apollo
 fi
 
 if [ "$LOCAL_IMAGE" == "yes" ] && [ -z "$VERSION_OPT" ]; then
