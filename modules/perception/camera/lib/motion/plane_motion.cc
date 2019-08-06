@@ -56,13 +56,10 @@ void PlaneMotion::generate_motion_matrix(base::VehicleStatus *vehicledata) {
         sqrt(vehicledata->velocity_x * vehicledata->velocity_x +
              vehicledata->velocity_y * vehicledata->velocity_y));
     float displacement = time_d * velocity;
-    trans(0) = static_cast<float>(displacement * cos(theta));
-    trans(1) = static_cast<float>(displacement * sin(theta));
-    // trans(0) = time_d * vehicledata->velocity_x;
-    // trans(1) = time_d * vehicledata->velocity_y;
+    trans << displacement, 0;
 
     motion_2d.block(0, 0, 2, 2) = rot2d.toRotationMatrix().transpose();
-    motion_2d.block(0, 2, 2, 1) = -rot2d.toRotationMatrix().transpose() * trans;
+    motion_2d.block(0, 2, 2, 1) = -trans;
     CHECK(vehicledata->motion.rows() == motion_2d.rows());
     CHECK(vehicledata->motion.cols() == motion_2d.cols());
     vehicledata->motion = motion_2d;
@@ -76,20 +73,16 @@ void PlaneMotion::generate_motion_matrix(base::VehicleStatus *vehicledata) {
     Eigen::AngleAxisf pitch_angle(pitch_delta, Eigen::Vector3f::UnitY());
     Eigen::AngleAxisf yaw_angle(yaw_delta, Eigen::Vector3f::UnitZ());
 
-    Eigen::Quaternion<float> q = roll_angle * pitch_angle * yaw_angle;
+    // here the intrinsic sequeeze is z-y-x(converted from z-x-y in location previously)
+    Eigen::Quaternion<float> q = yaw_angle * pitch_angle * roll_angle;
     Eigen::Matrix3f rot3d = q.matrix();
 
     float displacement = time_d * vehicledata->velocity;
     Eigen::Vector3f trans;
-    trans(0) =
-        static_cast<float>(sqrt(displacement * displacement /
-                                (tan(yaw_delta) * tan(yaw_delta) +
-                                 tan(pitch_delta) * tan(pitch_delta) + 1)));
-    trans(1) = static_cast<float>(tan(yaw_delta) * trans(0));
-    trans(2) = static_cast<float>(tan(pitch_delta) * trans(0));
+    trans << displacement, 0, 0;
 
     motion_3d.block(0, 0, 3, 3) = rot3d.transpose();
-    motion_3d.block(0, 3, 3, 1) = -rot3d.transpose() * trans;
+    motion_3d.block(0, 3, 3, 1) = -trans;
     CHECK(vehicledata->motion.rows() == motion_3d.rows());
     CHECK(vehicledata->motion.cols() == motion_3d.cols());
     vehicledata->motion = motion_3d;

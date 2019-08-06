@@ -243,24 +243,24 @@ void LaneDetectionComponent::OnMotionService(
   vehicledata.time_ts = message->vehicle_status()[0].time_ts();
   vehicledata.time_d = message->vehicle_status()[0].time_d();
 
-  base::MotionType motion_2d = base::MotionType::Identity();
-  motion_2d(0, 0) = message->vehicle_status()[0].motion().m00();
-  motion_2d(0, 1) = message->vehicle_status()[0].motion().m01();
-  motion_2d(0, 2) = message->vehicle_status()[0].motion().m02();
-  motion_2d(0, 3) = message->vehicle_status()[0].motion().m03();
-  motion_2d(1, 0) = message->vehicle_status()[0].motion().m10();
-  motion_2d(1, 1) = message->vehicle_status()[0].motion().m11();
-  motion_2d(1, 2) = message->vehicle_status()[0].motion().m12();
-  motion_2d(1, 3) = message->vehicle_status()[0].motion().m13();
-  motion_2d(2, 0) = message->vehicle_status()[0].motion().m20();
-  motion_2d(2, 1) = message->vehicle_status()[0].motion().m21();
-  motion_2d(2, 2) = message->vehicle_status()[0].motion().m22();
-  motion_2d(2, 3) = message->vehicle_status()[0].motion().m23();
-  motion_2d(3, 0) = message->vehicle_status()[0].motion().m30();
-  motion_2d(3, 1) = message->vehicle_status()[0].motion().m31();
-  motion_2d(3, 2) = message->vehicle_status()[0].motion().m32();
-  motion_2d(3, 3) = message->vehicle_status()[0].motion().m33();
-  vehicledata.motion = motion_2d;
+  base::MotionType motion_3d = base::MotionType::Identity();
+  motion_3d(0, 0) = message->vehicle_status()[0].motion().m00();
+  motion_3d(0, 1) = message->vehicle_status()[0].motion().m01();
+  motion_3d(0, 2) = message->vehicle_status()[0].motion().m02();
+  motion_3d(0, 3) = message->vehicle_status()[0].motion().m03();
+  motion_3d(1, 0) = message->vehicle_status()[0].motion().m10();
+  motion_3d(1, 1) = message->vehicle_status()[0].motion().m11();
+  motion_3d(1, 2) = message->vehicle_status()[0].motion().m12();
+  motion_3d(1, 3) = message->vehicle_status()[0].motion().m13();
+  motion_3d(2, 0) = message->vehicle_status()[0].motion().m20();
+  motion_3d(2, 1) = message->vehicle_status()[0].motion().m21();
+  motion_3d(2, 2) = message->vehicle_status()[0].motion().m22();
+  motion_3d(2, 3) = message->vehicle_status()[0].motion().m23();
+  motion_3d(3, 0) = message->vehicle_status()[0].motion().m30();
+  motion_3d(3, 1) = message->vehicle_status()[0].motion().m31();
+  motion_3d(3, 2) = message->vehicle_status()[0].motion().m32();
+  motion_3d(3, 3) = message->vehicle_status()[0].motion().m33();
+  vehicledata.motion = motion_3d;
 
   mot_buffer_->push_back(vehicledata);
 
