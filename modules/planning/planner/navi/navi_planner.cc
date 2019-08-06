@@ -358,8 +358,9 @@ std::vector<SpeedPoint> NaviPlanner::GenerateSpeedHotStart(
   std::vector<SpeedPoint> hot_start_speed_profile;
   double s = 0.0;
   double t = 0.0;
-  double v = common::math::Clamp(planning_init_point.v(), 5.0,
-                                 FLAGS_planning_upper_speed_limit);
+  double v = common::math::Clamp(planning_init_point.v(),
+                                FLAGS_planning_lower_speed_limit,
+                                FLAGS_planning_upper_speed_limit);
   while (t < FLAGS_trajectory_time_length) {
     SpeedPoint speed_point;
     speed_point.set_s(s);
