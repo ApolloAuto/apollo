@@ -1,6 +1,6 @@
 #! /bin/bash
 if [ $# -lt 3 ]; then
-    echo "Usage: msf_simple_map_creator.sh [bags folder] [extrinsic_file] [zone_id]"
+    echo "Usage: msf_simple_map_creator.sh [bags folder] [extrinsic_file] [zone_id] [lidar_type]"
     exit 1;
 fi
 
@@ -9,20 +9,21 @@ cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
+IN_FOLDER=$1
+EXTRINSIC_FILE=$2
+ZONE_ID=$3
+LIDAR_TYPE=${4:-64}
+
 GNSS_LOC_TOPIC="/apollo/localization/msf_gnss"
 LIDAR_LOC_TOPIC="/apollo/localization/msf_lidar"
 FUSION_LOC_TOPIC="/apollo/localization/pose"
 ODOMETRY_LOC_TOPIC="/apollo/sensor/gnss/odometry"
-CLOUD_TOPIC="/apollo/sensor/velodyne64/compensator/PointCloud2"
+CLOUD_TOPIC="/apollo/sensor/velodyne$LIDAR_TYPE/compensator/PointCloud2"
 
 GNSS_LOC_FILE="gnss_loc.txt"
 LIDAR_LOC_FILE="lidar_loc.txt"
 FUSION_LOC_FILE="fusion_loc.txt"
 ODOMETRY_LOC_FILE="odometry_loc.txt"
-
-IN_FOLDER=$1
-EXTRINSIC_FILE=$2
-ZONE_ID=$3
 
 function data_exporter() {
   local BAG_FILE=$1

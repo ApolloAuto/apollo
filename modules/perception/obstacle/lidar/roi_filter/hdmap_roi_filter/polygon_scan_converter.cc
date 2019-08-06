@@ -31,7 +31,8 @@ void PolygonScanConverter::Init(const DirectionMajor major_dir,
 
   polygon_ = polygon;
   min_x_ = valid_x_range.first;
-  scans_size_ = (valid_x_range.second - valid_x_range.first) / step;
+  scans_size_ = static_cast<uint64_t>(std::abs(valid_x_range.second
+                                      - valid_x_range.first) / step);
   step_ = step;
 }
 

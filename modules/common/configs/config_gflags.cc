@@ -62,3 +62,5 @@ DEFINE_double(look_forward_time_sec, 8.0,
 // If you want to use relative map in std model with utm coor , set it true.
 DEFINE_bool(use_navigation_with_utm, false,
             "Use relative map with utm coor instead of hdmap.");
+DEFINE_double(half_vehicle_width, 1.05,
+    "half vehicle width");
