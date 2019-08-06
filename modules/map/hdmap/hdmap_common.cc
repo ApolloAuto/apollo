@@ -169,23 +169,22 @@ void LaneInfo::Init() {
 
   if (lane_.has_type()) {
     if (lane_.type() == Lane::CITY_DRIVING) {
-      const double kMinHalfWidth = 1.05;
       for (const auto &p : sampled_left_width_) {
-        if (p.second < kMinHalfWidth) {
+        if (p.second < FLAGS_half_vehicle_width) {
           AERROR
               << "lane[id = " << lane_.id().DebugString()
               << "]. sampled_left_width_[" << p.second
               << "] is too small. It should be larger than half vehicle width["
-              << kMinHalfWidth << "].";
+              << FLAGS_half_vehicle_width << "].";
         }
       }
       for (const auto &p : sampled_right_width_) {
-        if (p.second < kMinHalfWidth) {
+        if (p.second < FLAGS_half_vehicle_width) {
           AERROR
               << "lane[id = " << lane_.id().DebugString()
               << "]. sampled_right_width_[" << p.second
               << "] is too small. It should be larger than half vehicle width["
-              << kMinHalfWidth << "].";
+              << FLAGS_half_vehicle_width << "].";
         }
       }
     } else if (lane_.type() == Lane::NONE) {
