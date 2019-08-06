@@ -129,6 +129,9 @@ DEFINE_double(smoothed_reference_line_max_diff, 5.0,
 DEFINE_double(planning_upper_speed_limit, 31.3,
               "Maximum speed (m/s) in planning.");
 
+DEFINE_double(planning_lower_speed_limit, 5.0,
+              "Minimum speed (m/s) in planning.");
+
 DEFINE_double(trajectory_time_length, 8.0, "Trajectory time length");
 
 // planning trajectory output time density control

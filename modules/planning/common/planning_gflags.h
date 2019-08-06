@@ -69,6 +69,7 @@ DECLARE_double(smoothed_reference_line_max_diff);
 
 // parameters for trajectory planning
 DECLARE_double(planning_upper_speed_limit);
+DECLARE_double(planning_lower_speed_limit);
 DECLARE_double(trajectory_time_length);
 DECLARE_double(trajectory_time_min_interval);
 DECLARE_double(trajectory_time_max_interval);
