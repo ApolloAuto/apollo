@@ -43,9 +43,12 @@ class MpcOsqp {
    */
   MpcOsqp(const Eigen::MatrixXd &matrix_a, const Eigen::MatrixXd &matrix_b,
           const Eigen::MatrixXd &matrix_q, const Eigen::MatrixXd &matrix_r,
-          const Eigen::MatrixXd &matrix_lower,
-          const Eigen::MatrixXd &matrix_upper,
-          const Eigen::MatrixXd &matrix_initial_state, const int max_iter,
+          const Eigen::MatrixXd &matrix_initial_x,
+          const Eigen::MatrixXd &matrix_u_lower,
+          const Eigen::MatrixXd &matrix_u_upper,
+          const Eigen::MatrixXd &matrix_x_lower,
+          const Eigen::MatrixXd &matrix_x_upper,
+          const Eigen::MatrixXd &matrix_x_ref, const int max_iter,
           const int horizon, const double eps_abs);
 
   // control vector
@@ -76,9 +79,12 @@ class MpcOsqp {
   Eigen::MatrixXd matrix_b_;
   Eigen::MatrixXd matrix_q_;
   Eigen::MatrixXd matrix_r_;
-  Eigen::MatrixXd matrix_initial_state_;
-  Eigen::MatrixXd matrix_lower_;
-  Eigen::MatrixXd matrix_upper_;
+  Eigen::MatrixXd matrix_initial_x_;
+  const Eigen::MatrixXd matrix_u_lower_;
+  const Eigen::MatrixXd matrix_u_upper_;
+  const Eigen::MatrixXd matrix_x_lower_;
+  const Eigen::MatrixXd matrix_x_upper_;
+  const Eigen::MatrixXd matrix_x_ref_;
   int max_iteration_;
   size_t horizon_;
   double eps_abs_;
