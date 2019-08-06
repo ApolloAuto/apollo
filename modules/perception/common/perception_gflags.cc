@@ -21,7 +21,8 @@ namespace perception {
 
 // sensor_manager
 DEFINE_string(obs_sensor_intrinsic_path,
-              "/apollo/modules/perception/data/params",
+              "/apollo/modules/perception/production"
+              "/data/perception/camera/params",
               "The intrinsics/extrinsics dir.");
 
 DEFINE_string(obs_sensor_meta_path,
