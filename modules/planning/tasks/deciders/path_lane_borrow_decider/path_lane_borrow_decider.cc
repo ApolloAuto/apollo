@@ -82,14 +82,14 @@ bool PathLaneBorrowDecider::IsNecessaryToBorrowLane(
         // first time init decided_side_pass_direction
         bool left_borrowable;
         bool right_borrowable;
-        CheckLaneBorrow(reference_line_info,
-                        &left_borrowable, &right_borrowable);
+        CheckLaneBorrow(reference_line_info, &left_borrowable,
+                        &right_borrowable);
         if (!left_borrowable && !right_borrowable) {
-          mutable_path_decider_status->
-              set_is_in_path_lane_borrow_scenario(false);
+          mutable_path_decider_status->set_is_in_path_lane_borrow_scenario(
+              false);
         } else {
-          mutable_path_decider_status->
-              set_is_in_path_lane_borrow_scenario(true);
+          mutable_path_decider_status->set_is_in_path_lane_borrow_scenario(
+              true);
           if (left_borrowable) {
             mutable_path_decider_status->add_decided_side_pass_direction(
                 PathDeciderStatus::LEFT_BORROW);
@@ -242,8 +242,7 @@ bool PathLaneBorrowDecider::IsSidePassableObstacle(
 
 void PathLaneBorrowDecider::CheckLaneBorrow(
     const ReferenceLineInfo& reference_line_info,
-    bool *left_neighbor_lane_borrowable,
-    bool *right_neighbor_lane_borrowable) {
+    bool* left_neighbor_lane_borrowable, bool* right_neighbor_lane_borrowable) {
   const ReferenceLine& reference_line = reference_line_info.reference_line();
 
   *left_neighbor_lane_borrowable = true;
