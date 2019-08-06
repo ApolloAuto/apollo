@@ -23,17 +23,23 @@ MpcOsqp::MpcOsqp(const Eigen::MatrixXd &matrix_a,
                  const Eigen::MatrixXd &matrix_b,
                  const Eigen::MatrixXd &matrix_q,
                  const Eigen::MatrixXd &matrix_r,
-                 const Eigen::MatrixXd &matrix_lower,
-                 const Eigen::MatrixXd &matrix_upper,
-                 const Eigen::MatrixXd &matrix_initial_state,
-                 const int max_iter, const int horizon, const double eps_abs)
+                 const Eigen::MatrixXd &matrix_initial_x,
+                 const Eigen::MatrixXd &matrix_u_lower,
+                 const Eigen::MatrixXd &matrix_u_upper,
+                 const Eigen::MatrixXd &matrix_x_lower,
+                 const Eigen::MatrixXd &matrix_x_upper,
+                 const Eigen::MatrixXd &matrix_x_ref, const int max_iter,
+                 const int horizon, const double eps_abs)
     : matrix_a_(matrix_a),
       matrix_b_(matrix_b),
       matrix_q_(matrix_q),
       matrix_r_(matrix_r),
-      matrix_initial_state_(matrix_initial_state),
-      matrix_lower_(matrix_lower),
-      matrix_upper_(matrix_upper),
+      matrix_initial_x_(matrix_initial_x),
+      matrix_u_lower_(matrix_u_lower),
+      matrix_u_upper_(matrix_u_upper),
+      matrix_x_lower_(matrix_x_lower),
+      matrix_x_upper_(matrix_x_upper),
+      matrix_x_ref_(matrix_x_ref),
       max_iteration_(max_iter),
       horizon_(horizon),
       eps_abs_(eps_abs) {
@@ -90,6 +96,12 @@ void MpcOsqp::CalculateGradient() {
   // populate the gradient vector
   gradient_ = Eigen::VectorXd::Zero(
       state_dim_ * (horizon_ + 1) + control_dim_ * horizon_, 1);
+  for (size_t i = 0; i < horizon_ + 1; i++) {
+    gradient_.block(i * state_dim_, 0, state_dim_, 1) =
+        -1.0 * matrix_q_ * matrix_x_ref_;
+  }
+  ADEBUG << "Gradient_mat";
+  ADEBUG << gradient_;
 }
 
 // equality constraints x(k+1) = A*x(k)
@@ -109,7 +121,8 @@ void MpcOsqp::CalculateEqualityConstraint(std::vector<c_float> *A_data,
   matrix_constraint.block(0, 0, state_dim_ * (horizon_ + 1),
                           state_dim_ * (horizon_ + 1)) =
       -1 * state_identity_mat;
-  ADEBUG << "matrix_constraint" << matrix_constraint;
+  ADEBUG << "matrix_constraint";
+  ADEBUG << matrix_constraint;
 
   Eigen::MatrixXd control_identity_mat =
       Eigen::MatrixXd::Identity(control_dim_, control_dim_);
@@ -172,34 +185,35 @@ void MpcOsqp::CalculateConstraintVectors() {
       state_dim_ * (horizon_ + 1) + control_dim_ * horizon_, 1);
   for (size_t i = 0; i < horizon_; i++) {
     lowerInequality.block(control_dim_ * i + state_dim_ * (horizon_ + 1), 0,
-                          control_dim_, 1) = matrix_lower_;
+                          control_dim_, 1) = matrix_u_lower_;
     upperInequality.block(control_dim_ * i + state_dim_ * (horizon_ + 1), 0,
-                          control_dim_, 1) = matrix_upper_;
+                          control_dim_, 1) = matrix_u_upper_;
   }
-  Eigen::MatrixXd state_bound = Eigen::MatrixXd::Ones(state_dim_, 1);
-  double max = std::numeric_limits<double>::max();
+  ADEBUG << " matrix_u_lower_";
   for (size_t i = 0; i < horizon_ + 1; i++) {
-    lowerInequality.block(state_dim_ * i, 0, state_dim_, 1) =
-        -1 * max * state_bound;
-    upperInequality.block(state_dim_ * i, 0, state_dim_, 1) = max * state_bound;
+    lowerInequality.block(state_dim_ * i, 0, state_dim_, 1) = matrix_x_lower_;
+    upperInequality.block(state_dim_ * i, 0, state_dim_, 1) = matrix_x_upper_;
   }
+  ADEBUG << " matrix_x_lower_";
 
   // evaluate the lower and the upper equality vectors
   Eigen::VectorXd lowerEquality =
       Eigen::MatrixXd::Zero(state_dim_ * (horizon_ + 1), 1);
   Eigen::VectorXd upperEquality;
-  lowerEquality.block(0, 0, state_dim_, 1) = matrix_initial_state_;
+  lowerEquality.block(0, 0, state_dim_, 1) = -1 * matrix_initial_x_;
   upperEquality = lowerEquality;
   lowerEquality = lowerEquality;
+  ADEBUG << " matrix_initial_x_";
 
   // merge inequality and equality vectors
   lowerBound_ = Eigen::MatrixXd::Zero(
       2 * state_dim_ * (horizon_ + 1) + control_dim_ * horizon_, 1);
   lowerBound_ << lowerEquality, lowerInequality;
-
+  ADEBUG << " lowerBound_ ";
   upperBound_ = Eigen::MatrixXd::Zero(
       2 * state_dim_ * (horizon_ + 1) + control_dim_ * horizon_, 1);
   upperBound_ << upperEquality, upperInequality;
+  ADEBUG << " upperBound_";
 }
 
 OSQPSettings *MpcOsqp::Settings() {
@@ -209,10 +223,9 @@ OSQPSettings *MpcOsqp::Settings() {
   osqp_set_default_settings(settings);
   settings->polish = true;
   settings->scaled_termination = true;
-  settings->verbose = true;
+  settings->verbose = false;
   settings->max_iter = max_iteration_;
   settings->eps_abs = eps_abs_;
-  settings->warm_start = false;
   return settings;
 }
 
@@ -257,7 +270,9 @@ void MpcOsqp::FreeData(OSQPData *data) {
 }
 
 bool MpcOsqp::Solve(std::vector<double> *control_cmd) {
+  ADEBUG << "Before Calc Gradient";
   CalculateGradient();
+  ADEBUG << "After Calc Gradient";
   CalculateConstraintVectors();
   ADEBUG << "MPC2Matrix";
 
@@ -280,9 +295,7 @@ bool MpcOsqp::Solve(std::vector<double> *control_cmd) {
   OSQPSettings *settings = Settings();
   ADEBUG << "OSQP setting done";
   OSQPWorkspace *osqp_workspace = osqp_setup(data, settings);
-  ADEBUG << "before solve";
-  ADEBUG << "osqp result status:" << osqp_solve(osqp_workspace);
-  ADEBUG << "after solve";
+  osqp_solve(osqp_workspace);
 
   auto status = osqp_workspace->info->status_val;
   ADEBUG << "status:" << status;

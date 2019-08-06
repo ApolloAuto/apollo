@@ -325,6 +325,9 @@ cc_test(
     ],
     deps = [
         ":mpc_osqp",
+        ":mpc",
+        "//modules/common/math/qp_solver",
+        "//modules/common/math/qp_solver:active_set_qp_solver",
         "@gtest//:main",
     ],
 )
