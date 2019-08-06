@@ -53,22 +53,21 @@ void UDPBridgeMultiReceiverComponent::MsgDispatcher() {
   listener_->Listen();
 }
 
-ProtoDiserializedBufBase
-    *UDPBridgeMultiReceiverComponent::CreateBridgeProtoBuf(
+std::shared_ptr<ProtoDiserializedBufBase>
+    UDPBridgeMultiReceiverComponent::CreateBridgeProtoBuf(
         const BridgeHeader &header) {
+  std::shared_ptr<ProtoDiserializedBufBase> proto_buf;
   if (IsTimeout(header.GetTimeStamp())) {
-    std::vector<ProtoDiserializedBufBase *>::iterator itor
+    std::vector<std::shared_ptr<ProtoDiserializedBufBase>>::iterator itor
       = proto_list_.begin();
     for (; itor != proto_list_.end();) {
       if ((*itor)->IsTheProto(header)) {
-        ProtoDiserializedBufBase *tmp = *itor;
-        FREE_POINTER(tmp);
         itor = proto_list_.erase(itor);
         break;
       }
       ++itor;
     }
-    return nullptr;
+    return proto_buf;
   }
 
   for (auto proto : proto_list_) {
@@ -77,10 +76,9 @@ ProtoDiserializedBufBase
     }
   }
 
-  ProtoDiserializedBufBase *proto_buf =
-    ProtoDiserializedBufBaseFactory::CreateObj(header);
+  proto_buf = ProtoDiserializedBufBaseFactory::CreateObj(header);
   if (!proto_buf) {
-    return nullptr;
+    return proto_buf;
   }
   proto_buf->Initialize(header, node_);
   proto_list_.push_back(proto_buf);
@@ -156,7 +154,8 @@ bool UDPBridgeMultiReceiverComponent::MsgHandle(int fd) {
   ADEBUG << "proto frame index: " << header.GetIndex();
 
   std::lock_guard<std::mutex> lock(mutex_);
-  ProtoDiserializedBufBase *proto_buf = CreateBridgeProtoBuf(header);
+  std::shared_ptr<ProtoDiserializedBufBase> proto_buf =
+    CreateBridgeProtoBuf(header);
   if (!proto_buf) {
     return false;
   }
@@ -178,12 +177,11 @@ bool UDPBridgeMultiReceiverComponent::RemoveInvalidBuf(uint32_t msg_id,
   if (msg_id == 0) {
     return false;
   }
-  std::vector<ProtoDiserializedBufBase *>::iterator itor =
+  std::vector<std::shared_ptr<ProtoDiserializedBufBase>>::iterator itor =
       proto_list_.begin();
   for (; itor != proto_list_.end();) {
-    if ((*itor)->GetMsgID() < msg_id) {
-      ProtoDiserializedBufBase *tmp = *itor;
-      FREE_POINTER(tmp);
+    if ((*itor)->GetMsgID() < msg_id &&
+      strcmp((*itor)->GetMsgName().c_str(), msg_name.c_str()) == 0) {
       itor = proto_list_.erase(itor);
       continue;
     }

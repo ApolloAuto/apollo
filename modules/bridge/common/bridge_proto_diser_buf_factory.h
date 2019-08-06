@@ -17,6 +17,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 #include "modules/bridge/common/bridge_proto_diserialized_buf.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -26,10 +27,11 @@ namespace bridge {
 
 class ProtoDiserializedBufBaseFactory {
  public:
-  static ProtoDiserializedBufBase *CreateObj(const BridgeHeader &header) {
-    ProtoDiserializedBufBase *obj = nullptr;
+  static std::shared_ptr<ProtoDiserializedBufBase> CreateObj(
+    const BridgeHeader &header) {
+    std::shared_ptr<ProtoDiserializedBufBase> obj;
     if (strcmp("Chassis", header.GetMsgName().c_str()) == 0) {
-      obj = new BridgeProtoDiserializedBuf<canbus::Chassis>(
+      obj = std::make_shared<BridgeProtoDiserializedBuf<canbus::Chassis>>(
         FLAGS_chassis_topic);
     }
     return obj;
