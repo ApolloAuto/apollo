@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_node.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_node.h"
 #include <gtest/gtest.h>
-#include "modules/localization/msf/local_map/base_map/base_map_node.h"
-#include "modules/localization/msf/local_map/base_map/base_map_node_config.h"
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_config.h"
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_node_config.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_node.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_node_config.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_node_config.h"
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
@@ -28,6 +28,7 @@ int main(int argc, char** argv) {
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 class PyramidMapNodeTestSuite : public ::testing::Test {
  protected:
@@ -340,6 +341,7 @@ TEST_F(PyramidMapNodeTestSuite, test_base_map_node) {
   }
 }
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
