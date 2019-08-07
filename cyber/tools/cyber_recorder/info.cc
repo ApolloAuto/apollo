@@ -91,7 +91,7 @@ bool Info::Display(const std::string& file) {
   }
 
   // channel info
-  std::cout << std::setw(w) << "channel_info: ";
+  std::cout << std::setw(w) << "channel_info: " << std::endl;
   Index idx = file_reader.GetIndex();
   for (int i = 0; i < idx.indexes_size(); ++i) {
     ChannelCache* cache = idx.mutable_indexes(i)->mutable_channel_cache();
