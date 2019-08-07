@@ -67,16 +67,6 @@ class ScenarioManager final {
 
   ScenarioConfig::ScenarioType SelectParkAndGoScenario(const Frame& frame);
 
-  // functions for scenario voter implementation
-  // do NOT delete the code yet
-  // void ScenarioSelfVote(const common::TrajectoryPoint& ego_point,
-  //                       const Frame& frame);
-  // bool ReuseCurrentScenario(const common::TrajectoryPoint& ego_point,
-  //                           const Frame& frame);
-  // bool SelectScenario(const ScenarioConfig::ScenarioType type,
-  //                     const common::TrajectoryPoint& ego_point,
-  //                     const Frame& frame);
-
   void ScenarioDispatch(const common::TrajectoryPoint& ego_point,
                         const Frame& frame);
 
