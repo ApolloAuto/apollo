@@ -129,6 +129,7 @@ bool RecordFileWriter::WriteIndex() {
 
 bool RecordFileWriter::WriteChannel(const Channel& channel) {
   std::lock_guard<std::mutex> lock(mutex_);
+  uint64_t pos = CurrentPosition();
   if (!WriteSection<Channel>(channel)) {
     AERROR << "Write section fail";
     return false;
@@ -136,7 +137,7 @@ bool RecordFileWriter::WriteChannel(const Channel& channel) {
   header_.set_channel_number(header_.channel_number() + 1);
   SingleIndex* single_index = index_.add_indexes();
   single_index->set_type(SectionType::SECTION_CHANNEL);
-  single_index->set_position(CurrentPosition());
+  single_index->set_position(pos);
   ChannelCache* channel_cache = new ChannelCache();
   channel_cache->set_name(channel.name());
   channel_cache->set_message_number(0);
@@ -149,19 +150,22 @@ bool RecordFileWriter::WriteChannel(const Channel& channel) {
 bool RecordFileWriter::WriteChunk(const ChunkHeader& chunk_header,
                                   const ChunkBody& chunk_body) {
   std::lock_guard<std::mutex> lock(mutex_);
+  uint64_t pos = CurrentPosition();
   if (!WriteSection<ChunkHeader>(chunk_header)) {
     AERROR << "Write chunk header fail";
     return false;
   }
   SingleIndex* single_index = index_.add_indexes();
   single_index->set_type(SectionType::SECTION_CHUNK_HEADER);
-  single_index->set_position(CurrentPosition());
+  single_index->set_position(pos);
   ChunkHeaderCache* chunk_header_cache = new ChunkHeaderCache();
   chunk_header_cache->set_begin_time(chunk_header.begin_time());
   chunk_header_cache->set_end_time(chunk_header.end_time());
   chunk_header_cache->set_message_number(chunk_header.message_number());
   chunk_header_cache->set_raw_size(chunk_header.raw_size());
   single_index->set_allocated_chunk_header_cache(chunk_header_cache);
+
+  pos = CurrentPosition();
   if (!WriteSection<ChunkBody>(chunk_body)) {
     AERROR << "Write chunk body fail";
     return false;
@@ -175,7 +179,7 @@ bool RecordFileWriter::WriteChunk(const ChunkHeader& chunk_header,
                              chunk_header.message_number());
   single_index = index_.add_indexes();
   single_index->set_type(SectionType::SECTION_CHUNK_BODY);
-  single_index->set_position(CurrentPosition());
+  single_index->set_position(pos);
   ChunkBodyCache* chunk_body_cache = new ChunkBodyCache();
   chunk_body_cache->set_message_number(chunk_body.messages_size());
   single_index->set_allocated_chunk_body_cache(chunk_body_cache);
