@@ -198,8 +198,9 @@ void ObstacleCameraPerception::InitLane(
     lane_detector_init_options.root_dir =
         GetAbsolutePath(work_root, lane_detector_plugin_param.root_dir());
     lane_detector_init_options.gpu_id = perception_param_.gpu_id();
-    base::BaseCameraModelPtr model = common::SensorManager::Instance()->
-               GetUndistortCameraModel(lane_detector_param.camera_name());
+    base::BaseCameraModelPtr model =
+        common::SensorManager::Instance()->GetUndistortCameraModel(
+            lane_detector_param.camera_name());
     lane_detector_init_options.base_camera_model = model;
     AINFO << "lane_detector_name: " << lane_detector_plugin_param.name();
     lane_detector_.reset(BaseLaneDetectorRegisterer::GetInstanceByName(

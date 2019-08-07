@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/bridge/udp_bridge_multi_receiver_component.h"
+#include "modules/bridge/common/bridge_proto_diser_buf_factory.h"
 #include "modules/bridge/common/macro.h"
 #include "modules/bridge/common/util.h"
-#include "modules/bridge/common/bridge_proto_diser_buf_factory.h"
 
 namespace apollo {
 namespace bridge {
@@ -44,8 +44,8 @@ bool UDPBridgeMultiReceiverComponent::Init() {
 }
 
 bool UDPBridgeMultiReceiverComponent::InitSession(uint16_t port) {
-  return listener_->Initialize(this,
-    &UDPBridgeMultiReceiverComponent::MsgHandle, port);
+  return listener_->Initialize(
+      this, &UDPBridgeMultiReceiverComponent::MsgHandle, port);
 }
 
 void UDPBridgeMultiReceiverComponent::MsgDispatcher() {
@@ -54,12 +54,12 @@ void UDPBridgeMultiReceiverComponent::MsgDispatcher() {
 }
 
 std::shared_ptr<ProtoDiserializedBufBase>
-    UDPBridgeMultiReceiverComponent::CreateBridgeProtoBuf(
-        const BridgeHeader &header) {
+UDPBridgeMultiReceiverComponent::CreateBridgeProtoBuf(
+    const BridgeHeader &header) {
   std::shared_ptr<ProtoDiserializedBufBase> proto_buf;
   if (IsTimeout(header.GetTimeStamp())) {
-    std::vector<std::shared_ptr<ProtoDiserializedBufBase>>::iterator itor
-      = proto_list_.begin();
+    std::vector<std::shared_ptr<ProtoDiserializedBufBase>>::iterator itor =
+        proto_list_.begin();
     for (; itor != proto_list_.end();) {
       if ((*itor)->IsTheProto(header)) {
         itor = proto_list_.erase(itor);
@@ -155,7 +155,7 @@ bool UDPBridgeMultiReceiverComponent::MsgHandle(int fd) {
 
   std::lock_guard<std::mutex> lock(mutex_);
   std::shared_ptr<ProtoDiserializedBufBase> proto_buf =
-    CreateBridgeProtoBuf(header);
+      CreateBridgeProtoBuf(header);
   if (!proto_buf) {
     return false;
   }
@@ -172,8 +172,8 @@ bool UDPBridgeMultiReceiverComponent::MsgHandle(int fd) {
   return true;
 }
 
-bool UDPBridgeMultiReceiverComponent::RemoveInvalidBuf(uint32_t msg_id,
-  const std::string &msg_name) {
+bool UDPBridgeMultiReceiverComponent::RemoveInvalidBuf(
+    uint32_t msg_id, const std::string &msg_name) {
   if (msg_id == 0) {
     return false;
   }
@@ -181,7 +181,7 @@ bool UDPBridgeMultiReceiverComponent::RemoveInvalidBuf(uint32_t msg_id,
       proto_list_.begin();
   for (; itor != proto_list_.end();) {
     if ((*itor)->GetMsgID() < msg_id &&
-      strcmp((*itor)->GetMsgName().c_str(), msg_name.c_str()) == 0) {
+        strcmp((*itor)->GetMsgName().c_str(), msg_name.c_str()) == 0) {
       itor = proto_list_.erase(itor);
       continue;
     }
