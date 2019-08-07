@@ -226,8 +226,11 @@ bool SchedulerClassic::RemoveCRoutine(uint64_t crid) {
        it != ClassicContext::cr_group_[group_name].at(prio).end(); ++it) {
     if ((*it)->id() == crid) {
       auto cr = *it;
-
-      (*it)->Stop();
+      cr->Stop();
+      while (!cr->Acquire()) {
+        std::this_thread::sleep_for(std::chrono::microseconds(1));
+        AINFO_EVERY(1000) << "waiting for task " << cr->name() << " completion";
+      }
       it = ClassicContext::cr_group_[group_name].at(prio).erase(it);
       cr->Release();
       return true;

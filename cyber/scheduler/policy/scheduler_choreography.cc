@@ -230,8 +230,12 @@ bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
     for (auto it = croutines.begin(); it != croutines.end(); ++it) {
       if ((*it)->id() == crid) {
         auto cr = *it;
-
         cr->Stop();
+        while (!cr->Acquire()) {
+          std::this_thread::sleep_for(std::chrono::milliseconds(1));
+          AINFO_EVERY(1000) << "waiting for task "
+                            << cr->name() << " completion";
+        }
         croutines.erase(it);
         cr->Release();
         return true;

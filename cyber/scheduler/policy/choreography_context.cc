@@ -83,6 +83,10 @@ void ChoreographyContext::RemoveCRoutine(uint64_t crid) {
     auto cr = it->second;
     if (cr->id() == crid) {
       cr->Stop();
+      while (!cr->Acquire()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        AINFO_EVERY(1000) << "waiting for task " << cr->name() << " completion";
+      }
       it = cr_queue_.erase(it);
       cr->Release();
       return;
