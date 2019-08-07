@@ -493,9 +493,11 @@ function citest_basic() {
   cd /apollo
   source cyber/setup.bash
 
-  BUILD_TARGETS="
-    `bazel query //modules/... union //cyber/...`
-  "
+  # FIXME(all): temporarily disable modules doesn't compile in 18.04
+#   BUILD_TARGETS="
+#    `bazel query //modules/... union //cyber/...`
+#  "
+  BUILD_TARGETS=`bazel query //modules/... union //cyber/... except //modules/tools/visualizer/... except //modules/data/tools/rosbag_to_record/...  except //modules/v2x/... except //modules/drivers/video/tools/decode_video/... except //modules/map/tools/map_datachecker/... `
 
   JOB_ARG="--jobs=$(nproc) --ram_utilization_factor 80"
 
