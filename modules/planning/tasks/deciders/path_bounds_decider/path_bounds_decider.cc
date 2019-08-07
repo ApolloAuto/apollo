@@ -1325,6 +1325,10 @@ void PathBoundsDecider::PathBoundsDebugString(
 bool PathBoundsDecider::CheckLaneBoundaryType(
     const ReferenceLineInfo& reference_line_info, const double check_s,
     const LaneBorrowInfo& lane_borrow_info) {
+  if (lane_borrow_info == LaneBorrowInfo::NO_BORROW) {
+    return false;
+  }
+
   const ReferenceLine& reference_line = reference_line_info.reference_line();
   auto ref_point = reference_line.GetNearestReferencePoint(check_s);
   if (ref_point.lane_waypoints().empty()) {
