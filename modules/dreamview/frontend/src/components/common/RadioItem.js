@@ -7,11 +7,19 @@ export default class RadioItem extends React.Component {
         this.setElementRef = (element) => {
             this.elementRef = element;
         };
+        this.handleKeyPress = this.handleKeyPress.bind(this);
     }
 
     componentDidMount() {
         if (this.props.autoFocus && this.elementRef) {
             this.elementRef.focus();
+        }
+    }
+
+    handleKeyPress(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            this.props.onClick();
         }
     }
 
@@ -22,7 +30,7 @@ export default class RadioItem extends React.Component {
             <ul className={extraClasses}
                 tabIndex="0"
                 ref={this.setElementRef}
-                onKeyPress={onClick}
+                onKeyPress={this.handleKeyPress}
                 onClick={onClick} >
                 <li>
                     <input type="radio" name={id} checked={checked} readOnly />

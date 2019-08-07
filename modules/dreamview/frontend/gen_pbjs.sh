@@ -20,7 +20,7 @@ mkdir -p proto_bundle
 
 # proto dependencies
 COMMON_PROTOS='../../common/proto/*.proto'
-LOCALIZATION_PROTOS='../../localization/proto/localization.proto ../../localization/proto/pose.proto'
+LOCALIZATION_PROTOS='../../localization/proto/localization.proto ../../localization/proto/pose.proto ../../localization/proto/localization_status.proto'
 CHASSIS_PROTOS='../../canbus/proto/chassis.proto'
 PLANNING_PROTOS='../../planning/proto/sl_boundary.proto ../../planning/proto/decision.proto ../../planning/proto/planning_internal.proto'
 PERCEPTION_PROTOS='../../perception/proto/traffic_light_detection.proto ../../perception/proto/perception_obstacle.proto'

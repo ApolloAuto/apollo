@@ -1118,15 +1118,24 @@
                   "rule": "repeated",
                   "type": "apollo.common.TrajectoryPoint",
                   "id": 5
+                },
+                "msfStatus": {
+                  "type": "MsfStatus",
+                  "id": 6
+                },
+                "sensorStatus": {
+                  "type": "MsfSensorMsgStatus",
+                  "id": 7
                 }
               }
             },
             "MeasureState": {
               "values": {
-                "NOT_VALID": 0,
-                "NOT_STABLE": 1,
-                "OK": 2,
-                "VALID": 3
+                "OK": 0,
+                "WARNNING": 1,
+                "ERROR": 2,
+                "CRITICAL_ERROR": 3,
+                "FATAL_ERROR": 4
               }
             },
             "LocalizationStatus": {
@@ -1141,15 +1150,25 @@
                 },
                 "gnssStatus": {
                   "type": "MeasureState",
-                  "id": 3
+                  "id": 3,
+                  "options": {
+                    "deprecated": true
+                  }
                 },
                 "lidarStatus": {
                   "type": "MeasureState",
-                  "id": 4
+                  "id": 4,
+                  "options": {
+                    "deprecated": true
+                  }
                 },
                 "measurementTime": {
                   "type": "double",
                   "id": 5
+                },
+                "stateMessage": {
+                  "type": "string",
+                  "id": 6
                 }
               }
             },
@@ -1190,6 +1209,180 @@
                 "eulerAngles": {
                   "type": "apollo.common.Point3D",
                   "id": 9
+                }
+              }
+            },
+            "LocalLidarStatus": {
+              "values": {
+                "MSF_LOCAL_LIDAR_NORMAL": 0,
+                "MSF_LOCAL_LIDAR_MAP_MISSING": 1,
+                "MSF_LOCAL_LIDAR_EXTRINSICS_MISSING": 2,
+                "MSF_LOCAL_LIDAR_MAP_LOADING_FAILED": 3,
+                "MSF_LOCAL_LIDAR_NO_OUTPUT": 4,
+                "MSF_LOCAL_LIDAR_OUT_OF_MAP": 5,
+                "MSF_LOCAL_LIDAR_NOT_GOOD": 6,
+                "MSF_LOCAL_LIDAR_UNDEFINED_STATUS": 7
+              }
+            },
+            "LocalLidarQuality": {
+              "values": {
+                "MSF_LOCAL_LIDAR_VERY_GOOD": 0,
+                "MSF_LOCAL_LIDAR_GOOD": 1,
+                "MSF_LOCAL_LIDAR_NOT_BAD": 2,
+                "MSF_LOCAL_LIDAR_BAD": 3
+              }
+            },
+            "LocalLidarConsistency": {
+              "values": {
+                "MSF_LOCAL_LIDAR_CONSISTENCY_00": 0,
+                "MSF_LOCAL_LIDAR_CONSISTENCY_01": 1,
+                "MSF_LOCAL_LIDAR_CONSISTENCY_02": 2,
+                "MSF_LOCAL_LIDAR_CONSISTENCY_03": 3
+              }
+            },
+            "GnssConsistency": {
+              "values": {
+                "MSF_GNSS_CONSISTENCY_00": 0,
+                "MSF_GNSS_CONSISTENCY_01": 1,
+                "MSF_GNSS_CONSISTENCY_02": 2,
+                "MSF_GNSS_CONSISTENCY_03": 3
+              }
+            },
+            "GnssPositionType": {
+              "values": {
+                "NONE": 0,
+                "FIXEDPOS": 1,
+                "FIXEDHEIGHT": 2,
+                "FLOATCONV": 4,
+                "WIDELANE": 5,
+                "NARROWLANE": 6,
+                "DOPPLER_VELOCITY": 8,
+                "SINGLE": 16,
+                "PSRDIFF": 17,
+                "WAAS": 18,
+                "PROPOGATED": 19,
+                "OMNISTAR": 20,
+                "L1_FLOAT": 32,
+                "IONOFREE_FLOAT": 33,
+                "NARROW_FLOAT": 34,
+                "L1_INT": 48,
+                "WIDE_INT": 49,
+                "NARROW_INT": 50,
+                "RTK_DIRECT_INS": 51,
+                "INS_SBAS": 52,
+                "INS_PSRSP": 53,
+                "INS_PSRDIFF": 54,
+                "INS_RTKFLOAT": 55,
+                "INS_RTKFIXED": 56,
+                "INS_OMNISTAR": 57,
+                "INS_OMNISTAR_HP": 58,
+                "INS_OMNISTAR_XP": 59,
+                "OMNISTAR_HP": 64,
+                "OMNISTAR_XP": 65,
+                "PPP_CONVERGING": 68,
+                "PPP": 69,
+                "INS_PPP_Converging": 73,
+                "INS_PPP": 74,
+                "MSG_LOSS": 91
+              }
+            },
+            "ImuMsgDelayStatus": {
+              "values": {
+                "IMU_DELAY_NORMAL": 0,
+                "IMU_DELAY_1": 1,
+                "IMU_DELAY_2": 2,
+                "IMU_DELAY_3": 3,
+                "IMU_DELAY_ABNORMAL": 4
+              }
+            },
+            "ImuMsgMissingStatus": {
+              "values": {
+                "IMU_MISSING_NORMAL": 0,
+                "IMU_MISSING_1": 1,
+                "IMU_MISSING_2": 2,
+                "IMU_MISSING_3": 3,
+                "IMU_MISSING_4": 4,
+                "IMU_MISSING_5": 5,
+                "IMU_MISSING_ABNORMAL": 6
+              }
+            },
+            "ImuMsgDataStatus": {
+              "values": {
+                "IMU_DATA_NORMAL": 0,
+                "IMU_DATA_ABNORMAL": 1,
+                "IMU_DATA_OTHER": 2
+              }
+            },
+            "MsfRunningStatus": {
+              "values": {
+                "MSF_SOL_LIDAR_GNSS": 0,
+                "MSF_SOL_X_GNSS": 1,
+                "MSF_SOL_LIDAR_X": 2,
+                "MSF_SOL_LIDAR_XX": 3,
+                "MSF_SOL_LIDAR_XXX": 4,
+                "MSF_SOL_X_X": 5,
+                "MSF_SOL_X_XX": 6,
+                "MSF_SOL_X_XXX": 7,
+                "MSF_SSOL_LIDAR_GNSS": 8,
+                "MSF_SSOL_X_GNSS": 9,
+                "MSF_SSOL_LIDAR_X": 10,
+                "MSF_SSOL_LIDAR_XX": 11,
+                "MSF_SSOL_LIDAR_XXX": 12,
+                "MSF_SSOL_X_X": 13,
+                "MSF_SSOL_X_XX": 14,
+                "MSF_SSOL_X_XXX": 15,
+                "MSF_NOSOL_LIDAR_GNSS": 16,
+                "MSF_NOSOL_X_GNSS": 17,
+                "MSF_NOSOL_LIDAR_X": 18,
+                "MSF_NOSOL_LIDAR_XX": 19,
+                "MSF_NOSOL_LIDAR_XXX": 20,
+                "MSF_NOSOL_X_X": 21,
+                "MSF_NOSOL_X_XX": 22,
+                "MSF_NOSOL_X_XXX": 23,
+                "MSF_RUNNING_INIT": 24
+              }
+            },
+            "MsfSensorMsgStatus": {
+              "fields": {
+                "imuDelayStatus": {
+                  "type": "ImuMsgDelayStatus",
+                  "id": 1
+                },
+                "imuMissingStatus": {
+                  "type": "ImuMsgMissingStatus",
+                  "id": 2
+                },
+                "imuDataStatus": {
+                  "type": "ImuMsgDataStatus",
+                  "id": 3
+                }
+              }
+            },
+            "MsfStatus": {
+              "fields": {
+                "localLidarConsistency": {
+                  "type": "LocalLidarConsistency",
+                  "id": 1
+                },
+                "gnssConsistency": {
+                  "type": "GnssConsistency",
+                  "id": 2
+                },
+                "localLidarStatus": {
+                  "type": "LocalLidarStatus",
+                  "id": 3
+                },
+                "localLidarQuality": {
+                  "type": "LocalLidarQuality",
+                  "id": 4
+                },
+                "gnssposPositionType": {
+                  "type": "GnssPositionType",
+                  "id": 5
+                },
+                "msfRunningStatus": {
+                  "type": "MsfRunningStatus",
+                  "id": 6
                 }
               }
             }
