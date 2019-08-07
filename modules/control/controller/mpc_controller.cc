@@ -81,7 +81,10 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   vehicle_param_ = VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
 
   ts_ = control_conf->mpc_controller_conf().ts();
-  CHECK_GT(ts_, 0.0) << "[MPCController] Invalid control update interval.";
+  if (ts_ <= 0.0) {
+    AERROR << "[MPCController] Invalid control update interval.";
+    return false;
+  }
   cf_ = control_conf->mpc_controller_conf().cf();
   cr_ = control_conf->mpc_controller_conf().cr();
   wheelbase_ = vehicle_param_.wheel_base();

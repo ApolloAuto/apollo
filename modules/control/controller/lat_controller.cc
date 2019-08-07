@@ -97,7 +97,10 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
       common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
 
   ts_ = control_conf->lat_controller_conf().ts();
-  CHECK_GT(ts_, 0.0) << "[LatController] Invalid control update interval.";
+  if (ts_ <= 0.0) {
+    AERROR << "[MPCController] Invalid control update interval.";
+    return false;
+  }
   cf_ = control_conf->lat_controller_conf().cf();
   cr_ = control_conf->lat_controller_conf().cr();
   preview_window_ = control_conf->lat_controller_conf().preview_window();
