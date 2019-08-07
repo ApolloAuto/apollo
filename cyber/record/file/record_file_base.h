@@ -47,9 +47,9 @@ class RecordFileBase {
   virtual ~RecordFileBase() {}
   virtual bool Open(const std::string& path) = 0;
   virtual void Close() = 0;
-  std::string GetPath() { return path_; }
-  Header GetHeader() { return header_; }
-  Index GetIndex() { return index_; }
+  const std::string& GetPath() const { return path_; }
+  const Header& GetHeader() const { return header_; }
+  const Index& GetIndex() const { return index_; }
   int64_t CurrentPosition();
   bool SetPosition(int64_t position);
 
