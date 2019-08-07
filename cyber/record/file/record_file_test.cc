@@ -32,7 +32,8 @@ const char CHAN_1[] = "/test1";
 const char CHAN_2[] = "/test2";
 const char MSG_TYPE[] = "apollo.cyber.proto.Test";
 const char STR_10B[] = "1234567890";
-const char TEST_FILE[] = "test.record";
+const char TEST_FILE_1[] = "test_1.record";
+const char TEST_FILE_2[] = "test_2.record";
 
 TEST(ChunkTest, TestAll) {
   Chunk* ck = new Chunk();
@@ -77,8 +78,8 @@ TEST(ChunkTest, TestAll) {
 TEST(RecordFileTest, TestOneMessageFile) {
   // writer open one message file
   RecordFileWriter* rfw = new RecordFileWriter();
-  ASSERT_TRUE(rfw->Open(TEST_FILE));
-  ASSERT_EQ(TEST_FILE, rfw->GetPath());
+  ASSERT_TRUE(rfw->Open(TEST_FILE_1));
+  ASSERT_EQ(TEST_FILE_1, rfw->GetPath());
 
   // write header section
   Header hdr1 = HeaderBuilder::GetHeaderWithSegmentParams(0, 0);
@@ -114,8 +115,8 @@ TEST(RecordFileTest, TestOneMessageFile) {
 
   // header open one message file
   RecordFileReader* rfr = new RecordFileReader();
-  ASSERT_TRUE(rfr->Open(TEST_FILE));
-  ASSERT_EQ(TEST_FILE, rfr->GetPath());
+  ASSERT_TRUE(rfr->Open(TEST_FILE_1));
+  ASSERT_EQ(TEST_FILE_1, rfr->GetPath());
 
   Section sec;
 
@@ -162,8 +163,8 @@ TEST(RecordFileTest, TestOneMessageFile) {
 TEST(RecordFileTest, TestOneChunkFile) {
   RecordFileWriter* rfw = new RecordFileWriter();
 
-  ASSERT_TRUE(rfw->Open(TEST_FILE));
-  ASSERT_EQ(TEST_FILE, rfw->GetPath());
+  ASSERT_TRUE(rfw->Open(TEST_FILE_1));
+  ASSERT_EQ(TEST_FILE_1, rfw->GetPath());
 
   Header header = HeaderBuilder::GetHeaderWithChunkParams(0, 0);
   header.set_segment_interval(0);
@@ -210,6 +211,92 @@ TEST(RecordFileTest, TestOneChunkFile) {
   ASSERT_EQ(1e9, rfw->GetHeader().begin_time());
   ASSERT_EQ(3e9, rfw->GetHeader().end_time());
   ASSERT_EQ(3, rfw->GetHeader().message_number());
+}
+
+TEST(RecordFileTest, TestIndex) {
+  {
+    RecordFileWriter* rfw = new RecordFileWriter();
+
+    ASSERT_TRUE(rfw->Open(TEST_FILE_2));
+    ASSERT_EQ(TEST_FILE_2, rfw->GetPath());
+
+    Header header = HeaderBuilder::GetHeaderWithChunkParams(0, 0);
+    header.set_segment_interval(0);
+    header.set_segment_raw_size(0);
+    ASSERT_TRUE(rfw->WriteHeader(header));
+    ASSERT_FALSE(rfw->GetHeader().is_complete());
+
+    Channel chan1;
+    chan1.set_name(CHAN_1);
+    chan1.set_message_type(MSG_TYPE);
+    chan1.set_proto_desc(STR_10B);
+    ASSERT_TRUE(rfw->WriteChannel(chan1));
+
+    Channel chan2;
+    chan2.set_name(CHAN_2);
+    chan2.set_message_type(MSG_TYPE);
+    chan2.set_proto_desc(STR_10B);
+    ASSERT_TRUE(rfw->WriteChannel(chan2));
+
+    SingleMessage msg1;
+    msg1.set_channel_name(chan1.name());
+    msg1.set_content(STR_10B);
+    msg1.set_time(1e9);
+    ASSERT_TRUE(rfw->WriteMessage(msg1));
+    ASSERT_EQ(1, rfw->GetMessageNumber(chan1.name()));
+
+    SingleMessage msg2;
+    msg2.set_channel_name(chan2.name());
+    msg2.set_content(STR_10B);
+    msg2.set_time(2e9);
+    ASSERT_TRUE(rfw->WriteMessage(msg2));
+    ASSERT_EQ(1, rfw->GetMessageNumber(chan2.name()));
+
+    SingleMessage msg3;
+    msg3.set_channel_name(chan1.name());
+    msg3.set_content(STR_10B);
+    msg3.set_time(3e9);
+    ASSERT_TRUE(rfw->WriteMessage(msg3));
+    ASSERT_EQ(2, rfw->GetMessageNumber(chan1.name()));
+
+    rfw->Close();
+    ASSERT_TRUE(rfw->GetHeader().is_complete());
+    ASSERT_EQ(1, rfw->GetHeader().chunk_number());
+    ASSERT_EQ(1e9, rfw->GetHeader().begin_time());
+    ASSERT_EQ(3e9, rfw->GetHeader().end_time());
+    ASSERT_EQ(3, rfw->GetHeader().message_number());
+  }
+  {
+    RecordFileReader reader;
+    reader.Open(TEST_FILE_2);
+
+    reader.ReadIndex();
+    const auto& index = reader.GetIndex();
+
+    // Walk through file the long way and check that the indexes match the
+    // sections
+    reader.Reset();
+    Section section;
+    for (uint64_t pos = reader.CurrentPosition();
+         reader.ReadSection(&section) && reader.SkipSection(section.size);
+         pos = reader.CurrentPosition()) {
+      // Find index at position
+      if (section.type != SectionType::SECTION_INDEX) {
+        bool found = false;
+        SingleIndex match;
+        for (const auto& row : index.indexes()) {
+          if (row.position() == pos) {
+            match = row;
+            found = true;
+            break;
+          }
+        }
+        ASSERT_TRUE(found);
+        EXPECT_EQ(match.position(), pos);
+        EXPECT_EQ(match.type(), section.type);
+      }
+    }
+  }
 }
 
 }  // namespace record
