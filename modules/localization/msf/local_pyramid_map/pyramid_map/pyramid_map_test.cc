@@ -16,12 +16,12 @@
 #include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
 
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map.h"
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_config.h"
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_pool.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_pool.h"
 
-#include "modules/localization/msf/local_map/base_map/base_map.h"
-#include "modules/localization/msf/local_map/base_map/base_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
@@ -31,6 +31,7 @@ int main(int argc, char** argv) {
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 class PyramidMapTestSuite : public ::testing::Test {
  protected:
@@ -222,6 +223,7 @@ TEST_F(PyramidMapTestSuite, test_init) {
   EXPECT_TRUE(pyramid_map.LoadMapArea(loc, 0, 50, 0, 0));
 }
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
