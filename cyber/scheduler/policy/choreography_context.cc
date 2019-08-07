@@ -60,8 +60,6 @@ std::shared_ptr<CRoutine> ChoreographyContext::NextRoutine() {
 }
 
 bool ChoreographyContext::Enqueue(const std::shared_ptr<CRoutine>& cr) {
-  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::RT_CREATE, cr->id(),
-                                            cr->processor_id());
   WriteLockGuard<AtomicRWLock> lock(rq_lk_);
   cr_queue_.emplace(cr->priority(), cr);
   return true;
