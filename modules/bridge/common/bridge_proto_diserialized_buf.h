@@ -31,17 +31,17 @@ constexpr uint32_t INT_BITS = static_cast<uint32_t>(sizeof(uint32_t) * 8);
 class ProtoDiserializedBufBase {
  public:
   ProtoDiserializedBufBase() {}
-  virtual  ~ProtoDiserializedBufBase() {}
+  virtual ~ProtoDiserializedBufBase() {}
 
   virtual bool Initialize(const BridgeHeader &header,
-    std::shared_ptr<cyber::Node> node) = 0;
+                          std::shared_ptr<cyber::Node> node) = 0;
 
   virtual bool DiserializedAndPub() = 0;
   virtual bool IsReadyDiserialize() const = 0;
   virtual bool IsTheProto(const BridgeHeader &header) = 0;
   virtual void UpdateStatus(uint32_t frame_index) = 0;
   virtual uint32_t GetMsgID() const = 0;
-  virtual std::string GetMsgName() const  = 0;
+  virtual std::string GetMsgName() const = 0;
   virtual char *GetBuf(size_t offset) = 0;
 };
 
@@ -50,12 +50,12 @@ class BridgeProtoDiserializedBuf : public ProtoDiserializedBufBase {
  public:
   BridgeProtoDiserializedBuf() {}
   explicit BridgeProtoDiserializedBuf(const std::string &topic_name)
-    : topic_name_(topic_name) {}
+      : topic_name_(topic_name) {}
   virtual ~BridgeProtoDiserializedBuf();
 
   virtual bool DiserializedAndPub();
   virtual bool Initialize(const BridgeHeader &header,
-    std::shared_ptr<cyber::Node> node);
+                          std::shared_ptr<cyber::Node> node);
 
   virtual bool IsReadyDiserialize() const { return is_ready_diser; }
   virtual void UpdateStatus(uint32_t frame_index);
@@ -154,7 +154,7 @@ bool BridgeProtoDiserializedBuf<T>::Initialize(const BridgeHeader &header) {
 
 template <typename T>
 bool BridgeProtoDiserializedBuf<T>::Initialize(
-  const BridgeHeader &header, std::shared_ptr<cyber::Node> node) {
+    const BridgeHeader &header, std::shared_ptr<cyber::Node> node) {
   writer_ = node->CreateWriter<T>(topic_name_.c_str());
   return Initialize(header);
 }

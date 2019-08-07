@@ -47,7 +47,7 @@ class UDPBridgeMultiReceiverComponent final : public cyber::Component<> {
   bool Init() override;
   std::string Name() const { return FLAGS_bridge_module_name; }
   std::shared_ptr<ProtoDiserializedBufBase> CreateBridgeProtoBuf(
-    const BridgeHeader &header);
+      const BridgeHeader &header);
   bool IsProtoExist(const BridgeHeader &header);
   bool IsTimeout(double time_stamp);
   void MsgDispatcher();

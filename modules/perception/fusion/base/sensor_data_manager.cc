@@ -15,8 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/fusion/base/sensor_data_manager.h"
 
-#include <utility>
 #include <algorithm>
+#include <utility>
 
 #include "cyber/common/log.h"
 
