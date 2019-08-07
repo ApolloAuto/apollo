@@ -508,6 +508,7 @@ function citest_basic() {
           | grep -v "modules\/common" \
           | grep -v "can_client" \
           | grep -v "blob_test" \
+          | grep -v "ndt_lidar_locator_test" \
           | grep -v "syncedmem_test" | grep -v "blob_test" \
           | grep -v "perception_inference_operators_test" \
           | grep -v "cuda_util_test" \
