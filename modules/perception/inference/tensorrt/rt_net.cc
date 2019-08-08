@@ -155,7 +155,8 @@ void RTNet::addActiveLayer(const LayerParameter &layer_param,
                            nvinfer1::INetworkDefinition *net,
                            TensorMap *tensor_map,
                            TensorModifyMap *tensor_modify_map) {
-  if (layer_param.type() == "ReLU") {
+  if (layer_param.type() == "ReLU" &&
+      layer_param.relu_param().negative_slope() > 0.0f) {
     std::shared_ptr<ReLUPlugin> relu_plugin;
     relu_plugin.reset(
         new ReLUPlugin(layer_param.relu_param(), inputs[0]->getDimensions()));
