@@ -68,6 +68,9 @@ class PathAssessmentDecider : public Decider {
   bool IsCollidingWithStaticObstacles(
       const ReferenceLineInfo& reference_line_info, const PathData& path_data);
 
+  bool IsStopOnReverseNeighborLane(
+      const ReferenceLineInfo& reference_line_info, const PathData& path_data);
+
   // * @brief Check if the path ever returns to the self-lane.
   //   * @param reference_line_info
   //   * @param path_data
