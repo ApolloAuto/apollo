@@ -89,3 +89,6 @@ docs/demo_guide/*.bag
 
 # Logs
 cyber/log/*
+
+# Bash Environment
+.dev_bash_hist
