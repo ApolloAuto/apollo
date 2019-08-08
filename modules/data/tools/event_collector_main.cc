@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
+#include <time.h>
+#include <chrono>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -42,8 +45,9 @@ DEFINE_double(event_time_backtrack_seconds, 20,
 namespace apollo {
 namespace data {
 namespace {
-using apollo::common::adapter::AdapterManager;
 using apollo::canbus::Chassis;
+using apollo::common::adapter::AdapterManager;
+using std::chrono::system_clock;
 
 void OnSigInt(int32_t signal_num) {
   // only response for ctrl + c
@@ -58,6 +62,32 @@ void OnSigInt(int32_t signal_num) {
     is_stopping = true;
     ros::shutdown();
   }
+}
+
+std::string NanosecondsToDateString(const uint64_t nanoseconds_) {
+  auto nano = std::chrono::nanoseconds(nanoseconds_);
+  system_clock::time_point tp(nano);
+  auto time = system_clock::to_time_t(tp);
+  struct tm stm;
+  auto ret = localtime_r(&time, &stm);
+  if (ret == nullptr) {
+    return std::to_string(static_cast<double>(nanoseconds_) / 1000000000.0);
+  }
+  std::stringstream ss;
+#if __GNUC__ >= 5
+  ss << std::put_time(ret, "%F %T");
+  ss << "." << nanoseconds_ % 1000000000UL;
+#else
+  char date_time[128];
+  strftime(date_time, sizeof(date_time), "%F %T", ret);
+  ss << std::string(date_time) << "." << nanoseconds_ % 1000000000UL;
+#endif
+  return ss.str();
+}
+
+std::string SecondsToDateString(const double seconds) {
+  const uint64_t nanoseconds = static_cast<uint64_t>(seconds * 1000000000UL);
+  return NanosecondsToDateString(nanoseconds);
 }
 
 class EventCollector {
@@ -97,6 +127,7 @@ class EventCollector {
       rosbag::Bag bag(bag_filename);
       rosbag::View view(bag);
       const double begin_time = view.getBeginTime().toSec();
+      std::string time_str = SecondsToDateString(begin_time);
       const double end_time =
           view.getEndTime().toSec() + FLAGS_event_time_backtrack_seconds;
 
@@ -111,7 +142,7 @@ class EventCollector {
           fout << bag_filename << "\n";
         }
         fout << "  Offset = " << std::get<0>(*iter) - begin_time << ", "
-             << std::get<1>(*iter) << "\n";
+             << time_str << "," << std::get<1>(*iter) << "\n";
       }
     }
   }
@@ -152,7 +183,7 @@ class EventCollector {
   void SaveEvent(const double timestamp_sec, const std::string& type,
                  const std::string& description = "") {
     const auto msg = apollo::common::util::StrCat(
-        timestamp_sec, " [", type, "] ", description);
+        SecondsToDateString(timestamp_sec), " [", type, "] ", description);
 
     AINFO << "SaveEvent: " << msg;
     events_.emplace_back(timestamp_sec, msg);
