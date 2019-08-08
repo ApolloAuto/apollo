@@ -335,6 +335,13 @@ bool PathAssessmentDecider::IsValidRegularPath(
     ADEBUG << path_data.path_label() << ": ADC has collision.";
     return false;
   }
+
+  if (IsStopOnReverseNeighborLane(reference_line_info, path_data)) {
+    ADEBUG << path_data.path_label()
+           << ": stop at reverse neighbor lane";
+    return false;
+  }
+
   return true;
 }
 
@@ -498,6 +505,87 @@ bool PathAssessmentDecider::IsCollidingWithStaticObstacles(
     }
   }
 
+  return false;
+}
+
+bool PathAssessmentDecider::IsStopOnReverseNeighborLane(
+    const ReferenceLineInfo& reference_line_info,
+    const PathData& path_data) {
+  if (path_data.path_label().find("left") == std::string::npos &&
+      path_data.path_label().find("right") == std::string::npos) {
+    return false;
+  }
+
+  const auto& reference_line = reference_line_info.reference_line();
+  const auto& path_decision = reference_line_info.path_decision();
+  double adc_end_s = reference_line_info.AdcSlBoundary().end_s();
+
+  constexpr double kLookForwardBuffer = 5.0;  // filter out sidepass stop fence
+  double min_stop_line_s = std::numeric_limits<double>::infinity();
+  bool stop_fence_found = false;
+  for (const auto* obstacle : path_decision.obstacles().Items()) {
+    const auto& object_decision = obstacle->LongitudinalDecision();
+    if (!object_decision.has_stop()) {
+      continue;
+    }
+    apollo::common::PointENU stop_point = object_decision.stop().stop_point();
+    common::SLPoint stop_line_sl;
+    reference_line.XYToSL({stop_point.x(), stop_point.y()}, &stop_line_sl);
+    if (stop_line_sl.s() > reference_line.Length() ||
+        stop_line_sl.s() - adc_end_s < kLookForwardBuffer) {
+      continue;
+    }
+    if (stop_line_sl.s() < min_stop_line_s) {
+      min_stop_line_s = stop_line_sl.s();
+      stop_fence_found = true;
+    }
+  }
+  if (!stop_fence_found) {
+    return false;
+  }
+
+  const double check_s = min_stop_line_s;
+  double lane_left_width = 0.0;
+  double lane_right_width = 0.0;
+  if (!reference_line.GetLaneWidth(check_s,
+                                   &lane_left_width,
+                                   &lane_right_width)) {
+    return false;
+  }
+
+  constexpr double kSDelta = 0.3;
+  common::SLPoint path_point_sl;
+  for (const auto& frenet_path_point : path_data.frenet_frame_path()) {
+    if (std::fabs(frenet_path_point.s() - check_s) < kSDelta) {
+      path_point_sl.set_s(frenet_path_point.s());
+      path_point_sl.set_l(frenet_path_point.l());
+    }
+  }
+  ADEBUG << "path_point_sl[" << path_point_sl.s()  << ", " << path_point_sl.l()
+         << "] lane_left_width[" << lane_left_width
+         << "] lane_right_width[" << lane_right_width << "]";
+
+  hdmap::Id neighbor_lane_id;
+  double neighbor_lane_width = 0.0;
+  if (path_data.path_label().find("left") != std::string::npos &&
+      path_point_sl.l() > lane_left_width) {
+    if (reference_line_info.GetNeighborLaneInfo(
+            ReferenceLineInfo::LaneType::LeftReverse, path_point_sl.s(),
+            &neighbor_lane_id, &neighbor_lane_width)) {
+      ADEBUG << "stop path point at LeftReverse neighbor lane["
+             <<  neighbor_lane_id.id() << "]";
+      return true;
+    }
+  } else if (path_data.path_label().find("right") != std::string::npos &&
+      path_point_sl.l() < -lane_right_width) {
+    if (reference_line_info.GetNeighborLaneInfo(
+            ReferenceLineInfo::LaneType::RightReverse, path_point_sl.s(),
+            &neighbor_lane_id, &neighbor_lane_width)) {
+      ADEBUG << "stop path point at RightReverse neighbor lane["
+             <<  neighbor_lane_id.id() << "]";
+      return true;
+    }
+  }
   return false;
 }
 
