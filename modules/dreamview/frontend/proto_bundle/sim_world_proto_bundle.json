@@ -6470,16 +6470,7 @@
               }
             },
             "PlannerPublicRoadConfig": {
-              "fields": {
-                "scenarioType": {
-                  "rule": "repeated",
-                  "type": "ScenarioConfig.ScenarioType",
-                  "id": 1,
-                  "options": {
-                    "packed": false
-                  }
-                }
-              }
+              "fields": {}
             },
             "PlannerNaviConfig": {
               "fields": {
@@ -6773,6 +6764,18 @@
                 }
               }
             },
+            "ParkAndGoStatus": {
+              "fields": {
+                "adcInitPosition": {
+                  "type": "apollo.common.PointENU",
+                  "id": 1
+                },
+                "adcInitHeading": {
+                  "type": "double",
+                  "id": 2
+                }
+              }
+            },
             "PedestrianStatus": {
               "fields": {
                 "stopTime": {
@@ -6972,6 +6975,10 @@
                 "trafficLight": {
                   "type": "TrafficLightStatus",
                   "id": 15
+                },
+                "parkAndGo": {
+                  "type": "ParkAndGoStatus",
+                  "id": 16
                 }
               }
             },

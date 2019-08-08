@@ -129,7 +129,7 @@ export default class TileGround {
                 currentTrafficLightIds.push(id);
             }
         });
-        this.trafficControl.removeTrafficLight(currentTrafficLightIds, scene);
+        this.trafficControl.removeExpiredTrafficLights(currentTrafficLightIds, scene);
 
         const currentStopSignIds = [];
         this.currentStopSign.forEach((item) => {
@@ -138,7 +138,7 @@ export default class TileGround {
                 currentStopSignIds.push(id);
             }
         });
-        this.trafficControl.removeStopSign(currentStopSignIds, scene);
+        this.trafficControl.removeExpiredStopSigns(currentStopSignIds, scene);
     }
 
     updateIndex(hash, newTiles, coordinates, scene) {
