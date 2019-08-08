@@ -1,15 +1,6 @@
 standard_planning_config {
   planner_type: PUBLIC_ROAD
   planner_public_road_config {
-     scenario_type: LANE_FOLLOW
-     scenario_type: BARE_INTERSECTION_UNPROTECTED
-     scenario_type: PULL_OVER
-     scenario_type: STOP_SIGN_UNPROTECTED
-     scenario_type: TRAFFIC_LIGHT_PROTECTED
-     scenario_type: TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN
-     scenario_type: TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN
-     scenario_type: VALET_PARKING
-     scenario_type: PARK_AND_GO
   }
 }
 default_task_config: {
