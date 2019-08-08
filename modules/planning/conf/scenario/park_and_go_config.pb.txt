@@ -24,7 +24,7 @@ stage_config:{
     task_config: {
         task_type: OPEN_SPACE_ROI_DECIDER
         open_space_roi_decider_config {
-            roi_type: PARK_AND_GO_ADJUST
+            roi_type: PARK_AND_GO
         }
     }
     task_config: {

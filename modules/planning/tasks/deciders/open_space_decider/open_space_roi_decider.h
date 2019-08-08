@@ -26,11 +26,13 @@
 #include <vector>
 
 #include "Eigen/Dense"
+
 #include "cyber/common/log.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/map/pnc_map/pnc_map.h"
@@ -65,11 +67,12 @@ class OpenSpaceRoiDecider : public Decider {
   // @brief Set an origin to normlalize the problem for later computation
   void SetOrigin(Frame *const frame,
                  const std::array<common::math::Vec2d, 4> &vertices);
-
+  void SetOriginFromADC(Frame *const frame);
   void SetParkingSpotEndPose(
       Frame *const frame, const std::array<common::math::Vec2d, 4> &vertices);
 
   void SetPullOverSpotEndPose(Frame *const frame);
+  void SetParkAndGoEndPose(Frame *const frame);
 
   // @brief Get road boundaries of both sides
   void GetRoadBoundary(
@@ -116,6 +119,10 @@ class OpenSpaceRoiDecider : public Decider {
   bool GetPullOverBoundary(Frame *const frame,
                            const std::array<common::math::Vec2d, 4> &vertices,
                            const hdmap::Path &nearby_path,
+                           std::vector<std::vector<common::math::Vec2d>>
+                               *const roi_parking_boundary);
+
+  bool GetParkAndGoBoundary(Frame *const frame, const hdmap::Path &nearby_path,
                            std::vector<std::vector<common::math::Vec2d>>
                                *const roi_parking_boundary);
 

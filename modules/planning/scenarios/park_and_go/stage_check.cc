@@ -32,6 +32,7 @@ Stage::StageStatus ParkAndGoStageCheck::Process(
   CHECK_NOTNULL(frame);
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
+  ADCInitStatus(frame);
 
   bool ready_to_cruise =
       scenario::util::CheckADCReadyToCruise(frame, scenario_config_);
@@ -47,7 +48,7 @@ Stage::StageStatus ParkAndGoStageCheck::FinishStage(const bool success) {
   return Stage::FINISHED;
 }
 
-void ADCInitStatus(Frame* frame) {
+void ParkAndGoStageCheck::ADCInitStatus(Frame* frame) {
   auto* park_and_go_status = PlanningContext::Instance()
                                  ->mutable_planning_status()
                                  ->mutable_park_and_go();
