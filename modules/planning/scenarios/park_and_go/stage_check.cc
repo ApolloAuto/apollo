@@ -16,6 +16,9 @@
 
 #include "modules/planning/scenarios/park_and_go/stage_check.h"
 
+#include <string>
+#include <vector>
+
 namespace apollo {
 namespace planning {
 namespace scenario {
@@ -45,9 +48,9 @@ Stage::StageStatus ParkAndGoStageCheck::FinishStage(const bool success) {
 }
 
 void ADCInitStatus(Frame* frame) {
-   auto* park_and_go_status = PlanningContext::Instance()
-                               ->mutable_planning_status()
-                               ->mutable_park_and_go();
+  auto* park_and_go_status = PlanningContext::Instance()
+                                 ->mutable_planning_status()
+                                 ->mutable_park_and_go();
   park_and_go_status->Clear();
   park_and_go_status->mutable_adc_init_position()->set_x(
       common::VehicleStateProvider::Instance()->x());

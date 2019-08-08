@@ -19,9 +19,6 @@
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
 
-#include <string>
-#include <vector>
-
 #include "cyber/common/log.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -57,7 +54,7 @@ class ParkAndGoStageCheck : public Stage {
 
  private:
   bool CheckObstacle(const ReferenceLineInfo& reference_line_info);
-  void ADCInitStatus(Frame *frame);
+  void ADCInitStatus(Frame* frame);
 
  private:
   ScenarioParkAndGoConfig scenario_config_;
