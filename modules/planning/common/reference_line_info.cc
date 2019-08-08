@@ -871,5 +871,34 @@ int ReferenceLineInfo::GetPnCJunction(
   return 0;
 }
 
+std::vector<common::SLPoint>
+ReferenceLineInfo::GetAllStopDecisionSLPoint() const {
+  std::vector<common::SLPoint> result;
+  for (const auto* obstacle : path_decision_.obstacles().Items()) {
+    const auto& object_decision = obstacle->LongitudinalDecision();
+    if (!object_decision.has_stop()) {
+      continue;
+    }
+    apollo::common::PointENU stop_point = object_decision.stop().stop_point();
+    common::SLPoint stop_line_sl;
+    reference_line_.XYToSL({stop_point.x(), stop_point.y()}, &stop_line_sl);
+    if (stop_line_sl.s() <= 0 ||
+        stop_line_sl.s() >= reference_line_.Length()) {
+      continue;
+    }
+    result.push_back(stop_line_sl);
+  }
+
+  // sort by s
+  if (!result.empty()) {
+    std::sort(result.begin(), result.end(),
+              [](const common::SLPoint& a, const common::SLPoint& b) {
+                return a.s() < b.s();
+              });
+  }
+
+  return result;
+}
+
 }  // namespace planning
 }  // namespace apollo
