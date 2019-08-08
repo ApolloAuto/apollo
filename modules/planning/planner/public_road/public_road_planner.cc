@@ -28,17 +28,7 @@ using apollo::common::TrajectoryPoint;
 
 Status PublicRoadPlanner::Init(const PlanningConfig& config) {
   config_ = config;
-  std::set<ScenarioConfig::ScenarioType> supported_scenarios;
-  const auto& public_road_config =
-      config_.standard_planning_config().planner_public_road_config();
-
-  for (int i = 0; i < public_road_config.scenario_type_size(); ++i) {
-    const ScenarioConfig::ScenarioType scenario =
-        public_road_config.scenario_type(i);
-    supported_scenarios.insert(scenario);
-  }
-  scenario_manager_.Init(supported_scenarios);
-
+  scenario_manager_.Init();
   return Status::OK();
 }
 

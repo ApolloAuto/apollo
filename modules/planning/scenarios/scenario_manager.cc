@@ -47,11 +47,9 @@ using apollo::common::VehicleState;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::PathOverlap;
 
-bool ScenarioManager::Init(
-    const std::set<ScenarioConfig::ScenarioType>& supported_scenarios) {
+bool ScenarioManager::Init() {
   RegisterScenarios();
   default_scenario_type_ = ScenarioConfig::LANE_FOLLOW;
-  supported_scenarios_ = supported_scenarios;
   current_scenario_ = CreateScenario(default_scenario_type_);
   return true;
 }
@@ -689,11 +687,6 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
   // VALET_PARKING scenario
   if (scenario_type == default_scenario_type_) {
     scenario_type = SelectValetParkingScenario(frame);
-  }
-
-  // Check if it is supported by confs
-  if (supported_scenarios_.find(scenario_type) == supported_scenarios_.end()) {
-    scenario_type = default_scenario_type_;
   }
 
   ADEBUG << "select scenario: "

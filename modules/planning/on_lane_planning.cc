@@ -578,9 +578,8 @@ bool OnLanePlanning::CheckPlanningConfig(const PlanningConfig& config) {
   if (!config.has_standard_planning_config()) {
     return false;
   }
-  if (config.standard_planning_config()
-          .planner_public_road_config()
-          .scenario_type_size() == 0) {
+  if (!config.standard_planning_config()
+          .has_planner_public_road_config()) {
     return false;
   }
   // TODO(All): check other config params
