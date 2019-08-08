@@ -193,6 +193,7 @@ bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
   const double l_diff = std::fabs(target_sl.l() - adc_position_sl.l());
   const double theta_diff =
       std::fabs(common::math::NormalizeAngle(target_theta - adc_theta));
+
   ADEBUG << "adc_position_s[" << adc_position_sl.s() << "] adc_position_l["
          << adc_position_sl.l() << "] target_s[" << target_sl.s()
          << "] target_l[" << target_sl.l() << "] s_diff[" << s_diff
@@ -218,7 +219,6 @@ bool CheckPullOverPositionByDistance(
       std::fabs(common::math::NormalizeAngle(target_theta - adc_theta));
   ADEBUG << "distance_diff[" << distance_diff << "] theta_diff[" << theta_diff
          << "]";
-
   // check distance/theta diff
   return (distance_diff <= scenario_config.max_distance_error_to_end_point() &&
           theta_diff <= scenario_config.max_theta_error_to_end_point());
@@ -227,7 +227,7 @@ bool CheckPullOverPositionByDistance(
 ParkAndGoStatus CheckADCParkAndGoCruiseCompleted(
     const ReferenceLineInfo& reference_line_info,
     const ScenarioParkAndGoConfig& scenario_config) {
-  const double kLBuffer = 0.3;
+  const double kLBuffer = 0.5;
   const double kHeadingBuffer = 0.1;
   // check if vehicle in reference line
   const auto& reference_line = reference_line_info.reference_line();
