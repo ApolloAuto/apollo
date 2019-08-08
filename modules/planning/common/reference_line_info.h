@@ -227,6 +227,8 @@ class ReferenceLineInfo {
   int GetPnCJunction(const double s,
                      hdmap::PathOverlap* pnc_junction_overlap) const;
 
+  std::vector<common::SLPoint> GetAllStopDecisionSLPoint() const;
+
  private:
   void InitFirstOverlaps();
 

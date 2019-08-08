@@ -516,40 +516,30 @@ bool PathAssessmentDecider::IsStopOnReverseNeighborLane(
     return false;
   }
 
-  const auto& reference_line = reference_line_info.reference_line();
-  const auto& path_decision = reference_line_info.path_decision();
-  double adc_end_s = reference_line_info.AdcSlBoundary().end_s();
-
-  constexpr double kLookForwardBuffer = 5.0;  // filter out sidepass stop fence
-  double min_stop_line_s = std::numeric_limits<double>::infinity();
-  bool stop_fence_found = false;
-  for (const auto* obstacle : path_decision.obstacles().Items()) {
-    const auto& object_decision = obstacle->LongitudinalDecision();
-    if (!object_decision.has_stop()) {
-      continue;
-    }
-    apollo::common::PointENU stop_point = object_decision.stop().stop_point();
-    common::SLPoint stop_line_sl;
-    reference_line.XYToSL({stop_point.x(), stop_point.y()}, &stop_line_sl);
-    if (stop_line_sl.s() > reference_line.Length() ||
-        stop_line_sl.s() - adc_end_s < kLookForwardBuffer) {
-      continue;
-    }
-    if (stop_line_sl.s() < min_stop_line_s) {
-      min_stop_line_s = stop_line_sl.s();
-      stop_fence_found = true;
-    }
-  }
-  if (!stop_fence_found) {
+  std::vector<common::SLPoint> all_stop_point_sl =
+      reference_line_info.GetAllStopDecisionSLPoint();
+  if (all_stop_point_sl.empty()) {
     return false;
   }
 
-  const double check_s = min_stop_line_s;
+  double check_s = 0.0;
+  constexpr double kLookForwardBuffer = 5.0;  // filter out sidepass stop fence
+  const double adc_end_s = reference_line_info.AdcSlBoundary().end_s();
+  for (const auto& stop_point_sl : all_stop_point_sl) {
+    if (stop_point_sl.s() - adc_end_s < kLookForwardBuffer) {
+      continue;
+    }
+    check_s = stop_point_sl.s();
+    break;
+  }
+  if (check_s <= 0.0) {
+    return false;
+  }
+
   double lane_left_width = 0.0;
   double lane_right_width = 0.0;
-  if (!reference_line.GetLaneWidth(check_s,
-                                   &lane_left_width,
-                                   &lane_right_width)) {
+  if (!reference_line_info.reference_line().GetLaneWidth(
+          check_s, &lane_left_width, &lane_right_width)) {
     return false;
   }
 
