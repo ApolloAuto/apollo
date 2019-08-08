@@ -275,7 +275,11 @@ size_t BaseMapNode::LoadBodyBinary(std::vector<unsigned char>* buf) {
     return map_matrix_handler_->LoadBinary(&(*buf)[0], map_matrix_);
   }
   std::vector<unsigned char> buf_uncompressed;
-  compression_strategy_->Decode(buf, &buf_uncompressed);
+  unsigned int ret = compression_strategy_->Decode(buf, &buf_uncompressed);
+  if (ret < 0) {
+    AERROR << "compression Decode error: " << ret;
+    return 0;
+  }
   uncompressed_file_body_size_ = buf_uncompressed.size();
   AINFO << "map node compress ratio: "
         << static_cast<float>(buf->size()) /
