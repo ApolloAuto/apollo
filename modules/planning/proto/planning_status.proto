@@ -66,6 +66,11 @@ message PathDeciderStatus {
   repeated LaneBorrowDirection decided_side_pass_direction = 5;
 }
 
+message ParkAndGoStatus{
+    optional apollo.common.PointENU adc_init_position = 1;
+    optional double adc_init_heading = 2;
+}
+
 message PedestrianStatus {
   repeated StopTime stop_time = 1;
 }
@@ -130,4 +135,5 @@ message PlanningStatus {
   optional SidePassStatus side_pass = 13;
   optional StopSignStatus stop_sign = 14;
   optional TrafficLightStatus traffic_light = 15;
+  optional ParkAndGoStatus park_and_go = 16;
 }
