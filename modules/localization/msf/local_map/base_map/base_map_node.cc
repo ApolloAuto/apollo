@@ -297,7 +297,7 @@ unsigned int BaseMapNode::LoadBodyBinary(std::vector<unsigned char>* buf) {
     return map_matrix_->LoadBinary(&((*buf)[0]));
   }
   std::vector<unsigned char> buf_uncompressed;
-  unsigned int ret = compression_strategy_->Decode(buf, &buf_uncompressed);
+  int ret = compression_strategy_->Decode(buf, &buf_uncompressed);
   if (ret < 0) {
     AERROR << "compression Decode error: " << ret;
     return 0;

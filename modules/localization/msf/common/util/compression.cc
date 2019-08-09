@@ -26,15 +26,15 @@ namespace msf {
 
 const unsigned int ZlibStrategy::zlib_chunk = 16384;
 
-unsigned int ZlibStrategy::Encode(BufferStr* buf, BufferStr* buf_compressed) {
+int ZlibStrategy::Encode(BufferStr* buf, BufferStr* buf_compressed) {
   return ZlibCompress(buf, buf_compressed);
 }
 
-unsigned int ZlibStrategy::Decode(BufferStr* buf, BufferStr* buf_uncompressed) {
+int ZlibStrategy::Decode(BufferStr* buf, BufferStr* buf_uncompressed) {
   return ZlibUncompress(buf, buf_uncompressed);
 }
 
-unsigned int ZlibStrategy::ZlibCompress(BufferStr* src, BufferStr* dst) {
+int ZlibStrategy::ZlibCompress(BufferStr* src, BufferStr* dst) {
   dst->resize(zlib_chunk * 2);
   int ret, flush;
   unsigned have;
@@ -90,7 +90,7 @@ unsigned int ZlibStrategy::ZlibCompress(BufferStr* src, BufferStr* dst) {
   return Z_OK;
 }
 
-unsigned int ZlibStrategy::ZlibUncompress(BufferStr* src, BufferStr* dst) {
+int ZlibStrategy::ZlibUncompress(BufferStr* src, BufferStr* dst) {
   dst->resize(zlib_chunk * 2);
   int ret;
   unsigned have;
