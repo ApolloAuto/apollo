@@ -304,7 +304,7 @@ def validate_record_files(record_files, kword='.record.'):
 
     if len(record_files) == 1 and os.path.isdir(record_files[0]):
         print('Load cyber records from: %s' % record_files[0])
-        for f in os.listdir(record_files[0]):
+        for f in sorted(os.listdir(record_files[0])):
             if kword in f:
                 file_abs_path = os.path.join(record_files[0], f)
                 if validate_record(file_abs_path):
