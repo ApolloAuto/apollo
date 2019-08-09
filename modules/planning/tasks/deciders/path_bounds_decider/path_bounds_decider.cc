@@ -101,8 +101,8 @@ Status PathBoundsDecider::Process(
                                ->mutable_pull_over();
   if (pull_over_status->is_in_pull_over_scenario()) {
     PathBound pullover_path_bound;
-    Status ret = GeneratePullOverPathBound(
-        *frame, *reference_line_info, &pullover_path_bound);
+    Status ret = GeneratePullOverPathBound(*frame, *reference_line_info,
+                                           &pullover_path_bound);
     if (!ret.ok()) {
       AWARN << "Cannot generate a pullover path bound, do regular planning.";
     } else {
@@ -786,13 +786,11 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
         // Borrowing left neighbor lane.
         if (reference_line_info.GetNeighborLaneInfo(
                 ReferenceLineInfo::LaneType::LeftForward, curr_s,
-                &neighbor_lane_id,
-                &curr_neighbor_lane_width)) {
+                &neighbor_lane_id, &curr_neighbor_lane_width)) {
           ADEBUG << "Borrow left forward neighbor lane.";
         } else if (reference_line_info.GetNeighborLaneInfo(
                        ReferenceLineInfo::LaneType::LeftReverse, curr_s,
-                       &neighbor_lane_id,
-                       &curr_neighbor_lane_width)) {
+                       &neighbor_lane_id, &curr_neighbor_lane_width)) {
           borrowing_reverse_lane = true;
           ADEBUG << "Borrow left reverse neighbor lane.";
         } else {
@@ -802,13 +800,11 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
         // Borrowing right neighbor lane.
         if (reference_line_info.GetNeighborLaneInfo(
                 ReferenceLineInfo::LaneType::RightForward, curr_s,
-                &neighbor_lane_id,
-                &curr_neighbor_lane_width)) {
+                &neighbor_lane_id, &curr_neighbor_lane_width)) {
           ADEBUG << "Borrow right forward neighbor lane.";
         } else if (reference_line_info.GetNeighborLaneInfo(
                        ReferenceLineInfo::LaneType::RightReverse, curr_s,
-                       &neighbor_lane_id,
-                       &curr_neighbor_lane_width)) {
+                       &neighbor_lane_id, &curr_neighbor_lane_width)) {
           borrowing_reverse_lane = true;
           ADEBUG << "Borrow right reverse neighbor lane.";
         } else {
