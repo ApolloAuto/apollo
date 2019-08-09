@@ -90,13 +90,13 @@ bool PathDecider::MakeStaticObstacleDecision(
 
   // Go through every obstalce and make decisions.
   for (const auto *obstacle : path_decision->obstacles().Items()) {
-    // - skip decision making for moving vehicles or unknowns.
-    bool is_bycycle_or_pedestrain =
-        (obstacle->Perception().type() ==
-             perception::PerceptionObstacle::BICYCLE ||
-         obstacle->Perception().type() ==
-             perception::PerceptionObstacle::PEDESTRIAN);
-    if (!is_bycycle_or_pedestrain && !obstacle->IsStatic()) {
+    const std::string& obstacle_id = obstacle->Id();
+    const std::string obstacle_type_name =
+        PerceptionObstacle_Type_Name(obstacle->Perception().type());
+    ADEBUG << "obstacle_id[<< " << obstacle_id
+           << "] type[" << obstacle_type_name << "]";
+
+    if (!obstacle->IsStatic() || obstacle->IsVirtual()) {
       continue;
     }
     // - skip decision making for obstacles with IGNORE/STOP decisions already.
