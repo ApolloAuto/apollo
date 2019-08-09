@@ -110,7 +110,7 @@ void MpcOsqp::CalculateEqualityConstraint(std::vector<c_float> *A_data,
                                           std::vector<c_int> *A_indptr) {
   constexpr double kEpsilon = 1e-6;
   // block matrix
-  Eigen::MatrixXd matrix_constraint(
+  Eigen::MatrixXd matrix_constraint = Eigen::MatrixXd::Zero(
       state_dim_ * (horizon_ + 1) + state_dim_ * (horizon_ + 1) +
           control_dim_ * horizon_,
       state_dim_ * (horizon_ + 1) + control_dim_ * horizon_);
@@ -295,6 +295,7 @@ bool MpcOsqp::Solve(std::vector<double> *control_cmd) {
   OSQPSettings *settings = Settings();
   ADEBUG << "OSQP setting done";
   OSQPWorkspace *osqp_workspace = osqp_setup(data, settings);
+  ADEBUG << "OSQP workspace ready";
   osqp_solve(osqp_workspace);
 
   auto status = osqp_workspace->info->status_val;

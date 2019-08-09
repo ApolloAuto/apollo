@@ -117,16 +117,16 @@ TEST(MPCOSQPSolverTest, NonFullRankMatrix) {
   const double max = std::numeric_limits<double>::max();
 
   Eigen::MatrixXd A(states, states);
-  A << 0, 2, 0, 0;
+  A << 0, 1, 0, 0;
 
   Eigen::MatrixXd B(states, controls);
-  B << 0, 3;
+  B << -1, 1;
 
   Eigen::MatrixXd Q(states, states);
-  Q << 0, 0, 0, 100;
+  Q << 100, 0, 0, 0;
 
   Eigen::MatrixXd R(controls, controls);
-  R << 1;
+  R << 0;
 
   Eigen::MatrixXd lower_bound(controls, 1);
   lower_bound << -5;
@@ -135,7 +135,7 @@ TEST(MPCOSQPSolverTest, NonFullRankMatrix) {
   upper_bound << 5;
 
   Eigen::MatrixXd initial_state(states, 1);
-  initial_state << 0, 200;
+  initial_state << 0, 5;
 
   Eigen::MatrixXd reference_state(states, 1);
   reference_state << 0, 0;

@@ -35,7 +35,6 @@
 
 namespace apollo {
 namespace control {
-
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
@@ -376,7 +375,7 @@ Status MPCController::ComputeControlCommand(
   // TODO(SHU): Load status limit from config file
   lower_state_bound << -1.0 * max, -1.0 * max, -1.0 * max, -1.0 * max,
       -1.0 * max, -1.0 * max;
-  lower_state_bound << max, max, max, max, max, max;
+  upper_state_bound << max, max, max, max, max, max;
 
   double mpc_start_timestamp = Clock::NowInSeconds();
   double steer_angle_feedback = 0.0;
@@ -391,8 +390,9 @@ Status MPCController::ComputeControlCommand(
   if (FLAGS_use_osqp_solver) {
     apollo::common::math::MpcOsqp mpc_osqp(
         matrix_ad_, matrix_bd_, matrix_q_updated_, matrix_r_updated_,
-        lower_bound, upper_bound, lower_state_bound, upper_state_bound,
-        reference_state, matrix_state_, mpc_max_iteration_, horizon_, mpc_eps_);
+        matrix_state_, lower_bound, upper_bound, lower_state_bound,
+        upper_state_bound, reference_state, mpc_max_iteration_, horizon_,
+        mpc_eps_);
     if (!mpc_osqp.Solve(&control_cmd)) {
       AERROR << "MPC OSQP solver failed";
     } else {
