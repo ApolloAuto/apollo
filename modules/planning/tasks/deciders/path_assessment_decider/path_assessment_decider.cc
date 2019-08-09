@@ -337,8 +337,7 @@ bool PathAssessmentDecider::IsValidRegularPath(
   }
 
   if (IsStopOnReverseNeighborLane(reference_line_info, path_data)) {
-    ADEBUG << path_data.path_label()
-           << ": stop at reverse neighbor lane";
+    ADEBUG << path_data.path_label() << ": stop at reverse neighbor lane";
     return false;
   }
 
@@ -509,8 +508,7 @@ bool PathAssessmentDecider::IsCollidingWithStaticObstacles(
 }
 
 bool PathAssessmentDecider::IsStopOnReverseNeighborLane(
-    const ReferenceLineInfo& reference_line_info,
-    const PathData& path_data) {
+    const ReferenceLineInfo& reference_line_info, const PathData& path_data) {
   if (path_data.path_label().find("left") == std::string::npos &&
       path_data.path_label().find("right") == std::string::npos) {
     return false;
@@ -551,9 +549,9 @@ bool PathAssessmentDecider::IsStopOnReverseNeighborLane(
       path_point_sl.set_l(frenet_path_point.l());
     }
   }
-  ADEBUG << "path_point_sl[" << path_point_sl.s()  << ", " << path_point_sl.l()
-         << "] lane_left_width[" << lane_left_width
-         << "] lane_right_width[" << lane_right_width << "]";
+  ADEBUG << "path_point_sl[" << path_point_sl.s() << ", " << path_point_sl.l()
+         << "] lane_left_width[" << lane_left_width << "] lane_right_width["
+         << lane_right_width << "]";
 
   hdmap::Id neighbor_lane_id;
   double neighbor_lane_width = 0.0;
@@ -563,16 +561,16 @@ bool PathAssessmentDecider::IsStopOnReverseNeighborLane(
             ReferenceLineInfo::LaneType::LeftReverse, path_point_sl.s(),
             &neighbor_lane_id, &neighbor_lane_width)) {
       ADEBUG << "stop path point at LeftReverse neighbor lane["
-             <<  neighbor_lane_id.id() << "]";
+             << neighbor_lane_id.id() << "]";
       return true;
     }
   } else if (path_data.path_label().find("right") != std::string::npos &&
-      path_point_sl.l() < -lane_right_width) {
+             path_point_sl.l() < -lane_right_width) {
     if (reference_line_info.GetNeighborLaneInfo(
             ReferenceLineInfo::LaneType::RightReverse, path_point_sl.s(),
             &neighbor_lane_id, &neighbor_lane_width)) {
       ADEBUG << "stop path point at RightReverse neighbor lane["
-             <<  neighbor_lane_id.id() << "]";
+             << neighbor_lane_id.id() << "]";
       return true;
     }
   }

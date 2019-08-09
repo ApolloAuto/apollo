@@ -123,8 +123,8 @@ class OpenSpaceRoiDecider : public Decider {
                                *const roi_parking_boundary);
 
   bool GetParkAndGoBoundary(Frame *const frame, const hdmap::Path &nearby_path,
-                           std::vector<std::vector<common::math::Vec2d>>
-                               *const roi_parking_boundary);
+                            std::vector<std::vector<common::math::Vec2d>>
+                                *const roi_parking_boundary);
 
   // @brief search target parking spot on the path by vehicle location, if
   // no return a nullptr in target_parking_spot

@@ -233,8 +233,8 @@ bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
         cr->Stop();
         while (!cr->Acquire()) {
           std::this_thread::sleep_for(std::chrono::milliseconds(1));
-          AINFO_EVERY(1000) << "waiting for task "
-                            << cr->name() << " completion";
+          AINFO_EVERY(1000)
+              << "waiting for task " << cr->name() << " completion";
         }
         croutines.erase(it);
         cr->Release();
