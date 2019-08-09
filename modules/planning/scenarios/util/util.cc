@@ -193,6 +193,7 @@ bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
   const double l_diff = std::fabs(target_sl.l() - adc_position_sl.l());
   const double theta_diff =
       std::fabs(common::math::NormalizeAngle(target_theta - adc_theta));
+
   ADEBUG << "adc_position_s[" << adc_position_sl.s() << "] adc_position_l["
          << adc_position_sl.l() << "] target_s[" << target_sl.s()
          << "] target_l[" << target_sl.l() << "] s_diff[" << s_diff
@@ -218,7 +219,6 @@ bool CheckPullOverPositionByDistance(
       std::fabs(common::math::NormalizeAngle(target_theta - adc_theta));
   ADEBUG << "distance_diff[" << distance_diff << "] theta_diff[" << theta_diff
          << "]";
-
   // check distance/theta diff
   return (distance_diff <= scenario_config.max_distance_error_to_end_point() &&
           theta_diff <= scenario_config.max_theta_error_to_end_point());
@@ -227,8 +227,8 @@ bool CheckPullOverPositionByDistance(
 ParkAndGoStatus CheckADCParkAndGoCruiseCompleted(
     const ReferenceLineInfo& reference_line_info,
     const ScenarioParkAndGoConfig& scenario_config) {
-  const double kLBuffer = 0.1;
-  const double kHeadingBuffer = 0.05;
+  const double kLBuffer = 0.5;
+  const double kHeadingBuffer = 0.1;
   // check if vehicle in reference line
   const auto& reference_line = reference_line_info.reference_line();
   // get vehicle s,l info
@@ -243,8 +243,12 @@ ParkAndGoStatus CheckADCParkAndGoCruiseCompleted(
   const auto reference_point =
       reference_line.GetReferencePoint(adc_position_sl.s());
   const auto path_point = reference_point.ToPathPoint(adc_position_sl.s());
-  if (std::fabs(adc_position_sl.l() < kLBuffer) &&
+  ADEBUG << "adc_position_sl.l():[" << adc_position_sl.l() << "]";
+  ADEBUG << "adc_heading - path_point.theta():[" << adc_heading << "]"
+         << "[" << path_point.theta() << "]";
+  if (std::fabs(adc_position_sl.l()) < kLBuffer &&
       std::fabs(adc_heading - path_point.theta()) < kHeadingBuffer) {
+    ADEBUG << "cruise completed";
     return CRUISE_COMPLETE;
   }
   return CRUISING;
@@ -259,11 +263,11 @@ bool CheckADCReadyToCruise(Frame* frame,
       common::VehicleStateProvider::Instance()->heading();
   const ReferenceLineInfo& reference_line_info =
       frame->reference_line_info().front();
-  bool no_near_front_obstacle = CheckADCSurroundObstacles(
+  bool is_near_front_obstacle = CheckADCSurroundObstacles(
       adc_position, adc_heading, frame, scenario_config);
   bool heading_align_w_reference_line = CheckADCHeading(
       adc_position, adc_heading, reference_line_info, scenario_config);
-  if (no_near_front_obstacle && heading_align_w_reference_line) {
+  if (!is_near_front_obstacle && heading_align_w_reference_line) {
     return true;
   }
   return false;

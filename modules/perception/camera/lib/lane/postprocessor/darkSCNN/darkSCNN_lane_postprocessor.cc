@@ -190,8 +190,9 @@ bool DarkSCNNLanePostprocessor::Process2D(
           if (std::fabs(xy_p(2)) < 1e-6) continue;
           xy_point << xy_p(0) / xy_p(2), xy_p(1) / xy_p(2);
           // Filter out lane line points
-          if (xy_point(0) < 0.0 || xy_point(0) > 300.0 ||
-              std::abs(xy_point(1)) > 25.0) {
+          if (xy_point(0) < 0.0 ||  // This condition is only for front camera
+              xy_point(0) > max_longitudinal_distance_ ||
+              std::abs(xy_point(1)) > 30.0) {
             continue;
           }
           uv_point << static_cast<float>(x * roi_width_ / lane_map.cols),
@@ -228,7 +229,6 @@ bool DarkSCNNLanePostprocessor::Process2D(
     // Solve linear system to estimate polynomial coefficients
     if (RansacFitting(xy_points[i], &selected_xy_points, &coeff, 200,
                       static_cast<int>(minNumPoints_), 0.1f)) {
-      // if (PolyFit(xy_points[i], max_poly_order, &coeff, true)) {
       coeffs[i] = coeff;
 
       xy_points[i].clear();

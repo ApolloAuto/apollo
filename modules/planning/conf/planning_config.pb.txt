@@ -1,14 +1,6 @@
 standard_planning_config {
   planner_type: PUBLIC_ROAD
   planner_public_road_config {
-     scenario_type: LANE_FOLLOW
-     scenario_type: BARE_INTERSECTION_UNPROTECTED
-     scenario_type: PULL_OVER
-     scenario_type: STOP_SIGN_UNPROTECTED
-     scenario_type: TRAFFIC_LIGHT_PROTECTED
-     scenario_type: TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN
-     scenario_type: TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN
-     scenario_type: VALET_PARKING
   }
 }
 default_task_config: {
@@ -218,7 +210,7 @@ default_task_config: {
           reanchoring_trails_num: 50
           reanchoring_pos_stddev: 0.25
           reanchoring_length_stddev: 1.0
-          estimate_bound: true
+          estimate_bound: false
           default_bound: 2.0
           vehicle_shortest_dimension: 1.04
           fem_pos_deviation_smoother_config {
@@ -241,7 +233,7 @@ default_task_config: {
             ref_s_weight: 10.0
             ref_v_weight: 0.0
           }
-          collision_decrease_ratio: 0.8
+          collision_decrease_ratio: 0.0
           max_forward_v: 1.0
           max_reverse_v: 1.0
           max_forward_acc: 0.5

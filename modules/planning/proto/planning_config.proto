@@ -255,8 +255,6 @@ message ScenarioConfig {
 }
 
 message PlannerPublicRoadConfig {
-  // supported scenario types
-  repeated ScenarioConfig.ScenarioType scenario_type = 1;
 }
 
 message PlannerNaviConfig {

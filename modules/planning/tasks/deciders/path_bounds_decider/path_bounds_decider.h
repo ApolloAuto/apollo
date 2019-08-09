@@ -83,9 +83,9 @@ class PathBoundsDecider : public Decider {
    * @param lane_borrow_info: which lane to borrow.
    * @param The generated regular path_boundary, if there is one.
    * @param The blocking obstacle's id. If none, then it's not modified.
-   * @return A failure message. If succeeded, return "" (empty string).
+   * @return common::Status
    */
-  std::string GenerateRegularPathBound(
+  common::Status GenerateRegularPathBound(
       const ReferenceLineInfo& reference_line_info,
       const LaneBorrowInfo& lane_borrow_info,
       std::vector<std::tuple<double, double, double>>* const path_bound,
@@ -105,13 +105,13 @@ class PathBoundsDecider : public Decider {
    *   doesn't consider any lane-borrowing.
    * @param reference_line_info
    * @param The generated fallback path_boundary, if there is one.
-   * @return A failure message. If succeeded, return "" (empty string).
+   * @return common::Status
    */
-  std::string GenerateFallbackPathBound(
+  common::Status GenerateFallbackPathBound(
       const ReferenceLineInfo& reference_line_info,
       std::vector<std::tuple<double, double, double>>* const path_bound);
 
-  std::string GeneratePullOverPathBound(
+  common::Status GeneratePullOverPathBound(
       const Frame& frame, const ReferenceLineInfo& reference_line_info,
       std::vector<std::tuple<double, double, double>>* const path_bound);
 

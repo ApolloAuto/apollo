@@ -270,7 +270,17 @@ export default class TrafficControl {
         });
     }
 
-    removeTrafficLight(currentItemIds, scene) {
+    removeAllTrafficLights(scene) {
+        if (!this.trafficLight) {
+            return;
+        }
+        for (const id in this.trafficLight) {
+            TrafficControl.removeMapObject(this.trafficLight[id], scene);
+        }
+        this.trafficLight = {};
+    }
+
+    removeExpiredTrafficLights(currentItemIds, scene) {
         if (!this.trafficLight) {
             return;
         }
@@ -288,7 +298,17 @@ export default class TrafficControl {
         this.trafficLight = currentItems;
     }
 
-    removeStopSign(currentItemIds, scene) {
+    removeAllStopSigns(scene) {
+        if (!this.stopSign) {
+            return;
+        }
+        for (const id in this.stopSign) {
+            TrafficControl.removeMapObject(this.stopSign[id], scene);
+        }
+        this.stopSign = {};
+    }
+
+    removeExpiredStopSigns(currentItemIds, scene) {
         if (!this.stopSign) {
             return;
         }

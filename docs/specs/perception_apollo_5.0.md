@@ -27,7 +27,7 @@ To learn more about individual sub-modules, please visit [Perception - Apollo 3.
 
 The Apollo platform's perception module actively depended on Caffe for its modelling, but will now support PaddlePaddle, an open source platform developed by Baidu to support its various deep learning projects. 
 Some features include:
-- **PCNNSeg**: Object detection from 128-channel lidar or a fusion of three 16-channel lidars using PaddlePaddle
+- **PCNNSeg**: Object detection from 128-channel lidar or a fusion of three 16-channel lidars using PaddlePaddle
 - **PCameraDetector**: Object detection from a camera
 - **PlaneDetector**: Lane line detection from a camera
 

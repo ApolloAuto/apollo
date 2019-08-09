@@ -8,9 +8,8 @@ message OpenSpaceRoiDeciderConfig{
     NOT_DEFINED = 0;
     PARKING = 1;
     PULL_OVER = 2;
-    PARK_AND_GO_ADJUST = 3;
-    PARK_AND_GO_CRUISE = 4;
-    NARROW_STREET_U_TURN = 5;
+    PARK_AND_GO = 3;
+    NARROW_STREET_U_TURN = 4;
   }
   optional RoiType roi_type = 1;
   // longitudinal range of parking roi

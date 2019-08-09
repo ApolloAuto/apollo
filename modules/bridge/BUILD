@@ -10,6 +10,7 @@ cc_library(
         "//external:gflags",
         "//modules/bridge/common:bridge_gflags",
         "//modules/bridge/common:bridge_header",
+        "//modules/bridge/common:bridge_proto_diser_buf_factory",
         "//modules/bridge/common:bridge_proto_diserialized_buf",
         "//modules/bridge/common:bridge_proto_serialized_buf",
         "//modules/bridge/common:macro",
@@ -53,6 +54,21 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "udp_bridge_multi_receiver",
+    srcs = [
+        "udp_bridge_multi_receiver_component.cc",
+    ],
+    hdrs = [
+        "udp_bridge_multi_receiver_component.h",
+    ],
+    copts = ['-DMODULE_NAME=\\"bridge\\"'],
+    deps = [
+        ":udp_bridge",
+        "//modules/bridge/common:udp_listener",
+    ],
+)
+
 cc_binary(
     name = "libudp_bridge_sender_component.so",
     linkshared = True,
@@ -65,6 +81,13 @@ cc_binary(
     linkshared = True,
     linkstatic = False,
     deps = [":udp_bridge_receiver"],
+)
+
+cc_binary(
+    name = "libudp_bridge_multi_receiver_component.so",
+    linkshared = True,
+    linkstatic = False,
+    deps = [":udp_bridge_multi_receiver"],
 )
 
 cc_test(

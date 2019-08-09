@@ -17,12 +17,13 @@
 
 #include <Eigen/Core>
 #include <vector>
-#include "modules/localization/msf/local_map/base_map/base_map_node.h"
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_matrix.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_node.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_matrix.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 class PyramidMapNode : public BaseMapNode {
  public:
@@ -137,6 +138,7 @@ class PyramidMapNode : public BaseMapNode {
   std::vector<float> resolutions_mr_;
 };
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

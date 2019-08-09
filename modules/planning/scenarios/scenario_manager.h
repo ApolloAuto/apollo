@@ -33,7 +33,7 @@ class ScenarioManager final {
  public:
   ScenarioManager() = default;
 
-  bool Init(const std::set<ScenarioConfig::ScenarioType>& supported_scenarios);
+  bool Init();
 
   Scenario* mutable_scenario() { return current_scenario_.get(); }
 
@@ -67,16 +67,6 @@ class ScenarioManager final {
 
   ScenarioConfig::ScenarioType SelectParkAndGoScenario(const Frame& frame);
 
-  // functions for scenario voter implementation
-  // do NOT delete the code yet
-  // void ScenarioSelfVote(const common::TrajectoryPoint& ego_point,
-  //                       const Frame& frame);
-  // bool ReuseCurrentScenario(const common::TrajectoryPoint& ego_point,
-  //                           const Frame& frame);
-  // bool SelectScenario(const ScenarioConfig::ScenarioType type,
-  //                     const common::TrajectoryPoint& ego_point,
-  //                     const Frame& frame);
-
   void ScenarioDispatch(const common::TrajectoryPoint& ego_point,
                         const Frame& frame);
 
@@ -107,7 +97,6 @@ class ScenarioManager final {
       config_map_;
   std::unique_ptr<Scenario> current_scenario_;
   ScenarioConfig::ScenarioType default_scenario_type_;
-  std::set<ScenarioConfig::ScenarioType> supported_scenarios_;
   ScenarioContext scenario_context_;
   std::unordered_map<ReferenceLineInfo::OverlapType, hdmap::PathOverlap,
                      std::hash<int>>

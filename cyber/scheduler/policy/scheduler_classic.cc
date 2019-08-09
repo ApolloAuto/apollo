@@ -22,7 +22,6 @@
 
 #include "cyber/common/environment.h"
 #include "cyber/common/file.h"
-#include "cyber/event/perf_event_cache.h"
 #include "cyber/scheduler/policy/classic_context.h"
 #include "cyber/scheduler/processor.h"
 
@@ -38,8 +37,6 @@ using apollo::cyber::common::GlobalData;
 using apollo::cyber::common::PathExists;
 using apollo::cyber::common::WorkRoot;
 using apollo::cyber::croutine::RoutineState;
-using apollo::cyber::event::PerfEventCache;
-using apollo::cyber::event::SchedPerf;
 
 SchedulerClassic::SchedulerClassic() {
   std::string conf("conf/");
@@ -158,8 +155,6 @@ bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
         .emplace_back(cr);
   }
 
-  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::RT_CREATE, cr->id(),
-                                            cr->processor_id());
   ClassicContext::Notify(cr->group_name());
   return true;
 }

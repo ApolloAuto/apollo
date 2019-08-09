@@ -13,16 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_node.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_node.h"
 
+#include <memory>
 #include <vector>
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_matrix.h"
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_matrix_handler.h"
-#include "modules/localization/msf/local_map/pyramid_map/pyramid_map_node_config.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_matrix.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_matrix_handler.h"
+#include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_node_config.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 PyramidMapNode::PyramidMapNode() {}
 
@@ -497,6 +499,7 @@ double PyramidMapNode::ComputeMeanIntensity(unsigned int level) {
   return map_matrix->ComputeMeanIntensity(level);
 }
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

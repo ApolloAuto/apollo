@@ -29,6 +29,7 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::VehicleConfigHelper;
 using apollo::common::math::Box2d;
 using apollo::common::math::CrossProd;
 using apollo::common::math::Polygon2d;
@@ -110,27 +111,16 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
-  } else if (roi_type == OpenSpaceRoiDeciderConfig::PARK_AND_GO_ADJUST) {
-    // Get parking spot boundary
-    // TODO(SHU): add implementation
-    bool get_parking_spot = true;
-    if (!get_parking_spot) {
-      const std::string msg = "Fail to get current parking boundary from map";
-      AERROR << msg;
-      return Status(ErrorCode::PLANNING_ERROR, msg);
-    }
+  } else if (roi_type == OpenSpaceRoiDeciderConfig::PARK_AND_GO) {
+    nearby_path =
+        frame->reference_line_info().front().reference_line().GetMapPath();
 
-    SetOrigin(frame, spot_vertices);
+    SetOriginFromADC(frame);
 
-    // set ParkAndGo adjust end pose
-    // TODO(SHU): add implementation
-    // SetParkAndGoAdjustEndPose(frame);
+    SetParkAndGoEndPose(frame);
 
-    // get ParkAndGo adjust Boundary
-    // TODO(SHU): add implementation
-    bool get_adjust_boundary = true;
-    if (!get_adjust_boundary) {
-      const std::string msg = "Fail to get adjust boundary from map";
+    if (!GetParkAndGoBoundary(frame, nearby_path, &roi_boundary)) {
+      const std::string msg = "Fail to get park and go boundary from map";
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
@@ -148,6 +138,34 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
   }
 
   return Status::OK();
+}
+
+// get origin from ADC
+void OpenSpaceRoiDecider::SetOriginFromADC(Frame *const frame) {
+  // get ADC box
+  const auto &park_and_go_status =
+      PlanningContext::Instance()->planning_status().park_and_go();
+  const double adc_init_x = park_and_go_status.adc_init_position().x();
+  const double adc_init_y = park_and_go_status.adc_init_position().y();
+  const double adc_init_heading = park_and_go_status.adc_init_heading();
+  common::math::Vec2d adc_init_position = {adc_init_x, adc_init_y};
+  const auto &vehicle_config =
+      common::VehicleConfigHelper::Instance()->GetConfig();
+  const double adc_length = vehicle_config.vehicle_param().length();
+  const double adc_width = vehicle_config.vehicle_param().width();
+  // ADC box
+  Box2d adc_box(adc_init_position, adc_init_heading, adc_length, adc_width);
+  // get vertices from ADC box
+  std::vector<common::math::Vec2d> adc_corners;
+  adc_box.GetAllCorners(&adc_corners);
+  auto left_top = adc_corners[0];
+  auto right_top = adc_corners[3];
+  // rotate the points to have the lane to be horizontal to x axis positive
+  // direction and scale them base on the origin point
+  Vec2d heading_vec = right_top - left_top;
+  frame->mutable_open_space_info()->set_origin_heading(heading_vec.Angle());
+  frame->mutable_open_space_info()->mutable_origin_point()->set_x(left_top.x());
+  frame->mutable_open_space_info()->mutable_origin_point()->set_y(left_top.y());
 }
 
 void OpenSpaceRoiDecider::SetOrigin(
@@ -255,6 +273,49 @@ void OpenSpaceRoiDecider::SetPullOverSpotEndPose(Frame *const frame) {
   end_pose->push_back(0.0);
 }
 
+void OpenSpaceRoiDecider::SetParkAndGoEndPose(Frame *const frame) {
+  const double kSTargetBuffer = 5.0;
+  const double kSpeedRatio = 0.8;  // after adjust speed is 80% of speed limit
+  // get vehicle current location
+  const ReferenceLineInfo &reference_line_info =
+      frame->reference_line_info().front();
+  const auto &reference_line = reference_line_info.reference_line();
+  // get vehicle s,l info
+  const auto &park_and_go_status =
+      PlanningContext::Instance()->planning_status().park_and_go();
+  const double adc_init_x = park_and_go_status.adc_init_position().x();
+  const double adc_init_y = park_and_go_status.adc_init_position().y();
+
+  const common::math::Vec2d adc_position = {adc_init_x, adc_init_y};
+  common::SLPoint adc_position_sl;
+  reference_line.XYToSL(adc_position, &adc_position_sl);
+
+  // target is at reference line
+  const double target_s = adc_position_sl.s() + kSTargetBuffer;
+  const auto reference_point =
+      reference_line.GetReferencePoint(adc_position_sl.s() + kSTargetBuffer);
+  const double target_x = reference_point.x();
+  const double target_y = reference_point.y();
+  double target_theta = reference_point.heading();
+
+  // Normalize according to origin_point and origin_heading
+  const auto &origin_point = frame->open_space_info().origin_point();
+  const auto &origin_heading = frame->open_space_info().origin_heading();
+  Vec2d center(target_x, target_y);
+  center -= origin_point;
+  center.SelfRotate(-origin_heading);
+  target_theta = common::math::NormalizeAngle(target_theta - origin_heading);
+
+  auto *end_pose =
+      frame->mutable_open_space_info()->mutable_open_space_end_pose();
+  end_pose->push_back(center.x());
+  end_pose->push_back(center.y());
+  end_pose->push_back(target_theta);
+  // end pose velocity set to be speed limit
+  double target_speed = reference_line.GetSpeedLimitFromS(target_s);
+  end_pose->push_back(kSpeedRatio * target_speed);
+}
+
 void OpenSpaceRoiDecider::GetRoadBoundary(
     const hdmap::Path &nearby_path, const double center_line_s,
     const common::math::Vec2d &origin_point, const double origin_heading,
@@ -329,7 +390,7 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
     right_lane_boundary->at(i) -= origin_point;
     right_lane_boundary->at(i).SelfRotate(-origin_heading);
   }
-}  // namespace planning
+}
 
 void OpenSpaceRoiDecider::AddBoundaryKeyPoint(
     const hdmap::Path &nearby_path, const double check_point_s,
@@ -734,6 +795,114 @@ bool OpenSpaceRoiDecider::GetPullOverBoundary(
   right_top.SelfRotate(-origin_heading);
   right_down -= origin_point;
   right_down.SelfRotate(-origin_heading);
+
+  const double center_line_s = (left_top_s + right_top_s) / 2.0;
+  std::vector<Vec2d> left_lane_boundary;
+  std::vector<Vec2d> right_lane_boundary;
+  std::vector<Vec2d> center_lane_boundary_left;
+  std::vector<Vec2d> center_lane_boundary_right;
+  std::vector<double> center_lane_s_left;
+  std::vector<double> center_lane_s_right;
+  std::vector<double> left_lane_road_width;
+  std::vector<double> right_lane_road_width;
+
+  GetRoadBoundary(nearby_path, center_line_s, origin_point, origin_heading,
+                  &left_lane_boundary, &right_lane_boundary,
+                  &center_lane_boundary_left, &center_lane_boundary_right,
+                  &center_lane_s_left, &center_lane_s_right,
+                  &left_lane_road_width, &right_lane_road_width);
+
+  // Load boundary as line segments in counter-clockwise order
+  std::reverse(left_lane_boundary.begin(), left_lane_boundary.end());
+
+  std::vector<Vec2d> boundary_points;
+  std::copy(right_lane_boundary.begin(), right_lane_boundary.end(),
+            std::back_inserter(boundary_points));
+  std::copy(left_lane_boundary.begin(), left_lane_boundary.end(),
+            std::back_inserter(boundary_points));
+
+  size_t right_lane_boundary_last_index = right_lane_boundary.size() - 1;
+  for (size_t i = 0; i < right_lane_boundary_last_index; i++) {
+    std::vector<Vec2d> segment{right_lane_boundary[i],
+                               right_lane_boundary[i + 1]};
+    roi_parking_boundary->push_back(segment);
+  }
+
+  size_t left_lane_boundary_last_index = left_lane_boundary.size() - 1;
+  for (size_t i = left_lane_boundary_last_index; i > 0; i--) {
+    std::vector<Vec2d> segment{left_lane_boundary[i],
+                               left_lane_boundary[i - 1]};
+    roi_parking_boundary->push_back(segment);
+  }
+
+  // Fuse line segments into convex contraints
+  if (!FuseLineSegments(roi_parking_boundary)) {
+    return false;
+  }
+  // Get xy boundary
+  auto xminmax = std::minmax_element(
+      boundary_points.begin(), boundary_points.end(),
+      [](const Vec2d &a, const Vec2d &b) { return a.x() < b.x(); });
+  auto yminmax = std::minmax_element(
+      boundary_points.begin(), boundary_points.end(),
+      [](const Vec2d &a, const Vec2d &b) { return a.y() < b.y(); });
+  std::vector<double> ROI_xy_boundary{xminmax.first->x(), xminmax.second->x(),
+                                      yminmax.first->y(), yminmax.second->y()};
+  auto *xy_boundary =
+      frame->mutable_open_space_info()->mutable_ROI_xy_boundary();
+  xy_boundary->assign(ROI_xy_boundary.begin(), ROI_xy_boundary.end());
+
+  Vec2d vehicle_xy = Vec2d(vehicle_state_.x(), vehicle_state_.y());
+  vehicle_xy -= origin_point;
+  vehicle_xy.SelfRotate(-origin_heading);
+  if (vehicle_xy.x() < ROI_xy_boundary[0] ||
+      vehicle_xy.x() > ROI_xy_boundary[1] ||
+      vehicle_xy.y() < ROI_xy_boundary[2] ||
+      vehicle_xy.y() > ROI_xy_boundary[3]) {
+    AERROR << "vehicle outside of xy boundary of parking ROI";
+    return false;
+  }
+  return true;
+}
+
+bool OpenSpaceRoiDecider::GetParkAndGoBoundary(
+    Frame *const frame, const hdmap::Path &nearby_path,
+    std::vector<std::vector<common::math::Vec2d>> *const roi_parking_boundary) {
+  const auto &park_and_go_status =
+      PlanningContext::Instance()->planning_status().park_and_go();
+  const double adc_init_x = park_and_go_status.adc_init_position().x();
+  const double adc_init_y = park_and_go_status.adc_init_position().y();
+  const double adc_init_heading = park_and_go_status.adc_init_heading();
+  common::math::Vec2d adc_init_position = {adc_init_x, adc_init_y};
+  const auto &vehicle_config =
+      common::VehicleConfigHelper::Instance()->GetConfig();
+  const double adc_length = vehicle_config.vehicle_param().length();
+  const double adc_width = vehicle_config.vehicle_param().width();
+  // ADC box
+  Box2d adc_box(adc_init_position, adc_init_heading, adc_length, adc_width);
+  // get vertices from ADC box
+  std::vector<common::math::Vec2d> adc_corners;
+  adc_box.GetAllCorners(&adc_corners);
+  auto left_top = adc_corners[0];
+  auto right_top = adc_corners[3];
+
+  const auto &origin_point = frame->open_space_info().origin_point();
+  const auto &origin_heading = frame->open_space_info().origin_heading();
+
+  double left_top_s = 0.0;
+  double left_top_l = 0.0;
+  double right_top_s = 0.0;
+  double right_top_l = 0.0;
+  if (!(nearby_path.GetProjection(left_top, &left_top_s, &left_top_l) &&
+        nearby_path.GetProjection(right_top, &right_top_s, &right_top_l))) {
+    AERROR << "fail to get parking spot points' projections on reference line";
+    return false;
+  }
+
+  left_top -= origin_point;
+  left_top.SelfRotate(-origin_heading);
+  right_top -= origin_point;
+  right_top.SelfRotate(-origin_heading);
 
   const double center_line_s = (left_top_s + right_top_s) / 2.0;
   std::vector<Vec2d> left_lane_boundary;

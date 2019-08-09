@@ -17,9 +17,19 @@
 #pragma once
 
 #include "modules/planning/proto/planning_config.pb.h"
-
 #include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
+
+#include "cyber/common/log.h"
+#include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/math/vec2d.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/planning/common/frame.h"
+#include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/util/common.h"
 #include "modules/planning/scenarios/stage.h"
+#include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -44,6 +54,7 @@ class ParkAndGoStageCheck : public Stage {
 
  private:
   bool CheckObstacle(const ReferenceLineInfo& reference_line_info);
+  void ADCInitStatus(Frame* frame);
 
  private:
   ScenarioParkAndGoConfig scenario_config_;

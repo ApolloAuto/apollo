@@ -47,11 +47,9 @@ using apollo::common::VehicleState;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::PathOverlap;
 
-bool ScenarioManager::Init(
-    const std::set<ScenarioConfig::ScenarioType>& supported_scenarios) {
+bool ScenarioManager::Init() {
   RegisterScenarios();
   default_scenario_type_ = ScenarioConfig::LANE_FOLLOW;
-  supported_scenarios_ = supported_scenarios;
   current_scenario_ = CreateScenario(default_scenario_type_);
   return true;
 }
@@ -552,42 +550,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectParkAndGoScenario(
   return default_scenario_type_;
 }
 
-/*
- * @brief: function called by ScenarioSelfVote(),
- *         which selects scenario based on vote from each individual scenario.
- *         not in use now. but please do NOT delete the code yet
- */
-/*
-bool ScenarioManager::ReuseCurrentScenario(
-   const common::TrajectoryPoint& ego_point, const Frame& frame) {
- return current_scenario_->IsTransferable(*current_scenario_, frame);
-}
-*/
-
-/*
- * @brief: function called by ScenarioSelfVote(),
- *         which selects scenario based on vote from each individual scenario.
- *         not in use now. but please do NOT delete the code yet
- */
-/*
-bool ScenarioManager::SelectScenario(
-    const ScenarioConfig::ScenarioType type,
-    const common::TrajectoryPoint& ego_point,
-    const Frame& frame) {
-  if (current_scenario_->scenario_type() == type) {
-    return true;
-  }
-
-  auto scenario = CreateScenario(type);
-  if (scenario->IsTransferable(*current_scenario_, frame)) {
-    AINFO << "switch to scenario: " << scenario->Name();
-    current_scenario_ = std::move(scenario);
-    return true;
-  }
-  return false;
-}
-*/
-
 void ScenarioManager::Observe(const Frame& frame) {
   // init first_encountered_overlap_map_
   first_encountered_overlap_map_.clear();
@@ -727,11 +689,6 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
     scenario_type = SelectValetParkingScenario(frame);
   }
 
-  // Check if it is supported by confs
-  if (supported_scenarios_.find(scenario_type) == supported_scenarios_.end()) {
-    scenario_type = default_scenario_type_;
-  }
-
   ADEBUG << "select scenario: "
          << ScenarioConfig::ScenarioType_Name(scenario_type);
 
@@ -742,115 +699,6 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
     current_scenario_ = CreateScenario(scenario_type);
   }
 }
-
-/*
- * @brief: select scenario based on vote from each individual scenario
- *         not in use now. but please do NOT delete the code yet
- */
-/*
-void ScenarioManager::ScenarioSelfVote(const common::TrajectoryPoint& ego_point,
-                                       const Frame& frame) {
-  CHECK(!frame.reference_line_info().empty());
-
-  const auto& reference_line_info = frame.reference_line_info().front();
-
-  // change lane case, currently default to LANE_FOLLOW in change lane case.
-  // TODO(all) implement change lane scenario.
-  // SelectChangeLaneScenario(reference_line_info);
-
-  // non change lane case
-  std::set<ScenarioConfig::ScenarioType> rejected_scenarios;
-  if (current_scenario_->scenario_type() != default_scenario_type_ &&
-      ReuseCurrentScenario(ego_point, frame)) {
-    ADEBUG << "reuse current scenario: " << current_scenario_->Name();
-    return;
-  }
-  rejected_scenarios.insert(current_scenario_->scenario_type());
-
-  std::vector<ScenarioConfig::ScenarioType> preferred_scenarios;
-  preferred_scenarios.push_back(ScenarioConfig::LANE_FOLLOW);
-
-  const auto& first_overlaps = reference_line_info.FirstEncounteredOverlaps();
-  for (const auto& overlap : first_overlaps) {
-    // side_pass
-    if (overlap.first == ReferenceLineInfo::OBSTACLE) {
-      preferred_scenarios.push_back(ScenarioConfig::SIDE_PASS);
-    }
-
-    // stop_sign scenarios
-    if (overlap.first == ReferenceLineInfo::STOP_SIGN) {
-      preferred_scenarios.push_back(ScenarioConfig::STOP_SIGN_UNPROTECTED);
-    }
-
-    // traffic_light scenarios
-    if (overlap.first == ReferenceLineInfo::SIGNAL) {
-      preferred_scenarios.push_back(ScenarioConfig::TRAFFIC_LIGHT_PROTECTED);
-      preferred_scenarios.push_back(
-          ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN);
-      preferred_scenarios.push_back(
-          ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN);
-    }
-  }
-
-  for (const auto& preferred_scenario : preferred_scenarios) {
-    if (rejected_scenarios.find(preferred_scenario) !=
-            rejected_scenarios.end() ||
-        supported_scenarios_.count(preferred_scenario) == 0) {
-      continue;
-    }
-    if (SelectScenario(preferred_scenario, ego_point, frame)) {
-      AINFO << "select preferred scenario: "
-            << ScenarioConfig::ScenarioType_Name(preferred_scenario);
-      return;
-    } else {
-      rejected_scenarios.insert(preferred_scenario);
-    }
-  }
-
-  // prefer to use first non-default transferrable scenario.
-  for (const auto scenario : supported_scenarios_) {
-    if (rejected_scenarios.find(scenario) != rejected_scenarios.end()) {
-      continue;
-    }
-    if (!FLAGS_enable_scenario_side_pass) {
-      if (scenario == ScenarioConfig::SIDE_PASS) {
-        continue;
-      }
-    }
-    if (!FLAGS_enable_scenario_stop_sign) {
-      if (scenario == ScenarioConfig::STOP_SIGN_UNPROTECTED) {
-        continue;
-      }
-    }
-    if (!FLAGS_enable_scenario_traffic_light) {
-      if (scenario == ScenarioConfig::TRAFFIC_LIGHT_PROTECTED) {
-        continue;
-      }
-      if (scenario == ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN) {
-        continue;
-      }
-      if (scenario == ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN) {
-        continue;
-      }
-    }
-
-    if (SelectScenario(scenario, ego_point, frame)) {
-      AINFO << "select transferable scenario: "
-            << ScenarioConfig::ScenarioType_Name(scenario);
-      return;
-    } else {
-      rejected_scenarios.insert(scenario);
-    }
-  }
-
-  // finally use default transferrable scenario.
-  if (current_scenario_->scenario_type() != default_scenario_type_) {
-    AINFO << "select default scenario: "
-          << ScenarioConfig::ScenarioType_Name(default_scenario_type_);
-    current_scenario_ = CreateScenario(default_scenario_type_);
-  }
-}
-*/
 
 bool ScenarioManager::IsBareIntersectionScenario(
     const ScenarioConfig::ScenarioType& scenario_type) {
