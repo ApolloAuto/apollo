@@ -191,10 +191,7 @@ bool PncMap::UpdateVehicleState(const VehicleState &vehicle_state) {
     return false;
   }
 
-  int last_index = GetWaypointIndex(routing_waypoint_index_.back().waypoint);
-  if (next_routing_waypoint_index_ == routing_waypoint_index_.size() - 1 ||
-      (!stop_for_destination_ &&
-       last_index == routing_waypoint_index_.back().index)) {
+  if (next_routing_waypoint_index_ == routing_waypoint_index_.size() - 1) {
     stop_for_destination_ = true;
   }
   return true;
