@@ -111,7 +111,8 @@ function set_lib_path() {
     export LD_LIBRARY_PATH=/usr/local/apollo/libtorch/lib:$LD_LIBRARY_PATH
     export LD_LIBRARY_PATH=/usr/local/apollo/libtorch_gpu/lib:$LD_LIBRARY_PATH
   fi
-  export LD_PRELOAD="$PRELOAD"
+  export LD_LIBRARY_PATH=/usr/local/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH  
+  export LD_PRELOAD="$PRELOAD libGL.so.1 libEGL.so.1"
   export PYTHONPATH=/usr/local/lib/python2.7/dist-packages:${PY_LIB_PATH}:${PY_TOOLS_PATH}:${PYTHONPATH}
   if [ -e /usr/local/cuda-8.0/ ];then
     export PATH=/usr/local/cuda-8.0/bin:$PATH
