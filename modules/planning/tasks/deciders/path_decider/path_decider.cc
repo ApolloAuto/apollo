@@ -90,11 +90,11 @@ bool PathDecider::MakeStaticObstacleDecision(
 
   // Go through every obstalce and make decisions.
   for (const auto *obstacle : path_decision->obstacles().Items()) {
-    const std::string& obstacle_id = obstacle->Id();
+    const std::string &obstacle_id = obstacle->Id();
     const std::string obstacle_type_name =
         PerceptionObstacle_Type_Name(obstacle->Perception().type());
-    ADEBUG << "obstacle_id[<< " << obstacle_id
-           << "] type[" << obstacle_type_name << "]";
+    ADEBUG << "obstacle_id[<< " << obstacle_id << "] type["
+           << obstacle_type_name << "]";
 
     if (!obstacle->IsStatic() || obstacle->IsVirtual()) {
       continue;
