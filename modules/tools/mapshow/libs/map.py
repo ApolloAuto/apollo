@@ -262,6 +262,13 @@ class Map:
                 for curve in stop_line.segment:
                     self._draw_stop_line(curve.line_segment, stop_sign.id.id, ax, "yellow")
 
+    def draw_yield_signs(self, ax):
+        """draw_yield_signs"""
+        for yieldsign in getattr(self.map_pb, "yield"):
+            for stop_line in yieldsign.stop_line:
+                for curve in stop_line.segment:
+                    self._draw_stop_line(curve.line_segment, yieldsign.id.id, ax, "powderblue")
+
     @staticmethod
     def _draw_stop_line(line_segment, label, ax, label_color_val):
         """draw a signal"""
