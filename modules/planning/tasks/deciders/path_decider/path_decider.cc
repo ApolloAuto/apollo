@@ -50,8 +50,10 @@ Status PathDecider::Process(const ReferenceLineInfo *reference_line_info,
                             const PathData &path_data,
                             PathDecision *const path_decision) {
   CHECK_NOTNULL(path_decision);
-  std::string blocking_obstacle_id =
-      reference_line_info->GetBlockingObstacleId();
+  std::string blocking_obstacle_id;
+  if (reference_line_info->GetBlockingObstacle() != nullptr) {
+    blocking_obstacle_id = reference_line_info->GetBlockingObstacle()->Id();
+  }
   if (!MakeObjectDecision(path_data, blocking_obstacle_id, path_decision)) {
     AERROR << "Failed to make decision based on tunnel";
     return Status(ErrorCode::PLANNING_ERROR, "dp_road_graph decision ");

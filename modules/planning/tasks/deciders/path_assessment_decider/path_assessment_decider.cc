@@ -217,7 +217,7 @@ Status PathAssessmentDecider::Process(
     FLAGS_static_decision_nudge_l_buffer = 0.3;
   }
   *(reference_line_info->mutable_path_data()) = valid_path_data.front();
-  reference_line_info->SetBlockingObstacleId(
+  reference_line_info->SetBlockingObstacle(
       valid_path_data.front().blocking_obstacle_id());
   const auto& end_time3 = std::chrono::system_clock::now();
   diff = end_time3 - end_time2;
@@ -238,14 +238,14 @@ Status PathAssessmentDecider::Process(
   auto* mutable_path_decider_status = PlanningContext::Instance()
                                           ->mutable_planning_status()
                                           ->mutable_path_decider();
-  if (!(reference_line_info->GetBlockingObstacleId()).empty()) {
+  if (reference_line_info->GetBlockingObstacle() != nullptr) {
     int front_static_obstacle_cycle_counter =
         mutable_path_decider_status->front_static_obstacle_cycle_counter();
     if (front_static_obstacle_cycle_counter < 0) {
       front_static_obstacle_cycle_counter = 0;
     }
     mutable_path_decider_status->set_front_static_obstacle_id(
-        reference_line_info->GetBlockingObstacleId());
+        reference_line_info->GetBlockingObstacle()->Id());
     mutable_path_decider_status->set_front_static_obstacle_cycle_counter(
         std::min(front_static_obstacle_cycle_counter + 1, 10));
   } else {
