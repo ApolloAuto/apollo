@@ -178,11 +178,8 @@ class ReferenceLineInfo {
 
   void SetCandidatePathData(std::vector<PathData> candidate_path_data);
 
-  std::string GetBlockingObstacleId() const { return blocking_obstacle_id_; }
-
-  void SetBlockingObstacleId(const std::string& blocking_obstacle_id) {
-    blocking_obstacle_id_ = blocking_obstacle_id;
-  }
+  Obstacle* GetBlockingObstacle() const { return blocking_obstacle_; }
+  void SetBlockingObstacle(const std::string& blocking_obstacle_id);
 
   bool is_path_lane_borrow() const { return is_path_lane_borrow_; }
   void set_is_path_lane_borrow(bool is_path_lane_borrow) {
@@ -268,7 +265,7 @@ class ReferenceLineInfo {
 
   PathDecision path_decision_;
 
-  std::string blocking_obstacle_id_ = "";
+  Obstacle* blocking_obstacle_;
 
   std::vector<PathBoundary> candidate_path_boundaries_;
   std::vector<PathData> candidate_path_data_;

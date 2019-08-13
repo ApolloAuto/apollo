@@ -871,6 +871,11 @@ int ReferenceLineInfo::GetPnCJunction(
   return 0;
 }
 
+void ReferenceLineInfo::SetBlockingObstacle(
+    const std::string& blocking_obstacle_id) {
+  blocking_obstacle_ =  path_decision_.Find(blocking_obstacle_id);
+}
+
 std::vector<common::SLPoint> ReferenceLineInfo::GetAllStopDecisionSLPoint()
     const {
   std::vector<common::SLPoint> result;
