@@ -33,6 +33,17 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 Apollo 5.0 is loaded with new modules and features but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding of Apollo's core technology and platform. 
 
+
+**[Attention]** The Apollo team is proud to announce that the platform is migrating to Ubuntu 18.04, one of the most requested upgrades from our developers. We do not expect a disruption to your current work with the Apollo platform, but for perception related code, you would need to:
+
+1. Upgrade host to ubuntu_16.04 and above (Ubuntu 18.04 is preferred)
+2. Install NVIDIA-docker 2.0
+3. Update local host NVIDIA driver >=410.48
+
+For those developers that would like to continue working with Ubuntu 14.04, please use [the Ubuntu 14 branch](https://github.com/ApolloAuto/apollo/tree/ubuntu_14.04) instead of the master branch.
+
+[migration guide](docs/howto/how_to_migrate_to_the_updated_apollo_master_from_old_versions.md).
+
 **[Attention]** The Apollo team has decided to retire Git LFS, which might impact your development. For details, please refer to:
 [migration guide](docs/howto/how_to_migrate_to_the_updated_apollo_master_from_old_versions.md).
 
