@@ -49,6 +49,17 @@ struct RawMessage {
 
   ~RawMessage() {}
 
+  class Descriptor {
+   public:
+    std::string full_name() const { return "apollo.cyber.message.RawMessage"; }
+    std::string name() const { return "apollo.cyber.message.RawMessage"; }
+  };
+
+  static const Descriptor* descriptor() {
+    static Descriptor desc;
+    return &desc;
+  }
+
   static void GetDescriptorString(const std::string &type,
                                   std::string *desc_str) {
     ProtobufFactory::Instance()->GetDescriptorString(type, desc_str);

@@ -28,54 +28,100 @@ namespace apollo {
 namespace cyber {
 namespace transport {
 
-TEST(IntraDispatcherTest, on_message) {
+TEST(DispatcherTest, on_message) {
   auto dispatcher = IntraDispatcher::Instance();
-
-  auto send_pb_msg = std::make_shared<proto::Chatter>();
-  send_pb_msg->set_timestamp(123);
-  send_pb_msg->set_lidar_timestamp(456);
-  send_pb_msg->set_seq(789);
-  send_pb_msg->set_content("on_message");
-
+  std::vector<std::shared_ptr<proto::Chatter>> chatter_msgs;
+  std::vector<std::shared_ptr<message::RawMessage>> raw_msgs;
+  auto chatter = std::make_shared<proto::Chatter>();
+  chatter->set_content("chatter");
+  auto chatter2 = std::make_shared<proto::Chatter>();
+  chatter2->set_content("raw message");
+  std::string str;
+  chatter2->SerializeToString(&str);
+  auto raw = std::make_shared<message::RawMessage>(str);
+  auto chatter_callback = [&chatter_msgs](
+                              const std::shared_ptr<proto::Chatter>& msg,
+                              const MessageInfo&) {
+    AINFO << "chatter callback";
+    chatter_msgs.push_back(msg);
+  };
+  auto raw_callback = [&raw_msgs](
+                          const std::shared_ptr<message::RawMessage>& msg,
+                          const MessageInfo&) {
+    AINFO << "raw callback";
+    raw_msgs.push_back(msg);
+  };
   MessageInfo msg_info;
 
-  dispatcher->OnMessage(common::Hash("pb_channel"), send_pb_msg, msg_info);
+  const std::string channel_name = "channel";
+  const uint64_t channel_id = common::Hash(channel_name);
+  proto::RoleAttributes self_attr1;
+  self_attr1.set_channel_name(channel_name);
+  self_attr1.set_channel_id(channel_id);
+  self_attr1.set_id(Identity().HashValue());
+  proto::RoleAttributes self_attr2(self_attr1);
+  self_attr2.set_id(Identity().HashValue());
+  proto::RoleAttributes self_none;
+  self_none.set_channel_name("channel1");
+  self_none.set_channel_id(common::Hash("channel1"));
+  proto::RoleAttributes oppo_attr1(self_attr1);
+  Identity identity1;
+  oppo_attr1.set_id(identity1.HashValue());
+  proto::RoleAttributes oppo_attr2(self_attr1);
+  Identity identity2;
+  oppo_attr2.set_id(identity2.HashValue());
 
-  RoleAttributes attr;
-  attr.set_channel_name("pb_channel");
-  attr.set_channel_id(common::Hash("pb_channel"));
-  Identity pb_id;
-  attr.set_id(pb_id.HashValue());
-  auto recv_pb_msg = std::make_shared<proto::Chatter>();
-  dispatcher->AddListener<proto::Chatter>(
-      attr, [&recv_pb_msg](const std::shared_ptr<proto::Chatter>& msg,
-                           const MessageInfo& msg_info) {
-        (void)msg_info;
-        recv_pb_msg->CopyFrom(*msg);
-      });
-  dispatcher->OnMessage(common::Hash("pb_channel"), send_pb_msg, msg_info);
+  // AddListener
+  // add chatter
+  dispatcher->AddListener<proto::Chatter>(self_attr1, chatter_callback);
+  // add raw
+  dispatcher->AddListener<message::RawMessage>(self_attr2, raw_callback);
+  // add chatter opposite
+  dispatcher->AddListener<proto::Chatter>(self_attr1, oppo_attr1,
+                                          chatter_callback);
+  // add raw opposite
+  dispatcher->AddListener<message::RawMessage>(self_attr2, oppo_attr1,
+                                               raw_callback);
 
-  EXPECT_EQ(recv_pb_msg->timestamp(), 123);
-  EXPECT_EQ(recv_pb_msg->lidar_timestamp(), 456);
-  EXPECT_EQ(recv_pb_msg->seq(), 789);
-  EXPECT_EQ(recv_pb_msg->content(), "on_message");
+  // run 1 + 2
+  dispatcher->OnMessage<proto::Chatter>(channel_id, chatter, msg_info);
+  EXPECT_EQ(1, chatter_msgs.size());
+  EXPECT_EQ(1, raw_msgs.size());
 
-  attr.set_channel_name("raw_channel");
-  attr.set_channel_id(common::Hash("raw_channel"));
-  Identity raw_id;
-  attr.set_id(raw_id.HashValue());
-  auto recv_raw_msg = std::make_shared<message::RawMessage>();
-  dispatcher->AddListener<message::RawMessage>(
-      attr, [&recv_raw_msg](const std::shared_ptr<message::RawMessage>& msg,
-                            const MessageInfo& msg_info) {
-        (void)msg_info;
-        recv_raw_msg->message = msg->message;
-      });
+  // run 1, 3 + 2, 4
+  msg_info.set_sender_id(identity1);
+  dispatcher->OnMessage<message::RawMessage>(channel_id, raw, msg_info);
+  EXPECT_EQ(3, chatter_msgs.size());
+  EXPECT_EQ(3, raw_msgs.size());
+  Identity identity3;
+  msg_info.set_sender_id(identity3);
+  // no oppo handler, but self handler will run
+  dispatcher->OnMessage<proto::Chatter>(channel_id, chatter, msg_info);
+  // run 1 + 2
+  EXPECT_EQ(4, chatter_msgs.size());
+  EXPECT_EQ(4, raw_msgs.size());
 
-  auto send_raw_msg = std::make_shared<message::RawMessage>("on_message");
-  dispatcher->OnMessage(common::Hash("raw_channel"), send_raw_msg, msg_info);
+  // RemoveListenerHandler
+  // find no key
+  dispatcher->RemoveListener<proto::Chatter>(self_none);
+  dispatcher->RemoveListener<proto::Chatter>(self_none, oppo_attr2);
+  // find keys
+  dispatcher->RemoveListener<proto::Chatter>(self_attr1);
+  dispatcher->RemoveListener<proto::Chatter>(self_attr2);
+  dispatcher->RemoveListener<proto::Chatter>(self_attr1, oppo_attr1);
+  dispatcher->RemoveListener<proto::Chatter>(self_attr2, oppo_attr2);
 
-  EXPECT_EQ(recv_raw_msg->message, send_raw_msg->message);
+  // run nothing
+  raw_msgs.clear();
+  chatter_msgs.clear();
+  MessageInfo msg_info1;
+  dispatcher->OnMessage<proto::Chatter>(channel_id, chatter, msg_info);
+  EXPECT_EQ(0, chatter_msgs.size());
+  EXPECT_EQ(0, raw_msgs.size());
+  msg_info.set_sender_id(identity1);
+  dispatcher->OnMessage<proto::Chatter>(channel_id, chatter, msg_info);
+  EXPECT_EQ(0, chatter_msgs.size());
+  EXPECT_EQ(0, raw_msgs.size());
 }
 
 }  // namespace transport
