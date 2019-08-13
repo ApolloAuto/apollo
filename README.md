@@ -37,8 +37,8 @@ Apollo 5.0 is loaded with new modules and features but needs to be calibrated an
 **[Attention]** The Apollo team is proud to announce that the platform is migrating to Ubuntu 18.04, one of the most requested upgrades from our developers. We do not expect a disruption to your current work with the Apollo platform, but for perception related code, you would need to:
 
 1. Upgrade host to ubuntu_16.04 and above (Ubuntu 18.04 is preferred)
-2. Install NVIDIA-docker 2.0
-3. Update local host NVIDIA driver >=410.48
+2. Install NVIDIA-docker 2.0 - you can refer to [this link](https://github.com/nvidia/nvidia-docker/wiki/Installation-(version-2.0)) for steps on installation
+3. Update local host NVIDIA driver >=410.48. [Website link](https://www.nvidia.com/Download/index.aspx?lang=en-us)
 
 For those developers that would like to continue working with Ubuntu 14.04, please use [the Ubuntu 14 branch](https://github.com/ApolloAuto/apollo/tree/ubuntu_14.04) instead of the master branch.
 
