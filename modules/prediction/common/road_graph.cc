@@ -333,10 +333,18 @@ RoadGraph::LaneWithSmallestAverageCurvature(
   CHECK(!lane_infos.empty());
   size_t sample_size = FLAGS_sample_size_for_average_lane_curvature;
   std::shared_ptr<const hdmap::LaneInfo> selected_lane_info = lane_infos[0];
+  if (selected_lane_info == nullptr) {
+    AERROR << "Lane Vector first element: selected_lane_info is nullptr.";
+    return nullptr;
+  }
   double smallest_curvature =
       AverageCurvature(selected_lane_info->id().id(), sample_size);
   for (size_t i = 1; i < lane_infos.size(); ++i) {
     std::shared_ptr<const hdmap::LaneInfo> lane_info = lane_infos[i];
+    if (lane_info == nullptr) {
+      AWARN << "Lane vector element: one lane_info is nullptr.";
+      continue;
+    }
     double curvature = AverageCurvature(lane_info->id().id(), sample_size);
     if (curvature < smallest_curvature) {
       smallest_curvature = curvature;
