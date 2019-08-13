@@ -86,6 +86,7 @@ cc_library(
         ":listener_handler",
         ":message_info",
         "//cyber/proto:role_attributes_cc_proto",
+        "//cyber/message:message_traits",
     ],
 )
 
