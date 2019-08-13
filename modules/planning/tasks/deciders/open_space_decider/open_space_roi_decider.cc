@@ -158,8 +158,8 @@ void OpenSpaceRoiDecider::SetOriginFromADC(Frame *const frame) {
   // get vertices from ADC box
   std::vector<common::math::Vec2d> adc_corners;
   adc_box.GetAllCorners(&adc_corners);
-  auto left_top = adc_corners[0];
-  auto right_top = adc_corners[3];
+  auto left_top = adc_corners[3];
+  auto right_top = adc_corners[0];
   // rotate the points to have the lane to be horizontal to x axis positive
   // direction and scale them base on the origin point
   Vec2d heading_vec = right_top - left_top;
