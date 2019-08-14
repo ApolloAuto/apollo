@@ -113,7 +113,8 @@ int GetBackToInLaneIndex(
     const std::vector<std::tuple<double, PathData::PathPointType, double>>&
         path_point_decision);
 
-bool ComparePathData(const PathData& lhs, const PathData& rhs);
+bool ComparePathData(const PathData& lhs, const PathData& rhs,
+                     const Obstacle* blocking_obstacle);
 
 }  // namespace planning
 }  // namespace apollo
