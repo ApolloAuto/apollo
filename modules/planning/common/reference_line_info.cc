@@ -369,7 +369,7 @@ Obstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
   }
   mutable_obstacle->SetPerceptionSlBoundary(perception_sl);
   mutable_obstacle->CheckLaneBlocking(reference_line_);
-  if (obstacle->IsLaneBlocking()) {
+  if (mutable_obstacle->IsLaneBlocking()) {
     ADEBUG << "obstacle [" << obstacle->Id() << "] is lane blocking.";
   } else {
     ADEBUG << "obstacle [" << obstacle->Id() << "] is NOT lane blocking.";
