@@ -55,7 +55,7 @@ bool load_pcl_pcds_xyzit(const std::string& filename, PointCloudPtr cloud_out) {
     point.y = org_cloud.points[i].y;
     point.z = org_cloud.points[i].z;
     point.intensity = org_cloud.points[i].intensity;
-    if (isnan(org_cloud.points[i].x)) {
+    if (std::isnan(org_cloud.points[i].x)) {
       continue;
     }
     cloud_out->push_back(point);
@@ -78,7 +78,7 @@ bool load_pcl_pcds_xyzl(const std::string& filename, PointCloudPtr cloud_out) {
     point.z = org_cloud.points[i].z;
     point.intensity = 255;
     point.label = org_cloud.points[i].label;
-    if (isnan(org_cloud.points[i].x)) {
+    if (std::isnan(org_cloud.points[i].x)) {
       continue;
     }
     cloud_out->push_back(point);
