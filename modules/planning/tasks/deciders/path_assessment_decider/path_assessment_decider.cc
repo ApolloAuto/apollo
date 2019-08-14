@@ -84,6 +84,7 @@ Status PathAssessmentDecider::Process(
          << " msec.";
 
   // 2. Analyze and add important info for speed decider to use
+  const Obstacle* blocking_obstacle_on_selflane = nullptr;
   for (auto& curr_path_data : valid_path_data) {
     if (curr_path_data.path_label().find("fallback") != std::string::npos) {
       continue;
@@ -93,6 +94,13 @@ Status PathAssessmentDecider::Process(
     // position.
     if (curr_path_data.path_label().find("pullover") == std::string::npos) {
       TrimTailingOutLanePoints(&curr_path_data);
+    }
+
+    // find blocking_obstacle_on_selflane, to be used for lane selection later
+    if (curr_path_data.path_label().find("self") != std::string::npos) {
+      const auto blocking_obstacle_id = curr_path_data.blocking_obstacle_id();
+      blocking_obstacle_on_selflane =
+          reference_line_info->path_decision()->Find(blocking_obstacle_id);
     }
 
     // TODO(jiacheng): remove empty path_data.
@@ -114,7 +122,10 @@ Status PathAssessmentDecider::Process(
   ADEBUG << "Time for path info labeling: " << diff.count() * 1000 << " msec.";
 
   // 3. Pick the optimal path.
-  std::sort(valid_path_data.begin(), valid_path_data.end(), ComparePathData);
+  std::sort(valid_path_data.begin(), valid_path_data.end(),
+            std::bind(ComparePathData,
+                      std::placeholders::_1, std::placeholders::_2,
+                      blocking_obstacle_on_selflane));
 
   ADEBUG << "Using '" << valid_path_data.front().path_label()
          << "' path out of " << valid_path_data.size() << " path(s)";
@@ -221,7 +232,8 @@ Status PathAssessmentDecider::Process(
   return Status::OK();
 }
 
-bool ComparePathData(const PathData& lhs, const PathData& rhs) {
+bool ComparePathData(const PathData& lhs, const PathData& rhs,
+                     const Obstacle* blocking_obstacle) {
   ADEBUG << "Comparing " << lhs.path_label() << " and "
          << rhs.path_label();
   // Empty path_data is never the larger one.
@@ -245,12 +257,22 @@ bool ComparePathData(const PathData& lhs, const PathData& rhs) {
        rhs.path_label().find("right") != std::string::npos) ||
       (lhs.path_label().find("right") != std::string::npos &&
        rhs.path_label().find("left") != std::string::npos)) {
-    // select left/right path based on ADC's position
-    double adc_l = lhs.frenet_frame_path().front().l();
-    if (adc_l < -1.0) {
-      return lhs.path_label().find("right") != std::string::npos;
-    } else if (adc_l > 1.0) {
-      return lhs.path_label().find("left") != std::string::npos;
+    if (blocking_obstacle) {
+      // select left/right path based on blocking_obstacle's position
+      const double obstacle_l =
+          (blocking_obstacle->PerceptionSLBoundary().start_l() +
+              blocking_obstacle->PerceptionSLBoundary().end_l()) / 2;
+      ADEBUG << "obstacle[" << blocking_obstacle->Id()
+             << "] l[" << obstacle_l << "]";
+      return (obstacle_l > 0.0);
+    } else {
+      // select left/right path based on ADC's position
+      double adc_l = lhs.frenet_frame_path().front().l();
+      if (adc_l < -1.0) {
+        return lhs.path_label().find("right") != std::string::npos;
+      } else if (adc_l > 1.0) {
+        return lhs.path_label().find("left") != std::string::npos;
+      }
     }
   }
   // Select longer path.
