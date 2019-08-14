@@ -15,6 +15,7 @@ cc_library(
         "rerouting.cc",
         "stop_sign.cc",
         "traffic_light.cc",
+        "yield_sign.cc",
     ],
     hdrs = [
         "backside_vehicle.h",
@@ -27,6 +28,7 @@ cc_library(
         "stop_sign.h",
         "traffic_light.h",
         "traffic_rule.h",
+        "yield_sign.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
