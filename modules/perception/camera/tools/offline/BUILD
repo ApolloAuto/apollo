@@ -8,6 +8,7 @@ cc_library(
         "visualizer.cc",
     ],
     hdrs = [
+        "colormap.h",
         "keycode.h",
         "visualizer.h",
     ],

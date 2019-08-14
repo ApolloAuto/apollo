@@ -23,34 +23,51 @@
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/perception/camera/tools/offline/keycode.h"
+#include "modules/perception/camera/tools/offline/colormap.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
 
 std::vector<cv::Scalar> colorlistobj = {
-    cv::Scalar(0, 0, 255),     cv::Scalar(0, 100, 255),
-    cv::Scalar(0, 200, 255),   cv::Scalar(100, 255, 255),
-    cv::Scalar(127, 255, 255), cv::Scalar(255, 100, 255),
-    cv::Scalar(255, 0, 255),   cv::Scalar(255, 255, 100),
-    cv::Scalar(255, 255, 0),   cv::Scalar(255, 0, 100),
-    cv::Scalar(255, 0, 0),     cv::Scalar(0, 255, 0),
-    cv::Scalar(100, 255, 100)};
+    apollo::perception::magenta_color,  // last digit 0
+    apollo::perception::purple_color,  // last digit 1
+    apollo::perception::teal_color,  // last digit 2
+    apollo::perception::violet_color,  // last digit 3
+    apollo::perception::pink_color,  // last digit 4
+    apollo::perception::beige_color,  // last digit 5
+    apollo::perception::ivory_color,  // last digit 6
+    apollo::perception::olive_color,  // last digit 7
+    apollo::perception::maroon_color,  // last digit 8
+    apollo::perception::lime_color};  // last digit 9
 
 std::map<base::LaneLinePositionType, cv::Scalar> colormapline = {
-    {base::LaneLinePositionType::UNKNOWN, cv::Scalar(0, 0, 255)},
-    {base::LaneLinePositionType::FOURTH_LEFT, cv::Scalar(0, 100, 255)},
-    {base::LaneLinePositionType::THIRD_LEFT, cv::Scalar(0, 200, 255)},
-    {base::LaneLinePositionType::ADJACENT_LEFT, cv::Scalar(100, 255, 255)},
-    {base::LaneLinePositionType::EGO_LEFT, cv::Scalar(200, 255, 255)},
-    {base::LaneLinePositionType::EGO_CENTER, cv::Scalar(255, 100, 255)},
-    {base::LaneLinePositionType::EGO_RIGHT, cv::Scalar(255, 0, 255)},
-    {base::LaneLinePositionType::ADJACENT_RIGHT, cv::Scalar(255, 255, 100)},
-    {base::LaneLinePositionType::THIRD_RIGHT, cv::Scalar(255, 255, 0)},
-    {base::LaneLinePositionType::FOURTH_RIGHT, cv::Scalar(255, 0, 100)},
-    {base::LaneLinePositionType::OTHER, cv::Scalar(255, 0, 0)},
-    {base::LaneLinePositionType::CURB_LEFT, cv::Scalar(0, 255, 0)},
-    {base::LaneLinePositionType::CURB_RIGHT, cv::Scalar(100, 255, 100)}};
+    {base::LaneLinePositionType::UNKNOWN,
+      apollo::perception::black_color},
+    {base::LaneLinePositionType::FOURTH_LEFT,
+      apollo::perception::sky_blue_color},
+    {base::LaneLinePositionType::THIRD_LEFT,
+      apollo::perception::dodger_blue_color},
+    {base::LaneLinePositionType::ADJACENT_LEFT,
+      apollo::perception::blue_color},
+    {base::LaneLinePositionType::EGO_LEFT,
+      apollo::perception::dark_blue_color},
+    {base::LaneLinePositionType::EGO_CENTER,
+      apollo::perception::light_green_color},
+    {base::LaneLinePositionType::EGO_RIGHT,
+      apollo::perception::red_color},
+    {base::LaneLinePositionType::ADJACENT_RIGHT,
+      apollo::perception::coral_color},
+    {base::LaneLinePositionType::THIRD_RIGHT,
+      apollo::perception::salmon_color},
+    {base::LaneLinePositionType::FOURTH_RIGHT,
+      apollo::perception::orange_color},
+    {base::LaneLinePositionType::OTHER,
+      apollo::perception::white_color},
+    {base::LaneLinePositionType::CURB_LEFT,
+      apollo::perception::cyan_color},
+    {base::LaneLinePositionType::CURB_RIGHT,
+      apollo::perception::yellow_color}};
 
 Eigen::Matrix3d Camera2CarHomograph(Eigen::Matrix3d intrinsic,
                                     Eigen::Matrix4d extrinsic_camera2lidar,
@@ -93,11 +110,12 @@ bool Visualizer::Init(const std::vector<std::string> &camera_names,
 
   for (size_t i = 0; i < camera_names.size(); ++i) {
     camera_image_[camera_names[i]] =
-        cv::Mat(small_h_, small_w_, CV_8UC3, cv::Scalar(0, 0, 0));
+        cv::Mat(small_h_, small_w_, CV_8UC3, apollo::perception::black_color);
   }
-  world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3, cv::Scalar(0, 0, 0));
-  color_cipv_ = cv::Scalar(255, 255, 255);
-  virtual_lane_color_ = cv::Scalar(0, 0, 255);
+  world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3,
+                         apollo::perception::black_color);
+  color_cipv_ = apollo::perception::white_color;
+  virtual_lane_color_ = apollo::perception::white_color;
   return true;
 }
 
@@ -127,10 +145,14 @@ bool Visualizer::Init_all_info_single_camera(
   AINFO << "small_h_: " << small_h_;
   AINFO << "small_w_: " << small_w_;
   camera_image_[camera_name + "_2D"] =
-      cv::Mat(small_h_, small_w_, CV_8UC3, cv::Scalar(0, 0, 0));
+      cv::Mat(small_h_, small_w_, CV_8UC3, apollo::perception::black_color);
   camera_image_[camera_name + "_3D"] =
-      cv::Mat(small_h_, small_w_, CV_8UC3, cv::Scalar(0, 0, 0));
-  world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3, cv::Scalar(0, 0, 0));
+      cv::Mat(small_h_, small_w_, CV_8UC3, apollo::perception::black_color);
+  world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3,
+                         apollo::perception::black_color);
+  color_cipv_ = apollo::perception::white_color;
+  virtual_lane_color_ = apollo::perception::green_color;
+
   draw_range_circle();
 
   // 1. transform camera_>lidar
@@ -801,17 +823,17 @@ bool Visualizer::DrawTrajectories(
                  static_cast<float>(object->drops[0](1)), 0, 1;
   start_point = (*motion_buffer)[0].motion * start_point;
   cv::circle(world_image_, world_point_to_bigimg(start_point), 3,
-    cv::Scalar(127, 127, 127));
+    apollo::perception::gray_color);
 
   for (size_t i = 1; i < count; i++) {
     Eigen::Vector4f end_point;
     end_point << static_cast<float>(object->drops[i](0)),
                  static_cast<float>(object->drops[i](1)), 0, 1;
     cv::circle(world_image_, world_point_to_bigimg(end_point), 3,
-      cv::Scalar(127, 127, 127));
+      apollo::perception::gray_color);
     cv::line(world_image_, world_point_to_bigimg(start_point),
              world_point_to_bigimg(end_point),
-             cv::Scalar(127, 127, 127), trajectory_line_thickness_);
+             apollo::perception::gray_color, trajectory_line_thickness_);
     start_point = end_point;
   }
   return true;
@@ -839,7 +861,7 @@ void Visualizer::Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame) {
     cv::rectangle(image, r, color, 2);
     cv::putText(image, std::to_string(object->track_id),
                 cv::Point(static_cast<int>(rect.x), static_cast<int>(rect.y)),
-                cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar(0, 0, 255), 2);
+                cv::FONT_HERSHEY_DUPLEX, 1, apollo::perception::red_color, 2);
     Eigen::Vector3d theta;
     theta << cos(object->theta), sin(object->theta), 0;
     theta = world2lidar.linear() * theta;
@@ -926,15 +948,16 @@ void Visualizer::ShowResult(const cv::Mat &img, const CameraFrame &frame) {
       int key = cvWaitKey(30);
       key_handler(camera_name, key);
     }
-    world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3, cv::Scalar(0, 0, 0));
+    world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3,
+                           apollo::perception::black_color);
     draw_range_circle();
   }
 
   cv::putText(image, camera_name, cv::Point(10, 50), cv::FONT_HERSHEY_DUPLEX,
-              1.3, cv::Scalar(0, 0, 255), 3);
+              1.3, apollo::perception::red_color, 3);
   cv::putText(image, "frame #: " + std::to_string(frame.frame_id),
               cv::Point(10, 100), cv::FONT_HERSHEY_DUPLEX, 1.3,
-              cv::Scalar(0, 0, 255), 3);
+              apollo::perception::red_color, 3);
   Draw2Dand3D(image, frame);
 }
 
@@ -951,28 +974,28 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
 
   // plot FOV
 
-  // cv::line(img2, p_fov_1_, p_fov_2_, cv::Scalar(255, 255, 255), 2);
-  // cv::line(img2, p_fov_1_, p_fov_3_, cv::Scalar(255, 255, 255), 2);
-  // cv::line(img2, p_fov_2_, p_fov_4_, cv::Scalar(255, 255, 255), 2);
+  // cv::line(img2, p_fov_1_, p_fov_2_, apollo::perception::white_color, 2);
+  // cv::line(img2, p_fov_1_, p_fov_3_, apollo::perception::white_color, 2);
+  // cv::line(img2, p_fov_2_, p_fov_4_, apollo::perception::white_color, 2);
   // cv::line(world_image_, world_point_to_bigimg(image2ground(p_fov_1_)),
   //          world_point_to_bigimg(image2ground(p_fov_2_)),
-  //          cv::Scalar(255, 255, 255), 2);
+  //          apollo::perception::white_color, 2);
   // cv::line(world_image_, world_point_to_bigimg(image2ground(p_fov_1_)),
   //          world_point_to_bigimg(image2ground(p_fov_3_)),
-  //          cv::Scalar(255, 255, 255), 2);
+  //          apollo::perception::white_color, 2);
   // cv::line(world_image_, world_point_to_bigimg(image2ground(p_fov_2_)),
   //          world_point_to_bigimg(image2ground(p_fov_4_)),
-  //          cv::Scalar(255, 255, 255), 2);
+  //          apollo::perception::white_color, 2);
 
-  // cv::line(img2, p_fov_2_, p_fov_4_, cv::Scalar(255, 255, 255), 2);
+  // cv::line(img2, p_fov_2_, p_fov_4_, apollo::perception::white_color, 2);
   // cv::line(world_image_, world_point_to_bigimg(image2ground(p_fov_1_)),
   //          world_point_to_bigimg(image2ground(p_fov_2_)),
-  //          cv::Scalar(255, 255, 255), 2);
+  //          apollo::perception::white_color, 2);
   // cv::line(world_image_, world_point_to_bigimg(image2ground(p_fov_1_)),
 
   if (show_vp_grid_) {
     cv::line(image_2D, ground2image(vp1_), ground2image(vp2_),
-             cv::Scalar(255, 255, 255), 2);
+             apollo::perception::white_color, 2);
   }
   AINFO << "vp1_: " << vp1_ << ", vp1_image: " << ground2image(vp1_);
   AINFO << "vp2_: " << vp2_ << ", vp2_image: " << ground2image(vp2_);
@@ -996,7 +1019,12 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
       p_cur.y = static_cast<int>(object.curve_image_point_set[i].y);
       Eigen::Vector2d p_cur_ground = image2ground(p_cur);
 
-      cv::line(image_3D, p_prev, p_cur, lane_color, line_thickness_);
+      if (p_cur.x >= 0 && p_cur.y >= 0 && p_prev.x >= 0 && p_prev.y >= 0 &&
+          p_cur.x < image_width_ && p_cur.y < image_height_ &&
+          p_prev.x < image_width_ && p_prev.y <  image_height_) {
+        cv::line(image_2D, p_prev, p_cur, lane_color, line_thickness_);
+        cv::line(image_3D, p_prev, p_cur, lane_color, line_thickness_);
+      }
       cv::line(world_image_, world_point_to_bigimg(p_prev_ground),
                world_point_to_bigimg(p_cur_ground), lane_color, 2);
       p_prev = p_cur;
@@ -1022,7 +1050,7 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
         // type_to_string(object->type) + "->" +
         sub_type_to_string(object->sub_type),
         cv::Point(static_cast<int>(rect.x), static_cast<int>(rect.y) + 30),
-        cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar(0, 0, 255), 1);
+        cv::FONT_HERSHEY_DUPLEX, 1, apollo::perception::red_color, 1);
 
     // compute 8 vetices in camera coodinates
     Eigen::Vector3d pos;
@@ -1076,7 +1104,7 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
     cv::putText(
         image_2D, dist_string,
         cv::Point(static_cast<int>(rect.x), static_cast<int>(rect.y - 10)),
-        cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar(0, 255, 0), 2);
+        cv::FONT_HERSHEY_DUPLEX, 1, apollo::perception::lime_color, 2);
 
     // plot projected 3D box on image_3D
     Eigen::Matrix3d rotate_ry;
@@ -1239,7 +1267,10 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
       cv::Point p_cur = ground2image(p_cur_ground);
       AINFO << "[Left] p_cur_ground: " << p_cur_ground
             << ", " << "p_cur: " << p_prev;
-      if (p_cur.x > 0 && p_cur.y > 0 && p_prev.x > 0 && p_prev.y > 0) {
+      if (p_cur.x >= 0 && p_cur.y >= 0 && p_prev.x >= 0 && p_prev.y >= 0 &&
+          p_cur.x < image_width_ && p_cur.y < image_height_ &&
+          p_prev.x < image_width_ && p_prev.y <  image_height_) {
+        cv::line(image_2D, p_prev, p_cur, virtual_lane_color_, line_thickness_);
         cv::line(image_3D, p_prev, p_cur, virtual_lane_color_, line_thickness_);
       }
       cv::line(world_image_, world_point_to_bigimg(p_prev_ground),
@@ -1259,7 +1290,10 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
       p_cur_ground(1) = virtual_egolane_ground.right_line.line_point[i](1);
       cv::Point p_cur = ground2image(p_cur_ground);
 
-      if (p_cur.x > 0 && p_cur.y > 0 && p_prev.x > 0 && p_prev.y > 0) {
+      if (p_cur.x >= 0 && p_cur.y >= 0 && p_prev.x >= 0 && p_prev.y >= 0 &&
+          p_cur.x < image_width_ && p_cur.y < image_height_ &&
+          p_prev.x < image_width_ && p_prev.y <  image_height_) {
+        cv::line(image_2D, p_prev, p_cur, virtual_lane_color_, line_thickness_);
         cv::line(image_3D, p_prev, p_cur, virtual_lane_color_, line_thickness_);
       }
       cv::line(world_image_, world_point_to_bigimg(p_prev_ground),
@@ -1296,46 +1330,52 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
       image,
       "Manual Calibration: Pitch(up/down) Yaw(left/right) Roll(SH+left/right)",
       cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
-      cv::Scalar(0, 0, 255), 3);
+      apollo::perception::red_color, 3);
   }
   line_pos += 50;
   cv::putText(image, camera_name, cv::Point(10, line_pos),
-              cv::FONT_HERSHEY_DUPLEX, 1.3, cv::Scalar(0, 0, 255), 3);
+              cv::FONT_HERSHEY_DUPLEX, 1.3, apollo::perception::red_color, 3);
   line_pos += 50;
   cv::putText(image, "frame id: " + std::to_string(frame.frame_id),
               cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
-              cv::Scalar(0, 0, 255), 3);
+              apollo::perception::red_color, 3);
   line_pos += 50;
   if (motion_buffer != nullptr) {
     cv::putText(image,
                 "yaw rate: " + std::to_string(motion_buffer->back().yaw_rate),
                 cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
-                cv::Scalar(0, 0, 255), 3);
+                apollo::perception::red_color, 3);
     line_pos += 50;
     cv::putText(
       image,
       "pitch rate: " + std::to_string(motion_buffer->back().pitch_rate),
       cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
-      cv::Scalar(0, 0, 255), 3);
+      apollo::perception::red_color, 3);
     line_pos += 50;
     cv::putText(
       image,
       "roll rate: " + std::to_string(motion_buffer->back().roll_rate),
       cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
-      cv::Scalar(0, 0, 255), 3);
+      apollo::perception::red_color, 3);
     line_pos += 50;
     cv::putText(image,
                 "velocity: " + std::to_string(motion_buffer->back().velocity),
                 cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
-                cv::Scalar(0, 0, 255), 3);
+                apollo::perception::red_color, 3);
   }
 
   // plot predicted vanishing point
   if (frame.pred_vpt.size() > 0) {
+    // Option 1. Show both x and y
     cv::circle(image,
                cv::Point(static_cast<int>(frame.pred_vpt[0]),
-                  static_cast<int>(frame.pred_vpt[1])),
-               5, cv::Scalar(0, 255, 0), 3);
+               static_cast<int>(frame.pred_vpt[1])),
+               5, apollo::perception::dark_green_color, 3);
+    // Option 2. Show height/2 (x) and y
+    cv::circle(image,
+               cv::Point(static_cast<int>(image_width_>>1),
+               static_cast<int>(frame.pred_vpt[1])),
+               5, apollo::perception::dark_green_color, 3);
   }
 
   for (const auto &object : frame.tracked_objects) {
@@ -1343,7 +1383,7 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
       line_pos += 50;
       cv::putText(image, "CIPV: " + std::to_string(object->track_id),
                   cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
-                  cv::Scalar(0, 0, 255), 3);
+                  apollo::perception::red_color, 3);
     }
   }
 
@@ -1383,22 +1423,22 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
   }
 
   // re-initialize empty world_image_
-  world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3, cv::Scalar(0, 0, 0));
+  world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3,
+                         apollo::perception::black_color);
   draw_range_circle();
 }
 
 void Visualizer::draw_range_circle() {
-  cv::Scalar color(255, 100, 0);
   cv::circle(world_image_, cv::Point(wide_pixel_ / 2, world_h_), 1 * m2pixel_,
-             color, 1);
+             apollo::perception::deep_sky_blue_color, 1);
   for (int i = 20; i < 300; i += 20) {
     cv::circle(world_image_, cv::Point(wide_pixel_ / 2, world_h_), i * m2pixel_,
-               color, 2);
+               apollo::perception::deep_sky_blue_color, 2);
   }
   for (int i = 50; i < 300; i += 50) {
     cv::putText(world_image_, std::to_string(i),
                 cv::Point(wide_pixel_ / 2, world_h_ - i * m2pixel_),
-                cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar(0, 0, 255), 2);
+                cv::FONT_HERSHEY_DUPLEX, 1, apollo::perception::red_color, 2);
   }
 }
 
