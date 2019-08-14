@@ -185,7 +185,7 @@ void compute_ap_aos(
     std::vector<SPRCTuple>* tuples,
     const std::vector<double>& cumulated_orientation_similarity_per_conf,
     double* aos) {
-  if (ap == nullptr || tuples == nullptr) {
+  if (ap == nullptr || tuples == nullptr || aos == nullptr) {
     return;
   }
   *ap = 0.0;
