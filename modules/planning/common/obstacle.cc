@@ -100,7 +100,6 @@ Obstacle::Obstacle(const std::string& id,
                    const ObstaclePriority::Priority& obstacle_priority,
                    const bool is_static)
     : Obstacle(id, perception_obstacle, obstacle_priority, is_static) {
-  is_caution_level_obstacle_ = (obstacle_priority == ObstaclePriority::CAUTION);
   trajectory_ = trajectory;
   auto& trajectory_points = *trajectory_.mutable_trajectory_point();
   double cumulative_s = 0.0;
