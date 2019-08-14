@@ -446,6 +446,7 @@ function run() {
 }
 
 check_in_docker
+unset OMP_NUM_THREADS
 if [ $APOLLO_IN_DOCKER = "true" ]; then
   CYBER_SETUP="/apollo/cyber/setup.bash"
   if [ -e "${CYBER_SETUP}" ]; then
