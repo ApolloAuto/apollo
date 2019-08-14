@@ -45,6 +45,7 @@ class TimerComponent : public ComponentBase {
    * @return returns true if successful, otherwise returns false
    */
   bool Initialize(const TimerComponentConfig& config) override;
+  void Clear() override;
   bool Process();
   uint64_t GetInterval() const;
 
