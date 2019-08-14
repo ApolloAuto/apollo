@@ -21,10 +21,10 @@ cc_binary(
     srcs = ["lidar_detection_benchmark.cc"],
     deps = [
         "//modules/perception/tool/benchmark/lidar:benchmark_evaluation",
+        "@boost",
     ],
     linkopts = [
-        "-lboost_filesystem",
-        "-lboost_program_options",
+        "-llz4",
     ],
 )
 
