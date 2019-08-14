@@ -62,6 +62,9 @@ void TaskManager::Shutdown() {
   if (stop_.exchange(true)) {
     return;
   }
+  for (uint32_t i = 0; i < num_threads_; i++) {
+    scheduler::Instance()->RemoveTask(task_prefix + std::to_string(i));
+  }
 }
 
 }  // namespace cyber

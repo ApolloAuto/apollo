@@ -42,17 +42,18 @@ bool TimerComponent::Initialize(const TimerComponentConfig& config) {
     return false;
   }
 
-  std::weak_ptr<TimerComponent> self =
+  std::shared_ptr<TimerComponent> self =
       std::dynamic_pointer_cast<TimerComponent>(shared_from_this());
   auto func = [self]() {
-    auto ptr = self.lock();
-    if (ptr) {
-      ptr->Proc();
-    }
+    self->Proc();
   };
   timer_.reset(new Timer(config.interval(), func, false));
   timer_->Start();
   return true;
+}
+
+void TimerComponent::Clear() {
+  timer_.reset();
 }
 
 uint64_t TimerComponent::GetInterval() const { return interval_; }

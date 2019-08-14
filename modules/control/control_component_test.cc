@@ -52,6 +52,12 @@ class ControlComponentTest : public ::testing::Test {
     SetupCyber();
   }
 
+  virtual void TearDown() {
+    if (control_component_) {
+      control_component_->Shutdown();
+    }
+  }
+
  protected:
   bool FeedTestData();
   void SetupCyber();
