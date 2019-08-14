@@ -42,8 +42,6 @@ Apollo 5.0 is loaded with new modules and features but needs to be calibrated an
 
 For those developers that would like to continue working with Ubuntu 14.04, please use [the Ubuntu 14 branch](https://github.com/ApolloAuto/apollo/tree/ubuntu_14.04) instead of the master branch.
 
-[migration guide](docs/howto/how_to_migrate_to_the_updated_apollo_master_from_old_versions.md).
-
 **[Attention]** The Apollo team has decided to retire Git LFS, which might impact your development. For details, please refer to:
 [migration guide](docs/howto/how_to_migrate_to_the_updated_apollo_master_from_old_versions.md).
 
