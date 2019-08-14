@@ -83,7 +83,7 @@ Status PathAssessmentDecider::Process(
   ADEBUG << "Time for path validity checking: " << diff.count() * 1000
          << " msec.";
 
-  // 2. Analyze and add important info for speed decider to use.
+  // 2. Analyze and add important info for speed decider to use
   for (auto& curr_path_data : valid_path_data) {
     if (curr_path_data.path_label().find("fallback") != std::string::npos) {
       continue;
@@ -94,6 +94,7 @@ Status PathAssessmentDecider::Process(
     if (curr_path_data.path_label().find("pullover") == std::string::npos) {
       TrimTailingOutLanePoints(&curr_path_data);
     }
+
     // TODO(jiacheng): remove empty path_data.
 
     // RecordDebugInfo(curr_path_data, curr_path_data.path_label(),
@@ -113,103 +114,10 @@ Status PathAssessmentDecider::Process(
   ADEBUG << "Time for path info labeling: " << diff.count() * 1000 << " msec.";
 
   // 3. Pick the optimal path.
-  std::sort(valid_path_data.begin(), valid_path_data.end(),
-            [](const PathData& lhs, const PathData& rhs) {
-              ADEBUG << "Comparing " << lhs.path_label() << " and "
-                     << rhs.path_label();
-              // Empty path_data is never the larger one.
-              if (lhs.Empty()) {
-                ADEBUG << "LHS is empty.";
-                return false;
-              }
-              if (rhs.Empty()) {
-                ADEBUG << "RHS is empty.";
-                return true;
-              }
-              // Regular path goes before fallback path.
-              bool lhs_is_regular =
-                  lhs.path_label().find("regular") != std::string::npos;
-              bool rhs_is_regular =
-                  rhs.path_label().find("regular") != std::string::npos;
-              if (lhs_is_regular != rhs_is_regular) {
-                return lhs_is_regular;
-              }
-              // For two lane-borrow directions, based on ADC's position,
-              // select the more convenient one.
-              if ((lhs.path_label().find("left") != std::string::npos &&
-                   rhs.path_label().find("right") != std::string::npos) ||
-                  (lhs.path_label().find("right") != std::string::npos &&
-                   rhs.path_label().find("left") != std::string::npos)) {
-                double adc_l = lhs.frenet_frame_path().front().l();
-                if (adc_l < -1.0 || adc_l > 1.0) {
-                  if (adc_l < -1.0) {
-                    return lhs.path_label().find("right") != std::string::npos;
-                  } else {
-                    return lhs.path_label().find("left") != std::string::npos;
-                  }
-                }
-              }
-              // Select longer path.
-              // If roughly same length, then select self-lane path.
-              bool lhs_on_selflane =
-                  lhs.path_label().find("self") != std::string::npos;
-              bool rhs_on_selflane =
-                  rhs.path_label().find("self") != std::string::npos;
-              constexpr double kSelfPathLengthComparisonTolerance = 15.0;
-              constexpr double kNeighborPathLengthComparisonTolerance = 25.0;
-              double lhs_path_length = lhs.frenet_frame_path().back().s();
-              double rhs_path_length = rhs.frenet_frame_path().back().s();
-              if (lhs_on_selflane || rhs_on_selflane) {
-                if (std::fabs(lhs_path_length - rhs_path_length) >
-                    kSelfPathLengthComparisonTolerance) {
-                  return lhs_path_length > rhs_path_length;
-                } else {
-                  return lhs_on_selflane;
-                }
-              } else {
-                if (std::fabs(lhs_path_length - rhs_path_length) >
-                    kNeighborPathLengthComparisonTolerance) {
-                  return lhs_path_length > rhs_path_length;
-                }
-              }
-              // If roughly same length, and must borrow neighbor lane,
-              // then prefer to borrow forward lane rather than reverse lane.
-              int lhs_on_reverse =
-                  ContainsOutOnReverseLane(lhs.path_point_decision_guide());
-              int rhs_on_reverse =
-                  ContainsOutOnReverseLane(rhs.path_point_decision_guide());
-              // TODO(jiacheng): make this a flag.
-              if (std::abs(lhs_on_reverse - rhs_on_reverse) > 6) {
-                return lhs_on_reverse < rhs_on_reverse;
-              }
-              // If same length, both neighbor lane are forward,
-              // then select the one that returns to in-lane earlier.
-              constexpr double kBackToSelfLaneComparisonTolerance = 20.0;
-              int lhs_back_idx =
-                  GetBackToInLaneIndex(lhs.path_point_decision_guide());
-              int rhs_back_idx =
-                  GetBackToInLaneIndex(rhs.path_point_decision_guide());
-              double lhs_back_s = lhs.frenet_frame_path()[lhs_back_idx].s();
-              double rhs_back_s = rhs.frenet_frame_path()[rhs_back_idx].s();
-              if (std::fabs(lhs_back_s - rhs_back_s) >
-                  kBackToSelfLaneComparisonTolerance) {
-                return lhs_back_idx < rhs_back_idx;
-              }
-              // If same length, both forward, back to inlane at same time,
-              // select the left one to side-pass.
-              bool lhs_on_leftlane =
-                  lhs.path_label().find("left") != std::string::npos;
-              bool rhs_on_leftlane =
-                  rhs.path_label().find("left") != std::string::npos;
-              if (lhs_on_leftlane != rhs_on_leftlane) {
-                ADEBUG << "Select left lane over right lane.";
-                return lhs_on_leftlane;
-              }
-              // Otherwise, they are the same path, lhs is not < rhs.
-              return false;
-            });
-  ADEBUG << "There are " << valid_path_data.size() << " path(s).";
-  ADEBUG << "Using " << valid_path_data.front().path_label() << " path.";
+  std::sort(valid_path_data.begin(), valid_path_data.end(), ComparePathData);
+
+  ADEBUG << "Using '" << valid_path_data.front().path_label()
+         << "' path out of " << valid_path_data.size() << " path(s)";
   if (valid_path_data.front().path_label().find("fallback") !=
       std::string::npos) {
     FLAGS_static_decision_nudge_l_buffer = 0.8;
@@ -312,6 +220,96 @@ Status PathAssessmentDecider::Process(
                   reference_line_info);
   return Status::OK();
 }
+
+bool ComparePathData(const PathData& lhs, const PathData& rhs) {
+  ADEBUG << "Comparing " << lhs.path_label() << " and "
+         << rhs.path_label();
+  // Empty path_data is never the larger one.
+  if (lhs.Empty()) {
+    ADEBUG << "LHS is empty.";
+    return false;
+  }
+  if (rhs.Empty()) {
+    ADEBUG << "RHS is empty.";
+    return true;
+  }
+  // Regular path goes before fallback path.
+  bool lhs_is_regular = lhs.path_label().find("regular") != std::string::npos;
+  bool rhs_is_regular = rhs.path_label().find("regular") != std::string::npos;
+  if (lhs_is_regular != rhs_is_regular) {
+    return lhs_is_regular;
+  }
+  // For two lane-borrow directions, based on ADC's position,
+  // select the more convenient one.
+  if ((lhs.path_label().find("left") != std::string::npos &&
+       rhs.path_label().find("right") != std::string::npos) ||
+      (lhs.path_label().find("right") != std::string::npos &&
+       rhs.path_label().find("left") != std::string::npos)) {
+    // select left/right path based on ADC's position
+    double adc_l = lhs.frenet_frame_path().front().l();
+    if (adc_l < -1.0) {
+      return lhs.path_label().find("right") != std::string::npos;
+    } else if (adc_l > 1.0) {
+      return lhs.path_label().find("left") != std::string::npos;
+    }
+  }
+  // Select longer path.
+  // If roughly same length, then select self-lane path.
+  bool lhs_on_selflane = lhs.path_label().find("self") != std::string::npos;
+  bool rhs_on_selflane = rhs.path_label().find("self") != std::string::npos;
+  constexpr double kSelfPathLengthComparisonTolerance = 15.0;
+  constexpr double kNeighborPathLengthComparisonTolerance = 25.0;
+  double lhs_path_length = lhs.frenet_frame_path().back().s();
+  double rhs_path_length = rhs.frenet_frame_path().back().s();
+  if (lhs_on_selflane || rhs_on_selflane) {
+    if (std::fabs(lhs_path_length - rhs_path_length) >
+        kSelfPathLengthComparisonTolerance) {
+      return lhs_path_length > rhs_path_length;
+    } else {
+      return lhs_on_selflane;
+    }
+  } else {
+    if (std::fabs(lhs_path_length - rhs_path_length) >
+        kNeighborPathLengthComparisonTolerance) {
+      return lhs_path_length > rhs_path_length;
+    }
+  }
+  // If roughly same length, and must borrow neighbor lane,
+  // then prefer to borrow forward lane rather than reverse lane.
+  int lhs_on_reverse =
+      ContainsOutOnReverseLane(lhs.path_point_decision_guide());
+  int rhs_on_reverse =
+      ContainsOutOnReverseLane(rhs.path_point_decision_guide());
+  // TODO(jiacheng): make this a flag.
+  if (std::abs(lhs_on_reverse - rhs_on_reverse) > 6) {
+    return lhs_on_reverse < rhs_on_reverse;
+  }
+  // If same length, both neighbor lane are forward,
+  // then select the one that returns to in-lane earlier.
+  constexpr double kBackToSelfLaneComparisonTolerance = 20.0;
+  int lhs_back_idx =
+      GetBackToInLaneIndex(lhs.path_point_decision_guide());
+  int rhs_back_idx =
+      GetBackToInLaneIndex(rhs.path_point_decision_guide());
+  double lhs_back_s = lhs.frenet_frame_path()[lhs_back_idx].s();
+  double rhs_back_s = rhs.frenet_frame_path()[rhs_back_idx].s();
+  if (std::fabs(lhs_back_s - rhs_back_s) >
+      kBackToSelfLaneComparisonTolerance) {
+    return lhs_back_idx < rhs_back_idx;
+  }
+  // If same length, both forward, back to inlane at same time,
+  // select the left one to side-pass.
+  bool lhs_on_leftlane = lhs.path_label().find("left") != std::string::npos;
+  bool rhs_on_leftlane = rhs.path_label().find("left") != std::string::npos;
+  if (lhs_on_leftlane != rhs_on_leftlane) {
+    ADEBUG << "Select left lane over right lane.";
+    return lhs_on_leftlane;
+  }
+  // Otherwise, they are the same path, lhs is not < rhs.
+  return false;
+}
+
+
 
 bool PathAssessmentDecider::IsValidRegularPath(
     const ReferenceLineInfo& reference_line_info, const PathData& path_data) {
