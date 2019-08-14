@@ -114,6 +114,12 @@ message StopSignStatus {
   repeated string wait_for_obstacle_id = 3;
 }
 
+message YieldSignStatus {
+  optional string current_yield_sign_overlap_id = 1;
+  optional string done_yield_sign_overlap_id = 2;
+  repeated string wait_for_obstacle_id = 3;
+}
+
 message TrafficLightStatus {
   repeated string current_traffic_light_overlap_id = 1;
   repeated string done_traffic_light_overlap_id = 2;
@@ -134,6 +140,7 @@ message PlanningStatus {
   optional ScenarioStatus scenario = 12;
   optional SidePassStatus side_pass = 13;
   optional StopSignStatus stop_sign = 14;
-  optional TrafficLightStatus traffic_light = 15;
-  optional ParkAndGoStatus park_and_go = 16;
+  optional YieldSignStatus yield_sign = 15;
+  optional TrafficLightStatus traffic_light = 16;
+  optional ParkAndGoStatus park_and_go = 17;
 }
