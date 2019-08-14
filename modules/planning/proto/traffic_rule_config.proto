@@ -85,6 +85,13 @@ message StopSignConfig {
   optional double stop_distance = 2 [default = 1.0];  // meter
 }
 
+message YieldSignConfig {
+  optional bool enabled = 1 [default = true];
+  // stop distance(m) to the stop line of the yield sign
+  optional double stop_distance = 2 [default = 1.0];  // meter
+  optional double start_watch_distance = 3 [default = 2.0];  // meter
+}
+
 message TrafficLightConfig {
   optional bool enabled = 1 [default = true];
   // stop distance(m) to the stop line of the traffic light
@@ -117,7 +124,8 @@ message TrafficRuleConfig {
     ReferenceLineEndConfig reference_line_end = 8;
     ReroutingConfig rerouting = 9;
     StopSignConfig stop_sign = 10;
-    TrafficLightConfig traffic_light = 11;
+    YieldSignConfig yield_sign = 11;
+    TrafficLightConfig traffic_light = 12;
   }
 }
 
