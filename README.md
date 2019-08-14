@@ -31,14 +31,14 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 ## Getting Started
 
-Apollo 5.0 is loaded with new modules and features but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding of Apollo's core technology and platform. 
+Apollo 5.0 is loaded with new modules and features but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding of Apollo's core technology and platform.
 
 
 **[Attention]** The Apollo team is proud to announce that the platform is migrating to Ubuntu 18.04, one of the most requested upgrades from our developers. We do not expect a disruption to your current work with the Apollo platform, but for perception related code, you would need to:
 
 1. Upgrade host to ubuntu_16.04 and above (Ubuntu 18.04 is preferred)
-2. Install NVIDIA-docker 2.0 - you can refer to [this link](https://github.com/nvidia/nvidia-docker/wiki/Installation-(version-2.0)) for steps on installation
-3. Update local host NVIDIA driver >=410.48. [Website link](https://www.nvidia.com/Download/index.aspx?lang=en-us)
+2. Update local host NVIDIA driver >=410.48. [Website link](https://www.nvidia.com/Download/index.aspx?lang=en-us)
+3. Install NVIDIA-docker 2.0 - you can refer to [this link](https://github.com/nvidia/nvidia-docker/wiki/Installation-(version-2.0)) for steps on installation
 
 For those developers that would like to continue working with Ubuntu 14.04, please use [the Ubuntu 14 branch](https://github.com/ApolloAuto/apollo/tree/ubuntu_14.04) instead of the master branch.
 
@@ -60,9 +60,9 @@ For those developers that would like to continue working with Ubuntu 14.04, plea
 * Working knowledge of Docker
 
 
- - Please note, it is recommended that you install the versions of Apollo in the following order: 
+ - Please note, it is recommended that you install the versions of Apollo in the following order:
  **1.0 > whichever version you would like to test out**.
- The reason behind this recommendation is that you need to confirm whether individual hardware components 
+ The reason behind this recommendation is that you need to confirm whether individual hardware components
  and modules are functioning correctly and clear various version test cases,
  before progressing to a higher, more capable version for your safety and the safety of those around you.
 
@@ -72,7 +72,7 @@ The following diagram highlights the scope and features of each Apollo release:
 
 ![](docs/demo_guide/images/Apollo_Roadmap.png)
 
-[**Apollo 1.0:**](docs/quickstart/apollo_1_0_hardware_system_installation_guide.md) 
+[**Apollo 1.0:**](docs/quickstart/apollo_1_0_hardware_system_installation_guide.md)
 
 Apollo 1.0, also referred to as the Automatic GPS Waypoint Following, works in an enclosed venue such as a test track or parking lot. This installation is necessary to ensure that Apollo works perfectly with your vehicle. The diagram below lists the various modules in Apollo 1.0.
 
@@ -100,11 +100,11 @@ Apollo 1.0, also referred to as the Automatic GPS Waypoint Following, works in a
 
     * Apollo Linux Kernel (based on Linux Kernel 4.4.32)
 
-[**Apollo 1.5:**](docs/quickstart/apollo_1_5_hardware_system_installation_guide.md) 
+[**Apollo 1.5:**](docs/quickstart/apollo_1_5_hardware_system_installation_guide.md)
 
 Apollo 1.5 is meant for fixed lane cruising. With the addition of LiDAR, vehicles with this version now have better perception of its surroundings and can better map its current position and plan its trajectory for safer maneuvering on its lane. Please note, the modules highlighted in Yellow are additions or upgrades for version 1.5.
 
-![image alt text](docs/demo_guide/images/Apollo_1_5.png)	
+![image alt text](docs/demo_guide/images/Apollo_1_5.png)
 
 **For Setup:**
 
@@ -144,12 +144,12 @@ Apollo 2.0 supports vehicles autonomously driving on simple urban roads. Vehicle
 
 [**Apollo 2.5:**](docs/quickstart/apollo_2_5_hardware_system_installation_guide_v1.md)
 
-Apollo 2.5 allows the vehicle to autonomously run on geo-fenced highways with a camera for obstacle detection. Vehicles are able to maintain lane control, cruise and avoid collisions with vehicles ahead of them. 
+Apollo 2.5 allows the vehicle to autonomously run on geo-fenced highways with a camera for obstacle detection. Vehicles are able to maintain lane control, cruise and avoid collisions with vehicles ahead of them.
 
 ```
 Please note, if you need to test Apollo 2.5; for safety purposes, please seek the help of the
 Apollo Engineering team. Your safety is our #1 priority,
-and we want to ensure Apollo 2.5 was integrated correctly with your vehicle before you hit the road. 
+and we want to ensure Apollo 2.5 was integrated correctly with your vehicle before you hit the road.
 ```
 
 ![image alt text](docs/demo_guide/images/Apollo_2_5.png)
@@ -162,13 +162,13 @@ and we want to ensure Apollo 2.5 was integrated correctly with your vehicle befo
 
     * Additional Camera
 
-* Software: 
+* Software:
 
     * Same as 2.0
 
 [**Apollo 3.0:**](docs/quickstart/apollo_3_0_quick_start.md)
 
-Apollo 3.0's primary focus is to provide a platform for developers to build upon in a closed venue low-speed environment. Vehicles are able to maintain lane control, cruise and avoid collisions with vehicles ahead of them. 
+Apollo 3.0's primary focus is to provide a platform for developers to build upon in a closed venue low-speed environment. Vehicles are able to maintain lane control, cruise and avoid collisions with vehicles ahead of them.
 
 ![image alt text](docs/demo_guide/images/Apollo_3.0_diagram.png)
 
@@ -180,7 +180,7 @@ Apollo 3.0's primary focus is to provide a platform for developers to build upon
     * Apollo Sensor Unit
     * Apollo Hardware Development Platform with additional sensor support and flexibility
 
-* Software: 
+* Software:
 
     * Guardian
     * Monitor
@@ -188,7 +188,7 @@ Apollo 3.0's primary focus is to provide a platform for developers to build upon
 
 [**Apollo 3.5:**](docs/quickstart/apollo_3_5_quick_start.md)
 
-Apollo 3.5 is capable of navigating through complex driving scenarios such as residential and downtown areas. The car now has 360-degree visibility, along with upgraded perception algorithms to handle the changing conditions of urban roads, making the car more secure and aware. Scenario-based planning can navigate through complex scenarios, including unprotected turns and narrow streets often found in residential areas and roads with stop signs. 
+Apollo 3.5 is capable of navigating through complex driving scenarios such as residential and downtown areas. The car now has 360-degree visibility, along with upgraded perception algorithms to handle the changing conditions of urban roads, making the car more secure and aware. Scenario-based planning can navigate through complex scenarios, including unprotected turns and narrow streets often found in residential areas and roads with stop signs.
 
 ![image alt text](docs/demo_guide/images/Apollo_3_5_Architecture.png)
 
@@ -202,7 +202,7 @@ Apollo 3.5 is capable of navigating through complex driving scenarios such as re
     * NovAtel PwrPak7
     * Additional IPC
 
-* Software: 
+* Software:
 
     * Perception
     * Planning
@@ -215,7 +215,7 @@ Apollo 3.5 is capable of navigating through complex driving scenarios such as re
 [**Apollo 5.0:**](docs/quickstart/apollo_3_5_quick_start.md)
 
 Apollo 5.0 is an effort to support volume production for Geo-Fenced Autonomous Driving.
-The car now has 360-degree visibility, along with upgraded perception deep learning model to handle the changing conditions of complex road scenarios, making the car more secure and aware. Scenario-based planning has been enhanced to support additional scenarios like pull over and crossing bare intersections. 
+The car now has 360-degree visibility, along with upgraded perception deep learning model to handle the changing conditions of complex road scenarios, making the car more secure and aware. Scenario-based planning has been enhanced to support additional scenarios like pull over and crossing bare intersections.
 
 ![](docs/demo_guide/images/Apollo_5_0_diagram1.png)
 
@@ -225,7 +225,7 @@ The car now has 360-degree visibility, along with upgraded perception deep learn
 
     * Same as Apollo 3.5
 
-* Software: 
+* Software:
 
     * [Data Pipeline](https://github.com/ApolloAuto/apollo/tree/master/modules/tools/fuel_proxy)
     * Perception
@@ -253,7 +253,7 @@ The car now has 360-degree visibility, along with upgraded perception deep learn
 
 ## Installation
 
-* [Fork and then Clone Apollo's GitHub code](https://github.com/ApolloAuto/apollo) 
+* [Fork and then Clone Apollo's GitHub code](https://github.com/ApolloAuto/apollo)
 
 * [Build and Release using Docker](docs/howto/how_to_build_and_release.md) - This step is required
 
@@ -281,11 +281,11 @@ Congratulations! You have successfully built out Apollo without Hardware. If you
 
 * [Technical Tutorial](docs/technical_tutorial/README.md): Everything you need to know about Apollo. Written as individual versions with links to every document related to that version.
 
-* [HowTo](docs/howto/README.md): Brief technical solutions to common problems that developers face during the installation and use of the Apollo platform 
+* [HowTo](docs/howto/README.md): Brief technical solutions to common problems that developers face during the installation and use of the Apollo platform
 
-* [Specs](docs/specs/README.md): A Deep dive into Apollo's Hardware and Software specifications (only recommended for expert level developers that have successfully installed and launched Apollo) 
+* [Specs](docs/specs/README.md): A Deep dive into Apollo's Hardware and Software specifications (only recommended for expert level developers that have successfully installed and launched Apollo)
 
-* [FAQs](docs/FAQs/README.md) 
+* [FAQs](docs/FAQs/README.md)
 
 ## Questions
 
@@ -299,12 +299,10 @@ Apollo is provided under the [Apache-2.0 license](https://github.com/ApolloAuto/
 
 Please refer to the Disclaimer of Apollo in [Apollo's official website](http://apollo.auto/docs/disclaimer.html).
 
-## Connect with us 
+## Connect with us
 * [Have suggestions for our GitHub page?](https://github.com/ApolloAuto/apollo/issues)
 * [Twitter](https://twitter.com/apolloplatform)
 * [YouTube](https://www.youtube.com/channel/UC8wR_NX_NShUTSSqIaEUY9Q)
 * [Blog](https://www.medium.com/apollo-auto)
 * [Newsletter](http://eepurl.com/c-mLSz)
 * Interested in our turnKey solutions or partnering with us Mail us at: apollopartner@baidu.com
-
-
