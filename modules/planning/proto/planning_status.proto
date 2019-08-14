@@ -53,22 +53,21 @@ message OpenSpaceStatus {
   repeated string partitioned_trajectories_index_history = 1;
 }
 
+message ParkAndGoStatus{
+    optional apollo.common.PointENU adc_init_position = 1;
+    optional double adc_init_heading = 2;
+}
+
 message PathDeciderStatus {
   enum LaneBorrowDirection {
     LEFT_BORROW = 1;  // borrow left neighbor lane
     RIGHT_BORROW = 2;  // borrow right neighbor lane
   }
-
   optional int32 front_static_obstacle_cycle_counter = 1 [default = 0];
   optional int32 able_to_use_self_lane_counter = 2 [default = 0];
   optional bool is_in_path_lane_borrow_scenario = 3 [default = false];
   optional string front_static_obstacle_id = 4 [default = ""];
   repeated LaneBorrowDirection decided_side_pass_direction = 5;
-}
-
-message ParkAndGoStatus{
-    optional apollo.common.PointENU adc_init_position = 1;
-    optional double adc_init_heading = 2;
 }
 
 message PedestrianStatus {
@@ -114,15 +113,15 @@ message StopSignStatus {
   repeated string wait_for_obstacle_id = 3;
 }
 
+message TrafficLightStatus {
+  repeated string current_traffic_light_overlap_id = 1;
+  repeated string done_traffic_light_overlap_id = 2;
+}
+
 message YieldSignStatus {
   optional string current_yield_sign_overlap_id = 1;
   optional string done_yield_sign_overlap_id = 2;
   repeated string wait_for_obstacle_id = 3;
-}
-
-message TrafficLightStatus {
-  repeated string current_traffic_light_overlap_id = 1;
-  repeated string done_traffic_light_overlap_id = 2;
 }
 
 message PlanningStatus {
@@ -133,14 +132,14 @@ message PlanningStatus {
   optional apollo.common.EngageAdvice engage_advice = 5;
   optional OpenSpaceStatus open_space = 6;
   optional PedestrianStatus pedestrian = 7;
-  optional PathDeciderStatus path_decider = 8;
-  optional PullOverStatus pull_over = 9;
-  optional ReroutingStatus rerouting = 10;
-  optional RightOfWayStatus right_of_way = 11;
-  optional ScenarioStatus scenario = 12;
-  optional SidePassStatus side_pass = 13;
-  optional StopSignStatus stop_sign = 14;
-  optional YieldSignStatus yield_sign = 15;
+  optional ParkAndGoStatus park_and_go = 8;
+  optional PathDeciderStatus path_decider = 9;
+  optional PullOverStatus pull_over = 10;
+  optional ReroutingStatus rerouting = 11;
+  optional RightOfWayStatus right_of_way = 12;
+  optional ScenarioStatus scenario = 13;
+  optional SidePassStatus side_pass = 14;
+  optional StopSignStatus stop_sign = 15;
   optional TrafficLightStatus traffic_light = 16;
-  optional ParkAndGoStatus park_and_go = 17;
+  optional YieldSignStatus yield_sign = 17;
 }

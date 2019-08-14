@@ -112,6 +112,7 @@ message TrafficRuleConfig {
     REROUTING = 7;
     STOP_SIGN = 8;
     TRAFFIC_LIGHT = 9;
+    YIELD_SIGN = 10;
   }
   optional RuleId rule_id = 1;
   optional bool enabled = 2;
@@ -124,8 +125,8 @@ message TrafficRuleConfig {
     ReferenceLineEndConfig reference_line_end = 8;
     ReroutingConfig rerouting = 9;
     StopSignConfig stop_sign = 10;
-    YieldSignConfig yield_sign = 11;
-    TrafficLightConfig traffic_light = 12;
+    TrafficLightConfig traffic_light = 11;
+    YieldSignConfig yield_sign = 12;
   }
 }
 
