@@ -11,7 +11,7 @@ message FemPosDeviationSmootherConfig {
   optional double curvature_constraint = 7 [default = 0.2];
   optional bool use_sqp = 8 [default = false];
   optional double sqp_jtol = 9 [default = 1e-2];
-  optional int32 sqp_max_ter = 10 [default = 10];
+  optional int32 sqp_max_iter = 10 [default = 10];
 
   // osqp settings
   optional int32 max_iter = 100 [default = 500];

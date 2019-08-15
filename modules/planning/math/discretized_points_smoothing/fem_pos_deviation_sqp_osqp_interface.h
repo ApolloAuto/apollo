@@ -61,6 +61,10 @@ class FemPosDeviationSqpOsqpInterface {
         weight_curvature_constraint_slack_var;
   }
 
+  void set_curvature_constraint(const double curvature_constraint) {
+    curvature_constraint_ = curvature_constraint;
+  }
+
   void set_max_iter(const int max_iter) { max_iter_ = max_iter; }
 
   void set_time_limit(const double time_limit) { time_limit_ = time_limit; }
@@ -77,13 +81,13 @@ class FemPosDeviationSqpOsqpInterface {
     sqp_max_iter_ = sqp_max_iter;
   }
 
-  void set_sqp_jtol(const int sqp_jtol) { sqp_jtol_ = sqp_jtol; }
+  void set_sqp_jtol(const double sqp_jtol) { sqp_jtol_ = sqp_jtol; }
 
   bool Solve();
 
-  const std::vector<double>& opt_x() const { return x_; }
-
-  const std::vector<double>& opt_y() const { return y_; }
+  const std::vector<std::pair<double, double>>& opt_xy() const {
+    return opt_xy_;
+  }
 
  private:
   void CalculateKernel(std::vector<c_float>* P_data,
@@ -92,29 +96,26 @@ class FemPosDeviationSqpOsqpInterface {
 
   void CalculateOffset(std::vector<c_float>* q);
 
-  void CalculateAffineConstraint(std::vector<c_float>* A_data,
-                                 std::vector<c_int>* A_indices,
-                                 std::vector<c_int>* A_indptr,
-                                 std::vector<c_float>* lower_bounds,
-                                 std::vector<c_float>* upper_bounds);
+  std::vector<double> CalculateLinearizedFemPosParams(
+      const std::vector<std::pair<double, double>>& points, const size_t index);
 
-  void UpdateAffineConstraint(std::vector<c_float>* A_data,
-                              std::vector<c_int>* A_indices,
-                              std::vector<c_int>* A_indptr,
-                              std::vector<c_float>* lower_bounds,
-                              std::vector<c_float>* upper_bounds);
+  void CalculateAffineConstraint(
+      const std::vector<std::pair<double, double>>& points,
+      std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
+      std::vector<c_int>* A_indptr, std::vector<c_float>* lower_bounds,
+      std::vector<c_float>* upper_bounds);
 
-  void SetPrimalWarmStart(std::vector<c_float>* primal_warm_start);
-
-  void UpdatePrimalWarmStart(std::vector<c_float>* primal_warm_start);
+  void SetPrimalWarmStart(const std::vector<std::pair<double, double>>& points,
+                          std::vector<c_float>* primal_warm_start);
 
   bool OptimizeWithOsqp(const std::vector<c_float>& primal_warm_start,
                         OSQPWorkspace** work);
 
  private:
-  // Reference points and deviation bounds
+  // Init states and constraints
   std::vector<std::pair<double, double>> ref_points_;
   std::vector<double> bounds_around_refs_;
+  double curvature_constraint_ = 0.2;
 
   // Weights in optimization cost function
   double weight_fem_pos_deviation_ = 1.0e5;
@@ -143,8 +144,9 @@ class FemPosDeviationSqpOsqpInterface {
   int num_of_constraints_ = 0;
 
   // Optimized_result
-  std::vector<double> x_;
-  std::vector<double> y_;
+  std::vector<std::pair<double, double>> opt_xy_;
+  std::vector<double> slack_;
+  double average_interval_length_ = 0.0;
 };
 }  // namespace planning
 }  // namespace apollo
