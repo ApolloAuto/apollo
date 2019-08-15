@@ -66,6 +66,8 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:planning_common",
         "//modules/planning/common:planning_context",
         "//modules/planning/common/util:util_lib",
