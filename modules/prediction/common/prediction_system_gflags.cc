@@ -58,7 +58,7 @@ DEFINE_bool(enable_multi_thread, true, "If enable multi-thread.");
 DEFINE_int32(max_thread_num, 8, "Maximal number of threads.");
 DEFINE_int32(max_caution_thread_num, 2,
              "Maximal number of threads for caution obstacles.");
-DEFINE_bool(enable_async_draw_base_image, false,
+DEFINE_bool(enable_async_draw_base_image, true,
             "If enable async to draw base image");
 
 // Bag replay timestamp gap

@@ -56,6 +56,7 @@ DEFINE_int32(road_graph_max_search_horizon, 20,
 
 // Semantic Map
 DEFINE_double(base_image_half_range, 100.0, "The half range of base image.");
+DEFINE_bool(img_show_semantic_map, false, "If show the image of semantic map.");
 
 // Scenario
 DEFINE_double(junction_distance_threshold, 10.0,
