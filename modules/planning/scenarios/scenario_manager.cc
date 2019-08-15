@@ -23,6 +23,7 @@
 
 #include "modules/map/proto/map_lane.pb.h"
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_context.h"
@@ -196,7 +197,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
 
   // check around junction
   if (pull_over_scenario) {
-    constexpr double kDisanceToAvoidJunction = 8.0;  // meter
+    constexpr double kDistanceToAvoidJunction = 8.0;  // meter
     for (const auto& overlap : first_encountered_overlap_map_) {
       if (overlap.first == ReferenceLineInfo::PNC_JUNCTION ||
           overlap.first == ReferenceLineInfo::SIGNAL ||
@@ -204,9 +205,9 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
           overlap.first == ReferenceLineInfo::YIELD_SIGN) {
         const double distance_to = overlap.second.start_s - dest_sl.s();
         const double distance_passed = dest_sl.s() - overlap.second.end_s;
-        if ((distance_to > 0.0 && distance_to < kDisanceToAvoidJunction) ||
+        if ((distance_to > 0.0 && distance_to < kDistanceToAvoidJunction) ||
             (distance_passed > 0.0 &&
-             distance_passed < kDisanceToAvoidJunction)) {
+             distance_passed < kDistanceToAvoidJunction)) {
           pull_over_scenario = false;
           break;
         }
@@ -530,17 +531,25 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectParkAndGoScenario(
       common::VehicleStateProvider::Instance()->vehicle_state();
   auto adc_point = common::util::MakePointENU(
       vehicle_state.x(), vehicle_state.y(), vehicle_state.z());
+  // TODO(SHU) might consider gear == GEAR_PARKING
+  double adc_speed =
+      common::VehicleStateProvider::Instance()->linear_velocity();
   double s = 0.0;
   double l = 0.0;
+  const double max_abs_speed_when_stopped =
+      common::VehicleConfigHelper::Instance()
+          ->GetConfig()
+          .vehicle_param()
+          .max_abs_speed_when_stopped();
+
   hdmap::LaneInfoConstPtr lane;
-  if (HDMapUtil::BaseMap().GetNearestLaneWithHeading(
-          adc_point, 2.0, vehicle_state.heading(), M_PI / 3.0, &lane, &s, &l) !=
-      0) {
+  // if vehicle is static and (off-lane or not on city_driving lane)
+  if (std::fabs(adc_speed) < max_abs_speed_when_stopped &&
+      (HDMapUtil::BaseMap().GetNearestLaneWithHeading(
+           adc_point, 2.0, vehicle_state.heading(), M_PI / 3.0, &lane, &s,
+           &l) != 0 ||
+       lane->lane().type() != hdmap::Lane::CITY_DRIVING)) {
     park_and_go = true;
-  } else {
-    if (lane->lane().type() != hdmap::Lane::CITY_DRIVING) {
-      park_and_go = true;
-    }
   }
 
   if (park_and_go) {
