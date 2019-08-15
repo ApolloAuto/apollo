@@ -64,6 +64,7 @@ bool FemPosDeviationSmoother::QpWithOsqp(
   solver.set_weight_fem_pos_deviation(config_.weight_fem_pos_deviation());
   solver.set_weight_path_length(config_.weight_path_length());
   solver.set_weight_ref_deviation(config_.weight_ref_deviation());
+
   solver.set_max_iter(config_.max_iter());
   solver.set_time_limit(config_.time_limit());
   solver.set_verbose(config_.verbose());
@@ -94,6 +95,13 @@ bool FemPosDeviationSmoother::SqpWithOsqp(
   solver.set_weight_fem_pos_deviation(config_.weight_fem_pos_deviation());
   solver.set_weight_path_length(config_.weight_path_length());
   solver.set_weight_ref_deviation(config_.weight_ref_deviation());
+  solver.set_weight_curvature_constraint_slack_var(
+      config_.weight_curvature_constraint_slack_var());
+
+  solver.set_curvature_constraint(config_.curvature_constraint());
+
+  solver.set_sqp_max_iter(config_.sqp_max_iter());
+  solver.set_sqp_jtol(config_.sqp_jtol());
   solver.set_max_iter(config_.max_iter());
   solver.set_time_limit(config_.time_limit());
   solver.set_verbose(config_.verbose());
@@ -107,8 +115,15 @@ bool FemPosDeviationSmoother::SqpWithOsqp(
     return false;
   }
 
-  *opt_x = solver.opt_x();
-  *opt_y = solver.opt_y();
+  std::vector<std::pair<double, double>> opt_xy = solver.opt_xy();
+
+  // TODO(Jinyun): unify output data container
+  opt_x->resize(opt_xy.size());
+  opt_y->resize(opt_xy.size());
+  for (size_t i = 0; i < opt_xy.size(); ++i) {
+    (*opt_x)[i] = opt_xy[i].first;
+    (*opt_y)[i] = opt_xy[i].second;
+  }
   return true;
 }
 
