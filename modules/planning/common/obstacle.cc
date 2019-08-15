@@ -382,16 +382,18 @@ bool Obstacle::BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
     const auto& first_point = first_traj_point.path_point();
     const auto& second_point = second_traj_point.path_point();
 
-    double total_length =
+    double object_moving_box_length =
         object_length + common::util::DistanceXY(first_point, second_point);
 
     common::math::Vec2d center((first_point.x() + second_point.x()) / 2.0,
                                (first_point.y() + second_point.y()) / 2.0);
     common::math::Box2d object_moving_box(center, first_point.theta(),
-                                          total_length, object_width);
+                                          object_moving_box_length,
+                                          object_width);
     SLBoundary object_boundary;
     // NOTICE: this method will have errors when the reference line is not
     // straight. Need double loop to cover all corner cases.
+    // roughly skip points that are too close to last_sl_boundary box
     const double distance_xy =
         common::util::DistanceXY(trajectory_points[last_index].path_point(),
                                  trajectory_points[i].path_point());
