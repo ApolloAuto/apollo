@@ -459,13 +459,15 @@ bool Obstacle::BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
       if (!has_low) {
         auto low_ref = reference_line.GetReferencePoint(low_s);
         has_low = object_moving_box.HasOverlap(
-            {low_ref, low_ref.heading(), adc_length, adc_width});
+            {low_ref, low_ref.heading(),
+             adc_length, adc_width + FLAGS_nonstatic_obstacle_nudge_l_buffer});
         low_s += st_boundary_delta_s;
       }
       if (!has_high) {
         auto high_ref = reference_line.GetReferencePoint(high_s);
         has_high = object_moving_box.HasOverlap(
-            {high_ref, high_ref.heading(), adc_length, adc_width});
+            {high_ref, high_ref.heading(),
+             adc_length, adc_width + FLAGS_nonstatic_obstacle_nudge_l_buffer});
         high_s -= st_boundary_delta_s;
       }
     }
