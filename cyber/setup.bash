@@ -13,7 +13,6 @@ service_path="${CYBER_PATH}/tools/cyber_service"
 qt_path=/usr/local/Qt5.5.1/5.5/gcc_64
 rosbag_to_record_path="/apollo/bazel-bin/modules/data/tools/rosbag_to_record"
 
-
 export LD_LIBRARY_PATH=${qt_path}/lib:$LD_LIBRARY_PATH
 export QT_QPA_PLATFORM_PLUGIN_PATH=${qt_path}/plugins
 export PATH=${binary_path}:${recorder_path}:${monitor_path}:${launch_path}:${channel_path}:${node_path}:${service_path}:${qt_path}/bin:${visualizer_path}:${rosbag_to_record_path}:$PATH

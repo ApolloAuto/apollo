@@ -81,11 +81,13 @@ function check_in_docker() {
 }
 
 function set_lib_path() {
+  export LD_LIBRARY_PATH=/usr/lib:/usr/lib/x86_64-linux-gnu
+  export LD_PRELOAD=
+ 
   local PRELOAD="libcaffe2_gpu.so libopencv_core.so"
   if [ "$1" == "CYBER_ONLY" ]; then
     PRELOAD=""
   fi
-  export LD_LIBRARY_PATH=/usr/lib:/usr/lib/x86_64-linux-gnu
   if [ "$RELEASE_DOCKER" == 1 ]; then
     local CYBER_SETUP="/apollo/cyber/setup.bash"
     if [ -e "${CYBER_SETUP}" ]; then
