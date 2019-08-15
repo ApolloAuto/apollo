@@ -398,10 +398,10 @@ void OpenSpaceRoiDecider::AddBoundaryKeyPoint(
     const bool is_left_curb, std::vector<Vec2d> *center_lane_boundary,
     std::vector<Vec2d> *curb_lane_boundary, std::vector<double> *center_lane_s,
     std::vector<double> *road_width) {
-  // Check if current centerl-lane checking point's mapping on the left/right
+  // Check if current central-lane checking point's mapping on the left/right
   // road boundary is a key point. The road boundary point is a key point if one
   // of the following two confitions is satisfied:
-  // 1. the current centerl-lane point is an anchor point: (a start/end point or
+  // 1. the current central-lane point is an anchor point: (a start/end point or
   // the point on path with large curvatures)
   // 2. the point on the left/right lane boundary is close to a curb corner
   // As indicated below:
