@@ -21,7 +21,7 @@
 #include <vector>
 
 #include "torch/script.h"
-#include "torch/torch.h"
+#include "torch/extension.h"
 
 #include "modules/prediction/evaluator/evaluator.h"
 
@@ -73,7 +73,7 @@ class JunctionMapEvaluator : public Evaluator {
  private:
   // junction exit mask
   static const size_t JUNCTION_FEATURE_SIZE = 12;
-  std::shared_ptr<torch::jit::script::Module> torch_model_ptr_ = nullptr;
+  torch::jit::script::Module torch_model_ptr_;
   torch::Device device_;
 };
 

@@ -99,7 +99,7 @@ class LaneScanningEvaluator : public Evaluator {
 
   void ModelInference(
       const std::vector<torch::jit::IValue>& torch_inputs,
-      std::shared_ptr<torch::jit::script::Module> torch_model_ptr,
+      torch::jit::script::Module torch_model_ptr,
       Feature* feature_ptr);
 
  private:
@@ -111,8 +111,7 @@ class LaneScanningEvaluator : public Evaluator {
   static const size_t MAX_NUM_LANE = 10;
   static const size_t SHORT_TERM_TRAJECTORY_SIZE = 10;
 
-  std::shared_ptr<torch::jit::script::Module> torch_lane_scanning_model_ptr_ =
-      nullptr;
+  torch::jit::script::Module torch_lane_scanning_model_ptr_;
   torch::Device device_;
 };
 

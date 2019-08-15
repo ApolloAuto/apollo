@@ -95,12 +95,9 @@ class LaneAggregatingEvaluator : public Evaluator {
   void LoadModel();
 
  private:
-  std::shared_ptr<torch::jit::script::Module> torch_obstacle_encoding_ptr_ =
-      nullptr;
-  std::shared_ptr<torch::jit::script::Module> torch_lane_encoding_ptr_ =
-      nullptr;
-  std::shared_ptr<torch::jit::script::Module> torch_prediction_layer_ptr_ =
-      nullptr;
+  torch::jit::script::Module torch_obstacle_encoding_ptr_;
+  torch::jit::script::Module torch_lane_encoding_ptr_;
+  torch::jit::script::Module torch_prediction_layer_ptr_;
   torch::Device device_;
 
   static const size_t OBSTACLE_FEATURE_SIZE = 20 * 9;

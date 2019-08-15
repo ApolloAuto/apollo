@@ -98,7 +98,7 @@ class CruiseMLPEvaluator : public Evaluator {
 
   void ModelInference(
       const std::vector<torch::jit::IValue>& torch_inputs,
-      std::shared_ptr<torch::jit::script::Module> torch_model_ptr,
+      torch::jit::script::Module torch_model_ptr,
       LaneSequence* lane_sequence_ptr);
 
  private:
@@ -107,8 +107,8 @@ class CruiseMLPEvaluator : public Evaluator {
   static const size_t SINGLE_LANE_FEATURE_SIZE = 4;
   static const size_t LANE_POINTS_SIZE = 20;
 
-  std::shared_ptr<torch::jit::script::Module> torch_go_model_ptr_ = nullptr;
-  std::shared_ptr<torch::jit::script::Module> torch_cutin_model_ptr_ = nullptr;
+  torch::jit::script::Module torch_go_model_ptr_;
+  torch::jit::script::Module torch_cutin_model_ptr_;
   torch::Device device_;
 };
 
