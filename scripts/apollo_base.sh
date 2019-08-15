@@ -84,7 +84,7 @@ function set_lib_path() {
   export LD_LIBRARY_PATH=/usr/lib:/usr/lib/x86_64-linux-gnu
   export LD_PRELOAD=
  
-  local PRELOAD="libcaffe2_gpu.so libopencv_core.so"
+  local PRELOAD="libopencv_core.so"
   if [ "$1" == "CYBER_ONLY" ]; then
     PRELOAD=""
   fi
@@ -109,7 +109,6 @@ function set_lib_path() {
   export LD_LIBRARY_PATH=/usr/local/Qt5.5.1/5.5/gcc_64/lib:$LD_LIBRARY_PATH
   export LD_LIBRARY_PATH=/usr/local/fast-rtps/lib:$LD_LIBRARY_PATH
   export LD_LIBRARY_PATH=/usr/local/apollo/libtorch/lib:$LD_LIBRARY_PATH
-  export LD_LIBRARY_PATH=/usr/local/apollo/libtorch_gpu/lib:$LD_LIBRARY_PATH
   export LD_LIBRARY_PATH=/usr/local/apollo/boost/lib:$LD_LIBRARY_PATH
   export LD_LIBRARY_PATH=/usr/local/apollo/paddlepaddle_dep/mkldnn/lib/:$LD_LIBRARY_PATH
   export LD_PRELOAD="$PRELOAD"

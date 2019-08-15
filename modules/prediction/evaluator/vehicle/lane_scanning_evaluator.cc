@@ -443,11 +443,10 @@ bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
 }
 
 void LaneScanningEvaluator::LoadModel() {
-  // TODO(all) uncomment the following when cuda issue is resolved
-  // if (torch::cuda::is_available()) {
-  //   ADEBUG << "CUDA is available";
-  //   device_ = torch::Device(torch::kCUDA);
-  // }
+  if (torch::cuda::is_available()) {
+    ADEBUG << "CUDA is available";
+    device_ = torch::Device(torch::kCUDA);
+  }
   torch::set_num_threads(1);
   torch_lane_scanning_model_ptr_ =
       torch::jit::load(FLAGS_torch_vehicle_lane_scanning_file, device_);
@@ -455,9 +454,9 @@ void LaneScanningEvaluator::LoadModel() {
 
 void LaneScanningEvaluator::ModelInference(
     const std::vector<torch::jit::IValue>& torch_inputs,
-    std::shared_ptr<torch::jit::script::Module> torch_model_ptr,
+    torch::jit::script::Module torch_model_ptr,
     Feature* feature_ptr) {
-  auto torch_output_tensor = torch_model_ptr->forward(torch_inputs).toTensor();
+  auto torch_output_tensor = torch_model_ptr.forward(torch_inputs).toTensor();
   auto torch_output = torch_output_tensor.accessor<float, 3>();
   for (size_t i = 0; i < SHORT_TERM_TRAJECTORY_SIZE; ++i) {
     TrajectoryPoint point;

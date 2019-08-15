@@ -548,9 +548,9 @@ void CruiseMLPEvaluator::LoadModels() {
 
 void CruiseMLPEvaluator::ModelInference(
     const std::vector<torch::jit::IValue>& torch_inputs,
-    std::shared_ptr<torch::jit::script::Module> torch_model_ptr,
+    torch::jit::script::Module torch_model_ptr,
     LaneSequence* lane_sequence_ptr) {
-  auto torch_output_tuple = torch_model_ptr->forward(torch_inputs).toTuple();
+  auto torch_output_tuple = torch_model_ptr.forward(torch_inputs).toTuple();
   auto probability_tensor = torch_output_tuple->elements()[0].toTensor();
   auto finish_time_tensor = torch_output_tuple->elements()[1].toTensor();
   lane_sequence_ptr->set_probability(Sigmoid(

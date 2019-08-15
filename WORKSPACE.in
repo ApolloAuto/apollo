@@ -294,13 +294,6 @@ new_local_repository(
     path = "/usr/local/apollo/libtorch",
 )
 
-# PyTorch GPU
-new_local_repository(
-    name = "pytorch_gpu",
-    build_file = "third_party/pytorch_gpu.BUILD",
-    path = "/usr/local/apollo/libtorch_gpu",
-)
-
 # ffmpeg
 new_local_repository(
     name = "ffmpeg",
