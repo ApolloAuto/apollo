@@ -235,7 +235,9 @@ DEFINE_bool(enable_alwasy_stop_for_pedestrian, true,
 DEFINE_bool(enable_side_radar, false,
             "If there is no radar on the side,ignore it");
 DEFINE_double(static_obstacle_nudge_l_buffer, 0.3,
-              "minimum l-distance to nudge an obstacle (meters)");
+              "minimum l-distance to nudge a static obstacle (meters)");
+DEFINE_double(nonstatic_obstacle_nudge_l_buffer, 0.4,
+              "minimum l-distance to nudge a non-static obstacle (meters)");
 DEFINE_double(lateral_ignore_buffer, 3.0,
               "If an obstacle's lateral distance is further away than this "
               "distance, ignore it");

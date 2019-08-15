@@ -207,7 +207,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
       const Box2d& obs_box = obstacle.PerceptionBoundingBox();
 
       if (CheckOverlap(curr_point_on_path, obs_box,
-                       speed_bounds_config_.boundary_buffer())) {
+                       FLAGS_nonstatic_obstacle_nudge_l_buffer)) {
         const double backward_distance = -vehicle_param_.front_edge_to_center();
         const double forward_distance = obs_box.length();
         double low_s =
@@ -253,7 +253,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
         const auto curr_adc_path_point =
             discretized_path.Evaluate(path_s + discretized_path.front().s());
         if (CheckOverlap(curr_adc_path_point, obs_box,
-                         speed_bounds_config_.boundary_buffer())) {
+                         FLAGS_nonstatic_obstacle_nudge_l_buffer)) {
           // found overlap, start searching with higher resolution
           const double backward_distance = -step_length;
           const double forward_distance = vehicle_param_.length() +
@@ -277,7 +277,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
               const auto& point_low = discretized_path.Evaluate(
                   low_s + discretized_path.front().s());
               if (!CheckOverlap(point_low, obs_box,
-                                speed_bounds_config_.boundary_buffer())) {
+                                FLAGS_nonstatic_obstacle_nudge_l_buffer)) {
                 low_s += fine_tuning_step_length;
               } else {
                 find_low = true;
@@ -287,7 +287,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
               const auto& point_high = discretized_path.Evaluate(
                   high_s + discretized_path.front().s());
               if (!CheckOverlap(point_high, obs_box,
-                                speed_bounds_config_.boundary_buffer())) {
+                                FLAGS_nonstatic_obstacle_nudge_l_buffer)) {
                 high_s -= fine_tuning_step_length;
               } else {
                 find_high = true;
@@ -366,7 +366,7 @@ void STBoundaryMapper::ComputeSTBoundaryWithDecision(
 
 bool STBoundaryMapper::CheckOverlap(const PathPoint& path_point,
                                     const Box2d& obs_box,
-                                    const double buffer) const {
+                                    const double l_buffer) const {
   Vec2d ego_center_map_frame((vehicle_param_.front_edge_to_center() -
                               vehicle_param_.back_edge_to_center()) *
                                  0.5,
@@ -379,7 +379,7 @@ bool STBoundaryMapper::CheckOverlap(const PathPoint& path_point,
   ego_center_map_frame.set_y(ego_center_map_frame.y() + path_point.y());
 
   Box2d adc_box(ego_center_map_frame, path_point.theta(),
-                vehicle_param_.length(), vehicle_param_.width());
+                vehicle_param_.length(), vehicle_param_.width() + l_buffer);
   return obs_box.HasOverlap(adc_box);
 }
 

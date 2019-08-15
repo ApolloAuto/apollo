@@ -52,7 +52,7 @@ class STBoundaryMapper {
   FRIEND_TEST(StBoundaryMapperTest, check_overlap_test);
   bool CheckOverlap(const common::PathPoint& path_point,
                     const common::math::Box2d& obs_box,
-                    const double buffer) const;
+                    const double l_buffer) const;
 
   /**
    * Creates valid st boundary upper_points and lower_points
