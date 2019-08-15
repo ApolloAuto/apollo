@@ -185,7 +185,7 @@ bool IsBlockingDrivingPathObstacle(const ReferenceLine& reference_line,
       VehicleConfigHelper::GetConfig().vehicle_param().width();
   ADEBUG << " (driving width = " << driving_width
          << ", adc_width = " << adc_width << ")";
-  if (driving_width > adc_width + FLAGS_static_decision_nudge_l_buffer +
+  if (driving_width > adc_width + FLAGS_static_obstacle_nudge_l_buffer +
                           FLAGS_side_pass_driving_width_l_buffer) {
     // TODO(jiacheng): make this a GFLAG:
     // side_pass_context_.scenario_config_.min_l_nudge_buffer()
