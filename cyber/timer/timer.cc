@@ -64,11 +64,10 @@ bool Timer::InitTimerTask() {
     std::weak_ptr<TimerTask> task_weak_ptr = task_;
     task_->callback = [callback = this->timer_opt_.callback, task_weak_ptr]() {
       auto task = task_weak_ptr.lock();
-      if (!task) {
-        return;
+      if (task) {
+        std::lock_guard<std::mutex> lg(task->mtx_);
+        callback();
       }
-      std::lock_guard<std::mutex> lg(task->mtx_);
-      callback();
     };
   } else {
     std::weak_ptr<TimerTask> task_weak_ptr = task_;
