@@ -4376,9 +4376,8 @@
                     "NOT_DEFINED": 0,
                     "PARKING": 1,
                     "PULL_OVER": 2,
-                    "PARK_AND_GO_ADJUST": 3,
-                    "PARK_AND_GO_CRUISE": 4,
-                    "NARROW_STREET_U_TURN": 5
+                    "PARK_AND_GO": 3,
+                    "NARROW_STREET_U_TURN": 4
                   }
                 }
               }
@@ -6317,20 +6316,32 @@
             "ScenarioParkAndGoConfig": {
               "fields": {}
             },
+            "ScenarioYieldSigndConfig": {
+              "fields": {
+                "startYieldSignScenarioDistance": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 5
+                  }
+                }
+              }
+            },
             "ScenarioConfig": {
               "oneofs": {
                 "scenarioConfig": {
                   "oneof": [
                     "laneFollowConfig",
                     "bareIntersectionUnprotectedConfig",
+                    "narrowStreetUTurnConfig",
                     "stopSignUnprotectedConfig",
                     "trafficLightProtectedConfig",
                     "trafficLightUnprotectedRightTurnConfig",
                     "trafficLightUnprotectedLeftTurnConfig",
+                    "parkAndGoConfig",
                     "pullOverConfig",
                     "valetParkingConfig",
-                    "narrowStreetUTurnConfig",
-                    "parkAndGoConfig"
+                    "yieldSignConfig"
                   ]
                 }
               },
@@ -6347,42 +6358,46 @@
                   "type": "ScenarioBareIntersectionUnprotectedConfig",
                   "id": 4
                 },
+                "narrowStreetUTurnConfig": {
+                  "type": "ScenarioNarrowStreetUTurnConfig",
+                  "id": 5
+                },
                 "stopSignUnprotectedConfig": {
                   "type": "ScenarioStopSignUnprotectedConfig",
-                  "id": 5
+                  "id": 6
                 },
                 "trafficLightProtectedConfig": {
                   "type": "ScenarioTrafficLightProtectedConfig",
-                  "id": 6
+                  "id": 7
                 },
                 "trafficLightUnprotectedRightTurnConfig": {
                   "type": "ScenarioTrafficLightUnprotectedRightTurnConfig",
-                  "id": 7
+                  "id": 8
                 },
                 "trafficLightUnprotectedLeftTurnConfig": {
                   "type": "ScenarioTrafficLightUnprotectedLeftTurnConfig",
-                  "id": 8
-                },
-                "pullOverConfig": {
-                  "type": "ScenarioPullOverConfig",
                   "id": 9
-                },
-                "valetParkingConfig": {
-                  "type": "ScenarioValetParkingConfig",
-                  "id": 10
-                },
-                "narrowStreetUTurnConfig": {
-                  "type": "ScenarioNarrowStreetUTurnConfig",
-                  "id": 11
                 },
                 "parkAndGoConfig": {
                   "type": "ScenarioParkAndGoConfig",
+                  "id": 10
+                },
+                "pullOverConfig": {
+                  "type": "ScenarioPullOverConfig",
+                  "id": 11
+                },
+                "valetParkingConfig": {
+                  "type": "ScenarioValetParkingConfig",
                   "id": 12
+                },
+                "yieldSignConfig": {
+                  "type": "ScenarioYieldSigndConfig",
+                  "id": 13
                 },
                 "stageType": {
                   "rule": "repeated",
                   "type": "StageType",
-                  "id": 13,
+                  "id": 14,
                   "options": {
                     "packed": false
                   }
@@ -6390,7 +6405,7 @@
                 "stageConfig": {
                   "rule": "repeated",
                   "type": "StageConfig",
-                  "id": 14
+                  "id": 15
                 }
               },
               "nested": {
@@ -6404,7 +6419,7 @@
                     "TRAFFIC_LIGHT_PROTECTED": 6,
                     "TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN": 7,
                     "TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN": 8,
-                    "YIELD_SIGN_UNPROTECTED": 9,
+                    "YIELD_SIGN": 9,
                     "PULL_OVER": 10,
                     "VALET_PARKING": 11,
                     "NARROW_STREET_U_TURN": 12,
@@ -6434,9 +6449,12 @@
                     "PULL_OVER_RETRY_PARKING": 502,
                     "VALET_PARKING_APPROACHING_PARKING_SPOT": 510,
                     "VALET_PARKING_PARKING": 511,
-                    "PARK_AND_GO_CHECK": 601,
-                    "PARK_AND_GO_CRUISE": 602,
-                    "PARK_AND_GO_ADJUST": 603
+                    "PARK_AND_GO_CHECK": 600,
+                    "PARK_AND_GO_CRUISE": 601,
+                    "PARK_AND_GO_ADJUST": 602,
+                    "YIELD_SIGN_APPROACH": 700,
+                    "YIELD_SIGN_CREEP": 701,
+                    "YIELD_SIGN_INTERSECTION_CRUISE": 703
                   }
                 },
                 "StageConfig": {
@@ -6716,6 +6734,18 @@
                 }
               }
             },
+            "ParkAndGoStatus": {
+              "fields": {
+                "adcInitPosition": {
+                  "type": "apollo.common.PointENU",
+                  "id": 1
+                },
+                "adcInitHeading": {
+                  "type": "double",
+                  "id": 2
+                }
+              }
+            },
             "PathDeciderStatus": {
               "fields": {
                 "frontStaticObstacleCycleCounter": {
@@ -6761,18 +6791,6 @@
                     "LEFT_BORROW": 1,
                     "RIGHT_BORROW": 2
                   }
-                }
-              }
-            },
-            "ParkAndGoStatus": {
-              "fields": {
-                "adcInitPosition": {
-                  "type": "apollo.common.PointENU",
-                  "id": 1
-                },
-                "adcInitHeading": {
-                  "type": "double",
-                  "id": 2
                 }
               }
             },
@@ -6914,6 +6932,18 @@
                 }
               }
             },
+            "YieldSignStatus": {
+              "fields": {
+                "currentYieldSignOverlapId": {
+                  "type": "string",
+                  "id": 1
+                },
+                "doneYieldSignOverlapId": {
+                  "type": "string",
+                  "id": 2
+                }
+              }
+            },
             "PlanningStatus": {
               "fields": {
                 "bareIntersection": {
@@ -6944,41 +6974,45 @@
                   "type": "PedestrianStatus",
                   "id": 7
                 },
+                "parkAndGo": {
+                  "type": "ParkAndGoStatus",
+                  "id": 8
+                },
                 "pathDecider": {
                   "type": "PathDeciderStatus",
-                  "id": 8
+                  "id": 9
                 },
                 "pullOver": {
                   "type": "PullOverStatus",
-                  "id": 9
+                  "id": 10
                 },
                 "rerouting": {
                   "type": "ReroutingStatus",
-                  "id": 10
+                  "id": 11
                 },
                 "rightOfWay": {
                   "type": "RightOfWayStatus",
-                  "id": 11
+                  "id": 12
                 },
                 "scenario": {
                   "type": "ScenarioStatus",
-                  "id": 12
+                  "id": 13
                 },
                 "sidePass": {
                   "type": "SidePassStatus",
-                  "id": 13
+                  "id": 14
                 },
                 "stopSign": {
                   "type": "StopSignStatus",
-                  "id": 14
+                  "id": 15
                 },
                 "trafficLight": {
                   "type": "TrafficLightStatus",
-                  "id": 15
-                },
-                "parkAndGo": {
-                  "type": "ParkAndGoStatus",
                   "id": 16
+                },
+                "yieldSign": {
+                  "type": "YieldSignStatus",
+                  "id": 17
                 }
               }
             },
@@ -7797,6 +7831,31 @@
                 }
               }
             },
+            "YieldSignConfig": {
+              "fields": {
+                "enabled": {
+                  "type": "bool",
+                  "id": 1,
+                  "options": {
+                    "default": true
+                  }
+                },
+                "stopDistance": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "startWatchDistance": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 2
+                  }
+                }
+              }
+            },
             "TrafficRuleConfig": {
               "oneofs": {
                 "config": {
@@ -7809,7 +7868,8 @@
                     "referenceLineEnd",
                     "rerouting",
                     "stopSign",
-                    "trafficLight"
+                    "trafficLight",
+                    "yieldSign"
                   ]
                 }
               },
@@ -7857,6 +7917,10 @@
                 "trafficLight": {
                   "type": "TrafficLightConfig",
                   "id": 11
+                },
+                "yieldSign": {
+                  "type": "YieldSignConfig",
+                  "id": 12
                 }
               },
               "nested": {
@@ -7870,7 +7934,8 @@
                     "REFERENCE_LINE_END": 6,
                     "REROUTING": 7,
                     "STOP_SIGN": 8,
-                    "TRAFFIC_LIGHT": 9
+                    "TRAFFIC_LIGHT": 9,
+                    "YIELD_SIGN": 10
                   }
                 }
               }
