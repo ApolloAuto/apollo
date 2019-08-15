@@ -82,7 +82,7 @@ void SemanticMap::RunCurrFrame(
   obstacle_id_history_map_ = obstacle_id_history_map;
 
   // Crop ego_vehicle for demo
-  if (false) {
+  if (FLAGS_img_show_semantic_map) {
     cv::Mat output_img;
     if (GetMapById(FLAGS_ego_vehicle_id, &output_img)) {
       cv::namedWindow("Demo window", cv::WINDOW_NORMAL);
