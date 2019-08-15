@@ -25,6 +25,7 @@ stage_config:{
         task_type: OPEN_SPACE_ROI_DECIDER
         open_space_roi_decider_config {
             roi_type: PARK_AND_GO
+            perception_obstacle_buffer: 0.1
         }
     }
     task_config: {
