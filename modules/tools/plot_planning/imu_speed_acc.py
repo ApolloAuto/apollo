@@ -18,36 +18,35 @@
 
 import math
 from record_reader import RecordItemReader
+from imu_speed import ImuSpeed
 
 
-class ImuSpeed:
+class ImuSpeedAcc:
 
     def __init__(self):
         self.timestamp_list = []
-        self.speed_list = []
-
-        self.last_speed_mps = None
-        self.last_imu_speed = None
+        self.acc_list = []
+        self.imu_speed = ImuSpeed()
 
     def add(self, location_est):
-        timestamp_sec = location_est.measurement_time
-        self.timestamp_list.append(timestamp_sec)
+        self.imu_speed.add(location_est)
+        speed_timestamp_list = self.imu_speed.get_timestamp_list()
+        if len(speed_timestamp_list) > 5:
+            speed_list = self.imu_speed.get_speed_list()
+            acc = (speed_list[-1] - speed_list[-5]) / \
+                (speed_timestamp_list[-1] - speed_timestamp_list[-5])
+            self.acc_list.append(acc)
+            self.timestamp_list.append(speed_timestamp_list[-1])
 
-        speed = location_est.pose.linear_velocity.x \
-            * math.cos(location_est.pose.heading) + \
-            location_est.pose.linear_velocity.y * \
-            math.sin(location_est.pose.heading)
-        self.speed_list.append(speed)
-
-    def get_speed_list(self):
-        return self.speed_list
+    def get_acc_list(self):
+        return self.acc_list
 
     def get_timestamp_list(self):
         return self.timestamp_list
 
-    def get_lastest_speed(self):
-        if len(self.speed_list) > 0:
-            return self.speed_list[-1]
+    def get_lastest_acc(self):
+        if len(self.acc_list) > 0:
+            return self.acc_list[-1]
         else:
             return None
 
@@ -75,7 +74,7 @@ if __name__ == "__main__":
         fns = [f for f in listdir(folder) if isfile(join(folder, f))]
         for fn in fns:
             reader = RecordItemReader(folder+"/"+fn)
-            processor = TimeSpeedData()
+            processor = ImuSpeedAcc()
             last_pose_data = None
             last_chassis_data = None
             topics = ["/apollo/localization/pose"]
@@ -85,7 +84,9 @@ if __name__ == "__main__":
                     processor.add(last_pose_data)
 
             data_x = processor.get_timestamp_list()
-            data_y = processor.get_speed_list()
+            data_y = processor.get_acc_list()
             ax.scatter(data_x, data_y, c=color, marker=marker, alpha=0.4)
+        ax.set_xlabel('Timestamp')
+        ax.set_ylabel('Acc')
 
     plt.show()
