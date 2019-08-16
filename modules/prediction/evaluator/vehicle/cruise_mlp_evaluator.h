@@ -107,8 +107,8 @@ class CruiseMLPEvaluator : public Evaluator {
   static const size_t SINGLE_LANE_FEATURE_SIZE = 4;
   static const size_t LANE_POINTS_SIZE = 20;
 
-  torch::jit::script::Module torch_go_model_ptr_;
-  torch::jit::script::Module torch_cutin_model_ptr_;
+  torch::jit::script::Module torch_go_model_;
+  torch::jit::script::Module torch_cutin_model_;
   torch::Device device_;
 };
 

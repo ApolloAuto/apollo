@@ -131,9 +131,9 @@ bool CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     }
     torch_inputs.push_back(torch_input.to(device_));
     if (lane_sequence_ptr->vehicle_on_lane()) {
-      ModelInference(torch_inputs, torch_go_model_ptr_, lane_sequence_ptr);
+      ModelInference(torch_inputs, torch_go_model_, lane_sequence_ptr);
     } else {
-      ModelInference(torch_inputs, torch_cutin_model_ptr_, lane_sequence_ptr);
+      ModelInference(torch_inputs, torch_cutin_model_, lane_sequence_ptr);
     }
   }
   return true;
@@ -540,9 +540,9 @@ void CruiseMLPEvaluator::LoadModels() {
   //   device_ = torch::Device(torch::kCUDA);
   // }
   torch::set_num_threads(1);
-  torch_go_model_ptr_ =
+  torch_go_model_ =
       torch::jit::load(FLAGS_torch_vehicle_cruise_go_file, device_);
-  torch_cutin_model_ptr_ =
+  torch_cutin_model_ =
       torch::jit::load(FLAGS_torch_vehicle_cruise_cutin_file, device_);
 }
 

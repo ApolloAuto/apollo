@@ -102,7 +102,7 @@ class JunctionMLPEvaluator : public Evaluator {
   // junction feature on 12 fan area 8 dim each
   static const size_t JUNCTION_FEATURE_SIZE = 12 * 8;
 
-  torch::jit::script::Module torch_model_ptr_;
+  torch::jit::script::Module torch_model_;
   torch::Device device_;
 };
 
