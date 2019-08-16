@@ -82,12 +82,7 @@ function check_in_docker() {
 
 function set_lib_path() {
   export LD_LIBRARY_PATH=/usr/lib:/usr/lib/x86_64-linux-gnu
-  export LD_PRELOAD=
- 
-  local PRELOAD="libopencv_core.so"
-  if [ "$1" == "CYBER_ONLY" ]; then
-    PRELOAD=""
-  fi
+
   if [ "$RELEASE_DOCKER" == 1 ]; then
     local CYBER_SETUP="/apollo/cyber/setup.bash"
     if [ -e "${CYBER_SETUP}" ]; then
@@ -111,7 +106,6 @@ function set_lib_path() {
   export LD_LIBRARY_PATH=/usr/local/apollo/libtorch/lib:$LD_LIBRARY_PATH
   export LD_LIBRARY_PATH=/usr/local/apollo/boost/lib:$LD_LIBRARY_PATH
   export LD_LIBRARY_PATH=/usr/local/apollo/paddlepaddle_dep/mkldnn/lib/:$LD_LIBRARY_PATH
-  export LD_PRELOAD="$PRELOAD"
   export PYTHONPATH=/usr/local/lib/python2.7/dist-packages:${PY_LIB_PATH}:${PY_TOOLS_PATH}:${PYTHONPATH}
   if [ -e /usr/local/cuda-8.0/ ];then
     export PATH=/usr/local/cuda-8.0/bin:$PATH
