@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 #pragma once
-#include <boost/filesystem.hpp>
 #include <algorithm>
+#include <boost/filesystem.hpp>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -37,8 +37,8 @@ class SequenceDataLoader {
   virtual ~SequenceDataLoader() = default;
   bool init_loader_with_list(const std::vector<std::string>& file_lists);
   bool init_loader_with_folder(const std::vector<std::string>& folders);
-  virtual bool query_next(std::shared_ptr<DataType>& data); // NOLINT
-  virtual bool query_last(std::shared_ptr<DataType>& data); // NOLINT
+  virtual bool query_next(std::shared_ptr<DataType>& data);  // NOLINT
+  virtual bool query_last(std::shared_ptr<DataType>& data);  // NOLINT
   inline std::size_t size() { return _initialized ? _filenames[0].size() : 0; }
   inline const std::vector<std::vector<std::string>>& get_filenames() const {
     return _filenames;
@@ -120,7 +120,7 @@ bool SequenceDataLoader<DataType>::init_loader_with_folder(
 
 template <class DataType>
 bool SequenceDataLoader<DataType>::query_next(
-    std::shared_ptr<DataType>& data) { // NOLINT
+    std::shared_ptr<DataType>& data) {  // NOLINT
   if (!_initialized) {
     return false;
   }
@@ -142,7 +142,7 @@ bool SequenceDataLoader<DataType>::query_next(
 
 template <class DataType>
 bool SequenceDataLoader<DataType>::query_last(
-    std::shared_ptr<DataType>& data) { // NOLINT
+    std::shared_ptr<DataType>& data) {  // NOLINT
   if (!_initialized) {
     return false;
   }

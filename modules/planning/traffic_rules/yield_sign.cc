@@ -34,13 +34,13 @@ using apollo::hdmap::PathOverlap;
 YieldSign::YieldSign(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 Status YieldSign::ApplyRule(Frame* const frame,
-                           ReferenceLineInfo* const reference_line_info) {
+                            ReferenceLineInfo* const reference_line_info) {
   MakeDecisions(frame, reference_line_info);
   return Status::OK();
 }
 
 void YieldSign::MakeDecisions(Frame* const frame,
-                             ReferenceLineInfo* const reference_line_info) {
+                              ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -79,9 +79,9 @@ void YieldSign::MakeDecisions(Frame* const frame,
         const std::string& obstacle_id = obstacle->Id();
         std::string obstacle_type_name =
             PerceptionObstacle_Type_Name(obstacle->Perception().type());
-        ADEBUG <<  "yield_sign[" << yield_sign_overlap.object_id
-               << "] obstacle_id[" << obstacle_id
-               << "] type[" << obstacle_type_name << "]";
+        ADEBUG << "yield_sign[" << yield_sign_overlap.object_id
+               << "] obstacle_id[" << obstacle_id << "] type["
+               << obstacle_type_name << "]";
         if (obstacle->IsVirtual()) {
           continue;
         }
@@ -98,8 +98,7 @@ void YieldSign::MakeDecisions(Frame* const frame,
              << "] start_s[" << yield_sign_overlap.start_s << "]";
       const std::string virtual_obstacle_id =
           YIELD_SIGN_VO_ID_PREFIX + yield_sign_overlap.object_id;
-      util::BuildStopDecision(virtual_obstacle_id,
-                              yield_sign_overlap.start_s,
+      util::BuildStopDecision(virtual_obstacle_id, yield_sign_overlap.start_s,
                               config_.yield_sign().stop_distance(),
                               StopReasonCode::STOP_REASON_YIELD_SIGN,
                               wait_for_obstacle_ids,
