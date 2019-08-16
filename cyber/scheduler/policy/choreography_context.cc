@@ -77,7 +77,7 @@ void ChoreographyContext::Wait() {
   cv_wq_.wait_for(lk, std::chrono::milliseconds(1));
 }
 
-void ChoreographyContext::RemoveCRoutine(uint64_t crid) {
+bool ChoreographyContext::RemoveCRoutine(uint64_t crid) {
   WriteLockGuard<AtomicRWLock> lock(rq_lk_);
   for (auto it = cr_queue_.begin(); it != cr_queue_.end();) {
     auto cr = it->second;
@@ -89,10 +89,11 @@ void ChoreographyContext::RemoveCRoutine(uint64_t crid) {
       }
       it = cr_queue_.erase(it);
       cr->Release();
-      return;
+      return true;
     }
     ++it;
   }
+  return false;
 }
 }  // namespace scheduler
 }  // namespace cyber

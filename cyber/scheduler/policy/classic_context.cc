@@ -24,6 +24,7 @@ namespace scheduler {
 
 using apollo::cyber::base::AtomicRWLock;
 using apollo::cyber::base::ReadLockGuard;
+using apollo::cyber::base::WriteLockGuard;
 using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::croutine::RoutineState;
 using apollo::cyber::event::PerfEventCache;
@@ -106,6 +107,29 @@ void ClassicContext::Shutdown() {
 
 void ClassicContext::Notify(const std::string& group_name) {
   cv_wq_[group_name].Cv().notify_one();
+}
+
+bool ClassicContext::RemoveCRoutine(const std::shared_ptr<CRoutine>& cr) {
+  auto grp = cr->group_name();
+  auto prio = cr->priority();
+  auto crid = cr->id();
+  WriteLockGuard<AtomicRWLock> lk(
+      ClassicContext::rq_locks_[grp].at(prio));
+  auto& croutines = ClassicContext::cr_group_[grp].at(prio);
+  for (auto it = croutines.begin(); it != croutines.end(); ++it) {
+    if ((*it)->id() == crid) {
+      auto cr = *it;
+      cr->Stop();
+      while (!cr->Acquire()) {
+        std::this_thread::sleep_for(std::chrono::microseconds(1));
+        AINFO_EVERY(1000) << "waiting for task " << cr->name() << " completion";
+      }
+      croutines.erase(it);
+      cr->Release();
+      return true;
+    }
+  }
+  return false;
 }
 
 }  // namespace scheduler
