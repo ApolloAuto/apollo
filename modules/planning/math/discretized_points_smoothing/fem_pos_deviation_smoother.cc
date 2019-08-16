@@ -100,8 +100,11 @@ bool FemPosDeviationSmoother::SqpWithOsqp(
 
   solver.set_curvature_constraint(config_.curvature_constraint());
 
-  solver.set_sqp_max_iter(config_.sqp_max_iter());
-  solver.set_sqp_jtol(config_.sqp_jtol());
+  solver.set_sqp_sub_max_iter(config_.sqp_sub_max_iter());
+  solver.set_sqp_ftol(config_.sqp_ftol());
+  solver.set_sqp_pen_max_iter(config_.sqp_pen_max_iter());
+  solver.set_sqp_ctol(config_.sqp_ctol());
+
   solver.set_max_iter(config_.max_iter());
   solver.set_time_limit(config_.time_limit());
   solver.set_verbose(config_.verbose());

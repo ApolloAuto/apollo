@@ -77,11 +77,17 @@ class FemPosDeviationSqpOsqpInterface {
 
   void set_warm_start(const bool warm_start) { warm_start_ = warm_start; }
 
-  void set_sqp_max_iter(const int sqp_max_iter) {
-    sqp_max_iter_ = sqp_max_iter;
+  void set_sqp_pen_max_iter(const int sqp_pen_max_iter) {
+    sqp_pen_max_iter_ = sqp_pen_max_iter;
   }
 
-  void set_sqp_jtol(const double sqp_jtol) { sqp_jtol_ = sqp_jtol; }
+  void set_sqp_ftol(const double sqp_ftol) { sqp_ftol_ = sqp_ftol; }
+
+  void set_sqp_sub_max_iter(const int sqp_sub_max_iter) {
+    sqp_sub_max_iter_ = sqp_sub_max_iter;
+  }
+
+  void set_sqp_ctol(const double sqp_ctol) { sqp_ctol_ = sqp_ctol; }
 
   bool Solve();
 
@@ -111,6 +117,9 @@ class FemPosDeviationSqpOsqpInterface {
   bool OptimizeWithOsqp(const std::vector<c_float>& primal_warm_start,
                         OSQPWorkspace** work);
 
+  double CalculateConstraintViolation(
+      const std::vector<std::pair<double, double>>& points);
+
  private:
   // Init states and constraints
   std::vector<std::pair<double, double>> ref_points_;
@@ -131,8 +140,10 @@ class FemPosDeviationSqpOsqpInterface {
   bool warm_start_ = true;
 
   // Settings of sqp
-  int sqp_max_iter_ = 100;
-  double sqp_jtol_ = 1e-2;
+  int sqp_pen_max_iter_ = 100;
+  double sqp_ftol_ = 1e-2;
+  int sqp_sub_max_iter_ = 100;
+  double sqp_ctol_ = 1e-2;
 
   // Optimization problem definitions
   int num_of_points_ = 0;

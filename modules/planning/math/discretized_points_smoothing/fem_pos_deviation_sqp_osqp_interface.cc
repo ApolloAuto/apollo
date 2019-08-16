@@ -22,6 +22,7 @@
 
 #include <cmath>
 #include <limits>
+#include <numeric>
 
 #include "cyber/common/log.h"
 
@@ -105,6 +106,11 @@ bool FemPosDeviationSqpOsqpInterface::Solve() {
   settings->verbose = verbose_;
   settings->scaled_termination = scaled_termination_;
   settings->warm_start = warm_start_;
+  settings->polish = true;
+  settings->eps_abs = 1e-5;
+  settings->eps_rel = 1e-5;
+  settings->eps_prim_inf = 1e-5;
+  settings->eps_dual_inf = 1e-5;
 
   // Define osqp workspace
   OSQPWorkspace* work = osqp_setup(data, settings);
@@ -123,36 +129,65 @@ bool FemPosDeviationSqpOsqpInterface::Solve() {
   }
 
   // Sequential solution
-  int itr = 1;
-  bool iterative_solve_res = true;
-  double eps = 1.0;
-  double last_jvalue = work->info->obj_val;
 
-  while (itr < sqp_max_iter_) {
-    // linearize and update matrices
-    SetPrimalWarmStart(opt_xy_, &primal_warm_start);
-    CalculateAffineConstraint(opt_xy_, &A_data, &A_indices, &A_indptr,
-                              &lower_bounds, &upper_bounds);
-    osqp_update_A(work, A_data.data(), OSQP_NULL, A_data.size());
-    osqp_update_bounds(work, lower_bounds.data(), upper_bounds.data());
-    iterative_solve_res = OptimizeWithOsqp(primal_warm_start, &work);
-    if (!iterative_solve_res) {
-      AERROR << "iteration at " << itr << "solving fails with max iter "
-             << sqp_max_iter_;
-      osqp_cleanup(work);
-      c_free(data->A);
-      c_free(data->P);
-      c_free(data);
-      c_free(settings);
-      return false;
+  int pen_itr = 0;
+  double original_slack_penalty = weight_curvature_constraint_slack_var_;
+  double last_fvalue = work->info->obj_val;
+
+  while (pen_itr < sqp_pen_max_iter_) {
+    int sub_itr = 1;
+    bool fconverged = false;
+
+    while (sub_itr < sqp_sub_max_iter_) {
+      SetPrimalWarmStart(opt_xy_, &primal_warm_start);
+      CalculateOffset(&q);
+      CalculateAffineConstraint(opt_xy_, &A_data, &A_indices, &A_indptr,
+                                &lower_bounds, &upper_bounds);
+      osqp_update_lin_cost(work, q.data());
+      osqp_update_A(work, A_data.data(), OSQP_NULL, A_data.size());
+      osqp_update_bounds(work, lower_bounds.data(), upper_bounds.data());
+
+      bool iterative_solve_res = OptimizeWithOsqp(primal_warm_start, &work);
+      if (!iterative_solve_res) {
+        AERROR << "iteration at " << sub_itr
+               << ", solving fails with max sub iter " << sqp_sub_max_iter_;
+        weight_curvature_constraint_slack_var_ = original_slack_penalty;
+        osqp_cleanup(work);
+        c_free(data->A);
+        c_free(data->P);
+        c_free(data);
+        c_free(settings);
+        return false;
+      }
+
+      double cur_fvalue = work->info->obj_val;
+      double ftol = std::abs((last_fvalue - cur_fvalue) / last_fvalue);
+
+      if (ftol < sqp_ftol_) {
+        ADEBUG << "merit function value converges at sub itr num " << sub_itr;
+        ADEBUG << "merit function value converges to " << cur_fvalue
+               << ", with ftol " << ftol << ", under max_ftol " << sqp_ftol_;
+        fconverged = true;
+        break;
+      }
+
+      last_fvalue = cur_fvalue;
+      ++sub_itr;
     }
 
-    // check objective meets sqp_jtol, if return true
-    eps = std::abs((last_jvalue - static_cast<double>(work->info->obj_val)) /
-                   last_jvalue);
-    if (eps < sqp_jtol_) {
-      ADEBUG << "objective value converges to " << work->info->obj_val
-             << "with eps " << eps << "under jtol " << sqp_jtol_;
+    if (!fconverged) {
+      break;
+    }
+
+    double ctol = CalculateConstraintViolation(opt_xy_);
+
+    ADEBUG << "ctol is " << ctol << ", at pen itr " << pen_itr;
+
+    if (ctol < sqp_ctol_) {
+      ADEBUG << "constraint satisfied at pen itr num " << pen_itr;
+      ADEBUG << "constraint voilation value drops to " << ctol
+             << ", under max_ctol " << sqp_ctol_;
+      weight_curvature_constraint_slack_var_ = original_slack_penalty;
       osqp_cleanup(work);
       c_free(data->A);
       c_free(data->P);
@@ -161,11 +196,12 @@ bool FemPosDeviationSqpOsqpInterface::Solve() {
       return true;
     }
 
-    last_jvalue = work->info->obj_val;
+    weight_curvature_constraint_slack_var_ *= 10;
+    ++pen_itr;
   }
 
-  AERROR << "objective not converged with eps " << eps << "over jtol "
-         << sqp_jtol_;
+  AERROR << "Max number of iteration reached";
+  weight_curvature_constraint_slack_var_ = original_slack_penalty;
   osqp_cleanup(work);
   c_free(data->A);
   c_free(data->P);
@@ -263,7 +299,7 @@ void FemPosDeviationSqpOsqpInterface::CalculateKernel(
   CHECK_EQ(col_num, num_of_pos_variables_);
 
   int ind_p = 0;
-  for (int i = 0; i < col_num; ++i) {
+  for (int i = 0; i < num_of_variables_; ++i) {
     P_indptr->push_back(ind_p);
     for (const auto& row_data_pair : columns[i]) {
       // Rescale by 2.0 as the quadratic term in osqp default qp problem setup
@@ -323,10 +359,13 @@ void FemPosDeviationSqpOsqpInterface::CalculateAffineConstraint(
     std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
     std::vector<c_int>* A_indptr, std::vector<c_float>* lower_bounds,
     std::vector<c_float>* upper_bounds) {
+  const double scale_factor = 1;
+
   std::vector<std::vector<double>> lin_cache;
   for (int i = 1; i < num_of_points_ - 1; ++i) {
-    lin_cache.push_back(std::move(CalculateLinearizedFemPosParams(points, i)));
+    lin_cache.push_back(CalculateLinearizedFemPosParams(points, i));
   }
+
   std::vector<std::vector<std::pair<c_int, c_float>>> columns;
   columns.resize(num_of_variables_);
 
@@ -335,26 +374,31 @@ void FemPosDeviationSqpOsqpInterface::CalculateAffineConstraint(
   }
 
   for (int i = num_of_pos_variables_; i < num_of_variables_; ++i) {
-    columns[i].emplace_back(i + num_of_slack_variables_, -1.0);
+    columns[i].emplace_back(i + num_of_slack_variables_, -1.0 * scale_factor);
   }
 
   for (int i = 2; i < num_of_points_; ++i) {
     int index = 2 * i;
-    columns[index].emplace_back(i - 2 + num_of_variables_, lin_cache[i - 1][4]);
+    columns[index].emplace_back(i - 2 + num_of_variables_,
+                                lin_cache[i - 2][4] * scale_factor);
     columns[index + 1].emplace_back(i - 2 + num_of_variables_,
-                                    lin_cache[i - 1][5]);
+                                    lin_cache[i - 2][5] * scale_factor);
   }
 
   for (int i = 1; i < num_of_points_ - 1; ++i) {
     int index = 2 * i;
-    columns[index].emplace_back(i - 1 + num_of_variables_, lin_cache[i][2]);
-    columns[index + 1].emplace_back(i - 1 + num_of_variables_, lin_cache[i][3]);
+    columns[index].emplace_back(i - 1 + num_of_variables_,
+                                lin_cache[i - 1][2] * scale_factor);
+    columns[index + 1].emplace_back(i - 1 + num_of_variables_,
+                                    lin_cache[i - 1][3] * scale_factor);
   }
 
   for (int i = 0; i < num_of_points_ - 2; ++i) {
     int index = 2 * i;
-    columns[index].emplace_back(i + num_of_variables_, lin_cache[i + 1][0]);
-    columns[index + 1].emplace_back(i + num_of_variables_, lin_cache[i + 1][1]);
+    columns[index].emplace_back(i + num_of_variables_,
+                                lin_cache[i][0] * scale_factor);
+    columns[index + 1].emplace_back(i + num_of_variables_,
+                                    lin_cache[i][1] * scale_factor);
   }
 
   int ind_a = 0;
@@ -389,7 +433,7 @@ void FemPosDeviationSqpOsqpInterface::CalculateAffineConstraint(
                                     (interval_sqr * curvature_constraint_);
   for (int i = 0; i < num_of_curvature_constraints_; ++i) {
     (*upper_bounds)[num_of_variable_constraints_ + i] =
-        curvature_constraint_sqr - lin_cache[i][6];
+        (curvature_constraint_sqr - lin_cache[i][6]) * scale_factor;
     (*lower_bounds)[num_of_variable_constraints_ + i] = -1e20;
   }
 }
@@ -455,11 +499,44 @@ bool FemPosDeviationSqpOsqpInterface::OptimizeWithOsqp(
   }
 
   for (int i = 0; i < num_of_slack_variables_; ++i) {
-    slack_.at(num_of_pos_variables_ + i) =
-        (*work)->solution->x[num_of_pos_variables_ + i];
+    slack_.at(i) = (*work)->solution->x[num_of_pos_variables_ + i];
   }
 
   return true;
+}
+
+double FemPosDeviationSqpOsqpInterface::CalculateConstraintViolation(
+    const std::vector<std::pair<double, double>>& points) {
+  CHECK_GT(points.size(), 2);
+
+  double total_length = 0.0;
+  auto pre_point = points.front();
+  for (int i = 1; i < num_of_points_; ++i) {
+    const auto& cur_point = points[i];
+    total_length += std::sqrt((pre_point.first - cur_point.first) *
+                                  (pre_point.first - cur_point.first) +
+                              (pre_point.second - cur_point.second) *
+                                  (pre_point.second - cur_point.second));
+    pre_point = cur_point;
+  }
+  double average_interval_length = total_length / (num_of_points_ - 1);
+  double interval_sqr = average_interval_length * average_interval_length;
+  double curvature_constraint_sqr = (interval_sqr * curvature_constraint_) *
+                                    (interval_sqr * curvature_constraint_);
+
+  double cviolation = 0.0;
+  for (size_t i = 1; i < points.size() - 1; ++i) {
+    double x_f = points[i - 1].first;
+    double x_m = points[i].first;
+    double x_l = points[i + 1].first;
+    double y_f = points[i - 1].second;
+    double y_m = points[i].second;
+    double y_l = points[i + 1].second;
+    cviolation += curvature_constraint_sqr -
+                  (-2.0 * x_m + x_f + x_l) * (-2.0 * x_m + x_f + x_l) +
+                  (-2.0 * y_m + y_f + y_l) * (-2.0 * y_m + y_f + y_l);
+  }
+  return cviolation;
 }
 
 }  // namespace planning

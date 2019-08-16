@@ -10,8 +10,10 @@ message FemPosDeviationSmootherConfig {
   optional double weight_curvature_constraint_slack_var = 6 [default = 1.0e2];
   optional double curvature_constraint = 7 [default = 0.2];
   optional bool use_sqp = 8 [default = false];
-  optional double sqp_jtol = 9 [default = 1e-2];
-  optional int32 sqp_max_iter = 10 [default = 10];
+  optional double sqp_ftol = 9 [default = 1e-4];
+  optional double sqp_ctol = 10 [default = 1e-3];
+  optional int32 sqp_pen_max_iter = 11 [default = 10];
+  optional int32 sqp_sub_max_iter = 12 [default = 100];
 
   // osqp settings
   optional int32 max_iter = 100 [default = 500];
