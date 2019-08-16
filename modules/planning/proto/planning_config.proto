@@ -144,7 +144,6 @@ message ScenarioPullOverConfig {
 message ScenarioValetParkingConfig {
   optional double parking_spot_range_to_start = 1 [default = 20.0];
   optional double max_valid_stop_distance = 2 [default = 1.0];  // meter
-  optional double max_adc_stop_speed = 3 [default = 0.1];  // m/s
 }
 
 message ScenarioNarrowStreetUTurnConfig {}

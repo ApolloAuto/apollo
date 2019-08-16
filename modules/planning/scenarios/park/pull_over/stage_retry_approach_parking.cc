@@ -20,6 +20,7 @@
 
 #include "modules/planning/scenarios/park/pull_over/stage_retry_approach_parking.h"
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 
 namespace apollo {
