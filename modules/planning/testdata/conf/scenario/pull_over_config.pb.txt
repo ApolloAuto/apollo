@@ -8,6 +8,7 @@ pull_over_config: {
   max_l_error_to_end_point: 1.0
   max_theta_error_to_end_point: 0.2
   pass_destination_threshold: 15.0
+  max_distance_error_to_end_point: 0.2
 }
 
 stage_type: PULL_OVER_APPROACH
@@ -92,7 +93,8 @@ stage_config: {
     task_config: {
         task_type: OPEN_SPACE_PRE_STOP_DECIDER
         open_space_pre_stop_decider_config {
-            stop_type: PARKING
+            stop_type: PULL_OVER
+            rightaway_stop_distance: 1.0
         }
     }
     task_config: {
@@ -144,6 +146,7 @@ stage_config: {
         task_type: OPEN_SPACE_ROI_DECIDER
         open_space_roi_decider_config {
             roi_type: PULL_OVER
+            perception_obstacle_buffer: 0.5
         }
     }
     task_config: {
@@ -151,6 +154,13 @@ stage_config: {
     }
     task_config: {
         task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+        open_space_trajectory_partition_config {
+            heading_offset_to_midpoint: 0.79
+            lateral_offset_to_midpoint: 0.5
+            longitudinal_offset_to_midpoint: 0.2
+            vehicle_box_iou_threshold_to_midpoint: 0.8
+            linear_velocity_threshold_on_ego: 0.2
+        }
     }
     task_config: {
         task_type: OPEN_SPACE_FALLBACK_DECIDER

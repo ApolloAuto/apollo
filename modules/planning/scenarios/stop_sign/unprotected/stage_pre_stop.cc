@@ -26,6 +26,7 @@
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
 #include "cyber/common/log.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
@@ -224,7 +225,11 @@ bool StopSignUnprotectedStagePreStop::CheckADCStop(
     const double adc_front_edge_s, const double stop_line_s) {
   const double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
-  if (adc_speed > scenario_config_.max_adc_stop_speed()) {
+  const double max_adc_stop_speed =
+      common::VehicleConfigHelper::Instance()->GetConfig()
+          .vehicle_param()
+          .max_abs_speed_when_stopped();
+  if (adc_speed > max_adc_stop_speed) {
     ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
     return false;
   }

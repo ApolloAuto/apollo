@@ -3,7 +3,6 @@ stop_sign_unprotected_config: {
   start_stop_sign_scenario_distance: 4.0
   watch_vehicle_max_valid_stop_distance: 5.0
   max_valid_stop_distance: 2.0
-  max_adc_stop_speed: 0.3
   stop_duration_sec: 1.0
   min_pass_s_distance: 3.0
   stop_timeout_sec: 8.0
