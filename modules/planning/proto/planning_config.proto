@@ -156,7 +156,7 @@ message ScenarioNarrowStreetUTurnConfig {}
 
 message ScenarioParkAndGoConfig {}
 
-message ScenarioYieldSigndConfig {
+message ScenarioYieldSignConfig {
   optional double start_yield_sign_scenario_distance = 1 [default = 5.0];  // meter
 }
 
@@ -255,7 +255,7 @@ message ScenarioConfig {
     ScenarioParkAndGoConfig park_and_go_config = 10;
     ScenarioPullOverConfig pull_over_config = 11;
     ScenarioValetParkingConfig valet_parking_config = 12;
-    ScenarioYieldSigndConfig yield_sign_config = 13;
+    ScenarioYieldSignConfig yield_sign_config = 13;
   }
   // a list of stages that are used at runtime.  The first one is default stage.
   repeated StageType stage_type = 14;

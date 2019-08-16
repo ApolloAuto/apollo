@@ -67,6 +67,10 @@ DEFINE_string(scenario_valet_parking_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/valet_parking_config.pb.txt",
               "valet_parking scenario config file");
+DEFINE_string(scenario_yield_sign_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/yield_sign_config.pb.txt",
+              "yield_sign scenario config file");
 
 DEFINE_bool(enable_scenario_bare_intersection, false,
             "enable bare_intersection scenarios in planning");
