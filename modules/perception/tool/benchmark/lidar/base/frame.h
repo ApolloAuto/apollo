@@ -73,7 +73,7 @@ class Frame : protected SensorObjects {
     return _road_polygon;
   }
   inline void release() {
-    _point_cloud = NULL;
+    _point_cloud = nullptr;
     objects.clear();
     gt_objects.clear();
     _left_boundary.clear();
