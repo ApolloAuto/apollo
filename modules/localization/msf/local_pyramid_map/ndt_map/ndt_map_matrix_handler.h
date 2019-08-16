@@ -15,12 +15,14 @@
  *****************************************************************************/
 #pragma once
 
-#include "modules/localization/msf/local_map/base_map/base_map_matrix_handler.h"
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_matrix.h"
+#include <memory>
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_matrix_handler.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_matrix.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 class NdtMapMatrixHandlerSelector {
  public:
@@ -35,17 +37,19 @@ class NdtMapMatrixHandler : public BaseMapMatrixHandler {
   NdtMapMatrixHandler();
   virtual ~NdtMapMatrixHandler();
 
-  size_t LoadBinary(const unsigned char* buf, BaseMapMatrix* matrix);
+  size_t LoadBinary(const unsigned char* buf,
+                    std::shared_ptr<BaseMapMatrix> matrix);
   /**@brief Create the binary. Serialization of the object.
    * @param <buf, buf_size> The buffer and its size.
    * @param <return> The required or the used size of is returned.
    */
-  size_t CreateBinary(const BaseMapMatrix* matrix, unsigned char* buf,
-                      size_t buf_size);
+  size_t CreateBinary(const std::shared_ptr<BaseMapMatrix> matrix,
+                      unsigned char* buf, size_t buf_size);
   /**@brief Get the binary size of the object. */
-  size_t GetBinarySize(const BaseMapMatrix* matrix);
+  size_t GetBinarySize(const std::shared_ptr<BaseMapMatrix> matrix);
 };
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

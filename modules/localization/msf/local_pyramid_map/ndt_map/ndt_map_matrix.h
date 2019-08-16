@@ -18,14 +18,16 @@
 
 #include <Eigen/Eigenvalues>
 #include <limits>
+#include <memory>
 #include <unordered_map>
 #include <vector>
-#include "modules/localization/msf/local_map/base_map/base_map_config.h"
-#include "modules/localization/msf/local_map/base_map/base_map_matrix.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_matrix.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 /**@brief The data structure of a single ndt map cell. */
 class NdtMapSingleCell {
@@ -194,6 +196,7 @@ class NdtMapMatrix : public BaseMapMatrix {
   std::unique_ptr<NdtMapCells[]> map3d_cells_;
 };
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
