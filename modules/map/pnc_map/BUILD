@@ -27,8 +27,8 @@ cc_test(
     ],
     deps = [
         "//modules/common/math",
-        "@gtest//:main",
         "@cuda",
+        "@gtest//:main",
     ],
 )
 

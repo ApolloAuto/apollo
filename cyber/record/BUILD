@@ -136,8 +136,8 @@ cc_library(
         ":header_builder",
         ":record_base",
         ":record_file_writer",
-        "//cyber/message:raw_message",
         "//cyber/message:message_traits",
+        "//cyber/message:raw_message",
         "//cyber/proto:record_cc_proto",
     ],
 )
