@@ -137,8 +137,6 @@ class DpRoadGraph {
   common::FrenetFramePoint init_frenet_frame_point_;
   apollo::planning_internal::Debug *planning_debug_ = nullptr;
 
-  ObjectSidePass sidepass_;
-
   std::unique_ptr<WaypointSampler> waypoint_sampler_;
 };
 
