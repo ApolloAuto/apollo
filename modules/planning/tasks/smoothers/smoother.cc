@@ -22,6 +22,7 @@
 
 #include <string>
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/planning_gflags.h"
 
@@ -77,7 +78,11 @@ apollo::common::Status Smoother::Smooth(
   }
 
   const auto& vehicle_state = current_frame->vehicle_state();
-  if (vehicle_state.linear_velocity() > FLAGS_max_stop_speed) {
+  const double max_adc_stop_speed =
+      common::VehicleConfigHelper::Instance()->GetConfig()
+          .vehicle_param()
+          .max_abs_speed_when_stopped();
+  if (vehicle_state.linear_velocity() > max_adc_stop_speed) {
     ADEBUG << "vehicle speed:" << vehicle_state.linear_velocity()
            << " skip smoothing for non-stop scenario";
     return Status::OK();

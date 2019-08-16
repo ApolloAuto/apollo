@@ -263,7 +263,6 @@ DEFINE_double(follow_time_buffer, 2.5,
 DEFINE_double(follow_min_time_sec, 0.1,
               "min follow time in st region before considering a valid follow");
 DEFINE_double(stop_line_stop_distance, 1.0, "stop distance from stop line");
-DEFINE_double(max_stop_speed, 0.2, "max speed(m/s) to be considered as a stop");
 DEFINE_double(signal_light_min_pass_s_distance, 4.0,
               "min s_distance for adc to be considered "
               "have passed signal_light (stop_line_end_s)");

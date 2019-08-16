@@ -20,6 +20,7 @@
 #include <limits>
 #include <vector>
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -60,7 +61,11 @@ double GetADCStopDeceleration(const double adc_front_edge_s,
                               const double stop_line_s) {
   double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
-  if (adc_speed < FLAGS_max_stop_speed) {
+  const double max_adc_stop_speed =
+      common::VehicleConfigHelper::Instance()->GetConfig()
+          .vehicle_param()
+          .max_abs_speed_when_stopped();
+  if (adc_speed < max_adc_stop_speed) {
     return 0.0;
   }
 
