@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_config.h"
 
 #include <boost/foreach.hpp>
 #include <string>
@@ -22,6 +22,7 @@
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 NdtMapConfig::NdtMapConfig(std::string map_version)
     : BaseMapConfig(map_version) {
@@ -70,6 +71,7 @@ bool NdtMapConfig::LoadXml(boost::property_tree::ptree* config) {
   return true;
 }
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

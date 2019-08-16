@@ -14,13 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_matrix.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_matrix.h"
 
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_config.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 NdtMapSingleCell::NdtMapSingleCell() {
   intensity_ = 0.0;
@@ -524,6 +525,7 @@ bool NdtMapMatrix::GetIntensityImg(cv::Mat* intensity_img) const {
   return true;
 }
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
