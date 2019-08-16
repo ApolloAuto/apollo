@@ -56,8 +56,10 @@ bool FemPosDeviationSmoother::QpWithOsqp(
     const std::vector<std::pair<double, double>>& raw_point2d,
     const std::vector<double>& bounds, std::vector<double>* opt_x,
     std::vector<double>* opt_y) {
-  CHECK_NOTNULL(opt_x);
-  CHECK_NOTNULL(opt_y);
+  if (opt_x == nullptr || opt_y == nullptr) {
+    AERROR << "opt_x or opt_y is nullptr";
+    return false;
+  }
 
   FemPosDeviationOsqpInterface solver;
 
@@ -87,8 +89,10 @@ bool FemPosDeviationSmoother::SqpWithOsqp(
     const std::vector<std::pair<double, double>>& raw_point2d,
     const std::vector<double>& bounds, std::vector<double>* opt_x,
     std::vector<double>* opt_y) {
-  CHECK_NOTNULL(opt_x);
-  CHECK_NOTNULL(opt_y);
+  if (opt_x == nullptr || opt_y == nullptr) {
+    AERROR << "opt_x or opt_y is nullptr";
+    return false;
+  }
 
   FemPosDeviationSqpOsqpInterface solver;
 
@@ -134,6 +138,11 @@ bool FemPosDeviationSmoother::NlpWithIpopt(
     const std::vector<std::pair<double, double>>& raw_point2d,
     const std::vector<double>& bounds, std::vector<double>* opt_x,
     std::vector<double>* opt_y) {
+  if (opt_x == nullptr || opt_y == nullptr) {
+    AERROR << "opt_x or opt_y is nullptr";
+    return false;
+  }
+
   FemPosDeviationIpoptInterface* smoother =
       new FemPosDeviationIpoptInterface(raw_point2d, bounds);
 

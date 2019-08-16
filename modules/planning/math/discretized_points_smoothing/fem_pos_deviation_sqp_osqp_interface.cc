@@ -131,6 +131,7 @@ bool FemPosDeviationSqpOsqpInterface::Solve() {
   // Sequential solution
 
   int pen_itr = 0;
+  double ctol = 0.0;
   double original_slack_penalty = weight_curvature_constraint_slack_var_;
   double last_fvalue = work->info->obj_val;
 
@@ -176,10 +177,17 @@ bool FemPosDeviationSqpOsqpInterface::Solve() {
     }
 
     if (!fconverged) {
-      break;
+      AERROR << "Max number of iteration reached";
+      weight_curvature_constraint_slack_var_ = original_slack_penalty;
+      osqp_cleanup(work);
+      c_free(data->A);
+      c_free(data->P);
+      c_free(data);
+      c_free(settings);
+      return false;
     }
 
-    double ctol = CalculateConstraintViolation(opt_xy_);
+    ctol = CalculateConstraintViolation(opt_xy_);
 
     ADEBUG << "ctol is " << ctol << ", at pen itr " << pen_itr;
 
@@ -200,14 +208,16 @@ bool FemPosDeviationSqpOsqpInterface::Solve() {
     ++pen_itr;
   }
 
-  AERROR << "Max number of iteration reached";
+  ADEBUG << "constraint not satisfied with total itr num " << pen_itr;
+  ADEBUG << "constraint voilation value drops to " << ctol
+         << ", higher than max_ctol " << sqp_ctol_;
   weight_curvature_constraint_slack_var_ = original_slack_penalty;
   osqp_cleanup(work);
   c_free(data->A);
   c_free(data->P);
   c_free(data);
   c_free(settings);
-  return false;
+  return true;
 }
 
 void FemPosDeviationSqpOsqpInterface::CalculateKernel(
@@ -524,7 +534,7 @@ double FemPosDeviationSqpOsqpInterface::CalculateConstraintViolation(
   double curvature_constraint_sqr = (interval_sqr * curvature_constraint_) *
                                     (interval_sqr * curvature_constraint_);
 
-  double cviolation = 0.0;
+  double max_cviolation = std::numeric_limits<double>::min();
   for (size_t i = 1; i < points.size() - 1; ++i) {
     double x_f = points[i - 1].first;
     double x_m = points[i].first;
@@ -532,11 +542,12 @@ double FemPosDeviationSqpOsqpInterface::CalculateConstraintViolation(
     double y_f = points[i - 1].second;
     double y_m = points[i].second;
     double y_l = points[i + 1].second;
-    cviolation += curvature_constraint_sqr -
-                  (-2.0 * x_m + x_f + x_l) * (-2.0 * x_m + x_f + x_l) +
-                  (-2.0 * y_m + y_f + y_l) * (-2.0 * y_m + y_f + y_l);
+    double cviolation = curvature_constraint_sqr -
+                        (-2.0 * x_m + x_f + x_l) * (-2.0 * x_m + x_f + x_l) +
+                        (-2.0 * y_m + y_f + y_l) * (-2.0 * y_m + y_f + y_l);
+    max_cviolation = max_cviolation < cviolation ? cviolation : max_cviolation;
   }
-  return cviolation;
+  return max_cviolation;
 }
 
 }  // namespace planning
