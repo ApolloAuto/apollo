@@ -205,39 +205,17 @@ bool SchedulerClassic::RemoveCRoutine(uint64_t crid) {
   std::lock_guard<std::mutex> lg(wrapper->Mutex());
 
   std::shared_ptr<CRoutine> cr = nullptr;
-  int prio;
-  std::string group_name;
   {
     WriteLockGuard<AtomicRWLock> lk(id_cr_lock_);
     if (id_cr_.find(crid) != id_cr_.end()) {
       cr = id_cr_[crid];
-      prio = cr->priority();
-      group_name = cr->group_name();
       id_cr_[crid]->Stop();
       id_cr_.erase(crid);
     } else {
       return false;
     }
   }
-
-  WriteLockGuard<AtomicRWLock> lk(
-      ClassicContext::rq_locks_[group_name].at(prio));
-  for (auto it = ClassicContext::cr_group_[group_name].at(prio).begin();
-       it != ClassicContext::cr_group_[group_name].at(prio).end(); ++it) {
-    if ((*it)->id() == crid) {
-      auto cr = *it;
-      cr->Stop();
-      while (!cr->Acquire()) {
-        std::this_thread::sleep_for(std::chrono::microseconds(1));
-        AINFO_EVERY(1000) << "waiting for task " << cr->name() << " completion";
-      }
-      it = ClassicContext::cr_group_[group_name].at(prio).erase(it);
-      cr->Release();
-      return true;
-    }
-  }
-
-  return false;
+  return ClassicContext::RemoveCRoutine(cr);
 }
 
 }  // namespace scheduler
