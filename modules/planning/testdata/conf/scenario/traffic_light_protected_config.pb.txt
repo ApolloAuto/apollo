@@ -2,7 +2,6 @@ scenario_type: TRAFFIC_LIGHT_PROTECTED
 traffic_light_protected_config: {
   start_traffic_light_scenario_distance: 5.0
   max_valid_stop_distance: 2.0
-  max_adc_stop_speed: 0.3
   min_pass_s_distance: 3.0
 }
 stage_type: TRAFFIC_LIGHT_PROTECTED_APPROACH
