@@ -106,9 +106,8 @@ bool JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   torch_inputs.push_back(torch_input.to(device_));
   std::vector<double> probability;
   if (latest_feature_ptr->junction_feature().junction_exit_size() > 1) {
-    // CHECK_NOTNULL(torch_model_ptr_);
     at::Tensor torch_output_tensor =
-        torch_model_ptr_.forward(torch_inputs).toTensor().to(torch::kCPU);
+        torch_model_.forward(torch_inputs).toTensor().to(torch::kCPU);
     auto torch_output = torch_output_tensor.accessor<float, 2>();
     for (int i = 0; i < torch_output.size(1); ++i) {
       probability.push_back(static_cast<double>(torch_output[0][i]));
@@ -364,7 +363,7 @@ void JunctionMLPEvaluator::LoadModel() {
     device_ = torch::Device(torch::kCUDA);
   }
   torch::set_num_threads(1);
-  torch_model_ptr_ =
+  torch_model_ =
       torch::jit::load(FLAGS_torch_vehicle_junction_mlp_file, device_);
 }
 

@@ -73,7 +73,7 @@ class JunctionMapEvaluator : public Evaluator {
  private:
   // junction exit mask
   static const size_t JUNCTION_FEATURE_SIZE = 12;
-  torch::jit::script::Module torch_model_ptr_;
+  torch::jit::script::Module torch_model_;
   torch::Device device_;
 };
 
