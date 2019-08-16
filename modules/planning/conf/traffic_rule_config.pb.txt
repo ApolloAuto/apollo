@@ -89,7 +89,7 @@ config: {
 
 config: {
   rule_id: YIELD_SIGN
-  enabled: false
+  enabled: true
   yield_sign: {
     stop_distance: 1.0
     start_watch_distance: 2.0
