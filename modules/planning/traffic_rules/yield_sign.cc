@@ -85,11 +85,37 @@ void YieldSign::MakeDecisions(Frame* const frame,
         if (obstacle->IsVirtual()) {
           continue;
         }
-        if (!obstacle->reference_line_st_boundary().IsEmpty()) {
-          build_stop_fence = true;
-          wait_for_obstacle_ids.push_back(obstacle->Id());
-          break;
+
+        if (obstacle->reference_line_st_boundary().IsEmpty()) {
+          continue;
         }
+
+        constexpr double kMinSTBoundaryT = 6.0;  // sec
+        if (obstacle->reference_line_st_boundary().min_t() > kMinSTBoundaryT) {
+          continue;
+        }
+        const double kepsilon = 1e-6;
+        double obstacle_traveled_s =
+            obstacle->reference_line_st_boundary().bottom_left_point().s() -
+            obstacle->reference_line_st_boundary().bottom_right_point().s();
+        ADEBUG << "obstacle[" << obstacle->Id() << "] obstacle_st_min_t["
+               << obstacle->reference_line_st_boundary().min_t()
+               << "] obstacle_st_min_s["
+               << obstacle->reference_line_st_boundary().min_s()
+               << "] obstacle_traveled_s[" << obstacle_traveled_s << "]";
+
+        // ignore the obstacle which is already on reference line and moving
+        // along the direction of ADC
+        constexpr double kIgnoreMaxSTMinT = 0.1;  // max st_min_t(sec) to ignore
+        constexpr double kIgnoreMinSTMinS = 15.0;  // min st_min_s(m) to ignore
+        if (obstacle_traveled_s < kepsilon &&
+            obstacle->reference_line_st_boundary().min_t() < kIgnoreMaxSTMinT &&
+            obstacle->reference_line_st_boundary().min_s() > kIgnoreMinSTMinS) {
+            continue;
+        }
+
+        build_stop_fence = true;
+        wait_for_obstacle_ids.push_back(obstacle->Id());
       }
     }
 
