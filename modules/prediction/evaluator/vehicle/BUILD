@@ -128,7 +128,7 @@ cc_library(
         "//modules/prediction/evaluator",
     ] + select({
         "//tools/platforms:use_gpu": [
-            "@pytorch",
+            "@pytorch_gpu",
         ],
         "//conditions:default": [
             "@pytorch",
@@ -171,7 +171,7 @@ cc_library(
         "//modules/prediction/evaluator",
     ] + select({
         "//tools/platforms:use_gpu": [
-            "@pytorch",
+            "@pytorch_gpu",
         ],
         "//conditions:default": [
             "@pytorch",
@@ -196,7 +196,7 @@ cc_library(
         "//modules/prediction/evaluator",
     ] + select({
         "//tools/platforms:use_gpu": [
-            "@pytorch",
+            "@pytorch_gpu",
         ],
         "//conditions:default": [
             "@pytorch",
@@ -236,7 +236,7 @@ cc_library(
         "//modules/prediction/evaluator",
     ] + select({
         "//tools/platforms:use_gpu": [
-            "@pytorch",
+            "@pytorch_gpu",
         ],
         "//conditions:default": [
             "@pytorch",
@@ -260,7 +260,7 @@ cc_library(
         "//modules/prediction/evaluator",
     ] + select({
         "//tools/platforms:use_gpu": [
-            "@pytorch",
+            "@pytorch_gpu",
         ],
         "//conditions:default": [
             "@pytorch",
