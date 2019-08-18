@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <map>
+#include <unordered_map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -89,9 +89,14 @@ class Stage {
   virtual Stage::StageStatus FinishScenario();
 
  protected:
-  std::map<TaskConfig::TaskType, std::unique_ptr<Task>> tasks_;
+  static std::unordered_map<ScenarioConfig::StageType,
+                            std::unordered_map<TaskConfig::TaskType,
+                                               std::unique_ptr<Task>,
+                                               std::hash<int>>,
+                            std::hash<int>> tasks_;
   std::vector<Task*> task_list_;
   ScenarioConfig::StageConfig config_;
+  ScenarioConfig::StageType cur_stage_;
   ScenarioConfig::StageType next_stage_;
   void* context_ = nullptr;
   std::string name_;

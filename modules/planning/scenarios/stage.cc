@@ -42,6 +42,12 @@ constexpr double kSpeedOptimizationFallbackCost = 2e4;
 // constexpr double kStraightForwardLineCost = 10.0;
 }  // namespace
 
+std::unordered_map<ScenarioConfig::StageType,
+                   std::unordered_map<TaskConfig::TaskType,
+                                      std::unique_ptr<Task>,
+                                      std::hash<int>>,
+                   std::hash<int>> Stage::tasks_;
+
 Stage::Stage(const ScenarioConfig::StageConfig& config) : config_(config) {
   // set stage_type in PlanningContext
   PlanningContext::Instance()
@@ -50,6 +56,7 @@ Stage::Stage(const ScenarioConfig::StageConfig& config) : config_(config) {
       ->set_stage_type(stage_type());
 
   name_ = ScenarioConfig::StageType_Name(config_.stage_type());
+  cur_stage_ = config_.stage_type();
   next_stage_ = config_.stage_type();
   std::unordered_map<TaskConfig::TaskType, const TaskConfig*, std::hash<int>>
       config_map;
@@ -61,11 +68,11 @@ Stage::Stage(const ScenarioConfig::StageConfig& config) : config_(config) {
     CHECK(config_map.find(task_type) != config_map.end())
         << "Task: " << TaskConfig::TaskType_Name(task_type)
         << " used but not configured";
-    auto iter = tasks_.find(task_type);
-    if (iter == tasks_.end()) {
+    auto iter = tasks_[cur_stage_].find(task_type);
+    if (iter == tasks_[cur_stage_].end()) {
       auto ptr = TaskFactory::CreateTask(*config_map[task_type]);
       task_list_.push_back(ptr.get());
-      tasks_[task_type] = std::move(ptr);
+      tasks_[cur_stage_][task_type] = std::move(ptr);
     } else {
       task_list_.push_back(iter->second.get());
     }
@@ -75,8 +82,8 @@ Stage::Stage(const ScenarioConfig::StageConfig& config) : config_(config) {
 const std::string& Stage::Name() const { return name_; }
 
 Task* Stage::FindTask(TaskConfig::TaskType task_type) const {
-  auto iter = tasks_.find(task_type);
-  if (iter == tasks_.end()) {
+  auto iter = tasks_[cur_stage_].find(task_type);
+  if (iter == tasks_[cur_stage_].end()) {
     return nullptr;
   } else {
     return iter->second.get();
