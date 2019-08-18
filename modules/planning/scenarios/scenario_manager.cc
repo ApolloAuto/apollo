@@ -560,6 +560,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectParkAndGoScenario(
 }
 
 void ScenarioManager::Observe(const Frame& frame) {
+  CHECK(!frame.reference_line_info().empty());
   // init first_encountered_overlap_map_
   first_encountered_overlap_map_.clear();
   const auto& reference_line_info = frame.reference_line_info().front();
@@ -636,30 +637,30 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
         reference_line_info.FirstEncounteredOverlaps();
     // note: first_encountered_overlaps already sorted
     for (const auto& overlap : first_encountered_overlaps) {
-      if (overlap.first == ReferenceLineInfo::SIGNAL ||
-          overlap.first == ReferenceLineInfo::STOP_SIGN ||
+      if ((FLAGS_enable_scenario_traffic_light &&
+           overlap.first == ReferenceLineInfo::SIGNAL) ||
+          (FLAGS_enable_scenario_stop_sign &&
+           overlap.first == ReferenceLineInfo::STOP_SIGN) ||
           overlap.first == ReferenceLineInfo::YIELD_SIGN) {
         overlap_type = overlap.first;
         traffic_sign_overlap = const_cast<hdmap::PathOverlap*>(&overlap.second);
         break;
-      } else if (overlap.first == ReferenceLineInfo::PNC_JUNCTION) {
+      } else if (FLAGS_enable_scenario_bare_intersection &&
+                 overlap.first == ReferenceLineInfo::PNC_JUNCTION) {
         pnc_junction_overlap = const_cast<hdmap::PathOverlap*>(&overlap.second);
+        break;
       }
     }
 
     if (traffic_sign_overlap) {
       switch (overlap_type) {
         case ReferenceLineInfo::STOP_SIGN:
-          if (FLAGS_enable_scenario_stop_sign) {
-            scenario_type =
-                SelectStopSignScenario(frame, *traffic_sign_overlap);
-          }
+          scenario_type =
+              SelectStopSignScenario(frame, *traffic_sign_overlap);
           break;
         case ReferenceLineInfo::SIGNAL:
-          if (FLAGS_enable_scenario_traffic_light) {
-            scenario_type =
-                SelectTrafficLightScenario(frame, *traffic_sign_overlap);
-          }
+          scenario_type =
+              SelectTrafficLightScenario(frame, *traffic_sign_overlap);
           break;
         case ReferenceLineInfo::YIELD_SIGN:
           // TODO(all): to be added
@@ -671,10 +672,8 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
       }
     } else if (pnc_junction_overlap) {
       // bare intersection
-      if (FLAGS_enable_scenario_bare_intersection) {
-        scenario_type =
-            SelectBareIntersectionScenario(frame, *pnc_junction_overlap);
-      }
+      scenario_type =
+          SelectBareIntersectionScenario(frame, *pnc_junction_overlap);
     }
   }
 
