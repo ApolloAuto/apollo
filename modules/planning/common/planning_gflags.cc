@@ -260,8 +260,10 @@ DEFINE_double(yield_distance_pedestrian_bycicle, 5.0,
               "min yield distance for pedestrians/bicycles");
 DEFINE_double(follow_time_buffer, 2.5,
               "time buffer in second to calculate the following distance.");
-DEFINE_double(follow_min_time_sec, 0.1,
-              "min follow time in st region before considering a valid follow");
+DEFINE_double(follow_min_time_sec, 2.0,
+              "min follow time in st region before considering a valid follow,"
+              " this is to differentiate a moving obstacle cross adc's"
+              " current lane and move to a different direction");
 DEFINE_double(stop_line_stop_distance, 1.0, "stop distance from stop line");
 DEFINE_double(signal_light_min_pass_s_distance, 4.0,
               "min s_distance for adc to be considered "
