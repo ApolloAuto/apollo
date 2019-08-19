@@ -99,10 +99,10 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
 
   const double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
-  const double max_adc_stop_speed =
-      common::VehicleConfigHelper::Instance()->GetConfig()
-          .vehicle_param()
-          .max_abs_speed_when_stopped();
+  const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
+                                        ->GetConfig()
+                                        .vehicle_param()
+                                        .max_abs_speed_when_stopped();
   if (adc_speed > max_adc_stop_speed) {
     ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
     return APPROACHING;
@@ -284,8 +284,8 @@ bool CheckADCReadyToCruise(Frame* frame,
 bool CheckADCSurroundObstacles(const common::math::Vec2d adc_position,
                                const double adc_heading, Frame* frame,
                                const ScenarioParkAndGoConfig& scenario_config) {
-  // TODO(SHU): move to config
-  const double kFrontBuffer = 2.0;  // safe cruise distance
+  // safe cruise distance
+  const double kFrontBuffer = scenario_config.front_obstacle_buffer();
   const auto& vehicle_config =
       common::VehicleConfigHelper::Instance()->GetConfig();
   const double adc_length = vehicle_config.vehicle_param().length();

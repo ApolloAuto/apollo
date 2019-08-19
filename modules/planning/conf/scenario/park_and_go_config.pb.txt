@@ -1,6 +1,7 @@
 scenario_type: PARK_AND_GO
 park_and_go_config:
 {
+  front_obstacle_buffer: 4.0
 }
 
 stage_type: PARK_AND_GO_CHECK
@@ -56,7 +57,7 @@ stage_config:{
     task_config: {
         task_type: PATH_BOUNDS_DECIDER
         path_bounds_decider_config {
-        is_lane_borrowing: false
+        is_lane_borrowing: true
         }
     }
     task_config: {
