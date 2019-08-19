@@ -341,6 +341,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
     const Frame& frame, const hdmap::PathOverlap& traffic_light_overlap) {
+  // scenario conf is the same across all traffic-light scenarios
   const auto& scenario_config =
       config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]
           .traffic_light_unprotected_right_turn_config();
@@ -419,9 +420,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
           return ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN;
         }
         if (left_turn) {
-          // TODO(all): switch when ready
-          // return ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN;
-          return ScenarioConfig::TRAFFIC_LIGHT_PROTECTED;
+          return ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN;
         }
 
         return ScenarioConfig::TRAFFIC_LIGHT_PROTECTED;
