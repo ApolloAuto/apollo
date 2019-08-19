@@ -285,9 +285,8 @@ void NCut::GetPatchFeature(const MatrixXf &points, MatrixXf *features_in) {
     for (int r = 0; r < patch.rows; ++r) {
       for (int c = 0; c < patch.cols; ++c) {
         float val = patch.at<float>(r, c);
-        features.coeffRef(i, p++) =
-          static_cast<float>((std::isnan(val) || std::isinf(val))
-                             ? 1.e-50 : val);
+        features.coeffRef(i, p++) = static_cast<float>(
+            (std::isnan(val) || std::isinf(val)) ? 1.e-50 : val);
         // features.coeffRef(i, p++) = patch.at<float>(r, c);
       }
     }
