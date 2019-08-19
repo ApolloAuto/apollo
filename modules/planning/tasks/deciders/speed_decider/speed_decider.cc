@@ -521,7 +521,7 @@ bool SpeedDecider::CheckStopForPedestrian(
     std::unordered_map<std::string, double>* pedestrian_stop_times) const {
   CHECK_NOTNULL(pedestrian_stop_times);
 
-  if (!FLAGS_enable_alwasy_stop_for_pedestrian) {
+  if (!FLAGS_enable_always_stop_for_pedestrian) {
     return false;
   }
 
