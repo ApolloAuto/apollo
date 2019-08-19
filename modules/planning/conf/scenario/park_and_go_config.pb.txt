@@ -2,6 +2,7 @@ scenario_type: PARK_AND_GO
 park_and_go_config:
 {
   front_obstacle_buffer: 4.0
+  heading_buffer: 0.5
 }
 
 stage_type: PARK_AND_GO_CHECK
