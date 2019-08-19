@@ -149,7 +149,8 @@ message ScenarioValetParkingConfig {
 message ScenarioNarrowStreetUTurnConfig {}
 
 message ScenarioParkAndGoConfig {
-    optional double front_obstacle_buffer =1 [default = 4.0]; //meter
+    optional double front_obstacle_buffer = 1 [default = 4.0]; //meter
+    optional double heading_buffer = 2 [default = 0.5]; //rad
 }
 
 message ScenarioYieldSignConfig {

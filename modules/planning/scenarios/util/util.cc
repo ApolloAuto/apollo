@@ -267,10 +267,12 @@ bool CheckADCReadyToCruise(Frame* frame,
       common::VehicleStateProvider::Instance()->heading();
   const ReferenceLineInfo& reference_line_info =
       frame->reference_line_info().front();
-  bool is_near_front_obstacle = CheckADCSurroundObstacles(
-      adc_position, adc_heading, frame, scenario_config);
-  bool heading_align_w_reference_line = CheckADCHeading(
-      adc_position, adc_heading, reference_line_info, scenario_config);
+  bool is_near_front_obstacle =
+      CheckADCSurroundObstacles(adc_position, adc_heading, frame,
+                                scenario_config.front_obstacle_buffer());
+  bool heading_align_w_reference_line =
+      CheckADCHeading(adc_position, adc_heading, reference_line_info,
+                      scenario_config.heading_buffer());
   if (!is_near_front_obstacle && heading_align_w_reference_line) {
     return true;
   }
@@ -283,17 +285,15 @@ bool CheckADCReadyToCruise(Frame* frame,
  */
 bool CheckADCSurroundObstacles(const common::math::Vec2d adc_position,
                                const double adc_heading, Frame* frame,
-                               const ScenarioParkAndGoConfig& scenario_config) {
-  // safe cruise distance
-  const double kFrontBuffer = scenario_config.front_obstacle_buffer();
+                               const double front_obstacle_buffer) {
   const auto& vehicle_config =
       common::VehicleConfigHelper::Instance()->GetConfig();
   const double adc_length = vehicle_config.vehicle_param().length();
   const double adc_width = vehicle_config.vehicle_param().width();
   // ADC box
   Box2d adc_box(adc_position, adc_heading, adc_length, adc_width);
-  double shift_distance =
-      kFrontBuffer + vehicle_config.vehicle_param().back_edge_to_center();
+  double shift_distance = front_obstacle_buffer +
+                          vehicle_config.vehicle_param().back_edge_to_center();
   Vec2d shift_vec{shift_distance * std::cos(adc_heading),
                   shift_distance * std::sin(adc_heading)};
   adc_box.Shift(shift_vec);
@@ -316,9 +316,7 @@ bool CheckADCSurroundObstacles(const common::math::Vec2d adc_position,
 bool CheckADCHeading(const common::math::Vec2d adc_position,
                      const double adc_heading,
                      const ReferenceLineInfo& reference_line_info,
-                     const ScenarioParkAndGoConfig& scenario_config) {
-  // TODO(SHU): move to config
-  const double kThetaDiffToReferenceLine = 0.5;
+                     const double heading_diff_to_reference_line) {
   const auto& reference_line = reference_line_info.reference_line();
   common::SLPoint adc_position_sl;
   reference_line.XYToSL(adc_position, &adc_position_sl);
@@ -327,7 +325,7 @@ bool CheckADCHeading(const common::math::Vec2d adc_position,
       reference_line.GetReferencePoint(adc_position_sl.s());
   const auto path_point = reference_point.ToPathPoint(adc_position_sl.s());
   if (std::fabs(common::math::NormalizeAngle(
-          adc_heading - path_point.theta())) < kThetaDiffToReferenceLine) {
+          adc_heading - path_point.theta())) < heading_diff_to_reference_line) {
     return true;
   }
   return false;
