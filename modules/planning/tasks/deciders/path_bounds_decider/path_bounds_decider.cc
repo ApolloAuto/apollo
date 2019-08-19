@@ -211,26 +211,17 @@ void PathBoundsDecider::InitPathBoundsDecider(
   const ReferenceLine& reference_line = reference_line_info.reference_line();
   const common::TrajectoryPoint& planning_start_point =
       frame.PlanningStartPoint();
-  // Reset variables.
-  adc_frenet_s_ = 0.0;
-  adc_frenet_l_ = 0.0;
-  adc_l_to_lane_center_ = 0.0;
-  adc_lane_width_ = 0.0;
 
   // Initialize some private variables.
   // ADC s/l info.
-
-  // TODO(jiacheng): using ToFrenetFrame only.
-  auto adc_frenet_position =
-      reference_line.GetFrenetPoint(planning_start_point.path_point());
-  adc_frenet_s_ = adc_frenet_position.s();
-  adc_frenet_l_ = adc_frenet_position.l();
+  auto adc_sl_info = reference_line.ToFrenetFrame(planning_start_point);
+  adc_frenet_s_ = adc_sl_info.first[0];
+  adc_frenet_l_ = adc_sl_info.second[0];
+  adc_frenet_sd_ = adc_sl_info.first[1];
+  adc_frenet_ld_ = adc_sl_info.second[1];
   double offset_to_map = 0.0;
   reference_line.GetOffsetToMap(adc_frenet_s_, &offset_to_map);
   adc_l_to_lane_center_ = adc_frenet_l_ + offset_to_map;
-  auto adc_sl_info = reference_line.ToFrenetFrame(planning_start_point);
-  adc_frenet_sd_ = adc_sl_info.first[1];
-  adc_frenet_ld_ = adc_sl_info.second[1] * adc_frenet_sd_;
 
   // ADC's lane width.
   double lane_left_width = 0.0;
