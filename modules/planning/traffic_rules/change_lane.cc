@@ -168,7 +168,6 @@ ObjectDecisionType ChangeLane::CreateOvertakeDecision(
   double distance =
       std::max(obstacle.speed() * config_.change_lane().min_overtake_time(),
                config_.change_lane().min_overtake_distance());
-  overtake.mutable_overtake()->set_distance_s(distance);
   double fence_s = obstacle.PerceptionSLBoundary().end_s() + distance;
   auto point = reference_line.GetReferencePoint(fence_s);
   overtake.mutable_overtake()->set_time_buffer(

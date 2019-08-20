@@ -63,12 +63,6 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
       (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0);
   Vec2d center(position + vec_to_center.rotate(path_point.theta()));
   Box2d box(center, path_point.theta(), param.length(), param.width());
-  // realtime vehicle position
-  Vec2d vehicle_position(vehicle_state_.x(), vehicle_state_.y());
-  Vec2d vehicle_center(vehicle_position +
-                       vec_to_center.rotate(vehicle_state_.heading()));
-  Box2d vehicle_box(vehicle_center, vehicle_state_.heading(), param.length(),
-                    param.width());
 
   if (!reference_line_.GetSLBoundary(box, &adc_sl_boundary_)) {
     AERROR << "Failed to get ADC boundary from box: " << box.DebugString();

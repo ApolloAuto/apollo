@@ -367,23 +367,23 @@ bool Obstacle::BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
   const double adc_length = adc_param.length();
   const double adc_half_length = adc_length / 2.0;
   const double adc_width = adc_param.width();
-  common::math::Box2d min_box({0, 0}, 1.0, 1.0, 1.0);
-  common::math::Box2d max_box({0, 0}, 1.0, 1.0, 1.0);
   std::vector<std::pair<STPoint, STPoint>> polygon_points;
 
   SLBoundary last_sl_boundary;
-  int last_index = 0;
 
   for (int i = 1; i < trajectory_points.size(); ++i) {
     ADEBUG << "last_sl_boundary: " << last_sl_boundary.ShortDebugString();
 
+    // first is the last traj point, second is the current traj point
     const auto& first_traj_point = trajectory_points[i - 1];
     const auto& second_traj_point = trajectory_points[i];
     const auto& first_point = first_traj_point.path_point();
     const auto& second_point = second_traj_point.path_point();
 
-    double object_moving_box_length =
-        object_length + common::util::DistanceXY(first_point, second_point);
+    // distance_xy: distance between the last traj point and
+    //                               the current traj point
+    double distance_xy = common::util::DistanceXY(first_point, second_point);
+    double object_moving_box_length = object_length + distance_xy;
 
     common::math::Vec2d center((first_point.x() + second_point.x()) / 2.0,
                                (first_point.y() + second_point.y()) / 2.0);
@@ -393,10 +393,6 @@ bool Obstacle::BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
     SLBoundary object_boundary;
     // NOTICE: this method will have errors when the reference line is not
     // straight. Need double loop to cover all corner cases.
-    // roughly skip points that are too close to last_sl_boundary box
-    const double distance_xy =
-        common::util::DistanceXY(trajectory_points[last_index].path_point(),
-                                 trajectory_points[i].path_point());
     if (last_sl_boundary.start_l() > distance_xy ||
         last_sl_boundary.end_l() < -distance_xy) {
       continue;
@@ -417,7 +413,6 @@ bool Obstacle::BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
 
     // update history record
     last_sl_boundary = object_boundary;
-    last_index = i;
 
     // skip if object is entirely on one side of reference line.
     constexpr double kSkipLDistanceFactor = 0.4;
