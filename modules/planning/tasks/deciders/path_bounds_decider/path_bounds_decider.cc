@@ -351,11 +351,9 @@ Status PathBoundsDecider::GeneratePullOverPathBound(
              curr_idx + kNumExtraTailBoundPoint) {
         path_bound->pop_back();
       }
-      for (int idx = 0; idx < kNumExtraTailBoundPoint; ++idx) {
-        std::get<1>((*path_bound)[path_bound->size() - 1 - idx]) =
-            std::get<1>((*path_bound)[curr_idx]);
-        std::get<2>((*path_bound)[path_bound->size() - 1 - idx]) =
-            std::get<2>((*path_bound)[curr_idx]);
+      for (size_t idx = curr_idx + 1; idx < path_bound->size(); ++idx) {
+        std::get<1>((*path_bound)[idx]) = std::get<1>((*path_bound)[curr_idx]);
+        std::get<2>((*path_bound)[idx]) = std::get<2>((*path_bound)[curr_idx]);
       }
       // PathBoundsDebugString(*path_bound);
       return Status::OK();
@@ -392,15 +390,14 @@ Status PathBoundsDecider::GeneratePullOverPathBound(
          << pull_over_status->position().y() << "] theta["
          << pull_over_status->theta() << "]";
 
+  auto curr_idx = std::get<3>(pull_over_configuration);
   while (static_cast<int>(path_bound->size()) - 1 >
-         std::get<3>(pull_over_configuration) + kNumExtraTailBoundPoint) {
+         curr_idx + kNumExtraTailBoundPoint) {
     path_bound->pop_back();
   }
-  for (int idx = 0; idx < kNumExtraTailBoundPoint; ++idx) {
-    std::get<1>((*path_bound)[path_bound->size() - 1 - idx]) =
-        std::get<1>((*path_bound)[std::get<3>(pull_over_configuration)]);
-    std::get<2>((*path_bound)[path_bound->size() - 1 - idx]) =
-        std::get<2>((*path_bound)[std::get<3>(pull_over_configuration)]);
+  for (size_t idx = curr_idx + 1; idx < path_bound->size(); ++idx) {
+    std::get<1>((*path_bound)[idx]) = std::get<1>((*path_bound)[curr_idx]);
+    std::get<2>((*path_bound)[idx]) = std::get<2>((*path_bound)[curr_idx]);
   }
 
   return Status::OK();
@@ -559,9 +556,10 @@ bool PathBoundsDecider::SearchPullOverPosition(
           (0.5 * (kPulloverLonSearchCoeff - 1.0) * vehicle_param.length() +
            vehicle_param.back_edge_to_center()) /
           vehicle_param.length() / kPulloverLonSearchCoeff;
-      const auto& pull_over_point = path_bound[static_cast<size_t>(
-          back_clear_to_total_length_ratio * static_cast<double>(i) +
-          (1.0 - back_clear_to_total_length_ratio) * static_cast<double>(j))];
+      auto pull_over_idx = static_cast<size_t>(
+                   back_clear_to_total_length_ratio * static_cast<double>(i) +
+           (1.0 - back_clear_to_total_length_ratio) * static_cast<double>(j));
+      const auto& pull_over_point = path_bound[pull_over_idx];
       const double pull_over_s = std::get<0>(pull_over_point);
       const double pull_over_l =
           std::get<1>(pull_over_point) + pull_over_space_width / 2.0;
@@ -589,7 +587,8 @@ bool PathBoundsDecider::SearchPullOverPosition(
         pull_over_theta = lane->Heading(s);
       }
       *pull_over_configuration = std::make_tuple(pull_over_x, pull_over_y,
-                                                 pull_over_theta, (i + j) / 2);
+                                                 pull_over_theta,
+                                             static_cast<int>(pull_over_idx));
       break;
     }
     --i;
@@ -971,6 +970,9 @@ bool PathBoundsDecider::GetBoundaryFromStaticObstacles(
             std::get<2>((*path_boundaries)[i])) {
           ADEBUG << "Path is blocked at s = " << curr_s;
           path_blocked_idx = static_cast<int>(i);
+          if (!obs_id_to_direction.empty()) {
+            *blocking_obstacle_id = obs_id_to_direction.begin()->first;
+          }
           break;
         } else {
           center_line = (std::get<1>((*path_boundaries)[i]) +
