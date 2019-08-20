@@ -45,7 +45,7 @@ void Ecustatus2516::Parse(const std::uint8_t* bytes, int32_t length,
 // config detail: {'description': 'Percentage of battery remaining (BMS
 // status)', 'offset': 0.0, 'precision': 1.0, 'len': 16, 'name':
 // 'battery_remaining_capacity', 'is_signed_var': False, 'physical_range':
-// '[0|0]', 'bit': 0, 'type': 'int', 'order': 'intel', 'physical_unit': '%'}
+// '[0|100]', 'bit': 0, 'type': 'int', 'order': 'intel', 'physical_unit': '%'}
 int Ecustatus2516::battery_remaining_capacity(const std::uint8_t* bytes,
                                               int32_t length) const {
   Byte t0(bytes + 1);
@@ -62,7 +62,7 @@ int Ecustatus2516::battery_remaining_capacity(const std::uint8_t* bytes,
 
 // config detail: {'description': 'Current battery voltage (BMS status)',
 // 'offset': 0.0, 'precision': 0.1, 'len': 16, 'name': 'battery_voltage',
-// 'is_signed_var': False, 'physical_range': '[0|0]', 'bit': 16, 'type':
+// 'is_signed_var': False, 'physical_range': '[0|80]', 'bit': 16, 'type':
 // 'double', 'order': 'intel', 'physical_unit': 'V'}
 double Ecustatus2516::battery_voltage(const std::uint8_t* bytes,
                                       int32_t length) const {
@@ -80,7 +80,7 @@ double Ecustatus2516::battery_voltage(const std::uint8_t* bytes,
 
 // config detail: {'description': 'Current battery current (BMS status)',
 // 'offset': 0.0, 'precision': 0.1, 'len': 16, 'name': 'battery_current',
-// 'is_signed_var': True, 'physical_range': '[0|0]', 'bit': 32, 'type':
+// 'is_signed_var': True, 'physical_range': '[-60|60]', 'bit': 32, 'type':
 // 'double', 'order': 'intel', 'physical_unit': 'A'}
 double Ecustatus2516::battery_current(const std::uint8_t* bytes,
                                       int32_t length) const {
@@ -101,8 +101,8 @@ double Ecustatus2516::battery_current(const std::uint8_t* bytes,
 
 // config detail: {'description': 'Current battery temperature (BMS status)',
 // 'offset': 0.0, 'precision': 1.0, 'len': 16, 'name': 'battery_temperature',
-// 'is_signed_var': True, 'physical_range': '[0|0]', 'bit': 48, 'type': 'int',
-// 'order': 'intel', 'physical_unit': '?'}
+// 'is_signed_var': True, 'physical_range': '[-40|110]', 'bit': 48, 'type':
+// 'int', 'order': 'intel', 'physical_unit': '\xc2\xa1\xc3\x89'}
 int Ecustatus2516::battery_temperature(const std::uint8_t* bytes,
                                        int32_t length) const {
   Byte t0(bytes + 7);
