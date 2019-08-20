@@ -173,10 +173,10 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
     return kInf;
   }
 
-  const double max_adc_stop_speed =
-      common::VehicleConfigHelper::Instance()->GetConfig()
-          .vehicle_param()
-          .max_abs_speed_when_stopped();
+  const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
+                                        ->GetConfig()
+                                        .vehicle_param()
+                                        .max_abs_speed_when_stopped();
   if (speed < max_adc_stop_speed && InKeepClearRange(second.s())) {
     // first.s in range
     cost += config_.keep_clear_low_speed_penalty() * unit_t_ *

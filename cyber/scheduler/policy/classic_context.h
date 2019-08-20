@@ -58,7 +58,7 @@ class ClassicContext : public ProcessorContext {
   void Shutdown() override;
 
   static void Notify(const std::string &group_name);
-  static bool RemoveCRoutine(const std::shared_ptr<CRoutine>& cr);
+  static bool RemoveCRoutine(const std::shared_ptr<CRoutine> &cr);
 
   alignas(CACHELINE_SIZE) static RQ_LOCK_GROUP rq_locks_;
   alignas(CACHELINE_SIZE) static CR_GROUP cr_group_;

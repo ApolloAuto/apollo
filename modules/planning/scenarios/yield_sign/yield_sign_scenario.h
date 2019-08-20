@@ -46,7 +46,7 @@ struct YieldSignContext {
 class YieldSignScenario : public Scenario {
  public:
   YieldSignScenario(const ScenarioConfig& config,
-                              const ScenarioContext* context)
+                    const ScenarioContext* context)
       : Scenario(config, context) {}
 
   void Init() override;

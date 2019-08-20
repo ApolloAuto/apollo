@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 #pragma once
-#include <iostream>
-#include <utility>
-#include <string>
 #include <algorithm>
-#include <vector>
+#include <iostream>
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 #include "modules/perception/tool/benchmark/lidar/eval/frame_statistics.h"
 #include "modules/perception/tool/benchmark/lidar/eval/lidar_option.h"
 #include "modules/perception/tool/benchmark/lidar/eval/sequence_self_statistics.h"

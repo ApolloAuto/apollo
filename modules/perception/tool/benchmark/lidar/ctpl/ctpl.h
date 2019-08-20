@@ -35,8 +35,8 @@
 #ifndef __ctpl_thread_pool_H__
 #define __ctpl_thread_pool_H__
 
-#include <boost/lockfree/queue.hpp>
 #include <atomic>
+#include <boost/lockfree/queue.hpp>
 #include <exception>
 #include <functional>
 #include <future>
