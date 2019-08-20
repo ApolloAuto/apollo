@@ -83,7 +83,7 @@ Status GriddedPathTimeGraph::Search(SpeedData* const speed_data) {
          std::fabs(boundary->min_s()) < kBounadryEpsilon)) {
       std::vector<SpeedPoint> speed_profile;
       double t = 0.0;
-      for (int i = 0; i <= gridded_path_time_graph_config_.matrix_dimension_t();
+      for (int i = 0; i < gridded_path_time_graph_config_.matrix_dimension_t();
            ++i, t += unit_t_) {
         SpeedPoint speed_point;
         speed_point.set_s(0.0);
