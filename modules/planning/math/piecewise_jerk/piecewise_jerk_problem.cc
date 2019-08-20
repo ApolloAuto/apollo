@@ -251,7 +251,8 @@ void PiecewiseJerkProblem::CalculateAffineConstraint(
       ++ind_p;
     }
   }
-  // TODO(all): need this?
+  // We indeed need this line because of
+  // https://github.com/oxfordcontrol/osqp/blob/master/src/cs.c#L255
   A_indptr->push_back(ind_p);
 }
 
