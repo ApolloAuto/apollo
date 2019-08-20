@@ -202,7 +202,7 @@ export default class TrafficControl {
 
         // Prepare materials for red/yellow/green light
         loadMaterial(trafficLightMaterial, materials => {
-            const [ , , DARK_GREEN, DARK_YELLOW, DARK_RED ] = materials.getAsArray();
+            const [, DARK_GREEN, DARK_YELLOW, DARK_RED ] = materials.getAsArray();
 
             const getLightMaterial = (material, subsignal) => {
                 const lightMaterial = material.clone();
