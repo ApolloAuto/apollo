@@ -40,7 +40,7 @@ DpStCost::DpStCost(const DpStSpeedConfig& config, const double total_time,
   for (const auto& obstacle : obstacles) {
     boundary_map_[obstacle->path_st_boundary().id()] = index++;
   }
-  unit_t_ = total_time / config_.matrix_dimension_t();
+  unit_t_ = total_time / (config_.matrix_dimension_t() - 1);
 
   AddToKeepClearRange(obstacles);
 
@@ -173,10 +173,10 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
     return kInf;
   }
 
-  const double max_adc_stop_speed =
-      common::VehicleConfigHelper::Instance()->GetConfig()
-          .vehicle_param()
-          .max_abs_speed_when_stopped();
+  const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
+                                        ->GetConfig()
+                                        .vehicle_param()
+                                        .max_abs_speed_when_stopped();
   if (speed < max_adc_stop_speed && InKeepClearRange(second.s())) {
     // first.s in range
     cost += config_.keep_clear_low_speed_penalty() * unit_t_ *
