@@ -32,6 +32,7 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/speed_profile_generator.h"
 #include "modules/planning/common/util/util.h"
 #include "modules/planning/scenarios/util/util.h"
 #include "modules/planning/tasks/deciders/creep_decider/creep_decider.h"
@@ -108,20 +109,24 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
       Clock::NowInSeconds() - GetContext()->creep_start_time;
   const double timeout_sec = scenario_config_.creep_timeout_sec();
   auto* task = dynamic_cast<CreepDecider*>(FindTask(TaskConfig::CREEP_DECIDER));
-  if (task &&
-      task->CheckCreepDone(*frame, reference_line_info, traffic_light->end_s,
-                           wait_time, timeout_sec)) {
+  if (task == nullptr) {
+    AERROR << "task is nullptr";
     return FinishStage();
   }
 
-  // set param for PROCEED_WITH_CAUTION_SPEED
-  // dynamic_cast<CreepDecider*>(FindTask(TaskConfig::CREEP_DECIDER))
-  //    ->SetProceedWithCautionSpeedParam(*frame, reference_line_info,
-  //                                      traffic_light.end_s);
+  double creep_stop_s = traffic_light->end_s +
+      task->FindCreepDistance(*frame, reference_line_info);
+  const double distance =
+      creep_stop_s - reference_line_info.AdcSlBoundary().end_s();
+  if (distance <= 0.0) {
+    auto& rfl_info = frame->mutable_reference_line_info()->front();
+    *(rfl_info.mutable_speed_data()) =
+        SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(0.0, 0);
+  }
 
-  plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
-    AERROR << "TrafficLightUnprotectedRightTurnStageCreep planning error";
+  if (task->CheckCreepDone(*frame, reference_line_info, traffic_light->end_s,
+                           wait_time, timeout_sec)) {
+    return FinishStage();
   }
 
   return Stage::RUNNING;
