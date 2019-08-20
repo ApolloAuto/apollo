@@ -4,8 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "boost",
+    copts = ["-fPIC"],
     includes = ["."],
-    copts = [ "-fPIC" ],
     linkopts = [
         "-L/usr/local/apollo/boost/lib",
         "-lboost_system",
