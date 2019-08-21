@@ -467,7 +467,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectYieldSignScenario(
       yield_sign_overlap.start_s - adc_front_edge_s;
   ADEBUG << "adc_distance_to_yield_sign[" << adc_distance_to_yield_sign
          << "] yield_sign[" << yield_sign_overlap.object_id
-         << "] yield_sign_overlap_start_s[" << yield_sign_overlap.start_s << "]";
+         << "] yield_sign_overlap_start_s["
+         << yield_sign_overlap.start_s << "]";
 
   const bool yield_sign_scenario =
           (adc_distance_to_yield_sign > 0.0 &&
