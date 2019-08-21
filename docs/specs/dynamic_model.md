@@ -6,12 +6,12 @@ Simulation is a vital part of autonomous driving especially in Apollo where most
 
 The architecture diagram for how Dynamic model works is included below:
 
-![](Images/architecture.png)
+![](images/architecture.png)
 The Control module recieves input via planning and the vehicle and uses it effectively to generate the output path which is then fed into the Dynamic model. 
 
 ## Examples
 
-The simulation platform (Dreamview) can be used to test various control parameters, three parameters are shown below:
+The simulation platform - [Dreamland](http://apollo.auto/platform/simulation.html) can be used to test various control parameters, three parameters are shown below:
 
 ```
 Note:
@@ -26,7 +26,7 @@ A pedestrian walk across the road and the ego car needs to stop by applying the 
 2. **Lateral Control**
 The ego car has to make a wide-angle U-turn in this scenario. As seen in the image below, the steering turn is at 64%. You can also monitor the performance of the dynamic model on the right against the actual planned trajectory.
 
-3. **Backward Behavior**
+3. **Backward Behavior** 
 The ego car has to park itself in a designated spot. This scenario is complex as it requires a mixture of forward and backward (reverse) driving and requires a high level of accuracy from the control module. As you can see in the image below, the steering turn required is at `-92%`. Additional details on this example can be seen in the planning module's Park scenario.
 
 ![](images/Backward.png)
