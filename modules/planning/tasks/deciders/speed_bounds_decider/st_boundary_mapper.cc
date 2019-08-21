@@ -232,7 +232,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
           sampled_path_points.push_back(path_points[i]);
         }
       }
-      discretized_path = DiscretizedPath(sampled_path_points);
+      discretized_path = DiscretizedPath(std::move(sampled_path_points));
     } else {
       discretized_path = DiscretizedPath(path_points);
     }
