@@ -80,6 +80,7 @@ cc_library(
         "//modules/planning/scenarios/traffic_light/protected:traffic_light_protected_scenario",
         "//modules/planning/scenarios/traffic_light/unprotected_left_turn:traffic_light_unprotected_left_turn_scenario",
         "//modules/planning/scenarios/traffic_light/unprotected_right_turn:traffic_light_unprotected_right_turn_scenario",
+        "//modules/planning/scenarios/yield_sign:yield_sign_scenario",
     ],
 )
 
