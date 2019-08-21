@@ -23,15 +23,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # Prepare
 apt-get update -y
-apt-get install -y \
-    automake \
-    autotools-dev \
-    g++ \
-    libcurl4-openssl-dev \
-    libfuse-dev \
-    libssl-dev \
-    make \
-    uuid-dev
+apt-get install -y libfuse-dev
 PACKAGE="bosfs-1.0.0.9.tar.gz"
 wget http://sdk.bce.baidu.com/console-sdk/${PACKAGE}
 tar zxf ${PACKAGE}
