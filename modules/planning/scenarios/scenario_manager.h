@@ -75,6 +75,7 @@ class ScenarioManager final {
   bool IsStopSignScenario(const ScenarioConfig::ScenarioType& scenario_type);
   bool IsTrafficLightScenario(
       const ScenarioConfig::ScenarioType& scenario_type);
+  bool IsYieldSignScenario(const ScenarioConfig::ScenarioType& scenario_type);
 
   void UpdatePlanningContext(const Frame& frame,
                              const ScenarioConfig::ScenarioType& scenario_type);
@@ -86,6 +87,9 @@ class ScenarioManager final {
       const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
 
   void UpdatePlanningContextTrafficLightScenario(
+      const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
+
+  void UpdatePlanningContextYieldSignScenario(
       const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
 
   void UpdatePlanningContextPullOverScenario(
