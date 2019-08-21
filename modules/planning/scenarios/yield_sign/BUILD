@@ -5,9 +5,13 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "yield_sign_scenario",
     srcs = [
+        "stage_approach.cc",
+        "stage_creep.cc",
         "yield_sign_scenario.cc",
     ],
     hdrs = [
+        "stage_approach.h",
+        "stage_creep.h",
         "yield_sign_scenario.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],

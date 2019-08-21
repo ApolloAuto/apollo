@@ -41,6 +41,7 @@ namespace yield_sign {
 struct YieldSignContext {
   ScenarioYieldSignConfig scenario_config;
   std::string current_yield_sign_overlap_id;
+  double creep_start_time = 0.0;
 };
 
 class YieldSignScenario : public Scenario {
