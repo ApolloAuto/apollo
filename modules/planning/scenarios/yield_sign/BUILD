@@ -30,19 +30,19 @@ cc_library(
     ],
 )
 
-#cc_test(
-#    name = "yield_sign_scenario_test",
-#    size = "small",
-#    srcs = [
-#        "yield_sign_scenario_test.cc",
-#    ],
-#    data = [
-#        "//modules/planning:planning_conf",
-#    ],
-#    deps = [
-#        ":yield_sign_scenario",
-#        "@gtest//:main",
-#    ],
-#)
+cc_test(
+    name = "yield_sign_scenario_test",
+    size = "small",
+    srcs = [
+        "yield_sign_scenario_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        ":yield_sign_scenario",
+        "@gtest//:main",
+    ],
+)
 
 cpplint()
