@@ -40,7 +40,7 @@ using apollo::perception::TrafficLight;
 
 Stage::StageStatus YieldSignStageApproach::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
-   << "stage: Approach";
+  ADEBUG << "stage: Approach";
   CHECK_NOTNULL(frame);
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
@@ -71,7 +71,7 @@ Stage::StageStatus YieldSignStageApproach::Process(
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double distance_adc_to_stop_line =
       current_yield_sign_overlap->start_s - adc_front_edge_s;
-   << "yield_sign_overlap_id[" << yield_sign_overlap_id
+  ADEBUG << "yield_sign_overlap_id[" << yield_sign_overlap_id
          << "] start_s[" << current_yield_sign_overlap->start_s
          << "] distance_adc_to_stop_line[" << distance_adc_to_stop_line << "]";
   if (distance_adc_to_stop_line <

@@ -64,6 +64,15 @@ hdmap::PathOverlap* GetOverlapOnReferenceLine(
         return const_cast<hdmap::PathOverlap*>(&pnc_junction_overlap);
       }
     }
+  } else if (overlap_type == ReferenceLineInfo::YIELD_SIGN) {
+    // yield_sign_overlap
+    const auto& yield_sign_overlaps =
+        reference_line_info.reference_line().map_path().yield_sign_overlaps();
+    for (const auto& yield_sign_overlap : yield_sign_overlaps) {
+      if (yield_sign_overlap.object_id == overlap_id) {
+        return const_cast<hdmap::PathOverlap*>(&yield_sign_overlap);
+      }
+    }
   }
 
   return nullptr;
