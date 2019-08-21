@@ -47,7 +47,7 @@ Stage::StageStatus TrafficLightProtectedStageApproach::Process(
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "TrafficLightProtectedStop planning error";
+    AERROR << "TrafficLightProtectedStageApproach planning error";
   }
 
   if (GetContext()->current_traffic_light_overlap_ids.size() == 0) {
