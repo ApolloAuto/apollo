@@ -218,7 +218,7 @@ void PathBoundsDecider::InitPathBoundsDecider(
   adc_frenet_s_ = adc_sl_info.first[0];
   adc_frenet_l_ = adc_sl_info.second[0];
   adc_frenet_sd_ = adc_sl_info.first[1];
-  adc_frenet_ld_ = adc_sl_info.second[1];
+  adc_frenet_ld_ = adc_sl_info.second[1] * adc_frenet_sd_;
   double offset_to_map = 0.0;
   reference_line.GetOffsetToMap(adc_frenet_s_, &offset_to_map);
   adc_l_to_lane_center_ = adc_frenet_l_ + offset_to_map;
