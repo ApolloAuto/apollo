@@ -39,10 +39,11 @@ void Steerstatus512::Parse(const std::uint8_t* bytes, int32_t length,
 }
 
 // config detail: {'description': 'steering angle enable bit(Status)', 'enum':
-// {0: 'STEER_ANGLE_EN_STS_DISABLE', 1: 'STEER_ANGLE_EN_STS_ENABLE'},
-// 'precision': 1.0, 'len': 8, 'name': 'steer_angle_en_sts', 'is_signed_var':
-// False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum',
-// 'order': 'intel', 'physical_unit': ''}
+// {0: 'STEER_ANGLE_EN_STS_DISABLE', 1: 'STEER_ANGLE_EN_STS_ENABLE', 2:
+// 'STEER_ANGLE_EN_STS_TAKEOVER'}, 'precision': 1.0, 'len': 8, 'name':
+// 'steer_angle_en_sts', 'is_signed_var': False, 'offset': 0.0,
+// 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'intel',
+// 'physical_unit': ''}
 Steer_status__512::Steer_angle_en_stsType Steerstatus512::steer_angle_en_sts(
     const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 0);
