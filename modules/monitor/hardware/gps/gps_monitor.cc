@@ -26,18 +26,13 @@ DEFINE_string(gps_hardware_name, "GPS", "Name of the GPS hardware.");
 DEFINE_string(gps_monitor_name, "GpsMonitor", "Name of the GPS monitor.");
 DEFINE_double(gps_monitor_interval, 3, "GPS status checking interval (s).");
 
-DEFINE_double(acceptable_gnss_best_pose_std_dev, 0.5,
-              "Acceptable Gnss BestPose standard deviation on latitude, "
-              "longitude and height.");
-
-DEFINE_double(acceptable_gnss_best_pose_unstable_duration, 120,
-              "Acceptable Gnss BestPose unstable duration in seconds.");
-
 namespace apollo {
 namespace monitor {
 
 using apollo::common::adapter::AdapterManager;
+using apollo::common::util::StrCat;
 using apollo::drivers::gnss_status::InsStatus;
+using apollo::localization::MeasureState;
 
 GpsMonitor::GpsMonitor() : RecurrentRunner(FLAGS_gps_monitor_name,
                                            FLAGS_gps_monitor_interval) {
@@ -86,40 +81,47 @@ void GpsMonitor::RunOnce(const double current_time) {
       return;
   }
 
-  // Check Gnss BestPose.
-  auto *best_pose_adapter = AdapterManager::GetGnssBestPose();
-  best_pose_adapter->Observe();
-  if (best_pose_adapter->Empty()) {
+  // Check Localization MSF status.
+  auto *msf_status_adapter = AdapterManager::GetLocalizationMsfStatus();
+  msf_status_adapter->Observe();
+  if (msf_status_adapter->Empty()) {
     status->set_status(HardwareStatus::ERR);
-    status->set_detailed_msg("No Gnss BestPose message.");
+    status->set_detailed_msg("No LocalizationStatus received.");
     return;
   }
-  const auto &best_pose = best_pose_adapter->GetLatestObserved();
-  const double largest_std_dev = std::max({best_pose.latitude_std_dev(),
-                                           best_pose.longitude_std_dev(),
-                                           best_pose.height_std_dev()});
-  if (largest_std_dev > FLAGS_acceptable_gnss_best_pose_std_dev) {
-    status->set_status(HardwareStatus::GPS_UNSTABLE_WARNING);
-    status->set_detailed_msg("GPS BestPose is unstable.");
-    if (status->has_gps_unstable_start_time()) {
-      const double duration = current_time - status->gps_unstable_start_time();
-      if (duration > FLAGS_acceptable_gnss_best_pose_unstable_duration) {
-        status->set_status(HardwareStatus::GPS_UNSTABLE_ERROR);
-        MonitorManager::LogBuffer().ERROR("GPS is very unstable!");
-      }
-    } else {
-      status->set_gps_unstable_start_time(current_time);
-      MonitorManager::LogBuffer().WARN("GPS becomes unstable!");
-    }
-    return;
-  } else if (status->has_gps_unstable_start_time()) {
-    status->clear_gps_unstable_start_time();
-    MonitorManager::LogBuffer().INFO("GPS stability recovered.");
+  const auto &msf_status = msf_status_adapter->GetLatestObserved();
+  switch (msf_status.fusion_status()) {
+    case MeasureState::OK:
+      status->set_status(HardwareStatus::OK);
+      status->set_detailed_msg("OK");
+      break;
+    case MeasureState::WARNNING:
+      status->set_status(HardwareStatus::GPS_UNSTABLE_WARNING);
+      status->set_detailed_msg(
+          StrCat("WARNNING: ", msf_status.state_message()));
+      MonitorManager::LogBuffer().WARN(status->detailed_msg());
+      break;
+    case MeasureState::ERROR:
+      status->set_status(HardwareStatus::GPS_UNSTABLE_ERROR);
+      status->set_detailed_msg(StrCat("ERROR: ", msf_status.state_message()));
+      MonitorManager::LogBuffer().ERROR(status->detailed_msg());
+      break;
+    case MeasureState::CRITICAL_ERROR:
+      status->set_status(HardwareStatus::GPS_UNSTABLE_ERROR);
+      status->set_detailed_msg(
+          StrCat("CRITICAL_ERROR: ", msf_status.state_message()));
+      MonitorManager::LogBuffer().ERROR(status->detailed_msg());
+      break;
+    case MeasureState::FATAL_ERROR:
+      status->set_status(HardwareStatus::GPS_UNSTABLE_ERROR);
+      status->set_detailed_msg(
+          StrCat("FATAL_ERROR: ", msf_status.state_message()));
+      MonitorManager::LogBuffer().FATAL(status->detailed_msg());
+      break;
+    default:
+      AFATAL << "Unknown fusion_status: " << msf_status.fusion_status();
+      break;
   }
-
-  // All check passed.
-  status->set_status(HardwareStatus::OK);
-  status->set_detailed_msg("OK");
 }
 
 }  // namespace monitor
