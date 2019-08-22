@@ -84,17 +84,18 @@ This is **essential** before you can get enjoy control calibration or other Apol
 
 Before uploading your data, take a note of:
 1. The folder structure to be maintained is:
-   ![](images/file_system1.png)
+   ![](images/file_system2.png)
 
 1. As seen above, the file structure to be maintained is
    ```
-   Origin Folder -> Vehicle Folder -> Records + Configuration files
+   Origin Folder -> Task Folder ->Vehicle Folder -> Records + Configuration files
    ```
-1. A vehicle folder needs to be created for your vehicle. The name of the folder
-   should be the same as seen in Dreamview
+1. A **task** folder needs to be created for your caliration job, such as task001, task002... 
+1. A vehicle folder needs to be created for your vehicle. The name of the folder should be the same as seen in Dreamview
 1. Inside your folder, create a **Records** folder to hold the data
-1. Store all the **Configuration files** along with the Records folder, within
-   the **Vehicle** folder
+1. Store all the **Configuration files** along with the Records folder, within the **Vehicle** folder
+1. The vehicle configuration file (vehicle_param.pb.txt) is updated since Apollo 5.0 and later, you should check it
+1. One task folder can contain more than one vehicle folder, you can  train more vehicles in one training job
 
 ### Upload
 
@@ -111,7 +112,7 @@ MOUNT=/mnt/bos
 REGION=bj
 
 mkdir -p "${MOUNT}"
-bosfs "${BUCKET}" "${MOUNT}" -o allow_other,logfile=/tmp/bos-${BUCKET}.log,endpoint=http://su.${REGION}.bcebos.com,ak=${AK},sk=${SK}
+bosfs "${BUCKET}" "${MOUNT}" -o allow_other,logfile=/tmp/bos-${BUCKET}.log,endpoint=http://${REGION}.bcebos.com,ak=${AK},sk=${SK}
 ```
 
 Then you can copy the prepared data folder to somewhere under /mnt/bos.
