@@ -50,13 +50,12 @@ void YieldSign::MakeDecisions(Frame* const frame,
 
   const auto& yield_sign_status =
       PlanningContext::Instance()->planning_status().yield_sign();
-  const double adc_back_edge_s = reference_line_info->AdcSlBoundary().start_s();
   const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
 
   const std::vector<PathOverlap>& yield_sign_overlaps =
       reference_line_info->reference_line().map_path().yield_sign_overlaps();
   for (const auto& yield_sign_overlap : yield_sign_overlaps) {
-    if (yield_sign_overlap.end_s <= adc_back_edge_s) {
+    if (yield_sign_overlap.end_s <= adc_front_edge_s) {
       continue;
     }
 
@@ -66,72 +65,21 @@ void YieldSign::MakeDecisions(Frame* const frame,
     }
 
     // build stop decision
-    std::vector<std::string> wait_for_obstacle_ids;
-    bool build_stop_fence = false;
-    if (yield_sign_overlap.start_s - adc_front_edge_s >=
-        config_.yield_sign().start_watch_distance()) {
-      // far enough
-      build_stop_fence = true;
-    } else {
-      // close enough, check ST-graph
-      auto* path_decision = reference_line_info->path_decision();
-      for (const auto* obstacle : path_decision->obstacles().Items()) {
-        const std::string& obstacle_id = obstacle->Id();
-        std::string obstacle_type_name =
-            PerceptionObstacle_Type_Name(obstacle->Perception().type());
-        ADEBUG <<  "yield_sign[" << yield_sign_overlap.object_id
-               << "] obstacle_id[" << obstacle_id
-               << "] type[" << obstacle_type_name << "]";
-        if (obstacle->IsVirtual()) {
-          continue;
-        }
-
-        if (obstacle->reference_line_st_boundary().IsEmpty()) {
-          continue;
-        }
-
-        constexpr double kMinSTBoundaryT = 6.0;  // sec
-        if (obstacle->reference_line_st_boundary().min_t() > kMinSTBoundaryT) {
-          continue;
-        }
-        const double kepsilon = 1e-6;
-        double obstacle_traveled_s =
-            obstacle->reference_line_st_boundary().bottom_left_point().s() -
-            obstacle->reference_line_st_boundary().bottom_right_point().s();
-        ADEBUG << "obstacle[" << obstacle->Id() << "] obstacle_st_min_t["
-               << obstacle->reference_line_st_boundary().min_t()
-               << "] obstacle_st_min_s["
-               << obstacle->reference_line_st_boundary().min_s()
-               << "] obstacle_traveled_s[" << obstacle_traveled_s << "]";
-
-        // ignore the obstacle which is already on reference line and moving
-        // along the direction of ADC
-        constexpr double kIgnoreMaxSTMinT = 0.1;  // max st_min_t(sec) to ignore
-        constexpr double kIgnoreMinSTMinS = 15.0;  // min st_min_s(m) to ignore
-        if (obstacle_traveled_s < kepsilon &&
-            obstacle->reference_line_st_boundary().min_t() < kIgnoreMaxSTMinT &&
-            obstacle->reference_line_st_boundary().min_s() > kIgnoreMinSTMinS) {
-            continue;
-        }
-
-        build_stop_fence = true;
-        wait_for_obstacle_ids.push_back(obstacle->Id());
-      }
-    }
-
-    if (build_stop_fence) {
-      ADEBUG << "BuildStopDecision: yield_sign[" << yield_sign_overlap.object_id
-             << "] start_s[" << yield_sign_overlap.start_s << "]";
-      const std::string virtual_obstacle_id =
-          YIELD_SIGN_VO_ID_PREFIX + yield_sign_overlap.object_id;
-      util::BuildStopDecision(virtual_obstacle_id,
-                              yield_sign_overlap.start_s,
-                              config_.yield_sign().stop_distance(),
-                              StopReasonCode::STOP_REASON_YIELD_SIGN,
-                              wait_for_obstacle_ids,
-                              TrafficRuleConfig::RuleId_Name(config_.rule_id()),
-                              frame, reference_line_info);
-    }
+    ADEBUG << "BuildStopDecision: yield_sign[" << yield_sign_overlap.object_id
+           << "] start_s[" << yield_sign_overlap.start_s << "]";
+    const std::string virtual_obstacle_id =
+        YIELD_SIGN_VO_ID_PREFIX + yield_sign_overlap.object_id;
+    const std::vector<std::string> wait_for_obstacle_ids;
+    // const std::vector<std::string> wait_for_obstacle_ids(
+    //    yield_sign_status.wait_for_obstacle_id().begin(),
+    //    yield_sign_status.wait_for_obstacle_id().end());
+    util::BuildStopDecision(virtual_obstacle_id,
+                            yield_sign_overlap.start_s,
+                            config_.yield_sign().stop_distance(),
+                            StopReasonCode::STOP_REASON_YIELD_SIGN,
+                            wait_for_obstacle_ids,
+                            TrafficRuleConfig::RuleId_Name(config_.rule_id()),
+                            frame, reference_line_info);
   }
 }
 
