@@ -212,8 +212,8 @@ bool RuleBasedStopDecider::CheckSidePassStop(
           shift_vec + Vec2d(stop_pathpoint.x(), stop_pathpoint.y());
       double stop_l_on_pathdata = 0.0;
       const auto &nearby_path = reference_line_info.reference_line().map_path();
-      stop_s_on_pathdata -= nearby_path.GetNearestPoint(
-          stop_fence_pose, stop_s_on_pathdata, &stop_l_on_pathdata);
+      nearby_path.GetNearestPoint(stop_fence_pose,
+                                  stop_s_on_pathdata, &stop_l_on_pathdata);
       return true;
     }
     last_path_point_type = std::get<1>(point_guide);
