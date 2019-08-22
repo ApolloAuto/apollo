@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include "modules/planning/scenarios/yield_sign/stage_approach.h"
 
 #include "cyber/common/log.h"
+#include "modules/common/time/time.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
@@ -34,6 +35,7 @@ namespace planning {
 namespace scenario {
 namespace yield_sign {
 
+using apollo::common::time::Clock;
 using apollo::common::TrajectoryPoint;
 using apollo::hdmap::PathOverlap;
 using apollo::perception::TrafficLight;
@@ -66,21 +68,72 @@ Stage::StageStatus YieldSignStageApproach::Process(
   reference_line_info.SetJunctionRightOfWay(
       current_yield_sign_overlap->start_s, false);
 
-  bool yield_sign_clear = false;
-  // check distance to stop line
+  constexpr double kPassStopLineBuffer = 0.3;  // unit: m
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+  const double distance_adc_pass_stop_sign =
+      adc_front_edge_s - current_yield_sign_overlap->start_s;
+  if (distance_adc_pass_stop_sign > kPassStopLineBuffer) {
+    // passed stop line
+    return FinishStage();
+  }
+
   const double distance_adc_to_stop_line =
       current_yield_sign_overlap->start_s - adc_front_edge_s;
   ADEBUG << "yield_sign_overlap_id[" << yield_sign_overlap_id
          << "] start_s[" << current_yield_sign_overlap->start_s
          << "] distance_adc_to_stop_line[" << distance_adc_to_stop_line << "]";
+  bool yield_sign_done = false;
   if (distance_adc_to_stop_line <
       scenario_config_.max_valid_stop_distance()) {
-    // TODO(all): check YIELD_SIGN clear
-    yield_sign_clear = true;
+    // close enough, check yield_sign clear
+    yield_sign_done = true;
+    const auto& path_decision = reference_line_info.path_decision();
+    for (const auto* obstacle : path_decision.obstacles().Items()) {
+      const std::string& obstacle_id = obstacle->Id();
+      std::string obstacle_type_name =
+          PerceptionObstacle_Type_Name(obstacle->Perception().type());
+      ADEBUG <<  "yield_sign[" << yield_sign_overlap_id
+             << "] obstacle_id[" << obstacle_id
+             << "] type[" << obstacle_type_name << "]";
+      if (obstacle->IsVirtual()) {
+        continue;
+      }
+
+      if (obstacle->reference_line_st_boundary().IsEmpty()) {
+        continue;
+      }
+
+      constexpr double kMinSTBoundaryT = 6.0;  // sec
+      if (obstacle->reference_line_st_boundary().min_t() > kMinSTBoundaryT) {
+        continue;
+      }
+      const double kepsilon = 1e-6;
+      double obstacle_traveled_s =
+          obstacle->reference_line_st_boundary().bottom_left_point().s() -
+          obstacle->reference_line_st_boundary().bottom_right_point().s();
+      ADEBUG << "obstacle[" << obstacle->Id() << "] obstacle_st_min_t["
+             << obstacle->reference_line_st_boundary().min_t()
+             << "] obstacle_st_min_s["
+             << obstacle->reference_line_st_boundary().min_s()
+             << "] obstacle_traveled_s[" << obstacle_traveled_s << "]";
+
+      // ignore the obstacle which is already on reference line and moving
+      // along the direction of ADC
+      constexpr double kIgnoreMaxSTMinT = 0.1;  // max st_min_t(sec) to ignore
+      constexpr double kIgnoreMinSTMinS = 15.0;  // min st_min_s(m) to ignore
+      if (obstacle_traveled_s < kepsilon &&
+          obstacle->reference_line_st_boundary().min_t() < kIgnoreMaxSTMinT &&
+          obstacle->reference_line_st_boundary().min_s() > kIgnoreMinSTMinS) {
+        continue;
+      }
+
+      yield_sign_done = false;
+      // TODO(all): pass wait_for_obstacle_id to traffic-rule
+      // wait_for_obstacle_ids.push_back(obstacle->Id());
+    }
   }
 
-  if (yield_sign_clear) {
+  if (yield_sign_done) {
     return FinishStage();
   }
 
@@ -95,6 +148,17 @@ Stage::StageStatus YieldSignStageApproach::FinishScenario() {
 }
 
 Stage::StageStatus YieldSignStageApproach::FinishStage() {
+  // update PlanningContext
+  auto* yield_sign_status =
+      PlanningContext::Instance()
+          ->mutable_planning_status()
+          ->mutable_yield_sign();
+  yield_sign_status->set_done_yield_sign_overlap_id(
+      GetContext()->current_yield_sign_overlap_id);
+  // yield_sign_status->clear_wait_for_obstacle_id();
+
+  GetContext()->creep_start_time = Clock::NowInSeconds();
+
   next_stage_ = ScenarioConfig::YIELD_SIGN_CREEP;
   return Stage::FINISHED;
 }
