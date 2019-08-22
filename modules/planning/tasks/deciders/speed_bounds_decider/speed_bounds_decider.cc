@@ -125,14 +125,10 @@ Status SpeedBoundsDecider::Process(
 
 double SpeedBoundsDecider::SetSpeedFallbackDistance(
     PathDecision *const path_decision) {
-  // Set min_s_on_st_boundaries to guide speed fallback. Different stop distance
-  // is taken when there is an obstacle moving in opposite direction of ADV
+  // Set min_s_on_st_boundaries to guide speed fallback.
   constexpr double kEpsilon = 1.0e-6;
   double min_s_non_reverse = std::numeric_limits<double>::infinity();
   double min_s_reverse = std::numeric_limits<double>::infinity();
-  // TODO(Jinyun): tmp workaround for side pass capability because of doomed
-  // speed planning failure when side pass creeping
-  double side_pass_stop_s = std::numeric_limits<double>::infinity();
 
   for (auto *obstacle : path_decision->obstacles().Items()) {
     const auto &st_boundary = obstacle->path_st_boundary();
@@ -152,21 +148,11 @@ double SpeedBoundsDecider::SetSpeedFallbackDistance(
     } else if (min_s_non_reverse > lowest_s) {
       min_s_non_reverse = lowest_s;
     }
-
-    if (obstacle->LongitudinalDecision().stop().reason_code() ==
-            StopReasonCode::STOP_REASON_SIDEPASS_SAFETY &&
-        side_pass_stop_s > lowest_s) {
-      side_pass_stop_s = lowest_s;
-    }
   }
 
   min_s_reverse = std::max(min_s_reverse, 0.0);
   min_s_non_reverse = std::max(min_s_non_reverse, 0.0);
-  side_pass_stop_s = std::max(side_pass_stop_s, 0.0);
 
-  if (!std::isinf(side_pass_stop_s)) {
-    return side_pass_stop_s;
-  }
   return min_s_non_reverse > min_s_reverse ? 0.0 : min_s_non_reverse;
 }
 
