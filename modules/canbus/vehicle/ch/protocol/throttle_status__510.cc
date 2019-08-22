@@ -40,10 +40,11 @@ void Throttlestatus510::Parse(const std::uint8_t* bytes, int32_t length,
 }
 
 // config detail: {'description': 'throttle pedal enable bit(Status)', 'enum':
-// {0: 'THROTTLE_PEDAL_EN_STS_DISABLE', 1: 'THROTTLE_PEDAL_EN_STS_ENABLE'},
-// 'precision': 1.0, 'len': 8, 'name': 'throttle_pedal_en_sts', 'is_signed_var':
-// False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum',
-// 'order': 'intel', 'physical_unit': ''}
+// {0: 'THROTTLE_PEDAL_EN_STS_DISABLE', 1: 'THROTTLE_PEDAL_EN_STS_ENABLE', 2:
+// 'THROTTLE_PEDAL_EN_STS_TAKEOVER'}, 'precision': 1.0, 'len': 8, 'name':
+// 'throttle_pedal_en_sts', 'is_signed_var': False, 'offset': 0.0,
+// 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'intel',
+// 'physical_unit': ''}
 Throttle_status__510::Throttle_pedal_en_stsType
 Throttlestatus510::throttle_pedal_en_sts(const std::uint8_t* bytes,
                                          int32_t length) const {

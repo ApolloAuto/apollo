@@ -21,7 +21,7 @@ message Gear_command_114 {
     GEAR_CMD_NEUTRAL = 3;
     GEAR_CMD_DRIVE = 4;
   }
-  // PRND control(Command) [] [0|3]
+  // PRND control(Command) [] [1|4]
   optional Gear_cmdType gear_cmd = 1;
 }
 
@@ -77,6 +77,7 @@ message Brake_status__511 {
   enum Brake_pedal_en_stsType {
     BRAKE_PEDAL_EN_STS_DISABLE = 0;
     BRAKE_PEDAL_EN_STS_ENABLE = 1;
+    BRAKE_PEDAL_EN_STS_TAKEOVER = 2;
   }
   // brake pedal enable bit(Status) [] [0|1]
   optional Brake_pedal_en_stsType brake_pedal_en_sts = 1;
@@ -89,6 +90,7 @@ message Throttle_status__510 {
   enum Throttle_pedal_en_stsType {
     THROTTLE_PEDAL_EN_STS_DISABLE = 0;
     THROTTLE_PEDAL_EN_STS_ENABLE = 1;
+    THROTTLE_PEDAL_EN_STS_TAKEOVER = 2;
   }
   // throttle pedal enable bit(Status) [] [0|1]
   optional Throttle_pedal_en_stsType throttle_pedal_en_sts = 1;
@@ -112,6 +114,7 @@ message Steer_status__512 {
   enum Steer_angle_en_stsType {
     STEER_ANGLE_EN_STS_DISABLE = 0;
     STEER_ANGLE_EN_STS_ENABLE = 1;
+    STEER_ANGLE_EN_STS_TAKEOVER = 2;
   }
   // steering angle enable bit(Status) [] [0|1]
   optional Steer_angle_en_stsType steer_angle_en_sts = 1;
@@ -145,7 +148,7 @@ message Gear_status_514 {
     GEAR_STS_NEUTRAL = 3;
     GEAR_STS_DRIVE = 4;
   }
-  // PRND control(Status) [] [0|3]
+  // PRND control(Status) [] [1|4]
   optional Gear_stsType gear_sts = 1;
 }
 
@@ -171,13 +174,13 @@ message Ecu_status_3_517 {
 
 message Ecu_status_2_516 {
 // Report Message
-  // Percentage of battery remaining (BMS status) [%] [0|0]
+  // Percentage of battery remaining (BMS status) [%] [0|100]
   optional int32 battery_remaining_capacity = 1;
-  // Current battery voltage (BMS status) [V] [0|0]
+  // Current battery voltage (BMS status) [V] [0|80]
   optional double battery_voltage = 2;
-  // Current battery current (BMS status) [A] [0|0]
+  // Current battery current (BMS status) [A] [-60|60]
   optional double battery_current = 3;
-  // Current battery temperature (BMS status) [?] [0|0]
+  // Current battery temperature (BMS status) [¡É] [-40|110]
   optional int32 battery_temperature = 4;
 }
 

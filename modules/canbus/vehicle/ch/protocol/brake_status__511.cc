@@ -39,10 +39,11 @@ void Brakestatus511::Parse(const std::uint8_t* bytes, int32_t length,
 }
 
 // config detail: {'description': 'brake pedal enable bit(Status)', 'enum': {0:
-// 'BRAKE_PEDAL_EN_STS_DISABLE', 1: 'BRAKE_PEDAL_EN_STS_ENABLE'},
-// 'precision': 1.0, 'len': 8, 'name': 'brake_pedal_en_sts', 'is_signed_var':
-// False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum',
-// 'order': 'intel', 'physical_unit': ''}
+// 'BRAKE_PEDAL_EN_STS_DISABLE', 1: 'BRAKE_PEDAL_EN_STS_ENABLE', 2:
+// 'BRAKE_PEDAL_EN_STS_TAKEOVER'}, 'precision': 1.0, 'len': 8, 'name':
+// 'brake_pedal_en_sts', 'is_signed_var': False, 'offset': 0.0,
+// 'physical_range': '[0|1]', 'bit': 0, 'type': 'enum', 'order': 'intel',
+// 'physical_unit': ''}
 Brake_status__511::Brake_pedal_en_stsType Brakestatus511::brake_pedal_en_sts(
     const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 0);
