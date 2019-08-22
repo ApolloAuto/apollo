@@ -122,6 +122,7 @@ message TrafficLightStatus {
 message YieldSignStatus {
   optional string current_yield_sign_overlap_id = 1;
   optional string done_yield_sign_overlap_id = 2;
+  repeated string wait_for_obstacle_id = 3;
 }
 
 message PlanningStatus {

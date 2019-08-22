@@ -69,10 +69,9 @@ void YieldSign::MakeDecisions(Frame* const frame,
            << "] start_s[" << yield_sign_overlap.start_s << "]";
     const std::string virtual_obstacle_id =
         YIELD_SIGN_VO_ID_PREFIX + yield_sign_overlap.object_id;
-    const std::vector<std::string> wait_for_obstacle_ids;
-    // const std::vector<std::string> wait_for_obstacle_ids(
-    //    yield_sign_status.wait_for_obstacle_id().begin(),
-    //    yield_sign_status.wait_for_obstacle_id().end());
+    const std::vector<std::string> wait_for_obstacle_ids(
+        yield_sign_status.wait_for_obstacle_id().begin(),
+        yield_sign_status.wait_for_obstacle_id().end());
     util::BuildStopDecision(virtual_obstacle_id,
                             yield_sign_overlap.start_s,
                             config_.yield_sign().stop_distance(),

@@ -127,9 +127,12 @@ Stage::StageStatus YieldSignStageApproach::Process(
         continue;
       }
 
+      PlanningContext::Instance()
+          ->mutable_planning_status()
+          ->mutable_yield_sign()
+          ->add_wait_for_obstacle_id(obstacle->Id());
+
       yield_sign_done = false;
-      // TODO(all): pass wait_for_obstacle_id to traffic-rule
-      // wait_for_obstacle_ids.push_back(obstacle->Id());
     }
   }
 
@@ -155,7 +158,7 @@ Stage::StageStatus YieldSignStageApproach::FinishStage() {
           ->mutable_yield_sign();
   yield_sign_status->set_done_yield_sign_overlap_id(
       GetContext()->current_yield_sign_overlap_id);
-  // yield_sign_status->clear_wait_for_obstacle_id();
+  yield_sign_status->clear_wait_for_obstacle_id();
 
   GetContext()->creep_start_time = Clock::NowInSeconds();
 
