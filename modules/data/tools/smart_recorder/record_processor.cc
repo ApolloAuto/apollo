@@ -54,11 +54,12 @@ bool RecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
     return false;
   }
   // Init writer
+  constexpr uint64_t kMBToKB = 1024UL;
   writer_.reset(new RecordWriter());
   writer_->SetIntervalOfFileSegmentation(
       trigger_conf.segment_setting().time_segment());
   writer_->SetSizeOfFileSegmentation(
-      trigger_conf.segment_setting().size_segment() * 1024UL);
+      trigger_conf.segment_setting().size_segment() * kMBToKB);
   const std::string output_file = GetDefaultOutputFile();
   AINFO << "output file path: " << output_file;
   if (!writer_->Open(output_file)) {

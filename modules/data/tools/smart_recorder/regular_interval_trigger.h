@@ -37,7 +37,7 @@ class RegularIntervalTrigger : public TriggerBase {
 
  private:
   // Trigger the recording every 300 seconds (5 minutes)
-  const int recording_interval_ = 300;
+  const double recording_interval_ = 300.0;
   uint64_t current_recording_time_ = 0UL;
 };
 

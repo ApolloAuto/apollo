@@ -33,7 +33,8 @@ void RegularIntervalTrigger::Pull(const RecordMessage& msg) {
     current_recording_time_ = msg.time;
     return;
   }
-  if (msg.time - current_recording_time_ > recording_interval_ * 1000000000UL) {
+  if (msg.time - current_recording_time_ >
+      SecondsToNanoSeconds(recording_interval_)) {
     current_recording_time_ = msg.time;
     AINFO << "regular interval trigger is pulled: " << msg.time;
     TriggerIt(msg.time);

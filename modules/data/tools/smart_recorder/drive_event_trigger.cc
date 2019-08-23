@@ -36,7 +36,7 @@ void DriveEventTrigger::Pull(const RecordMessage& msg) {
     DriveEvent drive_event_msg;
     drive_event_msg.ParseFromString(msg.content);
     const uint64_t header_time = static_cast<uint64_t>(
-        drive_event_msg.header().timestamp_sec() * 1000000000UL);
+        SecondsToNanoSeconds(drive_event_msg.header().timestamp_sec()));
     AINFO << "drive event trigger is pulled: " << header_time << " - "
           << msg.channel_name;
     TriggerIt(header_time);
