@@ -48,6 +48,8 @@ class TriggerBase {
 
   const std::string& GetTriggerName() const { return trigger_name_; }
 
+  uint64_t SecondsToNanoSeconds(const double seconds) const;
+
   virtual ~TriggerBase() = default;
 
  protected:
