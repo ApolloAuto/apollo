@@ -40,7 +40,7 @@ void HistoryObjectDecision::Init(const ObjectDecision& object_decisions) {
 }
 
 const std::vector<const ObjectDecisionType*>
-HistoryObjectDecision::object_decision() const {
+HistoryObjectDecision::GetObjectDecision() const {
   std::vector<const ObjectDecisionType*> result;
   for (size_t i = 0; i < object_decision_.size(); i++) {
     result.push_back(&(object_decision_[i]));

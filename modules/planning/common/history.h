@@ -38,7 +38,7 @@ class HistoryObjectDecision {
   void Init(const ObjectDecision& object_decisions);
 
   const std::string& id() const { return id_; }
-  const std::vector<const ObjectDecisionType*> object_decision() const;
+  const std::vector<const ObjectDecisionType*> GetObjectDecision() const;
 
  private:
   std::string id_;
