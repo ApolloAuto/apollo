@@ -86,6 +86,8 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
     reference_line_info.SetJunctionRightOfWay(
         current_traffic_light_overlap->start_s, false);
 
+    traffic_light = current_traffic_light_overlap;
+
     auto signal_color = frame->GetSignal(traffic_light_overlap_id).color();
     ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap_id
            << "] start_s[" << current_traffic_light_overlap->start_s
@@ -96,8 +98,6 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
       traffic_light_all_green = false;
       break;
     }
-
-    traffic_light = current_traffic_light_overlap;
   }
 
   if (traffic_light_all_green || traffic_light == nullptr) {
