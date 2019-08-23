@@ -63,11 +63,11 @@ void PedestrianInteractionEvaluator::Clear() {
 
 void PedestrianInteractionEvaluator::LoadModel() {
   torch::set_num_threads(1);
-  // TODO(all) uncomment the following when cuda issue is resolved
-  // if (torch::cuda::is_available()) {
-  //   AERROR << "CUDA is available for PedestrianInteractionEvaluator!";
-  //   device_ = torch::Device(torch::kCUDA);
-  // }
+  if (FLAGS_use_cuda && torch::cuda::is_available()) {
+    ADEBUG << "CUDA is available";
+    device_ = torch::Device(torch::kCUDA);
+  }
+
   torch_position_embedding_ = torch::jit::load(
       FLAGS_torch_pedestrian_interaction_position_embedding_file, device_);
   torch_social_embedding_ = torch::jit::load(

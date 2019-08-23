@@ -443,7 +443,7 @@ bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
 }
 
 void LaneScanningEvaluator::LoadModel() {
-  if (torch::cuda::is_available()) {
+  if (FLAGS_use_cuda && torch::cuda::is_available()) {
     ADEBUG << "CUDA is available";
     device_ = torch::Device(torch::kCUDA);
   }

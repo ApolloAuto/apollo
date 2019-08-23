@@ -177,9 +177,8 @@ bool JunctionMapEvaluator::ExtractFeatureValues(
 }
 
 void JunctionMapEvaluator::LoadModel() {
-  // TODO(all) uncomment the following when cuda issue is resolved
-  if (torch::cuda::is_available()) {
-    ADEBUG << "CUDA is available for JunctionMapEvaluator!";
+  if (FLAGS_use_cuda && torch::cuda::is_available()) {
+    ADEBUG << "CUDA is available";
     device_ = torch::Device(torch::kCUDA);
   }
   torch::set_num_threads(1);
