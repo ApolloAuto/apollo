@@ -49,6 +49,7 @@ cc_library(
         ":drive_event_trigger",
         ":emergency_mode_trigger",
         ":interval_pool",
+        ":regular_interval_trigger",
         ":small_topics_trigger",
         "//cyber/common:file",
         "//cyber/record:record_writer",
@@ -92,6 +93,15 @@ cc_library(
     hdrs = ["small_topics_trigger.h"],
     deps = [
         ":channel_pool",
+        ":trigger_base",
+    ],
+)
+
+cc_library(
+    name = "regular_interval_trigger",
+    srcs = ["regular_interval_trigger.cc"],
+    hdrs = ["regular_interval_trigger.h"],
+    deps = [
         ":trigger_base",
     ],
 )

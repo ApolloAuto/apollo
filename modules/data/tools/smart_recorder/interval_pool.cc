@@ -17,6 +17,8 @@
 #include "modules/data/tools/smart_recorder/interval_pool.h"
 
 #include <algorithm>
+#include <fstream>
+#include <iomanip>
 
 #include "cyber/common/log.h"
 
@@ -84,6 +86,24 @@ void IntervalPool::PrintIntervals() const {
     AINFO << "Interval " << ++idx << ": " << interval.begin_time << " - "
           << interval.end_time;
   }
+}
+
+void IntervalPool::LogIntervalEvent(const std::string& name,
+                                    const std::string& description,
+                                    const uint64_t msg_time,
+                                    const uint64_t backward_time,
+                                    const uint64_t forward_time) const {
+  std::ofstream logfile(interval_event_log_file_path_,
+                        std::ios::out | std::ios::app);
+  if (!logfile) {
+    AERROR << "Failed to write " << interval_event_log_file_path_;
+    return;
+  }
+  logfile << std::fixed << std::setprecision(9);
+  logfile << "name=" << name << ", description=\"" << description << "\""
+          << ", msg_time=" << msg_time << ", interval_range=["
+          << msg_time - backward_time << ":" << msg_time + forward_time << "]"
+          << std::endl;
 }
 
 Interval IntervalPool::GetNextInterval() const {

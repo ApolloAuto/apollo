@@ -42,7 +42,7 @@ void TriggerBase::LockTrigger(const SmartRecordTrigger& trigger_conf) {
 }
 
 void TriggerBase::TriggerIt(const uint64_t msg_time) const {
-  constexpr float kMaxBackwardTime = 30.0, kMaxForwardTime = 10.0;
+  constexpr float kMaxBackwardTime = 30.0, kMaxForwardTime = 15.0;
   const uint64_t backword_time = static_cast<uint64_t>(
       (trigger_obj_->backward_time() < 0.0
            ? 0.0
@@ -57,6 +57,9 @@ void TriggerBase::TriggerIt(const uint64_t msg_time) const {
                  ? kMaxForwardTime
                  : trigger_obj_->forward_time()) *
       1000000000UL);
+  IntervalPool::Instance()->LogIntervalEvent(
+      trigger_obj_->trigger_name(), trigger_obj_->description(), msg_time,
+      backword_time, forward_time);
   IntervalPool::Instance()->AddInterval(msg_time - backword_time,
                                         msg_time + forward_time);
 }
