@@ -135,8 +135,8 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   enable_mpc_feedforward_compensation_ =
       control_conf->mpc_controller_conf().enable_mpc_feedforward_compensation();
 
-  unconstraint_control_diff_limit_ =
-      control_conf->mpc_controller_conf().unconstraint_control_diff_limit();
+  unconstrained_control_diff_limit_ =
+      control_conf->mpc_controller_conf().unconstrained_control_diff_limit();
 
   LoadControlCalibrationTable(control_conf->mpc_controller_conf());
   ADEBUG << "MPC conf loaded";
@@ -381,9 +381,9 @@ Status MPCController::ComputeControlCommand(
   double steer_angle_feedback = 0.0;
   double acc_feedback = 0.0;
   double steer_angle_ff_compensation = 0.0;
-  double unconstraint_control_diff = 0.0;
+  double unconstrained_control_diff = 0.0;
   double control_gain_truncation_ratio = 0.0;
-  double unconstraint_control = 0.0;
+  double unconstrained_control = 0.0;
   const double v = VehicleStateProvider::Instance()->linear_velocity();
 
   std::vector<double> control_cmd(controls_, 0);
@@ -415,20 +415,20 @@ Status MPCController::ComputeControlCommand(
   steer_angle_feedback = Wheel2SteerPct(control[0](0, 0));
   acc_feedback = control[0](1, 0);
   for (int i = 0; i < basic_state_size_; ++i) {
-    unconstraint_control += control_gain[0](0, i) * matrix_state_(i, 0);
+    unconstrained_control += control_gain[0](0, i) * matrix_state_(i, 0);
   }
-  unconstraint_control += addition_gain[0](0, 0) * v * debug->curvature();
+  unconstrained_control += addition_gain[0](0, 0) * v * debug->curvature();
   if (enable_mpc_feedforward_compensation_) {
-    unconstraint_control_diff =
-        Wheel2SteerPct(control[0](0, 0) - unconstraint_control);
-    if (fabs(unconstraint_control_diff) <= unconstraint_control_diff_limit_) {
+    unconstrained_control_diff =
+        Wheel2SteerPct(control[0](0, 0) - unconstrained_control);
+    if (fabs(unconstrained_control_diff) <= unconstrained_control_diff_limit_) {
       steer_angle_ff_compensation =
           Wheel2SteerPct(debug->curvature() *
                          (control_gain[0](0, 2) *
                               (lr_ - lf_ / cr_ * mass_ * v * v / wheelbase_) -
                           addition_gain[0](0, 0) * v));
     } else {
-      control_gain_truncation_ratio = control[0](0, 0) / unconstraint_control;
+      control_gain_truncation_ratio = control[0](0, 0) / unconstrained_control;
       steer_angle_ff_compensation =
           Wheel2SteerPct(debug->curvature() *
                          (control_gain[0](0, 2) *
@@ -522,7 +522,7 @@ Status MPCController::ComputeControlCommand(
   debug->set_steer_angle(steer_angle);
   debug->set_steer_angle_feedforward(steer_angle_feedforwardterm_updated_);
   debug->set_steer_angle_feedforward_compensation(steer_angle_ff_compensation);
-  debug->set_steer_unconstraint_control_diff(unconstraint_control_diff);
+  debug->set_steer_unconstrained_control_diff(unconstrained_control_diff);
   debug->set_steer_angle_feedback(steer_angle_feedback);
   debug->set_steering_position(chassis->steering_percentage());
 
