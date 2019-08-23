@@ -145,10 +145,15 @@ bool PlanningComponent::Proc(
   const int seq_num = history->GetLastFrame()->seq_num();
   ADEBUG << "record in history: seq_num[" << seq_num << "]";
   auto object_decisions =  history->GetLastFrame()->GetObjectDecisions();
-  for (const auto object_decision : object_decisions) {
-    ADEBUG << "   object_decision[" << object_decision->id() << "]";
+  for (const HistoryObjectDecision* object_decision : object_decisions) {
+    ADEBUG << "object_decision[" << object_decision->id() << "]";
+    auto obj_decision = object_decision->GetObjectDecision();
+    for (const ObjectDecisionType* decision_type : obj_decision) {
+      ADEBUG << "  decistion_type[" << decision_type->object_tag_case() << "]";
+    }
   }
   */
+
   return true;
 }
 
