@@ -72,7 +72,7 @@ stage_config: {
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: PROCEED_WITH_CAUTION_SPEED
+  # task_type: PROCEED_WITH_CAUTION_SPEED
   task_config: {
     task_type: CREEP_DECIDER
     creep_decider_config: {

@@ -64,6 +64,9 @@ Stage::Stage(const ScenarioConfig::StageConfig& config) : config_(config) {
     auto iter = tasks_.find(task_type);
     if (iter == tasks_.end()) {
       auto ptr = TaskFactory::CreateTask(*config_map[task_type]);
+      CHECK(ptr.get() != nullptr)
+        << "Task: " << TaskConfig::TaskType_Name(task_type)
+        << " used but not registered";
       task_list_.push_back(ptr.get());
       tasks_[task_type] = std::move(ptr);
     } else {
