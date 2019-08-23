@@ -534,11 +534,10 @@ void CruiseMLPEvaluator::SetLaneFeatureValues(
 }
 
 void CruiseMLPEvaluator::LoadModels() {
-  // TODO(all) uncomment the following when cuda issue is resolved
-  // if (torch::cuda::is_available()) {
-  //   ADEBUG << "CUDA is available";
-  //   device_ = torch::Device(torch::kCUDA);
-  // }
+  if (FLAGS_use_cuda && torch::cuda::is_available()) {
+    ADEBUG << "CUDA is available";
+    device_ = torch::Device(torch::kCUDA);
+  }
   torch::set_num_threads(1);
   torch_go_model_ =
       torch::jit::load(FLAGS_torch_vehicle_cruise_go_file, device_);

@@ -358,8 +358,8 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
 }
 
 void JunctionMLPEvaluator::LoadModel() {
-  if (torch::cuda::is_available()) {
-    ADEBUG << "CUDA is available for JunctionMLPEvaluator!";
+  if (FLAGS_use_cuda && torch::cuda::is_available()) {
+    ADEBUG << "CUDA is available";
     device_ = torch::Device(torch::kCUDA);
   }
   torch::set_num_threads(1);
