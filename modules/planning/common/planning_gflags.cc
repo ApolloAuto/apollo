@@ -26,6 +26,10 @@ DEFINE_double(test_duration, -1.0,
 
 DEFINE_int32(planning_loop_rate, 10, "Loop rate for planning node");
 
+DEFINE_int32(history_max_record_num, 5,
+             "the number of planning history frame to keep");
+DEFINE_int32(max_frame_history_num, 1, "The maximum history frame number");
+
 // scenario related
 DEFINE_string(scenario_bare_intersection_unprotected_config_file,
               "/apollo/modules/planning/conf/"
@@ -156,7 +160,6 @@ DEFINE_bool(enable_change_lane_decider, false,
             "True to use change lane state machine decider.");
 DEFINE_double(change_lane_speed_relax_percentage, 0.05,
               "The percentage of change lane speed relaxation.");
-DEFINE_int32(max_history_frame_num, 1, "The maximum history frame number");
 
 DEFINE_double(max_collision_distance, 0.1,
               "considered as collision if distance (meters) is smaller than or "

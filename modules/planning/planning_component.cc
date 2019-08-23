@@ -22,6 +22,7 @@
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/pnc_map.h"
+#include "modules/planning/common/history.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/navi_planning.h"
 #include "modules/planning/on_lane_planning.h"
@@ -135,6 +136,19 @@ bool PlanningComponent::Proc(
     p.set_relative_time(p.relative_time() + dt);
   }
   planning_writer_->Write(std::make_shared<ADCTrajectory>(adc_trajectory_pb));
+
+  // record in history
+  auto* history = History::Instance();
+  history->Add(adc_trajectory_pb);
+
+  /* debug
+  const int seq_num = history->GetLastFrame()->seq_num();
+  ADEBUG << "record in history: seq_num[" << seq_num << "]";
+  auto object_decisions =  history->GetLastFrame()->GetObjectDecisions();
+  for (const auto object_decision : object_decisions) {
+    ADEBUG << "   object_decision[" << object_decision->id() << "]";
+  }
+  */
   return true;
 }
 

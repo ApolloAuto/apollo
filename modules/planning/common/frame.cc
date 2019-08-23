@@ -50,7 +50,7 @@ using apollo::common::time::Clock;
 using apollo::prediction::PredictionObstacles;
 
 FrameHistory::FrameHistory()
-    : IndexedQueue<uint32_t, Frame>(FLAGS_max_history_frame_num) {}
+    : IndexedQueue<uint32_t, Frame>(FLAGS_max_frame_history_num) {}
 
 Frame::Frame(uint32_t sequence_num)
     : sequence_num_(sequence_num),

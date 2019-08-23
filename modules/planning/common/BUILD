@@ -336,6 +336,26 @@ cc_test(
 )
 
 cc_library(
+    name = "history",
+    srcs = [
+        "history.cc",
+    ],
+    hdrs = [
+        "history.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+    ],
+    deps = [
+        ":planning_gflags",
+        "//cyber/common",
+        "//modules/planning/proto:decision_proto",
+        "//modules/planning/proto:planning_proto",
+        "@eigen",
+    ],
+)
+
+cc_library(
     name = "speed_limit",
     srcs = [
         "speed_limit.cc",
