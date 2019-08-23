@@ -52,7 +52,6 @@ class TriggerBase {
 
  protected:
   void TriggerIt(const uint64_t msg_time) const;
-  void LogTrigger(const uint64_t msg_time) const;
 
   std::string trigger_name_;
   std::unique_ptr<Trigger> trigger_obj_ = nullptr;
