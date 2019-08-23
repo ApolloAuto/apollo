@@ -67,7 +67,7 @@ MPCController::MPCController() : name_("MPC Controller") {
     mpc_log_file_ << std::setprecision(6);
     WriteHeaders(mpc_log_file_);
   }
-  ADEBUG << "Using " << name_;
+  AINFO << "Using " << name_;
 }
 
 MPCController::~MPCController() { CloseLogFile(); }
@@ -372,10 +372,11 @@ Status MPCController::ComputeControlCommand(
   Matrix lower_state_bound(basic_state_size_, 1);
   Matrix upper_state_bound(basic_state_size_, 1);
 
-  // TODO(SHU): Load status limit from config file
-  lower_state_bound << -1.0 * max, -1.0 * max, -1.0 * max, -1.0 * max,
+  // lateral_error, lateral_error_rate, heading_error, heading_error_rate
+  // station_error, station_error_rate
+  lower_state_bound << -1.0 * max, -1.0 * max, -1.0 * M_PI, -1.0 * max,
       -1.0 * max, -1.0 * max;
-  upper_state_bound << max, max, max, max, max, max;
+  upper_state_bound << max, max, M_PI, max, max, max;
 
   double mpc_start_timestamp = Clock::NowInSeconds();
   double steer_angle_feedback = 0.0;
