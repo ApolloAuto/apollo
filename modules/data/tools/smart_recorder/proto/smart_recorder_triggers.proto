@@ -13,6 +13,7 @@ message Trigger {
   optional bool enabled = 2;
   optional double backward_time = 3;
   optional double forward_time = 4;
+  optional string description = 5;
 }
 
 message SmartRecordTrigger {
@@ -20,4 +21,5 @@ message SmartRecordTrigger {
   repeated Trigger triggers = 2;
   optional double max_backward_time = 3 [default = 30.0];
   optional double min_restore_chunk = 4 [default = 5.0];
+  optional string trigger_log_file_path = 5;
 }
