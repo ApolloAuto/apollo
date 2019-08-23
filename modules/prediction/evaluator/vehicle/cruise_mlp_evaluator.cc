@@ -550,8 +550,10 @@ void CruiseMLPEvaluator::ModelInference(
     torch::jit::script::Module torch_model_ptr,
     LaneSequence* lane_sequence_ptr) {
   auto torch_output_tuple = torch_model_ptr.forward(torch_inputs).toTuple();
-  auto probability_tensor = torch_output_tuple->elements()[0].toTensor();
-  auto finish_time_tensor = torch_output_tuple->elements()[1].toTensor();
+  auto probability_tensor =
+      torch_output_tuple->elements()[0].toTensor().to(torch::kCPU);
+  auto finish_time_tensor =
+      torch_output_tuple->elements()[1].toTensor().to(torch::kCPU);
   lane_sequence_ptr->set_probability(Sigmoid(
       static_cast<double>(probability_tensor.accessor<float, 2>()[0][0])));
   lane_sequence_ptr->set_time_to_lane_center(
