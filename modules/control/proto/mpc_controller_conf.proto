@@ -40,5 +40,5 @@ message MPCControllerConf {
   optional apollo.control.GainScheduler feedforwardterm_gain_scheduler = 21;
   optional calibrationtable.ControlCalibrationTable calibration_table = 22;
   optional bool enable_mpc_feedforward_compensation = 23 [default = false];
-  optional double unconstraint_control_diff_limit = 24;
+  optional double unconstrained_control_diff_limit = 24;
 }
