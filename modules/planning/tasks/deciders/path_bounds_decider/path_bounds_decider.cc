@@ -286,6 +286,37 @@ Status PathBoundsDecider::GenerateRegularPathBound(
   return Status::OK();
 }
 
+Status PathBoundsDecider::GenerateLaneChangePathBound(
+    const ReferenceLineInfo& reference_line_info,
+    std::vector<std::tuple<double, double, double>>* const path_bound) {
+  // 1. Initialize the path boundaries to be an indefinitely large area.
+  if (!InitPathBoundary(reference_line_info.reference_line(), path_bound)) {
+    const std::string msg = "Failed to initialize path boundaries.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  // PathBoundsDebugString(*path_bound);
+
+  // 2. Decide a rough boundary based on lane info and ADC's position
+  std::string dummy_borrow_lane_type;
+  if (!GetBoundaryFromLanesAndADC(
+          reference_line_info, LaneBorrowInfo::NO_BORROW, 0.1,
+          path_bound, &dummy_borrow_lane_type)) {
+    const std::string msg =
+        "Failed to decide a rough boundary based on "
+        "road information.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  // PathBoundsDebugString(*path_bound);
+
+  // 3. Remove the S-length of target lane out of the path-bound.
+  // TODO(jiacheng): implement this.
+
+  ADEBUG << "Completed generating path boundaries.";
+  return Status::OK();
+}
+
 Status PathBoundsDecider::GeneratePullOverPathBound(
     const Frame& frame, const ReferenceLineInfo& reference_line_info,
     PathBound* const path_bound) {
