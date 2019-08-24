@@ -144,7 +144,7 @@ Stage::StageStatus YieldSignStageApproach::Process(
 }
 
 Stage::StageStatus YieldSignStageApproach::FinishScenario() {
-  PlanningContext::Instance()->mutable_planning_status()->clear_traffic_light();
+  PlanningContext::Instance()->mutable_planning_status()->clear_yield_sign();
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
