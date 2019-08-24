@@ -33,13 +33,19 @@ namespace planning {
 namespace scenario {
 namespace park_and_go {
 
+using apollo::cyber::common::GetProtoFromFile;
+
 class ParkAndGoStageCruiseTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    PlanningConfig config;
-    TaskFactory::Init(config);
-    apollo::cyber::common::GetProtoFromFile(
-        FLAGS_scenario_park_and_go_config_file, &park_and_go_config_);
+    PlanningConfig planning_config;
+    CHECK(GetProtoFromFile(FLAGS_planning_config_file, &planning_config))
+        << "failed to load planning config file " << FLAGS_planning_config_file;
+    TaskFactory::Init(planning_config);
+    CHECK(GetProtoFromFile(
+        FLAGS_scenario_park_and_go_config_file, &park_and_go_config_))
+        << "failed to load park_and_go config file "
+        << FLAGS_scenario_park_and_go_config_file;
   }
 
  protected:
@@ -47,6 +53,7 @@ class ParkAndGoStageCruiseTest : public ::testing::Test {
 };
 
 TEST_F(ParkAndGoStageCruiseTest, Init) {
+  AERROR << park_and_go_config_.stage_config(2).ShortDebugString();
   ParkAndGoStageCruise park_and_go_stage_cruise(
       park_and_go_config_.stage_config(2));
   EXPECT_EQ(park_and_go_stage_cruise.stage_type(),

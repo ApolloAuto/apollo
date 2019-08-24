@@ -29,12 +29,16 @@
 namespace apollo {
 namespace planning {
 
+using apollo::cyber::common::GetProtoFromFile;
+
 TEST(PublicRoadPlannerTest, Simple) {
   PublicRoadPlanner public_road_planner;
-  PlanningConfig config;
-  TaskFactory::Init(config);
+  PlanningConfig planning_config;
+  CHECK(GetProtoFromFile(FLAGS_planning_config_file, &planning_config))
+      << "failed to load planning config file " << FLAGS_planning_config_file;
+  TaskFactory::Init(planning_config);
   EXPECT_EQ(public_road_planner.Name(), "PUBLIC_ROAD");
-  EXPECT_EQ(public_road_planner.Init(config), common::Status::OK());
+  EXPECT_EQ(public_road_planner.Init(planning_config), common::Status::OK());
 }
 
 }  // namespace planning
