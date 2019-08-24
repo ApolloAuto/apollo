@@ -17,7 +17,6 @@
 #include "modules/data/tools/smart_recorder/trigger_base.h"
 
 #include "cyber/common/log.h"
-
 #include "modules/data/tools/smart_recorder/interval_pool.h"
 
 namespace apollo {
@@ -46,21 +45,22 @@ void TriggerBase::LockTrigger(const SmartRecordTrigger& trigger_conf) {
   }
 }
 
+uint64_t TriggerBase::GetValidValueInRange(const double desired_value,
+                                           const double min_limit,
+                                           const double max_limit) const {
+  return SecondsToNanoSeconds(desired_value < min_limit
+                                  ? min_limit
+                                  : desired_value > max_limit ? max_limit
+                                                              : desired_value);
+}
+
 void TriggerBase::TriggerIt(const uint64_t msg_time) const {
   constexpr float kMaxBackwardTime = 30.0, kMaxForwardTime = 15.0;
   constexpr uint64_t kZero = 0.0;
-  const uint64_t backward_time = SecondsToNanoSeconds(
-      trigger_obj_->backward_time() < kZero
-          ? kZero
-          : trigger_obj_->backward_time() > kMaxBackwardTime
-                ? kMaxBackwardTime
-                : trigger_obj_->backward_time());
-  const uint64_t forward_time =
-      SecondsToNanoSeconds(trigger_obj_->forward_time() < kZero
-                               ? kZero
-                               : trigger_obj_->forward_time() > kMaxForwardTime
-                                     ? kMaxForwardTime
-                                     : trigger_obj_->forward_time());
+  const uint64_t backward_time = GetValidValueInRange(
+      trigger_obj_->backward_time(), kZero, kMaxBackwardTime);
+  const uint64_t forward_time = GetValidValueInRange(
+      trigger_obj_->forward_time(), kZero, kMaxForwardTime);
   IntervalPool::Instance()->AddInterval(msg_time - backward_time,
                                         msg_time + forward_time);
   IntervalPool::Instance()->LogIntervalEvent(
