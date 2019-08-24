@@ -54,6 +54,9 @@ class TriggerBase {
 
  protected:
   void TriggerIt(const uint64_t msg_time) const;
+  uint64_t GetValidValueInRange(const double desired_value,
+                                const double min_limit,
+                                const double max_limit) const;
 
   std::string trigger_name_;
   std::unique_ptr<Trigger> trigger_obj_ = nullptr;
