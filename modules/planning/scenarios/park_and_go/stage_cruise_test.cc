@@ -26,6 +26,7 @@
 #include "cyber/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/tasks/task_factory.h"
 
 namespace apollo {
 namespace planning {
@@ -35,6 +36,8 @@ namespace park_and_go {
 class ParkAndGoStageCruiseTest : public ::testing::Test {
  public:
   virtual void SetUp() {
+    PlanningConfig config;
+    TaskFactory::Init(config);
     apollo::cyber::common::GetProtoFromFile(
         FLAGS_scenario_park_and_go_config_file, &park_and_go_config_);
   }

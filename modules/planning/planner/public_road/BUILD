@@ -46,6 +46,7 @@ cc_test(
         "public_road_planner_test.cc",
     ],
     deps = [
+        "//modules/planning/tasks:task_factory",
         ":public_road_planner",
         "@gtest//:main",
     ],

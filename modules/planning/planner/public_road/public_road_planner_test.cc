@@ -24,6 +24,7 @@
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/tasks/task_factory.h"
 
 namespace apollo {
 namespace planning {
@@ -31,6 +32,7 @@ namespace planning {
 TEST(PublicRoadPlannerTest, Simple) {
   PublicRoadPlanner public_road_planner;
   PlanningConfig config;
+  TaskFactory::Init(config);
   EXPECT_EQ(public_road_planner.Name(), "PUBLIC_ROAD");
   EXPECT_EQ(public_road_planner.Init(config), common::Status::OK());
 }

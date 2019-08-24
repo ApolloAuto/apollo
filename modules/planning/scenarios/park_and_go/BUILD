@@ -59,6 +59,7 @@ cc_test(
         "//modules/planning:planning_conf",
     ],
     deps = [
+        "//modules/planning/tasks:task_factory",
         ":park_and_go_scenario",
         "@gtest//:main",
     ],
