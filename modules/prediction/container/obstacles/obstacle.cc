@@ -599,10 +599,7 @@ void Obstacle::SetAcceleration(Feature* feature) {
     const Point3D& prev_velocity = feature_history_.front().velocity();
 
     if (curr_ts > prev_ts) {
-      /*
-       * A damp function is to punish acc calculation for low speed
-       * and reward it for high speed
-       */
+      // A damp function is to punish acc calculation for low speed
       double damping_x = Damp(curr_velocity.x(), 0.001);
       double damping_y = Damp(curr_velocity.y(), 0.001);
       double damping_z = Damp(curr_velocity.z(), 0.001);
@@ -616,13 +613,13 @@ void Obstacle::SetAcceleration(Feature* feature) {
       acc_z *= damping_z;
 
       acc_x =
-          common::math::Clamp(acc_x * damping_x, FLAGS_vehicle_min_linear_acc,
+          common::math::Clamp(acc_x, FLAGS_vehicle_min_linear_acc,
                               FLAGS_vehicle_max_linear_acc);
       acc_y =
-          common::math::Clamp(acc_y * damping_y, FLAGS_vehicle_min_linear_acc,
+          common::math::Clamp(acc_y, FLAGS_vehicle_min_linear_acc,
                               FLAGS_vehicle_max_linear_acc);
       acc_z =
-          common::math::Clamp(acc_z * damping_z, FLAGS_vehicle_min_linear_acc,
+          common::math::Clamp(acc_z, FLAGS_vehicle_min_linear_acc,
                               FLAGS_vehicle_max_linear_acc);
 
       double heading = feature->velocity_heading();
