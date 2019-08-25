@@ -98,7 +98,7 @@ message Feature {
   optional JunctionFeature junction_feature = 26;
 
   // Obstacle tracked features
-  optional apollo.common.Point3D t_position = 16;
+  optional apollo.common.Point3D t_position = 16 [deprecated = true];
   optional apollo.common.Point3D t_velocity = 17 [deprecated = true];
   optional double t_velocity_heading = 18 [deprecated = true];
   optional double t_speed = 19 [deprecated = true];

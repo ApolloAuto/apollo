@@ -348,9 +348,9 @@ void Obstacle::UpdateStatus(Feature* feature) {
   }
   auto state = kf_motion_tracker_.GetStateEstimate();
 
-  feature->mutable_t_position()->set_x(state(0, 0));
-  feature->mutable_t_position()->set_y(state(1, 0));
-  feature->mutable_t_position()->set_z(feature->position().z());
+  feature->mutable_position()->set_x(state(0, 0));
+  feature->mutable_position()->set_y(state(1, 0));
+  feature->mutable_position()->set_z(feature->position().z());
 
   double velocity_x = state(2, 0);
   double velocity_y = state(3, 0);
@@ -378,10 +378,10 @@ void Obstacle::UpdateStatus(Feature* feature) {
   feature->set_acc(acc);
 
   ADEBUG << "Obstacle [" << id_ << "] has tracked position [" << std::fixed
-         << std::setprecision(6) << feature->t_position().x() << ", "
-         << std::fixed << std::setprecision(6) << feature->t_position().y()
+         << std::setprecision(6) << feature->position().x() << ", "
+         << std::fixed << std::setprecision(6) << feature->position().y()
          << ", " << std::fixed << std::setprecision(6)
-         << feature->t_position().z() << "]";
+         << feature->position().z() << "]";
   ADEBUG << "Obstacle [" << id_ << "] has tracked velocity [" << std::fixed
          << std::setprecision(6) << feature->velocity().x() << ", "
          << std::fixed << std::setprecision(6) << feature->velocity().y()
@@ -403,15 +403,15 @@ void Obstacle::UpdateStatus(Feature* feature) {
              << "] has not initialized pedestrian tracker.";
       return;
     }
-    feature->mutable_t_position()->set_x(
+    feature->mutable_position()->set_x(
         kf_pedestrian_tracker_.GetStateEstimate()(0, 0));
-    feature->mutable_t_position()->set_y(
+    feature->mutable_position()->set_y(
         kf_pedestrian_tracker_.GetStateEstimate()(1, 0));
     ADEBUG << "Obstacle [" << id_ << "] has tracked pedestrian position ["
-           << std::setprecision(6) << feature->t_position().x() << std::fixed
-           << ", " << std::setprecision(6) << feature->t_position().y()
+           << std::setprecision(6) << feature->position().x() << std::fixed
+           << ", " << std::setprecision(6) << feature->position().y()
            << std::fixed << ", " << std::setprecision(6)
-           << feature->t_position().z() << std::fixed << "]";
+           << feature->position().z() << std::fixed << "]";
   }
 }
 

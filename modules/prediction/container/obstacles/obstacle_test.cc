@@ -64,24 +64,18 @@ TEST_F(ObstacleTest, VehiclePosition) {
 
   const Feature& start_feature = obstacle_ptr->feature(2);
   EXPECT_DOUBLE_EQ(start_feature.timestamp(), 0.0);
-  EXPECT_DOUBLE_EQ(start_feature.position().x(), -458.941);
-  EXPECT_DOUBLE_EQ(start_feature.position().y(), -159.240);
-  EXPECT_NEAR(start_feature.t_position().x(), -458.941, 0.001);
-  EXPECT_NEAR(start_feature.t_position().y(), -159.240, 0.001);
+  EXPECT_NEAR(start_feature.position().x(), -458.941, 0.001);
+  EXPECT_NEAR(start_feature.position().y(), -159.240, 0.001);
 
   Feature* mid_feature_ptr = obstacle_ptr->mutable_feature(1);
   EXPECT_DOUBLE_EQ(mid_feature_ptr->timestamp(), 0.1);
-  EXPECT_DOUBLE_EQ(mid_feature_ptr->position().x(), -457.010);
-  EXPECT_DOUBLE_EQ(mid_feature_ptr->position().y(), -160.023);
-  EXPECT_NEAR(mid_feature_ptr->t_position().x(), -457.010, 0.1);
-  EXPECT_NEAR(mid_feature_ptr->t_position().y(), -160.023, 0.1);
+  EXPECT_NEAR(mid_feature_ptr->position().x(), -457.010, 0.1);
+  EXPECT_NEAR(mid_feature_ptr->position().y(), -160.023, 0.1);
 
   const Feature& latest_feature = obstacle_ptr->latest_feature();
   EXPECT_DOUBLE_EQ(latest_feature.timestamp(), 0.2);
-  EXPECT_DOUBLE_EQ(latest_feature.position().x(), -455.182);
-  EXPECT_DOUBLE_EQ(latest_feature.position().y(), -160.608);
-  EXPECT_NEAR(latest_feature.t_position().x(), -455.182, 0.1);
-  EXPECT_NEAR(latest_feature.t_position().y(), -160.608, 0.1);
+  EXPECT_NEAR(latest_feature.position().x(), -455.182, 0.1);
+  EXPECT_NEAR(latest_feature.position().y(), -160.608, 0.1);
 }
 
 TEST_F(ObstacleTest, VehicleVelocity) {
@@ -142,24 +136,18 @@ TEST_F(ObstacleTest, PedestrianPosition) {
 
   const Feature& start_feature = obstacle_ptr->feature(2);
   EXPECT_DOUBLE_EQ(start_feature.timestamp(), 0.0);
-  EXPECT_DOUBLE_EQ(start_feature.position().x(), -438.879);
-  EXPECT_DOUBLE_EQ(start_feature.position().y(), -161.931);
-  EXPECT_NEAR(start_feature.t_position().x(), -438.879, 0.001);
-  EXPECT_NEAR(start_feature.t_position().y(), -161.931, 0.001);
+  EXPECT_NEAR(start_feature.position().x(), -438.879, 0.001);
+  EXPECT_NEAR(start_feature.position().y(), -161.931, 0.001);
 
   Feature* mid_feature_ptr = obstacle_ptr->mutable_feature(1);
   EXPECT_DOUBLE_EQ(mid_feature_ptr->timestamp(), 0.1);
-  EXPECT_DOUBLE_EQ(mid_feature_ptr->position().x(), -438.610);
-  EXPECT_DOUBLE_EQ(mid_feature_ptr->position().y(), -161.521);
-  EXPECT_NEAR(mid_feature_ptr->t_position().x(), -438.610, 0.05);
-  EXPECT_NEAR(mid_feature_ptr->t_position().y(), -161.521, 0.05);
+  EXPECT_NEAR(mid_feature_ptr->position().x(), -438.610, 0.05);
+  EXPECT_NEAR(mid_feature_ptr->position().y(), -161.521, 0.05);
 
   const Feature& latest_feature = obstacle_ptr->latest_feature();
   EXPECT_DOUBLE_EQ(latest_feature.timestamp(), 0.2);
-  EXPECT_DOUBLE_EQ(latest_feature.position().x(), -438.537);
-  EXPECT_DOUBLE_EQ(latest_feature.position().y(), -160.991);
-  EXPECT_NEAR(latest_feature.t_position().x(), -438.537, 0.05);
-  EXPECT_NEAR(latest_feature.t_position().y(), -160.991, 0.05);
+  EXPECT_NEAR(latest_feature.position().x(), -438.537, 0.05);
+  EXPECT_NEAR(latest_feature.position().y(), -160.991, 0.05);
 }
 
 TEST_F(ObstacleTest, PedestrianVelocity) {
