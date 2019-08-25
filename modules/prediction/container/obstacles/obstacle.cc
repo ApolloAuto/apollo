@@ -964,7 +964,7 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
     double heading = feature->velocity_heading();
     double angle_diff = 0.0;
     hdmap::MapPathPoint nearest_point;
-    if (!PredictionMap::ProjectionFromLane(nearby_lane, s, &nearest_point)) {
+    if (PredictionMap::ProjectionFromLane(nearby_lane, s, &nearest_point)) {
       angle_diff = common::math::AngleDiff(nearest_point.heading(), heading);
     }
 
