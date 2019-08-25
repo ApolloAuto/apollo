@@ -257,7 +257,8 @@ class Obstacle {
   void SetStatus(const perception::PerceptionObstacle& perception_obstacle,
                  double timestamp, Feature* feature);
 
-  void UpdateStatus(Feature* feature);
+  void UpdateStatus(const perception::PerceptionObstacle& perception_obstacle,
+                    Feature* feature);
 
   bool SetId(const perception::PerceptionObstacle& perception_obstacle,
              Feature* feature, const int prediction_id = -1);
@@ -284,9 +285,11 @@ class Obstacle {
 
   void AdjustHeadingByLane(Feature* feature);
 
-  void UpdateVelocity(const double theta, double* velocity_x,
-                      double* velocity_y, double* velocity_heading,
-                      double* speed);
+  void AdjustVelocityByPositionShift(
+                    const perception::PerceptionObstacle& perception_obstacle,
+                    const double position_x, double* velocity_x,
+                    const double position_y, double* velocity_y,
+                    double* velocity_heading, double* speed);
 
   void SetAcceleration(Feature* feature);
 

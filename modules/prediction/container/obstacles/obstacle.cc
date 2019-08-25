@@ -186,7 +186,7 @@ bool Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
     }
     // Update obstacle status based on KF if enabled
     if (FLAGS_enable_kf_tracking) {
-      UpdateStatus(&feature);
+      UpdateStatus(perception_obstacle, &feature);
     }
   }
 
@@ -340,7 +340,8 @@ void Obstacle::SetStatus(const PerceptionObstacle& perception_obstacle,
   SetIsNearJunction(perception_obstacle, feature);
 }
 
-void Obstacle::UpdateStatus(Feature* feature) {
+void Obstacle::UpdateStatus(const PerceptionObstacle& perception_obstacle,
+                            Feature* feature) {
   // Update motion belief
   if (!kf_motion_tracker_.IsInitialized()) {
     ADEBUG << "Obstacle [" << id_ << "] has not initialized motion tracker.";
@@ -356,13 +357,15 @@ void Obstacle::UpdateStatus(Feature* feature) {
   double velocity_y = state(3, 0);
   double speed = std::hypot(velocity_x, velocity_y);
   double velocity_heading = std::atan2(velocity_y, velocity_x);
-  if (FLAGS_adjust_velocity_by_position_shift) {
-    UpdateVelocity(feature->theta(), &velocity_x, &velocity_y,
-                   &velocity_heading, &speed);
+  if (!FLAGS_use_navigation_mode && FLAGS_adjust_velocity_by_position_shift) {
+    AdjustVelocityByPositionShift(perception_obstacle,
+                                  feature->t_position().x(), &velocity_x,
+                                  feature->t_position().y(), &velocity_y,
+                                  &velocity_heading, &speed);
   }
   feature->mutable_velocity()->set_x(velocity_x);
   feature->mutable_velocity()->set_y(velocity_y);
-  feature->mutable_velocity()->set_z(velocity_heading);
+  feature->mutable_velocity()->set_z(feature->velocity().z());
   feature->set_speed(speed);
   feature->set_velocity_heading(std::atan2(state(3, 0), state(2, 0)));
 
@@ -511,34 +514,11 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
     velocity_heading = perception_obstacle.theta();
   }
 
-  if (!FLAGS_use_navigation_mode && FLAGS_adjust_velocity_by_position_shift &&
-      history_size() > 0) {
-    double diff_x =
-        feature->position().x() - feature_history_.front().position().x();
-    double diff_y =
-        feature->position().y() - feature_history_.front().position().y();
-    double prev_obstacle_size = std::fmax(feature_history_.front().length(),
-                                          feature_history_.front().width());
-    double obstacle_size =
-        std::fmax(perception_obstacle.length(), perception_obstacle.width());
-    double size_diff = std::abs(obstacle_size - prev_obstacle_size);
-    double shift_thred =
-        std::fmax(obstacle_size * FLAGS_valid_position_diff_rate_threshold,
-                  FLAGS_valid_position_diff_threshold);
-    double size_diff_thred =
-        FLAGS_split_rate * std::min(obstacle_size, prev_obstacle_size);
-    if (std::fabs(diff_x) > shift_thred && std::fabs(diff_y) > shift_thred &&
-        size_diff < size_diff_thred) {
-      double shift_heading = std::atan2(diff_y, diff_x);
-      double angle_diff =
-          common::math::NormalizeAngle(shift_heading - velocity_heading);
-      if (std::fabs(angle_diff) > FLAGS_max_lane_angle_diff) {
-        ADEBUG << "Shift velocity heading to be " << shift_heading;
-        velocity_heading = shift_heading;
-      }
-    }
-    velocity_x = speed * std::cos(velocity_heading);
-    velocity_y = speed * std::sin(velocity_heading);
+  if (!FLAGS_use_navigation_mode && FLAGS_adjust_velocity_by_position_shift) {
+    AdjustVelocityByPositionShift(perception_obstacle,
+                                  feature->position().x(), &velocity_x,
+                                  feature->position().y(), &velocity_y,
+                                  &velocity_heading, &speed);
   }
 
   feature->mutable_velocity()->set_x(velocity_x);
@@ -573,16 +553,36 @@ void Obstacle::AdjustHeadingByLane(Feature* feature) {
   }
 }
 
-void Obstacle::UpdateVelocity(const double theta, double* velocity_x,
-                              double* velocity_y, double* velocity_heading,
-                              double* speed) {
-  *speed = std::hypot(*velocity_x, *velocity_y);
-  double angle_diff = common::math::NormalizeAngle(*velocity_heading - theta);
-  if (std::fabs(angle_diff) <= FLAGS_max_lane_angle_diff) {
-    *velocity_heading = theta;
-    *velocity_x = *speed * std::cos(*velocity_heading);
-    *velocity_y = *speed * std::sin(*velocity_heading);
+void Obstacle::AdjustVelocityByPositionShift(
+                                const PerceptionObstacle& perception_obstacle,
+                                const double position_x, double* velocity_x,
+                                const double position_y, double* velocity_y,
+                                double* velocity_heading, double* speed) {
+  if (feature_history_.empty()) return;
+  double diff_x = position_x - feature_history_.front().position().x();
+  double diff_y = position_y - feature_history_.front().position().y();
+  double prev_obstacle_size = std::fmax(feature_history_.front().length(),
+                                        feature_history_.front().width());
+  double obstacle_size =
+      std::fmax(perception_obstacle.length(), perception_obstacle.width());
+  double size_diff = std::abs(obstacle_size - prev_obstacle_size);
+  double shift_thred =
+      std::fmax(obstacle_size * FLAGS_valid_position_diff_rate_threshold,
+                FLAGS_valid_position_diff_threshold);
+  double size_diff_thred =
+      FLAGS_split_rate * std::min(obstacle_size, prev_obstacle_size);
+  if (std::fabs(diff_x) > shift_thred && std::fabs(diff_y) > shift_thred &&
+      size_diff < size_diff_thred) {
+    double shift_heading = std::atan2(diff_y, diff_x);
+    double angle_diff =
+        common::math::NormalizeAngle(shift_heading - *velocity_heading);
+    if (std::fabs(angle_diff) > FLAGS_max_lane_angle_diff) {
+      ADEBUG << "Shift velocity heading to be " << shift_heading;
+      *velocity_heading = shift_heading;
+    }
   }
+  *velocity_x = *speed * std::cos(*velocity_heading);
+  *velocity_y = *speed * std::sin(*velocity_heading);
 }
 
 void Obstacle::SetAcceleration(Feature* feature) {
