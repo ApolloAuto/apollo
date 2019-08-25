@@ -153,7 +153,7 @@ bool Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
     return false;
   }
 
-  if (ReceivedNewerMessage(timestamp)) {
+  if (ReceivedOlderMessage(timestamp)) {
     AERROR << "Obstacle [" << id_ << "] received an older frame ["
            << std::setprecision(20) << timestamp
            << "] than the most recent timestamp [ " << this->timestamp()
@@ -1626,7 +1626,7 @@ std::unique_ptr<Obstacle> Obstacle::Create(const Feature& feature) {
   return ptr_obstacle;
 }
 
-bool Obstacle::ReceivedNewerMessage(const double timestamp) const {
+bool Obstacle::ReceivedOlderMessage(const double timestamp) const {
   if (feature_history_.empty()) {
     return false;
   }
