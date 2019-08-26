@@ -228,6 +228,11 @@ Chassis LexusController::chassis() {
     Chassis::GearPosition gear_pos = Chassis::GEAR_INVALID;
 
     if (chassis_detail.lexus().shift_rpt_228().output_value() ==
+        Shift_rpt_228::OUTPUT_VALUE_PARK) {
+      gear_pos = Chassis::GEAR_PARKING;
+    }
+
+    if (chassis_detail.lexus().shift_rpt_228().output_value() ==
         Shift_rpt_228::OUTPUT_VALUE_NEUTRAL) {
       gear_pos = Chassis::GEAR_NEUTRAL;
     }
