@@ -38,8 +38,8 @@
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/traffic_light_unprotected_left_turn_scenario.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/traffic_light_unprotected_right_turn_scenario.h"
-#include "modules/planning/scenarios/yield_sign/yield_sign_scenario.h"
 #include "modules/planning/scenarios/util/util.h"
+#include "modules/planning/scenarios/yield_sign/yield_sign_scenario.h"
 
 namespace apollo {
 namespace planning {
@@ -467,13 +467,13 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectYieldSignScenario(
       yield_sign_overlap.start_s - adc_front_edge_s;
   ADEBUG << "adc_distance_to_yield_sign[" << adc_distance_to_yield_sign
          << "] yield_sign[" << yield_sign_overlap.object_id
-         << "] yield_sign_overlap_start_s["
-         << yield_sign_overlap.start_s << "]";
+         << "] yield_sign_overlap_start_s[" << yield_sign_overlap.start_s
+         << "]";
 
   const bool yield_sign_scenario =
-          (adc_distance_to_yield_sign > 0.0 &&
-              adc_distance_to_yield_sign <=
-               scenario_config.start_yield_sign_scenario_distance());
+      (adc_distance_to_yield_sign > 0.0 &&
+       adc_distance_to_yield_sign <=
+           scenario_config.start_yield_sign_scenario_distance());
 
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:

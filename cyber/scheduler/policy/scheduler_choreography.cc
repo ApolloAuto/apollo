@@ -221,8 +221,8 @@ bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
   if (pid == -1) {
     return ClassicContext::RemoveCRoutine(cr);
   } else {
-    return static_cast<ChoreographyContext*>(
-      pctxs_[pid].get())->RemoveCRoutine(crid);
+    return static_cast<ChoreographyContext*>(pctxs_[pid].get())
+        ->RemoveCRoutine(crid);
   }
 }
 

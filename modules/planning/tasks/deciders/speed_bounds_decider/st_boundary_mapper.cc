@@ -379,8 +379,7 @@ bool STBoundaryMapper::CheckOverlap(const PathPoint& path_point,
   ego_center_map_frame.set_y(ego_center_map_frame.y() + path_point.y());
 
   Box2d adc_box(ego_center_map_frame, path_point.theta(),
-                vehicle_param_.length(),
-                vehicle_param_.width() + l_buffer * 2);
+                vehicle_param_.length(), vehicle_param_.width() + l_buffer * 2);
   return obs_box.HasOverlap(adc_box);
 }
 

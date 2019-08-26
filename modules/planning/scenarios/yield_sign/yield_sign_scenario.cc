@@ -60,10 +60,11 @@ void YieldSignScenario::Init() {
     return;
   }
 
-  const std::string yield_sign_overlap_id = PlanningContext::Instance()
-                                               ->planning_status()
-                                               .yield_sign()
-                                               .current_yield_sign_overlap_id();
+  const std::string yield_sign_overlap_id =
+      PlanningContext::Instance()
+          ->planning_status()
+          .yield_sign()
+          .current_yield_sign_overlap_id();
   if (yield_sign_overlap_id.empty()) {
     AERROR << "Could not find yield sign";
     return;

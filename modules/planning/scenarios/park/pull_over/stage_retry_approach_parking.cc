@@ -62,10 +62,10 @@ bool PullOverStageRetryApproachParking::CheckADCStop(const Frame& frame) {
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
-  const double max_adc_stop_speed =
-      common::VehicleConfigHelper::Instance()->GetConfig()
-          .vehicle_param()
-          .max_abs_speed_when_stopped();
+  const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
+                                        ->GetConfig()
+                                        .vehicle_param()
+                                        .max_abs_speed_when_stopped();
   if (adc_speed > max_adc_stop_speed) {
     ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
     return false;

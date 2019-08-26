@@ -299,9 +299,9 @@ Status PathBoundsDecider::GenerateLaneChangePathBound(
 
   // 2. Decide a rough boundary based on lane info and ADC's position
   std::string dummy_borrow_lane_type;
-  if (!GetBoundaryFromLanesAndADC(
-          reference_line_info, LaneBorrowInfo::NO_BORROW, 0.1,
-          path_bound, &dummy_borrow_lane_type)) {
+  if (!GetBoundaryFromLanesAndADC(reference_line_info,
+                                  LaneBorrowInfo::NO_BORROW, 0.1, path_bound,
+                                  &dummy_borrow_lane_type)) {
     const std::string msg =
         "Failed to decide a rough boundary based on "
         "road information.";

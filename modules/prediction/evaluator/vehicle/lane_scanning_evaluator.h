@@ -97,10 +97,9 @@ class LaneScanningEvaluator : public Evaluator {
                                 std::vector<double>* feature_values,
                                 std::vector<int>* lane_sequence_idx_to_remove);
 
-  void ModelInference(
-      const std::vector<torch::jit::IValue>& torch_inputs,
-      torch::jit::script::Module torch_model,
-      Feature* feature_ptr);
+  void ModelInference(const std::vector<torch::jit::IValue>& torch_inputs,
+                      torch::jit::script::Module torch_model,
+                      Feature* feature_ptr);
 
  private:
   static const size_t OBSTACLE_FEATURE_SIZE = 20 * (9 + 40);

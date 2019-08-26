@@ -60,18 +60,18 @@ Status CreepDecider::Process(Frame* frame,
           ->planning_status()
           .traffic_light()
           .current_traffic_light_overlap_id_size() > 0) {
-    current_traffic_light_overlap_id =
-        PlanningContext::Instance()
-            ->planning_status()
-            .traffic_light()
-            .current_traffic_light_overlap_id(0);
+    current_traffic_light_overlap_id = PlanningContext::Instance()
+                                           ->planning_status()
+                                           .traffic_light()
+                                           .current_traffic_light_overlap_id(0);
   }
 
   // yield sign
-  const std::string yield_sign_overlap_id = PlanningContext::Instance()
-                                               ->planning_status()
-                                               .yield_sign()
-                                               .current_yield_sign_overlap_id();
+  const std::string yield_sign_overlap_id =
+      PlanningContext::Instance()
+          ->planning_status()
+          .yield_sign()
+          .current_yield_sign_overlap_id();
 
   if (!stop_sign_overlap_id.empty()) {
     // get overlap along reference line

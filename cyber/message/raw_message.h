@@ -55,7 +55,7 @@ struct RawMessage {
     std::string name() const { return "apollo.cyber.message.RawMessage"; }
   };
 
-  static const Descriptor* descriptor() {
+  static const Descriptor *descriptor() {
     static Descriptor desc;
     return &desc;
   }
