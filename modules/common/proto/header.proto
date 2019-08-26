@@ -5,7 +5,7 @@ package apollo.common;
 import "modules/common/proto/error_code.proto";
 
 message Header {
-  // Message publishing time in seconds. 
+  // Message publishing time in seconds.
   optional double timestamp_sec = 1;
 
   // Module name.
