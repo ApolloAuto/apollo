@@ -51,25 +51,6 @@ export default class TrafficControlsBase {
         }
     }
 
-    static getParams(item, coordinates, getPosAndHeading) {
-        const params = {};
-        if (OFFLINE_PLAYBACK) {
-            params.heading = item.heading;
-            params.position = coordinates.applyOffset({
-                x: item.x,
-                y: item.y,
-                z: 0,
-            });
-            params.id = item.id;
-        } else {
-            const posAndHeading = getPosAndHeading(item, coordinates);
-            params.heading = posAndHeading.heading;
-            params.position = posAndHeading.pos;
-            params.id = item.id.id;
-        }
-        return params;
-    }
-
     constructor(material, object, scale) {
         this.object = {};
 
@@ -84,6 +65,25 @@ export default class TrafficControlsBase {
         };
     }
 
+    getParams(item, coordinates) {
+        const params = {};
+        if (OFFLINE_PLAYBACK) {
+            params.heading = item.heading;
+            params.position = coordinates.applyOffset({
+                x: item.x,
+                y: item.y,
+                z: 0,
+            });
+            params.id = item.id;
+        } else {
+            const posAndHeading = this.getPositionAndHeading(item, coordinates);
+            params.heading = posAndHeading.heading;
+            params.position = posAndHeading.pos;
+            params.id = item.id.id;
+        }
+        return params;
+    }
+
     getPositionAndHeading(sign, coordinates) {
         // Return dummy as this should be implemented in the derived class
         return { "pos": new THREE.Vector3(0, 0, 0), "heading": 0 };
@@ -95,8 +95,7 @@ export default class TrafficControlsBase {
         }
 
         items.forEach((item) => {
-            const { position, heading, id } = TrafficControlsBase.getParams(
-                item, coordinates, this.getPositionAndHeading);
+            const { position, heading, id } = this.getParams(item, coordinates);
 
             TrafficControlsBase.loadModel(this.model.material, this.model.object, this.model.scales,
                 position, heading, (err, mesh) => {
