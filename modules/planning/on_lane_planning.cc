@@ -31,6 +31,7 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/ego_info.h"
+#include "modules/planning/common/history.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory_stitcher.h"
@@ -65,6 +66,7 @@ OnLanePlanning::~OnLanePlanning() {
   }
   planner_->Stop();
   FrameHistory::Instance()->Clear();
+  History::Instance()->Clear();
   PlanningContext::Instance()->mutable_planning_status()->Clear();
   last_routing_.Clear();
   EgoInfo::Instance()->Clear();
@@ -87,6 +89,9 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
       FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
       << "Failed to load traffic rule config file "
       << FLAGS_traffic_rule_config_filename;
+
+  // clear planning history
+  History::Instance()->Clear();
 
   // clear planning status
   PlanningContext::Instance()->mutable_planning_status()->Clear();
@@ -228,6 +233,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
 
   if (util::IsDifferentRouting(last_routing_, *local_view_.routing)) {
     last_routing_ = *local_view_.routing;
+    History::Instance()->Clear();
     PlanningContext::Instance()->mutable_planning_status()->Clear();
     reference_line_provider_->UpdateRoutingResponse(*local_view_.routing);
   }
