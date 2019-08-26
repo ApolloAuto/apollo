@@ -311,7 +311,88 @@ Status PathBoundsDecider::GenerateLaneChangePathBound(
   // PathBoundsDebugString(*path_bound);
 
   // 3. Remove the S-length of target lane out of the path-bound.
-  // TODO(jiacheng): implement this.
+  // center line of smoothed reference lane boundry
+  size_t window_size = 10;    // need further fine-tune
+  if (path_bound->size() > window_size) {
+    std::vector<double> smoothed_center_line;
+    smoothed_center_line.resize(path_bound->size());
+    double prev_average_center;
+    double average_center = (std::get<1>(path_bound->at(0)) +
+                             std::get<2>(path_bound->at(0))) / 2.0;
+    smoothed_center_line[0] = average_center;
+    for (size_t idx = 1; idx != window_size; ++idx) {
+      prev_average_center = average_center;
+      average_center += (std::get<1>(path_bound->at(idx)) +
+                         std::get<2>(path_bound->at(idx))) / 2.0;
+      smoothed_center_line[idx] = smoothed_center_line[idx - 1] +
+                                  (average_center - prev_average_center);
+    }
+    prev_average_center = average_center;
+    average_center += (std::get<1>(path_bound->at(window_size)) +
+                       std::get<2>(path_bound->at(window_size))) / 2.0;
+    smoothed_center_line[window_size] = smoothed_center_line[window_size - 1] +
+                                       (average_center - prev_average_center) -
+                                        smoothed_center_line[0];
+    for (size_t idx = window_size + 1; idx != path_bound->size(); ++idx) {
+      prev_average_center = average_center;
+      average_center += (std::get<1>(path_bound->at(idx)) +
+                         std::get<2>(path_bound->at(idx))) / 2.0;
+      smoothed_center_line[idx] = smoothed_center_line[idx - 1] +
+                                  (average_center - prev_average_center) -
+                                  (smoothed_center_line[idx - window_size] -
+                                   smoothed_center_line[idx - window_size - 1]);
+    }
+
+    average_center /= static_cast<double>(path_bound->size());
+    for (size_t idx = 0; idx != window_size; ++idx) {
+      smoothed_center_line[idx] /= static_cast<double>(idx + 1);
+    }
+    for (size_t idx = window_size; idx != path_bound->size(); ++idx) {
+      smoothed_center_line[idx] /= static_cast<double>(window_size);
+    }
+
+    // check the cross points between center straight line{
+    // center straight line currently,
+    // ((center straight line + left_most_boundry) / 2) and
+    // ((center straight line + left_most_boundry) / 2) could be added further}
+    // and center line of smoothed reference lane boundry
+    int last_idx = -1;
+    int last_last_idx = -1;
+    bool found_S = false;
+    double min_half_S_interval = 5;     // need further fine-tune
+    double max_half_S_interval = 80;    // need further fine-tune
+    double kEpislon = 0.01;             // need further fine-tune
+    for (size_t idx = 0; idx != path_bound->size(); ++idx) {
+      if (std::fabs(smoothed_center_line[idx] - average_center) < kEpislon) {
+        if (last_idx != -1) {
+          double interval = std::get<0>(path_bound->at(idx)) -
+                            std::get<0>(path_bound->at(last_idx));
+          if (interval > min_half_S_interval &&
+              interval < max_half_S_interval) {
+            if (last_last_idx != -1) {
+              double last_interval = std::get<0>(path_bound->at(last_idx)) -
+                                     std::get<0>(path_bound->at(last_last_idx));
+              if (last_interval > min_half_S_interval &&
+                  last_interval < max_half_S_interval) {
+                found_S = true;
+                ADEBUG << "Found S: path_bound[" << last_last_idx << "],"
+                                << "path_bound[" << last_idx << "],"
+                                << "path_bound[" << idx << "]";
+                break;
+              }
+            }
+            last_last_idx = last_idx;
+          }
+        }
+        last_idx = static_cast<int>(idx);
+      }
+    }
+
+    if (found_S) {
+      // TrimPathBounds(last_idx, path_bound);
+      TrimPathBounds(last_last_idx, path_bound);
+    }
+  }
 
   ADEBUG << "Completed generating path boundaries.";
   return Status::OK();
