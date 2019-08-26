@@ -79,7 +79,7 @@ class AsyncSequenceDataLoader : public SequenceDataLoader<DataType> {
 // case 1. not load, then loading
 // case 2. pre-loading, then wait
 // case 3. loaded, then do nothing
-// finaly trigger prefetching
+// finally trigger prefetching
 
 template <class DataType>
 bool AsyncSequenceDataLoader<DataType>::query_next(
