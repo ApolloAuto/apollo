@@ -60,6 +60,7 @@ cc_library(
         "//modules/localization/proto:localization_proto",
         "//modules/map/hdmap:hdmap_util",
         "//modules/perception/proto:perception_proto",
+        "//modules/planning/common:history",
         "//modules/planning/common:planning_common",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:trajectory_stitcher",
