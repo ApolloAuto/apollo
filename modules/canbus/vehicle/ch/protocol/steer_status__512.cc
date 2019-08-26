@@ -34,6 +34,10 @@ void Steerstatus512::Parse(const std::uint8_t* bytes, int32_t length,
       steer_angle_en_sts(bytes, length));
   chassis->mutable_ch()->mutable_steer_status__512()->set_steer_angle_sts(
       steer_angle_sts(bytes, length));
+  chassis->mutable_ch()->mutable_steer_status__512()->set_steer_err(
+      steer_err(bytes, length));
+  chassis->mutable_ch()->mutable_steer_status__512()->set_sensor_err(
+      sensor_err(bytes, length));
   chassis->mutable_check_response()->set_is_eps_online(
       steer_angle_en_sts(bytes, length) == 1);
 }
@@ -72,6 +76,34 @@ double Steerstatus512::steer_angle_sts(const std::uint8_t* bytes,
   x >>= 16;
 
   double ret = x * 0.001000;
+  return ret;
+}
+
+// config detail: {'name': 'steer_err', 'enum': {0: 'STEER_ERR_NOERR', 1:
+// 'STEER_ERR_STEER_MOTOR_ERR'}, 'precision': 1.0, 'len': 8, 'is_signed_var':
+// False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 24, 'type': 'enum',
+// 'order': 'intel', 'physical_unit': ''}
+Steer_status__512::Steer_errType Steerstatus512::steer_err(
+    const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 3);
+  int32_t x = t0.get_byte(0, 8);
+
+  Steer_status__512::Steer_errType ret =
+      static_cast<Steer_status__512::Steer_errType>(x);
+  return ret;
+}
+
+// config detail: {'name': 'sensor_err', 'enum': {0: 'SENSOR_ERR_NOERR', 1:
+// 'SENSOR_ERR_STEER_SENSOR_ERR'}, 'precision': 1.0, 'len': 8, 'is_signed_var':
+// False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 32, 'type': 'enum',
+// 'order': 'intel', 'physical_unit': ''}
+Steer_status__512::Sensor_errType Steerstatus512::sensor_err(
+    const std::uint8_t* bytes, int32_t length) const {
+  Byte t0(bytes + 4);
+  int32_t x = t0.get_byte(0, 8);
+
+  Steer_status__512::Sensor_errType ret =
+      static_cast<Steer_status__512::Sensor_errType>(x);
   return ret;
 }
 }  // namespace ch
