@@ -52,7 +52,8 @@ class HistoryFrame {
   void Init(const ADCTrajectory& adc_trajactory);
   int seq_num() const { return seq_num_; }
   const std::vector<const HistoryObjectDecision*> GetObjectDecisions() const;
-  HistoryObjectDecision* GetObjectDecisionsById(const std::string& id);
+  const HistoryObjectDecision* GetObjectDecisionsById(
+      const std::string& id) const;
 
  private:
   int seq_num_;

@@ -91,12 +91,12 @@ HistoryFrame::GetObjectDecisions() const {
   return result;
 }
 
-HistoryObjectDecision* HistoryFrame::GetObjectDecisionsById(
-    const std::string& id) {
+const HistoryObjectDecision* HistoryFrame::GetObjectDecisionsById(
+    const std::string& id) const {
   if (object_decisions_map_.find(id) == object_decisions_map_.end()) {
     return nullptr;
   }
-  return &(object_decisions_map_[id]);
+  return &(object_decisions_map_.at(id));
 }
 
 ////////////////////////////////////////////////
