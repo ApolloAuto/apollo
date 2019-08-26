@@ -30,7 +30,7 @@ import math
 from cyber_py import cyber
 from cyber_py import cyber_time
 import scipy.signal as signal
-from logger import Logger
+from common.logger import Logger
 from numpy import genfromtxt
 
 from modules.canbus.proto import chassis_pb2

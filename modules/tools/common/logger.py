@@ -22,6 +22,7 @@ This module provides the logging function.
 import logging
 import logging.handlers
 import os
+import sys
 
 
 class Logger(object):
@@ -40,7 +41,6 @@ class Logger(object):
     def config(log_file, use_stdout, log_level):
         """set the config, where config is a ConfigParser object
         """
-        key_logger_section = "logger"
         Logger.__use_stdout = use_stdout
         Logger.__log_level = log_level
         dirname = os.path.dirname(log_file)
