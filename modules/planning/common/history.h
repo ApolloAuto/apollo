@@ -64,8 +64,9 @@ class HistoryFrame {
 class History {
  public:
   const HistoryFrame* GetLastFrame() const;
-  void Add(const ADCTrajectory& adc_trajectory_pb);
+  int Add(const ADCTrajectory& adc_trajectory_pb);
   void Clear();
+  size_t Size() const;
 
  private:
   std::list<HistoryFrame> history_frames_;

@@ -355,6 +355,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "history_test",
+    size = "small",
+    srcs = [
+        "history_test.cc",
+    ],
+    deps = [
+        ":history",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "speed_limit",
     srcs = [
