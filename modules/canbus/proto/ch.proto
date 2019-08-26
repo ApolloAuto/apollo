@@ -78,10 +78,40 @@ message Brake_status__511 {
     BRAKE_PEDAL_EN_STS_ENABLE = 1;
     BRAKE_PEDAL_EN_STS_TAKEOVER = 2;
   }
+  enum Brake_errType {
+    BRAKE_ERR_NOERR = 0;
+    BRAKE_ERR_BRAKE_SYSTEM_ERR = 1;
+  }
+  enum Emergency_btn_envType {
+    EMERGENCY_BTN_ENV_NOENV = 0;
+    EMERGENCY_BTN_ENV_EMERGENCY_BUTTON_ENV = 1;
+  }
+  enum Front_bump_envType {
+    FRONT_BUMP_ENV_NOENV = 0;
+    FRONT_BUMP_ENV_FRONT_BUMPER_ENV = 1;
+  }
+  enum Back_bump_envType {
+    BACK_BUMP_ENV_NOENV = 0;
+    BACK_BUMP_ENV_BACK_BUMPER_ENV = 1;
+  }
+  enum Overspd_envType {
+    OVERSPD_ENV_NOENV = 0;
+    OVERSPD_ENV_OVERSPEED_ENV = 1;
+  }
   // brake pedal enable bit(Status) [] [0|1]
   optional Brake_pedal_en_stsType brake_pedal_en_sts = 1;
   // Percentage of brake pedal(Status) [%] [0|100]
   optional int32 brake_pedal_sts = 2;
+  // [] [0|1]
+  optional Brake_errType brake_err = 3;
+  // [] [0|1]
+  optional Emergency_btn_envType emergency_btn_env = 4;
+  // [] [0|1]
+  optional Front_bump_envType front_bump_env = 5;
+  // [] [0|1]
+  optional Back_bump_envType back_bump_env = 6;
+  // [] [0|1]
+  optional Overspd_envType overspd_env = 7;
 }
 
 message Throttle_status__510 {
@@ -91,10 +121,22 @@ message Throttle_status__510 {
     THROTTLE_PEDAL_EN_STS_ENABLE = 1;
     THROTTLE_PEDAL_EN_STS_TAKEOVER = 2;
   }
+  enum Drive_motor_errType {
+    DRIVE_MOTOR_ERR_NOERR = 0;
+    DRIVE_MOTOR_ERR_DRV_MOTOR_ERR = 1;
+  }
+  enum Battery_bms_errType {
+    BATTERY_BMS_ERR_NOERR = 0;
+    BATTERY_BMS_ERR_BATTERY_ERR = 1;
+  }
   // throttle pedal enable bit(Status) [] [0|1]
   optional Throttle_pedal_en_stsType throttle_pedal_en_sts = 1;
   // Percentage of throttle pedal(Status) [%] [0|100]
   optional int32 throttle_pedal_sts = 2;
+  // [] [0|1]
+  optional Drive_motor_errType drive_motor_err = 3;
+  // [] [0|1]
+  optional Battery_bms_errType battery_bms_err = 4;
 }
 
 message Turnsignal_status__513 {
@@ -115,10 +157,22 @@ message Steer_status__512 {
     STEER_ANGLE_EN_STS_ENABLE = 1;
     STEER_ANGLE_EN_STS_TAKEOVER = 2;
   }
+  enum Steer_errType {
+    STEER_ERR_NOERR = 0;
+    STEER_ERR_STEER_MOTOR_ERR = 1;
+  }
+  enum Sensor_errType {
+    SENSOR_ERR_NOERR = 0;
+    SENSOR_ERR_STEER_SENSOR_ERR = 1;
+  }
   // steering angle enable bit(Status) [] [0|1]
   optional Steer_angle_en_stsType steer_angle_en_sts = 1;
   // Current steering angle(Status) [radian] [-0.524|0.524]
   optional double steer_angle_sts = 2;
+  // [] [0|1]
+  optional Steer_errType steer_err = 3;
+  // [] [0|1]
+  optional Sensor_errType sensor_err = 4;
 }
 
 message Ecu_status_1_515 {

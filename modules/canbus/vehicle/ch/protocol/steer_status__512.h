@@ -46,6 +46,20 @@ class Steerstatus512 : public ::apollo::drivers::canbus::ProtocolData<
   // 'is_signed_var': True, 'physical_range': '[-0.524|0.524]', 'bit': 8,
   // 'type': 'double', 'order': 'intel', 'physical_unit': 'radian'}
   double steer_angle_sts(const std::uint8_t* bytes, const int32_t length) const;
+
+  // config detail: {'name': 'STEER_ERR', 'enum': {0: 'STEER_ERR_NOERR', 1:
+  // 'STEER_ERR_STEER_MOTOR_ERR'}, 'precision': 1.0, 'len': 8, 'is_signed_var':
+  // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 24, 'type': 'enum',
+  // 'order': 'intel', 'physical_unit': ''}
+  Steer_status__512::Steer_errType steer_err(const std::uint8_t* bytes,
+                                             const int32_t length) const;
+
+  // config detail: {'name': 'SENSOR_ERR', 'enum': {0: 'SENSOR_ERR_NOERR', 1:
+  // 'SENSOR_ERR_STEER_SENSOR_ERR'}, 'precision': 1.0, 'len': 8,
+  // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit':
+  // 32, 'type': 'enum', 'order': 'intel', 'physical_unit': ''}
+  Steer_status__512::Sensor_errType sensor_err(const std::uint8_t* bytes,
+                                               const int32_t length) const;
 };
 
 }  // namespace ch
