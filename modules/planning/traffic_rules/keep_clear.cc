@@ -164,8 +164,7 @@ bool KeepClear::IsCreeping(const double pnc_junction_start_s,
   if (stage_type != ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP &&
       stage_type !=
           ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP &&
-      stage_type !=
-          ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP) {
+      stage_type != ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP) {
     return false;
   }
 

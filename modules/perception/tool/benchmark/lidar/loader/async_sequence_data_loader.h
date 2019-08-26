@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 #pragma once
+#include <algorithm>
 #include <future>
 #include <map>
-#include <mutex>
 #include <memory>
+#include <mutex>
 #include <string>
-#include <algorithm>
 #include <vector>
 #include "modules/perception/tool/benchmark/lidar/ctpl/ctpl.h"
 #include "modules/perception/tool/benchmark/lidar/loader/sequence_data_loader.h"
@@ -56,8 +56,8 @@ class AsyncSequenceDataLoader : public SequenceDataLoader<DataType> {
     }
     _cached_data.clear();
   }
-  bool query_next(std::shared_ptr<DataType>& data) override; // NOLINT
-  bool query_last(std::shared_ptr<DataType>& data) override; // NOLINT
+  bool query_next(std::shared_ptr<DataType>& data) override;  // NOLINT
+  bool query_last(std::shared_ptr<DataType>& data) override;  // NOLINT
 
  protected:
   using CachePtr = std::shared_ptr<Cache<DataType>>;
@@ -83,7 +83,7 @@ class AsyncSequenceDataLoader : public SequenceDataLoader<DataType> {
 
 template <class DataType>
 bool AsyncSequenceDataLoader<DataType>::query_next(
-    std::shared_ptr<DataType>& data) { // NOLINT
+    std::shared_ptr<DataType>& data) {  // NOLINT
   if (_thread_pool == nullptr) {
     return false;
   }
@@ -159,7 +159,7 @@ bool AsyncSequenceDataLoader<DataType>::query_next(
 
 template <class DataType>
 bool AsyncSequenceDataLoader<DataType>::query_last(
-    std::shared_ptr<DataType>& data) { // NOLINT
+    std::shared_ptr<DataType>& data) {  // NOLINT
   if (_thread_pool == nullptr) {
     return false;
   }

@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 #include "modules/perception/tool/benchmark/lidar/eval/position_metric.h"
-#include <vector>
 #include <algorithm>
+#include <vector>
 namespace apollo {
 namespace perception {
 namespace benchmark {

@@ -113,8 +113,7 @@ bool ClassicContext::RemoveCRoutine(const std::shared_ptr<CRoutine>& cr) {
   auto grp = cr->group_name();
   auto prio = cr->priority();
   auto crid = cr->id();
-  WriteLockGuard<AtomicRWLock> lk(
-      ClassicContext::rq_locks_[grp].at(prio));
+  WriteLockGuard<AtomicRWLock> lk(ClassicContext::rq_locks_[grp].at(prio));
   auto& croutines = ClassicContext::cr_group_[grp].at(prio);
   for (auto it = croutines.begin(); it != croutines.end(); ++it) {
     if ((*it)->id() == crid) {

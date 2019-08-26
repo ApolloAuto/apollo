@@ -33,7 +33,6 @@ cv::Scalar pink_color = cv::Scalar(203, 192, 255);
 cv::Scalar beige_color = cv::Scalar(220, 245, 245);
 cv::Scalar ivory_color = cv::Scalar(240, 255, 255);
 
-
 // Blue class
 cv::Scalar azure_color = cv::Scalar(255, 255, 240);
 cv::Scalar cyan_color = cv::Scalar(255, 255, 0);

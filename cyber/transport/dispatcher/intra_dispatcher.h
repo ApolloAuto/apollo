@@ -230,7 +230,7 @@ class ChannelChain {
           }
           msg.resize(msg_size);
           if (!message::SerializeToHC(*message, const_cast<char*>(msg.data()),
-                                     msg_size)) {
+                                      msg_size)) {
             AERROR << "Chain Serialize error for channel id: " << channel_id;
             msg.clear();
           }

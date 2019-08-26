@@ -34,13 +34,13 @@ using apollo::hdmap::PathOverlap;
 YieldSign::YieldSign(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 Status YieldSign::ApplyRule(Frame* const frame,
-                           ReferenceLineInfo* const reference_line_info) {
+                            ReferenceLineInfo* const reference_line_info) {
   MakeDecisions(frame, reference_line_info);
   return Status::OK();
 }
 
 void YieldSign::MakeDecisions(Frame* const frame,
-                             ReferenceLineInfo* const reference_line_info) {
+                              ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -72,8 +72,7 @@ void YieldSign::MakeDecisions(Frame* const frame,
     const std::vector<std::string> wait_for_obstacle_ids(
         yield_sign_status.wait_for_obstacle_id().begin(),
         yield_sign_status.wait_for_obstacle_id().end());
-    util::BuildStopDecision(virtual_obstacle_id,
-                            yield_sign_overlap.start_s,
+    util::BuildStopDecision(virtual_obstacle_id, yield_sign_overlap.start_s,
                             config_.yield_sign().stop_distance(),
                             StopReasonCode::STOP_REASON_YIELD_SIGN,
                             wait_for_obstacle_ids,
