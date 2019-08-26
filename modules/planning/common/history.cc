@@ -45,6 +45,7 @@ HistoryObjectDecision::GetObjectDecision() const {
   for (size_t i = 0; i < object_decision_.size(); i++) {
     result.push_back(&(object_decision_[i]));
   }
+
   return result;
 }
 
@@ -72,6 +73,7 @@ HistoryFrame::GetObjectDecisions() const {
   for (size_t i = 0; i < object_decisions_.size(); i++) {
     result.push_back(&(object_decisions_[i]));
   }
+
   return result;
 }
 
@@ -97,7 +99,7 @@ const HistoryFrame* History::GetLastFrame() const {
 }
 void History::Clear() { history_frames_.clear(); }
 
-void History::Add(const ADCTrajectory& adc_trajectory_pb) {
+int History::Add(const ADCTrajectory& adc_trajectory_pb) {
   if (history_frames_.size() >=
       static_cast<size_t>(FLAGS_history_max_record_num)) {
     history_frames_.pop_front();
@@ -106,6 +108,12 @@ void History::Add(const ADCTrajectory& adc_trajectory_pb) {
   HistoryFrame history_frame;
   history_frame.Init(adc_trajectory_pb);
   history_frames_.emplace_back(std::move(history_frame));
+
+  return 0;
+}
+
+size_t History::Size() const {
+  return history_frames_.size();
 }
 
 }  // namespace planning
