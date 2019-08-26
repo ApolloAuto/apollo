@@ -997,14 +997,6 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
     cv::line(image_2D, ground2image(vp1_), ground2image(vp2_),
              apollo::perception::white_color, 2);
   }
-  AINFO << "vp1_: " << vp1_ << ", vp1_image: " << ground2image(vp1_);
-  AINFO << "vp2_: " << vp2_ << ", vp2_image: " << ground2image(vp2_);
-
-  // AINFO << "FOV point 1: " << image2ground(p_fov_1_);
-  // AINFO << "FOV point 2: " << image2ground(p_fov_2_);
-  // AINFO << "FOV point 3: " << image2ground(p_fov_3_);
-  // AINFO << "FOV point 4: " << image2ground(p_fov_4_);
-
   // plot laneline on image and ground plane
   for (const auto &object : frame.lane_objects) {
     cv::Scalar lane_color = colormapline[object.pos_type];
@@ -1012,7 +1004,6 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
     p_prev.x = static_cast<int>(object.curve_image_point_set[0].x);
     p_prev.y = static_cast<int>(object.curve_image_point_set[0].y);
     Eigen::Vector2d p_prev_ground = image2ground(p_prev);
-
     for (unsigned i = 1; i < object.curve_image_point_set.size(); i++) {
       cv::Point p_cur;
       p_cur.x = static_cast<int>(object.curve_image_point_set[i].x);
@@ -1257,16 +1248,12 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
     p_prev_ground(0) = virtual_egolane_ground.left_line.line_point[0](0);
     p_prev_ground(1) = virtual_egolane_ground.left_line.line_point[0](1);
     cv::Point p_prev = ground2image(p_prev_ground);
-    AINFO << "[Left] p_prev_ground: " << p_prev_ground << ", "
-          << "p_prev: " << p_prev;
     for (unsigned i = 1;
          i < virtual_egolane_ground.left_line.line_point.size(); i++) {
       Eigen::Vector2d p_cur_ground;
       p_cur_ground(0) = virtual_egolane_ground.left_line.line_point[i](0);
       p_cur_ground(1) = virtual_egolane_ground.left_line.line_point[i](1);
       cv::Point p_cur = ground2image(p_cur_ground);
-      AINFO << "[Left] p_cur_ground: " << p_cur_ground
-            << ", " << "p_cur: " << p_prev;
       if (p_cur.x >= 0 && p_cur.y >= 0 && p_prev.x >= 0 && p_prev.y >= 0 &&
           p_cur.x < image_width_ && p_cur.y < image_height_ &&
           p_prev.x < image_width_ && p_prev.y <  image_height_) {

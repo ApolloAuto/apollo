@@ -653,11 +653,8 @@ bool TrafficLightsPerceptionComponent::GetCarPose(const double timestamp,
            << tf2_child_frame_id_;
     return false;
   }
-  if (!pose->Init(timestamp, pose_matrix)) {
-    AERROR << "PreprocessComponent::get_car_pose failed, ts:"
-           << std::to_string(timestamp) << " pose:" << pose_matrix;
-    return false;
-  }
+  pose->timestamp_ = timestamp;
+  pose->pose_ = pose_matrix;
 
   int state = 0;
   bool ret = true;
@@ -670,7 +667,7 @@ bool TrafficLightsPerceptionComponent::GetCarPose(const double timestamp,
       pose->ClearCameraPose(camera_name);
       AERROR << "get pose from tf failed, camera_name: " << camera_name;
     } else {
-      pose->SetCameraPose(camera_name, pose_matrix);
+      pose->c2w_poses_[camera_name] = pose_matrix;
       state += 1;
     }
   }
@@ -953,7 +950,7 @@ bool TrafficLightsPerceptionComponent::TransformDebugMessage(
     camera::CarPose pose;
     if (GetCarPose(frame->timestamp, &pose)) {
       Eigen::Matrix4d cam_pose;
-      pose.GetCameraPose("front_6mm", &cam_pose);
+      cam_pose = pose.c2w_poses_.at("front_6mm");
       light_debug->set_distance_to_stop_line(stopline_distance(cam_pose));
     } else {
       AERROR << "error occurred in calc distance to stop line";
