@@ -46,8 +46,6 @@ TEST_F(HistoryTest, GetLastFrame) {
 
   history_->Clear();
 
-  AERROR << "size: " << history_->Size();
-
   ADCTrajectory adc_trajectory_1;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
       "/apollo/modules/planning/testdata/common/history_01.pb.txt",
@@ -105,23 +103,21 @@ TEST_F(HistoryTest, GetObjectDecisions) {
     }
   }
 
-  // 11720: nudge
+  // 11720: nudge, stop
   EXPECT_STREQ("11720", object_decisions[0]->id().c_str());
-  AERROR << "object_decision[" << object_decisions[0]->id() << "]";
   auto obj_decision = object_decisions[0]->GetObjectDecision();
-  EXPECT_EQ(1, obj_decision.size());
-  EXPECT_TRUE(obj_decision[0]->has_nudge());
+  EXPECT_EQ(2, obj_decision.size());
+  EXPECT_TRUE(obj_decision[0]->has_stop());
+  EXPECT_TRUE(obj_decision[1]->has_nudge());
 
   // CW_2832: stop
   EXPECT_STREQ("CW_2832", object_decisions[1]->id().c_str());
-  AERROR << "object_decision[" << object_decisions[1]->id() << "]";
   obj_decision = object_decisions[1]->GetObjectDecision();
   EXPECT_EQ(1, obj_decision.size());
   EXPECT_TRUE(obj_decision[0]->has_stop());
 
   // TL_2516: stop
-  EXPECT_STREQ("TL_2516", object_decisions[1]->id().c_str());
-  AERROR << "object_decision[" << object_decisions[2]->id() << "]";
+  EXPECT_STREQ("TL_2516", object_decisions[2]->id().c_str());
   obj_decision = object_decisions[2]->GetObjectDecision();
   EXPECT_EQ(1, obj_decision.size());
   EXPECT_TRUE(obj_decision[0]->has_stop());

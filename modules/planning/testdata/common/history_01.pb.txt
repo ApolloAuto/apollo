@@ -30,6 +30,18 @@ decision {
           distance_l: -0.3
         }
       }
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_OBSTACLE
+          distance_s: -1
+          stop_point {
+            x: 586261.33054620528
+            y: 4141304.5678338786
+            z: 0
+          }
+          stop_heading: -1.7949095101125847
+        }
+      }
     }
     decision {
       id: "CW_2832"
