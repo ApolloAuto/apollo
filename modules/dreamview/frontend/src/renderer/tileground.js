@@ -1,7 +1,16 @@
 import * as THREE from "three";
 
 import { loadTexture } from "utils/models";
-import TrafficControl from "renderer/traffic_control";
+import TrafficSigns from "renderer/traffic_controls/traffic_signs";
+import TrafficSignals from "renderer/traffic_controls/traffic_signals";
+
+import stopSignMaterial from "assets/models/stop_sign.mtl";
+import stopSignObject from "assets/models/stop_sign.obj";
+import yieldSignMaterial from "assets/models/yield_sign.mtl";
+import yieldSignObject from "assets/models/yield_sign.obj";
+
+const STOP_SIGN_SCALE = 0.01;
+const YIELD_SIGN_SCALE = 1.5;
 
 function diffTiles(newTiles, currentTiles) {
     const difference = new Set(newTiles);
@@ -15,26 +24,34 @@ function diffTiles(newTiles, currentTiles) {
 export default class TileGround {
     constructor(renderer) {
         this.renderer = renderer;
+
         // This a dummy variable. Without it,
         // renderer will not proceed the render process.
         this.mesh = true;
         this.type = "tile";
-
-        this.hash = -1;
-        this.currentTiles = {};
-        this.currentTrafficLight = [];
-        this.currentStopSign = [];
-        this.initialized = false;
 
         this.range = PARAMETERS.ground.defaults.tileRange;
         this.metadata = null;
         this.mapId = null;
         this.mapUrlPrefix = null;
 
-        this.trafficControl = new TrafficControl();
+        this.hash = -1;
+        this.currentTiles = {};
+        this.currentTrafficLights = [];
+        this.currentStopSigns = [];
+        this.currentYieldSigns = [];
+        this.initialized = false;
+
+        this.trafficSignals = new TrafficSignals();
+        this.stopSigns = new TrafficSigns(
+            stopSignMaterial, stopSignObject, STOP_SIGN_SCALE,
+        );
+        this.yieldSigns = new TrafficSigns(
+            yieldSignMaterial, yieldSignObject, YIELD_SIGN_SCALE,
+        );
     }
 
-    initialize(serverUrl, metadata) {
+    initialize(metadata) {
         this.metadata = {
             tileLength: metadata.tile * metadata.mpp,
             left: metadata.left,
@@ -45,12 +62,14 @@ export default class TileGround {
             tile: metadata.tile,
             imageUrl: metadata.image_url,
             availableMapTiles: new Set(metadata.availableImages),
+
+            allSignals: metadata.signal,
+            allStopSigns: metadata.stopSign,
+            allYieldSigns: metadata.yield,
         };
 
         this.mapId = metadata.mapid;
         this.mapUrlPrefix = `${this.metadata.imageUrl}/${this.mapId}`;
-        this.totalSignals = metadata.signal;
-        this.totalStopSigns = metadata.stopSign;
         this.initialized = true;
     }
 
@@ -68,7 +87,7 @@ export default class TileGround {
         delete items[key];
     }
 
-    // get signal and stopSign within current range
+    // get traffic-control items within current range
     getItems(row, col, totalItemsInMap) {
         const newItems = [];
         totalItemsInMap.forEach((item) => {
@@ -123,22 +142,30 @@ export default class TileGround {
         }
 
         const currentTrafficLightIds = [];
-        this.currentTrafficLight.forEach((item) => {
+        this.currentTrafficLights.forEach((item) => {
             const { key, id } = item;
             if (newTiles.has(key)) {
                 currentTrafficLightIds.push(id);
             }
         });
-        this.trafficControl.removeExpiredTrafficLights(currentTrafficLightIds, scene);
+        this.trafficSignals.removeExpired(currentTrafficLightIds, scene);
 
         const currentStopSignIds = [];
-        this.currentStopSign.forEach((item) => {
+        this.currentStopSigns.forEach((item) => {
             const { key, id } = item;
             if (newTiles.has(key)) {
                 currentStopSignIds.push(id);
             }
         });
-        this.trafficControl.removeExpiredStopSigns(currentStopSignIds, scene);
+        this.stopSigns.removeExpired(currentStopSignIds, scene);
+
+        const currentYieldSignIds = [];
+        this.currentYieldSigns.forEach((item) => {
+            if (newTiles.has(item.key)) {
+                currentYieldSignIds.push(item.id);
+            }
+        });
+        this.yieldSigns.removeExpired(currentYieldSignIds, scene);
     }
 
     updateIndex(hash, newTiles, coordinates, scene) {
@@ -159,20 +186,29 @@ export default class TileGround {
                     }
                     this.appendTiles(row, col, key, coordinates, scene);
 
-                    if (this.totalSignals) {
-                        const newItems = this.getItems(row, col, this.totalSignals);
-                        this.trafficControl.addTrafficLight(newItems, coordinates, scene);
-                        this.currentTrafficLight = [
-                            ...this.currentTrafficLight,
+                    if (this.metadata.allSignals) {
+                        const newItems = this.getItems(row, col, this.metadata.allSignals);
+                        this.trafficSignals.add(newItems, coordinates, scene);
+                        this.currentTrafficLights = [
+                            ...this.currentTrafficLights,
                             ...newItems.map(item => ({ key, id: item.id }))
                         ];
                     }
 
-                    if (this.totalStopSigns) {
-                        const newItems = this.getItems(row, col, this.totalStopSigns);
-                        this.trafficControl.addStopSign(newItems, coordinates, scene);
-                        this.currentStopSign = [
-                            ...this.currentStopSign,
+                    if (this.metadata.allStopSigns) {
+                        const newItems = this.getItems(row, col, this.metadata.allStopSigns);
+                        this.stopSigns.add(newItems, coordinates, scene);
+                        this.currentStopSigns = [
+                            ...this.currentStopSigns,
+                            ...newItems.map(item => ({ key, id: item.id }))
+                        ];
+                    }
+
+                    if (this.metadata.allYieldSigns) {
+                        const newItems = this.getItems(row, col, this.metadata.allYieldSigns);
+                        this.yieldSigns.add(newItems, coordinates, scene);
+                        this.currentYieldSigns = [
+                            ...this.currentYieldSigns,
                             ...newItems.map(item => ({ key, id: item.id }))
                         ];
                     }
@@ -207,6 +243,6 @@ export default class TileGround {
         }
 
         this.updateIndex(newHash, newTiles, coordinates, scene);
-        this.trafficControl.updateTrafficLightStatus(world.perceivedSignal);
+        this.trafficSignals.updateTrafficLightStatus(world.perceivedSignal);
     }
 }

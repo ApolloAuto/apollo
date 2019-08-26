@@ -47,7 +47,7 @@ export default class OfflinePlaybackWebSocketEndpoint {
             }
             switch (message.type) {
                 case "GroundMetadata":
-                    RENDERER.updateGroundMetadata(this.serverUrl, message.data);
+                    RENDERER.updateGroundMetadata(message.data);
                     this.requestFrameCount(STORE.playback.recordId);
                     break;
                 case "FrameCount":
