@@ -32,11 +32,22 @@ namespace planning {
 ////////////////////////////////////////////////
 // HistoryObjectDecision
 
-void HistoryObjectDecision::Init(const ObjectDecision& object_decisions) {
+void HistoryObjectDecision::Init(
+    const ObjectDecision& object_decisions) {
   id_ = object_decisions.id();
   object_decision_.clear();
   for (int i = 0; i < object_decisions.object_decision_size(); i++) {
     object_decision_.push_back(object_decisions.object_decision(i));
+  }
+}
+
+void HistoryObjectDecision::Init(
+    const std::string& id,
+    const std::vector<ObjectDecisionType>& object_decision) {
+  id_ = id;
+  object_decision_.clear();
+  for (const auto decision_type : object_decision) {
+    object_decision_.push_back(decision_type);
   }
 }
 
@@ -79,6 +90,33 @@ HistoryFrame::GetObjectDecisions() const {
   std::vector<const HistoryObjectDecision*> result;
   for (size_t i = 0; i < object_decisions_.size(); i++) {
     result.push_back(&(object_decisions_[i]));
+  }
+
+  // sort
+  std::sort(result.begin(), result.end(),
+            [](const HistoryObjectDecision* lhs,
+               const HistoryObjectDecision* rhs) {
+              return lhs->id() < rhs->id();
+            });
+
+  return result;
+}
+
+const std::vector<const HistoryObjectDecision*>
+HistoryFrame::GetStopObjectDecisions() const {
+  std::vector<const HistoryObjectDecision*> result;
+  for (size_t i = 0; i < object_decisions_.size(); i++) {
+    auto obj_decision = object_decisions_[i].GetObjectDecision();
+    for (const ObjectDecisionType* decision_type : obj_decision) {
+      if (decision_type->has_stop()) {
+        std::vector<ObjectDecisionType> object_decision;
+        object_decision.push_back(*decision_type);
+
+        HistoryObjectDecision* decision = new HistoryObjectDecision();
+        decision->Init(object_decisions_[i].id(), object_decision);
+        result.push_back(decision);
+      }
+    }
   }
 
   // sort

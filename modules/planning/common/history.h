@@ -36,6 +36,8 @@ class HistoryObjectDecision {
   HistoryObjectDecision() = default;
 
   void Init(const ObjectDecision& object_decisions);
+  void Init(const std::string& id,
+            const std::vector<ObjectDecisionType>& object_decisions);
 
   const std::string& id() const { return id_; }
   const std::vector<const ObjectDecisionType*> GetObjectDecision() const;
@@ -50,8 +52,14 @@ class HistoryFrame {
   HistoryFrame() = default;
 
   void Init(const ADCTrajectory& adc_trajactory);
+
   int seq_num() const { return seq_num_; }
+
   const std::vector<const HistoryObjectDecision*> GetObjectDecisions() const;
+
+  const std::vector<const HistoryObjectDecision*>
+  GetStopObjectDecisions() const;
+
   const HistoryObjectDecision* GetObjectDecisionsById(
       const std::string& id) const;
 
