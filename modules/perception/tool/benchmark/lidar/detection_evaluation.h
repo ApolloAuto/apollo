@@ -96,7 +96,7 @@ class DetectionEvaluation {
   std::vector<std::vector<double>> _classification_confusion_matrix_det_major;
   std::vector<std::vector<double>>
       _classification_confusion_matrix_det_major_with_fp;
-  // self evaluation
+  // self-evaluation
   std::vector<std::vector<double>> _classification_change_rate_per_class;
   double _classification_change_rate;
   // option
