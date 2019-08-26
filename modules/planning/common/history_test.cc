@@ -122,6 +122,39 @@ TEST_F(HistoryTest, GetObjectDecisions) {
   EXPECT_TRUE(obj_decision[0]->has_stop());
 }
 
+TEST_F(HistoryTest, GetStopObjectDecisions) {
+  history_->Clear();
+
+  ADCTrajectory adc_trajectory;
+  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
+      "/apollo/modules/planning/testdata/common/history_01.pb.txt",
+      &adc_trajectory));
+
+  history_->Add(adc_trajectory);
+  EXPECT_NE(nullptr, history_->GetLastFrame());
+  std::vector<const HistoryObjectDecision*> object_decisions =
+      history_->GetLastFrame()->GetStopObjectDecisions();
+  EXPECT_EQ(3, object_decisions.size());
+
+  // 11720: stop
+  EXPECT_STREQ("11720", object_decisions[0]->id().c_str());
+  auto obj_decision = object_decisions[0]->GetObjectDecision();
+  EXPECT_EQ(1, obj_decision.size());
+  EXPECT_TRUE(obj_decision[0]->has_stop());
+
+  // CW_2832: stop
+  EXPECT_STREQ("CW_2832", object_decisions[1]->id().c_str());
+  obj_decision = object_decisions[1]->GetObjectDecision();
+  EXPECT_EQ(1, obj_decision.size());
+  EXPECT_TRUE(obj_decision[0]->has_stop());
+
+  // TL_2516: stop
+  EXPECT_STREQ("TL_2516", object_decisions[2]->id().c_str());
+  obj_decision = object_decisions[2]->GetObjectDecision();
+  EXPECT_EQ(1, obj_decision.size());
+  EXPECT_TRUE(obj_decision[0]->has_stop());
+}
+
 TEST_F(HistoryTest, GetObjectDecisionsById) {
   history_->Clear();
 
