@@ -20,6 +20,7 @@
 
 #include "modules/planning/common/history.h"
 
+#include <algorithm>
 #include <utility>
 
 #include "cyber/common/log.h"
@@ -46,6 +47,12 @@ HistoryObjectDecision::GetObjectDecision() const {
     result.push_back(&(object_decision_[i]));
   }
 
+  // sort
+  std::sort(result.begin(), result.end(),
+            [](const ObjectDecisionType* lhs,
+               const ObjectDecisionType* rhs) {
+              return lhs->object_tag_case() < rhs->object_tag_case();
+            });
   return result;
 }
 
@@ -73,6 +80,13 @@ HistoryFrame::GetObjectDecisions() const {
   for (size_t i = 0; i < object_decisions_.size(); i++) {
     result.push_back(&(object_decisions_[i]));
   }
+
+  // sort
+  std::sort(result.begin(), result.end(),
+            [](const HistoryObjectDecision* lhs,
+               const HistoryObjectDecision* rhs) {
+              return lhs->id() < rhs->id();
+            });
 
   return result;
 }
