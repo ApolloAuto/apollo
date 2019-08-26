@@ -171,8 +171,7 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 
     std::vector<torch::jit::IValue> lstm_inputs;
     lstm_inputs.push_back(lstm_input.to(device_));
-    auto lstm_out_tuple =
-        torch_single_lstm_.forward(lstm_inputs).toTuple();
+    auto lstm_out_tuple = torch_single_lstm_.forward(lstm_inputs).toTuple();
     auto ht = lstm_out_tuple->elements()[0].toTensor();
     auto ct = lstm_out_tuple->elements()[1].toTensor();
     obstacle_id_lstm_state_map_[id].ht = ht.clone();
@@ -229,16 +228,14 @@ bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     }
     std::vector<torch::jit::IValue> lstm_inputs;
     lstm_inputs.push_back(std::move(lstm_input));
-    auto lstm_out_tuple =
-        torch_single_lstm_.forward(lstm_inputs).toTuple();
+    auto lstm_out_tuple = torch_single_lstm_.forward(lstm_inputs).toTuple();
     ht = lstm_out_tuple->elements()[0].toTensor();
     ct = lstm_out_tuple->elements()[1].toTensor();
     std::vector<torch::jit::IValue> prediction_inputs;
     prediction_inputs.push_back(ht[0]);
-    auto pred_out_tensor =
-        torch_prediction_layer_.forward(prediction_inputs)
-            .toTensor()
-            .to(torch::kCPU);
+    auto pred_out_tensor = torch_prediction_layer_.forward(prediction_inputs)
+                               .toTensor()
+                               .to(torch::kCPU);
     auto pred_out = pred_out_tensor.accessor<float, 2>();
     TrajectoryPoint* point = trajectory->add_trajectory_point();
     double curr_x = prev_x + static_cast<double>(pred_out[0][0]);

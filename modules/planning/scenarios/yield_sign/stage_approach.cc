@@ -35,8 +35,8 @@ namespace planning {
 namespace scenario {
 namespace yield_sign {
 
-using apollo::common::time::Clock;
 using apollo::common::TrajectoryPoint;
+using apollo::common::time::Clock;
 using apollo::hdmap::PathOverlap;
 using apollo::perception::TrafficLight;
 
@@ -65,8 +65,8 @@ Stage::StageStatus YieldSignStageApproach::Process(
   }
 
   // set right_of_way_status
-  reference_line_info.SetJunctionRightOfWay(
-      current_yield_sign_overlap->start_s, false);
+  reference_line_info.SetJunctionRightOfWay(current_yield_sign_overlap->start_s,
+                                            false);
 
   constexpr double kPassStopLineBuffer = 0.3;  // unit: m
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
@@ -79,12 +79,11 @@ Stage::StageStatus YieldSignStageApproach::Process(
 
   const double distance_adc_to_stop_line =
       current_yield_sign_overlap->start_s - adc_front_edge_s;
-  ADEBUG << "yield_sign_overlap_id[" << yield_sign_overlap_id
-         << "] start_s[" << current_yield_sign_overlap->start_s
+  ADEBUG << "yield_sign_overlap_id[" << yield_sign_overlap_id << "] start_s["
+         << current_yield_sign_overlap->start_s
          << "] distance_adc_to_stop_line[" << distance_adc_to_stop_line << "]";
   bool yield_sign_done = false;
-  if (distance_adc_to_stop_line <
-      scenario_config_.max_valid_stop_distance()) {
+  if (distance_adc_to_stop_line < scenario_config_.max_valid_stop_distance()) {
     // close enough, check yield_sign clear
     yield_sign_done = true;
     const auto& path_decision = reference_line_info.path_decision();
@@ -92,9 +91,8 @@ Stage::StageStatus YieldSignStageApproach::Process(
       const std::string& obstacle_id = obstacle->Id();
       std::string obstacle_type_name =
           PerceptionObstacle_Type_Name(obstacle->Perception().type());
-      ADEBUG <<  "yield_sign[" << yield_sign_overlap_id
-             << "] obstacle_id[" << obstacle_id
-             << "] type[" << obstacle_type_name << "]";
+      ADEBUG << "yield_sign[" << yield_sign_overlap_id << "] obstacle_id["
+             << obstacle_id << "] type[" << obstacle_type_name << "]";
       if (obstacle->IsVirtual()) {
         continue;
       }
@@ -119,7 +117,7 @@ Stage::StageStatus YieldSignStageApproach::Process(
 
       // ignore the obstacle which is already on reference line and moving
       // along the direction of ADC
-      constexpr double kIgnoreMaxSTMinT = 0.1;  // max st_min_t(sec) to ignore
+      constexpr double kIgnoreMaxSTMinT = 0.1;   // max st_min_t(sec) to ignore
       constexpr double kIgnoreMinSTMinS = 15.0;  // min st_min_s(m) to ignore
       if (obstacle_traveled_s < kepsilon &&
           obstacle->reference_line_st_boundary().min_t() < kIgnoreMaxSTMinT &&
@@ -152,10 +150,9 @@ Stage::StageStatus YieldSignStageApproach::FinishScenario() {
 
 Stage::StageStatus YieldSignStageApproach::FinishStage() {
   // update PlanningContext
-  auto* yield_sign_status =
-      PlanningContext::Instance()
-          ->mutable_planning_status()
-          ->mutable_yield_sign();
+  auto* yield_sign_status = PlanningContext::Instance()
+                                ->mutable_planning_status()
+                                ->mutable_yield_sign();
   yield_sign_status->set_done_yield_sign_overlap_id(
       GetContext()->current_yield_sign_overlap_id);
   yield_sign_status->clear_wait_for_obstacle_id();

@@ -15,9 +15,9 @@
  *****************************************************************************/
 #pragma once
 
+#include <set>
 #include <string>
 #include <vector>
-#include <set>
 #include "modules/perception/tool/benchmark/lidar/util/object.h"
 #include "modules/perception/tool/benchmark/lidar/util/types.h"
 

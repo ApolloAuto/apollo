@@ -55,8 +55,7 @@ void HistoryFrame::Init(const ADCTrajectory& adc_trajactory) {
   adc_trajactory_.CopyFrom(adc_trajactory);
 
   seq_num_ = adc_trajactory.header().sequence_num();
-  const auto& object_decisions =
-      adc_trajactory.decision().object_decision();
+  const auto& object_decisions = adc_trajactory.decision().object_decision();
   for (int i = 0; i < object_decisions.decision_size(); i++) {
     const std::string id = object_decisions.decision(i).id();
     HistoryObjectDecision object_decision;
@@ -91,14 +90,12 @@ History::History() {}
 
 const HistoryFrame* History::GetLastFrame() const {
   if (history_frames_.empty()) {
-      return nullptr;
+    return nullptr;
   } else {
-      return &(history_frames_.back());
+    return &(history_frames_.back());
   }
 }
-void History::Clear() {
-  history_frames_.clear();
-}
+void History::Clear() { history_frames_.clear(); }
 
 void History::Add(const ADCTrajectory& adc_trajectory_pb) {
   if (history_frames_.size() >=

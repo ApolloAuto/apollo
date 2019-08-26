@@ -93,9 +93,8 @@ bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     junction_exit_mask[0][i] = static_cast<float>(feature_values[i]);
   }
 
-  torch_inputs.push_back(c10::ivalue::Tuple::create({
-      img_tensor.to(device_), junction_exit_mask.to(device_)
-  }));
+  torch_inputs.push_back(c10::ivalue::Tuple::create(
+      {img_tensor.to(device_), junction_exit_mask.to(device_)}));
 
   // Compute probability
   std::vector<double> probability;

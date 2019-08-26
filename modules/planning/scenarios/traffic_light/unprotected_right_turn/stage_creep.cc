@@ -115,7 +115,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
   }
 
   double creep_stop_s = traffic_light->end_s +
-      task->FindCreepDistance(*frame, reference_line_info);
+                        task->FindCreepDistance(*frame, reference_line_info);
   const double distance =
       creep_stop_s - reference_line_info.AdcSlBoundary().end_s();
   if (distance <= 0.0) {

@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 #pragma once
+#include <algorithm>
 #include <map>
 #include <vector>
-#include <algorithm>
 #include "modules/perception/tool/benchmark/lidar/base/frame.h"
 #include "modules/perception/tool/benchmark/lidar/eval/meta_statistics.h"
 

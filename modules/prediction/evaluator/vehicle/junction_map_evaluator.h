@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "torch/script.h"
 #include "torch/extension.h"
+#include "torch/script.h"
 
 #include "modules/prediction/evaluator/evaluator.h"
 

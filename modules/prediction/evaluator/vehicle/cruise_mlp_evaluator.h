@@ -96,10 +96,9 @@ class CruiseMLPEvaluator : public Evaluator {
    */
   void LoadModels();
 
-  void ModelInference(
-      const std::vector<torch::jit::IValue>& torch_inputs,
-      torch::jit::script::Module torch_model_ptr,
-      LaneSequence* lane_sequence_ptr);
+  void ModelInference(const std::vector<torch::jit::IValue>& torch_inputs,
+                      torch::jit::script::Module torch_model_ptr,
+                      LaneSequence* lane_sequence_ptr);
 
  private:
   static const size_t OBSTACLE_FEATURE_SIZE = 23 + 5 * 9;

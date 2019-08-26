@@ -34,8 +34,7 @@ struct YieldSignContext;
 
 class YieldSignStageCreep : public Stage {
  public:
-  explicit YieldSignStageCreep(
-      const ScenarioConfig::StageConfig& config)
+  explicit YieldSignStageCreep(const ScenarioConfig::StageConfig& config)
       : Stage(config) {}
 
  private:

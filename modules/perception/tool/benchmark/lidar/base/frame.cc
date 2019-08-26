@@ -18,9 +18,9 @@
 #include <unistd.h>
 #include <fstream>
 #include <iostream>
+#include <set>
 #include <string>
 #include <vector>
-#include <set>
 #include "modules/perception/tool/benchmark/lidar/util/geo_util.h"
 #include "modules/perception/tool/benchmark/lidar/util/io_util.h"
 #include "modules/perception/tool/benchmark/lidar/util/object_util.h"
