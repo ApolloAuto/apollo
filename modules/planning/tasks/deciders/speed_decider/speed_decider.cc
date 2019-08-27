@@ -43,9 +43,7 @@ using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
 using apollo::perception::PerceptionObstacle;
 
-SpeedDecider::SpeedDecider(const TaskConfig& config) : Task(config) {
-  SetName("SpeedDecider");
-}
+SpeedDecider::SpeedDecider(const TaskConfig& config) : Task(config) {}
 
 common::Status SpeedDecider::Execute(Frame* frame,
                                      ReferenceLineInfo* reference_line_info) {

@@ -46,7 +46,6 @@ using apollo::common::TrajectoryPoint;
 PiecewiseJerkSpeedOptimizer::PiecewiseJerkSpeedOptimizer(
     const TaskConfig& config)
     : SpeedOptimizer(config) {
-  SetName("PiecewiseJerkSpeedOptimizer");
   CHECK(config_.has_piecewise_jerk_speed_config());
 }
 

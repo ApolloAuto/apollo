@@ -45,7 +45,6 @@ RuleBasedStopDecider::RuleBasedStopDecider(const TaskConfig &config)
     : Decider(config) {
   CHECK(config.has_rule_based_stop_decider_config());
   rule_based_stop_decider_config_ = config.rule_based_stop_decider_config();
-  SetName("RuleBasedStopDecider");
 }
 
 apollo::common::Status RuleBasedStopDecider::Process(
