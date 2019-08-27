@@ -38,9 +38,7 @@ using ad_rss::world::Object;
 using ad_rss::world::RoadArea;
 using ad_rss::world::Scene;
 
-RssDecider::RssDecider(const TaskConfig &config) : Task(config) {
-  SetName("RssDecider");
-}
+RssDecider::RssDecider(const TaskConfig &config) : Task(config) {}
 
 apollo::common::Status RssDecider::Execute(
     Frame *frame, ReferenceLineInfo *reference_line_info) {

@@ -35,9 +35,7 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
 
-PathDecider::PathDecider(const TaskConfig &config) : Task(config) {
-  SetName("PathDecider");
-}
+PathDecider::PathDecider(const TaskConfig &config) : Task(config) {}
 
 Status PathDecider::Execute(Frame *frame,
                             ReferenceLineInfo *reference_line_info) {

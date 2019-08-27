@@ -46,7 +46,6 @@ SpeedBoundsDecider::SpeedBoundsDecider(const TaskConfig &config)
     : Decider(config) {
   CHECK(config.has_speed_bounds_decider_config());
   speed_bounds_config_ = config.speed_bounds_decider_config();
-  SetName("SpeedBoundsDecider");
 }
 
 Status SpeedBoundsDecider::Process(

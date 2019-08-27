@@ -41,8 +41,6 @@ PathTimeHeuristicOptimizer::PathTimeHeuristicOptimizer(const TaskConfig& config)
     : SpeedOptimizer(config) {
   CHECK(config.has_dp_st_speed_config());
   dp_st_speed_config_ = config.dp_st_speed_config();
-  // TODO(all): fix the name
-  SetName("DpStSpeedOptimizer");
 }
 
 bool PathTimeHeuristicOptimizer::SearchPathTimeGraph(

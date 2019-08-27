@@ -39,7 +39,6 @@ using apollo::common::Status;
 
 PiecewiseJerkPathOptimizer::PiecewiseJerkPathOptimizer(const TaskConfig& config)
     : PathOptimizer(config) {
-  SetName("PiecewiseJerkPathOptimizer");
   CHECK(config_.has_piecewise_jerk_path_config());
 }
 
