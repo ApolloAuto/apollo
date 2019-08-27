@@ -38,11 +38,16 @@ VehicleManager::VehicleManager() {
       << FLAGS_vehicle_data_config_filename;
 }
 
+std::string VehicleManager::GetVehicleDataPath() const {
+  return vehicle_data_path_;
+}
+
 bool VehicleManager::UseVehicle(const std::string &vehicle_data_path) {
   if (!cyber::common::DirectoryExists(vehicle_data_path)) {
     AERROR << "Cannot find vehicle data: " << vehicle_data_path;
     return false;
   }
+  vehicle_data_path_ = vehicle_data_path;
 
   for (const auto &data_file : vehicle_data_.data_files()) {
     const auto source_path =

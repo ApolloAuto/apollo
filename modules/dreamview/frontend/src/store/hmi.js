@@ -67,8 +67,7 @@ export default class HMI {
         if (newStatus.currentMode) {
             this.isCalibrationMode = (newStatus.currentMode.toLowerCase().includes('calibration'));
             if (this.currentMode !== newStatus.currentMode) {
-                this.dataCollectionUpdateStatus.clear();
-                this.dataCollectionProgress.clear();
+                this.resetDataCollectionProgress();
             }
             this.currentMode = newStatus.currentMode;
         }
@@ -84,6 +83,9 @@ export default class HMI {
             this.vehicles = newStatus.vehicles.sort();
         }
         if (newStatus.currentVehicle) {
+            if (this.isCalibrationMode && this.currentVehicle !== newStatus.currentVehicle) {
+                this.resetDataCollectionProgress();
+            }
             this.currentVehicle = newStatus.currentVehicle;
         }
 
@@ -135,6 +137,11 @@ export default class HMI {
         return this.currentMode === "Navigation";
     }
 
+    @action resetDataCollectionProgress() {
+        this.dataCollectionUpdateStatus.clear();
+        this.dataCollectionProgress.clear();
+    }
+
     @action updateDataCollectionProgress(data) {
         Object.keys(data).sort().forEach((scenarioName) => {
             if (!this.dataCollectionProgress.has(scenarioName)) {
@@ -142,7 +149,7 @@ export default class HMI {
                 this.dataCollectionUpdateStatus.set(scenarioName, observable.map());
             }
             const categoryProgress = this.dataCollectionProgress.get(scenarioName);
-            const categoryStatus =  this.dataCollectionUpdateStatus.get(scenarioName);
+            const categoryStatus = this.dataCollectionUpdateStatus.get(scenarioName);
             const scenario = data[scenarioName];
             Object.keys(scenario).sort().forEach((categoryName) => {
                 const isUpdated = categoryProgress.get(categoryName) !== scenario[categoryName];
