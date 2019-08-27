@@ -31,8 +31,8 @@ namespace dreamview {
 
 class VehicleManager {
  public:
-  bool UseVehicle(const std::string &vehicle_data_path);
-  std::string GetVehicleDataPath() const;
+  bool UseVehicle(const std::string& vehicle_data_path);
+  const std::string& GetVehicleDataPath() const;
 
  private:
   std::string vehicle_data_path_;

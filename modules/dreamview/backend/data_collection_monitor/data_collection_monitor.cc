@@ -109,7 +109,7 @@ void DataCollectionMonitor::InitReaders() {
 }
 
 void DataCollectionMonitor::LoadConfiguration() {
-  const std::string vehicle_dir =
+  const std::string& vehicle_dir =
       VehicleManager::Instance()->GetVehicleDataPath();
   std::string data_collection_config_path =
       vehicle_dir + "/data_collection_table.pb.txt";
