@@ -105,6 +105,9 @@ void HMI::RegisterMessageHandlers() {
           // Reload lidar params for point cloud service.
           PointCloudUpdater::LoadLidarHeight(FLAGS_lidar_height_yaml);
           SendVehicleParam();
+          if (data_collection_monitor_->IsEnabled()) {
+            data_collection_monitor_->Restart();
+          }
         } else if (hmi_action == HMIAction::CHANGE_MODE) {
           static constexpr char kCalibrationMode[] = "Vehicle Calibration";
           if (value == kCalibrationMode) {

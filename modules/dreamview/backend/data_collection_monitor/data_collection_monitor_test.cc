@@ -47,7 +47,7 @@ class DataCollectionMonitorTest : public ::testing::Test {
 
  protected:
   DataCollectionMonitorTest() {
-    FLAGS_data_collection_config_path =
+    FLAGS_default_data_collection_config_path =
         "/apollo/modules/dreamview/backend/testdata/"
         "data_collection_table.pb.txt";
   }

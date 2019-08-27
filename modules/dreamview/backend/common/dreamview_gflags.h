@@ -58,4 +58,4 @@ DECLARE_string(lidar_height_yaml);
 
 DECLARE_int32(monitor_msg_pending_queue_size);
 
-DECLARE_string(data_collection_config_path);
+DECLARE_string(default_data_collection_config_path);
