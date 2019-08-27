@@ -272,6 +272,10 @@
 			"default": true,
 			"menuId": "mapStopSign"
 		},
+		"showMapYield": {
+			"default": true,
+			"menuId": "mapYield"
+		},
 		"showMapSpeedBump": {
 			"default": true,
 			"menuId": "mapSpeedBump"

@@ -5,6 +5,7 @@ import ControlIcons from "components/PlaybackControls/ControlIcons";
 import TimeControls from "components/PlaybackControls/TimeControls";
 import WS from "store/websocket";
 
+const PLAY_BACK_SPEED = [0.5, 1.0, 1.5, 2.0, 3.0];
 
 @inject("store") @observer
 export default class PlaybackControls extends React.Component {
@@ -29,7 +30,7 @@ export default class PlaybackControls extends React.Component {
         const { playback } = this.props.store;
 
         const newRate = parseFloat(event.target.value);
-        this.setState({rate: newRate});
+        this.setState({ rate: newRate });
         playback.setPlayRate(newRate);
 
         if (this.state.isPlaying) {
@@ -42,7 +43,7 @@ export default class PlaybackControls extends React.Component {
 
         const isPlaying = !this.state.isPlaying;
         playback.setPlayAction(isPlaying);
-        this.setState({isPlaying: isPlaying});
+        this.setState({ isPlaying: isPlaying });
 
         switch (this.nextAction) {
             case 'play':
@@ -64,11 +65,11 @@ export default class PlaybackControls extends React.Component {
         switch (this.state.nextScreenMode) {
             case 'fullscreen':
                 options.showMenu = false;
-                this.setState({nextScreenMode: 'normalscreen'});
+                this.setState({ nextScreenMode: 'normalscreen' });
                 break;
             case 'normalscreen':
                 options.showMenu = true;
-                this.setState({nextScreenMode: 'fullscreen'});
+                this.setState({ nextScreenMode: 'fullscreen' });
                 break;
         }
     }
@@ -89,7 +90,7 @@ export default class PlaybackControls extends React.Component {
 
         if (playback.replayComplete && this.state.isPlaying) {
             playback.setPlayAction(false);
-            this.setState({isPlaying: false});
+            this.setState({ isPlaying: false });
         }
 
         if (playback.replayComplete && !playback.isSeeking) {
@@ -102,7 +103,7 @@ export default class PlaybackControls extends React.Component {
     }
 
     render() {
-        const {playback} = this.props.store;
+        const { playback } = this.props.store;
 
         return (
             <div className="playback-controls">
@@ -111,10 +112,8 @@ export default class PlaybackControls extends React.Component {
                               type={this.nextAction} />
                 <div className="rate-selector">
                     <select onChange={this.handleRateChange} value={this.state.rate}>
-                        <option value={0.25}>x 0.25</option>
-                        <option value={0.5}>x 0.5</option>
-                        <option value={1.0}>x 1.0</option>
-                        <option value={2.0}>x 2.0</option>
+                        {PLAY_BACK_SPEED.map(
+                            (speed) => <option value={speed}>{`x ${speed.toFixed(1)}`}</option>)}
                     </select>
                     <span className="arrow"></span>
                 </div>
