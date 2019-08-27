@@ -98,7 +98,7 @@ DEFINE_bool(enable_scenario_stop_sign, true,
 DEFINE_bool(enable_scenario_traffic_light, true,
             "enable traffic_light scenarios in planning");
 
-DEFINE_bool(enable_scenario_yield_sign, false,
+DEFINE_bool(enable_scenario_yield_sign, true,
             "enable yield_sign scenarios in planning");
 
 DEFINE_bool(enable_force_pull_over_open_space_parking_test, false,
