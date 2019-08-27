@@ -38,7 +38,7 @@ VehicleManager::VehicleManager() {
       << FLAGS_vehicle_data_config_filename;
 }
 
-std::string VehicleManager::GetVehicleDataPath() const {
+const std::string &VehicleManager::GetVehicleDataPath() const {
   return vehicle_data_path_;
 }
 
