@@ -17,19 +17,25 @@
 ###############################################################################
 
 import math
+import sys
+import matplotlib.pyplot as plt
+import numpy as np
+from os import listdir
+from os.path import isfile, join
+
 from record_reader import RecordItemReader
 from imu_speed_jerk import ImuSpeedJerk
 from imu_speed_acc import ImuSpeedAcc
 
 
+def grid(data_list, shift):
+    data_grid = []
+    for data in data_list:
+        data_grid.append(round(data) + shift/10.0)
+    return data_grid
+
+
 if __name__ == "__main__":
-    import sys
-    import matplotlib.pyplot as plt
-    import numpy as np
-    from os import listdir
-    from os.path import isfile, join
-
-
     folders = sys.argv[1:]
     fig, ax = plt.subplots(1, 1)
     colors = ["g", "b", "r", "m", "y"]
@@ -54,9 +60,9 @@ if __name__ == "__main__":
                     acc_processor.add(pose_data)
                     jerk_processor.add(pose_data)
 
-            data_x = acc_processor.get_acc_list()
-            data_y = jerk_processor.get_jerk_list()
-            data_x = data_x[-1* len(data_y):]
+            data_x = grid(acc_processor.get_acc_list(), i + 1)
+            data_y = grid(jerk_processor.get_jerk_list(), i + 1)
+            data_x = data_x[-1 * len(data_y):]
             x.extend(data_x)
             y.extend(data_y)
 
