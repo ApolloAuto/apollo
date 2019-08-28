@@ -58,7 +58,8 @@ TEST_F(TrafficLightUnprotectedRightTurnStageIntersectionCruiseTest, Init) {
   TrafficLightUnprotectedRightTurnStageIntersectionCruise
       traffic_light_unprotected_right_turn_stage_intersection_cruise(
       traffic_light_unprotected_right_turn_config_.stage_config(2));
-  EXPECT_EQ(traffic_light_unprotected_right_turn_stage_intersection_cruise.Name(),
+  EXPECT_EQ(traffic_light_unprotected_right_turn_stage_intersection_cruise
+      .Name(),
       ScenarioConfig::StageType_Name(
       traffic_light_unprotected_right_turn_config_.stage_config(2)
       .stage_type()));

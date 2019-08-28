@@ -56,6 +56,9 @@ stage_config: {
   task_config: {
     task_type: SPEED_BOUNDS_FINAL_DECIDER
   }
+  task_config: {
+    task_type: RULE_BASED_STOP_DECIDER
+  }
 }
 
 stage_config: {
