@@ -386,7 +386,7 @@ bool Visualizer::reset_key() {
   show_associate_color_ = false;
   show_type_id_label_ = true;
   show_verbose_ = false;
-  show_lane_ = true;
+  show_lane_count_ = 1;
   show_trajectory_ = true;
   show_vp_grid_ = true;  // show vanishing point and ground plane grid
   draw_lane_objects_ = true;
@@ -675,7 +675,7 @@ bool Visualizer::key_handler(const std::string &camera_name, const int key) {
       show_camera_bdv_ = !show_camera_bdv_;
       break;
     case KEY_UPPER_Q: case KEY_LOWER_Q:
-      show_lane_ = !show_lane_;
+      show_lane_count_ = (show_lane_count_ + 1) % 3;
       break;
     case KEY_UPPER_R: case KEY_LOWER_R:
       reset_key();
@@ -760,7 +760,7 @@ bool Visualizer::key_handler(const std::string &camera_name, const int key) {
     help_str_ += "\nI: show type id label";
     if (show_type_id_label_) help_str_ += " (ON)";
     help_str_ += "\nQ: show lane";
-    if (show_lane_) help_str_ += " (ON)";
+    if (show_lane_count_ > 0) help_str_ += " (ON)";
     help_str_ += "\nE: draw lane objects";
     if (draw_lane_objects_) help_str_ += " (ON)";
     help_str_ += "\nF: show fusion";
@@ -998,28 +998,63 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
              apollo::perception::white_color, 2);
   }
   // plot laneline on image and ground plane
-  for (const auto &object : frame.lane_objects) {
-    cv::Scalar lane_color = colormapline[object.pos_type];
-    cv::Point p_prev;
-    p_prev.x = static_cast<int>(object.curve_image_point_set[0].x);
-    p_prev.y = static_cast<int>(object.curve_image_point_set[0].y);
-    Eigen::Vector2d p_prev_ground = image2ground(p_prev);
-    for (unsigned i = 1; i < object.curve_image_point_set.size(); i++) {
-      cv::Point p_cur;
-      p_cur.x = static_cast<int>(object.curve_image_point_set[i].x);
-      p_cur.y = static_cast<int>(object.curve_image_point_set[i].y);
-      Eigen::Vector2d p_cur_ground = image2ground(p_cur);
+  if (show_lane_count_ > 0) {  // Do now show lane line
+    for (const auto &object : frame.lane_objects) {
+      cv::Scalar lane_color = colormapline[object.pos_type];
+      if (show_lane_count_ == 1) {  // show inlier points
+        cv::Point p_prev;
+        p_prev.x = static_cast<int>(object.curve_image_point_set[0].x);
+        p_prev.y = static_cast<int>(object.curve_image_point_set[0].y);
+        Eigen::Vector2d p_prev_ground = image2ground(p_prev);
+        for (unsigned i = 1; i < object.curve_image_point_set.size(); i++) {
+          cv::Point p_cur;
+          p_cur.x = static_cast<int>(object.curve_image_point_set[i].x);
+          p_cur.y = static_cast<int>(object.curve_image_point_set[i].y);
+          Eigen::Vector2d p_cur_ground = image2ground(p_cur);
 
-      if (p_cur.x >= 0 && p_cur.y >= 0 && p_prev.x >= 0 && p_prev.y >= 0 &&
-          p_cur.x < image_width_ && p_cur.y < image_height_ &&
-          p_prev.x < image_width_ && p_prev.y <  image_height_) {
-        cv::line(image_2D, p_prev, p_cur, lane_color, line_thickness_);
-        cv::line(image_3D, p_prev, p_cur, lane_color, line_thickness_);
+          if (p_cur.x >= 0 && p_cur.y >= 0 && p_prev.x >= 0 && p_prev.y >= 0 &&
+              p_cur.x < image_width_ && p_cur.y < image_height_ &&
+              p_prev.x < image_width_ && p_prev.y <  image_height_) {
+            cv::line(image_2D, p_prev, p_cur, lane_color, line_thickness_);
+            cv::line(image_3D, p_prev, p_cur, lane_color, line_thickness_);
+          }
+          cv::line(world_image_, world_point_to_bigimg(p_prev_ground),
+                   world_point_to_bigimg(p_cur_ground), lane_color, 2);
+          p_prev = p_cur;
+          p_prev_ground = p_cur_ground;
+        }
+      } else if (show_lane_count_ == 2) {  // Show fitted curve
+        base::LaneLineCubicCurve curve_coord = object.curve_car_coord;
+        Eigen::Vector2d p_prev_ground;
+        float step =
+            std::max(std::abs(curve_coord.x_end - curve_coord.x_start) /
+                              static_cast<float>(lane_step_num_), 3.0f);
+        float x = curve_coord.x_start;
+        p_prev_ground(0) = x;
+        p_prev_ground(1) = curve_coord.a * x * x * x + curve_coord.b * x * x +
+                         curve_coord.c * x + curve_coord.d;
+        cv::Point p_prev = ground2image(p_prev_ground);
+        x += step;
+        for (unsigned int i = 0;
+             x < curve_coord.x_end && i < lane_step_num_;
+             x += step, i++) {
+          Eigen::Vector2d p_cur_ground;
+          p_cur_ground(0) = x;
+          p_cur_ground(1) = curve_coord.a * x * x * x + curve_coord.b * x * x +
+                           curve_coord.c * x + curve_coord.d;
+          cv::Point p_cur = ground2image(p_cur_ground);
+          if (p_cur.x >= 0 && p_cur.y >= 0 && p_prev.x >= 0 && p_prev.y >= 0 &&
+              p_cur.x < image_width_ && p_cur.y < image_height_ &&
+              p_prev.x < image_width_ && p_prev.y <  image_height_) {
+            cv::line(image_2D, p_prev, p_cur, lane_color, line_thickness_);
+            cv::line(image_3D, p_prev, p_cur, lane_color, line_thickness_);
+          }
+          cv::line(world_image_, world_point_to_bigimg(p_prev_ground),
+                   world_point_to_bigimg(p_cur_ground), lane_color, 2);
+          p_prev = p_cur;
+          p_prev_ground = p_cur_ground;
+        }
       }
-      cv::line(world_image_, world_point_to_bigimg(p_prev_ground),
-               world_point_to_bigimg(p_cur_ground), lane_color, 2);
-      p_prev = p_cur;
-      p_prev_ground = p_cur_ground;
     }
   }
 

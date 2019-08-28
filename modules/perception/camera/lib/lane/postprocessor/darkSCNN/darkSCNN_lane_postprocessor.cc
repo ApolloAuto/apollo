@@ -234,6 +234,7 @@ bool DarkSCNNLanePostprocessor::Process2D(
       xy_points[i].clear();
       xy_points[i] = selected_xy_points;
     } else {
+      coeffs[i] << 0, 0, 0, 0;
       xy_points[i].clear();
     }
   }
