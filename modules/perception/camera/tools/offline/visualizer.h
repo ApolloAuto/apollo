@@ -171,7 +171,6 @@ class Visualizer {
   bool show_associate_color_ = false;
   bool show_type_id_label_ = true;
   bool show_verbose_ = false;
-  bool show_lane_ = true;
   bool show_trajectory_ = true;
   bool show_vp_grid_ = true;  // show vanishing point and ground plane grid
   bool draw_lane_objects_ = true;
@@ -182,6 +181,7 @@ class Visualizer {
   bool show_help_text_ = false;
   bool manual_calibration_mode_ = false;
   bool show_homography_object_ = false;
+  unsigned int show_lane_count_ = 1;
   std::string help_str_;
   // color
   cv::Scalar color_cipv_ = cv::Scalar(255, 255, 255);
@@ -190,6 +190,7 @@ class Visualizer {
   int cipv_line_thickness_ = 6;
   int trajectory_line_thickness_ = 1;
   double speed_limit_ = 1.0;  // in m/s
+  unsigned int lane_step_num_ = 20;
   Cipv cipv_;
 };
 
