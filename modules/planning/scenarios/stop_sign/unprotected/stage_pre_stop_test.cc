@@ -15,9 +15,10 @@
  *****************************************************************************/
 
 /**
- * @file
+ * @file stage_pre_stop_test.cc
  **/
-#include "modules/planning/scenarios/park/valet_parking/stage_approaching_parking_spot.h"
+
+#include "modules/planning/scenarios/stop_sign/unprotected/stage_pre_stop.h"
 
 #include "gtest/gtest.h"
 
@@ -30,11 +31,11 @@
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace valet_parking {
+namespace stop_sign {
 
 using apollo::cyber::common::GetProtoFromFile;
 
-class StageApproachingParkingSpotTest : public ::testing::Test {
+class StopSignUnprotectedStagePreStopTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     PlanningConfig planning_config;
@@ -42,24 +43,25 @@ class StageApproachingParkingSpotTest : public ::testing::Test {
         << "failed to load planning config file " << FLAGS_planning_config_file;
     TaskFactory::Init(planning_config);
     CHECK(GetProtoFromFile(
-        FLAGS_scenario_valet_parking_config_file, &valet_parking_config_))
-        << "failed to load valet_parking config file "
-        << FLAGS_scenario_valet_parking_config_file;
+        FLAGS_scenario_stop_sign_unprotected_config_file,
+        &stop_sign_unprotected_config_))
+        << "failed to load stop_sign_unprotected config file "
+        << FLAGS_scenario_stop_sign_unprotected_config_file;
   }
 
  protected:
-  ScenarioConfig valet_parking_config_;
+  ScenarioConfig stop_sign_unprotected_config_;
 };
 
-TEST_F(StageApproachingParkingSpotTest, Init) {
-  StageApproachingParkingSpot stage_approaching_parking_spot(
-      valet_parking_config_.stage_config(0));
-  EXPECT_EQ(stage_approaching_parking_spot.Name(),
+TEST_F(StopSignUnprotectedStagePreStopTest, Init) {
+  StopSignUnprotectedStagePreStop stop_sign_unprotected_stage_pre_stop(
+      stop_sign_unprotected_config_.stage_config(0));
+  EXPECT_EQ(stop_sign_unprotected_stage_pre_stop.Name(),
       ScenarioConfig::StageType_Name(
-      valet_parking_config_.stage_config(0).stage_type()));
+      stop_sign_unprotected_config_.stage_config(0).stage_type()));
 }
 
-}  // namespace valet_parking
+}  // namespace stop_sign
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

@@ -41,4 +41,21 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "bare_intersection_unprotected_stages_test",
+    size = "small",
+    srcs = [
+        "stage_approach_test.cc",
+        "stage_intersection_cruise_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        "//modules/planning/tasks:task_factory",
+        ":bare_intersection_unprotected_scenario",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

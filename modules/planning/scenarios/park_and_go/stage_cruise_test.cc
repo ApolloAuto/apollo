@@ -16,7 +16,7 @@
 
 /**
  * @file stage_cruise_test.cc
- */
+ **/
 
 #include "modules/planning/scenarios/park_and_go/stage_cruise.h"
 
@@ -53,11 +53,11 @@ class ParkAndGoStageCruiseTest : public ::testing::Test {
 };
 
 TEST_F(ParkAndGoStageCruiseTest, Init) {
-  AERROR << park_and_go_config_.stage_config(2).ShortDebugString();
   ParkAndGoStageCruise park_and_go_stage_cruise(
       park_and_go_config_.stage_config(2));
-  EXPECT_EQ(park_and_go_stage_cruise.stage_type(),
-            ScenarioConfig::PARK_AND_GO_CRUISE);
+  EXPECT_EQ(park_and_go_stage_cruise.Name(),
+      ScenarioConfig::StageType_Name(
+      park_and_go_config_.stage_config(2).stage_type()));
 }
 
 }  // namespace park_and_go

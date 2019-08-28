@@ -48,10 +48,11 @@ cc_test(
 )
 
 cc_test(
-    name = "stage_approach_test",
+    name = "pull_over_stages_test",
     size = "small",
     srcs = [
         "stage_approach_test.cc",
+        "stage_retry_parking_test.cc",
     ],
     data = [
         "//modules/planning:planning_conf",

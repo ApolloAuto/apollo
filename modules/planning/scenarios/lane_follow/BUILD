@@ -102,4 +102,20 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "lane_follow_stages_test",
+    size = "small",
+    srcs = [
+        "lane_follow_stage_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        "//modules/planning/tasks:task_factory",
+        ":lane_follow",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

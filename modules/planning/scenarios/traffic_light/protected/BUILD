@@ -40,4 +40,20 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "traffic_light_protected_stages_test",
+    size = "small",
+    srcs = [
+        "stage_approach_test.cc",
+        "stage_intersection_cruise_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        ":traffic_light_protected_scenario",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

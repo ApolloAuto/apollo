@@ -46,4 +46,22 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "stop_sign_unprotected_stages_test",
+    size = "small",
+    srcs = [
+        "stage_creep_test.cc",
+        "stage_intersection_cruise_test.cc",
+        "stage_pre_stop_test.cc",
+        "stage_stop_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        ":stop_sign_unprotected_scenario",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

@@ -14,8 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#define protected public
-#define private public
+/**
+ * @file stage_approach_test.cc
+ **/
+
 #include "modules/planning/scenarios/park/pull_over/stage_approach.h"
 
 #include "gtest/gtest.h"
@@ -23,35 +25,39 @@
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/tasks/task_factory.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace pull_over {
 
-class StageApproachTest : public ::testing::Test {
+using apollo::cyber::common::GetProtoFromFile;
+
+class PullOverStageApproachTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::PULL_OVER_APPROACH);
+    PlanningConfig planning_config;
+    CHECK(GetProtoFromFile(FLAGS_planning_config_file, &planning_config))
+        << "failed to load planning config file " << FLAGS_planning_config_file;
+    TaskFactory::Init(planning_config);
+    CHECK(GetProtoFromFile(
+        FLAGS_scenario_pull_over_config_file, &pull_over_config_))
+        << "failed to load pull_over config file "
+        << FLAGS_scenario_pull_over_config_file;
   }
 
  protected:
-  ScenarioConfig::StageConfig config_;
+  ScenarioConfig pull_over_config_;
 };
 
-TEST_F(StageApproachTest, VerifyConf) {
-  FLAGS_scenario_pull_over_config_file =
-      "/apollo/modules/planning/conf/scenario/pull_over_config.pb.txt";
-
-  ScenarioConfig config;
-  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_pull_over_config_file, &config));
-}
-
-TEST_F(StageApproachTest, Init) {
-  PullOverStageApproach pull_over_stage_approach(config_);
+TEST_F(PullOverStageApproachTest, Init) {
+  PullOverStageApproach pull_over_stage_approach(
+      pull_over_config_.stage_config(0));
   EXPECT_EQ(pull_over_stage_approach.Name(),
-            ScenarioConfig::StageType_Name(config_.stage_type()));
+      ScenarioConfig::StageType_Name(
+      pull_over_config_.stage_config(0).stage_type()));
 }
 
 }  // namespace pull_over

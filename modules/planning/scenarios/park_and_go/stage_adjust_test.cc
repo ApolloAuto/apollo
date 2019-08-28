@@ -15,8 +15,9 @@
  *****************************************************************************/
 
 /**
- * @file
+ * @file stage_adjust_test.cc
  **/
+
 #include "modules/planning/scenarios/park_and_go/stage_adjust.h"
 
 #include "gtest/gtest.h"

@@ -15,9 +15,10 @@
  *****************************************************************************/
 
 /**
- * @file
+ * @file stage_approach_test.cc
  **/
-#include "modules/planning/scenarios/park/valet_parking/stage_approaching_parking_spot.h"
+
+#include "modules/planning/scenarios/yield_sign/stage_approach.h"
 
 #include "gtest/gtest.h"
 
@@ -30,11 +31,11 @@
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace valet_parking {
+namespace yield_sign {
 
 using apollo::cyber::common::GetProtoFromFile;
 
-class StageApproachingParkingSpotTest : public ::testing::Test {
+class YieldSignStageApproachTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     PlanningConfig planning_config;
@@ -42,24 +43,24 @@ class StageApproachingParkingSpotTest : public ::testing::Test {
         << "failed to load planning config file " << FLAGS_planning_config_file;
     TaskFactory::Init(planning_config);
     CHECK(GetProtoFromFile(
-        FLAGS_scenario_valet_parking_config_file, &valet_parking_config_))
-        << "failed to load valet_parking config file "
-        << FLAGS_scenario_valet_parking_config_file;
+        FLAGS_scenario_yield_sign_config_file, &yield_sign_config_))
+        << "failed to load yield_sign config file "
+        << FLAGS_scenario_yield_sign_config_file;
   }
 
  protected:
-  ScenarioConfig valet_parking_config_;
+  ScenarioConfig yield_sign_config_;
 };
 
-TEST_F(StageApproachingParkingSpotTest, Init) {
-  StageApproachingParkingSpot stage_approaching_parking_spot(
-      valet_parking_config_.stage_config(0));
-  EXPECT_EQ(stage_approaching_parking_spot.Name(),
+TEST_F(YieldSignStageApproachTest, Init) {
+  YieldSignStageApproach yield_sign_stage_approach(
+      yield_sign_config_.stage_config(0));
+  EXPECT_EQ(yield_sign_stage_approach.Name(),
       ScenarioConfig::StageType_Name(
-      valet_parking_config_.stage_config(0).stage_type()));
+      yield_sign_config_.stage_config(0).stage_type()));
 }
 
-}  // namespace valet_parking
+}  // namespace yield_sign
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

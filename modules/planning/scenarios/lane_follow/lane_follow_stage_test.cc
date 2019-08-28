@@ -15,9 +15,10 @@
  *****************************************************************************/
 
 /**
- * @file
+ * @file lane_follow_stage_test.cc
  **/
-#include "modules/planning/scenarios/park/valet_parking/stage_approaching_parking_spot.h"
+
+#include "modules/planning/scenarios/lane_follow/lane_follow_stage.h"
 
 #include "gtest/gtest.h"
 
@@ -30,11 +31,11 @@
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace valet_parking {
+namespace lane_follow {
 
 using apollo::cyber::common::GetProtoFromFile;
 
-class StageApproachingParkingSpotTest : public ::testing::Test {
+class LaneFollowStageTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     PlanningConfig planning_config;
@@ -42,24 +43,24 @@ class StageApproachingParkingSpotTest : public ::testing::Test {
         << "failed to load planning config file " << FLAGS_planning_config_file;
     TaskFactory::Init(planning_config);
     CHECK(GetProtoFromFile(
-        FLAGS_scenario_valet_parking_config_file, &valet_parking_config_))
-        << "failed to load valet_parking config file "
-        << FLAGS_scenario_valet_parking_config_file;
+        FLAGS_scenario_lane_follow_config_file, &lane_follow_config_))
+        << "failed to load lane_follow config file "
+        << FLAGS_scenario_lane_follow_config_file;
   }
 
  protected:
-  ScenarioConfig valet_parking_config_;
+  ScenarioConfig lane_follow_config_;
 };
 
-TEST_F(StageApproachingParkingSpotTest, Init) {
-  StageApproachingParkingSpot stage_approaching_parking_spot(
-      valet_parking_config_.stage_config(0));
-  EXPECT_EQ(stage_approaching_parking_spot.Name(),
+TEST_F(LaneFollowStageTest, Init) {
+  LaneFollowStage lane_follow_stage(
+      lane_follow_config_.stage_config(0));
+  EXPECT_EQ(lane_follow_stage.Name(),
       ScenarioConfig::StageType_Name(
-      valet_parking_config_.stage_config(0).stage_type()));
+      lane_follow_config_.stage_config(0).stage_type()));
 }
 
-}  // namespace valet_parking
+}  // namespace lane_follow
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

@@ -15,32 +15,49 @@
  *****************************************************************************/
 
 /**
- * @file
+ * @file stage_parking_test.cc
  **/
+
 #include "modules/planning/scenarios/park/valet_parking/stage_parking.h"
 
 #include "gtest/gtest.h"
+
+#include "cyber/common/file.h"
+#include "cyber/common/log.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/tasks/task_factory.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace valet_parking {
 
+using apollo::cyber::common::GetProtoFromFile;
+
 class StageParkingTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::VALET_PARKING_PARKING);
+    PlanningConfig planning_config;
+    CHECK(GetProtoFromFile(FLAGS_planning_config_file, &planning_config))
+        << "failed to load planning config file " << FLAGS_planning_config_file;
+    TaskFactory::Init(planning_config);
+    CHECK(GetProtoFromFile(
+        FLAGS_scenario_valet_parking_config_file, &valet_parking_config_))
+        << "failed to load valet_parking config file "
+        << FLAGS_scenario_valet_parking_config_file;
   }
 
  protected:
-  ScenarioConfig::StageConfig config_;
+  ScenarioConfig valet_parking_config_;
 };
 
 TEST_F(StageParkingTest, Init) {
-  StageParking stage_parking(config_);
+  StageParking stage_parking(
+      valet_parking_config_.stage_config(1));
   EXPECT_EQ(stage_parking.Name(),
-            ScenarioConfig::StageType_Name(config_.stage_type()));
+      ScenarioConfig::StageType_Name(
+      valet_parking_config_.stage_config(1).stage_type()));
 }
 
 }  // namespace valet_parking

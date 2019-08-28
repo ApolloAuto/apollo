@@ -40,4 +40,20 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "traffic_light_left_turn_unprotected_stages_test",
+    size = "small",
+    srcs = [
+        "stage_creep_test.cc",
+        "stage_intersection_cruise_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        ":traffic_light_unprotected_left_turn_scenario",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

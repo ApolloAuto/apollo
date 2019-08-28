@@ -15,32 +15,49 @@
  *****************************************************************************/
 
 /**
- * @file
+ * @file stage_check_test.cc
  **/
+
 #include "modules/planning/scenarios/park_and_go/stage_check.h"
 
 #include "gtest/gtest.h"
+
+#include "cyber/common/file.h"
+#include "cyber/common/log.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/tasks/task_factory.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace park_and_go {
 
+using apollo::cyber::common::GetProtoFromFile;
+
 class ParkAndGoStageCheckTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::PARK_AND_GO_CHECK);
+    PlanningConfig planning_config;
+    CHECK(GetProtoFromFile(FLAGS_planning_config_file, &planning_config))
+        << "failed to load planning config file " << FLAGS_planning_config_file;
+    TaskFactory::Init(planning_config);
+    CHECK(GetProtoFromFile(
+        FLAGS_scenario_park_and_go_config_file, &park_and_go_config_))
+        << "failed to load park_and_go config file "
+        << FLAGS_scenario_park_and_go_config_file;
   }
 
  protected:
-  ScenarioConfig::StageConfig config_;
+  ScenarioConfig park_and_go_config_;
 };
 
 TEST_F(ParkAndGoStageCheckTest, Init) {
-  ParkAndGoStageCheck park_and_go_stage_check(config_);
+  ParkAndGoStageCheck park_and_go_stage_check(
+      park_and_go_config_.stage_config(0));
   EXPECT_EQ(park_and_go_stage_check.Name(),
-            ScenarioConfig::StageType_Name(config_.stage_type()));
+      ScenarioConfig::StageType_Name(
+      park_and_go_config_.stage_config(0).stage_type()));
 }
 
 }  // namespace park_and_go
