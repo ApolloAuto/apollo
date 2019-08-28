@@ -109,9 +109,10 @@ bool PolyEval(const Dtype& x, int order,
 template <typename Dtype>
 bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
                    std::vector<Eigen::Matrix<Dtype, 2, 1>>* selected_points,
-                   Eigen::Matrix<Dtype, 4, 1>* coeff, const int max_iters = 100,
-                   const int N = 5, const Dtype inlier_thres = 0.1,
-                   const Dtype data_thres = 2.0) {
+                   Eigen::Matrix<Dtype, 4, 1>* coeff,
+                   const int max_iters = 100,
+                   const int N = 5,
+                   const Dtype inlier_thres = static_cast<Dtype>(0.1)) {
   if (coeff == nullptr) {
     AERROR << "The coefficient pointer is NULL.";
     return false;
@@ -147,10 +148,11 @@ bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
         pos_vec[index[2]](0) * pos_vec[index[2]](0),
         pos_vec[index[2]](0), 1;
 
-    // Filter out points which cause degenerate cases
-    if ((std::abs(pos_vec[index[0]](0) - pos_vec[index[1]](0) < data_thres)) ||
-        (std::abs(pos_vec[index[1]](0) - pos_vec[index[2]](0) < data_thres)) ||
-        (std::abs(pos_vec[index[0]](0) - pos_vec[index[2]](0) < data_thres))) {
+    Eigen::FullPivLU<Eigen::Matrix<Dtype, 3, 3>> mat(matA);
+    mat.setThreshold(1e-5f);
+    if (mat.rank() < 3) {
+      ADEBUG << "matA: "<< matA;
+      ADEBUG << "Matrix is not full rank (3). The rank is: " << mat.rank();
       continue;
     }
 
