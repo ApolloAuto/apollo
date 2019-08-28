@@ -19,6 +19,7 @@
 from cyber_py.record import RecordReader
 from modules.canbus.proto import chassis_pb2
 from modules.localization.proto import localization_pb2
+from modules.planning.proto import planning_pb2
 
 class RecordItemReader:
     def __init__(self, record_file):
@@ -38,4 +39,10 @@ class RecordItemReader:
                 location_est = localization_pb2.LocalizationEstimate()
                 location_est.ParseFromString(msg.message)
                 data = {"pose": location_est}
+                yield data                   
+
+            if msg.topic == "/apollo/planning":
+                planning = planning_pb2.ADCTrajectory()
+                planning.ParseFromString(msg.message)
+                data = {"planning": planning}
                 yield data                   
