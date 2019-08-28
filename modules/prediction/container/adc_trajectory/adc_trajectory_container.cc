@@ -135,7 +135,7 @@ void ADCTrajectoryContainer::SetJunctionPolygon() {
     if (vertices.size() >= 3) {
       adc_junction_info_ptr_ = junction_info;
       s_dist_to_junction_ = s_at_junction - s_start;
-      adc_junction_polygon_ = Polygon2d{vertices};
+      adc_junction_polygon_ = std::move(Polygon2d{vertices});
     }
   }
 }
@@ -177,7 +177,7 @@ void ADCTrajectoryContainer::SetPNCJunctionPolygon() {
     if (vertices.size() >= 3) {
       adc_pnc_junction_info_ptr_ = junction_info;
       s_dist_to_junction_ = s_at_junction - s_start;
-      adc_pnc_junction_polygon_ = Polygon2d{vertices};
+      adc_pnc_junction_polygon_ = std::move(Polygon2d{vertices});
     }
   }
 }
