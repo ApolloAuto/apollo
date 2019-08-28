@@ -228,7 +228,7 @@ bool DarkSCNNLanePostprocessor::Process2D(
     Eigen::Matrix<float, 4, 1> coeff;
     // Solve linear system to estimate polynomial coefficients
     if (RansacFitting<float>(xy_points[i], &selected_xy_points, &coeff, 200,
-                      static_cast<int>(minNumPoints_), 0.1f, 2.0f)) {
+                      static_cast<int>(minNumPoints_), 0.1f)) {
       coeffs[i] = coeff;
 
       xy_points[i].clear();
@@ -393,6 +393,8 @@ bool DarkSCNNLanePostprocessor::Process2D(
   // AINFO << "Time for writing: " << microseconds - microseconds_2 << " us";
   time_3 += microseconds - microseconds_2;
   ++time_num;
+
+  ADEBUG << "frame->lane_objects.size(): " << frame->lane_objects.size();
 
   ADEBUG << "Avg sampling time: " << time_1 / time_num
          << " Avg fitting time: " << time_2 / time_num

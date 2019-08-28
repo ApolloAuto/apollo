@@ -350,8 +350,6 @@ bool ObstacleCameraPerception::Perception(
       WriteLanelines(write_out_lane_file_, lane_file_path, frame->lane_objects);
     }
   } else {
-    AINFO << "Skip lane detection & calibration due to sensor mismatch.";
-    AINFO << "Will use service sync from obstacle camera instead.";
     // Fill the frame using previous estimates
     frame->calibration_service->Update(frame);
     PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(

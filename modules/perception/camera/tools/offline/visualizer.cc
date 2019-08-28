@@ -1389,10 +1389,10 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
   // plot predicted vanishing point
   if (frame.pred_vpt.size() > 0) {
     // Option 1. Show both x and y
-    cv::circle(image,
-               cv::Point(static_cast<int>(frame.pred_vpt[0]),
-               static_cast<int>(frame.pred_vpt[1])),
-               5, apollo::perception::dark_green_color, 3);
+    // cv::circle(image,
+    //            cv::Point(static_cast<int>(frame.pred_vpt[0]),
+    //            static_cast<int>(frame.pred_vpt[1])),
+    //            5, apollo::perception::dark_green_color, 3);
     // Option 2. Show height/2 (x) and y
     cv::circle(image,
                cv::Point(static_cast<int>(image_width_>>1),
