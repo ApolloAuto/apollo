@@ -21,16 +21,6 @@ decision {
   }
   object_decision {
     decision {
-      id: "11720"
-      perception_id: 11720
-      object_decision {
-        nudge {
-          type: RIGHT_NUDGE
-          distance_l: -0.3
-        }
-      }
-    }
-    decision {
       id: "CW_2832"
       perception_id: -1198750198
       object_decision {
