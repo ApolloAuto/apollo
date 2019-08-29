@@ -103,7 +103,7 @@ bool JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   for (size_t i = 0; i < feature_values.size(); ++i) {
     torch_input[0][i] = static_cast<float>(feature_values[i]);
   }
-  torch_inputs.push_back(torch_input.to(device_));
+  torch_inputs.push_back(std::move(torch_input.to(device_)));
   std::vector<double> probability;
   if (latest_feature_ptr->junction_feature().junction_exit_size() > 1) {
     at::Tensor torch_output_tensor =
