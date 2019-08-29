@@ -154,8 +154,8 @@ message ScenarioParkAndGoConfig {
 }
 
 message ScenarioYieldSignConfig {
-  optional double start_yield_sign_scenario_distance = 1 [default = 5.0];  // meter
-  optional double max_valid_stop_distance = 2 [default = 3.5];  // meter
+  optional double start_yield_sign_scenario_distance = 1 [default = 10.0];  // meter
+  optional double max_valid_stop_distance = 2 [default = 4.5];  // meter
   optional double min_pass_s_distance = 3 [default = 3.0];  // meter
   optional float creep_timeout_sec = 4 [default = 10.0];  // sec
 }
