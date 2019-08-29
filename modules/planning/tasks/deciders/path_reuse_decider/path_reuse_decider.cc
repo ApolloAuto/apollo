@@ -19,6 +19,10 @@
  **/
 #include "modules/planning/tasks/deciders/path_reuse_decider/path_reuse_decider.h"
 
+#include <algorithm>
+#include <string>
+#include <vector>
+
 namespace apollo {
 namespace planning {
 
@@ -39,7 +43,7 @@ Status PathReuseDecider::Process(Frame* const frame,
 
   bool enable_path_reuse = true;
 
-  // Check if path is reusable, if so, reuse previous path.
+  // Check if path is reusable
   if (enable_path_reuse && CheckPathReusable(frame)) {
     // count reusable path
     ++reusable_path_counter;
@@ -47,7 +51,44 @@ Status PathReuseDecider::Process(Frame* const frame,
   return Status::OK();
 }
 
-bool PathReuseDecider::CheckPathReusable(Frame* const frame) { return true; }
+bool PathReuseDecider::CheckPathReusable(Frame* const frame) {
+  if (history_->GetLastFrame() == nullptr) {
+    return false;
+  } else {
+    auto obstacles = frame->obstacles();
+    for (auto obstacle : obstacles) {
+      const std::string& id = obstacle->Id();
+      auto history_decisions = history_->GetLastFrame()
+                                   ->GetObjectDecisionsById(id)
+                                   ->GetObjectDecision();
+      // if there are new objects in current frame than previous path is
+      // non-reusable
+      if (history_decisions.empty())
+        return false;
+      else
+        return CompObjectDecision(obstacle->decisions(), history_decisions);
+    }
+  }
+  return true;
+}
+
+bool PathReuseDecider::CompObjectDecision(
+    const std::vector<ObjectDecisionType>& current_decisions,
+    const std::vector<const ObjectDecisionType*> history_decisions) {
+  std::vector<const ObjectDecisionType*> result;
+  for (size_t i = 0; i < current_decisions.size(); i++) {
+    result.push_back(&(current_decisions[i]));
+  }
+  std::sort(result.begin(), result.end(),
+            [](const ObjectDecisionType* lhs, const ObjectDecisionType* rhs) {
+              return lhs->object_tag_case() < rhs->object_tag_case();
+            });
+  for (size_t i = 0; i < result.size(); ++i) {
+    if (result[i]->object_tag_case() != history_decisions[i]->object_tag_case())
+      return false;
+  }
+  return true;
+}
 
 }  // namespace planning
 }  // namespace apollo

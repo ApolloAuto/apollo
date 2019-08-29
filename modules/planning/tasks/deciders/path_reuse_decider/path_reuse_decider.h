@@ -20,8 +20,11 @@
 
 #pragma once
 
+#include <vector>
+
 #include "modules/planning/tasks/deciders/decider.h"
 
+#include "modules/planning/common/history.h"
 #include "modules/planning/proto/decider_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
@@ -36,6 +39,10 @@ class PathReuseDecider : public Decider {
   common::Status Process(Frame* frame,
                          ReferenceLineInfo* reference_line_info) override;
   bool CheckPathReusable(Frame* frame);
+  bool CompObjectDecision(
+      const std::vector<ObjectDecisionType>& current_decisions,
+      const std::vector<const ObjectDecisionType*> history_decisions);
+  History* history_ = History::Instance();
 };
 
 }  // namespace planning
