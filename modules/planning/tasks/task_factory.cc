@@ -32,6 +32,7 @@
 #include "modules/planning/tasks/deciders/path_bounds_decider/path_bounds_decider.h"
 #include "modules/planning/tasks/deciders/path_decider/path_decider.h"
 #include "modules/planning/tasks/deciders/path_lane_borrow_decider/path_lane_borrow_decider.h"
+#include "modules/planning/tasks/deciders/path_reuse_decider/path_reuse_decider.h"
 #include "modules/planning/tasks/deciders/rule_based_stop_decider/rule_based_stop_decider.h"
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_bounds_decider.h"
 #include "modules/planning/tasks/deciders/speed_decider/speed_decider.h"
@@ -67,6 +68,10 @@ void TaskFactory::Init(const PlanningConfig& config) {
   task_factory_.Register(TaskConfig::PATH_BOUNDS_DECIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new PathBoundsDecider(config);
+                         });
+  task_factory_.Register(TaskConfig::PATH_REUSE_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new PathReuseDecider(config);
                          });
   task_factory_.Register(TaskConfig::PATH_ASSESSMENT_DECIDER,
                          [](const TaskConfig& config) -> Task* {
