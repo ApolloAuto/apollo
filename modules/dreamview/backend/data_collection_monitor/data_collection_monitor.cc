@@ -124,21 +124,62 @@ void DataCollectionMonitor::LoadConfiguration() {
       << "Unable to parse data collection configuration from file "
       << data_collection_config_path;
 
-  for (const auto& scenario_iter : data_collection_table_.scenario()) {
-    const std::string& scenario_name = scenario_iter.first;
-    const Scenario& scenario = scenario_iter.second;
+  ConstructCategories();
+  for (const auto& iter : categories_) {
+    const std::string& scenario_name = iter.first;
+    const std::vector<Range>& categories = iter.second;
 
-    for (const auto& category_iter : scenario.category()) {
-      const std::string& category_name = category_iter.first;
-      const Category& category = category_iter.second;
-
+    for (const auto& category : categories) {
+      const std::string& category_name = category.name();
       category_consecutive_frame_count_[scenario_name][category_name] = 0.0;
       category_frame_count_[scenario_name][category_name] = 0.0;
-      current_progress_json_[scenario_name][category.description()] = 0.0;
+      current_progress_json_[scenario_name][category_name] = 0.0;
     }
   }
 
   ADEBUG << "Configuration loaded.";
+}
+
+void DataCollectionMonitor::ConstructCategories() {
+  categories_.clear();
+
+  for (const auto& scenario_iter : data_collection_table_.scenario()) {
+    const std::string& scenario_name = scenario_iter.first;
+    const Scenario& scenario = scenario_iter.second;
+
+    Range category;
+    ConstructCategoriesHelper(scenario, 0, category,
+                              &categories_[scenario_name]);
+  }
+}
+
+void DataCollectionMonitor::ConstructCategoriesHelper(
+    const Scenario& scenario, int feature_idx, const Range& current_category,
+    std::vector<Range>* categories) {
+  if (feature_idx == scenario.feature_size()) {
+    categories->push_back(current_category);
+    return;
+  }
+
+  const Feature& feature = scenario.feature(feature_idx);
+  for (const auto& range : feature.range()) {
+    Range new_category(current_category);
+    for (const auto& criterion : range.criterion()) {
+      new_category.add_criterion()->CopyFrom(criterion);
+    }
+
+    // set new category name by appending it with the current range name
+    const std::string& range_name = range.name();
+    if (feature.range().size() > 1 && !range_name.empty()) {
+      if (!new_category.name().empty()) {
+        new_category.set_name(new_category.name() + ", ");
+      }
+      new_category.set_name(new_category.name() + range_name);
+    }
+
+    ConstructCategoriesHelper(scenario, feature_idx + 1, new_category,
+                              categories);
+  }
 }
 
 void DataCollectionMonitor::Start() {
@@ -164,17 +205,16 @@ void DataCollectionMonitor::OnChassis(const std::shared_ptr<Chassis>& chassis) {
   }
 
   const size_t frame_threshold = data_collection_table_.frame_threshold();
-  for (const auto& scenario_iter : data_collection_table_.scenario()) {
-    const std::string& scenario_name = scenario_iter.first;
-    const Scenario& scenario = scenario_iter.second;
+  const auto total_frames = data_collection_table_.total_frames();
+  for (const auto& iter : categories_) {
+    const std::string& scenario_name = iter.first;
+    const std::vector<Range>& categories = iter.second;
 
-    for (const auto& category_iter : scenario.category()) {
-      const std::string& category_name = category_iter.first;
-      const Category& category = category_iter.second;
+    for (const auto& category : categories) {
+      const std::string& category_name = category.name();
 
       // This category is done, skip
-      if (category_frame_count_[scenario_name][category_name] >=
-          category.total_frames()) {
+      if (category_frame_count_[scenario_name][category_name] >= total_frames) {
         continue;
       }
 
@@ -198,10 +238,10 @@ void DataCollectionMonitor::OnChassis(const std::shared_ptr<Chassis>& chassis) {
           100.0 *
           static_cast<double>(
               category_frame_count_[scenario_name][category_name]) /
-          static_cast<double>(category.total_frames());
+          static_cast<double>(total_frames);
       {
         boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-        current_progress_json_[scenario_name][category.description()] =
+        current_progress_json_[scenario_name][category_name] =
             progress_percentage;
       }
     }
@@ -209,7 +249,7 @@ void DataCollectionMonitor::OnChassis(const std::shared_ptr<Chassis>& chassis) {
 }
 
 bool DataCollectionMonitor::IsCompliedWithCriteria(
-    const std::shared_ptr<Chassis>& chassis, const Category& category) {
+    const std::shared_ptr<Chassis>& chassis, const Range& category) {
   const auto& vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
   const auto* vehicle_param_descriptor = vehicle_param.GetDescriptor();
   const auto* vehicle_param_reflection = vehicle_param.GetReflection();

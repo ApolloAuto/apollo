@@ -23,6 +23,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "boost/thread/shared_mutex.hpp"
 #include "gtest/gtest_prod.h"
@@ -77,10 +78,14 @@ class DataCollectionMonitor {
  private:
   void InitReaders();
   void LoadConfiguration();
+  void ConstructCategories();
+  void ConstructCategoriesHelper(const Scenario& scenario, int feature_idx,
+                                 const Range& current_category,
+                                 std::vector<Range>* categories);
   void OnChassis(const std::shared_ptr<apollo::canbus::Chassis>& chassis);
   bool IsCompliedWithCriteria(
       const std::shared_ptr<apollo::canbus::Chassis>& chassis,
-      const Category& category);
+      const Range& category);
 
   std::unique_ptr<cyber::Node> node_;
 
@@ -89,6 +94,10 @@ class DataCollectionMonitor {
 
   // The table defines data collection requirements for calibration
   DataCollectionTable data_collection_table_;
+
+  // A map from scenario to its categories. Categories are collections
+  // of criteria from all possible combination of Feature x Range in a Scenario.
+  std::unordered_map<std::string, std::vector<Range>> categories_;
 
   // Number of frames that has been collected for each (scenario, category)
   std::unordered_map<std::string, std::unordered_map<std::string, size_t>>
@@ -107,6 +116,7 @@ class DataCollectionMonitor {
   boost::shared_mutex mutex_;
 
   FRIEND_TEST(DataCollectionMonitorTest, UpdateCollectionProgress);
+  FRIEND_TEST(DataCollectionMonitorTest, ConstructCategories);
 };
 
 }  // namespace dreamview

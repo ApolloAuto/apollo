@@ -49,11 +49,40 @@ class DataCollectionMonitorTest : public ::testing::Test {
   DataCollectionMonitorTest() {
     FLAGS_default_data_collection_config_path =
         "/apollo/modules/dreamview/backend/testdata/"
-        "data_collection_table.pb.txt";
+        "data_collection_table_test.pb.txt";
   }
 
   std::unique_ptr<DataCollectionMonitor> data_collection_monitor_;
 };
+
+TEST_F(DataCollectionMonitorTest, ConstructCategories) {
+  data_collection_monitor_->Start();
+  const auto& scenario =
+      data_collection_monitor_->categories_.find("Category Construction Test");
+  EXPECT_NE(scenario, data_collection_monitor_->categories_.end());
+
+  const auto& categories = scenario->second;
+  EXPECT_EQ(6, categories.size());
+  EXPECT_EQ("mps < 10, Throttle == 30%", categories[0].name());
+  EXPECT_EQ("mps < 10, Throttle != 30%", categories[1].name());
+  EXPECT_EQ("mps < 10, Throttle deadzone ~ 35%", categories[2].name());
+  EXPECT_EQ("mps >= 10, Throttle == 30%", categories[3].name());
+  EXPECT_EQ("mps >= 10, Throttle != 30%", categories[4].name());
+  EXPECT_EQ("mps >= 10, Throttle deadzone ~ 35%", categories[5].name());
+
+  const auto& criterion = categories[0].criterion();
+  EXPECT_EQ("gear_location", criterion[0].field());
+  EXPECT_EQ(ComparisonOperator::EQUAL, criterion[0].comparison_operator());
+  EXPECT_EQ(1, criterion[0].value());
+
+  EXPECT_EQ("speed_mps", criterion[1].field());
+  EXPECT_EQ(ComparisonOperator::LESS_THAN, criterion[1].comparison_operator());
+  EXPECT_EQ(10, criterion[1].value());
+
+  EXPECT_EQ("throttle_percentage", criterion[2].field());
+  EXPECT_EQ(ComparisonOperator::EQUAL, criterion[2].comparison_operator());
+  EXPECT_EQ(30, criterion[2].value());
+}
 
 TEST_F(DataCollectionMonitorTest, UpdateCollectionProgress) {
   data_collection_monitor_->Start();
@@ -64,11 +93,11 @@ TEST_F(DataCollectionMonitorTest, UpdateCollectionProgress) {
   chassis->set_brake_percentage(30.0f);
   chassis->set_steering_percentage(-30.0f);
 
+  std::string scenarioName = "Comparison Operator Test";
   {
     data_collection_monitor_->OnChassis(chassis);
     nlohmann::json progress = data_collection_monitor_->GetProgressAsJson();
 
-    std::string scenarioName = "Go Straight";
     auto scenario = progress.find(scenarioName);
     EXPECT_NE(scenario, progress.end());
 
@@ -122,16 +151,19 @@ TEST_F(DataCollectionMonitorTest, UpdateCollectionProgress) {
     data_collection_monitor_->OnChassis(chassis);
     nlohmann::json progress = data_collection_monitor_->GetProgressAsJson();
 
-    std::string scenarioName = "Go Straight";
     auto scenario = progress.find(scenarioName);
     EXPECT_NE(scenario, progress.end());
 
     float value;
     bool hasField;
 
+    hasField = JsonUtil::GetNumberFromJson(*scenario, "Brake > 30%", &value);
+    EXPECT_TRUE(hasField);
+    EXPECT_DOUBLE_EQ(0.0, value);
+
     hasField = JsonUtil::GetNumberFromJson(*scenario, "Brake <= 30%", &value);
     EXPECT_TRUE(hasField);
-    EXPECT_DOUBLE_EQ(100.0, value);
+    EXPECT_DOUBLE_EQ(75.0, value);
 
     hasField =
         JsonUtil::GetNumberFromJson(*scenario, "Throttle != 30%", &value);
@@ -141,12 +173,12 @@ TEST_F(DataCollectionMonitorTest, UpdateCollectionProgress) {
     hasField = JsonUtil::GetNumberFromJson(*scenario,
                                            "Right steering 20% ~ 40%", &value);
     EXPECT_TRUE(hasField);
-    EXPECT_DOUBLE_EQ(30.0, value);
+    EXPECT_DOUBLE_EQ(75.0, value);
 
     hasField = JsonUtil::GetNumberFromJson(*scenario, "Throttle deadzone ~ 35%",
                                            &value);
     EXPECT_TRUE(hasField);
-    EXPECT_DOUBLE_EQ(30.0, value);
+    EXPECT_DOUBLE_EQ(75.0, value);
   }
 
   data_collection_monitor_->Stop();
