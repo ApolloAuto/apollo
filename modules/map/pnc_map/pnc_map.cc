@@ -494,11 +494,14 @@ bool PncMap::GetRouteSegments(const VehicleState &vehicle_state,
 bool PncMap::GetNearestPointFromRouting(const VehicleState &state,
                                         LaneWaypoint *waypoint) const {
   const double kMaxDistance = 10.0;  // meters.
+  const double kHeadingBuffer = M_PI / 10.0;
   waypoint->lane = nullptr;
   std::vector<LaneInfoConstPtr> lanes;
   auto point = common::util::MakePointENU(state.x(), state.y(), state.z());
-  const int status = hdmap_->GetLanesWithHeading(
-      point, kMaxDistance, state.heading(), M_PI / 2.0, &lanes);
+  const int status =
+      hdmap_->GetLanesWithHeading(point, kMaxDistance, state.heading(),
+                                  M_PI / 2.0 + kHeadingBuffer, &lanes);
+  ADEBUG << "lanes:" << lanes.size();
   if (status < 0) {
     AERROR << "Failed to get lane from point: " << point.ShortDebugString();
     return false;
@@ -520,7 +523,7 @@ bool PncMap::GetNearestPointFromRouting(const VehicleState &state,
                  });
   }
 
-  // Get nearest_wayponints for current position
+  // Get nearest_waypoints for current position
   double min_distance = std::numeric_limits<double>::infinity();
   for (const auto &lane : valid_lanes) {
     if (range_lane_ids_.count(lane->id().id()) == 0) {
@@ -530,6 +533,7 @@ bool PncMap::GetNearestPointFromRouting(const VehicleState &state,
       double s = 0.0;
       double l = 0.0;
       if (!lane->GetProjection({point.x(), point.y()}, &s, &l)) {
+        AERROR << "fail to get projection";
         return false;
       }
       // Use large epsilon to allow projection diff
@@ -553,6 +557,7 @@ bool PncMap::GetNearestPointFromRouting(const VehicleState &state,
       waypoint->lane = lane;
       waypoint->s = s;
     }
+    ADEBUG << "distance" << distance;
   }
   if (waypoint->lane == nullptr) {
     AERROR << "Failed to find nearest point: " << point.ShortDebugString();
