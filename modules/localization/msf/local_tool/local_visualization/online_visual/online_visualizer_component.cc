@@ -23,7 +23,7 @@
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/localization/msf/common/io/pcl_point_types.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"
-#include "modules/localization/msf/local_map/base_map/base_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
 
 namespace apollo {
 namespace localization {
@@ -70,7 +70,7 @@ bool OnlineVisualizerComponent::InitConfig() {
   }
   std::cout << "Load lidar extrinsic succeed." << std::endl;
 
-  BaseMapConfig map_config;
+  pyramid_map::BaseMapConfig map_config;
   std::string config_file = map_folder_ + "/config.xml";
   map_config.map_version_ = "lossy_map";
   success = map_config.Load(config_file);
