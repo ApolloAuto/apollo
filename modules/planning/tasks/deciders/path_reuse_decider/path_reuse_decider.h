@@ -39,10 +39,17 @@ class PathReuseDecider : public Decider {
   common::Status Process(Frame* frame,
                          ReferenceLineInfo* reference_line_info) override;
   bool CheckPathReusable(Frame* frame);
-  bool CompObjectDecision(
-      const std::vector<ObjectDecisionType>& current_decisions,
-      const std::vector<const ObjectDecisionType*> history_decisions);
+  void GetCurrentStopPositions(
+      Frame* frame, std::vector<common::PointENU>* current_stop_positions);
+  void GetHistoryStopPositions(
+      const std::vector<const HistoryObjectDecision*>&
+          history_objects_decisions,
+      std::vector<common::PointENU>* history_stop_positions);
+
+ private:
   History* history_ = History::Instance();
+  static int reusable_path_counter_;  // count reused path
+  static int total_path_counter_;     // count total path
 };
 
 }  // namespace planning
