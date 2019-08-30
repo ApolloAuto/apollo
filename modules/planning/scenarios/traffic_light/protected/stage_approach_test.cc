@@ -18,47 +18,33 @@
  * @file stage_approach_test.cc
  **/
 
+#include "modules/planning/scenarios/test/stage_test_base.h"
 #include "modules/planning/scenarios/traffic_light/protected/stage_approach.h"
 
 #include "gtest/gtest.h"
 
-#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/tasks/task_factory.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace traffic_light {
 
-using apollo::cyber::common::GetProtoFromFile;
-
-class TrafficLightProtectedStageApproachTest : public ::testing::Test {
+class TrafficLightProtectedStageApproachTest : public StageTestBase {
  public:
   virtual void SetUp() {
-    PlanningConfig planning_config;
-    CHECK(GetProtoFromFile(FLAGS_planning_config_file, &planning_config))
-        << "failed to load planning config file " << FLAGS_planning_config_file;
-    TaskFactory::Init(planning_config);
-    CHECK(GetProtoFromFile(
-        FLAGS_scenario_traffic_light_protected_config_file,
-        &traffic_light_protected_config_))
-        << "failed to load traffic_light_protected config file "
-        << FLAGS_scenario_traffic_light_protected_config_file;
+    scenario_config_file_ = FLAGS_scenario_traffic_light_protected_config_file;
+    stage_type_ = ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_APPROACH;
+    StageTestBase::SetUp();
   }
-
- protected:
-  ScenarioConfig traffic_light_protected_config_;
 };
 
 TEST_F(TrafficLightProtectedStageApproachTest, Init) {
-  TrafficLightProtectedStageApproach traffic_light_protected_stage_approach(
-      traffic_light_protected_config_.stage_config(0));
-  EXPECT_EQ(traffic_light_protected_stage_approach.Name(),
-      ScenarioConfig::StageType_Name(
-      traffic_light_protected_config_.stage_config(0).stage_type()));
+  EXPECT_NE(stage_config_map_.find(stage_type_), stage_config_map_.end());
+  TrafficLightProtectedStageApproach stage(*stage_config_map_[stage_type_]);
+  EXPECT_EQ(stage.stage_type(), stage_type_);
+  EXPECT_EQ(stage.Name(), ScenarioConfig::StageType_Name(stage_type_));
 }
 
 }  // namespace traffic_light

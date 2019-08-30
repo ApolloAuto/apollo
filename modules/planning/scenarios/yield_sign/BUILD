@@ -56,6 +56,7 @@ cc_test(
         "//modules/planning:planning_conf",
     ],
     deps = [
+        "//modules/planning/scenarios/test:stage_test_base",
         ":yield_sign_scenario",
         "@gtest//:main",
     ],

@@ -18,15 +18,13 @@
  * @file stage_retry_parking_test.cc
  **/
 
+#include "modules/planning/scenarios/test/stage_test_base.h"
 #include "modules/planning/scenarios/park/pull_over/stage_retry_parking.h"
 
 #include "gtest/gtest.h"
 
-#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/tasks/task_factory.h"
 
 namespace apollo {
 namespace planning {
@@ -35,29 +33,20 @@ namespace pull_over {
 
 using apollo::cyber::common::GetProtoFromFile;
 
-class PullOverStageRetryParkingTest : public ::testing::Test {
+class PullOverStageRetryParkingTest : public StageTestBase {
  public:
   virtual void SetUp() {
-    PlanningConfig planning_config;
-    CHECK(GetProtoFromFile(FLAGS_planning_config_file, &planning_config))
-        << "failed to load planning config file " << FLAGS_planning_config_file;
-    TaskFactory::Init(planning_config);
-    CHECK(GetProtoFromFile(
-        FLAGS_scenario_pull_over_config_file, &pull_over_config_))
-        << "failed to load pull_over config file "
-        << FLAGS_scenario_pull_over_config_file;
+    scenario_config_file_ = FLAGS_scenario_pull_over_config_file;
+    stage_type_ = ScenarioConfig::PULL_OVER_RETRY_PARKING;
+    StageTestBase::SetUp();
   }
-
- protected:
-  ScenarioConfig pull_over_config_;
 };
 
 TEST_F(PullOverStageRetryParkingTest, Init) {
-  PullOverStageRetryParking pull_over_stage_retry_parking(
-      pull_over_config_.stage_config(1));
-  EXPECT_EQ(pull_over_stage_retry_parking.Name(),
-      ScenarioConfig::StageType_Name(
-      pull_over_config_.stage_config(1).stage_type()));
+  EXPECT_NE(stage_config_map_.find(stage_type_), stage_config_map_.end());
+  PullOverStageRetryParking stage(*stage_config_map_[stage_type_]);
+  EXPECT_EQ(stage.stage_type(), stage_type_);
+  EXPECT_EQ(stage.Name(), ScenarioConfig::StageType_Name(stage_type_));
 }
 
 }  // namespace pull_over

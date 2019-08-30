@@ -52,12 +52,14 @@ cc_test(
     size = "small",
     srcs = [
         "stage_approach_test.cc",
+        "stage_retry_approach_parking_test.cc",
         "stage_retry_parking_test.cc",
     ],
     data = [
         "//modules/planning:planning_conf",
     ],
     deps = [
+        "//modules/planning/scenarios/test:stage_test_base",
         ":pull_over_scenario",
         "@gtest//:main",
     ],

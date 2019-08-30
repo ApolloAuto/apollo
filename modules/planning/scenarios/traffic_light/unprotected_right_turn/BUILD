@@ -55,6 +55,7 @@ cc_test(
         "//modules/planning:planning_conf",
     ],
     deps = [
+        "//modules/planning/scenarios/test:stage_test_base",
         ":traffic_light_unprotected_right_turn_scenario",
         "@gtest//:main",
     ],

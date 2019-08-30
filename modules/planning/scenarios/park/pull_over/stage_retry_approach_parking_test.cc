@@ -15,11 +15,11 @@
  *****************************************************************************/
 
 /**
- * @file stage_intersection_cruise_test.cc
+ * @file stage_retry_approach_parking_test.cc
  **/
 
 #include "modules/planning/scenarios/test/stage_test_base.h"
-#include "modules/planning/scenarios/stop_sign/unprotected/stage_intersection_cruise.h"
+#include "modules/planning/scenarios/park/pull_over/stage_retry_approach_parking.h"
 
 #include "gtest/gtest.h"
 
@@ -29,26 +29,25 @@
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace stop_sign {
+namespace pull_over {
 
-class StopSignUnprotectedStageIntersectionCruiseTest : public StageTestBase {
+class PullOverStageRetryApproachParkingTest : public StageTestBase {
  public:
   virtual void SetUp() {
-    scenario_config_file_ = FLAGS_scenario_stop_sign_unprotected_config_file;
-    stage_type_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
+    scenario_config_file_ = FLAGS_scenario_pull_over_config_file;
+    stage_type_ = ScenarioConfig::PULL_OVER_RETRY_APPROACH_PARKING;
     StageTestBase::SetUp();
   }
 };
 
-TEST_F(StopSignUnprotectedStageIntersectionCruiseTest, Init) {
+TEST_F(PullOverStageRetryApproachParkingTest, Init) {
   EXPECT_NE(stage_config_map_.find(stage_type_), stage_config_map_.end());
-  StopSignUnprotectedStageIntersectionCruise
-      stage(*stage_config_map_[stage_type_]);
+  PullOverStageRetryApproachParking stage(*stage_config_map_[stage_type_]);
   EXPECT_EQ(stage.stage_type(), stage_type_);
   EXPECT_EQ(stage.Name(), ScenarioConfig::StageType_Name(stage_type_));
 }
 
-}  // namespace stop_sign
+}  // namespace pull_over
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

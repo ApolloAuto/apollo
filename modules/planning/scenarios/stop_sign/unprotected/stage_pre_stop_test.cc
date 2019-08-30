@@ -18,47 +18,33 @@
  * @file stage_pre_stop_test.cc
  **/
 
+#include "modules/planning/scenarios/test/stage_test_base.h"
 #include "modules/planning/scenarios/stop_sign/unprotected/stage_pre_stop.h"
 
 #include "gtest/gtest.h"
 
-#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/tasks/task_factory.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace stop_sign {
 
-using apollo::cyber::common::GetProtoFromFile;
-
-class StopSignUnprotectedStagePreStopTest : public ::testing::Test {
+class StopSignUnprotectedStagePreStopTest : public StageTestBase {
  public:
   virtual void SetUp() {
-    PlanningConfig planning_config;
-    CHECK(GetProtoFromFile(FLAGS_planning_config_file, &planning_config))
-        << "failed to load planning config file " << FLAGS_planning_config_file;
-    TaskFactory::Init(planning_config);
-    CHECK(GetProtoFromFile(
-        FLAGS_scenario_stop_sign_unprotected_config_file,
-        &stop_sign_unprotected_config_))
-        << "failed to load stop_sign_unprotected config file "
-        << FLAGS_scenario_stop_sign_unprotected_config_file;
+    scenario_config_file_ = FLAGS_scenario_stop_sign_unprotected_config_file;
+    stage_type_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_PRE_STOP;
+    StageTestBase::SetUp();
   }
-
- protected:
-  ScenarioConfig stop_sign_unprotected_config_;
 };
 
 TEST_F(StopSignUnprotectedStagePreStopTest, Init) {
-  StopSignUnprotectedStagePreStop stop_sign_unprotected_stage_pre_stop(
-      stop_sign_unprotected_config_.stage_config(0));
-  EXPECT_EQ(stop_sign_unprotected_stage_pre_stop.Name(),
-      ScenarioConfig::StageType_Name(
-      stop_sign_unprotected_config_.stage_config(0).stage_type()));
+  EXPECT_NE(stage_config_map_.find(stage_type_), stage_config_map_.end());
+  StopSignUnprotectedStagePreStop stage(*stage_config_map_[stage_type_]);
+  EXPECT_EQ(stage.stage_type(), stage_type_);
+  EXPECT_EQ(stage.Name(), ScenarioConfig::StageType_Name(stage_type_));
 }
 
 }  // namespace stop_sign

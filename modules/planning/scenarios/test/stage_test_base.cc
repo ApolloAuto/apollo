@@ -15,40 +15,31 @@
  *****************************************************************************/
 
 /**
- * @file stage_intersection_cruise_test.cc
+ * @file stage_test_base.cc
  **/
 
 #include "modules/planning/scenarios/test/stage_test_base.h"
-#include "modules/planning/scenarios/stop_sign/unprotected/stage_intersection_cruise.h"
 
-#include "gtest/gtest.h"
-
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/tasks/task_factory.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
-namespace stop_sign {
 
-class StopSignUnprotectedStageIntersectionCruiseTest : public StageTestBase {
- public:
-  virtual void SetUp() {
-    scenario_config_file_ = FLAGS_scenario_stop_sign_unprotected_config_file;
-    stage_type_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
-    StageTestBase::SetUp();
+using apollo::cyber::common::GetProtoFromFile;
+
+void StageTestBase::SetUp() {
+  CHECK(GetProtoFromFile(FLAGS_planning_config_file, &planning_config_))
+      << "failed to load planning config file " << FLAGS_planning_config_file;
+  TaskFactory::Init(planning_config_);
+  CHECK(GetProtoFromFile(scenario_config_file_, &scenario_config_))
+      << "failed to load config file " << scenario_config_file_;
+  for (const auto& stage_config : scenario_config_.stage_config()) {
+    stage_config_map_[stage_config.stage_type()] = &stage_config;
   }
-};
-
-TEST_F(StopSignUnprotectedStageIntersectionCruiseTest, Init) {
-  EXPECT_NE(stage_config_map_.find(stage_type_), stage_config_map_.end());
-  StopSignUnprotectedStageIntersectionCruise
-      stage(*stage_config_map_[stage_type_]);
-  EXPECT_EQ(stage.stage_type(), stage_type_);
-  EXPECT_EQ(stage.Name(), ScenarioConfig::StageType_Name(stage_type_));
 }
 
-}  // namespace stop_sign
-}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

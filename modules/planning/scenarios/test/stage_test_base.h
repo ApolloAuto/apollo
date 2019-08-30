@@ -15,39 +15,34 @@
  *****************************************************************************/
 
 /**
- * @file lane_follow_stage_test.cc
+ * @file stage_test_base.h
  **/
 
-#include "modules/planning/scenarios/test/stage_test_base.h"
-#include "modules/planning/scenarios/lane_follow/lane_follow_stage.h"
+#pragma once
+
+#include <unordered_map>
+#include <string>
 
 #include "gtest/gtest.h"
 
-#include "cyber/common/log.h"
-#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
-namespace lane_follow {
 
-class LaneFollowStageTest : public StageTestBase {
+class StageTestBase: public ::testing::Test {
  public:
-  virtual void SetUp() {
-    scenario_config_file_ = FLAGS_scenario_lane_follow_config_file;
-    stage_type_ = ScenarioConfig::LANE_FOLLOW_DEFAULT_STAGE;
-    StageTestBase::SetUp();
-  }
+  virtual void SetUp();
+ protected:
+  PlanningConfig planning_config_;
+  ScenarioConfig scenario_config_;
+  std::unordered_map<ScenarioConfig::StageType,
+                     const ScenarioConfig::StageConfig*, std::hash<int>>
+      stage_config_map_;
+
+  std::string scenario_config_file_;
+  ScenarioConfig::StageType stage_type_;
 };
 
-TEST_F(LaneFollowStageTest, Init) {
-  EXPECT_NE(stage_config_map_.find(stage_type_), stage_config_map_.end());
-  LaneFollowStage stage(*stage_config_map_[stage_type_]);
-  EXPECT_EQ(stage.stage_type(), stage_type_);
-  EXPECT_EQ(stage.Name(), ScenarioConfig::StageType_Name(stage_type_));
-}
-
-}  // namespace lane_follow
-}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
