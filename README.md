@@ -1,7 +1,7 @@
 ![image alt text](docs/demo_guide/images/Apollo_logo.png)
 
 [![Build Status](http://180.76.142.62:8111/app/rest/builds/buildType:ApolloPublic_Build/statusIcon)](http://180.76.142.62:8111/viewType.html?buildTypeId=ApolloPublic_Build&guest=1)
-[![Simulation Status](https://azure.apollo.auto/dailybuildstatus.svg)](https://azure.apollo.auto/daily-build/all)
+[![Simulation Status](https://azure.apollo.auto/dailybuildstatus.svg)](https://azure.apollo.auto/daily-build/public)
 
 ```
 
