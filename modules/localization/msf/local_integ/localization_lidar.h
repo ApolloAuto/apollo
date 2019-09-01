@@ -93,6 +93,7 @@ class LocalizationLidar {
             const unsigned int resolution_id = 0);
 
   void SetVelodyneExtrinsic(const Eigen::Affine3d& pose);
+
   void SetVehicleHeight(double height);
 
   void SetValidThreshold(float valid_threashold);
