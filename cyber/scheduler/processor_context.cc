@@ -21,9 +21,7 @@ namespace cyber {
 namespace scheduler {
 
 void ProcessorContext::Shutdown() {
-  if (!stop_) {
-    stop_ = true;
-  }
+  stop_.store(true);
 }
 
 }  // namespace scheduler

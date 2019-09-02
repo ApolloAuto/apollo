@@ -49,7 +49,7 @@ void ClassicContext::InitGroup(const std::string& group_name) {
 }
 
 std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
-  if (unlikely(stop_)) {
+  if (unlikely(stop_.load())) {
     return nullptr;
   }
 
@@ -82,7 +82,7 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
 
 void ClassicContext::Wait() {
   std::unique_lock<std::mutex> lk(mtx_wrapper_->Mutex());
-  if (stop_) {
+  if (stop_.load()) {
     return;
   }
 
@@ -96,12 +96,7 @@ void ClassicContext::Wait() {
 }
 
 void ClassicContext::Shutdown() {
-  {
-    std::lock_guard<std::mutex> lg(mtx_wrapper_->Mutex());
-    if (!stop_) {
-      stop_ = true;
-    }
-  }
+  stop_.store(true);
   cw_->Cv().notify_all();
 }
 
