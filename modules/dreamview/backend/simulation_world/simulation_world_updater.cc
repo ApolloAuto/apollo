@@ -84,7 +84,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         std::string to_send;
         {
-          boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+          std::shared_lock<std::shared_timed_mutex> reader_lock(mutex_);
           to_send = relative_map_string_;
         }
         map_ws_->SendBinaryData(conn, to_send, true);
@@ -173,7 +173,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         {
           // Pay the price to copy the data instead of sending data over the
           // wire while holding the lock.
-          boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+          std::shared_lock<std::shared_timed_mutex> reader_lock(mutex_);
           to_send = enable_pnc_monitor ? simulation_world_with_planning_data_
                                        : simulation_world_;
         }
@@ -387,7 +387,7 @@ void SimulationWorldUpdater::OnTimer() {
   sim_world_service_.Update();
 
   {
-    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+    std::unique_lock<std::shared_timed_mutex> writer_lock(mutex_);
     sim_world_service_.GetWireFormatString(
         FLAGS_sim_map_radius, &simulation_world_,
         &simulation_world_with_planning_data_);

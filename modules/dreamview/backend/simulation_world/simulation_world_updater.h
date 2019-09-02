@@ -20,11 +20,9 @@
 
 #pragma once
 
+#include <shared_mutex>
 #include <memory>
 #include <string>
-
-#include "boost/thread/locks.hpp"
-#include "boost/thread/shared_mutex.hpp"
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
@@ -152,8 +150,7 @@ class SimulationWorldUpdater {
   std::string relative_map_string_;
 
   // Mutex to protect concurrent access to simulation_world_json_.
-  // NOTE: Use boost until we have std version of rwlock support.
-  boost::shared_mutex mutex_;
+  std::shared_timed_mutex mutex_;
 };
 
 }  // namespace dreamview

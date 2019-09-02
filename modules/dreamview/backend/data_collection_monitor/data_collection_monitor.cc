@@ -200,7 +200,7 @@ void DataCollectionMonitor::OnChassis(const std::shared_ptr<Chassis>& chassis) {
               category_frame_count_[scenario_name][category_name]) /
           static_cast<double>(category.total_frames());
       {
-        boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+        std::unique_lock<std::shared_timed_mutex> writer_lock(mutex_);
         current_progress_json_[scenario_name][category.description()] =
             progress_percentage;
       }
@@ -245,7 +245,7 @@ bool DataCollectionMonitor::IsCompliedWithCriteria(
 }
 
 nlohmann::json DataCollectionMonitor::GetProgressAsJson() {
-  boost::unique_lock<boost::shared_mutex> reader_lock(mutex_);
+  std::unique_lock<std::shared_timed_mutex> reader_lock(mutex_);
   return current_progress_json_;
 }
 

@@ -70,7 +70,6 @@ cc_library(
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/dreamview/backend/map:map_service",
         "//modules/dreamview/backend/sim_control",
-        "@boost",
     ],
 )
 

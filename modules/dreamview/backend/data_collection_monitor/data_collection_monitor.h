@@ -20,11 +20,11 @@
 
 #pragma once
 
+#include <shared_mutex>
 #include <memory>
 #include <string>
 #include <unordered_map>
 
-#include "boost/thread/shared_mutex.hpp"
 #include "gtest/gtest_prod.h"
 #include "third_party/json/json.hpp"
 
@@ -103,8 +103,7 @@ class DataCollectionMonitor {
   nlohmann::json current_progress_json_;
 
   // Mutex to protect concurrent access to current_progress_json_.
-  // NOTE: Use boost until we have std version of rwlock support.
-  boost::shared_mutex mutex_;
+  std::shared_timed_mutex mutex_;
 
   FRIEND_TEST(DataCollectionMonitorTest, UpdateCollectionProgress);
 };

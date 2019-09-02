@@ -59,8 +59,8 @@ using apollo::cyber::Node;
 using apollo::monitor::ComponentStatus;
 using apollo::monitor::SystemStatus;
 using google::protobuf::Map;
-using RLock = boost::shared_lock<boost::shared_mutex>;
-using WLock = boost::unique_lock<boost::shared_mutex>;
+using RLock = std::shared_lock<std::shared_timed_mutex>;
+using WLock = std::unique_lock<std::shared_timed_mutex>;
 
 constexpr char kNavigationModeName[] = "Navigation";
 

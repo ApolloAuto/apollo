@@ -35,7 +35,7 @@ using apollo::localization::LocalizationEstimate;
 using Json = nlohmann::json;
 
 float PointCloudUpdater::lidar_height_ = kDefaultLidarHeight;
-boost::shared_mutex PointCloudUpdater::mutex_;
+std::shared_timed_mutex PointCloudUpdater::mutex_;
 
 PointCloudUpdater::PointCloudUpdater(WebSocketHandler *websocket)
     : node_(cyber::CreateNode("point_cloud")),
@@ -51,14 +51,14 @@ void PointCloudUpdater::LoadLidarHeight(const std::string &file_path) {
   if (!cyber::common::PathExists(file_path)) {
     AWARN << "No such file: " << FLAGS_lidar_height_yaml
           << ". Using default lidar height:" << kDefaultLidarHeight;
-    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+    std::unique_lock<std::shared_timed_mutex> writer_lock(mutex_);
     lidar_height_ = kDefaultLidarHeight;
     return;
   }
 
   YAML::Node config = YAML::LoadFile(file_path);
   if (config["vehicle"] && config["vehicle"]["parameters"]) {
-    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+    std::unique_lock<std::shared_timed_mutex> writer_lock(mutex_);
     lidar_height_ = config["vehicle"]["parameters"]["height"].as<float>();
     AINFO << "Lidar height is updated to " << lidar_height_;
     return;
@@ -67,7 +67,7 @@ void PointCloudUpdater::LoadLidarHeight(const std::string &file_path) {
   AWARN << "Fail to load the lidar height yaml file: "
         << FLAGS_lidar_height_yaml
         << ". Using default lidar height:" << kDefaultLidarHeight;
-  boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+  std::unique_lock<std::shared_timed_mutex> writer_lock(mutex_);
   lidar_height_ = kDefaultLidarHeight;
 }
 
@@ -87,11 +87,11 @@ void PointCloudUpdater::RegisterMessageHandlers() {
         // If there is no point_cloud data for more than 2 seconds, reset.
         if (point_cloud_str_ != "" &&
             std::fabs(last_localization_time_ - last_point_cloud_time_) > 2.0) {
-          boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+          std::unique_lock<std::shared_timed_mutex> writer_lock(mutex_);
           point_cloud_str_ = "";
         }
         {
-          boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+          std::shared_lock<std::shared_timed_mutex> reader_lock(mutex_);
           to_send = point_cloud_str_;
         }
         websocket_->SendBinaryData(conn, to_send, true);
@@ -188,7 +188,7 @@ void PointCloudUpdater::FilterPointCloud(
 
   float z_offset;
   {
-    boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+    std::shared_lock<std::shared_timed_mutex> reader_lock(mutex_);
     z_offset = lidar_height_;
   }
   apollo::dreamview::PointCloud point_cloud_pb;
@@ -201,7 +201,7 @@ void PointCloudUpdater::FilterPointCloud(
     }
   }
   {
-    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+    std::unique_lock<std::shared_timed_mutex> writer_lock(mutex_);
     point_cloud_pb.SerializeToString(&point_cloud_str_);
     future_ready_ = true;
   }

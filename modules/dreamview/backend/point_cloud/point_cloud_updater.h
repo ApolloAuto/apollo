@@ -20,11 +20,9 @@
 
 #pragma once
 
+#include <shared_mutex>
 #include <memory>
 #include <string>
-
-#include "boost/thread/locks.hpp"
-#include "boost/thread/shared_mutex.hpp"
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
@@ -69,8 +67,7 @@ class PointCloudUpdater {
   static float lidar_height_;
 
   // Mutex to protect concurrent access to point_cloud_str_ and lidar_height_.
-  // NOTE: Use boost until we have std version of rwlock support.
-  static boost::shared_mutex mutex_;
+  static std::shared_timed_mutex mutex_;
 
  private:
   void RegisterMessageHandlers();

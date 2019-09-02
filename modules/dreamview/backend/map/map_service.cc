@@ -88,7 +88,7 @@ MapService::MapService(bool use_sim_map) : use_sim_map_(use_sim_map) {
 }
 
 bool MapService::ReloadMap(bool force_reload) {
-  boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+  std::unique_lock<std::shared_timed_mutex> writer_lock(mutex_);
   bool ret = true;
   if (force_reload) {
     ret = HDMapUtil::ReloadMaps();
@@ -160,7 +160,7 @@ void MapService::CollectMapElementIds(const PointENU &point, double radius,
   if (!MapReady()) {
     return;
   }
-  boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+  std::shared_lock<std::shared_timed_mutex> reader_lock(mutex_);
 
   std::vector<LaneInfoConstPtr> lanes;
   if (SimMap()->GetLanes(point, radius, &lanes) != 0) {
@@ -225,7 +225,7 @@ void MapService::CollectMapElementIds(const PointENU &point, double radius,
 }
 
 Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
-  boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+  std::shared_lock<std::shared_timed_mutex> reader_lock(mutex_);
 
   Map result;
   if (!MapReady()) {
@@ -332,7 +332,7 @@ Map MapService::RetrieveMapElements(const MapElementIds &ids) const {
 bool MapService::GetNearestLane(const double x, const double y,
                                 LaneInfoConstPtr *nearest_lane,
                                 double *nearest_s, double *nearest_l) const {
-  boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+  std::shared_lock<std::shared_timed_mutex> reader_lock(mutex_);
 
   PointENU point;
   point.set_x(x);
@@ -349,7 +349,7 @@ bool MapService::GetNearestLaneWithHeading(const double x, const double y,
                                            LaneInfoConstPtr *nearest_lane,
                                            double *nearest_s, double *nearest_l,
                                            const double heading) const {
-  boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+  std::shared_lock<std::shared_timed_mutex> reader_lock(mutex_);
 
   PointENU point;
   point.set_x(x);
@@ -486,7 +486,7 @@ bool MapService::AddPathFromPassageRegion(
   if (!MapReady()) {
     return false;
   }
-  boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+  std::shared_lock<std::shared_timed_mutex> reader_lock(mutex_);
 
   std::vector<MapPathPoint> path_points;
   for (const auto &segment : passage_region.segment()) {

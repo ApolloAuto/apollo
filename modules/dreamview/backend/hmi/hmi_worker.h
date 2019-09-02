@@ -16,12 +16,10 @@
 
 #pragma once
 
+#include <shared_mutex>
 #include <memory>
 #include <string>
 #include <vector>
-
-#include "boost/thread/locks.hpp"
-#include "boost/thread/shared_mutex.hpp"
 
 #include "cyber/cyber.h"
 #include "modules/canbus/proto/chassis.pb.h"
@@ -100,7 +98,7 @@ class HMIWorker {
   HMIMode current_mode_;
   bool status_changed_ = false;
   bool stop_ = false;
-  mutable boost::shared_mutex status_mutex_;
+  mutable std::shared_timed_mutex status_mutex_;
   std::future<void> thread_future_;
   std::vector<StatusUpdateHandler> status_update_handlers_;
 
