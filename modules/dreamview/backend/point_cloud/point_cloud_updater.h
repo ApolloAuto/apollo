@@ -57,7 +57,7 @@ class PointCloudUpdater {
   explicit PointCloudUpdater(WebSocketHandler *websocket);
   ~PointCloudUpdater();
 
-  static void LoadLidarHeight(const std::string &file_path);
+  void LoadLidarHeight(const std::string &file_path);
 
   /**
    * @brief Starts to push PointCloud to frontend.
@@ -66,11 +66,11 @@ class PointCloudUpdater {
   void Stop();
 
   // The height of lidar w.r.t the ground.
-  static float lidar_height_;
+  float lidar_height_;
 
-  // Mutex to protect concurrent access to point_cloud_str_ and lidar_height_.
+  // Mutex to protect concurrent access to point_cloud_str_.
   // NOTE: Use boost until we have std version of rwlock support.
-  static boost::shared_mutex mutex_;
+  boost::shared_mutex mutex_;
 
  private:
   void RegisterMessageHandlers();
