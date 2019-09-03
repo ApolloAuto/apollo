@@ -81,10 +81,10 @@ class DataCollectionMonitor {
   void InitReaders();
   void LoadConfiguration();
   void ConstructCategories();
-  void ConstructCategoriesHelper(
-      const Scenario& scenario, int feature_idx,
-      std::string current_category_name, const Category& current_category,
-      std::unordered_map<std::string, Category>* categories);
+  void ConstructCategoriesHelper(const std::string& scenario_name,
+                                 const Scenario& scenario, int feature_idx,
+                                 std::string current_category_name,
+                                 const Category& current_category);
   void OnChassis(const std::shared_ptr<apollo::canbus::Chassis>& chassis);
   bool IsCompliedWithCriteria(
       const std::shared_ptr<apollo::canbus::Chassis>& chassis,

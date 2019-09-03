@@ -18,7 +18,6 @@
 
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
-#include <sstream>
 
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -126,17 +125,6 @@ void DataCollectionMonitor::LoadConfiguration() {
       << data_collection_config_path;
 
   ConstructCategories();
-  for (const auto& scenario_iter : scenario_to_categories_) {
-    const std::string& scenario_name = scenario_iter.first;
-    const auto& categories = scenario_iter.second;
-
-    for (const auto& category_iter : categories) {
-      const std::string& category_name = category_iter.first;
-      category_consecutive_frame_count_[scenario_name][category_name] = 0.0;
-      category_frame_count_[scenario_name][category_name] = 0.0;
-      current_progress_json_[scenario_name][category_name] = 0.0;
-    }
-  }
 
   ADEBUG << "Configuration loaded.";
 }
@@ -149,17 +137,21 @@ void DataCollectionMonitor::ConstructCategories() {
     const Scenario& scenario = scenario_iter.second;
 
     Category category;
-    ConstructCategoriesHelper(scenario, 0, "", category,
-                              &scenario_to_categories_[scenario_name]);
+    ConstructCategoriesHelper(scenario_name, scenario, 0, "", category);
   }
 }
 
 void DataCollectionMonitor::ConstructCategoriesHelper(
-    const Scenario& scenario, int feature_idx,
-    std::string current_category_name, const Category& current_category,
-    std::unordered_map<std::string, Category>* categories) {
+    const std::string& scenario_name, const Scenario& scenario, int feature_idx,
+    std::string current_category_name, const Category& current_category) {
   if (feature_idx == scenario.feature_size()) {
-    categories->insert({current_category_name, current_category});
+    scenario_to_categories_[scenario_name].insert(
+        {current_category_name, current_category});
+
+    category_consecutive_frame_count_[scenario_name][current_category_name] =
+        0.0;
+    category_frame_count_[scenario_name][current_category_name] = 0.0;
+    current_progress_json_[scenario_name][current_category_name] = 0.0;
     return;
   }
 
@@ -169,19 +161,17 @@ void DataCollectionMonitor::ConstructCategoriesHelper(
     new_category.push_back(range);
 
     // set new category name by appending it with the current range name
-    std::stringstream new_category_name;
-    new_category_name << current_category_name;
+    std::string new_category_name(current_category_name);
     const std::string& range_name = range.name();
     if (feature.range().size() > 1 && !range_name.empty()) {
-      if (!current_category_name.empty()) {
-        new_category_name << ", ";
+      if (!new_category_name.empty()) {
+        new_category_name += ", ";
       }
-      new_category_name << range_name;
+      new_category_name += range_name;
     }
 
-    ConstructCategoriesHelper(scenario, feature_idx + 1,
-                              new_category_name.str(), new_category,
-                              categories);
+    ConstructCategoriesHelper(scenario_name, scenario, feature_idx + 1,
+                              new_category_name, new_category);
   }
 }
 
