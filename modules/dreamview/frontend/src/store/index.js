@@ -72,10 +72,6 @@ class DreamviewStore {
         this.isInitialized = status;
     }
 
-    @action updatePlanning(newPlanningData) {
-        this.planning.update(newPlanningData);
-    }
-
     @action setGeolocation(newGeolocation) {
         this.geolocation = newGeolocation;
     }
