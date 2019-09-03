@@ -137,7 +137,7 @@ bool CreepDecider::CheckCreepDone(const Frame& frame,
   const auto& creep_config = config_.creep_decider_config();
   bool creep_done = false;
   double creep_stop_s = traffic_sign_overlap_end_s +
-      FindCreepDistance(frame, reference_line_info);
+                        FindCreepDistance(frame, reference_line_info);
 
   const double distance =
       creep_stop_s - reference_line_info.AdcSlBoundary().end_s();

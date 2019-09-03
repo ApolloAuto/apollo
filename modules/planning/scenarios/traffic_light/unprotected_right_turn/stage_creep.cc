@@ -104,8 +104,8 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
   }
 
   if (task->CheckCreepDone(*frame, reference_line_info,
-                           current_traffic_light_overlap->end_s,
-                           wait_time, timeout_sec)) {
+                           current_traffic_light_overlap->end_s, wait_time,
+                           timeout_sec)) {
     return FinishStage();
   }
 
