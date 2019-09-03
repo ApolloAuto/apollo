@@ -18,6 +18,7 @@
 
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
+#include <sstream>
 
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -125,12 +126,12 @@ void DataCollectionMonitor::LoadConfiguration() {
       << data_collection_config_path;
 
   ConstructCategories();
-  for (const auto& iter : categories_) {
-    const std::string& scenario_name = iter.first;
-    const std::vector<Range>& categories = iter.second;
+  for (const auto& scenario_iter : scenario_to_categories_) {
+    const std::string& scenario_name = scenario_iter.first;
+    const auto& categories = scenario_iter.second;
 
-    for (const auto& category : categories) {
-      const std::string& category_name = category.name();
+    for (const auto& category_iter : categories) {
+      const std::string& category_name = category_iter.first;
       category_consecutive_frame_count_[scenario_name][category_name] = 0.0;
       category_frame_count_[scenario_name][category_name] = 0.0;
       current_progress_json_[scenario_name][category_name] = 0.0;
@@ -141,43 +142,45 @@ void DataCollectionMonitor::LoadConfiguration() {
 }
 
 void DataCollectionMonitor::ConstructCategories() {
-  categories_.clear();
+  scenario_to_categories_.clear();
 
   for (const auto& scenario_iter : data_collection_table_.scenario()) {
     const std::string& scenario_name = scenario_iter.first;
     const Scenario& scenario = scenario_iter.second;
 
-    Range category;
-    ConstructCategoriesHelper(scenario, 0, category,
-                              &categories_[scenario_name]);
+    Category category;
+    ConstructCategoriesHelper(scenario, 0, "", category,
+                              &scenario_to_categories_[scenario_name]);
   }
 }
 
 void DataCollectionMonitor::ConstructCategoriesHelper(
-    const Scenario& scenario, int feature_idx, const Range& current_category,
-    std::vector<Range>* categories) {
+    const Scenario& scenario, int feature_idx,
+    std::string current_category_name, const Category& current_category,
+    std::unordered_map<std::string, Category>* categories) {
   if (feature_idx == scenario.feature_size()) {
-    categories->push_back(current_category);
+    categories->insert({current_category_name, current_category});
     return;
   }
 
   const Feature& feature = scenario.feature(feature_idx);
   for (const auto& range : feature.range()) {
-    Range new_category(current_category);
-    for (const auto& criterion : range.criterion()) {
-      new_category.add_criterion()->CopyFrom(criterion);
-    }
+    Category new_category(current_category);
+    new_category.push_back(range);
 
     // set new category name by appending it with the current range name
+    std::stringstream new_category_name;
+    new_category_name << current_category_name;
     const std::string& range_name = range.name();
     if (feature.range().size() > 1 && !range_name.empty()) {
-      if (!new_category.name().empty()) {
-        new_category.set_name(new_category.name() + ", ");
+      if (!current_category_name.empty()) {
+        new_category_name << ", ";
       }
-      new_category.set_name(new_category.name() + range_name);
+      new_category_name << range_name;
     }
 
-    ConstructCategoriesHelper(scenario, feature_idx + 1, new_category,
+    ConstructCategoriesHelper(scenario, feature_idx + 1,
+                              new_category_name.str(), new_category,
                               categories);
   }
 }
@@ -206,12 +209,13 @@ void DataCollectionMonitor::OnChassis(const std::shared_ptr<Chassis>& chassis) {
 
   const size_t frame_threshold = data_collection_table_.frame_threshold();
   const auto total_frames = data_collection_table_.total_frames();
-  for (const auto& iter : categories_) {
-    const std::string& scenario_name = iter.first;
-    const std::vector<Range>& categories = iter.second;
+  for (const auto& scenario_iter : scenario_to_categories_) {
+    const std::string& scenario_name = scenario_iter.first;
+    const auto& categories = scenario_iter.second;
 
-    for (const auto& category : categories) {
-      const std::string& category_name = category.name();
+    for (const auto& category_iter : categories) {
+      const std::string& category_name = category_iter.first;
+      const Category& category = category_iter.second;
 
       // This category is done, skip
       if (category_frame_count_[scenario_name][category_name] >= total_frames) {
@@ -249,7 +253,7 @@ void DataCollectionMonitor::OnChassis(const std::shared_ptr<Chassis>& chassis) {
 }
 
 bool DataCollectionMonitor::IsCompliedWithCriteria(
-    const std::shared_ptr<Chassis>& chassis, const Range& category) {
+    const std::shared_ptr<Chassis>& chassis, const Category& category) {
   const auto& vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
   const auto* vehicle_param_descriptor = vehicle_param.GetDescriptor();
   const auto* vehicle_param_reflection = vehicle_param.GetReflection();
@@ -257,27 +261,29 @@ bool DataCollectionMonitor::IsCompliedWithCriteria(
   const auto* chassis_descriptor = chassis->GetDescriptor();
   const auto* chassis_reflection = chassis->GetReflection();
 
-  for (const auto& criterion : category.criterion()) {
-    float target_value;
-    if (criterion.has_value()) {
-      target_value = criterion.value();
-    } else if (!GetProtobufFloatByFieldName(
-                   vehicle_param, vehicle_param_descriptor,
-                   vehicle_param_reflection, criterion.vehicle_config(),
-                   &target_value)) {
-      return false;
-    }
+  for (const auto& range : category) {
+    for (const auto& criterion : range.criterion()) {
+      float target_value;
+      if (criterion.has_value()) {
+        target_value = criterion.value();
+      } else if (!GetProtobufFloatByFieldName(
+                     vehicle_param, vehicle_param_descriptor,
+                     vehicle_param_reflection, criterion.vehicle_config(),
+                     &target_value)) {
+        return false;
+      }
 
-    float actual_value;
-    if (!GetProtobufFloatByFieldName(*chassis, chassis_descriptor,
-                                     chassis_reflection, criterion.field(),
-                                     &actual_value)) {
-      return false;
-    }
+      float actual_value;
+      if (!GetProtobufFloatByFieldName(*chassis, chassis_descriptor,
+                                       chassis_reflection, criterion.field(),
+                                       &actual_value)) {
+        return false;
+      }
 
-    if (!IsCompliedWithCriterion(actual_value, criterion.comparison_operator(),
-                                 target_value)) {
-      return false;
+      if (!IsCompliedWithCriterion(
+              actual_value, criterion.comparison_operator(), target_value)) {
+        return false;
+      }
     }
   }
 

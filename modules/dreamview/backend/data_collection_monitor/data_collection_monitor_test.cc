@@ -57,31 +57,43 @@ class DataCollectionMonitorTest : public ::testing::Test {
 
 TEST_F(DataCollectionMonitorTest, ConstructCategories) {
   data_collection_monitor_->Start();
-  const auto& scenario =
-      data_collection_monitor_->categories_.find("Category Construction Test");
-  EXPECT_NE(scenario, data_collection_monitor_->categories_.end());
+  const auto& scenario = data_collection_monitor_->scenario_to_categories_.find(
+      "Category Construction Test");
+  EXPECT_NE(scenario, data_collection_monitor_->scenario_to_categories_.end());
 
   const auto& categories = scenario->second;
   EXPECT_EQ(6, categories.size());
-  EXPECT_EQ("mps < 10, Throttle == 30%", categories[0].name());
-  EXPECT_EQ("mps < 10, Throttle != 30%", categories[1].name());
-  EXPECT_EQ("mps < 10, Throttle deadzone ~ 35%", categories[2].name());
-  EXPECT_EQ("mps >= 10, Throttle == 30%", categories[3].name());
-  EXPECT_EQ("mps >= 10, Throttle != 30%", categories[4].name());
-  EXPECT_EQ("mps >= 10, Throttle deadzone ~ 35%", categories[5].name());
+  EXPECT_NE(categories.end(), categories.find("mps < 10, Throttle == 30%"));
+  EXPECT_NE(categories.end(), categories.find("mps < 10, Throttle != 30%"));
+  EXPECT_NE(categories.end(),
+            categories.find("mps < 10, Throttle deadzone ~ 35%"));
+  EXPECT_NE(categories.end(), categories.find("mps >= 10, Throttle == 30%"));
+  EXPECT_NE(categories.end(), categories.find("mps >= 10, Throttle != 30%"));
+  EXPECT_NE(categories.end(),
+            categories.find("mps >= 10, Throttle deadzone ~ 35%"));
 
-  const auto& criterion = categories[0].criterion();
-  EXPECT_EQ("gear_location", criterion[0].field());
-  EXPECT_EQ(ComparisonOperator::EQUAL, criterion[0].comparison_operator());
-  EXPECT_EQ(1, criterion[0].value());
+  const auto& category = categories.find("mps < 10, Throttle == 30%")->second;
+  EXPECT_EQ(3, category.size());
 
-  EXPECT_EQ("speed_mps", criterion[1].field());
-  EXPECT_EQ(ComparisonOperator::LESS_THAN, criterion[1].comparison_operator());
-  EXPECT_EQ(10, criterion[1].value());
+  const auto& gear_criterion = category[0].criterion();
+  EXPECT_EQ(1, gear_criterion.size());
+  EXPECT_EQ("gear_location", gear_criterion[0].field());
+  EXPECT_EQ(ComparisonOperator::EQUAL, gear_criterion[0].comparison_operator());
+  EXPECT_EQ(1, gear_criterion[0].value());
 
-  EXPECT_EQ("throttle_percentage", criterion[2].field());
-  EXPECT_EQ(ComparisonOperator::EQUAL, criterion[2].comparison_operator());
-  EXPECT_EQ(30, criterion[2].value());
+  const auto& speed_criterion = category[1].criterion();
+  EXPECT_EQ(1, speed_criterion.size());
+  EXPECT_EQ("speed_mps", speed_criterion[0].field());
+  EXPECT_EQ(ComparisonOperator::LESS_THAN,
+            speed_criterion[0].comparison_operator());
+  EXPECT_EQ(10, speed_criterion[0].value());
+
+  const auto& throttle_criterion = category[2].criterion();
+  EXPECT_EQ(1, throttle_criterion.size());
+  EXPECT_EQ("throttle_percentage", throttle_criterion[0].field());
+  EXPECT_EQ(ComparisonOperator::EQUAL,
+            throttle_criterion[0].comparison_operator());
+  EXPECT_EQ(30, throttle_criterion[0].value());
 }
 
 TEST_F(DataCollectionMonitorTest, UpdateCollectionProgress) {

@@ -40,6 +40,8 @@
 namespace apollo {
 namespace dreamview {
 
+typedef std::vector<Range> Category;
+
 /**
  * @class DataCollectionMonitor
  * @brief A module that monitor data collection progress for calibration
@@ -79,13 +81,14 @@ class DataCollectionMonitor {
   void InitReaders();
   void LoadConfiguration();
   void ConstructCategories();
-  void ConstructCategoriesHelper(const Scenario& scenario, int feature_idx,
-                                 const Range& current_category,
-                                 std::vector<Range>* categories);
+  void ConstructCategoriesHelper(
+      const Scenario& scenario, int feature_idx,
+      std::string current_category_name, const Category& current_category,
+      std::unordered_map<std::string, Category>* categories);
   void OnChassis(const std::shared_ptr<apollo::canbus::Chassis>& chassis);
   bool IsCompliedWithCriteria(
       const std::shared_ptr<apollo::canbus::Chassis>& chassis,
-      const Range& category);
+      const Category& category);
 
   std::unique_ptr<cyber::Node> node_;
 
@@ -96,8 +99,9 @@ class DataCollectionMonitor {
   DataCollectionTable data_collection_table_;
 
   // A map from scenario to its categories. Categories are collections
-  // of criteria from all possible combination of Feature x Range in a Scenario.
-  std::unordered_map<std::string, std::vector<Range>> categories_;
+  // of ranges from all possible combination of Feature x Range in a Scenario.
+  std::unordered_map<std::string, std::unordered_map<std::string, Category>>
+      scenario_to_categories_;
 
   // Number of frames that has been collected for each (scenario, category)
   std::unordered_map<std::string, std::unordered_map<std::string, size_t>>
