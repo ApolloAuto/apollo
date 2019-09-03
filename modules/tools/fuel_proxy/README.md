@@ -29,6 +29,7 @@ We have offered a unique opportunity through the Data Pipeline tool to communica
 1. Activate the Python 3 Conda environment, and run the tool.
 
    ```bash
+   conda env update -f /apollo/docker/build/installers/py37_conda.yaml
    source activate py37
    python submit_job.py --job_config=/path/to/your/job.pb.txt
    ```
