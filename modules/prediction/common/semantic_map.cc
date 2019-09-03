@@ -131,14 +131,15 @@ void SemanticMap::DrawRoads(const common::PointENU& center_point,
         } else if (edge.type() == 3) {  // right edge
           for (const auto& segment : edge.curve().segment()) {
             for (const auto& point : segment.line_segment().point()) {
-              polygon.insert(
-                  polygon.begin(),
-                  GetTransPoint(point.x(), point.y(), base_x, base_y));
+              polygon.insert(polygon.begin(),
+                             std::move(GetTransPoint(point.x(), point.y(),
+                                                     base_x, base_y)));
             }
           }
         }
       }
-      cv::fillPoly(base_img_, std::vector<std::vector<cv::Point>>({polygon}),
+      cv::fillPoly(base_img_,
+                   std::vector<std::vector<cv::Point>>({std::move(polygon)}),
                    color);
     }
   }
@@ -153,9 +154,11 @@ void SemanticMap::DrawJunctions(const common::PointENU& center_point,
   for (const auto& junction : junctions) {
     std::vector<cv::Point> polygon;
     for (const auto& point : junction->junction().polygon().point()) {
-      polygon.push_back(GetTransPoint(point.x(), point.y(), base_x, base_y));
+      polygon.push_back(
+          std::move(GetTransPoint(point.x(), point.y(), base_x, base_y)));
     }
-    cv::fillPoly(base_img_, std::vector<std::vector<cv::Point>>({polygon}),
+    cv::fillPoly(base_img_,
+                 std::vector<std::vector<cv::Point>>({std::move(polygon)}),
                  color);
   }
 }
@@ -169,9 +172,11 @@ void SemanticMap::DrawCrosswalks(const common::PointENU& center_point,
   for (const auto& crosswalk : crosswalks) {
     std::vector<cv::Point> polygon;
     for (const auto& point : crosswalk->crosswalk().polygon().point()) {
-      polygon.push_back(GetTransPoint(point.x(), point.y(), base_x, base_y));
+      polygon.push_back(
+          std::move(GetTransPoint(point.x(), point.y(), base_x, base_y)));
     }
-    cv::fillPoly(base_img_, std::vector<std::vector<cv::Point>>({polygon}),
+    cv::fillPoly(base_img_,
+                 std::vector<std::vector<cv::Point>>({std::move(polygon)}),
                  color);
   }
 }
@@ -272,22 +277,24 @@ void SemanticMap::DrawRect(const Feature& feature, const cv::Scalar& color,
   double theta = feature.theta();
   std::vector<cv::Point> polygon;
   // point 1 (head-right point)
-  polygon.push_back(GetTransPoint(
+  polygon.push_back(std::move(GetTransPoint(
       obs_x + (cos(theta) * obs_l - sin(theta) * obs_w) / 2,
-      obs_y + (sin(theta) * obs_l + cos(theta) * obs_w) / 2, base_x, base_y));
+      obs_y + (sin(theta) * obs_l + cos(theta) * obs_w) / 2, base_x, base_y)));
   // point 2 (head-left point)
-  polygon.push_back(GetTransPoint(
+  polygon.push_back(std::move(GetTransPoint(
       obs_x + (cos(theta) * -obs_l - sin(theta) * obs_w) / 2,
-      obs_y + (sin(theta) * -obs_l + cos(theta) * obs_w) / 2, base_x, base_y));
+      obs_y + (sin(theta) * -obs_l + cos(theta) * obs_w) / 2, base_x, base_y)));
   // point 3 (back-left point)
-  polygon.push_back(GetTransPoint(
-      obs_x + (cos(theta) * -obs_l - sin(theta) * -obs_w) / 2,
-      obs_y + (sin(theta) * -obs_l + cos(theta) * -obs_w) / 2, base_x, base_y));
+  polygon.push_back(std::move(
+      GetTransPoint(obs_x + (cos(theta) * -obs_l - sin(theta) * -obs_w) / 2,
+                    obs_y + (sin(theta) * -obs_l + cos(theta) * -obs_w) / 2,
+                    base_x, base_y)));
   // point 4 (back-right point)
-  polygon.push_back(GetTransPoint(
+  polygon.push_back(std::move(GetTransPoint(
       obs_x + (cos(theta) * obs_l - sin(theta) * -obs_w) / 2,
-      obs_y + (sin(theta) * obs_l + cos(theta) * -obs_w) / 2, base_x, base_y));
-  cv::fillPoly(*img, std::vector<std::vector<cv::Point>>({polygon}), color);
+      obs_y + (sin(theta) * obs_l + cos(theta) * -obs_w) / 2, base_x, base_y)));
+  cv::fillPoly(*img, std::vector<std::vector<cv::Point>>({std::move(polygon)}),
+               color);
 }
 
 void SemanticMap::DrawPoly(const Feature& feature, const cv::Scalar& color,
@@ -298,7 +305,8 @@ void SemanticMap::DrawPoly(const Feature& feature, const cv::Scalar& color,
     polygon.push_back(std::move(
         GetTransPoint(polygon_point.x(), polygon_point.y(), base_x, base_y)));
   }
-  cv::fillPoly(*img, std::vector<std::vector<cv::Point>>({polygon}), color);
+  cv::fillPoly(*img, std::vector<std::vector<cv::Point>>({std::move(polygon)}),
+               color);
 }
 
 void SemanticMap::DrawHistory(const ObstacleHistory& history,
@@ -335,7 +343,7 @@ cv::Mat SemanticMap::CropByHistory(const ObstacleHistory& history,
   cv::Mat feature_map = curr_img_.clone();
   DrawHistory(history, color, base_x, base_y, &feature_map);
   const Feature& curr_feature = history.feature(0);
-  cv::Point2i center_point = GetTransPoint(
+  const cv::Point2i& center_point = GetTransPoint(
       curr_feature.position().x(), curr_feature.position().y(), base_x, base_y);
   return CropArea(feature_map, center_point, curr_feature.theta());
 }

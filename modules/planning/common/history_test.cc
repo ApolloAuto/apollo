@@ -15,8 +15,8 @@ limitations under the License.
 
 #include "modules/planning/common/history.h"
 
-#include "gtest/gtest.h"
 #include "cyber/common/file.h"
+#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -94,6 +94,13 @@ TEST_F(HistoryTest, GetObjectDecisions) {
       history_->GetLastFrame()->GetObjectDecisions();
   EXPECT_EQ(3, object_decisions.size());
 
+  // sort
+  std::sort(object_decisions.begin(), object_decisions.end(),
+            [](const HistoryObjectDecision* lhs,
+               const HistoryObjectDecision* rhs) {
+              return lhs->id() < rhs->id();
+            });
+
   for (const HistoryObjectDecision* object_decision : object_decisions) {
     ADEBUG << "object_decision[" << object_decision->id() << "]";
     auto obj_decision = object_decision->GetObjectDecision();
@@ -106,6 +113,12 @@ TEST_F(HistoryTest, GetObjectDecisions) {
   EXPECT_STREQ("11720", object_decisions[0]->id().c_str());
   auto obj_decision = object_decisions[0]->GetObjectDecision();
   EXPECT_EQ(2, obj_decision.size());
+  // sort
+  std::sort(obj_decision.begin(), obj_decision.end(),
+            [](const ObjectDecisionType* lhs,
+               const ObjectDecisionType* rhs) {
+              return lhs->object_tag_case() < rhs->object_tag_case();
+            });
   EXPECT_TRUE(obj_decision[0]->has_stop());
   EXPECT_TRUE(obj_decision[1]->has_nudge());
 
@@ -170,6 +183,12 @@ TEST_F(HistoryTest, GetObjectDecisionsById) {
       history_->GetLastFrame()->GetObjectDecisionsById("11720");
   EXPECT_STREQ("11720", object_decision->id().c_str());
   auto obj_decision = object_decision->GetObjectDecision();
+  // sort
+  std::sort(obj_decision.begin(), obj_decision.end(),
+            [](const ObjectDecisionType* lhs,
+               const ObjectDecisionType* rhs) {
+              return lhs->object_tag_case() < rhs->object_tag_case();
+            });
   EXPECT_EQ(2, obj_decision.size());
   EXPECT_TRUE(obj_decision[0]->has_stop());
   EXPECT_TRUE(obj_decision[1]->has_nudge());

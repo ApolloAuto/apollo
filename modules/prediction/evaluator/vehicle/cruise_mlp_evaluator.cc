@@ -129,7 +129,7 @@ bool CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     for (size_t i = 0; i < feature_values.size(); ++i) {
       torch_input[0][i] = static_cast<float>(feature_values[i]);
     }
-    torch_inputs.push_back(torch_input.to(device_));
+    torch_inputs.push_back(std::move(torch_input.to(device_)));
     if (lane_sequence_ptr->vehicle_on_lane()) {
       ModelInference(torch_inputs, torch_go_model_, lane_sequence_ptr);
     } else {

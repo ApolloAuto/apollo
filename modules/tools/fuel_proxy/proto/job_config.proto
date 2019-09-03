@@ -20,6 +20,15 @@ message BosConfig {
   optional Region region = 4 [default = bj];
 }
 
+// Azure Blob is an S3-like object storage.
+// For more information, please visit
+// https://azure.microsoft.com/en-us/services/storage/blobs
+message AzureBlobConfig {
+  optional string storage_account = 1;
+  optional string storage_access_key = 2;
+  optional string blob_container = 3;
+}
+
 // Accept exactly one storage access config. And we highly recommend the
 // principle of Least Privilege:
 // 1. Only grant access to this bucket.
@@ -27,6 +36,7 @@ message BosConfig {
 message Storage {
   oneof storage_config {
     BosConfig bos = 1;
+    AzureBlobConfig blob = 2;
   }
 }
 
@@ -41,7 +51,7 @@ message JobConfig {
   optional string partner_id = 2;
 
   optional Storage storage = 3;
-  // 1. For object storage like BOS and S3, the path should be a key.
+  // 1. For object storage like BOS and Blob, the path should be a key.
   // 2. If not provided, we'll take the storage root as data path.
   optional string input_data_path = 4;
 }

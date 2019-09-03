@@ -297,6 +297,9 @@ export default class Map {
 
     removeAllElements(scene) {
         this.removeExpiredElements([], scene);
+        this.trafficSignals.removeAll(scene);
+        this.stopSigns.removeAll(scene);
+        this.yieldSigns.removeAll(scene);
     }
 
     removeExpiredElements(elementIds, scene) {
