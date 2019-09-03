@@ -6,7 +6,7 @@ cc_library(
     name = "localization_pyramid_map_ndt_map_config",
     srcs = ["ndt_map_config.cc"],
     hdrs = ["ndt_map_config.h"],
-    copts= ["-g"],
+    copts = ["-g"],
     deps = [
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map_config",
         "@glog",
@@ -63,8 +63,8 @@ cc_library(
     deps = [
         ":localization_pyramid_map_ndt_map_config",
         ":localization_pyramid_map_ndt_map_matrix",
-        ":localization_pyramid_map_ndt_map_node_config",
         ":localization_pyramid_map_ndt_map_matrix_handler",
+        ":localization_pyramid_map_ndt_map_node_config",
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map_node",
         "@eigen",
@@ -82,10 +82,10 @@ cc_library(
         "-lopencv_imgproc",
     ],
     deps = [
-        ":localization_pyramid_map_ndt_map_node",
         ":localization_pyramid_map_ndt_map_matrix",
-        ":localization_pyramid_map_ndt_map_node_config",
         ":localization_pyramid_map_ndt_map_matrix_handler",
+        ":localization_pyramid_map_ndt_map_node",
+        ":localization_pyramid_map_ndt_map_node_config",
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map_config",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map_pool",
@@ -99,8 +99,8 @@ cc_library(
     srcs = ["ndt_map.cc"],
     hdrs = ["ndt_map.h"],
     deps = [
-        ":localization_pyramid_map_ndt_map_node",
         ":localization_pyramid_map_ndt_map_config",
+        ":localization_pyramid_map_ndt_map_node",
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
         "@eigen",
