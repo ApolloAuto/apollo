@@ -251,6 +251,11 @@ function cibuild() {
     //modules/routing/...
     //modules/transform/..."
 
+  # The data module is lightweight and rarely changed. If it fails, it's
+  # most-likely an environment mess. So we try `bazel clean` and then initial
+  # the building process.
+  bazel build $JOB_ARG $DEFINES $@ "//modules/data/..." || bazel clean
+
   bazel build $JOB_ARG $DEFINES $@ $BUILD_TARGETS
 
   if [ $? -eq 0 ]; then
