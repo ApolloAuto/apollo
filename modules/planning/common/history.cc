@@ -32,8 +32,7 @@ namespace planning {
 ////////////////////////////////////////////////
 // HistoryObjectDecision
 
-void HistoryObjectDecision::Init(
-    const ObjectDecision& object_decisions) {
+void HistoryObjectDecision::Init(const ObjectDecision& object_decisions) {
   id_ = object_decisions.id();
   object_decision_.clear();
   for (int i = 0; i < object_decisions.object_decision_size(); i++) {
@@ -58,12 +57,6 @@ HistoryObjectDecision::GetObjectDecision() const {
     result.push_back(&(object_decision_[i]));
   }
 
-  // sort
-  std::sort(result.begin(), result.end(),
-            [](const ObjectDecisionType* lhs,
-               const ObjectDecisionType* rhs) {
-              return lhs->object_tag_case() < rhs->object_tag_case();
-            });
   return result;
 }
 
@@ -92,13 +85,6 @@ HistoryFrame::GetObjectDecisions() const {
     result.push_back(&(object_decisions_[i]));
   }
 
-  // sort
-  std::sort(result.begin(), result.end(),
-            [](const HistoryObjectDecision* lhs,
-               const HistoryObjectDecision* rhs) {
-              return lhs->id() < rhs->id();
-            });
-
   return result;
 }
 
@@ -120,11 +106,11 @@ HistoryFrame::GetStopObjectDecisions() const {
   }
 
   // sort
-  std::sort(result.begin(), result.end(),
-            [](const HistoryObjectDecision* lhs,
-               const HistoryObjectDecision* rhs) {
-              return lhs->id() < rhs->id();
-            });
+  std::sort(
+      result.begin(), result.end(),
+      [](const HistoryObjectDecision* lhs, const HistoryObjectDecision* rhs) {
+        return lhs->id() < rhs->id();
+      });
 
   return result;
 }
@@ -164,9 +150,7 @@ int History::Add(const ADCTrajectory& adc_trajectory_pb) {
   return 0;
 }
 
-size_t History::Size() const {
-  return history_frames_.size();
-}
+size_t History::Size() const { return history_frames_.size(); }
 
 }  // namespace planning
 }  // namespace apollo

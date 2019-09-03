@@ -21,6 +21,7 @@ import "modules/planning/proto/speed_bounds_decider_config.proto";
 import "modules/planning/proto/navi_path_decider_config.proto";
 import "modules/planning/proto/navi_speed_decider_config.proto";
 import "modules/planning/proto/navi_obstacle_decider_config.proto";
+import "modules/planning/proto/path_reuse_decider_config.proto";
 
 message PathDeciderConfig {
   // place holder
@@ -28,8 +29,7 @@ message PathDeciderConfig {
 
 // Planning's configuration is based on the following architecture
 // * Scenario has one more multiple stages
-// * a stage has one or
-
+// * a stage has one or more
 // tasks are shared among all scenarios and stages.
 message TaskConfig {
   enum TaskType {
@@ -56,6 +56,7 @@ message TaskConfig {
     PIECEWISE_JERK_SPEED_OPTIMIZER = 27;
     LANE_CHANGE_DECIDER = 28;
     RULE_BASED_STOP_DECIDER = 29;
+    PATH_REUSE_DECIDER = 30;
   };
   optional TaskType task_type = 1;
   oneof task_config {
@@ -76,6 +77,7 @@ message TaskConfig {
     PathLaneBorrowDeciderConfig path_lane_borrow_decider_config = 24;
     LaneChangeDeciderConfig lane_change_decider_config = 25;
     RuleBasedStopDeciderConfig rule_based_stop_decider_config = 26;
+    PathReuseDeciderConfig path_reuse_decider_config = 27;
   }
 }
 
