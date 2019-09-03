@@ -405,7 +405,7 @@ void PredictionMap::NearbyLanesByCurrentLanes(
         double l = 0.0;
         GetProjection(point, nearby_lane, &s, &l);
         if (s < 0.0 || s >= nearby_lane->total_length() ||
-                       std::fabs(l) > radius) {
+            std::fabs(l) > radius) {
           continue;
         }
         lane_ids.insert(id);
@@ -421,7 +421,7 @@ void PredictionMap::NearbyLanesByCurrentLanes(
         double l = 0.0;
         GetProjection(point, nearby_lane, &s, &l);
         if (s < 0.0 || s >= nearby_lane->total_length() ||
-                       std::fabs(l) > radius) {
+            std::fabs(l) > radius) {
           continue;
         }
         lane_ids.insert(id);
