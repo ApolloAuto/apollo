@@ -153,7 +153,7 @@ bool Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
     return false;
   }
 
-  if (ReceivedNewerMessage(timestamp)) {
+  if (ReceivedOlderMessage(timestamp)) {
     AERROR << "Obstacle [" << id_ << "] received an older frame ["
            << std::setprecision(20) << timestamp
            << "] than the most recent timestamp [ " << this->timestamp()
@@ -599,10 +599,7 @@ void Obstacle::SetAcceleration(Feature* feature) {
     const Point3D& prev_velocity = feature_history_.front().velocity();
 
     if (curr_ts > prev_ts) {
-      /*
-       * A damp function is to punish acc calculation for low speed
-       * and reward it for high speed
-       */
+      // A damp function is to punish acc calculation for low speed
       double damping_x = Damp(curr_velocity.x(), 0.001);
       double damping_y = Damp(curr_velocity.y(), 0.001);
       double damping_z = Damp(curr_velocity.z(), 0.001);
@@ -616,13 +613,13 @@ void Obstacle::SetAcceleration(Feature* feature) {
       acc_z *= damping_z;
 
       acc_x =
-          common::math::Clamp(acc_x * damping_x, FLAGS_vehicle_min_linear_acc,
+          common::math::Clamp(acc_x, FLAGS_vehicle_min_linear_acc,
                               FLAGS_vehicle_max_linear_acc);
       acc_y =
-          common::math::Clamp(acc_y * damping_y, FLAGS_vehicle_min_linear_acc,
+          common::math::Clamp(acc_y, FLAGS_vehicle_min_linear_acc,
                               FLAGS_vehicle_max_linear_acc);
       acc_z =
-          common::math::Clamp(acc_z * damping_z, FLAGS_vehicle_min_linear_acc,
+          common::math::Clamp(acc_z, FLAGS_vehicle_min_linear_acc,
                               FLAGS_vehicle_max_linear_acc);
 
       double heading = feature->velocity_heading();
@@ -964,7 +961,7 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
     double heading = feature->velocity_heading();
     double angle_diff = 0.0;
     hdmap::MapPathPoint nearest_point;
-    if (!PredictionMap::ProjectionFromLane(nearby_lane, s, &nearest_point)) {
+    if (PredictionMap::ProjectionFromLane(nearby_lane, s, &nearest_point)) {
       angle_diff = common::math::AngleDiff(nearest_point.heading(), heading);
     }
 
@@ -1626,7 +1623,7 @@ std::unique_ptr<Obstacle> Obstacle::Create(const Feature& feature) {
   return ptr_obstacle;
 }
 
-bool Obstacle::ReceivedNewerMessage(const double timestamp) const {
+bool Obstacle::ReceivedOlderMessage(const double timestamp) const {
   if (feature_history_.empty()) {
     return false;
   }

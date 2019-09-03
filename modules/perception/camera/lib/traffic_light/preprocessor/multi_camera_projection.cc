@@ -87,10 +87,11 @@ bool MultiCamerasProjection::Project(const CarPose& pose,
   }
 
   Eigen::Matrix4d c2w_pose;
-  if (!pose.GetCameraPose(option.camera_name, &c2w_pose)) {
-    AERROR << "invalid camera_name: " << option.camera_name;
+
+  if (pose.c2w_poses_.find(option.camera_name) == pose.c2w_poses_.end()) {
     return false;
   }
+  c2w_pose = pose.c2w_poses_.at(option.camera_name);
 
   bool ret = false;
   AINFO << "project use camera_name: " << option.camera_name;

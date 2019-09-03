@@ -75,7 +75,7 @@ if __name__ == "__main__":
         fns = [f for f in listdir(folder) if isfile(join(folder, f))]
         for fn in fns:
             reader = RecordItemReader(folder+"/"+fn)
-            processor = TimeSpeedData()
+            processor = ImuSpeed()
             last_pose_data = None
             last_chassis_data = None
             topics = ["/apollo/localization/pose"]

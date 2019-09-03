@@ -23,12 +23,14 @@
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
+#include "modules/dreamview/backend/hmi/vehicle_manager.h"
 
 namespace apollo {
 namespace dreamview {
 
 using apollo::canbus::Chassis;
 using apollo::common::VehicleConfigHelper;
+using cyber::common::PathExists;
 using google::protobuf::FieldDescriptor;
 using Json = nlohmann::json;
 namespace {
@@ -94,7 +96,7 @@ bool IsCompliedWithCriterion(float actual_value,
 DataCollectionMonitor::DataCollectionMonitor()
     : node_(cyber::CreateNode("data_collection_monitor")) {
   InitReaders();
-  LoadConfiguration(FLAGS_data_collection_config_path);
+  LoadConfiguration();
 }
 
 DataCollectionMonitor::~DataCollectionMonitor() { Stop(); }
@@ -106,8 +108,17 @@ void DataCollectionMonitor::InitReaders() {
                                });
 }
 
-void DataCollectionMonitor::LoadConfiguration(
-    const std::string& data_collection_config_path) {
+void DataCollectionMonitor::LoadConfiguration() {
+  const std::string& vehicle_dir =
+      VehicleManager::Instance()->GetVehicleDataPath();
+  std::string data_collection_config_path =
+      vehicle_dir + "/data_collection_table.pb.txt";
+  if (!PathExists(data_collection_config_path)) {
+    AWARN << "No corresponding data collection table file found in "
+          << vehicle_dir << ". Using default one instead.";
+    data_collection_config_path = FLAGS_default_data_collection_config_path;
+  }
+
   CHECK(cyber::common::GetProtoFromFile(data_collection_config_path,
                                         &data_collection_table_))
       << "Unable to parse data collection configuration from file "
@@ -135,12 +146,17 @@ void DataCollectionMonitor::Start() {
     category_consecutive_frame_count_.clear();
     category_frame_count_.clear();
     current_progress_json_.clear();
-    LoadConfiguration(FLAGS_data_collection_config_path);
+    LoadConfiguration();
   }
   enabled_ = true;
 }
 
 void DataCollectionMonitor::Stop() { enabled_ = false; }
+
+void DataCollectionMonitor::Restart() {
+  Stop();
+  Start();
+}
 
 void DataCollectionMonitor::OnChassis(const std::shared_ptr<Chassis>& chassis) {
   if (!enabled_) {

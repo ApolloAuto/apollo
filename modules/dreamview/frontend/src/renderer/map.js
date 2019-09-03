@@ -9,8 +9,16 @@ import {
     drawShapeFromPoints
 } from "utils/draw";
 import Text3D, { TEXT_ALIGN } from "renderer/text3d";
-import RENDERER from "renderer";
-import TrafficControl from "renderer/traffic_control";
+import TrafficSigns from "renderer/traffic_controls/traffic_signs";
+import TrafficSignals from "renderer/traffic_controls/traffic_signals";
+
+import stopSignMaterial from "assets/models/stop_sign.mtl";
+import stopSignObject from "assets/models/stop_sign.obj";
+import yieldSignMaterial from "assets/models/yield_sign.mtl";
+import yieldSignObject from "assets/models/yield_sign.obj";
+
+const STOP_SIGN_SCALE = 0.01;
+const YIELD_SIGN_SCALE = 1.5;
 
 const colorMapping = {
     YELLOW: 0XDAA520,
@@ -33,7 +41,13 @@ export default class Map {
         this.initialized = false;
         this.elementKindsDrawn = '';
 
-        this.trafficControl = new TrafficControl();
+        this.trafficSignals = new TrafficSignals();
+        this.stopSigns = new TrafficSigns(
+            stopSignMaterial, stopSignObject, STOP_SIGN_SCALE,
+        );
+        this.yieldSigns = new TrafficSigns(
+            yieldSignMaterial, yieldSignObject, YIELD_SIGN_SCALE,
+        );
     }
 
     // The result will be the all the elements in current but not in data.
@@ -283,6 +297,9 @@ export default class Map {
 
     removeAllElements(scene) {
         this.removeExpiredElements([], scene);
+        this.trafficSignals.removeAll(scene);
+        this.stopSigns.removeAll(scene);
+        this.yieldSigns.removeAll(scene);
     }
 
     removeExpiredElements(elementIds, scene) {
@@ -356,14 +373,21 @@ export default class Map {
                             drewObjects: this.addStopLine(
                                 newData[kind][i].stopLine, coordinates, scene)
                         }));
-                        this.trafficControl.addTrafficLight([newData[kind][i]], coordinates, scene);
+                        this.trafficSignals.add([newData[kind][i]], coordinates, scene);
                         break;
                     case "stopSign":
                         this.data[kind].push(Object.assign(newData[kind][i], {
                             drewObjects: this.addStopLine(
                                 newData[kind][i].stopLine, coordinates, scene)
                         }));
-                        this.trafficControl.addStopSign([newData[kind][i]], coordinates, scene);
+                        this.stopSigns.add([newData[kind][i]], coordinates, scene);
+                        break;
+                    case "yield":
+                        this.data[kind].push(Object.assign(newData[kind][i], {
+                            drewObjects: this.addStopLine(
+                                newData[kind][i].stopLine, coordinates, scene)
+                        }));
+                        this.yieldSigns.add([newData[kind][i]], coordinates, scene);
                         break;
                     case "road":
                         const road = newData[kind][i];
@@ -441,22 +465,28 @@ export default class Map {
                 this.removeExpiredElements(elementIds, scene);
 
                 if (!this.shouldDrawObjectOfThisElementKind('signal')) {
-                    this.trafficControl.removeAllTrafficLights(scene);
+                    this.trafficSignals.removeAll(scene);
                 } else {
-                    this.trafficControl.removeExpiredTrafficLights(elementIds['signal'], scene);
+                    this.trafficSignals.removeExpired(elementIds['signal'], scene);
                 }
 
                 if (!this.shouldDrawObjectOfThisElementKind('stopSign')) {
-                    this.trafficControl.removeAllStopSigns(scene);
+                    this.stopSigns.removeAll(scene);
                 } else {
-                    this.trafficControl.removeExpiredStopSigns(elementIds['stopSign'], scene);
+                    this.stopSigns.removeExpired(elementIds['stopSign'], scene);
+                }
+
+                if (!this.shouldDrawObjectOfThisElementKind('yield')) {
+                    this.yieldSigns.removeAll(scene);
+                } else {
+                    this.yieldSigns.removeExpired(elementIds['yield'], scene);
                 }
             }
         }
     }
 
     update(world) {
-        this.trafficControl.updateTrafficLightStatus(world.perceivedSignal);
+        this.trafficSignals.updateTrafficLightStatus(world.perceivedSignal);
     }
 }
 

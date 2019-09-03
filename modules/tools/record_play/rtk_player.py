@@ -30,7 +30,7 @@ import math
 from cyber_py import cyber
 from cyber_py import cyber_time
 import scipy.signal as signal
-from logger import Logger
+from common.logger import Logger
 from numpy import genfromtxt
 
 from modules.canbus.proto import chassis_pb2
@@ -137,12 +137,12 @@ class RtkPlayer(object):
         self.closestpoint = self.closest_dist()
         self.logger.debug("replan!")
         self.start = max(self.closestpoint - 1, 0)
-        self.logger.debug("replan_start:", self.start)
+        self.logger.debug("replan_start: %s" % self.start)
         self.starttime = cyber_time.Time.now().to_sec()
-        self.logger.debug("at time", self.starttime)
+        self.logger.debug("at time %s" % self.starttime)
         # self.end = min(self.start + 1000, len(self.data) - 1)
         self.end = self.next_gear_switch_time(self.start, len(self.data))
-        self.logger.debug("replan_end:", self.end)
+        self.logger.debug("replan_end: %s" % self.end)
 
         self.logger.info("finish replan at time %s, self.closestpoint=%s" %
                          (self.starttime, self.closestpoint))
@@ -153,10 +153,10 @@ class RtkPlayer(object):
         self.logger.debug("before closest self.start=%s" % (self.start))
         search_start = max(self.start - SEARCH_INTERVAL / 2, 0)
         search_end = min(self.start + SEARCH_INTERVAL / 2, len(self.data))
-        self.logger.debug("search_start:", search_start)
-        self.logger.debug("search_end:", search_end)
+        self.logger.debug("search_start: %s" % search_start)
+        self.logger.debug("search_end: %s" % search_end)
         start = self.start
-        self.logger.debug("self.start:", self.start)
+        self.logger.debug("self.start: %s" % self.start)
         for i in range(search_start, search_end):
             dist_sqr = (self.carx - self.data['x'][i]) ** 2 + \
                 (self.cary - self.data['y'][i]) ** 2
@@ -203,7 +203,7 @@ class RtkPlayer(object):
         """
         if not self.localization_received:
             self.logger.warning(
-                "locaization not received yet when publish_planningmsg")
+                "localization not received yet when publish_planningmsg")
             return
 
         planningdata = planning_pb2.ADCTrajectory()

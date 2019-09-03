@@ -28,6 +28,7 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/ego_info.h"
+#include "modules/planning/common/history.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory_stitcher.h"
@@ -53,6 +54,7 @@ NaviPlanning::~NaviPlanning() {
   frame_.reset(nullptr);
   planner_.reset(nullptr);
   FrameHistory::Instance()->Clear();
+  History::Instance()->Clear();
   PlanningContext::Instance()->mutable_planning_status()->Clear();
 }
 
@@ -73,6 +75,9 @@ Status NaviPlanning::Init(const PlanningConfig& config) {
       FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
       << "Failed to load traffic rule config file "
       << FLAGS_traffic_rule_config_filename;
+
+  // clear planning history
+  History::Instance()->Clear();
 
   // clear planning status
   PlanningContext::Instance()->mutable_planning_status()->Clear();

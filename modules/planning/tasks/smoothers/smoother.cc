@@ -78,10 +78,10 @@ apollo::common::Status Smoother::Smooth(
   }
 
   const auto& vehicle_state = current_frame->vehicle_state();
-  const double max_adc_stop_speed =
-      common::VehicleConfigHelper::Instance()->GetConfig()
-          .vehicle_param()
-          .max_abs_speed_when_stopped();
+  const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
+                                        ->GetConfig()
+                                        .vehicle_param()
+                                        .max_abs_speed_when_stopped();
   if (vehicle_state.linear_velocity() > max_adc_stop_speed) {
     ADEBUG << "vehicle speed:" << vehicle_state.linear_velocity()
            << " skip smoothing for non-stop scenario";

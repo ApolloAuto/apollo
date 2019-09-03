@@ -16,14 +16,15 @@
 
 #pragma once
 
-#include "modules/localization/msf/local_map/base_map/base_map_node_index.h"
-#include "modules/localization/msf/local_map/base_map/base_map_pool.h"
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_config.h"
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_node.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_node_index.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_pool.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_node.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 /**@brief The memory pool for the data structure of BaseMapNode. */
 class NdtMapNodePool : public BaseMapNodePool {
@@ -40,6 +41,7 @@ class NdtMapNodePool : public BaseMapNodePool {
   virtual BaseMapNode* AllocNewMapNode();
 };
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

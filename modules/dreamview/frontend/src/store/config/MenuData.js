@@ -91,6 +91,7 @@ export default [
             mapRoad: 'Road',
             mapSignal: 'Signal',
             mapStopSign: 'Stop Sign',
+            mapYield: 'Yield Sign',
             mapSpeedBump: 'Speed Bump',
             mapParkingSpace: 'Parking Space',
             mapLaneId: 'Lane Id'

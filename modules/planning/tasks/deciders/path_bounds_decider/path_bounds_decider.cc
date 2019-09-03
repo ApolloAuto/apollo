@@ -211,26 +211,17 @@ void PathBoundsDecider::InitPathBoundsDecider(
   const ReferenceLine& reference_line = reference_line_info.reference_line();
   const common::TrajectoryPoint& planning_start_point =
       frame.PlanningStartPoint();
-  // Reset variables.
-  adc_frenet_s_ = 0.0;
-  adc_frenet_l_ = 0.0;
-  adc_l_to_lane_center_ = 0.0;
-  adc_lane_width_ = 0.0;
 
   // Initialize some private variables.
   // ADC s/l info.
-
-  // TODO(jiacheng): using ToFrenetFrame only.
-  auto adc_frenet_position =
-      reference_line.GetFrenetPoint(planning_start_point.path_point());
-  adc_frenet_s_ = adc_frenet_position.s();
-  adc_frenet_l_ = adc_frenet_position.l();
+  auto adc_sl_info = reference_line.ToFrenetFrame(planning_start_point);
+  adc_frenet_s_ = adc_sl_info.first[0];
+  adc_frenet_l_ = adc_sl_info.second[0];
+  adc_frenet_sd_ = adc_sl_info.first[1];
+  adc_frenet_ld_ = adc_sl_info.second[1] * adc_frenet_sd_;
   double offset_to_map = 0.0;
   reference_line.GetOffsetToMap(adc_frenet_s_, &offset_to_map);
   adc_l_to_lane_center_ = adc_frenet_l_ + offset_to_map;
-  auto adc_sl_info = reference_line.ToFrenetFrame(planning_start_point);
-  adc_frenet_sd_ = adc_sl_info.first[1];
-  adc_frenet_ld_ = adc_sl_info.second[1] * adc_frenet_sd_;
 
   // ADC's lane width.
   double lane_left_width = 0.0;
@@ -290,6 +281,37 @@ Status PathBoundsDecider::GenerateRegularPathBound(
 
   // 4. Adjust the boundary considering dynamic obstacles
   // TODO(all): may need to implement this in the future.
+
+  ADEBUG << "Completed generating path boundaries.";
+  return Status::OK();
+}
+
+Status PathBoundsDecider::GenerateLaneChangePathBound(
+    const ReferenceLineInfo& reference_line_info,
+    std::vector<std::tuple<double, double, double>>* const path_bound) {
+  // 1. Initialize the path boundaries to be an indefinitely large area.
+  if (!InitPathBoundary(reference_line_info.reference_line(), path_bound)) {
+    const std::string msg = "Failed to initialize path boundaries.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  // PathBoundsDebugString(*path_bound);
+
+  // 2. Decide a rough boundary based on lane info and ADC's position
+  std::string dummy_borrow_lane_type;
+  if (!GetBoundaryFromLanesAndADC(reference_line_info,
+                                  LaneBorrowInfo::NO_BORROW, 0.1, path_bound,
+                                  &dummy_borrow_lane_type)) {
+    const std::string msg =
+        "Failed to decide a rough boundary based on "
+        "road information.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  // PathBoundsDebugString(*path_bound);
+
+  // 3. Remove the S-length of target lane out of the path-bound.
+  // TODO(jiacheng): implement this.
 
   ADEBUG << "Completed generating path boundaries.";
   return Status::OK();

@@ -14,11 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_pool.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_pool.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 /**@brief Constructor
  * @param <pool_size> The memory pool size.
@@ -29,6 +30,7 @@ NdtMapNodePool::NdtMapNodePool(unsigned int pool_size, unsigned int thread_size)
 
 BaseMapNode* NdtMapNodePool::AllocNewMapNode() { return new NdtMapNode(); }
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

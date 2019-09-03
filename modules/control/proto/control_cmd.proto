@@ -190,7 +190,7 @@ message SimpleMPCDebug {
   optional double acceleration_lookup = 28;
   optional double speed_lookup = 29;
   optional double calibration_value = 30;
-  optional double steer_unconstraint_control_diff = 31;
+  optional double steer_unconstrained_control_diff = 31;
   optional double steer_angle_feedforward_compensation = 32;
   repeated double matrix_q_updated = 33;  // matrix_q_updated_ size = 6
   repeated double matrix_r_updated = 34;  // matrix_r_updated_ size = 2

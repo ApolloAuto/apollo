@@ -94,7 +94,7 @@ class Obstacle {
    */
   double timestamp() const;
 
-  bool ReceivedNewerMessage(const double timestamp) const;
+  bool ReceivedOlderMessage(const double timestamp) const;
 
   /**
    * @brief Get the ith feature from latest to earliest.

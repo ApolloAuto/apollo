@@ -46,7 +46,7 @@ void FrameManager::SaveFrame(std::unique_ptr<Frame>* const frame) {
   sequence_queue_.emplace_back((*frame)->SequenceNum());
   frames_[(*frame)->SequenceNum()] = std::move(*frame);
   if (sequence_queue_.size() >
-      static_cast<size_t>(FLAGS_max_history_frame_num)) {
+      static_cast<size_t>(FLAGS_max_frame_history_num)) {
     frames_.erase(sequence_queue_.front());
     sequence_queue_.pop_front();
   }

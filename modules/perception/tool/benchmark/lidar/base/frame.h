@@ -15,9 +15,9 @@
  *****************************************************************************/
 #pragma once
 
+#include <set>
 #include <string>
 #include <vector>
-#include <set>
 #include "modules/perception/tool/benchmark/lidar/util/object.h"
 #include "modules/perception/tool/benchmark/lidar/util/types.h"
 
@@ -73,7 +73,7 @@ class Frame : protected SensorObjects {
     return _road_polygon;
   }
   inline void release() {
-    _point_cloud = NULL;
+    _point_cloud = nullptr;
     objects.clear();
     gt_objects.clear();
     _left_boundary.clear();

@@ -39,7 +39,6 @@ using apollo::common::Status;
 
 PiecewiseJerkPathOptimizer::PiecewiseJerkPathOptimizer(const TaskConfig& config)
     : PathOptimizer(config) {
-  SetName("PiecewiseJerkPathOptimizer");
   CHECK(config_.has_piecewise_jerk_path_config());
 }
 
@@ -126,7 +125,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       // final_path_data might carry info from upper stream
       PathData path_data = *final_path_data;
       path_data.SetReferenceLine(&reference_line);
-      path_data.SetFrenetPath(FrenetFramePath(frenet_frame_path));
+      path_data.SetFrenetPath(frenet_frame_path);
       path_data.set_path_label(path_boundary.label());
       path_data.set_blocking_obstacle_id(path_boundary.blocking_obstacle_id());
       candidate_path_data.push_back(std::move(path_data));
@@ -233,7 +232,7 @@ FrenetFramePath PiecewiseJerkPathOptimizer::ToPiecewiseJerkPath(
     accumulated_s += FLAGS_trajectory_space_resolution;
   }
 
-  return FrenetFramePath(frenet_frame_path);
+  return FrenetFramePath(std::move(frenet_frame_path));
 }
 
 double PiecewiseJerkPathOptimizer::EstimateJerkBoundary(

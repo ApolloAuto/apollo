@@ -4,11 +4,11 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "benchmark_evaluation",
-    hdrs = [
-        "detection_evaluation.h",
-    ],
     srcs = [
         "detection_evaluation.cc",
+    ],
+    hdrs = [
+        "detection_evaluation.h",
     ],
     deps = [
         "//modules/perception/tool/benchmark/lidar/eval:benchmark_eval",
@@ -19,12 +19,12 @@ cc_library(
 cc_binary(
     name = "lidar_benchmark",
     srcs = ["lidar_detection_benchmark.cc"],
+    linkopts = [
+        "-llz4",
+    ],
     deps = [
         "//modules/perception/tool/benchmark/lidar:benchmark_evaluation",
         "@boost",
-    ],
-    linkopts = [
-        "-llz4",
     ],
 )
 

@@ -129,11 +129,11 @@ bool CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     for (size_t i = 0; i < feature_values.size(); ++i) {
       torch_input[0][i] = static_cast<float>(feature_values[i]);
     }
-    torch_inputs.push_back(torch_input.to(device_));
+    torch_inputs.push_back(std::move(torch_input.to(device_)));
     if (lane_sequence_ptr->vehicle_on_lane()) {
-      ModelInference(torch_inputs, torch_go_model_ptr_, lane_sequence_ptr);
+      ModelInference(torch_inputs, torch_go_model_, lane_sequence_ptr);
     } else {
-      ModelInference(torch_inputs, torch_cutin_model_ptr_, lane_sequence_ptr);
+      ModelInference(torch_inputs, torch_cutin_model_, lane_sequence_ptr);
     }
   }
   return true;
@@ -534,25 +534,26 @@ void CruiseMLPEvaluator::SetLaneFeatureValues(
 }
 
 void CruiseMLPEvaluator::LoadModels() {
-  // TODO(all) uncomment the following when cuda issue is resolved
-  // if (torch::cuda::is_available()) {
-  //   ADEBUG << "CUDA is available";
-  //   device_ = torch::Device(torch::kCUDA);
-  // }
+  if (FLAGS_use_cuda && torch::cuda::is_available()) {
+    ADEBUG << "CUDA is available";
+    device_ = torch::Device(torch::kCUDA);
+  }
   torch::set_num_threads(1);
-  torch_go_model_ptr_ =
+  torch_go_model_ =
       torch::jit::load(FLAGS_torch_vehicle_cruise_go_file, device_);
-  torch_cutin_model_ptr_ =
+  torch_cutin_model_ =
       torch::jit::load(FLAGS_torch_vehicle_cruise_cutin_file, device_);
 }
 
 void CruiseMLPEvaluator::ModelInference(
     const std::vector<torch::jit::IValue>& torch_inputs,
-    std::shared_ptr<torch::jit::script::Module> torch_model_ptr,
+    torch::jit::script::Module torch_model_ptr,
     LaneSequence* lane_sequence_ptr) {
-  auto torch_output_tuple = torch_model_ptr->forward(torch_inputs).toTuple();
-  auto probability_tensor = torch_output_tuple->elements()[0].toTensor();
-  auto finish_time_tensor = torch_output_tuple->elements()[1].toTensor();
+  auto torch_output_tuple = torch_model_ptr.forward(torch_inputs).toTuple();
+  auto probability_tensor =
+      torch_output_tuple->elements()[0].toTensor().to(torch::kCPU);
+  auto finish_time_tensor =
+      torch_output_tuple->elements()[1].toTensor().to(torch::kCPU);
   lane_sequence_ptr->set_probability(Sigmoid(
       static_cast<double>(probability_tensor.accessor<float, 2>()[0][0])));
   lane_sequence_ptr->set_time_to_lane_center(

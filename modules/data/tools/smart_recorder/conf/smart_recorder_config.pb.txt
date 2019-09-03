@@ -1,8 +1,11 @@
+trigger_log_file_path: "/apollo/data/log/smart_recorder_triggers"
+
 triggers {
   trigger_name: "DriveEventTrigger"
   enabled: true
   backward_time: 30.0
   forward_time: 5.0
+  description: "triggered by DriveEvent messages"
 }
 
 triggers {
@@ -10,6 +13,7 @@ triggers {
   enabled: true
   backward_time: 25.0
   forward_time: 5.0
+  description: "triggered when mode changes from auto to driver engagement"
 }
 
 triggers {
@@ -17,4 +21,13 @@ triggers {
   enabled: true
   backward_time: 0
   forward_time: 0
+  description: "record the messages from topics that are small in size"
+}
+
+triggers {
+  trigger_name: "RegularIntervalTrigger"
+  enabled: true
+  backward_time: 15
+  forward_time: 15
+  description: "regularly triggered every certain time interval"
 }

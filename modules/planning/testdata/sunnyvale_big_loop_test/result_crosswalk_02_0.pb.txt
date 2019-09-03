@@ -24,7 +24,7 @@ decision {
       id: "11511_0"
       perception_id: 11511
       object_decision {
-        follow {
+        yield {
           distance_s: -3
           fence_point {
             x: 586260.940854132
@@ -39,7 +39,7 @@ decision {
       id: "11511_1"
       perception_id: 11511
       object_decision {
-        follow {
+        yield {
           distance_s: -3
           fence_point {
             x: 586260.87535046809
@@ -47,16 +47,6 @@ decision {
             z: 0
           }
           fence_heading: -1.2478322159946527
-        }
-      }
-    }
-    decision {
-      id: "11652"
-      perception_id: 11652
-      object_decision {
-        nudge {
-          type: RIGHT_NUDGE
-          distance_l: -0.3
         }
       }
     }

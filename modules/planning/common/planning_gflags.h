@@ -23,6 +23,9 @@ DECLARE_double(test_duration);
 
 DECLARE_string(planning_config_file);
 
+DECLARE_int32(history_max_record_num);
+DECLARE_int32(max_frame_history_num);
+
 // scenarios related
 DECLARE_string(scenario_bare_intersection_unprotected_config_file);
 DECLARE_string(scenario_lane_follow_config_file);
@@ -74,8 +77,6 @@ DECLARE_bool(ignore_overlapped_obstacle);
 DECLARE_bool(publish_estop);
 DECLARE_bool(enable_trajectory_stitcher);
 
-DECLARE_int32(max_history_frame_num);
-
 // parameters for trajectory stitching and reinit planning starting point.
 DECLARE_double(replan_lateral_distance_threshold);
 DECLARE_double(replan_longitudinal_distance_threshold);
@@ -116,7 +117,7 @@ DECLARE_double(st_max_t);
 // Decision Part
 DECLARE_bool(enable_nudge_decision);
 DECLARE_bool(enable_nudge_slowdown);
-DECLARE_bool(enable_alwasy_stop_for_pedestrian);
+DECLARE_bool(enable_always_stop_for_pedestrian);
 DECLARE_double(static_obstacle_nudge_l_buffer);
 DECLARE_double(nonstatic_obstacle_nudge_l_buffer);
 DECLARE_double(lateral_ignore_buffer);

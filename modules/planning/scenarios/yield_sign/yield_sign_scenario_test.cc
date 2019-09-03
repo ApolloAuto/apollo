@@ -31,7 +31,7 @@
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace stop_sign {
+namespace yield_sign {
 
 class YieldSignScenarioTest : public ::testing::Test {
  public:
@@ -49,23 +49,13 @@ TEST_F(YieldSignScenarioTest, VerifyConf) {
   ScenarioConfig config;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
       FLAGS_scenario_yield_sign_config_file, &config));
-}
-
-TEST_F(YieldSignScenarioTest, Init) {
-  FLAGS_scenario_yield_sign_config_file =
-      "/apollo/modules/planning/testdata/conf/"
-      "scenario/yield_sign_config.pb.txt";
-
-  ScenarioConfig config;
-  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_yield_sign_config_file, &config));
 
   ScenarioContext context;
   scenario_.reset(new YieldSignScenario(config, &context));
   EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::YIELD_SIGN);
 }
 
-}  // namespace stop_sign
+}  // namespace yield_sign
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

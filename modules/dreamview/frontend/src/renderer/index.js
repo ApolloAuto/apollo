@@ -421,8 +421,8 @@ class Renderer {
         this.ground.updateImage(mapName);
     }
 
-    updateGroundMetadata(serverUrl, mapInfo) {
-        this.ground.initialize(serverUrl, mapInfo);
+    updateGroundMetadata(mapInfo) {
+        this.ground.initialize(mapInfo);
     }
 
     updateMap(newData, removeOldMap = false) {

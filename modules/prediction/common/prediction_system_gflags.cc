@@ -60,6 +60,7 @@ DEFINE_int32(max_caution_thread_num, 2,
              "Maximal number of threads for caution obstacles.");
 DEFINE_bool(enable_async_draw_base_image, true,
             "If enable async to draw base image");
+DEFINE_bool(use_cuda, false, "If use cuda for torch.");
 
 // Bag replay timestamp gap
 DEFINE_double(replay_timestamp_gap, 10.0,

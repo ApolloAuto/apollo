@@ -51,16 +51,17 @@ message DestinationStatus {
 
 message OpenSpaceStatus {
   repeated string partitioned_trajectories_index_history = 1;
+  optional bool position_init = 2 [default = false];
 }
 
-message ParkAndGoStatus{
-    optional apollo.common.PointENU adc_init_position = 1;
-    optional double adc_init_heading = 2;
+message ParkAndGoStatus {
+  optional apollo.common.PointENU adc_init_position = 1;
+  optional double adc_init_heading = 2;
 }
 
 message PathDeciderStatus {
   enum LaneBorrowDirection {
-    LEFT_BORROW = 1;  // borrow left neighbor lane
+    LEFT_BORROW = 1;   // borrow left neighbor lane
     RIGHT_BORROW = 2;  // borrow right neighbor lane
   }
   optional int32 front_static_obstacle_cycle_counter = 1 [default = 0];
@@ -121,6 +122,7 @@ message TrafficLightStatus {
 message YieldSignStatus {
   optional string current_yield_sign_overlap_id = 1;
   optional string done_yield_sign_overlap_id = 2;
+  repeated string wait_for_obstacle_id = 3;
 }
 
 message PlanningStatus {

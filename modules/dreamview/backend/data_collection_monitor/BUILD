@@ -17,6 +17,7 @@ cc_library(
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/dreamview/backend/common:dreamview_gflags",
+        "//modules/dreamview/backend/hmi:vehicle_manager",
         "//modules/dreamview/proto:data_collection_table_proto",
         "//third_party/json",
         "@gtest",

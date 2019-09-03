@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/localization/msf/local_map/ndt_map/ndt_map.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map.h"
 
 #include <gtest/gtest.h>
 #include <string>
@@ -23,13 +23,14 @@
 #include "modules/common/util/string_util.h"
 #include "modules/localization/msf/common/io/pcl_point_types.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_config.h"
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_matrix.h"
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_pool.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_config.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_matrix.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_pool.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
+namespace pyramid_map {
 
 TEST(MapNdtTestSuite, matrix) {
   const std::string pcd_folder =
@@ -127,6 +128,7 @@ TEST(MapNdtTestSuite, matrix) {
   }
 }
 
+}  // namespace pyramid_map
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo

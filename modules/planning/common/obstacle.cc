@@ -387,9 +387,8 @@ bool Obstacle::BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
 
     common::math::Vec2d center((first_point.x() + second_point.x()) / 2.0,
                                (first_point.y() + second_point.y()) / 2.0);
-    common::math::Box2d object_moving_box(center, first_point.theta(),
-                                          object_moving_box_length,
-                                          object_width);
+    common::math::Box2d object_moving_box(
+        center, first_point.theta(), object_moving_box_length, object_width);
     SLBoundary object_boundary;
     // NOTICE: this method will have errors when the reference line is not
     // straight. Need double loop to cover all corner cases.
@@ -459,15 +458,15 @@ bool Obstacle::BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
       if (!has_low) {
         auto low_ref = reference_line.GetReferencePoint(low_s);
         has_low = object_moving_box.HasOverlap(
-            {low_ref, low_ref.heading(),
-             adc_length, adc_width + FLAGS_nonstatic_obstacle_nudge_l_buffer});
+            {low_ref, low_ref.heading(), adc_length,
+             adc_width + FLAGS_nonstatic_obstacle_nudge_l_buffer});
         low_s += st_boundary_delta_s;
       }
       if (!has_high) {
         auto high_ref = reference_line.GetReferencePoint(high_s);
         has_high = object_moving_box.HasOverlap(
-            {high_ref, high_ref.heading(),
-             adc_length, adc_width + FLAGS_nonstatic_obstacle_nudge_l_buffer});
+            {high_ref, high_ref.heading(), adc_length,
+             adc_width + FLAGS_nonstatic_obstacle_nudge_l_buffer});
         high_s -= st_boundary_delta_s;
       }
     }

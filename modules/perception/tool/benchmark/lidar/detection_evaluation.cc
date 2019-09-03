@@ -126,7 +126,7 @@ void DetectionEvaluation::run_evaluation() {
 
   _meta_stat.get_2017_aad(&_aad_2017);
   std::sort(_frame_metrics.begin(), _frame_metrics.end());
-  // self evaluation metrics
+  // self-evaluation metrics
   _self_stat.get_classification_type_change_rates(
       &_classification_change_rate_per_class, &_classification_change_rate);
 }

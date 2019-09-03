@@ -1,0 +1,7 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message PathReuseDeciderConfig {
+  optional bool reuse_path = 1;
+}

@@ -84,9 +84,18 @@ Status PathAssessmentDecider::Process(
          << " msec.";
 
   // 2. Analyze and add important info for speed decider to use
+  size_t cnt = 0;
   const Obstacle* blocking_obstacle_on_selflane = nullptr;
-  for (auto& curr_path_data : valid_path_data) {
+  for (size_t i = 0; i != valid_path_data.size(); ++i) {
+    auto& curr_path_data = valid_path_data[i];
     if (curr_path_data.path_label().find("fallback") != std::string::npos) {
+      // remove empty path_data.
+      if (!curr_path_data.Empty()) {
+        if (cnt != i) {
+          valid_path_data[cnt] = curr_path_data;
+        }
+        ++cnt;
+      }
       continue;
     }
     SetPathInfo(*reference_line_info, &curr_path_data);
@@ -103,13 +112,20 @@ Status PathAssessmentDecider::Process(
           reference_line_info->path_decision()->Find(blocking_obstacle_id);
     }
 
-    // TODO(jiacheng): remove empty path_data.
+    // remove empty path_data.
+    if (!curr_path_data.Empty()) {
+      if (cnt != i) {
+        valid_path_data[cnt] = curr_path_data;
+      }
+      ++cnt;
+    }
 
     // RecordDebugInfo(curr_path_data, curr_path_data.path_label(),
     //                 reference_line_info);
     ADEBUG << "For " << curr_path_data.path_label() << ", "
            << "path length = " << curr_path_data.frenet_frame_path().size();
   }
+  valid_path_data.resize(cnt);
   // If there is no valid path_data, exit.
   if (valid_path_data.empty()) {
     const std::string msg = "Neither regular nor fallback path is valid.";
@@ -123,9 +139,8 @@ Status PathAssessmentDecider::Process(
 
   // 3. Pick the optimal path.
   std::sort(valid_path_data.begin(), valid_path_data.end(),
-            std::bind(ComparePathData,
-                      std::placeholders::_1, std::placeholders::_2,
-                      blocking_obstacle_on_selflane));
+            std::bind(ComparePathData, std::placeholders::_1,
+                      std::placeholders::_2, blocking_obstacle_on_selflane));
 
   ADEBUG << "Using '" << valid_path_data.front().path_label()
          << "' path out of " << valid_path_data.size() << " path(s)";
@@ -141,14 +156,7 @@ Status PathAssessmentDecider::Process(
   ADEBUG << "Time for optimal path selection: " << diff.count() * 1000
          << " msec.";
 
-  // TODO(jiacheng): retire the following code.
-  std::vector<PathData> new_candidate_path_data;
-  for (const auto& curr_path_data : valid_path_data) {
-    if (!curr_path_data.Empty()) {
-      new_candidate_path_data.push_back(curr_path_data);
-    }
-  }
-  reference_line_info->SetCandidatePathData(std::move(new_candidate_path_data));
+  reference_line_info->SetCandidatePathData(std::move(valid_path_data));
 
   // 4. Update necessary info for lane-borrow decider's future uses.
   // Update front static obstacle's info.
@@ -174,7 +182,7 @@ Status PathAssessmentDecider::Process(
       std::string::npos) {
     // && std::get<1>(reference_line_info->path_data()
     //                 .path_point_decision_guide()
-    //                 .front()) == PathData::PathPointType::IN_LANE) {
+    //                 .front()) == PathData::PathPointType::IN_LANE)
     int able_to_use_self_lane_counter =
         mutable_path_decider_status->able_to_use_self_lane_counter();
 
@@ -207,9 +215,6 @@ Status PathAssessmentDecider::Process(
       }
     }
 
-    auto* mutable_path_decider_status = PlanningContext::Instance()
-                                            ->mutable_planning_status()
-                                            ->mutable_path_decider();
     mutable_path_decider_status->clear_decided_side_pass_direction();
     if (right_borrow) {
       mutable_path_decider_status->add_decided_side_pass_direction(
@@ -232,8 +237,7 @@ Status PathAssessmentDecider::Process(
 
 bool ComparePathData(const PathData& lhs, const PathData& rhs,
                      const Obstacle* blocking_obstacle) {
-  ADEBUG << "Comparing " << lhs.path_label() << " and "
-         << rhs.path_label();
+  ADEBUG << "Comparing " << lhs.path_label() << " and " << rhs.path_label();
   // Empty path_data is never the larger one.
   if (lhs.Empty()) {
     ADEBUG << "LHS is empty.";
@@ -259,10 +263,13 @@ bool ComparePathData(const PathData& lhs, const PathData& rhs,
       // select left/right path based on blocking_obstacle's position
       const double obstacle_l =
           (blocking_obstacle->PerceptionSLBoundary().start_l() +
-              blocking_obstacle->PerceptionSLBoundary().end_l()) / 2;
-      ADEBUG << "obstacle[" << blocking_obstacle->Id()
-             << "] l[" << obstacle_l << "]";
-      return (obstacle_l > 0.0);
+           blocking_obstacle->PerceptionSLBoundary().end_l()) /
+          2;
+      ADEBUG << "obstacle[" << blocking_obstacle->Id() << "] l[" << obstacle_l
+             << "]";
+      return (obstacle_l > 0.0
+                  ? (lhs.path_label().find("right") != std::string::npos)
+                  : (lhs.path_label().find("left") != std::string::npos));
     } else {
       // select left/right path based on ADC's position
       double adc_l = lhs.frenet_frame_path().front().l();
@@ -307,14 +314,11 @@ bool ComparePathData(const PathData& lhs, const PathData& rhs,
   // If same length, both neighbor lane are forward,
   // then select the one that returns to in-lane earlier.
   constexpr double kBackToSelfLaneComparisonTolerance = 20.0;
-  int lhs_back_idx =
-      GetBackToInLaneIndex(lhs.path_point_decision_guide());
-  int rhs_back_idx =
-      GetBackToInLaneIndex(rhs.path_point_decision_guide());
+  int lhs_back_idx = GetBackToInLaneIndex(lhs.path_point_decision_guide());
+  int rhs_back_idx = GetBackToInLaneIndex(rhs.path_point_decision_guide());
   double lhs_back_s = lhs.frenet_frame_path()[lhs_back_idx].s();
   double rhs_back_s = rhs.frenet_frame_path()[rhs_back_idx].s();
-  if (std::fabs(lhs_back_s - rhs_back_s) >
-      kBackToSelfLaneComparisonTolerance) {
+  if (std::fabs(lhs_back_s - rhs_back_s) > kBackToSelfLaneComparisonTolerance) {
     return lhs_back_idx < rhs_back_idx;
   }
   // If same length, both forward, back to inlane at same time,
@@ -322,14 +326,13 @@ bool ComparePathData(const PathData& lhs, const PathData& rhs,
   bool lhs_on_leftlane = lhs.path_label().find("left") != std::string::npos;
   bool rhs_on_leftlane = rhs.path_label().find("left") != std::string::npos;
   if (lhs_on_leftlane != rhs_on_leftlane) {
-    ADEBUG << "Select left lane over right lane.";
+    ADEBUG << "Select " << (lhs_on_leftlane ? "left" : "right") << " lane over "
+           << (!lhs_on_leftlane ? "left" : "right") << " lane.";
     return lhs_on_leftlane;
   }
   // Otherwise, they are the same path, lhs is not < rhs.
   return false;
 }
-
-
 
 bool PathAssessmentDecider::IsValidRegularPath(
     const ReferenceLineInfo& reference_line_info, const PathData& path_data) {

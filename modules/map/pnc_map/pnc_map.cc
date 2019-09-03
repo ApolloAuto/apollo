@@ -132,16 +132,9 @@ std::vector<routing::LaneWaypoint> PncMap::FutureRouteWaypoints() const {
 
 void PncMap::UpdateRoutingRange(int adc_index) {
   // Track routing range.
-  if (range_start_ > adc_index || range_end_ < adc_index) {
-    range_lane_ids_.clear();
-    range_start_ = std::max(0, adc_index - 1);
-    range_end_ = range_start_;
-  }
-  while (range_start_ + 1 < adc_index) {
-    // TODO(Hongyi): Delete this when confirmed
-    // range_lane_ids_.erase(route_indices_[range_start_].segment.lane->id().id());
-    ++range_start_;
-  }
+  range_lane_ids_.clear();
+  range_start_ = std::max(0, adc_index - 1);
+  range_end_ = range_start_;
   while (range_end_ < static_cast<int>(route_indices_.size())) {
     const auto &lane_id = route_indices_[range_end_].segment.lane->id().id();
     if (range_lane_ids_.count(lane_id) != 0) {

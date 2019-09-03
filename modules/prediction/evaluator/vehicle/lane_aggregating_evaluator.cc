@@ -45,11 +45,11 @@ LaneAggregatingEvaluator::LaneAggregatingEvaluator() : device_(torch::kCPU) {
 
 void LaneAggregatingEvaluator::LoadModel() {
   torch::set_num_threads(1);
-  torch_obstacle_encoding_ptr_ = torch::jit::load(
+  torch_obstacle_encoding_ = torch::jit::load(
       FLAGS_torch_lane_aggregating_obstacle_encoding_file, device_);
-  torch_lane_encoding_ptr_ = torch::jit::load(
+  torch_lane_encoding_ = torch::jit::load(
       FLAGS_torch_lane_aggregating_lane_encoding_file, device_);
-  torch_prediction_layer_ptr_ = torch::jit::load(
+  torch_prediction_layer_ = torch::jit::load(
       FLAGS_torch_lane_aggregating_prediction_layer_file, device_);
 }
 
@@ -104,7 +104,7 @@ bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   obstacle_encoding_inputs.push_back(
       std::move(obstacle_encoding_inputs_tensor));
   torch::Tensor obstalce_encoding =
-      torch_obstacle_encoding_ptr_->forward(obstacle_encoding_inputs)
+      torch_obstacle_encoding_.forward(obstacle_encoding_inputs)
           .toTensor()
           .to(torch::kCPU);
   // 2. Encode the lane features.
@@ -135,7 +135,7 @@ bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     single_lane_encoding_inputs.push_back(
         std::move(single_lane_encoding_inputs_tensor));
     torch::Tensor single_lane_encoding =
-        torch_lane_encoding_ptr_->forward(single_lane_encoding_inputs)
+        torch_lane_encoding_.forward(single_lane_encoding_inputs)
             .toTensor()
             .to(torch::kCPU);
     lane_encoding_list.push_back(std::move(single_lane_encoding));
@@ -170,7 +170,7 @@ bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     prediction_layer_inputs.push_back(
         std::move(prediction_layer_inputs_tensor));
     torch::Tensor prediction_layer_output =
-        torch_prediction_layer_ptr_->forward(prediction_layer_inputs)
+        torch_prediction_layer_.forward(prediction_layer_inputs)
             .toTensor()
             .to(torch::kCPU);
     auto prediction_score = prediction_layer_output.accessor<float, 2>();

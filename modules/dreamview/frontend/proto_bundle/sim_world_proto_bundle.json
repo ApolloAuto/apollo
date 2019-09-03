@@ -3672,72 +3672,107 @@
                     "default": 0.2
                   }
                 },
+                "useSqp": {
+                  "type": "bool",
+                  "id": 8,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "sqpFtol": {
+                  "type": "double",
+                  "id": 9,
+                  "options": {
+                    "default": 0.0001
+                  }
+                },
+                "sqpCtol": {
+                  "type": "double",
+                  "id": 10,
+                  "options": {
+                    "default": 0.001
+                  }
+                },
+                "sqpPenMaxIter": {
+                  "type": "int32",
+                  "id": 11,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "sqpSubMaxIter": {
+                  "type": "int32",
+                  "id": 12,
+                  "options": {
+                    "default": 100
+                  }
+                },
                 "maxIter": {
                   "type": "int32",
-                  "id": 10,
+                  "id": 100,
                   "options": {
                     "default": 500
                   }
                 },
                 "timeLimit": {
                   "type": "double",
-                  "id": 11,
+                  "id": 101,
                   "options": {
                     "default": 0
                   }
                 },
                 "verbose": {
                   "type": "bool",
-                  "id": 12,
+                  "id": 102,
                   "options": {
                     "default": false
                   }
                 },
                 "scaledTermination": {
                   "type": "bool",
-                  "id": 13,
+                  "id": 103,
                   "options": {
                     "default": true
                   }
                 },
                 "warmStart": {
                   "type": "bool",
-                  "id": 14,
+                  "id": 104,
                   "options": {
                     "default": true
                   }
                 },
                 "printLevel": {
                   "type": "int32",
-                  "id": 20,
+                  "id": 200,
                   "options": {
                     "default": 0
                   }
                 },
                 "maxNumOfIterations": {
                   "type": "int32",
-                  "id": 21,
+                  "id": 201,
                   "options": {
                     "default": 500
                   }
                 },
                 "acceptableNumOfIterations": {
                   "type": "int32",
-                  "id": 22,
+                  "id": 202,
                   "options": {
                     "default": 15
                   }
                 },
                 "tol": {
                   "type": "double",
-                  "id": 23,
+                  "id": 203,
                   "options": {
                     "default": 1e-8
                   }
                 },
                 "acceptableTol": {
                   "type": "double",
-                  "id": 24,
+                  "id": 204,
                   "options": {
                     "default": 0.1
                   }
@@ -6043,37 +6078,30 @@
                     "default": 3.5
                   }
                 },
-                "maxAdcStopSpeed": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 0.3
-                  }
-                },
                 "stopDurationSec": {
                   "type": "float",
-                  "id": 5,
+                  "id": 4,
                   "options": {
                     "default": 1
                   }
                 },
                 "minPassSDistance": {
                   "type": "double",
-                  "id": 6,
+                  "id": 5,
                   "options": {
                     "default": 3
                   }
                 },
                 "stopTimeoutSec": {
                   "type": "float",
-                  "id": 7,
+                  "id": 6,
                   "options": {
                     "default": 8
                   }
                 },
                 "creepTimeoutSec": {
                   "type": "float",
-                  "id": 8,
+                  "id": 7,
                   "options": {
                     "default": 10
                   }
@@ -6096,16 +6124,9 @@
                     "default": 2
                   }
                 },
-                "maxAdcStopSpeed": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 0.3
-                  }
-                },
                 "minPassSDistance": {
                   "type": "double",
-                  "id": 4,
+                  "id": 3,
                   "options": {
                     "default": 3
                   }
@@ -6128,23 +6149,16 @@
                     "default": 3.5
                   }
                 },
-                "maxAdcStopSpeed": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 0.3
-                  }
-                },
                 "minPassSDistance": {
                   "type": "double",
-                  "id": 4,
+                  "id": 3,
                   "options": {
                     "default": 3
                   }
                 },
                 "creepTimeoutSec": {
                   "type": "float",
-                  "id": 5,
+                  "id": 4,
                   "options": {
                     "default": 10
                   }
@@ -6174,30 +6188,23 @@
                     "default": 3.5
                   }
                 },
-                "maxAdcStopSpeed": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 0.3
-                  }
-                },
                 "minPassSDistance": {
                   "type": "double",
-                  "id": 5,
+                  "id": 4,
                   "options": {
                     "default": 3
                   }
                 },
                 "redLightRightTurnStopDurationSec": {
                   "type": "float",
-                  "id": 6,
+                  "id": 5,
                   "options": {
                     "default": 3
                   }
                 },
                 "creepTimeoutSec": {
                   "type": "float",
-                  "id": 7,
+                  "id": 6,
                   "options": {
                     "default": 10
                   }
@@ -6227,58 +6234,51 @@
                     "default": 25
                   }
                 },
-                "maxAdcStopSpeed": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 0.1
-                  }
-                },
                 "maxSErrorToEndPoint": {
                   "type": "double",
-                  "id": 5,
+                  "id": 4,
                   "options": {
                     "default": 0.2
                   }
                 },
                 "maxLErrorToEndPoint": {
                   "type": "double",
-                  "id": 6,
+                  "id": 5,
                   "options": {
                     "default": 0.5
                   }
                 },
                 "maxThetaErrorToEndPoint": {
                   "type": "double",
-                  "id": 7,
+                  "id": 6,
                   "options": {
                     "default": 0.2
                   }
                 },
                 "maxDistanceErrorToEndPoint": {
                   "type": "double",
-                  "id": 8,
+                  "id": 7,
                   "options": {
                     "default": 0.2
                   }
                 },
                 "passDestinationThreshold": {
                   "type": "double",
-                  "id": 9,
+                  "id": 8,
                   "options": {
                     "default": 10
                   }
                 },
                 "maxValidStopDistance": {
                   "type": "double",
-                  "id": 10,
+                  "id": 9,
                   "options": {
                     "default": 1
                   }
                 },
                 "sDistanceToStopForOpenSpaceParking": {
                   "type": "double",
-                  "id": 11,
+                  "id": 10,
                   "options": {
                     "default": 7
                   }
@@ -6300,13 +6300,6 @@
                   "options": {
                     "default": 1
                   }
-                },
-                "maxAdcStopSpeed": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 0.1
-                  }
                 }
               }
             },
@@ -6314,15 +6307,51 @@
               "fields": {}
             },
             "ScenarioParkAndGoConfig": {
-              "fields": {}
+              "fields": {
+                "frontObstacleBuffer": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 4
+                  }
+                },
+                "headingBuffer": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 0.5
+                  }
+                }
+              }
             },
-            "ScenarioYieldSigndConfig": {
+            "ScenarioYieldSignConfig": {
               "fields": {
                 "startYieldSignScenarioDistance": {
                   "type": "double",
                   "id": 1,
                   "options": {
                     "default": 5
+                  }
+                },
+                "maxValidStopDistance": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 3.5
+                  }
+                },
+                "minPassSDistance": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 3
+                  }
+                },
+                "creepTimeoutSec": {
+                  "type": "float",
+                  "id": 4,
+                  "options": {
+                    "default": 10
                   }
                 }
               }
@@ -6391,7 +6420,7 @@
                   "id": 12
                 },
                 "yieldSignConfig": {
-                  "type": "ScenarioYieldSigndConfig",
+                  "type": "ScenarioYieldSignConfig",
                   "id": 13
                 },
                 "stageType": {
@@ -6453,8 +6482,7 @@
                     "PARK_AND_GO_CRUISE": 601,
                     "PARK_AND_GO_ADJUST": 602,
                     "YIELD_SIGN_APPROACH": 700,
-                    "YIELD_SIGN_CREEP": 701,
-                    "YIELD_SIGN_INTERSECTION_CRUISE": 703
+                    "YIELD_SIGN_CREEP": 701
                   }
                 },
                 "StageConfig": {
@@ -6731,6 +6759,13 @@
                   "rule": "repeated",
                   "type": "string",
                   "id": 1
+                },
+                "positionInit": {
+                  "type": "bool",
+                  "id": 2,
+                  "options": {
+                    "default": false
+                  }
                 }
               }
             },
@@ -6941,6 +6976,11 @@
                 "doneYieldSignOverlapId": {
                   "type": "string",
                   "id": 2
+                },
+                "waitForObstacleId": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 3
                 }
               }
             },
@@ -7665,44 +7705,37 @@
                     "default": 1
                   }
                 },
-                "maxStopSpeed": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 0.3
-                  }
-                },
                 "maxValidStopDistance": {
                   "type": "double",
-                  "id": 5,
+                  "id": 4,
                   "options": {
                     "default": 3
                   }
                 },
                 "expandSDistance": {
                   "type": "double",
-                  "id": 6,
+                  "id": 5,
                   "options": {
                     "default": 2
                   }
                 },
                 "stopStrictLDistance": {
                   "type": "double",
-                  "id": 7,
+                  "id": 6,
                   "options": {
                     "default": 4
                   }
                 },
                 "stopLooseLDistance": {
                   "type": "double",
-                  "id": 8,
+                  "id": 7,
                   "options": {
                     "default": 5
                   }
                 },
                 "stopTimeout": {
                   "type": "double",
-                  "id": 9,
+                  "id": 8,
                   "options": {
                     "default": 10
                   }

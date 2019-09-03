@@ -63,7 +63,8 @@ class SpeedDecider : public Task {
    * @return true if the ADC believe it should follow the obstacle, and
    *         false otherwise.
    **/
-  bool CheckIsFollowByT(const STBoundary& boundary) const;
+  bool CheckIsFollow(const Obstacle& obstacle,
+                     const STBoundary& boundary) const;
 
   bool CheckStopForPedestrian(
       const Obstacle& obstacle,

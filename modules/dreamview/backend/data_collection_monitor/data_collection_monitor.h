@@ -65,13 +65,18 @@ class DataCollectionMonitor {
   void Stop();
 
   /**
+   * @brief restart monitoring collection progress
+   */
+  void Restart();
+
+  /**
    * @brief return collection progress of categories and overall as json
    */
   nlohmann::json GetProgressAsJson();
 
  private:
   void InitReaders();
-  void LoadConfiguration(const std::string& data_collection_config_path);
+  void LoadConfiguration();
   void OnChassis(const std::shared_ptr<apollo::canbus::Chassis>& chassis);
   bool IsCompliedWithCriteria(
       const std::shared_ptr<apollo::canbus::Chassis>& chassis,

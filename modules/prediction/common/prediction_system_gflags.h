@@ -36,6 +36,7 @@ DECLARE_bool(enable_multi_thread);
 DECLARE_int32(max_thread_num);
 DECLARE_int32(max_caution_thread_num);
 DECLARE_bool(enable_async_draw_base_image);
+DECLARE_bool(use_cuda);
 
 // Bag replay timestamp gap
 DECLARE_double(replay_timestamp_gap);

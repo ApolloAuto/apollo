@@ -51,8 +51,6 @@ bool FusionComponent::Init() {
 }
 
 bool FusionComponent::Proc(const std::shared_ptr<SensorFrameMessage>& message) {
-  AINFO << "Enter FusionComponent proc. message->sensor_id_: "
-        << message->sensor_id_;
   if (message->process_stage_ == ProcessStage::SENSOR_FUSION) {
     return true;
   }
@@ -64,8 +62,8 @@ bool FusionComponent::Proc(const std::shared_ptr<SensorFrameMessage>& message) {
   if (status) {
     // TODO(conver sensor id)
     if (message->sensor_id_ != fusion_main_sensor_) {
-      AINFO << "Fusion receive non " << fusion_main_sensor_
-            << " message, skip send.";
+      AINFO << "Fusion receive from " << message->sensor_id_ << "not from "
+            << fusion_main_sensor_ << ". Skip send.";
     } else {
       // Send("/apollo/perception/obstacles", out_message);
       writer_->Write(out_message);

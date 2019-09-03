@@ -45,11 +45,11 @@ class CarPose {
   void setTimestamp(double ts) { timestamp_ = ts; }
   double getTimestamp() const { return timestamp_; }
 
- private:
   Eigen::Matrix4d pose_;  // car(novatel) to world pose
   std::map<std::string, Eigen::Matrix4d> c2w_poses_;  // camera to world poses
   double timestamp_;
 
+ private:
   friend std::ostream& operator<<(std::ostream& os, const CarPose&);
 };
 

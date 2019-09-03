@@ -29,7 +29,8 @@ namespace benchmark {
 static const std::map<std::string,
                       std::function<bool(const std::string&, PointCloudPtr)>>
     s_load_method = {
-        {"xyzl", load_pcl_pcds_xyzl}, {"xyzit", load_pcl_pcds_xyzit},
+        {"xyzl", load_pcl_pcds_xyzl},
+        {"xyzit", load_pcl_pcds_xyzit},
 };
 
 bool load_pcl_pcds(const std::string& filename, PointCloudPtr cloud_out,

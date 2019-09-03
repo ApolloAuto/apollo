@@ -28,6 +28,8 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/scenarios/yield_sign/stage_approach.h"
+#include "modules/planning/scenarios/yield_sign/stage_creep.h"
 
 namespace apollo {
 namespace planning {
@@ -58,10 +60,11 @@ void YieldSignScenario::Init() {
     return;
   }
 
-  const std::string yield_sign_overlap_id = PlanningContext::Instance()
-                                               ->planning_status()
-                                               .yield_sign()
-                                               .current_yield_sign_overlap_id();
+  const std::string yield_sign_overlap_id =
+      PlanningContext::Instance()
+          ->planning_status()
+          .yield_sign()
+          .current_yield_sign_overlap_id();
   if (yield_sign_overlap_id.empty()) {
     AERROR << "Could not find yield sign";
     return;
@@ -83,7 +86,6 @@ void YieldSignScenario::RegisterStages() {
   if (!s_stage_factory_.Empty()) {
     s_stage_factory_.Clear();
   }
-  /*
   s_stage_factory_.Register(
       ScenarioConfig::YIELD_SIGN_APPROACH,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
@@ -94,12 +96,6 @@ void YieldSignScenario::RegisterStages() {
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
         return new YieldSignStageCreep(config);
       });
-  s_stage_factory_.Register(
-      ScenarioConfig::YIELD_SIGN_INTERSECTION_CRUISE,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new YieldSignStageIntersectionCruise(config);
-      });
-   */
 }
 
 std::unique_ptr<Stage> YieldSignScenario::CreateStage(

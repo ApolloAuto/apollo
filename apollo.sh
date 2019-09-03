@@ -118,7 +118,7 @@ function generate_build_targets() {
   *)
 #    BUILD_TARGETS=`bazel query //modules/... union //cyber/...`
     # FIXME(all): temporarily disable modules doesn't compile in 18.04
-    BUILD_TARGETS=`bazel query //modules/... union //cyber/... except //modules/tools/visualizer/... except //modules/data/tools/rosbag_to_record/...  except //modules/v2x/... except //modules/drivers/video/tools/decode_video/... except //modules/map/tools/map_datachecker/... `
+    BUILD_TARGETS=`bazel query //modules/... union //cyber/... except //modules/tools/visualizer/... except //modules/data/tools/rosbag_to_record/...  except //modules/v2x/... except //modules/map/tools/map_datachecker/... `
 
   esac
 
@@ -250,6 +250,11 @@ function cibuild() {
     //modules/prediction/...
     //modules/routing/...
     //modules/transform/..."
+
+  # The data module is lightweight and rarely changed. If it fails, it's
+  # most-likely an environment mess. So we try `bazel clean` and then initial
+  # the building process.
+  bazel build $JOB_ARG $DEFINES $@ "//modules/data/..." || bazel clean
 
   bazel build $JOB_ARG $DEFINES $@ $BUILD_TARGETS
 

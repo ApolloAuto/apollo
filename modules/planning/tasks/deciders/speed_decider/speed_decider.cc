@@ -43,9 +43,7 @@ using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
 using apollo::perception::PerceptionObstacle;
 
-SpeedDecider::SpeedDecider(const TaskConfig& config) : Task(config) {
-  SetName("SpeedDecider");
-}
+SpeedDecider::SpeedDecider(const TaskConfig& config) : Task(config) {}
 
 common::Status SpeedDecider::Execute(Frame* frame,
                                      ReferenceLineInfo* reference_line_info) {
@@ -235,11 +233,6 @@ Status SpeedDecider::MakeObjectDecision(
       }
     }
 
-    auto box = obstacle->PerceptionBoundingBox();
-    common::SLPoint start_sl_point;
-    reference_line_->XYToSL({box.center_x(), box.center_y()}, &start_sl_point);
-    double start_abs_l = std::abs(start_sl_point.l());
-
     switch (location) {
       case BELOW:
         if (boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
@@ -248,10 +241,7 @@ Status SpeedDecider::MakeObjectDecision(
             mutable_obstacle->AddLongitudinalDecision("dp_st_graph/keep_clear",
                                                       stop_decision);
           }
-        } else if (CheckIsFollowByT(boundary) &&
-                   (boundary.max_t() - boundary.min_t() >
-                    FLAGS_follow_min_time_sec) &&
-                   start_abs_l < FLAGS_follow_min_obs_lateral_distance) {
+        } else if (CheckIsFollow(*obstacle, boundary)) {
           // stop for low_speed decelerating
           if (IsFollowTooClose(*mutable_obstacle)) {
             ObjectDecisionType stop_decision;
@@ -495,16 +485,32 @@ bool SpeedDecider::CreateOvertakeDecision(
   return true;
 }
 
-bool SpeedDecider::CheckIsFollowByT(const STBoundary& boundary) const {
+bool SpeedDecider::CheckIsFollow(const Obstacle& obstacle,
+                                 const STBoundary& boundary) const {
+  const double obstacle_l_distance =
+      std::min(std::fabs(obstacle.PerceptionSLBoundary().start_l()),
+               std::fabs(obstacle.PerceptionSLBoundary().end_l()));
+  if (obstacle_l_distance > FLAGS_follow_min_obs_lateral_distance) {
+    return false;
+  }
+
+  // move towards adc
   if (boundary.bottom_left_point().s() > boundary.bottom_right_point().s()) {
     return false;
   }
+
   constexpr double kFollowTimeEpsilon = 1e-3;
   constexpr double kFollowCutOffTime = 0.5;
   if (boundary.min_t() > kFollowCutOffTime ||
       boundary.max_t() < kFollowTimeEpsilon) {
     return false;
   }
+
+  // cross lane but be moving to different direction
+  if (boundary.max_t() - boundary.min_t() < FLAGS_follow_min_time_sec) {
+    return false;
+  }
+
   return true;
 }
 
@@ -513,7 +519,7 @@ bool SpeedDecider::CheckStopForPedestrian(
     std::unordered_map<std::string, double>* pedestrian_stop_times) const {
   CHECK_NOTNULL(pedestrian_stop_times);
 
-  if (!FLAGS_enable_alwasy_stop_for_pedestrian) {
+  if (!FLAGS_enable_always_stop_for_pedestrian) {
     return false;
   }
 

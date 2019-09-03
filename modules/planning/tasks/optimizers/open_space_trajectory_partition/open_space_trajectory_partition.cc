@@ -102,6 +102,23 @@ Status OpenSpaceTrajectoryPartition::Process() {
   PartitionTrajectory(*interpolated_trajectory_result_ptr,
                       partitioned_trajectories);
 
+  const auto& open_space_status =
+      PlanningContext::Instance()->planning_status().open_space();
+  if (!open_space_status.position_init() &&
+      frame_->open_space_info().open_space_provider_success()) {
+    auto* open_space_status = PlanningContext::Instance()
+                                  ->mutable_planning_status()
+                                  ->mutable_open_space();
+    open_space_status->set_position_init(true);
+    auto* chosen_partitioned_trajectory =
+        open_space_info_ptr->mutable_chosen_partitioned_trajectory();
+    auto* mutable_trajectory =
+        open_space_info_ptr->mutable_stitched_trajectory_result();
+    AdjustRelativeTimeAndS(open_space_info.partitioned_trajectories(), 0, 0,
+                           mutable_trajectory, chosen_partitioned_trajectory);
+    return Status::OK();
+  }
+
   // Choose the one to follow based on the closest partitioned trajectory
   size_t trajectories_size = partitioned_trajectories->size();
 

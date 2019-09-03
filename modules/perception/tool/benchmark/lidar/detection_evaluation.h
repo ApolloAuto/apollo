@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 #pragma once
-#include <iostream>
-#include <utility>
-#include <string>
 #include <algorithm>
-#include <vector>
+#include <iostream>
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 #include "modules/perception/tool/benchmark/lidar/eval/frame_statistics.h"
 #include "modules/perception/tool/benchmark/lidar/eval/lidar_option.h"
 #include "modules/perception/tool/benchmark/lidar/eval/sequence_self_statistics.h"
@@ -96,7 +96,7 @@ class DetectionEvaluation {
   std::vector<std::vector<double>> _classification_confusion_matrix_det_major;
   std::vector<std::vector<double>>
       _classification_confusion_matrix_det_major_with_fp;
-  // self evaluation
+  // self-evaluation
   std::vector<std::vector<double>> _classification_change_rate_per_class;
   double _classification_change_rate;
   // option

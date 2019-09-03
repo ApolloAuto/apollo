@@ -44,7 +44,7 @@ TEST_F(Ecustatus1515Test, General) {
   EXPECT_DOUBLE_EQ(cd.ch().ecu_status_1_515().speed(), 5.1299999999999999);
   EXPECT_DOUBLE_EQ(cd.ch().ecu_status_1_515().acc_speed(), 1.0269999999999999);
   EXPECT_EQ(cd.ch().ecu_status_1_515().ctrl_sts(), 1);
-  EXPECT_EQ(cd.ch().ecu_status_1_515().chassis_sts(), 1);
+  EXPECT_EQ(cd.ch().ecu_status_1_515().chassis_sts(), 18);
   EXPECT_EQ(cd.ch().ecu_status_1_515().chassis_err(), 5139);
 }
 

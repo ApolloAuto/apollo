@@ -22,7 +22,7 @@ namespace apollo {
 namespace perception {
 namespace benchmark {
 
-std::string PointCloudFrame::_s_cloud_type = "xyzit"; // NOLINT    
+std::string PointCloudFrame::_s_cloud_type = "xyzit";  // NOLINT
 
 void PointCloudFrame::set_cloud_type(const std::string& type) {
   _s_cloud_type = type;
