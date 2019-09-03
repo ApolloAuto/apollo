@@ -15,8 +15,8 @@ limitations under the License.
 
 #include "modules/planning/common/history.h"
 
-#include "gtest/gtest.h"
 #include "cyber/common/file.h"
+#include "gtest/gtest.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
