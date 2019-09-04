@@ -97,6 +97,12 @@ Status GriddedPathTimeGraph::Search(SpeedData* const speed_data) {
     }
   }
 
+  if (!InitSpeedLimitLookUp().ok()) {
+    const std::string msg = "Initialize speed limit lookup table failed.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
   if (!InitCostTable().ok()) {
     const std::string msg = "Initialize cost table failed.";
     AERROR << msg;
@@ -132,6 +138,19 @@ Status GriddedPathTimeGraph::InitCostTable() {
     for (uint32_t j = 0; j < cost_table_i.size(); ++j, curr_s += unit_s_) {
       cost_table_i[j].Init(i, j, STPoint(curr_s, curr_t));
     }
+  }
+  return Status::OK();
+}
+
+Status GriddedPathTimeGraph::InitSpeedLimitLookUp() {
+  speed_limit_by_index_.clear();
+
+  uint32_t dim_s = gridded_path_time_graph_config_.matrix_dimension_s();
+  speed_limit_by_index_.resize(dim_s);
+  const auto& speed_limit = st_graph_data_.speed_limit();
+
+  for (uint32_t i = 0; i < dim_s; ++i) {
+    speed_limit_by_index_[i] = speed_limit.GetSpeedLimitByS(unit_s_ * i);
   }
   return Status::OK();
 }
@@ -240,8 +259,7 @@ void GriddedPathTimeGraph::CalculateCostAt(
     return;
   }
 
-  const double speed_limit =
-      st_graph_data_.speed_limit().GetSpeedLimitByS(unit_s_ * r);
+  const double speed_limit = speed_limit_by_index_[r];
 
   // TODO(all): fix here; remove soft_speed_limit
   const double soft_speed_limit = speed_limit;
@@ -275,9 +293,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
   double curr_speed_limit = speed_limit;
   if (c == 2) {
     for (uint32_t r_pre = r_low; r_pre <= r; ++r_pre) {
-      curr_speed_limit = std::fmin(
-          curr_speed_limit,
-          st_graph_data_.speed_limit().GetSpeedLimitByS(unit_s_ * r_pre));
+      curr_speed_limit =
+          std::fmin(curr_speed_limit, speed_limit_by_index_[r_pre]);
       const double acc =
           (r * unit_s_ - 2 * r_pre * unit_s_) / (unit_t_ * unit_t_);
       if (acc < gridded_path_time_graph_config_.max_deceleration() ||
@@ -308,9 +325,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
       continue;
     }
 
-    curr_speed_limit = std::fmin(
-        curr_speed_limit,
-        st_graph_data_.speed_limit().GetSpeedLimitByS(unit_s_ * r_pre));
+    curr_speed_limit =
+        std::fmin(curr_speed_limit, speed_limit_by_index_[r_pre]);
     const double curr_a = (cost_cr.index_s() * unit_s_ +
                            pre_col[r_pre].pre_point()->index_s() * unit_s_ -
                            2 * pre_col[r_pre].index_s() * unit_s_) /

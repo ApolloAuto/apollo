@@ -53,6 +53,8 @@ class GriddedPathTimeGraph {
  private:
   common::Status InitCostTable();
 
+  common::Status InitSpeedLimitLookUp();
+
   common::Status RetrieveSpeedProfile(SpeedData* const speed_data);
 
   common::Status CalculateTotalCost();
@@ -82,6 +84,8 @@ class GriddedPathTimeGraph {
 
  private:
   const StGraphData& st_graph_data_;
+
+  std::vector<double> speed_limit_by_index_;
 
   // dp st configuration
   DpStSpeedConfig gridded_path_time_graph_config_;
