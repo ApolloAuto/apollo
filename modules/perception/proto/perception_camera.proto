@@ -2,9 +2,9 @@ syntax = "proto2";
 
 package apollo.perception.camera;
 
+import "modules/common/proto/geometry.proto";
 import "modules/common/proto/header.proto";
 import "modules/perception/proto/perception_obstacle.proto";
-import "modules/common/proto/geometry.proto";
 
 enum CameraErrorCode {
     ERROR_NONE = 0;
