@@ -329,7 +329,7 @@ void SimulationWorldService::Update() {
     *world_.mutable_auto_driving_car() = car;
 
     {
-      boost::unique_lock<boost::shared_mutex> writer_lock(route_paths_mutex_);
+      std::unique_lock<std::shared_timed_mutex> writer_lock(route_paths_mutex_);
       route_paths_.clear();
     }
 
@@ -1059,7 +1059,7 @@ void SimulationWorldService::UpdateSimulationWorld(
   //         this related field has been added.
   //
   //{
-  //  boost::shared_lock<boost::shared_mutex> reader_lock(route_paths_mutex_);
+  //  std::shared_lock<std::shared_timed_mutex> reader_lock(route_paths_mutex_);
     if (world_.has_routing_time() &&
         world_.routing_time() == routing_response.header().timestamp_sec()) {
       // This routing response has been processed.
@@ -1096,7 +1096,7 @@ void SimulationWorldService::UpdateSimulationWorld(
     }
   }
   {
-    boost::unique_lock<boost::shared_mutex> writer_lock(route_paths_mutex_);
+    std::unique_lock<std::shared_timed_mutex> writer_lock(route_paths_mutex_);
     std::swap(route_paths, route_paths_);
     world_.set_routing_time(routing_response.header().timestamp_sec());
   }
@@ -1106,7 +1106,7 @@ Json SimulationWorldService::GetRoutePathAsJson() const {
   Json response;
   response["routePath"] = Json::array();
   {
-    boost::shared_lock<boost::shared_mutex> reader_lock(route_paths_mutex_);
+    std::shared_lock<std::shared_timed_mutex> reader_lock(route_paths_mutex_);
     response["routingTime"] = world_.routing_time();
     std::vector<RoutePath> route_paths(route_paths_);
   }
