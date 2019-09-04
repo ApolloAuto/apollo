@@ -134,7 +134,6 @@ int LocalizationLidar::Update(const unsigned int frame_idx,
 
   Eigen::Affine3d imu_pose = pose;
   RefineAltitudeFromMap(&imu_pose);
-
   // load all needed map
   Eigen::Vector3d pose_trans = imu_pose.translation();
   Eigen::Quaterniond pose_quat(imu_pose.linear());
