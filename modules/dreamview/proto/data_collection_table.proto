@@ -20,14 +20,18 @@ message Criterion {
   optional string vehicle_config = 4;
 }
 
-message Category {
-  optional uint32 total_frames = 1;
-  optional string description = 2;
-  repeated Criterion criterion = 3;
+message Range {
+  optional string name = 1;
+  repeated Criterion criterion = 2;
+}
+
+message Feature {
+  optional string name = 1;
+  repeated Range range = 2;
 }
 
 message Scenario {
-  map<string, Category> category = 1;
+  repeated Feature feature = 1;
 }
 
 message DataCollectionTable {
@@ -35,5 +39,8 @@ message DataCollectionTable {
 
   // For each category, this is the amount of consecutive
   // frames needed to start incrementing the count
-  optional uint32 frame_threshold = 2;
+  required uint32 frame_threshold = 2;
+
+  // Total number of frames that each category wants to collect
+  required uint32 total_frames = 3;
 }
