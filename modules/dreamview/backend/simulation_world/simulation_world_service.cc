@@ -328,10 +328,7 @@ void SimulationWorldService::Update() {
     world_.Clear();
     *world_.mutable_auto_driving_car() = car;
 
-    {
-      std::unique_lock<std::shared_timed_mutex> writer_lock(route_paths_mutex_);
-      route_paths_.clear();
-    }
+    route_paths_.clear();
 
     to_clear_ = false;
   }
@@ -1053,19 +1050,11 @@ void SimulationWorldService::UpdateSimulationWorld(
 template <>
 void SimulationWorldService::UpdateSimulationWorld(
     const RoutingResponse &routing_response) {
-  // NOTICE: No need to add read lock here. Because no elsewhere place
-  //         modifys the world_.routing_time() field concurrently.
-  //         Consider to uncomment here after concurrency modification on
-  //         this related field has been added.
-  //
-  //{
-  //  std::shared_lock<std::shared_timed_mutex> reader_lock(route_paths_mutex_);
-    if (world_.has_routing_time() &&
-        world_.routing_time() == routing_response.header().timestamp_sec()) {
-      // This routing response has been processed.
-      return;
-    }
-  //}
+  if (world_.has_routing_time() &&
+      world_.routing_time() == routing_response.header().timestamp_sec()) {
+    // This routing response has been processed.
+    return;
+  }
 
   std::vector<Path> paths;
   if (!map_service_->GetPathsFromRouting(routing_response, &paths)) {
@@ -1073,15 +1062,16 @@ void SimulationWorldService::UpdateSimulationWorld(
   }
 
   world_.clear_route_path();
+  route_paths_.clear();
+  world_.set_routing_time(routing_response.header().timestamp_sec());
 
-  std::vector<RoutePath> route_paths;
   for (const Path &path : paths) {
     // Downsample the path points for frontend display.
     auto sampled_indices =
         DownsampleByAngle(path.path_points(), kAngleThreshold);
 
-    route_paths.emplace_back();
-    RoutePath *route_path = &route_paths.back();
+    route_paths_.emplace_back();
+    RoutePath *route_path = &route_paths_.back();
     for (const size_t index : sampled_indices) {
       const auto &path_point = path.path_points()[index];
       PolygonPoint *route_point = route_path->add_point();
@@ -1095,22 +1085,15 @@ void SimulationWorldService::UpdateSimulationWorld(
       *new_path = *route_path;
     }
   }
-  {
-    std::unique_lock<std::shared_timed_mutex> writer_lock(route_paths_mutex_);
-    std::swap(route_paths, route_paths_);
-    world_.set_routing_time(routing_response.header().timestamp_sec());
-  }
 }
 
 Json SimulationWorldService::GetRoutePathAsJson() const {
   Json response;
+  response["routingTime"] = world_.routing_time();
   response["routePath"] = Json::array();
-  {
-    std::shared_lock<std::shared_timed_mutex> reader_lock(route_paths_mutex_);
-    response["routingTime"] = world_.routing_time();
-    std::vector<RoutePath> route_paths(route_paths_);
-  }
-  for (const auto &route_path : route_paths) {
+  // TODO(simulation): there might be a race if there are multiple
+  // RoutingResponse arrived at the same time.
+  for (const auto &route_path : route_paths_) {
     Json path;
     path["point"] = Json::array();
     for (const auto &route_point : route_path.point()) {

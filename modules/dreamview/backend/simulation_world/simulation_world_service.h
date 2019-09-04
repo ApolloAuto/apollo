@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include <shared_mutex>
 #include <algorithm>
 #include <list>
 #include <memory>
@@ -309,7 +308,6 @@ class SimulationWorldService {
   SimulationWorld world_;
 
   // Downsampled route paths to be rendered in frontend.
-  std::shared_timed_mutex route_paths_mutex_;
   std::vector<RoutePath> route_paths_;
 
   // The handle of MapService, not owned by SimulationWorldService.
