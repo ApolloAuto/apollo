@@ -1,0 +1,9 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+message CameraUpdate {
+    repeated double localization = 1;
+    repeated double tf_static = 2;
+    optional bytes data = 3;
+}

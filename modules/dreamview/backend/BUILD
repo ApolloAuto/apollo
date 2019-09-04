@@ -21,6 +21,7 @@ cc_library(
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/dreamview/backend/hmi",
         "//modules/dreamview/backend/map:map_service",
+        "//modules/dreamview/backend/perception_camera_updater",
         "//modules/dreamview/backend/point_cloud:point_cloud_updater",
         "//modules/dreamview/backend/sim_control",
         "//modules/dreamview/backend/simulation_world:simulation_world_updater",
