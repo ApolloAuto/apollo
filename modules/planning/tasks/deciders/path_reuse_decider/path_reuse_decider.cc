@@ -52,6 +52,7 @@ Status PathReuseDecider::Process(Frame* const frame,
 
 bool PathReuseDecider::CheckPathReusable(Frame* const frame) {
   if (history_->GetLastFrame() == nullptr) return false;
+  constexpr double kEpsilon = 1e-6;
   const std::vector<const HistoryObjectDecision*>
       history_stop_objects_decisions =
           history_->GetLastFrame()->GetStopObjectDecisions();
@@ -65,9 +66,9 @@ bool PathReuseDecider::CheckPathReusable(Frame* const frame) {
   } else {
     for (size_t i = 0; i < current_stop_positions.size(); ++i) {
       if (std::fabs(current_stop_positions[i]->x() -
-                    history_stop_positions[i]->x()) > 1e-6 ||
+                    history_stop_positions[i]->x()) > kEpsilon ||
           std::fabs(current_stop_positions[i]->y() -
-                    history_stop_positions[i]->y()) > 1e-6)
+                    history_stop_positions[i]->y()) > kEpsilon)
         return false;
     }
   }
@@ -75,7 +76,8 @@ bool PathReuseDecider::CheckPathReusable(Frame* const frame) {
 }
 
 // get current stop positions
-void PathReuseDecider::GetCurrentStopPositions(Frame* frame,
+void PathReuseDecider::GetCurrentStopPositions(
+    Frame* frame,
     std::vector<const common::PointENU*>* current_stop_positions) {
   auto obstacles = frame->obstacles();
   for (auto obstacle : obstacles) {
@@ -88,12 +90,11 @@ void PathReuseDecider::GetCurrentStopPositions(Frame* frame,
     }
   }
   // sort
-  std::sort(
-      current_stop_positions->begin(), current_stop_positions->end(),
-      [](const common::PointENU* lhs, const common::PointENU* rhs) {
-        return (lhs->x() < rhs->x() ||
-                (lhs->x() == rhs->x() && lhs->y() < rhs->y()));
-      });
+  std::sort(current_stop_positions->begin(), current_stop_positions->end(),
+            [](const common::PointENU* lhs, const common::PointENU* rhs) {
+              return (lhs->x() < rhs->x() ||
+                      (lhs->x() == rhs->x() && lhs->y() < rhs->y()));
+            });
 }
 
 // get history stop positions
@@ -109,12 +110,11 @@ void PathReuseDecider::GetHistoryStopPositions(
     }
   }
   // sort
-  std::sort(
-      history_stop_positions->begin(), history_stop_positions->end(),
-      [](const common::PointENU* lhs, const common::PointENU* rhs) {
-        return (lhs->x() < rhs->x() ||
-                (lhs->x() == rhs->x() && lhs->y() < rhs->y()));
-      });
+  std::sort(history_stop_positions->begin(), history_stop_positions->end(),
+            [](const common::PointENU* lhs, const common::PointENU* rhs) {
+              return (lhs->x() < rhs->x() ||
+                      (lhs->x() == rhs->x() && lhs->y() < rhs->y()));
+            });
 }
 
 }  // namespace planning
