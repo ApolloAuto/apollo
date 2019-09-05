@@ -21,6 +21,7 @@
 #include <string>
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/proto/geometry.pb.h"
 #include "opencv2/opencv.hpp"
 
 namespace apollo {
@@ -31,6 +32,7 @@ using apollo::localization::LocalizationEstimate;
 using apollo::localization::Pose;
 using apollo::transform::TransformStampeds;
 using apollo::transform::Transform;
+using apollo::common::Quaternion;
 
 namespace {
   void ConvertMatrixToArray(
@@ -39,6 +41,22 @@ namespace {
     for (int i = 0; i < matrix.size(); ++i) {
       array->push_back(pointer[i]);
     }
+  }
+
+  template <typename Point>
+  void ConstructTransformationMatrix(const Quaternion &quaternion,
+      const Point &translation, Eigen::Matrix4d &matrix) {
+    matrix.setConstant(0);
+    Eigen::Quaterniond q;
+    q.x() = quaternion.qx();
+    q.y() = quaternion.qy();
+    q.z() = quaternion.qz();
+    q.w() = quaternion.qw();
+    matrix.block<3, 3>(0, 0) = q.normalized().toRotationMatrix();
+    matrix(0, 3) = translation.x();
+    matrix(1, 3) = translation.y();
+    matrix(2, 3) = translation.z();
+    matrix(3, 3) = 1;
   }
 }  // namespace
 
@@ -74,31 +92,20 @@ void PerceptionCameraUpdater::GetImageLocalization(
       timestamp_diff = tmp_diff;
       image_pos = (*iter)->pose();
     } else {
-      if (std::abs(tmp_diff) < timestamp_diff) {
+      if (std::fabs(tmp_diff) < timestamp_diff) {
         image_pos = (*iter)->pose();
       }
       break;
     }
   }
   // clean useless localization
-  auto iter_begin = localization_queue_.begin();
-  while ((*iter_begin) != (*iter)) {
-    iter_begin = localization_queue_.erase(iter_begin);
+  while (localization_queue_.front() != (*iter)) {
+    localization_queue_.pop_front();
   }
 
   Eigen::Matrix4d localization_matrix;
-  localization_matrix.setConstant(0);
-  Eigen::Quaterniond q;
-  q.x() = image_pos.orientation().qx();
-  q.y() = image_pos.orientation().qy();
-  q.z() = image_pos.orientation().qz();
-  q.w() = image_pos.orientation().qw();
-  localization_matrix.block<3, 3>(0, 0) = q.normalized().toRotationMatrix();
-  localization_matrix(0, 3) = image_pos.position().x();
-  localization_matrix(1, 3) = image_pos.position().y();
-  localization_matrix(2, 3) = image_pos.position().z();
-  localization_matrix(3, 3) = 1;
-
+  ConstructTransformationMatrix(image_pos.orientation(), image_pos.position(),
+      localization_matrix);
   ConvertMatrixToArray(localization_matrix, localization);
 }
 
@@ -107,13 +114,6 @@ void PerceptionCameraUpdater::OnImage(
   if (!enabled_
       || compressed_image->format() == "h265" /* skip video format */) {
     return;
-  }
-
-  std::lock_guard<std::mutex> lock(image_mutex_);
-  if (compressed_image->has_measurement_time()) {
-    current_image_timestamp_ = compressed_image->measurement_time();
-  } else {
-    current_image_timestamp_ = compressed_image->header().timestamp_sec();
   }
 
   std::vector<uint8_t> compressed_raw_data(compressed_image->data().begin(),
@@ -129,6 +129,12 @@ void PerceptionCameraUpdater::OnImage(
   std::vector<uint8_t> tmp_buffer;
   cv::imencode(".jpg", mat_image, tmp_buffer, std::vector<int>() /* params */);
 
+  std::lock_guard<std::mutex> lock(image_mutex_);
+  if (compressed_image->has_measurement_time()) {
+    current_image_timestamp_ = compressed_image->measurement_time();
+  } else {
+    current_image_timestamp_ = compressed_image->header().timestamp_sec();
+  }
   camera_update_.set_data(&(tmp_buffer[0]), tmp_buffer.size());
 }
 
@@ -151,20 +157,14 @@ void PerceptionCameraUpdater::OnStaticTransform(
       const std::string child_frame_id = tf.child_frame_id();
       Transform transform = tf.transform();
       Eigen::Matrix4d matrix;
-      matrix.setConstant(0);
-      Eigen::Quaterniond q;
-      q.x() = transform.rotation().qx();
-      q.y() = transform.rotation().qy();
-      q.z() = transform.rotation().qz();
-      q.w() = transform.rotation().qw();
-      matrix.block<3, 3>(0, 0) = q.normalized().toRotationMatrix();
-      matrix(0, 3) = transform.translation().x();
-      matrix(1, 3) = transform.translation().y();
-      matrix(2, 3) = transform.translation().z();
-      matrix(3, 3) = 1;
+      ConstructTransformationMatrix(transform.rotation(),
+          transform.translation(), matrix);
       std::string key = frame_id + "_" + child_frame_id;
       transforms[key] = matrix;
     }
+    // Camera-to-localization transformation matrix can be calculated by
+    // camera->lidar->imu->localization extrinsic parameters, refer to
+    // modules/perception/camera/tools/Visualizer::Init_all_info_single_camera
     Eigen::Matrix4d localization2camera_mat = Eigen::Matrix4d::Identity();
     if (transforms.find("localization_novatel") != transforms.end()) {
       localization2camera_mat *= transforms["localization_novatel"];

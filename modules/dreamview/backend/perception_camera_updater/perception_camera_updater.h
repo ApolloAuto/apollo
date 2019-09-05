@@ -78,7 +78,7 @@ class PerceptionCameraUpdater {
 
   std::unique_ptr<cyber::Node> node_;
 
-  std::list<std::shared_ptr<apollo::localization::LocalizationEstimate>>
+  std::deque<std::shared_ptr<apollo::localization::LocalizationEstimate>>
       localization_queue_;
   std::vector<uint8_t> image_buffer_;
   std::vector<double> tf_static_;
