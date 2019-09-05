@@ -290,11 +290,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
 
   const auto& pre_col = cost_table_[c - 1];
 
-  double curr_speed_limit = speed_limit;
   if (c == 2) {
     for (uint32_t r_pre = r_low; r_pre <= r; ++r_pre) {
-      curr_speed_limit =
-          std::fmin(curr_speed_limit, speed_limit_by_index_[r_pre]);
       const double acc =
           (r * unit_s_ - 2 * r_pre * unit_s_) / (unit_t_ * unit_t_);
       if (acc < gridded_path_time_graph_config_.max_deceleration() ||
@@ -307,6 +304,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
         continue;
       }
 
+      double curr_speed_limit =
+          std::fmin(speed_limit, speed_limit_by_index_[r_pre]);
       const double cost = cost_cr.obstacle_cost() +
                           pre_col[r_pre].total_cost() +
                           CalculateEdgeCostForThirdCol(
@@ -325,8 +324,6 @@ void GriddedPathTimeGraph::CalculateCostAt(
       continue;
     }
 
-    curr_speed_limit =
-        std::fmin(curr_speed_limit, speed_limit_by_index_[r_pre]);
     const double curr_a = (cost_cr.index_s() * unit_s_ +
                            pre_col[r_pre].pre_point()->index_s() * unit_s_ -
                            2 * pre_col[r_pre].index_s() * unit_s_) /
@@ -353,6 +350,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
     const STPoint& prepre_point = prepre_graph_point.point();
     const STPoint& pre_point = pre_col[r_pre].point();
     const STPoint& curr_point = cost_cr.point();
+    double curr_speed_limit =
+        std::fmin(speed_limit, speed_limit_by_index_[r_pre]);
     double cost =
         cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
         CalculateEdgeCost(triple_pre_point, prepre_point, pre_point, curr_point,
