@@ -58,12 +58,16 @@ There are two steps in the installation process:
   ```sh
      bash apollo.sh build_opt_gpu
   ```
-  5. Start CyberRT and Dreamview:
+  5. Change CYBER_IP in cyber/setup.bash to IPC1's ip address:
+  ```sh
+     source cyber/setup.bash
+  ```
+  6. Start CyberRT and Dreamview:
   ```sh
      bash scripts/bootstrap.sh
   ```
 
-  6. Open Chrome and go to localhost:8888 to access Apollo Dreamview:
+  7. Open Chrome and go to localhost:8888 to access Apollo Dreamview:
 
       - on IPC1 
   
@@ -110,6 +114,10 @@ There are two steps in the installation process:
         ```
   
       - on IPC2 
+        Change CYBER_IP in cyber/setup.bash to IPC2's ip address:
+        ```sh
+          source cyber/setup.bash
+        ```
 
         Start dreamview on IPC2 by using the below command:
 
@@ -131,7 +139,7 @@ There are two steps in the installation process:
         
         [See Dreamview user's guide](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/dreamview_usage_table.md)
 
-7. How to start/stop Dreamview:
+8. How to start/stop Dreamview:
 
   The current version of Dreamview shouldn't run on the different IPCs simultaneously, so the user must perform it alternatively on IPC1 or IPC2. 
  
@@ -145,7 +153,7 @@ There are two steps in the installation process:
      bash scripts/bootstrap.sh
   ```
  
-  8. Cyber monitor
+  9. Cyber monitor
 
       Cyber monitor is CyberRT's tool used to check the status of all of the modules on local and remote machines. The User may observe the activity status of all the hardware and software components and ensure that they are working correctly.   
  
