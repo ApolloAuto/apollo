@@ -224,6 +224,7 @@ bool DarkSCNNLanePostprocessor::Process2D(
   coeffs.resize(lane_type_num_);
   img_coeffs.resize(lane_type_num_);
   for (int i = 1; i < lane_type_num_; ++i) {
+    coeffs[i] << 0, 0, 0, 0;
     if (xy_points[i].size() < minNumPoints_) continue;
     Eigen::Matrix<float, 4, 1> coeff;
     // Solve linear system to estimate polynomial coefficients
@@ -234,7 +235,6 @@ bool DarkSCNNLanePostprocessor::Process2D(
       xy_points[i].clear();
       xy_points[i] = selected_xy_points;
     } else {
-      coeffs[i] << 0, 0, 0, 0;
       xy_points[i].clear();
     }
   }

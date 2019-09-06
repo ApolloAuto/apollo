@@ -158,7 +158,11 @@ bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
 
     Eigen::Matrix<Dtype, 3, 1> matB;
     matB << pos_vec[index[0]](1), pos_vec[index[1]](1), pos_vec[index[2]](1);
-    Eigen::Matrix<Dtype, 3, 1> c = matA.colPivHouseholderQr().solve(matB);
+    Eigen::Matrix<Dtype, 3, 1> c = mat.solve(matB);
+    if (!(matA * c).isApprox(matB)) {
+      ADEBUG << "No solution.";
+      continue;
+    }
 
     int num_inliers = 0;
     Dtype residual = 0;
