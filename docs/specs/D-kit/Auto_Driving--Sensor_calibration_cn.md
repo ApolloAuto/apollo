@@ -25,13 +25,16 @@
 ### ch目录文件结构说明
 传感器的外参文件、内参文件存储在`modules/calibration/data/ch`目录下，标定的目的就是为了获得传感器的外参、内参文件。
 标定相关目录的作用如下表所示：
+
 | 目录名称  | 作用  |
 |---|---|
 | camera_params  | 存放摄像头内外参文件  | 
 |init_params	|	存放初始化外参文件|
 |radar_params | 存放radar外参文件|
 |velodyne_params	|	存放lidar标定文件|
+
 标定相关文件的作用如下表所示：
+
 | 目录名称  | 作用  |
 |---|---|
 | long_camera_extrinsics.yaml|长焦摄像头外参文件|
@@ -45,7 +48,6 @@
 |VLP16_calibration.yaml	|lidar内参标定文件(厂商提供)	|
 |velodyne16_height.yaml	|	lidar到地面高度文件|
 |velodyne16_novatel_extrinsics_example.yaml		|	lidar外参文件|
-
 
 ### yaml外参文件格式解析
 ros使用yaml文件来描述两个传感器之间的位置、姿态的关系，上文中提到的`.yaml`、`.yaml_init`文件均采用相同的格式，这里以`short_camera_extrinsics.yaml`文件为例对外参文件格式进行说明：
@@ -115,6 +117,7 @@ Lidar-IMU标定流程图如下图所示：
 | --------- | ---------------------------------------- | ------------- |
 | VLP-16    |  /apollo/sensor/velodyne16/PointCloud2   | 10            |
 | INS       | /apollo/sensor/gnss/odometry             | 100           |
+
 录制bag时，以8字形轨迹控制车辆，缓慢行驶，并使转弯半径尽量小 。行驶的时长3分钟即可，但要保证标定数据至少包含一个完整的8字，如下图所示。
 
 ![图片](../images/sensor_calibration/8.png)
