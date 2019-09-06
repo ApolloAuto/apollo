@@ -116,8 +116,8 @@ class RtkPlayer(object):
         New chassis Received
         """
         self.chassis.CopyFrom(data)
-        self.automode = (self.chassis.driving_mode ==
-                         chassis_pb2.Chassis.COMPLETE_AUTO_DRIVE)
+        self.automode = (self.chassis.driving_mode
+                         == chassis_pb2.Chassis.COMPLETE_AUTO_DRIVE)
         self.chassis_received = True
 
     def padmsg_callback(self, data):
@@ -182,8 +182,8 @@ class RtkPlayer(object):
         for i in range(start, end):
             # trajectory with gear switch
             # include gear_neutral at the beginning of a trajectory
-            if((self.data['gear'][i] == 1 or self.data['gear'][i] == 2)
-                    and (self.data['gear'][i + 1] != self.data['gear'][i]) ):
+            if((i < end - 1) and (self.data['gear'][i] == 1 or self.data['gear'][i] == 2) and
+                    (self.data['gear'][i + 1] != self.data['gear'][i]) ):
                 self.logger.debug("enter i in while loop: [ %s ]" % i)
                 self.logger.debug("self.data['gear'][i] != 1: %s" % self.data['gear'][i])
                 self.logger.debug("self.data['gear'][i] != 2: %s" % self.data['gear'][i])
@@ -301,8 +301,8 @@ class RtkPlayer(object):
         planningdata.estop.is_estop = self.estop
 
         self.planning_pub.write(planningdata)
-        self.logger.debug("Generated Planning Sequence: " +
-                          str(self.sequence_num - 1))
+        self.logger.debug("Generated Planning Sequence: "
+                          + str(self.sequence_num - 1))
 
     def shutdown(self):
         """
