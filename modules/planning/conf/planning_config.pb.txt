@@ -314,3 +314,9 @@ default_task_config: {
     enable_lane_change_urgency_check: false
   }
 }
+default_task_config: {
+  task_type: PATH_REUSE_DECIDER
+  path_reuse_decider_config {
+    reuse_path: false
+  }
+}
