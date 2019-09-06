@@ -237,36 +237,6 @@ bool CheckPullOverPositionByDistance(
           theta_diff <= scenario_config.max_theta_error_to_end_point());
 }
 
-ParkAndGoStatus CheckADCParkAndGoCruiseCompleted(
-    const ReferenceLineInfo& reference_line_info,
-    const ScenarioParkAndGoConfig& scenario_config) {
-  const double kLBuffer = 0.5;
-  const double kHeadingBuffer = 0.1;
-  // check if vehicle in reference line
-  const auto& reference_line = reference_line_info.reference_line();
-  // get vehicle s,l info
-  const common::math::Vec2d adc_position = {
-      common::VehicleStateProvider::Instance()->x(),
-      common::VehicleStateProvider::Instance()->y()};
-  const double adc_heading =
-      common::VehicleStateProvider::Instance()->heading();
-  common::SLPoint adc_position_sl;
-  reference_line.XYToSL(adc_position, &adc_position_sl);
-  // reference line heading angle at s
-  const auto reference_point =
-      reference_line.GetReferencePoint(adc_position_sl.s());
-  const auto path_point = reference_point.ToPathPoint(adc_position_sl.s());
-  ADEBUG << "adc_position_sl.l():[" << adc_position_sl.l() << "]";
-  ADEBUG << "adc_heading - path_point.theta():[" << adc_heading << "]"
-         << "[" << path_point.theta() << "]";
-  if (std::fabs(adc_position_sl.l()) < kLBuffer &&
-      std::fabs(adc_heading - path_point.theta()) < kHeadingBuffer) {
-    ADEBUG << "cruise completed";
-    return CRUISE_COMPLETE;
-  }
-  return CRUISING;
-}
-
 bool CheckADCReadyToCruise(Frame* frame,
                            const ScenarioParkAndGoConfig& scenario_config) {
   common::math::Vec2d adc_position = {

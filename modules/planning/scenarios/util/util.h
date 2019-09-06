@@ -34,14 +34,6 @@ enum PullOverStatus {
   PASS_DESTINATION = 4,
 };
 
-enum ParkAndGoStatus {
-  CRUISING = 1,
-  CRUISE_COMPLETE = 2,
-  ADJUST = 3,
-  ADJUST_COMPLETE = 4,
-  FAIL = 5,
-};
-
 hdmap::PathOverlap* GetOverlapOnReferenceLine(
     const ReferenceLineInfo& reference_line_info, const std::string& overlap_id,
     const ReferenceLineInfo::OverlapType& overlap_type);
@@ -68,11 +60,6 @@ bool CheckPullOverPositionByDistance(
     const ScenarioPullOverConfig& scenario_config,
     const common::math::Vec2d& adc_position, const double adc_theta,
     const common::math::Vec2d& target_position, const double target_theta);
-
-/* park_and_go */
-ParkAndGoStatus CheckADCParkAndGoCruiseCompleted(
-    const ReferenceLineInfo& reference_line_info,
-    const ScenarioParkAndGoConfig& scenario_config);
 
 bool CheckADCReadyToCruise(Frame* frame,
                            const ScenarioParkAndGoConfig& scenario_config);
