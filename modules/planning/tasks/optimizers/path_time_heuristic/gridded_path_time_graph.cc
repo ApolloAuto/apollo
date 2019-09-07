@@ -283,11 +283,14 @@ void GriddedPathTimeGraph::CalculateCostAt(
       static_cast<uint32_t>(FLAGS_planning_upper_speed_limit *
                             (1 + kSpeedRangeBuffer) * unit_t_ / unit_s_);
   const uint32_t r_low = (max_s_diff < r ? r - max_s_diff : 0);
-
+  const uint32_t r_pre_size = r - r_low + 1;
+  uint32_t r_pre = r;
   const auto& pre_col = cost_table_[c - 1];
+  double curr_speed_limit = speed_limit;
 
   if (c == 2) {
-    for (uint32_t r_pre = r_low; r_pre <= r; ++r_pre) {
+    for (uint32_t i = 0; i < r_pre_size; ++i) {
+      r_pre = r - i;
       const double acc =
           (r * unit_s_ - 2 * r_pre * unit_s_) / (unit_t_ * unit_t_);
       if (acc < gridded_path_time_graph_config_.max_deceleration() ||
@@ -299,9 +302,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
                                   pre_col[r_pre])) {
         continue;
       }
-
-      double curr_speed_limit =
-          std::fmin(speed_limit, speed_limit_by_index_[r_pre]);
+      curr_speed_limit =
+          std::fmin(curr_speed_limit, speed_limit_by_index_[r_pre]);
       const double cost =
           cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
           CalculateEdgeCostForThirdCol(r, r_pre, curr_speed_limit);
@@ -313,7 +315,9 @@ void GriddedPathTimeGraph::CalculateCostAt(
     }
     return;
   }
-  for (uint32_t r_pre = r_low; r_pre <= r; ++r_pre) {
+
+  for (uint32_t i = 0; i < r_pre_size; ++i) {
+    r_pre = r - i;
     if (std::isinf(pre_col[r_pre].total_cost()) ||
         pre_col[r_pre].pre_point() == nullptr) {
       continue;
@@ -345,8 +349,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
     const STPoint& prepre_point = prepre_graph_point.point();
     const STPoint& pre_point = pre_col[r_pre].point();
     const STPoint& curr_point = cost_cr.point();
-    double curr_speed_limit =
-        std::fmin(speed_limit, speed_limit_by_index_[r_pre]);
+    curr_speed_limit =
+        std::fmin(curr_speed_limit, speed_limit_by_index_[r_pre]);
     double cost = cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
                   CalculateEdgeCost(triple_pre_point, prepre_point, pre_point,
                                     curr_point, curr_speed_limit);
