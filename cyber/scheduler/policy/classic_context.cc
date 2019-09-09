@@ -79,7 +79,7 @@ std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
 void ClassicContext::Wait() {
   std::unique_lock<std::mutex> lk(mtx_wrapper_->Mutex());
   cw_->Cv().wait_for(lk, std::chrono::milliseconds(1000),
-                    [&]() { return notify_grp_[current_grp] > 0; });
+                     [&]() { return notify_grp_[current_grp] > 0; });
   if (notify_grp_[current_grp] > 0) {
     notify_grp_[current_grp]--;
   }
