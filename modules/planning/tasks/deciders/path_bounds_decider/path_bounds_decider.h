@@ -238,6 +238,11 @@ class PathBoundsDecider : public Decider {
                              const double check_s,
                              const LaneBorrowInfo& lane_borrow_info);
 
+  void RecordDebugInfo(
+      const std::vector<std::tuple<double, double, double>>& path_boundaries,
+      const std::string& debug_name,
+      ReferenceLineInfo* const reference_line_info);
+
  private:
   double adc_frenet_s_ = 0.0;
   double adc_frenet_sd_ = 0.0;

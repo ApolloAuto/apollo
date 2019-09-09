@@ -190,6 +190,7 @@ Status PathBoundsDecider::Process(
         // regular_self_path_bound = regular_path_bound;
         break;
     }
+    // RecordDebugInfo(regular_path_bound, "", reference_line_info);
     candidate_path_boundaries.back().set_label(
         StrCat("regular/", path_label, "/", borrow_lane_type));
     candidate_path_boundaries.back().set_blocking_obstacle_id(
@@ -1369,6 +1370,58 @@ bool PathBoundsDecider::CheckLaneBoundaryType(
     return false;
   }
   return true;
+}
+
+void PathBoundsDecider::RecordDebugInfo(
+    const PathBound& path_boundaries, const std::string& debug_name,
+    ReferenceLineInfo* const reference_line_info) {
+  // Sanity checks.
+  CHECK(!path_boundaries.empty());
+  CHECK_NOTNULL(reference_line_info);
+
+  // Take the left and right path boundaries, and transform them into two
+  // PathData so that they can be displayed in simulator.
+  std::vector<common::FrenetFramePoint> frenet_frame_left_boundaries;
+  std::vector<common::FrenetFramePoint> frenet_frame_right_boundaries;
+  for (const PathBoundPoint& path_bound_point : path_boundaries) {
+    common::FrenetFramePoint frenet_frame_point;
+    frenet_frame_point.set_s(std::get<0>(path_bound_point));
+    frenet_frame_point.set_dl(0.0);
+    frenet_frame_point.set_ddl(0.0);
+
+    frenet_frame_point.set_l(std::get<1>(path_bound_point));
+    frenet_frame_right_boundaries.push_back(frenet_frame_point);
+    frenet_frame_point.set_l(std::get<2>(path_bound_point));
+    frenet_frame_left_boundaries.push_back(frenet_frame_point);
+  }
+
+  auto frenet_frame_left_path = FrenetFramePath(
+      std::move(frenet_frame_left_boundaries));
+  auto frenet_frame_right_path = FrenetFramePath(
+      std::move(frenet_frame_right_boundaries));
+
+  PathData left_path_data;
+  left_path_data.SetReferenceLine(&(reference_line_info->reference_line()));
+  left_path_data.SetFrenetPath(frenet_frame_left_path);
+  PathData right_path_data;
+  right_path_data.SetReferenceLine(&(reference_line_info->reference_line()));
+  right_path_data.SetFrenetPath(frenet_frame_right_path);
+
+  // Insert the transformed PathData into the simulator display.
+  auto* ptr_display_path_1 =
+      reference_line_info->mutable_debug()->mutable_planning_data()->add_path();
+  ptr_display_path_1->set_name("planning_path_boundary_1");
+  ptr_display_path_1->mutable_path_point()->CopyFrom(
+      {left_path_data.discretized_path().begin(),
+       left_path_data.discretized_path().end()});
+  auto* ptr_display_path_2 =
+      reference_line_info->mutable_debug()->mutable_planning_data()->add_path();
+  ptr_display_path_2->set_name("planning_path_boundary_2");
+  ptr_display_path_2->mutable_path_point()->CopyFrom(
+      {right_path_data.discretized_path().begin(),
+       right_path_data.discretized_path().end()});
+
+  return;
 }
 
 }  // namespace planning
