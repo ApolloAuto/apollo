@@ -17,19 +17,16 @@
 #include "cyber/croutine/croutine.h"
 
 #include <utility>
+#include <algorithm>
 
 #include "cyber/base/concurrent_object_pool.h"
 #include "cyber/common/global_data.h"
 #include "cyber/common/log.h"
 #include "cyber/croutine/detail/routine_context.h"
-#include "cyber/event/perf_event_cache.h"
 
 namespace apollo {
 namespace cyber {
 namespace croutine {
-
-using apollo::cyber::event::PerfEventCache;
-using apollo::cyber::event::SchedPerf;
 
 thread_local CRoutine *CRoutine::current_routine_ = nullptr;
 thread_local char *CRoutine::main_stack_ = nullptr;
@@ -47,11 +44,12 @@ void CRoutineEntry(void *arg) {
 
 CRoutine::CRoutine(const std::function<void()> &func) : func_(func) {
   std::call_once(pool_init_flag, [&]() {
-    auto routine_num = 100;
+    uint32_t routine_num = common::GlobalData::Instance()->ComponentNums();
     auto &global_conf = common::GlobalData::Instance()->Config();
     if (global_conf.has_scheduler_conf() &&
         global_conf.scheduler_conf().has_routine_num()) {
-      routine_num = global_conf.scheduler_conf().routine_num();
+      routine_num = std::max(routine_num,
+          global_conf.scheduler_conf().routine_num());
     }
     context_pool.reset(new base::CCObjectPool<RoutineContext>(routine_num));
   });
@@ -82,11 +80,7 @@ RoutineState CRoutine::Resume() {
   }
 
   current_routine_ = this;
-  PerfEventCache::Instance()->AddSchedEvent(
-      SchedPerf::SWAP_IN, id_, processor_id_, static_cast<int>(state_));
   SwapContext(GetMainStack(), GetStack());
-  PerfEventCache::Instance()->AddSchedEvent(
-      SchedPerf::SWAP_OUT, id_, processor_id_, static_cast<int>(state_));
   current_routine_ = nullptr;
   return state_;
 }
