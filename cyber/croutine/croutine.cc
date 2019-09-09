@@ -16,8 +16,8 @@
 
 #include "cyber/croutine/croutine.h"
 
-#include <utility>
 #include <algorithm>
+#include <utility>
 
 #include "cyber/base/concurrent_object_pool.h"
 #include "cyber/common/global_data.h"
@@ -48,8 +48,8 @@ CRoutine::CRoutine(const std::function<void()> &func) : func_(func) {
     auto &global_conf = common::GlobalData::Instance()->Config();
     if (global_conf.has_scheduler_conf() &&
         global_conf.scheduler_conf().has_routine_num()) {
-      routine_num = std::max(routine_num,
-          global_conf.scheduler_conf().routine_num());
+      routine_num =
+          std::max(routine_num, global_conf.scheduler_conf().routine_num());
     }
     context_pool.reset(new base::CCObjectPool<RoutineContext>(routine_num));
   });

@@ -39,7 +39,8 @@ class PathReuseDecider : public Decider {
   common::Status Process(Frame* frame,
                          ReferenceLineInfo* reference_line_info) override;
   bool CheckPathReusable(Frame* frame);
-  void GetCurrentStopPositions(Frame* frame,
+  void GetCurrentStopPositions(
+      Frame* frame,
       std::vector<const common::PointENU*>* current_stop_positions);
   void GetHistoryStopPositions(
       const std::vector<const HistoryObjectDecision*>&
