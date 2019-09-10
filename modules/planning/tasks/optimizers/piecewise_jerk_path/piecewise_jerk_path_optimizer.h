@@ -44,6 +44,7 @@ class PiecewiseJerkPathOptimizer : public PathOptimizer {
       const std::array<double, 3>& init_state,
       const std::array<double, 3>& end_state, const double delta_s,
       const std::vector<std::pair<double, double>>& lat_boundaries,
+      const std::vector<std::pair<double, double>>& ddl_bounds,
       const std::array<double, 5>& w, std::vector<double>* ptr_x,
       std::vector<double>* ptr_dx, std::vector<double>* ptr_ddx,
       const int max_iter);
