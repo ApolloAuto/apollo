@@ -107,7 +107,7 @@ void GpsMonitor::RunOnce(const double current_time) {
       MonitorManager::LogBuffer().ERROR(status->detailed_msg());
       break;
     case MeasureState::CRITICAL_ERROR:
-      status->set_status(HardwareStatus::GPS_UNSTABLE_ERROR);
+      status->set_status(HardwareStatus::GPS_UNSTABLE_WARNING);
       status->set_detailed_msg(
           StrCat("CRITICAL_ERROR: ", msf_status.state_message()));
       MonitorManager::LogBuffer().ERROR(status->detailed_msg());
