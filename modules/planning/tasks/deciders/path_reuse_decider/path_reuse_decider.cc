@@ -70,8 +70,8 @@ bool PathReuseDecider::CheckPathReusable(
       common::VehicleStateProvider::Instance()->y()};
   common::SLPoint adc_position_sl;
   reference_line.XYToSL(adc_position, &adc_position_sl);
-  double nearest_history_stop_s = 300.0;
-  double nearest_current_stop_s = 300.0;
+  double nearest_history_stop_s = FLAGS_default_front_clear_distance;
+  double nearest_current_stop_s = FLAGS_default_front_clear_distance;
   for (auto history_stop_position : history_stop_positions) {
     // history_stop position at current reference line
     common::math::Vec2d stop_position = {history_stop_position->second->x(),
