@@ -16,10 +16,11 @@
 
 #include "modules/data/tools/smart_recorder/emergency_mode_trigger_beta.h"
 
+#include <memory>
+
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/control/proto/control_cmd.pb.h"
-#include <vector>
 
 namespace apollo {
 namespace data {
@@ -58,9 +59,9 @@ bool EmergencyModeTriggerBeta::IsEmergency(
   const std::shared_ptr<EmergencyMessage>& msg) {
   float his_speed_mean_value = GetHistoryMeanSpeed();
   float delta = his_speed_mean_value - msg->chassis_msg_->speed_mps();
-  if ( delta > MAX_DELTA) {
+  if (delta > MAX_DELTA) {
     return true;
-  } 
+  }
   return false;
 }
 
@@ -85,10 +86,10 @@ void EmergencyModeTriggerBeta::PushToHistoryList(
 }
 
 bool EmergencyMessage::Initial(const RecordMessage& msg) {
-  record_msg_ = std::make_shared<RecordMessage>(msg); 
+  record_msg_ = std::make_shared<RecordMessage>(msg);
   apollo::canbus::Chassis chassis_msg;
   chassis_msg.ParseFromString(msg.content);
-  chassis_msg_ = std::make_shared<apollo::canbus::Chassis>(chassis_msg);  
+  chassis_msg_ = std::make_shared<apollo::canbus::Chassis>(chassis_msg);
   return true;
 }
 
