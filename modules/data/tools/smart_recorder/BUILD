@@ -48,6 +48,7 @@ cc_library(
     deps = [
         ":drive_event_trigger",
         ":emergency_mode_trigger",
+        ":emergency_mode_trigger_beta",
         ":interval_pool",
         ":regular_interval_trigger",
         ":small_topics_trigger",
@@ -79,6 +80,18 @@ cc_library(
     name = "emergency_mode_trigger",
     srcs = ["emergency_mode_trigger.cc"],
     hdrs = ["emergency_mode_trigger.h"],
+    deps = [
+        ":trigger_base",
+        "//modules/canbus/proto:canbus_proto",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/control/proto:control_proto",
+    ],
+)
+
+cc_library(
+    name = "emergency_mode_trigger_beta",
+    srcs = ["emergency_mode_trigger_beta.cc"],
+    hdrs = ["emergency_mode_trigger_beta.h"],
     deps = [
         ":trigger_base",
         "//modules/canbus/proto:canbus_proto",
