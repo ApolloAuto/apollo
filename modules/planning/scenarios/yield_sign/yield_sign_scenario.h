@@ -40,7 +40,7 @@ namespace yield_sign {
 // stage context
 struct YieldSignContext {
   ScenarioYieldSignConfig scenario_config;
-  std::string current_yield_sign_overlap_id;
+  std::vector<std::string> current_yield_sign_overlap_ids;
   double creep_start_time = 0.0;
 };
 

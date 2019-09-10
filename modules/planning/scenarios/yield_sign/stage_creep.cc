@@ -60,10 +60,13 @@ Stage::StageStatus YieldSignStageCreep::Process(
     AERROR << "YieldSignStageCreep planning error";
   }
 
-  const auto& reference_line_info = frame->reference_line_info().front();
+  if (GetContext()->current_yield_sign_overlap_ids.size() == 0) {
+    return FinishScenario();
+  }
 
+  const auto& reference_line_info = frame->reference_line_info().front();
   const std::string yield_sign_overlap_id =
-      GetContext()->current_yield_sign_overlap_id;
+      GetContext()->current_yield_sign_overlap_ids[0];
 
   // get overlap along reference line
   PathOverlap* current_yield_sign_overlap =
