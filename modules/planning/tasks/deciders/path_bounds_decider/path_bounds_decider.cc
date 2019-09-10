@@ -1402,10 +1402,10 @@ void PathBoundsDecider::RecordDebugInfo(
 
   PathData left_path_data;
   left_path_data.SetReferenceLine(&(reference_line_info->reference_line()));
-  left_path_data.SetFrenetPath(frenet_frame_left_path);
+  left_path_data.SetFrenetPath(std::move(frenet_frame_left_path));
   PathData right_path_data;
   right_path_data.SetReferenceLine(&(reference_line_info->reference_line()));
-  right_path_data.SetFrenetPath(frenet_frame_right_path);
+  right_path_data.SetFrenetPath(std::move(frenet_frame_right_path));
 
   // Insert the transformed PathData into the simulator display.
   auto* ptr_display_path_1 =

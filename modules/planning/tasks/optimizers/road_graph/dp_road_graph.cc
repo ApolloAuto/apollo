@@ -103,9 +103,8 @@ bool DpRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
       accumulated_s += path_length;
     }
   }
-  FrenetFramePath tunnel(frenet_path);
   path_data->SetReferenceLine(&reference_line_);
-  path_data->SetFrenetPath(tunnel);
+  path_data->SetFrenetPath(FrenetFramePath(std::move(frenet_path)));
   return true;
 }
 

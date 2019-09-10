@@ -397,7 +397,7 @@ void PathAssessmentDecider::SetPathInfo(
     SetPathPointType(reference_line_info, *path_data, &path_decision);
   }
   // SetObstacleDistance(reference_line_info, *path_data, &path_decision);
-  path_data->SetPathPointDecisionGuide(path_decision);
+  path_data->SetPathPointDecisionGuide(std::move(path_decision));
 }
 
 void PathAssessmentDecider::TrimTailingOutLanePoints(
@@ -428,8 +428,8 @@ void PathAssessmentDecider::TrimTailingOutLanePoints(
     frenet_path.pop_back();
     path_point_decision.pop_back();
   }
-  path_data->SetFrenetPath(frenet_path);
-  path_data->SetPathPointDecisionGuide(path_point_decision);
+  path_data->SetFrenetPath(std::move(frenet_path));
+  path_data->SetPathPointDecisionGuide(std::move(path_point_decision));
 }
 
 bool PathAssessmentDecider::IsGreatlyOffReferenceLine(
