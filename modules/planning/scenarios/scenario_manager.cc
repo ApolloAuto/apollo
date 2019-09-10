@@ -931,17 +931,55 @@ void ScenarioManager::UpdatePlanningContextYieldSignScenario(
     return;
   }
 
-  // set to first_encountered stop_sign
+  // get first_encountered yield_sign
+  std::string current_yield_sign_overlap_id;
   const auto map_itr =
       first_encountered_overlap_map_.find(ReferenceLineInfo::YIELD_SIGN);
   if (map_itr != first_encountered_overlap_map_.end()) {
+    current_yield_sign_overlap_id = map_itr->second.object_id;
+  }
+
+  if (current_yield_sign_overlap_id.empty()) {
     PlanningContext::Instance()
         ->mutable_planning_status()
         ->mutable_yield_sign()
-        ->set_current_yield_sign_overlap_id(map_itr->second.object_id);
-    ADEBUG << "Update PlanningContext with first_encountered yield sign["
-           << map_itr->second.object_id << "] start_s["
-           << map_itr->second.start_s << "]";
+        ->Clear();
+    return;
+  }
+
+  // find all the yield_sign at/within the same location/group
+  const auto& reference_line_info = frame.reference_line_info().front();
+  const std::vector<PathOverlap>& yield_sign_overlaps =
+      reference_line_info.reference_line().map_path().yield_sign_overlaps();
+  auto yield_sign_overlap_itr = std::find_if(
+      yield_sign_overlaps.begin(), yield_sign_overlaps.end(),
+      [&current_yield_sign_overlap_id](const hdmap::PathOverlap& overlap) {
+        return overlap.object_id == current_yield_sign_overlap_id;
+      });
+  if (yield_sign_overlap_itr == yield_sign_overlaps.end()) {
+    PlanningContext::Instance()
+        ->mutable_planning_status()
+        ->mutable_yield_sign()
+        ->Clear();
+    return;
+  }
+
+  constexpr double kTrafficLightGroupingMaxDist = 2.0;  // unit: m
+  const double current_yield_sign_overlap_start_s =
+      yield_sign_overlap_itr->start_s;
+  for (const auto& yield_sign_overlap : yield_sign_overlaps) {
+    const double dist =
+        yield_sign_overlap.start_s - current_yield_sign_overlap_start_s;
+    if (fabs(dist) <= kTrafficLightGroupingMaxDist) {
+      PlanningContext::Instance()
+          ->mutable_planning_status()
+          ->mutable_yield_sign()
+          ->add_current_yield_sign_overlap_id(
+              yield_sign_overlap.object_id);
+      ADEBUG << "Update PlanningContext with first_encountered yield_sign["
+             << yield_sign_overlap.object_id << "] start_s["
+             << yield_sign_overlap.start_s << "]";
+    }
   }
 }
 

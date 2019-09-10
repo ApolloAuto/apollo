@@ -59,8 +59,16 @@ void YieldSign::MakeDecisions(Frame* const frame,
       continue;
     }
 
-    if (yield_sign_overlap.object_id ==
-        yield_sign_status.done_yield_sign_overlap_id()) {
+    // check if yield-sign-stop already finished, set by scenario/stage
+    bool yield_sign_done = false;
+    for (const auto& done_yield_sign_overlap_id :
+         yield_sign_status.done_yield_sign_overlap_id()) {
+      if (yield_sign_overlap.object_id == done_yield_sign_overlap_id) {
+        yield_sign_done = true;
+        break;
+      }
+    }
+    if (yield_sign_done) {
       continue;
     }
 

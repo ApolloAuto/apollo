@@ -67,11 +67,16 @@ Status CreepDecider::Process(Frame* frame,
   }
 
   // yield sign
-  const std::string yield_sign_overlap_id =
-      PlanningContext::Instance()
+  std::string yield_sign_overlap_id;
+  if (PlanningContext::Instance()
           ->planning_status()
           .yield_sign()
-          .current_yield_sign_overlap_id();
+          .current_yield_sign_overlap_id_size() > 0) {
+    yield_sign_overlap_id = PlanningContext::Instance()
+                                           ->planning_status()
+                                           .yield_sign()
+                                           .current_yield_sign_overlap_id(0);
+  }
 
   if (!stop_sign_overlap_id.empty()) {
     // get overlap along reference line
