@@ -909,6 +909,50 @@ void PathBoundsDecider::ConvertBoundaryAxesFromLaneCenterToRefLine(
   }
 }
 
+void PathBoundsDecider::GetBoundaryFromLaneChangeForbiddenZone(
+    const ReferenceLineInfo& reference_line_info, PathBound* const path_bound) {
+  // Sanity checks.
+  CHECK_NOTNULL(path_bound);
+
+  // If there is a pre-determined lane-change starting position, then use it;
+  // otherwise, decide one.
+  auto* lane_change_status = PlanningContext::Instance()
+                                 ->mutable_planning_status()
+                                 ->mutable_change_lane();
+  double lane_change_start_s = 0.0;
+  if (lane_change_status->exist_lane_change_start_position()) {
+    common::SLPoint point_sl;
+    reference_line_info.reference_line().XYToSL(
+        {lane_change_status->lane_change_start_position().x(),
+         lane_change_status->lane_change_start_position().y()}, &point_sl);
+    lane_change_start_s = point_sl.s();
+  } else {
+    // TODO(jiacheng): train ML model to learn this.
+    lane_change_start_s = 20.0 + adc_frenet_s_;
+
+    // Update the decided lane_change_start_s into planning-context.
+    common::SLPoint lane_change_start_sl;
+    lane_change_start_sl.set_s(lane_change_start_s);
+    lane_change_start_sl.set_l(0.0);
+    common::math::Vec2d lane_change_start_xy;
+    reference_line_info.reference_line().SLToXY(
+        lane_change_start_sl, &lane_change_start_xy);
+    lane_change_status->set_exist_lane_change_start_position(true);
+    lane_change_status->mutable_lane_change_start_position()->set_x(
+        lane_change_start_xy.x());
+    lane_change_status->mutable_lane_change_start_position()->set_y(
+        lane_change_start_xy.y());
+  }
+
+  // Remove the target lane out of the path-boundary, up to the decided S.
+  if (lane_change_start_s < adc_frenet_s_) {
+    // If already passed the decided S, then return.
+    lane_change_status->set_exist_lane_change_start_position(false);
+    return;
+  }
+  // TODO(jiacheng): implement this part.
+}
+
 // Currently, it processes each obstacle based on its frenet-frame
 // projection. Therefore, it might be overly conservative when processing
 // obstacles whose headings differ from road-headings a lot.
