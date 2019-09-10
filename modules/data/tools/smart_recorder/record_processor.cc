@@ -21,6 +21,7 @@
 
 #include "modules/data/tools/smart_recorder/drive_event_trigger.h"
 #include "modules/data/tools/smart_recorder/emergency_mode_trigger.h"
+#include "modules/data/tools/smart_recorder/emergency_mode_trigger_beta.h"
 #include "modules/data/tools/smart_recorder/interval_pool.h"
 #include "modules/data/tools/smart_recorder/regular_interval_trigger.h"
 #include "modules/data/tools/smart_recorder/small_topics_trigger.h"
@@ -76,6 +77,7 @@ bool RecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
 bool RecordProcessor::InitTriggers(const SmartRecordTrigger& trigger_conf) {
   triggers_.push_back(std::unique_ptr<TriggerBase>(new DriveEventTrigger));
   triggers_.push_back(std::unique_ptr<TriggerBase>(new EmergencyModeTrigger));
+  triggers_.push_back(std::unique_ptr<TriggerBase>(new EmergencyModeTriggerBeta));
   triggers_.push_back(std::unique_ptr<TriggerBase>(new SmallTopicsTrigger));
   triggers_.push_back(std::unique_ptr<TriggerBase>(new RegularIntervalTrigger));
   for (const auto& trigger : triggers_) {
