@@ -4910,6 +4910,14 @@
                 }
               }
             },
+            "PathReuseDeciderConfig": {
+              "fields": {
+                "reusePath": {
+                  "type": "bool",
+                  "id": 1
+                }
+              }
+            },
             "PiecewiseJerkPathConfig": {
               "fields": {
                 "defaultPathConfig": {
@@ -5863,7 +5871,8 @@
                     "UNKNOWN": 0,
                     "NORMAL": 1,
                     "PATH_FALLBACK": 2,
-                    "SPEED_FALLBACK": 3
+                    "SPEED_FALLBACK": 3,
+                    "PATH_REUSED": 4
                   }
                 }
               }
@@ -5891,7 +5900,8 @@
                     "piecewiseJerkSpeedConfig",
                     "pathLaneBorrowDeciderConfig",
                     "laneChangeDeciderConfig",
-                    "ruleBasedStopDeciderConfig"
+                    "ruleBasedStopDeciderConfig",
+                    "pathReuseDeciderConfig"
                   ]
                 }
               },
@@ -5967,6 +5977,10 @@
                 "ruleBasedStopDeciderConfig": {
                   "type": "RuleBasedStopDeciderConfig",
                   "id": 26
+                },
+                "pathReuseDeciderConfig": {
+                  "type": "PathReuseDeciderConfig",
+                  "id": 27
                 }
               },
               "nested": {
@@ -5994,7 +6008,8 @@
                     "PATH_LANE_BORROW_DECIDER": 26,
                     "PIECEWISE_JERK_SPEED_OPTIMIZER": 27,
                     "LANE_CHANGE_DECIDER": 28,
-                    "RULE_BASED_STOP_DECIDER": 29
+                    "RULE_BASED_STOP_DECIDER": 29,
+                    "PATH_REUSE_DECIDER": 30
                   }
                 }
               }
@@ -6330,14 +6345,14 @@
                   "type": "double",
                   "id": 1,
                   "options": {
-                    "default": 5
+                    "default": 10
                   }
                 },
                 "maxValidStopDistance": {
                   "type": "double",
                   "id": 2,
                   "options": {
-                    "default": 3.5
+                    "default": 4.5
                   }
                 },
                 "minPassSDistance": {
