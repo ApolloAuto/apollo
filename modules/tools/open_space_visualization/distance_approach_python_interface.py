@@ -17,13 +17,27 @@
 ###############################################################################
 
 import ctypes
-from ctypes import cdll, c_ushort, c_int
-from ctypes import c_double
-from ctypes import POINTER
+from ctypes import *
 import math
 
 lib = cdll.LoadLibrary(
     '/apollo/bazel-bin/modules/planning/open_space/tools/distance_approach_problem_wrapper_lib.so')
+
+lib.CreateHybridAPtr.argtypes = []
+lib.CreateHybridAPtr.restype = c_void_p
+lib.DistanceCreateResultPtr.argtypes = []
+lib.DistanceCreateResultPtr.restype = c_void_p
+lib.DistanceCreateObstaclesPtr.argtypes = []
+lib.DistanceCreateObstaclesPtr.restype = c_void_p
+lib.AddObstacle.argtypes = [c_void_p, POINTER(c_double)]
+lib.DistancePlan.restype = c_bool
+lib.DistancePlan.argtypes = [c_void_p, c_void_p, c_void_p, c_double, c_double, c_double, c_double, 
+                     c_double, c_double, POINTER(c_double)]
+lib.DistanceGetResult.argtypes = [c_void_p, c_void_p, POINTER(c_double), POINTER(c_double), POINTER(c_double),
+                    POINTER(c_double), POINTER(c_double), POINTER(c_double), POINTER(c_double), 
+                    POINTER(c_double), POINTER(c_double), POINTER(c_double), POINTER(c_double), 
+                    POINTER(c_double), POINTER(c_double), POINTER(c_double), POINTER(c_double),
+                    POINTER(c_ushort), POINTER(c_double), POINTER(c_double), POINTER(c_double)]
 
 class DistancePlanner(object):
     def __init__(self):
