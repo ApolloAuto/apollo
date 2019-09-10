@@ -35,13 +35,13 @@ namespace planning {
 using apollo::common::SLPoint;
 using apollo::common::math::CartesianFrenetConverter;
 
-bool PathData::SetDiscretizedPath(const DiscretizedPath &path) {
+bool PathData::SetDiscretizedPath(DiscretizedPath path) {
   if (reference_line_ == nullptr) {
     AERROR << "Should NOT set discretized path when reference line is nullptr. "
               "Please set reference line first.";
     return false;
   }
-  discretized_path_ = path;
+  discretized_path_ = std::move(path);
   if (!XYToSL(discretized_path_, &frenet_path_)) {
     AERROR << "Fail to transfer discretized path to frenet path.";
     return false;
@@ -51,13 +51,13 @@ bool PathData::SetDiscretizedPath(const DiscretizedPath &path) {
   return true;
 }
 
-bool PathData::SetFrenetPath(const FrenetFramePath &frenet_path) {
+bool PathData::SetFrenetPath(FrenetFramePath frenet_path) {
   if (reference_line_ == nullptr) {
     AERROR << "Should NOT set frenet path when reference line is nullptr. "
               "Please set reference line first.";
     return false;
   }
-  frenet_path_ = frenet_path;
+  frenet_path_ = std::move(frenet_path);
   if (!SLToXY(frenet_path_, &discretized_path_)) {
     AERROR << "Fail to transfer frenet path to discretized path.";
     return false;
@@ -68,8 +68,8 @@ bool PathData::SetFrenetPath(const FrenetFramePath &frenet_path) {
 }
 
 bool PathData::SetPathPointDecisionGuide(
-    const std::vector<std::tuple<double, PathPointType, double>>
-        &path_point_decision_guide) {
+    std::vector<std::tuple<double, PathPointType, double>>
+        path_point_decision_guide) {
   if (reference_line_ == nullptr) {
     AERROR << "Should NOT set path_point_decision_guide when reference line is "
               "nullptr. ";
@@ -80,7 +80,7 @@ bool PathData::SetPathPointDecisionGuide(
               "world frame trajectory is empty. ";
     return false;
   }
-  path_point_decision_guide_ = path_point_decision_guide;
+  path_point_decision_guide_ = std::move(path_point_decision_guide);
   return true;
 }
 
