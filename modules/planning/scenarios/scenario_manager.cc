@@ -356,17 +356,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
           .traffic_light_unprotected_right_turn_config();
 
   const auto& reference_line_info = frame.reference_line_info().front();
-
-  // first encountered traffic light overlap
-  const auto first_encountered_traffic_light_itr =
-      first_encountered_overlap_map_.find(ReferenceLineInfo::SIGNAL);
-  if (first_encountered_traffic_light_itr ==
-      first_encountered_overlap_map_.end()) {
-    return default_scenario_type_;
-  }
-  const auto& first_encountered_traffic_light =
-      first_encountered_traffic_light_itr->second;
-
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
 
   // find all the traffic light belong to
@@ -377,7 +366,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
       reference_line_info.reference_line().map_path().signal_overlaps();
   for (const auto& traffic_light_overlap : traffic_light_overlaps) {
     const double dist =
-        traffic_light_overlap.start_s - first_encountered_traffic_light.start_s;
+        traffic_light_overlap.start_s - traffic_light_overlap.start_s;
     if (fabs(dist) <= kTrafficLightGroupingMaxDist) {
       next_traffic_lights.push_back(traffic_light_overlap);
     }
@@ -389,7 +378,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
   // note: need iterate all lights to check no RED/YELLOW/UNKNOWN
   for (const auto& traffic_light_overlap : next_traffic_lights) {
     const double adc_distance_to_traffic_light =
-        first_encountered_traffic_light.start_s - adc_front_edge_s;
+        traffic_light_overlap.start_s - adc_front_edge_s;
     ADEBUG << "traffic_light[" << traffic_light_overlap.object_id
            << "] start_s[" << traffic_light_overlap.start_s
            << "] adc_distance_to_traffic_light["
@@ -420,8 +409,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
     case ScenarioConfig::PARK_AND_GO:
     case ScenarioConfig::PULL_OVER:
       if (traffic_light_scenario) {
-        const auto& turn_type = reference_line_info.GetPathTurnType(
-            first_encountered_traffic_light.start_s);
+        const auto& turn_type =
+            reference_line_info.GetPathTurnType(traffic_light_overlap.start_s);
         const bool right_turn = (turn_type == hdmap::Lane::RIGHT_TURN);
         const bool left_turn = (turn_type == hdmap::Lane::LEFT_TURN);
 
