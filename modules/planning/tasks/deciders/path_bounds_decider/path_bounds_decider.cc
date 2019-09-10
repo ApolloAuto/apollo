@@ -132,6 +132,45 @@ Status PathBoundsDecider::Process(
     }
   }
 
+  // TODO(jiacheng): uncomment this part later after debugging.
+  /*
+  // If it's a lane-change reference-line, generate lane-change path boundary.
+  if (reference_line_info->IsChangeLanePath()) {
+    PathBound lanechange_path_bound;
+    Status ret = GenerateLaneChangePathBound(
+        *reference_line_info, &lanechange_path_bound);
+    if (!ret.ok()) {
+      ADEBUG << "Cannot generate a lane-change path bound.";
+      return Status(ErrorCode::PLANNING_ERROR, ret.error_message());
+    }
+    if (lanechange_path_bound.empty()) {
+      const std::string msg = "Failed to get a valid fallback path boundary";
+      AERROR << msg;
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+    }
+    if (!lanechange_path_bound.empty()) {
+      CHECK_LE(adc_frenet_l_, std::get<2>(lanechange_path_bound[0]));
+      CHECK_GE(adc_frenet_l_, std::get<1>(lanechange_path_bound[0]));
+    }
+    // Update the fallback path boundary into the reference_line_info.
+    std::vector<std::pair<double, double>> lanechange_path_bound_pair;
+    for (size_t i = 0; i < lanechange_path_bound.size(); ++i) {
+      lanechange_path_bound_pair.emplace_back(
+          std::get<1>(lanechange_path_bound[i]),
+          std::get<2>(lanechange_path_bound[i]));
+    }
+    candidate_path_boundaries.emplace_back(
+        std::get<0>(lanechange_path_bound[0]),
+        kPathBoundsDeciderResolution, lanechange_path_bound_pair);
+    candidate_path_boundaries.back().set_label("regular/lanechange");
+    RecordDebugInfo(lanechange_path_bound, "", reference_line_info);
+    reference_line_info->SetCandidatePathBoundaries(
+        std::move(candidate_path_boundaries));
+    ADEBUG << "Completed lanechange and fallback path boundaries generation.";
+    return Status::OK();
+  }
+  */
+
   // Generate regular path boundaries.
   std::vector<LaneBorrowInfo> lane_borrow_info_list;
   lane_borrow_info_list.push_back(LaneBorrowInfo::NO_BORROW);
@@ -312,7 +351,7 @@ Status PathBoundsDecider::GenerateLaneChangePathBound(
   // PathBoundsDebugString(*path_bound);
 
   // 3. Remove the S-length of target lane out of the path-bound.
-  // TODO(jiacheng): implement this.
+  GetBoundaryFromLaneChangeForbiddenZone(reference_line_info, path_bound);
 
   ADEBUG << "Completed generating path boundaries.";
   return Status::OK();
@@ -913,6 +952,7 @@ void PathBoundsDecider::GetBoundaryFromLaneChangeForbiddenZone(
     const ReferenceLineInfo& reference_line_info, PathBound* const path_bound) {
   // Sanity checks.
   CHECK_NOTNULL(path_bound);
+  const ReferenceLine& reference_line = reference_line_info.reference_line();
 
   // If there is a pre-determined lane-change starting position, then use it;
   // otherwise, decide one.
@@ -922,21 +962,20 @@ void PathBoundsDecider::GetBoundaryFromLaneChangeForbiddenZone(
   double lane_change_start_s = 0.0;
   if (lane_change_status->exist_lane_change_start_position()) {
     common::SLPoint point_sl;
-    reference_line_info.reference_line().XYToSL(
+    reference_line.XYToSL(
         {lane_change_status->lane_change_start_position().x(),
          lane_change_status->lane_change_start_position().y()}, &point_sl);
     lane_change_start_s = point_sl.s();
   } else {
     // TODO(jiacheng): train ML model to learn this.
-    lane_change_start_s = 20.0 + adc_frenet_s_;
+    lane_change_start_s = 40.0 + adc_frenet_s_;
 
     // Update the decided lane_change_start_s into planning-context.
     common::SLPoint lane_change_start_sl;
     lane_change_start_sl.set_s(lane_change_start_s);
     lane_change_start_sl.set_l(0.0);
     common::math::Vec2d lane_change_start_xy;
-    reference_line_info.reference_line().SLToXY(
-        lane_change_start_sl, &lane_change_start_xy);
+    reference_line.SLToXY(lane_change_start_sl, &lane_change_start_xy);
     lane_change_status->set_exist_lane_change_start_position(true);
     lane_change_status->mutable_lane_change_start_position()->set_x(
         lane_change_start_xy.x());
@@ -947,10 +986,34 @@ void PathBoundsDecider::GetBoundaryFromLaneChangeForbiddenZone(
   // Remove the target lane out of the path-boundary, up to the decided S.
   if (lane_change_start_s < adc_frenet_s_) {
     // If already passed the decided S, then return.
-    lane_change_status->set_exist_lane_change_start_position(false);
+    // lane_change_status->set_exist_lane_change_start_position(false);
     return;
   }
-  // TODO(jiacheng): implement this part.
+  for (size_t i = 0; i < path_bound->size(); ++i) {
+    double curr_s = std::get<0>((*path_bound)[i]);
+    if (curr_s > lane_change_start_s)
+      break;
+    double curr_lane_left_width = 0.0;
+    double curr_lane_right_width = 0.0;
+    double offset_to_map = 0.0;
+    reference_line.GetOffsetToMap(curr_s, &offset_to_map);
+    if (reference_line.GetLaneWidth(curr_s, &curr_lane_left_width,
+                                    &curr_lane_right_width)) {
+      double offset_to_lane_center = 0.0;
+      reference_line.GetOffsetToMap(curr_s, &offset_to_lane_center);
+      curr_lane_left_width += offset_to_lane_center;
+      curr_lane_right_width -= offset_to_lane_center;
+    }
+    curr_lane_left_width -= offset_to_map;
+    curr_lane_right_width += offset_to_map;
+
+    std::get<1>((*path_bound)[i]) = adc_frenet_l_ > curr_lane_left_width ?
+        curr_lane_left_width + GetBufferBetweenADCCenterAndEdge()
+        : std::get<1>((*path_bound)[i]);
+    std::get<2>((*path_bound)[i]) = adc_frenet_l_ < -curr_lane_right_width ?
+        -curr_lane_right_width - GetBufferBetweenADCCenterAndEdge()
+        : std::get<2>((*path_bound)[i]);
+  }
 }
 
 // Currently, it processes each obstacle based on its frenet-frame
