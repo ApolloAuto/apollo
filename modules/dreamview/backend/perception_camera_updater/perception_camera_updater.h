@@ -19,15 +19,15 @@
 #include <Eigen/Dense>
 
 #include <memory>
-#include <list>
+#include <deque>
 #include <string>
 #include <vector>
 
-#include "third_party/json/json.hpp"
 #include "cyber/cyber.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/localization/proto/pose.pb.h"
+#include "modules/transform/buffer.h"
 #include "modules/transform/proto/transform.pb.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/proto/camera_update.pb.h"
@@ -60,8 +60,6 @@ class PerceptionCameraUpdater {
   void OnImage(const std::shared_ptr<apollo::drivers::CompressedImage> &image);
   void OnLocalization(
       const std::shared_ptr<apollo::localization::LocalizationEstimate> &loc);
-  void OnStaticTransform(
-      const std::shared_ptr<apollo::transform::TransformStampeds> &static_tf);
 
   /**
    * @brief Since localization is updated more frequently than camera image,
@@ -69,6 +67,12 @@ class PerceptionCameraUpdater {
    * for image.
    */
   void GetImageLocalization(std::vector<double> *localization);
+
+  apollo::transform::Buffer *tf_buffer_ =
+      apollo::transform::Buffer::Instance();
+  bool QueryTF(const std::string &frame_id, const std::string &child_frame_id,
+      Eigen::Matrix4d *matrix);
+  void GetStaticTF(std::vector<double> *tf_static);
 
   WebSocketHandler *websocket_;
   CameraUpdate camera_update_;

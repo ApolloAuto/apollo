@@ -17,7 +17,6 @@
 #include "modules/dreamview/backend/perception_camera_updater/perception_camera_updater.h"
 
 #include <float.h>
-#include <map>
 #include <string>
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -30,8 +29,7 @@ namespace dreamview {
 using apollo::drivers::CompressedImage;
 using apollo::localization::LocalizationEstimate;
 using apollo::localization::Pose;
-using apollo::transform::TransformStampeds;
-using apollo::transform::Transform;
+using apollo::transform::TransformStamped;
 using apollo::common::Quaternion;
 
 namespace {
@@ -45,18 +43,18 @@ namespace {
 
   template <typename Point>
   void ConstructTransformationMatrix(const Quaternion &quaternion,
-      const Point &translation, Eigen::Matrix4d &matrix) {
-    matrix.setConstant(0);
+      const Point &translation, Eigen::Matrix4d *matrix) {
+    matrix->setConstant(0);
     Eigen::Quaterniond q;
     q.x() = quaternion.qx();
     q.y() = quaternion.qy();
     q.z() = quaternion.qz();
     q.w() = quaternion.qw();
-    matrix.block<3, 3>(0, 0) = q.normalized().toRotationMatrix();
-    matrix(0, 3) = translation.x();
-    matrix(1, 3) = translation.y();
-    matrix(2, 3) = translation.z();
-    matrix(3, 3) = 1;
+    matrix->block<3, 3>(0, 0) = q.normalized().toRotationMatrix();
+    (*matrix)(0, 3) = translation.x();
+    (*matrix)(1, 3) = translation.y();
+    (*matrix)(2, 3) = translation.z();
+    (*matrix)(3, 3) = 1;
   }
 }  // namespace
 
@@ -82,31 +80,69 @@ void PerceptionCameraUpdater::Stop() {
 
 void PerceptionCameraUpdater::GetImageLocalization(
     std::vector<double> *localization) {
+  if (localization_queue_.empty()) {
+    AERROR << "Localization queue is empty, cannot get localization for image,"
+           << "image_timestamp: " << current_image_timestamp_;
+    return;
+  }
+
   double timestamp_diff = DBL_MAX;
-  auto iter = localization_queue_.rbegin();
   Pose image_pos;
-  for (; iter != localization_queue_.rend(); ++iter) {
-    const double tmp_diff = (*iter)->measurement_time()
+  while (!localization_queue_.empty()) {
+    const double tmp_diff = localization_queue_.front()->measurement_time()
         - current_image_timestamp_;
-    if (tmp_diff > 0) {
+    if (tmp_diff < 0) {
       timestamp_diff = tmp_diff;
-      image_pos = (*iter)->pose();
+      image_pos = localization_queue_.front()->pose();
+      localization_queue_.pop_front();
     } else {
-      if (std::fabs(tmp_diff) < timestamp_diff) {
-        image_pos = (*iter)->pose();
+      if (tmp_diff < std::fabs(timestamp_diff)) {
+        image_pos = localization_queue_.front()->pose();
       }
       break;
     }
   }
-  // clean useless localization
-  while (localization_queue_.front() != (*iter)) {
-    localization_queue_.pop_front();
-  }
 
   Eigen::Matrix4d localization_matrix;
   ConstructTransformationMatrix(image_pos.orientation(), image_pos.position(),
-      localization_matrix);
+      &localization_matrix);
   ConvertMatrixToArray(localization_matrix, localization);
+}
+
+bool PerceptionCameraUpdater::QueryTF(const std::string &frame_id,
+    const std::string &child_frame_id, Eigen::Matrix4d *matrix) {
+  TransformStamped transform;
+  if (tf_buffer_->GetStaticTF(frame_id, child_frame_id, &transform)) {
+    ConstructTransformationMatrix(transform.transform().rotation(),
+        transform.transform().translation(), matrix);
+    return true;
+  }
+  return false;
+}
+
+void PerceptionCameraUpdater::GetStaticTF(std::vector<double> *tf_static) {
+  Eigen::Matrix4d localization2camera_mat = Eigen::Matrix4d::Identity();
+
+  // Since "/tf" topic has dynamic updates of world->novatel and
+  // world->localization, novatel->localization in tf buffer is being changed
+  // and their transformation does not represent for static transform anymore.
+  // Thus we query static transform respectively and calculate by ourselves
+  Eigen::Matrix4d loc2novatel_mat;
+  if (QueryTF("localization", "novatel", &loc2novatel_mat)) {
+    localization2camera_mat *= loc2novatel_mat;
+  }
+
+  Eigen::Matrix4d novatel2lidar_mat;
+  if (QueryTF("novatel", "velodyne128", &novatel2lidar_mat)) {
+    localization2camera_mat *= novatel2lidar_mat;
+  }
+
+  Eigen::Matrix4d lidar2camera_mat;
+  if (QueryTF("velodyne128", "front_6mm", &lidar2camera_mat)) {
+    localization2camera_mat *= lidar2camera_mat;
+  }
+
+  ConvertMatrixToArray(localization2camera_mat, tf_static);
 }
 
 void PerceptionCameraUpdater::OnImage(
@@ -148,40 +184,6 @@ void PerceptionCameraUpdater::OnLocalization(
   localization_queue_.push_back(localization);
 }
 
-void PerceptionCameraUpdater::OnStaticTransform(
-    const std::shared_ptr<TransformStampeds> &static_tf) {
-  if (static_tf->transforms().size() > 0) {
-    std::map<std::string, Eigen::Matrix4d> transforms;
-    for (const auto &tf : static_tf->transforms()) {
-      const std::string frame_id = tf.header().frame_id();
-      const std::string child_frame_id = tf.child_frame_id();
-      Transform transform = tf.transform();
-      Eigen::Matrix4d matrix;
-      ConstructTransformationMatrix(transform.rotation(),
-          transform.translation(), matrix);
-      std::string key = frame_id + "_" + child_frame_id;
-      transforms[key] = matrix;
-    }
-    // Camera-to-localization transformation matrix can be calculated by
-    // camera->lidar->imu->localization extrinsic parameters, refer to
-    // modules/perception/camera/tools/Visualizer::Init_all_info_single_camera
-    Eigen::Matrix4d localization2camera_mat = Eigen::Matrix4d::Identity();
-    if (transforms.find("localization_novatel") != transforms.end()) {
-      localization2camera_mat *= transforms["localization_novatel"];
-    }
-    if (transforms.find("novatel_velodyne128") != transforms.end()) {
-      localization2camera_mat *= transforms["novatel_velodyne128"];
-    }
-    if (transforms.find("velodyne128_front_6mm") != transforms.end()) {
-      localization2camera_mat *= transforms["velodyne128_front_6mm"];
-    }
-    std::vector<double> localization2camera_arr;
-    ConvertMatrixToArray(localization2camera_mat, &localization2camera_arr);
-    *camera_update_.mutable_tf_static() = {localization2camera_arr.begin(),
-                                           localization2camera_arr.end()};
-  }
-}
-
 void PerceptionCameraUpdater::InitReaders() {
   node_->CreateReader<CompressedImage>(
       FLAGS_image_short_topic,
@@ -193,12 +195,6 @@ void PerceptionCameraUpdater::InitReaders() {
       FLAGS_localization_topic,
       [this](const std::shared_ptr<LocalizationEstimate> &localization) {
         OnLocalization(localization);
-      });
-
-  node_->CreateReader<TransformStampeds>(
-      FLAGS_tf_static_topic,
-      [this](const std::shared_ptr<TransformStampeds> &static_transform) {
-        OnStaticTransform(static_transform);
       });
 }
 
@@ -212,9 +208,12 @@ void PerceptionCameraUpdater::GetUpdate(std::string *camera_update) {
     GetImageLocalization(&localization);
     *camera_update_.mutable_localization() = {localization.begin(),
                                               localization.end()};
-
-    camera_update_.SerializeToString(camera_update);
   }
+  std::vector<double> tf_static;
+  GetStaticTF(&tf_static);
+  *camera_update_.mutable_tf_static() = {tf_static.begin(),
+                                         tf_static.end()};
+  camera_update_.SerializeToString(camera_update);
 }
 
 }  // namespace dreamview

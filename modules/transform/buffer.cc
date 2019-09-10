@@ -111,6 +111,18 @@ void Buffer::SubscriptionCallbackImpl(
   }
 }
 
+bool Buffer::GetStaticTF(const std::string &frame_id,
+    const std::string &child_frame_id, TransformStamped *tf) {
+  for (auto &static_msg : static_msgs_) {
+    if (static_msg.header.frame_id == frame_id
+        && static_msg.child_frame_id == child_frame_id) {
+      TF2MsgToCyber(static_msg, (*tf));
+      return true;
+    }
+  }
+  return false;
+}
+
 void Buffer::TF2MsgToCyber(
     const geometry_msgs::TransformStamped& tf2_trans_stamped,
     TransformStamped& trans_stamped) const {

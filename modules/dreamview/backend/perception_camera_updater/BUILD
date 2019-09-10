@@ -22,10 +22,10 @@ cc_library(
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/common/proto:geometry_proto",
+        "//modules/transform:tf2_buffer_lib",
         "//modules/transform/proto:transform_proto",
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/dreamview/proto:camera_update_proto",
-        "//third_party/json",
         "@eigen",
     ],
 )
