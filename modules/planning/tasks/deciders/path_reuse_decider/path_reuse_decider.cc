@@ -42,39 +42,74 @@ Status PathReuseDecider::Process(Frame* const frame,
 
   // Check if path is reusable
   if (Decider::config_.path_reuse_decider_config().reuse_path() &&
-      CheckPathReusable(frame)) {
+      CheckPathReusable(frame, reference_line_info)) {
     // count reusable path
     ++reusable_path_counter_;
   }
   ++total_path_counter_;
+  ADEBUG << "reusable_path_counter_" << reusable_path_counter_;
+  ADEBUG << "total_path_counter_" << total_path_counter_;
   return Status::OK();
 }
 
-bool PathReuseDecider::CheckPathReusable(Frame* const frame) {
+bool PathReuseDecider::CheckPathReusable(
+    Frame* const frame, ReferenceLineInfo* const reference_line_info) {
   if (history_->GetLastFrame() == nullptr) return false;
-  constexpr double kEpsilon = 1e-6;
-  const std::vector<const HistoryObjectDecision*>
-      history_stop_objects_decisions =
-          history_->GetLastFrame()->GetStopObjectDecisions();
-  std::vector<const common::PointENU*> history_stop_positions;
-  std::vector<const common::PointENU*> current_stop_positions;
-  GetCurrentStopPositions(frame, &current_stop_positions);
-  GetHistoryStopPositions(history_stop_objects_decisions,
-                          &history_stop_positions);
-  if (current_stop_positions.size() != history_stop_positions.size()) {
-    return false;
-  } else {
-    for (size_t i = 0; i < current_stop_positions.size(); ++i) {
-      if (std::fabs(current_stop_positions[i]->x() -
-                    history_stop_positions[i]->x()) > kEpsilon ||
-          std::fabs(current_stop_positions[i]->y() -
-                    history_stop_positions[i]->y()) > kEpsilon)
-        return false;
+  const std::vector<const HistoryObjectDecision*> history_objects_decisions =
+      history_->GetLastFrame()->GetStopObjectDecisions();
+  const auto& reference_line = reference_line_info->reference_line();
+  std::vector<std::pair<const double, const common::PointENU*>*>
+      history_stop_positions;
+  std::vector<double> current_stop_positions;
+  GetCurrentStopObstacleS(frame, &current_stop_positions);
+  GetHistoryStopPositions(history_objects_decisions, &history_stop_positions);
+
+  // get current vehicle s
+  common::math::Vec2d adc_position = {
+      common::VehicleStateProvider::Instance()->x(),
+      common::VehicleStateProvider::Instance()->y()};
+  common::SLPoint adc_position_sl;
+  reference_line.XYToSL(adc_position, &adc_position_sl);
+  double nearest_history_stop_s = 300.0;
+  double nearest_current_stop_s = 300.0;
+  for (auto history_stop_position : history_stop_positions) {
+    // history_stop position at current reference line
+    common::math::Vec2d stop_position = {history_stop_position->second->x(),
+                                         history_stop_position->second->y()};
+    common::SLPoint stop_position_sl;
+    reference_line.XYToSL(stop_position, &stop_position_sl);
+    if (stop_position_sl.s() < adc_position_sl.s()) {
+      continue;
+    } else {
+      // find nearest history stop
+      nearest_history_stop_s = stop_position_sl.s();
+      break;
     }
   }
-  return true;
+  for (auto current_stop_position : current_stop_positions) {
+    if (current_stop_position < adc_position_sl.s()) {
+      continue;
+    } else {
+      // find nearest current stop
+      nearest_current_stop_s = current_stop_position;
+      break;
+    }
+  }
+  return SameStopS(nearest_history_stop_s, nearest_current_stop_s);
 }
 
+// compare history stop position vs current stop position
+bool PathReuseDecider::SameStopS(const double history_stop_s,
+                                 const double current_stop_s) {
+  const double KNegative = 0.1;  // (meter) closer
+  const double kPositive = 0.5;  // (meter) further
+  if ((current_stop_s > history_stop_s &&
+       current_stop_s - history_stop_s < kPositive) ||
+      (current_stop_s < history_stop_s &&
+       history_stop_s - current_stop_s < KNegative))
+    return true;
+  return false;
+}
 // get current stop positions
 void PathReuseDecider::GetCurrentStopPositions(
     Frame* frame,
@@ -97,23 +132,44 @@ void PathReuseDecider::GetCurrentStopPositions(
             });
 }
 
+// get current stop obstacle position in s-direction
+void PathReuseDecider::GetCurrentStopObstacleS(
+    Frame* frame, std::vector<double>* current_stop_obstacle) {
+  // get all obstacles
+  auto obstacles = frame->obstacles();
+
+  for (auto obstacle : obstacles)
+    if (obstacle->IsLaneBlocking())
+      current_stop_obstacle->emplace_back(
+          obstacle->PerceptionSLBoundary().start_s());
+
+  // sort w.r.t s
+  std::sort(current_stop_obstacle->begin(), current_stop_obstacle->end(),
+            [](const double lhs, const double rhs) { return lhs < rhs; });
+}
+
 // get history stop positions
 void PathReuseDecider::GetHistoryStopPositions(
     const std::vector<const HistoryObjectDecision*>& history_objects_decisions,
-    std::vector<const common::PointENU*>* history_stop_positions) {
+    std::vector<std::pair<const double, const common::PointENU*>*>*
+        history_stop_positions) {
   for (auto history_object_decision : history_objects_decisions) {
     const std::vector<const ObjectDecisionType*> decisions =
         history_object_decision->GetObjectDecision();
     for (const ObjectDecisionType* decision : decisions) {
-      if (decision->has_stop())
-        history_stop_positions->emplace_back(&decision->stop().stop_point());
+      if (decision->has_stop()) {
+        std::pair<const double, const common::PointENU*> stop_pos =
+            std::make_pair(decision->stop().distance_s(),
+                           &decision->stop().stop_point());
+        history_stop_positions->emplace_back(&stop_pos);
+      }
     }
   }
-  // sort
+  // sort w.r.t s
   std::sort(history_stop_positions->begin(), history_stop_positions->end(),
-            [](const common::PointENU* lhs, const common::PointENU* rhs) {
-              return (lhs->x() < rhs->x() ||
-                      (lhs->x() == rhs->x() && lhs->y() < rhs->y()));
+            [](const std::pair<const double, const common::PointENU*>* lhs,
+               const std::pair<const double, const common::PointENU*>* rhs) {
+              return lhs->first < rhs->first;
             });
 }
 
