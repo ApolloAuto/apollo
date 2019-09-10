@@ -16,6 +16,9 @@
 
 #pragma once
 
+#include <vector>
+#include <memory>
+
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/data/tools/smart_recorder/proto/smart_recorder_triggers.pb.h"
 #include "modules/data/tools/smart_recorder/trigger_base.h"
