@@ -17,14 +17,24 @@
 ###############################################################################
 
 import ctypes
-from ctypes import cdll, c_ushort, c_int
-from ctypes import c_double
-from ctypes import POINTER
+from ctypes import *
 import math
 
 lib = cdll.LoadLibrary(
     '/apollo/bazel-bin/modules/planning/open_space/tools/hybrid_a_star_wrapper_lib.so')
 
+lib.CreatePlannerPtr.argtypes = []
+lib.CreatePlannerPtr.restype = c_void_p
+lib.CreateResultPtr.argtypes = []
+lib.CreateResultPtr.restype = c_void_p
+lib.CreateObstaclesPtr.argtypes = []
+lib.CreateObstaclesPtr.restype = c_void_p
+lib.AddVirtualObstacle.argtypes = [c_void_p, POINTER(c_double), POINTER(c_double), c_int]
+lib.Plan.restype = c_bool
+lib.Plan.argtypes = [c_void_p, c_void_p, c_void_p, c_double, c_double, c_double, c_double, 
+                     c_double, c_double, POINTER(c_double)]
+lib.GetResult.argtypes = [c_void_p, POINTER(c_double), POINTER(c_double), POINTER(c_double),
+                    POINTER(c_double), POINTER(c_double), POINTER(c_double), POINTER(c_ushort)]
 
 class HybridAStarPlanner(object):
     def __init__(self):
@@ -38,8 +48,10 @@ class HybridAStarPlanner(object):
 
     def Plan(self, sx, sy, sphi, ex, ey, ephi, XYbounds):
         return lib.Plan(self.planner, self.obstacles, self.result, c_double(sx),
-                        c_double(sy), c_double(sphi), c_double(ex), c_double(ey), c_double(ephi), POINTER(c_double)(XYbounds))
+                        c_double(sy), c_double(sphi), c_double(ex), c_double(ey), 
+                        c_double(ephi), POINTER(c_double)(XYbounds))
 
     def GetResult(self, x, y, phi, v, a, steer, output_size):
         lib.GetResult(self.result, POINTER(c_double)(x), POINTER(c_double)(y),
-                      POINTER(c_double)(phi), POINTER(c_double)(v), POINTER(c_double)(a), POINTER(c_double)(steer), POINTER(c_ushort)(output_size))
+                      POINTER(c_double)(phi), POINTER(c_double)(v), POINTER(c_double)(a), 
+                      POINTER(c_double)(steer), POINTER(c_ushort)(output_size))
