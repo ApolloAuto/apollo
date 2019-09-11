@@ -143,6 +143,9 @@ message ScenarioPullOverConfig {
   optional double s_distance_to_stop_for_open_space_parking = 10 [default = 7.0];
 }
 
+message ScenarioPullOverEmergencyConfig {
+}
+
 message ScenarioValetParkingConfig {
   optional double parking_spot_range_to_start = 1 [default = 20.0];
   optional double max_valid_stop_distance = 2 [default = 1.0];  // meter
@@ -179,11 +182,12 @@ message ScenarioConfig {
 
     // parking
     PULL_OVER = 10;
-    VALET_PARKING = 11;
+    PULL_OVER_EMREGENCY = 11;
+    VALET_PARKING = 12;
 
     // misc
-    NARROW_STREET_U_TURN = 12;
-    PARK_AND_GO = 13;
+    NARROW_STREET_U_TURN = 13;
+    PARK_AND_GO = 14;
   }
 
   // StageType is a superset of stages from all scenarios.
@@ -222,9 +226,12 @@ message ScenarioConfig {
     PULL_OVER_RETRY_APPROACH_PARKING = 501;
     PULL_OVER_RETRY_PARKING = 502;
 
+    // pull_over_emergency scenario
+    PULL_OVER_EMREGENCY_APPROACH = 510;
+
     // valet parking scenario
-    VALET_PARKING_APPROACHING_PARKING_SPOT = 510;
-    VALET_PARKING_PARKING = 511;
+    VALET_PARKING_APPROACHING_PARKING_SPOT = 520;
+    VALET_PARKING_PARKING = 521;
 
     // park_and_go scenario
     PARK_AND_GO_CHECK = 600;
@@ -255,13 +262,14 @@ message ScenarioConfig {
     ScenarioTrafficLightUnprotectedLeftTurnConfig traffic_light_unprotected_left_turn_config = 9;
     ScenarioParkAndGoConfig park_and_go_config = 10;
     ScenarioPullOverConfig pull_over_config = 11;
-    ScenarioValetParkingConfig valet_parking_config = 12;
-    ScenarioYieldSignConfig yield_sign_config = 13;
+    ScenarioPullOverEmergencyConfig pull_over_emergency_config = 12;
+    ScenarioValetParkingConfig valet_parking_config = 13;
+    ScenarioYieldSignConfig yield_sign_config = 14;
   }
   // a list of stages that are used at runtime.  The first one is default stage.
-  repeated StageType stage_type = 14;
+  repeated StageType stage_type = 15;
   // an unordered list of stage configs.
-  repeated StageConfig stage_config = 15;
+  repeated StageConfig stage_config = 16;
 }
 
 message PlannerPublicRoadConfig {
