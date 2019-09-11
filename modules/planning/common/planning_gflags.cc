@@ -85,6 +85,9 @@ DEFINE_bool(enable_scenario_park_and_go, true,
 DEFINE_bool(enable_scenario_pull_over, false,
             "enable pull-over scenario in planning");
 
+DEFINE_bool(enable_scenario_pull_over_emergency, false,
+            "enable pull-over-emregency scenario in planning");
+
 DEFINE_bool(enable_pull_over_exit, false,
             "allow pull-over scenario exit to lane follow in planning");
 

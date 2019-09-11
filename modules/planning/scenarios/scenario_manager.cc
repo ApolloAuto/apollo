@@ -300,6 +300,16 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
   return default_scenario_type_;
 }
 
+ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverEmergencyScenario(
+    const Frame& frame) {
+  if (emergency_vehicle_alert_) {
+    return ScenarioConfig::PULL_OVER_EMERGENCY;
+  }
+
+  return default_scenario_type_;
+}
+
+
 ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
     const Frame& frame, const hdmap::PathOverlap& stop_sign_overlap) {
   const auto& scenario_config =
@@ -635,8 +645,8 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
   // default: LANE_FOLLOW
   ScenarioConfig::ScenarioType scenario_type = default_scenario_type_;
 
-  if (emergency_vehicle_alert_) {
-    scenario_type = ScenarioConfig::PULL_OVER_EMERGENCY;
+  if (FLAGS_enable_scenario_pull_over_emergency) {
+    scenario_type = SelectPullOverEmergencyScenario(frame);
   }
 
   if (scenario_type == default_scenario_type_) {
