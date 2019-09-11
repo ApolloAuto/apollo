@@ -49,6 +49,8 @@ using apollo::common::VehicleState;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::PathOverlap;
 
+bool ScenarioManager::emergency_vehicle_alert_ = false;
+
 bool ScenarioManager::Init() {
   RegisterScenarios();
   default_scenario_type_ = ScenarioConfig::LANE_FOLLOW;
@@ -612,6 +614,8 @@ void ScenarioManager::Observe(const Frame& frame) {
       first_encountered_overlap_map_[overlap.first] = overlap.second;
     }
   }
+
+  CheckEmergencyVehicleAlert();
 }
 
 void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
@@ -631,29 +635,36 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
   // default: LANE_FOLLOW
   ScenarioConfig::ScenarioType scenario_type = default_scenario_type_;
 
-  // check current_scenario (not switchable)
-  switch (current_scenario_->scenario_type()) {
-    case ScenarioConfig::LANE_FOLLOW:
-    case ScenarioConfig::CHANGE_LANE:
-    case ScenarioConfig::PULL_OVER:
-      break;
-    case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
-    case ScenarioConfig::PARK_AND_GO:
-    case ScenarioConfig::STOP_SIGN_PROTECTED:
-    case ScenarioConfig::STOP_SIGN_UNPROTECTED:
-    case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
-    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
-    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
-    case ScenarioConfig::VALET_PARKING:
-    case ScenarioConfig::YIELD_SIGN:
-      // must continue until finish
-      if (current_scenario_->GetStatus() !=
-          Scenario::ScenarioStatus::STATUS_DONE) {
-        scenario_type = current_scenario_->scenario_type();
-      }
-      break;
-    default:
-      break;
+  if (emergency_vehicle_alert_) {
+    scenario_type = ScenarioConfig::PULL_OVER_EMERGENCY;
+  }
+
+  if (scenario_type == default_scenario_type_) {
+    // check current_scenario (not switchable)
+    switch (current_scenario_->scenario_type()) {
+      case ScenarioConfig::LANE_FOLLOW:
+      case ScenarioConfig::CHANGE_LANE:
+      case ScenarioConfig::PULL_OVER:
+      case ScenarioConfig::PULL_OVER_EMERGENCY:
+        break;
+      case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
+      case ScenarioConfig::PARK_AND_GO:
+      case ScenarioConfig::STOP_SIGN_PROTECTED:
+      case ScenarioConfig::STOP_SIGN_UNPROTECTED:
+      case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
+      case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
+      case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
+      case ScenarioConfig::VALET_PARKING:
+      case ScenarioConfig::YIELD_SIGN:
+        // must continue until finish
+        if (current_scenario_->GetStatus() !=
+            Scenario::ScenarioStatus::STATUS_DONE) {
+          scenario_type = current_scenario_->scenario_type();
+        }
+        break;
+      default:
+        break;
+    }
   }
 
   ////////////////////////////////////////
@@ -1027,6 +1038,13 @@ void ScenarioManager::UpdatePlanningContextPullOverScenario(
       }
     }
   }
+}
+
+void ScenarioManager::CheckEmergencyVehicleAlert() {
+  static int emergency_vehicle_alert_count = 0;
+
+  // TODO(all): to be implement
+  emergency_vehicle_alert_ = (emergency_vehicle_alert_count >= 5);
 }
 
 }  // namespace scenario
