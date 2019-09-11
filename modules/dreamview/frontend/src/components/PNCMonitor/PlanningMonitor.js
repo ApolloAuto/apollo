@@ -11,8 +11,8 @@ export default class PlanningMonitor extends React.Component {
     generateStGraph(stGraph) {
         const graphs = [];
         const displayNames = {
-            'DpStSpeedOptimizer': 'Speed Heuristic',
-            'PiecewiseJerkSpeedOptimizer': 'Planning S-T Graph',
+            'DP_ST_SPEED_OPTIMIZER': 'Speed Heuristic',
+            'PIECEWISE_JERK_SPEED_OPTIMIZER': 'Planning S-T Graph',
         };
         for (const pathName in displayNames) {
             const graph = stGraph[pathName];
@@ -54,7 +54,7 @@ export default class PlanningMonitor extends React.Component {
                 {this.generateStGraph(data.stGraph)}
                 {generateScatterGraph(
                     SETTING.stSpeedGraph,
-                    data.stSpeedGraph.PiecewiseJerkSpeedOptimizer
+                    data.stSpeedGraph.PIECEWISE_JERK_SPEED_OPTIMIZER
                 )}
                 {generateScatterGraph(SETTING.planningDkappaGraph, data.dkappaGraph)}
                 {generateScatterGraph(SETTING.referenceLineThetaGraph, data.thetaGraph)}
