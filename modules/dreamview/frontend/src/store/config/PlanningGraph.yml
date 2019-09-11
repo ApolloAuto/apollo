@@ -1,3 +1,13 @@
+# A map from path names defined planning_internal.proto
+# to display ones on Dreamview graphs.
+# This display names are used in the graph settings
+# such as speed graph as well.
+nameMapper:
+    planning_reference_line: ReferenceLine
+    DpStSpeedOptimizer: SpeedHeuristic
+    PIECEWISE_JERK_PATH_OPTIMIZER: PlannedSpeed
+
+# Planning Graph settings
 slGraph:
     title: 'QP Path - sl graph'
     options:
@@ -102,8 +112,12 @@ stGraph:
                 pointRadius: 1
                 fill: false
                 showLine: false
+    datasets:
+        - name: DP_ST_SPEED_OPTIMIZER
+          graphTitle: Speed Heuristic
+        - name: PIECEWISE_JERK_SPEED_OPTIMIZER
+          graphTitle: Planning S-T Graph
 stSpeedGraph:
-    title: 'Planning V-T Graph'
     options:
         legend:
             display: true
@@ -142,6 +156,9 @@ stSpeedGraph:
                 pointRadius: 0
                 fill: false
                 showLine: true
+    datasets:
+        - name: PIECEWISE_JERK_SPEED_OPTIMIZER
+          graphTitle: Planning V-T Graph
 speedGraph:
     title: 'Planning Speed'
     options:
