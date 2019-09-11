@@ -115,7 +115,7 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
                             const float timeout_second = 0.01f,
                             std::string* errstr = nullptr) const;
 
-  bool GetStaticTF(const std::string &frame_id,
+  bool GetLatestStaticTF(const std::string &frame_id,
       const std::string &child_frame_id, TransformStamped *tf);
 
  private:

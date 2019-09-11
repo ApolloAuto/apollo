@@ -9,8 +9,8 @@ message CameraUpdate {
 
     // The transformation matrix of localization to camera are stored in the
     // double array in column-major order
-    repeated double tf_static = 2;
+    repeated double localization2camera_tf = 2;
 
     // Camera image data
-    optional bytes data = 3;
+    optional bytes image = 3;
 }

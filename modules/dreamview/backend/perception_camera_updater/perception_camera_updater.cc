@@ -109,10 +109,10 @@ void PerceptionCameraUpdater::GetImageLocalization(
   ConvertMatrixToArray(localization_matrix, localization);
 }
 
-bool PerceptionCameraUpdater::QueryTF(const std::string &frame_id,
+bool PerceptionCameraUpdater::QueryStaticTF(const std::string &frame_id,
     const std::string &child_frame_id, Eigen::Matrix4d *matrix) {
   TransformStamped transform;
-  if (tf_buffer_->GetStaticTF(frame_id, child_frame_id, &transform)) {
+  if (tf_buffer_->GetLatestStaticTF(frame_id, child_frame_id, &transform)) {
     ConstructTransformationMatrix(transform.transform().rotation(),
         transform.transform().translation(), matrix);
     return true;
@@ -120,7 +120,8 @@ bool PerceptionCameraUpdater::QueryTF(const std::string &frame_id,
   return false;
 }
 
-void PerceptionCameraUpdater::GetStaticTF(std::vector<double> *tf_static) {
+void PerceptionCameraUpdater::GetLocalization2CameraTF(
+    std::vector<double> *localization2camera_tf) {
   Eigen::Matrix4d localization2camera_mat = Eigen::Matrix4d::Identity();
 
   // Since "/tf" topic has dynamic updates of world->novatel and
@@ -128,21 +129,21 @@ void PerceptionCameraUpdater::GetStaticTF(std::vector<double> *tf_static) {
   // and their transformation does not represent for static transform anymore.
   // Thus we query static transform respectively and calculate by ourselves
   Eigen::Matrix4d loc2novatel_mat;
-  if (QueryTF("localization", "novatel", &loc2novatel_mat)) {
+  if (QueryStaticTF("localization", "novatel", &loc2novatel_mat)) {
     localization2camera_mat *= loc2novatel_mat;
   }
 
   Eigen::Matrix4d novatel2lidar_mat;
-  if (QueryTF("novatel", "velodyne128", &novatel2lidar_mat)) {
+  if (QueryStaticTF("novatel", "velodyne128", &novatel2lidar_mat)) {
     localization2camera_mat *= novatel2lidar_mat;
   }
 
   Eigen::Matrix4d lidar2camera_mat;
-  if (QueryTF("velodyne128", "front_6mm", &lidar2camera_mat)) {
+  if (QueryStaticTF("velodyne128", "front_6mm", &lidar2camera_mat)) {
     localization2camera_mat *= lidar2camera_mat;
   }
 
-  ConvertMatrixToArray(localization2camera_mat, tf_static);
+  ConvertMatrixToArray(localization2camera_mat, localization2camera_tf);
 }
 
 void PerceptionCameraUpdater::OnImage(
@@ -171,7 +172,7 @@ void PerceptionCameraUpdater::OnImage(
   } else {
     current_image_timestamp_ = compressed_image->header().timestamp_sec();
   }
-  camera_update_.set_data(&(tmp_buffer[0]), tmp_buffer.size());
+  camera_update_.set_image(&(tmp_buffer[0]), tmp_buffer.size());
 }
 
 void PerceptionCameraUpdater::OnLocalization(
@@ -209,10 +210,10 @@ void PerceptionCameraUpdater::GetUpdate(std::string *camera_update) {
     *camera_update_.mutable_localization() = {localization.begin(),
                                               localization.end()};
   }
-  std::vector<double> tf_static;
-  GetStaticTF(&tf_static);
-  *camera_update_.mutable_tf_static() = {tf_static.begin(),
-                                         tf_static.end()};
+  std::vector<double> localization2camera_tf;
+  GetLocalization2CameraTF(&localization2camera_tf);
+  *camera_update_.mutable_localization2camera_tf() = {
+      localization2camera_tf.begin(), localization2camera_tf.end()};
   camera_update_.SerializeToString(camera_update);
 }
 

@@ -70,9 +70,9 @@ class PerceptionCameraUpdater {
 
   apollo::transform::Buffer *tf_buffer_ =
       apollo::transform::Buffer::Instance();
-  bool QueryTF(const std::string &frame_id, const std::string &child_frame_id,
-      Eigen::Matrix4d *matrix);
-  void GetStaticTF(std::vector<double> *tf_static);
+  bool QueryStaticTF(const std::string &frame_id,
+      const std::string &child_frame_id, Eigen::Matrix4d *matrix);
+  void GetLocalization2CameraTF(std::vector<double> *localization2camera_tf);
 
   WebSocketHandler *websocket_;
   CameraUpdate camera_update_;

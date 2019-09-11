@@ -111,12 +111,13 @@ void Buffer::SubscriptionCallbackImpl(
   }
 }
 
-bool Buffer::GetStaticTF(const std::string &frame_id,
+bool Buffer::GetLatestStaticTF(const std::string &frame_id,
     const std::string &child_frame_id, TransformStamped *tf) {
-  for (auto &static_msg : static_msgs_) {
-    if (static_msg.header.frame_id == frame_id
-        && static_msg.child_frame_id == child_frame_id) {
-      TF2MsgToCyber(static_msg, (*tf));
+  for (auto reverse_iter = static_msgs_.rbegin();
+      reverse_iter != static_msgs_.rend(); ++reverse_iter) {
+    if ((*reverse_iter).header.frame_id == frame_id
+        && (*reverse_iter).child_frame_id == child_frame_id) {
+      TF2MsgToCyber((*reverse_iter), (*tf));
       return true;
     }
   }
