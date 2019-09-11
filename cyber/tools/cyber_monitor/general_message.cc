@@ -20,6 +20,50 @@
 
 #include <iomanip>
 #include <sstream>
+#include <vector>
+
+namespace {
+
+/**
+ * if map has string keys, lexically sort them
+ */
+std::vector<int> SortProtobufMapByKeys(
+    const google::protobuf::Message& message,
+    const google::protobuf::FieldDescriptor* field,
+    const google::protobuf::Reflection& reflection, const int size) {
+  std::vector<int> output;
+  if (0 == size) {
+    return output;
+  }
+  const ::google::protobuf::Message& item =
+      reflection.GetRepeatedMessage(message, field, 0);
+  const ::google::protobuf::FieldDescriptor* item_fd =
+      item.GetDescriptor()->FindFieldByName("key");
+  if (item_fd && field->is_map() &&
+      ::google::protobuf::FieldDescriptor::Type::TYPE_STRING ==
+          item_fd->type()) {
+    std::vector<std::pair<std::string, int>> key_indices;
+    key_indices.reserve(size);
+    for (int i = 0; i < size; ++i) {
+      const ::google::protobuf::Message& item =
+          reflection.GetRepeatedMessage(message, field, i);
+      const ::google::protobuf::FieldDescriptor* item_fd =
+          item.GetDescriptor()->FindFieldByName("key");
+      const std::string key(item.GetReflection()->GetString(item, item_fd));
+      key_indices.emplace_back(key, i);
+    }
+    std::sort(key_indices.begin(), key_indices.end());
+    output.reserve(size);
+    for (const std::pair<std::string, int>& key_index : key_indices) {
+      output.push_back(key_index.second);
+    }
+  } else {
+    output.resize(size);
+    std::iota(output.begin(), output.end(), 0);
+  }
+  return output;
+}
+}  // namespace
 
 GeneralMessage::GeneralMessage(GeneralMessageBase* parent,
                                const google::protobuf::Message* msg,
@@ -110,14 +154,17 @@ void GeneralMessage::Render(const Screen* s, int key) {
       pages_ = lcount / page_item_count_ + 1;
       SplitPages(key);
       int jumpLines = page_index_ * page_item_count_;
+      const std::vector<int> indices(
+          SortProtobufMapByKeys(*message_ptr_, field_, *reflection_ptr_, size));
       if (is_folded_) {
         GeneralMessageBase::PrintField(this, *message_ptr_, jumpLines, s,
                                        lineNo, 0, reflection_ptr_, field_,
-                                       itemIndex_);
+                                       indices[itemIndex_]);
       } else {
-        for (int i = 0; i < size; ++i) {
+        for (const int index : indices) {
           GeneralMessageBase::PrintField(this, *message_ptr_, jumpLines, s,
-                                         lineNo, 0, reflection_ptr_, field_, i);
+                                         lineNo, 0, reflection_ptr_, field_,
+                                         index);
         }
       }
     }

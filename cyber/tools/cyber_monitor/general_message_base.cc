@@ -300,9 +300,12 @@ void GeneralMessageBase::PrintField(
     case google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE:
       if (!jumpLines) {
         const std::string& fieldName = field->name();
-        outStr << fieldName << ": ";
-        if (field->is_repeated()) {
-          outStr << "[" << index << "] ";
+        outStr << fieldName;
+        if (!field->is_map()) {
+          outStr << ": ";
+          if (field->is_repeated()) {
+            outStr << "[" << index << "] ";
+          }
         }
         s->AddStr(indent, lineNo++, outStr.str().c_str());
       } else {
