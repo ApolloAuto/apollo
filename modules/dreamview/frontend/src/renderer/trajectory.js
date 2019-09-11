@@ -88,13 +88,14 @@ export default class PlanningTrajectory {
                     console.warn(
                         `No path properties found for [${name}]. Use default properties instead.`);
                     property = PARAMETERS.planning.pathProperties.default;
+                    PARAMETERS.planning.pathProperties[name] = property;
                 }
 
                 if (newPaths[name]) {
                     const points = normalizePlanningTrajectory(newPaths[name], coordinates);
                     if (property.style === 'dash') {
                         this.paths[name] = drawDashedLineFromPoints(points, property.color,
-                            width * property.width, 2 /* dash size */, 1 /* gapSize */,
+                            width * property.width, 1 /* dash size */, 1 /* gapSize */,
                             property.zOffset, property.opacity);
                     } else {
                         this.paths[name] = drawThickBandFromPoints(points, width * property.width,

@@ -6300,6 +6300,9 @@
                 }
               }
             },
+            "ScenarioPullOverEmergencyConfig": {
+              "fields": {}
+            },
             "ScenarioValetParkingConfig": {
               "fields": {
                 "parkingSpotRangeToStart": {
@@ -6384,6 +6387,7 @@
                     "trafficLightUnprotectedLeftTurnConfig",
                     "parkAndGoConfig",
                     "pullOverConfig",
+                    "pullOverEmergencyConfig",
                     "valetParkingConfig",
                     "yieldSignConfig"
                   ]
@@ -6430,18 +6434,22 @@
                   "type": "ScenarioPullOverConfig",
                   "id": 11
                 },
+                "pullOverEmergencyConfig": {
+                  "type": "ScenarioPullOverEmergencyConfig",
+                  "id": 12
+                },
                 "valetParkingConfig": {
                   "type": "ScenarioValetParkingConfig",
-                  "id": 12
+                  "id": 13
                 },
                 "yieldSignConfig": {
                   "type": "ScenarioYieldSignConfig",
-                  "id": 13
+                  "id": 14
                 },
                 "stageType": {
                   "rule": "repeated",
                   "type": "StageType",
-                  "id": 14,
+                  "id": 15,
                   "options": {
                     "packed": false
                   }
@@ -6449,7 +6457,7 @@
                 "stageConfig": {
                   "rule": "repeated",
                   "type": "StageConfig",
-                  "id": 15
+                  "id": 16
                 }
               },
               "nested": {
@@ -6465,9 +6473,10 @@
                     "TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN": 8,
                     "YIELD_SIGN": 9,
                     "PULL_OVER": 10,
-                    "VALET_PARKING": 11,
-                    "NARROW_STREET_U_TURN": 12,
-                    "PARK_AND_GO": 13
+                    "PULL_OVER_EMREGENCY": 11,
+                    "VALET_PARKING": 12,
+                    "NARROW_STREET_U_TURN": 13,
+                    "PARK_AND_GO": 14
                   }
                 },
                 "StageType": {
@@ -6491,8 +6500,9 @@
                     "PULL_OVER_APPROACH": 500,
                     "PULL_OVER_RETRY_APPROACH_PARKING": 501,
                     "PULL_OVER_RETRY_PARKING": 502,
-                    "VALET_PARKING_APPROACHING_PARKING_SPOT": 510,
-                    "VALET_PARKING_PARKING": 511,
+                    "PULL_OVER_EMREGENCY_APPROACH": 510,
+                    "VALET_PARKING_APPROACHING_PARKING_SPOT": 520,
+                    "VALET_PARKING_PARKING": 521,
                     "PARK_AND_GO_CHECK": 600,
                     "PARK_AND_GO_CRUISE": 601,
                     "PARK_AND_GO_ADJUST": 602,
@@ -6715,6 +6725,17 @@
                 "timestamp": {
                   "type": "double",
                   "id": 3
+                },
+                "existLaneChangeStartPosition": {
+                  "type": "bool",
+                  "id": 4,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "laneChangeStartPosition": {
+                  "type": "apollo.common.Point3D",
+                  "id": 5
                 }
               },
               "nested": {
@@ -6985,10 +7006,12 @@
             "YieldSignStatus": {
               "fields": {
                 "currentYieldSignOverlapId": {
+                  "rule": "repeated",
                   "type": "string",
                   "id": 1
                 },
                 "doneYieldSignOverlapId": {
+                  "rule": "repeated",
                   "type": "string",
                   "id": 2
                 },
