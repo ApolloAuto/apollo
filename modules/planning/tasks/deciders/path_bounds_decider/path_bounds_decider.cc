@@ -807,7 +807,7 @@ bool PathBoundsDecider::GetBoundaryFromRoads(
 
 bool PathBoundsDecider::GetBoundaryFromLanes(
     const ReferenceLineInfo& reference_line_info,
-    const LaneBorrowInfo& lane_borrow_info, double ADC_buffer,
+    const LaneBorrowInfo& lane_borrow_info,
     PathBound* const path_bound, std::string* const borrow_lane_type) {
   // Sanity checks.
   CHECK_NOTNULL(path_bound);
@@ -905,6 +905,39 @@ bool PathBoundsDecider::GetBoundaryFromLanes(
   return true;
 }
 
+bool PathBoundsDecider::GetBoundaryFromADC(
+    const ReferenceLineInfo& reference_line_info, double ADC_extra_buffer,
+    PathBound* const path_bound) {
+  // Sanity checks.
+  CHECK_NOTNULL(path_bound);
+  CHECK(!path_bound->empty());
+
+  // Calculate the ADC's lateral boundary.
+  constexpr double kMaxLateralAccelerations = 1.5;
+  double ADC_lat_decel_buffer = (adc_frenet_ld_ > 0 ? 1.0 : -1.0) *
+                                adc_frenet_ld_ * adc_frenet_ld_ /
+                                kMaxLateralAccelerations / 2.0;
+  double curr_left_bound_adc =
+      GetBufferBetweenADCCenterAndEdge() + ADC_extra_buffer +
+      std::fmax(adc_l_to_lane_center_,
+                adc_l_to_lane_center_ + ADC_lat_decel_buffer);
+  double curr_right_bound_adc =
+      - GetBufferBetweenADCCenterAndEdge() - ADC_extra_buffer +
+      std::fmin(adc_l_to_lane_center_,
+                adc_l_to_lane_center_ + ADC_lat_decel_buffer);
+
+  // Expand the boundary in case ADC falls outside.
+  for (size_t i = 0; i < path_bound->size(); ++i) {
+    double curr_left_bound = std::get<2>((*path_bound)[i]);
+    curr_left_bound = std::fmax(curr_left_bound_adc, curr_left_bound);
+    double curr_right_bound = std::get<1>((*path_bound)[i]);
+    curr_right_bound = std::fmin(curr_right_bound_adc, curr_right_bound);
+    UpdatePathBoundary(i, curr_left_bound, curr_right_bound, path_bound);
+  }
+  return true;
+}
+
+// TODO(jiacheng): this function is to be retired soon.
 bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
     const ReferenceLineInfo& reference_line_info,
     const LaneBorrowInfo& lane_borrow_info, double ADC_buffer,
