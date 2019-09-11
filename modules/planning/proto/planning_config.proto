@@ -182,7 +182,7 @@ message ScenarioConfig {
 
     // parking
     PULL_OVER = 10;
-    PULL_OVER_EMREGENCY = 11;
+    PULL_OVER_EMERGENCY = 11;
     VALET_PARKING = 12;
 
     // misc
@@ -227,7 +227,7 @@ message ScenarioConfig {
     PULL_OVER_RETRY_PARKING = 502;
 
     // pull_over_emergency scenario
-    PULL_OVER_EMREGENCY_APPROACH = 510;
+    PULL_OVER_EMERGENCY_APPROACH = 510;
 
     // valet parking scenario
     VALET_PARKING_APPROACHING_PARKING_SPOT = 520;
