@@ -805,6 +805,106 @@ bool PathBoundsDecider::GetBoundaryFromRoads(
   return true;
 }
 
+bool PathBoundsDecider::GetBoundaryFromLanes(
+    const ReferenceLineInfo& reference_line_info,
+    const LaneBorrowInfo& lane_borrow_info, double ADC_buffer,
+    PathBound* const path_bound, std::string* const borrow_lane_type) {
+  // Sanity checks.
+  CHECK_NOTNULL(path_bound);
+  CHECK(!path_bound->empty());
+  const ReferenceLine& reference_line = reference_line_info.reference_line();
+
+  // Go through every point, update the boundary based on lane-info.
+  double past_lane_left_width = adc_lane_width_ / 2.0;
+  double past_lane_right_width = adc_lane_width_ / 2.0;
+  int path_blocked_idx = -1;
+  bool borrowing_reverse_lane = false;
+  for (size_t i = 0; i < path_bound->size(); ++i) {
+    double curr_s = std::get<0>((*path_bound)[i]);
+
+    // 1. Get the current lane width at current point.
+    double curr_lane_left_width = 0.0;
+    double curr_lane_right_width = 0.0;
+    if (!reference_line.GetLaneWidth(curr_s, &curr_lane_left_width,
+                                     &curr_lane_right_width)) {
+      AWARN << "Failed to get lane width at s = " << curr_s;
+      curr_lane_left_width = past_lane_left_width;
+      curr_lane_right_width = past_lane_right_width;
+    } else {
+      double offset_to_lane_center = 0.0;
+      reference_line.GetOffsetToMap(curr_s, &offset_to_lane_center);
+      // The left-width and right-width are w.r.t. lane-center, not ref-line.
+      curr_lane_left_width += offset_to_lane_center;
+      curr_lane_right_width -= offset_to_lane_center;
+      past_lane_left_width = curr_lane_left_width;
+      past_lane_right_width = curr_lane_right_width;
+    }
+
+    // 2. Get the neighbor lane widths at the current point.
+    double curr_neighbor_lane_width = 0.0;
+    if (CheckLaneBoundaryType(reference_line_info, curr_s, lane_borrow_info)) {
+      hdmap::Id neighbor_lane_id;
+      if (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW) {
+        // Borrowing left neighbor lane.
+        if (reference_line_info.GetNeighborLaneInfo(
+                ReferenceLineInfo::LaneType::LeftForward, curr_s,
+                &neighbor_lane_id, &curr_neighbor_lane_width)) {
+          ADEBUG << "Borrow left forward neighbor lane.";
+        } else if (reference_line_info.GetNeighborLaneInfo(
+                       ReferenceLineInfo::LaneType::LeftReverse, curr_s,
+                       &neighbor_lane_id, &curr_neighbor_lane_width)) {
+          borrowing_reverse_lane = true;
+          ADEBUG << "Borrow left reverse neighbor lane.";
+        } else {
+          ADEBUG << "There is no left neighbor lane.";
+        }
+      } else if (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW) {
+        // Borrowing right neighbor lane.
+        if (reference_line_info.GetNeighborLaneInfo(
+                ReferenceLineInfo::LaneType::RightForward, curr_s,
+                &neighbor_lane_id, &curr_neighbor_lane_width)) {
+          ADEBUG << "Borrow right forward neighbor lane.";
+        } else if (reference_line_info.GetNeighborLaneInfo(
+                       ReferenceLineInfo::LaneType::RightReverse, curr_s,
+                       &neighbor_lane_id, &curr_neighbor_lane_width)) {
+          borrowing_reverse_lane = true;
+          ADEBUG << "Borrow right reverse neighbor lane.";
+        } else {
+          ADEBUG << "There is no right neighbor lane.";
+        }
+      }
+    }
+
+    // 3. Get the proper boundary
+    double curr_left_bound = curr_lane_left_width +
+        (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW
+         ? curr_neighbor_lane_width : 0.0);
+    double curr_right_bound = -curr_lane_right_width -
+        (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW
+         ? curr_neighbor_lane_width : 0.0);
+    ADEBUG << "At s = " << curr_s
+           << ", left_lane_bound = " << curr_left_bound
+           << ", right_lane_bound = " << curr_right_bound;
+
+    // 4. Update the boundary.
+    if (!UpdatePathBoundary(
+            i, curr_left_bound, curr_right_bound, path_bound)) {
+      path_blocked_idx = static_cast<int>(i);
+    }
+    if (path_blocked_idx != -1) {
+      break;
+    }
+  }
+  TrimPathBounds(path_blocked_idx, path_bound);
+
+  if (lane_borrow_info == LaneBorrowInfo::NO_BORROW) {
+    *borrow_lane_type = "";
+  } else {
+    *borrow_lane_type = borrowing_reverse_lane ? "reverse" : "forward";
+  }
+  return true;
+}
+
 bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
     const ReferenceLineInfo& reference_line_info,
     const LaneBorrowInfo& lane_borrow_info, double ADC_buffer,
@@ -840,7 +940,6 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
     }
 
     // 2. Get the neighbor lane widths at the current point.
-
     double curr_neighbor_lane_width = 0.0;
     if (CheckLaneBoundaryType(reference_line_info, curr_s, lane_borrow_info)) {
       hdmap::Id neighbor_lane_id;
@@ -1427,6 +1526,28 @@ bool PathBoundsDecider::UpdatePathBoundaryAndCenterLine(
   *center_line = (std::get<1>((*path_boundaries)[idx]) +
                   std::get<2>((*path_boundaries)[idx])) /
                  2.0;
+  return true;
+}
+
+bool PathBoundsDecider::UpdatePathBoundary(
+    size_t idx, double left_bound, double right_bound,
+    PathBound* const path_boundaries) {
+  // Update the right bound (l_min):
+  double new_l_min =
+      std::fmax(std::get<1>((*path_boundaries)[idx]), right_bound);
+  // Update the left bound (l_max):
+  double new_l_max =
+      std::fmin(std::get<2>((*path_boundaries)[idx]), left_bound);
+
+  // Check if ADC is blocked.
+  // If blocked, don't update anything, return false.
+  if (new_l_min > new_l_max) {
+    ADEBUG << "Path is blocked at idx = " << idx;
+    return false;
+  }
+  // Otherwise, update path_boundaries and center_line; then return true.
+  std::get<1>((*path_boundaries)[idx]) = new_l_min;
+  std::get<2>((*path_boundaries)[idx]) = new_l_max;
   return true;
 }
 
