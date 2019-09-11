@@ -166,9 +166,18 @@ class PathBoundsDecider : public Decider {
    */
   bool GetBoundaryFromLanes(
       const ReferenceLineInfo& reference_line_info,
-      const LaneBorrowInfo& lane_borrow_info, double ADC_buffer,
+      const LaneBorrowInfo& lane_borrow_info,
       std::vector<std::tuple<double, double, double>>* const path_bound,
       std::string* const borrow_lane_type);
+
+  /** @brief Refine the boundary based on the ADC position and velocity.
+   *  The returned boundary is with respect to the lane-center (NOT the
+   *  reference_line), though for most of the times reference_line's
+   *  deviation from lane-center is negligible.
+   */
+  bool GetBoundaryFromADC(
+      const ReferenceLineInfo& reference_line_info, double ADC_extra_buffer,
+      std::vector<std::tuple<double, double, double>>* const path_bound);
 
   /** @brief Refine the boundary based on lane-info and ADC's location.
    *   It will comply to the lane-boundary. However, if the ADC itself
