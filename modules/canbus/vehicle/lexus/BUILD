@@ -55,4 +55,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "lexus_controller_test",
+    size = "small",
+    srcs = [
+        "lexus_controller_test.cc",
+    ],
+    data = ["//modules/canbus:canbus_testdata"],
+    deps = [
+        "//modules/canbus/vehicle/lexus:lexus_controller",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
