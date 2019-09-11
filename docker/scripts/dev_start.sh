@@ -231,6 +231,10 @@ function main(){
     APOLLO_DEV="apollo_dev_${USER}"
     docker ps -a --format "{{.Names}}" | grep "$APOLLO_DEV" 1>/dev/null
     if [ $? == 0 ]; then
+        if [[ "$(docker inspect --format='{{.Config.Image}}' $APOLLO_DEV 2> /dev/null)" != "$IMG" ]]; then
+            rm -rf $APOLLO_ROOT_DIR/bazel-*
+            rm -rf $HOME/.cache/bazel/*
+        fi
         docker stop $APOLLO_DEV 1>/dev/null
         docker rm -v -f $APOLLO_DEV 1>/dev/null
     fi
