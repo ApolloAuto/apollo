@@ -150,12 +150,12 @@ DEFINE_bool(prioritize_change_lane, false,
 DEFINE_bool(reckless_change_lane, false,
             "Always allow the vehicle change lane. The vehicle may continue "
             "changing lane. This is mainly test purpose");
-DEFINE_double(change_lane_fail_freeze_time, 3.0,
+DEFINE_double(change_lane_fail_freeze_time, 1.0,
               "seconds. Not allowed to change lane this amount of time "
-              "if it just finished change lane or failed to change lane");
+              "if it just failed to change lane");
 DEFINE_double(change_lane_success_freeze_time, 3.0,
               "seconds. Not allowed to change lane this amount of time "
-              "if it just finished change lane or failed to change lane");
+              "if it just finished change lane");
 DEFINE_double(change_lane_min_length, 30.0,
               "meters. If the change lane target has longer length than this "
               "threshold, it can shortcut the default lane.");

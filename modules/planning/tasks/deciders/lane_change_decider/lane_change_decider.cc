@@ -117,6 +117,19 @@ Status LaneChangeDecider::Process(Frame* frame) {
   return Status::OK();
 }
 
+void LaneChangeDecider::UpdateStatus(const bool is_opt_succeed,
+      const ReferenceLineInfo* const reference_line_info) {
+  // If path optimizer or speed optimizer failed, report the status
+  if (!is_opt_succeed) {
+    auto* change_lane_status = PlanningContext::Instance()
+                                 ->mutable_planning_status()
+                                 ->mutable_change_lane();
+    change_lane_status->set_timestamp(Clock::NowInSeconds());
+    change_lane_status->set_path_id(reference_line_info->Lanes().Id());
+    change_lane_status->set_status(ChangeLaneStatus::CHANGE_LANE_FAILED);
+  }
+}
+
 void LaneChangeDecider::UpdateStatus(ChangeLaneStatus::Status status_code,
                                      const std::string& path_id) {
   UpdateStatus(Clock::NowInSeconds(), status_code, path_id);
