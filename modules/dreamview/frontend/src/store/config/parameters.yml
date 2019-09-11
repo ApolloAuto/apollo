@@ -61,7 +61,7 @@ planning:
       color: 0x8DFCB4
       opacity: 0.8
       zOffset: 1.2
-    QpSplinePathOptimizer:
+    PIECEWISE_JERK_PATH_OPTIMIZER:
       width: 0.2
       color: 0x36A2EB
       opacity: 1

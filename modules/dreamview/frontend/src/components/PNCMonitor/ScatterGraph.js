@@ -372,8 +372,13 @@ export default class ScatterGraph extends React.Component {
 }
 
 function generateScatterGraph(setting, lineDatasets, carDatasets, polygonsDatasets) {
-    if (!lineDatasets || !setting || !setting.properties || !setting.options) {
-        console.error("Graph setting or data not found:", setting.title);
+    if (!lineDatasets) {
+        console.error("Graph data not found:", setting.title);
+        return null;
+    }
+
+    if (!setting || !setting.properties || !setting.options) {
+        console.error("Graph setting not found:", setting.title);
         return null;
     }
 

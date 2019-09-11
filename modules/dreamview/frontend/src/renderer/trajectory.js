@@ -66,10 +66,10 @@ export default class PlanningTrajectory {
                 newPaths[path.name] = path.pathPoint;
             });
         }
+
         // Draw paths
-        let propertyIndex = 0;
-        const totalPaths = _.union(Object.keys(this.paths), Object.keys(newPaths));
-        totalPaths.forEach((name) => {
+        const allPaths = _.union(Object.keys(this.paths), Object.keys(newPaths));
+        allPaths.forEach((name) => {
             const optionName = name === 'trajectory' ? 'showPlanningTrajectory' : name;
             if (!STORE.options[optionName] && !STORE.options.customizedToggles.get(optionName)) {
                 if (this.paths[name]) {
@@ -85,8 +85,8 @@ export default class PlanningTrajectory {
 
                 let property = PARAMETERS.planning.pathProperties[name];
                 if (!property) {
-                    console.warn('No properties found for', name,
-                        '. Use default properties instead.');
+                    console.warn(
+                        `No path properties found for [${name}]. Use default properties instead.`);
                     property = PARAMETERS.planning.pathProperties.default;
                 }
 
@@ -103,7 +103,6 @@ export default class PlanningTrajectory {
                     scene.add(this.paths[name]);
                 }
             }
-            propertyIndex += 1;
         });
     }
 }

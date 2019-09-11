@@ -6,8 +6,8 @@ const MAX_SCENARIO_LENGTH = 5;
 
 const PATH_DISPLAY_NAME = {
   'planning_reference_line': 'ReferenceLine',
-  'DpStSpeedOptimizer': 'SpeedHeuristic',
-  'PiecewiseJerkSpeedOptimizer': 'PlannedSpeed',
+  'DP_ST_SPEED_OPTIMIZER': 'SpeedHeuristic',
+  'PIECEWISE_JERK_SPEED_OPTIMIZER': 'PlannedSpeed',
 };
 
 export default class PlanningData {

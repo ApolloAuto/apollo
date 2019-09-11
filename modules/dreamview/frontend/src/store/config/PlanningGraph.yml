@@ -175,7 +175,7 @@ speedGraph:
                 borderWidth: 2
                 pointRadius: 0
                 fill: false
-                showLine: ture
+                showLine: true
 accelerationGraph:
     title: 'Planning Acceleration'
     options:
@@ -197,7 +197,7 @@ accelerationGraph:
                 borderWidth: 2
                 pointRadius: 0
                 fill: false
-                showLine: ture
+                showLine: true
 planningKappaGraph:
     title: 'Planning Kappa'
     options:
