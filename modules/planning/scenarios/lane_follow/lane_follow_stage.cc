@@ -133,6 +133,7 @@ Stage::StageStatus LaneFollowStage::Process(
           reference_line_info.SetDrivable(true);
           ADEBUG << "\tclear for lane change";
         } else {
+          LaneChangeDecider::UpdateStatus(false, &reference_line_info);
           reference_line_info.SetDrivable(false);
           ADEBUG << "\tlane change failed";
         }

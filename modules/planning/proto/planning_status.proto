@@ -23,7 +23,7 @@ message ChangeLaneStatus {
   enum Status {
     IN_CHANGE_LANE = 1;       // during change lane state
     CHANGE_LANE_FAILED = 2;   // change lane failed
-    CHANGE_LANE_SUCCESS = 3;  // change lane failed
+    CHANGE_LANE_SUCCESS = 3;  // change lane succeeded
   }
   optional Status status = 1;
   // the id of the route segment that the vehicle is driving on

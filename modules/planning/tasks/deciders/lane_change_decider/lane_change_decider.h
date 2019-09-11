@@ -60,6 +60,9 @@ class LaneChangeDecider : public Decider {
                                   const double search_range,
                                   const double is_block_angle_threshold);
 
+  static void UpdateStatus(const bool is_opt_succeed,
+                           const ReferenceLineInfo* const reference_line_info);
+
  private:
   common::Status Process(Frame* frame) override;
 
