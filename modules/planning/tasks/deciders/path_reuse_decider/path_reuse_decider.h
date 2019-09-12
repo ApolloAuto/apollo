@@ -39,18 +39,37 @@ class PathReuseDecider : public Decider {
  private:
   common::Status Process(Frame* frame,
                          ReferenceLineInfo* reference_line_info) override;
+
+  // check if previous path reusable
   bool CheckPathReusable(Frame* frame, ReferenceLineInfo* reference_line_info);
+
   void GetCurrentStopPositions(
       Frame* frame,
       std::vector<const common::PointENU*>* current_stop_positions);
+
+  // get current s_projection of history objects which has stop decisions
   void GetHistoryStopPositions(
+      ReferenceLineInfo* const reference_line_info,
       const std::vector<const HistoryObjectDecision*>&
           history_objects_decisions,
-      std::vector<std::pair<const double, const common::PointENU*>*>*
+      std::vector<std::pair<const double, const common::PointENU>>*
           history_stop_positions);
-  void GetCurrentStopObstacleS(Frame* frame,
+
+  // get current s_projection of current virtual obstacles
+  void GetCurrentStopObstacleS(ReferenceLineInfo* const reference_line_info,
                                std::vector<double>* current_stop_obstacle);
+
+  void GetHistoryStopSPosition(ReferenceLineInfo* const reference_line_info,
+                               const std::vector<const HistoryObjectDecision*>&
+                                   history_objects_decisions,
+                               std::vector<double>* history_stop_positions);
+
+  // compared stop decision in s-direction
   bool SameStopS(const double history_stop_s, const double current_stop_s);
+
+  // check if the nearest virtual obstacle in history is same as current
+  bool IsSameVirtualObstacles(Frame* const frame,
+                              ReferenceLineInfo* const reference_line_info);
 
  private:
   History* history_ = History::Instance();
