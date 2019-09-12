@@ -43,10 +43,9 @@ Status PathReuseDecider::Process(Frame* const frame,
   // Check if path is reusable
   if (Decider::config_.path_reuse_decider_config().reuse_path() &&
       CheckPathReusable(frame, reference_line_info)) {
-    // count reusable path
-    ++reusable_path_counter_;
+    ++reusable_path_counter_;  // count reusable path
   }
-  ++total_path_counter_;
+  ++total_path_counter_;  // count total path
   ADEBUG << "reusable_path_counter_" << reusable_path_counter_;
   ADEBUG << "total_path_counter_" << total_path_counter_;
   return Status::OK();
@@ -54,44 +53,51 @@ Status PathReuseDecider::Process(Frame* const frame,
 
 bool PathReuseDecider::CheckPathReusable(
     Frame* const frame, ReferenceLineInfo* const reference_line_info) {
+  return IsSameVirtualObstacles(frame, reference_line_info);
+}
+
+bool PathReuseDecider::IsSameVirtualObstacles(
+    Frame* const frame, ReferenceLineInfo* const reference_line_info) {
   if (history_->GetLastFrame() == nullptr) return false;
+
   const std::vector<const HistoryObjectDecision*> history_objects_decisions =
       history_->GetLastFrame()->GetStopObjectDecisions();
   const auto& reference_line = reference_line_info->reference_line();
-  std::vector<std::pair<const double, const common::PointENU*>*>
-      history_stop_positions;
+  std::vector<double> history_stop_positions;
   std::vector<double> current_stop_positions;
-  GetCurrentStopObstacleS(frame, &current_stop_positions);
-  GetHistoryStopPositions(history_objects_decisions, &history_stop_positions);
+
+  GetCurrentStopObstacleS(reference_line_info, &current_stop_positions);
+  GetHistoryStopSPosition(reference_line_info, history_objects_decisions,
+                          &history_stop_positions);
 
   // get current vehicle s
   common::math::Vec2d adc_position = {
       common::VehicleStateProvider::Instance()->x(),
       common::VehicleStateProvider::Instance()->y()};
   common::SLPoint adc_position_sl;
+
   reference_line.XYToSL(adc_position, &adc_position_sl);
-<<<<<<< HEAD
+
+  ADEBUG << "ADC_s:" << adc_position_sl.s();
+
   double nearest_history_stop_s = FLAGS_default_front_clear_distance;
   double nearest_current_stop_s = FLAGS_default_front_clear_distance;
-=======
-  double nearest_history_stop_s = 300.0;
-  double nearest_current_stop_s = 300.0;
->>>>>>> Planning: updated path_reuse_decider
+
   for (auto history_stop_position : history_stop_positions) {
-    // history_stop position at current reference line
-    common::math::Vec2d stop_position = {history_stop_position->second->x(),
-                                         history_stop_position->second->y()};
-    common::SLPoint stop_position_sl;
-    reference_line.XYToSL(stop_position, &stop_position_sl);
-    if (stop_position_sl.s() < adc_position_sl.s()) {
+    ADEBUG << "current_stop_position " << history_stop_position
+           << "adc_position_sl.s()" << adc_position_sl.s();
+    if (history_stop_position < adc_position_sl.s()) {
       continue;
     } else {
       // find nearest history stop
-      nearest_history_stop_s = stop_position_sl.s();
+      nearest_history_stop_s = history_stop_position;
       break;
     }
   }
+
   for (auto current_stop_position : current_stop_positions) {
+    ADEBUG << "current_stop_position " << current_stop_position
+           << "adc_position_sl.s()" << adc_position_sl.s();
     if (current_stop_position < adc_position_sl.s()) {
       continue;
     } else {
@@ -108,6 +114,8 @@ bool PathReuseDecider::SameStopS(const double history_stop_s,
                                  const double current_stop_s) {
   const double KNegative = 0.1;  // (meter) closer
   const double kPositive = 0.5;  // (meter) further
+  ADEBUG << "current_stop_s" << current_stop_s;
+  ADEBUG << "history_stop_s" << history_stop_s;
   if ((current_stop_s > history_stop_s &&
        current_stop_s - history_stop_s < kPositive) ||
       (current_stop_s < history_stop_s &&
@@ -115,6 +123,7 @@ bool PathReuseDecider::SameStopS(const double history_stop_s,
     return true;
   return false;
 }
+
 // get current stop positions
 void PathReuseDecider::GetCurrentStopPositions(
     Frame* frame,
@@ -139,43 +148,54 @@ void PathReuseDecider::GetCurrentStopPositions(
 
 // get current stop obstacle position in s-direction
 void PathReuseDecider::GetCurrentStopObstacleS(
-    Frame* frame, std::vector<double>* current_stop_obstacle) {
+    ReferenceLineInfo* const reference_line_info,
+    std::vector<double>* current_stop_obstacle) {
   // get all obstacles
-  auto obstacles = frame->obstacles();
-
-  for (auto obstacle : obstacles)
-    if (obstacle->IsLaneBlocking())
+  for (auto obstacle :
+       reference_line_info->path_decision()->obstacles().Items()) {
+    ADEBUG << "current obstacle: "
+           << obstacle->PerceptionSLBoundary().start_s();
+    if (obstacle->IsVirtual() && obstacle->IsLaneBlocking())
       current_stop_obstacle->emplace_back(
           obstacle->PerceptionSLBoundary().start_s());
+  }
 
   // sort w.r.t s
-  std::sort(current_stop_obstacle->begin(), current_stop_obstacle->end(),
-            [](const double lhs, const double rhs) { return lhs < rhs; });
+  std::sort(current_stop_obstacle->begin(), current_stop_obstacle->end());
 }
 
-// get history stop positions
-void PathReuseDecider::GetHistoryStopPositions(
+// get history stop positions at current reference line
+void PathReuseDecider::GetHistoryStopSPosition(
+    ReferenceLineInfo* const reference_line_info,
     const std::vector<const HistoryObjectDecision*>& history_objects_decisions,
-    std::vector<std::pair<const double, const common::PointENU*>*>*
-        history_stop_positions) {
+    std::vector<double>* history_stop_positions) {
+  const auto& reference_line = reference_line_info->reference_line();
+
   for (auto history_object_decision : history_objects_decisions) {
     const std::vector<const ObjectDecisionType*> decisions =
         history_object_decision->GetObjectDecision();
+
     for (const ObjectDecisionType* decision : decisions) {
       if (decision->has_stop()) {
-        std::pair<const double, const common::PointENU*> stop_pos =
-            std::make_pair(decision->stop().distance_s(),
-                           &decision->stop().stop_point());
-        history_stop_positions->emplace_back(&stop_pos);
+        common::math::Vec2d stop_position({decision->stop().stop_point().x(),
+                                           decision->stop().stop_point().y()});
+        common::SLPoint stop_position_sl;
+
+        reference_line.XYToSL(stop_position, &stop_position_sl);
+        history_stop_positions->emplace_back(stop_position_sl.s() -
+                                             decision->stop().distance_s());
+
+        ADEBUG << "stop_position_x: " << decision->stop().stop_point().x();
+        ADEBUG << "stop_position_y: " << decision->stop().stop_point().y();
+        ADEBUG << "stop_distance_s: " << decision->stop().distance_s();
+        ADEBUG << "stop_distance_s: " << stop_position_sl.s();
+        ADEBUG << "adjusted_stop_distance_s: "
+               << stop_position_sl.s() - decision->stop().distance_s();
       }
     }
   }
   // sort w.r.t s
-  std::sort(history_stop_positions->begin(), history_stop_positions->end(),
-            [](const std::pair<const double, const common::PointENU*>* lhs,
-               const std::pair<const double, const common::PointENU*>* rhs) {
-              return lhs->first < rhs->first;
-            });
+  std::sort(history_stop_positions->begin(), history_stop_positions->end());
 }
 
 }  // namespace planning
