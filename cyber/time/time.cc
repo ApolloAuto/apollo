@@ -18,13 +18,10 @@
 
 #include <time.h>
 #include <chrono>
+#include <iomanip>
 #include <limits>
 #include <sstream>
 #include <thread>
-
-#if __GNUC__ >= 5
-#include <iomanip>
-#endif
 
 namespace apollo {
 namespace cyber {
@@ -97,11 +94,12 @@ std::string Time::ToString() const {
   std::stringstream ss;
 #if __GNUC__ >= 5
   ss << std::put_time(ret, "%F %T");
-  ss << "." << nanoseconds_ % 1000000000UL;
+  ss << std::setw(9) << std::setfill('0') << "." << nanoseconds_ % 1000000000UL;
 #else
   char date_time[128];
   strftime(date_time, sizeof(date_time), "%F %T", ret);
-  ss << std::string(date_time) << "." << nanoseconds_ % 1000000000UL;
+  ss << std::string(date_time) << "." << std::setw(9) << std::setfill('0')
+     << nanoseconds_ % 1000000000UL;
 #endif
   return ss.str();
 }

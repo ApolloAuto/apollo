@@ -60,6 +60,8 @@ TEST(TimeTest, operators) {
 TEST(TimeTest, to_string) {
   Time t1(1531225311123456789UL);
   std::cout << t1.ToString().c_str() << std::endl;
+  Time t2(1531225311000006789UL);
+  std::cout << t2.ToString().c_str() << std::endl;
 }
 
 TEST(TimeTest, now) { std::cout << "Time Now: " << Time::Now() << std::endl; }
