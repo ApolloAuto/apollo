@@ -26,39 +26,44 @@ namespace record {
 
 using apollo::cyber::message::RawMessage;
 
-constexpr char kChannelName1[] = "/test/channel1";
-constexpr char kMessageType1[] = "apollo.cyber.proto.Test";
-constexpr char kProtoDesc[] = "1234567890";
-constexpr char kStr10B[] = "1234567890";
-constexpr char kTestFile[] = "record_reader_test.record";
-constexpr uint32_t kMessageNum = 16;
+const char CHANNEL_NAME_1[] = "/test/channel1";
+const char CHANNEL_NAME_2[] = "/test/channel2";
+const char MESSAGE_TYPE_1[] = "apollo.cyber.proto.Test";
+const char MESSAGE_TYPE_2[] = "apollo.cyber.proto.Channel";
+const char PROTO_DESC[] = "1234567890";
+const char STR_10B[] = "1234567890";
+const char TEST_FILE[] = "test.record";
+const uint64_t TIME_1 = 1000 * 1e6;
+const uint64_t TIME_2 = 1010 * 1e6;
+const uint64_t TIME_3 = 1020 * 1e6;
+const uint32_t MESSAGE_NUM = 16;
 
 TEST(RecordTest, TestSingleRecordFile) {
   RecordWriter writer;
   writer.SetSizeOfFileSegmentation(0);
   writer.SetIntervalOfFileSegmentation(0);
-  writer.Open(kTestFile);
-  writer.WriteChannel(kChannelName1, kMessageType1, kProtoDesc);
-  for (uint32_t i = 0; i < kMessageNum; ++i) {
+  writer.Open(TEST_FILE);
+  writer.WriteChannel(CHANNEL_NAME_1, MESSAGE_TYPE_1, PROTO_DESC);
+  for (uint32_t i = 0; i < MESSAGE_NUM; ++i) {
     auto msg = std::make_shared<RawMessage>(std::to_string(i));
-    writer.WriteMessage(kChannelName1, msg, i);
+    writer.WriteMessage(CHANNEL_NAME_1, msg, i);
   }
-  ASSERT_EQ(kMessageNum, writer.GetMessageNumber(kChannelName1));
-  ASSERT_EQ(kMessageType1, writer.GetMessageType(kChannelName1));
-  ASSERT_EQ(kProtoDesc, writer.GetProtoDesc(kChannelName1));
+  ASSERT_EQ(MESSAGE_NUM, writer.GetMessageNumber(CHANNEL_NAME_1));
+  ASSERT_EQ(MESSAGE_TYPE_1, writer.GetMessageType(CHANNEL_NAME_1));
+  ASSERT_EQ(PROTO_DESC, writer.GetProtoDesc(CHANNEL_NAME_1));
   writer.Close();
 
-  RecordReader reader(kTestFile);
+  RecordReader reader(TEST_FILE);
   RecordMessage message;
-  ASSERT_EQ(kMessageNum, reader.GetMessageNumber(kChannelName1));
-  ASSERT_EQ(kMessageType1, reader.GetMessageType(kChannelName1));
-  ASSERT_EQ(kProtoDesc, reader.GetProtoDesc(kChannelName1));
+  ASSERT_EQ(MESSAGE_NUM, reader.GetMessageNumber(CHANNEL_NAME_1));
+  ASSERT_EQ(MESSAGE_TYPE_1, reader.GetMessageType(CHANNEL_NAME_1));
+  ASSERT_EQ(PROTO_DESC, reader.GetProtoDesc(CHANNEL_NAME_1));
 
   // read all message
   uint32_t i = 0;
-  for (i = 0; i < kMessageNum; ++i) {
+  for (i = 0; i < MESSAGE_NUM; ++i) {
     ASSERT_TRUE(reader.ReadMessage(&message));
-    ASSERT_EQ(kChannelName1, message.channel_name);
+    ASSERT_EQ(CHANNEL_NAME_1, message.channel_name);
     ASSERT_EQ(std::to_string(i), message.content);
     ASSERT_EQ(i, message.time);
   }
@@ -66,9 +71,9 @@ TEST(RecordTest, TestSingleRecordFile) {
 
   // skip first message
   reader.Reset();
-  for (i = 0; i < kMessageNum - 1; ++i) {
+  for (i = 0; i < MESSAGE_NUM - 1; ++i) {
     ASSERT_TRUE(reader.ReadMessage(&message, 1));
-    ASSERT_EQ(kChannelName1, message.channel_name);
+    ASSERT_EQ(CHANNEL_NAME_1, message.channel_name);
     ASSERT_EQ(std::to_string(i + 1), message.content);
     ASSERT_EQ(i + 1, message.time);
   }
@@ -76,14 +81,13 @@ TEST(RecordTest, TestSingleRecordFile) {
 
   // skip last message
   reader.Reset();
-  for (i = 0; i < kMessageNum - 1; ++i) {
-    ASSERT_TRUE(reader.ReadMessage(&message, 0, kMessageNum - 2));
-    ASSERT_EQ(kChannelName1, message.channel_name);
+  for (i = 0; i < MESSAGE_NUM - 1; ++i) {
+    ASSERT_TRUE(reader.ReadMessage(&message, 0, MESSAGE_NUM - 2));
+    ASSERT_EQ(CHANNEL_NAME_1, message.channel_name);
     ASSERT_EQ(std::to_string(i), message.content);
     ASSERT_EQ(i, message.time);
   }
-  ASSERT_FALSE(reader.ReadMessage(&message, 0, kMessageNum - 2));
-  ASSERT_FALSE(remove(kTestFile));
+  ASSERT_FALSE(reader.ReadMessage(&message, 0, MESSAGE_NUM - 2));
 }
 
 }  // namespace record
