@@ -53,6 +53,8 @@ export default class RealtimeWebSocketEndpoint {
 
                     const isNewMode = (this.currentMode &&
                                        this.currentMode !== STORE.hmi.currentMode);
+                    const isNavigationModeInvolved = (this.currentMode === 'Navigation' ||
+                                                    STORE.hmi.currentMode === 'Navigation');
                     this.currentMode = STORE.hmi.currentMode;
                     if (STORE.hmi.inNavigationMode) {
                         // In navigation mode, the coordinate system is FLU and
@@ -76,7 +78,9 @@ export default class RealtimeWebSocketEndpoint {
                     RENDERER.maybeInitializeOffest(
                         message.autoDrivingCar.positionX,
                         message.autoDrivingCar.positionY,
-                        isNewMode);
+                        // Updating offset only if navigation mode is involved since
+                        // its coordination system is different from rest of the modes.
+                        isNewMode && isNavigationModeInvolved);
                     RENDERER.updateWorld(message);
                     this.updateMapIndex(message);
                     if (this.routingTime !== message.routingTime) {
