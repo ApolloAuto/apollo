@@ -57,6 +57,8 @@ class ScenarioManager final {
   ScenarioConfig::ScenarioType SelectPullOverEmergencyScenario(
       const Frame& frame);
 
+  ScenarioConfig::ScenarioType SelectInterceptionScenario(const Frame& frame);
+
   ScenarioConfig::ScenarioType SelectStopSignScenario(
       const Frame& frame, const hdmap::PathOverlap& stop_sign_overlap);
 
