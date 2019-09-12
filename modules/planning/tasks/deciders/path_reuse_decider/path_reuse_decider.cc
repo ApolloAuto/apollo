@@ -25,7 +25,7 @@
 
 namespace apollo {
 namespace planning {
-
+// #define ADEBUG AINFO
 using apollo::common::Status;
 
 int PathReuseDecider::reusable_path_counter_ = 0;
@@ -53,10 +53,11 @@ Status PathReuseDecider::Process(Frame* const frame,
 
 bool PathReuseDecider::CheckPathReusable(
     Frame* const frame, ReferenceLineInfo* const reference_line_info) {
-  return IsSameVirtualObstacles(frame, reference_line_info);
+  return IsSameStopObstacles(frame, reference_line_info);
+  //   return IsSameObstacles(reference_line_info);
 }
 
-bool PathReuseDecider::IsSameVirtualObstacles(
+bool PathReuseDecider::IsSameStopObstacles(
     Frame* const frame, ReferenceLineInfo* const reference_line_info) {
   if (history_->GetLastFrame() == nullptr) return false;
 
@@ -155,7 +156,7 @@ void PathReuseDecider::GetCurrentStopObstacleS(
        reference_line_info->path_decision()->obstacles().Items()) {
     ADEBUG << "current obstacle: "
            << obstacle->PerceptionSLBoundary().start_s();
-    if (obstacle->IsVirtual() && obstacle->IsLaneBlocking())
+    if (obstacle->IsLaneBlocking())
       current_stop_obstacle->emplace_back(
           obstacle->PerceptionSLBoundary().start_s());
   }

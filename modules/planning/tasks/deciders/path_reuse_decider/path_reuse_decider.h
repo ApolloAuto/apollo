@@ -67,8 +67,8 @@ class PathReuseDecider : public Decider {
   // compared stop decision in s-direction
   bool SameStopS(const double history_stop_s, const double current_stop_s);
 
-  // check if the nearest virtual obstacle in history is same as current
-  bool IsSameVirtualObstacles(Frame* const frame,
+  // check if the nearest Stop obstacle in history is same as current
+  bool IsSameStopObstacles(Frame* const frame,
                               ReferenceLineInfo* const reference_line_info);
 
   // check if same obstacles();
