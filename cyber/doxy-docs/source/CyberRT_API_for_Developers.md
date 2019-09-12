@@ -832,7 +832,7 @@ Time(uint32_t seconds, uint32_t nanoseconds);
 Static Time Now(); // Get the current time
 Double ToSecond() const; // convert to seconds
 Uint64_t ToNanosecond() const; // Convert to nanoseconds
-Std::string ToString() const; // Convert to a string in the format "2018-07-10 20:21:51.123456789"
+Std::string ToString() const; // Convert to a string in the format "2019-07-10 20:21:51.123456789"
 Bool IsZero() const; // Determine if the time is 0
 
 ```
@@ -846,7 +846,7 @@ A code example can be seen below:
 int main(int argc, char** argv) {
     cyber::Init(argv[0]);
     Time t1(1531225311123456789UL);
-    std::cout << t1.ToString() std::endl; // 2018-07-10 20:21:51.123456789
+    std::cout << t1.ToString() std::endl; // 2019-07-10 20:21:51.123456789
     // Duration time interval
     Time t1(100);
     Duration d(200);

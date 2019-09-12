@@ -189,8 +189,8 @@ usage: cyber_recorder play [options]
     -k, --black-channel <name>		not play the specified channel
     -l, --loop				loop play
     -r, --rate <1.0>			multiply the play rate by FACTOR
-    -b, --begin <2018-07-01 00:00:00>	play the record begin at
-    -e, --end <2018-07-01 00:01:00>	play the record end at
+    -b, --begin <2019-07-01 00:00:00>	play the record begin at
+    -e, --end <2019-07-01 00:01:00>	play the record end at
     -s, --start <seconds>		play started at n seconds
     -d, --delay <seconds>		play delayed n seconds
     -p, --preload <seconds>		play after trying to preload n second(s)
@@ -206,8 +206,8 @@ usage: cyber_recorder split [options]
     -o, --output <file>                output record file
     -a, --all                          all channels
     -c, --channel <name>               channel name
-    -b, --begin <2018-07-01 00:00:00>  begin at assigned time
-    -e, --end <2018-07-01 01:00:00>    end at assigned time
+    -b, --begin <2019-07-01 00:00:00>  begin at assigned time
+    -e, --end <2019-07-01 01:00:00>    end at assigned time
 ```
 
 - To repair a record file:
@@ -228,8 +228,8 @@ $ cyber_recorder info demo.record
 record_file:    demo.record
 version:        1.0
 duration:       19.995227 Seconds
-begin_time:     2018-04-17 06:25:36
-end_time:       2018-04-17 06:25:55
+begin_time:     2019-04-17 06:25:36
+end_time:       2019-04-17 06:25:55
 size:           28275479 Bytes (26.965598 MB)
 is_complete:    true
 message_number: 15379
@@ -264,12 +264,12 @@ $ cyber_recorder record -a
 #### Replay a record file
 
 ```
-$ cyber_recorder play -f 20180720202307.record
-file: 20180720202307.record, chunk_number: 1, begin_time: 1532089398663399667, end_time: 1532089404688079759, message_number: 75
+$ cyber_recorder play -f 20190720202307.record
+file: 20190720202307.record, chunk_number: 1, begin_time: 1532089398663399667, end_time: 1532089404688079759, message_number: 75
 please wait for loading and playing back record...
 Hit Ctrl+C to stop replay, or Space to pause.
 [RUNNING]  Record Time: 1532089404.688080    Progress: 6.024680 / 6.024680
-play finished. file: 20180720202307.record
+play finished. file: 20190720202307.record
 ```
 
 
@@ -327,8 +327,8 @@ $ rosbag_to_record demo_2.5.bag demo.record
 record_file:    demo.record
 version:        1.0
 duration:       19.995227 Seconds
-begin_time:     2018-04-17 06:25:36
-end_time:       2018-04-17 06:25:55
+begin_time:     2019-04-17 06:25:36
+end_time:       2019-04-17 06:25:55
 size:           28275479 Bytes (26.965598 MB)
 is_complete:    true
 message_number: 15379

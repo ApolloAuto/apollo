@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,11 +118,11 @@ void DisplayUsage(const std::string& binary, const std::string& command,
                   << " rate by FACTOR" << std::endl;
         break;
       case 'b':
-        std::cout << "\t-b, --begin <2018-07-01 00:00:00>\t" << command
+        std::cout << "\t-b, --begin <2019-07-01 00:00:00>\t" << command
                   << " the record begin at" << std::endl;
         break;
       case 'e':
-        std::cout << "\t-e, --end <2018-07-01 00:01:00>\t\t" << command
+        std::cout << "\t-e, --end <2019-07-01 00:01:00>\t\t" << command
                   << " the record end at" << std::endl;
         break;
       case 's':
