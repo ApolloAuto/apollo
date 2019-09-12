@@ -16,6 +16,8 @@
 
 #include "modules/canbus/vehicle/lexus/protocol/accel_cmd_100.h"
 
+#include <algorithm>
+
 #include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {
