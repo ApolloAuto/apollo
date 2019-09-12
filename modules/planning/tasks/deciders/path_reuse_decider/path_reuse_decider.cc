@@ -53,8 +53,8 @@ Status PathReuseDecider::Process(Frame* const frame,
 
 bool PathReuseDecider::CheckPathReusable(
     Frame* const frame, ReferenceLineInfo* const reference_line_info) {
-  return IsSameStopObstacles(frame, reference_line_info);
-  //   return IsSameObstacles(reference_line_info);
+  //   return IsSameStopObstacles(frame, reference_line_info);
+  return IsSameObstacles(reference_line_info);
 }
 
 bool PathReuseDecider::IsSameStopObstacles(
@@ -117,10 +117,10 @@ bool PathReuseDecider::SameStopS(const double history_stop_s,
   const double kPositive = 0.5;  // (meter) further
   ADEBUG << "current_stop_s" << current_stop_s;
   ADEBUG << "history_stop_s" << history_stop_s;
-  if ((current_stop_s > history_stop_s &&
-       current_stop_s - history_stop_s < kPositive) ||
-      (current_stop_s < history_stop_s &&
-       history_stop_s - current_stop_s < KNegative))
+  if ((current_stop_s >= history_stop_s &&
+       current_stop_s - history_stop_s <= kPositive) ||
+      (current_stop_s <= history_stop_s &&
+       history_stop_s - current_stop_s <= KNegative))
     return true;
   return false;
 }
@@ -231,8 +231,9 @@ bool PathReuseDecider::IsSameObstacles(
                                        history_obstacle)))
       return false;
   }
+  // TODO(SHU) add colision check
   return true;
-}  // namespace planning
+}
 
 }  // namespace planning
 }  // namespace apollo
