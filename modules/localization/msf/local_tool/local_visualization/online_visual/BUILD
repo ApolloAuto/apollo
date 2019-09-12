@@ -24,7 +24,7 @@ cc_library(
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/common:localization_common",
         "//modules/localization/msf/common/io:localization_msf_common_io",
-        "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
+        "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
         "//modules/localization/msf/local_tool/local_visualization/engine",
         "//modules/localization/proto:localization_config_proto",
         "//modules/localization/proto:localization_proto",

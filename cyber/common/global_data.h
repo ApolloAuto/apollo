@@ -43,6 +43,9 @@ class GlobalData {
   void SetProcessGroup(const std::string& process_group);
   const std::string& ProcessGroup() const;
 
+  void SetComponentNums(const int component_nums);
+  int ComponentNums() const;
+
   void SetSchedName(const std::string& sched_name);
   const std::string& SchedName() const;
 
@@ -87,6 +90,8 @@ class GlobalData {
   // process info
   int process_id_;
   std::string process_group_;
+
+  int component_nums_ = 0;
 
   // sched policy info
   std::string sched_name_ = "CYBER_DEFAULT";

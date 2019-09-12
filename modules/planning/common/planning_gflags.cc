@@ -79,11 +79,14 @@ DEFINE_string(scenario_yield_sign_config_file,
 DEFINE_bool(enable_scenario_bare_intersection, false,
             "enable bare_intersection scenarios in planning");
 
-DEFINE_bool(enable_scenario_park_and_go, false,
+DEFINE_bool(enable_scenario_park_and_go, true,
             "enable park-and-go scenario in planning");
 
 DEFINE_bool(enable_scenario_pull_over, false,
             "enable pull-over scenario in planning");
+
+DEFINE_bool(enable_scenario_pull_over_emergency, false,
+            "enable pull-over-emregency scenario in planning");
 
 DEFINE_bool(enable_pull_over_exit, false,
             "allow pull-over scenario exit to lane follow in planning");

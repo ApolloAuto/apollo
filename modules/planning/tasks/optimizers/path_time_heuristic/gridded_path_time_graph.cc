@@ -97,6 +97,12 @@ Status GriddedPathTimeGraph::Search(SpeedData* const speed_data) {
     }
   }
 
+  if (!InitSpeedLimitLookUp().ok()) {
+    const std::string msg = "Initialize speed limit lookup table failed.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
   if (!InitCostTable().ok()) {
     const std::string msg = "Initialize cost table failed.";
     AERROR << msg;
@@ -132,6 +138,19 @@ Status GriddedPathTimeGraph::InitCostTable() {
     for (uint32_t j = 0; j < cost_table_i.size(); ++j, curr_s += unit_s_) {
       cost_table_i[j].Init(i, j, STPoint(curr_s, curr_t));
     }
+  }
+  return Status::OK();
+}
+
+Status GriddedPathTimeGraph::InitSpeedLimitLookUp() {
+  speed_limit_by_index_.clear();
+
+  uint32_t dim_s = gridded_path_time_graph_config_.matrix_dimension_s();
+  speed_limit_by_index_.resize(dim_s);
+  const auto& speed_limit = st_graph_data_.speed_limit();
+
+  for (uint32_t i = 0; i < dim_s; ++i) {
+    speed_limit_by_index_[i] = speed_limit.GetSpeedLimitByS(unit_s_ * i);
   }
   return Status::OK();
 }
@@ -240,11 +259,7 @@ void GriddedPathTimeGraph::CalculateCostAt(
     return;
   }
 
-  const double speed_limit =
-      st_graph_data_.speed_limit().GetSpeedLimitByS(unit_s_ * r);
-
-  // TODO(all): fix here; remove soft_speed_limit
-  const double soft_speed_limit = speed_limit;
+  const double speed_limit = speed_limit_by_index_[r];
 
   if (c == 1) {
     const double acc = (r * unit_s_ / unit_t_ - init_point_.v()) / unit_t_;
@@ -257,9 +272,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
                                 cost_init)) {
       return;
     }
-    cost_cr.SetTotalCost(
-        cost_cr.obstacle_cost() + cost_init.total_cost() +
-        CalculateEdgeCostForSecondCol(r, speed_limit, soft_speed_limit));
+    cost_cr.SetTotalCost(cost_cr.obstacle_cost() + cost_init.total_cost() +
+                         CalculateEdgeCostForSecondCol(r, speed_limit));
     cost_cr.SetPrePoint(cost_init);
     return;
   }
@@ -269,15 +283,14 @@ void GriddedPathTimeGraph::CalculateCostAt(
       static_cast<uint32_t>(FLAGS_planning_upper_speed_limit *
                             (1 + kSpeedRangeBuffer) * unit_t_ / unit_s_);
   const uint32_t r_low = (max_s_diff < r ? r - max_s_diff : 0);
-
+  const uint32_t r_pre_size = r - r_low + 1;
+  uint32_t r_pre = r;
   const auto& pre_col = cost_table_[c - 1];
-
   double curr_speed_limit = speed_limit;
+
   if (c == 2) {
-    for (uint32_t r_pre = r_low; r_pre <= r; ++r_pre) {
-      curr_speed_limit = std::fmin(
-          curr_speed_limit,
-          st_graph_data_.speed_limit().GetSpeedLimitByS(unit_s_ * r_pre));
+    for (uint32_t i = 0; i < r_pre_size; ++i) {
+      r_pre = r - i;
       const double acc =
           (r * unit_s_ - 2 * r_pre * unit_s_) / (unit_t_ * unit_t_);
       if (acc < gridded_path_time_graph_config_.max_deceleration() ||
@@ -289,11 +302,11 @@ void GriddedPathTimeGraph::CalculateCostAt(
                                   pre_col[r_pre])) {
         continue;
       }
-
-      const double cost = cost_cr.obstacle_cost() +
-                          pre_col[r_pre].total_cost() +
-                          CalculateEdgeCostForThirdCol(
-                              r, r_pre, curr_speed_limit, soft_speed_limit);
+      curr_speed_limit =
+          std::fmin(curr_speed_limit, speed_limit_by_index_[r_pre]);
+      const double cost =
+          cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
+          CalculateEdgeCostForThirdCol(r, r_pre, curr_speed_limit);
 
       if (cost < cost_cr.total_cost()) {
         cost_cr.SetTotalCost(cost);
@@ -302,15 +315,14 @@ void GriddedPathTimeGraph::CalculateCostAt(
     }
     return;
   }
-  for (uint32_t r_pre = r_low; r_pre <= r; ++r_pre) {
+
+  for (uint32_t i = 0; i < r_pre_size; ++i) {
+    r_pre = r - i;
     if (std::isinf(pre_col[r_pre].total_cost()) ||
         pre_col[r_pre].pre_point() == nullptr) {
       continue;
     }
 
-    curr_speed_limit = std::fmin(
-        curr_speed_limit,
-        st_graph_data_.speed_limit().GetSpeedLimitByS(unit_s_ * r_pre));
     const double curr_a = (cost_cr.index_s() * unit_s_ +
                            pre_col[r_pre].pre_point()->index_s() * unit_s_ -
                            2 * pre_col[r_pre].index_s() * unit_s_) /
@@ -337,10 +349,11 @@ void GriddedPathTimeGraph::CalculateCostAt(
     const STPoint& prepre_point = prepre_graph_point.point();
     const STPoint& pre_point = pre_col[r_pre].point();
     const STPoint& curr_point = cost_cr.point();
-    double cost =
-        cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
-        CalculateEdgeCost(triple_pre_point, prepre_point, pre_point, curr_point,
-                          curr_speed_limit, soft_speed_limit);
+    curr_speed_limit =
+        std::fmin(curr_speed_limit, speed_limit_by_index_[r_pre]);
+    double cost = cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
+                  CalculateEdgeCost(triple_pre_point, prepre_point, pre_point,
+                                    curr_point, curr_speed_limit);
 
     if (cost < cost_cr.total_cost()) {
       cost_cr.SetTotalCost(cost);
@@ -408,22 +421,19 @@ double GriddedPathTimeGraph::CalculateEdgeCost(const STPoint& first,
                                                const STPoint& second,
                                                const STPoint& third,
                                                const STPoint& forth,
-                                               const double speed_limit,
-                                               const double soft_speed_limit) {
-  return dp_st_cost_.GetSpeedCost(third, forth, speed_limit, soft_speed_limit) +
+                                               const double speed_limit) {
+  return dp_st_cost_.GetSpeedCost(third, forth, speed_limit) +
          dp_st_cost_.GetAccelCostByThreePoints(second, third, forth) +
          dp_st_cost_.GetJerkCostByFourPoints(first, second, third, forth);
 }
 
 double GriddedPathTimeGraph::CalculateEdgeCostForSecondCol(
-    const uint32_t row, const double speed_limit,
-    const double soft_speed_limit) {
+    const uint32_t row, const double speed_limit) {
   double init_speed = init_point_.v();
   double init_acc = init_point_.a();
   const STPoint& pre_point = cost_table_[0][0].point();
   const STPoint& curr_point = cost_table_[1][row].point();
-  return dp_st_cost_.GetSpeedCost(pre_point, curr_point, speed_limit,
-                                  soft_speed_limit) +
+  return dp_st_cost_.GetSpeedCost(pre_point, curr_point, speed_limit) +
          dp_st_cost_.GetAccelCostByTwoPoints(init_speed, pre_point,
                                              curr_point) +
          dp_st_cost_.GetJerkCostByTwoPoints(init_speed, init_acc, pre_point,
@@ -431,14 +441,12 @@ double GriddedPathTimeGraph::CalculateEdgeCostForSecondCol(
 }
 
 double GriddedPathTimeGraph::CalculateEdgeCostForThirdCol(
-    const uint32_t curr_row, const uint32_t pre_row, const double speed_limit,
-    const double soft_speed_limit) {
+    const uint32_t curr_row, const uint32_t pre_row, const double speed_limit) {
   double init_speed = init_point_.v();
   const STPoint& first = cost_table_[0][0].point();
   const STPoint& second = cost_table_[1][pre_row].point();
   const STPoint& third = cost_table_[2][curr_row].point();
-  return dp_st_cost_.GetSpeedCost(second, third, speed_limit,
-                                  soft_speed_limit) +
+  return dp_st_cost_.GetSpeedCost(second, third, speed_limit) +
          dp_st_cost_.GetAccelCostByThreePoints(first, second, third) +
          dp_st_cost_.GetJerkCostByThreePoints(init_speed, first, second, third);
 }

@@ -1,7 +1,7 @@
 ![image alt text](docs/demo_guide/images/Apollo_logo.png)
 
 [![Build Status](http://180.76.142.62:8111/app/rest/builds/buildType:ApolloPublic_Build/statusIcon)](http://180.76.142.62:8111/viewType.html?buildTypeId=ApolloPublic_Build&guest=1)
-[![Simulation Status](https://azure.apollo.auto/dailybuildstatus.svg)](https://azure.apollo.auto/daily-build/all)
+[![Simulation Status](https://azure.apollo.auto/dailybuildstatus.svg)](https://azure.apollo.auto/daily-build/public)
 
 ```
 
@@ -280,7 +280,7 @@ Congratulations! You have successfully built out Apollo without Hardware. If you
 
 * [Technical Tutorial](docs/technical_tutorial/README.md): Everything you need to know about Apollo. Written as individual versions with links to every document related to that version.
 
-* [HowTo](docs/howto/README.md): Brief technical solutions to common problems that developers face during the installation and use of the Apollo platform
+* [How To Guide](docs/howto/README.md): Brief technical solutions to common problems that developers face during the installation and use of the Apollo platform
 
 * [Specs](docs/specs/README.md): A Deep dive into Apollo's Hardware and Software specifications (only recommended for expert level developers that have successfully installed and launched Apollo)
 

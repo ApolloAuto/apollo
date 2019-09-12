@@ -1,33 +1,34 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
 
+import _ from 'lodash';
 import SETTING from "store/config/PlanningGraph.yml";
 import ScatterGraph, { generateScatterGraph } from "components/PNCMonitor/ScatterGraph";
 import PlanningScenarioTable from "components/PNCMonitor/PlanningScenarioTable";
-import { timestampMsToTimeString } from "utils/misc";
+
 
 @inject("store") @observer
 export default class PlanningMonitor extends React.Component {
-    generateStGraph(stGraph) {
-        const graphs = [];
-        const displayNames = {
-            'DpStSpeedOptimizer': 'Speed Heuristic',
-            'PiecewiseJerkSpeedOptimizer': 'Planning S-T Graph',
-        };
-        for (const pathName in displayNames) {
-            const graph = stGraph[pathName];
+    generateGraphsFromDatasets(settingName, datasets) {
+        const setting = SETTING[settingName];
+        if (!setting) {
+            console.error("No such setting name found in PlanningGraph.yml:", settingName);
+            return null;
+        }
+
+        return _.get(setting, 'datasets', []).map(({name, graphTitle}) => {
+            const graph = datasets[name];
             const polygons = graph ? graph.obstaclesBoundary : [];
-            graphs.push(
+            return (
                 <ScatterGraph
-                    key={'stGraph_' + pathName}
-                    title={displayNames[pathName]}
-                    options={SETTING.stGraph.options}
-                    properties={SETTING.stGraph.properties}
+                    key={`${settingName}_${name}`}
+                    title={graphTitle}
+                    options={setting.options}
+                    properties={setting.properties}
                     data={{ lines: graph, polygons: polygons }}
                 />
             );
-        }
-        return graphs;
+        });
     }
 
     render() {
@@ -51,11 +52,8 @@ export default class PlanningMonitor extends React.Component {
                 {generateScatterGraph(SETTING.accelerationGraph, data.accelerationGraph)}
                 {generateScatterGraph(SETTING.planningThetaGraph, data.thetaGraph)}
                 {generateScatterGraph(SETTING.planningKappaGraph, data.kappaGraph)}
-                {this.generateStGraph(data.stGraph)}
-                {generateScatterGraph(
-                    SETTING.stSpeedGraph,
-                    data.stSpeedGraph.PiecewiseJerkSpeedOptimizer
-                )}
+                {this.generateGraphsFromDatasets('stGraph', data.stGraph)}
+                {this.generateGraphsFromDatasets('stSpeedGraph', data.stSpeedGraph)}
                 {generateScatterGraph(SETTING.planningDkappaGraph, data.dkappaGraph)}
                 {generateScatterGraph(SETTING.referenceLineThetaGraph, data.thetaGraph)}
                 {generateScatterGraph(SETTING.referenceLineKappaGraph, data.kappaGraph)}

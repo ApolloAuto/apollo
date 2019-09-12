@@ -165,8 +165,7 @@ double DpStCost::GetReferenceCost(const STPoint& point,
 }
 
 double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
-                              const double speed_limit,
-                              const double soft_speed_limit) const {
+                              const double speed_limit) const {
   double cost = 0.0;
   const double speed = (second.s() - first.s()) / unit_t_;
   if (speed < 0) {

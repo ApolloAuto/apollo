@@ -41,8 +41,9 @@ DECLARE_string(scenario_valet_parking_config_file);
 DECLARE_string(scenario_yield_sign_config_file);
 
 DECLARE_bool(enable_scenario_bare_intersection);
-DECLARE_bool(enable_scenario_pull_over);
 DECLARE_bool(enable_scenario_park_and_go);
+DECLARE_bool(enable_scenario_pull_over);
+DECLARE_bool(enable_scenario_pull_over_emergency);
 DECLARE_bool(enable_scenario_stop_sign);
 DECLARE_bool(enable_scenario_traffic_light);
 DECLARE_bool(enable_scenario_yield_sign);

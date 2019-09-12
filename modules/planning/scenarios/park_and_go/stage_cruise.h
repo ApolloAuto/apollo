@@ -30,6 +30,14 @@ struct ParkAndGoContext;
 
 class ParkAndGoStageCruise : public Stage {
  public:
+  enum ParkAndGoStatus {
+    CRUISING = 1,
+    CRUISE_COMPLETE = 2,
+    ADJUST = 3,
+    ADJUST_COMPLETE = 4,
+    FAIL = 5,
+  };
+
   explicit ParkAndGoStageCruise(const ScenarioConfig::StageConfig& config)
       : Stage(config) {}
 
@@ -41,6 +49,10 @@ class ParkAndGoStageCruise : public Stage {
   }
 
   Stage::StageStatus FinishStage();
+
+ private:
+  ParkAndGoStatus CheckADCParkAndGoCruiseCompleted(
+      const ReferenceLineInfo& reference_line_info);
 
  private:
   ScenarioParkAndGoConfig scenario_config_;

@@ -20,4 +20,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "path_reuse_decider_test",
+    size = "small",
+    srcs = [
+        "path_reuse_decider_test.cc",
+    ],
+    deps = [
+        "path_reuse_decider",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

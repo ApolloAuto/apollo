@@ -35,6 +35,7 @@
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
+#include "modules/dreamview/backend/perception_camera_updater/perception_camera_updater.h"
 #include "modules/routing/proto/poi.pb.h"
 
 /**
@@ -62,8 +63,10 @@ class SimulationWorldUpdater {
    * @param routing_from_file whether to read initial routing from file.
    */
   SimulationWorldUpdater(WebSocketHandler *websocket, WebSocketHandler *map_ws,
-                         SimControl *sim_control, const MapService *map_service,
+                         WebSocketHandler *camera_ws, SimControl *sim_control,
+                         const MapService *map_service,
                          DataCollectionMonitor *data_collection_monitor,
+                         PerceptionCameraUpdater *perception_camera_updater,
                          bool routing_from_file = false);
 
   /**
@@ -137,8 +140,10 @@ class SimulationWorldUpdater {
   const MapService *map_service_ = nullptr;
   WebSocketHandler *websocket_ = nullptr;
   WebSocketHandler *map_ws_ = nullptr;
+  WebSocketHandler *camera_ws_ = nullptr;
   SimControl *sim_control_ = nullptr;
   DataCollectionMonitor *data_collection_monitor_ = nullptr;
+  PerceptionCameraUpdater *perception_camera_updater_ = nullptr;
 
   // End point for requesting default route
   apollo::routing::POI poi_;

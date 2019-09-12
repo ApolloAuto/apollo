@@ -74,7 +74,7 @@
 				"opacity": 0.8,
 				"zOffset": 1.2
 			},
-			"QpSplinePathOptimizer": {
+			"PIECEWISE_JERK_PATH_OPTIMIZER": {
 				"width": 0.2,
 				"color": 3580651,
 				"opacity": 1,
@@ -82,15 +82,15 @@
 			},
 			"planning_path_boundary_1": {
 				"style": "dash",
-				"width": 0.05,
-				"color": 16711680,
+				"width": 0.1,
+				"color": 15793920,
 				"opacity": 1,
 				"zOffset": 1.3
 			},
 			"planning_path_boundary_2": {
 				"style": "dash",
-				"width": 0.05,
-				"color": 16711680,
+				"width": 0.1,
+				"color": 15793920,
 				"opacity": 1,
 				"zOffset": 1.3
 			}

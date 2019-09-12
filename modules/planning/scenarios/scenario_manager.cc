@@ -49,6 +49,8 @@ using apollo::common::VehicleState;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::PathOverlap;
 
+bool ScenarioManager::emergency_vehicle_alert_ = false;
+
 bool ScenarioManager::Init() {
   RegisterScenarios();
   default_scenario_type_ = ScenarioConfig::LANE_FOLLOW;
@@ -298,6 +300,16 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
   return default_scenario_type_;
 }
 
+ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverEmergencyScenario(
+    const Frame& frame) {
+  if (emergency_vehicle_alert_) {
+    return ScenarioConfig::PULL_OVER_EMERGENCY;
+  }
+
+  return default_scenario_type_;
+}
+
+
 ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
     const Frame& frame, const hdmap::PathOverlap& stop_sign_overlap) {
   const auto& scenario_config =
@@ -356,17 +368,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
           .traffic_light_unprotected_right_turn_config();
 
   const auto& reference_line_info = frame.reference_line_info().front();
-
-  // first encountered traffic light overlap
-  const auto first_encountered_traffic_light_itr =
-      first_encountered_overlap_map_.find(ReferenceLineInfo::SIGNAL);
-  if (first_encountered_traffic_light_itr ==
-      first_encountered_overlap_map_.end()) {
-    return default_scenario_type_;
-  }
-  const auto& first_encountered_traffic_light =
-      first_encountered_traffic_light_itr->second;
-
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
 
   // find all the traffic light belong to
@@ -377,7 +378,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
       reference_line_info.reference_line().map_path().signal_overlaps();
   for (const auto& traffic_light_overlap : traffic_light_overlaps) {
     const double dist =
-        traffic_light_overlap.start_s - first_encountered_traffic_light.start_s;
+        traffic_light_overlap.start_s - traffic_light_overlap.start_s;
     if (fabs(dist) <= kTrafficLightGroupingMaxDist) {
       next_traffic_lights.push_back(traffic_light_overlap);
     }
@@ -389,7 +390,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
   // note: need iterate all lights to check no RED/YELLOW/UNKNOWN
   for (const auto& traffic_light_overlap : next_traffic_lights) {
     const double adc_distance_to_traffic_light =
-        first_encountered_traffic_light.start_s - adc_front_edge_s;
+        traffic_light_overlap.start_s - adc_front_edge_s;
     ADEBUG << "traffic_light[" << traffic_light_overlap.object_id
            << "] start_s[" << traffic_light_overlap.start_s
            << "] adc_distance_to_traffic_light["
@@ -420,8 +421,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
     case ScenarioConfig::PARK_AND_GO:
     case ScenarioConfig::PULL_OVER:
       if (traffic_light_scenario) {
-        const auto& turn_type = reference_line_info.GetPathTurnType(
-            first_encountered_traffic_light.start_s);
+        const auto& turn_type =
+            reference_line_info.GetPathTurnType(traffic_light_overlap.start_s);
         const bool right_turn = (turn_type == hdmap::Lane::RIGHT_TURN);
         const bool left_turn = (turn_type == hdmap::Lane::LEFT_TURN);
 
@@ -623,6 +624,8 @@ void ScenarioManager::Observe(const Frame& frame) {
       first_encountered_overlap_map_[overlap.first] = overlap.second;
     }
   }
+
+  CheckEmergencyVehicleAlert();
 }
 
 void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
@@ -642,29 +645,36 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
   // default: LANE_FOLLOW
   ScenarioConfig::ScenarioType scenario_type = default_scenario_type_;
 
-  // check current_scenario (not switchable)
-  switch (current_scenario_->scenario_type()) {
-    case ScenarioConfig::LANE_FOLLOW:
-    case ScenarioConfig::CHANGE_LANE:
-    case ScenarioConfig::PULL_OVER:
-      break;
-    case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
-    case ScenarioConfig::PARK_AND_GO:
-    case ScenarioConfig::STOP_SIGN_PROTECTED:
-    case ScenarioConfig::STOP_SIGN_UNPROTECTED:
-    case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
-    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
-    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
-    case ScenarioConfig::VALET_PARKING:
-    case ScenarioConfig::YIELD_SIGN:
-      // must continue until finish
-      if (current_scenario_->GetStatus() !=
-          Scenario::ScenarioStatus::STATUS_DONE) {
-        scenario_type = current_scenario_->scenario_type();
-      }
-      break;
-    default:
-      break;
+  if (FLAGS_enable_scenario_pull_over_emergency) {
+    scenario_type = SelectPullOverEmergencyScenario(frame);
+  }
+
+  if (scenario_type == default_scenario_type_) {
+    // check current_scenario (not switchable)
+    switch (current_scenario_->scenario_type()) {
+      case ScenarioConfig::LANE_FOLLOW:
+      case ScenarioConfig::CHANGE_LANE:
+      case ScenarioConfig::PULL_OVER:
+      case ScenarioConfig::PULL_OVER_EMERGENCY:
+        break;
+      case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
+      case ScenarioConfig::PARK_AND_GO:
+      case ScenarioConfig::STOP_SIGN_PROTECTED:
+      case ScenarioConfig::STOP_SIGN_UNPROTECTED:
+      case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
+      case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
+      case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
+      case ScenarioConfig::VALET_PARKING:
+      case ScenarioConfig::YIELD_SIGN:
+        // must continue until finish
+        if (current_scenario_->GetStatus() !=
+            Scenario::ScenarioStatus::STATUS_DONE) {
+          scenario_type = current_scenario_->scenario_type();
+        }
+        break;
+      default:
+        break;
+    }
   }
 
   ////////////////////////////////////////
@@ -942,17 +952,55 @@ void ScenarioManager::UpdatePlanningContextYieldSignScenario(
     return;
   }
 
-  // set to first_encountered stop_sign
+  // get first_encountered yield_sign
+  std::string current_yield_sign_overlap_id;
   const auto map_itr =
       first_encountered_overlap_map_.find(ReferenceLineInfo::YIELD_SIGN);
   if (map_itr != first_encountered_overlap_map_.end()) {
+    current_yield_sign_overlap_id = map_itr->second.object_id;
+  }
+
+  if (current_yield_sign_overlap_id.empty()) {
     PlanningContext::Instance()
         ->mutable_planning_status()
         ->mutable_yield_sign()
-        ->set_current_yield_sign_overlap_id(map_itr->second.object_id);
-    ADEBUG << "Update PlanningContext with first_encountered yield sign["
-           << map_itr->second.object_id << "] start_s["
-           << map_itr->second.start_s << "]";
+        ->Clear();
+    return;
+  }
+
+  // find all the yield_sign at/within the same location/group
+  const auto& reference_line_info = frame.reference_line_info().front();
+  const std::vector<PathOverlap>& yield_sign_overlaps =
+      reference_line_info.reference_line().map_path().yield_sign_overlaps();
+  auto yield_sign_overlap_itr = std::find_if(
+      yield_sign_overlaps.begin(), yield_sign_overlaps.end(),
+      [&current_yield_sign_overlap_id](const hdmap::PathOverlap& overlap) {
+        return overlap.object_id == current_yield_sign_overlap_id;
+      });
+  if (yield_sign_overlap_itr == yield_sign_overlaps.end()) {
+    PlanningContext::Instance()
+        ->mutable_planning_status()
+        ->mutable_yield_sign()
+        ->Clear();
+    return;
+  }
+
+  constexpr double kTrafficLightGroupingMaxDist = 2.0;  // unit: m
+  const double current_yield_sign_overlap_start_s =
+      yield_sign_overlap_itr->start_s;
+  for (const auto& yield_sign_overlap : yield_sign_overlaps) {
+    const double dist =
+        yield_sign_overlap.start_s - current_yield_sign_overlap_start_s;
+    if (fabs(dist) <= kTrafficLightGroupingMaxDist) {
+      PlanningContext::Instance()
+          ->mutable_planning_status()
+          ->mutable_yield_sign()
+          ->add_current_yield_sign_overlap_id(
+              yield_sign_overlap.object_id);
+      ADEBUG << "Update PlanningContext with first_encountered yield_sign["
+             << yield_sign_overlap.object_id << "] start_s["
+             << yield_sign_overlap.start_s << "]";
+    }
   }
 }
 
@@ -1000,6 +1048,13 @@ void ScenarioManager::UpdatePlanningContextPullOverScenario(
       }
     }
   }
+}
+
+void ScenarioManager::CheckEmergencyVehicleAlert() {
+  static int emergency_vehicle_alert_count = 0;
+
+  // TODO(all): to be implement
+  emergency_vehicle_alert_ = (emergency_vehicle_alert_count >= 5);
 }
 
 }  // namespace scenario

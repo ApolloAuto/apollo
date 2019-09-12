@@ -71,15 +71,19 @@ Status Dreamview::Init() {
   websocket_.reset(new WebSocketHandler("SimWorld"));
   map_ws_.reset(new WebSocketHandler("Map"));
   point_cloud_ws_.reset(new WebSocketHandler("PointCloud"));
+  camera_ws_.reset(new WebSocketHandler("Camera"));
 
   map_service_.reset(new MapService());
   image_.reset(new ImageHandler());
   sim_control_.reset(new SimControl(map_service_.get()));
   data_collection_monitor_.reset(new DataCollectionMonitor());
+  perception_camera_updater_.reset(new PerceptionCameraUpdater(
+      camera_ws_.get()));
 
   sim_world_updater_.reset(new SimulationWorldUpdater(
-      websocket_.get(), map_ws_.get(), sim_control_.get(), map_service_.get(),
-      data_collection_monitor_.get(), FLAGS_routing_from_file));
+      websocket_.get(), map_ws_.get(), camera_ws_.get(), sim_control_.get(),
+      map_service_.get(), data_collection_monitor_.get(),
+      perception_camera_updater_.get(), FLAGS_routing_from_file));
   point_cloud_updater_.reset(new PointCloudUpdater(point_cloud_ws_.get()));
   hmi_.reset(new HMI(websocket_.get(), map_service_.get(),
                      data_collection_monitor_.get()));
@@ -87,6 +91,7 @@ Status Dreamview::Init() {
   server_->addWebSocketHandler("/websocket", *websocket_);
   server_->addWebSocketHandler("/map", *map_ws_);
   server_->addWebSocketHandler("/pointcloud", *point_cloud_ws_);
+  server_->addWebSocketHandler("/camera", *camera_ws_);
   server_->addHandler("/image", *image_);
 
   return Status::OK();
@@ -96,6 +101,7 @@ Status Dreamview::Start() {
   sim_world_updater_->Start();
   point_cloud_updater_->Start();
   hmi_->Start();
+  perception_camera_updater_->Start();
   return Status::OK();
 }
 
@@ -104,6 +110,7 @@ void Dreamview::Stop() {
   sim_control_->Stop();
   point_cloud_updater_->Stop();
   hmi_->Stop();
+  perception_camera_updater_->Stop();
 }
 
 }  // namespace dreamview

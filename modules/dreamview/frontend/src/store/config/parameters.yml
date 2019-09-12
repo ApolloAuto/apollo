@@ -61,21 +61,21 @@ planning:
       color: 0x8DFCB4
       opacity: 0.8
       zOffset: 1.2
-    QpSplinePathOptimizer:
+    PIECEWISE_JERK_PATH_OPTIMIZER:
       width: 0.2
       color: 0x36A2EB
       opacity: 1
       zOffset: 1.3
     planning_path_boundary_1:
       style: dash
-      width: 0.05
-      color: 0xFF0000
+      width: 0.1
+      color: 0xF0FF00
       opacity: 1
       zOffset: 1.3
     planning_path_boundary_2:
       style: dash
-      width: 0.05
-      color: 0xFF0000
+      width: 0.1
+      color: 0xF0FF00
       opacity: 1
       zOffset: 1.3
 

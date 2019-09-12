@@ -1,14 +1,11 @@
 import { action, computed, observable, runInAction } from 'mobx';
 import { LinearInterpolant } from 'three';
 import { parseChartDataFromProtoBuf } from 'utils/chart';
+import SETTING from "store/config/PlanningGraph.yml";
 
 const MAX_SCENARIO_LENGTH = 5;
 
-const PATH_DISPLAY_NAME = {
-  'planning_reference_line': 'ReferenceLine',
-  'DpStSpeedOptimizer': 'SpeedHeuristic',
-  'PiecewiseJerkSpeedOptimizer': 'PlannedSpeed',
-};
+const PATH_DISPLAY_NAME = SETTING.nameMapper;
 
 export default class PlanningData {
   @observable planningTime = null;

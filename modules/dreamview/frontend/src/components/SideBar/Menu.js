@@ -87,7 +87,7 @@ class SubMenu extends React.Component {
                 });
             if (tabId === 'planning' && options.customizedToggles.size > 0) {
                 const extraEntries = options.customizedToggles.keys().map(pathName => {
-                    const title = _.startCase(pathName);
+                    const title = _.startCase(_.snakeCase(pathName));
                     return (
                         <MenuItemCheckbox
                             key={pathName} id={pathName} title={title}
@@ -131,7 +131,7 @@ class SubMenu extends React.Component {
 }
 
 @observer
-export default class Menu extends React.Component {
+export default class LayerMenu extends React.Component {
     render() {
         const { options } = this.props;
 

@@ -27,6 +27,7 @@
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/hmi/hmi.h"
 #include "modules/dreamview/backend/map/map_service.h"
+#include "modules/dreamview/backend/perception_camera_updater/perception_camera_updater.h"
 #include "modules/dreamview/backend/point_cloud/point_cloud_updater.h"
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
@@ -58,10 +59,12 @@ class Dreamview {
   std::unique_ptr<WebSocketHandler> websocket_;
   std::unique_ptr<WebSocketHandler> map_ws_;
   std::unique_ptr<WebSocketHandler> point_cloud_ws_;
+  std::unique_ptr<WebSocketHandler> camera_ws_;
   std::unique_ptr<ImageHandler> image_;
   std::unique_ptr<MapService> map_service_;
   std::unique_ptr<HMI> hmi_;
   std::unique_ptr<DataCollectionMonitor> data_collection_monitor_;
+  std::unique_ptr<PerceptionCameraUpdater> perception_camera_updater_;
 };
 
 }  // namespace dreamview

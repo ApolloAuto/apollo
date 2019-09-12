@@ -108,9 +108,23 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       }
     }
 
-    bool res_opt = OptimizePath(
-        init_frenet_state.second, end_state, path_boundary.delta_s(),
-        path_boundary.boundary(), w, &opt_l, &opt_dl, &opt_ddl, max_iter);
+    const auto& veh_param =
+        common::VehicleConfigHelper::GetConfig().vehicle_param();
+    const double lat_acc_bound =
+        std::tan(veh_param.max_steer_angle() / veh_param.steer_ratio()) /
+        veh_param.wheel_base();
+    std::vector<std::pair<double, double>> ddl_bounds;
+    for (size_t i = 0; i < path_boundary.boundary().size(); ++i) {
+      double s = static_cast<double>(i) * path_boundary.delta_s() +
+                 path_boundary.start_s();
+      double kappa = reference_line.GetNearestReferencePoint(s).kappa();
+      ddl_bounds.emplace_back(-lat_acc_bound - kappa, lat_acc_bound - kappa);
+    }
+
+    bool res_opt =
+        OptimizePath(init_frenet_state.second, end_state,
+                     path_boundary.delta_s(), path_boundary.boundary(),
+                     ddl_bounds, w, &opt_l, &opt_dl, &opt_ddl, max_iter);
 
     if (res_opt) {
       for (size_t i = 0; i < path_boundary.boundary().size(); i += 4) {
@@ -143,6 +157,7 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
     const std::array<double, 3>& init_state,
     const std::array<double, 3>& end_state, const double delta_s,
     const std::vector<std::pair<double, double>>& lat_boundaries,
+    const std::vector<std::pair<double, double>>& ddl_bounds,
     const std::array<double, 5>& w, std::vector<double>* x,
     std::vector<double>* dx, std::vector<double>* ddx, const int max_iter) {
   PiecewiseJerkPathProblem piecewise_jerk_problem(lat_boundaries.size(),
@@ -167,11 +182,10 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   piecewise_jerk_problem.set_x_bounds(lat_boundaries);
   piecewise_jerk_problem.set_dx_bounds(-FLAGS_lateral_derivative_bound_default,
                                        FLAGS_lateral_derivative_bound_default);
-  piecewise_jerk_problem.set_ddx_bounds(-FLAGS_lateral_derivative_bound_default,
-                                        FLAGS_lateral_derivative_bound_default);
+  piecewise_jerk_problem.set_ddx_bounds(ddl_bounds);
   piecewise_jerk_problem.set_dddx_bound(FLAGS_lateral_jerk_bound);
 
-  // Estimate jerk boundary from vehicle_params
+  // Estimate lat_acc and jerk boundary from vehicle_params
   const auto& veh_param =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
   const double axis_distance = veh_param.wheel_base();

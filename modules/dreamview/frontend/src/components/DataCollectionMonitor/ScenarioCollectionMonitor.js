@@ -10,7 +10,7 @@ export default class ScenarioCollectionMonitor extends React.Component {
                 <div className={classNames({
                     "category-description": true,
                     "category-updated": isUpdated,
-                })}>{`${description}:`}</div>
+                })}>{description}</div>
                 <div className="category-progress-background">
                     <span className={isCompleted
                         ? "category-completed" : "category-in-progress"}

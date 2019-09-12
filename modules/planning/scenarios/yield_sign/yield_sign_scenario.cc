@@ -60,24 +60,29 @@ void YieldSignScenario::Init() {
     return;
   }
 
-  const std::string yield_sign_overlap_id =
-      PlanningContext::Instance()
-          ->planning_status()
-          .yield_sign()
-          .current_yield_sign_overlap_id();
-  if (yield_sign_overlap_id.empty()) {
-    AERROR << "Could not find yield sign";
-    return;
-  }
-  hdmap::YieldSignInfoConstPtr yield_sign =
-      HDMapUtil::BaseMap().GetYieldSignById(
-          hdmap::MakeMapId(yield_sign_overlap_id));
-  if (!yield_sign) {
-    AERROR << "Could not find yield sign: " << yield_sign_overlap_id;
+  const auto& yield_sign_status =
+      PlanningContext::Instance()->planning_status().yield_sign();
+
+  if (yield_sign_status.current_yield_sign_overlap_id_size() == 0) {
+    AERROR << "Could not find yield-sign(s)";
     return;
   }
 
-  context_.current_yield_sign_overlap_id = yield_sign_overlap_id;
+  context_.current_yield_sign_overlap_ids.clear();
+  for (int i = 0;
+       i < yield_sign_status.current_yield_sign_overlap_id_size(); i++) {
+    const std::string yield_sign_overlap_id =
+        yield_sign_status.current_yield_sign_overlap_id(i);
+    hdmap::YieldSignInfoConstPtr yield_sign =
+        HDMapUtil::BaseMap().GetYieldSignById(
+            hdmap::MakeMapId(yield_sign_overlap_id));
+    if (!yield_sign) {
+      AERROR << "Could not find yield sign: " << yield_sign_overlap_id;
+    }
+
+    context_.current_yield_sign_overlap_ids.push_back(
+        yield_sign_overlap_id);
+  }
 
   init_ = true;
 }

@@ -361,6 +361,7 @@ Parser::MessageType NovatelParser::PrepareMessage(MessagePtr* message_ptr) {
 
     case novatel::CORRIMUDATA:
     case novatel::CORRIMUDATAS:
+    case novatel::IMURATECORRIMUS:
       if (message_length != sizeof(novatel::CorrImuData)) {
         AERROR << "Incorrect message_length";
         break;

@@ -67,6 +67,7 @@ cc_library(
         "//modules/common/util:map_util",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/data_collection_monitor",
+        "//modules/dreamview/backend/perception_camera_updater",
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/dreamview/backend/map:map_service",
         "//modules/dreamview/backend/sim_control",

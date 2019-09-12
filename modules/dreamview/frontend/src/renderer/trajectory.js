@@ -66,10 +66,10 @@ export default class PlanningTrajectory {
                 newPaths[path.name] = path.pathPoint;
             });
         }
+
         // Draw paths
-        let propertyIndex = 0;
-        const totalPaths = _.union(Object.keys(this.paths), Object.keys(newPaths));
-        totalPaths.forEach((name) => {
+        const allPaths = _.union(Object.keys(this.paths), Object.keys(newPaths));
+        allPaths.forEach((name) => {
             const optionName = name === 'trajectory' ? 'showPlanningTrajectory' : name;
             if (!STORE.options[optionName] && !STORE.options.customizedToggles.get(optionName)) {
                 if (this.paths[name]) {
@@ -85,16 +85,17 @@ export default class PlanningTrajectory {
 
                 let property = PARAMETERS.planning.pathProperties[name];
                 if (!property) {
-                    console.warn('No properties found for', name,
-                        '. Use default properties instead.');
+                    console.warn(
+                        `No path properties found for [${name}]. Use default properties instead.`);
                     property = PARAMETERS.planning.pathProperties.default;
+                    PARAMETERS.planning.pathProperties[name] = property;
                 }
 
                 if (newPaths[name]) {
                     const points = normalizePlanningTrajectory(newPaths[name], coordinates);
                     if (property.style === 'dash') {
                         this.paths[name] = drawDashedLineFromPoints(points, property.color,
-                            width * property.width, 2 /* dash size */, 1 /* gapSize */,
+                            width * property.width, 1 /* dash size */, 1 /* gapSize */,
                             property.zOffset, property.opacity);
                     } else {
                         this.paths[name] = drawThickBandFromPoints(points, width * property.width,
@@ -103,7 +104,6 @@ export default class PlanningTrajectory {
                     scene.add(this.paths[name]);
                 }
             }
-            propertyIndex += 1;
         });
     }
 }

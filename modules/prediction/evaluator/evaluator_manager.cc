@@ -124,7 +124,6 @@ void EvaluatorManager::Init(const PredictionConf& config) {
       switch (obstacle_conf.obstacle_type()) {
         case PerceptionObstacle::VEHICLE: {
           if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
-            vehicle_on_lane_evaluator_ = obstacle_conf.evaluator_type();
             if (obstacle_conf.priority_type() == ObstaclePriority::CAUTION) {
               vehicle_on_lane_caution_evaluator_ =
                   obstacle_conf.evaluator_type();

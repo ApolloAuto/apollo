@@ -4910,6 +4910,14 @@
                 }
               }
             },
+            "PathReuseDeciderConfig": {
+              "fields": {
+                "reusePath": {
+                  "type": "bool",
+                  "id": 1
+                }
+              }
+            },
             "PiecewiseJerkPathConfig": {
               "fields": {
                 "defaultPathConfig": {
@@ -5863,7 +5871,8 @@
                     "UNKNOWN": 0,
                     "NORMAL": 1,
                     "PATH_FALLBACK": 2,
-                    "SPEED_FALLBACK": 3
+                    "SPEED_FALLBACK": 3,
+                    "PATH_REUSED": 4
                   }
                 }
               }
@@ -5891,7 +5900,8 @@
                     "piecewiseJerkSpeedConfig",
                     "pathLaneBorrowDeciderConfig",
                     "laneChangeDeciderConfig",
-                    "ruleBasedStopDeciderConfig"
+                    "ruleBasedStopDeciderConfig",
+                    "pathReuseDeciderConfig"
                   ]
                 }
               },
@@ -5967,6 +5977,10 @@
                 "ruleBasedStopDeciderConfig": {
                   "type": "RuleBasedStopDeciderConfig",
                   "id": 26
+                },
+                "pathReuseDeciderConfig": {
+                  "type": "PathReuseDeciderConfig",
+                  "id": 27
                 }
               },
               "nested": {
@@ -5994,7 +6008,8 @@
                     "PATH_LANE_BORROW_DECIDER": 26,
                     "PIECEWISE_JERK_SPEED_OPTIMIZER": 27,
                     "LANE_CHANGE_DECIDER": 28,
-                    "RULE_BASED_STOP_DECIDER": 29
+                    "RULE_BASED_STOP_DECIDER": 29,
+                    "PATH_REUSE_DECIDER": 30
                   }
                 }
               }
@@ -6285,6 +6300,9 @@
                 }
               }
             },
+            "ScenarioPullOverEmergencyConfig": {
+              "fields": {}
+            },
             "ScenarioValetParkingConfig": {
               "fields": {
                 "parkingSpotRangeToStart": {
@@ -6330,14 +6348,14 @@
                   "type": "double",
                   "id": 1,
                   "options": {
-                    "default": 5
+                    "default": 10
                   }
                 },
                 "maxValidStopDistance": {
                   "type": "double",
                   "id": 2,
                   "options": {
-                    "default": 3.5
+                    "default": 4.5
                   }
                 },
                 "minPassSDistance": {
@@ -6369,6 +6387,7 @@
                     "trafficLightUnprotectedLeftTurnConfig",
                     "parkAndGoConfig",
                     "pullOverConfig",
+                    "pullOverEmergencyConfig",
                     "valetParkingConfig",
                     "yieldSignConfig"
                   ]
@@ -6415,18 +6434,22 @@
                   "type": "ScenarioPullOverConfig",
                   "id": 11
                 },
+                "pullOverEmergencyConfig": {
+                  "type": "ScenarioPullOverEmergencyConfig",
+                  "id": 12
+                },
                 "valetParkingConfig": {
                   "type": "ScenarioValetParkingConfig",
-                  "id": 12
+                  "id": 13
                 },
                 "yieldSignConfig": {
                   "type": "ScenarioYieldSignConfig",
-                  "id": 13
+                  "id": 14
                 },
                 "stageType": {
                   "rule": "repeated",
                   "type": "StageType",
-                  "id": 14,
+                  "id": 15,
                   "options": {
                     "packed": false
                   }
@@ -6434,7 +6457,7 @@
                 "stageConfig": {
                   "rule": "repeated",
                   "type": "StageConfig",
-                  "id": 15
+                  "id": 16
                 }
               },
               "nested": {
@@ -6450,9 +6473,10 @@
                     "TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN": 8,
                     "YIELD_SIGN": 9,
                     "PULL_OVER": 10,
-                    "VALET_PARKING": 11,
-                    "NARROW_STREET_U_TURN": 12,
-                    "PARK_AND_GO": 13
+                    "PULL_OVER_EMREGENCY": 11,
+                    "VALET_PARKING": 12,
+                    "NARROW_STREET_U_TURN": 13,
+                    "PARK_AND_GO": 14
                   }
                 },
                 "StageType": {
@@ -6476,8 +6500,9 @@
                     "PULL_OVER_APPROACH": 500,
                     "PULL_OVER_RETRY_APPROACH_PARKING": 501,
                     "PULL_OVER_RETRY_PARKING": 502,
-                    "VALET_PARKING_APPROACHING_PARKING_SPOT": 510,
-                    "VALET_PARKING_PARKING": 511,
+                    "PULL_OVER_EMREGENCY_APPROACH": 510,
+                    "VALET_PARKING_APPROACHING_PARKING_SPOT": 520,
+                    "VALET_PARKING_PARKING": 521,
                     "PARK_AND_GO_CHECK": 600,
                     "PARK_AND_GO_CRUISE": 601,
                     "PARK_AND_GO_ADJUST": 602,
@@ -6700,6 +6725,17 @@
                 "timestamp": {
                   "type": "double",
                   "id": 3
+                },
+                "existLaneChangeStartPosition": {
+                  "type": "bool",
+                  "id": 4,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "laneChangeStartPosition": {
+                  "type": "apollo.common.Point3D",
+                  "id": 5
                 }
               },
               "nested": {
@@ -6970,10 +7006,12 @@
             "YieldSignStatus": {
               "fields": {
                 "currentYieldSignOverlapId": {
+                  "rule": "repeated",
                   "type": "string",
                   "id": 1
                 },
                 "doneYieldSignOverlapId": {
+                  "rule": "repeated",
                   "type": "string",
                   "id": 2
                 },

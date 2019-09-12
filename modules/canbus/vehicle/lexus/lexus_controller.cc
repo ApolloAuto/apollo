@@ -633,8 +633,53 @@ void LexusController::SecurityDogThreadFunc() {
 }
 
 bool LexusController::CheckResponse(const int32_t flags, bool need_wait) {
-  /* ADD YOUR OWN CAR CHASSIS OPERATION
-   */
+  // for Lexus, we assume CheckResponse will take 300ms. We leave a 100ms buffer
+  // for it.
+  // TODO(Yu) : check whether the current retry_num match the assumed time
+  // consumption
+  int32_t retry_num = 20;
+  ChassisDetail chassis_detail;
+  bool is_eps_online = false;
+  bool is_vcu_online = false;
+  bool is_esp_online = false;
+
+  do {
+    if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
+      AERROR_EVERY(100) << "Get chassis detail failed.";
+      return false;
+    }
+    bool check_ok = true;
+    if (flags & CHECK_RESPONSE_STEER_UNIT_FLAG) {
+      is_eps_online = chassis_detail.has_check_response() &&
+                      chassis_detail.check_response().has_is_eps_online() &&
+                      chassis_detail.check_response().is_eps_online();
+      check_ok = check_ok && is_eps_online;
+    }
+
+    if (flags & CHECK_RESPONSE_SPEED_UNIT_FLAG) {
+      is_vcu_online = chassis_detail.has_check_response() &&
+                      chassis_detail.check_response().has_is_vcu_online() &&
+                      chassis_detail.check_response().is_vcu_online();
+      is_esp_online = chassis_detail.has_check_response() &&
+                      chassis_detail.check_response().has_is_esp_online() &&
+                      chassis_detail.check_response().is_esp_online();
+      check_ok = check_ok && is_vcu_online && is_esp_online;
+    }
+    if (check_ok) {
+      return true;
+    }
+    ADEBUG << "Need to check response again.";
+    if (need_wait) {
+      --retry_num;
+      std::this_thread::sleep_for(
+          std::chrono::duration<double, std::milli>(20));
+    }
+  } while (need_wait && retry_num);
+
+  // If check_response fails, then report the specific module failure online
+  AINFO << "check_response fail: is_eps_online:" << is_eps_online
+        << ", is_vcu_online:" << is_vcu_online
+        << ", is_esp_online:" << is_esp_online;
   return false;
 }
 
