@@ -80,9 +80,6 @@ void ChoreographyContext::Wait() {
 
 void ChoreographyContext::Shutdown() {
   stop_.store(true);
-  mtx_wq_.lock();
-  notify = INT_MAX;
-  mtx_wq_.unlock();
   cv_wq_.notify_all();
 }
 
