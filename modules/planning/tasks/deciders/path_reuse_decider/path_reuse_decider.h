@@ -25,6 +25,7 @@
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/history.h"
+#include "modules/planning/common/obstacle_blocking_analyzer.h"
 #include "modules/planning/proto/decider_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
@@ -69,7 +70,7 @@ class PathReuseDecider : public Decider {
 
   // check if the nearest Stop obstacle in history is same as current
   bool IsSameStopObstacles(Frame* const frame,
-                              ReferenceLineInfo* const reference_line_info);
+                           ReferenceLineInfo* const reference_line_info);
 
   // check if same obstacles();
   bool IsSameObstacles(ReferenceLineInfo* const reference_line_info);
