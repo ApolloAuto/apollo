@@ -639,9 +639,9 @@ bool LexusController::CheckResponse(const int32_t flags, bool need_wait) {
   // consumption
   int32_t retry_num = 20;
   ChassisDetail chassis_detail;
-  bool is_eps_online = false;
-  bool is_vcu_online = false;
-  bool is_esp_online = false;
+  bool is_accel_enabled = false;
+  bool is_brake_enabled = false;
+  bool is_steering_enabled = false;
 
   do {
     if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
@@ -650,25 +650,25 @@ bool LexusController::CheckResponse(const int32_t flags, bool need_wait) {
     }
     bool check_ok = true;
     if (flags & CHECK_RESPONSE_STEER_UNIT_FLAG) {
-      is_eps_online = chassis_detail.has_check_response() &&
-                      chassis_detail.check_response().has_is_eps_online() &&
-                      chassis_detail.check_response().is_eps_online();
-      check_ok = check_ok && is_eps_online;
+      is_steering_enabled =
+          chassis_detail.lexus().has_steering_rpt_22c() &&
+          chassis_detail.lexus().steering_rpt_22c().has_enabled() &&
+          chassis_detail.lexus().steering_rpt_22c().enabled();
+      check_ok = check_ok && is_steering_enabled;
     }
 
     if (flags & CHECK_RESPONSE_SPEED_UNIT_FLAG) {
-      is_vcu_online = chassis_detail.has_check_response() &&
-                      chassis_detail.check_response().has_is_vcu_online() &&
-                      chassis_detail.check_response().is_vcu_online();
-      is_esp_online = chassis_detail.has_check_response() &&
-                      chassis_detail.check_response().has_is_esp_online() &&
-                      chassis_detail.check_response().is_esp_online();
-      check_ok = check_ok && is_vcu_online && is_esp_online;
+      is_brake_enabled = chassis_detail.lexus().has_brake_rpt_204() &&
+                         chassis_detail.lexus().brake_rpt_204().has_enabled() &&
+                         chassis_detail.lexus().brake_rpt_204().enabled();
+      is_accel_enabled = chassis_detail.lexus().has_accel_rpt_200() &&
+                         chassis_detail.lexus().accel_rpt_200().has_enabled() &&
+                         chassis_detail.lexus().accel_rpt_200().enabled();
+      check_ok = check_ok && is_brake_enabled && is_accel_enabled;
     }
     if (check_ok) {
       return true;
     }
-    ADEBUG << "Need to check response again.";
     if (need_wait) {
       --retry_num;
       std::this_thread::sleep_for(
@@ -677,9 +677,9 @@ bool LexusController::CheckResponse(const int32_t flags, bool need_wait) {
   } while (need_wait && retry_num);
 
   // If check_response fails, then report the specific module failure online
-  AINFO << "check_response fail: is_eps_online:" << is_eps_online
-        << ", is_vcu_online:" << is_vcu_online
-        << ", is_esp_online:" << is_esp_online;
+  AERROR << "check_response fail: is_steering_enabled:" << is_steering_enabled
+         << ", is_brake_enabled:" << is_brake_enabled
+         << ", is_accel_enabled:" << is_accel_enabled;
   return false;
 }
 
