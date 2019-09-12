@@ -116,7 +116,8 @@ void Steeringcmd12c::set_p_clear_faults(uint8_t* data, bool clear_faults) {
 }
 
 Steeringcmd12c* Steeringcmd12c::set_position(double position) {
-  position_ = position;
+  // TODO(AS): fix this direction and scaling.
+  position_ = -position;
   return this;
 }
 
