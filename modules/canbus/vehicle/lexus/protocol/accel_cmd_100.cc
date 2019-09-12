@@ -121,7 +121,9 @@ Accelcmd100* Accelcmd100::set_accel_cmd(double accel_cmd) {
 // 'len': 16, 'is_signed_var': False, 'physical_range': '[0|1]', 'bit': 15,
 // 'type': 'double', 'order': 'motorola', 'physical_unit': ''}
 void Accelcmd100::set_p_accel_cmd(uint8_t* data, double accel_cmd) {
+  accel_cmd = std::max(0.0, (accel_cmd - 8.0) / 100);
   accel_cmd = ProtocolData::BoundedValue(0.0, 1.0, accel_cmd);
+  // TODO(AS): fix this scaling.
   int x = static_cast<int>(accel_cmd / 0.001000);
   uint8_t t = 0;
 
