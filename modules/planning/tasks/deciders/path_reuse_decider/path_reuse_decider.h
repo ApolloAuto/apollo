@@ -71,6 +71,9 @@ class PathReuseDecider : public Decider {
   bool IsSameVirtualObstacles(Frame* const frame,
                               ReferenceLineInfo* const reference_line_info);
 
+  // check if same obstacles();
+  bool IsSameObstacles(ReferenceLineInfo* const reference_line_info);
+
  private:
   History* history_ = History::Instance();
   static int reusable_path_counter_;  // count reused path

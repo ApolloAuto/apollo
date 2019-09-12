@@ -198,5 +198,37 @@ void PathReuseDecider::GetHistoryStopSPosition(
   std::sort(history_stop_positions->begin(), history_stop_positions->end());
 }
 
+// compare obstacles
+bool PathReuseDecider::IsSameObstacles(
+    ReferenceLineInfo* const reference_line_info) {
+  const auto& history_frame = FrameHistory::Instance()->Latest();
+  if (!history_frame) return false;
+  //   const IndexedList<std::string, Obstacle>& history_obstacles =
+  //       history_frame->reference_line_info()->path_decision()->obstacles();
+
+  const auto& history_reference_line_info =
+      history_frame->reference_line_info().front();
+
+  const IndexedList<std::string, Obstacle>& history_obstacles =
+      history_reference_line_info.path_decision().obstacles();
+  size_t counter = 0;
+  for (auto obstacle :
+       reference_line_info->path_decision()->obstacles().Items()) {
+    const std::string& obstacle_id = obstacle->Id();
+    // same obstacle id
+    auto history_obstacle = history_obstacles.Find(obstacle_id);
+
+    // bool IsBlockingDrivingPathObstacle(const ReferenceLine& reference_line,
+    //                                const Obstacle* obstacle);
+    if (!history_obstacle ||
+        (obstacle->IsStatic() != history_obstacle->IsStatic())) {
+      return false;
+    }
+    ++counter;
+  }
+  if (counter == history_obstacles.Items().size()) return true;
+  return false;
+}
+
 }  // namespace planning
 }  // namespace apollo
