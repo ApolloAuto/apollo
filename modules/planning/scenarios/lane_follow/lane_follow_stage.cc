@@ -127,8 +127,7 @@ Stage::StageStatus LaneFollowStage::Process(
     if (cur_status.ok()) {
       if (reference_line_info.IsChangeLanePath()) {
         ADEBUG << "reference line is lane change ref.";
-        if (reference_line_info.Cost() < kStraightForwardLineCost &&
-            LaneChangeDecider::IsClearToChangeLane(&reference_line_info)) {
+        if (reference_line_info.Cost() < kStraightForwardLineCost) {
           has_drivable_reference_line = true;
           reference_line_info.SetDrivable(true);
           ADEBUG << "\tclear for lane change";
