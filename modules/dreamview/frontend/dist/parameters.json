@@ -21,6 +21,11 @@
 			"near": 1,
 			"far": 4000
 		},
+		"CameraView": {
+			"fov": 30.5,
+			"near": 1,
+			"far": 1500
+		},
 		"laneWidth": 4.5,
 		"laneWidthToViewDistanceRatio": 5
 	},
@@ -135,6 +140,9 @@
 		},
 		"cameraAngle": {
 			"default": "Default"
+		},
+		"showCameraView": {
+			"default": false
 		},
 		"showDecisionMain": {
 			"default": true,

@@ -22,12 +22,27 @@ class SceneView extends React.Component {
                 options, trafficSignal, video, hmi } = this.props.store;
 
         const sceneHeightOffset = OFFLINE_PLAYBACK ? 40 /* height of playback control */ : 0;
+
+        let width = null;
+        let height = null;
+        if (options.cameraAngle === 'CameraView') {
+            // Set width/height same as camera image ratio to ensure scene align to image
+            // thus the height won't change no mattter whether there's menu under scene
+            const ASPECT_RATIO = 1920 / 1080;
+            width = sceneDimension.width;
+            height = width / ASPECT_RATIO;
+        } else {
+            width = sceneDimension.width;
+            height = sceneDimension.height - sceneHeightOffset;
+        }
+
         return (
             <div className="main-view" style={{ height: sceneDimension.height }}>
-                <Scene  width={sceneDimension.width}
-                        height={sceneDimension.height - sceneHeightOffset}
-                        options={options}
-                        invisible={false} />
+                <Scene
+                    width={width}
+                    height={height}
+                    options={options}
+                    invisible={false} />
                 {options.showRouteEditingBar
                     ? <RouteEditingBar />
                     : <StatusBar meters={meters}

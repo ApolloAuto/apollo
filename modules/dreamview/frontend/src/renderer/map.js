@@ -31,8 +31,6 @@ const colorMapping = {
     DEFAULT: 0xC0C0C0
 };
 
-const Z_OFFSET_FACTOR = 1;
-
 export default class Map {
     constructor() {
         this.textRender = new Text3D();
@@ -48,6 +46,8 @@ export default class Map {
         this.yieldSigns = new TrafficSigns(
             yieldSignMaterial, yieldSignObject, YIELD_SIGN_SCALE,
         );
+
+        this.zOffsetFactor = 1;
     }
 
     // The result will be the all the elements in current but not in data.
@@ -82,31 +82,31 @@ export default class Map {
         switch (laneType) {
             case "DOTTED_YELLOW":
                 return drawDashedLineFromPoints(
-                    points, colorMapping.YELLOW, 4, 3, 3, Z_OFFSET_FACTOR, 1, false);
+                    points, colorMapping.YELLOW, 4, 3, 3, this.zOffsetFactor, 1, false);
             case "DOTTED_WHITE":
                 return drawDashedLineFromPoints(
-                    points, colorMapping.WHITE, 2, 0.5, 0.25, Z_OFFSET_FACTOR, 0.4, false);
+                    points, colorMapping.WHITE, 2, 0.5, 0.25, this.zOffsetFactor, 0.4, false);
             case "SOLID_YELLOW":
                 return drawSegmentsFromPoints(
-                    points, colorMapping.YELLOW, 3, Z_OFFSET_FACTOR, false);
+                    points, colorMapping.YELLOW, 3, this.zOffsetFactor, false);
             case "SOLID_WHITE":
                 return drawSegmentsFromPoints(
-                    points, colorMapping.WHITE, 3, Z_OFFSET_FACTOR, false);
+                    points, colorMapping.WHITE, 3, this.zOffsetFactor, false);
             case "DOUBLE_YELLOW":
                 const left = drawSegmentsFromPoints(
-                    points, colorMapping.YELLOW, 2, Z_OFFSET_FACTOR, false);
+                    points, colorMapping.YELLOW, 2, this.zOffsetFactor, false);
                 const right = drawSegmentsFromPoints(
                     points.map(point =>
                         new THREE.Vector3(point.x + 0.3, point.y + 0.3, point.z)),
-                    colorMapping.YELLOW, 3, Z_OFFSET_FACTOR, false);
+                    colorMapping.YELLOW, 3, this.zOffsetFactor, false);
                 left.add(right);
                 return left;
             case "CURB":
                 return drawSegmentsFromPoints(
-                    points, colorMapping.CORAL, 3, Z_OFFSET_FACTOR, false);
+                    points, colorMapping.CORAL, 3, this.zOffsetFactor, false);
             default:
                 return drawSegmentsFromPoints(
-                    points, colorMapping.DEFAULT, 3, Z_OFFSET_FACTOR, false);
+                    points, colorMapping.DEFAULT, 3, this.zOffsetFactor, false);
         }
     }
 
@@ -117,7 +117,7 @@ export default class Map {
         centralLine.forEach(segment => {
             const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
             const centerLine =
-                drawSegmentsFromPoints(points, colorMapping.GREEN, 1, Z_OFFSET_FACTOR, false);
+                drawSegmentsFromPoints(points, colorMapping.GREEN, 1, this.zOffsetFactor, false);
             centerLine.name = "CentralLine-" + lane.id.id;
             scene.add(centerLine);
             drewObjects.push(centerLine);
@@ -201,7 +201,7 @@ export default class Map {
         border.push(border[0]);
 
         const mesh = drawSegmentsFromPoints(
-            border, color, 2, Z_OFFSET_FACTOR, true, false, 1.0);
+            border, color, 2, this.zOffsetFactor, true, false, 1.0);
         scene.add(mesh);
         drewObjects.push(mesh);
 
@@ -243,12 +243,13 @@ export default class Map {
             opacity: .15
         });
 
-        const zoneShape = drawShapeFromPoints(border, zoneMaterial, false, 3, false);
+        const zoneShape = drawShapeFromPoints(
+            border, zoneMaterial, false, this.zOffsetFactor * 3, false);
         scene.add(zoneShape);
         drewObjects.push(zoneShape);
 
         const mesh = drawSegmentsFromPoints(
-            border, color, 2, Z_OFFSET_FACTOR, true, false, 1.0);
+            border, color, 2, this.zOffsetFactor, true, false, 1.0);
         scene.add(mesh);
         drewObjects.push(mesh);
 
@@ -260,7 +261,8 @@ export default class Map {
         lines.forEach(line => {
             line.segment.forEach(segment => {
                 const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
-                const mesh = drawSegmentsFromPoints(points, color, 5, Z_OFFSET_FACTOR + 1, false);
+                const mesh = drawSegmentsFromPoints(
+                    points, color, 5, this.zOffsetFactor * 2, false);
                 scene.add(mesh);
                 drewObjects.push(mesh);
             });
@@ -483,6 +485,9 @@ export default class Map {
                 }
             }
         }
+        // Do not set zOffset in camera view, since zOffset will affect the accuracy of matching
+        // between hdmap and camera image
+        this.zOffsetFactor = _.get(STORE, 'options.cameraAngle') === 'CameraView' ? 0 : 1;
     }
 
     update(world) {

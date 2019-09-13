@@ -4,6 +4,7 @@ const simWorldRoot = protobuf.Root.fromJSON(
 );
 const SimWorldMessage = simWorldRoot.lookupType("apollo.dreamview.SimulationWorld");
 const mapMessage = simWorldRoot.lookupType("apollo.hdmap.Map");
+const cameraMessage = simWorldRoot.lookupType("apollo.dreamview.CameraUpdate");
 const pointCloudRoot = protobuf.Root.fromJSON(
     require("proto_bundle/point_cloud_proto_bundle.json")
 );
@@ -36,6 +37,11 @@ self.addEventListener("message", event => {
                 message = pointCloudMessage.toObject(
                     pointCloudMessage.decode(new Uint8Array(data)), {arrays: true});
             }
+            break;
+        case "camera":
+            message = cameraMessage.toObject(
+                cameraMessage.decode(new Uint8Array(data)), { enums: String });
+            message.type = "CameraData";
             break;
     }
 

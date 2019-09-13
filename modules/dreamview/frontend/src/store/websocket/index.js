@@ -2,6 +2,7 @@ import OfflinePlaybackWebSocketEndpoint from "store/websocket/websocket_offline"
 import RealtimeWebSocketEndpoint from "store/websocket/websocket_realtime";
 import MapDataWebSocketEndpoint from "store/websocket/websocket_map";
 import PointCloudWebSocketEndpoint from "store/websocket/websocket_point_cloud";
+import CameraDataWebSocketEndpoint from "store/websocket/websocket_camera";
 
 // Returns the websocket server address based on the web server address.
 // Follows the convention that the websocket is served on the same host/port
@@ -25,6 +26,9 @@ function deduceWebsocketServerAddr(type) {
         case "sim_world":
             path = OFFLINE_PLAYBACK ? "offlineView" : "websocket";
             break;
+        case "camera":
+            path = "camera";
+            break;
     }
     return `${protocol}://${link.hostname}:${port}/${path}`;
 }
@@ -43,3 +47,6 @@ export const MAP_WS = new MapDataWebSocketEndpoint(mapServerAddr);
 
 const pointCloudServerAddr = deduceWebsocketServerAddr("point_cloud");
 export const POINT_CLOUD_WS = new PointCloudWebSocketEndpoint(pointCloudServerAddr);
+
+const cameraServerAddr = deduceWebsocketServerAddr("camera");
+export const CAMERA_WS = new CameraDataWebSocketEndpoint(cameraServerAddr);

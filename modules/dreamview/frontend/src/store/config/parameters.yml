@@ -16,6 +16,10 @@ camera:
     fov: 70
     near: 1
     far: 4000
+  CameraView:
+    fov: 30.5
+    near: 1
+    far: 1500
   laneWidth: 4.5 # original 3.32
   laneWidthToViewDistanceRatio: 5
 ground:
@@ -111,6 +115,8 @@ options:
   # layer Menu options
   cameraAngle:
     default: Default
+  showCameraView:
+    default: false
   showDecisionMain:
     default: true
     menuId: decisionMain

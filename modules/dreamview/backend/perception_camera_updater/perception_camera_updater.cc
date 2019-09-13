@@ -166,12 +166,20 @@ void PerceptionCameraUpdater::OnImage(
   std::vector<uint8_t> tmp_buffer;
   cv::imencode(".jpg", mat_image, tmp_buffer, std::vector<int>() /* params */);
 
-  std::lock_guard<std::mutex> lock(image_mutex_);
+  double next_image_timestamp;
   if (compressed_image->has_measurement_time()) {
-    current_image_timestamp_ = compressed_image->measurement_time();
+    next_image_timestamp = compressed_image->measurement_time();
   } else {
-    current_image_timestamp_ = compressed_image->header().timestamp_sec();
+    next_image_timestamp = compressed_image->header().timestamp_sec();
   }
+
+  std::lock_guard<std::mutex> lock(image_mutex_);
+  if (next_image_timestamp < current_image_timestamp_) {
+    // If replay different bags, the timestamp may jump to earlier time and
+    // we need to clear the localization queue
+    localization_queue_.clear();
+  }
+  current_image_timestamp_ = next_image_timestamp;
   camera_update_.set_image(&(tmp_buffer[0]), tmp_buffer.size());
 }
 
@@ -209,12 +217,14 @@ void PerceptionCameraUpdater::GetUpdate(std::string *camera_update) {
     GetImageLocalization(&localization);
     *camera_update_.mutable_localization() = {localization.begin(),
                                               localization.end()};
+    std::vector<double> localization2camera_tf;
+    GetLocalization2CameraTF(&localization2camera_tf);
+    *camera_update_.mutable_localization2camera_tf() = {
+        localization2camera_tf.begin(), localization2camera_tf.end()};
+    // Concurrently modify protobuf msg can cause ByteSizeConsistencyError
+    // when serializing, so we need lock.
+    camera_update_.SerializeToString(camera_update);
   }
-  std::vector<double> localization2camera_tf;
-  GetLocalization2CameraTF(&localization2camera_tf);
-  *camera_update_.mutable_localization2camera_tf() = {
-      localization2camera_tf.begin(), localization2camera_tf.end()};
-  camera_update_.SerializeToString(camera_update);
 }
 
 }  // namespace dreamview
