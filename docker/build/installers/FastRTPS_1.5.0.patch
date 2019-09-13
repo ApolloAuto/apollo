@@ -1,6 +1,6 @@
-diff -Npur -X ex.file a/cmake/dev/check_configuration.cmake b/cmake/dev/check_configuration.cmake
---- a/cmake/dev/check_configuration.cmake	2019-01-30 16:06:46.345544075 +0800
-+++ b/cmake/dev/check_configuration.cmake	2019-01-30 16:12:27.917537958 +0800
+diff -purN -x .git Fast-RTPS/cmake/dev/check_configuration.cmake Fast-RTPS2/cmake/dev/check_configuration.cmake
+--- Fast-RTPS/cmake/dev/check_configuration.cmake	2019-09-13 16:22:46.674739415 -0700
++++ Fast-RTPS2/cmake/dev/check_configuration.cmake	2019-09-13 16:00:25.976449923 -0700
 @@ -14,6 +14,7 @@
  
  macro(check_stdcxx)
@@ -9,9 +9,20 @@ diff -Npur -X ex.file a/cmake/dev/check_configuration.cmake b/cmake/dev/check_co
      include(CheckCXXCompilerFlag)
      if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANG OR
          CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-diff -Npur -X ex.file a/include/fastrtps/Domain.h b/include/fastrtps/Domain.h
---- a/include/fastrtps/Domain.h	2019-01-30 16:06:46.353544075 +0800
-+++ b/include/fastrtps/Domain.h	2019-01-30 16:12:27.917537958 +0800
+diff -purN -x .git Fast-RTPS/examples/C++/DeadlineQoSExample/deadlineQoS.cxx Fast-RTPS2/examples/C++/DeadlineQoSExample/deadlineQoS.cxx
+--- Fast-RTPS/examples/C++/DeadlineQoSExample/deadlineQoS.cxx	2019-09-13 16:22:46.678739469 -0700
++++ Fast-RTPS2/examples/C++/DeadlineQoSExample/deadlineQoS.cxx	2019-09-13 16:13:19.349736851 -0700
+@@ -15,6 +15,7 @@
+ #include <chrono>
+ 
+ #include "deadlineQoS.h"
++#include <functional>
+ #include <string>
+ 
+ using namespace asio;
+diff -purN -x .git Fast-RTPS/include/fastrtps/Domain.h Fast-RTPS2/include/fastrtps/Domain.h
+--- Fast-RTPS/include/fastrtps/Domain.h	2019-09-13 16:22:46.686739573 -0700
++++ Fast-RTPS2/include/fastrtps/Domain.h	2019-09-13 16:00:25.976449923 -0700
 @@ -19,7 +19,7 @@
  
  #ifndef DOMAIN_H_
@@ -30,9 +41,9 @@ diff -Npur -X ex.file a/include/fastrtps/Domain.h b/include/fastrtps/Domain.h
  };
  
  } /* namespace  */
-diff -Npur -X ex.file a/include/fastrtps/rtps/builtin/discovery/participant/PDPSimpleListener.h b/include/fastrtps/rtps/builtin/discovery/participant/PDPSimpleListener.h
---- a/include/fastrtps/rtps/builtin/discovery/participant/PDPSimpleListener.h	2019-01-30 16:06:46.353544075 +0800
-+++ b/include/fastrtps/rtps/builtin/discovery/participant/PDPSimpleListener.h	2019-01-30 16:12:27.921537958 +0800
+diff -purN -x .git Fast-RTPS/include/fastrtps/rtps/builtin/discovery/participant/PDPSimpleListener.h Fast-RTPS2/include/fastrtps/rtps/builtin/discovery/participant/PDPSimpleListener.h
+--- Fast-RTPS/include/fastrtps/rtps/builtin/discovery/participant/PDPSimpleListener.h	2019-09-13 16:22:46.686739573 -0700
++++ Fast-RTPS2/include/fastrtps/rtps/builtin/discovery/participant/PDPSimpleListener.h	2019-09-13 16:00:25.976449923 -0700
 @@ -70,9 +70,9 @@ public:
  	 */
  	bool getKey(CacheChange_t* change);
@@ -45,9 +56,9 @@ diff -Npur -X ex.file a/include/fastrtps/rtps/builtin/discovery/participant/PDPS
  };
  
  
-diff -Npur -X ex.file a/include/fastrtps/rtps/messages/RTPS_messages.h b/include/fastrtps/rtps/messages/RTPS_messages.h
---- a/include/fastrtps/rtps/messages/RTPS_messages.h	2019-01-30 16:06:46.357544075 +0800
-+++ b/include/fastrtps/rtps/messages/RTPS_messages.h	2019-01-30 16:12:27.921537958 +0800
+diff -purN -x .git Fast-RTPS/include/fastrtps/rtps/messages/RTPS_messages.h Fast-RTPS2/include/fastrtps/rtps/messages/RTPS_messages.h
+--- Fast-RTPS/include/fastrtps/rtps/messages/RTPS_messages.h	2019-09-13 16:22:46.690739626 -0700
++++ Fast-RTPS2/include/fastrtps/rtps/messages/RTPS_messages.h	2019-09-13 16:00:25.976449923 -0700
 @@ -29,22 +29,22 @@ namespace fastrtps{
  namespace rtps{
  
@@ -86,9 +97,9 @@ diff -Npur -X ex.file a/include/fastrtps/rtps/messages/RTPS_messages.h b/include
  //!@brief Structure Header_t, RTPS Message Header Structure.
  //!@ingroup COMMON_MODULE
   struct Header_t{
-diff -Npur -X ex.file a/include/fastrtps/rtps/reader/StatefulReader.h b/include/fastrtps/rtps/reader/StatefulReader.h
---- a/include/fastrtps/rtps/reader/StatefulReader.h	2019-01-30 16:06:46.357544075 +0800
-+++ b/include/fastrtps/rtps/reader/StatefulReader.h	2019-01-30 16:12:27.921537958 +0800
+diff -purN -x .git Fast-RTPS/include/fastrtps/rtps/reader/StatefulReader.h Fast-RTPS2/include/fastrtps/rtps/reader/StatefulReader.h
+--- Fast-RTPS/include/fastrtps/rtps/reader/StatefulReader.h	2019-09-13 16:22:46.690739626 -0700
++++ Fast-RTPS2/include/fastrtps/rtps/reader/StatefulReader.h	2019-09-13 16:00:25.976449923 -0700
 @@ -165,6 +165,7 @@ class StatefulReader:public RTPSReader
           */
          inline size_t getMatchedWritersSize() const { return matched_writers.size(); }
@@ -97,9 +108,20 @@ diff -Npur -X ex.file a/include/fastrtps/rtps/reader/StatefulReader.h b/include/
          /*!
           * @brief Returns there is a clean state with all Writers.
           * It occurs when the Reader received all samples sent by Writers. In other words,
-diff -Npur -X ex.file a/include/fastrtps/utils/IPFinder.h b/include/fastrtps/utils/IPFinder.h
---- a/include/fastrtps/utils/IPFinder.h	2019-01-30 16:06:46.357544075 +0800
-+++ b/include/fastrtps/utils/IPFinder.h	2019-01-30 16:12:27.921537958 +0800
+diff -purN -x .git Fast-RTPS/include/fastrtps/rtps/writer/RTPSWriter.h Fast-RTPS2/include/fastrtps/rtps/writer/RTPSWriter.h
+--- Fast-RTPS/include/fastrtps/rtps/writer/RTPSWriter.h	2019-09-13 16:22:46.690739626 -0700
++++ Fast-RTPS2/include/fastrtps/rtps/writer/RTPSWriter.h	2019-09-13 16:06:55.612350926 -0700
+@@ -24,6 +24,7 @@
+ #include "../attributes/WriterAttributes.h"
+ #include <vector>
+ #include <memory>
++#include <functional>
+ 
+ namespace eprosima {
+ namespace fastrtps{
+diff -purN -x .git Fast-RTPS/include/fastrtps/utils/IPFinder.h Fast-RTPS2/include/fastrtps/utils/IPFinder.h
+--- Fast-RTPS/include/fastrtps/utils/IPFinder.h	2019-09-13 16:22:46.694739679 -0700
++++ Fast-RTPS2/include/fastrtps/utils/IPFinder.h	2019-09-13 16:00:25.976449923 -0700
 @@ -61,7 +61,7 @@ public:
  	IPFinder();
  	virtual ~IPFinder();
@@ -109,9 +131,9 @@ diff -Npur -X ex.file a/include/fastrtps/utils/IPFinder.h b/include/fastrtps/uti
  
  	/**
      * Get the IP4Adresses in all interfaces.
-diff -Npur -X ex.file a/src/cpp/Domain.cpp b/src/cpp/Domain.cpp
---- a/src/cpp/Domain.cpp	2019-01-30 16:06:46.357544075 +0800
-+++ b/src/cpp/Domain.cpp	2019-01-30 16:12:27.873537959 +0800
+diff -purN -x .git Fast-RTPS/src/cpp/Domain.cpp Fast-RTPS2/src/cpp/Domain.cpp
+--- Fast-RTPS/src/cpp/Domain.cpp	2019-09-13 16:22:46.694739679 -0700
++++ Fast-RTPS2/src/cpp/Domain.cpp	2019-09-13 16:00:25.976449923 -0700
 @@ -40,6 +40,7 @@ namespace fastrtps {
  
  std::vector<Domain::t_p_Participant> Domain::m_participants;
@@ -200,9 +222,9 @@ diff -Npur -X ex.file a/src/cpp/Domain.cpp b/src/cpp/Domain.cpp
      //TODO El registro debería hacerse de manera que no tengamos un objeto del usuario sino que tengamos un objeto TopicDataTYpe propio para que no
      //haya problemas si el usuario lo destruye antes de tiempo.
      for (auto it = m_participants.begin(); it != m_participants.end();++it)
-diff -Npur -X ex.file a/src/cpp/publisher/PublisherImpl.cpp b/src/cpp/publisher/PublisherImpl.cpp
---- a/src/cpp/publisher/PublisherImpl.cpp	2019-01-30 16:06:46.357544075 +0800
-+++ b/src/cpp/publisher/PublisherImpl.cpp	2019-01-30 16:12:27.877537959 +0800
+diff -purN -x .git Fast-RTPS/src/cpp/publisher/PublisherImpl.cpp Fast-RTPS2/src/cpp/publisher/PublisherImpl.cpp
+--- Fast-RTPS/src/cpp/publisher/PublisherImpl.cpp	2019-09-13 16:22:46.694739679 -0700
++++ Fast-RTPS2/src/cpp/publisher/PublisherImpl.cpp	2019-09-13 16:00:25.980450139 -0700
 @@ -117,6 +117,7 @@ bool PublisherImpl::create_new_change_wi
          }
  
@@ -211,9 +233,9 @@ diff -Npur -X ex.file a/src/cpp/publisher/PublisherImpl.cpp b/src/cpp/publisher/
          if(high_mark_for_frag_ == 0)
          {
              uint32_t max_data_size = mp_writer->getMaxDataSize();
-diff -Npur -X ex.file a/src/cpp/rtps/builtin/BuiltinProtocols.cpp b/src/cpp/rtps/builtin/BuiltinProtocols.cpp
---- a/src/cpp/rtps/builtin/BuiltinProtocols.cpp	2019-01-30 16:06:46.361544074 +0800
-+++ b/src/cpp/rtps/builtin/BuiltinProtocols.cpp	2019-01-30 16:12:27.877537959 +0800
+diff -purN -x .git Fast-RTPS/src/cpp/rtps/builtin/BuiltinProtocols.cpp Fast-RTPS2/src/cpp/rtps/builtin/BuiltinProtocols.cpp
+--- Fast-RTPS/src/cpp/rtps/builtin/BuiltinProtocols.cpp	2019-09-13 16:22:46.694739679 -0700
++++ Fast-RTPS2/src/cpp/rtps/builtin/BuiltinProtocols.cpp	2019-09-13 16:00:25.980450139 -0700
 @@ -53,10 +53,12 @@ BuiltinProtocols::~BuiltinProtocols() {
      if(mp_PDP != nullptr)
          mp_PDP->announceParticipantState(true, true);
@@ -229,9 +251,9 @@ diff -Npur -X ex.file a/src/cpp/rtps/builtin/BuiltinProtocols.cpp b/src/cpp/rtps
  }
  
  
-diff -Npur -X ex.file a/src/cpp/rtps/builtin/discovery/endpoint/EDP.cpp b/src/cpp/rtps/builtin/discovery/endpoint/EDP.cpp
---- a/src/cpp/rtps/builtin/discovery/endpoint/EDP.cpp	2019-01-30 16:06:46.361544074 +0800
-+++ b/src/cpp/rtps/builtin/discovery/endpoint/EDP.cpp	2019-01-30 16:12:27.877537959 +0800
+diff -purN -x .git Fast-RTPS/src/cpp/rtps/builtin/discovery/endpoint/EDP.cpp Fast-RTPS2/src/cpp/rtps/builtin/discovery/endpoint/EDP.cpp
+--- Fast-RTPS/src/cpp/rtps/builtin/discovery/endpoint/EDP.cpp	2019-09-13 16:22:46.698739732 -0700
++++ Fast-RTPS2/src/cpp/rtps/builtin/discovery/endpoint/EDP.cpp	2019-09-13 16:00:25.980450139 -0700
 @@ -75,6 +75,7 @@ bool EDP::newLocalReaderProxyData(RTPSRe
      reader->m_acceptMessagesFromUnkownWriters = false;
      //ADD IT TO THE LIST OF READERPROXYDATA
@@ -320,9 +342,9 @@ diff -Npur -X ex.file a/src/cpp/rtps/builtin/discovery/endpoint/EDP.cpp b/src/cp
          if(mp_PDP->lookupReaderProxyData(readerGUID, &rdata, &rpdata))
          {
              std::unique_lock<std::recursive_mutex> plock(*pdata->mp_mutex);
-diff -Npur -X ex.file a/src/cpp/rtps/builtin/discovery/endpoint/EDPSimple.cpp b/src/cpp/rtps/builtin/discovery/endpoint/EDPSimple.cpp
---- a/src/cpp/rtps/builtin/discovery/endpoint/EDPSimple.cpp	2019-01-30 16:06:46.361544074 +0800
-+++ b/src/cpp/rtps/builtin/discovery/endpoint/EDPSimple.cpp	2019-01-30 16:12:27.877537959 +0800
+diff -purN -x .git Fast-RTPS/src/cpp/rtps/builtin/discovery/endpoint/EDPSimple.cpp Fast-RTPS2/src/cpp/rtps/builtin/discovery/endpoint/EDPSimple.cpp
+--- Fast-RTPS/src/cpp/rtps/builtin/discovery/endpoint/EDPSimple.cpp	2019-09-13 16:22:46.698739732 -0700
++++ Fast-RTPS2/src/cpp/rtps/builtin/discovery/endpoint/EDPSimple.cpp	2019-09-13 16:00:25.980450139 -0700
 @@ -129,6 +129,8 @@ bool EDPSimple::createSEDPEndpoints()
          watt.times.nackResponseDelay.fraction = 0;
          watt.times.initialHeartbeatDelay.seconds = 0;
@@ -377,9 +399,9 @@ diff -Npur -X ex.file a/src/cpp/rtps/builtin/discovery/endpoint/EDPSimple.cpp b/
          ratt.endpoint.durabilityKind = TRANSIENT_LOCAL;
          ratt.endpoint.reliabilityKind = RELIABLE;
          pdata->m_builtinReaders.push_back(ratt);
-diff -Npur -X ex.file a/src/cpp/rtps/builtin/discovery/endpoint/EDPSimpleListeners.cpp b/src/cpp/rtps/builtin/discovery/endpoint/EDPSimpleListeners.cpp
---- a/src/cpp/rtps/builtin/discovery/endpoint/EDPSimpleListeners.cpp	2019-01-30 16:06:46.361544074 +0800
-+++ b/src/cpp/rtps/builtin/discovery/endpoint/EDPSimpleListeners.cpp	2019-01-30 16:12:27.877537959 +0800
+diff -purN -x .git Fast-RTPS/src/cpp/rtps/builtin/discovery/endpoint/EDPSimpleListeners.cpp Fast-RTPS2/src/cpp/rtps/builtin/discovery/endpoint/EDPSimpleListeners.cpp
+--- Fast-RTPS/src/cpp/rtps/builtin/discovery/endpoint/EDPSimpleListeners.cpp	2019-09-13 16:22:46.698739732 -0700
++++ Fast-RTPS2/src/cpp/rtps/builtin/discovery/endpoint/EDPSimpleListeners.cpp	2019-09-13 16:00:25.980450139 -0700
 @@ -72,6 +72,7 @@ void EDPSimplePUBListener::onNewCacheCha
              //LOOK IF IS AN UPDATED INFORMATION
              WriterProxyData* wdata = nullptr;
@@ -396,9 +418,9 @@ diff -Npur -X ex.file a/src/cpp/rtps/builtin/discovery/endpoint/EDPSimpleListene
              if(this->mp_SEDP->mp_PDP->addReaderProxyData(&readerProxyData,true,&rdata,&pdata)) //ADDED NEW DATA
              {
                  pdata->mp_mutex->lock();
-diff -Npur -X ex.file a/src/cpp/rtps/builtin/discovery/participant/PDPSimple.cpp b/src/cpp/rtps/builtin/discovery/participant/PDPSimple.cpp
---- a/src/cpp/rtps/builtin/discovery/participant/PDPSimple.cpp	2019-01-30 16:06:46.361544074 +0800
-+++ b/src/cpp/rtps/builtin/discovery/participant/PDPSimple.cpp	2019-01-30 16:12:27.877537959 +0800
+diff -purN -x .git Fast-RTPS/src/cpp/rtps/builtin/discovery/participant/PDPSimple.cpp Fast-RTPS2/src/cpp/rtps/builtin/discovery/participant/PDPSimple.cpp
+--- Fast-RTPS/src/cpp/rtps/builtin/discovery/participant/PDPSimple.cpp	2019-09-13 16:22:46.698739732 -0700
++++ Fast-RTPS2/src/cpp/rtps/builtin/discovery/participant/PDPSimple.cpp	2019-09-13 16:00:25.980450139 -0700
 @@ -221,7 +221,8 @@ void PDPSimple::announceParticipantState
  {
      logInfo(RTPS_PDP,"Announcing RTPSParticipant State (new change: "<< new_change <<")");
@@ -456,9 +478,9 @@ diff -Npur -X ex.file a/src/cpp/rtps/builtin/discovery/participant/PDPSimple.cpp
          guardW.unlock();
          guardR.unlock();
  
-diff -Npur -X ex.file a/src/cpp/rtps/builtin/discovery/participant/PDPSimpleListener.cpp b/src/cpp/rtps/builtin/discovery/participant/PDPSimpleListener.cpp
---- a/src/cpp/rtps/builtin/discovery/participant/PDPSimpleListener.cpp	2019-01-30 16:06:46.361544074 +0800
-+++ b/src/cpp/rtps/builtin/discovery/participant/PDPSimpleListener.cpp	2019-01-30 16:12:27.877537959 +0800
+diff -purN -x .git Fast-RTPS/src/cpp/rtps/builtin/discovery/participant/PDPSimpleListener.cpp Fast-RTPS2/src/cpp/rtps/builtin/discovery/participant/PDPSimpleListener.cpp
+--- Fast-RTPS/src/cpp/rtps/builtin/discovery/participant/PDPSimpleListener.cpp	2019-09-13 16:22:46.698739732 -0700
++++ Fast-RTPS2/src/cpp/rtps/builtin/discovery/participant/PDPSimpleListener.cpp	2019-09-13 16:00:25.980450139 -0700
 @@ -45,10 +45,12 @@ namespace rtps {
  
  
@@ -566,9 +588,9 @@ diff -Npur -X ex.file a/src/cpp/rtps/builtin/discovery/participant/PDPSimpleList
  	aux_msg.buffer = pl->data;
  	aux_msg.length = pl->length;
  	aux_msg.max_size = pl->max_size;
-diff -Npur -X ex.file a/src/cpp/rtps/builtin/discovery/participant/timedevent/RemoteParticipantLeaseDuration.cpp b/src/cpp/rtps/builtin/discovery/participant/timedevent/RemoteParticipantLeaseDuration.cpp
---- a/src/cpp/rtps/builtin/discovery/participant/timedevent/RemoteParticipantLeaseDuration.cpp	2019-01-30 16:06:46.361544074 +0800
-+++ b/src/cpp/rtps/builtin/discovery/participant/timedevent/RemoteParticipantLeaseDuration.cpp	2019-01-30 16:12:27.877537959 +0800
+diff -purN -x .git Fast-RTPS/src/cpp/rtps/builtin/discovery/participant/timedevent/RemoteParticipantLeaseDuration.cpp Fast-RTPS2/src/cpp/rtps/builtin/discovery/participant/timedevent/RemoteParticipantLeaseDuration.cpp
+--- Fast-RTPS/src/cpp/rtps/builtin/discovery/participant/timedevent/RemoteParticipantLeaseDuration.cpp	2019-09-13 16:22:46.698739732 -0700
++++ Fast-RTPS2/src/cpp/rtps/builtin/discovery/participant/timedevent/RemoteParticipantLeaseDuration.cpp	2019-09-13 16:00:25.980450139 -0700
 @@ -73,7 +73,11 @@ void RemoteParticipantLeaseDuration::eve
          mp_participantProxyData->mp_mutex->lock();
          mp_participantProxyData->mp_leaseDurationTimer = nullptr;
@@ -582,9 +604,9 @@ diff -Npur -X ex.file a/src/cpp/rtps/builtin/discovery/participant/timedevent/Re
  
          if(mp_PDP->getRTPSParticipant()->getListener()!=nullptr)
              mp_PDP->getRTPSParticipant()->getListener()->onRTPSParticipantDiscovery(
-diff -Npur -X ex.file a/src/cpp/rtps/messages/CDRMessagePool.cpp b/src/cpp/rtps/messages/CDRMessagePool.cpp
---- a/src/cpp/rtps/messages/CDRMessagePool.cpp	2019-01-30 16:06:46.361544074 +0800
-+++ b/src/cpp/rtps/messages/CDRMessagePool.cpp	2019-01-30 16:12:27.877537959 +0800
+diff -purN -x .git Fast-RTPS/src/cpp/rtps/messages/CDRMessagePool.cpp Fast-RTPS2/src/cpp/rtps/messages/CDRMessagePool.cpp
+--- Fast-RTPS/src/cpp/rtps/messages/CDRMessagePool.cpp	2019-09-13 16:22:46.698739732 -0700
++++ Fast-RTPS2/src/cpp/rtps/messages/CDRMessagePool.cpp	2019-09-13 16:00:25.980450139 -0700
 @@ -57,12 +57,13 @@ void CDRMessagePool::allocateGroup(uint1
  
  CDRMessagePool::~CDRMessagePool()
@@ -600,9 +622,9 @@ diff -Npur -X ex.file a/src/cpp/rtps/messages/CDRMessagePool.cpp b/src/cpp/rtps/
      if(mutex_ != nullptr)
          delete mutex_;
  }
-diff -Npur -X ex.file a/src/cpp/rtps/participant/RTPSParticipantImpl.cpp b/src/cpp/rtps/participant/RTPSParticipantImpl.cpp
---- a/src/cpp/rtps/participant/RTPSParticipantImpl.cpp	2019-01-30 16:06:46.361544074 +0800
-+++ b/src/cpp/rtps/participant/RTPSParticipantImpl.cpp	2019-01-30 16:12:27.877537959 +0800
+diff -purN -x .git Fast-RTPS/src/cpp/rtps/participant/RTPSParticipantImpl.cpp Fast-RTPS2/src/cpp/rtps/participant/RTPSParticipantImpl.cpp
+--- Fast-RTPS/src/cpp/rtps/participant/RTPSParticipantImpl.cpp	2019-09-13 16:22:46.698739732 -0700
++++ Fast-RTPS2/src/cpp/rtps/participant/RTPSParticipantImpl.cpp	2019-09-13 16:00:25.980450139 -0700
 @@ -124,6 +124,7 @@ RTPSParticipantImpl::RTPSParticipantImpl
      for (const auto& transportDescriptor : PParam.userTransports)
          m_network_Factory.RegisterTransport(transportDescriptor.get());
@@ -663,9 +685,9 @@ diff -Npur -X ex.file a/src/cpp/rtps/participant/RTPSParticipantImpl.cpp b/src/c
      }
      //	std::lock_guard<std::recursive_mutex> guardEndpoint(*p_endpoint->getMutex());
      delete(p_endpoint);
-diff -Npur -X ex.file a/src/cpp/rtps/participant/RTPSParticipantImpl.h b/src/cpp/rtps/participant/RTPSParticipantImpl.h
---- a/src/cpp/rtps/participant/RTPSParticipantImpl.h	2019-01-30 16:06:46.361544074 +0800
-+++ b/src/cpp/rtps/participant/RTPSParticipantImpl.h	2019-01-30 16:12:27.877537959 +0800
+diff -purN -x .git Fast-RTPS/src/cpp/rtps/participant/RTPSParticipantImpl.h Fast-RTPS2/src/cpp/rtps/participant/RTPSParticipantImpl.h
+--- Fast-RTPS/src/cpp/rtps/participant/RTPSParticipantImpl.h	2019-09-13 16:22:46.698739732 -0700
++++ Fast-RTPS2/src/cpp/rtps/participant/RTPSParticipantImpl.h	2019-09-13 16:00:25.984450356 -0700
 @@ -261,6 +261,7 @@ class RTPSParticipantImpl
  #endif
  
@@ -674,9 +696,9 @@ diff -Npur -X ex.file a/src/cpp/rtps/participant/RTPSParticipantImpl.h b/src/cpp
          std::list<ReceiverControlBlock> m_receiverResourcelist;
          //!SenderResource List
          std::mutex m_send_resources_mutex;
-diff -Npur -X ex.file a/src/cpp/rtps/reader/FragmentedChangePitStop.cpp b/src/cpp/rtps/reader/FragmentedChangePitStop.cpp
---- a/src/cpp/rtps/reader/FragmentedChangePitStop.cpp	2019-01-30 16:06:25.529544448 +0800
-+++ b/src/cpp/rtps/reader/FragmentedChangePitStop.cpp	2019-01-30 16:12:27.877537959 +0800
+diff -purN -x .git Fast-RTPS/src/cpp/rtps/reader/FragmentedChangePitStop.cpp Fast-RTPS2/src/cpp/rtps/reader/FragmentedChangePitStop.cpp
+--- Fast-RTPS/src/cpp/rtps/reader/FragmentedChangePitStop.cpp	2019-09-13 16:22:46.698739732 -0700
++++ Fast-RTPS2/src/cpp/rtps/reader/FragmentedChangePitStop.cpp	2019-09-13 16:00:25.984450356 -0700
 @@ -18,7 +18,7 @@
  
  using namespace eprosima::fastrtps::rtps;
@@ -711,9 +733,9 @@ diff -Npur -X ex.file a/src/cpp/rtps/reader/FragmentedChangePitStop.cpp b/src/cp
          }
  
          // If it is completed, return CacheChange_t and remove information.
-diff -Npur -X ex.file a/src/cpp/rtps/reader/FragmentedChangePitStop.h b/src/cpp/rtps/reader/FragmentedChangePitStop.h
---- a/src/cpp/rtps/reader/FragmentedChangePitStop.h	2019-01-30 16:06:46.361544074 +0800
-+++ b/src/cpp/rtps/reader/FragmentedChangePitStop.h	2019-01-30 16:12:27.877537959 +0800
+diff -purN -x .git Fast-RTPS/src/cpp/rtps/reader/FragmentedChangePitStop.h Fast-RTPS2/src/cpp/rtps/reader/FragmentedChangePitStop.h
+--- Fast-RTPS/src/cpp/rtps/reader/FragmentedChangePitStop.h	2019-09-13 16:22:46.698739732 -0700
++++ Fast-RTPS2/src/cpp/rtps/reader/FragmentedChangePitStop.h	2019-09-13 16:00:25.984450356 -0700
 @@ -105,7 +105,7 @@ namespace eprosima
                   * @return If a CacheChange_t is completed with new incomming fragments, this will be returned.
                   * In other case nullptr is returned.
@@ -732,9 +754,9 @@ diff -Npur -X ex.file a/src/cpp/rtps/reader/FragmentedChangePitStop.h b/src/cpp/
                  RTPSReader* parent_;
  
                  FragmentedChangePitStop(const FragmentedChangePitStop&) NON_COPYABLE_CXX11;
-diff -Npur -X ex.file a/src/cpp/rtps/reader/StatefulReader.cpp b/src/cpp/rtps/reader/StatefulReader.cpp
---- a/src/cpp/rtps/reader/StatefulReader.cpp	2019-01-30 16:06:46.365544074 +0800
-+++ b/src/cpp/rtps/reader/StatefulReader.cpp	2019-01-30 16:12:27.877537959 +0800
+diff -purN -x .git Fast-RTPS/src/cpp/rtps/reader/StatefulReader.cpp Fast-RTPS2/src/cpp/rtps/reader/StatefulReader.cpp
+--- Fast-RTPS/src/cpp/rtps/reader/StatefulReader.cpp	2019-09-13 16:22:46.698739732 -0700
++++ Fast-RTPS2/src/cpp/rtps/reader/StatefulReader.cpp	2019-09-13 16:00:25.984450356 -0700
 @@ -29,6 +29,8 @@
  #include "FragmentedChangePitStop.h"
  #include <fastrtps/utils/TimeConversion.h>
@@ -820,9 +842,9 @@ diff -Npur -X ex.file a/src/cpp/rtps/reader/StatefulReader.cpp b/src/cpp/rtps/re
 +   }
 +
 +}
-diff -Npur -X ex.file a/src/cpp/rtps/reader/StatelessReader.cpp b/src/cpp/rtps/reader/StatelessReader.cpp
---- a/src/cpp/rtps/reader/StatelessReader.cpp	2019-01-30 16:06:46.365544074 +0800
-+++ b/src/cpp/rtps/reader/StatelessReader.cpp	2019-01-30 16:12:27.877537959 +0800
+diff -purN -x .git Fast-RTPS/src/cpp/rtps/reader/StatelessReader.cpp Fast-RTPS2/src/cpp/rtps/reader/StatelessReader.cpp
+--- Fast-RTPS/src/cpp/rtps/reader/StatelessReader.cpp	2019-09-13 16:22:46.702739785 -0700
++++ Fast-RTPS2/src/cpp/rtps/reader/StatelessReader.cpp	2019-09-13 16:00:25.984450356 -0700
 @@ -209,7 +209,9 @@ bool StatelessReader::processDataMsg(Cac
  
              if(getGuid().entityId == c_EntityId_SPDPReader)
@@ -854,9 +876,9 @@ diff -Npur -X ex.file a/src/cpp/rtps/reader/StatelessReader.cpp b/src/cpp/rtps/r
                      }
  
                      // Release CacheChange_t.
-diff -Npur -X ex.file a/src/cpp/rtps/reader/timedevent/HeartbeatResponseDelay.cpp b/src/cpp/rtps/reader/timedevent/HeartbeatResponseDelay.cpp
---- a/src/cpp/rtps/reader/timedevent/HeartbeatResponseDelay.cpp	2019-01-30 16:06:46.365544074 +0800
-+++ b/src/cpp/rtps/reader/timedevent/HeartbeatResponseDelay.cpp	2019-01-30 16:12:27.877537959 +0800
+diff -purN -x .git Fast-RTPS/src/cpp/rtps/reader/timedevent/HeartbeatResponseDelay.cpp Fast-RTPS2/src/cpp/rtps/reader/timedevent/HeartbeatResponseDelay.cpp
+--- Fast-RTPS/src/cpp/rtps/reader/timedevent/HeartbeatResponseDelay.cpp	2019-09-13 16:22:46.702739785 -0700
++++ Fast-RTPS2/src/cpp/rtps/reader/timedevent/HeartbeatResponseDelay.cpp	2019-09-13 16:00:25.984450356 -0700
 @@ -133,9 +133,9 @@ void HeartbeatResponseDelay::event(Event
                  // Fill the FragmentNumberSet_t bitmap.
                  for(; fit != cit->getDataFragments()->end(); ++fit)
@@ -869,9 +891,9 @@ diff -Npur -X ex.file a/src/cpp/rtps/reader/timedevent/HeartbeatResponseDelay.cp
                      ++frag_num;
                  }
  
-diff -Npur -X ex.file a/src/cpp/rtps/writer/ReaderProxy.cpp b/src/cpp/rtps/writer/ReaderProxy.cpp
---- a/src/cpp/rtps/writer/ReaderProxy.cpp	2019-01-30 16:06:46.365544074 +0800
-+++ b/src/cpp/rtps/writer/ReaderProxy.cpp	2019-01-30 16:12:27.877537959 +0800
+diff -purN -x .git Fast-RTPS/src/cpp/rtps/writer/ReaderProxy.cpp Fast-RTPS2/src/cpp/rtps/writer/ReaderProxy.cpp
+--- Fast-RTPS/src/cpp/rtps/writer/ReaderProxy.cpp	2019-09-13 16:22:46.702739785 -0700
++++ Fast-RTPS2/src/cpp/rtps/writer/ReaderProxy.cpp	2019-09-13 16:00:25.984450356 -0700
 @@ -198,6 +198,13 @@ void ReaderProxy::set_change_to_status(c
      auto it = m_changesForReader.find(ChangeForReader_t(seq_num));
      bool mustWakeUpAsyncThread = false;
@@ -906,9 +928,9 @@ diff -Npur -X ex.file a/src/cpp/rtps/writer/ReaderProxy.cpp b/src/cpp/rtps/write
  }
  
  bool ReaderProxy::thereIsUnacknowledged() const
-diff -Npur -X ex.file a/src/cpp/rtps/writer/StatefulWriter.cpp b/src/cpp/rtps/writer/StatefulWriter.cpp
---- a/src/cpp/rtps/writer/StatefulWriter.cpp	2019-01-30 16:06:46.365544074 +0800
-+++ b/src/cpp/rtps/writer/StatefulWriter.cpp	2019-01-30 16:12:27.877537959 +0800
+diff -purN -x .git Fast-RTPS/src/cpp/rtps/writer/StatefulWriter.cpp Fast-RTPS2/src/cpp/rtps/writer/StatefulWriter.cpp
+--- Fast-RTPS/src/cpp/rtps/writer/StatefulWriter.cpp	2019-09-13 16:22:46.702739785 -0700
++++ Fast-RTPS2/src/cpp/rtps/writer/StatefulWriter.cpp	2019-09-13 16:00:25.984450356 -0700
 @@ -54,7 +54,8 @@ StatefulWriter::StatefulWriter(RTPSParti
      mp_periodicHB(nullptr), m_times(att.times),
      all_acked_mutex_(nullptr), all_acked_(false), all_acked_cond_(nullptr),
@@ -957,9 +979,9 @@ diff -Npur -X ex.file a/src/cpp/rtps/writer/StatefulWriter.cpp b/src/cpp/rtps/wr
          }
  
          allRemoteReaders.push_back((*it)->m_att.guid);
-diff -Npur -X ex.file a/src/cpp/transport/UDPv4Transport.cpp b/src/cpp/transport/UDPv4Transport.cpp
---- a/src/cpp/transport/UDPv4Transport.cpp	2019-01-30 16:06:46.365544074 +0800
-+++ b/src/cpp/transport/UDPv4Transport.cpp	2019-01-30 16:12:27.873537959 +0800
+diff -purN -x .git Fast-RTPS/src/cpp/transport/UDPv4Transport.cpp Fast-RTPS2/src/cpp/transport/UDPv4Transport.cpp
+--- Fast-RTPS/src/cpp/transport/UDPv4Transport.cpp	2019-09-13 16:22:46.706739838 -0700
++++ Fast-RTPS2/src/cpp/transport/UDPv4Transport.cpp	2019-09-13 16:00:25.984450356 -0700
 @@ -30,7 +30,7 @@ static const uint32_t maximumMessageSize
  static const uint32_t minimumSocketBuffer = 65536;
  static const uint8_t defaultTTL = 1;
@@ -1017,9 +1039,9 @@ diff -Npur -X ex.file a/src/cpp/transport/UDPv4Transport.cpp b/src/cpp/transport
      if(mReceiveBufferSize != 0)
          socket.set_option(socket_base::receive_buffer_size(mReceiveBufferSize));
      if(is_multicast)
-diff -Npur -X ex.file a/thirdparty/fastcdr/include/fastcdr/Cdr.h b/thirdparty/fastcdr/include/fastcdr/Cdr.h
---- a/thirdparty/fastcdr/include/fastcdr/Cdr.h	2019-01-30 16:07:33.657543227 +0800
-+++ b/thirdparty/fastcdr/include/fastcdr/Cdr.h	2019-01-30 16:12:27.881537959 +0800
+diff -purN -x .git Fast-RTPS/thirdparty/fastcdr/include/fastcdr/Cdr.h Fast-RTPS2/thirdparty/fastcdr/include/fastcdr/Cdr.h
+--- Fast-RTPS/thirdparty/fastcdr/include/fastcdr/Cdr.h	2019-09-13 16:22:57.614883515 -0700
++++ Fast-RTPS2/thirdparty/fastcdr/include/fastcdr/Cdr.h	2019-09-13 16:00:25.988450572 -0700
 @@ -726,6 +726,7 @@ namespace eprosima
                   * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                   */
@@ -1054,9 +1076,9 @@ diff -Npur -X ex.file a/thirdparty/fastcdr/include/fastcdr/Cdr.h b/thirdparty/fa
  
  #if HAVE_CXX0X
                  /*!
-diff -Npur -X ex.file a/thirdparty/fastcdr/src/cpp/Cdr.cpp b/thirdparty/fastcdr/src/cpp/Cdr.cpp
---- a/thirdparty/fastcdr/src/cpp/Cdr.cpp	2019-01-30 16:07:33.657543227 +0800
-+++ b/thirdparty/fastcdr/src/cpp/Cdr.cpp	2019-01-30 16:12:27.877537959 +0800
+diff -purN -x .git Fast-RTPS/thirdparty/fastcdr/src/cpp/Cdr.cpp Fast-RTPS2/thirdparty/fastcdr/src/cpp/Cdr.cpp
+--- Fast-RTPS/thirdparty/fastcdr/src/cpp/Cdr.cpp	2019-09-13 16:22:57.614883515 -0700
++++ Fast-RTPS2/thirdparty/fastcdr/src/cpp/Cdr.cpp	2019-09-13 16:00:25.988450572 -0700
 @@ -570,6 +570,38 @@ Cdr& Cdr::serialize(const char *string_t
      return *this;
  }
