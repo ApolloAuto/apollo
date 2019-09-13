@@ -9,6 +9,7 @@ RUN apt update -y && \
     apt install -y \
     build-essential \
     gcc-8 \
+    g++-8 \
     cmake \
     curl \
     git \
@@ -46,20 +47,11 @@ RUN apt update -y && \
     net-tools \
     software-properties-common
 
-RUN add-apt-repository ppa:ubuntu-toolchain-r/test 
-RUN apt update 
-RUN apt install -y g++-8
-
-#install gcc 8.3
-RUN rm -f /usr/bin/gcc
-RUN ln -s /usr/bin/gcc-8 /etc/alternatives/gcc
-RUN ln -s /etc/alternatives/gcc /usr/bin/gcc
-RUN rm -f /usr/bin/g++
-RUN ln -s /usr/bin/g++-8 /etc/alternatives/g++
-RUN ln -s /etc/alternatives/g++ /usr/bin/g++
 
 # Run installer
 COPY installers /tmp/installers
+# config gcc 8.x (8.3 by Sep 2019)
+RUN bash /tmp/installers/config_gcc.sh
 RUN bash /tmp/installers/install_bazel.sh
 RUN bash /tmp/installers/install_gflags_glog.sh
 RUN bash /tmp/installers/install_protobuf.sh
