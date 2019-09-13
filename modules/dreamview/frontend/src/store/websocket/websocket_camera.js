@@ -35,6 +35,9 @@ export default class CameraDataWebSocketEndpoint {
                         RENDERER.updateCameraData(message);
                     }
                     break;
+                default:
+                    console.warn('Camera WebSocket received unknown message:', message);
+                    break;
             }
         };
         this.websocket.onclose = event => {
