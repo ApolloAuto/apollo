@@ -766,6 +766,30 @@
                   "id": 5
                 }
               }
+            },
+            "CameraUpdate": {
+              "fields": {
+                "localization": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "localization2cameraTf": {
+                  "rule": "repeated",
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "packed": false
+                  }
+                },
+                "image": {
+                  "type": "bytes",
+                  "id": 3
+                }
+              }
             }
           }
         },
@@ -6473,7 +6497,7 @@
                     "TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN": 8,
                     "YIELD_SIGN": 9,
                     "PULL_OVER": 10,
-                    "PULL_OVER_EMREGENCY": 11,
+                    "PULL_OVER_EMERGENCY": 11,
                     "VALET_PARKING": 12,
                     "NARROW_STREET_U_TURN": 13,
                     "PARK_AND_GO": 14
@@ -6500,7 +6524,7 @@
                     "PULL_OVER_APPROACH": 500,
                     "PULL_OVER_RETRY_APPROACH_PARKING": 501,
                     "PULL_OVER_RETRY_PARKING": 502,
-                    "PULL_OVER_EMREGENCY_APPROACH": 510,
+                    "PULL_OVER_EMERGENCY_APPROACH": 510,
                     "VALET_PARKING_APPROACHING_PARKING_SPOT": 520,
                     "VALET_PARKING_PARKING": 521,
                     "PARK_AND_GO_CHECK": 600,

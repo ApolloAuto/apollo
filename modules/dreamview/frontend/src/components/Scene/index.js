@@ -23,16 +23,19 @@ export default class Scene extends React.Component {
         const {invisible, options} = this.props;
 
         return (
-            <div id = "canvas"
-                 className={classNames({
-                            "dreamview-canvas" : true,
-                             "hidden" : invisible})}
-                 onMouseMove={(event) => {
-                    const geo = RENDERER.getGeolocation(event);
-                    STORE.setGeolocation(geo);
-                 }}>
-                {options.showGeo && <Geolocation />}
-            </div>
+            <React.Fragment>
+                <div id = "canvas"
+                    className={classNames({
+                                "dreamview-canvas" : true,
+                                "hidden" : invisible})}
+                    onMouseMove={(event) => {
+                        const geo = RENDERER.getGeolocation(event);
+                        STORE.setGeolocation(geo);
+                    }}>
+                    {options.showGeo && <Geolocation />}
+                </div>
+                { options.cameraAngle === 'CameraView' && <img id="camera-image" /> }
+            </React.Fragment>
         );
     }
 }

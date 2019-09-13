@@ -13,6 +13,7 @@ export default class Ground {
         this.geometry = null;
         this.initialized = false;
         this.inNaviMode = null;
+        this.isCameraView = false;
 
         loadTexture(gridGround, texture => {
             this.geometry = new THREE.PlaneGeometry(1, 1);
@@ -40,6 +41,7 @@ export default class Ground {
             console.log("using grid as ground image...");
             this.mesh.material.map = texture;
             this.mesh.type = "grid";
+            this.mesh.visible = true;
             this.render(coordinates);
         });
     }
@@ -48,6 +50,12 @@ export default class Ground {
         if (this.initialized !== true) {
             return;
         }
+
+        // Remove ground image when camera view is on
+        const isCameraView = STORE.options.cameraAngle === 'CameraView';
+        const cameraAngleChanged = (isCameraView !== this.isCameraView);
+        this.isCameraView = isCameraView;
+
         const modeChanged = this.inNaviMode !== STORE.hmi.inNavigationMode;
         this.inNaviMode = STORE.hmi.inNavigationMode;
         if (this.inNaviMode) {
@@ -63,8 +71,13 @@ export default class Ground {
             const adc = world.autoDrivingCar;
             const position = coordinates.applyOffset({x: adc.positionX, y: adc.positionY});
             this.mesh.position.set(position.x, position.y, 0);
-        } else if (this.loadedMap !== this.updateMap || modeChanged) {
-            // Only reload reflection map upon map/mode change.
+        } else if (this.loadedMap !== this.updateMap || modeChanged || cameraAngleChanged) {
+            if (isCameraView) {
+                scene.background = null;
+                this.mesh.visible = false;
+                return;
+            }
+            // Only reload reflection map upon map/mode/camera(cameraView->non-CameraView) change.
             const dir = this.titleCaseToSnakeCase(this.updateMap);
             const host = window.location;
             const port = PARAMETERS.server.port;
@@ -74,11 +87,13 @@ export default class Ground {
                 console.log("updating ground image with " + dir);
                 this.mesh.material.map = texture;
                 this.mesh.type = "reflection";
+                this.mesh.visible = true;
                 this.render(coordinates, dir);
             }, err => {
                 this.loadGrid(coordinates);
             });
             this.loadedMap = this.updateMap;
+            scene.background = new THREE.Color(0x000C17);
         }
     }
 

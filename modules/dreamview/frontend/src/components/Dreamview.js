@@ -13,7 +13,7 @@ import AudioCapture from "components/AudioCapture";
 import { CameraVideo } from "components/Tasks/SensorCamera";
 
 import HOTKEYS_CONFIG from "store/config/hotkeys.yml";
-import WS, { MAP_WS, POINT_CLOUD_WS } from "store/websocket";
+import WS, { MAP_WS, POINT_CLOUD_WS, CAMERA_WS } from "store/websocket";
 
 
 @inject("store") @observer
@@ -59,6 +59,7 @@ export default class Dreamview extends React.Component {
         WS.initialize();
         MAP_WS.initialize();
         POINT_CLOUD_WS.initialize();
+        CAMERA_WS.initialize();
         window.addEventListener("resize", this.updateDimension, false);
         window.addEventListener("keypress", this.handleKeyPress, false);
     }

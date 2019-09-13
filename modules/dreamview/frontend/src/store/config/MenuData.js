@@ -7,7 +7,8 @@ export default [
             1: 'Default',
             2: 'Near',
             3: 'Overhead',
-            4: 'Map'
+            4: 'Map',
+            5: 'CameraView',
         },
         supportInOfflineView: true,
     },

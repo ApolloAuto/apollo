@@ -26,10 +26,11 @@ class Renderer {
 
         this.coordinates = new Coordinates();
         this.renderer = new THREE.WebGLRenderer({
-            antialias: useAntialias
+            antialias: useAntialias,
+            // Transparent background
+            alpha: true,
         });
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x000C17);
 
         // The dimension of the scene
         this.dimension = {
@@ -92,6 +93,10 @@ class Renderer {
 
         // Geolocation of the mouse
         this.geolocation = { x: 0, y: 0 };
+
+        this.localizationToCameraMatrix = new THREE.Matrix4();
+        this.localizationMatrix = new THREE.Matrix4();
+        this.imageSrcData = '';
     }
 
     initialize(canvasId, width, height, options) {
@@ -105,7 +110,7 @@ class Renderer {
             PARAMETERS.camera.laneWidthToViewDistanceRatio);
         this.camera = new THREE.PerspectiveCamera(
             PARAMETERS.camera[this.options.cameraAngle].fov,
-            window.innerWidth / window.innerHeight,
+            width / height,
             PARAMETERS.camera[this.options.cameraAngle].near,
             PARAMETERS.camera[this.options.cameraAngle].far
         );
@@ -152,6 +157,11 @@ class Renderer {
     }
 
     updateDimension(width, height) {
+        if (width < 600) {
+            // Min width of main view is 600, so we need not update
+            // camera/renderer dimension anymore
+            return;
+        }
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(width, height);
@@ -264,7 +274,33 @@ class Renderer {
                 this.enableOrbitControls(true);
             }
             break;
+        case "CameraView": {
+            const cameraMatrixInWorld = new THREE.Matrix4();
+            cameraMatrixInWorld.multiplyMatrices(
+                this.localizationMatrix, this.localizationToCameraMatrix);
+
+            const position = new THREE.Vector3();
+            const quaternion = new THREE.Quaternion();
+            const scale = new THREE.Vector3();
+            cameraMatrixInWorld.decompose(position, quaternion, scale);
+            const euler = new THREE.Euler().setFromQuaternion(quaternion);
+
+            this.camera.position.set(position.x, position.y, position.z);
+            // Threejs camera is default facing towards to Z-axis negative direction,
+            // but the actual camera is looking at Z-axis positive direction. So we need
+            // to adjust the camera rotation considering the default camera orientation.
+            this.camera.rotation.set(euler.x + Math.PI, -euler.y, -euler.z);
+
+            this.controls.enabled = false;
+
+            const image = document.getElementById('camera-image');
+            if (image && this.imageSrcData) {
+                image.src = this.imageSrcData;
+            }
+            break;
         }
+        }
+
         this.camera.updateProjectionMatrix();
     }
 
@@ -493,6 +529,25 @@ class Renderer {
         const intersects = raycaster.intersectObjects(objects);
         const names = intersects.map(intersect => intersect.object.name);
         return names;
+    }
+
+    updateCameraData(data) {
+        if (data.image && data.image.length > 0) {
+            this.imageSrcData ='data:image/jpeg;base64,' +
+                new Buffer(data.image).toString('base64');
+        }
+        if (data.localization && this.coordinates.isInitialized()) {
+            // The translation parameters x/y/z is located at 12/13/14 respectively
+            const translation = this.coordinates.applyOffset({
+                x: data.localization[12], y: data.localization[13]});
+            data.localization[12] = translation.x;
+            data.localization[13] = translation.y;
+            data.localization[14] = 0;
+            this.localizationMatrix.fromArray(data.localization);
+        }
+        if (data.localization2cameraTf) {
+            this.localizationToCameraMatrix.fromArray(data.localization2cameraTf);
+        }
     }
 }
 
