@@ -8,8 +8,6 @@ RUN apt clean
 RUN apt update -y && \
     apt install -y \
     build-essential \
-    gcc-8 \
-    g++-8 \
     cmake \
     curl \
     git \
@@ -45,13 +43,12 @@ RUN apt update -y && \
     libopenni2-0 \
     libopenni2-dev \
     net-tools \
+    flex \
     software-properties-common
-
 
 # Run installer
 COPY installers /tmp/installers
-# config gcc 8.x (8.3 by Sep 2019)
-RUN bash /tmp/installers/config_gcc.sh
+RUN bash /tmp/installers/install_gcc.sh
 RUN bash /tmp/installers/install_bazel.sh
 RUN bash /tmp/installers/install_gflags_glog.sh
 RUN bash /tmp/installers/install_protobuf.sh
