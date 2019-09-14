@@ -63,7 +63,7 @@ class Component : public ComponentBase {
   /**
    * @brief init the component by protobuf object.
    *
-   * @param config which is define in 'cyber/proto/component_conf.proto'
+   * @param config which is defined in 'cyber/proto/component_conf.proto'
    *
    * @return returns true if successful, otherwise returns false
    */
