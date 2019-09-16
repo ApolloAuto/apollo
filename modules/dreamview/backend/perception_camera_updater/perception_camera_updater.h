@@ -39,7 +39,7 @@ class PerceptionCameraUpdater {
  public:
   /**
    * @class PerceptionCameraUpdater
-   * 
+   *
    * @brief A module that collects camera image and localization (by collecting
    * localization & static transforms) to adjust camera as its real position/
    * rotation in front-end camera view for projecting HDmap to camera image
