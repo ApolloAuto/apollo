@@ -91,10 +91,11 @@ std::string Time::ToString() const {
   if (ret == nullptr) {
     return std::to_string(static_cast<double>(nanoseconds_) / 1000000000.0);
   }
+
   std::stringstream ss;
 #if __GNUC__ >= 5
   ss << std::put_time(ret, "%F %T");
-  ss << std::setw(9) << std::setfill('0') << "." << nanoseconds_ % 1000000000UL;
+  ss << "." << std::setw(9) << std::setfill('0') << nanoseconds_ % 1000000000UL;
 #else
   char date_time[128];
   strftime(date_time, sizeof(date_time), "%F %T", ret);
