@@ -102,6 +102,7 @@ void LogFileObject::SetBasename(const char* basename) {
     if (file_ != nullptr) {
       fclose(file_);
       file_ = nullptr;
+      file_length_ = 0;
       rollover_attempt_ = kRolloverAttemptFrequency - 1;
     }
     base_filename_ = basename;
@@ -115,6 +116,7 @@ void LogFileObject::SetExtension(const char* ext) {
     if (file_ != nullptr) {
       fclose(file_);
       file_ = nullptr;
+      file_length_ = 0;
       rollover_attempt_ = kRolloverAttemptFrequency - 1;
     }
     filename_extension_ = ext;
@@ -181,7 +183,7 @@ bool LogFileObject::CreateLogfile(const std::string& time_pid_string) {
     const char* linkdest = slash ? (slash + 1) : filename;
     // silently ignore failures
     if (symlink(linkdest, linkpath.c_str())) {
-      AERROR << "symlink failed.";
+      AINFO << "symlink failed.";
     }
   }
   return true;

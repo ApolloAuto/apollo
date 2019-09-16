@@ -39,6 +39,7 @@ Logger::~Logger() {
        ++itr) {
     delete itr->second;
   }
+  moduleLoggerMap.clear();
 }
 
 void Logger::Write(bool force_flush, time_t timestamp, const char* message,
