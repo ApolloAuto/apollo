@@ -179,7 +179,7 @@ bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
 }
 
 bool SchedulerChoreography::RemoveTask(const std::string& name) {
-  if (unlikely(stop_)) {
+  if (cyber_unlikely(stop_)) {
     return true;
   }
 
@@ -227,7 +227,7 @@ bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
 }
 
 bool SchedulerChoreography::NotifyProcessor(uint64_t crid) {
-  if (unlikely(stop_)) {
+  if (cyber_unlikely(stop_)) {
     return true;
   }
 

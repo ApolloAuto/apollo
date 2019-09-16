@@ -194,7 +194,7 @@ bool Component<M0, NullType, NullType, NullType>::Initialize(
 
   std::shared_ptr<Reader<M0>> reader = nullptr;
 
-  if (likely(is_reality_mode)) {
+  if (cyber_likely(is_reality_mode)) {
     reader = node_->CreateReader<M0>(reader_cfg);
   } else {
     reader = node_->CreateReader<M0>(reader_cfg, func);
@@ -206,7 +206,7 @@ bool Component<M0, NullType, NullType, NullType>::Initialize(
   }
   readers_.emplace_back(std::move(reader));
 
-  if (unlikely(!is_reality_mode)) {
+  if (cyber_unlikely(!is_reality_mode)) {
     return true;
   }
 
@@ -258,7 +258,7 @@ bool Component<M0, M1, NullType, NullType>::Initialize(
   reader_cfg.pending_queue_size = config.readers(0).pending_queue_size();
 
   std::shared_ptr<Reader<M0>> reader0 = nullptr;
-  if (likely(is_reality_mode)) {
+  if (cyber_likely(is_reality_mode)) {
     reader0 = node_->template CreateReader<M0>(reader_cfg);
   } else {
     std::weak_ptr<Component<M0, M1>> self =
@@ -288,7 +288,7 @@ bool Component<M0, M1, NullType, NullType>::Initialize(
   readers_.push_back(std::move(reader0));
   readers_.push_back(std::move(reader1));
 
-  if (unlikely(!is_reality_mode)) {
+  if (cyber_unlikely(!is_reality_mode)) {
     return true;
   }
 
@@ -360,7 +360,7 @@ bool Component<M0, M1, M2, NullType>::Initialize(
   reader_cfg.qos_profile.CopyFrom(config.readers(0).qos_profile());
   reader_cfg.pending_queue_size = config.readers(0).pending_queue_size();
   std::shared_ptr<Reader<M0>> reader0 = nullptr;
-  if (likely(is_reality_mode)) {
+  if (cyber_likely(is_reality_mode)) {
     reader0 = node_->template CreateReader<M0>(reader_cfg);
   } else {
     std::weak_ptr<Component<M0, M1, M2, NullType>> self =
@@ -396,7 +396,7 @@ bool Component<M0, M1, M2, NullType>::Initialize(
   readers_.push_back(std::move(reader1));
   readers_.push_back(std::move(reader2));
 
-  if (unlikely(!is_reality_mode)) {
+  if (cyber_unlikely(!is_reality_mode)) {
     return true;
   }
 
@@ -477,7 +477,7 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
   reader_cfg.pending_queue_size = config.readers(0).pending_queue_size();
 
   std::shared_ptr<Reader<M0>> reader0 = nullptr;
-  if (likely(is_reality_mode)) {
+  if (cyber_likely(is_reality_mode)) {
     reader0 = node_->template CreateReader<M0>(reader_cfg);
   } else {
     std::weak_ptr<Component<M0, M1, M2, M3>> self =
@@ -520,7 +520,7 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
   readers_.push_back(std::move(reader2));
   readers_.push_back(std::move(reader3));
 
-  if (unlikely(!is_reality_mode)) {
+  if (cyber_unlikely(!is_reality_mode)) {
     return true;
   }
 

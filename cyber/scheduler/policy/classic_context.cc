@@ -52,7 +52,7 @@ void ClassicContext::InitGroup(const std::string& group_name) {
 }
 
 std::shared_ptr<CRoutine> ClassicContext::NextRoutine() {
-  if (unlikely(stop_.load())) {
+  if (cyber_unlikely(stop_.load())) {
     return nullptr;
   }
 

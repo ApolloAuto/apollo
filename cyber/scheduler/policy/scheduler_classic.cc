@@ -160,7 +160,7 @@ bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
 }
 
 bool SchedulerClassic::NotifyProcessor(uint64_t crid) {
-  if (unlikely(stop_)) {
+  if (cyber_unlikely(stop_)) {
     return true;
   }
 
@@ -181,7 +181,7 @@ bool SchedulerClassic::NotifyProcessor(uint64_t crid) {
 }
 
 bool SchedulerClassic::RemoveTask(const std::string& name) {
-  if (unlikely(stop_)) {
+  if (cyber_unlikely(stop_)) {
     return true;
   }
 
