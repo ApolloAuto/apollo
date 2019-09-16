@@ -24,6 +24,7 @@
 #include <memory>
 #include <new>
 #include <utility>
+#include <functional>
 
 #include "cyber/base/for_each.h"
 #include "cyber/base/macros.h"

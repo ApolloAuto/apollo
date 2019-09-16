@@ -13,6 +13,8 @@ RUN apt update -y && \
     git \
     unzip \
     vim \
+    gcc-8 \
+    g++-8 \
     wget \
     bc \
     gdb \
@@ -48,8 +50,9 @@ RUN apt update -y && \
 
 # Run installer
 COPY installers /tmp/installers
-RUN bash /tmp/installers/install_gcc.sh
+RUN bash /tmp/installers/config_gcc.sh
 RUN bash /tmp/installers/install_bazel.sh
+RUN bash /tmp/installers/install_bazel_packages.sh
 RUN bash /tmp/installers/install_gflags_glog.sh
 RUN bash /tmp/installers/install_protobuf.sh
 RUN bash /tmp/installers/install_bazel_packages.sh
@@ -68,6 +71,8 @@ RUN echo "deb http://security.ubuntu.com/ubuntu bionic-security main restricted"
 RUN echo "deb http://security.ubuntu.com/ubuntu bionic-security multiverse" >> /etc/apt/sources.list
 
 #add Trusty universe into apt source for Poco foundation 9
+RUN echo "deb http://dk.archive.ubuntu.com/ubuntu/ xenial main" >> /etc/apt/sources.list
+RUN echo "deb http://dk.archive.ubuntu.com/ubuntu/ xenial universe" >> /etc/apt/sources.list
 RUN echo "deb http://dk.archive.ubuntu.com/ubuntu/ trusty main" >> /etc/apt/sources.list
 RUN echo "deb http://dk.archive.ubuntu.com/ubuntu/ trusty universe" >> /etc/apt/sources.list
 RUN apt update -y
@@ -88,7 +93,7 @@ RUN apt install -y --allow-downgrades \
     libvtk6-dev \
     libvtk6.3 \
     vtk6 \
-    libpocofoundation9
+    libpocofoundation9v5
 RUN rm -f /usr/lib/libPocoFoundation.so
 RUN ln -s /usr/lib/libPocoFoundation.so.9 /usr/lib/libPocoFoundation.so
 RUN ln -s /usr/lib/x86_64-linux-gnu/libboost_filesystem.so.1.54.0 /usr/lib/x86_64-linux-gnu/libboost_filesystem.so

@@ -78,7 +78,7 @@
 #include <stdint.h>
 #include "rtklib.h"
 
-static const char rcsid[] = "$Id:$";
+//static const char rcsid[] = "$Id:$";
 
 #define P2_66 1.355252715606881E-20 /* 2^-66 for BeiDou ephemeris */
 
