@@ -62,15 +62,18 @@ class TimingWheel {
 
   void TickFunc();
 
+  inline uint64_t TickCount() const { return tick_count_; }
+
  private:
-  uint64_t GetWorkWheelIndex(const uint64_t index) {
+  inline uint64_t GetWorkWheelIndex(const uint64_t index) {
     return index & (WORK_WHEEL_SIZE - 1);
   }
-  uint64_t GetAssistantWheelIndex(const uint64_t index) {
+  inline uint64_t GetAssistantWheelIndex(const uint64_t index) {
     return index & (ASSISTANT_WHEEL_SIZE - 1);
   }
 
   bool running_ = false;
+  uint64_t tick_count_ = 0;
   std::mutex running_mutex_;
   TimerBucket work_wheel_[WORK_WHEEL_SIZE];
   TimerBucket assistant_wheel_[ASSISTANT_WHEEL_SIZE];
