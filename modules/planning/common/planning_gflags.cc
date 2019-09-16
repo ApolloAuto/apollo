@@ -343,6 +343,9 @@ DEFINE_double(perception_confidence_threshold, 0.4,
 DEFINE_double(lane_change_prepare_length, 40.0,
               "The distance of lane-change preparation on current lane.");
 
+DEFINE_bool(enable_smarter_lane_change, false,
+            "enable smarter lane change with longer preparation distance.");
+
 // QpSt optimizer
 DEFINE_double(slowdown_profile_deceleration, -4.0,
               "The deceleration to generate slowdown profile. unit: m/s^2.");

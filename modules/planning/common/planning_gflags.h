@@ -158,6 +158,7 @@ DECLARE_int32(trajectory_point_num_for_debug);
 DECLARE_double(lag_prediction_protection_distance);
 DECLARE_double(perception_confidence_threshold);
 DECLARE_double(lane_change_prepare_length);
+DECLARE_bool(enable_smarter_lane_change);
 
 DECLARE_double(turn_signal_distance);
 
