@@ -7,7 +7,7 @@
 	
  - [导航设备配置](#导航设备配置)
  
- - [检查定位信号](#检查定位信号)
+ - [系统文件配置](#系统文件配置)
 
 ## 概览
 
@@ -72,6 +72,58 @@ log com3 gprmc ontime 1 0.25
 
 将所有配置逐条或一起发送给设备，得到设备返回`$cmd,config,ok*ff`字段，说明配置成功，配置成功后要进行配置保存，发送`$cmd,save,config*ff`指令，然后将该设备断电后重新上电加载后即可使用。
 
-## 检查定位信号
+## 系统文件配置
 
-进入Apollo系统，打开gps模块和localization模块，查看localization的pose消息，若有数据刷新，则表明定位模块配置成功。
+系统文件配置主要包括三个部分，GNSS配置、关闭点云定位和定位模式配置。
+
+### GNSS配置
+
+修改`/apollo/modules/drivers/gnss/conf`文件夹下面的配置文件`gnss_conf.pb.txt`，将`gnss_conf_newton.pb.txt`的内容全部拷贝覆盖`gnss_conf.pb.txt`的内容即可。修改如下内容配置基站信息：
+```
+rtk_from {
+    format: RTCM_V3
+    ntrip {
+        address: "IP"
+        port: 8000
+        mount_point: "MOUNTPOINT"
+        user: "USERNAME"
+        password: "PASSWORD"
+        timeout_s: 5
+    }
+    push_location: true
+}
+
+```
+这是RTK基站信息相关的配置，请依据自己的实际情况进行配置。在程序运行的过程中，有可能会把`modules/calibration/data/vehicle_name/gnss_params/gnss_conf.pb.txt`拷贝到`modules/drivers/gnss/conf/gnss_conf.pb.txt`，那么我们也需要修改`modules/calibration/data/vehicle_name/gnss_params/gnss_conf.pb.txt`里面的基站配置信息才能保证`gnss`配置正确。
+
+### 检查GPS信号
+
+将车辆移至室外平坦开阔处，进入Apollo系统，在终端中执行gps.sh脚本打开gps模块。输入命令`rostopic echo /apollo/sensor/gnss/best_pose`，查看sol_type字段是否为NARROW_INT。若为NARROW_INT，则表示GPS信号良好；若不为NARROW_INT，则将车辆移动一下，直到出现NARROW_INT为止。输入命令`rostopic echo /apollo/sensor/gnss/imu`，确认IMU有数据刷新即表明GPS模块配置成功。
+
+### 关闭点云定位
+
+在`apollo/modules/localization/conf/localization.conf`文件中将：`--enable_lidar_localization=true`修改为：`--enable_lidar_localization=false`。
+
+### 定位模式配置
+
+在`apollo/modules/localization/conf/localization_config.pb.txt`文件中这个配置应为`localization_type:MSF`，M2不支持`RTK`模式。
+
+### 常见问题
+系统无法生成驱动设备`ttyACM0`，在`/apollo/data/log/gnss.ERROR`里面会有类似报错提示：
+
+```
+open device /dev/ttyACM0 failed， error: no such file or directory
+gnss driver connect failed, stream init failed
+```
+
+docker内和docker外的/dev/下都没有`ttyACM0`设备，先退出docker，然后关闭docker，再执行如下命令：
+```
+cd /apollo/docker/setup_host
+bash setup_host.sh
+```
+重启工控机，然后在/docker/外，/dev/下，就有`ttyACM0`，再进docker，再试gps，可以了。
+
+
+### 检查定位信号
+
+将车辆移至室外平坦开阔处，进入Apollo系统，在终端中执行gps.sh和localization.sh脚本打开gps模块和localization模块。确认GPS模块已成功启动并且GPS信号良好。输入命令`rostopic echo /apollo/localization/pose`,等待两分钟，直到有数据刷新即表明定位模块配置成功。
