@@ -1143,10 +1143,14 @@ void PathBoundsDecider::GetBoundaryFromLaneChangeForbiddenZone(
         adc_frenet_l_ > curr_lane_left_width
             ? curr_lane_left_width + GetBufferBetweenADCCenterAndEdge()
             : std::get<1>((*path_bound)[i]);
+    std::get<1>((*path_bound)[i]) = std::fmin(
+        std::get<1>((*path_bound)[i]), adc_frenet_l_ - 0.1);
     std::get<2>((*path_bound)[i]) =
         adc_frenet_l_ < -curr_lane_right_width
             ? -curr_lane_right_width - GetBufferBetweenADCCenterAndEdge()
             : std::get<2>((*path_bound)[i]);
+    std::get<2>((*path_bound)[i]) = std::fmax(
+        std::get<2>((*path_bound)[i]), adc_frenet_l_ + 0.1);
   }
 }
 
