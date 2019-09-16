@@ -85,7 +85,7 @@
 */
 #include "rtklib.h"
 
-static const char rcsid[] = "$Id:$";
+//static const char rcsid[] = "$Id:$";
 
 /* function prototypes -------------------------------------------------------*/
 extern int decode_rtcm2(rtcm_t* rtcm);
