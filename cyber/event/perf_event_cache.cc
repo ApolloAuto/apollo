@@ -72,7 +72,7 @@ PerfEventCache::~PerfEventCache() {
 void PerfEventCache::AddSchedEvent(const SchedPerf event_id,
                                    const uint64_t cr_id, const int proc_id,
                                    const int cr_state) {
-  if (likely(!enable_sched_perf_)) {
+  if (cyber_likely(!enable_sched_perf_)) {
     return;
   }
 
@@ -89,7 +89,7 @@ void PerfEventCache::AddSchedEvent(const SchedPerf event_id,
 void PerfEventCache::AddTransportEvent(const TransPerf event_id,
                                        const uint64_t channel_id,
                                        const uint64_t msg_seq) {
-  if (likely(!enable_trans_perf_)) {
+  if (cyber_likely(!enable_trans_perf_)) {
     return;
   }
 

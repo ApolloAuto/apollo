@@ -42,7 +42,7 @@ bool Scheduler::CreateTask(const RoutineFactory& factory,
 bool Scheduler::CreateTask(std::function<void()>&& func,
                            const std::string& name,
                            std::shared_ptr<DataVisitorBase> visitor) {
-  if (unlikely(stop_.load())) {
+  if (cyber_unlikely(stop_.load())) {
     ADEBUG << "scheduler is stoped, cannot create task!";
     return false;
   }
@@ -60,7 +60,7 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
 
   if (visitor != nullptr) {
     visitor->RegisterNotifyCallback([this, task_id, name]() {
-      if (unlikely(stop_.load())) {
+      if (cyber_unlikely(stop_.load())) {
         return;
       }
       this->NotifyProcessor(task_id);
@@ -70,7 +70,7 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
 }
 
 bool Scheduler::NotifyTask(uint64_t crid) {
-  if (unlikely(stop_.load())) {
+  if (cyber_unlikely(stop_.load())) {
     return true;
   }
   return NotifyProcessor(crid);
@@ -151,7 +151,7 @@ void Scheduler::SetInnerThreadAttr(const std::string& name, std::thread* thr) {
 }
 
 void Scheduler::Shutdown() {
-  if (unlikely(stop_.exchange(true))) {
+  if (cyber_unlikely(stop_.exchange(true))) {
     return;
   }
 

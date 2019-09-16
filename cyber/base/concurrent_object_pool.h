@@ -95,7 +95,7 @@ bool CCObjectPool<T>::FindFreeHead(Head *head) {
   Head new_head;
   Head old_head = free_head_.load(std::memory_order_acquire);
   do {
-    if (unlikely(old_head.node == nullptr)) {
+    if (cyber_unlikely(old_head.node == nullptr)) {
       return false;
     }
     new_head.node = old_head.node->next;
@@ -110,7 +110,7 @@ bool CCObjectPool<T>::FindFreeHead(Head *head) {
 template <typename T>
 std::shared_ptr<T> CCObjectPool<T>::GetObject() {
   Head free_head;
-  if (unlikely(!FindFreeHead(&free_head))) {
+  if (cyber_unlikely(!FindFreeHead(&free_head))) {
     return nullptr;
   }
   auto self = this->shared_from_this();
@@ -122,7 +122,7 @@ template <typename T>
 template <typename... Args>
 std::shared_ptr<T> CCObjectPool<T>::ConstructObject(Args &&... args) {
   Head free_head;
-  if (unlikely(!FindFreeHead(&free_head))) {
+  if (cyber_unlikely(!FindFreeHead(&free_head))) {
     return nullptr;
   }
   auto self = this->shared_from_this();

@@ -69,12 +69,12 @@ CRoutine::CRoutine(const std::function<void()> &func) : func_(func) {
 CRoutine::~CRoutine() { context_ = nullptr; }
 
 RoutineState CRoutine::Resume() {
-  if (unlikely(force_stop_)) {
+  if (cyber_unlikely(force_stop_)) {
     state_ = RoutineState::FINISHED;
     return state_;
   }
 
-  if (unlikely(state_ != RoutineState::READY)) {
+  if (cyber_unlikely(state_ != RoutineState::READY)) {
     AERROR << "Invalid Routine State!";
     return state_;
   }
