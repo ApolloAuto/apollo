@@ -18,19 +18,19 @@
 
 #include <Eigen/Dense>
 
-#include <memory>
 #include <deque>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "cyber/cyber.h"
+#include "modules/dreamview/backend/handlers/websocket_handler.h"
+#include "modules/dreamview/proto/camera_update.pb.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/localization/proto/pose.pb.h"
 #include "modules/transform/buffer.h"
 #include "modules/transform/proto/transform.pb.h"
-#include "modules/dreamview/backend/handlers/websocket_handler.h"
-#include "modules/dreamview/proto/camera_update.pb.h"
 
 namespace apollo {
 namespace dreamview {
@@ -68,10 +68,10 @@ class PerceptionCameraUpdater {
    */
   void GetImageLocalization(std::vector<double> *localization);
 
-  apollo::transform::Buffer *tf_buffer_ =
-      apollo::transform::Buffer::Instance();
+  apollo::transform::Buffer *tf_buffer_ = apollo::transform::Buffer::Instance();
   bool QueryStaticTF(const std::string &frame_id,
-      const std::string &child_frame_id, Eigen::Matrix4d *matrix);
+                     const std::string &child_frame_id,
+                     Eigen::Matrix4d *matrix);
   void GetLocalization2CameraTF(std::vector<double> *localization2camera_tf);
 
   WebSocketHandler *websocket_;

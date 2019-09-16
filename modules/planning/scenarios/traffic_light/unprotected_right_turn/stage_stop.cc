@@ -68,10 +68,9 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
   for (const auto& traffic_light_overlap_id :
        GetContext()->current_traffic_light_overlap_ids) {
     // get overlap along reference line
-    current_traffic_light_overlap =
-        scenario::util::GetOverlapOnReferenceLine(reference_line_info,
-                                                  traffic_light_overlap_id,
-                                                  ReferenceLineInfo::SIGNAL);
+    current_traffic_light_overlap = scenario::util::GetOverlapOnReferenceLine(
+        reference_line_info, traffic_light_overlap_id,
+        ReferenceLineInfo::SIGNAL);
     if (!current_traffic_light_overlap) {
       continue;
     }
@@ -113,8 +112,8 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
       // check distance pass stop line
       const double distance_adc_pass_stop_line =
           adc_front_edge_s - current_traffic_light_overlap->end_s;
-      ADEBUG << "distance_adc_pass_stop_line["
-             << distance_adc_pass_stop_line << "]";
+      ADEBUG << "distance_adc_pass_stop_line[" << distance_adc_pass_stop_line
+             << "]";
       if (distance_adc_pass_stop_line >
           scenario_config_.min_pass_s_distance()) {
         return FinishStage(false);

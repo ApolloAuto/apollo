@@ -256,8 +256,8 @@ class PathBoundsDecider : public Decider {
    *  @return If path is good, true; if path is blocked, false.
    */
   bool UpdatePathBoundary(
-    size_t idx, double left_bound, double right_bound,
-    std::vector<std::tuple<double, double, double>>* const path_boundaries);
+      size_t idx, double left_bound, double right_bound,
+      std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
   /** @brief Trim the path bounds starting at the idx where path is blocked.
    */

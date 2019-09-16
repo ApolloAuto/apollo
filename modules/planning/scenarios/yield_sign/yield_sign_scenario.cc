@@ -69,8 +69,8 @@ void YieldSignScenario::Init() {
   }
 
   context_.current_yield_sign_overlap_ids.clear();
-  for (int i = 0;
-       i < yield_sign_status.current_yield_sign_overlap_id_size(); i++) {
+  for (int i = 0; i < yield_sign_status.current_yield_sign_overlap_id_size();
+       i++) {
     const std::string yield_sign_overlap_id =
         yield_sign_status.current_yield_sign_overlap_id(i);
     hdmap::YieldSignInfoConstPtr yield_sign =
@@ -80,8 +80,7 @@ void YieldSignScenario::Init() {
       AERROR << "Could not find yield sign: " << yield_sign_overlap_id;
     }
 
-    context_.current_yield_sign_overlap_ids.push_back(
-        yield_sign_overlap_id);
+    context_.current_yield_sign_overlap_ids.push_back(yield_sign_overlap_id);
   }
 
   init_ = true;
