@@ -132,12 +132,13 @@ void Timer::Start() {
   if (!started_.exchange(true)) {
     if (InitTimerTask()) {
       timing_wheel_->AddTask(task_);
+      AINFO << "start timer [" << task_->timer_id_ << "]";
     }
   }
 }
 
 void Timer::Stop() {
-  if (started_.exchange(false)) {
+  if (started_.exchange(false) && task_) {
     AINFO << "stop timer, the timer_id: " << timer_id_;
     std::lock_guard<std::mutex> lg(task_->mtx_);
     task_.reset();

@@ -76,7 +76,7 @@ TEST(TimerTest, start_stop) {
   }
 }
 
-TEST(TimerTest, test1) {
+TEST(TimerTest, sim_mode) {
   auto count = 0;
 
   auto func = [count]() { AINFO << count; };
