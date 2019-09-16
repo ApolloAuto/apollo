@@ -231,7 +231,7 @@ bool PathReuseDecider::IsSameObstacles(
                                        history_obstacle)))
       return false;
   }
-  // TODO(SHU) add colision check
+  // TODO(SHU) add collision check
   return true;
 }
 
