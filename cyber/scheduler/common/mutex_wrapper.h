@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_SCHEDULER_MUTEX_WRAPPER_H_
-#define CYBER_SCHEDULER_MUTEX_WRAPPER_H_
+#ifndef CYBER_SCHEDULER_COMMON_MUTEX_WRAPPER_H_
+#define CYBER_SCHEDULER_COMMON_MUTEX_WRAPPER_H_
 
 #include <mutex>
 
@@ -35,4 +35,5 @@ class MutexWrapper {
 }  // namespace scheduler
 }  // namespace cyber
 }  // namespace apollo
-#endif  // CYBER_SCHEDULER_MUTEX_WRAPPER_H_
+
+#endif  // CYBER_SCHEDULER_COMMON_MUTEX_WRAPPER_H_
