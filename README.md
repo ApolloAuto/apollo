@@ -37,7 +37,7 @@ Apollo 5.0 is loaded with new modules and features but needs to be calibrated an
 
 1. Upgrade host to ubuntu_16.04 and above (Ubuntu 18.04 is preferred)
 2. Update local host NVIDIA driver >=410.48. [Website link](https://www.nvidia.com/Download/index.aspx?lang=en-us)
-3. Install NVIDIA-docker 2.0 - you can refer to [this link](https://github.com/nvidia/nvidia-docker/wiki/Installation-(version-2.0)) for steps on installation, or use the install scripts we provide [here](https://github.com/ApolloAuto/apollo/blob/master/docker/setup_host/install_nvidia_docker2.sh)  
+3. Install NVIDIA-docker 2.0 - you can refer to [this link](https://github.com/nvidia/nvidia-docker/wiki/Installation-(version-2.0)) for steps on installation, or use the install scripts we provide [here](https://github.com/ApolloAuto/apollo/blob/master/docker/setup_host/install_nvidia_docker.sh)  
 
 For those developers that would like to continue working with Ubuntu 14.04, please use the [Ubuntu 14.04 branch](https://github.com/ApolloAuto/apollo/tree/ubuntu_14.04) instead of the master branch.
 
