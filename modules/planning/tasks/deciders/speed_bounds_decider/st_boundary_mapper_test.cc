@@ -62,7 +62,7 @@ class StBoundaryMapperTest : public ::testing::Test {
       ff_points.push_back(std::move(ff_point));
     }
     frenet_frame_path_ = FrenetFramePath(std::move(ff_points));
-    path_data_.SetFrenetPath(frenet_frame_path_);
+    path_data_.SetFrenetPath(std::move(frenet_frame_path_));
   }
 
  protected:

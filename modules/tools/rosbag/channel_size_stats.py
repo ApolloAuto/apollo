@@ -42,7 +42,7 @@ class ChannelSizeStats(object):
         '/apollo/control',
         '/apollo/perception/obstacles',
         '/apollo/perception/traffic_light',
-        '/apollo/planning',
+#        '/apollo/planning',
         '/apollo/prediction',
         '/apollo/routing_request',
         '/apollo/routing_response',
@@ -63,9 +63,9 @@ class ChannelSizeStats(object):
                     channel_size_stats[channelname]['num'] += 1
                 else:
                     channel_size_stats[channelname] = {}
-                    channel_size_stats[channelname]['total'] = 0.0
-                    channel_size_stats[channelname]['num'] = 0.0
-            if channelname == "/apollo/planning":
+                    channel_size_stats[channelname]['total'] = len(msg)
+                    channel_size_stats[channelname]['num'] = 1.0
+            elif channelname == "/apollo/planning":
                 adc_trajectory = planning_pb2.ADCTrajectory()
                 adc_trajectory.ParseFromString(msg)
                 name = "planning_no_debug"
@@ -76,8 +76,8 @@ class ChannelSizeStats(object):
                     channel_size_stats[name]['num'] += 1
                 else:
                     channel_size_stats[name] = {}
-                    channel_size_stats[name]['total'] = 0.0
-                    channel_size_stats[name]['num'] = 0.0
+                    channel_size_stats[name]['total'] = len(planning_str)
+                    channel_size_stats[name]['num'] = 1.0
 
 
         for channelname in channel_size_stats.keys():

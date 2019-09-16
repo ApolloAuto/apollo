@@ -16,6 +16,8 @@
 
 #include "modules/canbus/vehicle/lexus/protocol/brake_cmd_104.h"
 
+#include <algorithm>
+
 #include "modules/drivers/canbus/common/byte.h"
 
 namespace apollo {

@@ -159,6 +159,26 @@ class PathBoundsDecider : public Decider {
       const ReferenceLineInfo& reference_line_info,
       std::vector<std::tuple<double, double, double>>* const path_bound);
 
+  /** @brief Refine the boundary based on the lane-info.
+   *  The returned boundary is with respect to the lane-center (NOT the
+   *  reference_line), though for most of the times reference_line's
+   *  deviation from lane-center is negligible.
+   */
+  bool GetBoundaryFromLanes(
+      const ReferenceLineInfo& reference_line_info,
+      const LaneBorrowInfo& lane_borrow_info,
+      std::vector<std::tuple<double, double, double>>* const path_bound,
+      std::string* const borrow_lane_type);
+
+  /** @brief Refine the boundary based on the ADC position and velocity.
+   *  The returned boundary is with respect to the lane-center (NOT the
+   *  reference_line), though for most of the times reference_line's
+   *  deviation from lane-center is negligible.
+   */
+  bool GetBoundaryFromADC(
+      const ReferenceLineInfo& reference_line_info, double ADC_extra_buffer,
+      std::vector<std::tuple<double, double, double>>* const path_bound);
+
   /** @brief Refine the boundary based on lane-info and ADC's location.
    *   It will comply to the lane-boundary. However, if the ADC itself
    *   is out of the given lane(s), it will adjust the boundary
@@ -214,18 +234,30 @@ class PathBoundsDecider : public Decider {
   double GetBufferBetweenADCCenterAndEdge();
 
   /** @brief Update the path_boundary at "idx", as well as the new center-line.
-   *        It also checks if ADC is blocked (lmax < lmin).
-   * @param The current index of the path_bounds
-   * @param The minimum left boundary (l_max)
-   * @param The maximum right boundary (l_min)
-   * @param The path_boundaries (its content at idx will be updated)
-   * @param The center_line (to be updated)
-   * @return If path is good, true; if path is blocked, false.
+   *         It also checks if ADC is blocked (lmax < lmin).
+   *  @param The current index of the path_bounds
+   *  @param The minimum left boundary (l_max)
+   *  @param The maximum right boundary (l_min)
+   *  @param The path_boundaries (its content at idx will be updated)
+   *  @param The center_line (to be updated)
+   *  @return If path is good, true; if path is blocked, false.
    */
   bool UpdatePathBoundaryAndCenterLine(
       size_t idx, double left_bound, double right_bound,
       std::vector<std::tuple<double, double, double>>* const path_boundaries,
       double* const center_line);
+
+  /** @brief Update the path_boundary at "idx", It also checks if
+             ADC is blocked (lmax < lmin).
+   *  @param The current index of the path_bounds
+   *  @param The minimum left boundary (l_max)
+   *  @param The maximum right boundary (l_min)
+   *  @param The path_boundaries (its content at idx will be updated)
+   *  @return If path is good, true; if path is blocked, false.
+   */
+  bool UpdatePathBoundary(
+    size_t idx, double left_bound, double right_bound,
+    std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
   /** @brief Trim the path bounds starting at the idx where path is blocked.
    */

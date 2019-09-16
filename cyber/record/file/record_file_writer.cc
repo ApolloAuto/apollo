@@ -91,6 +91,7 @@ void RecordFileWriter::Close() {
     if (close(fd_) < 0) {
       AERROR << "Close file failed, file: " << path_ << ", fd: " << fd_
              << ", errno: " << errno;
+      return;
     }
   }
 }

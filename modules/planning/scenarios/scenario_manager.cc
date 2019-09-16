@@ -309,6 +309,63 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverEmergencyScenario(
   return default_scenario_type_;
 }
 
+ScenarioConfig::ScenarioType
+ScenarioManager::SelectInterceptionScenario(const Frame& frame) {
+  ScenarioConfig::ScenarioType scenario_type = default_scenario_type_;
+
+  hdmap::PathOverlap* traffic_sign_overlap = nullptr;
+  hdmap::PathOverlap* pnc_junction_overlap = nullptr;
+  ReferenceLineInfo::OverlapType overlap_type;
+
+  const auto& reference_line_info = frame.reference_line_info().front();
+  const auto& first_encountered_overlaps =
+      reference_line_info.FirstEncounteredOverlaps();
+  // note: first_encountered_overlaps already sorted
+  for (const auto& overlap : first_encountered_overlaps) {
+    if (overlap.first == ReferenceLineInfo::SIGNAL ||
+        overlap.first == ReferenceLineInfo::STOP_SIGN ||
+        overlap.first == ReferenceLineInfo::YIELD_SIGN) {
+      overlap_type = overlap.first;
+      traffic_sign_overlap = const_cast<hdmap::PathOverlap*>(&overlap.second);
+      break;
+    } else if (overlap.first == ReferenceLineInfo::PNC_JUNCTION) {
+      pnc_junction_overlap = const_cast<hdmap::PathOverlap*>(&overlap.second);
+    }
+  }
+
+  if (traffic_sign_overlap) {
+    switch (overlap_type) {
+      case ReferenceLineInfo::STOP_SIGN:
+        if (FLAGS_enable_scenario_stop_sign) {
+          scenario_type =
+              SelectStopSignScenario(frame, *traffic_sign_overlap);
+        }
+        break;
+      case ReferenceLineInfo::SIGNAL:
+        if (FLAGS_enable_scenario_traffic_light) {
+          scenario_type =
+              SelectTrafficLightScenario(frame, *traffic_sign_overlap);
+        }
+        break;
+      case ReferenceLineInfo::YIELD_SIGN:
+        if (FLAGS_enable_scenario_yield_sign) {
+          scenario_type =
+              SelectYieldSignScenario(frame, *traffic_sign_overlap);
+        }
+        break;
+      default:
+        break;
+    }
+  } else if (pnc_junction_overlap) {
+    // bare intersection
+    if (FLAGS_enable_scenario_bare_intersection) {
+      scenario_type =
+          SelectBareIntersectionScenario(frame, *pnc_junction_overlap);
+    }
+  }
+
+  return scenario_type;
+}
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
     const Frame& frame, const hdmap::PathOverlap& stop_sign_overlap) {
@@ -688,56 +745,7 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
   ////////////////////////////////////////
   // intersection scenarios
   if (scenario_type == default_scenario_type_) {
-    hdmap::PathOverlap* traffic_sign_overlap = nullptr;
-    hdmap::PathOverlap* pnc_junction_overlap = nullptr;
-    ReferenceLineInfo::OverlapType overlap_type;
-
-    const auto& reference_line_info = frame.reference_line_info().front();
-    const auto& first_encountered_overlaps =
-        reference_line_info.FirstEncounteredOverlaps();
-    // note: first_encountered_overlaps already sorted
-    for (const auto& overlap : first_encountered_overlaps) {
-      if (overlap.first == ReferenceLineInfo::SIGNAL ||
-          overlap.first == ReferenceLineInfo::STOP_SIGN ||
-          overlap.first == ReferenceLineInfo::YIELD_SIGN) {
-        overlap_type = overlap.first;
-        traffic_sign_overlap = const_cast<hdmap::PathOverlap*>(&overlap.second);
-        break;
-      } else if (overlap.first == ReferenceLineInfo::PNC_JUNCTION) {
-        pnc_junction_overlap = const_cast<hdmap::PathOverlap*>(&overlap.second);
-      }
-    }
-
-    if (traffic_sign_overlap) {
-      switch (overlap_type) {
-        case ReferenceLineInfo::STOP_SIGN:
-          if (FLAGS_enable_scenario_stop_sign) {
-            scenario_type =
-                SelectStopSignScenario(frame, *traffic_sign_overlap);
-          }
-          break;
-        case ReferenceLineInfo::SIGNAL:
-          if (FLAGS_enable_scenario_traffic_light) {
-            scenario_type =
-                SelectTrafficLightScenario(frame, *traffic_sign_overlap);
-          }
-          break;
-        case ReferenceLineInfo::YIELD_SIGN:
-          if (FLAGS_enable_scenario_yield_sign) {
-            scenario_type =
-                SelectYieldSignScenario(frame, *traffic_sign_overlap);
-          }
-          break;
-        default:
-          break;
-      }
-    } else if (pnc_junction_overlap) {
-      // bare intersection
-      if (FLAGS_enable_scenario_bare_intersection) {
-        scenario_type =
-            SelectBareIntersectionScenario(frame, *pnc_junction_overlap);
-      }
-    }
+    scenario_type = SelectInterceptionScenario(frame);
   }
 
   ////////////////////////////////////////
@@ -770,6 +778,7 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
     current_scenario_ = CreateScenario(scenario_type);
   }
 }
+
 
 bool ScenarioManager::IsBareIntersectionScenario(
     const ScenarioConfig::ScenarioType& scenario_type) {
