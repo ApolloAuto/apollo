@@ -132,10 +132,9 @@ Status PathBoundsDecider::Process(
     }
   }
 
-  // TODO(jiacheng): uncomment this part later after debugging.
-  /*
   // If it's a lane-change reference-line, generate lane-change path boundary.
-  if (reference_line_info->IsChangeLanePath()) {
+  if (FLAGS_enable_smarter_lane_change &&
+      reference_line_info->IsChangeLanePath()) {
     PathBound lanechange_path_bound;
     Status ret = GenerateLaneChangePathBound(
         *reference_line_info, &lanechange_path_bound);
@@ -148,10 +147,8 @@ Status PathBoundsDecider::Process(
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
-    if (!lanechange_path_bound.empty()) {
-      CHECK_LE(adc_frenet_l_, std::get<2>(lanechange_path_bound[0]));
-      CHECK_GE(adc_frenet_l_, std::get<1>(lanechange_path_bound[0]));
-    }
+    CHECK_LE(adc_frenet_l_, std::get<2>(lanechange_path_bound[0]));
+    CHECK_GE(adc_frenet_l_, std::get<1>(lanechange_path_bound[0]));
     // Update the fallback path boundary into the reference_line_info.
     std::vector<std::pair<double, double>> lanechange_path_bound_pair;
     for (size_t i = 0; i < lanechange_path_bound.size(); ++i) {
@@ -169,7 +166,6 @@ Status PathBoundsDecider::Process(
     ADEBUG << "Completed lanechange and fallback path boundaries generation.";
     return Status::OK();
   }
-  */
 
   // Generate regular path boundaries.
   std::vector<LaneBorrowInfo> lane_borrow_info_list;
