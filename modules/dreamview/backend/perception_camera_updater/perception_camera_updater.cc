@@ -26,47 +26,46 @@
 namespace apollo {
 namespace dreamview {
 
+using apollo::common::Quaternion;
 using apollo::drivers::CompressedImage;
 using apollo::localization::LocalizationEstimate;
 using apollo::localization::Pose;
 using apollo::transform::TransformStamped;
-using apollo::common::Quaternion;
 
 namespace {
-  void ConvertMatrixToArray(
-      const Eigen::Matrix4d &matrix, std::vector<double> *array) {
-    const double* pointer = matrix.data();
-    for (int i = 0; i < matrix.size(); ++i) {
-      array->push_back(pointer[i]);
-    }
+void ConvertMatrixToArray(const Eigen::Matrix4d &matrix,
+                          std::vector<double> *array) {
+  const double *pointer = matrix.data();
+  for (int i = 0; i < matrix.size(); ++i) {
+    array->push_back(pointer[i]);
   }
+}
 
-  template <typename Point>
-  void ConstructTransformationMatrix(const Quaternion &quaternion,
-      const Point &translation, Eigen::Matrix4d *matrix) {
-    matrix->setConstant(0);
-    Eigen::Quaterniond q;
-    q.x() = quaternion.qx();
-    q.y() = quaternion.qy();
-    q.z() = quaternion.qz();
-    q.w() = quaternion.qw();
-    matrix->block<3, 3>(0, 0) = q.normalized().toRotationMatrix();
-    (*matrix)(0, 3) = translation.x();
-    (*matrix)(1, 3) = translation.y();
-    (*matrix)(2, 3) = translation.z();
-    (*matrix)(3, 3) = 1;
-  }
+template <typename Point>
+void ConstructTransformationMatrix(const Quaternion &quaternion,
+                                   const Point &translation,
+                                   Eigen::Matrix4d *matrix) {
+  matrix->setConstant(0);
+  Eigen::Quaterniond q;
+  q.x() = quaternion.qx();
+  q.y() = quaternion.qy();
+  q.z() = quaternion.qz();
+  q.w() = quaternion.qw();
+  matrix->block<3, 3>(0, 0) = q.normalized().toRotationMatrix();
+  (*matrix)(0, 3) = translation.x();
+  (*matrix)(1, 3) = translation.y();
+  (*matrix)(2, 3) = translation.z();
+  (*matrix)(3, 3) = 1;
+}
 }  // namespace
 
-PerceptionCameraUpdater::PerceptionCameraUpdater(WebSocketHandler* websocket)
+PerceptionCameraUpdater::PerceptionCameraUpdater(WebSocketHandler *websocket)
     : websocket_(websocket),
       node_(cyber::CreateNode("perception_camera_updater")) {
   InitReaders();
 }
 
-void PerceptionCameraUpdater::Start() {
-  enabled_ = true;
-}
+void PerceptionCameraUpdater::Start() { enabled_ = true; }
 
 void PerceptionCameraUpdater::Stop() {
   if (enabled_) {
@@ -89,8 +88,8 @@ void PerceptionCameraUpdater::GetImageLocalization(
   double timestamp_diff = DBL_MAX;
   Pose image_pos;
   while (!localization_queue_.empty()) {
-    const double tmp_diff = localization_queue_.front()->measurement_time()
-        - current_image_timestamp_;
+    const double tmp_diff = localization_queue_.front()->measurement_time() -
+                            current_image_timestamp_;
     if (tmp_diff < 0) {
       timestamp_diff = tmp_diff;
       image_pos = localization_queue_.front()->pose();
@@ -105,16 +104,17 @@ void PerceptionCameraUpdater::GetImageLocalization(
 
   Eigen::Matrix4d localization_matrix;
   ConstructTransformationMatrix(image_pos.orientation(), image_pos.position(),
-      &localization_matrix);
+                                &localization_matrix);
   ConvertMatrixToArray(localization_matrix, localization);
 }
 
 bool PerceptionCameraUpdater::QueryStaticTF(const std::string &frame_id,
-    const std::string &child_frame_id, Eigen::Matrix4d *matrix) {
+                                            const std::string &child_frame_id,
+                                            Eigen::Matrix4d *matrix) {
   TransformStamped transform;
   if (tf_buffer_->GetLatestStaticTF(frame_id, child_frame_id, &transform)) {
     ConstructTransformationMatrix(transform.transform().rotation(),
-        transform.transform().translation(), matrix);
+                                  transform.transform().translation(), matrix);
     return true;
   }
   return false;
@@ -148,8 +148,8 @@ void PerceptionCameraUpdater::GetLocalization2CameraTF(
 
 void PerceptionCameraUpdater::OnImage(
     const std::shared_ptr<CompressedImage> &compressed_image) {
-  if (!enabled_
-      || compressed_image->format() == "h265" /* skip video format */) {
+  if (!enabled_ ||
+      compressed_image->format() == "h265" /* skip video format */) {
     return;
   }
 
@@ -158,11 +158,10 @@ void PerceptionCameraUpdater::OnImage(
   cv::Mat mat_image = cv::imdecode(compressed_raw_data, CV_LOAD_IMAGE_COLOR);
   // Scale down image size properly to reduce data transfer latency through
   // websocket and ensure image quality is acceptable meanwhile
-  cv::resize(
-      mat_image, mat_image,
-      cv::Size(static_cast<int>(mat_image.cols * kImageScale),
-               static_cast<int>(mat_image.rows * kImageScale)),
-      0, 0, CV_INTER_LINEAR);
+  cv::resize(mat_image, mat_image,
+             cv::Size(static_cast<int>(mat_image.cols * kImageScale),
+                      static_cast<int>(mat_image.rows * kImageScale)),
+             0, 0, CV_INTER_LINEAR);
   std::vector<uint8_t> tmp_buffer;
   cv::imencode(".jpg", mat_image, tmp_buffer, std::vector<int>() /* params */);
 

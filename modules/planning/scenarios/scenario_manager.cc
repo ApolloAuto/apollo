@@ -309,8 +309,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverEmergencyScenario(
   return default_scenario_type_;
 }
 
-ScenarioConfig::ScenarioType
-ScenarioManager::SelectInterceptionScenario(const Frame& frame) {
+ScenarioConfig::ScenarioType ScenarioManager::SelectInterceptionScenario(
+    const Frame& frame) {
   ScenarioConfig::ScenarioType scenario_type = default_scenario_type_;
 
   hdmap::PathOverlap* traffic_sign_overlap = nullptr;
@@ -337,8 +337,7 @@ ScenarioManager::SelectInterceptionScenario(const Frame& frame) {
     switch (overlap_type) {
       case ReferenceLineInfo::STOP_SIGN:
         if (FLAGS_enable_scenario_stop_sign) {
-          scenario_type =
-              SelectStopSignScenario(frame, *traffic_sign_overlap);
+          scenario_type = SelectStopSignScenario(frame, *traffic_sign_overlap);
         }
         break;
       case ReferenceLineInfo::SIGNAL:
@@ -349,8 +348,7 @@ ScenarioManager::SelectInterceptionScenario(const Frame& frame) {
         break;
       case ReferenceLineInfo::YIELD_SIGN:
         if (FLAGS_enable_scenario_yield_sign) {
-          scenario_type =
-              SelectYieldSignScenario(frame, *traffic_sign_overlap);
+          scenario_type = SelectYieldSignScenario(frame, *traffic_sign_overlap);
         }
         break;
       default:
@@ -779,7 +777,6 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
   }
 }
 
-
 bool ScenarioManager::IsBareIntersectionScenario(
     const ScenarioConfig::ScenarioType& scenario_type) {
   return (scenario_type == ScenarioConfig::BARE_INTERSECTION_UNPROTECTED);
@@ -1004,8 +1001,7 @@ void ScenarioManager::UpdatePlanningContextYieldSignScenario(
       PlanningContext::Instance()
           ->mutable_planning_status()
           ->mutable_yield_sign()
-          ->add_current_yield_sign_overlap_id(
-              yield_sign_overlap.object_id);
+          ->add_current_yield_sign_overlap_id(yield_sign_overlap.object_id);
       ADEBUG << "Update PlanningContext with first_encountered yield_sign["
              << yield_sign_overlap.object_id << "] start_s["
              << yield_sign_overlap.start_s << "]";

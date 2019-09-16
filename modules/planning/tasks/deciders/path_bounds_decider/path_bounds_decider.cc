@@ -807,8 +807,8 @@ bool PathBoundsDecider::GetBoundaryFromRoads(
 
 bool PathBoundsDecider::GetBoundaryFromLanes(
     const ReferenceLineInfo& reference_line_info,
-    const LaneBorrowInfo& lane_borrow_info,
-    PathBound* const path_bound, std::string* const borrow_lane_type) {
+    const LaneBorrowInfo& lane_borrow_info, PathBound* const path_bound,
+    std::string* const borrow_lane_type) {
   // Sanity checks.
   CHECK_NOTNULL(path_bound);
   CHECK(!path_bound->empty());
@@ -876,19 +876,19 @@ bool PathBoundsDecider::GetBoundaryFromLanes(
     }
 
     // 3. Get the proper boundary
-    double curr_left_bound = curr_lane_left_width +
-        (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW
-         ? curr_neighbor_lane_width : 0.0);
+    double curr_left_bound =
+        curr_lane_left_width + (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW
+                                    ? curr_neighbor_lane_width
+                                    : 0.0);
     double curr_right_bound = -curr_lane_right_width -
-        (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW
-         ? curr_neighbor_lane_width : 0.0);
-    ADEBUG << "At s = " << curr_s
-           << ", left_lane_bound = " << curr_left_bound
+                              (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW
+                                   ? curr_neighbor_lane_width
+                                   : 0.0);
+    ADEBUG << "At s = " << curr_s << ", left_lane_bound = " << curr_left_bound
            << ", right_lane_bound = " << curr_right_bound;
 
     // 4. Update the boundary.
-    if (!UpdatePathBoundary(
-            i, curr_left_bound, curr_right_bound, path_bound)) {
+    if (!UpdatePathBoundary(i, curr_left_bound, curr_right_bound, path_bound)) {
       path_blocked_idx = static_cast<int>(i);
     }
     if (path_blocked_idx != -1) {
@@ -922,7 +922,7 @@ bool PathBoundsDecider::GetBoundaryFromADC(
       std::fmax(adc_l_to_lane_center_,
                 adc_l_to_lane_center_ + ADC_lat_decel_buffer);
   double curr_right_bound_adc =
-      - GetBufferBetweenADCCenterAndEdge() - ADC_extra_buffer +
+      -GetBufferBetweenADCCenterAndEdge() - ADC_extra_buffer +
       std::fmin(adc_l_to_lane_center_,
                 adc_l_to_lane_center_ + ADC_lat_decel_buffer);
 
@@ -1096,7 +1096,8 @@ void PathBoundsDecider::GetBoundaryFromLaneChangeForbiddenZone(
     common::SLPoint point_sl;
     reference_line.XYToSL(
         {lane_change_status->lane_change_start_position().x(),
-         lane_change_status->lane_change_start_position().y()}, &point_sl);
+         lane_change_status->lane_change_start_position().y()},
+        &point_sl);
     lane_change_start_s = point_sl.s();
   } else {
     // TODO(jiacheng): train ML model to learn this.
@@ -1123,8 +1124,7 @@ void PathBoundsDecider::GetBoundaryFromLaneChangeForbiddenZone(
   }
   for (size_t i = 0; i < path_bound->size(); ++i) {
     double curr_s = std::get<0>((*path_bound)[i]);
-    if (curr_s > lane_change_start_s)
-      break;
+    if (curr_s > lane_change_start_s) break;
     double curr_lane_left_width = 0.0;
     double curr_lane_right_width = 0.0;
     double offset_to_map = 0.0;
@@ -1139,12 +1139,14 @@ void PathBoundsDecider::GetBoundaryFromLaneChangeForbiddenZone(
     curr_lane_left_width -= offset_to_map;
     curr_lane_right_width += offset_to_map;
 
-    std::get<1>((*path_bound)[i]) = adc_frenet_l_ > curr_lane_left_width ?
-        curr_lane_left_width + GetBufferBetweenADCCenterAndEdge()
-        : std::get<1>((*path_bound)[i]);
-    std::get<2>((*path_bound)[i]) = adc_frenet_l_ < -curr_lane_right_width ?
-        -curr_lane_right_width - GetBufferBetweenADCCenterAndEdge()
-        : std::get<2>((*path_bound)[i]);
+    std::get<1>((*path_bound)[i]) =
+        adc_frenet_l_ > curr_lane_left_width
+            ? curr_lane_left_width + GetBufferBetweenADCCenterAndEdge()
+            : std::get<1>((*path_bound)[i]);
+    std::get<2>((*path_bound)[i]) =
+        adc_frenet_l_ < -curr_lane_right_width
+            ? -curr_lane_right_width - GetBufferBetweenADCCenterAndEdge()
+            : std::get<2>((*path_bound)[i]);
   }
 }
 
@@ -1562,9 +1564,9 @@ bool PathBoundsDecider::UpdatePathBoundaryAndCenterLine(
   return true;
 }
 
-bool PathBoundsDecider::UpdatePathBoundary(
-    size_t idx, double left_bound, double right_bound,
-    PathBound* const path_boundaries) {
+bool PathBoundsDecider::UpdatePathBoundary(size_t idx, double left_bound,
+                                           double right_bound,
+                                           PathBound* const path_boundaries) {
   // Update the right bound (l_min):
   double new_l_min =
       std::fmax(std::get<1>((*path_boundaries)[idx]), right_bound);
@@ -1656,10 +1658,10 @@ void PathBoundsDecider::RecordDebugInfo(
     frenet_frame_left_boundaries.push_back(frenet_frame_point);
   }
 
-  auto frenet_frame_left_path = FrenetFramePath(
-      std::move(frenet_frame_left_boundaries));
-  auto frenet_frame_right_path = FrenetFramePath(
-      std::move(frenet_frame_right_boundaries));
+  auto frenet_frame_left_path =
+      FrenetFramePath(std::move(frenet_frame_left_boundaries));
+  auto frenet_frame_right_path =
+      FrenetFramePath(std::move(frenet_frame_right_boundaries));
 
   PathData left_path_data;
   left_path_data.SetReferenceLine(&(reference_line_info->reference_line()));

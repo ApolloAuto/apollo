@@ -77,8 +77,8 @@ Status Dreamview::Init() {
   image_.reset(new ImageHandler());
   sim_control_.reset(new SimControl(map_service_.get()));
   data_collection_monitor_.reset(new DataCollectionMonitor());
-  perception_camera_updater_.reset(new PerceptionCameraUpdater(
-      camera_ws_.get()));
+  perception_camera_updater_.reset(
+      new PerceptionCameraUpdater(camera_ws_.get()));
 
   sim_world_updater_.reset(new SimulationWorldUpdater(
       websocket_.get(), map_ws_.get(), camera_ws_.get(), sim_control_.get(),

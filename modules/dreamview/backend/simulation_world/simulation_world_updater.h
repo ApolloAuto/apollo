@@ -33,9 +33,9 @@
 #include "modules/dreamview/backend/data_collection_monitor/data_collection_monitor.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/map/map_service.h"
+#include "modules/dreamview/backend/perception_camera_updater/perception_camera_updater.h"
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
-#include "modules/dreamview/backend/perception_camera_updater/perception_camera_updater.h"
 #include "modules/routing/proto/poi.pb.h"
 
 /**

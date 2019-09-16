@@ -58,8 +58,7 @@ Stage::StageStatus YieldSignStageApproach::Process(
     // get overlap along reference line
     PathOverlap* current_yield_sign_overlap =
         scenario::util::GetOverlapOnReferenceLine(
-            reference_line_info,
-            yield_sign_overlap_id,
+            reference_line_info, yield_sign_overlap_id,
             ReferenceLineInfo::YIELD_SIGN);
     if (!current_yield_sign_overlap) {
       continue;
@@ -82,8 +81,8 @@ Stage::StageStatus YieldSignStageApproach::Process(
         current_yield_sign_overlap->start_s - adc_front_edge_s;
     ADEBUG << "yield_sign_overlap_id[" << yield_sign_overlap_id << "] start_s["
            << current_yield_sign_overlap->start_s
-           << "] distance_adc_to_stop_line["
-           << distance_adc_to_stop_line << "]";
+           << "] distance_adc_to_stop_line[" << distance_adc_to_stop_line
+           << "]";
     bool yield_sign_done = false;
     if (distance_adc_to_stop_line <
         scenario_config_.max_valid_stop_distance()) {
@@ -128,9 +127,10 @@ Stage::StageStatus YieldSignStageApproach::Process(
           continue;
         }
 
-        PlanningContext::Instance()->mutable_planning_status()
-                                   ->mutable_yield_sign()
-                                   ->add_wait_for_obstacle_id(obstacle->Id());
+        PlanningContext::Instance()
+            ->mutable_planning_status()
+            ->mutable_yield_sign()
+            ->add_wait_for_obstacle_id(obstacle->Id());
 
         yield_sign_done = false;
       }
