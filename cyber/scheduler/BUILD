@@ -174,4 +174,17 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "processor_test",
+    size = "small",
+    srcs = [
+        "processor_test.cc",
+    ],
+    deps = [
+        "//cyber",
+        "//cyber/scheduler:processor",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
