@@ -8,11 +8,6 @@ So far Apollo simulation allowed external users to access over 200 sample scenar
 
 Several developers wrote in requesting that our Dreamland platform should support Scenario Creation and Editing which the Apollo team now proudly presents in Apollo 5.0!
 
-```
-Please note,
-In order to use this feature, please send an email to our BD team at idg-apollo@baidu.com using your company email as it is currently available only for select partners
-```
-
 ## Setting up Scenario Editor
 
 1. Login to your Dreamland account. For additional details on How to create an account, please refer to [our Dreamland Introduction Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Dreamland_introduction.md) 
@@ -21,11 +16,13 @@ In order to use this feature, please send an email to our BD team at idg-apollo@
 
     ![](images/se_location1.png)
 
-3. Once inside, you should see the prompt as seen in the image below, requesting you to send us an email from your company's email. As this app is in Beta testing, it is not open to all our developers.
+3. Once inside, you will have to comeplete the form on the screen as seen in the image below. As this app is in Beta testing, it is not open to all our developers.
 
-    ![](images/login_se.png)
+    ![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/form.png)
 
-4. In 3 business days, you should receive an email confirming your account's approval and activation, after which, your screen should no longer display the prompt and the buttons would no longer be greyed out.
+4. You should receive the following activation confirmation via email:
+
+ ![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/email.png)
 
 ## Using Scenario Editor
 
@@ -40,8 +37,8 @@ Congratulations! You are now ready to use our scenario editor.
     ![](images/se_tools.png)
 
 
-You can navigate through the map using your arrow keys. Alternatively, you can right-click the mouse and drag it to move the map. If you are using a trackpad, you will have to two-finger click drag with two fingers.
-Lets understand each tool along with its purpose
+You can navigate through the map using your arrow keys. Alternatively, you can right-click the mouse and drag it to move the map. If you are using a trackpad, you will have to double click and then drag with two fingers.
+Let's understand each tool along with its purpose
 
 ### General Action Tools
 
@@ -51,7 +48,7 @@ The 4 General action tools can be found on the bottom right corner of the map.
 
     ![](images/se_zoom1.png)
 
-2. **Re-center tool**: this tool allows you to locate you ego-car on the map even if you have moved away
+2. **Re-center tool**: this tool allows you to locate your ego-car on the map even if you have moved away
 
     ![](images/se_center1.png)
 
@@ -65,7 +62,7 @@ The 4 General action tools can be found on the bottom right corner of the map.
  
 ### Configuration Tools
 
-There are 3 types of configuration tools that you need to setup in order to create a scenario, which are listed on the left-side of the map - General, Ego-car and Obstacles
+There are 4 types of configuration tools that you need to setup in order to create a scenario, three of which are listed on the left-side of the map - General, Ego-car and Participants (Obstacles) and the last one is Traffic Light
 
 ![](images/se_config.png)
 
@@ -73,11 +70,11 @@ There are 3 types of configuration tools that you need to setup in order to crea
 
 This configuration tool is selected by default upon the selection of a map. The form on your right requests general scenario informagtion like the scenario name, duration, road structure, ego-car behavior along with which metrics you would like to track. Please note some selections are required while some are based on your discretion. Once you have set and confirmed all the parameters, please proceed to the `Ego Car` configuration tool.
 
-You can learn more about what each parameter is by hovering over the `?` sign next to each parameter.
+You can learn more about each parameter by hovering over the `?` sign next to each parameter.
 
 #### Ego Car Configuration
 
-This configuration tool allows you to set your Ego car on the map and configure its parameters. As soon as you select the tool icon, you can then hover over the map and place the car at your desired location. Once placed, you will notice a form on the right-hand side of the map, which allows you to configure the Ego car to set its speed, acceleration, along with your desired destination.
+This configuration tool allows you to set your Ego car on the map and configure its parameters. As soon as you select the tool icon, you can then hover over the map and place the car at your desired location. You will notice that your mouse pointer will turn into a cross until you place the ego-car on your map. Once placed, a form should appear on the right-hand side of the map, which allows you to configure the Ego car to set its speed, acceleration, along with your desired destination.
 
 ![](images/se_ego.png)
 
@@ -87,7 +84,7 @@ The Ego car's heading can also be set by dragging the arrow linked to the ego ca
 
 ```
 Note: 
-You can set the ego car’s end point by clicking on the “Add Route Point” icon in the lower right corner of the map. Described in the General Action tools section. Please note that the first version of the Scenario Editor does support the creation of multiple route points for the ego car.
+You can set the ego car’s end point by clicking on the “Add Route Point” icon in the lower right corner of the map. Described in the General Action tools section. 
 ```
 
 Once you have placed the Ego car's end point on the map, The end point coordinates will then appear on the right-hand attribute's window. You can drag the end point flag to change the ego car’s end point location. The “End point” coordinates will be automatically updated accordingly.
@@ -95,6 +92,33 @@ Once you have placed the Ego car's end point on the map, The end point coordinat
 ![](images/endpoints1.png)
 
 Finally, you can always come back and edit the existing attributes of the ego car by clicking on the ego car on the map. This will open its attributes tab in the right-hand attributes window.
+
+#### Participants' Configuration
+
+If you select `Participant` from the configuration menu, you can place your obstacle in your scenario by clicking on a desired location on the map. You will notice that your mouse pointer will turn into a cross until you place the new obstacle on your map. Once you place it, a form will appear on the right-hand attributes window as it did with `Ego Car`. Before you edit the fields on the form, you can change the position of the obstacle by clicking and dragging it. You can also modify its heading by clicking on the arrow head. Once you have finalized the heading and position of your participant, you can start working on specific details mentioned in the form - type, length, speed and motion type. 
+
+![](images/obstacle.png)
+
+In the Basic Information section, you will notice an auto-generated ID along with a description textbox. You could give your obstacle a suitable ID as well as a description about its expected behavior. You could also specify what is the type of the obstacle, which will be set to `Car` by default. Upon selecting a different type, the obstacle on your screen will change accordingly. You will also need to determine its initial speed and other attributes including width, length and height. There are predetermined values for each vehicle type, which can be changed. 
+
+In the Initial State section, you will need to set the speed of the obstacle which can be either set in `m/s` or `km/hr`. The coordinates and heading of the obstacle is preset and can be changed by directly editing the obstacle's position on the map.
+
+In Runtime Configuration, you can set whether the participant is mobile or static. Should you select static, you have finished setting up your obstacle and are ready to save. If you select mobile instead, you would need to set its `Trigger Type`.
+
+Once you have completed your setup, click on the `add route point` button to set the obstacle's trajectory points as seen in the image below. 
+
+![](images/se_addroute.png)
+
+You can set a single destination, or add several points in between. You will also be able to add speed and change the speed of your obstacle on the form from one point to the next. Also, you can edit the location of the point on the screen by clicking on and dragging it to its desired locaiton.
+
+Finally, if you have added several trajectory points and do not know how to go back to your obstacle, you can use the `Re-center tool` (which is similar to the General Action re-center tool), but this re-center tool only works for your obstacles. 
+
+![](images/center2.png)
+
+Your final participant screen should appear as follows:
+
+![](images/final_obs.png)
+
 
 #### Traffic Light Configuration
 
@@ -112,7 +136,7 @@ You will also be required to set the `Initial State` of the traffic light. And o
 You can save your scenario by clicking on `Save` in the file menu.
 ```
 Note:
-The minimum requirements of saving a scenario are to configure all required attributes in the “General” and “Ego Car” configurations. If not, a pop-up failure message window will highlight what you are still required to configure.
+The minimum requirements of saving a scenario are to configure all required attributes in the “General” and “Ego Car” configurations. If not, a pop-up window with a failure message will highlight what you are still required to configure.
 ```
 
 ## Running a New Scenario
@@ -128,3 +152,4 @@ The minimum requirements of saving a scenario are to configure all required attr
 3. You can then search for your newly created scenario. An easy way to filter your private scenarios is to perform an instance search for your username in the `Search scenarios` field. 
 
 ![](images/instance.png)
+c
