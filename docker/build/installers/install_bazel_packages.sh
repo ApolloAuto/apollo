@@ -33,7 +33,7 @@ wget -O glog-0.3.5.tar.gz \
 wget -O benchmark-1.1.0.tar.gz \
     https://github.com/google/benchmark/archive/v1.1.0.tar.gz
 wget -O eigen-3.2.10.tar.gz \
-    https://bitbucket.org/eigen/eigen/get/3.2.10.tar.gz
+    https://github.com/eigenteam/eigen-git-mirror/archive/3.2.10.tar.gz
 wget -O curlpp-0.8.1.tar.gz \
     https://github.com/jpbarrette/curlpp/archive/v0.8.1.tar.gz
 wget -O yaml-cpp-0.5.3.zip \

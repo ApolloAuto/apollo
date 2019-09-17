@@ -1,0 +1,33 @@
+diff -purN pcl-pcl-1.9.0/CMakeLists.txt pcl-pcl-1.9.0.new/CMakeLists.txt
+--- pcl-pcl-1.9.0/CMakeLists.txt	2018-11-06 11:16:59.000000000 -0800
++++ pcl-pcl-1.9.0.new/CMakeLists.txt	2019-09-17 13:58:08.521119156 -0700
+@@ -1,3 +1,4 @@
++add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
+ ### ---[ PCL global CMake
+ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+ 
+@@ -131,15 +132,17 @@ if(CMAKE_COMPILER_IS_GNUCXX)
+   if("${CMAKE_CXX_FLAGS}" STREQUAL "${CMAKE_CXX_FLAGS_DEFAULT}")
+     SET(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unknown-pragmas -fno-strict-aliasing -Wno-format-extra-args -Wno-sign-compare -Wno-invalid-offsetof -Wno-conversion ${SSE_FLAGS_STR}")
+ 
+-    # Enable -Wabi for GCC > 4.3, and -Wno-deprecated for GCC < 4.3
++    # Enable -Wabi for GCC > 4.3 and GCC < 8.0, and -Wno-deprecated for GCC < 4.3
+     # to disable a lot of warnings which are not fixable
+     execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+-    if(GCC_VERSION VERSION_GREATER 4.3)
+-      message(STATUS "-- GCC > 4.3 found, enabling -Wabi")
+-      SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wabi")
+-    else()
+-      message(STATUS "-- GCC < 4.3 found, enabling -Wno-deprecated")
+-      SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated")
++    if(GCC_VERSION VERSION_LESS 8.0)
++      if(GCC_VERSION VERSION_GREATER 4.3)
++        message(STATUS "-- GCC > 4.3 found, enabling -Wabi")
++        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wabi")
++      else()
++        message(STATUS "-- GCC < 4.3 found, enabling -Wno-deprecated")
++        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated")
++      endif()
+     endif()
+   endif()
+ 

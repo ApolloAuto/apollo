@@ -31,9 +31,7 @@ if [ "$BUILD" == "build" ] || [ "$ARCH" == "x86_64" ]; then
   tar xzvf pcl-1.9.0.tar.gz
 
   pushd pcl-pcl-1.9.0/
-  echo "add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)" > temp
-  cat CMakeLists.txt >> temp
-  mv temp CMakeLists.txt
+  patch -p1 < ../pcl-1.9.0.patch
   mkdir build
   cd build
   cmake ..
