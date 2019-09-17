@@ -57,10 +57,14 @@ Status PathReuseDecider::Process(Frame* const frame,
 
 bool PathReuseDecider::CheckPathReusable(
     Frame* const frame, ReferenceLineInfo* const reference_line_info) {
+  if (!IsSameStopObstacles(frame, reference_line_info))
+    ADEBUG << "not same stop obstacle";
+  return (IsCollisionFree(reference_line_info) &&
+          IsSameStopObstacles(frame, reference_line_info));
   //   return IsSameStopObstacles(frame, reference_line_info);
   //   return IsSameObstacles(reference_line_info);
-  ADEBUG << "Check Collision";
-  return IsCollisionFree(reference_line_info);
+  //   ADEBUG << "Check Collision";
+  //   return IsCollisionFree(reference_line_info);
 }
 
 bool PathReuseDecider::IsSameStopObstacles(
