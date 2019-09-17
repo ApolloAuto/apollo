@@ -6,18 +6,19 @@
 
 ## 内容
 **循迹自动驾驶搭建**
-- [循迹搭建--Apollo系统安装](#循迹搭建--Apollo系统安装)
-- [循迹搭建--车辆集成](#循迹搭建--车辆集成)
-- [循迹搭建--定位模块配置](#循迹搭建--定位模块配置)
-- [循迹搭建--车辆动力学标定](#循迹搭建--车辆动力学标定)
-- [循迹搭建--车辆循迹演示及常见问题](#循迹搭建--车辆循迹演示及常见问题)
+- [循迹搭建--Apollo系统安装](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/D-kit/Waypoint_following--Apollo_software_installation_cn.md)
+- [循迹搭建--车辆集成](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/D-kit/Waypoint_following--Vehicle_integration_cn.md)
+- [循迹搭建--定位模块配置](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/D-kit/Waypoint_following--Localization_configuration_cn.md)
+- [循迹搭建--车辆动力学标定](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/D-kit/Waypoint_following--Vehicle_calibration_cn.md)
+- [循迹搭建--车辆循迹演示及常见问题](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/D-kit/Waypoint_following--Operation_and_questions_cn.md)
 
 **封闭园区自动驾驶搭建**
-- [封闭园区自动驾驶搭建--感知设备集成](#封闭园区自动驾驶搭建--感知设备集成)
--  [封闭园区自动驾驶搭建--感知设备标定](#封闭园区自动驾驶搭建--感知设备标定)
--  [封闭园区自动驾驶搭建--感知适配](#封闭园区自动驾驶搭建--感知适配)
--  [封闭园区自动驾驶搭建--规划适配](#封闭园区自动驾驶搭建--规划适配)
-- [封闭园区自动驾驶搭建--自动驾驶演示](#封闭园区自动驾驶搭建--自动驾驶演示)
+- [封闭园区自动驾驶搭建--感知设备集成](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/D-kit/Auto_Driving--Sensor_integration_cn.md)
+- [封闭园区自动驾驶搭建--感知设备标定](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/D-kit/Auto_Driving--Sensor_calibration_cn.md)
+- [封闭园区自动驾驶搭建--定位地图制作](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/D-kit/Auto_Driving--local_map_generation_cn.md)
+- [封闭园区自动驾驶搭建--感知适配](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/D-kit/Auto_Driving--perception_adaptation.md)
+- [封闭园区自动驾驶搭建--规划适配](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/D-kit/Auto_Driving--planning_adaptation.md)
+- [封闭园区自动驾驶搭建--自动驾驶演示](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/specs/D-kit/Auto_Driving--audo_driving_demonstration.md)
 
 ## 循迹搭建--Apollo系统安装
 在集成车辆之前，首先需要在工控机上完成Apollo系统的软硬件安装，如CAN卡安装；之后需要完成工控机的软件安装，包括Ubuntu Linux安装、Apollo软件系统安装等。
@@ -26,10 +27,10 @@
 在车辆集成环节，将完成工控机、路由器、惯导、显示器等设备在车辆上的集成。
 
 ## 循迹搭建--定位模块配置
-定位模块的配置与验证
+定位模块的配置与验证。
 
 ## 循迹搭建--车辆动力学标定
-
+本环节将介绍生成车辆动力学标定表的工具和方法，形成控制闭环以获得更好的控制效果。
 
 ## 循迹搭建--车辆循迹演示及常见问题
 在完成以上软硬件安装，标定以及系统文件配置后，用户可以通过Dreamview界面录制车辆轨迹并回放，完成第一个循迹演示。
@@ -40,6 +41,9 @@
 
 ## 封闭园区自动驾驶搭建--感知设备标定
 本环节将介绍Lidar到IMU，Camera（短焦）到Lidar，Camera（长焦）到（短焦），Radar到Camera（短焦）感知设备的标定工具与方法。
+
+##封闭园区自动驾驶搭建--定位地图制作
+本环节将介绍定位地图制作工具的使用，以开启多传感器融合定位中的激光雷达点云定位能力。
 
 ## 封闭园区自动驾驶搭建--感知适配
 本环节将介绍基于Apollo开发套件的封闭园区自动驾驶感知配置与验证。
