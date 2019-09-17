@@ -68,7 +68,7 @@ There are 4 types of configuration tools that you need to setup in order to crea
 
 #### General Configuration
 
-This configuration tool is selected by default upon the selection of a map. The form on your right requests general scenario information like the scenario name, duration, road structure, ego-car behavior along with which metrics you would like to track. Please note some selections are required while some are based on your discretion. Once you have set and confirmed all the parameters, please proceed to the `Ego Car` configuration tool.
+This configuration tool is selected by default upon the selection of a map. The form on your right requests general scenario information like the scenario name, duration, road structure, ego-car behavior along with which metrics you would like to track. Please note some fields are required while some are based on your discretion. Once you have set and confirmed all the parameters, please proceed to the `Ego Car` configuration tool.
 
 You can learn more about each parameter by hovering over the `?` sign next to each parameter.
 
