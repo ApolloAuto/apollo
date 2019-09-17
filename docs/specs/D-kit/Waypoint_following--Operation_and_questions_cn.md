@@ -13,7 +13,6 @@
  - [调试与常见问题](#调试与常见问题)
 
 
-
 ## 概览
 
 该用户手册旨在帮助用户在教学小车上实现循迹功能。
@@ -26,54 +25,7 @@
 
 ### 系统文件配置
 
-系统文档配置主要包括两个部分，GNSS配置和车辆配置。
-
-#### GNSS配置
-
-此配置过程是基于Apollo的r3.0.0分支的代码进行的，将其clone至本地后编译通过即可。
-
-##### 修改配置
-修改`/apollo/modules/drivers/gnss/conf`文件夹下面的配置文件`gnss_conf.pb.txt`，将`gnss_conf_newton.pb.txt`的内容全部拷贝覆盖`gnss_conf.pb.txt`的内容即可。修改如下内容配置基站信息：
-```
-rtk_from {
-    format: RTCM_V3
-    ntrip {
-        address: "IP"
-        port: 8000
-        mount_point: "MOUNTPOINT"
-        user: "USERNAME"
-        password: "PASSWORD"
-        timeout_s: 5
-    }
-    push_location: true
-}
-
-```
-这是RTK基站信息相关的配置，请依据自己的实际情况进行配置。在程序运行的过程中，有可能会把`modules/calibration/data/vehicle_name/gnss_params/gnss_conf.pb.txt`拷贝到`modules/drivers/gnss/conf/gnss_conf.pb.txt`，那么我们也需要修改`modules/calibration/data/vehicle_name/gnss_params/gnss_conf.pb.txt`里面的基站配置信息才能保证`gnss`配置正确。
-
-##### 关闭雷达
-
-在`apollo/modules/localization/conf/localization.conf`文件中将：`--enable_lidar_localization=true`修改为：`--enable_lidar_localization=false`。
-
-##### 修改定位模式
-
-在`apollo/modules/localization/conf/localization_config.pb.txt`文件中这个配置应为`localization_type:MSF`，M2不支持`RTK`模式。
-
-##### 常见问题
-系统无法生成驱动设备`ttyACM0`，在`/apollo/data/log/gnss.ERROR`里面会有类似报错提示：
-
-```
-open device /dev/ttyACM0 failed， error: no such file or directory
-gnss driver connect failed, stream init failed
-```
-
-docker内和docker外的/dev/下都没有`ttyACM0`设备，先退出docker，然后关闭docker，再执行如下命令：
-```
-cd /apollo/docker/setup_host
-bash setup_host.sh
-```
-重启工控机，然后在/docker/外，/dev/下，就有`ttyACM0`，再进docker，再试gps，可以了。
-
+系统文件配置主要以车辆配置为主，其具体操作如下所示。
 
 #### 车辆配置
 所有的车辆配置都是以车型为单位的，一个车型的车辆相关的所有配置都放在一个以车型命名的文件夹里面。Apollo支持的所有的车型都在`/apollo/modules/calibration/data/`目录下。我们以酷黑小车为例，其在Apollo中的简称为ch，ch文件夹的内容如下：
@@ -99,14 +51,13 @@ bash setup_host.sh
 
 除了车辆相关配置外，还需要注意canbus和control模块的配置。分别介绍如下:
 
-1. `modules/canbus/conf/canbus_conf.pb.txt` 修改如下：
+1. `modules/calibration/data/ch/cancard_params/canbus_conf.pb.txt` 修改如下：
 ```
-brand:CH
 enable_debug_mode:true
 enable_receiver_log:true
 enable_sender_log: true
 ```
-第一行将默认的LINCOLN_MKZ改为CH，后三行用于打开debug信息。
+这三行用于打开debug信息。
 
 2. `modules/canbus/conf/canbus.conf` 修改如下:
 ```
