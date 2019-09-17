@@ -127,7 +127,11 @@ Stage::StageStatus LaneFollowStage::Process(
     if (cur_status.ok()) {
       if (reference_line_info.IsChangeLanePath()) {
         ADEBUG << "reference line is lane change ref.";
-        if (reference_line_info.Cost() < kStraightForwardLineCost) {
+        if (reference_line_info.Cost() < kStraightForwardLineCost &&
+            (LaneChangeDecider::IsClearToChangeLane(&reference_line_info) ||
+             FLAGS_enable_smarter_lane_change)) {
+          // If the path and speed optimization succeed on target lane while
+          // under smart lane-change or IsClearToChangeLane under older version
           has_drivable_reference_line = true;
           reference_line_info.SetDrivable(true);
           ADEBUG << "\tclear for lane change";
