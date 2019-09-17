@@ -62,7 +62,7 @@ The 4 General action tools can be found on the bottom right corner of the map.
  
 ### Configuration Tools
 
-There are 4 types of configuration tools that you need to setup in order to create a scenario, three of which are listed on the left-side of the map - General, Ego-car and Participants (Obstacles) and the last one is Traffic Light
+There are 4 types of configurations that you will need to set up in order to create a scenario, three of which are listed on the left-side of the map - General, Ego-car and Participants (Obstacles) and the last one is Traffic Light
 
 ![](images/se_config.png)
 
