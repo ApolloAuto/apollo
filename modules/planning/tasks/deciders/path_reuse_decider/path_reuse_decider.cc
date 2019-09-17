@@ -44,11 +44,12 @@ Status PathReuseDecider::Process(Frame* const frame,
   CHECK_NOTNULL(reference_line_info);
 
   // Check if path is reusable
-  if (Decider::config_.path_reuse_decider_config().reuse_path() &&
-      CheckPathReusable(frame, reference_line_info)) {
-    ++reusable_path_counter_;  // count reusable path
+  if (Decider::config_.path_reuse_decider_config().reuse_path()) {
+    ++total_path_counter_;  // count total path
+    if (CheckPathReusable(frame, reference_line_info)) {
+      ++reusable_path_counter_;  // count reusable path
+    }
   }
-  ++total_path_counter_;  // count total path
   ADEBUG << "reusable_path_counter_" << reusable_path_counter_;
   ADEBUG << "total_path_counter_" << total_path_counter_;
   return Status::OK();
@@ -257,38 +258,47 @@ bool PathReuseDecider::IsCollisionFree(
   std::vector<Polygon2d> obstacle_polygons;
   for (auto obstacle :
        reference_line_info->path_decision()->obstacles().Items()) {
-    const auto& obstacle_sl = obstacle->PerceptionSLBoundary();
     ADEBUG << "obstacle_boundaries";
-    // Ignore obstacles behind ADC
-    if (obstacle_sl.end_s() < adc_position_sl.s() - kSBuffer) {
+    // filtered all non-static objects and virtual obstacle
+    if (!obstacle->IsStatic() || obstacle->IsVirtual()) {
+      if (!obstacle->IsStatic()) ADEBUG << "SPOT a dynamic obstacle";
+      if (obstacle->IsVirtual()) ADEBUG << "SPOT a virtual obstacle";
       continue;
     }
+    const auto& obstacle_sl = obstacle->PerceptionSLBoundary();
+    // Ignore obstacles behind ADC
+    if (obstacle_sl.end_s() < adc_position_sl.s() - kSBuffer) continue;
     // Ignore too small obstacles.
     if ((obstacle_sl.end_s() - obstacle_sl.start_s()) *
             (obstacle_sl.end_l() - obstacle_sl.start_l()) <
-        kMinObstacleArea) {
+        kMinObstacleArea)
       continue;
-    }
     obstacle_polygons.push_back(
         Polygon2d({Vec2d(obstacle_sl.start_s(), obstacle_sl.start_l()),
                    Vec2d(obstacle_sl.start_s(), obstacle_sl.end_l()),
                    Vec2d(obstacle_sl.end_s(), obstacle_sl.end_l()),
                    Vec2d(obstacle_sl.end_s(), obstacle_sl.start_l())}));
   }
-  ADEBUG << "all obstacles";
+  if (obstacle_polygons.empty()) return true;
+
   const auto& history_frame = FrameHistory::Instance()->Latest();
   if (!history_frame) return false;
   const DiscretizedPath& history_path =
       history_frame->current_frame_planned_path();
+  // path end point
+  common::SLPoint path_end_position_sl;
+  common::math::Vec2d path_end_position = {history_path.back().x(),
+                                           history_path.back().y()};
+  reference_line.XYToSL(path_end_position, &path_end_position_sl);
   for (size_t i = 0; i < history_path.size(); ++i) {
-    if (history_path.back().s() - history_path[i].s() <
-        kNumExtraTailBoundPoint * kPathBoundsDeciderResolution) {
-      break;
-    }
     common::SLPoint path_position_sl;
     common::math::Vec2d path_position = {history_path[i].x(),
                                          history_path[i].y()};
     reference_line.XYToSL(path_position, &path_position_sl);
+    if (path_end_position_sl.s() - path_position_sl.s() <
+        kNumExtraTailBoundPoint * kPathBoundsDeciderResolution) {
+      break;
+    }
     if (path_position_sl.s() < adc_position_sl.s() - kSBuffer) continue;
     const auto& vehicle_box =
         common::VehicleConfigHelper::Instance()->GetBoundingBox(
@@ -305,9 +315,9 @@ bool PathReuseDecider::IsCollisionFree(
       auto curr_point = Vec2d(curr_point_sl.s(), curr_point_sl.l());
       // Check if it's in any polygon of other static obstacles.
       for (const auto& obstacle_polygon : obstacle_polygons) {
-        // ADEBUG << "all obstacles:" << curr_point.x() << ", " <<
-        // curr_point.y();
         if (obstacle_polygon.IsPointIn(curr_point)) {
+          ADEBUG << "to end point:"
+                 << path_end_position_sl.s() - path_position_sl.s();
           ADEBUG << "collision:" << curr_point.x() << ", " << curr_point.y();
           Vec2d xy_point;
           reference_line.SLToXY(curr_point_sl, &xy_point);
