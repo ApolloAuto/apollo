@@ -4,6 +4,7 @@ stage_config: {
   stage_type: LANE_FOLLOW_DEFAULT_STAGE
   enabled: true
   task_type: LANE_CHANGE_DECIDER
+  task_type: PATH_REUSE_DECIDER
   task_type: PATH_LANE_BORROW_DECIDER
   task_type: PATH_BOUNDS_DECIDER
   task_type: PIECEWISE_JERK_PATH_OPTIMIZER
@@ -23,6 +24,14 @@ stage_config: {
       enable_lane_change_urgency_check: true
     }
   }
+
+  task_config: {
+    task_type: PATH_REUSE_DECIDER
+    path_reuse_decider_config {
+      reuse_path: false
+    }
+  }
+
   task_config: {
     task_type: PATH_LANE_BORROW_DECIDER
     path_lane_borrow_decider_config {
