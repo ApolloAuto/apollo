@@ -204,14 +204,14 @@ class Time(object):
 
 class Timer(object):
 
-	def set_option(self, period, callback, oneshot=0):
-        '''
-        period The period of the timer, unit is ms
-        callback The tasks that the timer needs to perform
-        oneshot 1: perform the callback only after the first timing cycle
-                0:perform the callback every timed period
-        '''
-
+    def set_option(self, period, callback, oneshot=0):
+        """
+        set the option of timer.
+        @param period The period of the timer, unit is ms.
+        @param callback The tasks that the timer needs to perform.
+        @param oneshot 1:perform the callback only after the first timing cycle
+        0:perform the callback every timed period
+        """
 
     def start(self):
 
