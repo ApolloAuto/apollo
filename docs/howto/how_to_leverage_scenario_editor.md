@@ -16,11 +16,11 @@ Several developers wrote in requesting that our Dreamland platform should suppor
 
     ![](images/se_location1.png)
 
-3. Once inside, you will have to comeplete the form on the screen as seen in the image below. As this app is in Beta testing, it is not open to all our developers.
+3. Once inside, you will have to complete the form on the screen as seen in the image below. As this app is in Beta testing, it is not open to all our developers.
 
     ![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/form.png)
 
-4. You should receive the following activation confirmation via email:
+4. You should receive the following activation confirmation via email within 3 business days:
 
  ![](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/email.png)
 
@@ -95,23 +95,23 @@ Finally, you can always come back and edit the existing attributes of the ego ca
 
 #### Participants' Configuration
 
-If you select `Participant` from the configuration menu, you can place your obstacle in your scenario by clicking on a desired location on the map. You will notice that your mouse pointer will turn into a cross until you place the new obstacle on your map. Once you place it, a form will appear on the right-hand attributes window as it did with `Ego Car`. Before you edit the fields on the form, you can change the position of the obstacle by clicking and dragging it. You can also modify its heading by clicking on the arrow head. Once you have finalized the heading and position of your participant, you can start working on specific details mentioned in the form - type, length, speed and motion type. 
+If you select `Participant` from the configuration menu, you can place your participant in your scenario by clicking on a desired location on the map. You will notice that your mouse pointer will turn into a cross until you place the new participant on your map. Once you place it, a form will appear on the right-hand attributes window as it did with `Ego Car`. Before you edit the fields on the form, you can change the position of the participant by clicking and dragging it. You can also modify its heading by clicking on the arrow head. Once you have finalized the heading and position of your participant, you can start working on specific details mentioned in the form - type, length, speed and motion type. 
 
 ![](images/obstacle.png)
 
-In the Basic Information section, you will notice an auto-generated ID along with a description textbox. You could give your obstacle a suitable ID as well as a description about its expected behavior. You could also specify what is the type of the obstacle, which will be set to `Car` by default. Upon selecting a different type, the obstacle on your screen will change accordingly. You will also need to determine its initial speed and other attributes including width, length and height. There are predetermined values for each vehicle type, which can be changed. 
+In the Basic Information section, you will notice an auto-generated ID along with a description textbox. You could give your participant a suitable ID as well as a description about its expected behavior. You could also specify what is your participant's type, which will be set to `Car` by default. Upon selecting a different type, the participant on your screen will change accordingly. You will also need to determine its initial speed and other attributes including width, length and height. There are predetermined values for each vehicle type, which can be changed. 
 
-In the Initial State section, you will need to set the speed of the obstacle which can be either set in `m/s` or `km/hr`. The coordinates and heading of the obstacle is preset and can be changed by directly editing the obstacle's position on the map.
+In the Initial State section, you will need to set the speed of the participant which can be either set in `m/s` or `km/hr`. The coordinates and heading of the participant are preset and can be changed by directly editing the participant's position on the map.
 
-In Runtime Configuration, you can set whether the participant is mobile or static. Should you select static, you have finished setting up your obstacle and are ready to save. If you select mobile instead, you would need to set its `Trigger Type`.
+In Runtime Configuration, you can set whether the participant is mobile or static. Should you select static, you have finished setting up your participant and are ready to save. 
 
-Once you have completed your setup, click on the `add route point` button to set the obstacle's trajectory points as seen in the image below. 
+If you select mobile instead, you would need to set its `Trigger Type`. Once you have completed your mobile participant setup, click on the `add route point` button to set the participant's trajectory points as seen in the image below. 
 
 ![](images/se_addroute.png)
 
-You can set a single destination, or add several points in between. You will also be able to add speed and change the speed of your obstacle on the form from one point to the next. Also, you can edit the location of the point on the screen by clicking on and dragging it to its desired locaiton.
+You can set a single destination, or add several points in between. You will also be able to add speed and change the speed of your participant on the form from one point to the next. Also, you can edit the location of the point on the screen by clicking on and dragging it to its desired locaiton.
 
-Finally, if you have added several trajectory points and do not know how to go back to your obstacle, you can use the `Re-center tool` (which is similar to the General Action re-center tool), but this re-center tool only works for your obstacles. 
+Finally, if you have added several trajectory points and do not know how to go back to your participant, you can use the `Re-center tool` (which is similar to the General Action re-center tool), but this re-center tool only works for your participants. 
 
 ![](images/center2.png)
 
@@ -152,4 +152,3 @@ The minimum requirements of saving a scenario are to configure all required attr
 3. You can then search for your newly created scenario. An easy way to filter your private scenarios is to perform an instance search for your username in the `Search scenarios` field. 
 
 ![](images/instance.png)
-c
