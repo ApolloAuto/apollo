@@ -52,11 +52,11 @@ The 4 General action tools can be found on the bottom right corner of the map.
 
     ![](images/se_center1.png)
 
-3. **Ruler tool**: this tool allows you to measure the distance between two points. 
+3. **Ruler tool**: this tool allows you to measure the distance between two points. This tool is extremely useful when calculating the distance between the ego-car and obstacles or traffic lights on the map.
 
     ![](images/se_ruler.png)  ![](images/se_distance.png)
 
-4. **Add Route tool**: you can set the ego car’s end point by clicking on the Add Route tool. Please note that the first version of the Scenario Editor does support the creation of multiple route points for the ego car.
+4. **Add Route tool**: this tool can be used both for the ego-car as well as the obstacles you set in its path. For the ego-car you can only set its destination, but for obstacles, you can set multiple points that define their driving behavior. 
 
     ![](images/se_addroute.png)
  
