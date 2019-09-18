@@ -92,8 +92,6 @@ TEST_F(ParameterClientTest, list_parameter) {
 }  // namespace apollo
 
 int main(int argc, char** argv) {
-  // apollo::cyber::Init(argv[0]);
   testing::InitGoogleTest(&argc, argv);
-  auto res = RUN_ALL_TESTS();
-  return res;
+  return RUN_ALL_TESTS();
 }
