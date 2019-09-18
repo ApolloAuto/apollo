@@ -1,0 +1,135 @@
+/******************************************************************************
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+
+#include "modules/data/tools/smart_recorder/hard_break_trigger.h"
+
+#include <memory>
+#include <cmath>
+
+#include "cyber/common/log.h"
+#include "modules/common/adapters/adapter_gflags.h"
+#include "modules/control/proto/control_cmd.pb.h"
+
+namespace apollo {
+namespace data {
+
+using apollo::canbus::Chassis;
+
+constexpr int ITEM_SIZE = 10;
+constexpr float MAX_DELTA = 10.0f;
+constexpr float MAX_DIFF = 20.0f;
+constexpr float FLOAT_ZERO = 0.0001f;
+
+HardBreakTrigger::HardBreakTrigger() {
+  trigger_name_ = "HardBreakTrigger";
+}
+
+void HardBreakTrigger::Pull(const RecordMessage& msg) {
+  if (!trigger_obj_->enabled()) {
+    return;
+  }
+  std::shared_ptr<HardBreakMessage> hard_break_msg =
+    std::make_shared<HardBreakMessage>();
+  hard_break_msg->Initial(msg);
+  if (IsNoisy(hard_break_msg)) {
+    return;
+  }
+
+  if (msg.channel_name == FLAGS_chassis_topic) {
+    if (IsHardBreak(hard_break_msg)) {
+      AINFO << "hard break trigger is pulled: " << msg.time << " - "
+            << msg.channel_name;
+      TriggerIt(msg.time);
+    }
+    cur_driving_mode_ = hard_break_msg->chassis_msg_->driving_mode();
+  }
+  PushToList(hard_break_msg);
+}
+
+bool HardBreakTrigger::IsNoisy(const std::shared_ptr<HardBreakMessage>& msg) {
+  float pre_speed_mps = 0.0f;
+  float cur_speed_mps = msg->chassis_msg_->speed_mps();
+  if (cur_msg_list_.size() > 0) {
+    size_t num = cur_msg_list_.size() - 1;
+    pre_speed_mps = cur_msg_list_[num]->chassis_msg_->speed_mps();
+  }
+  if (fabs(pre_speed_mps - cur_speed_mps) > MAX_DIFF) {
+    return true;
+  }
+  return false;
+}
+
+bool HardBreakTrigger::IsHardBreak(
+  const std::shared_ptr<HardBreakMessage>& msg) {
+  float his_speed_mean_value = GetMeanSpeed(his_msg_list_);
+  float cur_speed_mean_value = GetMeanSpeed(cur_msg_list_);
+
+  float delta = his_speed_mean_value - cur_speed_mean_value;
+  if (delta > MAX_DELTA) {
+    return true;
+  }
+  return false;
+}
+
+float HardBreakTrigger::GetHistoryMeanSpeed() {
+  float speed_points = 0.0f;
+  if (his_msg_list_.size() == 0) {
+    return 0.0f;
+  }
+  for (size_t i = 0; i < his_msg_list_.size(); i ++) {
+    speed_points += his_msg_list_[i]->chassis_msg_->speed_mps();
+  }
+  return speed_points/static_cast<float>(his_msg_list_.size());
+}
+
+float HardBreakTrigger::GetMeanSpeed(
+    const std::vector<std::shared_ptr<HardBreakMessage>> &msg_list) {
+  float speed_points = 0.0f;
+  if (msg_list.size() == 0) {
+    return 0.0f;
+  }
+  for (size_t i = 0; i < msg_list.size(); i ++) {
+    speed_points += msg_list[i]->chassis_msg_->speed_mps();
+  }
+  return speed_points/static_cast<float>(msg_list.size());
+}
+
+void HardBreakTrigger::PushToList(
+  const std::shared_ptr<HardBreakMessage>& msg) {
+  cur_msg_list_.push_back(msg);
+  if (cur_msg_list_.size() > ITEM_SIZE) {
+    size_t offset = cur_msg_list_.size() - ITEM_SIZE;
+    for (size_t i = 0; i < offset; i++) {
+      his_msg_list_.push_back(cur_msg_list_[i]);
+    }
+    cur_msg_list_.erase(cur_msg_list_.begin(), cur_msg_list_.begin() + offset);
+  }
+  if (his_msg_list_.size() > ITEM_SIZE) {
+    size_t offset = his_msg_list_.size() - ITEM_SIZE;
+    his_msg_list_.erase(his_msg_list_.begin(), his_msg_list_.begin() + offset);
+  }
+}
+
+bool HardBreakMessage::Initial(const RecordMessage& msg) {
+  record_msg_ = std::make_shared<RecordMessage>(msg);
+  apollo::canbus::Chassis chassis_msg;
+  chassis_msg.ParseFromString(msg.content);
+  chassis_msg_ = std::make_shared<apollo::canbus::Chassis>(chassis_msg);
+  return true;
+}
+
+}  // namespace data
+}  // namespace apollo
