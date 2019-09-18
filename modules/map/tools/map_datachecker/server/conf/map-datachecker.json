@@ -1,8 +1,13 @@
 {
     "topic_list": {
-        "/apollo/sensor/gnss/best_pose": 2.0
+        "/apollo/sensor/gnss/best_pose": 0.9,
+        "/apollo/sensor/velodyne16/VelodyneScanUnified": 9.0,
+        "/apollo/sensor/velodyne64/VelodyneScanUnified": 9.0,
+        "/apollo/sensor/camera/traffic/image_short": 6.0,
+        "/apollo/sensor/camera/traffic/image_long": 6.0,
+        "/apollo/sensor/gnss/odometry": 99
     },
-    "use_system_time": true,
+    "use_system_time": false,
     "topic_rate_tolerance": 1.0,
     "channel_check_trigger_gap": 60,
 
