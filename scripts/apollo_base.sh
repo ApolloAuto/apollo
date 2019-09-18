@@ -461,7 +461,6 @@ if [ $APOLLO_IN_DOCKER = "true" ]; then
   set_lib_path $1
   if [ -z $APOLLO_BASE_SOURCED ]; then
     determine_bin_prefix
-    source $APOLLO_ROOT_DIR/modules/car1/common/scripts/car1_base.bash
     export APOLLO_BASE_SOURCED=1
   fi
 fi
