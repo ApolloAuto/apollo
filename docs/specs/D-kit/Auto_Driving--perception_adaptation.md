@@ -19,6 +19,7 @@
 
 注意：这些设置文件改动后需要重新用gpu方式编译，才可生效
 ## 感知开环验证及测试
+把车辆开到户外，手动控制车辆，看感知是否有数据。
 1. 进入docker环境，用gpu编译项目，编译项目，启动Dreamview 
 
 ```
@@ -51,7 +52,8 @@
     rostopic echo /apollo/perception/obstacles
 ```
 
-查看车前方10米处运动的人或者自行车（自行车上要有人），在DreamView上查看障碍物颜色以及位置速度信息（自行车青蓝色，人黄色），如下图所以
+查看车前方10米处运动的人或者自行车（自行车上要有人），在DreamView上查看障碍物颜色以及位置速度信息（自行车青蓝色，人黄色），如下图所示
 ![图片](../images/D-kits_Audo_driving_Adaptation/perception_verification.png)
 打印出的topic信息如下图所示
 ![图片](../images/D-kits_Audo_driving_Adaptation/perception_topic.jpg)
+如果在dreamview上能看到障碍物并且obstacles topic有障碍物信息，则开环测试通过。
