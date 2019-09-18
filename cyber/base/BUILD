@@ -207,6 +207,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "unbounded_queue_test",
+    size = "small",
+    srcs = [
+        "unbounded_queue_test.cc",
+    ],
+    deps = [
+        "//cyber/base:unbounded_queue",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "wait_strategy",
     hdrs = [
