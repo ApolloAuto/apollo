@@ -14,8 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_SERVICE_DISCOVERY_TOPOLOGY_H_
-#define CYBER_SERVICE_DISCOVERY_TOPOLOGY_H_
+#pragma once
 
 #include <atomic>
 #include <functional>
@@ -136,5 +135,3 @@ class TopologyManager {
 }  // namespace service_discovery
 }  // namespace cyber
 }  // namespace apollo
-
-#endif  // CYBER_SERVICE_DISCOVERY_TOPOLOGY_H_

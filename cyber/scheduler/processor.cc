@@ -31,7 +31,7 @@ namespace scheduler {
 
 using apollo::cyber::common::GlobalData;
 
-Processor::Processor() { running_.exchange(true); }
+Processor::Processor() { running_.store(true); }
 
 Processor::~Processor() { Stop(); }
 

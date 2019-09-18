@@ -152,6 +152,7 @@ class Client : public ClientBase {
  private:
   void HandleResponse(const std::shared_ptr<Response>& response,
                       const transport::MessageInfo& request_info);
+
   bool IsInit(void) const { return response_receiver_ != nullptr; }
 
   std::string node_name_;
