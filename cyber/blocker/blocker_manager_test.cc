@@ -28,9 +28,7 @@ namespace blocker {
 
 using apollo::cyber::proto::UnitTest;
 
-void cb(const std::shared_ptr<UnitTest>& msg_ptr) {
-  UNUSED(msg_ptr);
-}
+void cb(const std::shared_ptr<UnitTest>& msg_ptr) { UNUSED(msg_ptr); }
 
 TEST(BlockerTest, blocker_manager_test) {
   auto block_mgr = BlockerManager::Instance();
@@ -78,7 +76,7 @@ TEST(BlockerTest, blocker_intra_reader) {
   reader.Init();
   reader.Init();
   reader.SetHistoryDepth(10);
-  EXPECT_TRUE(reader.GetHistoryDepth() == 10);
+  EXPECT_EQ(10, reader.GetHistoryDepth());
   reader.Observe();
   reader.Begin();
   reader.End();
