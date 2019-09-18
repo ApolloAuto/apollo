@@ -332,6 +332,8 @@ function main(){
         -e DOCKER_GRP_ID=$GRP_ID \
         -e DOCKER_IMG=$IMG \
         -e USE_GPU=$USE_GPU \
+        -e NVIDIA_VISIBLE_DEVICES=all \
+        -e NVIDIA_DRIVER_CAPABILITIES=compute,video,utility \
         $(local_volumes) \
         --net host \
         -w /apollo \
