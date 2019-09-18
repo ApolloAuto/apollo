@@ -84,6 +84,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "single_value_warehouse_test",
+    size = "small",
+    srcs = ["container/single_value_warehouse_test.cc"],
+    deps = [
+        ":single_value_warehouse",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "warehouse_base",
     hdrs = ["container/warehouse_base.h"],
