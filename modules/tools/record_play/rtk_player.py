@@ -116,8 +116,8 @@ class RtkPlayer(object):
         New chassis Received
         """
         self.chassis.CopyFrom(data)
-        self.automode = (self.chassis.driving_mode
-                         == chassis_pb2.Chassis.COMPLETE_AUTO_DRIVE)
+        self.automode = (self.chassis.driving_mode ==
+                         chassis_pb2.Chassis.COMPLETE_AUTO_DRIVE)
         self.chassis_received = True
 
     def padmsg_callback(self, data):
@@ -133,37 +133,41 @@ class RtkPlayer(object):
     def restart(self):
         self.logger.info("before replan self.start=%s, self.closestpoint=%s" %
                          (self.start, self.closestpoint))
+        self.logger.debug("replan!")
 
         self.closestpoint = self.closest_dist()
-        self.logger.debug("replan!")
         self.start = max(self.closestpoint - 1, 0)
         self.logger.debug("replan_start: %s" % self.start)
         self.starttime = cyber_time.Time.now().to_sec()
         self.logger.debug("at time %s" % self.starttime)
-        # self.end = min(self.start + 1000, len(self.data) - 1)
         self.end = self.next_gear_switch_time(self.start, len(self.data))
         self.logger.debug("replan_end: %s" % self.end)
-
         self.logger.info("finish replan at time %s, self.closestpoint=%s" %
                          (self.starttime, self.closestpoint))
 
     def closest_dist(self):
         shortest_dist_sqr = float('inf')
         self.logger.info("before closest self.start=%s" % (self.start))
-        self.logger.debug("before closest self.start=%s" % (self.start))
         search_start = max(self.start - SEARCH_INTERVAL / 2, 0)
         search_end = min(self.start + SEARCH_INTERVAL / 2, len(self.data))
         self.logger.debug("search_start: %s" % search_start)
         self.logger.debug("search_end: %s" % search_end)
-        start = self.start
+        closest_dist_point = self.start
         self.logger.debug("self.start: %s" % self.start)
         for i in range(search_start, search_end):
             dist_sqr = (self.carx - self.data['x'][i]) ** 2 + \
                 (self.cary - self.data['y'][i]) ** 2
             if dist_sqr <= shortest_dist_sqr and self.data['gear'][i] == self.chassis.gear_location:
-                start = i
+                closest_dist_point = i
                 shortest_dist_sqr = dist_sqr
-        return start
+
+        # failled to find a trajectory matches current gear position
+        if shortest_dist_sqr == float('inf'):
+            self.logger.info(
+                'no trajectory point matches current gear position, check gear position')
+            return closest_dist_point + 1  # remain current start point
+
+        return closest_dist_point
 
     def closest_time(self):
         time_elapsed = cyber_time.Time.now().to_sec() - self.starttime
@@ -182,8 +186,9 @@ class RtkPlayer(object):
         for i in range(start, end):
             # trajectory with gear switch
             # include gear_neutral at the beginning of a trajectory
-            if((i < end - 1) and (self.data['gear'][i] == 1 or self.data['gear'][i] == 2) and
-                    (self.data['gear'][i + 1] != self.data['gear'][i]) ):
+            if (i < end - 1 and
+                self.data['gear'][i] in {1, 2} and
+                self.data['gear'][i + 1] != self.data['gear'][i]):
                 self.logger.debug("enter i in while loop: [ %s ]" % i)
                 self.logger.debug("self.data['gear'][i] != 1: %s" % self.data['gear'][i])
                 self.logger.debug("self.data['gear'][i] != 2: %s" % self.data['gear'][i])
@@ -301,8 +306,8 @@ class RtkPlayer(object):
         planningdata.estop.is_estop = self.estop
 
         self.planning_pub.write(planningdata)
-        self.logger.debug("Generated Planning Sequence: "
-                          + str(self.sequence_num - 1))
+        self.logger.debug("Generated Planning Sequence: " +
+                          str(self.sequence_num - 1))
 
     def shutdown(self):
         """
