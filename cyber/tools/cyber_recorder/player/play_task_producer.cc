@@ -53,7 +53,7 @@ bool PlayTaskProducer::Init() {
   }
 
   if (!ReadRecordInfo() || !UpdatePlayParam() || !CreateWriters()) {
-    is_initialized_.exchange(false);
+    is_initialized_.store(false);
     return false;
   }
 
@@ -269,7 +269,7 @@ void PlayTaskProducer::ThreadFunc() {
     }
 
     if (!play_param_.is_loop_playback) {
-      is_stopped_.exchange(true);
+      is_stopped_.store(true);
       break;
     }
     ++loop_num;
