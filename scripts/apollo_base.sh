@@ -111,6 +111,12 @@ function set_lib_path() {
   export LD_LIBRARY_PATH=/usr/local/apollo/boost/lib:$LD_LIBRARY_PATH
   export LD_LIBRARY_PATH=/usr/local/apollo/paddlepaddle_dep/mkldnn/lib/:$LD_LIBRARY_PATH
   export PYTHONPATH=/usr/local/lib/python2.7/dist-packages:${PY_LIB_PATH}:${PY_TOOLS_PATH}:${PYTHONPATH}
+
+  # Set teleop paths
+  export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+  export PYTHONPATH=/apollo/modules/car1/common:${PYTHONPATH}
+  export PATH=/apollo/modules/car1/common/scripts:${PATH}
+
   if [ -e /usr/local/cuda/ ];then
     export PATH=/usr/local/cuda/bin:$PATH
     export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
@@ -455,6 +461,7 @@ if [ $APOLLO_IN_DOCKER = "true" ]; then
   set_lib_path $1
   if [ -z $APOLLO_BASE_SOURCED ]; then
     determine_bin_prefix
+    source $APOLLO_ROOT_DIR/modules/car1/common/scripts/car1_base.bash
     export APOLLO_BASE_SOURCED=1
   fi
 fi
