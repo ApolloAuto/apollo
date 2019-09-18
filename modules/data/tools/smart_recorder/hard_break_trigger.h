@@ -28,7 +28,7 @@ namespace data {
 
 using apollo::canbus::Chassis;
 
-struct EmergencyMessage {
+struct HardBreakMessage {
   std::shared_ptr<RecordMessage> record_msg_;
   std::shared_ptr<canbus::Chassis> chassis_msg_;
 
@@ -36,25 +36,29 @@ struct EmergencyMessage {
 };
 
 /**
- * @class EmergencyModeTrigger
- * @brief EmergencyMode trigger that fires when emergency mode is engaged
+ * @class HardBreakTrigger
+ * @brief HardBreak trigger that fires when hard break is engaged
  */
-class EmergencyModeTriggerBeta: public TriggerBase {
+class HardBreakTrigger: public TriggerBase {
  public:
-  EmergencyModeTriggerBeta();
+  HardBreakTrigger();
 
   void Pull(const RecordMessage& msg) override;
   bool ShouldRestore(const RecordMessage& msg) const override { return false; };
 
-  virtual ~EmergencyModeTriggerBeta() = default;
+  virtual ~HardBreakTrigger() = default;
 
  private:
-  bool IsEmergency(const std::shared_ptr<EmergencyMessage>& msg);
+  bool IsHardBreak(const std::shared_ptr<HardBreakMessage>& msg);
+  bool IsNoisy(const std::shared_ptr<HardBreakMessage>& msg);
   float GetHistoryMeanSpeed();
-  void PushToHistoryList(const std::shared_ptr<EmergencyMessage>& msg);
+  float GetMeanSpeed(const std::vector<std::shared_ptr<HardBreakMessage>>
+    &msg_list);
+  void PushToList(const std::shared_ptr<HardBreakMessage>& msg);
  private:
   Chassis::DrivingMode cur_driving_mode_ = Chassis::COMPLETE_MANUAL;
-  std::vector<std::shared_ptr<EmergencyMessage>> msg_list_;
+  std::vector<std::shared_ptr<HardBreakMessage>> his_msg_list_;
+  std::vector<std::shared_ptr<HardBreakMessage>> cur_msg_list_;
 };
 
 }  // namespace data
