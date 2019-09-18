@@ -138,7 +138,7 @@ topics:
 ### 处理bag包，获得传感器数据
 在docker环境内执行如下指令，处理bag包，获得传感器数据：
 ```
-wangxitontg@in_dev_docker:/apollo$ /apollo/modules/calibration/exporter/export_msgs --config /apollo/modules/calibration/exporter/conf/export_config.yaml
+budaoshi@in_dev_docker:/apollo$ /apollo/modules/calibration/exporter/export_msgs --config /apollo/modules/calibration/exporter/conf/export_config.yaml
 ```
 其中：`/apollo/modules/calibration/exporter/export_msgs`为标定工具中可执行文件`export_msgs`的绝对路径；`/apollo/modules/calibration/exporter/conf/export_config.yaml`为上文中修改的配置文件的绝对路径，执行成功后，会在上文中配置的`dump_dir`目录中生成从bag中提取的数据文件，如下图所示：
 
@@ -179,8 +179,14 @@ calibration:
           fix_z: true
           iteration: 3
 ```
-### 注：
-校准部分提供了外部信息的初始猜测。所有的外部信息都是从激光雷达到GNSS，这意味着这种变换将激光雷达坐标系中定义的点的坐标映射到GNSS坐标系中定义的这一点的坐标。初始猜测要求旋转角度误差小于5度，平移误差小于0.1米。
+注:校准部分提供了外部信息的初始猜测。所有的外部信息都是从激光雷达到GNSS，这意味着这种变换将激光雷达坐标系中定义的点的坐标映射到GNSS坐标系中定义的这一点的坐标。初始猜测要求旋转角度误差小于5度，平移误差小于0.1米。
+### 执行标定
+执行如下命令，进行Lidar-IMU的标定,得到标定结果
+```
+budaoshi@in_dev_docker:/apollo$ /apollo/modules/calibration/lidar_gnss_calibrator/multi_lidar_gnss_calibrator --config /apollo/modules/calibration/lidar_gnss_calibrator/conf/multi_lidar_gnss_calibrator_config.yaml
+```
+
+
 ### 标定结果校验
 Lidar-IMU标定结果验证参考：[multiple_lidar_gnss_calibration_guide_cn.md](https://github.com/ApolloAuto/apollo/blob/r3.0.0/docs/quickstart/multiple_lidar_gnss_calibration_guide_cn.md)
 
