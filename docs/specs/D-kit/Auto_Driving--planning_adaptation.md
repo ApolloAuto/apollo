@@ -23,8 +23,9 @@
 |`planning_config.pb.txt` |修改`max_accel`数值| 比如1.0 | 车最大加速度|
 |`planning_config.pb.txt` |修改`preferred_accele`数值| 比如1.0 | 车最合适的加速度|
 
-注意：这些配置重新启动planning模块即可生效
+注意：这些配置重新启动planning模块即可生效。为了安全起见，车planning速度一定要设置得比较小，建议按照上面的给出的值来设置相应的配置参数。
 ## 规划启动流程及开环测试
+把车辆开到户外，手动控制车辆，在感知有障碍物信息显示的情况下添加routing点并查看是否有planning轨迹线信息。
 1. 进入docker环境，用gpu编译项目，编译项目，启动Dreamview 
 
 ```
@@ -49,7 +50,7 @@
     rostopic echo /apollo/sensor/velodyne16/compensator/PointCloud2 #确保有点云输出
 ```
 
-5. 在module Controller标签页启动perception模块，并在dreamview上查看障碍物信息，并确定有障碍物输出，如下图所以
+5. 在module Controller标签页启动perception模块，并在dreamview上查看障碍物信息，并确定有障碍物输出，如下图所示
 ![图片](../images/D-kits_Audo_driving_Adaptation/perception_verification.png)
 6. 在module Controller标签页启动planning、prediction、routing模块确保这些模块能够正常启动。
 7. 在routing editor标签中点击Add Point of Interest按钮添加一个point 然后选择Send Routing Request按钮发送添加的routing点，从dreamview中查看会出现一个蓝色的线 以及一个红色的stop标志。
@@ -68,4 +69,4 @@
 如下图所示
 ![图片](../images/D-kits_Audo_driving_Adaptation/planning_open_loop_verification.png)
   
-如果出现上图所示轨迹线和topic信息，表示规划模块适配和开环测试成功，否则继续查看log信息进行调试。
+如果出现上图所示轨迹线和topic信息，表示规划模块适配和开环测试通过，否则继续查看log信息进行调试。
