@@ -49,7 +49,7 @@ bool Player::Init() {
     return true;
   }
 
-  is_initialized_.exchange(false);
+  is_initialized_.store(false);
   return false;
 }
 
