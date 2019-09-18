@@ -52,7 +52,7 @@ message PerceptionParam {
     optional int32 gpu_id = 5;
     optional string camera_intrinsics = 6;
     optional FeatureParam feature_param = 7;
-    optional LanePerceptionParam lane_param = 8;
+    repeated LanePerceptionParam lane_param = 8;
     optional CalibrationServiceParam calibration_service_param = 9;
     optional DebugParam debug_param = 10;
     optional ObjectTemplateParam object_template_param = 11;

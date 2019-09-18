@@ -210,10 +210,10 @@ bool LaneDetectionComponent::Init() {
   AINFO << "velodyne128_novatel_extrinsics: " << ex_lidar2imu;
 
   CHECK(visualize_.Init_all_info_single_camera(
-      visual_camera_, intrinsic_map_, extrinsic_map_, ex_lidar2imu,
-      pitch_adj_degree, yaw_adj_degree, roll_adj_degree, image_height_,
-      image_width_));
-  homography_image2ground_ = visualize_.homography_im2car();
+      camera_names_, visual_camera_, intrinsic_map_, extrinsic_map_,
+      ex_lidar2imu, pitch_adj_degree, yaw_adj_degree, roll_adj_degree,
+      image_height_, image_width_));
+  homography_image2ground_ = visualize_.homography_im2car(visual_camera_);
   camera_lane_pipeline_->SetIm2CarHomography(homography_image2ground_);
 
   if (enable_visualization_) {
@@ -666,17 +666,14 @@ int LaneDetectionComponent::InternalProc(
     std::shared_ptr<base::Blob<uint8_t>> image_blob(new base::Blob<uint8_t>);
     camera_frame.data_provider->GetImageBlob(image_options, image_blob.get());
 
-    // visualize right away
-    if (camera_name == visual_camera_) {
-      cv::Mat output_image(image_height_, image_width_, CV_8UC3,
-                           cv::Scalar(0, 0, 0));
-      base::Image8U out_image(image_height_, image_width_, base::Color::RGB);
-      camera_frame.data_provider->GetImage(image_options, &out_image);
-      memcpy(output_image.data, out_image.cpu_data(),
-             out_image.total() * sizeof(uint8_t));
-      visualize_.ShowResult_all_info_single_camera(output_image, camera_frame,
-                                                   mot_buffer_, world2camera);
-    }
+    cv::Mat output_image(image_height_, image_width_, CV_8UC3,
+                         cv::Scalar(0, 0, 0));
+    base::Image8U out_image(image_height_, image_width_, base::Color::RGB);
+    camera_frame.data_provider->GetImage(image_options, &out_image);
+    memcpy(output_image.data, out_image.cpu_data(),
+           out_image.total() * sizeof(uint8_t));
+    visualize_.ShowResult_all_info_single_camera(output_image, camera_frame,
+                                                 mot_buffer_, world2camera);
   }
 
   // send out lane message
