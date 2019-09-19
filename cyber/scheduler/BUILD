@@ -41,6 +41,7 @@ cc_library(
     deps = [
         "//cyber/croutine",
         "//cyber/scheduler:mutex_wrapper",
+        "//cyber/scheduler:pin_thread",
         "//cyber/scheduler:processor",
     ],
 )
@@ -56,6 +57,19 @@ cc_library(
     name = "cv_wrapper",
     hdrs = [
         "common/cv_wrapper.h",
+    ],
+)
+
+cc_library(
+    name = "pin_thread",
+    srcs = [
+        "common/pin_thread.cc",
+    ],
+    hdrs = [
+        "common/pin_thread.h",
+    ],
+    deps = [
+        "//cyber/common:log"
     ],
 )
 
@@ -183,6 +197,19 @@ cc_test(
     deps = [
         "//cyber",
         "//cyber/scheduler:processor",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "pin_thread_test",
+    size = "small",
+    srcs = [
+        "common/pin_thread_test.cc",
+    ],
+    deps = [
+        "//cyber",
+        "//cyber/scheduler:pin_thread",
         "@gtest//:main",
     ],
 )

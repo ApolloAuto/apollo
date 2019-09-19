@@ -101,8 +101,9 @@ void SchedulerClassic::CreateProcessor() {
 
       auto proc = std::make_shared<Processor>();
       proc->BindContext(ctx);
-      proc->SetSchedAffinity(cpuset, affinity, i);
-      proc->SetSchedPolicy(processor_policy, processor_prio);
+      SetSchedAffinity(proc->Thread(), cpuset, affinity, i);
+      SetSchedPolicy(proc->Thread(), processor_policy,
+                     processor_prio, proc->Tid());
       processors_.emplace_back(proc);
     }
   }

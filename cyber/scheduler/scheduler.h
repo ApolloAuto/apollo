@@ -36,6 +36,7 @@
 #include "cyber/croutine/routine_factory.h"
 #include "cyber/proto/choreography_conf.pb.h"
 #include "cyber/scheduler/common/mutex_wrapper.h"
+#include "cyber/scheduler/common/pin_thread.h"
 
 namespace apollo {
 namespace cyber {
@@ -81,7 +82,6 @@ class Scheduler {
 
  protected:
   Scheduler() : stop_(false) {}
-  void ParseCpuset(const std::string&, std::vector<int>*);
 
   AtomicRWLock id_cr_lock_;
   AtomicHashMap<uint64_t, MutexWrapper*> id_map_mutex_;
