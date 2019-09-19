@@ -84,4 +84,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "logger_util_test",
+    size = "small",
+    srcs = [
+        "logger_util_test.cc",
+    ],
+    deps = [
+        "//cyber",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
