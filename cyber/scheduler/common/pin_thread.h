@@ -13,44 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "cyber/scheduler/processor.h"
 
-#include <gtest/gtest.h>
+#ifndef CYBER_SCHEDULER_COMMON_PIN_THREAD_H_
+#define CYBER_SCHEDULER_COMMON_PIN_THREAD_H_
+
 #include <string>
+#include <thread>
 #include <vector>
 
-#include "cyber/cyber.h"
-#include "cyber/scheduler/common/pin_thread.h"
-#include "policy/choreography_context.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-using scheduler::Processor;
-using scheduler::ChoreographyContext;
+void ParseCpuset(const std::string& str, std::vector<int>* cpuset);
 
-TEST(ProcessorTest, all) {
-  auto proc = std::make_shared<Processor>();
-  auto context = std::make_shared<ChoreographyContext>();
-  proc->BindContext(context);
-  std::string affinity = "1to1";
-  std::vector<int> cpuset;
-  cpuset.emplace_back(0);
-  SetSchedAffinity(proc->Thread(), cpuset, affinity, 0);
-  SetSchedPolicy(proc->Thread(), "SCHED_OTHER", 0, proc->Tid());
+void SetSchedAffinity(std::thread* thread,
+                      const std::vector<int>& cpus,
+                      const std::string& affinity,
+                      int cpu_id = -1);
 
-  auto proc1 = std::make_shared<Processor>();
-  auto context1 = std::make_shared<ChoreographyContext>();
-  proc1->BindContext(context1);
-  affinity = "range";
-  SetSchedAffinity(proc1->Thread(), cpuset, affinity, 0);
-  SetSchedPolicy(proc1->Thread(), "SCHED_FIFO", 0, proc1->Tid());
-
-  proc->Stop();
-  proc1->Stop();
-}
+void SetSchedPolicy(std::thread* thread,
+                    std::string spolicy,
+                    int sched_priority,
+                    pid_t tid = -1);
 
 }  // namespace scheduler
 }  // namespace cyber
 }  // namespace apollo
+
+#endif  // CYBER_SCHEDULER_COMMON_PIN_THREAD_H_

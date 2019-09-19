@@ -100,9 +100,10 @@ void SchedulerChoreography::CreateProcessor() {
     auto ctx = std::make_shared<ChoreographyContext>();
 
     proc->BindContext(ctx);
-    proc->SetSchedAffinity(choreography_cpuset_, choreography_affinity_, i);
-    proc->SetSchedPolicy(choreography_processor_policy_,
-                         choreography_processor_prio_);
+    SetSchedAffinity(proc->Thread(), choreography_cpuset_,
+                     choreography_affinity_, i);
+    SetSchedPolicy(proc->Thread(), choreography_processor_policy_,
+                   choreography_processor_prio_, proc->Tid());
     pctxs_.emplace_back(ctx);
     processors_.emplace_back(proc);
   }
@@ -112,8 +113,9 @@ void SchedulerChoreography::CreateProcessor() {
     auto ctx = std::make_shared<ClassicContext>();
 
     proc->BindContext(ctx);
-    proc->SetSchedAffinity(pool_cpuset_, pool_affinity_, i);
-    proc->SetSchedPolicy(pool_processor_policy_, pool_processor_prio_);
+    SetSchedAffinity(proc->Thread(), pool_cpuset_, pool_affinity_, i);
+    SetSchedPolicy(proc->Thread(), pool_processor_policy_,
+                   pool_processor_prio_, proc->Tid());
     pctxs_.emplace_back(ctx);
     processors_.emplace_back(proc);
   }
