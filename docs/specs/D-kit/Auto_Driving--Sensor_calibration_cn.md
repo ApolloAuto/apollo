@@ -188,29 +188,29 @@ Lidar-IMU标定结果验证参考：[multiple_lidar_gnss_calibration_guide_cn.md
 ###  相机内参文件
 内参包含相机的焦距、主点和畸变系数等信息，可以通过一些成熟的相机标定工具来获得，例如 [ROS Camera Calibration Tools](http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration) 和 [Camera Calibration Toolbox for Matlab](http://www.vision.caltech.edu/bouguetj/calib_doc/)。内参标定完成后，需将结果转换为 `.yaml` 格式的文件。下面是一个正确的内参文件样例：
 
-	```bash
-	header: 
-	  seq: 0
-	  stamp: 
-	    secs: 0
-	    nsecs: 0
-	  frame_id: short_camera
-	height: 1080
-	width: 1920
-	distortion_model: plumb_bob
-	D: [-0.535253, 0.259291, 0.004276, -0.000503, 0.0]
-	K: [1959.678185, 0.0, 1003.592207, 0.0, 1953.786100, 507.820634, 0.0, 0.0, 1.0]
-	R: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
-	P: [1665.387817, 0.0, 1018.703332, 0.0, 0.0, 1867.912842, 506.628623, 0.0, 0.0, 0.0, 1.0, 0.0]
-	binning_x: 0
-	binning_y: 0
-	roi: 
-	  x_offset: 0
-	  y_offset: 0
-	  height: 0
-	  width: 0
-	  do_rectify: False
-	```
+```
+  header: 
+    seq: 0
+    stamp: 
+      secs: 0
+      nsecs: 0
+    frame_id: short_camera
+  height: 1080
+  width: 1920
+  distortion_model: plumb_bob
+  D: [-0.535253, 0.259291, 0.004276, -0.000503, 0.0]
+  K: [1959.678185, 0.0, 1003.592207, 0.0, 1953.786100, 507.820634, 0.0, 0.0, 1.0]
+  R: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+  P: [1665.387817, 0.0, 1018.703332, 0.0, 0.0, 1867.912842, 506.628623, 0.0, 0.0, 0.0, 1.0, 0.0]
+  binning_x: 0
+  binning_y: 0
+  roi: 
+    x_offset: 0
+    y_offset: 0
+    height: 0
+    width: 0
+    do_rectify: False
+```
 标定后的内参文件，放置到形如`/apollo/modules/calibration/data/ch`的路径中，其中`ch`为车辆参数文件夹，用户根据自身情况选择，后文不再重复说明。	
 我们建议每一只相机都需要单独进行内参标定，而不是使用统一的内参结果。这样可以提高外参标定的准确性。
 ### 配置`camera_camera_calibrator.conf`文件，配置形式如下所示：
