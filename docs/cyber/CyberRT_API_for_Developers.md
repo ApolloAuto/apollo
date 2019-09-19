@@ -35,16 +35,16 @@ The first part of demonstrating CyberRT API is to understand the Talker/Listener
 In the CyberRT framework, the node is the most fundamental unit, similar to the role of a `handle`. When creating a specific functional object (writer, reader, etc.), you need to create it based on an existing node instance.
 The node creation interface is as follows:
 
-```C
+```cpp
 std::unique_ptr<Node> apollo::cyber::CreateNode(const std::string& node_name, const std::string& name_space = "");
 ```
 
 - Parameters:
     - node_name: name of the node, globally unique identifier
     - name_space: name of the space where the node is located
-    ```
-    name_space is empty by default. It is the name of the space concatenated with node_name. The format is /namespace/node_name
-    ```
+    
+    > name_space is empty by default. It is the name of the space concatenated with node_name. The format is `/namespace/node_name`
+    
 - Return value - An exclusive smart pointer to Node
 - Error Conditions - when `cyber::Init()` has not called, the system is in an uninitialized state, unable to create a node, return nullptr
 
@@ -53,7 +53,7 @@ std::unique_ptr<Node> apollo::cyber::CreateNode(const std::string& node_name, co
 The writer is the basic facility used in CyberRT to send messages. Every writer corresponds to a channel with a specific data type.
 The writer is created by the `CreateWriter` interface in the node class. The interfaces are listed as below:
 
-```C
+```cpp
 template <typename MessageT>
    auto CreateWriter(const std::string& channel_name)
        -> std::shared_ptr<Writer<MessageT>>;
@@ -72,7 +72,7 @@ template <typename MessageT>
 The reader is the basic facility used in cyber to receive messages. Reader has to be bound to a callback function when it is created. When a new message arrives in the channel, the callback will be called.
 The reader is created by the `CreateReader` interface of the node class. The interfaces are listed as below:
 
-```C
+```cpp
 template <typename MessageT>
 auto CreateReader(const std::string& channel_name, const std::function<void(const std::shared_ptr<MessageT>&)>& reader_func)
     -> std::shared_ptr<Reader<MessageT>>;
@@ -98,7 +98,7 @@ auto CreateReader(const proto::RoleAttributes& role_attr,
 
 #### Talker (cyber/examples/talker.cc)
 
-```C
+```cpp
 #include "cyber/cyber.h"
 #include "cyber/proto/chatter.pb.h"
 #include "cyber/time/rate.h"
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
 
 #### Listener (cyber/examples/listener.cc)
 
-```C
+```cpp
 #include "cyber/cyber.h"
 #include "cyber/proto/chatter.pb.h"
 void MessageCallback(
@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 #### Bazel BUILD file(cyber/samples/BUILD)
-```bazel
+```python
 cc_binary(
     name = "talker",
     srcs = [ "talker.cc", ],
@@ -209,7 +209,7 @@ message Driver {
 ```
 #### Create a service and a client
 
-```c
+```cpp
 // filename: cyber/examples/service.cc
 #include "cyber/cyber.h"
 #include "cyber/examples/proto/examples.pb.h"
@@ -249,7 +249,7 @@ int main(int argc, char* argv[]) {
 ```
 #### Bazel build file
 
-```bazel
+```python
 cc_binary(
     name = "service",
     srcs = [ "service.cc", ],
@@ -308,7 +308,7 @@ Besides the 5 types above, Parameter also supports interface with protobuf objec
 
 Supported constructors:
 
-```C
+```cpp
 Parameter();  // Name is empty, type is NOT_SET
 explicit Parameter(const Parameter& parameter);
 explicit Parameter(const std::string& name);  // type为NOT_SET
@@ -325,7 +325,7 @@ Parameter(const std::string& name, const google::protobuf::Message& msg);
 ```
   Sample code of using Parameter object:
 
-  ```C
+  ```cpp
   Parameter a("int", 10);
   Parameter b("bool", true);
   Parameter c("double", 0.1);
@@ -345,7 +345,7 @@ Parameter(const std::string& name, const google::protobuf::Message& msg);
 
 Interface list:
 
-```C
+```cpp
 inline ParamType type() const;
 inline std::string TypeName() const;
 inline std::string Descriptor() const;
@@ -374,7 +374,7 @@ value() const;
 
 An example of how to use those interfaces:
 
-```C
+```cpp
 Parameter a("int", 10);
 a.Name();  // return int
 a.Type();  // return apollo::cyber::proto::ParamType::INT
@@ -391,7 +391,7 @@ auto chatter = f.value<Chatter>();
 
 If a node wants to provide a Parameter Service to other nodes, then you need to create a `ParameterService`.
 
-```C
+```cpp
 /**
  * @brief Construct a new ParameterService object
  *
@@ -405,7 +405,7 @@ Since all parameters are stored in the parameter service object, the parameters 
 
 **Setting parameters:**
 
-```C
+```cpp
 /**
  * @brief Set the Parameter object
  *
@@ -415,7 +415,7 @@ void SetParameter(const Parameter& parameter);
 ```
 **Getting parameters:**
 
-```C
+```cpp
 /**
  * @brief Get the Parameter object
  *
@@ -429,7 +429,7 @@ bool GetParameter(const std::string& param_name, Parameter* parameter);
 
 **Getting the list of parameters:**
 
-```C
+```cpp
 /**
  * @brief Get all the Parameter objects
  *
@@ -444,7 +444,7 @@ bool ListParameters(std::vector<Parameter>* parameters);
 
 If a node wants to use parameter services of other nodes, you need to create a `ParameterClient`.
 
-```C
+```cpp
 /**
  * @brief Construct a new ParameterClient object
  *
@@ -458,7 +458,7 @@ You could also perform `SetParameter`, `GetParameter` and `ListParameters` menti
 
 ### Demo - example
 
-```C
+```cpp
 #include "cyber/cyber.h"
 #include "cyber/parameter/parameter_client.h"
 #include "cyber/parameter/parameter_server.h"
@@ -495,7 +495,7 @@ int main(int argc, char** argv) {
 
 Cyber log library is built on top of glog. The following header files need to be included:
 
-```C
+```cpp
 #include "cyber/common/log.h"
 #include "cyber/init.h"
 ```
@@ -517,7 +517,7 @@ export GLOG_minloglevel=0
 
 Call the Init method at the code entry to initialize the log:
 
-```c++
+```cpp++
 apollo::cyber::cyber::Init(argv[0]) is initialized.
 If no macro definition is made in the previous component, the corresponding log is printed to the binary log.
 ```
@@ -526,7 +526,7 @@ If no macro definition is made in the previous component, the corresponding log 
 
 Log library is encapsulated in Log printing macros. The related log macros are used as follows:
 
-```C
+```cpp
 ADEBUG << "hello cyber.";
 AINFO  << "hello cyber.";
 AWARN  << "hello cyber.";
@@ -573,7 +573,7 @@ There are two options to use Cyber RT framework for applications:
 
 An example dag file:
 
-```
+```protobuf
 # Define all coms in DAG streaming.
 module_config {
     module_library : "lib/libperception_component.so"
@@ -606,7 +606,7 @@ module_config {
 #### Common_component_example(cyber/examples/common_component_example/*)
 Header definition(common_component_example.h)
 
-```C
+```cpp
 #include <memory>
 
 #include "cyber/class_loader/class_loader.h"
@@ -628,7 +628,7 @@ CYBER_REGISTER_COMPONENT(Commontestcomponent)
 
 Cpp file implementation(common_component_example.cc)
 
-```C
+```cpp
 #include "cyber/examples/common_component_smaple/common_component_example.h"
 
 #include "cyber/class_loader/class_loader.h"
@@ -651,7 +651,7 @@ bool Commontestcomponent::Proc(const std::shared_ptr<Driver>& msg0,
 
 Header definition(timer_component_example.h)
 
-```C
+```cpp
 #include <memory>
 
 #include "cyber/class_loader/class_loader.h"
@@ -677,7 +677,7 @@ CYBER_REGISTER_COMPONENT(TimertestComponent)
 ```
 Cpp file implementation(timer_component_example.cc)
 
-```C
+```cpp
 #include "cyber/examples/timer_component_example/timer_component_example.h"
 
 #include "cyber/class_loader/class_loader.h"
@@ -710,7 +710,7 @@ Use timertestcomponent as example:
 
 - Component needs to be registered to load the class through SharedLibrary. The registration interface looks like:
 
-```C
+```cpp
 CYBER_REGISTER_COMPONENT(DriverComponent)
 ```
 
@@ -725,7 +725,7 @@ cyber_launch supports two scenarios for dynamically loading components or starti
 
 ### Launch File Format
 
-```
+```xml
 <cyber>
     <module>
         <name>driver</name>
@@ -762,7 +762,7 @@ Each loaded component or binary is a module
 Timer can be used to create a timed task to run on a periodic basis, or to run only once
 
 ### Timer Interface
-```C
+```cpp
 /**
  * @brief Construct a new Timer object
  *
@@ -776,7 +776,7 @@ Timer(uint32_t period, std::function<void()> callback, bool oneshot);
 
 Or you could encapsulate the parameters into a timer option as follows:
 
-```C
+```cpp
 struct TimerOption {
   uint32_t period;                 // The period of the timer, unit is ms
   std::function<void()> callback;  // The tasks that the timer needs to perform
@@ -801,7 +801,7 @@ When you need to manually stop a timer that has already started, you can call th
 
 ### Demo - example
 
-```C
+```cpp
 #include <iostream>
 #include "cyber/cyber.h"
 int main(int argc, char** argv) {
@@ -822,7 +822,7 @@ Time is a class used to manage time; it can be used for current time acquisition
 
 The time interfaces are as follows:
 
-```C
+```cpp
 // constructor, passing in a different value to construct Time
 Time(uint64_t nanoseconds); //uint64_t, in nanoseconds
 Time(int nanoseconds); // int type, unit: nanoseconds
@@ -839,7 +839,7 @@ Bool IsZero() const; // Determine if the time is 0
 
 A code example can be seen below:
 
-```C
+```cpp
 #include <iostream>
 #include "cyber/cyber.h"
 #include "cyber/duration.h"
@@ -867,7 +867,7 @@ int main(int argc, char** argv) {
 ### Demo - example(cyber/examples/record.cc)
 Write 100 RawMessage to`TEST_FILE` through `test_write` method, then read them out through `test_read` method.
 
-```c
+```cpp
 #include <string>
 
 #include "cyber/cyber.h"
@@ -960,7 +960,7 @@ For additional information and examples, refer to [Node](#node)
 
 ### API List
 
-```C
+```cpp
 //create writer with user-define attr and message type
 auto CreateWriter(const proto::RoleAttributes& role_attr)
     -> std::shared_ptr<transport::Writer<MessageT>>;
@@ -994,7 +994,7 @@ For additional information and examples, refer to [Writer](#writer)
 
 ### API List
 
-```C
+```cpp
 bool Write(const std::shared_ptr<MessageT>& message);
 ```
 
@@ -1003,7 +1003,7 @@ For additional information and examples, refer to [Client](#service-creation-and
 
 ### API List
 
-```C
+```cpp
 SharedResponse SendRequest(SharedRequest request,
                            const std::chrono::seconds& timeout_s = std::chrono::seconds(5));
 SharedResponse SendRequest(const Request& request,
@@ -1023,7 +1023,7 @@ For additional information and examples, refer to [Parameter](##param-parameter-
 
 ### API List - Setting parameters
 
-```C
+```cpp
 Parameter();  // Name is empty, type is NOT_SET
 explicit Parameter(const Parameter& parameter);
 explicit Parameter(const std::string& name);  // Type is NOT_SET
@@ -1041,7 +1041,7 @@ Parameter(const std::string& name, const google::protobuf::Message& msg);
 
 ### API List - Reading parameters
 
-```C
+```cpp
 inline ParamType type() const;
 inline std::string TypeName() const;
 inline std::string Descriptor() const;
@@ -1070,7 +1070,7 @@ value() const;
 
 ### API List - Creating parameter service
 
-```C
+```cpp
 explicit ParameterService(const std::shared_ptr<Node>& node);
 void SetParameter(const Parameter& parameter);
 bool GetParameter(const std::string& param_name, Parameter* parameter);
@@ -1079,7 +1079,7 @@ bool ListParameters(std::vector<Parameter>* parameters);
 
 ### API List - Creating parameter client
 
-```C
+```cpp
 ParameterClient(const std::shared_ptr<Node>& node, const std::string& service_node_name);
 bool SetParameter(const Parameter& parameter);
 bool GetParameter(const std::string& param_name, Parameter* parameter);
@@ -1093,7 +1093,7 @@ For additional information and examples, refer to [Timer](#timer)
 
 ### API List
 
-```C
+```cpp
 Timer(uint32_t period, std::function<void()> callback, bool oneshot);
 Timer(TimerOption opt);
 void SetTimerOption(TimerOption opt);
@@ -1106,7 +1106,7 @@ For additional information and examples, refer to [Time](#use-of-time)
 
 ### API List
 
-```C
+```cpp
 static const Time MAX;
 static const Time MIN;
 Time() {}
@@ -1129,7 +1129,7 @@ Interval-related interface, used to indicate the time interval, can be initializ
 
 ### API List
 
-```C
+```cpp
 Duration() {}
 Duration(int64_t nanoseconds);
 Duration(int nanoseconds);
@@ -1148,7 +1148,7 @@ The frequency interface is generally used to initialize the time of the sleep fr
 
 ### API List
 
-```C
+```cpp
 Rate(double frequency);
 Rate(uint64_t nanoseconds);
 Rate(const Duration&);
@@ -1163,7 +1163,7 @@ The interface for reading the record file is used to read the message and channe
 
 ### API List
 
-```C
+```cpp
 RecordReader();
 bool Open(const std::string& filename, uint64_t begin_time = 0,
           uint64_t end_time = UINT64_MAX);
@@ -1180,7 +1180,7 @@ The interface for writing the record file, used to record the message and channe
 
 ### API List
 
-```C
+```cpp
 RecordWriter();
 bool Open(const std::string& file);
 void Close();
