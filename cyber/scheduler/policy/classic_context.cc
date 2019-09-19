@@ -88,7 +88,7 @@ void ClassicContext::Wait() {
 void ClassicContext::Shutdown() {
   stop_.store(true);
   mtx_wrapper_->Mutex().lock();
-  notify_grp_[current_grp] = SHRT_MAX;
+  notify_grp_[current_grp] = UCHAR_MAX;
   mtx_wrapper_->Mutex().unlock();
   cw_->Cv().notify_all();
 }
