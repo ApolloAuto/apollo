@@ -1,4 +1,7 @@
 ﻿# 封闭园区自动驾驶搭建--定位地图制作
+多传感器融合定位(msf)，结合了RTK和激光雷达点云定位，可以提高定位精度，而激光雷达点云定位，则需要提前制作定位地图(local_map),本文将说明开发者套件的定位地图制作方法。
+## 注意
+   进行定位地图制作前，应首先确保`modules/localization/conf/localization.conf`文件中的`enable_lidar_localization`设置为`false`，待地图制作完成后，再修改为true。
 ## 录制制作定位地图的bag包
 
  - 制作定位地图，首先沿着高精地图轨迹录制包含所需数据的bag包，bag需要包含的`topic`如下表所示：
