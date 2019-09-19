@@ -32,7 +32,7 @@ export default class CameraDataWebSocketEndpoint {
             switch (message.type) {
                 case "CameraData":
                     if (message) {
-                        RENDERER.updateCameraData(message);
+                        STORE.cameraData.init(message, RENDERER.coordinates);
                     }
                     break;
                 default:

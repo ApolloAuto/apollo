@@ -93,7 +93,13 @@ void PerceptionCameraUpdater::GetImageLocalization(
     if (tmp_diff < 0) {
       timestamp_diff = tmp_diff;
       image_pos = localization_queue_.front()->pose();
-      localization_queue_.pop_front();
+      if (localization_queue_.size() > 1) {
+        localization_queue_.pop_front();
+      } else {
+        // At least keep one pose in queue, in case there's no localization
+        // coming between two requests.
+        break;
+      }
     } else {
       if (tmp_diff < std::fabs(timestamp_diff)) {
         image_pos = localization_queue_.front()->pose();
