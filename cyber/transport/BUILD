@@ -294,6 +294,7 @@ cc_library(
     srcs = ["rtps/underlay_message.cc"],
     hdrs = ["rtps/underlay_message.h"],
     deps = [
+        "//cyber/common:log",
         "@fastrtps",
     ],
 )
