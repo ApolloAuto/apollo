@@ -79,7 +79,7 @@ bool CommonComponentSample::Proc(const std::shared_ptr<Driver>& msg0,
 
 创建 bazel BUILD 文件.
 
-```bash
+```python
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -144,7 +144,7 @@ component_config {
   - 上一步创建的dag配置的名字。
   - 组件运行时所在的进程目录。
 
-```bash
+```xml
 <cyber>
     <component>
         <name>common</name>

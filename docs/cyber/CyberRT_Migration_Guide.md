@@ -21,7 +21,7 @@ target_link_libraries(pb_listener ${catkin_LIBRARIES}  pb_msgs_example_proto)
 
 Bazel
 
-```
+```python
 cc_binary(
   name = "talker",
   srcs = ["talker.cc"],
@@ -43,7 +43,7 @@ We can find the mapping easily from the 2 file snippets. For example, `pb_talker
 ### Proto
 Apollo ROS has customized to support proto message formate that a separate section `add_proto_files` and projectName_proto(`pb_msgs_example_proto`) in `target_link_libraries` are required to send message in proto formate. For config proto message in Cyber RT, it's as simple as adding the target proto file path concantenated with name of `cc_proto_library` in `deps` setting. The `cc_proto_library` is set up in BUILD file under proto folder.
 
-```C
+```python
 cc_proto_library(
   name = "examples_cc_proto",
   deps = [
@@ -85,7 +85,7 @@ As shown below, Cyber RT remove the src folder and pull all source code in the s
 ### Listener
 Cyber RT
 
-```c
+```cpp
 #include "cyber/cyber.h"
 #include "cyber/examples/proto/examples.pb.h"
 
@@ -110,7 +110,7 @@ int main(int argc, char* argv[]) {
 ```
 ROS
 
-```c
+```cpp
 #include "ros/ros.h"
 #include "chatter.pb.h"
 
@@ -142,7 +142,7 @@ Note: for Cyber RT, a listener node has to use `node->CreateReader<messageType>(
 
 Cyber RT
 
-```C
+```cpp
 #include "cyber/cyber.h"
 #include "cyber/examples/proto/examples.pb.h"
 
@@ -173,7 +173,7 @@ int main(int argc, char *argv[]) {
 
 ROS
 
-```c
+```cpp
 #include "ros/ros.h"
 #include "chatter.pb.h"
 
@@ -209,7 +209,7 @@ Most of the mappings are illustrated in listener code above, the rest are listed
 
 ## Tools mapping
 ROS | Cyber RT | Note
-------------- | ------------- | --------------
+:------------- | :------------- | :--------------
 rosbag    |   cyber_recorder |   data file
 scripts/diagnostics.sh | cyber_monitor | channel debug
 offline_lidar_visualizer_tool   | cyber_visualizer |point cloud visualizer

@@ -25,7 +25,7 @@
 
 接口定义如下：
 
-```
+```python
 class Node:
     """
     Class for cyber Node wrapper.
@@ -86,7 +86,7 @@ Record写的操作是：
 
 接口定义如下：
 
-```
+```python
 class RecordReader(object):
     """
     Class for cyber RecordReader wrapper.
@@ -173,7 +173,7 @@ class RecordWriter(object):
 
 ### 3.3 Time接口
 
-```
+```python
 class Time(object):
 	@staticmethod
     def now():
@@ -223,7 +223,7 @@ class Timer(object):
 ## 4. 例子
 ### 4.1 读channel (参见python/examples/listener.py)
 
-```
+```python
 import sys
 sys.path.append("../")
 from cyber_py import cyber
@@ -260,7 +260,7 @@ if __name__ == '__main__':
 
 ### 4.2 写channel(参见python/examples/talker.py)
 
-```
+```python
 from modules.common.util.testdata.simple_pb2 import SimpleMessage
 from cyber_py import cyber
 """Module for example of talker."""
@@ -296,7 +296,7 @@ if __name__ == '__main__':
 
 ### 4.3 读写消息到Record文件(参见python/examples/record.py)
 
-```
+```python
 """Module for example of record."""
 
 import time

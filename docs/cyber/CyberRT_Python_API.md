@@ -24,7 +24,7 @@ Steps shown as below:
 
 The interfaces are shown below:
 
-```
+```python
 class Node:
     """
     Class for cyber Node wrapper.
@@ -79,12 +79,12 @@ Read from record：
 
 Write to record：
 
-  1. Create a RecordWriter
-  2. Write messages to record；
+1. Create a RecordWriter
+2. Write messages to record；
 
 The interfaces are shown below:
 
-```
+```python
 class RecordReader(object):
     """
     Class for cyber RecordReader wrapper.
@@ -171,7 +171,7 @@ class RecordWriter(object):
 ```
 ### 3.3 Time Interfaces
 
-```
+```python
 class Time(object):
 	@staticmethod
     def now():
@@ -197,7 +197,7 @@ class Time(object):
 
 
 ### 3.4 Timer Interfaces
-```
+```python
 
 class Timer(object):
 
@@ -222,7 +222,7 @@ class Timer(object):
 ## 4. Examples
 ### 4.1 Read from Channel (in cyber/python/examples/listener.py)
 
-```
+```python
 import sys
 sys.path.append("../")
 from cyber_py import cyber
@@ -259,7 +259,7 @@ if __name__ == '__main__':
 
 ### 4.2 Write to Channel(in cyber/python/examples/talker.py)
 
- ```
+ ```python
 from modules.common.util.testdata.simple_pb2 import SimpleMessage
 from cyber_py import cyber
 """Module for example of talker."""
@@ -295,7 +295,7 @@ if __name__ == '__main__':
 
 ### 4.3 Read and Write Messages from/to Record File(in cyber/python/examples/record.py)
 
-```
+```python
 """Module for example of record."""
 
 import time
@@ -368,4 +368,3 @@ if __name__ == '__main__':
     cyber.shutdown()
 
 ```
-

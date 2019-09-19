@@ -158,7 +158,7 @@ The cyber_recorder commands are:
 - To view the information of a record file:
 
 ```
- cyber_recorder info -h
+$ cyber_recorder info -h
 usage: cyber_recorder info [options]
 	-h, --help				show help message
 ```
