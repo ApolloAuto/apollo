@@ -48,7 +48,7 @@ cc_library(
     deps = [
         ":drive_event_trigger",
         ":emergency_mode_trigger",
-        ":hard_break_trigger",
+        ":hard_brake_trigger",
         ":interval_pool",
         ":regular_interval_trigger",
         ":small_topics_trigger",
@@ -89,9 +89,9 @@ cc_library(
 )
 
 cc_library(
-    name = "hard_break_trigger",
-    srcs = ["hard_break_trigger.cc"],
-    hdrs = ["hard_break_trigger.h"],
+    name = "hard_brake_trigger",
+    srcs = ["hard_brake_trigger.cc"],
+    hdrs = ["hard_brake_trigger.h"],
     deps = [
         ":trigger_base",
         "//modules/canbus/proto:canbus_proto",
