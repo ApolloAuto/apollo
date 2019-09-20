@@ -232,9 +232,9 @@ body {
         .dreamview-body {
             display: flex;
             flex-flow: column nowrap;
-
             flex: 1 1 auto;
             overflow: hidden;
+            background-color: #1D2226;
 
             .main-view {
                 flex: 0 0 auto;
@@ -462,10 +462,13 @@ body {
                 flex-direction: column;
                 .section {
                     padding: 5px 10px 5px 10px;
+                    border-bottom: 1px solid #000000;
                     .section-title {
-                        margin-bottom: 5px;
+                        margin-bottom: 10px;
                         padding: 5px;
                         display: flex;
+                        width: 90px;
+                        border-bottom: 1px solid #999999;
                         span {
                             margin-left: 10px;
                             margin-top: 2px;
@@ -475,8 +478,8 @@ body {
                         padding-bottom: 2px;
                         display: inline-block;
                         border-bottom: 1px solid #999999;
-                        margin-bottom: 5px;
                         margin-left: 10px;
+                        margin-top: 10px;
                     }
                     .section-content {
                         padding: 10px 10px;
@@ -742,7 +745,6 @@ body {
         flex: 2 1 auto;
 
         z-index: 10 !important;
-        margin-right: 3px;
 
         overflow-y: hidden;
         overflow-x: auto;
@@ -1226,7 +1228,6 @@ body {
     flex: 1 1 auto;
 
     z-index: 10;
-    margin-right: 3px;
     overflow-x: auto;
     overflow-y: hidden;
 
