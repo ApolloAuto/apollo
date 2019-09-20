@@ -510,6 +510,10 @@ Status OnLanePlanning::Plan(
 
     if (FLAGS_export_chart) {
       ExportOnLaneChart(best_ref_info->debug(), ptr_debug);
+      const auto* failed_ref_info = frame_->FindFailedReferenceLineInfo();
+      if (failed_ref_info) {
+        ExportFailedSTChart(failed_ref_info->debug(), ptr_debug);
+      }
     } else {
       ptr_debug->MergeFrom(best_ref_info->debug());
       ExportReferenceLineDebug(ptr_debug);
@@ -664,6 +668,16 @@ void AddSpeedPlan(
     } else if (speed_plan.name() == "QpSplineStSpeedOptimizer") {
       (*properties)["color"] = "\"rgba(54, 162, 235, 1)\"";
     }
+  }
+}
+
+void OnLanePlanning::ExportFailedSTChart(
+    const planning_internal::Debug& debug_info,
+    planning_internal::Debug* debug_chart) {
+  const auto& src_data = debug_info.planning_data();
+  auto* dst_data = debug_chart->mutable_planning_data();
+  for (const auto& st_graph : src_data.st_graph()) {
+    AddSTGraph(st_graph, dst_data->add_chart());
   }
 }
 
