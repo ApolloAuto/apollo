@@ -24,7 +24,6 @@
 #include "cyber/common/global_data.h"
 #include "cyber/common/util.h"
 #include "cyber/data/data_visitor.h"
-#include "cyber/event/perf_event_cache.h"
 #include "cyber/scheduler/processor.h"
 #include "cyber/scheduler/processor_context.h"
 

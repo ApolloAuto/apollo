@@ -16,12 +16,12 @@
 
 #include "cyber/scheduler/policy/choreography_context.h"
 
+#include <limits.h>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
 #include "cyber/common/types.h"
-#include "cyber/event/perf_event_cache.h"
 
 namespace apollo {
 namespace cyber {
@@ -31,8 +31,6 @@ using apollo::cyber::base::ReadLockGuard;
 using apollo::cyber::base::WriteLockGuard;
 
 using apollo::cyber::croutine::RoutineState;
-using apollo::cyber::event::PerfEventCache;
-using apollo::cyber::event::SchedPerf;
 
 std::shared_ptr<CRoutine> ChoreographyContext::NextRoutine() {
   if (cyber_unlikely(stop_.load())) {
@@ -47,8 +45,6 @@ std::shared_ptr<CRoutine> ChoreographyContext::NextRoutine() {
     }
 
     if (cr->UpdateState() == RoutineState::READY) {
-      PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NEXT_RT, cr->id(),
-                                                cr->processor_id());
       return cr;
     }
     cr->Release();

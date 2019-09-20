@@ -39,8 +39,6 @@ using apollo::cyber::common::GlobalData;
 using apollo::cyber::common::PathExists;
 using apollo::cyber::common::WorkRoot;
 using apollo::cyber::croutine::RoutineState;
-using apollo::cyber::event::PerfEventCache;
-using apollo::cyber::event::SchedPerf;
 
 SchedulerChoreography::SchedulerChoreography() {
   std::string conf("conf/");
@@ -249,9 +247,6 @@ bool SchedulerChoreography::NotifyProcessor(uint64_t crid) {
       return false;
     }
   }
-
-  PerfEventCache::Instance()->AddSchedEvent(SchedPerf::NOTIFY_IN, crid,
-                                            cr->processor_id());
 
   if (cr->processor_id() != -1) {
     auto pid = cr->processor_id();
