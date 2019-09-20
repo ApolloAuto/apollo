@@ -3,16 +3,6 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "intra_message",
-    srcs = [
-        "intra_message.cc",
-    ],
-    hdrs = [
-        "intra_message.h",
-    ],
-)
-
-cc_library(
     name = "message_header",
     hdrs = [
         "message_header.h",
@@ -37,7 +27,6 @@ cc_library(
         "message_traits.h",
     ],
     deps = [
-        ":intra_message",
         ":message_header",
         ":protobuf_traits",
         ":py_message_traits",

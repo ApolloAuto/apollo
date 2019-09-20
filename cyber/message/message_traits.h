@@ -21,7 +21,6 @@
 
 #include "cyber/base/macros.h"
 #include "cyber/common/log.h"
-#include "cyber/message/intra_message.h"
 #include "cyber/message/message_header.h"
 #include "cyber/message/protobuf_traits.h"
 #include "cyber/message/py_message_traits.h"
