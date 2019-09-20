@@ -36,29 +36,29 @@ TEST(WriterReaderTest, constructor) {
   attr.set_channel_name(channel_name);
 
   Writer<proto::UnitTest> writer_a(attr);
-  EXPECT_FALSE(writer_a.IsInit());
+  EXPECT_FALSE(writer_a.IsInited());
   EXPECT_EQ(writer_a.GetChannelName(), channel_name);
 
   Reader<proto::UnitTest> reader_a(attr);
-  EXPECT_FALSE(reader_a.IsInit());
+  EXPECT_FALSE(reader_a.IsInited());
   EXPECT_EQ(reader_a.GetChannelName(), channel_name);
 
   attr.set_host_name("caros");
   Writer<proto::UnitTest> writer_b(attr);
-  EXPECT_FALSE(writer_b.IsInit());
+  EXPECT_FALSE(writer_b.IsInited());
   EXPECT_EQ(writer_b.GetChannelName(), channel_name);
 
   Reader<proto::UnitTest> reader_b(attr);
-  EXPECT_FALSE(reader_b.IsInit());
+  EXPECT_FALSE(reader_b.IsInited());
   EXPECT_EQ(reader_b.GetChannelName(), channel_name);
 
   attr.set_process_id(12345);
   Writer<proto::UnitTest> writer_c(attr);
-  EXPECT_FALSE(writer_c.IsInit());
+  EXPECT_FALSE(writer_c.IsInited());
   EXPECT_EQ(writer_c.GetChannelName(), channel_name);
 
   Reader<proto::UnitTest> reader_c(attr);
-  EXPECT_FALSE(reader_c.IsInit());
+  EXPECT_FALSE(reader_c.IsInited());
   EXPECT_EQ(reader_c.GetChannelName(), channel_name);
 }
 
@@ -73,7 +73,7 @@ TEST(WriterReaderTest, init_and_shutdown) {
 
   Writer<proto::UnitTest> writer_a(attr);
   EXPECT_TRUE(writer_a.Init());
-  EXPECT_TRUE(writer_a.IsInit());
+  EXPECT_TRUE(writer_a.IsInited());
   // repeated call
   EXPECT_TRUE(writer_a.Init());
 
@@ -81,24 +81,24 @@ TEST(WriterReaderTest, init_and_shutdown) {
   attr.set_process_id(54321);
   Reader<proto::UnitTest> reader_a(attr);
   EXPECT_TRUE(reader_a.Init());
-  EXPECT_TRUE(reader_a.IsInit());
+  EXPECT_TRUE(reader_a.IsInited());
   // repeated call
   EXPECT_TRUE(reader_a.Init());
 
   Writer<proto::UnitTest> writer_b(attr);
   EXPECT_TRUE(writer_b.Init());
-  EXPECT_TRUE(writer_b.IsInit());
+  EXPECT_TRUE(writer_b.IsInited());
 
   attr.set_channel_name(channel_name_a);
   attr.set_host_name("sorac");
   attr.set_process_id(12345);
   Reader<proto::UnitTest> reader_b(attr);
   EXPECT_TRUE(reader_b.Init());
-  EXPECT_TRUE(reader_b.IsInit());
+  EXPECT_TRUE(reader_b.IsInited());
 
   Reader<proto::UnitTest> reader_c(attr);
   EXPECT_FALSE(reader_c.Init());
-  EXPECT_FALSE(reader_c.IsInit());
+  EXPECT_FALSE(reader_c.IsInited());
 
   writer_a.Shutdown();
   // repeated call
@@ -110,11 +110,11 @@ TEST(WriterReaderTest, init_and_shutdown) {
   reader_b.Shutdown();
   reader_c.Shutdown();
 
-  EXPECT_FALSE(writer_a.IsInit());
-  EXPECT_FALSE(writer_b.IsInit());
-  EXPECT_FALSE(reader_a.IsInit());
-  EXPECT_FALSE(reader_b.IsInit());
-  EXPECT_FALSE(reader_c.IsInit());
+  EXPECT_FALSE(writer_a.IsInited());
+  EXPECT_FALSE(writer_b.IsInited());
+  EXPECT_FALSE(reader_a.IsInited());
+  EXPECT_FALSE(reader_b.IsInited());
+  EXPECT_FALSE(reader_c.IsInited());
 }
 
 TEST(WriterReaderTest, messaging) {

@@ -148,7 +148,7 @@ class ReaderBase {
    * @return true if the Reader has been inited
    * @return false if the Reader has not been inited
    */
-  bool IsInit() const { return init_.load(); }
+  bool IsInited() const { return init_.load(); }
 
  protected:
   proto::RoleAttributes role_attr_;

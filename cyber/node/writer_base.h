@@ -88,15 +88,11 @@ class WriterBase {
    * @return true if the Writer is inited
    * @return false if the Write is not inited
    */
-  bool IsInit() const {
-    std::lock_guard<std::mutex> g(lock_);
-    return init_;
-  }
+  bool IsInited() const { return init_.load(); }
 
  protected:
   proto::RoleAttributes role_attr_;
-  mutable std::mutex lock_;
-  bool init_;
+  std::atomic<bool> init_;
 };
 
 }  // namespace cyber
