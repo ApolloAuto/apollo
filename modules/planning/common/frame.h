@@ -95,6 +95,8 @@ class Frame {
 
   const ReferenceLineInfo *FindDriveReferenceLineInfo();
 
+  const ReferenceLineInfo *FindFailedReferenceLineInfo();
+
   const ReferenceLineInfo *DriveReferenceLineInfo() const;
 
   const std::vector<const Obstacle *> obstacles() const;
