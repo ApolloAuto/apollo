@@ -84,7 +84,7 @@ float HardBrakeTrigger::GetMeanSpeed(
   if (msg_list.empty()) {
     return 0.0f;
   }
-  for (const auto& msg: msg_list) {
+  for (const auto& msg : msg_list) {
     speed_points += msg->speed_mps();
   }
   return speed_points/static_cast<float>(msg_list.size());
