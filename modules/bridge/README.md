@@ -16,11 +16,11 @@
  The startup of Bridge is consistent with the startup of other modules. Bridge contains two sub-modules, other than: sender and receiver. The sender is responsible for sending the udp data, and the receiver is responsible for receiving the data packet sent by the udp client, and parsing it, and then sending it to the module that has registered to respond to the message.
 The start command of Sender is as follows.
 ```
-$ cyber_launch start /apollo/modules/bridge/bridge_receiver.launch
+$ cyber_launch start /apollo/modules/bridge/launch/bridge_receiver.launch
 ```
 The start command of Receiver is as follows:
 ```
-$ cyber_launch start /apollo/modules/bridge/bridge_sender.launch
+$ cyber_launch start /apollo/modules/bridge/launch/bridge_sender.launch
 ```
 ## modify the configuration
 - Receiver listens to port 8900 by default, and can change the port number to be monitored by modifying its corresponding configuration file.
