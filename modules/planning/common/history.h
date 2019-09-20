@@ -70,6 +70,33 @@ class HistoryFrame {
   std::vector<HistoryObjectDecision> object_decisions_;
 };
 
+class HistoryObjectStatus {
+ public:
+  HistoryObjectStatus() = default;
+
+  void Init(const std::string& id, const ObjectStatus& object_status);
+
+  const std::string& id() const { return id_; }
+  const ObjectStatus GetObjectStatus() const;
+
+ private:
+  std::string id_;
+  ObjectStatus object_status_;
+};
+
+class HistoryStatus {
+ public:
+  HistoryStatus() = default;
+
+  void SetObjectStatus(
+      const std::string& id, const ObjectStatus& object_status);
+
+  ObjectStatus GetObjectStatus(const std::string& id);
+
+ private:
+  std::unordered_map<std::string, ObjectStatus> object_id_to_status_;
+};
+
 class History {
  public:
   const HistoryFrame* GetLastFrame() const;
