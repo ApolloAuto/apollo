@@ -16,7 +16,6 @@
 
 #include "modules/data/tools/smart_recorder/hard_brake_trigger.h"
 
-
 #include <cmath>
 #include <memory>
 
