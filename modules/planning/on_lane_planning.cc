@@ -609,9 +609,13 @@ void PopulateChartOptions(double x_min, double x_max, std::string x_label,
 }
 
 void AddSTGraph(const STGraphDebug& st_graph, Chart* chart) {
-  chart->set_title(st_graph.name());
-  PopulateChartOptions(-2.0, 10.0, "t (second)", 0.0, 80.0, "s (meter)", true,
-                       chart);
+  if (st_graph.name() == "DP_ST_SPEED_OPTIMIZER") {
+    chart->set_title("Speed Heuristic");
+  } else {
+    chart->set_title("Planning S-T Graph");
+  }
+  PopulateChartOptions(-2.0, 10.0, "t (second)", -10.0, 220.0, "s (meter)",
+                       false, chart);
 
   for (const auto& boundary : st_graph.boundary()) {
     auto* boundary_chart = chart->add_polygon();
@@ -625,6 +629,15 @@ void AddSTGraph(const STGraphDebug& st_graph, Chart* chart) {
       point_debug->set_x(point.t());
       point_debug->set_y(point.s());
     }
+  }
+
+  auto* speed_profile = chart->add_line();
+  auto* properties = speed_profile->mutable_properties();
+  (*properties)["color"] = "\"rgba(255, 255, 255, 0.5)\"";
+  for (const auto& point : st_graph.speed_profile()) {
+    auto* point_debug = speed_profile->add_point();
+    point_debug->set_x(point.t());
+    point_debug->set_y(point.s());
   }
 }
 
