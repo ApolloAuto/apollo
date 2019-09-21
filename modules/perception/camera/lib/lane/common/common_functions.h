@@ -156,9 +156,12 @@ bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
       continue;
     }
 
+    // Since Eigen::solver was crashing, simple inverse of 3x3 matrix is used
+    // Note that Eigen::inverse of 3x3 and 4x4 is a closed form solution
     Eigen::Matrix<Dtype, 3, 1> matB;
     matB << pos_vec[index[0]](1), pos_vec[index[1]](1), pos_vec[index[2]](1);
-    Eigen::Matrix<Dtype, 3, 1> c = mat.solve(matB);
+    Eigen::Vector3f c =
+        static_cast<Eigen::Matrix<Dtype, 3, 1>> (matA.inverse() * matB);
     if (!(matA * c).isApprox(matB)) {
       ADEBUG << "No solution.";
       continue;
