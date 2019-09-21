@@ -48,7 +48,6 @@ class HardBrakeTrigger: public TriggerBase {
     &msg_list);
   void PushToList(const std::shared_ptr<canbus::Chassis>& msg);
  private:
-  Chassis::DrivingMode cur_driving_mode_ = Chassis::COMPLETE_MANUAL;
   std::vector<std::shared_ptr<canbus::Chassis>> his_msg_list_;
   std::vector<std::shared_ptr<canbus::Chassis>> cur_msg_list_;
 };
