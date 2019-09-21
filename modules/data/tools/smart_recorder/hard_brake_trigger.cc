@@ -42,9 +42,6 @@ void HardBrakeTrigger::Pull(const RecordMessage& msg) {
   if (!trigger_obj_->enabled()) {
     return;
   }
-  std::shared_ptr<apollo::canbus::Chassis> chassis_msg =
-    std::make_shared<apollo::canbus::Chassis>();
-  chassis_msg->ParseFromString(msg.content);
 
   if (msg.channel_name == FLAGS_chassis_topic) {
     std::shared_ptr<apollo::canbus::Chassis> chassis_msg =
