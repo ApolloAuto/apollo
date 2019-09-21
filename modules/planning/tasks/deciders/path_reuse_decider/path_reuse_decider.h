@@ -78,6 +78,10 @@ class PathReuseDecider : public Decider {
   // check if path is collision free
   bool IsCollisionFree(ReferenceLineInfo* const reference_line_info);
 
+  // trim history path
+  bool TrimHistoryPath(Frame* const frame,
+                       ReferenceLineInfo* const reference_line_info);
+
  private:
   History* history_ = History::Instance();
   static int reusable_path_counter_;  // count reused path
