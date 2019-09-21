@@ -45,18 +45,16 @@ void HardBrakeTrigger::Pull(const RecordMessage& msg) {
     std::make_shared<apollo::canbus::Chassis>();
   chassis_msg->ParseFromString(msg.content);
 
-  if (IsNoisy(chassis_msg)) {
-    return;
-  }
-
   if (msg.channel_name == FLAGS_chassis_topic) {
+    if (IsNoisy(chassis_msg)) {
+      return;
+    }
     PushToList(chassis_msg);
     if (IsHardBrake()) {
       AINFO << "hard break trigger is pulled: " << msg.time << " - "
             << msg.channel_name;
       TriggerIt(msg.time);
     }
-    cur_driving_mode_ = chassis_msg->driving_mode();
   }
 }
 
@@ -87,7 +85,7 @@ float HardBrakeTrigger::GetMeanSpeed(
   for (const auto& msg : msg_list) {
     speed_points += msg->speed_mps();
   }
-  return speed_points/static_cast<float>(msg_list.size());
+  return speed_points / static_cast<float>(msg_list.size());
 }
 
 void HardBrakeTrigger::PushToList(
