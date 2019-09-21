@@ -16,8 +16,9 @@
 
 #include "modules/data/tools/smart_recorder/hard_brake_trigger.h"
 
-#include <memory>
+
 #include <cmath>
+#include <memory>
 
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -46,6 +47,9 @@ void HardBrakeTrigger::Pull(const RecordMessage& msg) {
   chassis_msg->ParseFromString(msg.content);
 
   if (msg.channel_name == FLAGS_chassis_topic) {
+    std::shared_ptr<apollo::canbus::Chassis> chassis_msg =
+      std::make_shared<apollo::canbus::Chassis>();
+    chassis_msg->ParseFromString(msg.content);
     if (IsNoisy(chassis_msg)) {
       return;
     }
