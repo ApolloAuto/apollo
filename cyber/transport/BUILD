@@ -213,6 +213,18 @@ cc_library(
 )
 
 cc_test(
+    name = "message_info_test",
+    size = "small",
+    srcs = [
+        "message/message_info_test.cc",
+    ],
+    deps = [
+        "//cyber:cyber_core",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
     name = "message_test",
     size = "small",
     srcs = [
