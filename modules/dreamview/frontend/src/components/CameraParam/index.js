@@ -53,7 +53,6 @@ export default class CameraParam extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            hidden: true,
             inEditMode: false,
         };
         this.toggleEditMode = this.toggleEditMode.bind(this);

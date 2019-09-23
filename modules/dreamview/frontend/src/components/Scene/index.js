@@ -34,7 +34,7 @@ export default class Scene extends React.Component {
                     }}>
                     {options.showGeo && <Geolocation />}
                 </div>
-                { options.cameraAngle === 'CameraView' && <img id="camera-image" /> }
+                { options.isCameraView && <img id="camera-image" /> }
             </React.Fragment>
         );
     }
