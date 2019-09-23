@@ -38,6 +38,7 @@ class MessageInfo {
 
   MessageInfo& operator=(const MessageInfo& another);
   bool operator==(const MessageInfo& another) const;
+  bool operator!=(const MessageInfo& another) const;
 
   bool SerializeTo(std::string* dst) const;
   bool SerializeTo(char* dst, std::size_t len) const;
