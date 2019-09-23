@@ -98,6 +98,27 @@ void Scheduler::SetInnerThreadAttr(const std::string& name, std::thread* thr) {
   }
 }
 
+void Scheduler::CheckSchedStatus() {
+  std::string snap_info;
+  auto now = Time::Now().ToNanosecond();
+  for (auto processor : processors_) {
+    auto snap = processor->ProcSnapshot();
+    if (snap->execute_start_time.load()) {
+      auto execute_time = (now - snap->execute_start_time.load()) / 1000000;
+      snap_info.append(std::to_string(snap->processor_id.load()))
+               .append(":").append(snap->routine_name)
+               .append(":").append(std::to_string(execute_time));
+    } else {
+      snap_info.append(std::to_string(snap->processor_id.load()))
+               .append(":idle");
+    }
+    snap_info.append(", ");
+  }
+  snap_info.append("timestamp: ").append(std::to_string(now));
+  AINFO << snap_info;
+  snap_info.clear();
+}
+
 void Scheduler::Shutdown() {
   if (cyber_unlikely(stop_.exchange(true))) {
     return;

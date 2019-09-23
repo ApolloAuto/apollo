@@ -33,6 +33,7 @@
 #include "cyber/task/task.h"
 #include "cyber/timer/timing_wheel.h"
 #include "cyber/transport/transport.h"
+#include "cyber/sysmo/sysmo.h"
 
 namespace apollo {
 namespace cyber {
@@ -93,6 +94,7 @@ bool Init(const char* binary_name) {
   InitLogger(binary_name);
   auto thread = const_cast<std::thread*>(async_logger->LogThread());
   scheduler::Instance()->SetInnerThreadAttr("async_log", thread);
+  SysMo::Instance();
   std::signal(SIGINT, OnShutdown);
   // Register exit handlers
   if (!g_atexit_registered) {
@@ -112,6 +114,7 @@ void Clear() {
   if (GetState() == STATE_SHUTDOWN || GetState() == STATE_UNINITIALIZED) {
     return;
   }
+  SysMo::CleanUp();
   TaskManager::CleanUp();
   TimingWheel::CleanUp();
   scheduler::CleanUp();
