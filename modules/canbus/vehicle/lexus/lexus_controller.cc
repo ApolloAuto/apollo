@@ -478,10 +478,10 @@ void LexusController::Acceleration(double acc) {
   // None
 }
 
-// lexus default, -470 ~ 470, left:+, right:-
-// need to be compatible with control module, so reverse
-// steering with old angle speed
-// angle:-99.99~0.00~99.99, unit:, left:-, right:+
+// TODO(Yu/QiL): double check the physical range, unit and direction for Lexus
+// lexus default -32.768 ~ 32.767, unit: rad, left:-, right:+ in canbus protocal
+// need to be compatible with control module, so reverse steering
+// angle:-99.99~0.00~99.99, unit: %, left:+, right:- in control module
 void LexusController::Steer(double angle) {
   if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
       driving_mode() != Chassis::AUTO_STEER_ONLY) {
@@ -489,16 +489,18 @@ void LexusController::Steer(double angle) {
     return;
   }
   const double real_angle = vehicle_params_.max_steer_angle() * angle / 100.0;
-  // reverse sign
-
+  // TODO(Yu/QiL): double checck to decide if reverse sign needed
   steering_cmd_12c_->set_position(real_angle);
   // TODO(QiL) : double check this rate
   steering_cmd_12c_->set_rotation_rate(40);
 }
 
+// TODO(Yu/QiL): double check the physical range, unit and direction for Lexus
+// lexus default -32.768 ~ 32.767, unit: rad, left:-, right:+ in canbus protocal
+// lexus default 0 ~ 65.535, unit: rad/sec, in canbus protocal
 // steering with new angle speed
-// angle:-99.99~0.00~99.99, unit:, left:-, right:+
-// angle_spd:0.00~99.99, unit:deg/s
+// angle:-99.99~0.00~99.99, unit:%, left:+, right:- in control module
+// angle_spd:0.00~99.99, unit:%
 void LexusController::Steer(double angle, double angle_spd) {
   if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
       driving_mode() != Chassis::AUTO_STEER_ONLY) {
@@ -506,16 +508,14 @@ void LexusController::Steer(double angle, double angle_spd) {
     return;
   }
 
-  const double real_angle =
-      vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
+  const double real_angle = vehicle_params_.max_steer_angle() * angle / 100.0;
   const double real_angle_spd =
       ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
-          vehicle_params_.min_steer_angle_rate() / M_PI * 180,
-          vehicle_params_.max_steer_angle_rate() / M_PI * 180,
-          vehicle_params_.max_steer_angle_rate() / M_PI * 180 * angle_spd /
-              100.0);
+          vehicle_params_.min_steer_angle_rate(),
+          vehicle_params_.max_steer_angle_rate(),
+          vehicle_params_.max_steer_angle_rate() * angle_spd / 100.0);
+  // TODO(Yu/QiL): double checck to decide if reverse sign needed
   steering_cmd_12c_->set_position(real_angle);
-  // TODO(QiL) : double check this rate
   steering_cmd_12c_->set_rotation_rate(real_angle_spd);
 }
 
