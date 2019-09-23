@@ -136,8 +136,8 @@ Status PathBoundsDecider::Process(
   if (FLAGS_enable_smarter_lane_change &&
       reference_line_info->IsChangeLanePath()) {
     PathBound lanechange_path_bound;
-    Status ret = GenerateLaneChangePathBound(
-        *reference_line_info, &lanechange_path_bound);
+    Status ret = GenerateLaneChangePathBound(*reference_line_info,
+                                             &lanechange_path_bound);
     if (!ret.ok()) {
       ADEBUG << "Cannot generate a lane-change path bound.";
       return Status(ErrorCode::PLANNING_ERROR, ret.error_message());
@@ -157,8 +157,8 @@ Status PathBoundsDecider::Process(
           std::get<2>(lanechange_path_bound[i]));
     }
     candidate_path_boundaries.emplace_back(
-        std::get<0>(lanechange_path_bound[0]),
-        kPathBoundsDeciderResolution, lanechange_path_bound_pair);
+        std::get<0>(lanechange_path_bound[0]), kPathBoundsDeciderResolution,
+        lanechange_path_bound_pair);
     candidate_path_boundaries.back().set_label("regular/lanechange");
     RecordDebugInfo(lanechange_path_bound, "", reference_line_info);
     reference_line_info->SetCandidatePathBoundaries(
@@ -1139,14 +1139,14 @@ void PathBoundsDecider::GetBoundaryFromLaneChangeForbiddenZone(
         adc_frenet_l_ > curr_lane_left_width
             ? curr_lane_left_width + GetBufferBetweenADCCenterAndEdge()
             : std::get<1>((*path_bound)[i]);
-    std::get<1>((*path_bound)[i]) = std::fmin(
-        std::get<1>((*path_bound)[i]), adc_frenet_l_ - 0.1);
+    std::get<1>((*path_bound)[i]) =
+        std::fmin(std::get<1>((*path_bound)[i]), adc_frenet_l_ - 0.1);
     std::get<2>((*path_bound)[i]) =
         adc_frenet_l_ < -curr_lane_right_width
             ? -curr_lane_right_width - GetBufferBetweenADCCenterAndEdge()
             : std::get<2>((*path_bound)[i]);
-    std::get<2>((*path_bound)[i]) = std::fmax(
-        std::get<2>((*path_bound)[i]), adc_frenet_l_ + 0.1);
+    std::get<2>((*path_bound)[i]) =
+        std::fmax(std::get<2>((*path_bound)[i]), adc_frenet_l_ + 0.1);
   }
 }
 

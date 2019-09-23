@@ -800,8 +800,7 @@ int FusionCameraDetectionComponent::InternalProc(
             *error_code));
     bool send_viz_ret = camera_viz_writer_->Write(viz_msg);
     AINFO << "send out camera visualization msg, ts: "
-          << std::to_string(msg_timestamp)
-          << " send_viz_ret: " << send_viz_ret;
+          << std::to_string(msg_timestamp) << " send_viz_ret: " << send_viz_ret;
 
     cv::Mat output_image(image_height_, image_width_, CV_8UC3,
                          cv::Scalar(0, 0, 0));
@@ -809,8 +808,8 @@ int FusionCameraDetectionComponent::InternalProc(
     camera_frame.data_provider->GetImage(image_options, &out_image);
     memcpy(output_image.data, out_image.cpu_data(),
            out_image.total() * sizeof(uint8_t));
-    visualize_.ShowResult_all_info_single_camera(
-        output_image, camera_frame, motion_buffer_, world2camera);
+    visualize_.ShowResult_all_info_single_camera(output_image, camera_frame,
+                                                 motion_buffer_, world2camera);
   }
 
   // send out camera debug message

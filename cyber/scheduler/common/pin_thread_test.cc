@@ -77,9 +77,8 @@ TEST(pin_thread_test, sched_policy) {
 
   policy = "SCHED_OTHER";
   std::atomic<pid_t> tid{-1};
-  std::thread t2 = std::thread([&]() {
-    tid = static_cast<int>(syscall(SYS_gettid));
-  });
+  std::thread t2 =
+      std::thread([&]() { tid = static_cast<int>(syscall(SYS_gettid)); });
   while (tid.load() == -1) {
     cpu_relax();
   }

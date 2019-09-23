@@ -47,9 +47,7 @@ PerfEventCache::PerfEventCache() {
   }
 }
 
-PerfEventCache::~PerfEventCache() {
-  Shutdown();
-}
+PerfEventCache::~PerfEventCache() { Shutdown(); }
 
 void PerfEventCache::Shutdown() {
   if (!enable_) {
