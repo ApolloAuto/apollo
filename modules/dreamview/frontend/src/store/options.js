@@ -61,8 +61,11 @@ export default class Options {
     }
 
     @computed get showMonitor() {
-        return this.showPNCMonitor || this.showDataCollectionMonitor
-            || this.cameraAngle === 'CameraView';
+        return this.showPNCMonitor || this.showDataCollectionMonitor;
+    }
+
+    @computed get isCameraView() {
+        return this.cameraAngle === "CameraView";
     }
 
     @action toggle(option, isCustomized) {

@@ -28,7 +28,7 @@ export default class Dreamview extends React.Component {
 
     handleDrag(masterViewWidth) {
         const { options } = this.props.store;
-        if (options.showMonitor) {
+        if (options.showMonitor || options.isCameraView) {
             this.props.store.updateWidthInPercentage(
                 Math.min(1.00, masterViewWidth / window.innerWidth));
         }
@@ -80,7 +80,7 @@ export default class Dreamview extends React.Component {
                     <SplitPane split="vertical"
                         size={dimension.width}
                         onChange={this.handleDrag}
-                        allowResize={options.showMonitor}>
+                        allowResize={options.showMonitor || options.isCameraView}>
                         <div className="left-pane">
                             <SideBar />
                             <div className="dreamview-body">
@@ -95,7 +95,7 @@ export default class Dreamview extends React.Component {
                                     <CameraVideo />
                                 </div>
                             }
-                            {options.cameraAngle === 'CameraView' && <CameraParam />}
+                            {options.isCameraView && <CameraParam />}
                             {options.showPNCMonitor && <PNCMonitor options={options} />}
                             {options.showDataCollectionMonitor &&
                                 <DataCollectionMonitor

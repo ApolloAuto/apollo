@@ -487,7 +487,7 @@ export default class Map {
         }
         // Do not set zOffset in camera view, since zOffset will affect the accuracy of matching
         // between hdmap and camera image
-        this.zOffsetFactor = _.get(STORE, 'options.cameraAngle') === 'CameraView' ? 0 : 1;
+        this.zOffsetFactor = STORE.options.isCameraView ? 0 : 1;
     }
 
     update(world) {
