@@ -78,6 +78,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "reader_test",
+    size = "small",
+    srcs = ["reader_test.cc"],
+    deps = [
+        "//cyber",
+        "//cyber/proto:unit_test_cc_proto",
+        "@gtest",
+    ],
+)
+
 cc_library(
     name = "writer",
     hdrs = ["writer.h"],
