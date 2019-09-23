@@ -105,7 +105,10 @@ float MlfTrackObjectDistance::ComputeDistance(
       weights = &iter->second;
     }
   }
-  CHECK(weights != nullptr && weights->size() >= 7);
+  if (weights == nullptr || weights->size() < 7) {
+    AERROR << "Invalid weights";
+    return 1e+10f;
+  }
   float distance = 0.f;
   float delta = 1e-10f;
 

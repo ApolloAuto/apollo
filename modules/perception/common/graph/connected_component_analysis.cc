@@ -21,7 +21,10 @@ namespace common {
 
 void ConnectedComponentAnalysis(const std::vector<std::vector<int>>& graph,
                                 std::vector<std::vector<int>>* components) {
-  CHECK_NOTNULL(components);
+  if (components == nullptr) {
+    AERROR << "components is not available";
+    return;
+  }
   int num_item = static_cast<int>(graph.size());
   std::vector<int> visited;
   visited.resize(num_item, 0);

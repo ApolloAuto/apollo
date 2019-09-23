@@ -64,7 +64,10 @@ bool DstManager::IsAppAdded(const std::string &app_name) {
 }
 
 DstCommonDataPtr DstManager::GetAppDataPtr(const std::string &app_name) {
-  CHECK(IsAppAdded(app_name));
+  if (!IsAppAdded(app_name)) {
+    AERROR << "app_name is not available";
+    return nullptr;
+  }
   auto iter = dst_common_data_.find(app_name);
   if (iter != dst_common_data_.end()) {
     return &iter->second;

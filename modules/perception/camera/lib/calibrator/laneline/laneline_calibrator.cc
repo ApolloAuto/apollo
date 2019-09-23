@@ -33,7 +33,10 @@ bool LaneLineCalibrator::Init(const CalibratorInitOptions &options) {
 
 bool LaneLineCalibrator::Calibrate(const CalibratorOptions &options,
                                    float *pitch_angle) {
-  CHECK(pitch_angle != nullptr);
+  if (pitch_angle == nullptr) {
+    AERROR << "pitch_angle is not available";
+    return false;
+  }
   EgoLane ego_lane;
   if (!LoadEgoLaneline(*options.lane_objects, &ego_lane)) {
     AINFO << "Failed to get the ego lane.";
@@ -94,7 +97,11 @@ bool LaneLineCalibrator::Calibrate(const CalibratorOptions &options,
 
 bool LaneLineCalibrator::LoadEgoLaneline(
     const std::vector<base::LaneLine> &lane_objects, EgoLane *ego_lane) {
-  CHECK(ego_lane != nullptr);
+  if (ego_lane == nullptr) {
+    AERROR << "ego_lane is not available";
+    return false;
+  }
+
   bool found_ego_left = false;
   bool found_ego_right = false;
   // Using points from model fitting
