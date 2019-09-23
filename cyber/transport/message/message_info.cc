@@ -59,6 +59,10 @@ bool MessageInfo::operator==(const MessageInfo& another) const {
          spare_id_ == another.spare_id_;
 }
 
+bool MessageInfo::operator!=(const MessageInfo& another) const {
+  return !(*this == another);
+}
+
 bool MessageInfo::SerializeTo(std::string* dst) const {
   RETURN_VAL_IF_NULL(dst, false);
 
