@@ -67,6 +67,7 @@
 - [How to understand Apollo's core architecture and workflow](how_to_understand_architecture_and_workflow.md)
 
 ## Helper tools and optimization
+- [How to Leverage Apollo's RTK mode](how_to_leverage_rtk_mode.md)
 - [How to run the Map Data Verification Tool](how_to_run_map_verification_tool.md)
 - [How to run offline perception visualizer](how_to_run_offline_perception_visualizer.md)
 - [How to run offline sequential obstacle perception visualizer](how_to_run_offline_sequential_obstacle_perception_visualizer.md)
@@ -76,12 +77,14 @@
 - [How to do performance profiling](how_to_do_performance_profiling.md)
 - [How to run Offline Perception Visualizer for Apollo 2.5](how_to_run_apollo_2.5_perception_visualizer.md)
 - [How to use Common Cyber Commands - Basic guide](how_to_use_cyber_commands.md)
+- [How to Run RTK Localization Module On Your Local Computer](how_to_run_RTK_localization_module_on_your_local_computer.md)
 
 ### Chinese versions
 - [How to run offline perception visualizer](how_to_run_offline_perception_visualizer_cn.md)
 - [How to run offline sequential obstacle perception visualizer](how_to_run_offline_sequential_obstacle_perception_visualizer_cn.md)
 - [How to tune control parameters](how_to_tune_control_parameters_cn.md)
 - [How to update vehicle calibration](how_to_update_vehicle_calibration_cn.md)
+- [How to Run RTK Localization Module On Your Local Computer](how_to_run_RTK_localization_module_on_your_local_computer_cn.md)
 
 ## Others
 - [How to install ubuntu](how_to_install_ubuntu.md)
