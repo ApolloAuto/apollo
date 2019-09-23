@@ -57,12 +57,32 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "endpoint_test",
+    size = "small",
+    srcs = ["common/endpoint_test.cc"],
+    deps = [
+        "//cyber:cyber_core",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "identity",
     srcs = ["common/identity.cc"],
     hdrs = ["common/identity.h"],
     deps = [
         "//cyber/common:util",
+    ],
+)
+
+cc_test(
+    name = "identity_test",
+    size = "small",
+    srcs = ["common/identity_test.cc"],
+    deps = [
+        "//cyber:cyber_core",
+        "@gtest//:main",
     ],
 )
 
@@ -468,16 +488,6 @@ cc_library(
         ":endpoint",
         ":message_info",
         "//cyber/event:perf_event_cache",
-    ],
-)
-
-cc_test(
-    name = "endpoint_test",
-    size = "small",
-    srcs = ["common/endpoint_test.cc"],
-    deps = [
-        "//cyber:cyber_core",
-        "@gtest//:main",
     ],
 )
 
