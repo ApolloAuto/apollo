@@ -239,6 +239,21 @@ void GeneralChannelMessage::RenderDebugString(const Screen* s, int key,
         s->AddStr(0, lineNo++, "RawMessage Size: ");
         outStr.str("");
         outStr << channelMsg->message.size() << " Bytes";
+        if (channelMsg->message.size() >= (1024 * 1024 * 1024)) {
+          outStr << " ("
+                 << static_cast<double>(channelMsg->message.size()) /
+                        (1024 * 1024 * 1024)
+                 << " GB)";
+        } else if (channelMsg->message.size() >= (1024 * 1024)) {
+          outStr << " ("
+                 << static_cast<double>(channelMsg->message.size()) /
+                        (1024 * 1024)
+                 << " MB)";
+        } else if (channelMsg->message.size() >= 1024) {
+          outStr << " ("
+                 << static_cast<double>(channelMsg->message.size()) / 1024
+                 << " KB)";
+        }
         s->AddStr(outStr.str().c_str());
         if (raw_msg_class_->ParseFromString(channelMsg->message)) {
           int lcount = lineCount(*raw_msg_class_, s->Width());
