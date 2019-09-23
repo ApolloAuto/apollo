@@ -43,11 +43,14 @@ Status PathReuseDecider::Process(Frame* const frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  // Check if path is reusable
-  if (Decider::config_.path_reuse_decider_config().reuse_path()) {
+  // do not reuse path during sidepass
+  if (Decider::config_.path_reuse_decider_config().reuse_path() &&
+      !reference_line_info->is_path_lane_borrow()) {
     ++total_path_counter_;  // count total path
     if (CheckPathReusable(frame, reference_line_info)) {
       ++reusable_path_counter_;  // count reusable path
+      if (!TrimHistoryPath(frame, reference_line_info))
+        AERROR << "Failed to trim reference line ";
     }
   }
   ADEBUG << "reusable_path_counter_" << reusable_path_counter_;
