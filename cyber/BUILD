@@ -62,6 +62,7 @@ cc_library(
         "//cyber/logger:async_logger",
         "//cyber/node",
         "//cyber/timer:timing_wheel",
+        "//cyber/sysmo",
     ],
 )
 
@@ -111,6 +112,7 @@ cc_library(
         "//cyber/service:client",
         "//cyber/service_discovery:topology_manager",
         "//cyber/task",
+        "//cyber/sysmo",
         "//cyber/time",
         "//cyber/time:duration",
         "//cyber/time:rate",
