@@ -37,7 +37,7 @@ TEST(BlockerTest, blocker_manager_test) {
   block_mgr->Publish<UnitTest>("ch1", msgtype);
   block_mgr->Subscribe<UnitTest>("ch1", 10, "cb1", cb);
   auto blocker = block_mgr->GetOrCreateBlocker<UnitTest>(BlockerAttr("ch1"));
-  EXPECT_TRUE(blocker != nullptr);
+  EXPECT_NE(blocker, nullptr);
   block_mgr->Unsubscribe<UnitTest>("ch1", "cb1");
   block_mgr->Subscribe<UnitTest>("ch_null", 10, "cb1", cb);
   block_mgr->Observe();
