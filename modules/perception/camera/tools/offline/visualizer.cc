@@ -155,7 +155,7 @@ bool Visualizer::Init_all_info_single_camera(
   AINFO << "small_w_: " << small_w_;
 
   visual_camera_ = visual_camera;
-  // Set camera specifc parameters
+  // Set camera specific parameters
   for (auto camera_name : camera_names) {
     camera_image_[camera_name] =
         cv::Mat(small_h_, small_w_, CV_8UC3, apollo::perception::black_color);
