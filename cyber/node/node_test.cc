@@ -45,7 +45,7 @@ TEST(NodeTest, cases) {
   auto writer = node->CreateWriter<Chatter>(attr);
   auto server = node->CreateService<Chatter, Chatter>(
       "node_test_server", [](const std::shared_ptr<Chatter>& request,
-                        std::shared_ptr<Chatter>& response) {
+                             std::shared_ptr<Chatter>& response) {
         AINFO << "server: I am server";
         static uint64_t id = 0;
         ++id;

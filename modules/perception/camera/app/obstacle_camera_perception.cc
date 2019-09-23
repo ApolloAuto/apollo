@@ -319,27 +319,27 @@ bool ObstacleCameraPerception::Perception(
     AERROR << "Failed to detect lane.";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-      frame->data_provider->sensor_name(), "LaneDetector");
+  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                           "LaneDetector");
 
   if (!lane_postprocessor_->Process2D(lane_postprocessor_options, frame)) {
     AERROR << "Failed to postprocess lane 2D.";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-      frame->data_provider->sensor_name(), "LanePostprocessor2D");
+  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                           "LanePostprocessor2D");
 
   // Calibration service
   frame->calibration_service->Update(frame);
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-      frame->data_provider->sensor_name(), "CalibrationService");
+  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                           "CalibrationService");
 
   if (!lane_postprocessor_->Process3D(lane_postprocessor_options, frame)) {
     AERROR << "Failed to postprocess lane 3D.";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-      frame->data_provider->sensor_name(), "LanePostprocessor3D");
+  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                           "LanePostprocessor3D");
 
   if (write_out_lane_file_) {
     std::string lane_file_path =

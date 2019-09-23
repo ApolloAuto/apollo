@@ -27,8 +27,8 @@ namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-using scheduler::Processor;
 using scheduler::ChoreographyContext;
+using scheduler::Processor;
 
 TEST(ProcessorTest, all) {
   auto proc = std::make_shared<Processor>();

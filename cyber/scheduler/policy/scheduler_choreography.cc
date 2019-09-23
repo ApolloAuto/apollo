@@ -112,8 +112,8 @@ void SchedulerChoreography::CreateProcessor() {
 
     proc->BindContext(ctx);
     SetSchedAffinity(proc->Thread(), pool_cpuset_, pool_affinity_, i);
-    SetSchedPolicy(proc->Thread(), pool_processor_policy_,
-                   pool_processor_prio_, proc->Tid());
+    SetSchedPolicy(proc->Thread(), pool_processor_policy_, pool_processor_prio_,
+                   proc->Tid());
     pctxs_.emplace_back(ctx);
     processors_.emplace_back(proc);
   }

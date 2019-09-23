@@ -29,15 +29,11 @@ namespace scheduler {
 
 void ParseCpuset(const std::string& str, std::vector<int>* cpuset);
 
-void SetSchedAffinity(std::thread* thread,
-                      const std::vector<int>& cpus,
-                      const std::string& affinity,
-                      int cpu_id = -1);
+void SetSchedAffinity(std::thread* thread, const std::vector<int>& cpus,
+                      const std::string& affinity, int cpu_id = -1);
 
-void SetSchedPolicy(std::thread* thread,
-                    std::string spolicy,
-                    int sched_priority,
-                    pid_t tid = -1);
+void SetSchedPolicy(std::thread* thread, std::string spolicy,
+                    int sched_priority, pid_t tid = -1);
 
 }  // namespace scheduler
 }  // namespace cyber

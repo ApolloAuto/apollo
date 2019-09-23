@@ -30,10 +30,10 @@
 #include "cyber/logger/async_logger.h"
 #include "cyber/scheduler/scheduler.h"
 #include "cyber/service_discovery/topology_manager.h"
+#include "cyber/sysmo/sysmo.h"
 #include "cyber/task/task.h"
 #include "cyber/timer/timing_wheel.h"
 #include "cyber/transport/transport.h"
-#include "cyber/sysmo/sysmo.h"
 
 namespace apollo {
 namespace cyber {
