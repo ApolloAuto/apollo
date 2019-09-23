@@ -69,7 +69,7 @@ cc_library(
         "common/pin_thread.h",
     ],
     deps = [
-        "//cyber/common:log"
+        "//cyber/common:log",
     ],
 )
 
