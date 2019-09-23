@@ -471,6 +471,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "endpoint_test",
+    size = "small",
+    srcs = ["common/endpoint_test.cc"],
+    deps = [
+        "//cyber:cyber_core",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "rtps_transmitter",
     hdrs = ["transmitter/rtps_transmitter.h"],
