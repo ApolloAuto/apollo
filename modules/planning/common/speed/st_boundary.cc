@@ -292,8 +292,9 @@ bool STBoundary::GetUnblockSRange(const double curr_time, double* s_upper,
     AERROR << "Fail to get index range.";
     return false;
   }
-  const double r = (curr_time - upper_points_[left].t()) /
-                   (upper_points_.at(right).t() - upper_points_.at(left).t());
+  const double r = (left == right ? 0.0
+                   : (curr_time - upper_points_[left].t()) /
+                     (upper_points_[right].t() - upper_points_[left].t()));
 
   double upper_cross_s =
       upper_points_[left].s() +
@@ -330,8 +331,9 @@ bool STBoundary::GetBoundarySRange(const double curr_time, double* s_upper,
     AERROR << "Fail to get index range.";
     return false;
   }
-  const double r = (curr_time - upper_points_[left].t()) /
-                   (upper_points_[right].t() - upper_points_[left].t());
+  const double r = (left == right ? 0.0
+                   : (curr_time - upper_points_[left].t()) /
+                     (upper_points_[right].t() - upper_points_[left].t()));
 
   *s_upper = upper_points_[left].s() +
              r * (upper_points_[right].s() - upper_points_[left].s());
