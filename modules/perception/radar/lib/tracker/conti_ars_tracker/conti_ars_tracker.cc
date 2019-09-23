@@ -148,7 +148,10 @@ void ContiArsTracker::CreateNewTracks(
 }
 
 void ContiArsTracker::CollectTrackedFrame(base::FramePtr tracked_frame) {
-  CHECK(tracked_frame != nullptr) << "tracked_frame is nullptr";
+  if (tracked_frame == nullptr) {
+    AERROR << "tracked_frame is nullptr";
+    return;
+  }
   auto &objects = tracked_frame->objects;
   const auto &radar_tracks = track_manager_->GetTracks();
   for (size_t i = 0; i < radar_tracks.size(); ++i) {

@@ -136,13 +136,15 @@ bool MultiCamerasProjection::BoundaryBasedProject(
     const Eigen::Matrix4d& c2w_pose,
     const std::vector<base::PointXYZID>& points,
     base::TrafficLight* light) const {
-  CHECK_NOTNULL(camera_model.get());
+  if (camera_model.get() == nullptr) {
+    AERROR << "camera_model is not available.";
+    return false;
+  }
   int width = static_cast<int>(camera_model->get_width());
   int height = static_cast<int>(camera_model->get_height());
   int bound_size = static_cast<int>(points.size());
-  AINFO << "bound size " << bound_size;
   if (bound_size < 4) {
-    AERROR << "invalid bound_size";
+    AERROR << "invalid bound_size " << bound_size;
     return false;
   }
   std::vector<Eigen::Vector2i> pts2d(bound_size);

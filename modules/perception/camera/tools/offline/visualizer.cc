@@ -102,7 +102,10 @@ Eigen::Matrix3d Camera2CarHomograph(Eigen::Matrix3d intrinsic,
 bool Visualizer::Init(const std::vector<std::string> &camera_names,
                       TransformServer *tf_server) {
   tf_server_ = tf_server;
-  CHECK(tf_server_ != nullptr);
+  if (tf_server_ == nullptr) {
+    AERROR << "tf_server is unavailable";
+    return false;
+  }
   last_timestamp_ = 0;
   small_h_ = static_cast<int>(image_height_ * scale_ratio_);
   small_w_ = static_cast<int>(image_width_ * scale_ratio_);

@@ -202,9 +202,15 @@ bool RadarDetectionComponent::InternalProc(
 bool RadarDetectionComponent::GetCarLocalizationSpeed(
     double timestamp, Eigen::Vector3f* car_linear_speed,
     Eigen::Vector3f* car_angular_speed) {
-  CHECK_NOTNULL(car_linear_speed);
+  if (car_linear_speed == nullptr) {
+    AERROR << "car_linear_speed is not available";
+    return false;
+  }
   (*car_linear_speed) = Eigen::Vector3f::Zero();
-  CHECK_NOTNULL(car_angular_speed);
+  if (car_linear_speed == nullptr) {
+    AERROR << "car_linear_speed is not available";
+    return false;
+  }
   (*car_angular_speed) = Eigen::Vector3f::Zero();
   std::shared_ptr<LocalizationEstimate const> loct_ptr;
   if (!localization_subscriber_.LookupNearest(timestamp, &loct_ptr)) {

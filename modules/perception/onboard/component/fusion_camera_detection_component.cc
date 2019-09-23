@@ -975,7 +975,10 @@ int FusionCameraDetectionComponent::ConvertObjectToPb(
 int FusionCameraDetectionComponent::ConvertObjectToCameraObstacle(
     const base::ObjectPtr &object_ptr,
     apollo::perception::camera::CameraObstacle *camera_obstacle) {
-  CHECK_NOTNULL(camera_obstacle);
+  if (camera_obstacle == nullptr) {
+    AERROR << "camera_obstacle is not available";
+    return false;
+  }
   apollo::perception::PerceptionObstacle *obstacle =
       camera_obstacle->mutable_obstacle();
   ConvertObjectToPb(object_ptr, obstacle);
@@ -1008,7 +1011,10 @@ int FusionCameraDetectionComponent::ConvertObjectToCameraObstacle(
 int FusionCameraDetectionComponent::ConvertLaneToCameraLaneline(
     const base::LaneLine &lane_line,
     apollo::perception::camera::CameraLaneLine *camera_laneline) {
-  CHECK_NOTNULL(camera_laneline);
+  if (camera_laneline == nullptr) {
+    AERROR << "camera_laneline is not available";
+    return false;
+  }
   // fill the lane line attribute
   apollo::perception::camera::LaneLineType line_type =
       static_cast<apollo::perception::camera::LaneLineType>(lane_line.type);
@@ -1083,7 +1089,11 @@ int FusionCameraDetectionComponent::MakeCameraDebugMsg(
     double msg_timestamp, const std::string &camera_name,
     const camera::CameraFrame &camera_frame,
     apollo::perception::camera::CameraDebug *camera_debug_msg) {
-  CHECK_NOTNULL(camera_debug_msg);
+  if (camera_debug_msg == nullptr) {
+    AERROR << "camera_debug_msg is not available";
+    return false;
+  }
+
   auto itr = std::find(camera_names_.begin(), camera_names_.end(), camera_name);
   if (itr == camera_names_.end()) {
     AERROR << "invalid camera_name: " << camera_name;

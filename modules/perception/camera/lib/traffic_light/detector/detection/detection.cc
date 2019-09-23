@@ -374,7 +374,10 @@ bool TrafficLightDetection::SelectOutputBoxes(
 
 void TrafficLightDetection::ApplyNMS(std::vector<base::TrafficLightPtr> *lights,
                                      double iou_thresh) {
-  CHECK_NOTNULL(lights);
+  if (lights == nullptr) {
+    AERROR << "lights are not available";
+    return;
+  }
 
   // (score, index) pairs sorted by detect score
   std::vector<std::pair<float, int>> score_index_vec(lights->size());
