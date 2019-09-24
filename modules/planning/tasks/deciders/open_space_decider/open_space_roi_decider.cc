@@ -1456,14 +1456,32 @@ bool OpenSpaceRoiDecider::GetHyperPlanes(
 
 bool OpenSpaceRoiDecider::IsInParkingLot(
     const double adc_init_x, const double adc_init_y,
-    const double adc_init_heading,
-    std::vector<ParkingSpaceInfoConstPtr> *parking_spaces) {
+    const double adc_init_heading, std::array<Vec2d, 4> *parking_lot_vertices) {
+  std::vector<ParkingSpaceInfoConstPtr> *parking_lots;
   // make sure there is only one parking lot in search range
   const double kDistance = 2;
   auto adc_parking_spot = common::util::MakePointENU(adc_init_x, adc_init_y, 0);
-  if (hdmap_->GetParkingSpaces(adc_parking_spot, kDistance, parking_spaces))
-    return true;
+  if (hdmap_->GetParkingSpaces(adc_parking_spot, kDistance, parking_lots)) {
+    GetParkSpotFromMap(parking_lots->front(), parking_lot_vertices);
+  }
+
+  return true;
   return false;
+}
+
+void OpenSpaceRoiDecider::GetParkSpotFromMap(
+    ParkingSpaceInfoConstPtr parking_lot, std::array<Vec2d, 4> *vertices) {
+  // left or right of the parking lot is decided when viewing the parking spot
+  // open upward
+  Vec2d left_top = parking_lot->polygon().points().at(3);
+  Vec2d left_down = parking_lot->polygon().points().at(0);
+  Vec2d right_down = parking_lot->polygon().points().at(1);
+  Vec2d right_top = parking_lot->polygon().points().at(2);
+
+  std::array<Vec2d, 4> parking_vertices{left_top, left_down, right_down,
+                                        right_top};
+
+  *vertices = std::move(parking_vertices);
 }
 
 }  // namespace planning

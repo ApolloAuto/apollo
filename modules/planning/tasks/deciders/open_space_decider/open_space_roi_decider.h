@@ -173,7 +173,15 @@ class OpenSpaceRoiDecider : public Decider {
    */
   bool IsInParkingLot(const double adc_init_x, const double adc_init_y,
                       const double adc_init_heading,
-                      std::vector<apollo::hdmap::ParkingSpaceInfoConstPtr> *parking_spaces);
+                      std::array<common::math::Vec2d, 4> *parking_lot_vertices);
+  /**
+   * @brief Get the Park Spot From Map object
+   *
+   * @param parking_lot
+   * @param vertices
+   */
+  void GetParkSpotFromMap(hdmap::ParkingSpaceInfoConstPtr parking_lot,
+                          std::array<common::math::Vec2d, 4> *vertices);
 
  private:
   // @brief parking_spot_id from routing
