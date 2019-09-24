@@ -99,18 +99,21 @@ class SubMenu extends React.Component {
                 entries = entries.concat(extraEntries);
             }
         } else if (tabType === 'radio') {
-            const cameraAngles = Object.values(data)
-                .filter(angle => options[`show${angle}`] !== false);
-            entries = cameraAngles.map((item) => {
-                return (
-                    <RadioItem key={`${tabId}_${item}`} id={tabId}
-                                onClick={() => {
-                                         options.selectCamera(item);
-                                }}
-                                checked={options.cameraAngle === item}
-                                title={_.startCase(item)} options={options}/>
-                );
-            });
+            // Now we only have camera tab using radio in menu
+            if (tabId === 'camera') {
+                const cameraAngles = Object.values(data)
+                    .filter(angle => PARAMETERS.options.cameraAngle[`has${angle}`] !== false);
+                entries = cameraAngles.map((item) => {
+                    return (
+                        <RadioItem key={`${tabId}_${item}`} id={tabId}
+                                    onClick={() => {
+                                            options.selectCamera(item);
+                                    }}
+                                    checked={options.cameraAngle === item}
+                                    title={_.startCase(item)} options={options}/>
+                    );
+                });
+            }
         }
         const result = (
             <div className="card">

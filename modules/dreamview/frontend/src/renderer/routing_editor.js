@@ -22,12 +22,6 @@ export default class RoutingEditor {
     enableEditingMode(camera, adc) {
         this.inEditingMode = true;
 
-        // Remove camera image in editing mode
-        const image = document.getElementById('camera-image');
-        if (image) {
-            image.src = '';
-        }
-
         const pov = "Map";
         camera.fov = PARAMETERS.camera[pov].fov;
         camera.near = PARAMETERS.camera[pov].near;
