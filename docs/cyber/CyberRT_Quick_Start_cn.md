@@ -119,7 +119,7 @@ cpplint()
  - Class name: 此组件的入口类的名字
 
 ```bash
-# Define all coms in DAG streaming.
+# Define all components in DAG streaming.
 component_config {
     component_library : "/apollo/bazel-bin/cyber/examples/common_component_example/libcommon_component_example.so"
     components {
