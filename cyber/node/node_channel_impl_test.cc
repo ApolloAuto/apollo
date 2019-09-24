@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,6 @@
 namespace apollo {
 namespace cyber {
 namespace node_channel_impl {
-
-// CreateSerive and CreateClient will be tested with other components
 
 TEST(Node_Channel_ImplTest, test1) {
   auto globalData = common::GlobalData::Instance();
