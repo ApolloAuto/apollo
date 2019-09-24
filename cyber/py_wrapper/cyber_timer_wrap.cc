@@ -26,7 +26,7 @@ template <typename T>
 T PyObjectToPtr(PyObject* pyobj, const std::string& type_ptr) {
   T obj_ptr = (T)PyCapsule_GetPointer(pyobj, type_ptr.c_str());
   if (obj_ptr == nullptr) {
-    AINFO << "PyObjectToPtr failed,type->" << type_ptr << "pyobj: " << pyobj;
+    AERROR << "PyObjectToPtr failed,type->" << type_ptr << "pyobj: " << pyobj;
   }
   return obj_ptr;
 }
@@ -69,7 +69,7 @@ PyObject* cyber_delete_PyTimer(PyObject* self, PyObject* args) {
   auto pytimer = (apollo::cyber::PyTimer*)PyCapsule_GetPointer(
       pyobj_timer, "apollo_cybertron_pytimer");
   if (nullptr == pytimer) {
-    AINFO << "cyber_delete_PyTimer:timer ptr is null!";
+    AERROR << "cyber_delete_PyTimer:timer ptr is null!";
     Py_INCREF(Py_None);
     return Py_None;
   }
@@ -89,7 +89,7 @@ PyObject* cyber_PyTimer_start(PyObject* self, PyObject* args) {
   auto pytimer = (apollo::cyber::PyTimer*)PyCapsule_GetPointer(
       pyobj_timer, "apollo_cybertron_pytimer");
   if (nullptr == pytimer) {
-    AINFO << "cyber_delete_PyTimer:timer ptr is null!";
+    AERROR << "cyber_delete_PyTimer:timer ptr is null!";
     Py_INCREF(Py_None);
     return Py_None;
   }
