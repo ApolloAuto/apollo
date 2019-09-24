@@ -21,7 +21,6 @@ username@computername:~$: source /your-path-to-apollo-install-dir/cyber/setup.ba
 username@computername:~$: cyber_visualizer
 ```
 
-
 ### Interacting with cyber_visualizer
 
 - After launching cyber_visualizer, you will see the following interface:
@@ -131,7 +130,6 @@ b | B ------ Display channel message content
 n | N ---- Repeat the next data in the domain
 m | M ---- Repeat one data on the domain
 ```
-
 
 ## Cyber_recorder
 
@@ -270,7 +268,6 @@ Hit Ctrl+C to stop replay, or Space to pause.
 [RUNNING]  Record Time: 1532089404.688080    Progress: 6.024680 / 6.024680
 play finished. file: 20180720202307.record
 ```
-
 
 ## rosbag_to\_record
 

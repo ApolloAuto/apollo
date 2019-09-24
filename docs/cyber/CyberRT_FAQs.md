@@ -10,7 +10,7 @@ Apollo's Cyber RT is an open source runtime framework designed specifically for 
 
 - During years of development of autonomous driving technologies, we have learned a lot from our previous experience with Apollo. In autonomous driving scenarious, we need an effective centralized computing model, with demands for high performance,  including high concurrency, low latency and high throughput。
 
-- The industry is evolving, so does Apollo. Going forward, Apollo has already moved from development to productization, with volume deployments in the real world, we see the demands for the highest robustness and high performance. That’s why we spent years of building Apollo Cyber RT, which addresses that requirements of autonomous driving solutions. 
+- The industry is evolving, so does Apollo. Going forward, Apollo has already moved from development to productization, with volume deployments in the real world, we see the demands for the highest robustness and high performance. That’s why we spent years of building Apollo Cyber RT, which addresses that requirements of autonomous driving solutions.
 
 ---
 
@@ -38,13 +38,13 @@ Apollo's Cyber RT is an open source runtime framework designed specifically for 
 
 ---
 
-## Will you continue to support ROS? 
+## Will you continue to support ROS?
 
-We will continue to support previous Apollo releases (3.0 and before) based on ROS. We do appreciate you continue growing with us and highly encourage you to move to Apollo 3.5. While we know that some of our developers would prefer to work on ROS, we do hope you will understand why Apollo as a team cannot continue to support ROS in our future releases as we strive to work towards developing a more holistic platform that meets automotive standards. 
+We will continue to support previous Apollo releases (3.0 and before) based on ROS. We do appreciate you continue growing with us and highly encourage you to move to Apollo 3.5. While we know that some of our developers would prefer to work on ROS, we do hope you will understand why Apollo as a team cannot continue to support ROS in our future releases as we strive to work towards developing a more holistic platform that meets automotive standards.
 
 ---
 
-## 	Will Apollo Cyber RT affect regular code development?
+## Will Apollo Cyber RT affect regular code development?
 
 If you have not modified anything at runtime framework layer and have only worked on Apollo's module code base, you will not be affected by the introduction of our new runtime framework as most of time you would only need to re-interface the access of the input and output data. Additional documents are under [cyber](https://github.com/ApolloAuto/apollo/tree/master/docs/cyber/) with more details.
 
@@ -90,7 +90,6 @@ export CYBER_IP=127.0.0.1
 ```
 
 Suppose you have two hosts A and B，the ip of A is `192.168.10.6`, and the ip of B is `192.168.10.7`. Then set `CYBER_IP` to `192.168.10.6` on host A, and set `CYBER_IP` to `192.168.10.7` on host B. Now host A can communicate with host B.
-
 
 ---
 More FAQs to follow...

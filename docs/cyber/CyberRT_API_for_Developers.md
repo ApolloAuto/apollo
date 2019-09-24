@@ -1,6 +1,5 @@
 # Cyber RT API for Developers
 
-
 This document provides an extensive technical deep dive into how to create, manipulate and use Cyber RT's API.
 
 ## Table of Contents
@@ -42,9 +41,9 @@ std::unique_ptr<Node> apollo::cyber::CreateNode(const std::string& node_name, co
 - Parameters:
     - node_name: name of the node, globally unique identifier
     - name_space: name of the space where the node is located
-    
+
     > name_space is empty by default. It is the name of the space concatenated with node_name. The format is `/namespace/node_name`
-    
+
 - Return value - An exclusive smart pointer to Node
 - Error Conditions - when `cyber::Init()` has not called, the system is in an uninitialized state, unable to create a node, return nullptr
 
@@ -62,6 +61,7 @@ template <typename MessageT>
        -> std::shared_ptr<Writer<MessageT>>;
 
 ```
+
 - Parameters:
     - channel_name: the name of the channel to write to
     - MessageT: The type of message to be written out
@@ -87,6 +87,7 @@ auto CreateReader(const proto::RoleAttributes& role_attr,
                   const CallbackFunc<MessageT>& reader_func = nullptr)
 -> std::shared_ptr<cyber::Reader<MessageT>>;
 ```
+
 - Parameters:
     - MessageT: The type of message to read
     - channel_name: the name of the channel to receive from
@@ -153,7 +154,9 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 ```
+
 #### Bazel BUILD file(cyber/samples/BUILD)
+
 ```python
 cc_binary(
     name = "talker",
@@ -173,11 +176,13 @@ cc_binary(
     ],
 )
 ```
+
 #### Build and Run
+
 - Build: bazel build cyber/examples/…
 - Run talker/listener in different terminals:
-	- ./bazel-bin/cyber/examples/talker
-	- ./bazel-bin/cyber/examples/listener
+  - ./bazel-bin/cyber/examples/talker
+  - ./bazel-bin/cyber/examples/listener
 - Examine the results: you should see message printing out on listener.
 
 ## Service Creation and Use
@@ -207,6 +212,7 @@ message Driver {
     optional uint64 timestamp = 3;
 };
 ```
+
 #### Create a service and a client
 
 ```cpp
@@ -247,6 +253,7 @@ int main(int argc, char* argv[]) {
   return 0;
 }
 ```
+
 #### Bazel build file
 
 ```python
@@ -261,11 +268,12 @@ cc_binary(
 ```
 
 #### Build and run
+
 - Build service/client: bazel build cyber/examples/…
 - Run: ./bazel-bin/cyber/examples/service
 - Examining result: you should see content below in apollo/data/log/service.INFO
 
-```
+``` txt
 I1124 16:36:44.568845 14965 service.cc:30] [service] server: i am driver server
 I1124 16:36:44.569031 14949 service.cc:43] [service] client: responese: msg_id: 1 timestamp: 0
 I1124 16:36:45.569514 14966 service.cc:30] [service] server: i am driver server
@@ -290,17 +298,17 @@ The Parameter Service is used for shared data between nodes, and provides basic 
 ### Parameter Object
 
 #### Supported Data types
+
 All parameters passed through cyber are `apollo::cyber::Parameter` objects, the table below lists the 5 supported parameter types.
 
 Parameter type | C++ data type | protobuf data type
-------------- | ------------- | --------------
+:------------- | :------------- | :--------------
 apollo::cyber::proto::ParamType::INT    |   int64_t |   int64
 apollo::cyber::proto::ParamType::DOUBLE | double | double
 apollo::cyber::proto::ParamType::BOOL   | bool |bool
 apollo::cyber::proto::ParamType::STRING  | std::string | string
 apollo::cyber::proto::ParamType::PROTOBUF  | std::string | string
 apollo::cyber::proto::ParamType::NOT_SET | - | -
-
 
 Besides the 5 types above, Parameter also supports interface with protobuf object as incoming parameter. Post performing serialization processes the object and converts it to the STRING type for transfer.
 
@@ -323,23 +331,24 @@ Parameter(const std::string& name, const std::string& msg_str,
           const std::string& full_name, const std::string& proto_desc);
 Parameter(const std::string& name, const google::protobuf::Message& msg);
 ```
-  Sample code of using Parameter object:
 
-  ```cpp
-  Parameter a("int", 10);
-  Parameter b("bool", true);
-  Parameter c("double", 0.1);
-  Parameter d("string", "cyber");
-  Parameter e("string", std::string("cyber"));
-  // proto message Chatter
-  Chatter chatter;
-  Parameter f("chatter", chatter);
-  std::string msg_str("");
-  chatter.SerializeToString(&msg_str);
-  std::string msg_desc("");
-  ProtobufFactory::GetDescriptorString(chatter, &msg_desc);
-  Parameter g("chatter", msg_str, Chatter::descriptor()->full_name(), msg_desc);
-  ```
+Sample code of using Parameter object:
+
+```cpp
+Parameter a("int", 10);
+Parameter b("bool", true);
+Parameter c("double", 0.1);
+Parameter d("string", "cyber");
+Parameter e("string", std::string("cyber"));
+// proto message Chatter
+Chatter chatter;
+Parameter f("chatter", chatter);
+std::string msg_str("");
+chatter.SerializeToString(&msg_str);
+std::string msg_desc("");
+ProtobufFactory::GetDescriptorString(chatter, &msg_desc);
+Parameter g("chatter", msg_str, Chatter::descriptor()->full_name(), msg_desc);
+```
 
 #### Interface and Data Reading
 
@@ -400,7 +409,6 @@ If a node wants to provide a Parameter Service to other nodes, then you need to 
 explicit ParameterService(const std::shared_ptr<Node>& node);
 ```
 
-
 Since all parameters are stored in the parameter service object, the parameters can be manipulated directly in the ParameterService without sending a service request.
 
 **Setting parameters:**
@@ -413,6 +421,7 @@ Since all parameters are stored in the parameter service object, the parameters 
  */
 void SetParameter(const Parameter& parameter);
 ```
+
 **Getting parameters:**
 
 ```cpp
@@ -485,7 +494,9 @@ int main(int argc, char** argv) {
   return 0;
 }
 ```
+
 #### Build and run
+
 - Build: bazel build cyber/examples/…
 - Run: ./bazel-bin/cyber/examples/paramserver
 
@@ -539,12 +550,14 @@ AFATAL << "hello cyber.";
 
 The format is `<MODULE_NAME>.log.<LOG_LEVEL>.<datetime>.<process_id>`
 
-###  About log files
+### About log files
 
 Currently, the only different output behavior from default glog is that different log levels of a module will be written into the same log file.
 
 ## Building a module based on Component
+
 ### Key concepts
+
 #### 1. Component
 
 The component is the base class that Cyber RT provides to build application modules. Each specific application module can inherit the Component class and define its own `Init` and `Proc` functions so that it can be loaded into the Cyber framework.
@@ -555,7 +568,6 @@ There are two options to use Cyber RT framework for applications:
 
 - Binary based: the application is compiled separately into a binary, which communicates with other cyber modules by creating its own `Reader` and `Writer`.
 - Component based: the application is compiled into a Shared Library. By inheriting the Component class and writing the corresponding dag description file, the Cyber RT framework will load and run the application dynamically.
-
 
 ##### The essential Component interface
 
@@ -595,6 +607,7 @@ module_config {
     }
 }
 ```
+
 - **module_library**: If you want to load the .so library the root directory is the working directory of cyber (the same directory of `setup.bash`)
 - **components & timer_component**: Select the base component class type that needs to be loaded.
 - **class_name**: the name of the component class to load
@@ -604,6 +617,7 @@ module_config {
 ### Demo - examples
 
 #### Common_component_example(cyber/examples/common_component_example/*)
+
 Header definition(common_component_example.h)
 
 ```cpp
@@ -675,6 +689,7 @@ class TimertestComponent : public TimerComponent {
 };
 CYBER_REGISTER_COMPONENT(TimertestComponent)
 ```
+
 Cpp file implementation(timer_component_example.cc)
 
 ```cpp
@@ -699,12 +714,13 @@ bool TimertestComponent::Proc() {
   return true;
 }
 ```
+
 #### Build and run
+
 Use timertestcomponent as example:
 
 - Build: bazel build cyber/examples/timer_component_smaple/…
 - Run: mainboard -d cyber/examples/timer_component_smaple/timer.dag
-
 
 ### Precautions
 
@@ -762,6 +778,7 @@ Each loaded component or binary is a module
 Timer can be used to create a timed task to run on a periodic basis, or to run only once
 
 ### Timer Interface
+
 ```cpp
 /**
  * @brief Construct a new Timer object
@@ -865,6 +882,7 @@ int main(int argc, char** argv) {
 **RecordWriter** is the component used to record messages in the cyber framework. Each RecordWriter can create a new record file through the Open method. The user only needs to execute WriteMessage and WriteChannel to write message and channel information, and the writing process is asynchronous.
 
 ### Demo - example(cyber/examples/record.cc)
+
 Write 100 RawMessage to`TEST_FILE` through `test_write` method, then read them out through `test_read` method.
 
 ```cpp
@@ -936,7 +954,9 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 ```
+
 #### Build and run
+
 - Build: bazel build cyber/examples/…
 - Run: ./bazel-bin/cyber/examples/record
 - Examining result:
@@ -956,6 +976,7 @@ I1124 16:56:27.250434 15118 record.cc:74] [record] MSG validmsg:totalcount: 100:
 ## API Directory
 
 ### Node API
+
 For additional information and examples, refer to [Node](#node)
 
 ### API List
@@ -990,6 +1011,7 @@ auto CreateClient(const std::string& service_name)
 ```
 
 ## Writer API
+
 For additional information and examples, refer to [Writer](#writer)
 
 ### API List
@@ -999,6 +1021,7 @@ bool Write(const std::shared_ptr<MessageT>& message);
 ```
 
 ## Client API
+
 For additional information and examples, refer to [Client](#service-creation-and-use)
 
 ### API List
@@ -1086,8 +1109,8 @@ bool GetParameter(const std::string& param_name, Parameter* parameter);
 bool ListParameters(std::vector<Parameter>* parameters);
 ```
 
-
 ## Timer API
+
 You can set the parameters of the Timer and call the start and stop interfaces to start the timer and stop the timer.
 For additional information and examples, refer to [Timer](#timer)
 
@@ -1102,6 +1125,7 @@ void Stop();
 ```
 
 ## Time API
+
 For additional information and examples, refer to [Time](#use-of-time)
 
 ### API List
@@ -1125,6 +1149,7 @@ bool IsZero() const;
 ```
 
 ## Duration API
+
 Interval-related interface, used to indicate the time interval, can be initialized according to the specified nanosecond or second.
 
 ### API List
@@ -1144,6 +1169,7 @@ void Sleep() const;
 ```
 
 ## Rate API
+
 The frequency interface is generally used to initialize the time of the sleep frequency after the object is initialized according to the specified frequency.
 
 ### API List
@@ -1159,6 +1185,7 @@ Duration ExpectedCycleTime() const { return expected_cycle_time_; }
 ```
 
 ## RecordReader API
+
 The interface for reading the record file is used to read the message and channel information in the record file.
 
 ### API List
@@ -1176,6 +1203,7 @@ uint64_t CurrentMessageTime();
 ```
 
 ## RecordWriter API
+
 The interface for writing the record file, used to record the message and channel information into the record file.
 
 ### API List
