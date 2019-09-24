@@ -51,6 +51,10 @@ DEFINE_string(scenario_pull_over_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/pull_over_config.pb.txt",
               "The pull_over scenario configuration file");
+DEFINE_string(scenario_pull_over_emergency_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/pull_over_emergency_config.pb.txt",
+              "The pull_over_emergency scenario configuration file");
 DEFINE_string(scenario_stop_sign_unprotected_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/stop_sign_unprotected_config.pb.txt",
