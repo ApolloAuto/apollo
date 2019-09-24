@@ -122,4 +122,16 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "writer_test",
+    size = "small",
+    srcs = ["writer_test.cc"],
+    deps = [
+        "//cyber",
+        "//cyber/node:writer_base",
+        "//cyber/proto:unit_test_cc_proto",
+        "@gtest",
+    ],
+)
+
 cpplint()
