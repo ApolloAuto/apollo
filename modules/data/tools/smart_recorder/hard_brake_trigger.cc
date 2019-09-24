@@ -38,7 +38,7 @@ void HardBrakeTrigger::Pull(const RecordMessage& msg) {
   if (msg.channel_name == FLAGS_chassis_topic) {
     Chassis chassis_msg;
     chassis_msg.ParseFromString(msg.content);
-    float speed = chassis_msg.speed_mps();
+    const float speed = chassis_msg.speed_mps();
 
     if (IsNoisy(speed)) {
       return;
@@ -55,10 +55,8 @@ void HardBrakeTrigger::Pull(const RecordMessage& msg) {
 }
 
 bool HardBrakeTrigger::IsNoisy(const float speed) const {
-  float pre_speed_mps = 0.0f;
-  if (!current_speed_queue_.empty()) {
-    pre_speed_mps = current_speed_queue_.back();
-  }
+  const float pre_speed_mps =
+      (current_speed_queue_.empty() ? 0.0f : current_speed_queue_.back());
   return fabs(pre_speed_mps - speed) > noisy_diff_;
 }
 
@@ -67,7 +65,8 @@ bool HardBrakeTrigger::IsHardBrake() const {
       history_speed_queue_.size() < queue_size_) {
     return false;
   }
-  float delta = (history_total_ - current_total_) / float(queue_size_);
+  const float delta =
+      (history_total_ - current_total_) / static_cast<float>(queue_size_);
   return delta > max_delta_;
 }
 
@@ -75,16 +74,15 @@ void HardBrakeTrigger::EnqueueMessage(const float speed) {
   current_speed_queue_.emplace_back(speed);
   current_total_ += speed;
   if (current_speed_queue_.size() > queue_size_) {
-    float current_front = current_speed_queue_.front();
+    const float current_front = current_speed_queue_.front();
     current_speed_queue_.pop_front();
     current_total_ -= current_front;
 
     history_speed_queue_.emplace_back(current_front);
     history_total_ += current_front;
     if (history_speed_queue_.size() > queue_size_) {
-      float history_front = history_speed_queue_.front();
+      history_total_ -= history_speed_queue_.front();
       history_speed_queue_.pop_front();
-      history_total_ -= history_front;
     }
   }
 }
