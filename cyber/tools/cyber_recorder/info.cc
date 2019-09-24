@@ -61,11 +61,11 @@ bool Info::Display(const std::string& file) {
   // size
   std::cout << std::setw(w) << "size: " << hdr.size() << " Bytes";
   if (hdr.size() >= kGB) {
-    outStr << " (" << static_cast<float>(hdr.size()) / kGB << " GB)";
+    std::cout << " (" << static_cast<float>(hdr.size()) / kGB << " GB)";
   } else if (hdr.size() >= kMB) {
-    outStr << " (" << static_cast<float>(hdr.size()) / kMB << " MB)";
+    std::cout << " (" << static_cast<float>(hdr.size()) / kMB << " MB)";
   } else if (hdr.size() >= kKB) {
-    outStr << " (" << static_cast<float>(hdr.size()) / kKB << " KB)";
+    std::cout << " (" << static_cast<float>(hdr.size()) / kKB << " KB)";
   }
   std::cout << std::endl;
 
