@@ -18,7 +18,6 @@
 
 #include <deque>
 #include <memory>
-#include <vector>
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/data/tools/smart_recorder/proto/smart_recorder_triggers.pb.h"
