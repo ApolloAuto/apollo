@@ -1454,5 +1454,17 @@ bool OpenSpaceRoiDecider::GetHyperPlanes(
   return true;
 }
 
+bool OpenSpaceRoiDecider::IsInParkingLot(
+    const double adc_init_x, const double adc_init_y,
+    const double adc_init_heading,
+    std::vector<ParkingSpaceInfoConstPtr> *parking_spaces) {
+  // make sure there is only one parking lot in search range
+  const double kDistance = 2;
+  auto adc_parking_spot = common::util::MakePointENU(adc_init_x, adc_init_y, 0);
+  if (hdmap_->GetParkingSpaces(adc_parking_spot, kDistance, parking_spaces))
+    return true;
+  return false;
+}
+
 }  // namespace planning
 }  // namespace apollo
