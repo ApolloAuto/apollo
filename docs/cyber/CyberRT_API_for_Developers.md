@@ -242,7 +242,7 @@ int main(int argc, char* argv[]) {
   while (apollo::cyber::OK()) {
     auto res = client->SendRequest(driver_msg);
     if (res != nullptr) {
-      AINFO << "client: responese: " << res->ShortDebugString();
+      AINFO << "client: response: " << res->ShortDebugString();
     } else {
       AINFO << "client: service may not ready.";
     }
@@ -275,15 +275,15 @@ cc_binary(
 
 ``` txt
 I1124 16:36:44.568845 14965 service.cc:30] [service] server: i am driver server
-I1124 16:36:44.569031 14949 service.cc:43] [service] client: responese: msg_id: 1 timestamp: 0
+I1124 16:36:44.569031 14949 service.cc:43] [service] client: response: msg_id: 1 timestamp: 0
 I1124 16:36:45.569514 14966 service.cc:30] [service] server: i am driver server
-I1124 16:36:45.569932 14949 service.cc:43] [service] client: responese: msg_id: 2 timestamp: 0
+I1124 16:36:45.569932 14949 service.cc:43] [service] client: response: msg_id: 2 timestamp: 0
 I1124 16:36:46.570627 14967 service.cc:30] [service] server: i am driver server
-I1124 16:36:46.571024 14949 service.cc:43] [service] client: responese: msg_id: 3 timestamp: 0
+I1124 16:36:46.571024 14949 service.cc:43] [service] client: response: msg_id: 3 timestamp: 0
 I1124 16:36:47.571566 14968 service.cc:30] [service] server: i am driver server
-I1124 16:36:47.571962 14949 service.cc:43] [service] client: responese: msg_id: 4 timestamp: 0
+I1124 16:36:47.571962 14949 service.cc:43] [service] client: response: msg_id: 4 timestamp: 0
 I1124 16:36:48.572634 14969 service.cc:30] [service] server: i am driver server
-I1124 16:36:48.573030 14949 service.cc:43] [service] client: responese: msg_id: 5 timestamp: 0
+I1124 16:36:48.573030 14949 service.cc:43] [service] client: response: msg_id: 5 timestamp: 0
 ```
 
 ### Precautions
