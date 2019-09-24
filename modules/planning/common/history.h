@@ -77,7 +77,7 @@ class HistoryObjectStatus {
   void Init(const std::string& id, const ObjectStatus& object_status);
 
   const std::string& id() const { return id_; }
-  const ObjectStatus GetObjectStatus() const;
+  const ObjectStatus GetObjectStatus() const { return object_status_; }
 
  private:
   std::string id_;
@@ -91,7 +91,8 @@ class HistoryStatus {
   void SetObjectStatus(
       const std::string& id, const ObjectStatus& object_status);
 
-  ObjectStatus GetObjectStatus(const std::string& id);
+  bool GetObjectStatus(
+      const std::string& id, ObjectStatus* const object_status);
 
  private:
   std::unordered_map<std::string, ObjectStatus> object_id_to_status_;
