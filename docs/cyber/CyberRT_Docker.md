@@ -30,11 +30,11 @@ To enter the docker you just started:
 
 To build Cyber RT only and test it:
 
-
 ```bash
 ./apollo.sh build_cyber
 bazel test cyber/...
 ```
+
 You should be able to see all the tests passed before developing your project.
 
 To build drivers on Cyber RT only:
@@ -42,7 +42,6 @@ To build drivers on Cyber RT only:
 ```bash
 ./apollo.sh build_drivers
 ```
-
 
 **Note: start of instructions for ARM platform only**
 

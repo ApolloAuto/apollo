@@ -57,4 +57,3 @@ The Launch file provides a easy way to start modules. By defining one or multipl
 ## Record file
 
 The Record file is used to record messages sent/received to/from channels in Cyber RT. Reply record files can help reproduce the behavior of previous operations of Cyber RT.
-
