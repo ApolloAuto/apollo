@@ -21,7 +21,7 @@
 
 #include "cyber/cyber.h"
 #include "cyber/scheduler/common/pin_thread.h"
-#include "policy/choreography_context.h"
+#include "cyber/scheduler/policy/choreography_context.h"
 
 namespace apollo {
 namespace cyber {
