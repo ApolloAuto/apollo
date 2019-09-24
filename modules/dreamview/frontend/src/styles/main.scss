@@ -1,5 +1,8 @@
 @import "media-queries";
 
+$min-scene-width: 600;
+
+:export { minSceneWidth: $min-scene-width; }
 
 @mixin monitor-item-common-properties($text-width: calc(100% - 17px)) {
     display: flex;
@@ -239,7 +242,7 @@ body {
             .main-view {
                 flex: 0 0 auto;
                 position: relative;
-                min-width: 600px;
+                min-width: $min-scene-width + 0px;
                 #camera-image {
                     width: 100%;
                 }

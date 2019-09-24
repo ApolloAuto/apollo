@@ -9,6 +9,8 @@ export default class CameraData {
     @observable initDynamicRotation = observable.map();
     @observable deltaDynamicRotation = observable.map();
     @observable imageSrcData = null;
+    @observable imageWidth = null;
+    @observable imageHeight = null;
 
     constructor() {
         ['x', 'y', 'z'].forEach((axis) => {
@@ -36,6 +38,9 @@ export default class CameraData {
         if (data.image && data.image.length > 0) {
             this.imageSrcData = 'data:image/jpeg;base64,' + new Buffer(data.image).toString('base64');
         }
+
+        this.imageWidth = data.imgWidth;
+        this.imageHeight = data.imgHeight;
 
         // Camera dynamic transformation matrix: the dynamic localization matrix
         const localizationMatrix = new THREE.Matrix4();

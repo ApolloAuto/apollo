@@ -162,6 +162,9 @@ void PerceptionCameraUpdater::OnImage(
   std::vector<uint8_t> compressed_raw_data(compressed_image->data().begin(),
                                            compressed_image->data().end());
   cv::Mat mat_image = cv::imdecode(compressed_raw_data, CV_LOAD_IMAGE_COLOR);
+  const int width = mat_image.cols;
+  const int height = mat_image.rows;
+
   // Scale down image size properly to reduce data transfer latency through
   // websocket and ensure image quality is acceptable meanwhile
   cv::resize(mat_image, mat_image,
@@ -186,6 +189,8 @@ void PerceptionCameraUpdater::OnImage(
   }
   current_image_timestamp_ = next_image_timestamp;
   camera_update_.set_image(&(tmp_buffer[0]), tmp_buffer.size());
+  camera_update_.set_img_width(width);
+  camera_update_.set_img_height(height);
 }
 
 void PerceptionCameraUpdater::OnLocalization(

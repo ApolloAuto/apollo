@@ -13,7 +13,7 @@ export default class Ground {
         this.geometry = null;
         this.initialized = false;
         this.inNaviMode = null;
-        this.isCameraView = false;
+        this.showCameraView = false;
 
         loadTexture(gridGround, texture => {
             this.geometry = new THREE.PlaneGeometry(1, 1);
@@ -52,9 +52,9 @@ export default class Ground {
         }
 
         // Remove ground image when camera view is on
-        const isCameraView = STORE.options.isCameraView;
-        const cameraAngleChanged = (isCameraView !== this.isCameraView);
-        this.isCameraView = isCameraView;
+        const showCameraView = STORE.options.showCameraView;
+        const cameraAngleChanged = (showCameraView !== this.showCameraView);
+        this.showCameraView = showCameraView;
 
         const modeChanged = this.inNaviMode !== STORE.hmi.inNavigationMode;
         this.inNaviMode = STORE.hmi.inNavigationMode;
@@ -72,7 +72,7 @@ export default class Ground {
             const position = coordinates.applyOffset({x: adc.positionX, y: adc.positionY});
             this.mesh.position.set(position.x, position.y, 0);
         } else if (this.loadedMap !== this.updateMap || modeChanged || cameraAngleChanged) {
-            if (isCameraView) {
+            if (showCameraView) {
                 scene.background = null;
                 this.mesh.visible = false;
                 return;

@@ -48,7 +48,7 @@ export default class CameraDataWebSocketEndpoint {
         clearInterval(this.timer);
         this.timer = setInterval(() => {
             if (this.websocket.readyState === this.websocket.OPEN
-                && STORE.options.isCameraView) {
+                && STORE.options.showCameraView) {
                     this.requestCameraData();
             }
         }, this.cameraDataUpdatePeriodMs);

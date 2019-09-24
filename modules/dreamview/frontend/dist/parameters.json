@@ -139,10 +139,8 @@
 			"default": false
 		},
 		"cameraAngle": {
-			"default": "Default"
-		},
-		"showCameraView": {
-			"default": false
+			"default": "Default",
+			"hasCameraView": false
 		},
 		"showDecisionMain": {
 			"default": true,

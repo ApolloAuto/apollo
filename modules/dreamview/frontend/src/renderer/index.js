@@ -16,8 +16,9 @@ import Routing from "renderer/routing.js";
 import RoutingEditor from "renderer/routing_editor.js";
 import Gnss from "renderer/gnss.js";
 import PointCloud from "renderer/point_cloud.js";
-
+import Styles from "styles/main.scss";
 const _ = require('lodash');
+
 
 class Renderer {
     constructor() {
@@ -154,7 +155,7 @@ class Renderer {
     }
 
     updateDimension(width, height) {
-        if (width < 600) {
+        if (width < Styles.minSceneWidth) {
             // Min width of main view is 600, so we need not update
             // camera/renderer dimension anymore
             return;

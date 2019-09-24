@@ -788,6 +788,14 @@
                 "image": {
                   "type": "bytes",
                   "id": 3
+                },
+                "imgHeight": {
+                  "type": "uint32",
+                  "id": 4
+                },
+                "imgWidth": {
+                  "type": "uint32",
+                  "id": 5
                 }
               }
             }
@@ -6362,6 +6370,13 @@
                   "id": 2,
                   "options": {
                     "default": 0.5
+                  }
+                },
+                "minDistToDest": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 25
                   }
                 }
               }

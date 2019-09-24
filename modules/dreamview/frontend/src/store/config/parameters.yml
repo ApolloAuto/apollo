@@ -115,8 +115,7 @@ options:
   # layer Menu options
   cameraAngle:
     default: Default
-  showCameraView:
-    default: false
+    hasCameraView: false
   showDecisionMain:
     default: true
     menuId: decisionMain

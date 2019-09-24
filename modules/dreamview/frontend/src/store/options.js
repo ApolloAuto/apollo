@@ -64,7 +64,7 @@ export default class Options {
         return this.showPNCMonitor || this.showDataCollectionMonitor;
     }
 
-    @computed get isCameraView() {
+    @computed get showCameraView() {
         return this.cameraAngle === "CameraView";
     }
 
