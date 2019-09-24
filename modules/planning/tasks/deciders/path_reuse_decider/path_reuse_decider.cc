@@ -344,7 +344,6 @@ bool PathReuseDecider::TrimHistoryPath(
   if (!history_frame) return false;
   const DiscretizedPath& history_path =
       history_frame->current_frame_planned_path();
-  //   std::vector<common::PathPoint> trimmed_path;
   DiscretizedPath trimmed_path;
   // current vehicle status
   common::math::Vec2d adc_position = {
@@ -353,7 +352,7 @@ bool PathReuseDecider::TrimHistoryPath(
   common::SLPoint adc_position_sl;
   const auto& reference_line = reference_line_info->reference_line();
   reference_line.XYToSL(adc_position, &adc_position_sl);
-  double path_start_s = 0;
+  double path_start_s = 0.0;
   size_t path_start_index = 0;
 
   for (size_t i = 0; i < history_path.size(); ++i) {
@@ -366,13 +365,11 @@ bool PathReuseDecider::TrimHistoryPath(
       ++path_start_index;
     } else {
       double updated_s = history_path[i].s() - path_start_s;
-      //   history_path[i].set_s(updated_s);
       trimmed_path.emplace_back(history_path[i]);
       trimmed_path.back().set_s(updated_s);
     }
   }
   trimmed_path.insert(trimmed_path.begin(), history_path[path_start_index]);
-  // history_path[path_start_s].set_s(0);
   frame->set_current_frame_planned_path(trimmed_path);
   return true;
 }
