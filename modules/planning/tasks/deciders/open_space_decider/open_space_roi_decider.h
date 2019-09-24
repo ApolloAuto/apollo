@@ -165,6 +165,15 @@ class OpenSpaceRoiDecider : public Decider {
                       const std::vector<std::vector<common::math::Vec2d>>
                           &obstacles_vertices_vec,
                       Eigen::MatrixXd *A_all, Eigen::MatrixXd *b_all);
+  /**
+   * @brief check if vehicle is parked in a parking lot
+   *
+   * @return true adc parked in a parking lot
+   * @return false adc parked at a pull-over spot
+   */
+  bool IsInParkingLot(const double adc_init_x, const double adc_init_y,
+                      const double adc_init_heading,
+                      std::vector<apollo::hdmap::ParkingSpaceInfoConstPtr> *parking_spaces);
 
  private:
   // @brief parking_spot_id from routing
