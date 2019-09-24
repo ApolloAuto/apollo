@@ -23,10 +23,10 @@ from imu_speed_acc import ImuSpeedAcc
 
 class ImuSpeedJerk:
 
-    def __init__(self):
+    def __init__(self, is_lateral=False):
         self.timestamp_list = []
         self.jerk_list = []
-        self.imu_speed_acc = ImuSpeedAcc()
+        self.imu_speed_acc = ImuSpeedAcc(is_lateral)
 
     def add(self, location_est):
         self.imu_speed_acc.add(location_est)
@@ -91,7 +91,7 @@ if __name__ == "__main__":
         fns.sort()
         for fn in fns:
             reader = RecordItemReader(folder+"/"+fn)
-            processor = ImuSpeedJerk()
+            processor = ImuSpeedJerk(True)
             last_pose_data = None
             last_chassis_data = None
             topics = ["/apollo/localization/pose"]

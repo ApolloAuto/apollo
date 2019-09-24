@@ -22,21 +22,28 @@ from record_reader import RecordItemReader
 
 class ImuSpeed:
 
-    def __init__(self):
+    def __init__(self, is_lateral=False):
         self.timestamp_list = []
         self.speed_list = []
 
         self.last_speed_mps = None
         self.last_imu_speed = None
 
+        self.is_lateral = is_lateral
+
     def add(self, location_est):
         timestamp_sec = location_est.measurement_time
         self.timestamp_list.append(timestamp_sec)
-
-        speed = location_est.pose.linear_velocity.x \
-            * math.cos(location_est.pose.heading) + \
-            location_est.pose.linear_velocity.y * \
-            math.sin(location_est.pose.heading)
+        if self.is_lateral:
+            speed = location_est.pose.linear_velocity.x \
+                * math.sin(location_est.pose.heading) + \
+                location_est.pose.linear_velocity.y * \
+                math.cos(location_est.pose.heading)
+        else:
+            speed = location_est.pose.linear_velocity.x \
+                * math.cos(location_est.pose.heading) + \
+                location_est.pose.linear_velocity.y * \
+                math.sin(location_est.pose.heading)
         self.speed_list.append(speed)
 
     def get_speed_list(self):
@@ -75,7 +82,7 @@ if __name__ == "__main__":
         fns = [f for f in listdir(folder) if isfile(join(folder, f))]
         for fn in fns:
             reader = RecordItemReader(folder+"/"+fn)
-            processor = ImuSpeed()
+            processor = ImuSpeed(True)
             last_pose_data = None
             last_chassis_data = None
             topics = ["/apollo/localization/pose"]

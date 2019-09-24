@@ -23,10 +23,10 @@ from imu_speed import ImuSpeed
 
 class ImuSpeedAcc:
 
-    def __init__(self):
+    def __init__(self, is_lateral=False):
         self.timestamp_list = []
         self.acc_list = []
-        self.imu_speed = ImuSpeed()
+        self.imu_speed = ImuSpeed(is_lateral)
 
     def add(self, location_est):
         self.imu_speed.add(location_est)
@@ -100,8 +100,8 @@ if __name__ == "__main__":
         fns = [f for f in listdir(folder) if isfile(join(folder, f))]
         fns.sort()
         for fn in fns:
-            reader = RecordItemReader(folder+"/"+fn)
-            processor = ImuSpeedAcc()
+            reader = RecordItemReader(folder + "/" + fn)
+            processor = ImuSpeedAcc(True)
             last_pose_data = None
             last_chassis_data = None
             topics = ["/apollo/localization/pose"]
