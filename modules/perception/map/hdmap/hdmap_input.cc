@@ -105,7 +105,10 @@ bool HDMapInput::GetRoiHDMapStruct(
     const base::PointD& pointd, const double distance,
     std::shared_ptr<base::HdmapStruct> hdmap_struct_ptr) {
   lib::MutexLock lock(&mutex_);
-  CHECK_NOTNULL(hdmap_.get());
+  if (hdmap_.get() == nullptr) {
+    AERROR << "hdmap is not available";
+    return false;
+  }
   // Get original road boundary and junction
   std::vector<RoadRoiPtr> road_boundary_vec;
   std::vector<JunctionInfoConstPtr> junctions_vec;
@@ -405,7 +408,10 @@ bool HDMapInput::GetSignals(const Eigen::Vector3d& pointd,
                             double forward_distance,
                             std::vector<apollo::hdmap::Signal>* signals) {
   lib::MutexLock lock(&mutex_);
-  CHECK_NOTNULL(hdmap_.get());
+  if (hdmap_.get() == nullptr) {
+    AERROR << "hdmap is not available";
+    return false;
+  }
   return GetSignalsFromHDMap(pointd, forward_distance, signals);
 }
 

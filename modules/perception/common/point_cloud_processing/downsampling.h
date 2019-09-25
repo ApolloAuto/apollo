@@ -108,7 +108,10 @@ void DownsamplingCircularOrgPartial(
     std::vector<std::pair<int, int>>* all_org_idx_ptr) {
   int smp_height = static_cast<int>(cloud->height()) / smp_ratio;
   int smp_width = org_num;
-  CHECK(smp_width >= 1 && smp_width < velodyne_model) << "org_num error!";
+  if (smp_width < 1 || smp_width >= velodyne_model) {
+    AERROR << "org_num error!";
+    return;
+  }
   size_t ii = 0;
   down_cloud->resize(smp_height * smp_width);
   all_org_idx_ptr->resize(smp_height * smp_width);
@@ -149,7 +152,10 @@ void DownsamplingRectangleOrgPartial(
     std::vector<std::pair<int, int>>* all_org_idx_ptr) {
   int smp_height = static_cast<int>(cloud->height()) / smp_ratio;
   int smp_width = org_num;
-  CHECK(smp_width >= 1 && smp_width < velodyne_model) << "org_num error!";
+  if (smp_width < 1 || smp_width >= velodyne_model) {
+    AERROR << "org_num error!";
+    return;
+  }
   size_t ii = 0;
   down_cloud->resize(smp_height * smp_width);
   all_org_idx_ptr->resize(smp_height * smp_width);
@@ -185,7 +191,11 @@ void DownsamplingRectangleNeighbour(
     float front_range, float side_range, double max_nei, int velo_model,
     typename std::shared_ptr<const base::PointCloud<PointT>> cloud,
     typename std::shared_ptr<base::PointCloud<PointT>> down_cloud) {
-  CHECK_EQ(cloud->width(), velo_model);
+  if (cloud->width() != velo_model) {
+    AERROR << "cloud->width (" << cloud->width() << ") does not match "
+           << "velo_model (" << velo_model << ")";
+    return;
+  }
   down_cloud->resize(cloud->size());
   size_t pt_num = 0;
   for (int ww = 0; ww < cloud->width(); ++ww) {

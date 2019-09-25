@@ -36,7 +36,7 @@ As a decentralized design framework, Cyber RT does not have a master/central nod
 
 ## CRoutine
 
-Referred to as Coroutine concept, Cyber RT implemented CRoutine to optimize thread usage and system reource allocation.
+Referred to as Coroutine concept, Cyber RT implemented CRoutine to optimize thread usage and system resource allocation.
 
 ## Scheduler
 
@@ -57,4 +57,3 @@ The Launch file provides a easy way to start modules. By defining one or multipl
 ## Record file
 
 The Record file is used to record messages sent/received to/from channels in Cyber RT. Reply record files can help reproduce the behavior of previous operations of Cyber RT.
-

@@ -25,7 +25,10 @@ size_t Sensor::kMaxCachedFrameNum = 10;
 
 void Sensor::QueryLatestFrames(double timestamp,
                                std::vector<SensorFramePtr>* frames) {
-  CHECK_NOTNULL(frames);
+  if (frames == nullptr) {
+    AERROR << "frames are not available";
+    return;
+  }
 
   frames->clear();
   for (size_t i = 0; i < frames_.size(); ++i) {
@@ -50,8 +53,10 @@ SensorFramePtr Sensor::QueryLatestFrame(double timestamp) {
 }
 
 bool Sensor::GetPose(double timestamp, Eigen::Affine3d* pose) const {
-  CHECK_NOTNULL(pose);
-
+  if (pose == nullptr) {
+    AERROR << "pose is not available";
+    return false;
+  }
   for (int i = static_cast<int>(frames_.size()) - 1; i >= 0; --i) {
     double time_diff = timestamp - frames_[i]->GetTimestamp();
     if (fabs(time_diff) < 1.0e-3) {  // > ?

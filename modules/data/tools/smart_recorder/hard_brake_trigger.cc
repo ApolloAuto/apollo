@@ -28,14 +28,7 @@ namespace data {
 
 using apollo::canbus::Chassis;
 
-constexpr int ITEM_SIZE = 10;
-constexpr float MAX_DELTA = 10.0f;
-constexpr float MAX_DIFF = 20.0f;
-constexpr float FLOAT_ZERO = 0.0001f;
-
-HardBrakeTrigger::HardBrakeTrigger() {
-  trigger_name_ = "HardBrakeTrigger";
-}
+HardBrakeTrigger::HardBrakeTrigger() { trigger_name_ = "HardBrakeTrigger"; }
 
 void HardBrakeTrigger::Pull(const RecordMessage& msg) {
   if (!trigger_obj_->enabled()) {
@@ -43,13 +36,16 @@ void HardBrakeTrigger::Pull(const RecordMessage& msg) {
   }
 
   if (msg.channel_name == FLAGS_chassis_topic) {
-    std::shared_ptr<apollo::canbus::Chassis> chassis_msg =
-      std::make_shared<apollo::canbus::Chassis>();
-    chassis_msg->ParseFromString(msg.content);
-    if (IsNoisy(chassis_msg)) {
+    Chassis chassis_msg;
+    chassis_msg.ParseFromString(msg.content);
+    const float speed = chassis_msg.speed_mps();
+
+    if (IsNoisy(speed)) {
       return;
     }
-    PushToList(chassis_msg);
+
+    EnqueueMessage(speed);
+
     if (IsHardBrake()) {
       AINFO << "hard break trigger is pulled: " << msg.time << " - "
             << msg.channel_name;
@@ -58,49 +54,36 @@ void HardBrakeTrigger::Pull(const RecordMessage& msg) {
   }
 }
 
-bool HardBrakeTrigger::IsNoisy(const std::shared_ptr<canbus::Chassis>& msg) {
-  float pre_speed_mps = 0.0f;
-  float cur_speed_mps = msg->speed_mps();
-  if (cur_msg_list_.size() > 0) {
-    size_t num = cur_msg_list_.size() - 1;
-    pre_speed_mps = cur_msg_list_[num]->speed_mps();
-  }
-  return  (fabs(pre_speed_mps - cur_speed_mps) > MAX_DIFF);
+bool HardBrakeTrigger::IsNoisy(const float speed) const {
+  const float pre_speed_mps =
+      (current_speed_queue_.empty() ? 0.0f : current_speed_queue_.back());
+  return fabs(pre_speed_mps - speed) > noisy_diff_;
 }
 
-bool HardBrakeTrigger::IsHardBrake() {
-  float his_speed_mean_value = GetMeanSpeed(his_msg_list_);
-  float cur_speed_mean_value = GetMeanSpeed(cur_msg_list_);
-
-  float delta = his_speed_mean_value - cur_speed_mean_value;
-  return (delta > MAX_DELTA);
+bool HardBrakeTrigger::IsHardBrake() const {
+  if (current_speed_queue_.size() < queue_size_ ||
+      history_speed_queue_.size() < queue_size_) {
+    return false;
+  }
+  const float delta =
+      (history_total_ - current_total_) / static_cast<float>(queue_size_);
+  return delta > max_delta_;
 }
 
-float HardBrakeTrigger::GetMeanSpeed(
-    const std::vector<std::shared_ptr<canbus::Chassis>> &msg_list) {
-  float speed_points = 0.0f;
-  if (msg_list.empty()) {
-    return 0.0f;
-  }
-  for (const auto& msg : msg_list) {
-    speed_points += msg->speed_mps();
-  }
-  return speed_points / static_cast<float>(msg_list.size());
-}
+void HardBrakeTrigger::EnqueueMessage(const float speed) {
+  current_speed_queue_.emplace_back(speed);
+  current_total_ += speed;
+  if (current_speed_queue_.size() > queue_size_) {
+    const float current_front = current_speed_queue_.front();
+    current_speed_queue_.pop_front();
+    current_total_ -= current_front;
 
-void HardBrakeTrigger::PushToList(
-  const std::shared_ptr<canbus::Chassis>& msg) {
-  cur_msg_list_.push_back(msg);
-  if (cur_msg_list_.size() > ITEM_SIZE) {
-    size_t offset = cur_msg_list_.size() - ITEM_SIZE;
-    for (size_t i = 0; i < offset; i++) {
-      his_msg_list_.push_back(cur_msg_list_[i]);
+    history_speed_queue_.emplace_back(current_front);
+    history_total_ += current_front;
+    if (history_speed_queue_.size() > queue_size_) {
+      history_total_ -= history_speed_queue_.front();
+      history_speed_queue_.pop_front();
     }
-    cur_msg_list_.erase(cur_msg_list_.begin(), cur_msg_list_.begin() + offset);
-  }
-  if (his_msg_list_.size() > ITEM_SIZE) {
-    size_t offset = his_msg_list_.size() - ITEM_SIZE;
-    his_msg_list_.erase(his_msg_list_.begin(), his_msg_list_.begin() + offset);
   }
 }
 

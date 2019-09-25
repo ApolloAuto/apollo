@@ -168,7 +168,10 @@ void LaneCameraPerception::SetCameraHeightAndPitch(
     const std::map<std::string, float> name_camera_ground_height_map,
     const std::map<std::string, float> name_camera_pitch_angle_diff_map,
     const float &pitch_angle_calibrator_working_sensor) {
-  CHECK(calibration_service_ != nullptr);
+  if (calibration_service_ == nullptr) {
+    AERROR << "Calibraion service is not available";
+    return;
+  }
   calibration_service_->SetCameraHeightAndPitch(
       name_camera_ground_height_map, name_camera_pitch_angle_diff_map,
       pitch_angle_calibrator_working_sensor);
@@ -176,7 +179,10 @@ void LaneCameraPerception::SetCameraHeightAndPitch(
 
 void LaneCameraPerception::SetIm2CarHomography(
     Eigen::Matrix3d homography_im2car) {
-  CHECK(calibration_service_ != nullptr);
+  if (calibration_service_ == nullptr) {
+    AERROR << "Calibraion service is not available";
+    return;
+  }
   lane_postprocessor_->SetIm2CarHomography(homography_im2car);
 }
 
@@ -192,7 +198,10 @@ bool LaneCameraPerception::Perception(const CameraPerceptionOptions &options,
   inference::CudaUtil::set_device_id(perception_param_.gpu_id());
   PERCEPTION_PERF_BLOCK_START();
 
-  CHECK(frame->calibration_service != nullptr);
+  if (frame->calibration_service == nullptr) {
+    AERROR << "Calibraion service is not available";
+    return false;
+  }
 
   // Lane detector and postprocessor: work on front_6mm only
   if (lane_calibration_working_sensor_name_ ==

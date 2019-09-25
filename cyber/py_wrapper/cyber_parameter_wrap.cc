@@ -27,7 +27,7 @@ template <typename T>
 T PyObjectToPtr(PyObject* pyobj, const std::string& type_ptr) {
   T obj_ptr = (T)PyCapsule_GetPointer(pyobj, type_ptr.c_str());
   if (obj_ptr == nullptr) {
-    AINFO << "PyObjectToPtr failed,type->" << type_ptr << "pyobj: " << pyobj;
+    AERROR << "PyObjectToPtr failed,type->" << type_ptr << "pyobj: " << pyobj;
   }
   return obj_ptr;
 }
@@ -50,7 +50,7 @@ PyObject* cyber_delete_PyParameter(PyObject* self, PyObject* args) {
   auto pyparameter = (apollo::cyber::PyParameter*)PyCapsule_GetPointer(
       pyobj_param, "apollo_cybertron_pyparameter");
   if (nullptr == pyparameter) {
-    AINFO << "cyber_delete_PyParameter:parameter ptr is null!";
+    AERROR << "cyber_delete_PyParameter:parameter ptr is null!";
     Py_INCREF(Py_None);
     return Py_None;
   }
@@ -303,7 +303,7 @@ PyObject* cyber_delete_PyParameterClient(PyObject* self, PyObject* args) {
       (apollo::cyber::PyParameterClient*)PyCapsule_GetPointer(
           pyobj_param, "apollo_cybertron_pyparameterclient");
   if (nullptr == pyparameter_clt) {
-    AINFO << "cyber_delete_PyParameterClient:pyparameter_clt ptr is null!";
+    AERROR << "cyber_delete_PyParameterClient:pyparameter_clt ptr is null!";
     Py_INCREF(Py_None);
     return Py_None;
   }
@@ -472,7 +472,7 @@ PyObject* cyber_delete_PyParameterServer(PyObject* self, PyObject* args) {
       (apollo::cyber::PyParameterServer*)PyCapsule_GetPointer(
           pyobj_param, "apollo_cybertron_pyparameterserver");
   if (nullptr == pyparameter_srv) {
-    AINFO << "cyber_delete_PyParameterServer:pyparameter_srv ptr is null!";
+    AERROR << "cyber_delete_PyParameterServer:pyparameter_srv ptr is null!";
     Py_INCREF(Py_None);
     return Py_None;
   }

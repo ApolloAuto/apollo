@@ -933,7 +933,9 @@ bool Cipv::DetermineCipv(const std::vector<base::LaneLine> &lane_objects,
 bool Cipv::TranformPoint(const Eigen::VectorXf &in,
                          const Eigen::Matrix4f &motion_matrix,
                          Eigen::Vector3d *out) {
-  CHECK(in.rows() == motion_matrix.cols());
+  if (in.rows() != motion_matrix.cols()) {
+    AERROR << "Matrix mismatch";
+  }
   Eigen::VectorXf trans_pt = motion_matrix * in;
   if (fabs(trans_pt(3)) < kFloatEpsilon) {
     return false;

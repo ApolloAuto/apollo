@@ -1,4 +1,3 @@
-
 # How to create and run a new component in Apollo Cyber RT
 
 Apollo Cyber RT framework is built based on the concept of component. As a basic building block of Apollo Cyber RT framework, each component contains a specific algorithm module which process a set of data inputs and generate a set of outputs.
@@ -14,8 +13,8 @@ The example below demonstrates how to create a simple component, then build, run
 
 > **Note**: the example has to be run within apollo docker environment and it's compiled with Bazel.
 
-
 ## Set up the component file structure
+
 Please create the following files, assumed under the directory of `/apollo/cyber/examples/common_component_example/`:
 
 - Header file: common_component_example.h
@@ -27,6 +26,7 @@ Please create the following files, assumed under the directory of `/apollo/cyber
 ## Implement the component class
 
 ### Implement component header file
+
 To implement `common_component_example.h`:
 
 - Inherit the Component class
@@ -108,6 +108,7 @@ cc_library(
 
 cpplint()
 ```
+
 ## Set up the configuration files
 
 ### Configure the DAG dependency file

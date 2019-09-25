@@ -16,8 +16,7 @@
 
 #pragma once
 
-#include <vector>
-#include <memory>
+#include <deque>
 
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/data/tools/smart_recorder/proto/smart_recorder_triggers.pb.h"
@@ -32,7 +31,7 @@ using apollo::canbus::Chassis;
  * @class HardBrakeTrigger
  * @brief HardBrake trigger that fires when hard break is engaged
  */
-class HardBrakeTrigger: public TriggerBase {
+class HardBrakeTrigger : public TriggerBase {
  public:
   HardBrakeTrigger();
 
@@ -42,14 +41,18 @@ class HardBrakeTrigger: public TriggerBase {
   virtual ~HardBrakeTrigger() = default;
 
  private:
-  bool IsHardBrake();
-  bool IsNoisy(const std::shared_ptr<canbus::Chassis>& msg);
-  float GetMeanSpeed(const std::vector<std::shared_ptr<canbus::Chassis>>
-    &msg_list);
-  void PushToList(const std::shared_ptr<canbus::Chassis>& msg);
+  bool IsHardBrake() const;
+  bool IsNoisy(const float speed) const;
+  void EnqueueMessage(const float speed);
+
  private:
-  std::vector<std::shared_ptr<canbus::Chassis>> his_msg_list_;
-  std::vector<std::shared_ptr<canbus::Chassis>> cur_msg_list_;
+  const size_t queue_size_ = 10;
+  const float max_delta_ = 10.0f;
+  const float noisy_diff_ = 20.0f;
+  std::deque<float> history_speed_queue_;
+  std::deque<float> current_speed_queue_;
+  float history_total_;
+  float current_total_;
 };
 
 }  // namespace data

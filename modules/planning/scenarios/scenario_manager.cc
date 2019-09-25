@@ -633,6 +633,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectValetParkingScenario(
 ScenarioConfig::ScenarioType ScenarioManager::SelectParkAndGoScenario(
     const Frame& frame) {
   bool park_and_go = false;
+  const auto& scenario_config =
+      config_map_[ScenarioConfig::PARK_AND_GO].park_and_go_config();
   common::VehicleState vehicle_state =
       common::VehicleStateProvider::Instance()->vehicle_state();
   auto adc_point = common::util::MakePointENU(
@@ -649,8 +651,23 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectParkAndGoScenario(
           .max_abs_speed_when_stopped();
 
   hdmap::LaneInfoConstPtr lane;
-  // if vehicle is static and (off-lane or not on city_driving lane)
+
+  // check ego vehicle distance to destination
+  const auto& routing = frame.local_view().routing;
+  const auto& routing_end = *(routing->routing_request().waypoint().rbegin());
+  common::SLPoint dest_sl;
+  const auto& reference_line_info = frame.reference_line_info().front();
+  const auto& reference_line = reference_line_info.reference_line();
+  reference_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()},
+                        &dest_sl);
+  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+
+  const double adc_distance_to_dest = dest_sl.s() - adc_front_edge_s;
+  AINFO << "adc_distance_to_dest:" << adc_distance_to_dest;
+  // if vehicle is static, far enough to destination and (off-lane or not on
+  // city_driving lane)
   if (std::fabs(adc_speed) < max_abs_speed_when_stopped &&
+      adc_distance_to_dest > scenario_config.min_dist_to_dest() &&
       (HDMapUtil::BaseMap().GetNearestLaneWithHeading(
            adc_point, 2.0, vehicle_state.heading(), M_PI / 3.0, &lane, &s,
            &l) != 0 ||

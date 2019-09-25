@@ -196,11 +196,12 @@ bool RecordViewer::Iterator::operator!=(const Iterator& rhs) const {
   return !(*this == rhs);
 }
 
-void RecordViewer::Iterator::operator++() {
+RecordViewer::Iterator& RecordViewer::Iterator::operator++() {
   index_++;
   if (!viewer_->Update(&message_instance_)) {
     end_ = true;
   }
+  return *this;
 }
 
 RecordViewer::Iterator::pointer RecordViewer::Iterator::operator->() {

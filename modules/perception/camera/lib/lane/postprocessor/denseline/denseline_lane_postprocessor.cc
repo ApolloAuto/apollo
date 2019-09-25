@@ -388,7 +388,11 @@ bool DenselineLanePostprocessor::LocateLanelinePointSet(
   input_image_height_ = data_provider->src_height();
   std::vector<int> out_put_shape = frame->lane_detected_blob->shape();
   int channels = frame->lane_detected_blob->channels();
-  CHECK_GE(channels, net_model_channel_num_);
+  if (channels < net_model_channel_num_) {
+    AERROR << "channel (" << channels << ") is less than net channel ("
+           << net_model_channel_num_ << ")";
+    return false;
+  }
 
   lane_map_height_ = frame->lane_detected_blob->height();
   lane_map_width_ = frame->lane_detected_blob->width();

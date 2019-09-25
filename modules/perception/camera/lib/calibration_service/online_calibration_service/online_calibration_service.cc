@@ -117,7 +117,10 @@ bool OnlineCalibrationService::QueryPoint3dOnGroundPlane(
 
 bool OnlineCalibrationService::QueryGroundPlaneInCameraFrame(
     Eigen::Vector4d *plane_param) const {
-  CHECK(plane_param != nullptr);
+  if (plane_param == nullptr) {
+    AERROR << "plane_param is nullptr";
+    return false;
+  }
   if (!is_service_ready_) {
     (*plane_param)(0) = (*plane_param)(1) = (*plane_param)(2) =
         (*plane_param)(3) = 0.0;
@@ -133,8 +136,14 @@ bool OnlineCalibrationService::QueryGroundPlaneInCameraFrame(
 
 bool OnlineCalibrationService::QueryCameraToGroundHeightAndPitchAngle(
     float *height, float *pitch) const {
-  CHECK(height != nullptr);
-  CHECK(pitch != nullptr);
+  if (height == nullptr) {
+    AERROR << "height is nullptr";
+    return false;
+  }
+  if (pitch == nullptr) {
+    AERROR << "pitch is nullptr";
+    return false;
+  }
   if (!is_service_ready_) {
     *height = *pitch = 0.0;
     return false;
@@ -146,7 +155,10 @@ bool OnlineCalibrationService::QueryCameraToGroundHeightAndPitchAngle(
 }
 
 void OnlineCalibrationService::Update(CameraFrame *frame) {
-  CHECK(frame != nullptr);
+  if (frame == nullptr) {
+    AERROR << "frame is nullptr";
+    return;
+  }
   sensor_name_ = frame->data_provider->sensor_name();
   if (sensor_name_ == master_sensor_name_) {
     CalibratorOptions calibrator_options;

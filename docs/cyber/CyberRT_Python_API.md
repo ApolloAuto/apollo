@@ -1,10 +1,13 @@
 ## 1. Background
+
 The core functions of Cyber RT are developed in C++. We also provide more python interfaces to help developers build their own utilities for specific projects.
 
 ## 2. Cyber RT Python Interfaces
+
 The python interfaces of Cyber RT are wrapper the corresponding C++ interfaces. The implementation doesn't rely on other third-party tools, e.g. swig, which makes it easier to maintain.
 
 ## 3. Overview of Python Interfaces in Cyber RT
+
 So far, the python interfaces covers:
 
 * access the information of channels
@@ -70,6 +73,7 @@ class Writer(object):
         writer msg string
         """
 ```
+
 ### 3.2 Record Interfaces
 
 Read from record：
@@ -142,7 +146,7 @@ class RecordWriter(object):
         """
         writer msg:channelname,data,time,is data raw
         """
-	
+
 	def set_size_fileseg(self, size_kilobytes):
         """
         return filesegment size.
@@ -169,6 +173,7 @@ class RecordWriter(object):
         """
 
 ```
+
 ### 3.3 Time Interfaces
 
 ```python
@@ -195,10 +200,9 @@ class Time(object):
         return _CYBER_TIME.PyTime_sleep_until(self.time, nanoseconds)
 ```
 
-
 ### 3.4 Timer Interfaces
-```python
 
+```python
 class Timer(object):
 
     def set_option(self, period, callback, oneshot=0):
@@ -212,14 +216,12 @@ class Timer(object):
 
     def start(self):
 
-
     def stop(self):
-
 
 ```
 
-
 ## 4. Examples
+
 ### 4.1 Read from Channel (in cyber/python/examples/listener.py)
 
 ```python

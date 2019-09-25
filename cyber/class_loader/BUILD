@@ -37,4 +37,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "class_loader_test",
+    size = "small",
+    srcs = [
+        "class_loader_test.cc",
+    ],
+    deps = [
+        "//cyber",
+        "//cyber/class_loader/test:base",
+        "//cyber/proto:unit_test_cc_proto",
+        "@gtest",
+    ],
+)
+
 cpplint()

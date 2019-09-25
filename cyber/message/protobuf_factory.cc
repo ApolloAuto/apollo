@@ -211,6 +211,9 @@ void ErrorCollector::AddError(const std::string& filename,
                               const google::protobuf::Message* descriptor,
                               ErrorLocation location,
                               const std::string& message) {
+  UNUSED(element_name);
+  UNUSED(descriptor);
+  UNUSED(location);
   AWARN << "[" << filename << "] " << message;
 }
 
@@ -219,6 +222,9 @@ void ErrorCollector::AddWarning(const std::string& filename,
                                 const google::protobuf::Message* descriptor,
                                 ErrorLocation location,
                                 const std::string& message) {
+  UNUSED(element_name);
+  UNUSED(descriptor);
+  UNUSED(location);
   AWARN << "[" << filename << "] " << message;
 }
 
