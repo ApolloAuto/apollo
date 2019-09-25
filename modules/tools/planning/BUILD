@@ -13,15 +13,4 @@ package(default_visibility = ["//visibility:public"])
 #     ],
 # )
 
-# cc_binary(
-#     name = "planning_pad_terminal",
-#     srcs = ["terminal.cc"],
-#     deps = [
-#         "//external:gflags",
-#         "//cyber",
-#         "//modules/planning/proto:planning_proto",
-#         "@ros//:ros_common",
-#     ],
-# )
-
 cpplint()
