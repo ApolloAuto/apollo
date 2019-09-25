@@ -93,14 +93,11 @@ class Renderer {
 
         // Geolocation of the mouse
         this.geolocation = { x: 0, y: 0 };
-
-        this.localizationToCameraMatrix = new THREE.Matrix4();
-        this.localizationMatrix = new THREE.Matrix4();
-        this.imageSrcData = '';
     }
 
-    initialize(canvasId, width, height, options) {
+    initialize(canvasId, width, height, options, cameraData) {
         this.options = options;
+        this.cameraData = cameraData;
         this.canvasId = canvasId;
 
         // Camera
@@ -275,28 +272,23 @@ class Renderer {
             }
             break;
         case "CameraView": {
-            const cameraMatrixInWorld = new THREE.Matrix4();
-            cameraMatrixInWorld.multiplyMatrices(
-                this.localizationMatrix, this.localizationToCameraMatrix);
+            const { position, rotation } = this.cameraData.get();
 
-            const position = new THREE.Vector3();
-            const quaternion = new THREE.Quaternion();
-            const scale = new THREE.Vector3();
-            cameraMatrixInWorld.decompose(position, quaternion, scale);
-            const euler = new THREE.Euler().setFromQuaternion(quaternion);
+            const { x, y, z } = this.coordinates.applyOffset(position);
+            this.camera.position.set(x, y, z);
 
-            this.camera.position.set(position.x, position.y, position.z);
             // Threejs camera is default facing towards to Z-axis negative direction,
             // but the actual camera is looking at Z-axis positive direction. So we need
             // to adjust the camera rotation considering the default camera orientation.
-            this.camera.rotation.set(euler.x + Math.PI, -euler.y, -euler.z);
+            this.camera.rotation.set(rotation.x + Math.PI, -rotation.y, -rotation.z);
 
             this.controls.enabled = false;
 
             const image = document.getElementById('camera-image');
-            if (image && this.imageSrcData) {
-                image.src = this.imageSrcData;
+            if (image && this.cameraData.imageSrcData) {
+                image.src = this.cameraData.imageSrcData;
             }
+
             break;
         }
         }
@@ -529,25 +521,6 @@ class Renderer {
         const intersects = raycaster.intersectObjects(objects);
         const names = intersects.map(intersect => intersect.object.name);
         return names;
-    }
-
-    updateCameraData(data) {
-        if (data.image && data.image.length > 0) {
-            this.imageSrcData ='data:image/jpeg;base64,' +
-                new Buffer(data.image).toString('base64');
-        }
-        if (data.localization && this.coordinates.isInitialized()) {
-            // The translation parameters x/y/z is located at 12/13/14 respectively
-            const translation = this.coordinates.applyOffset({
-                x: data.localization[12], y: data.localization[13]});
-            data.localization[12] = translation.x;
-            data.localization[13] = translation.y;
-            data.localization[14] = 0;
-            this.localizationMatrix.fromArray(data.localization);
-        }
-        if (data.localization2cameraTf) {
-            this.localizationToCameraMatrix.fromArray(data.localization2cameraTf);
-        }
     }
 }
 

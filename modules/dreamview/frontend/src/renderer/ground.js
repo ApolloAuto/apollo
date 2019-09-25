@@ -52,7 +52,7 @@ export default class Ground {
         }
 
         // Remove ground image when camera view is on
-        const isCameraView = STORE.options.cameraAngle === 'CameraView';
+        const isCameraView = STORE.options.isCameraView;
         const cameraAngleChanged = (isCameraView !== this.isCameraView);
         this.isCameraView = isCameraView;
 

@@ -3,6 +3,7 @@ park_and_go_config:
 {
   front_obstacle_buffer: 10.0
   heading_buffer: 0.5
+  min_dist_to_dest: 25.0
 }
 
 stage_type: PARK_AND_GO_CHECK

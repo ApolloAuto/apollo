@@ -16,10 +16,10 @@ proto_library(
     ],
     deps = [
         ":choreography_conf_proto",
+        ":perf_conf_proto",
         ":run_mode_conf_proto",
         ":scheduler_conf_proto",
         ":transport_conf_proto",
-        ":perf_conf_proto",
     ],
 )
 

@@ -26,7 +26,6 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 namespace util {
-
 using apollo::common::VehicleConfigHelper;
 using apollo::common::math::Box2d;
 using apollo::common::math::Polygon2d;
@@ -252,6 +251,9 @@ bool CheckADCReadyToCruise(Frame* frame,
   bool heading_align_w_reference_line =
       CheckADCHeading(adc_position, adc_heading, reference_line_info,
                       scenario_config.heading_buffer());
+  ADEBUG << "is_near_front_obstacle: " << is_near_front_obstacle;
+  ADEBUG << "heading_align_w_reference_line: "
+         << heading_align_w_reference_line;
   if (!is_near_front_obstacle && heading_align_w_reference_line) {
     return true;
   }
@@ -270,8 +272,9 @@ bool CheckADCSurroundObstacles(const common::math::Vec2d adc_position,
   const double adc_length = vehicle_config.vehicle_param().length();
   const double adc_width = vehicle_config.vehicle_param().width();
   // ADC box
-  Box2d adc_box(adc_position, adc_heading, adc_length, adc_width);
-  double shift_distance = front_obstacle_buffer +
+  Box2d adc_box(adc_position, adc_heading, adc_length + front_obstacle_buffer,
+                adc_width);
+  double shift_distance = front_obstacle_buffer / 2 +
                           vehicle_config.vehicle_param().back_edge_to_center();
   Vec2d shift_vec{shift_distance * std::cos(adc_heading),
                   shift_distance * std::sin(adc_heading)};
@@ -282,6 +285,7 @@ bool CheckADCSurroundObstacles(const common::math::Vec2d adc_position,
   for (const auto& obstacle : obstacles) {
     const auto& obstacle_polygon = obstacle->PerceptionPolygon();
     if (adc_polygon.HasOverlap(obstacle_polygon)) {
+      ADEBUG << "blocked obstacle: " << obstacle->Id();
       return true;
     }
   }

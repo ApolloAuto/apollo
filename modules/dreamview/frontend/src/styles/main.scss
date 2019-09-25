@@ -232,9 +232,9 @@ body {
         .dreamview-body {
             display: flex;
             flex-flow: column nowrap;
-
             flex: 1 1 auto;
             overflow: hidden;
+            background-color: #1D2226;
 
             .main-view {
                 flex: 0 0 auto;
@@ -421,6 +421,95 @@ body {
                         position: absolute;
                         height: 100%;
                         background: #113B73;
+                    }
+                }
+            }
+        }
+
+        .camera-param {
+            overflow: auto;
+            user-select: none;
+            .camera-param-header {
+                min-width: 260px;
+                background: #2A3238;
+                color: #FFFFFF;
+                padding: 6px 12px;
+                border-bottom: 1px solid #000000;
+                display: flex;
+                height: 22px;
+                .title {
+                    flex-grow: 1;
+                    margin: auto;
+                }
+                .actions {
+                    display: flex;
+                    .action {
+                        flex: 1 1 auto;
+                        text-align: center;
+                        cursor: pointer;
+                        padding: 2px;
+                        width: 24px;
+                        svg:hover {
+                            fill: #FFFFFF;
+                        }
+                    }
+                }
+            }
+
+            .camera-param-content {
+                display: flex;
+                min-width: 260px;
+                flex-direction: column;
+                .section {
+                    padding: 5px 10px 5px 10px;
+                    border-bottom: 1px solid #000000;
+                    .section-title {
+                        margin-bottom: 10px;
+                        padding: 5px;
+                        display: flex;
+                        width: 90px;
+                        border-bottom: 1px solid #999999;
+                        span {
+                            margin-left: 10px;
+                            margin-top: 2px;
+                        }
+                    }
+                    .section-subtitle {
+                        padding-bottom: 2px;
+                        display: inline-block;
+                        border-bottom: 1px solid #999999;
+                        margin-left: 10px;
+                        margin-top: 10px;
+                    }
+                    .section-content {
+                        padding: 10px 10px;
+                    }
+                    .section-content-row {
+                        display: flex;
+                        padding-bottom: 5px;
+                        height: 24px;
+                        .field {
+                            width: 80px;
+                            opacity: 0.6;
+                        }
+                        .value {
+                            flex-grow: 1;
+                            min-width: 100px;
+                        }
+                        .delta {
+                            width: 30%;
+                        }
+                        .action {
+                            width: 30px;
+                            display: flex;
+                            flex-direction: column;
+                            svg {
+                                cursor: pointer;
+                                &:hover {
+                                    fill: #FFFFFF;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -656,7 +745,6 @@ body {
         flex: 2 1 auto;
 
         z-index: 10 !important;
-        margin-right: 3px;
 
         overflow-y: hidden;
         overflow-x: auto;
@@ -1140,7 +1228,6 @@ body {
     flex: 1 1 auto;
 
     z-index: 10;
-    margin-right: 3px;
     overflow-x: auto;
     overflow-y: hidden;
 

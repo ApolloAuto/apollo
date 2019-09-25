@@ -10,7 +10,7 @@ import STORE from "store";
 export default class Scene extends React.Component {
     componentDidMount() {
         RENDERER.initialize("canvas", this.props.width, this.props.height,
-                this.props.options);
+                this.props.options, this.props.store.cameraData);
     }
 
     componentWillUpdate(nextProps) {
@@ -34,7 +34,7 @@ export default class Scene extends React.Component {
                     }}>
                     {options.showGeo && <Geolocation />}
                 </div>
-                { options.cameraAngle === 'CameraView' && <img id="camera-image" /> }
+                { options.isCameraView && <img id="camera-image" /> }
             </React.Fragment>
         );
     }

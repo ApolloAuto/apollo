@@ -120,9 +120,9 @@ bool BoundedQueue<T>::Enqueue(const T& element) {
   pool_[GetIndex(old_tail)] = element;
   do {
     old_commit = old_tail;
-  } while (cyber_unlikely(!commit_.compare_exchange_weak(old_commit, new_tail,
-                                                   std::memory_order_acq_rel,
-                                                   std::memory_order_relaxed)));
+  } while (cyber_unlikely(!commit_.compare_exchange_weak(
+      old_commit, new_tail, std::memory_order_acq_rel,
+      std::memory_order_relaxed)));
   wait_strategy_->NotifyOne();
   return true;
 }
@@ -143,9 +143,9 @@ bool BoundedQueue<T>::Enqueue(T&& element) {
   pool_[GetIndex(old_tail)] = element;
   do {
     old_commit = old_tail;
-  } while (cyber_unlikely(!commit_.compare_exchange_weak(old_commit, new_tail,
-                                                   std::memory_order_acq_rel,
-                                                   std::memory_order_relaxed)));
+  } while (cyber_unlikely(!commit_.compare_exchange_weak(
+      old_commit, new_tail, std::memory_order_acq_rel,
+      std::memory_order_relaxed)));
   wait_strategy_->NotifyOne();
   return true;
 }

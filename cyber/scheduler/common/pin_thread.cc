@@ -49,8 +49,7 @@ void ParseCpuset(const std::string& str, std::vector<int>* cpuset) {
   }
 }
 
-void SetSchedAffinity(std::thread* thread,
-                      const std::vector<int>& cpus,
+void SetSchedAffinity(std::thread* thread, const std::vector<int>& cpus,
                       const std::string& affinity, int cpu_id) {
   cpu_set_t set;
   CPU_ZERO(&set);
@@ -78,7 +77,7 @@ void SetSchedPolicy(std::thread* thread, std::string spolicy,
   struct sched_param sp;
   int policy;
 
-  memset(reinterpret_cast<void *>(&sp), 0, sizeof(sp));
+  memset(reinterpret_cast<void*>(&sp), 0, sizeof(sp));
   sp.sched_priority = sched_priority;
 
   if (!spolicy.compare("SCHED_FIFO")) {

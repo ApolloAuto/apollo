@@ -111,7 +111,9 @@ void GetGround3FromPitchHeight(const std::vector<float> &k_mat,
 }
 
 GroundPlaneTracker::GroundPlaneTracker(int track_length) {
-  CHECK_GT(track_length, 0);
+  if (track_length <= 0) {
+    AERROR << "track_length, " << track_length << ", should be positive";
+  }
   pitch_height_inlier_tracks_.resize(track_length * 3);
   const_weight_temporal_.resize(track_length, 0.0f);
 
@@ -278,8 +280,14 @@ bool CameraGroundPlaneDetector::DetetGround(float pitch, float camera_height,
 
 bool CameraGroundPlaneDetector::DetectGroundFromSamples(float *vd, int count_vd,
                                                         float *inlier_ratio) {
-  CHECK(vd != nullptr);
-  CHECK(inlier_ratio != nullptr);
+  if (vd == nullptr) {
+    AERROR << "vd is nullptr";
+    return false;
+  }
+  if (inlier_ratio == nullptr) {
+    AERROR << "inlier_ratio is nullptr";
+    return false;
+  }
   *inlier_ratio = 0.0f;
   if (count_vd < params_.min_nr_samples) {
     l_[0] = l_[1] = l_[2] = 0.0f;

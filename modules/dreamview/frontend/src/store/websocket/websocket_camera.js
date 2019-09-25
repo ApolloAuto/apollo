@@ -32,7 +32,7 @@ export default class CameraDataWebSocketEndpoint {
             switch (message.type) {
                 case "CameraData":
                     if (message) {
-                        RENDERER.updateCameraData(message);
+                        STORE.cameraData.init(message, RENDERER.coordinates);
                     }
                     break;
                 default:
@@ -48,7 +48,7 @@ export default class CameraDataWebSocketEndpoint {
         clearInterval(this.timer);
         this.timer = setInterval(() => {
             if (this.websocket.readyState === this.websocket.OPEN
-                && STORE.options.cameraAngle === 'CameraView') {
+                && STORE.options.isCameraView) {
                     this.requestCameraData();
             }
         }, this.cameraDataUpdatePeriodMs);

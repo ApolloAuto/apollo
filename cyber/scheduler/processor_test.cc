@@ -21,14 +21,14 @@
 
 #include "cyber/cyber.h"
 #include "cyber/scheduler/common/pin_thread.h"
-#include "policy/choreography_context.h"
+#include "cyber/scheduler/policy/choreography_context.h"
 
 namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-using scheduler::Processor;
 using scheduler::ChoreographyContext;
+using scheduler::Processor;
 
 TEST(ProcessorTest, all) {
   auto proc = std::make_shared<Processor>();

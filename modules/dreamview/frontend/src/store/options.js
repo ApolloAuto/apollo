@@ -64,6 +64,10 @@ export default class Options {
         return this.showPNCMonitor || this.showDataCollectionMonitor;
     }
 
+    @computed get isCameraView() {
+        return this.cameraAngle === "CameraView";
+    }
+
     @action toggle(option, isCustomized) {
         if (isCustomized) {
             this.customizedToggles.set(option, !this.customizedToggles.get(option));

@@ -1,12 +1,14 @@
 # Migration guide from Apollo ROS
+
 This article describes the essential changes for projects to migrate from Apollo ROS (Apollo 3.0 and before) to Apollo Cyber RT (Apollo 3.5 and after). We will be using the very first ROS project talker/listener as example to demostrate step by step migration instruction.
 
 ## Build system
+
 ROS use `CMake` as its build system but Cyber RT use `bazel`. In a ROS project, CmakeLists.txt and package.xml are required for defining build configs like build target, dependency, message files and so on. As for a Cyber RT component, a single bazel BUILD file covers. Some key build config mappings are listed below.
 
 Cmake
 
-```
+``` cmake
 project(pb_msgs_example)
 add_proto_files(
   DIRECTORY proto
@@ -39,8 +41,11 @@ cc_binary(
     ],
   )
 ```
+
 We can find the mapping easily from the 2 file snippets. For example, `pb_talker` and `src/talker.cpp` in cmake `add_executable` setting map to `name = "talker"` and `srcs = ["talker.cc"]` in BUILD file `cc_binary`.
+
 ### Proto
+
 Apollo ROS has customized to support proto message formate that a separate section `add_proto_files` and projectName_proto(`pb_msgs_example_proto`) in `target_link_libraries` are required to send message in proto formate. For config proto message in Cyber RT, it's as simple as adding the target proto file path concantenated with name of `cc_proto_library` in `deps` setting. The `cc_proto_library` is set up in BUILD file under proto folder.
 
 ```python
@@ -61,9 +66,11 @@ proto_library(
 The package definition has also changed in Cyber RT. In Apollo ROS a fixed package `package pb_msgs;` is used for proto files, but in Cyber RT, the proto file path `package apollo.cyber.examples.proto;` is used instead.
 
 ## Folder structure
+
 As shown below, Cyber RT remove the src folder and pull all source code in the same folder as BUILD file. BUILD file plays the same role as CMakeLists.txt plus package.xml. Both Cyber RT and Apollo ROS talker/listener example have a proto folder for message proto files but Cyber RT requires a separate BUILD file for proto folder to set up the proto library.
 
 ### Apollo ROS
+
 - CMakeLists.txt
 - package.xml
 - proto
@@ -73,6 +80,7 @@ As shown below, Cyber RT remove the src folder and pull all source code in the s
   - talker.cpp
 
 ### Cyber RT
+
 - BUILD
 - listener.cc
 - talker.cc
@@ -83,6 +91,7 @@ As shown below, Cyber RT remove the src folder and pull all source code in the s
 ## Update source code
 
 ### Listener
+
 Cyber RT
 
 ```cpp
@@ -108,6 +117,7 @@ int main(int argc, char* argv[]) {
   return 0;
 }
 ```
+
 ROS
 
 ```cpp
@@ -200,14 +210,15 @@ int main(int argc, char** argv) {
   return 0;
 }
 ```
+
 Most of the mappings are illustrated in listener code above, the rest are listed here.
 
 - `ros::Publisher chatter_pub = n.advertise<pb_msgs::Chatter>("chatter", 1000);` --> `auto talker = talker_node->CreateWriter<Chatter>("channel/chatter");`
 
 - `chatter_pub.publish(msg);` --> ` talker->Write(msg);`
 
-
 ## Tools mapping
+
 ROS | Cyber RT | Note
 :------------- | :------------- | :--------------
 rosbag    |   cyber_recorder |   data file

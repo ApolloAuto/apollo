@@ -94,6 +94,24 @@ message ObjectSidePass {
 message ObjectAvoid {
 }
 
+message ObjectStatus {
+  optional ObjectMotionType motion_type = 1;
+  optional ObjectDecisionType decision_type = 2;
+}
+
+message ObjectStatic {
+}
+
+message ObjectDynamic {
+}
+
+message ObjectMotionType {
+  oneof motion_tag {
+    ObjectStatic static = 1;
+    ObjectDynamic dynamic = 2;
+  }
+}
+
 message ObjectDecisionType {
   oneof object_tag {
     ObjectIgnore ignore = 1;
@@ -103,6 +121,7 @@ message ObjectDecisionType {
     ObjectOvertake overtake = 5;
     ObjectNudge nudge = 6;
     ObjectAvoid avoid = 7;
+    ObjectSidePass side_pass = 8;
   }
 }
 

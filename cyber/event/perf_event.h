@@ -60,28 +60,14 @@ class EventBase {
   void set_etype(int etype) { etype_ = etype; }
   void set_stamp(uint64_t stamp) { stamp_ = stamp; }
 
-  virtual void set_cr_id(uint64_t cr_id) {
-    UNUSED(cr_id);
-  }
-  virtual void set_cr_state(int cr_state) {
-    UNUSED(cr_state);
-  }
-  virtual void set_proc_id(int proc_id) {
-    UNUSED(proc_id);
-  }
-  virtual void set_fetch_res(int fetch_res) {
-    UNUSED(fetch_res);
-  }
+  virtual void set_cr_id(uint64_t cr_id) { UNUSED(cr_id); }
+  virtual void set_cr_state(int cr_state) { UNUSED(cr_state); }
+  virtual void set_proc_id(int proc_id) { UNUSED(proc_id); }
+  virtual void set_fetch_res(int fetch_res) { UNUSED(fetch_res); }
 
-  virtual void set_msg_seq(uint64_t msg_seq) {
-    UNUSED(msg_seq);
-  }
-  virtual void set_channel_id(uint64_t channel_id) {
-    UNUSED(channel_id);
-  }
-  virtual void set_adder(const std::string& adder) {
-    UNUSED(adder);
-  }
+  virtual void set_msg_seq(uint64_t msg_seq) { UNUSED(msg_seq); }
+  virtual void set_channel_id(uint64_t channel_id) { UNUSED(channel_id); }
+  virtual void set_adder(const std::string& adder) { UNUSED(adder); }
 
  protected:
   int etype_;
@@ -141,9 +127,7 @@ class TransportEvent : public EventBase {
   void set_channel_id(uint64_t channel_id) override {
     channel_id_ = channel_id;
   }
-  void set_adder(const std::string& adder) override {
-    adder_ = adder;
-  }
+  void set_adder(const std::string& adder) override { adder_ = adder; }
 
   static std::string ShowTransPerf(TransPerf type) {
     if (type == TransPerf::TRANSMIT_BEGIN) {

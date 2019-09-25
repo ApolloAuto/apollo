@@ -10,6 +10,7 @@ import PlanningData from "store/planning_data";
 import Playback from "store/playback";
 import RouteEditingManager from "store/route_editing_manager";
 import TrafficSignal from "store/traffic_signal";
+import CameraData from "store/camera_data";
 
 class DreamviewStore {
     // Mutable States
@@ -51,6 +52,8 @@ class DreamviewStore {
     @observable geolocation = {};
 
     @observable moduleDelay = observable.map();
+
+    @observable cameraData = new CameraData();
 
     @observable newDisengagementReminder = false;
 

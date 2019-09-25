@@ -186,7 +186,7 @@ TEST(darkSCNNLanePostprocessor, camera_lane_postprocessor_point_test) {
 
   intrinsic_map["onsemi_obstacle"] = frame.camera_k_matrix;
   extrinsic_map["onsemi_obstacle"] = ex_camera2lidar;
-  std::vector <std::string> camera_names;
+  std::vector<std::string> camera_names;
   camera_names[0] = visual_camera;
 
   EXPECT_TRUE(visualize_.Init_all_info_single_camera(

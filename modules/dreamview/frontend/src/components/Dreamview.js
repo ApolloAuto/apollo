@@ -11,6 +11,7 @@ import DataCollectionMonitor from "components/DataCollectionMonitor";
 import SideBar from "components/SideBar";
 import AudioCapture from "components/AudioCapture";
 import { CameraVideo } from "components/Tasks/SensorCamera";
+import CameraParam from "components/CameraParam";
 
 import HOTKEYS_CONFIG from "store/config/hotkeys.yml";
 import WS, { MAP_WS, POINT_CLOUD_WS, CAMERA_WS } from "store/websocket";
@@ -27,7 +28,7 @@ export default class Dreamview extends React.Component {
 
     handleDrag(masterViewWidth) {
         const { options } = this.props.store;
-        if (options.showMonitor) {
+        if (options.showMonitor || options.isCameraView) {
             this.props.store.updateWidthInPercentage(
                 Math.min(1.00, masterViewWidth / window.innerWidth));
         }
@@ -70,7 +71,7 @@ export default class Dreamview extends React.Component {
     }
 
     render() {
-        const { isInitialized, dimension, sceneDimension, options, hmi } = this.props.store;
+        const { dimension, options, hmi } = this.props.store;
 
         return (
             <div>
@@ -79,7 +80,7 @@ export default class Dreamview extends React.Component {
                     <SplitPane split="vertical"
                         size={dimension.width}
                         onChange={this.handleDrag}
-                        allowResize={options.showMonitor}>
+                        allowResize={options.showMonitor || options.isCameraView}>
                         <div className="left-pane">
                             <SideBar />
                             <div className="dreamview-body">
@@ -94,6 +95,7 @@ export default class Dreamview extends React.Component {
                                     <CameraVideo />
                                 </div>
                             }
+                            {options.isCameraView && <CameraParam />}
                             {options.showPNCMonitor && <PNCMonitor options={options} />}
                             {options.showDataCollectionMonitor &&
                                 <DataCollectionMonitor

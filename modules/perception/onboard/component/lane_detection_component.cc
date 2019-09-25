@@ -693,7 +693,10 @@ int LaneDetectionComponent::InternalProc(
 int LaneDetectionComponent::ConvertLaneToCameraLaneline(
     const base::LaneLine &lane_line,
     apollo::perception::camera::CameraLaneLine *camera_laneline) {
-  CHECK_NOTNULL(camera_laneline);
+  if (camera_laneline == nullptr) {
+    AERROR << "camera_laneline is not available";
+    return false;
+  }
   // fill the lane line attribute
   apollo::perception::camera::LaneLineType line_type =
       static_cast<apollo::perception::camera::LaneLineType>(lane_line.type);
@@ -768,7 +771,10 @@ int LaneDetectionComponent::MakeProtobufMsg(
     double msg_timestamp, const std::string &camera_name,
     const camera::CameraFrame &camera_frame,
     apollo::perception::PerceptionLanes *lanes_msg) {
-  CHECK_NOTNULL(lanes_msg);
+  if (lanes_msg == nullptr) {
+    AERROR << "lanes_msg is not available";
+    return false;
+  }
   auto itr = std::find(camera_names_.begin(), camera_names_.end(), camera_name);
   if (itr == camera_names_.end()) {
     AERROR << "invalid camera_name: " << camera_name;

@@ -25,7 +25,7 @@ class SceneView extends React.Component {
 
         let width = null;
         let height = null;
-        if (options.cameraAngle === 'CameraView') {
+        if (options.isCameraView) {
             // Set width/height same as camera image ratio to ensure scene align to image
             // thus the height won't change no matter whether there's menu under scene
             const ASPECT_RATIO = 1920 / 1080;

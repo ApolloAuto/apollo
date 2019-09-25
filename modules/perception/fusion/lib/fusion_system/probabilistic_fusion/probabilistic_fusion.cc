@@ -108,7 +108,10 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
 bool ProbabilisticFusion::Fuse(const FusionOptions& options,
                                const base::FrameConstPtr& sensor_frame,
                                std::vector<base::ObjectPtr>* fused_objects) {
-  CHECK(fused_objects != nullptr) << "fusion error: fused_objects is nullptr";
+  if (fused_objects == nullptr) {
+    AERROR << "fusion error: fused_objects is nullptr";
+    return false;
+  }
 
   auto* sensor_data_manager = SensorDataManager::Instance();
   // 1. save frame data

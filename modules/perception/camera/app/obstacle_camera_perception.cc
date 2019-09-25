@@ -281,7 +281,10 @@ void ObstacleCameraPerception::SetCameraHeightAndPitch(
     const std::map<std::string, float> &name_camera_ground_height_map,
     const std::map<std::string, float> &name_camera_pitch_angle_diff_map,
     const float &pitch_angle_calibrator_working_sensor) {
-  CHECK(calibration_service_ != nullptr);
+  if (calibration_service_ == nullptr) {
+    AERROR << "Calibraion service is not available";
+    return;
+  }
   calibration_service_->SetCameraHeightAndPitch(
       name_camera_ground_height_map, name_camera_pitch_angle_diff_map,
       pitch_angle_calibrator_working_sensor);
@@ -289,7 +292,10 @@ void ObstacleCameraPerception::SetCameraHeightAndPitch(
 
 void ObstacleCameraPerception::SetIm2CarHomography(
     Eigen::Matrix3d homography_im2car) {
-  CHECK(calibration_service_ != nullptr);
+  if (calibration_service_ == nullptr) {
+    AERROR << "Calibraion service is not available";
+    return;
+  }
   lane_postprocessor_->SetIm2CarHomography(homography_im2car);
 }
 
@@ -311,7 +317,10 @@ bool ObstacleCameraPerception::Perception(
   PERCEPTION_PERF_BLOCK_START();
   frame->camera_k_matrix =
       name_intrinsic_map_.at(frame->data_provider->sensor_name());
-  CHECK(frame->calibration_service != nullptr);
+  if (frame->calibration_service == nullptr) {
+    AERROR << "Calibraion service is not available";
+    return false;
+  }
 
   LaneDetectorOptions lane_detetor_options;
   LanePostprocessorOptions lane_postprocessor_options;
@@ -319,27 +328,27 @@ bool ObstacleCameraPerception::Perception(
     AERROR << "Failed to detect lane.";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-      frame->data_provider->sensor_name(), "LaneDetector");
+  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                           "LaneDetector");
 
   if (!lane_postprocessor_->Process2D(lane_postprocessor_options, frame)) {
     AERROR << "Failed to postprocess lane 2D.";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-      frame->data_provider->sensor_name(), "LanePostprocessor2D");
+  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                           "LanePostprocessor2D");
 
   // Calibration service
   frame->calibration_service->Update(frame);
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-      frame->data_provider->sensor_name(), "CalibrationService");
+  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                           "CalibrationService");
 
   if (!lane_postprocessor_->Process3D(lane_postprocessor_options, frame)) {
     AERROR << "Failed to postprocess lane 3D.";
     return false;
   }
-  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
-      frame->data_provider->sensor_name(), "LanePostprocessor3D");
+  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
+                                           "LanePostprocessor3D");
 
   if (write_out_lane_file_) {
     std::string lane_file_path =
