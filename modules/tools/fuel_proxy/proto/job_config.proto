@@ -44,6 +44,7 @@ message JobConfig {
   enum JobType {
     UNKNOWN = 0;
     VEHICLE_CALIBRATION = 1;
+    SIMPLE_HDMAP = 2;
   }
   optional JobType job_type = 1;
   // You must have an assigned partner ID to use the service. Contact our BD
