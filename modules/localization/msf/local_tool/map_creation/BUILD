@@ -15,8 +15,9 @@ cc_binary(
         "//cyber",
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/common/util:localization_msf_common_util",
-        "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
-        "//modules/localization/msf/local_map/lossless_map:localization_msf_lossless_map",
+        "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
+        "//modules/localization/msf/local_pyramid_map/pyramid_map:localization_pyramid_map_pyramid_map",
+        "//modules/localization/msf/local_pyramid_map/pyramid_map:localization_pyramid_map_pyramid_map_pool",
         "@boost",
         "@eigen",
     ],
@@ -30,11 +31,9 @@ cc_binary(
     linkstatic = 0,
     deps = [
         "//cyber",
-        "//modules/localization/msf/common/io:localization_msf_common_io",
-        "//modules/localization/msf/common/util:localization_msf_common_util",
-        "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
-        "//modules/localization/msf/local_map/lossless_map:localization_msf_lossless_map",
-        "//modules/localization/msf/local_map/lossy_map:localization_msf_lossy_map",
+        "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
+        "//modules/localization/msf/local_pyramid_map/pyramid_map:localization_pyramid_map_pyramid_map",
+        "//modules/localization/msf/local_pyramid_map/pyramid_map:localization_pyramid_map_pyramid_map_pool",
         "@boost",
         "@eigen",
     ],
@@ -48,8 +47,7 @@ cc_binary(
     linkstatic = 0,
     deps = [
         "//modules/localization/msf/local_tool/map_creation/poses_interpolation:poses_interpolation_lib",
-        "@boost",
-        "@eigen",
+        "@eigen//:eigen",
     ],
 )
 

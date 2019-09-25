@@ -22,8 +22,8 @@
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 #include "modules/localization/msf/common/util/extract_ground_plane.h"
 #include "modules/localization/msf/common/util/system_utility.h"
-#include "modules/localization/msf/local_map/ndt_map/ndt_map.h"
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_pool.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_pool.h"
 
 int main(int argc, char** argv) {
   boost::program_options::options_description boost_desc("Allowed options");
@@ -117,7 +117,8 @@ int main(int argc, char** argv) {
   }
 
   // Output Config file
-  apollo::localization::msf::NdtMapConfig ndt_map_config("map_ndt_v01");
+  apollo::localization::msf::pyramid_map::NdtMapConfig ndt_map_config(
+      "map_ndt_v01");
   if (strcasecmp(resolution_type.c_str(), "single") == 0) {
     ndt_map_config.SetSingleResolutions(single_resolution_map);
     ndt_map_config.SetSingleResolutionZ(single_resolution_map_z);
@@ -141,10 +142,10 @@ int main(int argc, char** argv) {
   ndt_map_config.Save(file_buf);
 
   // Initialize map and pool
-  apollo::localization::msf::NdtMap ndt_map(&ndt_map_config);
+  apollo::localization::msf::pyramid_map::NdtMap ndt_map(&ndt_map_config);
   unsigned int thread_size = 4;
-  apollo::localization::msf::NdtMapNodePool ndt_map_node_pool(pool_size,
-                                                              thread_size);
+  apollo::localization::msf::pyramid_map::NdtMapNodePool ndt_map_node_pool(
+      pool_size, thread_size);
   ndt_map_node_pool.Initial(&ndt_map_config);
   ndt_map.InitMapNodeCaches(pool_size / 2, pool_size);
   ndt_map.AttachMapNodePool(&ndt_map_node_pool);
@@ -180,16 +181,17 @@ int main(int argc, char** argv) {
 
         for (size_t res = 0; res < ndt_map_config.map_resolutions_.size();
              ++res) {
-          apollo::localization::msf::MapNodeIndex index =
-              apollo::localization::msf::MapNodeIndex::GetMapNodeIndex(
-                  ndt_map_config, pt3d_global, static_cast<unsigned int>(res),
-                  zone_id);
+          apollo::localization::msf::pyramid_map::MapNodeIndex index =
+              apollo::localization::msf::pyramid_map::MapNodeIndex::
+                  GetMapNodeIndex(ndt_map_config, pt3d_global,
+                                  static_cast<unsigned int>(res), zone_id);
 
-          apollo::localization::msf::NdtMapNode* ndt_map_node =
-              static_cast<apollo::localization::msf::NdtMapNode*>(
+          apollo::localization::msf::pyramid_map::NdtMapNode* ndt_map_node =
+              static_cast<apollo::localization::msf::pyramid_map::NdtMapNode*>(
                   ndt_map.GetMapNodeSafe(index));
-          apollo::localization::msf::NdtMapMatrix& ndt_map_matrix =
-              static_cast<apollo::localization::msf::NdtMapMatrix&>(
+          apollo::localization::msf::pyramid_map::NdtMapMatrix& ndt_map_matrix =
+              static_cast<
+                  apollo::localization::msf::pyramid_map::NdtMapMatrix&>(
                   ndt_map_node->GetMapCellMatrix());
 
           Eigen::Vector2d coord2d;
@@ -209,7 +211,7 @@ int main(int argc, char** argv) {
           centroid[1] = static_cast<float>(coord2d[1]) -
                         static_cast<float>(left_top_corner[1]) -
                         resolution * static_cast<float>(y);
-          apollo::localization::msf::NdtMapCells& ndt_map_cell =
+          apollo::localization::msf::pyramid_map::NdtMapCells& ndt_map_cell =
               ndt_map_matrix.GetMapCell(y, x);
           int altitude_index = ndt_map_cell.CalAltitudeIndex(
               ndt_map_config.map_resolutions_z_[res],
