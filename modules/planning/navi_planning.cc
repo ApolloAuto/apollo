@@ -129,11 +129,20 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
       std::make_unique<ReferenceLineProvider>(hdmap_, local_view_.relative_map);
 
   // localization
-  ADEBUG << "Get localization:"
+  ADEBUG << "Get localization: "
          << local_view_.localization_estimate->DebugString();
 
   // chassis
-  ADEBUG << "Get chassis:" << local_view_.chassis->DebugString();
+  ADEBUG << "Get chassis: " << local_view_.chassis->DebugString();
+
+  // pad_msg
+  if (local_view_.pad_msg) {
+    ADEBUG << "Pad Msg: " << local_view_.pad_msg->DebugString();
+    if (local_view_.pad_msg->has_action()) {
+      driving_action_ = local_view_.pad_msg->action();
+      is_received_pad_msg_ = true;
+    }
+  }
 
   Status status = VehicleStateProvider::Instance()->Update(
       *local_view_.localization_estimate, *local_view_.chassis);
@@ -308,13 +317,6 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
 
   auto seq_num = frame_->SequenceNum();
   FrameHistory::Instance()->Add(seq_num, std::move(frame_));
-}
-
-void NaviPlanning::OnPad(const PadMessage& pad) {
-  ADEBUG << "Received Planning Pad Msg:" << pad.DebugString();
-  AERROR_IF(!pad.has_action()) << "pad message check failed!";
-  driving_action_ = pad.action();
-  is_received_pad_msg_ = true;
 }
 
 void NaviPlanning::ProcessPadMsg(DrivingAction drvie_action) {

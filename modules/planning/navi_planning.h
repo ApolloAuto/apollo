@@ -78,11 +78,6 @@ class NaviPlanning : public PlanningBase {
   bool CheckPlanningConfig(const PlanningConfig& config);
 
   /**
-   * @brief receiving planning pad message
-   */
-  void OnPad(const PadMessage& pad);
-
-  /**
    * @brief make driving decisions by received planning pad msg
    */
   void ProcessPadMsg(DrivingAction drvie_action);
