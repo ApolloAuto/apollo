@@ -53,6 +53,7 @@ class TestTime(unittest.TestCase):
         self.assertEqual(12, tm1.to_nsec())
 
         tm5 = cyber_time.Time(1.8)
+        self.assertFalse(tm5.iszero())
         self.assertEqual(1800000000, tm5.to_nsec())
         tm7 = cyber_time.Time(tm5)
         self.assertEqual(1800000000, tm7.to_nsec())
