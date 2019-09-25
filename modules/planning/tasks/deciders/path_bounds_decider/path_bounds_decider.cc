@@ -373,7 +373,7 @@ Status PathBoundsDecider::GeneratePullOverPathBound(
   }
   // PathBoundsDebugString(*path_bound);
 
-  ConvertBoundaryAxesFromLaneCenterToRefLine(reference_line_info, path_bound);
+  ConvertBoundarySAxisFromLaneCenterToRefLine(reference_line_info, path_bound);
   if (adc_frenet_l_ < std::get<1>(path_bound->front()) ||
       adc_frenet_l_ > std::get<2>(path_bound->front())) {
     const std::string msg =
@@ -1063,7 +1063,7 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
   return true;
 }
 
-void PathBoundsDecider::ConvertBoundaryAxesFromLaneCenterToRefLine(
+void PathBoundsDecider::ConvertBoundarySAxisFromLaneCenterToRefLine(
     const ReferenceLineInfo& reference_line_info, PathBound* const path_bound) {
   const ReferenceLine& reference_line = reference_line_info.reference_line();
   for (size_t i = 0; i < path_bound->size(); ++i) {
