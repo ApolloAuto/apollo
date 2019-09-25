@@ -16,13 +16,15 @@
 
 #include "cyber/tools/cyber_recorder/info.h"
 
+#include "cyber/record/record_message.h"
+
 namespace apollo {
 namespace cyber {
 namespace record {
 
-static constexpr size_t kGB = 1 << 30;
-static constexpr size_t kMB = 1 << 20;
-static constexpr size_t kKB = 1 << 10;
+using apollo::cyber::record::kGB;
+using apollo::cyber::record::kKB;
+using apollo::cyber::record::kMB;
 
 Info::Info() {}
 

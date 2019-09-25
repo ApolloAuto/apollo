@@ -42,6 +42,7 @@ cc_library(
         ":general_message_base",
         ":screen",
         "//cyber/message:raw_message",
+        "//cyber/record:record_message",
     ],
 )
 

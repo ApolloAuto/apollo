@@ -17,6 +17,7 @@
 #include "./general_channel_message.h"
 #include "./general_message.h"
 #include "./screen.h"
+#include "cyber/record/record_message.h"
 
 #include <iomanip>
 #include <sstream>

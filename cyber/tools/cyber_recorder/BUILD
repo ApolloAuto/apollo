@@ -28,6 +28,7 @@ cc_library(
         "//cyber/common:time_conversion",
         "//cyber/proto:record_cc_proto",
         "//cyber/record:record_file_reader",
+        "//cyber/record:record_message",
     ],
 )
 
