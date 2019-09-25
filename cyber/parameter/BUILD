@@ -47,13 +47,12 @@ cc_library(
 
 cc_test(
     name = "parameter_client_test",
-    size = "small",
     srcs = [
         "parameter_client_test.cc",
     ],
     deps = [
         "//cyber",
-        "@gtest",
+        "@gtest//:main",
     ],
 )
 
