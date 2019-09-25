@@ -5,6 +5,26 @@ import "modules/common/proto/header.proto";
 import "modules/control/proto/control_cmd.proto";
 
 message GuardianCommand {
+  enum ErrorCode {
+    NO_ERROR = 0;
+
+    // lost communication or control on by-wire-drive action
+    ACTUATION_LOST = 1;
+
+    // control/chassis signal not in period
+    CONTROL_NOT_IN_PERIOD = 2;  // control cmd not in period
+    CHASSIS_CAN_NOT_IN_PERIOD = 3;  // receive car chassis can frame not in period
+
+    // vehicle chassis report error, such as steer, brake, throttle, gear fault, etc.
+    CHASSIS_ERROR = 4;
+
+    // tele-op manipulation intervention
+    TELEOP_INTERVENTION = 5;  // human manual intervention
+
+    UNKNOWN_ERROR = 6;
+  }
+
   optional apollo.common.Header header = 1;
   optional apollo.control.ControlCommand control_command = 2;
+  optional ErrorCode error_code = 3 [default = NO_ERROR];
 }

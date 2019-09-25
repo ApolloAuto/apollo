@@ -46,6 +46,7 @@ class GuardianComponent : public apollo::cyber::TimerComponent {
 
  private:
   void PassThroughControlCommand();
+  void SetGuardianErrorCode(const GuardianCommand::ErrorCode& error_code);
   void TriggerSafetyMode();
 
   apollo::guardian::GuardianConf guardian_conf_;

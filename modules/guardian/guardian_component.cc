@@ -76,6 +76,10 @@ bool GuardianComponent::Proc() {
     PassThroughControlCommand();
   }
 
+  // TODO(Yu/QiL): define the switch - conditions by which different Guardian
+  // error codes are set
+  SetGuardianErrorCode(GuardianCommand::NO_ERROR);
+
   common::util::FillHeader(node_->Name(), &guardian_cmd_);
   guardian_writer_->Write(std::make_shared<GuardianCommand>(guardian_cmd_));
   return true;
@@ -84,6 +88,12 @@ bool GuardianComponent::Proc() {
 void GuardianComponent::PassThroughControlCommand() {
   std::lock_guard<std::mutex> lock(mutex_);
   guardian_cmd_.mutable_control_command()->CopyFrom(control_cmd_);
+}
+
+void GuardianComponent::SetGuardianErrorCode(
+    const GuardianCommand::ErrorCode& error_code) {
+  std::lock_guard<std::mutex> lock(mutex_);
+  guardian_cmd_.set_error_code(error_code);
 }
 
 void GuardianComponent::TriggerSafetyMode() {
