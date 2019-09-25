@@ -57,10 +57,11 @@ class PlanningComponent final
   void CheckRerouting();
   bool CheckInput();
 
+ private:
   std::shared_ptr<cyber::Reader<perception::TrafficLightDetection>>
       traffic_light_reader_;
   std::shared_ptr<cyber::Reader<routing::RoutingResponse>> routing_reader_;
-  std::shared_ptr<cyber::Reader<planning::PadMessage>> pad_message_reader_;
+  std::shared_ptr<cyber::Reader<planning::PadMessage>> pad_msg_reader_;
   std::shared_ptr<cyber::Reader<relative_map::MapMsg>> relative_map_reader_;
 
   std::shared_ptr<cyber::Writer<ADCTrajectory>> planning_writer_;
@@ -69,7 +70,7 @@ class PlanningComponent final
   std::mutex mutex_;
   perception::TrafficLightDetection traffic_light_;
   routing::RoutingResponse routing_;
-  PadMessage pad_message_;
+  PadMessage pad_msg_;
   relative_map::MapMsg relative_map_;
 
   LocalView local_view_;
