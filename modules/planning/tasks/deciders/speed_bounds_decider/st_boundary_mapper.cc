@@ -60,8 +60,8 @@ STBoundaryMapper::STBoundaryMapper(const SpeedBoundsDeciderConfig& config,
       planning_max_time_(planning_time) {}
 
 Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
+  // Sanity checks.
   CHECK_GT(planning_max_time_, 0.0);
-
   if (path_data_.discretized_path().size() < 2) {
     AERROR << "Fail to get params because of too few path points. path points "
               "size: "
@@ -70,21 +70,24 @@ Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
                   "Fail to get params because of too few path points");
   }
 
+  // Go through every obstacle.
   Obstacle* stop_obstacle = nullptr;
   ObjectDecisionType stop_decision;
   double min_stop_s = std::numeric_limits<double>::max();
-
   for (const auto* ptr_obstacle_item : path_decision->obstacles().Items()) {
     Obstacle* ptr_obstacle = path_decision->Find(ptr_obstacle_item->Id());
     CHECK(ptr_obstacle != nullptr);
 
+    // If no longitudinal decision has been made, then plot it onto ST-graph.
     if (!ptr_obstacle->HasLongitudinalDecision()) {
       ComputeSTBoundary(ptr_obstacle);
       continue;
     }
 
+    // If there is a longitudinal decision, then fine-tune boundary.
     const auto& decision = ptr_obstacle->LongitudinalDecision();
     if (decision.has_stop()) {
+      // 1. Store the closest stop fence info.
       // TODO(all): store ref. s value in stop decision; refine the code then.
       common::SLPoint stop_sl_point;
       reference_line_.XYToSL(decision.stop().stop_point(), &stop_sl_point);
@@ -97,12 +100,14 @@ Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
       }
     } else if (decision.has_follow() || decision.has_overtake() ||
                decision.has_yield()) {
+      // 2. Depending on the longitudinal overtake/yield decision,
+      //    fine-tune the upper/lower st-boundary of related obstacles.
       ComputeSTBoundaryWithDecision(ptr_obstacle, decision);
     } else if (!decision.has_ignore()) {
+      // 3. Ignore those unrelated obstacles.
       AWARN << "No mapping for decision: " << decision.DebugString();
     }
   }
-
   if (stop_obstacle) {
     bool success = MapStopDecision(stop_obstacle, stop_decision);
     if (!success) {
@@ -182,38 +187,45 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
     const std::vector<PathPoint>& path_points, const Obstacle& obstacle,
     std::vector<STPoint>* upper_points,
     std::vector<STPoint>* lower_points) const {
+  // Sanity checks.
   DCHECK_NOTNULL(upper_points);
   DCHECK_NOTNULL(lower_points);
   DCHECK(upper_points->empty());
   DCHECK(lower_points->empty());
   DCHECK_GT(path_points.size(), 0);
-
   if (path_points.empty()) {
     AERROR << "No points in path_data_.discretized_path().";
     return false;
   }
 
+  // Draw the given obstacle on the ST-graph.
   const auto& trajectory = obstacle.Trajectory();
   if (trajectory.trajectory_point_size() == 0) {
+    // For those with no predicted trajectories, just map the obstacle's
+    // current position to ST-graph and always assume it's static.
     if (!obstacle.IsStatic()) {
-      ADEBUG << "Non-static obstacle[" << obstacle.Id()
-             << "] has NO prediction trajectory."
-             << obstacle.Perception().ShortDebugString();
+      AWARN << "Non-static obstacle[" << obstacle.Id()
+            << "] has NO prediction trajectory."
+            << obstacle.Perception().ShortDebugString();
     }
     for (const auto& curr_point_on_path : path_points) {
       if (curr_point_on_path.s() > planning_max_distance_) {
         break;
       }
-      const Box2d& obs_box = obstacle.PerceptionBoundingBox();
 
+      const Box2d& obs_box = obstacle.PerceptionBoundingBox();
       if (CheckOverlap(curr_point_on_path, obs_box,
                        FLAGS_nonstatic_obstacle_nudge_l_buffer)) {
+        // If there is overlapping, then plot it on ST-graph.
         const double backward_distance = -vehicle_param_.front_edge_to_center();
         const double forward_distance = obs_box.length();
         double low_s =
             std::fmax(0.0, curr_point_on_path.s() + backward_distance);
         double high_s = std::fmin(planning_max_distance_,
                                   curr_point_on_path.s() + forward_distance);
+        // It is an unrotated rectangle appearing on the ST-graph.
+        // TODO(jiacheng): reconsider the backward_distance, it might be
+        // unnecessary, but forward_distance is indeed meaningful though.
         lower_points->emplace_back(low_s, 0.0);
         lower_points->emplace_back(low_s, planning_max_time_);
         upper_points->emplace_back(high_s, 0.0);
@@ -222,6 +234,8 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
       }
     }
   } else {
+    // For those with predicted trajectories (moving obstacles):
+    // 1. Subsample to reduce computation time.
     const int default_num_point = 50;
     DiscretizedPath discretized_path;
     if (path_points.size() > 2 * default_num_point) {
@@ -236,6 +250,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
     } else {
       discretized_path = DiscretizedPath(path_points);
     }
+    // 2. Go through every point of the predicted obstacle trajectory.
     for (int i = 0; i < trajectory.trajectory_point_size(); ++i) {
       const auto& trajectory_point = trajectory.trajectory_point(i);
       const Box2d obs_box = obstacle.GetBoundingBox(trajectory_point);
@@ -249,12 +264,13 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
       const double step_length = vehicle_param_.front_edge_to_center();
       auto path_len =
           std::min(FLAGS_max_trajectory_len, discretized_path.Length());
+      // Go through every point of the ADC's path.
       for (double path_s = 0.0; path_s < path_len; path_s += step_length) {
         const auto curr_adc_path_point =
             discretized_path.Evaluate(path_s + discretized_path.front().s());
         if (CheckOverlap(curr_adc_path_point, obs_box,
                          FLAGS_nonstatic_obstacle_nudge_l_buffer)) {
-          // found overlap, start searching with higher resolution
+          // Found overlap, start searching with higher resolution
           const double backward_distance = -step_length;
           const double forward_distance = vehicle_param_.length() +
                                           vehicle_param_.width() +
@@ -269,6 +285,8 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
           double high_s =
               std::fmin(discretized_path.Length(), path_s + forward_distance);
 
+          // Keep shrinking by the resolution bidirectionally until finally
+          // locating the tight upper and lower bounds.
           while (low_s < high_s) {
             if (find_low && find_high) {
               break;
@@ -307,6 +325,8 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
       }
     }
   }
+
+  // Sanity checks and return.
   DCHECK_EQ(lower_points->size(), upper_points->size());
   return (lower_points->size() > 1 && upper_points->size() > 1);
 }
@@ -367,19 +387,22 @@ void STBoundaryMapper::ComputeSTBoundaryWithDecision(
 bool STBoundaryMapper::CheckOverlap(const PathPoint& path_point,
                                     const Box2d& obs_box,
                                     const double l_buffer) const {
+  // Convert reference point from center of rear axis to center of ADC.
   Vec2d ego_center_map_frame((vehicle_param_.front_edge_to_center() -
                               vehicle_param_.back_edge_to_center()) *
                                  0.5,
                              (vehicle_param_.left_edge_to_center() -
                               vehicle_param_.right_edge_to_center()) *
                                  0.5);
-
   ego_center_map_frame.SelfRotate(path_point.theta());
   ego_center_map_frame.set_x(ego_center_map_frame.x() + path_point.x());
   ego_center_map_frame.set_y(ego_center_map_frame.y() + path_point.y());
 
+  // Compute the ADC bounding box.
   Box2d adc_box(ego_center_map_frame, path_point.theta(),
                 vehicle_param_.length(), vehicle_param_.width() + l_buffer * 2);
+
+  // Check whether ADC bounding box overlaps with obstacle bounding box.
   return obs_box.HasOverlap(adc_box);
 }
 
