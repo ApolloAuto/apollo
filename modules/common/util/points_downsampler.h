@@ -139,7 +139,10 @@ std::vector<size_t> DownsampleByDistance(const Points &points,
   Vec2d v_end =
       Vec2d(points[points.size() - 1].x() - points[points.size() - 2].x(),
             points[points.size() - 1].y() - points[points.size() - 2].y());
-  bool is_steep_turn = v_start.InnerProd(v_end) <= 0;
+  v_start.Normalize();
+  v_end.Normalize();
+  // If the angle exceeds 80 degree, it's a steep turn
+  bool is_steep_turn = v_start.InnerProd(v_end) <= cos(80.0 * M_PI / 180.0);
   int downsampleRate =
       is_steep_turn ? steepTurnDownsampleDistance : downsampleDistance;
 
