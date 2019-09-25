@@ -789,13 +789,9 @@
                   "type": "bytes",
                   "id": 3
                 },
-                "imgHeight": {
-                  "type": "uint32",
+                "imageAspectRatio": {
+                  "type": "double",
                   "id": 4
-                },
-                "imgWidth": {
-                  "type": "uint32",
-                  "id": 5
                 }
               }
             }

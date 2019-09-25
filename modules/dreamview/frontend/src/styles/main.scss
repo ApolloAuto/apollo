@@ -2,7 +2,7 @@
 
 $min-scene-width: 600;
 
-:export { minSceneWidth: $min-scene-width; }
+:export { MIN_SCENE_WIDTH: $min-scene-width; }
 
 @mixin monitor-item-common-properties($text-width: calc(100% - 17px)) {
     display: flex;

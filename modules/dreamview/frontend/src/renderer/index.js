@@ -155,7 +155,7 @@ class Renderer {
     }
 
     updateDimension(width, height) {
-        if (width < Styles.minSceneWidth) {
+        if (width < Styles.MIN_SCENE_WIDTH) {
             // Min width of main view is 600, so we need not update
             // camera/renderer dimension anymore
             return;

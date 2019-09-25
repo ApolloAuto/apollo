@@ -189,8 +189,7 @@ void PerceptionCameraUpdater::OnImage(
   }
   current_image_timestamp_ = next_image_timestamp;
   camera_update_.set_image(&(tmp_buffer[0]), tmp_buffer.size());
-  camera_update_.set_img_width(width);
-  camera_update_.set_img_height(height);
+  camera_update_.set_image_aspect_ratio((double)width / height);
 }
 
 void PerceptionCameraUpdater::OnLocalization(

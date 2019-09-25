@@ -34,8 +34,7 @@ export default class Scene extends React.Component {
                     }}>
                     {options.showGeo && <Geolocation />}
                 </div>
-                { (options.showCameraView && !RENDERER.routingEditor.isInEditingMode()) &&
-                    <img id="camera-image" /> }
+                { (options.showCameraView && !options.showRouteEditingBar) && <img id="camera-image" /> }
             </React.Fragment>
         );
     }
