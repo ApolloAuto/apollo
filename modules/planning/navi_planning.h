@@ -120,8 +120,6 @@ class NaviPlanning : public PlanningBase {
       const localization::LocalizationEstimate& localization) const;
 
   std::string target_lane_id_;
-  DrivingAction driving_action_;
-  bool is_received_pad_msg_ = false;
 
   std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
 };
