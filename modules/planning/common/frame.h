@@ -32,6 +32,7 @@
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/localization/proto/pose.pb.h"
+#include "modules/planning/proto/pad_msg.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
@@ -152,13 +153,17 @@ class Frame {
 
   const LocalView &local_view() const { return local_view_; }
 
-  ThreadSafeIndexedObstacles *GetObstacleList() { return &obstacles_; }
+  ThreadSafeIndexedObstacles* GetObstacleList() { return &obstacles_; }
 
   const OpenSpaceInfo &open_space_info() const { return open_space_info_; }
 
-  OpenSpaceInfo *mutable_open_space_info() { return &open_space_info_; }
+  OpenSpaceInfo* mutable_open_space_info() { return &open_space_info_; }
 
   perception::TrafficLight GetSignal(const std::string &traffic_light_id) const;
+
+  const DrivingAction& GetPadMsgDrivingAction() const {
+    return pad_msg_driving_action_;
+  }
 
  private:
   common::Status InitFrameData();
@@ -172,17 +177,20 @@ class Frame {
    * @return pointer to the obstacle if such obstacle exists, otherwise
    * @return false if no colliding obstacle.
    */
-  const Obstacle *FindCollisionObstacle() const;
+  const Obstacle* FindCollisionObstacle() const;
 
   /**
    * @brief create a static virtual obstacle
    */
-  const Obstacle *CreateStaticVirtualObstacle(const std::string &id,
+  const Obstacle* CreateStaticVirtualObstacle(const std::string &id,
                                               const common::math::Box2d &box);
 
   void AddObstacle(const Obstacle &obstacle);
 
   void ReadTrafficLights();
+
+  void ReadPadMsgDrivingAction();
+  void ResetPadMsgDrivingAction();
 
  private:
   uint32_t sequence_num_ = 0;
@@ -218,6 +226,8 @@ class Frame {
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
   std::tuple<bool, double, double, double> pull_over_info_;
+
+  static DrivingAction pad_msg_driving_action_;
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {

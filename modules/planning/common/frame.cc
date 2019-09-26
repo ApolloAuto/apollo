@@ -49,6 +49,8 @@ using apollo::common::math::Polygon2d;
 using apollo::common::time::Clock;
 using apollo::prediction::PredictionObstacles;
 
+DrivingAction Frame::pad_msg_driving_action_ = DrivingAction::NONE;
+
 FrameHistory::FrameHistory()
     : IndexedQueue<uint32_t, Frame>(FLAGS_max_frame_history_num) {}
 
@@ -372,6 +374,8 @@ Status Frame::InitFrameData() {
 
   ReadTrafficLights();
 
+  ReadPadMsgDrivingAction();
+
   return Status::OK();
 }
 
@@ -494,6 +498,18 @@ perception::TrafficLight Frame::GetSignal(
     return traffic_light;
   }
   return *result;
+}
+
+void Frame::ReadPadMsgDrivingAction() {
+  if (local_view_.pad_msg) {
+    if (local_view_.pad_msg->has_action()) {
+      pad_msg_driving_action_ = local_view_.pad_msg->action();
+    }
+  }
+}
+
+void Frame::ResetPadMsgDrivingAction() {
+  pad_msg_driving_action_ = DrivingAction::NONE;
 }
 
 const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {
