@@ -510,13 +510,14 @@ Status OnLanePlanning::Plan(
 
     if (FLAGS_export_chart) {
       ExportOnLaneChart(best_ref_info->debug(), ptr_debug);
-      const auto* failed_ref_info = frame_->FindFailedReferenceLineInfo();
-      if (failed_ref_info) {
-        ExportFailedSTChart(failed_ref_info->debug(), ptr_debug);
-      }
     } else {
       ptr_debug->MergeFrom(best_ref_info->debug());
       ExportReferenceLineDebug(ptr_debug);
+      // Export additional ST-chart for failed lane-change speed planning
+      const auto* failed_ref_info = frame_->FindFailedReferenceLineInfo();
+      if (failed_ref_info) {
+        ExportFailedLaneChangeSTChart(failed_ref_info->debug(), ptr_debug);
+      }
     }
     ptr_trajectory_pb->mutable_latency_stats()->MergeFrom(
         best_ref_info->latency_stats());
@@ -684,7 +685,7 @@ void AddSpeedPlan(
   }
 }
 
-void OnLanePlanning::ExportFailedSTChart(
+void OnLanePlanning::ExportFailedLaneChangeSTChart(
     const planning_internal::Debug& debug_info,
     planning_internal::Debug* debug_chart) {
   const auto& src_data = debug_info.planning_data();
