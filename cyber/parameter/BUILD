@@ -75,7 +75,6 @@ cc_library(
 
 cc_test(
     name = "parameter_server_test",
-    size = "small",
     srcs = [
         "parameter_server_test.cc",
     ],
