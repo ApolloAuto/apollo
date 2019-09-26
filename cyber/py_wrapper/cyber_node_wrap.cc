@@ -817,7 +817,7 @@ struct student {
 
 student *cyber_student() {
   student *stu1 = new student();
-  stu1->name = "ywf";
+  stu1->name = "lily";
   stu1->age = 22;
   return stu1;
 }
@@ -847,8 +847,8 @@ PyObject *cyber_test1(PyObject *self, PyObject *args) {
   AINFO << "===========================";
   // shared ptr
   std::vector<std::string> *strPtrV = new std::vector<std::string>;
-  strPtrV->push_back("ywf");
-  strPtrV->push_back("lj");
+  strPtrV->push_back("lily");
+  strPtrV->push_back("Jack");
   PyObject *py_stu1 = PyCapsule_New(strPtrV, "studentptr", nullptr);
   AINFO << "capsule name->" << PyCapsule_GetName(py_stu1);
 

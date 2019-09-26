@@ -64,16 +64,12 @@ class TestRecord(unittest.TestCase):
         self.assertEqual(1, len(channel_list))
         self.assertEqual(CHAN_1, channel_list[0])
         for channelname, msg, datatype, timestamp in fread.read_messages():
-            # print "+++"
-            # print channelname
-            # print msg, datatype, timestamp
             self.assertEqual(CHAN_1, channelname)
             self.assertEqual(STR_10B, msg)
             self.assertEqual(TIME, timestamp)
             self.assertEqual(1, fread.get_messagenumber(channelname))
             self.assertEqual(MSG_TYPE, datatype)
             self.assertEqual(MSG_TYPE, fread.get_messagetype(channelname))
-            # print "pbdesc -> %s" % fread.get_protodesc(channelname)
             msg = record_pb2.Header()
             header_msg = fread.get_headerstring()
             msg.ParseFromString(header_msg)
