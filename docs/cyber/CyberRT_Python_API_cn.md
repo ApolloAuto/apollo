@@ -180,8 +180,6 @@ class RecordWriter(object):
 class Time(object):
 	@staticmethod
     def now():
-        # print _CYBER_TIME.PyTime_now()
-        # print type(_CYBER_TIME.PyTime_now())
         time_now = Time(_CYBER_TIME.PyTime_now())
         return time_now
 
@@ -363,7 +361,6 @@ def test_record_reader(reader_path):
         print "msgtime -> %d" % timestamp
         print "msgnum -> %d" % freader.get_messagenumber(channelname)
         print "msgtype -> %s" % datatype
-        # print "pbdesc -> %s" % freader.get_protodesc(channelname)
         count = count + 1
 
 if __name__ == '__main__':
