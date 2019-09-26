@@ -25,6 +25,7 @@ from cyber_py import parameter
 
 PARAM_SERVICE_NAME = "global_parameter_service"
 
+
 class TestParams(unittest.TestCase):
 
     """
@@ -37,7 +38,6 @@ class TestParams(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cyber.shutdown()
-
 
     def test_params(self):
         param1 = parameter.Parameter("author_name", "WanderingEarth")

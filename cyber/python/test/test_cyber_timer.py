@@ -25,6 +25,7 @@ from cyber_py import cyber_timer
 global count
 count = 0
 
+
 def func():
     global count
     print('Callback function is called [%d] times.' % count)
@@ -32,6 +33,7 @@ def func():
 
 
 class TestNode(unittest.TestCase):
+
     """
     Class for node unit test.
     """
