@@ -23,10 +23,11 @@
 #include <string>
 #include <vector>
 #include "modules/localization/ndt/ndt_locator/ndt_solver.h"
-#include "modules/localization/msf/local_map/ndt_map/ndt_map.h"
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_matrix.h"
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_node.h"
-#include "modules/localization/msf/local_map/ndt_map/ndt_map_pool.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_node.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_pool.h"
+#include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_matrix.h"
+#include "modules/localization/msf/local_pyramid_map/base_map/base_map_node_index.h"
 
 #define USE_PRELOAD_MAP_NODE
 
@@ -60,11 +61,13 @@ namespace apollo {
 namespace localization {
 namespace ndt {
 
-typedef apollo::localization::msf::NdtMap NdtMap;
-typedef apollo::localization::msf::NdtMapConfig NdtMapConfig;
-typedef apollo::localization::msf::NdtMapNode NdtMapNode;
-typedef apollo::localization::msf::NdtMapNodePool NdtMapNodePool;
-typedef apollo::localization::msf::NdtMapMatrix NdtMapMatrix;
+typedef apollo::localization::msf::pyramid_map::NdtMap NdtMap;
+typedef apollo::localization::msf::pyramid_map::NdtMapConfig NdtMapConfig;
+typedef apollo::localization::msf::pyramid_map::NdtMapNode NdtMapNode;
+typedef apollo::localization::msf::pyramid_map::NdtMapCells NdtMapCells;
+typedef apollo::localization::msf::pyramid_map::NdtMapNodePool NdtMapNodePool;
+typedef apollo::localization::msf::pyramid_map::NdtMapMatrix NdtMapMatrix;
+typedef apollo::localization::msf::pyramid_map::MapNodeIndex MapNodeIndex;
 
 struct LidarFrame {
   LidarFrame() : measurement_time(0.0) {}
