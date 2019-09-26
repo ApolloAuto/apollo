@@ -54,6 +54,7 @@ inline ThreadPool::ThreadPool(std::size_t threads, std::size_t max_task_num)
   if (!task_queue_.Init(max_task_num, new BlockWaitStrategy())) {
     throw std::runtime_error("Task queue init failed.");
   }
+  workers_.reserve(threads);
   for (size_t i = 0; i < threads; ++i) {
     workers_.emplace_back([this] {
       while (!stop_) {
