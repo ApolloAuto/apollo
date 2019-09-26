@@ -17,6 +17,8 @@ RUN apt-get update -y && \
     git \
     google-perftools \
     graphviz \
+    iproute2 \
+    iputils-ping \
     lcov \
     libblas-dev \
     libboost-all-dev \
