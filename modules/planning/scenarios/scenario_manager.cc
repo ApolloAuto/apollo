@@ -697,8 +697,6 @@ void ScenarioManager::Observe(const Frame& frame) {
       first_encountered_overlap_map_[overlap.first] = overlap.second;
     }
   }
-
-  CheckEmergencyVehicleAlert();
 }
 
 void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
@@ -1073,13 +1071,6 @@ void ScenarioManager::UpdatePlanningContextPullOverScenario(
       }
     }
   }
-}
-
-void ScenarioManager::CheckEmergencyVehicleAlert() {
-  static int emergency_vehicle_alert_count = 0;
-
-  // TODO(all): to be implement
-  emergency_vehicle_alert_ = (emergency_vehicle_alert_count >= 5);
 }
 
 }  // namespace scenario
