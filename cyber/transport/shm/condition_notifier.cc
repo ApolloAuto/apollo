@@ -161,14 +161,14 @@ bool ConditionNotifier::OpenOnly() {
   // get managed_shm_
   int shmid = shmget(key_, 0, 0644);
   if (shmid == -1) {
-    AERROR << "get shm failed.";
+    AERROR << "get shm failed, error: " << strerror(errno);
     return false;
   }
 
   // attach managed_shm_
   managed_shm_ = shmat(shmid, nullptr, 0);
   if (managed_shm_ == reinterpret_cast<void*>(-1)) {
-    AERROR << "attach shm failed.";
+    AERROR << "attach shm failed, error: " << strerror(errno);
     return false;
   }
 
