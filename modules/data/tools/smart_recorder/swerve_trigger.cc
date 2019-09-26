@@ -38,7 +38,7 @@ void SwerveTrigger::Pull(const RecordMessage& msg) {
   if (msg.channel_name == FLAGS_chassis_topic) {
     Chassis chassis_msg;
     chassis_msg.ParseFromString(msg.content);
-    const float steer_per= chassis_msg.steering_percentage();
+    const float steer_per = chassis_msg.steering_percentage();
 
     if (IsNoisy(steer_per) || steer_per > 100.0 || steer_per < -100.0) {
       return;
