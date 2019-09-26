@@ -135,15 +135,6 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   // chassis
   ADEBUG << "Get chassis: " << local_view_.chassis->DebugString();
 
-  // pad_msg
-  if (local_view_.pad_msg) {
-    ADEBUG << "Pad Msg: " << local_view_.pad_msg->DebugString();
-    if (local_view_.pad_msg->has_action()) {
-      driving_action_ = local_view_.pad_msg->action();
-      is_received_pad_msg_ = true;
-    }
-  }
-
   Status status = VehicleStateProvider::Instance()->Update(
       *local_view_.localization_estimate, *local_view_.chassis);
 
@@ -264,7 +255,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
 
   // Use planning pad message to make driving decisions
   if (FLAGS_enable_planning_pad_msg) {
-    ProcessPadMsg(driving_action_);
+    const auto& pad_msg_driving_action = frame_->GetPadMsgDrivingAction();
+    ProcessPadMsg(pad_msg_driving_action);
   }
 
   for (auto& ref_line_info : *frame_->mutable_reference_line_info()) {
@@ -323,8 +315,7 @@ void NaviPlanning::ProcessPadMsg(DrivingAction drvie_action) {
   if (config_.has_navigation_planning_config()) {
     std::map<std::string, uint32_t> lane_id_to_priority;
     auto& ref_line_info_group = *frame_->mutable_reference_line_info();
-    if (is_received_pad_msg_) {
-      is_received_pad_msg_ = false;
+    if (drvie_action != DrivingAction::NONE) {
       using LaneInfoPair = std::pair<std::string, double>;
       std::string current_lane_id;
       switch (drvie_action) {
