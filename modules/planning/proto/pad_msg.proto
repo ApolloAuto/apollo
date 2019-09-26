@@ -4,6 +4,7 @@ package apollo.planning;
 import "modules/common/proto/header.proto";
 
 enum DrivingAction {
+  NONE = 100;
   FOLLOW = 0;
   CHANGE_LEFT = 1;
   CHANGE_RIGHT = 2;

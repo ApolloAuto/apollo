@@ -302,7 +302,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverEmergencyScenario(
     const Frame& frame) {
-  if (emergency_vehicle_alert_) {
+  const auto& pad_msg_driving_action = frame.GetPadMsgDrivingAction();
+  if (pad_msg_driving_action == DrivingAction::PULL_OVER) {
     return ScenarioConfig::PULL_OVER_EMERGENCY;
   }
 
@@ -663,7 +664,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectParkAndGoScenario(
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
 
   const double adc_distance_to_dest = dest_sl.s() - adc_front_edge_s;
-  AINFO << "adc_distance_to_dest:" << adc_distance_to_dest;
+  ADEBUG << "adc_distance_to_dest:" << adc_distance_to_dest;
   // if vehicle is static, far enough to destination and (off-lane or not on
   // city_driving lane)
   if (std::fabs(adc_speed) < max_abs_speed_when_stopped &&
@@ -717,6 +718,8 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
   // default: LANE_FOLLOW
   ScenarioConfig::ScenarioType scenario_type = default_scenario_type_;
 
+  ////////////////////////////////////////
+  // PULL_OVER_EMERGENCY
   if (FLAGS_enable_scenario_pull_over_emergency) {
     scenario_type = SelectPullOverEmergencyScenario(frame);
   }
