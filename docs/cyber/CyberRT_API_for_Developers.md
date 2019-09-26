@@ -863,7 +863,7 @@ A code example can be seen below:
 int main(int argc, char** argv) {
     cyber::Init(argv[0]);
     Time t1(1531225311123456789UL);
-    std::cout << t1.ToString() std::endl; // 2018-07-10 20:21:51.123456789
+    std::cout << t1.ToString() << std::endl; // 2018-07-10 20:21:51.123456789
     // Duration time interval
     Time t1(100);
     Duration d(200);
