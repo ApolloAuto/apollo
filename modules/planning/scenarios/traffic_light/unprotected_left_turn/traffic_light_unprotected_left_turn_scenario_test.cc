@@ -41,19 +41,9 @@ class TrafficLightUnprotectedLeftTurnScenarioTest : public ::testing::Test {
   std::unique_ptr<TrafficLightUnprotectedLeftTurnScenario> scenario_;
 };
 
-TEST_F(TrafficLightUnprotectedLeftTurnScenarioTest, VerifyConf) {
-  FLAGS_scenario_traffic_light_unprotected_left_turn_config_file =
-      "/apollo/modules/planning/conf/"
-      "scenario/traffic_light_unprotected_left_turn_config.pb.txt";
-
-  ScenarioConfig config;
-  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_traffic_light_unprotected_left_turn_config_file, &config));
-}
-
 TEST_F(TrafficLightUnprotectedLeftTurnScenarioTest, Init) {
   FLAGS_scenario_traffic_light_unprotected_left_turn_config_file =
-      "/apollo/modules/planning/testdata/conf/"
+      "/apollo/modules/planning/conf/"
       "scenario/traffic_light_unprotected_left_turn_config.pb.txt";
 
   ScenarioConfig config;
