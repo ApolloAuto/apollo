@@ -41,19 +41,9 @@ class ValetParkingScenarioTest : public ::testing::Test {
   std::unique_ptr<ValetParkingScenario> scenario_;
 };
 
-TEST_F(ValetParkingScenarioTest, VerifyConf) {
-  FLAGS_scenario_valet_parking_config_file =
-      "/apollo/modules/planning/conf/scenario/valet_parking_config.pb.txt";
-
-  ScenarioConfig config;
-  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_valet_parking_config_file, &config));
-}
-
 TEST_F(ValetParkingScenarioTest, Init) {
   FLAGS_scenario_valet_parking_config_file =
-      "/apollo/modules/planning/testdata/conf/"
-      "scenario/valet_parking_config.pb.txt";
+      "/apollo/modules/planning/conf/scenario/valet_parking_config.pb.txt";
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
