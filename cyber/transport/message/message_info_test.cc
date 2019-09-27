@@ -19,9 +19,7 @@
 #include "cyber/transport/message/message_info.h"
 
 #include <gtest/gtest.h>
-#include <iostream>
 #include <memory>
-#include <string>
 #include <utility>
 
 #include "cyber/transport/common/identity.h"

@@ -18,7 +18,6 @@
 
 #include <gtest/gtest.h>
 #include <stdlib.h>
-#include <string>
 
 #include "cyber/common/environment.h"
 #include "cyber/scheduler/scheduler_factory.h"
