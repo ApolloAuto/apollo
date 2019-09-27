@@ -17,7 +17,6 @@
 #include "cyber/message/message_traits.h"
 
 #include <gtest/gtest.h>
-#include <string.h>
 #include <string>
 
 #include "cyber/proto/unit_test.pb.h"

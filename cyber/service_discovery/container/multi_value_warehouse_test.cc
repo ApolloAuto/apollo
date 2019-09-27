@@ -16,12 +16,9 @@
 
 #include "cyber/service_discovery/container/multi_value_warehouse.h"
 
-#include <iostream>
+#include <gtest/gtest.h>
 #include <memory>
-#include <string>
 #include <utility>
-
-#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {
@@ -150,7 +147,6 @@ TEST(MultiValueWarehouseTest, test1) {
       wh.GetAllRoles(&roles_attr);
       EXPECT_EQ(roles.size(), roles_attr.size());
 
-      /////
       attr.set_node_id(0);
       attr.set_channel_id(0);
       attr.set_id(0);
@@ -199,7 +195,6 @@ TEST(MultiValueWarehouseTest, test1) {
 
       EXPECT_FALSE(wh.Search(attr));
 
-      ////
       roles_attr.clear();
       EXPECT_TRUE(wh.Search(3, &roles_attr));
       EXPECT_EQ(roles_attr.size(), 3);
@@ -208,7 +203,6 @@ TEST(MultiValueWarehouseTest, test1) {
       EXPECT_FALSE(wh.Search(10, &roles_attr));
       EXPECT_EQ(roles_attr.size(), 0);
 
-      ////
       roles.clear();
       EXPECT_TRUE(wh.Search(3, &roles));
       EXPECT_EQ(roles.size(), 3);
@@ -217,7 +211,6 @@ TEST(MultiValueWarehouseTest, test1) {
       EXPECT_FALSE(wh.Search(10, &roles));
       EXPECT_EQ(roles.size(), 0);
 
-      ///
       RolePtr role;
       EXPECT_TRUE(wh.Search(2, &role));
       EXPECT_TRUE(wh.Search(3, &attr));

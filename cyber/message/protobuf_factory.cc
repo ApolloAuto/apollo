@@ -182,7 +182,7 @@ google::protobuf::Message* ProtobufFactory::GetMessageByGeneratedType(
   auto descriptor =
       DescriptorPool::generated_pool()->FindMessageTypeByName(type);
   if (descriptor == nullptr) {
-    // LOG_WARN << "cannot find [" << type << "] descriptor";
+    // AERROR << "cannot find [" << type << "] descriptor";
     return nullptr;
   }
 
