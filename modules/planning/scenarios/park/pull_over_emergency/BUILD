@@ -1,0 +1,29 @@
+load("//tools:cpplint.bzl", "cpplint")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "pull_over_emergency_scenario",
+    srcs = [
+        "pull_over_emergency_scenario.cc",
+    ],
+    hdrs = [
+        "pull_over_emergency_scenario.h",
+    ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        "//cyber/common:log",
+        "//external:gflags",
+        "//modules/common/util:factory",
+        "//modules/common/vehicle_state:vehicle_state_provider",
+        "//modules/planning/common:planning_common",
+        "//modules/planning/common/util:common_lib",
+        "//modules/planning/common/util:util_lib",
+        "//modules/planning/proto:planning_proto",
+        "//modules/planning/scenarios:scenario",
+        "//modules/planning/scenarios/util:scenario_util_lib",
+        "@eigen",
+    ],
+)
+
+cpplint()
