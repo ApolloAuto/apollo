@@ -32,6 +32,7 @@ class ParameterClientTest : public ::testing::Test {
  protected:
   ParameterClientTest() {
     apollo::cyber::Init("parameter_client_test");
+    SetState(STATE_INITIALIZED);
     node_ = CreateNode("parameter_server");
   }
 
