@@ -22,6 +22,8 @@
 #include <string>
 #include <utility>
 
+#include "cyber/common/log.h"
+
 namespace apollo {
 namespace cyber {
 namespace logger {
@@ -32,35 +34,34 @@ TEST(LoggerUtilTest, GetHostName) {
   EXPECT_FALSE(host_name.empty());
 }
 
-TEST(LoggerUtilTest, GetLoggingDirectories) {
-  FLAGS_log_dir.clear();
-  auto list = GetLoggingDirectories();
-  FLAGS_log_dir = "./";
-  list = GetLoggingDirectories();
-  EXPECT_GT(list.size(), 0);
-}
-
 TEST(LoggerUtilTest, FindModuleName) {
-  std::string log_message = "<";
-  std::string module_name = "test";
+  std::string module_name = "module_name_0";
+  std::string log_message = LEFT_BRACKET;
   FindModuleName(&log_message, &module_name);
-  EXPECT_EQ("test", module_name);
+  EXPECT_EQ("module_name_0", module_name);
+
+  log_message = RIGHT_BRACKET;
+  FindModuleName(&log_message, &module_name);
+  EXPECT_EQ("module_name_0", module_name);
+
+  log_message = LEFT_BRACKET;
+  log_message.append("module_name_1");
+  log_message.append(RIGHT_BRACKET);
+  FindModuleName(&log_message, &module_name);
+  EXPECT_EQ("module_name_1", module_name);
 
   log_message = "123";
+  log_message.append(LEFT_BRACKET);
+  log_message.append("module_name_2");
+  log_message.append(RIGHT_BRACKET);
+  log_message.append("123");
   FindModuleName(&log_message, &module_name);
-  EXPECT_EQ("test", module_name);
+  EXPECT_EQ("module_name_2", module_name);
 
-  log_message = "[logger]123";
-  FindModuleName(&log_message, &module_name);
-  EXPECT_EQ("logger", module_name);
-
-  module_name = "test";
-  log_message = "123[logger]123";
-  FindModuleName(&log_message, &module_name);
-  EXPECT_EQ("logger", module_name);
-
-  module_name = "test";
-  log_message = "123[]123";
+  log_message = "123";
+  log_message.append(LEFT_BRACKET);
+  log_message.append(RIGHT_BRACKET);
+  log_message.append("123");
   FindModuleName(&log_message, &module_name);
   EXPECT_EQ("logger_util_test_" + std::to_string(GetMainThreadPid()),
             module_name);

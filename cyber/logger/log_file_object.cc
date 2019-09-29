@@ -56,7 +56,6 @@
 #include <iostream>
 #include <vector>
 
-#include "cyber/common/log.h"
 #include "cyber/logger/logger_util.h"
 
 namespace apollo {
@@ -231,22 +230,14 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
     std::string host_name;
     apollo::cyber::logger::GetHostName(&host_name);
     if (base_filename_selected_) {
-      bool success = false;
-
       std::string stripped_filename =
           base_filename_ + ".log." + LC_LOG_SEVERITY_NAMES[severity_] + ".";
-
-      const std::vector<std::string>& log_dirs = GetLoggingDirectories();
-
-      for (std::vector<std::string>::const_iterator dir = log_dirs.begin();
-           dir != log_dirs.end(); ++dir) {
-        base_filepath_ = *dir + PATH_SEPARATOR + stripped_filename;
-        if (CreateLogfile(time_pid_string)) {
-          success = true;
-          break;
-        }
+      if (!FLAGS_log_dir.empty()) {
+        base_filepath_ = FLAGS_log_dir + PATH_SEPARATOR + stripped_filename;
+      } else {
+        base_filepath_ = "./" + stripped_filename;
       }
-      if (success == false) {
+      if (!CreateLogfile(time_pid_string)) {
         perror("Could not create logging file");
         fprintf(stderr, "COULD NOT CREATE A LOGGINGFILE %s!",
                 time_pid_string.c_str());
