@@ -19,6 +19,7 @@
 #include "./screen.h"
 
 #include <iomanip>
+#include <numeric>
 #include <sstream>
 #include <vector>
 
@@ -143,7 +144,8 @@ void GeneralMessage::Render(const Screen* s, int key) {
             if (itemIndex_ < 0) itemIndex_ = size - 1;
             break;
 
-          default: {}
+          default: {
+          }
         }
       }
 
