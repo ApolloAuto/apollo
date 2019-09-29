@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef INCLUDE_CYBER_COMMON_ASYNC_LOGGER_H_
-#define INCLUDE_CYBER_COMMON_ASYNC_LOGGER_H_
+#ifndef CYBER_LOGGER_ASYNC_LOGGER_H_
+#define CYBER_LOGGER_ASYNC_LOGGER_H_
 
 #include <atomic>
 #include <condition_variable>
@@ -221,4 +221,4 @@ class AsyncLogger : public google::base::Logger {
 }  // namespace cyber
 }  // namespace apollo
 
-#endif  // CYBER_COMMON_ASYNC_LOGGER_H_
+#endif  // CYBER_LOGGER_ASYNC_LOGGER_H_

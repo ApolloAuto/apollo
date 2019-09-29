@@ -11,7 +11,6 @@ cc_library(
         "logger.h",
     ],
     deps = [
-        "//cyber/base:macros",
         "//cyber/common",
         "//cyber/logger:log_file_object",
     ],

@@ -22,7 +22,6 @@
 #include <unordered_map>
 #include <utility>
 
-#include "cyber/base/macros.h"
 #include "cyber/logger/log_file_object.h"
 #include "cyber/logger/logger_util.h"
 
