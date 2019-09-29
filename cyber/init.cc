@@ -63,7 +63,7 @@ void InitLogger(const char* binary_name) {
 
   // Init async logger
   async_logger = new ::apollo::cyber::logger::AsyncLogger(
-      google::base::GetLogger(FLAGS_minloglevel), 2 * 1024 * 1024);
+      google::base::GetLogger(FLAGS_minloglevel));
   google::base::SetLogger(FLAGS_minloglevel, async_logger);
   async_logger->Start();
 }
