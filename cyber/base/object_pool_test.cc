@@ -16,10 +16,10 @@
 
 #include "cyber/base/object_pool.h"
 
+#include <gtest/gtest.h>
 #include <thread>
 
 #include "cyber/base/concurrent_object_pool.h"
-#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {
