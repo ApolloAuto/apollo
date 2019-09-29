@@ -361,21 +361,14 @@ bool Segment::Recreate() {
 }
 
 uint32_t Segment::GetNextWritableBlockIndex() {
-  uint32_t try_idx = state_->wrote_num();
-
-  auto max_mod_num = conf_.block_num() - 1;
+  const auto block_num = conf_.block_num();
   while (1) {
-    if (try_idx >= conf_.block_num()) {
-      try_idx &= max_mod_num;
-    }
-
+    uint32_t try_idx = state_->FetchAddSeq(1) % block_num;
     if (blocks_[try_idx].TryLockForWrite()) {
-      state_->IncreaseWroteNum();
       return try_idx;
     }
-
-    ++try_idx;
   }
+  return 0;
 }
 
 }  // namespace transport
