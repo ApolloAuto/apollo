@@ -18,7 +18,6 @@
 
 #include <gtest/gtest.h>
 #include <memory>
-#include <string>
 #include <vector>
 
 #include "cyber/common/global_data.h"

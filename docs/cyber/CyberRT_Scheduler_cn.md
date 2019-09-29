@@ -2,7 +2,7 @@
 
 调度系统调度策略分为classic策略和choreography策略。  
 classic策略是一个较为通用的调度策略，如果对当前车上dag结构不清楚，建议用此策略。  
-choreography策略是基于 对车上任务足够熟悉，根据任务的依赖执行关系、任务的执行时长、任务cpu消耗情况、消息频率等，对任务进行编排。  
+choreography策略是基于对车上任务足够熟悉，根据任务的依赖执行关系、任务的执行时长、任务cpu消耗情况、消息频率等，对任务进行编排。  
 
 ## 2. classic策略
 ### 2.1 classic策略配置示例
@@ -82,7 +82,7 @@ scheduler_conf {
 
 ### 2.3 配置案例详解
 
-例如拓扑结构为下图所示，对应配置conf为2.1，那么A、B、C、D任务在第一个group中执行，E在第二个group中执行，对于没有出现在配置中的任务，比如F默认会放到第一个group中执行。
+例如拓扑结构为下图所示，对应2.1中的配置文件，那么A、B、C、D任务在第一个group中执行，E在第二个group中执行，对于没有出现在配置中的任务，比如F默认会放到第一个group中执行。
 而且配置中我们对于任务进行了优先级设置，A、B、C、D优先级依次增大，正好对应下图的拓扑依赖关系，在链路中越靠后的任务优先级越高。这样设置的目的是解决任务优先级反转的问题。
 
 <img src="images/topo_sched.png" width="30%" height="30%" />
@@ -153,7 +153,7 @@ scheduler_conf {
 ```
 
 ### 3.2 配置属性说明
-choreography策略，主要是对主链路上的任务进行编排（choreography开头的配置），将非主链路的任务放到池子中由classic策略（pool开头的配置），choreography策略中classic线程池存在的意义：主链路的任务执行先后关系比较明确，但是存在一些其他链路的任务在不清楚前后拓扑关系的情况下，或者说未被编排的任务（包括Async创建的异步task），会被放到classic线程池中执行。  
+choreography策略，主要是对主链路上的任务进行编排（choreography开头的配置），将非主链路的任务放到线程池中由classic策略（pool开头的配置）执行，choreography策略中classic线程池存在的意义：主链路的任务执行先后关系比较明确，但是存在一些其他链路的任务在不清楚前后拓扑关系的情况下，或者说未被编排的任务（包括Async创建的异步task），会被放到classic线程池中执行。  
 关于配置属性：  
 - affinity： 在2.2中进行了解释说明。
 - choreography_processor_policy和choreography_processor_prio是设置编排线程的调度策略和优先级，这里设置SCHED_FIFO是为了保证主链路能够及时抢占cpu执行， pool_processor_policy和pool_processor_prio是设置classic线程的调度策略和优先级。
@@ -163,7 +163,7 @@ choreography策略，主要是对主链路上的任务进行编排（choreograph
 A、B、C、D是主链路任务，都设置了processor属性，那么A、B在0号cpu上执行，C、D在1号cpu上执行。在同一个核上，A和B还设置了优先级，所以优先执行B，再执行A。  
 没有配置processor属性的任务E以及没有出现在task配置中的任务如F，则默认进入classic线程池中执行。  
 考虑到任务优先级、执行时长、频率与调度之间的关系，任务编排有如下几个依据：
-- 同一个path的任务尽量编排在一个同一个processor，如果processor负载过高，将部分任务拆分到另外一颗processor
+- 同一个path的任务尽量编排在同一个processor，如果processor负载过高，将部分任务拆分到另外其他processor
 - 同一个path上的任务从开始到结束，优先级逐级升高
 - 不同path上的任务尽量不混排
 - 高频&短耗时任务尽量排放同一processor
