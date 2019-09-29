@@ -3,7 +3,8 @@
 ## Prerequisites
  - Download source code of Apollo from [GitHub](https://github.com/ApolloAuto/apollo)
  - Follow the tutorial to set up [docker environment](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md).
- - Download localization data from the [Multi-Sensor Fusion Localization Data](http://data.apollo.auto/help?name=sensor%20data&data_key=multisensor&data_type=1&locale=en-us&lang=en)（US only).
+ - ~~Download localization data from the [Multi-Sensor Fusion Localization Data](http://data.apollo.auto/help?name=sensor%20data&data_key=multisensor&data_type=1&locale=en-us&lang=en)（US only).~~
+ - Download localization dataset: please contact Yao Zhou, zhouyao@baidu.com, to request the dataset. Requests need contain the following: (1) Email address and affiliation (business or school); (2) Application purpose.
 
 ## Build Apollo
 
