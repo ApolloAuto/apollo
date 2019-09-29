@@ -551,4 +551,14 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "condition_notifier_test",
+    size = "small",
+    srcs = ["shm/condition_notifier_test.cc"],
+    deps = [
+        "//cyber:cyber_core",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
