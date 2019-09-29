@@ -16,9 +16,10 @@
 
 #include <thread>
 
+#include <gtest/gtest.h>
+
 #include "cyber/cyber.h"
 #include "cyber/py_wrapper/py_node.h"
-#include "gtest/gtest.h"
 
 TEST(CyberInitTest, test_init) {
   EXPECT_TRUE(apollo::cyber::OK());

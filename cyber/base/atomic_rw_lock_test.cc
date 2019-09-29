@@ -16,10 +16,10 @@
 
 #include "cyber/base/atomic_rw_lock.h"
 
+#include <gtest/gtest.h>
 #include <thread>
 
 #include "cyber/base/reentrant_rw_lock.h"
-#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {
