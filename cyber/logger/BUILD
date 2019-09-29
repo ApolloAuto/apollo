@@ -43,6 +43,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "async_logger_test",
+    size = "small",
+    srcs = [
+        "async_logger_test.cc",
+    ],
+    deps = [
+        "//cyber",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "log_file_object",
     srcs = [

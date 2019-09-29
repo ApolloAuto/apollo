@@ -46,12 +46,11 @@ inline int64_t CycleClock_Now() {
 static inline void GetHostName(std::string* hostname) {
   struct utsname buf;
   if (0 != uname(&buf)) {
+    // ensure null termination on failure
     *buf.nodename = '\0';
   }
   *hostname = buf.nodename;
 }
-
-const std::vector<std::string>& GetLoggingDirectories();
 
 int32_t GetMainThreadPid();
 
