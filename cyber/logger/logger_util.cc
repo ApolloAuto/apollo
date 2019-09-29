@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/logger/logger_util.h"
+
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/utsname.h>
@@ -24,8 +26,6 @@
 #include <string>
 #include <vector>
 
-#include "cyber/common/global_data.h"
-#include "cyber/logger/logger_util.h"
 #include "glog/logging.h"
 
 namespace apollo {

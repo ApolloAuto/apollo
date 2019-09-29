@@ -32,7 +32,6 @@
 #include <vector>
 
 #include "cyber/common/global_data.h"
-#include "glog/logging.h"
 
 namespace apollo {
 namespace cyber {
@@ -63,9 +62,9 @@ inline int32_t MaxLogSize() {
 }
 
 inline void FindModuleName(std::string* log_message, std::string* module_name) {
-  auto lpos = log_message->find('[');
+  auto lpos = log_message->find(LEFT_BRACKET);
   if (lpos != std::string::npos) {
-    auto rpos = log_message->find(']', lpos);
+    auto rpos = log_message->find(RIGHT_BRACKET, lpos);
     if (rpos != std::string::npos) {
       module_name->assign(*log_message, lpos + 1, rpos - lpos - 1);
       auto cut_length = rpos - lpos + 1;
