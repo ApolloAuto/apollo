@@ -47,18 +47,6 @@ bool PidHasChanged() {
   return true;
 }
 
-const std::vector<std::string>& GetLoggingDirectories() {
-  static std::vector<std::string> logging_directories_list;
-  if (logging_directories_list.empty()) {
-    if (!FLAGS_log_dir.empty()) {
-      logging_directories_list.emplace_back(FLAGS_log_dir.c_str());
-    } else {
-      logging_directories_list.emplace_back("./");
-    }
-  }
-  return logging_directories_list;
-}
-
 }  // namespace logger
 }  // namespace cyber
 }  // namespace apollo
