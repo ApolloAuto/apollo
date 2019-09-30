@@ -14,94 +14,58 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "gtest/gtest.h"
-
 #include "cyber/logger/async_logger.h"
-#include "cyber/time/time.h"
+
+#include <glog/logging.h>
+#include <gtest/gtest.h>
+
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace cyber {
 namespace logger {
 
-const char fatalMsg[] = "Fatal [AsyncLoggerTest] Test AsyncLogger String\n";
-const char errorMsg[] = "Error [AsyncLoggerTest] Test AsyncLogger String\n";
-const char warningMsg[] = "Warning [AsyncLoggerTest] Test AsyncLogger String\n";
-const char inforMsg[] = "Info [AsyncLoggerTest] Test AsyncLogger String\n";
-const uint64_t timestamp = 1546272000LL;
-
 TEST(AsyncLoggerTest, WriteAndFlush) {
-  // Start async logger
-  google::InitGoogleLogging("AsyncLoggerTest");
-  AsyncLogger* a = new AsyncLogger(google::base::GetLogger(google::INFO));
-  google::base::SetLogger(FLAGS_minloglevel, a);
-  a->Start();
+  AsyncLogger logger(google::base::GetLogger(google::INFO));
 
-  a->Write(true, 0, "", 0);
+  // write in stop state
+  time_t timep;
+  time(&timep);
+  std::string message = "I0909 99:99:99.999999 99999 logger_test.cc:999] ";
+  message.append(LEFT_BRACKET);
+  message.append("AsyncLoggerTest");
+  message.append(RIGHT_BRACKET);
+  message.append("async logger test message\n");
+  logger.Write(false, timep, message.c_str(),
+               static_cast<int>(message.length()));
+  EXPECT_EQ(logger.LogSize(), 0);  // always zero
 
-  a->Flush();
-  EXPECT_EQ(a->LogSize(), 0);
+  // write in start state
+  logger.Start();
+  logger.Write(true, timep, message.c_str(),
+               static_cast<int>(message.length()));
+  EXPECT_EQ(logger.LogSize(), 0);  // always zero
 
-  a->Write(false, timestamp, fatalMsg, strlen(fatalMsg) - 1);
-  EXPECT_EQ(a->LogSize(), 0);
+  // flush
+  logger.Flush();
+  EXPECT_EQ(logger.LogSize(), 0);  // always zero
 
-  a->Write(false, timestamp, errorMsg, strlen(errorMsg) - 1);
-  EXPECT_EQ(a->LogSize(), 0);
-
-  a->Write(false, timestamp, warningMsg, strlen(warningMsg) - 1);
-  EXPECT_EQ(a->LogSize(), 0);
-
-  a->Write(false, timestamp, inforMsg, strlen(inforMsg) - 1);
-  EXPECT_EQ(a->LogSize(), 0);
-
-  a->Flush();
-  EXPECT_EQ(a->LogSize(), 0);
-
-  // Stop async logger
-  a->Stop();
-  a = nullptr;
-  google::ShutdownGoogleLogging();
+  logger.Stop();
 }
 
-TEST(AsyncLoggerTest, WriteAndFlushWithDefaultSize) {
-  // Start async logger
-  google::InitGoogleLogging("AsyncLoggerTest");
-  AsyncLogger* a = new AsyncLogger(google::base::GetLogger(google::INFO));
-  google::base::SetLogger(FLAGS_minloglevel, a);
-  a->Start();
-
-  a->Write(false, timestamp, fatalMsg, strlen(fatalMsg) - 1);
-  EXPECT_EQ(a->LogSize(), 0);
-
-  a->Write(false, timestamp, errorMsg, strlen(errorMsg) - 1);
-  EXPECT_EQ(a->LogSize(), 0);
-
-  a->Write(false, timestamp, warningMsg, strlen(warningMsg) - 1);
-  EXPECT_EQ(a->LogSize(), 0);
-
-  a->Write(false, timestamp, inforMsg, strlen(inforMsg) - 1);
-  EXPECT_EQ(a->LogSize(), 0);
-
-  a->Flush();
-  EXPECT_EQ(a->LogSize(), 0);
-
-  // Stop async logger
-  a->Stop();
-  a = nullptr;
-  google::ShutdownGoogleLogging();
-}
-
-TEST(AsyncLoggerTest, StartAndStop) {
-  // Start async logger
-  google::InitGoogleLogging("AsyncLoggerTest");
-
-  AsyncLogger* a = new AsyncLogger(google::base::GetLogger(google::INFO));
-  google::base::SetLogger(FLAGS_minloglevel, a);
-  a->Start();
-  a->LogThread()->detach();
-
-  // Stop async logger
-  a->Stop();
-  a = nullptr;
+TEST(AsyncLoggerTest, SetLoggerToGlog) {
+  google::InitGoogleLogging("AsyncLoggerTest2");
+  google::SetLogDestination(google::ERROR, "");
+  google::SetLogDestination(google::WARNING, "");
+  google::SetLogDestination(google::FATAL, "");
+  AsyncLogger* logger = new AsyncLogger(google::base::GetLogger(google::INFO));
+  google::base::SetLogger(FLAGS_minloglevel, logger);
+  logger->Start();
+  ALOG_MODULE("AsyncLoggerTest2", INFO) << "test set async logger to glog";
+  ALOG_MODULE("AsyncLoggerTest2", WARN) << "test set async logger to glog";
+  ALOG_MODULE("AsyncLoggerTest2", ERROR) << "test set async logger to glog";
+  logger->Stop();
+  logger = nullptr;
   google::ShutdownGoogleLogging();
 }
 
