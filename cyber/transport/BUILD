@@ -182,7 +182,7 @@ cc_library(
         ":dispatcher",
         ":notifier_factory",
         ":readable_info",
-        ":segment",
+        ":segment_factory",
         "//cyber/message:message_traits",
         "//cyber/proto:proto_desc_cc_proto",
         "//cyber/scheduler:scheduler_factory",
@@ -306,7 +306,6 @@ cc_library(
     deps = [
         ":readable_info",
         ":receiver",
-        ":segment",
     ],
 )
 
@@ -438,6 +437,28 @@ cc_library(
 )
 
 cc_library(
+    name = "xsi_segment",
+    srcs = ["shm/xsi_segment.cc"],
+    hdrs = ["shm/xsi_segment.h"],
+    deps = [
+        ":segment",
+        "//cyber/common:log",
+        "//cyber/common:util",
+    ],
+)
+
+cc_library(
+    name = "posix_segment",
+    srcs = ["shm/posix_segment.cc"],
+    hdrs = ["shm/posix_segment.h"],
+    deps = [
+        ":segment",
+        "//cyber/common:log",
+        "//cyber/common:util",
+    ],
+)
+
+cc_library(
     name = "segment",
     srcs = ["shm/segment.cc"],
     hdrs = ["shm/segment.h"],
@@ -447,6 +468,19 @@ cc_library(
         ":state",
         "//cyber/common:log",
         "//cyber/common:util",
+    ],
+)
+
+cc_library(
+    name = "segment_factory",
+    srcs = ["shm/segment_factory.cc"],
+    hdrs = ["shm/segment_factory.h"],
+    deps = [
+        ":xsi_segment",
+        ":posix_segment",
+        ":segment",
+        "//cyber/common:log",
+        "//cyber/common:global_data"
     ],
 )
 

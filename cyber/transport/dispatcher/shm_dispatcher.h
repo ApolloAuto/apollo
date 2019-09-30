@@ -30,7 +30,7 @@
 #include "cyber/message/message_traits.h"
 #include "cyber/transport/dispatcher/dispatcher.h"
 #include "cyber/transport/shm/notifier_factory.h"
-#include "cyber/transport/shm/segment.h"
+#include "cyber/transport/shm/segment_factory.h"
 
 namespace apollo {
 namespace cyber {

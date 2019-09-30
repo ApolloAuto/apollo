@@ -16,7 +16,8 @@ message ShmMulticastLocator {
 
 message ShmConf {
     optional string notifier_type = 1;
-    optional ShmMulticastLocator shm_locator = 2;
+    optional string shm_type = 2;
+    optional ShmMulticastLocator shm_locator = 3;
 };
 
 message RtpsParticipantAttr {

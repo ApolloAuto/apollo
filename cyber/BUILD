@@ -79,6 +79,7 @@ cc_library(
         "-lgflags",
         "-lprotobuf",
         "-luuid",
+        "-lrt",
     ],
     deps = [
         "//cyber:binary",
