@@ -67,7 +67,7 @@ class STBoundaryMapper {
       std::vector<STPoint>* lower_points) const;
 
   /** @brief Given a path-point and an obstacle bounding box, check if the
-    *        ADC, when at that path-point, will collide with the obstacle. 
+    *        ADC, when at that path-point, will collide with the obstacle.
     * @param The path-point of the center of rear-axis for ADC.
     * @param The bounding box of the obstacle.
     * @param The extra lateral buffer for our ADC.
