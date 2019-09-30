@@ -42,4 +42,20 @@ cc_test(
         "@gtest//:main",
     ],
 )
+
+cc_test(
+    name = "stage_approach_test",
+    size = "small",
+    srcs = [
+        "stage_approach_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        ":pull_over_emergency_scenario",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
