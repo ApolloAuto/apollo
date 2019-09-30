@@ -28,7 +28,7 @@
 #include "cyber/message/message_traits.h"
 #include "cyber/transport/shm/notifier_factory.h"
 #include "cyber/transport/shm/readable_info.h"
-#include "cyber/transport/shm/segment.h"
+#include "cyber/transport/shm/segment_factory.h"
 #include "cyber/transport/transmitter/transmitter.h"
 
 namespace apollo {
@@ -77,7 +77,7 @@ void ShmTransmitter<M>::Enable() {
     return;
   }
 
-  segment_ = std::make_shared<Segment>(channel_id_, WRITE_ONLY);
+  segment_ = SegmentFactory::CreateSegment(channel_id_);
   notifier_ = NotifierFactory::CreateNotifier();
   this->enabled_ = true;
 }
