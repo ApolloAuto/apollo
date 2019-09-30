@@ -21,6 +21,7 @@
 #include "modules/planning/scenarios/park/pull_over_emergency/pull_over_emergency_scenario.h"
 
 #include "cyber/common/log.h"
+#include "modules/planning/scenarios/park/pull_over_emergency/stage_approach.h"
 
 namespace apollo {
 namespace planning {
@@ -51,13 +52,11 @@ void PullOverEmergencyScenario::RegisterStages() {
   if (!s_stage_factory_.Empty()) {
     s_stage_factory_.Clear();
   }
-  /*
   s_stage_factory_.Register(
-      ScenarioConfig::PULL_OVER_APPROACH,
+      ScenarioConfig::PULL_OVER_EMERGENCY_APPROACH,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
         return new PullOverEmergencyStageApproach(config);
       });
-      */
 }
 
 std::unique_ptr<Stage> PullOverEmergencyScenario::CreateStage(
