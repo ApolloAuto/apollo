@@ -47,7 +47,7 @@ cc_binary(
     linkstatic = 0,
     deps = [
         "//modules/localization/msf/local_tool/map_creation/poses_interpolation:poses_interpolation_lib",
-        "@eigen//:eigen",
+        "@eigen",
     ],
 )
 

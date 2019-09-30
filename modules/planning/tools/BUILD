@@ -10,7 +10,8 @@ cc_binary(
         "//external:gflags",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util",
-        "//modules/planning/proto:planning_proto",    ],
+        "//modules/planning/proto:planning_proto",
+    ],
 )
 
 cpplint()
