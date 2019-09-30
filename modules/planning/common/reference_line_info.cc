@@ -620,9 +620,7 @@ void ReferenceLineInfo::SetEmergencyLight() {
 void ReferenceLineInfo::ExportVehicleSignal(
     common::VehicleSignal* vehicle_signal) const {
   CHECK_NOTNULL(vehicle_signal);
-  vehicle_signal->Clear();
-
-  vehicle_signal->CopyFrom(vehicle_signal_);
+  *vehicle_signal = vehicle_signal_;
   SetTurnSignal(vehicle_signal);
 }
 

@@ -54,6 +54,11 @@ Stage::StageStatus PullOverEmergencyStageApproach::Process(
     AERROR << "PullOverEmergencyStageApproach planning error";
   }
 
+  auto& reference_line_info = frame->mutable_reference_line_info()->front();
+
+  // set vehicle signal
+  reference_line_info.SetEmergencyLight();
+
   // TODO(all): to be implemented
   if (1) {
     return FinishStage(false);
