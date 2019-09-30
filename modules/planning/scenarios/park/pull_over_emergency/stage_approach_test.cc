@@ -41,7 +41,8 @@ class StageApproachTest : public ::testing::Test {
 TEST_F(StageApproachTest, Init) {
   PullOverEmergencyStageApproach pull_over_emergency_stage_approach(config_);
   EXPECT_EQ(pull_over_emergency_stage_approach.Name(),
-            ScenarioConfig::StageType_Name(config_.stage_type()));
+            ScenarioConfig::StageType_Name(
+                ScenarioConfig::PULL_OVER_EMERGENCY_APPROACH));
 }
 
 }  // namespace pull_over_emergency

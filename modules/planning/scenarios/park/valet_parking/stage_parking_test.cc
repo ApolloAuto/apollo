@@ -40,7 +40,8 @@ class StageParkingTest : public ::testing::Test {
 TEST_F(StageParkingTest, Init) {
   StageParking stage_parking(config_);
   EXPECT_EQ(stage_parking.Name(),
-            ScenarioConfig::StageType_Name(config_.stage_type()));
+            ScenarioConfig::StageType_Name(
+                ScenarioConfig::VALET_PARKING_PARKING));
 }
 
 }  // namespace valet_parking
