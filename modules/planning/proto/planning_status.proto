@@ -74,6 +74,11 @@ message PathDeciderStatus {
   repeated LaneBorrowDirection decided_side_pass_direction = 5;
 }
 
+message PathReuseDeciderStatus  {
+    optional bool reused_path = 1 [default = true];
+    optional int32 blocking_obstacle_cycle_counter = 2 [default = 0];
+}
+
 message PedestrianStatus {
   repeated StopTime stop_time = 1;
 }
@@ -138,12 +143,13 @@ message PlanningStatus {
   optional PedestrianStatus pedestrian = 7;
   optional ParkAndGoStatus park_and_go = 8;
   optional PathDeciderStatus path_decider = 9;
-  optional PullOverStatus pull_over = 10;
-  optional ReroutingStatus rerouting = 11;
-  optional RightOfWayStatus right_of_way = 12;
-  optional ScenarioStatus scenario = 13;
-  optional SidePassStatus side_pass = 14;
-  optional StopSignStatus stop_sign = 15;
-  optional TrafficLightStatus traffic_light = 16;
-  optional YieldSignStatus yield_sign = 17;
+  optional PathReuseDeciderStatus path_reuse_decider = 10;
+  optional PullOverStatus pull_over = 11;
+  optional ReroutingStatus rerouting = 12;
+  optional RightOfWayStatus right_of_way = 13;
+  optional ScenarioStatus scenario = 14;
+  optional SidePassStatus side_pass = 15;
+  optional StopSignStatus stop_sign = 16;
+  optional TrafficLightStatus traffic_light = 17;
+  optional YieldSignStatus yield_sign = 18;
 }
