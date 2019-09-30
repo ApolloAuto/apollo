@@ -226,12 +226,16 @@ class ReferenceLineInfo {
 
   std::vector<common::SLPoint> GetAllStopDecisionSLPoint() const;
 
+  void SetTurnSignal(const common::VehicleSignal::TurnSignal& turn_signal);
+  void SetEmergencyLight();
+
  private:
   void InitFirstOverlaps();
 
   bool CheckChangeLane() const;
 
-  void ExportTurnSignal(common::VehicleSignal* signal) const;
+  void SetTurnSignal(common::VehicleSignal* vehicle_signal) const;
+  void ExportVehicleSignal(common::VehicleSignal* vehicle_signal) const;
 
   bool IsIrrelevantObstacle(const Obstacle& obstacle);
 
@@ -315,6 +319,8 @@ class ReferenceLineInfo {
    * different st optimizer
    */
   StGraphData st_graph_data_;
+
+  common::VehicleSignal vehicle_signal_;
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };
