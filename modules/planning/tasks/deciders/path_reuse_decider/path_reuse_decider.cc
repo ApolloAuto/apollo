@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 
+#include "modules/planning/common/planning_context.h"
+
 namespace apollo {
 namespace planning {
 // #define ADEBUG AINFO
@@ -39,20 +41,50 @@ PathReuseDecider::PathReuseDecider(const TaskConfig& config)
 
 Status PathReuseDecider::Process(Frame* const frame,
                                  ReferenceLineInfo* const reference_line_info) {
+  if (!Decider::config_.path_reuse_decider_config().reuse_path())
+    return Status::OK();
   // Sanity checks.
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  // do not reuse path during sidepass
-  if (Decider::config_.path_reuse_decider_config().reuse_path() &&
-      !reference_line_info->is_path_lane_borrow()) {
-    ++total_path_counter_;  // count total path
+  // check front static blocking obstacle
+  auto* mutable_path_reuse_decider_status = PlanningContext::Instance()
+                                                ->mutable_planning_status()
+                                                ->mutable_path_reuse_decider();
+  const int kWaitCycle = 3;  // wait 3 cycle
+  ADEBUG << "reuse or not: "
+         << mutable_path_reuse_decider_status->reused_path();
+  if (mutable_path_reuse_decider_status->reused_path()) {
+    ADEBUG << "reused path";
+    // if (CheckPathReusable(frame, reference_line_info)) ADEBUG << "collision";
     if (CheckPathReusable(frame, reference_line_info)) {
+      ADEBUG << "no collision";
       ++reusable_path_counter_;  // count reusable path
       if (!TrimHistoryPath(frame, reference_line_info))
-        AERROR << "Failed to trim reference line ";
+        AERROR << "Failed to trim reused path";
+    } else {
+      // disable reuse path
+      ADEBUG << "collision!!!";
+      mutable_path_reuse_decider_status->set_reused_path(false);
+    }
+  } else {
+    int blocking_obstacle_cycle_counter =
+        mutable_path_reuse_decider_status->blocking_obstacle_cycle_counter();
+    ADEBUG
+        << "counter: "
+        << mutable_path_reuse_decider_status->blocking_obstacle_cycle_counter();
+    if (reference_line_info->GetBlockingObstacle() != nullptr &&
+        mutable_path_reuse_decider_status->blocking_obstacle_cycle_counter() >
+            kWaitCycle) {
+      // enable reuse path
+      mutable_path_reuse_decider_status->set_reused_path(true);
+      mutable_path_reuse_decider_status->set_blocking_obstacle_cycle_counter(0);
+    } else {
+      mutable_path_reuse_decider_status->set_blocking_obstacle_cycle_counter(
+          blocking_obstacle_cycle_counter + 1);
     }
   }
+  ++total_path_counter_;
   ADEBUG << "reusable_path_counter_" << reusable_path_counter_;
   ADEBUG << "total_path_counter_" << total_path_counter_;
   return Status::OK();
@@ -60,14 +92,14 @@ Status PathReuseDecider::Process(Frame* const frame,
 
 bool PathReuseDecider::CheckPathReusable(
     Frame* const frame, ReferenceLineInfo* const reference_line_info) {
-  if (!IsSameStopObstacles(frame, reference_line_info))
-    ADEBUG << "not same stop obstacle";
-  return (IsCollisionFree(reference_line_info) &&
-          IsSameStopObstacles(frame, reference_line_info));
+  //   if (!IsSameStopObstacles(frame, reference_line_info))
+  //     ADEBUG << "not same stop obstacle";
+  //   return (IsCollisionFree(reference_line_info) &&
+  //           IsSameStopObstacles(frame, reference_line_info));
   //   return IsSameStopObstacles(frame, reference_line_info);
   //   return IsSameObstacles(reference_line_info);
-  //   ADEBUG << "Check Collision";
-  //   return IsCollisionFree(reference_line_info);
+  ADEBUG << "Check Collision";
+  return IsCollisionFree(reference_line_info);
 }
 
 bool PathReuseDecider::IsSameStopObstacles(
@@ -266,7 +298,6 @@ bool PathReuseDecider::IsCollisionFree(
   std::vector<Polygon2d> obstacle_polygons;
   for (auto obstacle :
        reference_line_info->path_decision()->obstacles().Items()) {
-    ADEBUG << "obstacle_boundaries";
     // filtered all non-static objects and virtual obstacle
     if (!obstacle->IsStatic() || obstacle->IsVirtual()) {
       if (!obstacle->IsStatic()) ADEBUG << "SPOT a dynamic obstacle";
