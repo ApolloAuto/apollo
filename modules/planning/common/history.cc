@@ -126,23 +126,22 @@ const HistoryObjectDecision* HistoryFrame::GetObjectDecisionsById(
 ////////////////////////////////////////////////
 // HistoryObjectStatus
 
-void HistoryObjectStatus::Init(
-    const std::string& id, const ObjectStatus& object_status) {
+void HistoryObjectStatus::Init(const std::string& id,
+                               const ObjectStatus& object_status) {
   id_ = id;
   object_status_ = object_status;
 }
 
-
 ////////////////////////////////////////////////
 // HistoryStatus
 
-void HistoryStatus::SetObjectStatus(
-    const std::string& id, const ObjectStatus& object_status) {
+void HistoryStatus::SetObjectStatus(const std::string& id,
+                                    const ObjectStatus& object_status) {
   object_id_to_status_[id] = object_status;
 }
 
-bool HistoryStatus::GetObjectStatus(
-    const std::string& id, ObjectStatus* const object_status) {
+bool HistoryStatus::GetObjectStatus(const std::string& id,
+                                    ObjectStatus* const object_status) {
   if (object_id_to_status_.count(id) == 0) {
     return false;
   }
@@ -150,7 +149,6 @@ bool HistoryStatus::GetObjectStatus(
   *object_status = object_id_to_status_[id];
   return true;
 }
-
 
 ////////////////////////////////////////////////
 // History

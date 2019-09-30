@@ -122,8 +122,7 @@ bool PlanningComponent::Proc(
   }
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    local_view_.pad_msg =
-        std::make_shared<PadMessage>(pad_msg_);
+    local_view_.pad_msg = std::make_shared<PadMessage>(pad_msg_);
   }
 
   if (!CheckInput()) {

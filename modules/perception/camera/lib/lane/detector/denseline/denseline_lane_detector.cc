@@ -161,8 +161,8 @@ bool DenselineLaneDetector::Detect(const LaneDetectorOptions &options,
     return false;
   }
   if (input_height_ != data_provider->src_height()) {
-    AERROR  << "Input size is not correct: " << input_height_ << " vs "
-            << data_provider->src_height();
+    AERROR << "Input size is not correct: " << input_height_ << " vs "
+           << data_provider->src_height();
     return false;
   }
 

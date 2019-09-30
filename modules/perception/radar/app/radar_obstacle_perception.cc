@@ -75,7 +75,7 @@ bool RadarObstaclePerception::Perceive(
   base::FramePtr detect_frame_ptr(new base::Frame());
 
   if (!detector_->Detect(corrected_obstacles, options.detector_options,
-                        detect_frame_ptr)) {
+                         detect_frame_ptr)) {
     AERROR << "radar detect error";
     return false;
   }
@@ -91,7 +91,7 @@ bool RadarObstaclePerception::Perceive(
 
   base::FramePtr tracker_frame_ptr = std::make_shared<base::Frame>();
   if (!tracker_->Track(*detect_frame_ptr, options.track_options,
-                      tracker_frame_ptr)) {
+                       tracker_frame_ptr)) {
     AERROR << "radar track error";
     return false;
   }

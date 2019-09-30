@@ -29,14 +29,10 @@ using apollo::common::Status;
 STGuideLine::STGuideLine() {}
 
 // TODO(jiacheng): implement this.
-Status STGuideLine::ComputeSTGuideLine() {
-  return Status::OK();
-}
+Status STGuideLine::ComputeSTGuideLine() { return Status::OK(); }
 
 // TODO(jiacheng): implement this.
-double STGuideLine::GetGuideSFromT(double t) {
-  return 0.0;
-}
+double STGuideLine::GetGuideSFromT(double t) { return 0.0; }
 
-}
-}
+}  // namespace planning
+}  // namespace apollo
