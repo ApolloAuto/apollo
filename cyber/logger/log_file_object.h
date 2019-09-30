@@ -18,6 +18,7 @@
 #define CYBER_LOGGER_LOG_FILE_OBJECT_H_
 
 #include <cstdint>
+#include <iomanip>
 #include <mutex>
 #include <string>
 
@@ -27,44 +28,70 @@ namespace apollo {
 namespace cyber {
 namespace logger {
 
+// the C99 format
+typedef int32_t int32;
+typedef uint32_t uint32;
+typedef int64_t int64;
+typedef uint64_t uint64;
+
+using google::LogSeverity;
+using google::NUM_SEVERITIES;
+using std::ostringstream;
+using std::setw;
+using std::string;
+
+// Encapsulates all file-system related state
 class LogFileObject : public google::base::Logger {
  public:
-  LogFileObject(google::LogSeverity severity, const char* base_filename);
+  LogFileObject(LogSeverity severity, const char* base_filename);
   ~LogFileObject();
 
-  void Write(bool force_flush, time_t timestamp, const char* message,
-             int message_len) override;
+  void Write(bool force_flush,  // Should we force a flush here?
+             time_t timestamp,  // Timestamp for this entry
+             const char* message, int message_len) override;
 
+  // Configuration options
   void SetBasename(const char* basename);
   void SetExtension(const char* ext);
   void SetSymlinkBasename(const char* symlink_basename);
 
+  // Normal flushing routine
   void Flush() override;
 
-  // It is the actual file length for the system loggers
-  uint32_t LogSize() override {
+  // It is the actual file length for the system loggers,
+  // i.e., INFO, ERROR, etc.
+  uint32 LogSize() override {
     std::lock_guard<std::mutex> lock(lock_);
     return file_length_;
   }
 
+  // Internal flush routine.  Exposed so that FlushLogFilesUnsafe()
+  // can avoid grabbing a lock.  Usually Flush() calls it after
+  // acquiring lock_.
   void FlushUnlocked();
 
+  const string& hostname();
+
  private:
-  bool CreateLogfile(const std::string& time_pid_string);
-  static const uint32_t kRolloverAttemptFrequency = 0x20;
+  static const uint32 kRolloverAttemptFrequency = 0x20;
+
   std::mutex lock_;
   bool base_filename_selected_;
-  std::string base_filename_;
-  std::string base_filepath_;
-  std::string symlink_basename_;
-  std::string filename_extension_;
+  string base_filename_;
+  string symlink_basename_;
+  string filename_extension_;  // option users can specify (eg to add port#)
   FILE* file_;
-  google::LogSeverity severity_;
-  uint32_t bytes_since_flush_;
-  uint32_t dropped_mem_length_;
-  uint32_t file_length_;
+  LogSeverity severity_;
+  uint32 bytes_since_flush_;
+  uint32 file_length_;
   unsigned int rollover_attempt_;
-  int64_t next_flush_time_;  // cycle count of which to flush log
+  int64 next_flush_time_;  // cycle count at which to flush log
+  string hostname_;
+
+  // Actually create a logfile using the value of base_filename_ and the
+  // supplied argument time_pid_string
+  // REQUIRES: lock_ is held
+  bool CreateLogfile(const string& time_pid_string);
 };
 
 }  // namespace logger

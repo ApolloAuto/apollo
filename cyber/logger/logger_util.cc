@@ -32,9 +32,7 @@ namespace apollo {
 namespace cyber {
 namespace logger {
 
-namespace {
 static int32_t g_main_thread_pid = getpid();
-}
 
 int32_t GetMainThreadPid() { return g_main_thread_pid; }
 

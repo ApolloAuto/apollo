@@ -54,7 +54,11 @@ void Logger::Write(bool force_flush, time_t timestamp, const char* message,
     if (moduleLoggerMap.find(module_name) != moduleLoggerMap.end()) {
       fileobject = moduleLoggerMap[module_name];
     } else {
-      fileobject = new LogFileObject(google::INFO, module_name.c_str());
+      std::string file_name = module_name + ".log.INFO.";
+      if (!FLAGS_log_dir.empty()) {
+        file_name = FLAGS_log_dir + "/" + file_name;
+      }
+      fileobject = new LogFileObject(google::INFO, file_name.c_str());
       fileobject->SetSymlinkBasename(module_name.c_str());
       moduleLoggerMap[module_name] = fileobject;
     }

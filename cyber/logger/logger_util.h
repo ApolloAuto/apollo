@@ -43,6 +43,8 @@ inline int64_t CycleClock_Now() {
   return static_cast<int64_t>(tv.tv_sec) * 1000000 + tv.tv_usec;
 }
 
+inline int64_t UsecToCycles(int64_t usec) { return usec; }
+
 static inline void GetHostName(std::string* hostname) {
   struct utsname buf;
   if (0 != uname(&buf)) {
