@@ -62,7 +62,7 @@ TEST(Node_Channel_ImplTest, test2) {
 
     role_attr.set_channel_name(channelName);
     w = n->CreateWriter<proto::Chatter>(role_attr);
-    EXPECT_TRUE(w != nullptr);
+    EXPECT_NE(w, nullptr);
   }
 
   {
@@ -80,10 +80,10 @@ TEST(Node_Channel_ImplTest, test2) {
 
     role_attr.set_channel_name(channelName);
     w = n->CreateWriter<proto::Chatter>(role_attr);
-    EXPECT_TRUE(w != nullptr);
+    EXPECT_NE(w, nullptr);
 
     w = n->CreateWriter<proto::Chatter>(channelName);
-    EXPECT_TRUE(w != nullptr);
+    EXPECT_NE(w, nullptr);
   }
 }
 
@@ -105,7 +105,7 @@ TEST(Node_Channel_ImplTest, test3) {
     n->ClearData();
 
     auto r = n->CreateReader<proto::Chatter>("/chatter1", callback);
-    EXPECT_TRUE(r != nullptr);
+    EXPECT_NE(r, nullptr);
 
     proto::RoleAttributes role_attr;
     r = n->CreateReader<proto::Chatter>(role_attr, callback);
@@ -117,7 +117,7 @@ TEST(Node_Channel_ImplTest, test3) {
 
     role_attr.set_channel_name("/chatter2");
     r = n->CreateReader<proto::Chatter>(role_attr, callback);
-    EXPECT_TRUE(r != nullptr);
+    EXPECT_NE(r, nullptr);
 
     r = n->CreateReader<proto::Chatter>(role_attr);
     EXPECT_EQ(r, nullptr);
@@ -125,7 +125,7 @@ TEST(Node_Channel_ImplTest, test3) {
     ReaderConfig rc;
     rc.channel_name.assign("/chatter3");
     r = n->CreateReader<proto::Chatter>(rc, callback);
-    EXPECT_TRUE(r != nullptr);
+    EXPECT_NE(r, nullptr);
 
     n->Observe();
     n->ClearData();
@@ -140,7 +140,7 @@ TEST(Node_Channel_ImplTest, test3) {
     n->ClearData();
 
     auto r = n->CreateReader<proto::Chatter>("/chatter1", callback);
-    EXPECT_TRUE(r != nullptr);
+    EXPECT_NE(r, nullptr);
 
     proto::RoleAttributes role_attr;
     r = n->CreateReader<proto::Chatter>(role_attr, callback);
@@ -152,7 +152,7 @@ TEST(Node_Channel_ImplTest, test3) {
 
     role_attr.set_channel_name("/chatter2");
     r = n->CreateReader<proto::Chatter>(role_attr, callback);
-    EXPECT_TRUE(r != nullptr);
+    EXPECT_NE(r, nullptr);
 
     r = n->CreateReader<proto::Chatter>(role_attr);
     EXPECT_EQ(r, nullptr);
@@ -160,7 +160,7 @@ TEST(Node_Channel_ImplTest, test3) {
     ReaderConfig rc;
     rc.channel_name.assign("/chatter3");
     r = n->CreateReader<proto::Chatter>(rc, callback);
-    EXPECT_TRUE(r != nullptr);
+    EXPECT_NE(r, nullptr);
 
     n->Observe();
     n->ClearData();
