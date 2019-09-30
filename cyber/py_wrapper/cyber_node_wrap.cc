@@ -619,9 +619,10 @@ PyObject *cyber_PyChannelUtils_get_debugstring_by_msgtype_rawmsgdata(
 static PyObject *cyber_PyChannelUtils_get_active_channels(PyObject *self,
                                                           PyObject *args) {
   unsigned char sleep_s = 0;
-  if (!PyArg_ParseTuple(args, const_cast<char *>(
-                                  "B:cyber_PyChannelUtils_get_active_channels"),
-                        &sleep_s)) {
+  if (!PyArg_ParseTuple(
+          args,
+          const_cast<char *>("B:cyber_PyChannelUtils_get_active_channels"),
+          &sleep_s)) {
     AERROR << "cyber_PyChannelUtils_get_active_channels failed!";
     Py_INCREF(Py_None);
     return Py_None;
@@ -755,9 +756,10 @@ PyObject *cyber_PyNodeUtils_get_writersofnode(PyObject *self, PyObject *args) {
 PyObject *cyber_PyServiceUtils_get_active_services(PyObject *self,
                                                    PyObject *args) {
   unsigned char sleep_s = 0;
-  if (!PyArg_ParseTuple(args, const_cast<char *>(
-                                  "B:cyber_PyServiceUtils_get_active_services"),
-                        &sleep_s)) {
+  if (!PyArg_ParseTuple(
+          args,
+          const_cast<char *>("B:cyber_PyServiceUtils_get_active_services"),
+          &sleep_s)) {
     AERROR << "cyber_PyServiceUtils_get_active_services failed!";
     Py_INCREF(Py_None);
     return Py_None;

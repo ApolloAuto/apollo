@@ -38,8 +38,8 @@ struct PullOverEmergencyContext {
 
 class PullOverEmergencyScenario : public Scenario {
  public:
-  PullOverEmergencyScenario(
-      const ScenarioConfig& config, const ScenarioContext* context)
+  PullOverEmergencyScenario(const ScenarioConfig& config,
+                            const ScenarioContext* context)
       : Scenario(config, context) {}
 
   void Init() override;

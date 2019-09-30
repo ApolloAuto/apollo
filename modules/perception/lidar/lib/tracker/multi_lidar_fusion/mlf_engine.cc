@@ -196,7 +196,7 @@ void MlfEngine::CollectTrackedResult(LidarFrame* frame) {
         ++num_predict;
       } else {
         if (!track_data->ToObject(-global_to_local_offset_, frame->timestamp,
-                                   tracked_objects[pos])) {
+                                  tracked_objects[pos])) {
           AERROR << "Tracking failed";
           continue;
         }

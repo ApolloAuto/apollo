@@ -615,8 +615,8 @@ bool PathBoundsDecider::SearchPullOverPosition(
            vehicle_param.back_edge_to_center()) /
           vehicle_param.length() / kPulloverLonSearchCoeff;
       auto pull_over_idx = static_cast<size_t>(
-                   back_clear_to_total_length_ratio * static_cast<double>(i) +
-           (1.0 - back_clear_to_total_length_ratio) * static_cast<double>(j));
+          back_clear_to_total_length_ratio * static_cast<double>(i) +
+          (1.0 - back_clear_to_total_length_ratio) * static_cast<double>(j));
       const auto& pull_over_point = path_bound[pull_over_idx];
       const double pull_over_s = std::get<0>(pull_over_point);
       const double pull_over_l =
@@ -644,9 +644,9 @@ bool PathBoundsDecider::SearchPullOverPosition(
               point, 5.0, pull_over_theta, M_PI_2, &lane, &s, &l) == 0) {
         pull_over_theta = lane->Heading(s);
       }
-      *pull_over_configuration = std::make_tuple(pull_over_x, pull_over_y,
-                                                 pull_over_theta,
-                                             static_cast<int>(pull_over_idx));
+      *pull_over_configuration =
+          std::make_tuple(pull_over_x, pull_over_y, pull_over_theta,
+                          static_cast<int>(pull_over_idx));
       break;
     }
     --i;

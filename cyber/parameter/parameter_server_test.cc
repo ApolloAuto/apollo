@@ -38,9 +38,7 @@ class ParameterServerTest : public ::testing::Test {
     ps_.reset(new ParameterServer(node_));
   }
 
-  virtual void TearDown() {
-    ps_.reset();
-  }
+  virtual void TearDown() { ps_.reset(); }
 
  protected:
   std::shared_ptr<Node> node_;

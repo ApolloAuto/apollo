@@ -35,16 +35,16 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundary(
 }
 
 // TODO(jiacheng): implement this.
-std::pair<double, double>
-    STObstaclesProcessor::GetRegularBoundaryFromObstacles(double t) {
+std::pair<double, double> STObstaclesProcessor::GetRegularBoundaryFromObstacles(
+    double t) {
   return 0.0;
 }
 
 // TODO(jiacheng): implement this.
 std::pair<double, double>
-    STObstaclesProcessor::GetFallbackBoundaryFromObstacles(double t) {
+STObstaclesProcessor::GetFallbackBoundaryFromObstacles(double t) {
   return 0.0;
 }
 
-}
-}
+}  // namespace planning
+}  // namespace apollo

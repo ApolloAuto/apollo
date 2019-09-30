@@ -153,15 +153,15 @@ class Frame {
 
   const LocalView &local_view() const { return local_view_; }
 
-  ThreadSafeIndexedObstacles* GetObstacleList() { return &obstacles_; }
+  ThreadSafeIndexedObstacles *GetObstacleList() { return &obstacles_; }
 
   const OpenSpaceInfo &open_space_info() const { return open_space_info_; }
 
-  OpenSpaceInfo* mutable_open_space_info() { return &open_space_info_; }
+  OpenSpaceInfo *mutable_open_space_info() { return &open_space_info_; }
 
   perception::TrafficLight GetSignal(const std::string &traffic_light_id) const;
 
-  const DrivingAction& GetPadMsgDrivingAction() const {
+  const DrivingAction &GetPadMsgDrivingAction() const {
     return pad_msg_driving_action_;
   }
 
@@ -177,12 +177,12 @@ class Frame {
    * @return pointer to the obstacle if such obstacle exists, otherwise
    * @return false if no colliding obstacle.
    */
-  const Obstacle* FindCollisionObstacle() const;
+  const Obstacle *FindCollisionObstacle() const;
 
   /**
    * @brief create a static virtual obstacle
    */
-  const Obstacle* CreateStaticVirtualObstacle(const std::string &id,
+  const Obstacle *CreateStaticVirtualObstacle(const std::string &id,
                                               const common::math::Box2d &box);
 
   void AddObstacle(const Obstacle &obstacle);

@@ -29,14 +29,12 @@ using apollo::common::Status;
 STDrivingLimits::STDrivingLimits() {}
 
 // TODO(jiacheng): implement this.
-Status STDrivingLimits::ComputeSTDrivingLimits() {
-  return Status::OK();
-}
+Status STDrivingLimits::ComputeSTDrivingLimits() { return Status::OK(); }
 
 // TODO(jiacheng): implement this.
 std::pair<double, double> STDrivingLimits::GetVehicleDynamicsLimits(double t) {
   return 0.0;
 }
 
-}
-}
+}  // namespace planning
+}  // namespace apollo

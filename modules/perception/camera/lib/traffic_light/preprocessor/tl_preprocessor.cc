@@ -279,7 +279,6 @@ bool TLPreprocessor::ProjectLightsAndSelectCamera(
     const CarPose &pose, const TLPreprocessorOption &option,
     std::string *selected_camera_name,
     std::vector<base::TrafficLightPtr> *lights) {
-
   if (selected_camera_name == nullptr) {
     AERROR << "selected_camera_name is not available";
     return false;
