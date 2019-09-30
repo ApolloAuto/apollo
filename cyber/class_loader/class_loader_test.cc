@@ -36,7 +36,7 @@ TEST(ClassLoaderTest, createClassObj) {
   ClassLoader loader1(LIBRARY_1);
   EXPECT_EQ(LIBRARY_1, loader1.GetLibraryPath());
   auto rect_obj = loader1.CreateClassObj<Base>("Rect");
-  EXPECT_TRUE(nullptr != rect_obj);
+  EXPECT_NE(nullptr, rect_obj);
   rect_obj->DoSomething();
   EXPECT_EQ(nullptr, loader1.CreateClassObj<Base>("Xeee"));
 
@@ -95,13 +95,13 @@ TEST(ClassLoaderManagerTest, testClassLoaderManager) {
   }
 
   auto pear_obj = loader_mgr.CreateClassObj<Base>("Pear", LIBRARY_2);
-  EXPECT_TRUE(nullptr != pear_obj);
+  EXPECT_NE(nullptr, pear_obj);
   pear_obj->DoSomething();
 
   auto null_obj = loader_mgr.CreateClassObj<Base>("Pear", LIBRARY_1);
-  EXPECT_TRUE(nullptr == null_obj);
+  EXPECT_EQ(nullptr, null_obj);
   auto null_obj1 = loader_mgr.CreateClassObj<Base>("ClassNull", "libNull.so");
-  EXPECT_TRUE(nullptr == null_obj1);
+  EXPECT_EQ(nullptr, null_obj1);
 
   EXPECT_TRUE(loader_mgr.IsClassValid<Base>("Rect"));
   EXPECT_TRUE(loader_mgr.IsClassValid<Base>("Circle"));
