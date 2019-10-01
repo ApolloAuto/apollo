@@ -25,12 +25,14 @@ RUN apt update -y && \
     python-dev \
     python3 \
     python3-dev \
+    qt5-default \
     libasio-dev \
     libtinyxml2-6 \
     libtinyxml2-dev \
     libncurses5-dev \
     libavcodec57 \
     libavcodec-dev \
+    libconsole-bridge-dev \
     libswscale4 \
     libswscale-dev \
     libcurl4-nss-dev \

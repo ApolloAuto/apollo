@@ -256,13 +256,6 @@ new_http_archive(
     url = "https://github.com/ApolloAuto/apollo-contrib/releases/download/v3.0.0/plat-sw-3.0.0.1.zip",
 )
 
-# qt
-new_local_repository(
-    name = "qt",
-    build_file = "third_party/qt.BUILD",
-    path = "/usr/local/Qt5.5.1/5.5/gcc_64",
-)
-
 new_local_repository(
     name = "fastrtps",
     build_file = "third_party/fastrtps.BUILD",
