@@ -20,7 +20,7 @@ INCHINA="no"
 LOCAL_IMAGE="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="cyber-x86_64-18.04-20190613_1540"
+VERSION_X86_64="cyber-x86_64-18.04-20190930_1641"
 VERSION_AARCH64="cyber-aarch64-18.04-20190621_1606"
 VERSION_OPT=""
 
@@ -192,7 +192,7 @@ function main(){
         info "Start docker container based on local image : $IMG"
     else
         info "Start pulling docker image $IMG ..."
-        docker pull $IMG
+        #docker pull $IMG
         if [ $? -ne 0 ];then
             error "Failed to pull docker image."
             exit 1
