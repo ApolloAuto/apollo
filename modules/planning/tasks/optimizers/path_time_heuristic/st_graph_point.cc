@@ -37,6 +37,10 @@ double StGraphPoint::reference_cost() const { return reference_cost_; }
 
 double StGraphPoint::obstacle_cost() const { return obstacle_cost_; }
 
+double StGraphPoint::spatial_potential_cost() const {
+  return spatial_potential_cost_;
+}
+
 double StGraphPoint::total_cost() const { return total_cost_; }
 
 void StGraphPoint::Init(const std::uint32_t index_t,
@@ -52,6 +56,11 @@ void StGraphPoint::SetReferenceCost(const double reference_cost) {
 
 void StGraphPoint::SetObstacleCost(const double obs_cost) {
   obstacle_cost_ = obs_cost;
+}
+
+void StGraphPoint::SetSpatialPotentialCost(
+    const double spatial_potential_cost) {
+  spatial_potential_cost_ = spatial_potential_cost;
 }
 
 void StGraphPoint::SetTotalCost(const double total_cost) {

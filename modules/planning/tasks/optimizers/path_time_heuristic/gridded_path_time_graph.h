@@ -84,6 +84,8 @@ class GriddedPathTimeGraph {
 
   std::vector<double> speed_limit_by_index_;
 
+  std::vector<double> spatial_distance_by_index_;
+
   // dp st configuration
   DpStSpeedConfig gridded_path_time_graph_config_;
 
@@ -100,8 +102,16 @@ class GriddedPathTimeGraph {
   // cost utility with configuration;
   DpStCost dp_st_cost_;
 
-  double unit_s_ = 0.0;
+  double total_length_t_ = 0.0;
   double unit_t_ = 0.0;
+  uint32_t dimension_t_ = 0;
+
+  double total_length_s_ = 0.0;
+  double dense_unit_s_ = 0.0;
+  double sparse_unit_s_ = 0.0;
+  uint32_t dense_dimension_s_ = 0;
+  uint32_t sparse_dimension_s_ = 0;
+  uint32_t dimension_s_ = 0;
 
   // cost_table_[t][s]
   // row: s, col: t --- NOTICE: Please do NOT change.

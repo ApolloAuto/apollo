@@ -42,12 +42,15 @@ using apollo::common::Status;
 
 namespace {
 
+// Continuous-time collision check using linear interpolation as closed-loop
+// dynamics
 bool CheckOverlapOnDpStGraph(const std::vector<const STBoundary*>& boundaries,
                              const StGraphPoint& p1, const StGraphPoint& p2) {
   for (const auto* boundary : boundaries) {
     if (boundary->boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
       continue;
     }
+    // Check collision between a polygon and a line segment
     if (boundary->HasOverlap({p1.point(), p2.point()})) {
       return true;
     }
@@ -64,27 +67,33 @@ GriddedPathTimeGraph::GriddedPathTimeGraph(
       gridded_path_time_graph_config_(dp_config),
       obstacles_(obstacles),
       init_point_(init_point),
-      dp_st_cost_(dp_config, st_graph_data_.total_time_by_conf(), obstacles,
-                  init_point_) {
-  unit_s_ = st_graph_data_.path_length() /
-            (gridded_path_time_graph_config_.matrix_dimension_s() - 1);
-  unit_t_ = st_graph_data_.total_time_by_conf() /
-            (gridded_path_time_graph_config_.matrix_dimension_t() - 1);
+      dp_st_cost_(dp_config, st_graph_data_.total_time_by_conf(),
+                  st_graph_data_.path_length(), obstacles, init_point_) {
+  total_length_t_ = st_graph_data_.total_time_by_conf();
+  unit_t_ = gridded_path_time_graph_config_.unit_t();
+  total_length_s_ = st_graph_data_.path_length();
+  dense_unit_s_ = gridded_path_time_graph_config_.dense_unit_s();
+  sparse_unit_s_ = gridded_path_time_graph_config_.sparse_unit_s();
+  dense_dimension_s_ = gridded_path_time_graph_config_.dense_dimension_s();
 }
 
 Status GriddedPathTimeGraph::Search(SpeedData* const speed_data) {
   constexpr double kBounadryEpsilon = 1e-2;
   for (const auto& boundary : st_graph_data_.st_boundaries()) {
+    // KeepClear obstacles not considered in Dp St decision
     if (boundary->boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
       continue;
     }
+    // If init point in collision with obstacle, return speed fallback
     if (boundary->IsPointInBoundary({0.0, 0.0}) ||
         (std::fabs(boundary->min_t()) < kBounadryEpsilon &&
          std::fabs(boundary->min_s()) < kBounadryEpsilon)) {
+      dimension_t_ = static_cast<uint32_t>(std::ceil(
+                         total_length_t_ / static_cast<double>(unit_t_))) +
+                     1;
       std::vector<SpeedPoint> speed_profile;
       double t = 0.0;
-      for (int i = 0; i < gridded_path_time_graph_config_.matrix_dimension_t();
-           ++i, t += unit_t_) {
+      for (uint32_t i = 0; i < dimension_t_; ++i, t += unit_t_) {
         SpeedPoint speed_point;
         speed_point.set_s(0.0);
         speed_point.set_t(t);
@@ -97,14 +106,14 @@ Status GriddedPathTimeGraph::Search(SpeedData* const speed_data) {
     }
   }
 
-  if (!InitSpeedLimitLookUp().ok()) {
-    const std::string msg = "Initialize speed limit lookup table failed.";
+  if (!InitCostTable().ok()) {
+    const std::string msg = "Initialize cost table failed.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!InitCostTable().ok()) {
-    const std::string msg = "Initialize cost table failed.";
+  if (!InitSpeedLimitLookUp().ok()) {
+    const std::string msg = "Initialize speed limit lookup table failed.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -124,20 +133,54 @@ Status GriddedPathTimeGraph::Search(SpeedData* const speed_data) {
 }
 
 Status GriddedPathTimeGraph::InitCostTable() {
-  uint32_t dim_s = gridded_path_time_graph_config_.matrix_dimension_s();
-  uint32_t dim_t = gridded_path_time_graph_config_.matrix_dimension_t();
-  DCHECK_GT(dim_s, 2);
-  DCHECK_GT(dim_t, 2);
+  // Time dimension is homogeneous while Spatial dimension has two resolutions,
+  // dense and sparse with dense resolution comeing first in the spatial horizon
+  dimension_t_ = static_cast<uint32_t>(std::ceil(
+                     total_length_t_ / static_cast<double>(unit_t_))) +
+                 1;
+
+  double sparse_length_s =
+      total_length_s_ -
+      static_cast<double>(dense_dimension_s_ - 1) * dense_unit_s_;
+  sparse_dimension_s_ =
+      sparse_length_s > std::numeric_limits<double>::epsilon()
+          ? static_cast<uint32_t>(std::ceil(sparse_length_s / sparse_unit_s_))
+          : 0;
+  dense_dimension_s_ =
+      sparse_length_s > std::numeric_limits<double>::epsilon()
+          ? dense_dimension_s_
+          : static_cast<uint32_t>(std::ceil(total_length_s_ / dense_unit_s_)) +
+                1;
+  dimension_s_ = dense_dimension_s_ + sparse_dimension_s_;
+
+  // Sanity Check
+  if (dimension_t_ < 1 || dimension_s_ < 1) {
+    const std::string msg = "Dp st cost table size incorrect.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
   cost_table_ = std::vector<std::vector<StGraphPoint>>(
-      dim_t, std::vector<StGraphPoint>(dim_s, StGraphPoint()));
+      dimension_t_, std::vector<StGraphPoint>(dimension_s_, StGraphPoint()));
 
   double curr_t = 0.0;
   for (uint32_t i = 0; i < cost_table_.size(); ++i, curr_t += unit_t_) {
     auto& cost_table_i = cost_table_[i];
     double curr_s = 0.0;
-    for (uint32_t j = 0; j < cost_table_i.size(); ++j, curr_s += unit_s_) {
+    for (uint32_t j = 0; j < dense_dimension_s_; ++j, curr_s += dense_unit_s_) {
       cost_table_i[j].Init(i, j, STPoint(curr_s, curr_t));
     }
+    curr_s = static_cast<double>(dense_dimension_s_ - 1) * dense_unit_s_;
+    for (uint32_t j = dense_dimension_s_; j < cost_table_i.size();
+         ++j, curr_s += sparse_unit_s_) {
+      cost_table_i[j].Init(i, j, STPoint(curr_s, curr_t));
+    }
+  }
+
+  const auto& cost_table_0 = cost_table_[0];
+  spatial_distance_by_index_ = std::vector<double>(cost_table_0.size(), 0.0);
+  for (uint32_t i = 0; i < cost_table_0.size(); ++i) {
+    spatial_distance_by_index_[i] = cost_table_0[i].point().s();
   }
   return Status::OK();
 }
@@ -145,12 +188,12 @@ Status GriddedPathTimeGraph::InitCostTable() {
 Status GriddedPathTimeGraph::InitSpeedLimitLookUp() {
   speed_limit_by_index_.clear();
 
-  uint32_t dim_s = gridded_path_time_graph_config_.matrix_dimension_s();
-  speed_limit_by_index_.resize(dim_s);
+  speed_limit_by_index_.resize(dimension_s_);
   const auto& speed_limit = st_graph_data_.speed_limit();
 
-  for (uint32_t i = 0; i < dim_s; ++i) {
-    speed_limit_by_index_[i] = speed_limit.GetSpeedLimitByS(unit_s_ * i);
+  for (uint32_t i = 0; i < dimension_s_; ++i) {
+    speed_limit_by_index_[i] =
+        speed_limit.GetSpeedLimitByS(cost_table_[0][i].point().s());
   }
   return Status::OK();
 }
@@ -210,31 +253,39 @@ void GriddedPathTimeGraph::GetRowRange(const StGraphPoint& point,
   if (!point.pre_point()) {
     v0 = init_point_.v();
   } else {
-    v0 = (point.index_s() - point.pre_point()->index_s()) * unit_s_ / unit_t_;
+    v0 = (point.point().s() - point.pre_point()->point().s()) / unit_t_;
   }
 
-  const auto max_s_size = cost_table_.back().size() - 1;
+  const auto max_s_size = dimension_s_ - 1;
 
+  const double max_acceleration = std::abs(vehicle_param_.max_acceleration());
   const double speed_coeff = unit_t_ * unit_t_;
-
-  // TODO(Jinyun): Evaluate the upper bound correctness. Should be v0*t + 0.5*
-  // a*t^2
-  const double delta_s_upper_bound =
-      v0 * unit_t_ + vehicle_param_.max_acceleration() * speed_coeff;
-  *next_highest_row =
-      point.index_s() + static_cast<int>(delta_s_upper_bound / unit_s_);
-  if (*next_highest_row >= max_s_size) {
+  const double s_upper_bound =
+      v0 * unit_t_ + 0.5 * max_acceleration * speed_coeff + point.point().s();
+  const auto next_highest_itr =
+      std::lower_bound(spatial_distance_by_index_.begin(),
+                       spatial_distance_by_index_.end(), s_upper_bound);
+  if (next_highest_itr == spatial_distance_by_index_.end()) {
     *next_highest_row = max_s_size;
+  } else {
+    *next_highest_row =
+        std::distance(spatial_distance_by_index_.begin(), next_highest_itr);
   }
 
-  const double delta_s_lower_bound = std::fmax(
-      0.0, v0 * unit_t_ + vehicle_param_.max_deceleration() * speed_coeff);
-  *next_lowest_row =
-      point.index_s() + static_cast<int>(delta_s_lower_bound / unit_s_);
-  if (*next_lowest_row > max_s_size) {
+  // Safety approach preventing deceleration configuration error
+  const double max_deceleration =
+      -1.0 * std::abs(vehicle_param_.max_deceleration());
+  const double s_lower_bound =
+      std::fmax(0.0, v0 * unit_t_ + 0.5 * max_deceleration * speed_coeff) +
+      point.point().s();
+  const auto next_lowest_itr =
+      std::lower_bound(spatial_distance_by_index_.begin(),
+                       spatial_distance_by_index_.end(), s_lower_bound);
+  if (next_lowest_itr == spatial_distance_by_index_.end()) {
     *next_lowest_row = max_s_size;
-  } else if (*next_lowest_row < 0) {
-    *next_lowest_row = 0;
+  } else {
+    *next_lowest_row =
+        std::distance(spatial_distance_by_index_.begin(), next_lowest_itr);
   }
 }
 
@@ -243,14 +294,13 @@ void GriddedPathTimeGraph::CalculateCostAt(
   const uint32_t c = msg->c;
   const uint32_t r = msg->r;
   auto& cost_cr = cost_table_[c][r];
-  // TODO(Hongyi): refactor ObstacleCost for faster approach to stop_sign
-  cost_cr.SetObstacleCost(
-      dp_st_cost_.GetObstacleCost(cost_cr) +
-      (gridded_path_time_graph_config_.matrix_dimension_s() - r) *
-          gridded_path_time_graph_config_.default_speed_cost());
+
+  cost_cr.SetObstacleCost(dp_st_cost_.GetObstacleCost(cost_cr));
   if (cost_cr.obstacle_cost() > std::numeric_limits<double>::max()) {
     return;
   }
+
+  cost_cr.SetSpatialPotentialCost(dp_st_cost_.GetSpatialPotentialCost(cost_cr));
 
   const auto& cost_init = cost_table_[0][0];
   if (c == 0) {
@@ -262,7 +312,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
   const double speed_limit = speed_limit_by_index_[r];
 
   if (c == 1) {
-    const double acc = (r * unit_s_ / unit_t_ - init_point_.v()) / unit_t_;
+    const double acc =
+        (cost_cr.point().s() / unit_t_ - init_point_.v()) / unit_t_;
     if (acc < gridded_path_time_graph_config_.max_deceleration() ||
         acc > gridded_path_time_graph_config_.max_acceleration()) {
       return;
@@ -272,17 +323,27 @@ void GriddedPathTimeGraph::CalculateCostAt(
                                 cost_init)) {
       return;
     }
-    cost_cr.SetTotalCost(cost_cr.obstacle_cost() + cost_init.total_cost() +
-                         CalculateEdgeCostForSecondCol(r, speed_limit));
+    cost_cr.SetTotalCost(
+        cost_cr.obstacle_cost() + cost_cr.spatial_potential_cost() +
+        cost_init.total_cost() + CalculateEdgeCostForSecondCol(r, speed_limit));
     cost_cr.SetPrePoint(cost_init);
     return;
   }
 
   constexpr double kSpeedRangeBuffer = 0.20;
-  const uint32_t max_s_diff =
-      static_cast<uint32_t>(FLAGS_planning_upper_speed_limit *
-                            (1 + kSpeedRangeBuffer) * unit_t_ / unit_s_);
-  const uint32_t r_low = (max_s_diff < r ? r - max_s_diff : 0);
+  const double pre_lowest_s =
+      cost_cr.point().s() -
+      FLAGS_planning_upper_speed_limit * (1 + kSpeedRangeBuffer) * unit_t_;
+  const auto pre_lowest_itr =
+      std::lower_bound(spatial_distance_by_index_.begin(),
+                       spatial_distance_by_index_.end(), pre_lowest_s);
+  uint32_t r_low = 0;
+  if (pre_lowest_itr == spatial_distance_by_index_.end()) {
+    r_low = dimension_s_ - 1;
+  } else {
+    r_low = static_cast<uint32_t>(
+        std::distance(spatial_distance_by_index_.begin(), pre_lowest_itr));
+  }
   const uint32_t r_pre_size = r - r_low + 1;
   uint32_t r_pre = r;
   const auto& pre_col = cost_table_[c - 1];
@@ -291,13 +352,22 @@ void GriddedPathTimeGraph::CalculateCostAt(
   if (c == 2) {
     for (uint32_t i = 0; i < r_pre_size; ++i) {
       r_pre = r - i;
-      const double acc =
-          (r * unit_s_ - 2 * r_pre * unit_s_) / (unit_t_ * unit_t_);
-      if (acc < gridded_path_time_graph_config_.max_deceleration() ||
-          acc > gridded_path_time_graph_config_.max_acceleration()) {
+      if (std::isinf(pre_col[r_pre].total_cost()) ||
+          pre_col[r_pre].pre_point() == nullptr) {
         continue;
       }
-
+      // Use v0 = (pre_point.s - prepre_point.s) / unit_t as velocity estimate
+      // in acc estimate as 2.0 * (delta_s - v0*unit_t) / (unit_t*unit_t)
+      const double curr_a =
+          2.0 * (cost_cr.point().s() + pre_col[r_pre].pre_point()->point().s() -
+                 2 * pre_col[r_pre].point().s()) /
+          (unit_t_ * unit_t_);
+      if (curr_a < gridded_path_time_graph_config_.max_deceleration() ||
+          curr_a > gridded_path_time_graph_config_.max_acceleration()) {
+        continue;
+      }
+      // Filter out continous-time node connection which is in collision with
+      // obstacle
       if (CheckOverlapOnDpStGraph(st_graph_data_.st_boundaries(), cost_cr,
                                   pre_col[r_pre])) {
         continue;
@@ -305,7 +375,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
       curr_speed_limit =
           std::fmin(curr_speed_limit, speed_limit_by_index_[r_pre]);
       const double cost =
-          cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
+          cost_cr.obstacle_cost() + cost_cr.spatial_potential_cost() +
+          pre_col[r_pre].total_cost() +
           CalculateEdgeCostForThirdCol(r, r_pre, curr_speed_limit);
 
       if (cost < cost_cr.total_cost()) {
@@ -322,11 +393,10 @@ void GriddedPathTimeGraph::CalculateCostAt(
         pre_col[r_pre].pre_point() == nullptr) {
       continue;
     }
-
-    const double curr_a = (cost_cr.index_s() * unit_s_ +
-                           pre_col[r_pre].pre_point()->index_s() * unit_s_ -
-                           2 * pre_col[r_pre].index_s() * unit_s_) /
-                          (unit_t_ * unit_t_);
+    const double curr_a =
+        2.0 * (cost_cr.point().s() + pre_col[r_pre].pre_point()->point().s() -
+               2 * pre_col[r_pre].point().s()) /
+        (unit_t_ * unit_t_);
     if (curr_a > vehicle_param_.max_acceleration() ||
         curr_a < vehicle_param_.max_deceleration()) {
       continue;
@@ -351,7 +421,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
     const STPoint& curr_point = cost_cr.point();
     curr_speed_limit =
         std::fmin(curr_speed_limit, speed_limit_by_index_[r_pre]);
-    double cost = cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
+    double cost = cost_cr.obstacle_cost() + cost_cr.spatial_potential_cost() +
+                  pre_col[r_pre].total_cost() +
                   CalculateEdgeCost(triple_pre_point, prepre_point, pre_point,
                                     curr_point, curr_speed_limit);
 
