@@ -38,11 +38,13 @@ namespace planning {
 
 class DpStCost {
  public:
-  DpStCost(const DpStSpeedConfig& dp_st_speed_config, const double total_time,
-           const std::vector<const Obstacle*>& obstacles,
+  DpStCost(const DpStSpeedConfig& dp_st_speed_config, const double total_t,
+           const double total_s, const std::vector<const Obstacle*>& obstacles,
            const common::TrajectoryPoint& init_point);
 
   double GetObstacleCost(const StGraphPoint& point);
+
+  double GetSpatialPotentialCost(const StGraphPoint& point);
 
   double GetReferenceCost(const STPoint& point,
                           const STPoint& reference_point) const;
@@ -80,6 +82,7 @@ class DpStCost {
   const common::TrajectoryPoint& init_point_;
 
   double unit_t_ = 0.0;
+  double total_s_ = 0.0;
 
   std::unordered_map<std::string, int> boundary_map_;
   std::vector<std::vector<std::pair<double, double>>> boundary_cost_;

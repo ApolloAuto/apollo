@@ -37,6 +37,7 @@ class StGraphPoint {
 
   double reference_cost() const;
   double obstacle_cost() const;
+  double spatial_potential_cost() const;
   double total_cost() const;
 
   void Init(const std::uint32_t index_t, const std::uint32_t index_s,
@@ -47,6 +48,9 @@ class StGraphPoint {
 
   // given obstacle info, get the cost;
   void SetObstacleCost(const double obs_cost);
+
+  // given potential cost for minimal time traversal
+  void SetSpatialPotentialCost(const double spatial_potential_cost);
 
   // total cost
   void SetTotalCost(const double total_cost);
@@ -61,6 +65,7 @@ class StGraphPoint {
 
   double reference_cost_ = 0.0;
   double obstacle_cost_ = 0.0;
+  double spatial_potential_cost_ = 0.0;
   double total_cost_ = std::numeric_limits<double>::infinity();
 };
 
