@@ -192,7 +192,7 @@ function main(){
         info "Start docker container based on local image : $IMG"
     else
         info "Start pulling docker image $IMG ..."
-        #docker pull $IMG
+        docker pull $IMG
         if [ $? -ne 0 ];then
             error "Failed to pull docker image."
             exit 1
