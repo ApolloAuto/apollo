@@ -45,7 +45,7 @@ class STDrivingLimits {
 
   common::Status ComputeSTDrivingLimits();
 
-  std::pair<double, double> GetVehicleDynamicsLimits(double t) const;  
+  std::pair<double, double> GetVehicleDynamicsLimits(double t) const;
 
  private:
   double t_resolution_;

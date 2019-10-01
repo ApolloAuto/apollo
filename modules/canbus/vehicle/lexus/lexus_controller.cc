@@ -479,7 +479,7 @@ void LexusController::Acceleration(double acc) {
 }
 
 // TODO(Yu/QiL): double check the physical range, unit and direction for Lexus
-// lexus default -32.768 ~ 32.767, unit: rad, left:-, right:+ in canbus protocal
+// lexus default -32.768 ~ 32.767, unit: rad, left:-, right:+ in canbus protocol
 // need to be compatible with control module, so reverse steering
 // angle:-99.99~0.00~99.99, unit: %, left:+, right:- in control module
 void LexusController::Steer(double angle) {
@@ -496,8 +496,8 @@ void LexusController::Steer(double angle) {
 }
 
 // TODO(Yu/QiL): double check the physical range, unit and direction for Lexus
-// lexus default -32.768 ~ 32.767, unit: rad, left:-, right:+ in canbus protocal
-// lexus default 0 ~ 65.535, unit: rad/sec, in canbus protocal
+// lexus default -32.768 ~ 32.767, unit: rad, left:-, right:+ in canbus protocol
+// lexus default 0 ~ 65.535, unit: rad/sec, in canbus protocol
 // steering with new angle speed
 // angle:-99.99~0.00~99.99, unit:%, left:+, right:- in control module
 // angle_spd:0.00~99.99, unit:%

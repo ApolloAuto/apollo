@@ -79,7 +79,7 @@ class OnLanePlanning : public PlanningBase {
   bool CheckPlanningConfig(const PlanningConfig& config);
   void GenerateStopTrajectory(ADCTrajectory* ptr_trajectory_pb);
   void ExportFailedLaneChangeSTChart(const planning_internal::Debug& debug_info,
-                           planning_internal::Debug* debug_chart);
+                                     planning_internal::Debug* debug_chart);
   void ExportOnLaneChart(const planning_internal::Debug& debug_info,
                          planning_internal::Debug* debug_chart);
   void ExportOpenSpaceChart(const planning_internal::Debug& debug_info,

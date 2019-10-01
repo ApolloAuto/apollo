@@ -88,13 +88,13 @@ void ObstacleReference::UpdateReference(const CameraFrame *frame,
       continue;
     }
     if (box.ymax >= img_height_ + 1) {
-      AERROR << "box.ymax (" << box.ymax
-             << ") is larger than img_height_ + 1 (" << img_height_ + 1 << ")";
+      AERROR << "box.ymax (" << box.ymax << ") is larger than img_height_ + 1 ("
+             << img_height_ + 1 << ")";
       return;
     }
     if (box.xmax >= img_width_ + 1) {
-      AERROR << "box.xmax (" << box.xmax
-             << ") is larger than img_width_ + 1 (" << img_width_ + 1 << ")";
+      AERROR << "box.xmax (" << box.xmax << ") is larger than img_width_ + 1 ("
+             << img_width_ + 1 << ")";
       return;
     }
     float x = box.Center().x;

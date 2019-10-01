@@ -88,11 +88,11 @@ class HistoryStatus {
  public:
   HistoryStatus() = default;
 
-  void SetObjectStatus(
-      const std::string& id, const ObjectStatus& object_status);
+  void SetObjectStatus(const std::string& id,
+                       const ObjectStatus& object_status);
 
-  bool GetObjectStatus(
-      const std::string& id, ObjectStatus* const object_status);
+  bool GetObjectStatus(const std::string& id,
+                       ObjectStatus* const object_status);
 
  private:
   std::unordered_map<std::string, ObjectStatus> object_id_to_status_;

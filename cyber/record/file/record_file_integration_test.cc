@@ -123,4 +123,3 @@ int main(int argc, char** argv) {
   google::ShutDownCommandLineFlags();
   return ret_val;
 }
-
