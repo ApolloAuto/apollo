@@ -28,7 +28,7 @@ apt-get -y update && \
     python-pip \
     python-psutil \
     python-scipy \
-    python-software-properties \
+    software-properties-common \
     python3-psutil
 
 pip install -r py27_requirements.txt
