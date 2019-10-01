@@ -106,6 +106,8 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
   // set lattice planning target speed limit;
   SetCruiseSpeed(FLAGS_default_cruise_speed);
 
+  vehicle_signal_.Clear();
+
   return true;
 }
 
@@ -549,17 +551,22 @@ std::string ReferenceLineInfo::PathSpeedDebugString() const {
                                       "speed_data:", speed_data_.DebugString());
 }
 
-void ReferenceLineInfo::ExportTurnSignal(VehicleSignal* signal) const {
-  // set vehicle change lane signal
-  CHECK_NOTNULL(signal);
+void ReferenceLineInfo::SetTurnSignal(
+    common::VehicleSignal* vehicle_signal) const {
+  CHECK_NOTNULL(vehicle_signal);
 
-  signal->Clear();
-  signal->set_turn_signal(VehicleSignal::TURN_NONE);
+  if (vehicle_signal->has_turn_signal() &&
+      vehicle_signal->turn_signal() != VehicleSignal::TURN_NONE) {
+    return;
+  }
+
+  // set turn signal based on change lane
+  vehicle_signal->set_turn_signal(VehicleSignal::TURN_NONE);
   if (IsChangeLanePath()) {
     if (Lanes().PreviousAction() == routing::ChangeLaneType::LEFT) {
-      signal->set_turn_signal(VehicleSignal::TURN_LEFT);
+      vehicle_signal->set_turn_signal(VehicleSignal::TURN_LEFT);
     } else if (Lanes().PreviousAction() == routing::ChangeLaneType::RIGHT) {
-      signal->set_turn_signal(VehicleSignal::TURN_RIGHT);
+      vehicle_signal->set_turn_signal(VehicleSignal::TURN_RIGHT);
     }
     return;
   }
@@ -576,10 +583,10 @@ void ReferenceLineInfo::ExportTurnSignal(VehicleSignal* signal) const {
     }
     const auto& turn = seg.lane->lane().turn();
     if (turn == hdmap::Lane::LEFT_TURN) {
-      signal->set_turn_signal(VehicleSignal::TURN_LEFT);
+      vehicle_signal->set_turn_signal(VehicleSignal::TURN_LEFT);
       break;
     } else if (turn == hdmap::Lane::RIGHT_TURN) {
-      signal->set_turn_signal(VehicleSignal::TURN_RIGHT);
+      vehicle_signal->set_turn_signal(VehicleSignal::TURN_RIGHT);
       break;
     } else if (turn == hdmap::Lane::U_TURN) {
       // check left or right by geometry.
@@ -592,13 +599,29 @@ void ReferenceLineInfo::ExportTurnSignal(VehicleSignal* signal) const {
       auto start_to_middle = middle_xy - start_xy;
       auto start_to_end = end_xy - start_xy;
       if (start_to_middle.CrossProd(start_to_end) < 0) {
-        signal->set_turn_signal(VehicleSignal::TURN_RIGHT);
+        vehicle_signal->set_turn_signal(VehicleSignal::TURN_RIGHT);
       } else {
-        signal->set_turn_signal(VehicleSignal::TURN_LEFT);
+        vehicle_signal->set_turn_signal(VehicleSignal::TURN_LEFT);
       }
       break;
     }
   }
+}
+
+void ReferenceLineInfo::SetTurnSignal(
+    const VehicleSignal::TurnSignal& turn_signal) {
+  vehicle_signal_.set_turn_signal(turn_signal);
+}
+
+void ReferenceLineInfo::SetEmergencyLight() {
+  vehicle_signal_.set_emergency_light(true);
+}
+
+void ReferenceLineInfo::ExportVehicleSignal(
+    common::VehicleSignal* vehicle_signal) const {
+  CHECK_NOTNULL(vehicle_signal);
+  *vehicle_signal = vehicle_signal_;
+  SetTurnSignal(vehicle_signal);
 }
 
 bool ReferenceLineInfo::ReachedDestination() const {
@@ -625,7 +648,7 @@ double ReferenceLineInfo::SDistanceToDestination() const {
 
 void ReferenceLineInfo::ExportDecision(DecisionResult* decision_result) const {
   MakeDecision(decision_result);
-  ExportTurnSignal(decision_result->mutable_vehicle_signal());
+  ExportVehicleSignal(decision_result->mutable_vehicle_signal());
   auto* main_decision = decision_result->mutable_main_decision();
   if (main_decision->has_stop()) {
     main_decision->mutable_stop()->set_change_lane_type(

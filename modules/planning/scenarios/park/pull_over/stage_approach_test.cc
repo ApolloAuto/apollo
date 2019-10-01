@@ -39,19 +39,11 @@ class StageApproachTest : public ::testing::Test {
   ScenarioConfig::StageConfig config_;
 };
 
-TEST_F(StageApproachTest, VerifyConf) {
-  FLAGS_scenario_pull_over_config_file =
-      "/apollo/modules/planning/conf/scenario/pull_over_config.pb.txt";
-
-  ScenarioConfig config;
-  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_pull_over_config_file, &config));
-}
-
 TEST_F(StageApproachTest, Init) {
   PullOverStageApproach pull_over_stage_approach(config_);
   EXPECT_EQ(pull_over_stage_approach.Name(),
-            ScenarioConfig::StageType_Name(config_.stage_type()));
+            ScenarioConfig::StageType_Name(
+                ScenarioConfig::PULL_OVER_APPROACH));
 }
 
 }  // namespace pull_over

@@ -40,7 +40,8 @@ class ParkAndGoStageCheckTest : public ::testing::Test {
 TEST_F(ParkAndGoStageCheckTest, Init) {
   ParkAndGoStageCheck park_and_go_stage_check(config_);
   EXPECT_EQ(park_and_go_stage_check.Name(),
-            ScenarioConfig::StageType_Name(config_.stage_type()));
+            ScenarioConfig::StageType_Name(
+                ScenarioConfig::PARK_AND_GO_CHECK));
 }
 
 }  // namespace park_and_go

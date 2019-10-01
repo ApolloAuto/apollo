@@ -15,41 +15,42 @@
  *****************************************************************************/
 
 /**
- * @file stage_cruise_test.cc
- */
+ * @file
+ **/
 
-#include "modules/planning/scenarios/park_and_go/stage_cruise.h"
+#pragma once
 
-#include "gtest/gtest.h"
-
-#include "cyber/common/file.h"
-#include "cyber/common/log.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planning_config.pb.h"
+
+#include "modules/planning/scenarios/park/pull_over_emergency/pull_over_emergency_scenario.h"
+#include "modules/planning/scenarios/stage.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace park_and_go {
+namespace pull_over_emergency {
 
-class ParkAndGoStageCruiseTest : public ::testing::Test {
+struct PullOverEmergencyContext;
+
+class PullOverEmergencyStageApproach : public Stage {
  public:
-  virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::PARK_AND_GO_CRUISE);
+  explicit PullOverEmergencyStageApproach(
+      const ScenarioConfig::StageConfig& config);
+
+  StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                      Frame* frame) override;
+
+  PullOverEmergencyContext* GetContext() {
+    return Stage::GetContextAs<PullOverEmergencyContext>();
   }
 
- protected:
-  ScenarioConfig::StageConfig config_;
+  Stage::StageStatus FinishStage(const bool success);
+
+ private:
+  ScenarioPullOverEmergencyConfig scenario_config_;
 };
 
-TEST_F(ParkAndGoStageCruiseTest, Init) {
-  ParkAndGoStageCruise park_and_go_stage_cruise(config_);
-  EXPECT_EQ(park_and_go_stage_cruise.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::PARK_AND_GO_CRUISE));
-}
-
-}  // namespace park_and_go
+}  // namespace pull_over_emergency
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

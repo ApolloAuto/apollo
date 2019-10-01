@@ -14,42 +14,38 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file stage_cruise_test.cc
- */
-
-#include "modules/planning/scenarios/park_and_go/stage_cruise.h"
+#define protected public
+#define private public
+#include "modules/planning/scenarios/park/pull_over_emergency/stage_approach.h"
 
 #include "gtest/gtest.h"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace park_and_go {
+namespace pull_over_emergency {
 
-class ParkAndGoStageCruiseTest : public ::testing::Test {
+class StageApproachTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::PARK_AND_GO_CRUISE);
+    config_.set_stage_type(ScenarioConfig::PULL_OVER_EMERGENCY_APPROACH);
   }
 
  protected:
   ScenarioConfig::StageConfig config_;
 };
 
-TEST_F(ParkAndGoStageCruiseTest, Init) {
-  ParkAndGoStageCruise park_and_go_stage_cruise(config_);
-  EXPECT_EQ(park_and_go_stage_cruise.Name(),
+TEST_F(StageApproachTest, Init) {
+  PullOverEmergencyStageApproach pull_over_emergency_stage_approach(config_);
+  EXPECT_EQ(pull_over_emergency_stage_approach.Name(),
             ScenarioConfig::StageType_Name(
-                ScenarioConfig::PARK_AND_GO_CRUISE));
+                ScenarioConfig::PULL_OVER_EMERGENCY_APPROACH));
 }
 
-}  // namespace park_and_go
+}  // namespace pull_over_emergency
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
