@@ -166,15 +166,19 @@ Status PathAssessmentDecider::Process(
   if (reference_line_info->GetBlockingObstacle() != nullptr) {
     int front_static_obstacle_cycle_counter =
         mutable_path_decider_status->front_static_obstacle_cycle_counter();
-    if (front_static_obstacle_cycle_counter < 0) {
-      front_static_obstacle_cycle_counter = 0;
-    }
-    mutable_path_decider_status->set_front_static_obstacle_id(
-        reference_line_info->GetBlockingObstacle()->Id());
+    mutable_path_decider_status->set_front_static_obstacle_cycle_counter(
+        std::max(front_static_obstacle_cycle_counter, 0));
     mutable_path_decider_status->set_front_static_obstacle_cycle_counter(
         std::min(front_static_obstacle_cycle_counter + 1, 10));
+    mutable_path_decider_status->set_front_static_obstacle_id(
+        reference_line_info->GetBlockingObstacle()->Id());
   } else {
-    mutable_path_decider_status->set_front_static_obstacle_cycle_counter(0);
+    int front_static_obstacle_cycle_counter =
+        mutable_path_decider_status->front_static_obstacle_cycle_counter();
+    mutable_path_decider_status->set_front_static_obstacle_cycle_counter(
+        std::min(front_static_obstacle_cycle_counter, 0));
+    mutable_path_decider_status->set_front_static_obstacle_cycle_counter(
+        std::max(front_static_obstacle_cycle_counter - 1, -10));
   }
 
   // Update self-lane usage info.
