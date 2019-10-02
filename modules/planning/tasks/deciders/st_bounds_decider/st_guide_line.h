@@ -43,11 +43,15 @@ class STGuideLine {
 
   virtual ~STGuideLine() = default;
 
-  common::Status ComputeSTGuideLine();
+  common::Status ComputeSTGuideLine(
+      double vel_curr, double vel_expected, double acc);
 
   double GetGuideSFromT(double t) const;
 
  private:
-  double t_resolution_;
-  std::vector<std::pair<double, double>> guide_line_t_s_;
+  // Variables for simple guide-line calculation.
+  double t_th;
+  double s_th;
+  double acc_stage_1;
+  double vel_stage_2;
 };
