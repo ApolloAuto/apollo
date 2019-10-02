@@ -52,6 +52,12 @@ LineSegment2d::LineSegment2d(const Vec2d &start, const Vec2d &end)
   heading_ = unit_direction_.Angle();
 }
 
+Vec2d LineSegment2d::rotate(const double angle) {
+  Vec2d diff_vec = end_ - start_;
+  diff_vec.SelfRotate(angle);
+  return start_ + diff_vec;
+}
+
 double LineSegment2d::length() const { return length_; }
 
 double LineSegment2d::length_sqr() const { return length_ * length_; }
