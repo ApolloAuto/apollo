@@ -51,12 +51,14 @@ Status PathReuseDecider::Process(Frame* const frame,
   auto* mutable_path_reuse_decider_status = PlanningContext::Instance()
                                                 ->mutable_planning_status()
                                                 ->mutable_path_reuse_decider();
-  const int kWaitCycle = 3;  // wait 3 cycle
+  auto* mutable_path_decider_status = PlanningContext::Instance()
+                                          ->mutable_planning_status()
+                                          ->mutable_path_decider();
+  const int kWaitCycle = -2;  // wait 2 cycle
   ADEBUG << "reuse or not: "
          << mutable_path_reuse_decider_status->reused_path();
   if (mutable_path_reuse_decider_status->reused_path()) {
     ADEBUG << "reused path";
-    // if (CheckPathReusable(frame, reference_line_info)) ADEBUG << "collision";
     if (CheckPathReusable(frame, reference_line_info)) {
       ADEBUG << "no collision";
       ++reusable_path_counter_;  // count reusable path
@@ -68,20 +70,13 @@ Status PathReuseDecider::Process(Frame* const frame,
       mutable_path_reuse_decider_status->set_reused_path(false);
     }
   } else {
-    int blocking_obstacle_cycle_counter =
-        mutable_path_reuse_decider_status->blocking_obstacle_cycle_counter();
     ADEBUG
         << "counter: "
-        << mutable_path_reuse_decider_status->blocking_obstacle_cycle_counter();
-    if (reference_line_info->GetBlockingObstacle() != nullptr &&
-        mutable_path_reuse_decider_status->blocking_obstacle_cycle_counter() >
-            kWaitCycle) {
+        << mutable_path_decider_status->front_static_obstacle_cycle_counter();
+    if (mutable_path_decider_status->front_static_obstacle_cycle_counter() <
+        kWaitCycle) {
       // enable reuse path
       mutable_path_reuse_decider_status->set_reused_path(true);
-      mutable_path_reuse_decider_status->set_blocking_obstacle_cycle_counter(0);
-    } else {
-      mutable_path_reuse_decider_status->set_blocking_obstacle_cycle_counter(
-          blocking_obstacle_cycle_counter + 1);
     }
   }
   ++total_path_counter_;
