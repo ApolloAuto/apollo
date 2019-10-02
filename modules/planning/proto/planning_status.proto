@@ -75,7 +75,7 @@ message PathDeciderStatus {
 }
 
 message PathReuseDeciderStatus  {
-    optional bool reused_path = 1 [default = true];
+  optional bool reused_path = 1 [default = true];
 }
 
 message PedestrianStatus {

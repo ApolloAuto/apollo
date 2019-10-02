@@ -25,6 +25,7 @@
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/history.h"
+#include "modules/planning/common/indexed_list.h"
 #include "modules/planning/common/obstacle_blocking_analyzer.h"
 #include "modules/planning/proto/decider_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -56,6 +57,9 @@ class PathReuseDecider : public Decider {
       std::vector<std::pair<const double, const common::PointENU>>*
           history_stop_positions);
 
+  void GetADCSLPoint(ReferenceLineInfo* const reference_line_info,
+                     common::SLPoint* adc_position_sl);
+
   // get current s_projection of current virtual obstacles
   void GetCurrentStopObstacleS(ReferenceLineInfo* const reference_line_info,
                                std::vector<double>* current_stop_obstacle);
@@ -81,6 +85,12 @@ class PathReuseDecider : public Decider {
   // trim history path
   bool TrimHistoryPath(Frame* const frame,
                        ReferenceLineInfo* const reference_line_info);
+
+  bool GetBlockingObstacleS(ReferenceLineInfo* const reference_line_info,
+                            double* blocking_obstacle_s);
+
+  // ignore blocking obstacle when it is far away
+  bool IsIgnoredBlockingObstacle(ReferenceLineInfo* const reference_line_info);
 
  private:
   History* history_ = History::Instance();

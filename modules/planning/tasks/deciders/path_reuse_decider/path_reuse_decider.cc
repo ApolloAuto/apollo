@@ -41,8 +41,9 @@ PathReuseDecider::PathReuseDecider(const TaskConfig& config)
 
 Status PathReuseDecider::Process(Frame* const frame,
                                  ReferenceLineInfo* const reference_line_info) {
-  if (!Decider::config_.path_reuse_decider_config().reuse_path())
+  if (!Decider::config_.path_reuse_decider_config().reuse_path()) {
     return Status::OK();
+  }
   // Sanity checks.
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
@@ -54,9 +55,10 @@ Status PathReuseDecider::Process(Frame* const frame,
   auto* mutable_path_decider_status = PlanningContext::Instance()
                                           ->mutable_planning_status()
                                           ->mutable_path_decider();
-  const int kWaitCycle = -2;  // wait 2 cycle
+  constexpr int kWaitCycle = -2;  // wait 2 cycle
   ADEBUG << "reuse or not: "
          << mutable_path_reuse_decider_status->reused_path();
+  // T -> F
   if (mutable_path_reuse_decider_status->reused_path()) {
     ADEBUG << "reused path";
     if (CheckPathReusable(frame, reference_line_info)) {
@@ -70,11 +72,14 @@ Status PathReuseDecider::Process(Frame* const frame,
       mutable_path_reuse_decider_status->set_reused_path(false);
     }
   } else {
+    // F -> T
     ADEBUG
         << "counter: "
         << mutable_path_decider_status->front_static_obstacle_cycle_counter();
+    // far from blocking obstacle or no blocking obstacle for a while
     if (mutable_path_decider_status->front_static_obstacle_cycle_counter() <
-        kWaitCycle) {
+            kWaitCycle ||
+        IsIgnoredBlockingObstacle(reference_line_info)) {
       // enable reuse path
       mutable_path_reuse_decider_status->set_reused_path(true);
     }
@@ -87,14 +92,74 @@ Status PathReuseDecider::Process(Frame* const frame,
 
 bool PathReuseDecider::CheckPathReusable(
     Frame* const frame, ReferenceLineInfo* const reference_line_info) {
+  // TODO(SHU) kinds of criteria for path reuse
   //   if (!IsSameStopObstacles(frame, reference_line_info))
   //     ADEBUG << "not same stop obstacle";
+  // reuse path when when collision free and same blocking obstacle
   //   return (IsCollisionFree(reference_line_info) &&
   //           IsSameStopObstacles(frame, reference_line_info));
+  // reuse path when the blocking obstacle is same
   //   return IsSameStopObstacles(frame, reference_line_info);
+  // reuse path when all obstacles are same
   //   return IsSameObstacles(reference_line_info);
   ADEBUG << "Check Collision";
   return IsCollisionFree(reference_line_info);
+}
+
+bool PathReuseDecider::IsIgnoredBlockingObstacle(
+    ReferenceLineInfo* const reference_line_info) {
+  constexpr double kSDistBuffer = 30.0;  // meter
+  constexpr int kTimeBuffer = 3;         // second
+  // vehicle speed
+  double adc_speed =
+      common::VehicleStateProvider::Instance()->linear_velocity();
+  double final_s_buffer = std::max(kSDistBuffer, kTimeBuffer * adc_speed);
+  // current vehicle s position
+  common::SLPoint adc_position_sl;
+  GetADCSLPoint(reference_line_info, &adc_position_sl);
+  // blocking obstacle start s
+  double blocking_obstacle_start_s;
+  if (GetBlockingObstacleS(reference_line_info, &blocking_obstacle_start_s) &&
+      // distance to blocking obstacle
+      (blocking_obstacle_start_s - adc_position_sl.s() > final_s_buffer)) {
+    ADEBUG << "blocking obstacle distance: "
+           << blocking_obstacle_start_s - adc_position_sl.s();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool PathReuseDecider::GetBlockingObstacleS(
+    ReferenceLineInfo* const reference_line_info, double* blocking_obstacle_s) {
+  auto* mutable_path_decider_status = PlanningContext::Instance()
+                                          ->mutable_planning_status()
+                                          ->mutable_path_decider();
+  // get blocking obstacle ID (front_static_obstacle_id)
+  const std::string& blocking_obstacle_ID =
+      mutable_path_decider_status->front_static_obstacle_id();
+  const IndexedList<std::string, Obstacle>& indexed_obstacles =
+      reference_line_info->path_decision()->obstacles();
+  const auto* blocking_obstacle = indexed_obstacles.Find(blocking_obstacle_ID);
+
+  if (blocking_obstacle == nullptr) {
+    return false;
+  }
+  const auto& obstacle_sl = blocking_obstacle->PerceptionSLBoundary();
+  *blocking_obstacle_s = obstacle_sl.start_s();
+  ADEBUG << "blocking obstacle distance: " << obstacle_sl.start_s();
+  ADEBUG << "blocking obstacle distance: " << blocking_obstacle_s;
+  return true;
+}
+
+void PathReuseDecider::GetADCSLPoint(
+    ReferenceLineInfo* const reference_line_info,
+    common::SLPoint* adc_position_sl) {
+  const auto& reference_line = reference_line_info->reference_line();
+  common::math::Vec2d adc_position = {
+      common::VehicleStateProvider::Instance()->x(),
+      common::VehicleStateProvider::Instance()->y()};
+  reference_line.XYToSL(adc_position, adc_position_sl);
 }
 
 bool PathReuseDecider::IsSameStopObstacles(
