@@ -76,7 +76,6 @@ message PathDeciderStatus {
 
 message PathReuseDeciderStatus  {
     optional bool reused_path = 1 [default = true];
-    optional int32 blocking_obstacle_cycle_counter = 2 [default = 0];
 }
 
 message PedestrianStatus {
