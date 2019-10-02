@@ -25,10 +25,13 @@ namespace planning {
 
 using apollo::common::Status;
 
-// TODO(jiacheng): implement this.
-STGuideLine::STGuideLine() {}
+STGuideLine::STGuideLine() {
+  t_th = 0.0;
+  s_th = 0.0;
+  acc_stage_1 = 0.0;
+  vel_stage_2 = 15.0; // ~35mph
+}
 
-// TODO(jiacheng): implement this.
 Status STGuideLine::ComputeSTGuideLine() { return Status::OK(); }
 
 // TODO(jiacheng): implement this.
