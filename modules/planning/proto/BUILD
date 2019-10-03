@@ -174,6 +174,7 @@ proto_library(
         ":reference_line_smoother_config_proto_lib",
         ":rule_based_stop_decider_config_proto_lib",
         ":speed_bounds_decider_config_proto_lib",
+        ":st_bounds_decider_config_proto_lib",
     ],
 )
 
@@ -497,6 +498,20 @@ cc_proto_library(
     name = "speed_bounds_decider_config_proto",
     deps = [
         ":speed_bounds_decider_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "st_bounds_decider_config_proto_lib",
+    srcs = [
+        "st_bounds_decider_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "st_bounds_decider_config_proto",
+    deps = [
+        ":st_bounds_decider_config_proto_lib",
     ],
 )
 
