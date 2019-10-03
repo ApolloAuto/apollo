@@ -15,6 +15,10 @@ cc_binary(
         "-lglog",
         "-lpthread",
         "-lGL",
+        "-lQt5Core",
+        "-lQt5Widgets",
+        "-lQt5Gui",
+        "-lQt5OpenGL",
     ],
     deps = [
         ":visualizer_lib",
@@ -29,6 +33,7 @@ qt_cc_library(
     ),
     copts = [
         "-Imodules/drivers/proto",
+        "-I/usr/include/x86_64-linux-gnu/qt5",
     ],
     hdr = glob([
         "*.h",
@@ -46,7 +51,6 @@ qt_cc_library(
     deps = [
         "//cyber",
         "//modules/drivers/proto:sensor_proto",
-        "@qt//:qt_gui",
     ],
 )
 

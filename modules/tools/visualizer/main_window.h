@@ -16,9 +16,9 @@
 
 #pragma once
 
-#include <QMainWindow>
-#include <QMenu>
-#include <QMutex>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMenu>
+#include <QtCore/QMutex>
 
 #include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/drivers/proto/radar.pb.h"

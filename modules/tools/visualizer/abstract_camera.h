@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <QMatrix4x4>
+#include <QtGui/QMatrix4x4>
 
 class AbstractCamera {
  public:

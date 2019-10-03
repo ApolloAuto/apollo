@@ -16,9 +16,9 @@
 
 #include "modules/tools/visualizer/scene_viewer.h"
 
-#include <QMessageBox>
-#include <QTimer>
-#include <QWheelEvent>
+#include <QtWidgets/QMessageBox>
+#include <QtCore/QTimer>
+#include <QtGui/QWheelEvent>
 
 #include "modules/tools/visualizer/scene_camera_dialog.h"
 
