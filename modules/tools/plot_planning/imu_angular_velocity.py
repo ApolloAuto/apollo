@@ -20,7 +20,7 @@ import math
 from record_reader import RecordItemReader
 
 
-class AngularVelocity:
+class ImuAngularVelocity:
     def __init__(self):
         self.timestamp_list = []
         self.angular_velocity_list = []
@@ -101,9 +101,10 @@ if __name__ == "__main__":
         color = colors[i % len(colors)]
         marker = markers[i % len(markers)]
         fns = [f for f in listdir(folder) if isfile(join(folder, f))]
+        fns.sort()
         for fn in fns:
             reader = RecordItemReader(folder+"/"+fn)
-            processor = AngularVelocity()
+            processor = ImuAngularVelocity()
             for data in reader.read(["/apollo/localization/pose"]):
                 processor.add(data["pose"])
 

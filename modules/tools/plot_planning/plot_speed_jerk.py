@@ -60,7 +60,7 @@ if __name__ == "__main__":
         color = colors[i % len(colors)]
         marker = markers[i % len(markers)]
         fns = [f for f in listdir(folder) if isfile(join(folder, f))]
-        fns.sort()    
+        fns.sort()
         for fn in fns:
             reader = RecordItemReader(folder+"/"+fn)
             jerk_processor = ImuSpeedJerk(True)
