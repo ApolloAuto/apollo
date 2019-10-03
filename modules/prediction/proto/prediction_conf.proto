@@ -25,6 +25,7 @@ message ObstacleConf {
     PEDESTRIAN_INTERACTION_EVALUATOR = 7;
     JUNCTION_MAP_EVALUATOR = 8;
     LANE_AGGREGATING_EVALUATOR = 9;
+    SEMANTIC_LSTM_EVALUATOR = 10;
   }
 
   enum PredictorType {
