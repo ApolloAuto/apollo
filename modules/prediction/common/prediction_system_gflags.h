@@ -42,3 +42,6 @@ DECLARE_bool(use_cuda);
 DECLARE_double(replay_timestamp_gap);
 DECLARE_int32(max_num_dump_feature);
 DECLARE_int32(max_num_dump_dataforlearn);
+
+// Submodules
+DECLARE_string(container_submodule_name);
