@@ -39,18 +39,54 @@ namespace planning {
 
 class STObstaclesProcessor {
  public:
-  STObstaclesProcessor();
+  STObstaclesProcessor(
+      const double planning_distance, const double planning_time,
+      const PathData& path_data);
 
   virtual ~STObstaclesProcessor() = default;
 
-  common::Status MapObstaclesToSTBoundary(PathDecision* const path_decision);
+  common::Status MapObstaclesToSTBoundaries(PathDecision* const path_decision);
 
   std::pair<double, double> GetRegularBoundaryFromObstacles(double t);
 
   std::pair<double, double> GetFallbackBoundaryFromObstacles(double t);
 
  private:
-  double t_resolution_;
-  STGuideLine* st_guide_line_ptr_;
-  STDrivingLimits* st_driving_limits_ptr_;
+  /** @brief Given a single obstacle, compute its ST-boundary.
+    * @return If appears on ST-graph, return true; otherwise, false.
+    */
+  bool ComputeObstacleSTBoundary(Obstacle* const obstacle);
+
+  bool GetOverlappingS(
+      const std::vector<common::PathPoint>& adc_path_points,
+      const common::math::Box2d& obstacle_instance, const double adc_l_buffer,
+      std::pair<double, double>* const overlapping_s);
+
+  int GetSBoundingPathPointIndex(
+      const std::vector<common::PathPoint>& adc_path_points,
+      const common::math::Box2d& obstacle_instance, const double s_thresh,
+      const bool is_lower_bound, const int start_idx, const int end_idx);
+
+  /** @brief Over the s-dimension, check if the path-point is away
+    * from the projected obstacle in the given direction.
+    * @param A certain path-point.
+    * @param The next path-point indicating path direction.
+    * @param The obstacle bounding box.
+    * @param The threshold s to tell if path point is far away.
+    * @param Direction indicator. True if we want the path-point to be
+    *        before the obstacle.
+    * @return whether the path-point is away in the indicated direction.
+    */
+  bool IsPathPointAwayFromObstacle(
+      const common::PathPoint& path_point,
+      const common::PathPoint& direction_point,
+      const common::math::Box2d& obs_box, const double s_thresh,
+      const bool is_before);
+
+ private:
+  const PathData& path_data_;
+  double planning_time_;
+  double planning_distance_;
+
+  std::unordered_map<std::string, STBoundary> obs_id_to_st_boundary_;
 };
