@@ -16,7 +16,7 @@
 
 #include "modules/tools/visualizer/treewidget.h"
 
-#include <QResizeEvent>
+#include <QtGui/QResizeEvent>
 
 TreeWidget::TreeWidget(QWidget *parent) : QTreeWidget(parent) {}
 

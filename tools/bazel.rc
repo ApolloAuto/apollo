@@ -70,7 +70,7 @@ build --copt="-Werror=unused-but-set-variable"
 build --copt="-Werror=switch"
 
 # Strict check on type conversion.
-build --per_file_copt=^modules/.*\.cc,^cyber/.*\.cc@-Werror=conversion
+build --per_file_copt=^modules/.*\.cc,-modules/tools/visualizer/.*\.cc,^cyber/.*\.cc@-Werror=conversion
 
 
 # Enable C++14
