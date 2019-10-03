@@ -22,9 +22,11 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
+#include <utility>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/planning/proto/speed_bounds_decider_config.pb.h"
+#include "modules/planning/proto/st_bounds_decider_config.pb.h"
 
 #include "modules/common/status/status.h"
 #include "modules/planning/common/obstacle.h"
@@ -55,7 +57,7 @@ class STObstaclesProcessor {
   /** @brief Given a single obstacle, compute its ST-boundary.
     * @return If appears on ST-graph, return true; otherwise, false.
     */
-  bool ComputeObstacleSTBoundary(Obstacle* const obstacle);
+  bool ComputeObstacleSTBoundary(const Obstacle& obstacle);
 
   bool GetOverlappingS(
       const std::vector<common::PathPoint>& adc_path_points,
@@ -84,9 +86,12 @@ class STObstaclesProcessor {
       const bool is_before);
 
  private:
-  const PathData& path_data_;
   double planning_time_;
   double planning_distance_;
+  const PathData& path_data_;
 
   std::unordered_map<std::string, STBoundary> obs_id_to_st_boundary_;
 };
+
+}  // namespace planning
+}  // namespace apollo
