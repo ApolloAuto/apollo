@@ -42,62 +42,59 @@ using apollo::common::PathPoint;
 using apollo::common::Status;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
+using apollo::common::math::LineSegment2d;
 
 STObstaclesProcessor::STObstaclesProcessor(
     const double planning_distance, const double planning_time,
-    const PathData& path_data) {
-  CHECK_GT(planning_time, 0.0);
-  planning_time_ = planning_time;
-
-  CHECK_GT(planning_distance, 0.0);
-  planning_distance_ = planning_distance;
-
-  CHECK_GT(path_data_.discretized_path().size(), 1);
-  path_data_ = path_data;
-}
+    const PathData& path_data)
+    : planning_time_(planning_time),
+      planning_distance_(planning_distance),
+      path_data_(path_data) {}
 
 Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     PathDecision* const path_decision) {
   // Sanity checks.
   CHECK_NOTNULL(path_decision);
+  CHECK_GT(planning_time_, 0.0);
+  CHECK_GT(planning_distance_, 0.0);
+  CHECK_GT(path_data_.discretized_path().size(), 1);
 
   // Go through every obstacle.
-
   return Status::OK();
 }
 
 // TODO(jiacheng): implement this.
 std::pair<double, double> STObstaclesProcessor::GetRegularBoundaryFromObstacles(
     double t) {
-  return 0.0;
+  return {0.0, 0.0};
 }
 
 // TODO(jiacheng): implement this.
 std::pair<double, double>
 STObstaclesProcessor::GetFallbackBoundaryFromObstacles(double t) {
-  return 0.0;
+  return {0.0, 0.0};
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Private helper functions.
 
 bool STObstaclesProcessor::ComputeObstacleSTBoundary(const Obstacle& obstacle) {
-  std::vector<STPoint> lower_points;
-  std::vector<STPoint> upper_points;
-  const auto& adc_path_points = path_data_.discretized_path();
-  const auto& obs_trajectory = obstacle.Trajectory();
+  // std::vector<STPoint> lower_points;
+  // std::vector<STPoint> upper_points;
+  // const auto& adc_path_points = path_data_.discretized_path();
+  // const auto& obs_trajectory = obstacle.Trajectory();
 
-  if (obs_trajectory.trajectory_point_size() == 0) {
-    // Processing a static obstacle.
-    // Sanity checks.
-    if (!obstacle.IsStatic()) {
-      AWARN << "Non-static obstacle[" << obstacle.Id()
-            << "] has NO prediction trajectory."
-            << obstacle.Perception().ShortDebugString();
-    }
-  } else {
-    // Processing a dynamic obstacle.
-  }
+  // if (obs_trajectory.trajectory_point_size() == 0) {
+  //   // Processing a static obstacle.
+  //   // Sanity checks.
+  //   if (!obstacle.IsStatic()) {
+  //     AWARN << "Non-static obstacle[" << obstacle.Id()
+  //           << "] has NO prediction trajectory."
+  //           << obstacle.Perception().ShortDebugString();
+  //   }
+  // } else {
+  //   // Processing a dynamic obstacle.
+  // }
   return true;
 }
 
@@ -132,7 +129,7 @@ int STObstaclesProcessor::GetSBoundingPathPointIndex(
     else
       return GetSBoundingPathPointIndex(adc_path_points, obstacle_instance,
                                         s_thresh, is_lower_bound,
-                                        start_idx, mid_idx-1);;
+                                        start_idx, mid_idx-1);
   } else {
     int mid_idx = (start_idx + end_idx) / 2;
     if (IsPathPointAwayFromObstacle(adc_path_points[mid_idx],
@@ -144,7 +141,7 @@ int STObstaclesProcessor::GetSBoundingPathPointIndex(
     else
       return GetSBoundingPathPointIndex(adc_path_points, obstacle_instance,
                                         s_thresh, is_lower_bound,
-                                        mid_idx+1, end_idx);;
+                                        mid_idx+1, end_idx);
   }
 }
 
@@ -154,7 +151,8 @@ bool STObstaclesProcessor::IsPathPointAwayFromObstacle(
   Vec2d path_pt(path_point.x(), path_point.y());
   Vec2d dir_pt(direction_point.x(), direction_point.y());
   LineSegment2d path_dir_lineseg(path_pt, dir_pt);
-  LineSegment2d normal_line_seg = path_dir_lineseg.rotate(M_PI_2);
+  LineSegment2d normal_line_seg(
+      path_pt, path_dir_lineseg.rotate(M_PI_2));
 
   auto corner_points = obs_box.GetAllCorners();
   for (const auto& corner_pt : corner_points) {

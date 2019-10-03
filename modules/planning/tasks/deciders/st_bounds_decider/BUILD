@@ -12,6 +12,7 @@ cc_library(
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
+        ":st_obstacles_processor",
         "//modules/common/status",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
@@ -19,6 +20,39 @@ cc_library(
         "//modules/planning/common/util:common_lib",
         "//modules/planning/tasks:task",
         "//modules/planning/tasks/deciders:decider_base",
+    ],
+)
+
+cc_library(
+    name = "st_obstacles_processor",
+    srcs = [
+        "st_obstacles_processor.cc",
+    ],
+    hdrs = [
+        "st_obstacles_processor.h",
+    ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/configs/proto:vehicle_config_proto",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/common/status",
+        "//modules/map/pnc_map",
+        "//modules/map/proto:map_proto",
+        "//modules/planning/common:frame",
+        "//modules/planning/common:obstacle",
+        "//modules/planning/common:path_decision",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/common:speed_limit",
+        "//modules/planning/common/path:discretized_path",
+        "//modules/planning/common/path:frenet_frame_path",
+        "//modules/planning/common/path:path_data",
+        "//modules/planning/common/speed:st_boundary",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/proto:planning_config_proto",
+        "//modules/planning/proto:planning_proto",
+        "//modules/planning/proto:speed_bounds_decider_config_proto",
+        "//modules/planning/reference_line",
     ],
 )
 
