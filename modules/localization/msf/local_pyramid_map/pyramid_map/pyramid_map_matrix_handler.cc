@@ -416,9 +416,9 @@ size_t LossyMapFullAltMatrixHandler::GetBinarySize(
   const std::shared_ptr<PyramidMapMatrix> matrix =
       std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
   // assert(matrix->get_resolution_num() > 0);
-  if (matrix->GetResolutionNum() <= 0) {
+  if (matrix->GetResolutionNum() == 0) {
     throw "[LossyMapFullAltMatrixHandler::get_binary_size]"
-        "matrix->get_resolution_num() <= 0";
+        "matrix->get_resolution_num() == 0";
   }
 
   // rows and cols
@@ -602,9 +602,9 @@ size_t LosslessMapMatrixHandler::GetBinarySize(
   const std::shared_ptr<PyramidMapMatrix> matrix =
       std::dynamic_pointer_cast<PyramidMapMatrix>(base_matrix);
   // assert(matrix->get_resolution_num() > 0);
-  if (matrix->GetResolutionNum() <= 0) {
+  if (matrix->GetResolutionNum() == 0) {
     throw "[LosslessMapMatrixHandler::get_binary_size]"
-        "matrix->get_resolution_num() <= 0";
+        "matrix->get_resolution_num() == 0";
   }
 
   size_t target_size = sizeof(unsigned int) * 2;  // rows and cols
@@ -999,9 +999,8 @@ size_t PyramidLossyMapMatrixHandler::GetBinarySize(
 
   unsigned int resolution_num = matrix->GetResolutionNum();
   // assert(resolution_num > 0);
-  if (resolution_num <= 0) {
-    throw "[PyramidLossyMapMatrixHandler::get_binary_size]"
-        "resolution_num <= 0";
+  if (resolution_num == 0) {
+    throw "[PyramidLossyMapMatrixHandler::get_binary_size] resolution_num == 0";
   }
 
   // resolution_num and ratio
@@ -1278,9 +1277,9 @@ size_t PyramidLosslessMapMatrixHandler::GetBinarySize(
 
   unsigned int resolution_num = matrix->GetResolutionNum();
   // assert(resolution_num > 0);
-  if (resolution_num <= 0) {
+  if (resolution_num == 0) {
     throw "[PyramidLosslessMapMatrixHandler::get_binary_size]"
-        "resolution_num <= 0";
+        "resolution_num == 0";
   }
 
   // resolution_num and ratio
