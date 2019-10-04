@@ -500,7 +500,7 @@ bool PathAssessmentDecider::IsCollidingWithStaticObstacles(
   for (size_t i = 0; i < path_data.discretized_path().size(); ++i) {
     if (path_data.frenet_frame_path().back().s() -
             path_data.frenet_frame_path()[i].s() <
-        kNumExtraTailBoundPoint * kPathBoundsDeciderResolution) {
+        (kNumExtraTailBoundPoint + 1) * kPathBoundsDeciderResolution) {
       break;
     }
     const auto& path_point = path_data.discretized_path()[i];
