@@ -29,7 +29,22 @@ cc_library(
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",
         "@civetweb//:civetweb++",
-    ],
+    ] + select({
+        ":teleop": [
+            "//modules/dreamview/backend/teleop",
+        ],
+        "//conditions:default": [
+        ],
+
+    }),
 )
+
+config_setting(
+    name = "teleop",
+    values = {
+        "define": "WITH_TELEOP=1",
+    },
+)
+
 
 cpplint()

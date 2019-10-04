@@ -833,6 +833,11 @@ function main() {
       DEFINES="${DEFINES} --copt=-fpic"
       apollo_build_opt $@
       ;;
+    build_teleop)
+      set_use_gpu
+      DEFINES="${DEFINES} --copt=-fpic --define WITH_TELEOP=1 --cxxopt=-DTELEOP"
+      apollo_build_opt $@
+      ;;
     build_fe)
       build_fe
       ;;

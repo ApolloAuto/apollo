@@ -93,7 +93,10 @@ Status Dreamview::Init() {
   server_->addWebSocketHandler("/pointcloud", *point_cloud_ws_);
   server_->addWebSocketHandler("/camera", *camera_ws_);
   server_->addHandler("/image", *image_);
-
+#ifdef TELEOP
+  teleop_.reset(new TeleopService(teleop_ws_.get()));
+  server_->addWebSocketHandler("/teleop", *teleop_ws_);
+#endif
   return Status::OK();
 }
 
@@ -102,6 +105,9 @@ Status Dreamview::Start() {
   point_cloud_updater_->Start();
   hmi_->Start();
   perception_camera_updater_->Start();
+#ifdef TELEOP
+  teleop_->Start();
+#endif
   return Status::OK();
 }
 
