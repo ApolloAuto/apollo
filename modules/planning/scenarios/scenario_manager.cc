@@ -323,7 +323,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPadMsgScenario(
       break;
     default:
       AERROR << "DrivingAction::" << DrivingAction_Name(pad_msg_driving_action)
-             << " not implemented in pad message.".
+             << " not implemented in pad message.";
       break;
   }
 
