@@ -64,10 +64,21 @@ class STObstaclesProcessor {
       const common::math::Box2d& obstacle_instance, const double adc_l_buffer,
       std::pair<double, double>* const overlapping_s);
 
+  /** @brief Over the s-dimension, find the last point that is before the
+    * obstacle instance of the first point that is after the obstacle.
+    * If there exists no such point within the given range, return -1.
+    * @param ADC path points
+    * @param The obstacle box
+    * @param The s threshold, must be non-negative.
+    * @param The direction
+    * @param The start-idx
+    * @param The end-idx
+    * @return Whether there is overlapping or not.
+    */
   int GetSBoundingPathPointIndex(
       const std::vector<common::PathPoint>& adc_path_points,
       const common::math::Box2d& obstacle_instance, const double s_thresh,
-      const bool is_lower_bound, const int start_idx, const int end_idx);
+      const bool is_before, const int start_idx, const int end_idx);
 
   /** @brief Over the s-dimension, check if the path-point is away
     * from the projected obstacle in the given direction.
@@ -85,10 +96,16 @@ class STObstaclesProcessor {
       const common::math::Box2d& obs_box, const double s_thresh,
       const bool is_before);
 
+  bool IsADCOverlappingWithObstacle(
+      const common::PathPoint& adc_path_point,
+      const common::math::Box2d& obs_box,
+      const double l_buffer) const;
+
  private:
   double planning_time_;
   double planning_distance_;
   const PathData& path_data_;
+  const common::VehicleParam& vehicle_param_;
 
   std::unordered_map<std::string, STBoundary> obs_id_to_st_boundary_;
 };
