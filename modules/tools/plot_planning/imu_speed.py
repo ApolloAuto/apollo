@@ -72,7 +72,7 @@ if __name__ == "__main__":
     from os.path import isfile, join
 
     folders = sys.argv[1:]
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(2, 1)
     colors = ["g", "b", "r", "m", "y"]
     markers = ["o", "o", "o", "o"]
     for i in range(len(folders)):
@@ -82,17 +82,29 @@ if __name__ == "__main__":
         fns = [f for f in listdir(folder) if isfile(join(folder, f))]
         for fn in fns:
             reader = RecordItemReader(folder+"/"+fn)
-            processor = ImuSpeed(True)
+            lat_speed_processor = ImuSpeed(True)
+            lon_speed_processor = ImuSpeed(False)
+
             last_pose_data = None
             last_chassis_data = None
             topics = ["/apollo/localization/pose"]
             for data in reader.read(topics):
                 if "pose" in data:
                     last_pose_data = data["pose"]
-                    processor.add(last_pose_data)
+                    lat_speed_processor.add(last_pose_data)
+                    lon_speed_processor.add(last_pose_data)
 
-            data_x = processor.get_timestamp_list()
-            data_y = processor.get_speed_list()
-            ax.scatter(data_x, data_y, c=color, marker=marker, alpha=0.4)
+            data_x = lon_speed_processor.get_timestamp_list()
+            data_y = lon_speed_processor.get_speed_list()
+            ax[0].scatter(data_x, data_y, c=color, marker=marker, alpha=0.4)
 
+            data_x = lat_speed_processor.get_timestamp_list()
+            data_y = lat_speed_processor.get_speed_list()
+            ax[1].scatter(data_x, data_y, c=color, marker=marker, alpha=0.4)
+
+    ax[0].set_xlabel('Timestamp')
+    ax[0].set_ylabel('Lon Acc')
+    ax[1].set_xlabel('Timestamp')
+    ax[1].set_ylabel('Lat Acc')
+    
     plt.show()

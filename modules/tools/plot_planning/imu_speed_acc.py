@@ -88,12 +88,15 @@ if __name__ == "__main__":
         ax.plot(frq, abs(Y), c=color)
 
     folders = sys.argv[1:]
-    fig, ax = plt.subplots(2, 1)
+    fig, ax = plt.subplots(2, 2)
     colors = ["g", "b", "r", "m", "y"]
     markers = ["o", "o", "o", "o"]
     for i in range(len(folders)):
-        x = []
-        y = []
+        lat_time = []
+        lat_acc = []
+        lon_time = []
+        lon_acc = []
+
         folder = folders[i]
         color = colors[i % len(colors)]
         marker = markers[i % len(markers)]
@@ -101,28 +104,41 @@ if __name__ == "__main__":
         fns.sort()
         for fn in fns:
             reader = RecordItemReader(folder + "/" + fn)
-            processor = ImuSpeedAcc(True)
+            lat_acc_processor = ImuSpeedAcc(is_lateral=True)
+            lon_acc_processor = ImuSpeedAcc(is_lateral=False)
+
             last_pose_data = None
             last_chassis_data = None
             topics = ["/apollo/localization/pose"]
             for data in reader.read(topics):
                 if "pose" in data:
                     last_pose_data = data["pose"]
-                    processor.add(last_pose_data)
+                    lat_acc_processor.add(last_pose_data)
+                    lon_acc_processor.add(last_pose_data)
 
-            data_x = processor.get_timestamp_list()
-            data_y = processor.get_acc_list()
+            data_x = lat_acc_processor.get_timestamp_list()
+            data_y = lat_acc_processor.get_acc_list()
 
-            x.extend(data_x)
-            y.extend(data_y)
+            lat_time.extend(data_x)
+            lat_acc.extend(data_y)
 
-        if len(x) <= 0:
+            data_x = lon_acc_processor.get_timestamp_list()
+            data_y = lon_acc_processor.get_acc_list()
+
+            lon_time.extend(data_x)
+            lon_acc.extend(data_y)
+
+        if len(lat_time) == 0:
             continue
-        #ax.scatter(data_x, data_y, c=color, marker=marker, alpha=0.4)
-        ax[0].plot(x, y, c=color, alpha=0.4)
-        plot_freq(x, y, ax[1], color)
 
-        ax[0].set_xlabel('Timestamp')
-        ax[0].set_ylabel('Acc')
+        ax[0][0].plot(lon_time, lon_acc, c=color, alpha=0.4)
+
+        ax[0][1].plot(lat_time, lat_acc, c=color, alpha=0.4)
+
+        ax[1][0].plot(lat_acc, lon_acc , '.', c=color, alpha=0.4)
+    ax[0][0].set_xlabel('Timestamp')
+    ax[0][0].set_ylabel('Lon Acc')
+    ax[0][1].set_xlabel('Timestamp')
+    ax[0][1].set_ylabel('Lat Acc')
 
     plt.show()
