@@ -64,10 +64,10 @@ class OpenSpaceRoiDecider : public Decider {
                        std::array<common::math::Vec2d, 4> *vertices,
                        hdmap::Path *nearby_path);
 
-  // @brief Set an origin to normlalize the problem for later computation
+  // @brief Set an origin to normalize the problem for later computation
   void SetOrigin(Frame *const frame,
                  const std::array<common::math::Vec2d, 4> &vertices);
-  void SetOriginFromADC(Frame *const frame);
+  void SetOriginFromADC(Frame *const frame, const hdmap::Path &nearby_path);
   void SetParkingSpotEndPose(
       Frame *const frame, const std::array<common::math::Vec2d, 4> &vertices);
 
