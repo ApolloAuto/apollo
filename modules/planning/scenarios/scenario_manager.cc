@@ -310,20 +310,18 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPadMsgScenario(
         return ScenarioConfig::PULL_OVER_EMERGENCY;
       }
       break;
-    // TODO(all): to be added
-    // case DrivingAction::STOP:
-    //  if (FLAGS_) {
-    //    return ScenarioConfig::STOP_EMERGENCY;
-    //  }
-    //  break;
+    case DrivingAction::STOP:
+      // TODO(all): to be added
+      //  if (FLAGS_) {
+      //    return ScenarioConfig::STOP_EMERGENCY;
+      //  }
+      break;
     case DrivingAction::RESTART_CRUISE:
       if (FLAGS_enable_scenario_park_and_go) {
         return ScenarioConfig::PARK_AND_GO;
       }
       break;
     default:
-      AERROR << "DrivingAction::" << DrivingAction_Name(pad_msg_driving_action)
-             << " not implemented in pad message.";
       break;
   }
 
