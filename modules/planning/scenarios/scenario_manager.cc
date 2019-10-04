@@ -321,6 +321,10 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPadMsgScenario(
         return ScenarioConfig::PARK_AND_GO;
       }
       break;
+    default:
+      AERROR << "DrivingAction::" << DrivingAction_Name(pad_msg_driving_action)
+             << " not implemented in pad message.".
+      break;
   }
 
   return default_scenario_type_;
