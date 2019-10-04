@@ -54,7 +54,7 @@ class ScenarioManager final {
 
   ScenarioConfig::ScenarioType SelectPullOverScenario(const Frame& frame);
 
-  ScenarioConfig::ScenarioType SelectPullOverEmergencyScenario(
+  ScenarioConfig::ScenarioType SelectPadMsgScenario(
       const Frame& frame);
 
   ScenarioConfig::ScenarioType SelectInterceptionScenario(const Frame& frame);

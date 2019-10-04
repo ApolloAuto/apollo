@@ -300,11 +300,27 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
   return default_scenario_type_;
 }
 
-ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverEmergencyScenario(
+ScenarioConfig::ScenarioType ScenarioManager::SelectPadMsgScenario(
     const Frame& frame) {
   const auto& pad_msg_driving_action = frame.GetPadMsgDrivingAction();
-  if (pad_msg_driving_action == DrivingAction::PULL_OVER) {
-    return ScenarioConfig::PULL_OVER_EMERGENCY;
+
+  switch (pad_msg_driving_action) {
+    case DrivingAction::PULL_OVER:
+      if (FLAGS_enable_scenario_pull_over_emergency) {
+        return ScenarioConfig::PULL_OVER_EMERGENCY;
+      }
+      break;
+    // TODO(all): to be added
+    // case DrivingAction::STOP:
+    //  if (FLAGS_) {
+    //    return ScenarioConfig::STOP_EMERGENCY;
+    //  }
+    //  break;
+    case DrivingAction::RESTART_CRUISE:
+      if (FLAGS_enable_scenario_park_and_go) {
+        return ScenarioConfig::PARK_AND_GO;
+      }
+      break;
   }
 
   return default_scenario_type_;
@@ -717,10 +733,8 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
   ScenarioConfig::ScenarioType scenario_type = default_scenario_type_;
 
   ////////////////////////////////////////
-  // PULL_OVER_EMERGENCY
-  if (FLAGS_enable_scenario_pull_over_emergency) {
-    scenario_type = SelectPullOverEmergencyScenario(frame);
-  }
+  // Pad Msg Scenario
+  scenario_type = SelectPadMsgScenario(frame);
 
   if (scenario_type == default_scenario_type_) {
     // check current_scenario (not switchable)
