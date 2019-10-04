@@ -26,6 +26,7 @@
 
 namespace apollo {
 namespace planning {
+// #define ADEBUG AINFO
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
@@ -115,7 +116,7 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
     nearby_path =
         frame->reference_line_info().front().reference_line().GetMapPath();
 
-    SetOriginFromADC(frame);
+    SetOriginFromADC(frame, nearby_path);
 
     SetParkAndGoEndPose(frame);
 
@@ -141,7 +142,8 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
 }
 
 // get origin from ADC
-void OpenSpaceRoiDecider::SetOriginFromADC(Frame *const frame) {
+void OpenSpaceRoiDecider::SetOriginFromADC(Frame *const frame,
+                                           const hdmap::Path &nearby_path) {
   // get ADC box
   const auto &park_and_go_status =
       PlanningContext::Instance()->planning_status().park_and_go();
@@ -159,11 +161,19 @@ void OpenSpaceRoiDecider::SetOriginFromADC(Frame *const frame) {
   std::vector<common::math::Vec2d> adc_corners;
   adc_box.GetAllCorners(&adc_corners);
   auto left_top = adc_corners[3];
-  auto right_top = adc_corners[0];
+
   // rotate the points to have the lane to be horizontal to x axis positive
   // direction and scale them base on the origin point
-  Vec2d heading_vec = right_top - left_top;
-  frame->mutable_open_space_info()->set_origin_heading(heading_vec.Angle());
+  // heading angle
+  double heading;
+  if (!nearby_path.GetHeadingAlongPath(left_top, &heading)) {
+    AERROR << "fail to get heading on reference line";
+    return;
+  }
+
+  frame->mutable_open_space_info()->set_origin_heading(
+      common::math::NormalizeAngle(heading));
+  ADEBUG << "heading: " << heading;
   frame->mutable_open_space_info()->mutable_origin_point()->set_x(left_top.x());
   frame->mutable_open_space_info()->mutable_origin_point()->set_y(left_top.y());
 }
@@ -494,11 +504,16 @@ bool OpenSpaceRoiDecider::GetParkingBoundary(
     const hdmap::Path &nearby_path,
     std::vector<std::vector<common::math::Vec2d>> *const roi_parking_boundary) {
   auto left_top = vertices[0];
+  ADEBUG << "left_top: " << left_top.x() << ", " << left_top.y();
   auto left_down = vertices[1];
+  ADEBUG << "left_down: " << left_down.x() << ", " << left_down.y();
   auto right_down = vertices[2];
+  ADEBUG << "right_down: " << right_down.x() << ", " << left_down.y();
   auto right_top = vertices[3];
+  ADEBUG << "right_top: " << right_top.x() << ", " << right_top.y();
 
   const auto &origin_point = frame->open_space_info().origin_point();
+  ADEBUG << "origin_point: " << origin_point.x() << ", " << origin_point.y();
   const auto &origin_heading = frame->open_space_info().origin_heading();
 
   double left_top_s = 0.0;
@@ -658,7 +673,10 @@ bool OpenSpaceRoiDecider::GetParkingBoundary(
       left_lane_boundary[i] += center_lane_boundary_left[i];
       left_lane_boundary[i] -= origin_point;
       left_lane_boundary[i].SelfRotate(-origin_heading);
+      ADEBUG << "left_lane_boundary[" << i << "]: " << left_lane_boundary[i].x()
+             << ", " << left_lane_boundary[i].y();
     }
+
     auto point_right_to_right_top_connor_s = std::lower_bound(
         center_lane_s_left.begin(), center_lane_s_left.end(), right_top_s);
     size_t point_right_to_right_top_connor_index = std::distance(
@@ -898,7 +916,6 @@ bool OpenSpaceRoiDecider::GetParkAndGoBoundary(
     AERROR << "fail to get parking spot points' projections on reference line";
     return false;
   }
-
   left_top -= origin_point;
   left_top.SelfRotate(-origin_heading);
   right_top -= origin_point;
@@ -1457,15 +1474,21 @@ bool OpenSpaceRoiDecider::GetHyperPlanes(
 bool OpenSpaceRoiDecider::IsInParkingLot(
     const double adc_init_x, const double adc_init_y,
     const double adc_init_heading, std::array<Vec2d, 4> *parking_lot_vertices) {
-  std::vector<ParkingSpaceInfoConstPtr> *parking_lots;
+  std::vector<ParkingSpaceInfoConstPtr> parking_lots;
   // make sure there is only one parking lot in search range
-  const double kDistance = 2;
+  const double kDistance = 1.0;
   auto adc_parking_spot = common::util::MakePointENU(adc_init_x, adc_init_y, 0);
-  if (hdmap_->GetParkingSpaces(adc_parking_spot, kDistance, parking_lots)) {
-    GetParkSpotFromMap(parking_lots->front(), parking_lot_vertices);
+  ADEBUG << "IsInParkingLot";
+  ADEBUG << hdmap_;
+  ADEBUG << hdmap_->GetParkingSpaces(adc_parking_spot, kDistance,
+                                     &parking_lots);
+  if (hdmap_->GetParkingSpaces(adc_parking_spot, kDistance, &parking_lots) ==
+      0) {
+    std::array<Vec2d, 4> vertices;
+    GetParkSpotFromMap(parking_lots.front(), parking_lot_vertices);
+    // *parking_lot_vertices = vertices;
+    return true;
   }
-
-  return true;
   return false;
 }
 
@@ -1482,6 +1505,9 @@ void OpenSpaceRoiDecider::GetParkSpotFromMap(
                                         right_top};
 
   *vertices = std::move(parking_vertices);
+  Vec2d tmp = (*vertices)[0];
+  ADEBUG << "Parking Lot";
+  ADEBUG << "parking_lot_vertices: (" << tmp.x() << ", " << tmp.y() << ")";
 }
 
 }  // namespace planning
