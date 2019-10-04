@@ -40,6 +40,7 @@
 #include "modules/prediction/evaluator/vehicle/lane_scanning_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/rnn_evaluator.h"
+#include "modules/prediction/evaluator/vehicle/semantic_lstm_evaluator.h"
 
 namespace apollo {
 namespace prediction {
@@ -104,6 +105,7 @@ void EvaluatorManager::RegisterEvaluators() {
   RegisterEvaluator(ObstacleConf::LANE_AGGREGATING_EVALUATOR);
   RegisterEvaluator(ObstacleConf::PEDESTRIAN_INTERACTION_EVALUATOR);
   RegisterEvaluator(ObstacleConf::JUNCTION_MAP_EVALUATOR);
+  RegisterEvaluator(ObstacleConf::SEMANTIC_LSTM_EVALUATOR);
 }
 
 void EvaluatorManager::Init(const PredictionConf& config) {
@@ -418,6 +420,10 @@ std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
     }
     case ObstacleConf::JUNCTION_MAP_EVALUATOR: {
       evaluator_ptr.reset(new JunctionMapEvaluator());
+      break;
+    }
+    case ObstacleConf::SEMANTIC_LSTM_EVALUATOR: {
+      evaluator_ptr.reset(new SemanticLSTMEvaluator());
       break;
     }
     default: { break; }
