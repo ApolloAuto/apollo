@@ -82,6 +82,12 @@ message VehicleParam {
   optional double brake_deadzone = 20 [default = nan];
   // minimum value get from chassis.throttle, in percentage
   optional double throttle_deadzone = 21 [default = nan];
+
+  //latency parameters, in micro second
+  optional double steering_dead_time = 22 [default = 0.0];
+  optional double steering_rise_time = 23 [default = 0.0];
+  optional double steering_peak_time = 24 [default = 0.0];
+  optional double steering_settling_time = 25 [default = 0.0];
 }
 
 message VehicleConfig {
