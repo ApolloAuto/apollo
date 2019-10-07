@@ -21,9 +21,9 @@
 #pragma once
 
 #include <string>
-#include <vector>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/planning/proto/st_bounds_decider_config.pb.h"
@@ -41,9 +41,8 @@ namespace planning {
 
 class STObstaclesProcessor {
  public:
-  STObstaclesProcessor(
-      const double planning_distance, const double planning_time,
-      const PathData& path_data);
+  STObstaclesProcessor(const double planning_distance,
+                       const double planning_time, const PathData& path_data);
 
   virtual ~STObstaclesProcessor() = default;
 
@@ -55,51 +54,49 @@ class STObstaclesProcessor {
 
  private:
   /** @brief Given a single obstacle, compute its ST-boundary.
-    * @return If appears on ST-graph, return true; otherwise, false.
-    */
+   * @return If appears on ST-graph, return true; otherwise, false.
+   */
   bool ComputeObstacleSTBoundary(const Obstacle& obstacle);
 
-  bool GetOverlappingS(
-      const std::vector<common::PathPoint>& adc_path_points,
-      const common::math::Box2d& obstacle_instance, const double adc_l_buffer,
-      std::pair<double, double>* const overlapping_s);
+  bool GetOverlappingS(const std::vector<common::PathPoint>& adc_path_points,
+                       const common::math::Box2d& obstacle_instance,
+                       const double adc_l_buffer,
+                       std::pair<double, double>* const overlapping_s);
 
   /** @brief Over the s-dimension, find the last point that is before the
-    * obstacle instance of the first point that is after the obstacle.
-    * If there exists no such point within the given range, return -1.
-    * @param ADC path points
-    * @param The obstacle box
-    * @param The s threshold, must be non-negative.
-    * @param The direction
-    * @param The start-idx
-    * @param The end-idx
-    * @return Whether there is overlapping or not.
-    */
+   * obstacle instance of the first point that is after the obstacle.
+   * If there exists no such point within the given range, return -1.
+   * @param ADC path points
+   * @param The obstacle box
+   * @param The s threshold, must be non-negative.
+   * @param The direction
+   * @param The start-idx
+   * @param The end-idx
+   * @return Whether there is overlapping or not.
+   */
   int GetSBoundingPathPointIndex(
       const std::vector<common::PathPoint>& adc_path_points,
       const common::math::Box2d& obstacle_instance, const double s_thresh,
       const bool is_before, const int start_idx, const int end_idx);
 
   /** @brief Over the s-dimension, check if the path-point is away
-    * from the projected obstacle in the given direction.
-    * @param A certain path-point.
-    * @param The next path-point indicating path direction.
-    * @param The obstacle bounding box.
-    * @param The threshold s to tell if path point is far away.
-    * @param Direction indicator. True if we want the path-point to be
-    *        before the obstacle.
-    * @return whether the path-point is away in the indicated direction.
-    */
-  bool IsPathPointAwayFromObstacle(
-      const common::PathPoint& path_point,
-      const common::PathPoint& direction_point,
-      const common::math::Box2d& obs_box, const double s_thresh,
-      const bool is_before);
+   * from the projected obstacle in the given direction.
+   * @param A certain path-point.
+   * @param The next path-point indicating path direction.
+   * @param The obstacle bounding box.
+   * @param The threshold s to tell if path point is far away.
+   * @param Direction indicator. True if we want the path-point to be
+   *        before the obstacle.
+   * @return whether the path-point is away in the indicated direction.
+   */
+  bool IsPathPointAwayFromObstacle(const common::PathPoint& path_point,
+                                   const common::PathPoint& direction_point,
+                                   const common::math::Box2d& obs_box,
+                                   const double s_thresh, const bool is_before);
 
-  bool IsADCOverlappingWithObstacle(
-      const common::PathPoint& adc_path_point,
-      const common::math::Box2d& obs_box,
-      const double l_buffer) const;
+  bool IsADCOverlappingWithObstacle(const common::PathPoint& adc_path_point,
+                                    const common::math::Box2d& obs_box,
+                                    const double l_buffer) const;
 
  private:
   double planning_time_;

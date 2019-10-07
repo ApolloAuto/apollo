@@ -29,7 +29,7 @@ STGuideLine::STGuideLine() {
   t_th = 0.0;
   s_th = 0.0;
   acc_stage_1 = 0.0;
-  vel_stage_2 = 15.0; // ~35mph
+  vel_stage_2 = 15.0;  // ~35mph
 }
 
 Status STGuideLine::ComputeSTGuideLine() { return Status::OK(); }

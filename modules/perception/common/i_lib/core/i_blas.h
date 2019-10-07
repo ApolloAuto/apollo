@@ -215,7 +215,10 @@ inline void ICopy16(const T src[16], T dst[16]) {
 template <typename T>
 inline void ICopy(const T *const *src, T **dst, int m, int n) {
   int i;
-  for (i = 0; i < m; i++) { ICopy<T>(src[i], dst[i], n); }}
+  for (i = 0; i < m; i++) {
+    ICopy<T>(src[i], dst[i], n);
+  }
+}
 
 // Copy of 1D arrays with different types
 template <typename T, typename S>
@@ -229,12 +232,18 @@ inline void ICopy(const T *src, S *dst, int n) {
 template <typename T, typename S>
 inline void ICopy(const T *const *src, S **dst, int m, int n) {
   int i;
-  for (i = 0; i < m; i++) { ICopy<T, S>(src[i], dst[i], n); }}
+  for (i = 0; i < m; i++) {
+    ICopy<T, S>(src[i], dst[i], n);
+  }
+}
 
 // Fill array elements with constant value
 template <typename T>
 inline void IFill(T *a, int n, T val) {
-  for (int i = 0; i < n; i++) { a[i] = val; }}
+  for (int i = 0; i < n; i++) {
+    a[i] = val;
+  }
+}
 template <typename T>
 inline void IFill1(T a[1], T val) {
   a[0] = val;
@@ -309,7 +318,10 @@ inline void IFill16(T a[16], T val) {
 // Fill array elements with zeroes
 template <typename T>
 inline void IZero(T *a, int n) {
-  for (int i = 0; i < n; i++) { a[i] = static_cast<T>(0.0); }}
+  for (int i = 0; i < n; i++) {
+    a[i] = static_cast<T>(0.0);
+  }
+}
 template <typename T>
 inline void IZero1(T a[1]) {
   a[0] = static_cast<T>(0.0);
@@ -1839,7 +1851,10 @@ inline void ISubScaled9(const T x[9], T y[9], T k) {
 // Rescale n-dimensional vector x with a scale factor sf (inplace)
 template <typename T>
 inline void IScale(T *x, int n, T sf) {
-  for (int i = 0; i < n; i++) { x[i] *= sf; }}
+  for (int i = 0; i < n; i++) {
+    x[i] *= sf;
+  }
+}
 template <typename T>
 inline void IScale1(T x[1], T sf) {
   x[0] *= sf;
@@ -2483,7 +2498,10 @@ inline T IMean16(const T x[16]) {
 // Compute the sample standard deviation of sample data x
 template <typename T>
 inline T ISdv(const T *x, T mean, int n) {
-  if (n < 2) { return static_cast<T>(0.0); }  T sdv = static_cast<T>(0.0);
+  if (n < 2) {
+    return static_cast<T>(0.0);
+  }
+  T sdv = static_cast<T>(0.0);
   for (int i = 0; i < n; ++i) {
     sdv += ISqr(x[i] - mean);
   }
@@ -3201,7 +3219,10 @@ inline void ICentroid2(const float *a, int n, float centroid[2],
 template <typename T>
 inline T IMinElement(const T *a, int n) {
   T val, temp;
-  if (n <= 0) { return (static_cast<T>(0.0)); }  val = a[0];
+  if (n <= 0) {
+    return (static_cast<T>(0.0));
+  }
+  val = a[0];
   for (int i = 1; i < n; i++) {
     temp = a[i];
     if (temp < val) {
@@ -3214,7 +3235,10 @@ inline T IMinElement(const T *a, int n) {
 template <typename T>
 inline T IMaxElement(const T *a, int n) {
   T val, temp;
-  if (n <= 0) { return (static_cast<T>(0.0)); }  val = a[0];
+  if (n <= 0) {
+    return (static_cast<T>(0.0));
+  }
+  val = a[0];
   for (int i = 1; i < n; i++) {
     temp = a[i];
     if (temp > val) {
@@ -3264,7 +3288,10 @@ inline T IMaxElement(const T *a, int n) {
 template <typename T>
 inline T IMaxDiagonalElement(const T *a, int n) {
   T val, temp;
-  if (n <= 0) { return (static_cast<T>(0.0)); }  val = a[0];
+  if (n <= 0) {
+    return (static_cast<T>(0.0));
+  }
+  val = a[0];
   int i, ni = n;
   for (i = 1; i < n; i++, ni += n) {
     temp = a[ni + i];
@@ -3279,7 +3306,10 @@ inline T IMaxDiagonalElement(const T *a, int n) {
 inline int IMaxIndex(const double *a, int n) {
   int bi;
   double b, t;
-  if (n <= 0) { return (0); }  b = a[0];
+  if (n <= 0) {
+    return (0);
+  }
+  b = a[0];
   bi = 0;
   for (int i = 1; i < n; i++)
     if ((t = a[i]) > b) {
@@ -3291,7 +3321,10 @@ inline int IMaxIndex(const double *a, int n) {
 inline int IMaxIndex(const float *a, int n) {
   int bi;
   float b, t;
-  if (n <= 0) { return (0); }  b = a[0];
+  if (n <= 0) {
+    return (0);
+  }
+  b = a[0];
   bi = 0;
   for (int i = 1; i < n; i++)
     if ((t = a[i]) > b) {
@@ -3303,7 +3336,10 @@ inline int IMaxIndex(const float *a, int n) {
 inline int IMaxIndex(const int *a, int n) {
   int bi;
   int b, t;
-  if (n <= 0) { return (0); }  b = a[0];
+  if (n <= 0) {
+    return (0);
+  }
+  b = a[0];
   bi = 0;
   for (int i = 1; i < n; i++)
     if ((t = a[i]) > b) {
@@ -3317,7 +3353,10 @@ inline int IMaxIndex(const int *a, int n) {
 inline int IMaxAbsIndex(const double *a, int n) {
   int bi;
   double b, t;
-  if (n <= 0) { return (0); }  b = IAbs(a[0]);
+  if (n <= 0) {
+    return (0);
+  }
+  b = IAbs(a[0]);
   bi = 0;
   for (int i = 1; i < n; i++)
     if ((t = IAbs(a[i])) > b) {
@@ -3329,7 +3368,10 @@ inline int IMaxAbsIndex(const double *a, int n) {
 inline int IMaxAbsIndex(const float *a, int n) {
   int bi;
   float b, t;
-  if (n <= 0) { return (0); }  b = IAbs(a[0]);
+  if (n <= 0) {
+    return (0);
+  }
+  b = IAbs(a[0]);
   bi = 0;
   for (int i = 1; i < n; i++)
     if ((t = IAbs(a[i])) > b) {
@@ -3341,7 +3383,10 @@ inline int IMaxAbsIndex(const float *a, int n) {
 inline int IMaxAbsIndex(const int *a, int n) {
   int bi;
   int b, t;
-  if (n <= 0) { return (0); }  b = IAbs(a[0]);
+  if (n <= 0) {
+    return (0);
+  }
+  b = IAbs(a[0]);
   bi = 0;
   for (int i = 1; i < n; i++)
     if ((t = IAbs(a[i])) > b) {
@@ -3354,7 +3399,10 @@ inline int IMaxAbsIndex(const int *a, int n) {
 inline int IMinAbsIndex(const double *a, int n) {
   int bi;
   double b, t;
-  if (n <= 0) { return (0); }  b = IAbs(a[0]);
+  if (n <= 0) {
+    return (0);
+  }
+  b = IAbs(a[0]);
   bi = 0;
   for (int i = 1; i < n; i++)
     if ((t = IAbs(a[i])) < b) {
@@ -3366,7 +3414,10 @@ inline int IMinAbsIndex(const double *a, int n) {
 inline int IMinAbsIndex(const float *a, int n) {
   int bi;
   float b, t;
-  if (n <= 0) { return (0); }  b = IAbs(a[0]);
+  if (n <= 0) {
+    return (0);
+  }
+  b = IAbs(a[0]);
   bi = 0;
   for (int i = 1; i < n; i++)
     if ((t = IAbs(a[i])) < b) {
@@ -3378,7 +3429,10 @@ inline int IMinAbsIndex(const float *a, int n) {
 inline int IMinAbsIndex(const int *a, int n) {
   int bi;
   int b, t;
-  if (n <= 0) { return (0); }  b = IAbs(a[0]);
+  if (n <= 0) {
+    return (0);
+  }
+  b = IAbs(a[0]);
   bi = 0;
   for (int i = 1; i < n; i++)
     if ((t = IAbs(a[i])) < b) {

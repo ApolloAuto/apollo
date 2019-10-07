@@ -21,8 +21,7 @@
 namespace apollo {
 namespace dreamview {
 
-class TeleopServiceTest : public ::testing::Test {
-};
+class TeleopServiceTest : public ::testing::Test {};
 
 }  // namespace dreamview
 }  // namespace apollo

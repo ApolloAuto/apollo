@@ -39,8 +39,8 @@ void TeleopService::Start() {
   modem_info_reader_ = node_->CreateReader<ModemInfo>(
       "/apollo/networks/modems",
       [this](const std::shared_ptr<ModemInfo> &msg) { UpdateModemInfo(msg); });
-  daemon_cmd_writer_ =
-      node_->CreateWriter<DaemonServiceCmd>("/apollo/teleop/daemon_service/cmd");
+  daemon_cmd_writer_ = node_->CreateWriter<DaemonServiceCmd>(
+      "/apollo/teleop/daemon_service/cmd");
 }
 
 void TeleopService::RegisterMessageHandlers() {
@@ -99,7 +99,7 @@ void TeleopService::RegisterMessageHandlers() {
 }
 
 void TeleopService::UpdateModemInfo(
-      const std::shared_ptr<ModemInfo> &modem_info) {
+    const std::shared_ptr<ModemInfo> &modem_info) {
   {
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
     // TODO simplify data and only send necessary info for display

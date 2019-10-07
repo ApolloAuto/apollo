@@ -76,9 +76,9 @@ class LineSegment2d {
   Vec2d center() const { return (start_ + end_) / 2.0; }
 
   /** @brief Get a new line-segment with the same start point, but rotated
-    * counterclock-wise by the given amount.
-    * @return The rotated line-segment's end-point.
-    */
+   * counterclock-wise by the given amount.
+   * @return The rotated line-segment's end-point.
+   */
   Vec2d rotate(const double angle);
 
   /**

@@ -165,7 +165,9 @@ void PathReuseDecider::GetADCSLPoint(
 bool PathReuseDecider::IsSameStopObstacles(
     Frame* const frame, ReferenceLineInfo* const reference_line_info) {
   // sanity check
-  if (history_->GetLastFrame() == nullptr) { return false; }
+  if (history_->GetLastFrame() == nullptr) {
+    return false;
+  }
   const std::vector<const HistoryObjectDecision*> history_objects_decisions =
       history_->GetLastFrame()->GetStopObjectDecisions();
   const auto& reference_line = reference_line_info->reference_line();
@@ -308,7 +310,9 @@ void PathReuseDecider::GetHistoryStopSPosition(
 bool PathReuseDecider::IsSameObstacles(
     ReferenceLineInfo* const reference_line_info) {
   const auto& history_frame = FrameHistory::Instance()->Latest();
-  if (!history_frame) { return false; }
+  if (!history_frame) {
+    return false;
+  }
   const auto& history_reference_line_info =
       history_frame->reference_line_info().front();
   const IndexedList<std::string, Obstacle>& history_obstacles =
@@ -358,11 +362,19 @@ bool PathReuseDecider::IsCollisionFree(
        reference_line_info->path_decision()->obstacles().Items()) {
     // filtered all non-static objects and virtual obstacle
     if (!obstacle->IsStatic() || obstacle->IsVirtual()) {
-      if (!obstacle->IsStatic()) { ADEBUG << "SPOT a dynamic obstacle"; }      if (obstacle->IsVirtual()) { ADEBUG << "SPOT a virtual obstacle"; }      continue;
+      if (!obstacle->IsStatic()) {
+        ADEBUG << "SPOT a dynamic obstacle";
+      }
+      if (obstacle->IsVirtual()) {
+        ADEBUG << "SPOT a virtual obstacle";
+      }
+      continue;
     }
     const auto& obstacle_sl = obstacle->PerceptionSLBoundary();
     // Ignore obstacles behind ADC
-    if (obstacle_sl.end_s() < adc_position_sl.s() - kSBuffer) { continue; }    // Ignore too small obstacles.
+    if (obstacle_sl.end_s() < adc_position_sl.s() - kSBuffer) {
+      continue;
+    }  // Ignore too small obstacles.
     if ((obstacle_sl.end_s() - obstacle_sl.start_s()) *
             (obstacle_sl.end_l() - obstacle_sl.start_l()) <
         kMinObstacleArea)
@@ -373,9 +385,14 @@ bool PathReuseDecider::IsCollisionFree(
                    Vec2d(obstacle_sl.end_s(), obstacle_sl.end_l()),
                    Vec2d(obstacle_sl.end_s(), obstacle_sl.start_l())}));
   }
-  if (obstacle_polygons.empty()) { return true; }
+  if (obstacle_polygons.empty()) {
+    return true;
+  }
   const auto& history_frame = FrameHistory::Instance()->Latest();
-  if (!history_frame) { return false; }  const DiscretizedPath& history_path =
+  if (!history_frame) {
+    return false;
+  }
+  const DiscretizedPath& history_path =
       history_frame->current_frame_planned_path();
   // path end point
   common::SLPoint path_end_position_sl;
@@ -391,7 +408,10 @@ bool PathReuseDecider::IsCollisionFree(
         kNumExtraTailBoundPoint * kPathBoundsDeciderResolution) {
       break;
     }
-    if (path_position_sl.s() < adc_position_sl.s() - kSBuffer) { continue; }    const auto& vehicle_box =
+    if (path_position_sl.s() < adc_position_sl.s() - kSBuffer) {
+      continue;
+    }
+    const auto& vehicle_box =
         common::VehicleConfigHelper::Instance()->GetBoundingBox(
             history_path[i]);
     std::vector<Vec2d> ABCDpoints = vehicle_box.GetAllCorners();
@@ -424,7 +444,10 @@ bool PathReuseDecider::IsCollisionFree(
 bool PathReuseDecider::TrimHistoryPath(
     Frame* const frame, ReferenceLineInfo* const reference_line_info) {
   const auto& history_frame = FrameHistory::Instance()->Latest();
-  if (!history_frame) { return false; }  const DiscretizedPath& history_path =
+  if (!history_frame) {
+    return false;
+  }
+  const DiscretizedPath& history_path =
       history_frame->current_frame_planned_path();
   DiscretizedPath trimmed_path;
   // current vehicle status

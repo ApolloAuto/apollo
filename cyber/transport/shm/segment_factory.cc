@@ -19,10 +19,10 @@
 #include <memory>
 #include <string>
 
-#include "cyber/common/log.h"
 #include "cyber/common/global_data.h"
-#include "cyber/transport/shm/xsi_segment.h"
+#include "cyber/common/log.h"
 #include "cyber/transport/shm/posix_segment.h"
+#include "cyber/transport/shm/xsi_segment.h"
 
 namespace apollo {
 namespace cyber {

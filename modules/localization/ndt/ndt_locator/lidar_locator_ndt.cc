@@ -460,8 +460,7 @@ void LidarLocatorNdt::ComposeMapCells(
              map_y <= map_nodes_zones[y * 3 + x][3]; ++map_y) {
           for (int map_x = map_nodes_zones[y * 3 + x][0];
                map_x <= map_nodes_zones[y * 3 + x][2]; ++map_x) {
-            const NdtMapCells& cell_ndt =
-                map_cells.GetMapCell(map_y, map_x);
+            const NdtMapCells& cell_ndt = map_cells.GetMapCell(map_y, map_x);
             if (cell_ndt.cells_.size() > 0) {
               for (auto it = cell_ndt.cells_.begin();
                    it != cell_ndt.cells_.end(); ++it) {

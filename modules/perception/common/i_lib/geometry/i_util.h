@@ -25,7 +25,10 @@ namespace common {
 
 template <typename T>
 inline void IEigSymmetric2x2Closed(const T *A, T *EV, T *Q) {
-  if (A == nullptr) { return; }  Eigen::Matrix<T, 2, 2> a;
+  if (A == nullptr) {
+    return;
+  }
+  Eigen::Matrix<T, 2, 2> a;
   a << A[0], A[1], A[2], A[3];
   Eigen::SelfAdjointEigenSolver<Eigen::Matrix<T, 2, 2> > es(a);
   if (es.info() != Eigen::Success) {
@@ -49,7 +52,10 @@ inline void IEigSymmetric2x2Closed(const T *A, T *EV, T *Q) {
 
 template <typename T>
 inline void IEigSymmetric3x3Closed(const T *A, T *EV, T *Q) {
-  if (A == nullptr) { return; }  Eigen::Matrix<T, 3, 3> a;
+  if (A == nullptr) {
+    return;
+  }
+  Eigen::Matrix<T, 3, 3> a;
   a << A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[8];
   Eigen::SelfAdjointEigenSolver<Eigen::Matrix<T, 3, 3> > es(a);
   if (es.info() != Eigen::Success) {

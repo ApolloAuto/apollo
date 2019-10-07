@@ -42,8 +42,7 @@ class StageApproachTest : public ::testing::Test {
 TEST_F(StageApproachTest, Init) {
   PullOverStageApproach pull_over_stage_approach(config_);
   EXPECT_EQ(pull_over_stage_approach.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::PULL_OVER_APPROACH));
+            ScenarioConfig::StageType_Name(ScenarioConfig::PULL_OVER_APPROACH));
 }
 
 }  // namespace pull_over

@@ -40,8 +40,7 @@ class ParkAndGoStageAdjustTest : public ::testing::Test {
 TEST_F(ParkAndGoStageAdjustTest, Init) {
   ParkAndGoStageAdjust park_and_go_stage_adjust(config_);
   EXPECT_EQ(park_and_go_stage_adjust.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::PARK_AND_GO_ADJUST));
+            ScenarioConfig::StageType_Name(ScenarioConfig::PARK_AND_GO_ADJUST));
 }
 
 }  // namespace park_and_go

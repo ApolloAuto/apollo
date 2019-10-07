@@ -32,8 +32,8 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/common/util/util.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -42,17 +42,17 @@ using apollo::common::ErrorCode;
 using apollo::common::PathPoint;
 using apollo::common::Status;
 using apollo::common::math::Box2d;
-using apollo::common::math::Vec2d;
 using apollo::common::math::LineSegment2d;
+using apollo::common::math::Vec2d;
 
-STObstaclesProcessor::STObstaclesProcessor(
-    const double planning_distance, const double planning_time,
-    const PathData& path_data)
+STObstaclesProcessor::STObstaclesProcessor(const double planning_distance,
+                                           const double planning_time,
+                                           const PathData& path_data)
     : planning_time_(planning_time),
       planning_distance_(planning_distance),
       path_data_(path_data),
-      vehicle_param_(common::VehicleConfigHelper::GetConfig().vehicle_param())
-      {}
+      vehicle_param_(common::VehicleConfigHelper::GetConfig().vehicle_param()) {
+}
 
 Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     PathDecision* const path_decision) {
@@ -67,8 +67,8 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
 }
 
 // TODO(jiacheng): implement this.
-std::pair<double, double>
-STObstaclesProcessor::GetRegularBoundaryFromObstacles(double t) {
+std::pair<double, double> STObstaclesProcessor::GetRegularBoundaryFromObstacles(
+    double t) {
   return {0.0, 0.0};
 }
 
@@ -108,12 +108,10 @@ bool STObstaclesProcessor::GetOverlappingS(
     std::pair<double, double>* const overlapping_s) {
   // Locate the possible range to search in details.
   int pt_before_idx = GetSBoundingPathPointIndex(
-      adc_path_points, obstacle_instance,
-      vehicle_param_.front_edge_to_center(),
+      adc_path_points, obstacle_instance, vehicle_param_.front_edge_to_center(),
       true, 0, static_cast<int>(adc_path_points.size()) - 2);
   int pt_after_idx = GetSBoundingPathPointIndex(
-      adc_path_points, obstacle_instance,
-      vehicle_param_.back_edge_to_center(),
+      adc_path_points, obstacle_instance, vehicle_param_.back_edge_to_center(),
       false, 0, static_cast<int>(adc_path_points.size()) - 2);
   if (pt_before_idx == static_cast<int>(adc_path_points.size()) - 2) {
     return false;
@@ -133,19 +131,18 @@ bool STObstaclesProcessor::GetOverlappingS(
   // Detailed searching.
   bool has_overlapping = false;
   for (int i = pt_before_idx; i <= pt_after_idx; ++i) {
-    if (IsADCOverlappingWithObstacle(
-            adc_path_points[i], obstacle_instance, adc_l_buffer)) {
+    if (IsADCOverlappingWithObstacle(adc_path_points[i], obstacle_instance,
+                                     adc_l_buffer)) {
       overlapping_s->first = adc_path_points[std::max(i - 1, 0)].s();
       has_overlapping = true;
       break;
     }
   }
-  if (!has_overlapping)
-    return false;
+  if (!has_overlapping) return false;
 
   for (int i = pt_after_idx; i >= pt_before_idx; --i) {
-    if (IsADCOverlappingWithObstacle(
-            adc_path_points[i], obstacle_instance, adc_l_buffer)) {
+    if (IsADCOverlappingWithObstacle(adc_path_points[i], obstacle_instance,
+                                     adc_l_buffer)) {
       overlapping_s->second = adc_path_points[i + 1].s();
       break;
     }
@@ -155,12 +152,12 @@ bool STObstaclesProcessor::GetOverlappingS(
 
 int STObstaclesProcessor::GetSBoundingPathPointIndex(
     const std::vector<PathPoint>& adc_path_points,
-    const Box2d& obstacle_instance, const double s_thresh,
-    const bool is_before, const int start_idx, const int end_idx) {
+    const Box2d& obstacle_instance, const double s_thresh, const bool is_before,
+    const int start_idx, const int end_idx) {
   if (start_idx == end_idx) {
     if (IsPathPointAwayFromObstacle(adc_path_points[start_idx],
-            adc_path_points[start_idx+1], obstacle_instance, s_thresh,
-            is_before)) {
+                                    adc_path_points[start_idx + 1],
+                                    obstacle_instance, s_thresh, is_before)) {
       return start_idx;
     } else {
       return -1;
@@ -170,28 +167,27 @@ int STObstaclesProcessor::GetSBoundingPathPointIndex(
   if (is_before) {
     int mid_idx = (start_idx + end_idx - 1) / 2 + 1;
     if (IsPathPointAwayFromObstacle(adc_path_points[mid_idx],
-            adc_path_points[mid_idx+1], obstacle_instance, s_thresh,
-            is_before)) {
+                                    adc_path_points[mid_idx + 1],
+                                    obstacle_instance, s_thresh, is_before)) {
       return GetSBoundingPathPointIndex(adc_path_points, obstacle_instance,
-                                        s_thresh, is_before,
-                                        mid_idx, end_idx);
+                                        s_thresh, is_before, mid_idx, end_idx);
     } else {
       return GetSBoundingPathPointIndex(adc_path_points, obstacle_instance,
-                                        s_thresh, is_before,
-                                        start_idx, mid_idx-1);
+                                        s_thresh, is_before, start_idx,
+                                        mid_idx - 1);
     }
   } else {
     int mid_idx = (start_idx + end_idx) / 2;
     if (IsPathPointAwayFromObstacle(adc_path_points[mid_idx],
-            adc_path_points[mid_idx+1], obstacle_instance, s_thresh,
-            is_before)) {
+                                    adc_path_points[mid_idx + 1],
+                                    obstacle_instance, s_thresh, is_before)) {
       return GetSBoundingPathPointIndex(adc_path_points, obstacle_instance,
-                                        s_thresh, is_before,
-                                        start_idx, mid_idx);
+                                        s_thresh, is_before, start_idx,
+                                        mid_idx);
     } else {
       return GetSBoundingPathPointIndex(adc_path_points, obstacle_instance,
-                                        s_thresh, is_before,
-                                        mid_idx+1, end_idx);
+                                        s_thresh, is_before, mid_idx + 1,
+                                        end_idx);
     }
   }
 }
@@ -202,8 +198,7 @@ bool STObstaclesProcessor::IsPathPointAwayFromObstacle(
   Vec2d path_pt(path_point.x(), path_point.y());
   Vec2d dir_pt(direction_point.x(), direction_point.y());
   LineSegment2d path_dir_lineseg(path_pt, dir_pt);
-  LineSegment2d normal_line_seg(
-      path_pt, path_dir_lineseg.rotate(M_PI_2));
+  LineSegment2d normal_line_seg(path_pt, path_dir_lineseg.rotate(M_PI_2));
 
   auto corner_points = obs_box.GetAllCorners();
   for (const auto& corner_pt : corner_points) {
@@ -212,10 +207,8 @@ bool STObstaclesProcessor::IsPathPointAwayFromObstacle(
     Vec2d path_dir_unit_vec = path_dir_lineseg.unit_direction();
     Vec2d perpendicular_vec = corner_pt - normal_line_ft_pt;
     double corner_pt_s_dist = path_dir_unit_vec.InnerProd(perpendicular_vec);
-    if (is_before && corner_pt_s_dist < s_thresh)
-      return false;
-    if (!is_before && corner_pt_s_dist > -s_thresh)
-      return false;
+    if (is_before && corner_pt_s_dist < s_thresh) return false;
+    if (!is_before && corner_pt_s_dist > -s_thresh) return false;
   }
   return true;
 }

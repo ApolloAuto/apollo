@@ -547,7 +547,10 @@ bool DistanceApproachIPOPTCUDAInterface::eval_grad_f_hand(int n,
 bool DistanceApproachIPOPTCUDAInterface::eval_g(int n, const double* x,
                                                 bool new_x, int m, double* g) {
   eval_constraints(n, x, m, g);
-  if (enable_constraint_check_) { check_g(n, x, m, g); }  return true;
+  if (enable_constraint_check_) {
+    check_g(n, x, m, g);
+  }
+  return true;
 }
 
 bool DistanceApproachIPOPTCUDAInterface::eval_jac_g(int n, const double* x,
@@ -2372,7 +2375,10 @@ void DistanceApproachIPOPTCUDAInterface::get_optimization_results(
   *dual_l_result = dual_l_result_;
   *dual_n_result = dual_n_result_;
 
-  if (!distance_approach_config_.enable_initial_final_check()) { return; }  CHECK_EQ(state_result_.cols(), xWS_.cols());
+  if (!distance_approach_config_.enable_initial_final_check()) {
+    return;
+  }
+  CHECK_EQ(state_result_.cols(), xWS_.cols());
   CHECK_EQ(state_result_.rows(), xWS_.rows());
   double state_diff_max = 0.0;
   for (int i = 0; i < horizon_ + 1; ++i) {

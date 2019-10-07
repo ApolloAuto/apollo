@@ -1119,7 +1119,10 @@ void PathBoundsDecider::GetBoundaryFromLaneChangeForbiddenZone(
   }
   for (size_t i = 0; i < path_bound->size(); ++i) {
     double curr_s = std::get<0>((*path_bound)[i]);
-    if (curr_s > lane_change_start_s) { break; }    double curr_lane_left_width = 0.0;
+    if (curr_s > lane_change_start_s) {
+      break;
+    }
+    double curr_lane_left_width = 0.0;
     double curr_lane_right_width = 0.0;
     double offset_to_map = 0.0;
     reference_line.GetOffsetToMap(curr_s, &offset_to_map);
