@@ -83,15 +83,22 @@ message VehicleParam {
   // minimum value get from chassis.throttle, in percentage
   optional double throttle_deadzone = 21 [default = nan];
 
-  //latency parameters, in micro second
-  optional double steering_dead_time = 22 [default = 0.0];
-  optional double steering_rise_time = 23 [default = 0.0];
-  optional double steering_peak_time = 24 [default = 0.0];
-  optional double steering_settling_time = 25 [default = 0.0];
+
+  optional LatencyParam steering_latency_param = 22;
+  optional LatencyParam throttle_latency_param = 23;
+  optional LatencyParam brake_latency_param = 24;
 }
 
 message VehicleConfig {
   optional apollo.common.Header header = 1;
   optional VehicleParam vehicle_param = 2;
   optional Extrinsics extrinsics = 3;
+}
+
+message LatencyParam {
+    //latency parameters, in microsecond (ms)
+    optional double dead_time = 1 [default = 0.0];
+    optional double rise_time = 2 [default = 0.0];
+    optional double peak_time = 3 [default = 0.0];
+    optional double settling_time = 4 [default = 0.0];
 }
