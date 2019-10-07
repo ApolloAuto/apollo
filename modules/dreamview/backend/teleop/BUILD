@@ -4,21 +4,19 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "teleop",
-    hdrs = select({
-        "//modules/dreamview/backend:teleop": [
-            "teleop.h",
-        ],
-        "//conditions:default": [
-        ],
-
-    }),
     srcs = select({
         "//modules/dreamview/backend:teleop": [
             "teleop.cc",
         ],
         "//conditions:default": [
         ],
-
+    }),
+    hdrs = select({
+        "//modules/dreamview/backend:teleop": [
+            "teleop.h",
+        ],
+        "//conditions:default": [
+        ],
     }),
     copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
@@ -38,7 +36,6 @@ cc_library(
         ],
         "//conditions:default": [
         ],
-
     }),
 )
 
@@ -51,7 +48,6 @@ cc_test(
         ],
         "//conditions:default": [
         ],
-
     }),
     data = [
         "//modules/dreamview/backend/testdata",
