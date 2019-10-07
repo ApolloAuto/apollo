@@ -7,10 +7,12 @@ cc_library(
     srcs = [
         "emergency_pull_over_scenario.cc",
         "stage_approach.cc",
+        "stage_standby.cc",
     ],
     hdrs = [
         "emergency_pull_over_scenario.h",
         "stage_approach.h",
+        "stage_standby.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [

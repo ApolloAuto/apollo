@@ -229,6 +229,7 @@ message ScenarioConfig {
 
     // emergency_pull_over scenario
     EMERGENCY_PULL_OVER_APPROACH = 510;
+    EMERGENCY_PULL_OVER_STANDBY = 511;
 
     // valet parking scenario
     VALET_PARKING_APPROACHING_PARKING_SPOT = 520;
