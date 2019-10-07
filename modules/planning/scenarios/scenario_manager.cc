@@ -31,6 +31,7 @@
 #include "modules/planning/common/util/util.h"
 #include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
+#include "modules/planning/scenarios/park/emergency_pull_over/emergency_pull_over_scenario.h"
 #include "modules/planning/scenarios/park/pull_over/pull_over_scenario.h"
 #include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
 #include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
@@ -67,6 +68,10 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
       ptr.reset(
           new scenario::bare_intersection::BareIntersectionUnprotectedScenario(
               config_map_[scenario_type], &scenario_context_));
+      break;
+    case ScenarioConfig::EMERGENCY_PULL_OVER:
+      ptr.reset(new emergency_pull_over::EmergencyPullOverScenario(
+          config_map_[scenario_type], &scenario_context_));
       break;
     case ScenarioConfig::LANE_FOLLOW:
       ptr.reset(new lane_follow::LaneFollowScenario(config_map_[scenario_type],
@@ -125,6 +130,11 @@ void ScenarioManager::RegisterScenarios() {
   CHECK(Scenario::LoadConfig(
       FLAGS_scenario_bare_intersection_unprotected_config_file,
       &config_map_[ScenarioConfig::BARE_INTERSECTION_UNPROTECTED]));
+
+  // emergency_pull_over
+  CHECK(Scenario::LoadConfig(
+      FLAGS_scenario_emergency_pull_over_config_file,
+      &config_map_[ScenarioConfig::EMERGENCY_PULL_OVER]));
 
   // park_and_go
   CHECK(Scenario::LoadConfig(FLAGS_scenario_park_and_go_config_file,
@@ -278,6 +288,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
       }
       break;
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
+    case ScenarioConfig::EMERGENCY_PULL_OVER:
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::PARK_AND_GO:
     case ScenarioConfig::PULL_OVER:
@@ -415,6 +426,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
       }
       break;
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
+    case ScenarioConfig::EMERGENCY_PULL_OVER:
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
@@ -511,6 +523,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
       }
       break;
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
+    case ScenarioConfig::EMERGENCY_PULL_OVER:
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
@@ -560,6 +573,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectYieldSignScenario(
       }
       break;
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
+    case ScenarioConfig::EMERGENCY_PULL_OVER:
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
@@ -614,6 +628,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectBareIntersectionScenario(
       }
       break;
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
+    case ScenarioConfig::EMERGENCY_PULL_OVER:
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
@@ -744,9 +759,9 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
       case ScenarioConfig::LANE_FOLLOW:
       case ScenarioConfig::CHANGE_LANE:
       case ScenarioConfig::PULL_OVER:
-      case ScenarioConfig::EMERGENCY_PULL_OVER:
         break;
       case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
+      case ScenarioConfig::EMERGENCY_PULL_OVER:
       case ScenarioConfig::PARK_AND_GO:
       case ScenarioConfig::STOP_SIGN_PROTECTED:
       case ScenarioConfig::STOP_SIGN_UNPROTECTED:
