@@ -95,7 +95,7 @@ bool PathReuseDecider::CheckPathReusable(
   // TODO(SHU) kinds of criteria for path reuse
   //   if (!IsSameStopObstacles(frame, reference_line_info))
   //     ADEBUG << "not same stop obstacle";
-  // reuse path when when collision free and same blocking obstacle
+  // reuse path when collision free and same blocking obstacle
   //   return (IsCollisionFree(reference_line_info) &&
   //           IsSameStopObstacles(frame, reference_line_info));
   // reuse path when the blocking obstacle is same
