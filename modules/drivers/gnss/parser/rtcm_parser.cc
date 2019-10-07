@@ -62,8 +62,7 @@ void RtcmParser::ParseRtcmData(const std::string& msg) {
 
   while (cyber::OK()) {
     type = rtcm_parser_->GetMessage(&msg_ptr);
-    if (type == Parser::MessageType::NONE) break;
-    DispatchMessage(type, msg_ptr);
+    if (type == Parser::MessageType::NONE) { break; }    DispatchMessage(type, msg_ptr);
   }
 }
 

@@ -264,8 +264,7 @@ void ProbabilisticFusion::CreateNewTracks(
                     if (sensor_name == frame->GetSensorId())
                       prohibition_sensor_flag = true;
                   });
-    if (prohibition_sensor_flag) continue;
-
+    if (prohibition_sensor_flag) { continue; }
     TrackPtr track = TrackPool::Instance().Get();
     track->Initialize(frame->GetForegroundObjects()[obj_ind]);
     scenes_->AddForegroundTrack(track);

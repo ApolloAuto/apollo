@@ -572,9 +572,7 @@ void VisualizationEngine::DrawTips() {
 }
 
 void VisualizationEngine::UpdateLevel() {
-  if (cur_scale_ > max_stride_ * 1.5) SetScale(max_stride_ * 1.5);
-  if (cur_scale_ < 0.5) SetScale(0.5);
-
+  if (cur_scale_ > max_stride_ * 1.5) { SetScale(max_stride_ * 1.5); }  if (cur_scale_ < 0.5) { SetScale(0.5); }
   // calculate which image level to use
   cur_level_ = 0;
   cur_stride_ = 1;
@@ -794,12 +792,10 @@ void VisualizationEngine::CoordToImageKey(const Eigen::Vector2d &coord,
   }
 
   m = static_cast<int>(key->node_north_id) - lt_node_index_.y;
-  if (m < 0) m = m - (cur_stride_ - 1);
-  key->node_north_id = m / cur_stride_ * cur_stride_ + lt_node_index_.y;
+  if (m < 0) { m = m - (cur_stride_ - 1); }  key->node_north_id = m / cur_stride_ * cur_stride_ + lt_node_index_.y;
 
   n = static_cast<int>(key->node_east_id) - lt_node_index_.x;
-  if (n < 0) n = n - (cur_stride_ - 1);
-  key->node_east_id = n / cur_stride_ * cur_stride_ + lt_node_index_.x;
+  if (n < 0) { n = n - (cur_stride_ - 1); }  key->node_east_id = n / cur_stride_ * cur_stride_ + lt_node_index_.x;
 }
 
 cv::Point VisualizationEngine::CoordToMapGridIndex(

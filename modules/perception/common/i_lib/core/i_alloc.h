@@ -102,8 +102,7 @@ inline T ***IAlloc3(int l, int m, int n) {
   for (i = 0; i < l; i++) {
     head[i] = new (std::nothrow) T *[m];
     if (head[i] == nullptr) {
-      for (j = 0; j < i; j++) delete[] head[j];
-      delete[] head;
+      for (j = 0; j < i; j++) { delete[] head[j]; }      delete[] head;
       delete[] mem;
       return nullptr;
     }

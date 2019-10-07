@@ -210,8 +210,7 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
   }
 
   if (static_cast<int>(file_length_ >> 20) >= MaxLogSize() || PidHasChanged()) {
-    if (file_ != nullptr) fclose(file_);
-    file_ = nullptr;
+    if (file_ != nullptr) { fclose(file_); }    file_ = nullptr;
     file_length_ = bytes_since_flush_ = 0;
     rollover_attempt_ = kRolloverAttemptFrequency - 1;
   }
