@@ -94,6 +94,7 @@ Status Dreamview::Init() {
   server_->addWebSocketHandler("/camera", *camera_ws_);
   server_->addHandler("/image", *image_);
 #ifdef TELEOP
+  teleop_ws_.reset(new WebSocketHandler("Teleop"));
   teleop_.reset(new TeleopService(teleop_ws_.get()));
   server_->addWebSocketHandler("/teleop", *teleop_ws_);
 #endif
