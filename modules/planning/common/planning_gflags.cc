@@ -51,7 +51,7 @@ DEFINE_string(scenario_pull_over_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/pull_over_config.pb.txt",
               "The pull_over scenario configuration file");
-DEFINE_string(scenario_pull_over_emergency_config_file,
+DEFINE_string(scenario_emergency_pull_over_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/pull_over_emergency_config.pb.txt",
               "The pull_over_emergency scenario configuration file");
@@ -89,7 +89,7 @@ DEFINE_bool(enable_scenario_park_and_go, true,
 DEFINE_bool(enable_scenario_pull_over, false,
             "enable pull-over scenario in planning");
 
-DEFINE_bool(enable_scenario_pull_over_emergency, false,
+DEFINE_bool(enable_scenario_emergency_pull_over, false,
             "enable pull-over-emregency scenario in planning");
 
 DEFINE_bool(enable_pull_over_exit, false,
