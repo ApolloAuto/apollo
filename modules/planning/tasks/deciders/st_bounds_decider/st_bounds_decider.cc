@@ -17,5 +17,9 @@
 #include "modules/planning/tasks/deciders/st_bounds_decider/st_bounds_decider.h"
 
 namespace apollo {
-namespace planning {}
+namespace planning {
+
+// TODO(Planning): Add something or remove file.
+
+}  // namespace planning
 }  // namespace apollo
