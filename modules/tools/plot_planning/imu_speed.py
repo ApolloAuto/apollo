@@ -35,7 +35,7 @@ class ImuSpeed:
         timestamp_sec = location_est.measurement_time
         self.timestamp_list.append(timestamp_sec)
         if self.is_lateral:
-            speed = location_est.pose.linear_velocity.x \
+            speed = -1 * location_est.pose.linear_velocity.x \
                 * math.sin(location_est.pose.heading) + \
                 location_est.pose.linear_velocity.y * \
                 math.cos(location_est.pose.heading)
@@ -106,5 +106,5 @@ if __name__ == "__main__":
     ax[0].set_ylabel('Lon Acc')
     ax[1].set_xlabel('Timestamp')
     ax[1].set_ylabel('Lat Acc')
-    
+
     plt.show()
