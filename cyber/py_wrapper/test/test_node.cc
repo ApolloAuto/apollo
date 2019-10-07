@@ -31,8 +31,7 @@ apollo::cyber::PyReader *pr = nullptr;
 
 int cbfun(const char *channel_name) {
   AINFO << "recv->[ " << channel_name << " ]";
-  if (pr) AINFO << "read->[ " << pr->read() << " ]";
-}
+  if (pr) { AINFO << "read->[ " << pr->read() << " ]"; }}
 
 TEST(CyberNodeTest, create_reader) {
   EXPECT_TRUE(apollo::cyber::OK());

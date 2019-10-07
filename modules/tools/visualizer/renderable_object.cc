@@ -119,8 +119,7 @@ void RenderableObject::Render(const QMatrix4x4* mvp) {
   if (is_init_) {
     if (is_renderable()) {
       shader_program_->bind();
-      if (mvp) shader_program_->setUniformValue("mvp", *mvp);
-      SetupExtraUniforms();
+      if (mvp) { shader_program_->setUniformValue("mvp", *mvp); }      SetupExtraUniforms();
       vao_.bind();
       Draw();
       vao_.release();

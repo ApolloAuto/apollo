@@ -221,8 +221,7 @@ void SceneViewer::paintGL() {
 }
 
 void SceneViewer::ChangeCameraType(int index) {
-  if (index < TARGET || index > FREE) return;
-
+  if (index < TARGET || index > FREE) { return; }
   if (index == FREE) {
     current_cameraPtr_ = &free_camera_;
   } else {

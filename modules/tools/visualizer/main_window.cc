@@ -1195,8 +1195,7 @@ void MainWindow::AddNewWriter(
 void MainWindow::PlayPause(void) {
   QObject* obj = QObject::sender();
   bool b = true;
-  if (obj == ui_->actionPause) b = false;
-
+  if (obj == ui_->actionPause) { b = false; }
   if (pointcloud_top_item_) {
     pointcloud_button_->setChecked(b);
     PlayRenderableObject(b);

@@ -51,8 +51,7 @@ GnnBipartiteGraphMatcher::GnnBipartiteGraphMatcher(size_t max_size) {
 }
 
 GnnBipartiteGraphMatcher::~GnnBipartiteGraphMatcher() {
-  if (cost_matrix_ != nullptr) delete cost_matrix_;
-}
+  if (cost_matrix_ != nullptr) { delete cost_matrix_; }}
 
 void GnnBipartiteGraphMatcher::Match(
     const BipartiteGraphMatcherOptions& options,

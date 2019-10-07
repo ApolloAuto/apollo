@@ -182,8 +182,7 @@ bool receive(uint16_t port) {
         }
       }
     }
-    if (!res) break;
-  }
+    if (!res) { break; }  }
   close(listener_sock);
   return res;
 }

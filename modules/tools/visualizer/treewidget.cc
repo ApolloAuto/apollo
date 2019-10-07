@@ -30,8 +30,6 @@ void TreeWidget::resizeEvent(QResizeEvent *event) {
 
 bool TreeWidget::event(QEvent *e) {
   bool b = QTreeWidget::event(e);
-  if (e->type() == QEvent::Hide) emit visibilityChanged(false);
-  if (e->type() == QEvent::Show) emit visibilityChanged(true);
-
+  if (e->type() == QEvent::Hide) { emit visibilityChanged(false); }  if (e->type() == QEvent::Show) { emit visibilityChanged(true); }
   return b;
 }

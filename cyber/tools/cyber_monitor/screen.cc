@@ -89,8 +89,7 @@ inline bool Screen::IsInit(void) const { return (stdscr != nullptr); }
 
 void Screen::Init(void) {
   initscr();
-  if (stdscr == nullptr) return;
-
+  if (stdscr == nullptr) { return; }
   nodelay(stdscr, true);
   keypad(stdscr, true);
   meta(stdscr, true);
@@ -119,8 +118,7 @@ int Screen::Width(void) const { return COLS; }
 int Screen::Height(void) const { return LINES; }
 
 void Screen::SetCurrentColor(ColorPair color) const {
-  if (color == INVALID) return;
-  if (IsInit()) {
+  if (color == INVALID) { return; }  if (IsInit()) {
     current_color_pair_ = color;
     attron(COLOR_PAIR(color));
   }
@@ -166,8 +164,7 @@ void Screen::HighlightLine(int lineNo) {
     for (int x = 0; x < Width(); ++x) {
       chtype ch = mvinch(lineNo + highlight_direction_, x);
       ch &= A_CHARTEXT;
-      if (ch == ' ') mvaddch(lineNo + highlight_direction_, x, ch);
-    }
+      if (ch == ' ') { mvaddch(lineNo + highlight_direction_, x, ch); }    }
     ClearCurrentColor();
 
     SetCurrentColor(BLACK_WHITE);
@@ -222,8 +219,7 @@ void Screen::Run() {
     (this->*showFuncs[static_cast<int>(current_state_)])(ch);
 
     double fr = current_render_obj_->frame_ratio();
-    if (fr < MinHalfFrameRatio) fr = MinHalfFrameRatio;
-    int period = static_cast<int>(1000.0 / fr);
+    if (fr < MinHalfFrameRatio) { fr = MinHalfFrameRatio; }    int period = static_cast<int>(1000.0 / fr);
     period >>= 1;
     std::this_thread::sleep_for(std::chrono::milliseconds(period));
   } while (canRun_);
@@ -261,8 +257,7 @@ void Screen::ShowRenderMessage(int ch) {
     case 'W':
     case KEY_UP:
       --(*y);
-      if (*y < 1) *y = 1;
-      highlight_direction_ = 1;
+      if (*y < 1) { *y = 1; }      highlight_direction_ = 1;
       if (*y < 0) {
         *y = 0;
       }
