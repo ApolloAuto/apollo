@@ -43,8 +43,8 @@ class STGuideLine {
 
   virtual ~STGuideLine() = default;
 
-  common::Status ComputeSTGuideLine(
-      double vel_curr, double vel_expected, double acc);
+  common::Status ComputeSTGuideLine(double vel_curr, double vel_expected,
+                                    double acc);
 
   double GetGuideSFromT(double t) const;
 

@@ -29,8 +29,7 @@ namespace apollo {
 namespace cyber {
 namespace transport {
 
-XsiSegment::XsiSegment(uint64_t channel_id)
-    : Segment(channel_id) {
+XsiSegment::XsiSegment(uint64_t channel_id) : Segment(channel_id) {
   key_ = static_cast<key_t>(channel_id);
 }
 

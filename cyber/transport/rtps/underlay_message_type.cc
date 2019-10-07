@@ -42,7 +42,10 @@ UnderlayMessageType::UnderlayMessageType() {
 }
 
 UnderlayMessageType::~UnderlayMessageType() {
-  if (m_keyBuffer != nullptr) { free(m_keyBuffer); }}
+  if (m_keyBuffer != nullptr) {
+    free(m_keyBuffer);
+  }
+}
 
 bool UnderlayMessageType::serialize(void* data, SerializedPayload_t* payload) {
   UnderlayMessage* p_type = reinterpret_cast<UnderlayMessage*>(data);

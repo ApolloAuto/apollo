@@ -69,8 +69,7 @@ STBoundary::STBoundary(
   CHECK(IsValid(point_pairs)) << "The input point_pairs are NOT valid";
 
   std::vector<std::pair<STPoint, STPoint>> reduced_pairs(point_pairs);
-  if (!is_accurate_boundary)
-    RemoveRedundantPoints(&reduced_pairs);
+  if (!is_accurate_boundary) RemoveRedundantPoints(&reduced_pairs);
 
   for (const auto& item : reduced_pairs) {
     // use same t for both points
@@ -452,9 +451,9 @@ void STBoundary::RemoveRedundantPoints(
   point_pairs->resize(i + 1);
 }
 
-bool STBoundary::GetIndexRange(
-    const std::vector<STPoint>& points, const double t,
-    size_t* left, size_t* right) const {
+bool STBoundary::GetIndexRange(const std::vector<STPoint>& points,
+                               const double t, size_t* left,
+                               size_t* right) const {
   CHECK_NOTNULL(left);
   CHECK_NOTNULL(right);
   if (t < points.front().t() || t > points.back().t()) {

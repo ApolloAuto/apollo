@@ -45,8 +45,7 @@ class ParkAndGoStageCruiseTest : public ::testing::Test {
 TEST_F(ParkAndGoStageCruiseTest, Init) {
   ParkAndGoStageCruise park_and_go_stage_cruise(config_);
   EXPECT_EQ(park_and_go_stage_cruise.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::PARK_AND_GO_CRUISE));
+            ScenarioConfig::StageType_Name(ScenarioConfig::PARK_AND_GO_CRUISE));
 }
 
 }  // namespace park_and_go

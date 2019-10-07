@@ -16,22 +16,21 @@
 
 #include "cyber/transport/shm/posix_segment.h"
 
+#include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
-#include <fcntl.h>
 
 #include "cyber/common/log.h"
 #include "cyber/common/util.h"
-#include "cyber/transport/shm/shm_conf.h"
-#include "cyber/transport/shm/segment.h"
 #include "cyber/transport/shm/block.h"
+#include "cyber/transport/shm/segment.h"
+#include "cyber/transport/shm/shm_conf.h"
 
 namespace apollo {
 namespace cyber {
 namespace transport {
 
-PosixSegment::PosixSegment(uint64_t channel_id)
-    : Segment(channel_id) {
+PosixSegment::PosixSegment(uint64_t channel_id) : Segment(channel_id) {
   shm_name_ = std::to_string(channel_id);
 }
 
@@ -61,8 +60,8 @@ bool PosixSegment::OpenOrCreate() {
   }
 
   // attach managed_shm_
-  managed_shm_ = mmap(nullptr, conf_.managed_shm_size(),
-      PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+  managed_shm_ = mmap(nullptr, conf_.managed_shm_size(), PROT_READ | PROT_WRITE,
+                      MAP_SHARED, fd, 0);
   if (managed_shm_ == MAP_FAILED) {
     AERROR << "attach shm failed:" << strerror(errno);
     close(fd);
@@ -153,8 +152,8 @@ bool PosixSegment::OpenOnly() {
   }
 
   // attach managed_shm_
-  managed_shm_ = mmap(nullptr, file_attr.st_size, PROT_READ | PROT_WRITE, \
-    MAP_SHARED, fd, 0);
+  managed_shm_ = mmap(nullptr, file_attr.st_size, PROT_READ | PROT_WRITE,
+                      MAP_SHARED, fd, 0);
   if (managed_shm_ == MAP_FAILED) {
     AERROR << "attach shm failed: " << strerror(errno);
     close(fd);
