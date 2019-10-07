@@ -35,7 +35,6 @@ cc_library(
         ],
         "//conditions:default": [
         ],
-
     }),
 )
 
@@ -45,6 +44,5 @@ config_setting(
         "define": "WITH_TELEOP=1",
     },
 )
-
 
 cpplint()

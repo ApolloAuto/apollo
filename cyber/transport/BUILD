@@ -476,11 +476,11 @@ cc_library(
     srcs = ["shm/segment_factory.cc"],
     hdrs = ["shm/segment_factory.h"],
     deps = [
-        ":xsi_segment",
         ":posix_segment",
         ":segment",
+        ":xsi_segment",
+        "//cyber/common:global_data",
         "//cyber/common:log",
-        "//cyber/common:global_data"
     ],
 )
 
