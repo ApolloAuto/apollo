@@ -29,16 +29,16 @@
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace pull_over_emergency {
+namespace emergency_pull_over {
 
 // stage context
-struct PullOverEmergencyContext {
-  ScenarioPullOverEmergencyConfig scenario_config;
+struct EmergencyPullOverContext {
+  ScenarioEmergencyPullOverConfig scenario_config;
 };
 
-class PullOverEmergencyScenario : public Scenario {
+class EmergencyPullOverScenario : public Scenario {
  public:
-  PullOverEmergencyScenario(const ScenarioConfig& config,
+  EmergencyPullOverScenario(const ScenarioConfig& config,
                             const ScenarioContext* context)
       : Scenario(config, context) {}
 
@@ -47,7 +47,7 @@ class PullOverEmergencyScenario : public Scenario {
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config);
 
-  PullOverEmergencyContext* GetContext() { return &context_; }
+  EmergencyPullOverContext* GetContext() { return &context_; }
 
  private:
   static void RegisterStages();
@@ -59,10 +59,10 @@ class PullOverEmergencyScenario : public Scenario {
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
       s_stage_factory_;
   bool init_ = false;
-  PullOverEmergencyContext context_;
+  EmergencyPullOverContext context_;
 };
 
-}  // namespace pull_over_emergency
+}  // namespace emergency_pull_over
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

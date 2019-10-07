@@ -18,22 +18,22 @@
  * @file
  **/
 
-#include "modules/planning/scenarios/park/pull_over_emergency/pull_over_emergency_scenario.h"
+#include "modules/planning/scenarios/park/emergency_pull_over/emergency_pull_over_scenario.h"
 
 #include "cyber/common/log.h"
-#include "modules/planning/scenarios/park/pull_over_emergency/stage_approach.h"
+#include "modules/planning/scenarios/park/emergency_pull_over/stage_approach.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace pull_over_emergency {
+namespace emergency_pull_over {
 
 apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
-    PullOverEmergencyScenario::s_stage_factory_;
+    EmergencyPullOverScenario::s_stage_factory_;
 
-void PullOverEmergencyScenario::Init() {
+void EmergencyPullOverScenario::Init() {
   if (init_) {
     return;
   }
@@ -48,18 +48,18 @@ void PullOverEmergencyScenario::Init() {
   init_ = true;
 }
 
-void PullOverEmergencyScenario::RegisterStages() {
+void EmergencyPullOverScenario::RegisterStages() {
   if (!s_stage_factory_.Empty()) {
     s_stage_factory_.Clear();
   }
   s_stage_factory_.Register(
-      ScenarioConfig::PULL_OVER_EMERGENCY_APPROACH,
+      ScenarioConfig::EMERGENCY_PULL_OVER_APPROACH,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new PullOverEmergencyStageApproach(config);
+        return new EmergencyPullOverStageApproach(config);
       });
 }
 
-std::unique_ptr<Stage> PullOverEmergencyScenario::CreateStage(
+std::unique_ptr<Stage> EmergencyPullOverScenario::CreateStage(
     const ScenarioConfig::StageConfig& stage_config) {
   if (s_stage_factory_.Empty()) {
     RegisterStages();
@@ -75,16 +75,16 @@ std::unique_ptr<Stage> PullOverEmergencyScenario::CreateStage(
 /*
  * read scenario specific configs and set in context_ for stages to read
  */
-bool PullOverEmergencyScenario::GetScenarioConfig() {
-  if (!config_.has_pull_over_emergency_config()) {
+bool EmergencyPullOverScenario::GetScenarioConfig() {
+  if (!config_.has_emergency_pull_over_config()) {
     AERROR << "miss scenario specific config";
     return false;
   }
-  context_.scenario_config.CopyFrom(config_.pull_over_emergency_config());
+  context_.scenario_config.CopyFrom(config_.emergency_pull_over_config());
   return true;
 }
 
-}  // namespace pull_over_emergency
+}  // namespace emergency_pull_over
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

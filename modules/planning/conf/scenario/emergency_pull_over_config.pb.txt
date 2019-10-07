@@ -1,11 +1,11 @@
-scenario_type: PULL_OVER_EMERGENCY
-pull_over_emergency_config: {
+scenario_type: EMERGENCY_PULL_OVER
+emergency_pull_over_config: {
 }
 
-stage_type: PULL_OVER_EMERGENCY_APPROACH
+stage_type: EMERGENCY_PULL_OVER_APPROACH
 
 stage_config: {
-  stage_type: PULL_OVER_EMERGENCY_APPROACH
+  stage_type: EMERGENCY_PULL_OVER_APPROACH
   enabled: true
   # task_type: PATH_LANE_BORROW_DECIDER
   task_type: PATH_BOUNDS_DECIDER

@@ -306,8 +306,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPadMsgScenario(
 
   switch (pad_msg_driving_action) {
     case DrivingAction::PULL_OVER:
-      if (FLAGS_enable_scenario_pull_over_emergency) {
-        return ScenarioConfig::PULL_OVER_EMERGENCY;
+      if (FLAGS_enable_scenario_emergency_pull_over) {
+        return ScenarioConfig::EMERGENCY_PULL_OVER;
       }
       break;
     case DrivingAction::STOP:
@@ -744,7 +744,7 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
       case ScenarioConfig::LANE_FOLLOW:
       case ScenarioConfig::CHANGE_LANE:
       case ScenarioConfig::PULL_OVER:
-      case ScenarioConfig::PULL_OVER_EMERGENCY:
+      case ScenarioConfig::EMERGENCY_PULL_OVER:
         break;
       case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
       case ScenarioConfig::PARK_AND_GO:

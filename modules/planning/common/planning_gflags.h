@@ -28,11 +28,11 @@ DECLARE_int32(max_frame_history_num);
 
 // scenarios related
 DECLARE_string(scenario_bare_intersection_unprotected_config_file);
+DECLARE_string(scenario_emergency_pull_over_config_file);
 DECLARE_string(scenario_lane_follow_config_file);
 DECLARE_string(scenario_narrow_street_u_turn_config_file);
 DECLARE_string(scenario_park_and_go_config_file);
 DECLARE_string(scenario_pull_over_config_file);
-DECLARE_string(scenario_pull_over_emergency_config_file);
 DECLARE_string(scenario_stop_sign_unprotected_config_file);
 DECLARE_string(scenario_traffic_light_protected_config_file);
 DECLARE_string(scenario_traffic_light_unprotected_left_turn_config_file);
@@ -42,9 +42,9 @@ DECLARE_string(scenario_valet_parking_config_file);
 DECLARE_string(scenario_yield_sign_config_file);
 
 DECLARE_bool(enable_scenario_bare_intersection);
+DECLARE_bool(enable_scenario_emergency_pull_over);
 DECLARE_bool(enable_scenario_park_and_go);
 DECLARE_bool(enable_scenario_pull_over);
-DECLARE_bool(enable_scenario_pull_over_emergency);
 DECLARE_bool(enable_scenario_stop_sign);
 DECLARE_bool(enable_scenario_traffic_light);
 DECLARE_bool(enable_scenario_yield_sign);

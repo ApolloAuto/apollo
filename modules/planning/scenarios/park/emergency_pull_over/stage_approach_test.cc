@@ -14,46 +14,38 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
 #define protected public
 #define private public
-#include "modules/planning/scenarios/park/pull_over_emergency/pull_over_emergency_scenario.h"
+#include "modules/planning/scenarios/park/emergency_pull_over/stage_approach.h"
 
 #include "gtest/gtest.h"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
-namespace pull_over_emergency {
+namespace emergency_pull_over {
 
-class PullOverEmergencyScenarioTest : public ::testing::Test {
+class StageApproachTest : public ::testing::Test {
  public:
-  virtual void SetUp() {}
+  virtual void SetUp() {
+    config_.set_stage_type(ScenarioConfig::EMERGENCY_PULL_OVER_APPROACH);
+  }
 
  protected:
-  std::unique_ptr<PullOverEmergencyScenario> scenario_;
+  ScenarioConfig::StageConfig config_;
 };
 
-TEST_F(PullOverEmergencyScenarioTest, Init) {
-  FLAGS_scenario_pull_over_emergency_config_file =
-      "/apollo/modules/planning/conf/scenario"
-      "/pull_over_emergency_config.pb.txt";
-
-  ScenarioConfig config;
-  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_pull_over_emergency_config_file, &config));
-  ScenarioContext context;
-  scenario_.reset(new PullOverEmergencyScenario(config, &context));
-  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::PULL_OVER_EMERGENCY);
+TEST_F(StageApproachTest, Init) {
+  EmergencyPullOverStageApproach emergency_pull_over_stage_approach(config_);
+  EXPECT_EQ(emergency_pull_over_stage_approach.Name(),
+            ScenarioConfig::StageType_Name(
+                ScenarioConfig::EMERGENCY_PULL_OVER_APPROACH));
 }
 
-}  // namespace pull_over_emergency
+}  // namespace emergency_pull_over
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
