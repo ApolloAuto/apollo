@@ -192,6 +192,9 @@ DEFINE_string(v2x_obstacle_topic, "/apollo/v2x/obstacles",
               "v2x obstacles topic name");
 DEFINE_string(v2x_trafficlight_topic, "/apollo/v2x/traffic_light",
               "v2x trafficlight topic name");
+DEFINE_string(storytelling_topic, "/apollo/storytelling",
+              "Storytelling topic.");
+
 // For pandora.
 DEFINE_string(pandora_pointcloud_topic,
               "/apollo/sensor/pandora/hesai40/PointCloud2",
