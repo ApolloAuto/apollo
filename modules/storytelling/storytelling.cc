@@ -42,17 +42,16 @@ class Storytelling : public apollo::cyber::TimerComponent {
     auto* manager = FrameManager::Instance();
     manager->StartFrame();
 
-    Stories stories;
     // Query all tellers.
     for (const auto& teller : story_tellers_) {
-      teller->Update(&stories);
+      teller->Update(&stories_);
     }
 
     // Send stories.
     static auto writer = manager->CreateWriter<Stories>(
         FLAGS_storytelling_topic);
-    apollo::common::util::FillHeader("Storytelling", &stories);
-    writer->Write(stories);
+    apollo::common::util::FillHeader("Storytelling", &stories_);
+    writer->Write(stories_);
 
     manager->EndFrame();
     return true;
@@ -60,6 +59,7 @@ class Storytelling : public apollo::cyber::TimerComponent {
 
  private:
   std::vector<std::unique_ptr<BaseTeller>> story_tellers_;
+  Stories stories_;
 };
 
 CYBER_REGISTER_COMPONENT(Storytelling)
