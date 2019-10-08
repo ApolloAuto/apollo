@@ -10,7 +10,7 @@ message ProceedWithCaution {
 
 // TODO(xiaoxq): State triggering conditions.
 message CloseToJunction {
-  optional int32 distance = 1;
+  optional float distance = 1;
 }
 
 // Usage guide for action modules:
