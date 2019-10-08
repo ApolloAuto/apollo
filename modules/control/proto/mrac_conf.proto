@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package apollo.control;
+
+message MracConf {
+  optional int32 mrac_reference_order = 1 [default = 1];
+  optional double reference_time_constant = 2;
+  optional double reference_natural_frequency = 3;
+  optional double reference_damping_ratio = 4;
+  optional double adaption_state_gain = 5;
+  optional double adaption_desired_gain = 6;
+  optional double adaption_nonlinear_gain = 7;
+  optional double mrac_saturation_level = 8 [default = 100.0];
+}

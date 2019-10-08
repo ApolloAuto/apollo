@@ -4,6 +4,7 @@ package apollo.control;
 
 import "modules/control/proto/gain_scheduler_conf.proto";
 import "modules/control/proto/leadlag_conf.proto";
+import "modules/control/proto/mrac_conf.proto";
 
 // simple optimal steer control param
 message LatControllerConf {
@@ -31,4 +32,6 @@ message LatControllerConf {
   optional bool enable_look_ahead_back_control = 20 [default = false];
   optional double lookahead_station = 21 [default = 0.0];
   optional double lookback_station = 22 [default = 0.0];
+  optional MracConf actuation_mrac_conf = 23;
+  optional bool enable_actuation_mrac_control = 24 [default = false];
 }
