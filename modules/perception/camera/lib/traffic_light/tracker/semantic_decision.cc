@@ -234,7 +234,7 @@ bool SemanticReviser::Track(const TrafficLightTrackerOptions &options,
   std::vector<SemanticTable> semantic_table;
   ADEBUG << "start revise ";
 
-  if (lights_ref.size() <= 0) {
+  if (lights_ref.empty()) {
     history_semantic_.clear();
     ADEBUG << "no lights to revise, return";
     return true;

@@ -627,7 +627,7 @@ void StopSignInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
       }
     }
   }
-  if (overlap_junction_ids_.size() <= 0) {
+  if (overlap_junction_ids_.empty()) {
     AWARN << "stop sign " << id().id() << "has no overlap with any junction.";
   }
 }
