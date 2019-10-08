@@ -1,15 +1,12 @@
 import React from "react";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
-import { inject, observer } from "mobx-react";
 
 import PlanningMonitor from "components/PNCMonitor/PlanningMonitor";
 import ControlMonitor from "components/PNCMonitor/ControlMonitor";
 import LatencyMonitor from "components/PNCMonitor/LatencyMonitor";
 
-@inject("store") @observer
 export default class PNCMonitor extends React.Component {
     render() {
-        const { options } = this.props;
         return (
             <div className="monitor pnc-monitor">
                 <Tabs>

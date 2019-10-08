@@ -147,7 +147,7 @@ export default class DriveEventEditor extends React.Component {
                                 <td className="multiple-items">
                                     <span>
                                         <CheckboxItem
-                                            id={"showPNCMonitor"}
+                                            id="isReportableData"
                                             isChecked={this.state.isReportable}
                                             disabled={false}
                                             onClick={this.toggleTicket}
