@@ -31,3 +31,11 @@ triggers {
   forward_time: 15
   description: "regularly triggered every certain time interval"
 }
+
+triggers {
+  trigger_name: "SwerveTrigger"
+  enabled: true
+  backward_time: 15
+  forward_time: 15
+  description: "triggered when swerve happened"
+}

@@ -27,6 +27,8 @@ namespace apollo {
 namespace data {
 
 using apollo::canbus::Chassis;
+constexpr float MAX_STEER_PER = 100.0;
+constexpr float MIN_STEER_PER = -100.0;
 
 SwerveTrigger::SwerveTrigger() { trigger_name_ = "SwerveTrigger"; }
 
@@ -40,7 +42,7 @@ void SwerveTrigger::Pull(const RecordMessage& msg) {
     chassis_msg.ParseFromString(msg.content);
     const float steer_per = chassis_msg.steering_percentage();
 
-    if (IsNoisy(steer_per) || steer_per > 100.0 || steer_per < -100.0) {
+    if (IsNoisy(steer_per)) {
       return;
     }
 
@@ -55,6 +57,9 @@ void SwerveTrigger::Pull(const RecordMessage& msg) {
 }
 
 bool SwerveTrigger::IsNoisy(const float steer) const {
+  if (steer > MAX_STEER_PER || steer < MIN_STEER_PER) {
+    return true;
+  }
   const float pre_steer_mps =
       (current_steer_queue_.empty() ? 0.0f : current_steer_queue_.back());
   return fabs(pre_steer_mps - steer) > noisy_diff_;
@@ -70,6 +75,7 @@ bool SwerveTrigger::IsSwerve() const {
   return delta > max_delta_;
 }
 
+// TODO(Leisheng Mu): reuse the code with hard_brake_trigger in next iteration
 void SwerveTrigger::EnqueueMessage(const float steer) {
   current_steer_queue_.emplace_back(steer);
   current_total_ += steer;

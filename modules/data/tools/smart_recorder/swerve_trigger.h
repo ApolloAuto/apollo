@@ -29,7 +29,7 @@ using apollo::canbus::Chassis;
 
 /**
  * @class SwerveTrigger
- * @brief Swerve trigger that fires when hard break is engaged
+ * @brief Swerve trigger that fires when swerve is engaged
  */
 class SwerveTrigger : public TriggerBase {
  public:
