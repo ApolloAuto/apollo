@@ -16,11 +16,18 @@
 
 #include "modules/storytelling/story_tellers/close_to_junction_teller.h"
 
+#include "modules/common/adapters/adapter_gflags.h"
+#include "modules/planning/proto/planning.pb.h"
+#include "modules/storytelling/frame_manager.h"
+
 namespace apollo {
 namespace storytelling {
 
+using apollo::planning::ADCTrajectory;
+
 void CloseToJunctionTeller::Init() {
-  // TODO(xiaoxq): Create required readers.
+  auto* manager = FrameManager::Instance();
+  manager->CreateOrGetReader<ADCTrajectory>(FLAGS_planning_trajectory_topic);
 }
 
 void CloseToJunctionTeller::Update(Stories* stories) {

@@ -16,6 +16,9 @@ cc_library(
     hdrs = ["close_to_junction_teller.h"],
     deps = [
         ":base_teller",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/planning/proto:planning_proto",
+        "//modules/storytelling:frame_manager",
     ],
 )
 
