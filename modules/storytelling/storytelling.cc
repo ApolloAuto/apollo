@@ -28,10 +28,33 @@ namespace storytelling {
 class Storytelling : public apollo::cyber::TimerComponent {
  public:
   bool Init() override {
+    FrameManager::Instance()->Init(node_);
+    story_tellers_.emplace_back(new CloseToJunctionTeller());
+
+    // Init all tellers.
+    for (const auto& teller : story_tellers_) {
+      teller->Init();
+    }
     return true;
   }
 
   bool Proc() override {
+    auto* manager = FrameManager::Instance();
+    manager->StartFrame();
+
+    Stories stories;
+    // Query all tellers.
+    for (const auto& teller : story_tellers_) {
+      teller->Update(&stories);
+    }
+
+    // Send stories.
+    static auto writer = manager->CreateWriter<Stories>(
+        FLAGS_storytelling_topic);
+    apollo::common::util::FillHeader("Storytelling", &stories);
+    writer->Write(stories);
+
+    manager->EndFrame();
     return true;
   }
 
