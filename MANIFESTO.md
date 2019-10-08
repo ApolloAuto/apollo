@@ -1,4 +1,4 @@
-##  Open Capability--Shared Resources--Accelerated Innovation--Sustained Mutual Benefit
+##  Apollo Governance
 
 Apollo is an open platform whose primary purpose is to become a vibrant autonomous driving ecosystem by providing a comprehensive, safe, secure, and reliable solution that supports all major features and functions of an autonomous vehicle.
 
@@ -6,7 +6,7 @@ Apollo's ambition is no less than to revolutionize the auto and transportation i
 
 In order to safeguard the architectural integrity, system reliability, and rapid evolution of Apollo, Baidu is willing to step up and exercise its leadership in driving important decisions whenever needed while preserving active participation of the wider community.
 
-##  The Apollo manifesto: Open Capability--Shared Resources--Accelerated Innovation--Sustained Mutual Benefit.
+##  Apollo Manifesto
 
 In essence, Apollo is the freedom from wasting time and resources re-implementing fundamental components and allows each member of the ecosystem to focus on their specific areas of expertise, which will dramatically increase the speed of innovation.
 
@@ -22,6 +22,4 @@ This innovative platform and data service creates a lasting, mutually beneficial
 
 ## Attribution
 
-This Manifesto is available at <http://apollo.auto/docs/manifesto.html>
-
-[homepage]: http://apollo.auto
+This Manifesto is available on our website [apollo.auto](http://apollo.auto/docs/manifesto.html).
