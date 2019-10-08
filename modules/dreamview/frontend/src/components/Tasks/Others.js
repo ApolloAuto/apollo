@@ -10,6 +10,7 @@ export default class Others extends React.Component {
         const { options, enableHMIButtonsOnly, hmi } = this.props.store;
 
         const disablePanel = enableHMIButtonsOnly || options.lockTaskPanel;
+        const hasPncMonitor = !options.showCameraView;
 
         return (
             <div className="others card">
@@ -31,7 +32,8 @@ export default class Others extends React.Component {
                                   onClick={() => {
                                     this.props.store.handleOptionToggle('lockTaskPanel');
                                   }} />
-                    <CheckboxItem id={"showPNCMonitor"}
+                    {hasPncMonitor &&
+                        <CheckboxItem id={"showPNCMonitor"}
                                   title={"PNC Monitor"}
                                   isChecked={options.showPNCMonitor}
                                   disabled={disablePanel}
@@ -39,15 +41,18 @@ export default class Others extends React.Component {
                                   onClick={() => {
                                       this.props.store.handleOptionToggle('showPNCMonitor');
                                   }} />
-                    <CheckboxItem id={"showDataCollectionMonitor"}
-                                  title={"Data Collection Monitor"}
-                                  isChecked={options.showDataCollectionMonitor}
-                                  disabled={disablePanel || !hmi.isCalibrationMode}
-                                  extraClasses="others-checkbox"
-                                  onClick={() => {
-                                    this.props.store.handleOptionToggle(
-                                                         'showDataCollectionMonitor');
-                                  }} />
+                    }
+                    {hmi.isCalibrationMode &&
+                        <CheckboxItem id={"showDataCollectionMonitor"}
+                                    title={"Data Collection Monitor"}
+                                    isChecked={options.showDataCollectionMonitor}
+                                    disabled={disablePanel || !hmi.isCalibrationMode}
+                                    extraClasses="others-checkbox"
+                                    onClick={() => {
+                                        this.props.store.handleOptionToggle(
+                                                            'showDataCollectionMonitor');
+                                    }} />
+                    }
                     <CheckboxItem id={"toggleSimControl"}
                                   title={"Sim Control"}
                                   isChecked={options.enableSimControl}
