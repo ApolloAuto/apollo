@@ -78,28 +78,59 @@ STObstaclesProcessor::GetFallbackBoundaryFromObstacles(double t) {
   return {0.0, 0.0};
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Private helper functions.
 
-bool STObstaclesProcessor::ComputeObstacleSTBoundary(const Obstacle& obstacle) {
-  // TODO(jiacheng): implement and uncomment the following part.
-  // std::vector<STPoint> lower_points;
-  // std::vector<STPoint> upper_points;
-  // const auto& adc_path_points = path_data_.discretized_path();
-  // const auto& obs_trajectory = obstacle.Trajectory();
+bool STObstaclesProcessor::ComputeObstacleSTBoundary(
+    const Obstacle& obstacle,
+    std::vector<STPoint>* const lower_points,
+    std::vector<STPoint>* const upper_points) {
+  lower_points->clear();
+  upper_points->clear();
+  const auto& adc_path_points = path_data_.discretized_path();
+  const auto& obs_trajectory = obstacle.Trajectory();
 
-  // if (obs_trajectory.trajectory_point_size() == 0) {
-  //   // Processing a static obstacle.
-  //   // Sanity checks.
-  //   if (!obstacle.IsStatic()) {
-  //     AWARN << "Non-static obstacle[" << obstacle.Id()
-  //           << "] has NO prediction trajectory."
-  //           << obstacle.Perception().ShortDebugString();
-  //   }
-  // } else {
-  //   // Processing a dynamic obstacle.
-  // }
-  return true;
+  if (obs_trajectory.trajectory_point_size() == 0) {
+    // Processing a static obstacle.
+    // Sanity checks.
+    if (!obstacle.IsStatic()) {
+      AWARN << "Non-static obstacle[" << obstacle.Id()
+            << "] has NO prediction trajectory."
+            << obstacle.Perception().ShortDebugString();
+    }
+    // Get the overlapping s between ADC path and obstacle's perception box.
+    const Box2d& obs_box = obstacle.PerceptionBoundingBox();
+    std::pair<double, double> overlapping_s;
+    if (GetOverlappingS(adc_path_points, obs_box, kADCSafetyLBuffer,
+        &overlapping_s)) {
+      lower_points->emplace_back(overlapping_s.first, 0.0);
+      lower_points->emplace_back(overlapping_s.first, planning_time_);
+      upper_points->emplace_back(overlapping_s.second, 0.0);
+      upper_points->emplace_back(overlapping_s.second, planning_time_);
+    }
+  } else {
+    // Processing a dynamic obstacle.
+    // Go through every occurence of the obstacle at all timesteps, and
+    // figure out the overlapping s-max and s-min one by one.
+    for (const auto& obs_traj_pt : obs_trajectory.trajectory_point()) {
+      // TODO(jiacheng): Currently, if the obstacle overlaps with ADC at
+      // disjoint segments (happens very rarely), we merge them into one.
+      // In the future, this could be considered in greater details rather
+      // than being approximated.
+      const Box2d& obs_box = obstacle.GetBoundingBox(obs_traj_pt);
+      std::pair<double, double> overlapping_s;
+      if (GetOverlappingS(adc_path_points, obs_box, kADCSafetyLBuffer,
+          &overlapping_s)) {
+        lower_points->emplace_back(
+            overlapping_s.first, obs_traj_pt.relative_time());
+        upper_points->emplace_back(
+            overlapping_s.second, obs_traj_pt.relative_time());
+      }
+    }
+  }
+
+  return (!lower_points->empty() && !upper_points->empty());
 }
 
 bool STObstaclesProcessor::GetOverlappingS(
