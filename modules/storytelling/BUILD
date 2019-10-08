@@ -13,4 +13,16 @@ cc_library(
     ],
 )
 
+cc_binary(
+    name = "libstorytelling.so",
+    srcs = ["storytelling.cc"],
+    copts = ['-DMODULE_NAME=\\"storytelling\\"'],
+    linkshared = True,
+    linkstatic = False,
+    deps = [
+        "//cyber",
+        "//modules/storytelling/story_tellers:close_to_junction_teller",
+    ],
+)
+
 cpplint()
