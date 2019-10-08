@@ -69,7 +69,7 @@ bool ObjectSequence::GetTrackInTemporalWindow(TrackIdKey track_id,
 
 void ObjectSequence::RemoveStaleTracks(TimeStampKey current_stamp) {
   for (auto outer_iter = sequence_.begin(); outer_iter != sequence_.end();) {
-    if (outer_iter->second.size() <= 0) {
+    if (outer_iter->second.empty()) {
       AERROR << "Found empty tracks";
       continue;
     }

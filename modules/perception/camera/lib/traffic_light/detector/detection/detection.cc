@@ -234,7 +234,7 @@ bool TrafficLightDetection::Inference(
 
 bool TrafficLightDetection::Detect(const TrafficLightDetectorOptions &options,
                                    CameraFrame *frame) {
-  if (frame->traffic_lights.size() <= 0) {
+  if (frame->traffic_lights.empty()) {
     AINFO << "no lights to detect";
     return true;
   }

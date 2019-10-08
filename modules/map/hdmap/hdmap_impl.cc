@@ -584,7 +584,7 @@ int HDMapImpl::GetLanesWithHeading(const Vec2d& point, const double distance,
   CHECK_NOTNULL(lanes);
   std::vector<LaneInfoConstPtr> all_lanes;
   const int status = GetLanes(point, distance, &all_lanes);
-  if (status < 0 || all_lanes.size() <= 0) {
+  if (status < 0 || all_lanes.empty()) {
     return -1;
   }
 
@@ -618,7 +618,7 @@ int HDMapImpl::GetRoadBoundaries(
   junctions->clear();
 
   std::vector<LaneInfoConstPtr> lanes;
-  if (GetLanes(point, radius, &lanes) != 0 || lanes.size() <= 0) {
+  if (GetLanes(point, radius, &lanes) != 0 || lanes.empty()) {
     return -1;
   }
 
