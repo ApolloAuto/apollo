@@ -25,6 +25,7 @@
 #include "modules/data/tools/smart_recorder/interval_pool.h"
 #include "modules/data/tools/smart_recorder/regular_interval_trigger.h"
 #include "modules/data/tools/smart_recorder/small_topics_trigger.h"
+#include "modules/data/tools/smart_recorder/swerve_trigger.h"
 
 namespace apollo {
 namespace data {
@@ -80,6 +81,7 @@ bool RecordProcessor::InitTriggers(const SmartRecordTrigger& trigger_conf) {
   triggers_.push_back(std::unique_ptr<TriggerBase>(new HardBrakeTrigger));
   triggers_.push_back(std::unique_ptr<TriggerBase>(new SmallTopicsTrigger));
   triggers_.push_back(std::unique_ptr<TriggerBase>(new RegularIntervalTrigger));
+  triggers_.push_back(std::unique_ptr<TriggerBase>(new SwerveTrigger));
   for (const auto& trigger : triggers_) {
     if (!trigger->Init(trigger_conf)) {
       AERROR << "unable to initiate trigger and collect channels";
