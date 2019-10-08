@@ -22,4 +22,28 @@ vehicle_param {
 
   brake_deadzone: 15.5
   throttle_deadzone: 18.0
+
+  steering_latency_param
+  {
+      dead_time: 0.0
+      rise_time: 0.0
+      peak_time: 0.0
+      settling_time: 0.0
+  }
+
+  throttle_latency_param
+  {
+      dead_time: 0.0
+      rise_time: 0.0
+      peak_time: 0.0
+      settling_time: 0.0
+  }
+
+  brake_latency_param
+  {
+      dead_time: 0.0
+      rise_time: 0.0
+      peak_time: 0.0
+      settling_time: 0.0
+  }
 }
