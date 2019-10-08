@@ -76,7 +76,7 @@ export default class Options {
     }
 
     @computed get monitorName() {
-        if(this.showCameraView) {
+        if (this.showCameraView) {
             return MONITOR_MENU.CAMERA_PARAM;
         } else if (this.showDataCollectionMonitor) {
             return MONITOR_MENU.DATA_COLLECTION_MONITOR;
