@@ -18,6 +18,7 @@ proto_library(
         "leadlag_conf.proto",
         "lon_controller_conf.proto",
         "mpc_controller_conf.proto",
+        "mrac_conf.proto",
         "pad_msg.proto",
         "pid_conf.proto",
     ],

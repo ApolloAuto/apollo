@@ -73,6 +73,22 @@ cc_library(
 )
 
 cc_library(
+    name = "mrac_controller",
+    srcs = [
+        "mrac_controller.cc",
+    ],
+    hdrs = [
+        "mrac_controller.h",
+    ],
+    copts = ['-DMODULE_NAME=\\"control\\"'],
+    deps = [
+        "//cyber",
+        "//modules/common/filters",
+        "//modules/control/proto:control_proto",
+    ],
+)
+
+cc_library(
     name = "pid_controller",
     srcs = [
         "pid_controller.cc",
@@ -208,6 +224,21 @@ cc_test(
     data = ["//modules/control/testdata:control_testdata"],
     deps = [
         ":leadlag_controller",
+        "//modules/common/util",
+        "//modules/control/proto:control_proto",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "mrac_controller_test",
+    size = "small",
+    srcs = [
+        "mrac_controller_test.cc",
+    ],
+    data = ["//modules/control/testdata:control_testdata"],
+    deps = [
+        ":mrac_controller",
         "//modules/common/util",
         "//modules/control/proto:control_proto",
         "@gtest//:main",

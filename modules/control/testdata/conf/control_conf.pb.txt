@@ -93,7 +93,17 @@ lat_controller_conf {
       ratio: 0.4
     }
   }
-
+  enable_actuation_mrac_control: true
+  actuation_mrac_conf {
+    mrac_reference_order: 1
+    reference_time_constant: 0.01
+    reference_natural_frequency: 10
+    reference_damping_ratio: 0.9
+    adaption_state_gain: 1.0
+    adaption_desired_gain: 1.0
+    adaption_nonlinear_gain: 1.0
+    mrac_saturation_level: 100.0
+  }
 }
 lon_controller_conf {
   ts: 0.01
