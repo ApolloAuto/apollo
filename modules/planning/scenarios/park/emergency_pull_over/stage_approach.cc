@@ -61,20 +61,15 @@ Stage::StageStatus EmergencyPullOverStageApproach::Process(
 
   // TODO(all): to be implemented
   if (1) {
-    return FinishStage(false);
+    return FinishStage();
   }
 
   return StageStatus::RUNNING;
 }
 
-Stage::StageStatus EmergencyPullOverStageApproach::FinishStage(
-    const bool success) {
-  if (success) {
-    return FinishScenario();
-  } else {
-    next_stage_ = ScenarioConfig::PULL_OVER_RETRY_APPROACH_PARKING;
-    return Stage::FINISHED;
-  }
+Stage::StageStatus EmergencyPullOverStageApproach::FinishStage() {
+  next_stage_ = ScenarioConfig::EMERGENCY_PULL_OVER_STANDBY;
+  return Stage::FINISHED;
 }
 
 }  // namespace emergency_pull_over

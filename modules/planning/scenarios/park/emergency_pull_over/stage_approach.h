@@ -44,7 +44,7 @@ class EmergencyPullOverStageApproach : public Stage {
     return Stage::GetContextAs<EmergencyPullOverContext>();
   }
 
-  Stage::StageStatus FinishStage(const bool success);
+  Stage::StageStatus FinishStage();
 
  private:
   ScenarioEmergencyPullOverConfig scenario_config_;
