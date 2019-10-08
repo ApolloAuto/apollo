@@ -73,9 +73,18 @@ bool StageIntersectionCruiseImpl::CheckDone(
           reference_line_info,
           traffic_sign_overlap_id,
           ReferenceLineInfo::SIGNAL);
-    } else {
-      // TODO(all): to be added
+    } else if (scenario_type == ScenarioConfig::YIELD_SIGN) {
       // yield_sign scenarios
+      const auto& yield_sign_status =
+          PlanningContext::Instance()->planning_status().yield_sign();
+      const std::string traffic_sign_overlap_id =
+          yield_sign_status.current_yield_sign_overlap_id_size() > 0
+              ? yield_sign_status.current_yield_sign_overlap_id(0)
+              : "";
+      traffic_sign_overlap = scenario::util::GetOverlapOnReferenceLine(
+          reference_line_info,
+          traffic_sign_overlap_id,
+          ReferenceLineInfo::YIELD_SIGN);
     }
 
     if (!traffic_sign_overlap) {
