@@ -158,7 +158,6 @@ bool MaxPool1d::Load(const LayerParameter& layer_pb) {
   }
   MaxPool1dParameter maxpool1d_pb = layer_pb.maxpool1d();
   return Load(maxpool1d_pb);
-  return true;
 }
 
 bool MaxPool1d::Load(const MaxPool1dParameter& maxpool1d_pb) {
