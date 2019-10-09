@@ -18,7 +18,6 @@
 
 #include <omp.h>
 #include <unordered_map>
-#include <utility>
 
 #include "cyber/common/file.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -55,13 +54,6 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
   CHECK_NOTNULL(latest_feature_ptr);
 
-  // Extract features of obstacle_history
-  std::vector<double> feature_values;
-  if (!ExtractFeatureValues(obstacle_ptr, &feature_values)) {
-    ADEBUG << "Obstacle [" << id << "] failed to extract obstacle history";
-    return false;
-  }
-
   if (!FLAGS_enable_semantic_map) {
     ADEBUG << "Not enable semantic map, exit semantic_lstm_evaluator.";
     return false;
@@ -70,9 +62,6 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   if (!SemanticMap::Instance()->GetMapById(id, &feature_map)) {
     return false;
   }
-
-  // Build input features for torch
-  std::vector<torch::jit::IValue> torch_inputs;
   // Process the feature_map
   cv::cvtColor(feature_map, feature_map, CV_BGR2RGB);
   cv::Mat img_float;
@@ -82,10 +71,30 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   img_tensor[0][0] = img_tensor[0][0].sub(0.485).div(0.229);
   img_tensor[0][1] = img_tensor[0][1].sub(0.456).div(0.224);
   img_tensor[0][2] = img_tensor[0][2].sub(0.406).div(0.225);
+
+  // Extract features of pos_history
+  std::vector<std::pair<double, double>> pos_history(20, {0.0, 0.0});
+  if (!ExtractObstacleHistory(obstacle_ptr, &pos_history)) {
+    ADEBUG << "Obstacle [" << id << "] failed to extract obstacle history";
+    return false;
+  }
   // Process obstacle_history
   torch::Tensor obstacle_pos = torch::zeros({1, 20, 2});
   torch::Tensor obstacle_pos_step = torch::zeros({1, 20, 2});
+  for (int i = 0; i < 20; ++i) {
+    obstacle_pos[0][19 - i][0] = pos_history[i].first;
+    obstacle_pos[0][19 - i][1] = pos_history[i].second;
+    if (i == 19 || (i > 0 && pos_history[i].first == 0.0)) {
+      break;
+    }
+    obstacle_pos_step[0][19 - i][0] =
+        pos_history[i].first - pos_history[i + 1].first;
+    obstacle_pos_step[0][19 - i][1] =
+        pos_history[i].second - pos_history[i + 1].second;
+  }
 
+  // Build input features for torch
+  std::vector<torch::jit::IValue> torch_inputs;
   torch_inputs.push_back(c10::ivalue::Tuple::create(
       {std::move(img_tensor.to(device_)), std::move(obstacle_pos.to(device_)),
        std::move(obstacle_pos_step.to(device_))},
@@ -129,8 +138,23 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   return true;
 }
 
-bool SemanticLSTMEvaluator::ExtractFeatureValues(
-    Obstacle* obstacle_ptr, std::vector<double>* feature_values) {
+bool SemanticLSTMEvaluator::ExtractObstacleHistory(
+    Obstacle* obstacle_ptr,
+    std::vector<std::pair<double, double>>* pos_history) {
+  pos_history->resize(20, {0.0, 0.0});
+  const Feature& obs_curr_feature = obstacle_ptr->latest_feature();
+  double obs_curr_heading = obs_curr_feature.velocity_heading();
+  std::pair<double, double> obs_curr_pos = std::make_pair(
+      obs_curr_feature.position().x(), obs_curr_feature.position().y());
+  for (std::size_t i = 0; i < obstacle_ptr->history_size() && i < 20; ++i) {
+    const Feature& feature = obstacle_ptr->feature(i);
+    if (!feature.IsInitialized()) {
+      break;
+    }
+    pos_history->at(i) = WorldCoordToObjCoord(
+        std::make_pair(feature.position().x(), feature.position().y()),
+        obs_curr_pos, obs_curr_heading);
+  }
   return true;
 }
 
@@ -142,7 +166,7 @@ void SemanticLSTMEvaluator::LoadModel() {
   torch::set_num_threads(1);
   // TODO(Hongyi): change model file name and gflag
   torch_model_ =
-      torch::jit::load("/apollo/modules/prediction/data/model.pt", device_);
+      torch::jit::load(FLAGS_torch_vehicle_junction_map_file, device_);
 }
 
 }  // namespace prediction
