@@ -57,6 +57,7 @@ Status SpeedBoundsDecider::Process(
   PathDecision *const path_decision = reference_line_info->path_decision();
 
   // 1. Map obstacles into st graph
+  auto time1 = std::chrono::system_clock::now();
   STBoundaryMapper boundary_mapper(
       speed_bounds_config_, reference_line, path_data,
       path_data.discretized_path().Length(), speed_bounds_config_.total_time());
@@ -68,6 +69,10 @@ Status SpeedBoundsDecider::Process(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+  auto time2 = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff = time2 - time1;
+  ADEBUG << "Time for ST Boundary Mapping = " << diff.count() * 1000
+         << " msec.";
 
   std::vector<const STBoundary *> boundaries;
   for (auto *obstacle : path_decision->obstacles().Items()) {

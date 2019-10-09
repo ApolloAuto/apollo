@@ -61,8 +61,24 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
   CHECK_GT(planning_time_, 0.0);
   CHECK_GT(planning_distance_, 0.0);
   CHECK_GT(path_data_.discretized_path().size(), 1);
+  obs_id_to_st_boundary_.clear();
 
   // Go through every obstacle.
+  for (const auto* obs_item_ptr : path_decision->obstacles().Items()) {
+    Obstacle* obs_ptr = path_decision->Find(obs_item_ptr->Id());
+    CHECK_NOTNULL(obs_ptr);
+
+    std::vector<STPoint> lower_points;
+    std::vector<STPoint> upper_points;
+    if (!ComputeObstacleSTBoundary(*obs_ptr, &lower_points, &upper_points)) {
+      continue;
+    }
+    auto boundary = STBoundary::CreateInstanceAccurate(
+        lower_points, upper_points);
+    boundary.set_id(obs_ptr->Id());
+    obs_id_to_st_boundary_[obs_ptr->Id()] = boundary;
+  }
+
   return Status::OK();
 }
 

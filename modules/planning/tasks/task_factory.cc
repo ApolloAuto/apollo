@@ -36,6 +36,7 @@
 #include "modules/planning/tasks/deciders/rule_based_stop_decider/rule_based_stop_decider.h"
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_bounds_decider.h"
 #include "modules/planning/tasks/deciders/speed_decider/speed_decider.h"
+#include "modules/planning/tasks/deciders/st_bounds_decider/st_bounds_decider.h"
 #include "modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_provider.h"
 #include "modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.h"
 #include "modules/planning/tasks/optimizers/path_time_heuristic/path_time_heuristic_optimizer.h"
@@ -115,6 +116,10 @@ void TaskFactory::Init(const PlanningConfig& config) {
   task_factory_.Register(TaskConfig::SPEED_BOUNDS_FINAL_DECIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new SpeedBoundsDecider(config);
+                         });
+  task_factory_.Register(TaskConfig::ST_BOUNDS_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                            return new STBoundsDecider(config);
                          });
   task_factory_.Register(TaskConfig::OPEN_SPACE_ROI_DECIDER,
                          [](const TaskConfig& config) -> Task* {
