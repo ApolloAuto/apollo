@@ -92,22 +92,13 @@ Status PathReuseDecider::Process(Frame* const frame,
 
 bool PathReuseDecider::CheckPathReusable(
     Frame* const frame, ReferenceLineInfo* const reference_line_info) {
-  // TODO(SHU) kinds of criteria for path reuse
-  //   if (!IsSameStopObstacles(frame, reference_line_info))
-  //     ADEBUG << "not same stop obstacle";
-  // reuse path when collision free and same blocking obstacle
-  //   return (IsCollisionFree(reference_line_info) &&
-  //           IsSameStopObstacles(frame, reference_line_info));
-  // reuse path when the blocking obstacle is same
-  //   return IsSameStopObstacles(frame, reference_line_info);
-  // reuse path when all obstacles are same
-  //   return IsSameObstacles(reference_line_info);
   ADEBUG << "Check Collision";
   return IsCollisionFree(reference_line_info);
 }
 
 bool PathReuseDecider::IsIgnoredBlockingObstacle(
     ReferenceLineInfo* const reference_line_info) {
+  const ReferenceLine& reference_line = reference_line_info->reference_line();
   constexpr double kSDistBuffer = 30.0;  // meter
   constexpr int kTimeBuffer = 3;         // second
   // vehicle speed
@@ -116,7 +107,7 @@ bool PathReuseDecider::IsIgnoredBlockingObstacle(
   double final_s_buffer = std::max(kSDistBuffer, kTimeBuffer * adc_speed);
   // current vehicle s position
   common::SLPoint adc_position_sl;
-  GetADCSLPoint(reference_line_info, &adc_position_sl);
+  GetADCSLPoint(reference_line, &adc_position_sl);
   // blocking obstacle start s
   double blocking_obstacle_start_s;
   if (GetBlockingObstacleS(reference_line_info, &blocking_obstacle_start_s) &&
@@ -145,216 +136,31 @@ bool PathReuseDecider::GetBlockingObstacleS(
   if (blocking_obstacle == nullptr) {
     return false;
   }
+
   const auto& obstacle_sl = blocking_obstacle->PerceptionSLBoundary();
   *blocking_obstacle_s = obstacle_sl.start_s();
   ADEBUG << "blocking obstacle distance: " << obstacle_sl.start_s();
-  ADEBUG << "blocking obstacle distance: " << blocking_obstacle_s;
   return true;
 }
 
-void PathReuseDecider::GetADCSLPoint(
-    ReferenceLineInfo* const reference_line_info,
-    common::SLPoint* adc_position_sl) {
-  const auto& reference_line = reference_line_info->reference_line();
+void PathReuseDecider::GetADCSLPoint(const ReferenceLine& reference_line,
+                                     common::SLPoint* adc_position_sl) {
   common::math::Vec2d adc_position = {
       common::VehicleStateProvider::Instance()->x(),
       common::VehicleStateProvider::Instance()->y()};
   reference_line.XYToSL(adc_position, adc_position_sl);
 }
 
-bool PathReuseDecider::IsSameStopObstacles(
-    Frame* const frame, ReferenceLineInfo* const reference_line_info) {
-  // sanity check
-  if (history_->GetLastFrame() == nullptr) {
-    return false;
-  }
-  const std::vector<const HistoryObjectDecision*> history_objects_decisions =
-      history_->GetLastFrame()->GetStopObjectDecisions();
-  const auto& reference_line = reference_line_info->reference_line();
-  std::vector<double> history_stop_positions;
-  std::vector<double> current_stop_positions;
-
-  GetCurrentStopObstacleS(reference_line_info, &current_stop_positions);
-  GetHistoryStopSPosition(reference_line_info, history_objects_decisions,
-                          &history_stop_positions);
-
-  // get current vehicle s
-  common::math::Vec2d adc_position = {
-      common::VehicleStateProvider::Instance()->x(),
-      common::VehicleStateProvider::Instance()->y()};
-  common::SLPoint adc_position_sl;
-
-  reference_line.XYToSL(adc_position, &adc_position_sl);
-
-  ADEBUG << "ADC_s:" << adc_position_sl.s();
-
-  double nearest_history_stop_s = FLAGS_default_front_clear_distance;
-  double nearest_current_stop_s = FLAGS_default_front_clear_distance;
-
-  for (auto history_stop_position : history_stop_positions) {
-    ADEBUG << "current_stop_position " << history_stop_position
-           << "adc_position_sl.s()" << adc_position_sl.s();
-    if (history_stop_position < adc_position_sl.s()) {
-      continue;
-    } else {
-      // find nearest history stop
-      nearest_history_stop_s = history_stop_position;
-      break;
-    }
-  }
-
-  for (auto current_stop_position : current_stop_positions) {
-    ADEBUG << "current_stop_position " << current_stop_position
-           << "adc_position_sl.s()" << adc_position_sl.s();
-    if (current_stop_position < adc_position_sl.s()) {
-      continue;
-    } else {
-      // find nearest current stop
-      nearest_current_stop_s = current_stop_position;
-      break;
-    }
-  }
-  return SameStopS(nearest_history_stop_s, nearest_current_stop_s);
-}
-
-// compare history stop position vs current stop position
-bool PathReuseDecider::SameStopS(const double history_stop_s,
-                                 const double current_stop_s) {
-  const double KNegative = 0.1;  // (meter) closer
-  const double kPositive = 0.5;  // (meter) further
-  ADEBUG << "current_stop_s" << current_stop_s;
-  ADEBUG << "history_stop_s" << history_stop_s;
-  if ((current_stop_s >= history_stop_s &&
-       current_stop_s - history_stop_s <= kPositive) ||
-      (current_stop_s <= history_stop_s &&
-       history_stop_s - current_stop_s <= KNegative))
-    return true;
-  return false;
-}
-
-// get current stop positions
-void PathReuseDecider::GetCurrentStopPositions(
-    Frame* frame,
-    std::vector<const common::PointENU*>* current_stop_positions) {
-  auto obstacles = frame->obstacles();
-  for (auto obstacle : obstacles) {
-    const std::vector<ObjectDecisionType>& current_decisions =
-        obstacle->decisions();
-    for (auto current_decision : current_decisions) {
-      if (current_decision.has_stop())
-        current_stop_positions->emplace_back(
-            &current_decision.stop().stop_point());
-    }
-  }
-  // sort
-  std::sort(current_stop_positions->begin(), current_stop_positions->end(),
-            [](const common::PointENU* lhs, const common::PointENU* rhs) {
-              return (lhs->x() < rhs->x() ||
-                      (lhs->x() == rhs->x() && lhs->y() < rhs->y()));
-            });
-}
-
-// get current stop obstacle position in s-direction
-void PathReuseDecider::GetCurrentStopObstacleS(
-    ReferenceLineInfo* const reference_line_info,
-    std::vector<double>* current_stop_obstacle) {
-  // get all obstacles
-  for (auto obstacle :
-       reference_line_info->path_decision()->obstacles().Items()) {
-    ADEBUG << "current obstacle: "
-           << obstacle->PerceptionSLBoundary().start_s();
-    if (obstacle->IsLaneBlocking())
-      current_stop_obstacle->emplace_back(
-          obstacle->PerceptionSLBoundary().start_s());
-  }
-
-  // sort w.r.t s
-  std::sort(current_stop_obstacle->begin(), current_stop_obstacle->end());
-}
-
-// get history stop positions at current reference line
-void PathReuseDecider::GetHistoryStopSPosition(
-    ReferenceLineInfo* const reference_line_info,
-    const std::vector<const HistoryObjectDecision*>& history_objects_decisions,
-    std::vector<double>* history_stop_positions) {
-  const auto& reference_line = reference_line_info->reference_line();
-
-  for (auto history_object_decision : history_objects_decisions) {
-    const std::vector<const ObjectDecisionType*> decisions =
-        history_object_decision->GetObjectDecision();
-
-    for (const ObjectDecisionType* decision : decisions) {
-      if (decision->has_stop()) {
-        common::math::Vec2d stop_position({decision->stop().stop_point().x(),
-                                           decision->stop().stop_point().y()});
-        common::SLPoint stop_position_sl;
-
-        reference_line.XYToSL(stop_position, &stop_position_sl);
-        history_stop_positions->emplace_back(stop_position_sl.s() -
-                                             decision->stop().distance_s());
-
-        ADEBUG << "stop_position_x: " << decision->stop().stop_point().x();
-        ADEBUG << "stop_position_y: " << decision->stop().stop_point().y();
-        ADEBUG << "stop_distance_s: " << decision->stop().distance_s();
-        ADEBUG << "stop_distance_s: " << stop_position_sl.s();
-        ADEBUG << "adjusted_stop_distance_s: "
-               << stop_position_sl.s() - decision->stop().distance_s();
-      }
-    }
-  }
-  // sort w.r.t s
-  std::sort(history_stop_positions->begin(), history_stop_positions->end());
-}
-
-// compare obstacles
-bool PathReuseDecider::IsSameObstacles(
-    ReferenceLineInfo* const reference_line_info) {
-  const auto& history_frame = FrameHistory::Instance()->Latest();
-  if (!history_frame) {
-    return false;
-  }
-  const auto& history_reference_line_info =
-      history_frame->reference_line_info().front();
-  const IndexedList<std::string, Obstacle>& history_obstacles =
-      history_reference_line_info.path_decision().obstacles();
-  const ReferenceLine& history_reference_line =
-      history_reference_line_info.reference_line();
-  const ReferenceLine& current_reference_line =
-      reference_line_info->reference_line();
-
-  if (reference_line_info->path_decision()->obstacles().Items().size() !=
-      history_obstacles.Items().size())
-    return false;
-
-  for (auto obstacle :
-       reference_line_info->path_decision()->obstacles().Items()) {
-    const std::string& obstacle_id = obstacle->Id();
-    // same obstacle id
-    auto history_obstacle = history_obstacles.Find(obstacle_id);
-
-    if (!history_obstacle ||
-        (obstacle->IsStatic() != history_obstacle->IsStatic()) ||
-        (IsBlockingDrivingPathObstacle(current_reference_line, obstacle) !=
-         IsBlockingDrivingPathObstacle(history_reference_line,
-                                       history_obstacle)))
-      return false;
-  }
-  return true;
-}
-
 bool PathReuseDecider::IsCollisionFree(
     ReferenceLineInfo* const reference_line_info) {
+  const ReferenceLine& reference_line = reference_line_info->reference_line();
   constexpr double kMinObstacleArea = 1e-4;
   const double kSBuffer = 0.5;
   constexpr int kNumExtraTailBoundPoint = 20;
   constexpr double kPathBoundsDeciderResolution = 0.5;
-  // current vehicle status
-  common::math::Vec2d adc_position = {
-      common::VehicleStateProvider::Instance()->x(),
-      common::VehicleStateProvider::Instance()->y()};
+  // current vehicle sl position
   common::SLPoint adc_position_sl;
-  const auto& reference_line = reference_line_info->reference_line();
-  reference_line.XYToSL(adc_position, &adc_position_sl);
+  GetADCSLPoint(reference_line, &adc_position_sl);
 
   // current obstacles
   std::vector<Polygon2d> obstacle_polygons;
@@ -370,24 +176,27 @@ bool PathReuseDecider::IsCollisionFree(
       }
       continue;
     }
+
     const auto& obstacle_sl = obstacle->PerceptionSLBoundary();
     // Ignore obstacles behind ADC
-    if (obstacle_sl.end_s() < adc_position_sl.s() - kSBuffer) {
+    if ((obstacle_sl.end_s() < adc_position_sl.s() - kSBuffer) ||
+        // Ignore too small obstacles.
+        (obstacle_sl.end_s() - obstacle_sl.start_s()) *
+                (obstacle_sl.end_l() - obstacle_sl.start_l()) <
+            kMinObstacleArea) {
       continue;
-    }  // Ignore too small obstacles.
-    if ((obstacle_sl.end_s() - obstacle_sl.start_s()) *
-            (obstacle_sl.end_l() - obstacle_sl.start_l()) <
-        kMinObstacleArea)
-      continue;
+    }
     obstacle_polygons.push_back(
         Polygon2d({Vec2d(obstacle_sl.start_s(), obstacle_sl.start_l()),
                    Vec2d(obstacle_sl.start_s(), obstacle_sl.end_l()),
                    Vec2d(obstacle_sl.end_s(), obstacle_sl.end_l()),
                    Vec2d(obstacle_sl.end_s(), obstacle_sl.start_l())}));
   }
+
   if (obstacle_polygons.empty()) {
     return true;
   }
+
   const auto& history_frame = FrameHistory::Instance()->Latest();
   if (!history_frame) {
     return false;
@@ -427,12 +236,14 @@ bool PathReuseDecider::IsCollisionFree(
       // Check if it's in any polygon of other static obstacles.
       for (const auto& obstacle_polygon : obstacle_polygons) {
         if (obstacle_polygon.IsPointIn(curr_point)) {
-          ADEBUG << "to end point:"
+          // for debug
+          ADEBUG << "s distance to end point:"
                  << path_end_position_sl.s() - path_position_sl.s();
           ADEBUG << "collision:" << curr_point.x() << ", " << curr_point.y();
           Vec2d xy_point;
           reference_line.SLToXY(curr_point_sl, &xy_point);
           ADEBUG << "collision:" << xy_point.x() << ", " << xy_point.y();
+
           return false;
         }
       }
@@ -442,21 +253,19 @@ bool PathReuseDecider::IsCollisionFree(
 }
 
 bool PathReuseDecider::TrimHistoryPath(
-    Frame* const frame, ReferenceLineInfo* const reference_line_info) {
+    Frame* frame, ReferenceLineInfo* const reference_line_info) {
+  const ReferenceLine& reference_line = reference_line_info->reference_line();
   const auto& history_frame = FrameHistory::Instance()->Latest();
   if (!history_frame) {
     return false;
   }
+
   const DiscretizedPath& history_path =
       history_frame->current_frame_planned_path();
   DiscretizedPath trimmed_path;
-  // current vehicle status
-  common::math::Vec2d adc_position = {
-      common::VehicleStateProvider::Instance()->x(),
-      common::VehicleStateProvider::Instance()->y()};
+  // current vehicle sl position
   common::SLPoint adc_position_sl;
-  const auto& reference_line = reference_line_info->reference_line();
-  reference_line.XYToSL(adc_position, &adc_position_sl);
+  GetADCSLPoint(reference_line, &adc_position_sl);
   double path_start_s = 0.0;
   size_t path_start_index = 0;
 
