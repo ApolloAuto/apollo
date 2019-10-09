@@ -6,12 +6,9 @@ import SplitPane from 'react-split-pane';
 import Header from "components/Header";
 import MainView from "components/Layouts/MainView";
 import ToolView from "components/Layouts/ToolView";
-import PNCMonitor from "components/PNCMonitor";
-import DataCollectionMonitor from "components/DataCollectionMonitor";
+import MonitorPanel from "components/Layouts/MonitorPanel";
 import SideBar from "components/SideBar";
 import AudioCapture from "components/AudioCapture";
-import { CameraVideo } from "components/Tasks/SensorCamera";
-import CameraParam from "components/CameraParam";
 
 import HOTKEYS_CONFIG from "store/config/hotkeys.yml";
 import WS, { MAP_WS, POINT_CLOUD_WS, CAMERA_WS } from "store/websocket";
@@ -28,7 +25,7 @@ export default class Dreamview extends React.Component {
 
     handleDrag(masterViewWidth) {
         const { options } = this.props.store;
-        if (options.showMonitor || options.showCameraView) {
+        if (options.showMonitor) {
             this.props.store.updateWidthInPercentage(
                 Math.min(1.00, masterViewWidth / window.innerWidth));
         }
@@ -80,7 +77,7 @@ export default class Dreamview extends React.Component {
                     <SplitPane split="vertical"
                         size={dimension.width}
                         onChange={this.handleDrag}
-                        allowResize={options.showMonitor || options.showCameraView}>
+                        allowResize={options.showMonitor}>
                         <div className="left-pane">
                             <SideBar />
                             <div className="dreamview-body">
@@ -88,22 +85,10 @@ export default class Dreamview extends React.Component {
                                 <ToolView />
                             </div>
                         </div>
-                        <div className="right-pane">
-                            {options.showPNCMonitor && options.showVideo &&
-                                <div>
-                                    <Tab><span>Camera View</span></Tab>
-                                    <CameraVideo />
-                                </div>
-                            }
-                            {options.showCameraView && <CameraParam />}
-                            {options.showPNCMonitor && <PNCMonitor options={options} />}
-                            {options.showDataCollectionMonitor &&
-                                <DataCollectionMonitor
-                                    dataCollectionUpdateStatus={hmi.dataCollectionUpdateStatus}
-                                    dataCollectionProgress={hmi.dataCollectionProgress}
-                                />
-                            }
-                        </div>
+                        <MonitorPanel
+                            hmi={hmi}
+                            viewName={options.monitorName}
+                            showVideo={options.showVideo} />
                     </SplitPane>
                 </div>
                 <div className="hidden">

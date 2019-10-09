@@ -1010,7 +1010,7 @@ void Obstacle::BuildLaneGraph() {
 
   Feature* feature = mutable_latest_feature();
   // No need to BuildLaneGraph for those non-moving obstacles.
-  if (feature->is_still()) {
+  if (feature->is_still() && id_ != FLAGS_ego_vehicle_id) {
     ADEBUG << "Not build lane graph for still obstacle";
     return;
   }

@@ -247,7 +247,7 @@ void ObstacleReference::CorrectSize(CameraFrame *frame) {
         height.push_back(obj->size[2]);
       }
 
-      if (height.size() <= 0) {
+      if (height.empty()) {
         AERROR << "height vector is empty";
         continue;
       }

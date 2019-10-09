@@ -3193,6 +3193,44 @@
             "ObjectAvoid": {
               "fields": {}
             },
+            "ObjectStatus": {
+              "fields": {
+                "motionType": {
+                  "type": "ObjectMotionType",
+                  "id": 1
+                },
+                "decisionType": {
+                  "type": "ObjectDecisionType",
+                  "id": 2
+                }
+              }
+            },
+            "ObjectStatic": {
+              "fields": {}
+            },
+            "ObjectDynamic": {
+              "fields": {}
+            },
+            "ObjectMotionType": {
+              "oneofs": {
+                "motionTag": {
+                  "oneof": [
+                    "static",
+                    "dynamic"
+                  ]
+                }
+              },
+              "fields": {
+                "static": {
+                  "type": "ObjectStatic",
+                  "id": 1
+                },
+                "dynamic": {
+                  "type": "ObjectDynamic",
+                  "id": 2
+                }
+              }
+            },
             "ObjectDecisionType": {
               "oneofs": {
                 "objectTag": {
@@ -3203,7 +3241,8 @@
                     "yield",
                     "overtake",
                     "nudge",
-                    "avoid"
+                    "avoid",
+                    "sidePass"
                   ]
                 }
               },
@@ -3235,6 +3274,10 @@
                 "avoid": {
                   "type": "ObjectAvoid",
                   "id": 7
+                },
+                "sidePass": {
+                  "type": "ObjectSidePass",
+                  "id": 8
                 }
               }
             },
@@ -3479,18 +3522,32 @@
             },
             "DpStSpeedConfig": {
               "fields": {
-                "matrixDimensionS": {
-                  "type": "int32",
+                "unitT": {
+                  "type": "double",
                   "id": 1,
                   "options": {
-                    "default": 100
+                    "default": 1
                   }
                 },
-                "matrixDimensionT": {
+                "denseDimensionS": {
                   "type": "int32",
                   "id": 2,
                   "options": {
-                    "default": 10
+                    "default": 41
+                  }
+                },
+                "denseUnitS": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 0.5
+                  }
+                },
+                "sparseUnitS": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 1
                   }
                 },
                 "speedWeight": {
@@ -3570,30 +3627,16 @@
                     "default": 2.5
                   }
                 },
-                "exceedSoftSpeedPenalty": {
-                  "type": "double",
-                  "id": 34,
-                  "options": {
-                    "default": 0
-                  }
-                },
-                "lowSoftSpeedPenalty": {
-                  "type": "double",
-                  "id": 35,
-                  "options": {
-                    "default": 0
-                  }
-                },
                 "referenceSpeedPenalty": {
                   "type": "double",
-                  "id": 36,
+                  "id": 34,
                   "options": {
                     "default": 1
                   }
                 },
                 "keepClearLowSpeedPenalty": {
                   "type": "double",
-                  "id": 37,
+                  "id": 35,
                   "options": {
                     "default": 10
                   }
@@ -3652,6 +3695,13 @@
                   "id": 71,
                   "options": {
                     "default": 20
+                  }
+                },
+                "spatialPotentialPenalty": {
+                  "type": "double",
+                  "id": 80,
+                  "options": {
+                    "default": 1
                   }
                 }
               }
@@ -4875,11 +4925,13 @@
             },
             "DrivingAction": {
               "values": {
+                "NONE": 100,
                 "FOLLOW": 0,
                 "CHANGE_LEFT": 1,
                 "CHANGE_RIGHT": 2,
                 "PULL_OVER": 3,
-                "STOP": 4
+                "STOP": 4,
+                "RESTART_CRUISE": 5
               }
             },
             "PadMessage": {
@@ -6900,6 +6952,17 @@
                 }
               }
             },
+            "PathReuseDeciderStatus": {
+              "fields": {
+                "reusedPath": {
+                  "type": "bool",
+                  "id": 1,
+                  "options": {
+                    "default": true
+                  }
+                }
+              }
+            },
             "PedestrianStatus": {
               "fields": {
                 "stopTime": {
@@ -7095,37 +7158,41 @@
                   "type": "PathDeciderStatus",
                   "id": 9
                 },
+                "pathReuseDecider": {
+                  "type": "PathReuseDeciderStatus",
+                  "id": 10
+                },
                 "pullOver": {
                   "type": "PullOverStatus",
-                  "id": 10
+                  "id": 11
                 },
                 "rerouting": {
                   "type": "ReroutingStatus",
-                  "id": 11
+                  "id": 12
                 },
                 "rightOfWay": {
                   "type": "RightOfWayStatus",
-                  "id": 12
+                  "id": 13
                 },
                 "scenario": {
                   "type": "ScenarioStatus",
-                  "id": 13
+                  "id": 14
                 },
                 "sidePass": {
                   "type": "SidePassStatus",
-                  "id": 14
+                  "id": 15
                 },
                 "stopSign": {
                   "type": "StopSignStatus",
-                  "id": 15
+                  "id": 16
                 },
                 "trafficLight": {
                   "type": "TrafficLightStatus",
-                  "id": 16
+                  "id": 17
                 },
                 "yieldSign": {
                   "type": "YieldSignStatus",
-                  "id": 17
+                  "id": 18
                 }
               }
             },
@@ -7651,6 +7718,17 @@
                   "id": 3,
                   "options": {
                     "default": 20
+                  }
+                }
+              }
+            },
+            "STBoundsDeciderConfig": {
+              "fields": {
+                "totalTime": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 7
                   }
                 }
               }

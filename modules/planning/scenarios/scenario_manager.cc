@@ -245,7 +245,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
 
       std::vector<hdmap::LaneInfoConstPtr> lanes;
       reference_line.GetLaneFromS(check_s, &lanes);
-      if (lanes.size() <= 0) {
+      if (lanes.empty()) {
         ADEBUG << "check_s[" << check_s << "] can't find a lane";
         continue;
       }
