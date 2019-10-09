@@ -79,6 +79,7 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     return false;
   }
   // Process obstacle_history
+  // TODO(Hongyi): move magic numbers to parameters and gflags
   torch::Tensor obstacle_pos = torch::zeros({1, 20, 2});
   torch::Tensor obstacle_pos_step = torch::zeros({1, 20, 2});
   for (int i = 0; i < 20; ++i) {
