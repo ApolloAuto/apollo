@@ -42,6 +42,9 @@ stage_config: {
     task_type: PATH_DECIDER
   }
   task_config: {
+    task_type: RULE_BASED_STOP_DECIDER
+  }
+  task_config: {
     task_type: DP_ST_SPEED_OPTIMIZER
   }
   task_config: {
