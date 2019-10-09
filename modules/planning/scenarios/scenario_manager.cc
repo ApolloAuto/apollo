@@ -363,6 +363,20 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectInterceptionScenario(
     }
   }
 
+  // pick a closer one between consecutive bare_intersection and traffic_sign
+  if (traffic_sign_overlap && pnc_junction_overlap) {
+    constexpr double kJunctionDelta = 10.0;
+    double s_diff = std::fabs(traffic_sign_overlap->start_s -
+                             pnc_junction_overlap->start_s);
+    if (s_diff >= kJunctionDelta) {
+      if (pnc_junction_overlap->start_s > traffic_sign_overlap->start_s) {
+        pnc_junction_overlap = nullptr;
+      } else {
+        traffic_sign_overlap = nullptr;
+      }
+    }
+  }
+
   if (traffic_sign_overlap) {
     switch (overlap_type) {
       case ReferenceLineInfo::STOP_SIGN:

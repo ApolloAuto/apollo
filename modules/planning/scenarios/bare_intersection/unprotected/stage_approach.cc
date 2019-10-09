@@ -75,7 +75,7 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
          << "] start_s[" << current_pnc_junction->start_s
          << "] distance_adc_to_pnc_junction[" << distance_adc_to_pnc_junction
          << "]";
-  if (distance_adc_to_pnc_junction > kPassStopLineBuffer) {
+  if (distance_adc_to_pnc_junction < -kPassStopLineBuffer) {
     // passed stop line
     return FinishStage();
   }
