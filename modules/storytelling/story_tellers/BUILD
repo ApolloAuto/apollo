@@ -18,6 +18,8 @@ cc_library(
         ":base_teller",
         "//modules/common/adapters:adapter_gflags",
         "//modules/planning/proto:planning_proto",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/common:prediction_map",
         "//modules/storytelling:frame_manager",
     ],
 )

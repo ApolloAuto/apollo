@@ -8,9 +8,9 @@ import "modules/common/proto/header.proto";
 message ProceedWithCaution {
 }
 
-// TODO(xiaoxq): State triggering conditions.
+// Triggered when we are close to a junction.
 message CloseToJunction {
-  optional float distance = 1;
+  optional double distance = 1;
 }
 
 // Usage guide for action modules:
