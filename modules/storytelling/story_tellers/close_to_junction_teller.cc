@@ -52,7 +52,7 @@ bool IsPointInRegularJunction(const PathPoint& point) {
          junction_info->junction().polygon().point_size() >= 3;
 }
 
-double DistanceToPNCJunction(const ADCTrajectory& adc_trajectory) {
+double DistanceToJunction(const ADCTrajectory& adc_trajectory) {
   const double s_start = adc_trajectory.trajectory_point(0).path_point().s();
   // Test for PNCJunction.
   for (const auto& point : adc_trajectory.trajectory_point()) {
@@ -97,7 +97,7 @@ void CloseToJunctionTeller::Update(Stories* stories) {
   }
 
   auto& logger = manager->LogBuffer();
-  const double distance = DistanceToPNCJunction(*trajectory);
+  const double distance = DistanceToJunction(*trajectory);
   const bool close_to_junction = distance >= 0;
   if (close_to_junction) {
     if (!stories->has_close_to_junction()) {
