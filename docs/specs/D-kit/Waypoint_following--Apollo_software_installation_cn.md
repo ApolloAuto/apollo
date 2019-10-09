@@ -120,7 +120,7 @@ Apollo软件系统依赖于Linux操作系统而运行，而Linux操作系统种�
 
 ![tip_icon](../images/tip_icon.png) 推荐使用 **Ubuntu 14.04.3**.
 
-![tip_icon](../images/tip_icon.png)开机按F2进入BIOS设置菜单，建议禁用BIOS中的快速启动和静默启动，以便捕捉引导启动过程中的问题。建议您在BIOS中禁用“快速启动”和“安静启动”，以便了解启动过程中遇到的问题。
+![tip_icon](../images/tip_icon.png)开机按F2进入BIOS设置菜单，建议禁用BIOS中的快速启动和静默启动，以便捕捉引导启动过程中的问题。建议您在BIOS中禁用“快速启动”和“静默启动”，以便了解启动过程中遇到的问题。
 
 获取更多Ubuntu信息，可访问: 
 ![online_icon](../images/link.png)Ubuntu桌面站点:
@@ -134,6 +134,8 @@ a.将Ubuntu安装驱动器插入USB端口并启动IPC。
 b.按照屏幕上的说明安装Linux。
 
 #### 执行软件更新与安装
+
+![warning_icon](../images/warning_icon.png)**WARNING**：在整个Apollo系统的安装和操作的过程中，全程禁用root账户，皆用普通账户进行操作，切记！
 
 a.安装完成，重启进入Linux。
 
@@ -226,19 +228,29 @@ echo "export APOLLO_HOME=$(pwd)" >> ~/.bashrc && source ~/.bashrc
 source ~/.bashrc
 ```
 
-c.启动并进入docker容器，在终端输入以下命令：
+c.将当前账户加入docker账户组中并赋予其相应权限，在终端输入以下命令：
+
+```
+sudo gpasswd -a $USER docker  
+sudo usermod -aG docker $USER  
+sudo chmod 777 /var/run/docker.sock
+```
+
+命令执行完成后，重新启动一下计算机。
+
+d.启动并进入docker容器，在终端输入以下命令：
 
 ```
 cd ~/apollo
-bash docker/scripts/dev_start.sh -C
+bash docker/scripts/dev_start.sh
 ```
 
-其中，参数`-C`是可选的，这是拉取中国的镜像，请根据自己的网络情况选择。第一次进入docker时或者image镜像有更新时会自动下载apollo所需的image镜像文件，下载镜像文件的过程会很长，请耐心等待；这个过程完成后，请输入以下命令以进入docker环境中：
+第一次进入docker时或者image镜像有更新时会自动下载apollo所需的image镜像文件，下载镜像文件的过程会很长，请耐心等待；这个过程完成后，请输入以下命令以进入docker环境中：
 ```
 bash docker/scripts/dev_into.sh
 ```
 
-d.编译apollo，在终端输入以下命令，等待编译完成，整个编译过程大约耗时20分钟：
+e.编译apollo，在终端输入以下命令，等待编译完成，整个编译过程大约耗时20分钟：
 
 ```
 bash apollo.sh build
@@ -280,5 +292,5 @@ python docs/demo_guide/rosbag_helper.py demo_2.0.bag
 输入以下命令可以回放数据包，在浏览器DreamView中可以看到回放画面。
 
 ```
-rosbag play -l docs/demo_guide/demo_2.0.bag
+rosbag play -l demo_2.0.bag
 ```
