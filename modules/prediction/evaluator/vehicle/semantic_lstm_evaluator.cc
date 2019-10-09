@@ -105,6 +105,27 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr) {
          << " ms.";
   auto torch_output = torch_output_tensor.accessor<float, 3>();
 
+  // Get the trajectory
+  double pos_x = latest_feature_ptr->position().x();
+  double pos_y = latest_feature_ptr->position().y();
+  Trajectory* trajectory = latest_feature_ptr->add_predicted_trajectory();
+  trajectory->set_probability(1.0);
+
+  for (size_t i = 0; i < 30; ++i) {
+    TrajectoryPoint* point = trajectory->add_trajectory_point();
+    double dx = static_cast<double>(torch_output[0][i][0]);
+    double dy = static_cast<double>(torch_output[0][i][1]);
+    Vec2d offset(dx, dy);
+    Vec2d rotated_offset =
+        offset.rotate(latest_feature_ptr->velocity_heading());
+    double point_x = pos_x + rotated_offset.x();
+    double point_y = pos_y + rotated_offset.y();
+    point->mutable_path_point()->set_x(point_x);
+    point->mutable_path_point()->set_y(point_y);
+    point->set_relative_time(static_cast<double>(i) *
+                             FLAGS_prediction_trajectory_time_resolution);
+  }
+
   return true;
 }
 
