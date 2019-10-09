@@ -51,17 +51,19 @@ using cyber::record::RecordMessage;
 using cyber::record::RecordReader;
 
 bool MessageProcess::Init() {
-  // Load prediction conf
-  PredictionConf prediction_conf;
-  if (!cyber::common::GetProtoFromFile(FLAGS_prediction_conf_file,
-                                       &prediction_conf)) {
-    AERROR << "Unable to load prediction conf file: "
-           << FLAGS_prediction_conf_file;
+  InitContainers();
+  InitEvaluators();
+  InitPredictors();
+
+  if (!FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
+    AERROR << "Map cannot be loaded.";
     return false;
   }
-  ADEBUG << "Prediction config file is loaded into: "
-         << prediction_conf.ShortDebugString();
 
+  return true;
+}
+
+bool MessageProcess::InitContainers() {
   common::adapter::AdapterManagerConfig adapter_conf;
   if (!cyber::common::GetProtoFromFile(FLAGS_prediction_adapter_config_filename,
                                        &adapter_conf)) {
@@ -72,16 +74,37 @@ bool MessageProcess::Init() {
   ADEBUG << "Adapter config file is loaded into: "
          << adapter_conf.ShortDebugString();
 
-  // Initialization of all managers
   ContainerManager::Instance()->Init(adapter_conf);
-  EvaluatorManager::Instance()->Init(prediction_conf);
-  PredictorManager::Instance()->Init(prediction_conf);
+  return true;
+}
 
-  if (!FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
-    AERROR << "Map cannot be loaded.";
+bool MessageProcess::InitEvaluators() {
+  PredictionConf prediction_conf;
+  if (!cyber::common::GetProtoFromFile(FLAGS_prediction_conf_file,
+                                       &prediction_conf)) {
+    AERROR << "Unable to load prediction conf file: "
+           << FLAGS_prediction_conf_file;
     return false;
   }
+  ADEBUG << "Prediction config file is loaded into: "
+         << prediction_conf.ShortDebugString();
 
+  EvaluatorManager::Instance()->Init(prediction_conf);
+  return true;
+}
+
+bool MessageProcess::InitPredictors() {
+  PredictionConf prediction_conf;
+  if (!cyber::common::GetProtoFromFile(FLAGS_prediction_conf_file,
+                                       &prediction_conf)) {
+    AERROR << "Unable to load prediction conf file: "
+           << FLAGS_prediction_conf_file;
+    return false;
+  }
+  ADEBUG << "Prediction config file is loaded into: "
+         << prediction_conf.ShortDebugString();
+
+  PredictorManager::Instance()->Init(prediction_conf);
   return true;
 }
 

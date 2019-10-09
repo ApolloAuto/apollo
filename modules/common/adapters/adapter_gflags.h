@@ -46,6 +46,7 @@ DECLARE_string(lidar_16_fusion_topic);
 DECLARE_string(lidar_16_fusion_compensator_topic);
 DECLARE_string(lidar_128_topic);
 DECLARE_string(prediction_topic);
+DECLARE_string(prediction_container_topic);
 DECLARE_string(perception_obstacle_topic);
 DECLARE_string(drive_event_topic);
 DECLARE_string(traffic_light_detection_topic);

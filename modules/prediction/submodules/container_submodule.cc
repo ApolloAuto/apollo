@@ -16,12 +16,19 @@
 
 #include "modules/prediction/submodules/container_submodule.h"
 
+#include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/time/time.h"
+#include "modules/prediction/common/message_process.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 
 namespace apollo {
 namespace prediction {
 
+using apollo::common::time::Clock;
+using apollo::localization::LocalizationEstimate;
+using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
+using apollo::planning::ADCTrajectory;
 
 ContainerSubmodule::~ContainerSubmodule() {}
 
@@ -30,7 +37,19 @@ std::string ContainerSubmodule::Name() const {
 }
 
 bool ContainerSubmodule::Init() {
-  // TODO(kechxu): implement
+  if (!MessageProcess::InitContainers()) {
+    return false;
+  }
+
+  planning_reader_ = node_->CreateReader<ADCTrajectory>(
+      FLAGS_planning_trajectory_topic, nullptr);
+
+  localization_reader_ =
+      node_->CreateReader<localization::LocalizationEstimate>(
+          FLAGS_localization_topic, nullptr);
+
+  // TODO(kechxu) init the cyber writer
+
   return true;
 }
 
