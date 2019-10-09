@@ -80,6 +80,8 @@ DEFINE_string(lidar_16_fusion_compensator_topic,
 DEFINE_string(lidar_128_topic, "/apollo/sensor/lidar128/PointCloud2",
               "128 beam lidar topic name");
 DEFINE_string(prediction_topic, "/apollo/prediction", "prediction topic name");
+DEFINE_string(prediction_container_topic, "/apollo/prediction_container",
+              "prediction container submodule topic name");
 DEFINE_string(perception_obstacle_topic, "/apollo/perception/obstacles",
               "perception obstacle topic name");
 DEFINE_string(drive_event_topic, "/apollo/drive_event",

@@ -25,7 +25,9 @@
 #include <string>
 
 #include "cyber/component/component.h"
+#include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/planning/proto/planning.pb.h"
 
 /**
  * @namespace apollo::prediction
@@ -59,6 +61,18 @@ class ContainerSubmodule
    * @param Perception obstacle message.
    */
   bool Proc(const std::shared_ptr<perception::PerceptionObstacles>&) override;
+
+ private:
+  double component_start_time_ = 0.0;
+
+  double frame_start_time_ = 0.0;
+
+  std::shared_ptr<cyber::Reader<planning::ADCTrajectory>> planning_reader_;
+
+  std::shared_ptr<cyber::Reader<localization::LocalizationEstimate>>
+      localization_reader_;
+
+  // TODO(kechxu) add a cyber writer
 };
 
 CYBER_REGISTER_COMPONENT(ContainerSubmodule)
