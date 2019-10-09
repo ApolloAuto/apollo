@@ -48,6 +48,7 @@ cc_library(
         "//modules/planning/tasks/deciders/path_reuse_decider",
         "//modules/planning/tasks/deciders/rule_based_stop_decider",
         "//modules/planning/tasks/deciders/speed_bounds_decider",
+        "//modules/planning/tasks/deciders/st_bounds_decider",
         "//modules/planning/tasks/deciders/speed_decider",
         "//modules/planning/tasks/optimizers/open_space_trajectory_generation:open_space_trajectory_provider",
         "//modules/planning/tasks/optimizers/open_space_trajectory_partition",

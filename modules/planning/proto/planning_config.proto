@@ -22,6 +22,7 @@ import "modules/planning/proto/navi_path_decider_config.proto";
 import "modules/planning/proto/navi_speed_decider_config.proto";
 import "modules/planning/proto/navi_obstacle_decider_config.proto";
 import "modules/planning/proto/path_reuse_decider_config.proto";
+import "modules/planning/proto/st_bounds_decider_config.proto";
 
 message PathDeciderConfig {
   // place holder
@@ -57,6 +58,7 @@ message TaskConfig {
     LANE_CHANGE_DECIDER = 28;
     RULE_BASED_STOP_DECIDER = 29;
     PATH_REUSE_DECIDER = 30;
+    ST_BOUNDS_DECIDER = 31;
   };
   optional TaskType task_type = 1;
   oneof task_config {
@@ -78,6 +80,7 @@ message TaskConfig {
     LaneChangeDeciderConfig lane_change_decider_config = 25;
     RuleBasedStopDeciderConfig rule_based_stop_decider_config = 26;
     PathReuseDeciderConfig path_reuse_decider_config = 27;
+    STBoundsDeciderConfig st_bounds_decider_config = 28;
   }
 }
 

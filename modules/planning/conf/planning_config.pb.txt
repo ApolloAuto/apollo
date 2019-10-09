@@ -77,6 +77,12 @@ default_task_config: {
   }
 }
 default_task_config: {
+  task_type: ST_BOUNDS_DECIDER
+  st_bounds_decider_config {
+    total_time: 7.0
+  }
+}
+default_task_config: {
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
   speed_bounds_decider_config {
     total_time: 7.0
