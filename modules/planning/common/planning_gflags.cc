@@ -80,7 +80,7 @@ DEFINE_string(scenario_yield_sign_config_file,
               "scenario/yield_sign_config.pb.txt",
               "yield_sign scenario config file");
 
-DEFINE_bool(enable_scenario_bare_intersection, false,
+DEFINE_bool(enable_scenario_bare_intersection, true,
             "enable bare_intersection scenarios in planning");
 
 DEFINE_bool(enable_scenario_park_and_go, true,
