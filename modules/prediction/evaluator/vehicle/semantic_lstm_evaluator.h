@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "torch/extension.h"
@@ -52,12 +53,13 @@ class SemanticLSTMEvaluator : public Evaluator {
   bool Evaluate(Obstacle* obstacle_ptr) override;
 
   /**
-   * @brief Extract feature vector
+   * @brief Extract obstacle history
    * @param Obstacle pointer
-   *        Feature container in a vector for receiving the feature values
+   *        Feature container in a vector for receiving the obstacle history
    */
-  bool ExtractFeatureValues(Obstacle* obstacle_ptr,
-                            std::vector<double>* feature_values);
+  bool ExtractObstacleHistory(
+      Obstacle* obstacle_ptr,
+      std::vector<std::pair<double, double>>* pos_history);
 
   /**
    * @brief Get the name of evaluator.
@@ -71,7 +73,6 @@ class SemanticLSTMEvaluator : public Evaluator {
   void LoadModel();
 
  private:
-  static const size_t OBSTACLE_FEATURE_SIZE = 20 * 2;
   torch::jit::script::Module torch_model_;
   torch::Device device_;
 };
