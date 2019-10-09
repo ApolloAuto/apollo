@@ -38,7 +38,6 @@ using apollo::drivers::PointCloud;
 
 class PriSecFusionComponent : public Component<PointCloud> {
  public:
-  static const int32_t USLEEP_INTERVAL = 5000;
   bool Init() override;
   bool Proc(const std::shared_ptr<PointCloud>& point_cloud) override;
 

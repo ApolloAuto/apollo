@@ -18,6 +18,7 @@
 
 #include <gtest/gtest.h>
 #include <memory>
+#include <thread>
 #include <vector>
 
 #include "cyber/common/log.h"
@@ -45,7 +46,7 @@ struct Message {
 void Task1() { ADEBUG << "Task1 running"; }
 
 void Task2(const Message& input) {
-  usleep(10000);
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
   ADEBUG << "Task2 running";
 }
 

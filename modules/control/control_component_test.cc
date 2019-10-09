@@ -16,6 +16,8 @@
 
 #include "modules/control/control_component.h"
 
+#include <thread>
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
@@ -181,7 +183,7 @@ bool ControlComponentTest::RunControl(const std::string& test_case_name) {
   control_component_.reset(new ControlComponent());
   control_component_->Initialize(component_config_);
 
-  usleep(1000);  // sleep 1ms
+  std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
   // feed topics
   planning_writer_->Write(trajectory_);
@@ -190,7 +192,7 @@ bool ControlComponentTest::RunControl(const std::string& test_case_name) {
   chassis_writer_->Write(chassis_);
   pad_writer_->Write(pad_message_);
 
-  usleep(200000);  // sleep 200ms
+  std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
   TrimControlCommand(&control_command_);
 

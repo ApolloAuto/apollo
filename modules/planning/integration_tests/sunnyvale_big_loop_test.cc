@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <thread>
+
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/time/time.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -137,7 +139,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   EXPECT_EQ(stop_sign_status.done_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.wait_for_obstacle_id_size(), 0);
 
-  usleep(1000);
+  std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
   // STOP stage
   RUN_GOLDEN_TEST_DECISION(1);

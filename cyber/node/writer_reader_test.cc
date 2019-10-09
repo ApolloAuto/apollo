@@ -223,7 +223,7 @@ TEST(WriterReaderTest, observe) {
   Writer<proto::UnitTest> writer(attr);
   writer.Init();
   writer.Write(msg1);
-  usleep(10000);
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
   ASSERT_TRUE(reader.HasReceived());
   reader.Observe();
   ASSERT_FALSE(reader.Empty());
@@ -277,13 +277,13 @@ TEST(WriterReaderTest, user_defined_message) {
   msg->content = "message";
 
   writer->Write(msg);
-  usleep(10000);
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
   writer->Write(msg);
-  usleep(10000);
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
   writer->Write(msg);
-  usleep(10000);
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
   reader->Observe();
   ASSERT_TRUE(reader->HasReceived());
