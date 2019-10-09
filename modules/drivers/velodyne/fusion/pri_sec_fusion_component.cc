@@ -14,9 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <memory>
-
 #include "modules/drivers/velodyne/fusion/pri_sec_fusion_component.h"
+
+#include <memory>
+#include <thread>
 
 namespace apollo {
 namespace drivers {
@@ -61,7 +62,7 @@ bool PriSecFusionComponent::Proc(
         ++itr;
       }
     }
-    usleep(USLEEP_INTERVAL);
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
   }
   fusion_writer_->Write(target);
 

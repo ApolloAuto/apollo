@@ -14,13 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/drivers/velodyne/driver/driver.h"
+
 #include <cmath>
 #include <ctime>
 #include <string>
+#include <thread>
 
 #include "cyber/cyber.h"
-
-#include "modules/drivers/velodyne/driver/driver.h"
 #include "modules/drivers/velodyne/proto/config.pb.h"
 #include "modules/drivers/velodyne/proto/velodyne.pb.h"
 
@@ -101,7 +102,8 @@ bool VelodyneDriver::SetBaseTime() {
 bool VelodyneDriver::Poll(const std::shared_ptr<VelodyneScan>& scan) {
   // Allocate a new shared pointer for zero-copy sharing with other nodelets.
   if (basetime_ == 0) {
-    usleep(100);  // waiting for positioning data
+    // waiting for positioning data
+    std::this_thread::sleep_for(std::chrono::microseconds(100));
     AWARN << "basetime is zero";
     return false;
   }
@@ -198,7 +200,7 @@ void VelodyneDriver::PollPositioningPacket(void) {
     if (basetime_ == 0 && ret) {
       SetBaseTimeFromNmeaTime(nmea_time, &basetime_);
     } else {
-      usleep(1000);
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
   }
 }

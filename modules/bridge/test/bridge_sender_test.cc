@@ -20,6 +20,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include <thread>
+
 #include "cyber/common/log.h"
 #include "cyber/scheduler/scheduler_factory.h"
 #include "modules/bridge/common/bridge_proto_serialized_buf.h"
@@ -92,7 +94,7 @@ bool send(const std::string &remote_ip, uint16_t remote_port, uint32_t count) {
     close(sock_fd);
 
     // 1000Hz
-    usleep(1000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
   return true;
 }
