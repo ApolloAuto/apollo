@@ -52,6 +52,11 @@ bool IsPointInRegularJunction(const PathPoint& point) {
          junction_info->junction().polygon().point_size() >= 3;
 }
 
+/**
+ * @brief Get distance to the nearest junction within search radius.
+ * @return negative if no junction ahead, 0 if in junction, or positive which is
+ *         the distance to the nearest junction ahead.
+ */
 double DistanceToJunction(const ADCTrajectory& adc_trajectory) {
   const double s_start = adc_trajectory.trajectory_point(0).path_point().s();
   // Test for PNCJunction.
