@@ -61,14 +61,12 @@ Status PathReuseDecider::Process(Frame* const frame,
   // T -> F
   if (mutable_path_reuse_decider_status->reused_path()) {
     ADEBUG << "reused path";
-    if (CheckPathReusable(frame, reference_line_info)) {
-      ADEBUG << "no collision";
+    if (CheckPathReusable(frame, reference_line_info) &&
+        TrimHistoryPath(frame, reference_line_info)) {
       ++reusable_path_counter_;  // count reusable path
-      if (!TrimHistoryPath(frame, reference_line_info))
-        AERROR << "Failed to trim reused path";
     } else {
       // disable reuse path
-      ADEBUG << "collision!!!";
+      ADEBUG << "stop reuse path";
       mutable_path_reuse_decider_status->set_reused_path(false);
     }
   } else {
@@ -77,7 +75,7 @@ Status PathReuseDecider::Process(Frame* const frame,
         << "counter: "
         << mutable_path_decider_status->front_static_obstacle_cycle_counter();
     // far from blocking obstacle or no blocking obstacle for a while
-    if (mutable_path_decider_status->front_static_obstacle_cycle_counter() <
+    if (mutable_path_decider_status->front_static_obstacle_cycle_counter() <=
             kWaitCycle ||
         IsIgnoredBlockingObstacle(reference_line_info)) {
       // enable reuse path
@@ -156,7 +154,7 @@ bool PathReuseDecider::IsCollisionFree(
   const ReferenceLine& reference_line = reference_line_info->reference_line();
   constexpr double kMinObstacleArea = 1e-4;
   const double kSBuffer = 0.5;
-  constexpr int kNumExtraTailBoundPoint = 20;
+  constexpr int kNumExtraTailBoundPoint = 21;
   constexpr double kPathBoundsDeciderResolution = 0.5;
   // current vehicle sl position
   common::SLPoint adc_position_sl;
@@ -252,11 +250,19 @@ bool PathReuseDecider::IsCollisionFree(
   return true;
 }
 
+// check the length of the path
+bool PathReuseDecider::NotShortPath(DiscretizedPath* current_path) {
+  // TODO(shu): use gflag
+  constexpr double kShortPathThreshold = 40;
+  return current_path->size() > kShortPathThreshold;
+}
+
 bool PathReuseDecider::TrimHistoryPath(
     Frame* frame, ReferenceLineInfo* const reference_line_info) {
   const ReferenceLine& reference_line = reference_line_info->reference_line();
   const auto& history_frame = FrameHistory::Instance()->Latest();
   if (!history_frame) {
+    ADEBUG << "no history frame";
     return false;
   }
 
@@ -285,7 +291,7 @@ bool PathReuseDecider::TrimHistoryPath(
   }
   trimmed_path.insert(trimmed_path.begin(), history_path[path_start_index]);
   frame->set_current_frame_planned_path(trimmed_path);
-  return true;
+  return NotShortPath(&trimmed_path);
 }
 
 }  // namespace planning
