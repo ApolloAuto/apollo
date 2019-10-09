@@ -67,6 +67,9 @@ class PathReuseDecider : public Decider {
   // check if path is collision free
   bool IsCollisionFree(ReferenceLineInfo* const reference_line_info);
 
+  // check path length
+  bool NotShortPath(DiscretizedPath* current_path);
+
   // trim history path
   bool TrimHistoryPath(Frame* frame,
                        ReferenceLineInfo* const reference_line_info);
