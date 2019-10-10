@@ -39,6 +39,7 @@ Status STBoundsDecider::Process(
   const PathData &path_data = reference_line_info->path_data();
   PathDecision *const path_decision = reference_line_info->path_decision();
 
+  // Map all related obstacles onto ST-Graph.
   auto time1 = std::chrono::system_clock::now();
   STObstaclesProcessor st_obstacles_processor(
       path_data.discretized_path().Length(), st_bounds_config_.total_time(),
@@ -48,7 +49,7 @@ Status STBoundsDecider::Process(
   std::chrono::duration<double> diff = time2 - time1;
   ADEBUG << "Time for ST Obstacles Processing = " << diff.count() * 1000
          << " msec.";
-
+  // Record the ST-Graph for good visualization and easy debugging.
   auto all_st_boundaries = st_obstacles_processor.GetAllSTBoundaries();
   std::vector<STBoundary> st_boundaries;
   for (auto it = all_st_boundaries.begin();
@@ -59,6 +60,13 @@ Status STBoundsDecider::Process(
   STGraphDebug *st_graph_debug = reference_line_info_->mutable_debug()->
       mutable_planning_data()->add_st_graph();
   RecordSTGraphDebug(st_boundaries, st_graph_debug);
+
+  // Initialize Guide-Line and Driving-Limits.
+  // TODO(jiacheng): implement this.
+
+  // Sweep the t-axis, and determine the s-boundaries step by step.
+  // TODO(jiacheng): implement this.
+
   return Status::OK();
 }
 
