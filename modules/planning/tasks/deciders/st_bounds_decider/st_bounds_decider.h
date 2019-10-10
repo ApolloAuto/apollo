@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/proto/decider_config.pb.h"
@@ -39,8 +41,8 @@ class STBoundsDecider : public Decider {
                          ReferenceLineInfo* const reference_line_info) override;
 
   void RecordSTGraphDebug(
-      const StGraphData& st_graph_data,
-      planning_internal::STGraphDebug* st_graph_debug) const;
+      const std::vector<STBoundary>& st_graph_data,
+      planning_internal::STGraphDebug* const st_graph_debug);
 
  private:
   STBoundsDeciderConfig st_bounds_config_;

@@ -77,9 +77,15 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
         lower_points, upper_points);
     boundary.set_id(obs_ptr->Id());
     obs_id_to_st_boundary_[obs_ptr->Id()] = boundary;
+    obs_ptr->set_path_st_boundary(boundary);
   }
 
   return Status::OK();
+}
+
+std::unordered_map<std::string, STBoundary>
+STObstaclesProcessor::GetAllSTBoundaries() {
+  return obs_id_to_st_boundary_;
 }
 
 // TODO(jiacheng): implement this.
