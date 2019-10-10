@@ -55,7 +55,8 @@ bool ContainerSubmodule::Init() {
 
 bool ContainerSubmodule::Proc(
     const std::shared_ptr<PerceptionObstacles>& perception_message) {
-  // TODO(kechxu): implement
+  MessageProcess::ContainerProcess(*perception_message);
+  // TODO(kechxu): implement the writer
   return true;
 }
 
