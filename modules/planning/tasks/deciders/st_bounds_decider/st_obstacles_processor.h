@@ -40,6 +40,7 @@ namespace apollo {
 namespace planning {
 
 constexpr double kADCSafetyLBuffer = 0.1;
+constexpr double kSIgnoreThreshold = 0.01;
 
 class STObstaclesProcessor {
  public:
@@ -127,6 +128,7 @@ class STObstaclesProcessor {
   double planning_distance_;
   const PathData& path_data_;
   const common::VehicleParam& vehicle_param_;
+  double adc_path_init_s_;
 
   std::unordered_map<std::string, STBoundary> obs_id_to_st_boundary_;
 };
