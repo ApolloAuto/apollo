@@ -148,10 +148,8 @@ bool LogFileObject::CreateLogfile(const string& time_pid_string) {
   if (fd == -1) {
     return false;
   }
-#ifdef HAVE_FCNTL
   // Mark the file close-on-exec. We don't really care if this fails
   fcntl(fd, F_SETFD, FD_CLOEXEC);
-#endif
 
   file_ = fdopen(fd, "a");  // Make a FILE*.
   if (file_ == nullptr) {   // Man, we're screwed!
@@ -264,6 +262,9 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
     const string& file_header_string = file_header_stream.str();
 
     const int header_len = static_cast<int>(file_header_string.size());
+    if (file_ == nullptr) {
+      return;
+    }
     fwrite(file_header_string.data(), 1, header_len, file_);
     file_length_ += header_len;
     bytes_since_flush_ += header_len;
