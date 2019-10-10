@@ -489,6 +489,7 @@ Status OnLanePlanning::Plan(
     }
   } else {
     const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
+    const auto* target_ref_info = frame_->FindTargetReferenceLineInfo();
     if (!best_ref_info) {
       std::string msg("planner failed to make a driving plan");
       AERROR << msg;
@@ -524,8 +525,13 @@ Status OnLanePlanning::Plan(
     // set right of way status
     ptr_trajectory_pb->set_right_of_way_status(
         best_ref_info->GetRightOfWayStatus());
+
     for (const auto& id : best_ref_info->TargetLaneId()) {
       ptr_trajectory_pb->add_lane_id()->CopyFrom(id);
+    }
+
+    for (const auto& id : target_ref_info->TargetLaneId()) {
+      ptr_trajectory_pb->add_target_lane_id()->CopyFrom(id);
     }
 
     ptr_trajectory_pb->set_trajectory_type(best_ref_info->trajectory_type());

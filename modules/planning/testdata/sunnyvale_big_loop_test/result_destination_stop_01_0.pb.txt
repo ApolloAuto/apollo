@@ -70,3 +70,21 @@ engage_advice {
 }
 trajectory_type: NORMAL
 replan_reason: "replan for no previous trajectory."
+target_lane_id {
+  id: "2693_1_-1"
+}
+target_lane_id {
+  id: "2691_1_-1"
+}
+target_lane_id {
+  id: "2690_1_-1"
+}
+target_lane_id {
+  id: "2688_1_-1"
+}
+target_lane_id {
+  id: "2687_1_-1"
+}
+target_lane_id {
+  id: "732_1_-1"
+}

@@ -109,3 +109,30 @@ engage_advice {
 }
 trajectory_type: SPEED_FALLBACK
 replan_reason: "replan for manual mode."
+target_lane_id {
+  id: "188_1_-1"
+}
+target_lane_id {
+  id: "2726_1_-1"
+}
+target_lane_id {
+  id: "382_1_-1"
+}
+target_lane_id {
+  id: "10898_1_-1"
+}
+target_lane_id {
+  id: "300_1_-1"
+}
+target_lane_id {
+  id: "10771_1_-1"
+}
+target_lane_id {
+  id: "201_1_-1"
+}
+target_lane_id {
+  id: "2811_1_-1"
+}
+target_lane_id {
+  id: "2813_1_-1"
+}
