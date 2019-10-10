@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <tuple>
 #include <unordered_map>
 #include <utility>
 
@@ -52,9 +53,10 @@ STObstaclesProcessor::STObstaclesProcessor(const double planning_distance,
       planning_distance_(planning_distance),
       path_data_(path_data),
       vehicle_param_(common::VehicleConfigHelper::GetConfig().vehicle_param()) {
+  adc_path_init_s_ = path_data_.discretized_path().front().s();
 }
 
-//TODO(jiacheng):
+// TODO(jiacheng):
 //  1. Properly deal with clear-zone type obstacles.
 //  2. Further speed up by early terminating processing non-related obstacles.
 Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
@@ -76,24 +78,31 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     std::vector<STPoint> lower_points;
     std::vector<STPoint> upper_points;
     if (!ComputeObstacleSTBoundary(*obs_ptr, &lower_points, &upper_points)) {
-      // Obstalce doesn't appear on ST-Graph.
+      // Obstacle doesn't appear on ST-Graph.
       continue;
     }
+    CHECK_GT(lower_points.size(), 1);
+    CHECK_GT(upper_points.size(), 1);
     auto boundary = STBoundary::CreateInstanceAccurate(
         lower_points, upper_points);
     boundary.set_id(obs_ptr->Id());
     if (obs_ptr->Trajectory().trajectory_point_size() == 0) {
       // Obstacle is static.
       if (std::get<0>(closest_stop_obstacle) == "NULL" ||
-          std::get<1>(closest_stop_obstacle).lower_points().front().s() >
-              lower_points.front().s()) {
+          std::get<1>(closest_stop_obstacle).bottom_left_point().s() >
+              boundary.bottom_left_point().s()) {
         // If this static obstacle is closer for ADC to stop, record it.
-        std::get<0>(closest_stop_obstacle) = obs_ptr->Id();
-        std::get<1>(closest_stop_obstacle) = boundary;
-        std::get<2>(closest_stop_obstacle) = obs_ptr;
+        closest_stop_obstacle = std::make_tuple(
+            obs_ptr->Id(), boundary, obs_ptr);
       }
     } else {
       // Obstacle is dynamic.
+      if (boundary.bottom_left_point().s() - adc_path_init_s_
+              < kSIgnoreThreshold) {
+        // Ignore backward obstacles.
+        // TODO(jiacheng): don't ignore if ADC is in dangerous segments.
+        continue;
+      }
       obs_id_to_st_boundary_[obs_ptr->Id()] = boundary;
       obs_ptr->set_path_st_boundary(boundary);
     }
@@ -175,6 +184,12 @@ bool STObstaclesProcessor::ComputeObstacleSTBoundary(
         upper_points->emplace_back(
             overlapping_s.second, obs_traj_pt.relative_time());
       }
+    }
+    if (lower_points->size() == 1) {
+      lower_points->emplace_back(
+          lower_points->front().s(), lower_points->front().t() + 0.1);
+      upper_points->emplace_back(
+          upper_points->front().s(), upper_points->front().t() + 0.1);
     }
   }
 
