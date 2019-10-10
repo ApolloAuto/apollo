@@ -76,11 +76,9 @@ void LpFistOrderCoefficients(const double ts, const double settling_time,
   denominators->push_back(-1.0 * a_term);
 
   for (size_t i = 0; i < k_d-1; ++i) {
-      numerators->push_back(0.0);
+    numerators->push_back(0.0);
   }
   numerators->push_back(1 - a_term);
-
-  return;
 }
 
 }  // namespace common
