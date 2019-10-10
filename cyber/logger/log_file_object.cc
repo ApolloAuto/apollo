@@ -264,6 +264,9 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
     const string& file_header_string = file_header_stream.str();
 
     const int header_len = static_cast<int>(file_header_string.size());
+    if (file_ == nullptr){
+        return;
+    }
     fwrite(file_header_string.data(), 1, header_len, file_);
     file_length_ += header_len;
     bytes_since_flush_ += header_len;
