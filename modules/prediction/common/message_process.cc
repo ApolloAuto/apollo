@@ -108,9 +108,8 @@ bool MessageProcess::InitPredictors() {
   return true;
 }
 
-void MessageProcess::OnPerception(
-    const perception::PerceptionObstacles& perception_obstacles,
-    PredictionObstacles* const prediction_obstacles) {
+void MessageProcess::ContainerProcess(
+    const perception::PerceptionObstacles& perception_obstacles) {
   ADEBUG << "Received a perception message ["
          << perception_obstacles.ShortDebugString() << "].";
 
@@ -157,6 +156,18 @@ void MessageProcess::OnPerception(
 
   // Insert perception_obstacles
   ptr_obstacles_container->Insert(perception_obstacles);
+}
+
+void MessageProcess::OnPerception(
+    const perception::PerceptionObstacles& perception_obstacles,
+    PredictionObstacles* const prediction_obstacles) {
+
+  ContainerProcess(perception_obstacles);
+
+  auto ptr_obstacles_container =
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
+  CHECK_NOTNULL(ptr_obstacles_container);
 
   // Ignore some obstacles
   ObstaclesPrioritizer::Instance()->AssignIgnoreLevel();
