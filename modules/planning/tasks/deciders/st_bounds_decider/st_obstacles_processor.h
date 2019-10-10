@@ -50,6 +50,8 @@ class STObstaclesProcessor {
 
   common::Status MapObstaclesToSTBoundaries(PathDecision* const path_decision);
 
+  std::unordered_map<std::string, STBoundary> GetAllSTBoundaries();
+
   std::pair<double, double> GetRegularBoundaryFromObstacles(double t);
 
   std::pair<double, double> GetFallbackBoundaryFromObstacles(double t);
