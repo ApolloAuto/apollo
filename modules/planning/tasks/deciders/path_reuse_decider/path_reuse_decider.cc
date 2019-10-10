@@ -251,10 +251,10 @@ bool PathReuseDecider::IsCollisionFree(
 }
 
 // check the length of the path
-bool PathReuseDecider::NotShortPath(DiscretizedPath* current_path) {
+bool PathReuseDecider::NotShortPath(const DiscretizedPath& current_path) {
   // TODO(shu): use gflag
   constexpr double kShortPathThreshold = 40;
-  return current_path->size() > kShortPathThreshold;
+  return current_path.size() > kShortPathThreshold;
 }
 
 bool PathReuseDecider::TrimHistoryPath(
@@ -291,7 +291,7 @@ bool PathReuseDecider::TrimHistoryPath(
   }
   trimmed_path.insert(trimmed_path.begin(), history_path[path_start_index]);
   frame->set_current_frame_planned_path(trimmed_path);
-  return NotShortPath(&trimmed_path);
+  return NotShortPath(trimmed_path);
 }
 
 }  // namespace planning
