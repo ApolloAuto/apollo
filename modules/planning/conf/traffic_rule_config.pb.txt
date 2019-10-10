@@ -8,7 +8,7 @@ config: {
 
 config: {
   rule_id: CHANGE_LANE
-  enabled: true
+  enabled: false
   change_lane {
     min_overtake_distance: 10.0
     min_overtake_time: 2.0
