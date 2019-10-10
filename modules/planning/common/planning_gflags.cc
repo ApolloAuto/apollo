@@ -266,7 +266,7 @@ DEFINE_double(follow_min_obs_lateral_distance, 2.5,
 DEFINE_double(yield_distance, 3.0,
               "min yield distance for vehicles/moving objects "
               "other than pedestrians/bicycles");
-DEFINE_double(yield_distance_pedestrian_bycicle, 5.0,
+DEFINE_double(yield_distance_pedestrian_bicycle, 5.0,
               "min yield distance for pedestrians/bicycles");
 DEFINE_double(follow_time_buffer, 2.5,
               "time buffer in second to calculate the following distance.");
@@ -292,6 +292,9 @@ DEFINE_double(virtual_stop_wall_height, 2.0,
               "virtual stop wall height (meters)");
 
 // Path Deciders
+DEFINE_bool(enable_skip_path_tasks, false,
+            "skip all path tasks and use trimmed previous path");
+
 DEFINE_double(obstacle_lat_buffer, 0.4,
               "obstacle lateral buffer (meters) for deciding path boundaries");
 DEFINE_double(obstacle_lon_start_buffer, 3.0,
@@ -305,8 +308,8 @@ DEFINE_double(static_obstacle_speed_threshold, 0.5,
               "or not.");
 DEFINE_double(lane_borrow_max_speed, 5.0,
               "The speed threshold for lane-borrow");
-DEFINE_int32(long_term_blocking_obstacle_cycle_threhold, 3,
-             "The cycle threhold for long-term blocking obstacle.");
+DEFINE_int32(long_term_blocking_obstacle_cycle_threshold, 3,
+             "The cycle threshold for long-term blocking obstacle.");
 
 // Prediction Part
 DEFINE_double(prediction_total_time, 5.0, "Total prediction time");

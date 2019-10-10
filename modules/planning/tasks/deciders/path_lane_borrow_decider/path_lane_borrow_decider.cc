@@ -123,7 +123,7 @@ bool PathLaneBorrowDecider::IsLongTermBlockingObstacle() {
           ->planning_status()
           .path_decider()
           .front_static_obstacle_cycle_counter() >=
-      FLAGS_long_term_blocking_obstacle_cycle_threhold) {
+      FLAGS_long_term_blocking_obstacle_cycle_threshold) {
     ADEBUG << "The blocking obstacle is long-term existing.";
     return true;
   } else {
