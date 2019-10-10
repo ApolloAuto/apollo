@@ -52,7 +52,7 @@ message RSSInfo {
   optional double acc_lat_right_range_maximum = 9;
 }
 
-// next id: 23
+// next id: 24
 message ADCTrajectory {
   optional apollo.common.Header header = 1;
 
@@ -88,7 +88,7 @@ message ADCTrajectory {
   }
   optional RightOfWayStatus right_of_way_status = 17;
 
-  // lane id along reference line
+  // lane id along current reference line
   repeated apollo.hdmap.Id lane_id = 18;
 
   // set the engage advice for based on current planning result.
@@ -112,6 +112,9 @@ message ADCTrajectory {
     PATH_REUSED = 4;
   }
   optional TrajectoryType trajectory_type = 21 [default = UNKNOWN];
+
+  // lane id along target reference line
+  repeated apollo.hdmap.Id target_lane_id = 23;
 
   // output related to RSS
   optional RSSInfo rss_info = 100;

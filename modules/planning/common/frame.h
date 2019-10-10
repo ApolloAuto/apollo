@@ -96,6 +96,8 @@ class Frame {
 
   const ReferenceLineInfo *FindDriveReferenceLineInfo();
 
+  const ReferenceLineInfo *FindTargetReferenceLineInfo();
+
   const ReferenceLineInfo *FindFailedReferenceLineInfo();
 
   const ReferenceLineInfo *DriveReferenceLineInfo() const;

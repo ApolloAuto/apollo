@@ -525,6 +525,17 @@ const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {
   return drive_reference_line_info_;
 }
 
+const ReferenceLineInfo *Frame::FindTargetReferenceLineInfo() {
+  const ReferenceLineInfo *target_reference_line_info = nullptr;
+  for (const auto &reference_line_info : reference_line_info_) {
+    if (reference_line_info.IsChangeLanePath()) {
+      return &reference_line_info;
+    }
+    target_reference_line_info = &reference_line_info;
+  }
+  return target_reference_line_info;
+}
+
 const ReferenceLineInfo *Frame::FindFailedReferenceLineInfo() {
   for (const auto &reference_line_info : reference_line_info_) {
     // Find the unsuccessful lane-change path

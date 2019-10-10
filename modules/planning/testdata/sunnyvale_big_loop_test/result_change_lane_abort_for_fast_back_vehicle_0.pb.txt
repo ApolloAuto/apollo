@@ -32,3 +32,6 @@ engage_advice {
 }
 trajectory_type: SPEED_FALLBACK
 replan_reason: "replan for no previous trajectory."
+target_lane_id {
+  id: "3143_1_-1"
+}
