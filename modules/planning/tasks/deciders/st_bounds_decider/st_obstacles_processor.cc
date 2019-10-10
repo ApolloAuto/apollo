@@ -54,6 +54,9 @@ STObstaclesProcessor::STObstaclesProcessor(const double planning_distance,
       vehicle_param_(common::VehicleConfigHelper::GetConfig().vehicle_param()) {
 }
 
+//TODO(jiacheng):
+//  1. Properly deal with clear-zone type obstacles.
+//  2. Further speed up by early terminating processing non-related obstacles.
 Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     PathDecision* const path_decision) {
   // Sanity checks.
@@ -64,6 +67,8 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
   obs_id_to_st_boundary_.clear();
 
   // Go through every obstacle.
+  std::tuple<std::string, STBoundary, Obstacle*> closest_stop_obstacle;
+  std::get<0>(closest_stop_obstacle) = "NULL";
   for (const auto* obs_item_ptr : path_decision->obstacles().Items()) {
     Obstacle* obs_ptr = path_decision->Find(obs_item_ptr->Id());
     CHECK_NOTNULL(obs_ptr);
@@ -71,13 +76,34 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     std::vector<STPoint> lower_points;
     std::vector<STPoint> upper_points;
     if (!ComputeObstacleSTBoundary(*obs_ptr, &lower_points, &upper_points)) {
+      // Obstalce doesn't appear on ST-Graph.
       continue;
     }
     auto boundary = STBoundary::CreateInstanceAccurate(
         lower_points, upper_points);
     boundary.set_id(obs_ptr->Id());
-    obs_id_to_st_boundary_[obs_ptr->Id()] = boundary;
-    obs_ptr->set_path_st_boundary(boundary);
+    if (obs_ptr->Trajectory().trajectory_point_size() == 0) {
+      // Obstacle is static.
+      if (std::get<0>(closest_stop_obstacle) == "NULL" ||
+          std::get<1>(closest_stop_obstacle).lower_points().front().s() >
+              lower_points.front().s()) {
+        // If this static obstacle is closer for ADC to stop, record it.
+        std::get<0>(closest_stop_obstacle) = obs_ptr->Id();
+        std::get<1>(closest_stop_obstacle) = boundary;
+        std::get<2>(closest_stop_obstacle) = obs_ptr;
+      }
+    } else {
+      // Obstacle is dynamic.
+      obs_id_to_st_boundary_[obs_ptr->Id()] = boundary;
+      obs_ptr->set_path_st_boundary(boundary);
+    }
+  }
+  // Only retain the closest static obstacle.
+  if (std::get<0>(closest_stop_obstacle) != "NULL") {
+    obs_id_to_st_boundary_[std::get<0>(closest_stop_obstacle)] =
+        std::get<1>(closest_stop_obstacle);
+    std::get<2>(closest_stop_obstacle)->set_path_st_boundary(
+        std::get<1>(closest_stop_obstacle));
   }
 
   return Status::OK();
