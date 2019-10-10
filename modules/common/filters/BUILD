@@ -37,6 +37,9 @@ cc_library(
     hdrs = [
         "digital_filter_coefficients.h",
     ],
+    deps = [
+        "//cyber",
+    ],
 )
 
 cc_library(
@@ -82,6 +85,7 @@ cc_test(
         "digital_filter_coefficients_test.cc",
     ],
     deps = [
+        "//cyber",
         ":digital_filter_coefficients",
         "@gtest//:main",
     ],
