@@ -4,7 +4,7 @@
 
 车身铭牌号位于车身侧面的铭牌，如图：
 
-![mingpai](images\mingpai.jpg)
+![mingpai](images/mingpai.jpg)
 
 
 
@@ -56,11 +56,11 @@
 
 2）将电池组放入电池仓内； 
 
-3）将电缆与相应的高压放电插口和低压通讯插口连接妥当；![battery_12](/images/battery_12.png)
+3）将电缆与相应的高压放电插口和低压通讯插口连接妥当；![battery_12](images/battery_12.png)
 
 4）重新安装电池固定挡板用两个螺栓固定，确保电池固定板没有晃动的情况。
 
-![battery_11](/images/battery_11.png)
+![battery_11](images/battery_11.png)
 
  如果需要拆卸电池组，步骤相似。
 
@@ -85,7 +85,7 @@
 
 下电步骤：先关电池开关把手，后拔 充/放电插头；
 
-![battery_13](/images/battery_13.png)
+![battery_13](images/battery_13.png)
 
 **警告**
 

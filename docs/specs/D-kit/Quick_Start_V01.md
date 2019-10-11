@@ -4,7 +4,7 @@
 
 车身铭牌号位于车身侧面的铭牌，如图：
 
-![mingpai](images\mingpai.jpg)
+![mingpai](images/mingpai.jpg)
 
 # **快速介绍**
 
