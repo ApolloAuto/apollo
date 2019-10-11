@@ -97,6 +97,12 @@ class DigitalFilter {
   void set_dead_zone(const double deadzone);
 
   /**
+   * @brief re-set the x_values_ and y_values_
+   * @param deadzone The value of deadzone
+   */
+  void reset_values();
+
+  /**
    * @brief get denominators
    * @return vector<double> The denominators of filter
    */

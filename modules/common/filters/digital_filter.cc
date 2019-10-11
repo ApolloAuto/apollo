@@ -79,6 +79,11 @@ double DigitalFilter::Filter(const double x_insert) {
   return UpdateLast(y_insert);
 }
 
+void DigitalFilter::reset_values() {
+  x_values_.clear();
+  y_values_.clear();
+}
+
 double DigitalFilter::UpdateLast(const double input) {
   const double diff = std::abs(input - last_);
   if (diff < dead_zone_) {
