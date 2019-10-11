@@ -52,6 +52,12 @@ message DestinationStatus {
   optional bool has_passed_destination = 1 [default = false];
 }
 
+message EmergencyPullOverStatus {
+  optional apollo.common.PointENU position = 1;
+  optional double theta = 2;
+  optional bool is_in_emergency_pull_over_scenario = 3 [default = false];
+}
+
 message OpenSpaceStatus {
   repeated string partitioned_trajectories_index_history = 1;
   optional bool position_init = 2 [default = false];
@@ -137,18 +143,19 @@ message PlanningStatus {
   optional ChangeLaneStatus change_lane = 2;
   optional CrosswalkStatus crosswalk = 3;
   optional DestinationStatus destination = 4;
-  optional apollo.common.EngageAdvice engage_advice = 5;
-  optional OpenSpaceStatus open_space = 6;
-  optional PedestrianStatus pedestrian = 7;
-  optional ParkAndGoStatus park_and_go = 8;
-  optional PathDeciderStatus path_decider = 9;
-  optional PathReuseDeciderStatus path_reuse_decider = 10;
-  optional PullOverStatus pull_over = 11;
-  optional ReroutingStatus rerouting = 12;
-  optional RightOfWayStatus right_of_way = 13;
-  optional ScenarioStatus scenario = 14;
-  optional SidePassStatus side_pass = 15;
-  optional StopSignStatus stop_sign = 16;
-  optional TrafficLightStatus traffic_light = 17;
-  optional YieldSignStatus yield_sign = 18;
+  optional EmergencyPullOverStatus emergency_pull_over = 5;
+  optional apollo.common.EngageAdvice engage_advice = 6;
+  optional OpenSpaceStatus open_space = 7;
+  optional PedestrianStatus pedestrian = 8;
+  optional ParkAndGoStatus park_and_go = 9;
+  optional PathDeciderStatus path_decider = 10;
+  optional PathReuseDeciderStatus path_reuse_decider = 11;
+  optional PullOverStatus pull_over = 12;
+  optional ReroutingStatus rerouting = 13;
+  optional RightOfWayStatus right_of_way = 14;
+  optional ScenarioStatus scenario = 15;
+  optional SidePassStatus side_pass = 16;
+  optional StopSignStatus stop_sign = 17;
+  optional TrafficLightStatus traffic_light = 18;
+  optional YieldSignStatus yield_sign = 19;
 }
