@@ -19,7 +19,6 @@
 #include "Eigen/Dense"
 
 #include "cyber/common/log.h"
-
 #include "modules/common/math/linear_quadratic_regulator.h"
 
 namespace apollo {
@@ -30,7 +29,7 @@ using Matrix = Eigen::MatrixXd;
 
 //solver with cross term
 void SolveLQRProblem(const Matrix &A, const Matrix &B, const Matrix &Q,
-                     const Matrix &R, const Eigen::MatrixXd &M, const double tolerance,
+                     const Matrix &R, const Matrix &M, const double tolerance,
                      const uint max_num_iteration, Matrix *ptr_K) {
   if (A.rows() != A.cols() || B.rows() != A.rows() || Q.rows() != Q.cols() ||
       Q.rows() != A.rows() || R.rows() != R.cols() || R.rows() != B.cols() ||
