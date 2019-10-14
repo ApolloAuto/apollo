@@ -34,6 +34,7 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/proto/feature.pb.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 /**
  * @namespace apollo::prediction
@@ -250,6 +251,8 @@ class Obstacle {
   void SetPredictorType(const ObstacleConf::PredictorType& predictor_type);
 
   const ObstacleConf& obstacle_conf() { return obstacle_conf_; }
+
+  PredictionObstacle GeneratePredictionObstacle();
 
  private:
   Obstacle() = default;

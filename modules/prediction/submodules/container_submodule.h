@@ -28,6 +28,7 @@
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/planning.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 /**
  * @namespace apollo::prediction
@@ -72,7 +73,7 @@ class ContainerSubmodule
   std::shared_ptr<cyber::Reader<localization::LocalizationEstimate>>
       localization_reader_;
 
-  // TODO(kechxu) add a cyber writer
+  std::shared_ptr<cyber::Writer<PredictionObstacles>> prediction_writer_;
 };
 
 CYBER_REGISTER_COMPONENT(ContainerSubmodule)

@@ -17,13 +17,17 @@
 #include "modules/prediction/submodules/container_submodule.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/prediction/common/message_process.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
+#include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 
 namespace apollo {
 namespace prediction {
 
+using apollo::common::adapter::AdapterConfig;
 using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
@@ -48,14 +52,20 @@ bool ContainerSubmodule::Init() {
       node_->CreateReader<localization::LocalizationEstimate>(
           FLAGS_localization_topic, nullptr);
 
-  // TODO(kechxu) init the cyber writer
-
+  // TODO(kechxu) change topic name when finalized
+  prediction_writer_ =
+      node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
   return true;
 }
 
 bool ContainerSubmodule::Proc(
     const std::shared_ptr<PerceptionObstacles>& perception_message) {
   MessageProcess::ContainerProcess(*perception_message);
+
+  auto obstacles_container_ptr =
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
+  CHECK_NOTNULL(obstacles_container_ptr);
   // TODO(kechxu): implement the writer
   return true;
 }
