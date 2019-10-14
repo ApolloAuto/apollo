@@ -120,5 +120,13 @@ const std::vector<double> &DigitalFilter::numerators() const {
 
 double DigitalFilter::dead_zone() const { return dead_zone_; }
 
+const std::deque<double> &DigitalFilter::inputs_queue() const {
+  return x_values_;
+}
+
+const std::deque<double> &DigitalFilter::outputs_queue() const {
+  return y_values_;
+}
+
 }  // namespace common
 }  // namespace apollo
