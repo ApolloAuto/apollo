@@ -26,9 +26,9 @@ namespace apollo {
 namespace storytelling {
 namespace {
 
+using apollo::common::PathPoint;
 using apollo::planning::ADCTrajectory;
 using apollo::prediction::PredictionMap;
-using apollo::common::PathPoint;
 
 bool IsPointInPNCJunction(const PathPoint& point) {
   const auto junctions = PredictionMap::GetPNCJunctions(

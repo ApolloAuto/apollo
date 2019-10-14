@@ -132,9 +132,9 @@ void ScenarioManager::RegisterScenarios() {
       &config_map_[ScenarioConfig::BARE_INTERSECTION_UNPROTECTED]));
 
   // emergency_pull_over
-  CHECK(Scenario::LoadConfig(
-      FLAGS_scenario_emergency_pull_over_config_file,
-      &config_map_[ScenarioConfig::EMERGENCY_PULL_OVER]));
+  CHECK(
+      Scenario::LoadConfig(FLAGS_scenario_emergency_pull_over_config_file,
+                           &config_map_[ScenarioConfig::EMERGENCY_PULL_OVER]));
 
   // park_and_go
   CHECK(Scenario::LoadConfig(FLAGS_scenario_park_and_go_config_file,
@@ -367,7 +367,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectInterceptionScenario(
   if (traffic_sign_overlap && pnc_junction_overlap) {
     constexpr double kJunctionDelta = 10.0;
     double s_diff = std::fabs(traffic_sign_overlap->start_s -
-                             pnc_junction_overlap->start_s);
+                              pnc_junction_overlap->start_s);
     if (s_diff >= kJunctionDelta) {
       if (pnc_junction_overlap->start_s > traffic_sign_overlap->start_s) {
         pnc_junction_overlap = nullptr;

@@ -48,8 +48,8 @@ class Storytelling : public apollo::cyber::TimerComponent {
     }
 
     // Send stories.
-    static auto writer = manager->CreateWriter<Stories>(
-        FLAGS_storytelling_topic);
+    static auto writer =
+        manager->CreateWriter<Stories>(FLAGS_storytelling_topic);
     apollo::common::util::FillHeader("Storytelling", &stories_);
     writer->Write(stories_);
 

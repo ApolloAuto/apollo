@@ -28,16 +28,15 @@ using apollo::common::Status;
 using apollo::planning_internal::StGraphBoundaryDebug;
 using apollo::planning_internal::STGraphDebug;
 
-STBoundsDecider::STBoundsDecider(const TaskConfig& config)
-    : Decider(config) {
+STBoundsDecider::STBoundsDecider(const TaskConfig& config) : Decider(config) {
   CHECK(config.has_st_bounds_decider_config());
   st_bounds_config_ = config.st_bounds_decider_config();
 }
 
-Status STBoundsDecider::Process(
-    Frame* const frame, ReferenceLineInfo* const reference_line_info) {
-  const PathData &path_data = reference_line_info->path_data();
-  PathDecision *const path_decision = reference_line_info->path_decision();
+Status STBoundsDecider::Process(Frame* const frame,
+                                ReferenceLineInfo* const reference_line_info) {
+  const PathData& path_data = reference_line_info->path_data();
+  PathDecision* const path_decision = reference_line_info->path_decision();
 
   // Map all related obstacles onto ST-Graph.
   auto time1 = std::chrono::system_clock::now();
@@ -52,13 +51,14 @@ Status STBoundsDecider::Process(
   // Record the ST-Graph for good visualization and easy debugging.
   auto all_st_boundaries = st_obstacles_processor.GetAllSTBoundaries();
   std::vector<STBoundary> st_boundaries;
-  for (auto it = all_st_boundaries.begin();
-       it != all_st_boundaries.end(); ++it) {
+  for (auto it = all_st_boundaries.begin(); it != all_st_boundaries.end();
+       ++it) {
     st_boundaries.push_back(it->second);
   }
   ADEBUG << "Total ST boundaries = " << st_boundaries.size();
-  STGraphDebug *st_graph_debug = reference_line_info_->mutable_debug()->
-      mutable_planning_data()->add_st_graph();
+  STGraphDebug* st_graph_debug = reference_line_info_->mutable_debug()
+                                     ->mutable_planning_data()
+                                     ->add_st_graph();
   RecordSTGraphDebug(st_boundaries, st_graph_debug);
 
   // Initialize Guide-Line and Driving-Limits.
@@ -82,10 +82,9 @@ void STBoundsDecider::RecordSTGraphDebug(
     auto boundary_debug = st_graph_debug->add_boundary();
     boundary_debug->set_name(boundary.id());
     ADEBUG << "Obstacle ID = " << boundary.id();
-    boundary_debug->set_type(
-        StGraphBoundaryDebug::ST_BOUNDARY_TYPE_UNKNOWN);
+    boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_UNKNOWN);
 
-    for (const auto &point : boundary.points()) {
+    for (const auto& point : boundary.points()) {
       auto point_debug = boundary_debug->add_point();
       point_debug->set_t(point.x());
       point_debug->set_s(point.y());

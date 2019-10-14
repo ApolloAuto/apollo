@@ -161,7 +161,6 @@ void MessageProcess::ContainerProcess(
 void MessageProcess::OnPerception(
     const perception::PerceptionObstacles& perception_obstacles,
     PredictionObstacles* const prediction_obstacles) {
-
   ContainerProcess(perception_obstacles);
 
   auto ptr_obstacles_container =

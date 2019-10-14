@@ -198,12 +198,10 @@ void Frame::build_indices() {
   bool objects_has_indices = true;
   bool gt_objects_has_indices = true;
   if (objects.size() > 0) {
-    objects_has_indices =
-        objects[0]->indices->indices.size() > 0;
+    objects_has_indices = objects[0]->indices->indices.size() > 0;
   }
   if (gt_objects.size() > 0) {
-    gt_objects_has_indices =
-        gt_objects[0]->indices->indices.size() > 0;
+    gt_objects_has_indices = gt_objects[0]->indices->indices.size() > 0;
   }
   if (objects_has_indices && gt_objects_has_indices) {
     return;

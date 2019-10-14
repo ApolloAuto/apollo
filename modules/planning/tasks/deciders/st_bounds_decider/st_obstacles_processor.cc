@@ -83,8 +83,8 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     }
     CHECK_GT(lower_points.size(), 1);
     CHECK_GT(upper_points.size(), 1);
-    auto boundary = STBoundary::CreateInstanceAccurate(
-        lower_points, upper_points);
+    auto boundary =
+        STBoundary::CreateInstanceAccurate(lower_points, upper_points);
     boundary.set_id(obs_ptr->Id());
     if (obs_ptr->Trajectory().trajectory_point().empty()) {
       // Obstacle is static.
@@ -92,13 +92,13 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
           std::get<1>(closest_stop_obstacle).bottom_left_point().s() >
               boundary.bottom_left_point().s()) {
         // If this static obstacle is closer for ADC to stop, record it.
-        closest_stop_obstacle = std::make_tuple(
-            obs_ptr->Id(), boundary, obs_ptr);
+        closest_stop_obstacle =
+            std::make_tuple(obs_ptr->Id(), boundary, obs_ptr);
       }
     } else {
       // Obstacle is dynamic.
-      if (boundary.bottom_left_point().s() - adc_path_init_s_
-              < kSIgnoreThreshold) {
+      if (boundary.bottom_left_point().s() - adc_path_init_s_ <
+          kSIgnoreThreshold) {
         // Ignore backward obstacles.
         // TODO(jiacheng): don't ignore if ADC is in dangerous segments.
         continue;
@@ -111,8 +111,8 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
   if (std::get<0>(closest_stop_obstacle) != "NULL") {
     obs_id_to_st_boundary_[std::get<0>(closest_stop_obstacle)] =
         std::get<1>(closest_stop_obstacle);
-    std::get<2>(closest_stop_obstacle)->set_path_st_boundary(
-        std::get<1>(closest_stop_obstacle));
+    std::get<2>(closest_stop_obstacle)
+        ->set_path_st_boundary(std::get<1>(closest_stop_obstacle));
   }
 
   return Status::OK();
@@ -135,13 +135,11 @@ STObstaclesProcessor::GetFallbackBoundaryFromObstacles(double t) {
   return {0.0, 0.0};
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Private helper functions.
 
 bool STObstaclesProcessor::ComputeObstacleSTBoundary(
-    const Obstacle& obstacle,
-    std::vector<STPoint>* const lower_points,
+    const Obstacle& obstacle, std::vector<STPoint>* const lower_points,
     std::vector<STPoint>* const upper_points) {
   lower_points->clear();
   upper_points->clear();
@@ -160,7 +158,7 @@ bool STObstaclesProcessor::ComputeObstacleSTBoundary(
     const Box2d& obs_box = obstacle.PerceptionBoundingBox();
     std::pair<double, double> overlapping_s;
     if (GetOverlappingS(adc_path_points, obs_box, kADCSafetyLBuffer,
-        &overlapping_s)) {
+                        &overlapping_s)) {
       lower_points->emplace_back(overlapping_s.first, 0.0);
       lower_points->emplace_back(overlapping_s.first, planning_time_);
       upper_points->emplace_back(overlapping_s.second, 0.0);
@@ -178,18 +176,18 @@ bool STObstaclesProcessor::ComputeObstacleSTBoundary(
       const Box2d& obs_box = obstacle.GetBoundingBox(obs_traj_pt);
       std::pair<double, double> overlapping_s;
       if (GetOverlappingS(adc_path_points, obs_box, kADCSafetyLBuffer,
-          &overlapping_s)) {
-        lower_points->emplace_back(
-            overlapping_s.first, obs_traj_pt.relative_time());
-        upper_points->emplace_back(
-            overlapping_s.second, obs_traj_pt.relative_time());
+                          &overlapping_s)) {
+        lower_points->emplace_back(overlapping_s.first,
+                                   obs_traj_pt.relative_time());
+        upper_points->emplace_back(overlapping_s.second,
+                                   obs_traj_pt.relative_time());
       }
     }
     if (lower_points->size() == 1) {
-      lower_points->emplace_back(
-          lower_points->front().s(), lower_points->front().t() + 0.1);
-      upper_points->emplace_back(
-          upper_points->front().s(), upper_points->front().t() + 0.1);
+      lower_points->emplace_back(lower_points->front().s(),
+                                 lower_points->front().t() + 0.1);
+      upper_points->emplace_back(upper_points->front().s(),
+                                 upper_points->front().t() + 0.1);
     }
   }
 
@@ -232,7 +230,9 @@ bool STObstaclesProcessor::GetOverlappingS(
       break;
     }
   }
-  if (!has_overlapping) { return false; }
+  if (!has_overlapping) {
+    return false;
+  }
   for (int i = pt_after_idx; i >= pt_before_idx; --i) {
     if (IsADCOverlappingWithObstacle(adc_path_points[i], obstacle_instance,
                                      adc_l_buffer)) {
@@ -300,7 +300,13 @@ bool STObstaclesProcessor::IsPathPointAwayFromObstacle(
     Vec2d path_dir_unit_vec = path_dir_lineseg.unit_direction();
     Vec2d perpendicular_vec = corner_pt - normal_line_ft_pt;
     double corner_pt_s_dist = path_dir_unit_vec.InnerProd(perpendicular_vec);
-    if (is_before && corner_pt_s_dist < s_thresh) { return false; }    if (!is_before && corner_pt_s_dist > -s_thresh) { return false; }  }
+    if (is_before && corner_pt_s_dist < s_thresh) {
+      return false;
+    }
+    if (!is_before && corner_pt_s_dist > -s_thresh) {
+      return false;
+    }
+  }
   return true;
 }
 

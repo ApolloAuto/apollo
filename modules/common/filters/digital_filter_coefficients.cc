@@ -69,7 +69,7 @@ void LpFistOrderCoefficients(const double ts, const double settling_time,
   if (settling_time == 0.0) {
     a_term = 0.0;
   } else {
-    a_term = exp(-1 * ts/settling_time);
+    a_term = exp(-1 * ts / settling_time);
   }
 
   denominators->push_back(1.0);
