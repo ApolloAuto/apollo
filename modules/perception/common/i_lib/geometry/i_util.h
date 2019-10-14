@@ -205,7 +205,7 @@ inline bool IBackprojectPlaneIntersectionCanonical(const T *x, const T *K,
   X[0] = Z * umcx;
   X[1] = Z * vmcy;
   X[2] = Z;
-  return Z > static_cast<T>(0.0) ? true : false;
+  return Z > static_cast<T>(0.0);
 }
 
 }  // namespace common

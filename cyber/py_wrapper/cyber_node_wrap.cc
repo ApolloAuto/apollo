@@ -169,7 +169,7 @@ PyObject *cyber_PyReader_read(PyObject *self, PyObject *args) {
     return Py_None;
   }
 
-  bool wait = (r == 1 ? true : false);
+  bool wait = (r == 1);
 
   std::string reader_ret = reader->read(wait);
   // AERROR << "c++:PyReader_read -> " << reader_ret;

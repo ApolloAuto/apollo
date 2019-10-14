@@ -3960,7 +3960,7 @@ inline void IInvert2x2(const int A[4], double Ai[4]) {
 //   Ai[2] = sf * (-A[2]);
 //   Ai[3] = sf * (A[0]);
 //   is_invertible =
-//       (IAbs(d) > Constant<double>::MIN_ABS_SAFE_DIVIDEND()) ? true : false;
+//       (IAbs(d) > Constant<double>::MIN_ABS_SAFE_DIVIDEND());
 // }
 
 // inline void ISafeInvert2x2(const float A[4], float Ai[4], bool
@@ -3972,7 +3972,7 @@ inline void IInvert2x2(const int A[4], double Ai[4]) {
 //   Ai[2] = sf * (-A[2]);
 //   Ai[3] = sf * (A[0]);
 //   is_invertible =
-//       (IAbs(d) > Constant<float>::MIN_ABS_SAFE_DIVIDEND()) ? true : false;
+//       (IAbs(d) > Constant<float>::MIN_ABS_SAFE_DIVIDEND());
 // }
 
 // inline void ISafeInvert2x2(const int A[4], double Ai[4], bool &is_invertible)
@@ -3983,7 +3983,7 @@ inline void IInvert2x2(const int A[4], double Ai[4]) {
 //   Ai[1] = sf * (-A[1]);
 //   Ai[2] = sf * (-A[2]);
 //   Ai[3] = sf * (A[0]);
-//   is_invertible = (d != 0) ? true : false;
+//   is_invertible = (d != 0);
 // }
 
 // Compute the inverse of a 3x3 matrix A using the Cramer's rule
@@ -4068,7 +4068,7 @@ inline void IInvert3x3(const int A[9], double Ai[9]) {
 //   double sd8 = A[0] * A[4] - A[1] * A[3];
 //   double d = A[0] * sd0 + A[1] * sd1 + A[2] * sd2;
 //   is_invertible =
-//       (IAbs(d) > Constant<double>::MIN_ABS_SAFE_DIVIDEND()) ? true : false;
+//       (IAbs(d) > Constant<double>::MIN_ABS_SAFE_DIVIDEND());
 //   double d_rec = is_invertible ? IRec(d) : 1.0;
 //   Ai[0] = d_rec * sd0;
 //   Ai[1] = d_rec * sd3;
@@ -4094,7 +4094,7 @@ inline void IInvert3x3(const int A[9], double Ai[9]) {
 //   float sd8 = A[0] * A[4] - A[1] * A[3];
 //   float d = A[0] * sd0 + A[1] * sd1 + A[2] * sd2;
 //   is_invertible =
-//       (IAbs(d) > Constant<float>::MIN_ABS_SAFE_DIVIDEND()) ? true : false;
+//       (IAbs(d) > Constant<float>::MIN_ABS_SAFE_DIVIDEND());
 //   float d_rec = is_invertible ? IRec(d) : 1.f;
 //   Ai[0] = d_rec * sd0;
 //   Ai[1] = d_rec * sd3;
@@ -4119,7 +4119,7 @@ inline void IInvert3x3(const int A[9], double Ai[9]) {
 //   int sd7 = A[2] * A[3] - A[0] * A[5];
 //   int sd8 = A[0] * A[4] - A[1] * A[3];
 //   int d = A[0] * sd0 + A[1] * sd1 + A[2] * sd2;
-//   is_invertible = (d != 0) ? true : false;
+//   is_invertible = (d != 0);
 //   double d_rec = is_invertible ? IRec(d) : 1.0;
 //   Ai[0] = d_rec * sd0;
 //   Ai[1] = d_rec * sd3;

@@ -105,7 +105,7 @@ void LoopsVerifyAgent::CheckVerify(LoopsVerifyRequest *request,
     LoopResult *loop_result = response->mutable_loop_result();
 
     loop_result->set_loop_num(static_cast<double>(lap));
-    bool is_reached = lap >= GetLoopsToCheck(request) ? true : false;
+    bool is_reached = lap >= GetLoopsToCheck(request);
     loop_result->set_is_reached(is_reached);
 
     DataType data_type = request->type();
@@ -139,7 +139,7 @@ void LoopsVerifyAgent::StopVerify(LoopsVerifyRequest *request,
     AINFO << "acquired lap: " << lap << ", conf: " << conf;
     LoopResult *loop_result = response->mutable_loop_result();
     loop_result->set_loop_num(static_cast<double>(lap));
-    bool is_reached = lap >= GetLoopsToCheck(request) ? true : false;
+    bool is_reached = lap >= GetLoopsToCheck(request);
     loop_result->set_is_reached(is_reached);
 
     DataType data_type = request->type();

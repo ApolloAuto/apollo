@@ -50,7 +50,7 @@ bool send(const std::string &remote_ip, uint16_t remote_port, uint32_t count) {
     pb_msg->set_brake_percentage(coefficient * hundred / total);
     pb_msg->set_steering_percentage(coefficient * hundred / total);
     pb_msg->set_steering_torque_nm(coefficient);
-    pb_msg->set_parking_brake(i % 2 ? true : false);
+    pb_msg->set_parking_brake(i % 2);
     pb_msg->set_high_beam_signal(false);
     pb_msg->set_low_beam_signal(true);
     pb_msg->set_left_turn_signal(false);
