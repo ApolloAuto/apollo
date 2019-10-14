@@ -120,6 +120,18 @@ class DigitalFilter {
    */
   double dead_zone() const;
 
+  /**
+   * @brief get inputs of the filter
+   * @return deque<double> The queue of inputs of filter
+   */
+  const std::deque<double> &inputs_queue() const;
+
+  /**
+   * @brief get outputs of the filter
+   * @return deque<double> The queue of outputs of filter
+   */
+  const std::deque<double> &outputs_queue() const;
+
  private:
   /**
    * @desc: Update the last-filtered value,
