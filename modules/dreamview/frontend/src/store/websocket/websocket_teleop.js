@@ -1,7 +1,7 @@
 import STORE from "store";
 import Worker from 'utils/webworker.js';
 
-export default class PointCloudWebSocketEndpoint {
+export default class TeleopWebSocketEndpoint {
     constructor(serverAddr) {
         this.serverAddr = serverAddr;
         this.websocket = null;

@@ -5958,6 +5958,11 @@
                     "default": "UNKNOWN"
                   }
                 },
+                "targetLaneId": {
+                  "rule": "repeated",
+                  "type": "apollo.hdmap.Id",
+                  "id": 23
+                },
                 "rssInfo": {
                   "type": "RSSInfo",
                   "id": 100
@@ -6014,7 +6019,8 @@
                     "pathLaneBorrowDeciderConfig",
                     "laneChangeDeciderConfig",
                     "ruleBasedStopDeciderConfig",
-                    "pathReuseDeciderConfig"
+                    "pathReuseDeciderConfig",
+                    "stBoundsDeciderConfig"
                   ]
                 }
               },
@@ -6094,6 +6100,10 @@
                 "pathReuseDeciderConfig": {
                   "type": "PathReuseDeciderConfig",
                   "id": 27
+                },
+                "stBoundsDeciderConfig": {
+                  "type": "STBoundsDeciderConfig",
+                  "id": 28
                 }
               },
               "nested": {
@@ -6122,7 +6132,8 @@
                     "PIECEWISE_JERK_SPEED_OPTIMIZER": 27,
                     "LANE_CHANGE_DECIDER": 28,
                     "RULE_BASED_STOP_DECIDER": 29,
-                    "PATH_REUSE_DECIDER": 30
+                    "PATH_REUSE_DECIDER": 30,
+                    "ST_BOUNDS_DECIDER": 31
                   }
                 }
               }

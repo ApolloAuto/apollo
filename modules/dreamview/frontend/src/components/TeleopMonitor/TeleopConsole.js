@@ -101,11 +101,10 @@ export default class TeleOpConsole extends React.Component {
                                       }} />
                     </MonitorSection>
                     <MonitorSection title="Signal" icon={itemIcon}>
-                        {["Modem 1", "Modem 2", "Modem 3"]
-                            .map((name) => (
+                        {teleop.modemInfo.entries().map(([name, value]) => (
                                 <div className="section-content-row" key={name}>
                                     <span className="field">{name}</span>
-                                    <span className="field">-</span>
+                                    <span className="field">{value}</span>
                                 </div>
                             ))
                         }

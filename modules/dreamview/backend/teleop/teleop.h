@@ -51,8 +51,6 @@ class TeleopService {
   WebSocketHandler *websocket_;
 
 #ifdef TELEOP
-  modules::car1::network::ModemInfo modem_info_;
-
   std::shared_ptr<cyber::Reader<modules::car1::network::ModemInfo>>
       modem_info_reader_;
 
@@ -63,7 +61,7 @@ class TeleopService {
   // Store teleop status
   nlohmann::json teleop_status_;
 
-  // Mutex to protect concurrent access to modem_info_ and teleop_status_.
+  // Mutex to protect concurrent access to teleop_status_.
   // NOTE: Use boost until we upgrade to std version with rwlock support.
   boost::shared_mutex mutex_;
 };

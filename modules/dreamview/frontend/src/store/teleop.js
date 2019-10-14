@@ -4,6 +4,7 @@ export default class TeleopStore {
     @observable audioEnabled = false;
     @observable micEnabled = false;
     @observable videoEnabled = false;
+    @observable modemInfo = observable.map();
 
     @action toggleAudio() {
         this.audioEnabled = !this.audioEnabled;
@@ -26,6 +27,10 @@ export default class TeleopStore {
         }
         if (typeof status.video === "boolean") {
             this.videoEnabled = status.video;
+        }
+
+        for (const name in status.modems) {
+            this.modemInfo.set(name, status.modems[name]);
         }
     }
 }

@@ -106,10 +106,10 @@ void TeleopService::RegisterMessageHandlers() {
 
 void TeleopService::UpdateModemInfo(
     const std::shared_ptr<ModemInfo> &modem_info) {
-  {
+  // TODO simplify data and only send necessary info for display
+  if (modem_info->has_provider() && modem_info->has_technology()) {
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-    // TODO simplify data and only send necessary info for display
-    // update modem_info_
+    teleop_status_["modems"][modem_info->provider()] = modem_info->technology();
   }
 }
 
