@@ -15,7 +15,7 @@ cc_library(
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/adapters/proto:adapter_config_proto",
-        "//modules/common/time:time",
+        "//modules/common/time",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:message_process",
         "//modules/prediction/common:prediction_gflags",

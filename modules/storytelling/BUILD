@@ -4,8 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "frame_manager",
-    hdrs = ["frame_manager.h"],
     srcs = ["frame_manager.cc"],
+    hdrs = ["frame_manager.h"],
     deps = [
         "//cyber",
         "//modules/common/monitor_log",
