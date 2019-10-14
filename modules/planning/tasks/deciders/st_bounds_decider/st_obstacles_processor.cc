@@ -168,7 +168,7 @@ bool STObstaclesProcessor::ComputeObstacleSTBoundary(
     }
   } else {
     // Processing a dynamic obstacle.
-    // Go through every occurence of the obstacle at all timesteps, and
+    // Go through every occurrence of the obstacle at all timesteps, and
     // figure out the overlapping s-max and s-min one by one.
     for (const auto& obs_traj_pt : obs_trajectory.trajectory_point()) {
       // TODO(jiacheng): Currently, if the obstacle overlaps with ADC at

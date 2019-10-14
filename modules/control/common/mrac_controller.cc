@@ -173,7 +173,7 @@ void MracController::TransformReferenceModel(const double dt) {
       kd_reference_[1] = -8 + 2 * b_ref * Ts_ * Ts_;
       kd_reference_[2] = 4 - 2 * a_ref * Ts_ + b_ref * Ts_ * Ts_;
     } else {
-      AWARN << "refrence model order beyond the designed range, "
+      AWARN << "reference model order beyond the designed range, "
                "reference_model_order: "
             << reference_model_order_;
       reference_model_enabled_ = false;
