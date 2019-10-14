@@ -1684,5 +1684,11 @@ void Obstacle::SetPredictorType(
   obstacle_conf_.set_predictor_type(predictor_type);
 }
 
+PredictionObstacle Obstacle::GeneratePredictionObstacle() {
+  PredictionObstacle prediction_obstacle;
+  // TODO(kechxu) implement
+  return prediction_obstacle;
+}
+
 }  // namespace prediction
 }  // namespace apollo

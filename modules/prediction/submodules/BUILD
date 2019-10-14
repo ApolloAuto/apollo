@@ -14,10 +14,13 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
+        "//modules/common/adapters/proto:adapter_config_proto",
         "//modules/common/time:time",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:message_process",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/container:container_manager",
+        "//modules/prediction/container/obstacles:obstacles_container",
     ],
 )
 

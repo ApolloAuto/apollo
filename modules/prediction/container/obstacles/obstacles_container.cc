@@ -438,5 +438,23 @@ bool ObstaclesContainer::IsMovable(
 
 double ObstaclesContainer::timestamp() const { return timestamp_; }
 
+PredictionObstacles ObstaclesContainer::GetPredictionObstacles() {
+  PredictionObstacles prediction_obstacles;
+  for (const auto& id_pair : curr_frame_id_mapping_) {
+    int id = id_pair.second;
+    Obstacle* obstacle_ptr = GetObstacle(id);
+    if (obstacle_ptr == nullptr) {
+      AERROR << "Null obstacle ptr found for id [" << id << "]";
+      continue;
+    }
+    PredictionObstacle prediction_obstacle =
+        obstacle_ptr->GeneratePredictionObstacle();
+    prediction_obstacles.add_prediction_obstacle()->CopyFrom(
+        prediction_obstacle);
+  }
+  // TODO(kechxu) add other info into prediction_obstacles if needed
+  return prediction_obstacles;
+}
+
 }  // namespace prediction
 }  // namespace apollo

@@ -29,6 +29,7 @@
 #include "modules/common/util/lru_cache.h"
 #include "modules/prediction/container/container.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -131,6 +132,8 @@ class ObstaclesContainer : public Container {
   std::vector<int> curr_frame_obstacle_ids();
 
   double timestamp() const;
+
+  PredictionObstacles GetPredictionObstacles();
 
  private:
   Obstacle* GetObstacleWithLRUUpdate(const int obstacle_id);
