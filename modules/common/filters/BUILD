@@ -85,8 +85,8 @@ cc_test(
         "digital_filter_coefficients_test.cc",
     ],
     deps = [
-        "//cyber",
         ":digital_filter_coefficients",
+        "//cyber",
         "@gtest//:main",
     ],
 )
