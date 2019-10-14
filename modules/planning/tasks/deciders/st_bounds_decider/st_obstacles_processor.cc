@@ -232,8 +232,7 @@ bool STObstaclesProcessor::GetOverlappingS(
       break;
     }
   }
-  if (!has_overlapping) return false;
-
+  if (!has_overlapping) { return false; }
   for (int i = pt_after_idx; i >= pt_before_idx; --i) {
     if (IsADCOverlappingWithObstacle(adc_path_points[i], obstacle_instance,
                                      adc_l_buffer)) {
@@ -301,9 +300,7 @@ bool STObstaclesProcessor::IsPathPointAwayFromObstacle(
     Vec2d path_dir_unit_vec = path_dir_lineseg.unit_direction();
     Vec2d perpendicular_vec = corner_pt - normal_line_ft_pt;
     double corner_pt_s_dist = path_dir_unit_vec.InnerProd(perpendicular_vec);
-    if (is_before && corner_pt_s_dist < s_thresh) return false;
-    if (!is_before && corner_pt_s_dist > -s_thresh) return false;
-  }
+    if (is_before && corner_pt_s_dist < s_thresh) { return false; }    if (!is_before && corner_pt_s_dist > -s_thresh) { return false; }  }
   return true;
 }
 
