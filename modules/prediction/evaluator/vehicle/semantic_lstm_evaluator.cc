@@ -121,7 +121,7 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   Trajectory* trajectory = latest_feature_ptr->add_predicted_trajectory();
   trajectory->set_probability(1.0);
 
-  for (size_t i = 0; i < 30; ++i) {
+  for (int i = 0; i < 30; ++i) {
     TrajectoryPoint* point = trajectory->add_trajectory_point();
     double dx = static_cast<double>(torch_output[0][i][0]);
     double dy = static_cast<double>(torch_output[0][i][1]);
@@ -132,6 +132,16 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     double point_y = pos_y + rotated_offset.y();
     point->mutable_path_point()->set_x(point_x);
     point->mutable_path_point()->set_y(point_y);
+    if (i < 10) {  // use origin heading for the first second
+      point->mutable_path_point()->set_theta(
+          latest_feature_ptr->velocity_heading());
+    } else {
+      point->mutable_path_point()->set_theta(
+          std::atan2(trajectory->trajectory_point(i).path_point().y() -
+                         trajectory->trajectory_point(i - 1).path_point().y(),
+                     trajectory->trajectory_point(i).path_point().x() -
+                         trajectory->trajectory_point(i - 1).path_point().x()));
+    }
     point->set_relative_time(static_cast<double>(i) *
                              FLAGS_prediction_trajectory_time_resolution);
   }
