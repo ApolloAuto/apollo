@@ -39,6 +39,8 @@ void ADCTrajectoryContainer::Insert(
     const ::google::protobuf::Message& message) {
   adc_lane_ids_.clear();
   adc_lane_seq_.clear();
+  adc_target_lane_ids_.clear();
+  adc_target_lane_seq_.clear();
   adc_junction_polygon_ = std::move(Polygon2d());
 
   std::lock_guard<std::mutex> lock(adc_trajectory_mutex_);
@@ -207,7 +209,7 @@ bool ADCTrajectoryContainer::IsLaneIdInReferenceLine(
 
 bool ADCTrajectoryContainer::IsLaneIdInTargetReferenceLine(
     const std::string& lane_id) const {
-  return adc_lane_ids_.find(lane_id) != adc_target_lane_ids_.end();
+  return adc_target_lane_ids_.find(lane_id) != adc_target_lane_ids_.end();
 }
 
 void ADCTrajectoryContainer::SetLaneSequence() {
