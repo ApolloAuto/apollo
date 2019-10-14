@@ -154,7 +154,7 @@ int Client::DataCollectStage() {
   std::ofstream time_file_handler(data_collect_time_flag_file_);
   double now = UnixtimeNow();
   if (cmd == "start") {
-    if (lines.size() == 0) {
+    if (lines.empty()) {
       time_file_handler << std::to_string(now) << " start\n";
       AINFO << "write [" << std::to_string(now) << " start] to file "
             << data_collect_time_flag_file_;
@@ -181,7 +181,7 @@ int Client::DataCollectStage() {
       }
     }
   } else if (cmd == "stop") {
-    if (lines.size() == 0) {
+    if (lines.empty()) {
       AINFO << "Start first, this command will be ignored";
     } else {
       std::string& the_last_line = lines.back();

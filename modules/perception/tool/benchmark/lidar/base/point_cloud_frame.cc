@@ -29,7 +29,7 @@ void PointCloudFrame::set_cloud_type(const std::string& type) {
 }
 
 bool PointCloudFrame::load(const std::vector<std::string>& filenames) {
-  if (filenames.size() == 0) {
+  if (filenames.empty()) {
     std::cerr << "Filenames is empty" << std::endl;
     return false;
   }

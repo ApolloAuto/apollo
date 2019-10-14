@@ -292,7 +292,7 @@ class SimulationWorldService {
   void DownsampleSpeedPointsByInterval(const Points &points,
                                        size_t downsampleInterval,
                                        Points *downsampled_points) {
-    if (points.size() == 0) {
+    if (points.empty()) {
       return;
     }
 

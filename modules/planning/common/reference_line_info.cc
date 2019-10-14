@@ -152,28 +152,28 @@ bool ReferenceLineInfo::GetNeighborLaneInfo(
 
   switch (lane_type) {
     case LaneType::LeftForward: {
-      if (ptr_lane_info->lane().left_neighbor_forward_lane_id_size() == 0) {
+      if (ptr_lane_info->lane().left_neighbor_forward_lane_id().empty()) {
         return false;
       }
       *ptr_lane_id = ptr_lane_info->lane().left_neighbor_forward_lane_id(0);
       break;
     }
     case LaneType::LeftReverse: {
-      if (ptr_lane_info->lane().left_neighbor_reverse_lane_id_size() == 0) {
+      if (ptr_lane_info->lane().left_neighbor_reverse_lane_id().empty()) {
         return false;
       }
       *ptr_lane_id = ptr_lane_info->lane().left_neighbor_reverse_lane_id(0);
       break;
     }
     case LaneType::RightForward: {
-      if (ptr_lane_info->lane().right_neighbor_forward_lane_id_size() == 0) {
+      if (ptr_lane_info->lane().right_neighbor_forward_lane_id().empty()) {
         return false;
       }
       *ptr_lane_id = ptr_lane_info->lane().right_neighbor_forward_lane_id(0);
       break;
     }
     case LaneType::RightReverse: {
-      if (ptr_lane_info->lane().right_neighbor_reverse_lane_id_size() == 0) {
+      if (ptr_lane_info->lane().right_neighbor_reverse_lane_id().empty()) {
         return false;
       }
       *ptr_lane_id = ptr_lane_info->lane().right_neighbor_reverse_lane_id(0);

@@ -113,7 +113,7 @@ void Participant::CreateFastRtpsParticipant(
   const char* ip_val = ::getenv("CYBER_IP");
   if (ip_val != nullptr) {
     ip_env = ip_val;
-    if (ip_env.size() == 0) {
+    if (ip_env.empty()) {
       AERROR << "invalid CYBER_IP (an empty string)";
       return;
     }

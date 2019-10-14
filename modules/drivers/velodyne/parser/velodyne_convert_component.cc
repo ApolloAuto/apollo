@@ -66,7 +66,7 @@ bool VelodyneConvertComponent::Proc(
   point_cloud_out->Clear();
   conv_->ConvertPacketsToPointcloud(scan_msg, point_cloud_out);
 
-  if (point_cloud_out == nullptr || point_cloud_out->point_size() == 0) {
+  if (point_cloud_out == nullptr || point_cloud_out->point().empty()) {
     AWARN << "point_cloud_out convert is empty.";
     return false;
   }

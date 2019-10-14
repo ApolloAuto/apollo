@@ -52,7 +52,7 @@ void Velodyne32Parser::GeneratePointcloud(
       ADEBUG << "stamp: " << std::fixed << last_time_stamp_;
     }
   }
-  if (out_msg->point_size() == 0) {
+  if (out_msg->point().empty()) {
     // we discard this pointcloud if empty
     AERROR << "All points is NAN!Please check velodyne:" << config_.model();
   }

@@ -140,7 +140,7 @@ bool BridgeProtoDiserializedBuf<T>::Initialize(const BridgeHeader &header) {
   }
   int status_size = static_cast<int>(total_frames_ / INT_BITS +
                                      ((total_frames_ % INT_BITS) ? 1 : 0));
-  if (status_list_.size() == 0) {
+  if (status_list_.empty()) {
     for (int i = 0; i < status_size; i++) {
       status_list_.push_back(0);
     }

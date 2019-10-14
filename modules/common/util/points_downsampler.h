@@ -80,7 +80,7 @@ template <typename Points>
 std::vector<size_t> DownsampleByAngle(const Points &points,
                                       const double angle_threshold) {
   std::vector<size_t> sampled_indices;
-  if (points.size() == 0) {
+  if (points.empty()) {
     return sampled_indices;
   }
 

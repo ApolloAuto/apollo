@@ -209,7 +209,7 @@ void UpdateTurnSignal(const apollo::common::VehicleSignal &signal,
 }
 
 void DownsampleCurve(Curve *curve) {
-  if (curve->segment_size() == 0) {
+  if (curve->segment().empty()) {
     return;
   }
 
@@ -827,7 +827,7 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
             }
           }
         } else if (decision.has_nudge()) {
-          if (world_obj.polygon_point_size() == 0) {
+          if (world_obj.polygon_point().empty()) {
             if (world_obj.type() == Object_Type_VIRTUAL) {
               AWARN << "No current perception object with id=" << id
                     << " for nudge decision";

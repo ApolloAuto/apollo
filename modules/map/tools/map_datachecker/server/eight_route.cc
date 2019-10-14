@@ -32,7 +32,7 @@ void EightRoute::Reset() {
 
 bool EightRoute::IsEightRoutePose(const std::vector<FramePose>& poses,
                                   int pose_index) {
-  if (poses.size() == 0 || pose_index <= 0 ||
+  if (poses.empty() || pose_index <= 0 ||
       pose_index >= static_cast<int>(poses.size())) {
     AINFO << "params error, poses size: " << poses.size()
           << ", pose_index: " << pose_index;

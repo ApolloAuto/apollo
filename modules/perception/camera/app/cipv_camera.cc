@@ -974,7 +974,7 @@ bool Cipv::CollectDrops(const base::MotionBufferPtr &motion_buffer,
     // }
 
     // If it is the first object, set capacity.
-    if (object_trackjectories_[cur_id].size() == 0) {
+    if (object_trackjectories_[cur_id].empty()) {
       object_trackjectories_[cur_id].set_capacity(kDropsHistorySize);
     }
 

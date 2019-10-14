@@ -197,7 +197,7 @@ bool load_frame_objects(const std::string& filename,
     obj->velocity = Eigen::Vector3d(velocity_x, velocity_y, velocity_z);
     obj->sensor_type = translate_string_to_sensor_type(sensor_type);
 
-    if (black_list.size() == 0 || black_list.find(type) == black_list.end()) {
+    if (black_list.empty() || black_list.find(type) == black_list.end()) {
       objects_out->push_back(obj);
     } else {
       std::cerr << "Ignore object " << i

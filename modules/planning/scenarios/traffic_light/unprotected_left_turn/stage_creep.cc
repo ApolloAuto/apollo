@@ -61,7 +61,7 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageCreep::Process(
     AERROR << "TrafficLightUnprotectedLeftTurnStageCreep planning error";
   }
 
-  if (GetContext()->current_traffic_light_overlap_ids.size() == 0) {
+  if (GetContext()->current_traffic_light_overlap_ids.empty()) {
     return FinishScenario();
   }
 

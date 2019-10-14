@@ -73,7 +73,7 @@ void GrpcClientImpl::SendMsgToGrpc(const std::shared_ptr<CarStatus> &msg) {
 void GrpcClientImpl::SendMsgToGrpc(
     const std::shared_ptr<PerceptionObstacles> &msg) {
   // verify perception obstacles msg valid
-  if (msg->perception_obstacle_size() == 0) {
+  if (msg->perception_obstacle().empty()) {
     AERROR << "SendObstaclesToObu msg is not valid";
     return;
   }

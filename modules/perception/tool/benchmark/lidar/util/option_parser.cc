@@ -29,7 +29,7 @@ bool OptionParser::parse_from_string(const std::string& input) {
   std::vector<std::string> values;
   // std::string str = StringUtil::trim_all(input);
   apollo::common::util::Split(input, '|', &option_pairs);
-  if (option_pairs.size() == 0) {  // single option
+  if (option_pairs.empty()) {  // single option
     option_pairs.push_back(input);
   }
   for (auto& opt : option_pairs) {
@@ -41,7 +41,7 @@ bool OptionParser::parse_from_string(const std::string& input) {
     }
     values.clear();
     apollo::common::util::Split(key_value[1], ',', &values);
-    if (values.size() == 0) {
+    if (values.empty()) {
       values.push_back(key_value[1]);
     }
     auto iter = _options.find(key_value[0]);

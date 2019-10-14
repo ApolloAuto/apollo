@@ -127,7 +127,7 @@ bool RelativeMap::CreateMapFromNavigationLane(MapMsg* map_msg) {
     return false;
   }
 
-  if (navigation_lane_.Path().path().path_point_size() == 0) {
+  if (navigation_lane_.Path().path().path_point().empty()) {
     LogErrorStatus(map_msg,
                    "There is no path point in currnet navigation path.");
     return false;

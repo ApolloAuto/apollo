@@ -260,11 +260,11 @@ bool RawStream::Init() {
     }
   }
 
-  if (config_.login_commands_size() == 0) {
+  if (config_.login_commands().empty()) {
     AWARN << "No login_commands in config file.";
   }
 
-  if (config_.logout_commands_size() == 0) {
+  if (config_.logout_commands().empty()) {
     AWARN << "No logout_commands in config file.";
   }
 
