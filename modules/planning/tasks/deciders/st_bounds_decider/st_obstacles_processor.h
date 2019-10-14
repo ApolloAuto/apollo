@@ -21,11 +21,13 @@
 #pragma once
 
 #include <string>
+#include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
+#include "modules/planning/proto/decision.pb.h"
 #include "modules/planning/proto/st_bounds_decider_config.pb.h"
 
 #include "modules/common/status/status.h"
@@ -52,6 +54,21 @@ class STObstaclesProcessor {
   common::Status MapObstaclesToSTBoundaries(PathDecision* const path_decision);
 
   std::unordered_map<std::string, STBoundary> GetAllSTBoundaries();
+
+  /** @brief Given a time t, get the lower and upper s-boundaries.
+    * If the boundary is well-defined based on decision made previously,
+    * fill "available_s_bounds" with only one boundary.
+    * Otherwise, fill "available_s_bounds with all candidates and
+    * "available_obs_decisions" with corresponding possible obstacle decisions.
+    * @param Time t
+    * @param The available s-boundaries to be filled up.
+    * @param The corresponding possible obstacle decisions.
+    * @return Whether we can get valid s-bounds.
+    */
+  bool GetSBoundsFromDecisions(double t,
+      std::vector<std::pair<double, double>>* const available_s_bounds,
+      std::vector<std::vector<std::pair<std::string, ObjectDecisionType>>>*
+          const available_obs_decisions);
 
   std::pair<double, double> GetRegularBoundaryFromObstacles(double t);
 
@@ -130,7 +147,14 @@ class STObstaclesProcessor {
   const common::VehicleParam& vehicle_param_;
   double adc_path_init_s_;
 
+  // A vector of sorted obstacle's t-edges:
+  //  (is_starting_t, t, s_min, s_max, obs_id).
+  std::vector<std::tuple<int, double, double, double, std::string>>
+      obs_t_edges_;
+  int obs_t_edges_idx_;
+
   std::unordered_map<std::string, STBoundary> obs_id_to_st_boundary_;
+  std::unordered_map<std::string, ObjectDecisionType> obs_id_to_decision_;
 };
 
 }  // namespace planning
