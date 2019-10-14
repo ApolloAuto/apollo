@@ -27,7 +27,7 @@ namespace math {
 
 using Matrix = Eigen::MatrixXd;
 
-//solver with cross term
+// solver with cross term
 void SolveLQRProblem(const Matrix &A, const Matrix &B, const Matrix &Q,
                      const Matrix &R, const Matrix &M, const double tolerance,
                      const uint max_num_iteration, Matrix *ptr_K) {
@@ -48,9 +48,8 @@ void SolveLQRProblem(const Matrix &A, const Matrix &B, const Matrix &Q,
   uint num_iteration = 0;
   double diff = std::numeric_limits<double>::max();
   while (num_iteration++ < max_num_iteration && diff > tolerance) {
-    Matrix P_next =
-        AT * P * A - (AT * P * B + M) * (R + BT * P * B).inverse() * (BT * P * A + MT) + Q;
-
+    Matrix P_next = AT * P * A -
+        (AT * P * B + M) * (R + BT * P * B).inverse() * (BT * P * A + MT) + Q;
     // check the difference between P and P_next
     diff = fabs((P_next - P).maxCoeff());
     P = P_next;
@@ -67,15 +66,13 @@ void SolveLQRProblem(const Matrix &A, const Matrix &B, const Matrix &Q,
   *ptr_K = (R + BT * P * B).inverse() * (BT * P * A + MT);
 }
 
-
-
 void SolveLQRProblem(const Matrix &A, const Matrix &B, const Matrix &Q,
                      const Matrix &R, const double tolerance,
                      const uint max_num_iteration, Matrix *ptr_K) {
-
-	//create M as zero matrix of the right size: M.rows() == Q.rows() && M.cols() == R.cols()
-	Matrix M = Matrix::Zero(Q.rows(), R.cols());
-	SolveLQRProblem(A, B, Q, R, M, tolerance, max_num_iteration, ptr_K);
+  // create M as zero matrix of the right size:
+  // M.rows() == Q.rows() && M.cols() == R.cols()
+  Matrix M = Matrix::Zero(Q.rows(), R.cols());
+  SolveLQRProblem(A, B, Q, R, M, tolerance, max_num_iteration, ptr_K);
 }
 
 }  // namespace math

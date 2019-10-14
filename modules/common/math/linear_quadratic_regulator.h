@@ -50,8 +50,6 @@ void SolveLQRProblem(const Eigen::MatrixXd &A, const Eigen::MatrixXd &B,
                      const double tolerance, const uint max_num_iteration,
                      Eigen::MatrixXd *ptr_K);
 
-
-
 /**
  * @brief Solver for discrete-time linear quadratic problem.
  * @param A The system dynamic matrix
