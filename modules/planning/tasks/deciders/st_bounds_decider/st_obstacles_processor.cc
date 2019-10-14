@@ -46,6 +46,11 @@ using apollo::common::math::Box2d;
 using apollo::common::math::LineSegment2d;
 using apollo::common::math::Vec2d;
 
+namespace {
+// ObsTEdge contains: (is_starting_t, t, s_min, s_max, obs_id).
+using ObsTEdge = std::tuple<int, double, double, double, std::string>;
+}  // namespace
+
 STObstaclesProcessor::STObstaclesProcessor(const double planning_distance,
                                            const double planning_time,
                                            const PathData& path_data)
@@ -68,7 +73,8 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
   CHECK_GT(path_data_.discretized_path().size(), 1);
   obs_id_to_st_boundary_.clear();
 
-  // Go through every obstacle.
+  // Map obstacles into ST-graph.
+  // Go through every obstacle and plot them in ST-graph.
   std::tuple<std::string, STBoundary, Obstacle*> closest_stop_obstacle;
   std::get<0>(closest_stop_obstacle) = "NULL";
   for (const auto* obs_item_ptr : path_decision->obstacles().Items()) {
@@ -107,7 +113,7 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
       obs_ptr->set_path_st_boundary(boundary);
     }
   }
-  // Only retain the closest static obstacle.
+  // For static obstacles, only retain the closest one.
   if (std::get<0>(closest_stop_obstacle) != "NULL") {
     obs_id_to_st_boundary_[std::get<0>(closest_stop_obstacle)] =
         std::get<1>(closest_stop_obstacle);
@@ -115,12 +121,78 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
         ->set_path_st_boundary(std::get<1>(closest_stop_obstacle));
   }
 
+  // Preprocess the obstacles for sweep-line algorithms.
+  // Fetch every obstacle's beginning end ending t-edges only.
+  for (auto it : obs_id_to_st_boundary_) {
+    obs_t_edges_.emplace_back(true, it.second.min_t(),
+        it.second.min_s(), it.second.max_s(), it.first);
+    obs_t_edges_.emplace_back(false, it.second.max_t(),
+        it.second.min_s(), it.second.max_s(), it.first);
+  }
+  // Sort the edges.
+  std::sort(obs_t_edges_.begin(), obs_t_edges_.end(),
+            [](const ObsTEdge& lhs, const ObsTEdge& rhs) {
+              if (std::get<1>(lhs) != std::get<1>(rhs)) {
+                return std::get<1>(lhs) < std::get<1>(rhs);
+              } else {
+                return std::get<0>(lhs) > std::get<0>(rhs);
+              }
+            });
+
   return Status::OK();
 }
 
 std::unordered_map<std::string, STBoundary>
 STObstaclesProcessor::GetAllSTBoundaries() {
   return obs_id_to_st_boundary_;
+}
+
+bool STObstaclesProcessor::GetSBoundsFromDecisions(double t,
+    std::vector<std::pair<double, double>>* const available_s_bounds,
+    std::vector<std::vector<std::pair<std::string, ObjectDecisionType>>>*
+        const available_obs_decisions) {
+  // Gather any possible change in st-boundary situations.
+  std::vector<ObsTEdge> new_t_edges;
+  while (obs_t_edges_idx_ < static_cast<int>(obs_t_edges_.size()) &&
+         std::get<1>(obs_t_edges_[obs_t_edges_idx_]) <= t) {
+    if (std::get<0>(obs_t_edges_[obs_t_edges_idx_]) == 0 &&
+        std::get<1>(obs_t_edges_[obs_t_edges_idx_]) == t)
+      break;
+    new_t_edges.push_back(obs_t_edges_[obs_t_edges_idx_]);
+    ++obs_t_edges_idx_;
+  }
+
+  // For st-boundaries that disappeared before t, remove them.
+  for (auto obs_t_edge : new_t_edges) {
+    if (std::get<0>(obs_t_edge) == 0) {
+      obs_id_to_decision_.erase(std::get<4>(obs_t_edge));
+    }
+  }
+
+  // Based on existing decisions, get the s-boundary.
+  double s_min = 0.0;
+  double s_max = planning_distance_;
+  for (auto it : obs_id_to_decision_) {
+    auto obs_id = it.first;
+    auto obs_decision = it.second;
+    auto obs_st_boundary = obs_id_to_st_boundary_[obs_id];
+    double obs_s_min = 0.0;
+    double obs_s_max = 0.0;
+    obs_st_boundary.GetBoundarySRange(t, &obs_s_max, &obs_s_min);
+    if (obs_decision.has_yield() || obs_decision.has_stop()) {
+      s_max = std::fmin(s_max, obs_s_min);
+    } else if (it.second.has_overtake()) {
+      s_min = std::fmin(s_min, obs_s_max);
+    }
+  }
+
+  // For newly entering st_boundaries, determine possible new-boundaries.
+  // For apparent ones, make decisions directly.
+  // TODO(jiacheng):
+  // For ambiguous ones, enumerate all decisions and corresponding bounds.
+  // TODO(jiacheng):
+
+  return true;
 }
 
 // TODO(jiacheng): implement this.
