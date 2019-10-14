@@ -43,6 +43,11 @@ self.addEventListener("message", event => {
                 cameraMessage.decode(new Uint8Array(data)), { enums: String });
             message.type = "CameraData";
             break;
+        case "teleop":
+            if (typeof data === "string") {
+                message = JSON.parse(data);
+            }
+            break;
     }
 
     if (message) {

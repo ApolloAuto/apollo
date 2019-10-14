@@ -1,6 +1,7 @@
 import { observable, computed, action, autorun } from "mobx";
 
 import HMI from "store/hmi";
+import CameraData from "store/camera_data";
 import ControlData from "store/control_data";
 import Latency from "store/latency";
 import Meters from "store/meters";
@@ -9,8 +10,8 @@ import Options from "store/options";
 import PlanningData from "store/planning_data";
 import Playback from "store/playback";
 import RouteEditingManager from "store/route_editing_manager";
+import Teleop from "store/teleop";
 import TrafficSignal from "store/traffic_signal";
-import CameraData from "store/camera_data";
 
 class DreamviewStore {
     // Mutable States
@@ -54,6 +55,8 @@ class DreamviewStore {
     @observable moduleDelay = observable.map();
 
     @observable cameraData = new CameraData();
+
+    @observable teleop = new Teleop();
 
     @observable newDisengagementReminder = false;
 
@@ -134,6 +137,13 @@ class DreamviewStore {
 
     setOptionStatus(option, enabled) {
         this.options[option] = (enabled || false);
+    }
+
+    initDimension() {
+        if (this.options.showMonitor) {
+            this.enableMonitor();
+        }
+        this.updateDimension();
     }
 
     // This function is triggered automatically whenever an observable changes

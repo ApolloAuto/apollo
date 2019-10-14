@@ -1368,6 +1368,26 @@
                 }
               }
             },
+            "LatencyParam": {
+              "fields": {
+                "deadTime": {
+                  "type": "double",
+                  "id": 1
+                },
+                "riseTime": {
+                  "type": "double",
+                  "id": 2
+                },
+                "peakTime": {
+                  "type": "double",
+                  "id": 3
+                },
+                "settlingTime": {
+                  "type": "double",
+                  "id": 4
+                }
+              }
+            },
             "VehicleParam": {
               "fields": {
                 "brand": {
@@ -1510,6 +1530,18 @@
                   "options": {
                     "default": null
                   }
+                },
+                "steeringLatencyParam": {
+                  "type": "LatencyParam",
+                  "id": 22
+                },
+                "throttleLatencyParam": {
+                  "type": "LatencyParam",
+                  "id": 23
+                },
+                "brakeLatencyParam": {
+                  "type": "LatencyParam",
+                  "id": 24
                 }
               }
             },
@@ -1573,7 +1605,8 @@
                         "RACOBIT_RADAR": 16,
                         "ULTRASONIC_RADAR": 17,
                         "MOBILEYE": 18,
-                        "DELPHI_ESR": 19
+                        "DELPHI_ESR": 19,
+                        "STORYTELLING": 20
                       }
                     },
                     "LogLevel": {
@@ -6380,7 +6413,7 @@
                 }
               }
             },
-            "ScenarioPullOverEmergencyConfig": {
+            "ScenarioEmergencyPullOverConfig": {
               "fields": {}
             },
             "ScenarioValetParkingConfig": {
@@ -6467,6 +6500,7 @@
                   "oneof": [
                     "laneFollowConfig",
                     "bareIntersectionUnprotectedConfig",
+                    "emergencyPullOverConfig",
                     "narrowStreetUTurnConfig",
                     "stopSignUnprotectedConfig",
                     "trafficLightProtectedConfig",
@@ -6474,7 +6508,6 @@
                     "trafficLightUnprotectedLeftTurnConfig",
                     "parkAndGoConfig",
                     "pullOverConfig",
-                    "pullOverEmergencyConfig",
                     "valetParkingConfig",
                     "yieldSignConfig"
                   ]
@@ -6493,36 +6526,36 @@
                   "type": "ScenarioBareIntersectionUnprotectedConfig",
                   "id": 4
                 },
+                "emergencyPullOverConfig": {
+                  "type": "ScenarioEmergencyPullOverConfig",
+                  "id": 5
+                },
                 "narrowStreetUTurnConfig": {
                   "type": "ScenarioNarrowStreetUTurnConfig",
-                  "id": 5
+                  "id": 6
                 },
                 "stopSignUnprotectedConfig": {
                   "type": "ScenarioStopSignUnprotectedConfig",
-                  "id": 6
+                  "id": 7
                 },
                 "trafficLightProtectedConfig": {
                   "type": "ScenarioTrafficLightProtectedConfig",
-                  "id": 7
+                  "id": 8
                 },
                 "trafficLightUnprotectedRightTurnConfig": {
                   "type": "ScenarioTrafficLightUnprotectedRightTurnConfig",
-                  "id": 8
+                  "id": 9
                 },
                 "trafficLightUnprotectedLeftTurnConfig": {
                   "type": "ScenarioTrafficLightUnprotectedLeftTurnConfig",
-                  "id": 9
+                  "id": 10
                 },
                 "parkAndGoConfig": {
                   "type": "ScenarioParkAndGoConfig",
-                  "id": 10
+                  "id": 11
                 },
                 "pullOverConfig": {
                   "type": "ScenarioPullOverConfig",
-                  "id": 11
-                },
-                "pullOverEmergencyConfig": {
-                  "type": "ScenarioPullOverEmergencyConfig",
                   "id": 12
                 },
                 "valetParkingConfig": {
@@ -6560,7 +6593,7 @@
                     "TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN": 8,
                     "YIELD_SIGN": 9,
                     "PULL_OVER": 10,
-                    "PULL_OVER_EMERGENCY": 11,
+                    "EMERGENCY_PULL_OVER": 11,
                     "VALET_PARKING": 12,
                     "NARROW_STREET_U_TURN": 13,
                     "PARK_AND_GO": 14
@@ -6587,7 +6620,8 @@
                     "PULL_OVER_APPROACH": 500,
                     "PULL_OVER_RETRY_APPROACH_PARKING": 501,
                     "PULL_OVER_RETRY_PARKING": 502,
-                    "PULL_OVER_EMERGENCY_APPROACH": 510,
+                    "EMERGENCY_PULL_OVER_APPROACH": 510,
+                    "EMERGENCY_PULL_OVER_STANDBY": 511,
                     "VALET_PARKING_APPROACHING_PARKING_SPOT": 520,
                     "VALET_PARKING_PARKING": 521,
                     "PARK_AND_GO_CHECK": 600,

@@ -155,11 +155,11 @@ class Renderer {
     }
 
     updateDimension(width, height) {
-        if (width < Styles.MIN_SCENE_WIDTH) {
-            // Min width of main view is 600, so we need not update
-            // camera/renderer dimension anymore
+        if (width < Styles.MIN_SCENE_WIDTH && this.dimension.width >= width) {
+            // Reach minimum, do not update camera/renderer dimension anymore.
             return;
         }
+
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(width, height);

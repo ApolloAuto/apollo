@@ -1,0 +1,119 @@
+/* radio or checkbox item */
+ul.item {
+    flex: 0 0 auto;
+
+    margin: 0px 2px 0px 0px;
+    padding-left: 0px;
+    padding-right: 5px;
+
+    background-color: #1D2226;
+    color: #999999;
+    list-style: none;
+    cursor: pointer;
+
+    li {
+        line-height: 40px;
+        white-space: nowrap;
+
+        span {
+            margin-left: 15px;
+        }
+    }
+
+    li:hover {
+        color: #FFFFFF;
+        background-color: #2A3238;
+    }
+}
+
+/* Toggle switch */
+.switch {
+    display: inline-block;
+
+    position: relative;
+    width: 40px;
+    transform: translate(10%, 25%);
+
+    .toggle-switch {
+        display: none;
+    }
+
+    .toggle-switch-label {
+        display: block;
+        overflow: hidden;
+        cursor: pointer;
+        height: 20px;
+        padding: 0;
+        line-height: 20px;
+        border: 0px;
+        background-color: #3F4548;
+        transition: background-color 0.2s ease-in;
+    }
+
+    .toggle-switch-label:before {
+        content: "";
+        display: block;
+        width: 16px;
+        margin: 2px;
+        background: #A0A0A0;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 20px;
+        transition: all 0.2s ease-in;
+    }
+
+    .toggle-switch:checked+.toggle-switch-label {
+        background-color: #0E3D62;
+    }
+
+    .toggle-switch:checked+.toggle-switch-label,
+    .toggle-switch:checked+.toggle-switch-label:before {
+        border-color: #0E3D62;
+    }
+
+    .toggle-switch:checked+.toggle-switch-label:before {
+        right: 0px;
+        background-color: #30A5FF;
+    }
+
+    .toggle-switch:disabled+.toggle-switch-label,
+    .toggle-switch:disabled+.toggle-switch-label:before {
+        cursor: not-allowed;
+    }
+}
+
+.command-button {
+    flex: 1 1 0;
+
+    margin: 3px;
+    border: 0px;
+
+    min-width: 75px;
+    min-height: 40px;
+    max-height: 60px;
+
+    color: #999999;
+
+    border-bottom: 2px solid #1C9063;
+    background: linear-gradient(#000000, #111F1D);
+
+    outline: none;
+    cursor: pointer;
+
+    &:hover {
+        color: #FFFFFF;
+        background: #151E1B;
+    }
+
+    &:active {
+        background: rgba(35, 51, 45, 0.6);
+    }
+
+    &:disabled {
+        color: #999999;
+        border-color: #555555;
+        background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(9, 17, 16, 0.8));
+        cursor: not-allowed
+    }
+}
