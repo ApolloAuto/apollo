@@ -70,8 +70,8 @@ static int GetGpuId(
     AERROR << "Read config failed: " << config_file;
     return -1;
   }
-  if (trafficlight_param.detector_param_size() == 0) {
-    AERROR << "get gpu id failed. detector_param_size() == 0";
+  if (trafficlight_param.detector_param().empty()) {
+    AERROR << "get gpu id failed. detector_param().empty()";
     return -1;
   }
   if (!trafficlight_param.has_gpu_id()) {
@@ -866,7 +866,7 @@ double TrafficLightsPerceptionComponent::stopline_distance(
     return -1;
   }
   const apollo::hdmap::Curve& stopline = stoplines_.Get(0);
-  if (stopline.segment_size() == 0) {
+  if (stopline.segment().empty()) {
     AWARN << "compute car to stopline's distance"
           << " failed(stopline has no segment line). "
           << "cam_pose:" << cam_pose
@@ -881,7 +881,7 @@ double TrafficLightsPerceptionComponent::stopline_distance(
     return -1;
   }
 
-  if (stopline.segment(0).line_segment().point_size() == 0) {
+  if (stopline.segment(0).line_segment().point().empty()) {
     AWARN << "compute car to stopline's distance "
           << "failed(stopline has no point). "
           << "cam_pose:" << cam_pose

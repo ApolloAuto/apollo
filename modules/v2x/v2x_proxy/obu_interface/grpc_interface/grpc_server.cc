@@ -40,7 +40,7 @@ grpc::Status GrpcServerImpl::SendPerceptionObstacles(
     grpc::ServerContext* /* context */, const PerceptionObstacles* request,
     StatusResponse* response) {
   ADEBUG << "Received SendPerceptionObstacles request from client! \n";
-  if (request->perception_obstacle_size() == 0) {
+  if (request->perception_obstacle().empty()) {
     response->set_status(false);
     response->set_info("error perception obstacle size == 0");
     AERROR << "SendPerceptionObstacles request has no perception obstacle";
@@ -65,7 +65,7 @@ grpc::Status GrpcServerImpl::SendV2xTrafficLight(
     grpc::ServerContext* /* context */,
     const IntersectionTrafficLightData* request, StatusResponse* response) {
   ADEBUG << "Received SendV2xTrafficLight request from client! \n";
-  if (request->current_lane_trafficlight().single_traffic_light_size() == 0) {
+  if (request->current_lane_trafficlight().single_traffic_light().empty()) {
     response->set_status(false);
     response->set_info("error v2x traffic light size == 0");
     AERROR << "SendV2xTrafficLight request has no traffic light";
@@ -99,7 +99,7 @@ grpc::Status GrpcServerImpl::SendV2xTrafficLight(
 
 void GrpcServerImpl::GetMsgFromGrpc(
     const std::shared_ptr<PerceptionObstacles>& ptr) {
-  if (latest_obstacles_.perception_obstacle_size() == 0) {
+  if (latest_obstacles_.perception_obstacle().empty()) {
     AERROR << "GetMsgFromGrpc PerceptionObstacles is invalid";
     return;
   }

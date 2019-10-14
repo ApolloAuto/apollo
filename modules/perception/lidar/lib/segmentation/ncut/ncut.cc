@@ -737,7 +737,7 @@ void NCut::GetClustersPids(const std::vector<int> &cids,
 int NCut::GetComponentBoundingBox(const std::vector<int> &cluster_ids,
                                   NcutBoundingBox *box_in) {
   NcutBoundingBox &box = *box_in;
-  if (cluster_ids.size() == 0) {
+  if (cluster_ids.empty()) {
     return 0;
   }
   int cid = cluster_ids[0];

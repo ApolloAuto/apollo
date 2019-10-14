@@ -200,7 +200,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
 
   // Draw the given obstacle on the ST-graph.
   const auto& trajectory = obstacle.Trajectory();
-  if (trajectory.trajectory_point_size() == 0) {
+  if (trajectory.trajectory_point().empty()) {
     // For those with no predicted trajectories, just map the obstacle's
     // current position to ST-graph and always assume it's static.
     if (!obstacle.IsStatic()) {

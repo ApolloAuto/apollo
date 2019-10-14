@@ -563,7 +563,7 @@ bool PncMap::GetNearestPointFromRouting(const VehicleState &state,
 }
 
 LaneInfoConstPtr PncMap::GetRouteSuccessor(LaneInfoConstPtr lane) const {
-  if (lane->lane().successor_id_size() == 0) {
+  if (lane->lane().successor_id().empty()) {
     return nullptr;
   }
   hdmap::Id preferred_id = lane->lane().successor_id(0);
@@ -577,7 +577,7 @@ LaneInfoConstPtr PncMap::GetRouteSuccessor(LaneInfoConstPtr lane) const {
 }
 
 LaneInfoConstPtr PncMap::GetRoutePredecessor(LaneInfoConstPtr lane) const {
-  if (lane->lane().predecessor_id_size() == 0) {
+  if (lane->lane().predecessor_id().empty()) {
     return nullptr;
   }
   hdmap::Id preferred_id = lane->lane().predecessor_id(0);

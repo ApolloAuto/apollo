@@ -203,7 +203,7 @@ Status ControlComponent::ProduceControlCommand(
     estop_reason_ += local_view_.trajectory.estop().reason();
   }
 
-  if (local_view_.trajectory.trajectory_point_size() == 0) {
+  if (local_view_.trajectory.trajectory_point().empty()) {
     AWARN_EVERY(100) << "planning has no trajectory point. ";
     estop_ = true;
     estop_reason_ = "estop for empty planning trajectory, planning headers: " +
@@ -371,7 +371,7 @@ Status ControlComponent::CheckInput(LocalView *local_view) {
   ADEBUG << "Received chassis:" << local_view->chassis.ShortDebugString();
 
   if (!local_view->trajectory.estop().is_estop() &&
-      local_view->trajectory.trajectory_point_size() == 0) {
+      local_view->trajectory.trajectory_point().empty()) {
     AWARN_EVERY(100) << "planning has no trajectory point. ";
     std::string msg("planning has no trajectory point. planning_seq_num:");
     msg += std::to_string(local_view->trajectory.header().sequence_num());

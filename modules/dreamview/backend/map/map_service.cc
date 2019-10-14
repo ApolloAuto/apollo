@@ -466,7 +466,7 @@ bool MapService::GetStartPoint(apollo::common::PointENU *start_point) const {
 
 bool MapService::CreatePathsFromRouting(const RoutingResponse &routing,
                                         std::vector<Path> *paths) const {
-  if (routing.road_size() == 0) {
+  if (routing.road().empty()) {
     return false;
   }
 

@@ -115,7 +115,7 @@ bool ObstacleClusters::BackwardNearbyObstacle(
     const LaneSequence& lane_sequence, const int obstacle_id,
     const double obstacle_s, const double obstacle_l,
     NearbyObstacle* const nearby_obstacle_ptr) {
-  if (lane_sequence.lane_segment_size() == 0) {
+  if (lane_sequence.lane_segment().empty()) {
     AERROR << "Empty lane sequence found.";
     return false;
   }

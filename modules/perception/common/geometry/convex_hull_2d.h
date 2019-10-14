@@ -54,7 +54,7 @@ class ConvexHull2D {
         in_cloud_without_ground.push_back(in_cloud[id]);
       }
     }
-    if (in_cloud_without_ground.size() == 0) {
+    if (in_cloud_without_ground.empty()) {
       return GetConvexHull(in_cloud, out_polygon);
     } else {
       SetPoints(in_cloud_without_ground);
@@ -79,7 +79,7 @@ class ConvexHull2D {
         in_cloud_without_ground_and_head.push_back(in_cloud[id]);
       }
     }
-    if (in_cloud_without_ground_and_head.size() == 0) {
+    if (in_cloud_without_ground_and_head.empty()) {
       return GetConvexHull(in_cloud, out_polygon);
     } else {
       SetPoints(in_cloud_without_ground_and_head);

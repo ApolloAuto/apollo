@@ -23,7 +23,7 @@ namespace benchmark {
 
 void PositionMetric::cal_position_metric(const ObjectPtr& object,
                                          const PositionMetricOption& option) {
-  if (object->cloud->points.size() == 0) {
+  if (object->cloud->points.empty()) {
     return;
   }
   std::vector<double> distance;

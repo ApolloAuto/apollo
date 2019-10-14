@@ -43,7 +43,7 @@ void Convert::ConvertPacketsToPointcloud(
 
   parser_->GeneratePointcloud(scan_msg, point_cloud);
 
-  if (point_cloud == nullptr || point_cloud->point_size() == 0) {
+  if (point_cloud == nullptr || point_cloud->point().empty()) {
     AERROR << "point cloud has no point";
     return;
   }

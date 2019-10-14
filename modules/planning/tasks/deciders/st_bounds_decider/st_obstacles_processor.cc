@@ -86,7 +86,7 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     auto boundary = STBoundary::CreateInstanceAccurate(
         lower_points, upper_points);
     boundary.set_id(obs_ptr->Id());
-    if (obs_ptr->Trajectory().trajectory_point_size() == 0) {
+    if (obs_ptr->Trajectory().trajectory_point().empty()) {
       // Obstacle is static.
       if (std::get<0>(closest_stop_obstacle) == "NULL" ||
           std::get<1>(closest_stop_obstacle).bottom_left_point().s() >
@@ -148,7 +148,7 @@ bool STObstaclesProcessor::ComputeObstacleSTBoundary(
   const auto& adc_path_points = path_data_.discretized_path();
   const auto& obs_trajectory = obstacle.Trajectory();
 
-  if (obs_trajectory.trajectory_point_size() == 0) {
+  if (obs_trajectory.trajectory_point().empty()) {
     // Processing a static obstacle.
     // Sanity checks.
     if (!obstacle.IsStatic()) {

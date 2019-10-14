@@ -53,7 +53,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
     AERROR << "TrafficLightRightTurnUnprotectedStop planning error";
   }
 
-  if (GetContext()->current_traffic_light_overlap_ids.size() == 0) {
+  if (GetContext()->current_traffic_light_overlap_ids.empty()) {
     return FinishScenario();
   }
 

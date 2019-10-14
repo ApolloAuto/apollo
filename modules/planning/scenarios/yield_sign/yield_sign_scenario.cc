@@ -63,7 +63,7 @@ void YieldSignScenario::Init() {
   const auto& yield_sign_status =
       PlanningContext::Instance()->planning_status().yield_sign();
 
-  if (yield_sign_status.current_yield_sign_overlap_id_size() == 0) {
+  if (yield_sign_status.current_yield_sign_overlap_id().empty()) {
     AERROR << "Could not find yield-sign(s)";
     return;
   }

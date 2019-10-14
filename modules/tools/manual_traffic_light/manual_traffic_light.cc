@@ -118,7 +118,7 @@ class ManualTrafficLight final : public apollo::cyber::TimerComponent {
     static auto map_filename = apollo::hdmap::BaseMapFile();
     static apollo::hdmap::Map map_proto;
     static std::vector<SignalInfoConstPtr> map_traffic_lights;
-    if (map_proto.lane_size() == 0 && map_traffic_lights.empty()) {
+    if (map_proto.lane().empty() && map_traffic_lights.empty()) {
       AERROR << "signal size: " << map_proto.signal_size();
       if (apollo::common::util::EndWith(map_filename, ".xml")) {
         if (!apollo::hdmap::adapter::OpendriveAdapter::LoadData(map_filename,

@@ -43,7 +43,7 @@ ErrorCode ChannelVerify::Check(
     const std::string& record_dir_or_record_full_path) {
   std::vector<std::string> records_path;
   records_path = GetRecordsPath(record_dir_or_record_full_path);
-  if (records_path.size() == 0) {
+  if (records_path.empty()) {
     AINFO << "have no data file to check";
     return_state_ = ErrorCode::ERROR_VERIFY_NO_RECORDERS;
     return return_state_;
