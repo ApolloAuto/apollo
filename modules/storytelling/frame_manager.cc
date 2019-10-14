@@ -26,9 +26,7 @@ void FrameManager::Init(const std::shared_ptr<cyber::Node>& node) {
   node_ = node;
 }
 
-void FrameManager::StartFrame() {
-  node_->Observe();
-}
+void FrameManager::StartFrame() { node_->Observe(); }
 
 void FrameManager::EndFrame() {
   // Print and publish all monitor logs.

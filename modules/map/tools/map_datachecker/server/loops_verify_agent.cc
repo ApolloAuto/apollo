@@ -249,8 +249,7 @@ int LoopsVerifyAgent::GetPosesToCheck(
 
   std::vector<bool> range_index;
   double min_time = GetRangeIndex(sp_range, &range_index, sp_vec_poses);
-  if (min_time == std::numeric_limits<double>::max() ||
-      range_index.empty()) {
+  if (min_time == std::numeric_limits<double>::max() || range_index.empty()) {
     AINFO << "min_time: " << min_time
           << ", range_index size: " << range_index.size();
     return -1;

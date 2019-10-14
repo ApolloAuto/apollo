@@ -59,23 +59,23 @@ class STObstaclesProcessor {
 
  private:
   /** @brief Given a single obstacle, compute its ST-boundary.
-    * @param An obstacle (if moving, should contain predicted trajectory).
-    * @param A vector to be filled with lower edge of ST-polygon.
-    * @param A vector to be filled with upper edge of ST-polygon.
-    * @return If appears on ST-graph, return true; otherwise, false.
-    */
+   * @param An obstacle (if moving, should contain predicted trajectory).
+   * @param A vector to be filled with lower edge of ST-polygon.
+   * @param A vector to be filled with upper edge of ST-polygon.
+   * @return If appears on ST-graph, return true; otherwise, false.
+   */
   bool ComputeObstacleSTBoundary(const Obstacle& obstacle,
-      std::vector<STPoint>* const lower_points,
-      std::vector<STPoint>* const upper_points);
+                                 std::vector<STPoint>* const lower_points,
+                                 std::vector<STPoint>* const upper_points);
 
   /** @brief Given ADC's path and an obstacle instance at a certain timestep,
-    * get the upper and lower s that ADC might overlap with the obs instance.
-    * @param A vector of ADC planned path points.
-    * @param A obstacle at a certain timestep.
-    * @param ADC lateral buffer for safety consideration.
-    * @param The overlapping upper and lower s to be updated.
-    * @return Whether there is an overlap or not.
-    */
+   * get the upper and lower s that ADC might overlap with the obs instance.
+   * @param A vector of ADC planned path points.
+   * @param A obstacle at a certain timestep.
+   * @param ADC lateral buffer for safety consideration.
+   * @param The overlapping upper and lower s to be updated.
+   * @return Whether there is an overlap or not.
+   */
   bool GetOverlappingS(const std::vector<common::PathPoint>& adc_path_points,
                        const common::math::Box2d& obstacle_instance,
                        const double adc_l_buffer,
@@ -113,12 +113,12 @@ class STObstaclesProcessor {
                                    const double s_thresh, const bool is_before);
 
   /** @brief Check if ADC is overlapping with the given obstacle box.
-    * @param ADC's position.
-    * @param Obstacle's box.
-    * @param ADC's lateral buffer.
-    * @return Whether ADC at that position is overlapping with the given
-    * obstacle box.
-    */
+   * @param ADC's position.
+   * @param Obstacle's box.
+   * @param ADC's lateral buffer.
+   * @return Whether ADC at that position is overlapping with the given
+   * obstacle box.
+   */
   bool IsADCOverlappingWithObstacle(const common::PathPoint& adc_path_point,
                                     const common::math::Box2d& obs_box,
                                     const double l_buffer) const;
