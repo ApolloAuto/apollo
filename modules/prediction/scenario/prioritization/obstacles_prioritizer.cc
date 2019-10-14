@@ -48,7 +48,7 @@ bool IsLaneSequenceInReferenceLine(
     const ADCTrajectoryContainer* ego_trajectory_container) {
   for (const auto& lane_segment : lane_sequence.lane_segment()) {
     std::string lane_id = lane_segment.lane_id();
-    if (ego_trajectory_container->IsLaneIdInReferenceLine(lane_id)) {
+    if (ego_trajectory_container->IsLaneIdInTargetReferenceLine(lane_id)) {
       return true;
     }
   }
