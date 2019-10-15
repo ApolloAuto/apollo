@@ -103,6 +103,7 @@ lat_controller_conf {
     adaption_desired_gain: 1.0
     adaption_nonlinear_gain: 1.0
     mrac_saturation_level: 100.0
+    anti_windup_compensation_gain: 0.0
   }
 }
 lon_controller_conf {

@@ -76,9 +76,19 @@ class MracController {
    * @param state_adp state used in the adaptive law at k and k-1 steps
    * @param gain_adp adaptive gain for the given adaptive law
    */
-  void RunAdaptionModel(std::vector<double> *law_adp,
-                        const std::vector<double> state_adp,
-                        const double gain_adp);
+  void Adaption(std::vector<double> *law_adp,
+                const std::vector<double> state_adp, const double gain_adp);
+
+  /**
+   * @brief calculate the anti-windup compensation with respect to the integral
+   * windup issue
+   * @param control_command desired control command for the actuator
+   * @param upper_bound the physical or designed upper bound of the actuator
+   * @param upper_bound the physical or designed lower bound of the actuator
+   */
+  void AntiWindupCompensation(const double control_command,
+                              const double upper_bound,
+                              const double lower_bound);
 
   /**
    * @brief reset variables for mrac controller
@@ -86,13 +96,13 @@ class MracController {
   void Reset();
 
   /**
-   * @brief compute control value based on the error
-   * @param error error value, the difference between
-   * a desired value and a measured value
+   * @brief compute control value based on the original command
+   * @param command original command as the input of the actuation system
+   * @param state actual output state of the actuation system
    * @param dt sampling time interval
-   * @return control value based on mrac terms
+   * @return control value based on mrac controller architecture
    */
-  virtual double Control(const double error, const double state,
+  virtual double Control(const double command, const double state,
                          const double dt);
 
   /**
@@ -151,13 +161,17 @@ class MracController {
   // Mrac control output in the last step
   double control_previous_ = 0.0;
 
-  // State Saturations in discrete-time domain
+  // State saturation limits in discrete-time domain
   double bound_reference_high_ = 0.0;
   double bound_reference_low_ = 0.0;
   double bound_control_high_ = 0.0;
   double bound_control_low_ = 0.0;
   int saturation_status_reference_ = 0;
   int saturation_status_control_ = 0;
+
+  // Anti-Windup compensation
+  double gain_anti_windup_ = 0.0;
+  std::vector<double> compensation_anti_windup_{0.0, 0.0};
 };
 
 }  // namespace control
