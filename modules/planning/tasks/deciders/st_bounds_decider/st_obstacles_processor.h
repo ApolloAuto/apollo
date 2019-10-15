@@ -70,6 +70,13 @@ class STObstaclesProcessor {
       std::vector<std::vector<std::pair<std::string, ObjectDecisionType>>>*
           const available_obs_decisions);
 
+  /**
+    *
+    */
+  void SetObstacleDecision(
+      const std::string& obs_id,
+      const ObjectDecisionType& obs_decision);
+
   std::pair<double, double> GetRegularBoundaryFromObstacles(double t);
 
   std::pair<double, double> GetFallbackBoundaryFromObstacles(double t);
@@ -143,6 +150,9 @@ class STObstaclesProcessor {
   std::vector<std::pair<double, double>> FindSGaps(
       const std::vector<std::tuple<int, double, double, double, std::string>>&
           obstacle_t_edges, double s_min, double s_max);
+
+  ObjectDecisionType DetermineObstacleDecision(
+      const double obs_s_min, const double obs_s_max, const double s) const;
 
  private:
   double planning_time_;
