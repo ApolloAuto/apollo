@@ -151,6 +151,12 @@ bool STObstaclesProcessor::GetSBoundsFromDecisions(double t,
     std::vector<std::pair<double, double>>* const available_s_bounds,
     std::vector<std::vector<std::pair<std::string, ObjectDecisionType>>>*
         const available_obs_decisions) {
+  // Sanity checks.
+  CHECK_NOTNULL(available_s_bounds);
+  CHECK_NOTNULL(available_obs_decisions);
+  available_s_bounds->clear();
+  available_obs_decisions->clear();
+
   // Gather any possible change in st-boundary situations.
   std::vector<ObsTEdge> new_t_edges;
   while (obs_t_edges_idx_ < static_cast<int>(obs_t_edges_.size()) &&
@@ -194,15 +200,15 @@ bool STObstaclesProcessor::GetSBoundsFromDecisions(double t,
   for (auto obs_t_edge : new_t_edges) {
     if (std::get<0>(obs_t_edge) == 1) {
       if (std::get<2>(obs_t_edge) >= s_max) {
-        ObjectDecisionType yield_decision;
-        yield_decision.mutable_yield();
-        CHECK(yield_decision.has_yield());
-        obs_id_to_decision_[std::get<4>(obs_t_edge)] = yield_decision;
+        obs_id_to_decision_[std::get<4>(obs_t_edge)] =
+            DetermineObstacleDecision(std::get<2>(obs_t_edge),
+                                      std::get<3>(obs_t_edge),
+                                      s_max);
       } else if (std::get<3>(obs_t_edge) <= s_min) {
-        ObjectDecisionType overtake_decision;
-        overtake_decision.mutable_overtake();
-        CHECK(overtake_decision.has_overtake());
-        obs_id_to_decision_[std::get<4>(obs_t_edge)] = overtake_decision;
+        obs_id_to_decision_[std::get<4>(obs_t_edge)] =
+            DetermineObstacleDecision(std::get<2>(obs_t_edge),
+                                      std::get<3>(obs_t_edge),
+                                      s_min);
       } else {
         ambiguous_t_edges.push_back(obs_t_edge);
       }
@@ -212,9 +218,19 @@ bool STObstaclesProcessor::GetSBoundsFromDecisions(double t,
   auto s_gaps = FindSGaps(ambiguous_t_edges, s_min, s_max);
   if (s_gaps.empty())
     return false;
-  
+  for (auto s_gap : s_gaps) {
+    available_s_bounds->push_back(s_gap);
+    std::vector<std::pair<std::string, ObjectDecisionType>> obs_decisions;
+    for (auto obs_t_edge : ambiguous_t_edges) {
+      std::string obs_id = std::get<4>(obs_t_edge);
+      double obs_s_min = std::get<2>(obs_t_edge);
+      double obs_s_max = std::get<3>(obs_t_edge);
+      obs_decisions.emplace_back(obs_id, DetermineObstacleDecision(
+          obs_s_min, obs_s_max, (s_gap.first + s_gap.second) / 2.0));
+    }
+    available_obs_decisions->push_back(obs_decisions);
+  }
 
-  
   return true;
 }
 
@@ -465,6 +481,20 @@ std::vector<std::pair<double, double>> STObstaclesProcessor::FindSGaps(
   }
 
   return s_gaps;
+}
+
+ObjectDecisionType STObstaclesProcessor::DetermineObstacleDecision(
+    const double obs_s_min, const double obs_s_max, const double s) const {
+  CHECK(s <= obs_s_min || s >= obs_s_max);
+  ObjectDecisionType decision;
+  if (s <= obs_s_min) {
+    decision.mutable_yield();
+    CHECK(decision.has_yield());
+  } else if (s >= obs_s_max) {
+    decision.mutable_overtake();
+    CHECK(decision.has_overtake());
+  }
+  return decision;
 }
 
 }  // namespace planning
