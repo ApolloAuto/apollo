@@ -140,6 +140,10 @@ class STObstaclesProcessor {
                                     const common::math::Box2d& obs_box,
                                     const double l_buffer) const;
 
+  std::vector<std::pair<double, double>> FindSGaps(
+      const std::vector<std::tuple<int, double, double, double, std::string>>&
+          obstacle_t_edges, double s_min, double s_max);
+
  private:
   double planning_time_;
   double planning_distance_;

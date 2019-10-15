@@ -185,13 +185,36 @@ bool STObstaclesProcessor::GetSBoundsFromDecisions(double t,
       s_min = std::fmin(s_min, obs_s_max);
     }
   }
+  if (s_min > s_max)
+    return false;
 
   // For newly entering st_boundaries, determine possible new-boundaries.
   // For apparent ones, make decisions directly.
-  // TODO(jiacheng):
+  std::vector<ObsTEdge> ambiguous_t_edges;
+  for (auto obs_t_edge : new_t_edges) {
+    if (std::get<0>(obs_t_edge) == 1) {
+      if (std::get<2>(obs_t_edge) >= s_max) {
+        ObjectDecisionType yield_decision;
+        yield_decision.mutable_yield();
+        CHECK(yield_decision.has_yield());
+        obs_id_to_decision_[std::get<4>(obs_t_edge)] = yield_decision;
+      } else if (std::get<3>(obs_t_edge) <= s_min) {
+        ObjectDecisionType overtake_decision;
+        overtake_decision.mutable_overtake();
+        CHECK(overtake_decision.has_overtake());
+        obs_id_to_decision_[std::get<4>(obs_t_edge)] = overtake_decision;
+      } else {
+        ambiguous_t_edges.push_back(obs_t_edge);
+      }
+    }
+  }
   // For ambiguous ones, enumerate all decisions and corresponding bounds.
-  // TODO(jiacheng):
+  auto s_gaps = FindSGaps(ambiguous_t_edges, s_min, s_max);
+  if (s_gaps.empty())
+    return false;
+  
 
+  
   return true;
 }
 
@@ -402,6 +425,46 @@ bool STObstaclesProcessor::IsADCOverlappingWithObstacle(
 
   // Check whether ADC bounding box overlaps with obstacle bounding box.
   return obs_box.HasOverlap(adc_box);
+}
+
+std::vector<std::pair<double, double>> STObstaclesProcessor::FindSGaps(
+    const std::vector<ObsTEdge>& obstacle_t_edges,
+    double s_min, double s_max) {
+  std::vector<std::pair<double, int>> obs_s_edges;
+  for (auto obs_t_edge : obstacle_t_edges) {
+    obs_s_edges.emplace_back(std::get<2>(obs_t_edge), 1);
+    obs_s_edges.emplace_back(std::get<3>(obs_t_edge), 0);
+  }
+  // obs_s_edges.emplace_back(std::numeric_limits<double>::lowest(), 1);
+  obs_s_edges.emplace_back(s_min, 0);
+  obs_s_edges.emplace_back(s_max, 1);
+  // obs_s_edges.emplace_back(std::numeric_limits<double>::max(), 0);
+  std::sort(obs_s_edges.begin(), obs_s_edges.end(),
+            [](const std::pair<double, int>& lhs,
+               const std::pair<double, int>& rhs) {
+              if (lhs.first != rhs.first) {
+                return lhs.first < rhs.first;
+              } else {
+                return lhs.second > rhs.second;
+              }
+            });
+
+  std::vector<std::pair<double, double>> s_gaps;
+  int num_st_obs = 1;
+  double prev_open_s = 0.0;
+  for (auto obs_s_edge : obs_s_edges) {
+    if (obs_s_edge.second == 1) {
+      num_st_obs++;
+      if (num_st_obs == 1)
+        s_gaps.emplace_back(prev_open_s, obs_s_edge.first);
+    } else {
+      num_st_obs--;
+      if (num_st_obs == 0)
+        prev_open_s = obs_s_edge.first;
+    }
+  }
+
+  return s_gaps;
 }
 
 }  // namespace planning
