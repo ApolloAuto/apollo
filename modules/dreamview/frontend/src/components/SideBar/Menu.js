@@ -33,7 +33,7 @@ class MenuItemCheckbox extends React.Component {
     render() {
         const {id, title, optionName, options, isCustomized} = this.props;
         return (
-            <ul>
+            <ul className="item">
                 <li id={id} onClick={() => {
                     options.toggle(optionName, isCustomized);
                     if (id === "perceptionPointCloud") {

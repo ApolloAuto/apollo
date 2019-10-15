@@ -5,6 +5,7 @@ import MENU_DATA from "store/config/MenuData";
 export const MONITOR_MENU = Object.freeze({
     PNC_MONITOR: 'showPNCMonitor',
     DATA_COLLECTION_MONITOR: 'showDataCollectionMonitor',
+    TELEOP_CONSOLE_MONITOR: 'showTeleopConsoleMonitor',
     CAMERA_PARAM: 'showCameraView',
 });
 
@@ -76,7 +77,9 @@ export default class Options {
     }
 
     @computed get monitorName() {
-        if (this.showCameraView) {
+        if (this.showTeleopConsoleMonitor) {
+            return MONITOR_MENU.TELEOP_CONSOLE_MONITOR;
+        } else if (this.showCameraView) {
             return MONITOR_MENU.CAMERA_PARAM;
         } else if (this.showDataCollectionMonitor) {
             return MONITOR_MENU.DATA_COLLECTION_MONITOR;

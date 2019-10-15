@@ -1,4 +1,5 @@
 @import "media-queries";
+@import "common";
 
 $min-scene-width: 600;
 
@@ -142,7 +143,6 @@ body {
         }
     }
 
-
     .header-item {
         flex: 0 0 auto;
 
@@ -202,6 +202,7 @@ body {
         background: #181818;
         color: #ffffff;
         text-align: center;
+        cursor: pointer;
 
         @include small-screen {
             min-width: 110px;
@@ -302,221 +303,6 @@ body {
             }
         }
 
-        .monitor {
-            height: 100%;
-            width: 100%;
-            border: 1px solid #000000;
-            box-sizing: border-box;
-
-            background-color: #1D2226;
-            overflow: auto;
-        }
-
-        .pnc-monitor {
-            .scatter-graph {
-                margin: 0px;
-                border: 1px #000000;
-                border-style: solid none;
-            }
-
-            .scenario-history-container {
-                padding: 10px;
-                font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
-                font-weight: normal;
-
-                .scenario-history-title {
-                    margin: 5px;
-                    border-bottom: 1px solid rgba(153, 153, 153, 0.5);
-                    padding-bottom: 5px;
-
-                    font-size: 12px;
-                    font-weight: 600;
-                    text-align: center;
-                }
-
-                .scenario-history-table {
-                    position: relative;
-                    width: 100%;
-
-                    .scenario-history-item {
-                        position: relative;
-                        width: 100%;
-
-                        .text {
-                            position: relative;
-                            width: 30%;
-                            padding: 2px 4px;
-
-                            color: #999999;
-                            font-size: 12px;
-                        }
-
-                        .time {
-                            text-align: center;
-                        }
-                    }
-                }
-            }
-        }
-
-        .data-collection-monitor {
-            position: relative;
-            width: 100%;
-
-            .scenario-container {
-                position: absolute;
-            }
-
-            .section-divider-on-top {
-                border-top: 2px solid #080A0C;
-            }
-
-            .category-container {
-                position: relative;
-                width: 100%;
-                margin-bottom: 15px;
-
-                display: flex;
-                flex-direction: row;
-                justify-content: flex-start;
-                flex-wrap: wrap;
-            }
-
-            .dummy-category {
-                flex: 1 0 50%;
-                align-self: flex-end;
-                min-width: 130px;
-                overflow: hidden;
-                position: relative;
-            }
-
-            .category {
-                flex: 1 0 50%;
-                align-self: flex-end;
-                min-width: 130px;
-                overflow: hidden;
-                position: relative;
-
-                .category-description {
-                    position: relative;
-                    margin: 15px 0px 0px 10px;
-                    font-size: 12px;
-
-                    color: #888888;
-                }
-                .category-updated {
-                    color: #FFFFFF;
-                }
-
-                .category-progress-background {
-                    position: relative;
-                    height: 6px;
-                    margin: 5px 10px;
-                    background-color: #333639;
-
-                    .category-in-progress {
-                        position: absolute;
-                        height: 100%;
-                        background: #006AFF;
-                    }
-
-                    .category-completed {
-                        position: absolute;
-                        height: 100%;
-                        background: #113B73;
-                    }
-                }
-            }
-        }
-
-        .camera-param {
-            overflow: auto;
-            user-select: none;
-            .camera-param-header {
-                min-width: 260px;
-                background: #2A3238;
-                color: #FFFFFF;
-                padding: 6px 12px;
-                border-bottom: 1px solid #000000;
-                display: flex;
-                height: 22px;
-                .title {
-                    flex-grow: 1;
-                    margin: auto;
-                }
-                .actions {
-                    display: flex;
-                    .action {
-                        flex: 1 1 auto;
-                        text-align: center;
-                        cursor: pointer;
-                        padding: 2px;
-                        width: 24px;
-                        svg:hover {
-                            fill: #FFFFFF;
-                        }
-                    }
-                }
-            }
-
-            .camera-param-content {
-                display: flex;
-                min-width: 260px;
-                flex-direction: column;
-                .section {
-                    padding: 5px 10px 5px 10px;
-                    border-bottom: 1px solid #000000;
-                    .section-title {
-                        margin-bottom: 10px;
-                        padding: 5px;
-                        display: flex;
-                        width: 90px;
-                        border-bottom: 1px solid #999999;
-                        span {
-                            margin-left: 10px;
-                            margin-top: 2px;
-                        }
-                    }
-                    .section-subtitle {
-                        padding-bottom: 2px;
-                        display: inline-block;
-                        border-bottom: 1px solid #999999;
-                        margin-left: 10px;
-                        margin-top: 10px;
-                    }
-                    .section-content {
-                        padding: 10px 10px;
-                    }
-                    .section-content-row {
-                        display: flex;
-                        padding-bottom: 5px;
-                        height: 24px;
-                        .field {
-                            width: 80px;
-                            opacity: 0.6;
-                        }
-                        .value {
-                            flex-grow: 1;
-                            min-width: 100px;
-                        }
-                        .delta {
-                            width: 30%;
-                        }
-                        .action {
-                            width: 30px;
-                            display: flex;
-                            flex-direction: column;
-                            svg {
-                                cursor: pointer;
-                                &:hover {
-                                    fill: #FFFFFF;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     .SplitPane {
@@ -603,13 +389,14 @@ body {
 
     flex: 1 1 auto;
 
-    margin-top: 3px;
     overflow: hidden;
+    border-top: 1px solid #000000;
+    background: #000000;
 
     .card {
         flex: 1 1 auto;
 
-        border-right: 3px solid #000000;
+        margin-right: 1px;
         padding: 15px 10px 25px 20px;
         background: #1D2226;
 
@@ -655,91 +442,6 @@ body {
         }
     }
 
-    ul {
-        flex: 0 0 auto;
-
-        margin: 0px 2px 0px 0px;
-        padding-left: 0px;
-        padding-right: 5px;
-
-        background-color: #1D2226;
-        color: #999999;
-        list-style: none;
-        cursor: pointer;
-
-        li {
-            line-height: 40px;
-            white-space: nowrap;
-
-            span {
-                margin-left: 15px;
-            }
-        }
-
-        li:hover {
-            color: #FFFFFF;
-            background-color: #2A3238;
-        }
-    }
-
-
-    /* Toggle switch */
-    .switch {
-        display: inline-block;
-
-        position: relative;
-        width: 40px;
-        transform: translate(10%, 25%);
-
-        .toggle-switch {
-            display: none;
-        }
-
-        .toggle-switch-label {
-            display: block;
-            overflow: hidden;
-            cursor: pointer;
-            height: 20px;
-            padding: 0;
-            line-height: 20px;
-            border: 0px;
-            background-color: #3F4548;
-            transition: background-color 0.2s ease-in;
-        }
-
-        .toggle-switch-label:before {
-            content: "";
-            display: block;
-            width: 16px;
-            margin: 2px;
-            background: #A0A0A0;
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            right: 20px;
-            transition: all 0.2s ease-in;
-        }
-
-        .toggle-switch:checked+.toggle-switch-label {
-            background-color: #0E3D62;
-        }
-
-        .toggle-switch:checked+.toggle-switch-label,
-        .toggle-switch:checked+.toggle-switch-label:before {
-            border-color: #0E3D62;
-        }
-
-        .toggle-switch:checked+.toggle-switch-label:before {
-            right: 0px;
-            background-color: #30A5FF;
-        }
-
-        .toggle-switch:disabled+.toggle-switch-label,
-        .toggle-switch:disabled+.toggle-switch-label:before {
-            cursor: not-allowed;
-        }
-    }
-
     .tool-view-menu {
         display: flex;
         flex-flow: row nowrap;
@@ -748,10 +450,10 @@ body {
         flex: 2 1 auto;
 
         z-index: 10 !important;
-
+        margin-left: 1px;
         overflow-y: hidden;
         overflow-x: auto;
-        background: #1D2226;
+        background: #000000;
         color: #FFFFFF;
         text-align: left;
         white-space: nowrap;
@@ -840,7 +542,7 @@ body {
 
     z-index: 100;
     background: #1D2226;
-    border-right: 3px solid #000000;
+    border-right: 1px solid #000000;
     overflow-y: auto;
     overflow-x: hidden;
 
@@ -1309,41 +1011,6 @@ body {
         min-width: 265px;
     }
 
-    button {
-        flex: 1 1 0;
-
-        margin: 5px;
-        border: 0px;
-
-        min-width: 75px;
-        min-height: 40px;
-        max-height: 60px;
-
-        color: #999999;
-
-        border-bottom: 2px solid #1C9063;
-        background: linear-gradient(#000000, #111F1D);
-
-        outline: none;
-        cursor: pointer;
-    }
-
-    button:hover {
-        color: #FFFFFF;
-        background: #151E1B;
-    }
-
-    button:active {
-        background: rgba(35, 51, 45, 0.6);
-    }
-
-    button:disabled {
-        color: #999999;
-        border-color: #555555;
-        background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(9, 17, 16, 0.8));
-        cursor: not-allowed
-    }
-
     .disabled {
         cursor: not-allowed;
     }
@@ -1357,7 +1024,6 @@ body {
     flex: 1 1 auto;
 
     z-index: 10;
-    margin-right: 3px;
     overflow: hidden;
 
     .controller {

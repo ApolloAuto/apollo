@@ -138,6 +138,9 @@
 		"showVideo": {
 			"default": false
 		},
+		"showTeleopConsoleMonitor": {
+			"default": false
+		},
 		"cameraAngle": {
 			"default": "Default",
 			"hasCameraView": false

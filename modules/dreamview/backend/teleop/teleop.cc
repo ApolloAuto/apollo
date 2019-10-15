@@ -18,7 +18,6 @@
 
 #include "cyber/common/log.h"
 #include "google/protobuf/util/json_util.h"
-#include "third_party/json/json.hpp"
 
 namespace apollo {
 namespace dreamview {
@@ -31,6 +30,10 @@ using modules::car1::teleop::DaemonServiceCmd;
 TeleopService::TeleopService(WebSocketHandler *websocket)
     : node_(cyber::CreateNode("teleop")), websocket_(websocket) {
   RegisterMessageHandlers();
+
+  teleop_status_["audio"] = false;
+  teleop_status_["mic"] = false;
+  teleop_status_["video"] = false;
 }
 
 void TeleopService::Start() {
@@ -47,25 +50,30 @@ void TeleopService::RegisterMessageHandlers() {
   // Send current teleop status to the new client.
   websocket_->RegisterConnectionReadyHandler(
       [this](WebSocketHandler::Connection *conn) {
-        Json response;
-        response["audio"] = audio_enabled_;
-        response["mic"] = mic_enabled_;
-        response["video"] = video_enabled_;
-        websocket_->SendData(conn, response.dump());
+        SendStatus(conn);
       });
   // Start/Stop local and remote audio
   websocket_->RegisterMessageHandler(
       "ToggleAudio",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         // TODO
-        audio_enabled_ = !audio_enabled_;
+        {
+          boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+          teleop_status_["audio"] = !teleop_status_["audio"];
+
+          // turn on/off the mic based on the audio status
+          teleop_status_["mic"] = teleop_status_["audio"];
+        }
       });
   // Mute/Unmute local microphone
   websocket_->RegisterMessageHandler(
       "ToggleMic",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         // TODO
-        mic_enabled_ = !mic_enabled_;
+        {
+          boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+          teleop_status_["mic"] = !teleop_status_["mic"];
+        }
       });
   // Start/stop local decoder and viewer, start/stop remote encoder and
   // compositor
@@ -73,7 +81,10 @@ void TeleopService::RegisterMessageHandlers() {
       "ToggleVideo",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         // TODO
-        video_enabled_ = !video_enabled_;
+        {
+          boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+          teleop_status_["video"] = !teleop_status_["video"];
+        }
       });
   // Issue pull-over command to remote
   websocket_->RegisterMessageHandler(
@@ -87,24 +98,28 @@ void TeleopService::RegisterMessageHandlers() {
       });
   // Request to get updated modem info for client display
   websocket_->RegisterMessageHandler(
-      "GetModemInfo",
+      "RequestTeleopStatus",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        std::string to_send;
-        {
-          boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
-          MessageToJsonString(modem_info_, &to_send);
-        }
-        websocket_->SendData(conn, to_send);
+        SendStatus(conn);
       });
 }
 
 void TeleopService::UpdateModemInfo(
     const std::shared_ptr<ModemInfo> &modem_info) {
-  {
+  // TODO simplify data and only send necessary info for display
+  if (modem_info->has_provider() && modem_info->has_technology()) {
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-    // TODO simplify data and only send necessary info for display
-    // update modem_info_
+    teleop_status_["modems"][modem_info->provider()] = modem_info->technology();
   }
+}
+
+void TeleopService::SendStatus(WebSocketHandler::Connection *conn) {
+  std::string to_send;
+  {
+    boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
+    to_send = teleop_status_.dump();
+  }
+  websocket_->SendData(conn, to_send);
 }
 
 }  // namespace dreamview

@@ -5,13 +5,6 @@ import { inject, observer } from 'mobx-react';
 import positionIcon from "assets/images/icons/position.png";
 import rotationIcon from "assets/images/icons/rotation.png";
 
-const EditSvg = ({ inEditMode }) => (
-    <svg viewBox="0 0 1024 1024" width="20" height="20" fill={inEditMode ? "#FFFFFF" : "#999999"}>
-        <path d="M996.3776 72.4736L951.68 27.648C934.1184 10.0608 910.4128 0 886.8096 0c-20.864 0-40.0384 7.7056-54.144 21.7856L359.168 495.7952c-0.512 0.4352-0.3584 1.1008-0.7168 1.664-0.6144 0.7936-1.2544 1.6128-1.5104 2.6368l-48.6656 178.5344c-2.8416 10.3936 0.0768 21.6064 7.7568 29.4912 5.7088 5.5808 13.312 8.6784 21.376 8.6784 2.6624 0 5.3248-0.3584 7.9616-0.9984l177.0752-48.3584c0.3072 0 0.4608 0.256 0.64 0.256a7.68 7.68 0 0 0 5.5552-2.304l473.6-473.8816c14.0288-14.08 21.7344-33.3056 21.76-54.1952 0-23.6544-10.0352-47.3344-27.6224-64.8448z m-560.128 418.6112L779.9808 146.944l97.2544 97.2288-343.8592 344.064-97.1264-97.152z m-34.2272 38.1952l92.672 92.672-127.4368 34.7904 34.7648-127.4624zM966.016 155.3152L913.408 207.9488l-97.2544-97.2288 52.6592-52.7104c5.632-5.632 12.8768-6.8096 17.9968-6.8096 10.0608 0 20.7872 4.7104 28.6208 12.5696l44.8256 44.9536c7.8336 7.8592 12.544 18.5344 12.544 28.544 0 5.1456-1.2032 12.4672-6.784 18.048z"></path>
-        <path d="M921.6 947.2a25.6 25.6 0 0 1-25.6 25.6H76.8c-14.1056 0-25.6-11.4688-25.6-25.6V128c0-14.1056 11.4944-25.6 25.6-25.6h486.4V51.2H76.8a76.8 76.8 0 0 0-76.8 76.8v819.2a76.8 76.8 0 0 0 76.8 76.8h819.2a76.8 76.8 0 0 0 76.8-76.8V460.8h-51.2v486.4z"></path>
-    </svg>
-);
-
 const ResetSvg = () => (
     <svg viewBox="0 0 1024 1024" width="20" height="20" fill="#999999">
         <path d="M978.637 890.58H178.116V1024L0 846.551l176.115-174.78v133.42H933.94c29.353 0 44.696-12.008 44.696-41.36V496.99l88.725-141.426V800.52a88.724 88.724 0 0 1-88.725 88.058z m-88.724-667.101H133.42c-29.352 0-44.696 12.008-44.696 42.027v268.175L0 673.105v-450.96a88.724 88.724 0 0 1 88.724-88.725h800.522V0l178.116 178.116-176.115 176.115V220.81z"></path>
@@ -52,23 +45,8 @@ const FIELDS = {
 export default class CameraParam extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            inEditMode: false,
-        };
-        this.toggleEditMode = this.toggleEditMode.bind(this);
+
         this.resetParam = this.resetParam.bind(this);
-    }
-
-    componentWillMount() {
-        this.props.store.updateWidthInPercentage(0.8);
-    }
-
-    componentWillUnmount() {
-        this.props.store.updateWidthInPercentage(1.0);
-    }
-
-    toggleEditMode() {
-        this.setState({ inEditMode: !this.state.inEditMode });
     }
 
     resetParam() {
@@ -115,18 +93,16 @@ export default class CameraParam extends Component {
             const { color, text } = getDeltaColorAndText(delta);
 
             return (
-                <div className="section-content-row" key={`${type}_${field}`}>
+                <div className="camera-param-row" key={`${type}_${field}`}>
                     <div className="field">{field}</div>
                     <div className="value">{value}</div>
                     <div className="delta" style={{color}}>{text}</div>
-                    { this.state.inEditMode &&
-                        <div className="action">
-                            <UpArrowSvg onClick={() => cameraData.update(
-                                type, axis, adjustStep)} />
-                            <DownArrowSvg onClick={() => cameraData.update(
-                                type, axis, (-1) * adjustStep)} />
-                        </div>
-                    }
+                    <div className="action">
+                        <UpArrowSvg onClick={() => cameraData.update(
+                            type, axis, adjustStep)} />
+                        <DownArrowSvg onClick={() => cameraData.update(
+                            type, axis, (-1) * adjustStep)} />
+                    </div>
                 </div>
             );
         });
@@ -136,7 +112,7 @@ export default class CameraParam extends Component {
 
     renderCameraParam() {
         return (
-            <div className="camera-param-content">
+            <div className="monitor-content">
                 <div className="section">
                     <div className="section-title"
                          data-tip="Camera position in world coordinate system"
@@ -178,13 +154,9 @@ export default class CameraParam extends Component {
     render() {
         return (
             <div className="monitor camera-param">
-                <div className="camera-param-header">
+                <div className="monitor-header">
                     <div className="title">Camera Parameter</div>
                     <div className="actions">
-                        <div className="action" onClick={this.toggleEditMode} data-tip="Edit"
-                             data-for="action">
-                            <EditSvg inEditMode={this.state.inEditMode}/>
-                        </div>
                         <div className="action" onClick={this.resetParam} data-tip="Reset"
                              data-for="action">
                             <ResetSvg />

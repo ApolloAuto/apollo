@@ -19,6 +19,7 @@
 #include "boost/thread/locks.hpp"
 #include "boost/thread/shared_mutex.hpp"
 #include "cyber/cyber.h"
+#include "third_party/json/json.hpp"
 
 #ifdef TELEOP
 #include "modules/car1/network/proto/modem_info.pb.h"
@@ -38,6 +39,7 @@ class TeleopService {
 
  private:
   void RegisterMessageHandlers();
+  void SendStatus(WebSocketHandler::Connection *conn);
 
 #ifdef TELEOP
   void UpdateModemInfo(
@@ -48,13 +50,7 @@ class TeleopService {
 
   WebSocketHandler *websocket_;
 
-  bool audio_enabled_ = false;
-  bool mic_enabled_ = false;
-  bool video_enabled_ = false;
-
 #ifdef TELEOP
-  modules::car1::network::ModemInfo modem_info_;
-
   std::shared_ptr<cyber::Reader<modules::car1::network::ModemInfo>>
       modem_info_reader_;
 
@@ -62,7 +58,10 @@ class TeleopService {
       daemon_cmd_writer_;
 #endif
 
-  // Mutex to protect concurrent access to modem_info_.
+  // Store teleop status
+  nlohmann::json teleop_status_;
+
+  // Mutex to protect concurrent access to teleop_status_.
   // NOTE: Use boost until we upgrade to std version with rwlock support.
   boost::shared_mutex mutex_;
 };

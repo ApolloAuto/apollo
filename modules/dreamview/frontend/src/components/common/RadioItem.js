@@ -1,4 +1,5 @@
 import React from "react";
+import classNames from "classnames";
 
 export default class RadioItem extends React.Component {
     constructor(props) {
@@ -27,7 +28,7 @@ export default class RadioItem extends React.Component {
         const { id, title, options, onClick, checked, extraClasses, autoFocus } = this.props;
 
         return (
-            <ul className={extraClasses}
+            <ul className={classNames("item", extraClasses)}
                 tabIndex="0"
                 ref={this.setElementRef}
                 onKeyPress={this.handleKeyPress}

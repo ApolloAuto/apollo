@@ -1,6 +1,5 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
-import { Tab } from "react-tabs";
 
 import SplitPane from 'react-split-pane';
 import Header from "components/Header";
@@ -50,7 +49,7 @@ export default class Dreamview extends React.Component {
     }
 
     componentWillMount() {
-        this.props.store.updateDimension();
+        this.props.store.initDimension();
     }
 
     componentDidMount() {

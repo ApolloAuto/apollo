@@ -112,6 +112,10 @@ options:
   showVideo:
     default: false
 
+  # teleop
+  showTeleopConsoleMonitor:
+      default: false
+
   # layer Menu options
   cameraAngle:
     default: Default
