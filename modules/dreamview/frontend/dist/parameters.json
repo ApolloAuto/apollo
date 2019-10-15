@@ -117,9 +117,6 @@
 		"showPOI": {
 			"default": false
 		},
-		"enableAudioCapture": {
-			"default": false
-		},
 		"showDataRecorder": {
 			"default": false
 		},
