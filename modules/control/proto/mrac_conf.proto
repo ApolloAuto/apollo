@@ -11,4 +11,5 @@ message MracConf {
   optional double adaption_desired_gain = 6;
   optional double adaption_nonlinear_gain = 7;
   optional double mrac_saturation_level = 8 [default = 100.0];
+  optional double anti_windup_compensation_gain = 9;
 }

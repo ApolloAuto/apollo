@@ -24,7 +24,7 @@
 namespace apollo {
 namespace control {
 
-double MracController::Control(const double cmd, const double state,
+double MracController::Control(const double command, const double state,
                                const double dt) {
   // check if the reference model well set up during the initilization
   if (!reference_model_enabled_) {
@@ -34,7 +34,7 @@ double MracController::Control(const double cmd, const double state,
       AWARN << "MRAC: reference model setting failed; will work as a unity "
                "compensator, dt: "
             << dt;
-      return cmd;  // treat the mrac as a unity proportional controller
+      return command;  // treat the mrac as a unity proportional controller
     }
   }
   // check if the current sampling time is valid
@@ -46,7 +46,7 @@ double MracController::Control(const double cmd, const double state,
   double control = 0.0;
 
   // update the state in the reference system
-  state_reference_[0] = reference_model_.Filter(cmd);
+  state_reference_[0] = reference_model_.Filter(command);
   if (state_reference_[0] > bound_reference_high_) {
     state_reference_[0] = bound_reference_high_;
     saturation_status_reference_ = 1;
@@ -61,26 +61,30 @@ double MracController::Control(const double cmd, const double state,
   state_action_[0] = state;
 
   // update the desired command in the real actuation system
-  input_desired_[0] = cmd;
+  input_desired_[0] = command;
 
   // update the adaption laws including state adaption, command adaption and
   // nonlinear components adaption
-  RunAdaptionModel(&gain_state_adaption_, state_action_, gamma_state_adaption_);
-  RunAdaptionModel(&gain_input_adaption_, input_desired_,
-                   gamma_input_adaption_);
+  Adaption(&gain_state_adaption_, state_action_, gamma_state_adaption_);
+  Adaption(&gain_input_adaption_, input_desired_, gamma_input_adaption_);
 
   // update the generated control based on the adaptive law
-  control = gain_state_adaption_[0] * state_action_[0] +
-            gain_input_adaption_[0] * input_desired_[0];
-  if (control > bound_control_high_) {
+  double control_unbounded = gain_state_adaption_[0] * state_action_[0] +
+                             gain_input_adaption_[0] * input_desired_[0];
+  if (control_unbounded > bound_control_high_) {
     control = bound_control_high_;
     saturation_status_control_ = 1;
-  } else if (control < bound_control_low_) {
+  } else if (control_unbounded < bound_control_low_) {
     control = bound_control_low_;
     saturation_status_control_ = -1;
   } else {
+    control = control_unbounded;
     saturation_status_control_ = 0;
   }
+
+  // update the anti-windup compensation if applied
+  AntiWindupCompensation(control_unbounded, bound_control_high_,
+                         bound_control_low_);
 
   // update the previous value for next iteration
   state_reference_[1] = state_reference_[0];
@@ -123,6 +127,8 @@ void MracController::Init(const MracConf &mrac_conf, const double dt) {
   SetReferenceModel(mrac_conf);
   TransformReferenceModel(dt);
   reference_model_.set_coefficients(kd_reference_, kn_reference_);
+  // Initialize the anti-windup parameters
+  gain_anti_windup_ = mrac_conf.anti_windup_compensation_gain();
 }
 
 void MracController::SetReferenceModel(const MracConf &mrac_conf) {
@@ -137,16 +143,33 @@ void MracController::SetAdaptionModel(const MracConf &mrac_conf) {
   gamma_nonlinear_adaption_ = mrac_conf.adaption_nonlinear_gain();
 }
 
-void MracController::RunAdaptionModel(std::vector<double> *law_adp,
-                                      const std::vector<double> state_adp,
-                                      const double gain_adp) {
+void MracController::Adaption(std::vector<double> *law_adp,
+                              const std::vector<double> state_adp,
+                              const double gain_adp) {
+  std::vector<double> state_error{state_action_[0] - state_reference_[0],
+                                  state_action_[1] - state_reference_[1]};
   double tmp = (*law_adp)[0];
   (*law_adp)[0] = (*law_adp)[1] -
                   (0.5 * Ts_ * gain_adp * state_adp[0] *
-                   (state_action_[0] - state_reference_[0])) -
+                   (state_error[0] + compensation_anti_windup_[0])) -
                   (0.5 * Ts_ * gain_adp * state_adp[1] *
-                   (state_action_[1] - state_reference_[1]));
+                   (state_error[1] + compensation_anti_windup_[1]));
   (*law_adp)[1] = tmp;
+}
+
+void MracController::AntiWindupCompensation(const double control_command,
+                                            const double upper_bound,
+                                            const double lower_bound) {
+  if (upper_bound < lower_bound) {
+    AWARN << "windup upper_bound < lower_bound; failed to exectute the "
+             "anti-windup logic";
+    compensation_anti_windup_ = {0.0, 0.0};
+  }
+  double offset_windup =
+      ((control_command > upper_bound) ? upper_bound - control_command : 0.0) +
+      ((control_command < lower_bound) ? lower_bound - control_command : 0.0);
+  compensation_anti_windup_[1] = compensation_anti_windup_[0];
+  compensation_anti_windup_[0] = gain_anti_windup_ * offset_windup;
 }
 
 void MracController::TransformReferenceModel(const double dt) {
