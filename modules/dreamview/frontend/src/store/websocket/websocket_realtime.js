@@ -291,14 +291,6 @@ export default class RealtimeWebSocketEndpoint {
         }));
     }
 
-    sendAudioPiece(data) {
-        this.websocket.send(JSON.stringify({
-            type: "HMIAction",
-            action: "RECORD_AUDIO",
-            value: btoa(String.fromCharCode(...data)),
-        }));
-    }
-
     toggleSimControl(enable) {
         this.websocket.send(JSON.stringify({
             type: "ToggleSimControl",

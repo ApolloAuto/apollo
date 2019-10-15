@@ -91,8 +91,6 @@ class HMIWorker {
   void StartModule(const std::string& module) const;
   void StopModule(const std::string& module) const;
 
-  void RecordAudio(const std::string& data);
-
   const HMIConfig config_;
 
   // HMI status maintenance.
@@ -108,7 +106,6 @@ class HMIWorker {
   std::shared_ptr<apollo::cyber::Node> node_;
   std::shared_ptr<cyber::Reader<apollo::canbus::Chassis>> chassis_reader_;
   std::shared_ptr<cyber::Writer<HMIStatus>> status_writer_;
-  std::shared_ptr<cyber::Writer<AudioCapture>> audio_capture_writer_;
   std::shared_ptr<cyber::Writer<apollo::control::PadMessage>> pad_writer_;
   std::shared_ptr<cyber::Writer<apollo::common::DriveEvent>>
       drive_event_writer_;

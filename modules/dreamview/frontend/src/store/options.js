@@ -22,7 +22,7 @@ export default class Options {
             "showRouteEditingBar",
             "showDataRecorder",
         ];
-        this.secondarySideBarOptions = ["showPOI", "enableAudioCapture"];
+        this.secondarySideBarOptions = ["showPOI"];
 
         // Set options and their default values from PARAMETERS.options
         this.resetOptions();
@@ -135,8 +135,7 @@ export default class Options {
         }
 
         if (option === "showTasks" ||
-            option === "showModuleController" ||
-            option === "enableAudioCapture"
+            option === "showModuleController"
         ) {
             return false;
         } else if (option === "showRouteEditingBar") {

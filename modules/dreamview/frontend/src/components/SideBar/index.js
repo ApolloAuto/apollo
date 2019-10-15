@@ -27,7 +27,6 @@ const sidebarLabelMapping = {
     showMenu: "Layer Menu",
     showRouteEditingBar: "Route Editing",
     showDataRecorder: "Data Recorder",
-    enableAudioCapture: "Audio Capture",
     showPOI: "Default Routing",
 };
 
@@ -66,7 +65,6 @@ export default class SideBar extends React.Component {
                     <SideBarButton type="main" {...settings.showDataRecorder} />
                 </div>
                 <div className="sub-button-panel">
-                    <SideBarButton type="sub" {...settings.enableAudioCapture} />
                     <SideBarButton
                         type="sub" {...settings.showPOI}
                         active={!options.showRouteEditingBar && options.showPOI} />

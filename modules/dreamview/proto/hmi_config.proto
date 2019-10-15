@@ -16,17 +16,12 @@ enum HMIAction {
   CHANGE_VEHICLE = 7;  // value = vehicle_name
   START_MODULE = 8;    // value = module_name
   STOP_MODULE = 9;     // value = module_name
-  RECORD_AUDIO = 10;   // value = audio_piece
 }
 
 message HMIConfig {
   map<string, string> modes = 1;  // {mode_name: mode_path}
   map<string, string> maps = 2;  // {map_name: map_path}
   map<string, string> vehicles = 3;  // {vehicle_name: vehicle_path}
-}
-
-message AudioCapture {
-  optional bytes wav_stream = 1;
 }
 
 message VehicleData {

@@ -256,8 +256,6 @@ void HMIWorker::InitReadersAndWriters() {
   pad_writer_ = node_->CreateWriter<control::PadMessage>(FLAGS_pad_topic);
   drive_event_writer_ =
       node_->CreateWriter<DriveEvent>(FLAGS_drive_event_topic);
-  audio_capture_writer_ =
-      node_->CreateWriter<AudioCapture>(FLAGS_audio_capture_topic);
 
   node_->CreateReader<SystemStatus>(
       FLAGS_system_status_topic,
@@ -353,9 +351,6 @@ bool HMIWorker::Trigger(const HMIAction action, const std::string& value) {
       break;
     case HMIAction::STOP_MODULE:
       StopModule(value);
-      break;
-    case HMIAction::RECORD_AUDIO:
-      RecordAudio(value);
       break;
     default:
       AERROR << "HMIAction not implemented, yet!";
@@ -541,12 +536,6 @@ void HMIWorker::ResetMode() const {
   for (const auto& iter : current_mode_.modules()) {
     System(iter.second.stop_command());
   }
-}
-
-void HMIWorker::RecordAudio(const std::string& data) {
-  AudioCapture audio;
-  audio.set_wav_stream(apollo::common::util::DecodeBase64(data));
-  audio_capture_writer_->Write(audio);
 }
 
 void HMIWorker::StatusUpdateThreadLoop() {
