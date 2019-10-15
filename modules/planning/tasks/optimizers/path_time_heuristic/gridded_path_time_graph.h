@@ -72,12 +72,13 @@ class GriddedPathTimeGraph {
                            const double speed_limit);
   double CalculateEdgeCostForSecondCol(const uint32_t row,
                                        const double speed_limit);
-  double CalculateEdgeCostForThirdCol(const uint32_t curr_r,
-                                      const uint32_t pre_r,
+  double CalculateEdgeCostForThirdCol(const uint32_t curr_row,
+                                      const uint32_t pre_row,
                                       const double speed_limit);
 
-  void GetRowRange(const StGraphPoint& point, size_t* highest_row,
-                   size_t* lowest_row);
+  // get the row-range of next time step
+  void GetRowRange(const StGraphPoint& point, size_t* next_highest_row,
+                   size_t* next_lowest_row);
 
  private:
   const StGraphData& st_graph_data_;
