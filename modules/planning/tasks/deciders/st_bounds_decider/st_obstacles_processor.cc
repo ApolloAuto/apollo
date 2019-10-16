@@ -152,8 +152,6 @@ bool STObstaclesProcessor::GetSBoundsFromDecisions(double t,
     std::vector<std::vector<std::pair<std::string, ObjectDecisionType>>>*
         const available_obs_decisions) {
   // Sanity checks.
-  CHECK_NOTNULL(available_s_bounds);
-  CHECK_NOTNULL(available_obs_decisions);
   available_s_bounds->clear();
   available_obs_decisions->clear();
 
@@ -232,6 +230,19 @@ bool STObstaclesProcessor::GetSBoundsFromDecisions(double t,
   }
 
   return true;
+}
+
+void STObstaclesProcessor::SetObstacleDecision(
+    const std::string& obs_id, const ObjectDecisionType& obs_decision) {
+  obs_id_to_decision_[obs_id] = obs_decision;
+}
+
+void STObstaclesProcessor::SetObstacleDecision(
+    const std::vector<std::pair<std::string, ObjectDecisionType>>&
+        obstacle_decisions) {
+  for (auto obs_decision : obstacle_decisions) {
+    SetObstacleDecision(obs_decision.first, obs_decision.second);
+  }
 }
 
 // TODO(jiacheng): implement this.
@@ -485,7 +496,6 @@ std::vector<std::pair<double, double>> STObstaclesProcessor::FindSGaps(
 
 ObjectDecisionType STObstaclesProcessor::DetermineObstacleDecision(
     const double obs_s_min, const double obs_s_max, const double s) const {
-  CHECK(s <= obs_s_min || s >= obs_s_max);
   ObjectDecisionType decision;
   if (s <= obs_s_min) {
     decision.mutable_yield();
