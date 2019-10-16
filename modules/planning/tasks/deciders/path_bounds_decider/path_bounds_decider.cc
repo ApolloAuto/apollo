@@ -562,10 +562,11 @@ int PathBoundsDecider::IsPointWithinPathBound(
   return -1;
 }
 
-bool PathBoundsDecider::SearchPullOverPosition(
-    const Frame& frame, const ReferenceLineInfo& reference_line_info,
+bool PathBoundsDecider::FindDestinationPullOverS(
+    const Frame& frame,
+    const ReferenceLineInfo& reference_line_info,
     const std::vector<std::tuple<double, double, double>>& path_bound,
-    std::tuple<double, double, double, int>* const pull_over_configuration) {
+    double* pull_over_s) {
   // destination_s based on routing_end
   const auto& reference_line = reference_line_info_->reference_line();
   common::SLPoint destination_sl;
@@ -596,6 +597,63 @@ bool PathBoundsDecider::SearchPullOverPosition(
     return false;
   }
 
+  *pull_over_s = destination_s;
+  return true;
+}
+
+bool PathBoundsDecider::FindEmergencyPullOverS(
+    const ReferenceLineInfo& reference_line_info,
+    double* pull_over_s) {
+  const double adc_end_s = reference_line_info.AdcSlBoundary().end_s();
+
+  // TODO(all): to be implemented
+  *pull_over_s = adc_end_s + 10.0;
+  return true;
+}
+
+bool PathBoundsDecider::SearchPullOverPosition(
+    const Frame& frame,
+    const ReferenceLineInfo& reference_line_info,
+    const std::vector<std::tuple<double, double, double>>& path_bound,
+    std::tuple<double, double, double, int>* const pull_over_configuration) {
+  double pull_over_s = 0.0;
+  if (is_in_emergency_pull_over_scenario_) {
+    if (!FindEmergencyPullOverS(reference_line_info, &pull_over_s)) {
+      AERROR << "Failed to find emergency_pull_over s";
+      return false;
+    }
+  } else if (is_in_pull_over_scenario_) {
+    if (!FindDestinationPullOverS(frame, reference_line_info, path_bound,
+                                  &pull_over_s)) {
+      AERROR << "Failed to find pull_over s upon destination arrival";
+      return false;
+    }
+  } else {
+    return false;
+  }
+
+  // search direction
+  const bool search_backward = is_in_pull_over_scenario_;
+
+  int idx = 0;
+  if (search_backward) {
+    // 1. Locate the first point before destination.
+    idx = static_cast<int>(path_bound.size()) - 1;
+    while (idx >= 0 && std::get<0>(path_bound[idx]) > pull_over_s) {
+      --idx;
+    }
+  } else {
+    // 1. Locate the first point after emergency_pull_over s.
+    while (idx < static_cast<int>(path_bound.size()) &&
+        std::get<0>(path_bound[idx]) < pull_over_s) {
+      ++idx;
+    }
+  }
+  if (idx < 0 || idx >= static_cast<int>(path_bound.size())) {
+    AERROR << "Failed to find path_bound index for pull over s";
+    return false;
+  }
+
   // Search for a feasible location for pull-over.
   const double pull_over_space_length =
       kPulloverLonSearchCoeff *
@@ -606,20 +664,23 @@ bool PathBoundsDecider::SearchPullOverPosition(
       VehicleConfigHelper::GetConfig().vehicle_param().width();
   const double adc_half_width =
       VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
-  int i = static_cast<int>(path_bound.size()) - 1;
-  // 1. Locate the first point before destination.
-  while (i >= 0 && std::get<0>(path_bound[i]) > destination_s) {
-    --i;
-  }
+
   // 2. Find a window that is close to road-edge.
   bool has_a_feasible_window = false;
-  while (i >= 0 &&
-         std::get<0>(path_bound[i]) - std::get<0>(path_bound.front()) >
+  while ((search_backward && idx >= 0 &&
+         std::get<0>(path_bound[idx]) - std::get<0>(path_bound.front()) >
+             pull_over_space_length) ||
+         (!search_backward && idx < static_cast<int>(path_bound.size()) &&
+         std::get<0>(path_bound.back()) - std::get<0>(path_bound[idx])) >
              pull_over_space_length) {
-    int j = i;
+    int j = idx;
     bool is_feasible_window = true;
-    while (j >= 0 && std::get<0>(path_bound[i]) - std::get<0>(path_bound[j]) <
-                         pull_over_space_length) {
+    while ((search_backward && j >= 0 &&
+        std::get<0>(path_bound[idx]) - std::get<0>(path_bound[j]) <
+            pull_over_space_length) ||
+        (!search_backward && j < static_cast<int>(path_bound.size()) &&
+        std::get<0>(path_bound[j]) - std::get<0>(path_bound[idx]) <
+            pull_over_space_length)) {
       double curr_s = std::get<0>(path_bound[j]);
       double curr_right_bound = std::fabs(std::get<1>(path_bound[j]));
       double curr_road_left_width = 0;
@@ -639,7 +700,7 @@ bool PathBoundsDecider::SearchPullOverPosition(
         break;
       }
 
-      --j;
+      j = search_backward ? j - 1 : j + 1;
     }
     if (j < 0) {
       return false;
@@ -655,9 +716,18 @@ bool PathBoundsDecider::SearchPullOverPosition(
           (0.5 * (kPulloverLonSearchCoeff - 1.0) * vehicle_param.length() +
            vehicle_param.back_edge_to_center()) /
           vehicle_param.length() / kPulloverLonSearchCoeff;
+
+      int start_idx = j;
+      int end_idx = idx;
+      if (!search_backward) {
+        start_idx = idx;
+        end_idx = j;
+      }
       auto pull_over_idx = static_cast<size_t>(
-          back_clear_to_total_length_ratio * static_cast<double>(i) +
-          (1.0 - back_clear_to_total_length_ratio) * static_cast<double>(j));
+          back_clear_to_total_length_ratio * static_cast<double>(end_idx) +
+          (1.0 - back_clear_to_total_length_ratio) *
+              static_cast<double>(start_idx));
+
       const auto& pull_over_point = path_bound[pull_over_idx];
       const double pull_over_s = std::get<0>(pull_over_point);
       const double pull_over_l =
@@ -690,7 +760,8 @@ bool PathBoundsDecider::SearchPullOverPosition(
                           static_cast<int>(pull_over_idx));
       break;
     }
-    --i;
+
+    idx = search_backward ? idx - 1 : idx + 1;
   }
 
   return has_a_feasible_window;
