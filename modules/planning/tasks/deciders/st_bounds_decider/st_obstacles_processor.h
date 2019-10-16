@@ -70,12 +70,17 @@ class STObstaclesProcessor {
       std::vector<std::vector<std::pair<std::string, ObjectDecisionType>>>*
           const available_obs_decisions);
 
-  /**
-    *
+  /** @brief Set the decision for a given obstacle.
     */
   void SetObstacleDecision(
       const std::string& obs_id,
       const ObjectDecisionType& obs_decision);
+
+  /** @brief Set the decision for a list of obstacles.
+    */
+  void SetObstacleDecision(
+      const std::vector<std::pair<std::string, ObjectDecisionType>>&
+          obstacle_decisions);
 
   std::pair<double, double> GetRegularBoundaryFromObstacles(double t);
 
@@ -147,10 +152,23 @@ class STObstaclesProcessor {
                                     const common::math::Box2d& obs_box,
                                     const double l_buffer) const;
 
+  /** @brief Find the vertical (s) gaps of the st-graph.
+    * @param Vector of obstacle-t-edges
+    * @param The existing minimum s edge.
+    * @param The existing maximum s edge.
+    * @return A list of available s gaps for ADC to go.
+    */
   std::vector<std::pair<double, double>> FindSGaps(
       const std::vector<std::tuple<int, double, double, double, std::string>>&
           obstacle_t_edges, double s_min, double s_max);
 
+  /** @brief Based on obstacle position and prospective ADC position,
+    * determine the obstacle decision.
+    * @param Obstacle's minimum s.
+    * @param Obstacle's maximum s.
+    * @param ADC's prospective position.
+    * @return The decision for the given obstacle.
+    */
   ObjectDecisionType DetermineObstacleDecision(
       const double obs_s_min, const double obs_s_max, const double s) const;
 
