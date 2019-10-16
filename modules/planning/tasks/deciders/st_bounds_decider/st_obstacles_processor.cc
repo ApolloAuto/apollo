@@ -67,10 +67,22 @@ STObstaclesProcessor::STObstaclesProcessor(const double planning_distance,
 Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     PathDecision* const path_decision) {
   // Sanity checks.
-  CHECK_NOTNULL(path_decision);
-  CHECK_GT(planning_time_, 0.0);
-  CHECK_GT(planning_distance_, 0.0);
-  CHECK_GT(path_data_.discretized_path().size(), 1);
+  if (path_decision == nullptr) {
+    const std::string msg = "path_decision is nullptr";
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  if (planning_time_ < 0.0) {
+    const std::string msg = "Negative planning time.";
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  if (planning_distance_ < 0.0) {
+    const std::string msg = "Negative planning distance.";
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  if (path_data_.discretized_path().size() <= 1) {
+    const std::string msg = "Number of path points is too few.";
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
   obs_id_to_st_boundary_.clear();
 
   // Map obstacles into ST-graph.
@@ -79,7 +91,10 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
   std::get<0>(closest_stop_obstacle) = "NULL";
   for (const auto* obs_item_ptr : path_decision->obstacles().Items()) {
     Obstacle* obs_ptr = path_decision->Find(obs_item_ptr->Id());
-    CHECK_NOTNULL(obs_ptr);
+    if (obs_ptr == nullptr) {
+      const std::string msg = "Null obstacle pointer.";
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+    }
 
     std::vector<STPoint> lower_points;
     std::vector<STPoint> upper_points;
@@ -87,10 +102,8 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
       // Obstacle doesn't appear on ST-Graph.
       continue;
     }
-    CHECK_GT(lower_points.size(), 1);
-    CHECK_GT(upper_points.size(), 1);
-    auto boundary =
-        STBoundary::CreateInstanceAccurate(lower_points, upper_points);
+    auto boundary = STBoundary::CreateInstanceAccurate(
+        lower_points, upper_points);
     boundary.set_id(obs_ptr->Id());
     if (obs_ptr->Trajectory().trajectory_point().empty()) {
       // Obstacle is static.
@@ -340,7 +353,8 @@ bool STObstaclesProcessor::GetOverlappingS(
   if (pt_after_idx == -1) {
     pt_after_idx = static_cast<int>(adc_path_points.size()) - 2;
   }
-  CHECK(pt_before_idx < pt_after_idx);
+  if (pt_before_idx >= pt_after_idx)
+    return false;
 
   // Detailed searching.
   bool has_overlapping = false;
@@ -499,10 +513,8 @@ ObjectDecisionType STObstaclesProcessor::DetermineObstacleDecision(
   ObjectDecisionType decision;
   if (s <= obs_s_min) {
     decision.mutable_yield();
-    CHECK(decision.has_yield());
   } else if (s >= obs_s_max) {
     decision.mutable_overtake();
-    CHECK(decision.has_overtake());
   }
   return decision;
 }
