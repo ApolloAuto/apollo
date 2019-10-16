@@ -46,6 +46,13 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     const SpeedData& speed_data, const ReferenceLine& reference_line,
     const common::TrajectoryPoint& init_point,
     PathData* const final_path_data) {
+  // skip piecewise_jerk_path_optimizer if reused path
+  if (FLAGS_enable_skip_path_tasks && PlanningContext::Instance()
+                                          ->mutable_planning_status()
+                                          ->mutable_path_reuse_decider()
+                                          ->reused_path()) {
+    return Status::OK();
+  }
   const auto init_frenet_state = reference_line.ToFrenetFrame(init_point);
 
   // Choose lane_change_path_config for lane-change cases
