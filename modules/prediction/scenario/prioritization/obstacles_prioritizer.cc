@@ -183,7 +183,7 @@ void ObstaclesPrioritizer::AssignIgnoreLevel() {
 }
 
 void ObstaclesPrioritizer::AssignCautionLevel() {
-  AssignCautionLevelInJunction();
+  // AssignCautionLevelInJunction();
   AssignCautionLevelCruiseKeepLane();
   AssignCautionLevelCruiseChangeLane();
   AssignCautionLevelByEgoReferenceLine();
