@@ -869,14 +869,17 @@ void ScenarioManager::UpdatePlanningContext(
   // BareIntersection scenario
   UpdatePlanningContextBareIntersectionScenario(frame, scenario_type);
 
+  // EmergencyPullOver scenario
+  UpdatePlanningContextEmergencyPullOverScenario(frame, scenario_type);
+
+  // PullOver scenario
+  UpdatePlanningContextPullOverScenario(frame, scenario_type);
+
   // StopSign scenario
   UpdatePlanningContextStopSignScenario(frame, scenario_type);
 
   // TrafficLight scenario
   UpdatePlanningContextTrafficLightScenario(frame, scenario_type);
-
-  // PullOver scenario
-  UpdatePlanningContextPullOverScenario(frame, scenario_type);
 
   // YieldSign scenario
   UpdatePlanningContextYieldSignScenario(frame, scenario_type);
@@ -1116,6 +1119,21 @@ void ScenarioManager::UpdatePlanningContextPullOverScenario(
       }
     }
   }
+}
+
+// update: emergency_pull_over status in PlanningContext
+void ScenarioManager::UpdatePlanningContextEmergencyPullOverScenario(
+    const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
+  auto* emergency_pull_over = PlanningContext::Instance()
+                                ->mutable_planning_status()
+                                ->mutable_emergency_pull_over();
+
+  if (scenario_type != ScenarioConfig::EMERGENCY_PULL_OVER) {
+    emergency_pull_over->Clear();
+    return;
+  }
+
+  emergency_pull_over->set_is_in_emergency_pull_over_scenario(true);
 }
 
 }  // namespace scenario
