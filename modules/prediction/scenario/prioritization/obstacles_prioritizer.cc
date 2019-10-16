@@ -183,9 +183,35 @@ void ObstaclesPrioritizer::AssignIgnoreLevel() {
 }
 
 void ObstaclesPrioritizer::AssignCautionLevel() {
+  AssignCautionLevelInJunction();
   AssignCautionLevelCruiseKeepLane();
   AssignCautionLevelCruiseChangeLane();
   AssignCautionLevelByEgoReferenceLine();
+}
+
+void ObstaclesPrioritizer::AssignCautionLevelInJunction() {
+  auto obstacles_container =
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
+  if (obstacles_container == nullptr) {
+    AERROR << "Obstacles container pointer is a null pointer.";
+    return;
+  }
+
+  // TODO(Hongyi): get current junction_id from Storytelling
+  std::string curr_junction_id;
+  const auto& obstacle_ids =
+      obstacles_container->curr_frame_movable_obstacle_ids();
+  for (const int obstacle_id : obstacle_ids) {
+    Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
+    if (obstacle_ptr == nullptr) {
+      AERROR << "Null obstacle pointer found.";
+      continue;
+    }
+    if (obstacle_ptr->IsInJunction(curr_junction_id)) {
+      obstacle_ptr->SetCaution();
+    }
+  }
 }
 
 void ObstaclesPrioritizer::AssignCautionLevelCruiseKeepLane() {

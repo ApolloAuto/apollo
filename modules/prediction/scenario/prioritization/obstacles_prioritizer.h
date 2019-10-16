@@ -37,6 +37,8 @@ class ObstaclesPrioritizer {
   void AssignCautionLevel();
 
  private:
+  void AssignCautionLevelInJunction();
+
   void AssignCautionLevelCruiseKeepLane();
 
   void AssignCautionLevelCruiseChangeLane();
