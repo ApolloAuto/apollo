@@ -48,6 +48,15 @@ Status PathDecider::Process(const ReferenceLineInfo *reference_line_info,
                             const PathData &path_data,
                             PathDecision *const path_decision) {
   CHECK_NOTNULL(path_decision);
+
+  // skip path_decider if reused path
+  if (FLAGS_enable_skip_path_tasks && PlanningContext::Instance()
+                                          ->mutable_planning_status()
+                                          ->mutable_path_reuse_decider()
+                                          ->reused_path()) {
+    return Status::OK();
+  }
+
   std::string blocking_obstacle_id;
   if (reference_line_info->GetBlockingObstacle() != nullptr) {
     blocking_obstacle_id = reference_line_info->GetBlockingObstacle()->Id();

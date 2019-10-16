@@ -40,6 +40,16 @@ Status PathLaneBorrowDecider::Process(
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
+  // skip path_lane_borrow_decider if reused path
+  if (FLAGS_enable_skip_path_tasks && PlanningContext::Instance()
+                                          ->mutable_planning_status()
+                                          ->mutable_path_reuse_decider()
+                                          ->reused_path()) {
+    // for debug
+    AINFO << "skip due to reusing path";
+    return Status::OK();
+  }
+
   // By default, don't borrow any lane.
   reference_line_info->set_is_path_lane_borrow(false);
   // Check if lane-borrowing is needed, if so, borrow lane.

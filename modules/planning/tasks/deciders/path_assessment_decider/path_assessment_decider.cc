@@ -54,6 +54,14 @@ Status PathAssessmentDecider::Process(
   // Sanity checks.
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
+  // skip path_assessment_decider if reused path
+  if (FLAGS_enable_skip_path_tasks && PlanningContext::Instance()
+                                          ->mutable_planning_status()
+                                          ->mutable_path_reuse_decider()
+                                          ->reused_path()) {
+    return Status::OK();
+  }
+
   const auto& candidate_path_data = reference_line_info->GetCandidatePathData();
 
   if (candidate_path_data.empty()) {
