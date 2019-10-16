@@ -229,8 +229,14 @@ bool Obstacle::IsInJunction(const std::string& junction_id) const {
     AERROR << "Obstacle [" << id_ << "] has no history";
     return false;
   }
+  if (junction_id.empty()) {
+    return false;
+  }
   std::shared_ptr<const JunctionInfo> junction_info_ptr =
       PredictionMap::JunctionById(junction_id);
+  if (junction_info_ptr == nullptr) {
+    return false;
+  }
   const auto& position = latest_feature().position();
   return PredictionMap::IsPointInJunction(position.x(), position.y(),
                                           junction_info_ptr);

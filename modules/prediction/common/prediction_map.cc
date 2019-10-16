@@ -277,6 +277,9 @@ bool PredictionMap::NearJunction(const Eigen::Vector2d& point,
 bool PredictionMap::IsPointInJunction(
     const double x, const double y,
     const std::shared_ptr<const JunctionInfo> junction_info_ptr) {
+  if (junction_info_ptr == nullptr) {
+    return false;
+  }
   const Polygon2d& polygon = junction_info_ptr->polygon();
   return polygon.IsPointIn({x, y});
 }
