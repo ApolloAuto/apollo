@@ -159,13 +159,6 @@ bool TrafficLightUnprotectedRightTurnStageStop::
   return false;
 }
 
-Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishScenario() {
-  PlanningContext::Instance()->mutable_planning_status()->clear_traffic_light();
-
-  next_stage_ = ScenarioConfig::NO_STAGE;
-  return Stage::FINISHED;
-}
-
 Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishStage(
     const bool protected_mode) {
   if (protected_mode) {
