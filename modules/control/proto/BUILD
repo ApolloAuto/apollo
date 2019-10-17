@@ -17,14 +17,13 @@ proto_library(
         "lat_controller_conf.proto",
         "leadlag_conf.proto",
         "lon_controller_conf.proto",
-        # "mpc_controller_conf.proto",
         "mrac_conf.proto",
         "pad_msg.proto",
         "pid_conf.proto",
     ],
     deps = [
-        ":gain_scheduler_conf_proto_lib",
         ":calibration_table_proto_lib",
+        ":gain_scheduler_conf_proto_lib",
         ":mpc_controller_conf_proto_lib",
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/proto:drive_state_proto_lib",
@@ -47,9 +46,9 @@ proto_library(
     srcs = [
         "mpc_controller_conf.proto",
     ],
-        deps = [
-        ":gain_scheduler_conf_proto_lib",
+    deps = [
         ":calibration_table_proto_lib",
+        ":gain_scheduler_conf_proto_lib",
     ],
 )
 
