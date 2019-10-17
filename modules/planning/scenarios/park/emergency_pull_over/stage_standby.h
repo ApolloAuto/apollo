@@ -46,7 +46,6 @@ class EmergencyPullOverStageStandby : public Stage {
   }
 
  private:
-  Stage::StageStatus FinishScenario() override;
   Stage::StageStatus FinishStage();
 
  private:

@@ -55,14 +55,6 @@ Stage::StageStatus EmergencyPullOverStageStandby::Process(
   return Stage::RUNNING;
 }
 
-Stage::StageStatus EmergencyPullOverStageStandby::FinishScenario() {
-  // TODO(all): clear PlanningContext
-  // PlanningContext::Instance()->mutable_planning_status()->clear_emergency_pull_over();
-
-  next_stage_ = ScenarioConfig::NO_STAGE;
-  return Stage::FINISHED;
-}
-
 Stage::StageStatus EmergencyPullOverStageStandby::FinishStage() {
   return FinishScenario();
 }
