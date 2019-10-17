@@ -16,6 +16,8 @@
 
 #include "modules/storytelling/story_tellers/close_to_junction_teller.h"
 
+#include <string>
+
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -30,26 +32,35 @@ using apollo::common::PathPoint;
 using apollo::planning::ADCTrajectory;
 using apollo::prediction::PredictionMap;
 
-bool IsPointInPNCJunction(const PathPoint& point) {
+bool IsPointInPNCJunction(const PathPoint& point, std::string* junction_id) {
   const auto junctions = PredictionMap::GetPNCJunctions(
       Eigen::Vector2d(point.x(), point.y()), FLAGS_junction_search_radius);
   if (junctions.empty() || junctions.front() == nullptr) {
     return false;
   }
   const auto& junction_info = junctions.front();
-  return junction_info != nullptr &&
-         junction_info->pnc_junction().polygon().point_size() >= 3;
+  if (junction_info != nullptr &&
+      junction_info->pnc_junction().polygon().point_size() >= 3) {
+    *junction_id = junction_info->id().id();
+    return true;
+  }
+  return false;
 }
 
-bool IsPointInRegularJunction(const PathPoint& point) {
+bool IsPointInRegularJunction(const PathPoint& point,
+                              std::string* junction_id) {
   const auto junctions = PredictionMap::GetJunctions(
       Eigen::Vector2d(point.x(), point.y()), FLAGS_junction_search_radius);
   if (junctions.empty() || junctions.front() == nullptr) {
     return false;
   }
   const auto& junction_info = junctions.front();
-  return junction_info != nullptr &&
-         junction_info->junction().polygon().point_size() >= 3;
+  if (junction_info != nullptr &&
+      junction_info->junction().polygon().point_size() >= 3) {
+    *junction_id = junction_info->id().id();
+    return true;
+  }
+  return false;
 }
 
 /**
@@ -57,7 +68,8 @@ bool IsPointInRegularJunction(const PathPoint& point) {
  * @return negative if no junction ahead, 0 if in junction, or positive which is
  *         the distance to the nearest junction ahead.
  */
-double DistanceToJunction(const ADCTrajectory& adc_trajectory) {
+double DistanceToJunction(const ADCTrajectory& adc_trajectory,
+                          std::string* junction_id) {
   const double s_start = adc_trajectory.trajectory_point(0).path_point().s();
   // Test for PNCJunction.
   for (const auto& point : adc_trajectory.trajectory_point()) {
@@ -65,7 +77,7 @@ double DistanceToJunction(const ADCTrajectory& adc_trajectory) {
     if (path_point.s() > FLAGS_adc_trajectory_search_length) {
       break;
     }
-    if (IsPointInPNCJunction(path_point)) {
+    if (IsPointInPNCJunction(path_point, junction_id)) {
       return path_point.s() - s_start;
     }
   }
@@ -76,7 +88,7 @@ double DistanceToJunction(const ADCTrajectory& adc_trajectory) {
     if (path_point.s() > FLAGS_adc_trajectory_search_length) {
       break;
     }
-    if (IsPointInRegularJunction(path_point)) {
+    if (IsPointInRegularJunction(path_point, junction_id)) {
       return path_point.s() - s_start;
     }
   }
@@ -102,13 +114,16 @@ void CloseToJunctionTeller::Update(Stories* stories) {
   }
 
   auto& logger = manager->LogBuffer();
-  const double distance = DistanceToJunction(*trajectory);
+  std::string junction_id;
+  const double distance = DistanceToJunction(*trajectory, &junction_id);
   const bool close_to_junction = distance >= 0;
   if (close_to_junction) {
     if (!stories->has_close_to_junction()) {
       logger.INFO("Enter CloseToJunction Story");
     }
-    stories->mutable_close_to_junction()->set_distance(distance);
+    auto* story = stories->mutable_close_to_junction();
+    story->set_distance(distance);
+    story->set_junction_id(junction_id);
   } else if (stories->has_close_to_junction()) {
     logger.INFO("Exit CloseToJunction Story");
     stories->clear_close_to_junction();

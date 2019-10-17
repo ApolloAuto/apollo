@@ -11,6 +11,7 @@ message ProceedWithCaution {
 // Triggered when we are close to a junction.
 message CloseToJunction {
   optional double distance = 1;
+  optional string junction_id = 2;
 }
 
 // Usage guide for action modules:
