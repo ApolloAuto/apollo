@@ -104,7 +104,6 @@ class ScenarioManager final {
 
 
  private:
-  static bool emergency_vehicle_alert_;
   std::unordered_map<ScenarioConfig::ScenarioType, ScenarioConfig,
                      std::hash<int>>
       config_map_;

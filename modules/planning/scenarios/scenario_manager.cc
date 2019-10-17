@@ -50,8 +50,6 @@ using apollo::common::VehicleState;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::PathOverlap;
 
-bool ScenarioManager::emergency_vehicle_alert_ = false;
-
 bool ScenarioManager::Init() {
   RegisterScenarios();
   default_scenario_type_ = ScenarioConfig::LANE_FOLLOW;
