@@ -43,7 +43,6 @@ class YieldSignStageApproach : public Stage {
   YieldSignContext* GetContext() { return GetContextAs<YieldSignContext>(); }
 
  private:
-  Stage::StageStatus FinishScenario() override;
   Stage::StageStatus FinishStage();
 
  private:
