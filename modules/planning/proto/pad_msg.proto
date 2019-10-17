@@ -10,7 +10,7 @@ enum DrivingAction {
   CHANGE_RIGHT = 2;
   PULL_OVER = 3;
   STOP = 4;
-  RESTART_CRUISE = 5;
+  RESUME_CRUISE = 5;
 };
 
 message PadMessage {

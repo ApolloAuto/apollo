@@ -325,8 +325,9 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPadMsgScenario(
       //    return ScenarioConfig::STOP_EMERGENCY;
       //  }
       break;
-    case DrivingAction::RESTART_CRUISE:
-      if (FLAGS_enable_scenario_park_and_go) {
+    case DrivingAction::RESUME_CRUISE:
+      if (current_scenario_->scenario_type() ==
+          ScenarioConfig::EMERGENCY_PULL_OVER) {
         return ScenarioConfig::PARK_AND_GO;
       }
       break;
