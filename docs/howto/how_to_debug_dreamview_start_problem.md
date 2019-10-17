@@ -123,12 +123,19 @@ in_dev_docker:/apollo$ ./apollo.sh build_no_perception dbg
 ```
 2. Compile pcl and copy the pcl library files to `/usr/local/lib`:
 
+See [/apollo/WORKSPACE.in](https://github.com/ApolloAuto/apollo/blob/master/WORKSPACE.in) to identify your pcl library version:
+- Prior to Apollo 5.0 (inclusive): pcl-1.7
+- After Apollo 5.0: pcl-1.9
+
 Inside docker:
 ```
 (to keep pcl in host, we save pcl under /apollo)
 cd /apollo 
 git clone https://github.com/PointCloudLibrary/pcl.git
-git checkout -b 1.7.2 pcl-1.7.2
+
+git checkout -b <your pcl-lib version> pcl-<your pcl-lib version>
+Ex: git checkout -b 1.7.2 pcl-1.7.2
+    git checkout -b 1.9.1 pcl-1.9.1
 ```
 then hack CMakeLists.txt with :
 ```
