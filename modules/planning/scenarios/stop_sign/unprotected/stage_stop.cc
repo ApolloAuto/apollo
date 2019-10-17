@@ -228,13 +228,6 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
   return 0;
 }
 
-Stage::StageStatus StopSignUnprotectedStageStop::FinishScenario() {
-  PlanningContext::Instance()->mutable_planning_status()->clear_stop_sign();
-
-  next_stage_ = ScenarioConfig::NO_STAGE;
-  return Stage::FINISHED;
-}
-
 Stage::StageStatus StopSignUnprotectedStageStop::FinishStage() {
   // update PlanningContext
   PlanningContext::Instance()
