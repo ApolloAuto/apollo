@@ -20,6 +20,8 @@
 
 // data file
 DECLARE_string(control_conf_file);
+// mpc controller conf file
+DECLARE_string(mpc_controller_conf_file);
 
 DECLARE_double(control_test_duration);
 
@@ -29,6 +31,8 @@ DECLARE_bool(enable_csv_debug);
 DECLARE_bool(enable_speed_station_preview);
 
 DECLARE_string(control_node_name);
+DECLARE_string(mpc_controller_submodule_name);
+
 DECLARE_bool(is_control_test_mode);
 DECLARE_bool(use_preview_speed_for_table);
 
