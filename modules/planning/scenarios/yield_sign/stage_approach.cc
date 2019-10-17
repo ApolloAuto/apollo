@@ -53,6 +53,11 @@ Stage::StageStatus YieldSignStageApproach::Process(
   }
 
   const auto& reference_line_info = frame->reference_line_info().front();
+
+  if (GetContext()->current_yield_sign_overlap_ids.empty()) {
+    return FinishScenario();
+  }
+
   for (const auto& yield_sign_overlap_id :
        GetContext()->current_yield_sign_overlap_ids) {
     // get overlap along reference line
@@ -142,13 +147,6 @@ Stage::StageStatus YieldSignStageApproach::Process(
   }
 
   return Stage::RUNNING;
-}
-
-Stage::StageStatus YieldSignStageApproach::FinishScenario() {
-  PlanningContext::Instance()->mutable_planning_status()->clear_yield_sign();
-
-  next_stage_ = ScenarioConfig::NO_STAGE;
-  return Stage::FINISHED;
 }
 
 Stage::StageStatus YieldSignStageApproach::FinishStage() {
