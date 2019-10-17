@@ -587,7 +587,8 @@ function run_bash_lint() {
 
 function run_lint() {
   # Add cpplint rule to BUILD files that do not contain it.
-  for file in $(find cyber modules -name BUILD |  grep -v gnss/third_party | \
+  for file in $(find cyber modules -name BUILD | \
+    grep -v gnss/third_party | grep -v modules/car1/encoder/nvenc_sdk6 | \
     xargs grep -l -E 'cc_library|cc_test|cc_binary' | xargs grep -L 'cpplint()')
   do
     sed -i '1i\load("//tools:cpplint.bzl", "cpplint")\n' $file
