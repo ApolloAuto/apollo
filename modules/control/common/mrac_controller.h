@@ -123,6 +123,18 @@ class MracController {
    */
   double CurrentReferenceState() const;
 
+  /**
+   * @brief get current state adaptive gain for reference system
+   * @return current state adaptive gain
+   */
+  double CurrentStateAdaptionGain() const;
+
+  /**
+   * @brief get current input adaptive gain for reference system
+   * @return current input adaptive gain
+   */
+  double CurrentInputAdaptionGain() const;
+
  protected:
   // reference model as a digital filter
   common::DigitalFilter reference_model_;

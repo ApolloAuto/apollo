@@ -47,17 +47,21 @@ TEST_F(MracControllerTest, MracControl) {
   MracController mrac_controller;
   mrac_controller.Init(mrac_conf, dt);
   mrac_controller.Reset();
-  EXPECT_NEAR(mrac_controller.Control(10.0, 5.0, dt), 0.0, 1e-6);
-  EXPECT_NEAR(mrac_controller.CurrentReferenceState(), 5.0, 1e-6);
+  EXPECT_NEAR(mrac_controller.Control(18.0, 6.0, dt), 0.0, 1e-6);
   mrac_controller.Reset();
-  EXPECT_NEAR(mrac_controller.Control(10.0, 10.0, dt), -5.0, 1e-6);
+  EXPECT_NEAR(mrac_controller.Control(18.0, 10.0, dt), -8.48, 1e-6);
+  EXPECT_NEAR(mrac_controller.CurrentReferenceState(), 6.0, 1e-6);
+  EXPECT_NEAR(mrac_controller.CurrentStateAdaptionGain(), -0.2, 1e-6);
+  EXPECT_NEAR(mrac_controller.CurrentInputAdaptionGain(), -0.36, 1e-6);
+  EXPECT_NEAR(mrac_controller.Control(18.0, 10.0, dt), -8.48, 1e-6);
+  EXPECT_NEAR(mrac_controller.CurrentReferenceState(), 14.0, 1e-6);
+  EXPECT_NEAR(mrac_controller.CurrentStateAdaptionGain(), -0.2, 1e-6);
+  EXPECT_NEAR(mrac_controller.CurrentInputAdaptionGain(), -0.36, 1e-6);
   mrac_controller.Reset();
-  EXPECT_NEAR(mrac_controller.Control(10.0, 15.0, dt), -16.25, 1e-6);
-  mrac_controller.Reset();
-  double control_value = mrac_controller.Control(-20.0, -25.0, dt);
-  EXPECT_NEAR(control_value, 76.875, 1e-6);
+  double control_value = mrac_controller.Control(-18.0, -10.0, dt);
+  EXPECT_NEAR(control_value, 8.48, 1e-6);
   dt = 0.0;
-  EXPECT_EQ(mrac_controller.Control(-25.0, -30.0, dt), control_value);
+  EXPECT_EQ(mrac_controller.Control(-18.0, -10.0, dt), control_value);
 }
 
 }  // namespace control
