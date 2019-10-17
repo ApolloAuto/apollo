@@ -148,13 +148,12 @@ void MracController::Adaption(std::vector<double> *law_adp,
                               const double gain_adp) {
   std::vector<double> state_error{state_action_[0] - state_reference_[0],
                                   state_action_[1] - state_reference_[1]};
-  double tmp = (*law_adp)[0];
   (*law_adp)[0] = (*law_adp)[1] -
                   (0.5 * Ts_ * gain_adp * state_adp[0] *
                    (state_error[0] + compensation_anti_windup_[0])) -
                   (0.5 * Ts_ * gain_adp * state_adp[1] *
                    (state_error[1] + compensation_anti_windup_[1]));
-  (*law_adp)[1] = tmp;
+  (*law_adp)[1] = (*law_adp)[0];
 }
 
 void MracController::AntiWindupCompensation(const double control_command,
@@ -183,8 +182,8 @@ void MracController::TransformReferenceModel(const double dt) {
       double a_ref = -1 / tau_reference_;
       kn_reference_[0] = a_ref * Ts_;
       kn_reference_[1] = a_ref * Ts_;
-      kd_reference_[0] = -2;
-      kd_reference_[1] = 2;
+      kd_reference_[0] = a_ref * Ts_ - 2;
+      kd_reference_[1] = a_ref * Ts_ + 2;
     } else if (reference_model_order_ == 2) {
       double a_ref = 2 * wn_reference_ * zeta_reference_;
       double b_ref = wn_reference_ * wn_reference_;
@@ -215,6 +214,14 @@ int MracController::ControlSaturationStatus() const {
 
 double MracController::CurrentReferenceState() const {
   return state_reference_[0];
+}
+
+double MracController::CurrentStateAdaptionGain() const {
+  return gain_state_adaption_[0];
+}
+
+double MracController::CurrentInputAdaptionGain() const {
+  return gain_input_adaption_[0];
 }
 
 }  // namespace control
