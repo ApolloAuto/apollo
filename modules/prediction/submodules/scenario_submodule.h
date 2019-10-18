@@ -16,7 +16,7 @@
 
 /**
  * @file
- * @brief Use container submodule to manage all containers
+ * @brief Use scenario submodule to deal with scenario-related tasks
  */
 
 #pragma once
@@ -25,26 +25,18 @@
 #include <string>
 
 #include "cyber/component/component.h"
-#include "modules/localization/proto/localization.pb.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/planning/proto/planning.pb.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
+
 #include "modules/prediction/proto/submodule_messages.pb.h"
 
-/**
- * @namespace apollo::prediction
- * @brief apollo::prediction
- */
 namespace apollo {
 namespace prediction {
 
-class ContainerSubmodule
-    : public cyber::Component<perception::PerceptionObstacles> {
+class ScenarioSubmodule : public cyber::Component<PredictionContainerMessage> {
  public:
   /**
    * @brief Destructor
    */
-  ~ContainerSubmodule();
+  ~ScenarioSubmodule();
 
   /**
    * @brief Get name of the node
@@ -59,25 +51,17 @@ class ContainerSubmodule
   bool Init() override;
 
   /**
-   * @brief Data callback upon receiving a perception obstacle message.
-   * @param Perception obstacle message.
+   * @brief Data callback upon receiving a prediction container message.
+   * @param Prediction container message.
    */
-  bool Proc(const std::shared_ptr<perception::PerceptionObstacles>&) override;
+  bool Proc(const std::shared_ptr<PredictionContainerMessage>&) override;
 
  private:
-  double component_start_time_ = 0.0;
-
-  double frame_start_time_ = 0.0;
-
-  std::shared_ptr<cyber::Reader<planning::ADCTrajectory>> planning_reader_;
-
-  std::shared_ptr<cyber::Reader<localization::LocalizationEstimate>>
-      localization_reader_;
-
-  std::shared_ptr<cyber::Writer<PredictionContainerMessage>> container_writer_;
+  // TODO(kechxu) define storytelling reader
+  // TODO(kechxu) define writer
 };
 
-CYBER_REGISTER_COMPONENT(ContainerSubmodule)
+CYBER_REGISTER_COMPONENT(ScenarioSubmodule)
 
 }  // namespace prediction
 }  // namespace apollo

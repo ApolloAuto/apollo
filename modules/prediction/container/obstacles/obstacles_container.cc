@@ -438,8 +438,8 @@ bool ObstaclesContainer::IsMovable(
 
 double ObstaclesContainer::timestamp() const { return timestamp_; }
 
-PredictionObstacles ObstaclesContainer::GetPredictionObstacles() {
-  PredictionObstacles prediction_obstacles;
+PredictionContainerMessage ObstaclesContainer::GetContainerMessage() {
+  PredictionContainerMessage container_message;
   for (const auto& id_pair : curr_frame_id_mapping_) {
     int id = id_pair.second;
     Obstacle* obstacle_ptr = GetObstacle(id);
@@ -449,11 +449,11 @@ PredictionObstacles ObstaclesContainer::GetPredictionObstacles() {
     }
     PredictionObstacle prediction_obstacle =
         obstacle_ptr->GeneratePredictionObstacle();
-    prediction_obstacles.add_prediction_obstacle()->CopyFrom(
+    container_message.add_prediction_obstacle()->CopyFrom(
         prediction_obstacle);
   }
   // TODO(kechxu) add other info into prediction_obstacles if needed
-  return prediction_obstacles;
+  return container_message;
 }
 
 }  // namespace prediction
