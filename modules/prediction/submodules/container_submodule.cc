@@ -53,8 +53,8 @@ bool ContainerSubmodule::Init() {
           FLAGS_localization_topic, nullptr);
 
   // TODO(kechxu) change topic name when finalized
-  prediction_writer_ =
-      node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
+  container_writer_ =
+      node_->CreateWriter<PredictionContainerMessage>(FLAGS_prediction_topic);
   return true;
 }
 
@@ -66,7 +66,12 @@ bool ContainerSubmodule::Proc(
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
   CHECK_NOTNULL(obstacles_container_ptr);
-  // TODO(kechxu): implement the writer
+
+  PredictionContainerMessage container_message =
+      obstacles_container_ptr->GetContainerMessage();
+  container_writer_->Write(std::make_shared<PredictionContainerMessage>(
+      container_message));
+
   return true;
 }
 
