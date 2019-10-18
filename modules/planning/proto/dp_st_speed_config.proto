@@ -2,6 +2,11 @@ syntax = "proto2";
 
 package apollo.planning;
 
+message SpeedHeuristicConfig {
+  optional DpStSpeedConfig default_speed_config = 1;
+  optional DpStSpeedConfig lane_change_speed_config = 2;
+}
+
 message DpStSpeedConfig {
   optional double unit_t = 1 [default = 1.0];
   optional int32 dense_dimension_s = 2 [default = 41];

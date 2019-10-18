@@ -52,7 +52,7 @@ class DpStGraphTest : public ::testing::Test {
     DpStSpeedConfig default_dp_config;
     for (const auto& cfg : planning_config.default_task_config()) {
       if (cfg.task_type() == TaskConfig::DP_ST_SPEED_OPTIMIZER) {
-        default_dp_config = cfg.dp_st_speed_config();
+        default_dp_config = cfg.speed_heuristic_config().default_speed_config();
         break;
       }
     }
@@ -61,7 +61,8 @@ class DpStGraphTest : public ::testing::Test {
     for (const auto& stage : config.stage_config()) {
       for (const auto& cfg : stage.task_config()) {
         if (cfg.task_type() == TaskConfig::DP_ST_SPEED_OPTIMIZER) {
-          dp_config_.MergeFrom(cfg.dp_st_speed_config());
+          dp_config_.MergeFrom(
+              cfg.speed_heuristic_config().default_speed_config());
           break;
         }
       }
