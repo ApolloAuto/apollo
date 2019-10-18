@@ -23,14 +23,10 @@ IN_FOLDER=$1
 EXTRINSIC_FILE=$2
 ZONE_ID=$3
 OUT_MAP_FOLDER=$4
-LIDAR_TYPE=${5:-128}
+LIDAR_TYPE=${5:-lidar128}
 
 PARSED_DATA_FOLDER="$OUT_MAP_FOLDER/parsed_data"
-if [ $LIDAR_TYPE -eq 16 ]; then
-  CLOUD_TOPIC="/apollo/sensor/velodyne16/compensator/PointCloud2"
-else
-  CLOUD_TOPIC="/apollo/sensor/lidar128/compensator/PointCloud2"
-fi
+CLOUD_TOPIC="/apollo/sensor/$LIDAR_TYPE/compensator/PointCloud2"
 
 function data_exporter() {
   local BAG_FILE=$1
@@ -74,6 +70,7 @@ function create_lossy_map() {
     --dstdir $OUT_MAP_FOLDER \
 
   rm -fr $OUT_MAP_FOLDER/lossless_map
+  rm -fr $OUT_MAP_FOLDER/parsed_data
   mv $OUT_MAP_FOLDER/lossy_map $OUT_MAP_FOLDER/local_map
 }
 

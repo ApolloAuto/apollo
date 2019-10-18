@@ -1,4 +1,4 @@
-job_type: VEHICLE_CALIBRATION
+job_type: VEHICLE_CALIBRATION or SIMPLE_HDMAP
 partner_id: "my-id"
 storage {
   bos {
@@ -9,3 +9,5 @@ storage {
   }
 }
 input_data_path: "path/to/records-and-conf"
+zone_id: my-zone
+lidar_type: "my-lidartype"
