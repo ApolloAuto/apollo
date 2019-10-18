@@ -147,6 +147,8 @@ message ScenarioPullOverConfig {
 }
 
 message ScenarioEmergencyPullOverConfig {
+	optional double max_stop_deceleration = 1 [default = 3.0];
+	optional double slow_down_deceleration_time = 2 [default = 3.0];  // second
 }
 
 message ScenarioValetParkingConfig {
@@ -231,8 +233,9 @@ message ScenarioConfig {
     PULL_OVER_RETRY_PARKING = 502;
 
     // emergency_pull_over scenario
-    EMERGENCY_PULL_OVER_APPROACH = 510;
-    EMERGENCY_PULL_OVER_STANDBY = 511;
+    EMERGENCY_PULL_OVER_SLOW_DOWN = 510;
+    EMERGENCY_PULL_OVER_APPROACH = 511;
+    EMERGENCY_PULL_OVER_STANDBY = 512;
 
     // valet parking scenario
     VALET_PARKING_APPROACHING_PARKING_SPOT = 520;
