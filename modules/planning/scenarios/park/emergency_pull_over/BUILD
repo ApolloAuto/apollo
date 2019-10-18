@@ -48,6 +48,21 @@ cc_test(
 )
 
 cc_test(
+    name = "stage_slow_down_test",
+    size = "small",
+    srcs = [
+        "stage_slow_down_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        ":emergency_pull_over_scenario",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
     name = "stage_approach_test",
     size = "small",
     srcs = [
