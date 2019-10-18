@@ -24,6 +24,8 @@
 #ifdef TELEOP
 #include "modules/car1/network/proto/modem_info.pb.h"
 #include "modules/car1/teleop/proto/daemon_service_cmd.pb.h"
+#include "modules/car1/teleop/proto/daemon_service_rpt.pb.h"
+#include "modules/planning/proto/pad_msg.pb.h"
 #endif
 
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
@@ -51,11 +53,36 @@ class TeleopService {
   WebSocketHandler *websocket_;
 
 #ifdef TELEOP
+
+  // modem info readers and callback
   std::shared_ptr<cyber::Reader<modules::car1::network::ModemInfo>>
-      modem_info_reader_;
+      modem0_info_reader_;
+  std::shared_ptr<cyber::Reader<modules::car1::network::ModemInfo>>
+      modem1_info_reader_;
+  std::shared_ptr<cyber::Reader<modules::car1::network::ModemInfo>>
+      modem2_info_reader_;
+  // modem info callback
+  void UpdateModem(unsigned int index,
+    const std::shared_ptr<modules::car1::network::ModemInfo> &modem_info);
+
+
+  // daemon nodes and feedback
+  void UpdateCarDaemonRpt(
+      const std::shared_ptr<modules::car1::teleop::DaemonServiceRpt> &rpt);
+  void UpdateOperatorDaemonRpt(
+      const std::shared_ptr<modules::car1::teleop::DaemonServiceRpt> &rpt);
 
   std::shared_ptr<cyber::Writer<modules::car1::teleop::DaemonServiceCmd>>
-      daemon_cmd_writer_;
+      car_daemon_cmd_writer_;
+  std::shared_ptr<cyber::Writer<modules::car1::teleop::DaemonServiceCmd>>
+      operator_daemon_cmd_writer_;
+  std::shared_ptr<cyber::Reader<modules::car1::teleop::DaemonServiceRpt>>
+      car_daemon_rpt_reader_;
+
+  // planning driving actions  and feedback
+  std::shared_ptr<cyber::Writer<apollo::planning::PadMessage>>
+      pad_message_writer_;
+
 #endif
 
   // Store teleop status
