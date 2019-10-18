@@ -250,8 +250,16 @@ void GriddedPathTimeGraph::GetRowRange(const StGraphPoint& point,
                                        size_t* next_highest_row,
                                        size_t* next_lowest_row) {
   double v0 = 0.0;
+  // TODO(all): Record speed information in StGraphPoint and deprecate this.
+  // A scaling parameter for DP range search due to the lack of accurate
+  // information of the current velocity (set to 1 by default since we use
+  // past 1 second's average v as approximation)
+  double acc_coeff = 1.0;
   if (!point.pre_point()) {
     v0 = init_point_.v();
+    // When we have accurate velocity from TrajectoryPoint,
+    // set acc_coeff to 0.5.
+    acc_coeff = 0.5;
   } else {
     v0 = (point.point().s() - point.pre_point()->point().s()) / unit_t_;
   }
@@ -259,9 +267,10 @@ void GriddedPathTimeGraph::GetRowRange(const StGraphPoint& point,
   const auto max_s_size = dimension_s_ - 1;
 
   const double max_acceleration = std::abs(vehicle_param_.max_acceleration());
-  const double speed_coeff = unit_t_ * unit_t_;
+  const double t_squared = unit_t_ * unit_t_;
   const double s_upper_bound =
-      v0 * unit_t_ + 0.5 * max_acceleration * speed_coeff + point.point().s();
+      v0 * unit_t_ + acc_coeff * max_acceleration * t_squared +
+      point.point().s();
   const auto next_highest_itr =
       std::lower_bound(spatial_distance_by_index_.begin(),
                        spatial_distance_by_index_.end(), s_upper_bound);
@@ -276,7 +285,7 @@ void GriddedPathTimeGraph::GetRowRange(const StGraphPoint& point,
   const double max_deceleration =
       -1.0 * std::abs(vehicle_param_.max_deceleration());
   const double s_lower_bound =
-      std::fmax(0.0, v0 * unit_t_ + 0.5 * max_deceleration * speed_coeff) +
+      std::fmax(0.0, v0 * unit_t_ + acc_coeff * max_deceleration * t_squared) +
       point.point().s();
   const auto next_lowest_itr =
       std::lower_bound(spatial_distance_by_index_.begin(),
@@ -356,13 +365,13 @@ void GriddedPathTimeGraph::CalculateCostAt(
           pre_col[r_pre].pre_point() == nullptr) {
         continue;
       }
-      // Use v0 = (pre_point.s - prepre_point.s) / unit_t as velocity estimate
-      // in acc estimate as 2.0 * (delta_s - v0*unit_t) / (unit_t*unit_t)
-      const double curr_a =
-          2.0 *
-          (cost_cr.point().s() + pre_col[r_pre].pre_point()->point().s() -
-           2 * pre_col[r_pre].point().s()) /
-          (unit_t_ * unit_t_);
+      // Use curr_v = (point.s - pre_point.s) / unit_t as current v
+      // Use pre_v = (pre_point.s - prepre_point.s) / unit_t as previous v
+      // Current acc estimate: curr_a = (curr_v - pre_v) / unit_t
+      // = (point.s + prepre_point.s - 2 * pre_point.s) / (unit_t * unit_t)
+      const double curr_a = (cost_cr.point().s() +
+           pre_col[r_pre].pre_point()->point().s() -
+           2 * pre_col[r_pre].point().s()) / (unit_t_ * unit_t_);
       if (curr_a < gridded_path_time_graph_config_.max_deceleration() ||
           curr_a > gridded_path_time_graph_config_.max_acceleration()) {
         continue;
@@ -394,11 +403,13 @@ void GriddedPathTimeGraph::CalculateCostAt(
         pre_col[r_pre].pre_point() == nullptr) {
       continue;
     }
-    const double curr_a =
-        2.0 *
-        (cost_cr.point().s() + pre_col[r_pre].pre_point()->point().s() -
-         2 * pre_col[r_pre].point().s()) /
-        (unit_t_ * unit_t_);
+    // Use curr_v = (point.s - pre_point.s) / unit_t as current v
+    // Use pre_v = (pre_point.s - prepre_point.s) / unit_t as previous v
+    // Current acc estimate: curr_a = (curr_v - pre_v) / unit_t
+    // = (point.s + prepre_point.s - 2 * pre_point.s) / (unit_t * unit_t)
+    const double curr_a = (cost_cr.point().s() +
+         pre_col[r_pre].pre_point()->point().s() -
+         2 * pre_col[r_pre].point().s()) / (unit_t_ * unit_t_);
     if (curr_a > vehicle_param_.max_acceleration() ||
         curr_a < vehicle_param_.max_deceleration()) {
       continue;
