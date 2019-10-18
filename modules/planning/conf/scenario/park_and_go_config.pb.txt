@@ -13,9 +13,7 @@ stage_type: PARK_AND_GO_CRUISE
 stage_config:{
   stage_type: PARK_AND_GO_CHECK
   enabled: true
-
 }
-
 
 stage_config:{
     stage_type: PARK_AND_GO_ADJUST
