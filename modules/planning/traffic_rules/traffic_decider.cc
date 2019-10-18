@@ -132,7 +132,7 @@ void TrafficDecider::BuildPlanningTarget(
         vehicle_config.vehicle_param().front_edge_to_center();
     stop_point.set_s(min_s - front_edge_to_center +
                      FLAGS_virtual_stop_wall_length / 2.0);
-    reference_line_info->SetStopPoint(stop_point);
+    reference_line_info->SetLatticeStopPoint(stop_point);
   }
 }
 
