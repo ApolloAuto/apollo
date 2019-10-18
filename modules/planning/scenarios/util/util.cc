@@ -254,7 +254,10 @@ bool CheckADCReadyToCruise(Frame* frame,
   ADEBUG << "is_near_front_obstacle: " << is_near_front_obstacle;
   ADEBUG << "heading_align_w_reference_line: "
          << heading_align_w_reference_line;
-  if (!is_near_front_obstacle && heading_align_w_reference_line) {
+  // check gear status
+  if ((common::VehicleStateProvider::Instance()->gear() ==
+       canbus::Chassis::GEAR_DRIVE) &&
+      !is_near_front_obstacle && heading_align_w_reference_line) {
     return true;
   }
   return false;
@@ -300,6 +303,7 @@ bool CheckADCHeading(const common::math::Vec2d adc_position,
                      const double adc_heading,
                      const ReferenceLineInfo& reference_line_info,
                      const double heading_diff_to_reference_line) {
+  const double kReducedHeadingBuffer = 0.2;  // TODO(Shu) move to config
   const auto& reference_line = reference_line_info.reference_line();
   common::SLPoint adc_position_sl;
   reference_line.XYToSL(adc_position, &adc_position_sl);
@@ -307,8 +311,13 @@ bool CheckADCHeading(const common::math::Vec2d adc_position,
   const auto reference_point =
       reference_line.GetReferencePoint(adc_position_sl.s());
   const auto path_point = reference_point.ToPathPoint(adc_position_sl.s());
-  if (std::fabs(common::math::NormalizeAngle(
-          adc_heading - path_point.theta())) < heading_diff_to_reference_line) {
+  AINFO << "heading difference: "
+        << common::math::NormalizeAngle(adc_heading - path_point.theta());
+  double angle_difference =
+      common::math::NormalizeAngle(adc_heading - path_point.theta());
+  if (angle_difference >
+          -1.0 * (heading_diff_to_reference_line - kReducedHeadingBuffer) &&
+      angle_difference < heading_diff_to_reference_line) {
     return true;
   }
   return false;
