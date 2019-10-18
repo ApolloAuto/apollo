@@ -77,4 +77,19 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "stage_standby_test",
+    size = "small",
+    srcs = [
+        "stage_standby_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        ":emergency_pull_over_scenario",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
