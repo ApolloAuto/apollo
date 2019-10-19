@@ -230,7 +230,8 @@ math::Vec2d VehicleStateProvider::EstimateFuturePosition(const double t) const {
                                          orientation.qy(), orientation.qz());
     Eigen::Vector3d pos_vec(vehicle_state_.x(), vehicle_state_.y(),
                             vehicle_state_.z());
-    auto future_pos_3d = quaternion.toRotationMatrix() * vec_distance + pos_vec;
+    const Eigen::Vector3d future_pos_3d =
+        quaternion.toRotationMatrix() * vec_distance + pos_vec;
     return math::Vec2d(future_pos_3d[0], future_pos_3d[1]);
   }
 
