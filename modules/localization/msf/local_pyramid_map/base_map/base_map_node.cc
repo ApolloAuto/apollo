@@ -323,14 +323,13 @@ bool BaseMapNode::GetCoordinate(const Eigen::Vector2d& coordinate,
       (coordinate[0] - left_top_corner[0]) / GetMapResolution());
   unsigned int off_y = static_cast<unsigned int>(
       (coordinate[1] - left_top_corner[1]) / GetMapResolution());
-  if (off_x >= 0 && off_x < this->map_config_->map_node_size_x_ && off_y >= 0 &&
+  if (off_x < this->map_config_->map_node_size_x_ &&
       off_y < this->map_config_->map_node_size_y_) {
-    *x = static_cast<unsigned int>(off_x);
-    *y = static_cast<unsigned int>(off_y);
+    *x = off_x;
+    *y = off_y;
     return true;
-  } else {
-    return false;
   }
+  return false;
 }
 
 bool BaseMapNode::GetCoordinate(const Eigen::Vector3d& coordinate,
