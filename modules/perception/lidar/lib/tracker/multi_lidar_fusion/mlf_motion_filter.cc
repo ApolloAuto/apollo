@@ -282,7 +282,7 @@ void MlfMotionFilter::OnlineCovarianceEstimation(
   size_t evaluate_window =
       std::min(track_data->history_objects_.size(),
                static_cast<size_t>(object->boostup_need_history_size));
-  if (evaluate_window <= 0) {
+  if (evaluate_window == 0) {
     // a default large covariance
     object->belief_velocity_online_covariance = Eigen::Matrix3d::Identity() *
                                                 predict_variance_per_sqrsec_ *

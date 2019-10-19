@@ -681,10 +681,9 @@ bool OpenSpaceRoiDecider::GetParkingBoundary(
         center_lane_s_left.begin(), center_lane_s_left.end(), right_top_s);
     size_t point_right_to_right_top_connor_index = std::distance(
         center_lane_s_left.begin(), point_right_to_right_top_connor_s);
-    point_right_to_right_top_connor_index =
-        point_right_to_right_top_connor_index <= 0
-            ? point_right_to_right_top_connor_index
-            : point_right_to_right_top_connor_index - 1;
+    if (point_right_to_right_top_connor_index > 0) {
+      --point_right_to_right_top_connor_index;
+    }
     auto point_right_to_right_top_connor_itr =
         left_lane_boundary.begin() + point_right_to_right_top_connor_index;
 
