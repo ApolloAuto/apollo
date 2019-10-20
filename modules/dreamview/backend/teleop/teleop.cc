@@ -66,7 +66,7 @@ void TeleopService::Start() {
            UpdateCarDaemonRpt(msg);
        });
 
-  car_daemon_rpt_reader_ = node_->CreateReader<DaemonServiceRpt>(
+  operator_daemon_rpt_reader_ = node_->CreateReader<DaemonServiceRpt>(
       "/apollo/teleop/operator/daemon_service/rpt",
        [this](const std::shared_ptr<DaemonServiceRpt> &msg) {
            UpdateOperatorDaemonRpt(msg);
@@ -111,7 +111,7 @@ void TeleopService::RegisterMessageHandlers() {
         {
           boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
           teleop_status_["video"] = !teleop_status_["video"];
-          AINFO << "ToggleVideo" << std::endl;
+          AINFO << "ToggleVideo";
         }
       });
   // Issue pull-over command to remote
@@ -138,7 +138,7 @@ void TeleopService::SendStatus(WebSocketHandler::Connection *conn) {
   {
     boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
     to_send = teleop_status_.dump();
-    AINFO << "status: " << to_send << std::endl;
+    AINFO << "status: " << to_send;
   }
   websocket_->SendData(conn, to_send);
 }
@@ -147,12 +147,10 @@ void TeleopService::SendStatus(WebSocketHandler::Connection *conn) {
 void TeleopService::UpdateModem(unsigned int index,
     const std::shared_ptr<ModemInfo> &modem_info) {
 
-    // AINFO << "UpdateModem: " << index << std::endl;
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
     // TODO simplify data and only send necessary info for display
     // update modem_info_
     if (modem_info->has_provider() && modem_info->has_technology()) {
-        boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
         std::string modemId = "0";
         if (index == 0) {
             modemId = "1";
@@ -195,7 +193,6 @@ void TeleopService::UpdateCarDaemonRpt(
 void TeleopService::UpdateOperatorDaemonRpt(
     const std::shared_ptr<DaemonServiceRpt> &daemon_rpt) {
   {
-      boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
       // AINFO << "OperatorDaemonRpt" << std::endl;
       bool voipIsRunning = false;
       for (int i = 0; i < daemon_rpt->services_size(); i++) {
@@ -205,6 +202,7 @@ void TeleopService::UpdateOperatorDaemonRpt(
               voipIsRunning = true;
           }
       }
+      boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
       teleop_status_["mic"] = voipIsRunning;
 
   }

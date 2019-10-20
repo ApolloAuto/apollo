@@ -65,19 +65,20 @@ class TeleopService {
   void UpdateModem(unsigned int index,
     const std::shared_ptr<modules::car1::network::ModemInfo> &modem_info);
 
-
-  // daemon nodes and feedback
+  // daemon report readers and callback
   void UpdateCarDaemonRpt(
       const std::shared_ptr<modules::car1::teleop::DaemonServiceRpt> &rpt);
   void UpdateOperatorDaemonRpt(
       const std::shared_ptr<modules::car1::teleop::DaemonServiceRpt> &rpt);
-
+  std::shared_ptr<cyber::Reader<modules::car1::teleop::DaemonServiceRpt>>
+      car_daemon_rpt_reader_;
+  std::shared_ptr<cyber::Reader<modules::car1::teleop::DaemonServiceRpt>>
+      operator_daemon_rpt_reader_;
+  // daemon commands writers
   std::shared_ptr<cyber::Writer<modules::car1::teleop::DaemonServiceCmd>>
       car_daemon_cmd_writer_;
   std::shared_ptr<cyber::Writer<modules::car1::teleop::DaemonServiceCmd>>
       operator_daemon_cmd_writer_;
-  std::shared_ptr<cyber::Reader<modules::car1::teleop::DaemonServiceRpt>>
-      car_daemon_rpt_reader_;
 
   // planning driving actions  and feedback
   std::shared_ptr<cyber::Writer<apollo::planning::PadMessage>>
