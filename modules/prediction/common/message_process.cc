@@ -31,6 +31,7 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/validation_checker.h"
+#include "modules/prediction/container/storytelling/storytelling_container.h"
 #include "modules/prediction/evaluator/evaluator_manager.h"
 #include "modules/prediction/predictor/predictor_manager.h"
 #include "modules/prediction/proto/offline_features.pb.h"
@@ -131,6 +132,12 @@ void MessageProcess::ContainerProcess(
       ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
           AdapterConfig::PLANNING_TRAJECTORY);
   CHECK_NOTNULL(ptr_ego_trajectory_container);
+
+  // Get storytelling_container
+  auto ptr_storytelling_container =
+      ContainerManager::Instance()->GetContainer<StoryTellingContainer>(
+          AdapterConfig::STORYTELLING);
+  CHECK_NOTNULL(ptr_storytelling_container);
 
   // Insert ADC into the obstacle_container.
   const PerceptionObstacle* ptr_ego_vehicle =

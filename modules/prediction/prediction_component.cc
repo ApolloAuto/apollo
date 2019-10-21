@@ -81,6 +81,9 @@ bool PredictionComponent::Init() {
       node_->CreateReader<localization::LocalizationEstimate>(
           FLAGS_localization_topic, nullptr);
 
+  storytelling_reader_ = node_->CreateReader<storytelling::Stories>(
+          FLAGS_storytelling_topic, nullptr);
+
   prediction_writer_ =
       node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
 
