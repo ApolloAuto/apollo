@@ -147,7 +147,6 @@ void TeleopService::SendStatus(WebSocketHandler::Connection *conn) {
 void TeleopService::UpdateModem(unsigned int index,
     const std::shared_ptr<ModemInfo> &modem_info) {
 
-    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
     // TODO simplify data and only send necessary info for display
     // update modem_info_
     if (modem_info->has_provider() && modem_info->has_technology()) {
@@ -164,6 +163,7 @@ void TeleopService::UpdateModem(unsigned int index,
 
         // teleop_status_["modems"][modem_info->provider()] =
         //  modem_info->technology();
+        boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
         teleop_status_["modems"][modemId] = modem_info->technology();
     }
 }
