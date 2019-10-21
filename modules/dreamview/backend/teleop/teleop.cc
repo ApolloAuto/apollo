@@ -29,6 +29,11 @@ using modules::car1::teleop::DaemonServiceCmd;
 using modules::car1::teleop::DaemonServiceRpt;
 using apollo::planning::PadMessage;
 
+// modem ids
+const std::string modem0_id = "0";
+const std::string modem1_id = "1";
+const std::string modem2_id = "2";
+
 // channels
 const std::string modem0_channel = "/apollo/teleop/network/modem0";
 const std::string modem1_channel = "/apollo/teleop/network/modem1";
@@ -55,15 +60,16 @@ void TeleopService::Start() {
 
   modem0_info_reader_ = node_->CreateReader<ModemInfo>(
       modem0_channel,
-      [this](const std::shared_ptr<ModemInfo> &msg) { UpdateModem(0, msg); });
+      [this](const std::shared_ptr<ModemInfo> &msg) {UpdateModem(modem0_id, msg); 
+      });
 
   modem1_info_reader_ = node_->CreateReader<ModemInfo>(
       modem1_channel,
-      [this](const std::shared_ptr<ModemInfo> &msg) { UpdateModem(1, msg); });
+      [this](const std::shared_ptr<ModemInfo> &msg) { UpdateModem(modem1_id, msg); });
 
   modem2_info_reader_ = node_->CreateReader<ModemInfo>(
       modem2_channel,
-      [this](const std::shared_ptr<ModemInfo> &msg) { UpdateModem(2, msg); });
+      [this](const std::shared_ptr<ModemInfo> &msg) { UpdateModem(modem2_id, msg); });
 
   car_daemon_cmd_writer_ = node_->CreateWriter<DaemonServiceCmd>(
       car_daemon_cmd_channel);
@@ -155,27 +161,16 @@ void TeleopService::SendStatus(WebSocketHandler::Connection *conn) {
 }
 
 
-void TeleopService::UpdateModem(unsigned int index,
+void TeleopService::UpdateModem(const std::string &modem_id,
     const std::shared_ptr<ModemInfo> &modem_info) {
 
     // TODO simplify data and only send necessary info for display
     // update modem_info_
     if (modem_info->has_provider() && modem_info->has_technology()) {
-        std::string modemId = "0";
-        if (index == 0) {
-            modemId = "1";
-        }
-        if (index == 1) {
-            modemId = "2";
-        }
-        if (index == 2) {
-            modemId = "3";
-        }
-
         // teleop_status_["modems"][modem_info->provider()] =
         //  modem_info->technology();
         boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-        teleop_status_["modems"][modemId] = modem_info->technology();
+        teleop_status_["modems"][modem_id] = modem_info->technology();
     }
 }
 

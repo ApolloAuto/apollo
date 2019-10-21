@@ -62,7 +62,7 @@ class TeleopService {
   std::shared_ptr<cyber::Reader<modules::car1::network::ModemInfo>>
       modem2_info_reader_;
   // modem info callback
-  void UpdateModem(unsigned int index,
+  void UpdateModem(const std::string &modem_id,
     const std::shared_ptr<modules::car1::network::ModemInfo> &modem_info);
 
   // daemon report readers and callback
