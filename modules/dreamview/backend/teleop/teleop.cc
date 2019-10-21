@@ -180,10 +180,8 @@ void TeleopService::UpdateCarDaemonRpt(
           if (service.find("voip_encoder") >= 0) {
               voipIsRunning = true;
           }          
-	  else {
-	      if (service.find("encoder") >= 0) {
-                  aVideoEncoderIsRunning = true; 
-	      }
+	  else if (service.find("encoder") >= 0) {
+              aVideoEncoderIsRunning = true; 
           }
 
       }
