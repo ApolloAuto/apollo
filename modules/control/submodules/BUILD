@@ -23,7 +23,11 @@ cc_library(
         "//modules/common/util",
         "//modules/control/common:control_gflags",
         "//modules/control/controller",
+<<<<<<< HEAD
         "//modules/control/proto:mpc_controller_conf_proto",
+=======
+        "//modules/control/proto:control_proto",
+>>>>>>> control: added implementation to MPC submodule Init()
         "//modules/localization/proto:localization_proto",
         "//modules/planning/proto:planning_proto",
     ],

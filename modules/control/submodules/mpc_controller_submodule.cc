@@ -28,6 +28,9 @@ using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
+MPCControllerSubmodule::MPCControllerSubmodule()
+    : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
+
 MPCControllerSubmodule::~MPCControllerSubmodule() {}
 
 std::string MPCControllerSubmodule::Name() const {
@@ -41,7 +44,14 @@ bool MPCControllerSubmodule::Init() {
                   FLAGS_mpc_controller_conf_file;
     return false;
   }
-  // TODO(SHU): implementation
+
+  // MPC controller
+  if (!mpc_controller_.Init(&mpc_controller_conf_).ok()) {
+    monitor_logger_buffer_.ERROR(
+        "MPC Control init controller failed! Stopping...");
+    return false;
+  }
+  // initialize readers and writers
   cyber::ReaderConfig chassis_reader_config;
   chassis_reader_config.channel_name = FLAGS_chassis_topic;
   chassis_reader_config.pending_queue_size = FLAGS_chassis_pending_queue_size;
@@ -49,6 +59,48 @@ bool MPCControllerSubmodule::Init() {
   chassis_reader_ =
       node_->CreateReader<Chassis>(chassis_reader_config, nullptr);
   CHECK(chassis_reader_ != nullptr);
+
+  cyber::ReaderConfig planning_reader_config;
+  planning_reader_config.channel_name = FLAGS_planning_trajectory_topic;
+  planning_reader_config.pending_queue_size = FLAGS_planning_pending_queue_size;
+
+  trajectory_reader_ =
+      node_->CreateReader<ADCTrajectory>(planning_reader_config, nullptr);
+  CHECK(trajectory_reader_ != nullptr);
+
+  cyber::ReaderConfig localization_reader_config;
+  localization_reader_config.channel_name = FLAGS_localization_topic;
+  localization_reader_config.pending_queue_size =
+      FLAGS_localization_pending_queue_size;
+
+  localization_reader_ = node_->CreateReader<LocalizationEstimate>(
+      localization_reader_config, nullptr);
+  CHECK(localization_reader_ != nullptr);
+
+  cyber::ReaderConfig pad_msg_reader_config;
+  pad_msg_reader_config.channel_name = FLAGS_pad_topic;
+  pad_msg_reader_config.pending_queue_size = FLAGS_pad_msg_pending_queue_size;
+
+  pad_msg_reader_ =
+      node_->CreateReader<PadMessage>(pad_msg_reader_config, nullptr);
+  CHECK(pad_msg_reader_ != nullptr);
+
+  control_command_writer_ =
+      node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
+  CHECK(control_command_writer_ != nullptr);
+
+  // set initial vehicle state by cmd
+  // need to sleep, because advertised channel is not ready immediately
+  // simple test shows a short delay of 80 ms or so
+  AINFO << "Control resetting vehicle state, sleeping for 1000 ms ...";
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+  // should init_vehicle first, let car enter work status, then use status msg
+  // trigger control
+  AINFO << "Control default driving action is "
+        << DrivingAction_Name(mpc_controller_conf_.action());
+  pad_msg_.set_action(mpc_controller_conf_.action());
+
   return true;
 }
 
@@ -63,7 +115,7 @@ bool MPCControllerSubmodule::Proc() {
     return false;
   }
 
-  // TODO(shu): implementation
+  // TODO(Shu): implementation
   return true;
 }
 

@@ -24,19 +24,24 @@
 #include "cyber/component/timer_component.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/common/util/util.h"
 #include "modules/control/controller/controller.h"
+#include "modules/control/controller/mpc_controller.h"
 #include "modules/control/proto/control_cmd.pb.h"
-#include "modules/control/proto/mpc_controller_conf.pb.h"
+#include "modules/control/proto/control_conf.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
-
-#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace control {
 class MPCControllerSubmodule final : public apollo::cyber::TimerComponent {
  public:
+  /**
+   * @brief Construct a new MPCControllerSubmodule object
+   *
+   */
+  MPCControllerSubmodule();
   /**
    * @brief Destructor
    */
@@ -63,17 +68,28 @@ class MPCControllerSubmodule final : public apollo::cyber::TimerComponent {
   bool Proc() override;
 
  private:
-  std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
-      localization_reader_;
+  double init_time_ = 0.0;
+
+  MPCController mpc_controller_;
+
+  localization::LocalizationEstimate latest_localization_;
+  canbus::Chassis latest_chassis_;
+  planning::ADCTrajectory latest_trajectory_;
+  PadMessage pad_msg_;
+  common::Header latest_replan_trajectory_header_;
 
   std::shared_ptr<cyber::Reader<apollo::canbus::Chassis>> chassis_reader_;
-
-  std::shared_ptr<cyber::Reader<planning::ADCTrajectory>> planning_reader_;
-
+  std::shared_ptr<cyber::Reader<apollo::control::PadMessage>> pad_msg_reader_;
+  std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
+      localization_reader_;
+  std::shared_ptr<cyber::Reader<planning::ADCTrajectory>> trajectory_reader_;
   std::shared_ptr<cyber::Writer<apollo::control::ControlCommand>>
       control_command_writer_;
 
-  MPCControllerConf mpc_controller_conf_;
+  common::monitor::MonitorLogBuffer monitor_logger_buffer_;
+
+  // TODO(SHU): separate conf
+  ControlConf mpc_controller_conf_;
 };
 
 CYBER_REGISTER_COMPONENT(MPCControllerSubmodule)
