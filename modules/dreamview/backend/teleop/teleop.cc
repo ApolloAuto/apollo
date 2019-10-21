@@ -172,18 +172,21 @@ void TeleopService::UpdateCarDaemonRpt(
     const std::shared_ptr<DaemonServiceRpt> &daemon_rpt) {
   {
       boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-      // AINFO << "CarDaemonRpt" << std::endl;
       bool aVideoEncoderIsRunning = false;
       bool voipIsRunning = false;
       for (int i = 0; i < daemon_rpt->services_size(); i++) {
+	  // look for voip_encoder or encoder0..1.2
+	  // check 'voip_encoder' first because it contains 'encoder'
           std::string service =  daemon_rpt->services(i);
-          AINFO <<  "  *" << service << std::endl;
-          if (service.find("encoder") >= 0) {
-              aVideoEncoderIsRunning = true;
-          }
           if (service.find("voip_encoder") >= 0) {
               voipIsRunning = true;
+          }          
+	  else {
+	      if (service.find("encoder") >= 0) {
+                  aVideoEncoderIsRunning = true; 
+	      }
           }
+
       }
       teleop_status_["video"] = aVideoEncoderIsRunning;
       teleop_status_["audio"] = voipIsRunning;
