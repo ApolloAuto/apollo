@@ -122,7 +122,7 @@ Status ObjectsXmlParser::ParseSpeedBumps(
         RETURN_IF_ERROR(UtilXmlParser::ParseGeometry(*sub_node, curve_segment));
         sub_node = sub_node->NextSiblingElement("geometry");
       }
-      if (speed_bump.position_size() <= 0) {
+      if (speed_bump.position().empty()) {
         std::string err_msg = "Error speed bump miss stop line.";
         return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
       }

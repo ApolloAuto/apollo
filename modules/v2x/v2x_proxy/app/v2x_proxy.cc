@@ -132,7 +132,7 @@ void V2xProxy::OnX2vTrafficLightTimer() {
     return;
   }
   auto current_traff = x2v_trafficlight_->mutable_current_lane_trafficlight();
-  if (current_traff->single_traffic_light_size() <= 0) {
+  if (current_traff->single_traffic_light().empty()) {
     AERROR << "Error:v2x trafficlight ignore, no traffic light contained.";
     return;
   }
