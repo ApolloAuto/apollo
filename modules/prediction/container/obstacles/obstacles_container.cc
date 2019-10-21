@@ -449,8 +449,7 @@ PredictionContainerMessage ObstaclesContainer::GetContainerMessage() {
     }
     PredictionObstacle prediction_obstacle =
         obstacle_ptr->GeneratePredictionObstacle();
-    container_message.add_prediction_obstacle()->CopyFrom(
-        prediction_obstacle);
+    container_message.add_prediction_obstacle()->CopyFrom(prediction_obstacle);
   }
   // TODO(kechxu) add other info into prediction_obstacles if needed
   return container_message;

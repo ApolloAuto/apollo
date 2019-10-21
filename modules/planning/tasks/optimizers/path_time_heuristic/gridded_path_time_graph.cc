@@ -268,9 +268,9 @@ void GriddedPathTimeGraph::GetRowRange(const StGraphPoint& point,
 
   const double max_acceleration = std::abs(vehicle_param_.max_acceleration());
   const double t_squared = unit_t_ * unit_t_;
-  const double s_upper_bound =
-      v0 * unit_t_ + acc_coeff * max_acceleration * t_squared +
-      point.point().s();
+  const double s_upper_bound = v0 * unit_t_ +
+                               acc_coeff * max_acceleration * t_squared +
+                               point.point().s();
   const auto next_highest_itr =
       std::lower_bound(spatial_distance_by_index_.begin(),
                        spatial_distance_by_index_.end(), s_upper_bound);
@@ -369,9 +369,10 @@ void GriddedPathTimeGraph::CalculateCostAt(
       // Use pre_v = (pre_point.s - prepre_point.s) / unit_t as previous v
       // Current acc estimate: curr_a = (curr_v - pre_v) / unit_t
       // = (point.s + prepre_point.s - 2 * pre_point.s) / (unit_t * unit_t)
-      const double curr_a = (cost_cr.point().s() +
-           pre_col[r_pre].pre_point()->point().s() -
-           2 * pre_col[r_pre].point().s()) / (unit_t_ * unit_t_);
+      const double curr_a =
+          (cost_cr.point().s() + pre_col[r_pre].pre_point()->point().s() -
+           2 * pre_col[r_pre].point().s()) /
+          (unit_t_ * unit_t_);
       if (curr_a < gridded_path_time_graph_config_.max_deceleration() ||
           curr_a > gridded_path_time_graph_config_.max_acceleration()) {
         continue;
@@ -407,9 +408,10 @@ void GriddedPathTimeGraph::CalculateCostAt(
     // Use pre_v = (pre_point.s - prepre_point.s) / unit_t as previous v
     // Current acc estimate: curr_a = (curr_v - pre_v) / unit_t
     // = (point.s + prepre_point.s - 2 * pre_point.s) / (unit_t * unit_t)
-    const double curr_a = (cost_cr.point().s() +
-         pre_col[r_pre].pre_point()->point().s() -
-         2 * pre_col[r_pre].point().s()) / (unit_t_ * unit_t_);
+    const double curr_a =
+        (cost_cr.point().s() + pre_col[r_pre].pre_point()->point().s() -
+         2 * pre_col[r_pre].point().s()) /
+        (unit_t_ * unit_t_);
     if (curr_a > vehicle_param_.max_acceleration() ||
         curr_a < vehicle_param_.max_deceleration()) {
       continue;

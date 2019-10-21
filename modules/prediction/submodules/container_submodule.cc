@@ -69,8 +69,8 @@ bool ContainerSubmodule::Proc(
 
   PredictionContainerMessage container_message =
       obstacles_container_ptr->GetContainerMessage();
-  container_writer_->Write(std::make_shared<PredictionContainerMessage>(
-      container_message));
+  container_writer_->Write(
+      std::make_shared<PredictionContainerMessage>(container_message));
 
   return true;
 }

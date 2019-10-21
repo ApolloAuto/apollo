@@ -109,8 +109,8 @@ Status PathBoundsDecider::Process(
                                ->mutable_planning_status()
                                ->mutable_pull_over();
   auto* emergency_pull_over_status = PlanningContext::Instance()
-                                     ->mutable_planning_status()
-                                     ->mutable_emergency_pull_over();
+                                         ->mutable_planning_status()
+                                         ->mutable_emergency_pull_over();
   is_in_pull_over_scenario_ = pull_over_status->is_in_pull_over_scenario();
   is_in_emergency_pull_over_scenario_ =
       emergency_pull_over_status->is_in_emergency_pull_over_scenario();
@@ -415,23 +415,19 @@ Status PathBoundsDecider::GeneratePullOverPathBound(
                                ->mutable_planning_status()
                                ->mutable_pull_over();
   auto* emergency_pull_over_status = PlanningContext::Instance()
-                                     ->mutable_planning_status()
-                                     ->mutable_emergency_pull_over();
+                                         ->mutable_planning_status()
+                                         ->mutable_emergency_pull_over();
   // If already found a pull-over position, simply check if it's valid.
   int curr_idx = -1;
   if (emergency_pull_over_status->has_position()) {
     curr_idx = IsPointWithinPathBound(
-        reference_line_info,
-        emergency_pull_over_status->position().x(),
-        emergency_pull_over_status->position().y(),
-        *path_bound);
+        reference_line_info, emergency_pull_over_status->position().x(),
+        emergency_pull_over_status->position().y(), *path_bound);
   } else if (pull_over_status->is_feasible() &&
-      pull_over_status->has_position()) {
+             pull_over_status->has_position()) {
     curr_idx = IsPointWithinPathBound(
-        reference_line_info,
-        pull_over_status->position().x(),
-        pull_over_status->position().y(),
-        *path_bound);
+        reference_line_info, pull_over_status->position().x(),
+        pull_over_status->position().y(), *path_bound);
   }
   if (curr_idx >= 0) {
     // Trim path-bound properly.
@@ -473,9 +469,9 @@ Status PathBoundsDecider::GeneratePullOverPathBound(
     emergency_pull_over_status->set_theta(std::get<2>(pull_over_configuration));
 
     ADEBUG << "Emergency Pull Over: x["
-           << emergency_pull_over_status->position().x()
-           << "] y[" << emergency_pull_over_status->position().y()
-           << "] theta["<< emergency_pull_over_status->theta() << "]";
+           << emergency_pull_over_status->position().x() << "] y["
+           << emergency_pull_over_status->position().y() << "] theta["
+           << emergency_pull_over_status->theta() << "]";
 
   } else if (is_in_pull_over_scenario_) {
     pull_over_status->Clear();
@@ -500,7 +496,7 @@ Status PathBoundsDecider::GeneratePullOverPathBound(
 
   curr_idx = std::get<3>(pull_over_configuration);
   while (static_cast<int>(path_bound->size()) - 1 >
-        curr_idx + kNumExtraTailBoundPoint) {
+         curr_idx + kNumExtraTailBoundPoint) {
     path_bound->pop_back();
   }
   for (size_t idx = curr_idx + 1; idx < path_bound->size(); ++idx) {
@@ -572,8 +568,7 @@ int PathBoundsDecider::IsPointWithinPathBound(
 }
 
 bool PathBoundsDecider::FindDestinationPullOverS(
-    const Frame& frame,
-    const ReferenceLineInfo& reference_line_info,
+    const Frame& frame, const ReferenceLineInfo& reference_line_info,
     const std::vector<std::tuple<double, double, double>>& path_bound,
     double* pull_over_s) {
   // destination_s based on routing_end
@@ -611,8 +606,7 @@ bool PathBoundsDecider::FindDestinationPullOverS(
 }
 
 bool PathBoundsDecider::FindEmergencyPullOverS(
-    const ReferenceLineInfo& reference_line_info,
-    double* pull_over_s) {
+    const ReferenceLineInfo& reference_line_info, double* pull_over_s) {
   const double adc_end_s = reference_line_info.AdcSlBoundary().end_s();
 
   // TODO(all): to be implemented
@@ -621,8 +615,7 @@ bool PathBoundsDecider::FindEmergencyPullOverS(
 }
 
 bool PathBoundsDecider::SearchPullOverPosition(
-    const Frame& frame,
-    const ReferenceLineInfo& reference_line_info,
+    const Frame& frame, const ReferenceLineInfo& reference_line_info,
     const std::vector<std::tuple<double, double, double>>& path_bound,
     std::tuple<double, double, double, int>* const pull_over_configuration) {
   double pull_over_s = 0.0;
@@ -654,7 +647,7 @@ bool PathBoundsDecider::SearchPullOverPosition(
   } else {
     // 1. Locate the first point after emergency_pull_over s.
     while (idx < static_cast<int>(path_bound.size()) &&
-        std::get<0>(path_bound[idx]) < pull_over_s) {
+           std::get<0>(path_bound[idx]) < pull_over_s) {
       ++idx;
     }
   }
@@ -677,19 +670,19 @@ bool PathBoundsDecider::SearchPullOverPosition(
   // 2. Find a window that is close to road-edge.
   bool has_a_feasible_window = false;
   while ((search_backward && idx >= 0 &&
-         std::get<0>(path_bound[idx]) - std::get<0>(path_bound.front()) >
-             pull_over_space_length) ||
+          std::get<0>(path_bound[idx]) - std::get<0>(path_bound.front()) >
+              pull_over_space_length) ||
          (!search_backward && idx < static_cast<int>(path_bound.size()) &&
-         std::get<0>(path_bound.back()) - std::get<0>(path_bound[idx])) >
+          std::get<0>(path_bound.back()) - std::get<0>(path_bound[idx])) >
              pull_over_space_length) {
     int j = idx;
     bool is_feasible_window = true;
     while ((search_backward && j >= 0 &&
-        std::get<0>(path_bound[idx]) - std::get<0>(path_bound[j]) <
-            pull_over_space_length) ||
-        (!search_backward && j < static_cast<int>(path_bound.size()) &&
-        std::get<0>(path_bound[j]) - std::get<0>(path_bound[idx]) <
-            pull_over_space_length)) {
+            std::get<0>(path_bound[idx]) - std::get<0>(path_bound[j]) <
+                pull_over_space_length) ||
+           (!search_backward && j < static_cast<int>(path_bound.size()) &&
+            std::get<0>(path_bound[j]) - std::get<0>(path_bound[idx]) <
+                pull_over_space_length)) {
       double curr_s = std::get<0>(path_bound[j]);
       double curr_right_bound = std::fabs(std::get<1>(path_bound[j]));
       double curr_road_left_width = 0;
