@@ -49,8 +49,8 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:message_process",
         "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/scenario:scenario_manager",
         "//modules/prediction/proto:submodule_messages_proto",
+        "//modules/prediction/scenario:scenario_manager",
     ],
 )
 
