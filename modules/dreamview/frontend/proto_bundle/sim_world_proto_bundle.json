@@ -3553,6 +3553,18 @@
                 }
               }
             },
+            "SpeedHeuristicConfig": {
+              "fields": {
+                "defaultSpeedConfig": {
+                  "type": "DpStSpeedConfig",
+                  "id": 1
+                },
+                "laneChangeSpeedConfig": {
+                  "type": "DpStSpeedConfig",
+                  "id": 2
+                }
+              }
+            },
             "DpStSpeedConfig": {
               "fields": {
                 "unitT": {
@@ -4964,7 +4976,7 @@
                 "CHANGE_RIGHT": 2,
                 "PULL_OVER": 3,
                 "STOP": 4,
-                "RESTART_CRUISE": 5
+                "RESUME_CRUISE": 5
               }
             },
             "PadMessage": {
@@ -6002,7 +6014,7 @@
               "oneofs": {
                 "taskConfig": {
                   "oneof": [
-                    "dpStSpeedConfig",
+                    "speedHeuristicConfig",
                     "pathDeciderConfig",
                     "proceedWithCautionSpeedConfig",
                     "creepDeciderConfig",
@@ -6029,8 +6041,8 @@
                   "type": "TaskType",
                   "id": 1
                 },
-                "dpStSpeedConfig": {
-                  "type": "DpStSpeedConfig",
+                "speedHeuristicConfig": {
+                  "type": "SpeedHeuristicConfig",
                   "id": 3
                 },
                 "pathDeciderConfig": {
@@ -6425,7 +6437,22 @@
               }
             },
             "ScenarioEmergencyPullOverConfig": {
-              "fields": {}
+              "fields": {
+                "maxStopDeceleration": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 3
+                  }
+                },
+                "slowDownDecelerationTime": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 3
+                  }
+                }
+              }
             },
             "ScenarioValetParkingConfig": {
               "fields": {
@@ -6631,8 +6658,9 @@
                     "PULL_OVER_APPROACH": 500,
                     "PULL_OVER_RETRY_APPROACH_PARKING": 501,
                     "PULL_OVER_RETRY_PARKING": 502,
-                    "EMERGENCY_PULL_OVER_APPROACH": 510,
-                    "EMERGENCY_PULL_OVER_STANDBY": 511,
+                    "EMERGENCY_PULL_OVER_SLOW_DOWN": 510,
+                    "EMERGENCY_PULL_OVER_APPROACH": 511,
+                    "EMERGENCY_PULL_OVER_STANDBY": 512,
                     "VALET_PARKING_APPROACHING_PARKING_SPOT": 520,
                     "VALET_PARKING_PARKING": 521,
                     "PARK_AND_GO_CHECK": 600,
