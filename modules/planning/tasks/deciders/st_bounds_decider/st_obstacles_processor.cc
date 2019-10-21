@@ -102,8 +102,8 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
       // Obstacle doesn't appear on ST-Graph.
       continue;
     }
-    auto boundary = STBoundary::CreateInstanceAccurate(
-        lower_points, upper_points);
+    auto boundary =
+        STBoundary::CreateInstanceAccurate(lower_points, upper_points);
     boundary.set_id(obs_ptr->Id());
     if (obs_ptr->Trajectory().trajectory_point().empty()) {
       // Obstacle is static.
@@ -137,10 +137,10 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
   // Preprocess the obstacles for sweep-line algorithms.
   // Fetch every obstacle's beginning end ending t-edges only.
   for (auto it : obs_id_to_st_boundary_) {
-    obs_t_edges_.emplace_back(true, it.second.min_t(),
-        it.second.min_s(), it.second.max_s(), it.first);
-    obs_t_edges_.emplace_back(false, it.second.max_t(),
-        it.second.min_s(), it.second.max_s(), it.first);
+    obs_t_edges_.emplace_back(true, it.second.min_t(), it.second.min_s(),
+                              it.second.max_s(), it.first);
+    obs_t_edges_.emplace_back(false, it.second.max_t(), it.second.min_s(),
+                              it.second.max_s(), it.first);
   }
   // Sort the edges.
   std::sort(obs_t_edges_.begin(), obs_t_edges_.end(),
@@ -160,10 +160,10 @@ STObstaclesProcessor::GetAllSTBoundaries() {
   return obs_id_to_st_boundary_;
 }
 
-bool STObstaclesProcessor::GetSBoundsFromDecisions(double t,
-    std::vector<std::pair<double, double>>* const available_s_bounds,
-    std::vector<std::vector<std::pair<std::string, ObjectDecisionType>>>*
-        const available_obs_decisions) {
+bool STObstaclesProcessor::GetSBoundsFromDecisions(
+    double t, std::vector<std::pair<double, double>>* const available_s_bounds,
+    std::vector<std::vector<std::pair<std::string, ObjectDecisionType>>>* const
+        available_obs_decisions) {
   // Sanity checks.
   available_s_bounds->clear();
   available_obs_decisions->clear();
@@ -202,8 +202,9 @@ bool STObstaclesProcessor::GetSBoundsFromDecisions(double t,
       s_min = std::fmin(s_min, obs_s_max);
     }
   }
-  if (s_min > s_max)
+  if (s_min > s_max) {
     return false;
+  }
 
   // For newly entering st_boundaries, determine possible new-boundaries.
   // For apparent ones, make decisions directly.
@@ -213,13 +214,11 @@ bool STObstaclesProcessor::GetSBoundsFromDecisions(double t,
       if (std::get<2>(obs_t_edge) >= s_max) {
         obs_id_to_decision_[std::get<4>(obs_t_edge)] =
             DetermineObstacleDecision(std::get<2>(obs_t_edge),
-                                      std::get<3>(obs_t_edge),
-                                      s_max);
+                                      std::get<3>(obs_t_edge), s_max);
       } else if (std::get<3>(obs_t_edge) <= s_min) {
         obs_id_to_decision_[std::get<4>(obs_t_edge)] =
             DetermineObstacleDecision(std::get<2>(obs_t_edge),
-                                      std::get<3>(obs_t_edge),
-                                      s_min);
+                                      std::get<3>(obs_t_edge), s_min);
       } else {
         ambiguous_t_edges.push_back(obs_t_edge);
       }
@@ -227,8 +226,9 @@ bool STObstaclesProcessor::GetSBoundsFromDecisions(double t,
   }
   // For ambiguous ones, enumerate all decisions and corresponding bounds.
   auto s_gaps = FindSGaps(ambiguous_t_edges, s_min, s_max);
-  if (s_gaps.empty())
+  if (s_gaps.empty()) {
     return false;
+  }
   for (auto s_gap : s_gaps) {
     available_s_bounds->push_back(s_gap);
     std::vector<std::pair<std::string, ObjectDecisionType>> obs_decisions;
@@ -236,8 +236,10 @@ bool STObstaclesProcessor::GetSBoundsFromDecisions(double t,
       std::string obs_id = std::get<4>(obs_t_edge);
       double obs_s_min = std::get<2>(obs_t_edge);
       double obs_s_max = std::get<3>(obs_t_edge);
-      obs_decisions.emplace_back(obs_id, DetermineObstacleDecision(
-          obs_s_min, obs_s_max, (s_gap.first + s_gap.second) / 2.0));
+      obs_decisions.emplace_back(
+          obs_id,
+          DetermineObstacleDecision(obs_s_min, obs_s_max,
+                                    (s_gap.first + s_gap.second) / 2.0));
     }
     available_obs_decisions->push_back(obs_decisions);
   }
@@ -353,8 +355,9 @@ bool STObstaclesProcessor::GetOverlappingS(
   if (pt_after_idx == -1) {
     pt_after_idx = static_cast<int>(adc_path_points.size()) - 2;
   }
-  if (pt_before_idx >= pt_after_idx)
+  if (pt_before_idx >= pt_after_idx) {
     return false;
+  }
 
   // Detailed searching.
   bool has_overlapping = false;
@@ -469,8 +472,7 @@ bool STObstaclesProcessor::IsADCOverlappingWithObstacle(
 }
 
 std::vector<std::pair<double, double>> STObstaclesProcessor::FindSGaps(
-    const std::vector<ObsTEdge>& obstacle_t_edges,
-    double s_min, double s_max) {
+    const std::vector<ObsTEdge>& obstacle_t_edges, double s_min, double s_max) {
   std::vector<std::pair<double, int>> obs_s_edges;
   for (auto obs_t_edge : obstacle_t_edges) {
     obs_s_edges.emplace_back(std::get<2>(obs_t_edge), 1);
@@ -480,15 +482,15 @@ std::vector<std::pair<double, double>> STObstaclesProcessor::FindSGaps(
   obs_s_edges.emplace_back(s_min, 0);
   obs_s_edges.emplace_back(s_max, 1);
   // obs_s_edges.emplace_back(std::numeric_limits<double>::max(), 0);
-  std::sort(obs_s_edges.begin(), obs_s_edges.end(),
-            [](const std::pair<double, int>& lhs,
-               const std::pair<double, int>& rhs) {
-              if (lhs.first != rhs.first) {
-                return lhs.first < rhs.first;
-              } else {
-                return lhs.second > rhs.second;
-              }
-            });
+  std::sort(
+      obs_s_edges.begin(), obs_s_edges.end(),
+      [](const std::pair<double, int>& lhs, const std::pair<double, int>& rhs) {
+        if (lhs.first != rhs.first) {
+          return lhs.first < rhs.first;
+        } else {
+          return lhs.second > rhs.second;
+        }
+      });
 
   std::vector<std::pair<double, double>> s_gaps;
   int num_st_obs = 1;
@@ -496,12 +498,14 @@ std::vector<std::pair<double, double>> STObstaclesProcessor::FindSGaps(
   for (auto obs_s_edge : obs_s_edges) {
     if (obs_s_edge.second == 1) {
       num_st_obs++;
-      if (num_st_obs == 1)
+      if (num_st_obs == 1) {
         s_gaps.emplace_back(prev_open_s, obs_s_edge.first);
+      }
     } else {
       num_st_obs--;
-      if (num_st_obs == 0)
+      if (num_st_obs == 0) {
         prev_open_s = obs_s_edge.first;
+      }
     }
   }
 

@@ -1124,8 +1124,8 @@ void ScenarioManager::UpdatePlanningContextPullOverScenario(
 void ScenarioManager::UpdatePlanningContextEmergencyPullOverScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
   auto* emergency_pull_over = PlanningContext::Instance()
-                                ->mutable_planning_status()
-                                ->mutable_emergency_pull_over();
+                                  ->mutable_planning_status()
+                                  ->mutable_emergency_pull_over();
 
   if (scenario_type != ScenarioConfig::EMERGENCY_PULL_OVER) {
     emergency_pull_over->Clear();

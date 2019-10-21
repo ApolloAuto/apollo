@@ -53,9 +53,9 @@ Stage::StageStatus EmergencyPullOverStageSlowDown::Process(
   // set speed_limit to slow down
   const double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
-  const double target_speed = adc_speed -
-      scenario_config_.max_stop_deceleration() *
-      scenario_config_.slow_down_deceleration_time();
+  const double target_speed =
+      adc_speed - scenario_config_.max_stop_deceleration() *
+                      scenario_config_.slow_down_deceleration_time();
   // TODO(all) : to be updated
   if (frame->mutable_reference_line_info()) {
     auto* reference_line =

@@ -49,9 +49,7 @@ void TeleopService::Start() {
 void TeleopService::RegisterMessageHandlers() {
   // Send current teleop status to the new client.
   websocket_->RegisterConnectionReadyHandler(
-      [this](WebSocketHandler::Connection *conn) {
-        SendStatus(conn);
-      });
+      [this](WebSocketHandler::Connection *conn) { SendStatus(conn); });
   // Start/Stop local and remote audio
   websocket_->RegisterMessageHandler(
       "ToggleAudio",

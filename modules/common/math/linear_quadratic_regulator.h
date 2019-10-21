@@ -31,7 +31,6 @@ namespace apollo {
 namespace common {
 namespace math {
 
-
 /**
  * @brief Solver for discrete-time linear quadratic problem.
  * @param A The system dynamic matrix
@@ -46,9 +45,8 @@ namespace math {
  */
 void SolveLQRProblem(const Eigen::MatrixXd &A, const Eigen::MatrixXd &B,
                      const Eigen::MatrixXd &Q, const Eigen::MatrixXd &R,
-                     const Eigen::MatrixXd &M,
-                     const double tolerance, const uint max_num_iteration,
-                     Eigen::MatrixXd *ptr_K);
+                     const Eigen::MatrixXd &M, const double tolerance,
+                     const uint max_num_iteration, Eigen::MatrixXd *ptr_K);
 
 /**
  * @brief Solver for discrete-time linear quadratic problem.

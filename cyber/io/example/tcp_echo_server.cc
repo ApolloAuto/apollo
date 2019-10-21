@@ -76,8 +76,7 @@ int main(int argc, char* argv[]) {
           return;
         }
         session.Listen(10);
-        auto conn_session =
-            session.Accept((struct sockaddr*)nullptr, nullptr);
+        auto conn_session = session.Accept((struct sockaddr*)nullptr, nullptr);
         std::cout << "accepted" << std::endl;
         auto routine_name =
             "connected session" + std::to_string(Time::Now().ToNanosecond());
