@@ -159,7 +159,7 @@ void FeatureOutput::InsertDataForTuning(
 }
 
 void FeatureOutput::WriteFeatureProto() {
-  if (features_.feature_size() <= 0) {
+  if (features_.feature().empty()) {
     ADEBUG << "Skip writing empty feature.";
   } else {
     const std::string file_name = StrCat(FLAGS_prediction_data_dir, "/feature.",

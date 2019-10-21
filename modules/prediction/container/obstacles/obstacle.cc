@@ -1113,7 +1113,7 @@ void Obstacle::BuildLaneGraph() {
 
 void Obstacle::SetLaneSequenceStopSign(LaneSequence* lane_sequence_ptr) {
   // Set the nearest stop sign along the lane sequence
-  if (lane_sequence_ptr->lane_segment_size() <= 0) {
+  if (lane_sequence_ptr->lane_segment().empty()) {
     return;
   }
   double accumulate_s = 0.0;
@@ -1304,7 +1304,7 @@ void Obstacle::SetLanePoints(const Feature* feature,
   // Go through every lane_sequence.
   for (int i = 0; i < lane_graph->lane_sequence_size(); ++i) {
     LaneSequence* lane_sequence = lane_graph->mutable_lane_sequence(i);
-    if (lane_sequence->lane_segment_size() <= 0) {
+    if (lane_sequence->lane_segment().empty()) {
       continue;
     }
     // TODO(jiacheng): can refactor the following two parts into one to

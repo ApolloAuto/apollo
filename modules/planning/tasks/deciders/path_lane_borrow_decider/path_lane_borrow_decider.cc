@@ -88,7 +88,7 @@ bool PathLaneBorrowDecider::IsNecessaryToBorrowLane(
       // set side-pass direction
       const auto& path_decider_status =
           PlanningContext::Instance()->planning_status().path_decider();
-      if (path_decider_status.decided_side_pass_direction_size() <= 0) {
+      if (path_decider_status.decided_side_pass_direction().empty()) {
         // first time init decided_side_pass_direction
         bool left_borrowable;
         bool right_borrowable;
