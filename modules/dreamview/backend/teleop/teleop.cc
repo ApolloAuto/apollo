@@ -29,6 +29,17 @@ using modules::car1::teleop::DaemonServiceCmd;
 using modules::car1::teleop::DaemonServiceRpt;
 using apollo::planning::PadMessage;
 
+// channels
+const std::string modem0_channel = "/apollo/teleop/network/modem0";
+const std::string modem1_channel = "/apollo/teleop/network/modem1";
+const std::string modem2_channel = "/apollo/teleop/network/modem2";
+const std::string car_daemon_cmd_channel = "/apollo/teleop/car/daemon_service/cmd";
+const std::string car_daemon_rpt_channel = "/apollo/teleop/car/daemon_service/rpt";
+const std::string operator_daemon_cmd_channel = "/apollo/teleop/operator/daemon_service/cmd";
+const std::string operator_daemon_rpt_channel = "/apollo/teleop/operator/daemon_service/rpt";
+
+
+
 TeleopService::TeleopService(WebSocketHandler *websocket)
     : node_(cyber::CreateNode("teleop")), websocket_(websocket) {
   RegisterMessageHandlers();
@@ -43,34 +54,34 @@ void TeleopService::Start() {
   // TODO update proto to get all modems' info combined with rank
 
   modem0_info_reader_ = node_->CreateReader<ModemInfo>(
-      "/apollo/teleop/network/modem0",
+      modem0_channel,
       [this](const std::shared_ptr<ModemInfo> &msg) { UpdateModem(0, msg); });
 
   modem1_info_reader_ = node_->CreateReader<ModemInfo>(
-      "/apollo/teleop/network/modem1",
+      modem1_channel,
       [this](const std::shared_ptr<ModemInfo> &msg) { UpdateModem(1, msg); });
 
   modem2_info_reader_ = node_->CreateReader<ModemInfo>(
-      "/apollo/teleop/network/modem2",
+      modem2_channel,
       [this](const std::shared_ptr<ModemInfo> &msg) { UpdateModem(2, msg); });
 
   car_daemon_cmd_writer_ = node_->CreateWriter<DaemonServiceCmd>(
-      "/apollo/teleop/operator/daemon_service/cmd");
+      car_daemon_cmd_channel);
 
   operator_daemon_cmd_writer_ = node_->CreateWriter<DaemonServiceCmd>(
-      "/apollo/teleop/car/daemon_service/cmd");
+      operator_daemon_cmd_channel);
 
   car_daemon_rpt_reader_ = node_->CreateReader<DaemonServiceRpt>(
-      "/apollo/teleop/car/daemon_service/rpt",
-       [this](const std::shared_ptr<DaemonServiceRpt> &msg) {
-           UpdateCarDaemonRpt(msg);
-       });
+      car_daemon_rpt_channel,
+      [this](const std::shared_ptr<DaemonServiceRpt> &msg) {
+          UpdateCarDaemonRpt(msg);
+      });
 
   operator_daemon_rpt_reader_ = node_->CreateReader<DaemonServiceRpt>(
-      "/apollo/teleop/operator/daemon_service/rpt",
-       [this](const std::shared_ptr<DaemonServiceRpt> &msg) {
-           UpdateOperatorDaemonRpt(msg);
-       });
+      operator_daemon_rpt_channel,
+      [this](const std::shared_ptr<DaemonServiceRpt> &msg) {
+          UpdateOperatorDaemonRpt(msg);
+      });
 }
 
 void TeleopService::RegisterMessageHandlers() {
@@ -194,11 +205,9 @@ void TeleopService::UpdateCarDaemonRpt(
 void TeleopService::UpdateOperatorDaemonRpt(
     const std::shared_ptr<DaemonServiceRpt> &daemon_rpt) {
   {
-      // AINFO << "OperatorDaemonRpt" << std::endl;
       bool voipIsRunning = false;
       for (int i = 0; i < daemon_rpt->services_size(); i++) {
           std::string service =  daemon_rpt->services(i);
-          AINFO <<  "  *" << service << std::endl;
           if (service.find("voip_encoder") >= 0) {
               voipIsRunning = true;
           }
