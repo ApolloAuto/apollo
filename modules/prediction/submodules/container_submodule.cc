@@ -52,6 +52,9 @@ bool ContainerSubmodule::Init() {
       node_->CreateReader<localization::LocalizationEstimate>(
           FLAGS_localization_topic, nullptr);
 
+  storytelling_reader_ = node_->CreateReader<storytelling::Stories>(
+          FLAGS_storytelling_topic, nullptr);
+
   // TODO(kechxu) change topic name when finalized
   container_writer_ =
       node_->CreateWriter<PredictionContainerMessage>(FLAGS_prediction_topic);

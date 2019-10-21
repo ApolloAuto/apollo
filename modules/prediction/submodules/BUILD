@@ -22,6 +22,7 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/proto:submodule_messages_proto",
+        "//modules/storytelling/proto:story_proto",
     ],
 )
 
