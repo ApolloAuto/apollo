@@ -171,7 +171,6 @@ void TeleopService::UpdateModem(unsigned int index,
 void TeleopService::UpdateCarDaemonRpt(
     const std::shared_ptr<DaemonServiceRpt> &daemon_rpt) {
   {
-      boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
       bool aVideoEncoderIsRunning = false;
       bool voipIsRunning = false;
       for (int i = 0; i < daemon_rpt->services_size(); i++) {
@@ -188,6 +187,7 @@ void TeleopService::UpdateCarDaemonRpt(
           }
 
       }
+      boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
       teleop_status_["video"] = aVideoEncoderIsRunning;
       teleop_status_["audio"] = voipIsRunning;
   }
