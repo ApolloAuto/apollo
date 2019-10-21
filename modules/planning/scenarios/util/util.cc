@@ -287,7 +287,9 @@ bool CheckADCSurroundObstacles(const common::math::Vec2d adc_position,
   auto obstacles = frame->obstacles();
   for (const auto& obstacle : obstacles) {
     const auto& obstacle_polygon = obstacle->PerceptionPolygon();
-    if (adc_polygon.HasOverlap(obstacle_polygon)) {
+    const Polygon2d& nudge_polygon = obstacle_polygon.ExpandByDistance(
+        std::fabs(FLAGS_static_obstacle_nudge_l_buffer));
+    if (adc_polygon.HasOverlap(nudge_polygon)) {
       ADEBUG << "blocked obstacle: " << obstacle->Id();
       return true;
     }
