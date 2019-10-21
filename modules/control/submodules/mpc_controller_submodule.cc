@@ -114,9 +114,31 @@ bool MPCControllerSubmodule::Proc() {
     AERROR << "Chassis msg is not ready!";
     return false;
   }
+  OnChassis(chassis_msg);
 
   // TODO(Shu): implementation
+  ControlCommand control_command;
+  Status status = ProduceControlCommand(&control_command);
+  AERROR_IF(!status.ok()) << "Failed to produce control command:"
+                          << status.error_message();
+  control_command_writer_->Write(
+      std::make_shared<ControlCommand>(control_command));
   return true;
+}
+
+Status MPCControllerSubmodule::ProduceControlCommand(
+    ControlCommand *control_command) {
+  Status status = mpc_controller_.ComputeControlCommand(
+      &local_view_.localization, &local_view_.chassis, &local_view_.trajectory,
+      control_command);
+  return status;
+}
+
+void MPCControllerSubmodule::OnChassis(
+    const std::shared_ptr<Chassis> &chassis) {
+  ADEBUG << "Received chassis data: run chassis callback.";
+  std::lock_guard<std::mutex> lock(mutex_);
+  latest_chassis_.CopyFrom(*chassis);
 }
 
 }  // namespace control

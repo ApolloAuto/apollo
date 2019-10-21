@@ -66,6 +66,16 @@ class MPCControllerSubmodule final : public apollo::cyber::TimerComponent {
    * @return false fail to generate control command
    */
   bool Proc() override;
+  struct LocalView {
+    canbus::Chassis chassis;
+    planning::ADCTrajectory trajectory;
+    localization::LocalizationEstimate localization;
+  };
+
+ private:
+  void OnChassis(const std::shared_ptr<apollo::canbus::Chassis> &chassis);
+  common::Status ProduceControlCommand(
+      apollo::control::ControlCommand *control_command);
 
  private:
   double init_time_ = 0.0;
@@ -77,6 +87,8 @@ class MPCControllerSubmodule final : public apollo::cyber::TimerComponent {
   planning::ADCTrajectory latest_trajectory_;
   PadMessage pad_msg_;
   common::Header latest_replan_trajectory_header_;
+
+  std::mutex mutex_;
 
   std::shared_ptr<cyber::Reader<apollo::canbus::Chassis>> chassis_reader_;
   std::shared_ptr<cyber::Reader<apollo::control::PadMessage>> pad_msg_reader_;
@@ -90,6 +102,8 @@ class MPCControllerSubmodule final : public apollo::cyber::TimerComponent {
 
   // TODO(SHU): separate conf
   ControlConf mpc_controller_conf_;
+
+  LocalView local_view_;
 };
 
 CYBER_REGISTER_COMPONENT(MPCControllerSubmodule)
