@@ -156,17 +156,6 @@ void MessageProcess::ContainerProcess(
 
   // Insert perception_obstacles
   ptr_obstacles_container->Insert(perception_obstacles);
-}
-
-void MessageProcess::OnPerception(
-    const perception::PerceptionObstacles& perception_obstacles,
-    PredictionObstacles* const prediction_obstacles) {
-  ContainerProcess(perception_obstacles);
-
-  auto ptr_obstacles_container =
-      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
-          AdapterConfig::PERCEPTION_OBSTACLES);
-  CHECK_NOTNULL(ptr_obstacles_container);
 
   // Ignore some obstacles
   ObstaclesPrioritizer::Instance()->AssignIgnoreLevel();
@@ -189,6 +178,17 @@ void MessageProcess::OnPerception(
 
   // Analyze RightOfWay for the caution obstacles
   RightOfWay::Analyze();
+}
+
+void MessageProcess::OnPerception(
+    const perception::PerceptionObstacles& perception_obstacles,
+    PredictionObstacles* const prediction_obstacles) {
+  ContainerProcess(perception_obstacles);
+
+  auto ptr_obstacles_container =
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
+  CHECK_NOTNULL(ptr_obstacles_container);
 
   // Insert features to FeatureOutput for offline_mode
   if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpFeatureProto) {
