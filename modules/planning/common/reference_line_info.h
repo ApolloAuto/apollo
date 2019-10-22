@@ -92,7 +92,8 @@ class ReferenceLineInfo {
 
   void SetCruiseSpeed(double speed) { cruise_speed_ = speed; }
   const double GetCruiseSpeed() const {
-    return cruise_speed_ > 0.0 ? cruise_speed_ : FLAGS_default_cruise_speed; }
+    return cruise_speed_ > 0.0 ? cruise_speed_ : FLAGS_default_cruise_speed;
+  }
 
   hdmap::LaneInfoConstPtr LocateLaneInfo(const double s) const;
 
