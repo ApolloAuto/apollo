@@ -154,7 +154,7 @@ class PathBoundsDecider : public Decider {
   /** @brief Initializes an empty path boundary.
    */
   bool InitPathBoundary(
-      const ReferenceLine& reference_line,
+      const ReferenceLineInfo& reference_line_info,
       std::vector<std::tuple<double, double, double>>* const path_bound);
 
   /** @brief Refine the boundary based on the road-info.

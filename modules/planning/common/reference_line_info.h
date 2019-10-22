@@ -39,6 +39,7 @@
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_boundary.h"
 #include "modules/planning/common/path_decision.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
@@ -90,7 +91,8 @@ class ReferenceLineInfo {
   const PlanningTarget& planning_target() const { return planning_target_; }
 
   void SetCruiseSpeed(double speed) { cruise_speed_ = speed; }
-  const double GetCruiseSpeed() const { return cruise_speed_; }
+  const double GetCruiseSpeed() const {
+    return cruise_speed_ > 0.0 ? cruise_speed_ : FLAGS_default_cruise_speed; }
 
   hdmap::LaneInfoConstPtr LocateLaneInfo(const double s) const;
 
@@ -325,7 +327,7 @@ class ReferenceLineInfo {
 
   common::VehicleSignal vehicle_signal_;
 
-  double cruise_speed_;
+  double cruise_speed_ = 0.0;
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };

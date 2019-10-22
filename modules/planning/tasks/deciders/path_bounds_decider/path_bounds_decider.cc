@@ -293,7 +293,7 @@ Status PathBoundsDecider::GenerateRegularPathBound(
     std::string* const blocking_obstacle_id,
     std::string* const borrow_lane_type) {
   // 1. Initialize the path boundaries to be an indefinitely large area.
-  if (!InitPathBoundary(reference_line_info.reference_line(), path_bound)) {
+  if (!InitPathBoundary(reference_line_info, path_bound)) {
     const std::string msg = "Failed to initialize path boundaries.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -342,7 +342,7 @@ Status PathBoundsDecider::GenerateLaneChangePathBound(
     const ReferenceLineInfo& reference_line_info,
     std::vector<std::tuple<double, double, double>>* const path_bound) {
   // 1. Initialize the path boundaries to be an indefinitely large area.
-  if (!InitPathBoundary(reference_line_info.reference_line(), path_bound)) {
+  if (!InitPathBoundary(reference_line_info, path_bound)) {
     const std::string msg = "Failed to initialize path boundaries.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -373,7 +373,7 @@ Status PathBoundsDecider::GeneratePullOverPathBound(
     const Frame& frame, const ReferenceLineInfo& reference_line_info,
     PathBound* const path_bound) {
   // 1. Initialize the path boundaries to be an indefinitely large area.
-  if (!InitPathBoundary(reference_line_info.reference_line(), path_bound)) {
+  if (!InitPathBoundary(reference_line_info, path_bound)) {
     const std::string msg = "Failed to initialize path boundaries.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -510,7 +510,7 @@ Status PathBoundsDecider::GeneratePullOverPathBound(
 Status PathBoundsDecider::GenerateFallbackPathBound(
     const ReferenceLineInfo& reference_line_info, PathBound* const path_bound) {
   // 1. Initialize the path boundaries to be an indefinitely large area.
-  if (!InitPathBoundary(reference_line_info.reference_line(), path_bound)) {
+  if (!InitPathBoundary(reference_line_info, path_bound)) {
     const std::string msg = "Failed to initialize fallback path boundaries.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -835,20 +835,23 @@ bool PathBoundsDecider::IsContained(
   return true;
 }
 
-bool PathBoundsDecider::InitPathBoundary(const ReferenceLine& reference_line,
-                                         PathBound* const path_bound) {
+bool PathBoundsDecider::InitPathBoundary(
+    const ReferenceLineInfo& reference_line_info,
+    PathBound* const path_bound) {
   // Sanity checks.
   CHECK_NOTNULL(path_bound);
   path_bound->clear();
 
+  const auto& reference_line = reference_line_info.reference_line();
   // Starting from ADC's current position, increment until the horizon, and
   // set lateral bounds to be infinite at every spot.
   for (double curr_s = adc_frenet_s_;
        curr_s <
-       std::fmin(adc_frenet_s_ + std::fmax(kPathBoundsDeciderHorizon,
-                                           FLAGS_default_cruise_speed *
-                                               FLAGS_trajectory_time_length),
-                 reference_line.Length());
+       std::fmin(
+           adc_frenet_s_ + std::fmax(kPathBoundsDeciderHorizon,
+                                     reference_line_info.GetCruiseSpeed() *
+                                         FLAGS_trajectory_time_length),
+           reference_line.Length());
        curr_s += kPathBoundsDeciderResolution) {
     path_bound->emplace_back(curr_s, std::numeric_limits<double>::lowest(),
                              std::numeric_limits<double>::max());
