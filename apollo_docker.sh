@@ -69,7 +69,7 @@ function start_build_docker() {
     else
       ping -q -c 1 -W 1 www.baidu.com 1>/dev/null 2>&1
       # If Baidu is unreachable, we use local images. 
-      if [ $? -ne 0 ];
+      if [ $? -ne 0 ]; then
         opt="-l"
       fi
     fi

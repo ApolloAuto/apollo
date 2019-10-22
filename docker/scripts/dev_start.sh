@@ -322,14 +322,14 @@ function main(){
     # Try to use GPU in container.
     DOCKER_RUN="docker run"
     if [ ${USE_GPU} -eq 1 ]; then
-      # For docker 19.03+, use `docker run --gpus all` to access GPU.
       DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
-      dpkg --compare-versions "${DOCKER_VERSION}" "ge" "19.03"
-      if [ $? -eq 0 ]; then
-        DOCKER_RUN="docker run --gpus all"
-      elif ! [ -z "$(which nvidia-docker)" ]; then
+      if ! [ -z "$(which nvidia-docker)" ]; then
         DOCKER_RUN="nvidia-docker run"
-        warning "nvidia-docker is in deprecation! Please upgrade docker to 19.03+"
+        warning "nvidia-docker is in deprecation! Please upgrade docker to 19.03+ according to "
+        warning "https://github.com/NVIDIA/nvidia-docker/blob/master/README.md#upgrading-with-nvidia-docker2-deprecated"
+      elif dpkg --compare-versions "${DOCKER_VERSION}" "ge" "19.03"; then
+        # For docker 19.03+, use `docker run --gpus all` to access GPU.
+        DOCKER_RUN="docker run --gpus all"
       else
         USE_GPU=0
         warning "Cannot access GPU from container. Please upgrade docker to 19.03+"
