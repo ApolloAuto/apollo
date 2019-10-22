@@ -143,8 +143,9 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
     }
     if (s < s_lower) {
       // TODO(all): merge this parameter with existing parameter
-      const double follow_distance_s =
-          obstacle->speed() * config_.safe_time_buffer();
+      const double follow_distance_s = config_.is_lane_changing()
+                             ? config_.safe_distance()
+                             : obstacle->speed() * config_.safe_time_buffer();
       if (s + follow_distance_s < s_lower) {
         continue;
       } else {
