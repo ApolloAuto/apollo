@@ -15,6 +15,7 @@ import "modules/planning/proto/path_bounds_decider_config.proto";
 import "modules/planning/proto/path_lane_borrow_decider_config.proto";
 import "modules/planning/proto/piecewise_jerk_path_config.proto";
 import "modules/planning/proto/piecewise_jerk_speed_config.proto";
+import "modules/planning/proto/piecewise_jerk_nonlinear_speed_config.proto";
 import "modules/planning/proto/proceed_with_caution_speed_config.proto";
 import "modules/planning/proto/rule_based_stop_decider_config.proto";
 import "modules/planning/proto/speed_bounds_decider_config.proto";
@@ -59,6 +60,7 @@ message TaskConfig {
     RULE_BASED_STOP_DECIDER = 29;
     PATH_REUSE_DECIDER = 30;
     ST_BOUNDS_DECIDER = 31;
+    PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER = 32;
   };
   optional TaskType task_type = 1;
   oneof task_config {
@@ -72,8 +74,10 @@ message TaskConfig {
     PathBoundsDeciderConfig path_bounds_decider_config = 17;
     OpenSpaceFallBackDeciderConfig open_space_fallback_decider_config = 18;
     OpenSpaceRoiDeciderConfig open_space_roi_decider_config = 19;
-    OpenSpaceTrajectoryProviderConfig open_space_trajectory_provider_config = 20;
-    OpenSpaceTrajectoryPartitionConfig open_space_trajectory_partition_config = 21;
+    OpenSpaceTrajectoryProviderConfig open_space_trajectory_provider_config =
+        20;
+    OpenSpaceTrajectoryPartitionConfig open_space_trajectory_partition_config =
+        21;
     PathAssessmentDeciderConfig path_assessment_decider_config = 22;
     PiecewiseJerkSpeedConfig piecewise_jerk_speed_config = 23;
     PathLaneBorrowDeciderConfig path_lane_borrow_decider_config = 24;
@@ -81,6 +85,8 @@ message TaskConfig {
     RuleBasedStopDeciderConfig rule_based_stop_decider_config = 26;
     PathReuseDeciderConfig path_reuse_decider_config = 27;
     STBoundsDeciderConfig st_bounds_decider_config = 28;
+    PiecewiseJerkNonlinearSpeedConfig piecewise_jerk_nonlinear_speed_config =
+        29;
   }
 }
 
@@ -88,56 +94,65 @@ message ScenarioLaneFollowConfig {
 }
 
 message ScenarioBareIntersectionUnprotectedConfig {
-  optional double start_bare_intersection_scenario_distance = 1 [default = 25.0];  // meter
+  optional double start_bare_intersection_scenario_distance = 1
+      [default = 25.0];  // meter
   // explicit stop while waiting
   optional bool enable_explicit_stop = 2 [default = false];
   optional double min_pass_s_distance = 3 [default = 3.0];  // meter
   // speed limit while approaching bare intersection with caution
   // default to 15 mph
-  optional double approach_speed_limit = 4 [default = 6.7056]; // meter/sec
-  optional double stop_distance = 5 [default = 0.5];  // meter
-  optional float stop_timeout_sec = 6 [default = 8.0];  // sec
-  optional float creep_timeout_sec = 7 [default = 10.0];  // sec
+  optional double approach_speed_limit = 4 [default = 6.7056];  // meter/sec
+  optional double stop_distance = 5 [default = 0.5];            // meter
+  optional float stop_timeout_sec = 6 [default = 8.0];          // sec
+  optional float creep_timeout_sec = 7 [default = 10.0];        // sec
 }
 
 message ScenarioStopSignUnprotectedConfig {
-  optional double start_stop_sign_scenario_distance = 1 [default = 5.0];  // meter
-  optional double watch_vehicle_max_valid_stop_distance = 2 [default = 5.0];  // meter
+  optional double start_stop_sign_scenario_distance = 1
+      [default = 5.0];  // meter
+  optional double watch_vehicle_max_valid_stop_distance = 2
+      [default = 5.0];                                          // meter
   optional double max_valid_stop_distance = 3 [default = 3.5];  // meter
-  optional float stop_duration_sec = 4 [default = 1.0];  // sec
-  optional double min_pass_s_distance = 5 [default = 3.0];  // meter
-  optional float stop_timeout_sec = 6 [default = 8.0];  // sec
-  optional float creep_timeout_sec = 7 [default = 10.0];  // sec
+  optional float stop_duration_sec = 4 [default = 1.0];         // sec
+  optional double min_pass_s_distance = 5 [default = 3.0];      // meter
+  optional float stop_timeout_sec = 6 [default = 8.0];          // sec
+  optional float creep_timeout_sec = 7 [default = 10.0];        // sec
 }
 
 message ScenarioTrafficLightProtectedConfig {
-  optional double start_traffic_light_scenario_distance = 1 [default = 5.0];  // meter
+  optional double start_traffic_light_scenario_distance = 1
+      [default = 5.0];                                          // meter
   optional double max_valid_stop_distance = 2 [default = 2.0];  // meter
-  optional double min_pass_s_distance = 3 [default = 3.0];  // meter
+  optional double min_pass_s_distance = 3 [default = 3.0];      // meter
 }
 
 message ScenarioTrafficLightUnprotectedLeftTurnConfig {
-  optional double start_traffic_light_scenario_distance = 1 [default = 5.0];  // meter
-  optional double max_valid_stop_distance = 2 [default = 3.5];  // meter
-  optional double min_pass_s_distance = 3 [default = 3.0];  // meter
-  optional float creep_timeout_sec = 4 [default = 10.0];  // sec
+  optional double start_traffic_light_scenario_distance = 1
+      [default = 5.0];                                             // meter
+  optional double max_valid_stop_distance = 2 [default = 3.5];     // meter
+  optional double min_pass_s_distance = 3 [default = 3.0];         // meter
+  optional float creep_timeout_sec = 4 [default = 10.0];           // sec
   optional double max_adc_speed_before_creep = 5 [default = 3.0];  // m/s
 }
 
 message ScenarioTrafficLightUnprotectedRightTurnConfig {
-  optional double start_traffic_light_scenario_distance = 1 [default = 5.0];  // meter
-  optional bool enable_right_turn_on_red = 2  [default = false];
+  optional double start_traffic_light_scenario_distance = 1
+      [default = 5.0];  // meter
+  optional bool enable_right_turn_on_red = 2 [default = false];
   optional double max_valid_stop_distance = 3 [default = 3.5];  // meter
-  optional double min_pass_s_distance = 4 [default = 3.0];  // meter
-  optional float red_light_right_turn_stop_duration_sec = 5 [default = 3.0];  // sec
-  optional float creep_timeout_sec = 6 [default = 10.0];  // sec
+  optional double min_pass_s_distance = 4 [default = 3.0];      // meter
+  optional float red_light_right_turn_stop_duration_sec = 5
+      [default = 3.0];                                             // sec
+  optional float creep_timeout_sec = 6 [default = 10.0];           // sec
   optional double max_adc_speed_before_creep = 7 [default = 3.0];  // m/s
 }
 
 message ScenarioPullOverConfig {
-  optional double start_pull_over_scenario_distance = 1 [default = 50.0];  // meter
+  optional double start_pull_over_scenario_distance = 1
+      [default = 50.0];                                                // meter
   optional double pull_over_min_distance_buffer = 2 [default = 10.0];  // meter
-  // keep the same value as pull_over_destination_to_adc_buffer in PathBoundsDeciderConfig
+  // keep the same value as pull_over_destination_to_adc_buffer in
+  // PathBoundsDeciderConfig
   optional double max_distance_stop_search = 3 [default = 25.0];  // meter
   optional double max_s_error_to_end_point = 4 [default = 0.2];
   optional double max_l_error_to_end_point = 5 [default = 0.5];
@@ -145,12 +160,13 @@ message ScenarioPullOverConfig {
   optional double max_distance_error_to_end_point = 7 [default = 0.2];
   optional double pass_destination_threshold = 8 [default = 10.0];
   optional double max_valid_stop_distance = 9 [default = 1.0];
-  optional double s_distance_to_stop_for_open_space_parking = 10 [default = 7.0];
+  optional double s_distance_to_stop_for_open_space_parking = 10
+      [default = 7.0];
 }
 
 message ScenarioEmergencyPullOverConfig {
-	optional double max_stop_deceleration = 1 [default = 3.0];
-	optional double slow_down_deceleration_time = 2 [default = 3.0];  // second
+  optional double max_stop_deceleration = 1 [default = 3.0];
+  optional double slow_down_deceleration_time = 2 [default = 3.0];  // second
 }
 
 message ScenarioValetParkingConfig {
@@ -158,19 +174,21 @@ message ScenarioValetParkingConfig {
   optional double max_valid_stop_distance = 2 [default = 1.0];  // meter
 }
 
-message ScenarioNarrowStreetUTurnConfig {}
+message ScenarioNarrowStreetUTurnConfig {
+}
 
 message ScenarioParkAndGoConfig {
-    optional double front_obstacle_buffer = 1 [default = 4.0]; //meter
-    optional double heading_buffer = 2 [default = 0.5]; //rad
-    optional double min_dist_to_dest = 3 [default = 25.0]; //meter
+  optional double front_obstacle_buffer = 1 [default = 4.0];  // meter
+  optional double heading_buffer = 2 [default = 0.5];         // rad
+  optional double min_dist_to_dest = 3 [default = 25.0];      // meter
 }
 
 message ScenarioYieldSignConfig {
-  optional double start_yield_sign_scenario_distance = 1 [default = 10.0];  // meter
+  optional double start_yield_sign_scenario_distance = 1
+      [default = 10.0];                                         // meter
   optional double max_valid_stop_distance = 2 [default = 4.5];  // meter
-  optional double min_pass_s_distance = 3 [default = 3.0];  // meter
-  optional float creep_timeout_sec = 4 [default = 10.0];  // sec
+  optional double min_pass_s_distance = 3 [default = 3.0];      // meter
+  optional float creep_timeout_sec = 4 [default = 10.0];        // sec
 }
 
 // scenario configs
@@ -207,13 +225,13 @@ message ScenarioConfig {
 
     // bare_intersection_unprotected scenario
     BARE_INTERSECTION_UNPROTECTED_APPROACH = 200;
-    BARE_INTERSECTION_UNPROTECTED_CREEP = 201 ;
+    BARE_INTERSECTION_UNPROTECTED_CREEP = 201;
     BARE_INTERSECTION_UNPROTECTED_INTERSECTION_CRUISE = 202;
 
     // stop_sign_unprotected scenario
     STOP_SIGN_UNPROTECTED_PRE_STOP = 300;
     STOP_SIGN_UNPROTECTED_STOP = 301;
-    STOP_SIGN_UNPROTECTED_CREEP = 302 ;
+    STOP_SIGN_UNPROTECTED_CREEP = 302;
     STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE = 303;
 
     // traffic_light_protected scenario
@@ -221,12 +239,12 @@ message ScenarioConfig {
     TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE = 401;
 
     // traffic_light_unprotected_left_turn scenario
-    TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP = 410 ;
+    TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP = 410;
     TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_INTERSECTION_CRUISE = 411;
 
     // traffic_light_unprotected_right_turn scenario
     TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP = 420;
-    TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP = 421 ;
+    TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP = 421;
     TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE = 422;
 
     // pull_over scenario
@@ -255,7 +273,8 @@ message ScenarioConfig {
   message StageConfig {
     optional StageType stage_type = 1;
     optional bool enabled = 2 [default = true];
-    // an ordered list of tasks that are used at runtime. Its order determines the runtime order of the tasks.
+    // an ordered list of tasks that are used at runtime. Its order determines
+    // the runtime order of the tasks.
     repeated TaskConfig.TaskType task_type = 3;
     // an unordered task configurations
     repeated TaskConfig task_config = 4;
@@ -264,13 +283,16 @@ message ScenarioConfig {
   optional ScenarioType scenario_type = 1;
   oneof scenario_config {
     ScenarioLaneFollowConfig lane_follow_config = 2;
-    ScenarioBareIntersectionUnprotectedConfig bare_intersection_unprotected_config = 4;
+    ScenarioBareIntersectionUnprotectedConfig
+        bare_intersection_unprotected_config = 4;
     ScenarioEmergencyPullOverConfig emergency_pull_over_config = 5;
     ScenarioNarrowStreetUTurnConfig narrow_street_u_turn_config = 6;
     ScenarioStopSignUnprotectedConfig stop_sign_unprotected_config = 7;
     ScenarioTrafficLightProtectedConfig traffic_light_protected_config = 8;
-    ScenarioTrafficLightUnprotectedRightTurnConfig traffic_light_unprotected_right_turn_config = 9;
-    ScenarioTrafficLightUnprotectedLeftTurnConfig traffic_light_unprotected_left_turn_config = 10;
+    ScenarioTrafficLightUnprotectedRightTurnConfig
+        traffic_light_unprotected_right_turn_config = 9;
+    ScenarioTrafficLightUnprotectedLeftTurnConfig
+        traffic_light_unprotected_left_turn_config = 10;
     ScenarioParkAndGoConfig park_and_go_config = 11;
     ScenarioPullOverConfig pull_over_config = 12;
     ScenarioValetParkingConfig valet_parking_config = 13;
