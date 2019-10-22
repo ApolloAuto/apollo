@@ -19,8 +19,6 @@
 DEFINE_string(third_party_perception_node_name, "third_party_perception",
               "Node name");
 
-DEFINE_string(adapter_config_filename, "", "Path for adapter configuration");
-
 DEFINE_double(third_party_perception_freq, 10,
               "third party perception timer frequency.");
 DEFINE_bool(enable_mobileye, true, "switch to turn on/off mobileye obstacles");
