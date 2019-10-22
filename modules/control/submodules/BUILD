@@ -21,6 +21,7 @@ cc_library(
         "//modules/common/status",
         "//modules/common/time",
         "//modules/common/util",
+        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/control/common:control_gflags",
         "//modules/control/proto:control_command_proto",
         "//modules/control/proto:control_common_conf_proto",
