@@ -6,7 +6,7 @@
  
 ## 准备工作
   
- -  下载[multi-lidar-gnss标定工具](https://apollocache.bloob.core.windows.net/apollo-cache/multi_lidar_gnss_calibrator_and_doc.zip)、[传感器标定工具](https://github.com/ApolloAuto/apollo/releases/download/v2.0.0/calibration.tar.gz)并将文件提取到`modules /calibration`目录下，目录结构如下所示：
+ -  下载[multi-lidar-gnss标定工具](https://apollocache.blob.core.windows.net/apollo-cache/multi_lidar_gnss_calibrator_and_doc.zip)、[传感器标定工具](https://github.com/ApolloAuto/apollo/releases/download/v2.0.0/calibration.tar.gz)并将文件提取到`modules /calibration`目录下，目录结构如下所示：
 
 ![图片](../images/sensor_calibration/dir_tree.png)
 
@@ -299,6 +299,19 @@ transform:
 | INS          | /apollo/sensor/gnss/odometry              | 100               |
 | INS          | /apollo/sensor/gnss/ins_stat              | 2                 |
 
+### 修改摄像头Topic的频率
+摄像头数据默认的发布频率为30HZ，在进行标定过程中，需要将频率修改为9HZ。修改方法如下：
+- 关闭摄像头模块
+- 分别将`modules/calibration/data/ch/camera_params/start_leopard.launch`、`modules/drivers/camera/launch/start_leopard.launch`两个文件中的`<arg name="frame_rate" default="30"/>`修改为`<arg name="frame_rate" default="9"/>`
+- 执行如下命令，重新编译摄像头
+```
+  bash apollo.sh build_usbcam
+``` 
+- 启动摄像头模块，使用如下命令，查看摄像头数据发布频率是否修改成功
+```
+  rostopic hz /apollo/sensor/camera/traffic/image_short
+  rostopic hz /apollo/sensor/camera/traffic/image_long
+```
 
 ### 执行标定
 执行如下命令，进行camera_camera的标定：
