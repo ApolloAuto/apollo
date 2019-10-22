@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file piecewise_jerk_speed_optimizer.h
+ * @file piecewise_jerk_speed_nonlinear_optimizer.h
  **/
 
 #pragma once
@@ -25,11 +25,11 @@
 namespace apollo {
 namespace planning {
 
-class PiecewiseJerkSpeedOptimizer : public SpeedOptimizer {
+class PiecewiseJerkSpeedNonlinearOptimizer : public SpeedOptimizer {
  public:
-  explicit PiecewiseJerkSpeedOptimizer(const TaskConfig& config);
+  explicit PiecewiseJerkSpeedNonlinearOptimizer(const TaskConfig& config);
 
-  virtual ~PiecewiseJerkSpeedOptimizer() = default;
+  virtual ~PiecewiseJerkSpeedNonlinearOptimizer() = default;
 
  private:
   common::Status Process(const PathData& path_data,
