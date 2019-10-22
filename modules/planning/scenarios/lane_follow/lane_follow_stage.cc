@@ -293,7 +293,7 @@ void LaneFollowStage::PlanFallbackTrajectory(
 
   const double curr_speed_distance =
       FLAGS_fallback_total_time *
-      std::min({FLAGS_default_cruise_speed,
+      std::min({reference_line_info->GetCruiseSpeed(),
                 reference_line_info->vehicle_state().linear_velocity()});
 
   *reference_line_info->mutable_speed_data() =

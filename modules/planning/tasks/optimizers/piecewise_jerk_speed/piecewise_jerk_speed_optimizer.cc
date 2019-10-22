@@ -99,7 +99,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
   piecewise_jerk_problem.set_ddx_bounds(-4.0, 2.0);
 
   piecewise_jerk_problem.set_dx_ref(piecewise_jerk_speed_config.ref_v_weight(),
-                                    FLAGS_default_cruise_speed);
+                                    reference_line_info_->GetCruiseSpeed());
 
   // Update STBoundary
   std::vector<std::pair<double, double>> s_bounds;
