@@ -35,27 +35,23 @@
 namespace apollo {
 namespace control {
 
-/**
- * @brief informations for producing control command
- *
- */
 struct LocalView {
   canbus::Chassis chassis;
   planning::ADCTrajectory trajectory;
   localization::LocalizationEstimate localization;
 };
 
-class PreProcessSubmodule : public apollo::cyber::TimerComponent {
+class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
  public:
   /**
-   * @brief Construct a new MPCControllerSubmodule object
+   * @brief Construct a new PreprocessorSubmodule object
    *
    */
-  PreProcessSubmodule();
+  PreprocessorSubmodule();
   /**
    * @brief Destructor
    */
-  ~PreProcessSubmodule();
+  ~PreprocessorSubmodule();
 
   /**
    * @brief Get name of the node
@@ -169,6 +165,6 @@ class PreProcessSubmodule : public apollo::cyber::TimerComponent {
   LocalView local_view_;
 };
 
-CYBER_REGISTER_COMPONENT(PreProcessSubmodule);
+CYBER_REGISTER_COMPONENT(PreprocessorSubmodule);
 }  // namespace control
 }  // namespace apollo
