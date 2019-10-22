@@ -185,8 +185,8 @@ void TeleopService::UpdateCarDaemonRpt(
           std::string service =  daemon_rpt->services(i);
           if (service.find("voip_encoder") >= 0) {
               voipIsRunning = true;
-          }          
-      else if (service.find("encoder") >= 0) {
+          }
+          else if (service.find("encoder") >= 0) {
               aVideoEncoderIsRunning = true; 
           }
 
