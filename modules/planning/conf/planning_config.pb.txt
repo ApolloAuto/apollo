@@ -92,6 +92,7 @@ default_task_config: {
       max_acceleration: 3.0
       max_deceleration: -4.0
       spatial_potential_penalty: 1.0e5
+      is_lane_changing: true
     }
   }
 }
