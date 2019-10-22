@@ -74,11 +74,38 @@ class MPCControllerSubmodule final : public apollo::cyber::TimerComponent {
 
  private:
   void OnChassis(const std::shared_ptr<apollo::canbus::Chassis> &chassis);
+  // Upon receiving pad message
+  void OnPad(const std::shared_ptr<apollo::control::PadMessage> &pad);
+
+  void OnPlanning(
+      const std::shared_ptr<apollo::planning::ADCTrajectory> &trajectory);
+
+  void OnLocalization(
+      const std::shared_ptr<apollo::localization::LocalizationEstimate>
+          &localization);
+
+  // Upon receiving monitor message
+  void OnMonitor(
+      const apollo::common::monitor::MonitorMessage &monitor_message);
+
   common::Status ProduceControlCommand(
       apollo::control::ControlCommand *control_command);
 
+  common::Status CheckInput(LocalView *local_view);
+  common::Status CheckTimestamp(const LocalView &local_view);
+  common::Status CheckPad();
+
  private:
   double init_time_ = 0.0;
+
+  bool estop_ = false;
+  std::string estop_reason_;
+  bool pad_received_ = false;
+
+  unsigned int status_lost_ = 0;
+  unsigned int status_sanity_check_failed_ = 0;
+  unsigned int total_status_lost_ = 0;
+  unsigned int total_status_sanity_check_failed_ = 0;
 
   MPCController mpc_controller_;
 
