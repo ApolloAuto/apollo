@@ -18,7 +18,7 @@
  * @file pre_process_submodule.cc
  */
 
-#include "modules/control/submodules/pre_process_submodule.h"
+#include "modules/control/submodules/preprocessor_submodule.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -34,16 +34,16 @@ using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
-PreProcessSubmodule::PreProcessSubmodule()
+PreprocessorSubmodule::PreprocessorSubmodule()
     : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
 
-PreProcessSubmodule::~PreProcessSubmodule() {}
+PreprocessorSubmodule::~PreprocessorSubmodule() {}
 
-std::string PreProcessSubmodule::Name() const {
+std::string PreprocessorSubmodule::Name() const {
   return FLAGS_pre_process_submodule_name;
 }
 
-bool PreProcessSubmodule::Init() {
+bool PreprocessorSubmodule::Init() {
   if (!cyber::common::GetProtoFromFile(FLAGS_control_common_conf_file,
                                        &control_common_conf_)) {
     AERROR << "Unable to load control common conf file: " +
@@ -96,13 +96,46 @@ bool PreProcessSubmodule::Init() {
   return true;
 }
 
-void PreProcessSubmodule::OnChassis(const std::shared_ptr<Chassis> &chassis) {
+bool PreprocessorSubmodule::Proc() {
+  chassis_reader_->Observe();
+  const auto &chassis_msg = chassis_reader_->GetLatestObserved();
+  if (chassis_msg == nullptr) {
+    AERROR << "Chassis msg is not ready!";
+    return false;
+  }
+  OnChassis(chassis_msg);
+
+  trajectory_reader_->Observe();
+  const auto &trajectory_msg = trajectory_reader_->GetLatestObserved();
+  if (trajectory_msg == nullptr) {
+    AERROR << "planning msg is not ready!";
+    return false;
+  }
+  OnPlanning(trajectory_msg);
+
+  localization_reader_->Observe();
+  const auto &localization_msg = localization_reader_->GetLatestObserved();
+  if (localization_msg == nullptr) {
+    AERROR << "localization msg is not ready!";
+    return false;
+  }
+  OnLocalization(localization_msg);
+
+  pad_msg_reader_->Observe();
+  const auto &pad_msg = pad_msg_reader_->GetLatestObserved();
+  if (pad_msg != nullptr) {
+    OnPad(pad_msg);
+  }
+  return true;
+}
+
+void PreprocessorSubmodule::OnChassis(const std::shared_ptr<Chassis> &chassis) {
   ADEBUG << "Received chassis data: run chassis callback.";
   std::lock_guard<std::mutex> lock(mutex_);
   latest_chassis_.CopyFrom(*chassis);
 }
 
-void PreProcessSubmodule::OnPad(const std::shared_ptr<PadMessage> &pad) {
+void PreprocessorSubmodule::OnPad(const std::shared_ptr<PadMessage> &pad) {
   pad_msg_.CopyFrom(*pad);
   ADEBUG << "Received Pad Msg:" << pad_msg_.DebugString();
   AERROR_IF(!pad_msg_.has_action()) << "pad message check failed!";
@@ -116,21 +149,21 @@ void PreProcessSubmodule::OnPad(const std::shared_ptr<PadMessage> &pad) {
   pad_received_ = true;
 }
 
-void PreProcessSubmodule::OnPlanning(
+void PreprocessorSubmodule::OnPlanning(
     const std::shared_ptr<ADCTrajectory> &trajectory) {
   ADEBUG << "Received chassis data: run trajectory callback.";
   std::lock_guard<std::mutex> lock(mutex_);
   latest_trajectory_.CopyFrom(*trajectory);
 }
 
-void PreProcessSubmodule::OnLocalization(
+void PreprocessorSubmodule::OnLocalization(
     const std::shared_ptr<LocalizationEstimate> &localization) {
   ADEBUG << "Received control data: run localization message callback.";
   std::lock_guard<std::mutex> lock(mutex_);
   latest_localization_.CopyFrom(*localization);
 }
 
-void PreProcessSubmodule::OnMonitor(
+void PreprocessorSubmodule::OnMonitor(
     const common::monitor::MonitorMessage &monitor_message) {
   for (const auto &item : monitor_message.item()) {
     if (item.log_level() == common::monitor::MonitorMessageItem::FATAL) {
@@ -140,7 +173,7 @@ void PreProcessSubmodule::OnMonitor(
   }
 }
 
-Status PreProcessSubmodule::CheckInput(LocalView *local_view) {
+Status PreprocessorSubmodule::CheckInput(LocalView *local_view) {
   ADEBUG << "Received localization:"
          << local_view->localization.ShortDebugString();
   ADEBUG << "Received chassis:" << local_view->chassis.ShortDebugString();
@@ -170,7 +203,7 @@ Status PreProcessSubmodule::CheckInput(LocalView *local_view) {
   return Status::OK();
 }
 
-Status PreProcessSubmodule::CheckTimestamp(const LocalView &local_view) {
+Status PreprocessorSubmodule::CheckTimestamp(const LocalView &local_view) {
   if (!control_common_conf_.enable_input_timestamp_check() ||
       control_common_conf_.is_control_test_mode()) {
     ADEBUG << "Skip input timestamp check by gflags.";

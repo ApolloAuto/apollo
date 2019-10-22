@@ -3,13 +3,13 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "pre_process_submodule_lib",
-    srcs = ["pre_process_submodule.cc"],
+    name = "preprocessor_submodule_lib",
+    srcs = ["preprocessor_submodule.cc"],
     hdrs = [
-        "pre_process_submodule.h",
+        "preprocessor_submodule.h",
     ],
     copts = [
-        "-DMODULE_NAME=\\\"mpc_controller_submodule\\\"",
+        "-DMODULE_NAME=\\\"preprocessor_submodule\\\"",
     ],
     deps = [
         "//cyber",
@@ -31,10 +31,10 @@ cc_library(
 )
 
 cc_binary(
-    name = "pre_process_submodule.so",
+    name = "preprocessor_submodule.so",
     linkshared = True,
     linkstatic = False,
-    deps = [":pre_process_submodule_lib"],
+    deps = [":preprocessor_submodule_lib"],
 )
 
 cc_library(
