@@ -34,7 +34,7 @@ DECLARE_bool(enable_speed_station_preview);
 
 DECLARE_string(control_node_name);
 
-DECLARE_string(pre_process_submodule_name);
+DECLARE_string(preprocessor_submodule_name);
 DECLARE_string(mpc_controller_submodule_name);
 
 DECLARE_bool(is_control_test_mode);
@@ -67,6 +67,6 @@ DECLARE_bool(query_forward_time_point_only);
 
 DECLARE_bool(enable_feedback_augment_on_high_speed);
 
-DECLARE_bool(enable_gear_dirve_negative_speed_protection);
+DECLARE_bool(enable_gear_drive_negative_speed_protection);
 
 DECLARE_bool(use_osqp_solver);
