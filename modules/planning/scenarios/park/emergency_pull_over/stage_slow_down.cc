@@ -50,18 +50,14 @@ Stage::StageStatus EmergencyPullOverStageSlowDown::Process(
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
-  // set speed_limit to slow down
+  // set cruise_speed to slow down
   const double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
   const double target_speed =
       adc_speed - scenario_config_.max_stop_deceleration() *
                       scenario_config_.slow_down_deceleration_time();
-  // TODO(all) : to be updated
-  if (frame->mutable_reference_line_info()) {
-    auto* reference_line =
-        frame->mutable_reference_line_info()->front().mutable_reference_line();
-    reference_line->AddSpeedLimit(0.0, 100.0, target_speed);
-  }
+  auto& reference_line_info = frame->mutable_reference_line_info()->front();
+  reference_line_info.SetCruiseSpeed(target_speed);
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {

@@ -54,7 +54,7 @@ class StGraphData {
 
   const SpeedLimit& speed_limit() const;
 
-  const double cruise_speed() const;
+  double cruise_speed() const;
 
   double path_length() const;
 

@@ -58,7 +58,7 @@ const TrajectoryPoint& StGraphData::init_point() const { return init_point_; }
 
 const SpeedLimit& StGraphData::speed_limit() const { return speed_limit_; }
 
-const double StGraphData::cruise_speed() const {
+double StGraphData::cruise_speed() const {
   return cruise_speed_ > 0.0 ? cruise_speed_ : FLAGS_default_cruise_speed;
 }
 
