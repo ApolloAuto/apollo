@@ -178,7 +178,8 @@ double DpStCost::GetReferenceCost(const STPoint& point,
 }
 
 double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
-                              const double speed_limit) const {
+                              const double speed_limit,
+                              const double cruise_speed) const {
   double cost = 0.0;
   const double speed = (second.s() - first.s()) / unit_t_;
   if (speed < 0) {
@@ -205,7 +206,7 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
   }
 
   if (FLAGS_enable_dp_reference_speed) {
-    double diff_speed = speed - FLAGS_default_cruise_speed;
+    double diff_speed = speed - cruise_speed;
     cost += config_.reference_speed_penalty() * config_.default_speed_cost() *
             fabs(diff_speed) * unit_t_;
   }
