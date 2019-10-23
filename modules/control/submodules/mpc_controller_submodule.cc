@@ -131,7 +131,7 @@ bool MPCControllerSubmodule::Proc() {
 
 Status MPCControllerSubmodule::ProduceControlCommand(
     ControlCommand *control_command) {
-  // TODO(SHU): move to pre_processing submodule
+  // TODO(SHU): move to preprocessor submodule
 
   {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -189,7 +189,7 @@ Status MPCControllerSubmodule::ProduceControlCommand(
                     local_view_.trajectory.header().ShortDebugString();
   }
 
-  if (FLAGS_enable_gear_dirve_negative_speed_protection) {
+  if (FLAGS_enable_gear_drive_negative_speed_protection) {
     const double kEpsilon = 0.001;
     auto first_trajectory_point = local_view_.trajectory.trajectory_point(0);
     if (local_view_.chassis.gear_location() == Chassis::GEAR_DRIVE &&

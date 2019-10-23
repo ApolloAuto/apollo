@@ -36,8 +36,8 @@ DEFINE_string(control_node_name, "control", "The control node name in proto");
 DEFINE_string(mpc_controller_submodule_name, "MPC controller",
               "MPC controller node name in proto");
 
-DEFINE_string(pre_process_submodule_name, "pre process submodule",
-              "pre-process node name in proto");
+DEFINE_string(preprocessor_submodule_name, "preprocessor submodule",
+              "preprocessor submodule name in proto");
 
 DEFINE_bool(is_control_test_mode, false, "True to run control in test mode");
 DEFINE_bool(use_preview_speed_for_table, false,
@@ -92,7 +92,7 @@ DEFINE_bool(enable_feedback_augment_on_high_speed, false,
             "Enable augmented control on lateral error on high speed");
 
 DEFINE_bool(
-    enable_gear_dirve_negative_speed_protection, false,
+    enable_gear_drive_negative_speed_protection, false,
     "Enable estop to prevent following negative speed during gear drive");
 
 DEFINE_bool(use_osqp_solver, false, "use OSQP solver for MPC controller");
