@@ -14,41 +14,36 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
+#define protected public
+#define private public
+#include "modules/planning/scenarios/emergency/emergency_pull_over/stage_slow_down.h"
 
-#pragma once
+#include "gtest/gtest.h"
 
-#include "modules/planning/proto/planning_config.pb.h"
-
-#include "modules/planning/scenarios/park/emergency_pull_over/emergency_pull_over_scenario.h"
-#include "modules/planning/scenarios/stage.h"
+#include "cyber/common/file.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace emergency_pull_over {
 
-struct EmergencyPullOverContext;
-
-class EmergencyPullOverStageApproach : public Stage {
+class StageSlowDownTest : public ::testing::Test {
  public:
-  explicit EmergencyPullOverStageApproach(
-      const ScenarioConfig::StageConfig& config);
-
-  StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                      Frame* frame) override;
-
-  EmergencyPullOverContext* GetContext() {
-    return Stage::GetContextAs<EmergencyPullOverContext>();
+  virtual void SetUp() {
+    config_.set_stage_type(ScenarioConfig::EMERGENCY_PULL_OVER_SLOW_DOWN);
   }
 
-  Stage::StageStatus FinishStage();
-
- private:
-  ScenarioEmergencyPullOverConfig scenario_config_;
+ protected:
+  ScenarioConfig::StageConfig config_;
 };
+
+TEST_F(StageSlowDownTest, Init) {
+  EmergencyPullOverStageSlowDown emergency_pull_over_stage_slow_down(config_);
+  EXPECT_EQ(emergency_pull_over_stage_slow_down.Name(),
+            ScenarioConfig::StageType_Name(
+                ScenarioConfig::EMERGENCY_PULL_OVER_SLOW_DOWN));
+}
 
 }  // namespace emergency_pull_over
 }  // namespace scenario

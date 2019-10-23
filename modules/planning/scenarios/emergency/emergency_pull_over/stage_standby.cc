@@ -14,35 +14,49 @@
  * limitations under the License.
  *****************************************************************************/
 
-#define protected public
-#define private public
-#include "modules/planning/scenarios/park/emergency_pull_over/stage_slow_down.h"
+/**
+ * @file
+ **/
 
-#include "gtest/gtest.h"
+#include "modules/planning/scenarios/emergency/emergency_pull_over/stage_standby.h"
 
-#include "cyber/common/file.h"
+#include <string>
+#include <vector>
+
 #include "cyber/common/log.h"
+
+#include "modules/planning/common/frame.h"
+#include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/util/common.h"
+#include "modules/planning/scenarios/util/util.h"
+#include "modules/planning/tasks/deciders/path_bounds_decider/path_bounds_decider.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace emergency_pull_over {
 
-class StageSlowDownTest : public ::testing::Test {
- public:
-  virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::EMERGENCY_PULL_OVER_SLOW_DOWN);
+using apollo::common::TrajectoryPoint;
+
+Stage::StageStatus EmergencyPullOverStageStandby::Process(
+    const TrajectoryPoint& planning_init_point, Frame* frame) {
+  ADEBUG << "stage: Stop";
+  CHECK_NOTNULL(frame);
+
+  scenario_config_.CopyFrom(GetContext()->scenario_config);
+
+  bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
+  if (!plan_ok) {
+    AERROR << "EmergencyPullOverStageStandby planning error";
   }
 
- protected:
-  ScenarioConfig::StageConfig config_;
-};
+  // TODO(all): add a stop fence ahead of ADC
 
-TEST_F(StageSlowDownTest, Init) {
-  EmergencyPullOverStageSlowDown emergency_pull_over_stage_slow_down(config_);
-  EXPECT_EQ(emergency_pull_over_stage_slow_down.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::EMERGENCY_PULL_OVER_SLOW_DOWN));
+  return Stage::RUNNING;
+}
+
+Stage::StageStatus EmergencyPullOverStageStandby::FinishStage() {
+  return FinishScenario();
 }
 
 }  // namespace emergency_pull_over

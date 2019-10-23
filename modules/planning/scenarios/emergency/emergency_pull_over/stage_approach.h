@@ -22,7 +22,7 @@
 
 #include "modules/planning/proto/planning_config.pb.h"
 
-#include "modules/planning/scenarios/park/emergency_pull_over/emergency_pull_over_scenario.h"
+#include "modules/planning/scenarios/emergency/emergency_pull_over/emergency_pull_over_scenario.h"
 #include "modules/planning/scenarios/stage.h"
 
 namespace apollo {
@@ -32,9 +32,9 @@ namespace emergency_pull_over {
 
 struct EmergencyPullOverContext;
 
-class EmergencyPullOverStageSlowDown : public Stage {
+class EmergencyPullOverStageApproach : public Stage {
  public:
-  explicit EmergencyPullOverStageSlowDown(
+  explicit EmergencyPullOverStageApproach(
       const ScenarioConfig::StageConfig& config);
 
   StageStatus Process(const common::TrajectoryPoint& planning_init_point,

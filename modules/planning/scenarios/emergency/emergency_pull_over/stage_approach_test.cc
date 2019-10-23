@@ -16,7 +16,7 @@
 
 #define protected public
 #define private public
-#include "modules/planning/scenarios/park/emergency_pull_over/stage_approach.h"
+#include "modules/planning/scenarios/emergency/emergency_pull_over/stage_approach.h"
 
 #include "gtest/gtest.h"
 

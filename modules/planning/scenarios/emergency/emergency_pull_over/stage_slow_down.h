@@ -17,41 +17,38 @@
 /**
  * @file
  **/
-#define protected public
-#define private public
-#include "modules/planning/scenarios/park/emergency_pull_over/emergency_pull_over_scenario.h"
 
-#include "gtest/gtest.h"
+#pragma once
 
-#include "cyber/common/file.h"
-#include "cyber/common/log.h"
-#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/proto/planning_config.pb.h"
+
+#include "modules/planning/scenarios/emergency/emergency_pull_over/emergency_pull_over_scenario.h"
+#include "modules/planning/scenarios/stage.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace emergency_pull_over {
 
-class EmergencyPullOverScenarioTest : public ::testing::Test {
+struct EmergencyPullOverContext;
+
+class EmergencyPullOverStageSlowDown : public Stage {
  public:
-  virtual void SetUp() {}
+  explicit EmergencyPullOverStageSlowDown(
+      const ScenarioConfig::StageConfig& config);
 
- protected:
-  std::unique_ptr<EmergencyPullOverScenario> scenario_;
+  StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                      Frame* frame) override;
+
+  EmergencyPullOverContext* GetContext() {
+    return Stage::GetContextAs<EmergencyPullOverContext>();
+  }
+
+  Stage::StageStatus FinishStage();
+
+ private:
+  ScenarioEmergencyPullOverConfig scenario_config_;
 };
-
-TEST_F(EmergencyPullOverScenarioTest, Init) {
-  FLAGS_scenario_emergency_pull_over_config_file =
-      "/apollo/modules/planning/conf/scenario"
-      "/emergency_pull_over_config.pb.txt";
-
-  ScenarioConfig config;
-  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_emergency_pull_over_config_file, &config));
-  ScenarioContext context;
-  scenario_.reset(new EmergencyPullOverScenario(config, &context));
-  EXPECT_EQ(scenario_->scenario_type(), ScenarioConfig::EMERGENCY_PULL_OVER);
-}
 
 }  // namespace emergency_pull_over
 }  // namespace scenario
