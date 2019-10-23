@@ -91,7 +91,7 @@ class ReferenceLineInfo {
   const PlanningTarget& planning_target() const { return planning_target_; }
 
   void SetCruiseSpeed(double speed) { cruise_speed_ = speed; }
-  const double GetCruiseSpeed() const;
+  double GetCruiseSpeed() const;
 
   hdmap::LaneInfoConstPtr LocateLaneInfo(const double s) const;
 
