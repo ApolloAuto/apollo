@@ -29,20 +29,22 @@
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/control_common_conf.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
+#include "modules/control/proto/preprocessor.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace control {
 
-struct LocalView {
-  canbus::Chassis chassis;
-  planning::ADCTrajectory trajectory;
-  localization::LocalizationEstimate localization;
-};
-
 class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
  public:
+  // TODO(SHU): remove to proto
+  struct LocalView {
+    canbus::Chassis chassis;
+    planning::ADCTrajectory trajectory;
+    localization::LocalizationEstimate localization;
+  };
+
   /**
    * @brief Construct a new PreprocessorSubmodule object
    *
@@ -65,11 +67,6 @@ class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
    */
   bool Init() override;
 
-  /**
-   * @brief generate local_view object for control command
-   *
-   * @return If local_view is successfully generated
-   */
   bool Proc() override;
 
  private:
@@ -134,6 +131,9 @@ class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
    * @return common::Status
    */
   common::Status CheckPad();
+
+  common::Status ProducePreprocessorStatus(
+      apollo::control::Preprocessor *preprocessor_status);
 
  private:
   double init_time_ = 0.0;

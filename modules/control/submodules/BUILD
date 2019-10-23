@@ -25,6 +25,7 @@ cc_library(
         "//modules/control/common:control_gflags",
         "//modules/control/proto:control_command_proto",
         "//modules/control/proto:control_common_conf_proto",
+        "//modules/control/proto:preprocessor_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/planning/proto:planning_proto",
     ],
