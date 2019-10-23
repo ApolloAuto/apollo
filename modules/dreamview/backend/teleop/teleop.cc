@@ -60,7 +60,7 @@ void TeleopService::Start() {
 
   modem0_info_reader_ = node_->CreateReader<ModemInfo>(
       modem0_channel,
-      [this](const std::shared_ptr<ModemInfo> &msg) {UpdateModem(modem0_id, msg); 
+      [this](const std::shared_ptr<ModemInfo> &msg) { UpdateModem(modem0_id, msg);
       });
 
   modem1_info_reader_ = node_->CreateReader<ModemInfo>(
@@ -166,7 +166,7 @@ void TeleopService::UpdateModem(const std::string &modem_id,
 
     // TODO simplify data and only send necessary info for display
     // update modem_info_
-    if (modem_info->has_provider() && modem_info->has_technology()) {
+    if (modem_info->has_technology()) {
         // teleop_status_["modems"][modem_info->provider()] =
         //  modem_info->technology();
         boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
@@ -187,7 +187,7 @@ void TeleopService::UpdateCarDaemonRpt(
               voipIsRunning = true;
           }
           else if (service.find("encoder") >= 0) {
-              aVideoEncoderIsRunning = true; 
+              aVideoEncoderIsRunning = true;
           }
 
       }
@@ -205,6 +205,7 @@ void TeleopService::UpdateOperatorDaemonRpt(
           std::string service =  daemon_rpt->services(i);
           if (service.find("voip_encoder") >= 0) {
               voipIsRunning = true;
+              break;
           }
       }
       boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
