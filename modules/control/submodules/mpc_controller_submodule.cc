@@ -57,7 +57,7 @@ bool MPCControllerSubmodule::Init() {
 }
 
 bool MPCControllerSubmodule::Proc(
-    const std ::shared_ptr<control::Preprocessor> &preprocessor_status) {
+    const std::shared_ptr<control::Preprocessor>& preprocessor_status) {
   ControlCommand control_command;
   local_view_ = preprocessor_status->mutable_local_view();
 
@@ -70,7 +70,7 @@ bool MPCControllerSubmodule::Proc(
 }
 
 Status MPCControllerSubmodule::ProduceControlCommand(
-    ControlCommand *control_command) {
+    ControlCommand* control_command) {
   std::lock_guard<std::mutex> lock(mutex_);
 
   // TODO(SHU): skip produce control command if estop

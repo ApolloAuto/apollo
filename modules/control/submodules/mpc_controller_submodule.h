@@ -67,12 +67,12 @@ class MPCControllerSubmodule final
    * @return true control command is successfully generated
    * @return false fail to generate control command
    */
-  bool Proc(const std ::shared_ptr<control::Preprocessor> &preprocessor_status)
+  bool Proc(const std::shared_ptr<control::Preprocessor>& preprocessor_status)
       override;
 
  private:
   common::Status ProduceControlCommand(
-      apollo::control::ControlCommand *control_command);
+      apollo::control::ControlCommand* control_command);
 
  private:
   bool estop_ = false;
@@ -89,7 +89,7 @@ class MPCControllerSubmodule final
   // TODO(SHU): separate conf
   ControlConf mpc_controller_conf_;
 
-  control::LocalView *local_view_;
+  control::LocalView* local_view_;
 };
 
 CYBER_REGISTER_COMPONENT(MPCControllerSubmodule)
