@@ -131,6 +131,10 @@ void ReferenceLineInfo::SetCandidatePathBoundaries(
   candidate_path_boundaries_ = std::move(path_boundaries);
 }
 
+const double ReferenceLineInfo::GetCruiseSpeed() const {
+  return cruise_speed_ > 0.0 ? cruise_speed_ : FLAGS_default_cruise_speed;
+}
+
 hdmap::LaneInfoConstPtr ReferenceLineInfo::LocateLaneInfo(
     const double s) const {
   std::vector<hdmap::LaneInfoConstPtr> lanes;
