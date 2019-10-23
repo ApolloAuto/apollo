@@ -85,6 +85,11 @@ bool PreprocessorSubmodule::Init() {
       node_->CreateReader<PadMessage>(pad_msg_reader_config, nullptr);
   CHECK(pad_msg_reader_ != nullptr);
 
+  // Preprocessor writer
+  preprocessor_writer_ =
+      node_->CreateWriter<Preprocessor>(FLAGS_control_preprocessor_topic);
+  CHECK(preprocessor_writer_ != nullptr);
+
   // set initial vehicle state by cmd
   // need to sleep, because advertised channel is not ready immediately
   // simple test shows a short delay of 80 ms or so
@@ -137,6 +142,10 @@ Status PreprocessorSubmodule::ProducePreprocessorStatus(
     Preprocessor *preprocessor_status) {
   {
     std::lock_guard<std::mutex> lock(mutex_);
+    preprocessor_status->mutable_local_view()->set_allocated_chassis(
+        &latest_chassis_);
+
+    // TODO(SHU): change the followings
     local_view_.chassis = latest_chassis_;
     local_view_.trajectory = latest_trajectory_;
     local_view_.localization = latest_localization_;
