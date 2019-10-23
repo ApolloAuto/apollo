@@ -29,7 +29,6 @@
 #include "modules/prediction/common/semantic_map.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/container/pose/pose_container.h"
 #include "modules/prediction/evaluator/cyclist/cyclist_keep_lane_evaluator.h"
 #include "modules/prediction/evaluator/pedestrian/pedestrian_interaction_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/cost_evaluator.h"
@@ -320,10 +319,6 @@ void EvaluatorManager::BuildObstacleIdHistoryMap() {
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
   CHECK_NOTNULL(obstacles_container);
-  auto ego_pose_container =
-      ContainerManager::Instance()->GetContainer<PoseContainer>(
-          AdapterConfig::LOCALIZATION);
-  CHECK_NOTNULL(ego_pose_container);
   std::vector<int> obstacle_ids =
       obstacles_container->curr_frame_movable_obstacle_ids();
   obstacle_ids.push_back(FLAGS_ego_vehicle_id);

@@ -32,7 +32,7 @@
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/container/container_manager.h"
-#include "modules/prediction/container/pose/pose_container.h"
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 
 namespace apollo {
 namespace prediction {
@@ -252,18 +252,19 @@ void JunctionMLPEvaluator::SetEgoVehicleFeatureValues(
     Obstacle* obstacle_ptr, std::vector<double>* const feature_values) {
   feature_values->clear();
   *feature_values = std::vector<double>(4, 0.0);
-  auto ego_pose_container_ptr =
-      ContainerManager::Instance()->GetContainer<PoseContainer>(
-          AdapterConfig::LOCALIZATION);
-  if (ego_pose_container_ptr == nullptr) {
+  auto obstacles_container_ptr =
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
+  CHECK_NOTNULL(obstacles_container_ptr);
+  auto ego_pose_obstacle_ptr =
+      obstacles_container_ptr->GetObstacle(FLAGS_ego_vehicle_id);
+  if (ego_pose_obstacle_ptr == nullptr) {
     (*feature_values)[0] = 100.0;
     (*feature_values)[1] = 100.0;
     return;
   }
-  const auto ego_pose_obstacle_ptr =
-      ego_pose_container_ptr->ToPerceptionObstacle();
-  const auto ego_position = ego_pose_obstacle_ptr->position();
-  const auto ego_velocity = ego_pose_obstacle_ptr->velocity();
+  const auto ego_position = ego_pose_obstacle_ptr->latest_feature().position();
+  const auto ego_velocity = ego_pose_obstacle_ptr->latest_feature().velocity();
   CHECK_GT(obstacle_ptr->history_size(), 0);
   const Feature& obstacle_feature = obstacle_ptr->latest_feature();
   apollo::common::math::Vec2d ego_relative_position(
