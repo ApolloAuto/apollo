@@ -15,10 +15,13 @@
  *****************************************************************************/
 
 /**
- * @file pre_process_submodule.cc
+ * @file processor_submodule.cc
  */
 
 #include "modules/control/submodules/preprocessor_submodule.h"
+
+#include <string>
+
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -40,18 +43,19 @@ PreprocessorSubmodule::PreprocessorSubmodule()
 PreprocessorSubmodule::~PreprocessorSubmodule() {}
 
 std::string PreprocessorSubmodule::Name() const {
-  return FLAGS_pre_process_submodule_name;
+  return FLAGS_preprocessor_submodule_name;
 }
 
 bool PreprocessorSubmodule::Init() {
   if (!cyber::common::GetProtoFromFile(FLAGS_control_common_conf_file,
                                        &control_common_conf_)) {
-    AERROR << "Unable to load control common conf file: " +
-                  FLAGS_control_common_conf_file;
+    AERROR << "Unable to load control common conf file: "
+           << FLAGS_control_common_conf_file;
     return false;
   }
 
   /*  initialize readers and writers */
+  // TODO(SHU): add writer of preprocessor
   cyber::ReaderConfig chassis_reader_config;
   chassis_reader_config.channel_name = FLAGS_chassis_topic;
   chassis_reader_config.pending_queue_size = FLAGS_chassis_pending_queue_size;
@@ -98,7 +102,7 @@ bool PreprocessorSubmodule::Init() {
 
 bool PreprocessorSubmodule::Proc() {
   chassis_reader_->Observe();
-  const auto &chassis_msg = chassis_reader_->GetLatestObserved();
+  const auto chassis_msg = chassis_reader_->GetLatestObserved();
   if (chassis_msg == nullptr) {
     AERROR << "Chassis msg is not ready!";
     return false;
@@ -106,7 +110,7 @@ bool PreprocessorSubmodule::Proc() {
   OnChassis(chassis_msg);
 
   trajectory_reader_->Observe();
-  const auto &trajectory_msg = trajectory_reader_->GetLatestObserved();
+  const auto trajectory_msg = trajectory_reader_->GetLatestObserved();
   if (trajectory_msg == nullptr) {
     AERROR << "planning msg is not ready!";
     return false;
@@ -114,7 +118,7 @@ bool PreprocessorSubmodule::Proc() {
   OnPlanning(trajectory_msg);
 
   localization_reader_->Observe();
-  const auto &localization_msg = localization_reader_->GetLatestObserved();
+  const auto localization_msg = localization_reader_->GetLatestObserved();
   if (localization_msg == nullptr) {
     AERROR << "localization msg is not ready!";
     return false;
@@ -122,11 +126,98 @@ bool PreprocessorSubmodule::Proc() {
   OnLocalization(localization_msg);
 
   pad_msg_reader_->Observe();
-  const auto &pad_msg = pad_msg_reader_->GetLatestObserved();
+  const auto pad_msg = pad_msg_reader_->GetLatestObserved();
   if (pad_msg != nullptr) {
     OnPad(pad_msg);
   }
   return true;
+}
+
+Status PreprocessorSubmodule::ProducePreprocessorStatus(
+    Preprocessor *preprocessor_status) {
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    local_view_.chassis = latest_chassis_;
+    local_view_.trajectory = latest_trajectory_;
+    local_view_.localization = latest_localization_;
+  }
+  Status status = CheckInput(&local_view_);
+
+  if (!status.ok()) {
+    AERROR_EVERY(100) << "Control input data failed: "
+                      << status.error_message();
+    preprocessor_status->mutable_engage_advice()->set_advice(
+        apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+    preprocessor_status->mutable_engage_advice()->set_reason(
+        status.error_message());
+    estop_ = true;
+    estop_reason_ = status.error_message();
+  } else {
+    Status status_ts = CheckTimestamp(local_view_);
+    if (!status_ts.ok()) {
+      AERROR << "Input messages timeout";
+      status = status_ts;
+      if (local_view_.chassis.driving_mode() !=
+          apollo::canbus::Chassis::COMPLETE_AUTO_DRIVE) {
+        preprocessor_status->mutable_engage_advice()->set_advice(
+            apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+        preprocessor_status->mutable_engage_advice()->set_reason(
+            status.error_message());
+      }
+    } else {
+      preprocessor_status->mutable_engage_advice()->set_advice(
+          apollo::common::EngageAdvice::READY_TO_ENGAGE);
+    }
+  }
+
+  // check estop
+  estop_ = control_common_conf_.enable_persistent_estop()
+               ? estop_ || local_view_.trajectory.estop().is_estop()
+               : local_view_.trajectory.estop().is_estop();
+
+  if (local_view_.trajectory.estop().is_estop()) {
+    estop_ = true;
+    estop_reason_ = "estop from planning : ";
+    estop_reason_ += local_view_.trajectory.estop().reason();
+  }
+
+  if (local_view_.trajectory.trajectory_point().empty()) {
+    AWARN_EVERY(100) << "planning has no trajectory point. ";
+    estop_ = true;
+    estop_reason_ = "estop for empty planning trajectory, planning headers: " +
+                    local_view_.trajectory.header().ShortDebugString();
+  }
+
+  if (FLAGS_enable_gear_drive_negative_speed_protection) {
+    const double kEpsilon = 0.001;
+    auto first_trajectory_point = local_view_.trajectory.trajectory_point(0);
+    if (local_view_.chassis.gear_location() == Chassis::GEAR_DRIVE &&
+        first_trajectory_point.v() < -1 * kEpsilon) {
+      estop_ = true;
+      estop_reason_ = "estop for negative speed when gear_drive";
+    }
+  }
+
+  if (!estop_) {
+    auto debug = preprocessor_status->mutable_input_debug();
+    debug->mutable_localization_header()->CopyFrom(
+        local_view_.localization.header());
+    debug->mutable_canbus_header()->CopyFrom(local_view_.chassis.header());
+    debug->mutable_trajectory_header()->CopyFrom(
+        local_view_.trajectory.header());
+
+    if (local_view_.trajectory.is_replan()) {
+      latest_replan_trajectory_header_.CopyFrom(
+          local_view_.trajectory.header());
+    }
+
+    if (latest_replan_trajectory_header_.has_sequence_num()) {
+      debug->mutable_latest_replan_trajectory_header()->CopyFrom(
+          latest_replan_trajectory_header_);
+    }
+  }
+
+  return status;
 }
 
 void PreprocessorSubmodule::OnChassis(const std::shared_ptr<Chassis> &chassis) {
@@ -140,7 +231,6 @@ void PreprocessorSubmodule::OnPad(const std::shared_ptr<PadMessage> &pad) {
   ADEBUG << "Received Pad Msg:" << pad_msg_.DebugString();
   AERROR_IF(!pad_msg_.has_action()) << "pad message check failed!";
 
-  // do something according to pad message
   if (pad_msg_.action() == DrivingAction::RESET) {
     AINFO << "Control received RESET action!";
     estop_ = false;
@@ -181,8 +271,8 @@ Status PreprocessorSubmodule::CheckInput(LocalView *local_view) {
   if (!local_view->trajectory.estop().is_estop() &&
       local_view->trajectory.trajectory_point().empty()) {
     AWARN_EVERY(100) << "planning has no trajectory point. ";
-    std::string msg("planning has no trajectory point. planning_seq_num:");
-    msg += std::to_string(local_view->trajectory.header().sequence_num());
+    std::string msg = "planning has no trajectory point. planning_seq_num: ";
+    msg.append(std::to_string(local_view->trajectory.header().sequence_num()));
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, msg);
   }
 
