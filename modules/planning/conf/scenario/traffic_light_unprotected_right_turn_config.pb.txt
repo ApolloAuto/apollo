@@ -6,6 +6,7 @@ traffic_light_unprotected_right_turn_config: {
   min_pass_s_distance: 3.0
   red_light_right_turn_stop_duration_sec: 3.0
   creep_timeout_sec: 10.0
+  max_adc_speed_before_creep: 3.0
 }
 stage_type: TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP
 stage_type: TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP

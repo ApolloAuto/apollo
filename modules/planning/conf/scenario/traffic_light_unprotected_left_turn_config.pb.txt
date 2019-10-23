@@ -4,6 +4,7 @@ traffic_light_unprotected_left_turn_config: {
   max_valid_stop_distance: 2.0
   min_pass_s_distance: 3.0
   creep_timeout_sec: 10.0
+  max_adc_speed_before_creep: 3.0
 }
 
 stage_type: TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP

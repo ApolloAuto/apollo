@@ -24,6 +24,7 @@
 
 #include "cyber/common/log.h"
 #include "modules/common/time/time.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
@@ -166,23 +167,32 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishStage(
     next_stage_ = ScenarioConfig ::
         TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE;
   } else {
-    // creep
-    // update PlanningContext
-    PlanningContext::Instance()
-        ->mutable_planning_status()
-        ->mutable_traffic_light()
-        ->mutable_done_traffic_light_overlap_id()
-        ->Clear();
-    for (const auto& traffic_light_overlap_id :
-         GetContext()->current_traffic_light_overlap_ids) {
+    // check speed at stop_stage
+    const double adc_speed =
+        common::VehicleStateProvider::Instance()->linear_velocity();
+    if (adc_speed > scenario_config_.max_adc_speed_before_creep()) {
+      // skip creep
+      next_stage_ = ScenarioConfig ::
+          TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE;
+    } else {
+      // creep
+      // update PlanningContext
       PlanningContext::Instance()
           ->mutable_planning_status()
           ->mutable_traffic_light()
-          ->add_done_traffic_light_overlap_id(traffic_light_overlap_id);
-    }
+          ->mutable_done_traffic_light_overlap_id()
+          ->Clear();
+      for (const auto& traffic_light_overlap_id :
+          GetContext()->current_traffic_light_overlap_ids) {
+        PlanningContext::Instance()
+            ->mutable_planning_status()
+            ->mutable_traffic_light()
+            ->add_done_traffic_light_overlap_id(traffic_light_overlap_id);
+      }
 
-    GetContext()->creep_start_time = Clock::NowInSeconds();
-    next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP;
+      GetContext()->creep_start_time = Clock::NowInSeconds();
+      next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP;
+    }
   }
   return Stage::FINISHED;
 }

@@ -139,12 +139,12 @@ void TrafficLight::MakeDecisions(Frame* const frame,
 
     if (signal_color == perception::TrafficLight::GREEN) {
       continue;
-    } else {
-      // Red/Yellow/Unown: check deceleration
-      if (stop_deceleration > config_.traffic_light().max_stop_deceleration()) {
-        AWARN << "stop_deceleration too big to achieve.  SKIP red light";
-        continue;
-      }
+    }
+
+    // Red/Yellow/Unkown: check deceleration
+    if (stop_deceleration > config_.traffic_light().max_stop_deceleration()) {
+      AWARN << "stop_deceleration too big to achieve.  SKIP red light";
+      continue;
     }
 
     // build stop decision
