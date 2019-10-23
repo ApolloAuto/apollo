@@ -38,12 +38,12 @@ namespace control {
 
 class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
  public:
-  // TODO(SHU): remove to proto
-  struct LocalView {
-    canbus::Chassis chassis;
-    planning::ADCTrajectory trajectory;
-    localization::LocalizationEstimate localization;
-  };
+//   TODO(SHU): remove to proto
+    struct LocalView {
+      canbus::Chassis chassis;
+      planning::ADCTrajectory trajectory;
+      localization::LocalizationEstimate localization;
+    };
 
   /**
    * @brief Construct a new PreprocessorSubmodule object
@@ -155,8 +155,9 @@ class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
   std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
       localization_reader_;
   std::shared_ptr<cyber::Reader<planning::ADCTrajectory>> trajectory_reader_;
-  std::shared_ptr<cyber::Writer<apollo::control::ControlCommand>>
-      control_command_writer_;
+
+  std::shared_ptr<cyber::Writer<apollo::control::Preprocessor>>
+      preprocessor_writer_;
 
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
