@@ -43,7 +43,7 @@ STDrivingLimits::STDrivingLimits(const double max_acc, const double max_dec,
 std::pair<double, double> STDrivingLimits::GetVehicleDynamicsLimits(
     const double t) const {
   std::pair<double, double> dynamic_limits;
-  // Process lower bound:
+  // Process lower bound: (constant deceleration)
   double dec_time = lower_v0_ / max_dec_;
   if (t - lower_t0_ < dec_time) {
     dynamic_limits.first = lower_s0_ +
@@ -53,7 +53,7 @@ std::pair<double, double> STDrivingLimits::GetVehicleDynamicsLimits(
     dynamic_limits.first = lower_s0_ + (lower_v0_ * dec_time) * 0.5;
   }
 
-  // Process upper bound:
+  // Process upper bound: (constant acceleration)
   double acc_time = (max_v_ - upper_v0_) / max_acc_;
   if (t - upper_t0_ < acc_time) {
     dynamic_limits.second = upper_s0_ +
