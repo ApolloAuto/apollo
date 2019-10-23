@@ -121,6 +121,7 @@ message ScenarioTrafficLightUnprotectedLeftTurnConfig {
   optional double max_valid_stop_distance = 2 [default = 3.5];  // meter
   optional double min_pass_s_distance = 3 [default = 3.0];  // meter
   optional float creep_timeout_sec = 4 [default = 10.0];  // sec
+  optional double max_adc_speed_before_creep = 5 [default = 3.0];  // m/s
 }
 
 message ScenarioTrafficLightUnprotectedRightTurnConfig {
@@ -130,6 +131,7 @@ message ScenarioTrafficLightUnprotectedRightTurnConfig {
   optional double min_pass_s_distance = 4 [default = 3.0];  // meter
   optional float red_light_right_turn_stop_duration_sec = 5 [default = 3.0];  // sec
   optional float creep_timeout_sec = 6 [default = 10.0];  // sec
+  optional double max_adc_speed_before_creep = 7 [default = 3.0];  // m/s
 }
 
 message ScenarioPullOverConfig {
