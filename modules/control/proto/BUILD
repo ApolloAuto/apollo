@@ -34,6 +34,30 @@ proto_library(
     ],
 )
 
+# preprocessor_proto
+cc_proto_library(
+    name = "preprocessor_proto",
+    deps = [
+        ":preprocessor_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "preprocessor_proto_lib",
+    srcs = [
+        "preprocessor.proto",
+    ],
+    deps = [
+        ":control_command_proto_lib",
+        ":pad_msg_lib",
+        "//modules/canbus/proto:canbus_proto_lib",
+        "//modules/common/proto:drive_state_proto_lib",
+        "//modules/common/proto:header_proto_lib",
+        "//modules/localization/proto:localization_proto_lib",
+        "//modules/planning/proto:planning_proto_lib",
+    ],
+)
+
 # control command
 cc_proto_library(
     name = "control_command_proto",
