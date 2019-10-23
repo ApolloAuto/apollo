@@ -37,21 +37,28 @@
 namespace apollo {
 namespace planning {
 
+// TODO(jiacheng): currently implemented a constant velocity model for
+// guide-line. Upgrade it to a constant acceleration model.
 class STGuideLine {
  public:
-  STGuideLine();
+  explicit STGuideLine(double desired_v);
 
   virtual ~STGuideLine() = default;
 
-  common::Status ComputeSTGuideLine(double vel_curr, double vel_expected,
-                                    double acc);
-
   double GetGuideSFromT(double t) const;
+
+  void UpdateBlockingInfo(
+      const double t, const double s_block, const bool is_lower_block);
 
  private:
   // Variables for simple guide-line calculation.
-  double t_th;
-  double s_th;
-  double acc_stage_1;
-  double vel_stage_2;
+  double t0_;
+  double s0_;
+  double v0_;
+  // double max_acc_;
+  // double max_dec_;
+  // double max_v_;
 };
+
+}  // namespace planning
+}  // namespace apollo
