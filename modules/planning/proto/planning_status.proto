@@ -23,7 +23,7 @@ message ChangeLaneStatus {
   enum Status {
     IN_CHANGE_LANE = 1;       // during change lane state
     CHANGE_LANE_FAILED = 2;   // change lane failed
-    CHANGE_LANE_SUCCESS = 3;  // change lane succeeded
+    CHANGE_LANE_FINISHED = 3;  // change lane finished
   }
   optional Status status = 1;
   // the id of the route segment that the vehicle is driving on
@@ -33,6 +33,8 @@ message ChangeLaneStatus {
   // the starting position only after which lane-change can happen.
   optional bool exist_lane_change_start_position = 4 [default = false];
   optional apollo.common.Point3D lane_change_start_position = 5;
+  // the last time stamp when the lane-change planning succeed.
+  optional double last_succeed_timestamp = 6;
 }
 
 message StopTime {
