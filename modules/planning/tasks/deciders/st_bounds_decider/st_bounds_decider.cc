@@ -35,21 +35,32 @@ STBoundsDecider::STBoundsDecider(const TaskConfig& config) : Decider(config) {
 
 Status STBoundsDecider::Process(Frame* const frame,
                                 ReferenceLineInfo* const reference_line_info) {
+  // Initialize the related helper classes.
+  InitSTBoundsDecider(*frame, reference_line_info);
+
+  // Sweep the t-axis, and determine the s-boundaries step by step.
+  // TODO(jiacheng): implement this.
+
+  return Status::OK();
+}
+
+void STBoundsDecider::InitSTBoundsDecider(
+    const Frame& frame, ReferenceLineInfo* const reference_line_info) {
   const PathData& path_data = reference_line_info->path_data();
-  PathDecision* const path_decision = reference_line_info->path_decision();
+  PathDecision* path_decision = reference_line_info->path_decision();
 
   // Map all related obstacles onto ST-Graph.
   auto time1 = std::chrono::system_clock::now();
-  STObstaclesProcessor st_obstacles_processor(
+  st_obstacles_processor_.Init(
       path_data.discretized_path().Length(), st_bounds_config_.total_time(),
       path_data);
-  st_obstacles_processor.MapObstaclesToSTBoundaries(path_decision);
+  st_obstacles_processor_.MapObstaclesToSTBoundaries(path_decision);
   auto time2 = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = time2 - time1;
   ADEBUG << "Time for ST Obstacles Processing = " << diff.count() * 1000
          << " msec.";
   // Record the ST-Graph for good visualization and easy debugging.
-  auto all_st_boundaries = st_obstacles_processor.GetAllSTBoundaries();
+  auto all_st_boundaries = st_obstacles_processor_.GetAllSTBoundaries();
   std::vector<STBoundary> st_boundaries;
   for (auto it = all_st_boundaries.begin(); it != all_st_boundaries.end();
        ++it) {
@@ -62,12 +73,13 @@ Status STBoundsDecider::Process(Frame* const frame,
   RecordSTGraphDebug(st_boundaries, st_graph_debug);
 
   // Initialize Guide-Line and Driving-Limits.
-  // TODO(jiacheng): implement this.
-
-  // Sweep the t-axis, and determine the s-boundaries step by step.
-  // TODO(jiacheng): implement this.
-
-  return Status::OK();
+  constexpr double desired_speed = 15.0;
+  st_guide_line_.Init(desired_speed);
+  constexpr double max_acc = 2.0;
+  constexpr double max_dec = 4.0;
+  constexpr double max_v = desired_speed * 1.5;
+  st_driving_limits_.Init(max_acc, max_dec, max_v,
+      frame.PlanningStartPoint().v());
 }
 
 void STBoundsDecider::RecordSTGraphDebug(

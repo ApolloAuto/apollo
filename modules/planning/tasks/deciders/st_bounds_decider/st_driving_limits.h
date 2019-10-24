@@ -41,7 +41,9 @@ namespace planning {
 
 class STDrivingLimits {
  public:
-  STDrivingLimits(const double max_acc, const double max_dec,
+  STDrivingLimits() {}
+
+  void Init(const double max_acc, const double max_dec,
       const double max_v, double curr_v);
 
   virtual ~STDrivingLimits() = default;

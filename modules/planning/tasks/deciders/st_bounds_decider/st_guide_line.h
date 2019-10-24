@@ -41,7 +41,9 @@ namespace planning {
 // guide-line. Upgrade it to a constant acceleration model.
 class STGuideLine {
  public:
-  explicit STGuideLine(double desired_v);
+  STGuideLine() {}
+
+  void Init(double desired_v);
 
   virtual ~STGuideLine() = default;
 
