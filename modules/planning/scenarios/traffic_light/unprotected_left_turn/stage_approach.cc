@@ -53,7 +53,7 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::Process(
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
   if (!config_.enabled()) {
-    return FinishStage();
+    return FinishStage(frame);
   }
 
   // set cruise_speed to slow down
@@ -70,6 +70,7 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::Process(
   }
 
   const auto& reference_line_info = frame->reference_line_info().front();
+
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
 
   PathOverlap* traffic_light = nullptr;
@@ -100,15 +101,15 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::Process(
            << "] distance_adc_to_stop_line[" << distance_adc_to_stop_line
            << "] color[" << signal_color << "]";
 
-    // check distance to stop line
-    if (distance_adc_to_stop_line >
-        scenario_config_.max_valid_stop_distance()) {
-      break;
-    }
-
     // check on traffic light color
     if (signal_color != TrafficLight::GREEN) {
       traffic_light_all_green = false;
+      break;
+    }
+
+    // check distance to stop line
+    if (distance_adc_to_stop_line >
+        scenario_config_.max_valid_stop_distance()) {
       break;
     }
   }
@@ -118,13 +119,14 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::Process(
   }
 
   if (traffic_light_all_green) {
-    return FinishStage();
+    return FinishStage(frame);
   }
 
   return Stage::RUNNING;
 }
 
-Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::FinishStage() {
+Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::FinishStage(
+    Frame* frame) {
   // check speed at stop_stage
   const double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
@@ -151,6 +153,10 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::FinishStage() {
     GetContext()->creep_start_time = Clock::NowInSeconds();
     next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP;
   }
+
+  // reset cruise_speed
+  auto& reference_line_info = frame->mutable_reference_line_info()->front();
+  reference_line_info.SetCruiseSpeed(FLAGS_default_cruise_speed);
 
   return Stage::FINISHED;
 }
