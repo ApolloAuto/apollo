@@ -14,21 +14,54 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/submodules/scenario_submodule.h"
+/**
+ * @file
+ * @brief Use evaluator submodule to manage all evaluators
+ */
+
+#pragma once
+
+#include <memory>
+#include <string>
+
+#include "cyber/component/component.h"
+
+#include "modules/prediction/submodules/container_output.h"
 
 namespace apollo {
 namespace prediction {
 
-bool ScenarioSubmodule::Init() {
-  // TODO(kechxu) implement
-  return true;
-}
+class EvaluatorSubmodule
+    : public cyber::Component<ContainerOutput> {
+ public:
+  /**
+   * @brief Destructor
+   */
+  ~EvaluatorSubmodule();
 
-bool ScenarioSubmodule::Proc(
-    const std::shared_ptr<PredictionContainerMessage>& container_message) {
-  // TODO(kechxu) implement
-  return true;
-}
+  /**
+   * @brief Get name of the node
+   * @return Name of the node
+   */
+  std::string Name() const;
+
+  /**
+   * @brief Initialize the node
+   * @return If initialized
+   */
+  bool Init() override;
+
+  /**
+   * @brief Data callback upon receiving a prediction container output.
+   * @param Prediction container output.
+   */
+  bool Proc(const std::shared_ptr<ContainerOutput>&) override;
+
+ private:
+  // TODO(kechxu) define writer
+};
+
+CYBER_REGISTER_COMPONENT(EvaluatorSubmodule)
 
 }  // namespace prediction
 }  // namespace apollo

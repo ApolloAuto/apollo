@@ -16,52 +16,24 @@
 
 /**
  * @file
- * @brief Use scenario submodule to deal with scenario-related tasks
+ * @brief Output information of prediction container submodule
  */
-
-#pragma once
-
-#include <memory>
-#include <string>
-
-#include "cyber/component/component.h"
-
-#include "modules/prediction/proto/submodule_messages.pb.h"
 
 namespace apollo {
 namespace prediction {
 
-class ScenarioSubmodule : public cyber::Component<PredictionContainerMessage> {
+class ContainerOutput {
  public:
+  /**
+   * @brief Constructor
+   */
+  ContainerOutput();
+
   /**
    * @brief Destructor
    */
-  ~ScenarioSubmodule();
-
-  /**
-   * @brief Get name of the node
-   * @return Name of the node
-   */
-  std::string Name() const;
-
-  /**
-   * @brief Initialize the node
-   * @return If initialized
-   */
-  bool Init() override;
-
-  /**
-   * @brief Data callback upon receiving a prediction container message.
-   * @param Prediction container message.
-   */
-  bool Proc(const std::shared_ptr<PredictionContainerMessage>&) override;
-
- private:
-  // TODO(kechxu) define storytelling reader
-  // TODO(kechxu) define writer
+  ~ContainerOutput();
 };
-
-CYBER_REGISTER_COMPONENT(ScenarioSubmodule)
 
 }  // namespace prediction
 }  // namespace apollo

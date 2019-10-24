@@ -9,7 +9,7 @@ cc_library(
         "container_submodule.h",
     ],
     copts = [
-        "-DMODULE_NAME=\\\"container_submodule\\\"",
+        "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
         "//cyber",
@@ -26,6 +26,17 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "container_output",
+    srcs = ["container_output.cc"],
+    hdrs = ["container_output.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
+    deps = [ 
+    ],
+)
+
 cc_binary(
     name = "container_submodule.so",
     linkshared = True,
@@ -34,13 +45,13 @@ cc_binary(
 )
 
 cc_library(
-    name = "scenario_submodule_lib",
-    srcs = ["scenario_submodule.cc"],
+    name = "evaluator_submodule_lib",
+    srcs = ["evaluator_submodule.cc"],
     hdrs = [
-        "scenario_submodule.h",
+        "evaluator_submodule.h",
     ],
     copts = [
-        "-DMODULE_NAME=\\\"scenario_submodule\\\"",
+        "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
         "//cyber",
@@ -50,16 +61,16 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:message_process",
         "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/proto:submodule_messages_proto",
-        "//modules/prediction/scenario:scenario_manager",
+        "//modules/prediction/evaluator:evaluator_manager",
+        "//modules/prediction/submodules:container_output",
     ],
 )
 
 cc_binary(
-    name = "scenario_submodule.so",
+    name = "evaluator_submodule.so",
     linkshared = True,
     linkstatic = False,
-    deps = [":scenario_submodule_lib"],
+    deps = [":evaluator_submodule_lib"],
 )
 
 cpplint()
