@@ -224,7 +224,7 @@ void MessageProcess::OnPerception(
   }
 
   // Make evaluations
-  EvaluatorManager::Instance()->Run();
+  EvaluatorManager::Instance()->Run(ptr_obstacles_container);
   if (FLAGS_prediction_offline_mode ==
           PredictionConstants::kDumpDataForLearning ||
       FLAGS_prediction_offline_mode == PredictionConstants::kDumpFrameEnv) {

@@ -25,7 +25,6 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/container_manager.h"
-#include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {
@@ -53,7 +52,8 @@ void LaneAggregatingEvaluator::LoadModel() {
       FLAGS_torch_lane_aggregating_prediction_layer_file, device_);
 }
 
-bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr,
+    ObstaclesContainer* obstacles_container) {
   // Sanity checks.
   CHECK_NOTNULL(obstacle_ptr);
 

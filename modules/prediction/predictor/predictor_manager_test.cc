@@ -60,7 +60,7 @@ TEST_F(PredictorManagerTest, General) {
   CHECK_NOTNULL(obstacles_container);
   obstacles_container->Insert(perception_obstacles_);
 
-  EvaluatorManager::Instance()->Run();
+  EvaluatorManager::Instance()->Run(obstacles_container);
   PredictorManager::Instance()->Run();
 
   const PredictionObstacles& prediction_obstacles =

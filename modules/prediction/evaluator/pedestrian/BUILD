@@ -16,6 +16,7 @@ cc_library(
     deps = [
         "//modules/prediction/container:container_manager",
         "//modules/prediction/evaluator",
+        "//modules/prediction/container/obstacles:obstacles_container",
     ] + select({
         "//tools/platforms:use_gpu": [
             "@pytorch_gpu",

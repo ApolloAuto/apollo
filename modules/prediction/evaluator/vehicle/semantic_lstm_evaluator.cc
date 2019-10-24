@@ -39,7 +39,8 @@ SemanticLSTMEvaluator::SemanticLSTMEvaluator() : device_(torch::kCPU) {
 
 void SemanticLSTMEvaluator::Clear() {}
 
-bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr,
+    ObstaclesContainer* obstacles_container) {
   omp_set_num_threads(1);
 
   obstacle_ptr->SetEvaluatorType(evaluator_type_);

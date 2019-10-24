@@ -62,7 +62,8 @@ JunctionMLPEvaluator::JunctionMLPEvaluator() : device_(torch::kCPU) {
 
 void JunctionMLPEvaluator::Clear() {}
 
-bool JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr,
+    ObstaclesContainer* obstacles_container) {
   // Sanity checks.
   omp_set_num_threads(1);
   Clear();
@@ -86,7 +87,7 @@ bool JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   }
 
   std::vector<double> feature_values;
-  ExtractFeatureValues(obstacle_ptr, &feature_values);
+  ExtractFeatureValues(obstacle_ptr, obstacles_container, &feature_values);
 
   // Insert features to DataForLearning
   if (FLAGS_prediction_offline_mode ==
@@ -161,7 +162,8 @@ bool JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 }
 
 void JunctionMLPEvaluator::ExtractFeatureValues(
-    Obstacle* obstacle_ptr, std::vector<double>* feature_values) {
+    Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container,
+    std::vector<double>* feature_values) {
   CHECK_NOTNULL(obstacle_ptr);
   int id = obstacle_ptr->id();
 
@@ -176,7 +178,8 @@ void JunctionMLPEvaluator::ExtractFeatureValues(
   }
 
   std::vector<double> ego_vehicle_feature_values;
-  SetEgoVehicleFeatureValues(obstacle_ptr, &ego_vehicle_feature_values);
+  SetEgoVehicleFeatureValues(obstacle_ptr, obstacles_container,
+                             &ego_vehicle_feature_values);
   if (ego_vehicle_feature_values.size() != EGO_VEHICLE_FEATURE_SIZE) {
     AERROR << "Obstacle [" << id << "] has fewer than "
            << "expected ego vehicle feature_values"
@@ -249,15 +252,12 @@ void JunctionMLPEvaluator::SetObstacleFeatureValues(
 }
 
 void JunctionMLPEvaluator::SetEgoVehicleFeatureValues(
-    Obstacle* obstacle_ptr, std::vector<double>* const feature_values) {
+    Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container,
+    std::vector<double>* const feature_values) {
   feature_values->clear();
   *feature_values = std::vector<double>(4, 0.0);
-  auto obstacles_container_ptr =
-      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
-          AdapterConfig::PERCEPTION_OBSTACLES);
-  CHECK_NOTNULL(obstacles_container_ptr);
   auto ego_pose_obstacle_ptr =
-      obstacles_container_ptr->GetObstacle(FLAGS_ego_vehicle_id);
+      obstacles_container->GetObstacle(FLAGS_ego_vehicle_id);
   if (ego_pose_obstacle_ptr == nullptr) {
     (*feature_values)[0] = 100.0;
     (*feature_values)[1] = 100.0;

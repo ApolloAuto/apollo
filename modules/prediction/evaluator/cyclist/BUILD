@@ -15,6 +15,7 @@ cc_library(
     ],
     deps = [
         "//modules/prediction/evaluator",
+        "//modules/prediction/container/obstacles:obstacles_container",
     ],
 )
 

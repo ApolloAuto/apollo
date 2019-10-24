@@ -53,8 +53,10 @@ class PedestrianInteractionEvaluator : public Evaluator {
   /**
    * @brief Override Evaluate
    * @param Obstacle pointer
+   * @param Obstacles container
    */
-  bool Evaluate(Obstacle* obstacle_ptr) override;
+  bool Evaluate(Obstacle* obstacle_ptr,
+                ObstaclesContainer* obstacles_container) override;
 
   /**
    * @brief Extract features for learning model's input
@@ -77,7 +79,7 @@ class PedestrianInteractionEvaluator : public Evaluator {
     int frame_count = 0;
   };
 
-  void Clear();
+  // void Clear();
 
   void LoadModel();
 

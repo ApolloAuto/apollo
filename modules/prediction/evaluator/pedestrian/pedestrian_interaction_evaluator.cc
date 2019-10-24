@@ -44,6 +44,7 @@ PedestrianInteractionEvaluator::PedestrianInteractionEvaluator()
   LoadModel();
 }
 
+/* TODO(kechxu) figure out if this function is necessary. It is not being used
 void PedestrianInteractionEvaluator::Clear() {
   auto ptr_obstacles_container =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
@@ -60,6 +61,7 @@ void PedestrianInteractionEvaluator::Clear() {
     obstacle_id_lstm_state_map_.erase(key);
   }
 }
+*/
 
 void PedestrianInteractionEvaluator::LoadModel() {
   torch::set_num_threads(1);
@@ -83,7 +85,8 @@ torch::Tensor PedestrianInteractionEvaluator::GetSocialPooling() {
   return torch::zeros({1, kGridSize * kGridSize * kHiddenSize});
 }
 
-bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr,
+    ObstaclesContainer* obstacles_container) {
   // Sanity checks.
   CHECK_NOTNULL(obstacle_ptr);
 

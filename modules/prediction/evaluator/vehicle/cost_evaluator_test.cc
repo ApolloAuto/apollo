@@ -46,7 +46,7 @@ TEST_F(CostEvaluatorTest, OnLaneCase) {
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_NE(obstacle_ptr, nullptr);
-  cost_evaluator.Evaluate(obstacle_ptr);
+  cost_evaluator.Evaluate(obstacle_ptr, &container);
   const Feature& feature = obstacle_ptr->latest_feature();
   const LaneGraph& lane_graph = feature.lane().lane_graph();
   for (const auto& lane_sequence : lane_graph.lane_sequence()) {
