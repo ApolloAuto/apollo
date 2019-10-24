@@ -347,8 +347,15 @@ DEFINE_double(perception_confidence_threshold, 0.4,
               "Skip the obstacle if its confidence is lower than "
               "this threshold.");
 
-DEFINE_double(lane_change_prepare_length, 40.0,
+DEFINE_double(lane_change_prepare_length, 80.0,
               "The distance of lane-change preparation on current lane.");
+
+DEFINE_double(min_lane_change_prepare_length, 10.0,
+              "The minimal distance needed of lane-change on current lane.");
+
+DEFINE_double(allowed_lane_change_failure_time, 2.0,
+              "The time allowed for lane-change failure before updating"
+              "preparation distance.");
 
 DEFINE_bool(enable_smarter_lane_change, false,
             "enable smarter lane change with longer preparation distance.");
