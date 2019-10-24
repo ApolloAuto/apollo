@@ -33,16 +33,10 @@ MapNodeIndex::MapNodeIndex() {
 }
 
 bool MapNodeIndex::operator<(const MapNodeIndex& index) const {
-  if (resolution_id_ != index.resolution_id_) {
-    return resolution_id_ < index.resolution_id_;
-  }
-  if (zone_id_ != index.zone_id_) {
-    return zone_id_ < index.zone_id_;
-  }
-  if (m_ != index.m_) {
-    return m_ < index.m_;
-  }
-  return n_ < index.n_;
+  // Compare elements by priority.
+  return std::forward_as_tuple(resolution_id_, zone_id_, m_, n_) <
+         std::forward_as_tuple(index.resolution_id_, index.zone_id_, index.m_,
+                               index.n_);
 }
 
 bool MapNodeIndex::operator==(const MapNodeIndex& index) const {
