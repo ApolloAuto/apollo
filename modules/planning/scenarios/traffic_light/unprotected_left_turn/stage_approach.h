@@ -47,7 +47,7 @@ class TrafficLightUnprotectedLeftTurnStageApproach : public Stage {
   }
 
  private:
-  Stage::StageStatus FinishStage();
+  Stage::StageStatus FinishStage(Frame* frame);
 
  private:
   ScenarioTrafficLightUnprotectedLeftTurnConfig scenario_config_;
