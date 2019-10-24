@@ -260,18 +260,6 @@ void STObstaclesProcessor::SetObstacleDecision(
   }
 }
 
-// TODO(jiacheng): implement this.
-std::pair<double, double> STObstaclesProcessor::GetRegularBoundaryFromObstacles(
-    double t) {
-  return {0.0, 0.0};
-}
-
-// TODO(jiacheng): implement this.
-std::pair<double, double>
-STObstaclesProcessor::GetFallbackBoundaryFromObstacles(double t) {
-  return {0.0, 0.0};
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // Private helper functions.
 
