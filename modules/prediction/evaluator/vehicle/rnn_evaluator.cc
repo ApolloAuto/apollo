@@ -33,7 +33,8 @@ RNNEvaluator::RNNEvaluator() {
   LoadModel(FLAGS_evaluator_vehicle_rnn_file);
 }
 
-bool RNNEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool RNNEvaluator::Evaluate(Obstacle* obstacle_ptr,
+                            ObstaclesContainer* obstacles_container) {
   Clear();
   CHECK_NOTNULL(obstacle_ptr);
 

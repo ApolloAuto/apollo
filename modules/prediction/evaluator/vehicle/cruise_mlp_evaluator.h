@@ -25,6 +25,8 @@
 
 #include "modules/prediction/evaluator/evaluator.h"
 
+#include "modules/prediction/container/obstacles/obstacles_container.h"
+
 namespace apollo {
 namespace prediction {
 
@@ -43,8 +45,10 @@ class CruiseMLPEvaluator : public Evaluator {
   /**
    * @brief Override Evaluate
    * @param Obstacle pointer
+   * @param Obstacles container
    */
-  bool Evaluate(Obstacle* obstacle_ptr) override;
+  bool Evaluate(Obstacle* obstacle_ptr,
+                ObstaclesContainer* obstacles_container) override;
 
   /**
    * @brief Extract feature vector
@@ -74,10 +78,12 @@ class CruiseMLPEvaluator : public Evaluator {
   /**
    * @brief Set interaction feature vector
    * @param Obstacle pointer
-   *        Lane sequence pointer
-   *        Feature container in a vector for receiving the feature values
+   * @param Obstacles container
+   * @param Lane sequence pointer
+   * @param Feature container in a vector for receiving the feature values
    */
   void SetInteractionFeatureValues(Obstacle* obstacle_ptr,
+                                   ObstaclesContainer* obstacles_container,
                                    LaneSequence* lane_sequence_ptr,
                                    std::vector<double>* feature_values);
 

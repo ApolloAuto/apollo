@@ -37,7 +37,8 @@ JunctionMapEvaluator::JunctionMapEvaluator() : device_(torch::kCPU) {
 
 void JunctionMapEvaluator::Clear() {}
 
-bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool JunctionMapEvaluator::Evaluate(Obstacle* obstacle_ptr,
+    ObstaclesContainer* obstacles_container) {
   // Sanity checks.
   omp_set_num_threads(1);
 

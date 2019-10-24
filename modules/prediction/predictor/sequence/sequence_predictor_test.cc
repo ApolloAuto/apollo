@@ -48,7 +48,7 @@ TEST_F(SequencePredictorTest, General) {
   container.BuildLaneGraph();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_NE(obstacle_ptr, nullptr);
-  mlp_evaluator.Evaluate(obstacle_ptr);
+  mlp_evaluator.Evaluate(obstacle_ptr, &container);
   SequencePredictor predictor;
   predictor.Predict(obstacle_ptr);
   EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 0);

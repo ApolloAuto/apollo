@@ -60,16 +60,19 @@ class EvaluatorManager {
   /**
    * @brief Run evaluators
    */
-  void Run();
+  void Run(ObstaclesContainer* obstacles_container);
 
-  void EvaluateObstacle(Obstacle* obstacle, std::vector<Obstacle*> dynamic_env);
+  void EvaluateObstacle(Obstacle* obstacle,
+      ObstaclesContainer* obstacles_container,
+      std::vector<Obstacle*> dynamic_env);
 
-  void EvaluateObstacle(Obstacle* obstacle);
+  void EvaluateObstacle(Obstacle* obstacle,
+      ObstaclesContainer* obstacles_container);
 
  private:
-  void BuildObstacleIdHistoryMap();
+  void BuildObstacleIdHistoryMap(ObstaclesContainer* obstacles_container);
 
-  void DumpCurrentFrameEnv();
+  void DumpCurrentFrameEnv(ObstaclesContainer* obstacles_container);
 
   /**
    * @brief Register an evaluator by type

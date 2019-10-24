@@ -50,7 +50,8 @@ MLPEvaluator::MLPEvaluator() {
 
 void MLPEvaluator::Clear() {}
 
-bool MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool MLPEvaluator::Evaluate(Obstacle* obstacle_ptr,
+                            ObstaclesContainer* obstacles_container) {
   Clear();
   CHECK_NOTNULL(obstacle_ptr);
   CHECK_LE(LANE_FEATURE_SIZE, 4 * FLAGS_max_num_lane_point);

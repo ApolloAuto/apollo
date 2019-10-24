@@ -41,8 +41,10 @@ class RNNEvaluator : public Evaluator {
   /**
    * @brief Override Evaluate
    * @param Obstacle pointer
+   * @param Obstacles container
    */
-  bool Evaluate(Obstacle* obstacle_ptr) override;
+  bool Evaluate(Obstacle* obstacle_ptr,
+                ObstaclesContainer* obstacles_container) override;
 
   /**
    * @brief Extract feature vector

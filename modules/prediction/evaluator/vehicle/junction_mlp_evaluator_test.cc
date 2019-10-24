@@ -52,7 +52,7 @@ TEST_F(JunctionMLPEvaluatorTest, InJunctionCase) {
   container.BuildJunctionFeature();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_NE(obstacle_ptr, nullptr);
-  junction_mlp_evaluator.Evaluate(obstacle_ptr);
+  junction_mlp_evaluator.Evaluate(obstacle_ptr, &container);
   const JunctionFeature& junction_feature =
       obstacle_ptr->latest_feature().junction_feature();
   EXPECT_EQ(junction_feature.junction_id(), "j2");

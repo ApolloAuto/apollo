@@ -53,7 +53,7 @@ TEST_F(JunctionPredictorTest, InJunctionCase) {
   container.BuildJunctionFeature();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_NE(obstacle_ptr, nullptr);
-  junction_mlp_evaluator.Evaluate(obstacle_ptr);
+  junction_mlp_evaluator.Evaluate(obstacle_ptr, &container);
   JunctionPredictor predictor;
   predictor.Predict(obstacle_ptr);
   // EXPECT_EQ(predictor.NumOfTrajectories(), 2);
