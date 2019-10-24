@@ -464,7 +464,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
   // scenario conf is the same across all traffic-light scenarios
   const auto& scenario_config =
       config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]
-          .traffic_light_unprotected_right_turn_config();
+          .traffic_light_protected_config();
 
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
