@@ -20,6 +20,9 @@
 
 #pragma once
 
+#include <string>
+#include <tuple>
+#include <utility>
 #include <vector>
 
 #include "modules/planning/common/frame.h"
@@ -35,6 +38,8 @@
 namespace apollo {
 namespace planning {
 
+constexpr double kSTBoundsDeciderResolution = 0.1;
+
 class STBoundsDecider : public Decider {
  public:
   explicit STBoundsDecider(const TaskConfig& config);
@@ -45,6 +50,15 @@ class STBoundsDecider : public Decider {
 
   void InitSTBoundsDecider(const Frame& frame,
                            ReferenceLineInfo* const reference_line_info);
+
+  common::Status GenerateRegularSTBound(
+      std::vector<std::tuple<double, double, double>>* const st_bound);
+
+  void RankDecisions(
+      double s_guide_line, std::pair<double, double> driving_limit,
+      std::vector<std::pair<double, double>>* const available_s_bounds,
+      std::vector<std::vector<std::pair<std::string, ObjectDecisionType>>>*
+          const available_obs_decisions);
 
   void RecordSTGraphDebug(
       const std::vector<STBoundary>& st_graph_data,

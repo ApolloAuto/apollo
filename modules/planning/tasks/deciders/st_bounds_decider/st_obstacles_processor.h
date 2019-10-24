@@ -86,10 +86,6 @@ class STObstaclesProcessor {
       const std::vector<std::pair<std::string, ObjectDecisionType>>&
           obstacle_decisions);
 
-  std::pair<double, double> GetRegularBoundaryFromObstacles(double t);
-
-  std::pair<double, double> GetFallbackBoundaryFromObstacles(double t);
-
  private:
   /** @brief Given a single obstacle, compute its ST-boundary.
    * @param An obstacle (if moving, should contain predicted trajectory).
