@@ -47,7 +47,7 @@ using apollo::perception::TrafficLight;
 
 Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
-  AERROR << "stage: Approach";
+  ADEBUG << "stage: Approach";
   CHECK_NOTNULL(frame);
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
@@ -95,7 +95,7 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::Process(
     const double distance_adc_to_stop_line =
         current_traffic_light_overlap->start_s - adc_front_edge_s;
     auto signal_color = frame->GetSignal(traffic_light_overlap_id).color();
-    AERROR << "traffic_light_overlap_id[" << traffic_light_overlap_id
+    ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap_id
            << "] start_s[" << current_traffic_light_overlap->start_s
            << "] distance_adc_to_stop_line[" << distance_adc_to_stop_line
            << "] color[" << signal_color << "]";
@@ -128,7 +128,6 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::FinishStage() {
   // check speed at stop_stage
   const double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
-  AERROR << "++++++++++++ speed: " << adc_speed;
   if (adc_speed > scenario_config_.max_adc_speed_before_creep()) {
     // skip creep
     next_stage_ = ScenarioConfig ::
