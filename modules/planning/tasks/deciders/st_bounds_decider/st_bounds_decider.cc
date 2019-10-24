@@ -51,7 +51,17 @@ Status STBoundsDecider::Process(Frame* const frame,
   InitSTBoundsDecider(*frame, reference_line_info);
 
   // Sweep the t-axis, and determine the s-boundaries step by step.
-  // TODO(jiacheng): implement this.
+  STBound regular_st_bound;
+  Status ret = GenerateRegularSTBound(&regular_st_bound);
+  if (!ret.ok()) {
+    ADEBUG << "Cannot generate a regular ST-boundary.";
+    return Status(ErrorCode::PLANNING_ERROR, ret.error_message());
+  }
+  if (regular_st_bound.empty()) {
+    std::string msg = "Generated regular ST-boundary is empty.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
 
   return Status::OK();
 }
