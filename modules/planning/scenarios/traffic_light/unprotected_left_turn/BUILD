@@ -5,11 +5,13 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "traffic_light_unprotected_left_turn_scenario",
     srcs = [
+        "stage_approach.cc",
         "stage_creep.cc",
         "stage_intersection_cruise.cc",
         "traffic_light_unprotected_left_turn_scenario.cc",
     ],
     hdrs = [
+        "stage_approach.h",
         "stage_creep.h",
         "stage_intersection_cruise.h",
         "traffic_light_unprotected_left_turn_scenario.h",
