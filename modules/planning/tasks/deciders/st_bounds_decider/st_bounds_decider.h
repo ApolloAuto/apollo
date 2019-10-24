@@ -28,6 +28,9 @@
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/st_bounds_decider_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
+#include "modules/planning/tasks/deciders/st_bounds_decider/st_guide_line.h"
+#include "modules/planning/tasks/deciders/st_bounds_decider/st_driving_limits.h"
+#include "modules/planning/tasks/deciders/st_bounds_decider/st_obstacles_processor.h"
 
 namespace apollo {
 namespace planning {
@@ -40,12 +43,19 @@ class STBoundsDecider : public Decider {
   common::Status Process(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info) override;
 
+  void InitSTBoundsDecider(const Frame& frame,
+                           ReferenceLineInfo* const reference_line_info);
+
   void RecordSTGraphDebug(
       const std::vector<STBoundary>& st_graph_data,
       planning_internal::STGraphDebug* const st_graph_debug);
 
  private:
   STBoundsDeciderConfig st_bounds_config_;
+
+  STGuideLine st_guide_line_;
+  STDrivingLimits st_driving_limits_;
+  STObstaclesProcessor st_obstacles_processor_;
 };
 
 }  // namespace planning

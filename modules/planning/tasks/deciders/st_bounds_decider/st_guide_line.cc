@@ -25,7 +25,7 @@ namespace planning {
 
 using apollo::common::Status;
 
-STGuideLine::STGuideLine(double desired_v) {
+void STGuideLine::Init(double desired_v) {
   s0_ = 0.0;
   t0_ = 0.0;
   v0_ = desired_v;

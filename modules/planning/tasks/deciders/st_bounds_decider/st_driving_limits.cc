@@ -27,7 +27,7 @@ namespace planning {
 
 using apollo::common::Status;
 
-STDrivingLimits::STDrivingLimits(const double max_acc, const double max_dec,
+void STDrivingLimits::Init(const double max_acc, const double max_dec,
     const double max_v, double curr_v) {
   max_acc_ = max_acc;
   max_dec_ = max_dec;

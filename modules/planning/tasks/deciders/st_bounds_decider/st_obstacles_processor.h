@@ -46,8 +46,11 @@ constexpr double kSIgnoreThreshold = 0.01;
 
 class STObstaclesProcessor {
  public:
-  STObstaclesProcessor(const double planning_distance,
-                       const double planning_time, const PathData& path_data);
+  STObstaclesProcessor() {}
+
+  void Init(const double planning_distance,
+            const double planning_time,
+            const PathData& path_data);
 
   virtual ~STObstaclesProcessor() = default;
 
@@ -178,8 +181,8 @@ class STObstaclesProcessor {
  private:
   double planning_time_;
   double planning_distance_;
-  const PathData& path_data_;
-  const common::VehicleParam& vehicle_param_;
+  PathData path_data_;
+  common::VehicleParam vehicle_param_;
   double adc_path_init_s_;
 
   // A vector of sorted obstacle's t-edges:
