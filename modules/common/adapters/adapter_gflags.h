@@ -122,3 +122,7 @@ DECLARE_string(recorder_status_topic);
 
 // simulation clock topic
 DECLARE_string(tick_topic);
+
+// Latency recording topic
+DECLARE_string(latency_recording_topic);
+
