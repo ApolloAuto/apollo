@@ -35,7 +35,7 @@ class ContainerOutput {
   /**
    * @brief Constructor
    */
-  ContainerOutput();
+  ContainerOutput() = default;
 
   /**
    * @brief Destructor
@@ -58,6 +58,7 @@ class ContainerOutput {
 
  private:
   void Clear();
+
   std::vector<Obstacle> curr_frame_obstacles_;
   std::vector<apollo::perception::PerceptionObstacle>
       curr_frame_perception_obstacles_;

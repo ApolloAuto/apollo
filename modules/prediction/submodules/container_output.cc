@@ -20,10 +20,6 @@
 namespace apollo {
 namespace prediction {
 
-ContainerOutput::ContainerOutput() {
-  Clear();
-}
-
 ContainerOutput::~ContainerOutput() {
   Clear();
 }
