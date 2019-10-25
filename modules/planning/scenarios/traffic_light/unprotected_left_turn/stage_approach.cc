@@ -74,7 +74,7 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::Process(
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
 
   PathOverlap* traffic_light = nullptr;
-  bool traffic_light_done = true;
+  bool traffic_light_all_done = true;
   for (const auto& traffic_light_overlap_id :
        GetContext()->current_traffic_light_overlap_ids) {
     // get overlap along reference line
@@ -104,7 +104,7 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::Process(
     if (signal_color != TrafficLight::GREEN ||
         distance_adc_to_stop_line >=
                 scenario_config_.max_valid_stop_distance()) {
-      traffic_light_done = false;
+      traffic_light_all_done = false;
       break;
     }
   }
@@ -113,7 +113,7 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::Process(
     return FinishScenario();
   }
 
-  if (traffic_light_done) {
+  if (traffic_light_all_done) {
     return FinishStage(frame);
   }
 
