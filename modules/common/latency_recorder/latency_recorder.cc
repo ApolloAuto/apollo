@@ -15,6 +15,8 @@
  *****************************************************************************/
 
 #include "modules/common/latency_recorder/latency_recorder.h"
+
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
 
 namespace apollo {
@@ -67,7 +69,7 @@ LatencyRecorder::CreateWriter() {
       return nullptr;
     }
   }
-  return node_->CreateWriter<LatencyRecordMap>("/apollo/common/latency_record");
+  return node_->CreateWriter<LatencyRecordMap>(FLAGS_latency_recording_topic);
 }
 
 void LatencyRecorder::PublishLatencyRecords(
