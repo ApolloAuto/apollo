@@ -22,8 +22,8 @@
 #include "third_party/json/json.hpp"
 
 #ifdef TELEOP
-#include "modules/car1/network/proto/modem_info.pb.h"
-#include "modules/car1/teleop/proto/daemon_service_cmd.pb.h"
+#include "modules/teleop/network/proto/modem_info.pb.h"
+#include "modules/teleop/teleop/proto/daemon_service_cmd.pb.h"
 #endif
 
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
@@ -43,7 +43,7 @@ class TeleopService {
 
 #ifdef TELEOP
   void UpdateModemInfo(
-      const std::shared_ptr<modules::car1::network::ModemInfo> &modem_info);
+      const std::shared_ptr<modules::teleop::network::ModemInfo> &modem_info);
 #endif
 
   std::unique_ptr<cyber::Node> node_;
@@ -51,10 +51,10 @@ class TeleopService {
   WebSocketHandler *websocket_;
 
 #ifdef TELEOP
-  std::shared_ptr<cyber::Reader<modules::car1::network::ModemInfo>>
+  std::shared_ptr<cyber::Reader<modules::teleop::network::ModemInfo>>
       modem_info_reader_;
 
-  std::shared_ptr<cyber::Writer<modules::car1::teleop::DaemonServiceCmd>>
+  std::shared_ptr<cyber::Writer<modules::teleop::teleop::DaemonServiceCmd>>
       daemon_cmd_writer_;
 #endif
 
