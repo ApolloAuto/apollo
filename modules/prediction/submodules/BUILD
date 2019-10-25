@@ -33,6 +33,12 @@ cc_library(
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
+    deps = [
+        "//modules/common/util:lru_cache",
+        "//modules/perception/proto:perception_proto",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/container/obstacles:obstacle",
+    ],
 )
 
 cc_binary(
