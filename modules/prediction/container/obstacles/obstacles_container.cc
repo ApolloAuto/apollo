@@ -325,7 +325,25 @@ double ObstaclesContainer::timestamp() const { return timestamp_; }
 
 ContainerOutput ObstaclesContainer::GetContainerOutput() {
   ContainerOutput container_output;
-  // TODO(kechxu) implement
+  for (const auto& perception_obstacle_pair :
+       curr_frame_id_perception_obstacle_map_) {
+    int id = perception_obstacle_pair.first;
+    container_output.InsertPerceptionObstacle(perception_obstacle_pair.second);
+    Obstacle* obstacle = GetObstacle(id);
+    if (obstacle == nullptr) {
+      AERROR << "Nullptr found for obstacle [" << id << "]";
+      continue;
+    }
+    container_output.InsertObstacle(*obstacle);
+  }
+
+  container_output.set_curr_frame_movable_obstacle_ids(
+      curr_frame_movable_obstacle_ids_);
+  container_output.set_curr_frame_unmovable_obstacle_ids(
+      curr_frame_unmovable_obstacle_ids_);
+  container_output.set_curr_frame_considered_obstacle_ids(
+      curr_frame_considered_obstacle_ids_);
+
   return container_output;
 }
 
