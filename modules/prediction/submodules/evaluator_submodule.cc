@@ -21,7 +21,6 @@
 #include "modules/common/time/time.h"
 #include "modules/prediction/common/message_process.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
-#include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/evaluator/evaluator_manager.h"
 
 namespace apollo {

@@ -31,6 +31,7 @@
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/prediction/proto/submodule_messages.pb.h"
+#include "modules/prediction/submodules/container_output.h"
 
 namespace apollo {
 namespace prediction {
@@ -134,7 +135,7 @@ class ObstaclesContainer : public Container {
 
   double timestamp() const;
 
-  PredictionContainerMessage GetContainerMessage();
+  ContainerOutput GetContainerOutput();
 
  private:
   Obstacle* GetObstacleWithLRUUpdate(const int obstacle_id);
