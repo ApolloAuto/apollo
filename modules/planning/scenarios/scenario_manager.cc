@@ -506,7 +506,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
            << adc_distance_to_traffic_light << "]";
 
     // enter traffic-light scenarios: based on distance only
-    if (adc_distance_to_traffic_light > start_check_distance) {
+    if (adc_distance_to_traffic_light <= 0.0 ||
+        adc_distance_to_traffic_light > start_check_distance) {
       continue;
     }
 
@@ -540,9 +541,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
       const auto& scenario_config =
           config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN]
                       .traffic_light_unprotected_right_turn_config();
-      if (adc_distance_to_traffic_light >= 0.0 &&
-          adc_distance_to_traffic_light <
-              scenario_config.start_traffic_light_scenario_distance()) {
+      if (adc_distance_to_traffic_light <
+            scenario_config.start_traffic_light_scenario_distance()) {
         traffic_light_unprotected_right_turn_scenario = true;
       }
     } else if (left_turn) {
@@ -550,9 +550,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
       const auto& scenario_config =
           config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN]
                       .traffic_light_unprotected_left_turn_config();
-      if (adc_distance_to_traffic_light >= 0.0 &&
-          adc_distance_to_traffic_light <
-              scenario_config.start_traffic_light_scenario_distance()) {
+      if (adc_distance_to_traffic_light <
+            scenario_config.start_traffic_light_scenario_distance()) {
         traffic_light_unprotected_left_turn_scenario = true;
       }
     } else {
@@ -560,9 +559,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
       const auto& scenario_config =
           config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]
                       .traffic_light_protected_config();
-      if (adc_distance_to_traffic_light >= 0.0 &&
-          adc_distance_to_traffic_light <
-              scenario_config.start_traffic_light_scenario_distance()) {
+      if (adc_distance_to_traffic_light <
+            scenario_config.start_traffic_light_scenario_distance()) {
         traffic_light_protected_scenario = true;
       }
     }
