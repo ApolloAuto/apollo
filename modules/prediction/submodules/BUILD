@@ -33,8 +33,6 @@ cc_library(
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
-    deps = [ 
-    ],
 )
 
 cc_binary(
