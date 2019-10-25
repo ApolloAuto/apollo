@@ -47,7 +47,7 @@ void LatencyRecorder::AppendLatencyRecord(const uint64_t message_id,
 
   const auto now_nano_time = Time::Now().ToNanosecond();
   if (now_nano_time - current_timestamp_ >
-      Time(time_to_publish).ToNanosecond()) {
+      Time(publish_interval_).ToNanosecond()) {
     PublishLatencyRecords(writer);
     current_timestamp_ = now_nano_time;
   }
@@ -76,7 +76,7 @@ void LatencyRecorder::PublishLatencyRecords(
     const std::shared_ptr<apollo::cyber::Writer<LatencyRecordMap>>& writer) {
   records_->set_module_name(module_name_);
   apollo::common::util::FillHeader("LatencyRecorderMap", records_.get());
-  writer->Write(*records_.get());
+  writer->Write(*records_);
   records_.reset(new LatencyRecordMap);
 }
 
