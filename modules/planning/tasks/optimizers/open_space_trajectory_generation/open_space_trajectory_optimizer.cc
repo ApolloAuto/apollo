@@ -88,6 +88,10 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
   double init_x = trajectory_stitching_point.path_point().x();
   double init_y = trajectory_stitching_point.path_point().y();
   double init_phi = trajectory_stitching_point.path_point().theta();
+  ADEBUG << "origin x: " << std::setprecision(9) << translate_origin.x();
+  ADEBUG << "origin y: " << std::setprecision(9) << translate_origin.y();
+  ADEBUG << "init_x: " << std::setprecision(9) << init_x;
+  ADEBUG << "init_y: " << std::setprecision(9) << init_y;
 
   // Rotate and scale the state
   PathPointNormalizing(rotate_angle, translate_origin, &init_x, &init_y,
