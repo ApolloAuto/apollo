@@ -134,10 +134,12 @@ Stage::StageStatus LaneFollowStage::Process(
           // under smart lane-change or IsClearToChangeLane under older version
           has_drivable_reference_line = true;
           reference_line_info.SetDrivable(true);
-          LaneChangeDecider::UpdateStatus(true, frame, &reference_line_info);
+          LaneChangeDecider::UpdatePreparationDistance(true, frame,
+                                                       &reference_line_info);
           ADEBUG << "\tclear for lane change";
         } else {
-          LaneChangeDecider::UpdateStatus(false, frame, &reference_line_info);
+          LaneChangeDecider::UpdatePreparationDistance(false, frame,
+                                                       &reference_line_info);
           reference_line_info.SetDrivable(false);
           ADEBUG << "\tlane change failed";
         }

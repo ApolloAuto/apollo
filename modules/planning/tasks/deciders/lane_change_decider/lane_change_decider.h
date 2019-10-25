@@ -60,7 +60,8 @@ class LaneChangeDecider : public Decider {
                                   const double search_range,
                                   const double is_block_angle_threshold);
 
-  static void UpdateStatus(const bool is_opt_succeed, const Frame* frame,
+  static void UpdatePreparationDistance(const bool is_opt_succeed,
+                           const Frame* frame,
                            const ReferenceLineInfo* const reference_line_info);
 
  private:
