@@ -45,4 +45,34 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "stage_approach_test",
+    size = "small",
+    srcs = [
+        "stage_approach_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        ":yield_sign_scenario",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "stage_creep_test",
+    size = "small",
+    srcs = [
+        "stage_creep_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        ":yield_sign_scenario",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
