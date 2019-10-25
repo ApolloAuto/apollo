@@ -24,7 +24,6 @@
 
 namespace apollo {
 namespace planning {
-// #define ADEBUG AINFO
 
 using apollo::common::time::Clock;
 
