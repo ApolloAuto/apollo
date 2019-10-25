@@ -77,16 +77,12 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
          << "]";
   if (distance_adc_to_pnc_junction < -kPassStopLineBuffer) {
     // passed stop line
-    return FinishStage();
+    return FinishStage(frame);
   }
 
-  // set speed_limit to slow down
-  if (frame->mutable_reference_line_info()) {
-    auto* reference_line =
-        frame->mutable_reference_line_info()->front().mutable_reference_line();
-    reference_line->AddSpeedLimit(0.0, current_pnc_junction->start_s,
-                                  scenario_config_.approach_speed_limit());
-  }
+  // set cruise_speed to slow down
+  frame->mutable_reference_line_info()->front().SetCruiseSpeed(
+      scenario_config_.approach_cruise_speed());
 
   // set right_of_way_status
   reference_line_info.SetJunctionRightOfWay(current_pnc_junction->start_s,
@@ -149,7 +145,7 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
       // creeping area
       if (clear_counter_ >= 5) {
         clear_counter_ = 0;  // reset
-        return FinishStage();
+        return FinishStage(frame);
       } else {
         stop = true;
       }
@@ -171,15 +167,21 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
     }
   } else if (distance_adc_to_pnc_junction <= 0) {
     // rely on st-graph
-    return FinishStage();
+    return FinishStage(frame);
   }
 
   return Stage::RUNNING;
 }
 
-Stage::StageStatus BareIntersectionUnprotectedStageApproach::FinishStage() {
+Stage::StageStatus BareIntersectionUnprotectedStageApproach::FinishStage(
+    Frame* frame) {
   next_stage_ =
       ScenarioConfig::BARE_INTERSECTION_UNPROTECTED_INTERSECTION_CRUISE;
+
+  // reset cruise_speed
+  auto& reference_line_info = frame->mutable_reference_line_info()->front();
+  reference_line_info.SetCruiseSpeed(FLAGS_default_cruise_speed);
+
   return Stage::FINISHED;
 }
 
