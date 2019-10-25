@@ -14,9 +14,7 @@ proto_library(
     srcs = [
         "control_conf.proto",
         "lat_controller_conf.proto",
-        "leadlag_conf.proto",
         "lon_controller_conf.proto",
-        "mrac_conf.proto",
         "pid_conf.proto",
     ],
     deps = [
@@ -24,6 +22,8 @@ proto_library(
         ":control_command_proto_lib",
         ":gain_scheduler_conf_proto_lib",
         ":mpc_controller_conf_proto_lib",
+        ":mrac_conf_proto_lib",
+        ":leadlag_conf_proto_lib",
         ":pad_msg_lib",
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/proto:drive_state_proto_lib",
@@ -113,6 +113,36 @@ proto_library(
     name = "gain_scheduler_conf_proto_lib",
     srcs = [
         "gain_scheduler_conf.proto",
+    ],
+)
+
+# leadlag_conf
+cc_proto_library(
+    name = "leadlag_conf_proto",
+    deps = [
+        ":leadlag_conf_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "leadlag_conf_proto_lib",
+    srcs = [
+        "leadlag_conf.proto",
+    ],
+)
+
+# mrac_conf
+cc_proto_library(
+    name = "mrac_conf_proto",
+    deps = [
+        ":mrac_conf_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "mrac_conf_proto_lib",
+    srcs = [
+        "mrac_conf.proto",
     ],
 )
 
