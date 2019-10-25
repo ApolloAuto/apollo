@@ -673,8 +673,8 @@ bool PathBoundsDecider::SearchPullOverPosition(
           std::get<0>(path_bound[idx]) - std::get<0>(path_bound.front()) >
               pull_over_space_length) ||
          (!search_backward && idx < static_cast<int>(path_bound.size()) &&
-          std::get<0>(path_bound.back()) - std::get<0>(path_bound[idx])) >
-             pull_over_space_length) {
+          std::get<0>(path_bound.back()) - std::get<0>(path_bound[idx]) >
+              pull_over_space_length)) {
     int j = idx;
     bool is_feasible_window = true;
     while ((search_backward && j >= 0 &&
