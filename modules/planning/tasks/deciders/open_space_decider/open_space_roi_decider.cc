@@ -113,13 +113,17 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
   } else if (roi_type == OpenSpaceRoiDeciderConfig::PARK_AND_GO) {
+    ADEBUG << "in Park_and_Go";
     nearby_path =
         frame->reference_line_info().front().reference_line().GetMapPath();
 
+    ADEBUG << "nearby_path: " << nearby_path.DebugString();
+    ADEBUG << "found nearby_path";
+
     SetOriginFromADC(frame, nearby_path);
-
+    ADEBUG << "SetOrigin";
     SetParkAndGoEndPose(frame);
-
+    ADEBUG << "SetEndPose";
     if (!GetParkAndGoBoundary(frame, nearby_path, &roi_boundary)) {
       const std::string msg = "Fail to get park and go boundary from map";
       AERROR << msg;
@@ -160,7 +164,16 @@ void OpenSpaceRoiDecider::SetOriginFromADC(Frame *const frame,
   // get vertices from ADC box
   std::vector<common::math::Vec2d> adc_corners;
   adc_box.GetAllCorners(&adc_corners);
+  for (size_t i = 0; i < adc_corners.size(); ++i) {
+    ADEBUG << "ADC [" << i << "]x: " << std::setprecision(9)
+           << adc_corners[i].x();
+    ADEBUG << "ADC [" << i << "]y: " << std::setprecision(9)
+           << adc_corners[i].y();
+  }
   auto left_top = adc_corners[3];
+
+  ADEBUG << "left_top x: " << std::setprecision(9) << left_top.x();
+  ADEBUG << "left_top y: " << std::setprecision(9) << left_top.y();
 
   // rotate the points to have the lane to be horizontal to x axis positive
   // direction and scale them base on the origin point
@@ -289,12 +302,18 @@ void OpenSpaceRoiDecider::SetParkAndGoEndPose(Frame *const frame) {
   // get vehicle current location
   const ReferenceLineInfo &reference_line_info =
       frame->reference_line_info().front();
+
+  ADEBUG << "reference_line ID: " << reference_line_info.Lanes().Id();
   const auto &reference_line = reference_line_info.reference_line();
   // get vehicle s,l info
   const auto &park_and_go_status =
       PlanningContext::Instance()->planning_status().park_and_go();
+
   const double adc_init_x = park_and_go_status.adc_init_position().x();
   const double adc_init_y = park_and_go_status.adc_init_position().y();
+
+  ADEBUG << "ADC position (x): " << std::setprecision(9) << adc_init_x;
+  ADEBUG << "ADC position (y): " << std::setprecision(9) << adc_init_y;
 
   const common::math::Vec2d adc_position = {adc_init_x, adc_init_y};
   common::SLPoint adc_position_sl;
@@ -302,11 +321,14 @@ void OpenSpaceRoiDecider::SetParkAndGoEndPose(Frame *const frame) {
 
   // target is at reference line
   const double target_s = adc_position_sl.s() + kSTargetBuffer;
-  const auto reference_point =
-      reference_line.GetReferencePoint(adc_position_sl.s() + kSTargetBuffer);
+  const auto reference_point = reference_line.GetReferencePoint(target_s);
   const double target_x = reference_point.x();
   const double target_y = reference_point.y();
   double target_theta = reference_point.heading();
+
+  ADEBUG << "center.x(): " << std::setprecision(9) << target_x;
+  ADEBUG << "center.y(): " << std::setprecision(9) << target_y;
+  ADEBUG << "target_theta: " << std::setprecision(9) << target_theta;
 
   // Normalize according to origin_point and origin_heading
   const auto &origin_point = frame->open_space_info().origin_point();
@@ -318,9 +340,11 @@ void OpenSpaceRoiDecider::SetParkAndGoEndPose(Frame *const frame) {
 
   auto *end_pose =
       frame->mutable_open_space_info()->mutable_open_space_end_pose();
+
   end_pose->push_back(center.x());
   end_pose->push_back(center.y());
   end_pose->push_back(target_theta);
+
   // end pose velocity set to be speed limit
   double target_speed = reference_line.GetSpeedLimitFromS(target_s);
   end_pose->push_back(kSpeedRatio * target_speed);
@@ -900,8 +924,8 @@ bool OpenSpaceRoiDecider::GetParkAndGoBoundary(
   // get vertices from ADC box
   std::vector<common::math::Vec2d> adc_corners;
   adc_box.GetAllCorners(&adc_corners);
-  auto left_top = adc_corners[0];
-  auto right_top = adc_corners[3];
+  auto left_top = adc_corners[1];
+  auto right_top = adc_corners[0];
 
   const auto &origin_point = frame->open_space_info().origin_point();
   const auto &origin_heading = frame->open_space_info().origin_heading();
