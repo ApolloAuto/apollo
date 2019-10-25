@@ -35,6 +35,9 @@ message ChangeLaneStatus {
   optional apollo.common.Point3D lane_change_start_position = 5;
   // the last time stamp when the lane-change planning succeed.
   optional double last_succeed_timestamp = 6;
+  // if the current path and speed planning on the lane-change 
+  // reference-line succeed.
+  optional bool is_current_opt_succeed = 7 [default = false];
 }
 
 message StopTime {

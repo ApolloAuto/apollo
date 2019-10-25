@@ -119,22 +119,25 @@ Status LaneChangeDecider::Process(Frame* frame) {
   return Status::OK();
 }
 
-void LaneChangeDecider::UpdateStatus(
+void LaneChangeDecider::UpdatePreparationDistance(
     const bool is_opt_succeed, const Frame* frame,
     const ReferenceLineInfo* const reference_line_info) {
   auto* lane_change_status = PlanningContext::Instance()
                                 ->mutable_planning_status()
                                 ->mutable_change_lane();
-  // If lane change planning succeeded, no need to update
+  lane_change_status->set_timestamp(Clock::NowInSeconds());
+  lane_change_status->set_path_id(reference_line_info->Lanes().Id());
+  ADEBUG << "Current time: " << lane_change_status->timestamp();
+  ADEBUG << "Lane Change Status: " << lane_change_status->status();
+  // If lane change planning succeeded, update and return
   if (is_opt_succeed) {
     lane_change_status->set_last_succeed_timestamp(Clock::NowInSeconds());
+    lane_change_status->set_is_current_opt_succeed(true);
     return;
   }
   // If path optimizer or speed optimizer failed, report the status
-  lane_change_status->set_timestamp(Clock::NowInSeconds());
-  lane_change_status->set_path_id(reference_line_info->Lanes().Id());
-  lane_change_status->set_status(ChangeLaneStatus::CHANGE_LANE_FAILED);
-  // If the planner just succeed recently, let's be more patient
+  lane_change_status->set_is_current_opt_succeed(false);
+  // If the planner just succeed recently, let's be more patient and try again
   if (Clock::NowInSeconds() - lane_change_status->last_succeed_timestamp() <
      FLAGS_allowed_lane_change_failure_time) {
     return;
@@ -152,12 +155,14 @@ void LaneChangeDecider::UpdateStatus(
         {lane_change_status->lane_change_start_position().x(),
          lane_change_status->lane_change_start_position().y()},
         &point_sl);
+  ADEBUG << "Current ADC s: " << adc_sl_info.first[0];
+  ADEBUG << "Change lane point s: " << point_sl.s();
   // If the remaining lane-change preparation distance is too small,
   // refresh the preparation distance
   if (adc_sl_info.first[0] + FLAGS_min_lane_change_prepare_length >
       point_sl.s()) {
     lane_change_status->set_exist_lane_change_start_position(false);
-    ADEBUG << "refresh the lane-change preparation distance";
+    ADEBUG << "Refresh the lane-change preparation distance";
   }
 }
 
