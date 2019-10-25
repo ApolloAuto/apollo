@@ -302,43 +302,45 @@ Status PreprocessorSubmodule::CheckInput(LocalView *local_view) {
 }
 
 Status PreprocessorSubmodule::CheckTimestamp(LocalView *local_view) {
-  // if (!control_common_conf_.enable_input_timestamp_check() ||
-  //     control_common_conf_.is_control_test_mode()) {
-  //   ADEBUG << "Skip input timestamp check by gflags.";
-  //   return Status::OK();
-  // }
-  // double current_timestamp = Clock::NowInSeconds();
-  // double localization_diff =
-  //     current_timestamp - local_view.localization.header().timestamp_sec();
-  // if (localization_diff > (control_common_conf_.max_localization_miss_num() *
-  //                          control_common_conf_.localization_period())) {
-  //   AERROR << "Localization msg lost for " << std::setprecision(6)
-  //          << localization_diff << "s";
-  //   monitor_logger_buffer_.ERROR("Localization msg lost");
-  //   return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Localization msg
-  //   timeout");
-  // }
+  if (!control_common_conf_.enable_input_timestamp_check() ||
+      control_common_conf_.is_control_test_mode()) {
+    ADEBUG << "Skip input timestamp check by gflags.";
+    return Status::OK();
+  }
 
-  // double chassis_diff =
-  //     current_timestamp - local_view.chassis.header().timestamp_sec();
-  // if (chassis_diff > (control_common_conf_.max_chassis_miss_num() *
-  //                     control_common_conf_.chassis_period())) {
-  //   AERROR << "Chassis msg lost for " << std::setprecision(6) << chassis_diff
-  //          << "s";
-  //   monitor_logger_buffer_.ERROR("Chassis msg lost");
-  //   return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Chassis msg timeout");
-  // }
+  double current_timestamp = Clock::NowInSeconds();
+  double localization_diff =
+      current_timestamp - local_view->localization().header().timestamp_sec();
 
-  // double trajectory_diff =
-  //     current_timestamp - local_view.trajectory.header().timestamp_sec();
-  // if (trajectory_diff > (control_common_conf_.max_planning_miss_num() *
-  //                        control_common_conf_.trajectory_period())) {
-  //   AERROR << "Trajectory msg lost for " << std::setprecision(6)
-  //          << trajectory_diff << "s";
-  //   monitor_logger_buffer_.ERROR("Trajectory msg lost");
-  //   return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Trajectory msg
-  //   timeout");
-  // }
+  if (localization_diff > (control_common_conf_.max_localization_miss_num() *
+                           control_common_conf_.localization_period())) {
+    AERROR << "Localization msg lost for " << std::setprecision(6)
+           << localization_diff << "s";
+    monitor_logger_buffer_.ERROR("Localization msg lost");
+    return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Localization msg timeout");
+  }
+
+  double chassis_diff =
+      current_timestamp - local_view->chassis().header().timestamp_sec();
+
+  if (chassis_diff > (control_common_conf_.max_chassis_miss_num() *
+                      control_common_conf_.chassis_period())) {
+    AERROR << "Chassis msg lost for " << std::setprecision(6) << chassis_diff
+           << "s";
+    monitor_logger_buffer_.ERROR("Chassis msg lost");
+    return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Chassis msg timeout");
+  }
+
+  double trajectory_diff =
+      current_timestamp - local_view->trajectory().header().timestamp_sec();
+
+  if (trajectory_diff > (control_common_conf_.max_planning_miss_num() *
+                         control_common_conf_.trajectory_period())) {
+    AERROR << "Trajectory msg lost for " << std::setprecision(6)
+           << trajectory_diff << "s";
+    monitor_logger_buffer_.ERROR("Trajectory msg lost");
+    return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Trajectory msg timeout");
+  }
   return Status::OK();
 }
 
