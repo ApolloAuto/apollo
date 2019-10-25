@@ -38,13 +38,6 @@ namespace control {
 
 class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
  public:
-  //   TODO(SHU): remove to proto
-  // struct LocalView {
-  //   canbus::Chassis chassis;
-  //   planning::ADCTrajectory trajectory;
-  //   localization::LocalizationEstimate localization;
-  // };
-
   /**
    * @brief Construct a new PreprocessorSubmodule object
    *
