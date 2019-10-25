@@ -38,12 +38,12 @@ namespace control {
 
 class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
  public:
-//   TODO(SHU): remove to proto
-    struct LocalView {
-      canbus::Chassis chassis;
-      planning::ADCTrajectory trajectory;
-      localization::LocalizationEstimate localization;
-    };
+  //   TODO(SHU): remove to proto
+  // struct LocalView {
+  //   canbus::Chassis chassis;
+  //   planning::ADCTrajectory trajectory;
+  //   localization::LocalizationEstimate localization;
+  // };
 
   /**
    * @brief Construct a new PreprocessorSubmodule object
@@ -115,7 +115,7 @@ class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
    * @param local_view
    * @return common::Status
    */
-  common::Status CheckInput(LocalView *local_view);
+  common::Status CheckInput(apollo::control::LocalView *local_view);
 
   /**
    * @brief check time stamp
@@ -123,7 +123,7 @@ class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
    * @param local_view
    * @return common::Status
    */
-  common::Status CheckTimestamp(const LocalView &local_view);
+  common::Status CheckTimestamp(apollo::control::LocalView *local_view);
 
   /**
    * @brief check pad message
@@ -163,7 +163,7 @@ class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
 
   ControlCommonConf control_common_conf_;
 
-  LocalView local_view_;
+  apollo::control::LocalView *local_view_;
 };
 
 CYBER_REGISTER_COMPONENT(PreprocessorSubmodule);

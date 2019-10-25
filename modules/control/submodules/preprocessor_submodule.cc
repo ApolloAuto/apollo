@@ -34,6 +34,7 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleStateProvider;
 using apollo::common::time::Clock;
+using apollo::common::util::StrCat;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
@@ -140,17 +141,14 @@ bool PreprocessorSubmodule::Proc() {
 
 Status PreprocessorSubmodule::ProducePreprocessorStatus(
     Preprocessor *preprocessor_status) {
-  {
-    std::lock_guard<std::mutex> lock(mutex_);
-    preprocessor_status->mutable_local_view()->set_allocated_chassis(
-        &latest_chassis_);
+  std::lock_guard<std::mutex> lock(mutex_);
+  local_view_ = preprocessor_status->mutable_local_view();
 
-    // TODO(SHU): change the followings
-    local_view_.chassis = latest_chassis_;
-    local_view_.trajectory = latest_trajectory_;
-    local_view_.localization = latest_localization_;
-  }
-  Status status = CheckInput(&local_view_);
+  local_view_->set_allocated_chassis(&latest_chassis_);
+  local_view_->set_allocated_trajectory(&latest_trajectory_);
+  local_view_->set_allocated_localization(&latest_localization_);
+
+  Status status = CheckInput(local_view_);
 
   if (!status.ok()) {
     AERROR_EVERY(100) << "Control input data failed: "
@@ -166,7 +164,7 @@ Status PreprocessorSubmodule::ProducePreprocessorStatus(
     if (!status_ts.ok()) {
       AERROR << "Input messages timeout";
       status = status_ts;
-      if (local_view_.chassis.driving_mode() !=
+      if (local_view_->chassis().driving_mode() !=
           apollo::canbus::Chassis::COMPLETE_AUTO_DRIVE) {
         preprocessor_status->mutable_engage_advice()->set_advice(
             apollo::common::EngageAdvice::DISALLOW_ENGAGE);
@@ -181,26 +179,27 @@ Status PreprocessorSubmodule::ProducePreprocessorStatus(
 
   // check estop
   estop_ = control_common_conf_.enable_persistent_estop()
-               ? estop_ || local_view_.trajectory.estop().is_estop()
-               : local_view_.trajectory.estop().is_estop();
+               ? estop_ || local_view_->trajectory().estop().is_estop()
+               : local_view_->trajectory().estop().is_estop();
 
-  if (local_view_.trajectory.estop().is_estop()) {
+  if (local_view_->trajectory().estop().is_estop()) {
     estop_ = true;
-    estop_reason_ = "estop from planning : ";
-    estop_reason_ += local_view_.trajectory.estop().reason();
+    estop_reason_ = StrCat("estop from planning : ",
+                           local_view_->trajectory().estop().reason());
   }
 
-  if (local_view_.trajectory.trajectory_point().empty()) {
+  if (local_view_->trajectory().trajectory_point().empty()) {
     AWARN_EVERY(100) << "planning has no trajectory point. ";
     estop_ = true;
-    estop_reason_ = "estop for empty planning trajectory, planning headers: " +
-                    local_view_.trajectory.header().ShortDebugString();
+    estop_reason_ =
+        StrCat("estop for empty planning trajectory, planning headers: ",
+               local_view_->trajectory().header().ShortDebugString());
   }
 
   if (FLAGS_enable_gear_drive_negative_speed_protection) {
     const double kEpsilon = 0.001;
-    auto first_trajectory_point = local_view_.trajectory.trajectory_point(0);
-    if (local_view_.chassis.gear_location() == Chassis::GEAR_DRIVE &&
+    auto first_trajectory_point = local_view_->trajectory().trajectory_point(0);
+    if (local_view_->chassis().gear_location() == Chassis::GEAR_DRIVE &&
         first_trajectory_point.v() < -1 * kEpsilon) {
       estop_ = true;
       estop_reason_ = "estop for negative speed when gear_drive";
@@ -210,14 +209,14 @@ Status PreprocessorSubmodule::ProducePreprocessorStatus(
   if (!estop_) {
     auto debug = preprocessor_status->mutable_input_debug();
     debug->mutable_localization_header()->CopyFrom(
-        local_view_.localization.header());
-    debug->mutable_canbus_header()->CopyFrom(local_view_.chassis.header());
+        local_view_->localization().header());
+    debug->mutable_canbus_header()->CopyFrom(local_view_->chassis().header());
     debug->mutable_trajectory_header()->CopyFrom(
-        local_view_.trajectory.header());
+        local_view_->trajectory().header());
 
-    if (local_view_.trajectory.is_replan()) {
+    if (local_view_->trajectory().is_replan()) {
       latest_replan_trajectory_header_.CopyFrom(
-          local_view_.trajectory.header());
+          local_view_->trajectory().header());
     }
 
     if (latest_replan_trajectory_header_.has_sequence_num()) {
@@ -274,20 +273,19 @@ void PreprocessorSubmodule::OnMonitor(
 
 Status PreprocessorSubmodule::CheckInput(LocalView *local_view) {
   ADEBUG << "Received localization:"
-         << local_view->localization.ShortDebugString();
-  ADEBUG << "Received chassis:" << local_view->chassis.ShortDebugString();
+         << local_view->localization().ShortDebugString();
+  ADEBUG << "Received chassis:" << local_view->chassis().ShortDebugString();
 
-  if (!local_view->trajectory.estop().is_estop() &&
-      local_view->trajectory.trajectory_point().empty()) {
+  if (!local_view->trajectory().estop().is_estop() &&
+      local_view->trajectory().trajectory_point().empty()) {
     AWARN_EVERY(100) << "planning has no trajectory point. ";
     const std::string msg = common::util::StrCat(
         "planning has no trajectory point. planning_seq_num: ",
-        local_view->trajectory.header().sequence_num());
+        local_view->trajectory().header().sequence_num());
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, msg);
   }
 
-  for (auto &trajectory_point :
-       *local_view->trajectory.mutable_trajectory_point()) {
+  for (auto trajectory_point : local_view->trajectory().trajectory_point()) {
     if (std::abs(trajectory_point.v()) <
             control_common_conf_.minimum_speed_resolution() &&
         std::abs(trajectory_point.a()) <
@@ -297,48 +295,50 @@ Status PreprocessorSubmodule::CheckInput(LocalView *local_view) {
     }
   }
 
-  VehicleStateProvider::Instance()->Update(local_view->localization,
-                                           local_view->chassis);
+  VehicleStateProvider::Instance()->Update(local_view->localization(),
+                                           local_view->chassis());
 
   return Status::OK();
 }
 
-Status PreprocessorSubmodule::CheckTimestamp(const LocalView &local_view) {
-  if (!control_common_conf_.enable_input_timestamp_check() ||
-      control_common_conf_.is_control_test_mode()) {
-    ADEBUG << "Skip input timestamp check by gflags.";
-    return Status::OK();
-  }
-  double current_timestamp = Clock::NowInSeconds();
-  double localization_diff =
-      current_timestamp - local_view.localization.header().timestamp_sec();
-  if (localization_diff > (control_common_conf_.max_localization_miss_num() *
-                           control_common_conf_.localization_period())) {
-    AERROR << "Localization msg lost for " << std::setprecision(6)
-           << localization_diff << "s";
-    monitor_logger_buffer_.ERROR("Localization msg lost");
-    return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Localization msg timeout");
-  }
+Status PreprocessorSubmodule::CheckTimestamp(LocalView *local_view) {
+  // if (!control_common_conf_.enable_input_timestamp_check() ||
+  //     control_common_conf_.is_control_test_mode()) {
+  //   ADEBUG << "Skip input timestamp check by gflags.";
+  //   return Status::OK();
+  // }
+  // double current_timestamp = Clock::NowInSeconds();
+  // double localization_diff =
+  //     current_timestamp - local_view.localization.header().timestamp_sec();
+  // if (localization_diff > (control_common_conf_.max_localization_miss_num() *
+  //                          control_common_conf_.localization_period())) {
+  //   AERROR << "Localization msg lost for " << std::setprecision(6)
+  //          << localization_diff << "s";
+  //   monitor_logger_buffer_.ERROR("Localization msg lost");
+  //   return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Localization msg
+  //   timeout");
+  // }
 
-  double chassis_diff =
-      current_timestamp - local_view.chassis.header().timestamp_sec();
-  if (chassis_diff > (control_common_conf_.max_chassis_miss_num() *
-                      control_common_conf_.chassis_period())) {
-    AERROR << "Chassis msg lost for " << std::setprecision(6) << chassis_diff
-           << "s";
-    monitor_logger_buffer_.ERROR("Chassis msg lost");
-    return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Chassis msg timeout");
-  }
+  // double chassis_diff =
+  //     current_timestamp - local_view.chassis.header().timestamp_sec();
+  // if (chassis_diff > (control_common_conf_.max_chassis_miss_num() *
+  //                     control_common_conf_.chassis_period())) {
+  //   AERROR << "Chassis msg lost for " << std::setprecision(6) << chassis_diff
+  //          << "s";
+  //   monitor_logger_buffer_.ERROR("Chassis msg lost");
+  //   return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Chassis msg timeout");
+  // }
 
-  double trajectory_diff =
-      current_timestamp - local_view.trajectory.header().timestamp_sec();
-  if (trajectory_diff > (control_common_conf_.max_planning_miss_num() *
-                         control_common_conf_.trajectory_period())) {
-    AERROR << "Trajectory msg lost for " << std::setprecision(6)
-           << trajectory_diff << "s";
-    monitor_logger_buffer_.ERROR("Trajectory msg lost");
-    return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Trajectory msg timeout");
-  }
+  // double trajectory_diff =
+  //     current_timestamp - local_view.trajectory.header().timestamp_sec();
+  // if (trajectory_diff > (control_common_conf_.max_planning_miss_num() *
+  //                        control_common_conf_.trajectory_period())) {
+  //   AERROR << "Trajectory msg lost for " << std::setprecision(6)
+  //          << trajectory_diff << "s";
+  //   monitor_logger_buffer_.ERROR("Trajectory msg lost");
+  //   return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Trajectory msg
+  //   timeout");
+  // }
   return Status::OK();
 }
 
