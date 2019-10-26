@@ -190,8 +190,13 @@ function local_volumes() {
     # Apollo root and bazel cache dirs are required.
     volumes="-v $APOLLO_ROOT_DIR:/apollo \
              -v $HOME/.cache:${DOCKER_HOME}/.cache"
+    APOLLO_TELEOP="${APOLLO_ROOT_DIR}/../apollo-teleop"
+    if [ -d ${APOLLO_TELEOP} ]; then
+        volumes="-v ${APOLLO_TELEOP}:/apollo/modules/teleop ${volumes}"
+    fi
     case "$(uname -s)" in
         Linux)
+
             case "$(lsb_release -r | cut -f2)" in
                 14.04)
                     volumes="${volumes} "
