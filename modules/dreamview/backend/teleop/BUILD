@@ -31,8 +31,8 @@ cc_library(
         "//third_party/json",
     ] + select({
         "//modules/dreamview/backend:teleop": [
-            "//modules/car1/network/proto:network_proto",
-            "//modules/car1/teleop/proto:teleop_proto",
+            "//modules/teleop/network/proto:network_proto",
+            "//modules/teleop/teleop/proto:teleop_proto",
         ],
         "//conditions:default": [
         ],

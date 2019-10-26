@@ -22,9 +22,9 @@
 #include "third_party/json/json.hpp"
 
 #ifdef TELEOP
-#include "modules/car1/network/proto/modem_info.pb.h"
-#include "modules/car1/teleop/proto/daemon_service_cmd.pb.h"
-#include "modules/car1/teleop/proto/daemon_service_rpt.pb.h"
+#include "modules/teleop/network/proto/modem_info.pb.h"
+#include "modules/teleop/teleop/proto/daemon_service_cmd.pb.h"
+#include "modules/teleop/teleop/proto/daemon_service_rpt.pb.h"
 #include "modules/planning/proto/pad_msg.pb.h"
 #endif
 
@@ -45,7 +45,7 @@ class TeleopService {
 
 #ifdef TELEOP
   void UpdateModemInfo(
-      const std::shared_ptr<modules::car1::network::ModemInfo> &modem_info);
+      const std::shared_ptr<modules::teleop::network::ModemInfo> &modem_info);
 #endif
 
   std::unique_ptr<cyber::Node> node_;
@@ -55,29 +55,29 @@ class TeleopService {
 #ifdef TELEOP
 
   // modem info readers and callback
-  std::shared_ptr<cyber::Reader<modules::car1::network::ModemInfo>>
+  std::shared_ptr<cyber::Reader<modules::teleop::network::ModemInfo>>
       modem0_info_reader_;
-  std::shared_ptr<cyber::Reader<modules::car1::network::ModemInfo>>
+  std::shared_ptr<cyber::Reader<modules::teleop::network::ModemInfo>>
       modem1_info_reader_;
-  std::shared_ptr<cyber::Reader<modules::car1::network::ModemInfo>>
+  std::shared_ptr<cyber::Reader<modules::teleop::network::ModemInfo>>
       modem2_info_reader_;
   // modem info callback
   void UpdateModem(const std::string &modem_id,
-    const std::shared_ptr<modules::car1::network::ModemInfo> &modem_info);
+    const std::shared_ptr<modules::teleop::network::ModemInfo> &modem_info);
 
   // daemon report readers and callback
   void UpdateCarDaemonRpt(
-      const std::shared_ptr<modules::car1::teleop::DaemonServiceRpt> &rpt);
+      const std::shared_ptr<modules::teleop::teleop::DaemonServiceRpt> &rpt);
   void UpdateOperatorDaemonRpt(
-      const std::shared_ptr<modules::car1::teleop::DaemonServiceRpt> &rpt);
-  std::shared_ptr<cyber::Reader<modules::car1::teleop::DaemonServiceRpt>>
+      const std::shared_ptr<modules::teleop::teleop::DaemonServiceRpt> &rpt);
+  std::shared_ptr<cyber::Reader<modules::teleop::teleop::DaemonServiceRpt>>
       car_daemon_rpt_reader_;
-  std::shared_ptr<cyber::Reader<modules::car1::teleop::DaemonServiceRpt>>
+  std::shared_ptr<cyber::Reader<modules::teleop::teleop::DaemonServiceRpt>>
       operator_daemon_rpt_reader_;
   // daemon commands writers
-  std::shared_ptr<cyber::Writer<modules::car1::teleop::DaemonServiceCmd>>
+  std::shared_ptr<cyber::Writer<modules::teleop::teleop::DaemonServiceCmd>>
       car_daemon_cmd_writer_;
-  std::shared_ptr<cyber::Writer<modules::car1::teleop::DaemonServiceCmd>>
+  std::shared_ptr<cyber::Writer<modules::teleop::teleop::DaemonServiceCmd>>
       operator_daemon_cmd_writer_;
 
   // planning driving actions  and feedback

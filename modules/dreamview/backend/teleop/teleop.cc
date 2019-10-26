@@ -24,9 +24,9 @@ namespace dreamview {
 
 using Json = nlohmann::json;
 using ::google::protobuf::util::MessageToJsonString;
-using modules::car1::network::ModemInfo;
-using modules::car1::teleop::DaemonServiceCmd;
-using modules::car1::teleop::DaemonServiceRpt;
+using modules::teleop::network::ModemInfo;
+using modules::teleop::teleop::DaemonServiceCmd;
+using modules::teleop::teleop::DaemonServiceRpt;
 using apollo::planning::PadMessage;
 
 // modem ids
