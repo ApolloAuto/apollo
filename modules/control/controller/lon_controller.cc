@@ -269,7 +269,7 @@ Status LonController::ComputeControlCommand(
   GetPathRemain(debug);
 
   // At near-stop stage, replace the brake control command with the standstill
-  // accleration if the former is even softer than the latter
+  // acceleration if the former is even softer than the latter
   if ((trajectory_message_->trajectory_type() ==
        apollo::planning::ADCTrajectory::NORMAL) &&
       ((std::fabs(debug->preview_acceleration_reference()) <=

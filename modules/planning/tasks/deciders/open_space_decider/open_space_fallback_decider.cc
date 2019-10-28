@@ -159,7 +159,7 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
 
     // If stop_index == fallback_start_index;
     if (fallback_start_index == stop_index) {
-      // 1. Set fallback start speed to 0, accleration to max accleration.
+      // 1. Set fallback start speed to 0, acceleration to max acceleration.
       AINFO << "Stop distance within safety buffer, stop now!";
       fallback_start_point.set_v(0.0);
       fallback_start_point.set_a(0.0);

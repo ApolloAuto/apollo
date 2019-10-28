@@ -53,7 +53,7 @@ message LocalizationEstimate {
   // The time of pose measurement, seconds since 1970-1-1 (UNIX time).
   optional double measurement_time = 4;  // In seconds.
 
-  // Future trajectory acturally driven by the drivers
+  // Future trajectory actually driven by the drivers
   repeated apollo.common.TrajectoryPoint trajectory_point = 5;
 
   // msf status

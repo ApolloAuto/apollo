@@ -100,7 +100,7 @@ class MracController {
 
   /**
    * @brief reset all the variables (including all the states, gains and
-   * externally-settting control parameters) for mrac controller
+   * externally-setting control parameters) for mrac controller
    */
   void Reset();
 
