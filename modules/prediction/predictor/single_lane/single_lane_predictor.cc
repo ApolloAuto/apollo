@@ -33,7 +33,8 @@ SingleLanePredictor::SingleLanePredictor() {
   predictor_type_ = ObstacleConf::SINGLE_LANE_PREDICTOR;
 }
 
-void SingleLanePredictor::Predict(Obstacle* obstacle) {
+void SingleLanePredictor::Predict(Obstacle* obstacle,
+                                  ObstaclesContainer* obstacles_container) {
   Clear();
 
   CHECK_NOTNULL(obstacle);

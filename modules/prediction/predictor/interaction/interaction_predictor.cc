@@ -46,7 +46,8 @@ InteractionPredictor::InteractionPredictor() {
   BuildADCTrajectory(FLAGS_collision_cost_time_resolution);
 }
 
-void InteractionPredictor::Predict(Obstacle* obstacle) {
+void InteractionPredictor::Predict(Obstacle* obstacle,
+                                   ObstaclesContainer* obstacles_container) {
   Clear();
 
   CHECK_NOTNULL(obstacle);

@@ -38,13 +38,12 @@ using apollo::prediction::PredictionConstants;
 ObstaclesContainer::ObstaclesContainer()
     : ptr_obstacles_(FLAGS_max_num_obstacles) {}
 
-ObstaclesContainer::ObstaclesContainer(
-    const ContainerOutput& container_output)
+ObstaclesContainer::ObstaclesContainer(const ContainerOutput& container_output)
     : ptr_obstacles_(FLAGS_max_num_obstacles) {
   for (Obstacle obstacle : container_output.curr_frame_obstacles()) {
     // Deep copy of obstacle is needed for modification
     ptr_obstacles_.Put(obstacle.id(),
-        std::move(std::unique_ptr<Obstacle>(&obstacle)));
+                       std::move(std::unique_ptr<Obstacle>(&obstacle)));
   }
   for (const auto& perception_obstacle :
        container_output.curr_frame_perception_obstacles()) {

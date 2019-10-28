@@ -34,7 +34,8 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterConfig;
 using apollo::hdmap::LaneInfo;
 
-void SequencePredictor::Predict(Obstacle* obstacle) {
+void SequencePredictor::Predict(Obstacle* obstacle,
+                                ObstaclesContainer* obstacles_container) {
   Clear();
 
   CHECK_NOTNULL(obstacle);
@@ -56,7 +57,7 @@ std::string SequencePredictor::ToString(const LaneSequence& sequence) {
 
 void SequencePredictor::FilterLaneSequences(
     const Feature& feature, const std::string& lane_id,
-    std::vector<bool>* enable_lane_sequence) {
+    const Obstacle* ego_vehicle_ptr, std::vector<bool>* enable_lane_sequence) {
   if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
     return;
   }
@@ -89,7 +90,7 @@ void SequencePredictor::FilterLaneSequences(
     }
 
     // The obstacle has interference with ADC within a small distance
-    double distance = GetLaneChangeDistanceWithADC(sequence);
+    double distance = GetLaneChangeDistanceWithADC(sequence, ego_vehicle_ptr);
     ADEBUG << "Distance to ADC " << std::fixed << std::setprecision(6)
            << distance;
     if (distance > 0.0 && distance < FLAGS_lane_change_dist) {
@@ -197,15 +198,11 @@ SequencePredictor::LaneChangeType SequencePredictor::GetLaneChangeType(
 }
 
 double SequencePredictor::GetLaneChangeDistanceWithADC(
-    const LaneSequence& lane_sequence) {
-  auto pose_container =
-      ContainerManager::Instance()->GetContainer<PoseContainer>(
-          AdapterConfig::LOCALIZATION);
+    const LaneSequence& lane_sequence, const Obstacle* ego_vehicle_ptr) {
   auto adc_container =
       ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
           AdapterConfig::PLANNING_TRAJECTORY);
 
-  CHECK_NOTNULL(pose_container);
   CHECK_NOTNULL(adc_container);
 
   if (!adc_container->HasOverlap(lane_sequence)) {
@@ -215,9 +212,10 @@ double SequencePredictor::GetLaneChangeDistanceWithADC(
   }
 
   Eigen::Vector2d adc_position;
-  if (pose_container->ToPerceptionObstacle() != nullptr) {
-    adc_position[0] = pose_container->ToPerceptionObstacle()->position().x();
-    adc_position[1] = pose_container->ToPerceptionObstacle()->position().y();
+  if (ego_vehicle_ptr != nullptr) {
+    const auto& position = ego_vehicle_ptr->latest_feature().position();
+    adc_position[0] = position.x();
+    adc_position[1] = position.y();
 
     std::string obstacle_lane_id = lane_sequence.lane_segment(0).lane_id();
     double obstacle_lane_s = lane_sequence.lane_segment(0).start_s();

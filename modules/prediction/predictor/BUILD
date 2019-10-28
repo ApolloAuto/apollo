@@ -50,6 +50,7 @@ cc_library(
     ],
     deps = [
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
+        "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/container/obstacles:obstacle",
     ],
 )

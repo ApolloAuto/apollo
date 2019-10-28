@@ -37,7 +37,8 @@ JunctionPredictor::JunctionPredictor() {
   predictor_type_ = ObstacleConf::JUNCTION_PREDICTOR;
 }
 
-void JunctionPredictor::Predict(Obstacle* obstacle) {
+void JunctionPredictor::Predict(Obstacle* obstacle,
+                                ObstaclesContainer* obstacles_container) {
   Clear();
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);

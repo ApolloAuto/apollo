@@ -23,7 +23,8 @@ EmptyPredictor::EmptyPredictor() {
   predictor_type_ = ObstacleConf::EMPTY_PREDICTOR;
 }
 
-void EmptyPredictor::Predict(Obstacle* obstacle) {
+void EmptyPredictor::Predict(Obstacle* obstacle,
+                             ObstaclesContainer* obstacles_container) {
   obstacle->SetPredictorType(predictor_type_);
 }
 

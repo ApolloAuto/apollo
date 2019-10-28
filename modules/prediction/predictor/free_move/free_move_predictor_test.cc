@@ -50,7 +50,7 @@ TEST_F(FreeMovePredictorTest, General) {
   Obstacle* obstacle_ptr = container.GetObstacle(15);
   EXPECT_NE(obstacle_ptr, nullptr);
   FreeMovePredictor predictor;
-  predictor.Predict(obstacle_ptr);
+  predictor.Predict(obstacle_ptr, &container);
   EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 1);
 }
 
@@ -63,7 +63,7 @@ TEST_F(FreeMovePredictorTest, Pedestrian) {
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(15);
   FreeMovePredictor predictor;
-  predictor.Predict(obstacle_ptr);
+  predictor.Predict(obstacle_ptr, &container);
   EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 1);
 }
 

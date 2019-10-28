@@ -35,7 +35,8 @@ LaneSequencePredictor::LaneSequencePredictor() {
   predictor_type_ = ObstacleConf::LANE_SEQUENCE_PREDICTOR;
 }
 
-void LaneSequencePredictor::Predict(Obstacle* obstacle) {
+void LaneSequencePredictor::Predict(Obstacle* obstacle,
+                                    ObstaclesContainer* obstacles_container) {
   Clear();
 
   CHECK_NOTNULL(obstacle);
@@ -56,7 +57,9 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
   }
   int num_lane_sequence = feature.lane().lane_graph().lane_sequence_size();
   std::vector<bool> enable_lane_sequence(num_lane_sequence, true);
-  FilterLaneSequences(feature, lane_id, &enable_lane_sequence);
+  Obstacle* ego_vehicle_ptr =
+      obstacles_container->GetObstacle(FLAGS_ego_vehicle_id);
+  FilterLaneSequences(feature, lane_id, ego_vehicle_ptr, &enable_lane_sequence);
 
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = feature.lane().lane_graph().lane_sequence(i);

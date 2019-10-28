@@ -50,7 +50,7 @@ TEST_F(SingleLanePredictorTest, OnLaneCase) {
   EXPECT_NE(obstacle_ptr, nullptr);
   cost_evaluator.Evaluate(obstacle_ptr, &container);
   SingleLanePredictor predictor;
-  predictor.Predict(obstacle_ptr);
+  predictor.Predict(obstacle_ptr, &container);
   EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 2);
 }
 

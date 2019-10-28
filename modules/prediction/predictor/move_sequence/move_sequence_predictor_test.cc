@@ -50,7 +50,7 @@ TEST_F(MoveSequencePredictorTest, OnLaneCase) {
   EXPECT_NE(obstacle_ptr, nullptr);
   mlp_evaluator.Evaluate(obstacle_ptr, &container);
   MoveSequencePredictor predictor;
-  predictor.Predict(obstacle_ptr);
+  predictor.Predict(obstacle_ptr, &container);
   EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 1);
 }
 
