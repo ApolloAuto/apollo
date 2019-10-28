@@ -45,8 +45,10 @@ class MoveSequencePredictor : public SequencePredictor {
   /**
    * @brief Make prediction
    * @param Obstacle pointer
+   * @param Obstacles container
    */
-  void Predict(Obstacle* obstacle) override;
+  void Predict(Obstacle* obstacle,
+               ObstaclesContainer* obstacles_container) override;
 
   FRIEND_TEST(MoveSequencePredictorTest, Polynomial);
   FRIEND_TEST(MoveSequencePredictorTest, Utils);

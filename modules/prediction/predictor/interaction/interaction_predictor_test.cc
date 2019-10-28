@@ -50,7 +50,7 @@ TEST_F(InteractionPredictorTest, OnLaneCase) {
   EXPECT_NE(obstacle_ptr, nullptr);
   mlp_evaluator.Evaluate(obstacle_ptr, &container);
   InteractionPredictor predictor;
-  predictor.Predict(obstacle_ptr);
+  predictor.Predict(obstacle_ptr, &container);
   EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 1);
 }
 

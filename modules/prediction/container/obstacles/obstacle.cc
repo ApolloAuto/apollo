@@ -111,13 +111,11 @@ bool Obstacle::IsSlow() {
 }
 
 bool Obstacle::IsOnLane() const {
-  if (feature_history_.empty() ||
-      !latest_feature().has_lane() ||
+  if (feature_history_.empty() || !latest_feature().has_lane() ||
       latest_feature().lane().current_lane_feature().empty()) {
     return false;
   }
-  for (const auto& curr_lane :
-       latest_feature().lane().current_lane_feature()) {
+  for (const auto& curr_lane : latest_feature().lane().current_lane_feature()) {
     if (curr_lane.lane_type() != hdmap::Lane::CITY_DRIVING) {
       return false;
     }
@@ -618,15 +616,12 @@ void Obstacle::SetAcceleration(Feature* feature) {
       acc_y *= damping_y;
       acc_z *= damping_z;
 
-      acc_x =
-          common::math::Clamp(acc_x, FLAGS_vehicle_min_linear_acc,
-                              FLAGS_vehicle_max_linear_acc);
-      acc_y =
-          common::math::Clamp(acc_y, FLAGS_vehicle_min_linear_acc,
-                              FLAGS_vehicle_max_linear_acc);
-      acc_z =
-          common::math::Clamp(acc_z, FLAGS_vehicle_min_linear_acc,
-                              FLAGS_vehicle_max_linear_acc);
+      acc_x = common::math::Clamp(acc_x, FLAGS_vehicle_min_linear_acc,
+                                  FLAGS_vehicle_max_linear_acc);
+      acc_y = common::math::Clamp(acc_y, FLAGS_vehicle_min_linear_acc,
+                                  FLAGS_vehicle_max_linear_acc);
+      acc_z = common::math::Clamp(acc_z, FLAGS_vehicle_min_linear_acc,
+                                  FLAGS_vehicle_max_linear_acc);
 
       double heading = feature->velocity_heading();
       acc = acc_x * std::cos(heading) + acc_y * std::sin(heading);
@@ -991,7 +986,8 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
   }
 }
 
-bool Obstacle::HasJunctionExitLane(const LaneSequence& lane_sequence,
+bool Obstacle::HasJunctionExitLane(
+    const LaneSequence& lane_sequence,
     const std::unordered_set<std::string>& exit_lane_id_set) {
   const Feature& feature = latest_feature();
   if (!feature.has_junction_feature()) {

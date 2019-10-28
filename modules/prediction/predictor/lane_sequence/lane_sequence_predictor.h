@@ -22,6 +22,7 @@
 
 #include <vector>
 
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/predictor/sequence/sequence_predictor.h"
 
 namespace apollo {
@@ -42,8 +43,10 @@ class LaneSequencePredictor : public SequencePredictor {
   /**
    * @brief Make prediction
    * @param Obstacle pointer
+   * @param Obstacles container
    */
-  void Predict(Obstacle* obstacle) override;
+  void Predict(Obstacle* obstacle,
+               ObstaclesContainer* obstacles_container) override;
 
  protected:
   /**

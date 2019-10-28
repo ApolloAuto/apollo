@@ -23,7 +23,8 @@ ExtrapolationPredictor::ExtrapolationPredictor() {
   predictor_type_ = ObstacleConf::EXTRAPOLATION_PREDICTOR;
 }
 
-void ExtrapolationPredictor::Predict(Obstacle* obstacle) {
+void ExtrapolationPredictor::Predict(Obstacle* obstacle,
+                                     ObstaclesContainer* obstacles_container) {
   Clear();
 
   CHECK_NOTNULL(obstacle);

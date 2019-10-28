@@ -23,6 +23,7 @@
 
 #include <vector>
 
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/predictor/predictor.h"
 
 namespace apollo {
@@ -43,8 +44,10 @@ class FreeMovePredictor : public Predictor {
   /**
    * @brief Make prediction
    * @param Obstacle pointer
+   * @param Obstacles container
    */
-  void Predict(Obstacle* obstacle) override;
+  void Predict(Obstacle* obstacle,
+               ObstaclesContainer* obstacles_container) override;
 
  private:
   /**

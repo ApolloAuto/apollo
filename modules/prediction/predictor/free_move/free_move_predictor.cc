@@ -32,7 +32,8 @@ FreeMovePredictor::FreeMovePredictor() {
   predictor_type_ = ObstacleConf::FREE_MOVE_PREDICTOR;
 }
 
-void FreeMovePredictor::Predict(Obstacle* obstacle) {
+void FreeMovePredictor::Predict(Obstacle* obstacle,
+                                ObstaclesContainer* obstacles_container) {
   Clear();
 
   CHECK_NOTNULL(obstacle);

@@ -27,6 +27,7 @@ cc_test(
     ],
     deps = [
         "//modules/prediction/common:kml_map_based_test",
+        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "//modules/prediction/predictor/sequence:sequence_predictor",
     ],
