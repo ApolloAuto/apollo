@@ -57,7 +57,7 @@ message JobConfig {
   optional string input_data_path = 4;
 
   // 1. zone_id is required in local_map generator
-  // 2. e.g., if you are in beijing, then zone_id is 50
+  // 2. e.g., if you are in Beijing, then zone_id is 50
   optional uint32 zone_id = 5;
 
   // 1. lidar_type is required in local_map generator

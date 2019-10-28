@@ -141,7 +141,7 @@ void TrafficLight::MakeDecisions(Frame* const frame,
       continue;
     }
 
-    // Red/Yellow/Unkown: check deceleration
+    // Red/Yellow/Unknown: check deceleration
     if (stop_deceleration > config_.traffic_light().max_stop_deceleration()) {
       AWARN << "stop_deceleration too big to achieve.  SKIP red light";
       continue;

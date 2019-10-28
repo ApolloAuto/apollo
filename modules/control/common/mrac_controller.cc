@@ -243,7 +243,7 @@ void MracController::AntiWindupCompensation(const double control_command,
                                             const double upper_bound,
                                             const double lower_bound) {
   if (upper_bound < lower_bound) {
-    AWARN << "windup upper_bound < lower_bound; failed to exectute the "
+    AWARN << "windup upper_bound < lower_bound; failed to execute the "
              "anti-windup logic";
     compensation_anti_windup_.setZero(model_order_, 2);
   }

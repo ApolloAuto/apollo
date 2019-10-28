@@ -79,7 +79,7 @@ message RacobitRadarObs {
   // longitude acceleration standard deviation to the radar; (+) = farword; unit
   // = m/s2
   optional double longitude_accel_rms = 19;
-  // lateral acclearation standard deviation to the radar; (+) = left; unit =
+  // lateral acceleration standard deviation to the radar; (+) = left; unit =
   // m/s2
   optional double lateral_accel_rms = 20;
   // oritation angle standard deviation to the radar; (+) = conterclockwise;

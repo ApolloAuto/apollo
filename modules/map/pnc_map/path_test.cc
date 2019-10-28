@@ -445,7 +445,7 @@ TEST(TestSuite, hdmap_circle_path) {
   EXPECT_NEAR(lateral, 0.0, 1e-6);
   EXPECT_NEAR(distance, 0.0, 1e-6);
 
-  // Randomly generated test cases on path.approxmiation.
+  // Randomly generated test cases on path.approximation.
   const Path path_no_approximation(points, {});
   for (int case_id = 0; case_id < 10000; ++case_id) {
     const double x = RandomDouble(-kRadius * 0.5, kRadius * 1.5);
