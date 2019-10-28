@@ -371,7 +371,7 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_jac_g(
   int v_offset = num_of_points_;
   int a_offset = 2 * num_of_points_;
 
-  if (values == NULL) {
+  if (values == nullptr) {
     int non_zero_index = 0;
     int constraint_index = 0;
 
@@ -565,7 +565,7 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_h(
     int n, const double *x, bool new_x, double obj_factor, int m,
     const double *lambda, bool new_lambda, int nele_hess, int *iRow, int *jCol,
     double *values) {
-  if (values == NULL) {
+  if (values == nullptr) {
     int nz_index = 0;
     for (int i = 0; i < num_of_points_; ++i) {
       iRow[nz_index] = i;
