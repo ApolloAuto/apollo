@@ -56,8 +56,7 @@ class LaneScanningEvaluator : public Evaluator {
    * @param Obstacles container
    * @param vector of all Obstacles
    */
-  bool Evaluate(Obstacle* obstacle_ptr,
-                ObstaclesContainer* obstacles_container,
+  bool Evaluate(Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container,
                 std::vector<Obstacle*> dynamic_env) override;
 
   /**

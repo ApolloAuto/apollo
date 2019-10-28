@@ -123,8 +123,8 @@ void LaneChangeDecider::UpdatePreparationDistance(
     const bool is_opt_succeed, const Frame* frame,
     const ReferenceLineInfo* const reference_line_info) {
   auto* lane_change_status = PlanningContext::Instance()
-                                ->mutable_planning_status()
-                                ->mutable_change_lane();
+                                 ->mutable_planning_status()
+                                 ->mutable_change_lane();
   lane_change_status->set_timestamp(Clock::NowInSeconds());
   lane_change_status->set_path_id(reference_line_info->Lanes().Id());
   ADEBUG << "Current time: " << lane_change_status->timestamp();
@@ -139,7 +139,7 @@ void LaneChangeDecider::UpdatePreparationDistance(
   lane_change_status->set_is_current_opt_succeed(false);
   // If the planner just succeed recently, let's be more patient and try again
   if (Clock::NowInSeconds() - lane_change_status->last_succeed_timestamp() <
-     FLAGS_allowed_lane_change_failure_time) {
+      FLAGS_allowed_lane_change_failure_time) {
     return;
   }
   // Get ADC's current s and the lane-change start distance s
@@ -151,10 +151,9 @@ void LaneChangeDecider::UpdatePreparationDistance(
     return;
   }
   common::SLPoint point_sl;
-  reference_line.XYToSL(
-        {lane_change_status->lane_change_start_position().x(),
-         lane_change_status->lane_change_start_position().y()},
-        &point_sl);
+  reference_line.XYToSL({lane_change_status->lane_change_start_position().x(),
+                         lane_change_status->lane_change_start_position().y()},
+                        &point_sl);
   ADEBUG << "Current ADC s: " << adc_sl_info.first[0];
   ADEBUG << "Change lane point s: " << point_sl.s();
   // If the remaining lane-change preparation distance is too small,

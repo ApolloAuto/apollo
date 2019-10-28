@@ -35,8 +35,8 @@ double STGuideLine::GetGuideSFromT(double t) const {
   return s0_ + (t - t0_) * v0_;
 }
 
-void STGuideLine::UpdateBlockingInfo(
-    const double t, const double s_block, const bool is_lower_block) {
+void STGuideLine::UpdateBlockingInfo(const double t, const double s_block,
+                                     const bool is_lower_block) {
   if (is_lower_block) {
     if (GetGuideSFromT(t) < s_block) {
       s0_ = s_block;

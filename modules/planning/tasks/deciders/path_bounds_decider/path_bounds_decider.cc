@@ -836,8 +836,7 @@ bool PathBoundsDecider::IsContained(
 }
 
 bool PathBoundsDecider::InitPathBoundary(
-    const ReferenceLineInfo& reference_line_info,
-    PathBound* const path_bound) {
+    const ReferenceLineInfo& reference_line_info, PathBound* const path_bound) {
   // Sanity checks.
   CHECK_NOTNULL(path_bound);
   path_bound->clear();
@@ -846,12 +845,11 @@ bool PathBoundsDecider::InitPathBoundary(
   // Starting from ADC's current position, increment until the horizon, and
   // set lateral bounds to be infinite at every spot.
   for (double curr_s = adc_frenet_s_;
-       curr_s <
-       std::fmin(
-           adc_frenet_s_ + std::fmax(kPathBoundsDeciderHorizon,
-                                     reference_line_info.GetCruiseSpeed() *
-                                         FLAGS_trajectory_time_length),
-           reference_line.Length());
+       curr_s < std::fmin(adc_frenet_s_ +
+                              std::fmax(kPathBoundsDeciderHorizon,
+                                        reference_line_info.GetCruiseSpeed() *
+                                            FLAGS_trajectory_time_length),
+                          reference_line.Length());
        curr_s += kPathBoundsDeciderResolution) {
     path_bound->emplace_back(curr_s, std::numeric_limits<double>::lowest(),
                              std::numeric_limits<double>::max());

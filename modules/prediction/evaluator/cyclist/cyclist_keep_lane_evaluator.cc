@@ -23,8 +23,8 @@ CyclistKeepLaneEvaluator::CyclistKeepLaneEvaluator() {
   evaluator_type_ = ObstacleConf::CYCLIST_KEEP_LANE_EVALUATOR;
 }
 
-bool CyclistKeepLaneEvaluator::Evaluate(Obstacle* obstacle_ptr,
-    ObstaclesContainer* obstacles_container) {
+bool CyclistKeepLaneEvaluator::Evaluate(
+    Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container) {
   CHECK_NOTNULL(obstacle_ptr);
 
   obstacle_ptr->SetEvaluatorType(evaluator_type_);

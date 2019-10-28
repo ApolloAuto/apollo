@@ -63,11 +63,11 @@ class EvaluatorManager {
   void Run(ObstaclesContainer* obstacles_container);
 
   void EvaluateObstacle(Obstacle* obstacle,
-      ObstaclesContainer* obstacles_container,
-      std::vector<Obstacle*> dynamic_env);
+                        ObstaclesContainer* obstacles_container,
+                        std::vector<Obstacle*> dynamic_env);
 
   void EvaluateObstacle(Obstacle* obstacle,
-      ObstaclesContainer* obstacles_container);
+                        ObstaclesContainer* obstacles_container);
 
  private:
   void BuildObstacleIdHistoryMap(ObstaclesContainer* obstacles_container);

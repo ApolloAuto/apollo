@@ -31,8 +31,8 @@
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/st_bounds_decider_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
-#include "modules/planning/tasks/deciders/st_bounds_decider/st_guide_line.h"
 #include "modules/planning/tasks/deciders/st_bounds_decider/st_driving_limits.h"
+#include "modules/planning/tasks/deciders/st_bounds_decider/st_guide_line.h"
 #include "modules/planning/tasks/deciders/st_bounds_decider/st_obstacles_processor.h"
 
 namespace apollo {
@@ -57,8 +57,9 @@ class STBoundsDecider : public Decider {
   void RankDecisions(
       double s_guide_line, std::pair<double, double> driving_limit,
       std::vector<std::pair<double, double>>* const available_s_bounds,
-      std::vector<std::vector<std::pair<std::string, ObjectDecisionType>>>*
-          const available_obs_decisions);
+      std::vector<
+          std::vector<std::pair<std::string, ObjectDecisionType>>>* const
+          available_obs_decisions);
 
   void RecordSTGraphDebug(
       const std::vector<STBoundary>& st_graph_data,

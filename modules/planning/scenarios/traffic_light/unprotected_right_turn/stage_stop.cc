@@ -183,7 +183,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishStage(
           ->mutable_done_traffic_light_overlap_id()
           ->Clear();
       for (const auto& traffic_light_overlap_id :
-          GetContext()->current_traffic_light_overlap_ids) {
+           GetContext()->current_traffic_light_overlap_ids) {
         PlanningContext::Instance()
             ->mutable_planning_status()
             ->mutable_traffic_light()

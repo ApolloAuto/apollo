@@ -41,9 +41,9 @@ class PullOverStageRetryParkingTest : public ::testing::Test {
 
 TEST_F(PullOverStageRetryParkingTest, Init) {
   PullOverStageRetryParking pull_over_stage_retry_parking(config_);
-  EXPECT_EQ(pull_over_stage_retry_parking.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::PULL_OVER_RETRY_PARKING));
+  EXPECT_EQ(
+      pull_over_stage_retry_parking.Name(),
+      ScenarioConfig::StageType_Name(ScenarioConfig::PULL_OVER_RETRY_PARKING));
 }
 
 }  // namespace pull_over

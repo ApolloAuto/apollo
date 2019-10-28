@@ -29,8 +29,8 @@ namespace planning {
 namespace scenario {
 namespace traffic_light {
 
-class TrafficLightUnprotectedLeftTurnStageApproachTest :
-    public ::testing::Test {
+class TrafficLightUnprotectedLeftTurnStageApproachTest
+    : public ::testing::Test {
  public:
   virtual void SetUp() {
     config_.set_stage_type(

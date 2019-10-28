@@ -40,8 +40,7 @@ class StopSignUnprotectedStagePreStopTest : public ::testing::Test {
 };
 
 TEST_F(StopSignUnprotectedStagePreStopTest, Init) {
-  StopSignUnprotectedStagePreStop stop_sign_unprotected_stage_pre_stop(
-      config_);
+  StopSignUnprotectedStagePreStop stop_sign_unprotected_stage_pre_stop(config_);
   EXPECT_EQ(stop_sign_unprotected_stage_pre_stop.Name(),
             ScenarioConfig::StageType_Name(
                 ScenarioConfig::STOP_SIGN_UNPROTECTED_PRE_STOP));

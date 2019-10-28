@@ -238,8 +238,8 @@ void EvaluatorManager::Run(ObstaclesContainer* obstacles_container) {
 }
 
 void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
-    ObstaclesContainer* obstacles_container,
-    std::vector<Obstacle*> dynamic_env) {
+                                        ObstaclesContainer* obstacles_container,
+                                        std::vector<Obstacle*> dynamic_env) {
   Evaluator* evaluator = nullptr;
   // Select different evaluators depending on the obstacle's type.
   switch (obstacle->type()) {
@@ -304,8 +304,8 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
   }
 }
 
-void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
-    ObstaclesContainer* obstacles_container) {
+void EvaluatorManager::EvaluateObstacle(
+    Obstacle* obstacle, ObstaclesContainer* obstacles_container) {
   std::vector<Obstacle*> dummy_dynamic_env;
   EvaluateObstacle(obstacle, obstacles_container, dummy_dynamic_env);
 }

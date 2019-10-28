@@ -48,8 +48,7 @@ class STObstaclesProcessor {
  public:
   STObstaclesProcessor() {}
 
-  void Init(const double planning_distance,
-            const double planning_time,
+  void Init(const double planning_distance, const double planning_time,
             const PathData& path_data);
 
   virtual ~STObstaclesProcessor() = default;

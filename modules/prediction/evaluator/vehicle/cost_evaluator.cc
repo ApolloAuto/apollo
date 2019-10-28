@@ -27,7 +27,7 @@ CostEvaluator::CostEvaluator() {
 }
 
 bool CostEvaluator::Evaluate(Obstacle* obstacle_ptr,
-    ObstaclesContainer* obstacles_container) {
+                             ObstaclesContainer* obstacles_container) {
   CHECK_NOTNULL(obstacle_ptr);
 
   obstacle_ptr->SetEvaluatorType(evaluator_type_);

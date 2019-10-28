@@ -118,10 +118,8 @@ Status SpeedBoundsDecider::Process(
   STGraphDebug *st_graph_debug = debug->mutable_planning_data()->add_st_graph();
 
   st_graph_data->LoadData(boundaries, min_s_on_st_boundaries, init_point,
-                          speed_limit,
-                          reference_line_info->GetCruiseSpeed(),
-                          path_data_length, total_time_by_conf,
-                          st_graph_debug);
+                          speed_limit, reference_line_info->GetCruiseSpeed(),
+                          path_data_length, total_time_by_conf, st_graph_debug);
 
   // Create and record st_graph debug info
   RecordSTGraphDebug(*st_graph_data, st_graph_debug);

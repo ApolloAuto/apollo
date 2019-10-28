@@ -103,7 +103,7 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::Process(
     // check on traffic light color and distance to stop line
     if (signal_color != TrafficLight::GREEN ||
         distance_adc_to_stop_line >=
-                scenario_config_.max_valid_stop_distance()) {
+            scenario_config_.max_valid_stop_distance()) {
       traffic_light_all_done = false;
       break;
     }
@@ -138,7 +138,7 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageApproach::FinishStage(
         ->mutable_done_traffic_light_overlap_id()
         ->Clear();
     for (const auto& traffic_light_overlap_id :
-        GetContext()->current_traffic_light_overlap_ids) {
+         GetContext()->current_traffic_light_overlap_ids) {
       PlanningContext::Instance()
           ->mutable_planning_status()
           ->mutable_traffic_light()
