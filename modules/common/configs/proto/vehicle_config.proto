@@ -43,7 +43,7 @@ message VehicleID {
 }
 
 message LatencyParam {
-  // latency parameters, in millisecond (ms)
+  // latency parameters, in second (s)
   optional double dead_time = 1;
   optional double rise_time = 2;
   optional double peak_time = 3;
