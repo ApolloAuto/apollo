@@ -25,8 +25,7 @@
 
 #include "Eigen/Core"
 
-#include "modules/common/filters/digital_filter.h"
-#include "modules/common/filters/digital_filter_coefficients.h"
+#include "modules/common/status/status.h"
 #include "modules/control/proto/mrac_conf.pb.h"
 
 /**
@@ -52,15 +51,17 @@ class MracController {
   /**
    * time constant, natrual frequency and damping ratio
    * @param mrac_conf configuration for reference model
+   * @return Status parameter initialization status
    */
-  void SetReferenceModel(const MracConf &mrac_conf);
+  common::Status SetReferenceModel(const MracConf &mrac_conf);
 
   /**
    * state adaptive gain, desired adaptive gain and nonlinear-component adaptive
    * gain
    * @param mrac_conf configuration for adaption model
+   * @return Status parameter initialization status
    */
-  void SetAdaptionModel(const MracConf &mrac_conf);
+  common::Status SetAdaptionModel(const MracConf &mrac_conf);
 
   /**
    * @brief build mrac (1st or 2nd) order reference model in the discrete-time
@@ -75,6 +76,16 @@ class MracController {
    * @param none
    */
   void BuildAdaptionModel();
+
+  /**
+   * @brief check if the solution of the algebraic Lyapunov Equation is
+   * symmetric positive definte
+   * @param matrix_a reference model matrix
+   * @param matrix_p Lyapunov function matrix
+   * @return indicator of the symmetric positive definte matrix
+   */
+  bool CheckLyapunovPD(const Eigen::MatrixXd matrix_a,
+                       const Eigen::MatrixXd matrix_p) const;
 
   /**
    * @brief exexute the adaption interation with respect to the designed law in
@@ -191,8 +202,6 @@ class MracController {
   double CurrentInputAdaptionGain() const;
 
  protected:
-  // reference model as a digital filter
-  common::DigitalFilter reference_model_;
   // indicator if the reference/adaption model is valid
   bool reference_model_enabled_ = false;
   bool adaption_model_enabled_ = false;

@@ -19,13 +19,18 @@
 #include <cmath>
 #include <vector>
 
+#include "Eigen/Dense"
 #include "Eigen/LU"
 
 #include "cyber/common/log.h"
+#include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace control {
 
+using apollo::common::ErrorCode;
+using apollo::common::Status;
+using apollo::common::util::StrCat;
 using Matrix = Eigen::MatrixXd;
 
 double MracController::Control(const double command, const Matrix state,
@@ -159,32 +164,69 @@ void MracController::Init(const MracConf &mrac_conf, const double dt) {
   // Initialize the reference model parameters
   matrix_a_reference_ = Matrix::Zero(model_order_, model_order_);
   matrix_b_reference_ = Matrix::Zero(model_order_, 1);
-  SetReferenceModel(mrac_conf);
-  BuildReferenceModel(dt);
+  if (SetReferenceModel(mrac_conf).ok()) {
+    BuildReferenceModel(dt);
+  } else {
+    reference_model_enabled_ = false;
+  }
   // Initialize the adaption model parameters
   matrix_p_adaption_ = Matrix::Zero(model_order_, model_order_);
   matrix_b_adaption_ = Matrix::Zero(model_order_, 1);
-  SetAdaptionModel(mrac_conf);
-  BuildAdaptionModel();
+  if (SetAdaptionModel(mrac_conf).ok()) {
+    BuildAdaptionModel();
+  } else {
+    adaption_model_enabled_ = false;
+  }
   // Initialize the anti-windup parameters
   gain_anti_windup_ = mrac_conf.anti_windup_compensation_gain();
 }
 
-void MracController::SetReferenceModel(const MracConf &mrac_conf) {
+Status MracController::SetReferenceModel(const MracConf &mrac_conf) {
+  const double Epsilon = 0.000001;
+  if (((mrac_conf.reference_time_constant() < Epsilon && model_order_ == 1)) ||
+      ((mrac_conf.reference_natural_frequency() < Epsilon &&
+        model_order_ == 2))) {
+    const auto error_msg = StrCat(
+        "mrac controller error: reference model time-constant parameter: ",
+        mrac_conf.reference_time_constant(),
+        "and natrual frequency parameter: ",
+        mrac_conf.reference_natural_frequency(),
+        " in configuration file are not reasonable with respect to the "
+        "reference model order: ",
+        model_order_);
+    AERROR << error_msg;
+    return Status(ErrorCode::CONTROL_INIT_ERROR, error_msg);
+  }
   tau_reference_ = mrac_conf.reference_time_constant();
   wn_reference_ = mrac_conf.reference_natural_frequency();
   zeta_reference_ = mrac_conf.reference_damping_ratio();
+  return Status::OK();
 }
 
-void MracController::SetAdaptionModel(const MracConf &mrac_conf) {
+Status MracController::SetAdaptionModel(const MracConf &mrac_conf) {
+  if (mrac_conf.adaption_matrix_p_size() != matrix_p_adaption_.size()) {
+    const auto error_msg =
+        StrCat("mrac controller error: adaption matrix p element number: ",
+               mrac_conf.adaption_matrix_p_size(),
+               " in configuration file is not equal to desired matrix p size: ",
+               matrix_p_adaption_.size());
+    AERROR << error_msg;
+    return Status(ErrorCode::CONTROL_INIT_ERROR, error_msg);
+  }
   for (int i = 0; i < model_order_; ++i) {
     gamma_state_adaption_(i, 0) = mrac_conf.adaption_state_gain();
+    for (int j = 0; j < model_order_; ++j) {
+      matrix_p_adaption_(i, j) =
+          mrac_conf.adaption_matrix_p(i * model_order_ + j);
+    }
   }
   gamma_input_adaption_(0, 0) = mrac_conf.adaption_desired_gain();
   gamma_nonlinear_adaption_(0, 0) = mrac_conf.adaption_nonlinear_gain();
+  return Status::OK();
 }
 
 void MracController::BuildReferenceModel(const double dt) {
+  reference_model_enabled_ = true;
   if (dt <= 0.0) {
     AWARN << "dt <= 0, continuous-discrete transformation for reference model "
              "failed, dt: "
@@ -198,7 +240,7 @@ void MracController::BuildReferenceModel(const double dt) {
       Ts_ = dt;
       matrix_a_reference_(0, 1) = 1.0;
       matrix_a_reference_(1, 0) = -wn_reference_ * wn_reference_;
-      matrix_a_reference_(1, 1) = -2 * zeta_reference_ / wn_reference_;
+      matrix_a_reference_(1, 1) = -2 * zeta_reference_ * wn_reference_;
       matrix_b_reference_(1, 0) = wn_reference_ * wn_reference_;
     } else {
       AWARN << "reference model order beyond the designed range, "
@@ -207,25 +249,37 @@ void MracController::BuildReferenceModel(const double dt) {
       reference_model_enabled_ = false;
     }
   }
-  reference_model_enabled_ = true;
 }
 
 void MracController::BuildAdaptionModel() {
-  if (model_order_ == 1) {
-    matrix_b_adaption_(0, 0) = 1.0;
-    matrix_p_adaption_(0, 0) = 1.0;
-  } else if (model_order_ == 2) {
-    matrix_b_adaption_(1, 0) = 1.0;
-    matrix_p_adaption_(0, 0) = 1.0;
-    matrix_p_adaption_(1, 1) = 1.0;
-    // TODO(Yu): check whether the high-order P matrix is positive definite
+  adaption_model_enabled_ = true;
+  if (model_order_ <= 2) {
+    if (model_order_ == 1) {
+      matrix_b_adaption_(0, 0) = 1.0;
+    } else {
+      matrix_b_adaption_(1, 0) = 1.0;
+    }
+    if (!CheckLyapunovPD(matrix_a_reference_, matrix_p_adaption_)) {
+      AWARN << "Solution of the algebraic Lyapunov equation is not symmetric "
+               "positive definite";
+      adaption_model_enabled_ = false;
+    }
   } else {
     AWARN << "Adaption model order beyond the designed range, "
              "model_order: "
           << model_order_;
     adaption_model_enabled_ = false;
   }
-  adaption_model_enabled_ = true;
+}
+
+bool MracController::CheckLyapunovPD(const Matrix matrix_a,
+                                     const Matrix matrix_p) const {
+  Matrix matrix_q = -matrix_p * matrix_a - matrix_a.transpose() * matrix_p;
+  Eigen::LLT<Matrix> llt_matrix_q(matrix_q);
+  // if matrix Q is not symmetric or the Cholkesky decomposition (LLT) failed
+  // due to the matrix Q are not positive definite
+  return (matrix_q.isApprox(matrix_q.transpose()) &&
+          llt_matrix_q.info() != Eigen::NumericalIssue);
 }
 
 void MracController::Adaption(Matrix *law_adp, const Matrix state_adp,
