@@ -461,20 +461,17 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
     const Frame& frame, const hdmap::PathOverlap& traffic_light_overlap) {
-
   // some scenario may need start sooner than the others
-  const double start_check_distance =
-      std::max(
-          {config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]
-                          .traffic_light_protected_config()
-                          .start_traffic_light_scenario_distance(),
-           config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN]
-                          .traffic_light_unprotected_left_turn_config()
-                          .start_traffic_light_scenario_distance(),
-           config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN]
-                          .traffic_light_unprotected_right_turn_config()
-                          .start_traffic_light_scenario_distance()
-          });
+  const double start_check_distance = std::max(
+      {config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]
+           .traffic_light_protected_config()
+           .start_traffic_light_scenario_distance(),
+       config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN]
+           .traffic_light_unprotected_left_turn_config()
+           .start_traffic_light_scenario_distance(),
+       config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN]
+           .traffic_light_unprotected_right_turn_config()
+           .start_traffic_light_scenario_distance()});
 
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
@@ -540,27 +537,27 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
       // check TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN
       const auto& scenario_config =
           config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN]
-                      .traffic_light_unprotected_right_turn_config();
+              .traffic_light_unprotected_right_turn_config();
       if (adc_distance_to_traffic_light <
-            scenario_config.start_traffic_light_scenario_distance()) {
+          scenario_config.start_traffic_light_scenario_distance()) {
         traffic_light_unprotected_right_turn_scenario = true;
       }
     } else if (left_turn) {
       // check TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN
       const auto& scenario_config =
           config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN]
-                      .traffic_light_unprotected_left_turn_config();
+              .traffic_light_unprotected_left_turn_config();
       if (adc_distance_to_traffic_light <
-            scenario_config.start_traffic_light_scenario_distance()) {
+          scenario_config.start_traffic_light_scenario_distance()) {
         traffic_light_unprotected_left_turn_scenario = true;
       }
     } else {
       // check TRAFFIC_LIGHT_PROTECTED
       const auto& scenario_config =
           config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]
-                      .traffic_light_protected_config();
+              .traffic_light_protected_config();
       if (adc_distance_to_traffic_light <
-            scenario_config.start_traffic_light_scenario_distance()) {
+          scenario_config.start_traffic_light_scenario_distance()) {
         traffic_light_protected_scenario = true;
       }
     }

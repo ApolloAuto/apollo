@@ -85,8 +85,8 @@ torch::Tensor PedestrianInteractionEvaluator::GetSocialPooling() {
   return torch::zeros({1, kGridSize * kGridSize * kHiddenSize});
 }
 
-bool PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr,
-    ObstaclesContainer* obstacles_container) {
+bool PedestrianInteractionEvaluator::Evaluate(
+    Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container) {
   // Sanity checks.
   CHECK_NOTNULL(obstacle_ptr);
 

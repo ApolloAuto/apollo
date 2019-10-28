@@ -63,7 +63,7 @@ JunctionMLPEvaluator::JunctionMLPEvaluator() : device_(torch::kCPU) {
 void JunctionMLPEvaluator::Clear() {}
 
 bool JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr,
-    ObstaclesContainer* obstacles_container) {
+                                    ObstaclesContainer* obstacles_container) {
   // Sanity checks.
   omp_set_num_threads(1);
   Clear();

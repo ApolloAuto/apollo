@@ -52,8 +52,8 @@ void LaneAggregatingEvaluator::LoadModel() {
       FLAGS_torch_lane_aggregating_prediction_layer_file, device_);
 }
 
-bool LaneAggregatingEvaluator::Evaluate(Obstacle* obstacle_ptr,
-    ObstaclesContainer* obstacles_container) {
+bool LaneAggregatingEvaluator::Evaluate(
+    Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container) {
   // Sanity checks.
   CHECK_NOTNULL(obstacle_ptr);
 

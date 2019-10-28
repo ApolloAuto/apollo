@@ -43,7 +43,8 @@ TEST_F(PullOverStageRetryApproachParkingTest, Init) {
   PullOverStageRetryApproachParking pull_over_stage_retry_approach_parking(
       config_);
   EXPECT_EQ(pull_over_stage_retry_approach_parking.Name(),
-            ScenarioConfig::StageType_Name(ScenarioConfig::PULL_OVER_RETRY_APPROACH_PARKING));
+            ScenarioConfig::StageType_Name(
+                ScenarioConfig::PULL_OVER_RETRY_APPROACH_PARKING));
 }
 
 }  // namespace pull_over

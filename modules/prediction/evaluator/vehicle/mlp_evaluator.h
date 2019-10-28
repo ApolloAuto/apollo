@@ -21,8 +21,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "modules/prediction/evaluator/evaluator.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/evaluator/evaluator.h"
 #include "modules/prediction/proto/fnn_vehicle_model.pb.h"
 
 namespace apollo {

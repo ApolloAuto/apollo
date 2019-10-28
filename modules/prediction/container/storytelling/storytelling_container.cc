@@ -26,8 +26,8 @@ void StoryTellingContainer::Insert(const ::google::protobuf::Message& message) {
   close_to_junction_.CopyFrom(story_message.close_to_junction());
 }
 
-std::shared_ptr<const hdmap::JunctionInfo>
-StoryTellingContainer::ADCJunction() const {
+std::shared_ptr<const hdmap::JunctionInfo> StoryTellingContainer::ADCJunction()
+    const {
   std::string adc_junction_id = close_to_junction_.junction_id();
   return PredictionMap::JunctionById(adc_junction_id);
 }

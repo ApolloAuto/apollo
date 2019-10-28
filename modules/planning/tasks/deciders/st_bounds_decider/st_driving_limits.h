@@ -43,30 +43,30 @@ class STDrivingLimits {
  public:
   STDrivingLimits() {}
 
-  void Init(const double max_acc, const double max_dec,
-      const double max_v, double curr_v);
+  void Init(const double max_acc, const double max_dec, const double max_v,
+            double curr_v);
 
   virtual ~STDrivingLimits() = default;
 
   /** @brief Given time t, calculate the driving limits in s due to
-    * vehicle's dynamics.
-    * @param Timestamp t.
-    * @return The lower and upper bounds.
-    */
+   * vehicle's dynamics.
+   * @param Timestamp t.
+   * @return The lower and upper bounds.
+   */
   std::pair<double, double> GetVehicleDynamicsLimits(const double t) const;
 
   /** @brief Update the anchoring of the vehicle dynamics limits.
-    * For example, when ADC is blocked by some obstacle, its max.
-    * drivable area, max. speed, etc. are also limited subsequently.
-    * @param Time t
-    * @param lower bound in s
-    * @param lower bound's corresponding speed.
-    * @param upper bound in s
-    * @param upper bound's corresponding speed.
-    */
-  void UpdateBlockingInfo(const double t,
-      const double lower_s, const double lower_v,
-      const double upper_s, const double upper_v);
+   * For example, when ADC is blocked by some obstacle, its max.
+   * drivable area, max. speed, etc. are also limited subsequently.
+   * @param Time t
+   * @param lower bound in s
+   * @param lower bound's corresponding speed.
+   * @param upper bound in s
+   * @param upper bound's corresponding speed.
+   */
+  void UpdateBlockingInfo(const double t, const double lower_s,
+                          const double lower_v, const double upper_s,
+                          const double upper_v);
 
  private:
   // Private variables for calculating vehicle dynamic limits:
@@ -81,7 +81,6 @@ class STDrivingLimits {
   double lower_t0_;
   double lower_v0_;
   double lower_s0_;
-
 
   // The limits expressed as v vs. s, which contains the following parts:
   //  1. speed limits at path segments with big curvatures.

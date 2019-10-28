@@ -92,7 +92,7 @@ void TimingWheel::AddTask(const std::shared_ptr<TimerTask>& task,
   } else {
     work_wheel_[work_wheel_index].AddTask(task);
     ADEBUG << "add task [" << task->timer_id_
-          << "] to work wheel. index :" << work_wheel_index;
+           << "] to work wheel. index :" << work_wheel_index;
   }
 }
 

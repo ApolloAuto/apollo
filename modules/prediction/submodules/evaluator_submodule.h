@@ -31,8 +31,7 @@
 namespace apollo {
 namespace prediction {
 
-class EvaluatorSubmodule
-    : public cyber::Component<ContainerOutput> {
+class EvaluatorSubmodule : public cyber::Component<ContainerOutput> {
  public:
   /**
    * @brief Destructor

@@ -38,7 +38,7 @@ namespace {
 using STBoundPoint = std::tuple<double, double, double>;
 // STBound is a vector of STBoundPoints
 using STBound = std::vector<STBoundPoint>;
-}
+}  // namespace
 
 STBoundsDecider::STBoundsDecider(const TaskConfig& config) : Decider(config) {
   CHECK(config.has_st_bounds_decider_config());
@@ -73,9 +73,8 @@ void STBoundsDecider::InitSTBoundsDecider(
 
   // Map all related obstacles onto ST-Graph.
   auto time1 = std::chrono::system_clock::now();
-  st_obstacles_processor_.Init(
-      path_data.discretized_path().Length(), st_bounds_config_.total_time(),
-      path_data);
+  st_obstacles_processor_.Init(path_data.discretized_path().Length(),
+                               st_bounds_config_.total_time(), path_data);
   st_obstacles_processor_.MapObstaclesToSTBoundaries(path_decision);
   auto time2 = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = time2 - time1;
@@ -101,13 +100,12 @@ void STBoundsDecider::InitSTBoundsDecider(
   constexpr double max_dec = 4.0;
   constexpr double max_v = desired_speed * 1.5;
   st_driving_limits_.Init(max_acc, max_dec, max_v,
-      frame.PlanningStartPoint().v());
+                          frame.PlanningStartPoint().v());
 }
 
 Status STBoundsDecider::GenerateRegularSTBound(STBound* const st_bound) {
   // Initialize st-boundary.
-  for (double curr_t = 0.0;
-       curr_t <= st_bounds_config_.total_time();
+  for (double curr_t = 0.0; curr_t <= st_bounds_config_.total_time();
        curr_t += kSTBoundsDeciderResolution) {
     st_bound->emplace_back(curr_t, std::numeric_limits<double>::lowest(),
                            std::numeric_limits<double>::max());
@@ -152,8 +150,8 @@ Status STBoundsDecider::GenerateRegularSTBound(STBound* const st_bound) {
 void STBoundsDecider::RankDecisions(
     double s_guide_line, std::pair<double, double> driving_limit,
     std::vector<std::pair<double, double>>* const available_s_bounds,
-    std::vector<std::vector<std::pair<std::string, ObjectDecisionType>>>*
-        const available_obs_decisions) {
+    std::vector<std::vector<std::pair<std::string, ObjectDecisionType>>>* const
+        available_obs_decisions) {
   // TODO(jiacheng): implement this.
   return;
 }

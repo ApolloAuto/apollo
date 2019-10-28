@@ -38,10 +38,8 @@ class StGraphData {
   void LoadData(const std::vector<const STBoundary*>& st_boundaries,
                 const double min_s_on_st_boundaries,
                 const apollo::common::TrajectoryPoint& init_point,
-                const SpeedLimit& speed_limit,
-                const double cruise_speed,
-                const double path_data_length,
-                const double total_time_by_conf,
+                const SpeedLimit& speed_limit, const double cruise_speed,
+                const double path_data_length, const double total_time_by_conf,
                 planning_internal::STGraphDebug* st_graph_debug);
 
   bool is_initialized() const { return init_; }

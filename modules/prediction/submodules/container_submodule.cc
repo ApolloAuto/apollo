@@ -52,7 +52,7 @@ bool ContainerSubmodule::Init() {
           FLAGS_localization_topic, nullptr);
 
   storytelling_reader_ = node_->CreateReader<storytelling::Stories>(
-          FLAGS_storytelling_topic, nullptr);
+      FLAGS_storytelling_topic, nullptr);
 
   // TODO(kechxu) change topic name when finalized
   container_writer_ =
@@ -71,8 +71,7 @@ bool ContainerSubmodule::Proc(
 
   ContainerOutput container_output =
       obstacles_container_ptr->GetContainerOutput();
-  container_writer_->Write(
-      std::make_shared<ContainerOutput>(container_output));
+  container_writer_->Write(std::make_shared<ContainerOutput>(container_output));
 
   return true;
 }

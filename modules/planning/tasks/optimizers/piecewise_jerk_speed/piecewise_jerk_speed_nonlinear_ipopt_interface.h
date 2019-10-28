@@ -105,8 +105,9 @@ class PiecewiseJerkSpeedNonlinearIpoptInterface : public Ipopt::TNLP {
                   int *iRow, int *jCol, double *values) override;
 
   /** Method to return:
-   *   1) The structure of the hessian of the lagrangian (if "values" is nullptr)
-   *   2) The values of the hessian of the lagrangian (if "values" is not nullptr)
+   *   1) The structure of the hessian of the lagrangian (if "values" is
+   * nullptr) 2) The values of the hessian of the lagrangian (if "values" is not
+   * nullptr)
    */
   bool eval_h(int n, const double *x, bool new_x, double obj_factor, int m,
               const double *lambda, bool new_lambda, int nele_hess, int *iRow,

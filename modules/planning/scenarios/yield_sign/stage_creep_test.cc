@@ -42,8 +42,7 @@ class YieldSignStageCreepTest : public ::testing::Test {
 TEST_F(YieldSignStageCreepTest, Init) {
   YieldSignStageCreep yield_sign_stage_creep(config_);
   EXPECT_EQ(yield_sign_stage_creep.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::YIELD_SIGN_CREEP));
+            ScenarioConfig::StageType_Name(ScenarioConfig::YIELD_SIGN_CREEP));
 }
 
 }  // namespace yield_sign

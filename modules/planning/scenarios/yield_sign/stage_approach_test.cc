@@ -41,9 +41,9 @@ class YieldSignStageApproachTest : public ::testing::Test {
 
 TEST_F(YieldSignStageApproachTest, Init) {
   YieldSignStageApproach yield_sign_stage_approach(config_);
-  EXPECT_EQ(yield_sign_stage_approach.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::YIELD_SIGN_APPROACH));
+  EXPECT_EQ(
+      yield_sign_stage_approach.Name(),
+      ScenarioConfig::StageType_Name(ScenarioConfig::YIELD_SIGN_APPROACH));
 }
 
 }  // namespace yield_sign

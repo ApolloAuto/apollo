@@ -49,8 +49,8 @@ class STGuideLine {
 
   double GetGuideSFromT(double t) const;
 
-  void UpdateBlockingInfo(
-      const double t, const double s_block, const bool is_lower_block);
+  void UpdateBlockingInfo(const double t, const double s_block,
+                          const bool is_lower_block);
 
  private:
   // Variables for simple guide-line calculation.
