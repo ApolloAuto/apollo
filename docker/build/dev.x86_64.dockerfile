@@ -1,10 +1,12 @@
-FROM nvidia/cuda:8.0-cudnn7-devel-ubuntu14.04
+FROM nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -y && \
     apt-get install -y \
     apt-transport-https \
+    autotools-dev \
+    automake \
     bc \
     build-essential \
     cmake \
@@ -21,6 +23,7 @@ RUN apt-get update -y && \
     iputils-ping \
     lcov \
     libblas-dev \
+    libssl-dev \
     libboost-all-dev \
     libcurl4-openssl-dev \
     libfreetype6-dev \
@@ -32,12 +35,12 @@ RUN apt-get update -y && \
     lsof \
     nfs-common \
     python-autopep8 \
-    realpath \
     shellcheck \
     software-properties-common \
     sshfs \
     subversion \
     unzip \
+    uuid-dev \
     v4l-utils \
     vim \
     wget \
