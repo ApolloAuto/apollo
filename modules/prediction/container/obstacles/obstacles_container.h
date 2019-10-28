@@ -44,6 +44,11 @@ class ObstaclesContainer : public Container {
   ObstaclesContainer();
 
   /**
+   * @brief Constructor from container output
+   */
+  explicit ObstaclesContainer(const ContainerOutput& container_output);
+
+  /**
    * @brief Destructor
    */
   virtual ~ObstaclesContainer() = default;
