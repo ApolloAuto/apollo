@@ -80,8 +80,8 @@ double DigitalFilter::Filter(const double x_insert) {
 }
 
 void DigitalFilter::reset_values() {
-  x_values_.clear();
-  y_values_.clear();
+  std::fill(x_values_.begin(), x_values_.end(), 0.0);
+  std::fill(y_values_.begin(), y_values_.end(), 0.0);
 }
 
 double DigitalFilter::UpdateLast(const double input) {
