@@ -12,9 +12,9 @@ cc_library(
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        ":st_obstacles_processor",
-        ":st_guide_line",
         ":st_driving_limits",
+        ":st_guide_line",
+        ":st_obstacles_processor",
         "//modules/common/status",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",

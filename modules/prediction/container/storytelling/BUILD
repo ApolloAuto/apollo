@@ -10,9 +10,9 @@ cc_library(
         "-DMODULE_NAME=\\\"prediction_container\\\"",
     ],
     deps = [
-        "//modules/storytelling/proto:story_proto",
         "//modules/prediction/common:prediction_map",
         "//modules/prediction/container",
+        "//modules/storytelling/proto:story_proto",
     ],
 )
 

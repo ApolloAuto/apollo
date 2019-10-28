@@ -52,9 +52,9 @@ cc_library(
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
+        "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/trajectory1d:piecewise_jerk_trajectory1d",
-        "//modules/common/proto:pnc_point_proto",
         "@ipopt",
     ],
 )
