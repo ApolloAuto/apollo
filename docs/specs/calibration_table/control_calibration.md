@@ -58,7 +58,7 @@ For each bar, there is a blue ribbon indicating collected data frames. When the 
 
 For calibration table data collection, when the first 13 bars (total progress bar and 12 brake/throttle condition bars) reaches 100% the data collection process is considered as completed. For dynamic model data collection, the data collection process is completed when all bars reaches 100%.
 
-All data are saved in `nvme dirve` or `data/record/`
+All data are saved in `nvme drive` or `data/record/`
 
 ### Vehicle Configuration
 

@@ -47,7 +47,7 @@ TEST_F(DigitalFilterCoefficientsTest, LpFirstOrderCoefficients) {
   double dead_time = 0.05;
   std::vector<double> den;
   std::vector<double> num;
-  LpFistOrderCoefficients(ts, settling_time, dead_time, &den, &num);
+  LpFirstOrderCoefficients(ts, settling_time, dead_time, &den, &num);
   EXPECT_EQ(den.size(), 2);
   EXPECT_EQ(num.size(), 5);
   EXPECT_NEAR(den[1], -0.13533, 0.01);

@@ -48,7 +48,7 @@ TEST_F(SingleLanePredictorTest, OnLaneCase) {
   container.BuildLaneGraph();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_NE(obstacle_ptr, nullptr);
-  cost_evaluator.Evaluate(obstacle_ptr);
+  cost_evaluator.Evaluate(obstacle_ptr, &container);
   SingleLanePredictor predictor;
   predictor.Predict(obstacle_ptr);
   EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 2);

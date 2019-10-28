@@ -38,16 +38,10 @@ const char car_img_path[3][1024] = {
 
 // =================VisualizationEngine=================
 bool MapImageKey::operator<(const MapImageKey &key) const {
-  if (level != key.level) {
-    return level < key.level;
-  }
-  if (zone_id != key.zone_id) {
-    return zone_id < key.zone_id;
-  }
-  if (node_north_id != key.node_north_id) {
-    return node_north_id < key.node_north_id;
-  }
-  return node_east_id < key.node_east_id;
+  // Compare elements by priority.
+  return std::forward_as_tuple(level, zone_id, node_north_id, node_east_id) <
+         std::forward_as_tuple(key.level, key.zone_id, key.node_north_id,
+                               key.node_east_id);
 }
 
 // =================MapImageCache=================

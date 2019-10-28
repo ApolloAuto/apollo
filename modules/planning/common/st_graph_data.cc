@@ -20,6 +20,8 @@
 
 #include "modules/planning/common/st_graph_data.h"
 
+#include "modules/planning/common/planning_gflags.h"
+
 namespace apollo {
 namespace planning {
 
@@ -29,6 +31,7 @@ void StGraphData::LoadData(const std::vector<const STBoundary*>& st_boundaries,
                            const double min_s_on_st_boundaries,
                            const apollo::common::TrajectoryPoint& init_point,
                            const SpeedLimit& speed_limit,
+                           const double cruise_speed,
                            const double path_data_length,
                            const double total_time_by_conf,
                            planning_internal::STGraphDebug* st_graph_debug) {
@@ -37,6 +40,7 @@ void StGraphData::LoadData(const std::vector<const STBoundary*>& st_boundaries,
   min_s_on_st_boundaries_ = min_s_on_st_boundaries;
   init_point_ = init_point;
   speed_limit_ = speed_limit;
+  cruise_speed_ = cruise_speed;
   path_data_length_ = path_data_length;
   total_time_by_conf_ = total_time_by_conf;
   st_graph_debug_ = st_graph_debug;
@@ -53,6 +57,10 @@ double StGraphData::min_s_on_st_boundaries() const {
 const TrajectoryPoint& StGraphData::init_point() const { return init_point_; }
 
 const SpeedLimit& StGraphData::speed_limit() const { return speed_limit_; }
+
+double StGraphData::cruise_speed() const {
+  return cruise_speed_ > 0.0 ? cruise_speed_ : FLAGS_default_cruise_speed;
+}
 
 double StGraphData::path_length() const { return path_data_length_; }
 

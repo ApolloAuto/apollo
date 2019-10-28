@@ -23,6 +23,8 @@
 
 #include <vector>
 
+#include "Eigen/Core"
+
 #include "modules/common/filters/digital_filter.h"
 #include "modules/common/filters/digital_filter_coefficients.h"
 #include "modules/control/proto/mrac_conf.pb.h"
@@ -61,12 +63,18 @@ class MracController {
   void SetAdaptionModel(const MracConf &mrac_conf);
 
   /**
-   * @brief transfer mrac (1st or 2nd) order reference model coefficients to the
-   discrete-time form, with the bilinear transform (trapezoidal integration)
-   method
+   * @brief build mrac (1st or 2nd) order reference model in the discrete-time
+   form, with the bilinear transform (trapezoidal integration) method
    * @param dt sampling time interval
    */
-  void TransformReferenceModel(const double dt);
+  void BuildReferenceModel(const double dt);
+
+  /**
+   * @brief build mrac (1st or 2nd) order adaptive dynamic model in the
+   * discrete-time form
+   * @param none
+   */
+  void BuildAdaptionModel();
 
   /**
    * @brief exexute the adaption interation with respect to the designed law in
@@ -76,8 +84,8 @@ class MracController {
    * @param state_adp state used in the adaptive law at k and k-1 steps
    * @param gain_adp adaptive gain for the given adaptive law
    */
-  void Adaption(std::vector<double> *law_adp,
-                const std::vector<double> state_adp, const double gain_adp);
+  void Adaption(Eigen::MatrixXd *law_adp, const Eigen::MatrixXd state_adp,
+                const Eigen::MatrixXd gain_adp);
 
   /**
    * @brief calculate the anti-windup compensation with respect to the integral
@@ -91,9 +99,20 @@ class MracController {
                               const double lower_bound);
 
   /**
-   * @brief reset variables for mrac controller
+   * @brief reset all the variables (including all the states, gains and
+   * externally-settting control parameters) for mrac controller
    */
   void Reset();
+
+  /**
+   * @brief reset internal states for mrac controller
+   */
+  void ResetStates();
+
+  /**
+   * @brief reset adaptive gains for mrac controller
+   */
+  void ResetGains();
 
   /**
    * @brief compute control value based on the original command
@@ -102,8 +121,44 @@ class MracController {
    * @param dt sampling time interval
    * @return control value based on mrac controller architecture
    */
-  virtual double Control(const double command, const double state,
+  virtual double Control(const double command, const Eigen::MatrixXd state,
                          const double dt);
+
+  /**
+   * @brief set convergence ratio for state components in adaptive dynamics
+   * @param ratio_state convergence ratio for state adaption
+   */
+  void SetStateAdaptionRate(const double ratio_state);
+
+  /**
+   * @brief set convergence ratio for input components in adaptive dynamics
+   * @param ratio_input convergence ratio for input adaption
+   */
+  void SetInputAdaptionRate(const double ratio_input);
+
+  /**
+   * @brief set convergence ratio for nonliear components in adaptive dynamics
+   * @param ratio_nonlinear convergence ratio for additional nonlinear adaption
+   */
+  void SetNonlinearAdaptionRate(const double ratio_nonliear);
+
+  /**
+   * @brief get convergence ratio for state components in adaptive dynamics
+   * @return state adaption ratio
+   */
+  double StateAdaptionRate() const;
+
+  /**
+   * @brief get convergence ratio for input components in adaptive dynamics
+   * @return input adaption ratio
+   */
+  double InputAdaptionRate() const;
+
+  /**
+   * @brief get convergence ratio for nonlinear components in adaptive dynamics
+   * @return nonlinear adaption ratio
+   */
+  double NonlinearAdaptionRate() const;
 
   /**
    * @brief get saturation status for reference system
@@ -138,37 +193,49 @@ class MracController {
  protected:
   // reference model as a digital filter
   common::DigitalFilter reference_model_;
-  // indicator if the reference model is valid
+  // indicator if the reference/adaption model is valid
   bool reference_model_enabled_ = false;
-  // The order of the reference model
-  int reference_model_order_ = 1;
+  bool adaption_model_enabled_ = false;
+  // The order of the reference/adaption model
+  int model_order_ = 1;
+
   // 1st-order Reference system coefficients in contiouous-time domain
   double tau_reference_ = 0.0;
   // 2nd-order Reference system coefficients in contiouous-time domain
   double wn_reference_ = 0.0;
   double zeta_reference_ = 0.0;
+
   double Ts_ = 0.01;  // By default, control sampling time is 0.01 sec
 
   // Adaption system coefficients
-  double gamma_state_adaption_ = 0.0;      // State adaption gain
-  double gamma_input_adaption_ = 0.0;      // Desired command adaption gain
-  double gamma_nonlinear_adaption_ = 0.0;  // Nonlinear dynamics adaption gain
+  // State adaption gain
+  Eigen::MatrixXd gamma_state_adaption_;
+  // Desired command adaption gain
+  Eigen::MatrixXd gamma_input_adaption_;
+  // Nonlinear dynamics adaption gain
+  Eigen::MatrixXd gamma_nonlinear_adaption_;
+  // Adjustable ratio of the state adaption gain
+  double gamma_ratio_state_ = 1.0;
+  // Adjustable ratio of the desired command adaption gain
+  double gamma_ratio_input_ = 1.0;
+  // Adjustable ratio of the nonlinear dynamics adaption gain
+  double gamma_ratio_nonlinear_ = 1.0;
 
-  // Reference system coefficients in discrete-time domain
-  std::vector<double> kd_reference_{0.0, 0.0, 0.0};  // Denominator coefficients
-  std::vector<double> kn_reference_{0.0, 0.0, 0.0};  // Numerator coefficients
+  // Reference system matrix in continuous-time domain
+  Eigen::MatrixXd matrix_a_reference_;  // Matrix A in reference models
+  Eigen::MatrixXd matrix_b_reference_;  // Matrix B in reference models
+
+  // Adaption system matrix in discrete-time domain
+  Eigen::MatrixXd matrix_p_adaption_;  // Matrix P in adaption models
+  Eigen::MatrixXd matrix_b_adaption_;  // Matrix B in adaption models
 
   // Adaption system input variables in discrete-time domain
-  std::vector<double> input_desired_{0.0,
-                                     0.0};  // Updated desired command vector
-  std::vector<double> state_action_{0.0,
-                                    0.0};  // Updated actuation states vector
-  std::vector<double> state_reference_{0.0, 0.0};  // Reference states vector
-  std::vector<double> gain_state_adaption_{0.0, 0.0};  // State adaption vector
-  std::vector<double> gain_input_adaption_{
-      0.0, 0.0};  // Desired command adaption vector
-  std::vector<double> gain_nonlinear_adaption_{
-      0.0, 0.0};  // Nonlinear adaption vector
+  Eigen::MatrixXd input_desired_;            // Updated desired command vector
+  Eigen::MatrixXd state_action_;             // Updated actuation states vector
+  Eigen::MatrixXd state_reference_;          // Reference states vector
+  Eigen::MatrixXd gain_state_adaption_;      // State adaption vector
+  Eigen::MatrixXd gain_input_adaption_;      // Desired command adaption vector
+  Eigen::MatrixXd gain_nonlinear_adaption_;  // Nonlinear adaption vector
 
   // Mrac control output in the last step
   double control_previous_ = 0.0;
@@ -183,7 +250,7 @@ class MracController {
 
   // Anti-Windup compensation
   double gain_anti_windup_ = 0.0;
-  std::vector<double> compensation_anti_windup_{0.0, 0.0};
+  Eigen::MatrixXd compensation_anti_windup_;
 };
 
 }  // namespace control

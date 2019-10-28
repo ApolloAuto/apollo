@@ -227,8 +227,8 @@ void ADCTrajectoryContainer::SetLaneSequence() {
 void ADCTrajectoryContainer::SetTargetLaneSequence() {
   for (const auto& lane : adc_trajectory_.target_lane_id()) {
     if (!lane.id().empty()) {
-      if (adc_target_lane_seq_.empty() || lane.id() !=
-          adc_target_lane_seq_.back()) {
+      if (adc_target_lane_seq_.empty() ||
+          lane.id() != adc_target_lane_seq_.back()) {
         adc_target_lane_seq_.emplace_back(lane.id());
       }
     }

@@ -91,7 +91,7 @@ void TimingWheel::AddTask(const std::shared_ptr<TimerTask>& task,
     }
   } else {
     work_wheel_[work_wheel_index].AddTask(task);
-    AINFO << "add task [" << task->timer_id_
+    ADEBUG << "add task [" << task->timer_id_
           << "] to work wheel. index :" << work_wheel_index;
   }
 }
@@ -113,7 +113,7 @@ void TimingWheel::TickFunc() {
   Rate rate(TIMER_RESOLUTION_MS * 1000000);  // ms to ns
   while (running_) {
     Tick();
-    AINFO_EVERY(1000) << "Tick " << TickCount();
+    // AINFO_EVERY(1000) << "Tick " << TickCount();
     tick_count_++;
     rate.Sleep();
     current_work_wheel_index_ =

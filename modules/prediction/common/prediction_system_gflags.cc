@@ -72,3 +72,5 @@ DEFINE_int32(max_num_dump_dataforlearn, 5000,
 // Submodules
 DEFINE_string(container_submodule_name, "container_submodule",
               "Container submodule name");
+DEFINE_string(evaluator_submodule_name, "evaluator_submodule",
+              "Evaluator submodule name");

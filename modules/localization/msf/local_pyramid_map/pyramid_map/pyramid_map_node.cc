@@ -154,14 +154,13 @@ bool PyramidMapNode::GetCoordinate(const Eigen::Vector2d& coordinate,
       (coordinate[0] - left_top_corner_[0]) / current_resolution);
   unsigned int off_y = static_cast<unsigned int>(
       (coordinate[1] - left_top_corner_[1]) / current_resolution);
-  if (off_x >= 0 && off_x < map_matrix->GetCols(level) && off_y >= 0 &&
+  if (off_x < map_matrix->GetCols(level) &&
       off_y < map_matrix->GetRows(level)) {
-    *x = static_cast<unsigned int>(off_x);
-    *y = static_cast<unsigned int>(off_y);
+    *x = off_x;
+    *y = off_y;
     return true;
-  } else {
-    return false;
   }
+  return false;
 }
 
 Eigen::Vector2d PyramidMapNode::GetCoordinate(unsigned int level,

@@ -31,7 +31,6 @@
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -103,8 +102,10 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
                                   FLAGS_speed_bump_speed_limit);
   }
 
-  // set lattice planning target speed limit;
   SetCruiseSpeed(FLAGS_default_cruise_speed);
+
+  // set lattice planning target speed limit;
+  SetLatticeCruiseSpeed(FLAGS_default_cruise_speed);
 
   vehicle_signal_.Clear();
 
@@ -128,6 +129,10 @@ const std::vector<PathBoundary>& ReferenceLineInfo::GetCandidatePathBoundaries()
 void ReferenceLineInfo::SetCandidatePathBoundaries(
     std::vector<PathBoundary> path_boundaries) {
   candidate_path_boundaries_ = std::move(path_boundaries);
+}
+
+double ReferenceLineInfo::GetCruiseSpeed() const {
+  return cruise_speed_ > 0.0 ? cruise_speed_ : FLAGS_default_cruise_speed;
 }
 
 hdmap::LaneInfoConstPtr ReferenceLineInfo::LocateLaneInfo(
@@ -434,7 +439,7 @@ bool ReferenceLineInfo::IsIrrelevantObstacle(const Obstacle& obstacle) {
   if (obstacle_boundary.end_s() > reference_line_.Length()) {
     return true;
   }
-  if (is_on_reference_line_ &&
+  if (is_on_reference_line_ && !IsChangeLanePath() &&
       obstacle_boundary.end_s() < adc_sl_boundary_.end_s() &&
       (reference_line_.IsOnLane(obstacle_boundary) ||
        obstacle_boundary.end_s() < 0.0)) {  // if obstacle is far backward
@@ -447,11 +452,11 @@ const DiscretizedTrajectory& ReferenceLineInfo::trajectory() const {
   return discretized_trajectory_;
 }
 
-void ReferenceLineInfo::SetStopPoint(const StopPoint& stop_point) {
+void ReferenceLineInfo::SetLatticeStopPoint(const StopPoint& stop_point) {
   planning_target_.mutable_stop_point()->CopyFrom(stop_point);
 }
 
-void ReferenceLineInfo::SetCruiseSpeed(double speed) {
+void ReferenceLineInfo::SetLatticeCruiseSpeed(double speed) {
   planning_target_.set_cruise_speed(speed);
 }
 

@@ -30,7 +30,6 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/container_manager.h"
-#include "modules/prediction/container/obstacles/obstacles_container.h"
 
 namespace apollo {
 namespace prediction {
@@ -45,13 +44,15 @@ LaneScanningEvaluator::LaneScanningEvaluator() : device_(torch::kCPU) {
   LoadModel();
 }
 
-bool LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
+                                     ObstaclesContainer* obstacles_container) {
   std::vector<Obstacle*> dummy_dynamic_env;
-  Evaluate(obstacle_ptr, dummy_dynamic_env);
+  Evaluate(obstacle_ptr, obstacles_container, dummy_dynamic_env);
   return true;
 }
 
 bool LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
+                                     ObstaclesContainer* obstacles_container,
                                      std::vector<Obstacle*> dynamic_env) {
   // Sanity checks.
   omp_set_num_threads(1);

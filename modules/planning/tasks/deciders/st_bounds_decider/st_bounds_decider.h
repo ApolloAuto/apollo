@@ -20,6 +20,9 @@
 
 #pragma once
 
+#include <string>
+#include <tuple>
+#include <utility>
 #include <vector>
 
 #include "modules/planning/common/frame.h"
@@ -28,9 +31,14 @@
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/st_bounds_decider_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
+#include "modules/planning/tasks/deciders/st_bounds_decider/st_guide_line.h"
+#include "modules/planning/tasks/deciders/st_bounds_decider/st_driving_limits.h"
+#include "modules/planning/tasks/deciders/st_bounds_decider/st_obstacles_processor.h"
 
 namespace apollo {
 namespace planning {
+
+constexpr double kSTBoundsDeciderResolution = 0.1;
 
 class STBoundsDecider : public Decider {
  public:
@@ -40,12 +48,28 @@ class STBoundsDecider : public Decider {
   common::Status Process(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info) override;
 
+  void InitSTBoundsDecider(const Frame& frame,
+                           ReferenceLineInfo* const reference_line_info);
+
+  common::Status GenerateRegularSTBound(
+      std::vector<std::tuple<double, double, double>>* const st_bound);
+
+  void RankDecisions(
+      double s_guide_line, std::pair<double, double> driving_limit,
+      std::vector<std::pair<double, double>>* const available_s_bounds,
+      std::vector<std::vector<std::pair<std::string, ObjectDecisionType>>>*
+          const available_obs_decisions);
+
   void RecordSTGraphDebug(
       const std::vector<STBoundary>& st_graph_data,
       planning_internal::STGraphDebug* const st_graph_debug);
 
  private:
   STBoundsDeciderConfig st_bounds_config_;
+
+  STGuideLine st_guide_line_;
+  STDrivingLimits st_driving_limits_;
+  STObstaclesProcessor st_obstacles_processor_;
 };
 
 }  // namespace planning

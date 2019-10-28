@@ -19,7 +19,7 @@ proto_library(
         "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:header_proto_lib",
         "//modules/common/proto:vehicle_signal_proto_lib",
-        "//modules/control/proto:control_proto_lib",
+        "//modules/control/proto:control_command_proto_lib",
     ],
 )
 

@@ -50,7 +50,8 @@ class DpStCost {
                           const STPoint& reference_point) const;
 
   double GetSpeedCost(const STPoint& first, const STPoint& second,
-                      const double speed_limit) const;
+                      const double speed_limit,
+                      const double cruise_speed) const;
 
   double GetAccelCostByTwoPoints(const double pre_speed, const STPoint& first,
                                  const STPoint& second);

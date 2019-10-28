@@ -125,12 +125,11 @@ class PathBoundsDecider : public Decider {
       const std::vector<std::tuple<double, double, double>>& path_bound);
 
   bool FindDestinationPullOverS(
-      const Frame& frame,
-      const ReferenceLineInfo& reference_line_info,
+      const Frame& frame, const ReferenceLineInfo& reference_line_info,
       const std::vector<std::tuple<double, double, double>>& path_bound,
       double* pull_over_s);
-  bool FindEmergencyPullOverS(
-      const ReferenceLineInfo& reference_line_info, double* pull_over_s);
+  bool FindEmergencyPullOverS(const ReferenceLineInfo& reference_line_info,
+                              double* pull_over_s);
 
   bool SearchPullOverPosition(
       const Frame& frame, const ReferenceLineInfo& reference_line_info,
@@ -155,7 +154,7 @@ class PathBoundsDecider : public Decider {
   /** @brief Initializes an empty path boundary.
    */
   bool InitPathBoundary(
-      const ReferenceLine& reference_line,
+      const ReferenceLineInfo& reference_line_info,
       std::vector<std::tuple<double, double, double>>* const path_bound);
 
   /** @brief Refine the boundary based on the road-info.

@@ -287,7 +287,9 @@ bool CheckADCSurroundObstacles(const common::math::Vec2d adc_position,
   auto obstacles = frame->obstacles();
   for (const auto& obstacle : obstacles) {
     const auto& obstacle_polygon = obstacle->PerceptionPolygon();
-    if (adc_polygon.HasOverlap(obstacle_polygon)) {
+    const Polygon2d& nudge_polygon = obstacle_polygon.ExpandByDistance(
+        std::fabs(FLAGS_static_obstacle_nudge_l_buffer));
+    if (adc_polygon.HasOverlap(nudge_polygon)) {
       ADEBUG << "blocked obstacle: " << obstacle->Id();
       return true;
     }
@@ -303,7 +305,7 @@ bool CheckADCHeading(const common::math::Vec2d adc_position,
                      const double adc_heading,
                      const ReferenceLineInfo& reference_line_info,
                      const double heading_diff_to_reference_line) {
-  const double kReducedHeadingBuffer = 0.2;  // TODO(Shu) move to config
+  const double kReducedHeadingBuffer = 0.3;  // (rad) TODO(Shu) move to config
   const auto& reference_line = reference_line_info.reference_line();
   common::SLPoint adc_position_sl;
   reference_line.XYToSL(adc_position, &adc_position_sl);

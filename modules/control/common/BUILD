@@ -85,6 +85,7 @@ cc_library(
         "//cyber",
         "//modules/common/filters",
         "//modules/control/proto:control_proto",
+        "@eigen",
     ],
 )
 

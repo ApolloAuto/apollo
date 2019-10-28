@@ -268,9 +268,9 @@ void GriddedPathTimeGraph::GetRowRange(const StGraphPoint& point,
 
   const double max_acceleration = std::abs(vehicle_param_.max_acceleration());
   const double t_squared = unit_t_ * unit_t_;
-  const double s_upper_bound =
-      v0 * unit_t_ + acc_coeff * max_acceleration * t_squared +
-      point.point().s();
+  const double s_upper_bound = v0 * unit_t_ +
+                               acc_coeff * max_acceleration * t_squared +
+                               point.point().s();
   const auto next_highest_itr =
       std::lower_bound(spatial_distance_by_index_.begin(),
                        spatial_distance_by_index_.end(), s_upper_bound);
@@ -319,6 +319,7 @@ void GriddedPathTimeGraph::CalculateCostAt(
   }
 
   const double speed_limit = speed_limit_by_index_[r];
+  const double cruise_speed = st_graph_data_.cruise_speed();
 
   if (c == 1) {
     const double acc =
@@ -334,7 +335,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
     }
     cost_cr.SetTotalCost(
         cost_cr.obstacle_cost() + cost_cr.spatial_potential_cost() +
-        cost_init.total_cost() + CalculateEdgeCostForSecondCol(r, speed_limit));
+        cost_init.total_cost() +
+        CalculateEdgeCostForSecondCol(r, speed_limit, cruise_speed));
     cost_cr.SetPrePoint(cost_init);
     return;
   }
@@ -369,9 +371,10 @@ void GriddedPathTimeGraph::CalculateCostAt(
       // Use pre_v = (pre_point.s - prepre_point.s) / unit_t as previous v
       // Current acc estimate: curr_a = (curr_v - pre_v) / unit_t
       // = (point.s + prepre_point.s - 2 * pre_point.s) / (unit_t * unit_t)
-      const double curr_a = (cost_cr.point().s() +
-           pre_col[r_pre].pre_point()->point().s() -
-           2 * pre_col[r_pre].point().s()) / (unit_t_ * unit_t_);
+      const double curr_a =
+          (cost_cr.point().s() + pre_col[r_pre].pre_point()->point().s() -
+           2 * pre_col[r_pre].point().s()) /
+          (unit_t_ * unit_t_);
       if (curr_a < gridded_path_time_graph_config_.max_deceleration() ||
           curr_a > gridded_path_time_graph_config_.max_acceleration()) {
         continue;
@@ -387,7 +390,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
       const double cost =
           cost_cr.obstacle_cost() + cost_cr.spatial_potential_cost() +
           pre_col[r_pre].total_cost() +
-          CalculateEdgeCostForThirdCol(r, r_pre, curr_speed_limit);
+          CalculateEdgeCostForThirdCol(r, r_pre,
+                                       curr_speed_limit, cruise_speed);
 
       if (cost < cost_cr.total_cost()) {
         cost_cr.SetTotalCost(cost);
@@ -407,9 +411,10 @@ void GriddedPathTimeGraph::CalculateCostAt(
     // Use pre_v = (pre_point.s - prepre_point.s) / unit_t as previous v
     // Current acc estimate: curr_a = (curr_v - pre_v) / unit_t
     // = (point.s + prepre_point.s - 2 * pre_point.s) / (unit_t * unit_t)
-    const double curr_a = (cost_cr.point().s() +
-         pre_col[r_pre].pre_point()->point().s() -
-         2 * pre_col[r_pre].point().s()) / (unit_t_ * unit_t_);
+    const double curr_a =
+        (cost_cr.point().s() + pre_col[r_pre].pre_point()->point().s() -
+         2 * pre_col[r_pre].point().s()) /
+        (unit_t_ * unit_t_);
     if (curr_a > vehicle_param_.max_acceleration() ||
         curr_a < vehicle_param_.max_deceleration()) {
       continue;
@@ -437,7 +442,7 @@ void GriddedPathTimeGraph::CalculateCostAt(
     double cost = cost_cr.obstacle_cost() + cost_cr.spatial_potential_cost() +
                   pre_col[r_pre].total_cost() +
                   CalculateEdgeCost(triple_pre_point, prepre_point, pre_point,
-                                    curr_point, curr_speed_limit);
+                                    curr_point, curr_speed_limit, cruise_speed);
 
     if (cost < cost_cr.total_cost()) {
       cost_cr.SetTotalCost(cost);
@@ -505,19 +510,21 @@ double GriddedPathTimeGraph::CalculateEdgeCost(const STPoint& first,
                                                const STPoint& second,
                                                const STPoint& third,
                                                const STPoint& forth,
-                                               const double speed_limit) {
-  return dp_st_cost_.GetSpeedCost(third, forth, speed_limit) +
+                                               const double speed_limit,
+                                               const double cruise_speed) {
+  return dp_st_cost_.GetSpeedCost(third, forth, speed_limit, cruise_speed) +
          dp_st_cost_.GetAccelCostByThreePoints(second, third, forth) +
          dp_st_cost_.GetJerkCostByFourPoints(first, second, third, forth);
 }
 
 double GriddedPathTimeGraph::CalculateEdgeCostForSecondCol(
-    const uint32_t row, const double speed_limit) {
+    const uint32_t row, const double speed_limit, const double cruise_speed) {
   double init_speed = init_point_.v();
   double init_acc = init_point_.a();
   const STPoint& pre_point = cost_table_[0][0].point();
   const STPoint& curr_point = cost_table_[1][row].point();
-  return dp_st_cost_.GetSpeedCost(pre_point, curr_point, speed_limit) +
+  return dp_st_cost_.GetSpeedCost(pre_point, curr_point,
+                                  speed_limit, cruise_speed) +
          dp_st_cost_.GetAccelCostByTwoPoints(init_speed, pre_point,
                                              curr_point) +
          dp_st_cost_.GetJerkCostByTwoPoints(init_speed, init_acc, pre_point,
@@ -525,12 +532,13 @@ double GriddedPathTimeGraph::CalculateEdgeCostForSecondCol(
 }
 
 double GriddedPathTimeGraph::CalculateEdgeCostForThirdCol(
-    const uint32_t curr_row, const uint32_t pre_row, const double speed_limit) {
+    const uint32_t curr_row, const uint32_t pre_row,
+    const double speed_limit, const double cruise_speed) {
   double init_speed = init_point_.v();
   const STPoint& first = cost_table_[0][0].point();
   const STPoint& second = cost_table_[1][pre_row].point();
   const STPoint& third = cost_table_[2][curr_row].point();
-  return dp_st_cost_.GetSpeedCost(second, third, speed_limit) +
+  return dp_st_cost_.GetSpeedCost(second, third, speed_limit, cruise_speed) +
          dp_st_cost_.GetAccelCostByThreePoints(first, second, third) +
          dp_st_cost_.GetJerkCostByThreePoints(init_speed, first, second, third);
 }

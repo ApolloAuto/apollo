@@ -22,7 +22,6 @@
 #include "modules/prediction/common/message_process.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/container_manager.h"
-#include "modules/prediction/container/obstacles/obstacles_container.h"
 
 namespace apollo {
 namespace prediction {
@@ -52,9 +51,12 @@ bool ContainerSubmodule::Init() {
       node_->CreateReader<localization::LocalizationEstimate>(
           FLAGS_localization_topic, nullptr);
 
+  storytelling_reader_ = node_->CreateReader<storytelling::Stories>(
+          FLAGS_storytelling_topic, nullptr);
+
   // TODO(kechxu) change topic name when finalized
-  prediction_writer_ =
-      node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
+  container_writer_ =
+      node_->CreateWriter<ContainerOutput>(FLAGS_prediction_topic);
   return true;
 }
 
@@ -66,7 +68,12 @@ bool ContainerSubmodule::Proc(
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
   CHECK_NOTNULL(obstacles_container_ptr);
-  // TODO(kechxu): implement the writer
+
+  ContainerOutput container_output =
+      obstacles_container_ptr->GetContainerOutput();
+  container_writer_->Write(
+      std::make_shared<ContainerOutput>(container_output));
+
   return true;
 }
 

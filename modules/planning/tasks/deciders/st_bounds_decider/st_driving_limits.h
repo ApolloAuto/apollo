@@ -21,6 +21,8 @@
 #pragma once
 
 #include <string>
+#include <tuple>
+#include <utility>
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
@@ -39,19 +41,47 @@ namespace planning {
 
 class STDrivingLimits {
  public:
-  STDrivingLimits();
+  STDrivingLimits() {}
+
+  void Init(const double max_acc, const double max_dec,
+      const double max_v, double curr_v);
 
   virtual ~STDrivingLimits() = default;
 
-  common::Status ComputeSTDrivingLimits();
+  /** @brief Given time t, calculate the driving limits in s due to
+    * vehicle's dynamics.
+    * @param Timestamp t.
+    * @return The lower and upper bounds.
+    */
+  std::pair<double, double> GetVehicleDynamicsLimits(const double t) const;
 
-  std::pair<double, double> GetVehicleDynamicsLimits(double t) const;
+  /** @brief Update the anchoring of the vehicle dynamics limits.
+    * For example, when ADC is blocked by some obstacle, its max.
+    * drivable area, max. speed, etc. are also limited subsequently.
+    * @param Time t
+    * @param lower bound in s
+    * @param lower bound's corresponding speed.
+    * @param upper bound in s
+    * @param upper bound's corresponding speed.
+    */
+  void UpdateBlockingInfo(const double t,
+      const double lower_s, const double lower_v,
+      const double upper_s, const double upper_v);
 
  private:
-  double t_resolution_;
-  // The limits due to vehicle dynamics (expressed as s vs. t), such as
-  // max. acceleration, max. cruise speed, etc.
-  std::vector<std::tuple<double, double, double>> vehicle_dynamics_limits_t_s_;
+  // Private variables for calculating vehicle dynamic limits:
+  double max_acc_;
+  double max_dec_;
+  double max_v_;
+
+  double upper_t0_;
+  double upper_v0_;
+  double upper_s0_;
+
+  double lower_t0_;
+  double lower_v0_;
+  double lower_s0_;
+
 
   // The limits expressed as v vs. s, which contains the following parts:
   //  1. speed limits at path segments with big curvatures.
@@ -61,3 +91,6 @@ class STDrivingLimits {
   //  3. speed limits for safety considerations when other obstacles are nearby
   std::vector<std::tuple<double, double, double>> obstacles_speed_limits_s_v_;
 };
+
+}  // namespace planning
+}  // namespace apollo

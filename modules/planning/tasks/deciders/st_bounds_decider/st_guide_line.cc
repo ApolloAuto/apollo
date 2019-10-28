@@ -25,17 +25,30 @@ namespace planning {
 
 using apollo::common::Status;
 
-STGuideLine::STGuideLine() {
-  t_th = 0.0;
-  s_th = 0.0;
-  acc_stage_1 = 0.0;
-  vel_stage_2 = 15.0;  // ~35mph
+void STGuideLine::Init(double desired_v) {
+  s0_ = 0.0;
+  t0_ = 0.0;
+  v0_ = desired_v;
 }
 
-Status STGuideLine::ComputeSTGuideLine() { return Status::OK(); }
+double STGuideLine::GetGuideSFromT(double t) const {
+  return s0_ + (t - t0_) * v0_;
+}
 
-// TODO(jiacheng): implement this.
-double STGuideLine::GetGuideSFromT(double t) { return 0.0; }
+void STGuideLine::UpdateBlockingInfo(
+    const double t, const double s_block, const bool is_lower_block) {
+  if (is_lower_block) {
+    if (GetGuideSFromT(t) < s_block) {
+      s0_ = s_block;
+      t0_ = t;
+    }
+  } else {
+    if (GetGuideSFromT(t) > s_block) {
+      s0_ = s_block;
+      t0_ = t;
+    }
+  }
+}
 
 }  // namespace planning
 }  // namespace apollo

@@ -17,16 +17,22 @@
 #include "modules/control/submodules/mpc_controller_submodule.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/time/time.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/common/control_gflags.h"
 
 namespace apollo {
 namespace control {
 
 using apollo::canbus::Chassis;
+using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::VehicleStateProvider;
 using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
+
+MPCControllerSubmodule::MPCControllerSubmodule()
+    : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
 
 MPCControllerSubmodule::~MPCControllerSubmodule() {}
 
@@ -41,30 +47,44 @@ bool MPCControllerSubmodule::Init() {
                   FLAGS_mpc_controller_conf_file;
     return false;
   }
-  // TODO(SHU): implementation
-  cyber::ReaderConfig chassis_reader_config;
-  chassis_reader_config.channel_name = FLAGS_chassis_topic;
-  chassis_reader_config.pending_queue_size = FLAGS_chassis_pending_queue_size;
-
-  chassis_reader_ =
-      node_->CreateReader<Chassis>(chassis_reader_config, nullptr);
-  CHECK(chassis_reader_ != nullptr);
+  // MPC controller
+  if (!mpc_controller_.Init(&mpc_controller_conf_).ok()) {
+    monitor_logger_buffer_.ERROR(
+        "MPC Control init controller failed! Stopping...");
+    return false;
+  }
   return true;
 }
 
-bool MPCControllerSubmodule::Proc() {
-  // will uncomment during implementation
-  // double start_timestamp = Clock::NowInSeconds();
+bool MPCControllerSubmodule::Proc(
+    const std::shared_ptr<control::Preprocessor>& preprocessor_status) {
+  ControlCommand control_command;
+  local_view_ = preprocessor_status->mutable_local_view();
 
-  chassis_reader_->Observe();
-  const auto &chassis_msg = chassis_reader_->GetLatestObserved();
-  if (chassis_msg == nullptr) {
-    AERROR << "Chassis msg is not ready!";
-    return false;
+  Status status = ProduceControlCommand(&control_command);
+  AERROR_IF(!status.ok()) << "Failed to produce control command:"
+                          << status.error_message();
+  control_command_writer_->Write(
+      std::make_shared<ControlCommand>(control_command));
+  return true;
+}
+
+Status MPCControllerSubmodule::ProduceControlCommand(
+    ControlCommand* control_command) {
+  std::lock_guard<std::mutex> lock(mutex_);
+
+  // TODO(SHU): skip produce control command if estop
+  if (local_view_->mutable_chassis()->driving_mode() ==
+      Chassis::COMPLETE_MANUAL) {
+    mpc_controller_.Reset();
+    AINFO_EVERY(100) << "Reset Controllers in Manual Mode";
   }
 
-  // TODO(shu): implementation
-  return true;
+  Status status = mpc_controller_.ComputeControlCommand(
+      local_view_->mutable_localization(), local_view_->mutable_chassis(),
+      local_view_->mutable_trajectory(), control_command);
+
+  return status;
 }
 
 }  // namespace control

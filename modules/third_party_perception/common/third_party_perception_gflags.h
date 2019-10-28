@@ -20,8 +20,6 @@
 
 DECLARE_string(third_party_perception_node_name);
 
-DECLARE_string(adapter_config_filename);
-
 DECLARE_double(third_party_perception_freq);
 DECLARE_bool(enable_mobileye);
 DECLARE_bool(enable_radar);

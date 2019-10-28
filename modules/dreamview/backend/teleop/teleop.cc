@@ -44,7 +44,6 @@ const std::string operator_daemon_cmd_channel = "/apollo/teleop/operator/daemon_
 const std::string operator_daemon_rpt_channel = "/apollo/teleop/operator/daemon_service/rpt";
 
 
-
 TeleopService::TeleopService(WebSocketHandler *websocket)
     : node_(cyber::CreateNode("teleop")), websocket_(websocket) {
   RegisterMessageHandlers();
@@ -93,9 +92,7 @@ void TeleopService::Start() {
 void TeleopService::RegisterMessageHandlers() {
   // Send current teleop status to the new client.
   websocket_->RegisterConnectionReadyHandler(
-      [this](WebSocketHandler::Connection *conn) {
-        SendStatus(conn);
-      });
+      [this](WebSocketHandler::Connection *conn) { SendStatus(conn); });
   // Start/Stop local and remote audio
   websocket_->RegisterMessageHandler(
       "ToggleAudio",

@@ -114,8 +114,8 @@ function set_lib_path() {
 
   # Set teleop paths
   export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-  export PYTHONPATH=/apollo/modules/car1/common:${PYTHONPATH}
-  export PATH=/apollo/modules/car1/common/scripts:${PATH}
+  export PYTHONPATH=/apollo/modules/teleop/common:${PYTHONPATH}
+  export PATH=/apollo/modules/teleop/common/scripts:${PATH}
 
   if [ -e /usr/local/cuda/ ];then
     export PATH=/usr/local/cuda/bin:$PATH

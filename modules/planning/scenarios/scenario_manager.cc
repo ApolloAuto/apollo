@@ -30,8 +30,8 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/util/util.h"
 #include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
+#include "modules/planning/scenarios/emergency/emergency_pull_over/emergency_pull_over_scenario.h"
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
-#include "modules/planning/scenarios/park/emergency_pull_over/emergency_pull_over_scenario.h"
 #include "modules/planning/scenarios/park/pull_over/pull_over_scenario.h"
 #include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
 #include "modules/planning/scenarios/park_and_go/park_and_go_scenario.h"
@@ -461,10 +461,20 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
     const Frame& frame, const hdmap::PathOverlap& traffic_light_overlap) {
-  // scenario conf is the same across all traffic-light scenarios
-  const auto& scenario_config =
-      config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]
-          .traffic_light_unprotected_right_turn_config();
+
+  // some scenario may need start sooner than the others
+  const double start_check_distance =
+      std::max(
+          {config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]
+                          .traffic_light_protected_config()
+                          .start_traffic_light_scenario_distance(),
+           config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN]
+                          .traffic_light_unprotected_left_turn_config()
+                          .start_traffic_light_scenario_distance(),
+           config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN]
+                          .traffic_light_unprotected_right_turn_config()
+                          .start_traffic_light_scenario_distance()
+          });
 
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
@@ -496,20 +506,62 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
            << adc_distance_to_traffic_light << "]";
 
     // enter traffic-light scenarios: based on distance only
-    if (adc_distance_to_traffic_light > 0.0 &&
-        adc_distance_to_traffic_light <=
+    if (adc_distance_to_traffic_light <= 0.0 ||
+        adc_distance_to_traffic_light > start_check_distance) {
+      continue;
+    }
+
+    traffic_light_scenario = true;
+
+    const auto& signal_color =
+        frame.GetSignal(traffic_light_overlap.object_id).color();
+    ADEBUG << "traffic_light_id[" << traffic_light_overlap.object_id
+           << "] start_s[" << traffic_light_overlap.start_s << "] color["
+           << signal_color << "]";
+
+    if (signal_color != perception::TrafficLight::GREEN) {
+      red_light = true;
+      break;
+    }
+  }
+
+  bool traffic_light_protected_scenario = false;
+  bool traffic_light_unprotected_left_turn_scenario = false;
+  bool traffic_light_unprotected_right_turn_scenario = false;
+  if (traffic_light_scenario) {
+    const auto& turn_type =
+        reference_line_info.GetPathTurnType(traffic_light_overlap.start_s);
+    const bool right_turn = (turn_type == hdmap::Lane::RIGHT_TURN);
+    const bool left_turn = (turn_type == hdmap::Lane::LEFT_TURN);
+    const double adc_distance_to_traffic_light =
+        traffic_light_overlap.start_s - adc_front_edge_s;
+
+    if (right_turn && red_light) {
+      // check TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN
+      const auto& scenario_config =
+          config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN]
+                      .traffic_light_unprotected_right_turn_config();
+      if (adc_distance_to_traffic_light <
             scenario_config.start_traffic_light_scenario_distance()) {
-      traffic_light_scenario = true;
-
-      const auto& signal_color =
-          frame.GetSignal(traffic_light_overlap.object_id).color();
-      ADEBUG << "traffic_light_id[" << traffic_light_overlap.object_id
-             << "] start_s[" << traffic_light_overlap.start_s << "] color["
-             << signal_color << "]";
-
-      if (signal_color != perception::TrafficLight::GREEN) {
-        red_light = true;
-        break;
+        traffic_light_unprotected_right_turn_scenario = true;
+      }
+    } else if (left_turn) {
+      // check TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN
+      const auto& scenario_config =
+          config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN]
+                      .traffic_light_unprotected_left_turn_config();
+      if (adc_distance_to_traffic_light <
+            scenario_config.start_traffic_light_scenario_distance()) {
+        traffic_light_unprotected_left_turn_scenario = true;
+      }
+    } else {
+      // check TRAFFIC_LIGHT_PROTECTED
+      const auto& scenario_config =
+          config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]
+                      .traffic_light_protected_config();
+      if (adc_distance_to_traffic_light <
+            scenario_config.start_traffic_light_scenario_distance()) {
+        traffic_light_protected_scenario = true;
       }
     }
   }
@@ -519,19 +571,11 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::PARK_AND_GO:
     case ScenarioConfig::PULL_OVER:
-      if (traffic_light_scenario) {
-        const auto& turn_type =
-            reference_line_info.GetPathTurnType(traffic_light_overlap.start_s);
-        const bool right_turn = (turn_type == hdmap::Lane::RIGHT_TURN);
-        const bool left_turn = (turn_type == hdmap::Lane::LEFT_TURN);
-
-        if (right_turn && red_light) {
-          return ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN;
-        }
-        if (left_turn) {
-          return ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN;
-        }
-
+      if (traffic_light_unprotected_left_turn_scenario) {
+        return ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN;
+      } else if (traffic_light_unprotected_right_turn_scenario) {
+        return ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN;
+      } else if (traffic_light_protected_scenario) {
         return ScenarioConfig::TRAFFIC_LIGHT_PROTECTED;
       }
       break;
@@ -1124,8 +1168,8 @@ void ScenarioManager::UpdatePlanningContextPullOverScenario(
 void ScenarioManager::UpdatePlanningContextEmergencyPullOverScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
   auto* emergency_pull_over = PlanningContext::Instance()
-                                ->mutable_planning_status()
-                                ->mutable_emergency_pull_over();
+                                  ->mutable_planning_status()
+                                  ->mutable_emergency_pull_over();
 
   if (scenario_type != ScenarioConfig::EMERGENCY_PULL_OVER) {
     emergency_pull_over->Clear();

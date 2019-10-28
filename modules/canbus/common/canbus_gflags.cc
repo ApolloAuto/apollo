@@ -20,9 +20,6 @@
 DEFINE_string(canbus_node_name, "chassis", "The chassis module name in proto");
 DEFINE_string(canbus_module_name, "canbus_component", "Module name");
 
-DEFINE_string(canbus_adapter_config_filename,
-              "modules/canbus/conf/adapter.conf", "The adapter config file");
-
 // data file
 DEFINE_string(canbus_conf_file,
               "/apollo/modules/canbus/conf/canbus_conf.pb.txt",

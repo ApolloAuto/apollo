@@ -54,7 +54,8 @@ CruiseMLPEvaluator::CruiseMLPEvaluator() : device_(torch::kCPU) {
 
 void CruiseMLPEvaluator::Clear() {}
 
-bool CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr,
+    ObstaclesContainer* obstacles_container) {
   // Sanity checks.
   omp_set_num_threads(1);
   Clear();
@@ -103,8 +104,8 @@ bool CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     if (FLAGS_prediction_offline_mode ==
         PredictionConstants::kDumpDataForLearning) {
       std::vector<double> interaction_feature_values;
-      SetInteractionFeatureValues(obstacle_ptr, lane_sequence_ptr,
-                                  &interaction_feature_values);
+      SetInteractionFeatureValues(obstacle_ptr, obstacles_container,
+          lane_sequence_ptr, &interaction_feature_values);
       if (interaction_feature_values.size() != INTERACTION_FEATURE_SIZE) {
         ADEBUG << "Obstacle [" << id << "] has fewer than "
                << "expected lane feature_values"
@@ -410,7 +411,8 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
 }
 
 void CruiseMLPEvaluator::SetInteractionFeatureValues(
-    Obstacle* obstacle_ptr, LaneSequence* lane_sequence_ptr,
+    Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container,
+    LaneSequence* lane_sequence_ptr,
     std::vector<double>* feature_values) {
   // forward / backward: relative_s, relative_l, speed, length
   feature_values->clear();
@@ -438,9 +440,6 @@ void CruiseMLPEvaluator::SetInteractionFeatureValues(
     }
   }
 
-  auto obstacles_container =
-      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
-          AdapterConfig::PERCEPTION_OBSTACLES);
   // Set feature values for forward obstacle
   feature_values->push_back(forward_obstacle.s());
   feature_values->push_back(forward_obstacle.l());

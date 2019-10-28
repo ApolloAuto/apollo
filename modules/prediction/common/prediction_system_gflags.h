@@ -45,3 +45,4 @@ DECLARE_int32(max_num_dump_dataforlearn);
 
 // Submodules
 DECLARE_string(container_submodule_name);
+DECLARE_string(evaluator_submodule_name);

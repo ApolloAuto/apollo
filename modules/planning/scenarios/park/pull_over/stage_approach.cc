@@ -74,9 +74,9 @@ Stage::StageStatus PullOverStageApproach::Process(
         break;
       }
 
-      for (size_t i = path_data.discretized_path().size() - 1; i >= 0; --i) {
+      for (size_t i = path_data.discretized_path().size(); i >= 1; --i) {
         if (path_data.frenet_frame_path().back().s() -
-                path_data.frenet_frame_path()[i].s() <
+                path_data.frenet_frame_path()[i - 1].s() <
             kNumExtraTailBoundPoint * kPathBoundsDeciderResolution) {
           continue;
         }

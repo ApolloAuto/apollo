@@ -39,6 +39,7 @@
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_boundary.h"
 #include "modules/planning/common/path_decision.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
@@ -85,9 +86,12 @@ class ReferenceLineInfo {
   double PriorityCost() const { return priority_cost_; }
   void SetPriorityCost(double cost) { priority_cost_ = cost; }
   // For lattice planner'speed planning target
-  void SetStopPoint(const StopPoint& stop_point);
-  void SetCruiseSpeed(double speed);
+  void SetLatticeStopPoint(const StopPoint& stop_point);
+  void SetLatticeCruiseSpeed(double speed);
   const PlanningTarget& planning_target() const { return planning_target_; }
+
+  void SetCruiseSpeed(double speed) { cruise_speed_ = speed; }
+  double GetCruiseSpeed() const;
 
   hdmap::LaneInfoConstPtr LocateLaneInfo(const double s) const;
 
@@ -321,6 +325,8 @@ class ReferenceLineInfo {
   StGraphData st_graph_data_;
 
   common::VehicleSignal vehicle_signal_;
+
+  double cruise_speed_ = 0.0;
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };

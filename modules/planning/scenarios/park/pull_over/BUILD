@@ -62,4 +62,34 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "stage_retry_approach_parking_test",
+    size = "small",
+    srcs = [
+        "stage_retry_approach_parking.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        ":pull_over_scenario",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "stage_retry_parking_test",
+    size = "small",
+    srcs = [
+        "stage_retry_parking.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        ":pull_over_scenario",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

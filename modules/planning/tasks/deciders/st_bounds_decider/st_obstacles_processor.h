@@ -46,8 +46,11 @@ constexpr double kSIgnoreThreshold = 0.01;
 
 class STObstaclesProcessor {
  public:
-  STObstaclesProcessor(const double planning_distance,
-                       const double planning_time, const PathData& path_data);
+  STObstaclesProcessor() {}
+
+  void Init(const double planning_distance,
+            const double planning_time,
+            const PathData& path_data);
 
   virtual ~STObstaclesProcessor() = default;
 
@@ -56,35 +59,32 @@ class STObstaclesProcessor {
   std::unordered_map<std::string, STBoundary> GetAllSTBoundaries();
 
   /** @brief Given a time t, get the lower and upper s-boundaries.
-    * If the boundary is well-defined based on decision made previously,
-    * fill "available_s_bounds" with only one boundary.
-    * Otherwise, fill "available_s_bounds with all candidates and
-    * "available_obs_decisions" with corresponding possible obstacle decisions.
-    * @param Time t
-    * @param The available s-boundaries to be filled up.
-    * @param The corresponding possible obstacle decisions.
-    * @return Whether we can get valid s-bounds.
-    */
-  bool GetSBoundsFromDecisions(double t,
+   * If the boundary is well-defined based on decision made previously,
+   * fill "available_s_bounds" with only one boundary.
+   * Otherwise, fill "available_s_bounds with all candidates and
+   * "available_obs_decisions" with corresponding possible obstacle decisions.
+   * @param Time t
+   * @param The available s-boundaries to be filled up.
+   * @param The corresponding possible obstacle decisions.
+   * @return Whether we can get valid s-bounds.
+   */
+  bool GetSBoundsFromDecisions(
+      double t,
       std::vector<std::pair<double, double>>* const available_s_bounds,
-      std::vector<std::vector<std::pair<std::string, ObjectDecisionType>>>*
-          const available_obs_decisions);
+      std::vector<
+          std::vector<std::pair<std::string, ObjectDecisionType>>>* const
+          available_obs_decisions);
 
   /** @brief Set the decision for a given obstacle.
-    */
-  void SetObstacleDecision(
-      const std::string& obs_id,
-      const ObjectDecisionType& obs_decision);
+   */
+  void SetObstacleDecision(const std::string& obs_id,
+                           const ObjectDecisionType& obs_decision);
 
   /** @brief Set the decision for a list of obstacles.
-    */
+   */
   void SetObstacleDecision(
       const std::vector<std::pair<std::string, ObjectDecisionType>>&
           obstacle_decisions);
-
-  std::pair<double, double> GetRegularBoundaryFromObstacles(double t);
-
-  std::pair<double, double> GetFallbackBoundaryFromObstacles(double t);
 
  private:
   /** @brief Given a single obstacle, compute its ST-boundary.
@@ -153,30 +153,32 @@ class STObstaclesProcessor {
                                     const double l_buffer) const;
 
   /** @brief Find the vertical (s) gaps of the st-graph.
-    * @param Vector of obstacle-t-edges
-    * @param The existing minimum s edge.
-    * @param The existing maximum s edge.
-    * @return A list of available s gaps for ADC to go.
-    */
+   * @param Vector of obstacle-t-edges
+   * @param The existing minimum s edge.
+   * @param The existing maximum s edge.
+   * @return A list of available s gaps for ADC to go.
+   */
   std::vector<std::pair<double, double>> FindSGaps(
       const std::vector<std::tuple<int, double, double, double, std::string>>&
-          obstacle_t_edges, double s_min, double s_max);
+          obstacle_t_edges,
+      double s_min, double s_max);
 
   /** @brief Based on obstacle position and prospective ADC position,
-    * determine the obstacle decision.
-    * @param Obstacle's minimum s.
-    * @param Obstacle's maximum s.
-    * @param ADC's prospective position.
-    * @return The decision for the given obstacle.
-    */
-  ObjectDecisionType DetermineObstacleDecision(
-      const double obs_s_min, const double obs_s_max, const double s) const;
+   * determine the obstacle decision.
+   * @param Obstacle's minimum s.
+   * @param Obstacle's maximum s.
+   * @param ADC's prospective position.
+   * @return The decision for the given obstacle.
+   */
+  ObjectDecisionType DetermineObstacleDecision(const double obs_s_min,
+                                               const double obs_s_max,
+                                               const double s) const;
 
  private:
   double planning_time_;
   double planning_distance_;
-  const PathData& path_data_;
-  const common::VehicleParam& vehicle_param_;
+  PathData path_data_;
+  common::VehicleParam vehicle_param_;
   double adc_path_init_s_;
 
   // A vector of sorted obstacle's t-edges:

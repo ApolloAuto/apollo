@@ -1,0 +1,16 @@
+syntax = "proto2";
+
+package apollo.common;
+
+import "modules/common/proto/header.proto";
+
+message LatencyRecord {
+  optional uint64 begin_time = 1;
+  optional uint64 end_time = 2;
+};
+
+message LatencyRecordMap {
+  optional apollo.common.Header header = 1;
+  optional string module_name = 2;
+  map<uint64, LatencyRecord> latency_records = 3;
+};

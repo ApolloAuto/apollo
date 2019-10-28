@@ -66,14 +66,13 @@ function start_build_docker() {
     # If Google is reachable, we fetch the docker image directly. 
     if ping -q -c 1 -W 1 www.google.com 1>/dev/null 2>&1; then
       opt=""
-    # If Google is unreachable but Baidu reachable, we fetch the docker image from China. 
-    elif ping -q -c 1 -W 1 www.baidu.com 1>/dev/null 2>&1; then
-      opt="-C"
-    # If Baidu is unreachable, we use local images. 
     else
-      opt="-l"
+      ping -q -c 1 -W 1 www.baidu.com 1>/dev/null 2>&1
+      # If Baidu is unreachable, we use local images. 
+      if [ $? -ne 0 ]; then
+        opt="-l"
+      fi
     fi
-    #echo ${opt}
     bash docker/scripts/dev_start.sh ${opt}
   fi
 }

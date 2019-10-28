@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file piecewise_jerk_fallback_speed.h
+ * @file piecewise_jerk_speed_optimizer.h
  **/
 
 #pragma once

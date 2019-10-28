@@ -25,6 +25,8 @@
 
 #include "modules/prediction/evaluator/evaluator.h"
 
+#include "modules/prediction/container/obstacles/obstacles_container.h"
+
 namespace apollo {
 namespace prediction {
 
@@ -43,15 +45,19 @@ class LaneScanningEvaluator : public Evaluator {
   /**
    * @brief Override Evaluate
    * @param Obstacle pointer
+   * @param Obstacles container
    */
-  bool Evaluate(Obstacle* obstacle_ptr) override;
+  bool Evaluate(Obstacle* obstacle_ptr,
+                ObstaclesContainer* obstacles_container) override;
 
   /**
    * @brief Override Evaluate
    * @param Obstacle pointer
+   * @param Obstacles container
    * @param vector of all Obstacles
    */
   bool Evaluate(Obstacle* obstacle_ptr,
+                ObstaclesContainer* obstacles_container,
                 std::vector<Obstacle*> dynamic_env) override;
 
   /**

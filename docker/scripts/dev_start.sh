@@ -314,16 +314,36 @@ function main(){
 
     info "Starting docker container \"${APOLLO_DEV}\" ..."
 
-    DOCKER_CMD="nvidia-docker"
-    USE_GPU=1
-    if ! [ -x "$(command -v ${DOCKER_CMD})" ]; then
-        DOCKER_CMD="docker"
+    # Check nvidia-driver and GPU device.
+    USE_GPU=0
+    if [ -z "$(which nvidia-smi)" ]; then
+      warning "No nvidia-driver found! Use CPU."
+    elif [ -z "$(nvidia-smi)" ]; then
+      warning "No GPU device found! Use CPU."
+    else
+      USE_GPU=1
+    fi
+
+    # Try to use GPU in container.
+    DOCKER_RUN="docker run"
+    if [ ${USE_GPU} -eq 1 ]; then
+      DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
+      if ! [ -z "$(which nvidia-docker)" ]; then
+        DOCKER_RUN="nvidia-docker run"
+        warning "nvidia-docker is in deprecation! Please upgrade docker to 19.03+ according to "
+        warning "https://github.com/NVIDIA/nvidia-docker/blob/master/README.md#upgrading-with-nvidia-docker2-deprecated"
+      elif dpkg --compare-versions "${DOCKER_VERSION}" "ge" "19.03"; then
+        # For docker 19.03+, use `docker run --gpus all` to access GPU.
+        DOCKER_RUN="docker run --gpus all"
+      else
         USE_GPU=0
+        warning "Cannot access GPU from container. Please upgrade docker to 19.03+"
+      fi
     fi
 
     set -x
 
-    ${DOCKER_CMD} run -it \
+    ${DOCKER_RUN} -it \
         -d \
         --privileged \
         --name $APOLLO_DEV \

@@ -53,7 +53,6 @@ class TeleopService {
   WebSocketHandler *websocket_;
 
 #ifdef TELEOP
-
   // modem info readers and callback
   std::shared_ptr<cyber::Reader<modules::teleop::network::ModemInfo>>
       modem0_info_reader_;

@@ -39,8 +39,8 @@ using apollo::planning_internal::STGraphDebug;
 
 PathTimeHeuristicOptimizer::PathTimeHeuristicOptimizer(const TaskConfig& config)
     : SpeedOptimizer(config) {
-  CHECK(config.has_dp_st_speed_config());
-  dp_st_speed_config_ = config.dp_st_speed_config();
+  CHECK(config.has_speed_heuristic_config());
+  speed_heuristic_config_ = config.speed_heuristic_config();
 }
 
 bool PathTimeHeuristicOptimizer::SearchPathTimeGraph(
@@ -60,6 +60,10 @@ Status PathTimeHeuristicOptimizer::Process(
     const PathData& path_data, const common::TrajectoryPoint& init_point,
     SpeedData* const speed_data) {
   init_point_ = init_point;
+
+  dp_st_speed_config_ = reference_line_info_->IsChangeLanePath()
+                            ? speed_heuristic_config_.lane_change_speed_config()
+                            : speed_heuristic_config_.default_speed_config();
 
   if (path_data.discretized_path().empty()) {
     std::string msg("Empty path data");

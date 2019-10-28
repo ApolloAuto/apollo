@@ -51,7 +51,7 @@ void DigitalFilter::set_coefficients(const std::vector<double> &denominators,
 }
 
 void DigitalFilter::set_dead_zone(const double deadzone) {
-  dead_zone_ = std::abs(deadzone);
+  dead_zone_ = std::fabs(deadzone);
   AINFO << "Setting digital filter dead zone = " << dead_zone_;
 }
 
@@ -71,7 +71,7 @@ double DigitalFilter::Filter(const double x_insert) {
       Compute(y_values_, denominators_, 1, denominators_.size() - 1);
 
   double y_insert = 0.0;
-  if (std::abs(denominators_.front()) > kDoubleEpsilon) {
+  if (std::fabs(denominators_.front()) > kDoubleEpsilon) {
     y_insert = (xside - yside) / denominators_.front();
   }
   y_values_.push_front(y_insert);
@@ -85,13 +85,12 @@ void DigitalFilter::reset_values() {
 }
 
 double DigitalFilter::UpdateLast(const double input) {
-  const double diff = std::abs(input - last_);
+  const double diff = std::fabs(input - last_);
   if (diff < dead_zone_) {
     return last_;
-  } else {
-    last_ = input;
-    return input;
   }
+  last_ = input;
+  return input;
 }
 
 double DigitalFilter::Compute(const std::deque<double> &values,

@@ -43,4 +43,34 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "stage_creep_test",
+    size = "small",
+    srcs = [
+        "stage_creep_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        ":traffic_light_unprotected_right_turn_scenario",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "stage_stop_test",
+    size = "small",
+    srcs = [
+        "stage_stop_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        ":traffic_light_unprotected_right_turn_scenario",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

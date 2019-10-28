@@ -360,7 +360,7 @@ Eigen::VectorXd KalmanMotionFusion::ComputeAccelerationMeasurement(
   }
   if (GetSensorHistoryLength(sensor_type) >= s_eval_window_) {
     size_t history_index = GetSensorHistoryIndex(sensor_type, s_eval_window_);
-    if (history_index < 0 || history_index >= history_velocity_.size()) {
+    if (history_index >= history_velocity_.size()) {
       AERROR << "illegal history index";
       return Eigen::Vector3d::Zero();
     }
