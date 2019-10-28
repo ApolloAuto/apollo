@@ -20,10 +20,6 @@
 namespace apollo {
 namespace prediction {
 
-ContainerOutput::~ContainerOutput() {
-  Clear();
-}
-
 void ContainerOutput::InsertObstacle(const Obstacle& obstacle) {
   curr_frame_obstacles_.push_back(obstacle);
 }
@@ -46,14 +42,6 @@ void ContainerOutput::set_curr_frame_unmovable_obstacle_ids(
 void ContainerOutput::set_curr_frame_considered_obstacle_ids(
     const std::vector<int>& curr_frame_considered_obstacle_ids) {
   curr_frame_considered_obstacle_ids_ = curr_frame_considered_obstacle_ids;
-}
-
-void ContainerOutput::Clear() {
-  curr_frame_obstacles_.clear();
-  curr_frame_perception_obstacles_.clear();
-  curr_frame_movable_obstacle_ids_.clear();
-  curr_frame_unmovable_obstacle_ids_.clear();
-  curr_frame_considered_obstacle_ids_.clear();
 }
 
 }  // namespace prediction

@@ -40,7 +40,7 @@ class ContainerOutput {
   /**
    * @brief Destructor
    */
-  ~ContainerOutput();
+  ~ContainerOutput() = default;
 
   void InsertObstacle(const Obstacle& obstacle);
 
@@ -57,8 +57,6 @@ class ContainerOutput {
       const std::vector<int>& curr_frame_considered_obstacle_ids);
 
  private:
-  void Clear();
-
   std::vector<Obstacle> curr_frame_obstacles_;
   std::vector<apollo::perception::PerceptionObstacle>
       curr_frame_perception_obstacles_;
