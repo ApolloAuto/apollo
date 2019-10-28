@@ -346,18 +346,6 @@ void STBoundaryMapper::ComputeSTBoundaryWithDecision(
     return;
   }
 
-  if (decision.has_follow() && lower_points.back().t() < planning_max_time_) {
-    const double diff_s = lower_points.back().s() - lower_points.front().s();
-    const double diff_t = lower_points.back().t() - lower_points.front().t();
-    double extend_lower_s =
-        diff_s / diff_t * (planning_max_time_ - lower_points.front().t()) +
-        lower_points.front().s();
-    const double extend_upper_s =
-        extend_lower_s + (upper_points.back().s() - lower_points.back().s());
-    upper_points.emplace_back(extend_upper_s, planning_max_time_);
-    lower_points.emplace_back(extend_lower_s, planning_max_time_);
-  }
-
   auto boundary = STBoundary::CreateInstance(lower_points, upper_points);
 
   // get characteristic_length and boundary_type.

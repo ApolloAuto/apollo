@@ -167,6 +167,11 @@ bool STBoundary::GetUnblockSRange(const double curr_time, double* s_upper,
     AERROR << "Fail to get index range.";
     return false;
   }
+
+  if (curr_time > upper_points_[right].t()) {
+    return true;
+  }
+
   const double r =
       (left == right
            ? 0.0
