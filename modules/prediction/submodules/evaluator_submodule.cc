@@ -40,9 +40,7 @@ bool EvaluatorSubmodule::Init() {
 
 bool EvaluatorSubmodule::Proc(
     const std::shared_ptr<ContainerOutput>& container_output) {
-  // TODO(kechxu) build a light obstacles_container from container_output
-  ObstaclesContainer obstacles_container;
-
+  ObstaclesContainer obstacles_container(*container_output);
   EvaluatorManager::Instance()->Run(&obstacles_container);
 
   // TODO(kechxu) write the output

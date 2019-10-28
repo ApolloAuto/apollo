@@ -38,6 +38,27 @@ using apollo::prediction::PredictionConstants;
 ObstaclesContainer::ObstaclesContainer()
     : ptr_obstacles_(FLAGS_max_num_obstacles) {}
 
+ObstaclesContainer::ObstaclesContainer(
+    const ContainerOutput& container_output)
+    : ptr_obstacles_(FLAGS_max_num_obstacles) {
+  for (Obstacle obstacle : container_output.curr_frame_obstacles()) {
+    // Deep copy of obstacle is needed for modification
+    ptr_obstacles_.Put(obstacle.id(),
+        std::move(std::unique_ptr<Obstacle>(&obstacle)));
+  }
+  for (const auto& perception_obstacle :
+       container_output.curr_frame_perception_obstacles()) {
+    int id = perception_obstacle.id();
+    curr_frame_id_perception_obstacle_map_[id] = perception_obstacle;
+  }
+  curr_frame_movable_obstacle_ids_ =
+      container_output.curr_frame_movable_obstacle_ids();
+  curr_frame_unmovable_obstacle_ids_ =
+      container_output.curr_frame_unmovable_obstacle_ids();
+  curr_frame_considered_obstacle_ids_ =
+      container_output.curr_frame_considered_obstacle_ids();
+}
+
 void ObstaclesContainer::CleanUp() {
   // Clean up the history and get the PerceptionObstacles
   curr_frame_movable_obstacle_ids_.clear();

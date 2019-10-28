@@ -56,6 +56,17 @@ class ContainerOutput {
   void set_curr_frame_considered_obstacle_ids(
       const std::vector<int>& curr_frame_considered_obstacle_ids);
 
+  const std::vector<Obstacle>& curr_frame_obstacles() const;
+
+  const std::vector<apollo::perception::PerceptionObstacle>&
+  curr_frame_perception_obstacles() const;
+
+  std::vector<int> curr_frame_movable_obstacle_ids() const;
+
+  std::vector<int> curr_frame_unmovable_obstacle_ids() const;
+
+  std::vector<int> curr_frame_considered_obstacle_ids() const;
+
  private:
   std::vector<Obstacle> curr_frame_obstacles_;
   std::vector<apollo::perception::PerceptionObstacle>

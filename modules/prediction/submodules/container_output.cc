@@ -44,5 +44,26 @@ void ContainerOutput::set_curr_frame_considered_obstacle_ids(
   curr_frame_considered_obstacle_ids_ = curr_frame_considered_obstacle_ids;
 }
 
+const std::vector<Obstacle>& ContainerOutput::curr_frame_obstacles() const {
+  return curr_frame_obstacles_;
+}
+
+const std::vector<apollo::perception::PerceptionObstacle>&
+ContainerOutput::curr_frame_perception_obstacles() const {
+  return curr_frame_perception_obstacles_;
+}
+
+std::vector<int> ContainerOutput::curr_frame_movable_obstacle_ids() const {
+  return curr_frame_movable_obstacle_ids_;
+}
+
+std::vector<int> ContainerOutput::curr_frame_unmovable_obstacle_ids() const {
+  return curr_frame_unmovable_obstacle_ids_;
+}
+
+std::vector<int> ContainerOutput::curr_frame_considered_obstacle_ids() const {
+  return curr_frame_considered_obstacle_ids_;
+}
+
 }  // namespace prediction
 }  // namespace apollo
