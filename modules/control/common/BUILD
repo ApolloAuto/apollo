@@ -83,7 +83,8 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         "//cyber",
-        "//modules/common/filters",
+        "//modules/common/status",
+        "//modules/common/util",
         "//modules/control/proto:control_proto",
         "@eigen",
     ],
