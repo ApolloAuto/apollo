@@ -87,6 +87,8 @@ message PathDeciderStatus {
 
 message PathReuseDeciderStatus  {
   optional bool reused_path = 1 [default = true];
+  // count lane_change optimization failure frames
+  optional int32 lane_change_failure_counter = 2;
 }
 
 message PedestrianStatus {
