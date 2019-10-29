@@ -318,6 +318,9 @@ Status PathBoundsDecider::GenerateRegularPathBound(
   }
   // PathBoundsDebugString(*path_bound);
 
+  // TODO(jiacheng): once ready, limit the path boundary based on the
+  //                 actual road boundary to avoid getting off-road.
+
   // 3. Fine-tune the boundary based on static obstacles
   PathBound temp_path_bound = *path_bound;
   if (!GetBoundaryFromStaticObstacles(reference_line_info.path_decision(),
