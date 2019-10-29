@@ -25,6 +25,7 @@
 
 #include "cyber/common/log.h"
 
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/common.h"
@@ -54,13 +55,14 @@ Stage::StageStatus EmergencyPullOverStageApproach::Process(
     AERROR << "EmergencyPullOverStageApproach planning error";
   }
 
-  auto& reference_line_info = frame->mutable_reference_line_info()->front();
-
-  // set vehicle signal
-  reference_line_info.SetEmergencyLight();
-
-  // TODO(all): to be implemented
-  if (1) {
+  const double adc_speed =
+      common::VehicleStateProvider::Instance()->linear_velocity();
+  const double max_adc_stop_speed =
+      common::VehicleConfigHelper::Instance()->GetConfig()
+          .vehicle_param()
+          .max_abs_speed_when_stopped();
+  // TODO(all): add pull over position check
+  if (adc_speed <= max_adc_stop_speed) {
     return FinishStage();
   }
 
