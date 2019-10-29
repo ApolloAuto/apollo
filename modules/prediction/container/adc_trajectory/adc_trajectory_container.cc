@@ -266,7 +266,8 @@ std::string ADCTrajectoryContainer::ToString(
   return str_lane_sequence;
 }
 
-bool ADCTrajectoryContainer::HasOverlap(const LaneSequence& lane_sequence) {
+bool ADCTrajectoryContainer::HasOverlap(
+    const LaneSequence& lane_sequence) const {
   for (const auto& lane_segment : lane_sequence.lane_segment()) {
     std::string lane_id = lane_segment.lane_id();
     if (adc_lane_ids_.find(lane_id) != adc_lane_ids_.end()) {

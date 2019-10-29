@@ -46,11 +46,12 @@ TEST_F(RegionalPredictorTest, Predict) {
       perception_obstacles_.perception_obstacle(0);
   EXPECT_EQ(perception_obstacle.id(), 101);
   ObstaclesContainer container;
+  ADCTrajectoryContainer adc_trajectory_container;
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(101);
   EXPECT_NE(obstacle_ptr, nullptr);
   RegionalPredictor predictor;
-  predictor.Predict(obstacle_ptr, &container);
+  predictor.Predict(&adc_trajectory_container, obstacle_ptr, &container);
   EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 2);
 }
 

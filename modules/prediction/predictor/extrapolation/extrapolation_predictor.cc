@@ -23,8 +23,9 @@ ExtrapolationPredictor::ExtrapolationPredictor() {
   predictor_type_ = ObstacleConf::EXTRAPOLATION_PREDICTOR;
 }
 
-void ExtrapolationPredictor::Predict(Obstacle* obstacle,
-                                     ObstaclesContainer* obstacles_container) {
+void ExtrapolationPredictor::Predict(
+    const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
+    ObstaclesContainer* obstacles_container) {
   Clear();
 
   CHECK_NOTNULL(obstacle);

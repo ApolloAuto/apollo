@@ -43,10 +43,12 @@ class FreeMovePredictor : public Predictor {
 
   /**
    * @brief Make prediction
+   * @param ADC trajectory container
    * @param Obstacle pointer
    * @param Obstacles container
    */
-  void Predict(Obstacle* obstacle,
+  void Predict(const ADCTrajectoryContainer* adc_trajectory_container,
+               Obstacle* obstacle,
                ObstaclesContainer* obstacles_container) override;
 
  private:

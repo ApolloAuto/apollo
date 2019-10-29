@@ -56,20 +56,23 @@ class PredictorManager {
 
   /**
    * @brief Execute the predictor generation
+   * @param Adc trajectory container
+   * @param Obstacles container
    */
-  void Run();
+  void Run(const ADCTrajectoryContainer* adc_trajectory_container,
+           ObstaclesContainer* obstacles_container);
 
   /**
    * @brief Predict a single obstacle
+   * @param A pointer to adc_trajectory_container
    * @param A pointer to the specific obstacle
    * @param A pointer to the obstacles container
    * @param A pointer to prediction_obstacle
-   * @param A pointer to adc_trajectory_container
    */
-  void PredictObstacle(Obstacle* obstacle,
+  void PredictObstacle(const ADCTrajectoryContainer* adc_trajectory_container,
+                       Obstacle* obstacle,
                        ObstaclesContainer* obstacles_container,
-                       PredictionObstacle* const prediction_obstacle,
-                       ADCTrajectoryContainer* adc_trajectory_container);
+                       PredictionObstacle* const prediction_obstacle);
 
   /**
    * @brief Get prediction obstacles
@@ -97,12 +100,12 @@ class PredictorManager {
    */
   void RegisterPredictors();
 
-  void PredictObstacles(ObstaclesContainer* obstacles_container,
-                        ADCTrajectoryContainer* adc_trajectory_container);
+  void PredictObstacles(const ADCTrajectoryContainer* adc_trajectory_container,
+                        ObstaclesContainer* obstacles_container);
 
   void PredictObstaclesInParallel(
-      ObstaclesContainer* obstacles_container,
-      ADCTrajectoryContainer* adc_trajectory_container);
+      const ADCTrajectoryContainer* adc_trajectory_container,
+      ObstaclesContainer* obstacles_container);
 
  private:
   std::map<ObstacleConf::PredictorType, std::unique_ptr<Predictor>> predictors_;

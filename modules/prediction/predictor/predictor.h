@@ -52,7 +52,8 @@ class Predictor {
    * @param Obstacle pointer
    * @param Obstacles container
    */
-  virtual void Predict(Obstacle* obstacle,
+  virtual void Predict(const ADCTrajectoryContainer* adc_trajectory_container,
+                       Obstacle* obstacle,
                        ObstaclesContainer* obstacles_container) = 0;
 
   /**
