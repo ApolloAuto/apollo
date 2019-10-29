@@ -360,7 +360,7 @@ bool LaneChangeDecider::IsPerceptionBlocked(
       // obstacle is not in search range
       continue;
     }
-    if (std::abs(common::math::NormalizeAngle(
+    if (std::fabs(common::math::NormalizeAngle(
             left_most_angle - right_most_angle)) > is_block_angle_threshold) {
       return true;
     }
