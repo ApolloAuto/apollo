@@ -151,8 +151,11 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
 
   ptr_interface->set_path(path_data);
 
-  // TODO(Jinyun): add speed_limit fitting curve
-  //   ptr_interface->set_speed_limit_curve(speed_limit);
+  // TODO(Hongyi): enable speed_limit fitting curve
+  // const SpeedLimit& speed_limit = st_graph_data.speed_limit();
+  // PiecewiseJerkTrajectory1d smooth_speed_limit =
+  //     SmoothSpeedLimit(const SpeedLimit& speed_limit);
+  // ptr_interface->set_speed_limit_curve(smooth_speed_limit);
 
   // TODO(Jinyun): add ref_s into optimizer
   ptr_interface->set_w_overall_a(
@@ -227,6 +230,51 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
   SpeedProfileGenerator::FillEnoughSpeedPoints(speed_data);
   RecordDebugInfo(*speed_data, st_graph_data.mutable_st_graph_debug());
   return Status::OK();
+}
+
+PiecewiseJerkTrajectory1d
+PiecewiseJerkSpeedNonlinearOptimizer::SmoothSpeedLimit(
+    const SpeedLimit& speed_limit) {
+  // using piecewise_jerk_path to fit a curve of speed_ref
+  double delta_s = 2.0;
+  std::vector<double> speed_ref;
+  for (int i = 0; i < 100; ++i) {
+    double path_s = i * delta_s;
+    double limit = speed_limit.GetSpeedLimitByS(path_s);
+    speed_ref.emplace_back(limit);
+  }
+  std::array<double, 3> init_state = {speed_ref[0], 0.0, 0.0};
+  PiecewiseJerkPathProblem piecewise_jerk_problem(speed_ref.size(), delta_s,
+                                                  init_state);
+  piecewise_jerk_problem.set_x_bounds(0.0, 50.0);
+  piecewise_jerk_problem.set_dx_bounds(-10.0, 10.0);
+  piecewise_jerk_problem.set_ddx_bounds(-10.0, 10.0);
+  piecewise_jerk_problem.set_dddx_bound(-10.0, 10.0);
+
+  piecewise_jerk_problem.set_weight_x(0.0);
+  piecewise_jerk_problem.set_weight_dx(10.0);
+  piecewise_jerk_problem.set_weight_ddx(10.0);
+  piecewise_jerk_problem.set_weight_dddx(10.0);
+
+  piecewise_jerk_problem.set_x_ref(1.0, speed_ref);
+  bool success = piecewise_jerk_problem.Optimize(4000);
+  std::vector<double> opt_x;
+  std::vector<double> opt_dx;
+  std::vector<double> opt_ddx;
+  if (success) {
+    opt_x = piecewise_jerk_problem.opt_x();
+    opt_dx = piecewise_jerk_problem.opt_dx();
+    opt_ddx = piecewise_jerk_problem.opt_ddx();
+  }
+
+  PiecewiseJerkTrajectory1d smooth_speed_limit(opt_x.front(), opt_dx.front(),
+                                               opt_ddx.front());
+  for (size_t i = 1; i < opt_ddx.size(); ++i) {
+    double j = (opt_ddx[i] - opt_ddx[i - 1]) / delta_s;
+    smooth_speed_limit.AppendSegment(j, delta_s);
+  }
+
+  return smooth_speed_limit;
 }
 
 }  // namespace planning
