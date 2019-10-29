@@ -21,6 +21,7 @@
 #include "modules/planning/scenarios/emergency/emergency_pull_over/emergency_pull_over_scenario.h"
 
 #include "cyber/common/log.h"
+#include "modules/planning/scenarios/emergency/emergency_pull_over/stage_slow_down.h"
 #include "modules/planning/scenarios/emergency/emergency_pull_over/stage_approach.h"
 #include "modules/planning/scenarios/emergency/emergency_pull_over/stage_standby.h"
 
@@ -53,6 +54,11 @@ void EmergencyPullOverScenario::RegisterStages() {
   if (!s_stage_factory_.Empty()) {
     s_stage_factory_.Clear();
   }
+  s_stage_factory_.Register(
+      ScenarioConfig::EMERGENCY_PULL_OVER_SLOW_DOWN,
+      [](const ScenarioConfig::StageConfig& config) -> Stage* {
+        return new EmergencyPullOverStageSlowDown(config);
+      });
   s_stage_factory_.Register(
       ScenarioConfig::EMERGENCY_PULL_OVER_APPROACH,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {

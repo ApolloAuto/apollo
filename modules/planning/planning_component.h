@@ -70,7 +70,7 @@ class PlanningComponent final
   std::mutex mutex_;
   perception::TrafficLightDetection traffic_light_;
   routing::RoutingResponse routing_;
-  PadMessage pad_msg_;
+  planning::PadMessage pad_msg_;
   relative_map::MapMsg relative_map_;
 
   LocalView local_view_;
