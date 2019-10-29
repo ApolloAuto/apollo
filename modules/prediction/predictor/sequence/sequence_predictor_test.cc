@@ -45,13 +45,14 @@ TEST_F(SequencePredictorTest, General) {
   EXPECT_EQ(perception_obstacle.id(), 1);
   MLPEvaluator mlp_evaluator;
   ObstaclesContainer container;
+  ADCTrajectoryContainer adc_trajectory_container;
   container.Insert(perception_obstacles_);
   container.BuildLaneGraph();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_NE(obstacle_ptr, nullptr);
   mlp_evaluator.Evaluate(obstacle_ptr, &container);
   SequencePredictor predictor;
-  predictor.Predict(obstacle_ptr, &container);
+  predictor.Predict(&adc_trajectory_container, obstacle_ptr, &container);
   EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 0);
   LaneSequence* lane_seq = obstacle_ptr->mutable_latest_feature()
                                ->mutable_lane()
@@ -71,7 +72,8 @@ TEST_F(SequencePredictorTest, General) {
   std::vector<bool> enable_lane_sequence(3, true);
   predictor.FilterLaneSequences(*obstacle_ptr->mutable_latest_feature(),
                                 lane_seq->mutable_lane_segment(0)->lane_id(),
-                                ego_vehicle_ptr, &enable_lane_sequence);
+                                ego_vehicle_ptr, &adc_trajectory_container,
+                                &enable_lane_sequence);
   EXPECT_TRUE(enable_lane_sequence[0]);
 
   predictor.Clear();

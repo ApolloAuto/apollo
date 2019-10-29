@@ -157,28 +157,21 @@ Predictor* PredictorManager::GetPredictor(
   return it != predictors_.end() ? it->second.get() : nullptr;
 }
 
-void PredictorManager::Run() {
+void PredictorManager::Run(
+    const ADCTrajectoryContainer* adc_trajectory_container,
+    ObstaclesContainer* obstacles_container) {
   prediction_obstacles_.Clear();
-  auto obstacles_container =
-      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
-          AdapterConfig::PERCEPTION_OBSTACLES);
-
-  auto adc_trajectory_container =
-      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
-          AdapterConfig::PLANNING_TRAJECTORY);
-
-  CHECK_NOTNULL(obstacles_container);
 
   if (FLAGS_enable_multi_thread) {
-    PredictObstaclesInParallel(obstacles_container, adc_trajectory_container);
+    PredictObstaclesInParallel(adc_trajectory_container, obstacles_container);
   } else {
-    PredictObstacles(obstacles_container, adc_trajectory_container);
+    PredictObstacles(adc_trajectory_container, obstacles_container);
   }
 }
 
 void PredictorManager::PredictObstacles(
-    ObstaclesContainer* obstacles_container,
-    ADCTrajectoryContainer* adc_trajectory_container) {
+    const ADCTrajectoryContainer* adc_trajectory_container,
+    ObstaclesContainer* obstacles_container) {
   for (const int id : obstacles_container->curr_frame_obstacle_ids()) {
     if (id < 0) {
       ADEBUG << "The obstacle has invalid id [" << id << "].";
@@ -193,8 +186,8 @@ void PredictorManager::PredictObstacles(
     // if obstacle == nullptr, that means obstacle is unmovable
     // Checkout the logic of unmovable in obstacle.cc
     if (obstacle != nullptr) {
-      PredictObstacle(obstacle, obstacles_container, &prediction_obstacle,
-                      adc_trajectory_container);
+      PredictObstacle(adc_trajectory_container, obstacle, obstacles_container,
+                      &prediction_obstacle);
     } else {  // obstacle == nullptr
       prediction_obstacle.set_timestamp(perception_obstacle.timestamp());
       prediction_obstacle.set_is_static(true);
@@ -211,8 +204,8 @@ void PredictorManager::PredictObstacles(
 }
 
 void PredictorManager::PredictObstaclesInParallel(
-    ObstaclesContainer* obstacles_container,
-    ADCTrajectoryContainer* adc_trajectory_container) {
+    const ADCTrajectoryContainer* adc_trajectory_container,
+    ObstaclesContainer* obstacles_container) {
   IdPredictionObstacleMap id_prediction_obstacle_map;
   for (int id : obstacles_container->curr_frame_obstacle_ids()) {
     id_prediction_obstacle_map[id] = std::make_shared<PredictionObstacle>();
@@ -236,9 +229,9 @@ void PredictorManager::PredictObstaclesInParallel(
       [&](IdObstacleListMap::iterator::value_type& obstacles_iter) {
         for (auto obstacle_ptr : obstacles_iter.second) {
           int id = obstacle_ptr->id();
-          PredictObstacle(obstacle_ptr, obstacles_container,
-                          id_prediction_obstacle_map[id].get(),
-                          adc_trajectory_container);
+          PredictObstacle(adc_trajectory_container, obstacle_ptr,
+                          obstacles_container,
+                          id_prediction_obstacle_map[id].get());
         }
       });
   for (auto& item : id_prediction_obstacle_map) {
@@ -256,9 +249,9 @@ void PredictorManager::PredictObstaclesInParallel(
 }
 
 void PredictorManager::PredictObstacle(
-    Obstacle* obstacle, ObstaclesContainer* obstacles_container,
-    PredictionObstacle* const prediction_obstacle,
-    ADCTrajectoryContainer* adc_trajectory_container) {
+    const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
+    ObstaclesContainer* obstacles_container,
+    PredictionObstacle* const prediction_obstacle) {
   CHECK_NOTNULL(obstacle);
   Predictor* predictor = nullptr;
   prediction_obstacle->set_timestamp(obstacle->timestamp());
@@ -311,7 +304,7 @@ void PredictorManager::PredictObstacle(
   }
 
   if (predictor != nullptr) {
-    predictor->Predict(obstacle, obstacles_container);
+    predictor->Predict(adc_trajectory_container, obstacle, obstacles_container);
     if (FLAGS_enable_trim_prediction_trajectory &&
         obstacle->type() == PerceptionObstacle::VEHICLE) {
       CHECK_NOTNULL(adc_trajectory_container);

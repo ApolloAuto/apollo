@@ -34,8 +34,9 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterConfig;
 using apollo::hdmap::LaneInfo;
 
-void SequencePredictor::Predict(Obstacle* obstacle,
-                                ObstaclesContainer* obstacles_container) {
+void SequencePredictor::Predict(
+    const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
+    ObstaclesContainer* obstacles_container) {
   Clear();
 
   CHECK_NOTNULL(obstacle);
@@ -57,7 +58,9 @@ std::string SequencePredictor::ToString(const LaneSequence& sequence) {
 
 void SequencePredictor::FilterLaneSequences(
     const Feature& feature, const std::string& lane_id,
-    const Obstacle* ego_vehicle_ptr, std::vector<bool>* enable_lane_sequence) {
+    const Obstacle* ego_vehicle_ptr,
+    const ADCTrajectoryContainer* adc_trajectory_container,
+    std::vector<bool>* enable_lane_sequence) {
   if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
     return;
   }
@@ -90,7 +93,8 @@ void SequencePredictor::FilterLaneSequences(
     }
 
     // The obstacle has interference with ADC within a small distance
-    double distance = GetLaneChangeDistanceWithADC(sequence, ego_vehicle_ptr);
+    double distance = GetLaneChangeDistanceWithADC(sequence, ego_vehicle_ptr,
+                                                   adc_trajectory_container);
     ADEBUG << "Distance to ADC " << std::fixed << std::setprecision(6)
            << distance;
     if (distance > 0.0 && distance < FLAGS_lane_change_dist) {
@@ -198,14 +202,9 @@ SequencePredictor::LaneChangeType SequencePredictor::GetLaneChangeType(
 }
 
 double SequencePredictor::GetLaneChangeDistanceWithADC(
-    const LaneSequence& lane_sequence, const Obstacle* ego_vehicle_ptr) {
-  auto adc_container =
-      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
-          AdapterConfig::PLANNING_TRAJECTORY);
-
-  CHECK_NOTNULL(adc_container);
-
-  if (!adc_container->HasOverlap(lane_sequence)) {
+    const LaneSequence& lane_sequence, const Obstacle* ego_vehicle_ptr,
+    const ADCTrajectoryContainer* adc_trajectory_container) {
+  if (!adc_trajectory_container->HasOverlap(lane_sequence)) {
     ADEBUG << "The sequence [" << ToString(lane_sequence)
            << "] has no overlap with ADC.";
     return std::numeric_limits<double>::max();

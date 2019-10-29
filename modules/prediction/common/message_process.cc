@@ -197,6 +197,11 @@ void MessageProcess::OnPerception(
           AdapterConfig::PERCEPTION_OBSTACLES);
   CHECK_NOTNULL(ptr_obstacles_container);
 
+  auto ptr_ego_trajectory_container =
+      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
+          AdapterConfig::PLANNING_TRAJECTORY);
+  CHECK_NOTNULL(ptr_ego_trajectory_container);
+
   // Insert features to FeatureOutput for offline_mode
   if (FLAGS_prediction_offline_mode == PredictionConstants::kDumpFeatureProto) {
     for (const int id :
@@ -231,7 +236,8 @@ void MessageProcess::OnPerception(
     return;
   }
   // Make predictions
-  PredictorManager::Instance()->Run();
+  PredictorManager::Instance()->Run(ptr_ego_trajectory_container,
+                                    ptr_obstacles_container);
 
   // Get predicted obstacles
   *prediction_obstacles = PredictorManager::Instance()->prediction_obstacles();
