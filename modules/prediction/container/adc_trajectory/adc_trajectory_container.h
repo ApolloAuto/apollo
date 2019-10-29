@@ -145,7 +145,6 @@ class ADCTrajectoryContainer : public Container {
   std::vector<std::string> adc_lane_seq_;
   std::unordered_set<std::string> adc_target_lane_ids_;
   std::vector<std::string> adc_target_lane_seq_;
-  std::mutex adc_trajectory_mutex_;
 };
 
 }  // namespace prediction
