@@ -63,6 +63,19 @@ Status STBoundsDecider::Process(Frame* const frame,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
+  // Record the ST-Graph for good visualization and easy debugging.
+  auto all_st_boundaries = st_obstacles_processor_.GetAllSTBoundaries();
+  std::vector<STBoundary> st_boundaries;
+  for (auto it = all_st_boundaries.begin(); it != all_st_boundaries.end();
+       ++it) {
+    st_boundaries.push_back(it->second);
+  }
+  ADEBUG << "Total ST boundaries = " << st_boundaries.size();
+  STGraphDebug* st_graph_debug = reference_line_info->mutable_debug()
+                                     ->mutable_planning_data()
+                                     ->add_st_graph();
+  RecordSTGraphDebug(st_boundaries, regular_st_bound, st_graph_debug);
+
   return Status::OK();
 }
 
@@ -80,18 +93,6 @@ void STBoundsDecider::InitSTBoundsDecider(
   std::chrono::duration<double> diff = time2 - time1;
   ADEBUG << "Time for ST Obstacles Processing = " << diff.count() * 1000
          << " msec.";
-  // Record the ST-Graph for good visualization and easy debugging.
-  auto all_st_boundaries = st_obstacles_processor_.GetAllSTBoundaries();
-  std::vector<STBoundary> st_boundaries;
-  for (auto it = all_st_boundaries.begin(); it != all_st_boundaries.end();
-       ++it) {
-    st_boundaries.push_back(it->second);
-  }
-  ADEBUG << "Total ST boundaries = " << st_boundaries.size();
-  STGraphDebug* st_graph_debug = reference_line_info_->mutable_debug()
-                                     ->mutable_planning_data()
-                                     ->add_st_graph();
-  RecordSTGraphDebug(st_boundaries, st_graph_debug);
 
   // Initialize Guide-Line and Driving-Limits.
   constexpr double desired_speed = 15.0;
@@ -157,13 +158,14 @@ void STBoundsDecider::RankDecisions(
 }
 
 void STBoundsDecider::RecordSTGraphDebug(
-    const std::vector<STBoundary>& st_graph_data,
+    const std::vector<STBoundary>& st_graph_data, const STBound& st_bound,
     planning_internal::STGraphDebug* const st_graph_debug) {
   if (!FLAGS_enable_record_debug || !st_graph_debug) {
     ADEBUG << "Skip record debug info";
     return;
   }
 
+  // Plot ST-obstacle boundaries.
   for (const auto& boundary : st_graph_data) {
     auto boundary_debug = st_graph_debug->add_boundary();
     boundary_debug->set_name(boundary.id());
@@ -175,6 +177,27 @@ void STBoundsDecider::RecordSTGraphDebug(
       point_debug->set_t(point.x());
       point_debug->set_s(point.y());
     }
+  }
+
+  // Plot the chosen ST boundary.
+  auto boundary_debug = st_graph_debug->add_boundary();
+  boundary_debug->set_name("Generated ST-Boundary");
+  boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_UNKNOWN);
+  for (int i = 0; i < static_cast<int>(st_bound.size()); ++i) {
+    auto point_debug = boundary_debug->add_point();
+    double t = 0.0;
+    double s_lower = 0.0;
+    std::tie(t, s_lower, std::ignore) = st_bound[i];
+    point_debug->set_t(t);
+    point_debug->set_s(s_lower);
+  }
+  for (int i = static_cast<int>(st_bound.size()) - 1; i >= 0; --i) {
+    auto point_debug = boundary_debug->add_point();
+    double t = 0.0;
+    double s_upper = 0.0;
+    std::tie(t, std::ignore, s_upper) = st_bound[i];
+    point_debug->set_t(t);
+    point_debug->set_s(s_upper);
   }
 }
 
