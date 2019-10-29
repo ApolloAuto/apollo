@@ -63,6 +63,7 @@ class STBoundsDecider : public Decider {
 
   void RecordSTGraphDebug(
       const std::vector<STBoundary>& st_graph_data,
+      const std::vector<std::tuple<double, double, double>>& st_bound,
       planning_internal::STGraphDebug* const st_graph_debug);
 
  private:
