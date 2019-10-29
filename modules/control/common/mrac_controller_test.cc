@@ -43,6 +43,7 @@ class MracControllerTest : public ::testing::Test {
   LatControllerConf lat_controller_conf_;
 };
 
+// test the input-output of the model reference adaptive controller
 TEST_F(MracControllerTest, MracControl) {
   double dt = 0.01;
   Matrix state = Matrix::Zero(1, 1);
@@ -68,6 +69,41 @@ TEST_F(MracControllerTest, MracControl) {
   EXPECT_NEAR(control_value, 8.48, 1e-6);
   dt = 0.0;
   EXPECT_EQ(mrac_controller.Control(-18.0, state, dt), control_value);
+}
+
+// test the judgement of the symetric positive definite solution of the Lyapunov
+// equation
+TEST_F(MracControllerTest, CheckLyapunovPD) {
+  double dt = 0.01;
+  MracConf mrac_conf = lat_controller_conf_.actuation_mrac_conf();
+  MracController mrac_controller;
+  mrac_controller.Init(mrac_conf, dt);
+  // test on 1st order adaption dynamics
+  Matrix matrix_a = Matrix::Zero(1, 1);
+  Matrix matrix_p = Matrix::Zero(1, 1);
+  matrix_a(0, 0) = -100.0;
+  matrix_p(0, 0) = 1.0;
+  EXPECT_EQ(mrac_controller.CheckLyapunovPD(matrix_a, matrix_p), true);
+  matrix_a(0, 0) = -100.0;
+  matrix_p(0, 0) = -1.0;
+  EXPECT_EQ(mrac_controller.CheckLyapunovPD(matrix_a, matrix_p), false);
+  // test on 2nd order adaption dynamics
+  matrix_a = Matrix::Zero(2, 2);
+  matrix_p = Matrix::Zero(2, 2);
+  matrix_a(0, 1) = 1.0;
+  matrix_a(1, 0) = -100.0;
+  matrix_a(1, 1) = -18.0;
+  matrix_p(0, 0) = 1.0;
+  matrix_p(1, 1) = 1.0;
+  EXPECT_EQ(mrac_controller.CheckLyapunovPD(matrix_a, matrix_p), false);
+  matrix_p(0, 0) = 1.0;
+  matrix_p(1, 1) = 0.01;
+  EXPECT_EQ(mrac_controller.CheckLyapunovPD(matrix_a, matrix_p), false);
+  matrix_p(0, 0) = 10.0;
+  matrix_p(0, 1) = 0.1;
+  matrix_p(1, 0) = 0.1;
+  matrix_p(1, 1) = 0.1;
+  EXPECT_EQ(mrac_controller.CheckLyapunovPD(matrix_a, matrix_p), true);
 }
 
 }  // namespace control
