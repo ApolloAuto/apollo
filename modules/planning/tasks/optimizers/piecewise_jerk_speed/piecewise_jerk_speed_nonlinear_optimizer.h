@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include "modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h"
+#include "modules/planning/math/piecewise_jerk/piecewise_jerk_path_problem.h"
 #include "modules/planning/tasks/optimizers/speed_optimizer.h"
 
 namespace apollo {
@@ -35,6 +37,8 @@ class PiecewiseJerkSpeedNonlinearOptimizer : public SpeedOptimizer {
   common::Status Process(const PathData& path_data,
                          const common::TrajectoryPoint& init_point,
                          SpeedData* const speed_data) override;
+
+  PiecewiseJerkTrajectory1d SmoothSpeedLimit(const SpeedLimit& speed_limit);
 };
 
 }  // namespace planning
