@@ -57,6 +57,10 @@ bool ContainerSubmodule::Init() {
   // TODO(kechxu) change topic name when finalized
   container_writer_ =
       node_->CreateWriter<ContainerOutput>(FLAGS_prediction_topic);
+
+  adc_container_writer_ =
+      node_->CreateWriter<ADCTrajectoryContainer>(FLAGS_prediction_topic);
+
   return true;
 }
 
@@ -69,9 +73,17 @@ bool ContainerSubmodule::Proc(
           AdapterConfig::PERCEPTION_OBSTACLES);
   CHECK_NOTNULL(obstacles_container_ptr);
 
+  auto adc_trajectory_container_ptr =
+      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
+          AdapterConfig::PLANNING_TRAJECTORY);
+  CHECK_NOTNULL(adc_trajectory_container_ptr);
+
   ContainerOutput container_output =
       obstacles_container_ptr->GetContainerOutput();
   container_writer_->Write(std::make_shared<ContainerOutput>(container_output));
+
+  adc_container_writer_->Write(
+      std::shared_ptr<ADCTrajectoryContainer>(adc_trajectory_container_ptr));
 
   return true;
 }
