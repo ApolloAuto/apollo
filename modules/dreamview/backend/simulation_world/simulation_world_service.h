@@ -50,6 +50,7 @@
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/storytelling/proto/story.pb.h"
 
 /**
  * @namespace apollo::dreamview
@@ -371,6 +372,8 @@ class SimulationWorldService {
       routing_request_reader_;
   std::shared_ptr<cyber::Reader<apollo::routing::RoutingResponse>>
       routing_response_reader_;
+  std::shared_ptr<cyber::Reader<apollo::storytelling::Stories>>
+      storytelling_reader_;
 
   // Writers.
   std::shared_ptr<cyber::Writer<apollo::relative_map::NavigationInfo>>

@@ -74,21 +74,13 @@ $monitor-header-height: 32px;
             }
         }
     }
-}
 
-.pnc-monitor {
-    .scatter-graph {
-        margin: 0px;
-        border: 1px #000000;
-        border-style: solid none;
-    }
-
-    .scenario-history-container {
+    .monitor-table-container {
         padding: 10px;
         font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
         font-weight: normal;
 
-        .scenario-history-title {
+        .monitor-table-title {
             margin: 5px;
             border-bottom: 1px solid rgba(153, 153, 153, 0.5);
             padding-bottom: 5px;
@@ -98,11 +90,11 @@ $monitor-header-height: 32px;
             text-align: center;
         }
 
-        .scenario-history-table {
+        .monitor-table {
             position: relative;
             width: 100%;
 
-            .scenario-history-item {
+            .monitor-table-item {
                 position: relative;
                 width: 100%;
 
@@ -118,7 +110,25 @@ $monitor-header-height: 32px;
                 .time {
                     text-align: center;
                 }
+
+                .active {
+                    color: #FFFFFF;
+                }
             }
+        }
+    }
+}
+
+.pnc-monitor {
+    .scatter-graph {
+        margin: 0px;
+
+        &:not(:first-child) {
+            border-top: 1px solid #000000;
+        }
+
+        &:only-child {
+            border-bottom: 1px solid #000000;
         }
     }
 }

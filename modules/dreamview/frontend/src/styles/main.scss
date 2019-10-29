@@ -263,6 +263,10 @@ body {
         }
 
         .react-tabs {
+            &:not(:last-child) {
+                border-bottom: 2px solid #000000;
+            }
+
             &__tab-list {
                 display: table;
                 width: 100%;
