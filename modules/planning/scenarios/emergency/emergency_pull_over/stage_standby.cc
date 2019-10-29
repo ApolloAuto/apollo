@@ -40,19 +40,23 @@ using apollo::common::TrajectoryPoint;
 
 Stage::StageStatus EmergencyPullOverStageStandby::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
-  ADEBUG << "stage: Stop";
+  ADEBUG << "stage: Standby";
   CHECK_NOTNULL(frame);
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
+
+  auto& reference_line_info = frame->mutable_reference_line_info()->front();
+
+  // set vehicle signal
+  reference_line_info.SetEmergencyLight();
+
+  // reset cruise_speed
+  reference_line_info.SetCruiseSpeed(FLAGS_default_cruise_speed);
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
     AERROR << "EmergencyPullOverStageStandby planning error";
   }
-
-  // reset cruise_speed
-  auto& reference_line_info = frame->mutable_reference_line_info()->front();
-  reference_line_info.SetCruiseSpeed(FLAGS_default_cruise_speed);
 
   // TODO(all): add a stop fence ahead of ADC
 
