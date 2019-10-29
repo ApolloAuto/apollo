@@ -151,11 +151,10 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
 
   ptr_interface->set_path(path_data);
 
-  // TODO(Hongyi): enable speed_limit fitting curve
-  // const SpeedLimit& speed_limit = st_graph_data.speed_limit();
-  // PiecewiseJerkTrajectory1d smooth_speed_limit =
-  //     SmoothSpeedLimit(const SpeedLimit& speed_limit);
-  // ptr_interface->set_speed_limit_curve(smooth_speed_limit);
+  // TODO(Hongyi): add debug_info for speed_limit fitting curve
+  const SpeedLimit& speed_limit = st_graph_data.speed_limit();
+  PiecewiseJerkTrajectory1d smooth_speed_limit = SmoothSpeedLimit(speed_limit);
+  ptr_interface->set_speed_limit_curve(smooth_speed_limit);
 
   // TODO(Jinyun): add ref_s into optimizer
   ptr_interface->set_w_overall_a(
