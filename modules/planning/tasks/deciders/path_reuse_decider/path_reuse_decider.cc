@@ -27,7 +27,6 @@
 
 namespace apollo {
 namespace planning {
-// #define ADEBUG AINFO
 
 using apollo::common::Status;
 using apollo::common::math::Polygon2d;
@@ -44,16 +43,27 @@ Status PathReuseDecider::Process(Frame* const frame,
   // Sanity checks.
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
-  ADEBUG << frame->current_frame_planned_path().size();
-  if (!Decider::config_.path_reuse_decider_config().reuse_path() ||
-      frame->current_frame_planned_path().size() > 0) {
-    return Status::OK();
-  }
+
+  // active path reuse during change_lane only
+  auto* lane_change_status = PlanningContext::Instance()
+                                 ->mutable_planning_status()
+                                 ->mutable_change_lane();
+
+  // skip path reuse if not in_change_lane
+  ADEBUG << "lane change status: " << lane_change_status->ShortDebugString();
 
   // check front static blocking obstacle
   auto* mutable_path_reuse_decider_status = PlanningContext::Instance()
                                                 ->mutable_planning_status()
                                                 ->mutable_path_reuse_decider();
+
+  if (!lane_change_status->is_current_opt_succeed() &&
+      !Decider::config_.path_reuse_decider_config().reuse_path()) {
+    ADEBUG << "skipping reusing path";
+    mutable_path_reuse_decider_status->set_reused_path(false);
+    return Status::OK();
+  }
+
   auto* mutable_path_decider_status = PlanningContext::Instance()
                                           ->mutable_planning_status()
                                           ->mutable_path_decider();
@@ -93,6 +103,7 @@ Status PathReuseDecider::Process(Frame* const frame,
          IsIgnoredBlockingObstacle(reference_line_info)) &&
         TrimHistoryPath(frame, reference_line_info)) {
       // enable reuse path
+      ++reusable_path_counter_;
       mutable_path_reuse_decider_status->set_reused_path(true);
     }
   }
@@ -277,15 +288,28 @@ bool PathReuseDecider::NotShortPath(const DiscretizedPath& current_path) {
 
 bool PathReuseDecider::TrimHistoryPath(
     Frame* frame, ReferenceLineInfo* const reference_line_info) {
-  constexpr double kSPathBuffer = 0.5;
-  constexpr double kSPathTrimBuffer = 0.1;
   const ReferenceLine& reference_line = reference_line_info->reference_line();
   const auto& history_frame = FrameHistory::Instance()->Latest();
-
   if (!history_frame) {
     ADEBUG << "no history frame";
     return false;
   }
+
+  const common::TrajectoryPoint history_planning_start_point =
+      history_frame->PlanningStartPoint();
+  common::PathPoint history_init_path_point =
+      history_planning_start_point.path_point();
+  ADEBUG << "history_init_path_point x:[" << std::setprecision(9)
+         << history_init_path_point.x() << "], y["
+         << history_init_path_point.y() << "], s: ["
+         << history_init_path_point.s() << "]";
+
+  const common::TrajectoryPoint planning_start_point =
+      frame->PlanningStartPoint();
+  common::PathPoint init_path_point = planning_start_point.path_point();
+  ADEBUG << "init_path_point x:[" << std::setprecision(9) << init_path_point.x()
+         << "], y[" << init_path_point.y() << "], s: [" << init_path_point.s()
+         << "]";
 
   const DiscretizedPath& history_path =
       history_frame->current_frame_planned_path();
@@ -297,35 +321,44 @@ bool PathReuseDecider::TrimHistoryPath(
   size_t path_start_index = 0;
 
   for (size_t i = 0; i < history_path.size(); ++i) {
+    // find previous init point
+    if (history_path[i].s() > 0) {
+      path_start_index = i;
+      break;
+    }
+  }
+  ADEBUG << "!!!path_start_index[" << path_start_index << "]";
+
+  // get current s=0
+  common::SLPoint init_path_position_sl;
+  reference_line.XYToSL(init_path_point, &init_path_position_sl);
+  bool inserted_init_point = false;
+
+  for (size_t i = path_start_index; i < history_path.size(); ++i) {
     common::SLPoint path_position_sl;
     common::math::Vec2d path_position = {history_path[i].x(),
                                          history_path[i].y()};
 
     reference_line.XYToSL(path_position, &path_position_sl);
 
-    // TODO(SHU): determine s of path init point
-    double updated_s =
-        path_position_sl.s() - adc_position_sl.s() - kSPathBuffer;
+    double updated_s = path_position_sl.s() - init_path_position_sl.s();
+    // insert init point
+    if (updated_s > 0 && !inserted_init_point) {
+      trimmed_path.emplace_back(init_path_point);
+      trimmed_path.back().set_s(0);
+      inserted_init_point = true;
+    }
 
     trimmed_path.emplace_back(history_path[i]);
-    if (i < 10) {
+
+    if (i < 50) {
       ADEBUG << "path_point:[" << i << "]" << updated_s;
+      path_position_sl.s();
+      ADEBUG << std::setprecision(9) << "path_point:[" << i << "]"
+             << "x: [" << history_path[i].x() << "], y:[" << history_path[i].y()
+             << "]. s[" << history_path[i].s() << "]";
     }
     trimmed_path.back().set_s(updated_s);
-  }
-
-  // find trimmed point
-  for (size_t i = 0; i < trimmed_path.size(); ++i) {
-    if (trimmed_path[i].s() < -1.0 * kSPathTrimBuffer) {
-      path_start_index = i;
-    }
-  }
-
-  ADEBUG << "!!!path_start_index[" << path_start_index << "]";
-
-  // trim path
-  if (path_start_index) {
-    trimmed_path.erase(trimmed_path.begin() + path_start_index);
   }
 
   ADEBUG << "trimmed_path[0]: " << trimmed_path.front().s();
@@ -340,8 +373,8 @@ bool PathReuseDecider::TrimHistoryPath(
   auto path_data = reference_line_info->mutable_path_data();
   ADEBUG << "previous path_data size: " << history_path.size();
   path_data->SetReferenceLine(&reference_line);
-  path_data->SetDiscretizedPath(DiscretizedPath(std::move(trimmed_path)));
   ADEBUG << "previous path_data size: " << path_data->discretized_path().size();
+  path_data->SetDiscretizedPath(DiscretizedPath(std::move(trimmed_path)));
   ADEBUG << "not short path: " << trimmed_path.size();
   ADEBUG << "current path size: "
          << reference_line_info->path_data().discretized_path().size();
