@@ -101,16 +101,30 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       // pull over scenario.
       const auto& pull_over_status =
           PlanningContext::Instance()->planning_status().pull_over();
+      const auto& emergency_pull_over_status =
+          PlanningContext::Instance()->planning_status().emergency_pull_over();
 
       // Set end lateral to be at the desired pull over destination
+      bool pull_over = false;
+      double pull_over_x;
+      double pull_over_y;
       if (pull_over_status.has_position() &&
           pull_over_status.position().has_x() &&
-          pull_over_status.position().has_y() &&
+          pull_over_status.position().has_y()) {
+        pull_over_x = pull_over_status.position().x();
+        pull_over_y = pull_over_status.position().y();
+        pull_over = true;
+      } else if (emergency_pull_over_status.has_position() &&
+          emergency_pull_over_status.position().has_x() &&
+          emergency_pull_over_status.position().has_y()) {
+        pull_over_x = emergency_pull_over_status.position().x();
+        pull_over_y = emergency_pull_over_status.position().y();
+        pull_over = true;
+      }
+      if (pull_over &&
           path_boundary.label().find("pullover") != std::string::npos) {
         common::SLPoint pull_over_sl;
-        reference_line.XYToSL(
-            {pull_over_status.position().x(), pull_over_status.position().y()},
-            &pull_over_sl);
+        reference_line.XYToSL({pull_over_x, pull_over_y}, &pull_over_sl);
         end_state[0] = pull_over_sl.l();
       }
     }
