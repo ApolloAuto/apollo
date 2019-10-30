@@ -10,6 +10,7 @@ import Options from "store/options";
 import PlanningData from "store/planning_data";
 import Playback from "store/playback";
 import RouteEditingManager from "store/route_editing_manager";
+import StoryTellers from "store/story_tellers";
 import Teleop from "store/teleop";
 import TrafficSignal from "store/traffic_signal";
 
@@ -55,6 +56,8 @@ class DreamviewStore {
     @observable moduleDelay = observable.map();
 
     @observable cameraData = new CameraData();
+
+    @observable storyTellers = new StoryTellers();
 
     @observable teleop = new Teleop();
 
@@ -233,6 +236,7 @@ class DreamviewStore {
 
         this.updateCustomizedToggles(world);
         if (this.options.showPNCMonitor) {
+            this.storyTellers.update(world);
             this.planningData.update(world);
             this.controlData.update(world, this.hmi.vehicleParam);
             this.latency.update(world);

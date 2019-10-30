@@ -197,7 +197,7 @@ message Notification {
   optional apollo.common.monitor.MonitorMessageItem item = 2;
 }
 
-// Next-id: 28
+// Next-id: 29
 message SimulationWorld {
   // Timestamp in milliseconds
   optional double timestamp = 1;
@@ -270,4 +270,7 @@ message SimulationWorld {
 
   // Perception detected signals
   repeated Object perceived_signal = 27;
+
+  // A map from a story name to whether it is on
+  map<string, bool> stories = 28;
 }

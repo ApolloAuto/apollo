@@ -596,6 +596,11 @@
                   "rule": "repeated",
                   "type": "Object",
                   "id": 27
+                },
+                "stories": {
+                  "keyType": "string",
+                  "type": "bool",
+                  "id": 28
                 }
               }
             },
@@ -3748,6 +3753,13 @@
                   "options": {
                     "default": 1
                   }
+                },
+                "isLaneChanging": {
+                  "type": "bool",
+                  "id": 81,
+                  "options": {
+                    "default": false
+                  }
                 }
               }
             },
@@ -5043,6 +5055,73 @@
                 }
               }
             },
+            "PiecewiseJerkNonlinearSpeedConfig": {
+              "fields": {
+                "accWeight": {
+                  "type": "double",
+                  "id": 1,
+                  "options": {
+                    "default": 500
+                  }
+                },
+                "jerkWeight": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 100
+                  }
+                },
+                "latAccWeight": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 500
+                  }
+                },
+                "refSWeight": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "refVWeight": {
+                  "type": "double",
+                  "id": 5,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "endSWeight": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "endVWeight": {
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "endAWeight": {
+                  "type": "double",
+                  "id": 8,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "useWarmStart": {
+                  "type": "bool",
+                  "id": 100,
+                  "options": {
+                    "default": true
+                  }
+                }
+              }
+            },
             "PiecewiseJerkPathConfig": {
               "fields": {
                 "defaultPathConfig": {
@@ -6032,7 +6111,8 @@
                     "laneChangeDeciderConfig",
                     "ruleBasedStopDeciderConfig",
                     "pathReuseDeciderConfig",
-                    "stBoundsDeciderConfig"
+                    "stBoundsDeciderConfig",
+                    "piecewiseJerkNonlinearSpeedConfig"
                   ]
                 }
               },
@@ -6116,6 +6196,10 @@
                 "stBoundsDeciderConfig": {
                   "type": "STBoundsDeciderConfig",
                   "id": 28
+                },
+                "piecewiseJerkNonlinearSpeedConfig": {
+                  "type": "PiecewiseJerkNonlinearSpeedConfig",
+                  "id": 29
                 }
               },
               "nested": {
@@ -6145,7 +6229,8 @@
                     "LANE_CHANGE_DECIDER": 28,
                     "RULE_BASED_STOP_DECIDER": 29,
                     "PATH_REUSE_DECIDER": 30,
-                    "ST_BOUNDS_DECIDER": 31
+                    "ST_BOUNDS_DECIDER": 31,
+                    "PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER": 32
                   }
                 }
               }
@@ -6176,7 +6261,7 @@
                     "default": 3
                   }
                 },
-                "approachSpeedLimit": {
+                "approachCruiseSpeed": {
                   "type": "double",
                   "id": 4,
                   "options": {
@@ -6293,25 +6378,39 @@
                     "default": 5
                   }
                 },
-                "maxValidStopDistance": {
+                "approachCruiseSpeed": {
                   "type": "double",
                   "id": 2,
+                  "options": {
+                    "default": 2.78
+                  }
+                },
+                "maxValidStopDistance": {
+                  "type": "double",
+                  "id": 3,
                   "options": {
                     "default": 3.5
                   }
                 },
                 "minPassSDistance": {
                   "type": "double",
-                  "id": 3,
+                  "id": 4,
                   "options": {
                     "default": 3
                   }
                 },
                 "creepTimeoutSec": {
                   "type": "float",
-                  "id": 4,
+                  "id": 5,
                   "options": {
                     "default": 10
+                  }
+                },
+                "maxAdcSpeedBeforeCreep": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 5.56
                   }
                 }
               }
@@ -6358,6 +6457,13 @@
                   "id": 6,
                   "options": {
                     "default": 10
+                  }
+                },
+                "maxAdcSpeedBeforeCreep": {
+                  "type": "double",
+                  "id": 7,
+                  "options": {
+                    "default": 3
                   }
                 }
               }
@@ -6642,16 +6748,16 @@
                     "NO_STAGE": 0,
                     "LANE_FOLLOW_DEFAULT_STAGE": 1,
                     "BARE_INTERSECTION_UNPROTECTED_APPROACH": 200,
-                    "BARE_INTERSECTION_UNPROTECTED_CREEP": 201,
-                    "BARE_INTERSECTION_UNPROTECTED_INTERSECTION_CRUISE": 202,
+                    "BARE_INTERSECTION_UNPROTECTED_INTERSECTION_CRUISE": 201,
                     "STOP_SIGN_UNPROTECTED_PRE_STOP": 300,
                     "STOP_SIGN_UNPROTECTED_STOP": 301,
                     "STOP_SIGN_UNPROTECTED_CREEP": 302,
                     "STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE": 303,
                     "TRAFFIC_LIGHT_PROTECTED_APPROACH": 400,
                     "TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE": 401,
-                    "TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP": 410,
-                    "TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_INTERSECTION_CRUISE": 411,
+                    "TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_APPROACH": 410,
+                    "TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP": 411,
+                    "TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_INTERSECTION_CRUISE": 412,
                     "TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP": 420,
                     "TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP": 421,
                     "TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE": 422,
@@ -6896,6 +7002,17 @@
                 "laneChangeStartPosition": {
                   "type": "apollo.common.Point3D",
                   "id": 5
+                },
+                "lastSucceedTimestamp": {
+                  "type": "double",
+                  "id": 6
+                },
+                "isCurrentOptSucceed": {
+                  "type": "bool",
+                  "id": 7,
+                  "options": {
+                    "default": false
+                  }
                 }
               },
               "nested": {
@@ -6903,7 +7020,7 @@
                   "values": {
                     "IN_CHANGE_LANE": 1,
                     "CHANGE_LANE_FAILED": 2,
-                    "CHANGE_LANE_SUCCESS": 3
+                    "CHANGE_LANE_FINISHED": 3
                   }
                 }
               }

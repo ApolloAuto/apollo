@@ -2,14 +2,15 @@
 import "styles/monitor.scss";
 
 import React from "react";
-import { Tab } from "react-tabs";
+import { Tabs, TabList, Tab, TabPanel } from "react-tabs";
+
+import { MONITOR_MENU } from "store/options";
 
 import CameraParam from "components/CameraParam";
+import { CameraVideo } from "components/Tasks/SensorCamera";
 import DataCollectionMonitor from "components/DataCollectionMonitor";
 import PNCMonitor from "components/PNCMonitor";
 import TeleOpConsole from "components/TeleopMonitor/TeleopConsole";
-import { CameraVideo } from "components/Tasks/SensorCamera";
-import { MONITOR_MENU } from "store/options";
 
 export default class MonitorPanel extends React.Component {
     renderMonitor() {
@@ -38,10 +39,14 @@ export default class MonitorPanel extends React.Component {
         return (
             <div className="right-pane">
                 {showCameraVideo &&
-                    <div>
-                        <Tab><span>Camera View</span></Tab>
-                        <CameraVideo />
-                    </div>
+                    <Tabs>
+                        <TabList>
+                            <Tab>Camera View</Tab>
+                        </TabList>
+                        <TabPanel>
+                            <CameraVideo />
+                        </TabPanel>
+                    </Tabs>
                 }
                 {this.renderMonitor()}
             </div>

@@ -33,6 +33,7 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
+        "//modules/storytelling/proto:story_proto",
         "//third_party/json",
     ],
 )
