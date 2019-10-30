@@ -42,7 +42,7 @@ class WaypointSampler {
  public:
   explicit WaypointSampler(const WaypointSamplerConfig &config)
       : config_(config) {}
-  ~WaypointSampler() = default;
+  virtual ~WaypointSampler() = default;
 
   virtual void Init(const ReferenceLineInfo *reference_line_info,
                     const common::SLPoint &init_sl_point_,

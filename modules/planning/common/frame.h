@@ -72,6 +72,8 @@ class Frame {
         const common::TrajectoryPoint &planning_start_point,
         const common::VehicleState &vehicle_state);
 
+  virtual ~Frame() = default;
+
   const common::TrajectoryPoint &PlanningStartPoint() const;
 
   common::Status Init(

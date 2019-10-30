@@ -71,6 +71,8 @@ DECLARE_string(test_previous_planning_file);
 
 class PlanningTestBase : public ::testing::Test {
  public:
+  virtual ~PlanningTestBase() = default;
+
   static void SetUpTestCase();
   virtual void SetUp();
   void UpdateData();
