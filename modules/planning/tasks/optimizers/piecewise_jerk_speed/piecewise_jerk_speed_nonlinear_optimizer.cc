@@ -235,6 +235,7 @@ PiecewiseJerkTrajectory1d
 PiecewiseJerkSpeedNonlinearOptimizer::SmoothSpeedLimit(
     const SpeedLimit& speed_limit) {
   // using piecewise_jerk_path to fit a curve of speed_ref
+  // TODO(Hongyi): move smooth configs to gflags
   double delta_s = 2.0;
   std::vector<double> speed_ref;
   for (int i = 0; i < 100; ++i) {
