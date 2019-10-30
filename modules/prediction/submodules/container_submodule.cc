@@ -69,7 +69,7 @@ bool ContainerSubmodule::Init() {
 bool ContainerSubmodule::Proc(
     const std::shared_ptr<PerceptionObstacles>& perception_message) {
   MessageProcess::ContainerProcess(*perception_message);
-  double frame_start_time = Clock::NowInSeconds();
+  const double frame_start_time = Clock::NowInSeconds();
   auto obstacles_container_ptr =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);

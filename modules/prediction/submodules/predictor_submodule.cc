@@ -49,11 +49,11 @@ bool PredictorSubmodule::Init() {
 bool PredictorSubmodule::Proc(
     const std::shared_ptr<EvaluatorOutput>& evaluator_output,
     const std::shared_ptr<ADCTrajectoryContainer>& adc_trajectory_container) {
-  apollo::common::Header perception_header =
+  const apollo::common::Header& perception_header =
       evaluator_output->submodule_output().perception_header();
-  apollo::common::ErrorCode perception_error_code =
+  const apollo::common::ErrorCode& perception_error_code =
       evaluator_output->submodule_output().perception_error_code();
-  double frame_start_time =
+  const double frame_start_time =
       evaluator_output->submodule_output().frame_start_time();
   ObstaclesContainer obstacles_container(evaluator_output->submodule_output());
   PredictorManager::Instance()->Run(adc_trajectory_container.get(),
