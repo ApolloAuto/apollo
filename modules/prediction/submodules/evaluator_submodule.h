@@ -27,6 +27,7 @@
 #include "cyber/component/component.h"
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/submodules/container_output.h"
 
 namespace apollo {
 namespace prediction {

@@ -27,9 +27,9 @@ cc_library(
 )
 
 cc_library(
-    name = "container_output",
-    srcs = ["container_output.cc"],
-    hdrs = ["container_output.h"],
+    name = "submodule_output",
+    srcs = ["submodule_output.cc"],
+    hdrs = ["submodule_output.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
@@ -38,6 +38,30 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container/obstacles:obstacle",
+    ],
+)
+
+cc_library(
+    name = "container_output",
+    srcs = ["container_output.cc"],
+    hdrs = ["container_output.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
+    deps = [
+        "//modules/prediction/submodules:submodule_output",
+    ],
+)
+
+cc_library(
+    name = "evaluator_output",
+    srcs = ["evaluator_output.cc"],
+    hdrs = ["evaluator_output.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
+    deps = [
+        "//modules/prediction/submodules:submodule_output",
     ],
 )
 

@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <utility>
+
 #include "modules/prediction/submodules/container_submodule.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
@@ -78,8 +80,9 @@ bool ContainerSubmodule::Proc(
           AdapterConfig::PLANNING_TRAJECTORY);
   CHECK_NOTNULL(adc_trajectory_container_ptr);
 
-  ContainerOutput container_output =
-      obstacles_container_ptr->GetContainerOutput();
+  SubmoduleOutput submodule_output =
+      obstacles_container_ptr->GetSubmoduleOutput();
+  ContainerOutput container_output(std::move(submodule_output));
   container_writer_->Write(std::make_shared<ContainerOutput>(container_output));
 
   adc_container_writer_->Write(
