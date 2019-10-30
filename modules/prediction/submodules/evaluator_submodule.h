@@ -28,6 +28,7 @@
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/submodules/container_output.h"
+#include "modules/prediction/submodules/evaluator_output.h"
 
 namespace apollo {
 namespace prediction {
@@ -58,7 +59,7 @@ class EvaluatorSubmodule : public cyber::Component<ContainerOutput> {
   bool Proc(const std::shared_ptr<ContainerOutput>&) override;
 
  private:
-  // TODO(kechxu) define writer
+  std::shared_ptr<cyber::Writer<EvaluatorOutput>> evaluator_writer_;
 };
 
 CYBER_REGISTER_COMPONENT(EvaluatorSubmodule)

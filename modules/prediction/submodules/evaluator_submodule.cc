@@ -45,8 +45,9 @@ bool EvaluatorSubmodule::Proc(
   ObstaclesContainer obstacles_container(
       container_output->submodule_output());
   EvaluatorManager::Instance()->Run(&obstacles_container);
-
-  // TODO(kechxu) write the output
+  SubmoduleOutput submodule_output = obstacles_container.GetSubmoduleOutput();
+  EvaluatorOutput evaluator_output(std::move(submodule_output));
+  evaluator_writer_->Write(std::make_shared<EvaluatorOutput>(evaluator_output));
   return true;
 }
 
