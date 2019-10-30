@@ -40,6 +40,8 @@ class Spline1dSolver {
         constraint_(x_knots, order),
         kernel_(x_knots, order) {}
 
+  virtual ~Spline1dSolver() = default;
+
   virtual void Reset(const std::vector<double>& x_knots, const uint32_t order) {
     spline_ = Spline1d(x_knots, order);
     constraint_ = Spline1dConstraint(x_knots, order);
