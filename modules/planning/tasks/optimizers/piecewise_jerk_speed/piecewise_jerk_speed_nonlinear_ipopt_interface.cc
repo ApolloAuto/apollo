@@ -181,9 +181,9 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::get_starting_point(
     bool init_lambda, double *lambda) {
   if (!x_warm_start_.empty()) {
     for (int i = 0; i < num_of_points_; ++i) {
-      x[i] = x_warm_start_[5 * i][0];
-      x[v_offset_ + i] = x_warm_start_[5 * i][1];
-      x[a_offset_ + i] = x_warm_start_[5 * i][2];
+      x[i] = x_warm_start_[i][0];
+      x[v_offset_ + i] = x_warm_start_[i][1];
+      x[a_offset_ + i] = x_warm_start_[i][2];
     }
     return true;
   }
@@ -812,9 +812,7 @@ void PiecewiseJerkSpeedNonlinearIpoptInterface::set_w_reference_speed(
 
 void PiecewiseJerkSpeedNonlinearIpoptInterface::set_warm_start(
     std::vector<std::vector<double>> speed_profile) {
-  if (speed_profile.size() >= 5 * (static_cast<size_t>(num_of_points_) - 1)) {
-    x_warm_start_ = speed_profile;
-  }
+  x_warm_start_ = speed_profile;
 }
 }  // namespace planning
 }  // namespace apollo
