@@ -176,6 +176,24 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
 
   ptr_interface->set_warm_start(warm_start);
 
+  // TODO(Jinyun): evaluate the performance of piecewise linear warm start st
+  // profile, will try piecewise polynomial st profile
+  std::vector<std::vector<double>> warm_start;
+  SpeedData reference_speed_data = *speed_data;
+  for (int i = 0; i < num_of_knots; ++i) {
+    SpeedPoint sp;
+    if (!reference_speed_data.EvaluateByTime(i * delta_t, &sp)) {
+      std::string msg("retriving dp st data for speed optimization failed!");
+      AERROR << msg;
+      speed_data->clear();
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+    }
+    warm_start.emplace_back(
+        std::initializer_list<double>{sp.s(), sp.v(), sp.a()});
+  }
+
+  ptr_interface->set_warm_start(warm_start);
+
   ptr_interface->set_w_overall_a(
       piecewise_jerk_nonlinear_speed_config.acc_weight());
   ptr_interface->set_w_overall_j(
