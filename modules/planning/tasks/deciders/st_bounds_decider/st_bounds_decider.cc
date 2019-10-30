@@ -38,6 +38,8 @@ namespace {
 using STBoundPoint = std::tuple<double, double, double>;
 // STBound is a vector of STBoundPoints
 using STBound = std::vector<STBoundPoint>;
+// ObsDecSet is a set of decision for new obstacles.
+using ObsDecSet = std::vector<std::pair<std::string, ObjectDecisionType>>;
 }  // namespace
 
 STBoundsDecider::STBoundsDecider(const TaskConfig& config) : Decider(config) {
@@ -119,11 +121,12 @@ Status STBoundsDecider::GenerateRegularSTBound(STBound* const st_bound) {
 
     // Get Boundary due to driving limits
     auto driving_limits_bound = st_driving_limits_.GetVehicleDynamicsLimits(t);
+    s_lower = std::fmax(s_lower, driving_limits_bound.first);
+    s_upper = std::fmin(s_upper, driving_limits_bound.second);
 
     // Get Boundary due to obstacles
     std::vector<std::pair<double, double>> available_s_bounds;
-    std::vector<std::vector<std::pair<std::string, ObjectDecisionType>>>
-        available_obs_decisions;
+    std::vector<ObsDecSet> available_obs_decisions;
     if (!st_obstacles_processor_.GetSBoundsFromDecisions(
             t, &available_s_bounds, &available_obs_decisions)) {
       const std::string msg =
@@ -131,14 +134,19 @@ Status STBoundsDecider::GenerateRegularSTBound(STBound* const st_bound) {
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
-    s_lower = std::fmax(s_lower, driving_limits_bound.first);
-    s_upper = std::fmin(s_upper, driving_limits_bound.second);
+    std::vector<std::pair<STBoundPoint, ObsDecSet>> available_choices;
+    for (int j = 0; j < static_cast<int>(available_s_bounds.size()); ++j) {
+      available_choices.emplace_back(
+          std::make_tuple(0.0, available_s_bounds[j].first,
+                          available_s_bounds[j].second),
+          available_obs_decisions[j]);
+    }
 
     if (available_s_bounds.size() >= 1) {
       RankDecisions(st_guide_line_.GetGuideSFromT(t), driving_limits_bound,
-                    &available_s_bounds, &available_obs_decisions);
-      s_lower = std::fmax(s_lower, available_s_bounds.front().first);
-      s_upper = std::fmin(s_upper, available_s_bounds.front().second);
+                    &available_choices);
+      // s_lower = std::fmax(s_lower, available_s_bounds.front().first);
+      // s_upper = std::fmin(s_upper, available_s_bounds.front().second);
     }
 
     // Update into st_bound
@@ -150,11 +158,49 @@ Status STBoundsDecider::GenerateRegularSTBound(STBound* const st_bound) {
 
 void STBoundsDecider::RankDecisions(
     double s_guide_line, std::pair<double, double> driving_limit,
-    std::vector<std::pair<double, double>>* const available_s_bounds,
-    std::vector<std::vector<std::pair<std::string, ObjectDecisionType>>>* const
-        available_obs_decisions) {
-  // TODO(jiacheng): implement this.
-  return;
+    std::vector<std::pair<STBoundPoint, ObsDecSet>>* available_choices) {
+  bool has_swaps = true;
+  while (has_swaps) {
+    has_swaps = false;
+    for (int i = 0; i < static_cast<int>(available_choices->size()) - 1; ++i) {
+      double A_s_lower = 0.0;
+      double A_s_upper = 0.0;
+      std::tie(std::ignore, A_s_lower, A_s_upper) =
+          available_choices->at(i).first;
+      double B_s_lower = 0.0;
+      double B_s_upper = 0.0;
+      std::tie(std::ignore, B_s_lower, B_s_upper) =
+          available_choices->at(i+1).first;
+
+      // If not both are larger than passable-threshold, should select
+      // the one with larger room.
+      double A_room = std::fmin(driving_limit.second, A_s_upper) -
+                      std::fmax(driving_limit.first, A_s_lower);
+      double B_room = std::fmin(driving_limit.second, B_s_upper) -
+                      std::fmax(driving_limit.first, B_s_lower);
+      if (!(A_room >= kSTPassableThreshold) ||
+          !(B_room >= kSTPassableThreshold)) {
+        if (A_room < B_room) {
+          swap(available_choices->at(i+1), available_choices->at(i));
+          has_swaps = true;
+          continue;
+        }
+      }
+
+      // Should select the one with overlap to guide-line
+      bool A_contains_guideline =
+          A_s_upper >= s_guide_line && A_s_lower <= s_guide_line;
+      bool B_contains_guideline =
+          B_s_upper >= s_guide_line && B_s_lower <= s_guide_line;
+      if (A_contains_guideline != B_contains_guideline) {
+        if (!A_contains_guideline) {
+          swap(available_choices->at(i+1), available_choices->at(i));
+          has_swaps = true;
+          continue;
+        }
+      }
+    }
+  }
 }
 
 void STBoundsDecider::RecordSTGraphDebug(
