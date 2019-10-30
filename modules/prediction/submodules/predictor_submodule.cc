@@ -14,44 +14,38 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <utility>
+#include "modules/prediction/submodules/predictor_submodule.h"
 
-#include "modules/prediction/submodules/evaluator_submodule.h"
+#include <utility>
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/time/time.h"
-#include "modules/prediction/common/message_process.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
-#include "modules/prediction/evaluator/evaluator_manager.h"
+#include "modules/prediction/predictor/predictor_manager.h"
 
 namespace apollo {
 namespace prediction {
 
-EvaluatorSubmodule::~EvaluatorSubmodule() {}
+PredictorSubmodule::~PredictorSubmodule() {}
 
-std::string EvaluatorSubmodule::Name() const {
+std::string PredictorSubmodule::Name() const {
   return FLAGS_evaluator_submodule_name;
 }
 
-bool EvaluatorSubmodule::Init() {
+bool PredictorSubmodule::Init() {
   if (!MessageProcess::InitEvaluators()) {
     return false;
   }
-  // TODO(kechxu) change topic name when finalized
-  evaluator_writer_ =
-      node_->CreateWriter<EvaluatorOutput>(FLAGS_prediction_topic);
+  predictor_writer_ =
+      node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
   return true;
 }
 
-bool EvaluatorSubmodule::Proc(
-    const std::shared_ptr<ContainerOutput>& container_output) {
-  ObstaclesContainer obstacles_container(
-      container_output->submodule_output());
-  EvaluatorManager::Instance()->Run(&obstacles_container);
-  SubmoduleOutput submodule_output = obstacles_container.GetSubmoduleOutput();
-  EvaluatorOutput evaluator_output(std::move(submodule_output));
-  evaluator_writer_->Write(std::make_shared<EvaluatorOutput>(evaluator_output));
+bool PredictorSubmodule::Proc(
+    const std::shared_ptr<EvaluatorOutput>& evaluator_output,
+    const std::shared_ptr<ADCTrajectoryContainer>& adc_trajectory_container) {
+  // TODO(kechxu) implement
   return true;
 }
 

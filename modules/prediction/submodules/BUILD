@@ -101,4 +101,35 @@ cc_binary(
     deps = [":evaluator_submodule_lib"],
 )
 
+cc_library(
+    name = "predictor_submodule_lib",
+    srcs = ["predictor_submodule.cc"],
+    hdrs = [
+        "predictor_submodule.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/common/adapters/proto:adapter_config_proto",
+        "//modules/common/time",
+        "//modules/perception/proto:perception_proto",
+        "//modules/prediction/common:message_process",
+        "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
+        "//modules/prediction/predictor:predictor_manager",
+        "//modules/prediction/proto:prediction_proto",
+        "//modules/prediction/submodules:evaluator_output",
+    ],
+)
+
+cc_binary(
+    name = "predictor_submodule.so",
+    linkshared = True,
+    linkstatic = False,
+    deps = [":evaluator_submodule_lib"],
+)
+
 cpplint()
