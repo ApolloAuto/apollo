@@ -33,25 +33,42 @@ void ExtrapolationPredictor::Predict(
 
   obstacle->SetPredictorType(predictor_type_);
 
-  const Feature& feature = obstacle->latest_feature();
+  Feature* feature_ptr = obstacle->mutable_latest_feature();
 
-  if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
+  if (!feature_ptr->lane().has_lane_graph()) {
     AERROR << "Obstacle [" << obstacle->id() << "] has no lane graph.";
     return;
   }
-  std::vector<apollo::common::TrajectoryPoint> trajectory_points;
-  DrawShortTermTrajectory(feature, &trajectory_points);
-  Trajectory trajectory = GenerateTrajectory(trajectory_points);
-  obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
-      trajectory);
+  for (int i = 0; i < feature_ptr->predicted_trajectory_size(); ++i) {
+    Trajectory* trajectory_ptr = feature_ptr->mutable_predicted_trajectory(i);
+    PostProcess(trajectory_ptr);
+  }
 }
 
-void ExtrapolationPredictor::DrawShortTermTrajectory(
-    const Feature& feature,
-    std::vector<apollo::common::TrajectoryPoint>* points) {
-  for (const auto& point : feature.short_term_predicted_trajectory_points()) {
-    points->push_back(point);
+void ExtrapolationPredictor::PostProcess(Trajectory* trajectory_ptr) {
+  // TODO(kechxu) handle corner cases
+  auto lane_search_result = SearchExtrapolationLane(*trajectory_ptr);
+  if (lane_search_result.found) {
+    ExtrapolateByLane(lane_search_result.lane_id, trajectory_ptr);
+  } else {
+    ExtrapolateByFreeMove(trajectory_ptr);
   }
+}
+
+ExtrapolationPredictor::LaneSearchResult
+ExtrapolationPredictor::SearchExtrapolationLane(const Trajectory& trajectory) {
+  LaneSearchResult lane_search_result;
+  // TODO(kechxu) implement
+  return lane_search_result;
+}
+
+void ExtrapolationPredictor::ExtrapolateByLane(
+    const std::string& lane_id, Trajectory* trajectory_ptr) {
+  // TODO(kechxu) implement
+}
+
+void ExtrapolationPredictor::ExtrapolateByFreeMove(Trajectory* trajectory_ptr) {
+  // TODO(kechxu) implement
 }
 
 }  // namespace prediction
