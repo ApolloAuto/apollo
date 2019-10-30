@@ -23,5 +23,9 @@ EvaluatorOutput::EvaluatorOutput(const SubmoduleOutput&& submodule_output) {
   submodule_output_ = submodule_output;
 }
 
+const SubmoduleOutput& EvaluatorOutput::submodule_output() const {
+  return submodule_output_;
+}
+
 }  // namespace prediction
 }  // namespace apollo
