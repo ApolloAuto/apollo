@@ -141,7 +141,7 @@ modules {
     start_command: "car1_run_encoder0.bash start"
     stop_command: "car1_run_encoder0.bash stop"
     process_monitor_config {
-      command_keywords: "car1_encoder"
+      command_keywords: "teleop_video_encoder"
       command_keywords: "encoder0"
     }
   }
@@ -152,7 +152,7 @@ modules {
     start_command: "car1_run_encoder1.bash start"
     stop_command: "car1_run_encoder1.bash stop"
     process_monitor_config {
-      command_keywords: "car1_encoder"
+      command_keywords: "teleop_video_encoder"
       command_keywords: "encoder1"
     }
   }
@@ -163,7 +163,7 @@ modules {
     start_command: "car1_run_encoder2.bash start"
     stop_command: "car1_run_encoder2.bash stop"
     process_monitor_config {
-      command_keywords: "car1_encoder"
+      command_keywords: "teleop_video_encoder"
       command_keywords: "encoder2"
     }
   }
