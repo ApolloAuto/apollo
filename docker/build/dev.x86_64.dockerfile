@@ -44,6 +44,7 @@ RUN apt-get update -y && \
     v4l-utils \
     vim \
     wget \
+    libasound2-dev \
     zip && \
     apt-get clean && rm -rf /var/lib/apt/lists/* && \
     echo '\n\n\n' | ssh-keygen -t rsa
@@ -78,6 +79,7 @@ RUN bash /tmp/installers/install_undistort.sh
 RUN bash /tmp/installers/install_user.sh
 RUN bash /tmp/installers/install_yarn.sh
 RUN bash /tmp/installers/post_install.sh
+RUN bash /tmp/installers/install_opuslib.sh
 
 WORKDIR /apollo
 USER apollo
