@@ -21,11 +21,15 @@
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/message_util.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/predictor/predictor_manager.h"
 
+
 namespace apollo {
 namespace prediction {
+
+using apollo::common::time::Clock;
 
 PredictorSubmodule::~PredictorSubmodule() {}
 
@@ -45,14 +49,29 @@ bool PredictorSubmodule::Init() {
 bool PredictorSubmodule::Proc(
     const std::shared_ptr<EvaluatorOutput>& evaluator_output,
     const std::shared_ptr<ADCTrajectoryContainer>& adc_trajectory_container) {
+  apollo::common::Header perception_header =
+      evaluator_output->submodule_output().perception_header();
+  apollo::common::ErrorCode perception_error_code =
+      evaluator_output->submodule_output().perception_error_code();
+  double frame_start_time =
+      evaluator_output->submodule_output().frame_start_time();
   ObstaclesContainer obstacles_container(evaluator_output->submodule_output());
   PredictorManager::Instance()->Run(adc_trajectory_container.get(),
                                     &obstacles_container);
   PredictionObstacles prediction_obstacles =
       PredictorManager::Instance()->prediction_obstacles();
 
-  // TODO(kechxu) start_time, end_time, header, error_code
+  prediction_obstacles.set_end_timestamp(Clock::NowInSeconds());
+  prediction_obstacles.mutable_header()->set_lidar_timestamp(
+      perception_header.lidar_timestamp());
+  prediction_obstacles.mutable_header()->set_camera_timestamp(
+      perception_header.camera_timestamp());
+  prediction_obstacles.mutable_header()->set_radar_timestamp(
+      perception_header.radar_timestamp());
+  prediction_obstacles.set_perception_error_code(perception_error_code);
+  prediction_obstacles.set_start_timestamp(frame_start_time);
 
+  common::util::FillHeader(node_->Name(), &prediction_obstacles);
   predictor_writer_->Write(
       std::make_shared<PredictionObstacles>(prediction_obstacles));
 
