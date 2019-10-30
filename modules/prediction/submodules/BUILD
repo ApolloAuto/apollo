@@ -90,7 +90,7 @@ cc_library(
         "//modules/prediction/common:message_process",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/evaluator:evaluator_manager",
-        "//modules/prediction/submodules:container_output",
+        "//modules/prediction/submodules:evaluator_output",
     ],
 )
 
