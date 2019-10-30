@@ -141,9 +141,16 @@ Status PathBoundsDecider::Process(
       reference_line_info->SetCandidatePathBoundaries(
           std::move(candidate_path_boundaries));
       ADEBUG << "Completed pullover and fallback path boundaries generation.";
-      *(reference_line_info->mutable_debug()
+      if (is_in_pull_over_scenario_) {
+        *(reference_line_info->mutable_debug()
             ->mutable_planning_data()
             ->mutable_pull_over_status()) = *pull_over_status;
+      } else if (is_in_emergency_pull_over_scenario_) {
+        *(reference_line_info->mutable_debug()
+            ->mutable_planning_data()
+            ->mutable_emergency_pull_over_status()) =
+                *emergency_pull_over_status;
+      }
       return Status::OK();
     }
   }
@@ -449,6 +456,7 @@ Status PathBoundsDecider::GeneratePullOverPathBound(
                               &pull_over_configuration)) {
     if (is_in_emergency_pull_over_scenario_) {
       emergency_pull_over_status->Clear();
+      emergency_pull_over_status->set_is_in_emergency_pull_over_scenario(true);
     } else if (is_in_pull_over_scenario_) {
       pull_over_status->Clear();
       pull_over_status->set_is_feasible(false);
@@ -461,6 +469,7 @@ Status PathBoundsDecider::GeneratePullOverPathBound(
   // and trim the path-bound properly.
   if (is_in_emergency_pull_over_scenario_) {
     emergency_pull_over_status->Clear();
+    emergency_pull_over_status->set_is_in_emergency_pull_over_scenario(true);
     emergency_pull_over_status->mutable_position()->set_x(
         std::get<0>(pull_over_configuration));
     emergency_pull_over_status->mutable_position()->set_y(
@@ -610,7 +619,8 @@ bool PathBoundsDecider::FindEmergencyPullOverS(
   const double adc_end_s = reference_line_info.AdcSlBoundary().end_s();
 
   // TODO(all): to be implemented
-  *pull_over_s = adc_end_s + 10.0;
+
+  *pull_over_s = adc_end_s + 15.0;
   return true;
 }
 
