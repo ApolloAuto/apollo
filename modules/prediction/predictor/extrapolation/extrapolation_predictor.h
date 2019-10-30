@@ -53,9 +53,20 @@ class ExtrapolationPredictor : public SequencePredictor {
                ObstaclesContainer* obstacles_container) override;
 
  private:
-  void DrawShortTermTrajectory(
-      const Feature& feature,
-      std::vector<apollo::common::TrajectoryPoint>* points);
+  struct LaneSearchResult {
+    bool found = false;
+    std::string lane_id = "";
+    int point_index = -1;
+  };
+
+  void PostProcess(Trajectory* trajectory_ptr);
+
+  LaneSearchResult SearchExtrapolationLane(const Trajectory& trajectory);
+
+  void ExtrapolateByLane(const std::string& lane_id,
+                         Trajectory* trajectory_ptr);
+
+  void ExtrapolateByFreeMove(Trajectory* trajectory_ptr);
 };
 
 }  // namespace prediction
