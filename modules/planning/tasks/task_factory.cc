@@ -41,6 +41,7 @@
 #include "modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.h"
 #include "modules/planning/tasks/optimizers/path_time_heuristic/path_time_heuristic_optimizer.h"
 #include "modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_optimizer.h"
+#include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_optimizer.h"
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_optimizer.h"
 #include "modules/planning/tasks/rss/decider_rss.h"
 #include "modules/planning/tasks/task.h"
@@ -86,6 +87,11 @@ void TaskFactory::Init(const PlanningConfig& config) {
                          [](const TaskConfig& config) -> Task* {
                            return new PiecewiseJerkSpeedOptimizer(config);
                          });
+  task_factory_.Register(
+      TaskConfig::PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER,
+      [](const TaskConfig& config) -> Task* {
+        return new PiecewiseJerkSpeedNonlinearOptimizer(config);
+      });
   task_factory_.Register(TaskConfig::DP_ST_SPEED_OPTIMIZER,
                          [](const TaskConfig& config) -> Task* {
                            return new PathTimeHeuristicOptimizer(config);
@@ -119,7 +125,7 @@ void TaskFactory::Init(const PlanningConfig& config) {
                          });
   task_factory_.Register(TaskConfig::ST_BOUNDS_DECIDER,
                          [](const TaskConfig& config) -> Task* {
-                            return new STBoundsDecider(config);
+                           return new STBoundsDecider(config);
                          });
   task_factory_.Register(TaskConfig::OPEN_SPACE_ROI_DECIDER,
                          [](const TaskConfig& config) -> Task* {

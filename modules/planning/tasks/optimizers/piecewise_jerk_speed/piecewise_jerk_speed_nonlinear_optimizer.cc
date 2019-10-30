@@ -144,7 +144,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
   // TODO(Jinyun): refactor state limits interface
   ptr_interface->set_constant_speed_limit(max_velocity);
   ptr_interface->set_s_max(total_length);
-
+  ptr_interface->set_safety_bounds(s_bounds);
   // Set weights and reference values
   const auto& piecewise_jerk_nonlinear_speed_config =
       config_.piecewise_jerk_nonlinear_speed_config();
@@ -160,27 +160,29 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
 
   // TODO(Jinyun): evaluate the performance of piecewise linear warm start st
   // profile, will try piecewise polynomial st profile
-  std::vector<std::vector<double>> warm_start;
-  SpeedData reference_speed_data = *speed_data;
-  for (int i = 0; i < num_of_knots; ++i) {
-    SpeedPoint sp;
-    if (!reference_speed_data.EvaluateByTime(i * delta_t, &sp)) {
-      std::string msg("retriving dp st data for speed optimization failed!");
-      AERROR << msg;
-      speed_data->clear();
-      return Status(ErrorCode::PLANNING_ERROR, msg);
+  if (piecewise_jerk_nonlinear_speed_config.use_warm_start()) {
+    std::vector<std::vector<double>> warm_start;
+    SpeedData reference_speed_data = *speed_data;
+    for (int i = 0; i < num_of_knots; ++i) {
+      SpeedPoint sp;
+      if (!reference_speed_data.EvaluateByTime(i * delta_t, &sp)) {
+        std::string msg("retriving dp st data for speed optimization failed!");
+        AERROR << msg;
+        speed_data->clear();
+        return Status(ErrorCode::PLANNING_ERROR, msg);
+      }
+      warm_start.emplace_back(
+          std::initializer_list<double>{sp.s(), sp.v(), sp.a()});
     }
-    warm_start.emplace_back(
-        std::initializer_list<double>{sp.s(), sp.v(), sp.a()});
+    ptr_interface->set_warm_start(warm_start);
   }
-
-  ptr_interface->set_warm_start(warm_start);
 
   ptr_interface->set_w_overall_a(
       piecewise_jerk_nonlinear_speed_config.acc_weight());
   ptr_interface->set_w_overall_j(
       piecewise_jerk_nonlinear_speed_config.jerk_weight());
-  ptr_interface->set_w_overall_centripetal_acc(500.0);
+  ptr_interface->set_w_overall_centripetal_acc(
+      piecewise_jerk_nonlinear_speed_config.lat_acc_weight());
   ptr_interface->set_reference_speed(FLAGS_default_cruise_speed);
   ptr_interface->set_w_reference_speed(
       piecewise_jerk_nonlinear_speed_config.ref_v_weight());
