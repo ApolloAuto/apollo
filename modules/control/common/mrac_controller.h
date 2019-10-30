@@ -45,8 +45,12 @@ class MracController {
    * @brief initialize mrac controller
    * @param mrac_conf configuration for mrac controller
    * @param dt sampling time interval
+   * @param input_limit physical or designed bound of the input
+   * @param input_rate_limit physical or designed bound of the input
+   * changing-rate
    */
-  void Init(const MracConf &mrac_conf, const double dt);
+  void Init(const MracConf &mrac_conf, const double dt,
+            const double input_limit, const double input_rate_limit);
 
   /**
    * time constant, natrual frequency and damping ratio
@@ -102,12 +106,11 @@ class MracController {
    * @brief calculate the anti-windup compensation with respect to the integral
    * windup issue
    * @param control_command desired control command for the actuator
-   * @param upper_bound the physical or designed upper bound of the actuator
-   * @param upper_bound the physical or designed lower bound of the actuator
+   * @param previous_command last control command for the actuator
+   * @param dt control sampling time
    */
   void AntiWindupCompensation(const double control_command,
-                              const double upper_bound,
-                              const double lower_bound);
+                              const double previous_command, const double dt);
 
   /**
    * @brief reset all the variables (including all the states, gains and
@@ -134,6 +137,17 @@ class MracController {
    */
   virtual double Control(const double command, const Eigen::MatrixXd state,
                          const double dt);
+
+  /**
+   * @brief bound the system output with the given bound and change-rate bound
+   * @param output_unbounded original system output without bound
+   * @param previous_output system output in the last step
+   * @param dt sampling time interval
+   * @param output_bounded bounded system output
+   * @return saturation_status system saturation status indicator
+   */
+  int BoundOutput(const double output_unbounded, const double previous_output,
+                  const double dt, double *output_bounded);
 
   /**
    * @brief set convergence ratio for state components in adaptive dynamics
@@ -250,15 +264,14 @@ class MracController {
   double control_previous_ = 0.0;
 
   // State saturation limits in discrete-time domain
-  double bound_reference_high_ = 0.0;
-  double bound_reference_low_ = 0.0;
-  double bound_control_high_ = 0.0;
-  double bound_control_low_ = 0.0;
+  double bound_ratio_ = 0.0;
+  double bound_command_ = 0.0;
+  double bound_command_rate_ = 0.0;
   int saturation_status_reference_ = 0;
   int saturation_status_control_ = 0;
 
   // Anti-Windup compensation
-  double gain_anti_windup_ = 0.0;
+  Eigen::MatrixXd gain_anti_windup_;
   Eigen::MatrixXd compensation_anti_windup_;
 };
 
