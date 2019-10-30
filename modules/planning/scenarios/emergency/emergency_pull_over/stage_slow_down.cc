@@ -60,11 +60,9 @@ Stage::StageStatus EmergencyPullOverStageSlowDown::Process(
         std::max(scenario_config_.target_slow_down_speed(),
                  adc_speed - scenario_config_.max_stop_deceleration() *
                              scenario_config_.slow_down_deceleration_time());
-    auto& reference_line_info = frame->mutable_reference_line_info()->front();
-    reference_line_info.SetCruiseSpeed(target_slow_down_speed);
   }
-  ADEBUG << "adc_speeed[" << adc_speed
-         << "] target_slow_down_speed[" << target_slow_down_speed << "]";
+  auto& reference_line_info = frame->mutable_reference_line_info()->front();
+  reference_line_info.SetCruiseSpeed(target_slow_down_speed);
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
@@ -81,6 +79,11 @@ Stage::StageStatus EmergencyPullOverStageSlowDown::Process(
 }
 
 Stage::StageStatus EmergencyPullOverStageSlowDown::FinishStage() {
+  auto* emergency_pull_over = PlanningContext::Instance()
+                                  ->mutable_planning_status()
+                                  ->mutable_emergency_pull_over();
+  emergency_pull_over->set_is_in_emergency_pull_over_scenario(true);
+
   next_stage_ = ScenarioConfig::EMERGENCY_PULL_OVER_APPROACH;
   return Stage::FINISHED;
 }

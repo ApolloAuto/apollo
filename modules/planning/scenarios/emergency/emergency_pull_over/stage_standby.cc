@@ -37,6 +37,7 @@ namespace scenario {
 namespace emergency_pull_over {
 
 using apollo::common::TrajectoryPoint;
+using apollo::common::VehicleConfigHelper;
 
 Stage::StageStatus EmergencyPullOverStageStandby::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -58,7 +59,36 @@ Stage::StageStatus EmergencyPullOverStageStandby::Process(
     AERROR << "EmergencyPullOverStageStandby planning error";
   }
 
-  // TODO(all): add a stop fence ahead of ADC
+  // add a stop fence
+  const auto& emergency_pull_over_status =
+      PlanningContext::Instance()->planning_status().emergency_pull_over();
+  if (emergency_pull_over_status.has_position() &&
+      emergency_pull_over_status.position().has_x() &&
+      emergency_pull_over_status.position().has_y()) {
+    const auto& reference_line_info = frame->reference_line_info().front();
+    const auto& reference_line = reference_line_info.reference_line();
+    common::SLPoint pull_over_sl;
+    reference_line.XYToSL({emergency_pull_over_status.position().x(),
+                           emergency_pull_over_status.position().y()},
+                          &pull_over_sl);
+    const double stop_distance = 1.0;
+    const double stop_line_s = pull_over_sl.s() + stop_distance +
+                               VehicleConfigHelper::GetConfig()
+                                   .vehicle_param()
+                                   .front_edge_to_center();
+    const std::string virtual_obstacle_id = "EMERGENCY_PULL_OVER";
+    const std::vector<std::string> wait_for_obstacle_ids;
+    planning::util::BuildStopDecision(
+        virtual_obstacle_id,
+        stop_line_s, stop_distance,
+        StopReasonCode::STOP_REASON_PREPARKING,
+        wait_for_obstacle_ids,
+        "EMERGENCY_PULL_OVER-scenario", frame,
+        &(frame->mutable_reference_line_info()->front()));
+
+    ADEBUG << "Build a stop fence for emergency_pull_over: id["
+           << virtual_obstacle_id << "] s[" << stop_line_s << "]";
+  }
 
   return Stage::RUNNING;
 }
