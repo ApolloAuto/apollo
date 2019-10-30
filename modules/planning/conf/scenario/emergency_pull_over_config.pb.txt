@@ -2,7 +2,7 @@ scenario_type: EMERGENCY_PULL_OVER
 emergency_pull_over_config: {
   max_stop_deceleration: 3.0
   slow_down_deceleration_time: 3.0
-  target_slow_down_speed: 2.5
+  target_slow_down_speed: 1.0
 }
 
 stage_type: EMERGENCY_PULL_OVER_SLOW_DOWN

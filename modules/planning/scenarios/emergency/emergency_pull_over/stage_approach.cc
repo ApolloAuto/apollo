@@ -38,6 +38,7 @@ namespace scenario {
 namespace emergency_pull_over {
 
 using apollo::common::TrajectoryPoint;
+using apollo::common::VehicleConfigHelper;
 
 EmergencyPullOverStageApproach::EmergencyPullOverStageApproach(
     const ScenarioConfig::StageConfig& config)
@@ -55,21 +56,63 @@ Stage::StageStatus EmergencyPullOverStageApproach::Process(
     AERROR << "EmergencyPullOverStageApproach planning error";
   }
 
-  const double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
-  const double max_adc_stop_speed =
-      common::VehicleConfigHelper::Instance()->GetConfig()
-          .vehicle_param()
-          .max_abs_speed_when_stopped();
-  // TODO(all): add pull over position check
-  if (adc_speed <= max_adc_stop_speed) {
-    return FinishStage();
+  // add a stop fence
+  const auto& emergency_pull_over_status =
+      PlanningContext::Instance()->planning_status().emergency_pull_over();
+  if (emergency_pull_over_status.has_position() &&
+      emergency_pull_over_status.position().has_x() &&
+      emergency_pull_over_status.position().has_y()) {
+    const auto& reference_line_info = frame->reference_line_info().front();
+    const auto& reference_line = reference_line_info.reference_line();
+    common::SLPoint pull_over_sl;
+    reference_line.XYToSL({emergency_pull_over_status.position().x(),
+                           emergency_pull_over_status.position().y()},
+                          &pull_over_sl);
+    const double stop_distance = 1.0;
+    const double stop_line_s = pull_over_sl.s() + stop_distance +
+                               VehicleConfigHelper::GetConfig()
+                                   .vehicle_param()
+                                   .front_edge_to_center();
+    const std::string virtual_obstacle_id = "EMERGENCY_PULL_OVER";
+    const std::vector<std::string> wait_for_obstacle_ids;
+    planning::util::BuildStopDecision(
+        virtual_obstacle_id,
+        stop_line_s, stop_distance,
+        StopReasonCode::STOP_REASON_PREPARKING,
+        wait_for_obstacle_ids,
+        "EMERGENCY_PULL_OVER-scenario", frame,
+        &(frame->mutable_reference_line_info()->front()));
+
+    ADEBUG << "Build a stop fence for emergency_pull_over: id["
+           << virtual_obstacle_id << "] s[" << stop_line_s << "]";
+
+    const double adc_front_edge_s =
+        reference_line_info.AdcSlBoundary().end_s();
+    double distance = stop_line_s - adc_front_edge_s;
+    const double adc_speed =
+        common::VehicleStateProvider::Instance()->linear_velocity();
+    const double max_adc_stop_speed =
+        common::VehicleConfigHelper::Instance()->GetConfig()
+            .vehicle_param()
+            .max_abs_speed_when_stopped();
+    ADEBUG << "adc_speed[" << adc_speed << "] distance[" << distance << "]";
+    constexpr double kStopSpeedTolerance = 0.15;
+    constexpr double kStopDistanceTolerance = 0.5;
+    if (adc_speed <= max_adc_stop_speed + kStopSpeedTolerance &&
+        distance <= stop_distance + kStopDistanceTolerance) {
+      return FinishStage();
+    }
   }
 
   return StageStatus::RUNNING;
 }
 
 Stage::StageStatus EmergencyPullOverStageApproach::FinishStage() {
+  auto* emergency_pull_over = PlanningContext::Instance()
+                                  ->mutable_planning_status()
+                                  ->mutable_emergency_pull_over();
+  emergency_pull_over->set_is_in_emergency_pull_over_scenario(false);
+
   next_stage_ = ScenarioConfig::EMERGENCY_PULL_OVER_STANDBY;
   return Stage::FINISHED;
 }

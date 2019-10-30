@@ -34,7 +34,7 @@ namespace emergency_pull_over {
 // stage context
 struct EmergencyPullOverContext {
   ScenarioEmergencyPullOverConfig scenario_config;
-  double target_slow_down_speed;
+  double target_slow_down_speed = 0.0;
 };
 
 class EmergencyPullOverScenario : public Scenario {
