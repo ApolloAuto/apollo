@@ -11,6 +11,6 @@ message MracConf {
   optional double adaption_desired_gain = 6;
   optional double adaption_nonlinear_gain = 7;
   repeated double adaption_matrix_p = 8;    // matrix size needs to match the mrac_reference_order
-  optional double mrac_saturation_level = 9 [default = 100.0];
+  optional double mrac_saturation_level = 9 [default = 1.0];
   optional double anti_windup_compensation_gain = 10;
 }

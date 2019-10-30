@@ -50,7 +50,6 @@ double MracController::Control(const double command, const Matrix state,
           << dt;
     return control_previous_;
   }
-  double control = 0.0;
 
   // update the state in the real actuation system
   state_action_.col(0) = state;
@@ -66,15 +65,10 @@ double MracController::Control(const double command, const Matrix state,
        dt * 0.5 * matrix_b_reference_ *
            (input_desired_(0, 0) + input_desired_(0, 1)));
 
-  if (state_reference_(0, 0) > bound_reference_high_) {
-    state_reference_(0, 0) = bound_reference_high_;
-    saturation_status_reference_ = 1;
-  } else if (state_reference_(0, 0) < bound_reference_low_) {
-    state_reference_(0, 0) = bound_reference_low_;
-    saturation_status_reference_ = -1;
-  } else {
-    saturation_status_reference_ = 0;
-  }
+  double state_bounded = 0.0;
+  saturation_status_reference_ = BoundOutput(
+      state_reference_(0, 0), state_reference_(0, 1), dt, &state_bounded);
+  state_reference_(0, 0) = state_bounded;
 
   // update the adaption laws including state adaption, command adaption and
   // nonlinear components adaption
@@ -87,20 +81,13 @@ double MracController::Control(const double command, const Matrix state,
   double control_unbounded =
       gain_state_adaption_.col(0).transpose() * state_action_.col(0) +
       gain_input_adaption_(0, 0) * input_desired_(0, 0);
-  if (control_unbounded > bound_control_high_) {
-    control = bound_control_high_;
-    saturation_status_control_ = 1;
-  } else if (control_unbounded < bound_control_low_) {
-    control = bound_control_low_;
-    saturation_status_control_ = -1;
-  } else {
-    control = control_unbounded;
-    saturation_status_control_ = 0;
-  }
+
+  double control = 0.0;
+  saturation_status_control_ =
+      BoundOutput(control_unbounded, control_previous_, dt, &control);
 
   // update the anti-windup compensation if applied
-  AntiWindupCompensation(control_unbounded, bound_control_high_,
-                         bound_control_low_);
+  AntiWindupCompensation(control_unbounded, control_previous_, dt);
 
   // update the previous value for next iteration
   state_reference_.col(1) = state_reference_.col(0);
@@ -139,15 +126,16 @@ void MracController::ResetGains() {
   gain_nonlinear_adaption_.setZero(1, 2);
 }
 
-void MracController::Init(const MracConf &mrac_conf, const double dt) {
+void MracController::Init(const MracConf &mrac_conf, const double dt,
+                          const double input_limit,
+                          const double input_rate_limit) {
   control_previous_ = 0.0;
   saturation_status_control_ = 0;
   saturation_status_reference_ = 0;
   // Initialize the saturation limits
-  bound_control_high_ = std::fabs(mrac_conf.mrac_saturation_level());
-  bound_control_low_ = -std::fabs(mrac_conf.mrac_saturation_level());
-  bound_reference_high_ = std::fabs(mrac_conf.mrac_saturation_level());
-  bound_reference_low_ = -std::fabs(mrac_conf.mrac_saturation_level());
+  bound_ratio_ = mrac_conf.mrac_saturation_level();
+  bound_command_ = input_limit * bound_ratio_;
+  bound_command_rate_ = input_rate_limit * bound_ratio_;
   // Initialize the common model parameters
   model_order_ = mrac_conf.mrac_reference_order();
   // Initialize the system states
@@ -294,19 +282,57 @@ void MracController::Adaption(Matrix *law_adp, const Matrix state_adp,
 }
 
 void MracController::AntiWindupCompensation(const double control_command,
-                                            const double upper_bound,
-                                            const double lower_bound) {
-  if (upper_bound < lower_bound) {
-    AWARN << "windup upper_bound < lower_bound; failed to execute the "
-             "anti-windup logic";
-    compensation_anti_windup_.setZero(model_order_, 2);
+                                            const double previous_command,
+                                            const double dt) {
+  Matrix offset_windup = Matrix::Zero(model_order_, 1);
+  offset_windup(0, 0) =
+      ((control_command > bound_command_) ? bound_command_ - control_command
+                                          : 0.0) +
+      ((control_command < -bound_command_) ? -bound_command_ - control_command
+                                           : 0.0);
+  if (model_order_ > 1) {
+    offset_windup(1, 0) =
+        ((control_command > previous_command + bound_command_rate_ * dt)
+             ? bound_command_rate_ - (control_command - previous_command) / dt
+             : 0.0) +
+        ((control_command < previous_command - bound_command_rate_ * dt)
+             ? -bound_command_rate_ - (control_command - previous_command) / dt
+             : 0.0);
   }
-  double offset_windup =
-      ((control_command > upper_bound) ? upper_bound - control_command : 0.0) +
-      ((control_command < lower_bound) ? lower_bound - control_command : 0.0);
   compensation_anti_windup_.col(1) = compensation_anti_windup_.col(0);
-  compensation_anti_windup_(0, 0) = gain_anti_windup_ * offset_windup;
-  // Todo(Yu): refactor the anti-windup for high-order system
+  compensation_anti_windup_.col(0) =
+      gain_anti_windup_.transpose() * offset_windup;
+}
+
+int MracController::BoundOutput(const double output_unbounded,
+                                const double previous_output, const double dt,
+                                double *output) {
+  int status = 0;
+  if (output_unbounded > bound_command_ ||
+      output_unbounded > previous_output + bound_command_rate_ * dt) {
+    *output = (bound_command_ < previous_output + bound_command_rate_ * dt)
+                  ? bound_command_
+                  : previous_output + bound_command_rate_ * dt;
+    // if output exceeds the upper bound, then status = 1; while if output
+    // changing rate exceeds the upper rate bound, then status = 2
+    status =
+        (bound_command_ < previous_output + bound_command_rate_ * dt) ? 1 : 2;
+  } else if (output_unbounded < -bound_command_ ||
+             output_unbounded < previous_output - bound_command_rate_ * dt) {
+    *output = (-bound_command_ > previous_output - bound_command_rate_ * dt)
+                  ? -bound_command_
+                  : previous_output - bound_command_rate_ * dt;
+    // if output exceeds the lower bound, then status = -1; while if output
+    // changing rate exceeds the lower rate bound, then status = -2
+    status = (-bound_command_ > previous_output - bound_command_rate_ * dt)
+                 ? -1
+                 : -2;
+  } else {
+    *output = output_unbounded;
+    // if output does not violate neithor bound nor rate bound, then status = 0
+    status = 0;
+  }
+  return status;
 }
 
 void MracController::SetStateAdaptionRate(const double ratio_state) {
