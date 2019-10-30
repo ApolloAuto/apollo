@@ -46,10 +46,19 @@ bool EvaluatorSubmodule::Init() {
 
 bool EvaluatorSubmodule::Proc(
     const std::shared_ptr<ContainerOutput>& container_output) {
+  apollo::common::Header perception_header =
+      container_output->submodule_output().perception_header();
+  apollo::common::ErrorCode perception_error_code =
+      container_output->submodule_output().perception_error_code();
+  double frame_start_time =
+      container_output->submodule_output().frame_start_time();
   ObstaclesContainer obstacles_container(
       container_output->submodule_output());
   EvaluatorManager::Instance()->Run(&obstacles_container);
   SubmoduleOutput submodule_output = obstacles_container.GetSubmoduleOutput();
+  submodule_output.set_perception_header(perception_header);
+  submodule_output.set_perception_error_code(perception_error_code);
+  submodule_output.set_frame_start_time(frame_start_time);
   EvaluatorOutput evaluator_output(std::move(submodule_output));
   evaluator_writer_->Write(std::make_shared<EvaluatorOutput>(evaluator_output));
   return true;

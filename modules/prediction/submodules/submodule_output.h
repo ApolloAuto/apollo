@@ -56,6 +56,12 @@ class SubmoduleOutput {
   void set_curr_frame_considered_obstacle_ids(
       const std::vector<int>& curr_frame_considered_obstacle_ids);
 
+  void set_perception_header(const apollo::common::Header& perception_header);
+
+  void set_perception_error_code(const apollo::common::ErrorCode&);
+
+  void set_frame_start_time(const double frame_start_time);
+
   const std::vector<Obstacle>& curr_frame_obstacles() const;
 
   const std::vector<apollo::perception::PerceptionObstacle>&
@@ -67,6 +73,12 @@ class SubmoduleOutput {
 
   std::vector<int> curr_frame_considered_obstacle_ids() const;
 
+  apollo::common::Header perception_header() const;
+
+  apollo::common::ErrorCode perception_error_code() const;
+
+  double frame_start_time() const;
+
  protected:
   std::vector<Obstacle> curr_frame_obstacles_;
   std::vector<apollo::perception::PerceptionObstacle>
@@ -74,6 +86,9 @@ class SubmoduleOutput {
   std::vector<int> curr_frame_movable_obstacle_ids_;
   std::vector<int> curr_frame_unmovable_obstacle_ids_;
   std::vector<int> curr_frame_considered_obstacle_ids_;
+  apollo::common::Header perception_header_;
+  apollo::common::ErrorCode perception_error_code_;
+  double frame_start_time_;
 };
 
 }  // namespace prediction
