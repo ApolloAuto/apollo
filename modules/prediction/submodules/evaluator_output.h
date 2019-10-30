@@ -43,6 +43,12 @@ class EvaluatorOutput {
    */
   virtual ~EvaluatorOutput() = default;
 
+  /**
+   * @brief Get submodule output
+   * @return submodule output
+   */
+  const SubmoduleOutput& submodule_output() const;
+
  private:
   SubmoduleOutput submodule_output_;
 };

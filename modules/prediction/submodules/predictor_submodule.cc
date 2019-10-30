@@ -45,7 +45,17 @@ bool PredictorSubmodule::Init() {
 bool PredictorSubmodule::Proc(
     const std::shared_ptr<EvaluatorOutput>& evaluator_output,
     const std::shared_ptr<ADCTrajectoryContainer>& adc_trajectory_container) {
-  // TODO(kechxu) implement
+  ObstaclesContainer obstacles_container(evaluator_output->submodule_output());
+  PredictorManager::Instance()->Run(adc_trajectory_container.get(),
+                                    &obstacles_container);
+  PredictionObstacles prediction_obstacles =
+      PredictorManager::Instance()->prediction_obstacles();
+
+  // TODO(kechxu) start_time, end_time, header, error_code
+
+  predictor_writer_->Write(
+      std::make_shared<PredictionObstacles>(prediction_obstacles));
+
   return true;
 }
 
