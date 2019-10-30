@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <utility>
+
 #include "modules/prediction/submodules/evaluator_submodule.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
@@ -40,7 +42,8 @@ bool EvaluatorSubmodule::Init() {
 
 bool EvaluatorSubmodule::Proc(
     const std::shared_ptr<ContainerOutput>& container_output) {
-  ObstaclesContainer obstacles_container(*container_output);
+  ObstaclesContainer obstacles_container(
+      container_output->submodule_output());
   EvaluatorManager::Instance()->Run(&obstacles_container);
 
   // TODO(kechxu) write the output

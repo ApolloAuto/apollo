@@ -16,7 +16,7 @@
 
 /**
  * @file
- * @brief Output information of prediction container submodule
+ * @brief Output information of prediction evaluator submodule
  */
 
 #pragma once
@@ -26,24 +26,22 @@
 namespace apollo {
 namespace prediction {
 
-class ContainerOutput {
+class EvaluatorOutput {
  public:
   /**
    * @brief Constructor
    */
-  ContainerOutput() = default;
+  EvaluatorOutput() = default;
 
   /**
    * @brief Constructor from SubmoduleOutput
    */
-  explicit ContainerOutput(const SubmoduleOutput&& submodule_output);
+  explicit EvaluatorOutput(const SubmoduleOutput&& submodule_output);
 
   /**
    * @brief Destructor
    */
-  virtual ~ContainerOutput() = default;
-
-  const SubmoduleOutput& submodule_output() const;
+  virtual ~EvaluatorOutput() = default;
 
  private:
   SubmoduleOutput submodule_output_;

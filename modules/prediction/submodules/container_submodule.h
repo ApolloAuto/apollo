@@ -32,6 +32,7 @@
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/prediction/proto/submodule_messages.pb.h"
+#include "modules/prediction/submodules/container_output.h"
 #include "modules/storytelling/proto/story.pb.h"
 
 /**

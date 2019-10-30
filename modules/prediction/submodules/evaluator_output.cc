@@ -14,40 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- * @brief Output information of prediction container submodule
- */
-
-#pragma once
-
-#include "modules/prediction/submodules/submodule_output.h"
+#include "modules/prediction/submodules/evaluator_output.h"
 
 namespace apollo {
 namespace prediction {
 
-class ContainerOutput {
- public:
-  /**
-   * @brief Constructor
-   */
-  ContainerOutput() = default;
-
-  /**
-   * @brief Constructor from SubmoduleOutput
-   */
-  explicit ContainerOutput(const SubmoduleOutput&& submodule_output);
-
-  /**
-   * @brief Destructor
-   */
-  virtual ~ContainerOutput() = default;
-
-  const SubmoduleOutput& submodule_output() const;
-
- private:
-  SubmoduleOutput submodule_output_;
-};
+EvaluatorOutput::EvaluatorOutput(const SubmoduleOutput&& submodule_output) {
+  submodule_output_ = submodule_output;
+}
 
 }  // namespace prediction
 }  // namespace apollo
