@@ -71,7 +71,7 @@ ExtrapolationPredictor::SearchExtrapolationLane(
 
   LaneSearchResult lane_search_result;
   for (int i = num_trajectory_point - 1;
-       i >= num_trajectory_point - num_trajectory_point; --i) {
+       i >= num_trajectory_point - num_tail_point; --i) {
     const TrajectoryPoint& trajectory_point = trajectory.trajectory_point(i);
     const PathPoint& path_point = trajectory_point.path_point();
     apollo::common::PointENU point_enu;
