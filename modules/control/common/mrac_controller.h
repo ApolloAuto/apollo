@@ -45,12 +45,8 @@ class MracController {
    * @brief initialize mrac controller
    * @param mrac_conf configuration for mrac controller
    * @param dt sampling time interval
-   * @param input_limit physical or designed bound of the input
-   * @param input_rate_limit physical or designed bound of the input
-   * changing-rate
    */
-  void Init(const MracConf &mrac_conf, const double dt,
-            const double input_limit, const double input_rate_limit);
+  void Init(const MracConf &mrac_conf, const double dt);
 
   /**
    * time constant, natrual frequency and damping ratio
@@ -133,10 +129,14 @@ class MracController {
    * @param command original command as the input of the actuation system
    * @param state actual output state of the actuation system
    * @param dt sampling time interval
+   * @param input_limit physical or designed bound of the input
+   * @param input_rate_limit physical or designed bound of the input
+   * changing-rate
    * @return control value based on mrac controller architecture
    */
   virtual double Control(const double command, const Eigen::MatrixXd state,
-                         const double dt);
+                         const double dt, const double input_limit,
+                         const double input_rate_limit);
 
   /**
    * @brief bound the system output with the given bound and change-rate bound

@@ -34,7 +34,8 @@ using apollo::common::util::StrCat;
 using Matrix = Eigen::MatrixXd;
 
 double MracController::Control(const double command, const Matrix state,
-                               const double dt) {
+                               const double dt, const double input_limit,
+                               const double input_rate_limit) {
   // check if the reference/adaption model well set up during the initilization
   if (!reference_model_enabled_ || !adaption_model_enabled_) {
     AWARN << "MRAC: model build failed; will work as a unity compensator. The "
@@ -56,6 +57,10 @@ double MracController::Control(const double command, const Matrix state,
 
   // update the desired command in the real actuation system
   input_desired_(0, 0) = command;
+
+  // update the command bounds for the real actuation system
+  bound_command_ = input_limit * bound_ratio_;
+  bound_command_rate_ = input_rate_limit * bound_ratio_;
 
   // update the state in the reference system
   Matrix matrix_i = Matrix::Identity(model_order_, model_order_);
@@ -126,16 +131,12 @@ void MracController::ResetGains() {
   gain_nonlinear_adaption_.setZero(1, 2);
 }
 
-void MracController::Init(const MracConf &mrac_conf, const double dt,
-                          const double input_limit,
-                          const double input_rate_limit) {
+void MracController::Init(const MracConf &mrac_conf, const double dt) {
   control_previous_ = 0.0;
   saturation_status_control_ = 0;
   saturation_status_reference_ = 0;
   // Initialize the saturation limits
   bound_ratio_ = mrac_conf.mrac_saturation_level();
-  bound_command_ = input_limit * bound_ratio_;
-  bound_command_rate_ = input_rate_limit * bound_ratio_;
   // Initialize the common model parameters
   model_order_ = mrac_conf.mrac_reference_order();
   // Initialize the system states
