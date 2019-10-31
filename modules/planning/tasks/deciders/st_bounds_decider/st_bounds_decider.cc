@@ -145,8 +145,25 @@ Status STBoundsDecider::GenerateRegularSTBound(STBound* const st_bound) {
     if (available_s_bounds.size() >= 1) {
       RankDecisions(st_guide_line_.GetGuideSFromT(t), driving_limits_bound,
                     &available_choices);
-      // s_lower = std::fmax(s_lower, available_s_bounds.front().first);
-      // s_upper = std::fmin(s_upper, available_s_bounds.front().second);
+      // Select the top decision.
+      auto top_choice_s_range = available_choices.front().first;
+      s_lower = std::fmax(s_lower, std::get<1>(top_choice_s_range));
+      s_upper = std::fmin(s_upper, std::get<2>(top_choice_s_range));
+
+      // Set decision for obstacles without decisions.
+      auto top_choice_decision = available_choices.front().second;
+      st_obstacles_processor_.SetObstacleDecision(top_choice_decision);
+
+      // Update st-guide-line and st-driving-limit info.
+      std::pair<double, double> limiting_speed_info;
+      if (st_obstacles_processor_.GetLimitingSpeedInfo(
+              t, &limiting_speed_info)) {
+        st_driving_limits_.UpdateBlockingInfo(
+            t, s_lower, limiting_speed_info.first,
+            s_upper, limiting_speed_info.second);
+        st_guide_line_.UpdateBlockingInfo(t, s_lower, true);
+        st_guide_line_.UpdateBlockingInfo(t, s_upper, false);
+      }
     }
 
     // Update into st_bound
