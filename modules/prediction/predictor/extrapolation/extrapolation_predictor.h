@@ -61,7 +61,8 @@ class ExtrapolationPredictor : public SequencePredictor {
 
   void PostProcess(Trajectory* trajectory_ptr);
 
-  LaneSearchResult SearchExtrapolationLane(const Trajectory& trajectory);
+  LaneSearchResult SearchExtrapolationLane(const Trajectory& trajectory,
+                                           const int num_tail_point);
 
   void ExtrapolateByLane(const std::string& lane_id,
                          Trajectory* trajectory_ptr);
