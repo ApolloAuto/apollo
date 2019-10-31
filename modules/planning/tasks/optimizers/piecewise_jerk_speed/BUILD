@@ -39,6 +39,7 @@ cc_library(
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/trajectory1d:piecewise_jerk_trajectory1d",
         "//modules/planning/math/piecewise_jerk:piecewise_jerk_path_problem",
+        "//modules/planning/proto:ipopt_return_status_proto",
         "//modules/planning/tasks/optimizers:speed_optimizer",
     ],
 )

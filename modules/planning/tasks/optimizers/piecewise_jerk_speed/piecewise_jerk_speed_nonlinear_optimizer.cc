@@ -34,6 +34,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed_profile_generator.h"
 #include "modules/planning/common/st_graph_data.h"
+#include "modules/planning/proto/ipopt_return_status.pb.h"
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_ipopt_interface.h"
 
 namespace apollo {
@@ -221,6 +222,14 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
     ADEBUG << "*** The final value of the objective function is " << final_obj
            << '.';
   } else {
+    const auto& ipopt_return_status =
+        IpoptReturnStatus_Name(static_cast<IpoptReturnStatus>(status));
+    if (ipopt_return_status.empty()) {
+      AERROR << "Solver ends with unknown failure code: "
+             << static_cast<int>(status);
+    } else {
+      AERROR << "Solver failure case: " << ipopt_return_status;
+    }
     std::string msg("Piecewise jerk speed nonlinear optimizer failed!");
     AERROR << msg;
     speed_data->clear();

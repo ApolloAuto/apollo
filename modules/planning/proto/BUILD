@@ -645,4 +645,19 @@ proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "ipopt_return_status_proto",
+    deps = [
+        ":ipopt_return_status_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "ipopt_return_status_proto_lib",
+    srcs = [
+        "ipopt_return_status.proto",
+    ],
+)
+
+
 cpplint()
