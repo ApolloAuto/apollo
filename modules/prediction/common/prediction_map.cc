@@ -668,5 +668,49 @@ std::vector<std::shared_ptr<const LaneInfo>> PredictionMap::GetNearbyLanes(
   return nearby_lanes;
 }
 
+std::shared_ptr<const LaneInfo> PredictionMap::LaneWithSmallestAverageCurvature(
+    const std::vector<std::shared_ptr<const LaneInfo>>& lane_infos) {
+  CHECK(!lane_infos.empty());
+  size_t sample_size = FLAGS_sample_size_for_average_lane_curvature;
+  std::shared_ptr<const hdmap::LaneInfo> selected_lane_info = lane_infos[0];
+  if (selected_lane_info == nullptr) {
+    AERROR << "Lane Vector first element: selected_lane_info is nullptr.";
+    return nullptr;
+  }
+  double smallest_curvature =
+      AverageCurvature(selected_lane_info->id().id(), sample_size);
+  for (size_t i = 1; i < lane_infos.size(); ++i) {
+    std::shared_ptr<const hdmap::LaneInfo> lane_info = lane_infos[i];
+    if (lane_info == nullptr) {
+      AWARN << "Lane vector element: one lane_info is nullptr.";
+      continue;
+    }
+    double curvature = AverageCurvature(lane_info->id().id(), sample_size);
+    if (curvature < smallest_curvature) {
+      smallest_curvature = curvature;
+      selected_lane_info = lane_info;
+    }
+  }
+  return selected_lane_info;
+}
+
+double PredictionMap::AverageCurvature(const std::string& lane_id,
+                                       const size_t sample_size) {
+  CHECK_GT(sample_size, 0);
+  std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr =
+      PredictionMap::LaneById(lane_id);
+  if (lane_info_ptr == nullptr) {
+    return 0.0;
+  }
+  double lane_length = lane_info_ptr->total_length();
+  double s_gap = lane_length / static_cast<double>(sample_size);
+  double curvature_sum = 0.0;
+  for (size_t i = 0; i < sample_size; ++i) {
+    double s = s_gap * static_cast<double>(i);
+    curvature_sum += std::abs(PredictionMap::CurvatureOnLane(lane_id, s));
+  }
+  return curvature_sum / static_cast<double>(sample_size);
+}
+
 }  // namespace prediction
 }  // namespace apollo
