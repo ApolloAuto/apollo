@@ -74,6 +74,15 @@ class STObstaclesProcessor {
           std::vector<std::pair<std::string, ObjectDecisionType>>>* const
           available_obs_decisions);
 
+  /** @brief Provided that decisions for all existing obstacles are made, get
+    * the speed limiting info from limiting st-obstacles.
+    * @param Time t.
+    * @param The actual limiting speed-info: (lower, upper)
+    * @return True if there is speed limiting info; otherwise, false.
+    */
+  bool GetLimitingSpeedInfo(
+      double t, std::pair<double, double>* const limiting_speed_info);
+
   /** @brief Set the decision for a given obstacle.
    */
   void SetObstacleDecision(const std::string& obs_id,
