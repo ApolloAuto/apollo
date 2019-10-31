@@ -160,6 +160,42 @@ STObstaclesProcessor::GetAllSTBoundaries() {
   return obs_id_to_st_boundary_;
 }
 
+bool STObstaclesProcessor::GetLimitingSpeedInfo(
+    double t, std::pair<double, double>* const limiting_speed_info) {
+  if (obs_id_to_decision_.empty())
+    // If no obstacle, then no speed limits.
+    return false;
+
+  double s_min = 0.0;
+  double s_max = planning_distance_;
+  for (auto it : obs_id_to_decision_) {
+    auto obs_id = it.first;
+    auto obs_decision = it.second;
+    auto obs_st_boundary = obs_id_to_st_boundary_[obs_id];
+    double obs_s_min = 0.0;
+    double obs_s_max = 0.0;
+    obs_st_boundary.GetBoundarySRange(t, &obs_s_max, &obs_s_min);
+    double obs_ds_lower = 0.0;
+    double obs_ds_upper = 0.0;
+    obs_st_boundary.GetBoundarySlopes(t, &obs_ds_upper, &obs_ds_lower);
+    if (obs_decision.has_yield() || obs_decision.has_stop()) {
+      if (obs_s_min <= s_max) {
+        s_max = obs_s_min;
+        limiting_speed_info->second = obs_ds_lower;
+      }
+    } else if (it.second.has_overtake()) {
+      if (obs_s_max >= s_min) {
+        s_min = obs_s_max;
+        limiting_speed_info->first = obs_ds_upper;
+      }
+    }
+  }
+  if (s_min > s_max) {
+    return false;
+  }
+  return true;
+}
+
 bool STObstaclesProcessor::GetSBoundsFromDecisions(
     double t, std::vector<std::pair<double, double>>* const available_s_bounds,
     std::vector<std::vector<std::pair<std::string, ObjectDecisionType>>>* const
