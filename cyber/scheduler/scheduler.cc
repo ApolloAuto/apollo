@@ -58,7 +58,7 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
   }
 
   if (visitor != nullptr) {
-    visitor->RegisterNotifyCallback([this, task_id, name]() {
+    visitor->RegisterNotifyCallback([this, task_id]() {
       if (cyber_unlikely(stop_.load())) {
         return;
       }
