@@ -148,6 +148,7 @@ void MracController::Init(const MracConf &mrac_conf, const double dt,
   gamma_state_adaption_ = Matrix::Zero(model_order_, 1);
   gamma_input_adaption_ = Matrix::Zero(1, 1);
   gamma_nonlinear_adaption_ = Matrix::Zero(1, 1);
+  gain_anti_windup_ = Matrix::Zero(model_order_, 1);
   compensation_anti_windup_ = Matrix::Zero(model_order_, 2);
   // Initialize the reference model parameters
   matrix_a_reference_ = Matrix::Zero(model_order_, model_order_);
@@ -165,8 +166,6 @@ void MracController::Init(const MracConf &mrac_conf, const double dt,
   } else {
     adaption_model_enabled_ = false;
   }
-  // Initialize the anti-windup parameters
-  gain_anti_windup_ = mrac_conf.anti_windup_compensation_gain();
 }
 
 Status MracController::SetReferenceModel(const MracConf &mrac_conf) {
@@ -192,17 +191,27 @@ Status MracController::SetReferenceModel(const MracConf &mrac_conf) {
 }
 
 Status MracController::SetAdaptionModel(const MracConf &mrac_conf) {
-  if (mrac_conf.adaption_matrix_p_size() != matrix_p_adaption_.size()) {
-    const auto error_msg =
-        StrCat("mrac controller error: adaption matrix p element number: ",
-               mrac_conf.adaption_matrix_p_size(),
-               " in configuration file is not equal to desired matrix p size: ",
-               matrix_p_adaption_.size());
+  const int p_size = mrac_conf.adaption_matrix_p_size();
+  const int x_size = mrac_conf.adaption_state_gain_size();
+  const int aw_size = mrac_conf.anti_windup_compensation_gain_size();
+  if (p_size != model_order_ * model_order_ || x_size > model_order_ ||
+      aw_size > model_order_) {
+    const auto error_msg = StrCat(
+        "mrac controller error: adaption matrix p element number: ", p_size,
+        ", state gain number: ", x_size,
+        ", and anti-windup compensation gain number: ", aw_size,
+        " in configuration file do not match the model number: ", model_order_);
     AERROR << error_msg;
     return Status(ErrorCode::CONTROL_INIT_ERROR, error_msg);
   }
   for (int i = 0; i < model_order_; ++i) {
-    gamma_state_adaption_(i, 0) = mrac_conf.adaption_state_gain();
+    gamma_state_adaption_(i, 0) =
+        (i <= x_size - 1) ? mrac_conf.adaption_state_gain(i)
+                          : mrac_conf.adaption_state_gain(x_size - 1);
+    gain_anti_windup_(i, 0) =
+        (i <= aw_size - 1)
+            ? mrac_conf.anti_windup_compensation_gain(i)
+            : mrac_conf.anti_windup_compensation_gain(aw_size - 1);
     for (int j = 0; j < model_order_; ++j) {
       matrix_p_adaption_(i, j) =
           mrac_conf.adaption_matrix_p(i * model_order_ + j);

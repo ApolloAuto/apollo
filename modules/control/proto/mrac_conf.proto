@@ -7,10 +7,13 @@ message MracConf {
   optional double reference_time_constant = 2;
   optional double reference_natural_frequency = 3;
   optional double reference_damping_ratio = 4;
-  optional double adaption_state_gain = 5;
+  // state gain size must be not higher than the mrac_reference_order
+  repeated double adaption_state_gain = 5;
   optional double adaption_desired_gain = 6;
   optional double adaption_nonlinear_gain = 7;
-  repeated double adaption_matrix_p = 8;    // matrix size needs to match the mrac_reference_order
+  // adaption matrix size must match the model matrix size based on mrac_reference_order
+  repeated double adaption_matrix_p = 8;
   optional double mrac_saturation_level = 9 [default = 1.0];
-  optional double anti_windup_compensation_gain = 10;
+  // compensation gain size must be not higher than the mrac_reference_order
+  repeated double anti_windup_compensation_gain = 10;
 }
