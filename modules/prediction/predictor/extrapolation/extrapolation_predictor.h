@@ -66,7 +66,8 @@ class ExtrapolationPredictor : public SequencePredictor {
   void ExtrapolateByLane(const std::string& lane_id,
                          Trajectory* trajectory_ptr);
 
-  void ExtrapolateByFreeMove(Trajectory* trajectory_ptr);
+  void ExtrapolateByFreeMove(const int num_tail_point,
+                             Trajectory* trajectory_ptr);
 };
 
 }  // namespace prediction

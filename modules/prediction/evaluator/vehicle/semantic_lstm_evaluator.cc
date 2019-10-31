@@ -145,6 +145,12 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr,
     }
     point->set_relative_time(static_cast<double>(i) *
                              FLAGS_prediction_trajectory_time_resolution);
+    if (i == 0) {
+      point->set_v(latest_feature_ptr->speed());
+    } else {
+      point->set_v(offset.Length() /
+                   FLAGS_prediction_trajectory_time_resolution);
+    }
   }
 
   return true;
