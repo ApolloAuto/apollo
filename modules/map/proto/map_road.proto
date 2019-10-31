@@ -5,16 +5,36 @@ package apollo.hdmap;
 import "modules/map/proto/map_geometry.proto";
 import "modules/map/proto/map_id.proto";
 
+enum BoundaryEdgeType {
+  DEFAULT = 0;
+  SURFACE = 1;
+  CURB = 2;
+  FENCE = 3;
+  WALL = 4;
+  SUNKEN = 5;
+  PED_XING = 6;
+  VIRTUAL = 7;
+};
+
+message BoundaryEdgeTypeInfo {
+ optional double start_s = 1;
+ optional double end_s = 2;
+ repeated BoundaryEdgeType type = 3;
+};
+
 message BoundaryEdge {
-  optional Curve curve = 1;
-  enum Type {
-    UNKNOWN = 0;
-    NORMAL = 1;
-    LEFT_BOUNDARY = 2;
-    RIGHT_BOUNDARY = 3;
-  };
-  optional Type type = 2;
-}
+ optional Curve curve = 1;
+
+ enum Type {
+   UNKNOWN = 0;
+   NORMAL = 1;
+   LEFT_BOUNDARY = 2;
+   RIGHT_BOUNDARY = 3;
+ };
+ optional Type type = 2;
+ 
+ repeated BoundaryEdgeTypeInfo edge_type_info = 3;
+};
 
 message BoundaryPolygon {
   repeated BoundaryEdge edge = 1;

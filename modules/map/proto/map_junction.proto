@@ -4,6 +4,11 @@ package apollo.hdmap;
 
 import "modules/map/proto/map_id.proto";
 import "modules/map/proto/map_geometry.proto";
+import "modules/map/proto/map_road.proto";
+
+message JunctionBoudary{
+  optional BoundaryPolygon outer_boundary = 1;
+}
 
 // A junction is the junction at-grade of two or more roads crossing.
 message Junction {
@@ -12,4 +17,15 @@ message Junction {
   optional Polygon polygon = 2;
 
   repeated Id overlap_id = 3;
+  enum Type {
+    UNKNOWN = 0;
+    MERGE = 1;
+    CROSS = 2;
+    FORK = 3;
+    MAIN_SIDE = 4;
+    DEAD_END = 5;
+  };
+  optional Type type = 4;
+
+  optional JunctionBoudary boundary = 5;
 }

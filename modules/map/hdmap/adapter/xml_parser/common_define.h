@@ -55,16 +55,17 @@ using PbBoundaryEdge = apollo::hdmap::BoundaryEdge;
 using PbRegionOverlap = apollo::hdmap::RegionOverlapInfo;
 using PbPNCJunction = apollo::hdmap::PNCJunction;
 
+using PbJunctionType = apollo::hdmap::Junction_Type;
 using PbLaneDirection = apollo::hdmap::Lane_LaneDirection;
 using PbSignalType = apollo::hdmap::Signal_Type;
 using PbSubSignalType = apollo::hdmap::Subsignal_Type;
 using PbStopSignType = apollo::hdmap::StopSign_StopType;
 using PbBoundaryEdgeType = apollo::hdmap::BoundaryEdge_Type;
+using PbRoadBoundaryEdgeType = apollo::hdmap::BoundaryEdgeType;
 using PbRoadType = apollo::hdmap::Road_Type;
 using PbSignInfoType = apollo::hdmap::SignInfo::Type;
 using PbPassageType = apollo::hdmap::Passage_Type;
 using PbPassageGroup = apollo::hdmap::PassageGroup;
-
 struct StopLineInternal {
   std::string id;
   PbCurve curve;

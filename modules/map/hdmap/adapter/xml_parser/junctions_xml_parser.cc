@@ -40,6 +40,7 @@ Status JunctionsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
     }
 
+
     // outline
     const tinyxml2::XMLElement* sub_node =
         junction_node->FirstChildElement("outline");
@@ -48,16 +49,36 @@ Status JunctionsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
     }
 
+    std::string junction_type;
+    checker =
+      UtilXmlParser::QueryStringAttribute(
+        *junction_node, "type", &junction_type);
+
     PbJunction junction;
     junction.mutable_id()->set_id(junction_id);
     PbPolygon* polygon = junction.mutable_polygon();
+
+    PbJunctionType pb_junction_type;
+    ToPbJunctionType(junction_type, &pb_junction_type);
+    junction.set_type(pb_junction_type);
+
     RETURN_IF_ERROR(UtilXmlParser::ParseOutline(*sub_node, polygon));
+    sub_node = junction_node->FirstChildElement("junction_boundary");
+    if (sub_node) {
+      const auto& outer_node = sub_node->FirstChildElement("outer_boundary");
+      if (outer_node) {
+        auto boundary = junction.mutable_boundary()->mutable_outer_boundary();
+        RETURN_IF_ERROR(
+            UtilXmlParser::ParseBoundaryPolygon(*outer_node, boundary));
+      }
+    }
 
     JunctionInternal junction_internal;
     junction_internal.junction = junction;
 
     // overlap
     sub_node = junction_node->FirstChildElement("objectOverlapGroup");
+
     if (sub_node) {
       sub_node = sub_node->FirstChildElement("objectReference");
       while (sub_node) {
@@ -72,8 +93,7 @@ Status JunctionsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
         OverlapWithJunction overlap_with_juntion;
         overlap_with_juntion.object_id = object_id;
         junction_internal.overlap_with_junctions.push_back(
-            overlap_with_juntion);
-
+          overlap_with_juntion);
         sub_node = sub_node->NextSiblingElement("objectReference");
       }
     }
@@ -83,6 +103,28 @@ Status JunctionsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
   }
   return Status::OK();
 }
+
+Status JunctionsXmlParser::ToPbJunctionType(
+        const std::string &junction_type, PbJunctionType *type) {
+  CHECK_NOTNULL(type);
+
+  *type = apollo::hdmap::Junction_Type_UNKNOWN;
+  if (junction_type == "UNKONW") {
+    *type = apollo::hdmap::Junction_Type_UNKNOWN;
+  } else if (junction_type == "MERGE") {
+    *type = apollo::hdmap::Junction_Type_MERGE;
+  } else if (junction_type == "CROSS") {
+    *type = ::apollo::hdmap::Junction_Type_CROSS;
+  } else if (junction_type == "FORK") {
+    *type = apollo::hdmap::Junction_Type_FORK;
+  } else if (junction_type == "MAIN_SIDE") {
+    *type = apollo::hdmap::Junction_Type_MAIN_SIDE;
+  } else if (junction_type == "DEAD_END") {
+    *type = apollo::hdmap::Junction_Type_DEAD_END;
+  }
+  return Status::OK();
+}
+
 
 }  // namespace adapter
 }  // namespace hdmap

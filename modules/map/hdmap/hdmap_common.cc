@@ -131,7 +131,12 @@ LaneInfo::LaneInfo(const Lane &lane) : lane_(lane) { Init(); }
 
 void LaneInfo::Init() {
   PointsFromCurve(lane_.central_curve(), &points_);
-  CHECK_GE(points_.size(), 2);
+  if (points_.size() < 2) {
+    AERROR
+    << "lane_ [id = " << lane_.id().DebugString()
+    << "]. lane central curve point size is less than 2.";
+    return;
+  }
   segments_.clear();
   accumulated_s_.clear();
   unit_directions_.clear();
@@ -569,7 +574,12 @@ void SignalInfo::Init() {
   for (const auto &stop_line : signal_.stop_line()) {
     SegmentsFromCurve(stop_line, &segments_);
   }
-  CHECK(!segments_.empty());
+  if (segments_.empty()) {
+    AERROR
+    << "SignalInfo[id = " << signal_.id().DebugString()
+    << "]. stop line  point size is null ";
+    return;
+  }
   std::vector<Vec2d> points;
   for (const auto &segment : segments_) {
     points.emplace_back(segment.start());
@@ -596,7 +606,12 @@ void StopSignInfo::init() {
   for (const auto &stop_line : stop_sign_.stop_line()) {
     SegmentsFromCurve(stop_line, &segments_);
   }
-  CHECK(!segments_.empty());
+  if (segments_.empty()) {
+    AERROR
+    << "stop_sign[id = " << stop_sign_.id().DebugString()
+    << "]. stop line  point size is null ";
+    return;
+  }
 
   for (const auto &overlap_id : stop_sign_.overlap_id()) {
     overlap_ids_.emplace_back(overlap_id);
@@ -642,7 +657,13 @@ void YieldSignInfo::Init() {
     SegmentsFromCurve(stop_line, &segments_);
   }
   // segments_from_curve(yield_sign_.stop_line(), &segments_);
-  CHECK(!segments_.empty());
+
+  if (segments_.empty()) {
+    AERROR
+    << "yield_sign_[id = " << yield_sign_.id().DebugString()
+    << "]. stop line  point size is null ";
+    return;
+  }
 }
 
 ClearAreaInfo::ClearAreaInfo(const ClearArea &clear_area)
@@ -664,7 +685,12 @@ void SpeedBumpInfo::Init() {
   for (const auto &stop_line : speed_bump_.position()) {
     SegmentsFromCurve(stop_line, &segments_);
   }
-  CHECK(!segments_.empty());
+  if (segments_.empty()) {
+    AERROR
+    << "SpeedBumpInfo[id = " << speed_bump_.id().DebugString()
+    << "].stop line  point size is null ";
+    return;
+  }
 }
 
 OverlapInfo::OverlapInfo(const Overlap &overlap) : overlap_(overlap) {}

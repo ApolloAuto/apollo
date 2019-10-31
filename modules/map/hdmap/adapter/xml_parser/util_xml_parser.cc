@@ -209,6 +209,120 @@ tinyxml2::XMLError UtilXmlParser::QueryStringAttribute(
   *value = val;
   return tinyxml2::XML_SUCCESS;
 }
+Status UtilXmlParser::ParseBoundaryPolygon(const tinyxml2::XMLElement& xml_node,
+                                  PbBoundaryPolygon* boundary_polygon) {
+  CHECK_NOTNULL(boundary_polygon);
+
+  auto sub_node = xml_node.FirstChildElement("boundary_polygon");
+  if (sub_node) {
+    auto egde_node = sub_node->FirstChildElement("boundary_edge");
+    while (egde_node) {
+      PbBoundaryEdge* boundary_edge = boundary_polygon->add_edge();
+      RETURN_IF_ERROR(ParseBoundaryEdge(*egde_node, boundary_edge));
+
+      egde_node = egde_node->NextSiblingElement("boundary_edge");
+    }
+
+    sub_node = sub_node->NextSiblingElement("boundary_polygon");
+  }
+  return Status::OK();
+}
+
+Status UtilXmlParser::ParseBoundaryEdge(const tinyxml2::XMLElement& xml_node,
+                                  PbBoundaryEdge* boundary_edge) {
+  CHECK_NOTNULL(boundary_edge);
+
+  std::string object_type;
+  const auto curve_node = xml_node.FirstChildElement("curve");
+  if (curve_node) {
+    const auto geometry_node = curve_node->FirstChildElement("geometry");
+    if (geometry_node) {
+      PbCurve* curve = boundary_edge->mutable_curve();
+      PbCurveSegment* curve_segment = curve->add_segment();
+      CHECK(curve_segment != nullptr);
+      RETURN_IF_ERROR(
+        UtilXmlParser::ParseGeometry(*geometry_node, curve_segment));
+    }
+  }
+
+  auto egdg_type_info_node = xml_node.FirstChildElement("edge_type_info");
+  while  (egdg_type_info_node) {
+    double start_s = 0;
+    double end_s = 0;
+    int checker =
+           egdg_type_info_node->QueryDoubleAttribute("start_s", &start_s);
+    checker += egdg_type_info_node->QueryDoubleAttribute("end_s", &end_s);
+    if (checker != tinyxml2::XML_SUCCESS) {
+      std::string err_msg = "Error parse start_s and end_s ";
+      return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+    }
+    auto edge_type_info = boundary_edge->add_edge_type_info();
+    edge_type_info->set_start_s(start_s);
+    edge_type_info->set_end_s(end_s);
+    auto egdg_type_info_type_node =
+            egdg_type_info_node->FirstChildElement("edge_type_info_type");
+    while (egdg_type_info_type_node) {
+      checker = UtilXmlParser::QueryStringAttribute(
+            *egdg_type_info_type_node, "type", &object_type);
+      if (checker != tinyxml2::XML_SUCCESS) {
+        std::string err_msg = "Error parse object type.";
+        return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+      }
+
+      PbRoadBoundaryEdgeType pb_boundary_edge_type;
+      ToBoundaryEdgeType(object_type, &pb_boundary_edge_type);
+      edge_type_info->add_type(pb_boundary_edge_type);
+      egdg_type_info_type_node =
+          egdg_type_info_type_node->NextSiblingElement("edge_type_info_type");
+    }
+
+    egdg_type_info_node =
+          egdg_type_info_node->NextSiblingElement("edge_type_info");
+  }
+  return Status::OK();
+}
+
+Status UtilXmlParser::ToBoundaryEdgeType(const std::string &edge_type,
+                        PbRoadBoundaryEdgeType* pb_boundary_edge_type) {
+  CHECK_NOTNULL(pb_boundary_edge_type);
+
+  *pb_boundary_edge_type = apollo::hdmap::DEFAULT;
+  if (edge_type == "DEFAULT") {
+    *pb_boundary_edge_type = apollo::hdmap::DEFAULT;
+  } else if (edge_type == "ROAD_SURFACE") {
+    *pb_boundary_edge_type = apollo::hdmap::SURFACE;
+  } else if (edge_type == "ROAD_CURB") {
+    *pb_boundary_edge_type = apollo::hdmap::CURB;
+  } else if (edge_type == "FENCE") {
+    *pb_boundary_edge_type = apollo::hdmap::FENCE;
+  } else if (edge_type == "WALL") {
+    *pb_boundary_edge_type = apollo::hdmap::WALL;
+  } else if (edge_type == "SUNKEN") {
+    *pb_boundary_edge_type = apollo::hdmap::SUNKEN;
+  } else if (edge_type == "PED_XING") {
+    *pb_boundary_edge_type = apollo::hdmap::PED_XING;
+  } else if (edge_type == "VIRTUAL") {
+    *pb_boundary_edge_type = apollo::hdmap::VIRTUAL;
+  }
+  return Status::OK();
+}
+
+Status UtilXmlParser::ToEdgeType(const std::string &edge_type,
+                                 PbBoundaryEdgeType* pb_edge_type) {
+  CHECK_NOTNULL(pb_edge_type);
+
+  *pb_edge_type = apollo::hdmap::BoundaryEdge_Type_UNKNOWN;
+  if (edge_type == "UNKNOWN") {
+    *pb_edge_type = apollo::hdmap::BoundaryEdge_Type_UNKNOWN;
+  } else if (edge_type == "NORMAL") {
+    *pb_edge_type = apollo::hdmap::BoundaryEdge_Type_NORMAL;
+  } else if (edge_type == "LEFT_BOUNDARY") {
+    *pb_edge_type = apollo::hdmap::BoundaryEdge_Type_LEFT_BOUNDARY;
+  } else if (edge_type == "RIGHT_BOUNDARY") {
+    *pb_edge_type = apollo::hdmap::BoundaryEdge_Type_RIGHT_BOUNDARY;
+  }
+  return Status::OK();
+}
 
 }  // namespace adapter
 }  // namespace hdmap

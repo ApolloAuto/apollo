@@ -49,7 +49,7 @@ class ObjectsXmlParser {
                                 const std::string& child_node_name,
                                 std::vector<std::string>* passage_node_ids);
   static Status ToPassageType(const std::string& type,
-                              PbPassageType* passage_type);
+                                PbPassageType* passage_type);
 };
 
 }  // namespace adapter
