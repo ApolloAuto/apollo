@@ -10,6 +10,7 @@ cc_library(
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
+        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/common:prediction_util",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/predictor/sequence:sequence_predictor",
