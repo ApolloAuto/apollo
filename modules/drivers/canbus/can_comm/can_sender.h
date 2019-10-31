@@ -78,7 +78,7 @@ class SenderMessage {
   /**
    * @brief Destructor.
    */
-  ~SenderMessage() = default;
+  virtual ~SenderMessage() = default;
 
   /**
    * @brief Update the current period for sending messages by a difference.
