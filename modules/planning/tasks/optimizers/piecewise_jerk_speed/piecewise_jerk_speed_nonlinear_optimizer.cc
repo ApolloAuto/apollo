@@ -258,6 +258,14 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
   }
   SpeedProfileGenerator::FillEnoughSpeedPoints(speed_data);
   RecordDebugInfo(*speed_data, st_graph_data.mutable_st_graph_debug());
+  // Record speed_constraint
+  auto speed_constraint =
+      st_graph_data.mutable_st_graph_debug()->mutable_speed_constraint();
+  for (int i = 0; i < num_of_knots; ++i) {
+    double t = i * delta_t;
+    speed_constraint->add_t(t);
+    speed_constraint->add_upper_bound(smooth_speed_limit.Evaluate(0, s[i]));
+  }
   return Status::OK();
 }
 
