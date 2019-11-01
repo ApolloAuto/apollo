@@ -47,7 +47,7 @@ class MracControllerTest : public ::testing::Test {
 TEST_F(MracControllerTest, MracControl) {
   double dt = 0.01;
   Matrix state = Matrix::Zero(1, 1);
-  MracConf mrac_conf = lat_controller_conf_.actuation_mrac_conf();
+  MracConf mrac_conf = lat_controller_conf_.steer_mrac_conf();
   MracController mrac_controller;
   mrac_controller.Init(mrac_conf, dt);
   mrac_controller.Reset();
@@ -103,7 +103,7 @@ TEST_F(MracControllerTest, MracControl) {
 // equation
 TEST_F(MracControllerTest, CheckLyapunovPD) {
   double dt = 0.01;
-  MracConf mrac_conf = lat_controller_conf_.actuation_mrac_conf();
+  MracConf mrac_conf = lat_controller_conf_.steer_mrac_conf();
   MracController mrac_controller;
   mrac_controller.Init(mrac_conf, dt);
   // test on 1st order adaption dynamics

@@ -32,6 +32,6 @@ message LatControllerConf {
   optional bool enable_look_ahead_back_control = 20 [default = false];
   optional double lookahead_station = 21 [default = 0.0];
   optional double lookback_station = 22 [default = 0.0];
-  optional MracConf actuation_mrac_conf = 23;
-  optional bool enable_actuation_mrac_control = 24 [default = false];
+  optional MracConf steer_mrac_conf = 23;
+  optional bool enable_steer_mrac_control = 24 [default = false];
 }

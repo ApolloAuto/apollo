@@ -93,9 +93,9 @@ lat_controller_conf {
       ratio: 0.4
     }
   }
-  enable_actuation_mrac_control: true
-  actuation_mrac_conf {
-    mrac_reference_order: 1
+  enable_steer_mrac_control: true
+  steer_mrac_conf {
+    mrac_model_order: 1
     reference_time_constant: 0.01
     reference_natural_frequency: 10
     reference_damping_ratio: 0.9
