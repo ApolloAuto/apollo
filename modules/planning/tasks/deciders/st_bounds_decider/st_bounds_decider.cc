@@ -68,9 +68,8 @@ Status STBoundsDecider::Process(Frame* const frame,
   // Record the ST-Graph for good visualization and easy debugging.
   auto all_st_boundaries = st_obstacles_processor_.GetAllSTBoundaries();
   std::vector<STBoundary> st_boundaries;
-  for (auto it = all_st_boundaries.begin(); it != all_st_boundaries.end();
-       ++it) {
-    st_boundaries.push_back(it->second);
+  for (const auto& st_boundary : all_st_boundaries) {
+    st_boundaries.push_back(st_boundary.second);
   }
   ADEBUG << "Total ST boundaries = " << st_boundaries.size();
   STGraphDebug* st_graph_debug = reference_line_info->mutable_debug()
@@ -118,11 +117,14 @@ Status STBoundsDecider::GenerateRegularSTBound(STBound* const st_bound) {
   for (size_t i = 0; i < st_bound->size(); ++i) {
     double t, s_lower, s_upper;
     std::tie(t, s_lower, s_upper) = st_bound->at(i);
+    ADEBUG << "Processing st-boundary at t = " << t;
 
     // Get Boundary due to driving limits
     auto driving_limits_bound = st_driving_limits_.GetVehicleDynamicsLimits(t);
     s_lower = std::fmax(s_lower, driving_limits_bound.first);
     s_upper = std::fmin(s_upper, driving_limits_bound.second);
+    ADEBUG << "Bounds for s due to driving limits are "
+           << "s_upper = " << s_upper << ", s_lower = " << s_lower;
 
     // Get Boundary due to obstacles
     std::vector<std::pair<double, double>> available_s_bounds;
@@ -135,7 +137,10 @@ Status STBoundsDecider::GenerateRegularSTBound(STBound* const st_bound) {
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
     std::vector<std::pair<STBoundPoint, ObsDecSet>> available_choices;
+    ADEBUG << "Available choices are:";
     for (int j = 0; j < static_cast<int>(available_s_bounds.size()); ++j) {
+      ADEBUG << "  (" << available_s_bounds[j].first
+             << ", " << available_s_bounds[j].second << ")";
       available_choices.emplace_back(
           std::make_tuple(0.0, available_s_bounds[j].first,
                           available_s_bounds[j].second),
@@ -143,6 +148,8 @@ Status STBoundsDecider::GenerateRegularSTBound(STBound* const st_bound) {
     }
 
     if (available_s_bounds.size() >= 1) {
+      ADEBUG << "One decision needs to be made among "
+             << available_s_bounds.size() << " choices.";
       RankDecisions(st_guide_line_.GetGuideSFromT(t), driving_limits_bound,
                     &available_choices);
       // Select the top decision.
@@ -187,7 +194,12 @@ void STBoundsDecider::RankDecisions(
       double B_s_lower = 0.0;
       double B_s_upper = 0.0;
       std::tie(std::ignore, B_s_lower, B_s_upper) =
-          available_choices->at(i+1).first;
+          available_choices->at(i + 1).first;
+
+      ADEBUG << "    Range ranking: A has s_upper = "
+             << A_s_upper << ", s_lower = " << A_s_lower;
+      ADEBUG << "    Range ranking: B has s_upper = "
+             << B_s_upper << ", s_lower = " << B_s_lower;
 
       // If not both are larger than passable-threshold, should select
       // the one with larger room.
@@ -195,8 +207,7 @@ void STBoundsDecider::RankDecisions(
                       std::fmax(driving_limit.first, A_s_lower);
       double B_room = std::fmin(driving_limit.second, B_s_upper) -
                       std::fmax(driving_limit.first, B_s_lower);
-      if (!(A_room >= kSTPassableThreshold) ||
-          !(B_room >= kSTPassableThreshold)) {
+      if (A_room < kSTPassableThreshold || B_room < kSTPassableThreshold) {
         if (A_room < B_room) {
           swap(available_choices->at(i+1), available_choices->at(i));
           has_swaps = true;
@@ -232,8 +243,22 @@ void STBoundsDecider::RecordSTGraphDebug(
   for (const auto& boundary : st_graph_data) {
     auto boundary_debug = st_graph_debug->add_boundary();
     boundary_debug->set_name(boundary.id());
-    ADEBUG << "Obstacle ID = " << boundary.id();
-    boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_UNKNOWN);
+    if (boundary.boundary_type() == STBoundary::BoundaryType::YIELD) {
+      boundary_debug->set_type(
+          StGraphBoundaryDebug::ST_BOUNDARY_TYPE_YIELD);
+      ADEBUG << "Obstacle ID = " << boundary.id()
+             << ", decision = YIELD";
+    } else if (boundary.boundary_type() == STBoundary::BoundaryType::OVERTAKE) {
+      boundary_debug->set_type(
+          StGraphBoundaryDebug::ST_BOUNDARY_TYPE_OVERTAKE);
+      ADEBUG << "Obstacle ID = " << boundary.id()
+             << ", decision = OVERTAKE";
+    } else {
+      boundary_debug->set_type(
+          StGraphBoundaryDebug::ST_BOUNDARY_TYPE_UNKNOWN);
+      ADEBUG << "Obstacle ID = " << boundary.id()
+             << ", decision = UNKNOWN";
+    }
 
     for (const auto& point : boundary.points()) {
       auto point_debug = boundary_debug->add_point();
@@ -246,11 +271,11 @@ void STBoundsDecider::RecordSTGraphDebug(
   auto boundary_debug = st_graph_debug->add_boundary();
   boundary_debug->set_name("Generated ST-Boundary");
   boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_UNKNOWN);
-  for (int i = 0; i < static_cast<int>(st_bound.size()); ++i) {
+  for (const auto& st_bound_pt : st_bound) {
     auto point_debug = boundary_debug->add_point();
     double t = 0.0;
     double s_lower = 0.0;
-    std::tie(t, s_lower, std::ignore) = st_bound[i];
+    std::tie(t, s_lower, std::ignore) = st_bound_pt;
     point_debug->set_t(t);
     point_debug->set_s(s_lower);
   }

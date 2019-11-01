@@ -231,10 +231,12 @@ bool STBoundary::GetBoundarySRange(const double curr_time, double* s_upper,
 
 bool STBoundary::GetBoundarySlopes(const double curr_time, double* ds_upper,
                                    double* ds_lower) const {
-  if (ds_upper == nullptr || ds_lower == nullptr)
+  if (ds_upper == nullptr || ds_lower == nullptr) {
     return false;
-  if (curr_time < min_t_ || curr_time > max_t_)
+  }
+  if (curr_time < min_t_ || curr_time > max_t_) {
     return false;
+  }
 
   constexpr double kTimeIncrement = 0.05;
   double t_prev = curr_time - kTimeIncrement;
@@ -248,8 +250,9 @@ bool STBoundary::GetBoundarySlopes(const double curr_time, double* ds_upper,
   double curr_s_upper = 0.0;
   double curr_s_lower = 0.0;
   GetBoundarySRange(curr_time, &curr_s_upper, &curr_s_lower);
-  if (!has_prev && !has_next)
+  if (!has_prev && !has_next) {
     return false;
+  }
   if (has_prev && has_next) {
     *ds_upper = ((next_s_upper - curr_s_upper) / kTimeIncrement +
         (curr_s_upper - prev_s_upper) / kTimeIncrement) * 0.5;
