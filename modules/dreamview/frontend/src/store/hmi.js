@@ -4,6 +4,9 @@ import WS from "store/websocket";
 import UTTERANCE from "store/utterance";
 import RENDERER from "renderer";
 
+
+const TELEOP_MODES = Object.freeze(['Car Teleop', 'Console Teleop']);
+
 export default class HMI {
     modes = [];
     @observable currentMode = 'none';
@@ -135,6 +138,14 @@ export default class HMI {
 
     @computed get inNavigationMode() {
         return this.currentMode === "Navigation";
+    }
+
+    @computed get inTeleopMode() {
+        return TELEOP_MODES.includes(this.currentMode);
+    }
+
+    @computed get shouldDisplayNavigationMap() {
+        return this.inNavigationMode || this.inTeleopMode;
     }
 
     @action resetDataCollectionProgress() {

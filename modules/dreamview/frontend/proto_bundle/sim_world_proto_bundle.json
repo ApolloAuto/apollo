@@ -6557,6 +6557,13 @@
                   "options": {
                     "default": 3
                   }
+                },
+                "targetSlowDownSpeed": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 2.5
+                  }
                 }
               }
             },
@@ -7169,6 +7176,10 @@
                   "options": {
                     "default": true
                   }
+                },
+                "laneChangeFailureCounter": {
+                  "type": "int32",
+                  "id": 2
                 }
               }
             },
@@ -9020,6 +9031,10 @@
                 "pullOverStatus": {
                   "type": "apollo.planning.PullOverStatus",
                   "id": 29
+                },
+                "emergencyPullOverStatus": {
+                  "type": "apollo.planning.EmergencyPullOverStatus",
+                  "id": 30
                 }
               }
             },
