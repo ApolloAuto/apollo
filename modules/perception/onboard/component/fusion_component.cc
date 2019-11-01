@@ -33,7 +33,7 @@ bool FusionComponent::Init() {
   if (!GetProtoConfig(&comp_config)) {
     return false;
   }
-  AINFO << "Radarr Component Configs: " << comp_config.DebugString();
+  AINFO << "Fusion Component Configs: " << comp_config.DebugString();
 
   // to load component configs
   fusion_method_ = comp_config.fusion_method();
