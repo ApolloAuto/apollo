@@ -44,7 +44,7 @@ class ObstacleClusters {
    * @param lane info
    * @return a corresponding lane graph
    */
-  static const LaneGraph& GetLaneGraph(
+  static LaneGraph GetLaneGraph(
       const double start_s, const double length, const bool is_on_lane,
       std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr);
 
@@ -131,7 +131,6 @@ class ObstacleClusters {
   static void Clear();
 
  private:
-  static std::unordered_map<std::string, LaneGraph> lane_graphs_;
   static std::unordered_map<std::string, std::vector<LaneObstacle>>
       lane_obstacles_;
   static std::unordered_map<std::string, StopSign> lane_id_stop_sign_map_;

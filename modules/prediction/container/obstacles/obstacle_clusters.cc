@@ -26,29 +26,26 @@ namespace prediction {
 
 using ::apollo::hdmap::LaneInfo;
 
-std::unordered_map<std::string, LaneGraph> ObstacleClusters::lane_graphs_;
 std::unordered_map<std::string, std::vector<LaneObstacle>>
     ObstacleClusters::lane_obstacles_;
 std::unordered_map<std::string, StopSign>
     ObstacleClusters::lane_id_stop_sign_map_;
 
 void ObstacleClusters::Clear() {
-  lane_graphs_.clear();
   lane_obstacles_.clear();
   lane_id_stop_sign_map_.clear();
 }
 
 void ObstacleClusters::Init() { Clear(); }
 
-const LaneGraph& ObstacleClusters::GetLaneGraph(
+LaneGraph ObstacleClusters::GetLaneGraph(
     const double start_s, const double length, const bool is_on_lane,
     std::shared_ptr<const LaneInfo> lane_info_ptr) {
   std::string lane_id = lane_info_ptr->id().id();
   RoadGraph road_graph(start_s, length, is_on_lane, lane_info_ptr);
   LaneGraph lane_graph;
   road_graph.BuildLaneGraph(&lane_graph);
-  lane_graphs_[lane_id] = std::move(lane_graph);
-  return lane_graphs_[lane_id];
+  return lane_graph;
 }
 
 LaneGraph ObstacleClusters::GetLaneGraphWithoutMemorizing(

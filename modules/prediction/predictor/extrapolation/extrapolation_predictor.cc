@@ -15,14 +15,19 @@
  *****************************************************************************/
 
 #include "modules/prediction/predictor/extrapolation/extrapolation_predictor.h"
+
+#include "modules/common/math/vec2d.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
+#include "modules/prediction/container/obstacles/obstacle_clusters.h"
+#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {
 
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
+using apollo::hdmap::LaneInfo;
 
 ExtrapolationPredictor::ExtrapolationPredictor() {
   predictor_type_ = ObstacleConf::EXTRAPOLATION_PREDICTOR;
@@ -56,7 +61,7 @@ void ExtrapolationPredictor::PostProcess(Trajectory* trajectory_ptr) {
   ExtrapolationPredictor::LaneSearchResult
   lane_search_result = SearchExtrapolationLane(*trajectory_ptr, kNumTailPoint);
   if (lane_search_result.found) {
-    ExtrapolateByLane(lane_search_result.lane_id, trajectory_ptr);
+    ExtrapolateByLane(lane_search_result, trajectory_ptr);
   } else {
     ExtrapolateByFreeMove(kNumTailPoint, trajectory_ptr);
   }
@@ -91,8 +96,77 @@ ExtrapolationPredictor::SearchExtrapolationLane(
 }
 
 void ExtrapolationPredictor::ExtrapolateByLane(
-    const std::string& lane_id, Trajectory* trajectory_ptr) {
-  // TODO(kechxu) implement
+    const LaneSearchResult& lane_search_result, Trajectory* trajectory_ptr) {
+  std::string start_lane_id = lane_search_result.lane_id;
+  int point_index = lane_search_result.point_index;
+  while (trajectory_ptr->trajectory_point_size() > point_index + 1) {
+    trajectory_ptr->mutable_trajectory_point()->RemoveLast();
+  }
+  auto lane_info_ptr = PredictionMap::LaneById(start_lane_id);
+  int num_trajectory_point = trajectory_ptr->trajectory_point_size();
+  const TrajectoryPoint& last_point =
+      trajectory_ptr->trajectory_point(num_trajectory_point);
+
+  Eigen::Vector2d position(last_point.path_point().x(),
+                           last_point.path_point().y());
+  double lane_s = 0.0;
+  double lane_l = 0.0;
+  bool projected = PredictionMap::GetProjection(
+      position, lane_info_ptr, &lane_s, &lane_l);
+  if (!projected) {
+    AERROR << "Position (" << position.x() << ", " << position.y() << ") "
+           << "cannot be projected onto lane [" << start_lane_id << "]";
+    return;
+  }
+
+  double last_relative_time = last_point.relative_time();
+  double speed = last_point.v();
+  double time_range = FLAGS_prediction_trajectory_time_length -
+                      last_relative_time;
+  double time_resolution = FLAGS_prediction_trajectory_time_resolution;
+  double length = speed * time_range;
+
+  LaneGraph lane_graph = ObstacleClusters::GetLaneGraph(
+      lane_s, length, false, lane_info_ptr);
+  CHECK_EQ(lane_graph.lane_sequence_size(), 1);
+  const LaneSequence& lane_sequence = lane_graph.lane_sequence(0);
+  int lane_segment_index = 0;
+  std::string lane_id =
+      lane_sequence.lane_segment(lane_segment_index).lane_id();
+
+  int num_point_remained = static_cast<int>(time_range / time_resolution);
+  for (int i = 0; i < num_point_remained; ++i) {
+    double relative_time = last_relative_time +
+                           static_cast<double>(i) * time_resolution;
+    Eigen::Vector2d point;
+    double theta = M_PI;
+    if (!PredictionMap::SmoothPointFromLane(lane_id, lane_s, lane_l, &point,
+                                            &theta)) {
+      AERROR << "Unable to get smooth point from lane [" << lane_id
+             << "] with s [" << lane_s << "] and l [" << lane_l << "]";
+      break;
+    }
+    TrajectoryPoint* trajectory_point = trajectory_ptr->add_trajectory_point();
+    PathPoint* path_point = trajectory_point->mutable_path_point();
+    path_point->set_x(point.x());
+    path_point->set_y(point.y());
+    path_point->set_z(0.0);
+    path_point->set_theta(theta);
+    path_point->set_lane_id(lane_id);
+    trajectory_point->set_v(speed);
+    trajectory_point->set_a(0.0);
+    trajectory_point->set_relative_time(relative_time);
+
+    lane_s += speed * time_resolution;
+    while (lane_s > PredictionMap::LaneById(lane_id)->total_length() &&
+           lane_segment_index + 1 < lane_sequence.lane_segment_size()) {
+      lane_segment_index += 1;
+      lane_s = lane_s - PredictionMap::LaneById(lane_id)->total_length();
+      lane_id = lane_sequence.lane_segment(lane_segment_index).lane_id();
+    }
+
+    lane_l *= FLAGS_go_approach_rate;
+  }
 }
 
 void ExtrapolationPredictor::ExtrapolateByFreeMove(
