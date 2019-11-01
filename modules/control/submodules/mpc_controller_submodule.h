@@ -36,8 +36,7 @@
 
 namespace apollo {
 namespace control {
-class MPCControllerSubmodule final
-    : public cyber::Component<control::Preprocessor> {
+class MPCControllerSubmodule final : public cyber::Component<Preprocessor> {
  public:
   /**
    * @brief Construct a new MPCControllerSubmodule object
@@ -67,29 +66,23 @@ class MPCControllerSubmodule final
    * @return true control command is successfully generated
    * @return false fail to generate control command
    */
-  bool Proc(const std::shared_ptr<control::Preprocessor>& preprocessor_status)
-      override;
+  bool Proc(const std::shared_ptr<Preprocessor>& preprocessor_status) override;
 
  private:
-  common::Status ProduceControlCommand(
-      apollo::control::ControlCommand* control_command);
+  common::Status ProduceControlCommand(ControlCommand* control_command);
 
  private:
   bool estop_ = false;
-
-  std::shared_ptr<cyber::Writer<apollo::control::ControlCommand>>
-      control_command_writer_;
 
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
   MPCController mpc_controller_;
 
   std::mutex mutex_;
-
   // TODO(SHU): separate conf
   ControlConf mpc_controller_conf_;
-
-  control::LocalView* local_view_;
+  LocalView* local_view_;
+  std::shared_ptr<cyber::Writer<ControlCommand>> control_command_writer_;
 };
 
 CYBER_REGISTER_COMPONENT(MPCControllerSubmodule)

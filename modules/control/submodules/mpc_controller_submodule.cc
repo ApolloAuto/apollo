@@ -57,7 +57,7 @@ bool MPCControllerSubmodule::Init() {
 }
 
 bool MPCControllerSubmodule::Proc(
-    const std::shared_ptr<control::Preprocessor>& preprocessor_status) {
+    const std::shared_ptr<Preprocessor>& preprocessor_status) {
   ControlCommand control_command;
   local_view_ = preprocessor_status->mutable_local_view();
 
