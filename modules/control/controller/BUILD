@@ -37,6 +37,7 @@ cc_library(
         "//modules/control/common:control_gflags",
         "//modules/control/common:interpolation_1d",
         "//modules/control/common:leadlag_controller",
+        "//modules/control/common:mrac_controller",
         "//modules/control/common:trajectory_analyzer",
         "//modules/control/proto:control_proto",
         "@eigen",
