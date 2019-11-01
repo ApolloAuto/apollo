@@ -1,9 +1,17 @@
 @import "media-queries";
 @import "common";
 
-$min-scene-width: 600;
+$min-main-view-width: 600;
+$side-bar-width: ('small': 80, 'large': 90);
+$header-height: ('small': 55, 'large': 60);
 
-:export { MIN_SCENE_WIDTH: $min-scene-width; }
+:export {
+    MIN_MAIN_VIEW_WIDTH: $min-main-view-width;
+    SIDE_BAR_WIDTH_SMALL: #{map-get($side-bar-width, 'small')};
+    SIDE_BAR_WIDTH_LARGE: #{map-get($side-bar-width, 'large')};
+    HEADER_HEIGHT_SMALL: #{map-get($header-height, 'small')};
+    HEADER_HEIGHT_LARGE: #{map-get($header-height, 'large')};
+}
 
 @mixin monitor-item-common-properties($text-width: calc(100% - 17px)) {
     display: flex;
@@ -114,14 +122,14 @@ body {
     position: relative;
     top: 0;
     left: 0;
-    height: 60px;
+    height: map-get($header-height, 'large') + 0px;
 
     background: #000000;
     color: #ffffff;
     text-align: left;
 
     @include small-screen {
-        height: 55px;
+        height: map-get($header-height, 'small') + 0px;
     }
 
     /* The Apollo logo on the header. */
@@ -243,7 +251,7 @@ body {
             .main-view {
                 flex: 0 0 auto;
                 position: relative;
-                min-width: $min-scene-width + 0px;
+                min-width: $min-main-view-width + 0px;
                 #camera-image {
                     width: 100%;
                 }
@@ -556,7 +564,7 @@ body {
 
     .button {
         display: block;
-        width: 90px;
+        width: map-get($side-bar-width, 'large') + 0px;
         border: none;
         padding: 20px 10px;
 
@@ -567,7 +575,7 @@ body {
         cursor: pointer;
 
         @include small-screen {
-            width: 80px;
+            width: map-get($side-bar-width, 'small') + 0px;
             padding-top: 10px;
         }
 
@@ -1454,5 +1462,7 @@ body {
         right: 0px;
         width: 30px;
         height: 30px;
+
+        cursor: pointer;
     }
 }

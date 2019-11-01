@@ -1,6 +1,8 @@
 import * as THREE from "three";
-import OrbitControls from "three/examples/js/controls/OrbitControls.js";
 import Stats from "stats.js";
+
+import Styles from "styles/main.scss";
+const _ = require('lodash');
 
 import Coordinates from "renderer/coordinates";
 import AutoDrivingCar from "renderer/adc";
@@ -16,8 +18,6 @@ import Routing from "renderer/routing.js";
 import RoutingEditor from "renderer/routing_editor.js";
 import Gnss from "renderer/gnss.js";
 import PointCloud from "renderer/point_cloud.js";
-import Styles from "styles/main.scss";
-const _ = require('lodash');
 
 
 class Renderer {
@@ -155,7 +155,7 @@ class Renderer {
     }
 
     updateDimension(width, height) {
-        if (width < Styles.MIN_SCENE_WIDTH && this.dimension.width >= width) {
+        if (width < Styles.MIN_MAIN_VIEW_WIDTH / 2 && this.dimension.width >= width) {
             // Reach minimum, do not update camera/renderer dimension anymore.
             return;
         }

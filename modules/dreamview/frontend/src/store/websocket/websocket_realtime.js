@@ -56,19 +56,22 @@ export default class RealtimeWebSocketEndpoint {
                     const isNavigationModeInvolved = (this.currentMode === 'Navigation' ||
                                                     STORE.hmi.currentMode === 'Navigation');
                     this.currentMode = STORE.hmi.currentMode;
-                    if (STORE.hmi.inNavigationMode) {
-                        // In navigation mode, the coordinate system is FLU and
-                        // relative position of the ego-car is (0, 0). But,
-                        // absolute position of the ego-car is needed in MAP_NAVIGATOR.
+                    if (STORE.hmi.shouldDisplayNavigationMap) {
                         if (MAP_NAVIGATOR.isInitialized()) {
                             MAP_NAVIGATOR.update(message);
                         }
-                        message.autoDrivingCar.positionX = 0;
-                        message.autoDrivingCar.positionY = 0;
-                        message.autoDrivingCar.heading = 0;
 
-                        RENDERER.coordinates.setSystem("FLU");
-                        this.mapUpdatePeriodMs = 100;
+                        if (STORE.hmi.inNavigationMode) {
+                            // In navigation mode, the coordinate system is FLU and
+                            // relative position of the ego-car is (0, 0). But,
+                            // absolute position of the ego-car is needed in MAP_NAVIGATOR.
+                            message.autoDrivingCar.positionX = 0;
+                            message.autoDrivingCar.positionY = 0;
+                            message.autoDrivingCar.heading = 0;
+
+                            RENDERER.coordinates.setSystem("FLU");
+                            this.mapUpdatePeriodMs = 100;
+                        }
                     } else {
                         RENDERER.coordinates.setSystem("ENU");
                         this.mapUpdatePeriodMs = 1000;
