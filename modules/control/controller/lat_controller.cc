@@ -246,9 +246,9 @@ Status LatController::Init(const ControlConf *control_conf) {
   }
 
   bool enable_mrac =
-      control_conf_->lat_controller_conf().enable_actuation_mrac_control();
+      control_conf_->lat_controller_conf().enable_steer_mrac_control();
   if (enable_mrac) {
-    mrac_controller_.Init(lat_controller_conf.actuation_mrac_conf(), ts_);
+    mrac_controller_.Init(lat_controller_conf.steer_mrac_conf(), ts_);
   }
 
   return Status::OK();
@@ -492,11 +492,11 @@ Status LatController::ComputeControlCommand(
   // Re-compute the steering command if the MRAC control is enabled, with steer
   // angle limitation and steer rate limitation
   bool enable_mrac =
-      control_conf_->lat_controller_conf().enable_actuation_mrac_control();
+      control_conf_->lat_controller_conf().enable_steer_mrac_control();
   if (enable_mrac) {
     const int mrac_model_order = control_conf_->lat_controller_conf()
-                                     .actuation_mrac_conf()
-                                     .mrac_reference_order();
+                                     .steer_mrac_conf()
+                                     .mrac_model_order();
     Matrix steer_state = Matrix::Zero(mrac_model_order, 1);
     steer_state(0, 0) = chassis->steering_percentage();
     if (mrac_model_order > 1) {

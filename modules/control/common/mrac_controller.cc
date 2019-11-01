@@ -138,7 +138,7 @@ void MracController::Init(const MracConf &mrac_conf, const double dt) {
   // Initialize the saturation limits
   bound_ratio_ = mrac_conf.mrac_saturation_level();
   // Initialize the common model parameters
-  model_order_ = mrac_conf.mrac_reference_order();
+  model_order_ = mrac_conf.mrac_model_order();
   // Initialize the system states
   input_desired_ = Matrix::Zero(1, 2);
   state_action_ = Matrix::Zero(model_order_, 2);
