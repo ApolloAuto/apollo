@@ -39,6 +39,9 @@ DEFINE_string(mpc_controller_submodule_name, "MPC controller",
 DEFINE_string(preprocessor_submodule_name, "preprocessor submodule",
               "preprocessor submodule name in proto");
 
+DEFINE_string(postprocessor_submodule_name, "postprocessor submodule",
+              "postprocessor submodule name in proto");
+
 DEFINE_bool(is_control_test_mode, false, "True to run control in test mode");
 DEFINE_bool(use_preview_speed_for_table, false,
             "True to use preview speed for table lookup");

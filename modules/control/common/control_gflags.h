@@ -36,6 +36,7 @@ DECLARE_string(control_node_name);
 
 DECLARE_string(preprocessor_submodule_name);
 DECLARE_string(mpc_controller_submodule_name);
+DECLARE_string(postprocessor_submodule_name);
 
 DECLARE_bool(is_control_test_mode);
 DECLARE_bool(use_preview_speed_for_table);
