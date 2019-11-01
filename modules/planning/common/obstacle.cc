@@ -684,7 +684,7 @@ const std::string Obstacle::DebugString() const {
   }
   if (longitudinal_decision_.object_tag_case() !=
       ObjectDecisionType::OBJECT_TAG_NOT_SET) {
-    ss << "longitutional decision: "
+    ss << "longitudinal decision: "
        << longitudinal_decision_.ShortDebugString();
   }
   return ss.str();

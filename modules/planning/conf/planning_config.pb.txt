@@ -371,3 +371,9 @@ default_task_config: {
     reuse_path: false
   }
 }
+default_task_config: {
+  task_type: PATH_DECIDER
+  path_decider_config{
+    static_obstacle_buffer: 0.3
+  }
+}
