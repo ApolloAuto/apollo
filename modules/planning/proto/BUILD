@@ -165,6 +165,7 @@ proto_library(
         ":open_space_trajectory_provider_config_proto_lib",
         ":path_assessment_decider_config_proto_lib",
         ":path_bounds_decider_config_proto_lib",
+        ":path_decider_config_proto_lib",
         ":path_lane_borrow_decider_config_proto_lib",
         ":path_reuse_decider_config_proto_lib",
         ":piecewise_jerk_nonlinear_speed_config_proto_lib",
@@ -310,6 +311,20 @@ proto_library(
     name = "path_bounds_decider_config_proto_lib",
     srcs = [
         "path_bounds_decider_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "path_decider_config_proto",
+    deps = [
+        ":path_decider_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "path_decider_config_proto_lib",
+    srcs = [
+        "path_decider_config.proto",
     ],
 )
 
