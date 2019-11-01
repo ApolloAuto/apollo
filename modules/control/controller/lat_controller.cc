@@ -245,6 +245,12 @@ Status LatController::Init(const ControlConf *control_conf) {
     leadlag_controller_.Init(lat_controller_conf.reverse_leadlag_conf(), ts_);
   }
 
+  bool enable_mrac =
+      control_conf_->lat_controller_conf().enable_actuation_mrac_control();
+  if (enable_mrac) {
+    mrac_controller_.Init(lat_controller_conf.actuation_mrac_conf(), ts_);
+  }
+
   return Status::OK();
 }
 
@@ -449,7 +455,6 @@ Status LatController::ComputeControlCommand(
 
   const double steer_angle_feedforward = ComputeFeedForward(debug->curvature());
 
-  // Clamp the steer angle to -100.0 to 100.0
   double steer_angle = 0.0;
   double steer_angle_feedback_augment = 0.0;
   bool enable_leadlag = control_conf_->lat_controller_conf()
@@ -466,23 +471,55 @@ Status LatController::ComputeControlCommand(
   steer_angle = steer_angle_feedback + steer_angle_feedforward +
                 steer_angle_feedback_augment;
 
-  // Limit the steering command with the given maximum lateral acceleration
-  if (FLAGS_set_steer_limit) {
-    const double steer_limit = std::atan(max_lat_acc_ * wheelbase_ /
-                                         (vehicle_state->linear_velocity() *
-                                          vehicle_state->linear_velocity())) *
-                               steer_ratio_ * 180 / M_PI /
-                               steer_single_direction_max_degree_ * 100;
+  // Compute the steering command limit with the given maximum lateral
+  // acceleration
+  const double steer_limit =
+      (FLAGS_set_steer_limit) ? std::atan(max_lat_acc_ * wheelbase_ /
+                                          (vehicle_state->linear_velocity() *
+                                           vehicle_state->linear_velocity())) *
+                                    steer_ratio_ * 180 / M_PI /
+                                    steer_single_direction_max_degree_ * 100
+                              : 100.0;
 
-    // Clamp the steer angle with steer limitations at current speed
-    double steer_angle_limited =
-        common::math::Clamp(steer_angle, -steer_limit, steer_limit);
-    steer_angle = steer_angle_limited;
-    debug->set_steer_angle_limited(steer_angle_limited);
+  const double steer_diff_with_max_rate =
+      (FLAGS_enable_maximum_steer_rate_limit)
+          ? vehicle_param_.max_steer_angle_rate() * ts_ * 180 / M_PI /
+                steer_single_direction_max_degree_ * 100
+          : 100.0;
+
+  const double steering_position = chassis->steering_percentage();
+
+  // Re-compute the steering command if the MRAC control is enabled, with steer
+  // angle limitation and steer rate limitation
+  bool enable_mrac =
+      control_conf_->lat_controller_conf().enable_actuation_mrac_control();
+  if (enable_mrac) {
+    const int mrac_model_order = control_conf_->lat_controller_conf()
+                                     .actuation_mrac_conf()
+                                     .mrac_reference_order();
+    Matrix steer_state = Matrix::Zero(mrac_model_order, 1);
+    steer_state(0, 0) = chassis->steering_percentage();
+    if (mrac_model_order > 1) {
+      steer_state(1, 0) = (steering_position - pre_steering_position_) / ts_;
+    }
+    steer_angle =
+        mrac_controller_.Control(steer_angle, steer_state, ts_, steer_limit,
+                                 steer_diff_with_max_rate / ts_);
   }
+  pre_steering_position_ = steering_position;
+
+  // Clamp the steer angle with steer limitations at current speed
+  double steer_angle_limited =
+      common::math::Clamp(steer_angle, -steer_limit, steer_limit);
+  steer_angle = steer_angle_limited;
+  debug->set_steer_angle_limited(steer_angle_limited);
+
+  // Limit the steering command with the designed digital filter
   steer_angle = digital_filter_.Filter(steer_angle);
   steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
 
+  // Check if the steer is locked and hence the previous steer angle should be
+  // executed
   if (std::abs(vehicle_state->linear_velocity()) < FLAGS_lock_steer_speed &&
       (vehicle_state->gear() == canbus::Chassis::GEAR_DRIVE ||
        vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) &&
@@ -490,21 +527,13 @@ Status LatController::ComputeControlCommand(
     steer_angle = pre_steer_angle_;
   }
 
-  const double steer_diff_with_max_rate =
-      vehicle_param_.max_steer_angle_rate() * ts_ * 180 / M_PI /
-      steer_single_direction_max_degree_ * 100;
+  // Set the steer commonds
+  cmd->set_steering_target(common::math::Clamp(
+      steer_angle, pre_steer_angle_ - steer_diff_with_max_rate,
+      pre_steer_angle_ + steer_diff_with_max_rate));
+  cmd->set_steering_rate(FLAGS_steer_angle_rate);
 
-  if (FLAGS_enable_maximum_steer_rate_limit) {
-    cmd->set_steering_target(common::math::Clamp(
-        steer_angle, pre_steer_angle_ - steer_diff_with_max_rate,
-        pre_steer_angle_ + steer_diff_with_max_rate));
-    pre_steer_angle_ = cmd->steering_target();
-    cmd->set_steering_rate(steer_diff_with_max_rate / ts_);
-  } else {
-    pre_steer_angle_ = steer_angle;
-    cmd->set_steering_target(steer_angle);
-    cmd->set_steering_rate(FLAGS_steer_angle_rate);
-  }
+  pre_steer_angle_ = cmd->steering_target();
 
   // compute extra information for logging and debugging
   const double steer_angle_lateral_contribution =
@@ -534,7 +563,7 @@ Status LatController::ComputeControlCommand(
       steer_angle_heading_rate_contribution);
   debug->set_steer_angle_feedback(steer_angle_feedback);
   debug->set_steer_angle_feedback_augment(steer_angle_feedback_augment);
-  debug->set_steering_position(chassis->steering_percentage());
+  debug->set_steering_position(steering_position);
   debug->set_ref_speed(vehicle_state->linear_velocity());
 
   ProcessLogs(debug, chassis);
