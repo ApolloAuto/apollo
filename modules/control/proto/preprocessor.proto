@@ -22,4 +22,7 @@ message Preprocessor {
   optional PadMessage pad_msg = 3;
   optional apollo.common.EngageAdvice engage_advice = 4;
   optional InputDebug input_debug = 5;
+  optional bool received_pad_msg = 6 [default = false];
+  optional bool estop = 7 [default = false];
+  optional string estop_reason = 8;
 }
