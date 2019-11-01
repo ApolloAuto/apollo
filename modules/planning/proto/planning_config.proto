@@ -12,6 +12,7 @@ import "modules/planning/proto/open_space_trajectory_provider_config.proto";
 import "modules/planning/proto/open_space_trajectory_partition_config.proto";
 import "modules/planning/proto/path_assessment_decider_config.proto";
 import "modules/planning/proto/path_bounds_decider_config.proto";
+import "modules/planning/proto/path_decider_config.proto";
 import "modules/planning/proto/path_lane_borrow_decider_config.proto";
 import "modules/planning/proto/piecewise_jerk_path_config.proto";
 import "modules/planning/proto/piecewise_jerk_speed_config.proto";
@@ -24,10 +25,6 @@ import "modules/planning/proto/navi_speed_decider_config.proto";
 import "modules/planning/proto/navi_obstacle_decider_config.proto";
 import "modules/planning/proto/path_reuse_decider_config.proto";
 import "modules/planning/proto/st_bounds_decider_config.proto";
-
-message PathDeciderConfig {
-  // place holder
-}
 
 // Planning's configuration is based on the following architecture
 // * Scenario has one more multiple stages
