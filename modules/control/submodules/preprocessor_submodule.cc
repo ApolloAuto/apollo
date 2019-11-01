@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file processor_submodule.cc
+ * @file preprocessor_submodule.cc
  */
 
 #include "modules/control/submodules/preprocessor_submodule.h"
@@ -136,6 +136,15 @@ bool PreprocessorSubmodule::Proc() {
   if (pad_msg != nullptr) {
     OnPad(pad_msg);
   }
+
+  Preprocessor control_preprocessor;
+  Status status = ProducePreprocessorStatus(&control_preprocessor);
+  AERROR_IF(!status.ok()) << "Failed to produce control preprocessor:"
+                          << status.error_message();
+  control_preprocessor.set_received_pad_msg(pad_received_);
+  control_preprocessor.set_allocated_pad_msg(&pad_msg_);
+  preprocessor_writer_->Write(
+      std::make_shared<Preprocessor>(control_preprocessor));
   return true;
 }
 
@@ -223,6 +232,9 @@ Status PreprocessorSubmodule::ProducePreprocessorStatus(
       debug->mutable_latest_replan_trajectory_header()->CopyFrom(
           latest_replan_trajectory_header_);
     }
+  } else {
+    preprocessor_status->set_estop(estop_);
+    preprocessor_status->set_estop_reason(estop_reason_);
   }
 
   return status;

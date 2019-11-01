@@ -75,7 +75,7 @@ class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
    *
    * @param pad
    */
-  void OnPad(const std::shared_ptr<apollo::control::PadMessage> &pad);
+  void OnPad(const std::shared_ptr<PadMessage> &pad);
 
   /**
    * @brief upon receiving planning message
@@ -108,7 +108,7 @@ class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
    * @param local_view
    * @return common::Status
    */
-  common::Status CheckInput(apollo::control::LocalView *local_view);
+  common::Status CheckInput(LocalView *local_view);
 
   /**
    * @brief check time stamp
@@ -116,7 +116,7 @@ class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
    * @param local_view
    * @return common::Status
    */
-  common::Status CheckTimestamp(apollo::control::LocalView *local_view);
+  common::Status CheckTimestamp(LocalView *local_view);
 
   /**
    * @brief check pad message
@@ -125,8 +125,7 @@ class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
    */
   common::Status CheckPad();
 
-  common::Status ProducePreprocessorStatus(
-      apollo::control::Preprocessor *preprocessor_status);
+  common::Status ProducePreprocessorStatus(Preprocessor *preprocessor_status);
 
  private:
   double init_time_ = 0.0;
@@ -144,19 +143,18 @@ class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
   std::mutex mutex_;
 
   std::shared_ptr<cyber::Reader<apollo::canbus::Chassis>> chassis_reader_;
-  std::shared_ptr<cyber::Reader<apollo::control::PadMessage>> pad_msg_reader_;
+  std::shared_ptr<cyber::Reader<PadMessage>> pad_msg_reader_;
   std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
       localization_reader_;
   std::shared_ptr<cyber::Reader<planning::ADCTrajectory>> trajectory_reader_;
 
-  std::shared_ptr<cyber::Writer<apollo::control::Preprocessor>>
-      preprocessor_writer_;
+  std::shared_ptr<cyber::Writer<Preprocessor>> preprocessor_writer_;
 
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
   ControlCommonConf control_common_conf_;
 
-  apollo::control::LocalView *local_view_;
+  LocalView *local_view_;
 };
 
 CYBER_REGISTER_COMPONENT(PreprocessorSubmodule);
