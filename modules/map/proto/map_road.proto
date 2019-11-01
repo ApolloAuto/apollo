@@ -12,7 +12,7 @@ enum BoundaryEdgeType {
   FENCE = 3;
   WALL = 4;
   SUNKEN = 5;
-  PED_XING = 6;
+  POST_FENCE= 6;
   VIRTUAL = 7;
 };
 

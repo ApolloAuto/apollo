@@ -289,9 +289,9 @@ Status UtilXmlParser::ToBoundaryEdgeType(const std::string &edge_type,
   *pb_boundary_edge_type = apollo::hdmap::DEFAULT;
   if (edge_type == "DEFAULT") {
     *pb_boundary_edge_type = apollo::hdmap::DEFAULT;
-  } else if (edge_type == "ROAD_SURFACE") {
+  } else if (edge_type == "SURFACE") {
     *pb_boundary_edge_type = apollo::hdmap::SURFACE;
-  } else if (edge_type == "ROAD_CURB") {
+  } else if (edge_type == "CURB") {
     *pb_boundary_edge_type = apollo::hdmap::CURB;
   } else if (edge_type == "FENCE") {
     *pb_boundary_edge_type = apollo::hdmap::FENCE;
@@ -299,8 +299,8 @@ Status UtilXmlParser::ToBoundaryEdgeType(const std::string &edge_type,
     *pb_boundary_edge_type = apollo::hdmap::WALL;
   } else if (edge_type == "SUNKEN") {
     *pb_boundary_edge_type = apollo::hdmap::SUNKEN;
-  } else if (edge_type == "PED_XING") {
-    *pb_boundary_edge_type = apollo::hdmap::PED_XING;
+  } else if (edge_type == "POST_FENCE") {
+    *pb_boundary_edge_type = apollo::hdmap::POST_FENCE;
   } else if (edge_type == "VIRTUAL") {
     *pb_boundary_edge_type = apollo::hdmap::VIRTUAL;
   }
