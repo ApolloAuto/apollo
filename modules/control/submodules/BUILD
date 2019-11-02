@@ -75,4 +75,41 @@ cc_binary(
     deps = [":mpc_controller_submodule_lib"],
 )
 
+cc_library(
+    name = "postprocessor_submodule_lib",
+    srcs = ["postprocessor_submodule.cc"],
+    hdrs = [
+        "postprocessor_submodule.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"postprocessor_submodule\\\"",
+    ],
+    deps = [
+        "//cyber",
+        "//external:gflags",
+        "//modules/canbus/proto:canbus_proto",
+        "//modules/common",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/common/monitor_log",
+        "//modules/common/status",
+        "//modules/common/time",
+        "//modules/common/util",
+        "//modules/common/vehicle_state:vehicle_state_provider",
+        "//modules/control/common:control_gflags",
+        "//modules/control/controller",
+        "//modules/control/proto:control_common_conf_proto",
+        "//modules/control/proto:control_proto",
+        "//modules/control/proto:preprocessor_proto",
+        "//modules/localization/proto:localization_proto",
+        "//modules/planning/proto:planning_proto",
+    ],
+)
+
+cc_binary(
+    name = "postprocessor_submodule.so",
+    linkshared = True,
+    linkstatic = False,
+    deps = [":postprocessor_submodule_lib"],
+)
+
 cpplint()
