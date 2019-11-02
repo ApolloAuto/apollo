@@ -150,6 +150,24 @@ class MracController {
                   const double dt, double *output_bounded);
 
   /**
+   * @brief set initial values for state components in reference model dynamics
+   * @param state_reference_init initial reference states
+   */
+  void SetInitialReferenceState(const Eigen::MatrixXd state_reference_init);
+
+  /**
+   * @brief set initial values for state components in actual actuator dynamics
+   * @param state_reference_init initial action states
+   */
+  void SetInitialActionState(const Eigen::MatrixXd state_action_init);
+
+  /**
+   * @brief set initial command (desired input)
+   * @param command_init initial desired input
+   */
+  void SetInitialCommand(const double command_init);
+
+  /**
    * @brief set convergence ratio for state components in adaptive dynamics
    * @param ratio_state convergence ratio for state adaption
    */
