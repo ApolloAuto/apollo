@@ -172,7 +172,6 @@ PyObject *cyber_PyReader_read(PyObject *self, PyObject *args) {
   bool wait = (r == 1);
 
   std::string reader_ret = reader->read(wait);
-  // AERROR << "c++:PyReader_read -> " << reader_ret;
   return PyString_FromStringAndSize(reader_ret.c_str(), reader_ret.size());
 }
 
@@ -192,7 +191,7 @@ PyObject *cyber_PyReader_register_func(PyObject *self, PyObject *args) {
       pyobj_reader, "apollo_cyber_pyreader");
   callback_fun = (int (*)(const char *i))PyInt_AsLong(pyobj_regist_fun);
   if (reader) {
-    AERROR << "reader regist fun";
+    AINFO << "reader regist fun";
     reader->register_func(callback_fun);
   }
 
@@ -263,10 +262,10 @@ PyObject *cyber_PyClient_send_request(PyObject *self, PyObject *args) {
   }
 
   std::string data_str(data, len);
-  AERROR << "c++:PyClient_send_request data->[ " << data_str << "]";
+  ADEBUG << "c++:PyClient_send_request data->[ " << data_str << "]";
   std::string response_str =
       client->send_request((std::string const &)data_str);
-  AERROR << "c++:response data->[ " << response_str << "]";
+  ADEBUG << "c++:response data->[ " << response_str << "]";
   return PyString_FromStringAndSize(response_str.c_str(), response_str.size());
 }
 
@@ -330,7 +329,7 @@ PyObject *cyber_PyService_register_func(PyObject *self, PyObject *args) {
       pyobj_service, "apollo_cyber_pyservice");
   callback_fun = (int (*)(const char *i))PyInt_AsLong(pyobj_regist_fun);
   if (service) {
-    AERROR << "service regist fun";
+    AINFO << "service regist fun";
     service->register_func(callback_fun);
   }
 
@@ -353,7 +352,7 @@ PyObject *cyber_PyService_read(PyObject *self, PyObject *args) {
   }
 
   std::string reader_ret = service->read();
-  AERROR << "c++:PyService_read -> " << reader_ret;
+  ADEBUG << "c++:PyService_read -> " << reader_ret;
   return PyString_FromStringAndSize(reader_ret.c_str(), reader_ret.size());
 }
 
@@ -376,7 +375,7 @@ PyObject *cyber_PyService_write(PyObject *self, PyObject *args) {
   }
 
   std::string data_str(data, len);
-  AERROR << "c++:PyService_write data->[ " << data_str << "]";
+  ADEBUG << "c++:PyService_write data->[ " << data_str << "]";
   int ret = service->write((std::string const &)data_str);
   return PyInt_FromLong(ret);
 }
@@ -801,7 +800,7 @@ PyObject *cyber_PyServiceUtils_get_service_attr(PyObject *self,
 PyObject *cyber_test0(PyObject *self, PyObject *args) {
   int channel = 0;
   int data_type = 0;
-  AERROR << "+++++++++++++++++++++begin";
+  AINFO << "+++++++++++++++++++++begin";
   if (!PyArg_ParseTuple(args, "ii", &channel, &data_type)) {
     Py_INCREF(Py_None);
     return Py_None;
