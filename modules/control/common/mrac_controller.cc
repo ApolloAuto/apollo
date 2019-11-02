@@ -66,7 +66,7 @@ double MracController::Control(const double command, const Matrix state,
   Matrix matrix_i = Matrix::Identity(model_order_, model_order_);
   state_reference_.col(0) =
       (matrix_i - dt * 0.5 * matrix_a_reference_).inverse() *
-      ((matrix_i + dt * 0.5 * matrix_a_reference_) * state_reference_.col(0) +
+      ((matrix_i + dt * 0.5 * matrix_a_reference_) * state_reference_.col(1) +
        dt * 0.5 * matrix_b_reference_ *
            (input_desired_(0, 0) + input_desired_(0, 1)));
 
@@ -79,6 +79,7 @@ double MracController::Control(const double command, const Matrix state,
   // nonlinear components adaption
   Adaption(&gain_state_adaption_, state_action_,
            gamma_state_adaption_ * gamma_ratio_state_);
+
   Adaption(&gain_input_adaption_, input_desired_,
            gamma_input_adaption_ * gamma_ratio_input_);
 
@@ -146,10 +147,10 @@ void MracController::Init(const MracConf &mrac_conf, const double dt) {
   gain_state_adaption_ = Matrix::Zero(model_order_, 2);
   gain_input_adaption_ = Matrix::Zero(1, 2);
   gain_nonlinear_adaption_ = Matrix::Zero(1, 2);
-  gamma_state_adaption_ = Matrix::Zero(model_order_, 1);
+  gamma_state_adaption_ = Matrix::Zero(model_order_, model_order_);
   gamma_input_adaption_ = Matrix::Zero(1, 1);
   gamma_nonlinear_adaption_ = Matrix::Zero(1, 1);
-  gain_anti_windup_ = Matrix::Zero(model_order_, 1);
+  gain_anti_windup_ = Matrix::Zero(model_order_, model_order_);
   compensation_anti_windup_ = Matrix::Zero(model_order_, 2);
   // Initialize the reference model parameters
   matrix_a_reference_ = Matrix::Zero(model_order_, model_order_);
@@ -206,10 +207,10 @@ Status MracController::SetAdaptionModel(const MracConf &mrac_conf) {
     return Status(ErrorCode::CONTROL_INIT_ERROR, error_msg);
   }
   for (int i = 0; i < model_order_; ++i) {
-    gamma_state_adaption_(i, 0) =
+    gamma_state_adaption_(i, i) =
         (i <= x_size - 1) ? mrac_conf.adaption_state_gain(i)
                           : mrac_conf.adaption_state_gain(x_size - 1);
-    gain_anti_windup_(i, 0) =
+    gain_anti_windup_(i, i) =
         (i <= aw_size - 1)
             ? mrac_conf.anti_windup_compensation_gain(i)
             : mrac_conf.anti_windup_compensation_gain(aw_size - 1);
@@ -255,7 +256,7 @@ void MracController::BuildAdaptionModel() {
     if (model_order_ == 1) {
       matrix_b_adaption_(0, 0) = 1.0;
     } else {
-      matrix_b_adaption_(1, 0) = 1.0;
+      matrix_b_adaption_(1, 0) = wn_reference_ * wn_reference_;
     }
     if (!CheckLyapunovPD(matrix_a_reference_, matrix_p_adaption_)) {
       AWARN << "Solution of the algebraic Lyapunov equation is not symmetric "
@@ -283,11 +284,14 @@ bool MracController::CheckLyapunovPD(const Matrix matrix_a,
 void MracController::Adaption(Matrix *law_adp, const Matrix state_adp,
                               const Matrix gain_adp) {
   Matrix state_error = state_action_ - state_reference_;
-  law_adp->col(0) = law_adp->col(1) -
-                    (0.5 * Ts_ * gain_adp * state_adp.col(0) *
-                     (state_error.col(0) + compensation_anti_windup_.col(0))) -
-                    (0.5 * Ts_ * gain_adp * state_adp.col(1) *
-                     (state_error.col(1) + compensation_anti_windup_.col(1)));
+  law_adp->col(0) =
+      law_adp->col(1) -
+      0.5 * Ts_ * gain_adp *
+          (state_adp.col(0) * (state_error.col(0).transpose() +
+                               compensation_anti_windup_.col(0).transpose()) +
+           state_adp.col(1) * (state_error.col(1).transpose() +
+                               compensation_anti_windup_.col(1).transpose())) *
+          matrix_p_adaption_ * matrix_b_adaption_;
   law_adp->col(1) = law_adp->col(0);
 }
 
@@ -310,8 +314,7 @@ void MracController::AntiWindupCompensation(const double control_command,
              : 0.0);
   }
   compensation_anti_windup_.col(1) = compensation_anti_windup_.col(0);
-  compensation_anti_windup_.col(0) =
-      gain_anti_windup_.transpose() * offset_windup;
+  compensation_anti_windup_.col(0) = gain_anti_windup_ * offset_windup;
 }
 
 int MracController::BoundOutput(const double output_unbounded,
@@ -343,6 +346,35 @@ int MracController::BoundOutput(const double output_unbounded,
     status = 0;
   }
   return status;
+}
+
+void MracController::SetInitialReferenceState(
+    const Matrix state_reference_init) {
+  if (state_reference_init.rows() != model_order_ ||
+      state_reference_init.cols() != 1) {
+    AWARN << "failed to set the initial reference states, due to the given "
+             "state size: "
+          << state_reference_init.rows() << " x " << state_reference_init.cols()
+          << " doesn't match the model order: " << model_order_;
+  } else {
+    state_reference_.col(1) = state_reference_init;
+  }
+}
+
+void MracController::SetInitialActionState(const Matrix state_action_init) {
+  if (state_action_init.rows() != model_order_ ||
+      state_action_init.cols() != 1) {
+    AWARN << "failed to set the initial action states, due to the given "
+             "state size: "
+          << state_action_init.rows() << " x " << state_action_init.cols()
+          << " doesn't match the model order: " << model_order_;
+  } else {
+    state_action_.col(1) = state_action_init;
+  }
+}
+
+void MracController::SetInitialCommand(const double command_init) {
+  input_desired_(0, 1) = command_init;
 }
 
 void MracController::SetStateAdaptionRate(const double ratio_state) {
