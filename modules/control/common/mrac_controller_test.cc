@@ -99,6 +99,46 @@ TEST_F(MracControllerTest, MracControl) {
   EXPECT_EQ(mrac_controller.ControlSaturationStatus(), -1);
 }
 
+// test the higher-order input-output of the model reference adaptive controller
+TEST_F(MracControllerTest, HighOrderMracControl) {
+  double dt = 0.01;
+  Matrix state = Matrix::Zero(2, 1);
+  Matrix reference_init = Matrix::Zero(2, 1);
+  Matrix action_init = Matrix::Zero(2, 1);
+  double command_init = 10.0;
+  // Re-design the 2nd order model parameters
+  MracConf mrac_conf = lat_controller_conf_.steer_mrac_conf();
+  MracController mrac_controller;
+  mrac_conf.set_mrac_model_order(2);
+  mrac_conf.clear_adaption_state_gain();
+  mrac_conf.add_adaption_state_gain(0.1);
+  mrac_conf.add_adaption_state_gain(0.1);
+  mrac_conf.set_adaption_desired_gain(0.1);
+  mrac_conf.clear_adaption_matrix_p();
+  mrac_conf.add_adaption_matrix_p(10.0);
+  mrac_conf.add_adaption_matrix_p(0.1);
+  mrac_conf.add_adaption_matrix_p(0.1);
+  mrac_conf.add_adaption_matrix_p(0.1);
+  // Fill the initial reference / actuation states and command
+  mrac_controller.Init(mrac_conf, dt);
+  double limit = 100.0;
+  double rate_limit = 100.0 / dt;
+  state(0, 0) = 10.0;
+  state(1, 0) = 0.0;
+  reference_init(0, 0) = 10.0;
+  reference_init(1, 0) = 0.0;
+  action_init(0, 0) = 10.0;
+  action_init(1, 0) = 0.0;
+  mrac_controller.SetInitialReferenceState(reference_init);
+  mrac_controller.SetInitialActionState(action_init);
+  mrac_controller.SetInitialCommand(command_init);
+  // 2nd order system test
+  EXPECT_NEAR(mrac_controller.Control(15.0, state, dt, limit, rate_limit),
+              3.738, 1e-3);
+  EXPECT_NEAR(mrac_controller.Control(15.0, state, dt, limit, rate_limit),
+              18.08, 1e-2);
+}
+
 // test the judgement of the symetric positive definite solution of the Lyapunov
 // equation
 TEST_F(MracControllerTest, CheckLyapunovPD) {
