@@ -75,6 +75,14 @@ GriddedPathTimeGraph::GriddedPathTimeGraph(
   dense_unit_s_ = gridded_path_time_graph_config_.dense_unit_s();
   sparse_unit_s_ = gridded_path_time_graph_config_.sparse_unit_s();
   dense_dimension_s_ = gridded_path_time_graph_config_.dense_dimension_s();
+  // Safety approach preventing unreachable acceleration/deceleration
+  max_acceleration_ =
+      std::min(std::abs(vehicle_param_.max_acceleration()),
+               std::abs(gridded_path_time_graph_config_.max_acceleration()));
+  max_deceleration_ =
+      -1.0 *
+      std::min(std::abs(vehicle_param_.max_deceleration()),
+               std::abs(gridded_path_time_graph_config_.max_deceleration()));
 }
 
 Status GriddedPathTimeGraph::Search(SpeedData* const speed_data) {
@@ -265,11 +273,9 @@ void GriddedPathTimeGraph::GetRowRange(const StGraphPoint& point,
   }
 
   const auto max_s_size = dimension_s_ - 1;
-
-  const double max_acceleration = std::abs(vehicle_param_.max_acceleration());
   const double t_squared = unit_t_ * unit_t_;
   const double s_upper_bound = v0 * unit_t_ +
-                               acc_coeff * max_acceleration * t_squared +
+                               acc_coeff * max_acceleration_ * t_squared +
                                point.point().s();
   const auto next_highest_itr =
       std::lower_bound(spatial_distance_by_index_.begin(),
@@ -281,11 +287,8 @@ void GriddedPathTimeGraph::GetRowRange(const StGraphPoint& point,
         std::distance(spatial_distance_by_index_.begin(), next_highest_itr);
   }
 
-  // Safety approach preventing deceleration configuration error
-  const double max_deceleration =
-      -1.0 * std::abs(vehicle_param_.max_deceleration());
   const double s_lower_bound =
-      std::fmax(0.0, v0 * unit_t_ + acc_coeff * max_deceleration * t_squared) +
+      std::fmax(0.0, v0 * unit_t_ + acc_coeff * max_deceleration_ * t_squared) +
       point.point().s();
   const auto next_lowest_itr =
       std::lower_bound(spatial_distance_by_index_.begin(),
@@ -323,9 +326,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
 
   if (c == 1) {
     const double acc =
-        (cost_cr.point().s() / unit_t_ - init_point_.v()) / unit_t_;
-    if (acc < gridded_path_time_graph_config_.max_deceleration() ||
-        acc > gridded_path_time_graph_config_.max_acceleration()) {
+        2 * (cost_cr.point().s() / unit_t_ - init_point_.v()) / unit_t_;
+    if (acc < max_deceleration_ || acc > max_acceleration_) {
       return;
     }
 
@@ -367,6 +369,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
           pre_col[r_pre].pre_point() == nullptr) {
         continue;
       }
+      // TODO(Jiaxuan): Calculate accurate acceleration by recording speed
+      // data in ST point.
       // Use curr_v = (point.s - pre_point.s) / unit_t as current v
       // Use pre_v = (pre_point.s - prepre_point.s) / unit_t as previous v
       // Current acc estimate: curr_a = (curr_v - pre_v) / unit_t
@@ -375,8 +379,7 @@ void GriddedPathTimeGraph::CalculateCostAt(
           (cost_cr.point().s() + pre_col[r_pre].pre_point()->point().s() -
            2 * pre_col[r_pre].point().s()) /
           (unit_t_ * unit_t_);
-      if (curr_a < gridded_path_time_graph_config_.max_deceleration() ||
-          curr_a > gridded_path_time_graph_config_.max_acceleration()) {
+      if (curr_a < max_deceleration_ || curr_a > max_acceleration_) {
         continue;
       }
       // Filter out continuous-time node connection which is in collision with
@@ -415,8 +418,7 @@ void GriddedPathTimeGraph::CalculateCostAt(
         (cost_cr.point().s() + pre_col[r_pre].pre_point()->point().s() -
          2 * pre_col[r_pre].point().s()) /
         (unit_t_ * unit_t_);
-    if (curr_a > vehicle_param_.max_acceleration() ||
-        curr_a < vehicle_param_.max_deceleration()) {
+    if (curr_a > max_acceleration_ || curr_a < max_deceleration_) {
       continue;
     }
     if (CheckOverlapOnDpStGraph(st_graph_data_.st_boundaries(), cost_cr,

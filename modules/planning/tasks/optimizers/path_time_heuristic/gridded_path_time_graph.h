@@ -116,6 +116,9 @@ class GriddedPathTimeGraph {
   uint32_t sparse_dimension_s_ = 0;
   uint32_t dimension_s_ = 0;
 
+  double max_acceleration_ = 0.0;
+  double max_deceleration_ = 0.0;
+
   // cost_table_[t][s]
   // row: s, col: t --- NOTICE: Please do NOT change.
   std::vector<std::vector<StGraphPoint>> cost_table_;
