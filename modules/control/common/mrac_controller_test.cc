@@ -54,45 +54,41 @@ TEST_F(MracControllerTest, MracControl) {
   double limit = 100.0;
   double rate_limit = 100.0 / dt;
   state(0, 0) = 6.0;
-  EXPECT_NEAR(mrac_controller.Control(18.0, state, dt, limit, rate_limit), 0.0,
+  EXPECT_NEAR(mrac_controller.Control(18.0, state, limit, rate_limit), 0.0,
               1e-6);
   mrac_controller.Reset();
   state(0, 0) = 10.0;
-  EXPECT_NEAR(mrac_controller.Control(18.0, state, dt, limit, rate_limit),
-              -8.48, 1e-6);
+  EXPECT_NEAR(mrac_controller.Control(18.0, state, limit, rate_limit), -8.48,
+              1e-6);
   EXPECT_NEAR(mrac_controller.CurrentReferenceState(), 6.0, 1e-6);
   EXPECT_NEAR(mrac_controller.CurrentStateAdaptionGain(), -0.2, 1e-6);
   EXPECT_NEAR(mrac_controller.CurrentInputAdaptionGain(), -0.36, 1e-6);
-  EXPECT_NEAR(mrac_controller.Control(18.0, state, dt, limit, rate_limit),
-              -8.48, 1e-6);
+  EXPECT_NEAR(mrac_controller.Control(18.0, state, limit, rate_limit), -8.48,
+              1e-6);
   EXPECT_NEAR(mrac_controller.CurrentReferenceState(), 14.0, 1e-6);
   EXPECT_NEAR(mrac_controller.CurrentStateAdaptionGain(), -0.2, 1e-6);
   EXPECT_NEAR(mrac_controller.CurrentInputAdaptionGain(), -0.36, 1e-6);
   mrac_controller.Reset();
   state(0, 0) = -10.0;
   double control_value =
-      mrac_controller.Control(-18.0, state, dt, limit, rate_limit);
+      mrac_controller.Control(-18.0, state, limit, rate_limit);
   EXPECT_NEAR(control_value, 8.48, 1e-6);
-  dt = 0.0;
-  EXPECT_EQ(mrac_controller.Control(-18.0, state, dt, limit, rate_limit),
-            control_value);
-  mrac_controller.Reset();
   // test the bounded conditions of the system output
   dt = 0.01;
   mrac_controller.Init(mrac_conf, dt);
   state(0, 0) = 10.0;
-  EXPECT_NEAR(mrac_controller.Control(18.0, state, dt, 100.0, 1.0 / dt), -1.0,
+  EXPECT_NEAR(mrac_controller.Control(18.0, state, 100.0, 1.0 / dt), -1.0,
               1e-6);
   EXPECT_EQ(mrac_controller.ReferenceSaturationStatus(), 2);
   EXPECT_EQ(mrac_controller.ControlSaturationStatus(), -2);
   mrac_controller.Reset();
   state(0, 0) = 10.0;
-  EXPECT_NEAR(mrac_controller.Control(18.0, state, dt, 10.0, 100.0 / dt), -8.48,
+  EXPECT_NEAR(mrac_controller.Control(18.0, state, 10.0, 100.0 / dt), -8.48,
               1e-6);
   EXPECT_NEAR(mrac_controller.CurrentReferenceState(), 6.0, 1e-6);
   EXPECT_EQ(mrac_controller.ReferenceSaturationStatus(), 0);
   EXPECT_EQ(mrac_controller.ControlSaturationStatus(), 0);
-  EXPECT_NEAR(mrac_controller.Control(18.0, state, dt, 10.0, 100.0 / dt), -10.0,
+  EXPECT_NEAR(mrac_controller.Control(18.0, state, 10.0, 100.0 / dt), -10.0,
               1e-6);
   EXPECT_NEAR(mrac_controller.CurrentReferenceState(), 10.0, 1e-6);
   EXPECT_EQ(mrac_controller.ReferenceSaturationStatus(), 1);
@@ -133,10 +129,20 @@ TEST_F(MracControllerTest, HighOrderMracControl) {
   mrac_controller.SetInitialActionState(action_init);
   mrac_controller.SetInitialCommand(command_init);
   // 2nd order system test
-  EXPECT_NEAR(mrac_controller.Control(15.0, state, dt, limit, rate_limit),
-              3.738, 1e-3);
-  EXPECT_NEAR(mrac_controller.Control(15.0, state, dt, limit, rate_limit),
-              18.08, 1e-2);
+  EXPECT_NEAR(mrac_controller.Control(15.0, state, limit, rate_limit), 3.738,
+              1e-3);
+  EXPECT_NEAR(mrac_controller.Control(15.0, state, limit, rate_limit), 18.08,
+              1e-2);
+  // Reference system convergence test
+  const int settling_cycle =
+      static_cast<int>(std::round(4.6 /
+                                  (mrac_conf.reference_natural_frequency() *
+                                   mrac_conf.reference_damping_ratio()) /
+                                  dt));
+  for (int i = 0; i < settling_cycle; ++i) {
+    mrac_controller.Control(15.0, state, limit, rate_limit);
+  }
+  EXPECT_NEAR(mrac_controller.CurrentReferenceState(), 15.0, 0.05);
 }
 
 // test the judgement of the symmetric positive definite solution of the
