@@ -14,3 +14,21 @@ message LatencyRecordMap {
   optional string module_name = 2;
   map<uint64, LatencyRecord> latency_records = 3;
 };
+
+message LatencyStat {
+  optional uint64 min_duration = 1;
+  optional uint64 max_duration = 2;
+  optional uint64 aver_duration = 3;
+  optional uint32 sample_size = 4;
+};
+
+message LatencyTrack {
+  optional uint64 total_duration = 1;
+  map<string, uint64> intervals = 2;
+};
+
+message LatencyReport {
+  optional apollo.common.Header header = 1;
+  map<string, LatencyStat> stat_aggr = 2;
+  optional LatencyTrack track_info = 3;
+};

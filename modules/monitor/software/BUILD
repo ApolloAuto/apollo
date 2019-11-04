@@ -83,4 +83,16 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "latency_monitor",
+    srcs = ["latency_monitor.cc"],
+    hdrs = ["latency_monitor.h"],
+    deps = [
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/common/latency_recorder/proto:latency_record_proto",
+        "//modules/monitor/common:monitor_manager",
+        "//modules/monitor/common:recurrent_runner",
+    ],
+)
+
 cpplint()
