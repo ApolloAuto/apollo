@@ -39,10 +39,10 @@ void ObstacleClusters::Clear() {
 void ObstacleClusters::Init() { Clear(); }
 
 LaneGraph ObstacleClusters::GetLaneGraph(
-    const double start_s, const double length, const bool is_on_lane,
+    const double start_s, const double length, const bool consider_lane_split,
     std::shared_ptr<const LaneInfo> lane_info_ptr) {
   std::string lane_id = lane_info_ptr->id().id();
-  RoadGraph road_graph(start_s, length, is_on_lane, lane_info_ptr);
+  RoadGraph road_graph(start_s, length, consider_lane_split, lane_info_ptr);
   LaneGraph lane_graph;
   road_graph.BuildLaneGraph(&lane_graph);
   return lane_graph;
