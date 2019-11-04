@@ -11,7 +11,6 @@ export default class Navigation extends React.Component {
     constructor(props) {
         super(props);
 
-        this.onClickHandler = this.onClickHandler.bind(this);
         this.scriptOnLoadHandler = this.scriptOnLoadHandler.bind(this);
 
         if (!MAP_NAVIGATOR.mapAPILoaded) {
@@ -36,22 +35,19 @@ export default class Navigation extends React.Component {
         }
     }
 
-    onClickHandler() {
-        const { hasRoutingControls, size, onResize } = this.props;
-
-        if (hasRoutingControls) {
-            if (size === MAP_SIZE.DEFAULT) {
-                MAP_NAVIGATOR.enableControls();
-            } else {
-                MAP_NAVIGATOR.disableControls();
-            }
-        }
-        onResize();
-    }
-
     componentDidMount() {
         if (MAP_NAVIGATOR.mapAPILoaded) {
             this.scriptOnLoadHandler();
+        }
+    }
+
+    componentDidUpdate() {
+        const { hasRoutingControls, size } = this.props;
+
+        if (hasRoutingControls && size === MAP_SIZE.FULL) {
+            MAP_NAVIGATOR.enableControls();
+        } else {
+            MAP_NAVIGATOR.disableControls();
         }
     }
 
@@ -72,7 +68,7 @@ export default class Navigation extends React.Component {
     }
 
     render() {
-        const { width, height, size } = this.props;
+        const { width, height, size, onResize } = this.props;
 
         if (!["GoogleMap", "BaiduMap"].includes(PARAMETERS.navigation.map)) {
             console.error(`Map API ${PARAMETERS.navigation.map} is not supported.`);
@@ -82,7 +78,7 @@ export default class Navigation extends React.Component {
         return (
             <div displayname="navigation" className="navigation-view" style={{ width, height }} >
                 <div id="map_canvas" />
-                <WindowResizeControl type={size} onClick={this.onClickHandler} />
+                <WindowResizeControl type={size} onClick={onResize} />
             </div>
         );
     }

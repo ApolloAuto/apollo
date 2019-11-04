@@ -2,15 +2,43 @@ import { observable, computed, action } from "mobx";
 
 import PLAYBACK_STYLE from "styles/playback-controls.scss";
 import MAIN_STYLE from "styles/main.scss";
+import { MONITOR_MENU } from "store/options";
 
 export const MAP_SIZE = {
     DEFAULT: 'default',
     FULL: 'full',
 };
 
+const MONITOR_WIDTH_IN_PX = {
+    [MONITOR_MENU.PNC_MONITOR]: {
+        small: 400,
+        large: 450,
+    },
+    [MONITOR_MENU.DATA_COLLECTION_MONITOR]: {
+        small: 500,
+        large: 640,
+    },
+    [MONITOR_MENU.CONSOLE_TELEOP_MONITOR]: {
+        small: 240,
+        large: 270,
+    },
+    [MONITOR_MENU.CAR_TELEOP_MONITOR]: {
+        small: 200,
+        large: 240,
+    },
+    [MONITOR_MENU.CAMERA_PARAM]: {
+        small: 400,
+        large: 450,
+    },
+    'default': {
+        small: 200,
+        large: 240,
+    }
+};
+
 export default class Dimension {
-    // left pane to right pane ratio
-    @observable paneWidthRatio = 1;
+    // width of the right pane
+    @observable monitorWidth = 0;
 
     // the left pane that excludes monitor and header.
     @observable pane = {
@@ -46,17 +74,18 @@ export default class Dimension {
         return window.innerHeight < 800.0 || window.innerWidth < 1280.0;
     }
 
-    @action updateWidthInPercentage(newRatio) {
-        this.paneWidthRatio = newRatio;
+    @action updateMonitorWidth(width) {
+        this.monitorWidth = width;
         this.update();
     }
 
     @action enableMonitor() {
-        this.updateWidthInPercentage(0.7);
+        const width = MONITOR_WIDTH_IN_PX[this.options.monitorName] || MONITOR_WIDTH_IN_PX['default'];
+        this.updateMonitorWidth(this.isSmallScreen() ? width.small : width.large);
     }
 
     @action disableMonitor() {
-        this.updateWidthInPercentage(1.0);
+        this.updateMonitorWidth(0.0);
     }
 
     @computed get shouldDivideSceneAndMapSpace() {
@@ -70,7 +99,7 @@ export default class Dimension {
                 ? MAIN_STYLE.HEADER_HEIGHT_SMALL : MAIN_STYLE.HEADER_HEIGHT_LARGE;
         }
 
-        this.pane.width = window.innerWidth * this.paneWidthRatio;
+        this.pane.width = window.innerWidth - this.monitorWidth;
         this.pane.height = window.innerHeight - offset;
     }
 
@@ -112,10 +141,12 @@ export default class Dimension {
     @action updateNavigationDimension() {
         const mainWidth = this.main.width;
         const sceneHeight = this.scene.height;
+
         switch (this.navigation.size) {
             case MAP_SIZE.FULL:
                 this.navigation.height = sceneHeight;
-                this.navigation.width = this.hmi.inTeleopMode ? mainWidth / 2 : mainWidth;
+                this.navigation.width = this.shouldDivideSceneAndMapSpace
+                    ? mainWidth / 2 : mainWidth;
                 break;
             case MAP_SIZE.DEFAULT:
                 this.navigation.height = Math.min(sceneHeight * 0.5, 300);

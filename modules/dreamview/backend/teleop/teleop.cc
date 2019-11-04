@@ -143,6 +143,12 @@ void TeleopService::RegisterMessageHandlers() {
       "EStop", [this](const Json &json, WebSocketHandler::Connection *conn) {
         // TODO
       });
+  // Issue resume-cruise command to remote
+  websocket_->RegisterMessageHandler(
+      "ResumeCruise",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        // TODO
+      });
   // Request to get updated modem info for client display
   websocket_->RegisterMessageHandler(
       "RequestTeleopStatus",

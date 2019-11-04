@@ -10,15 +10,18 @@ import CameraParam from "components/CameraParam";
 import { CameraVideo } from "components/Tasks/SensorCamera";
 import DataCollectionMonitor from "components/DataCollectionMonitor";
 import PNCMonitor from "components/PNCMonitor";
-import TeleOpConsole from "components/TeleopMonitor/TeleopConsole";
+import ConsoleTeleOp from "components/TeleopMonitor/ConsoleTeleop";
+import CarTeleOp from "components/TeleopMonitor/CarTeleop";
 
 export default class MonitorPanel extends React.Component {
     renderMonitor() {
         const { viewName, hmi } = this.props;
 
         switch (viewName) {
-            case MONITOR_MENU.TELEOP_CONSOLE_MONITOR:
-                return <TeleOpConsole />;
+            case MONITOR_MENU.CONSOLE_TELEOP_MONITOR:
+                return <ConsoleTeleOp />;
+            case MONITOR_MENU.CAR_TELEOP_MONITOR:
+                return <CarTeleOp />;
             case MONITOR_MENU.CAMERA_PARAM:
                 return <CameraParam />;
             case MONITOR_MENU.DATA_COLLECTION_MONITOR:

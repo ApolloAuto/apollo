@@ -1,4 +1,4 @@
-$min-monitor-width: 260px;
+$min-monitor-width: 160px;
 $monitor-header-height: 32px;
 
 .monitor {
@@ -263,7 +263,7 @@ $monitor-header-height: 32px;
     }
 }
 
-.teleop-console {
+.teleop {
     .mute-button {
         width: 20px;
         border: 1px solid #383838;
