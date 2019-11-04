@@ -44,6 +44,9 @@ class TeleopService {
   void SendStatus(WebSocketHandler::Connection *conn);
 
 #ifdef TELEOP
+
+  void SendVideoStreamCmd(bool start_stop);
+
   void UpdateModemInfo(
       const std::shared_ptr<modules::teleop::network::ModemInfo> &modem_info);
 #endif
@@ -83,7 +86,6 @@ class TeleopService {
   // planning driving actions  and feedback
   std::shared_ptr<cyber::Writer<apollo::planning::PadMessage>>
       pad_message_writer_;
-
 #endif
 
   // Store teleop status
@@ -92,6 +94,7 @@ class TeleopService {
   // Mutex to protect concurrent access to teleop_status_.
   // NOTE: Use boost until we upgrade to std version with rwlock support.
   boost::shared_mutex mutex_;
+
 };
 
 }  // namespace dreamview
