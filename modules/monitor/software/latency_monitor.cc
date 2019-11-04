@@ -71,7 +71,7 @@ void LatencyMonitor::UpdateLatencyStat(
   }
   auto* stat = &latency_report_.mutable_stat_aggr()->at(records->module_name());
 
-  uint64_t min_duration = ((1UL << 63) - 1), max_duration = 0,
+  uint64_t min_duration = (1UL << 63), max_duration = 0,
            total_duration = 0;
   for (const auto record : records->latency_records()) {
     const auto duration = record.second.end_time() - record.second.begin_time();
