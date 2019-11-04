@@ -2,22 +2,11 @@ import React from "react";
 import { inject, observer } from "mobx-react";
 
 import { TELEOP_WS } from "store/websocket";
-import CheckboxItem from "components/common/CheckboxItem";
-import itemIcon from "assets/images/icons/teleop_item.png";
 
-function MonitorSection(props) {
-    return (
-        <div className="section">
-            <div className="section-title">
-                <img height="20px" width="20px" src={props.icon} />
-                <span>{props.title}</span>
-            </div>
-            <div className="section-content">
-                {props.children}
-            </div>
-        </div>
-    );
-}
+import CheckboxItem from "components/common/CheckboxItem";
+import MonitorSection from "components/TeleopMonitor/MonitorSection";
+
+import itemIcon from "assets/images/icons/teleop_item.png";
 
 function MicIcon(props) {
     const color = props.isOn ? "#30A5FF" : "#999999";
@@ -36,8 +25,25 @@ function MicIcon(props) {
     );
 };
 
+function OperationButton(props) {
+    const { name, command } = props;
+
+    return (
+        <button
+            className="command-button teleop-button"
+            onClick={() => {
+                if (confirm(`Are you sure you want to execute ${name} command?`)) {
+                    command();
+                }
+            }}
+        >
+            {name}
+        </button>
+    );
+}
+
 @inject("store") @observer
-export default class TeleOpConsole extends React.Component {
+export default class ConsoleTeleOp extends React.Component {
     constructor(props) {
         super(props);
 
@@ -47,6 +53,9 @@ export default class TeleOpConsole extends React.Component {
             },
             "PULL OVER": () => {
                 TELEOP_WS.executeCommand("PullOver");
+            },
+            "RESUME": () => {
+                TELEOP_WS.executeCommand("ResumeCruise");
             }
         };
     }
@@ -65,9 +74,9 @@ export default class TeleOpConsole extends React.Component {
         const micOn = teleop.micEnabled;
 
         return (
-            <div className="monitor teleop-console">
+            <div className="monitor teleop">
                 <div className="monitor-header">
-                    <div className="title">Teleop Console</div>
+                    <div className="title">Console Teleop Controls</div>
                 </div>
 
                 <div className="monitor-content">
@@ -111,10 +120,8 @@ export default class TeleOpConsole extends React.Component {
                     </MonitorSection>
                     <MonitorSection title="Operation" icon={itemIcon}>
                         <div className="teleop-command-group">
-                            {Object.entries(this.operation).map(([key, command]) => (
-                                <button className="command-button teleop-button"
-                                        key={key}
-                                        onClick={command}>{key}</button>)
+                            {Object.entries(this.operation).map(([name, command]) => (
+                                <OperationButton key={name} name={name} command={command} />)
                             )}
                         </div>
                     </MonitorSection>

@@ -5,7 +5,10 @@ import UTTERANCE from "store/utterance";
 import RENDERER from "renderer";
 
 
-const TELEOP_MODES = Object.freeze(['Car Teleop', 'Console Teleop']);
+const TELEOP_MODE = Object.freeze({
+    CAR: 'Car Teleop',
+    CONSOLE: 'Console Teleop',
+});
 
 export default class HMI {
     modes = [];
@@ -140,8 +143,16 @@ export default class HMI {
         return this.currentMode === "Navigation";
     }
 
+    @computed get inCarTeleopMode() {
+        return this.currentMode === TELEOP_MODE.CAR;
+    }
+
+    @computed get inConsoleTeleopMode() {
+        return this.currentMode === TELEOP_MODE.CONSOLE;
+    }
+
     @computed get inTeleopMode() {
-        return TELEOP_MODES.includes(this.currentMode);
+        return Object.values(TELEOP_MODE).includes(this.currentMode);
     }
 
     @computed get shouldDisplayNavigationMap() {

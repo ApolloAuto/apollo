@@ -201,8 +201,11 @@ class DreamviewStore {
             this.controlData.update(world, this.hmi.vehicleParam);
             this.latency.update(world);
         }
-        if (this.hmi.inTeleopMode) {
-            this.setOptionStatus('showTeleopConsoleMonitor', true);
+
+        if (this.hmi.inCarTeleopMode) {
+            this.setOptionStatus('showCarTeleopMonitor', true);
+        } else if (this.hmi.inConsoleTeleopMode) {
+            this.setOptionStatus('showConsoleTeleopMonitor', true);
         }
     }
 }

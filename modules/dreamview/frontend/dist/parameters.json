@@ -135,7 +135,10 @@
 		"showVideo": {
 			"default": false
 		},
-		"showTeleopConsoleMonitor": {
+		"showConsoleTeleopMonitor": {
+			"default": false
+		},
+		"showCarTeleopMonitor": {
 			"default": false
 		},
 		"cameraAngle": {

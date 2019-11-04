@@ -24,8 +24,12 @@ export default class Dreamview extends React.Component {
     handleDrag(masterViewWidth) {
         const { options, dimension } = this.props.store;
         if (options.showMonitor) {
-            dimension.updateWidthInPercentage(
-                Math.min(1.00, masterViewWidth / window.innerWidth));
+            dimension.updateMonitorWidth(
+                Math.min(
+                    Math.max(window.innerWidth - masterViewWidth, 0),
+                    window.innerWidth
+                )
+            );
         }
     }
 

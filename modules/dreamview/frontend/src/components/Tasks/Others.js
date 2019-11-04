@@ -10,7 +10,7 @@ export default class Others extends React.Component {
         const { options, enableHMIButtonsOnly, hmi } = this.props.store;
 
         const disablePanel = enableHMIButtonsOnly || options.lockTaskPanel;
-        const hasPncMonitor = !options.showTeleopConsoleMonitor && !options.showCameraView;
+        const hasPncMonitor = !hmi.inTeleopMode && !options.showCameraView;
 
         return (
             <div className="others card">
