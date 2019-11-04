@@ -137,7 +137,7 @@ void ExtrapolationPredictor::ExtrapolateByLane(
       lane_sequence.lane_segment(lane_segment_index).lane_id();
 
   int num_point_remained = static_cast<int>(time_range / time_resolution);
-  for (int i = 0; i < num_point_remained; ++i) {
+  for (int i = 1; i <= num_point_remained; ++i) {
     double relative_time =
         last_relative_time + static_cast<double>(i) * time_resolution;
     Eigen::Vector2d point;
