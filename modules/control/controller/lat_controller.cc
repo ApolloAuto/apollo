@@ -502,9 +502,8 @@ Status LatController::ComputeControlCommand(
     if (mrac_model_order > 1) {
       steer_state(1, 0) = (steering_position - pre_steering_position_) / ts_;
     }
-    steer_angle =
-        mrac_controller_.Control(steer_angle, steer_state, ts_, steer_limit,
-                                 steer_diff_with_max_rate / ts_);
+    steer_angle = mrac_controller_.Control(
+        steer_angle, steer_state, steer_limit, steer_diff_with_max_rate / ts_);
   }
   pre_steering_position_ = steering_position;
 

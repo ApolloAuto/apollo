@@ -66,9 +66,8 @@ class MracController {
   /**
    * @brief build mrac (1st or 2nd) order reference model in the discrete-time
    form, with the bilinear transform (trapezoidal integration) method
-   * @param dt sampling time interval
    */
-  void BuildReferenceModel(const double dt);
+  void BuildReferenceModel();
 
   /**
    * @brief build mrac (1st or 2nd) order adaptive dynamic model in the
@@ -88,6 +87,13 @@ class MracController {
                        const Eigen::MatrixXd matrix_p) const;
 
   /**
+   * @brief exexute the reference state interation with respect to the designed
+   inputs in discrete-time form, with the bilinear transform (trapezoidal
+   integration) method
+   */
+  void UpdateReference();
+
+  /**
    * @brief exexute the adaption interation with respect to the designed law in
    discrete-time form, with the bilinear transform (trapezoidal integration)
    method
@@ -95,8 +101,8 @@ class MracController {
    * @param state_adp state used in the adaptive law at k and k-1 steps
    * @param gain_adp adaptive gain for the given adaptive law
    */
-  void Adaption(Eigen::MatrixXd *law_adp, const Eigen::MatrixXd state_adp,
-                const Eigen::MatrixXd gain_adp);
+  void UpdateAdaption(Eigen::MatrixXd *law_adp, const Eigen::MatrixXd state_adp,
+                      const Eigen::MatrixXd gain_adp);
 
   /**
    * @brief calculate the anti-windup compensation with respect to the integral
@@ -106,7 +112,7 @@ class MracController {
    * @param dt control sampling time
    */
   void AntiWindupCompensation(const double control_command,
-                              const double previous_command, const double dt);
+                              const double previous_command);
 
   /**
    * @brief reset all the variables (including all the states, gains and
@@ -135,7 +141,7 @@ class MracController {
    * @return control value based on mrac controller architecture
    */
   virtual double Control(const double command, const Eigen::MatrixXd state,
-                         const double dt, const double input_limit,
+                         const double input_limit,
                          const double input_rate_limit);
 
   /**
@@ -147,7 +153,7 @@ class MracController {
    * @return saturation_status system saturation status indicator
    */
   int BoundOutput(const double output_unbounded, const double previous_output,
-                  const double dt, double *output_bounded);
+                  double *output_bounded);
 
   /**
    * @brief set initial values for state components in reference model dynamics
@@ -246,7 +252,7 @@ class MracController {
   double wn_reference_ = 0.0;
   double zeta_reference_ = 0.0;
 
-  double Ts_ = 0.01;  // By default, control sampling time is 0.01 sec
+  double ts_ = 0.01;  // By default, control sampling time is 0.01 sec
 
   // Adaption system coefficients
   // State adaption gain
