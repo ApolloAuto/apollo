@@ -60,10 +60,12 @@ void ExtrapolationPredictor::PostProcess(Trajectory* trajectory_ptr) {
   constexpr int kNumTailPoint = 5;
   ExtrapolationPredictor::LaneSearchResult lane_search_result =
       SearchExtrapolationLane(*trajectory_ptr, kNumTailPoint);
+  double extraplation_speed =
+      ComputeExtraplationSpeed(kNumTailPoint, *trajectory_ptr);
   if (lane_search_result.found) {
-    ExtrapolateByLane(lane_search_result, trajectory_ptr);
+    ExtrapolateByLane(lane_search_result, extraplation_speed, trajectory_ptr);
   } else {
-    ExtrapolateByFreeMove(kNumTailPoint, trajectory_ptr);
+    ExtrapolateByFreeMove(kNumTailPoint, extraplation_speed, trajectory_ptr);
   }
 }
 
@@ -96,7 +98,8 @@ ExtrapolationPredictor::SearchExtrapolationLane(const Trajectory& trajectory,
 }
 
 void ExtrapolationPredictor::ExtrapolateByLane(
-    const LaneSearchResult& lane_search_result, Trajectory* trajectory_ptr) {
+    const LaneSearchResult& lane_search_result, const double extraplation_speed,
+    Trajectory* trajectory_ptr) {
   std::string start_lane_id = lane_search_result.lane_id;
   int point_index = lane_search_result.point_index;
   while (trajectory_ptr->trajectory_point_size() > point_index + 1) {
@@ -105,7 +108,7 @@ void ExtrapolationPredictor::ExtrapolateByLane(
   auto lane_info_ptr = PredictionMap::LaneById(start_lane_id);
   int num_trajectory_point = trajectory_ptr->trajectory_point_size();
   const TrajectoryPoint& last_point =
-      trajectory_ptr->trajectory_point(num_trajectory_point);
+      trajectory_ptr->trajectory_point(num_trajectory_point - 1);
 
   Eigen::Vector2d position(last_point.path_point().x(),
                            last_point.path_point().y());
@@ -120,11 +123,10 @@ void ExtrapolationPredictor::ExtrapolateByLane(
   }
 
   double last_relative_time = last_point.relative_time();
-  double speed = last_point.v();
   double time_range =
       FLAGS_prediction_trajectory_time_length - last_relative_time;
   double time_resolution = FLAGS_prediction_trajectory_time_resolution;
-  double length = speed * time_range;
+  double length = extraplation_speed * time_range;
 
   LaneGraph lane_graph =
       ObstacleClusters::GetLaneGraph(lane_s, length, false, lane_info_ptr);
@@ -153,11 +155,11 @@ void ExtrapolationPredictor::ExtrapolateByLane(
     path_point->set_z(0.0);
     path_point->set_theta(theta);
     path_point->set_lane_id(lane_id);
-    trajectory_point->set_v(speed);
+    trajectory_point->set_v(extraplation_speed);
     trajectory_point->set_a(0.0);
     trajectory_point->set_relative_time(relative_time);
 
-    lane_s += speed * time_resolution;
+    lane_s += extraplation_speed * time_resolution;
     while (lane_s > PredictionMap::LaneById(lane_id)->total_length() &&
            lane_segment_index + 1 < lane_sequence.lane_segment_size()) {
       lane_segment_index += 1;
@@ -169,40 +171,50 @@ void ExtrapolationPredictor::ExtrapolateByLane(
   }
 }
 
-void ExtrapolationPredictor::ExtrapolateByFreeMove(const int num_tail_point,
-                                                   Trajectory* trajectory_ptr) {
+void ExtrapolationPredictor::ExtrapolateByFreeMove(
+    const int num_tail_point, const double extraplation_speed,
+    Trajectory* trajectory_ptr) {
   int num_trajectory_point = trajectory_ptr->trajectory_point_size();
-  CHECK_GT(num_trajectory_point, num_tail_point);
-  double time_resolution = FLAGS_prediction_trajectory_time_resolution;
-  double time_length = FLAGS_prediction_trajectory_time_length;
   const TrajectoryPoint& last_point =
       trajectory_ptr->trajectory_point(num_trajectory_point - 1);
-  const TrajectoryPoint& mid_point =
-      trajectory_ptr->trajectory_point(num_trajectory_point - num_tail_point);
   double theta = last_point.path_point().theta();
-  double diff_x = last_point.path_point().x() - mid_point.path_point().x();
-  double diff_y = last_point.path_point().y() - mid_point.path_point().y();
-  double speed =
-      std::hypot(diff_x, diff_y) / (num_tail_point * time_resolution);
+  double time_resolution = FLAGS_prediction_trajectory_time_resolution;
+  double time_length = FLAGS_prediction_trajectory_time_length;
   double relative_time = last_point.relative_time() + time_resolution;
   while (relative_time < time_length) {
     int prev_size = trajectory_ptr->trajectory_point_size();
     const TrajectoryPoint& prev_point =
-        trajectory_ptr->trajectory_point(prev_size);
+        trajectory_ptr->trajectory_point(prev_size - 1);
     TrajectoryPoint* curr_point = trajectory_ptr->add_trajectory_point();
-    double dx = time_resolution * speed * std::cos(theta);
-    double dy = time_resolution * speed * std::sin(theta);
+    double dx = time_resolution * extraplation_speed * std::cos(theta);
+    double dy = time_resolution * extraplation_speed * std::sin(theta);
     double curr_x = prev_point.path_point().x() + dx;
     double curr_y = prev_point.path_point().y() + dy;
     PathPoint* curr_path_point_ptr = curr_point->mutable_path_point();
     curr_path_point_ptr->set_x(curr_x);
     curr_path_point_ptr->set_y(curr_y);
     curr_path_point_ptr->set_theta(theta);
-    curr_point->set_v(speed);
+    curr_point->set_v(extraplation_speed);
     curr_point->set_relative_time(relative_time);
 
     relative_time += time_resolution;
   }
+}
+
+double ExtrapolationPredictor::ComputeExtraplationSpeed(
+    const int num_tail_point, const Trajectory& trajectory) {
+  int num_trajectory_point = trajectory.trajectory_point_size();
+  CHECK_GT(num_trajectory_point, num_tail_point);
+  double time_resolution = FLAGS_prediction_trajectory_time_resolution;
+  const TrajectoryPoint& last_point =
+      trajectory.trajectory_point(num_trajectory_point - 1);
+  const TrajectoryPoint& mid_point =
+      trajectory.trajectory_point(num_trajectory_point - num_tail_point);
+  double diff_x = last_point.path_point().x() - mid_point.path_point().x();
+  double diff_y = last_point.path_point().y() - mid_point.path_point().y();
+  double speed =
+      std::hypot(diff_x, diff_y) / (num_tail_point * time_resolution);
+  return speed;
 }
 
 }  // namespace prediction

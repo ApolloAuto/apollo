@@ -65,10 +65,15 @@ class ExtrapolationPredictor : public SequencePredictor {
                                            const int num_tail_point);
 
   void ExtrapolateByLane(const LaneSearchResult& lane_search_result,
+                         const double extrapolation_speed,
                          Trajectory* trajectory_ptr);
 
   void ExtrapolateByFreeMove(const int num_tail_point,
+                             const double extrapolation_speed,
                              Trajectory* trajectory_ptr);
+
+  double ComputeExtraplationSpeed(const int num_tail_point,
+                                  const Trajectory& trajectory);
 };
 
 }  // namespace prediction
