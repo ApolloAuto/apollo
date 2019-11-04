@@ -23,11 +23,11 @@ namespace apollo {
 namespace dreamview {
 
 using Json = nlohmann::json;
+using apollo::planning::PadMessage;
 using ::google::protobuf::util::MessageToJsonString;
 using modules::teleop::network::ModemInfo;
 using modules::teleop::teleop::DaemonServiceCmd;
 using modules::teleop::teleop::DaemonServiceRpt;
-using apollo::planning::PadMessage;
 
 // modem ids
 const std::string modem0_id = "0";
@@ -38,11 +38,14 @@ const std::string modem2_id = "2";
 const std::string modem0_channel = "/apollo/teleop/network/modem0";
 const std::string modem1_channel = "/apollo/teleop/network/modem1";
 const std::string modem2_channel = "/apollo/teleop/network/modem2";
-const std::string car_daemon_cmd_channel = "/apollo/teleop/car/daemon_service/cmd";
-const std::string car_daemon_rpt_channel = "/apollo/teleop/car/daemon_service/rpt";
-const std::string operator_daemon_cmd_channel = "/apollo/teleop/operator/daemon_service/cmd";
-const std::string operator_daemon_rpt_channel = "/apollo/teleop/operator/daemon_service/rpt";
-
+const std::string car_daemon_cmd_channel =
+    "/apollo/teleop/car/daemon_service/cmd";
+const std::string car_daemon_rpt_channel =
+    "/apollo/teleop/car/daemon_service/rpt";
+const std::string operator_daemon_cmd_channel =
+    "/apollo/teleop/operator/daemon_service/cmd";
+const std::string operator_daemon_rpt_channel =
+    "/apollo/teleop/operator/daemon_service/rpt";
 
 TeleopService::TeleopService(WebSocketHandler *websocket)
     : node_(cyber::CreateNode("teleop")), websocket_(websocket) {
@@ -58,34 +61,36 @@ void TeleopService::Start() {
   // TODO update proto to get all modems' info combined with rank
 
   modem0_info_reader_ = node_->CreateReader<ModemInfo>(
-      modem0_channel,
-      [this](const std::shared_ptr<ModemInfo> &msg) { UpdateModem(modem0_id, msg);
+      modem0_channel, [this](const std::shared_ptr<ModemInfo> &msg) {
+        UpdateModem(modem0_id, msg);
       });
 
   modem1_info_reader_ = node_->CreateReader<ModemInfo>(
-      modem1_channel,
-      [this](const std::shared_ptr<ModemInfo> &msg) { UpdateModem(modem1_id, msg); });
+      modem1_channel, [this](const std::shared_ptr<ModemInfo> &msg) {
+        UpdateModem(modem1_id, msg);
+      });
 
   modem2_info_reader_ = node_->CreateReader<ModemInfo>(
-      modem2_channel,
-      [this](const std::shared_ptr<ModemInfo> &msg) { UpdateModem(modem2_id, msg); });
+      modem2_channel, [this](const std::shared_ptr<ModemInfo> &msg) {
+        UpdateModem(modem2_id, msg);
+      });
 
-  car_daemon_cmd_writer_ = node_->CreateWriter<DaemonServiceCmd>(
-      car_daemon_cmd_channel);
+  car_daemon_cmd_writer_ =
+      node_->CreateWriter<DaemonServiceCmd>(car_daemon_cmd_channel);
 
-  operator_daemon_cmd_writer_ = node_->CreateWriter<DaemonServiceCmd>(
-      operator_daemon_cmd_channel);
+  operator_daemon_cmd_writer_ =
+      node_->CreateWriter<DaemonServiceCmd>(operator_daemon_cmd_channel);
 
   car_daemon_rpt_reader_ = node_->CreateReader<DaemonServiceRpt>(
       car_daemon_rpt_channel,
       [this](const std::shared_ptr<DaemonServiceRpt> &msg) {
-          UpdateCarDaemonRpt(msg);
+        UpdateCarDaemonRpt(msg);
       });
 
   operator_daemon_rpt_reader_ = node_->CreateReader<DaemonServiceRpt>(
       operator_daemon_rpt_channel,
       [this](const std::shared_ptr<DaemonServiceRpt> &msg) {
-          UpdateOperatorDaemonRpt(msg);
+        UpdateOperatorDaemonRpt(msg);
       });
 }
 
@@ -146,7 +151,6 @@ void TeleopService::RegisterMessageHandlers() {
       });
 }
 
-
 void TeleopService::SendStatus(WebSocketHandler::Connection *conn) {
   std::string to_send;
   {
@@ -157,60 +161,54 @@ void TeleopService::SendStatus(WebSocketHandler::Connection *conn) {
   websocket_->SendData(conn, to_send);
 }
 
-
 void TeleopService::UpdateModem(const std::string &modem_id,
-    const std::shared_ptr<ModemInfo> &modem_info) {
-
-    // TODO simplify data and only send necessary info for display
-    // update modem_info_
-    if (modem_info->has_technology()) {
-        // teleop_status_["modems"][modem_info->provider()] =
-        //  modem_info->technology();
-        boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-        teleop_status_["modems"][modem_id] = modem_info->technology();
-    }
+                                const std::shared_ptr<ModemInfo> &modem_info) {
+  // TODO simplify data and only send necessary info for display
+  // update modem_info_
+  if (modem_info->has_technology()) {
+    // teleop_status_["modems"][modem_info->provider()] =
+    //  modem_info->technology();
+    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+    teleop_status_["modems"][modem_id] = modem_info->technology();
+  }
 }
 
 void TeleopService::UpdateCarDaemonRpt(
     const std::shared_ptr<DaemonServiceRpt> &daemon_rpt) {
   {
-      bool aVideoEncoderIsRunning = false;
-      bool voipIsRunning = false;
-      for (int i = 0; i < daemon_rpt->services_size(); i++) {
-          // look for voip_encoder or encoder0..1.2
-          // check 'voip_encoder' first because it contains 'encoder'
-          std::string service =  daemon_rpt->services(i);
-          if (service.find("voip_encoder") >= 0) {
-              voipIsRunning = true;
-          }
-          else if (service.find("encoder") >= 0) {
-              aVideoEncoderIsRunning = true;
-          }
-
+    bool aVideoEncoderIsRunning = false;
+    bool voipIsRunning = false;
+    for (int i = 0; i < daemon_rpt->services_size(); i++) {
+      // look for voip_encoder or encoder0..1.2
+      // check 'voip_encoder' first because it contains 'encoder'
+      std::string service = daemon_rpt->services(i);
+      if (service.find("voip_encoder") >= 0) {
+        voipIsRunning = true;
+      } else if (service.find("encoder") >= 0) {
+        aVideoEncoderIsRunning = true;
       }
-      boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-      teleop_status_["video"] = aVideoEncoderIsRunning;
-      teleop_status_["audio"] = voipIsRunning;
+    }
+    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+    teleop_status_["video"] = aVideoEncoderIsRunning;
+    teleop_status_["audio"] = voipIsRunning;
   }
 }
 
 void TeleopService::UpdateOperatorDaemonRpt(
     const std::shared_ptr<DaemonServiceRpt> &daemon_rpt) {
   {
-      bool voipIsRunning = false;
-      for (int i = 0; i < daemon_rpt->services_size(); i++) {
-          std::string service =  daemon_rpt->services(i);
-          if (service.find("voip_encoder") >= 0) {
-              voipIsRunning = true;
-              break;
-          }
+    bool voipIsRunning = false;
+    for (int i = 0; i < daemon_rpt->services_size(); i++) {
+      std::string service = daemon_rpt->services(i);
+      if (service.find("voip_encoder") >= 0) {
+        voipIsRunning = true;
+        break;
       }
-      boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-      teleop_status_["mic"] = voipIsRunning;
-
+    }
+    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+    teleop_status_["mic"] = voipIsRunning;
   }
 }
-
 
 }  // namespace dreamview
 }  // namespace apollo

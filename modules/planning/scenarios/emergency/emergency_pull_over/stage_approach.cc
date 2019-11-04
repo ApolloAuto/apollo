@@ -69,32 +69,28 @@ Stage::StageStatus EmergencyPullOverStageApproach::Process(
                            emergency_pull_over_status.position().y()},
                           &pull_over_sl);
     const double stop_distance = 1.0;
-    const double stop_line_s = pull_over_sl.s() + stop_distance +
-                               VehicleConfigHelper::GetConfig()
-                                   .vehicle_param()
-                                   .front_edge_to_center();
+    const double stop_line_s =
+        pull_over_sl.s() + stop_distance +
+        VehicleConfigHelper::GetConfig().vehicle_param().front_edge_to_center();
     const std::string virtual_obstacle_id = "EMERGENCY_PULL_OVER";
     const std::vector<std::string> wait_for_obstacle_ids;
     planning::util::BuildStopDecision(
-        virtual_obstacle_id,
-        stop_line_s, stop_distance,
-        StopReasonCode::STOP_REASON_PREPARKING,
-        wait_for_obstacle_ids,
+        virtual_obstacle_id, stop_line_s, stop_distance,
+        StopReasonCode::STOP_REASON_PREPARKING, wait_for_obstacle_ids,
         "EMERGENCY_PULL_OVER-scenario", frame,
         &(frame->mutable_reference_line_info()->front()));
 
     ADEBUG << "Build a stop fence for emergency_pull_over: id["
            << virtual_obstacle_id << "] s[" << stop_line_s << "]";
 
-    const double adc_front_edge_s =
-        reference_line_info.AdcSlBoundary().end_s();
+    const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
     double distance = stop_line_s - adc_front_edge_s;
     const double adc_speed =
         common::VehicleStateProvider::Instance()->linear_velocity();
-    const double max_adc_stop_speed =
-        common::VehicleConfigHelper::Instance()->GetConfig()
-            .vehicle_param()
-            .max_abs_speed_when_stopped();
+    const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
+                                          ->GetConfig()
+                                          .vehicle_param()
+                                          .max_abs_speed_when_stopped();
     ADEBUG << "adc_speed[" << adc_speed << "] distance[" << distance << "]";
     constexpr double kStopSpeedTolerance = 0.15;
     constexpr double kStopDistanceTolerance = 0.5;

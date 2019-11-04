@@ -21,8 +21,8 @@
 #include "modules/planning/scenarios/emergency/emergency_pull_over/emergency_pull_over_scenario.h"
 
 #include "cyber/common/log.h"
-#include "modules/planning/scenarios/emergency/emergency_pull_over/stage_slow_down.h"
 #include "modules/planning/scenarios/emergency/emergency_pull_over/stage_approach.h"
+#include "modules/planning/scenarios/emergency/emergency_pull_over/stage_slow_down.h"
 #include "modules/planning/scenarios/emergency/emergency_pull_over/stage_standby.h"
 
 namespace apollo {

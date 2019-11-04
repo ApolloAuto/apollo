@@ -72,17 +72,14 @@ Stage::StageStatus EmergencyPullOverStageStandby::Process(
                            emergency_pull_over_status.position().y()},
                           &pull_over_sl);
     const double stop_distance = 1.0;
-    const double stop_line_s = pull_over_sl.s() + stop_distance +
-                               VehicleConfigHelper::GetConfig()
-                                   .vehicle_param()
-                                   .front_edge_to_center();
+    const double stop_line_s =
+        pull_over_sl.s() + stop_distance +
+        VehicleConfigHelper::GetConfig().vehicle_param().front_edge_to_center();
     const std::string virtual_obstacle_id = "EMERGENCY_PULL_OVER";
     const std::vector<std::string> wait_for_obstacle_ids;
     planning::util::BuildStopDecision(
-        virtual_obstacle_id,
-        stop_line_s, stop_distance,
-        StopReasonCode::STOP_REASON_PREPARKING,
-        wait_for_obstacle_ids,
+        virtual_obstacle_id, stop_line_s, stop_distance,
+        StopReasonCode::STOP_REASON_PREPARKING, wait_for_obstacle_ids,
         "EMERGENCY_PULL_OVER-scenario", frame,
         &(frame->mutable_reference_line_info()->front()));
 
