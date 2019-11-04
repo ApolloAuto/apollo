@@ -212,9 +212,7 @@ double ExtrapolationPredictor::ComputeExtraplationSpeed(
       trajectory.trajectory_point(num_trajectory_point - num_tail_point);
   double diff_x = last_point.path_point().x() - mid_point.path_point().x();
   double diff_y = last_point.path_point().y() - mid_point.path_point().y();
-  double speed =
-      std::hypot(diff_x, diff_y) / (num_tail_point * time_resolution);
-  return speed;
+  return std::hypot(diff_x, diff_y) / (num_tail_point * time_resolution);
 }
 
 }  // namespace prediction
