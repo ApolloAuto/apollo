@@ -61,6 +61,11 @@ bool MPCControllerSubmodule::Proc(
   ControlCommand control_command;
   local_view_ = preprocessor_status->mutable_local_view();
 
+  // skip produce control command when estop for MPC controller
+  if (preprocessor_status->estop()) {
+    return true;
+  }
+
   Status status = ProduceControlCommand(&control_command);
   AERROR_IF(!status.ok()) << "Failed to produce control command:"
                           << status.error_message();
@@ -73,7 +78,6 @@ Status MPCControllerSubmodule::ProduceControlCommand(
     ControlCommand* control_command) {
   std::lock_guard<std::mutex> lock(mutex_);
 
-  // TODO(SHU): skip produce control command if estop
   if (local_view_->mutable_chassis()->driving_mode() ==
       Chassis::COMPLETE_MANUAL) {
     mpc_controller_.Reset();
