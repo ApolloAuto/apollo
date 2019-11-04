@@ -45,16 +45,17 @@ class UtilXmlParser {
   static double CurveLength(const PbCurve& curve);
 
   static tinyxml2::XMLError QueryStringAttribute(
-          const tinyxml2::XMLElement& xml_node, const std::string& name,
-          std::string* value);
+      const tinyxml2::XMLElement& xml_node, const std::string& name,
+      std::string* value);
   static Status ParseBoundaryPolygon(const tinyxml2::XMLElement& xml_node,
-                                 PbBoundaryPolygon* boundary_polygon);
+                                     PbBoundaryPolygon* boundary_polygon);
   static Status ParseBoundaryEdge(const tinyxml2::XMLElement& xml_node,
-                                 PbBoundaryEdge* boundary_edge);
-  static Status ToBoundaryEdgeType(const std::string &edge_type,
-                                 PbRoadBoundaryEdgeType* pb_boundary_edge_type);
-  static Status ToEdgeType(const std::string &edge_type,
-                                 PbBoundaryEdgeType* pb_edge_type);
+                                  PbBoundaryEdge* boundary_edge);
+  static Status ToBoundaryEdgeType(
+      const std::string& edge_type,
+      PbRoadBoundaryEdgeType* pb_boundary_edge_type);
+  static Status ToEdgeType(const std::string& edge_type,
+                           PbBoundaryEdgeType* pb_edge_type);
 };
 
 }  // namespace adapter

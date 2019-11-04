@@ -132,9 +132,8 @@ LaneInfo::LaneInfo(const Lane &lane) : lane_(lane) { Init(); }
 void LaneInfo::Init() {
   PointsFromCurve(lane_.central_curve(), &points_);
   if (points_.size() < 2) {
-    AERROR
-    << "lane_ [id = " << lane_.id().DebugString()
-    << "]. lane central curve point size is less than 2.";
+    AERROR << "lane_ [id = " << lane_.id().DebugString()
+           << "]. lane central curve point size is less than 2.";
     return;
   }
   segments_.clear();
@@ -575,9 +574,8 @@ void SignalInfo::Init() {
     SegmentsFromCurve(stop_line, &segments_);
   }
   if (segments_.empty()) {
-    AERROR
-    << "SignalInfo[id = " << signal_.id().DebugString()
-    << "]. stop line  point size is null ";
+    AERROR << "SignalInfo[id = " << signal_.id().DebugString()
+           << "]. stop line  point size is null ";
     return;
   }
   std::vector<Vec2d> points;
@@ -607,9 +605,8 @@ void StopSignInfo::init() {
     SegmentsFromCurve(stop_line, &segments_);
   }
   if (segments_.empty()) {
-    AERROR
-    << "stop_sign[id = " << stop_sign_.id().DebugString()
-    << "]. stop line  point size is null ";
+    AERROR << "stop_sign[id = " << stop_sign_.id().DebugString()
+           << "]. stop line  point size is null ";
     return;
   }
 
@@ -659,9 +656,8 @@ void YieldSignInfo::Init() {
   // segments_from_curve(yield_sign_.stop_line(), &segments_);
 
   if (segments_.empty()) {
-    AERROR
-    << "yield_sign_[id = " << yield_sign_.id().DebugString()
-    << "]. stop line  point size is null ";
+    AERROR << "yield_sign_[id = " << yield_sign_.id().DebugString()
+           << "]. stop line  point size is null ";
     return;
   }
 }
@@ -686,9 +682,8 @@ void SpeedBumpInfo::Init() {
     SegmentsFromCurve(stop_line, &segments_);
   }
   if (segments_.empty()) {
-    AERROR
-    << "SpeedBumpInfo[id = " << speed_bump_.id().DebugString()
-    << "].stop line  point size is null ";
+    AERROR << "SpeedBumpInfo[id = " << speed_bump_.id().DebugString()
+           << "].stop line  point size is null ";
     return;
   }
 }

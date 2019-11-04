@@ -209,8 +209,8 @@ tinyxml2::XMLError UtilXmlParser::QueryStringAttribute(
   *value = val;
   return tinyxml2::XML_SUCCESS;
 }
-Status UtilXmlParser::ParseBoundaryPolygon(const tinyxml2::XMLElement& xml_node,
-                                  PbBoundaryPolygon* boundary_polygon) {
+Status UtilXmlParser::ParseBoundaryPolygon(
+    const tinyxml2::XMLElement& xml_node, PbBoundaryPolygon* boundary_polygon) {
   CHECK_NOTNULL(boundary_polygon);
 
   auto sub_node = xml_node.FirstChildElement("boundary_polygon");
@@ -229,7 +229,7 @@ Status UtilXmlParser::ParseBoundaryPolygon(const tinyxml2::XMLElement& xml_node,
 }
 
 Status UtilXmlParser::ParseBoundaryEdge(const tinyxml2::XMLElement& xml_node,
-                                  PbBoundaryEdge* boundary_edge) {
+                                        PbBoundaryEdge* boundary_edge) {
   CHECK_NOTNULL(boundary_edge);
 
   std::string object_type;
@@ -241,16 +241,16 @@ Status UtilXmlParser::ParseBoundaryEdge(const tinyxml2::XMLElement& xml_node,
       PbCurveSegment* curve_segment = curve->add_segment();
       CHECK(curve_segment != nullptr);
       RETURN_IF_ERROR(
-        UtilXmlParser::ParseGeometry(*geometry_node, curve_segment));
+          UtilXmlParser::ParseGeometry(*geometry_node, curve_segment));
     }
   }
 
   auto egdg_type_info_node = xml_node.FirstChildElement("edge_type_info");
-  while  (egdg_type_info_node) {
+  while (egdg_type_info_node) {
     double start_s = 0;
     double end_s = 0;
     int checker =
-           egdg_type_info_node->QueryDoubleAttribute("start_s", &start_s);
+        egdg_type_info_node->QueryDoubleAttribute("start_s", &start_s);
     checker += egdg_type_info_node->QueryDoubleAttribute("end_s", &end_s);
     if (checker != tinyxml2::XML_SUCCESS) {
       std::string err_msg = "Error parse start_s and end_s ";
@@ -260,10 +260,10 @@ Status UtilXmlParser::ParseBoundaryEdge(const tinyxml2::XMLElement& xml_node,
     edge_type_info->set_start_s(start_s);
     edge_type_info->set_end_s(end_s);
     auto egdg_type_info_type_node =
-            egdg_type_info_node->FirstChildElement("edge_type_info_type");
+        egdg_type_info_node->FirstChildElement("edge_type_info_type");
     while (egdg_type_info_type_node) {
-      checker = UtilXmlParser::QueryStringAttribute(
-            *egdg_type_info_type_node, "type", &object_type);
+      checker = UtilXmlParser::QueryStringAttribute(*egdg_type_info_type_node,
+                                                    "type", &object_type);
       if (checker != tinyxml2::XML_SUCCESS) {
         std::string err_msg = "Error parse object type.";
         return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -277,13 +277,14 @@ Status UtilXmlParser::ParseBoundaryEdge(const tinyxml2::XMLElement& xml_node,
     }
 
     egdg_type_info_node =
-          egdg_type_info_node->NextSiblingElement("edge_type_info");
+        egdg_type_info_node->NextSiblingElement("edge_type_info");
   }
   return Status::OK();
 }
 
-Status UtilXmlParser::ToBoundaryEdgeType(const std::string &edge_type,
-                        PbRoadBoundaryEdgeType* pb_boundary_edge_type) {
+Status UtilXmlParser::ToBoundaryEdgeType(
+    const std::string& edge_type,
+    PbRoadBoundaryEdgeType* pb_boundary_edge_type) {
   CHECK_NOTNULL(pb_boundary_edge_type);
 
   *pb_boundary_edge_type = apollo::hdmap::DEFAULT;
@@ -307,7 +308,7 @@ Status UtilXmlParser::ToBoundaryEdgeType(const std::string &edge_type,
   return Status::OK();
 }
 
-Status UtilXmlParser::ToEdgeType(const std::string &edge_type,
+Status UtilXmlParser::ToEdgeType(const std::string& edge_type,
                                  PbBoundaryEdgeType* pb_edge_type) {
   CHECK_NOTNULL(pb_edge_type);
 

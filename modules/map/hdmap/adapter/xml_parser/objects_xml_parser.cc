@@ -158,8 +158,8 @@ Status ObjectsXmlParser::ParseStopLines(
       CHECK(curve_segment != nullptr);
       const auto sub_node = object_node->FirstChildElement("geometry");
       if (sub_node == nullptr) {
-       std::string err_msg = "Error parse stopline geometry";
-       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+        std::string err_msg = "Error parse stopline geometry";
+        return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
       }
 
       RETURN_IF_ERROR(UtilXmlParser::ParseGeometry(*sub_node, curve_segment));
@@ -362,7 +362,6 @@ Status ObjectsXmlParser::ToPassageType(const std::string& type,
 
   return Status::OK();
 }
-
 
 }  // namespace adapter
 }  // namespace hdmap

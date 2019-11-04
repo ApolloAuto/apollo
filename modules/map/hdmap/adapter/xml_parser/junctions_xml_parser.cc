@@ -40,7 +40,6 @@ Status JunctionsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
     }
 
-
     // outline
     const tinyxml2::XMLElement* sub_node =
         junction_node->FirstChildElement("outline");
@@ -50,9 +49,8 @@ Status JunctionsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
     }
 
     std::string junction_type;
-    checker =
-      UtilXmlParser::QueryStringAttribute(
-        *junction_node, "type", &junction_type);
+    checker = UtilXmlParser::QueryStringAttribute(*junction_node, "type",
+                                                  &junction_type);
 
     PbJunction junction;
     junction.mutable_id()->set_id(junction_id);
@@ -93,7 +91,7 @@ Status JunctionsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
         OverlapWithJunction overlap_with_juntion;
         overlap_with_juntion.object_id = object_id;
         junction_internal.overlap_with_junctions.push_back(
-          overlap_with_juntion);
+            overlap_with_juntion);
         sub_node = sub_node->NextSiblingElement("objectReference");
       }
     }
@@ -104,12 +102,12 @@ Status JunctionsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
   return Status::OK();
 }
 
-Status JunctionsXmlParser::ToPbJunctionType(
-        const std::string &junction_type, PbJunctionType *type) {
+Status JunctionsXmlParser::ToPbJunctionType(const std::string& junction_type,
+                                            PbJunctionType* type) {
   CHECK_NOTNULL(type);
 
   *type = apollo::hdmap::Junction_Type_UNKNOWN;
-  if (junction_type == "UNKONW") {
+  if (junction_type == "UNKNONW") {
     *type = apollo::hdmap::Junction_Type_UNKNOWN;
   } else if (junction_type == "MERGE") {
     *type = apollo::hdmap::Junction_Type_MERGE;
@@ -124,7 +122,6 @@ Status JunctionsXmlParser::ToPbJunctionType(
   }
   return Status::OK();
 }
-
 
 }  // namespace adapter
 }  // namespace hdmap
