@@ -22,10 +22,10 @@
 #include "third_party/json/json.hpp"
 
 #ifdef TELEOP
+#include "modules/planning/proto/pad_msg.pb.h"
 #include "modules/teleop/network/proto/modem_info.pb.h"
 #include "modules/teleop/teleop/proto/daemon_service_cmd.pb.h"
 #include "modules/teleop/teleop/proto/daemon_service_rpt.pb.h"
-#include "modules/planning/proto/pad_msg.pb.h"
 #endif
 
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
@@ -61,8 +61,9 @@ class TeleopService {
   std::shared_ptr<cyber::Reader<modules::teleop::network::ModemInfo>>
       modem2_info_reader_;
   // modem info callback
-  void UpdateModem(const std::string &modem_id,
-    const std::shared_ptr<modules::teleop::network::ModemInfo> &modem_info);
+  void UpdateModem(
+      const std::string &modem_id,
+      const std::shared_ptr<modules::teleop::network::ModemInfo> &modem_info);
 
   // daemon report readers and callback
   void UpdateCarDaemonRpt(

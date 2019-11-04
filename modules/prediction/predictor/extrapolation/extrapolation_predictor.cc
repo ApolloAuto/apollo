@@ -58,8 +58,8 @@ void ExtrapolationPredictor::Predict(
 void ExtrapolationPredictor::PostProcess(Trajectory* trajectory_ptr) {
   // TODO(kechxu) handle corner cases
   constexpr int kNumTailPoint = 5;
-  ExtrapolationPredictor::LaneSearchResult
-  lane_search_result = SearchExtrapolationLane(*trajectory_ptr, kNumTailPoint);
+  ExtrapolationPredictor::LaneSearchResult lane_search_result =
+      SearchExtrapolationLane(*trajectory_ptr, kNumTailPoint);
   if (lane_search_result.found) {
     ExtrapolateByLane(lane_search_result, trajectory_ptr);
   } else {
@@ -68,8 +68,8 @@ void ExtrapolationPredictor::PostProcess(Trajectory* trajectory_ptr) {
 }
 
 ExtrapolationPredictor::LaneSearchResult
-ExtrapolationPredictor::SearchExtrapolationLane(
-    const Trajectory& trajectory, const int num_tail_point) {
+ExtrapolationPredictor::SearchExtrapolationLane(const Trajectory& trajectory,
+                                                const int num_tail_point) {
   constexpr double radius = 1.0;
   constexpr double angle_diff_threshold = M_PI / 3.0;
   int num_trajectory_point = trajectory.trajectory_point_size();
@@ -111,8 +111,8 @@ void ExtrapolationPredictor::ExtrapolateByLane(
                            last_point.path_point().y());
   double lane_s = 0.0;
   double lane_l = 0.0;
-  bool projected = PredictionMap::GetProjection(
-      position, lane_info_ptr, &lane_s, &lane_l);
+  bool projected =
+      PredictionMap::GetProjection(position, lane_info_ptr, &lane_s, &lane_l);
   if (!projected) {
     AERROR << "Position (" << position.x() << ", " << position.y() << ") "
            << "cannot be projected onto lane [" << start_lane_id << "]";
@@ -121,13 +121,13 @@ void ExtrapolationPredictor::ExtrapolateByLane(
 
   double last_relative_time = last_point.relative_time();
   double speed = last_point.v();
-  double time_range = FLAGS_prediction_trajectory_time_length -
-                      last_relative_time;
+  double time_range =
+      FLAGS_prediction_trajectory_time_length - last_relative_time;
   double time_resolution = FLAGS_prediction_trajectory_time_resolution;
   double length = speed * time_range;
 
-  LaneGraph lane_graph = ObstacleClusters::GetLaneGraph(
-      lane_s, length, false, lane_info_ptr);
+  LaneGraph lane_graph =
+      ObstacleClusters::GetLaneGraph(lane_s, length, false, lane_info_ptr);
   CHECK_EQ(lane_graph.lane_sequence_size(), 1);
   const LaneSequence& lane_sequence = lane_graph.lane_sequence(0);
   int lane_segment_index = 0;
@@ -136,8 +136,8 @@ void ExtrapolationPredictor::ExtrapolateByLane(
 
   int num_point_remained = static_cast<int>(time_range / time_resolution);
   for (int i = 0; i < num_point_remained; ++i) {
-    double relative_time = last_relative_time +
-                           static_cast<double>(i) * time_resolution;
+    double relative_time =
+        last_relative_time + static_cast<double>(i) * time_resolution;
     Eigen::Vector2d point;
     double theta = M_PI;
     if (!PredictionMap::SmoothPointFromLane(lane_id, lane_s, lane_l, &point,
@@ -169,8 +169,8 @@ void ExtrapolationPredictor::ExtrapolateByLane(
   }
 }
 
-void ExtrapolationPredictor::ExtrapolateByFreeMove(
-    const int num_tail_point, Trajectory* trajectory_ptr) {
+void ExtrapolationPredictor::ExtrapolateByFreeMove(const int num_tail_point,
+                                                   Trajectory* trajectory_ptr) {
   int num_trajectory_point = trajectory_ptr->trajectory_point_size();
   CHECK_GT(num_trajectory_point, num_tail_point);
   double time_resolution = FLAGS_prediction_trajectory_time_resolution;
@@ -182,8 +182,8 @@ void ExtrapolationPredictor::ExtrapolateByFreeMove(
   double theta = last_point.path_point().theta();
   double diff_x = last_point.path_point().x() - mid_point.path_point().x();
   double diff_y = last_point.path_point().y() - mid_point.path_point().y();
-  double speed = std::hypot(diff_x, diff_y) /
-                 (num_tail_point * time_resolution);
+  double speed =
+      std::hypot(diff_x, diff_y) / (num_tail_point * time_resolution);
   double relative_time = last_point.relative_time() + time_resolution;
   while (relative_time < time_length) {
     int prev_size = trajectory_ptr->trajectory_point_size();

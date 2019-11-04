@@ -115,8 +115,8 @@ common::Status PiecewiseJerkPathOptimizer::Process(
         pull_over_y = pull_over_status.position().y();
         pull_over = true;
       } else if (emergency_pull_over_status.has_position() &&
-          emergency_pull_over_status.position().has_x() &&
-          emergency_pull_over_status.position().has_y()) {
+                 emergency_pull_over_status.position().has_x() &&
+                 emergency_pull_over_status.position().has_y()) {
         pull_over_x = emergency_pull_over_status.position().x();
         pull_over_y = emergency_pull_over_status.position().y();
         pull_over = true;

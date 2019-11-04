@@ -87,9 +87,7 @@ apollo::common::ErrorCode SubmoduleOutput::perception_error_code() const {
   return perception_error_code_;
 }
 
-double SubmoduleOutput::frame_start_time() const {
-  return frame_start_time_;
-}
+double SubmoduleOutput::frame_start_time() const { return frame_start_time_; }
 
 }  // namespace prediction
 }  // namespace apollo

@@ -25,7 +25,6 @@
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/predictor/predictor_manager.h"
 
-
 namespace apollo {
 namespace prediction {
 

@@ -139,8 +139,8 @@ TEST_F(MracControllerTest, HighOrderMracControl) {
               18.08, 1e-2);
 }
 
-// test the judgement of the symmetric positive definite solution of the Lyapunov
-// equation
+// test the judgement of the symmetric positive definite solution of the
+// Lyapunov equation
 TEST_F(MracControllerTest, CheckLyapunovPD) {
   double dt = 0.01;
   MracConf mrac_conf = lat_controller_conf_.steer_mrac_conf();

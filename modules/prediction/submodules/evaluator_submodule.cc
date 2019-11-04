@@ -52,8 +52,7 @@ bool EvaluatorSubmodule::Proc(
       container_output->submodule_output().perception_error_code();
   const double frame_start_time =
       container_output->submodule_output().frame_start_time();
-  ObstaclesContainer obstacles_container(
-      container_output->submodule_output());
+  ObstaclesContainer obstacles_container(container_output->submodule_output());
   EvaluatorManager::Instance()->Run(&obstacles_container);
   SubmoduleOutput submodule_output = obstacles_container.GetSubmoduleOutput();
   submodule_output.set_perception_header(perception_header);

@@ -56,10 +56,10 @@ Stage::StageStatus EmergencyPullOverStageSlowDown::Process(
       common::VehicleStateProvider::Instance()->linear_velocity();
   double target_slow_down_speed = GetContext()->target_slow_down_speed;
   if (target_slow_down_speed <= 0) {
-    target_slow_down_speed = GetContext()->target_slow_down_speed =
-        std::max(scenario_config_.target_slow_down_speed(),
-                 adc_speed - scenario_config_.max_stop_deceleration() *
-                             scenario_config_.slow_down_deceleration_time());
+    target_slow_down_speed = GetContext()->target_slow_down_speed = std::max(
+        scenario_config_.target_slow_down_speed(),
+        adc_speed - scenario_config_.max_stop_deceleration() *
+                        scenario_config_.slow_down_deceleration_time());
   }
   auto& reference_line_info = frame->mutable_reference_line_info()->front();
   reference_line_info.SetCruiseSpeed(target_slow_down_speed);

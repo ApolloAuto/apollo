@@ -143,13 +143,13 @@ Status PathBoundsDecider::Process(
       ADEBUG << "Completed pullover and fallback path boundaries generation.";
       if (is_in_pull_over_scenario_) {
         *(reference_line_info->mutable_debug()
-            ->mutable_planning_data()
-            ->mutable_pull_over_status()) = *pull_over_status;
+              ->mutable_planning_data()
+              ->mutable_pull_over_status()) = *pull_over_status;
       } else if (is_in_emergency_pull_over_scenario_) {
         *(reference_line_info->mutable_debug()
-            ->mutable_planning_data()
-            ->mutable_emergency_pull_over_status()) =
-                *emergency_pull_over_status;
+              ->mutable_planning_data()
+              ->mutable_emergency_pull_over_status()) =
+            *emergency_pull_over_status;
       }
       return Status::OK();
     }
