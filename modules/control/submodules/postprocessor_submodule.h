@@ -42,16 +42,6 @@ class PostprocessorSubmodule final
     : public cyber::Component<Preprocessor, ControlCommand> {
  public:
   /**
-   * @brief Construct a new PostprocessorSubmodule object
-   *
-   */
-  PostprocessorSubmodule();
-  /**
-   * @brief Destructor
-   */
-  ~PostprocessorSubmodule();
-
-  /**
    * @brief Get name of the node
    * @return Name of the node
    */
@@ -77,6 +67,7 @@ class PostprocessorSubmodule final
  private:
   std::shared_ptr<cyber::Writer<ControlCommand>> postprocessor_writer_;
   ControlCommonConf control_common_conf_;
+  common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 };
 }  // namespace control
 }  // namespace apollo

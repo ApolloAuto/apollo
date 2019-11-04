@@ -56,7 +56,6 @@ bool PreprocessorSubmodule::Init() {
   }
 
   /*  initialize readers and writers */
-  // TODO(SHU): add writer of preprocessor
   cyber::ReaderConfig chassis_reader_config;
   chassis_reader_config.channel_name = FLAGS_chassis_topic;
   chassis_reader_config.pending_queue_size = FLAGS_chassis_pending_queue_size;
