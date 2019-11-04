@@ -30,10 +30,6 @@ namespace control {
 
 using apollo::canbus::Chassis;
 
-PostprocessorSubmodule::PostprocessorSubmodule() {}
-
-PostprocessorSubmodule::~PostprocessorSubmodule() {}
-
 std::string PostprocessorSubmodule::Name() const {
   return FLAGS_postprocessor_submodule_name;
 }
@@ -87,8 +83,12 @@ bool PostprocessorSubmodule::Proc(
   post_processor.mutable_header()->set_radar_timestamp(
       local_view.mutable_trajectory()->header().radar_timestamp());
 
+  common::util::FillHeader(Name(), &post_processor);
+
   postprocessor_writer_->Write(
       std::make_shared<ControlCommand>(post_processor));
+
+  // TODO(SHU): add debug info; add latency time
   return true;
 }
 
