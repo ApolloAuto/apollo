@@ -27,6 +27,9 @@
 
 namespace apollo {
 namespace control {
+
+using apollo::canbus::Chassis;
+
 PostprocessorSubmodule::PostprocessorSubmodule() {}
 
 PostprocessorSubmodule::~PostprocessorSubmodule() {}
@@ -36,6 +39,12 @@ std::string PostprocessorSubmodule::Name() const {
 }
 
 bool PostprocessorSubmodule::Init() {
+  if (!cyber::common::GetProtoFromFile(FLAGS_control_common_conf_file,
+                                       &control_common_conf_)) {
+    AERROR << "Unable to load control common conf file: "
+           << FLAGS_control_common_conf_file;
+    return false;
+  }
   postprocessor_writer_ =
       node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
   CHECK(postprocessor_writer_ != nullptr);
@@ -50,18 +59,26 @@ bool PostprocessorSubmodule::Proc(
     post_processor.mutable_pad_msg()->CopyFrom(preprocessor_status->pad_msg());
   }
 
-  // control_command.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
-  // control_command.mutable_latency_stats()->set_total_time_exceeded(
-  //     time_diff_ms > control_conf_.control_period());
-  // status.Save(control_command.mutable_header()->mutable_status());
-
   // forward estop reason among following control frames.
   if (preprocessor_status->estop()) {
+    AWARN_EVERY(100) << "Estop triggered! No control core method executed!";
     post_processor.mutable_header()->mutable_status()->set_msg(
         preprocessor_status->estop_reason());
+    post_processor.set_speed(0);
+    post_processor.set_throttle(0);
+    post_processor.set_brake(control_common_conf_.soft_estop_brake());
+    post_processor.set_gear_location(Chassis::GEAR_DRIVE);
+  } else {
+    // set control command
+    post_processor.set_brake(control_command->brake());
+    post_processor.set_throttle(control_command->throttle());
+    post_processor.set_steering_target(control_command->steering_target());
+    post_processor.set_steering_rate(control_command->steering_rate());
+    post_processor.set_gear_location(control_command->gear_location());
+    post_processor.set_acceleration(control_command->acceleration());
   }
 
-  // // set header
+  // set header
   LocalView local_view = preprocessor_status->local_view();
   post_processor.mutable_header()->set_lidar_timestamp(
       local_view.mutable_trajectory()->header().lidar_timestamp());
@@ -69,14 +86,6 @@ bool PostprocessorSubmodule::Proc(
       local_view.mutable_trajectory()->header().camera_timestamp());
   post_processor.mutable_header()->set_radar_timestamp(
       local_view.mutable_trajectory()->header().radar_timestamp());
-
-  // common::util::FillHeader(node_->Name(), &control_command);
-
-  //   ADEBUG << control_command.ShortDebugString();
-  //   if (control_conf_.is_control_test_mode()) {
-  //     ADEBUG << "Skip publish control command in test mode";
-  //     return true;
-  //   }
 
   postprocessor_writer_->Write(
       std::make_shared<ControlCommand>(post_processor));
