@@ -54,8 +54,8 @@ cc_library(
         "//modules/planning/tasks/optimizers/open_space_trajectory_partition",
         "//modules/planning/tasks/optimizers/path_time_heuristic:path_time_heuristic_optimizer",
         "//modules/planning/tasks/optimizers/piecewise_jerk_path:piecewise_jerk_path_optimizer",
-        "//modules/planning/tasks/optimizers/piecewise_jerk_speed:piecewise_jerk_speed_optimizer",
         "//modules/planning/tasks/optimizers/piecewise_jerk_speed:piecewise_jerk_speed_nonlinear_optimizer",
+        "//modules/planning/tasks/optimizers/piecewise_jerk_speed:piecewise_jerk_speed_optimizer",
         "//modules/planning/tasks/rss:decider_rss",
     ],
 )
