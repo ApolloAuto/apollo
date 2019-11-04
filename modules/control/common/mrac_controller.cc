@@ -34,7 +34,7 @@ using apollo::common::util::StrCat;
 using Matrix = Eigen::MatrixXd;
 
 double MracController::Control(const double command, const Matrix state,
-                               const double dt, const double input_limit,
+                               const double input_limit,
                                const double input_rate_limit) {
   // check if the reference/adaption model well set up during the initilization
   if (!reference_model_enabled_ || !adaption_model_enabled_) {
@@ -46,9 +46,10 @@ double MracController::Control(const double command, const Matrix state,
     return command;  // treat the mrac as a unity proportional controller
   }
   // check if the current sampling time is valid
-  if (dt <= 0.0) {
-    AWARN << "MRAC: current sampling time <= 0, will use the last control, dt: "
-          << dt;
+  if (ts_ <= 0.0) {
+    AWARN
+        << "MRAC: current sampling time <= 0, will use the last control, ts_: "
+        << ts_;
     return control_previous_;
   }
 
@@ -63,25 +64,20 @@ double MracController::Control(const double command, const Matrix state,
   bound_command_rate_ = input_rate_limit * bound_ratio_;
 
   // update the state in the reference system
-  Matrix matrix_i = Matrix::Identity(model_order_, model_order_);
-  state_reference_.col(0) =
-      (matrix_i - dt * 0.5 * matrix_a_reference_).inverse() *
-      ((matrix_i + dt * 0.5 * matrix_a_reference_) * state_reference_.col(1) +
-       dt * 0.5 * matrix_b_reference_ *
-           (input_desired_(0, 0) + input_desired_(0, 1)));
+  UpdateReference();
 
   double state_bounded = 0.0;
   saturation_status_reference_ = BoundOutput(
-      state_reference_(0, 0), state_reference_(0, 1), dt, &state_bounded);
+      state_reference_(0, 0), state_reference_(0, 1), &state_bounded);
   state_reference_(0, 0) = state_bounded;
 
   // update the adaption laws including state adaption, command adaption and
   // nonlinear components adaption
-  Adaption(&gain_state_adaption_, state_action_,
-           gamma_state_adaption_ * gamma_ratio_state_);
+  UpdateAdaption(&gain_state_adaption_, state_action_,
+                 gamma_state_adaption_ * gamma_ratio_state_);
 
-  Adaption(&gain_input_adaption_, input_desired_,
-           gamma_input_adaption_ * gamma_ratio_input_);
+  UpdateAdaption(&gain_input_adaption_, input_desired_,
+                 gamma_input_adaption_ * gamma_ratio_input_);
 
   // update the generated control based on the adaptive law
   double control_unbounded =
@@ -90,10 +86,10 @@ double MracController::Control(const double command, const Matrix state,
 
   double control = 0.0;
   saturation_status_control_ =
-      BoundOutput(control_unbounded, control_previous_, dt, &control);
+      BoundOutput(control_unbounded, control_previous_, &control);
 
   // update the anti-windup compensation if applied
-  AntiWindupCompensation(control_unbounded, control_previous_, dt);
+  AntiWindupCompensation(control_unbounded, control_previous_);
 
   // update the previous value for next iteration
   state_reference_.col(1) = state_reference_.col(0);
@@ -136,10 +132,11 @@ void MracController::Init(const MracConf &mrac_conf, const double dt) {
   control_previous_ = 0.0;
   saturation_status_control_ = 0;
   saturation_status_reference_ = 0;
-  // Initialize the saturation limits
-  bound_ratio_ = mrac_conf.mrac_saturation_level();
+  ts_ = dt;
   // Initialize the common model parameters
   model_order_ = mrac_conf.mrac_model_order();
+  // Initialize the saturation limits
+  bound_ratio_ = mrac_conf.mrac_saturation_level();
   // Initialize the system states
   input_desired_ = Matrix::Zero(1, 2);
   state_action_ = Matrix::Zero(model_order_, 2);
@@ -156,7 +153,7 @@ void MracController::Init(const MracConf &mrac_conf, const double dt) {
   matrix_a_reference_ = Matrix::Zero(model_order_, model_order_);
   matrix_b_reference_ = Matrix::Zero(model_order_, 1);
   if (SetReferenceModel(mrac_conf).ok()) {
-    BuildReferenceModel(dt);
+    BuildReferenceModel();
   } else {
     reference_model_enabled_ = false;
   }
@@ -224,19 +221,18 @@ Status MracController::SetAdaptionModel(const MracConf &mrac_conf) {
   return Status::OK();
 }
 
-void MracController::BuildReferenceModel(const double dt) {
+void MracController::BuildReferenceModel() {
   reference_model_enabled_ = true;
-  if (dt <= 0.0) {
-    AWARN << "dt <= 0, continuous-discrete transformation for reference model "
-             "failed, dt: "
-          << dt;
+  if (ts_ <= 0.0) {
+    AWARN << "ts_ <= 0, continuous-discrete transformation for reference model "
+             "failed, ts_: "
+          << ts_;
     reference_model_enabled_ = false;
   } else {
     if (model_order_ == 1) {
       matrix_a_reference_(0, 0) = -1.0 / tau_reference_;
       matrix_b_reference_(0, 0) = 1.0 / tau_reference_;
     } else if (model_order_ == 2) {
-      Ts_ = dt;
       matrix_a_reference_(0, 1) = 1.0;
       matrix_a_reference_(1, 0) = -wn_reference_ * wn_reference_;
       matrix_a_reference_(1, 1) = -2 * zeta_reference_ * wn_reference_;
@@ -281,12 +277,21 @@ bool MracController::CheckLyapunovPD(const Matrix matrix_a,
           llt_matrix_q.info() != Eigen::NumericalIssue);
 }
 
-void MracController::Adaption(Matrix *law_adp, const Matrix state_adp,
-                              const Matrix gain_adp) {
+void MracController::UpdateReference() {
+  Matrix matrix_i = Matrix::Identity(model_order_, model_order_);
+  state_reference_.col(0) =
+      (matrix_i - ts_ * 0.5 * matrix_a_reference_).inverse() *
+      ((matrix_i + ts_ * 0.5 * matrix_a_reference_) * state_reference_.col(1) +
+       ts_ * 0.5 * matrix_b_reference_ *
+           (input_desired_(0, 0) + input_desired_(0, 1)));
+}
+
+void MracController::UpdateAdaption(Matrix *law_adp, const Matrix state_adp,
+                                    const Matrix gain_adp) {
   Matrix state_error = state_action_ - state_reference_;
   law_adp->col(0) =
       law_adp->col(1) -
-      0.5 * Ts_ * gain_adp *
+      0.5 * ts_ * gain_adp *
           (state_adp.col(0) * (state_error.col(0).transpose() +
                                compensation_anti_windup_.col(0).transpose()) +
            state_adp.col(1) * (state_error.col(1).transpose() +
@@ -296,8 +301,7 @@ void MracController::Adaption(Matrix *law_adp, const Matrix state_adp,
 }
 
 void MracController::AntiWindupCompensation(const double control_command,
-                                            const double previous_command,
-                                            const double dt) {
+                                            const double previous_command) {
   Matrix offset_windup = Matrix::Zero(model_order_, 1);
   offset_windup(0, 0) =
       ((control_command > bound_command_) ? bound_command_ - control_command
@@ -306,11 +310,11 @@ void MracController::AntiWindupCompensation(const double control_command,
                                            : 0.0);
   if (model_order_ > 1) {
     offset_windup(1, 0) =
-        ((control_command > previous_command + bound_command_rate_ * dt)
-             ? bound_command_rate_ - (control_command - previous_command) / dt
+        ((control_command > previous_command + bound_command_rate_ * ts_)
+             ? bound_command_rate_ - (control_command - previous_command) / ts_
              : 0.0) +
-        ((control_command < previous_command - bound_command_rate_ * dt)
-             ? -bound_command_rate_ - (control_command - previous_command) / dt
+        ((control_command < previous_command - bound_command_rate_ * ts_)
+             ? -bound_command_rate_ - (control_command - previous_command) / ts_
              : 0.0);
   }
   compensation_anti_windup_.col(1) = compensation_anti_windup_.col(0);
@@ -318,26 +322,25 @@ void MracController::AntiWindupCompensation(const double control_command,
 }
 
 int MracController::BoundOutput(const double output_unbounded,
-                                const double previous_output, const double dt,
-                                double *output) {
+                                const double previous_output, double *output) {
   int status = 0;
   if (output_unbounded > bound_command_ ||
-      output_unbounded > previous_output + bound_command_rate_ * dt) {
-    *output = (bound_command_ < previous_output + bound_command_rate_ * dt)
+      output_unbounded > previous_output + bound_command_rate_ * ts_) {
+    *output = (bound_command_ < previous_output + bound_command_rate_ * ts_)
                   ? bound_command_
-                  : previous_output + bound_command_rate_ * dt;
+                  : previous_output + bound_command_rate_ * ts_;
     // if output exceeds the upper bound, then status = 1; while if output
     // changing rate exceeds the upper rate bound, then status = 2
     status =
-        (bound_command_ < previous_output + bound_command_rate_ * dt) ? 1 : 2;
+        (bound_command_ < previous_output + bound_command_rate_ * ts_) ? 1 : 2;
   } else if (output_unbounded < -bound_command_ ||
-             output_unbounded < previous_output - bound_command_rate_ * dt) {
-    *output = (-bound_command_ > previous_output - bound_command_rate_ * dt)
+             output_unbounded < previous_output - bound_command_rate_ * ts_) {
+    *output = (-bound_command_ > previous_output - bound_command_rate_ * ts_)
                   ? -bound_command_
-                  : previous_output - bound_command_rate_ * dt;
+                  : previous_output - bound_command_rate_ * ts_;
     // if output exceeds the lower bound, then status = -1; while if output
     // changing rate exceeds the lower rate bound, then status = -2
-    status = (-bound_command_ > previous_output - bound_command_rate_ * dt)
+    status = (-bound_command_ > previous_output - bound_command_rate_ * ts_)
                  ? -1
                  : -2;
   } else {
