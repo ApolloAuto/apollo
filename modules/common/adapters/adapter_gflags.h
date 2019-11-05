@@ -126,3 +126,6 @@ DECLARE_string(tick_topic);
 
 // Latency recording topic
 DECLARE_string(latency_recording_topic);
+// Latency reporting topic
+DECLARE_string(latency_reporting_topic);
+
