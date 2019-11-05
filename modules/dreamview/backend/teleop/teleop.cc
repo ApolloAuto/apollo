@@ -30,7 +30,6 @@ using ::google::protobuf::util::MessageToJsonString;
 using modules::teleop::network::ModemInfo;
 using modules::teleop::teleop::DaemonServiceCmd;
 using modules::teleop::teleop::DaemonServiceRpt;
-using apollo::planning::PadMessage;
 using apollo::cyber::Time;
 
 // modem ids
