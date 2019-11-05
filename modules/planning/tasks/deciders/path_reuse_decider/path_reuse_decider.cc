@@ -56,8 +56,9 @@ Status PathReuseDecider::Process(Frame* const frame,
   auto* mutable_path_reuse_decider_status = PlanningContext::Instance()
                                                 ->mutable_planning_status()
                                                 ->mutable_path_reuse_decider();
-
-  if (!lane_change_status->is_current_opt_succeed() &&
+  ADEBUG << "lane_change_status->is_current_opt_succeed(): "
+         << lane_change_status->is_current_opt_succeed();
+  if (!lane_change_status->is_current_opt_succeed() ||
       !Decider::config_.path_reuse_decider_config().reuse_path()) {
     ADEBUG << "skipping reusing path";
     mutable_path_reuse_decider_status->set_reused_path(false);
