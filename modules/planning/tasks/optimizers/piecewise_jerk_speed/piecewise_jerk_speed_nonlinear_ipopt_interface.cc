@@ -30,7 +30,8 @@ PiecewiseJerkSpeedNonlinearIpoptInterface::
         const double s_init, const double s_dot_init, const double s_ddot_init,
         const double delta_t, const int num_of_points, const double s_ddot_min,
         const double s_ddot_max, const double s_dddot_abs_max)
-    : v_bound_func_(0.0, 0.0, 0.0),
+    : curvature_curve_(0.0, 0.0, 0.0),
+      v_bound_func_(0.0, 0.0, 0.0),
       s_init_(s_init),
       s_dot_init_(s_dot_init),
       s_ddot_init_(s_ddot_init),
@@ -233,7 +234,7 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_f(int n, const double *x,
   for (int i = 0; i < num_of_points_; ++i) {
     double v = x[v_offset_ + i];
     double s = x[i];
-    double kappa = path_.GetPathPointWithPathS(s).kappa();
+    double kappa = curvature_curve_.Evaluate(0, s);
     double a_lat = v * v * kappa;
     obj_value += a_lat * a_lat * w_overall_centripetal_acc_;
   }
@@ -288,8 +289,8 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_grad_f(int n,
     double v4 = v3 * v;
 
     double s = x[i];
-    double kappa = path_.GetPathPointWithPathS(s).kappa();
-    double kappa_dot = path_.GetPathPointWithPathS(s).dkappa();
+    double kappa = curvature_curve_.Evaluate(0, s);
+    double kappa_dot = curvature_curve_.Evaluate(1, s);
 
     grad_f[i] += 2.0 * w_overall_centripetal_acc_ * v4 * kappa * kappa_dot;
     grad_f[v_offset_ + i] +=
@@ -614,9 +615,9 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_h(
       auto s = x[s_index];
       auto v = x[v_index];
 
-      auto kappa = path_.GetPathPointWithPathS(s).kappa();
-      auto kappa_dot = path_.GetPathPointWithPathS(s).dkappa();
-      auto kappa_ddot = path_.GetPathPointWithPathS(s).ddkappa();
+      auto kappa = curvature_curve_.Evaluate(0, s);
+      auto kappa_dot = curvature_curve_.Evaluate(1, s);
+      auto kappa_ddot = curvature_curve_.Evaluate(2, s);
 
       auto v2 = v * v;
       auto v3 = v2 * v;
@@ -742,8 +743,9 @@ void PiecewiseJerkSpeedNonlinearIpoptInterface::finalize_solution(
   }
 }
 
-void PiecewiseJerkSpeedNonlinearIpoptInterface::set_path(PathData path) {
-  path_ = std::move(path);
+void PiecewiseJerkSpeedNonlinearIpoptInterface::set_curvature_curve(
+    PiecewiseJerkTrajectory1d curvature_curve) {
+  curvature_curve_ = std::move(curvature_curve);
 }
 
 void PiecewiseJerkSpeedNonlinearIpoptInterface::set_speed_limit_curve(

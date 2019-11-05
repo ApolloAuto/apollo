@@ -45,7 +45,7 @@ class PiecewiseJerkSpeedNonlinearIpoptInterface : public Ipopt::TNLP {
 
   void set_warm_start(std::vector<std::vector<double>> speed_profile);
 
-  void set_path(PathData path);
+  void set_curvature_curve(PiecewiseJerkTrajectory1d curvature_curve);
 
   void get_optimization_results(std::vector<double> *ptr_opt_s,
                                 std::vector<double> *ptr_opt_v,
@@ -127,7 +127,7 @@ class PiecewiseJerkSpeedNonlinearIpoptInterface : public Ipopt::TNLP {
 
   std::unordered_map<int, int> hessian_mapper_;
 
-  PathData path_;
+  PiecewiseJerkTrajectory1d curvature_curve_;
 
   bool use_v_bound_ = false;
 

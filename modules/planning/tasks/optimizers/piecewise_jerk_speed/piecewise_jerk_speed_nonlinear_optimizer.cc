@@ -150,9 +150,8 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
   const auto& piecewise_jerk_nonlinear_speed_config =
       config_.piecewise_jerk_nonlinear_speed_config();
 
-  // TODO(Jinyun): evaluate the performance of piecewise linear path data, will
-  // try piecewise polynomial path data
-  ptr_interface->set_path(path_data);
+  PiecewiseJerkTrajectory1d smooth_curvature = SmoothPathCurvature(path_data);
+  ptr_interface->set_curvature_curve(smooth_curvature);
 
   // TODO(Hongyi): add debug_info for speed_limit fitting curve
   const SpeedLimit& speed_limit = st_graph_data.speed_limit();
@@ -192,7 +191,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
 
   app->Options()->SetIntegerValue("print_level", 0);
-  app->Options()->SetIntegerValue("max_iter", 5000);
+  app->Options()->SetIntegerValue("max_iter", 1000);
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
@@ -315,5 +314,54 @@ PiecewiseJerkSpeedNonlinearOptimizer::SmoothSpeedLimit(
   return smooth_speed_limit;
 }
 
+PiecewiseJerkTrajectory1d
+PiecewiseJerkSpeedNonlinearOptimizer::SmoothPathCurvature(
+    const PathData& path_data) {
+  // using piecewise_jerk_path to fit a curve of path kappa profile
+  // TODO(Jinyun): move smooth configs to gflags
+  const auto& cartesian_path = path_data.discretized_path();
+  const double delta_s = 0.5;
+  std::vector<double> path_curvature;
+  for (double path_s = cartesian_path.front().s();
+       path_s < cartesian_path.back().s() + delta_s; path_s += delta_s) {
+    const auto& path_point = cartesian_path.Evaluate(path_s);
+    path_curvature.push_back(path_point.kappa());
+  }
+  const auto& path_init_point = cartesian_path.front();
+  std::array<double, 3> init_state = {path_init_point.kappa(),
+                                      path_init_point.dkappa(),
+                                      path_init_point.ddkappa()};
+  PiecewiseJerkPathProblem piecewise_jerk_problem(path_curvature.size(),
+                                                  delta_s, init_state);
+  piecewise_jerk_problem.set_x_bounds(-1.0, 1.0);
+  piecewise_jerk_problem.set_dx_bounds(-10.0, 10.0);
+  piecewise_jerk_problem.set_ddx_bounds(-10.0, 10.0);
+  piecewise_jerk_problem.set_dddx_bound(-10.0, 10.0);
+
+  piecewise_jerk_problem.set_weight_x(0.0);
+  piecewise_jerk_problem.set_weight_dx(10.0);
+  piecewise_jerk_problem.set_weight_ddx(10.0);
+  piecewise_jerk_problem.set_weight_dddx(10.0);
+
+  piecewise_jerk_problem.set_x_ref(10.0, path_curvature);
+  bool success = piecewise_jerk_problem.Optimize(1000);
+  std::vector<double> opt_x;
+  std::vector<double> opt_dx;
+  std::vector<double> opt_ddx;
+  if (success) {
+    opt_x = piecewise_jerk_problem.opt_x();
+    opt_dx = piecewise_jerk_problem.opt_dx();
+    opt_ddx = piecewise_jerk_problem.opt_ddx();
+  }
+
+  PiecewiseJerkTrajectory1d smooth_curvature(opt_x.front(), opt_dx.front(),
+                                             opt_ddx.front());
+  for (size_t i = 1; i < opt_ddx.size(); ++i) {
+    double j = (opt_ddx[i] - opt_ddx[i - 1]) / delta_s;
+    smooth_curvature.AppendSegment(j, delta_s);
+  }
+
+  return smooth_curvature;
+}
 }  // namespace planning
 }  // namespace apollo
