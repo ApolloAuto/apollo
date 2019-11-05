@@ -112,10 +112,10 @@ void TeleopService::RegisterMessageHandlers() {
         // TODO
         {
           boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-          // teleop_status_["audio"] = !teleop_status_["audio"];
+          teleop_status_["audio"] = !teleop_status_["audio"];
 
           // turn on/off the mic based on the audio status
-          // teleop_status_["mic"] = teleop_status_["audio"];
+          teleop_status_["mic"] = teleop_status_["audio"];
         }
       });
   // Mute/Unmute local microphone
