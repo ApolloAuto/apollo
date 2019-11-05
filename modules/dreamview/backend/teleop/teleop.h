@@ -95,7 +95,6 @@ class TeleopService {
   // Mutex to protect concurrent access to teleop_status_.
   // NOTE: Use boost until we upgrade to std version with rwlock support.
   boost::shared_mutex mutex_;
-
 };
 
 }  // namespace dreamview
