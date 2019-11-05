@@ -28,19 +28,17 @@
 namespace apollo {
 namespace monitor {
 
-using apollo::common::LatencyRecordMap;
-using apollo::common::LatencyReport;
-
 class LatencyMonitor : public RecurrentRunner {
  public:
   LatencyMonitor();
   void RunOnce(const double current_time) override;
 
  private:
-  void UpdateLatencyStat(const std::shared_ptr<LatencyRecordMap>& records);
+  void UpdateLatencyStat(
+      const std::shared_ptr<apollo::common::LatencyRecordMap>& records);
   void PublishLatencyReport();
 
-  LatencyReport latency_report_;
+  apollo::common::LatencyReport latency_report_;
   std::unordered_map<uint64_t,
                      std::vector<std::tuple<std::string, uint64_t, uint64_t>>>
       track_map_;

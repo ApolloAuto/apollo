@@ -64,16 +64,15 @@ void LatencyMonitor::RunOnce(const double current_time) {
 
 void LatencyMonitor::UpdateLatencyStat(
     const std::shared_ptr<LatencyRecordMap>& records) {
-  if (latency_report_.stat_aggr().find(records->module_name()) ==
-      latency_report_.stat_aggr().end()) {
+  auto* stat_aggr = latency_report_.mutable_stat_aggr();
+  if (stat_aggr->find(records->module_name()) == stat_aggr->end()) {
     LatencyStat stat;
-    latency_report_.mutable_stat_aggr()->insert({records->module_name(), stat});
+    stat_aggr->insert({records->module_name(), stat});
   }
-  auto* stat = &latency_report_.mutable_stat_aggr()->at(records->module_name());
+  auto* stat = &stat_aggr->at(records->module_name());
 
-  uint64_t min_duration = (1UL << 63), max_duration = 0,
-           total_duration = 0;
-  for (const auto record : records->latency_records()) {
+  uint64_t min_duration = (1UL << 63), max_duration = 0, total_duration = 0;
+  for (const auto& record : records->latency_records()) {
     const auto duration = record.second.end_time() - record.second.begin_time();
     min_duration = std::min(min_duration, duration);
     max_duration = std::max(max_duration, duration);
