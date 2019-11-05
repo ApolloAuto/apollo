@@ -68,7 +68,7 @@ Stage::StageStatus EmergencyPullOverStageApproach::Process(
     reference_line.XYToSL({emergency_pull_over_status.position().x(),
                            emergency_pull_over_status.position().y()},
                           &pull_over_sl);
-    const double stop_distance = 1.0;
+    const double stop_distance = scenario_config_.stop_distance();
     const double stop_line_s =
         pull_over_sl.s() + stop_distance +
         VehicleConfigHelper::GetConfig().vehicle_param().front_edge_to_center();
@@ -76,7 +76,7 @@ Stage::StageStatus EmergencyPullOverStageApproach::Process(
     const std::vector<std::string> wait_for_obstacle_ids;
     planning::util::BuildStopDecision(
         virtual_obstacle_id, stop_line_s, stop_distance,
-        StopReasonCode::STOP_REASON_PREPARKING, wait_for_obstacle_ids,
+        StopReasonCode::STOP_REASON_PULL_OVER, wait_for_obstacle_ids,
         "EMERGENCY_PULL_OVER-scenario", frame,
         &(frame->mutable_reference_line_info()->front()));
 
@@ -92,10 +92,10 @@ Stage::StageStatus EmergencyPullOverStageApproach::Process(
                                           .vehicle_param()
                                           .max_abs_speed_when_stopped();
     ADEBUG << "adc_speed[" << adc_speed << "] distance[" << distance << "]";
-    constexpr double kStopSpeedTolerance = 0.15;
+    constexpr double kStopSpeedTolerance = 0.4;
     constexpr double kStopDistanceTolerance = 0.5;
     if (adc_speed <= max_adc_stop_speed + kStopSpeedTolerance &&
-        distance <= stop_distance + kStopDistanceTolerance) {
+        distance <= kStopDistanceTolerance) {
       return FinishStage();
     }
   }
@@ -104,10 +104,12 @@ Stage::StageStatus EmergencyPullOverStageApproach::Process(
 }
 
 Stage::StageStatus EmergencyPullOverStageApproach::FinishStage() {
+  /*
   auto* emergency_pull_over = PlanningContext::Instance()
                                   ->mutable_planning_status()
                                   ->mutable_emergency_pull_over();
   emergency_pull_over->set_is_in_emergency_pull_over_scenario(false);
+  */
 
   next_stage_ = ScenarioConfig::EMERGENCY_PULL_OVER_STANDBY;
   return Stage::FINISHED;
