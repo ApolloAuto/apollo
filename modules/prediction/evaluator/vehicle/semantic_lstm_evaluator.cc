@@ -19,6 +19,8 @@
 #include <omp.h>
 #include <unordered_map>
 
+#include "Eigen/Dense"
+
 #include "cyber/common/file.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
@@ -126,13 +128,40 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr,
     TrajectoryPoint* point = trajectory->add_trajectory_point();
     double dx = static_cast<double>(torch_output[0][i][0]);
     double dy = static_cast<double>(torch_output[0][i][1]);
+    double sigma_xr = std::abs(static_cast<double>(torch_output[0][i][2]));
+    double sigma_yr = std::abs(static_cast<double>(torch_output[0][i][3]));
+    double corr_r = static_cast<double>(torch_output[0][i][4]);
+    double heading = latest_feature_ptr->velocity_heading();
     Vec2d offset(dx, dy);
-    Vec2d rotated_offset =
-        offset.rotate(latest_feature_ptr->velocity_heading());
+    Vec2d rotated_offset = offset.rotate(heading);
     double point_x = pos_x + rotated_offset.x();
     double point_y = pos_y + rotated_offset.y();
     point->mutable_path_point()->set_x(point_x);
     point->mutable_path_point()->set_y(point_y);
+
+    Eigen::Matrix2d cov_matrix_r;
+    cov_matrix_r(0, 0) = sigma_xr * sigma_xr;
+    cov_matrix_r(0, 1) = corr_r * sigma_xr * sigma_yr;
+    cov_matrix_r(1, 0) = corr_r * sigma_xr * sigma_yr;
+    cov_matrix_r(1, 1) = sigma_yr * sigma_yr;
+
+    Eigen::Matrix2d rotation_matrix;
+    rotation_matrix(0, 0) = std::cos(heading);
+    rotation_matrix(0, 1) = -std::sin(heading);
+    rotation_matrix(1, 0) = std::sin(heading);
+    rotation_matrix(1, 1) = std::cos(heading);
+
+    Eigen::Matrix2d cov_matrix;
+    cov_matrix = rotation_matrix * cov_matrix_r * (rotation_matrix.transpose());
+    double sigma_x = std::sqrt(std::abs(cov_matrix(0, 0)));
+    double sigma_y = std::sqrt(std::abs(cov_matrix(1, 1)));
+    double corr = cov_matrix(0, 1) / (sigma_x + FLAGS_double_precision) /
+                                     (sigma_y + FLAGS_double_precision);
+
+    point->mutable_gaussian_info()->set_sigma_x(sigma_x);
+    point->mutable_gaussian_info()->set_sigma_y(sigma_y);
+    point->mutable_gaussian_info()->set_correlation(corr);
+
     if (i < 10) {  // use origin heading for the first second
       point->mutable_path_point()->set_theta(
           latest_feature_ptr->velocity_heading());
