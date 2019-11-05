@@ -182,9 +182,8 @@ void SemanticLSTMEvaluator::LoadModel() {
     device_ = torch::Device(torch::kCUDA);
   }
   torch::set_num_threads(1);
-  // TODO(Hongyi): change model file name and gflag
   torch_model_ =
-      torch::jit::load(FLAGS_torch_vehicle_junction_map_file, device_);
+      torch::jit::load(FLAGS_torch_vehicle_semantic_lstm_file, device_);
 }
 
 }  // namespace prediction
