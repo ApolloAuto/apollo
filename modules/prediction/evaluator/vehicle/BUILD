@@ -288,6 +288,7 @@ cc_library(
         "//modules/prediction/common:semantic_map",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
+        "@eigen",
     ] + select({
         "//tools/platforms:use_gpu": [
             "@pytorch_gpu",
