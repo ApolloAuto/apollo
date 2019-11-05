@@ -39,6 +39,8 @@ class PiecewiseJerkSpeedNonlinearOptimizer : public SpeedOptimizer {
                          SpeedData* const speed_data) override;
 
   PiecewiseJerkTrajectory1d SmoothSpeedLimit(const SpeedLimit& speed_limit);
+
+  PiecewiseJerkTrajectory1d SmoothPathCurvature(const PathData& path_data);
 };
 
 }  // namespace planning
