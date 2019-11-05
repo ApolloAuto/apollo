@@ -289,7 +289,6 @@ void TeleopService::UpdateOperatorDaemonRpt(
 }
 
 void TeleopService::SendVideoStreamCmd(bool start_stop) {
-  // auto msg = std::make_shared<DaemonServiceCmd>();
   DaemonServiceCmd msg;
   if (start_stop) {
     msg.set_cmd("start");
