@@ -65,7 +65,8 @@ class LaneChangeDecider : public Decider {
       const ReferenceLineInfo* const reference_line_info);
 
  private:
-  common::Status Process(Frame* frame) override;
+  common::Status Process(Frame* frame,
+                         ReferenceLineInfo* reference_line_info) override;
 
   static bool HysteresisFilter(const double obstacle_distance,
                                const double safe_distance,

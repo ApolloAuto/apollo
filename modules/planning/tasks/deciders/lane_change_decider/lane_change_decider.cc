@@ -34,7 +34,9 @@ using apollo::common::util::StrCat;
 LaneChangeDecider::LaneChangeDecider(const TaskConfig& config)
     : Decider(config) {}
 
-Status LaneChangeDecider::Process(Frame* frame) {
+// added a dummy parameter to enable this task in ExecuteTaskOnReferenceLine
+Status LaneChangeDecider::Process(
+    Frame* frame, ReferenceLineInfo* current_reference_line_info) {
   // Sanity checks.
   CHECK_NOTNULL(frame);
   std::list<ReferenceLineInfo>* reference_line_info =
@@ -63,6 +65,7 @@ Status LaneChangeDecider::Process(Frame* frame) {
   }
 
   bool has_change_lane = reference_line_info->size() > 1;
+  ADEBUG << "has_change_lane: " << has_change_lane;
   if (!has_change_lane) {
     const auto& path_id = reference_line_info->front().Lanes().Id();
     if (prev_status->status() == ChangeLaneStatus::CHANGE_LANE_FINISHED) {
@@ -88,6 +91,7 @@ Status LaneChangeDecider::Process(Frame* frame) {
         PrioritizeChangeLane(reference_line_info);
       } else {
         RemoveChangeLane(reference_line_info);
+        ADEBUG << "removed change lane.";
         UpdateStatus(now, ChangeLaneStatus::CHANGE_LANE_FINISHED,
                      current_path_id);
       }
@@ -95,8 +99,10 @@ Status LaneChangeDecider::Process(Frame* frame) {
     } else if (prev_status->status() == ChangeLaneStatus::CHANGE_LANE_FAILED) {
       if (now - prev_status->timestamp() < FLAGS_change_lane_fail_freeze_time) {
         RemoveChangeLane(reference_line_info);
+        ADEBUG << "freezed after failed";
       } else {
         UpdateStatus(now, ChangeLaneStatus::IN_CHANGE_LANE, current_path_id);
+        ADEBUG << "change lane again after failed";
       }
       return Status::OK();
     } else if (prev_status->status() ==
@@ -104,9 +110,11 @@ Status LaneChangeDecider::Process(Frame* frame) {
       if (now - prev_status->timestamp() <
           FLAGS_change_lane_success_freeze_time) {
         RemoveChangeLane(reference_line_info);
+        ADEBUG << "freezed after completed lane change";
       } else {
         PrioritizeChangeLane(reference_line_info);
         UpdateStatus(now, ChangeLaneStatus::IN_CHANGE_LANE, current_path_id);
+        ADEBUG << "change lane again after success";
       }
     } else {
       const std::string msg =
@@ -200,13 +208,16 @@ void LaneChangeDecider::PrioritizeChangeLane(
 
 void LaneChangeDecider::RemoveChangeLane(
     std::list<ReferenceLineInfo>* reference_line_info) const {
+  return;
+  /* disable rest to avoid core dump */
+  ADEBUG << "removed change lane";
   auto iter = reference_line_info->begin();
   while (iter != reference_line_info->end()) {
     if (iter->IsChangeLanePath()) {
-      iter = reference_line_info->erase(iter);
-    } else {
-      ++iter;
+      reference_line_info->erase(iter);
+      return;
     }
+    ++iter;
   }
 }
 
