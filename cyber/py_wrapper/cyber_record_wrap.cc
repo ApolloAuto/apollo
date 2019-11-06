@@ -20,7 +20,15 @@
 
 #include "cyber/py_wrapper/py_record.h"
 
+#if PY_MAJOR_VERSION >= 3
+#define PYOBJECT_NULL_STRING PyBytes_FromStringAndSize("", 0)
+#define C_STR_TO_PY_BYTES(cstr) \
+  PyBytes_FromStringAndSize(cstr.c_str(), cstr.size())
+#else
 #define PYOBJECT_NULL_STRING PyString_FromStringAndSize("", 0)
+#define C_STR_TO_PY_BYTES(cstr) \
+  PyString_FromStringAndSize(cstr.c_str(), cstr.size())
+#endif
 
 template <typename T>
 T PyObjectToPtr(PyObject *pyobj, const std::string &type_ptr) {
@@ -94,7 +102,12 @@ PyObject *cyber_PyRecordReader_ReadMessage(PyObject *self, PyObject *args) {
   Py_DECREF(bld_name);
 
   PyObject *bld_data =
+#if PY_MAJOR_VERSION >= 3
+      Py_BuildValue("y#", result.data.c_str(), result.data.length());
+#else
       Py_BuildValue("s#", result.data.c_str(), result.data.length());
+#endif
+  CHECK(bld_data) << "Py_BuildValue returns NULL.";
   PyDict_SetItemString(pyobj_bag_message, "data", bld_data);
   Py_DECREF(bld_data);
 
@@ -154,8 +167,8 @@ PyObject *cyber_PyRecordReader_GetMessageType(PyObject *self, PyObject *args) {
     return PYOBJECT_NULL_STRING;
   }
 
-  std::string msg_type = reader->GetMessageType(channel_name);
-  return PyString_FromStringAndSize(msg_type.c_str(), msg_type.size());
+  const std::string msg_type = reader->GetMessageType(channel_name);
+  return C_STR_TO_PY_BYTES(msg_type);
 }
 
 PyObject *cyber_PyRecordReader_GetProtoDesc(PyObject *self, PyObject *args) {
@@ -175,8 +188,8 @@ PyObject *cyber_PyRecordReader_GetProtoDesc(PyObject *self, PyObject *args) {
     return PYOBJECT_NULL_STRING;
   }
 
-  std::string pb_desc = reader->GetProtoDesc(channel_name);
-  return PyString_FromStringAndSize(pb_desc.c_str(), pb_desc.size());
+  const std::string pb_desc = reader->GetProtoDesc(channel_name);
+  return C_STR_TO_PY_BYTES(pb_desc);
 }
 
 PyObject *cyber_PyRecordReader_GetHeaderString(PyObject *self, PyObject *args) {
@@ -194,9 +207,8 @@ PyObject *cyber_PyRecordReader_GetHeaderString(PyObject *self, PyObject *args) {
     return PYOBJECT_NULL_STRING;
   }
 
-  std::string header_string = reader->GetHeaderString();
-  return PyString_FromStringAndSize(header_string.c_str(),
-                                    header_string.size());
+  const std::string header_string = reader->GetHeaderString();
+  return C_STR_TO_PY_BYTES(header_string);
 }
 
 PyObject *cyber_PyRecordReader_Reset(PyObject *self, PyObject *args) {
@@ -491,7 +503,7 @@ PyObject *cyber_PyRecordWriter_GetMessageType(PyObject *self, PyObject *args) {
   }
 
   std::string msg_type = writer->GetMessageType(channel_name);
-  return PyString_FromStringAndSize(msg_type.c_str(), msg_type.size());
+  return C_STR_TO_PY_BYTES(msg_type);
 }
 
 PyObject *cyber_PyRecordWriter_GetProtoDesc(PyObject *self, PyObject *args) {
@@ -511,9 +523,8 @@ PyObject *cyber_PyRecordWriter_GetProtoDesc(PyObject *self, PyObject *args) {
     return PYOBJECT_NULL_STRING;
   }
 
-  std::string proto_desc_str = writer->GetProtoDesc(channel_name);
-  return PyString_FromStringAndSize(proto_desc_str.c_str(),
-                                    proto_desc_str.size());
+  const std::string proto_desc_str = writer->GetProtoDesc(channel_name);
+  return C_STR_TO_PY_BYTES(proto_desc_str);
 }
 
 static PyMethodDef _cyber_record_methods[] = {
@@ -554,11 +565,30 @@ static PyMethodDef _cyber_record_methods[] = {
     {"PyRecordWriter_GetProtoDesc", cyber_PyRecordWriter_GetProtoDesc,
      METH_VARARGS, ""},
 
-    {NULL, NULL, 0, NULL} /* sentinel */
+    {nullptr, nullptr, 0, nullptr} /* sentinel */
 };
 
 /// Init function of this module
+#if PY_MAJOR_VERSION >= 3
+PyMODINIT_FUNC PyInit__cyber_record_py3(void) {
+  static struct PyModuleDef _cyber_record_module_def = {
+      PyModuleDef_HEAD_INIT,
+      "_cyber_record_py3",    // Module name.
+      "CyberRecord module",   // Module doc.
+      -1,                     // Module size.
+      _cyber_record_methods,  // Module methods.
+      nullptr,
+      nullptr,
+      nullptr,
+      nullptr,
+  };
+
+  AINFO << "init _cyber_record_py3";
+  return PyModule_Create(&_cyber_record_module_def);
+}
+#else
 PyMODINIT_FUNC init_cyber_record(void) {
   AINFO << "init _cyber_record";
   Py_InitModule("_cyber_record", _cyber_record_methods);
 }
+#endif

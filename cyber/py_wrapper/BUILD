@@ -60,6 +60,26 @@ cc_library(
 )
 
 cc_binary(
+    name = "_cyber_record_py3.so",
+    linkshared = True,
+    deps = [
+        ":py3_record",
+    ],
+)
+
+cc_library(
+    name = "py3_record",
+    srcs = ["cyber_record_wrap.cc"],
+    hdrs = ["py_record.h"],
+    defines = ["PY_MAJOR_VERSION=3"],
+    deps = [
+        "//cyber/message:py_message",
+        "//cyber/record",
+        "@python3",
+    ],
+)
+
+cc_binary(
     name = "_cyber_time.so",
     linkshared = True,
     deps = [
