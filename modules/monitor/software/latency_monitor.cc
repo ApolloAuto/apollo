@@ -55,13 +55,16 @@ std::vector<std::pair<std::string, uint64_t>> GetFlowTrackStats(
     uint64_t* total_duration) {
   const std::string module_connector = "->";
   std::vector<std::pair<std::string, uint64_t>> stats;
+
+  // Sort by begin_time
   std::sort(module_durations->begin(), module_durations->end(),
             [](const std::tuple<std::string, uint64_t, uint64_t>& t1,
                const std::tuple<std::string, uint64_t, uint64_t>& t2) {
-              // Sort by begin_time
               return std::get<1>(t1) < std::get<1>(t2);
             });
 
+  // Generate a list of <module, duration> pair, for example:
+  // <percetpion: 100>, <perception->prediction: 10>, <prediction: 50>, ...
   auto iter = module_durations->begin();
   std::string module_name, next_name;
   uint64_t begin_time = 0, end_time = 0, next_begin_time = 0;
@@ -144,6 +147,7 @@ void LatencyMonitor::AggregateLatency() {
   std::unordered_map<std::string, std::vector<uint64_t>> tracks;
   std::vector<uint64_t> totals;
 
+  // Aggregate durations by module names
   for (auto& message : track_map_) {
     uint64_t total_duration = 0;
     const auto stats = GetFlowTrackStats(&message.second, &total_duration);
@@ -156,6 +160,12 @@ void LatencyMonitor::AggregateLatency() {
     }
   }
 
+  // The results could be in the following fromat:
+  // total: min(500), max(600), average(550), sample_size(1500)
+  // perception: min(5), max(50), average(30), sample_size(1000)
+  // perception->prediction: min(0), max(5), average(3), sample_size(1000)
+  // prediction: min(50), max(500), average(80), sample_size(800)
+  // ...
   const auto total_stat = GenerateStat(totals);
   auto* total_duration_aggr = latency_report_.mutable_total_duration();
   total_duration_aggr->set_min_duration(total_stat.min_duration());
