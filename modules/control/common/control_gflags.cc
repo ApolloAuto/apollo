@@ -28,6 +28,14 @@ DEFINE_string(mpc_controller_conf_file,
               "/apollo/modules/control/conf/mpc_controller_conf.pb.txt",
               "mpc controller conf data file");
 
+DEFINE_string(lqr_controller_conf_file,
+              "/apollo/modules/control/conf/lqr_controller_conf.pb.txt",
+              "lqr controller conf data file");
+
+DEFINE_string(pid_controller_conf_file,
+              "/apollo/modules/control/conf/pid_controller_conf.pb.txt",
+              "pid controller conf data file");
+
 DEFINE_bool(enable_csv_debug, false, "True to write out csv debug file.");
 DEFINE_bool(enable_speed_station_preview, true, "enable speed/station preview");
 
@@ -35,6 +43,9 @@ DEFINE_string(control_node_name, "control", "The control node name in proto");
 
 DEFINE_string(mpc_controller_submodule_name, "MPC controller",
               "MPC controller node name in proto");
+
+DEFINE_string(pid_lqr_controller_submodule_name, "PID+LQR controller",
+              "PID+LQR controller node name in proto");
 
 DEFINE_string(preprocessor_submodule_name, "preprocessor submodule",
               "preprocessor submodule name in proto");
