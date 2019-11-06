@@ -22,6 +22,10 @@
 
 namespace apollo {
 namespace control {
+
+using apollo::canbus::Chassis;
+using apollo::common::Status;
+
 PidLqrControllerSubmodule::PidLqrControllerSubmodule()
     : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
 
@@ -57,6 +61,48 @@ bool PidLqrControllerSubmodule::Init() {
     return false;
   }
   return true;
+}
+
+bool PidLqrControllerSubmodule::Proc(
+    const std::shared_ptr<Preprocessor>& preprocessor_status) {
+  ControlCommand control_command;
+
+  local_view_ = preprocessor_status->mutable_local_view();
+
+  // skip produce control command when estop for MPC controller
+  if (preprocessor_status->estop()) {
+    return true;
+  }
+
+  Status status = ProduceControlCommand(&control_command);
+  AERROR_IF(!status.ok()) << "Failed to produce control command:"
+                          << status.error_message();
+  control_command_writer_->Write(
+      std::make_shared<ControlCommand>(control_command));
+  return true;
+}
+
+Status PidLqrControllerSubmodule::ProduceControlCommand(
+    ControlCommand* control_command) {
+  std::lock_guard<std::mutex> lock(mutex_);
+  if (local_view_->mutable_chassis()->driving_mode() ==
+      Chassis::COMPLETE_MANUAL) {
+    lqr_controller_.Reset();
+    pid_controller_.Reset();
+    AINFO_EVERY(100) << "Reset Controllers in Manual Mode";
+  }
+  //   ControlCommand pid_control_command;
+  Status pid_status = pid_controller_.ComputeControlCommand(
+      local_view_->mutable_localization(), local_view_->mutable_chassis(),
+      local_view_->mutable_trajectory(), control_command);
+  if (!pid_status.ok()) {
+    return pid_status;
+  }
+  //   ControlCommand lqr_control_command;
+  Status lqr_status = lqr_controller_.ComputeControlCommand(
+      local_view_->mutable_localization(), local_view_->mutable_chassis(),
+      local_view_->mutable_trajectory(), control_command);
+  return lqr_status;
 }
 
 }  // namespace control
