@@ -37,6 +37,7 @@ class LatencyMonitor : public RecurrentRunner {
   void UpdateLatencyStat(
       const std::shared_ptr<apollo::common::LatencyRecordMap>& records);
   void PublishLatencyReport();
+  void AggregateLatency();
 
   apollo::common::LatencyReport latency_report_;
   std::unordered_map<uint64_t,
