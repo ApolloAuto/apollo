@@ -125,6 +125,13 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr,
   trajectory->set_probability(1.0);
 
   for (int i = 0; i < 30; ++i) {
+    double prev_x = pos_x;
+    double prev_y = pos_y;
+    if (i > 0) {
+      const auto& last_point = trajectory->trajectory_point(i - 1).path_point();
+      prev_x = last_point.x();
+      prev_y = last_point.y();
+    }
     TrajectoryPoint* point = trajectory->add_trajectory_point();
     double dx = static_cast<double>(torch_output[0][i][0]);
     double dy = static_cast<double>(torch_output[0][i][1]);
@@ -177,7 +184,9 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr,
     if (i == 0) {
       point->set_v(latest_feature_ptr->speed());
     } else {
-      point->set_v(offset.Length() /
+      double diff_x = point_x - prev_x;
+      double diff_y = point_y - prev_y;
+      point->set_v(std::hypot(diff_x, diff_y) /
                    FLAGS_prediction_trajectory_time_resolution);
     }
   }
