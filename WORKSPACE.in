@@ -280,6 +280,12 @@ new_local_repository(
     path = "/usr",
 )
 
+new_local_repository(
+    name = "python3",
+    build_file = "third_party/python3.BUILD",
+    path = "/usr",
+)
+
 # PyTorch
 new_local_repository(
     name = "pytorch",
