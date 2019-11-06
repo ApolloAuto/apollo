@@ -76,13 +76,13 @@ cc_binary(
 )
 
 cc_library(
-    name = "pid_lqr_controller_submodule_lib",
-    srcs = ["pid_lqr_controller_submodule.cc"],
+    name = "lat_lon_controller_submodule_lib",
+    srcs = ["lat_lon_controller_submodule.cc"],
     hdrs = [
-        "pid_lqr_controller_submodule.h",
+        "lat_lon_controller_submodule.h",
     ],
     copts = [
-        "-DMODULE_NAME=\\\"pid_lqr_controller_submodule\\\"",
+        "-DMODULE_NAME=\\\"lat_lon_controller_submodule\\\"",
     ],
     deps = [
         "//cyber",
@@ -106,10 +106,10 @@ cc_library(
 )
 
 cc_binary(
-    name = "pid_lqr_controller_submodule.so",
+    name = "lat_lon_controller_submodule.so",
     linkshared = True,
     linkstatic = False,
-    deps = [":pid_lqr_controller_submodule_lib"],
+    deps = [":lat_lon_controller_submodule_lib"],
 )
 
 cc_library(

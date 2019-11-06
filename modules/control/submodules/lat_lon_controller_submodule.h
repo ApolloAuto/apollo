@@ -37,17 +37,17 @@
 
 namespace apollo {
 namespace control {
-class PidLqrControllerSubmodule final : public cyber::Component<Preprocessor> {
+class LatLonControllerSubmodule final : public cyber::Component<Preprocessor> {
  public:
   /**
    * @brief Construct a new PID+LQR ControllerSubmodule object
    *
    */
-  PidLqrControllerSubmodule();
+  LatLonControllerSubmodule();
   /**
    * @brief Destructor
    */
-  ~PidLqrControllerSubmodule();
+  ~LatLonControllerSubmodule();
 
   /**
    * @brief Get name of the node
@@ -77,18 +77,18 @@ class PidLqrControllerSubmodule final : public cyber::Component<Preprocessor> {
 
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
-  LatController lqr_controller_;
-  LonController pid_controller_;
+  LatController lateral_controller_;
+  LonController longitudinal_controller_;
 
   std::mutex mutex_;
   // TODO(SHU): separate conf
-  ControlConf lqr_controller_conf_;
-  ControlConf pid_controller_conf_;
+  ControlConf lateral_controller_conf_;
+  ControlConf longitudinal_controller_conf_;
   LocalView* local_view_;
   std::shared_ptr<cyber::Writer<ControlCommand>> control_command_writer_;
 };
 
-CYBER_REGISTER_COMPONENT(PidLqrControllerSubmodule)
+CYBER_REGISTER_COMPONENT(LatLonControllerSubmodule)
 
 }  // namespace control
 }  // namespace apollo
