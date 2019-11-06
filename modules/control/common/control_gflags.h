@@ -24,6 +24,10 @@ DECLARE_string(control_conf_file);
 DECLARE_string(control_common_conf_file);
 // mpc controller conf file
 DECLARE_string(mpc_controller_conf_file);
+// LQR controller conf file
+DECLARE_string(lqr_controller_conf_file);
+// PID controller conf file
+DECLARE_string(pid_controller_conf_file);
 
 DECLARE_double(control_test_duration);
 
@@ -37,6 +41,7 @@ DECLARE_string(control_node_name);
 DECLARE_string(preprocessor_submodule_name);
 DECLARE_string(mpc_controller_submodule_name);
 DECLARE_string(postprocessor_submodule_name);
+DECLARE_string(pid_lqr_controller_submodule_name);
 
 DECLARE_bool(is_control_test_mode);
 DECLARE_bool(use_preview_speed_for_table);

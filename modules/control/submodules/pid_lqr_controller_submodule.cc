@@ -26,5 +26,38 @@ PidLqrControllerSubmodule::PidLqrControllerSubmodule()
     : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
 
 PidLqrControllerSubmodule::~PidLqrControllerSubmodule() {}
+
+std::string PidLqrControllerSubmodule::Name() const {
+  return FLAGS_pid_lqr_controller_submodule_name;
+}
+
+bool PidLqrControllerSubmodule::Init() {
+  /* LQR controller*/
+  if (!cyber::common::GetProtoFromFile(FLAGS_lqr_controller_conf_file,
+                                       &lqr_controller_conf_)) {
+    AERROR << "Unable to load LQR controller conf file: " +
+                  FLAGS_lqr_controller_conf_file;
+    return false;
+  }
+  if (!lqr_controller_.Init(&lqr_controller_conf_).ok()) {
+    monitor_logger_buffer_.ERROR(
+        "Control init LQR controller failed! Stopping...");
+    return false;
+  }
+  /* PID controller*/
+  if (!cyber::common::GetProtoFromFile(FLAGS_pid_controller_conf_file,
+                                       &pid_controller_conf_)) {
+    AERROR << "Unable to load PID controller conf file: " +
+                  FLAGS_pid_controller_conf_file;
+    return false;
+  }
+  if (!pid_controller_.Init(&pid_controller_conf_).ok()) {
+    monitor_logger_buffer_.ERROR(
+        "Control init PID controller failed! Stopping...");
+    return false;
+  }
+  return true;
+}
+
 }  // namespace control
 }  // namespace apollo
