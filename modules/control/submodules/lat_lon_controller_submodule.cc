@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/control/submodules/pid_lqr_controller_submodule.h"
+#include "modules/control/submodules/lat_lon_controller_submodule.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -26,44 +26,44 @@ namespace control {
 using apollo::canbus::Chassis;
 using apollo::common::Status;
 
-PidLqrControllerSubmodule::PidLqrControllerSubmodule()
+LatLonControllerSubmodule::LatLonControllerSubmodule()
     : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
 
-PidLqrControllerSubmodule::~PidLqrControllerSubmodule() {}
+LatLonControllerSubmodule::~LatLonControllerSubmodule() {}
 
-std::string PidLqrControllerSubmodule::Name() const {
-  return FLAGS_pid_lqr_controller_submodule_name;
+std::string LatLonControllerSubmodule::Name() const {
+  return FLAGS_lat_lon_controller_submodule_name;
 }
 
-bool PidLqrControllerSubmodule::Init() {
-  /* LQR controller*/
-  if (!cyber::common::GetProtoFromFile(FLAGS_lqr_controller_conf_file,
-                                       &lqr_controller_conf_)) {
-    AERROR << "Unable to load LQR controller conf file: " +
-                  FLAGS_lqr_controller_conf_file;
+bool LatLonControllerSubmodule::Init() {
+  /* lateral controller*/
+  if (!cyber::common::GetProtoFromFile(FLAGS_lateral_controller_conf_file,
+                                       &lateral_controller_conf_)) {
+    AERROR << "Unable to load lateral controller conf file: " +
+                  FLAGS_lateral_controller_conf_file;
     return false;
   }
-  if (!lqr_controller_.Init(&lqr_controller_conf_).ok()) {
+  if (!lateral_controller_.Init(&lateral_controller_conf_).ok()) {
     monitor_logger_buffer_.ERROR(
-        "Control init LQR controller failed! Stopping...");
+        "Control init lateral controller failed! Stopping...");
     return false;
   }
-  /* PID controller*/
-  if (!cyber::common::GetProtoFromFile(FLAGS_pid_controller_conf_file,
-                                       &pid_controller_conf_)) {
-    AERROR << "Unable to load PID controller conf file: " +
-                  FLAGS_pid_controller_conf_file;
+  /* longitudinal controller*/
+  if (!cyber::common::GetProtoFromFile(FLAGS_longitudinal_controller_conf_file,
+                                       &longitudinal_controller_conf_)) {
+    AERROR << "Unable to load longitudinal controller conf file: " +
+                  FLAGS_longitudinal_controller_conf_file;
     return false;
   }
-  if (!pid_controller_.Init(&pid_controller_conf_).ok()) {
+  if (!longitudinal_controller_.Init(&longitudinal_controller_conf_).ok()) {
     monitor_logger_buffer_.ERROR(
-        "Control init PID controller failed! Stopping...");
+        "Control init longitudinal controller failed! Stopping...");
     return false;
   }
   return true;
 }
 
-bool PidLqrControllerSubmodule::Proc(
+bool LatLonControllerSubmodule::Proc(
     const std::shared_ptr<Preprocessor>& preprocessor_status) {
   ControlCommand control_command;
 
@@ -82,27 +82,30 @@ bool PidLqrControllerSubmodule::Proc(
   return true;
 }
 
-Status PidLqrControllerSubmodule::ProduceControlCommand(
+Status LatLonControllerSubmodule::ProduceControlCommand(
     ControlCommand* control_command) {
   std::lock_guard<std::mutex> lock(mutex_);
   if (local_view_->mutable_chassis()->driving_mode() ==
       Chassis::COMPLETE_MANUAL) {
-    lqr_controller_.Reset();
-    pid_controller_.Reset();
+    lateral_controller_.Reset();
+    longitudinal_controller_.Reset();
     AINFO_EVERY(100) << "Reset Controllers in Manual Mode";
   }
-  //   ControlCommand pid_control_command;
-  Status pid_status = pid_controller_.ComputeControlCommand(
+
+  // fill out control command sequentially
+  Status lateral_status = lateral_controller_.ComputeControlCommand(
       local_view_->mutable_localization(), local_view_->mutable_chassis(),
       local_view_->mutable_trajectory(), control_command);
-  if (!pid_status.ok()) {
-    return pid_status;
+
+  // return error if lateral status has error
+  if (!lateral_status.ok()) {
+    return lateral_status;
   }
-  //   ControlCommand lqr_control_command;
-  Status lqr_status = lqr_controller_.ComputeControlCommand(
+
+  Status longitudinal_status = longitudinal_controller_.ComputeControlCommand(
       local_view_->mutable_localization(), local_view_->mutable_chassis(),
       local_view_->mutable_trajectory(), control_command);
-  return lqr_status;
+  return longitudinal_status;
 }
 
 }  // namespace control
