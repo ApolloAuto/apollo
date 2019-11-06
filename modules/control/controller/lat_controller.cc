@@ -526,7 +526,7 @@ Status LatController::ComputeControlCommand(
     steer_angle = pre_steer_angle_;
   }
 
-  // Set the steer commonds
+  // Set the steer commands
   cmd->set_steering_target(common::math::Clamp(
       steer_angle, pre_steer_angle_ - steer_diff_with_max_rate,
       pre_steer_angle_ + steer_diff_with_max_rate));
