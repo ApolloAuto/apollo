@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <utility>
 
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -35,10 +36,67 @@ DEFINE_double(latency_report_interval, 10.0,
 namespace apollo {
 namespace monitor {
 
+namespace {
+
 using apollo::common::LatencyRecordMap;
 using apollo::common::LatencyReport;
 using apollo::common::LatencyStat;
-using apollo::common::LatencyTrack;
+using apollo::common::util::StrCat;
+
+void FillInStat(const std::string& module_name, const uint64_t duration,
+                std::vector<std::pair<std::string, uint64_t>>* stats,
+                uint64_t* total_duration) {
+  *total_duration += duration;
+  stats->emplace_back(module_name, duration);
+}
+
+std::vector<std::pair<std::string, uint64_t>> GetFlowTrackStats(
+    std::vector<std::tuple<std::string, uint64_t, uint64_t>>* module_durations,
+    uint64_t* total_duration) {
+  const std::string module_connector = "->";
+  std::vector<std::pair<std::string, uint64_t>> stats;
+  std::sort(module_durations->begin(), module_durations->end(),
+            [](const std::tuple<std::string, uint64_t, uint64_t>& t1,
+               const std::tuple<std::string, uint64_t, uint64_t>& t2) {
+              // Sort by begin_time
+              return std::get<1>(t1) < std::get<1>(t2);
+            });
+
+  auto iter = module_durations->begin();
+  std::string module_name, next_name;
+  uint64_t begin_time = 0, end_time = 0, next_begin_time = 0;
+  while (iter != module_durations->end()) {
+    std::tie(module_name, begin_time, end_time) = *iter;
+    FillInStat(module_name, end_time - begin_time, &stats, total_duration);
+    const auto iter_next = iter + 1;
+    if (iter_next != module_durations->end()) {
+      std::tie(next_name, next_begin_time, std::ignore) = *iter_next;
+      FillInStat(StrCat(module_name, module_connector, next_name),
+                 next_begin_time - end_time, &stats, total_duration);
+    }
+    ++iter;
+  }
+
+  return stats;
+}
+
+LatencyStat GenerateStat(const std::vector<uint64_t>& numbers) {
+  LatencyStat stat;
+  uint64_t min_number = (1UL << 63), max_number = 0, sum = 0;
+  for (const auto number : numbers) {
+    min_number = std::min(min_number, number);
+    max_number = std::max(max_number, number);
+    sum += number;
+  }
+  const uint32_t sample_size = static_cast<uint32_t>(numbers.size());
+  stat.set_min_duration(min_number);
+  stat.set_max_duration(max_number);
+  stat.set_aver_duration(static_cast<uint64_t>(sum / sample_size));
+  stat.set_sample_size(sample_size);
+  return stat;
+}
+
+}  // namespace
 
 LatencyMonitor::LatencyMonitor()
     : RecurrentRunner(FLAGS_latency_monitor_name,
@@ -64,41 +122,51 @@ void LatencyMonitor::RunOnce(const double current_time) {
 
 void LatencyMonitor::UpdateLatencyStat(
     const std::shared_ptr<LatencyRecordMap>& records) {
-  auto* stat_aggr = latency_report_.mutable_stat_aggr();
-  if (stat_aggr->find(records->module_name()) == stat_aggr->end()) {
-    LatencyStat stat;
-    stat_aggr->insert({records->module_name(), stat});
-  }
-  auto* stat = &stat_aggr->at(records->module_name());
-
-  uint64_t min_duration = (1UL << 63), max_duration = 0, total_duration = 0;
   for (const auto& record : records->latency_records()) {
-    const auto duration = record.second.end_time() - record.second.begin_time();
-    min_duration = std::min(min_duration, duration);
-    max_duration = std::max(max_duration, duration);
-    total_duration += duration;
-    // TODO(Longtao): Track latency accross modules later
-    // by using track_map_
     track_map_[record.first].emplace_back(records->module_name(),
                                           record.second.begin_time(),
                                           record.second.end_time());
   }
-  stat->set_min_duration(std::min(stat->min_duration(), min_duration));
-  stat->set_max_duration(std::max(stat->max_duration(), max_duration));
-  const uint32_t sample_size =
-      stat->sample_size() +
-      static_cast<uint32_t>(records->latency_records().size());
-  total_duration += stat->aver_duration() * stat->sample_size();
-  stat->set_aver_duration(static_cast<uint64_t>(total_duration / sample_size));
-  stat->set_sample_size(sample_size);
 }
 
 void LatencyMonitor::PublishLatencyReport() {
   static auto writer = MonitorManager::Instance()->CreateWriter<LatencyReport>(
       FLAGS_latency_reporting_topic);
   apollo::common::util::FillHeader("LatencyReport", &latency_report_);
+  AggregateLatency();
   writer->Write(latency_report_);
+  latency_report_.clear_header();
+  track_map_.clear();
   latency_report_.mutable_stat_aggr()->clear();
+}
+
+void LatencyMonitor::AggregateLatency() {
+  std::unordered_map<std::string, std::vector<uint64_t>> tracks;
+  std::vector<uint64_t> totals;
+
+  for (auto& message : track_map_) {
+    uint64_t total_duration = 0;
+    const auto stats = GetFlowTrackStats(&message.second, &total_duration);
+    std::string module_name;
+    uint64_t duration = 0;
+    totals.push_back(total_duration);
+    for (const auto& module_stat : stats) {
+      std::tie(module_name, duration) = module_stat;
+      tracks[module_name].push_back(duration);
+    }
+  }
+
+  const auto total_stat = GenerateStat(totals);
+  auto* total_duration_aggr = latency_report_.mutable_total_duration();
+  total_duration_aggr->set_min_duration(total_stat.min_duration());
+  total_duration_aggr->set_max_duration(total_stat.max_duration());
+  total_duration_aggr->set_aver_duration(total_stat.aver_duration());
+  total_duration_aggr->set_sample_size(total_stat.sample_size());
+
+  auto* stat_aggr = latency_report_.mutable_stat_aggr();
+  for (const auto& track : tracks) {
+    stat_aggr->insert({track.first, GenerateStat(track.second)});
+  }
 }
 
 }  // namespace monitor
