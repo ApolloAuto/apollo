@@ -642,7 +642,7 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_h(
 
     // speed limit constraint
     if (use_v_bound_) {
-      int lambda_offset = 5 * (num_of_points_ - 1) + 1;
+      int lambda_offset = 4 * (num_of_points_ - 1);
       for (int i = 0; i < num_of_points_; ++i) {
         auto s_index = i;
 
