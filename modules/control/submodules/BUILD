@@ -76,6 +76,43 @@ cc_binary(
 )
 
 cc_library(
+    name = "pid_lqr_controller_submodule_lib",
+    srcs = ["pid_lqr_controller_submodule.cc"],
+    hdrs = [
+        "pid_lqr_controller_submodule.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"pid_lqr_controller_submodule\\\"",
+    ],
+    deps = [
+        "//cyber",
+        "//external:gflags",
+        "//modules/canbus/proto:canbus_proto",
+        "//modules/common",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/common/monitor_log",
+        "//modules/common/status",
+        "//modules/common/time",
+        "//modules/common/util",
+        "//modules/common/vehicle_state:vehicle_state_provider",
+        "//modules/control/common:control_gflags",
+        "//modules/control/controller",
+        "//modules/control/proto:control_common_conf_proto",
+        "//modules/control/proto:control_proto",
+        "//modules/control/proto:preprocessor_proto",
+        "//modules/localization/proto:localization_proto",
+        "//modules/planning/proto:planning_proto",
+    ],
+)
+
+cc_binary(
+    name = "pid_lqr_controller_submodule.so",
+    linkshared = True,
+    linkstatic = False,
+    deps = [":pid_lqr_controller_submodule_lib"],
+)
+
+cc_library(
     name = "postprocessor_submodule_lib",
     srcs = ["postprocessor_submodule.cc"],
     hdrs = [
