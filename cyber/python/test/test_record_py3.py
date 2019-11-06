@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # ****************************************************************************
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -23,14 +23,14 @@ import unittest
 
 sys.path.append("../")
 from cyber.proto import record_pb2
-from cyber_py import record
+from cyber_py import record_py3 as record
 from modules.common.util.testdata.simple_pb2 import SimpleMessage
 
 
 TEST_RECORD_FILE = "/tmp/test02.record"
 CHAN_1 = "channel/chatter"
 MSG_TYPE = "apollo.common.util.test.SimpleMessage"
-STR_10B = "1234567890"
+STR_10B = b"1234567890"
 TIME = 999
 
 
