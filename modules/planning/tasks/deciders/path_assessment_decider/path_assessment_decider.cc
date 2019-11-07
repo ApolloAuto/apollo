@@ -400,14 +400,26 @@ bool PathAssessmentDecider::IsValidFallbackPath(
 void PathAssessmentDecider::SetPathInfo(
     const ReferenceLineInfo& reference_line_info, PathData* const path_data) {
   // Go through every path_point, and label its:
-  //  - in-lane/out-of-lane info
+  //  - in-lane/out-of-lane info (side-pass or lane-change)
   //  - distance to the closest obstacle.
   std::vector<PathPointDecision> path_decision;
+
+  // 0. Initialize the path info.
   InitPathPointDecision(*path_data, &path_decision);
-  if (path_data->path_label().find("fallback") == std::string::npos &&
-      path_data->path_label().find("self") == std::string::npos) {
-    SetPathPointType(reference_line_info, *path_data, &path_decision);
+
+  // 1. Label caution types, differently for side-pass or lane-change.
+  if (reference_line_info.IsChangeLanePath()) {
+    // If lane-change, then label the lane-changing part to
+    // be out-on-forward lane.
+    SetPathPointType(reference_line_info, *path_data, true, &path_decision);
+  } else {
+    // Otherwise, only do the label for borrow-lane generated paths.
+    if (path_data->path_label().find("fallback") == std::string::npos &&
+        path_data->path_label().find("self") == std::string::npos) {
+      SetPathPointType(reference_line_info, *path_data, false, &path_decision);
+    }
   }
+
   // SetObstacleDistance(reference_line_info, *path_data, &path_decision);
   path_data->SetPathPointDecisionGuide(std::move(path_decision));
 }
@@ -627,7 +639,8 @@ void PathAssessmentDecider::InitPathPointDecision(
 }
 
 void PathAssessmentDecider::SetPathPointType(
-    const ReferenceLineInfo& reference_line_info, const PathData& path_data,
+    const ReferenceLineInfo& reference_line_info,
+    const PathData& path_data, const bool is_lane_change_path,
     std::vector<PathPointDecision>* const path_point_decision) {
   // Sanity checks.
   CHECK_NOTNULL(path_point_decision);
@@ -665,41 +678,64 @@ void PathAssessmentDecider::SetPathPointType(
     if (reference_line_info.reference_line().GetLaneWidth(
             middle_s, &lane_left_width, &lane_right_width)) {
       // Rough sl boundary estimate using single point lane width
-      double back_to_inlane_extra_buffer = 0.5;
+      double back_to_inlane_extra_buffer = 0.2;
       double in_and_out_lane_hysteresis_buffer =
           is_prev_point_out_lane ? back_to_inlane_extra_buffer : 0.0;
-      if (ego_sl_boundary.end_l() >
-              lane_left_width + in_and_out_lane_hysteresis_buffer ||
-          ego_sl_boundary.start_l() <
-              -lane_right_width - in_and_out_lane_hysteresis_buffer) {
-        if (path_data.path_label().find("reverse") != std::string::npos) {
+
+      // Check for lane-change and lane-borrow differently:
+      if (is_lane_change_path) {
+        // For lane-change path, only transitioning part is labeled as
+        // out-of-lane.
+        if (ego_sl_boundary.start_l() > lane_left_width ||
+            ego_sl_boundary.end_l() < -lane_right_width) {
+          // This means that ADC hasn't started lane-change yet.
           std::get<1>((*path_point_decision)[i]) =
-              PathData::PathPointType::OUT_ON_REVERSE_LANE;
-        } else if (path_data.path_label().find("forward") !=
-                   std::string::npos) {
+              PathData::PathPointType::IN_LANE;
+        } else if (
+            ego_sl_boundary.start_l() >
+                -lane_right_width + back_to_inlane_extra_buffer &&
+            ego_sl_boundary.end_l() <
+                lane_left_width - back_to_inlane_extra_buffer) {
+          // This means that ADC has safely completed lane-change with margin.
+          std::get<1>((*path_point_decision)[i]) =
+              PathData::PathPointType::IN_LANE;
+        } else {
+          // ADC is right across two lanes.
           std::get<1>((*path_point_decision)[i]) =
               PathData::PathPointType::OUT_ON_FORWARD_LANE;
-        } else {
-          std::get<1>((*path_point_decision)[i]) =
-              PathData::PathPointType::UNKNOWN;
-        }
-
-        if (!is_prev_point_out_lane) {
-          if (ego_sl_boundary.end_l() >
-                  lane_left_width + back_to_inlane_extra_buffer ||
-              ego_sl_boundary.start_l() <
-                  -lane_right_width - back_to_inlane_extra_buffer) {
-            is_prev_point_out_lane = true;
-          }
         }
       } else {
-        // The path point is within the reference_line's lane.
-        std::get<1>((*path_point_decision)[i]) =
-            PathData::PathPointType::IN_LANE;
-
-        if (is_prev_point_out_lane) {
-          if (ego_sl_boundary.end_l() > lane_left_width ||
-              ego_sl_boundary.start_l() < -lane_right_width) {
+        // For lane-borrow path, as long as ADC is not on the lane of
+        // reference-line, it is out on other lanes. It might even be
+        // on reverse lane!
+        if (ego_sl_boundary.end_l() >
+                lane_left_width + in_and_out_lane_hysteresis_buffer ||
+            ego_sl_boundary.start_l() <
+                -lane_right_width - in_and_out_lane_hysteresis_buffer) {
+          if (path_data.path_label().find("reverse") != std::string::npos) {
+            std::get<1>((*path_point_decision)[i]) =
+                PathData::PathPointType::OUT_ON_REVERSE_LANE;
+          } else if (path_data.path_label().find("forward") !=
+                     std::string::npos) {
+            std::get<1>((*path_point_decision)[i]) =
+                PathData::PathPointType::OUT_ON_FORWARD_LANE;
+          } else {
+            std::get<1>((*path_point_decision)[i]) =
+                PathData::PathPointType::UNKNOWN;
+          }
+          if (!is_prev_point_out_lane) {
+            if (ego_sl_boundary.end_l() >
+                    lane_left_width + back_to_inlane_extra_buffer ||
+                ego_sl_boundary.start_l() <
+                    -lane_right_width - back_to_inlane_extra_buffer) {
+              is_prev_point_out_lane = true;
+            }
+          }
+        } else {
+          // The path point is within the reference_line's lane.
+          std::get<1>((*path_point_decision)[i]) =
+              PathData::PathPointType::IN_LANE;
+          if (is_prev_point_out_lane) {
             is_prev_point_out_lane = false;
           }
         }
