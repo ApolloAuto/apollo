@@ -157,3 +157,16 @@ export function drawShapeFromPoints(points,
     }
     return mesh;
 }
+
+export function disposeMeshGroup(mesh) {
+    if (!mesh) {
+        return;
+    }
+
+    mesh.traverse((child) => {
+        if (child.geometry !== undefined) {
+            child.geometry.dispose();
+            child.material.dispose();
+        }
+    });
+}
