@@ -293,7 +293,7 @@ void TeleopService::SendVideoStreamCmd(bool start_stop) {
   // we send a message to each encoder.
   for (unsigned int i = 0; i < encoder_count; i++) {
     char encoderName[20];
-    snprintf(encoderName, 20, "encoder%d", i);
+    snprintf(encoderName, 20, "encoder%u", i);
     msg.set_service(encoderName);
     common::util::FillHeader("dreamview", &msg);
     car_daemon_cmd_writer_->Write(msg);
