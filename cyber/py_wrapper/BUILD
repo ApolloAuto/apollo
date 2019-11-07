@@ -43,9 +43,7 @@ cc_library(
 
 cc_test(
     name = "py_init_test",
-    srcs = [
-        "py_init_test.cc",
-    ],
+    srcs = ["py_init_test.cc"],
     deps = [
         ":py3_init",
         "@gtest//:main",
@@ -112,9 +110,7 @@ cc_library(
 
 cc_test(
     name = "py_record_test",
-    srcs = [
-        "py_record_test.cc",
-    ],
+    srcs = ["py_record_test.cc"],
     deps = [
         ":py3_record",
         "//cyber:cyber_core",
