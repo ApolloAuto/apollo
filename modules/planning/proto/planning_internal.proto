@@ -199,9 +199,7 @@ message PlanningData {
   optional ScenarioDebug scenario = 26;
   optional OpenSpaceDebug open_space = 27;
   optional SmootherDebug smoother = 28;
-
   optional apollo.planning.PullOverStatus pull_over_status = 29;
-  optional apollo.planning.EmergencyPullOverStatus emergency_pull_over_status = 30;
 }
 
 message LatticeStPixel {
