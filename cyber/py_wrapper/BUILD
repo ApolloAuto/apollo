@@ -50,7 +50,7 @@ cc_binary(
 
 cc_library(
     name = "py_record",
-    srcs = ["cyber_record_wrap.cc"],
+    srcs = ["py_record.cc"],
     hdrs = ["py_record.h"],
     deps = [
         "//cyber/message:py_message",
@@ -69,7 +69,7 @@ cc_binary(
 
 cc_library(
     name = "py3_record",
-    srcs = ["cyber_record_wrap.cc"],
+    srcs = ["py_record.cc"],
     hdrs = ["py_record.h"],
     defines = ["PY_MAJOR_VERSION=3"],
     deps = [
