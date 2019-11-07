@@ -21,6 +21,26 @@ cc_library(
     ],
 )
 
+cc_binary(
+    name = "_cyber_init_py3.so",
+    linkshared = True,
+    deps = [
+        ":py3_init",
+    ],
+)
+
+cc_library(
+    name = "py3_init",
+    srcs = ["py_init.cc"],
+    hdrs = ["py_init.h"],
+    defines = ["PY_MAJOR_VERSION=3"],
+    deps = [
+        "//cyber:cyber_core",
+        "@fastrtps",
+        "@python3",
+    ],
+)
+
 cc_test(
     name = "py_init_test",
     srcs = [
