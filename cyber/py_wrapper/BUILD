@@ -140,6 +140,26 @@ cc_library(
 )
 
 cc_binary(
+    name = "_cyber_time_py3.so",
+    linkshared = True,
+    deps = [
+        ":py3_time",
+    ],
+)
+
+cc_library(
+    name = "py3_time",
+    srcs = ["py_time.cc"],
+    hdrs = ["py_time.h"],
+    defines = ["PY_MAJOR_VERSION=3"],
+    deps = [
+        "//cyber:cyber_core",
+        "@fastrtps",
+        "@python3",
+    ],
+)
+
+cc_binary(
     name = "_cyber_timer.so",
     linkshared = True,
     deps = [

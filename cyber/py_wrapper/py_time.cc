@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/py_wrapper/py_time.h"
+
 #include <Python.h>
 #include <set>
 #include <string>
-
-#include "cyber/py_wrapper/py_time.h"
 
 #define PYOBJECT_NULL_STRING PyString_FromStringAndSize("", 0)
 
@@ -330,11 +330,29 @@ static PyMethodDef _cyber_time_methods[] = {
     {"PyRate_get_expected_cycle_time", cyber_PyRate_get_expected_cycle_time,
      METH_VARARGS, ""},
 
-    {NULL, NULL, 0, NULL} /* sentinel */
+    {nullptr, nullptr, 0, nullptr} /* sentinel */
 };
 
 /// Init function of this module
+#if PY_MAJOR_VERSION >= 3
+PyMODINIT_FUNC PyInit__cyber_time_py3(void) {
+  static struct PyModuleDef module_def = {
+      PyModuleDef_HEAD_INIT,
+      "_cyber_time_py3",    // Module name.
+      "CyberTime module",   // Module doc.
+      -1,                   // Module size.
+      _cyber_time_methods,  // Module methods.
+      nullptr,
+      nullptr,
+      nullptr,
+      nullptr,
+  };
+
+  return PyModule_Create(&module_def);
+}
+#else
 PyMODINIT_FUNC init_cyber_time(void) {
   AINFO << "init _cyber_time";
   Py_InitModule("_cyber_time", _cyber_time_methods);
 }
+#endif
