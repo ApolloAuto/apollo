@@ -293,8 +293,6 @@ class PathBoundsDecider : public Decider {
   double adc_frenet_ld_ = 0.0;
   double adc_l_to_lane_center_ = 0.0;
   double adc_lane_width_ = 0.0;
-  bool is_in_pull_over_scenario_ = false;
-  bool is_in_emergency_pull_over_scenario_ = false;
 
   FRIEND_TEST(PathBoundsDeciderTest, InitPathBoundary);
   FRIEND_TEST(PathBoundsDeciderTest, GetBoundaryFromLanesAndADC);
