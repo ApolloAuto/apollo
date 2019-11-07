@@ -106,31 +106,24 @@ void ObstaclesPrioritizer::AssignIgnoreLevel() {
     return;
   }
 
-  auto pose_container =
-      ContainerManager::Instance()->GetContainer<PoseContainer>(
-          AdapterConfig::LOCALIZATION);
-  if (pose_container == nullptr) {
-    AERROR << "Pose container pointer is a null pointer.";
+  Obstacle* ego_obstacle_ptr =
+      obstacles_container->GetObstacle(FLAGS_ego_vehicle_id);
+  if (ego_obstacle_ptr == nullptr) {
+    AERROR << "Ego obstacle nullptr found";
     return;
   }
 
-  const PerceptionObstacle* pose_obstacle_ptr =
-      pose_container->ToPerceptionObstacle();
-  if (pose_obstacle_ptr == nullptr) {
-    AERROR << "Pose obstacle pointer is a null pointer.";
-    return;
-  }
-
-  double pose_theta = pose_obstacle_ptr->theta();
-  double pose_x = pose_obstacle_ptr->position().x();
-  double pose_y = pose_obstacle_ptr->position().y();
-  ADEBUG << "Get pose (" << pose_x << ", " << pose_y << ", " << pose_theta
+  const Feature& ego_feature = ego_obstacle_ptr->latest_feature();
+  double ego_theta = ego_feature.theta();
+  double ego_x = ego_feature.position().x();
+  double ego_y = ego_feature.position().y();
+  ADEBUG << "Get pose (" << ego_x << ", " << ego_y << ", " << ego_theta
          << ")";
 
   // Build rectangular scan_area
-  Box2d scan_box({pose_x + FLAGS_scan_length / 2.0 * std::cos(pose_theta),
-                  pose_y + FLAGS_scan_length / 2.0 * std::sin(pose_theta)},
-                 pose_theta, FLAGS_scan_length, FLAGS_scan_width);
+  Box2d scan_box({ego_x + FLAGS_scan_length / 2.0 * std::cos(ego_theta),
+                  ego_y + FLAGS_scan_length / 2.0 * std::sin(ego_theta)},
+                 ego_theta, FLAGS_scan_length, FLAGS_scan_width);
 
   const auto& obstacle_ids =
       obstacles_container->curr_frame_movable_obstacle_ids();
@@ -147,8 +140,8 @@ void ObstaclesPrioritizer::AssignIgnoreLevel() {
     Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
     double obstacle_x = latest_feature_ptr->position().x();
     double obstacle_y = latest_feature_ptr->position().y();
-    Vec2d ego_to_obstacle_vec(obstacle_x - pose_x, obstacle_y - pose_y);
-    Vec2d ego_vec = Vec2d::CreateUnitVec2d(pose_theta);
+    Vec2d ego_to_obstacle_vec(obstacle_x - ego_x, obstacle_y - ego_y);
+    Vec2d ego_vec = Vec2d::CreateUnitVec2d(ego_theta);
     double s = ego_to_obstacle_vec.InnerProd(ego_vec);
 
     double pedestrian_like_nearby_lane_radius =
@@ -333,21 +326,16 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
     return;
   }
 
-  auto pose_container =
-      ContainerManager::Instance()->GetContainer<PoseContainer>(
-          AdapterConfig::LOCALIZATION);
-  if (pose_container == nullptr) {
-    AERROR << "Pose container pointer is a null pointer.";
+  Obstacle* ego_obstacle_ptr =
+      obstacles_container->GetObstacle(FLAGS_ego_vehicle_id);
+  if (ego_obstacle_ptr == nullptr) {
+    AERROR << "Ego obstacle nullptr found";
     return;
   }
-  const PerceptionObstacle* pose_obstacle_ptr =
-      pose_container->ToPerceptionObstacle();
-  if (pose_obstacle_ptr == nullptr) {
-    AERROR << "Pose obstacle pointer is a null pointer.";
-    return;
-  }
-  double pose_x = pose_obstacle_ptr->position().x();
-  double pose_y = pose_obstacle_ptr->position().y();
+
+  const Feature& ego_feature = ego_obstacle_ptr->latest_feature();
+  double ego_x = ego_feature.position().x();
+  double ego_y = ego_feature.position().y();
   double ego_vehicle_s = std::numeric_limits<double>::max();
   double ego_vehicle_l = std::numeric_limits<double>::max();
   double accumulated_s = 0.0;
@@ -361,7 +349,7 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
     }
     double s = 0.0;
     double l = 0.0;
-    if (PredictionMap::GetProjection({pose_x, pose_y}, lane_info_ptr, &s, &l)) {
+    if (PredictionMap::GetProjection({ego_x, ego_y}, lane_info_ptr, &s, &l)) {
       if (std::fabs(l) < std::fabs(ego_vehicle_l)) {
         ego_vehicle_s = accumulated_s + s;
         ego_vehicle_l = l;
