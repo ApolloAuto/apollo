@@ -14,20 +14,21 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <thread>
+#include "cyber/py_wrapper/py_init.h"
 
 #include <gtest/gtest.h>
+#include <thread>
 
-#include "cyber/cyber.h"
-#include "cyber/py_wrapper/py_node.h"
+namespace apollo {
+namespace cyber {
 
-TEST(CyberInitTest, test_init) {
-  EXPECT_TRUE(apollo::cyber::OK());
-  EXPECT_TRUE(apollo::cyber::IsShutdown());
+TEST(PyInitTest, test_init) {
+  EXPECT_TRUE(py_init("py_init_test"));
+  EXPECT_TRUE(py_ok());
+
+  py_shutdown();
+  EXPECT_TRUE(py_is_shutdown());
 }
 
-int main(int argc, char** argv) {
-  apollo::cyber::Init(argv[0]);
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
+}  // namespace cyber
+}  // namespace apollo

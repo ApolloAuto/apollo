@@ -21,6 +21,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "py_init_test",
+    srcs = [
+        "py_init_test.cc",
+    ],
+    deps = [
+        ":py_init",
+        "@gtest//:main",
+    ],
+)
+
 cc_binary(
     name = "_cyber_node.so",
     linkshared = True,
