@@ -76,8 +76,6 @@ DEFINE_double(caution_search_distance_backward_for_overlap, 30.0,
               "in the case of overlap");
 DEFINE_double(caution_pedestrian_approach_time, 3.0,
               "The time for a pedestrian to approach adc trajectory");
-DEFINE_double(caution_distance_threshold, 60.0,
-              "The distance threshold for obstacles to be caution");
 
 // Obstacle features
 DEFINE_int32(ego_vehicle_id, -1, "The obstacle ID of the ego vehicle.");
