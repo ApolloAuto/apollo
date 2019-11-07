@@ -37,6 +37,7 @@ using apollo::perception::PerceptionObstacle;
 using common::adapter::AdapterConfig;
 using common::math::Box2d;
 using common::math::Vec2d;
+using common::Point3D;
 using hdmap::LaneInfo;
 using hdmap::OverlapInfo;
 using ConstLaneInfoPtr = std::shared_ptr<const LaneInfo>;
@@ -176,43 +177,11 @@ void ObstaclesPrioritizer::AssignIgnoreLevel() {
 }
 
 void ObstaclesPrioritizer::AssignCautionLevel() {
-  // AssignCautionLevelInJunction();
-  AssignCautionLevelCruiseKeepLane();
-  AssignCautionLevelCruiseChangeLane();
-  AssignCautionLevelByEgoReferenceLine();
-}
-
-void ObstaclesPrioritizer::AssignCautionLevelInJunction() {
   auto obstacles_container =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
   if (obstacles_container == nullptr) {
     AERROR << "Obstacles container pointer is a null pointer.";
-    return;
-  }
-
-  // TODO(Hongyi): get current junction_id from Storytelling
-  std::string curr_junction_id;
-  const auto& obstacle_ids =
-      obstacles_container->curr_frame_movable_obstacle_ids();
-  for (const int obstacle_id : obstacle_ids) {
-    Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
-    if (obstacle_ptr == nullptr) {
-      AERROR << "Null obstacle pointer found.";
-      continue;
-    }
-    if (obstacle_ptr->IsInJunction(curr_junction_id)) {
-      obstacle_ptr->SetCaution();
-    }
-  }
-}
-
-void ObstaclesPrioritizer::AssignCautionLevelCruiseKeepLane() {
-  ObstaclesContainer* obstacles_container =
-      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
-          AdapterConfig::PERCEPTION_OBSTACLES);
-  if (obstacles_container == nullptr) {
-    AERROR << "Null obstacles container found";
     return;
   }
   Obstacle* ego_vehicle =
@@ -225,7 +194,35 @@ void ObstaclesPrioritizer::AssignCautionLevelCruiseKeepLane() {
     AERROR << "Ego vehicle has no history";
     return;
   }
-  const Feature& ego_latest_feature = ego_vehicle->latest_feature();
+
+  // AssignCautionLevelInJunction(*ego_vehicle, obstacles_container);
+  AssignCautionLevelCruiseKeepLane(*ego_vehicle, obstacles_container);
+  AssignCautionLevelCruiseChangeLane(*ego_vehicle, obstacles_container);
+  AssignCautionLevelByEgoReferenceLine(*ego_vehicle, obstacles_container);
+}
+
+void ObstaclesPrioritizer::AssignCautionLevelInJunction(
+    const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container) {
+  // TODO(Hongyi): get current junction_id from Storytelling
+  std::string curr_junction_id;
+  const auto& obstacle_ids =
+      obstacles_container->curr_frame_movable_obstacle_ids();
+  for (const int obstacle_id : obstacle_ids) {
+    Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
+    if (obstacle_ptr == nullptr) {
+      AERROR << "Null obstacle pointer found.";
+      continue;
+    }
+    if (obstacle_ptr->IsInJunction(curr_junction_id)) {
+      SetCautionIfCloseToEgo(ego_vehicle, FLAGS_caution_distance_threshold,
+                             obstacle_ptr);
+    }
+  }
+}
+
+void ObstaclesPrioritizer::AssignCautionLevelCruiseKeepLane(
+    const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container) {
+  const Feature& ego_latest_feature = ego_vehicle.latest_feature();
   for (const LaneSequence& lane_sequence :
        ego_latest_feature.lane().lane_graph().lane_sequence()) {
     int nearest_front_obstacle_id =
@@ -239,32 +236,17 @@ void ObstaclesPrioritizer::AssignCautionLevelCruiseKeepLane() {
       AERROR << "Obstacle [" << nearest_front_obstacle_id << "] Not found";
       continue;
     }
-    obstacle_ptr->SetCaution();
+    SetCautionIfCloseToEgo(ego_vehicle, FLAGS_caution_distance_threshold,
+                           obstacle_ptr);
   }
 }
 
-void ObstaclesPrioritizer::AssignCautionLevelCruiseChangeLane() {
-  ObstaclesContainer* obstacles_container =
-      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
-          AdapterConfig::PERCEPTION_OBSTACLES);
-  if (obstacles_container == nullptr) {
-    AERROR << "Null obstacles container found";
-    return;
-  }
+void ObstaclesPrioritizer::AssignCautionLevelCruiseChangeLane(
+    const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container) {
   ADCTrajectoryContainer* ego_trajectory_container =
       ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
           AdapterConfig::PLANNING_TRAJECTORY);
-  Obstacle* ego_vehicle =
-      obstacles_container->GetObstacle(FLAGS_ego_vehicle_id);
-  if (ego_vehicle == nullptr) {
-    AERROR << "Ego vehicle not found";
-    return;
-  }
-  if (ego_vehicle->history_size() == 0) {
-    AERROR << "Ego vehicle has no history";
-    return;
-  }
-  const Feature& ego_latest_feature = ego_vehicle->latest_feature();
+  const Feature& ego_latest_feature = ego_vehicle.latest_feature();
   for (const LaneSequence& lane_sequence :
        ego_latest_feature.lane().lane_graph().lane_sequence()) {
     if (lane_sequence.vehicle_on_lane()) {
@@ -279,7 +261,8 @@ void ObstaclesPrioritizer::AssignCautionLevelCruiseChangeLane() {
         AERROR << "Obstacle [" << nearest_front_obstacle_id << "] Not found";
         continue;
       }
-      obstacle_ptr->SetCaution();
+      SetCautionIfCloseToEgo(ego_vehicle, FLAGS_caution_distance_threshold,
+                             obstacle_ptr);
     } else if (IsLaneSequenceInReferenceLine(lane_sequence,
                                              ego_trajectory_container)) {
       int nearest_front_obstacle_id =
@@ -290,29 +273,24 @@ void ObstaclesPrioritizer::AssignCautionLevelCruiseChangeLane() {
         Obstacle* front_obstacle_ptr =
             obstacles_container->GetObstacle(nearest_front_obstacle_id);
         if (front_obstacle_ptr != nullptr) {
-          front_obstacle_ptr->SetCaution();
+          SetCautionIfCloseToEgo(ego_vehicle, FLAGS_caution_distance_threshold,
+                                 front_obstacle_ptr);
         }
       }
       if (nearest_backward_obstacle_id >= 0) {
         Obstacle* backward_obstacle_ptr =
             obstacles_container->GetObstacle(nearest_backward_obstacle_id);
         if (backward_obstacle_ptr != nullptr) {
-          backward_obstacle_ptr->SetCaution();
+          SetCautionIfCloseToEgo(ego_vehicle, FLAGS_caution_distance_threshold,
+                                 backward_obstacle_ptr);
         }
       }
     }
   }
 }
 
-void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
-  ObstaclesContainer* obstacles_container =
-      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
-          AdapterConfig::PERCEPTION_OBSTACLES);
-  if (obstacles_container == nullptr) {
-    AERROR << "Null obstacles container found";
-    return;
-  }
-
+void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine(
+    const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container) {
   ADCTrajectoryContainer* adc_trajectory_container =
       ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
           AdapterConfig::PLANNING_TRAJECTORY);
@@ -326,14 +304,7 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
     return;
   }
 
-  Obstacle* ego_obstacle_ptr =
-      obstacles_container->GetObstacle(FLAGS_ego_vehicle_id);
-  if (ego_obstacle_ptr == nullptr) {
-    AERROR << "Ego obstacle nullptr found";
-    return;
-  }
-
-  const Feature& ego_feature = ego_obstacle_ptr->latest_feature();
+  const Feature& ego_feature = ego_vehicle.latest_feature();
   double ego_x = ego_feature.position().x();
   double ego_y = ego_feature.position().y();
   double ego_vehicle_s = std::numeric_limits<double>::max();
@@ -385,9 +356,11 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
     }
     accumulated_s += lane_info_ptr->total_length();
     if (lane_id != ego_lane_id_) {
-      AssignCautionByMerge(lane_info_ptr, &visited_lanes);
+      AssignCautionByMerge(ego_vehicle, lane_info_ptr, &visited_lanes,
+                           obstacles_container);
     }
-    AssignCautionByOverlap(lane_info_ptr, &visited_lanes);
+    AssignCautionByOverlap(ego_vehicle, lane_info_ptr, &visited_lanes,
+                           obstacles_container);
     if (accumulated_s > FLAGS_caution_search_distance_ahead + ego_vehicle_s) {
       break;
     }
@@ -441,7 +414,8 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
         if (std::fabs(start_l) < FLAGS_pedestrian_nearby_lane_search_radius ||
             std::fabs(end_l) < FLAGS_pedestrian_nearby_lane_search_radius ||
             start_l * end_l < 0.0) {
-          obstacle_ptr->SetCaution();
+          SetCautionIfCloseToEgo(ego_vehicle, FLAGS_caution_distance_threshold,
+                                 obstacle_ptr);
         }
       }
     }
@@ -449,16 +423,20 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
 }
 
 void ObstaclesPrioritizer::AssignCautionByMerge(
+    const Obstacle& ego_vehicle,
     std::shared_ptr<const LaneInfo> lane_info_ptr,
-    std::unordered_set<std::string>* const visited_lanes) {
-  SetCautionBackward(lane_info_ptr,
-                     FLAGS_caution_search_distance_backward_for_merge,
-                     visited_lanes);
+    std::unordered_set<std::string>* const visited_lanes,
+    ObstaclesContainer* obstacles_container) {
+  SetCautionBackward(FLAGS_caution_search_distance_backward_for_merge,
+                     ego_vehicle, lane_info_ptr, visited_lanes,
+                     obstacles_container);
 }
 
 void ObstaclesPrioritizer::AssignCautionByOverlap(
+    const Obstacle& ego_vehicle,
     std::shared_ptr<const LaneInfo> lane_info_ptr,
-    std::unordered_set<std::string>* const visited_lanes) {
+    std::unordered_set<std::string>* const visited_lanes,
+    ObstaclesContainer* obstacles_container) {
   std::string lane_id = lane_info_ptr->id().id();
   const std::vector<std::shared_ptr<const OverlapInfo>> cross_lanes =
       lane_info_ptr->cross_lanes();
@@ -486,25 +464,23 @@ void ObstaclesPrioritizer::AssignCautionByOverlap(
       double ahead_s = overlap_lane_ptr->total_length() -
                        object.lane_overlap_info().start_s();
       SetCautionBackward(
-          overlap_lane_ptr,
           ahead_s + FLAGS_caution_search_distance_backward_for_overlap,
-          visited_lanes);
+          ego_vehicle, overlap_lane_ptr, visited_lanes,
+          obstacles_container);
     }
   }
 }
 
 void ObstaclesPrioritizer::SetCautionBackward(
+    const double max_distance, const Obstacle& ego_vehicle,
     std::shared_ptr<const LaneInfo> start_lane_info_ptr,
-    const double max_distance,
-    std::unordered_set<std::string>* const visited_lanes) {
+    std::unordered_set<std::string>* const visited_lanes,
+    ObstaclesContainer* obstacles_container) {
   std::string start_lane_id = start_lane_info_ptr->id().id();
   if (ego_back_lane_id_set_.find(start_lane_id) !=
       ego_back_lane_id_set_.end()) {
     return;
   }
-  ObstaclesContainer* obstacles_container =
-      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
-          AdapterConfig::PERCEPTION_OBSTACLES);
   std::unordered_map<std::string, std::vector<LaneObstacle>> lane_obstacles =
       ObstacleClusters::GetLaneObstacles();
   std::queue<std::pair<ConstLaneInfoPtr, double>> lane_info_queue;
@@ -533,7 +509,8 @@ void ObstaclesPrioritizer::SetCautionBackward(
         AERROR << "Obstacle [" << obstacle_id << "] Not found";
         continue;
       }
-      obstacle_ptr->SetCaution();
+      SetCautionIfCloseToEgo(ego_vehicle, FLAGS_caution_distance_threshold,
+                             obstacle_ptr);
       continue;
     }
     if (cumu_distance > max_distance) {
@@ -548,6 +525,18 @@ void ObstaclesPrioritizer::SetCautionBackward(
       lane_info_queue.emplace(pre_lane_ptr,
                               cumu_distance + pre_lane_ptr->total_length());
     }
+  }
+}
+
+void ObstaclesPrioritizer::SetCautionIfCloseToEgo(const Obstacle& ego_vehicle,
+      const double distance_threshold, Obstacle* obstacle_ptr) {
+  const Point3D& obstacle_position = obstacle_ptr->latest_feature().position();
+  const Point3D& ego_position = ego_vehicle.latest_feature().position();
+  double diff_x = obstacle_position.x() - ego_position.x();
+  double diff_y = obstacle_position.y() - ego_position.y();
+  double distance = std::hypot(diff_x, diff_y);
+  if (distance < distance_threshold) {
+    obstacle_ptr->SetCaution();
   }
 }
 
