@@ -47,7 +47,7 @@ cc_test(
         "py_init_test.cc",
     ],
     deps = [
-        ":py_init",
+        ":py3_init",
         "@gtest//:main",
     ],
 )

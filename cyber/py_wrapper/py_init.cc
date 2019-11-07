@@ -82,7 +82,7 @@ static PyMethodDef _cyber_init_methods[] = {
 
 /// Init function of this module
 #if PY_MAJOR_VERSION >= 3
-PyMODINIT_FUNC PyInit___cyber_init_py3(void) {
+PyMODINIT_FUNC PyInit__cyber_init_py3(void) {
   static struct PyModuleDef _cyber_init_module_def = {
       PyModuleDef_HEAD_INIT,
       "_cyber_init_py3",    // Module name.
