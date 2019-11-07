@@ -77,10 +77,28 @@ static PyMethodDef _cyber_init_methods[] = {
     {"py_is_shutdown", cyber_py_is_shutdown, METH_NOARGS, ""},
     {"py_waitforshutdown", cyber_py_waitforshutdown, METH_NOARGS, ""},
 
-    {NULL, NULL, 0, NULL} /* sentinel */
+    {nullptr, nullptr, 0, nullptr} /* sentinel */
 };
 
 /// Init function of this module
+#if PY_MAJOR_VERSION >= 3
+PyMODINIT_FUNC PyInit___cyber_init_py3(void) {
+  static struct PyModuleDef _cyber_init_module_def = {
+      PyModuleDef_HEAD_INIT,
+      "_cyber_init_py3",    // Module name.
+      "CyberInit module",   // Module doc.
+      -1,                   // Module size.
+      _cyber_init_methods,  // Module methods.
+      nullptr,
+      nullptr,
+      nullptr,
+      nullptr,
+  };
+
+  return PyModule_Create(&_cyber_init_module_def);
+}
+#else
 PyMODINIT_FUNC init_cyber_init(void) {
   Py_InitModule("_cyber_init", _cyber_init_methods);
 }
+#endif
