@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/py_wrapper/py_timer.h"
+
 #include <Python.h>
 #include <set>
 #include <string>
-
-#include "cyber/py_wrapper/py_timer.h"
 
 #define PYOBJECT_NULL_STRING PyString_FromStringAndSize("", 0)
 
