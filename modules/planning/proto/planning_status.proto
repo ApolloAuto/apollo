@@ -96,13 +96,12 @@ message PullOverStatus {
   }
   optional PullOverType pull_over_type = 1;
   optional bool plan_pull_over_path = 2 [default = false];
-  optional bool is_feasible = 3 [default = false];  // default must be false
-  optional apollo.common.PointENU position = 4;
-  optional double theta = 5;
-  optional double length_front = 6;
-  optional double length_back = 7;
-  optional double width_left = 8;
-  optional double width_right = 9;
+  optional apollo.common.PointENU position = 3;
+  optional double theta = 4;
+  optional double length_front = 5;
+  optional double length_back = 6;
+  optional double width_left = 7;
+  optional double width_right = 8;
 }
 
 message ReroutingStatus {

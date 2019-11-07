@@ -84,9 +84,10 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
                                 const ScenarioPullOverConfig& scenario_config) {
   const auto& pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
-  if (!pull_over_status.is_feasible() || !pull_over_status.has_position() ||
+  if (!pull_over_status.has_position() ||
       !pull_over_status.position().has_x() ||
-      !pull_over_status.position().has_y() || !pull_over_status.has_theta()) {
+      !pull_over_status.position().has_y() ||
+      !pull_over_status.has_theta()) {
     ADEBUG << "pull_over status not set properly: "
            << pull_over_status.DebugString();
     return UNKNOWN;
@@ -145,9 +146,10 @@ PullOverStatus CheckADCPullOverPathPoint(
     const common::PathPoint& path_point) {
   const auto& pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
-  if (!pull_over_status.is_feasible() || !pull_over_status.has_position() ||
+  if (!pull_over_status.has_position() ||
       !pull_over_status.position().has_x() ||
-      !pull_over_status.position().has_y() || !pull_over_status.has_theta()) {
+      !pull_over_status.position().has_y() ||
+      !pull_over_status.has_theta()) {
     ADEBUG << "pull_over status not set properly: "
            << pull_over_status.DebugString();
     return UNKNOWN;
@@ -167,9 +169,10 @@ PullOverStatus CheckADCPullOverOpenSpace(
     const ScenarioPullOverConfig& scenario_config) {
   const auto& pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
-  if (!pull_over_status.is_feasible() || !pull_over_status.has_position() ||
+  if (!pull_over_status.has_position() ||
       !pull_over_status.position().has_x() ||
-      !pull_over_status.position().has_y() || !pull_over_status.has_theta()) {
+      !pull_over_status.position().has_y() ||
+      !pull_over_status.has_theta()) {
     ADEBUG << "pull_over status not set properly: "
            << pull_over_status.DebugString();
     return UNKNOWN;
