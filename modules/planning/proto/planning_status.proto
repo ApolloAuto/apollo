@@ -96,6 +96,10 @@ message PedestrianStatus {
 }
 
 message PullOverStatus {
+  enum PullOverType {
+    PULL_OVER = 1;   		  // pull-over upon destination arrival
+    EMERGENCY_PULL_OVER = 2;  // emergency pull-over
+  }
   optional bool is_feasible = 1 [default = false];  // default must be false
   optional apollo.common.PointENU position = 2;
   optional double theta = 3;
@@ -104,7 +108,8 @@ message PullOverStatus {
   optional double width_left = 6;
   optional double width_right = 7;
   optional int32 idx = 8;
-  optional bool is_in_pull_over_scenario = 9 [default = false];
+  optional bool plan_pull_over_path = 9 [default = false];
+  optional PullOverType pull_over_type = 10;
 }
 
 message ReroutingStatus {
