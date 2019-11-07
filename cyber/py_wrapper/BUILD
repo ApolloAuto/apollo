@@ -130,7 +130,7 @@ cc_binary(
 
 cc_library(
     name = "py_time",
-    srcs = ["cyber_time_wrap.cc"],
+    srcs = ["py_time.cc"],
     hdrs = ["py_time.h"],
     deps = [
         "//cyber:cyber_core",
