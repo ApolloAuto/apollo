@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -21,8 +21,8 @@
 import time
 import unittest
 
-from cyber_py import cyber
-from cyber_py import cyber_timer
+from cyber_py import cyber_py3 as cyber
+from cyber_py import cyber_timer_py3 as cyber_timer
 
 
 class TestCyberTimer(unittest.TestCase):
@@ -60,4 +60,4 @@ class TestCyberTimer(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-    # TODO(xiaoxq): It hangs here for a long time.
+    # TODO(xiaoxq): It crashes here.
