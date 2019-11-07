@@ -22,7 +22,7 @@ namespace cyber {
 namespace record {
 
 struct Section {
-  SectionType type;
+  proto::SectionType type;
   int64_t size;
 };
 

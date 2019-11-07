@@ -28,6 +28,13 @@ namespace apollo {
 namespace cyber {
 namespace record {
 
+using apollo::cyber::proto::Channel;
+using apollo::cyber::proto::ChunkBody;
+using apollo::cyber::proto::ChunkHeader;
+using apollo::cyber::proto::Header;
+using apollo::cyber::proto::SectionType;
+using apollo::cyber::proto::SingleMessage;
+
 constexpr char kChan1[] = "/test1";
 constexpr char kChan2[] = "/test2";
 constexpr char kMsgType[] = "apollo.cyber.proto.Test";
@@ -283,7 +290,7 @@ TEST(RecordFileTest, TestIndex) {
       // Find index at position
       if (section.type != SectionType::SECTION_INDEX) {
         bool found = false;
-        SingleIndex match;
+        proto::SingleIndex match;
         for (const auto& row : index.indexes()) {
           if (row.position() == pos) {
             match = row;

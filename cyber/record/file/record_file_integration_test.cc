@@ -77,7 +77,7 @@ TEST(RecordFileTest, SmallMessageHighThroughputOKThreadJitter) {
 
   ASSERT_TRUE(rfw.Open(kTestFile));
 
-  Header hdr1 = HeaderBuilder::GetHeaderWithSegmentParams(0, 0);
+  proto::Header hdr1 = HeaderBuilder::GetHeaderWithSegmentParams(0, 0);
   hdr1.set_chunk_interval(1000);
   hdr1.set_chunk_raw_size(0);
   ASSERT_TRUE(rfw.WriteHeader(hdr1));
@@ -90,7 +90,7 @@ TEST(RecordFileTest, SmallMessageHighThroughputOKThreadJitter) {
   static constexpr int64_t kMaxSamples = 1000;
   for (int i = 0;
        i < kMaxIterations && cpu_jitter.GetNumSamples() < kMaxSamples; ++i) {
-    SingleMessage msg1;
+    proto::SingleMessage msg1;
     msg1.set_channel_name(kChannelName);
     msg1.set_content("0123456789");
     msg1.set_time(i);
