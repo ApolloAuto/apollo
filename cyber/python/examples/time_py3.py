@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -21,7 +21,7 @@ import os
 import sys
 import time
 
-from cyber_py import cyber_time
+from cyber_py import cyber_time_py3 as cyber_time
 
 
 def test_time():
