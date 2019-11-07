@@ -13,7 +13,7 @@ cc_binary(
 
 cc_library(
     name = "py_init",
-    srcs = ["cyber_init_wrap.cc"],
+    srcs = ["py_init.cc"],
     hdrs = ["py_init.h"],
     deps = [
         "//cyber:cyber_core",
