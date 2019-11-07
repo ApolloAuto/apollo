@@ -79,6 +79,20 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "py_record_test",
+    srcs = [
+        "py_record_test.cc",
+    ],
+    deps = [
+        ":py3_record",
+        "//cyber:cyber_core",
+        "//cyber/proto:unit_test_cc_proto",
+        "@fastrtps",
+        "@gtest//:main",
+    ],
+)
+
 cc_binary(
     name = "_cyber_time.so",
     linkshared = True,

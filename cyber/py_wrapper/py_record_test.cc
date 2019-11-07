@@ -14,30 +14,34 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/py_wrapper/py_record.h"
+
 #include <gtest/gtest.h>
 #include <set>
 #include <string>
 
 #include "cyber/cyber.h"
 #include "cyber/proto/unit_test.pb.h"
-#include "cyber/py_wrapper/py_record.h"
 
-const char TEST_RECORD_FILE[] = "test02.record";
+const char TEST_RECORD_FILE[] = "/tmp/py_record_test.record";
 const char CHAN_1[] = "channel/chatter";
 const char CHAN_2[] = "/test2";
 const char MSG_TYPE[] = "apollo.cyber.proto.Test";
-const char STR_10B[] = "1234567890";
+const char PROTO_DESC[] = "1234567890";
+const char MSG_DATA[] = "9876543210";
 const char TEST_FILE[] = "test.record";
 
 TEST(CyberRecordTest, record_readerwriter) {
   apollo::cyber::record::PyRecordWriter rec_writer;
+  rec_writer.SetSizeOfFileSegmentation(0);
+  rec_writer.SetIntervalOfFileSegmentation(0);
 
   EXPECT_TRUE(rec_writer.Open(TEST_RECORD_FILE));
-  rec_writer.WriteChannel(CHAN_1, MSG_TYPE, STR_10B);
-  rec_writer.WriteMessage(CHAN_1, STR_10B, 888);
+  rec_writer.WriteChannel(CHAN_1, MSG_TYPE, PROTO_DESC);
+  rec_writer.WriteMessage(CHAN_1, MSG_DATA, 888);
   EXPECT_EQ(1, rec_writer.GetMessageNumber(CHAN_1));
   EXPECT_EQ(MSG_TYPE, rec_writer.GetMessageType(CHAN_1));
-  EXPECT_EQ(STR_10B, rec_writer.GetProtoDesc(CHAN_1));
+  EXPECT_EQ(PROTO_DESC, rec_writer.GetProtoDesc(CHAN_1));
   rec_writer.Close();
 
   // read
@@ -45,21 +49,20 @@ TEST(CyberRecordTest, record_readerwriter) {
   AINFO << "++++ begin reading";
 
   sleep(1);
-  int count = 0;
   apollo::cyber::record::BagMessage bag_msg = rec_reader.ReadMessage();
 
   std::set<std::string> channel_list = rec_reader.GetChannelList();
   EXPECT_EQ(1, channel_list.size());
   EXPECT_EQ(CHAN_1, *channel_list.begin());
 
-  std::string channel_name = bag_msg.channel_name;
+  const std::string& channel_name = bag_msg.channel_name;
   EXPECT_EQ(CHAN_1, channel_name);
-  EXPECT_EQ(STR_10B, bag_msg.data);
+  EXPECT_EQ(MSG_DATA, bag_msg.data);
   EXPECT_EQ(1, rec_reader.GetMessageNumber(channel_name));
   EXPECT_EQ(888, bag_msg.timestamp);
   EXPECT_EQ(MSG_TYPE, bag_msg.data_type);
   EXPECT_EQ(MSG_TYPE, rec_reader.GetMessageType(channel_name));
-  std::string header_str = rec_reader.GetHeaderString();
+  const std::string header_str = rec_reader.GetHeaderString();
   apollo::cyber::proto::Header header;
   header.ParseFromString(header_str);
   EXPECT_EQ(1, header.major_version());
@@ -67,10 +70,4 @@ TEST(CyberRecordTest, record_readerwriter) {
   EXPECT_EQ(1, header.chunk_number());
   EXPECT_EQ(1, header.channel_number());
   EXPECT_TRUE(header.is_complete());
-}
-
-int main(int argc, char** argv) {
-  apollo::cyber::Init(argv[0]);
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }
