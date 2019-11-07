@@ -169,7 +169,7 @@ cc_binary(
 
 cc_library(
     name = "py_timer",
-    srcs = ["cyber_timer_wrap.cc"],
+    srcs = ["py_timer.cc"],
     hdrs = ["py_timer.h"],
     deps = [
         "//cyber:cyber_core",
