@@ -43,9 +43,9 @@ class PiecewiseJerkSpeedNonlinearIpoptInterface : public Ipopt::TNLP {
 
   virtual ~PiecewiseJerkSpeedNonlinearIpoptInterface() = default;
 
-  void set_warm_start(std::vector<std::vector<double>> speed_profile);
+  void set_warm_start(const std::vector<std::vector<double>> &speed_profile);
 
-  void set_curvature_curve(PiecewiseJerkTrajectory1d curvature_curve);
+  void set_curvature_curve(const PiecewiseJerkTrajectory1d &curvature_curve);
 
   void get_optimization_results(std::vector<double> *ptr_opt_s,
                                 std::vector<double> *ptr_opt_v,
@@ -56,11 +56,14 @@ class PiecewiseJerkSpeedNonlinearIpoptInterface : public Ipopt::TNLP {
 
   void set_reference_speed(const double s_dot_ref);
 
+  void set_reference_spatial_distance(const std::vector<double> &s_ref);
+
   void set_constant_speed_limit(const double s_dot_max);
 
-  void set_speed_limit_curve(PiecewiseJerkTrajectory1d v_bound_f);
+  void set_speed_limit_curve(const PiecewiseJerkTrajectory1d &v_bound_f);
 
-  void set_safety_bounds(std::vector<std::pair<double, double>> safety_bounds);
+  void set_safety_bounds(
+      const std::vector<std::pair<double, double>> &safety_bounds);
 
   void set_s_max(const double s_max);
 
@@ -74,6 +77,8 @@ class PiecewiseJerkSpeedNonlinearIpoptInterface : public Ipopt::TNLP {
   void set_w_overall_centripetal_acc(const double w_overall_centripetal_acc);
 
   void set_w_reference_speed(const double w_reference_speed);
+
+  void set_w_reference_spatial_distance(const double w_ref_s);
 
   /** Method to return some info about the nlp */
   bool get_nlp_info(int &n, int &m, int &nnz_jac_g, int &nnz_h_lag,
@@ -167,6 +172,8 @@ class PiecewiseJerkSpeedNonlinearIpoptInterface : public Ipopt::TNLP {
 
   double w_ref_v_ = 1.0;
 
+  double w_ref_s_ = 1.0;
+
   double w_overall_a_ = 100.0;
 
   double w_overall_j_ = 10.0;
@@ -194,6 +201,8 @@ class PiecewiseJerkSpeedNonlinearIpoptInterface : public Ipopt::TNLP {
   std::vector<double> opt_a_;
 
   std::vector<std::vector<double>> x_warm_start_;
+
+  std::vector<double> s_ref_;
 };
 }  // namespace planning
 }  // namespace apollo

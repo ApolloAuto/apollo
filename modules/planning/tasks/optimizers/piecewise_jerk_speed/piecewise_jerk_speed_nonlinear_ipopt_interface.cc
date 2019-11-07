@@ -212,6 +212,12 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_f(int n, const double *x,
                                                        bool new_x,
                                                        double &obj_value) {
   obj_value = 0.0;
+  // difference between ref spatial distace
+  for (int i = 0; i < num_of_points_; ++i) {
+    double s_diff = x[i] - s_ref_[i];
+    obj_value += s_diff * s_diff * w_ref_s_;
+  }
+
   // difference between ref speed
   for (int i = 0; i < num_of_points_; ++i) {
     double v_diff = x[v_offset_ + i] - v_ref_;
@@ -258,6 +264,12 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_grad_f(int n,
                                                             bool new_x,
                                                             double *grad_f) {
   std::fill(grad_f, grad_f + n, 0.0);
+
+  // ref. spatial distance objective
+  for (int i = 0; i < num_of_points_; ++i) {
+    auto v_diff = x[i] - s_ref_[i];
+    grad_f[i] += 2.0 * v_diff * w_ref_s_;
+  }
 
   // ref. speed objective
   for (int i = 0; i < num_of_points_; ++i) {
@@ -640,6 +652,12 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_h(
           h_v_v_obj * w_overall_centripetal_acc_ * obj_factor;
     }
 
+    // spatial distance reference objective
+    for (int i = 0; i < num_of_points_; ++i) {
+      auto h_s_s_index = hessian_mapper_[to_hash_key(i, i)];
+      values[h_s_s_index] += 2.0 * w_ref_s_ * obj_factor;
+    }
+
     // speed limit constraint
     if (use_v_bound_) {
       int lambda_offset = 4 * (num_of_points_ - 1);
@@ -744,13 +762,13 @@ void PiecewiseJerkSpeedNonlinearIpoptInterface::finalize_solution(
 }
 
 void PiecewiseJerkSpeedNonlinearIpoptInterface::set_curvature_curve(
-    PiecewiseJerkTrajectory1d curvature_curve) {
-  curvature_curve_ = std::move(curvature_curve);
+    const PiecewiseJerkTrajectory1d &curvature_curve) {
+  curvature_curve_ = curvature_curve;
 }
 
 void PiecewiseJerkSpeedNonlinearIpoptInterface::set_speed_limit_curve(
-    PiecewiseJerkTrajectory1d v_bound_f) {
-  v_bound_func_ = std::move(v_bound_f);
+    const PiecewiseJerkTrajectory1d &v_bound_f) {
+  v_bound_func_ = v_bound_f;
   use_v_bound_ = true;
 }
 
@@ -765,13 +783,14 @@ void PiecewiseJerkSpeedNonlinearIpoptInterface::set_reference_speed(
 }
 
 void PiecewiseJerkSpeedNonlinearIpoptInterface::set_safety_bounds(
-    std::vector<std::pair<double, double>> safety_bounds) {
+    const std::vector<std::pair<double, double>> &safety_bounds) {
   safety_bounds_ = safety_bounds;
 }
 
 void PiecewiseJerkSpeedNonlinearIpoptInterface::set_s_max(const double s_max) {
   s_max_ = s_max;
 }
+
 int PiecewiseJerkSpeedNonlinearIpoptInterface::to_hash_key(const int i,
                                                            const int j) const {
   return i * num_of_variables_ + j;
@@ -812,9 +831,19 @@ void PiecewiseJerkSpeedNonlinearIpoptInterface::set_w_reference_speed(
   w_ref_v_ = w_reference_speed;
 }
 
+void PiecewiseJerkSpeedNonlinearIpoptInterface::
+    set_w_reference_spatial_distance(const double w_ref_s) {
+  w_ref_s_ = w_ref_s;
+}
+
 void PiecewiseJerkSpeedNonlinearIpoptInterface::set_warm_start(
-    std::vector<std::vector<double>> speed_profile) {
+    const std::vector<std::vector<double>> &speed_profile) {
   x_warm_start_ = speed_profile;
+}
+
+void PiecewiseJerkSpeedNonlinearIpoptInterface::set_reference_spatial_distance(
+    const std::vector<double> &s_ref) {
+  s_ref_ = s_ref;
 }
 }  // namespace planning
 }  // namespace apollo
