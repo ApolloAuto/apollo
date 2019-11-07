@@ -20,7 +20,9 @@
 #include <set>
 #include <string>
 
-#define PYOBJECT_NULL_STRING PyString_FromStringAndSize("", 0)
+#if PY_MAJOR_VERSION >= 3
+  #define PyInt_AsLong PyLong_AsLong
+#endif
 
 template <typename T>
 T PyObjectToPtr(PyObject* pyobj, const std::string& type_ptr) {
@@ -156,11 +158,29 @@ static PyMethodDef _cyber_timer_methods[] = {
     {"PyTimer_stop", cyber_PyTimer_stop, METH_VARARGS, ""},
     {"PyTimer_set_option", cyber_PyTimer_set_option, METH_VARARGS, ""},
 
-    {NULL, NULL, 0, NULL} /* sentinel */
+    {nullptr, nullptr, 0, nullptr} /* sentinel */
 };
 
 /// Init function of this module
+#if PY_MAJOR_VERSION >= 3
+PyMODINIT_FUNC PyInit__cyber_timer_py3(void) {
+  static struct PyModuleDef module_def = {
+      PyModuleDef_HEAD_INIT,
+      "_cyber_timer_py3",    // Module name.
+      "CyberTimer module",   // Module doc.
+      -1,                    // Module size.
+      _cyber_timer_methods,  // Module methods.
+      nullptr,
+      nullptr,
+      nullptr,
+      nullptr,
+  };
+
+  return PyModule_Create(&module_def);
+}
+#else
 PyMODINIT_FUNC init_cyber_timer(void) {
   AINFO << "init _cyber_timer";
   Py_InitModule("_cyber_timer", _cyber_timer_methods);
 }
+#endif

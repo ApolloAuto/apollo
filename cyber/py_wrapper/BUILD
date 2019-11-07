@@ -178,6 +178,25 @@ cc_library(
 )
 
 cc_binary(
+    name = "_cyber_timer_py3.so",
+    linkshared = True,
+    deps = [
+        ":py3_timer",
+    ],
+)
+
+cc_library(
+    name = "py3_timer",
+    srcs = ["py_timer.cc"],
+    hdrs = ["py_timer.h"],
+    defines = ["PY_MAJOR_VERSION=3"],
+    deps = [
+        "//cyber:cyber_core",
+        "@python3",
+    ],
+)
+
+cc_binary(
     name = "_cyber_parameter.so",
     linkshared = True,
     deps = [
