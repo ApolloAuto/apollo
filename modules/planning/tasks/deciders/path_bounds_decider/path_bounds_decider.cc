@@ -136,9 +136,23 @@ Status PathBoundsDecider::Process(
           std::move(candidate_path_boundaries));
       ADEBUG << "Completed pullover and fallback path boundaries generation.";
 
+      /* TODO(all): to be deleted soon
       *(reference_line_info->mutable_debug()
           ->mutable_planning_data()
           ->mutable_pull_over_status()) = *pull_over_status;
+      */
+
+      // set debug info in planning_data
+      auto* pull_over_debug = reference_line_info->mutable_debug()
+                                                 ->mutable_planning_data()
+                                                 ->mutable_pull_over();
+      pull_over_debug->mutable_position()->CopyFrom(
+          pull_over_status->position());
+      pull_over_debug->set_theta(pull_over_status->theta());
+      pull_over_debug->set_length_front(pull_over_status->length_front());
+      pull_over_debug->set_length_back(pull_over_status->length_back());
+      pull_over_debug->set_width_left(pull_over_status->width_left());
+      pull_over_debug->set_width_right(pull_over_status->width_right());
 
       return Status::OK();
     }
