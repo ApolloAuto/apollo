@@ -2,6 +2,7 @@ syntax = "proto2";
 
 package apollo.planning_internal;
 
+import "modules/common/proto/geometry.proto";
 import "modules/common/proto/header.proto";
 import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/pnc_point.proto";
@@ -172,6 +173,15 @@ message SmootherDebug {
   optional string reason = 3;
 }
 
+message PullOverDebug {
+  optional apollo.common.PointENU position = 1;
+  optional double theta = 2;
+  optional double length_front = 3;
+  optional double length_back = 4;
+  optional double width_left = 5;
+  optional double width_right = 6;
+}
+
 // next ID: 30
 message PlanningData {
   // input
@@ -201,6 +211,7 @@ message PlanningData {
   optional OpenSpaceDebug open_space = 27;
   optional SmootherDebug smoother = 28;
   optional apollo.planning.PullOverStatus pull_over_status = 29;
+  optional PullOverDebug pull_over = 30;
 }
 
 message LatticeStPixel {

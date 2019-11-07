@@ -191,6 +191,7 @@ proto_library(
         ":planning_status_proto_lib",
         ":sl_boundary_proto_lib",
         "//modules/canbus/proto:canbus_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:header_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
         "//modules/dreamview/proto:chart_proto_lib",
