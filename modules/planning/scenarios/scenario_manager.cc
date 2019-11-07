@@ -209,7 +209,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
     const auto& pull_over_status =
         PlanningContext::Instance()->planning_status().pull_over();
     if (adc_distance_to_dest < scenario_config.max_distance_stop_search() &&
-        !pull_over_status.is_feasible()) {
+        !pull_over_status.has_position()) {
       pull_over_scenario = false;
     }
   }

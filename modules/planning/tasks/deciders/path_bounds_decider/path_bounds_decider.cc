@@ -423,8 +423,7 @@ Status PathBoundsDecider::GeneratePullOverPathBound(
                                ->mutable_pull_over();
   // If already found a pull-over position, simply check if it's valid.
   int curr_idx = -1;
-  if (pull_over_status->is_feasible() &&
-      pull_over_status->has_position()) {
+  if (pull_over_status->has_position()) {
     curr_idx = IsPointWithinPathBound(
         reference_line_info, pull_over_status->position().x(),
         pull_over_status->position().y(), *path_bound);
@@ -440,8 +439,6 @@ Status PathBoundsDecider::GeneratePullOverPathBound(
     std::tuple<double, double, double, int> pull_over_configuration;
     if (!SearchPullOverPosition(frame, reference_line_info, *path_bound,
                                 &pull_over_configuration)) {
-      pull_over_status->set_is_feasible(false);
-
       const std::string msg = "Failed to find a proper pull-over position.";
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -450,7 +447,6 @@ Status PathBoundsDecider::GeneratePullOverPathBound(
     curr_idx = std::get<3>(pull_over_configuration);
 
     // If have found a pull-over position, update planning-context
-    pull_over_status->set_is_feasible(true);
     pull_over_status->mutable_position()->set_x(
         std::get<0>(pull_over_configuration));
     pull_over_status->mutable_position()->set_y(
