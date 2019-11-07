@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -16,14 +16,14 @@
 # limitations under the License.
 # ****************************************************************************
 # -*- coding: utf-8 -*-
-"""Module for test cyber_time."""
+"""Module for test cyber_time_py3."""
 
 import sys
 import time
 import unittest
 
-from cyber_py import cyber
-from cyber_py import cyber_time
+from cyber_py import cyber_py3 as cyber
+from cyber_py import cyber_time_py3 as cyber_time
 
 
 class TestTime(unittest.TestCase):
