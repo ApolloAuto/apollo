@@ -270,7 +270,8 @@ void STBoundsDecider::RecordSTGraphDebug(
   // Plot the chosen ST boundary.
   auto boundary_debug = st_graph_debug->add_boundary();
   boundary_debug->set_name("Generated ST-Boundary");
-  boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_UNKNOWN);
+  boundary_debug->set_type(
+      StGraphBoundaryDebug::ST_BOUNDARY_TYPE_DRIVABLE_REGION);
   for (const auto& st_bound_pt : st_bound) {
     auto point_debug = boundary_debug->add_point();
     double t = 0.0;
