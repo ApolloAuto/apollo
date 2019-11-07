@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -15,13 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ****************************************************************************
-# -*- coding: utf-8 -*-
+
 """Module for example of timer."""
 
 import time
 
-from cyber_py import cyber
-from cyber_py import cyber_timer
+from cyber_py import cyber_py3 as cyber
+from cyber_py import cyber_timer_py3 as cyber_timer
 
 
 count = 0
