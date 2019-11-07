@@ -25,6 +25,16 @@ namespace apollo {
 namespace cyber {
 namespace record {
 
+using apollo::cyber::proto::Channel;
+using apollo::cyber::proto::ChannelCache;
+using apollo::cyber::proto::ChunkBody;
+using apollo::cyber::proto::ChunkBodyCache;
+using apollo::cyber::proto::ChunkHeader;
+using apollo::cyber::proto::ChunkHeaderCache;
+using apollo::cyber::proto::Header;
+using apollo::cyber::proto::SectionType;
+using apollo::cyber::proto::SingleIndex;
+
 RecordFileWriter::RecordFileWriter() {}
 
 RecordFileWriter::~RecordFileWriter() { Close(); }
@@ -119,7 +129,7 @@ bool RecordFileWriter::WriteIndex() {
     }
   }
   header_.set_index_position(CurrentPosition());
-  if (!WriteSection<Index>(index_)) {
+  if (!WriteSection<proto::Index>(index_)) {
     AERROR << "Write section fail";
     return false;
   }
@@ -185,7 +195,7 @@ bool RecordFileWriter::WriteChunk(const ChunkHeader& chunk_header,
   return true;
 }
 
-bool RecordFileWriter::WriteMessage(const SingleMessage& message) {
+bool RecordFileWriter::WriteMessage(const proto::SingleMessage& message) {
   chunk_active_->add(message);
   auto it = channel_message_number_map_.find(message.channel_name());
   if (it != channel_message_number_map_.end()) {
