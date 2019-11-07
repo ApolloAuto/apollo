@@ -43,26 +43,6 @@
 namespace apollo {
 namespace cyber {
 
-bool py_is_shutdown() { return cyber::IsShutdown(); }
-bool py_init() {
-  static bool inited = false;
-
-  if (inited) {
-    AINFO << "cybertron already inited.";
-    return true;
-  }
-
-  if (!Init("cyber_python")) {
-    AINFO << "cyber::Init failed.";
-    return false;
-  }
-  inited = true;
-  AINFO << "cybertron init succ.";
-  return true;
-}
-
-bool py_OK() { return OK(); }
-
 class PyWriter {
  public:
   PyWriter(const std::string& channel, const std::string& type,
@@ -86,8 +66,6 @@ class PyWriter {
     qos_profile->set_depth(qos_depth_);
     writer_ = node_->CreateWriter<message::PyMessageWrap>(role_attr);
   }
-
-  ~PyWriter() {}
 
   int write(const std::string& data) {
     auto message =
@@ -123,8 +101,6 @@ class PyReader {
       reader_rawmsg_ = node_->CreateReader<message::RawMessage>(channel, f);
     }
   }
-
-  ~PyReader() {}
 
   void register_func(int (*func)(const char*)) { func_ = func; }
 
@@ -203,8 +179,6 @@ class PyService {
             service_name, f);
   }
 
-  ~PyService() {}
-
   void register_func(int (*func)(const char*)) { func_ = func; }
 
   std::string read() {
@@ -263,8 +237,6 @@ class PyClient {
             name);
   }
 
-  ~PyClient() {}
-
   std::string send_request(std::string request) {
     std::shared_ptr<message::PyMessageWrap> m;
     m.reset(new message::PyMessageWrap(request, data_type_));
@@ -292,7 +264,6 @@ class PyNode {
   explicit PyNode(const std::string& node_name) : node_name_(node_name) {
     node_ = CreateNode(node_name);
   }
-  ~PyNode() {}
 
   void shutdown() {
     node_.reset();
@@ -334,7 +305,7 @@ class PyNode {
     return nullptr;
   }
 
-  std::shared_ptr<apollo::cyber::Node> get_node() { return node_; }
+  std::shared_ptr<Node> get_node() { return node_; }
 
  private:
   std::string node_name_;
@@ -358,7 +329,7 @@ class PyChannelUtils {
     }
 
     if (raw_msg_class_ == nullptr) {
-      auto rawFactory = apollo::cyber::message::ProtobufFactory::Instance();
+      auto rawFactory = message::ProtobufFactory::Instance();
       raw_msg_class_ = rawFactory->GenerateMessageByType(msg_type);
     }
 
@@ -381,8 +352,7 @@ class PyChannelUtils {
       AERROR << "channel_name is null";
       return "";
     }
-    auto topology =
-        apollo::cyber::service_discovery::TopologyManager::Instance();
+    auto topology = service_discovery::TopologyManager::Instance();
     sleep(sleep_s);
     auto channel_manager = topology->channel_manager();
     std::string msg_type("");
@@ -391,8 +361,7 @@ class PyChannelUtils {
   }
 
   static std::vector<std::string> get_active_channels(uint8_t sleep_s = 2) {
-    auto topology =
-        apollo::cyber::service_discovery::TopologyManager::Instance();
+    auto topology = service_discovery::TopologyManager::Instance();
     sleep(sleep_s);
     auto channel_manager = topology->channel_manager();
     std::vector<std::string> channels;
@@ -402,10 +371,9 @@ class PyChannelUtils {
 
   static std::unordered_map<std::string, std::vector<std::string>>
   get_channels_info(uint8_t sleep_s = 2) {
-    auto topology =
-        apollo::cyber::service_discovery::TopologyManager::Instance();
+    auto topology = service_discovery::TopologyManager::Instance();
     sleep(sleep_s);
-    std::vector<apollo::cyber::proto::RoleAttributes> tmpVec;
+    std::vector<proto::RoleAttributes> tmpVec;
     topology->channel_manager()->GetWriters(&tmpVec);
     std::unordered_map<std::string, std::vector<std::string>> roles_info;
 
@@ -436,8 +404,7 @@ google::protobuf::Message* PyChannelUtils::raw_msg_class_ = nullptr;
 class PyNodeUtils {
  public:
   static std::vector<std::string> get_active_nodes(uint8_t sleep_s = 2) {
-    auto topology =
-        apollo::cyber::service_discovery::TopologyManager::Instance();
+    auto topology = service_discovery::TopologyManager::Instance();
     sleep(sleep_s);
     std::vector<std::string> node_names;
     std::vector<RoleAttributes> nodes;
@@ -449,11 +416,7 @@ class PyNodeUtils {
 
     std::sort(nodes.begin(), nodes.end(),
               [](const RoleAttributes& na, const RoleAttributes& nb) -> bool {
-                if (na.node_name().compare(nb.node_name()) <= 0) {
-                  return true;
-                } else {
-                  return false;
-                }
+                return na.node_name().compare(nb.node_name()) <= 0;
               });
     for (auto& node : nodes) {
       node_names.emplace_back(node.node_name());
@@ -463,8 +426,7 @@ class PyNodeUtils {
 
   static std::string get_node_attr(const std::string& node_name,
                                    uint8_t sleep_s = 2) {
-    auto topology =
-        apollo::cyber::service_discovery::TopologyManager::Instance();
+    auto topology = service_discovery::TopologyManager::Instance();
     sleep(sleep_s);
 
     if (!topology->node_manager()->HasNode(node_name)) {
@@ -487,8 +449,7 @@ class PyNodeUtils {
   static std::vector<std::string> get_readersofnode(
       const std::string& node_name, uint8_t sleep_s = 2) {
     std::vector<std::string> reader_channels;
-    auto topology =
-        apollo::cyber::service_discovery::TopologyManager::Instance();
+    auto topology = service_discovery::TopologyManager::Instance();
     sleep(sleep_s);
     if (!topology->node_manager()->HasNode(node_name)) {
       AERROR << "no node named: " << node_name;
@@ -510,8 +471,7 @@ class PyNodeUtils {
   static std::vector<std::string> get_writersofnode(
       const std::string& node_name, uint8_t sleep_s = 2) {
     std::vector<std::string> writer_channels;
-    auto topology =
-        apollo::cyber::service_discovery::TopologyManager::Instance();
+    auto topology = service_discovery::TopologyManager::Instance();
     sleep(sleep_s);
     if (!topology->node_manager()->HasNode(node_name)) {
       AERROR << "no node named: " << node_name;
@@ -534,8 +494,7 @@ class PyNodeUtils {
 class PyServiceUtils {
  public:
   static std::vector<std::string> get_active_services(uint8_t sleep_s = 2) {
-    auto topology =
-        apollo::cyber::service_discovery::TopologyManager::Instance();
+    auto topology = service_discovery::TopologyManager::Instance();
     sleep(sleep_s);
     std::vector<std::string> srv_names;
     std::vector<RoleAttributes> services;
@@ -547,11 +506,7 @@ class PyServiceUtils {
 
     std::sort(services.begin(), services.end(),
               [](const RoleAttributes& sa, const RoleAttributes& sb) -> bool {
-                if (sa.service_name().compare(sb.service_name()) <= 0) {
-                  return true;
-                } else {
-                  return false;
-                }
+                return sa.service_name().compare(sb.service_name()) <= 0;
               });
     for (auto& service : services) {
       srv_names.emplace_back(service.service_name());
@@ -561,8 +516,7 @@ class PyServiceUtils {
 
   static std::string get_service_attr(const std::string& service_name,
                                       uint8_t sleep_s = 2) {
-    auto topology =
-        apollo::cyber::service_discovery::TopologyManager::Instance();
+    auto topology = service_discovery::TopologyManager::Instance();
     sleep(sleep_s);
 
     if (!topology->service_manager()->HasService(service_name)) {
@@ -582,6 +536,7 @@ class PyServiceUtils {
     return "";
   }
 };
+
 }  // namespace cyber
 }  // namespace apollo
 

@@ -33,7 +33,7 @@ bool py_init(const std::string& module_name) {
     return true;
   }
 
-  if (!apollo::cyber::Init(module_name.c_str())) {
+  if (!Init(module_name.c_str())) {
     AERROR << "cyber::Init failed:" << module_name;
     return false;
   }
@@ -42,13 +42,13 @@ bool py_init(const std::string& module_name) {
   return true;
 }
 
-bool py_ok() { return apollo::cyber::OK(); }
+bool py_ok() { return OK(); }
 
-void py_shutdown() { return apollo::cyber::Clear(); }
+void py_shutdown() { return Clear(); }
 
-bool py_is_shutdown() { return apollo::cyber::IsShutdown(); }
+bool py_is_shutdown() { return IsShutdown(); }
 
-void py_waitforshutdown() { return apollo::cyber::WaitForShutdown(); }
+void py_waitforshutdown() { return WaitForShutdown(); }
 
 }  // namespace cyber
 }  // namespace apollo

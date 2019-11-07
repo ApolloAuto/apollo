@@ -571,7 +571,7 @@ static PyMethodDef _cyber_record_methods[] = {
 /// Init function of this module
 #if PY_MAJOR_VERSION >= 3
 PyMODINIT_FUNC PyInit__cyber_record_py3(void) {
-  static struct PyModuleDef _cyber_record_module_def = {
+  static struct PyModuleDef module_def = {
       PyModuleDef_HEAD_INIT,
       "_cyber_record_py3",    // Module name.
       "CyberRecord module",   // Module doc.
@@ -584,7 +584,7 @@ PyMODINIT_FUNC PyInit__cyber_record_py3(void) {
   };
 
   AINFO << "init _cyber_record_py3";
-  return PyModule_Create(&_cyber_record_module_def);
+  return PyModule_Create(&module_def);
 }
 #else
 PyMODINIT_FUNC init_cyber_record(void) {
