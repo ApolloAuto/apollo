@@ -17,10 +17,10 @@
 #pragma once
 
 #include <memory>
+#include <set>
 #include <string>
 #include <tuple>
 #include <unordered_map>
-#include <vector>
 
 #include "modules/common/latency_recorder/proto/latency_record.pb.h"
 #include "modules/monitor/common/recurrent_runner.h"
@@ -41,7 +41,7 @@ class LatencyMonitor : public RecurrentRunner {
 
   apollo::common::LatencyReport latency_report_;
   std::unordered_map<uint64_t,
-                     std::vector<std::tuple<std::string, uint64_t, uint64_t>>>
+                     std::set<std::tuple<uint64_t, uint64_t, std::string>>>
       track_map_;
   double flush_time_ = 0.0;
 };

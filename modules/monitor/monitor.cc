@@ -23,6 +23,7 @@
 #include "modules/monitor/hardware/socket_can_monitor.h"
 #include "modules/monitor/software/channel_monitor.h"
 #include "modules/monitor/software/functional_safety_monitor.h"
+#include "modules/monitor/software/latency_monitor.h"
 #include "modules/monitor/software/localization_monitor.h"
 #include "modules/monitor/software/process_monitor.h"
 #include "modules/monitor/software/recorder_monitor.h"
@@ -60,6 +61,8 @@ bool Monitor::Init() {
   if (FLAGS_enable_functional_safety) {
     runners_.emplace_back(new FunctionalSafetyMonitor());
   }
+  // Monitor message processing latencies across modules
+  runners_.emplace_back(new LatencyMonitor());
 
   return true;
 }

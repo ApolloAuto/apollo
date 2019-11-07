@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <memory>
 #include <utility>
+#include <vector>
 
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -51,32 +52,25 @@ void FillInStat(const std::string& module_name, const uint64_t duration,
 }
 
 std::vector<std::pair<std::string, uint64_t>> GetFlowTrackStats(
-    std::vector<std::tuple<std::string, uint64_t, uint64_t>>* module_durations,
+    std::set<std::tuple<uint64_t, uint64_t, std::string>>* module_durations,
     uint64_t* total_duration) {
   const std::string module_connector = "->";
   std::vector<std::pair<std::string, uint64_t>> stats;
 
-  // Sort by begin_time
-  std::sort(module_durations->begin(), module_durations->end(),
-            [](const std::tuple<std::string, uint64_t, uint64_t>& t1,
-               const std::tuple<std::string, uint64_t, uint64_t>& t2) {
-              return std::get<1>(t1) < std::get<1>(t2);
-            });
-
   // Generate a list of <module, duration> pair, for example:
   // <percetpion: 100>, <perception->prediction: 10>, <prediction: 50>, ...
   auto iter = module_durations->begin();
-  std::string module_name, next_name;
-  uint64_t begin_time = 0, end_time = 0, next_begin_time = 0;
+  std::string module_name, prev_name;
+  uint64_t begin_time = 0, end_time, prev_end_time = 0;
   while (iter != module_durations->end()) {
-    std::tie(module_name, begin_time, end_time) = *iter;
-    FillInStat(module_name, end_time - begin_time, &stats, total_duration);
-    const auto iter_next = iter + 1;
-    if (iter_next != module_durations->end()) {
-      std::tie(next_name, next_begin_time, std::ignore) = *iter_next;
-      FillInStat(StrCat(module_name, module_connector, next_name),
-                 next_begin_time - end_time, &stats, total_duration);
+    std::tie(begin_time, end_time, module_name) = *iter;
+    if (!prev_name.empty()) {
+      FillInStat(StrCat(prev_name, module_connector, module_name),
+                 begin_time - prev_end_time, &stats, total_duration);
     }
+    FillInStat(module_name, end_time - begin_time, &stats, total_duration);
+    prev_name = module_name;
+    prev_end_time = end_time;
     ++iter;
   }
 
@@ -126,9 +120,9 @@ void LatencyMonitor::RunOnce(const double current_time) {
 void LatencyMonitor::UpdateLatencyStat(
     const std::shared_ptr<LatencyRecordMap>& records) {
   for (const auto& record : records->latency_records()) {
-    track_map_[record.first].emplace_back(records->module_name(),
-                                          record.second.begin_time(),
-                                          record.second.end_time());
+    track_map_[record.first].emplace(record.second.begin_time(),
+                                     record.second.end_time(),
+                                     records->module_name());
   }
 }
 
