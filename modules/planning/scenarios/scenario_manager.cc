@@ -909,10 +909,7 @@ void ScenarioManager::UpdatePlanningContext(
   // BareIntersection scenario
   UpdatePlanningContextBareIntersectionScenario(frame, scenario_type);
 
-  // EmergencyPullOver scenario
-  UpdatePlanningContextEmergencyPullOverScenario(frame, scenario_type);
-
-  // PullOver scenario
+  // PullOver & EmergencyPullOver scenarios
   UpdatePlanningContextPullOverScenario(frame, scenario_type);
 
   // StopSign scenario
@@ -1118,18 +1115,22 @@ void ScenarioManager::UpdatePlanningContextYieldSignScenario(
 // update: pull_over status in PlanningContext
 void ScenarioManager::UpdatePlanningContextPullOverScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
+  auto* pull_over = PlanningContext::Instance()
+                        ->mutable_planning_status()
+                        ->mutable_pull_over();
   if (scenario_type == ScenarioConfig::PULL_OVER) {
-    PlanningContext::Instance()
-        ->mutable_planning_status()
-        ->mutable_pull_over()
-        ->set_is_in_pull_over_scenario(true);
+    pull_over->set_pull_over_type(PullOverStatus::PULL_OVER);
+    pull_over->set_plan_pull_over_path(true);
+    return;
+  } else if (scenario_type == ScenarioConfig::EMERGENCY_PULL_OVER) {
+    pull_over->set_pull_over_type(PullOverStatus::EMERGENCY_PULL_OVER);
     return;
   }
-  PlanningContext::Instance()
-      ->mutable_planning_status()
-      ->mutable_pull_over()
-      ->set_is_in_pull_over_scenario(false);
 
+  pull_over->set_plan_pull_over_path(false);
+
+  // check pull_over_status left behind
+  // keep it if close to destination, to keep stop fence
   const auto& pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
   if (pull_over_status.has_position() && pull_over_status.position().has_x() &&
@@ -1158,17 +1159,6 @@ void ScenarioManager::UpdatePlanningContextPullOverScenario(
             ->clear_pull_over();
       }
     }
-  }
-}
-
-// update: emergency_pull_over status in PlanningContext
-void ScenarioManager::UpdatePlanningContextEmergencyPullOverScenario(
-    const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
-  if (scenario_type != ScenarioConfig::EMERGENCY_PULL_OVER) {
-    auto* emergency_pull_over = PlanningContext::Instance()
-                                    ->mutable_planning_status()
-                                    ->mutable_emergency_pull_over();
-    emergency_pull_over->Clear();
   }
 }
 
