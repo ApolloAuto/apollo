@@ -152,7 +152,7 @@ class RecordWriter(object):
     #
     # @param path the file path.
     #
-    # @return Success is Ture, other False.
+    # @return Success is True, other False.
     def open(self, path):
         return _CYBER_RECORD.PyRecordWriter_Open(self.record_writer, path)
 
@@ -171,7 +171,7 @@ class RecordWriter(object):
     # @param type_name a string of message type name.
     # @param proto_desc the message descriptor.
     #
-    # @return Success is Ture, other False.
+    # @return Success is True, other False.
     def write_channel(self, channel_name, type_name, proto_desc):
         """
         Writer channel by channelname,typename,protodesc
@@ -187,7 +187,7 @@ class RecordWriter(object):
     # @param time message time.
     # @param raw the flag implies data whether or not a rawdata.
     #
-    # @return Success is Ture, other False.
+    # @return Success is True, other False.
     def write_message(self, channel_name, data, time, raw=True):
         """
         Writer msg:channelname,rawmsg,writer time
