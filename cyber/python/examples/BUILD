@@ -32,14 +32,4 @@ cc_binary(
     ],
 )
 
-cc_binary(
-    name = "py_record",
-    srcs = ["py_record.cc"],
-    deps = [
-        "//cyber",
-        "//cyber/proto:unit_test_cc_proto",
-        "//cyber/py_wrapper:py_record",
-    ],
-)
-
 cpplint()
