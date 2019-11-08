@@ -20,6 +20,8 @@
 
 #include "modules/planning/common/speed/st_boundary.h"
 
+#include <limits>
+
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -61,6 +63,8 @@ STBoundary::STBoundary(
   }
   min_t_ = lower_points_.front().t();
   max_t_ = lower_points_.back().t();
+
+  obstacle_road_right_ending_t_ = std::numeric_limits<double>::lowest();
 }
 
 STBoundary::STBoundary(
@@ -97,6 +101,8 @@ STBoundary::STBoundary(
   }
   min_t_ = lower_points_.front().t();
   max_t_ = lower_points_.back().t();
+
+  obstacle_road_right_ending_t_ = std::numeric_limits<double>::lowest();
 }
 
 STBoundary STBoundary::CreateInstance(

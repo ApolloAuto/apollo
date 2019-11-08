@@ -91,6 +91,27 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
   }
   obs_id_to_st_boundary_.clear();
 
+  // Some preprocessing to save the adc_low_road_right segments.
+  bool is_adc_low_road_right_beginning = true;
+  for (const auto& path_pt_info : path_data_.path_point_decision_guide()) {
+    double path_pt_s = 0.0;
+    PathData::PathPointType path_pt_type;
+    std::tie(path_pt_s, path_pt_type, std::ignore) = path_pt_info;
+    if (path_pt_type == PathData::PathPointType::OUT_ON_FORWARD_LANE ||
+        path_pt_type == PathData::PathPointType::OUT_ON_REVERSE_LANE) {
+      if (is_adc_low_road_right_beginning) {
+        adc_low_road_right_segments_.emplace_back(path_pt_s, path_pt_s);
+        is_adc_low_road_right_beginning = false;
+      } else {
+        adc_low_road_right_segments_.back().second = path_pt_s;
+      }
+    } else if (path_pt_type == PathData::PathPointType::IN_LANE) {
+      if (!is_adc_low_road_right_beginning) {
+        is_adc_low_road_right_beginning = true;
+      }
+    }
+  }
+
   // Map obstacles into ST-graph.
   // Go through every obstacle and plot them in ST-graph.
   std::tuple<std::string, STBoundary, Obstacle*> closest_stop_obstacle;
@@ -104,13 +125,19 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
 
     std::vector<STPoint> lower_points;
     std::vector<STPoint> upper_points;
-    if (!ComputeObstacleSTBoundary(*obs_ptr, &lower_points, &upper_points)) {
+    bool is_caution_obstacle = false;
+    double obs_caution_end_t = 0.0;
+    if (!ComputeObstacleSTBoundary(*obs_ptr, &lower_points, &upper_points,
+                                   &is_caution_obstacle, &obs_caution_end_t)) {
       // Obstacle doesn't appear on ST-Graph.
       continue;
     }
     auto boundary =
         STBoundary::CreateInstanceAccurate(lower_points, upper_points);
     boundary.set_id(obs_ptr->Id());
+    if (is_caution_obstacle) {
+      boundary.set_obstacle_road_right_ending_t(obs_caution_end_t);
+    }
     if (obs_ptr->Trajectory().trajectory_point().empty()) {
       // Obstacle is static.
       if (std::get<0>(closest_stop_obstacle) == "NULL" ||
@@ -332,9 +359,11 @@ void STObstaclesProcessor::SetObstacleDecision(
 
 bool STObstaclesProcessor::ComputeObstacleSTBoundary(
     const Obstacle& obstacle, std::vector<STPoint>* const lower_points,
-    std::vector<STPoint>* const upper_points) {
+    std::vector<STPoint>* const upper_points,
+    bool* const is_caution_obstacle, double* const obs_caution_end_t) {
   lower_points->clear();
   upper_points->clear();
+  *is_caution_obstacle = false;
   const auto& adc_path_points = path_data_.discretized_path();
   const auto& obs_trajectory = obstacle.Trajectory();
 
@@ -360,6 +389,7 @@ bool STObstaclesProcessor::ComputeObstacleSTBoundary(
     // Processing a dynamic obstacle.
     // Go through every occurrence of the obstacle at all timesteps, and
     // figure out the overlapping s-max and s-min one by one.
+    bool is_obs_first_traj_pt = true;
     for (const auto& obs_traj_pt : obs_trajectory.trajectory_point()) {
       // TODO(jiacheng): Currently, if the obstacle overlaps with ADC at
       // disjoint segments (happens very rarely), we merge them into one.
@@ -373,7 +403,20 @@ bool STObstaclesProcessor::ComputeObstacleSTBoundary(
                                    obs_traj_pt.relative_time());
         upper_points->emplace_back(overlapping_s.second,
                                    obs_traj_pt.relative_time());
+        if (is_obs_first_traj_pt) {
+          if (IsSWithinADCLowRoadRightSegment(overlapping_s.first) ||
+              IsSWithinADCLowRoadRightSegment(overlapping_s.second)) {
+            *is_caution_obstacle = true;
+          }
+        }
+        if ((*is_caution_obstacle)) {
+          if (IsSWithinADCLowRoadRightSegment(overlapping_s.first) ||
+              IsSWithinADCLowRoadRightSegment(overlapping_s.second)) {
+            *obs_caution_end_t = obs_traj_pt.relative_time();
+          }
+        }
       }
+      is_obs_first_traj_pt = false;
     }
     if (lower_points->size() == 1) {
       lower_points->emplace_back(lower_points->front().s(),
@@ -576,6 +619,16 @@ ObjectDecisionType STObstaclesProcessor::DetermineObstacleDecision(
     decision.mutable_overtake()->set_distance_s(0.0);
   }
   return decision;
+}
+
+bool STObstaclesProcessor::IsSWithinADCLowRoadRightSegment(
+    const double s) const {
+  for (const auto& seg : adc_low_road_right_segments_) {
+    if (s >= seg.first && s <= seg.second) {
+      return true;
+    }
+  }
+  return false;
 }
 
 }  // namespace planning
