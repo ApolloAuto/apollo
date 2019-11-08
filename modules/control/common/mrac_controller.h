@@ -66,15 +66,16 @@ class MracController {
   /**
    * @brief build mrac (1st or 2nd) order reference model in the discrete-time
    form, with the bilinear transform (trapezoidal integration) method
+   * @return Status reference model initialization status
    */
-  void BuildReferenceModel();
+  common::Status BuildReferenceModel();
 
   /**
    * @brief build mrac (1st or 2nd) order adaptive dynamic model in the
    * discrete-time form
-   * @param none
+   * @return Status adaption model initialization status
    */
-  void BuildAdaptionModel();
+  common::Status BuildAdaptionModel();
 
   /**
    * @brief check if the solution of the algebraic Lyapunov Equation is
