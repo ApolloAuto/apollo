@@ -53,11 +53,18 @@ Stage::StageStatus PullOverStageRetryParking::Process(
     return StageStatus::ERROR;
   }
 
-  *(frame->mutable_open_space_info()
-        ->mutable_debug()
-        ->mutable_planning_data()
-        ->mutable_pull_over_status()) =
+  // set debug info in planning_data
+  const auto& pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
+  auto* pull_over_debug = frame->mutable_open_space_info()
+                               ->mutable_debug()
+                               ->mutable_planning_data()
+                               ->mutable_pull_over();
+  pull_over_debug->set_theta(pull_over_status.theta());
+  pull_over_debug->set_length_front(pull_over_status.length_front());
+  pull_over_debug->set_length_back(pull_over_status.length_back());
+  pull_over_debug->set_width_left(pull_over_status.width_left());
+  pull_over_debug->set_width_right(pull_over_status.width_right());
   frame->mutable_open_space_info()->sync_debug_instance();
 
   scenario::util::PullOverStatus status =
