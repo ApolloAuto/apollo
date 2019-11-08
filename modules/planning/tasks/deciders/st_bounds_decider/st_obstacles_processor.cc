@@ -253,12 +253,32 @@ bool STObstaclesProcessor::GetSBoundsFromDecisions(
   }
 
   // For st-boundaries that disappeared before t, remove them.
-  for (auto obs_t_edge : new_t_edges) {
+  for (const auto& obs_t_edge : new_t_edges) {
     if (std::get<0>(obs_t_edge) == 0) {
       ADEBUG << "Obstacle id: " << std::get<4>(obs_t_edge)
              << " is leaving st-graph.";
-      obs_id_to_decision_.erase(std::get<4>(obs_t_edge));
+      if (obs_id_to_decision_.count(std::get<4>(obs_t_edge)) != 0) {
+        obs_id_to_decision_.erase(std::get<4>(obs_t_edge));
+      }
     }
+  }
+
+  // For overtaken obstacles, remove them if we are after
+  // their high right-of-road ending time (with a margin).
+  std::vector<std::string> obs_id_to_remove;
+  for (const auto& obs_id_to_decision_pair : obs_id_to_decision_) {
+    auto obs_id = obs_id_to_decision_pair.first;
+    auto obs_decision = obs_id_to_decision_pair.second;
+    auto obs_st_boundary = obs_id_to_st_boundary_[obs_id];
+    if (obs_decision.has_overtake() &&
+        obs_st_boundary.min_t() <= t - kOvertakenObsCautionTime &&
+        obs_st_boundary.obstacle_road_right_ending_t() <=
+            t - kOvertakenObsCautionTime) {
+      obs_id_to_remove.push_back(obs_id_to_decision_pair.first);
+    }
+  }
+  for (const auto& obs_id : obs_id_to_remove) {
+    obs_id_to_decision_.erase(obs_id);
   }
 
   // Based on existing decisions, get the s-boundary.
