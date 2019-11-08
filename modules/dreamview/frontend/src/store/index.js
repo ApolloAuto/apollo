@@ -143,9 +143,10 @@ class DreamviewStore {
                     }
                 });
             }
+
             // Add pull over status toggle
-            if (world.planningData.pullOverStatus) {
-                const keyword = 'pullOverStatus';
+            if (world.planningData.pullOver) {
+                const keyword = 'pullOver';
                 if (this.options.customizedToggles.has(keyword)) {
                     newToggles[keyword] = this.options.customizedToggles.get(keyword);
                 } else {

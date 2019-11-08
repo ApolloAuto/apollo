@@ -970,10 +970,9 @@ void SimulationWorldService::UpdatePlanningData(const PlanningData &data) {
   }
 
   // Update pull over status
-  planning_data->clear_pull_over_status();
-  if (data.has_pull_over_status()) {
-    planning_data->mutable_pull_over_status()->CopyFrom(
-        data.pull_over_status());
+  planning_data->clear_pull_over();
+  if (data.has_pull_over()) {
+    planning_data->mutable_pull_over()->CopyFrom(data.pull_over());
   }
 
   // Update planning signal
