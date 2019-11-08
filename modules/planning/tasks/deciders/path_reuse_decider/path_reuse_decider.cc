@@ -58,10 +58,20 @@ Status PathReuseDecider::Process(Frame* const frame,
                                                 ->mutable_path_reuse_decider();
   ADEBUG << "lane_change_status->is_current_opt_succeed(): "
          << lane_change_status->is_current_opt_succeed();
+  // reuse path when: in change lane status; reuse_path is enable and
+  // optimization is successful
   if (!lane_change_status->is_current_opt_succeed() ||
+      lane_change_status->status() != ChangeLaneStatus::IN_CHANGE_LANE ||
       !Decider::config_.path_reuse_decider_config().reuse_path()) {
+    /* increase total path number when fail to reuse due to optimization*/
+    if (lane_change_status->status() == ChangeLaneStatus::IN_CHANGE_LANE &&
+        Decider::config_.path_reuse_decider_config().reuse_path()) {
+      ++total_path_counter_;
+    }
     ADEBUG << "skipping reusing path";
     mutable_path_reuse_decider_status->set_reused_path(false);
+    ADEBUG << "reusable_path_counter_" << reusable_path_counter_;
+    ADEBUG << "total_path_counter_" << total_path_counter_;
     return Status::OK();
   }
 
