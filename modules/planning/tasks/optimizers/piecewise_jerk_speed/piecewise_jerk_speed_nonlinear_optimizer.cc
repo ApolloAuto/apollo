@@ -34,6 +34,8 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed_profile_generator.h"
 #include "modules/planning/common/st_graph_data.h"
+#include "modules/planning/math/piecewise_jerk/piecewise_jerk_path_problem.h"
+#include "modules/planning/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
 #include "modules/planning/proto/ipopt_return_status.pb.h"
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_ipopt_interface.h"
 
@@ -118,6 +120,16 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
     s_bounds.emplace_back(s_lower_bound, s_upper_bound);
+  }
+
+  // Check s bound feasibility
+  if (!CheckStBoundFeasibility(num_of_knots, delta_t,
+                               {s_init, s_dot_init, s_ddot_init}, s_bounds)) {
+    std::string msg(
+        "Piecewise jerk speed nonlinear optimizer feasibility check failed!");
+    AERROR << msg;
+    speed_data->clear();
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   // Set s_dot bounary
@@ -380,6 +392,41 @@ PiecewiseJerkSpeedNonlinearOptimizer::SmoothPathCurvature(
   }
 
   return smooth_curvature;
+}
+
+bool PiecewiseJerkSpeedNonlinearOptimizer::CheckStBoundFeasibility(
+    const int num_of_knots, const double delta_t,
+    const std::array<double, 3>& init_s,
+    const std::vector<std::pair<double, double>>& s_bounds) {
+  const auto start_timestamp = std::chrono::system_clock::now();
+
+  PiecewiseJerkSpeedProblem piecewise_jerk_problem(num_of_knots, delta_t,
+                                                   init_s);
+  piecewise_jerk_problem.set_dx_bounds(
+      0.0, std::fmax(FLAGS_planning_upper_speed_limit, init_s[1]));
+  // TODO(Hongyi): delete this when ready to use vehicle_params
+  piecewise_jerk_problem.set_ddx_bounds(-4.0, 2.0);
+  piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_lower_bound,
+                                        FLAGS_longitudinal_jerk_upper_bound);
+  piecewise_jerk_problem.set_x_bounds(s_bounds);
+
+  // Set objective to be zeros to only utilize feasibility check feature
+  piecewise_jerk_problem.set_weight_x(0.0);
+  piecewise_jerk_problem.set_weight_dx(0.0);
+  piecewise_jerk_problem.set_weight_ddx(0.0);
+  piecewise_jerk_problem.set_weight_dddx(0.0);
+
+  // Solve the problem
+  auto res = piecewise_jerk_problem.Optimize();
+
+  const auto end_timestamp = std::chrono::system_clock::now();
+
+  std::chrono::duration<double> time_diff_ms = end_timestamp - start_timestamp;
+
+  ADEBUG << " feasibility_check takes : " << time_diff_ms.count() * 1000.0
+         << " ms.";
+
+  return res;
 }
 }  // namespace planning
 }  // namespace apollo

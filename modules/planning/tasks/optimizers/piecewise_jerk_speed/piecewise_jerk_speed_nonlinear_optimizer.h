@@ -20,8 +20,10 @@
 
 #pragma once
 
+#include <utility>
+#include <vector>
+
 #include "modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h"
-#include "modules/planning/math/piecewise_jerk/piecewise_jerk_path_problem.h"
 #include "modules/planning/tasks/optimizers/speed_optimizer.h"
 
 namespace apollo {
@@ -41,6 +43,11 @@ class PiecewiseJerkSpeedNonlinearOptimizer : public SpeedOptimizer {
   PiecewiseJerkTrajectory1d SmoothSpeedLimit(const SpeedLimit& speed_limit);
 
   PiecewiseJerkTrajectory1d SmoothPathCurvature(const PathData& path_data);
+
+  bool CheckStBoundFeasibility(
+      const int num_of_knots, const double delta_t,
+      const std::array<double, 3>& init_s,
+      const std::vector<std::pair<double, double>>& s_bounds);
 };
 
 }  // namespace planning
