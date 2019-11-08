@@ -36,7 +36,7 @@ using Matrix = Eigen::MatrixXd;
 double MracController::Control(const double command, const Matrix state,
                                const double input_limit,
                                const double input_rate_limit) {
-  // check if the reference/adaption model well set up during the initilization
+  // check if the reference/adaption model well set up during the initialization
   if (!reference_model_enabled_ || !adaption_model_enabled_) {
     AWARN << "MRAC: model build failed; will work as a unity compensator. The "
              "reference_model building status: "
@@ -175,7 +175,7 @@ Status MracController::SetReferenceModel(const MracConf &mrac_conf) {
     const auto error_msg = StrCat(
         "mrac controller error: reference model time-constant parameter: ",
         mrac_conf.reference_time_constant(),
-        "and natrual frequency parameter: ",
+        "and natural frequency parameter: ",
         mrac_conf.reference_natural_frequency(),
         " in configuration file are not reasonable with respect to the "
         "reference model order: ",
@@ -228,41 +228,44 @@ void MracController::BuildReferenceModel() {
              "failed, ts_: "
           << ts_;
     reference_model_enabled_ = false;
-  } else {
-    if (model_order_ == 1) {
-      matrix_a_reference_(0, 0) = -1.0 / tau_reference_;
-      matrix_b_reference_(0, 0) = 1.0 / tau_reference_;
-    } else if (model_order_ == 2) {
-      matrix_a_reference_(0, 1) = 1.0;
-      matrix_a_reference_(1, 0) = -wn_reference_ * wn_reference_;
-      matrix_a_reference_(1, 1) = -2 * zeta_reference_ * wn_reference_;
-      matrix_b_reference_(1, 0) = wn_reference_ * wn_reference_;
-    } else {
-      AWARN << "reference model order beyond the designed range, "
-               "model_order: "
-            << model_order_;
-      reference_model_enabled_ = false;
-    }
+    return;
+  }
+
+  if (model_order_ > 2) {
+    AWARN << "reference model order beyond the designed range, "
+             "model_order: "
+          << model_order_;
+    reference_model_enabled_ = false;
+    return;
+  }
+  if (model_order_ == 1) {
+    matrix_a_reference_(0, 0) = -1.0 / tau_reference_;
+    matrix_b_reference_(0, 0) = 1.0 / tau_reference_;
+  } else if (model_order_ == 2) {
+    matrix_a_reference_(0, 1) = 1.0;
+    matrix_a_reference_(1, 0) = -wn_reference_ * wn_reference_;
+    matrix_a_reference_(1, 1) = -2 * zeta_reference_ * wn_reference_;
+    matrix_b_reference_(1, 0) = wn_reference_ * wn_reference_;
   }
 }
 
 void MracController::BuildAdaptionModel() {
   adaption_model_enabled_ = true;
-  if (model_order_ <= 2) {
-    if (model_order_ == 1) {
-      matrix_b_adaption_(0, 0) = 1.0;
-    } else {
-      matrix_b_adaption_(1, 0) = wn_reference_ * wn_reference_;
-    }
-    if (!CheckLyapunovPD(matrix_a_reference_, matrix_p_adaption_)) {
-      AWARN << "Solution of the algebraic Lyapunov equation is not symmetric "
-               "positive definite";
-      adaption_model_enabled_ = false;
-    }
-  } else {
+  if (model_order_ > 2) {
     AWARN << "Adaption model order beyond the designed range, "
              "model_order: "
           << model_order_;
+    adaption_model_enabled_ = false;
+    return;
+  }
+  if (model_order_ == 1) {
+    matrix_b_adaption_(0, 0) = 1.0;
+  } else if (model_order_ == 2) {
+    matrix_b_adaption_(1, 0) = wn_reference_ * wn_reference_;
+  }
+  if (!CheckLyapunovPD(matrix_a_reference_, matrix_p_adaption_)) {
+    AWARN << "Solution of the algebraic Lyapunov equation is not symmetric "
+             "positive definite";
     adaption_model_enabled_ = false;
   }
 }
@@ -271,7 +274,7 @@ bool MracController::CheckLyapunovPD(const Matrix matrix_a,
                                      const Matrix matrix_p) const {
   Matrix matrix_q = -matrix_p * matrix_a - matrix_a.transpose() * matrix_p;
   Eigen::LLT<Matrix> llt_matrix_q(matrix_q);
-  // if matrix Q is not symmetric or the Cholkesky decomposition (LLT) failed
+  // if matrix Q is not symmetric or the Cholesky decomposition (LLT) failed
   // due to the matrix Q are not positive definite
   return (matrix_q.isApprox(matrix_q.transpose()) &&
           llt_matrix_q.info() != Eigen::NumericalIssue);
@@ -345,7 +348,7 @@ int MracController::BoundOutput(const double output_unbounded,
                  : -2;
   } else {
     *output = output_unbounded;
-    // if output does not violate neithor bound nor rate bound, then status = 0
+    // if output does not violate neither bound nor rate bound, then status = 0
     status = 0;
   }
   return status;
