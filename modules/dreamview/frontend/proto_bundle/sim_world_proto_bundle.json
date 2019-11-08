@@ -9108,13 +9108,9 @@
                   "type": "SmootherDebug",
                   "id": 28
                 },
-                "pullOverStatus": {
-                  "type": "apollo.planning.PullOverStatus",
-                  "id": 29
-                },
                 "pullOver": {
                   "type": "PullOverDebug",
-                  "id": 30
+                  "id": 29
                 }
               }
             },
