@@ -17,6 +17,7 @@
 #include "modules/control/common/mrac_controller.h"
 
 #include <cmath>
+#include <string>
 #include <vector>
 
 #include "Eigen/Dense"
@@ -36,21 +37,15 @@ using Matrix = Eigen::MatrixXd;
 double MracController::Control(const double command, const Matrix state,
                                const double input_limit,
                                const double input_rate_limit) {
-  // check if the reference/adaption model well set up during the initialization
-  if (!reference_model_enabled_ || !adaption_model_enabled_) {
-    AWARN << "MRAC: model build failed; will work as a unity compensator. The "
-             "reference_model building status: "
-          << reference_model_enabled_
-          << "; The adaption_model building status: "
-          << adaption_model_enabled_;
+  // check if the current sampling time is valid and the reference/adaption
+  // model well set up during the initialization
+  if (ts_ <= 0.0 || !reference_model_enabled_ || !adaption_model_enabled_) {
+    AERROR << "MRAC: model build failed; will work as a unity compensator. The "
+              "reference_model building status: "
+           << reference_model_enabled_
+           << "; The adaption_model building status: "
+           << adaption_model_enabled_ << "; Current sampling time: " << ts_;
     return command;  // treat the mrac as a unity proportional controller
-  }
-  // check if the current sampling time is valid
-  if (ts_ <= 0.0) {
-    AWARN
-        << "MRAC: current sampling time <= 0, will use the last control, ts_: "
-        << ts_;
-    return control_previous_;
   }
 
   // update the state in the real actuation system
@@ -152,19 +147,13 @@ void MracController::Init(const MracConf &mrac_conf, const double dt) {
   // Initialize the reference model parameters
   matrix_a_reference_ = Matrix::Zero(model_order_, model_order_);
   matrix_b_reference_ = Matrix::Zero(model_order_, 1);
-  if (SetReferenceModel(mrac_conf).ok()) {
-    BuildReferenceModel();
-  } else {
-    reference_model_enabled_ = false;
-  }
+  reference_model_enabled_ =
+      (SetReferenceModel(mrac_conf).ok() && BuildReferenceModel().ok());
   // Initialize the adaption model parameters
   matrix_p_adaption_ = Matrix::Zero(model_order_, model_order_);
   matrix_b_adaption_ = Matrix::Zero(model_order_, 1);
-  if (SetAdaptionModel(mrac_conf).ok()) {
-    BuildAdaptionModel();
-  } else {
-    adaption_model_enabled_ = false;
-  }
+  adaption_model_enabled_ =
+      (SetAdaptionModel(mrac_conf).ok() && BuildAdaptionModel().ok());
 }
 
 Status MracController::SetReferenceModel(const MracConf &mrac_conf) {
@@ -221,22 +210,13 @@ Status MracController::SetAdaptionModel(const MracConf &mrac_conf) {
   return Status::OK();
 }
 
-void MracController::BuildReferenceModel() {
-  reference_model_enabled_ = true;
-  if (ts_ <= 0.0) {
-    AWARN << "ts_ <= 0, continuous-discrete transformation for reference model "
-             "failed, ts_: "
-          << ts_;
-    reference_model_enabled_ = false;
-    return;
-  }
-
+Status MracController::BuildReferenceModel() {
   if (model_order_ > 2) {
-    AWARN << "reference model order beyond the designed range, "
-             "model_order: "
-          << model_order_;
-    reference_model_enabled_ = false;
-    return;
+    const auto error_msg =
+        StrCat("mrac controller error: reference model order ", model_order_,
+               " is beyond the designed range");
+    AERROR << error_msg;
+    return Status(ErrorCode::CONTROL_INIT_ERROR, error_msg);
   }
   if (model_order_ == 1) {
     matrix_a_reference_(0, 0) = -1.0 / tau_reference_;
@@ -247,16 +227,16 @@ void MracController::BuildReferenceModel() {
     matrix_a_reference_(1, 1) = -2 * zeta_reference_ * wn_reference_;
     matrix_b_reference_(1, 0) = wn_reference_ * wn_reference_;
   }
+  return Status::OK();
 }
 
-void MracController::BuildAdaptionModel() {
-  adaption_model_enabled_ = true;
+Status MracController::BuildAdaptionModel() {
   if (model_order_ > 2) {
-    AWARN << "Adaption model order beyond the designed range, "
-             "model_order: "
-          << model_order_;
-    adaption_model_enabled_ = false;
-    return;
+    const auto error_msg =
+        StrCat("mrac controller error: adaption model order ", model_order_,
+               " is beyond the designed range");
+    AERROR << error_msg;
+    return Status(ErrorCode::CONTROL_INIT_ERROR, error_msg);
   }
   if (model_order_ == 1) {
     matrix_b_adaption_(0, 0) = 1.0;
@@ -264,10 +244,13 @@ void MracController::BuildAdaptionModel() {
     matrix_b_adaption_(1, 0) = wn_reference_ * wn_reference_;
   }
   if (!CheckLyapunovPD(matrix_a_reference_, matrix_p_adaption_)) {
-    AWARN << "Solution of the algebraic Lyapunov equation is not symmetric "
-             "positive definite";
-    adaption_model_enabled_ = false;
+    const std::string error_msg =
+        "Solution of the algebraic Lyapunov equation is not symmetric positive "
+        "definite";
+    AERROR << error_msg;
+    return Status(ErrorCode::CONTROL_INIT_ERROR, error_msg);
   }
+  return Status::OK();
 }
 
 bool MracController::CheckLyapunovPD(const Matrix matrix_a,
