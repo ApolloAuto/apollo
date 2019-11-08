@@ -157,7 +157,7 @@ DEFINE_bool(reckless_change_lane, false,
 DEFINE_double(change_lane_fail_freeze_time, 1.0,
               "seconds. Not allowed to change lane this amount of time "
               "if it just failed to change lane");
-DEFINE_double(change_lane_success_freeze_time, 3.0,
+DEFINE_double(change_lane_success_freeze_time, 1.5,
               "seconds. Not allowed to change lane this amount of time "
               "if it just finished change lane");
 DEFINE_double(change_lane_min_length, 30.0,
