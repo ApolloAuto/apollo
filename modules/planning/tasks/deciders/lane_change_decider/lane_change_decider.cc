@@ -133,8 +133,6 @@ void LaneChangeDecider::UpdatePreparationDistance(
   auto* lane_change_status = PlanningContext::Instance()
                                  ->mutable_planning_status()
                                  ->mutable_change_lane();
-  lane_change_status->set_timestamp(Clock::NowInSeconds());
-  lane_change_status->set_path_id(reference_line_info->Lanes().Id());
   ADEBUG << "Current time: " << lane_change_status->timestamp();
   ADEBUG << "Lane Change Status: " << lane_change_status->status();
   // If lane change planning succeeded, update and return
