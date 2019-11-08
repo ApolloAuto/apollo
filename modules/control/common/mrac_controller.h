@@ -49,7 +49,7 @@ class MracController {
   void Init(const MracConf &mrac_conf, const double dt);
 
   /**
-   * time constant, natrual frequency and damping ratio
+   * time constant, natural frequency and damping ratio
    * @param mrac_conf configuration for reference model
    * @return Status parameter initialization status
    */
@@ -78,23 +78,23 @@ class MracController {
 
   /**
    * @brief check if the solution of the algebraic Lyapunov Equation is
-   * symmetric positive definte
+   * symmetric positive definite
    * @param matrix_a reference model matrix
    * @param matrix_p Lyapunov function matrix
-   * @return indicator of the symmetric positive definte matrix
+   * @return indicator of the symmetric positive definite matrix
    */
   bool CheckLyapunovPD(const Eigen::MatrixXd matrix_a,
                        const Eigen::MatrixXd matrix_p) const;
 
   /**
-   * @brief exexute the reference state interation with respect to the designed
+   * @brief execute the reference state interation with respect to the designed
    inputs in discrete-time form, with the bilinear transform (trapezoidal
    integration) method
    */
   void UpdateReference();
 
   /**
-   * @brief exexute the adaption interation with respect to the designed law in
+   * @brief execute the adaption interation with respect to the designed law in
    discrete-time form, with the bilinear transform (trapezoidal integration)
    method
    * @param law_adp adaptive law at k and k-1 steps
@@ -186,10 +186,10 @@ class MracController {
   void SetInputAdaptionRate(const double ratio_input);
 
   /**
-   * @brief set convergence ratio for nonliear components in adaptive dynamics
+   * @brief set convergence ratio for nonlinear components in adaptive dynamics
    * @param ratio_nonlinear convergence ratio for additional nonlinear adaption
    */
-  void SetNonlinearAdaptionRate(const double ratio_nonliear);
+  void SetNonlinearAdaptionRate(const double ratio_nonlinear);
 
   /**
    * @brief get convergence ratio for state components in adaptive dynamics
@@ -246,9 +246,9 @@ class MracController {
   // The order of the reference/adaption model
   int model_order_ = 1;
 
-  // 1st-order Reference system coefficients in contiouous-time domain
+  // 1st-order Reference system coefficients in continuous-time domain
   double tau_reference_ = 0.0;
-  // 2nd-order Reference system coefficients in contiouous-time domain
+  // 2nd-order Reference system coefficients in continuous-time domain
   double wn_reference_ = 0.0;
   double zeta_reference_ = 0.0;
 
