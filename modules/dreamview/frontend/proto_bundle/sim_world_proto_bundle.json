@@ -7259,36 +7259,29 @@
                     "default": false
                   }
                 },
-                "isFeasible": {
-                  "type": "bool",
-                  "id": 3,
-                  "options": {
-                    "default": false
-                  }
-                },
                 "position": {
                   "type": "apollo.common.PointENU",
-                  "id": 4
+                  "id": 3
                 },
                 "theta": {
                   "type": "double",
-                  "id": 5
+                  "id": 4
                 },
                 "lengthFront": {
                   "type": "double",
-                  "id": 6
+                  "id": 5
                 },
                 "lengthBack": {
                   "type": "double",
-                  "id": 7
+                  "id": 6
                 },
                 "widthLeft": {
                   "type": "double",
-                  "id": 8
+                  "id": 7
                 },
                 "widthRight": {
                   "type": "double",
-                  "id": 9
+                  "id": 8
                 }
               },
               "nested": {
