@@ -128,6 +128,13 @@ class STBoundary : public common::math::Polygon2d {
   void set_bottom_left_point(STPoint st_point);
   void set_bottom_right_point(STPoint st_point);
 
+  void set_obstacle_road_right_ending_t(double road_right_ending_t) {
+    obstacle_road_right_ending_t_ = road_right_ending_t;
+  }
+  double obstacle_road_right_ending_t() const {
+    return obstacle_road_right_ending_t_;
+  }
+
  private:
   /** @brief The sanity check function for a vector of ST-point pairs.
    */
@@ -175,6 +182,8 @@ class STBoundary : public common::math::Polygon2d {
   STPoint bottom_right_point_;
   STPoint upper_left_point_;
   STPoint upper_right_point_;
+
+  double obstacle_road_right_ending_t_;
 };
 
 }  // namespace planning
