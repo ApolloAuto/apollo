@@ -45,7 +45,10 @@ class TeleopService {
 
 #ifdef TELEOP
 
-  // send a command to the car daemon to start or stop video encoders.
+  // send a command to the car daemon to start or stop
+  // video encoders and voip encoders
+  void SendAudioStreamCmd(bool start_stop);
+  void SendMicStreamCmd(bool start_stop);
   void SendVideoStreamCmd(bool start_stop);
 
   void UpdateModemInfo(
