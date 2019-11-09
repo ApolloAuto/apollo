@@ -39,6 +39,9 @@ const std::string modem2_id = "2";
 
 const unsigned int encoder_count = 2;
 
+const std::string start_cmd = "start";
+const std::string stop_cmd = "kill";
+
 // channels
 const std::string modem0_channel = "/apollo/teleop/network/modem0";
 const std::string modem1_channel = "/apollo/teleop/network/modem1";
@@ -57,7 +60,11 @@ TeleopService::TeleopService(WebSocketHandler *websocket)
   RegisterMessageHandlers();
 
   teleop_status_["audio"] = false;
+  teleop_status_["audio_starting"] = false;
+  teleop_status_["audio_stopping"] = false;
   teleop_status_["mic"] = false;
+  teleop_status_["mic_starting"] = false;
+  teleop_status_["mic_stopping"] = false;
   teleop_status_["video"] = false;
   teleop_status_["video_starting"] = false;
   teleop_status_["video_stopping"] = false;
@@ -109,62 +116,100 @@ void TeleopService::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "ToggleAudio",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        // TODO
         {
-          boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-          teleop_status_["audio"] = !teleop_status_["audio"];
-
-          // turn on/off the mic based on the audio status
-          teleop_status_["mic"] = teleop_status_["audio"];
+          bool start = false; // false means stop
+          // create a scope for the mutex lock
+          {
+            boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+            // toggle depending on current state change
+            if (teleop_status_["audio_starting"]) {
+              teleop_status_["audio_starting"] = false;
+              teleop_status_["audio_stopping"] = true;
+            } else if (teleop_status_["audio_stopping"]) {
+              teleop_status_["audio_starting"] = true;
+              teleop_status_["audio_stopping"] = false;
+            }
+            // not currently starting or stopping video
+            else {
+              // toggle depending on current state
+              if (teleop_status_["audio"]) {
+                teleop_status_["audio_stopping"] = true;
+                teleop_status_["audio_starting"] = false;
+              } else {
+                teleop_status_["audio_stopping"] = false;
+                teleop_status_["audio_starting"] = true;
+              }
+            }
+            start = teleop_status_["audio_starting"];
+          }
+          AINFO << "ToggleAudio: " << start;
+          SendAudioStreamCmd(start);
         }
       });
   // Mute/Unmute local microphone
   websocket_->RegisterMessageHandler(
       "ToggleMic",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        // TODO
+        bool start = false;
         {
           boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-          teleop_status_["mic"] = !teleop_status_["mic"];
+          // toggle depending on current state change
+          if (teleop_status_["mic_starting"]) {
+            teleop_status_["mic_starting"] = false;
+            teleop_status_["mic_stopping"] = true;
+          } else if (teleop_status_["mic_stopping"]) {
+            teleop_status_["mic_starting"] = true;
+            teleop_status_["mic_stopping"] = false;
+          }
+          // not currently starting or stopping video
+          else {
+            // toggle depending on current state
+            if (teleop_status_["mic"]) {
+              teleop_status_["mic_stopping"] = true;
+              teleop_status_["mic_starting"] = false;
+            } else {
+              teleop_status_["mic_stopping"] = false;
+              teleop_status_["mic_starting"] = true;
+            }
+          }
+          start = teleop_status_["mic_starting"];
         }
+        AINFO << "ToggleAudio: " << start;
+        SendMicStreamCmd(start);
       });
   // Start/stop local decoder and viewer, start/stop remote encoder and
   // compositor
   websocket_->RegisterMessageHandler(
       "ToggleVideo",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        // TODO
+        bool start = false; // false means stop
+        // create a scope for the mutex lock
         {
-          bool sendStartVideo = false;
-          bool sendStopVideo = false;
-          // create a scope for the mutex lock
-          {
-            boost::shared_lock<boost::shared_mutex> writer_lock(mutex_);
-            // toggle depending on current state change
-            if (teleop_status_["video_starting"]) {
-              teleop_status_["video_starting"] = false;
+          boost::shared_lock<boost::shared_mutex> writer_lock(mutex_);
+          // toggle depending on current state change
+          if (teleop_status_["video_starting"]) {
+            teleop_status_["video_starting"] = false;
+            teleop_status_["video_stopping"] = true;
+          } else if (teleop_status_["video_stopping"]) {
+            teleop_status_["video_starting"] = true;
+            teleop_status_["video_stopping"] = false;
+          }
+          // not currently starting or stopping video
+          else {
+            // toggle depending on current state
+            if (teleop_status_["video"]) {
               teleop_status_["video_stopping"] = true;
-            } else if (teleop_status_["video_stopping"]) {
-              teleop_status_["video_starting"] = true;
+              teleop_status_["video_starting"] = false;
+            } else {
               teleop_status_["video_stopping"] = false;
+              teleop_status_["video_starting"] = true;
             }
-            // not currently starting or stopping video
-            else {
-              // toggle depending on current state
-              if (teleop_status_["video"]) {
-                teleop_status_["video_stopping"] = true;
-                teleop_status_["video_starting"] = false;
-              } else {
-                teleop_status_["video_stopping"] = false;
-                teleop_status_["video_starting"] = true;
-              }
-            }
-            AINFO << "ToggleVideo: " << teleop_status_["video_starting"];
           }
-          if (sendStartVideo || sendStopVideo) {
-            SendVideoStreamCmd(sendStartVideo);
-          }
+          start = teleop_status_["video_starting"];
         }
+        // send a start or stop message to the video encoders
+        AINFO << "ToggleVideo: " << start;
+        SendVideoStreamCmd(start);
       });
   // Issue pull-over command to remote
   websocket_->RegisterMessageHandler(
@@ -211,6 +256,7 @@ void TeleopService::UpdateModem(const std::string &modem_id,
   }
 }
 
+// callback for messages that originate from the car computer
 void TeleopService::UpdateCarDaemonRpt(
     const std::shared_ptr<DaemonServiceRpt> &daemon_rpt) {
   {
@@ -235,12 +281,15 @@ void TeleopService::UpdateCarDaemonRpt(
     bool sendStartVideo = false;
     bool sendStopVideo = false;
 
+    bool sendStartAudio = false;
+    bool sendStopAudio = false;
     // scope for the lock
     {
       boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
       teleop_status_["video"] = videoIsRunning;
       teleop_status_["audio"] = voipIsRunning;
 
+      // video currently running
       if (teleop_status_["video"]) {
         if (teleop_status_["video_starting"]) {
           // video has started
@@ -260,13 +309,36 @@ void TeleopService::UpdateCarDaemonRpt(
           teleop_status_["video_stopping"] = false;
         }
       }
+      // audio currently running
+      if (teleop_status_["audio"]) {
+        if (teleop_status_["audio_starting"]) {
+          // audio has started
+          teleop_status_["audio_starting"] = false;
+        } else if (teleop_status_["audio_stopping"]) {
+          sendStopAudio = true;
+        }
+      }
+      // audio not running
+      else {
+        if (teleop_status_["audio_starting"]) {
+          // not started yet
+          sendStartVideo = true;
+        } else if (teleop_status_["audio_stopping"]) {
+          // video is stopped
+          teleop_status_["audio_stopping"] = false;
+        }
+      }
     }
     if (sendStartVideo || sendStopVideo) {
       SendVideoStreamCmd(sendStartVideo);
     }
+    if (sendStartAudio || sendStopAudio) {
+      SendAudioStreamCmd(sendStartAudio);
+    }
   }
 }
 
+// callback for messages that originate from this computer
 void TeleopService::UpdateOperatorDaemonRpt(
     const std::shared_ptr<DaemonServiceRpt> &daemon_rpt) {
   {
@@ -278,17 +350,44 @@ void TeleopService::UpdateOperatorDaemonRpt(
         break;
       }
     }
-    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-    teleop_status_["mic"] = voipIsRunning;
+    bool sendStartMic = false;
+    bool sendStopMic = false;
+    // scope for the lock
+    {
+      boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+      teleop_status_["mic"] = voipIsRunning;
+      // mic currently running
+      if (teleop_status_["mic"]) {
+        if (teleop_status_["mic_starting"]) {
+          // mic has started
+          teleop_status_["mic_starting"] = false;
+        } else if (teleop_status_["mic_stopping"]) {
+          sendStopMic = true;
+        }
+      }
+      // mic not running
+      else {
+        if (teleop_status_["mic_starting"]) {
+          // not started yet
+          sendStartMic = true;
+        } else if (teleop_status_["mic_stopping"]) {
+          // video is stopped
+          teleop_status_["mic_stopping"] = false;
+        }
+      }
+    }
+    if (sendStartMic || sendStopMic) {
+      SendMicStreamCmd(sendStartMic);
+    }
   }
 }
 
 void TeleopService::SendVideoStreamCmd(bool start_stop) {
   DaemonServiceCmd msg;
   if (start_stop) {
-    msg.set_cmd("start");
+    msg.set_cmd(start_cmd);
   } else {
-    msg.set_cmd("kill");
+    msg.set_cmd(stop_cmd);
   }
   // we send a message to each encoder.
   for (unsigned int i = 0; i < encoder_count; i++) {
@@ -300,6 +399,38 @@ void TeleopService::SendVideoStreamCmd(bool start_stop) {
     AINFO << encoderName << " " << msg.cmd();
   }
 }
+
+void TeleopService::SendAudioStreamCmd(bool start_stop) {
+  DaemonServiceCmd msg;
+  if (start_stop) {
+    msg.set_cmd(start_cmd);
+  } else {
+    msg.set_cmd(stop_cmd);
+  }
+  msg.set_service("voip_encoder");
+  common::util::FillHeader("dreamview", &msg);
+  car_daemon_cmd_writer_->Write(msg);
+  AINFO << "audio " << msg.cmd();
+  // audio start / stop implies mic start/stop
+  SendMicStreamCmd(start_stop);
+}
+
+void TeleopService::SendMicStreamCmd(bool start_stop) {
+  // by switching on or off the voip_encoder in the operator console
+  // we are controlling the mic
+  DaemonServiceCmd msg;
+  if (start_stop) {
+    msg.set_cmd(start_cmd);
+  } else {
+    msg.set_cmd(stop_cmd);
+  }
+  msg.set_service("voip_encoder");
+  common::util::FillHeader("dreamview", &msg);
+  operator_daemon_cmd_writer_->Write(msg);
+  AINFO << "mic " << msg.cmd();
+}
+
+
 
 }  // namespace dreamview
 }  // namespace apollo
