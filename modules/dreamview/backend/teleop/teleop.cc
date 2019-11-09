@@ -117,7 +117,7 @@ void TeleopService::RegisterMessageHandlers() {
       "ToggleAudio",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
         {
-          bool start = false; // false means stop
+          bool start = false;  // false means stop
           // create a scope for the mutex lock
           {
             boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
@@ -182,7 +182,7 @@ void TeleopService::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "ToggleVideo",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        bool start = false; // false means stop
+        bool start = false;  // false means stop
         // create a scope for the mutex lock
         {
           boost::shared_lock<boost::shared_mutex> writer_lock(mutex_);
@@ -429,8 +429,6 @@ void TeleopService::SendMicStreamCmd(bool start_stop) {
   operator_daemon_cmd_writer_->Write(msg);
   AINFO << "mic " << msg.cmd();
 }
-
-
 
 }  // namespace dreamview
 }  // namespace apollo
