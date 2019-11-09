@@ -37,35 +37,44 @@ function drawPullOverBox({ lengthFront, lengthBack, widthLeft, widthRight }) {
 export default class PlanningStatus {
     constructor() {
         this.pullOverBox = null;
+        this.dimension = {};
     }
 
     update(planningData, coordinates, scene) {
-        // Dispose old status
-        if (this.pullOverBox) {
+        const shouldDrawStatus = STORE.options.customizedToggles.get('pullOver');
+        const pullOver = _.get(planningData, 'pullOver');
+        if (!pullOver || !shouldDrawStatus) {
+            if (this.pullOverBox) {
+                this.pullOverBox.visible = false;
+            }
+            return;
+        }
+
+        // Dispose old status if dimension is different
+        const isNewDimension =
+            pullOver.lengthFront !== this.dimension.lengthFront ||
+            pullOver.lengthBack !== this.dimension.lengthBack ||
+            pullOver.widthLeft !== this.dimension.widthLeft ||
+            pullOver.widthRight !== this.dimension.widthRight;
+        if (this.pullOverBox && isNewDimension) {
             disposeMeshGroup(this.pullOverBox);
             scene.remove(this.pullOverBox);
             this.pullOverBox = null;
         }
 
-        if (!planningData) {
-            return;
-        }
-
         // Draw pull over status
-        if (STORE.options.customizedToggles.get('pullOver')) {
-            const { pullOver } = planningData;
-            if (pullOver) {
-                this.pullOverBox = drawPullOverBox(pullOver);
-
-                const position = coordinates.applyOffset({
-                    x: pullOver.position.x,
-                    y: pullOver.position.y,
-                    z: 0.3,
-                });
-                this.pullOverBox.position.set(position.x, position.y, position.z);
-                this.pullOverBox.rotation.set(0, 0, pullOver.theta);
-                scene.add(this.pullOverBox);
-            }
+        if (!this.pullOverBox) {
+            this.pullOverBox = drawPullOverBox(pullOver);
+            scene.add(this.pullOverBox);
         }
+
+        // Set position and theta
+        const position = coordinates.applyOffset({
+            x: pullOver.position.x,
+            y: pullOver.position.y,
+            z: 0.3,
+        });
+        this.pullOverBox.position.set(position.x, position.y, position.z);
+        this.pullOverBox.rotation.set(0, 0, pullOver.theta);
     }
 }
