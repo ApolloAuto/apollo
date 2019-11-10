@@ -170,12 +170,12 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
   // Preprocess the obstacles for sweep-line algorithms.
   // Fetch every obstacle's beginning end ending t-edges only.
   for (const auto& it : obs_id_to_st_boundary_) {
-    obs_t_edges_.emplace_back(
-        true, it.second.min_t(), it.second.bottom_left_point().s(),
-        it.second.upper_left_point().s(), it.first);
-    obs_t_edges_.emplace_back(
-        false, it.second.max_t(), it.second.bottom_right_point().s(),
-        it.second.upper_right_point().s(), it.first);
+    obs_t_edges_.emplace_back(true, it.second.min_t(),
+                              it.second.bottom_left_point().s(),
+                              it.second.upper_left_point().s(), it.first);
+    obs_t_edges_.emplace_back(false, it.second.max_t(),
+                              it.second.bottom_right_point().s(),
+                              it.second.upper_right_point().s(), it.first);
   }
   // Sort the edges.
   std::sort(obs_t_edges_.begin(), obs_t_edges_.end(),
@@ -300,16 +300,16 @@ bool STObstaclesProcessor::GetSBoundsFromDecisions(
   if (s_min > s_max) {
     return false;
   }
-  ADEBUG << "S-boundary based on existing decisions = ("
-         << s_min << ", " << s_max << ")";
+  ADEBUG << "S-boundary based on existing decisions = (" << s_min << ", "
+         << s_max << ")";
 
   // For newly entering st_boundaries, determine possible new-boundaries.
   // For apparent ones, make decisions directly.
   std::vector<ObsTEdge> ambiguous_t_edges;
   for (auto obs_t_edge : new_t_edges) {
     ADEBUG << "For obstacle id: " << std::get<4>(obs_t_edge)
-           << ", its s-range = [" << std::get<2>(obs_t_edge)
-           << ", " << std::get<3>(obs_t_edge) << "]";
+           << ", its s-range = [" << std::get<2>(obs_t_edge) << ", "
+           << std::get<3>(obs_t_edge) << "]";
     if (std::get<0>(obs_t_edge) == 1) {
       if (std::get<2>(obs_t_edge) >= s_max) {
         ADEBUG << "  Apparently, it should be yielded.";
@@ -379,8 +379,8 @@ void STObstaclesProcessor::SetObstacleDecision(
 
 bool STObstaclesProcessor::ComputeObstacleSTBoundary(
     const Obstacle& obstacle, std::vector<STPoint>* const lower_points,
-    std::vector<STPoint>* const upper_points,
-    bool* const is_caution_obstacle, double* const obs_caution_end_t) {
+    std::vector<STPoint>* const upper_points, bool* const is_caution_obstacle,
+    double* const obs_caution_end_t) {
   lower_points->clear();
   upper_points->clear();
   *is_caution_obstacle = false;

@@ -76,11 +76,11 @@ class STObstaclesProcessor {
           available_obs_decisions);
 
   /** @brief Provided that decisions for all existing obstacles are made, get
-    * the speed limiting info from limiting st-obstacles.
-    * @param Time t.
-    * @param The actual limiting speed-info: (lower, upper)
-    * @return True if there is speed limiting info; otherwise, false.
-    */
+   * the speed limiting info from limiting st-obstacles.
+   * @param Time t.
+   * @param The actual limiting speed-info: (lower, upper)
+   * @return True if there is speed limiting info; otherwise, false.
+   */
   bool GetLimitingSpeedInfo(
       double t, std::pair<double, double>* const limiting_speed_info);
 
@@ -186,9 +186,9 @@ class STObstaclesProcessor {
                                                const double s) const;
 
   /** @brief Check if a given s falls within adc's low road right segment.
-    * @param A certain S.
-    * @return True if within; false otherwise.
-    */
+   * @param A certain S.
+   * @return True if within; false otherwise.
+   */
   bool IsSWithinADCLowRoadRightSegment(const double s) const;
 
  private:

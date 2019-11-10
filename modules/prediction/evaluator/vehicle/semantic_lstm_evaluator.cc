@@ -163,7 +163,7 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr,
     double sigma_x = std::sqrt(std::abs(cov_matrix(0, 0)));
     double sigma_y = std::sqrt(std::abs(cov_matrix(1, 1)));
     double corr = cov_matrix(0, 1) / (sigma_x + FLAGS_double_precision) /
-                                     (sigma_y + FLAGS_double_precision);
+                  (sigma_y + FLAGS_double_precision);
 
     point->mutable_gaussian_info()->set_sigma_x(sigma_x);
     point->mutable_gaussian_info()->set_sigma_y(sigma_y);

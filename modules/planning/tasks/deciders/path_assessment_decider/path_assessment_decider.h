@@ -89,8 +89,8 @@ class PathAssessmentDecider : public Decider {
           path_point_decision);
 
   void SetPathPointType(
-      const ReferenceLineInfo& reference_line_info,
-      const PathData& path_data, const bool is_lane_change_path,
+      const ReferenceLineInfo& reference_line_info, const PathData& path_data,
+      const bool is_lane_change_path,
       std::vector<std::tuple<double, PathData::PathPointType, double>>* const
           path_point_decision);
 

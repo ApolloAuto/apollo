@@ -37,8 +37,8 @@ class ObstaclesPrioritizer {
   void AssignCautionLevel();
 
  private:
-  void AssignCautionLevelInJunction(
-      const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container);
+  void AssignCautionLevelInJunction(const Obstacle& ego_vehicle,
+                                    ObstaclesContainer* obstacles_container);
 
   void AssignCautionLevelCruiseKeepLane(
       const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container);
@@ -68,7 +68,8 @@ class ObstaclesPrioritizer {
       ObstaclesContainer* obstacles_container);
 
   void SetCautionIfCloseToEgo(const Obstacle& ego_vehicle,
-      const double distance_threshold, Obstacle* obstacle_ptr);
+                              const double distance_threshold,
+                              Obstacle* obstacle_ptr);
 
  private:
   std::unordered_set<std::string> ego_back_lane_id_set_;

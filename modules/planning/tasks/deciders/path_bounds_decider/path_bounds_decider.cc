@@ -138,8 +138,8 @@ Status PathBoundsDecider::Process(
 
       // set debug info in planning_data
       auto* pull_over_debug = reference_line_info->mutable_debug()
-                                                 ->mutable_planning_data()
-                                                 ->mutable_pull_over();
+                                  ->mutable_planning_data()
+                                  ->mutable_pull_over();
       pull_over_debug->mutable_position()->CopyFrom(
           pull_over_status->position());
       pull_over_debug->set_theta(pull_over_status->theta());
