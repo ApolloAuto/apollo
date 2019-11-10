@@ -57,9 +57,9 @@ class STBoundsDecider : public Decider {
 
   void RankDecisions(
       double s_guide_line, std::pair<double, double> driving_limit,
-      std::vector<std::pair<
-          std::tuple<double, double, double>,
-          std::vector<std::pair<std::string, ObjectDecisionType>>>>*
+      std::vector<
+          std::pair<std::tuple<double, double, double>,
+                    std::vector<std::pair<std::string, ObjectDecisionType>>>>*
           available_choices);
 
   void BackwardFlatten(

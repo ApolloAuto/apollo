@@ -261,9 +261,11 @@ bool STBoundary::GetBoundarySlopes(const double curr_time, double* ds_upper,
   }
   if (has_prev && has_next) {
     *ds_upper = ((next_s_upper - curr_s_upper) / kTimeIncrement +
-        (curr_s_upper - prev_s_upper) / kTimeIncrement) * 0.5;
+                 (curr_s_upper - prev_s_upper) / kTimeIncrement) *
+                0.5;
     *ds_lower = ((next_s_lower - curr_s_lower) / kTimeIncrement +
-        (curr_s_lower - prev_s_lower) / kTimeIncrement) * 0.5;
+                 (curr_s_lower - prev_s_lower) / kTimeIncrement) *
+                0.5;
     return true;
   }
   if (has_prev) {

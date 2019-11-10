@@ -21,7 +21,7 @@
 #include <string>
 
 #if PY_MAJOR_VERSION >= 3
-  #define PyInt_AsLong PyLong_AsLong
+#define PyInt_AsLong PyLong_AsLong
 #endif
 
 template <typename T>

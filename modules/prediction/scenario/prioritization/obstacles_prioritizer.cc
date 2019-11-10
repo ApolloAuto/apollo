@@ -34,10 +34,10 @@ namespace apollo {
 namespace prediction {
 
 using apollo::perception::PerceptionObstacle;
+using common::Point3D;
 using common::adapter::AdapterConfig;
 using common::math::Box2d;
 using common::math::Vec2d;
-using common::Point3D;
 using hdmap::LaneInfo;
 using hdmap::OverlapInfo;
 using ConstLaneInfoPtr = std::shared_ptr<const LaneInfo>;
@@ -120,8 +120,7 @@ void ObstaclesPrioritizer::AssignIgnoreLevel() {
   double ego_theta = ego_feature.theta();
   double ego_x = ego_feature.position().x();
   double ego_y = ego_feature.position().y();
-  ADEBUG << "Get pose (" << ego_x << ", " << ego_y << ", " << ego_theta
-         << ")";
+  ADEBUG << "Get pose (" << ego_x << ", " << ego_y << ", " << ego_theta << ")";
 
   // Build rectangular scan_area
   Box2d scan_box({ego_x + FLAGS_scan_length / 2.0 * std::cos(ego_theta),
@@ -425,8 +424,7 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine(
 }
 
 void ObstaclesPrioritizer::AssignCautionByMerge(
-    const Obstacle& ego_vehicle,
-    std::shared_ptr<const LaneInfo> lane_info_ptr,
+    const Obstacle& ego_vehicle, std::shared_ptr<const LaneInfo> lane_info_ptr,
     std::unordered_set<std::string>* const visited_lanes,
     ObstaclesContainer* obstacles_container) {
   SetCautionBackward(FLAGS_caution_search_distance_backward_for_merge,
@@ -435,8 +433,7 @@ void ObstaclesPrioritizer::AssignCautionByMerge(
 }
 
 void ObstaclesPrioritizer::AssignCautionByOverlap(
-    const Obstacle& ego_vehicle,
-    std::shared_ptr<const LaneInfo> lane_info_ptr,
+    const Obstacle& ego_vehicle, std::shared_ptr<const LaneInfo> lane_info_ptr,
     std::unordered_set<std::string>* const visited_lanes,
     ObstaclesContainer* obstacles_container) {
   std::string lane_id = lane_info_ptr->id().id();
@@ -467,8 +464,7 @@ void ObstaclesPrioritizer::AssignCautionByOverlap(
                        object.lane_overlap_info().start_s();
       SetCautionBackward(
           ahead_s + FLAGS_caution_search_distance_backward_for_overlap,
-          ego_vehicle, overlap_lane_ptr, visited_lanes,
-          obstacles_container);
+          ego_vehicle, overlap_lane_ptr, visited_lanes, obstacles_container);
     }
   }
 }
@@ -530,8 +526,9 @@ void ObstaclesPrioritizer::SetCautionBackward(
   }
 }
 
-void ObstaclesPrioritizer::SetCautionIfCloseToEgo(const Obstacle& ego_vehicle,
-      const double distance_threshold, Obstacle* obstacle_ptr) {
+void ObstaclesPrioritizer::SetCautionIfCloseToEgo(
+    const Obstacle& ego_vehicle, const double distance_threshold,
+    Obstacle* obstacle_ptr) {
   const Point3D& obstacle_position = obstacle_ptr->latest_feature().position();
   const Point3D& ego_position = ego_vehicle.latest_feature().position();
   double diff_x = obstacle_position.x() - ego_position.x();

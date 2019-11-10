@@ -139,8 +139,8 @@ Status STBoundsDecider::GenerateRegularSTBound(STBound* const st_bound) {
     std::vector<std::pair<STBoundPoint, ObsDecSet>> available_choices;
     ADEBUG << "Available choices are:";
     for (int j = 0; j < static_cast<int>(available_s_bounds.size()); ++j) {
-      ADEBUG << "  (" << available_s_bounds[j].first
-             << ", " << available_s_bounds[j].second << ")";
+      ADEBUG << "  (" << available_s_bounds[j].first << ", "
+             << available_s_bounds[j].second << ")";
       available_choices.emplace_back(
           std::make_tuple(0.0, available_s_bounds[j].first,
                           available_s_bounds[j].second),
@@ -163,11 +163,11 @@ Status STBoundsDecider::GenerateRegularSTBound(STBound* const st_bound) {
 
       // Update st-guide-line and st-driving-limit info.
       std::pair<double, double> limiting_speed_info;
-      if (st_obstacles_processor_.GetLimitingSpeedInfo(
-              t, &limiting_speed_info)) {
+      if (st_obstacles_processor_.GetLimitingSpeedInfo(t,
+                                                       &limiting_speed_info)) {
         st_driving_limits_.UpdateBlockingInfo(
-            t, s_lower, limiting_speed_info.first,
-            s_upper, limiting_speed_info.second);
+            t, s_lower, limiting_speed_info.first, s_upper,
+            limiting_speed_info.second);
         st_guide_line_.UpdateBlockingInfo(t, s_lower, true);
         st_guide_line_.UpdateBlockingInfo(t, s_upper, false);
       }
@@ -196,10 +196,10 @@ void STBoundsDecider::RankDecisions(
       std::tie(std::ignore, B_s_lower, B_s_upper) =
           available_choices->at(i + 1).first;
 
-      ADEBUG << "    Range ranking: A has s_upper = "
-             << A_s_upper << ", s_lower = " << A_s_lower;
-      ADEBUG << "    Range ranking: B has s_upper = "
-             << B_s_upper << ", s_lower = " << B_s_lower;
+      ADEBUG << "    Range ranking: A has s_upper = " << A_s_upper
+             << ", s_lower = " << A_s_lower;
+      ADEBUG << "    Range ranking: B has s_upper = " << B_s_upper
+             << ", s_lower = " << B_s_lower;
 
       // If not both are larger than passable-threshold, should select
       // the one with larger room.
@@ -209,7 +209,7 @@ void STBoundsDecider::RankDecisions(
                       std::fmax(driving_limit.first, B_s_lower);
       if (A_room < kSTPassableThreshold || B_room < kSTPassableThreshold) {
         if (A_room < B_room) {
-          swap(available_choices->at(i+1), available_choices->at(i));
+          swap(available_choices->at(i + 1), available_choices->at(i));
           has_swaps = true;
           continue;
         }
@@ -222,7 +222,7 @@ void STBoundsDecider::RankDecisions(
           B_s_upper >= s_guide_line && B_s_lower <= s_guide_line;
       if (A_contains_guideline != B_contains_guideline) {
         if (!A_contains_guideline) {
-          swap(available_choices->at(i+1), available_choices->at(i));
+          swap(available_choices->at(i + 1), available_choices->at(i));
           has_swaps = true;
           continue;
         }
@@ -244,20 +244,14 @@ void STBoundsDecider::RecordSTGraphDebug(
     auto boundary_debug = st_graph_debug->add_boundary();
     boundary_debug->set_name(boundary.id());
     if (boundary.boundary_type() == STBoundary::BoundaryType::YIELD) {
-      boundary_debug->set_type(
-          StGraphBoundaryDebug::ST_BOUNDARY_TYPE_YIELD);
-      ADEBUG << "Obstacle ID = " << boundary.id()
-             << ", decision = YIELD";
+      boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_YIELD);
+      ADEBUG << "Obstacle ID = " << boundary.id() << ", decision = YIELD";
     } else if (boundary.boundary_type() == STBoundary::BoundaryType::OVERTAKE) {
-      boundary_debug->set_type(
-          StGraphBoundaryDebug::ST_BOUNDARY_TYPE_OVERTAKE);
-      ADEBUG << "Obstacle ID = " << boundary.id()
-             << ", decision = OVERTAKE";
+      boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_OVERTAKE);
+      ADEBUG << "Obstacle ID = " << boundary.id() << ", decision = OVERTAKE";
     } else {
-      boundary_debug->set_type(
-          StGraphBoundaryDebug::ST_BOUNDARY_TYPE_UNKNOWN);
-      ADEBUG << "Obstacle ID = " << boundary.id()
-             << ", decision = UNKNOWN";
+      boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_UNKNOWN);
+      ADEBUG << "Obstacle ID = " << boundary.id() << ", decision = UNKNOWN";
     }
 
     for (const auto& point : boundary.points()) {

@@ -639,8 +639,8 @@ void PathAssessmentDecider::InitPathPointDecision(
 }
 
 void PathAssessmentDecider::SetPathPointType(
-    const ReferenceLineInfo& reference_line_info,
-    const PathData& path_data, const bool is_lane_change_path,
+    const ReferenceLineInfo& reference_line_info, const PathData& path_data,
+    const bool is_lane_change_path,
     std::vector<PathPointDecision>* const path_point_decision) {
   // Sanity checks.
   CHECK_NOTNULL(path_point_decision);
@@ -691,11 +691,10 @@ void PathAssessmentDecider::SetPathPointType(
           // This means that ADC hasn't started lane-change yet.
           std::get<1>((*path_point_decision)[i]) =
               PathData::PathPointType::IN_LANE;
-        } else if (
-            ego_sl_boundary.start_l() >
-                -lane_right_width + back_to_inlane_extra_buffer &&
-            ego_sl_boundary.end_l() <
-                lane_left_width - back_to_inlane_extra_buffer) {
+        } else if (ego_sl_boundary.start_l() >
+                       -lane_right_width + back_to_inlane_extra_buffer &&
+                   ego_sl_boundary.end_l() <
+                       lane_left_width - back_to_inlane_extra_buffer) {
           // This means that ADC has safely completed lane-change with margin.
           std::get<1>((*path_point_decision)[i]) =
               PathData::PathPointType::IN_LANE;

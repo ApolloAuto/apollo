@@ -57,9 +57,9 @@ Stage::StageStatus PullOverStageRetryParking::Process(
   const auto& pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
   auto* pull_over_debug = frame->mutable_open_space_info()
-                               ->mutable_debug()
-                               ->mutable_planning_data()
-                               ->mutable_pull_over();
+                              ->mutable_debug()
+                              ->mutable_planning_data()
+                              ->mutable_pull_over();
   pull_over_debug->set_theta(pull_over_status.theta());
   pull_over_debug->set_length_front(pull_over_status.length_front());
   pull_over_debug->set_length_back(pull_over_status.length_back());
