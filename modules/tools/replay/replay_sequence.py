@@ -48,7 +48,7 @@ def seq_publisher(seq_num, period):
             # continue
         messages[topic]["value"] = pb_msg
 
-    rate = rospy.Rate(int(1.0 / period))  # 10hz
+    rate = rospy.Rate(int(1.0 / period))  # 10Hz
     while not rospy.is_shutdown():
         for topic in messages:
             if messages[topic]["value"] is not None:

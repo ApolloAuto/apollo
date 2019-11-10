@@ -27,7 +27,7 @@ import numpy as np
 class FileObject(object):
     """Wrapper for file object"""
 
-    # Initalizing file object
+    # Initializing file object
     def __init__(self, file_path, operation='write', file_type='binary'):
         if operation != 'write' and operation != 'read':
             raise ValueError("Unsupported file operation: %s" % operation)
@@ -100,7 +100,7 @@ class OdometryFileObject(FileObject):
             raise ValueError("Odometry data must be in a list")
         data_size = len(data)
         self._file_object.write(struct.pack('i', data_size))
-        # have to pack seperate, to avoid struct padding, now 8+4+7*8 = 68 bytes
+        # have to pack separate, to avoid struct padding, now 8+4+7*8 = 68 bytes
         # TODO (yuanfan / gchen-Apollo): follow protobuf across tools.
 
         s0 = struct.Struct('d')

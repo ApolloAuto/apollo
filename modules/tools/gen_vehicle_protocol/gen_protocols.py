@@ -111,7 +111,7 @@ def gen_report_value_offset_precision(var, protocol):
     impl = ""
     if var["is_signed_var"]:
         fmt = "\n  x <<= %d;\n  x >>= %d;\n"
-        # x is a int32_t var
+        # x is an int32_t var
         shift_bit = 32 - var["len"]
         impl = impl + fmt % (shift_bit, shift_bit)
 

@@ -36,7 +36,7 @@ from data_file_object import *
 class SensorMessageParser(object):
     """Wrapper for cyber channel message extractor"""
 
-    # Initalizing extractor
+    # Initializing extractor
     def __init__(self, output_path, instance_saving=True):
         """
         instance_saving:
@@ -52,7 +52,7 @@ class SensorMessageParser(object):
         self._timestamp_file = os.path.join(self._output_path, "timestamps.txt")
         self._instance_saving = instance_saving
 
-    #initalizing msg and proto parser
+    #initializing msg and proto parser
     def _init_parser(self):
         raise NotImplementedError
 
@@ -126,7 +126,7 @@ class GpsParser(SensorMessageParser):
 class PointCloudParser(SensorMessageParser):
     """
     class to parse apollo/$(lidar)/PointCloud2 channels.
-    saving seperately each parsed msg
+    saving separately each parsed msg
     """
     def __init__(self, output_path, instance_saving=True):
         super(PointCloudParser, self).__init__(output_path, instance_saving)
@@ -203,7 +203,7 @@ class PointCloudParser(SensorMessageParser):
 class ImageParser(SensorMessageParser):
     """
     class to parse apollo/$(camera)/image channels.
-    saving seperately each parsed msg
+    saving separately each parsed msg
     """
     def __init__(self, output_path, instance_saving=True):
         super(ImageParser, self).__init__(output_path, instance_saving)

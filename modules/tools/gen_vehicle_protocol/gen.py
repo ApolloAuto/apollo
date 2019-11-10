@@ -41,7 +41,7 @@ def gen(conf):
     sender = conf["sender"]
     output_dir = conf["output_dir"]
 
-    # extract dbc file meta to a internal config file
+    # extract dbc file meta to an internal config file
     if not extract_dbc_meta(dbc_file, protocol_conf_file, car_type, black_list,
                             sender_list, sender):
         return

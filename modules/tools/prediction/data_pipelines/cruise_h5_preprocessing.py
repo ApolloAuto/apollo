@@ -30,7 +30,7 @@ import h5py
 def getListOfFiles(dirName):
     '''
     Given a directory (dirName), return a list containing the full-path
-    of all files inside that directory (including all hierachy).
+    of all files inside that directory (including all hierarchy).
     '''
     listOfFiles = os.listdir(dirName)
     allFiles = list()
@@ -136,7 +136,7 @@ if __name__ == '__main__':
                     # Split data into two categories:
                     fea_go, fea_cutin = data_splitting(feature)
 
-                    # Balance data by down-sampling over-sized bins:
+                    # Balance data by down-sampling oversized bins:
                     #fea_go = down_sample(fea_go, [0, 1, 4], [0.0, 0.95, 0.83])
                     #fea_cutin = down_sample(fea_cutin, [-1, 2, 3], [0.985 ,0.0, 0.0])
 
@@ -181,7 +181,7 @@ if __name__ == '__main__':
                     # Split data into two categories:
                     fea_go, fea_cutin = data_splitting(feature)
 
-                    # Balance data by down-sampling over-sized bins:
+                    # Balance data by down-sampling oversized bins:
                     #fea_go = down_sample(fea_go, [0, 1, 4], [0.0, 0.95, 0.83])
                     #fea_cutin = down_sample(fea_cutin, [-1, 2, 3], [0.985 ,0.0, 0.0])
 
