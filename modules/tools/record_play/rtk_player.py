@@ -161,7 +161,7 @@ class RtkPlayer(object):
                 closest_dist_point = i
                 shortest_dist_sqr = dist_sqr
 
-        # failled to find a trajectory matches current gear position
+        # failed to find a trajectory matches current gear position
         if shortest_dist_sqr == float('inf'):
             self.logger.info(
                 'no trajectory point matches current gear position, check gear position')

@@ -50,7 +50,7 @@ def frechet_distance(P, Q):
     try:
         dist = _c(ca, len(P)-1, len(Q)-1, P, Q)
     except:
-        print("calcualte frechet_distance exception.")
+        print("calculate frechet_distance exception.")
     return dist
 
 if __name__ == "__main__":

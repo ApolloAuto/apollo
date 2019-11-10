@@ -198,7 +198,7 @@ def retrieve_image(image_dir, message):
     return message_proto.SerializeToString()
 
 def get_message_id(timestamp, topic):
-    """Unify the way to get an unique identifier for the given message"""
+    """Unify the way to get a unique identifier for the given message"""
     return '{}{}'.format(timestamp, topic.replace('/', '_'))
 
 def image_message_to_proto(py_message):
