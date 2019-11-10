@@ -33,6 +33,6 @@ else
 		python ./modules/tools/create_map/create_map.py -i /tmp/lane.csv -o modules/map/data/${MAP}/base_map.txt -e modules/map/data/${MAP}/default_end_way_point.txt --left_lanes ${LEFT_LANES} --right_lanes ${RIGHT_LANES}
 	fi
 	echo "--map_dir=modules/map/data/${MAP}" >> modules/common/data/global_flagfile.txt
-	./scripts/generate_routing_topo_graph.sh 
+	./scripts/generate_routing_topo_graph.sh
 	./bazel-bin/modules/map/tools/sim_map_generator --map_dir=modules/map/data/${MAP} --output_dir=modules/map/data/${MAP}
 fi

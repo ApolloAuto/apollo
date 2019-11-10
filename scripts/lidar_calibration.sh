@@ -60,11 +60,11 @@ function pack() {
   md5sum lidar_calib.bag > bag_md5
   tar -czvf lidar_calib_data.tar.gz ./lidar_calib.bag ./bag_md5 \
     </dev/null >"${LOG}" 2>&1
-  
+
   if [ -f bag_md5 ]; then
     rm bag_md5
   fi
-  
+
   if [ -f lidar_calib.bag ]; then
     rm lidar_calib.bag
   fi
@@ -73,7 +73,7 @@ function pack() {
 function start_record() {
   LOG="${APOLLO_ROOT_DIR}/data/log/lidar_calibration.out"
   MODULE="republish_msg"
-  
+
   # check if the module has started
   NUM_PROCESSES="$(pgrep -c -f "modules/calibration/${MODULE}")"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then
@@ -83,7 +83,7 @@ function start_record() {
   fi
 
   sleep 1
-  
+
   if [ -f lidar_calib.bag ]; then
     rm lidar_calib.bag
   fi
@@ -104,7 +104,7 @@ function stop_record() {
   pkill -SIGKILL -f rosbag
 
   sleep 1
-  
+
   if [ -f lidar_calib_data.tar.gz ]; then
     rm lidar_calib_data.tar.gz
   fi
@@ -121,7 +121,7 @@ function stop_record() {
 function start_check_extrin() {
   LOG="${APOLLO_ROOT_DIR}/data/log/lidar_calibration.out"
   MODULE="lidar_ex_checker"
-  
+
   # check if the module has started
   NUM_PROCESSES="$(pgrep -c -f "modules/calibration/${MODULE}")"
   if [ "${NUM_PROCESSES}" -eq 0 ]; then

@@ -20,15 +20,15 @@
 i=0;
 j=0;
 for str in $@
-do    
+do
     # The strings starting with "--" are control arguments and need to be filtered.
-    if [[ ${str} =~ ^--.* ]]; then    
+    if [[ ${str} =~ ^--.* ]]; then
         CTRL_ARGS[i++]=${str}
         continue
     fi
     DIR=$(cd "$(dirname ${str} )" && pwd)
     FILE_NAME=$(basename ${str})
-    PATH_NAME[j++]="${DIR}/${FILE_NAME}"    
+    PATH_NAME[j++]="${DIR}/${FILE_NAME}"
 done
 
 #echo "${CTRL_ARGS[@]}"

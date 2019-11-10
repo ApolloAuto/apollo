@@ -19,7 +19,7 @@ cd "${DIR}/.."
 source "${DIR}/apollo_base.sh"
 
 GNSS_LOC_TOPIC="/apollo/localization/msf_gnss"
-LIDAR_LOC_TOPIC="/apollo/localization/msf_lidar" 
+LIDAR_LOC_TOPIC="/apollo/localization/msf_lidar"
 FUSION_LOC_TOPIC="/apollo/localization/pose"
 ODOMETRY_LOC_TOPIC="/apollo/sensor/gnss/odometry"
 CLOUD_TOPIC="/apollo/sensor/velodyne64/compensator/PointCloud2"
@@ -80,21 +80,21 @@ done
 rm -rf compare_fusion_odometry_all.txt
 touch compare_fusion_odometry_all.txt
 for item in  $(find . -name "compare_fusion_odometry.txt")
-do 
+do
   cat $item >> compare_fusion_odometry_all.txt
 done
 
 rm -rf compare_lidar_odometry_all.txt
 touch compare_lidar_odometry_all.txt
 for item in  $(find . -name "compare_lidar_odometry.txt")
-do 
+do
   cat $item >> compare_lidar_odometry_all.txt
 done
 
 rm -rf compare_gnss_odometry_all.txt
 touch compare_gnss_odometry_all.txt
 for item in  $(find . -name "compare_gnss_odometry.txt")
-do 
+do
   cat $item >> compare_gnss_odometry_all.txt
 done
 

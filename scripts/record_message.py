@@ -116,7 +116,7 @@ class Recorder(object):
 
     def record_task(self, disk):
         """
-        Save the full data into <disk>/data/bag/ReusedRecordsPool, 
+        Save the full data into <disk>/data/bag/ReusedRecordsPool,
         which will be cleared every time the smart recorder get started.
         Meanwhile restore the messages we are interested in to <disk>/data/bag/<task_id> directory.
         """
