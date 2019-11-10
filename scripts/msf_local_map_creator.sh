@@ -17,7 +17,7 @@ $APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/map_creation/lossless_map
     --zone_id $3 \
     --coordinate_type UTM \
     --map_resolution_type single
-    
+
 
 $APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/map_creation/lossless_map_to_lossy_map \
     --srcdir $4/lossless_map \

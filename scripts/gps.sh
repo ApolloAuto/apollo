@@ -23,6 +23,6 @@ cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
-# run function from apollo_base.sh 
-# run command_name module_name 
-run_customized_path drivers/gnss gnss "$@" 
+# run function from apollo_base.sh
+# run command_name module_name
+run_customized_path drivers/gnss gnss "$@"
