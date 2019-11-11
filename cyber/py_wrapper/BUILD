@@ -47,7 +47,7 @@ cc_test(
     deps = [
         ":py3_cyber",
         "//cyber/proto:unit_test_cc_proto",
-        "@gtest//:main",
+        "@gtest",
     ],
 )
 
