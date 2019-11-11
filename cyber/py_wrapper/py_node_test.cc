@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/py_wrapper/py_node.h"
+
 #include <memory>
 #include <string>
 
@@ -22,7 +24,6 @@
 #include "cyber/cyber.h"
 #include "cyber/message/py_message.h"
 #include "cyber/proto/unit_test.pb.h"
-#include "cyber/py_wrapper/py_node.h"
 
 using apollo::cyber::Time;
 using apollo::cyber::message::PyMessageWrap;
@@ -34,6 +35,7 @@ int cbfun(const char *channel_name) {
   if (pr) {
     AINFO << "read->[ " << pr->read() << " ]";
   }
+  return 0;
 }
 
 TEST(CyberNodeTest, create_reader) {
@@ -69,10 +71,4 @@ TEST(CyberNodeTest, create_writer) {
 
   delete pw;
   pw = nullptr;
-}
-
-int main(int argc, char **argv) {
-  apollo::cyber::Init(argv[0]);
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }
