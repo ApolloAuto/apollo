@@ -23,6 +23,9 @@
 #include "cyber/cyber.h"
 #include "cyber/proto/unit_test.pb.h"
 
+namespace apollo {
+namespace cyber {
+
 const char TEST_RECORD_FILE[] = "/tmp/py_record_test.record";
 const char CHAN_1[] = "channel/chatter";
 const char CHAN_2[] = "/test2";
@@ -32,7 +35,7 @@ const char MSG_DATA[] = "9876543210";
 const char TEST_FILE[] = "test.record";
 
 TEST(CyberRecordTest, record_readerwriter) {
-  apollo::cyber::record::PyRecordWriter rec_writer;
+  record::PyRecordWriter rec_writer;
   rec_writer.SetSizeOfFileSegmentation(0);
   rec_writer.SetIntervalOfFileSegmentation(0);
 
@@ -45,11 +48,11 @@ TEST(CyberRecordTest, record_readerwriter) {
   rec_writer.Close();
 
   // read
-  apollo::cyber::record::PyRecordReader rec_reader(TEST_RECORD_FILE);
+  record::PyRecordReader rec_reader(TEST_RECORD_FILE);
   AINFO << "++++ begin reading";
 
   sleep(1);
-  apollo::cyber::record::BagMessage bag_msg = rec_reader.ReadMessage();
+  record::BagMessage bag_msg = rec_reader.ReadMessage();
 
   std::set<std::string> channel_list = rec_reader.GetChannelList();
   EXPECT_EQ(1, channel_list.size());
@@ -63,7 +66,7 @@ TEST(CyberRecordTest, record_readerwriter) {
   EXPECT_EQ(MSG_TYPE, bag_msg.data_type);
   EXPECT_EQ(MSG_TYPE, rec_reader.GetMessageType(channel_name));
   const std::string header_str = rec_reader.GetHeaderString();
-  apollo::cyber::proto::Header header;
+  proto::Header header;
   header.ParseFromString(header_str);
   EXPECT_EQ(1, header.major_version());
   EXPECT_EQ(0, header.minor_version());
@@ -71,3 +74,6 @@ TEST(CyberRecordTest, record_readerwriter) {
   EXPECT_EQ(1, header.channel_number());
   EXPECT_TRUE(header.is_complete());
 }
+
+}  // namespace cyber
+}  // namespace apollo

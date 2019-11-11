@@ -16,10 +16,10 @@
 
 #include "cyber/py_wrapper/py_cyber.h"
 
+#include <gtest/gtest.h>
+
 #include <memory>
 #include <string>
-
-#include <gtest/gtest.h>
 
 #include "cyber/cyber.h"
 #include "cyber/message/py_message.h"
@@ -27,16 +27,6 @@
 
 namespace apollo {
 namespace cyber {
-
-PyReader *pr = nullptr;
-
-int cbfun(const char *channel_name) {
-  AINFO << "recv->[ " << channel_name << " ]";
-  if (pr) {
-    AINFO << "read->[ " << pr->read() << " ]";
-  }
-  return 0;
-}
 
 TEST(PyNodeTest, init) {
   EXPECT_TRUE(py_init("py_init_test"));
@@ -50,20 +40,22 @@ TEST(PyNodeTest, create_reader) {
   EXPECT_TRUE(OK());
   proto::Chatter chat;
   PyNode node("listener");
-  pr = node.create_reader("channel/chatter", chat.GetTypeName());
+  std::unique_ptr<PyReader> pr(
+      node.create_reader("channel/chatter", chat.GetTypeName()));
   EXPECT_EQ("apollo.cyber.proto.Chatter", chat.GetTypeName());
   EXPECT_NE(pr, nullptr);
-  pr->register_func(cbfun);
-  delete pr;
-  pr = nullptr;
+  pr->register_func([](const char* channel_name) -> int {
+    AINFO << "recv->[ " << channel_name << " ]";
+    return 0;
+  });
 }
 
 TEST(PyNodeTest, create_writer) {
   EXPECT_TRUE(OK());
   auto msgChat = std::make_shared<proto::Chatter>();
   PyNode node("talker");
-  PyWriter *pw =
-      node.create_writer("channel/chatter", msgChat->GetTypeName(), 10);
+  std::unique_ptr<PyWriter> pw(
+      node.create_writer("channel/chatter", msgChat->GetTypeName(), 10));
   EXPECT_NE(pw, nullptr);
 
   EXPECT_TRUE(OK());
@@ -76,9 +68,6 @@ TEST(PyNodeTest, create_writer) {
   std::string org_data;
   msgChat->SerializeToString(&org_data);
   EXPECT_TRUE(pw->write(org_data));
-
-  delete pw;
-  pw = nullptr;
 }
 
 }  // namespace cyber
