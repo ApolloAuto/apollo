@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/py_wrapper/py_node.h"
+#include "cyber/py_wrapper/py_cyber.h"
 
 #include <memory>
 #include <string>
@@ -25,10 +25,10 @@
 #include "cyber/message/py_message.h"
 #include "cyber/proto/unit_test.pb.h"
 
-using apollo::cyber::Time;
-using apollo::cyber::message::PyMessageWrap;
+namespace apollo {
+namespace cyber {
 
-apollo::cyber::PyReader *pr = nullptr;
+PyReader *pr = nullptr;
 
 int cbfun(const char *channel_name) {
   AINFO << "recv->[ " << channel_name << " ]";
@@ -38,10 +38,18 @@ int cbfun(const char *channel_name) {
   return 0;
 }
 
-TEST(CyberNodeTest, create_reader) {
-  EXPECT_TRUE(apollo::cyber::OK());
-  apollo::cyber::proto::Chatter chat;
-  apollo::cyber::PyNode node("listener");
+TEST(PyNodeTest, init) {
+  EXPECT_TRUE(py_init("py_init_test"));
+  EXPECT_TRUE(py_ok());
+
+  py_shutdown();
+  EXPECT_TRUE(py_is_shutdown());
+}
+
+TEST(PyNodeTest, create_reader) {
+  EXPECT_TRUE(OK());
+  proto::Chatter chat;
+  PyNode node("listener");
   pr = node.create_reader("channel/chatter", chat.GetTypeName());
   EXPECT_EQ("apollo.cyber.proto.Chatter", chat.GetTypeName());
   EXPECT_NE(pr, nullptr);
@@ -50,15 +58,15 @@ TEST(CyberNodeTest, create_reader) {
   pr = nullptr;
 }
 
-TEST(CyberNodeTest, create_writer) {
-  EXPECT_TRUE(apollo::cyber::OK());
-  auto msgChat = std::make_shared<apollo::cyber::proto::Chatter>();
-  apollo::cyber::PyNode node("talker");
-  apollo::cyber::PyWriter *pw =
+TEST(PyNodeTest, create_writer) {
+  EXPECT_TRUE(OK());
+  auto msgChat = std::make_shared<proto::Chatter>();
+  PyNode node("talker");
+  PyWriter *pw =
       node.create_writer("channel/chatter", msgChat->GetTypeName(), 10);
   EXPECT_NE(pw, nullptr);
 
-  EXPECT_TRUE(apollo::cyber::OK());
+  EXPECT_TRUE(OK());
   uint64_t seq = 5;
   msgChat->set_timestamp(Time::Now().ToNanosecond());
   msgChat->set_lidar_timestamp(Time::Now().ToNanosecond());
@@ -72,3 +80,6 @@ TEST(CyberNodeTest, create_writer) {
   delete pw;
   pw = nullptr;
 }
+
+}  // namespace cyber
+}  // namespace apollo

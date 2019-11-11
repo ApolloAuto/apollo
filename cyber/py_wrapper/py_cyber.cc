@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/py_wrapper/py_node.h"
+#include "cyber/py_wrapper/py_cyber.h"
 
 #include <Python.h>
 #include <string>
@@ -31,6 +31,54 @@
 #define C_STR_TO_PY_BYTES(cstr) \
   PyString_FromStringAndSize(cstr.c_str(), cstr.size())
 #endif
+
+
+static PyObject *cyber_py_init(PyObject *self, PyObject *args) {
+  char *data = nullptr;
+  Py_ssize_t len = 0;
+  if (!PyArg_ParseTuple(args, const_cast<char *>("s#:cyber_py_init"), &data,
+                        &len)) {
+    AERROR << "cyber_py_init:PyArg_ParseTuple failed!";
+    Py_RETURN_FALSE;
+  }
+  std::string module_name(data, len);
+  bool is_init = apollo::cyber::py_init(module_name);
+  if (is_init) {
+    Py_RETURN_TRUE;
+  } else {
+    Py_RETURN_FALSE;
+  }
+}
+
+static PyObject *cyber_py_ok(PyObject *self, PyObject *args) {
+  bool is_ok = apollo::cyber::py_ok();
+  if (is_ok) {
+    Py_RETURN_TRUE;
+  } else {
+    Py_RETURN_FALSE;
+  }
+}
+
+static PyObject *cyber_py_shutdown(PyObject *self, PyObject *args) {
+  apollo::cyber::py_shutdown();
+  Py_INCREF(Py_None);
+  return Py_None;
+}
+
+static PyObject *cyber_py_is_shutdown(PyObject *self, PyObject *args) {
+  bool is_shutdown = apollo::cyber::py_is_shutdown();
+  if (is_shutdown) {
+    Py_RETURN_TRUE;
+  } else {
+    Py_RETURN_FALSE;
+  }
+}
+
+static PyObject *cyber_py_waitforshutdown(PyObject *self, PyObject *args) {
+  apollo::cyber::py_waitforshutdown();
+  Py_INCREF(Py_None);
+  return Py_None;
+}
 
 template <typename T>
 T PyObjectToPtr(PyObject *pyobj, const std::string &type_ptr) {
@@ -876,7 +924,14 @@ PyObject *cyber_test1(PyObject *self, PyObject *args) {
 /////////////////////////////////////////////////////////////////////
 //// global for whole page, init module
 /////////////////////////////////////////////////////////////////////
-static PyMethodDef _cyber_node_methods[] = {
+static PyMethodDef _cyber_methods[] = {
+    // PyInit fun
+    {"py_init", cyber_py_init, METH_VARARGS, ""},
+    {"py_ok", cyber_py_ok, METH_NOARGS, ""},
+    {"py_shutdown", cyber_py_shutdown, METH_NOARGS, ""},
+    {"py_is_shutdown", cyber_py_is_shutdown, METH_NOARGS, ""},
+    {"py_waitforshutdown", cyber_py_waitforshutdown, METH_NOARGS, ""},
+
     // PyWriter fun
     {"new_PyWriter", cyber_new_PyWriter, METH_VARARGS, ""},
     {"delete_PyWriter", cyber_delete_PyWriter, METH_VARARGS, ""},
@@ -943,13 +998,13 @@ static PyMethodDef _cyber_node_methods[] = {
 
 /// Init function of this module
 #if PY_MAJOR_VERSION >= 3
-PyMODINIT_FUNC PyInit__cyber_node_py3(void) {
+PyMODINIT_FUNC PyInit__cyber_py3(void) {
   static struct PyModuleDef module_def = {
       PyModuleDef_HEAD_INIT,
-      "_cyber_node_py3",    // Module name.
+      "_cyber_py3",    // Module name.
       "CyberNode module",   // Module doc.
       -1,                   // Module size.
-      _cyber_node_methods,  // Module methods.
+      _cyber_methods,  // Module methods.
       nullptr,
       nullptr,
       nullptr,
@@ -959,7 +1014,7 @@ PyMODINIT_FUNC PyInit__cyber_node_py3(void) {
   return PyModule_Create(&module_def);
 }
 #else
-PyMODINIT_FUNC init_cyber_node(void) {
-  Py_InitModule("_cyber_node", _cyber_node_methods);
+PyMODINIT_FUNC init_cyber(void) {
+  Py_InitModule("_cyber", _cyber_methods);
 }
 #endif

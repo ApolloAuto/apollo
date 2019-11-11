@@ -3,18 +3,18 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_binary(
-    name = "_cyber_init.so",
+    name = "_cyber.so",
     linkshared = True,
     linkstatic = False,
     deps = [
-        ":py_init",
+        ":py_cyber",
     ],
 )
 
 cc_library(
-    name = "py_init",
-    srcs = ["py_init.cc"],
-    hdrs = ["py_init.h"],
+    name = "py_cyber",
+    srcs = ["py_cyber.cc"],
+    hdrs = ["py_cyber.h"],
     deps = [
         "//cyber:cyber_core",
         "@python27",
@@ -22,66 +22,18 @@ cc_library(
 )
 
 cc_binary(
-    name = "_cyber_init_py3.so",
-    linkshared = True,
-    deps = [
-        ":py3_init",
-    ],
-)
-
-cc_library(
-    name = "py3_init",
-    srcs = ["py_init.cc"],
-    hdrs = ["py_init.h"],
-    defines = ["PY_MAJOR_VERSION=3"],
-    deps = [
-        "//cyber:cyber_core",
-        "@fastrtps",
-        "@python3",
-    ],
-)
-
-cc_test(
-    name = "py_init_test",
-    srcs = ["py_init_test.cc"],
-    deps = [
-        ":py3_init",
-        "@gtest//:main",
-    ],
-)
-
-cc_binary(
-    name = "_cyber_node.so",
+    name = "_cyber_py3.so",
     linkshared = True,
     linkstatic = False,
     deps = [
-        ":py_node",
+        ":py3_cyber",
     ],
 )
 
 cc_library(
-    name = "py_node",
-    srcs = ["py_node.cc"],
-    hdrs = ["py_node.h"],
-    deps = [
-        "//cyber:cyber_core",
-        "@python27",
-    ],
-)
-
-cc_binary(
-    name = "_cyber_node_py3.so",
-    linkshared = True,
-    linkstatic = False,
-    deps = [
-        ":py3_node",
-    ],
-)
-
-cc_library(
-    name = "py3_node",
-    srcs = ["py_node.cc"],
-    hdrs = ["py_node.h"],
+    name = "py3_cyber",
+    srcs = ["py_cyber.cc"],
+    hdrs = ["py_cyber.h"],
     defines = ["PY_MAJOR_VERSION=3"],
     deps = [
         "//cyber:cyber_core",
@@ -90,10 +42,10 @@ cc_library(
 )
 
 cc_test(
-    name = "py_node_test",
-    srcs = ["py_node_test.cc"],
+    name = "py_cyber_test",
+    srcs = ["py_cyber_test.cc"],
     deps = [
-        ":py3_node",
+        ":py3_cyber",
         "//cyber/proto:unit_test_cc_proto",
         "@gtest//:main",
     ],
@@ -238,7 +190,7 @@ cc_library(
     name = "py_parameter",
     srcs = ["cyber_parameter_wrap.cc"],
     hdrs = [
-        "py_node.h",
+        "py_cyber.h",
         "py_parameter.h",
     ],
     deps = [

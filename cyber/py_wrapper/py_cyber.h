@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_PY_WRAPPER_PY_NODE_H_
-#define CYBER_PY_WRAPPER_PY_NODE_H_
+#ifndef CYBER_PY_WRAPPER_PY_CYBER_H_
+#define CYBER_PY_WRAPPER_PY_CYBER_H_
 
 #include <unistd.h>
 
@@ -42,6 +42,30 @@
 
 namespace apollo {
 namespace cyber {
+
+bool py_init(const std::string& module_name) {
+  static bool inited = false;
+  if (inited) {
+    AINFO << "cyber already inited.";
+    return true;
+  }
+
+  if (!Init(module_name.c_str())) {
+    AERROR << "cyber::Init failed:" << module_name;
+    return false;
+  }
+  inited = true;
+  AINFO << "cyber init succ.";
+  return true;
+}
+
+bool py_ok() { return OK(); }
+
+void py_shutdown() { return Clear(); }
+
+bool py_is_shutdown() { return IsShutdown(); }
+
+void py_waitforshutdown() { return WaitForShutdown(); }
 
 class PyWriter {
  public:
@@ -540,4 +564,4 @@ class PyServiceUtils {
 }  // namespace cyber
 }  // namespace apollo
 
-#endif  // CYBER_PY_WRAPPER_PY_NODE_H_
+#endif  // CYBER_PY_WRAPPER_PY_CYBER_H_
