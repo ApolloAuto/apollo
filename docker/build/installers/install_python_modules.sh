@@ -31,7 +31,8 @@ apt update -y && apt install -y \
     python3-pip \
     python3-psutil
 
-pip install -r py27_requirements.txt
+pip2 install --no-cache-dir -r py27_requirements.txt
+pip3 install --no-cache-dir -r py3_requirements.txt
 
 # Clean up.
 apt-get clean && rm -rf /var/lib/apt/lists/*

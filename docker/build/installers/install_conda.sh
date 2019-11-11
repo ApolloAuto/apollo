@@ -30,7 +30,6 @@ bash "${INSTALLER}" -b -p "${CONDA_PATH}"
 
 # Init python envs.
 "${CONDA_PATH}/bin/conda" env update -f py27_conda.yaml
-"${CONDA_PATH}/bin/conda" env update -f py37_conda.yaml
 
 # Clean up.
 rm -f "${INSTALLER}"
