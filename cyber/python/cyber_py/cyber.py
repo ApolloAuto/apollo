@@ -27,6 +27,7 @@ import ctypes
 
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
 
+
 PY_CALLBACK_TYPE = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p)
 PY_CALLBACK_TYPE_T = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p)
 
@@ -323,13 +324,8 @@ class Node(object):
     # @param args additional arguments to pass to the callback.
     #
     # @return return the service object.
-    def create_service(
-        self,
-        name,
-        req_data_type,
-        res_data_type,
-        callback,
-            args=None):
+    def create_service(self, name, req_data_type, res_data_type, callback,
+                       args=None):
         self.mutex.acquire()
         if name in self.services.keys():
             self.mutex.release()
