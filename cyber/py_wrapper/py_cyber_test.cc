@@ -28,15 +28,12 @@
 namespace apollo {
 namespace cyber {
 
-TEST(PyNodeTest, init) {
-  EXPECT_TRUE(py_init("py_init_test"));
+TEST(PyCyberTest, init_ok) {
   EXPECT_TRUE(py_ok());
-
-  py_shutdown();
-  EXPECT_TRUE(py_is_shutdown());
+  EXPECT_TRUE(OK());
 }
 
-TEST(PyNodeTest, create_reader) {
+TEST(PyCyberTest, create_reader) {
   EXPECT_TRUE(OK());
   proto::Chatter chat;
   PyNode node("listener");
@@ -50,7 +47,7 @@ TEST(PyNodeTest, create_reader) {
   });
 }
 
-TEST(PyNodeTest, create_writer) {
+TEST(PyCyberTest, create_writer) {
   EXPECT_TRUE(OK());
   auto msgChat = std::make_shared<proto::Chatter>();
   PyNode node("talker");
@@ -72,3 +69,12 @@ TEST(PyNodeTest, create_writer) {
 
 }  // namespace cyber
 }  // namespace apollo
+
+int main(int argc, char** argv) {
+  testing::InitGoogleTest(&argc, argv);
+  apollo::cyber::py_init("py_init_test");
+  const int ret_val = RUN_ALL_TESTS();
+  apollo::cyber::py_shutdown();
+
+  return ret_val;
+}
