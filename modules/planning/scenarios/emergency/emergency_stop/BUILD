@@ -6,9 +6,11 @@ cc_library(
     name = "emergency_stop_scenario",
     srcs = [
         "emergency_stop_scenario.cc",
+        "stage_approach.cc",
     ],
     hdrs = [
         "emergency_stop_scenario.h",
+        "stage_approach.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
