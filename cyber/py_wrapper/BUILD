@@ -70,6 +70,26 @@ cc_library(
 )
 
 cc_binary(
+    name = "_cyber_node_py3.so",
+    linkshared = True,
+    linkstatic = False,
+    deps = [
+        ":py3_node",
+    ],
+)
+
+cc_library(
+    name = "py3_node",
+    srcs = ["py_node.cc"],
+    hdrs = ["py_node.h"],
+    defines = ["PY_MAJOR_VERSION=3"],
+    deps = [
+        "//cyber:cyber_core",
+        "@python3",
+    ],
+)
+
+cc_binary(
     name = "_cyber_record.so",
     linkshared = True,
     deps = [

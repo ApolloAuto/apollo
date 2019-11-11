@@ -14,13 +14,26 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/py_wrapper/py_node.h"
+
 #include <Python.h>
 #include <string>
 #include <vector>
 
-#include "cyber/py_wrapper/py_node.h"
-
+#if PY_MAJOR_VERSION >= 3
+#define PyInt_AsLong PyLong_AsLong
+#define PyInt_FromLong PyLong_FromLong
+#define PYOBJECT_NULL_STRING PyBytes_FromStringAndSize("", 0)
+#define C_STR_TO_PY_BYTES(cstr) \
+  PyBytes_FromStringAndSize(cstr.c_str(), cstr.size())
+#else
 #define PYOBJECT_NULL_STRING PyString_FromStringAndSize("", 0)
+#define C_STR_TO_PY_BYTES(cstr) \
+  PyString_FromStringAndSize(cstr.c_str(), cstr.size())
+#endif
+
+google::protobuf::Message* apollo::cyber::PyChannelUtils::raw_msg_class_ =
+    nullptr;
 
 template <typename T>
 T PyObjectToPtr(PyObject *pyobj, const std::string &type_ptr) {
@@ -171,8 +184,8 @@ PyObject *cyber_PyReader_read(PyObject *self, PyObject *args) {
 
   bool wait = (r == 1);
 
-  std::string reader_ret = reader->read(wait);
-  return PyString_FromStringAndSize(reader_ret.c_str(), reader_ret.size());
+  const std::string reader_ret = reader->read(wait);
+  return C_STR_TO_PY_BYTES(reader_ret);
 }
 
 PyObject *cyber_PyReader_register_func(PyObject *self, PyObject *args) {
@@ -263,10 +276,10 @@ PyObject *cyber_PyClient_send_request(PyObject *self, PyObject *args) {
 
   std::string data_str(data, len);
   ADEBUG << "c++:PyClient_send_request data->[ " << data_str << "]";
-  std::string response_str =
+  const std::string response_str =
       client->send_request((std::string const &)data_str);
   ADEBUG << "c++:response data->[ " << response_str << "]";
-  return PyString_FromStringAndSize(response_str.c_str(), response_str.size());
+  return C_STR_TO_PY_BYTES(response_str);
 }
 
 PyObject *cyber_new_PyService(PyObject *self, PyObject *args) {
@@ -351,9 +364,9 @@ PyObject *cyber_PyService_read(PyObject *self, PyObject *args) {
     return PYOBJECT_NULL_STRING;
   }
 
-  std::string reader_ret = service->read();
+  const std::string reader_ret = service->read();
   ADEBUG << "c++:PyService_read -> " << reader_ret;
-  return PyString_FromStringAndSize(reader_ret.c_str(), reader_ret.size());
+  return C_STR_TO_PY_BYTES(reader_ret);
 }
 
 PyObject *cyber_PyService_write(PyObject *self, PyObject *args) {
@@ -467,6 +480,7 @@ PyObject *cyber_PyNode_create_reader(PyObject *self, PyObject *args) {
   apollo::cyber::PyReader *reader =
       (apollo::cyber::PyReader *)(node->create_reader(
           (std::string const &)channel_name, (std::string const &)type_name));
+  CHECK(reader) << "PyReader is NULL!";
 
   PyObject *pyobj_reader =
       PyCapsule_New(reader, "apollo_cyber_pyreader", nullptr);
@@ -585,13 +599,13 @@ PyObject *cyber_PyChannelUtils_get_msg_type(PyObject *self, PyObject *args) {
           args, const_cast<char *>("s#B:cyber_PyChannelUtils_get_msg_type"),
           &channel_name, &len, &sleep_s)) {
     AERROR << "cyber_PyChannelUtils_get_msg_type failed!";
-    return PyString_FromStringAndSize("", 0);
+    return PYOBJECT_NULL_STRING;
   }
   std::string channel(channel_name, len);
-  std::string msg_type =
+  const std::string msg_type =
       apollo::cyber::PyChannelUtils::get_msgtype_by_channelname(channel,
                                                                 sleep_s);
-  return PyString_FromStringAndSize(msg_type.c_str(), msg_type.size());
+  return C_STR_TO_PY_BYTES(msg_type);
 }
 
 PyObject *cyber_PyChannelUtils_get_debugstring_by_msgtype_rawmsgdata(
@@ -606,13 +620,13 @@ PyObject *cyber_PyChannelUtils_get_debugstring_by_msgtype_rawmsgdata(
           &msgtype, &rawdata, &len)) {
     AERROR
         << "cyber_PyChannelUtils_get_debugstring_by_msgtype_rawmsgdata failed!";
-    return PyString_FromStringAndSize("", 0);
+    return PYOBJECT_NULL_STRING;
   }
   std::string raw_data(rawdata, len);
-  std::string debug_string =
+  const std::string debug_string =
       apollo::cyber::PyChannelUtils::get_debugstring_by_msgtype_rawmsgdata(
           msgtype, raw_data);
-  return PyString_FromStringAndSize(debug_string.c_str(), debug_string.size());
+  return C_STR_TO_PY_BYTES(debug_string);
 }
 
 static PyObject *cyber_PyChannelUtils_get_active_channels(PyObject *self,
@@ -699,9 +713,9 @@ PyObject *cyber_PyNodeUtils_get_node_attr(PyObject *self, PyObject *args) {
     return Py_None;
   }
   std::string name(node_name, len);
-  std::string node_attr =
+  const std::string node_attr =
       apollo::cyber::PyNodeUtils::get_node_attr(name, sleep_s);
-  return PyString_FromStringAndSize(node_attr.c_str(), node_attr.size());
+  return C_STR_TO_PY_BYTES(node_attr);
 }
 
 PyObject *cyber_PyNodeUtils_get_readersofnode(PyObject *self, PyObject *args) {
@@ -789,9 +803,9 @@ PyObject *cyber_PyServiceUtils_get_service_attr(PyObject *self,
     return Py_None;
   }
   std::string name(srv_name, len);
-  std::string srv_attr =
+  const std::string srv_attr =
       apollo::cyber::PyServiceUtils::get_service_attr(name, sleep_s);
-  return PyString_FromStringAndSize(srv_attr.c_str(), srv_attr.size());
+  return C_STR_TO_PY_BYTES(srv_attr);
 }
 /////////////////////////////////////////////////////////////////////
 //// debug pyobject
@@ -807,8 +821,8 @@ PyObject *cyber_test0(PyObject *self, PyObject *args) {
   }
 
   AINFO << "channel, data_type->:" << channel << ":" << data_type;
-  std::string ret_str = "good morning";
-  return PyString_FromStringAndSize(ret_str.c_str(), ret_str.size());
+  const std::string ret_str = "good morning";
+  return C_STR_TO_PY_BYTES(ret_str);
 }
 
 struct student {
@@ -931,6 +945,24 @@ static PyMethodDef _cyber_node_methods[] = {
 };
 
 /// Init function of this module
+#if PY_MAJOR_VERSION >= 3
+PyMODINIT_FUNC PyInit__cyber_node_py3(void) {
+  static struct PyModuleDef module_def = {
+      PyModuleDef_HEAD_INIT,
+      "_cyber_node_py3",    // Module name.
+      "CyberNode module",   // Module doc.
+      -1,                   // Module size.
+      _cyber_node_methods,  // Module methods.
+      nullptr,
+      nullptr,
+      nullptr,
+      nullptr,
+  };
+
+  return PyModule_Create(&module_def);
+}
+#else
 PyMODINIT_FUNC init_cyber_node(void) {
   Py_InitModule("_cyber_node", _cyber_node_methods);
 }
+#endif
