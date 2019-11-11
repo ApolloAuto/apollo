@@ -18,7 +18,7 @@
 #include <set>
 #include <string>
 
-#include "cyber/py_wrapper/py_node.h"
+#include "cyber/py_wrapper/py_cyber.h"
 #include "cyber/py_wrapper/py_parameter.h"
 
 #define PYOBJECT_NULL_STRING PyString_FromStringAndSize("", 0)

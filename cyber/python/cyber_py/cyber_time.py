@@ -36,7 +36,7 @@ sys.path.append(CYBER_PATH + "/lib/python/")
 sys.path.append(CYBER_DIR + "/python/")
 sys.path.append(CYBER_DIR + "/cyber/")
 
-_CYBER_INIT = importlib.import_module('_cyber_init')
+_CYBER = importlib.import_module('_cyber')
 _CYBER_TIME = importlib.import_module('_cyber_time')
 
 
