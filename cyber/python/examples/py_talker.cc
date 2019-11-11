@@ -19,7 +19,7 @@
 
 #include "cyber/cyber.h"
 #include "cyber/proto/unit_test.pb.h"
-#include "cyber/py_wrapper/py_node.h"
+#include "cyber/py_wrapper/py_cyber.h"
 #include "cyber/time/rate.h"
 #include "cyber/time/time.h"
 
