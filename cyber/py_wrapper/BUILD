@@ -61,7 +61,7 @@ cc_binary(
 
 cc_library(
     name = "py_node",
-    srcs = ["cyber_node_wrap.cc"],
+    srcs = ["py_node.cc"],
     hdrs = ["py_node.h"],
     deps = [
         "//cyber:cyber_core",
