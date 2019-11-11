@@ -32,9 +32,6 @@
   PyString_FromStringAndSize(cstr.c_str(), cstr.size())
 #endif
 
-google::protobuf::Message* apollo::cyber::PyChannelUtils::raw_msg_class_ =
-    nullptr;
-
 template <typename T>
 T PyObjectToPtr(PyObject *pyobj, const std::string &type_ptr) {
   T obj_ptr = (T)PyCapsule_GetPointer(pyobj, type_ptr.c_str());
