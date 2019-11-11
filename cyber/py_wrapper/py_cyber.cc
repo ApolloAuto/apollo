@@ -841,75 +841,7 @@ PyObject *cyber_PyServiceUtils_get_service_attr(PyObject *self,
       apollo::cyber::PyServiceUtils::get_service_attr(name, sleep_s);
   return C_STR_TO_PY_BYTES(srv_attr);
 }
-/////////////////////////////////////////////////////////////////////
-//// debug pyobject
-/////////////////////////////////////////////////////////////////////
 
-PyObject *cyber_test0(PyObject *self, PyObject *args) {
-  int channel = 0;
-  int data_type = 0;
-  AINFO << "+++++++++++++++++++++begin";
-  if (!PyArg_ParseTuple(args, "ii", &channel, &data_type)) {
-    Py_INCREF(Py_None);
-    return Py_None;
-  }
-
-  AINFO << "channel, data_type->:" << channel << ":" << data_type;
-  const std::string ret_str = "good morning";
-  return C_STR_TO_PY_BYTES(ret_str);
-}
-
-struct student {
-  std::string name;
-  int age;
-};
-
-student *cyber_student() {
-  student *stu1 = new student();
-  stu1->name = "lily";
-  stu1->age = 22;
-  return stu1;
-}
-
-PyObject *cyber_test1(PyObject *self, PyObject *args) {
-  char *channel = nullptr;
-  char *data_type = nullptr;
-  char *s = 0;
-  int len = 0;
-  if (!PyArg_ParseTuple(args, "sss#", &channel, &data_type, &s, &len)) {
-    Py_INCREF(Py_None);
-    return Py_None;
-  }
-  std::string str(s, len);
-
-  AINFO << "p3: " << str;
-  AINFO << "++++len: " << len;
-  AINFO << str;
-
-  AINFO << "channel, data_type->:" << channel << ":" << data_type;
-
-  student *stu = cyber_student();
-  // ptr->pyobj
-  PyObject *py_stu = PyCapsule_New(stu, "student", nullptr);
-  AINFO << "capsule name->" << PyCapsule_GetName(py_stu);
-
-  AINFO << "===========================";
-  // shared ptr
-  std::vector<std::string> *strPtrV = new std::vector<std::string>;
-  strPtrV->push_back("lily");
-  strPtrV->push_back("Jack");
-  PyObject *py_stu1 = PyCapsule_New(strPtrV, "studentptr", nullptr);
-  AINFO << "capsule name->" << PyCapsule_GetName(py_stu1);
-
-  std::vector<std::string> *stu1_ptr =
-      (std::vector<std::string> *)PyCapsule_GetPointer(py_stu1, "studentptr");
-  if (stu1_ptr) {
-    AINFO << "jiebao->" << (*stu1_ptr)[0] << ";" << (*stu1_ptr)[1];
-  }
-
-  Py_INCREF(Py_None);
-  return Py_None;
-}
 /////////////////////////////////////////////////////////////////////
 //// global for whole page, init module
 /////////////////////////////////////////////////////////////////////
@@ -977,10 +909,6 @@ static PyMethodDef _cyber_methods[] = {
      cyber_PyServiceUtils_get_active_services, METH_VARARGS, ""},
     {"PyServiceUtils_get_service_attr", cyber_PyServiceUtils_get_service_attr,
      METH_VARARGS, ""},
-
-    // for test
-    {"cyber_test0", cyber_test0, METH_VARARGS, "test parms input."},
-    {"cyber_test1", cyber_test1, METH_VARARGS, "test parms input."},
 
     {NULL, NULL, 0, NULL} /* sentinel */
 };
