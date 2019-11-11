@@ -89,6 +89,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "py_node_test",
+    srcs = ["py_node_test.cc"],
+    deps = [
+        ":py3_node",
+        "//cyber/proto:unit_test_cc_proto",
+        "@gtest//:main",
+    ],
+)
+
 cc_binary(
     name = "_cyber_record.so",
     linkshared = True,
