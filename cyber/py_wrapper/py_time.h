@@ -35,18 +35,18 @@ class PyTime {
 
   static PyTime now() {
     PyTime t;
-    t.time_ = cyber::Time::Now();
+    t.time_ = Time::Now();
     return t;
   }
 
   static PyTime mono_time() {
     PyTime t;
-    t.time_ = cyber::Time::MonoTime();
+    t.time_ = Time::MonoTime();
     return t;
   }
 
   static void sleep_until(uint64_t nanoseconds) {
-    cyber::Time::SleepUntil(cyber::Time(nanoseconds));
+    Time::SleepUntil(Time(nanoseconds));
   }
 
   double to_sec() const { return time_.ToSecond(); }
@@ -54,7 +54,7 @@ class PyTime {
   uint64_t to_nsec() const { return time_.ToNanosecond(); }
 
  private:
-  cyber::Time time_;
+  Time time_;
 };
 
 class PyDuration {

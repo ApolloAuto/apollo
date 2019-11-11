@@ -32,7 +32,6 @@
   PyString_FromStringAndSize(cstr.c_str(), cstr.size())
 #endif
 
-
 static PyObject *cyber_py_init(PyObject *self, PyObject *args) {
   char *data = nullptr;
   Py_ssize_t len = 0;
@@ -1001,10 +1000,10 @@ static PyMethodDef _cyber_methods[] = {
 PyMODINIT_FUNC PyInit__cyber_py3(void) {
   static struct PyModuleDef module_def = {
       PyModuleDef_HEAD_INIT,
-      "_cyber_py3",    // Module name.
-      "CyberNode module",   // Module doc.
-      -1,                   // Module size.
-      _cyber_methods,  // Module methods.
+      "_cyber_py3",        // Module name.
+      "CyberNode module",  // Module doc.
+      -1,                  // Module size.
+      _cyber_methods,      // Module methods.
       nullptr,
       nullptr,
       nullptr,
@@ -1014,7 +1013,5 @@ PyMODINIT_FUNC PyInit__cyber_py3(void) {
   return PyModule_Create(&module_def);
 }
 #else
-PyMODINIT_FUNC init_cyber(void) {
-  Py_InitModule("_cyber", _cyber_methods);
-}
+PyMODINIT_FUNC init_cyber(void) { Py_InitModule("_cyber", _cyber_methods); }
 #endif
