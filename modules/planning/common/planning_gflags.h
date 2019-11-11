@@ -43,6 +43,7 @@ DECLARE_string(scenario_yield_sign_config_file);
 
 DECLARE_bool(enable_scenario_bare_intersection);
 DECLARE_bool(enable_scenario_emergency_pull_over);
+DECLARE_bool(enable_scenario_emergency_stop);
 DECLARE_bool(enable_scenario_park_and_go);
 DECLARE_bool(enable_scenario_pull_over);
 DECLARE_bool(enable_scenario_stop_sign);
