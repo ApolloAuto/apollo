@@ -57,12 +57,17 @@ class StGraphPoint {
 
   void SetPrePoint(const StGraphPoint& pre_point);
 
+  double GetOptimalSpeed() const;
+
+  void SetOptimalSpeed(const double optimal_speed);
+
  private:
   STPoint point_;
   const StGraphPoint* pre_point_ = nullptr;
   std::uint32_t index_s_ = 0;
   std::uint32_t index_t_ = 0;
 
+  double optimal_speed_ = 0.0;
   double reference_cost_ = 0.0;
   double obstacle_cost_ = 0.0;
   double spatial_potential_cost_ = 0.0;

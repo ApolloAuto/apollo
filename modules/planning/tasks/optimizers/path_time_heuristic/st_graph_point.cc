@@ -71,5 +71,11 @@ void StGraphPoint::SetPrePoint(const StGraphPoint& pre_point) {
   pre_point_ = &pre_point;
 }
 
+double StGraphPoint::GetOptimalSpeed() const { return optimal_speed_; }
+
+void StGraphPoint::SetOptimalSpeed(const double optimal_speed) {
+  optimal_speed_ = optimal_speed;
+}
+
 }  // namespace planning
 }  // namespace apollo

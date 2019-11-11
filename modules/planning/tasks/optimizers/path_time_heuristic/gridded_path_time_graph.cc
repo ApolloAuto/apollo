@@ -42,6 +42,8 @@ using apollo::common::Status;
 
 namespace {
 
+static constexpr double kDoubleEpsilon = 1.0e-6;
+
 // Continuous-time collision check using linear interpolation as closed-loop
 // dynamics
 bool CheckOverlapOnDpStGraph(const std::vector<const STBoundary*>& boundaries,
@@ -143,6 +145,11 @@ Status GriddedPathTimeGraph::Search(SpeedData* const speed_data) {
 Status GriddedPathTimeGraph::InitCostTable() {
   // Time dimension is homogeneous while Spatial dimension has two resolutions,
   // dense and sparse with dense resolution coming first in the spatial horizon
+  // The least meaningful unit_t_
+  if (unit_t_ < kDoubleEpsilon) {
+    // Sanity check for numerical stability
+    AERROR << "unit_t is smaller than the kDoubleEpsilon.";
+  }
   dimension_t_ = static_cast<uint32_t>(std::ceil(
                      total_length_t_ / static_cast<double>(unit_t_))) +
                  1;
@@ -262,14 +269,11 @@ void GriddedPathTimeGraph::GetRowRange(const StGraphPoint& point,
   // A scaling parameter for DP range search due to the lack of accurate
   // information of the current velocity (set to 1 by default since we use
   // past 1 second's average v as approximation)
-  double acc_coeff = 1.0;
+  double acc_coeff = 0.5;
   if (!point.pre_point()) {
     v0 = init_point_.v();
-    // When we have accurate velocity from TrajectoryPoint,
-    // set acc_coeff to 0.5.
-    acc_coeff = 0.5;
   } else {
-    v0 = (point.point().s() - point.pre_point()->point().s()) / unit_t_;
+    v0 = point.GetOptimalSpeed();
   }
 
   const auto max_s_size = dimension_s_ - 1;
@@ -318,16 +322,25 @@ void GriddedPathTimeGraph::CalculateCostAt(
   if (c == 0) {
     DCHECK_EQ(r, 0) << "Incorrect. Row should be 0 with col = 0. row: " << r;
     cost_cr.SetTotalCost(0.0);
+    cost_cr.SetOptimalSpeed(init_point_.v());
     return;
   }
 
   const double speed_limit = speed_limit_by_index_[r];
   const double cruise_speed = st_graph_data_.cruise_speed();
+  // The mininal s to model as constant acceleration formula
+  // default: 0.25 * 7 = 1.75 m
+  const double min_s_consider_speed = dense_unit_s_ * dimension_t_;
 
   if (c == 1) {
     const double acc =
         2 * (cost_cr.point().s() / unit_t_ - init_point_.v()) / unit_t_;
     if (acc < max_deceleration_ || acc > max_acceleration_) {
+      return;
+    }
+
+    if (init_point_.v() + acc * unit_t_ < -kDoubleEpsilon &&
+        cost_cr.point().s() > min_s_consider_speed) {
       return;
     }
 
@@ -340,6 +353,7 @@ void GriddedPathTimeGraph::CalculateCostAt(
         cost_init.total_cost() +
         CalculateEdgeCostForSecondCol(r, speed_limit, cruise_speed));
     cost_cr.SetPrePoint(cost_init);
+    cost_cr.SetOptimalSpeed(init_point_.v() + acc * unit_t_);
     return;
   }
 
@@ -376,12 +390,20 @@ void GriddedPathTimeGraph::CalculateCostAt(
       // Current acc estimate: curr_a = (curr_v - pre_v) / unit_t
       // = (point.s + prepre_point.s - 2 * pre_point.s) / (unit_t * unit_t)
       const double curr_a =
-          (cost_cr.point().s() + pre_col[r_pre].pre_point()->point().s() -
-           2 * pre_col[r_pre].point().s()) /
-          (unit_t_ * unit_t_);
+          2 *
+          ((cost_cr.point().s() - pre_col[r_pre].point().s()) / unit_t_ -
+           pre_col[r_pre].GetOptimalSpeed()) /
+          unit_t_;
       if (curr_a < max_deceleration_ || curr_a > max_acceleration_) {
         continue;
       }
+
+      if (pre_col[r_pre].GetOptimalSpeed() + curr_a * unit_t_ <
+              -kDoubleEpsilon &&
+          cost_cr.point().s() > min_s_consider_speed) {
+        continue;
+      }
+
       // Filter out continuous-time node connection which is in collision with
       // obstacle
       if (CheckOverlapOnDpStGraph(st_graph_data_.st_boundaries(), cost_cr,
@@ -399,6 +421,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
       if (cost < cost_cr.total_cost()) {
         cost_cr.SetTotalCost(cost);
         cost_cr.SetPrePoint(pre_col[r_pre]);
+        cost_cr.SetOptimalSpeed(pre_col[r_pre].GetOptimalSpeed() +
+                                curr_a * unit_t_);
       }
     }
     return;
@@ -415,12 +439,19 @@ void GriddedPathTimeGraph::CalculateCostAt(
     // Current acc estimate: curr_a = (curr_v - pre_v) / unit_t
     // = (point.s + prepre_point.s - 2 * pre_point.s) / (unit_t * unit_t)
     const double curr_a =
-        (cost_cr.point().s() + pre_col[r_pre].pre_point()->point().s() -
-         2 * pre_col[r_pre].point().s()) /
-        (unit_t_ * unit_t_);
+        2 *
+        ((cost_cr.point().s() - pre_col[r_pre].point().s()) / unit_t_ -
+         pre_col[r_pre].GetOptimalSpeed()) /
+        unit_t_;
     if (curr_a > max_acceleration_ || curr_a < max_deceleration_) {
       continue;
     }
+
+    if (pre_col[r_pre].GetOptimalSpeed() + curr_a * unit_t_ < -kDoubleEpsilon &&
+        cost_cr.point().s() > min_s_consider_speed) {
+      continue;
+    }
+
     if (CheckOverlapOnDpStGraph(st_graph_data_.st_boundaries(), cost_cr,
                                 pre_col[r_pre])) {
       continue;
@@ -449,6 +480,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
     if (cost < cost_cr.total_cost()) {
       cost_cr.SetTotalCost(cost);
       cost_cr.SetPrePoint(pre_col[r_pre]);
+      cost_cr.SetOptimalSpeed(pre_col[r_pre].GetOptimalSpeed() +
+                              curr_a * unit_t_);
     }
   }
 }
@@ -482,6 +515,9 @@ Status GriddedPathTimeGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
   std::vector<SpeedPoint> speed_profile;
   const StGraphPoint* cur_point = best_end_point;
   while (cur_point != nullptr) {
+    ADEBUG << "Time: " << cur_point->point().t();
+    ADEBUG << "S: " << cur_point->point().s();
+    ADEBUG << "V: " << cur_point->GetOptimalSpeed();
     SpeedPoint speed_point;
     speed_point.set_s(cur_point->point().s());
     speed_point.set_t(cur_point->point().t());
