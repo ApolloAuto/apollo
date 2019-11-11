@@ -192,7 +192,15 @@ Status LatController::Init(const ControlConf *control_conf) {
   matrix_a_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_ad_ = Matrix::Zero(basic_state_size_, basic_state_size_);
   matrix_adc_ = Matrix::Zero(matrix_size, matrix_size);
-
+  /*
+  A matrix (Gear Drive)
+  [0.0, 1.0, 0.0, 0.0;
+   0.0, (-(c_f + c_r) / m) / v, (c_f + c_r) / m,
+   (l_r * c_r - l_f * c_f) / m / v;
+   0.0, 0.0, 0.0, 1.0;
+   0.0, ((lr * cr - lf * cf) / i_z) / v, (l_f * c_f - l_r * c_r) / i_z,
+   (-1.0 * (l_f^2 * c_f + l_r^2 * c_r) / i_z) / v;]
+  */
   matrix_a_(0, 1) = 1.0;
   matrix_a_(1, 2) = (cf_ + cr_) / mass_;
   matrix_a_(2, 3) = 1.0;
@@ -204,6 +212,9 @@ Status LatController::Init(const ControlConf *control_conf) {
   matrix_a_coeff_(3, 1) = (lr_ * cr_ - lf_ * cf_) / iz_;
   matrix_a_coeff_(3, 3) = -1.0 * (lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_;
 
+  /*
+  b = [0.0, c_f / m, 0.0, l_f * c_f / i_z]^T
+  */
   matrix_b_ = Matrix::Zero(basic_state_size_, 1);
   matrix_bd_ = Matrix::Zero(basic_state_size_, 1);
   matrix_bdc_ = Matrix::Zero(matrix_size, 1);
@@ -222,7 +233,7 @@ Status LatController::Init(const ControlConf *control_conf) {
   if (matrix_size != q_param_size || matrix_size != reverse_q_param_size) {
     const auto error_msg =
         StrCat("lateral controller error: matrix_q size: ", q_param_size,
-               "lateral controller error: reverse_maxtrix_q size: ",
+               "lateral controller error: reverse_matrix_q size: ",
                reverse_q_param_size,
                " in parameter file not equal to matrix_size: ", matrix_size);
     AERROR << error_msg;
@@ -379,11 +390,29 @@ Status LatController::ComputeControlCommand(
   // replace the lateral translational motion dynamics with the corresponding
   // kinematic models)
   if (vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) {
+    /*
+    A matrix (Gear Reverse)
+    [0.0, 0.0, 1.0 * v 0.0;
+     0.0, (-(c_f + c_r) / m) / v, (c_f + c_r) / m,
+     (l_r * c_r - l_f * c_f) / m / v;
+     0.0, 0.0, 0.0, 1.0;
+     0.0, ((lr * cr - lf * cf) / i_z) / v, (l_f * c_f - l_r * c_r) / i_z,
+     (-1.0 * (l_f^2 * c_f + l_r^2 * c_r) / i_z) / v;]
+    */
     cf_ = -control_conf_->lat_controller_conf().cf();
     cr_ = -control_conf_->lat_controller_conf().cr();
     matrix_a_(0, 1) = 0.0;
     matrix_a_coeff_(0, 2) = 1.0;
   } else {
+    /*
+    A matrix (Gear Drive)
+    [0.0, 1.0, 0.0, 0.0;
+     0.0, (-(c_f + c_r) / m) / v, (c_f + c_r) / m,
+     (l_r * c_r - l_f * c_f) / m / v;
+     0.0, 0.0, 0.0, 1.0;
+     0.0, ((lr * cr - lf * cf) / i_z) / v, (l_f * c_f - l_r * c_r) / i_z,
+     (-1.0 * (l_f^2 * c_f + l_r^2 * c_r) / i_z) / v;]
+    */
     cf_ = control_conf_->lat_controller_conf().cf();
     cr_ = control_conf_->lat_controller_conf().cr();
     matrix_a_(0, 1) = 1.0;
@@ -395,6 +424,10 @@ Status LatController::ComputeControlCommand(
   matrix_a_coeff_(1, 3) = (lr_ * cr_ - lf_ * cf_) / mass_;
   matrix_a_coeff_(3, 1) = (lr_ * cr_ - lf_ * cf_) / iz_;
   matrix_a_coeff_(3, 3) = -1.0 * (lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_;
+
+  /*
+  b = [0.0, c_f / m, 0.0, l_f * c_f / i_z]^T
+  */
   matrix_b_(1, 0) = cf_ / mass_;
   matrix_b_(3, 0) = lf_ * cf_ / iz_;
   matrix_bd_ = matrix_b_ * ts_;
@@ -569,7 +602,10 @@ Status LatController::ComputeControlCommand(
   return Status::OK();
 }
 
-Status LatController::Reset() { return Status::OK(); }
+Status LatController::Reset() {
+  matrix_state_.setZero();
+  return Status::OK();
+}
 
 void LatController::UpdateState(SimpleLateralDebug *debug) {
   auto vehicle_state = VehicleStateProvider::Instance();
