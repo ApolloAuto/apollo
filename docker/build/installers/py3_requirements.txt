@@ -1,0 +1,6 @@
+# Google infras.
+absl-py
+protobuf
+
+# Web.
+requests
