@@ -475,31 +475,38 @@ void LonController::SetDigitalFilter(double ts, double cutoff_freq,
 // TODO(all): Refactor and simplify
 void LonController::GetPathRemain(SimpleLongitudinalDebug *debug) {
   int stop_index = 0;
+  constexpr double kSpeedThreshold = 1e-3;
+  constexpr double kForwardAccThreshold = -1e-2;
+  constexpr double kBackwardAccThreshold = 1e-1;
+  constexpr double kParkingSpeed = 0.1;
 
   if (trajectory_message_->gear() == canbus::Chassis::GEAR_DRIVE) {
     while (stop_index < trajectory_message_->trajectory_point_size()) {
-      if (fabs(trajectory_message_->trajectory_point(stop_index).v()) < 1e-3 &&
-          trajectory_message_->trajectory_point(stop_index).a() > -0.01 &&
+      if (fabs(trajectory_message_->trajectory_point(stop_index).v()) <
+              kSpeedThreshold &&
+          trajectory_message_->trajectory_point(stop_index).a() >
+              kForwardAccThreshold &&
           trajectory_message_->trajectory_point(stop_index).a() < 0.0) {
         break;
-      } else {
-        ++stop_index;
       }
+      ++stop_index;
     }
   } else {
     while (stop_index < trajectory_message_->trajectory_point_size()) {
-      if (fabs(trajectory_message_->trajectory_point(stop_index).v()) < 1e-3 &&
-          trajectory_message_->trajectory_point(stop_index).a() < 0.1 &&
+      if (fabs(trajectory_message_->trajectory_point(stop_index).v()) <
+              kSpeedThreshold &&
+          trajectory_message_->trajectory_point(stop_index).a() <
+              kBackwardAccThreshold &&
           trajectory_message_->trajectory_point(stop_index).a() > 0.0) {
         break;
-      } else {
-        ++stop_index;
       }
+      ++stop_index;
     }
   }
   if (stop_index == trajectory_message_->trajectory_point_size()) {
     --stop_index;
-    if (fabs(trajectory_message_->trajectory_point(stop_index).v()) < 0.1) {
+    if (fabs(trajectory_message_->trajectory_point(stop_index).v()) <
+        kParkingSpeed) {
       ADEBUG << "the last point is selected as parking point";
     } else {
       ADEBUG << "the last point found in path and speed > speed_deadzone";
