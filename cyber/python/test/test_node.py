@@ -30,24 +30,16 @@ def callback(data):
     """
     Reader callback.
     """
-    print "=" * 80
-    print "py:reader callback msg->:"
-    print data
-    print "=" * 80
+    print("=" * 80)
+    print("py:reader callback msg->:")
+    print(data)
+    print("=" * 80)
 
 
 class TestNode(unittest.TestCase):
-
     """
     Class for node unit test.
     """
-    @classmethod
-    def setUpClass(cls):
-        cyber.init()
-
-    @classmethod
-    def tearDownClass(cls):
-        cyber.shutdown()
 
     def test_writer(self):
         """
@@ -79,4 +71,6 @@ class TestNode(unittest.TestCase):
                          "apollo.common.util.test.SimpleMessage")
 
 if __name__ == '__main__':
+    cyber.init()
     unittest.main()
+    cyber.shutdown()
