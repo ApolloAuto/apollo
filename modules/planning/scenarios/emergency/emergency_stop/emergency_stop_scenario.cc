@@ -21,6 +21,8 @@
 #include "modules/planning/scenarios/emergency/emergency_stop/emergency_stop_scenario.h"
 
 #include "cyber/common/log.h"
+#include "modules/planning/scenarios/emergency/emergency_stop/stage_approach.h"
+#include "modules/planning/scenarios/emergency/emergency_stop/stage_standby.h"
 
 namespace apollo {
 namespace planning {
@@ -51,6 +53,16 @@ void EmergencyStopScenario::RegisterStages() {
   if (!s_stage_factory_.Empty()) {
     s_stage_factory_.Clear();
   }
+  s_stage_factory_.Register(
+      ScenarioConfig::EMERGENCY_STOP_APPROACH,
+      [](const ScenarioConfig::StageConfig& config) -> Stage* {
+        return new EmergencyStopStageApproach(config);
+      });
+  s_stage_factory_.Register(
+      ScenarioConfig::EMERGENCY_STOP_STANDBY,
+      [](const ScenarioConfig::StageConfig& config) -> Stage* {
+        return new EmergencyStopStageStandby(config);
+      });
 }
 
 std::unique_ptr<Stage> EmergencyStopScenario::CreateStage(
