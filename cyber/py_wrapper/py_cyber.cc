@@ -99,7 +99,6 @@ PyObject *cyber_new_PyWriter(PyObject *self, PyObject *args) {
   char *channel_name = nullptr;
   char *data_type = nullptr;
   uint32_t qos_depth = 1;
-  Node *node = nullptr;
 
   PyObject *node_pyobj = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char *>("ssIO:new_PyWriter"),
@@ -108,7 +107,7 @@ PyObject *cyber_new_PyWriter(PyObject *self, PyObject *args) {
     return Py_None;
   }
 
-  node = reinterpret_cast<Node *>(
+  Node* node = reinterpret_cast<Node *>(
       PyCapsule_GetPointer(node_pyobj, "apollo_cyber_pynode"));
   if (nullptr == node) {
     AERROR << "node is null";
@@ -125,8 +124,6 @@ PyObject *cyber_new_PyWriter(PyObject *self, PyObject *args) {
 }
 
 PyObject *cyber_delete_PyWriter(PyObject *self, PyObject *args) {
-  PyWriter *writer = nullptr;
-
   PyObject *writer_py = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char *>("O:delete_PyWriter"),
                         &writer_py)) {
@@ -134,7 +131,7 @@ PyObject *cyber_delete_PyWriter(PyObject *self, PyObject *args) {
     return Py_None;
   }
 
-  writer = reinterpret_cast<PyWriter *>(
+  PyWriter* writer = reinterpret_cast<PyWriter *>(
       PyCapsule_GetPointer(writer_py, "apollo_cyber_pywriter"));
   delete writer;
   Py_INCREF(Py_None);
@@ -167,16 +164,14 @@ PyObject *cyber_PyWriter_write(PyObject *self, PyObject *args) {
 PyObject *cyber_new_PyReader(PyObject *self, PyObject *args) {
   char *channel_name = nullptr;
   char *data_type = nullptr;
-  Node *node = 0;
-
-  PyObject *node_pyobj = 0;
+  PyObject *node_pyobj = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char *>("ssO:new_PyReader"),
                         &channel_name, &data_type, &node_pyobj)) {
     Py_INCREF(Py_None);
     return Py_None;
   }
 
-  node = reinterpret_cast<Node *>(
+  Node* node = reinterpret_cast<Node *>(
       PyCapsule_GetPointer(node_pyobj, "apollo_cyber_pynode"));
   if (!node) {
     AERROR << "node is null";
@@ -192,7 +187,7 @@ PyObject *cyber_new_PyReader(PyObject *self, PyObject *args) {
 }
 
 PyObject *cyber_delete_PyReader(PyObject *self, PyObject *args) {
-  PyObject *reader_py = 0;
+  PyObject *reader_py = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char *>("O:delete_PyReader"),
                         &reader_py)) {
     Py_INCREF(Py_None);
@@ -238,8 +233,8 @@ PyObject *cyber_PyReader_read(PyObject *self, PyObject *args) {
 }
 
 PyObject *cyber_PyReader_register_func(PyObject *self, PyObject *args) {
-  PyObject *pyobj_regist_fun = 0;
-  PyObject *pyobj_reader = 0;
+  PyObject *pyobj_regist_fun = nullptr;
+  PyObject *pyobj_reader = nullptr;
 
   int (*callback_fun)(char const *) = (int (*)(char const *))0;
 
@@ -262,18 +257,16 @@ PyObject *cyber_PyReader_register_func(PyObject *self, PyObject *args) {
 }
 
 PyObject *cyber_new_PyClient(PyObject *self, PyObject *args) {
-  char *channel_name = 0;
-  char *data_type = 0;
-  Node *node = 0;
-
-  PyObject *node_pyobj = 0;
+  char *channel_name = nullptr;
+  char *data_type = nullptr;
+  PyObject *node_pyobj = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char *>("ssO:new_PyClient"),
                         &channel_name, &data_type, &node_pyobj)) {
     Py_INCREF(Py_None);
     return Py_None;
   }
 
-  node = reinterpret_cast<Node *>(
+  Node* node = reinterpret_cast<Node *>(
       PyCapsule_GetPointer(node_pyobj, "apollo_cyber_pynode"));
   if (!node) {
     AERROR << "node is null";
@@ -289,7 +282,7 @@ PyObject *cyber_new_PyClient(PyObject *self, PyObject *args) {
 }
 
 PyObject *cyber_delete_PyClient(PyObject *self, PyObject *args) {
-  PyObject *client_py = 0;
+  PyObject *client_py = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char *>("O:delete_PyClient"),
                         &client_py)) {
     Py_INCREF(Py_None);
@@ -330,18 +323,16 @@ PyObject *cyber_PyClient_send_request(PyObject *self, PyObject *args) {
 }
 
 PyObject *cyber_new_PyService(PyObject *self, PyObject *args) {
-  char *channel_name = 0;
-  char *data_type = 0;
-  Node *node = 0;
-
-  PyObject *node_pyobj = 0;
+  char *channel_name = nullptr;
+  char *data_type = nullptr;
+  PyObject *node_pyobj = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char *>("ssO:new_PyService"),
                         &channel_name, &data_type, &node_pyobj)) {
     Py_INCREF(Py_None);
     return Py_None;
   }
 
-  node = reinterpret_cast<Node *>(
+  Node* node = reinterpret_cast<Node *>(
       PyCapsule_GetPointer(node_pyobj, "apollo_cyber_pynode"));
   if (!node) {
     AERROR << "node is null";
@@ -357,7 +348,7 @@ PyObject *cyber_new_PyService(PyObject *self, PyObject *args) {
 }
 
 PyObject *cyber_delete_PyService(PyObject *self, PyObject *args) {
-  PyObject *pyobj_service = 0;
+  PyObject *pyobj_service = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char *>("O:delete_PyService"),
                         &pyobj_service)) {
     Py_INCREF(Py_None);
@@ -910,7 +901,7 @@ static PyMethodDef _cyber_methods[] = {
     {"PyServiceUtils_get_service_attr", cyber_PyServiceUtils_get_service_attr,
      METH_VARARGS, ""},
 
-    {NULL, NULL, 0, NULL} /* sentinel */
+    {nullptr, nullptr, 0, nullptr} /* sentinel */
 };
 
 /// Init function of this module
