@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -20,8 +20,8 @@
 
 import sys
 
-from cyber_py import cyber
-from cyber_py import record
+from cyber_py import cyber_py3 as cyber
+from cyber_py import record_py3 as record
 from cyber.proto import record_pb2
 
 
