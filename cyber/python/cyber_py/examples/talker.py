@@ -16,14 +16,13 @@
 # limitations under the License.
 # ****************************************************************************
 # -*- coding: utf-8 -*-
-from cyber_py import cyber
-from cyber.proto.unit_test_pb2 import ChatterBenchmark
 """Module for example of talker."""
 
-import time
 import sys
+import time
 
-sys.path.append("../")
+from cyber_py import cyber
+from cyber.proto.unit_test_pb2 import ChatterBenchmark
 
 
 def test_talker_class():

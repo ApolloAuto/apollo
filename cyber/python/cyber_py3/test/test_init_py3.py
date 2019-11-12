@@ -21,7 +21,6 @@
 import sys
 import unittest
 
-sys.path.append("../")
 from cyber_py3 import cyber
 
 

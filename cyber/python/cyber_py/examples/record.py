@@ -21,7 +21,6 @@
 import time
 import sys
 
-sys.path.append("../")
 from cyber.proto.unit_test_pb2 import Chatter
 from cyber_py import record
 from google.protobuf.descriptor_pb2 import FileDescriptorProto

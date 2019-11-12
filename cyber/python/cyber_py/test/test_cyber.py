@@ -22,7 +22,6 @@ import sys
 import time
 import unittest
 
-sys.path.append("../")
 from cyber_py import cyber
 from modules.common.util.testdata.simple_pb2 import SimpleMessage
 
