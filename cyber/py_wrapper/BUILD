@@ -188,12 +188,10 @@ cc_binary(
 
 cc_library(
     name = "py_parameter",
-    srcs = ["cyber_parameter_wrap.cc"],
-    hdrs = [
-        "py_cyber.h",
-        "py_parameter.h",
-    ],
+    srcs = ["py_parameter.cc"],
+    hdrs = ["py_parameter.h"],
     deps = [
+        ":py_cyber",
         "//cyber:cyber_core",
         "@python27",
     ],
