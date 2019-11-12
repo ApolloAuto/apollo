@@ -54,7 +54,8 @@ Status STBoundsDecider::Process(Frame* const frame,
 
   // Sweep the t-axis, and determine the s-boundaries step by step.
   STBound regular_st_bound;
-  Status ret = GenerateRegularSTBound(&regular_st_bound);
+  STBound regular_vt_bound;
+  Status ret = GenerateRegularSTBound(&regular_st_bound, &regular_vt_bound);
   if (!ret.ok()) {
     ADEBUG << "Cannot generate a regular ST-boundary.";
     return Status(ErrorCode::PLANNING_ERROR, ret.error_message());
@@ -64,6 +65,9 @@ Status STBoundsDecider::Process(Frame* const frame,
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+  StGraphData *st_graph_data = reference_line_info_->mutable_st_graph_data();
+  st_graph_data->set_s_boundary(regular_st_bound);
+  st_graph_data->set_v_limits(regular_vt_bound);
 
   // Record the ST-Graph for good visualization and easy debugging.
   auto all_st_boundaries = st_obstacles_processor_.GetAllSTBoundaries();
@@ -105,18 +109,22 @@ void STBoundsDecider::InitSTBoundsDecider(
                           frame.PlanningStartPoint().v());
 }
 
-Status STBoundsDecider::GenerateRegularSTBound(STBound* const st_bound) {
+Status STBoundsDecider::GenerateRegularSTBound(
+    STBound* const st_bound, STBound* const vt_bound) {
   // Initialize st-boundary.
   for (double curr_t = 0.0; curr_t <= st_bounds_config_.total_time();
        curr_t += kSTBoundsDeciderResolution) {
     st_bound->emplace_back(curr_t, std::numeric_limits<double>::lowest(),
                            std::numeric_limits<double>::max());
+    vt_bound->emplace_back(curr_t, std::numeric_limits<double>::lowest(),
+                           std::numeric_limits<double>::max());
   }
 
   // Sweep-line to get detailed ST-boundary.
   for (size_t i = 0; i < st_bound->size(); ++i) {
-    double t, s_lower, s_upper;
+    double t, s_lower, s_upper, lower_obs_v, upper_obs_v;
     std::tie(t, s_lower, s_upper) = st_bound->at(i);
+    std::tie(t, lower_obs_v, upper_obs_v) = vt_bound->at(i);
     ADEBUG << "Processing st-boundary at t = " << t;
 
     // Get Boundary due to driving limits
@@ -154,14 +162,22 @@ Status STBoundsDecider::GenerateRegularSTBound(STBound* const st_bound) {
                     &available_choices);
       // Select the top decision.
       auto top_choice_s_range = available_choices.front().first;
-      s_lower = std::fmax(s_lower, std::get<1>(top_choice_s_range));
-      s_upper = std::fmin(s_upper, std::get<2>(top_choice_s_range));
+      bool is_limited_by_upper_obs = false;
+      bool is_limited_by_lower_obs = false;
+      if (s_lower < std::get<1>(top_choice_s_range)) {
+        s_lower = std::get<1>(top_choice_s_range);
+        is_limited_by_lower_obs = true;
+      }
+      if (s_upper > std::get<2>(top_choice_s_range)) {
+        s_upper = std::get<2>(top_choice_s_range);
+        is_limited_by_upper_obs = true;
+      }
 
       // Set decision for obstacles without decisions.
       auto top_choice_decision = available_choices.front().second;
       st_obstacles_processor_.SetObstacleDecision(top_choice_decision);
 
-      // Update st-guide-line and st-driving-limit info.
+      // Update st-guide-line, st-driving-limit info, and v-limits.
       std::pair<double, double> limiting_speed_info;
       if (st_obstacles_processor_.GetLimitingSpeedInfo(t,
                                                        &limiting_speed_info)) {
@@ -170,11 +186,18 @@ Status STBoundsDecider::GenerateRegularSTBound(STBound* const st_bound) {
             limiting_speed_info.second);
         st_guide_line_.UpdateBlockingInfo(t, s_lower, true);
         st_guide_line_.UpdateBlockingInfo(t, s_upper, false);
+        if (is_limited_by_lower_obs) {
+          lower_obs_v = limiting_speed_info.first;
+        }
+        if (is_limited_by_upper_obs) {
+          upper_obs_v = limiting_speed_info.second;
+        }
       }
     }
 
     // Update into st_bound
     st_bound->at(i) = std::make_tuple(t, s_lower, s_upper);
+    st_bound->at(i) = std::make_tuple(t, lower_obs_v, upper_obs_v);
   }
 
   return Status::OK();
