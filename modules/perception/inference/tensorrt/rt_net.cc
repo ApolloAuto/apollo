@@ -457,8 +457,6 @@ void RTNet::addLayer(const LayerParameter &layer_param,
   } else if (layer_param.type() == "ArgMax") {
     addArgmaxLayer(layer_param, inputs, nbInputs, net, tensor_map,
                    tensor_modify_map);
-  } else if (layer_param.type() == "Padding") {
-    addPaddingLayer(layer_param, inputs, net, tensor_map, tensor_modify_map);
   } else if (layer_param.type() == "Dropout") {
     AINFO << "skip dropout";
   } else if (layer_param.type() == "Power") {
