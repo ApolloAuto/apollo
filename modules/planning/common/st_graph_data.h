@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <tuple>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -60,6 +61,24 @@ class StGraphData {
 
   planning_internal::STGraphDebug* mutable_st_graph_debug();
 
+  void set_s_boundary(
+      const std::vector<std::tuple<double, double, double>>& s_boundary) {
+    s_boundary_ = s_boundary;
+  }
+
+  std::vector<std::tuple<double, double, double>> s_boundary() const {
+    return s_boundary_;
+  }
+
+  void set_v_limits(
+      const std::vector<std::tuple<double, double, double>>& v_limits) {
+    v_limits_ = v_limits;
+  }
+
+  std::vector<std::tuple<double, double, double>> v_limits() const {
+    return v_limits_;
+  }
+
  private:
   bool init_ = false;
   std::vector<const STBoundary*> st_boundaries_;
@@ -71,6 +90,9 @@ class StGraphData {
   double path_length_by_conf_ = 0.0;
   double total_time_by_conf_ = 0.0;
   planning_internal::STGraphDebug* st_graph_debug_ = nullptr;
+
+  std::vector<std::tuple<double, double, double>> s_boundary_;
+  std::vector<std::tuple<double, double, double>> v_limits_;
 };
 
 }  // namespace planning

@@ -53,7 +53,8 @@ class STBoundsDecider : public Decider {
                            ReferenceLineInfo* const reference_line_info);
 
   common::Status GenerateRegularSTBound(
-      std::vector<std::tuple<double, double, double>>* const st_bound);
+      std::vector<std::tuple<double, double, double>>* const st_bound,
+      std::vector<std::tuple<double, double, double>>* const vt_bound);
 
   void RankDecisions(
       double s_guide_line, std::pair<double, double> driving_limit,
