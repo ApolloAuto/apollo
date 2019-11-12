@@ -27,7 +27,6 @@ CYBER_PATH = os.environ['CYBER_PATH']
 CYBER_DIR = os.path.split(CYBER_PATH)[0]
 sys.path.append(CYBER_PATH + "/third_party/")
 sys.path.append(CYBER_PATH + "/lib/")
-sys.path.append(CYBER_PATH + "/python/cyber_py")
 
 sys.path.append(CYBER_PATH + "/lib/python/")
 
