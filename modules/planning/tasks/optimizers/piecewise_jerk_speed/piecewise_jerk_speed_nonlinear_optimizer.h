@@ -40,14 +40,55 @@ class PiecewiseJerkSpeedNonlinearOptimizer : public SpeedOptimizer {
                          const common::TrajectoryPoint& init_point,
                          SpeedData* const speed_data) override;
 
-  PiecewiseJerkTrajectory1d SmoothSpeedLimit(const SpeedLimit& speed_limit);
+  common::Status SetUpStatesAndBounds(const PathData& path_data);
 
-  PiecewiseJerkTrajectory1d SmoothPathCurvature(const PathData& path_data);
+  bool CheckSpeedLimitFeasibility();
 
-  bool CheckStBoundFeasibility(
-      const int num_of_knots, const double delta_t,
-      const std::array<double, 3>& init_s,
-      const std::vector<std::pair<double, double>>& s_bounds);
+  common::Status SmoothSpeedLimit();
+
+  common::Status SmoothPathCurvature(const PathData& path_data);
+
+  common::Status OptimizeByQP(SpeedData* const speed_data,
+                              std::vector<double>* distance,
+                              std::vector<double>* velocity,
+                              std::vector<double>* acceleration);
+
+  common::Status OptimizeByNLP(std::vector<double>* distance,
+                               std::vector<double>* velocity,
+                               std::vector<double>* acceleration);
+
+  // st problem dimensions
+  double delta_t_ = 0.0;
+  double total_length_ = 0.0;
+  double total_time_ = 0.0;
+  int num_of_knots_ = 0;
+
+  // st initial values
+  double s_init_ = 0.0;
+  double s_dot_init_ = 0.0;
+  double s_ddot_init_ = 0.0;
+
+  // st states dynamically feasibility bounds
+  double s_dot_max_ = 0.0;
+  double s_ddot_max_ = 0.0;
+  double s_ddot_min_ = 0.0;
+  double s_dddot_abs_max_ = 0.0;
+
+  // st safety bounds
+  std::vector<std::pair<double, double>> s_bounds_;
+
+  // speed limits
+  SpeedLimit speed_limit_;
+  PiecewiseJerkTrajectory1d smoothed_speed_limit_;
+
+  // smoothed path curvature profile as a function of traversal distance
+  PiecewiseJerkTrajectory1d smoothed_path_curvature_;
+
+  // reference speed profile
+  SpeedData reference_speed_data_;
+
+  // reference cruise speed
+  double cruise_speed_;
 };
 
 }  // namespace planning
