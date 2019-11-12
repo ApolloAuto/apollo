@@ -20,7 +20,6 @@
 
 import sys
 
-sys.path.append("../")
 from cyber_py import cyber
 from cyber_py import record
 
