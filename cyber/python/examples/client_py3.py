@@ -1,5 +1,5 @@
 
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -21,7 +21,7 @@
 import os
 import time
 
-from cyber_py import cyber
+from cyber_py import cyber_py3 as cyber
 from cyber.proto.unit_test_pb2 import ChatterBenchmark
 
 
