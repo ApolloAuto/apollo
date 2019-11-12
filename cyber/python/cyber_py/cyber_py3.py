@@ -223,7 +223,7 @@ class Node(object):
         return Writer(name, writer, datatype)
 
     def reader_callback(self, name):
-        sub = self.subs[name]
+        sub = self.subs[name.decode('utf8')]
         msg_str = _CYBER.PyReader_read(sub[0], False)
         if len(msg_str) > 0:
             if sub[3] != "RawData":
