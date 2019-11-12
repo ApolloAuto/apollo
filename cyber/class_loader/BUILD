@@ -43,6 +43,10 @@ cc_test(
     srcs = [
         "class_loader_test.cc",
     ],
+    data = [
+        "//cyber/class_loader/test:plugin1",
+        "//cyber/class_loader/test:plugin2",
+    ],
     deps = [
         "//cyber",
         "//cyber/class_loader/test:base",
