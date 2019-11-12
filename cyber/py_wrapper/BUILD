@@ -197,4 +197,24 @@ cc_library(
     ],
 )
 
+cc_binary(
+    name = "_cyber_parameter_py3.so",
+    linkshared = True,
+    deps = [
+        ":py3_parameter",
+    ],
+)
+
+cc_library(
+    name = "py3_parameter",
+    srcs = ["py_parameter.cc"],
+    hdrs = ["py_parameter.h"],
+    defines = ["PY_MAJOR_VERSION=3"],
+    deps = [
+        ":py3_cyber",
+        "//cyber:cyber_core",
+        "@python3",
+    ],
+)
+
 cpplint()
