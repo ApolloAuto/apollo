@@ -107,6 +107,18 @@ class PredictorManager {
       const ADCTrajectoryContainer* adc_trajectory_container,
       ObstaclesContainer* obstacles_container);
 
+  void InitVehiclePredictors(const ObstacleConf& conf);
+
+  void InitCyclistPredictors(const ObstacleConf& conf);
+
+  void InitDefaultPredictors(const ObstacleConf& conf);
+
+  Predictor* GetVehiclePredictor(const Obstacle& obstacle);
+
+  Predictor* GetCyclistPredictor(const Obstacle& obstacle);
+
+  Predictor* GetDefaultPredictor(const Obstacle& obstacle);
+
  private:
   std::map<ObstacleConf::PredictorType, std::unique_ptr<Predictor>> predictors_;
 
@@ -133,6 +145,12 @@ class PredictorManager {
 
   ObstacleConf::PredictorType default_off_lane_predictor_ =
       ObstacleConf::FREE_MOVE_PREDICTOR;
+
+  ObstacleConf::PredictorType vehicle_on_lane_caution_predictor_ =
+      ObstacleConf::MOVE_SEQUENCE_PREDICTOR;
+
+  ObstacleConf::PredictorType vehicle_in_junction_caution_predictor_ =
+      ObstacleConf::INTERACTION_PREDICTOR;
 
   PredictionObstacles prediction_obstacles_;
 
