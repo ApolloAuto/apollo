@@ -246,6 +246,8 @@ class Obstacle {
    */
   void SetCaution();
 
+  bool IsCaution() const;
+
   void SetEvaluatorType(const ObstacleConf::EvaluatorType& evaluator_type);
 
   void SetPredictorType(const ObstacleConf::PredictorType& predictor_type);

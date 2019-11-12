@@ -1673,6 +1673,14 @@ void Obstacle::SetCaution() {
   feature->mutable_priority()->set_priority(ObstaclePriority::CAUTION);
 }
 
+bool Obstacle::IsCaution() const {
+  if (feature_history_.size() == 0) {
+    return false;
+  }
+  const Feature& feature = latest_feature();
+  return feature.priority().priority() == ObstaclePriority::CAUTION;
+}
+
 void Obstacle::SetEvaluatorType(
     const ObstacleConf::EvaluatorType& evaluator_type) {
   obstacle_conf_.set_evaluator_type(evaluator_type);
