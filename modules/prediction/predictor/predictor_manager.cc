@@ -77,58 +77,34 @@ void PredictorManager::RegisterPredictors() {
 }
 
 void PredictorManager::Init(const PredictionConf& config) {
-  for (const auto& obstacle_conf : config.obstacle_conf()) {
-    if (!obstacle_conf.has_obstacle_type()) {
-      AERROR << "Obstacle config [" << obstacle_conf.ShortDebugString()
+  for (const auto& conf : config.obstacle_conf()) {
+    if (!conf.has_obstacle_type()) {
+      AERROR << "Obstacle config [" << conf.ShortDebugString()
              << "] has not defined obstacle type.";
       continue;
     }
 
-    if (!obstacle_conf.has_predictor_type()) {
-      AERROR << "Obstacle config [" << obstacle_conf.ShortDebugString()
+    if (!conf.has_predictor_type()) {
+      AERROR << "Obstacle config [" << conf.ShortDebugString()
              << "] has not defined predictor type.";
       continue;
     }
 
-    switch (obstacle_conf.obstacle_type()) {
+    switch (conf.obstacle_type()) {
       case PerceptionObstacle::VEHICLE: {
-        if (obstacle_conf.has_obstacle_status()) {
-          if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
-            vehicle_on_lane_predictor_ = obstacle_conf.predictor_type();
-          } else if (obstacle_conf.obstacle_status() ==
-                     ObstacleConf::OFF_LANE) {
-            vehicle_off_lane_predictor_ = obstacle_conf.predictor_type();
-          } else if (obstacle_conf.obstacle_status() ==
-                     ObstacleConf::IN_JUNCTION) {
-            vehicle_in_junction_predictor_ = obstacle_conf.predictor_type();
-          }
-        }
+        InitVehiclePredictors(conf);
         break;
       }
       case PerceptionObstacle::BICYCLE: {
-        if (obstacle_conf.has_obstacle_status()) {
-          if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
-            cyclist_on_lane_predictor_ = obstacle_conf.predictor_type();
-          } else if (obstacle_conf.obstacle_status() ==
-                     ObstacleConf::OFF_LANE) {
-            cyclist_off_lane_predictor_ = obstacle_conf.predictor_type();
-          }
-        }
+        InitCyclistPredictors(conf);
         break;
       }
       case PerceptionObstacle::PEDESTRIAN: {
-        pedestrian_predictor_ = obstacle_conf.predictor_type();
+        pedestrian_predictor_ = conf.predictor_type();
         break;
       }
       case PerceptionObstacle::UNKNOWN: {
-        if (obstacle_conf.has_obstacle_status()) {
-          if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
-            default_on_lane_predictor_ = obstacle_conf.predictor_type();
-          } else if (obstacle_conf.obstacle_status() ==
-                     ObstacleConf::OFF_LANE) {
-            default_off_lane_predictor_ = obstacle_conf.predictor_type();
-          }
-        }
+        InitDefaultPredictors(conf);
         break;
       }
       default: { break; }
@@ -143,8 +119,8 @@ void PredictorManager::Init(const PredictionConf& config) {
         << cyclist_on_lane_predictor_ << "].";
   AINFO << "Defined bicycle off lane obstacle predictor ["
         << cyclist_off_lane_predictor_ << "].";
-  AINFO << "Defined pedestrian obstacle predictor [" << pedestrian_predictor_
-        << "].";
+  AINFO << "Defined pedestrian obstacle predictor ["
+        << pedestrian_predictor_ << "].";
   AINFO << "Defined default on lane obstacle predictor ["
         << default_on_lane_predictor_ << "].";
   AINFO << "Defined default off lane obstacle predictor ["
@@ -266,17 +242,7 @@ void PredictorManager::PredictObstacle(
   } else {
     switch (obstacle->type()) {
       case PerceptionObstacle::VEHICLE: {
-        if (!obstacle->IsOnLane()) {
-          predictor = GetPredictor(vehicle_off_lane_predictor_);
-          CHECK_NOTNULL(predictor);
-        } else if (obstacle->HasJunctionFeatureWithExits() &&
-                   !obstacle->IsCloseToJunctionExit()) {
-          predictor = GetPredictor(vehicle_in_junction_predictor_);
-          CHECK_NOTNULL(predictor);
-        } else {
-          predictor = GetPredictor(vehicle_on_lane_predictor_);
-          CHECK_NOTNULL(predictor);
-        }
+        predictor = GetVehiclePredictor(*obstacle);
         break;
       }
       case PerceptionObstacle::PEDESTRIAN: {
@@ -284,20 +250,11 @@ void PredictorManager::PredictObstacle(
         break;
       }
       case PerceptionObstacle::BICYCLE: {
-        if (obstacle->IsOnLane()) {
-          predictor = GetPredictor(cyclist_on_lane_predictor_);
-          // TODO(kechxu) add a specific predictor in junction
-        } else {
-          predictor = GetPredictor(cyclist_off_lane_predictor_);
-        }
+        predictor = GetCyclistPredictor(*obstacle);
         break;
       }
       default: {
-        if (obstacle->IsOnLane()) {
-          predictor = GetPredictor(default_on_lane_predictor_);
-        } else {
-          predictor = GetPredictor(default_off_lane_predictor_);
-        }
+        predictor = GetDefaultPredictor(*obstacle);
         break;
       }
     }
@@ -380,6 +337,85 @@ void PredictorManager::RegisterPredictor(
 
 const PredictionObstacles& PredictorManager::prediction_obstacles() {
   return prediction_obstacles_;
+}
+
+void PredictorManager::InitVehiclePredictors(const ObstacleConf& conf) {
+  switch (conf.obstacle_status()) {
+    case ObstacleConf::ON_LANE: {
+      if (conf.priority_type() == ObstaclePriority::CAUTION) {
+        vehicle_on_lane_caution_predictor_ = conf.predictor_type();
+      } else {
+        vehicle_on_lane_predictor_ = conf.predictor_type();
+      }
+      break;
+    }
+    case ObstacleConf::OFF_LANE: {
+      vehicle_off_lane_predictor_ = conf.predictor_type();
+      break;
+    }
+    case ObstacleConf::IN_JUNCTION: {
+      if (conf.priority_type() == ObstaclePriority::CAUTION) {
+        vehicle_in_junction_caution_predictor_ = conf.predictor_type();
+      } else {
+        vehicle_in_junction_predictor_ = conf.predictor_type();
+      }
+      break;
+    }
+    default: { break; }
+  }
+}
+
+void PredictorManager::InitCyclistPredictors(const ObstacleConf& conf) {
+  switch (conf.obstacle_status()) {
+    case ObstacleConf::ON_LANE: {
+      cyclist_on_lane_predictor_ = conf.predictor_type();
+      break;
+    }
+    case ObstacleConf::OFF_LANE: {
+      cyclist_off_lane_predictor_ = conf.predictor_type();
+      break;
+    }
+    default: { break; }
+  }
+}
+
+void PredictorManager::InitDefaultPredictors(const ObstacleConf& conf) {
+  switch (conf.obstacle_status()) {
+    case ObstacleConf::ON_LANE: {
+      default_on_lane_predictor_ = conf.predictor_type();
+      break;
+    }
+    case ObstacleConf::OFF_LANE: {
+      default_off_lane_predictor_ = conf.predictor_type();
+      break;
+    }
+    default: { break; }
+  }
+}
+
+Predictor* PredictorManager::GetVehiclePredictor(const Obstacle& obstacle) {
+  if (!obstacle.IsOnLane()) {
+    return GetPredictor(vehicle_off_lane_predictor_);
+  }
+  if (obstacle.HasJunctionFeatureWithExits() &&
+      !obstacle.IsCloseToJunctionExit()) {
+    return GetPredictor(vehicle_in_junction_predictor_);
+  }
+  return GetPredictor(vehicle_on_lane_predictor_);
+}
+
+Predictor* PredictorManager::GetCyclistPredictor(const Obstacle& obstacle) {
+  if (obstacle.IsOnLane()) {
+    return GetPredictor(cyclist_on_lane_predictor_);
+  }
+  return GetPredictor(cyclist_off_lane_predictor_);
+}
+
+Predictor* PredictorManager::GetDefaultPredictor(const Obstacle& obstacle) {
+  if (obstacle.IsOnLane()) {
+    return GetPredictor(default_on_lane_predictor_);
+  }
+  return GetPredictor(default_off_lane_predictor_);
 }
 
 }  // namespace prediction

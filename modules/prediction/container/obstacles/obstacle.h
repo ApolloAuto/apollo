@@ -194,13 +194,13 @@ class Obstacle {
    * @brief Check if the obstacle is close to a junction exit.
    * @return If the obstacle is closed to a junction exit.
    */
-  bool IsCloseToJunctionExit();
+  bool IsCloseToJunctionExit() const;
 
   /**
    * @brief Check if the obstacle has junction feature.
    * @return If the obstacle has junction feature.
    */
-  bool HasJunctionFeatureWithExits();
+  bool HasJunctionFeatureWithExits() const;
 
   /**
    * @brief Build junction feature.

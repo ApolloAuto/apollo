@@ -272,7 +272,7 @@ void Obstacle::BuildJunctionFeature() {
   }
 }
 
-bool Obstacle::IsCloseToJunctionExit() {
+bool Obstacle::IsCloseToJunctionExit() const {
   if (!HasJunctionFeatureWithExits()) {
     AERROR << "No junction feature found";
     return false;
@@ -695,7 +695,7 @@ void Obstacle::SetIsNearJunction(const PerceptionObstacle& perception_obstacle,
   feature->set_is_near_junction(is_near_junction);
 }
 
-bool Obstacle::HasJunctionFeatureWithExits() {
+bool Obstacle::HasJunctionFeatureWithExits() const {
   if (history_size() == 0) {
     return false;
   }
