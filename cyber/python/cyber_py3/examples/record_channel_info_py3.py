@@ -20,8 +20,8 @@
 
 import sys
 
-from cyber_py import cyber_py3 as cyber
-from cyber_py import record_py3 as record
+from cyber_py3 import cyber
+from cyber_py3 import record
 from cyber.proto import record_pb2
 
 
