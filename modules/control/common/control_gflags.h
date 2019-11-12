@@ -28,6 +28,8 @@ DECLARE_string(mpc_controller_conf_file);
 DECLARE_string(lateral_controller_conf_file);
 // longitudinal controller conf file
 DECLARE_string(longitudinal_controller_conf_file);
+// calibration table
+DECLARE_string(calibration_table_file);
 
 DECLARE_double(control_test_duration);
 
