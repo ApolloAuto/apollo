@@ -399,7 +399,13 @@ Predictor* PredictorManager::GetVehiclePredictor(const Obstacle& obstacle) {
   }
   if (obstacle.HasJunctionFeatureWithExits() &&
       !obstacle.IsCloseToJunctionExit()) {
+    if (obstacle.IsCaution()) {
+      return GetPredictor(vehicle_in_junction_caution_predictor_);
+    }
     return GetPredictor(vehicle_in_junction_predictor_);
+  }
+  if (obstacle.IsCaution()) {
+    return GetPredictor(vehicle_on_lane_caution_predictor_);
   }
   return GetPredictor(vehicle_on_lane_predictor_);
 }
