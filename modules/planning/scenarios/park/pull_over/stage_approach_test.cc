@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#define protected public
-#define private public
 #include "modules/planning/scenarios/park/pull_over/stage_approach.h"
 
 #include "gtest/gtest.h"

@@ -23,9 +23,6 @@
 #include "gtest/gtest.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
-#define private public
-#define protected public
-
 namespace apollo {
 namespace planning {
 

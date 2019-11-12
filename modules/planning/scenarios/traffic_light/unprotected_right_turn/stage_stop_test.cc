@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#define protected public
-#define private public
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/stage_stop.h"
 
 #include "gtest/gtest.h"

@@ -18,8 +18,6 @@
  * @file
  **/
 
-#define protected public
-#define private public
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/traffic_light_unprotected_left_turn_scenario.h"
 
 #include "gtest/gtest.h"

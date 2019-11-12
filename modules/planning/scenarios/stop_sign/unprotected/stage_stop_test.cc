@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#define protected public
-#define private public
 #include "modules/planning/scenarios/stop_sign/unprotected/stage_stop.h"
 
 #include "gtest/gtest.h"
