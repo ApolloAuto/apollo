@@ -18,8 +18,6 @@
  * @file
  **/
 
-#define protected public
-#define private public
 #include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
 
 #include "gtest/gtest.h"

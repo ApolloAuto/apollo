@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#define protected public
-#define private public
 #include "modules/planning/scenarios/yield_sign/stage_creep.h"
 
 #include "gtest/gtest.h"

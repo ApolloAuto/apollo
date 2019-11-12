@@ -17,8 +17,7 @@
 /**
  * @file
  **/
-#define protected public
-#define private public
+
 #include "modules/planning/scenarios/emergency/emergency_stop/emergency_stop_scenario.h"
 
 #include "gtest/gtest.h"

@@ -17,8 +17,7 @@
 /**
  * @file
  **/
-#define protected public
-#define private public
+
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 
 #include "gtest/gtest.h"

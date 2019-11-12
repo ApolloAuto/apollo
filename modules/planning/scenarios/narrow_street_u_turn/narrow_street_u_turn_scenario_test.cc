@@ -18,8 +18,6 @@
  * @file
  **/
 
-#define protected public
-#define private public
 #include "modules/planning/scenarios/narrow_street_u_turn/narrow_street_u_turn_scenario.h"
 
 #include "gtest/gtest.h"

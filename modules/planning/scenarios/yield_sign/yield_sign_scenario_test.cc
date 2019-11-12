@@ -18,8 +18,6 @@
  * @file
  **/
 
-#define protected public
-#define private public
 #include "modules/planning/scenarios/yield_sign/yield_sign_scenario.h"
 
 #include "gtest/gtest.h"
