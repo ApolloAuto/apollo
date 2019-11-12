@@ -1,7 +1,7 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # ****************************************************************************
-# Copyright 2018 The Apollo Authors. All Rights Reserved.
+# Copyright 2019 The Apollo Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 import sys
 
 sys.path.append("../")
-from cyber_py import cyber
+from cyber_py import cyber_py3 as cyber
 from cyber.proto.unit_test_pb2 import ChatterBenchmark
 
 
