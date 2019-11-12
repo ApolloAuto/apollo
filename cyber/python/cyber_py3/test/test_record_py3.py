@@ -23,7 +23,7 @@ import unittest
 
 sys.path.append("../")
 from cyber.proto import record_pb2
-from cyber_py import record_py3 as record
+from cyber_py3 import record
 from modules.common.util.testdata.simple_pb2 import SimpleMessage
 
 

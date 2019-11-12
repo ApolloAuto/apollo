@@ -16,40 +16,35 @@
 # limitations under the License.
 # ****************************************************************************
 # -*- coding: utf-8 -*-
-from cyber_py import cyber_py3 as cyber
-from cyber.proto.unit_test_pb2 import ChatterBenchmark
-"""Module for example of talker."""
+"""Module for example of listener."""
 
-import time
 import sys
 
 sys.path.append("../")
+from cyber_py3 import cyber
+from cyber.proto.unit_test_pb2 import ChatterBenchmark
 
 
-def test_talker_class():
+def callback(data):
     """
-    Test talker.
+    Reader message callback.
     """
-    msg = ChatterBenchmark()
-    msg.content = "py:talker:send Alex!"
-    msg.stamp = 9999
-    msg.seq = 0
-    print(msg)
-    test_node = cyber.Node("node_name1")
-    g_count = 1
+    print("=" * 80)
+    print("py:reader callback msg->:")
+    print(data)
+    print("=" * 80)
 
-    writer = test_node.create_writer("channel/chatter", ChatterBenchmark, 6)
-    while not cyber.is_shutdown():
-        time.sleep(1)
-        g_count = g_count + 1
-        msg.seq = g_count
-        msg.content = "I am python talker."
-        print("=" * 80)
-        print("write msg -> %s" % msg)
-        writer.write(msg)
 
+def test_listener_class():
+    """
+    Reader message.
+    """
+    print("=" * 120)
+    test_node = cyber.Node("listener")
+    test_node.create_reader("channel/chatter", ChatterBenchmark, callback)
+    test_node.spin()
 
 if __name__ == '__main__':
-    cyber.init("talker_sample")
-    test_talker_class()
+    cyber.init()
+    test_listener_class()
     cyber.shutdown()

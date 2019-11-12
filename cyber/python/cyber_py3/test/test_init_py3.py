@@ -16,32 +16,29 @@
 # limitations under the License.
 # ****************************************************************************
 # -*- coding: utf-8 -*-
-"""Module for example of listener."""
+"""Module for test init."""
 
 import sys
-import time
+import unittest
 
-from cyber_py import cyber_py3 as cyber
-from cyber.proto.unit_test_pb2 import ChatterBenchmark
-
-
-def callback(data):
-    print("-" * 80)
-    print("get Request [ ", data, " ]")
-    return ChatterBenchmark(content="svr: Hello client!", seq=data.seq + 2)
+sys.path.append("../")
+from cyber_py3 import cyber
 
 
-def test_service_class():
+class TestInit(unittest.TestCase):
+
     """
-    Reader message.
+    Class for init unit test.
     """
-    print("=" * 120)
-    node = cyber.Node("service_node")
-    r = node.create_service(
-        "server_01", ChatterBenchmark, ChatterBenchmark, callback)
-    node.spin()
+
+    def test_init(self):
+        """
+        Test cyber.
+        """
+        self.assertTrue(cyber.init())
+        self.assertTrue(cyber.ok())
+        cyber.shutdown()
+        self.assertTrue(cyber.is_shutdown())
 
 if __name__ == '__main__':
-    cyber.init()
-    test_service_class()
-    cyber.shutdown()
+    unittest.main()

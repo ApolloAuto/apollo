@@ -21,7 +21,7 @@ import os
 import sys
 import time
 
-from cyber_py import cyber_time_py3 as cyber_time
+from cyber_py3 import cyber_time
 
 
 def test_time():

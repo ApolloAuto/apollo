@@ -23,7 +23,7 @@ import sys
 
 sys.path.append("../")
 from cyber.proto.unit_test_pb2 import Chatter
-from cyber_py import record_py3 as record
+from cyber_py3 import record
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
 from modules.common.util.testdata.simple_pb2 import SimpleMessage
 

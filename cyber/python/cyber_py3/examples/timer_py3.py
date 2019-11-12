@@ -15,30 +15,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ****************************************************************************
-# -*- coding: utf-8 -*-
-"""Module for test init."""
 
-import sys
-import unittest
+"""Module for example of timer."""
 
-sys.path.append("../")
-from cyber_py import cyber_py3 as cyber
+import time
+
+from cyber_py3 import cyber
+from cyber_py3 import cyber_timer
 
 
-class TestInit(unittest.TestCase):
+count = 0
 
-    """
-    Class for init unit test.
-    """
 
-    def test_init(self):
-        """
-        Test cyber.
-        """
-        self.assertTrue(cyber.init())
-        self.assertTrue(cyber.ok())
-        cyber.shutdown()
-        self.assertTrue(cyber.is_shutdown())
+def fun():
+    global count
+    print("cb fun is called:", count)
+    count += 1
+
+
+def test_timer():
+    cyber.init()
+    ct = cyber_timer.Timer(10, fun, 0)  # 10ms
+    ct.start()
+    time.sleep(1)  # 1s
+    ct.stop()
+
+    print("+" * 80, "test set_option")
+    ct2 = cyber_timer.Timer()  # 10ms
+    ct2.set_option(10, fun, 0)
+    ct2.start()
+    time.sleep(1)  # 1s
+    ct2.stop()
+
+    cyber.shutdown()
 
 if __name__ == '__main__':
-    unittest.main()
+    test_timer()

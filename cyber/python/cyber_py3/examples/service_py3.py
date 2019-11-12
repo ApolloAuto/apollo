@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 
 # ****************************************************************************
@@ -18,33 +17,31 @@
 # ****************************************************************************
 # -*- coding: utf-8 -*-
 """Module for example of listener."""
-import os
+
+import sys
 import time
 
-from cyber_py import cyber_py3 as cyber
+from cyber_py3 import cyber
 from cyber.proto.unit_test_pb2 import ChatterBenchmark
 
 
-def test_client_class():
-    """
-    Client send request
-    """
-    node = cyber.Node("client_node")
-    client = node.create_client("server_01", ChatterBenchmark, ChatterBenchmark)
-    req = ChatterBenchmark()
-    req.content = "clt:Hello service!"
-    req.seq = 0
-    count = 0
-    while not cyber.is_shutdown():
-        time.sleep(1)
-        count += 1
-        req.seq = count
-        print("-" * 80)
-        response = client.send_request(req)
-        print("get Response [ ", response, " ]")
+def callback(data):
+    print("-" * 80)
+    print("get Request [ ", data, " ]")
+    return ChatterBenchmark(content="svr: Hello client!", seq=data.seq + 2)
 
+
+def test_service_class():
+    """
+    Reader message.
+    """
+    print("=" * 120)
+    node = cyber.Node("service_node")
+    r = node.create_service(
+        "server_01", ChatterBenchmark, ChatterBenchmark, callback)
+    node.spin()
 
 if __name__ == '__main__':
     cyber.init()
-    test_client_class()
+    test_service_class()
     cyber.shutdown()

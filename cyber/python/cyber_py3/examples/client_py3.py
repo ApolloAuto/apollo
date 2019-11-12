@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 
 # ****************************************************************************
@@ -15,39 +16,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ****************************************************************************
-
-"""Module for example of timer."""
-
+# -*- coding: utf-8 -*-
+"""Module for example of listener."""
+import os
 import time
 
-from cyber_py import cyber_py3 as cyber
-from cyber_py import cyber_timer_py3 as cyber_timer
+from cyber_py3 import cyber
+from cyber.proto.unit_test_pb2 import ChatterBenchmark
 
 
-count = 0
+def test_client_class():
+    """
+    Client send request
+    """
+    node = cyber.Node("client_node")
+    client = node.create_client("server_01", ChatterBenchmark, ChatterBenchmark)
+    req = ChatterBenchmark()
+    req.content = "clt:Hello service!"
+    req.seq = 0
+    count = 0
+    while not cyber.is_shutdown():
+        time.sleep(1)
+        count += 1
+        req.seq = count
+        print("-" * 80)
+        response = client.send_request(req)
+        print("get Response [ ", response, " ]")
 
-
-def fun():
-    global count
-    print("cb fun is called:", count)
-    count += 1
-
-
-def test_timer():
-    cyber.init()
-    ct = cyber_timer.Timer(10, fun, 0)  # 10ms
-    ct.start()
-    time.sleep(1)  # 1s
-    ct.stop()
-
-    print("+" * 80, "test set_option")
-    ct2 = cyber_timer.Timer()  # 10ms
-    ct2.set_option(10, fun, 0)
-    ct2.start()
-    time.sleep(1)  # 1s
-    ct2.stop()
-
-    cyber.shutdown()
 
 if __name__ == '__main__':
-    test_timer()
+    cyber.init()
+    test_client_class()
+    cyber.shutdown()

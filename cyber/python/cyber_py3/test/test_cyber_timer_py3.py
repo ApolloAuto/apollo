@@ -21,8 +21,8 @@
 import time
 import unittest
 
-from cyber_py import cyber_py3 as cyber
-from cyber_py import cyber_timer_py3 as cyber_timer
+from cyber_py3 import cyber
+from cyber_py3 import cyber_timer
 
 
 class TestCyberTimer(unittest.TestCase):
