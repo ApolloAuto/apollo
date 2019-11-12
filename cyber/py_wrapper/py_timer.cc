@@ -20,6 +20,8 @@
 #include <set>
 #include <string>
 
+using apollo::cyber::PyTimer;
+
 #if PY_MAJOR_VERSION >= 3
 #define PyInt_AsLong PyLong_AsLong
 #endif
@@ -35,7 +37,7 @@ T PyObjectToPtr(PyObject* pyobj, const std::string& type_ptr) {
 
 PyObject* cyber_new_PyTimer(PyObject* self, PyObject* args) {
   uint32_t period = 0;
-  PyObject* pyobj_regist_fun = 0;
+  PyObject* pyobj_regist_fun = nullptr;
   unsigned int oneshot = 0;
   if (!PyArg_ParseTuple(args, const_cast<char*>("kOI:cyber_new_PyTimer"),
                         &period, &pyobj_regist_fun, &oneshot)) {
@@ -46,18 +48,13 @@ PyObject* cyber_new_PyTimer(PyObject* self, PyObject* args) {
 
   void (*callback_fun)() = (void (*)())0;
   callback_fun = (void (*)())PyInt_AsLong(pyobj_regist_fun);
-  apollo::cyber::PyTimer* pytimer =
-      new apollo::cyber::PyTimer(period, callback_fun, oneshot != 0);
-  PyObject* pyobj_timer =
-      PyCapsule_New(pytimer, "apollo_cybertron_pytimer", nullptr);
-  return pyobj_timer;
+  PyTimer* pytimer = new PyTimer(period, callback_fun, oneshot != 0);
+  return PyCapsule_New(pytimer, "apollo_cybertron_pytimer", nullptr);
 }
 
 PyObject* cyber_new_PyTimer_noparam(PyObject* self, PyObject* args) {
-  apollo::cyber::PyTimer* pytimer = new apollo::cyber::PyTimer();
-  PyObject* pyobj_timer =
-      PyCapsule_New(pytimer, "apollo_cybertron_pytimer", nullptr);
-  return pyobj_timer;
+  PyTimer* pytimer = new PyTimer();
+  return PyCapsule_New(pytimer, "apollo_cybertron_pytimer", nullptr);
 }
 
 PyObject* cyber_delete_PyTimer(PyObject* self, PyObject* args) {
@@ -68,8 +65,8 @@ PyObject* cyber_delete_PyTimer(PyObject* self, PyObject* args) {
     return Py_None;
   }
 
-  auto pytimer = (apollo::cyber::PyTimer*)PyCapsule_GetPointer(
-      pyobj_timer, "apollo_cybertron_pytimer");
+  auto* pytimer = reinterpret_cast<PyTimer*>(
+      PyCapsule_GetPointer(pyobj_timer, "apollo_cybertron_pytimer"));
   if (nullptr == pytimer) {
     AERROR << "cyber_delete_PyTimer:timer ptr is null!";
     Py_INCREF(Py_None);
@@ -88,8 +85,8 @@ PyObject* cyber_PyTimer_start(PyObject* self, PyObject* args) {
     return Py_None;
   }
 
-  auto pytimer = (apollo::cyber::PyTimer*)PyCapsule_GetPointer(
-      pyobj_timer, "apollo_cybertron_pytimer");
+  auto* pytimer = reinterpret_cast<PyTimer*>(
+      PyCapsule_GetPointer(pyobj_timer, "apollo_cybertron_pytimer"));
   if (nullptr == pytimer) {
     AERROR << "cyber_delete_PyTimer:timer ptr is null!";
     Py_INCREF(Py_None);
@@ -108,8 +105,8 @@ PyObject* cyber_PyTimer_stop(PyObject* self, PyObject* args) {
     return Py_None;
   }
 
-  auto pytimer = (apollo::cyber::PyTimer*)PyCapsule_GetPointer(
-      pyobj_timer, "apollo_cybertron_pytimer");
+  auto* pytimer = reinterpret_cast<PyTimer*>(
+      PyCapsule_GetPointer(pyobj_timer, "apollo_cybertron_pytimer"));
   if (nullptr == pytimer) {
     AERROR << "cyber_delete_PyTimer:timer ptr is null!";
     Py_INCREF(Py_None);
@@ -121,9 +118,9 @@ PyObject* cyber_PyTimer_stop(PyObject* self, PyObject* args) {
 }
 
 PyObject* cyber_PyTimer_set_option(PyObject* self, PyObject* args) {
-  PyObject* pyobj_timer = 0;
+  PyObject* pyobj_timer = nullptr;
   uint32_t period = 0;
-  PyObject* pyobj_regist_fun = 0;
+  PyObject* pyobj_regist_fun = nullptr;
   unsigned int oneshot = 0;
 
   void (*callback_fun)() = (void (*)())0;
@@ -135,8 +132,8 @@ PyObject* cyber_PyTimer_set_option(PyObject* self, PyObject* args) {
     return Py_None;
   }
 
-  apollo::cyber::PyTimer* pytimer = PyObjectToPtr<apollo::cyber::PyTimer*>(
-      pyobj_timer, "apollo_cybertron_pytimer");
+  PyTimer* pytimer =
+      PyObjectToPtr<PyTimer*>(pyobj_timer, "apollo_cybertron_pytimer");
   callback_fun = (void (*)())PyInt_AsLong(pyobj_regist_fun);
   if (nullptr == pytimer) {
     AERROR << "cyber_PyTimer_set_option ptr is null!";
