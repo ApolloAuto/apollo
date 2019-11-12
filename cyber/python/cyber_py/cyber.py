@@ -18,12 +18,12 @@
 # -*- coding: utf-8 -*-
 """Module for init environment."""
 
-import sys
-import os
-import importlib
-import time
-import threading
 import ctypes
+import importlib
+import os
+import sys
+import threading
+import time
 
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
 

@@ -16,9 +16,8 @@
 # limitations under the License.
 # ****************************************************************************
 # -*- coding: utf-8 -*-
-"""Module for test node."""
+"""Module for test cyber."""
 
-import sys
 import time
 import unittest
 

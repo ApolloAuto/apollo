@@ -18,11 +18,10 @@
 # -*- coding: utf-8 -*-
 """Module for example of talker."""
 
+import time
+
 from cyber_py3 import cyber
 from cyber.proto.unit_test_pb2 import ChatterBenchmark
-
-import time
-import sys
 
 
 def test_talker_class():

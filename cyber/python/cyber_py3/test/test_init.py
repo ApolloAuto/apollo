@@ -18,7 +18,6 @@
 # -*- coding: utf-8 -*-
 """Module for test init."""
 
-import sys
 import unittest
 
 from cyber_py3 import cyber

@@ -17,8 +17,7 @@
 # ****************************************************************************
 # -*- coding: utf-8 -*-
 """Module for example of cyber time."""
-import os
-import sys
+
 import time
 
 from cyber_py import cyber_time

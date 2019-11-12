@@ -18,7 +18,7 @@
 # ****************************************************************************
 # -*- coding: utf-8 -*-
 """Module for example of listener."""
-import os
+
 import time
 
 from cyber_py3 import cyber

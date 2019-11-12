@@ -19,12 +19,12 @@
 """Module for example of record."""
 
 import time
-import sys
 
 from cyber.proto.unit_test_pb2 import Chatter
 from cyber_py import record
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
 from modules.common.util.testdata.simple_pb2 import SimpleMessage
+
 
 MSG_TYPE = "apollo.common.util.test.SimpleMessage"
 MSG_TYPE_CHATTER = "apollo.cyber.proto.Chatter"

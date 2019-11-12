@@ -18,7 +18,6 @@
 # -*- coding: utf-8 -*-
 """Module for test record."""
 
-import sys
 import unittest
 
 from cyber.proto import record_pb2
