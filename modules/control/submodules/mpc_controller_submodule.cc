@@ -41,18 +41,22 @@ std::string MPCControllerSubmodule::Name() const {
 }
 
 bool MPCControllerSubmodule::Init() {
+  // TODO(SHU): seprate common_control conf from controller conf
   if (!cyber::common::GetProtoFromFile(FLAGS_mpc_controller_conf_file,
                                        &mpc_controller_conf_)) {
     AERROR << "Unable to load control conf file: " +
                   FLAGS_mpc_controller_conf_file;
     return false;
   }
-  // MPC controller
-  if (!mpc_controller_.Init(&mpc_controller_conf_).ok()) {
-    monitor_logger_buffer_.ERROR(
-        "MPC Control init controller failed! Stopping...");
+  // load calibration table
+  if (!cyber::common::GetProtoFromFile(FLAGS_calibration_table_file,
+                                       &calibration_table_)) {
+    AERROR << "Unable to load calibration table file: " +
+                  FLAGS_calibration_table_file;
     return false;
   }
+  mpc_controller_conf_.mutable_mpc_controller_conf()
+      ->set_allocated_calibration_table(&calibration_table_);
   return true;
 }
 

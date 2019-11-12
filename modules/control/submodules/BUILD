@@ -60,6 +60,7 @@ cc_library(
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/control/common:control_gflags",
         "//modules/control/controller",
+        "//modules/control/proto:calibration_table_proto",
         "//modules/control/proto:control_common_conf_proto",
         "//modules/control/proto:control_proto",
         "//modules/control/proto:preprocessor_proto",

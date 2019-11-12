@@ -475,29 +475,29 @@ void LonController::SetDigitalFilter(double ts, double cutoff_freq,
 // TODO(all): Refactor and simplify
 void LonController::GetPathRemain(SimpleLongitudinalDebug *debug) {
   int stop_index = 0;
-  constexpr double kSpeedThreshold = 1e-3;
-  constexpr double kForwardAccThreshold = -1e-2;
-  constexpr double kBackwardAccThreshold = 1e-1;
-  constexpr double kParkingSpeed = 0.1;
+  static constexpr double kSpeedThreshold = 1e-3;
+  static constexpr double kForwardAccThreshold = -1e-2;
+  static constexpr double kBackwardAccThreshold = 1e-1;
+  static constexpr double kParkingSpeed = 0.1;
 
   if (trajectory_message_->gear() == canbus::Chassis::GEAR_DRIVE) {
     while (stop_index < trajectory_message_->trajectory_point_size()) {
-      if (fabs(trajectory_message_->trajectory_point(stop_index).v()) <
-              kSpeedThreshold &&
-          trajectory_message_->trajectory_point(stop_index).a() >
-              kForwardAccThreshold &&
-          trajectory_message_->trajectory_point(stop_index).a() < 0.0) {
+      auto &current_trajectory_point =
+          trajectory_message_->trajectory_point(stop_index);
+      if (fabs(current_trajectory_point.v()) < kSpeedThreshold &&
+          current_trajectory_point.a() > kForwardAccThreshold &&
+          current_trajectory_point.a() < 0.0) {
         break;
       }
       ++stop_index;
     }
   } else {
     while (stop_index < trajectory_message_->trajectory_point_size()) {
-      if (fabs(trajectory_message_->trajectory_point(stop_index).v()) <
-              kSpeedThreshold &&
-          trajectory_message_->trajectory_point(stop_index).a() <
-              kBackwardAccThreshold &&
-          trajectory_message_->trajectory_point(stop_index).a() > 0.0) {
+      auto &current_trajectory_point =
+          trajectory_message_->trajectory_point(stop_index);
+      if (current_trajectory_point.v() < kSpeedThreshold &&
+          current_trajectory_point.a() < kBackwardAccThreshold &&
+          current_trajectory_point.a() > 0.0) {
         break;
       }
       ++stop_index;
