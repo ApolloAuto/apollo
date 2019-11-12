@@ -21,6 +21,7 @@
 #include <vector>
 
 using apollo::cyber::Node;
+using apollo::cyber::PyChannelUtils;
 using apollo::cyber::PyClient;
 using apollo::cyber::PyNode;
 using apollo::cyber::PyReader;
@@ -38,6 +39,8 @@ using apollo::cyber::PyWriter;
 #define C_STR_TO_PY_BYTES(cstr) \
   PyString_FromStringAndSize(cstr.c_str(), cstr.size())
 #endif
+
+google::protobuf::Message *PyChannelUtils::raw_msg_class_ = nullptr;
 
 static PyObject *cyber_py_init(PyObject *self, PyObject *args) {
   char *data = nullptr;
@@ -107,7 +110,7 @@ PyObject *cyber_new_PyWriter(PyObject *self, PyObject *args) {
     return Py_None;
   }
 
-  Node* node = reinterpret_cast<Node *>(
+  Node *node = reinterpret_cast<Node *>(
       PyCapsule_GetPointer(node_pyobj, "apollo_cyber_pynode"));
   if (nullptr == node) {
     AERROR << "node is null";
@@ -131,7 +134,7 @@ PyObject *cyber_delete_PyWriter(PyObject *self, PyObject *args) {
     return Py_None;
   }
 
-  PyWriter* writer = reinterpret_cast<PyWriter *>(
+  PyWriter *writer = reinterpret_cast<PyWriter *>(
       PyCapsule_GetPointer(writer_py, "apollo_cyber_pywriter"));
   delete writer;
   Py_INCREF(Py_None);
@@ -171,7 +174,7 @@ PyObject *cyber_new_PyReader(PyObject *self, PyObject *args) {
     return Py_None;
   }
 
-  Node* node = reinterpret_cast<Node *>(
+  Node *node = reinterpret_cast<Node *>(
       PyCapsule_GetPointer(node_pyobj, "apollo_cyber_pynode"));
   if (!node) {
     AERROR << "node is null";
@@ -266,7 +269,7 @@ PyObject *cyber_new_PyClient(PyObject *self, PyObject *args) {
     return Py_None;
   }
 
-  Node* node = reinterpret_cast<Node *>(
+  Node *node = reinterpret_cast<Node *>(
       PyCapsule_GetPointer(node_pyobj, "apollo_cyber_pynode"));
   if (!node) {
     AERROR << "node is null";
@@ -332,7 +335,7 @@ PyObject *cyber_new_PyService(PyObject *self, PyObject *args) {
     return Py_None;
   }
 
-  Node* node = reinterpret_cast<Node *>(
+  Node *node = reinterpret_cast<Node *>(
       PyCapsule_GetPointer(node_pyobj, "apollo_cyber_pynode"));
   if (!node) {
     AERROR << "node is null";
@@ -628,8 +631,7 @@ PyObject *cyber_PyChannelUtils_get_msg_type(PyObject *self, PyObject *args) {
   }
   std::string channel(channel_name, len);
   const std::string msg_type =
-      apollo::cyber::PyChannelUtils::get_msgtype_by_channelname(channel,
-                                                                sleep_s);
+      PyChannelUtils::get_msgtype_by_channelname(channel, sleep_s);
   return C_STR_TO_PY_BYTES(msg_type);
 }
 
@@ -649,8 +651,7 @@ PyObject *cyber_PyChannelUtils_get_debugstring_by_msgtype_rawmsgdata(
   }
   std::string raw_data(rawdata, len);
   const std::string debug_string =
-      apollo::cyber::PyChannelUtils::get_debugstring_by_msgtype_rawmsgdata(
-          msgtype, raw_data);
+      PyChannelUtils::get_debugstring_by_msgtype_rawmsgdata(msgtype, raw_data);
   return C_STR_TO_PY_BYTES(debug_string);
 }
 
@@ -667,7 +668,7 @@ static PyObject *cyber_PyChannelUtils_get_active_channels(PyObject *self,
   }
 
   std::vector<std::string> channel_list =
-      apollo::cyber::PyChannelUtils::get_active_channels(sleep_s);
+      PyChannelUtils::get_active_channels(sleep_s);
   PyObject *pyobj_list = PyList_New(channel_list.size());
   size_t pos = 0;
   for (const std::string &channel : channel_list) {
@@ -684,7 +685,7 @@ static PyObject *cyber_PyChannelUtils_get_active_channels(PyObject *self,
 // }
 static PyObject *cyber_PyChannelUtils_get_channels_info(PyObject *self,
                                                         PyObject *args) {
-  auto channelsinfo = apollo::cyber::PyChannelUtils::get_channels_info();
+  auto channelsinfo = PyChannelUtils::get_channels_info();
   PyObject *pyobj_channelinfo_dict = PyDict_New();
   for (auto &channelinfo : channelsinfo) {
     std::string channel_name = channelinfo.first;
