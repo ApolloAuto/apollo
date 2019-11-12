@@ -1316,29 +1316,28 @@ bool PathBoundsDecider::GetBoundaryFromStaticObstacles(
           } else {
             left_bounds.erase(left_bounds.find(curr_obstacle_l_min));
           }
-          obs_id_to_direction.erase(curr_obstacle_id);
-        }
-        // Update the bounds and center_line.
-        std::get<1>((*path_boundaries)[i]) = std::fmax(
-            std::get<1>((*path_boundaries)[i]),
-            *right_bounds.begin() + GetBufferBetweenADCCenterAndEdge());
-        std::get<2>((*path_boundaries)[i]) = std::fmin(
-            std::get<2>((*path_boundaries)[i]),
-            *left_bounds.begin() - GetBufferBetweenADCCenterAndEdge());
-        if (std::get<1>((*path_boundaries)[i]) >
-            std::get<2>((*path_boundaries)[i])) {
-          ADEBUG << "Path is blocked at s = " << curr_s;
-          path_blocked_idx = static_cast<int>(i);
-          if (!obs_id_to_direction.empty()) {
-            *blocking_obstacle_id = obs_id_to_direction.begin()->first;
+          obs_id_to_direction.erase(curr_obstacle_id);        
+          // Update the bounds and center_line.
+          std::get<1>((*path_boundaries)[i]) = std::fmax(
+              std::get<1>((*path_boundaries)[i]),
+              *right_bounds.begin() + GetBufferBetweenADCCenterAndEdge());
+          std::get<2>((*path_boundaries)[i]) = std::fmin(
+              std::get<2>((*path_boundaries)[i]),
+              *left_bounds.begin() - GetBufferBetweenADCCenterAndEdge());
+          if (std::get<1>((*path_boundaries)[i]) >
+              std::get<2>((*path_boundaries)[i])) {
+            ADEBUG << "Path is blocked at s = " << curr_s;
+            path_blocked_idx = static_cast<int>(i);
+            if (!obs_id_to_direction.empty()) {
+              *blocking_obstacle_id = obs_id_to_direction.begin()->first;
+            }
+            break;
+          } else {
+            center_line = (std::get<1>((*path_boundaries)[i]) +
+                          std::get<2>((*path_boundaries)[i])) /
+                          2.0;
           }
-          break;
-        } else {
-          center_line = (std::get<1>((*path_boundaries)[i]) +
-                         std::get<2>((*path_boundaries)[i])) /
-                        2.0;
         }
-
         ++obs_idx;
       }
     } else {
