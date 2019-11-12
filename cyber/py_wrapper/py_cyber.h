@@ -43,7 +43,7 @@
 namespace apollo {
 namespace cyber {
 
-bool py_init(const std::string& module_name) {
+inline bool py_init(const std::string& module_name) {
   static bool inited = false;
   if (inited) {
     AINFO << "cyber already inited.";
@@ -59,13 +59,13 @@ bool py_init(const std::string& module_name) {
   return true;
 }
 
-bool py_ok() { return OK(); }
+inline bool py_ok() { return OK(); }
 
-void py_shutdown() { return Clear(); }
+inline void py_shutdown() { return Clear(); }
 
-bool py_is_shutdown() { return IsShutdown(); }
+inline bool py_is_shutdown() { return IsShutdown(); }
 
-void py_waitforshutdown() { return WaitForShutdown(); }
+inline void py_waitforshutdown() { return WaitForShutdown(); }
 
 class PyWriter {
  public:
@@ -421,8 +421,6 @@ class PyChannelUtils {
  private:
   static google::protobuf::Message* raw_msg_class_;
 };
-
-google::protobuf::Message* PyChannelUtils::raw_msg_class_ = nullptr;
 
 class PyNodeUtils {
  public:

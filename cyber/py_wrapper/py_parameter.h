@@ -36,7 +36,6 @@ class PyParameter {
  public:
   PyParameter() { parameter_ = std::make_shared<Parameter>(); }
   explicit PyParameter(Parameter* param) { parameter_.reset(param); }
-  ~PyParameter() {}
 
   PyParameter(const std::string& name, const int64_t int_value) {
     parameter_ = std::make_shared<Parameter>(name, int_value);
@@ -78,7 +77,6 @@ class PyParameterClient {
                     const std::string& service_node_name) {
     parameter_clt_ = std::make_shared<ParameterClient>(node, service_node_name);
   }
-  ~PyParameterClient() {}
 
   bool set_parameter(const Parameter& parameter) {
     return parameter_clt_->SetParameter(parameter);
@@ -99,7 +97,6 @@ class PyParameterServer {
   explicit PyParameterServer(std::shared_ptr<Node> node) {
     parameter_srv_ = std::make_shared<ParameterServer>(node);
   }
-  ~PyParameterServer() {}
 
   void set_parameter(const Parameter& parameter) {
     parameter_srv_->SetParameter(parameter);
