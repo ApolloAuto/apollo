@@ -31,6 +31,7 @@
 #include "modules/planning/common/util/util.h"
 #include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
 #include "modules/planning/scenarios/emergency/emergency_pull_over/emergency_pull_over_scenario.h"
+#include "modules/planning/scenarios/emergency/emergency_stop/emergency_stop_scenario.h"
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 #include "modules/planning/scenarios/park/pull_over/pull_over_scenario.h"
 #include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
@@ -69,6 +70,10 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
       break;
     case ScenarioConfig::EMERGENCY_PULL_OVER:
       ptr.reset(new emergency_pull_over::EmergencyPullOverScenario(
+          config_map_[scenario_type], &scenario_context_));
+      break;
+    case ScenarioConfig::EMERGENCY_STOP:
+      ptr.reset(new emergency_stop::EmergencyStopScenario(
           config_map_[scenario_type], &scenario_context_));
       break;
     case ScenarioConfig::LANE_FOLLOW:
@@ -133,6 +138,10 @@ void ScenarioManager::RegisterScenarios() {
   CHECK(
       Scenario::LoadConfig(FLAGS_scenario_emergency_pull_over_config_file,
                            &config_map_[ScenarioConfig::EMERGENCY_PULL_OVER]));
+
+  // emergency_stop
+  CHECK(Scenario::LoadConfig(FLAGS_scenario_emergency_stop_config_file,
+                             &config_map_[ScenarioConfig::EMERGENCY_STOP]));
 
   // park_and_go
   CHECK(Scenario::LoadConfig(FLAGS_scenario_park_and_go_config_file,
@@ -320,14 +329,15 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPadMsgScenario(
       }
       break;
     case DrivingAction::STOP:
-      // TODO(all): to be added
-      //  if (FLAGS_) {
-      //    return ScenarioConfig::STOP_EMERGENCY;
-      //  }
+      if (FLAGS_enable_scenario_emergency_stop) {
+        return ScenarioConfig::EMERGENCY_STOP;
+      }
       break;
     case DrivingAction::RESUME_CRUISE:
       if (current_scenario_->scenario_type() ==
-          ScenarioConfig::EMERGENCY_PULL_OVER) {
+              ScenarioConfig::EMERGENCY_PULL_OVER ||
+          current_scenario_->scenario_type() ==
+              ScenarioConfig::EMERGENCY_STOP) {
         return ScenarioConfig::PARK_AND_GO;
       }
       break;
