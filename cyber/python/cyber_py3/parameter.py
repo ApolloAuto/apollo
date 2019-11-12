@@ -18,9 +18,10 @@
 # -*- coding: utf-8 -*-
 """Module for init environment."""
 
-import sys
-import os
 import importlib
+import os
+import sys
+
 
 # init vars
 CYBER_PATH = os.environ['CYBER_PATH']

@@ -18,12 +18,12 @@
 # -*- coding: utf-8 -*-
 """Module for test node."""
 
-import sys
-import unittest
 import time
+import unittest
 
 from cyber_py import cyber
 from cyber_py import parameter
+
 
 PARAM_SERVICE_NAME = "global_parameter_service"
 

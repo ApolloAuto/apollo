@@ -16,12 +16,11 @@
 # limitations under the License.
 # ****************************************************************************
 # -*- coding: utf-8 -*-
-"""Module for example of param."""
-
-import sys
+"""Module for example of parameter."""
 
 from cyber_py import cyber
 from cyber_py import parameter
+
 
 PARAM_SERVICE_NAME = "global_parameter_service"
 

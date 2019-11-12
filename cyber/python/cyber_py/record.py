@@ -25,6 +25,7 @@ import sys
 
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
 
+
 # init vars
 CYBER_PATH = os.environ['CYBER_PATH']
 CYBER_DIR = os.path.split(CYBER_PATH)[0]

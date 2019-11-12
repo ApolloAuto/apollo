@@ -16,9 +16,8 @@
 # limitations under the License.
 # ****************************************************************************
 # -*- coding: utf-8 -*-
-"""Module for test cyber_time_py3."""
+"""Module for test cyber_time."""
 
-import sys
 import time
 import unittest
 

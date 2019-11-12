@@ -18,7 +18,6 @@
 # -*- coding: utf-8 -*-
 """Module for example of talker."""
 
-import sys
 import time
 
 from cyber_py import cyber

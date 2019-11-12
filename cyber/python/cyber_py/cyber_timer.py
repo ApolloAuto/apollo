@@ -18,10 +18,11 @@
 # -*- coding: utf-8 -*-
 """Module for init environment."""
 
-import sys
-import os
-import importlib
 import ctypes
+import importlib
+import os
+import sys
+
 
 PY_TIMER_CB_TYPE = ctypes.CFUNCTYPE(ctypes.c_void_p)
 

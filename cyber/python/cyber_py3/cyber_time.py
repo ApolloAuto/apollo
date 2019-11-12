@@ -18,12 +18,10 @@
 # -*- coding: utf-8 -*-
 """Module for init environment."""
 
-import sys
-sys.path = [path for path in sys.path if "python2.7" not in path]
-
-import os
 import importlib
-import time
+import os
+import sys
+
 
 # init vars
 CYBER_PATH = os.environ['CYBER_PATH']
@@ -168,12 +166,13 @@ class Time(object):
         """
         return _CYBER_TIME.PyTime_to_nsec(self.time)
 
-    def sleep_until(self, time):
+    def sleep_until(self, cyber_time):
         """
         sleep until time.
         """
         if isinstance(time, Time):
-            return _CYBER_TIME.PyTime_sleep_until(self.time, time.to_nsec())
+            return _CYBER_TIME.PyTime_sleep_until(self.time,
+                                                  cyber_time.to_nsec())
         return NotImplemented
 
     def __sub__(self, other):

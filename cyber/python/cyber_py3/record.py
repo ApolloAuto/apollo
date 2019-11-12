@@ -2,7 +2,7 @@
 
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
-
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
@@ -18,12 +18,10 @@
 # -*- coding: utf-8 -*-
 """Module for wrapper cyber record."""
 
-import sys
-sys.path = [path for path in sys.path if "python2.7" not in path]
-
 import collections
 import importlib
 import os
+import sys
 
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
 

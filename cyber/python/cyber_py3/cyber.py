@@ -18,14 +18,12 @@
 # -*- coding: utf-8 -*-
 """Module for init environment."""
 
-import sys
-sys.path = [path for path in sys.path if "python2.7" not in path]
-
-import os
-import importlib
-import time
-import threading
 import ctypes
+import importlib
+import os
+import sys
+import threading
+import time
 
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
 

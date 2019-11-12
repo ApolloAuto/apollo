@@ -18,7 +18,6 @@
 # -*- coding: utf-8 -*-
 """Module for test record."""
 
-import sys
 import unittest
 
 from cyber.proto import record_pb2
@@ -29,7 +28,8 @@ from modules.common.util.testdata.simple_pb2 import SimpleMessage
 TEST_RECORD_FILE = "/tmp/test02.record"
 CHAN_1 = "channel/chatter"
 MSG_TYPE = "apollo.common.util.test.SimpleMessage"
-STR_10B = b"1234567890"
+PROTO_DESC = b"1234567890"
+MSG_DATA = b"0123456789"
 TIME = 999
 
 
@@ -49,12 +49,12 @@ class TestRecord(unittest.TestCase):
         fwriter.set_intervaltime_fileseg(0)
 
         self.assertTrue(fwriter.open(TEST_RECORD_FILE))
-        fwriter.write_channel(CHAN_1, MSG_TYPE, STR_10B)
-        fwriter.write_message(CHAN_1, STR_10B, TIME)
+        fwriter.write_channel(CHAN_1, MSG_TYPE, PROTO_DESC)
+        fwriter.write_message(CHAN_1, MSG_DATA, TIME)
 
         self.assertEqual(1, fwriter.get_messagenumber(CHAN_1))
         self.assertEqual(MSG_TYPE, fwriter.get_messagetype(CHAN_1))
-        self.assertEqual(STR_10B, fwriter.get_protodesc(CHAN_1))
+        self.assertEqual(PROTO_DESC, fwriter.get_protodesc(CHAN_1))
         fwriter.close()
 
         # reader
@@ -73,7 +73,7 @@ class TestRecord(unittest.TestCase):
 
         for channelname, msg, datatype, timestamp in fread.read_messages():
             self.assertEqual(CHAN_1, channelname)
-            self.assertEqual(STR_10B, msg)
+            self.assertEqual(MSG_DATA, msg)
             self.assertEqual(TIME, timestamp)
             self.assertEqual(1, fread.get_messagenumber(channelname))
             self.assertEqual(MSG_TYPE, datatype)
