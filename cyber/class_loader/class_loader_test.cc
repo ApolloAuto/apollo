@@ -185,5 +185,7 @@ TEST(ClassLoaderTest, util_test) {
 int main(int argc, char** argv) {
   apollo::cyber::Init(argv[0]);
   testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+  const int output = RUN_ALL_TESTS();
+  google::protobuf::ShutdownProtobufLibrary();
+  return output;
 }
