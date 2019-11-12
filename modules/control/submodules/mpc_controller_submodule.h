@@ -27,6 +27,7 @@
 #include "modules/common/util/util.h"
 #include "modules/control/controller/controller.h"
 #include "modules/control/controller/mpc_controller.h"
+#include "modules/control/proto/calibration_table.pb.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/control/proto/pad_msg.pb.h"
@@ -81,6 +82,7 @@ class MPCControllerSubmodule final : public cyber::Component<Preprocessor> {
   std::mutex mutex_;
   // TODO(SHU): separate conf
   ControlConf mpc_controller_conf_;
+  calibrationtable::ControlCalibrationTable calibration_table_;
   LocalView* local_view_;
   std::shared_ptr<cyber::Writer<ControlCommand>> control_command_writer_;
 };
