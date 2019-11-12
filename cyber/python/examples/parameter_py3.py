@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -20,8 +20,8 @@
 
 import sys
 
-from cyber_py import cyber
-from cyber_py import parameter
+from cyber_py import cyber_py3 as cyber
+from cyber_py import parameter_py3 as parameter
 
 PARAM_SERVICE_NAME = "global_parameter_service"
 
@@ -41,15 +41,15 @@ def print_param_srv():
     clt.set_parameter(param3)
 
     param_list = clt.get_paramslist()
-    print "clt param lst len is ", len(param_list)
+    print("clt param lst len is ", len(param_list))
     for param in param_list:
-        print param.debug_string()
+        print(param.debug_string())
 
-    print ""
+    print("")
     param_list = srv.get_paramslist()
-    print "srv param lst len is ", len(param_list)
+    print("srv param lst len is ", len(param_list))
     for param in param_list:
-        print param.debug_string()
+        print(param.debug_string())
 
 
 if __name__ == '__main__':
