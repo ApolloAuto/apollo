@@ -37,6 +37,10 @@ DEFINE_string(
     "/apollo/modules/control/conf/longitudinal_controller_conf_file.pb.txt",
     "longitudinal controller conf data file");
 
+DEFINE_string(calibration_table_file,
+              "/apollo/modules/control/conf/calibration_table.pb.txt",
+              "calibration table file");
+
 DEFINE_bool(enable_csv_debug, false, "True to write out csv debug file.");
 DEFINE_bool(enable_speed_station_preview, true, "enable speed/station preview");
 
