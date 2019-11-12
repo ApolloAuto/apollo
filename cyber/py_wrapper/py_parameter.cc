@@ -22,7 +22,15 @@
 
 #include "cyber/py_wrapper/py_cyber.h"
 
+#if PY_MAJOR_VERSION >= 3
+#define PYOBJECT_NULL_STRING PyBytes_FromStringAndSize("", 0)
+#define C_STR_TO_PY_BYTES(cstr) \
+  PyBytes_FromStringAndSize(cstr.c_str(), cstr.size())
+#else
 #define PYOBJECT_NULL_STRING PyString_FromStringAndSize("", 0)
+#define C_STR_TO_PY_BYTES(cstr) \
+  PyString_FromStringAndSize(cstr.c_str(), cstr.size())
+#endif
 
 template <typename T>
 T PyObjectToPtr(PyObject* pyobj, const std::string& type_ptr) {
@@ -132,8 +140,8 @@ PyObject* cyber_PyParameter_type_name(PyObject* self, PyObject* args) {
     return PYOBJECT_NULL_STRING;
   }
 
-  std::string type = param->type_name();
-  return PyString_FromStringAndSize(type.c_str(), type.size());
+  const std::string type = param->type_name();
+  return C_STR_TO_PY_BYTES(type);
 }
 
 PyObject* cyber_PyParameter_descriptor(PyObject* self, PyObject* args) {
@@ -152,8 +160,8 @@ PyObject* cyber_PyParameter_descriptor(PyObject* self, PyObject* args) {
     return PYOBJECT_NULL_STRING;
   }
 
-  std::string desc = param->descriptor();
-  return PyString_FromStringAndSize(desc.c_str(), desc.size());
+  const std::string desc = param->descriptor();
+  return C_STR_TO_PY_BYTES(desc);
 }
 
 PyObject* cyber_PyParameter_name(PyObject* self, PyObject* args) {
@@ -171,8 +179,8 @@ PyObject* cyber_PyParameter_name(PyObject* self, PyObject* args) {
     return PYOBJECT_NULL_STRING;
   }
 
-  std::string name = param->name();
-  return PyString_FromStringAndSize(name.c_str(), name.size());
+  const std::string name = param->name();
+  return C_STR_TO_PY_BYTES(name);
 }
 
 PyObject* cyber_PyParameter_debug_string(PyObject* self, PyObject* args) {
@@ -191,8 +199,8 @@ PyObject* cyber_PyParameter_debug_string(PyObject* self, PyObject* args) {
     return PYOBJECT_NULL_STRING;
   }
 
-  std::string strTemp = param->debug_string();
-  return PyString_FromStringAndSize(strTemp.c_str(), strTemp.size());
+  const std::string debug_string = param->debug_string();
+  return C_STR_TO_PY_BYTES(debug_string);
 }
 
 PyObject* cyber_PyParameter_as_string(PyObject* self, PyObject* args) {
@@ -211,8 +219,8 @@ PyObject* cyber_PyParameter_as_string(PyObject* self, PyObject* args) {
     return PYOBJECT_NULL_STRING;
   }
 
-  std::string strTemp = param->as_string();
-  return PyString_FromStringAndSize(strTemp.c_str(), strTemp.size());
+  std::string debug_string = param->as_string();
+  return C_STR_TO_PY_BYTES(debug_string);
 }
 
 PyObject* cyber_PyParameter_as_double(PyObject* self, PyObject* args) {
@@ -632,11 +640,29 @@ static PyMethodDef _cyber_parameter_methods[] = {
     {"PyParameter_srv_get_parameter_list",
      cyber_PyParameter_srv_get_parameter_list, METH_VARARGS, ""},
 
-    {NULL, NULL, 0, NULL} /* sentinel */
+    {nullptr, nullptr, 0, nullptr} /* sentinel */
 };
 
 /// Init function of this module
+#if PY_MAJOR_VERSION >= 3
+PyMODINIT_FUNC PyInit__cyber_parameter_py3(void) {
+  static struct PyModuleDef module_def = {
+      PyModuleDef_HEAD_INIT,
+      "_cyber_parameter_py3",    // Module name.
+      "CyberParameter module",   // Module doc.
+      -1,                        // Module size.
+      _cyber_parameter_methods,  // Module methods.
+      nullptr,
+      nullptr,
+      nullptr,
+      nullptr,
+  };
+
+  return PyModule_Create(&module_def);
+}
+#else
 PyMODINIT_FUNC init_cyber_parameter(void) {
   AINFO << "init _cyber_parameter";
   Py_InitModule("_cyber_parameter", _cyber_parameter_methods);
 }
+#endif
