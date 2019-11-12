@@ -26,6 +26,7 @@ using apollo::cyber::PyClient;
 using apollo::cyber::PyNode;
 using apollo::cyber::PyReader;
 using apollo::cyber::PyService;
+using apollo::cyber::PyServiceUtils;
 using apollo::cyber::PyWriter;
 
 #if PY_MAJOR_VERSION >= 3
@@ -805,7 +806,7 @@ PyObject *cyber_PyServiceUtils_get_active_services(PyObject *self,
   }
 
   std::vector<std::string> services_name =
-      apollo::cyber::PyServiceUtils::get_active_services(sleep_s);
+      PyServiceUtils::get_active_services(sleep_s);
   PyObject *pyobj_list = PyList_New(services_name.size());
   size_t pos = 0;
   for (const std::string &name : services_name) {
@@ -829,8 +830,7 @@ PyObject *cyber_PyServiceUtils_get_service_attr(PyObject *self,
     return Py_None;
   }
   std::string name(srv_name, len);
-  const std::string srv_attr =
-      apollo::cyber::PyServiceUtils::get_service_attr(name, sleep_s);
+  const std::string srv_attr = PyServiceUtils::get_service_attr(name, sleep_s);
   return C_STR_TO_PY_BYTES(srv_attr);
 }
 
@@ -910,10 +910,10 @@ static PyMethodDef _cyber_methods[] = {
 PyMODINIT_FUNC PyInit__cyber_py3(void) {
   static struct PyModuleDef module_def = {
       PyModuleDef_HEAD_INIT,
-      "_cyber_py3",        // Module name.
-      "CyberNode module",  // Module doc.
-      -1,                  // Module size.
-      _cyber_methods,      // Module methods.
+      "_cyber_py3",    // Module name.
+      "Cyber module",  // Module doc.
+      -1,              // Module size.
+      _cyber_methods,  // Module methods.
       nullptr,
       nullptr,
       nullptr,
