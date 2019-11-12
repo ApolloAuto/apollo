@@ -20,6 +20,10 @@
 #include <set>
 #include <string>
 
+using apollo::cyber::PyDuration;
+using apollo::cyber::PyRate;
+using apollo::cyber::PyTime;
+
 #define PYOBJECT_NULL_STRING PyString_FromStringAndSize("", 0)
 
 template <typename T>
@@ -40,10 +44,8 @@ PyObject* cyber_new_PyTime(PyObject* self, PyObject* args) {
     return Py_None;
   }
 
-  apollo::cyber::PyTime* pytime = new apollo::cyber::PyTime(nanoseconds);
-  PyObject* pyobj_time =
-      PyCapsule_New(pytime, "apollo_cybertron_pytime", nullptr);
-  return pyobj_time;
+  PyTime* pytime = new PyTime(nanoseconds);
+  return PyCapsule_New(pytime, "apollo_cybertron_pytime", nullptr);
 }
 
 PyObject* cyber_delete_PyTime(PyObject* self, PyObject* args) {
@@ -54,8 +56,8 @@ PyObject* cyber_delete_PyTime(PyObject* self, PyObject* args) {
     return Py_None;
   }
 
-  auto pytime = (apollo::cyber::PyTime*)PyCapsule_GetPointer(
-      pyobj_time, "apollo_cybertron_pytime");
+  auto* pytime = reinterpret_cast<PyTime*>(
+      PyCapsule_GetPointer(pyobj_time, "apollo_cybertron_pytime"));
   if (nullptr == pytime) {
     AERROR << "cyber_delete_PyTime:time ptr is null!";
     Py_INCREF(Py_None);
@@ -74,8 +76,8 @@ PyObject* cyber_PyTime_to_sec(PyObject* self, PyObject* args) {
     return PyFloat_FromDouble(0);
   }
 
-  auto pytime = (apollo::cyber::PyTime*)PyCapsule_GetPointer(
-      pyobj_time, "apollo_cybertron_pytime");
+  auto* pytime = reinterpret_cast<PyTime*>(
+      PyCapsule_GetPointer(pyobj_time, "apollo_cybertron_pytime"));
   if (nullptr == pytime) {
     AERROR << "cyber_PyTime_to_sec ptr is null!";
     return PyFloat_FromDouble(0);
@@ -93,8 +95,8 @@ PyObject* cyber_PyTime_to_nsec(PyObject* self, PyObject* args) {
     return PyLong_FromUnsignedLongLong(0);
   }
 
-  auto pytime = (apollo::cyber::PyTime*)PyCapsule_GetPointer(
-      pyobj_time, "apollo_cybertron_pytime");
+  auto* pytime = reinterpret_cast<PyTime*>(
+      PyCapsule_GetPointer(pyobj_time, "apollo_cybertron_pytime"));
   if (nullptr == pytime) {
     AERROR << "cyber_PyTime_to_nsec ptr is null!";
     return PyLong_FromUnsignedLongLong(0);
@@ -114,8 +116,8 @@ PyObject* cyber_PyTime_sleep_until(PyObject* self, PyObject* args) {
     return Py_None;
   }
 
-  auto pytime = (apollo::cyber::PyTime*)PyCapsule_GetPointer(
-      pyobj_time, "apollo_cybertron_pytime");
+  auto* pytime = reinterpret_cast<PyTime*>(
+      PyCapsule_GetPointer(pyobj_time, "apollo_cybertron_pytime"));
   if (nullptr == pytime) {
     AERROR << "cyber_PyTime_sleep_until ptr is null!";
     Py_INCREF(Py_None);
@@ -128,12 +130,12 @@ PyObject* cyber_PyTime_sleep_until(PyObject* self, PyObject* args) {
 }
 
 PyObject* cyber_PyTime_now(PyObject* self, PyObject* args) {
-  apollo::cyber::PyTime now = apollo::cyber::PyTime::now();
+  PyTime now = PyTime::now();
   return PyLong_FromUnsignedLongLong(now.to_nsec());
 }
 
 PyObject* cyber_PyTime_mono_time(PyObject* self, PyObject* args) {
-  apollo::cyber::PyTime mono_time = apollo::cyber::PyTime::mono_time();
+  PyTime mono_time = PyTime::mono_time();
   return PyLong_FromUnsignedLongLong(mono_time.to_nsec());
 }
 
@@ -147,11 +149,8 @@ PyObject* cyber_new_PyDuration(PyObject* self, PyObject* args) {
     return Py_None;
   }
 
-  apollo::cyber::PyDuration* pyduration =
-      new apollo::cyber::PyDuration(nanoseconds);
-  PyObject* pyobj_duration =
-      PyCapsule_New(pyduration, "apollo_cybertron_pyduration", nullptr);
-  return pyobj_duration;
+  PyDuration* pyduration = new PyDuration(nanoseconds);
+  return PyCapsule_New(pyduration, "apollo_cybertron_pyduration", nullptr);
 }
 
 PyObject* cyber_delete_PyDuration(PyObject* self, PyObject* args) {
@@ -162,8 +161,8 @@ PyObject* cyber_delete_PyDuration(PyObject* self, PyObject* args) {
     return Py_None;
   }
 
-  auto pyduration = (apollo::cyber::PyDuration*)PyCapsule_GetPointer(
-      pyobj_duration, "apollo_cybertron_pyduration");
+  auto* pyduration = reinterpret_cast<PyDuration*>(
+      PyCapsule_GetPointer(pyobj_duration, "apollo_cybertron_pyduration"));
   if (nullptr == pyduration) {
     AERROR << "cyber_delete_PyDuration:pyduration ptr is null!";
     Py_INCREF(Py_None);
@@ -182,8 +181,8 @@ PyObject* cyber_PyDuration_sleep(PyObject* self, PyObject* args) {
     return Py_None;
   }
 
-  auto pyduration = (apollo::cyber::PyDuration*)PyCapsule_GetPointer(
-      pyobj_duration, "apollo_cybertron_pyduration");
+  auto* pyduration = reinterpret_cast<PyDuration*>(
+      PyCapsule_GetPointer(pyobj_duration, "apollo_cybertron_pyduration"));
   if (nullptr == pyduration) {
     AERROR << "cyber_PyDuration_sleep:pyduration ptr is null!";
     Py_INCREF(Py_None);
@@ -204,10 +203,8 @@ PyObject* cyber_new_PyRate(PyObject* self, PyObject* args) {
     return Py_None;
   }
 
-  apollo::cyber::PyRate* pyrate = new apollo::cyber::PyRate(nanoseconds);
-  PyObject* pyobj_rate =
-      PyCapsule_New(pyrate, "apollo_cybertron_pyrate", nullptr);
-  return pyobj_rate;
+  PyRate* pyrate = new PyRate(nanoseconds);
+  return PyCapsule_New(pyrate, "apollo_cybertron_pyrate", nullptr);
 }
 
 PyObject* cyber_delete_PyRate(PyObject* self, PyObject* args) {
@@ -218,8 +215,8 @@ PyObject* cyber_delete_PyRate(PyObject* self, PyObject* args) {
     return Py_None;
   }
 
-  auto pyrate = (apollo::cyber::PyRate*)PyCapsule_GetPointer(
-      pyobj_rate, "apollo_cybertron_pyrate");
+  auto* pyrate = reinterpret_cast<PyRate*>(
+      PyCapsule_GetPointer(pyobj_rate, "apollo_cybertron_pyrate"));
   if (nullptr == pyrate) {
     AERROR << "cyber_delete_PyRate:rate ptr is null!";
     Py_INCREF(Py_None);
@@ -238,8 +235,8 @@ PyObject* cyber_PyRate_sleep(PyObject* self, PyObject* args) {
     return Py_None;
   }
 
-  auto pyrate = (apollo::cyber::PyRate*)PyCapsule_GetPointer(
-      pyobj_rate, "apollo_cybertron_pyrate");
+  auto* pyrate = reinterpret_cast<PyRate*>(
+      PyCapsule_GetPointer(pyobj_rate, "apollo_cybertron_pyrate"));
   if (nullptr == pyrate) {
     AERROR << "cyber_PyRate_sleep:rate ptr is null!";
     Py_INCREF(Py_None);
@@ -258,8 +255,8 @@ PyObject* cyber_PyRate_reset(PyObject* self, PyObject* args) {
     return Py_None;
   }
 
-  auto pyrate = (apollo::cyber::PyRate*)PyCapsule_GetPointer(
-      pyobj_rate, "apollo_cybertron_pyrate");
+  auto* pyrate = reinterpret_cast<PyRate*>(
+      PyCapsule_GetPointer(pyobj_rate, "apollo_cybertron_pyrate"));
   if (nullptr == pyrate) {
     AERROR << "cyber_PyRate_reset:rate ptr is null!";
     Py_INCREF(Py_None);
@@ -278,8 +275,8 @@ PyObject* cyber_PyRate_get_cycle_time(PyObject* self, PyObject* args) {
     return PyLong_FromUnsignedLongLong(0);
   }
 
-  auto pyrate = (apollo::cyber::PyRate*)PyCapsule_GetPointer(
-      pyobj_rate, "apollo_cybertron_pyrate");
+  auto* pyrate = reinterpret_cast<PyRate*>(
+      PyCapsule_GetPointer(pyobj_rate, "apollo_cybertron_pyrate"));
   if (nullptr == pyrate) {
     AERROR << "cyber_PyRate_get_cycle_time:rate ptr is null!";
     return PyLong_FromUnsignedLongLong(0);
@@ -296,8 +293,8 @@ PyObject* cyber_PyRate_get_expected_cycle_time(PyObject* self, PyObject* args) {
     return PyLong_FromUnsignedLongLong(0);
   }
 
-  auto pyrate = (apollo::cyber::PyRate*)PyCapsule_GetPointer(
-      pyobj_rate, "apollo_cybertron_pyrate");
+  auto* pyrate = reinterpret_cast<PyRate*>(
+      PyCapsule_GetPointer(pyobj_rate, "apollo_cybertron_pyrate"));
   if (nullptr == pyrate) {
     AERROR << "cyber_PyRate_get_expected_cycle_time:rate ptr is null!";
     return PyLong_FromUnsignedLongLong(0);
