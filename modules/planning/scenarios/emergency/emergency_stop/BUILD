@@ -30,4 +30,19 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "emergency_stop_scenario_test",
+    size = "small",
+    srcs = [
+        "emergency_stop_scenario_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        ":emergency_stop_scenario",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
