@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -35,7 +35,7 @@ sys.path.append(CYBER_PATH + "/lib/python/")
 sys.path.append(CYBER_DIR + "/python/")
 sys.path.append(CYBER_DIR + "/cyber/")
 
-_CYBER_PARAM = importlib.import_module('_cyber_parameter')
+_CYBER_PARAM = importlib.import_module('_cyber_parameter_py3')
 
 
 class Parameter(object):
@@ -49,7 +49,7 @@ class Parameter(object):
             self.param = name
         elif (name is None and value is None):
             self.param = _CYBER_PARAM.new_PyParameter_noparam()
-        elif isinstance(value, int) or isinstance(value, long):
+        elif isinstance(value, int):
             self.param = _CYBER_PARAM.new_PyParameter_int(name, value)
         elif isinstance(value, float):
             self.param = _CYBER_PARAM.new_PyParameter_double(name, value)
