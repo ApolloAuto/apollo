@@ -114,7 +114,16 @@ Stage::StageStatus LaneFollowStage::Process(
   ADEBUG << "Number of reference lines:\t"
          << frame->mutable_reference_line_info()->size();
 
+  unsigned count = 0;
+
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
+    // TODO(SHU): need refactor
+    if (count++ == frame->mutable_reference_line_info()->size()) {
+      break;
+    }
+    ADEBUG << "No: [" << count << "] Reference Line.";
+    ADEBUG << "IsChangeLanePath: " << reference_line_info.IsChangeLanePath();
+
     if (has_drivable_reference_line) {
       reference_line_info.SetDrivable(false);
       break;
@@ -126,6 +135,8 @@ Stage::StageStatus LaneFollowStage::Process(
     if (cur_status.ok()) {
       if (reference_line_info.IsChangeLanePath()) {
         ADEBUG << "reference line is lane change ref.";
+        ADEBUG << "FLAGS_enable_smarter_lane_change: "
+               << FLAGS_enable_smarter_lane_change;
         if (reference_line_info.Cost() < kStraightForwardLineCost &&
             (LaneChangeDecider::IsClearToChangeLane(&reference_line_info) ||
              FLAGS_enable_smarter_lane_change)) {
@@ -162,6 +173,8 @@ Status LaneFollowStage::PlanOnReferenceLine(
     reference_line_info->AddCost(kStraightForwardLineCost);
   }
   ADEBUG << "planning start point:" << planning_start_point.DebugString();
+  ADEBUG << "Current reference_line_info is IsChangeLanePath: "
+         << reference_line_info->IsChangeLanePath();
 
   auto ret = Status::OK();
   for (auto* optimizer : task_list_) {
@@ -180,6 +193,12 @@ Status LaneFollowStage::PlanOnReferenceLine(
     ADEBUG << optimizer->Name() << " time spend: " << time_diff_ms << " ms.";
 
     RecordDebugInfo(reference_line_info, optimizer->Name(), time_diff_ms);
+
+    // updated reference_line_info, because it is changed in
+    // lane_change_decider by PrioritizeChangeLane().
+    reference_line_info = &frame->mutable_reference_line_info()->front();
+    ADEBUG << "Current reference_line_info is IsChangeLanePath: "
+           << reference_line_info->IsChangeLanePath();
   }
 
   RecordObstacleDebugInfo(reference_line_info);
@@ -232,8 +251,8 @@ Status LaneFollowStage::PlanOnReferenceLine(
         }
       }
       if (add_stop_obstacle_cost) {
-        constexpr double kRefrenceLineStaticObsCost = 1e3;
-        reference_line_info->AddCost(kRefrenceLineStaticObsCost);
+        static constexpr double kReferenceLineStaticObsCost = 1e3;
+        reference_line_info->AddCost(kReferenceLineStaticObsCost);
       }
     }
   }

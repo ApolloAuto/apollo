@@ -80,10 +80,12 @@ class LaneChangeDecider : public Decider {
                     const std::string& path_id);
 
   void PrioritizeChangeLane(
+      const bool is_prioritize_change_lane,
       std::list<ReferenceLineInfo>* reference_line_info) const;
 
-  void RemoveChangeLane(
-      std::list<ReferenceLineInfo>* reference_line_info) const;
+  // disabled for now
+  // void RemoveChangeLane(
+  //       std::list<ReferenceLineInfo>* reference_line_info) const;
 
   std::string GetCurrentPathId(
       const std::list<ReferenceLineInfo>& reference_line_info) const;
