@@ -218,10 +218,13 @@ void SemanticLSTMEvaluator::LoadModel() {
   if (FLAGS_use_cuda && torch::cuda::is_available()) {
     ADEBUG << "CUDA is available";
     device_ = torch::Device(torch::kCUDA);
+    torch_model_ =
+        torch::jit::load(FLAGS_torch_vehicle_semantic_lstm_file, device_);
+  } else {
+    torch_model_ =
+        torch::jit::load(FLAGS_torch_vehicle_semantic_lstm_cpu_file, device_);
   }
   torch::set_num_threads(1);
-  torch_model_ =
-      torch::jit::load(FLAGS_torch_vehicle_semantic_lstm_file, device_);
 }
 
 }  // namespace prediction
