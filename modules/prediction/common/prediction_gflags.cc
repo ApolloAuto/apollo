@@ -149,7 +149,11 @@ DEFINE_string(torch_vehicle_junction_map_file,
               "Vehicle junction map model file");
 DEFINE_string(torch_vehicle_semantic_lstm_file,
               "/apollo/modules/prediction/data/semantic_lstm_vehicle_model.pt",
-              "Vehicle semantic lstm model file");
+              "Vehicle semantic lstm model file, default for gpu");
+DEFINE_string(
+    torch_vehicle_semantic_lstm_cpu_file,
+    "/apollo/modules/prediction/data/semantic_lstm_vehicle_cpu_model.pt",
+    "Vehicle semantic lstm cpu model file");
 DEFINE_string(torch_vehicle_cruise_go_file,
               "/apollo/modules/prediction/data/cruise_go_vehicle_model.pt",
               "Vehicle cruise go model file");
