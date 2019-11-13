@@ -87,8 +87,6 @@ new_local_repository(
 )
 
 # PCL 1.9
-# =======
-# This requires libpcl-dev to be installed in your Ubuntu/Debian.
 new_local_repository(
     name = "pcl",
     build_file = "third_party/pcl.BUILD",

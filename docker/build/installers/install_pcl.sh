@@ -27,11 +27,11 @@ if [ "$ARCH" == "aarch64" ]; then
 fi
 
 if [ "$BUILD" == "build" ] || [ "$ARCH" == "x86_64" ]; then
-  wget https://github.com/PointCloudLibrary/pcl/archive/pcl-1.7.2.tar.gz
+  wget https://github.com/PointCloudLibrary/pcl/archive/pcl-1.9.1.tar.gz
 
-  tar xzvf pcl-1.7.2.tar.gz
+  tar xzvf pcl-1.9.1.tar.gz
 
-  pushd pcl-pcl-1.7.2/
+  pushd pcl-pcl-1.9.1/
   echo "add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)" > temp
   cat CMakeLists.txt >> temp
   mv temp CMakeLists.txt
