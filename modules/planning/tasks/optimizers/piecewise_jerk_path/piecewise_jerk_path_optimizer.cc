@@ -173,7 +173,12 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   piecewise_jerk_problem.set_end_state_ref({1000.0, 0.0, 0.0}, end_state);
   if (end_state[0] != 0) {
     std::vector<double> x_ref(lat_boundaries.size(), end_state[0]);
-    piecewise_jerk_problem.set_x_ref(10.0, x_ref);
+    const auto& pull_over_type = PlanningContext::Instance()->planning_status()
+                                                              .pull_over()
+                                                              .pull_over_type();
+    const double weight_x_ref =
+        pull_over_type == PullOverStatus::EMERGENCY_PULL_OVER ? 200.0 : 10.0;
+    piecewise_jerk_problem.set_x_ref(weight_x_ref, x_ref);
   }
 
   piecewise_jerk_problem.set_weight_x(w[0]);

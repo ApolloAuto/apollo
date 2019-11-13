@@ -579,10 +579,14 @@ bool PathBoundsDecider::FindDestinationPullOverS(
 bool PathBoundsDecider::FindEmergencyPullOverS(
     const ReferenceLineInfo& reference_line_info, double* pull_over_s) {
   const double adc_end_s = reference_line_info.AdcSlBoundary().end_s();
+  const double min_turn_radius = common::VehicleConfigHelper::Instance()
+                                     ->GetConfig()
+                                     .vehicle_param()
+                                     .min_turn_radius();
+  constexpr double kAdjustFactor = 2.0;
+  const double pull_over_distance = min_turn_radius * 2 * kAdjustFactor;
+  *pull_over_s = adc_end_s + pull_over_distance;
 
-  // TODO(all): to be implemented
-
-  *pull_over_s = adc_end_s + 15.0;
   return true;
 }
 
