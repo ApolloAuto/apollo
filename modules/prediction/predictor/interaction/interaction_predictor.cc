@@ -337,6 +337,7 @@ double InteractionPredictor::CollisionWithEgoVehicleCost(
                                distance * distance);
         cost_abs_sum += std::abs(cost);
         cost_sqr_sum += cost * cost;
+        break;
       } else {
         ++lane_seg_idx;
         remained_s -= lane_length;
