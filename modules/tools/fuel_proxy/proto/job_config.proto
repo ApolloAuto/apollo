@@ -45,6 +45,7 @@ message JobConfig {
     UNKNOWN = 0;
     VEHICLE_CALIBRATION = 1;
     SIMPLE_HDMAP = 2;
+    PERCEPTION_MODEL_TRAINING = 3;
   }
   optional JobType job_type = 1;
   // You must have an assigned partner ID to use the service. Contact our BD
@@ -65,4 +66,8 @@ message JobConfig {
   // "/apollo/sensor/velodyne16/compensator/PointCloud2",
   // then lidar_type is velodyne16
   optional string lidar_type = 6;
+
+  // 1. output_trained_data_path is required in perception model training
+  // 2. it specifies where the model should be put after training is completed
+  optional string output_trained_model_path = 7;
 }
