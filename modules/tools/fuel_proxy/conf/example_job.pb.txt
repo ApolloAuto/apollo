@@ -1,4 +1,4 @@
-job_type: VEHICLE_CALIBRATION or SIMPLE_HDMAP
+job_type: VEHICLE_CALIBRATION or SIMPLE_HDMAP or PERCEPTION_MODEL_TRAINING
 partner_id: "my-id"
 storage {
   bos {
@@ -11,3 +11,4 @@ storage {
 input_data_path: "path/to/records-and-conf"
 zone_id: my-zone
 lidar_type: "my-lidartype"
+output_trained_model_path: "path/to/model"
