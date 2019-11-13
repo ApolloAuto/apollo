@@ -53,14 +53,17 @@ cc_library(
 
 cc_library(
     name = "swap",
-    srcs = select({
-        ":x86_mode": [
-            "detail/swap_x86_64.S",
-        ],
-        ":arm_mode": [
-            "detail/swap_aarch64.S",
-        ],
-    }),
+    srcs = select(
+        {
+            ":x86_mode": [
+                "detail/swap_x86_64.S",
+            ],
+            ":arm_mode": [
+                "detail/swap_aarch64.S",
+            ],
+        },
+        no_match_error = "Please Build with an ARM or Linux x86_64 platform",
+    ),
 )
 
 cc_test(
