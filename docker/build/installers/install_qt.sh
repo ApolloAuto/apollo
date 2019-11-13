@@ -21,27 +21,26 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-QT_VERSION_A=5.5
-QT_VERSION_B=5.5.1
-QT_VERSION_SCRIPT=551
+QT_VERSION_A=5.9
+QT_VERSION_B=5.9.8
+
+ARCH=$(uname -m)
 
 wget https://download.qt.io/archive/qt/${QT_VERSION_A}/${QT_VERSION_B}/qt-opensource-linux-x64-${QT_VERSION_B}.run
 
-chmod +x qt-opensource-linux-x64-${QT_VERSION_B}.run 
+chmod +x qt-opensource-linux-x64-${QT_VERSION_B}.run
 
-# The '-platform' flag causes a message to stdout "Unknown option: p, l, a, t, f, o, r, m": message is incorrectly printed (it's a bug). The command still succeeds.
-# https://stackoverflow.com/a/34032216/1158977
+    # The '-platform' flag causes a message to stdout "Unknown option: p, l, a, t, f, o, r, m": message is incorrectly printed (it's a bug). The command still succeeds.
+    # https://stackoverflow.com/a/34032216/1158977
 
-# the below error can be ignored since Ubuntu 14 does not have sslv2
-# qt.network.ssl: QSslSocket: cannot resolve SSLv2_client_method
-# qt.network.ssl: QSslSocket: cannot resolve SSLv2_server_method
+    # the below error can be ignored since Ubuntu 14 does not have sslv2
+    # qt.network.ssl: QSslSocket: cannot resolve SSLv2_client_method
+    # qt.network.ssl: QSslSocket: cannot resolve SSLv2_server_method
 ./qt-opensource-linux-x64-${QT_VERSION_B}.run --script qt-noninteractive.qs  -platform minimal
 
-# this will install to "/qt" so need to symlink to /usr/local/Qt5.5.1
-# as needed in https://github.com/ApolloAuto/apollo/blob/master/tools/qt.bzl
-ln -s /qt /usr/local/Qt$QT_VERSION_B
+mkdir /usr/local/Qt$QT_VERSION_B
+ln -s /qt/$QT_VERSION_B /usr/local/Qt$QT_VERSION_B/$QT_VERSION_A
 
-# clean up
+    # clean up
 rm qt-opensource-linux-x64-${QT_VERSION_B}.run
 rm -rf /usr/local/Qt$QT_VERSION_B/{Docs,Examples,Extras,Tools}
-
