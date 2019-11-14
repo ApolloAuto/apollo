@@ -114,7 +114,7 @@ Stage::StageStatus LaneFollowStage::Process(
   ADEBUG << "Number of reference lines:\t"
          << frame->mutable_reference_line_info()->size();
 
-  unsigned count = 0;
+  unsigned int count = 0;
 
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     // TODO(SHU): need refactor
@@ -194,11 +194,12 @@ Status LaneFollowStage::PlanOnReferenceLine(
 
     RecordDebugInfo(reference_line_info, optimizer->Name(), time_diff_ms);
 
+    // TODO(SHU): disable reference line order changes for now
     // updated reference_line_info, because it is changed in
     // lane_change_decider by PrioritizeChangeLane().
-    reference_line_info = &frame->mutable_reference_line_info()->front();
-    ADEBUG << "Current reference_line_info is IsChangeLanePath: "
-           << reference_line_info->IsChangeLanePath();
+    // reference_line_info = &frame->mutable_reference_line_info()->front();
+    // ADEBUG << "Current reference_line_info is IsChangeLanePath: "
+    //        << reference_line_info->IsChangeLanePath();
   }
 
   RecordObstacleDebugInfo(reference_line_info);

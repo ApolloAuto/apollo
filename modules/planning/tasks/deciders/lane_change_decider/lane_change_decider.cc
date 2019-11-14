@@ -56,7 +56,6 @@ Status LaneChangeDecider::Process(
   auto* prev_status = PlanningContext::Instance()
                           ->mutable_planning_status()
                           ->mutable_change_lane();
-  bool lane_change_opt_status = prev_status->is_current_opt_succeed();
   double now = Clock::NowInSeconds();
 
   if (!prev_status->has_status()) {
@@ -89,7 +88,7 @@ Status LaneChangeDecider::Process(
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
     if (prev_status->status() == ChangeLaneStatus::IN_CHANGE_LANE) {
-      if (prev_status->path_id() == current_path_id && lane_change_opt_status) {
+      if (prev_status->path_id() == current_path_id) {
         PrioritizeChangeLane(true, reference_line_info);
       } else {
         // RemoveChangeLane(reference_line_info);
@@ -100,6 +99,8 @@ Status LaneChangeDecider::Process(
       }
       return Status::OK();
     } else if (prev_status->status() == ChangeLaneStatus::CHANGE_LANE_FAILED) {
+      // TODO(SHU): add a optimization_failure counter to enter
+      // change_lane_failed status
       if (now - prev_status->timestamp() < FLAGS_change_lane_fail_freeze_time) {
         // RemoveChangeLane(reference_line_info);
         PrioritizeChangeLane(false, reference_line_info);
@@ -198,6 +199,11 @@ void LaneChangeDecider::PrioritizeChangeLane(
     AERROR << "Reference line info empty";
     return;
   }
+  // TODO(SHU): disable the reference line order change for now
+  return;
+  // if (!is_prioritize_change_lane) {
+  //   return;
+  // }
   auto iter = reference_line_info->begin();
   while (iter != reference_line_info->end()) {
     ADEBUG << "iter->IsChangeLanePath(): " << iter->IsChangeLanePath();
