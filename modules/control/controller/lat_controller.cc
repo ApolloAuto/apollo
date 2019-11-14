@@ -504,15 +504,15 @@ Status LatController::ComputeControlCommand(
   // Compute the steering command limit with the given maximum lateral
   // acceleration
   const double steer_limit =
-      (FLAGS_set_steer_limit) ? std::atan(max_lat_acc_ * wheelbase_ /
-                                          (vehicle_state->linear_velocity() *
-                                           vehicle_state->linear_velocity())) *
-                                    steer_ratio_ * 180 / M_PI /
-                                    steer_single_direction_max_degree_ * 100
-                              : 100.0;
+      FLAGS_set_steer_limit ? std::atan(max_lat_acc_ * wheelbase_ /
+                                        (vehicle_state->linear_velocity() *
+                                         vehicle_state->linear_velocity())) *
+                                  steer_ratio_ * 180 / M_PI /
+                                  steer_single_direction_max_degree_ * 100
+                            : 100.0;
 
   const double steer_diff_with_max_rate =
-      (FLAGS_enable_maximum_steer_rate_limit)
+      FLAGS_enable_maximum_steer_rate_limit
           ? vehicle_param_.max_steer_angle_rate() * ts_ * 180 / M_PI /
                 steer_single_direction_max_degree_ * 100
           : 100.0;
