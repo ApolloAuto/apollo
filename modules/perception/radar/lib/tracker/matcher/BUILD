@@ -25,7 +25,6 @@ cc_library(
     ],
     deps = [
         "//cyber/common:file",
-        "//modules/common/util:string_util",
         "//modules/perception/base",
         "//modules/perception/common/graph",
         "//modules/perception/lib/config_manager",
@@ -35,6 +34,7 @@ cc_library(
         "//modules/perception/radar/common:types",
         "//modules/perception/radar/lib/interface:base_matcher",
         "//modules/perception/radar/lib/tracker/common:radar_track",
+        "@com_google_absl//absl/strings",
         "@eigen",
     ],
 )

@@ -21,8 +21,8 @@
 #include "pcl/kdtree/kdtree.h"
 #include "pcl/kdtree/kdtree_flann.h"
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
-#include "modules/common/util/string_util.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point_cloud.h"
@@ -204,8 +204,7 @@ class OfflineLidarObstaclePerception {
       }
       if (!WriteObjectsForNewBenchmark(
               i, filtered_objects,
-              apollo::common::util::StrCat(output_path, "/", file_name,
-                                           ".pcd"))) {
+              absl::StrCat(output_path, "/", file_name, ".pcd"))) {
         return false;
       }
     }
