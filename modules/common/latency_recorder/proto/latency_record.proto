@@ -22,8 +22,16 @@ message LatencyStat {
   optional uint32 sample_size = 4;
 };
 
+message LatencyTrack {
+  message ModuleLatencyTrack {
+    optional string module_name = 1;
+    optional LatencyStat module_stat = 2;
+  }
+  repeated ModuleLatencyTrack module_latency = 1;
+}
+
 message LatencyReport {
   optional apollo.common.Header header = 1;
   optional LatencyStat total_duration = 2;
-  map<string, LatencyStat> stat_aggr = 3;
+  optional LatencyTrack latency_tracks = 3;
 };
