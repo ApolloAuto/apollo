@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 
+#include "absl/strings/str_cat.h"
 #include "boost/algorithm/string.hpp"
 #include "google/protobuf/stubs/stringprintf.h"
 #include "google/protobuf/stubs/strutil.h"
@@ -39,9 +40,9 @@ namespace common {
 namespace util {
 
 // Expose some useful utils from protobuf.
+using absl::StrCat;
 using google::protobuf::Join;
-using google::protobuf::StrAppend;
-using google::protobuf::StrCat;
+// TODO(xiaoxq): Migrate to absl::StrFormat after absl upgraded.
 using google::protobuf::StringPrintf;
 
 template <typename T>
@@ -82,9 +83,9 @@ std::string PrintIter(const Iter& begin, const Iter& end,
   if (transformer) {
     for (auto iter = begin; iter != end; ++iter) {
       if (iter == begin) {
-        StrAppend(&result, transformer(*iter));
+        absl::StrAppend(&result, transformer(*iter));
       } else {
-        StrAppend(&result, delimiter, transformer(*iter));
+        absl::StrAppend(&result, delimiter, transformer(*iter));
       }
     }
   } else {
@@ -129,9 +130,9 @@ std::string PrintDebugStringIter(const Iter& begin, const Iter& end,
   std::string result;
   for (auto iter = begin; iter != end; ++iter) {
     if (iter == begin) {
-      StrAppend(&result, iter->DebugString());
+      absl::StrAppend(&result, iter->DebugString());
     } else {
-      StrAppend(&result, delimiter, iter->DebugString());
+      absl::StrAppend(&result, delimiter, iter->DebugString());
     }
   }
   return result;
