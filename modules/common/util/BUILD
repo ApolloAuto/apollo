@@ -80,12 +80,8 @@ cc_library(
 
 cc_library(
     name = "string_util",
-    srcs = [
-        "string_util.cc",
-    ],
-    hdrs = [
-        "string_util.h",
-    ],
+    srcs = ["string_util.cc"],
+    hdrs = ["string_util.h"],
     deps = [
         "@com_google_protobuf//:protobuf",
     ],
@@ -246,6 +242,7 @@ cc_library(
         "//modules/common/status",
         "//modules/common/util:string_util",
         "//third_party/json",
+        "@com_google_absl//absl/strings",
         "@curlpp",
     ],
 )
