@@ -27,6 +27,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/util",
+        "@com_google_absl//absl/strings",
         "@eigen",
         "@pcl",
         "@vtk",

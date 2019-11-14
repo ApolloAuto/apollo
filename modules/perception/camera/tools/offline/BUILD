@@ -45,9 +45,7 @@ cc_library(
 
 cc_binary(
     name = "offline_obstacle_pipeline",
-    srcs = [
-        "offline_obstacle_pipeline.cc",
-    ],
+    srcs = ["offline_obstacle_pipeline.cc"],
     linkopts = [
         "-lopencv_core",
         "-lopencv_imgproc",
@@ -64,6 +62,7 @@ cc_binary(
         "//modules/perception/camera/lib/lane/detector/darkSCNN:darkSCNN_lane_detector",
         "//modules/perception/camera/lib/lane/postprocessor/darkSCNN:darkSCNN_lane_postprocessor",
         "//modules/perception/lib/utils",
+        "@com_google_absl//absl/strings",
     ],
 )
 

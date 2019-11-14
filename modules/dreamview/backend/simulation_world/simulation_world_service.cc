@@ -18,6 +18,7 @@
 
 #include <unordered_set>
 
+#include "absl/strings/str_split.h"
 #include "cyber/common/file.h"
 #include "google/protobuf/util/json_util.h"
 #include "modules/canbus/proto/chassis.pb.h"
@@ -838,8 +839,8 @@ void SimulationWorldService::UpdateDecision(const DecisionResult &decision_res,
           if (decision.has_stop()) {
             // flag yielded obstacles
             for (auto obstacle_id : decision.stop().wait_for_obstacle()) {
-              std::vector<std::string> id_segments;
-              apollo::common::util::Split(obstacle_id, '_', &id_segments);
+              const std::vector<std::string> id_segments =
+                  absl::StrSplit(obstacle_id, '_');
               if (id_segments.size() > 0) {
                 obj_map_[id_segments[0]].set_yielded_obstacle(true);
               }

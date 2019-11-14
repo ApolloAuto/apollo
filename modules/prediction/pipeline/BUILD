@@ -11,6 +11,7 @@ cc_binary(
     deps = [
         "//modules/prediction/common:message_process",
         "@boost",
+        "@com_google_absl//absl/strings",
         "@opencv",
     ],
 )
