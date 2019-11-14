@@ -94,12 +94,6 @@ int NearestBackwardObstacleIdOnLaneSequence(const LaneSequence& lane_sequence) {
 
 ObstaclesPrioritizer::ObstaclesPrioritizer() {}
 
-void ObstaclesPrioritizer::PrioritizeObstacles() {
-  ego_back_lane_id_set_.clear();
-  AssignIgnoreLevel();
-  AssignCautionLevel();
-}
-
 void ObstaclesPrioritizer::AssignIgnoreLevel() {
   auto obstacles_container =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
@@ -177,7 +171,7 @@ void ObstaclesPrioritizer::AssignIgnoreLevel() {
   obstacles_container->SetConsideredObstacleIds();
 }
 
-void ObstaclesPrioritizer::AssignCautionLevel() {
+void ObstaclesPrioritizer::AssignCautionLevel(const Scenario& scenario) {
   auto obstacles_container =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
@@ -196,16 +190,19 @@ void ObstaclesPrioritizer::AssignCautionLevel() {
     return;
   }
 
-  // AssignCautionLevelInJunction(*ego_vehicle, obstacles_container);
+  if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id()) {
+    AssignCautionLevelInJunction(*ego_vehicle, obstacles_container,
+                                 scenario.junction_id());
+  }
   AssignCautionLevelCruiseKeepLane(*ego_vehicle, obstacles_container);
   AssignCautionLevelCruiseChangeLane(*ego_vehicle, obstacles_container);
   AssignCautionLevelByEgoReferenceLine(*ego_vehicle, obstacles_container);
 }
 
 void ObstaclesPrioritizer::AssignCautionLevelInJunction(
-    const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container) {
+    const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container,
+    const std::string& junction_id) {
   // TODO(Hongyi): get current junction_id from Storytelling
-  std::string curr_junction_id;
   const auto& obstacle_ids =
       obstacles_container->curr_frame_movable_obstacle_ids();
   for (const int obstacle_id : obstacle_ids) {
@@ -214,7 +211,7 @@ void ObstaclesPrioritizer::AssignCautionLevelInJunction(
       AERROR << "Null obstacle pointer found.";
       continue;
     }
-    if (obstacle_ptr->IsInJunction(curr_junction_id)) {
+    if (obstacle_ptr->IsInJunction(junction_id)) {
       SetCautionIfCloseToEgo(ego_vehicle, kCautionDistanceThreshold,
                              obstacle_ptr);
     }
@@ -385,10 +382,12 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine(
     }
     double start_x = latest_feature_ptr->position().x();
     double start_y = latest_feature_ptr->position().y();
-    double end_x = start_x + FLAGS_caution_pedestrian_approach_time *
-                                 latest_feature_ptr->raw_velocity().x();
-    double end_y = start_y + FLAGS_caution_pedestrian_approach_time *
-                                 latest_feature_ptr->raw_velocity().y();
+    double end_x = start_x +
+                   FLAGS_caution_pedestrian_approach_time *
+                       latest_feature_ptr->raw_velocity().x();
+    double end_y = start_y +
+                   FLAGS_caution_pedestrian_approach_time *
+                       latest_feature_ptr->raw_velocity().y();
     std::vector<std::string> nearby_lane_ids = PredictionMap::NearbyLaneIds(
         {start_x, start_y}, FLAGS_pedestrian_nearby_lane_search_radius);
     if (nearby_lane_ids.empty()) {

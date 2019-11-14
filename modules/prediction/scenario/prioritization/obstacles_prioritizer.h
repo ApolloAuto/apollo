@@ -30,15 +30,14 @@ namespace prediction {
 
 class ObstaclesPrioritizer {
  public:
-  void PrioritizeObstacles();
-
   void AssignIgnoreLevel();
 
-  void AssignCautionLevel();
+  void AssignCautionLevel(const Scenario& scenario);
 
  private:
   void AssignCautionLevelInJunction(const Obstacle& ego_vehicle,
-                                    ObstaclesContainer* obstacles_container);
+                                    ObstaclesContainer* obstacles_container,
+                                    const std::string& junction_id);
 
   void AssignCautionLevelCruiseKeepLane(
       const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container);

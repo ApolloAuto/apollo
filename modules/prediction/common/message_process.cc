@@ -181,7 +181,7 @@ void MessageProcess::ContainerProcess(
   ptr_obstacles_container->BuildLaneGraph();
 
   // Assign CautionLevel for obstacles
-  ObstaclesPrioritizer::Instance()->AssignCautionLevel();
+  ObstaclesPrioritizer::Instance()->AssignCautionLevel(scenario);
 
   // Analyze RightOfWay for the caution obstacles
   RightOfWay::Analyze();
