@@ -13,6 +13,7 @@ cc_library(
         "//modules/common/util",
         "//modules/common/util:string_util",
         "//modules/dreamview/proto:hmi_config_proto",
+        "@com_google_absl//absl/strings",
     ],
 )
 
