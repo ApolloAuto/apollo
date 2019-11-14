@@ -19,21 +19,10 @@ cc_library(
         ":lru_cache",
         ":message_util",
         ":points_downsampler",
-        ":string_tokenizer",
         ":string_util",
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/time",
-    ],
-)
-
-cc_library(
-    name = "string_tokenizer",
-    srcs = [
-        "string_tokenizer.cc",
-    ],
-    hdrs = [
-        "string_tokenizer.h",
     ],
 )
 
@@ -132,18 +121,6 @@ cc_library(
     hdrs = ["map_util.h"],
     deps = [
         "@com_google_protobuf//:protobuf",
-    ],
-)
-
-cc_test(
-    name = "string_tokenizer_test",
-    size = "small",
-    srcs = [
-        "string_tokenizer_test.cc",
-    ],
-    deps = [
-        ":util",
-        "@gtest//:main",
     ],
 )
 
