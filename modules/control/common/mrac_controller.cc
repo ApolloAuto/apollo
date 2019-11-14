@@ -23,15 +23,14 @@
 #include "Eigen/Dense"
 #include "Eigen/LU"
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace control {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::util::StrCat;
 using Matrix = Eigen::MatrixXd;
 
 double MracController::Control(const double command, const Matrix state,
@@ -161,7 +160,7 @@ Status MracController::SetReferenceModel(const MracConf &mrac_conf) {
   if (((mrac_conf.reference_time_constant() < Epsilon && model_order_ == 1)) ||
       ((mrac_conf.reference_natural_frequency() < Epsilon &&
         model_order_ == 2))) {
-    const auto error_msg = StrCat(
+    const auto error_msg = absl::StrCat(
         "mrac controller error: reference model time-constant parameter: ",
         mrac_conf.reference_time_constant(),
         "and natural frequency parameter: ",
@@ -184,7 +183,7 @@ Status MracController::SetAdaptionModel(const MracConf &mrac_conf) {
   const int aw_size = mrac_conf.anti_windup_compensation_gain_size();
   if (p_size != model_order_ * model_order_ || x_size > model_order_ ||
       aw_size > model_order_) {
-    const auto error_msg = StrCat(
+    const auto error_msg = absl::StrCat(
         "mrac controller error: adaption matrix p element number: ", p_size,
         ", state gain number: ", x_size,
         ", and anti-windup compensation gain number: ", aw_size,
@@ -213,8 +212,8 @@ Status MracController::SetAdaptionModel(const MracConf &mrac_conf) {
 Status MracController::BuildReferenceModel() {
   if (model_order_ > 2) {
     const auto error_msg =
-        StrCat("mrac controller error: reference model order ", model_order_,
-               " is beyond the designed range");
+        absl::StrCat("mrac controller error: reference model order ",
+                     model_order_, " is beyond the designed range");
     AERROR << error_msg;
     return Status(ErrorCode::CONTROL_INIT_ERROR, error_msg);
   }
@@ -233,8 +232,8 @@ Status MracController::BuildReferenceModel() {
 Status MracController::BuildAdaptionModel() {
   if (model_order_ > 2) {
     const auto error_msg =
-        StrCat("mrac controller error: adaption model order ", model_order_,
-               " is beyond the designed range");
+        absl::StrCat("mrac controller error: adaption model order ",
+                     model_order_, " is beyond the designed range");
     AERROR << error_msg;
     return Status(ErrorCode::CONTROL_INIT_ERROR, error_msg);
   }

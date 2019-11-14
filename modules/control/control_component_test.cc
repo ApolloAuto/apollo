@@ -197,7 +197,7 @@ bool ControlComponentTest::RunControl(const std::string& test_case_name) {
   TrimControlCommand(&control_command_);
 
   const std::string golden_result_file =
-      apollo::common::util::StrCat("result_", test_case_name, ".pb.txt");
+      absl::StrCat("result_", test_case_name, ".pb.txt");
   std::string tmp_golden_path = "/tmp/" + golden_result_file;
   std::string full_golden_path = FLAGS_test_data_dir + golden_result_file;
   control_command_.Clear();

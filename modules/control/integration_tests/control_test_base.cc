@@ -137,8 +137,8 @@ void ControlTestBase::trim_control_command(ControlCommand *origin) {
 
 bool ControlTestBase::test_control(const std::string &test_case_name,
                                    int case_num) {
-  const std::string golden_result_file = apollo::common::util::StrCat(
-      "result_", test_case_name, "_", case_num, ".pb.txt");
+  const std::string golden_result_file =
+      absl::StrCat("result_", test_case_name, "_", case_num, ".pb.txt");
   std::string tmp_golden_path = "/tmp/" + golden_result_file;
   std::string full_golden_path = FLAGS_test_data_dir + "/" + golden_result_file;
   control_command_.Clear();
