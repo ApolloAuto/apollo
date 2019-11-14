@@ -66,8 +66,7 @@ Status STBoundsDecider::Process(Frame* const frame,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   StGraphData *st_graph_data = reference_line_info_->mutable_st_graph_data();
-  st_graph_data->set_s_boundary(regular_st_bound);
-  st_graph_data->set_v_limits(regular_vt_bound);
+  st_graph_data->SetSTDrivableBoundary(regular_st_bound, regular_vt_bound);
 
   // Record the ST-Graph for good visualization and easy debugging.
   auto all_st_boundaries = st_obstacles_processor_.GetAllSTBoundaries();
