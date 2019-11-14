@@ -86,7 +86,7 @@ bool HDMapInput::InitHDMap() {
 
   // Option2: Load own map with different hdmap_sample_step_
   // Load hdmap path from global_flagfile.txt
-  hdmap_file_ = apollo::common::util::StrCat(FLAGS_map_dir, "/base_map.bin");
+  hdmap_file_ = absl::StrCat(FLAGS_map_dir, "/base_map.bin");
   AINFO << "hdmap_file_: " << hdmap_file_;
   if (!apollo::cyber::common::PathExists(hdmap_file_)) {
     AERROR << "Failed to find hadmap file: " << hdmap_file_;

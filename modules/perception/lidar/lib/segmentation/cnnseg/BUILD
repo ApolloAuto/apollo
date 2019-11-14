@@ -16,7 +16,6 @@ cc_library(
         ":feature_generator",
         ":util",
         "//cyber",
-        "//modules/common/util:string_util",
         "//modules/perception/base",
         "//modules/perception/inference:inference_factory_lib",
         "//modules/perception/inference:inference_lib",
@@ -31,6 +30,7 @@ cc_library(
         "//modules/perception/lidar/lib/segmentation/cnnseg/spp_engine",
         "//modules/perception/lidar/lib/segmentation/ncut:ncut_segmentation",
         "//modules/perception/proto:perception_config_schema_proto",
+        "@com_google_absl//absl/strings",
     ],
     alwayslink = True,
 )
