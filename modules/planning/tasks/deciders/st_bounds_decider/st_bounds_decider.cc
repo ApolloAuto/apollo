@@ -196,7 +196,7 @@ Status STBoundsDecider::GenerateRegularSTBound(
 
     // Update into st_bound
     st_bound->at(i) = std::make_tuple(t, s_lower, s_upper);
-    st_bound->at(i) = std::make_tuple(t, lower_obs_v, upper_obs_v);
+    vt_bound->at(i) = std::make_tuple(t, lower_obs_v, upper_obs_v);
   }
 
   return Status::OK();
@@ -295,6 +295,7 @@ void STBoundsDecider::RecordSTGraphDebug(
     std::tie(t, s_lower, std::ignore) = st_bound_pt;
     point_debug->set_t(t);
     point_debug->set_s(s_lower);
+    ADEBUG << "(" << t << ", " << s_lower << ")";
   }
   for (int i = static_cast<int>(st_bound.size()) - 1; i >= 0; --i) {
     auto point_debug = boundary_debug->add_point();
@@ -303,6 +304,7 @@ void STBoundsDecider::RecordSTGraphDebug(
     std::tie(t, std::ignore, s_upper) = st_bound[i];
     point_debug->set_t(t);
     point_debug->set_s(s_upper);
+    ADEBUG << "(" << t << ", " << s_upper << ")";
   }
 }
 
