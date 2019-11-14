@@ -40,14 +40,6 @@ TEST(StringUtilTest, Split) {
   }
 }
 
-TEST(StringUtilTest, StartWith) {
-  EXPECT_TRUE(StartWith("abc.def", ""));
-  EXPECT_TRUE(StartWith("abc.def", "abc"));
-  EXPECT_TRUE(StartWith("abc.def", "abc."));
-  EXPECT_FALSE(StartWith("abc.def", "abcd"));
-  EXPECT_FALSE(StartWith("abc.def", "bc"));
-}
-
 TEST(StringUtilTest, EndWith) {
   EXPECT_TRUE(EndWith("abc.def", ""));
   EXPECT_TRUE(EndWith("abc.def", "def"));

@@ -53,9 +53,6 @@ using google::protobuf::StringPrintf;
 inline bool EndWith(const std::string& ori, const std::string& pat) {
   return std::equal(pat.rbegin(), pat.rend(), ori.rbegin());
 }
-inline bool StartWith(const std::string& ori, const std::string& pat) {
-  return std::equal(pat.begin(), pat.end(), ori.begin());
-}
 
 /**
  * @brief split string by one character

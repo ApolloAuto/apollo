@@ -21,8 +21,8 @@
 #include <curlpp/Options.hpp>
 #include <curlpp/cURLpp.hpp>
 
+#include "absl/strings/match.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace common {
@@ -63,7 +63,7 @@ Status HttpClient::Post(const std::string &url, const Json &json,
 
 Status HttpClient::Post(const std::string &url, const Json &json,
                         Json *result) {
-  if (!StartWith(url, "https://")) {
+  if (!absl::StartsWith(url, "https://")) {
     return Status(ErrorCode::HTTP_LOGIC_ERROR, "Use HTTPS to post data!");
   }
   std::string response;
