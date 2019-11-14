@@ -25,7 +25,20 @@ message ResourceMonitorConfig {
     optional int32 insufficient_space_warning = 2;  // In GB.
     optional int32 insufficient_space_error = 3;
   }
+
+  message CPUUsage {
+    optional float high_cpu_usage_warning = 1;
+    optional float high_cpu_usage_error = 2; 
+  }
+
+  message MemoryUsage {
+    optional int32 high_memory_usage_warning = 1;
+    optional int32 high_memory_usage_error = 2;
+  }
+
   repeated DiskSpace disk_spaces = 1;
+  optional CPUUsage cpu_usage = 2;
+  optional MemoryUsage memory_usage = 3;
 }
 
 // A monitored component will be listed on HMI which only shows its status but
