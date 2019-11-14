@@ -22,16 +22,6 @@ namespace apollo {
 namespace common {
 namespace util {
 
-using ::testing::ElementsAre;
-
-TEST(UtilTest, StringTokenizer) {
-  std::string str("aa,bbb,c");
-  std::string delim(",");
-
-  EXPECT_THAT(StringTokenizer::Split(str, delim),
-              ElementsAre("aa", "bbb", "c"));
-}
-
 TEST(UtilTest, StringTokenizerNext) {
   std::string str("     aa,  bbb , c   ");
   std::string delim(", ");

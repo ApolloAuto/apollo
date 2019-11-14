@@ -29,20 +29,6 @@ StringTokenizer::StringTokenizer(const std::string &s,
   index_ = s_.find_first_of(delims, last_index_);
 }
 
-std::vector<std::string> StringTokenizer::Split(const std::string &str,
-                                                const std::string &delims) {
-  std::vector<std::string> tokens;
-  std::string::size_type last_index = str.find_first_not_of(delims, 0);
-  std::string::size_type index = str.find_first_of(delims, last_index);
-
-  while (std::string::npos != index || std::string::npos != last_index) {
-    tokens.push_back(str.substr(last_index, index - last_index));
-    last_index = str.find_first_not_of(delims, index);
-    index = str.find_first_of(delims, last_index);
-  }
-  return tokens;
-}
-
 std::string StringTokenizer::Next() {
   if (std::string::npos != index_ || std::string::npos != last_index_) {
     auto token = s_.substr(last_index_, index_ - last_index_);

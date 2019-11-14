@@ -48,17 +48,6 @@ const char* tripletBase64(const int triplet) {
 
 }  // namespace
 
-int Split(const std::string& str, char ch, std::vector<std::string>* result) {
-  std::stringstream ss(str);
-  std::string segment;
-  int count = 0;
-  while (std::getline(ss, segment, ch)) {
-    result->push_back(segment);
-    ++count;
-  }
-  return count;
-}
-
 std::string DecodeBase64(const std::string& base64_str) {
   static const std::vector<int> kBase64CodeTable = Base64CodeTable();
 
