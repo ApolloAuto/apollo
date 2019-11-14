@@ -16,13 +16,13 @@
 
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
 
+#include "absl/strings/str_split.h"
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/kv_db/kv_db.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/message_util.h"
-#include "modules/common/util/string_tokenizer.h"
 #include "modules/common/util/string_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
@@ -66,9 +66,7 @@ constexpr char kNavigationModeName[] = "Navigation";
 
 // Convert a string to be title-like. E.g.: "hello_world" -> "Hello World".
 std::string TitleCase(const std::string& origin) {
-  static const std::string kDelimiter = "_";
-  std::vector<std::string> parts =
-      apollo::common::util::StringTokenizer::Split(origin, kDelimiter);
+  std::vector<std::string> parts = absl::StrSplit(origin, '_');
   for (auto& part : parts) {
     if (!part.empty()) {
       // Upper case the first char.

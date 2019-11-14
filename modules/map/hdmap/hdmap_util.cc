@@ -14,8 +14,8 @@ limitations under the License.
 =========================================================================*/
 #include "modules/map/hdmap/hdmap_util.h"
 
+#include "absl/strings/str_split.h"
 #include "cyber/common/file.h"
-#include "modules/common/util/string_tokenizer.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
 
 namespace apollo {
@@ -27,8 +27,7 @@ namespace {
 
 // Find the first existing file from a list of candidates: "file_a|file_b|...".
 std::string FindFirstExist(const std::string& dir, const std::string& files) {
-  const auto candidates =
-      apollo::common::util::StringTokenizer::Split(files, "|");
+  const std::vector<std::string> candidates = absl::StrSplit(files, '|');
   for (const auto& filename : candidates) {
     const std::string file_path =
         apollo::common::util::StrCat(FLAGS_map_dir, "/", filename);

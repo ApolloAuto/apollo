@@ -52,17 +52,6 @@ class StringTokenizer {
   virtual ~StringTokenizer() = default;
 
   /**
-   * @brief Static method; creates a vector with the non-empty tokens obtained
-   * from splitting.
-   * @param str String to be split
-   * @param delims Delimiters where the string should be split
-   * @return A vector of tokens, each a substring of str
-   * surrounded by delimiters.
-   */
-  static std::vector<std::string> Split(const std::string &str,
-                                        const std::string &delims);
-
-  /**
    * @brief The i-th time Next() is called, it returns the i-th token obtained
    * from splitting the string fed to the initializer at the given delimiters;
    * once the end is reached, will always return "".

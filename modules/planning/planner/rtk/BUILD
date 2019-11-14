@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "rtk_planner",
-    srcs = [
-        "rtk_replay_planner.cc",
-    ],
-    hdrs = [
-        "rtk_replay_planner.h",
-    ],
+    srcs = ["rtk_replay_planner.cc"],
+    hdrs = ["rtk_replay_planner.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
@@ -23,6 +19,7 @@ cc_library(
         "//modules/planning/planner",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
+        "@com_google_absl//absl/strings",
         "@eigen",
     ],
 )
