@@ -21,10 +21,11 @@ cc_library(
 
 cc_binary(
     name = "msg_exporter",
-    srcs = [
-        "msg_exporter_main.cc",
+    srcs = ["msg_exporter_main.cc"],
+    deps = [
+        ":msgexporterlib",
+        "@com_google_absl//absl/strings",
     ],
-    deps = [":msgexporterlib"],
 )
 
 cpplint()

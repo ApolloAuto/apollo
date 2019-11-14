@@ -44,15 +44,6 @@ using google::protobuf::StrAppend;
 using google::protobuf::StrCat;
 using google::protobuf::StringPrintf;
 
-/**
- * @brief split string by one character
- * @param [in]: the string you want to split
- * @param [in]: the character
- * @param [out]: result strings after exploded by character
- * @return: the number of elements splitted in the given str
- **/
-int Split(const std::string& str, char ch, std::vector<std::string>* result);
-
 template <typename T>
 std::string Print(const T& val) {
   std::ostringstream oss;

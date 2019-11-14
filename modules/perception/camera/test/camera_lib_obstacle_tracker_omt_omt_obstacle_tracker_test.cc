@@ -16,6 +16,7 @@
 
 #include "modules/perception/camera/lib/obstacle/tracker/omt/omt_obstacle_tracker.h"
 
+#include "absl/strings/str_split.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "gflags/gflags.h"
@@ -244,8 +245,8 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
   CHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   // Init camera list
-  std::vector<std::string> camera_names;
-  apollo::common::util::Split(FLAGS_sensor_name, ',', &camera_names);
+  const std::vector<std::string> camera_names =
+      absl::StrSplit(FLAGS_sensor_name, ',');
   // Init data provider
   DataProvider::InitOptions data_options;
   data_options.image_height = 1080;
@@ -334,8 +335,7 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
   fin.open(filename, std::ifstream::in);
   ASSERT_TRUE(fin.is_open());
   while (fin >> line) {
-    std::vector<std::string> temp_strs;
-    apollo::common::util::Split(line, '/', &temp_strs);
+    const std::vector<std::string> temp_strs = absl::StrSplit(line, '/');
     if (temp_strs.size() != 2) {
       AERROR << "invaid format in " << FLAGS_test_list;
     }

@@ -16,14 +16,16 @@
 
 #include <fstream>
 #include <memory>
+
+#include "absl/strings/str_split.h"
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
-#include "modules/common/util/string_util.h"
 #include "modules/perception/lidar/tools/exporter/msg_exporter.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
+
 bool config_parser(const std::string& config_file,
                    std::vector<std::string>* channels,
                    std::vector<std::string>* child_frame_ids) {
@@ -34,7 +36,6 @@ bool config_parser(const std::string& config_file,
   channels->clear();
   child_frame_ids->clear();
   std::string line;
-  std::vector<std::string> splits;
   std::getline(fin, line);
   while (!fin.eof()) {
     std::cout << line << std::endl;
@@ -42,8 +43,7 @@ bool config_parser(const std::string& config_file,
       std::getline(fin, line);
       continue;
     }
-    splits.clear();
-    apollo::common::util::Split(line, ' ', &splits);
+    const std::vector<std::string> splits = absl::StrSplit(line, ' ');
     if (splits.size() == 3 && std::stoi(splits[2]) > 0) {
       channels->push_back(splits[0]);
       child_frame_ids->push_back(splits[1]);

@@ -264,16 +264,13 @@ cc_library(
 
 cc_library(
     name = "camera_lib_calibrator_laneline_lane_io",
-    srcs = [
-        "camera_lib_calibrator_laneline_lane_io.cc",
-    ],
-    hdrs = [
-        "camera_lib_calibrator_laneline_lane_io.h",
-    ],
+    srcs = ["camera_lib_calibrator_laneline_lane_io.cc"],
+    hdrs = ["camera_lib_calibrator_laneline_lane_io.h"],
     deps = [
         ":camera_lib_calibrator_laneline_app_util",
         "//modules/perception/camera/lib/calibrator/laneline:lane_based_calibrator",
         "//modules/perception/common/i_lib/core",
+        "@com_google_absl//absl/strings",
         "@eigen",
     ],
 )
@@ -518,6 +515,7 @@ cc_test(
 #         "//modules/perception/camera/lib/interface:interface",
 #         "//modules/perception/common/geometry:common",
 #         "//modules/perception/common/io:io_util",
+#         "@com_google_absl//absl/strings",
 #         "@gtest//:main",
 #         "@opencv",
 #         "@yaml_cpp//:yaml",
