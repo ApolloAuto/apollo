@@ -56,7 +56,63 @@ Stage::StageStatus EmergencyStopStageApproach::Process(
     AERROR << "EmergencyStopStageApproach planning error";
   }
 
-  // TODO(all): to be implemented
+  // add a stop fence
+  const auto& reference_line_info = frame->reference_line_info().front();
+  const auto& reference_line = reference_line_info.reference_line();
+  const double adc_speed =
+      common::VehicleStateProvider::Instance()->linear_velocity();
+  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+  const double stop_distance = scenario_config_.stop_distance();
+
+  double stop_line_s;
+  const auto& emergency_stop_status =
+      PlanningContext::Instance()->planning_status().emergency_stop();
+  AERROR << emergency_stop_status.DebugString();
+  if (emergency_stop_status.has_stop_fence_point()) {
+    common::SLPoint stop_fence_sl;
+    reference_line.XYToSL(
+        {emergency_stop_status.stop_fence_point().x(),
+         emergency_stop_status.stop_fence_point().y()},
+        &stop_fence_sl);
+    stop_line_s = stop_fence_sl.s();
+  } else {
+    const double deceleration = scenario_config_.max_stop_deceleration();
+    const double travel_distance =
+        std::ceil(std::pow(adc_speed, 2) / (2 * deceleration));
+    stop_line_s = adc_front_edge_s + travel_distance + stop_distance;
+    AERROR << "travel_distance[" << travel_distance << "] [" << adc_speed
+           << "] adc_front_edge_s[" << adc_front_edge_s
+           << "] stop_line_s[" << stop_line_s << "]";
+    const auto& stop_fence_point =
+        reference_line.GetReferencePoint(stop_line_s);
+    auto* emergency_stop_fence_point = PlanningContext::Instance()
+                                           ->mutable_planning_status()
+                                           ->mutable_emergency_stop()
+                                           ->mutable_stop_fence_point();
+    emergency_stop_fence_point->set_x(stop_fence_point.x());
+    emergency_stop_fence_point->set_y(stop_fence_point.y());
+  }
+
+  const std::string virtual_obstacle_id = "EMERGENCY_STOP";
+  const std::vector<std::string> wait_for_obstacle_ids;
+  planning::util::BuildStopDecision(
+      virtual_obstacle_id, stop_line_s, stop_distance,
+      StopReasonCode::STOP_REASON_EMERGENCY, wait_for_obstacle_ids,
+      "EMERGENCY_STOP-scenario", frame,
+      &(frame->mutable_reference_line_info()->front()));
+
+  AERROR << "Build a stop fence for emergency_stop: id["
+         << virtual_obstacle_id << "] s[" << stop_line_s << "]";
+
+  const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
+                                        ->GetConfig()
+                                        .vehicle_param()
+                                        .max_abs_speed_when_stopped();
+  AERROR << "adc_speed[" << adc_speed << "]";
+  if (adc_speed <= max_adc_stop_speed) {
+    return FinishStage();
+  }
+
   return StageStatus::RUNNING;
 }
 
