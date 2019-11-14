@@ -919,6 +919,9 @@ void ScenarioManager::UpdatePlanningContext(
   // BareIntersection scenario
   UpdatePlanningContextBareIntersectionScenario(frame, scenario_type);
 
+  // EmergencyStop scenario
+  UpdatePlanningContextEmergencyStopcenario(frame, scenario_type);
+
   // PullOver & EmergencyPullOver scenarios
   UpdatePlanningContextPullOverScenario(frame, scenario_type);
 
@@ -957,6 +960,17 @@ void ScenarioManager::UpdatePlanningContextBareIntersectionScenario(
     ADEBUG << "Update PlanningContext with first_encountered pnc_junction["
            << map_itr->second.object_id << "] start_s["
            << map_itr->second.start_s << "]";
+  }
+}
+
+// update: emergency_stop status in PlanningContext
+void ScenarioManager::UpdatePlanningContextEmergencyStopcenario(
+    const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
+  auto* emergency_stop = PlanningContext::Instance()
+                             ->mutable_planning_status()
+                             ->mutable_emergency_stop();
+  if (!scenario_type == ScenarioConfig::EMERGENCY_STOP) {
+    emergency_stop->Clear();
   }
 }
 

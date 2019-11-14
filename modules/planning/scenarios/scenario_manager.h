@@ -87,6 +87,9 @@ class ScenarioManager final {
   void UpdatePlanningContextBareIntersectionScenario(
       const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
 
+  void UpdatePlanningContextEmergencyStopcenario(
+      const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
+
   void UpdatePlanningContextPullOverScenario(
       const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
 
