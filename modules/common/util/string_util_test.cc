@@ -40,14 +40,6 @@ TEST(StringUtilTest, Split) {
   }
 }
 
-TEST(StringUtilTest, EndWith) {
-  EXPECT_TRUE(EndWith("abc.def", ""));
-  EXPECT_TRUE(EndWith("abc.def", "def"));
-  EXPECT_TRUE(EndWith("abc.def", ".def"));
-  EXPECT_FALSE(EndWith("abc.def", "abc"));
-  EXPECT_FALSE(EndWith("abc.def", "de"));
-}
-
 TEST(StringUtilTest, IterPrinter) {
   // Container.
   std::vector<std::string> vec;

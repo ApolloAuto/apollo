@@ -20,8 +20,8 @@ limitations under the License.
 #include <set>
 #include <unordered_set>
 
+#include "absl/strings/match.h"
 #include "cyber/common/file.h"
-#include "modules/common/util/string_util.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
 
 namespace apollo {
@@ -49,7 +49,7 @@ int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
   Clear();
   // TODO(All) seems map_ can be changed to a local variable of this
   // function, but test will fail if I do so. if so.
-  if (apollo::common::util::EndWith(map_filename, ".xml")) {
+  if (absl::EndsWith(map_filename, ".xml")) {
     if (!adapter::OpendriveAdapter::LoadData(map_filename, &map_)) {
       return -1;
     }

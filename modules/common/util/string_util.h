@@ -45,16 +45,6 @@ using google::protobuf::StrCat;
 using google::protobuf::StringPrintf;
 
 /**
- * @brief Check if a string ends with a pattern.
- * @param ori The original string. To see if it ends with a specified pattern.
- * @param pat The target pattern. To see if the original string ends with it.
- * @return Whether the original string ends with the specified pattern.
- */
-inline bool EndWith(const std::string& ori, const std::string& pat) {
-  return std::equal(pat.rbegin(), pat.rend(), ori.rbegin());
-}
-
-/**
  * @brief split string by one character
  * @param [in]: the string you want to split
  * @param [in]: the character
