@@ -14,6 +14,9 @@ limitations under the License.
 =========================================================================*/
 #include "modules/map/hdmap/hdmap_util.h"
 
+#include <string>
+#include <vector>
+
 #include "absl/strings/str_split.h"
 #include "cyber/common/file.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
