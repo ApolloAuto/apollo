@@ -18,15 +18,14 @@
 
 #include <vector>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
-#include "modules/common/util/string_util.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 
 namespace apollo {
 namespace prediction {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::util::StrCat;
 
 Features FeatureOutput::features_;
 ListDataForLearning FeatureOutput::list_data_for_learning_;
@@ -162,8 +161,8 @@ void FeatureOutput::WriteFeatureProto() {
   if (features_.feature().empty()) {
     ADEBUG << "Skip writing empty feature.";
   } else {
-    const std::string file_name =
-        StrCat(FLAGS_prediction_data_dir, "/feature.", idx_feature_, ".bin");
+    const std::string file_name = absl::StrCat(
+        FLAGS_prediction_data_dir, "/feature.", idx_feature_, ".bin");
     cyber::common::SetProtoToBinaryFile(features_, file_name);
     features_.Clear();
     ++idx_feature_;
@@ -174,8 +173,8 @@ void FeatureOutput::WriteDataForLearning() {
   if (list_data_for_learning_.data_for_learning().empty()) {
     ADEBUG << "Skip writing empty data_for_learning.";
   } else {
-    const std::string file_name =
-        StrCat(FLAGS_prediction_data_dir, "/datalearn.", idx_learning_, ".bin");
+    const std::string file_name = absl::StrCat(
+        FLAGS_prediction_data_dir, "/datalearn.", idx_learning_, ".bin");
     cyber::common::SetProtoToBinaryFile(list_data_for_learning_, file_name);
     list_data_for_learning_.Clear();
     ++idx_learning_;
@@ -187,8 +186,8 @@ void FeatureOutput::WritePredictionResult() {
     ADEBUG << "Skip writing empty prediction_result.";
   } else {
     const std::string file_name =
-        StrCat(FLAGS_prediction_data_dir, "/prediction_result.",
-               idx_prediction_result_, ".bin");
+        absl::StrCat(FLAGS_prediction_data_dir, "/prediction_result.",
+                     idx_prediction_result_, ".bin");
     cyber::common::SetProtoToBinaryFile(list_prediction_result_, file_name);
     list_prediction_result_.Clear();
     ++idx_prediction_result_;
@@ -199,8 +198,8 @@ void FeatureOutput::WriteFrameEnv() {
   if (list_frame_env_.frame_env().empty()) {
     ADEBUG << "Skip writing empty prediction_result.";
   } else {
-    const std::string file_name = StrCat(FLAGS_prediction_data_dir,
-                                         "/frame_env.", idx_frame_env_, ".bin");
+    const std::string file_name = absl::StrCat(
+        FLAGS_prediction_data_dir, "/frame_env.", idx_frame_env_, ".bin");
     cyber::common::SetProtoToBinaryFile(list_frame_env_, file_name);
     list_frame_env_.Clear();
     ++idx_frame_env_;
@@ -212,8 +211,8 @@ void FeatureOutput::WriteDataForTuning() {
     ADEBUG << "Skip writing empty data_for_tuning.";
     return;
   }
-  const std::string file_name =
-      StrCat(FLAGS_prediction_data_dir, "/datatuning.", idx_tuning_, ".bin");
+  const std::string file_name = absl::StrCat(
+      FLAGS_prediction_data_dir, "/datatuning.", idx_tuning_, ".bin");
   cyber::common::SetProtoToBinaryFile(list_data_for_tuning_, file_name);
   list_data_for_tuning_.Clear();
   ++idx_tuning_;

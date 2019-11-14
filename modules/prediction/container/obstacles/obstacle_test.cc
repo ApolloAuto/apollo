@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
-#include "modules/common/util/string_util.h"
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
@@ -36,7 +36,7 @@ class ObstacleTest : public KMLMapBasedTest {
 
     int num_frame = 3;
     for (int i = 1; i <= num_frame; ++i) {
-      const auto filename = common::util::StrCat(
+      const auto filename = absl::StrCat(
           "modules/prediction/testdata/frame_sequence/frame_", i, ".pb.txt");
       perception::PerceptionObstacles perception_obstacles;
       cyber::common::GetProtoFromFile(filename, &perception_obstacles);
