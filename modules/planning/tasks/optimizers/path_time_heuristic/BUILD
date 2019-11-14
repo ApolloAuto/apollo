@@ -33,6 +33,7 @@ cc_library(
         "//modules/planning/common:obstacle",
         "//modules/planning/common/speed:st_boundary",
         "//modules/planning/proto:dp_st_speed_config_proto",
+        "//modules/planning/tasks/utils:st_gap_estimator"
     ],
 )
 

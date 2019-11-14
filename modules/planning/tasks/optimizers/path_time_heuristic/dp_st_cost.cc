@@ -25,6 +25,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/speed/st_point.h"
+#include "modules/planning/tasks/utils/st_gap_estimator.h"
 
 namespace apollo {
 namespace planning {
@@ -142,11 +143,10 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
       s_lower = boundary_cost_[boundary_index][st_graph_point.index_t()].second;
     }
     if (s < s_lower) {
-      // TODO(all): merge this parameter with existing parameter
       const double follow_distance_s =
           config_.is_lane_changing()
               ? config_.safe_distance()
-              : obstacle->speed() * config_.safe_time_buffer();
+              : StGapEstimator::EstimateSafeFollowingGap(obstacle->speed());
       if (s + follow_distance_s < s_lower) {
         continue;
       } else {
@@ -155,11 +155,12 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
                 s_diff * s_diff;
       }
     } else if (s > s_upper) {
-      if (s >
-          s_upper + config_.safe_distance()) {  // or calculated from velocity
+      const double overtake_distance_s =
+          StGapEstimator::EstimateSafeOvertakingGap();
+      if (s > s_upper + overtake_distance_s) {  // or calculated from velocity
         continue;
       } else {
-        auto s_diff = config_.safe_distance() + s_upper - s;
+        auto s_diff = overtake_distance_s + s_upper - s;
         cost += config_.obstacle_weight() * config_.default_obstacle_cost() *
                 s_diff * s_diff;
       }

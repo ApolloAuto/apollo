@@ -32,6 +32,7 @@
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/tasks/utils/st_gap_estimator.h"
 
 namespace apollo {
 namespace planning {
@@ -374,8 +375,8 @@ bool SpeedDecider::CreateFollowDecision(
   DCHECK_NOTNULL(follow_decision);
 
   const double follow_speed = init_point_.v();
-  const double follow_distance_s = -std::fmax(
-      follow_speed * FLAGS_follow_time_buffer, FLAGS_follow_min_distance);
+  const double follow_distance_s =
+      -StGapEstimator::EstimateProperFollowingGap(follow_speed);
 
   const auto& boundary = obstacle.path_st_boundary();
   const double reference_s =
@@ -410,7 +411,7 @@ bool SpeedDecider::CreateYieldDecision(
   DCHECK_NOTNULL(yield_decision);
 
   PerceptionObstacle::Type obstacle_type = obstacle.Perception().type();
-  double yield_distance = FLAGS_yield_distance;
+  double yield_distance = StGapEstimator::EstimateProperYieldingGap();
 
   const auto& obstacle_boundary = obstacle.path_st_boundary();
   const double yield_distance_s =
@@ -446,17 +447,14 @@ bool SpeedDecider::CreateOvertakeDecision(
     ObjectDecisionType* const overtake_decision) const {
   DCHECK_NOTNULL(overtake_decision);
 
-  constexpr double kOvertakeTimeBuffer = 3.0;    // in seconds
-  constexpr double kMinOvertakeDistance = 10.0;  // in meters
-
   const auto& velocity = obstacle.Perception().velocity();
   const double obstacle_speed =
       common::math::Vec2d::CreateUnitVec2d(init_point_.path_point().theta())
           .InnerProd(Vec2d(velocity.x(), velocity.y()));
 
-  const double overtake_distance_s = std::fmax(
-      std::fmax(init_point_.v(), obstacle_speed) * kOvertakeTimeBuffer,
-      kMinOvertakeDistance);
+  const double overtake_distance_s =
+      StGapEstimator::EstimateProperOvertakingGap(obstacle_speed,
+                                                  init_point_.v());
 
   const auto& boundary = obstacle.path_st_boundary();
   const double reference_line_fence_s =
