@@ -24,13 +24,13 @@
 
 #include "Eigen/LU"
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/mpc_osqp.h"
 #include "modules/common/math/mpc_solver.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/string_util.h"
 #include "modules/control/common/control_gflags.h"
 
 namespace apollo {
@@ -220,10 +220,10 @@ Status MPCController::Init(const ControlConf *control_conf) {
 
   int q_param_size = control_conf->mpc_controller_conf().matrix_q_size();
   if (basic_state_size_ != q_param_size) {
-    const auto error_msg = common::util::StrCat(
-        "MPC controller error: matrix_q size: ", q_param_size,
-        " in parameter file not equal to basic_state_size_: ",
-        basic_state_size_);
+    const auto error_msg =
+        absl::StrCat("MPC controller error: matrix_q size: ", q_param_size,
+                     " in parameter file not equal to basic_state_size_: ",
+                     basic_state_size_);
     AERROR << error_msg;
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, error_msg);
   }

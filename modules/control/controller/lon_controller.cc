@@ -18,11 +18,11 @@
 #include <algorithm>
 #include <utility>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/string_util.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/localization/common/localization_gflags.h"
 
@@ -185,8 +185,8 @@ Status LonController::ComputeControlCommand(
       lon_controller_conf.enable_reverse_leadlag_compensation();
 
   if (preview_time < 0.0) {
-    const auto error_msg = common::util::StrCat(
-        "Preview time set as: ", preview_time, " less than 0");
+    const auto error_msg =
+        absl::StrCat("Preview time set as: ", preview_time, " less than 0");
     AERROR << error_msg;
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, error_msg);
   }
