@@ -12,6 +12,7 @@ import "modules/map/relative_map/proto/navigation.proto";
 import "modules/routing/proto/routing.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
 import "modules/planning/proto/sl_boundary.proto";
+import "modules/planning/proto/st_drivable_boundary.proto";
 import "modules/planning/proto/decision.proto";
 import "modules/planning/proto/planning_config.proto";
 

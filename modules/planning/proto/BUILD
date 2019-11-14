@@ -189,6 +189,7 @@ proto_library(
         ":decision_proto_lib",
         ":planning_config_proto_lib",
         ":sl_boundary_proto_lib",
+        ":st_drivable_boundary_proto_lib",
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:header_proto_lib",
@@ -238,6 +239,16 @@ proto_library(
     name = "sl_boundary_proto_lib",
     srcs = [
         "sl_boundary.proto",
+    ],
+    deps = [
+        "//modules/common/proto:pnc_point_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "st_drivable_boundary_proto_lib",
+    srcs = [
+        "st_drivable_boundary.proto",
     ],
     deps = [
         "//modules/common/proto:pnc_point_proto_lib",
