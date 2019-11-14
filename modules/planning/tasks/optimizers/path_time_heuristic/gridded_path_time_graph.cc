@@ -70,7 +70,8 @@ GriddedPathTimeGraph::GriddedPathTimeGraph(
       obstacles_(obstacles),
       init_point_(init_point),
       dp_st_cost_(dp_config, st_graph_data_.total_time_by_conf(),
-                  st_graph_data_.path_length(), obstacles, init_point_) {
+                  st_graph_data_.path_length(), obstacles,
+                  st_graph_data_.st_drivable_boundary(), init_point_) {
   total_length_t_ = st_graph_data_.total_time_by_conf();
   unit_t_ = gridded_path_time_graph_config_.unit_t();
   total_length_s_ = st_graph_data_.path_length();
@@ -390,9 +391,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
       // Current acc estimate: curr_a = (curr_v - pre_v) / unit_t
       // = (point.s + prepre_point.s - 2 * pre_point.s) / (unit_t * unit_t)
       const double curr_a =
-          2 *
-          ((cost_cr.point().s() - pre_col[r_pre].point().s()) / unit_t_ -
-           pre_col[r_pre].GetOptimalSpeed()) /
+          2 * ((cost_cr.point().s() - pre_col[r_pre].point().s()) / unit_t_ -
+               pre_col[r_pre].GetOptimalSpeed()) /
           unit_t_;
       if (curr_a < max_deceleration_ || curr_a > max_acceleration_) {
         continue;
@@ -439,9 +439,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
     // Current acc estimate: curr_a = (curr_v - pre_v) / unit_t
     // = (point.s + prepre_point.s - 2 * pre_point.s) / (unit_t * unit_t)
     const double curr_a =
-        2 *
-        ((cost_cr.point().s() - pre_col[r_pre].point().s()) / unit_t_ -
-         pre_col[r_pre].GetOptimalSpeed()) /
+        2 * ((cost_cr.point().s() - pre_col[r_pre].point().s()) / unit_t_ -
+             pre_col[r_pre].GetOptimalSpeed()) /
         unit_t_;
     if (curr_a > max_acceleration_ || curr_a < max_deceleration_) {
       continue;

@@ -68,7 +68,7 @@ class StGraphData {
       const std::vector<std::tuple<double, double, double>>& s_boundary,
       const std::vector<std::tuple<double, double, double>>& v_obs_info);
 
-  apollo::planning::STDrivableBoundary st_drivable_boundary() const;
+  const STDrivableBoundary& st_drivable_boundary() const;
 
  private:
   bool init_ = false;
@@ -82,7 +82,7 @@ class StGraphData {
   double total_time_by_conf_ = 0.0;
   planning_internal::STGraphDebug* st_graph_debug_ = nullptr;
 
-  apollo::planning::STDrivableBoundary st_drivable_boundary_;
+  STDrivableBoundary st_drivable_boundary_;
 };
 
 }  // namespace planning

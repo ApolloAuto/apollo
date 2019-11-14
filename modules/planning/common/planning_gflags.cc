@@ -590,3 +590,6 @@ DEFINE_uint64(trajectory_stitching_preserved_length, 20,
 
 DEFINE_double(side_pass_driving_width_l_buffer, 0.1,
               "(unit: meter) for side pass driving width l buffer");
+
+DEFINE_bool(use_st_drivable_boundary, false,
+            "True to use st_drivable boundary in speed planning");

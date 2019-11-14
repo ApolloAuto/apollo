@@ -91,7 +91,7 @@ bool StGraphData::SetSTDrivableBoundary(
   return true;
 }
 
-apollo::planning::STDrivableBoundary StGraphData::st_drivable_boundary() const {
+const STDrivableBoundary& StGraphData::st_drivable_boundary() const {
   return st_drivable_boundary_;
 }
 
