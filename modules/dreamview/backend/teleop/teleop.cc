@@ -27,14 +27,13 @@ namespace dreamview {
 using Json = nlohmann::json;
 using apollo::cyber::Time;
 using apollo::planning::ADCTrajectory;
-using apollo::planning::ScenarioConfig;
-using apollo::planning::PadMessage;
 using apollo::planning::DrivingAction;
+using apollo::planning::PadMessage;
+using apollo::planning::ScenarioConfig;
 using ::google::protobuf::util::MessageToJsonString;
 using modules::teleop::network::ModemInfo;
 using modules::teleop::teleop::DaemonServiceCmd;
 using modules::teleop::teleop::DaemonServiceRpt;
-
 
 // modem ids
 const std::string modem0_id = "0";
@@ -447,7 +446,6 @@ void TeleopService::SendMicStreamCmd(bool start_stop) {
   AINFO << "mic " << msg.cmd();
 }
 
-
 void TeleopService::SendResumeCruiseCmd() {
   AINFO << "Resume cruise";
   PadMessage pad_msg;
@@ -469,10 +467,9 @@ void TeleopService::SendPullOverCmd() {
   pad_message_writer_->Write(pad_msg);
 }
 
-void TeleopService::UpdatePlanning(const std::shared_ptr<ADCTrajectory> &msg)
-{
+void TeleopService::UpdatePlanning(const std::shared_ptr<ADCTrajectory> &msg) {
   static int count = 0;
-  count ++;
+  ++count;
 
   if (count % 10 == 0) {
     AINFO << "Update Planning";
@@ -482,7 +479,6 @@ void TeleopService::UpdatePlanning(const std::shared_ptr<ADCTrajectory> &msg)
   bool pulled_over = scenario_type == ScenarioConfig::PULL_OVER;
   bool autonomy_resumed = scenario_type == ScenarioConfig::PARK_AND_GO;
   bool e_stopped = scenario_type == ScenarioConfig::EMERGENCY_PULL_OVER;
-
 
   bool sendPullOver = false;
   bool sendStop = false;
@@ -519,20 +515,22 @@ void TeleopService::UpdatePlanning(const std::shared_ptr<ADCTrajectory> &msg)
       if (teleop_status_["resuming_autonomy"]) {
         teleop_status_["resuming_autonomy"] = false;
       }
-    }
-    else {
+    } else {
       if (teleop_status_["resuming_autonomy"]) {
         sendResume = true;
       }
     }
-  } // writer lock scope
+  }  // writer lock scope
 
-  if (sendResume)
+  if (sendResume) {
     SendResumeCruiseCmd();
-  if (sendStop)
+  }
+  if (sendStop) {
     SendEstopCmd();
-  if (sendPullOver)
+  }
+  if (sendPullOver) {
     SendPullOverCmd();
+  }
 }
 
 }  // namespace dreamview

@@ -77,7 +77,7 @@ class TeleopService {
       const std::shared_ptr<modules::teleop::network::ModemInfo> &modem_info);
   // planning message reader
   std::shared_ptr<cyber::Reader<apollo::planning::ADCTrajectory>>
-    planning_reader_;
+      planning_reader_;
 
   // daemon report readers and callback
   void UpdateCarDaemonRpt(
@@ -97,8 +97,8 @@ class TeleopService {
   // planning driving actions  and feedback
   std::shared_ptr<cyber::Writer<apollo::planning::PadMessage>>
       pad_message_writer_;
-  void UpdatePlanning(const std::shared_ptr<apollo::planning::ADCTrajectory>
-    &msg);
+  void UpdatePlanning(
+      const std::shared_ptr<apollo::planning::ADCTrajectory> &msg);
 #endif
 
   // Store teleop status
