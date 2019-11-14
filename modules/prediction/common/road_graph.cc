@@ -94,7 +94,7 @@ RoadGraph::RoadGraph(const double start_s, const double length,
 Status RoadGraph::BuildLaneGraph(LaneGraph* const lane_graph_ptr) {
   // Sanity checks.
   if (length_ < 0.0 || lane_info_ptr_ == nullptr) {
-    const auto error_msg = common::util::StrCat(
+    const auto error_msg = absl::StrCat(
         "Invalid road graph settings. Road graph length = ", length_);
     AERROR << error_msg;
     return Status(ErrorCode::PREDICTION_ERROR, error_msg);
@@ -118,7 +118,7 @@ Status RoadGraph::BuildLaneGraph(LaneGraph* const lane_graph_ptr) {
 Status RoadGraph::BuildLaneGraphBidirection(LaneGraph* const lane_graph_ptr) {
   // Sanity checks.
   if (length_ < 0.0 || lane_info_ptr_ == nullptr) {
-    const auto error_msg = common::util::StrCat(
+    const auto error_msg = absl::StrCat(
         "Invalid road graph settings. Road graph length = ", length_);
     AERROR << error_msg;
     return Status(ErrorCode::PREDICTION_ERROR, error_msg);

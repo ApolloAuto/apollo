@@ -22,6 +22,7 @@
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/color.h"
 #include "modules/common/util/message_util.h"
+#include "modules/common/util/string_util.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
