@@ -16,6 +16,7 @@
 
 #include "gflags/gflags.h"
 
+#include "absl/strings/match.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
@@ -111,7 +112,7 @@ int main(int32_t argc, char** argv) {
 
   Map map_pb;
   const auto map_file = apollo::hdmap::BaseMapFile();
-  if (apollo::common::util::EndWith(map_file, ".xml")) {
+  if (absl::EndsWith(map_file, ".xml")) {
     CHECK(OpendriveAdapter::LoadData(map_file, &map_pb));
   } else {
     CHECK(GetProtoFromFile(map_file, &map_pb)) << "Fail to open: " << map_file;
