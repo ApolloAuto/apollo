@@ -22,6 +22,7 @@ cc_library(
         "//modules/planning/common:reference_line_info",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/tasks:task",
+        "//modules/planning/tasks/utils:st_gap_estimator"
     ],
 )
 
