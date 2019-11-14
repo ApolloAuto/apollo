@@ -36,9 +36,11 @@ constexpr double kInf = std::numeric_limits<double>::infinity();
 DpStCost::DpStCost(const DpStSpeedConfig& config, const double total_t,
                    const double total_s,
                    const std::vector<const Obstacle*>& obstacles,
+                   const STDrivableBoundary& st_drivable_boundary,
                    const common::TrajectoryPoint& init_point)
     : config_(config),
       obstacles_(obstacles),
+      st_drivable_boundary_(st_drivable_boundary),
       init_point_(init_point),
       unit_t_(config.unit_t()),
       total_s_(total_s) {
@@ -113,6 +115,22 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
   const double t = st_graph_point.point().t();
 
   double cost = 0.0;
+
+  if (FLAGS_use_st_drivable_boundary) {
+    // TODO(Jiancheng): move to configs
+    constexpr double boundary_resolution = 0.1;
+    int index = static_cast<int>(t / boundary_resolution);
+    const double lower_bound =
+        st_drivable_boundary_.st_boundary(index).s_lower();
+    const double upper_bound =
+        st_drivable_boundary_.st_boundary(index).s_upper();
+
+    if (s > upper_bound || s < lower_bound) {
+      return kInf;
+    }
+    return cost * unit_t_;
+  }
+
   for (const auto* obstacle : obstacles_) {
     // Not applying obstacle approaching cost to virtual obstacle
     if (obstacle->IsVirtual()) {
