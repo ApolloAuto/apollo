@@ -3,6 +3,23 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "control_module_lib",
+    deps = [
+        ":lat_lon_controller_submodule_lib",
+        ":mpc_controller_submodule_lib",
+        ":postprocessor_submodule_lib",
+        ":preprocessor_submodule_lib",
+    ],
+)
+
+cc_binary(
+    name = "control_module.so",
+    linkshared = True,
+    linkstatic = False,
+    deps = [":control_module_lib"],
+)
+
+cc_library(
     name = "preprocessor_submodule_lib",
     srcs = ["preprocessor_submodule.cc"],
     hdrs = [
