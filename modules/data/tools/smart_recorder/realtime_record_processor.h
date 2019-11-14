@@ -20,10 +20,10 @@
 #include <string>
 #include <vector>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/cyber.h"
 #include "cyber/record/record_reader.h"
 #include "cyber/tools/cyber_recorder/recorder.h"
-#include "modules/common/util/string_util.h"
 
 #include "modules/data/tools/smart_recorder/proto/smart_recorder_status.pb.h"
 #include "modules/data/tools/smart_recorder/proto/smart_recorder_triggers.pb.h"
@@ -32,7 +32,6 @@
 namespace apollo {
 namespace data {
 
-using apollo::common::util::StrCat;
 using cyber::Node;
 using cyber::Writer;
 using cyber::record::Recorder;
@@ -48,7 +47,7 @@ class RealtimeRecordProcessor : public RecordProcessor {
   bool Init(const SmartRecordTrigger& trigger_conf) override;
   bool Process() override;
   std::string GetDefaultOutputFile() const override {
-    return StrCat(restored_output_dir_, "/", default_output_filename_);
+    return absl::StrCat(restored_output_dir_, "/", default_output_filename_);
   };
   void MonitorStatus();
   virtual ~RealtimeRecordProcessor() = default;

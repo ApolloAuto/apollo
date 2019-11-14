@@ -18,15 +18,14 @@
 
 #include "gflags/gflags.h"
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/string_util.h"
 
 #include "modules/data/tools/smart_recorder/post_record_processor.h"
 #include "modules/data/tools/smart_recorder/realtime_record_processor.h"
 #include "modules/data/tools/smart_recorder/smart_recorder_gflags.h"
 
-using apollo::common::util::StrCat;
 using apollo::cyber::common::GetProtoFromFile;
 using apollo::data::PostRecordProcessor;
 using apollo::data::RealtimeRecordProcessor;
@@ -36,7 +35,8 @@ using apollo::data::SmartRecordTrigger;
 int main(int argc, char** argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
   if (FLAGS_restored_output_dir.empty()) {
-    FLAGS_restored_output_dir = StrCat(FLAGS_source_records_dir, "_restored");
+    FLAGS_restored_output_dir =
+        absl::StrCat(FLAGS_source_records_dir, "_restored");
   }
   AINFO << "input dir: " << FLAGS_source_records_dir
         << ". output dir: " << FLAGS_restored_output_dir
