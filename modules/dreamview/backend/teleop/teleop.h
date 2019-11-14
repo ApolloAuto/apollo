@@ -45,7 +45,7 @@ class TeleopService {
   void SendStatus(WebSocketHandler::Connection *conn);
 
 #ifdef TELEOP
-  // send a command to the car daemon to start or stop
+  // send a command to the remote daemon to start or stop
   // video encoders and voip encoders
   void SendAudioStreamCmd(bool start_stop);
   void SendMicStreamCmd(bool start_stop);
@@ -85,14 +85,14 @@ class TeleopService {
   void UpdateOperatorDaemonRpt(
       const std::shared_ptr<modules::teleop::teleop::DaemonServiceRpt> &rpt);
   std::shared_ptr<cyber::Reader<modules::teleop::teleop::DaemonServiceRpt>>
-      car_daemon_rpt_reader_;
+      remote_daemon_rpt_reader_;
   std::shared_ptr<cyber::Reader<modules::teleop::teleop::DaemonServiceRpt>>
-      operator_daemon_rpt_reader_;
+      local_daemon_rpt_reader_;
   // daemon commands writers
   std::shared_ptr<cyber::Writer<modules::teleop::teleop::DaemonServiceCmd>>
-      car_daemon_cmd_writer_;
+      remote_daemon_cmd_writer_;
   std::shared_ptr<cyber::Writer<modules::teleop::teleop::DaemonServiceCmd>>
-      operator_daemon_cmd_writer_;
+      local_daemon_cmd_writer_;
 
   // planning driving actions  and feedback
   std::shared_ptr<cyber::Writer<apollo::planning::PadMessage>>

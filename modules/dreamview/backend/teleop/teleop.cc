@@ -49,14 +49,14 @@ const std::string stop_cmd = "kill";
 const std::string modem0_channel = "/apollo/teleop/network/modem0";
 const std::string modem1_channel = "/apollo/teleop/network/modem1";
 const std::string modem2_channel = "/apollo/teleop/network/modem2";
-const std::string car_daemon_cmd_channel =
-    "/apollo/teleop/car/daemon_service/cmd";
-const std::string car_daemon_rpt_channel =
-    "/apollo/teleop/car/daemon_service/rpt";
-const std::string operator_daemon_cmd_channel =
-    "/apollo/teleop/operator/daemon_service/cmd";
-const std::string operator_daemon_rpt_channel =
-    "/apollo/teleop/operator/daemon_service/rpt";
+const std::string remote_daemon_cmd_channel =
+    "/apollo/teleop/remote/daemon_service/cmd";
+const std::string remote_daemon_rpt_channel =
+    "/apollo/teleop/remote/daemon_service/rpt";
+const std::string local_daemon_cmd_channel =
+    "/apollo/teleop/local/daemon_service/cmd";
+const std::string local_daemon_rpt_channel =
+    "/apollo/teleop/local/daemon_service/rpt";
 const std::string planning_channel = "/apollo/planning";
 const std::string planning_pad_channel = "/apollo/planning/pad";
 
@@ -102,20 +102,20 @@ void TeleopService::Start() {
         UpdatePlanning(msg);
       });
 
-  car_daemon_cmd_writer_ =
-      node_->CreateWriter<DaemonServiceCmd>(car_daemon_cmd_channel);
+  remote_daemon_cmd_writer_ =
+      node_->CreateWriter<DaemonServiceCmd>(remote_daemon_cmd_channel);
 
-  operator_daemon_cmd_writer_ =
-      node_->CreateWriter<DaemonServiceCmd>(operator_daemon_cmd_channel);
+  local_daemon_cmd_writer_ =
+      node_->CreateWriter<DaemonServiceCmd>(local_daemon_cmd_channel);
 
-  car_daemon_rpt_reader_ = node_->CreateReader<DaemonServiceRpt>(
-      car_daemon_rpt_channel,
+  remote_daemon_rpt_reader_ = node_->CreateReader<DaemonServiceRpt>(
+      remote_daemon_rpt_channel,
       [this](const std::shared_ptr<DaemonServiceRpt> &msg) {
         UpdateCarDaemonRpt(msg);
       });
 
-  operator_daemon_rpt_reader_ = node_->CreateReader<DaemonServiceRpt>(
-      operator_daemon_rpt_channel,
+  local_daemon_rpt_reader_ = node_->CreateReader<DaemonServiceRpt>(
+      local_daemon_rpt_channel,
       [this](const std::shared_ptr<DaemonServiceRpt> &msg) {
         UpdateOperatorDaemonRpt(msg);
       });
@@ -272,7 +272,7 @@ void TeleopService::UpdateModem(const std::string &modem_id,
   }
 }
 
-// callback for messages that originate from the car computer
+// callback for messages that originate from the remote computer
 void TeleopService::UpdateCarDaemonRpt(
     const std::shared_ptr<DaemonServiceRpt> &daemon_rpt) {
   {
@@ -411,7 +411,7 @@ void TeleopService::SendVideoStreamCmd(bool start_stop) {
     snprintf(encoderName, 20, "encoder%u", i);
     msg.set_service(encoderName);
     common::util::FillHeader("dreamview", &msg);
-    car_daemon_cmd_writer_->Write(msg);
+    remote_daemon_cmd_writer_->Write(msg);
     AINFO << encoderName << " " << msg.cmd();
   }
 }
@@ -425,14 +425,14 @@ void TeleopService::SendAudioStreamCmd(bool start_stop) {
   }
   msg.set_service("voip_encoder");
   common::util::FillHeader("dreamview", &msg);
-  car_daemon_cmd_writer_->Write(msg);
+  remote_daemon_cmd_writer_->Write(msg);
   AINFO << "audio " << msg.cmd();
   // audio start / stop implies mic start/stop
   SendMicStreamCmd(start_stop);
 }
 
 void TeleopService::SendMicStreamCmd(bool start_stop) {
-  // by switching on or off the voip_encoder in the operator console
+  // by switching on or off the voip_encoder in the local console
   // we are controlling the mic
   DaemonServiceCmd msg;
   if (start_stop) {
@@ -442,7 +442,7 @@ void TeleopService::SendMicStreamCmd(bool start_stop) {
   }
   msg.set_service("voip_encoder");
   common::util::FillHeader("dreamview", &msg);
-  operator_daemon_cmd_writer_->Write(msg);
+  local_daemon_cmd_writer_->Write(msg);
   AINFO << "mic " << msg.cmd();
 }
 
