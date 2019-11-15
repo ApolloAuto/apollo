@@ -37,7 +37,7 @@ default_task_config: {
     jerk_weight: 300.0
     lat_acc_weight: 1000.0
     ref_v_weight: 0.0
-    ref_s_weight: 100.0
+    ref_s_weight: 1000.0
     use_warm_start: true
   }
 }
