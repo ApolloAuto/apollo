@@ -23,8 +23,8 @@
 #include "cyber/common/log.h"
 #include "gflags/gflags.h"
 
+#include "absl/strings/str_cat.h"
 #include "modules/common/util/map_util.h"
-#include "modules/common/util/string_util.h"
 #include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/software/summary_monitor.h"
 
@@ -36,8 +36,6 @@ DEFINE_double(resource_monitor_interval, 5,
 
 namespace apollo {
 namespace monitor {
-
-using apollo::common::util::StrCat;
 
 ResourceMonitor::ResourceMonitor()
     : RecurrentRunner(FLAGS_resource_monitor_name,
@@ -68,13 +66,13 @@ void ResourceMonitor::UpdateStatus(
       const int available_gb = static_cast<int>(space.available >> 30);
       if (available_gb < disk_space.insufficient_space_error()) {
         const std::string err =
-            StrCat(path, " has insufficient space: ", available_gb, "GB < ",
-                   disk_space.insufficient_space_error());
+            absl::StrCat(path, " has insufficient space: ", available_gb,
+                         "GB < ", disk_space.insufficient_space_error());
         SummaryMonitor::EscalateStatus(ComponentStatus::ERROR, err, status);
       } else if (available_gb < disk_space.insufficient_space_warning()) {
         const std::string err =
-            StrCat(path, " has insufficient space: ", available_gb, "GB < ",
-                   disk_space.insufficient_space_warning());
+            absl::StrCat(path, " has insufficient space: ", available_gb,
+                         "GB < ", disk_space.insufficient_space_warning());
         SummaryMonitor::EscalateStatus(ComponentStatus::WARN, err, status);
       }
     }

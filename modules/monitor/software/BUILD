@@ -21,7 +21,6 @@ cc_library(
     hdrs = ["channel_monitor.h"],
     deps = [
         ":summary_monitor",
-        "//modules/common/util:string_util",
         "//modules/control/proto:control_proto",
         "//modules/dreamview/proto:hmi_mode_proto",
         "//modules/drivers/proto:sensor_proto",
@@ -32,6 +31,7 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
+        "@com_google_absl//absl/strings",
     ],
 )
 
@@ -64,9 +64,9 @@ cc_library(
     hdrs = ["summary_monitor.h"],
     deps = [
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/util:string_util",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
+        "@com_google_absl//absl/strings",
     ],
 )
 
