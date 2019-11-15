@@ -132,4 +132,20 @@ cc_binary(
     deps = [":evaluator_submodule_lib"],
 )
 
+cc_library(
+    name = "prediction_lego_lib",
+    deps = [
+        ":container_submodule_lib",
+        ":evaluator_submodule_lib",
+        ":predictor_submodule_lib",
+    ],
+)
+
+cc_binary(
+    name = "prediction_lego.so",
+    linkshared = True,
+    linkstatic = False,
+    deps = [":prediction_lego_lib"],
+)
+
 cpplint()

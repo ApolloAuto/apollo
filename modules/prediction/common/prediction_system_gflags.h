@@ -44,5 +44,8 @@ DECLARE_int32(max_num_dump_feature);
 DECLARE_int32(max_num_dump_dataforlearn);
 
 // Submodules
+DECLARE_string(container_topic_name);
+DECLARE_string(adccontainer_topic_name);
+DECLARE_string(evaluator_topic_name);
 DECLARE_string(container_submodule_name);
 DECLARE_string(evaluator_submodule_name);

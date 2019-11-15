@@ -58,18 +58,40 @@ bool ContainerSubmodule::Init() {
 
   // TODO(kechxu) change topic name when finalized
   container_writer_ =
-      node_->CreateWriter<ContainerOutput>(FLAGS_prediction_topic);
+      node_->CreateWriter<ContainerOutput>(FLAGS_container_topic_name);
 
   adc_container_writer_ =
-      node_->CreateWriter<ADCTrajectoryContainer>(FLAGS_prediction_topic);
+      node_->CreateWriter<ADCTrajectoryContainer>(
+          FLAGS_adccontainer_topic_name);
 
   return true;
 }
 
 bool ContainerSubmodule::Proc(
     const std::shared_ptr<PerceptionObstacles>& perception_message) {
-  MessageProcess::ContainerProcess(*perception_message);
   const double frame_start_time = Clock::NowInSeconds();
+  // Read localization info. and call OnLocalization to update
+  // the PoseContainer.
+  localization_reader_->Observe();
+  auto ptr_localization_msg = localization_reader_->GetLatestObserved();
+  if (ptr_localization_msg == nullptr) {
+    AERROR << "Prediction: cannot receive any localization message.";
+    return false;
+  }
+  auto localization_msg = *ptr_localization_msg;
+  MessageProcess::OnLocalization(localization_msg);
+
+  // Read planning info. of last frame and call OnPlanning to update
+  // the ADCTrajectoryContainer
+  planning_reader_->Observe();
+  auto ptr_trajectory_msg = planning_reader_->GetLatestObserved();
+  if (ptr_trajectory_msg != nullptr) {
+    auto trajectory_msg = *ptr_trajectory_msg;
+    MessageProcess::OnPlanning(trajectory_msg);
+  }
+
+  MessageProcess::ContainerProcess(*perception_message);
+
   auto obstacles_container_ptr =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
