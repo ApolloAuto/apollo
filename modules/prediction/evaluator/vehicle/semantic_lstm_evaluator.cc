@@ -169,6 +169,19 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr,
     point->mutable_gaussian_info()->set_sigma_y(sigma_y);
     point->mutable_gaussian_info()->set_correlation(corr);
 
+    constexpr int ellipse_gap = 5;
+    if (i > 0 && i % ellipse_gap == 0) {
+      Eigen::EigenSolver<Eigen::Matrix2d> eigen_solver(cov_matrix);
+      const auto& eigen_values = eigen_solver.eigenvalues();
+      const auto& eigen_vectors = eigen_solver.eigenvectors();
+      point->mutable_gaussian_info()->set_ellipse_a(eigen_values(0).real());
+      point->mutable_gaussian_info()->set_ellipse_b(eigen_values(1).real());
+      double cos_theta_a = eigen_vectors(0, 0).real();
+      double sin_theta_a = eigen_vectors(1, 0).real();
+      point->mutable_gaussian_info()->set_theta_a(
+          std::atan2(sin_theta_a, cos_theta_a));
+    }
+
     if (i < 10) {  // use origin heading for the first second
       point->mutable_path_point()->set_theta(
           latest_feature_ptr->velocity_heading());
