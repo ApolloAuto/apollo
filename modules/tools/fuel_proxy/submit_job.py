@@ -17,6 +17,9 @@
 ###############################################################################
 
 """ Submit Apollo fuel job. """
+import sys
+# Disable python2 paths.
+sys.path = [path for path in sys.path if 'python2' not in path]
 
 import json
 import os
