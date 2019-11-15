@@ -21,6 +21,9 @@
 #include "google/protobuf/util/json_util.h"
 #include "modules/common/util/message_util.h"
 
+#include <iomanip>
+#include <sstream>
+
 namespace apollo {
 namespace dreamview {
 
@@ -268,7 +271,20 @@ void TeleopService::UpdateModem(const std::string &modem_id,
     // teleop_status_["modems"][modem_info->provider()] =
     //  modem_info->technology();
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-    teleop_status_["modems"][modem_id] = modem_info->technology();
+    std::string str;
+    std::stringstream ss(str);
+    double rx = 1.0 * modem_info->rx() / (1024 * 1024);
+    double tx = 1.0 * modem_info->tx() / (1024 * 1024);
+
+    ss << modem_info->technology();
+    ss << std::fixed << std::setw(6) << std::setprecision(2)
+       << std::setfill('0');
+    ss << " rank: " << modem_info->rank();
+    ss << " sig: " << modem_info->signal();
+    ss << " q: " << modem_info->quality();
+    ss << " rx: " << rx << " MB";
+    ss << " tx: " << tx << " MB";
+    teleop_status_["modems"][modem_id] = ss.str();
   }
 }
 
