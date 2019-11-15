@@ -29,7 +29,6 @@ using apollo::common::ErrorCode;
 using apollo::common::SLPoint;
 using apollo::common::Status;
 using apollo::common::time::Clock;
-using apollo::common::util::StrCat;
 
 LaneChangeDecider::LaneChangeDecider(const TaskConfig& config)
     : Decider(config) {}
@@ -74,7 +73,7 @@ Status LaneChangeDecider::Process(
     } else if (prev_status->status() == ChangeLaneStatus::CHANGE_LANE_FAILED) {
     } else {
       const std::string msg =
-          StrCat("Unknown state: ", prev_status->ShortDebugString());
+          absl::StrCat("Unknown state: ", prev_status->ShortDebugString());
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
@@ -118,7 +117,7 @@ Status LaneChangeDecider::Process(
       }
     } else {
       const std::string msg =
-          StrCat("Unknown state: ", prev_status->ShortDebugString());
+          absl::StrCat("Unknown state: ", prev_status->ShortDebugString());
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }

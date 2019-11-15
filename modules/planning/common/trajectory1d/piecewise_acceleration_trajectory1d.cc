@@ -22,6 +22,7 @@
 
 #include <algorithm>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/string_util.h"
@@ -74,11 +75,10 @@ double PiecewiseAccelerationTrajectory1d::ParamLength() const {
 }
 
 std::string PiecewiseAccelerationTrajectory1d::ToString() const {
-  return apollo::common::util::StrCat(apollo::common::util::PrintIter(s_, "\t"),
-                                      apollo::common::util::PrintIter(t_, "\t"),
-                                      apollo::common::util::PrintIter(v_, "\t"),
-                                      apollo::common::util::PrintIter(a_, "\t"),
-                                      "\n");
+  return absl::StrCat(apollo::common::util::PrintIter(s_, "\t"),
+                      apollo::common::util::PrintIter(t_, "\t"),
+                      apollo::common::util::PrintIter(v_, "\t"),
+                      apollo::common::util::PrintIter(a_, "\t"), "\n");
 }
 
 double PiecewiseAccelerationTrajectory1d::Evaluate(const std::uint32_t order,

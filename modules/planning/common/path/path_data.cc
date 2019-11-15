@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <vector>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/util/string_util.h"
@@ -165,7 +166,7 @@ std::string PathData::DebugString() const {
       std::min(discretized_path_.size(),
                static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
 
-  return common::util::StrCat(
+  return absl::StrCat(
       "[\n",
       common::util::PrintDebugStringIter(
           discretized_path_.begin(), discretized_path_.begin() + limit, ",\n"),

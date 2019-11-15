@@ -221,8 +221,8 @@ void PlanningTestBase::TrimPlanning(ADCTrajectory* origin,
 
 bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
                                    int case_num, bool no_trajectory_point) {
-  const std::string golden_result_file = apollo::common::util::StrCat(
-      "result_", test_case_name, "_", case_num, ".pb.txt");
+  const std::string golden_result_file =
+      absl::StrCat("result_", test_case_name, "_", case_num, ".pb.txt");
 
   std::string full_golden_path = FLAGS_test_data_dir + "/" + golden_result_file;
 

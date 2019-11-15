@@ -189,12 +189,8 @@ std::string LaneSegment::DebugString() const {
     return "(lane is null)";
   }
   return absl::StrCat("id = ", lane->id().id(),
-                      "  "
-                      "start_s = ",
-                      start_s,
-                      "  "
-                      "end_s = ",
-                      end_s);
+                      "  start_s = ", start_s,
+                      "  end_s = ", end_s);
 }
 
 std::vector<MapPathPoint> MapPathPoint::GetPointsFromSegment(
