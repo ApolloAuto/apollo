@@ -38,9 +38,9 @@ int main(int argc, char **argv) {
 
     {
         struct Second {
-            Second(const std::string & s) { std::cout << "Second ctor\n"; this->s = s; }
+            Second(const std::string & cs) : s(cs) { std::cout << "Second ctor\n"; }
             Second(Second && c) { std::cout << "Second move ctor\n"; s = std::move(c.s); }
-            Second(const Second & c) { std::cout << "Second copy ctor\n"; this->s = c.s; };
+            Second(const Second & c) : s(c.s) { std::cout << "Second copy ctor\n"; };
             ~Second() { std::cout << "Second dtor\n"; }
             void operator()(int id) const {
                 std::cout << "hello from " << id << ' ' << this->s << '\n';
