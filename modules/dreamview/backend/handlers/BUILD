@@ -15,9 +15,9 @@ cc_library(
         "//modules/common",
         "//modules/common/time",
         "//modules/common/util:map_util",
-        "//modules/common/util:string_util",
         "//third_party/json",
         "@civetweb//:civetweb++",
+        "@com_google_absl//absl/strings",
     ],
 )
 

@@ -29,7 +29,7 @@
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 
-#include "modules/common/util/string_util.h"
+#include "absl/strings/str_cat.h"
 #include "modules/dreamview/backend/data_collection_monitor/data_collection_monitor.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/map/map_service.h"
@@ -122,13 +122,12 @@ class SimulationWorldUpdater {
     if (adapter->DumpLatestMessage()) {
       sim_world_service_.PublishMonitorMessage(
           common::monitor::MonitorMessageItem::INFO,
-          common::util::StrCat("Dumped latest ", adapter_name,
-                               " message under /tmp/", adapter_name, "."));
+          absl::StrCat("Dumped latest ", adapter_name, " message under /tmp/",
+                       adapter_name, "."));
     } else {
       sim_world_service_.PublishMonitorMessage(
           common::monitor::MonitorMessageItem::WARN,
-          common::util::StrCat("Failed to dump latest ", adapter_name,
-                               " message."));
+          absl::StrCat("Failed to dump latest ", adapter_name, " message."));
     }
   }
 

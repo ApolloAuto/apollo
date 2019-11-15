@@ -16,11 +16,11 @@
 
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "gflags/gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/util/string_util.h"
 
 DEFINE_string(vehicle_data_config_filename,
               "/apollo/modules/dreamview/conf/vehicle_data.pb.txt",
@@ -29,7 +29,6 @@ DEFINE_string(vehicle_data_config_filename,
 namespace apollo {
 namespace dreamview {
 
-using apollo::common::util::StrCat;
 using cyber::common::GetProtoFromFile;
 
 VehicleManager::VehicleManager() {
@@ -51,7 +50,7 @@ bool VehicleManager::UseVehicle(const std::string &vehicle_data_path) {
 
   for (const auto &data_file : vehicle_data_.data_files()) {
     const auto source_path =
-        StrCat(vehicle_data_path, "/", data_file.source_path());
+        absl::StrCat(vehicle_data_path, "/", data_file.source_path());
     const auto &dest_path = data_file.dest_path();
 
     const bool ret = cyber::common::Copy(source_path, dest_path);

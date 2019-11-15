@@ -53,7 +53,6 @@ using apollo::canbus::Chassis;
 using apollo::common::DriveEvent;
 using apollo::common::KVDB;
 using apollo::common::time::Clock;
-using apollo::common::util::StrCat;
 using apollo::control::DrivingAction;
 using apollo::cyber::Node;
 using apollo::monitor::ComponentStatus;
@@ -83,7 +82,7 @@ Map<std::string, std::string> ListDirAsDict(const std::string& dir) {
   const auto subdirs = cyber::common::ListSubPaths(dir);
   for (const auto& subdir : subdirs) {
     const auto subdir_title = TitleCase(subdir);
-    const auto subdir_path = StrCat(dir, "/", subdir);
+    const auto subdir_path = absl::StrCat(dir, "/", subdir);
     result.insert({subdir_title, subdir_path});
   }
   return result;
@@ -93,7 +92,7 @@ Map<std::string, std::string> ListDirAsDict(const std::string& dir) {
 Map<std::string, std::string> ListFilesAsDict(const std::string& dir,
                                               const std::string& extension) {
   Map<std::string, std::string> result;
-  const std::string pattern = StrCat(dir, "/*", extension);
+  const std::string pattern = absl::StrCat(dir, "/*", extension);
   for (const std::string& file_path : cyber::common::Glob(pattern)) {
     // Remove the extension and convert to title case as the file title.
     const std::string filename = cyber::common::GetFileName(file_path);
@@ -196,7 +195,7 @@ HMIMode HMIWorker::LoadMode(const std::string& mode_config_path) {
 
     // Construct stop_command: pkill -f '<dag[0]>'
     const std::string& first_dag = cyber_module.dag_files(0);
-    module.set_stop_command(StrCat("pkill -f \"", first_dag, "\""));
+    module.set_stop_command(absl::StrCat("pkill -f \"", first_dag, "\""));
     // Construct process_monitor_config.
     module.mutable_process_monitor_config()->add_command_keywords("mainboard");
     module.mutable_process_monitor_config()->add_command_keywords(first_dag);
