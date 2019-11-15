@@ -23,8 +23,8 @@ const MONITOR_WIDTH_IN_PX = {
         large: 270,
     },
     [MONITOR_MENU.CAR_TELEOP_MONITOR]: {
-        small: 200,
-        large: 240,
+        small: 240,
+        large: 270,
     },
     [MONITOR_MENU.CAMERA_PARAM]: {
         small: 400,

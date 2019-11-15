@@ -5095,6 +5095,13 @@
                   "options": {
                     "default": 0.15
                   }
+                },
+                "pullOverApproachLonDistanceAdjustFactor": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 1.5
+                  }
                 }
               }
             },

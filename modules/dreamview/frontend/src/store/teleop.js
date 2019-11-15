@@ -19,13 +19,27 @@ export default class TeleopStore {
     }
 
     @action update(status) {
-        if (typeof status.audio === "boolean") {
+        if (status.audio_starting) {
+            this.audioEnabled = true;
+        } else if (status.audio_stopping) {
+            this.audioEnabled = false;
+        } else {
             this.audioEnabled = status.audio;
         }
-        if (typeof status.mic === "boolean") {
+
+        if (status.mic_starting) {
+            this.micEnabled = true;
+        } else if (status.mic_stopping) {
+            this.micEnabled = false;
+        } else {
             this.micEnabled = status.mic;
         }
-        if (typeof status.video === "boolean") {
+
+        if (status.video_starting) {
+            this.videoEnabled = true;
+        } else if (status.video_stopping) {
+            this.videoEnabled = false;
+        } else {
             this.videoEnabled = status.video;
         }
 
