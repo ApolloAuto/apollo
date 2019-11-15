@@ -526,6 +526,11 @@ bool SpeedDecider::CheckStopForPedestrian(
     return false;
   }
 
+  const auto& obstacle_sl_boundary = obstacle.PerceptionSLBoundary();
+  if (obstacle_sl_boundary.end_s() < adc_sl_boundary_.start_s()) {
+    return false;
+  }
+
   const std::string& obstacle_id = obstacle.Id();
 
   // update stop timestamp on static pedestrian for watch timer
