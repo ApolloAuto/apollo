@@ -24,11 +24,6 @@ namespace apollo {
 namespace common {
 namespace util {
 
-TEST(Util, MinElement) {
-  EXPECT_EQ(1, MinElement(std::vector<int>{1, 2, 3}));
-  EXPECT_FLOAT_EQ(1.1, MinElement(std::vector<float>{1.1, 2.2, 3.3}));
-}
-
 TEST(Util, IsProtoEqual) {
   test::SimpleRepeatedMessage sim1;
   for (int i = 0; i < 10; ++i) {
