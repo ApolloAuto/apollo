@@ -40,7 +40,7 @@ bool EvaluatorSubmodule::Init() {
   }
   // TODO(kechxu) change topic name when finalized
   evaluator_writer_ =
-      node_->CreateWriter<EvaluatorOutput>(FLAGS_prediction_topic);
+      node_->CreateWriter<EvaluatorOutput>(FLAGS_evaluator_topic_name);
   return true;
 }
 

@@ -70,6 +70,12 @@ DEFINE_int32(max_num_dump_dataforlearn, 5000,
              "Max number of dataforlearn to dump");
 
 // Submodules
+DEFINE_string(container_topic_name, "/apollo/prediction/container",
+              "Container topic name");
+DEFINE_string(adccontainer_topic_name, "/apollo/prediction/adccontainer",
+              "ADC Container topic name");
+DEFINE_string(evaluator_topic_name, "/apollo/prediction/evaluator",
+              "Evaluator topic name");
 DEFINE_string(container_submodule_name, "container_submodule",
               "Container submodule name");
 DEFINE_string(evaluator_submodule_name, "evaluator_submodule",
