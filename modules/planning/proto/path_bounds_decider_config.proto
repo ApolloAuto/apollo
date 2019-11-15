@@ -12,4 +12,5 @@ message PathBoundsDeciderConfig {
   // disquality a pull-over position if the available path boundary's edge is not
   // within this distance from the road edge
   optional double pull_over_road_edge_buffer = 5 [default = 0.15];
+  optional double pull_over_approach_lon_distance_adjust_factor = 6 [default = 1.5];
 }
