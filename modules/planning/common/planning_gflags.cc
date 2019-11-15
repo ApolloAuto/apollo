@@ -593,3 +593,9 @@ DEFINE_double(side_pass_driving_width_l_buffer, 0.1,
 
 DEFINE_bool(use_st_drivable_boundary, false,
             "True to use st_drivable boundary in speed planning");
+
+DEFINE_bool(enable_prioritize_change_lane, false,
+            "True to enable prioritize change_lane reference line");
+
+DEFINE_bool(enable_remove_change_lane, false,
+            "True to enable remove change_lane reference line");

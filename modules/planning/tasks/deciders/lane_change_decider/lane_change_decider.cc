@@ -199,10 +199,9 @@ void LaneChangeDecider::PrioritizeChangeLane(
     return;
   }
   // TODO(SHU): disable the reference line order change for now
-  return;
-  // if (!is_prioritize_change_lane) {
-  //   return;
-  // }
+  if (!FLAGS_enable_prioritize_change_lane) {
+    return;
+  }
   auto iter = reference_line_info->begin();
   while (iter != reference_line_info->end()) {
     ADEBUG << "iter->IsChangeLanePath(): " << iter->IsChangeLanePath();
@@ -224,21 +223,22 @@ void LaneChangeDecider::PrioritizeChangeLane(
 }
 
 // disabled for now
-// void LaneChangeDecider::RemoveChangeLane(
-//     std::list<ReferenceLineInfo>* reference_line_info) const {
-//   // TODO(SHU): fix core dump when removing change lane
-//   return;
-//   /* disable rest to avoid core dump */
-//   ADEBUG << "removed change lane";
-//   auto iter = reference_line_info->begin();
-//   while (iter != reference_line_info->end()) {
-//     if (iter->IsChangeLanePath()) {
-//       iter = reference_line_info->erase(iter);
-//     } else {
-//       ++iter;
-//     }
-//   }
-// }
+void LaneChangeDecider::RemoveChangeLane(
+    std::list<ReferenceLineInfo>* reference_line_info) const {
+  // TODO(SHU): fix core dump when removing change lane
+  if (!FLAGS_enable_remove_change_lane) {
+    return;
+  }
+  ADEBUG << "removed change lane";
+  auto iter = reference_line_info->begin();
+  while (iter != reference_line_info->end()) {
+    if (iter->IsChangeLanePath()) {
+      iter = reference_line_info->erase(iter);
+    } else {
+      ++iter;
+    }
+  }
+}
 
 std::string LaneChangeDecider::GetCurrentPathId(
     const std::list<ReferenceLineInfo>& reference_line_info) const {

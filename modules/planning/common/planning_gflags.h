@@ -291,3 +291,7 @@ DECLARE_double(short_path_length_threshold);
 DECLARE_uint64(trajectory_stitching_preserved_length);
 
 DECLARE_bool(use_st_drivable_boundary);
+
+DECLARE_bool(enable_prioritize_change_lane);
+
+DECLARE_bool(enable_remove_change_lane);
