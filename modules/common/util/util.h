@@ -156,11 +156,6 @@ void uniform_slice(const T start, const T end, uint32_t num,
 }
 
 template <typename Container>
-typename Container::value_type MaxElement(const Container& elements) {
-  return *std::max_element(elements.begin(), elements.end());
-}
-
-template <typename Container>
 typename Container::value_type MinElement(const Container& elements) {
   return *std::min_element(elements.begin(), elements.end());
 }
