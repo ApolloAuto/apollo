@@ -190,10 +190,10 @@ void ObstaclesPrioritizer::AssignCautionLevel(const Scenario& scenario) {
     return;
   }
 
-  if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id()) {
-    AssignCautionLevelInJunction(*ego_vehicle, obstacles_container,
-                                 scenario.junction_id());
-  }
+  // if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id()) {
+  //   AssignCautionLevelInJunction(*ego_vehicle, obstacles_container,
+  //                                scenario.junction_id());
+  // }
   AssignCautionLevelCruiseKeepLane(*ego_vehicle, obstacles_container);
   AssignCautionLevelCruiseChangeLane(*ego_vehicle, obstacles_container);
   AssignCautionLevelByEgoReferenceLine(*ego_vehicle, obstacles_container);
