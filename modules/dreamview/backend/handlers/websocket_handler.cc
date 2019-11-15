@@ -16,16 +16,15 @@
 
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/map_util.h"
-#include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace dreamview {
 
 using apollo::common::util::ContainsKey;
-using apollo::common::util::StrCat;
 
 void WebSocketHandler::handleReadyState(CivetServer *server, Connection *conn) {
   {
@@ -128,9 +127,9 @@ bool WebSocketHandler::SendData(Connection *conn, const std::string &data,
   // Note that while we are holding the connection lock, the connection won't be
   // closed and removed.
   int ret;
-  PERF_BLOCK(
-      StrCat(name_, ": Writing ", data.size(), " bytes via websocket took"),
-      0.1) {
+  PERF_BLOCK(absl::StrCat(name_, ": Writing ", data.size(),
+                          " bytes via websocket took"),
+             0.1) {
     ret = mg_websocket_write(conn, op_code, data.c_str(), data.size());
   }
   connection_lock->unlock();
@@ -148,8 +147,8 @@ bool WebSocketHandler::SendData(Connection *conn, const std::string &data,
     } else if (ret < 0) {
       msg = "Send Error: " + std::string(std::strerror(errno));
     } else {
-      msg = StrCat("Expect to send ", data.size(), " bytes. But sent ", ret,
-                   " bytes");
+      msg = absl::StrCat("Expect to send ", data.size(), " bytes. But sent ",
+                         ret, " bytes");
     }
     AWARN << name_
           << ": Failed to send data via websocket connection. Reason: " << msg;
