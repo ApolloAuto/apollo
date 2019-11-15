@@ -31,6 +31,7 @@ cc_library(
         ":polynomial_curve1d",
         "//cyber/common",
         "//modules/common/util:string_util",
+        "@com_google_absl//absl/strings",
     ],
 )
 
@@ -64,6 +65,7 @@ cc_library(
         ":polynomial_curve1d",
         "//cyber/common",
         "//modules/common/util:string_util",
+        "@com_google_absl//absl/strings",
     ],
 )
 
@@ -82,7 +84,7 @@ cc_library(
         ":polynomial_curve1d",
         ":quartic_polynomial_curve1d",
         "//cyber/common:log",
-        "//modules/common/util:string_util",
+        "@com_google_absl//absl/strings",
     ],
 )
 
@@ -116,7 +118,7 @@ cc_library(
         ":quintic_polynomial_curve1d",
         "//cyber/common:log",
         "//modules/common/math",
-        "//modules/common/util:string_util",
+        "@com_google_absl//absl/strings",
     ],
 )
 
@@ -135,7 +137,7 @@ cc_library(
         ":quintic_spiral_path",
         "//cyber/common:log",
         "//modules/common/math",
-        "//modules/common/util:string_util",
+        "@com_google_absl//absl/strings",
     ],
 )
 

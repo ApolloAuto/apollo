@@ -229,7 +229,7 @@ std::list<std::unique_ptr<Obstacle>> Obstacle::CreateObstacles(
       }
 
       const std::string obstacle_id =
-          apollo::common::util::StrCat(perception_id, "_", trajectory_index);
+          absl::StrCat(perception_id, "_", trajectory_index);
       obstacles.emplace_back(
           new Obstacle(obstacle_id, prediction_obstacle.perception_obstacle(),
                        trajectory, prediction_obstacle.priority().priority(),

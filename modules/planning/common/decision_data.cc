@@ -69,7 +69,7 @@ DecisionData::DecisionData(
         continue;
       }
       const std::string obstacle_id =
-          apollo::common::util::StrCat(perception_id, "_", trajectory_index);
+          absl::StrCat(perception_id, "_", trajectory_index);
       obstacles_.emplace_back(new Obstacle(
           obstacle_id, prediction_obstacle.perception_obstacle(), trajectory));
       all_obstacle_.emplace_back(obstacles_.back().get());

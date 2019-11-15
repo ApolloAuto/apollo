@@ -25,8 +25,8 @@
 #include "cyber/task/task.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
 
+#include "absl/strings/str_cat.h"
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -552,8 +552,8 @@ bool ReferenceLineInfo::IsNeighborLanePath() const {
 }
 
 std::string ReferenceLineInfo::PathSpeedDebugString() const {
-  return apollo::common::util::StrCat("path_data:", path_data_.DebugString(),
-                                      "speed_data:", speed_data_.DebugString());
+  return absl::StrCat("path_data:", path_data_.DebugString(),
+                      "speed_data:", speed_data_.DebugString());
 }
 
 void ReferenceLineInfo::SetTurnSignal(

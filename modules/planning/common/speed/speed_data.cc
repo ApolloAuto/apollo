@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <utility>
 
+#include "absl/strings/str_cat.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
@@ -166,11 +167,10 @@ double SpeedData::TotalLength() const {
 std::string SpeedData::DebugString() const {
   const auto limit = std::min(
       size(), static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
-  return apollo::common::util::StrCat(
-      "[\n",
-      apollo::common::util::PrintDebugStringIter(begin(), begin() + limit,
-                                                 ",\n"),
-      "]\n");
+  return absl::StrCat("[\n",
+                      apollo::common::util::PrintDebugStringIter(
+                          begin(), begin() + limit, ",\n"),
+                      "]\n");
 }
 
 }  // namespace planning

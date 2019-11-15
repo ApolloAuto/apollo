@@ -18,10 +18,10 @@ cc_library(
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/util:map_util",
-        "//modules/common/util:string_util",
         "//modules/map/pnc_map:path",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planning_proto",
+        "@com_google_absl//absl/strings",
     ],
 )
 
