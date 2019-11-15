@@ -105,7 +105,6 @@ Stage::StageStatus EmergencyStopStageApproach::Process(
       StopReasonCode::STOP_REASON_EMERGENCY, wait_for_obstacle_ids,
       "EMERGENCY_STOP-scenario", frame,
       &(frame->mutable_reference_line_info()->front()));
-
   ADEBUG << "Build a stop fence for emergency_stop: id["
          << virtual_obstacle_id << "] s[" << stop_line_s << "]";
 
