@@ -53,19 +53,6 @@ static void FillHeader(const std::string& module_name, T* msg) {
 }
 
 template <typename T, typename std::enable_if<
-                          !std::is_base_of<Message, T>::value, int>::type = 0>
-static bool DumpMessage(const std::shared_ptr<T>& msg,
-                        const std::string& dump_dir = "/tmp") {
-  return true;
-}
-
-template <typename T, typename std::enable_if<
-                          !std::is_base_of<Message, T>::value, int>::type = 0>
-static bool DumpMessage(const T& msg, const std::string& dump_dir = "/tmp") {
-  return true;
-}
-
-template <typename T, typename std::enable_if<
                           std::is_base_of<Message, T>::value, int>::type = 0>
 bool DumpMessage(const std::shared_ptr<T>& msg,
                  const std::string& dump_dir = "/tmp") {
