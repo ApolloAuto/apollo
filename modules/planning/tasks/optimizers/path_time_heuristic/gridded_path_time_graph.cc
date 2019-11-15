@@ -186,7 +186,8 @@ Status GriddedPathTimeGraph::InitCostTable() {
     for (uint32_t j = 0; j < dense_dimension_s_; ++j, curr_s += dense_unit_s_) {
       cost_table_i[j].Init(i, j, STPoint(curr_s, curr_t));
     }
-    curr_s = static_cast<double>(dense_dimension_s_ - 1) * dense_unit_s_;
+    curr_s = static_cast<double>(dense_dimension_s_ - 1) * dense_unit_s_ +
+             sparse_unit_s_;
     for (uint32_t j = dense_dimension_s_; j < cost_table_i.size();
          ++j, curr_s += sparse_unit_s_) {
       cost_table_i[j].Init(i, j, STPoint(curr_s, curr_t));
