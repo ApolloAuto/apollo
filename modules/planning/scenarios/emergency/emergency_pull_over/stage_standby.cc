@@ -54,11 +54,6 @@ Stage::StageStatus EmergencyPullOverStageStandby::Process(
   // reset cruise_speed
   reference_line_info.SetCruiseSpeed(FLAGS_default_cruise_speed);
 
-  bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
-    AERROR << "EmergencyPullOverStageStandby planning error";
-  }
-
   // add a stop fence
   const auto& pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
@@ -91,6 +86,11 @@ Stage::StageStatus EmergencyPullOverStageStandby::Process(
 
     ADEBUG << "Build a stop fence for emergency_pull_over: id["
            << virtual_obstacle_id << "] s[" << stop_line_s << "]";
+  }
+
+  bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
+  if (!plan_ok) {
+    AERROR << "EmergencyPullOverStageStandby planning error";
   }
 
   return Stage::RUNNING;
