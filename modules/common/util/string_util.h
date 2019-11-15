@@ -39,8 +39,6 @@ namespace apollo {
 namespace common {
 namespace util {
 
-// Expose some useful utils from protobuf.
-using absl::StrCat;
 // TODO(xiaoxq): Migrate to absl::StrFormat after absl upgraded.
 using google::protobuf::StringPrintf;
 

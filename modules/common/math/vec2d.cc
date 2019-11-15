@@ -18,8 +18,8 @@
 
 #include <cmath>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace common {
@@ -122,7 +122,7 @@ bool Vec2d::operator==(const Vec2d &other) const {
 Vec2d operator*(const double ratio, const Vec2d &vec) { return vec * ratio; }
 
 std::string Vec2d::DebugString() const {
-  return util::StrCat("vec2d ( x = ", x_, "  y = ", y_, " )");
+  return absl::StrCat("vec2d ( x = ", x_, "  y = ", y_, " )");
 }
 
 }  // namespace math

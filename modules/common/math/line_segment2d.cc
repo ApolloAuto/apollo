@@ -20,8 +20,8 @@
 #include <cmath>
 #include <utility>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/string_util.h"
 
 #include "modules/common/math/math_utils.h"
 
@@ -220,7 +220,7 @@ double LineSegment2d::GetPerpendicularFoot(const Vec2d &point,
 }
 
 std::string LineSegment2d::DebugString() const {
-  return util::StrCat("segment2d ( start = ", start_.DebugString(),
+  return absl::StrCat("segment2d ( start = ", start_.DebugString(),
                       "  end = ", end_.DebugString(), " )");
 }
 

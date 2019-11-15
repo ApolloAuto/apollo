@@ -79,12 +79,10 @@ cc_library(
 
 cc_library(
     name = "message_util",
-    hdrs = [
-        "message_util.h",
-    ],
+    hdrs = ["message_util.h"],
     deps = [
-        ":string_util",
         "//modules/common/time",
+        "@com_google_absl//absl/strings",
         "@com_google_protobuf//:protobuf",
     ],
 )

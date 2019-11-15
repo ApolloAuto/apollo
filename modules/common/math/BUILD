@@ -44,6 +44,7 @@ cc_library(
     deps = [
         "//cyber/common:log",
         "//modules/common/util:string_util",
+        "@com_google_absl//absl/strings",
         "@eigen",
         "@osqp",
     ],

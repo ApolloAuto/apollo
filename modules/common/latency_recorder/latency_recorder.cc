@@ -22,7 +22,6 @@
 namespace apollo {
 namespace common {
 
-using apollo::common::util::StrCat;
 using apollo::cyber::Time;
 
 LatencyRecorder::LatencyRecorder(const std::string& module_name)
@@ -63,7 +62,7 @@ LatencyRecorder::CreateWriter() {
   if (node_ == nullptr) {
     current_timestamp_ = apollo::cyber::Time::Now().ToNanosecond();
     node_ = apollo::cyber::CreateNode(
-        StrCat(node_name_prefix, module_name_, current_timestamp_));
+        absl::StrCat(node_name_prefix, module_name_, current_timestamp_));
     if (node_ == nullptr) {
       AERROR << "unable to create node for latency recording";
       return nullptr;
