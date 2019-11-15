@@ -24,7 +24,6 @@ cc_library(
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/util",
-        "//modules/common/util:string_util",
     ],
 )
 
