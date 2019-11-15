@@ -36,6 +36,7 @@
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -198,6 +199,15 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
     return false;
   }
 
+  const auto* planning_status = PlanningContext::Instance()
+                                    ->mutable_planning_status()
+                                    ->mutable_change_lane();
+
+  double l_buffer =
+      planning_status->status() == ChangeLaneStatus::IN_CHANGE_LANE
+          ? FLAGS_lane_change_obstacle_nudge_l_buffer
+          : FLAGS_nonstatic_obstacle_nudge_l_buffer;
+
   // Draw the given obstacle on the ST-graph.
   const auto& trajectory = obstacle.Trajectory();
   if (trajectory.trajectory_point().empty()) {
@@ -214,8 +224,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
       }
 
       const Box2d& obs_box = obstacle.PerceptionBoundingBox();
-      if (CheckOverlap(curr_point_on_path, obs_box,
-                       FLAGS_nonstatic_obstacle_nudge_l_buffer)) {
+      if (CheckOverlap(curr_point_on_path, obs_box, l_buffer)) {
         // If there is overlapping, then plot it on ST-graph.
         const double backward_distance = -vehicle_param_.front_edge_to_center();
         const double forward_distance = obs_box.length();
@@ -268,8 +277,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
       for (double path_s = 0.0; path_s < path_len; path_s += step_length) {
         const auto curr_adc_path_point =
             discretized_path.Evaluate(path_s + discretized_path.front().s());
-        if (CheckOverlap(curr_adc_path_point, obs_box,
-                         FLAGS_nonstatic_obstacle_nudge_l_buffer)) {
+        if (CheckOverlap(curr_adc_path_point, obs_box, l_buffer)) {
           // Found overlap, start searching with higher resolution
           const double backward_distance = -step_length;
           const double forward_distance = vehicle_param_.length() +
@@ -294,8 +302,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
             if (!find_low) {
               const auto& point_low = discretized_path.Evaluate(
                   low_s + discretized_path.front().s());
-              if (!CheckOverlap(point_low, obs_box,
-                                FLAGS_nonstatic_obstacle_nudge_l_buffer)) {
+              if (!CheckOverlap(point_low, obs_box, l_buffer)) {
                 low_s += fine_tuning_step_length;
               } else {
                 find_low = true;
@@ -304,8 +311,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
             if (!find_high) {
               const auto& point_high = discretized_path.Evaluate(
                   high_s + discretized_path.front().s());
-              if (!CheckOverlap(point_high, obs_box,
-                                FLAGS_nonstatic_obstacle_nudge_l_buffer)) {
+              if (!CheckOverlap(point_high, obs_box, l_buffer)) {
                 high_s -= fine_tuning_step_length;
               } else {
                 find_high = true;
