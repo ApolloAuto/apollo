@@ -122,6 +122,10 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
       const std::string msg = "Null obstacle pointer.";
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
+    // Temporarily ignore
+    if (obs_item_ptr->Id().find("KC_JC") != std::string::npos) {
+      continue;
+    }
 
     std::vector<STPoint> lower_points;
     std::vector<STPoint> upper_points;

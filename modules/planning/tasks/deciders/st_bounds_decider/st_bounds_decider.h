@@ -39,7 +39,7 @@ namespace apollo {
 namespace planning {
 
 constexpr double kSTBoundsDeciderResolution = 0.1;
-constexpr double kSTPassableThreshold = 3.0;
+constexpr double kSTPassableThreshold = 5.0;
 
 class STBoundsDecider : public Decider {
  public:
