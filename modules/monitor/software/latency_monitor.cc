@@ -23,6 +23,7 @@
 #include <utility>
 #include <vector>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/monitor/common/monitor_manager.h"
@@ -45,7 +46,6 @@ using apollo::common::LatencyRecordMap;
 using apollo::common::LatencyReport;
 using apollo::common::LatencyStat;
 using apollo::common::LatencyTrack;
-using apollo::common::util::StrCat;
 
 void FillInStat(const std::string& module_name, const uint64_t duration,
                 std::vector<std::pair<std::string, uint64_t>>* stats,
@@ -114,7 +114,7 @@ std::vector<std::pair<std::string, uint64_t>> GetFlowTrackStats(
     std::tie(begin_time, end_time, module_name) = *iter;
     if (!prev_name.empty()) {
       const std::string mid_name =
-          StrCat(prev_name, module_connector, module_name);
+          absl::StrCat(prev_name, module_connector, module_name);
       FillInStat(mid_name, begin_time - prev_end_time, &stats, total_duration);
       FillInTopo(prev_name, mid_name, topo);
       FillInTopo(mid_name, module_name, topo);

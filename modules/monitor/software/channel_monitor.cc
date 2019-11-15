@@ -19,11 +19,11 @@
 #include <memory>
 #include <string>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/map_util.h"
-#include "modules/common/util/string_util.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/drivers/proto/pointcloud.pb.h"
@@ -44,7 +44,6 @@ DEFINE_double(channel_monitor_interval, 5,
 namespace apollo {
 namespace monitor {
 namespace {
-using apollo::common::util::StrCat;
 
 // We have to specify exact type of each channel. This function is a wrapper for
 // those only need a ReaderBase.
@@ -102,7 +101,8 @@ void ChannelMonitor::UpdateStatus(
   if (reader == nullptr) {
     SummaryMonitor::EscalateStatus(
         ComponentStatus::UNKNOWN,
-        StrCat(config.name(), " is not registered in ChannelMonitor."), status);
+        absl::StrCat(config.name(), " is not registered in ChannelMonitor."),
+        status);
     return;
   }
 
@@ -110,7 +110,8 @@ void ChannelMonitor::UpdateStatus(
   if (delay < 0 || delay > config.delay_fatal()) {
     SummaryMonitor::EscalateStatus(
         ComponentStatus::FATAL,
-        StrCat(config.name(), " delayed for ", delay, " seconds."), status);
+        absl::StrCat(config.name(), " delayed for ", delay, " seconds."),
+        status);
   } else {
     SummaryMonitor::EscalateStatus(ComponentStatus::OK, "", status);
   }
