@@ -20,6 +20,7 @@
 #include <limits>
 #include <unordered_map>
 
+#include "absl/strings/str_cat.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/polygon2d.h"
@@ -62,7 +63,7 @@ std::string LaneWaypoint::DebugString() const {
   if (lane == nullptr) {
     return "(lane is null)";
   }
-  return common::util::StrCat("id = ", lane->id().id(), "  s = ", s);
+  return absl::StrCat("id = ", lane->id().id(), "  s = ", s);
 }
 
 LaneBoundaryType::Type LeftBoundaryType(const LaneWaypoint& waypoint) {
@@ -187,13 +188,13 @@ std::string LaneSegment::DebugString() const {
   if (lane == nullptr) {
     return "(lane is null)";
   }
-  return common::util::StrCat("id = ", lane->id().id(),
-                              "  "
-                              "start_s = ",
-                              start_s,
-                              "  "
-                              "end_s = ",
-                              end_s);
+  return absl::StrCat("id = ", lane->id().id(),
+                      "  "
+                      "start_s = ",
+                      start_s,
+                      "  "
+                      "end_s = ",
+                      end_s);
 }
 
 std::vector<MapPathPoint> MapPathPoint::GetPointsFromSegment(
@@ -253,7 +254,7 @@ void MapPathPoint::RemoveDuplicates(std::vector<MapPathPoint>* points) {
 }
 
 std::string MapPathPoint::DebugString() const {
-  return common::util::StrCat(
+  return absl::StrCat(
       "x = ", x_, "  y = ", y_, "  heading = ", heading_,
       "  lwp = "
       "{(",
@@ -261,7 +262,7 @@ std::string MapPathPoint::DebugString() const {
 }
 
 std::string Path::DebugString() const {
-  return common::util::StrCat(
+  return absl::StrCat(
       "num_points = ", num_points_,
       "  points = "
       "{(",
@@ -275,7 +276,7 @@ std::string Path::DebugString() const {
 }
 
 std::string PathOverlap::DebugString() const {
-  return common::util::StrCat(object_id, " ", start_s, " ", end_s);
+  return absl::StrCat(object_id, " ", start_s, " ", end_s);
 }
 
 Path::Path(const std::vector<MapPathPoint>& path_points)
