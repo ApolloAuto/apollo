@@ -1,0 +1,43 @@
+module_config {
+     module_library : "/apollo/bazel-bin/modules/control/submodules/control_module.so"
+
+    timer_components {
+        class_name : "PreprocessorSubmodule"
+        config {
+            name: "preprocessor submodule"
+            config_file_path: "/apollo/modules/control/conf/control_common_conf.pb.txt"
+            flag_file_path: "/apollo/modules/control/conf/control.conf"
+            interval: 10
+        }
+    }
+
+
+    components {
+        class_name : "LatLonControllerSubmodule"
+        config {
+            name: "lateral+longitudinal controller"
+            flag_file_path: "/apollo/modules/control/conf/control.conf"
+            readers: [
+                {
+                    channel:"/apollo/control_preprocessor"
+                }
+            ]
+        }
+    }
+
+    components {
+        class_name : "PostprocessorSubmodule"
+        config {
+            name: "postprocessor submodule"
+            flag_file_path: "/apollo/modules/control/conf/control.conf"
+            readers: [
+                {
+                    channel:"/apollo/control_preprocessor"
+                },
+                {
+                    channel:"/apollo/control"
+                }
+            ]
+        }
+    }
+}
