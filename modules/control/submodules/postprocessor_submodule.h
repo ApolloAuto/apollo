@@ -67,7 +67,9 @@ class PostprocessorSubmodule final
  private:
   std::shared_ptr<cyber::Writer<ControlCommand>> postprocessor_writer_;
   ControlCommonConf control_common_conf_;
-  common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 };
+
+CYBER_REGISTER_COMPONENT(PostprocessorSubmodule)
+
 }  // namespace control
 }  // namespace apollo
