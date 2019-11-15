@@ -5,7 +5,7 @@
 nameMapper:
     planning_reference_line: ReferenceLine
     DpStSpeedOptimizer: SpeedHeuristic
-    PIECEWISE_JERK_PATH_OPTIMIZER: PlannedSpeed
+    PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER: PlannedSpeed
 
 # Planning Graph settings
 slGraph:
@@ -115,7 +115,7 @@ stGraph:
     datasets:
         - name: DP_ST_SPEED_OPTIMIZER
           graphTitle: Speed Heuristic
-        - name: PIECEWISE_JERK_SPEED_OPTIMIZER
+        - name: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
           graphTitle: Planning S-T Graph
 stSpeedGraph:
     options:
@@ -157,7 +157,7 @@ stSpeedGraph:
                 fill: false
                 showLine: true
     datasets:
-        - name: PIECEWISE_JERK_SPEED_OPTIMIZER
+        - name: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
           graphTitle: Planning V-T Graph
 speedGraph:
     title: 'Planning Speed'
