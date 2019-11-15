@@ -46,20 +46,55 @@ Stage::StageStatus EmergencyStopStageStandby::Process(
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
-  auto& reference_line_info = frame->mutable_reference_line_info()->front();
+  // add a stop fence
+  const auto& reference_line_info = frame->reference_line_info().front();
+  const auto& reference_line = reference_line_info.reference_line();
+  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+  const double stop_distance = scenario_config_.stop_distance();
 
-  // set vehicle signal
-  reference_line_info.SetEmergencyLight();
+  bool stop_fence_exist = false;
+  double stop_line_s;
+  const auto& emergency_stop_status =
+      PlanningContext::Instance()->planning_status().emergency_stop();
+  if (emergency_stop_status.has_stop_fence_point()) {
+    common::SLPoint stop_fence_sl;
+    reference_line.XYToSL(
+        {emergency_stop_status.stop_fence_point().x(),
+         emergency_stop_status.stop_fence_point().y()},
+        &stop_fence_sl);
+    if (stop_fence_sl.s() > adc_front_edge_s) {
+      stop_fence_exist = true;
+      stop_line_s = stop_fence_sl.s();
+    }
+  }
 
-  // reset cruise_speed
-  reference_line_info.SetCruiseSpeed(FLAGS_default_cruise_speed);
+  if (!stop_fence_exist) {
+    constexpr double kBuffer = 2.0;
+    stop_line_s = adc_front_edge_s + stop_distance + kBuffer;
+    const auto& stop_fence_point =
+        reference_line.GetReferencePoint(stop_line_s);
+    auto* emergency_stop_fence_point = PlanningContext::Instance()
+                                           ->mutable_planning_status()
+                                           ->mutable_emergency_stop()
+                                           ->mutable_stop_fence_point();
+    emergency_stop_fence_point->set_x(stop_fence_point.x());
+    emergency_stop_fence_point->set_y(stop_fence_point.y());
+  }
+
+  const std::string virtual_obstacle_id = "EMERGENCY_STOP";
+  const std::vector<std::string> wait_for_obstacle_ids;
+  planning::util::BuildStopDecision(
+      virtual_obstacle_id, stop_line_s, stop_distance,
+      StopReasonCode::STOP_REASON_EMERGENCY, wait_for_obstacle_ids,
+      "EMERGENCY_STOP-scenario", frame,
+      &(frame->mutable_reference_line_info()->front()));
+  ADEBUG << "Build a stop fence for emergency_stop: id["
+         << virtual_obstacle_id << "] s[" << stop_line_s << "]";
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
     AERROR << "EmergencyStopStageStandby planning error";
   }
-
-  // TODO(all): to be implemented
 
   return Stage::RUNNING;
 }
