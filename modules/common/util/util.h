@@ -155,11 +155,6 @@ void uniform_slice(const T start, const T end, uint32_t num,
   sliced->at(num) = end;
 }
 
-template <typename Container>
-typename Container::value_type MinElement(const Container& elements) {
-  return *std::min_element(elements.begin(), elements.end());
-}
-
 template <typename T>
 std::unordered_set<T> Intersection(const std::unordered_set<T>& s1,
                                    const std::unordered_set<T>& s2) {
