@@ -34,7 +34,7 @@ DEFINE_string(lateral_controller_conf_file,
 
 DEFINE_string(
     longitudinal_controller_conf_file,
-    "/apollo/modules/control/conf/longitudinal_controller_conf_file.pb.txt",
+    "/apollo/modules/control/conf/longitudinal_controller_conf.pb.txt",
     "longitudinal controller conf data file");
 
 DEFINE_string(calibration_table_file,
