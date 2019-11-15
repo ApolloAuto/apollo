@@ -38,7 +38,6 @@ cc_library(
         ":hdmap",
         "//modules/common/configs:config_gflags",
         "//modules/common/util",
-        "//modules/common/util:string_util",
         "//modules/map/relative_map/proto:navigation_proto",
         "@com_google_absl//absl/strings",
     ],
