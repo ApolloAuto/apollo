@@ -1,0 +1,26 @@
+control_test_duration: -1
+enable_csv_debug: false
+enable_speed_station_preview: false
+is_control_test_mode: false
+use_preview_speed_for_table: false
+enable_input_timestamp_check: false
+max_localization_miss_num : 20
+max_planning_miss_num: 20
+max_acceleration_when_stopped: 0.01
+max_path_remain_when_stopped: 0.3
+steer_angle_rate: 100
+enable_gain_scheduler: true
+set_steer_limit: true
+enable_slope_offset: false
+control_period: 0.01
+trajectory_period: 0.1
+chassis_period: 0.01
+localization_period: 0.01
+max_status_interval_sec: 0.1
+max_planning_interval_sec: 0.2
+max_planning_delay_threshold: 4.0
+soft_estop_brake: 50.0
+max_steering_percentage_allowed: 100
+minimum_speed_resolution: 0.2
+query_relative_time: 0.8
+minimum_speed_protection: 0.1
