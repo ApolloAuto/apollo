@@ -21,8 +21,8 @@
 #include "modules/planning/math/curve1d/quartic_polynomial_curve1d.h"
 
 #include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/string_util.h"
 
 namespace apollo {
 namespace planning {
@@ -169,8 +169,7 @@ void QuarticPolynomialCurve1d::ComputeCoefficients(
 }
 
 std::string QuarticPolynomialCurve1d::ToString() const {
-  return absl::StrCat(apollo::common::util::PrintIter(coef_, "\t"), param_,
-                      "\n");
+  return absl::StrCat(absl::StrJoin(coef_, "\t"), param_, "\n");
 }
 
 double QuarticPolynomialCurve1d::Coef(const size_t order) const {

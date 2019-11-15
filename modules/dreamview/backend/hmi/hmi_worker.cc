@@ -17,6 +17,7 @@
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
 
 #include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -24,7 +25,6 @@
 #include "modules/common/kv_db/kv_db.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/message_util.h"
-#include "modules/common/util/string_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
 #include "modules/monitor/proto/system_status.pb.h"
@@ -73,7 +73,7 @@ std::string TitleCase(const std::string& origin) {
     }
   }
 
-  return apollo::common::util::PrintIter(parts);
+  return absl::StrJoin(parts, " ");
 }
 
 // List subdirs and return a dict of {subdir_title: subdir_path}.
