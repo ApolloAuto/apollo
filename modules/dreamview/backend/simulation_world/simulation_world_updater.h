@@ -112,25 +112,6 @@ class SimulationWorldUpdater {
    */
   bool LoadPOI();
 
-  /**
-   * @brief Dumps the latest received message to file.
-   * @param adapter the adapter to perform dumping
-   * @param adapter_name the name of the adapter
-   */
-  template <typename AdapterType>
-  void DumpMessage(AdapterType *adapter, std::string adapter_name) {
-    if (adapter->DumpLatestMessage()) {
-      sim_world_service_.PublishMonitorMessage(
-          common::monitor::MonitorMessageItem::INFO,
-          absl::StrCat("Dumped latest ", adapter_name, " message under /tmp/",
-                       adapter_name, "."));
-    } else {
-      sim_world_service_.PublishMonitorMessage(
-          common::monitor::MonitorMessageItem::WARN,
-          absl::StrCat("Failed to dump latest ", adapter_name, " message."));
-    }
-  }
-
   void RegisterMessageHandlers();
 
   std::unique_ptr<cyber::Timer> timer_;

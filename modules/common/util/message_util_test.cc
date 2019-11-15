@@ -26,8 +26,6 @@ namespace common {
 namespace util {
 
 TEST(MessageUtilTest, DumpMessage) {
-  auto a = 1;
-  EXPECT_TRUE(DumpMessage(a));
   auto simple_msg = std::make_shared<test::SimpleMessage>();
   FillHeader("test", simple_msg.get());
   EXPECT_TRUE(DumpMessage(simple_msg));
