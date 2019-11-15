@@ -42,13 +42,6 @@ namespace util {
 // TODO(xiaoxq): Migrate to absl::StrFormat after absl upgraded.
 using google::protobuf::StringPrintf;
 
-template <typename T>
-std::string Print(const T& val) {
-  std::ostringstream oss;
-  oss << val;
-  return oss.str();
-}
-
 /**
  * @brief Make conatiners and iterators printable.
  */
