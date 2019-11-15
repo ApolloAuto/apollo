@@ -20,6 +20,7 @@
 
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_limit_decider.h"
 
+#include <algorithm>
 #include <limits>
 #include <tuple>
 
