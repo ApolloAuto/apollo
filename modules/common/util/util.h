@@ -202,18 +202,6 @@ PathPoint GetWeightedAverageOfTwoPathPoints(const PathPoint& p1,
                                             const PathPoint& p2,
                                             const double w1, const double w2);
 
-// a wrapper template function for remove_if on associative containers
-template <class Container, class F>
-void erase_map_where(Container& c, F&& f) {  // NOLINT
-  for (auto it = c.begin(); it != c.end();) {
-    if (f(*it)) {
-      it = c.erase(it);
-    } else {
-      ++it;
-    }
-  }
-}
-
 template <typename T>
 void QuaternionToRotationMatrix(const T* quat, T* R) {
   T x2 = quat[0] * quat[0];
