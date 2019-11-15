@@ -17,12 +17,12 @@
 #include <poll.h>
 
 #include "absl/strings/match.h"
+#include "absl/strings/str_join.h"
 #include "cyber/component/timer_component.h"
 #include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/color.h"
 #include "modules/common/util/message_util.h"
-#include "modules/common/util/string_util.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
@@ -30,7 +30,6 @@
 using apollo::common::color::ANSI_GREEN;
 using apollo::common::color::ANSI_RED;
 using apollo::common::color::ANSI_RESET;
-using apollo::common::util::PrintIter;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::SignalInfoConstPtr;
 using apollo::localization::LocalizationEstimate;
@@ -98,11 +97,11 @@ class ManualTrafficLight final : public apollo::cyber::TimerComponent {
         }
       } else {
         if (signal_ids.size() < 5) {
-          std::cout << " IDs: "
-                    << PrintIter(signal_ids.begin(), signal_ids.end());
+          std::cout << " IDs: " << absl::StrJoin(signal_ids, " ");
         } else {
           std::cout << " IDs: "
-                    << PrintIter(signal_ids.begin(), signal_ids.begin() + 4)
+                    << absl::StrJoin(signal_ids.begin(), signal_ids.begin() + 4,
+                                     " ")
                     << " ...";
         }
       }

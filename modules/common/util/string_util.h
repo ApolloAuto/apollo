@@ -41,7 +41,6 @@ namespace util {
 
 // Expose some useful utils from protobuf.
 using absl::StrCat;
-using google::protobuf::Join;
 // TODO(xiaoxq): Migrate to absl::StrFormat after absl upgraded.
 using google::protobuf::StringPrintf;
 
@@ -53,76 +52,7 @@ std::string Print(const T& val) {
 }
 
 /**
- * @brief Make arrays, conatiners and iterators printable.
- *
- * Usage:
- *   vector<int> vec = {1, 2, 3};
- *   std::cout << PrintIter(vec);
- *   std::cout << PrintIter(vec, ",");
- *   std::cout << PrintIter(vec.begin(), vec.end());
- *   std::cout << PrintIter(vec.begin(), vec.end(), "|");
- *
- *   int array[] = {1, 2, 3};
- *   std::cout << PrintIter(array);
- *   std::cout << PrintIter(array, "|");
- *   std::cout << PrintIter(array + 0, array + 10, "|");
- */
-template <typename Iter>
-std::string PrintIter(const Iter& begin, const Iter& end,
-                      const std::string& delimiter = " ") {
-  std::string result;
-  Join(begin, end, delimiter.c_str(), &result);
-  return result;
-}
-
-template <typename Iter>
-std::string PrintIter(const Iter& begin, const Iter& end,
-                      const std::function<std::string(Iter)> transformer,
-                      const std::string& delimiter = " ") {
-  std::string result;
-  if (transformer) {
-    for (auto iter = begin; iter != end; ++iter) {
-      if (iter == begin) {
-        absl::StrAppend(&result, transformer(*iter));
-      } else {
-        absl::StrAppend(&result, delimiter, transformer(*iter));
-      }
-    }
-  } else {
-    PrintIter(begin, end, delimiter);
-  }
-  return result;
-}
-
-template <typename Container, typename Iter>
-std::string PrintIter(const Container& container,
-                      const std::function<std::string(Iter)> transformer,
-                      const std::string& delimiter = " ") {
-  return PrintIter(container.begin(), container.end(), transformer, delimiter);
-}
-
-template <typename Container>
-std::string PrintIter(const Container& container,
-                      const std::string& delimiter = " ") {
-  return PrintIter(container.begin(), container.end(), delimiter);
-}
-
-template <typename T, int length>
-std::string PrintIter(T (&array)[length], T* end,
-                      const std::string& delimiter = " ") {
-  std::string result;
-  Join(array, end, delimiter.c_str(), &result);
-  return result;
-}
-
-template <typename T, int length>
-std::string PrintIter(T (&array)[length], const std::string& delimiter = " ") {
-  return PrintIter(array, array + length, delimiter);
-}
-
-/**
- * @brief Make conatiners and iterators printable. Similar to PrintIter but
- *        output the DebugString().
+ * @brief Make conatiners and iterators printable.
  */
 template <typename Iter>
 std::string PrintDebugStringIter(const Iter& begin, const Iter& end,
