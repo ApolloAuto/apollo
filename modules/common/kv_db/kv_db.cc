@@ -19,8 +19,8 @@
 
 #include "gflags/gflags.h"
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 
 DEFINE_string(kv_db_path, "/apollo/data/kv_db.sqlite",
@@ -29,7 +29,6 @@ DEFINE_string(kv_db_path, "/apollo/data/kv_db.sqlite",
 namespace apollo {
 namespace common {
 namespace {
-using apollo::common::util::StrCat;
 
 // Self-maintained sqlite instance.
 class SqliteWraper {
@@ -93,21 +92,22 @@ class SqliteWraper {
 bool KVDB::Put(const std::string &key, const std::string &value) {
   SqliteWraper sqlite;
   return sqlite.SQL(
-      StrCat("INSERT OR REPLACE INTO key_value (key, value) "
-             "VALUES ('",
-             key, "', '", value, "');"));
+      absl::StrCat("INSERT OR REPLACE INTO key_value (key, value) VALUES ('",
+                   key, "', '", value, "');"));
 }
 
 bool KVDB::Delete(const std::string &key) {
   SqliteWraper sqlite;
-  return sqlite.SQL(StrCat("DELETE FROM key_value WHERE key='", key, "';"));
+  return sqlite.SQL(
+      absl::StrCat("DELETE FROM key_value WHERE key='", key, "';"));
 }
 
 bool KVDB::Has(const std::string &key) {
   SqliteWraper sqlite;
   std::string value;
   const bool ret = sqlite.SQL(
-      StrCat("SELECT value FROM key_value WHERE key='", key, "';"), &value);
+      absl::StrCat("SELECT value FROM key_value WHERE key='", key, "';"),
+      &value);
   // Take empty field as non-exist.
   return ret && !value.empty();
 }
@@ -117,7 +117,8 @@ std::string KVDB::Get(const std::string &key,
   SqliteWraper sqlite;
   std::string value;
   const bool ret = sqlite.SQL(
-      StrCat("SELECT value FROM key_value WHERE key='", key, "';"), &value);
+      absl::StrCat("SELECT value FROM key_value WHERE key='", key, "';"),
+      &value);
   return (ret && !value.empty()) ? value : default_value;
 }
 

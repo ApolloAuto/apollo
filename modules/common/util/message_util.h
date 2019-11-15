@@ -24,10 +24,10 @@
 #include <memory>
 #include <string>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "google/protobuf/message.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/string_util.h"
 
 /**
  * @namespace apollo::common::util
@@ -73,7 +73,7 @@ bool DumpMessage(const std::shared_ptr<T>& msg,
 
   auto sequence_num = msg->header().sequence_num();
   return cyber::common::SetProtoToASCIIFile(
-      *msg, util::StrCat(dump_path, "/", sequence_num, ".pb.txt"));
+      *msg, absl::StrCat(dump_path, "/", sequence_num, ".pb.txt"));
 }
 
 inline size_t MessageFingerprint(const google::protobuf::Message& message) {

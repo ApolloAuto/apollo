@@ -22,10 +22,10 @@
 
 #include "cyber/common/log.h"
 
+#include "absl/strings/str_cat.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/math/quaternion.h"
-#include "modules/common/util/string_util.h"
 #include "modules/localization/common/localization_gflags.h"
 
 namespace apollo {
@@ -38,7 +38,7 @@ Status VehicleStateProvider::Update(
     const canbus::Chassis &chassis) {
   original_localization_ = localization;
   if (!ConstructExceptLinearVelocity(localization)) {
-    std::string msg = util::StrCat(
+    std::string msg = absl::StrCat(
         "Fail to update because ConstructExceptLinearVelocity error.",
         "localization:\n", localization.DebugString());
     return Status(ErrorCode::LOCALIZATION_ERROR, msg);

@@ -20,8 +20,8 @@
 #include <cmath>
 #include <utility>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/string_util.h"
 
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/polygon2d.h"
@@ -344,7 +344,7 @@ void Box2d::LateralExtend(const double extension_length) {
 }
 
 std::string Box2d::DebugString() const {
-  return util::StrCat("box2d ( center = ", center_.DebugString(),
+  return absl::StrCat("box2d ( center = ", center_.DebugString(),
                       "  heading = ", heading_, "  length = ", length_,
                       "  width = ", width_, " )");
 }
