@@ -43,7 +43,8 @@ const std::string modem0_id = "0";
 const std::string modem1_id = "1";
 const std::string modem2_id = "2";
 
-const unsigned int encoder_count = 2;
+const unsigned int encoder_count = 3;
+const unsigned int write_wait_ms = 50;
 
 const std::string start_cmd = "start";
 const std::string stop_cmd = "kill";
@@ -307,7 +308,7 @@ void TeleopService::UpdateCarDaemonRpt(
     }
 
     // all  video encoders are running.
-    videoIsRunning = runningEncoders == encoder_count;
+    videoIsRunning = runningEncoders >= encoder_count;
 
     // we may need to write commands to start/stop the video stream
     bool sendStartVideo = false;
@@ -354,7 +355,7 @@ void TeleopService::UpdateCarDaemonRpt(
       else {
         if (teleop_status_["audio_starting"]) {
           // not started yet
-          sendStartVideo = true;
+          sendStartAudio = true;
         } else if (teleop_status_["audio_stopping"]) {
           // video is stopped
           teleop_status_["audio_stopping"] = false;
@@ -423,6 +424,10 @@ void TeleopService::SendVideoStreamCmd(bool start_stop) {
   }
   // we send a message to each encoder.
   for (unsigned int i = 0; i < encoder_count; i++) {
+    if (i > 0) {
+      // delay between sending 2 messages to ensure they are received
+      std::this_thread::sleep_for(std::chrono::milliseconds(write_wait_ms));
+    }
     char encoderName[20];
     snprintf(encoderName, 20, "encoder%u", i);
     msg.set_service(encoderName);
