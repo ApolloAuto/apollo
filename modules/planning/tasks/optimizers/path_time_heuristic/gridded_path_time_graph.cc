@@ -146,11 +146,21 @@ Status GriddedPathTimeGraph::Search(SpeedData* const speed_data) {
 Status GriddedPathTimeGraph::InitCostTable() {
   // Time dimension is homogeneous while Spatial dimension has two resolutions,
   // dense and sparse with dense resolution coming first in the spatial horizon
-  // The least meaningful unit_t_
+
+  // Sanity check for numerical stability
   if (unit_t_ < kDoubleEpsilon) {
-    // Sanity check for numerical stability
-    AERROR << "unit_t is smaller than the kDoubleEpsilon.";
+    const std::string msg = "unit_t is smaller than the kDoubleEpsilon.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+
+  // Sanity check on s dimension setting
+  if (dense_dimension_s_ < 1) {
+    const std::string msg = "dense_dimension_s is at least 1.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
   dimension_t_ = static_cast<uint32_t>(std::ceil(
                      total_length_t_ / static_cast<double>(unit_t_))) +
                  1;
