@@ -123,6 +123,11 @@ void TeleopService::Start() {
       [this](const std::shared_ptr<DaemonServiceRpt> &msg) {
         UpdateOperatorDaemonRpt(msg);
       });
+
+  pad_message_writer_ =
+      node_->CreateWriter<PadMessage>(planning_pad_channel);
+
+
 }
 
 void TeleopService::RegisterMessageHandlers() {
