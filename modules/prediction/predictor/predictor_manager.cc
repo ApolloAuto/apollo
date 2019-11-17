@@ -119,8 +119,8 @@ void PredictorManager::Init(const PredictionConf& config) {
         << cyclist_on_lane_predictor_ << "].";
   AINFO << "Defined bicycle off lane obstacle predictor ["
         << cyclist_off_lane_predictor_ << "].";
-  AINFO << "Defined pedestrian obstacle predictor ["
-        << pedestrian_predictor_ << "].";
+  AINFO << "Defined pedestrian obstacle predictor [" << pedestrian_predictor_
+        << "].";
   AINFO << "Defined default on lane obstacle predictor ["
         << default_on_lane_predictor_ << "].";
   AINFO << "Defined default off lane obstacle predictor ["

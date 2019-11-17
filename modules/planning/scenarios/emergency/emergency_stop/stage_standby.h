@@ -34,8 +34,7 @@ struct EmergencyStopContext;
 
 class EmergencyStopStageStandby : public Stage {
  public:
-  explicit EmergencyStopStageStandby(
-      const ScenarioConfig::StageConfig& config)
+  explicit EmergencyStopStageStandby(const ScenarioConfig::StageConfig& config)
       : Stage(config) {}
 
  private:

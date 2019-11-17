@@ -68,10 +68,9 @@ Stage::StageStatus EmergencyStopStageApproach::Process(
       PlanningContext::Instance()->planning_status().emergency_stop();
   if (emergency_stop_status.has_stop_fence_point()) {
     common::SLPoint stop_fence_sl;
-    reference_line.XYToSL(
-        {emergency_stop_status.stop_fence_point().x(),
-         emergency_stop_status.stop_fence_point().y()},
-        &stop_fence_sl);
+    reference_line.XYToSL({emergency_stop_status.stop_fence_point().x(),
+                           emergency_stop_status.stop_fence_point().y()},
+                          &stop_fence_sl);
     if (stop_fence_sl.s() > adc_front_edge_s) {
       stop_fence_exist = true;
       stop_line_s = stop_fence_sl.s();
@@ -86,8 +85,8 @@ Stage::StageStatus EmergencyStopStageApproach::Process(
     constexpr double kBuffer = 2.0;
     stop_line_s = adc_front_edge_s + travel_distance + stop_distance + kBuffer;
     ADEBUG << "travel_distance[" << travel_distance << "] [" << adc_speed
-           << "] adc_front_edge_s[" << adc_front_edge_s
-           << "] stop_line_s[" << stop_line_s << "]";
+           << "] adc_front_edge_s[" << adc_front_edge_s << "] stop_line_s["
+           << stop_line_s << "]";
     const auto& stop_fence_point =
         reference_line.GetReferencePoint(stop_line_s);
     auto* emergency_stop_fence_point = PlanningContext::Instance()
@@ -105,8 +104,8 @@ Stage::StageStatus EmergencyStopStageApproach::Process(
       StopReasonCode::STOP_REASON_EMERGENCY, wait_for_obstacle_ids,
       "EMERGENCY_STOP-scenario", frame,
       &(frame->mutable_reference_line_info()->front()));
-  ADEBUG << "Build a stop fence for emergency_stop: id["
-         << virtual_obstacle_id << "] s[" << stop_line_s << "]";
+  ADEBUG << "Build a stop fence for emergency_stop: id[" << virtual_obstacle_id
+         << "] s[" << stop_line_s << "]";
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
