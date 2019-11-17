@@ -10,7 +10,7 @@ Apollo 3.0 introduced a production level solution for the low-cost, closed venue
   * **Asynchronous sensor fusion**: unlike the previous version, Perception in Apollo 3.0 is capable of consolidating all the information and data points by asynchronously fusing LiDAR, Radar and Camera data. Such conditions allow for more comprehensive data capture and reflect more practical sensor environments.
   * **Online pose estimation**: This new feature estimates the pose of an ego-vehicle for every single frame. This feature helps to drive through bumps or slopes on the road with more accurate 3D scene understanding.
   * **Ultrasonic sensors**: Perception in Apollo 3.0 now works with ultrasonic sensors. The output can be used for Automated Emergency Brake (AEB) and vertical/perpendicular parking.
-  * **Whole lane line**: Unlike previous lane line segments, this whole lane line feature will provide more accurate and long range detection of lane lines. 
+  * **Whole lane line**: Unlike previous lane line segments, this whole lane line feature will provide more accurate and long range detection of lane lines.
   * **Visual localization**: Camera's are currently being tested to aide and enhance localization
   * **16 beam LiDAR support**
 
@@ -62,9 +62,9 @@ The lane can be represented by multiple sets of polylines such as next left lane
 A CIPV is the closest vehicle in the ego-lane. An object is represented by 3D bounding box and its 2D projection from the top-down view localizes the object on the ground. Then, each object will be checked if it is in the ego-lane or not. Among the objects in our ego-lane, the closest one will be selected as a CIPV.
 
 ### Tailgating
-Tailgating is a maneuver to follow the vehicle or object in front of the autonomous car. From the tracked objects and ego-vehicle motion, the trajectories of objects are estimated. This trajectory will guide how the objects are moving as a group on the road and the future trajectory can be predicted. There is two kinds of tailgating, the one is pure tailgating by following the specific car and the other is CIPV-guided tailgating, which the ego-vehicle follows the CIPV's trajectory when the no lane line is detected.  
+Tailgating is a maneuver to follow the vehicle or object in front of the autonomous car. From the tracked objects and ego-vehicle motion, the trajectories of objects are estimated. This trajectory will guide how the objects are moving as a group on the road and the future trajectory can be predicted. There is two kinds of tailgating, the one is pure tailgating by following the specific car and the other is CIPV-guided tailgating, which the ego-vehicle follows the CIPV's trajectory when the no lane line is detected.
 
-The snapshot of visualization of the output is shown in the figure below: 
+The snapshot of visualization of the output is shown in the figure below:
 ![Image](images/perception_visualization_apollo_3.0.png)
 
 The figure above depicts visualization of the Perception output in Apollo 3.0. The top left image shows image-based output. The bottom-left image shows the 3D bounding box of objects. Therefore, the left image shows 3-D top-down view of lane lines and objects. The CIPV is marked with a red bounding box. The yellow lines depicts the trajectory of each vehicle
