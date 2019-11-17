@@ -65,7 +65,7 @@ Status STBoundsDecider::Process(Frame* const frame,
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  StGraphData *st_graph_data = reference_line_info_->mutable_st_graph_data();
+  StGraphData* st_graph_data = reference_line_info_->mutable_st_graph_data();
   st_graph_data->SetSTDrivableBoundary(regular_st_bound, regular_vt_bound);
 
   // Record the ST-Graph for good visualization and easy debugging.
@@ -108,8 +108,8 @@ void STBoundsDecider::InitSTBoundsDecider(
                           frame.PlanningStartPoint().v());
 }
 
-Status STBoundsDecider::GenerateRegularSTBound(
-    STBound* const st_bound, STBound* const vt_bound) {
+Status STBoundsDecider::GenerateRegularSTBound(STBound* const st_bound,
+                                               STBound* const vt_bound) {
   // Initialize st-boundary.
   for (double curr_t = 0.0; curr_t <= st_bounds_config_.total_time();
        curr_t += kSTBoundsDeciderResolution) {

@@ -564,7 +564,7 @@ bool PathBoundsDecider::FindDestinationPullOverS(
   // Check if destination is within path-bounds searching scope.
   const double destination_to_pathend_buffer =
       config_.path_bounds_decider_config()
-             .pull_over_destination_to_pathend_buffer();
+          .pull_over_destination_to_pathend_buffer();
   if (destination_s + destination_to_pathend_buffer >=
       std::get<0>(path_bound.back())) {
     AERROR << "Destination is not within path_bounds search scope";
@@ -584,7 +584,7 @@ bool PathBoundsDecider::FindEmergencyPullOverS(
                                      .min_turn_radius();
   const double adjust_factor =
       config_.path_bounds_decider_config()
-             .pull_over_approach_lon_distance_adjust_factor();
+          .pull_over_approach_lon_distance_adjust_factor();
   const double pull_over_distance = min_turn_radius * 2 * adjust_factor;
   *pull_over_s = adc_end_s + pull_over_distance;
 

@@ -188,8 +188,7 @@ std::string LaneSegment::DebugString() const {
   if (lane == nullptr) {
     return "(lane is null)";
   }
-  return absl::StrCat("id = ", lane->id().id(),
-                      "  start_s = ", start_s,
+  return absl::StrCat("id = ", lane->id().id(), "  start_s = ", start_s,
                       "  end_s = ", end_s);
 }
 

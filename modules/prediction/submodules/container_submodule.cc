@@ -60,9 +60,8 @@ bool ContainerSubmodule::Init() {
   container_writer_ =
       node_->CreateWriter<ContainerOutput>(FLAGS_container_topic_name);
 
-  adc_container_writer_ =
-      node_->CreateWriter<ADCTrajectoryContainer>(
-          FLAGS_adccontainer_topic_name);
+  adc_container_writer_ = node_->CreateWriter<ADCTrajectoryContainer>(
+      FLAGS_adccontainer_topic_name);
 
   return true;
 }

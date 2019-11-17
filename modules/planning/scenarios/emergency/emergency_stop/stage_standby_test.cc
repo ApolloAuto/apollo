@@ -38,9 +38,9 @@ class StageStandbyTest : public ::testing::Test {
 
 TEST_F(StageStandbyTest, Init) {
   EmergencyStopStageStandby emergency_stop_stage_standby(config_);
-  EXPECT_EQ(emergency_stop_stage_standby.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::EMERGENCY_STOP_STANDBY));
+  EXPECT_EQ(
+      emergency_stop_stage_standby.Name(),
+      ScenarioConfig::StageType_Name(ScenarioConfig::EMERGENCY_STOP_STANDBY));
 }
 
 }  // namespace emergency_stop

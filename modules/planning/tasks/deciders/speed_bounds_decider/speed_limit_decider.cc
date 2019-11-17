@@ -203,11 +203,10 @@ Status SpeedLimitDecider::GetSpeedLimits(
                     speed_limit_from_centripetal_acc, centri_jerk_speed_limit,
                     speed_limit_from_nearby_obstacles}));
     } else {
-      curr_speed_limit = std::fmax(
-          speed_bounds_config_.lowest_speed(),
-          std::min({speed_limit_from_reference_line,
-                    speed_limit_from_centripetal_acc,
-                    centri_jerk_speed_limit}));
+      curr_speed_limit = std::fmax(speed_bounds_config_.lowest_speed(),
+                                   std::min({speed_limit_from_reference_line,
+                                             speed_limit_from_centripetal_acc,
+                                             centri_jerk_speed_limit}));
     }
     speed_limit_data->AppendSpeedLimit(path_s, curr_speed_limit);
   }

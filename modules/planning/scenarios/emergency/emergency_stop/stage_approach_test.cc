@@ -38,9 +38,9 @@ class StageApproachTest : public ::testing::Test {
 
 TEST_F(StageApproachTest, Init) {
   EmergencyStopStageApproach emergency_stop_stage_approach(config_);
-  EXPECT_EQ(emergency_stop_stage_approach.Name(),
-            ScenarioConfig::StageType_Name(
-                ScenarioConfig::EMERGENCY_STOP_APPROACH));
+  EXPECT_EQ(
+      emergency_stop_stage_approach.Name(),
+      ScenarioConfig::StageType_Name(ScenarioConfig::EMERGENCY_STOP_APPROACH));
 }
 
 }  // namespace emergency_stop
