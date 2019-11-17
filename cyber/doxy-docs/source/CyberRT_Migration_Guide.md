@@ -1,7 +1,7 @@
 Migration guide from Apollo ROS
 ================================
 
-This article describes the essential changes for projects to migrate from Apollo ROS (Apollo 3.0 and before) to Apollo Cyber RT (Apollo 3.5 and after). We will be using the very first ROS project talker/listener as example to demostrate step by step migration instruction.
+This article describes the essential changes for projects to migrate from Apollo ROS (Apollo 3.0 and before) to Apollo Cyber RT (Apollo 3.5 and after). We will be using the very first ROS project talker/listener as example to demonstrate step by step migration instruction.
 
 ## Build system
 

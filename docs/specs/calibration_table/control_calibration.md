@@ -78,7 +78,7 @@ Firstly, please make sure you have already finished setting up the **Apollo Fuel
 
 https://github.com/ApolloAuto/apollo/blob/master/modules/tools/fuel_proxy/README.md
 
-This is **essential** before you can get enjoy control calibration or other Apollo Fuel based cloud service.
+This is **essential** before you can get enjoy control calibration or other Apollo Fuel-based cloud service.
 
 ## Folder Structure Requirement
 

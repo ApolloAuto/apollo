@@ -52,9 +52,9 @@ Note: The team is working to add additional driving scenarios into our planner. 
 
 In order to safely and smoothly pass through a traffic light, we created 3 driving scenarios:  
 
-- **Protected**: In this scenario, our ego car has to pass through a intersection with a clear traffic light indicator. A left arrow or right arrow in green for the corresponding turn.
-- **Unprotected Left**: In this scenario, our ego car will have to make a left turn without a distinct light, meaning the car would need to yeild to oncoming traffic. Just like in the unprotected STOP scenario, our ego car would have to creep to ensure that it is safe to cross the intersection before safely moving through the lane. 
-- **Unprotected Right**: In this scenario, our ego car is expected to make an unprotected right turn while yeilding to oncoming traffic. Our ego car will need to creep slowly and gauge the traffic and then make a safe turn.
+- **Protected**: In this scenario, our ego car has to pass through an intersection with a clear traffic light indicator. A left arrow or right arrow in green for the corresponding turn.
+- **Unprotected Left**: In this scenario, our ego car will have to make a left turn without a distinct light, meaning the car would need to yield to oncoming traffic. Just like in the unprotected STOP scenario, our ego car would have to creep to ensure that it is safe to cross the intersection before safely moving through the lane. 
+- **Unprotected Right**: In this scenario, our ego car is expected to make an unprotected right turn while yielding to oncoming traffic. Our ego car will need to creep slowly and gauge the traffic and then make a safe turn.
 
 As discussed above, based on the three driving scenarios, the following 3 steps are performed:
 

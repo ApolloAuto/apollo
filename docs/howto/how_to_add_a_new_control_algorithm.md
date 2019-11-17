@@ -43,7 +43,7 @@ class NewController : public Controller {
 
 To add the new controller configuration complete the following steps:
 
-1. Define a `proto` for the new controller configurations and parameters based on the algorithm requirements. A example `proto` definition of `LatController` can be found at:  `modules/control/proto/lat_controller_conf.proto`
+1. Define a `proto` for the new controller configurations and parameters based on the algorithm requirements. An example `proto` definition of `LatController` can be found at:  `modules/control/proto/lat_controller_conf.proto`
 2. After defining the new controller `proto`, e.g., `new_controller_conf.proto`, type the following:
 
     ```protobuf

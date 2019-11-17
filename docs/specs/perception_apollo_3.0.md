@@ -4,7 +4,7 @@ June 27, 2018
 
 ## Introduction
 
-Apollo 3.0 introduced a production level solution for the low-cost, closed venue driving scenario that is used as the foundation for comercialized products. The Perception module introduced a few major features to provide more diverse functionalities and a more reliable, robust perception in AV performance, which are:
+Apollo 3.0 introduced a production level solution for the low-cost, closed venue driving scenario that is used as the foundation for commercialized products. The Perception module introduced a few major features to provide more diverse functionalities and a more reliable, robust perception in AV performance, which are:
 
  * **CIPV(Closest In-Path Vehicle) detection and Tailgaiting**: The vehicle in front of the ego-car is detected and its trajectory is estimated for more efficient tailgating and lane keeping when lane detection is unreliable.
   * **Asynchronous sensor fusion**: unlike the previous version, Perception in Apollo 3.0 is capable of consolidating all the information and data points by asynchronously fusing LiDAR, Radar and Camera data. Such conditions allow for more comprehensive data capture and reflect more practical sensor environments.
@@ -26,7 +26,7 @@ Apollo 3.0 *does not* support a high curvature road, roads without lane lines in
 	- ***Road without lane line marks***
 	- ***Intersections***
 	- ***Dotted lane lines***
-	- ***Public roads with alot of pedestrians or cars***
+	- ***Public roads with a lot of pedestrians or cars***
 
 ## Perception module
 The flow chart of Apollo 3.0 Perception module:
@@ -72,8 +72,8 @@ The figure above depicts visualization of the Perception output in Apollo 3.0. T
 ### Radar + Camera Output Fusion
 Given multiple sensors, their output should be combined in a synergic fashion. Apollo 3.0. introduces a sensor set with a radar and a camera. For this process, both sensors need to be calibrated. Each sensor will be calibrated using the same method introduced in Apollo 2.0. After calibration, the output will be represented in a 3-D world coordinate system and each output will be fused by their similarity in location, size, time and the utility of each sensor. After learning the utility function of each sensor, the camera contributes more on lateral distance and the radar contributes more on longitudinal distance measurement. Asynchronous sensor fusion algorithm can also be used as an option.
 
-### Psuedo Lane
-All lane detection results will be combined spatially and temporarily to induce the psuedo lane which will be fed to Planning and Control modules. Some lane lines would be incorrect or missing in a certain frame. To provide the smooth lane line output, the history of lane lines using vehicle odometry is used. As the vehicle moves, the odometer of each frame is saved and lane lines in previous frames will be also saved in the history buffer. The detected lane line which does not match with the history lane lines will be removed and the history output will replace the lane line and be provided to the planning module.
+### Pseudo Lane
+All lane detection results will be combined spatially and temporarily to induce the pseudo lane which will be fed to Planning and Control modules. Some lane lines would be incorrect or missing in a certain frame. To provide the smooth lane line output, the history of lane lines using vehicle odometry is used. As the vehicle moves, the odometer of each frame is saved and lane lines in previous frames will be also saved in the history buffer. The detected lane line which does not match with the history lane lines will be removed and the history output will replace the lane line and be provided to the planning module.
 
 ### Ultrasonic Sensors
 Apollo 3.0 supports ultrasonic sensors. Each ultrasonic sensor provides the distance of a detected object through the CANBus. The distance measurement from the ultrasonic sensor is then gathered and broadcasted as a ROS topic. In the future, after fusing ultrasonic sensor output, the map of objects and boundary will be published as a ROS output.

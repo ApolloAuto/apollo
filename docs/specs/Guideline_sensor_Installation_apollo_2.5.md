@@ -66,4 +66,4 @@ transform:
         y: -0.235
         z: 1.256
 ```
-If angles are not zero, they need to be calibrated and represented in quarternion (see above stransformation->rotation).
+If angles are not zero, they need to be calibrated and represented in quaternion (see above stransformation->rotation).
