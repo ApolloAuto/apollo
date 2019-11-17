@@ -40,7 +40,7 @@ Once this stage is complete, the output is directly sent to the Control module t
 
 ![](images/os_step3.png)
 
-## Use Cases 
+## Use Cases
 
 Currently Open Space Planner is used for 2 parking scenarios in the planning stage namely:
 

@@ -19,7 +19,7 @@ The simulation platform allows users to choose different road types, obstacles, 
 The simulation platform gives users a complete setup to run multiple scenarios parallelly in the cloud and verify modules in the Apollo environment.
 
 3. **Automatic Grading System:**
-The current Automatic Grading System tests via 12 metrics: 
+The current Automatic Grading System tests via 12 metrics:
     - Collision detection
     - Red-light violation detection
     - Speeding detection
@@ -43,7 +43,7 @@ The current Automatic Grading System tests via 12 metrics:
 Through Dreamland, you could run millions of scenarios on the Apollo platform, but broadly speaking, there are two types of scenarios:
 
 1. **Worldsim:**
-Worldsim is synthetic data created manually with specific and well-defined obstacle behavior and traffic light status. They are simple yet effective for testing the autonomous car in a well-defined environment. They do however lack the complexity found in real-world traffic conditions. 
+Worldsim is synthetic data created manually with specific and well-defined obstacle behavior and traffic light status. They are simple yet effective for testing the autonomous car in a well-defined environment. They do however lack the complexity found in real-world traffic conditions.
 
 2. **Logsim:**
 Logsim is extracted from real world data using our sensors. They are more realistic but also less deterministic. The obstacles perceived may be fuzzy and the traffic conditions are more complicated.
@@ -51,7 +51,7 @@ Logsim is extracted from real world data using our sensors. They are more realis
 ## Key Features
 
 1. **Web Based:** Dreamland does not require you to download large packages or heavy software, it is a web based tool that can be accessed from any browser-friendly device
-2. **Highly Customizable Scenarios:** With a comprehensive list of traffic elements you can fine tune Dreamland to suit your niche development. 
+2. **Highly Customizable Scenarios:** With a comprehensive list of traffic elements you can fine tune Dreamland to suit your niche development.
 
 3. **Rigorous Grading Metrics:** The grading metrics include:
 - Collision detection - Checks whether there is a collision (any distance between objects less than 0.1m is considered a collision)
@@ -77,8 +77,8 @@ Logsim is extracted from real world data using our sensors. They are more realis
 3. Upon successful logging in, you will be redirected to the Dreamland Introduction page which includes a basic introduction and offerings
 ![](images/Dreamland_home.png)
 
-Dreamland platform offers a number of features that you could explore to help you accelerate your autonomous driving testing and deployment. 
-1. **User Manual** - This section includes documentation to help you get up and running with Dreamland. 
+Dreamland platform offers a number of features that you could explore to help you accelerate your autonomous driving testing and deployment.
+1. **User Manual** - This section includes documentation to help you get up and running with Dreamland.
     - [Quickstart](https://azure.apollo.auto/user-manual/quick-start): This section will walk you through testing your build using our APIs and also how to manage and edit existing scenarios.
     - [Scenario Editor](): The scenario editor is a new feature to be launched in Apollo 5.0 which enables our developers to create their own scenarios to test niche aspects of their algorithm. In order to use this feature, you will have to comeplete the form on the screen as seen in the image below:
 
@@ -103,7 +103,7 @@ Dreamland platform offers a number of features that you could explore to help yo
 4. **Task Management:** Like Scenario Editor, Task Management is also a service offering currently in beta testing and open only to selective partners. In order to use this feature, you will have to comeplete the form on the screen and request for activation.
 The Task Management tab is extremely useful when testing any one particular type of scenario like side pass or U-turns. It helps test your algorithms against very specific test cases.
 
-Within the Task Management page, you can run a `New Task` to test your personal Apollo github repository against a list of scenarios. You will receive a summary of the task which highlights if the build passed or not, along with the passing rate of both worldsim and logsim scenarios and finally the total miles tested virtually. You can also view the number of failed scenarios along with a description detailing the failed timestamp and the grading metric which failed. Finally, you can run the comparison tool to check how your build performed versus previous builds. 
+Within the Task Management page, you can run a `New Task` to test your personal Apollo github repository against a list of scenarios. You will receive a summary of the task which highlights if the build passed or not, along with the passing rate of both worldsim and logsim scenarios and finally the total miles tested virtually. You can also view the number of failed scenarios along with a description detailing the failed timestamp and the grading metric which failed. Finally, you can run the comparison tool to check how your build performed versus previous builds.
 
 5. **Daily Build:** The Daily Build shows how well the current Apollo official Github repository runs against all the scenarios. It is run once every morning Pacific Time.
 
