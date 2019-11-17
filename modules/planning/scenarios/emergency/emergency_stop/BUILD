@@ -60,7 +60,6 @@ cc_test(
     ],
 )
 
-
 cc_test(
     name = "stage_standby_test",
     size = "small",
