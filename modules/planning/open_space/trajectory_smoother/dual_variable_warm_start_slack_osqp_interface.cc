@@ -515,8 +515,8 @@ void DualVariableWarmStartSlackOSQPInterface::get_optimization_results(
     }
   }
 
-  ADEBUG << "max_s: " << std::to_string(max_s);
-  ADEBUG << "min_s: " << std::to_string(min_s);
+  ADEBUG << "max_s: " << max_s;
+  ADEBUG << "min_s: " << min_s;
 }
 }  // namespace planning
 }  // namespace apollo

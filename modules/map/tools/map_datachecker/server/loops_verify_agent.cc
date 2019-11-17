@@ -193,8 +193,8 @@ double LoopsVerifyAgent::GetRangeIndex(
   double max_time = std::numeric_limits<double>::min();
   for (size_t i = 0; i < size; ++i) {
     if (range[i].first >= range[i].second) {
-      AINFO << "range error, [" << std::to_string(range[i].first) << ","
-            << std::to_string(range[i].second) << "]";
+      AINFO << "range error, [" << range[i].first << "," << range[i].second
+            << "]";
       continue;
     }
     if (range[i].first < min_time) {
@@ -204,8 +204,8 @@ double LoopsVerifyAgent::GetRangeIndex(
       max_time = range[i].second;
     }
   }
-  AINFO << "[get_range_index] min_time:" << std::to_string(min_time)
-        << ", max_time" << std::to_string(max_time);
+  AINFO << "[get_range_index] min_time:" << min_time << ", max_time"
+        << max_time;
 
   std::vector<bool> &range_index = *sp_range_index;
   if (size == 0 || max_time <= 0) {
@@ -229,7 +229,7 @@ double LoopsVerifyAgent::GetRangeIndex(
       }
     }
   }
-  AINFO << "returned min_time:" << std::to_string(min_time);
+  AINFO << "returned min_time:" << min_time;
   return min_time;
 }
 

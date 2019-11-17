@@ -539,7 +539,7 @@ Status NaviPlanning::Plan(
   last_publishable_trajectory_.reset(new PublishableTrajectory(
       current_time_stamp, best_ref_info->trajectory()));
 
-  ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
+  ADEBUG << "current_time_stamp: " << current_time_stamp;
 
   // Navi Planner doesn't need to stitch the last path planning
   // trajectory.Otherwise, it will cause the Dreamview planning track to display

@@ -217,9 +217,9 @@ void SemanticReviser::ReviseByTimeSeries(
     ADEBUG << "semantic " << semantic_table.semantic << " color "
            << s_color_strs[iter->color] << " blink " << iter->blink << " cur "
            << s_color_strs[cur_color];
-    ADEBUG << "cur ts " << std::to_string(time_stamp);
-    ADEBUG << "bri ts " << std::to_string(iter->last_bright_time_stamp);
-    ADEBUG << "dar ts " << std::to_string(iter->last_dark_time_stamp);
+    ADEBUG << "cur ts " << time_stamp;
+    ADEBUG << "bri ts " << iter->last_bright_time_stamp;
+    ADEBUG << "dar ts " << iter->last_dark_time_stamp;
   } else {
     semantic_table.last_dark_time_stamp = semantic_table.time_stamp;
     semantic_table.last_bright_time_stamp = semantic_table.time_stamp;

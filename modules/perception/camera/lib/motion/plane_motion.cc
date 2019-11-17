@@ -164,8 +164,8 @@ void PlaneMotion::add_new_motion(double pre_image_timestamp,
   while (!raw_motion_queue_.empty() &&
          vehicledata->time_ts < raw_motion_queue_.back().time_ts) {
     raw_motion_queue_.pop_back();
-    ADEBUG << "pop ts : back ts" << std::to_string(vehicledata->time_ts) << " "
-           << std::to_string(raw_motion_queue_.back().time_ts) << " "
+    ADEBUG << "pop ts : back ts" << vehicledata->time_ts << " "
+           << raw_motion_queue_.back().time_ts << " "
            << raw_motion_queue_.size();
   }
 

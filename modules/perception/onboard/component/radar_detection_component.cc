@@ -60,8 +60,8 @@ bool RadarDetectionComponent::Init() {
 
 bool RadarDetectionComponent::Proc(const std::shared_ptr<ContiRadar>& message) {
   AINFO << "Enter radar preprocess, message timestamp: "
-        << std::to_string(message->header().timestamp_sec())
-        << " current timestamp " << apollo::common::time::Clock::NowInSeconds();
+        << message->header().timestamp_sec() << " current timestamp "
+        << apollo::common::time::Clock::NowInSeconds();
   std::shared_ptr<SensorFrameMessage> out_message(new (std::nothrow)
                                                       SensorFrameMessage);
   if (!InternalProc(message, out_message)) {
@@ -108,9 +108,9 @@ bool RadarDetectionComponent::InternalProc(
   double timestamp = in_message->header().timestamp_sec();
   const double cur_time = apollo::common::time::Clock::NowInSeconds();
   const double start_latency = (cur_time - timestamp) * 1e3;
-  AINFO << "FRAME_STATISTICS:Radar:Start:msg_time[" << std::to_string(timestamp)
-        << "]:cur_time[" << std::to_string(cur_time) << "]:cur_latency["
-        << start_latency << "]";
+  AINFO << "FRAME_STATISTICS:Radar:Start:msg_time[" << timestamp
+        << "]:cur_time[" << cur_time << "]:cur_latency[" << start_latency
+        << "]";
   PERCEPTION_PERF_BLOCK_START();
   // Init preprocessor_options
   radar::PreprocessorOptions preprocessor_options;
@@ -152,8 +152,7 @@ bool RadarDetectionComponent::InternalProc(
   if (!GetCarLocalizationSpeed(timestamp,
                                &(options.detector_options.car_linear_speed),
                                &(options.detector_options.car_angular_speed))) {
-    AERROR << "Failed to call get_car_speed. [timestamp: "
-           << std::to_string(timestamp);
+    AERROR << "Failed to call get_car_speed. [timestamp: " << timestamp;
     // return false;
   }
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name, "GetCarSpeed");
@@ -192,9 +191,8 @@ bool RadarDetectionComponent::InternalProc(
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name,
                                            "radar_perception");
   AINFO << "FRAME_STATISTICS:Radar:End:msg_time["
-        << std::to_string(in_message->header().timestamp_sec()) << "]:cur_time["
-        << std::to_string(end_timestamp) << "]:cur_latency[" << end_latency
-        << "]";
+        << in_message->header().timestamp_sec() << "]:cur_time["
+        << end_timestamp << "]:cur_latency[" << end_latency << "]";
 
   return true;
 }
