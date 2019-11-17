@@ -111,7 +111,7 @@ bool MlfEngine::Track(const MultiTargetTrackerOptions& options,
   RemoveStaleTrackData("background", frame->timestamp, &background_track_data_);
   AINFO << "MlfEngine publish objects: " << frame->tracked_objects.size()
         << " sensor_name: " << frame->sensor_info.name
-        << " at timestamp: " << std::to_string(frame->timestamp);
+        << " at timestamp: " << frame->timestamp;
   return true;
 }
 

@@ -45,7 +45,7 @@ void PoseCollectionAgent::OnBestgnssposCallback(
   FramePose pose;
   if (sp_conf_->use_system_time) {
     pose.time_stamp = UnixtimeNow();
-    AINFO << "system time: " << std::to_string(pose.time_stamp);
+    AINFO << "system time: " << pose.time_stamp;
   } else {
     pose.time_stamp = time_stamp;
   }

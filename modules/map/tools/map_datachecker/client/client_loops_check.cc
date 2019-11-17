@@ -139,8 +139,8 @@ int LoopsChecker::Start(
     VerifyRange* range = request.add_range();
     range->set_start_time(time_ranges[i].first);
     range->set_end_time(time_ranges[i].second);
-    AINFO << "range[" << i << "] is [" << std::to_string(time_ranges[i].first)
-          << "," << std::to_string(time_ranges[i].second) << "]";
+    AINFO << "range[" << i << "] is [" << time_ranges[i].first << ","
+          << time_ranges[i].second << "]";
   }
   LoopsVerifyResponse response;
   return GrpcStub(&request, &response);

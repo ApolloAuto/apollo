@@ -576,7 +576,7 @@ Status OnLanePlanning::Plan(
     last_publishable_trajectory_.reset(new PublishableTrajectory(
         current_time_stamp, best_ref_info->trajectory()));
 
-    ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
+    ADEBUG << "current_time_stamp: " << current_time_stamp;
 
     last_publishable_trajectory_->PrependTrajectoryPoints(
         std::vector<TrajectoryPoint>(stitching_trajectory.begin(),

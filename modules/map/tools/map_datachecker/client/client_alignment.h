@@ -69,7 +69,7 @@ class Alignment {
       AINFO << "alignment check progress: [" << progress << "]";
       fprintf(USER_STREAM, "alignment progress: %.2lf%%\n", progress * 100);
       if (fabs(progress - 1.0) < 1e-8) {
-        AINFO << "diff " << std::to_string(fabs(progress - 1.0));
+        AINFO << "diff " << fabs(progress - 1.0);
         break;
       }
       std::this_thread::sleep_for(std::chrono::seconds(check_period_));

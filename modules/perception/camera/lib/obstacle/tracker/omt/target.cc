@@ -302,8 +302,7 @@ void Target::Update3D(CameraFrame *frame) {
   }
 
   // debug velocity
-  ADEBUG << "obj_speed--id: " << id << " "
-         << std::to_string(object->velocity.head(2).norm());
+  ADEBUG << "obj_speed--id: " << id << " " << object->velocity.head(2).norm();
 }
 
 void Target::UpdateType(CameraFrame *frame) {

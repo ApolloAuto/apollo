@@ -155,8 +155,8 @@ int Client::DataCollectStage() {
   double now = UnixtimeNow();
   if (cmd == "start") {
     if (lines.empty()) {
-      time_file_handler << std::to_string(now) << " start\n";
-      AINFO << "write [" << std::to_string(now) << " start] to file "
+      time_file_handler << now << " start\n";
+      AINFO << "write [" << now << " start] to file "
             << data_collect_time_flag_file_;
       fprintf(USER_STREAM,
               "Start success. At the end of the collection, you should run: "
@@ -172,8 +172,8 @@ int Client::DataCollectStage() {
                 "This progress has been already started, this command will be "
                 "ignored\n");
       } else {
-        time_file_handler << std::to_string(now) << " start\n";
-        AINFO << "write [" << std::to_string(now) << " start] to file "
+        time_file_handler << now << " start\n";
+        AINFO << "write [" << now << " start] to file "
               << data_collect_time_flag_file_;
         fprintf(USER_STREAM,
                 "Start success. At the end of the collection, you should run: "
@@ -188,8 +188,8 @@ int Client::DataCollectStage() {
       std::vector<std::string> s;
       boost::split(s, the_last_line, boost::is_any_of(" ,\t\n"));
       if (s[1] == "start") {
-        time_file_handler << std::to_string(now) << " stop\n";
-        AINFO << "write [" << std::to_string(now) << " stop] to file "
+        time_file_handler << now << " stop\n";
+        AINFO << "write [" << now << " stop] to file "
               << data_collect_time_flag_file_;
         fprintf(USER_STREAM,
                 "Stop success. Next you may want to run: bash client.sh "

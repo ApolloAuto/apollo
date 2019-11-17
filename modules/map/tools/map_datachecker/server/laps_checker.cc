@@ -56,7 +56,7 @@ double LapsChecker::GetConfidence() {
   double res = 0.0;
   lap_ = laps_to_check_;
   for (size_t i = 0; i < confidence_.size(); ++i) {
-    AINFO << "confidence[" << i << "]: " << std::to_string(confidence_[i]);
+    AINFO << "confidence[" << i << "]: " << confidence_[i];
   }
   AINFO << "laps to check: " << laps_to_check_;
   for (size_t i = laps_to_check_; i < confidence_.size(); ++i) {

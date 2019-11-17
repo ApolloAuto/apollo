@@ -103,7 +103,7 @@ std::string FrameProcessor::GetOutputFile(const int frame_num) const {
   std::stringstream jpg_suffix;
   jpg_suffix.fill('0');
   jpg_suffix.width(kSuffixLen);
-  jpg_suffix << std::to_string(frame_num);
+  jpg_suffix << frame_num;
   return absl::StrCat(output_jpg_dir_, "/", jpg_suffix.str(), ".jpg");
 }
 

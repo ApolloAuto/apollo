@@ -64,10 +64,9 @@ std::string GetNextRecordFileName(const std::string& record_path) {
   std::stringstream record_suffix;
   record_suffix.fill('0');
   record_suffix.width(kSuffixLen);
-  record_suffix << std::to_string(
-      std::stoi(
-          record_path.substr(record_path.size() - kSuffixLen, kSuffixLen)) +
-      1);
+  record_suffix << std::stoi(record_path.substr(record_path.size() - kSuffixLen,
+                                                kSuffixLen)) +
+                       1;
   return record_suffix.str();
 }
 
@@ -115,8 +114,7 @@ bool RealtimeRecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
   }
   // Init recorder
   cyber::Init("smart_recorder");
-  smart_recorder_node_ =
-      CreateNode(absl::StrCat("smart_recorder_", std::to_string(getpid())));
+  smart_recorder_node_ = CreateNode(absl::StrCat("smart_recorder_", getpid()));
   if (smart_recorder_node_ == nullptr) {
     AERROR << "create smart recorder node failed: " << getpid();
     return false;

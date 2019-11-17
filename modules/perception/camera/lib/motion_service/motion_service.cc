@@ -83,9 +83,8 @@ void MotionService::OnReceiveImage(const ImageMsgType &message,
                                    const std::string &camera_name) {
   std::lock_guard<std::mutex> lock(mutex_);
   const double curr_timestamp = message->measurement_time() + timestamp_offset_;
-  ADEBUG << "image received: "
-         << " camera_name: " << camera_name
-         << " image ts: " + std::to_string(curr_timestamp);
+  ADEBUG << "image received: camera_name: " << camera_name
+         << " image ts: " << curr_timestamp;
   camera_timestamp_ = curr_timestamp;
 }
 
@@ -93,8 +92,8 @@ void MotionService::OnReceiveImage(const ImageMsgType &message,
 // compute motion between camera time stamps
 void MotionService::OnLocalization(const LocalizationMsgType &message) {
   std::lock_guard<std::mutex> lock(mutex_);
-  ADEBUG << "localization received: "
-         << " localization ts: " + std::to_string(message->measurement_time());
+  ADEBUG << "localization received: localization ts: "
+         << message->measurement_time();
   const auto &velocity = message->pose().linear_velocity();
   // Get base::VehicleStatus
   base::VehicleStatus vehicle_status;
@@ -132,8 +131,7 @@ void MotionService::OnLocalization(const LocalizationMsgType &message) {
   // double camera_timestamp = camera_shared_data_->GetLatestTimestamp();
   double camera_timestamp = 0;
   camera_timestamp = camera_timestamp_;
-  ADEBUG << "motion processed for camera timestamp: "
-         << std::to_string(camera_timestamp);
+  ADEBUG << "motion processed for camera timestamp: " << camera_timestamp;
 
   if (start_flag_) {
     if (std::abs(camera_timestamp - pre_camera_timestamp_) <
