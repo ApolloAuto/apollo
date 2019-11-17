@@ -98,7 +98,7 @@ message GaussianInfo {
   optional double sigma_x = 1;
   optional double sigma_y = 2;
   optional double correlation = 3;
-  // Information of representive uncertainty area
+  // Information of representative uncertainty area
   optional double area_probability = 4;
   optional double ellipse_a = 5;
   optional double ellipse_b = 6;

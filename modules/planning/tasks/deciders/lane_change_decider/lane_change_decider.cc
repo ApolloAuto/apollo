@@ -98,7 +98,7 @@ Status LaneChangeDecider::Process(
       }
       return Status::OK();
     } else if (prev_status->status() == ChangeLaneStatus::CHANGE_LANE_FAILED) {
-      // TODO(SHU): add a optimization_failure counter to enter
+      // TODO(SHU): add an optimization_failure counter to enter
       // change_lane_failed status
       if (now - prev_status->timestamp() < FLAGS_change_lane_fail_freeze_time) {
         // RemoveChangeLane(reference_line_info);

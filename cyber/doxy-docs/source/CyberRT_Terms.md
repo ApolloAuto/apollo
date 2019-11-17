@@ -53,7 +53,7 @@ Dag file is the config file of module topology. You can define components used a
 
 ## Launch files
 
-The Launch file provides a easy way to start modules. By defining one or multiple dag files in the launch file, you can start multiple modules at the same time.
+The Launch file provides an easy way to start modules. By defining one or multiple dag files in the launch file, you can start multiple modules at the same time.
 
 ## Record file
 

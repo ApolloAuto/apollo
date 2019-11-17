@@ -56,7 +56,7 @@ function print_usage() {
   ${BLUE}version${NONE}: display current commit and date
   ${BLUE}push${NONE}: pushes the images to Docker hub
   ${BLUE}gen${NONE}: generate a docker release image
-  ${BLUE}ota_gen${NONE}: generate a ota docker release image
+  ${BLUE}ota_gen${NONE}: generate an ota docker release image
   "
 }
 

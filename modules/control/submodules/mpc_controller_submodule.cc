@@ -41,7 +41,7 @@ std::string MPCControllerSubmodule::Name() const {
 }
 
 bool MPCControllerSubmodule::Init() {
-  // TODO(SHU): seprate common_control conf from controller conf
+  // TODO(SHU): separate common_control conf from controller conf
   if (!cyber::common::GetProtoFromFile(FLAGS_mpc_controller_conf_file,
                                        &mpc_controller_conf_)) {
     AERROR << "Unable to load control conf file: " +

@@ -707,7 +707,7 @@ function print_usage() {
   ${BLUE}build_control${NONE}: compile control and its dependencies.
   ${BLUE}build_prediction${NONE}: compile prediction and its dependencies.
   ${BLUE}build_pnc${NONE}: compile pnc and its dependencies.
-  ${BLUE}build_no_perception [dbg|opt]${NONE}: run build, skip building perception module, useful when some perception dependencies are not satisified, e.g., CUDA, CUDNN, LIDAR, etc.
+  ${BLUE}build_no_perception [dbg|opt]${NONE}: run build, skip building perception module, useful when some perception dependencies are not satisfied, e.g., CUDA, CUDNN, LIDAR, etc.
   ${BLUE}build_prof${NONE}: build for gprof support.
   ${BLUE}buildify${NONE}: fix style of BUILD files
   ${BLUE}check${NONE}: run build/lint/test, please make sure it passes before checking in new code

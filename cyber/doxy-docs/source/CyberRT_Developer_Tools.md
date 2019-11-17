@@ -50,7 +50,7 @@ As shown in figure below, three cameras' channel data on the button sections and
 
    Place the mouse on the image of the camera channel, you can double-click the left button to highlight the corresponding data channel on the left menu bar. Right click on the image to bring up menu for deleting the camera channel.
 
-   Play and Pause buttons: when clicking the `Play` button, all channels will be showed. While when clicking the `Pause` button, all channels will stop showing on the tool.
+   Play and Pause buttons: when clicking the `Play` button, all channels will be shown. While when clicking the `Pause` button, all channels will stop showing on the tool.
 
 ## Cyber_monitor
 
