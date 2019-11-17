@@ -1674,7 +1674,7 @@ void Obstacle::SetCaution() {
 }
 
 bool Obstacle::IsCaution() const {
-  if (feature_history_.size() == 0) {
+  if (feature_history_.empty()) {
     return false;
   }
   const Feature& feature = latest_feature();
