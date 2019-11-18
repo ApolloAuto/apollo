@@ -113,9 +113,9 @@ bool PedestrianInteractionEvaluator::Evaluate(
     return true;
   }
 
-  constexpr double kShortTermPredictionTimeResolution = 0.4;
-  constexpr int kShortTermPredictionPointNum = 5;
-  constexpr int kHiddenStateUpdateCycle = 4;
+  static constexpr double kShortTermPredictionTimeResolution = 0.4;
+  static constexpr int kShortTermPredictionPointNum = 5;
+  static constexpr int kHiddenStateUpdateCycle = 4;
 
   // Step 1 Get social embedding
   torch::Tensor social_pooling = GetSocialPooling();

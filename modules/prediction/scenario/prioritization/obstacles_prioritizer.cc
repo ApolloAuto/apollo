@@ -42,7 +42,7 @@ using hdmap::LaneInfo;
 using hdmap::OverlapInfo;
 using ConstLaneInfoPtr = std::shared_ptr<const LaneInfo>;
 
-constexpr double kCautionDistanceThreshold = 60.0;
+static constexpr double kCautionDistanceThreshold = 60.0;
 
 namespace {
 

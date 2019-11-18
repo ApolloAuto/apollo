@@ -57,7 +57,7 @@ void ExtrapolationPredictor::Predict(
 
 void ExtrapolationPredictor::PostProcess(Trajectory* trajectory_ptr) {
   // TODO(kechxu) handle corner cases
-  constexpr int kNumTailPoint = 5;
+  static constexpr int kNumTailPoint = 5;
   ExtrapolationPredictor::LaneSearchResult lane_search_result =
       SearchExtrapolationLane(*trajectory_ptr, kNumTailPoint);
   double extraplation_speed =
@@ -72,8 +72,8 @@ void ExtrapolationPredictor::PostProcess(Trajectory* trajectory_ptr) {
 ExtrapolationPredictor::LaneSearchResult
 ExtrapolationPredictor::SearchExtrapolationLane(const Trajectory& trajectory,
                                                 const int num_tail_point) {
-  constexpr double radius = 1.0;
-  constexpr double angle_diff_threshold = M_PI / 3.0;
+  static constexpr double radius = 1.0;
+  static constexpr double angle_diff_threshold = M_PI / 3.0;
   int num_trajectory_point = trajectory.trajectory_point_size();
 
   LaneSearchResult lane_search_result;
