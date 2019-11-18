@@ -1042,6 +1042,17 @@ void SimulationWorldService::CreatePredictionTrajectory(
       PolygonPoint *world_point = prediction->add_predicted_trajectory();
       world_point->set_x(point.x() + map_service_->GetXOffset());
       world_point->set_y(point.y() + map_service_->GetYOffset());
+
+      const TrajectoryPoint &traj_point = traj.trajectory_point(index);
+      if (traj_point.has_gaussian_info()) {
+        const apollo::common::GaussianInfo &gaussian =
+            traj_point.gaussian_info();
+
+        auto *ellipse = world_point->mutable_gaussian_info();
+        ellipse->set_ellipse_a(gaussian.ellipse_a());
+        ellipse->set_ellipse_b(gaussian.ellipse_b());
+        ellipse->set_theta_a(gaussian.theta_a());
+      }
     }
   }
 }

@@ -39,6 +39,7 @@ export default [
         data: {
             predictionMajor: 'Major Prediction Line',
             predictionMinor: 'Minor Prediction Line',
+            predictionGaussianInfo: 'Gaussian Info',
             predictionPriority: 'Priority'
         },
         supportInOfflineView: true,
