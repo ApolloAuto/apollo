@@ -143,30 +143,30 @@ class PlannigAnalyzer:
 
     def print_latency_statistics(self):
         """print_latency_statistics"""
-        print "\n\n"
-        print PrintColors.HEADER + "--- Planning Latency (ms) ---" + \
-            PrintColors.ENDC
+        print("\n\n")
+        print(PrintColors.HEADER + "--- Planning Latency (ms) ---" + \
+            PrintColors.ENDC)
         StatisticalAnalyzer().print_statistical_results(self.module_latency)
 
-        print PrintColors.HEADER + "--- Planning Trajectroy Type Distribution" \
-                                   " ---" + PrintColors.ENDC
+        print(PrintColors.HEADER + "--- Planning Trajectroy Type Distribution" \
+                                   " ---" + PrintColors.ENDC)
         DistributionAnalyzer().print_distribution_results(
             self.trajectory_type_dist)
 
-        print PrintColors.HEADER + "--- Planning Estop Distribution" \
-                                   " ---" + PrintColors.ENDC
+        print(PrintColors.HEADER + "--- Planning Estop Distribution" \
+                                   " ---" + PrintColors.ENDC)
         DistributionAnalyzer().print_distribution_results(
             self.estop_reason_dist)
 
-        print PrintColors.HEADER + "--- Planning Error Code Distribution---" + \
-            PrintColors.ENDC
+        print(PrintColors.HEADER + "--- Planning Error Code Distribution---" + \
+            PrintColors.ENDC)
         self.error_code_analyzer.print_results()
-        print PrintColors.HEADER + "--- Planning Error Msg Distribution ---" + \
-            PrintColors.ENDC
+        print(PrintColors.HEADER + "--- Planning Error Msg Distribution ---" + \
+            PrintColors.ENDC)
         self.error_msg_analyzer.print_results()
 
-        print PrintColors.HEADER + "--- Planning Trajectory Frechet Distance (m) ---" + \
-            PrintColors.ENDC
+        print(PrintColors.HEADER + "--- Planning Trajectory Frechet Distance (m) ---" + \
+            PrintColors.ENDC)
         StatisticalAnalyzer().print_statistical_results(self.frechet_distance_list)
 
     def print_sim_results(self):
@@ -201,7 +201,7 @@ class PlannigAnalyzer:
         v2_results["reference_line"] = self.reference_line.get()
 
         # output final reuslts
-        print json.dumps(v2_results)
+        print(json.dumps(v2_results))
 
     def plot_path(self, plt, adc_trajectory):
         path_coords = self.trim_path_by_distance(adc_trajectory, 5.0)

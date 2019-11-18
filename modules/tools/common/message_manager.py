@@ -115,9 +115,9 @@ class PbMessageManager:
             try:
                 message = meta_msg.parse_file(filename)
                 if message:
-                    print "identified topic %s" % topic
+                    print("identified topic %s" % topic)
                     return (meta_msg, message)
             except text_format.ParseError as e:
-                print "Tried %s, failed" % (topic)
+                print("Tried %s, failed" % (topic))
                 continue
         return (None, None)

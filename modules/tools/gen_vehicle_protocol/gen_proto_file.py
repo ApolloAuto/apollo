@@ -104,7 +104,7 @@ def gen_proto_file(config_file, work_dir):
         config_file: the config file is generated with dbc
         work_dir: the protobuf file will be output
     """
-    print "Generating proto file"
+    print("Generating proto file")
     if not os.path.exists(work_dir):
         os.makedirs(work_dir)
     with open(config_file, 'r') as fp:
@@ -136,7 +136,7 @@ def gen_proto_file(config_file, work_dir):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print "usage:\npython %s some_config.yml" % sys.argv[0]
+        print("usage:\npython %s some_config.yml" % sys.argv[0])
         sys.exit(0)
     with open(sys.argv[1], 'r') as fp:
         conf = yaml.load(fp)

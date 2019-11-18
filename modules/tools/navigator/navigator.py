@@ -31,7 +31,7 @@ if __name__ == '__main__':
     navigation_info = navigation_pb2.NavigationInfo()
     priority = 0
     for fdata in navi_files:
-        print "processing " + fdata
+        print("processing " + fdata)
         navigation_path = navigation_info.navigation_path.add()
         navigation_path.path_priority = priority
         priority += 1

@@ -87,11 +87,11 @@ def parse_apollo_record(parse_dict, dest_dict, parser_func):
     parse_timestamp = []
     parse_mod = import_module(parser_func)
 
-    print "=" *60
+    print("=" *60)
     print('--------- Parsing data for: ' + parse_type + ' ---------')
 
     for rfile in record_files:
-        print "=" *60
+        print("=" *60)
         print("parsing record file: %s" % rfile)
         freader = record.RecordReader(record_folder_path + rfile)
         time.sleep(.025)
@@ -106,9 +106,9 @@ def parse_apollo_record(parse_dict, dest_dict, parser_func):
             for item in parse_timestamp:
                 f.write("%s\n" % item)
 
-    print "=" *60
+    print("=" *60)
     print('DONE: records parsed and data saved to: \n  ' + dest_dict['destination_folder'])
-    print "=" *60
+    print("=" *60)
 
 
 ###########################################################

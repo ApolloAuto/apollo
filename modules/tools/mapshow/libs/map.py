@@ -82,7 +82,7 @@ class Map:
             elif is_show_lane_details:
                 self._draw_lane_details(lane, ax, color_val)
             elif lane.id.id in laneids:
-                print str(lane)
+                print(str(lane))
                 self._draw_lane_id(lane, ax, color_val)
             cnt += 1
 

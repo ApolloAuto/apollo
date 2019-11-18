@@ -40,7 +40,7 @@ def generate_future_pose_list(rosbag_in, period):
         for topic, localization, t in bag_in.read_messages():
             if topic == '/apollo/localization/pose':
                 total_adc_trajectory.append((t.to_sec(), localization.pose))
-    print "Total # Frames for Localization=" + str(len(total_adc_trajectory))
+    print("Total # Frames for Localization=" + str(len(total_adc_trajectory)))
 
     # dedup trajectory by position
     ret = []
@@ -80,7 +80,7 @@ def generate_future_traj(rosbag_in, rosbag_out, future_pose_list):
                 augment_future_traj(new_localization, ptr_start, ptr_end,
                                     future_pose_list)
                 bag_out.write(topic, new_localization, t)
-                print "Write to bag start =", ptr_start, "end =", ptr_end
+                print("Write to bag start =", ptr_start, "end =", ptr_end)
                 ptr_start += 1
                 ptr_end += 1
             else:

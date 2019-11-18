@@ -85,7 +85,7 @@ if __name__ == "__main__":
         marker = markers[i % len(markers)]
         fns = [f for f in listdir(folder) if isfile(join(folder, f))]
         for fn in fns:
-            print fn
+            print(fn)
             reader = RecordItemReader(folder+"/"+fn)
             processor = TimeCurvatureData()
             last_pose_data = None
