@@ -21,6 +21,7 @@
 #include <unordered_map>
 
 #include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/polygon2d.h"
@@ -38,6 +39,7 @@ using apollo::common::math::kMathEpsilon;
 using apollo::common::math::LineSegment2d;
 using apollo::common::math::Sqr;
 using apollo::common::math::Vec2d;
+using apollo::common::util::DebugStringFormatter;
 using std::placeholders::_1;
 
 namespace {
@@ -253,7 +255,7 @@ std::string MapPathPoint::DebugString() const {
       "x = ", x_, "  y = ", y_, "  heading = ", heading_,
       "  lwp = "
       "{(",
-      common::util::PrintDebugStringIter(lane_waypoints_, "), ("), ")}");
+      absl::StrJoin(lane_waypoints_, "), (", DebugStringFormatter()), ")}");
 }
 
 std::string Path::DebugString() const {
@@ -261,13 +263,13 @@ std::string Path::DebugString() const {
       "num_points = ", num_points_,
       "  points = "
       "{(",
-      common::util::PrintDebugStringIter(path_points_, "), ("),
+      absl::StrJoin(path_points_, "), (", DebugStringFormatter()),
       ")}  "
       "numlane_segments_ = ",
       lane_segments_.size(),
       "  lane_segments = "
       "{(",
-      common::util::PrintDebugStringIter(lane_segments_, "), ("), ")}");
+      absl::StrJoin(lane_segments_, "), (", DebugStringFormatter()), ")}");
 }
 
 std::string PathOverlap::DebugString() const {
