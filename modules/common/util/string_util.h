@@ -43,8 +43,6 @@ struct DebugStringFormatter {
   }
 };
 
-std::string DecodeBase64(const std::string& base64_str);
-
 std::string EncodeBase64(const std::string& in);
 
 }  // namespace util
