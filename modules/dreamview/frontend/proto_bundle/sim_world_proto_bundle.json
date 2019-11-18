@@ -20,6 +20,10 @@
                   "options": {
                     "default": 0
                   }
+                },
+                "gaussianInfo": {
+                  "type": "apollo.common.GaussianInfo",
+                  "id": 4
                 }
               }
             },
