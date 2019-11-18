@@ -88,7 +88,7 @@ class BodySensationCalculator(object):
             if msg.topic == kChassisTopic:
                 chassis.ParseFromString(msg.message)
                 _t = msg.timestamp
-                t = long(str(_t)) * pow(10, -9)
+                t = int(str(_t)) * pow(10, -9)
                 cur_status = chassis.driving_mode
                 if mode["status"] != cur_status:
                     if mode["status"] != 'UNKNOW':
@@ -148,7 +148,7 @@ class BodySensationCalculator(object):
             if msg.topic == kLocalizationTopic:
                 localization.ParseFromString(msg.message)
                 _t = msg.timestamp
-                t = long(str(_t)) * pow(10, -9)
+                t = int(str(_t)) * pow(10, -9)
                 self.timestamp = t
                 diff_bump_time = t - self._last_bump_time
                 if diff_bump_time <= BUMP_TIME_THRESHOLD:
