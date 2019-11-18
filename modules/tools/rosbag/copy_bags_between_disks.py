@@ -191,7 +191,7 @@ def main():
     # TODO(xiaoxq): We always try to make data structurized, such as putting
     # them into rosbag, instead of copying raw files around.
     other_data_dirs = {'/apollo/data/gpsbin': 'data/gpsbin'}
-    for src, dst in other_data_dirs.iteritems():
+    for src, dst in other_data_dirs.items():
         if os.path.exists(src):
             print('Copying ', src)
             shutil.copytree(src, os.path.join(copy_to, dst))

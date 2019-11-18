@@ -76,7 +76,7 @@ def dump_bag(in_bag, out_dir):
             seq += 1
             topic_name_map[channel][1] = msg
             print('Generating seq: %d' % seq)
-            for t, name_pb in topic_name_map.iteritems():
+            for t, name_pb in topic_name_map.items():
                 if name_pb[1] is None:
                     continue
                 file_path = os.path.join(out_dir,
