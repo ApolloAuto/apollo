@@ -48,6 +48,9 @@ class ObstaclesPrioritizer {
   void AssignCautionLevelByEgoReferenceLine(
       const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container);
 
+  void RankingCautionLevelObstacles(const Obstacle& ego_vehicle,
+                                    ObstaclesContainer* obstacles_container);
+
   void AssignCautionByMerge(
       const Obstacle& ego_vehicle,
       std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,

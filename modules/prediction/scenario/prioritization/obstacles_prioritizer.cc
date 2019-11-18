@@ -190,13 +190,16 @@ void ObstaclesPrioritizer::AssignCautionLevel(const Scenario& scenario) {
     return;
   }
 
-  // if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id()) {
-  //   AssignCautionLevelInJunction(*ego_vehicle, obstacles_container,
-  //                                scenario.junction_id());
-  // }
+  if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id()) {
+    AssignCautionLevelInJunction(*ego_vehicle, obstacles_container,
+                                 scenario.junction_id());
+  }
   AssignCautionLevelCruiseKeepLane(*ego_vehicle, obstacles_container);
   AssignCautionLevelCruiseChangeLane(*ego_vehicle, obstacles_container);
   AssignCautionLevelByEgoReferenceLine(*ego_vehicle, obstacles_container);
+
+  // Ranking Caution Obstacles
+  RankingCautionLevelObstacles(*ego_vehicle, obstacles_container);
 }
 
 void ObstaclesPrioritizer::AssignCautionLevelInJunction(
@@ -382,10 +385,12 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine(
     }
     double start_x = latest_feature_ptr->position().x();
     double start_y = latest_feature_ptr->position().y();
-    double end_x = start_x + FLAGS_caution_pedestrian_approach_time *
-                                 latest_feature_ptr->raw_velocity().x();
-    double end_y = start_y + FLAGS_caution_pedestrian_approach_time *
-                                 latest_feature_ptr->raw_velocity().y();
+    double end_x = start_x +
+                   FLAGS_caution_pedestrian_approach_time *
+                       latest_feature_ptr->raw_velocity().x();
+    double end_y = start_y +
+                   FLAGS_caution_pedestrian_approach_time *
+                       latest_feature_ptr->raw_velocity().y();
     std::vector<std::string> nearby_lane_ids = PredictionMap::NearbyLaneIds(
         {start_x, start_y}, FLAGS_pedestrian_nearby_lane_search_radius);
     if (nearby_lane_ids.empty()) {
@@ -417,6 +422,35 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine(
         }
       }
     }
+  }
+}
+
+void ObstaclesPrioritizer::RankingCautionLevelObstacles(
+    const Obstacle& ego_vehicle, ObstaclesContainer* obstacles_container) {
+  const Point3D& ego_position = ego_vehicle.latest_feature().position();
+  const auto& obstacle_ids =
+      obstacles_container->curr_frame_movable_obstacle_ids();
+  std::priority_queue<std::pair<double, Obstacle*>> caution_obstacle_queue;
+  for (const int obstacle_id : obstacle_ids) {
+    Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
+    if (obstacle_ptr == nullptr) {
+      AERROR << "Obstacle [" << obstacle_id << "] Not found";
+      continue;
+    }
+    if (!obstacle_ptr->IsCaution()) {
+      continue;
+    }
+    const Point3D& obstacle_position =
+        obstacle_ptr->latest_feature().position();
+    double distance = std::hypot(obstacle_position.x() - ego_position.x(),
+                                 obstacle_position.y() - ego_position.y());
+    caution_obstacle_queue.push({distance, obstacle_ptr});
+  }
+  while (caution_obstacle_queue.size() > FLAGS_caution_obs_max_nums) {
+    Obstacle* obstacle_ptr = caution_obstacle_queue.top().second;
+    obstacle_ptr->mutable_latest_feature()->mutable_priority()->set_priority(
+        ObstaclePriority::NORMAL);
+    caution_obstacle_queue.pop();
   }
 }
 
