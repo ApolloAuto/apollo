@@ -25,7 +25,9 @@
 #include "cyber/common/log.h"
 #include "gflags/gflags.h"
 
+#include "absl/strings/match.h"
 #include "absl/strings/str_cat.h"
+#include "absl/strings/string_view.h"
 #include "modules/common/util/map_util.h"
 #include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/software/summary_monitor.h"
@@ -54,7 +56,7 @@ bool GetPIDByCmdLine(const std::string& process_dag_path, int* pid) {
     std::ifstream cmdline_file(
         absl::StrCat(system_proc_path, "/", dir_name, proc_cmdline_path));
     std::getline(cmdline_file, cmd_line);
-    if (cmd_line.find(process_dag_path) != std::string::npos) {
+    if (absl::StrContains(cmd_line, process_dag_path)) {
       return true;
     }
   }
