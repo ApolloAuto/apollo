@@ -55,13 +55,13 @@ class RealTimeTest(object):
             deltv = sum(self.buff) / len(self.buff) - self.last_speed
             if deltt <= 1e-10:
                 deltt = 0.000000000001
-                print "delt=0 ", t, ",", self.last_t
+                print("delt=0 ", t, ",", self.last_t)
             self.acc = deltv / deltt
 
             self.accs.append(self.acc)
             if abs(self.acc) > self.acclimit:
-                print t, "\t", (sum(self.buff) / len(self.buff)) * 3.6, "\t", \
-                    self.acc, "\t", self.count, "\t", self.acclimit
+                print(t, "\t", (sum(self.buff) / len(self.buff)) * 3.6, "\t", \
+                    self.acc, "\t", self.count, "\t", self.acclimit)
         self.last_acc = self.acc
         self.last_t = t
         self.last_speed = sum(self.buff) / len(self.buff)
@@ -82,7 +82,7 @@ if __name__ == '__main__':
         help="Acc limit default must > 0")
     args = parser.parse_args()
     if args.acc < 0:
-        print "acc must larger than 0"
+        print("acc must larger than 0")
     cyber.init()
     rttest = RealTimeTest()
     rttest.acclimit = args.acc

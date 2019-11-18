@@ -122,7 +122,7 @@ def set_planning_flag(config):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print "\nusage: python navi_config.py config.ini\n\n"
+        print("\nusage: python navi_config.py config.ini\n\n")
         sys.exit(0)
     config_file = sys.argv[1]
     config = ConfigParser.ConfigParser()

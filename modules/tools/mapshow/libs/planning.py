@@ -385,8 +385,8 @@ class Planning:
         st_boundary_type = self.st_data_boundary_type[st_graph_name]
         for boundary_name in st_graph_boudnary_s.keys():
             if cnt >= len(boundaries_pool):
-                print "WARNING: number of path lines is more than " \
-                      + len(boundaries_pool)
+                print("WARNING: number of path lines is more than " \
+                      + len(boundaries_pool))
                 continue
             boundary = boundaries_pool[cnt]
             boundary.set_visible(True)
@@ -438,8 +438,8 @@ class Planning:
         self.path_data_lock.acquire()
         for name in self.path_data_x.keys():
             if cnt >= len(path_lines):
-                print "WARNING: number of path lines is more than " \
-                      + len(path_lines)
+                print("WARNING: number of path lines is more than " \
+                      + len(path_lines))
                 continue
             if len(self.path_data_x[name]) <= 1:
                 continue
@@ -478,8 +478,8 @@ class Planning:
         self.speed_data_lock.acquire()
         for name in self.speed_data_time.keys():
             if cnt >= len(speed_lines):
-                print "WARNING: number of speed lines is more than " \
-                      + len(speed_lines)
+                print("WARNING: number of speed lines is more than " \
+                      + len(speed_lines))
                 continue
             if len(self.speed_data_time[name]) <= 1:
                 continue

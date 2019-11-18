@@ -50,7 +50,7 @@ class StaticInfoCalculator(object):
             reader = RecordReader(record_file)
             print("Begin to process record file {}".format(record_file))
             for msg in reader.read_messages():
-                print msg.topic
+                print(msg.topic)
                 if msg.topic == kChassisInfoTopic and self.vehicle_vin is None:
                     chassis = chassis_pb2.Chassis()
                     chassis.ParseFromString(msg.message)
@@ -61,7 +61,7 @@ class StaticInfoCalculator(object):
                     hmistatus.ParseFromString(msg.message)
                     if hmistatus.current_map:
                         self.vehicle_name = hmistatus.current_map
-                        print self.vehicle_name
+                        print(self.vehicle_name)
                 if self.done():
                     return True
         except:

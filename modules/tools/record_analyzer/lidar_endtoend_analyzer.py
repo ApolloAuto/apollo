@@ -41,7 +41,7 @@ class LidarEndToEndAnalyzer(object):
         Put  data
         """
         if module_name not in self.unprocessed_lidar_timestamps:
-            print module_name, " is not supported"
+            print(module_name, " is not supported")
             return
 
         if pb_msg.header.lidar_timestamp in \

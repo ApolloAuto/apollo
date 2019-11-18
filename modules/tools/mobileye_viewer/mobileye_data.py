@@ -48,7 +48,7 @@ class MobileyeData:
         self.next_lanes_x = []
         self.next_lanes_y = []
         if len(self.mobileye_pb.next_76c) != len(self.mobileye_pb.next_76d):
-            print "next lanes output is incomplete!"
+            print("next lanes output is incomplete!")
             self.next_lane_data_lock.release()
             return
         for i in range(len(self.mobileye_pb.next_76c)):

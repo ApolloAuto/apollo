@@ -259,7 +259,7 @@ class ControlInfo(object):
         """
         Plot everything in time domain
         """
-        print "Showing Lateral"
+        print("Showing Lateral")
         for loc, ax in numpy.ndenumerate(self.ax):
             ax.clear()
         self.ax[0, 0].plot(
@@ -344,7 +344,7 @@ if __name__ == "__main__":
         # bag = rosbag.Bag(file_path)
         reader = RecordReader(file_path)
         for msg in reader.read_messages():
-            print msg.timestamp, msg.topic
+            print(msg.timestamp, msg.topic)
             if msg.topic == "/apollo/localization/pose":
                 localization = localization_pb2.LocalizationEstimate()
                 localization.ParseFromString(msg.message)
@@ -361,7 +361,7 @@ if __name__ == "__main__":
                 chassis = chassis_pb2.Chassis()
                 chassis.ParseFromString(msg.message)
                 controlinfo.callback_canbus(chassis)
-        print "Done reading the file"
+        print("Done reading the file")
 
     else:
         cyber.init()

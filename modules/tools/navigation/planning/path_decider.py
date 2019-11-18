@@ -54,7 +54,7 @@ class PathDecider:
                 left_dist = lat_dist
             else:
                 right_dist = lat_dist
-        print left_dist, right_dist
+        print(left_dist, right_dist)
         return final_path
 
     def get(self, perception, routing, adv):
@@ -96,7 +96,7 @@ class PathDecider:
                                                                  right_nudgable)
                 smoothed_nudge_dist = self._smooth_init_y(nudge_dist)
                 if smoothed_nudge_dist != 0:
-                    print smoothed_nudge_dist
+                    print(smoothed_nudge_dist)
                 routing_path.shift(smoothed_nudge_dist)
             return routing_path
 

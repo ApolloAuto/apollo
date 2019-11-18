@@ -120,7 +120,7 @@ if __name__ == "__main__":
     import google.protobuf.text_format as text_format
 
     if len(sys.argv) < 2:
-        print "usage: python map_viewer.py dbmap_file [utm_zone=10]"
+        print("usage: python map_viewer.py dbmap_file [utm_zone=10]")
         sys.exit(0)
 
     map_file = sys.argv[1]

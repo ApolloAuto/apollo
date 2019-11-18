@@ -217,7 +217,7 @@ def gen_build_file(content, output_dir):
 
 
 def gen_vehicle_controller_and_manager(config_file, output_dir):
-    print "Generating controller and manager"
+    print("Generating controller and manager")
     with open(config_file, 'r') as fp:
         content = yaml.load(fp)
         gen_vehicle_controller_header(content, output_dir)

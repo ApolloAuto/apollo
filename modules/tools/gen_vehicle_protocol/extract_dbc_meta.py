@@ -151,17 +151,17 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
         report_protocol_num =\
             len([key for key in protocols.keys()
                  if protocols[key]["protocol_type"] == "report"])
-        print "Extract car_type:%s's protocol meta info to file: %s" % (
-            car_type.upper(), out_file)
-        print "Total parsed protocols: %d" % len(protocols)
-        print "Control protocols: %d" % control_protocol_num
-        print "Report protocols: %d" % report_protocol_num
+        print("Extract car_type:%s's protocol meta info to file: %s" % (
+            car_type.upper(), out_file))
+        print("Total parsed protocols: %d" % len(protocols))
+        print("Control protocols: %d" % control_protocol_num)
+        print("Report protocols: %d" % report_protocol_num)
         return True
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print "Usage:\npython %s your_car_parse_config_file.yml" % sys.argv[0]
+        print("Usage:\npython %s your_car_parse_config_file.yml" % sys.argv[0])
         sys.exit(0)
     with open(sys.argv[1], 'r') as fp:
         conf = yaml.load(fp)
