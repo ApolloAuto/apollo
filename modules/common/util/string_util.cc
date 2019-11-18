@@ -27,16 +27,6 @@ namespace {
 static const char kBase64Array[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-// A table which maps a char to its value in Base64 mode.
-std::vector<int> Base64CodeTable() {
-  std::vector<int> table(256, -1);
-  const size_t base64_array_length = strlen(kBase64Array);
-  for (size_t i = 0; i < base64_array_length; ++i) {
-    table[kBase64Array[i]] = static_cast<int>(i);
-  }
-  return table;
-}
-
 const char* tripletBase64(const int triplet) {
   static char result[4];
   result[0] = kBase64Array[(triplet >> 18) & 0x3f];
@@ -47,29 +37,6 @@ const char* tripletBase64(const int triplet) {
 }
 
 }  // namespace
-
-std::string DecodeBase64(const std::string& base64_str) {
-  static const std::vector<int> kBase64CodeTable = Base64CodeTable();
-
-  std::string bytes;
-  // Binary string is generally 3/4 the length of base64 string
-  bytes.reserve(base64_str.length() * 3 / 4 + 3);
-  unsigned int sum = 0, sum_bits = 0;
-  for (const char c : base64_str) {
-    if (kBase64CodeTable[c] == -1) {
-      break;
-    }
-
-    // Convert 6-bits Base64 chars to 8-bits general bytes.
-    sum = (sum << 6) + kBase64CodeTable[c];
-    sum_bits += 6;
-    if (sum_bits >= 8) {
-      bytes.push_back(static_cast<char>((sum >> (sum_bits - 8)) & 0xFF));
-      sum_bits -= 8;
-    }
-  }
-  return bytes;
-}
 
 std::string EncodeBase64(const std::string& in) {
   std::string out;
