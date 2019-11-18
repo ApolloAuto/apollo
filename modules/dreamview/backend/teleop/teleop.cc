@@ -43,8 +43,10 @@ const std::string modem0_id = "0";
 const std::string modem1_id = "1";
 const std::string modem2_id = "2";
 
-const unsigned int encoder_count = 3;
-const unsigned int write_wait_ms = 50;
+// number of simultaneous video encoders
+static const unsigned int kEncoderCount = 3;
+// delay between to consecutive  msg writes
+static const unsigned int kWriteWaitMs = 50;
 
 const std::string start_cmd = "start";
 const std::string stop_cmd = "kill";
@@ -124,10 +126,7 @@ void TeleopService::Start() {
         UpdateOperatorDaemonRpt(msg);
       });
 
-  pad_message_writer_ =
-      node_->CreateWriter<PadMessage>(planning_pad_channel);
-
-
+  pad_message_writer_ = node_->CreateWriter<PadMessage>(planning_pad_channel);
 }
 
 void TeleopService::RegisterMessageHandlers() {
@@ -313,7 +312,7 @@ void TeleopService::UpdateCarDaemonRpt(
     }
 
     // all  video encoders are running.
-    videoIsRunning = runningEncoders >= encoder_count;
+    videoIsRunning = runningEncoders >= kEncoderCount;
 
     // we may need to write commands to start/stop the video stream
     bool sendStartVideo = false;
@@ -428,10 +427,10 @@ void TeleopService::SendVideoStreamCmd(bool start_stop) {
     msg.set_cmd(stop_cmd);
   }
   // we send a message to each encoder.
-  for (unsigned int i = 0; i < encoder_count; i++) {
+  for (unsigned int i = 0; i < kEncoderCount; i++) {
     if (i > 0) {
       // delay between sending 2 messages to ensure they are received
-      std::this_thread::sleep_for(std::chrono::milliseconds(write_wait_ms));
+      std::this_thread::sleep_for(std::chrono::milliseconds(kWriteWaitMs));
     }
     char encoderName[20];
     snprintf(encoderName, 20, "encoder%u", i);
