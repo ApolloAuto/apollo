@@ -21,15 +21,9 @@
 
 #pragma once
 
-#include <functional>
-#include <sstream>
 #include <string>
-#include <vector>
 
-#include "absl/strings/str_cat.h"
-#include "boost/algorithm/string.hpp"
 #include "google/protobuf/stubs/stringprintf.h"
-#include "google/protobuf/stubs/strutil.h"
 
 /**
  * @namespace apollo::common::util
@@ -42,28 +36,12 @@ namespace util {
 // TODO(xiaoxq): Migrate to absl::StrFormat after absl upgraded.
 using google::protobuf::StringPrintf;
 
-/**
- * @brief Make conatiners and iterators printable.
- */
-template <typename Iter>
-std::string PrintDebugStringIter(const Iter& begin, const Iter& end,
-                                 const std::string& delimiter = " ") {
-  std::string result;
-  for (auto iter = begin; iter != end; ++iter) {
-    if (iter == begin) {
-      absl::StrAppend(&result, iter->DebugString());
-    } else {
-      absl::StrAppend(&result, delimiter, iter->DebugString());
-    }
+struct DebugStringFormatter {
+  template <class T>
+  void operator()(std::string* out, const T& t) const {
+    out->append(t.DebugString());
   }
-  return result;
-}
-
-template <typename Container>
-std::string PrintDebugStringIter(const Container& container,
-                                 const std::string& delimiter = " ") {
-  return PrintDebugStringIter(container.begin(), container.end(), delimiter);
-}
+};
 
 std::string DecodeBase64(const std::string& base64_str);
 
