@@ -64,6 +64,8 @@ DEFINE_double(junction_distance_threshold, 10.0,
               "to junction to consider as junction scenario");
 DEFINE_bool(enable_all_junction, false,
             "If consider all junction with junction_mlp_model.");
+DEFINE_int32(caution_obs_max_nums, 6,
+             "The max number of caution-level obstacles");
 DEFINE_double(caution_search_distance_ahead, 50.0,
               "The distance ahead to search caution-level obstacles");
 DEFINE_double(caution_search_distance_backward, 50.0,
