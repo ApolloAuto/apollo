@@ -23,6 +23,7 @@
 
 #include <string>
 
+#include "absl/strings/string_view.h"
 #include "google/protobuf/stubs/stringprintf.h"
 
 /**
@@ -43,7 +44,7 @@ struct DebugStringFormatter {
   }
 };
 
-std::string EncodeBase64(const std::string& in);
+std::string EncodeBase64(absl::string_view in);
 
 }  // namespace util
 }  // namespace common
