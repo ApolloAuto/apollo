@@ -53,8 +53,6 @@ void PiecewiseJerkTrajectory1d::AppendSegment(const double jerk,
 
 double PiecewiseJerkTrajectory1d::Evaluate(const std::uint32_t order,
                                            const double param) const {
-  CHECK_GE(param, -FLAGS_numerical_epsilon);
-
   auto it_lower = std::lower_bound(param_.begin(), param_.end(), param);
 
   if (it_lower == param_.begin()) {
