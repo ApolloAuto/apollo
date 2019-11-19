@@ -155,22 +155,6 @@ void uniform_slice(const T start, const T end, uint32_t num,
   sliced->at(num) = end;
 }
 
-template <typename T>
-std::unordered_set<T> Intersection(const std::unordered_set<T>& s1,
-                                   const std::unordered_set<T>& s2) {
-  if (s1.size() < s2.size()) {
-    std::unordered_set<T> result;
-    for (const auto& v : s1) {
-      if (s2.count(v) > 0) {
-        result.insert(v);
-      }
-    }
-    return result;
-  } else {
-    return intersection(s2, s1);
-  }
-}
-
 /**
  * calculate the distance beteween Point u and Point v, which are all have
  * member function x() and y() in XY dimension.
