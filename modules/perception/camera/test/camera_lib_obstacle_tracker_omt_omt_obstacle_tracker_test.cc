@@ -16,6 +16,7 @@
 
 #include "modules/perception/camera/lib/obstacle/tracker/omt/omt_obstacle_tracker.h"
 
+#include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
@@ -348,8 +349,8 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
     CameraFrame &frame = frames[frame_num];
 
     // read detections from txt
-    std::string filename = FLAGS_data_root + "/detection_feature/" +
-                           std::to_string(frame_num) + ".txt";
+    const std::string filename =
+        absl::StrCat(FLAGS_data_root, "/detection_feature/", frame_num, ".txt");
     read_detections(filename, FLAGS_feature_length, camera_name, &frame);
     AINFO << "Frame " << frame_num << " has " << frame.detected_objects.size()
           << " detection objects";

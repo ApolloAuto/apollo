@@ -20,10 +20,11 @@
 #include <iostream>
 #include <limits>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/perception/camera/tools/offline/keycode.h"
 #include "modules/perception/camera/tools/offline/colormap.h"
+#include "modules/perception/camera/tools/offline/keycode.h"
 
 namespace apollo {
 namespace perception {
@@ -507,7 +508,7 @@ bool Visualizer::copy_backup_file(const std::string &filename) {
   // index = last_index;
 
   ++index;
-  std::string yaml_bak_file = filename + "__" + std::to_string(index);
+  std::string yaml_bak_file = absl::StrCat(filename, "__", index);
   AINFO << "yaml_backup_file: " << yaml_bak_file;
 
   if (!cyber::common::Copy(filename, yaml_bak_file)) {
@@ -987,10 +988,9 @@ void Visualizer::ShowResult(const cv::Mat &img, const CameraFrame &frame) {
   }
 
   cv::putText(image, camera_name, cv::Point(10, 50), cv::FONT_HERSHEY_DUPLEX,
-              1.3, apollo::perception::red_color, 3);
-  cv::putText(image, "frame #: " + std::to_string(frame.frame_id),
-              cv::Point(10, 100), cv::FONT_HERSHEY_DUPLEX, 1.3,
-              apollo::perception::red_color, 3);
+              1.3, red_color, 3);
+  cv::putText(image, absl::StrCat("frame #: ", frame.frame_id),
+              cv::Point(10, 100), cv::FONT_HERSHEY_DUPLEX, 1.3, red_color, 3);
   Draw2Dand3D(image, frame);
 }
 
@@ -1388,32 +1388,26 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
   cv::putText(image, camera_name, cv::Point(10, line_pos),
               cv::FONT_HERSHEY_DUPLEX, 1.3, apollo::perception::red_color, 3);
   line_pos += 50;
-  cv::putText(image, "frame id: " + std::to_string(frame.frame_id),
-              cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
-              apollo::perception::red_color, 3);
+  cv::putText(image, absl::StrCat("frame id: ", frame.frame_id),
+              cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3, red_color,
+              3);
   line_pos += 50;
   if (motion_buffer != nullptr) {
-    cv::putText(image,
-                "yaw rate: " + std::to_string(motion_buffer->back().yaw_rate),
-                cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
-                apollo::perception::red_color, 3);
+    cv::putText(
+        image, absl::StrCat("yaw rate: ", motion_buffer->back().yaw_rate),
+        cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3, red_color, 3);
     line_pos += 50;
     cv::putText(
-      image,
-      "pitch rate: " + std::to_string(motion_buffer->back().pitch_rate),
-      cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
-      apollo::perception::red_color, 3);
+        image, absl::StrCat("pitch rate: ", motion_buffer->back().pitch_rate),
+        cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3, red_color, 3);
     line_pos += 50;
     cv::putText(
-      image,
-      "roll rate: " + std::to_string(motion_buffer->back().roll_rate),
-      cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
-      apollo::perception::red_color, 3);
+        image, absl::StrCat("roll rate: ", motion_buffer->back().roll_rate),
+        cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3, red_color, 3);
     line_pos += 50;
-    cv::putText(image,
-                "velocity: " + std::to_string(motion_buffer->back().velocity),
-                cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
-                apollo::perception::red_color, 3);
+    cv::putText(
+        image, absl::StrCat("velocity: ", motion_buffer->back().velocity),
+        cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3, red_color, 3);
   }
 
   // plot predicted vanishing point
@@ -1433,9 +1427,9 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
   for (const auto &object : frame.tracked_objects) {
     if (object->b_cipv) {
       line_pos += 50;
-      cv::putText(image, "CIPV: " + std::to_string(object->track_id),
+      cv::putText(image, absl::StrCat("CIPV: ", object->track_id),
                   cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
-                  apollo::perception::red_color, 3);
+                  red_color, 3);
     }
   }
 

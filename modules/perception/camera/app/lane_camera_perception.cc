@@ -17,12 +17,14 @@
 
 #include <gflags/gflags.h>
 #include <yaml-cpp/yaml.h>
+
 #include <algorithm>
 #include <fstream>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/perception/base/object.h"
@@ -238,7 +240,7 @@ bool LaneCameraPerception::Perception(const CameraPerceptionOptions &options,
 
     if (write_out_lane_file_) {
       std::string lane_file_path =
-          out_lane_dir_ + "/" + std::to_string(frame->frame_id) + ".txt";
+          absl::StrCat(out_lane_dir_, "/", frame->frame_id, ".txt");
       WriteLanelines(write_out_lane_file_, lane_file_path, frame->lane_objects);
     }
   } else {
@@ -252,7 +254,7 @@ bool LaneCameraPerception::Perception(const CameraPerceptionOptions &options,
 
   if (write_out_calib_file_) {
     std::string calib_file_path =
-        out_calib_dir_ + "/" + std::to_string(frame->frame_id) + ".txt";
+        absl::StrCat(out_calib_dir_, "/", frame->frame_id, ".txt");
     WriteCalibrationOutput(write_out_calib_file_, calib_file_path, frame);
   }
   return true;

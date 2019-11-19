@@ -17,14 +17,15 @@
 /**
  * @file
  **/
+#include "modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.h"
+
 #include <limits>
 #include <queue>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include "modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.h"
-
+#include "absl/strings/str_cat.h"
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/common/planning_context.h"
@@ -330,27 +331,24 @@ bool OpenSpaceTrajectoryPartition::EncodeTrajectory(
   const auto& init_path_point = trajectory.front().path_point();
   const auto& last_path_point = trajectory.back().path_point();
 
-  const std::string init_point_x_encoding = std::to_string(
-      static_cast<int>((init_path_point.x() - encoding_origin_x) * 1000.0));
-  const std::string init_point_y_encoding = std::to_string(
-      static_cast<int>((init_path_point.y() - encoding_origin_y) * 1000.0));
-  const std::string init_point_heading_encoding =
-      std::to_string(static_cast<int>(init_path_point.theta() * 10000.0));
-  const std::string last_point_x_encoding = std::to_string(
-      static_cast<int>((last_path_point.x() - encoding_origin_x) * 1000.0));
-  const std::string last_point_y_encoding = std::to_string(
-      static_cast<int>((last_path_point.y() - encoding_origin_y) * 1000.0));
-  const std::string last_point_heading_encoding =
-      std::to_string(static_cast<int>(last_path_point.theta() * 10000.0));
+  const int init_point_x =
+      static_cast<int>((init_path_point.x() - encoding_origin_x) * 1000.0);
+  const int init_point_y =
+      static_cast<int>((init_path_point.y() - encoding_origin_y) * 1000.0);
+  const int init_point_heading =
+      static_cast<int>(init_path_point.theta() * 10000.0);
+  const int last_point_x =
+      static_cast<int>((last_path_point.x() - encoding_origin_x) * 1000.0);
+  const int last_point_y =
+      static_cast<int>((last_path_point.y() - encoding_origin_y) * 1000.0);
+  const int last_point_heading =
+      static_cast<int>(last_path_point.theta() * 10000.0);
 
-  const std::string init_point_encoding = init_point_x_encoding + "_" +
-                                          init_point_y_encoding + "_" +
-                                          init_point_heading_encoding;
-  const std::string last_point_encoding = last_point_x_encoding + "_" +
-                                          last_point_y_encoding + "_" +
-                                          last_point_heading_encoding;
-
-  *encoding = init_point_encoding + "/" + last_point_encoding;
+  *encoding = absl::StrCat(
+      // init point
+      init_point_x, "_", init_point_y, "_", init_point_heading, "/",
+      // last point
+      last_point_x, "_", last_point_y, "_", last_point_heading);
   return true;
 }
 
