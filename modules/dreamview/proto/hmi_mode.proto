@@ -14,6 +14,10 @@ message ProcessMonitorConfig {
 message ChannelMonitorConfig {
   optional string name = 1;
   optional double delay_fatal = 2 [default = 3.0];  // In seconds.
+  
+  // The fields will be checked to make sure they are existing
+  // Specify in the format of "a.b.c"
+  repeated string mandatory_fields = 3;
 }
 
 // For ResourceMonitor.
