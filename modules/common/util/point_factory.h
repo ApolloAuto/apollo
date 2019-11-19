@@ -17,6 +17,7 @@
 #pragma once
 
 #include "modules/common/math/vec2d.h"
+#include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 
 namespace apollo {
@@ -35,6 +36,20 @@ class PointFactory {
     sl.set_s(s);
     sl.set_l(l);
     return sl;
+  }
+
+  static inline PointENU ToPointENU(const double x, const double y,
+                                    const double z = 0) {
+    PointENU point_enu;
+    point_enu.set_x(x);
+    point_enu.set_y(y);
+    point_enu.set_z(z);
+    return point_enu;
+  }
+
+  template <typename XYZ>
+  static inline PointENU ToPointENU(const XYZ& xyz) {
+    return ToPointENU(xyz.x(), xyz.y(), xyz.z());
   }
 };
 

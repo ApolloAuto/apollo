@@ -29,6 +29,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
@@ -99,8 +100,7 @@ bool Frame::Rerouting() {
   auto request = local_view_.routing->routing_request();
   request.clear_header();
 
-  auto point = common::util::MakePointENU(
-      vehicle_state_.x(), vehicle_state_.y(), vehicle_state_.z());
+  auto point = common::util::PointFactory::ToPointENU(vehicle_state_);
   double s = 0.0;
   double l = 0.0;
   hdmap::LaneInfoConstPtr lane;

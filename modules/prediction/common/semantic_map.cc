@@ -25,8 +25,8 @@
 #include "cyber/common/log.h"
 #include "cyber/task/task.h"
 #include "modules/common/configs/config_gflags.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/common/util/string_util.h"
-#include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
@@ -96,7 +96,7 @@ void SemanticMap::DrawBaseMap(const double x, const double y,
                               const double base_x, const double base_y) {
   base_img_drawn_ = false;
   base_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
-  common::PointENU center_point = common::util::MakePointENU(x, y, 0.0);
+  common::PointENU center_point = common::util::PointFactory::ToPointENU(x, y);
   DrawRoads(center_point, base_x, base_y);
   DrawJunctions(center_point, base_x, base_y);
   DrawCrosswalks(center_point, base_x, base_y);

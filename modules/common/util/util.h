@@ -74,11 +74,7 @@ bool WithinBound(T start, T end, T value) {
   return value >= start && value <= end;
 }
 
-PointENU MakePointENU(const double x, const double y, const double z);
-
 PointENU operator+(const PointENU enu, const math::Vec2d& xy);
-
-PointENU MakePointENU(const math::Vec2d& xy);
 
 SpeedPoint MakeSpeedPoint(const double s, const double t, const double v,
                           const double a, const double da);
