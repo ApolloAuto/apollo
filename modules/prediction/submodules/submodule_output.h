@@ -44,6 +44,8 @@ class SubmoduleOutput {
 
   void InsertObstacle(const Obstacle& obstacle);
 
+  void InsertEgoVehicle(const Obstacle& ego_vehicle);
+
   void InsertPerceptionObstacle(
       const apollo::perception::PerceptionObstacle& perception_obstacle);
 
@@ -64,6 +66,8 @@ class SubmoduleOutput {
 
   const std::vector<Obstacle>& curr_frame_obstacles() const;
 
+  const Obstacle& GetEgoVehicle() const;
+
   const std::vector<apollo::perception::PerceptionObstacle>&
   curr_frame_perception_obstacles() const;
 
@@ -81,6 +85,7 @@ class SubmoduleOutput {
 
  protected:
   std::vector<Obstacle> curr_frame_obstacles_;
+  Obstacle ego_vehicle_;
   std::vector<apollo::perception::PerceptionObstacle>
       curr_frame_perception_obstacles_;
   std::vector<int> curr_frame_movable_obstacle_ids_;
