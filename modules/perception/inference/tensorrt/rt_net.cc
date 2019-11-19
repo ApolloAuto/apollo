@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <utility>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
 #include "modules/perception/inference/tensorrt/plugins/argmax_plugin.h"
 #include "modules/perception/inference/tensorrt/plugins/leakyReLU_plugin.h"
@@ -101,12 +102,12 @@ void RTNet::addConvLayer(const LayerParameter &layer_param,
   auto tmp_out_dims = convLayer->getOutput(0)->getDimensions();
   std::string dim_string = "input: ";
   for (int i = 0; i < 3; i++) {
-    dim_string +=
-        " " + std::to_string(convLayer->getInput(0)->getDimensions().d[i]);
+    absl::StrAppend(&dim_string, " ",
+                    convLayer->getInput(0)->getDimensions().d[i]);
   }
-  dim_string += " | output: ";
+  absl::StrAppend(&dim_string, " | output: ");
   for (int i = 0; i < 3; i++) {
-    dim_string += " " + std::to_string(tmp_out_dims.d[i]);
+    absl::StrAppend(&dim_string, " ", tmp_out_dims.d[i]);
   }
   AINFO << layer_param.name() << dim_string;
 #endif
@@ -144,9 +145,9 @@ void RTNet::addDeconvLayer(const LayerParameter &layer_param,
 #if LOAD_DEBUG
   std::string dim_string = "input: ";
   for (int i = 0; i < 3; i++) {
-    dim_string += " " + std::to_string(inputs[0]->getDimensions().d[i]);
+    absl::StrAppend(&dim_string, " ", inputs[0]->getDimensions().d[i]);
   }
-  dim_string += " | output: ";
+  absl::StrAppend(&dim_string, " | output: ");
   AINFO << layer_param.name() << dim_string;
 #endif
 }
@@ -195,7 +196,7 @@ void RTNet::addConcatLayer(const LayerParameter &layer_param,
   for (int i = 0; i < nbInputs; i++) {
     auto dim_tmp = inputs[i]->getDimensions();
     for (int i = 0; i < 3; i++) {
-      dim_string += " " + std::to_string(dim_tmp.d[i]);
+      absl::StrAppend(&dim_string, " ", dim_tmp.d[i]);
     }
     AINFO << layer_param.name() << ": " << layer_param.bottom(i) << " "
           << (*tensor_modify_map)[layer_param.bottom(i)] << " " << dim_string;
