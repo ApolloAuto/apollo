@@ -31,17 +31,6 @@ PointENU operator+(const PointENU enu, const math::Vec2d& xy) {
   return point;
 }
 
-SpeedPoint MakeSpeedPoint(const double s, const double t, const double v,
-                          const double a, const double da) {
-  SpeedPoint speed_point;
-  speed_point.set_s(s);
-  speed_point.set_t(t);
-  speed_point.set_v(v);
-  speed_point.set_a(a);
-  speed_point.set_da(da);
-  return speed_point;
-}
-
 PathPoint MakePathPoint(const double x, const double y, const double z,
                         const double theta, const double kappa,
                         const double dkappa, const double ddkappa) {

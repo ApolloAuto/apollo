@@ -76,9 +76,6 @@ bool WithinBound(T start, T end, T value) {
 
 PointENU operator+(const PointENU enu, const math::Vec2d& xy);
 
-SpeedPoint MakeSpeedPoint(const double s, const double t, const double v,
-                          const double a, const double da);
-
 PathPoint MakePathPoint(const double x, const double y, const double z,
                         const double theta, const double kappa,
                         const double dkappa, const double ddkappa);

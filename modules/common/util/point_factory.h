@@ -51,6 +51,18 @@ class PointFactory {
   static inline PointENU ToPointENU(const XYZ& xyz) {
     return ToPointENU(xyz.x(), xyz.y(), xyz.z());
   }
+
+  static inline SpeedPoint ToSpeedPoint(const double s, const double t,
+                                        const double v = 0, const double a = 0,
+                                        const double da = 0) {
+    SpeedPoint speed_point;
+    speed_point.set_s(s);
+    speed_point.set_t(t);
+    speed_point.set_v(v);
+    speed_point.set_a(a);
+    speed_point.set_da(da);
+    return speed_point;
+  }
 };
 
 }  // namespace util
