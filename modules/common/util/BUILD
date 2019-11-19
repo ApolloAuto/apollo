@@ -27,6 +27,14 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "point_factory",
+    hdrs = ["point_factory.h"],
+    deps = [
+        "//modules/common/math:geometry",
+    ],
+)
+
 cc_test(
     name = "util_test",
     size = "small",
