@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
 #include "cyber/common/log.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/util/string_util.h"
@@ -168,8 +169,9 @@ std::string PathData::DebugString() const {
 
   return absl::StrCat(
       "[\n",
-      common::util::PrintDebugStringIter(
-          discretized_path_.begin(), discretized_path_.begin() + limit, ",\n"),
+      absl::StrJoin(discretized_path_.begin(),
+                    discretized_path_.begin() + limit, ",\n",
+                    apollo::common::util::DebugStringFormatter()),
       "]\n");
 }
 

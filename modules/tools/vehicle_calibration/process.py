@@ -72,7 +72,7 @@ def process(data):
     np.set_printoptions(precision=3)
 
     if np.all(data['vehicle_speed'] == 0):
-        print "All Speed = 0"
+        print("All Speed = 0")
         return [], [], [], [], [], []
 
     start_index = get_start_index(data)

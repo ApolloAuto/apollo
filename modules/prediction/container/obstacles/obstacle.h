@@ -58,6 +58,8 @@ class Obstacle {
 
   static std::unique_ptr<Obstacle> Create(const Feature& feature);
 
+  Obstacle() = default;
+
   /**
    * @brief Destructor
    */
@@ -257,8 +259,6 @@ class Obstacle {
   PredictionObstacle GeneratePredictionObstacle();
 
  private:
-  Obstacle() = default;
-
   void SetStatus(const perception::PerceptionObstacle& perception_obstacle,
                  double timestamp, Feature* feature);
 

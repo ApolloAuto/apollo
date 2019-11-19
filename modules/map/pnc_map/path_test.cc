@@ -16,13 +16,12 @@
 
 #include "modules/map/pnc_map/path.h"
 
-#include "gflags/gflags.h"
-#include "gtest/gtest.h"
+#include <string>
 
 #include "absl/strings/str_cat.h"
-#include "modules/routing/proto/routing.pb.h"
-
+#include "gtest/gtest.h"
 #include "modules/map/hdmap/hdmap.h"
+#include "modules/routing/proto/routing.pb.h"
 
 using Point = apollo::common::PointENU;
 using AABox2d = apollo::common::math::AABox2d;
@@ -671,7 +670,7 @@ TEST(TestSuite, hdmap_path_get_smooth_point) {
   std::vector<LaneInfoConstPtr> lanes;
   for (int i = 0; i < kNumSegments; ++i) {
     Lane lane;
-    lane.mutable_id()->set_id(absl::StrCat(i));
+    lane.mutable_id()->set_id(std::to_string(i));
     auto* segment =
         lane.mutable_central_curve()->add_segment()->mutable_line_segment();
     auto* point1 = segment->add_point();
@@ -711,17 +710,19 @@ TEST(TestSuite, hdmap_path_get_smooth_point) {
     EXPECT_NEAR(point.heading(), points[i].heading(), 1e-6);
     if (i == 0) {
       EXPECT_EQ(point.lane_waypoints().size(), 1);
-      EXPECT_EQ(point.lane_waypoints()[0].lane->id().id(), absl::StrCat(i));
+      EXPECT_EQ(point.lane_waypoints()[0].lane->id().id(), std::to_string(i));
       EXPECT_NEAR(point.lane_waypoints()[0].s, 0.0, 1e-6);
     } else if (i == kNumSegments) {
       EXPECT_EQ(point.lane_waypoints().size(), 1);
-      EXPECT_EQ(point.lane_waypoints()[0].lane->id().id(), absl::StrCat(i - 1));
+      EXPECT_EQ(point.lane_waypoints()[0].lane->id().id(),
+                std::to_string(i - 1));
       EXPECT_NEAR(point.lane_waypoints()[0].s, segment_length, 1e-6);
     } else {
       EXPECT_EQ(point.lane_waypoints().size(), 2);
-      EXPECT_EQ(point.lane_waypoints()[0].lane->id().id(), absl::StrCat(i - 1));
+      EXPECT_EQ(point.lane_waypoints()[0].lane->id().id(),
+                std::to_string(i - 1));
       EXPECT_NEAR(point.lane_waypoints()[0].s, segment_length, 1e-6);
-      EXPECT_EQ(point.lane_waypoints()[1].lane->id().id(), absl::StrCat(i));
+      EXPECT_EQ(point.lane_waypoints()[1].lane->id().id(), std::to_string(i));
       EXPECT_NEAR(point.lane_waypoints()[1].s, 0.0, 1e-6);
     }
 
@@ -736,7 +737,7 @@ TEST(TestSuite, hdmap_path_get_smooth_point) {
                     points[i].y() + offset * sin(points[i].heading()), 1e-6);
         EXPECT_NEAR(point.heading(), points[i].heading(), 1e-6);
         EXPECT_EQ(point.lane_waypoints().size(), 1);
-        EXPECT_EQ(point.lane_waypoints()[0].lane->id().id(), absl::StrCat(i));
+        EXPECT_EQ(point.lane_waypoints()[0].lane->id().id(), std::to_string(i));
         EXPECT_NEAR(point.lane_waypoints()[0].s, offset, 1e-6);
         const InterpolatedIndex index = path.GetIndexFromS(s);
         EXPECT_EQ(index.id, i);

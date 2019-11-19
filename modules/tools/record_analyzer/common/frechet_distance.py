@@ -57,8 +57,8 @@ if __name__ == "__main__":
     """test"""
     P = [[1, 1], [2, 1], [2, 2]]
     Q = [[2, 2], [0, 1], [2, 4]]
-    print frechet_distance(P, Q)  # 2
+    print(frechet_distance(P, Q))  # 2
 
     P = [[1, 1], [2, 1], [2, 2]]
     Q = [[1, 1], [2, 1], [2, 2]]
-    print frechet_distance(P, Q)  # 0
+    print(frechet_distance(P, Q))  # 0

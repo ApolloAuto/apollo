@@ -85,7 +85,7 @@ if __name__ == "__main__":
         fns = [f for f in listdir(folder) if isfile(join(folder, f))]
         fns.sort()
         for fn in fns:
-            print fn
+            print(fn)
             reader = RecordItemReader(folder+"/"+fn)
             curvature_processor = ImuAvCurvature()
             speed_processor = ImuSpeed()

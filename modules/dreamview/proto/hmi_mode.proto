@@ -39,6 +39,7 @@ message ResourceMonitorConfig {
   repeated DiskSpace disk_spaces = 1;
   optional CPUUsage cpu_usage = 2;
   optional MemoryUsage memory_usage = 3;
+  optional string process_dag_path = 4;
 }
 
 // A monitored component will be listed on HMI which only shows its status but

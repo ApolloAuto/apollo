@@ -47,7 +47,7 @@ def callback(chassis_pb):
     current_t = chassis_pb.header.timestamp_sec
     current_v = chassis_pb.speed_mps
 
-    print current_v
+    print(current_v)
     if abs(current_t - last_t) < 0.015:
         return
 

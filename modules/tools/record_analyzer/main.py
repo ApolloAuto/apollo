@@ -94,7 +94,7 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print "usage: python main.py record_file"
+        print("usage: python main.py record_file")
     parser = argparse.ArgumentParser(
         description="Recode Analyzer is a tool to analyze record files.",
         prog="main.py")

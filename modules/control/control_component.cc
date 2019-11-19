@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/control/control_component.h"
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -373,8 +374,9 @@ Status ControlComponent::CheckInput(LocalView *local_view) {
   if (!local_view->trajectory.estop().is_estop() &&
       local_view->trajectory.trajectory_point().empty()) {
     AWARN_EVERY(100) << "planning has no trajectory point. ";
-    std::string msg("planning has no trajectory point. planning_seq_num:");
-    msg += std::to_string(local_view->trajectory.header().sequence_num());
+    const std::string msg =
+        absl::StrCat("planning has no trajectory point. planning_seq_num:",
+                     local_view->trajectory.header().sequence_num());
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, msg);
   }
 

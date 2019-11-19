@@ -322,9 +322,9 @@ def gen_control_value_func_impl(classname, var, protocol):
     """
     impl = ""
     if var["len"] > 32:
-        print "This generator not support big than four bytes var." + \
+        print("This generator not support big than four bytes var." + \
               "protocol classname: %s, var_name:%s " % (
-                  class_name, var["name"])
+                  class_name, var["name"]))
         return impl
 
     fmt = """
@@ -436,7 +436,7 @@ def gen_protocols(protocol_conf_file, protocol_dir):
     """
         doc string:
     """
-    print "Generating protocols"
+    print("Generating protocols")
     if not os.path.exists(protocol_dir):
         os.makedirs(protocol_dir)
     with open(protocol_conf_file, 'r') as fp:
@@ -454,7 +454,7 @@ def gen_protocols(protocol_conf_file, protocol_dir):
                 gen_control_cpp(car_type, protocol, protocol_dir)
 
             else:
-                print "Unknown protocol_type:%s" % protocol["protocol_type"]
+                print("Unknown protocol_type:%s" % protocol["protocol_type"])
         gen_build_file(car_type, protocol_dir)
 
 def gen_esd_can_extended(str):
@@ -469,7 +469,7 @@ def gen_esd_can_extended(str):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print "Usage:\npython %s some_config.yml" % sys.argv[0]
+        print("Usage:\npython %s some_config.yml" % sys.argv[0])
         sys.exit(0)
     with open(sys.argv[1], 'r') as fp:
         conf = yaml.load(fp)

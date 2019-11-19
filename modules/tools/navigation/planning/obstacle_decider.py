@@ -162,7 +162,7 @@ if __name__ == "__main__":
                                       obs_decider)
         obs_decider.update(mobileye)
         obs_decider.process_path_obstacle(fpath)
-        print "nudge distance = ", obs_decider.get_nudge_distance()
+        print("nudge distance = ", obs_decider.get_nudge_distance())
 
     def update(frame):
         if not ad_vehicle.is_ready():

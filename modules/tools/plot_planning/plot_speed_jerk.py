@@ -87,5 +87,5 @@ if __name__ == "__main__":
 
         ax.set_xlabel('Speed')
         ax.set_ylabel('Jerk')
-    print speed_jerk_dict
+    print(speed_jerk_dict)
     plt.show()

@@ -46,7 +46,7 @@ def tf_stats(in_bag):
                 stats[key] += 1
             else:
                 stats[key] = 1
-    print 'tf stats: {}'.format(stats)
+    print('tf stats: {}'.format(stats))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

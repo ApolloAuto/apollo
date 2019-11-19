@@ -21,6 +21,7 @@
 #include <list>
 #include <utility>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "gtest/gtest_prod.h"
 
@@ -765,7 +766,7 @@ void OnLanePlanning::AddOpenSpaceOptimizerResult(
   int obstacle_index = 1;
   for (const auto& obstacle : open_space_debug.obstacles()) {
     auto* obstacle_outline = chart->add_line();
-    obstacle_outline->set_label("Bdr" + std::to_string(obstacle_index));
+    obstacle_outline->set_label(absl::StrCat("Bdr", obstacle_index));
     obstacle_index += 1;
     for (int vertice_index = 0;
          vertice_index < obstacle.vertices_x_coords_size(); vertice_index++) {
@@ -886,8 +887,8 @@ void OnLanePlanning::AddPartitionedTrajectory(
   for (const auto& partitioned_trajectory :
        open_space_debug.partitioned_trajectories().trajectory()) {
     auto* partition_line = chart->add_line();
-    partition_line->set_label("Patitioned " +
-                              std::to_string(partitioned_trajectory_label));
+    partition_line->set_label(
+        absl::StrCat("Patitioned ", partitioned_trajectory_label));
     ++partitioned_trajectory_label;
     for (const auto& point : partitioned_trajectory.trajectory_point()) {
       auto* point_debug = partition_line->add_point();

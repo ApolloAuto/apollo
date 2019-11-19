@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/camera/lib/calibrator/laneline/laneline_calibrator.h"
 
+#include "absl/strings/str_cat.h"
+
 namespace apollo {
 namespace perception {
 namespace camera {
@@ -71,9 +73,9 @@ bool LaneLineCalibrator::Calibrate(const CalibratorOptions &options,
     camera::GetYawVelocityInfo(time_diff_, cam_coord_cur_, cam_coord_pre_,
                                cam_coord_pre_pre_, &yaw_rate_, &velocity_);
     std::string timediff_yawrate_velocity_text =
-        "time_diff_: " + std::to_string(time_diff_).substr(0, 4) + " | " +
-        "yaw_rate_: " + std::to_string(yaw_rate_).substr(0, 4) + " | " +
-        "velocity_: " + std::to_string(velocity_).substr(0, 4);
+        absl::StrCat("time_diff_: ", std::to_string(time_diff_).substr(0, 4),
+                     " | yaw_rate_: ", std::to_string(yaw_rate_).substr(0, 4),
+                     " | velocity_: ", std::to_string(velocity_).substr(0, 4));
     ADEBUG << timediff_yawrate_velocity_text << std::endl;
   }
 

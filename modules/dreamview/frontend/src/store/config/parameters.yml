@@ -144,6 +144,9 @@ options:
   showPredictionMinor:
     default: true
     menuId: predictionMinor
+  showGaussianInfo:
+    default: false
+    menuId: predictionGaussianInfo
   showPredictionPriority:
     default: true
     menuId: predictionPriority

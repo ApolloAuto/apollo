@@ -18,6 +18,7 @@
 
 #include <thread>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
 
@@ -29,8 +30,8 @@ static constexpr float kSecondToNanoFactor = 1e9f;
 Buffer::Buffer() : BufferCore() { Init(); }
 
 int Buffer::Init() {
-  std::string node_name =
-      "transform_listener_" + std::to_string(cyber::Time::Now().ToNanosecond());
+  const std::string node_name =
+      absl::StrCat("transform_listener_", cyber::Time::Now().ToNanosecond());
   node_ = cyber::CreateNode(node_name);
   apollo::cyber::proto::RoleAttributes attr;
   attr.set_channel_name("/tf");

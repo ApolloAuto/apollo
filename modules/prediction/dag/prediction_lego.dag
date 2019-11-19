@@ -1,10 +1,10 @@
 module_config {
-     module_library : "/apollo/bazel-bin/modules/prediction/submodules/prediction_lego.so"
+    module_library : "/apollo/bazel-bin/modules/prediction/submodules/prediction_lego.so"
 
     components {
         class_name : "ContainerSubmodule"
         config {
-            name: "container submodule"
+            name: "container_submodule"
             config_file_path: "/apollo/modules/prediction/conf/prediction_conf.pb.txt"
             flag_file_path: "/apollo/modules/prediction/conf/prediction.conf"
             readers: [

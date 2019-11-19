@@ -113,9 +113,9 @@ bool PedestrianInteractionEvaluator::Evaluate(
     return true;
   }
 
-  constexpr double kShortTermPredictionTimeResolution = 0.4;
-  constexpr int kShortTermPredictionPointNum = 5;
-  constexpr int kHiddenStateUpdateCycle = 4;
+  static constexpr double kShortTermPredictionTimeResolution = 0.4;
+  static constexpr int kShortTermPredictionPointNum = 5;
+  static constexpr int kHiddenStateUpdateCycle = 4;
 
   // Step 1 Get social embedding
   torch::Tensor social_pooling = GetSocialPooling();
@@ -211,7 +211,7 @@ bool PedestrianInteractionEvaluator::Evaluate(
     torch_position[0][0] = curr_rel_x;
     torch_position[0][1] = curr_rel_y;
     std::vector<torch::jit::IValue> position_embedding_inputs;
-    position_embedding_inputs.push_back(std::move(torch_position));
+    position_embedding_inputs.push_back(std::move(torch_position.to(device_)));
     torch::Tensor position_embedding =
         torch_position_embedding_.forward(position_embedding_inputs)
             .toTensor()
@@ -230,7 +230,7 @@ bool PedestrianInteractionEvaluator::Evaluate(
       lstm_input[0][kEmbeddingSize + kHiddenSize + i] = ct[0][0][i];
     }
     std::vector<torch::jit::IValue> lstm_inputs;
-    lstm_inputs.push_back(std::move(lstm_input));
+    lstm_inputs.push_back(std::move(lstm_input.to(device_)));
     auto lstm_out_tuple = torch_single_lstm_.forward(lstm_inputs).toTuple();
     ht = lstm_out_tuple->elements()[0].toTensor();
     ct = lstm_out_tuple->elements()[1].toTensor();

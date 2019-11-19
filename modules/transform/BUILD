@@ -15,6 +15,7 @@ cc_library(
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/transform/proto:transform_proto",
+        "@com_google_absl//absl/strings",
     ],
 )
 

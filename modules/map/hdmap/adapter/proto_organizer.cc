@@ -17,6 +17,7 @@ limitations under the License.
 
 #include <unordered_set>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/math/vec2d.h"
@@ -26,7 +27,7 @@ namespace {
 std::string CreateOverlapId() {
   static int count = 0;
   ++count;
-  return "overlap_" + std::to_string(count);
+  return absl::StrCat("overlap_", count);
 }
 
 }  // namespace

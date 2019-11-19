@@ -21,6 +21,9 @@
 #include "google/protobuf/util/json_util.h"
 #include "modules/common/util/message_util.h"
 
+#include <iomanip>
+#include <sstream>
+
 namespace apollo {
 namespace dreamview {
 
@@ -40,7 +43,10 @@ const std::string modem0_id = "0";
 const std::string modem1_id = "1";
 const std::string modem2_id = "2";
 
-const unsigned int encoder_count = 2;
+// number of simultaneous video encoders
+static const unsigned int kEncoderCount = 3;
+// delay between to consecutive  msg writes
+static const unsigned int kWriteWaitMs = 50;
 
 const std::string start_cmd = "start";
 const std::string stop_cmd = "kill";
@@ -119,6 +125,8 @@ void TeleopService::Start() {
       [this](const std::shared_ptr<DaemonServiceRpt> &msg) {
         UpdateOperatorDaemonRpt(msg);
       });
+
+  pad_message_writer_ = node_->CreateWriter<PadMessage>(planning_pad_channel);
 }
 
 void TeleopService::RegisterMessageHandlers() {
@@ -268,7 +276,20 @@ void TeleopService::UpdateModem(const std::string &modem_id,
     // teleop_status_["modems"][modem_info->provider()] =
     //  modem_info->technology();
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-    teleop_status_["modems"][modem_id] = modem_info->technology();
+    std::string str;
+    std::stringstream ss(str);
+    double rx = 1.0 * modem_info->rx() / (1024 * 1024);
+    double tx = 1.0 * modem_info->tx() / (1024 * 1024);
+
+    ss << modem_info->technology();
+    ss << std::fixed << std::setw(6) << std::setprecision(2)
+       << std::setfill('0');
+    ss << " rank: " << modem_info->rank();
+    ss << " sig: " << modem_info->signal();
+    ss << " q: " << modem_info->quality();
+    ss << " rx: " << rx << " MB";
+    ss << " tx: " << tx << " MB";
+    teleop_status_["modems"][modem_id] = ss.str();
   }
 }
 
@@ -291,7 +312,7 @@ void TeleopService::UpdateCarDaemonRpt(
     }
 
     // all  video encoders are running.
-    videoIsRunning = runningEncoders == encoder_count;
+    videoIsRunning = runningEncoders >= kEncoderCount;
 
     // we may need to write commands to start/stop the video stream
     bool sendStartVideo = false;
@@ -338,7 +359,7 @@ void TeleopService::UpdateCarDaemonRpt(
       else {
         if (teleop_status_["audio_starting"]) {
           // not started yet
-          sendStartVideo = true;
+          sendStartAudio = true;
         } else if (teleop_status_["audio_stopping"]) {
           // video is stopped
           teleop_status_["audio_stopping"] = false;
@@ -406,7 +427,11 @@ void TeleopService::SendVideoStreamCmd(bool start_stop) {
     msg.set_cmd(stop_cmd);
   }
   // we send a message to each encoder.
-  for (unsigned int i = 0; i < encoder_count; i++) {
+  for (unsigned int i = 0; i < kEncoderCount; i++) {
+    if (i > 0) {
+      // delay between sending 2 messages to ensure they are received
+      std::this_thread::sleep_for(std::chrono::milliseconds(kWriteWaitMs));
+    }
     char encoderName[20];
     snprintf(encoderName, 20, "encoder%u", i);
     msg.set_service(encoderName);

@@ -227,13 +227,11 @@ void LatencyMonitor::AggregateLatency() {
   // perception->prediction: min(0), max(5), average(3), sample_size(1000)
   // prediction: min(50), max(500), average(80), sample_size(800)
   // ...
-  const auto total_stat = GenerateStat(totals);
-  auto* total_duration_aggr = latency_report_.mutable_total_duration();
-  SetStat(total_stat, total_duration_aggr);
+  SetStat(GenerateStat(totals), latency_report_.mutable_total_duration());
 
   // Sort the modules following the messages flowing direction,
   // for better display
-  std::vector<std::string> topo_sorted_modules = topology_sort(&topo);
+  const auto topo_sorted_modules = topology_sort(&topo);
   auto* latency_tracks = latency_report_.mutable_latency_tracks();
   for (const auto& module_name : topo_sorted_modules) {
     auto* module_latency = latency_tracks->add_module_latency();

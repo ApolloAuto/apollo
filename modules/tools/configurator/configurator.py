@@ -162,4 +162,4 @@ if __name__ == '__main__':
         curses.wrapper(main)
     except Exception as e:
         tb = traceback.format_exc()
-        print tb
+        print(tb)

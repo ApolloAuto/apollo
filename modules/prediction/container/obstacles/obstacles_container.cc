@@ -42,9 +42,14 @@ ObstaclesContainer::ObstaclesContainer(const SubmoduleOutput& submodule_output)
     : ptr_obstacles_(FLAGS_max_num_obstacles) {
   for (Obstacle obstacle : submodule_output.curr_frame_obstacles()) {
     // Deep copy of obstacle is needed for modification
-    ptr_obstacles_.Put(obstacle.id(),
-                       std::move(std::unique_ptr<Obstacle>(&obstacle)));
+    std::unique_ptr<Obstacle> ptr_obstacle(new Obstacle(obstacle));
+    ptr_obstacles_.Put(obstacle.id(), std::move(ptr_obstacle));
   }
+
+  Obstacle ego_vehicle = submodule_output.GetEgoVehicle();
+  std::unique_ptr<Obstacle> ptr_ego_vehicle(new Obstacle(ego_vehicle));
+  ptr_obstacles_.Put(ego_vehicle.id(), std::move(ptr_ego_vehicle));
+
   for (const auto& perception_obstacle :
        submodule_output.curr_frame_perception_obstacles()) {
     int id = perception_obstacle.id();
@@ -355,6 +360,11 @@ SubmoduleOutput ObstaclesContainer::GetSubmoduleOutput() {
       continue;
     }
     container_output.InsertObstacle(*obstacle);
+  }
+
+  Obstacle* ego_obstacle = GetObstacle(FLAGS_ego_vehicle_id);
+  if (ego_obstacle != nullptr) {
+    container_output.InsertEgoVehicle(*ego_obstacle);
   }
 
   container_output.set_curr_frame_movable_obstacle_ids(
