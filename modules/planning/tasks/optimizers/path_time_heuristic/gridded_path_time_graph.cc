@@ -31,6 +31,7 @@
 
 #include "cyber/common/log.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -39,6 +40,7 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::SpeedPoint;
 using apollo::common::Status;
+using apollo::common::util::PointFactory;
 
 namespace {
 
@@ -105,12 +107,7 @@ Status GriddedPathTimeGraph::Search(SpeedData* const speed_data) {
       std::vector<SpeedPoint> speed_profile;
       double t = 0.0;
       for (uint32_t i = 0; i < dimension_t_; ++i, t += unit_t_) {
-        SpeedPoint speed_point;
-        speed_point.set_s(0.0);
-        speed_point.set_t(t);
-        speed_point.set_v(0.0);
-        speed_point.set_a(0.0);
-        speed_profile.emplace_back(speed_point);
+        speed_profile.push_back(PointFactory::ToSpeedPoint(0, t));
       }
       *speed_data = SpeedData(speed_profile);
       return Status::OK();
@@ -530,10 +527,8 @@ Status GriddedPathTimeGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
     ADEBUG << "Time: " << cur_point->point().t();
     ADEBUG << "S: " << cur_point->point().s();
     ADEBUG << "V: " << cur_point->GetOptimalSpeed();
-    SpeedPoint speed_point;
-    speed_point.set_s(cur_point->point().s());
-    speed_point.set_t(cur_point->point().t());
-    speed_profile.emplace_back(speed_point);
+    speed_profile.push_back(PointFactory::ToSpeedPoint(
+        cur_point->point().s(), cur_point->point().t()));
     cur_point = cur_point->pre_point();
   }
   std::reverse(speed_profile.begin(), speed_profile.end());
