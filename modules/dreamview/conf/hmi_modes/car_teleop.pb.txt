@@ -106,8 +106,7 @@ modules {
     stop_command: "car1_run_compositor0.bash kill"
     process_monitor_config {
       command_keywords: "python"
-      command_keywords: "compositor.py"
-      command_keywords: "compositor0.spark.json"
+      command_keywords: "compositor.py 0"
     }
   }
 }
@@ -118,8 +117,7 @@ modules {
     stop_command: "car1_run_compositor1.bash kill"
     process_monitor_config {
       command_keywords: "python"
-      command_keywords: "compositor.py"
-      command_keywords: "compositor1.spark.json"
+      command_keywords: "compositor.py 1"
     }
   }
 }
@@ -130,8 +128,7 @@ modules {
     stop_command: "car1_run_compositor2.bash kill"
     process_monitor_config {
       command_keywords: "python"
-      command_keywords: "compositor.py"
-      command_keywords: "compositor2.spark.json"
+      command_keywords: "compositor.py 2"
     }
   }
 }
