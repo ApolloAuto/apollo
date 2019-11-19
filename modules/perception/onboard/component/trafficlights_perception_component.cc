@@ -23,6 +23,7 @@
 #include <map>
 #include <utility>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
@@ -378,11 +379,10 @@ void TrafficLightsPerceptionComponent::OnReceiveImage(
   // caros monitor -- image system time diff
   const auto& diff_image_sys_ts = image_msg_ts - receive_img_timestamp;
   if (fabs(diff_image_sys_ts) > image_sys_ts_diff_threshold_) {
-    std::string metric_name = "perception traffic_light exception";
-    std::string debug_string = "";
-    debug_string += ("diff_image_sys_ts:" + std::to_string(diff_image_sys_ts));
-    debug_string += (",camera_id:" + camera_name);
-    debug_string += (",camera_ts:" + std::to_string(image_msg_ts));
+    const std::string metric_name = "perception traffic_light exception";
+    const std::string debug_string =
+        absl::StrCat("diff_image_sys_ts:", diff_image_sys_ts,
+                     ",camera_id:", camera_name, ",camera_ts:", image_msg_ts);
     AWARN << "image_ts - system_ts(in seconds): " << diff_image_sys_ts
           << ". Check if image timestamp drifts."
           << ", camera_id: " + camera_name
@@ -1047,7 +1047,7 @@ void TrafficLightsPerceptionComponent::Visualize(
 
   cv::resize(output_image, output_image, cv::Size(), 0.5, 0.5);
   cv::imshow("Traffic Light", output_image);
-  cv::imwrite("/apollo/debug_vis/" + std::to_string(frame.timestamp) + ".jpg",
+  cv::imwrite(absl::StrCat("/apollo/debug_vis/", frame.timestamp, ".jpg"),
               output_image);
   cvWaitKey(30);
 }

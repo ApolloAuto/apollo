@@ -14,6 +14,7 @@ cc_library(
         "//cyber",
         "//modules/perception/base:common",
         "//modules/perception/proto:rt_proto",
+        "@com_google_absl//absl/strings",
         "@tensorrt",
     ],
 )
@@ -124,17 +125,14 @@ cc_test(
 
 cc_library(
     name = "batch_stream",
-    srcs = [
-        "batch_stream.cc",
-    ],
-    hdrs = [
-        "batch_stream.h",
-    ],
+    srcs = ["batch_stream.cc"],
+    hdrs = ["batch_stream.h"],
     linkopts = ["-lopencv_core -lnvinfer_plugin -lopencv_imgproc -lopencv_highgui"],
     deps = [
         "//cyber",
         "//modules/perception/proto:rt_proto",
         "@caffe",
+        "@com_google_absl//absl/strings",
         "@com_google_protobuf//:protobuf",
         "@tensorrt",
     ],

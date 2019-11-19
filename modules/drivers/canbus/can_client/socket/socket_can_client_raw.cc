@@ -22,6 +22,8 @@
 
 #include "modules/drivers/canbus/can_client/socket/socket_can_client_raw.h"
 
+#include "absl/strings/str_cat.h"
+
 namespace apollo {
 namespace drivers {
 namespace canbus {
@@ -95,7 +97,7 @@ ErrorCode SocketCanClientRaw::Start() {
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
   }
 
-  std::string can_name("can" + std::to_string(port_));
+  const std::string can_name = absl::StrCat("can", port_);
   std::strncpy(ifr.ifr_name, can_name.c_str(), IFNAMSIZ);
   if (ioctl(dev_handler_, SIOCGIFINDEX, &ifr) < 0) {
     AERROR << "ioctl error";

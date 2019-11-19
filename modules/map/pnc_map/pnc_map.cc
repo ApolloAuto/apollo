@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <limits>
 
+#include "absl/strings/str_cat.h"
 #include "google/protobuf/text_format.h"
 
 #include "modules/map/proto/map_id.pb.h"
@@ -472,8 +473,7 @@ bool PncMap::GetRouteSegments(const VehicleState &vehicle_state,
     }
     route_segments->back().SetCanExit(passage.can_exit());
     route_segments->back().SetNextAction(passage.change_lane_type());
-    std::string route_segment_id =
-        std::to_string(road_index) + "_" + std::to_string(index);
+    const std::string route_segment_id = absl::StrCat(road_index, "_", index);
     route_segments->back().SetId(route_segment_id);
     route_segments->back().SetStopForDestination(stop_for_destination_);
     if (index == passage_index) {

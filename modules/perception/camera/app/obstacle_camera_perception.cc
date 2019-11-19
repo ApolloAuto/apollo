@@ -17,6 +17,7 @@
 
 #include <utility>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/perception/base/object.h"
@@ -352,13 +353,13 @@ bool ObstacleCameraPerception::Perception(
 
   if (write_out_lane_file_) {
     std::string lane_file_path =
-        out_lane_dir_ + "/" + std::to_string(frame->frame_id) + ".txt";
+        absl::StrCat(out_lane_dir_, "/", frame->frame_id, ".txt");
     WriteLanelines(write_out_lane_file_, lane_file_path, frame->lane_objects);
   }
 
   if (write_out_calib_file_) {
     std::string calib_file_path =
-        out_calib_dir_ + "/" + std::to_string(frame->frame_id) + ".txt";
+        absl::StrCat(out_calib_dir_, "/", frame->frame_id, ".txt");
     WriteCalibrationOutput(write_out_calib_file_, calib_file_path, frame);
   }
 
@@ -381,10 +382,11 @@ bool ObstacleCameraPerception::Perception(
                                            "detect");
 
   // Save all detections results as kitti format
-  WriteDetections(perception_param_.debug_param().has_detection_out_dir(),
-                  perception_param_.debug_param().detection_out_dir() + "/" +
-                      std::to_string(frame->frame_id) + ".txt",
-                  frame->detected_objects);
+  WriteDetections(
+      perception_param_.debug_param().has_detection_out_dir(),
+      absl::StrCat(perception_param_.debug_param().detection_out_dir(), "/",
+                   frame->frame_id, ".txt"),
+      frame->detected_objects);
   if (extractor_ && !extractor_->Extract(extractor_options, frame)) {
     AERROR << "Failed to extractor";
     return false;
@@ -393,10 +395,11 @@ bool ObstacleCameraPerception::Perception(
                                            "external_feature");
 
   // Save detection results with bbox, detection_feature
-  WriteDetections(perception_param_.debug_param().has_detect_feature_dir(),
-                  perception_param_.debug_param().detect_feature_dir() + "/" +
-                      std::to_string(frame->frame_id) + ".txt",
-                  frame);
+  WriteDetections(
+      perception_param_.debug_param().has_detect_feature_dir(),
+      absl::StrCat(perception_param_.debug_param().detect_feature_dir(), "/",
+                   frame->frame_id, ".txt"),
+      frame);
   // Set the sensor name of each object
   for (size_t i = 0; i < frame->detected_objects.size(); ++i) {
     frame->detected_objects[i]->camera_supplement.sensor_name =
@@ -452,8 +455,8 @@ bool ObstacleCameraPerception::Perception(
   // Save tracked detections results as kitti format
   WriteDetections(
       perception_param_.debug_param().has_tracked_detection_out_dir(),
-      perception_param_.debug_param().tracked_detection_out_dir() + "/" +
-          std::to_string(frame->frame_id) + ".txt",
+      absl::StrCat(perception_param_.debug_param().tracked_detection_out_dir(),
+                   "/", frame->frame_id, ".txt"),
       frame->tracked_objects);
 
   // Fill polygon and set anchor point

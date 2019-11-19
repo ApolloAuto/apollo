@@ -18,6 +18,8 @@
 
 #include <utility>
 
+#include "absl/strings/str_cat.h"
+
 namespace apollo {
 namespace perception {
 namespace inference {
@@ -70,7 +72,7 @@ void ParseNetParam(const NetParameter &net_param,
       LayerParameter fake_layer_param;
       fake_layer_param.CopyFrom(tensorrt_layer_param);
       fake_layer_param.set_type("Padding");
-      fake_layer_param.set_name("padding_split_" + std::to_string(i));
+      fake_layer_param.set_name(absl::StrCat("padding_split_", i));
       fake_layer_param.clear_pooling_param();
       auto pad_param = fake_layer_param.mutable_padding_param();
       auto pool_param = tensorrt_layer_param.mutable_pooling_param();

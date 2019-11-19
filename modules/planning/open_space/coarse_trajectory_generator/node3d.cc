@@ -20,6 +20,8 @@
 
 #include "modules/planning/open_space/coarse_trajectory_generator/node3d.h"
 
+#include "absl/strings/str_cat.h"
+
 namespace apollo {
 namespace planning {
 
@@ -106,8 +108,7 @@ bool Node3d::operator==(const Node3d& right) const {
 }
 
 std::string Node3d::ComputeStringIndex(int x_grid, int y_grid, int phi_grid) {
-  return std::to_string(x_grid) + "_" + std::to_string(y_grid) + "_" +
-         std::to_string(phi_grid);
+  return absl::StrCat(x_grid, "_", y_grid, "_", phi_grid);
 }
 
 }  // namespace planning
