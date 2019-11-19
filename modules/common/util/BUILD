@@ -32,6 +32,7 @@ cc_library(
     hdrs = ["point_factory.h"],
     deps = [
         "//modules/common/math:geometry",
+        "//modules/common/proto:pnc_point_proto",
     ],
 )
 

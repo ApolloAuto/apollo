@@ -17,6 +17,7 @@
 #pragma once
 
 #include "modules/common/math/vec2d.h"
+#include "modules/common/proto/pnc_point.pb.h"
 
 namespace apollo {
 namespace common {
@@ -27,6 +28,13 @@ class PointFactory {
   template <typename XY>
   static inline math::Vec2d ToVec2d(const XY& xy) {
     return math::Vec2d(xy.x(), xy.y());
+  }
+
+  static inline SLPoint ToSLPoint(const double s, const double l) {
+    SLPoint sl;
+    sl.set_s(s);
+    sl.set_l(l);
+    return sl;
   }
 };
 

@@ -30,8 +30,6 @@
 #include <vector>
 
 #include "absl/memory/memory.h"
-#include "google/protobuf/util/message_differencer.h"
-
 #include "cyber/common/log.h"
 #include "cyber/common/types.h"
 #include "modules/common/math/vec2d.h"
@@ -75,14 +73,6 @@ template <typename T>
 bool WithinBound(T start, T end, T value) {
   return value >= start && value <= end;
 }
-
-/**
- * @brief create a SL point
- * @param s the s value
- * @param l the l value
- * @return a SLPoint instance
- */
-SLPoint MakeSLPoint(const double s, const double l);
 
 PointENU MakePointENU(const double x, const double y, const double z);
 
