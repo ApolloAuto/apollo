@@ -13,6 +13,26 @@ stage_type: PARK_AND_GO_CRUISE
 stage_config:{
   stage_type: PARK_AND_GO_CHECK
   enabled: true
+  task_type: OPEN_SPACE_ROI_DECIDER
+  task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
+  task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+  task_type: OPEN_SPACE_FALLBACK_DECIDER
+  task_config: {
+        task_type: OPEN_SPACE_ROI_DECIDER
+        open_space_roi_decider_config {
+            roi_type: PARK_AND_GO
+            perception_obstacle_buffer: 0.0
+        }
+  }
+  task_config: {
+        task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
+  }
+  task_config: {
+        task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+  }
+  task_config: {
+        task_type: OPEN_SPACE_FALLBACK_DECIDER
+  }
 }
 
 stage_config:{

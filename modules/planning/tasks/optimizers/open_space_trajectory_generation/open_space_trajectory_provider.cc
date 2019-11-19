@@ -81,8 +81,19 @@ void OpenSpaceTrajectoryProvider::Restart() {
 }
 
 Status OpenSpaceTrajectoryProvider::Process() {
+  ADEBUG << "trajectory provider";
   auto trajectory_data =
       frame_->mutable_open_space_info()->mutable_stitched_trajectory_result();
+
+  // generate stop trajectory at park_and_go check_stage
+  if (PlanningContext::Instance()
+          ->mutable_planning_status()
+          ->mutable_park_and_go()
+          ->in_check_stage()) {
+    ADEBUG << "ParkAndGo Stage Check.";
+    GenerateStopTrajectory(trajectory_data);
+    return Status::OK();
+  }
   // Start thread when getting in Process() for the first time
   if (FLAGS_enable_open_space_planner_thread && !thread_init_flag_) {
     task_future_ = cyber::Async(
