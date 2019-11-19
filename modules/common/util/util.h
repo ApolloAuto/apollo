@@ -26,18 +26,17 @@
 #include <limits>
 #include <memory>
 #include <string>
-#include <unordered_set>
 #include <utility>
 #include <vector>
 
+#include "absl/memory/memory.h"
 #include "google/protobuf/util/message_differencer.h"
-
-#include "modules/common/proto/geometry.pb.h"
-#include "modules/common/proto/pnc_point.pb.h"
 
 #include "cyber/common/log.h"
 #include "cyber/common/types.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/common/proto/geometry.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
 
 // The helper function "std::make_unique()" is defined since C++14.
 // The definition of "std::make_unique()" borrowed from C++14 is given here
@@ -45,40 +44,8 @@
 #if __cplusplus == 201103L
 namespace std {
 
-template <typename _Tp>
-struct _MakeUniq {
-  typedef unique_ptr<_Tp> __single_object;
-};
+using absl::make_unique;
 
-template <typename _Tp>
-struct _MakeUniq<_Tp[]> {
-  typedef unique_ptr<_Tp[]> __array;
-};
-
-template <typename _Tp, size_t _Bound>
-struct _MakeUniq<_Tp[_Bound]> {
-  struct __invalid_type {};
-};
-
-// std::make_unique for single objects
-template <typename _Tp, typename... _Args>
-inline typename _MakeUniq<_Tp>::__single_object make_unique(_Args&&... __args) {
-  return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...));
-}
-
-// Alias template for remove_extent
-template <typename _Tp>
-using remove_extent_t = typename remove_extent<_Tp>::type;
-
-// std::make_unique for arrays of unknown bound
-template <typename _Tp>
-inline typename _MakeUniq<_Tp>::__array make_unique(size_t __num) {
-  return unique_ptr<_Tp>(new remove_extent_t<_Tp>[__num]());
-}
-
-// Disable std::make_unique for arrays of known bound
-template <typename _Tp, typename... _Args>
-inline typename _MakeUniq<_Tp>::__invalid_type make_unique(_Args&&...) = delete;
 }  // namespace std
 #endif
 
