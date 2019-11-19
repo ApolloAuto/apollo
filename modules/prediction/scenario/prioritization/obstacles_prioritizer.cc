@@ -446,7 +446,8 @@ void ObstaclesPrioritizer::RankingCautionLevelObstacles(
                                  obstacle_position.y() - ego_position.y());
     caution_obstacle_queue.push({distance, obstacle_ptr});
   }
-  while (caution_obstacle_queue.size() > FLAGS_caution_obs_max_nums) {
+  while (static_cast<int>(caution_obstacle_queue.size()) >
+         FLAGS_caution_obs_max_nums) {
     Obstacle* obstacle_ptr = caution_obstacle_queue.top().second;
     obstacle_ptr->mutable_latest_feature()->mutable_priority()->set_priority(
         ObstaclePriority::NORMAL);
