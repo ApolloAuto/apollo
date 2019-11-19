@@ -23,13 +23,6 @@ namespace apollo {
 namespace common {
 namespace util {
 
-SLPoint MakeSLPoint(const double s, const double l) {
-  SLPoint sl;
-  sl.set_s(s);
-  sl.set_l(l);
-  return sl;
-}
-
 PointENU MakePointENU(const double x, const double y, const double z) {
   PointENU point_enu;
   point_enu.set_x(x);
