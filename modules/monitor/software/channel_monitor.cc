@@ -18,8 +18,15 @@
 
 #include <memory>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "absl/strings/str_cat.h"
+#include "absl/strings/str_split.h"
+#include "google/protobuf/compiler/parser.h"
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/dynamic_message.h"
+
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -47,30 +54,106 @@ namespace {
 
 // We have to specify exact type of each channel. This function is a wrapper for
 // those only need a ReaderBase.
-std::shared_ptr<cyber::ReaderBase> GetReader(const std::string& channel) {
+std::pair<std::shared_ptr<cyber::ReaderBase>,
+          std::shared_ptr<google::protobuf::Message>>
+GetReaderAndLatestMessage(const std::string& channel) {
   auto manager = MonitorManager::Instance();
   if (channel == FLAGS_control_command_topic) {
-    return manager->CreateReader<control::ControlCommand>(channel);
+    const auto reader = manager->CreateReader<control::ControlCommand>(channel);
+    reader->Observe();
+    const auto message = reader ? reader->GetLatestObserved() : nullptr;
+    return std::pair<std::shared_ptr<cyber::ReaderBase>,
+                     std::shared_ptr<google::protobuf::Message>>(reader,
+                                                                 message);
   } else if (channel == FLAGS_localization_topic) {
-    return manager->CreateReader<localization::LocalizationEstimate>(channel);
+    const auto reader =
+        manager->CreateReader<localization::LocalizationEstimate>(channel);
+    reader->Observe();
+    const auto message = reader ? reader->GetLatestObserved() : nullptr;
+    return std::pair<std::shared_ptr<cyber::ReaderBase>,
+                     std::shared_ptr<google::protobuf::Message>>(reader,
+                                                                 message);
   } else if (channel == FLAGS_perception_obstacle_topic) {
-    return manager->CreateReader<perception::PerceptionObstacles>(channel);
+    const auto reader =
+        manager->CreateReader<perception::PerceptionObstacles>(channel);
+    reader->Observe();
+    const auto message = reader ? reader->GetLatestObserved() : nullptr;
+    return std::pair<std::shared_ptr<cyber::ReaderBase>,
+                     std::shared_ptr<google::protobuf::Message>>(reader,
+                                                                 message);
   } else if (channel == FLAGS_prediction_topic) {
-    return manager->CreateReader<prediction::PredictionObstacles>(channel);
+    const auto reader =
+        manager->CreateReader<prediction::PredictionObstacles>(channel);
+    reader->Observe();
+    const auto message = reader ? reader->GetLatestObserved() : nullptr;
+    return std::pair<std::shared_ptr<cyber::ReaderBase>,
+                     std::shared_ptr<google::protobuf::Message>>(reader,
+                                                                 message);
   } else if (channel == FLAGS_planning_trajectory_topic) {
-    return manager->CreateReader<planning::ADCTrajectory>(channel);
+    const auto reader = manager->CreateReader<planning::ADCTrajectory>(channel);
+    reader->Observe();
+    const auto message = reader ? reader->GetLatestObserved() : nullptr;
+    return std::pair<std::shared_ptr<cyber::ReaderBase>,
+                     std::shared_ptr<google::protobuf::Message>>(reader,
+                                                                 message);
   } else if (channel == FLAGS_conti_radar_topic) {
-    return manager->CreateReader<drivers::ContiRadar>(channel);
+    const auto reader = manager->CreateReader<drivers::ContiRadar>(channel);
+    reader->Observe();
+    const auto message = reader ? reader->GetLatestObserved() : nullptr;
+    return std::pair<std::shared_ptr<cyber::ReaderBase>,
+                     std::shared_ptr<google::protobuf::Message>>(reader,
+                                                                 message);
   } else if (channel == FLAGS_relative_map_topic) {
-    return manager->CreateReader<relative_map::MapMsg>(channel);
+    const auto reader = manager->CreateReader<relative_map::MapMsg>(channel);
+    reader->Observe();
+    const auto message = reader ? reader->GetLatestObserved() : nullptr;
+    return std::pair<std::shared_ptr<cyber::ReaderBase>,
+                     std::shared_ptr<google::protobuf::Message>>(reader,
+                                                                 message);
   } else if (channel == FLAGS_pointcloud_topic ||
              channel == FLAGS_pointcloud_128_topic ||
              channel == FLAGS_pointcloud_16_front_up_topic) {
-    return manager->CreateReader<drivers::PointCloud>(channel);
+    const auto reader = manager->CreateReader<drivers::PointCloud>(channel);
+    reader->Observe();
+    const auto message = reader ? reader->GetLatestObserved() : nullptr;
+    return std::pair<std::shared_ptr<cyber::ReaderBase>,
+                     std::shared_ptr<google::protobuf::Message>>(reader,
+                                                                 message);
   }
   // Add more channels here if you want to monitor.
   AERROR << "Channel is not handled by ChannelMonitor: " << channel;
-  return nullptr;
+  return std::pair<std::shared_ptr<cyber::ReaderBase>,
+                   std::shared_ptr<google::protobuf::Message>>(nullptr,
+                                                               nullptr);
+}
+
+bool ValidateFields(const google::protobuf::Message& message,
+                    const std::vector<std::string>& fields,
+                    const size_t field_step) {
+  if (field_step >= fields.size()) {
+    return true;
+  }
+  const auto* desc = message.GetDescriptor();
+  const auto* refl = message.GetReflection();
+  const auto field_count = desc->field_count();
+  for (int field_idx = 0; field_idx < field_count; ++field_idx) {
+    const auto* field_desc = desc->field(field_idx);
+    if (field_desc->name() == fields[field_step]) {
+      if (field_desc->is_repeated()) {
+        // For repeated field, we do not expect it has deeper level validation
+        const auto size = refl->FieldSize(message, field_desc);
+        return size > 0 && field_step == fields.size() - 1;
+      }
+      if (field_desc->type() !=
+          google::protobuf::FieldDescriptor::TYPE_MESSAGE) {
+        return refl->HasField(message, field_desc) &&
+               field_step == fields.size() - 1;
+      }
+      return ValidateFields(refl->GetMessage(message, field_desc), fields,
+                            field_step + 1);
+    }
+  }
+  return false;
 }
 
 }  // namespace
@@ -97,7 +180,11 @@ void ChannelMonitor::UpdateStatus(
     const apollo::dreamview::ChannelMonitorConfig& config,
     ComponentStatus* status) {
   status->clear_status();
-  auto reader = GetReader(config.name());
+
+  const auto reader_message_pair = GetReaderAndLatestMessage(config.name());
+  const auto reader = reader_message_pair.first;
+  const auto message = reader_message_pair.second;
+
   if (reader == nullptr) {
     SummaryMonitor::EscalateStatus(
         ComponentStatus::UNKNOWN,
@@ -106,15 +193,28 @@ void ChannelMonitor::UpdateStatus(
     return;
   }
 
+  // Check channel delay
   const double delay = reader->GetDelaySec();
   if (delay < 0 || delay > config.delay_fatal()) {
     SummaryMonitor::EscalateStatus(
         ComponentStatus::FATAL,
         absl::StrCat(config.name(), " delayed for ", delay, " seconds."),
         status);
-  } else {
-    SummaryMonitor::EscalateStatus(ComponentStatus::OK, "", status);
   }
+
+  // Check channel fields
+  const std::string field_sepr = ".";
+  if (message != nullptr) {
+    for (const auto& field : config.mandatory_fields()) {
+      if (!ValidateFields(*message, absl::StrSplit(field, field_sepr), 0)) {
+        SummaryMonitor::EscalateStatus(
+            ComponentStatus::ERROR,
+            absl::StrCat(config.name(), " missing field ", field), status);
+      }
+    }
+  }
+
+  SummaryMonitor::EscalateStatus(ComponentStatus::OK, "", status);
 }
 
 }  // namespace monitor
