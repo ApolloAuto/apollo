@@ -24,6 +24,10 @@ void SubmoduleOutput::InsertObstacle(const Obstacle& obstacle) {
   curr_frame_obstacles_.push_back(obstacle);
 }
 
+void SubmoduleOutput::InsertEgoVehicle(const Obstacle& ego_vehicle) {
+  ego_vehicle_ = ego_vehicle;
+}
+
 void SubmoduleOutput::InsertPerceptionObstacle(
     const apollo::perception::PerceptionObstacle& perception_obstacle) {
   curr_frame_perception_obstacles_.push_back(perception_obstacle);
@@ -60,6 +64,10 @@ void SubmoduleOutput::set_frame_start_time(const double frame_start_time) {
 
 const std::vector<Obstacle>& SubmoduleOutput::curr_frame_obstacles() const {
   return curr_frame_obstacles_;
+}
+
+const Obstacle& SubmoduleOutput::GetEgoVehicle() const {
+  return ego_vehicle_;
 }
 
 const std::vector<apollo::perception::PerceptionObstacle>&

@@ -46,6 +46,11 @@ bool ContainerSubmodule::Init() {
     return false;
   }
 
+  if (!FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
+    AERROR << "Map cannot be loaded.";
+    return false;
+  }
+
   planning_reader_ = node_->CreateReader<ADCTrajectory>(
       FLAGS_planning_trajectory_topic, nullptr);
 
@@ -88,7 +93,6 @@ bool ContainerSubmodule::Proc(
     auto trajectory_msg = *ptr_trajectory_msg;
     MessageProcess::OnPlanning(trajectory_msg);
   }
-
   MessageProcess::ContainerProcess(*perception_message);
 
   auto obstacles_container_ptr =
@@ -108,10 +112,9 @@ bool ContainerSubmodule::Proc(
   submodule_output.set_frame_start_time(frame_start_time);
   ContainerOutput container_output(std::move(submodule_output));
   container_writer_->Write(std::make_shared<ContainerOutput>(container_output));
-
+  ADCTrajectoryContainer adc_container = *adc_trajectory_container_ptr;
   adc_container_writer_->Write(
-      std::shared_ptr<ADCTrajectoryContainer>(adc_trajectory_container_ptr));
-
+      std::make_shared<ADCTrajectoryContainer>(adc_container));
   return true;
 }
 
