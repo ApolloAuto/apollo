@@ -24,11 +24,12 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+#include "modules/common/util/point_factory.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
 
-using apollo::common::util::MakePathPoint;
+using apollo::common::util::PointFactory;
 
 namespace apollo {
 namespace planning {
@@ -44,8 +45,8 @@ class NaviPathDeciderTest : public ::testing::Test {
     DCHECK_NOTNULL(path_points);
     for (double x = 0.0, y = init_y; x < s; ++x) {
       path_points->clear();
-      auto path_point = MakePathPoint(x, y, 0.0, 0.0, kappa, 0.0, 0.0);
-      path_points->emplace_back(path_point);
+      path_points->push_back(
+          PointFactory::ToPathPoint(x, y, 0.0, 0.0, 0.0, kappa));
     }
   }
 

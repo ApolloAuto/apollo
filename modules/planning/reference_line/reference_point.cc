@@ -21,7 +21,7 @@
 #include "modules/planning/reference_line/reference_point.h"
 
 #include "absl/strings/str_cat.h"
-#include "modules/common/util/util.h"
+#include "modules/common/util/point_factory.h"
 
 namespace apollo {
 namespace planning {
@@ -36,10 +36,8 @@ ReferencePoint::ReferencePoint(const MapPathPoint& map_path_point,
     : hdmap::MapPathPoint(map_path_point), kappa_(kappa), dkappa_(dkappa) {}
 
 common::PathPoint ReferencePoint::ToPathPoint(double s) const {
-  common::PathPoint path_point = common::util::MakePathPoint(
-      x(), y(), 0.0, heading(), kappa_, dkappa_, 0.0);
-  path_point.set_s(s);
-  return path_point;
+  return common::util::PointFactory::ToPathPoint(x(), y(), 0.0, s, heading(),
+                                                 kappa_, dkappa_);
 }
 
 double ReferencePoint::kappa() const { return kappa_; }

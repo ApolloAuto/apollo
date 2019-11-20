@@ -31,20 +31,6 @@ PointENU operator+(const PointENU enu, const math::Vec2d& xy) {
   return point;
 }
 
-PathPoint MakePathPoint(const double x, const double y, const double z,
-                        const double theta, const double kappa,
-                        const double dkappa, const double ddkappa) {
-  PathPoint path_point;
-  path_point.set_x(x);
-  path_point.set_y(y);
-  path_point.set_z(z);
-  path_point.set_theta(theta);
-  path_point.set_kappa(kappa);
-  path_point.set_dkappa(dkappa);
-  path_point.set_ddkappa(ddkappa);
-  return path_point;
-}
-
 PathPoint GetWeightedAverageOfTwoPathPoints(const PathPoint& p1,
                                             const PathPoint& p2,
                                             const double w1, const double w2) {
