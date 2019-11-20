@@ -223,22 +223,6 @@ cc_library(
 )
 
 cc_library(
-    name = "nonlinear_interpolation",
-    srcs = [
-        "nonlinear_interpolation.cc",
-    ],
-    hdrs = [
-        "nonlinear_interpolation.h",
-    ],
-    deps = [
-        ":geometry",
-        ":hermite_spline",
-        ":integral",
-        "//modules/common/proto:pnc_point_proto",
-    ],
-)
-
-cc_library(
     name = "integral",
     srcs = [
         "integral.cc",
