@@ -147,18 +147,6 @@ cc_library(
 )
 
 cc_library(
-    name = "extended_kalman_filter",
-    hdrs = [
-        "extended_kalman_filter.h",
-    ],
-    deps = [
-        "//cyber/common:log",
-        "//modules/common/math:matrix_operations",
-        "@eigen",
-    ],
-)
-
-cc_library(
     name = "factorial",
     hdrs = [
         "factorial.h",
