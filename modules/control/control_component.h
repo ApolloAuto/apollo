@@ -32,6 +32,7 @@
 
 #include "modules/common/util/util.h"
 #include "modules/control/controller/controller_agent.h"
+#include "modules/control/proto/preprocessor.pb.h"
 
 /**
  * @namespace apollo::control
@@ -56,12 +57,6 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
   bool Init() override;
 
   bool Proc() override;
-
-  struct LocalView {
-    canbus::Chassis chassis;
-    planning::ADCTrajectory trajectory;
-    localization::LocalizationEstimate localization;
-  };
 
  private:
   // Upon receiving pad message

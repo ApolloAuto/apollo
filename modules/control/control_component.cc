@@ -157,9 +157,9 @@ Status ControlComponent::ProduceControlCommand(
     ControlCommand *control_command) {
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    local_view_.chassis = latest_chassis_;
-    local_view_.trajectory = latest_trajectory_;
-    local_view_.localization = latest_localization_;
+    local_view_.mutable_chassis()->CopyFrom(latest_chassis_);
+    local_view_.mutable_trajectory()->CopyFrom(latest_trajectory_);
+    local_view_.mutable_localization()->CopyFrom(latest_localization_);
   }
 
   Status status = CheckInput(&local_view_);
@@ -180,7 +180,7 @@ Status ControlComponent::ProduceControlCommand(
       AERROR << "Input messages timeout";
       // estop_ = true;
       status = status_ts;
-      if (local_view_.chassis.driving_mode() !=
+      if (local_view_.chassis().driving_mode() !=
           apollo::canbus::Chassis::COMPLETE_AUTO_DRIVE) {
         control_command->mutable_engage_advice()->set_advice(
             apollo::common::EngageAdvice::DISALLOW_ENGAGE);
@@ -195,26 +195,26 @@ Status ControlComponent::ProduceControlCommand(
 
   // check estop
   estop_ = control_conf_.enable_persistent_estop()
-               ? estop_ || local_view_.trajectory.estop().is_estop()
-               : local_view_.trajectory.estop().is_estop();
+               ? estop_ || local_view_.trajectory().estop().is_estop()
+               : local_view_.trajectory().estop().is_estop();
 
-  if (local_view_.trajectory.estop().is_estop()) {
+  if (local_view_.trajectory().estop().is_estop()) {
     estop_ = true;
     estop_reason_ = "estop from planning : ";
-    estop_reason_ += local_view_.trajectory.estop().reason();
+    estop_reason_ += local_view_.trajectory().estop().reason();
   }
 
-  if (local_view_.trajectory.trajectory_point().empty()) {
+  if (local_view_.trajectory().trajectory_point().empty()) {
     AWARN_EVERY(100) << "planning has no trajectory point. ";
     estop_ = true;
     estop_reason_ = "estop for empty planning trajectory, planning headers: " +
-                    local_view_.trajectory.header().ShortDebugString();
+                    local_view_.trajectory().header().ShortDebugString();
   }
 
   if (FLAGS_enable_gear_drive_negative_speed_protection) {
     const double kEpsilon = 0.001;
-    auto first_trajectory_point = local_view_.trajectory.trajectory_point(0);
-    if (local_view_.chassis.gear_location() == Chassis::GEAR_DRIVE &&
+    auto first_trajectory_point = local_view_.trajectory().trajectory_point(0);
+    if (local_view_.chassis().gear_location() == Chassis::GEAR_DRIVE &&
         first_trajectory_point.v() < -1 * kEpsilon) {
       estop_ = true;
       estop_reason_ = "estop for negative speed when gear_drive";
@@ -222,39 +222,39 @@ Status ControlComponent::ProduceControlCommand(
   }
 
   if (!estop_) {
-    if (local_view_.chassis.driving_mode() == Chassis::COMPLETE_MANUAL) {
+    if (local_view_.chassis().driving_mode() == Chassis::COMPLETE_MANUAL) {
       controller_agent_.Reset();
       AINFO_EVERY(100) << "Reset Controllers in Manual Mode";
     }
 
     auto debug = control_command->mutable_debug()->mutable_input_debug();
     debug->mutable_localization_header()->CopyFrom(
-        local_view_.localization.header());
-    debug->mutable_canbus_header()->CopyFrom(local_view_.chassis.header());
+        local_view_.localization().header());
+    debug->mutable_canbus_header()->CopyFrom(local_view_.chassis().header());
     debug->mutable_trajectory_header()->CopyFrom(
-        local_view_.trajectory.header());
+        local_view_.trajectory().header());
 
-    if (local_view_.trajectory.is_replan()) {
+    if (local_view_.trajectory().is_replan()) {
       latest_replan_trajectory_header_.CopyFrom(
-          local_view_.trajectory.header());
+          local_view_.trajectory().header());
     }
 
     if (latest_replan_trajectory_header_.has_sequence_num()) {
       debug->mutable_latest_replan_trajectory_header()->CopyFrom(
           latest_replan_trajectory_header_);
     }
-
+    /*control agent*/
     Status status_compute = controller_agent_.ComputeControlCommand(
-        &local_view_.localization, &local_view_.chassis,
-        &local_view_.trajectory, control_command);
+        &local_view_.localization(), &local_view_.chassis(),
+        &local_view_.trajectory(), control_command);
 
     if (!status_compute.ok()) {
       AERROR << "Control main function failed"
              << " with localization: "
-             << local_view_.localization.ShortDebugString()
-             << " with chassis: " << local_view_.chassis.ShortDebugString()
+             << local_view_.localization().ShortDebugString()
+             << " with chassis: " << local_view_.chassis().ShortDebugString()
              << " with trajectory: "
-             << local_view_.trajectory.ShortDebugString()
+             << local_view_.trajectory().ShortDebugString()
              << " with cmd: " << control_command->ShortDebugString()
              << " status:" << status_compute.error_message();
       estop_ = true;
@@ -272,9 +272,9 @@ Status ControlComponent::ProduceControlCommand(
     control_command->set_gear_location(Chassis::GEAR_DRIVE);
   }
   // check signal
-  if (local_view_.trajectory.decision().has_vehicle_signal()) {
+  if (local_view_.trajectory().decision().has_vehicle_signal()) {
     control_command->mutable_signal()->CopyFrom(
-        local_view_.trajectory.decision().vehicle_signal());
+        local_view_.trajectory().decision().vehicle_signal());
   }
   return status;
 }
@@ -347,11 +347,11 @@ bool ControlComponent::Proc() {
 
   // set header
   control_command.mutable_header()->set_lidar_timestamp(
-      local_view_.trajectory.header().lidar_timestamp());
+      local_view_.trajectory().header().lidar_timestamp());
   control_command.mutable_header()->set_camera_timestamp(
-      local_view_.trajectory.header().camera_timestamp());
+      local_view_.trajectory().header().camera_timestamp());
   control_command.mutable_header()->set_radar_timestamp(
-      local_view_.trajectory.header().radar_timestamp());
+      local_view_.trajectory().header().radar_timestamp());
 
   common::util::FillHeader(node_->Name(), &control_command);
 
@@ -362,26 +362,25 @@ bool ControlComponent::Proc() {
   }
 
   control_cmd_writer_->Write(std::make_shared<ControlCommand>(control_command));
-
   return true;
 }
 
 Status ControlComponent::CheckInput(LocalView *local_view) {
   ADEBUG << "Received localization:"
-         << local_view->localization.ShortDebugString();
-  ADEBUG << "Received chassis:" << local_view->chassis.ShortDebugString();
+         << local_view->localization().ShortDebugString();
+  ADEBUG << "Received chassis:" << local_view->chassis().ShortDebugString();
 
-  if (!local_view->trajectory.estop().is_estop() &&
-      local_view->trajectory.trajectory_point().empty()) {
+  if (!local_view->trajectory().estop().is_estop() &&
+      local_view->trajectory().trajectory_point().empty()) {
     AWARN_EVERY(100) << "planning has no trajectory point. ";
     const std::string msg =
         absl::StrCat("planning has no trajectory point. planning_seq_num:",
-                     local_view->trajectory.header().sequence_num());
+                     local_view->trajectory().header().sequence_num());
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, msg);
   }
 
   for (auto &trajectory_point :
-       *local_view->trajectory.mutable_trajectory_point()) {
+       *local_view->mutable_trajectory()->mutable_trajectory_point()) {
     if (std::abs(trajectory_point.v()) <
             control_conf_.minimum_speed_resolution() &&
         std::abs(trajectory_point.a()) <
@@ -391,8 +390,8 @@ Status ControlComponent::CheckInput(LocalView *local_view) {
     }
   }
 
-  VehicleStateProvider::Instance()->Update(local_view->localization,
-                                           local_view->chassis);
+  VehicleStateProvider::Instance()->Update(local_view->localization(),
+                                           local_view->chassis());
 
   return Status::OK();
 }
@@ -405,7 +404,7 @@ Status ControlComponent::CheckTimestamp(const LocalView &local_view) {
   }
   double current_timestamp = Clock::NowInSeconds();
   double localization_diff =
-      current_timestamp - local_view.localization.header().timestamp_sec();
+      current_timestamp - local_view.localization().header().timestamp_sec();
   if (localization_diff > (control_conf_.max_localization_miss_num() *
                            control_conf_.localization_period())) {
     AERROR << "Localization msg lost for " << std::setprecision(6)
@@ -415,7 +414,7 @@ Status ControlComponent::CheckTimestamp(const LocalView &local_view) {
   }
 
   double chassis_diff =
-      current_timestamp - local_view.chassis.header().timestamp_sec();
+      current_timestamp - local_view.chassis().header().timestamp_sec();
   if (chassis_diff >
       (control_conf_.max_chassis_miss_num() * control_conf_.chassis_period())) {
     AERROR << "Chassis msg lost for " << std::setprecision(6) << chassis_diff
@@ -425,7 +424,7 @@ Status ControlComponent::CheckTimestamp(const LocalView &local_view) {
   }
 
   double trajectory_diff =
-      current_timestamp - local_view.trajectory.header().timestamp_sec();
+      current_timestamp - local_view.trajectory().header().timestamp_sec();
   if (trajectory_diff > (control_conf_.max_planning_miss_num() *
                          control_conf_.trajectory_period())) {
     AERROR << "Trajectory msg lost for " << std::setprecision(6)
