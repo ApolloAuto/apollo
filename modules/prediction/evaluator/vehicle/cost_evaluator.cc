@@ -20,8 +20,6 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::prediction::math_util::Sigmoid;
-
 CostEvaluator::CostEvaluator() {
   evaluator_type_ = ObstacleConf::COST_EVALUATOR;
 }
@@ -78,7 +76,7 @@ double CostEvaluator::ComputeProbability(const double obstacle_length,
                                          const LaneSequence& lane_sequence) {
   double front_lateral_distance_cost =
       FrontLateralDistanceCost(obstacle_length, obstacle_width, lane_sequence);
-  return Sigmoid(front_lateral_distance_cost);
+  return apollo::common::math::Sigmoid(front_lateral_distance_cost);
 }
 
 double CostEvaluator::FrontLateralDistanceCost(

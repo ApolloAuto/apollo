@@ -34,7 +34,6 @@ namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
 using apollo::cyber::common::GetProtoFromFile;
-using apollo::prediction::math_util::Sigmoid;
 
 // Helper function for computing the mean value of a vector.
 double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
@@ -553,7 +552,7 @@ void CruiseMLPEvaluator::ModelInference(
       torch_output_tuple->elements()[0].toTensor().to(torch::kCPU);
   auto finish_time_tensor =
       torch_output_tuple->elements()[1].toTensor().to(torch::kCPU);
-  lane_sequence_ptr->set_probability(Sigmoid(
+  lane_sequence_ptr->set_probability(apollo::common::math::Sigmoid(
       static_cast<double>(probability_tensor.accessor<float, 2>()[0][0])));
   lane_sequence_ptr->set_time_to_lane_center(
       static_cast<double>(finish_time_tensor.accessor<float, 2>()[0][0]));

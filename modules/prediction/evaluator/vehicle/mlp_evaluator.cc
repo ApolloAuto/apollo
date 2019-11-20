@@ -28,8 +28,9 @@
 
 namespace apollo {
 namespace prediction {
-
 namespace {
+
+using apollo::common::math::Sigmoid;
 
 double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
   int count = 0;
@@ -402,14 +403,14 @@ double MLPEvaluator::ComputeProbability(
       if (layer.layer_activation_func() == Layer::RELU) {
         neuron_output = apollo::prediction::math_util::Relu(neuron_output);
       } else if (layer.layer_activation_func() == Layer::SIGMOID) {
-        neuron_output = apollo::prediction::math_util::Sigmoid(neuron_output);
+        neuron_output = Sigmoid(neuron_output);
       } else if (layer.layer_activation_func() == Layer::TANH) {
         neuron_output = std::tanh(neuron_output);
       } else {
         AERROR << "Undefined activation function ["
                << layer.layer_activation_func()
                << "]. A default sigmoid will be used instead.";
-        neuron_output = apollo::prediction::math_util::Sigmoid(neuron_output);
+        neuron_output = Sigmoid(neuron_output);
       }
       layer_output.push_back(neuron_output);
     }
