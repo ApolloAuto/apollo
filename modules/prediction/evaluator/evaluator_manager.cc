@@ -61,31 +61,38 @@ bool IsTrainable(const Feature& feature) {
   return true;
 }
 
-void GroupObstaclesByObstacleId(const int obstacle_id,
-                                ObstaclesContainer* const obstacles_container,
-                                IdObstacleListMap* const id_obstacle_map) {
-  Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
-  if (obstacle_ptr == nullptr) {
-    AERROR << "Null obstacle [" << obstacle_id << "] found";
-    return;
-  }
-  if (obstacle_ptr->IsStill()) {
-    ADEBUG << "Ignore still obstacle [" << obstacle_id << "]";
-    return;
-  }
-  const Feature& feature = obstacle_ptr->latest_feature();
-  if (feature.priority().priority() == ObstaclePriority::IGNORE) {
-    ADEBUG << "Skip ignored obstacle [" << obstacle_id << "]";
-    return;
-  } else if (feature.priority().priority() == ObstaclePriority::CAUTION) {
-    int id_mod = obstacle_id % FLAGS_max_caution_thread_num;
-    (*id_obstacle_map)[id_mod].push_back(obstacle_ptr);
-    ADEBUG << "Cautioned obstacle [" << obstacle_id << "] for thread" << id_mod;
-  } else {
-    int normal_thread_num = FLAGS_max_thread_num - FLAGS_max_caution_thread_num;
-    int id_mod = obstacle_id % normal_thread_num + FLAGS_max_caution_thread_num;
-    (*id_obstacle_map)[id_mod].push_back(obstacle_ptr);
-    ADEBUG << "Normal obstacle [" << obstacle_id << "] for thread" << id_mod;
+void GroupObstaclesByObstacleIds(ObstaclesContainer* const obstacles_container,
+                                 IdObstacleListMap* const id_obstacle_map) {
+  int caution_thread_idx = 0;
+  for (int obstacle_id :
+       obstacles_container->curr_frame_considered_obstacle_ids()) {
+    Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
+    if (obstacle_ptr == nullptr) {
+      AERROR << "Null obstacle [" << obstacle_id << "] found";
+      return;
+    }
+    if (obstacle_ptr->IsStill()) {
+      ADEBUG << "Ignore still obstacle [" << obstacle_id << "]";
+      return;
+    }
+    const Feature& feature = obstacle_ptr->latest_feature();
+    if (feature.priority().priority() == ObstaclePriority::IGNORE) {
+      ADEBUG << "Skip ignored obstacle [" << obstacle_id << "]";
+      return;
+    } else if (feature.priority().priority() == ObstaclePriority::CAUTION) {
+      caution_thread_idx = caution_thread_idx % FLAGS_max_caution_thread_num;
+      (*id_obstacle_map)[caution_thread_idx].push_back(obstacle_ptr);
+      ADEBUG << "Cautioned obstacle [" << obstacle_id << "] for thread"
+             << caution_thread_idx;
+      ++caution_thread_idx;
+    } else {
+      int normal_thread_num =
+          FLAGS_max_thread_num - FLAGS_max_caution_thread_num;
+      int id_mod =
+          obstacle_id % normal_thread_num + FLAGS_max_caution_thread_num;
+      (*id_obstacle_map)[id_mod].push_back(obstacle_ptr);
+      ADEBUG << "Normal obstacle [" << obstacle_id << "] for thread" << id_mod;
+    }
   }
 }
 
@@ -210,9 +217,7 @@ void EvaluatorManager::Run(ObstaclesContainer* obstacles_container) {
 
   if (FLAGS_enable_multi_thread) {
     IdObstacleListMap id_obstacle_map;
-    for (int id : obstacles_container->curr_frame_considered_obstacle_ids()) {
-      GroupObstaclesByObstacleId(id, obstacles_container, &id_obstacle_map);
-    }
+    GroupObstaclesByObstacleIds(obstacles_container, &id_obstacle_map);
     PredictionThreadPool::ForEach(
         id_obstacle_map.begin(), id_obstacle_map.end(),
         [&](IdObstacleListMap::iterator::value_type& obstacles_iter) {
