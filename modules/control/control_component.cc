@@ -113,14 +113,6 @@ void ControlComponent::OnPad(const std::shared_ptr<PadMessage> &pad) {
   pad_msg_.CopyFrom(*pad);
   ADEBUG << "Received Pad Msg:" << pad_msg_.DebugString();
   AERROR_IF(!pad_msg_.has_action()) << "pad message check failed!";
-
-  // do something according to pad message
-  if (pad_msg_.action() == DrivingAction::RESET) {
-    AINFO << "Control received RESET action!";
-    estop_ = false;
-    estop_reason_.clear();
-  }
-  pad_received_ = true;
 }
 
 void ControlComponent::OnChassis(const std::shared_ptr<Chassis> &chassis) {
@@ -243,7 +235,7 @@ Status ControlComponent::ProduceControlCommand(
       debug->mutable_latest_replan_trajectory_header()->CopyFrom(
           latest_replan_trajectory_header_);
     }
-    /*control agent*/
+    // controller agent
     Status status_compute = controller_agent_.ComputeControlCommand(
         &local_view_.localization(), &local_view_.chassis(),
         &local_view_.trajectory(), control_command);
@@ -312,6 +304,14 @@ bool ControlComponent::Proc() {
   if (pad_msg != nullptr) {
     OnPad(pad_msg);
   }
+
+  // do something according to pad message
+  if (pad_msg_.action() == DrivingAction::RESET) {
+    AINFO << "Control received RESET action!";
+    estop_ = false;
+    estop_reason_.clear();
+  }
+  pad_received_ = true;
 
   if (control_conf_.is_control_test_mode() &&
       control_conf_.control_test_duration() > 0 &&
