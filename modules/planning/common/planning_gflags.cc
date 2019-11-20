@@ -93,7 +93,7 @@ DEFINE_bool(enable_scenario_park_and_go, true,
 DEFINE_bool(enable_scenario_pull_over, false,
             "enable pull-over scenario in planning");
 
-DEFINE_bool(enable_scenario_emergency_pull_over, false,
+DEFINE_bool(enable_scenario_emergency_pull_over, true,
             "enable emregency-pull-over scenario in planning");
 
 DEFINE_bool(enable_scenario_emergency_stop, false,
