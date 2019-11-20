@@ -28,7 +28,7 @@ cc_test(
     ],
     deps = [
         ":discretized_path",
-        "//modules/common/util",
+        "//modules/common/util:point_factory",
         "@gtest//:main",
     ],
 )

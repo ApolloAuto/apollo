@@ -76,10 +76,6 @@ bool WithinBound(T start, T end, T value) {
 
 PointENU operator+(const PointENU enu, const math::Vec2d& xy);
 
-PathPoint MakePathPoint(const double x, const double y, const double z,
-                        const double theta, const double kappa,
-                        const double dkappa, const double ddkappa);
-
 /**
  * uniformly slice a segment [start, end] to num + 1 pieces
  * the result sliced will contain the n + 1 points that slices the provided

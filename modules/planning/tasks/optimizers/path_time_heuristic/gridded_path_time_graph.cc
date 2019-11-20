@@ -527,8 +527,10 @@ Status GriddedPathTimeGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
     ADEBUG << "Time: " << cur_point->point().t();
     ADEBUG << "S: " << cur_point->point().s();
     ADEBUG << "V: " << cur_point->GetOptimalSpeed();
-    speed_profile.push_back(PointFactory::ToSpeedPoint(
-        cur_point->point().s(), cur_point->point().t()));
+    SpeedPoint speed_point;
+    speed_point.set_s(cur_point->point().s());
+    speed_point.set_t(cur_point->point().t());
+    speed_profile.push_back(speed_point);
     cur_point = cur_point->pre_point();
   }
   std::reverse(speed_profile.begin(), speed_profile.end());

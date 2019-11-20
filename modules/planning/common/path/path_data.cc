@@ -27,8 +27,8 @@
 #include "absl/strings/str_join.h"
 #include "cyber/common/log.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/common/util/string_util.h"
-#include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -36,6 +36,7 @@ namespace planning {
 
 using apollo::common::SLPoint;
 using apollo::common::math::CartesianFrenetConverter;
+using apollo::common::util::PointFactory;
 
 bool PathData::SetDiscretizedPath(DiscretizedPath path) {
   if (reference_line_ == nullptr) {
@@ -180,39 +181,34 @@ bool PathData::SLToXY(const FrenetFramePath &frenet_path,
   DCHECK_NOTNULL(discretized_path);
   std::vector<common::PathPoint> path_points;
   for (const common::FrenetFramePoint &frenet_point : frenet_path) {
-    common::SLPoint sl_point;
+    const common::SLPoint sl_point =
+        PointFactory::ToSLPoint(frenet_point.s(), frenet_point.l());
     common::math::Vec2d cartesian_point;
-    sl_point.set_s(frenet_point.s());
-    sl_point.set_l(frenet_point.l());
     if (!reference_line_->SLToXY(sl_point, &cartesian_point)) {
       AERROR << "Fail to convert sl point to xy point";
       return false;
     }
-    ReferencePoint ref_point =
+    const ReferencePoint ref_point =
         reference_line_->GetReferencePoint(frenet_point.s());
-    double theta = CartesianFrenetConverter::CalculateTheta(
+    const double theta = CartesianFrenetConverter::CalculateTheta(
         ref_point.heading(), ref_point.kappa(), frenet_point.l(),
         frenet_point.dl());
     ADEBUG << "frenet_point: " << frenet_point.ShortDebugString();
-    double kappa = CartesianFrenetConverter::CalculateKappa(
+    const double kappa = CartesianFrenetConverter::CalculateKappa(
         ref_point.kappa(), ref_point.dkappa(), frenet_point.l(),
         frenet_point.dl(), frenet_point.ddl());
 
-    common::PathPoint path_point = common::util::MakePathPoint(
-        cartesian_point.x(), cartesian_point.y(), 0.0, theta, kappa, 0.0, 0.0);
-
-    if (path_points.empty()) {
-      path_point.set_s(0.0);
-      path_point.set_dkappa(0.0);
-    } else {
-      common::math::Vec2d last(path_points.back().x(), path_points.back().y());
-      common::math::Vec2d current(path_point.x(), path_point.y());
-      double distance = (last - current).Length();
-      path_point.set_s(path_points.back().s() + distance);
-      path_point.set_dkappa((path_point.kappa() - path_points.back().kappa()) /
-                            distance);
+    double s = 0.0;
+    double dkappa = 0.0;
+    if (!path_points.empty()) {
+      common::math::Vec2d last = PointFactory::ToVec2d(path_points.back());
+      const double distance = (last - cartesian_point).Length();
+      s = path_points.back().s() + distance;
+      dkappa = (kappa - path_points.back().kappa()) / distance;
     }
-    path_points.push_back(std::move(path_point));
+    path_points.push_back(PointFactory::ToPathPoint(cartesian_point.x(),
+                                                    cartesian_point.y(), 0.0, s,
+                                                    theta, kappa, dkappa));
   }
   *discretized_path = DiscretizedPath(std::move(path_points));
 

@@ -43,6 +43,7 @@ using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleSignal;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
+using apollo::common::util::PointFactory;
 
 ReferenceLineInfo::ReferenceLineInfo(const common::VehicleState& vehicle_state,
                                      const TrajectoryPoint& adc_planning_point,
@@ -596,7 +597,6 @@ void ReferenceLineInfo::SetTurnSignal(
       break;
     } else if (turn == hdmap::Lane::U_TURN) {
       // check left or right by geometry.
-      using apollo::common::util::PointFactory;
       auto start_xy =
           PointFactory::ToVec2d(seg.lane->GetSmoothPoint(seg.start_s));
       auto middle_xy = PointFactory::ToVec2d(
