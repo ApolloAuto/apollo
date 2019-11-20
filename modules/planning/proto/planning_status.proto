@@ -38,6 +38,9 @@ message ChangeLaneStatus {
   // if the current path and speed planning on the lane-change
   // reference-line succeed.
   optional bool is_current_opt_succeed = 7 [default = false];
+  // denotes if the surrounding area is clear for ego vehicle to
+  // change lane at this moment.
+  optional bool is_clear_to_change_lane = 8 [default = false];
 }
 
 message StopTime {
