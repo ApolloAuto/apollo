@@ -37,11 +37,6 @@ TEST(PredictionUtilTest, relu) {
   EXPECT_DOUBLE_EQ(Relu(value), 0.0);
 }
 
-TEST(PredictionUtilTest, sigmoid) {
-  double value = 2.0;
-  EXPECT_DOUBLE_EQ(Sigmoid(value), 0.88079707797788231);
-}
-
 TEST(PredictionUtilTest, softmax) {
   std::vector<double> value = {0.0, 10.0, 100.0};
   std::vector<double> result = Softmax(value);

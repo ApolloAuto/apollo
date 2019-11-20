@@ -37,13 +37,6 @@ namespace math_util {
 double Normalize(const double value, const double mean, const double std);
 
 /**
- * @brief Sigmoid function used in neural networks as an activation function.
- * @param value The input.
- * @return The output of sigmoid function.
- */
-double Sigmoid(const double value);
-
-/**
  * @brief RELU function used in neural networks as an activation function.
  * @param value The input.
  * @return The output of RELU function.
