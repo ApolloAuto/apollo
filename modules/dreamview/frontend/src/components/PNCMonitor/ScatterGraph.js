@@ -234,7 +234,7 @@ export default class ScatterGraph extends React.Component {
     constructDataConfig(properties) {
         // basic properties
         const config = {
-            label: name, //legend
+            label: null, // legend
             hideLabelInLegend: properties.hideLabelInLegend,
             showText: properties.showText,
             text: null, // text in the graph
@@ -262,6 +262,7 @@ export default class ScatterGraph extends React.Component {
             datasets[idx] = config;
         }
 
+        datasets[idx].label = name;
         datasets[idx].text = name;
         datasets[idx].data = data;
     }
