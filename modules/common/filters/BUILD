@@ -42,15 +42,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "filters",
-    deps = [
-        ":digital_filter",
-        ":digital_filter_coefficients",
-        ":mean_filter",
-    ],
-)
-
 cc_test(
     name = "digital_filter_test",
     size = "small",
