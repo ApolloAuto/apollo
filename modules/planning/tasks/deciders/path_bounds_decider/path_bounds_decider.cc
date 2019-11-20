@@ -1185,6 +1185,11 @@ void PathBoundsDecider::GetBoundaryFromLaneChangeForbiddenZone(
   auto* lane_change_status = PlanningContext::Instance()
                                  ->mutable_planning_status()
                                  ->mutable_change_lane();
+  if (lane_change_status->is_clear_to_change_lane()) {
+    ADEBUG << "Current position is clear to change lane. No need prep s.";
+    lane_change_status->set_exist_lane_change_start_position(false);
+    return;
+  }
   double lane_change_start_s = 0.0;
   if (lane_change_status->exist_lane_change_start_position()) {
     common::SLPoint point_sl;
