@@ -54,93 +54,37 @@ bool PreprocessorSubmodule::Init() {
     return false;
   }
 
-  /*  initialize readers and writers */
-  cyber::ReaderConfig chassis_reader_config;
-  chassis_reader_config.channel_name = FLAGS_chassis_topic;
-  chassis_reader_config.pending_queue_size = FLAGS_chassis_pending_queue_size;
-  chassis_reader_ =
-      node_->CreateReader<Chassis>(chassis_reader_config, nullptr);
-  CHECK(chassis_reader_ != nullptr);
-
-  cyber::ReaderConfig planning_reader_config;
-  planning_reader_config.channel_name = FLAGS_planning_trajectory_topic;
-  planning_reader_config.pending_queue_size = FLAGS_planning_pending_queue_size;
-  trajectory_reader_ =
-      node_->CreateReader<ADCTrajectory>(planning_reader_config, nullptr);
-  CHECK(trajectory_reader_ != nullptr);
-
-  cyber::ReaderConfig localization_reader_config;
-  localization_reader_config.channel_name = FLAGS_localization_topic;
-  localization_reader_config.pending_queue_size =
-      FLAGS_localization_pending_queue_size;
-  localization_reader_ = node_->CreateReader<LocalizationEstimate>(
-      localization_reader_config, nullptr);
-  CHECK(localization_reader_ != nullptr);
-
-  cyber::ReaderConfig pad_msg_reader_config;
-  pad_msg_reader_config.channel_name = FLAGS_pad_topic;
-  pad_msg_reader_config.pending_queue_size = FLAGS_pad_msg_pending_queue_size;
-  pad_msg_reader_ =
-      node_->CreateReader<PadMessage>(pad_msg_reader_config, nullptr);
-  CHECK(pad_msg_reader_ != nullptr);
-
   // Preprocessor writer
   preprocessor_writer_ =
       node_->CreateWriter<Preprocessor>(FLAGS_control_preprocessor_topic);
   CHECK(preprocessor_writer_ != nullptr);
 
-  // set initial vehicle state by cmd
-  // need to sleep, because advertised channel is not ready immediately
-  // simple test shows a short delay of 80 ms or so
-  AINFO << "Control resetting vehicle state, sleeping for 1000 ms ...";
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-  // should init_vehicle first, let car enter work status, then use status msg
-  // trigger control
-  AINFO << "Control default driving action is: "
-        << DrivingAction_Name(control_common_conf_.action());
-  pad_msg_.set_action(control_common_conf_.action());
+  // TODO(SHU) pad_msg action is set by control_conf from control component
+  // not by control_common_conf
 
   return true;
 }
 
-bool PreprocessorSubmodule::Proc() {
-  chassis_reader_->Observe();
-  const auto chassis_msg = chassis_reader_->GetLatestObserved();
-  if (chassis_msg == nullptr) {
-    AERROR << "Chassis msg is not ready!";
-    return false;
-  }
-  OnChassis(chassis_msg);
+bool PreprocessorSubmodule::Proc(
+    const std::shared_ptr<LocalView> &local_view,
+    const std::shared_ptr<PadMessage> &pad_message) {
+  local_view_->CopyFrom(*local_view);
+  // pad_msg_.CopyFrom(*pad_message);
 
-  trajectory_reader_->Observe();
-  const auto trajectory_msg = trajectory_reader_->GetLatestObserved();
-  if (trajectory_msg == nullptr) {
-    AERROR << "planning msg is not ready!";
-    return false;
+  if (pad_message->action() == DrivingAction::RESET) {
+    AINFO << "Control received RESET action!";
+    estop_ = false;
+    estop_reason_.clear();
   }
-  OnPlanning(trajectory_msg);
-
-  localization_reader_->Observe();
-  const auto localization_msg = localization_reader_->GetLatestObserved();
-  if (localization_msg == nullptr) {
-    AERROR << "localization msg is not ready!";
-    return false;
-  }
-  OnLocalization(localization_msg);
-
-  pad_msg_reader_->Observe();
-  const auto pad_msg = pad_msg_reader_->GetLatestObserved();
-  if (pad_msg != nullptr) {
-    OnPad(pad_msg);
-  }
+  pad_received_ = true;
 
   Preprocessor control_preprocessor;
+
   Status status = ProducePreprocessorStatus(&control_preprocessor);
   AERROR_IF(!status.ok()) << "Failed to produce control preprocessor:"
                           << status.error_message();
   control_preprocessor.set_received_pad_msg(pad_received_);
-  control_preprocessor.set_allocated_pad_msg(&pad_msg_);
+  control_preprocessor.mutable_pad_msg()->CopyFrom(*pad_message);
   preprocessor_writer_->Write(
       std::make_shared<Preprocessor>(control_preprocessor));
   return true;
@@ -149,12 +93,6 @@ bool PreprocessorSubmodule::Proc() {
 Status PreprocessorSubmodule::ProducePreprocessorStatus(
     Preprocessor *preprocessor_status) {
   std::lock_guard<std::mutex> lock(mutex_);
-  local_view_ = preprocessor_status->mutable_local_view();
-
-  local_view_->set_allocated_chassis(&latest_chassis_);
-  local_view_->set_allocated_trajectory(&latest_trajectory_);
-  local_view_->set_allocated_localization(&latest_localization_);
-
   Status status = CheckInput(local_view_);
 
   if (!status.ok()) {
@@ -236,49 +174,6 @@ Status PreprocessorSubmodule::ProducePreprocessorStatus(
   }
 
   return status;
-}
-
-void PreprocessorSubmodule::OnChassis(const std::shared_ptr<Chassis> &chassis) {
-  ADEBUG << "Received chassis data: run chassis callback.";
-  std::lock_guard<std::mutex> lock(mutex_);
-  latest_chassis_.CopyFrom(*chassis);
-}
-
-void PreprocessorSubmodule::OnPad(const std::shared_ptr<PadMessage> &pad) {
-  pad_msg_.CopyFrom(*pad);
-  ADEBUG << "Received Pad Msg:" << pad_msg_.DebugString();
-  AERROR_IF(!pad_msg_.has_action()) << "pad message check failed!";
-
-  if (pad_msg_.action() == DrivingAction::RESET) {
-    AINFO << "Control received RESET action!";
-    estop_ = false;
-    estop_reason_.clear();
-  }
-  pad_received_ = true;
-}
-
-void PreprocessorSubmodule::OnPlanning(
-    const std::shared_ptr<ADCTrajectory> &trajectory) {
-  ADEBUG << "Received chassis data: run trajectory callback.";
-  std::lock_guard<std::mutex> lock(mutex_);
-  latest_trajectory_.CopyFrom(*trajectory);
-}
-
-void PreprocessorSubmodule::OnLocalization(
-    const std::shared_ptr<LocalizationEstimate> &localization) {
-  ADEBUG << "Received control data: run localization message callback.";
-  std::lock_guard<std::mutex> lock(mutex_);
-  latest_localization_.CopyFrom(*localization);
-}
-
-void PreprocessorSubmodule::OnMonitor(
-    const common::monitor::MonitorMessage &monitor_message) {
-  for (const auto &item : monitor_message.item()) {
-    if (item.log_level() == common::monitor::MonitorMessageItem::FATAL) {
-      estop_ = true;
-      return;
-    }
-  }
 }
 
 Status PreprocessorSubmodule::CheckInput(LocalView *local_view) {
