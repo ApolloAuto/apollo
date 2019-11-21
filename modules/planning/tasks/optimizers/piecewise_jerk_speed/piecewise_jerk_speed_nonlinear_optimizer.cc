@@ -238,8 +238,9 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
           break;
         case STBoundary::BoundaryType::FOLLOW:
           // TODO(Hongyi): unify follow buffer on decision side
-          s_upper_bound = std::fmin(s_upper_bound, s_upper);
-          s_soft_upper_bound = s_upper_bound - 8.0;
+          s_upper_bound =
+              std::fmin(s_upper_bound, s_upper - FLAGS_follow_min_distance);
+          s_soft_upper_bound = s_upper_bound - 5.0;
           break;
         case STBoundary::BoundaryType::OVERTAKE:
           s_lower_bound = std::fmax(s_lower_bound, s_lower);
