@@ -50,8 +50,11 @@ bool ControlComponent::Init() {
 
   AINFO << "Conf file: " << ConfigFilePath() << " is loaded.";
 
-  // set controller
-  if (!controller_agent_.Init(&control_conf_).ok()) {
+  // use control submodules
+  if (FLAGS_use_control_submodules) {
+    dynamic_cast<ControlComponent *>(&preprocessor_submodule_);
+  } else if (!controller_agent_.Init(&control_conf_).ok()) {
+    // set controller
     monitor_logger_buffer_.ERROR("Control init controller failed! Stopping...");
     return false;
   }
@@ -303,6 +306,14 @@ bool ControlComponent::Proc() {
   const auto &pad_msg = pad_msg_reader_->GetLatestObserved();
   if (pad_msg != nullptr) {
     OnPad(pad_msg);
+  }
+
+  // use control submodules
+  if (FLAGS_use_control_submodules) {
+    local_view_reader_->Observe();
+    const auto &local_view_msg = local_view_reader_->GetLatestObserved();
+    preprocessor_submodule_.Proc(local_view_msg, pad_msg);
+    return true;
   }
 
   // do something according to pad message
