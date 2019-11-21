@@ -33,6 +33,7 @@
 #include "modules/common/util/util.h"
 #include "modules/control/controller/controller_agent.h"
 #include "modules/control/proto/preprocessor.pb.h"
+#include "modules/control/submodules/preprocessor_submodule.h"
 
 /**
  * @namespace apollo::control
@@ -110,10 +111,13 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
   std::shared_ptr<Reader<apollo::localization::LocalizationEstimate>>
       localization_reader_;
   std::shared_ptr<Reader<apollo::planning::ADCTrajectory>> trajectory_reader_;
+  std::shared_ptr<Reader<apollo::control::LocalView>> local_view_reader_;
   std::shared_ptr<Writer<apollo::control::ControlCommand>> control_cmd_writer_;
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
   LocalView local_view_;
+
+  PreprocessorSubmodule preprocessor_submodule_;
 };
 
 CYBER_REGISTER_COMPONENT(ControlComponent)
