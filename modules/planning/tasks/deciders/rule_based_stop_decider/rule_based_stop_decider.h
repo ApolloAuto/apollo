@@ -65,6 +65,7 @@ class RuleBasedStopDecider : public Decider {
                       const common::PathPoint& stop_point);
 
  private:
+  static constexpr char const* const PATH_END_STOP_VO_ID = "PATH_END_STOP";
   RuleBasedStopDeciderConfig rule_based_stop_decider_config_;
   bool is_clear_to_change_lane_ = false;
   bool is_change_lane_planning_succeed_ = false;
