@@ -36,6 +36,12 @@ std::vector<int> SortProtobufMapByKeys(
   if (0 == size) {
     return output;
   }
+  if (field->cpp_type() != google::protobuf::FieldDescriptor::CPPTYPE_MESSAGE) {
+    for (int i = 0; i < size; ++i) {
+      output.emplace_back(i);
+    }
+    return output;
+  }
   const ::google::protobuf::Message& item =
       reflection.GetRepeatedMessage(message, field, 0);
   const ::google::protobuf::FieldDescriptor* item_fd =
