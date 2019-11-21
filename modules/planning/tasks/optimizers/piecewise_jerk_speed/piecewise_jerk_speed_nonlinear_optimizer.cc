@@ -422,11 +422,9 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
     std::vector<double>* acceleration) {
   // Set optimizer instance
   auto ptr_interface = new PiecewiseJerkSpeedNonlinearIpoptInterface(
-      s_init_, s_dot_init_, s_ddot_init_, delta_t_, num_of_knots_, s_ddot_min_,
-      s_ddot_max_, s_dddot_abs_max_);
-  // TODO(Jinyun): refactor state limits interface
-  ptr_interface->set_constant_speed_limit(s_dot_max_);
-  ptr_interface->set_s_max(total_length_);
+      s_init_, s_dot_init_, s_ddot_init_, delta_t_, num_of_knots_,
+      total_length_, s_dot_max_, s_ddot_min_, s_ddot_max_, s_dddot_abs_max_);
+
   ptr_interface->set_safety_bounds(s_bounds_);
 
   // Set weights and reference values
