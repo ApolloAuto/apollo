@@ -39,7 +39,7 @@ class TrafficLight : public TrafficRule {
                      ReferenceLineInfo* const reference_line_info);
 
  private:
-  static constexpr char const* const TRAFFIC_LIGHT_VO_ID_PREFIX = "TL_";
+  static constexpr char const* TRAFFIC_LIGHT_VO_ID_PREFIX = "TL_";
 };
 
 }  // namespace planning

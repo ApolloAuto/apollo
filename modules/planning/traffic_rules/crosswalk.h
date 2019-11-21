@@ -46,7 +46,7 @@ class Crosswalk : public TrafficRule {
                             const double stop_deceleration);
 
  private:
-  static constexpr char const* const CROSSWALK_VO_ID_PREFIX = "CW_";
+  static constexpr char const* CROSSWALK_VO_ID_PREFIX = "CW_";
   std::vector<const hdmap::PathOverlap*> crosswalk_overlaps_;
 };
 

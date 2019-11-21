@@ -42,7 +42,7 @@ class YieldSign : public TrafficRule {
                      ReferenceLineInfo* const reference_line_info);
 
  private:
-  static constexpr char const* const YIELD_SIGN_VO_ID_PREFIX = "YS_";
+  static constexpr char const* YIELD_SIGN_VO_ID_PREFIX = "YS_";
 };
 
 }  // namespace planning
