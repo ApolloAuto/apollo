@@ -16,11 +16,16 @@
 
 #include "modules/planning/common/util/common.h"
 
+#include <algorithm>
+
+#include "modules/map/pnc_map/path.h"
+
 namespace apollo {
 namespace planning {
 namespace util {
 
 using apollo::common::util::WithinBound;
+using apollo::hdmap::HDMapUtil;
 
 /*
  * @brief: build virtual obstacle of stop wall, and add STOP decision
@@ -91,6 +96,18 @@ int BuildStopDecision(const std::string& stop_wall_id,
 
   const auto& reference_line = reference_line_info->reference_line();
 
+  const auto lane =
+      HDMapUtil::BaseMap().GetLaneById(hdmap::MakeMapId(lane_id));
+  if (lane == nullptr) {
+    return -1;
+  }
+  double dest_lane_s = std::max(0.0, lane_s);
+  auto dest_point = lane->GetSmoothPoint(dest_lane_s);
+  if (!reference_line.IsOnLane(dest_point)) {
+    ADEBUG << "stop point is not on lane. SKIP creating DESTINATION";
+    return 0;
+  }
+
   // create virtual stop wall
   const auto* obstacle =
       frame->CreateStopObstacle(stop_wall_id, lane_id, lane_s);
@@ -103,12 +120,6 @@ int BuildStopDecision(const std::string& stop_wall_id,
   if (!stop_wall) {
     AERROR << "Failed to create obstacle for: " << stop_wall_id;
     return -1;
-  }
-
-  const auto& stop_wall_box = stop_wall->PerceptionBoundingBox();
-  if (!reference_line.IsOnLane(stop_wall_box.center())) {
-    ADEBUG << "stop point is not on lane. SKIP STOP decision";
-    return 0;
   }
 
   // build stop decision
