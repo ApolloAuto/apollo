@@ -47,6 +47,16 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::get_nlp_info(
     int &n, int &m, int &nnz_jac_g, int &nnz_h_lag,
     IndexStyleEnum &index_style) {
   num_of_variables_ = num_of_points_ * 3;
+
+  if (use_soft_safety_bound_) {
+    // complementary slack variable for soft upper and lower s bound
+    num_of_variables_ += num_of_points_ * 2;
+
+    lower_s_slack_offset_ = num_of_points_ * 3;
+
+    upper_s_slack_offset_ = num_of_points_ * 4;
+  }
+
   n = num_of_variables_;
 
   // s monotone constraints s_i+1 - s_i >= 0.0
@@ -71,6 +81,15 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::get_nlp_info(
     num_of_constraints_ += num_of_points_;
   }
 
+  if (use_soft_safety_bound_) {
+    // soft safety boundary constraints
+    // s_i - soft_lower_s_i + lower_slack_i >= 0.0
+    num_of_constraints_ += num_of_points_;
+
+    // s_i - soft_upper_s_i - upper_slack_i <= 0.0
+    num_of_constraints_ += num_of_points_;
+  }
+
   m = num_of_constraints_;
 
   nnz_jac_g = 0;
@@ -90,6 +109,15 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::get_nlp_info(
   if (use_v_bound_) {
     // speed limit constraints
     // s_dot_i - v_bound_func_(s_i) <= 0.0
+    nnz_jac_g += num_of_points_ * 2;
+  }
+
+  if (use_soft_safety_bound_) {
+    // soft safety boundary constraints
+    // s_i - soft_lower_s_i + lower_slack_i >= 0.0
+    nnz_jac_g += num_of_points_ * 2;
+
+    // s_i - soft_upper_s_i - upper_slack_i <= 0.0
     nnz_jac_g += num_of_points_ * 2;
   }
 
@@ -131,6 +159,20 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::get_bounds_info(
     x_u[a_offset_ + i] = s_ddot_max_;
   }
 
+  if (use_soft_safety_bound_) {
+    // lower_s_slack
+    for (int i = 0; i < num_of_points_; ++i) {
+      x_l[lower_s_slack_offset_ + i] = 0.0;
+      x_u[lower_s_slack_offset_ + i] = INF;
+    }
+
+    // upper_s_slack
+    for (int i = 0; i < num_of_points_; ++i) {
+      x_l[upper_s_slack_offset_ + i] = 0.0;
+      x_u[upper_s_slack_offset_ + i] = INF;
+    }
+  }
+
   // bounds for constraints
   // s monotone constraints s_i+1 - s_i
   for (int i = 0; i + 1 < num_of_points_; ++i) {
@@ -149,7 +191,7 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::get_bounds_info(
   // position equality constraints,
   // s_i+1 - s_i - s_dot_i * delta_t - 1/3 * s_ddot_i * delta_t^2 - 1/6 *
   // s_ddot_i+1 * delta_t^2
-  offset = offset + num_of_points_ - 1;
+  offset += num_of_points_ - 1;
   for (int i = 0; i + 1 < num_of_points_; ++i) {
     g_l[offset + i] = 0.0;
     g_u[offset + i] = 0.0;
@@ -158,7 +200,7 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::get_bounds_info(
   // velocity equality constraints,
   // s_dot_i+1 - s_dot_i - 0.5 * delta_t * s_ddot_i - 0.5 * delta_t *
   // s_ddot_i+1
-  offset = offset + num_of_points_ - 1;
+  offset += num_of_points_ - 1;
   for (int i = 0; i + 1 < num_of_points_; ++i) {
     g_l[offset + i] = 0.0;
     g_u[offset + i] = 0.0;
@@ -167,7 +209,24 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::get_bounds_info(
   if (use_v_bound_) {
     // speed limit constraints
     // s_dot_i - v_bound_func_(s_i) <= 0.0
-    offset = offset + num_of_points_ - 1;
+    offset += num_of_points_ - 1;
+    for (int i = 0; i < num_of_points_; ++i) {
+      g_l[offset + i] = -INF;
+      g_u[offset + i] = 0.0;
+    }
+  }
+
+  if (use_soft_safety_bound_) {
+    // soft_s_bound constraints
+    // s_i - soft_lower_s_i + lower_slack_i >= 0.0
+    offset += num_of_points_;
+    for (int i = 0; i < num_of_points_; ++i) {
+      g_l[offset + i] = 0.0;
+      g_u[offset + i] = INF;
+    }
+
+    // s_i - soft_upper_s_i - upper_slack_i <= 0.0
+    offset += num_of_points_;
     for (int i = 0; i < num_of_points_; ++i) {
       g_l[offset + i] = -INF;
       g_u[offset + i] = 0.0;
@@ -186,8 +245,16 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::get_starting_point(
       x[v_offset_ + i] = x_warm_start_[i][1];
       x[a_offset_ + i] = x_warm_start_[i][2];
     }
-    return true;
   }
+
+  if (use_soft_safety_bound_) {
+    for (int i = 0; i < num_of_points_; ++i) {
+      x[lower_s_slack_offset_ + i] = 0.0;
+      x[upper_s_slack_offset_ + i] = 0.0;
+    }
+  }
+
+  return true;
 
   // TODO(Jinyun): Implement better default warm start based on safety_bounds
   for (int i = 0; i < num_of_points_; ++i) {
@@ -204,6 +271,13 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::get_starting_point(
     x[a_offset_ + i] = 0.0;
   }
   x[a_offset_] = s_ddot_init_;
+
+  if (use_soft_safety_bound_) {
+    for (int i = 0; i < num_of_points_; ++i) {
+      x[lower_s_slack_offset_ + i] = 0.0;
+      x[upper_s_slack_offset_ + i] = 0.0;
+    }
+  }
 
   return true;
 }
@@ -254,6 +328,13 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_f(int n, const double *x,
 
     double a_diff = x[a_offset_ + num_of_points_ - 1] - a_target_;
     obj_value += a_diff * a_diff * w_target_a_;
+  }
+
+  if (use_soft_safety_bound_) {
+    for (int i = 0; i < num_of_points_; ++i) {
+      obj_value += x[lower_s_slack_offset_ + i] * w_soft_s_bound_;
+      obj_value += x[upper_s_slack_offset_ + i] * w_soft_s_bound_;
+    }
   }
 
   return true;
@@ -320,16 +401,27 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_grad_f(int n,
     grad_f[a_offset_ + num_of_points_ - 1] += 2.0 * a_diff * w_target_a_;
   }
 
+  if (use_soft_safety_bound_) {
+    for (int i = 0; i < num_of_points_; ++i) {
+      grad_f[lower_s_slack_offset_ + i] += w_soft_s_bound_;
+      grad_f[upper_s_slack_offset_ + i] += w_soft_s_bound_;
+    }
+  }
+
   return true;
 }
 
 bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_g(int n, const double *x,
                                                        bool new_x, int m,
                                                        double *g) {
+  int offset = 0;
+
   // s monotone constraints s_i+1 - s_i
   for (int i = 0; i + 1 < num_of_points_; ++i) {
-    g[i] = x[i + 1] - x[i];
+    g[i] = x[offset + i + 1] - x[i];
   }
+
+  offset += num_of_points_ - 1;
 
   // jerk bound constraint, |s_ddot_i+1 - s_ddot_i| <= s_dddot_max
   // position equality constraints,
@@ -337,7 +429,7 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_g(int n, const double *x,
   // s_ddot_i+1 * delta_t^2
   // velocity equality constraints
   // s_dot_i+1 - s_dot_i - 0.5 * delta_t * (s_ddot_i + s_ddot_i+1)
-  int coffset_jerk = num_of_points_ - 1;
+  int coffset_jerk = offset;
   int coffset_position = coffset_jerk + num_of_points_ - 1;
   int coffset_velocity = coffset_position + num_of_points_ - 1;
 
@@ -363,15 +455,43 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_g(int n, const double *x,
     g[coffset_velocity + i] = v1 - (v0 + a0 * t + 0.5 * j * t2);
   }
 
+  offset += 3 * (num_of_points_ - 1);
+
   if (use_v_bound_) {
     // speed limit constraints
+    int coffset_speed_limit = offset;
     // s_dot_i - v_bound_func_(s_i) <= 0.0
-    int coffset_speedlimit = coffset_velocity + num_of_points_ - 1;
     for (int i = 0; i < num_of_points_; ++i) {
       double s = x[i];
       double s_dot = x[v_offset_ + i];
-      g[coffset_speedlimit + i] = s_dot - v_bound_func_.Evaluate(0, s);
+      g[coffset_speed_limit + i] = s_dot - v_bound_func_.Evaluate(0, s);
     }
+
+    offset += num_of_points_;
+  }
+
+  if (use_soft_safety_bound_) {
+    // soft safety boundary constraints
+    int coffset_soft_lower_s = offset;
+    // s_i - soft_lower_s_i + lower_slack_i >= 0.0
+    for (int i = 0; i < num_of_points_; ++i) {
+      double s = x[i];
+      double lower_s_slack = x[lower_s_slack_offset_ + i];
+      g[coffset_soft_lower_s + i] =
+          s - soft_safety_bounds_[i].first + lower_s_slack;
+    }
+    offset += num_of_points_;
+
+    int coffset_soft_upper_s = offset;
+    // s_i - soft_upper_s_i - upper_slack_i <= 0.0
+    for (int i = 0; i < num_of_points_; ++i) {
+      double s = x[i];
+      double upper_s_slack = x[upper_s_slack_offset_ + i];
+      g[coffset_soft_upper_s + i] =
+          s - soft_safety_bounds_[i].second - upper_s_slack;
+    }
+
+    offset += num_of_points_;
   }
 
   return true;
@@ -380,10 +500,6 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_g(int n, const double *x,
 bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_jac_g(
     int n, const double *x, bool new_x, int m, int nele_jac, int *iRow,
     int *jCol, double *values) {
-  int s_offset = 0;
-  int v_offset = num_of_points_;
-  int a_offset = 2 * num_of_points_;
-
   if (values == nullptr) {
     int non_zero_index = 0;
     int constraint_index = 0;
@@ -392,12 +508,12 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_jac_g(
     for (int i = 0; i + 1 < num_of_points_; ++i) {
       // s_i
       iRow[non_zero_index] = constraint_index;
-      jCol[non_zero_index] = s_offset + i;
+      jCol[non_zero_index] = i;
       non_zero_index++;
 
       // s_i+1
       iRow[non_zero_index] = constraint_index;
-      jCol[non_zero_index] = s_offset + i + 1;
+      jCol[non_zero_index] = i + 1;
       non_zero_index++;
 
       constraint_index++;
@@ -407,12 +523,12 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_jac_g(
     for (int i = 0; i + 1 < num_of_points_; ++i) {
       // a_i
       iRow[non_zero_index] = constraint_index;
-      jCol[non_zero_index] = a_offset + i;
+      jCol[non_zero_index] = a_offset_ + i;
       non_zero_index++;
 
       // a_i+1
       iRow[non_zero_index] = constraint_index;
-      jCol[non_zero_index] = a_offset + i + 1;
+      jCol[non_zero_index] = a_offset_ + i + 1;
       non_zero_index++;
 
       constraint_index++;
@@ -422,27 +538,27 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_jac_g(
     for (int i = 0; i + 1 < num_of_points_; ++i) {
       // s_i
       iRow[non_zero_index] = constraint_index;
-      jCol[non_zero_index] = s_offset + i;
+      jCol[non_zero_index] = i;
       non_zero_index++;
 
       // v_i
       iRow[non_zero_index] = constraint_index;
-      jCol[non_zero_index] = v_offset + i;
+      jCol[non_zero_index] = v_offset_ + i;
       non_zero_index++;
 
       // a_i
       iRow[non_zero_index] = constraint_index;
-      jCol[non_zero_index] = a_offset + i;
+      jCol[non_zero_index] = a_offset_ + i;
       non_zero_index++;
 
       // s_i+1
       iRow[non_zero_index] = constraint_index;
-      jCol[non_zero_index] = s_offset + i + 1;
+      jCol[non_zero_index] = i + 1;
       non_zero_index++;
 
       // a_i+1
       iRow[non_zero_index] = constraint_index;
-      jCol[non_zero_index] = a_offset + i + 1;
+      jCol[non_zero_index] = a_offset_ + i + 1;
       non_zero_index++;
 
       constraint_index++;
@@ -452,22 +568,22 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_jac_g(
     for (int i = 0; i + 1 < num_of_points_; ++i) {
       // v_i
       iRow[non_zero_index] = constraint_index;
-      jCol[non_zero_index] = v_offset + i;
+      jCol[non_zero_index] = v_offset_ + i;
       non_zero_index++;
 
       // a_i
       iRow[non_zero_index] = constraint_index;
-      jCol[non_zero_index] = a_offset + i;
+      jCol[non_zero_index] = a_offset_ + i;
       non_zero_index++;
 
       // v_i+1
       iRow[non_zero_index] = constraint_index;
-      jCol[non_zero_index] = v_offset + i + 1;
+      jCol[non_zero_index] = v_offset_ + i + 1;
       non_zero_index++;
 
       // a_i+1
       iRow[non_zero_index] = constraint_index;
-      jCol[non_zero_index] = a_offset + i + 1;
+      jCol[non_zero_index] = a_offset_ + i + 1;
       non_zero_index++;
 
       constraint_index++;
@@ -479,17 +595,51 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_jac_g(
       for (int i = 0; i < num_of_points_; ++i) {
         // s_i
         iRow[non_zero_index] = constraint_index;
-        jCol[non_zero_index] = s_offset + i;
+        jCol[non_zero_index] = i;
         non_zero_index++;
 
         // v_i
         iRow[non_zero_index] = constraint_index;
-        jCol[non_zero_index] = v_offset + i;
+        jCol[non_zero_index] = v_offset_ + i;
         non_zero_index++;
 
         constraint_index++;
       }
     }
+
+    if (use_soft_safety_bound_) {
+      // soft_s_bound constraints
+      // s_i - soft_lower_s_i + lower_slack_i >= 0.0
+      for (int i = 0; i < num_of_points_; ++i) {
+        // s_i
+        iRow[non_zero_index] = constraint_index;
+        jCol[non_zero_index] = i;
+        non_zero_index++;
+
+        // lower_slack_i
+        iRow[non_zero_index] = constraint_index;
+        jCol[non_zero_index] = lower_s_slack_offset_ + i;
+        non_zero_index++;
+
+        constraint_index++;
+      }
+      // s_i - soft_upper_s_i - upper_slack_i <= 0.0
+
+      for (int i = 0; i < num_of_points_; ++i) {
+        // s_i
+        iRow[non_zero_index] = constraint_index;
+        jCol[non_zero_index] = i;
+        non_zero_index++;
+
+        // upper_slack_i
+        iRow[non_zero_index] = constraint_index;
+        jCol[non_zero_index] = upper_s_slack_offset_ + i;
+        non_zero_index++;
+
+        constraint_index++;
+      }
+    }
+
   } else {
     int non_zero_index = 0;
     // s monotone constraints s_i+1 - s_i
@@ -561,12 +711,37 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_jac_g(
       // s_dot_i - v_bound_func_(s_i) <= 0.0
       for (int i = 0; i < num_of_points_; ++i) {
         // s_i
-        double s = x[s_offset + i];
+        double s = x[i];
         values[non_zero_index] = -1.0 * v_bound_func_.Evaluate(1, s);
         non_zero_index++;
 
         // v_i
         values[non_zero_index] = 1.0;
+        non_zero_index++;
+      }
+    }
+
+    if (use_soft_safety_bound_) {
+      // soft_s_bound constraints
+      // s_i - soft_lower_s_i + lower_slack_i >= 0.0
+      for (int i = 0; i < num_of_points_; ++i) {
+        // s_i
+        values[non_zero_index] = 1.0;
+        non_zero_index++;
+
+        // lower_slack_i
+        values[non_zero_index] = 1.0;
+        non_zero_index++;
+      }
+
+      // s_i - soft_upper_s_i - upper_slack_i <= 0.0
+      for (int i = 0; i < num_of_points_; ++i) {
+        // s_i
+        values[non_zero_index] = 1.0;
+        non_zero_index++;
+
+        // upper_slack_i
+        values[non_zero_index] = -1.0;
         non_zero_index++;
       }
     }
@@ -748,12 +923,10 @@ void PiecewiseJerkSpeedNonlinearIpoptInterface::finalize_solution(
   opt_v_.clear();
   opt_a_.clear();
 
-  int v_offset = num_of_points_;
-  int a_offset = 2 * num_of_points_;
   for (int i = 0; i < num_of_points_; ++i) {
     auto s = x[i];
-    auto v = x[v_offset + i];
-    auto a = x[a_offset + i];
+    auto v = x[v_offset_ + i];
+    auto a = x[a_offset_ + i];
 
     opt_s_.push_back(s);
     opt_v_.push_back(v);
@@ -785,6 +958,12 @@ void PiecewiseJerkSpeedNonlinearIpoptInterface::set_reference_speed(
 void PiecewiseJerkSpeedNonlinearIpoptInterface::set_safety_bounds(
     const std::vector<std::pair<double, double>> &safety_bounds) {
   safety_bounds_ = safety_bounds;
+}
+
+void PiecewiseJerkSpeedNonlinearIpoptInterface::set_soft_safety_bounds(
+    const std::vector<std::pair<double, double>> &soft_safety_bounds) {
+  soft_safety_bounds_ = soft_safety_bounds;
+  use_soft_safety_bound_ = true;
 }
 
 void PiecewiseJerkSpeedNonlinearIpoptInterface::set_s_max(const double s_max) {
@@ -834,6 +1013,11 @@ void PiecewiseJerkSpeedNonlinearIpoptInterface::set_w_reference_speed(
 void PiecewiseJerkSpeedNonlinearIpoptInterface::
     set_w_reference_spatial_distance(const double w_ref_s) {
   w_ref_s_ = w_ref_s;
+}
+
+void PiecewiseJerkSpeedNonlinearIpoptInterface::set_w_soft_s_bound(
+    const double w_soft_s_bound) {
+  w_soft_s_bound_ = w_soft_s_bound;
 }
 
 void PiecewiseJerkSpeedNonlinearIpoptInterface::set_warm_start(
