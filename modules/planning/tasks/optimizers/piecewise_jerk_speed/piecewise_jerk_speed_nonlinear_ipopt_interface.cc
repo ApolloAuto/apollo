@@ -929,13 +929,55 @@ void PiecewiseJerkSpeedNonlinearIpoptInterface::finalize_solution(
   opt_a_.clear();
 
   for (int i = 0; i < num_of_points_; ++i) {
-    auto s = x[i];
-    auto v = x[v_offset_ + i];
-    auto a = x[a_offset_ + i];
+    double s = x[i];
+    double v = x[v_offset_ + i];
+    double a = x[a_offset_ + i];
 
     opt_s_.push_back(s);
     opt_v_.push_back(v);
     opt_a_.push_back(a);
+  }
+
+  if (use_soft_safety_bound_) {
+    // statistic analysis on soft bound intrusion by inspecting slack variable
+    double lower_s_mean_intrusion = 0.0;
+    double lower_s_highest_intrusion = -std::numeric_limits<double>::infinity();
+    int lower_s_highest_intrustion_index = 0.0;
+    double upper_s_mean_intrusion = 0.0;
+    double upper_s_highest_intrusion = -std::numeric_limits<double>::infinity();
+    int upper_s_highest_intrustion_index = 0.0;
+
+    for (int i = 0; i < num_of_points_; ++i) {
+      double lower_s_slack = x[lower_s_slack_offset_ + i];
+      double upper_s_slack = x[upper_s_slack_offset_ + i];
+
+      lower_s_mean_intrusion += lower_s_slack;
+      upper_s_mean_intrusion += upper_s_slack;
+
+      if (lower_s_highest_intrusion < lower_s_slack) {
+        lower_s_highest_intrusion = lower_s_slack;
+        lower_s_highest_intrustion_index = i;
+      }
+
+      if (upper_s_highest_intrusion < upper_s_slack) {
+        upper_s_highest_intrusion = upper_s_slack;
+        upper_s_highest_intrustion_index = i;
+      }
+    }
+
+    lower_s_mean_intrusion /= static_cast<double>(num_of_points_);
+    upper_s_mean_intrusion /= static_cast<double>(num_of_points_);
+
+    ADEBUG << "lower soft s boundary average intrustion is ["
+           << lower_s_mean_intrusion << "] with highest value of ["
+           << lower_s_highest_intrusion << "] at time ["
+           << delta_t_ * static_cast<double>(lower_s_highest_intrustion_index)
+           << "].";
+    ADEBUG << "upper soft s boundary average intrustion is ["
+           << upper_s_mean_intrusion << "] with highest value of ["
+           << upper_s_highest_intrusion << "] at time ["
+           << delta_t_ * static_cast<double>(upper_s_highest_intrustion_index)
+           << "].";
   }
 }
 
