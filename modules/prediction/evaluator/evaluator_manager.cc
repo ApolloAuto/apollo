@@ -138,12 +138,6 @@ void EvaluatorManager::Init(const PredictionConf& config) {
             } else {
               vehicle_on_lane_evaluator_ = obstacle_conf.evaluator_type();
             }
-            // TODO(all): delete this offline hack when ready
-            if (FLAGS_prediction_offline_mode ==
-                PredictionConstants::kDumpDataForLearning) {
-              vehicle_on_lane_evaluator_ =
-                  ObstacleConf::LANE_SCANNING_EVALUATOR;
-            }
           }
           if (obstacle_conf.obstacle_status() == ObstacleConf::IN_JUNCTION) {
             if (obstacle_conf.priority_type() == ObstaclePriority::CAUTION) {
@@ -151,11 +145,6 @@ void EvaluatorManager::Init(const PredictionConf& config) {
                   obstacle_conf.evaluator_type();
             } else {
               vehicle_in_junction_evaluator_ = obstacle_conf.evaluator_type();
-            }
-            if (FLAGS_prediction_offline_mode ==
-                PredictionConstants::kDumpDataForLearning) {
-              vehicle_in_junction_evaluator_ =
-                  ObstacleConf::LANE_SCANNING_EVALUATOR;
             }
           }
           break;
