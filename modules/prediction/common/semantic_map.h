@@ -101,7 +101,7 @@ class SemanticMap {
 
   std::future<void> task_future_;
 
-  bool base_img_drawn_ = false;
+  bool started_drawing_ = false;
 
   DECLARE_SINGLETON(SemanticMap)
 };
