@@ -515,14 +515,14 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_jac_g(
       // s_i
       iRow[non_zero_index] = constraint_index;
       jCol[non_zero_index] = i;
-      non_zero_index++;
+      ++non_zero_index;
 
       // s_i+1
       iRow[non_zero_index] = constraint_index;
       jCol[non_zero_index] = i + 1;
-      non_zero_index++;
+      ++non_zero_index;
 
-      constraint_index++;
+      ++constraint_index;
     }
 
     // jerk bound constraint, |s_ddot_i+1 - s_ddot_i| / delta_t <= s_dddot_max
@@ -530,14 +530,14 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_jac_g(
       // a_i
       iRow[non_zero_index] = constraint_index;
       jCol[non_zero_index] = a_offset_ + i;
-      non_zero_index++;
+      ++non_zero_index;
 
       // a_i+1
       iRow[non_zero_index] = constraint_index;
       jCol[non_zero_index] = a_offset_ + i + 1;
-      non_zero_index++;
+      ++non_zero_index;
 
-      constraint_index++;
+      ++constraint_index;
     }
 
     // position equality constraints
@@ -545,29 +545,29 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_jac_g(
       // s_i
       iRow[non_zero_index] = constraint_index;
       jCol[non_zero_index] = i;
-      non_zero_index++;
+      ++non_zero_index;
 
       // v_i
       iRow[non_zero_index] = constraint_index;
       jCol[non_zero_index] = v_offset_ + i;
-      non_zero_index++;
+      ++non_zero_index;
 
       // a_i
       iRow[non_zero_index] = constraint_index;
       jCol[non_zero_index] = a_offset_ + i;
-      non_zero_index++;
+      ++non_zero_index;
 
       // s_i+1
       iRow[non_zero_index] = constraint_index;
       jCol[non_zero_index] = i + 1;
-      non_zero_index++;
+      ++non_zero_index;
 
       // a_i+1
       iRow[non_zero_index] = constraint_index;
       jCol[non_zero_index] = a_offset_ + i + 1;
-      non_zero_index++;
+      ++non_zero_index;
 
-      constraint_index++;
+      ++constraint_index;
     }
 
     // velocity equality constraints
@@ -575,24 +575,24 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_jac_g(
       // v_i
       iRow[non_zero_index] = constraint_index;
       jCol[non_zero_index] = v_offset_ + i;
-      non_zero_index++;
+      ++non_zero_index;
 
       // a_i
       iRow[non_zero_index] = constraint_index;
       jCol[non_zero_index] = a_offset_ + i;
-      non_zero_index++;
+      ++non_zero_index;
 
       // v_i+1
       iRow[non_zero_index] = constraint_index;
       jCol[non_zero_index] = v_offset_ + i + 1;
-      non_zero_index++;
+      ++non_zero_index;
 
       // a_i+1
       iRow[non_zero_index] = constraint_index;
       jCol[non_zero_index] = a_offset_ + i + 1;
-      non_zero_index++;
+      ++non_zero_index;
 
-      constraint_index++;
+      ++constraint_index;
     }
 
     if (use_v_bound_) {
@@ -602,14 +602,14 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_jac_g(
         // s_i
         iRow[non_zero_index] = constraint_index;
         jCol[non_zero_index] = i;
-        non_zero_index++;
+        ++non_zero_index;
 
         // v_i
         iRow[non_zero_index] = constraint_index;
         jCol[non_zero_index] = v_offset_ + i;
-        non_zero_index++;
+        ++non_zero_index;
 
-        constraint_index++;
+        ++constraint_index;
       }
     }
 
@@ -620,14 +620,14 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_jac_g(
         // s_i
         iRow[non_zero_index] = constraint_index;
         jCol[non_zero_index] = i;
-        non_zero_index++;
+        ++non_zero_index;
 
         // lower_slack_i
         iRow[non_zero_index] = constraint_index;
         jCol[non_zero_index] = lower_s_slack_offset_ + i;
-        non_zero_index++;
+        ++non_zero_index;
 
-        constraint_index++;
+        ++constraint_index;
       }
       // s_i - soft_upper_s_i - upper_slack_i <= 0.0
 
@@ -635,14 +635,14 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_jac_g(
         // s_i
         iRow[non_zero_index] = constraint_index;
         jCol[non_zero_index] = i;
-        non_zero_index++;
+        ++non_zero_index;
 
         // upper_slack_i
         iRow[non_zero_index] = constraint_index;
         jCol[non_zero_index] = upper_s_slack_offset_ + i;
-        non_zero_index++;
+        ++non_zero_index;
 
-        constraint_index++;
+        ++constraint_index;
       }
     }
 
@@ -652,64 +652,64 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_jac_g(
     for (int i = 0; i + 1 < num_of_points_; ++i) {
       // s_i
       values[non_zero_index] = -1.0;
-      non_zero_index++;
+      ++non_zero_index;
 
       // s_i+1
       values[non_zero_index] = 1.0;
-      non_zero_index++;
+      ++non_zero_index;
     }
 
     // jerk bound constraint, |s_ddot_i+1 - s_ddot_i| / delta_t <= s_dddot_max
     for (int i = 0; i + 1 < num_of_points_; ++i) {
       // a_i
       values[non_zero_index] = -1.0 / delta_t_;
-      non_zero_index++;
+      ++non_zero_index;
 
       // a_i+1
       values[non_zero_index] = 1.0 / delta_t_;
-      non_zero_index++;
+      ++non_zero_index;
     }
 
     // position equality constraints
     for (int i = 0; i + 1 < num_of_points_; ++i) {
       // s_i
       values[non_zero_index] = -1.0;
-      non_zero_index++;
+      ++non_zero_index;
 
       // v_i
       values[non_zero_index] = -delta_t_;
-      non_zero_index++;
+      ++non_zero_index;
 
       // a_i
       values[non_zero_index] = -1.0 / 3.0 * delta_t_ * delta_t_;
-      non_zero_index++;
+      ++non_zero_index;
 
       // s_i+1
       values[non_zero_index] = 1.0;
-      non_zero_index++;
+      ++non_zero_index;
 
       // a_i+1
       values[non_zero_index] = -1.0 / 6.0 * delta_t_ * delta_t_;
-      non_zero_index++;
+      ++non_zero_index;
     }
 
     // velocity equality constraints
     for (int i = 0; i + 1 < num_of_points_; ++i) {
       // v_i
       values[non_zero_index] = -1.0;
-      non_zero_index++;
+      ++non_zero_index;
 
       // a_i
       values[non_zero_index] = -0.5 * delta_t_;
-      non_zero_index++;
+      ++non_zero_index;
 
       // v_i+1
       values[non_zero_index] = 1.0;
-      non_zero_index++;
+      ++non_zero_index;
 
       // a_i+1
       values[non_zero_index] = -0.5 * delta_t_;
-      non_zero_index++;
+      ++non_zero_index;
     }
 
     if (use_v_bound_) {
@@ -719,11 +719,11 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_jac_g(
         // s_i
         double s = x[i];
         values[non_zero_index] = -1.0 * v_bound_func_.Evaluate(1, s);
-        non_zero_index++;
+        ++non_zero_index;
 
         // v_i
         values[non_zero_index] = 1.0;
-        non_zero_index++;
+        ++non_zero_index;
       }
     }
 
@@ -733,22 +733,22 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_jac_g(
       for (int i = 0; i < num_of_points_; ++i) {
         // s_i
         values[non_zero_index] = 1.0;
-        non_zero_index++;
+        ++non_zero_index;
 
         // lower_slack_i
         values[non_zero_index] = 1.0;
-        non_zero_index++;
+        ++non_zero_index;
       }
 
       // s_i - soft_upper_s_i - upper_slack_i <= 0.0
       for (int i = 0; i < num_of_points_; ++i) {
         // s_i
         values[non_zero_index] = 1.0;
-        non_zero_index++;
+        ++non_zero_index;
 
         // upper_slack_i
         values[non_zero_index] = -1.0;
-        non_zero_index++;
+        ++non_zero_index;
       }
     }
   }
@@ -764,31 +764,31 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_h(
     for (int i = 0; i < num_of_points_; ++i) {
       iRow[nz_index] = i;
       jCol[nz_index] = i;
-      nz_index++;
+      ++nz_index;
     }
 
     for (int i = 0; i < num_of_points_; ++i) {
       iRow[nz_index] = i;
       jCol[nz_index] = v_offset_ + i;
-      nz_index++;
+      ++nz_index;
     }
 
     for (int i = 0; i < num_of_points_; ++i) {
       iRow[nz_index] = v_offset_ + i;
       jCol[nz_index] = v_offset_ + i;
-      nz_index++;
+      ++nz_index;
     }
 
     for (int i = 0; i < num_of_points_; ++i) {
       iRow[nz_index] = a_offset_ + i;
       jCol[nz_index] = a_offset_ + i;
-      nz_index++;
+      ++nz_index;
     }
 
     for (int i = 0; i + 1 < num_of_points_; ++i) {
       iRow[nz_index] = a_offset_ + i;
       jCol[nz_index] = a_offset_ + i + 1;
-      nz_index++;
+      ++nz_index;
     }
 
     for (int i = 0; i < nz_index; ++i) {
