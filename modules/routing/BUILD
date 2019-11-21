@@ -14,6 +14,7 @@ cc_library(
     deps = [
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
+        "//modules/common/util:point_factory",
         "//modules/map/hdmap:hdmap_util",
         "//modules/routing/core",
     ],

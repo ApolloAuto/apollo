@@ -25,11 +25,12 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+#include "modules/common/util/point_factory.h"
 #include "modules/planning/common/planning_gflags.h"
 
 using apollo::common::PathPoint;
 using apollo::common::Status;
-using apollo::common::util::MakePathPoint;
+using apollo::common::util::PointFactory;
 using apollo::perception::PerceptionObstacle;
 using apollo::prediction::ObstaclePriority;
 
@@ -37,9 +38,7 @@ namespace apollo {
 namespace planning {
 
 static PathPoint GenPathPoint(double s, double kappa = 0.0) {
-  auto path_point = MakePathPoint(s, 0.0, 0.0, 0.0, kappa, 0.0, 0.0);
-  path_point.set_s(s);
-  return path_point;
+  return PointFactory::ToPathPoint(s, 0.0, 0.0, s, 0.0, kappa);
 }
 
 TEST(NaviSpeedDeciderTest, CreateSpeedData) {

@@ -25,6 +25,7 @@
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/cartesian_frenet_conversion.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/ego_info.h"
@@ -141,7 +142,8 @@ bool WaypointSampler::SamplePathWaypoints(
     std::vector<common::SLPoint> level_points;
     planning_internal::SampleLayerDebug sample_layer_debug;
     for (size_t j = 0; j < sample_l.size(); ++j) {
-      common::SLPoint sl = common::util::MakeSLPoint(s, sample_l[j]);
+      common::SLPoint sl =
+          common::util::PointFactory::ToSLPoint(s, sample_l[j]);
       sample_layer_debug.add_sl_point()->CopyFrom(sl);
       level_points.push_back(std::move(sl));
     }

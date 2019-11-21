@@ -57,6 +57,12 @@ Status LaneChangeDecider::Process(
                           ->mutable_change_lane();
   double now = Clock::NowInSeconds();
 
+  prev_status->set_is_clear_to_change_lane(false);
+  if (current_reference_line_info->IsChangeLanePath()) {
+    prev_status->set_is_clear_to_change_lane(
+        IsClearToChangeLane(current_reference_line_info));
+  }
+
   if (!prev_status->has_status()) {
     UpdateStatus(now, ChangeLaneStatus::CHANGE_LANE_FINISHED,
                  GetCurrentPathId(*reference_line_info));

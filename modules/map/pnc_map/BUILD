@@ -79,6 +79,7 @@ cc_library(
     deps = [
         ":path",
         ":route_segments",
+        "//modules/common/util:point_factory",
         "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/map/hdmap",
         "//modules/planning/common:planning_gflags",

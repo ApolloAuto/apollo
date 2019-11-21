@@ -22,6 +22,7 @@
 
 #include <utility>
 
+#include "modules/common/util/point_factory.h"
 #include "modules/planning/common/planning_context.h"
 
 namespace apollo {
@@ -1021,8 +1022,7 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
     return false;
   }
 
-  auto point = common::util::MakePointENU(
-      vehicle_state_.x(), vehicle_state_.y(), vehicle_state_.z());
+  auto point = common::util::PointFactory::ToPointENU(vehicle_state_);
   LaneInfoConstPtr nearest_lane;
   double vehicle_lane_s = 0.0;
   double vehicle_lane_l = 0.0;
@@ -1500,7 +1500,8 @@ bool OpenSpaceRoiDecider::IsInParkingLot(
   std::vector<ParkingSpaceInfoConstPtr> parking_lots;
   // make sure there is only one parking lot in search range
   const double kDistance = 1.0;
-  auto adc_parking_spot = common::util::MakePointENU(adc_init_x, adc_init_y, 0);
+  auto adc_parking_spot =
+      common::util::PointFactory::ToPointENU(adc_init_x, adc_init_y, 0);
   ADEBUG << "IsInParkingLot";
   ADEBUG << hdmap_;
   ADEBUG << hdmap_->GetParkingSpaces(adc_parking_spot, kDistance,

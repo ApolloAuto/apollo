@@ -166,8 +166,7 @@ T Clamp(const T value, T bound1, T bound2) {
 // Gaussian
 double Gaussian(const double u, const double std, const double x);
 
-// Sigmoid
-double Sigmoid(const double x);
+inline double Sigmoid(const double x) { return 1.0 / (1.0 + std::exp(-x)); }
 
 // Rotate a 2d vector counter-clockwise by theta
 Eigen::Vector2d RotateVector2d(const Eigen::Vector2d &v_in, const double theta);

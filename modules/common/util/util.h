@@ -30,8 +30,6 @@
 #include <vector>
 
 #include "absl/memory/memory.h"
-#include "google/protobuf/util/message_differencer.h"
-
 #include "cyber/common/log.h"
 #include "cyber/common/types.h"
 #include "modules/common/math/vec2d.h"
@@ -76,31 +74,7 @@ bool WithinBound(T start, T end, T value) {
   return value >= start && value <= end;
 }
 
-/**
- * @brief create a SL point
- * @param s the s value
- * @param l the l value
- * @return a SLPoint instance
- */
-SLPoint MakeSLPoint(const double s, const double l);
-
-template <typename T>
-common::math::Vec2d MakeVec2d(const T& t) {
-  return common::math::Vec2d(t.x(), t.y());
-}
-
-PointENU MakePointENU(const double x, const double y, const double z);
-
 PointENU operator+(const PointENU enu, const math::Vec2d& xy);
-
-PointENU MakePointENU(const math::Vec2d& xy);
-
-SpeedPoint MakeSpeedPoint(const double s, const double t, const double v,
-                          const double a, const double da);
-
-PathPoint MakePathPoint(const double x, const double y, const double z,
-                        const double theta, const double kappa,
-                        const double dkappa, const double ddkappa);
 
 /**
  * uniformly slice a segment [start, end] to num + 1 pieces

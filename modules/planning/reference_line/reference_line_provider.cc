@@ -30,6 +30,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
@@ -455,7 +456,7 @@ bool ReferenceLineProvider::GetNearestWayPointFromNavigationPath(
   const double kMaxDistance = 10.0;
   waypoint->lane = nullptr;
   std::vector<hdmap::LaneInfoConstPtr> lanes;
-  auto point = common::util::MakePointENU(state.x(), state.y(), state.z());
+  auto point = common::util::PointFactory::ToPointENU(state);
   if (std::isnan(point.x()) || std::isnan(point.y())) {
     AERROR << "vehicle state is invalid";
     return false;

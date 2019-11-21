@@ -28,7 +28,7 @@
 
 #include "absl/strings/str_cat.h"
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/util/util.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/path_boundary.h"
 #include "modules/planning/common/planning_context.h"
@@ -735,7 +735,8 @@ bool PathBoundsDecider::SearchPullOverPosition(
       hdmap::LaneInfoConstPtr lane;
       double s = 0.0;
       double l = 0.0;
-      auto point = common::util::MakePointENU(pull_over_x, pull_over_y, 0.0);
+      auto point =
+          common::util::PointFactory::ToPointENU(pull_over_x, pull_over_y);
       if (HDMapUtil::BaseMap().GetNearestLaneWithHeading(
               point, 5.0, pull_over_theta, M_PI_2, &lane, &s, &l) == 0) {
         pull_over_theta = lane->Heading(s);
@@ -1184,6 +1185,11 @@ void PathBoundsDecider::GetBoundaryFromLaneChangeForbiddenZone(
   auto* lane_change_status = PlanningContext::Instance()
                                  ->mutable_planning_status()
                                  ->mutable_change_lane();
+  if (lane_change_status->is_clear_to_change_lane()) {
+    ADEBUG << "Current position is clear to change lane. No need prep s.";
+    lane_change_status->set_exist_lane_change_start_position(false);
+    return;
+  }
   double lane_change_start_s = 0.0;
   if (lane_change_status->exist_lane_change_start_position()) {
     common::SLPoint point_sl;

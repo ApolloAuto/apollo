@@ -209,7 +209,8 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
   // Set s_dddot boundary
   // TODO(Jinyun): allow the setting of jerk_lower_bound and move jerk config to
   // a better place
-  s_dddot_abs_max_ = FLAGS_longitudinal_jerk_upper_bound;
+  s_dddot_min_ = -std::abs(FLAGS_longitudinal_jerk_lower_bound);
+  s_dddot_max_ = FLAGS_longitudinal_jerk_upper_bound;
 
   // Set s boundary
   s_bounds_.clear();
@@ -381,8 +382,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByQP(
       0.0, std::fmax(FLAGS_planning_upper_speed_limit, init_states[1]));
   // TODO(Hongyi): delete this when ready to use vehicle_params
   piecewise_jerk_problem.set_ddx_bounds(-4.0, 2.0);
-  piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_lower_bound,
-                                        FLAGS_longitudinal_jerk_upper_bound);
+  piecewise_jerk_problem.set_dddx_bound(s_dddot_min_, s_dddot_max_);
   piecewise_jerk_problem.set_x_bounds(s_bounds_);
 
   // TODO(Jinyun): parameter tunnings
@@ -422,11 +422,10 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
     std::vector<double>* acceleration) {
   // Set optimizer instance
   auto ptr_interface = new PiecewiseJerkSpeedNonlinearIpoptInterface(
-      s_init_, s_dot_init_, s_ddot_init_, delta_t_, num_of_knots_, s_ddot_min_,
-      s_ddot_max_, s_dddot_abs_max_);
-  // TODO(Jinyun): refactor state limits interface
-  ptr_interface->set_constant_speed_limit(s_dot_max_);
-  ptr_interface->set_s_max(total_length_);
+      s_init_, s_dot_init_, s_ddot_init_, delta_t_, num_of_knots_,
+      total_length_, s_dot_max_, s_ddot_min_, s_ddot_max_, s_dddot_min_,
+      s_dddot_max_);
+
   ptr_interface->set_safety_bounds(s_bounds_);
 
   // Set weights and reference values

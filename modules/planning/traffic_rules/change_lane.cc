@@ -22,7 +22,7 @@
 
 #include <algorithm>
 
-#include "modules/common/util/util.h"
+#include "modules/common/util/point_factory.h"
 
 namespace apollo {
 namespace planning {
@@ -107,8 +107,9 @@ bool ChangeLane::CreateGuardObstacle(
     auto ref_point = reference_line.GetNearestReferencePoint(ref_s);
 
     Vec2d xy_point;
-    if (!reference_line.SLToXY(common::util::MakeSLPoint(ref_s, sl_point.l()),
-                               &xy_point)) {
+    if (!reference_line.SLToXY(
+            common::util::PointFactory::ToSLPoint(ref_s, sl_point.l()),
+            &xy_point)) {
       return false;
     }
 
