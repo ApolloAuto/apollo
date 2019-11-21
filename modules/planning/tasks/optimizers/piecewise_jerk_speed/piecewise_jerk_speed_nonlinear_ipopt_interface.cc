@@ -30,7 +30,8 @@ PiecewiseJerkSpeedNonlinearIpoptInterface::
         const double s_init, const double s_dot_init, const double s_ddot_init,
         const double delta_t, const int num_of_points, const double s_max,
         const double s_dot_max, const double s_ddot_min,
-        const double s_ddot_max, const double s_dddot_abs_max)
+        const double s_ddot_max, const double s_dddot_min,
+        const double s_dddot_max)
     : curvature_curve_(0.0, 0.0, 0.0),
       v_bound_func_(0.0, 0.0, 0.0),
       s_init_(s_init),
@@ -40,9 +41,10 @@ PiecewiseJerkSpeedNonlinearIpoptInterface::
       num_of_points_(num_of_points),
       s_max_(s_max),
       s_dot_max_(s_dot_max),
-      s_ddot_min_(s_ddot_min),
+      s_ddot_min_(-std::abs(s_ddot_min)),
       s_ddot_max_(s_ddot_max),
-      s_dddot_abs_max_(s_dddot_abs_max),
+      s_dddot_min_(-std::abs(s_dddot_min)),
+      s_dddot_max_(s_dddot_max),
       v_offset_(num_of_points),
       a_offset_(num_of_points * 2) {}
 
@@ -187,8 +189,8 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::get_bounds_info(
   // |s_ddot_i+1 - s_ddot_i| / delta_t <= s_dddot_max
   int offset = num_of_points_ - 1;
   for (int i = 0; i + 1 < num_of_points_; ++i) {
-    g_l[offset + i] = -s_dddot_abs_max_;
-    g_u[offset + i] = s_dddot_abs_max_;
+    g_l[offset + i] = s_dddot_min_;
+    g_u[offset + i] = s_dddot_max_;
   }
 
   // position equality constraints,
