@@ -65,6 +65,9 @@ class PiecewiseJerkSpeedNonlinearIpoptInterface : public Ipopt::TNLP {
   void set_safety_bounds(
       const std::vector<std::pair<double, double>> &safety_bounds);
 
+  void set_soft_safety_bounds(
+      const std::vector<std::pair<double, double>> &soft_safety_bounds);
+
   void set_s_max(const double s_max);
 
   void set_w_target_state(const double w_target_s, const double w_target_v,
@@ -79,6 +82,8 @@ class PiecewiseJerkSpeedNonlinearIpoptInterface : public Ipopt::TNLP {
   void set_w_reference_speed(const double w_reference_speed);
 
   void set_w_reference_spatial_distance(const double w_ref_s);
+
+  void set_w_soft_s_bound(const double w_soft_s_bound);
 
   /** Method to return some info about the nlp */
   bool get_nlp_info(int &n, int &m, int &nnz_jac_g, int &nnz_h_lag,
@@ -136,6 +141,8 @@ class PiecewiseJerkSpeedNonlinearIpoptInterface : public Ipopt::TNLP {
 
   bool use_v_bound_ = false;
 
+  bool use_soft_safety_bound_ = false;
+
   PiecewiseJerkTrajectory1d v_bound_func_;
 
   double s_max_ = 150.0;
@@ -160,6 +167,10 @@ class PiecewiseJerkSpeedNonlinearIpoptInterface : public Ipopt::TNLP {
 
   const int a_offset_;
 
+  int lower_s_slack_offset_ = 0;
+
+  int upper_s_slack_offset_ = 0;
+
   int num_of_variables_ = 0;
 
   int num_of_constraints_ = 0;
@@ -180,6 +191,8 @@ class PiecewiseJerkSpeedNonlinearIpoptInterface : public Ipopt::TNLP {
 
   double w_overall_centripetal_acc_ = 500.0;
 
+  double w_soft_s_bound_ = 0.0;
+
   double v_max_ = 0.0;
 
   double s_target_ = 0.0;
@@ -191,6 +204,8 @@ class PiecewiseJerkSpeedNonlinearIpoptInterface : public Ipopt::TNLP {
   double v_ref_ = 0.0;
 
   std::vector<std::pair<double, double>> safety_bounds_;
+
+  std::vector<std::pair<double, double>> soft_safety_bounds_;
 
   bool has_end_state_target_ = false;
 
