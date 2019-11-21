@@ -25,11 +25,13 @@
 
 #include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
+#include "modules/common/math/matrix_operations.h"
 
 namespace apollo {
 namespace control {
 
 using apollo::common::ErrorCode;
+using apollo::common::LatencyParam;
 using apollo::common::Status;
 using Matrix = Eigen::MatrixXd;
 
@@ -122,7 +124,8 @@ void MracController::ResetGains() {
   gain_nonlinear_adaption_.setZero(1, 2);
 }
 
-void MracController::Init(const MracConf &mrac_conf, const double dt) {
+void MracController::Init(const MracConf &mrac_conf,
+                          const LatencyParam &latency_param, const double dt) {
   control_previous_ = 0.0;
   saturation_status_control_ = 0;
   saturation_status_reference_ = 0;
@@ -153,6 +156,7 @@ void MracController::Init(const MracConf &mrac_conf, const double dt) {
   matrix_b_adaption_ = Matrix::Zero(model_order_, 1);
   adaption_model_enabled_ =
       (SetAdaptionModel(mrac_conf).ok() && BuildAdaptionModel().ok());
+  EstimateInitialGains(latency_param);
 }
 
 Status MracController::SetReferenceModel(const MracConf &mrac_conf) {
@@ -260,6 +264,48 @@ bool MracController::CheckLyapunovPD(const Matrix matrix_a,
   // due to the matrix Q are not positive definite
   return (matrix_q.isApprox(matrix_q.transpose()) &&
           llt_matrix_q.info() != Eigen::NumericalIssue);
+}
+
+void MracController::EstimateInitialGains(const LatencyParam &latency_param) {
+  const double rise_time_estimate =
+      latency_param.dead_time() + latency_param.rise_time();
+  const double settling_time_estimate =
+      latency_param.dead_time() + latency_param.settling_time();
+  Matrix matrix_a_estimate = Matrix::Zero(model_order_, model_order_);
+  Matrix matrix_b_estimate = Matrix::Zero(model_order_, 1);
+  if (model_order_ == 1 &&
+      (rise_time_estimate >= ts_ || settling_time_estimate >= ts_)) {
+    const double tau_estimate = (rise_time_estimate >= ts_)
+                                    ? rise_time_estimate / 2.2
+                                    : settling_time_estimate / 4.0;
+    matrix_a_estimate(0, 0) = -1.0 / tau_estimate;
+    matrix_b_estimate(0, 0) = 1.0 / tau_estimate;
+    gain_state_adaption_(0, 1) =
+        (matrix_a_reference_(0, 0) - matrix_a_estimate(0, 0)) /
+        matrix_b_estimate(0, 0);
+    gain_input_adaption_(0, 1) =
+        matrix_b_reference_(0, 0) / matrix_b_estimate(0, 0);
+  } else if (model_order_ == 2 &&
+             (rise_time_estimate >= ts_ && settling_time_estimate >= ts_)) {
+    const double wn_estimate = 1.8 / rise_time_estimate;
+    const double zeta_estimate =
+        4.6 / (rise_time_estimate * settling_time_estimate);
+    matrix_a_estimate(0, 1) = 1.0;
+    matrix_a_estimate(1, 0) = -wn_estimate * wn_estimate;
+    matrix_a_estimate(1, 1) = -2 * zeta_estimate * wn_estimate;
+    matrix_b_estimate(1, 0) = wn_estimate * wn_estimate;
+    gain_state_adaption_.col(1) =
+        (common::math::PseudoInverse<double, 2, 1>(matrix_b_estimate) *
+         (matrix_a_reference_ - matrix_a_estimate))
+            .transpose();
+    gain_input_adaption_.col(1) =
+        (common::math::PseudoInverse<double, 2, 1>(matrix_b_estimate) *
+         matrix_b_reference_)
+            .transpose();
+  } else {
+    AWARN << "No pre-known actuation dynamics; the initial states of the "
+             "adaptive gains are set as zeros";
+  }
 }
 
 void MracController::UpdateReference() {
