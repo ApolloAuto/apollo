@@ -21,6 +21,7 @@
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_ipopt_interface.h"
 
 #include <algorithm>
+#include <limits>
 
 namespace apollo {
 namespace planning {
