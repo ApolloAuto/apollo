@@ -21,12 +21,14 @@
 
 #include "cyber/common/file.h"
 #include "gtest/gtest.h"
+#include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/control/proto/mrac_conf.pb.h"
 
 namespace apollo {
 namespace control {
 
+using apollo::common::LatencyParam;
 using Matrix = Eigen::MatrixXd;
 
 class MracControllerTest : public ::testing::Test {
@@ -36,11 +38,16 @@ class MracControllerTest : public ::testing::Test {
         "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
     CHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf_));
     lat_controller_conf_ = control_conf_.lat_controller_conf();
+    steering_latency_param_.set_dead_time(0.0);
+    steering_latency_param_.set_rise_time(0.0);
+    steering_latency_param_.set_peak_time(0.0);
+    steering_latency_param_.set_settling_time(0.0);
   }
 
  protected:
   ControlConf control_conf_;
   LatControllerConf lat_controller_conf_;
+  LatencyParam steering_latency_param_;
 };
 
 // test the input-output of the model reference adaptive controller
@@ -49,7 +56,7 @@ TEST_F(MracControllerTest, MracControl) {
   Matrix state = Matrix::Zero(1, 1);
   MracConf mrac_conf = lat_controller_conf_.steer_mrac_conf();
   MracController mrac_controller;
-  mrac_controller.Init(mrac_conf, dt);
+  mrac_controller.Init(mrac_conf, steering_latency_param_, dt);
   mrac_controller.Reset();
   double limit = 100.0;
   double rate_limit = 100.0 / dt;
@@ -75,7 +82,7 @@ TEST_F(MracControllerTest, MracControl) {
   EXPECT_NEAR(control_value, 8.48, 1e-6);
   // test the bounded conditions of the system output
   dt = 0.01;
-  mrac_controller.Init(mrac_conf, dt);
+  mrac_controller.Init(mrac_conf, steering_latency_param_, dt);
   state(0, 0) = 10.0;
   EXPECT_NEAR(mrac_controller.Control(18.0, state, 100.0, 1.0 / dt), -1.0,
               1e-6);
@@ -116,7 +123,7 @@ TEST_F(MracControllerTest, HighOrderMracControl) {
   mrac_conf.add_adaption_matrix_p(0.1);
   mrac_conf.add_adaption_matrix_p(0.1);
   // Fill the initial reference / actuation states and command
-  mrac_controller.Init(mrac_conf, dt);
+  mrac_controller.Init(mrac_conf, steering_latency_param_, dt);
   double limit = 100.0;
   double rate_limit = 100.0 / dt;
   state(0, 0) = 10.0;
@@ -151,7 +158,7 @@ TEST_F(MracControllerTest, CheckLyapunovPD) {
   double dt = 0.01;
   MracConf mrac_conf = lat_controller_conf_.steer_mrac_conf();
   MracController mrac_controller;
-  mrac_controller.Init(mrac_conf, dt);
+  mrac_controller.Init(mrac_conf, steering_latency_param_, dt);
   // test on 1st order adaption dynamics
   Matrix matrix_a = Matrix::Zero(1, 1);
   Matrix matrix_p = Matrix::Zero(1, 1);
