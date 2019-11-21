@@ -63,6 +63,11 @@ void SemanticMap::RunCurrFrame(
     curr_base_x_ = base_x_;
     curr_base_y_ = base_y_;
     task_future_ = cyber::Async(&SemanticMap::DrawBaseMapThread, this);
+    // This is only for the first frame without base image yet
+    if (!started_drawing_) {
+      started_drawing_ = true;
+      return;
+    }
   }
 
   // Draw all obstacles_history
