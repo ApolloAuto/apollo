@@ -371,6 +371,25 @@ Status PathBoundsDecider::GenerateLaneChangePathBound(
   // 3. Remove the S-length of target lane out of the path-bound.
   GetBoundaryFromLaneChangeForbiddenZone(reference_line_info, path_bound);
 
+  PathBound temp_path_bound = *path_bound;
+  std::string blocking_obstacle_id;
+  if (!GetBoundaryFromStaticObstacles(reference_line_info.path_decision(),
+                                      path_bound, &blocking_obstacle_id)) {
+    const std::string msg =
+        "Failed to decide fine tune the boundaries after "
+        "taking into consideration all static obstacles.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  // Append some extra path bound points to avoid zero-length path data.
+  int counter = 0;
+  while (!blocking_obstacle_id.empty() &&
+         path_bound->size() < temp_path_bound.size() &&
+         counter < kNumExtraTailBoundPoint) {
+    path_bound->push_back(temp_path_bound[path_bound->size()]);
+    counter++;
+  }
+
   ADEBUG << "Completed generating path boundaries.";
   return Status::OK();
 }
@@ -1265,6 +1284,7 @@ bool PathBoundsDecider::GetBoundaryFromStaticObstacles(
   // Preprocessing.
   auto indexed_obstacles = path_decision.obstacles();
   auto sorted_obstacles = SortObstaclesForSweepLine(indexed_obstacles);
+  ADEBUG << "There are " << sorted_obstacles.size() << " obstacles.";
   double center_line = adc_frenet_l_;
   size_t obs_idx = 0;
   int path_blocked_idx = -1;
