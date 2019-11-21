@@ -492,6 +492,10 @@ bool SpeedDecider::CheckIsFollow(const Obstacle& obstacle,
     return false;
   }
 
+  if (obstacle.IsStatic()) {
+    return false;
+  }
+
   // move towards adc
   if (boundary.bottom_left_point().s() > boundary.bottom_right_point().s()) {
     return false;
