@@ -38,6 +38,7 @@ default_task_config: {
     lat_acc_weight: 1000.0
     ref_v_weight: 0.0
     ref_s_weight: 1000.0
+    soft_s_bound_weight: 1e9
     use_warm_start: true
   }
 }
