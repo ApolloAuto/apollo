@@ -28,7 +28,8 @@ namespace planning {
 PiecewiseJerkSpeedNonlinearIpoptInterface::
     PiecewiseJerkSpeedNonlinearIpoptInterface(
         const double s_init, const double s_dot_init, const double s_ddot_init,
-        const double delta_t, const int num_of_points, const double s_ddot_min,
+        const double delta_t, const int num_of_points, const double s_max,
+        const double s_dot_max, const double s_ddot_min,
         const double s_ddot_max, const double s_dddot_abs_max)
     : curvature_curve_(0.0, 0.0, 0.0),
       v_bound_func_(0.0, 0.0, 0.0),
@@ -37,6 +38,8 @@ PiecewiseJerkSpeedNonlinearIpoptInterface::
       s_ddot_init_(s_ddot_init),
       delta_t_(delta_t),
       num_of_points_(num_of_points),
+      s_max_(s_max),
+      s_dot_max_(s_dot_max),
       s_ddot_min_(s_ddot_min),
       s_ddot_max_(s_ddot_max),
       s_dddot_abs_max_(s_dddot_abs_max),
@@ -132,7 +135,7 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::get_bounds_info(
     int n, double *x_l, double *x_u, int m, double *g_l, double *g_u) {
   // default nlp_lower_bound_inf value in Ipopt
   double INF = 1.0e19;
-  double LARGE_VELOCITY_VALUE = v_max_;
+  double LARGE_VELOCITY_VALUE = s_dot_max_;
 
   // bounds for variables
   // s
@@ -945,11 +948,6 @@ void PiecewiseJerkSpeedNonlinearIpoptInterface::set_speed_limit_curve(
   use_v_bound_ = true;
 }
 
-void PiecewiseJerkSpeedNonlinearIpoptInterface::set_constant_speed_limit(
-    const double s_dot_max) {
-  v_max_ = s_dot_max;
-}
-
 void PiecewiseJerkSpeedNonlinearIpoptInterface::set_reference_speed(
     const double v_ref) {
   v_ref_ = v_ref;
@@ -964,10 +962,6 @@ void PiecewiseJerkSpeedNonlinearIpoptInterface::set_soft_safety_bounds(
     const std::vector<std::pair<double, double>> &soft_safety_bounds) {
   soft_safety_bounds_ = soft_safety_bounds;
   use_soft_safety_bound_ = true;
-}
-
-void PiecewiseJerkSpeedNonlinearIpoptInterface::set_s_max(const double s_max) {
-  s_max_ = s_max;
 }
 
 int PiecewiseJerkSpeedNonlinearIpoptInterface::to_hash_key(const int i,
