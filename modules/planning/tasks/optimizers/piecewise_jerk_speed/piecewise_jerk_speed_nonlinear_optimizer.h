@@ -77,6 +77,7 @@ class PiecewiseJerkSpeedNonlinearOptimizer : public SpeedOptimizer {
 
   // st safety bounds
   std::vector<std::pair<double, double>> s_bounds_;
+  std::vector<std::pair<double, double>> s_soft_bounds_;
 
   // speed limits
   SpeedLimit speed_limit_;

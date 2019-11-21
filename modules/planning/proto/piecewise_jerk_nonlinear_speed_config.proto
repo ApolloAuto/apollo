@@ -11,6 +11,7 @@ message PiecewiseJerkNonlinearSpeedConfig {
   optional double end_s_weight = 6 [default = 10.0];
   optional double end_v_weight = 7 [default = 10.0];
   optional double end_a_weight = 8 [default = 10.0];
+  optional double soft_s_bound_weight = 9 [default = 10.0];
 
   optional bool use_warm_start = 100 [default = true];
 }

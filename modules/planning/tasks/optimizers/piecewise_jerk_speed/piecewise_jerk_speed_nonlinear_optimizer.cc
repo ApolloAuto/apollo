@@ -214,10 +214,16 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
 
   // Set s boundary
   s_bounds_.clear();
+  s_soft_bounds_.clear();
+  // TODO(Jinyun): soft bound only takes effect in follow fence, will use in
+  // other speed decision as well and use more sophisticated bound for follow
+  // fence
   for (int i = 0; i < num_of_knots_; ++i) {
     double curr_t = i * delta_t_;
     double s_lower_bound = 0.0;
     double s_upper_bound = total_length_;
+    double s_soft_lower_bound = 0.0;
+    double s_soft_upper_bound = 0.0;
     for (const STBoundary* boundary : st_graph_data.st_boundaries()) {
       double s_lower = 0.0;
       double s_upper = 0.0;
@@ -228,13 +234,16 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
         case STBoundary::BoundaryType::STOP:
         case STBoundary::BoundaryType::YIELD:
           s_upper_bound = std::fmin(s_upper_bound, s_upper);
+          s_soft_lower_bound = s_upper_bound;
           break;
         case STBoundary::BoundaryType::FOLLOW:
           // TODO(Hongyi): unify follow buffer on decision side
-          s_upper_bound = std::fmin(s_upper_bound, s_upper - 8.0);
+          s_upper_bound = std::fmin(s_upper_bound, s_upper);
+          s_soft_upper_bound = s_upper_bound - 8.0;
           break;
         case STBoundary::BoundaryType::OVERTAKE:
           s_lower_bound = std::fmax(s_lower_bound, s_lower);
+          s_soft_lower_bound = s_lower_bound;
           break;
         default:
           break;
@@ -245,6 +254,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
+    s_soft_bounds_.emplace_back(s_soft_lower_bound, s_soft_upper_bound);
     s_bounds_.emplace_back(s_lower_bound, s_upper_bound);
   }
   speed_limit_ = st_graph_data.speed_limit();
@@ -428,6 +438,8 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
 
   ptr_interface->set_safety_bounds(s_bounds_);
 
+  ptr_interface->set_soft_safety_bounds(s_soft_bounds_);
+
   // Set weights and reference values
   const auto& config = config_.piecewise_jerk_nonlinear_speed_config();
 
@@ -471,6 +483,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
   ptr_interface->set_w_overall_j(config.jerk_weight());
   ptr_interface->set_w_overall_centripetal_acc(config.lat_acc_weight());
   ptr_interface->set_w_reference_speed(config.ref_v_weight());
+  ptr_interface->set_w_soft_s_bound(config.soft_s_bound_weight());
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptr_interface;
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
