@@ -354,8 +354,8 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_grad_f(int n,
 
   // ref. spatial distance objective
   for (int i = 0; i < num_of_points_; ++i) {
-    auto v_diff = x[i] - s_ref_[i];
-    grad_f[i] += 2.0 * v_diff * w_ref_s_;
+    auto s_diff = x[i] - s_ref_[i];
+    grad_f[i] += 2.0 * s_diff * w_ref_s_;
   }
 
   // ref. speed objective

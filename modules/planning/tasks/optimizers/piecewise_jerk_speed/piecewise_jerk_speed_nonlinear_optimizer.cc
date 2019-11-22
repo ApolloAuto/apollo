@@ -223,7 +223,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
     double s_lower_bound = 0.0;
     double s_upper_bound = total_length_;
     double s_soft_lower_bound = 0.0;
-    double s_soft_upper_bound = 0.0;
+    double s_soft_upper_bound = total_length_;
     for (const STBoundary* boundary : st_graph_data.st_boundaries()) {
       double s_lower = 0.0;
       double s_upper = 0.0;
@@ -234,7 +234,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
         case STBoundary::BoundaryType::STOP:
         case STBoundary::BoundaryType::YIELD:
           s_upper_bound = std::fmin(s_upper_bound, s_upper);
-          s_soft_lower_bound = s_upper_bound;
+          s_soft_upper_bound = s_upper_bound;
           break;
         case STBoundary::BoundaryType::FOLLOW:
           // TODO(Hongyi): unify follow buffer on decision side
@@ -402,7 +402,6 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByQP(
   piecewise_jerk_problem.set_weight_dx(0.0);
   piecewise_jerk_problem.set_weight_ddx(config.acc_weight());
   piecewise_jerk_problem.set_weight_dddx(config.jerk_weight());
-  piecewise_jerk_problem.set_dx_ref(config.ref_v_weight(), cruise_speed_);
 
   std::vector<double> x_ref;
   for (int i = 0; i < num_of_knots_; ++i) {
@@ -473,13 +472,12 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
     ptr_interface->set_warm_start(warm_start);
   }
 
-  // TODO(Jinyun): will deprecate penalty towards dp st after refactoring on
-  // safety distance keeping in speed decider is done
-  ptr_interface->set_reference_spatial_distance(*distance);
+  std::vector<double> spatial_potantial(num_of_knots_, total_length_);
+  ptr_interface->set_reference_spatial_distance(spatial_potantial);
 
   ptr_interface->set_reference_speed(cruise_speed_);
 
-  ptr_interface->set_w_reference_spatial_distance(config.ref_s_weight());
+  ptr_interface->set_w_reference_spatial_distance(config.s_potential_weight());
   ptr_interface->set_w_overall_a(config.acc_weight());
   ptr_interface->set_w_overall_j(config.jerk_weight());
   ptr_interface->set_w_overall_centripetal_acc(config.lat_acc_weight());
