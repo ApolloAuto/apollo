@@ -72,9 +72,8 @@ export default class Prediction {
                 this.predLines.push(mesh);
                 scene.add(mesh);
 
-                // Downsampling points to draw circles
-                const downsamplingRatio = Math.ceil(predictedTraj.length / 3);
-                for (let j = 0; j < predictedTraj.length; j += downsamplingRatio) {
+                // Draw circles and gaussian
+                for (let j = 0; j < predictedTraj.length; j += 1) {
                     const circleMesh = this.getPredCircle();
                     circleMesh.position.set(predictedTraj[j].x, predictedTraj[j].y, 0.24);
                     circleMesh.material.color.setHex(predictionLineColor);
@@ -99,9 +98,7 @@ export default class Prediction {
                     this.predLines.push(mesh);
                     scene.add(mesh);
 
-                    // Downsampling points to draw gaussian
-                    const downsamplingRatio = Math.ceil(traj.length / 3);
-                    for (let j = 0; j < traj.length; j += downsamplingRatio) {
+                    for (let j = 0; j < traj.length; j += 1) {
                         this.drawGaussian(
                             traj[j].gaussianInfo, predictionLineColor, positions[j], scene);
                     }

@@ -202,10 +202,9 @@ void SpeedBoundsDecider::RecordSTGraphDebug(
   }
 
   for (const auto &point : st_graph_data.speed_limit().speed_limit_points()) {
-    common::SpeedPoint speed_point;
-    speed_point.set_s(point.first);
-    speed_point.set_v(point.second);
-    st_graph_debug->add_speed_limit()->CopyFrom(speed_point);
+    common::SpeedPoint* speed_point = st_graph_debug->add_speed_limit();
+    speed_point->set_s(point.first);
+    speed_point->set_v(point.second);
   }
 }
 

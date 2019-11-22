@@ -21,8 +21,8 @@ message BareIntersectionStatus {
 
 message ChangeLaneStatus {
   enum Status {
-    IN_CHANGE_LANE = 1;       // during change lane state
-    CHANGE_LANE_FAILED = 2;   // change lane failed
+    IN_CHANGE_LANE = 1;        // during change lane state
+    CHANGE_LANE_FAILED = 2;    // change lane failed
     CHANGE_LANE_FINISHED = 3;  // change lane finished
   }
   optional Status status = 1;
@@ -38,6 +38,9 @@ message ChangeLaneStatus {
   // if the current path and speed planning on the lane-change
   // reference-line succeed.
   optional bool is_current_opt_succeed = 7 [default = false];
+  // denotes if the surrounding area is clear for ego vehicle to
+  // change lane at this moment.
+  optional bool is_clear_to_change_lane = 8 [default = false];
 }
 
 message StopTime {
@@ -69,6 +72,7 @@ message OpenSpaceStatus {
 message ParkAndGoStatus {
   optional apollo.common.PointENU adc_init_position = 1;
   optional double adc_init_heading = 2;
+  optional bool in_check_stage = 3;
 }
 
 message PathDeciderStatus {
@@ -83,7 +87,7 @@ message PathDeciderStatus {
   repeated LaneBorrowDirection decided_side_pass_direction = 5;
 }
 
-message PathReuseDeciderStatus  {
+message PathReuseDeciderStatus {
   optional bool reused_path = 1 [default = true];
   // count lane_change optimization failure frames
   optional int32 lane_change_failure_counter = 2;
@@ -95,7 +99,7 @@ message PedestrianStatus {
 
 message PullOverStatus {
   enum PullOverType {
-    PULL_OVER = 1;   		  // pull-over upon destination arrival
+    PULL_OVER = 1;            // pull-over upon destination arrival
     EMERGENCY_PULL_OVER = 2;  // emergency pull-over
   }
   optional PullOverType pull_over_type = 1;

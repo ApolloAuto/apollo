@@ -27,6 +27,7 @@
 
 #include "absl/strings/str_cat.h"
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -42,6 +43,7 @@ using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleSignal;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
+using apollo::common::util::PointFactory;
 
 ReferenceLineInfo::ReferenceLineInfo(const common::VehicleState& vehicle_state,
                                      const TrajectoryPoint& adc_planning_point,
@@ -556,10 +558,9 @@ std::string ReferenceLineInfo::PathSpeedDebugString() const {
                       "speed_data:", speed_data_.DebugString());
 }
 
-void ReferenceLineInfo::SetTurnSignal(
+void ReferenceLineInfo::SetTurnSignalBasedOnLaneTurnType(
     common::VehicleSignal* vehicle_signal) const {
   CHECK_NOTNULL(vehicle_signal);
-
   if (vehicle_signal->has_turn_signal() &&
       vehicle_signal->turn_signal() != VehicleSignal::TURN_NONE) {
     return;
@@ -596,11 +597,10 @@ void ReferenceLineInfo::SetTurnSignal(
     } else if (turn == hdmap::Lane::U_TURN) {
       // check left or right by geometry.
       auto start_xy =
-          common::util::MakeVec2d(seg.lane->GetSmoothPoint(seg.start_s));
-      auto middle_xy = common::util::MakeVec2d(
+          PointFactory::ToVec2d(seg.lane->GetSmoothPoint(seg.start_s));
+      auto middle_xy = PointFactory::ToVec2d(
           seg.lane->GetSmoothPoint((seg.start_s + seg.end_s) / 2.0));
-      auto end_xy =
-          common::util::MakeVec2d(seg.lane->GetSmoothPoint(seg.end_s));
+      auto end_xy = PointFactory::ToVec2d(seg.lane->GetSmoothPoint(seg.end_s));
       auto start_to_middle = middle_xy - start_xy;
       auto start_to_end = end_xy - start_xy;
       if (start_to_middle.CrossProd(start_to_end) < 0) {
@@ -626,7 +626,7 @@ void ReferenceLineInfo::ExportVehicleSignal(
     common::VehicleSignal* vehicle_signal) const {
   CHECK_NOTNULL(vehicle_signal);
   *vehicle_signal = vehicle_signal_;
-  SetTurnSignal(vehicle_signal);
+  SetTurnSignalBasedOnLaneTurnType(vehicle_signal);
 }
 
 bool ReferenceLineInfo::ReachedDestination() const {

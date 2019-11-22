@@ -27,6 +27,7 @@
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap.h"
@@ -50,6 +51,7 @@ using apollo::common::SLPoint;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::time::Clock;
+using apollo::common::util::PointFactory;
 
 namespace {
 constexpr double kPathOptimizationFallbackCost = 2e4;
@@ -351,11 +353,9 @@ void LaneFollowStage::GenerateFallbackPathProfile(
 
     const double max_s = 100.0;
     for (double s = 0; s < max_s; s += unit_s) {
-      common::PathPoint path_point = common::util::MakePathPoint(
-          adc_traversed_x, adc_traversed_y, 0.0, adc_point_heading,
-          adc_point_kappa, adc_point_dkappa, 0.0);
-      path_point.set_s(s);
-      path_points.push_back(std::move(path_point));
+      path_points.push_back(PointFactory::ToPathPoint(
+          adc_traversed_x, adc_traversed_y, 0.0, s, adc_point_heading,
+          adc_point_kappa, adc_point_dkappa));
       adc_traversed_x += unit_s * std::cos(adc_point_heading);
       adc_traversed_y += unit_s * std::sin(adc_point_heading);
     }
@@ -374,11 +374,9 @@ void LaneFollowStage::GenerateFallbackPathProfile(
   const double max_s = reference_line.Length();
   for (double s = adc_s; s < max_s; s += unit_s) {
     const auto& ref_point = reference_line.GetReferencePoint(s);
-    common::PathPoint path_point = common::util::MakePathPoint(
-        ref_point.x() + dx, ref_point.y() + dy, 0.0, ref_point.heading(),
-        ref_point.kappa(), ref_point.dkappa(), 0.0);
-    path_point.set_s(s - adc_s);
-    path_points.push_back(std::move(path_point));
+    path_points.push_back(PointFactory::ToPathPoint(
+        ref_point.x() + dx, ref_point.y() + dy, 0.0, s - adc_s,
+        ref_point.heading(), ref_point.kappa(), ref_point.dkappa()));
   }
   path_data->SetDiscretizedPath(DiscretizedPath(std::move(path_points)));
 }

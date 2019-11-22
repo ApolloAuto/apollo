@@ -33,11 +33,13 @@ default_task_config: {
 default_task_config: {
   task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
   piecewise_jerk_nonlinear_speed_config {
-    acc_weight: 100.0
-    jerk_weight: 300.0
+    acc_weight: 1.0
+    jerk_weight: 3.0
     lat_acc_weight: 1000.0
-    ref_v_weight: 0.0
-    ref_s_weight: 1000.0
+    s_potential_weight: 0.1
+    ref_v_weight: 10.0
+    ref_s_weight: 100.0
+    soft_s_bound_weight: 1e6
     use_warm_start: true
   }
 }

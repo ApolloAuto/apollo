@@ -27,6 +27,7 @@
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap.h"
@@ -53,6 +54,7 @@ using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
+using apollo::common::util::PointFactory;
 
 namespace {
 constexpr uint32_t KDestLanePriority = 0;
@@ -325,13 +327,9 @@ std::vector<SpeedPoint> NaviPlanner::GenerateInitSpeedProfile(
         start_s = speed_point.s();
         is_updated_start = true;
       }
-      SpeedPoint refined_speed_point;
-      refined_speed_point.set_s(speed_point.s() - start_s);
-      refined_speed_point.set_t(speed_point.t() - start_time);
-      refined_speed_point.set_v(speed_point.v());
-      refined_speed_point.set_a(speed_point.a());
-      refined_speed_point.set_da(speed_point.da());
-      speed_profile.push_back(std::move(refined_speed_point));
+      speed_profile.push_back(PointFactory::ToSpeedPoint(
+          speed_point.s() - start_s, speed_point.t() - start_time,
+          speed_point.v(), speed_point.a(), speed_point.da()));
     }
   }
   return speed_profile;
@@ -346,13 +344,7 @@ std::vector<SpeedPoint> NaviPlanner::GenerateSpeedHotStart(
   double v = common::math::Clamp(planning_init_point.v(), 5.0,
                                  FLAGS_planning_upper_speed_limit);
   while (t < FLAGS_trajectory_time_length) {
-    SpeedPoint speed_point;
-    speed_point.set_s(s);
-    speed_point.set_t(t);
-    speed_point.set_v(v);
-
-    hot_start_speed_profile.push_back(std::move(speed_point));
-
+    hot_start_speed_profile.push_back(PointFactory::ToSpeedPoint(s, t, v));
     t += FLAGS_trajectory_time_min_interval;
     s += v * FLAGS_trajectory_time_min_interval;
   }
@@ -378,12 +370,9 @@ void NaviPlanner::GenerateFallbackPathProfile(
   for (double s = adc_s; s < max_s; s += unit_s) {
     const auto& ref_point =
         reference_line_info->reference_line().GetReferencePoint(s);
-    common::PathPoint path_point = common::util::MakePathPoint(
-        ref_point.x() + dx, ref_point.y() + dy, 0.0, ref_point.heading(),
-        ref_point.kappa(), ref_point.dkappa(), 0.0);
-    path_point.set_s(s);
-
-    path_points.push_back(std::move(path_point));
+    path_points.push_back(PointFactory::ToPathPoint(
+        ref_point.x() + dx, ref_point.y() + dy, 0.0, s, ref_point.heading(),
+        ref_point.kappa(), ref_point.dkappa()));
   }
   path_data->SetReferenceLine(&(reference_line_info->reference_line()));
   path_data->SetDiscretizedPath(DiscretizedPath(std::move(path_points)));

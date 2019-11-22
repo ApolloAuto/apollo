@@ -26,8 +26,8 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "modules/common/math/linear_interpolation.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/common/util/string_util.h"
-#include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -48,7 +48,7 @@ void SpeedData::AppendSpeedPoint(const double s, const double time,
   if (!empty()) {
     CHECK(back().t() < time);
   }
-  push_back(common::util::MakeSpeedPoint(s, time, v, a, da));
+  push_back(common::util::PointFactory::ToSpeedPoint(s, time, v, a, da));
 }
 
 bool SpeedData::EvaluateByTime(const double t,
@@ -75,28 +75,18 @@ bool SpeedData::EvaluateByTime(const double t,
     double t0 = p0.t();
     double t1 = p1.t();
 
-    common::SpeedPoint res;
-    res.set_t(t);
-
-    double s = common::math::lerp(p0.s(), t0, p1.s(), t1, t);
-    res.set_s(s);
-
+    speed_point->Clear();
+    speed_point->set_s(common::math::lerp(p0.s(), t0, p1.s(), t1, t));
+    speed_point->set_t(t);
     if (p0.has_v() && p1.has_v()) {
-      double v = common::math::lerp(p0.v(), t0, p1.v(), t1, t);
-      res.set_v(v);
+      speed_point->set_v(common::math::lerp(p0.v(), t0, p1.v(), t1, t));
     }
-
     if (p0.has_a() && p1.has_a()) {
-      double a = common::math::lerp(p0.a(), t0, p1.a(), t1, t);
-      res.set_a(a);
+      speed_point->set_a(common::math::lerp(p0.a(), t0, p1.a(), t1, t));
     }
-
     if (p0.has_da() && p1.has_da()) {
-      double da = common::math::lerp(p0.da(), t0, p1.da(), t1, t);
-      res.set_da(da);
+      speed_point->set_da(common::math::lerp(p0.da(), t0, p1.da(), t1, t));
     }
-
-    *speed_point = res;
   }
   return true;
 }
@@ -125,28 +115,18 @@ bool SpeedData::EvaluateByS(const double s,
     double s0 = p0.s();
     double s1 = p1.s();
 
-    common::SpeedPoint res;
-    res.set_s(s);
-
-    double t = common::math::lerp(p0.t(), s0, p1.t(), s1, s);
-    res.set_t(t);
-
+    speed_point->Clear();
+    speed_point->set_s(s);
+    speed_point->set_t(common::math::lerp(p0.t(), s0, p1.t(), s1, s));
     if (p0.has_v() && p1.has_v()) {
-      double v = common::math::lerp(p0.v(), s0, p1.v(), s1, s);
-      res.set_v(v);
+      speed_point->set_v(common::math::lerp(p0.v(), s0, p1.v(), s1, s));
     }
-
     if (p0.has_a() && p1.has_a()) {
-      double a = common::math::lerp(p0.a(), s0, p1.a(), s1, s);
-      res.set_a(a);
+      speed_point->set_a(common::math::lerp(p0.a(), s0, p1.a(), s1, s));
     }
-
     if (p0.has_da() && p1.has_da()) {
-      double da = common::math::lerp(p0.da(), s0, p1.da(), s1, s);
-      res.set_da(da);
+      speed_point->set_da(common::math::lerp(p0.da(), s0, p1.da(), s1, s));
     }
-
-    *speed_point = res;
   }
   return true;
 }

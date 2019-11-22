@@ -256,7 +256,8 @@ Status LatController::Init(const ControlConf *control_conf) {
   bool enable_mrac =
       control_conf_->lat_controller_conf().enable_steer_mrac_control();
   if (enable_mrac) {
-    mrac_controller_.Init(lat_controller_conf.steer_mrac_conf(), ts_);
+    mrac_controller_.Init(lat_controller_conf.steer_mrac_conf(),
+                          vehicle_param_.steering_latency_param(), ts_);
   }
 
   return Status::OK();

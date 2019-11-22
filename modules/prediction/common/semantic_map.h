@@ -89,19 +89,19 @@ class SemanticMap {
   double base_x_ = 0.0;
   double base_y_ = 0.0;
 
+  std::mutex draw_base_map_thread_mutex_;
+
   // base_image, base_x, and base_y to be used in the current cycle
-  cv::Mat curr_base_img_;
+  cv::Mat curr_img_;
   double curr_base_x_ = 0.0;
   double curr_base_y_ = 0.0;
-
-  cv::Mat curr_img_;
 
   std::unordered_map<int, ObstacleHistory> obstacle_id_history_map_;
   Feature ego_feature_;
 
   std::future<void> task_future_;
 
-  bool base_img_drawn_ = false;
+  bool started_drawing_ = false;
 
   DECLARE_SINGLETON(SemanticMap)
 };

@@ -209,14 +209,21 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
   // Set s_dddot boundary
   // TODO(Jinyun): allow the setting of jerk_lower_bound and move jerk config to
   // a better place
-  s_dddot_abs_max_ = FLAGS_longitudinal_jerk_upper_bound;
+  s_dddot_min_ = -std::abs(FLAGS_longitudinal_jerk_lower_bound);
+  s_dddot_max_ = FLAGS_longitudinal_jerk_upper_bound;
 
   // Set s boundary
   s_bounds_.clear();
+  s_soft_bounds_.clear();
+  // TODO(Jinyun): soft bound only takes effect in follow fence, will use in
+  // other speed decision as well and use more sophisticated bound for follow
+  // fence
   for (int i = 0; i < num_of_knots_; ++i) {
     double curr_t = i * delta_t_;
     double s_lower_bound = 0.0;
     double s_upper_bound = total_length_;
+    double s_soft_lower_bound = 0.0;
+    double s_soft_upper_bound = total_length_;
     for (const STBoundary* boundary : st_graph_data.st_boundaries()) {
       double s_lower = 0.0;
       double s_upper = 0.0;
@@ -227,13 +234,17 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
         case STBoundary::BoundaryType::STOP:
         case STBoundary::BoundaryType::YIELD:
           s_upper_bound = std::fmin(s_upper_bound, s_upper);
+          s_soft_upper_bound = s_upper_bound;
           break;
         case STBoundary::BoundaryType::FOLLOW:
           // TODO(Hongyi): unify follow buffer on decision side
-          s_upper_bound = std::fmin(s_upper_bound, s_upper - 8.0);
+          s_upper_bound =
+              std::fmin(s_upper_bound, s_upper - FLAGS_follow_min_distance);
+          s_soft_upper_bound = s_upper_bound - 5.0;
           break;
         case STBoundary::BoundaryType::OVERTAKE:
           s_lower_bound = std::fmax(s_lower_bound, s_lower);
+          s_soft_lower_bound = s_lower_bound;
           break;
         default:
           break;
@@ -244,6 +255,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
+    s_soft_bounds_.emplace_back(s_soft_lower_bound, s_soft_upper_bound);
     s_bounds_.emplace_back(s_lower_bound, s_upper_bound);
   }
   speed_limit_ = st_graph_data.speed_limit();
@@ -381,8 +393,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByQP(
       0.0, std::fmax(FLAGS_planning_upper_speed_limit, init_states[1]));
   // TODO(Hongyi): delete this when ready to use vehicle_params
   piecewise_jerk_problem.set_ddx_bounds(-4.0, 2.0);
-  piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_lower_bound,
-                                        FLAGS_longitudinal_jerk_upper_bound);
+  piecewise_jerk_problem.set_dddx_bound(s_dddot_min_, s_dddot_max_);
   piecewise_jerk_problem.set_x_bounds(s_bounds_);
 
   // TODO(Jinyun): parameter tunnings
@@ -391,7 +402,6 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByQP(
   piecewise_jerk_problem.set_weight_dx(0.0);
   piecewise_jerk_problem.set_weight_ddx(config.acc_weight());
   piecewise_jerk_problem.set_weight_dddx(config.jerk_weight());
-  piecewise_jerk_problem.set_dx_ref(config.ref_v_weight(), cruise_speed_);
 
   std::vector<double> x_ref;
   for (int i = 0; i < num_of_knots_; ++i) {
@@ -422,12 +432,13 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
     std::vector<double>* acceleration) {
   // Set optimizer instance
   auto ptr_interface = new PiecewiseJerkSpeedNonlinearIpoptInterface(
-      s_init_, s_dot_init_, s_ddot_init_, delta_t_, num_of_knots_, s_ddot_min_,
-      s_ddot_max_, s_dddot_abs_max_);
-  // TODO(Jinyun): refactor state limits interface
-  ptr_interface->set_constant_speed_limit(s_dot_max_);
-  ptr_interface->set_s_max(total_length_);
+      s_init_, s_dot_init_, s_ddot_init_, delta_t_, num_of_knots_,
+      total_length_, s_dot_max_, s_ddot_min_, s_ddot_max_, s_dddot_min_,
+      s_dddot_max_);
+
   ptr_interface->set_safety_bounds(s_bounds_);
+
+  ptr_interface->set_soft_safety_bounds(s_soft_bounds_);
 
   // Set weights and reference values
   const auto& config = config_.piecewise_jerk_nonlinear_speed_config();
@@ -461,17 +472,17 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByNLP(
     ptr_interface->set_warm_start(warm_start);
   }
 
-  // TODO(Jinyun): will deprecate penalty towards dp st after refactoring on
-  // safety distance keeping in speed decider is done
-  ptr_interface->set_reference_spatial_distance(*distance);
+  std::vector<double> spatial_potantial(num_of_knots_, total_length_);
+  ptr_interface->set_reference_spatial_distance(spatial_potantial);
 
   ptr_interface->set_reference_speed(cruise_speed_);
 
-  ptr_interface->set_w_reference_spatial_distance(config.ref_s_weight());
+  ptr_interface->set_w_reference_spatial_distance(config.s_potential_weight());
   ptr_interface->set_w_overall_a(config.acc_weight());
   ptr_interface->set_w_overall_j(config.jerk_weight());
   ptr_interface->set_w_overall_centripetal_acc(config.lat_acc_weight());
   ptr_interface->set_w_reference_speed(config.ref_v_weight());
+  ptr_interface->set_w_soft_s_bound(config.soft_s_bound_weight());
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptr_interface;
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();

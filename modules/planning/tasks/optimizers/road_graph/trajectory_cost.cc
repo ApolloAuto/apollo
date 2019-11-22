@@ -27,7 +27,7 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/util/util.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -227,7 +227,7 @@ ComparableCost TrajectoryCost::CalculateDynamicObstacleCost(
     const double l = curve.Evaluate(0, s);
     const double dl = curve.Evaluate(1, s);
 
-    const common::SLPoint sl = common::util::MakeSLPoint(ref_s, l);
+    const common::SLPoint sl = common::util::PointFactory::ToSLPoint(ref_s, l);
     const Box2d ego_box = GetBoxFromSLPoint(sl, dl);
     for (const auto &obstacle_trajectory : dynamic_obstacle_boxes_) {
       obstacle_cost +=

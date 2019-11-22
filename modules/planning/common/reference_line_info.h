@@ -238,7 +238,9 @@ class ReferenceLineInfo {
 
   bool CheckChangeLane() const;
 
-  void SetTurnSignal(common::VehicleSignal* vehicle_signal) const;
+  void SetTurnSignalBasedOnLaneTurnType(
+      common::VehicleSignal* vehicle_signal) const;
+
   void ExportVehicleSignal(common::VehicleSignal* vehicle_signal) const;
 
   bool IsIrrelevantObstacle(const Obstacle& obstacle);

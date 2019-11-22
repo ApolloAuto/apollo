@@ -61,31 +61,38 @@ bool IsTrainable(const Feature& feature) {
   return true;
 }
 
-void GroupObstaclesByObstacleId(const int obstacle_id,
-                                ObstaclesContainer* const obstacles_container,
-                                IdObstacleListMap* const id_obstacle_map) {
-  Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
-  if (obstacle_ptr == nullptr) {
-    AERROR << "Null obstacle [" << obstacle_id << "] found";
-    return;
-  }
-  if (obstacle_ptr->IsStill()) {
-    ADEBUG << "Ignore still obstacle [" << obstacle_id << "]";
-    return;
-  }
-  const Feature& feature = obstacle_ptr->latest_feature();
-  if (feature.priority().priority() == ObstaclePriority::IGNORE) {
-    ADEBUG << "Skip ignored obstacle [" << obstacle_id << "]";
-    return;
-  } else if (feature.priority().priority() == ObstaclePriority::CAUTION) {
-    int id_mod = obstacle_id % FLAGS_max_caution_thread_num;
-    (*id_obstacle_map)[id_mod].push_back(obstacle_ptr);
-    ADEBUG << "Cautioned obstacle [" << obstacle_id << "] for thread" << id_mod;
-  } else {
-    int normal_thread_num = FLAGS_max_thread_num - FLAGS_max_caution_thread_num;
-    int id_mod = obstacle_id % normal_thread_num + FLAGS_max_caution_thread_num;
-    (*id_obstacle_map)[id_mod].push_back(obstacle_ptr);
-    ADEBUG << "Normal obstacle [" << obstacle_id << "] for thread" << id_mod;
+void GroupObstaclesByObstacleIds(ObstaclesContainer* const obstacles_container,
+                                 IdObstacleListMap* const id_obstacle_map) {
+  int caution_thread_idx = 0;
+  for (int obstacle_id :
+       obstacles_container->curr_frame_considered_obstacle_ids()) {
+    Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
+    if (obstacle_ptr == nullptr) {
+      AERROR << "Null obstacle [" << obstacle_id << "] found";
+      return;
+    }
+    if (obstacle_ptr->IsStill()) {
+      ADEBUG << "Ignore still obstacle [" << obstacle_id << "]";
+      return;
+    }
+    const Feature& feature = obstacle_ptr->latest_feature();
+    if (feature.priority().priority() == ObstaclePriority::IGNORE) {
+      ADEBUG << "Skip ignored obstacle [" << obstacle_id << "]";
+      return;
+    } else if (feature.priority().priority() == ObstaclePriority::CAUTION) {
+      caution_thread_idx = caution_thread_idx % FLAGS_max_caution_thread_num;
+      (*id_obstacle_map)[caution_thread_idx].push_back(obstacle_ptr);
+      ADEBUG << "Cautioned obstacle [" << obstacle_id << "] for thread"
+             << caution_thread_idx;
+      ++caution_thread_idx;
+    } else {
+      int normal_thread_num =
+          FLAGS_max_thread_num - FLAGS_max_caution_thread_num;
+      int id_mod =
+          obstacle_id % normal_thread_num + FLAGS_max_caution_thread_num;
+      (*id_obstacle_map)[id_mod].push_back(obstacle_ptr);
+      ADEBUG << "Normal obstacle [" << obstacle_id << "] for thread" << id_mod;
+    }
   }
 }
 
@@ -131,12 +138,6 @@ void EvaluatorManager::Init(const PredictionConf& config) {
             } else {
               vehicle_on_lane_evaluator_ = obstacle_conf.evaluator_type();
             }
-            // TODO(all): delete this offline hack when ready
-            if (FLAGS_prediction_offline_mode ==
-                PredictionConstants::kDumpDataForLearning) {
-              vehicle_on_lane_evaluator_ =
-                  ObstacleConf::LANE_SCANNING_EVALUATOR;
-            }
           }
           if (obstacle_conf.obstacle_status() == ObstacleConf::IN_JUNCTION) {
             if (obstacle_conf.priority_type() == ObstaclePriority::CAUTION) {
@@ -144,11 +145,6 @@ void EvaluatorManager::Init(const PredictionConf& config) {
                   obstacle_conf.evaluator_type();
             } else {
               vehicle_in_junction_evaluator_ = obstacle_conf.evaluator_type();
-            }
-            if (FLAGS_prediction_offline_mode ==
-                PredictionConstants::kDumpDataForLearning) {
-              vehicle_in_junction_evaluator_ =
-                  ObstacleConf::LANE_SCANNING_EVALUATOR;
             }
           }
           break;
@@ -210,9 +206,7 @@ void EvaluatorManager::Run(ObstaclesContainer* obstacles_container) {
 
   if (FLAGS_enable_multi_thread) {
     IdObstacleListMap id_obstacle_map;
-    for (int id : obstacles_container->curr_frame_considered_obstacle_ids()) {
-      GroupObstaclesByObstacleId(id, obstacles_container, &id_obstacle_map);
-    }
+    GroupObstaclesByObstacleIds(obstacles_container, &id_obstacle_map);
     PredictionThreadPool::ForEach(
         id_obstacle_map.begin(), id_obstacle_map.end(),
         [&](IdObstacleListMap::iterator::value_type& obstacles_iter) {
@@ -244,35 +238,40 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
   // Select different evaluators depending on the obstacle's type.
   switch (obstacle->type()) {
     case PerceptionObstacle::VEHICLE: {
-      if (obstacle->HasJunctionFeatureWithExits() &&
-          !obstacle->IsCloseToJunctionExit()) {
-        if (obstacle->latest_feature().priority().priority() ==
-            ObstaclePriority::CAUTION) {
+      if (obstacle->latest_feature().priority().priority() ==
+          ObstaclePriority::CAUTION) {
+        if (obstacle->IsNearJunction()) {
           evaluator = GetEvaluator(vehicle_in_junction_caution_evaluator_);
-          CHECK_NOTNULL(evaluator);
-          if (evaluator->Evaluate(obstacle, obstacles_container)) {
-            break;
-          }
-        }
-        evaluator = GetEvaluator(vehicle_in_junction_evaluator_);
-        CHECK_NOTNULL(evaluator);
-        evaluator->Evaluate(obstacle, obstacles_container);
-      } else if (obstacle->IsOnLane()) {
-        if (obstacle->latest_feature().priority().priority() ==
-            ObstaclePriority::CAUTION) {
+        } else if (obstacle->IsOnLane()) {
           evaluator = GetEvaluator(vehicle_on_lane_caution_evaluator_);
         } else {
-          evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
+          evaluator = GetEvaluator(vehicle_default_caution_evaluator_);
         }
         CHECK_NOTNULL(evaluator);
-        if (evaluator->GetName() == "LANE_SCANNING_EVALUATOR") {
-          evaluator->Evaluate(obstacle, obstacles_container, dynamic_env);
+        // Evaluate and break if success
+        if (evaluator->Evaluate(obstacle, obstacles_container)) {
+          break;
         } else {
-          evaluator->Evaluate(obstacle, obstacles_container);
+          AERROR << "Obstacle: " << obstacle->id()
+                 << " caution evaluator failed, downgrade to normal level!";
         }
+      }
+      // if obstacle is not caution or caution_evaluator run failed
+      if (obstacle->HasJunctionFeatureWithExits() &&
+          !obstacle->IsCloseToJunctionExit()) {
+        evaluator = GetEvaluator(vehicle_in_junction_evaluator_);
+      } else if (obstacle->IsOnLane()) {
+        evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
       } else {
         ADEBUG << "Obstacle: " << obstacle->id()
                << " is neither on lane, nor in junction. Skip evaluating.";
+        break;
+      }
+      CHECK_NOTNULL(evaluator);
+      if (evaluator->GetName() == "LANE_SCANNING_EVALUATOR") {
+        evaluator->Evaluate(obstacle, obstacles_container, dynamic_env);
+      } else {
+        evaluator->Evaluate(obstacle, obstacles_container);
       }
       break;
     }

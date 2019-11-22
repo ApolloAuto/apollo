@@ -147,18 +147,6 @@ cc_library(
 )
 
 cc_library(
-    name = "extended_kalman_filter",
-    hdrs = [
-        "extended_kalman_filter.h",
-    ],
-    deps = [
-        "//cyber/common:log",
-        "//modules/common/math:matrix_operations",
-        "@eigen",
-    ],
-)
-
-cc_library(
     name = "factorial",
     hdrs = [
         "factorial.h",
@@ -230,22 +218,6 @@ cc_library(
     ],
     deps = [
         ":geometry",
-        "//modules/common/proto:pnc_point_proto",
-    ],
-)
-
-cc_library(
-    name = "nonlinear_interpolation",
-    srcs = [
-        "nonlinear_interpolation.cc",
-    ],
-    hdrs = [
-        "nonlinear_interpolation.h",
-    ],
-    deps = [
-        ":geometry",
-        ":hermite_spline",
-        ":integral",
         "//modules/common/proto:pnc_point_proto",
     ],
 )

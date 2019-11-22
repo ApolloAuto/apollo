@@ -40,7 +40,7 @@ class ReferenceLineEnd : public TrafficRule {
                            ReferenceLineInfo* const reference_line_info);
 
  private:
-  static constexpr char const* const REF_LINE_END_VO_ID_PREFIX = "REF_END_";
+  static constexpr char const* REF_LINE_END_VO_ID_PREFIX = "REF_END_";
 };
 
 }  // namespace planning

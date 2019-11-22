@@ -23,6 +23,16 @@ cc_library(
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/time",
+        "@com_google_absl//absl/memory",
+    ],
+)
+
+cc_library(
+    name = "point_factory",
+    hdrs = ["point_factory.h"],
+    deps = [
+        "//modules/common/math:geometry",
+        "//modules/common/proto:pnc_point_proto",
     ],
 )
 

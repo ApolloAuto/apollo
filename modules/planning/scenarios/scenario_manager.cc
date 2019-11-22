@@ -21,11 +21,11 @@
 #include <utility>
 #include <vector>
 
-#include "modules/map/proto/map_lane.pb.h"
-
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
+#include "modules/map/proto/map_lane.pb.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/util/util.h"
@@ -733,13 +733,11 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectParkAndGoScenario(
   bool park_and_go = false;
   const auto& scenario_config =
       config_map_[ScenarioConfig::PARK_AND_GO].park_and_go_config();
-  common::VehicleState vehicle_state =
-      common::VehicleStateProvider::Instance()->vehicle_state();
-  auto adc_point = common::util::MakePointENU(
-      vehicle_state.x(), vehicle_state.y(), vehicle_state.z());
+  const auto vehicle_state_provider = common::VehicleStateProvider::Instance();
+  common::VehicleState vehicle_state = vehicle_state_provider->vehicle_state();
+  auto adc_point = common::util::PointFactory::ToPointENU(vehicle_state);
   // TODO(SHU) might consider gear == GEAR_PARKING
-  double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
+  double adc_speed = vehicle_state_provider->linear_velocity();
   double s = 0.0;
   double l = 0.0;
   const double max_abs_speed_when_stopped =

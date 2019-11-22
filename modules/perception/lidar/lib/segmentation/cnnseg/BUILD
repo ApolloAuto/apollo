@@ -24,6 +24,8 @@ cc_library(
         "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/interface",
+        "//modules/perception/lidar/lib/roi_filter/hdmap_roi_filter",
+        "//modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector",
         "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_config_proto",
         "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_param_proto",
         "//modules/perception/lidar/lib/segmentation/cnnseg/proto:spp_engine_config_proto",

@@ -118,12 +118,13 @@ void RuleBasedStopDecider::CheckLaneChangeUrgency(Frame *const frame) {
 
 void RuleBasedStopDecider::AddPathEndStop(
     Frame *const frame, ReferenceLineInfo *const reference_line_info) {
-  const std::string stop_wall_id = "path_end_stop";
-  std::vector<std::string> wait_for_obstacles;
   if (!reference_line_info->path_data().path_label().empty() &&
       reference_line_info->path_data().frenet_frame_path().back().s() -
               reference_line_info->path_data().frenet_frame_path().front().s() <
           FLAGS_short_path_length_threshold) {
+    const std::string stop_wall_id = PATH_END_VO_ID_PREFIX +
+        reference_line_info->path_data().path_label();
+    std::vector<std::string> wait_for_obstacles;
     util::BuildStopDecision(
         stop_wall_id,
         reference_line_info->path_data().frenet_frame_path().back().s() - 5.0,
