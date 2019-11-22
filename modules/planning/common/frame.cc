@@ -218,7 +218,7 @@ const Obstacle *Frame::CreateStopObstacle(
   const double box_center_s = obstacle_s + FLAGS_virtual_stop_wall_length / 2.0;
   auto box_center = reference_line.GetReferencePoint(box_center_s);
   double heading = reference_line.GetReferencePoint(obstacle_s).heading();
-  constexpr double kStopWallWidth = 4.0;
+  static constexpr double kStopWallWidth = 4.0;
   Box2d stop_wall_box{box_center, heading, FLAGS_virtual_stop_wall_length,
                       kStopWallWidth};
 

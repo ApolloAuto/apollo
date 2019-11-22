@@ -66,7 +66,7 @@ void PosesInterpolation::LoadPCDTimestamp() {
   if (file) {
     unsigned int index;
     double timestamp;
-    constexpr int kSize = 2;
+    static constexpr int kSize = 2;
     while (fscanf(file, "%u %lf\n", &index, &timestamp) == kSize) {
       ref_timestamps_.push_back(timestamp);
       ref_ids_.push_back(index);

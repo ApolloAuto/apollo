@@ -37,7 +37,7 @@ bool ChangeLane::FilterObstacles(ReferenceLineInfo* reference_line_info) {
   const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
   const auto& path_decision = reference_line_info->path_decision();
   const Obstacle* first_guard_vehicle = nullptr;
-  constexpr double kGuardForwardDistance = 60.0;
+  static constexpr double kGuardForwardDistance = 60.0;
   double max_s = 0.0;
   const double min_overtake_time = config_.change_lane().min_overtake_time();
   for (const auto* obstacle : path_decision->obstacles().Items()) {

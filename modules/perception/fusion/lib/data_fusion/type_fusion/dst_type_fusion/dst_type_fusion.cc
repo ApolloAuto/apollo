@@ -180,7 +180,7 @@ void DstTypeFusion::UpdateWithoutMeasurement(const std::string &sensor_id,
     // in a box detected by the camera.
     auto loss_fun = [](double dist_score) {
       CHECK_GE(dist_score, 0.0);
-      constexpr double th = 0.9;
+      static constexpr double th = 0.9;
       if (dist_score >= th) {
         return 0.0;
       }

@@ -154,8 +154,8 @@ SpeedData SpeedProfileGenerator::GenerateStopProfile(const double init_speed,
 
 SpeedData SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(
     const double distance, const double max_speed) {
-  constexpr double kConstDeceleration = -0.8;  // (~3sec to fully stop)
-  constexpr double kProceedingSpeed = 2.23;    // (5mph proceeding speed)
+  static constexpr double kConstDeceleration = -0.8;  // (~3sec to fully stop)
+  static constexpr double kProceedingSpeed = 2.23;    // (5mph proceeding speed)
   const double proceeding_speed = std::fmin(max_speed, kProceedingSpeed);
   const double distance_to_start_deceleration =
       proceeding_speed * proceeding_speed / kConstDeceleration / 2;
@@ -166,7 +166,7 @@ SpeedData SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(
   double s = 0.0;
   double v = proceeding_speed;
 
-  constexpr double kDeltaT = 0.1;
+  static constexpr double kDeltaT = 0.1;
 
   SpeedData speed_data;
   while (s < distance && v > 0) {

@@ -100,8 +100,8 @@ Stage::StageStatus EmergencyPullOverStageApproach::Process(
                                           .vehicle_param()
                                           .max_abs_speed_when_stopped();
     ADEBUG << "adc_speed[" << adc_speed << "] distance[" << distance << "]";
-    constexpr double kStopSpeedTolerance = 0.4;
-    constexpr double kStopDistanceTolerance = 3.0;
+    static constexpr double kStopSpeedTolerance = 0.4;
+    static constexpr double kStopDistanceTolerance = 3.0;
     if (adc_speed <= max_adc_stop_speed + kStopSpeedTolerance &&
         std::fabs(distance) <= kStopDistanceTolerance) {
       return FinishStage();

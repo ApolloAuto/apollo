@@ -271,7 +271,7 @@ void PathLaneBorrowDecider::CheckLaneBorrow(
   *left_neighbor_lane_borrowable = true;
   *right_neighbor_lane_borrowable = true;
 
-  constexpr double kLookforwardDistance = 100.0;
+  static constexpr double kLookforwardDistance = 100.0;
   double check_s = reference_line_info.AdcSlBoundary().end_s();
   const double lookforward_distance =
       std::min(check_s + kLookforwardDistance, reference_line.Length());

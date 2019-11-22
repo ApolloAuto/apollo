@@ -82,7 +82,7 @@ Stage::StageStatus EmergencyStopStageApproach::Process(
     const double travel_distance =
         std::ceil(std::pow(adc_speed, 2) / (2 * deceleration));
 
-    constexpr double kBuffer = 2.0;
+    static constexpr double kBuffer = 2.0;
     stop_line_s = adc_front_edge_s + travel_distance + stop_distance + kBuffer;
     ADEBUG << "travel_distance[" << travel_distance << "] [" << adc_speed
            << "] adc_front_edge_s[" << adc_front_edge_s << "] stop_line_s["

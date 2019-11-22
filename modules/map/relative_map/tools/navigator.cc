@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
   // such as the network delay, We send it several times to ensure that the data
   // is sent successfully.
   Rate rate(1.0);
-  constexpr int kTransNum = 3;
+  static constexpr int kTransNum = 3;
   int trans_num = 0;
   while (apollo::cyber::OK()) {
     if (trans_num > kTransNum) {

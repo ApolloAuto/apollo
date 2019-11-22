@@ -178,7 +178,7 @@ void ReferenceLineProvider::UpdateReferenceLine(
   // update history
   reference_line_history_.push(reference_lines_);
   route_segments_history_.push(route_segments_);
-  constexpr int kMaxHistoryNum = 3;
+  static constexpr int kMaxHistoryNum = 3;
   if (reference_line_history_.size() > kMaxHistoryNum) {
     reference_line_history_.pop();
     route_segments_history_.pop();
@@ -187,7 +187,7 @@ void ReferenceLineProvider::UpdateReferenceLine(
 
 void ReferenceLineProvider::GenerateThread() {
   while (!is_stop_) {
-    constexpr int32_t kSleepTime = 50;  // milliseconds
+    static constexpr int32_t kSleepTime = 50;  // milliseconds
     cyber::SleepFor(std::chrono::milliseconds(kSleepTime));
     const double start_time = Clock::NowInSeconds();
     if (!has_routing_) {
@@ -497,7 +497,7 @@ bool ReferenceLineProvider::GetNearestWayPointFromNavigationPath(
     if (!lane->GetProjection({point.x(), point.y()}, &s, &l)) {
       continue;
     }
-    constexpr double kEpsilon = 1e-6;
+    static constexpr double kEpsilon = 1e-6;
     if (s > (lane->total_length() + kEpsilon) || (s + kEpsilon) < 0.0) {
       continue;
     }
@@ -703,7 +703,7 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
 bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
                                    ReferenceLine *reference_line,
                                    RouteSegments *segments) {
-  constexpr double kMaxHeadingDiff = M_PI * 5.0 / 6.0;
+  static constexpr double kMaxHeadingDiff = M_PI * 5.0 / 6.0;
   // shrink reference line
   double new_backward_distance = sl.s();
   double new_forward_distance = reference_line->Length() - sl.s();
@@ -749,7 +749,7 @@ bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
 
 bool ReferenceLineProvider::IsReferenceLineSmoothValid(
     const ReferenceLine &raw, const ReferenceLine &smoothed) const {
-  constexpr double kReferenceLineDiffCheckStep = 10.0;
+  static constexpr double kReferenceLineDiffCheckStep = 10.0;
   for (double s = 0.0; s < smoothed.Length();
        s += kReferenceLineDiffCheckStep) {
     auto xy_new = smoothed.GetReferencePoint(s);

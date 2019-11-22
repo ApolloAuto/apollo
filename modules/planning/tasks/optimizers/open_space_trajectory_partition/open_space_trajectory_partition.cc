@@ -326,8 +326,8 @@ bool OpenSpaceTrajectoryPartition::EncodeTrajectory(
     AERROR << "Fail to encode trajectory because it is empty";
     return false;
   }
-  constexpr double encoding_origin_x = 58700.0;
-  constexpr double encoding_origin_y = 4141000.0;
+  static constexpr double encoding_origin_x = 58700.0;
+  static constexpr double encoding_origin_y = 4141000.0;
   const auto& init_path_point = trajectory.front().path_point();
   const auto& last_path_point = trajectory.back().path_point();
 

@@ -130,7 +130,7 @@ Status SpeedBoundsDecider::Process(
 double SpeedBoundsDecider::SetSpeedFallbackDistance(
     PathDecision *const path_decision) {
   // Set min_s_on_st_boundaries to guide speed fallback.
-  constexpr double kEpsilon = 1.0e-6;
+  static constexpr double kEpsilon = 1.0e-6;
   double min_s_non_reverse = std::numeric_limits<double>::infinity();
   double min_s_reverse = std::numeric_limits<double>::infinity();
 
@@ -202,7 +202,7 @@ void SpeedBoundsDecider::RecordSTGraphDebug(
   }
 
   for (const auto &point : st_graph_data.speed_limit().speed_limit_points()) {
-    common::SpeedPoint* speed_point = st_graph_debug->add_speed_limit();
+    common::SpeedPoint *speed_point = st_graph_debug->add_speed_limit();
     speed_point->set_s(point.first);
     speed_point->set_v(point.second);
   }

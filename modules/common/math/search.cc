@@ -25,7 +25,7 @@ namespace math {
 double GoldenSectionSearch(const std::function<double(double)> &func,
                            const double lower_bound, const double upper_bound,
                            const double tol) {
-  constexpr double gr = 1.618033989;  // (sqrt(5) + 1) / 2
+  static constexpr double gr = 1.618033989;  // (sqrt(5) + 1) / 2
 
   double a = lower_bound;
   double b = upper_bound;

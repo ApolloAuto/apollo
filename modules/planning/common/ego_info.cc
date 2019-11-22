@@ -80,8 +80,8 @@ void EgoInfo::CalculateFrontObstacleClearDistance(
   Vec2d unit_vec_heading = Vec2d::CreateUnitVec2d(vehicle_state_.heading());
 
   // Due to the error of ego heading, only short range distance is meaningful
-  constexpr double kDistanceThreshold = 50.0;
-  constexpr double buffer = 0.1;  // in meters
+  static constexpr double kDistanceThreshold = 50.0;
+  static constexpr double buffer = 0.1;  // in meters
   const double impact_region_length =
       param.length() + buffer + kDistanceThreshold;
   Box2d ego_front_region(center + unit_vec_heading * kDistanceThreshold / 2.0,

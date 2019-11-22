@@ -337,7 +337,7 @@ bool RouteSegments::CanDriveFrom(const LaneWaypoint &waypoint) const {
     AERROR << "No projection from waypoint: " << waypoint.DebugString();
     return false;
   }
-  constexpr double kMaxLaneWidth = 10.0;
+  static constexpr double kMaxLaneWidth = 10.0;
   if (std::fabs(route_sl.l()) > 2 * kMaxLaneWidth) {
     return false;
   }

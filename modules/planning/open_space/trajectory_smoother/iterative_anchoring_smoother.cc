@@ -758,8 +758,8 @@ void IterativeAnchoringSmoother::AdjustPathAndSpeedByGear(
 bool IterativeAnchoringSmoother::GenerateStopProfileFromPolynomial(
     const double init_acc, const double init_speed, const double stop_distance,
     SpeedData* smoothed_speeds) {
-  constexpr double kMaxT = 8.0;
-  constexpr double kUnitT = 0.2;
+  static constexpr double kMaxT = 8.0;
+  static constexpr double kUnitT = 0.2;
   for (double t = 2.0; t <= kMaxT; t += kUnitT) {
     QuinticPolynomialCurve1d curve(0.0, init_speed, init_acc, stop_distance,
                                    0.0, 0.0, t);
@@ -786,7 +786,7 @@ bool IterativeAnchoringSmoother::IsValidPolynomialProfile(
        evaluate_t += 0.2) {
     const double v = curve.Evaluate(1, evaluate_t);
     const double a = curve.Evaluate(2, evaluate_t);
-    constexpr double kEpsilon = 1e-3;
+    static constexpr double kEpsilon = 1e-3;
     if (v < -kEpsilon || a > 1.0) {
       return false;
     }
