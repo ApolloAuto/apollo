@@ -95,6 +95,8 @@ class PreprocessorSubmodule final
 
   std::mutex mutex_;
 
+  std::shared_ptr<Reader<LocalView>> local_view_reader_;
+
   std::shared_ptr<cyber::Writer<Preprocessor>> preprocessor_writer_;
 
   ControlCommonConf control_common_conf_;
