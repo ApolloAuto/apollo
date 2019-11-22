@@ -25,7 +25,7 @@
 
 namespace apollo {
 namespace control {
-#define ADEBUG AINFO
+
 using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
@@ -55,7 +55,7 @@ bool ControlComponent::Init() {
   if (!FLAGS_use_control_submodules &&
       !controller_agent_.Init(&control_conf_).ok()) {
     // set controller
-    AINFO << "original control";
+    ADEBUG << "original control";
     monitor_logger_buffer_.ERROR("Control init controller failed! Stopping...");
     return false;
   }
@@ -316,26 +316,10 @@ bool ControlComponent::Proc() {
     local_view_.mutable_chassis()->CopyFrom(latest_chassis_);
     local_view_.mutable_trajectory()->CopyFrom(latest_trajectory_);
     local_view_.mutable_localization()->CopyFrom(latest_localization_);
-    AINFO << "Control main function failed"
-          << " with localization: "
-          << local_view_.localization().ShortDebugString()
-          << " with chassis: " << local_view_.chassis().ShortDebugString()
-          << " with trajectory: "
-          << local_view_.trajectory().ShortDebugString();
   }
 
   // use control submodules
-  // AWARN << "FLAGS_use_control_submodules: " << FLAGS_use_control_submodules;
   if (FLAGS_use_control_submodules) {
-    AINFO << "Control main function failed"
-          << " with localization: "
-          << local_view_.localization().ShortDebugString()
-          << " with chassis: " << local_view_.chassis().ShortDebugString()
-          << " with trajectory: "
-          << local_view_.trajectory().ShortDebugString();
-    //   preprocessor_submodule_->Proc(
-    //       std::make_shared<apollo::control::LocalView>(local_view_),
-    //       pad_msg);
     local_view_writer_->Write(std::make_shared<LocalView>(local_view_));
     pad_msg_writer_->Write(std::make_shared<PadMessage>(pad_msg_));
     return true;

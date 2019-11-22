@@ -30,8 +30,6 @@
 namespace apollo {
 namespace control {
 
-#define ADEBUG AINFO
-
 using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
@@ -41,9 +39,7 @@ using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 
 PreprocessorSubmodule::PreprocessorSubmodule()
-    : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {
-  AINFO << "preprocessor";
-}
+    : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
 
 PreprocessorSubmodule::~PreprocessorSubmodule() {}
 
@@ -52,7 +48,6 @@ std::string PreprocessorSubmodule::Name() const {
 }
 
 bool PreprocessorSubmodule::Init() {
-  AINFO << "preprocessor";
   if (!cyber::common::GetProtoFromFile(FLAGS_control_common_conf_file,
                                        &control_common_conf_)) {
     AERROR << "Unable to load control common conf file: "
@@ -63,12 +58,8 @@ bool PreprocessorSubmodule::Init() {
   // Preprocessor writer
   preprocessor_writer_ =
       node_->CreateWriter<Preprocessor>(FLAGS_control_preprocessor_topic);
-  AINFO << "preprocessor";
-  CHECK(preprocessor_writer_ != nullptr);
-  AINFO << "preprocessor";
 
-  // TODO(SHU) pad_msg action is set by control_conf from control component
-  // not by control_common_conf
+  CHECK(preprocessor_writer_ != nullptr);
 
   return true;
 }
@@ -76,7 +67,6 @@ bool PreprocessorSubmodule::Init() {
 bool PreprocessorSubmodule::Proc(
     const std::shared_ptr<LocalView> &local_view,
     const std::shared_ptr<PadMessage> &pad_message) {
-  AINFO << "preprocessor";
   {
     std::lock_guard<std::mutex> lock(mutex_);
     local_view_reader_->Observe();
@@ -88,14 +78,13 @@ bool PreprocessorSubmodule::Proc(
     local_view_->CopyFrom(*local_view_msg);
   }
 
-  AINFO << "preprocessor";
   Preprocessor control_preprocessor;
 
   Status status = ProducePreprocessorStatus(&control_preprocessor);
   AERROR_IF(!status.ok()) << "Failed to produce control preprocessor:"
                           << status.error_message();
 
-  AINFO << "preprocessor";
+  // TODO(SHU): will enabled later
   // if (pad_message != nullptr) {
   //   if (pad_message->action() == DrivingAction::RESET) {
   //     AINFO << "Control received RESET action!";
@@ -107,12 +96,9 @@ bool PreprocessorSubmodule::Proc(
   //   control_preprocessor.mutable_pad_msg()->CopyFrom(*pad_message);
   // }
 
-  AINFO << "preprocessor";
-
   preprocessor_writer_->Write(
       std::make_shared<Preprocessor>(control_preprocessor));
 
-  AINFO << "preprocessor";
   return true;
 }
 
@@ -120,9 +106,7 @@ Status PreprocessorSubmodule::ProducePreprocessorStatus(
     Preprocessor *preprocessor_status) {
   Status status = CheckInput(local_view_);
 
-  AINFO << "preprocessor";
   if (!status.ok()) {
-    AINFO << "preprocessor";
     AERROR_EVERY(100) << "Control input data failed: "
                       << status.error_message();
     preprocessor_status->mutable_engage_advice()->set_advice(
@@ -133,7 +117,7 @@ Status PreprocessorSubmodule::ProducePreprocessorStatus(
     estop_reason_ = status.error_message();
   } else {
     Status status_ts = CheckTimestamp(local_view_);
-    AINFO << "preprocessor";
+
     if (!status_ts.ok()) {
       AERROR << "Input messages timeout";
       status = status_ts;
@@ -201,8 +185,6 @@ Status PreprocessorSubmodule::ProducePreprocessorStatus(
     preprocessor_status->set_estop_reason(estop_reason_);
   }
 
-  AINFO << "preprocessor";
-
   return status;
 }
 
@@ -231,13 +213,9 @@ Status PreprocessorSubmodule::CheckInput(LocalView *local_view) {
       }
     }
   }
-
-  AINFO << "preprocessor";
-
   VehicleStateProvider::Instance()->Update(local_view->localization(),
                                            local_view->chassis());
 
-  AINFO << "preprocessor";
   return Status::OK();
 }
 
@@ -282,7 +260,6 @@ Status PreprocessorSubmodule::CheckTimestamp(LocalView *local_view) {
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, "Trajectory msg timeout");
   }
 
-  AINFO << "preprocessor";
   return Status::OK();
 }
 
