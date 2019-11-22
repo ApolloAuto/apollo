@@ -68,8 +68,8 @@ def sort_files_by_timestamp(in_path, out_path,
             out_file_name = os.path.join(out_path, ("%06d"%(i+1)) + extension)
             copyfile(in_file_name, out_file_name)
 
-    elif extension=='Odometry.bin':
-        tmp_file = os.path.join(in_path, 'Odometry.bin')
+    elif extension=='odometry':
+        tmp_file = os.path.join(in_path, 'odometry')
         in_odm = OdometryFileObject(file_path=tmp_file,
                                     operation='read',
                                     file_type='binary')
@@ -79,7 +79,7 @@ def sort_files_by_timestamp(in_path, out_path,
             d = data[idx]
             sorted_data.append(d)
 
-        tmp_file = os.path.join(out_path, 'Odometry.bin')
+        tmp_file = os.path.join(out_path, 'odometry')
         out_odm = OdometryFileObject(file_path=tmp_file,
                                     operation='write',
                                     file_type='binary')
@@ -189,7 +189,7 @@ def select_static_image_pcd(path, min_distance=5, stop_times=5,
         ts_map = np.loadtxt(ts_file)
         timestamp_dict[f] = ts_map
     #  load odometry binary file
-    odometry_file = os.path.join(path, odometry_subfolder, 'Odometry.bin')
+    odometry_file = os.path.join(path, odometry_subfolder, 'odometry')
     in_odm = OdometryFileObject(file_path=odometry_file,
                       operation='read',
                       file_type='binary')
@@ -328,7 +328,7 @@ def main2():
     out_path = os.path.join(in_path, 'new')
     mkdir_p(out_path)
     timestamp_filename = 'timestamps.txt'
-    extension = 'Odometry.bin'
+    extension = 'odometry'
     sort_files_by_timestamp(in_path, out_path, timestamp_filename, extension=extension)
 
 def main():
