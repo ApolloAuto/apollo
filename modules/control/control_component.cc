@@ -100,9 +100,7 @@ bool ControlComponent::Init() {
   } else {
     local_view_writer_ =
         node_->CreateWriter<LocalView>(FLAGS_control_local_view_topic);
-    CHECK(local_view_writer_);
-    pad_msg_writer_ = node_->CreateWriter<PadMessage>(FLAGS_pad_topic);
-    CHECK(pad_msg_writer_);
+    CHECK(local_view_writer_ != nullptr);
   }
 
   // set initial vehicle state by cmd
@@ -312,6 +310,7 @@ bool ControlComponent::Proc() {
   }
 
   {
+    // TODO(SHU): to avoid redundent copy
     std::lock_guard<std::mutex> lock(mutex_);
     local_view_.mutable_chassis()->CopyFrom(latest_chassis_);
     local_view_.mutable_trajectory()->CopyFrom(latest_trajectory_);
@@ -321,7 +320,6 @@ bool ControlComponent::Proc() {
   // use control submodules
   if (FLAGS_use_control_submodules) {
     local_view_writer_->Write(std::make_shared<LocalView>(local_view_));
-    pad_msg_writer_->Write(std::make_shared<PadMessage>(pad_msg_));
     return true;
   }
 
