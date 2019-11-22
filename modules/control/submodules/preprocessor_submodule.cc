@@ -64,9 +64,7 @@ bool PreprocessorSubmodule::Init() {
   return true;
 }
 
-bool PreprocessorSubmodule::Proc(
-    const std::shared_ptr<LocalView> &local_view,
-    const std::shared_ptr<PadMessage> &pad_message) {
+bool PreprocessorSubmodule::Proc(const std::shared_ptr<LocalView> &local_view) {
   {
     std::lock_guard<std::mutex> lock(mutex_);
     local_view_reader_->Observe();
@@ -85,17 +83,16 @@ bool PreprocessorSubmodule::Proc(
   AERROR_IF(!status.ok()) << "Failed to produce control preprocessor:"
                           << status.error_message();
 
-  // TODO(SHU): will enabled later
-  // if (pad_message != nullptr) {
-  //   if (pad_message->action() == DrivingAction::RESET) {
-  //     AINFO << "Control received RESET action!";
-  //     estop_ = false;
-  //     estop_reason_.clear();
-  //   }
-  //   pad_received_ = true;
-  //   control_preprocessor.set_received_pad_msg(pad_received_);
-  //   control_preprocessor.mutable_pad_msg()->CopyFrom(*pad_message);
-  // }
+  if (local_view_->mutable_pad_msg() != nullptr) {
+    auto pad_message = local_view_->mutable_pad_msg();
+    if (pad_message->action() == DrivingAction::RESET) {
+      AINFO << "Control received RESET action!";
+      estop_ = false;
+      estop_reason_.clear();
+    }
+    pad_received_ = true;
+    control_preprocessor.set_received_pad_msg(pad_received_);
+  }
 
   preprocessor_writer_->Write(
       std::make_shared<Preprocessor>(control_preprocessor));
