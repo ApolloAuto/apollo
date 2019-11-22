@@ -52,7 +52,8 @@ bool PostprocessorSubmodule::Proc(
     const std::shared_ptr<ControlCommand>& control_command) {
   ControlCommand post_processor;
   if (preprocessor_status->received_pad_msg()) {
-    post_processor.mutable_pad_msg()->CopyFrom(preprocessor_status->pad_msg());
+    post_processor.mutable_pad_msg()->CopyFrom(
+        preprocessor_status->mutable_local_view()->pad_msg());
   }
 
   // forward estop reason among following control frames.
