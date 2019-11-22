@@ -114,7 +114,6 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
   std::shared_ptr<Writer<ControlCommand>> control_cmd_writer_;
   // when using control submodules
   std::shared_ptr<Writer<LocalView>> local_view_writer_;
-  std::shared_ptr<Writer<PadMessage>> pad_msg_writer_;
 
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 

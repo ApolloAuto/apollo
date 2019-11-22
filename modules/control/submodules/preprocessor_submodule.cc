@@ -75,6 +75,7 @@ bool PreprocessorSubmodule::Proc(
       AERROR << "local view msg is not ready!";
       return false;
     }
+    // TODO(SHU): to avoid redundent copy
     local_view_->CopyFrom(*local_view_msg);
   }
 
