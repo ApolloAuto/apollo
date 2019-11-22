@@ -25,7 +25,7 @@
 
 namespace apollo {
 namespace control {
-
+#define ADEBUG AINFO
 using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
@@ -50,11 +50,12 @@ bool ControlComponent::Init() {
 
   AINFO << "Conf file: " << ConfigFilePath() << " is loaded.";
 
-  // use control submodules
-  if (FLAGS_use_control_submodules) {
-    dynamic_cast<ControlComponent *>(&preprocessor_submodule_);
-  } else if (!controller_agent_.Init(&control_conf_).ok()) {
+  // initial controller agent when not using control submodules
+  ADEBUG << "FLAGS_use_control_submodules: " << FLAGS_use_control_submodules;
+  if (!FLAGS_use_control_submodules &&
+      !controller_agent_.Init(&control_conf_).ok()) {
     // set controller
+    AINFO << "original control";
     monitor_logger_buffer_.ERROR("Control init controller failed! Stopping...");
     return false;
   }
@@ -92,9 +93,17 @@ bool ControlComponent::Init() {
       node_->CreateReader<PadMessage>(pad_msg_reader_config, nullptr);
   CHECK(pad_msg_reader_ != nullptr);
 
-  control_cmd_writer_ =
-      node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
-  CHECK(control_cmd_writer_ != nullptr);
+  if (!FLAGS_use_control_submodules) {
+    control_cmd_writer_ =
+        node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
+    CHECK(control_cmd_writer_ != nullptr);
+  } else {
+    local_view_writer_ =
+        node_->CreateWriter<LocalView>(FLAGS_control_local_view_topic);
+    CHECK(local_view_writer_);
+    pad_msg_writer_ = node_->CreateWriter<PadMessage>(FLAGS_pad_topic);
+    CHECK(pad_msg_writer_);
+  }
 
   // set initial vehicle state by cmd
   // need to sleep, because advertised channel is not ready immediately
@@ -113,6 +122,7 @@ bool ControlComponent::Init() {
 }
 
 void ControlComponent::OnPad(const std::shared_ptr<PadMessage> &pad) {
+  std::lock_guard<std::mutex> lock(mutex_);
   pad_msg_.CopyFrom(*pad);
   ADEBUG << "Received Pad Msg:" << pad_msg_.DebugString();
   AERROR_IF(!pad_msg_.has_action()) << "pad message check failed!";
@@ -150,13 +160,6 @@ void ControlComponent::OnMonitor(
 
 Status ControlComponent::ProduceControlCommand(
     ControlCommand *control_command) {
-  {
-    std::lock_guard<std::mutex> lock(mutex_);
-    local_view_.mutable_chassis()->CopyFrom(latest_chassis_);
-    local_view_.mutable_trajectory()->CopyFrom(latest_trajectory_);
-    local_view_.mutable_localization()->CopyFrom(latest_localization_);
-  }
-
   Status status = CheckInput(&local_view_);
   // check data
 
@@ -308,21 +311,43 @@ bool ControlComponent::Proc() {
     OnPad(pad_msg);
   }
 
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    local_view_.mutable_chassis()->CopyFrom(latest_chassis_);
+    local_view_.mutable_trajectory()->CopyFrom(latest_trajectory_);
+    local_view_.mutable_localization()->CopyFrom(latest_localization_);
+    AINFO << "Control main function failed"
+          << " with localization: "
+          << local_view_.localization().ShortDebugString()
+          << " with chassis: " << local_view_.chassis().ShortDebugString()
+          << " with trajectory: "
+          << local_view_.trajectory().ShortDebugString();
+  }
+
   // use control submodules
+  // AWARN << "FLAGS_use_control_submodules: " << FLAGS_use_control_submodules;
   if (FLAGS_use_control_submodules) {
-    local_view_reader_->Observe();
-    const auto &local_view_msg = local_view_reader_->GetLatestObserved();
-    preprocessor_submodule_.Proc(local_view_msg, pad_msg);
+    AINFO << "Control main function failed"
+          << " with localization: "
+          << local_view_.localization().ShortDebugString()
+          << " with chassis: " << local_view_.chassis().ShortDebugString()
+          << " with trajectory: "
+          << local_view_.trajectory().ShortDebugString();
+    //   preprocessor_submodule_->Proc(
+    //       std::make_shared<apollo::control::LocalView>(local_view_),
+    //       pad_msg);
+    local_view_writer_->Write(std::make_shared<LocalView>(local_view_));
+    pad_msg_writer_->Write(std::make_shared<PadMessage>(pad_msg_));
     return true;
   }
 
   // do something according to pad message
-  if (pad_msg_.action() == DrivingAction::RESET) {
+  if (pad_msg != nullptr && pad_msg_.action() == DrivingAction::RESET) {
     AINFO << "Control received RESET action!";
     estop_ = false;
     estop_reason_.clear();
+    pad_received_ = true;
   }
-  pad_received_ = true;
 
   if (control_conf_.is_control_test_mode() &&
       control_conf_.control_test_duration() > 0 &&
