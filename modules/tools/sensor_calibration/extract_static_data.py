@@ -69,7 +69,6 @@ def sort_files_by_timestamp(in_path, out_path,
             in_file_name = os.path.join(in_path, ("%06d"%(idx+1)) + extension)
             out_file_name = os.path.join(out_path, ("%06d"%(i+1)) + extension)
             copyfile(in_file_name, out_file_name)
-
     elif extension == 'odometry':
         tmp_file = os.path.join(in_path, 'odometry')
         in_odm = OdometryFileObject(file_path=tmp_file,
