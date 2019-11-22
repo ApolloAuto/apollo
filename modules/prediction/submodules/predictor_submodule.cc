@@ -37,7 +37,7 @@ std::string PredictorSubmodule::Name() const {
 }
 
 bool PredictorSubmodule::Init() {
-  if (!MessageProcess::InitEvaluators()) {
+  if (!MessageProcess::InitPredictors()) {
     return false;
   }
   predictor_writer_ =

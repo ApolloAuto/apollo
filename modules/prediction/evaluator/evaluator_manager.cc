@@ -138,12 +138,6 @@ void EvaluatorManager::Init(const PredictionConf& config) {
             } else {
               vehicle_on_lane_evaluator_ = obstacle_conf.evaluator_type();
             }
-            // TODO(all): delete this offline hack when ready
-            if (FLAGS_prediction_offline_mode ==
-                PredictionConstants::kDumpDataForLearning) {
-              vehicle_on_lane_evaluator_ =
-                  ObstacleConf::LANE_SCANNING_EVALUATOR;
-            }
           }
           if (obstacle_conf.obstacle_status() == ObstacleConf::IN_JUNCTION) {
             if (obstacle_conf.priority_type() == ObstaclePriority::CAUTION) {
@@ -151,11 +145,6 @@ void EvaluatorManager::Init(const PredictionConf& config) {
                   obstacle_conf.evaluator_type();
             } else {
               vehicle_in_junction_evaluator_ = obstacle_conf.evaluator_type();
-            }
-            if (FLAGS_prediction_offline_mode ==
-                PredictionConstants::kDumpDataForLearning) {
-              vehicle_in_junction_evaluator_ =
-                  ObstacleConf::LANE_SCANNING_EVALUATOR;
             }
           }
           break;
@@ -249,35 +238,40 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
   // Select different evaluators depending on the obstacle's type.
   switch (obstacle->type()) {
     case PerceptionObstacle::VEHICLE: {
-      if (obstacle->HasJunctionFeatureWithExits() &&
-          !obstacle->IsCloseToJunctionExit()) {
-        if (obstacle->latest_feature().priority().priority() ==
-            ObstaclePriority::CAUTION) {
+      if (obstacle->latest_feature().priority().priority() ==
+          ObstaclePriority::CAUTION) {
+        if (obstacle->IsNearJunction()) {
           evaluator = GetEvaluator(vehicle_in_junction_caution_evaluator_);
-          CHECK_NOTNULL(evaluator);
-          if (evaluator->Evaluate(obstacle, obstacles_container)) {
-            break;
-          }
-        }
-        evaluator = GetEvaluator(vehicle_in_junction_evaluator_);
-        CHECK_NOTNULL(evaluator);
-        evaluator->Evaluate(obstacle, obstacles_container);
-      } else if (obstacle->IsOnLane()) {
-        if (obstacle->latest_feature().priority().priority() ==
-            ObstaclePriority::CAUTION) {
+        } else if (obstacle->IsOnLane()) {
           evaluator = GetEvaluator(vehicle_on_lane_caution_evaluator_);
         } else {
-          evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
+          evaluator = GetEvaluator(vehicle_default_caution_evaluator_);
         }
         CHECK_NOTNULL(evaluator);
-        if (evaluator->GetName() == "LANE_SCANNING_EVALUATOR") {
-          evaluator->Evaluate(obstacle, obstacles_container, dynamic_env);
+        // Evaluate and break if success
+        if (evaluator->Evaluate(obstacle, obstacles_container)) {
+          break;
         } else {
-          evaluator->Evaluate(obstacle, obstacles_container);
+          AERROR << "Obstacle: " << obstacle->id()
+                 << " caution evaluator failed, downgrade to normal level!";
         }
+      }
+      // if obstacle is not caution or caution_evaluator run failed
+      if (obstacle->HasJunctionFeatureWithExits() &&
+          !obstacle->IsCloseToJunctionExit()) {
+        evaluator = GetEvaluator(vehicle_in_junction_evaluator_);
+      } else if (obstacle->IsOnLane()) {
+        evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
       } else {
         ADEBUG << "Obstacle: " << obstacle->id()
                << " is neither on lane, nor in junction. Skip evaluating.";
+        break;
+      }
+      CHECK_NOTNULL(evaluator);
+      if (evaluator->GetName() == "LANE_SCANNING_EVALUATOR") {
+        evaluator->Evaluate(obstacle, obstacles_container, dynamic_env);
+      } else {
+        evaluator->Evaluate(obstacle, obstacles_container);
       }
       break;
     }

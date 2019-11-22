@@ -216,6 +216,14 @@ Status SpeedDecider::MakeObjectDecision(
       continue;
     }
 
+    // for Virtual obstacle, skip if center point NOT "on lane"
+    if (obstacle->IsVirtual()) {
+      const auto& obstacle_box = obstacle->PerceptionBoundingBox();
+      if (!reference_line_->IsOnLane(obstacle_box.center())) {
+        continue;
+      }
+    }
+
     // always STOP for pedestrian
     if (CheckStopForPedestrian(*mutable_obstacle, &pedestrian_stop_times)) {
       ObjectDecisionType stop_decision;

@@ -558,10 +558,9 @@ std::string ReferenceLineInfo::PathSpeedDebugString() const {
                       "speed_data:", speed_data_.DebugString());
 }
 
-void ReferenceLineInfo::SetTurnSignal(
+void ReferenceLineInfo::SetTurnSignalBasedOnLaneTurnType(
     common::VehicleSignal* vehicle_signal) const {
   CHECK_NOTNULL(vehicle_signal);
-
   if (vehicle_signal->has_turn_signal() &&
       vehicle_signal->turn_signal() != VehicleSignal::TURN_NONE) {
     return;
@@ -627,7 +626,7 @@ void ReferenceLineInfo::ExportVehicleSignal(
     common::VehicleSignal* vehicle_signal) const {
   CHECK_NOTNULL(vehicle_signal);
   *vehicle_signal = vehicle_signal_;
-  SetTurnSignal(vehicle_signal);
+  SetTurnSignalBasedOnLaneTurnType(vehicle_signal);
 }
 
 bool ReferenceLineInfo::ReachedDestination() const {
