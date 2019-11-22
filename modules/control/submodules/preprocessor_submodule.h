@@ -37,7 +37,7 @@ namespace apollo {
 namespace control {
 
 class PreprocessorSubmodule final
-    : public cyber::Component<LocalView, PadMessage> {
+    : public cyber::Component<LocalView> {
  public:
   /**
    * @brief Construct a new Preprocessor Submodule object
@@ -60,8 +60,7 @@ class PreprocessorSubmodule final
    */
   bool Init() override;
 
-  bool Proc(const std::shared_ptr<LocalView> &local_view,
-            const std::shared_ptr<PadMessage> &pad_message) override;
+  bool Proc(const std::shared_ptr<LocalView> &local_view) override;
 
  private:
   /**
