@@ -69,16 +69,16 @@ void GroupObstaclesByObstacleIds(ObstaclesContainer* const obstacles_container,
     Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
     if (obstacle_ptr == nullptr) {
       AERROR << "Null obstacle [" << obstacle_id << "] found";
-      return;
+      continue;
     }
     if (obstacle_ptr->IsStill()) {
       ADEBUG << "Ignore still obstacle [" << obstacle_id << "]";
-      return;
+      continue;
     }
     const Feature& feature = obstacle_ptr->latest_feature();
     if (feature.priority().priority() == ObstaclePriority::IGNORE) {
       ADEBUG << "Skip ignored obstacle [" << obstacle_id << "]";
-      return;
+      continue;
     } else if (feature.priority().priority() == ObstaclePriority::CAUTION) {
       caution_thread_idx = caution_thread_idx % FLAGS_max_caution_thread_num;
       (*id_obstacle_map)[caution_thread_idx].push_back(obstacle_ptr);
