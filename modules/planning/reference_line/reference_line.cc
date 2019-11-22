@@ -96,7 +96,7 @@ bool ReferenceLine::Stitch(const ReferenceLine& other) {
   const auto& accumulated_s = other.map_path().accumulated_s();
   const auto& other_points = other.reference_points();
   auto lower = accumulated_s.begin();
-  constexpr double kStitchingError = 1e-1;
+  static constexpr double kStitchingError = 1e-1;
   if (first_join) {
     if (first_sl.l() > kStitchingError) {
       AERROR << "lateral stitching error on first join of reference line too "

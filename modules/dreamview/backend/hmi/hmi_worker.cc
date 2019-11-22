@@ -403,8 +403,8 @@ bool HMIWorker::ChangeDrivingMode(const Chassis::DrivingMode mode) {
       return false;
   }
 
-  constexpr int kMaxTries = 3;
-  constexpr auto kTryInterval = std::chrono::milliseconds(500);
+  static constexpr int kMaxTries = 3;
+  static constexpr auto kTryInterval = std::chrono::milliseconds(500);
   for (int i = 0; i < kMaxTries; ++i) {
     // Send driving action periodically until entering target driving mode.
     common::util::FillHeader("HMI", pad.get());

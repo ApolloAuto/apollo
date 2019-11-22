@@ -91,7 +91,7 @@ GriddedPathTimeGraph::GriddedPathTimeGraph(
 }
 
 Status GriddedPathTimeGraph::Search(SpeedData* const speed_data) {
-  constexpr double kBounadryEpsilon = 1e-2;
+  static constexpr double kBounadryEpsilon = 1e-2;
   for (const auto& boundary : st_graph_data_.st_boundaries()) {
     // KeepClear obstacles not considered in Dp St decision
     if (boundary->boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
@@ -366,7 +366,7 @@ void GriddedPathTimeGraph::CalculateCostAt(
     return;
   }
 
-  constexpr double kSpeedRangeBuffer = 0.20;
+  static constexpr double kSpeedRangeBuffer = 0.20;
   const double pre_lowest_s =
       cost_cr.point().s() -
       FLAGS_planning_upper_speed_limit * (1 + kSpeedRangeBuffer) * unit_t_;
@@ -535,7 +535,7 @@ Status GriddedPathTimeGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
   }
   std::reverse(speed_profile.begin(), speed_profile.end());
 
-  constexpr double kEpsilon = std::numeric_limits<double>::epsilon();
+  static constexpr double kEpsilon = std::numeric_limits<double>::epsilon();
   if (speed_profile.front().t() > kEpsilon ||
       speed_profile.front().s() > kEpsilon) {
     const std::string msg = "Fail to retrieve speed profile.";

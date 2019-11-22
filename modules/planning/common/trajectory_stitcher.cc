@@ -57,8 +57,8 @@ std::vector<TrajectoryPoint>
 TrajectoryStitcher::ComputeReinitStitchingTrajectory(
     const double planning_cycle_time, const VehicleState& vehicle_state) {
   TrajectoryPoint reinit_point;
-  constexpr double kEpsilon_v = 0.1;
-  constexpr double kEpsilon_a = 0.4;
+  static constexpr double kEpsilon_v = 0.1;
+  static constexpr double kEpsilon_a = 0.4;
   // TODO(Jinyun/Yu): adjust kEpsilon if corrected IMU acceleration provided
   if (std::abs(vehicle_state.linear_velocity()) < kEpsilon_v &&
       std::abs(vehicle_state.linear_acceleration()) < kEpsilon_a) {

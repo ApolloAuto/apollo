@@ -273,8 +273,8 @@ void MeasureRepublishProcess::GnssLocalProcess(
       pre_yaw_from_vel = yaw_from_vel;
       return;
     } else {
-      constexpr double rad_round = 2 * M_PI;
-      constexpr double rad_pi = M_PI;
+      static constexpr double rad_round = 2 * M_PI;
+      static constexpr double rad_pi = M_PI;
 
       double delta_yaw = yaw_from_vel - pre_yaw_from_vel;
       if (delta_yaw > rad_pi) {
@@ -291,7 +291,7 @@ void MeasureRepublishProcess::GnssLocalProcess(
       }
       double yaw_incr = delta_yaw / delta_time;
       // 0.0872rad = 5deg
-      constexpr double rad_5deg = 5 * DEG_TO_RAD;
+      static constexpr double rad_5deg = 5 * DEG_TO_RAD;
       if ((yaw_incr > rad_5deg) || (yaw_incr < -rad_5deg)) {
         AWARN << "yaw velocity is large! pre, "
               << "cur yaw from vel and velocity: "
@@ -373,7 +373,7 @@ bool MeasureRepublishProcess::LidarLocalProcess(
   double latitude_var = lidar_local_msg.uncertainty().position_std_dev().y();
   double yaw_var = lidar_local_msg.uncertainty().orientation_std_dev().z();
 
-  constexpr double height_var = 0.03 * 0.03;
+  static constexpr double height_var = 0.03 * 0.03;
   measure_data.variance[0][0] = longitude_var;
   measure_data.variance[1][1] = latitude_var;
   measure_data.variance[2][2] = height_var;
@@ -505,8 +505,8 @@ bool MeasureRepublishProcess::CalculateVelFromBestgnsspose(
     pre_yaw_from_vel = yaw_from_vel;
     return false;
   } else {
-    constexpr double rad_round = 2 * M_PI;
-    constexpr double rad_pi = M_PI;
+    static constexpr double rad_round = 2 * M_PI;
+    static constexpr double rad_pi = M_PI;
 
     double delta_yaw = yaw_from_vel - pre_yaw_from_vel;
     if (delta_yaw > rad_pi) {
@@ -518,7 +518,7 @@ bool MeasureRepublishProcess::CalculateVelFromBestgnsspose(
 
     AINFO << "yaw calculated from position difference: "
           << yaw_from_vel * RAD_TO_DEG;
-    constexpr double rad_5deg = 5 * DEG_TO_RAD;
+    static constexpr double rad_5deg = 5 * DEG_TO_RAD;
     if (delta_yaw > rad_5deg || delta_yaw < -rad_5deg) {
       AWARN << "novatel bestgnsspos delta yaw is large! "
             << "pre, cur yaw from vel and delta: "

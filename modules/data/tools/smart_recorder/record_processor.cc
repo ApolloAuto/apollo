@@ -56,7 +56,7 @@ bool RecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
     return false;
   }
   // Init writer
-  constexpr uint64_t kMBToKB = 1024UL;
+  static constexpr uint64_t kMBToKB = 1024UL;
   writer_.reset(new RecordWriter());
   writer_->SetIntervalOfFileSegmentation(
       trigger_conf.segment_setting().time_segment());

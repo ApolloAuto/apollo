@@ -99,7 +99,7 @@ bool FrameProcessor::ProcessStream() const {
 }
 
 std::string FrameProcessor::GetOutputFile(const int frame_num) const {
-  constexpr int kSuffixLen = 5;
+  static constexpr int kSuffixLen = 5;
   std::stringstream jpg_suffix;
   jpg_suffix.fill('0');
   jpg_suffix.width(kSuffixLen);

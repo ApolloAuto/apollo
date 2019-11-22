@@ -96,7 +96,7 @@ void TrafficLight::MakeDecisions(Frame* const frame,
     }
 
     // work around incorrect s-projection along round routing
-    constexpr double kSDiscrepanceTolerance = 10.0;
+    static constexpr double kSDiscrepanceTolerance = 10.0;
     const auto& reference_line = reference_line_info->reference_line();
     common::SLPoint traffic_light_sl;
     traffic_light_sl.set_s(traffic_light_overlap.start_s);

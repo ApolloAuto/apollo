@@ -265,7 +265,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
       const Box2d obs_box = obstacle.GetBoundingBox(trajectory_point);
 
       double trajectory_point_time = trajectory_point.relative_time();
-      constexpr double kNegtiveTimeThreshold = -1.0;
+      static constexpr double kNegtiveTimeThreshold = -1.0;
       if (trajectory_point_time < kNegtiveTimeThreshold) {
         continue;
       }

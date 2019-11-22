@@ -67,7 +67,7 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
     return FinishScenario();
   }
 
-  constexpr double kPassStopLineBuffer = 0.3;  // unit: m
+  static constexpr double kPassStopLineBuffer = 0.3;  // unit: m
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double distance_adc_to_pnc_junction =
       current_pnc_junction->start_s - adc_front_edge_s;
@@ -94,9 +94,9 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
   }
 
   // TODO(all): move to conf
-  constexpr double kConf_min_boundary_t = 6.0;        // second
-  constexpr double kConf_ignore_max_st_min_t = 0.1;   // second
-  constexpr double kConf_ignore_min_st_min_s = 15.0;  // meter
+  static constexpr double kConf_min_boundary_t = 6.0;        // second
+  static constexpr double kConf_ignore_max_st_min_t = 0.1;   // second
+  static constexpr double kConf_ignore_min_st_min_s = 15.0;  // meter
 
   std::vector<std::string> wait_for_obstacle_ids;
   bool all_far_away = true;
@@ -135,8 +135,8 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
     clear_counter_ = all_far_away ? clear_counter_ + 1 : 0;
 
     bool stop = false;
-    constexpr double kCheckClearDistance = 5.0;  // meter
-    constexpr double kStartWatchDistance = 2.0;  // meter
+    static constexpr double kCheckClearDistance = 5.0;  // meter
+    static constexpr double kStartWatchDistance = 2.0;  // meter
     if (distance_adc_to_pnc_junction <= kCheckClearDistance &&
         distance_adc_to_pnc_junction >= kStartWatchDistance && !all_far_away) {
       clear_counter_ = 0;  // reset

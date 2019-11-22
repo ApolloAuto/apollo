@@ -1055,7 +1055,7 @@ bool PathBoundsDecider::GetBoundaryFromADC(
   CHECK(!path_bound->empty());
 
   // Calculate the ADC's lateral boundary.
-  constexpr double kMaxLateralAccelerations = 1.5;
+  static constexpr double kMaxLateralAccelerations = 1.5;
   double ADC_lat_decel_buffer = (adc_frenet_ld_ > 0 ? 1.0 : -1.0) *
                                 adc_frenet_ld_ * adc_frenet_ld_ /
                                 kMaxLateralAccelerations / 2.0;
@@ -1151,7 +1151,7 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
 
     // 3. Calculate the proper boundary based on lane-width, ADC's position,
     //    and ADC's velocity.
-    constexpr double kMaxLateralAccelerations = 1.5;
+    static constexpr double kMaxLateralAccelerations = 1.5;
     double offset_to_map = 0.0;
     reference_line.GetOffsetToMap(curr_s, &offset_to_map);
 
@@ -1690,7 +1690,7 @@ double PathBoundsDecider::GetBufferBetweenADCCenterAndEdge() {
       VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
   // TODO(all): currently it's a fixed number. But it can take into account many
   // factors such as: ADC length, possible turning angle, speed, etc.
-  constexpr double kAdcEdgeBuffer = 0.0;
+  static constexpr double kAdcEdgeBuffer = 0.0;
 
   return (adc_half_width + kAdcEdgeBuffer);
 }

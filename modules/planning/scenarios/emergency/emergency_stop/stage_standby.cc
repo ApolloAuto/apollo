@@ -68,7 +68,7 @@ Stage::StageStatus EmergencyStopStageStandby::Process(
   }
 
   if (!stop_fence_exist) {
-    constexpr double kBuffer = 2.0;
+    static constexpr double kBuffer = 2.0;
     stop_line_s = adc_front_edge_s + stop_distance + kBuffer;
     const auto& stop_fence_point =
         reference_line.GetReferencePoint(stop_line_s);

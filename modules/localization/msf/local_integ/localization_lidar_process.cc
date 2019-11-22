@@ -250,7 +250,7 @@ int LocalizationLidarProcess::GetResult(LocalizationEstimate* lidar_local_msg) {
   position_std_dev->set_y(location_covariance_(1, 1));
   position_std_dev->set_z(0.0);
 
-  constexpr double yaw_covariance = 0.15 * 0.15 * DEG_TO_RAD2;
+  static constexpr double yaw_covariance = 0.15 * 0.15 * DEG_TO_RAD2;
   apollo::common::Point3D* orientation_std_dev =
       uncertainty->mutable_orientation_std_dev();
   orientation_std_dev->set_x(0.0);

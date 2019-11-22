@@ -265,8 +265,8 @@ bool NaviPathDecider::GetBasicPathData(
 
   // get basic path points form reference_line
   ADEBUG << "Basic path data len ; " << reference_line_len;
-  constexpr double KDenseSampleUnit = 0.50;
-  constexpr double KSparseSmapleUnit = 2.0;
+  static constexpr double KDenseSampleUnit = 0.50;
+  static constexpr double KSparseSmapleUnit = 2.0;
   for (double s = start_plan_point_project_s; s < reference_line_len;
        s += ((s < path_len) ? KDenseSampleUnit : KSparseSmapleUnit)) {
     const auto& ref_point = reference_line.GetReferencePoint(s);
@@ -305,15 +305,15 @@ bool NaviPathDecider::IsSafeChangeLane(const ReferenceLine& reference_line,
 
   for (const auto* obstacle : path_decision.obstacles().Items()) {
     const auto& sl_boundary = obstacle->PerceptionSLBoundary();
-    constexpr double kLateralShift = 6.0;
+    static constexpr double kLateralShift = 6.0;
     if (sl_boundary.start_l() < -kLateralShift ||
         sl_boundary.end_l() > kLateralShift) {
       continue;
     }
 
-    constexpr double kSafeTime = 3.0;
-    constexpr double kForwardMinSafeDistance = 6.0;
-    constexpr double kBackwardMinSafeDistance = 8.0;
+    static constexpr double kSafeTime = 3.0;
+    static constexpr double kForwardMinSafeDistance = 6.0;
+    static constexpr double kBackwardMinSafeDistance = 8.0;
 
     const double kForwardSafeDistance = std::max(
         kForwardMinSafeDistance,
@@ -347,7 +347,7 @@ double NaviPathDecider::NudgeProcess(
 
   // get nudge latteral position
   int lane_obstacles_num = 0;
-  constexpr double KNudgeEpsilon = 1e-6;
+  static constexpr double KNudgeEpsilon = 1e-6;
   double nudge_distance = obstacle_decider_.GetNudgeDistance(
       obstacles, reference_line, path_decision, path_data_points, vehicle_state,
       &lane_obstacles_num);

@@ -118,7 +118,7 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
 
   if (FLAGS_use_st_drivable_boundary) {
     // TODO(Jiancheng): move to configs
-    constexpr double boundary_resolution = 0.1;
+    static constexpr double boundary_resolution = 0.1;
     int index = static_cast<int>(t / boundary_resolution);
     const double lower_bound =
         st_drivable_boundary_.st_boundary(index).s_lower();
@@ -236,8 +236,8 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
 
 double DpStCost::GetAccelCost(const double accel) {
   double cost = 0.0;
-  constexpr double kEpsilon = 0.1;
-  constexpr size_t kShift = 100;
+  static constexpr double kEpsilon = 0.1;
+  static constexpr size_t kShift = 100;
   const size_t accel_key = static_cast<size_t>(accel / kEpsilon + 0.5 + kShift);
   DCHECK_LT(accel_key, accel_cost_.size());
   if (accel_key >= accel_cost_.size()) {
@@ -284,8 +284,8 @@ double DpStCost::GetAccelCostByTwoPoints(const double pre_speed,
 
 double DpStCost::JerkCost(const double jerk) {
   double cost = 0.0;
-  constexpr double kEpsilon = 0.1;
-  constexpr size_t kShift = 200;
+  static constexpr double kEpsilon = 0.1;
+  static constexpr size_t kShift = 200;
   const size_t jerk_key = static_cast<size_t>(jerk / kEpsilon + 0.5 + kShift);
   if (jerk_key >= jerk_cost_.size()) {
     return kInf;

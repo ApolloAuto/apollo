@@ -249,7 +249,7 @@ void DpRoadGraph::UpdateNode(const std::shared_ptr<RoadGraphMessage> &msg) {
 }
 
 bool DpRoadGraph::IsValidCurve(const QuinticPolynomialCurve1d &curve) const {
-  constexpr double kMaxLateralDistance = 20.0;
+  static constexpr double kMaxLateralDistance = 20.0;
   for (double s = 0.0; s < curve.ParamLength(); s += 2.0) {
     const double l = curve.Evaluate(0, s);
     if (std::fabs(l) > kMaxLateralDistance) {

@@ -128,7 +128,7 @@ bool SpeedDecider::CheckKeepClearCrossable(
                            (last_speed_point.t() - last_2nd_speed_point.t());
     }
   }
-  constexpr double kKeepClearSlowSpeed = 2.5;  // m/s
+  static constexpr double kKeepClearSlowSpeed = 2.5;  // m/s
   ADEBUG << "last_speed_point_s[" << last_speed_point.s()
          << "] st_boundary.max_s[" << keep_clear_st_boundary.max_s()
          << "] last_speed_point_v[" << last_speed_point_v << "]";
@@ -179,7 +179,7 @@ bool SpeedDecider::IsFollowTooClose(const Obstacle& obstacle) const {
   }
   const double distance =
       obstacle.path_st_boundary().min_s() - FLAGS_min_stop_distance_obstacle;
-  constexpr double decel = 1.0;
+  static constexpr double decel = 1.0;
   return distance < std::pow((ego_speed - obs_speed), 2) * 0.5 / decel;
 }
 
@@ -505,8 +505,8 @@ bool SpeedDecider::CheckIsFollow(const Obstacle& obstacle,
     return false;
   }
 
-  constexpr double kFollowTimeEpsilon = 1e-3;
-  constexpr double kFollowCutOffTime = 0.5;
+  static constexpr double kFollowTimeEpsilon = 1e-3;
+  static constexpr double kFollowCutOffTime = 0.5;
   if (boundary.min_t() > kFollowCutOffTime ||
       boundary.max_t() < kFollowTimeEpsilon) {
     return false;
@@ -543,9 +543,9 @@ bool SpeedDecider::CheckStopForPedestrian(
 
   // update stop timestamp on static pedestrian for watch timer
   // check on stop timer for static pedestrians
-  constexpr double kSDistanceStartTimer = 10.0;
-  constexpr double kMaxStopSpeed = 0.3;
-  constexpr double kPedestrianStopTimeout = 4.0;
+  static constexpr double kSDistanceStartTimer = 10.0;
+  static constexpr double kMaxStopSpeed = 0.3;
+  static constexpr double kPedestrianStopTimeout = 4.0;
   if (obstacle.path_st_boundary().min_s() < kSDistanceStartTimer) {
     const auto obstacle_speed = std::hypot(perception_obstacle.velocity().x(),
                                            perception_obstacle.velocity().y());
