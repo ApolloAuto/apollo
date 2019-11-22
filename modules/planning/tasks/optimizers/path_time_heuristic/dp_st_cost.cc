@@ -206,6 +206,10 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
     return kInf;
   }
 
+  if (speed - speed_limit > 0) {
+    return kInf;
+  }
+
   const double max_adc_stop_speed = common::VehicleConfigHelper::Instance()
                                         ->GetConfig()
                                         .vehicle_param()
@@ -214,15 +218,6 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
     // first.s in range
     cost += config_.keep_clear_low_speed_penalty() * unit_t_ *
             config_.default_speed_cost();
-  }
-
-  double det_speed = (speed - speed_limit) / speed_limit;
-  if (det_speed > 0) {
-    cost += config_.exceed_speed_penalty() * config_.default_speed_cost() *
-            (det_speed * det_speed) * unit_t_;
-  } else if (det_speed < 0) {
-    cost += config_.low_speed_penalty() * config_.default_speed_cost() *
-            -det_speed * unit_t_;
   }
 
   if (FLAGS_enable_dp_reference_speed) {
