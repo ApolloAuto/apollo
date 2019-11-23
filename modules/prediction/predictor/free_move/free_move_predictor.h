@@ -46,8 +46,9 @@ class FreeMovePredictor : public Predictor {
    * @param ADC trajectory container
    * @param Obstacle pointer
    * @param Obstacles container
+   * @return If predicted successfully
    */
-  void Predict(const ADCTrajectoryContainer* adc_trajectory_container,
+  bool Predict(const ADCTrajectoryContainer* adc_trajectory_container,
                Obstacle* obstacle,
                ObstaclesContainer* obstacles_container) override;
 

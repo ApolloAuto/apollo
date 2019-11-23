@@ -33,7 +33,7 @@ ExtrapolationPredictor::ExtrapolationPredictor() {
   predictor_type_ = ObstacleConf::EXTRAPOLATION_PREDICTOR;
 }
 
-void ExtrapolationPredictor::Predict(
+bool ExtrapolationPredictor::Predict(
     const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
     ObstaclesContainer* obstacles_container) {
   Clear();
@@ -47,12 +47,18 @@ void ExtrapolationPredictor::Predict(
 
   if (!feature_ptr->lane().has_lane_graph()) {
     AERROR << "Obstacle [" << obstacle->id() << "] has no lane graph.";
-    return;
+    return false;
+  }
+  if (feature_ptr->predicted_trajectory_size() == 0) {
+    AERROR << "Obstacle [" << obstacle->id()
+           << "] has no short-term trajectories.";
+    return false;
   }
   for (int i = 0; i < feature_ptr->predicted_trajectory_size(); ++i) {
     Trajectory* trajectory_ptr = feature_ptr->mutable_predicted_trajectory(i);
     PostProcess(trajectory_ptr);
   }
+  return true;
 }
 
 void ExtrapolationPredictor::PostProcess(Trajectory* trajectory_ptr) {

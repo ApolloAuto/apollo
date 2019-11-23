@@ -36,7 +36,7 @@ MoveSequencePredictor::MoveSequencePredictor() {
   predictor_type_ = ObstacleConf::MOVE_SEQUENCE_PREDICTOR;
 }
 
-void MoveSequencePredictor::Predict(
+bool MoveSequencePredictor::Predict(
     const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
     ObstaclesContainer* obstacles_container) {
   Clear();
@@ -50,7 +50,7 @@ void MoveSequencePredictor::Predict(
 
   if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
     AERROR << "Obstacle [" << obstacle->id() << "] has no lane graph.";
-    return;
+    return false;
   }
 
   std::string lane_id = "";
@@ -111,6 +111,7 @@ void MoveSequencePredictor::Predict(
     obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
         trajectory);
   }
+  return true;
 }
 
 /**

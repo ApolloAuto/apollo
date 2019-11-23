@@ -45,7 +45,7 @@ InteractionPredictor::InteractionPredictor() {
   predictor_type_ = ObstacleConf::INTERACTION_PREDICTOR;
 }
 
-void InteractionPredictor::Predict(
+bool InteractionPredictor::Predict(
     const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
     ObstaclesContainer* obstacles_container) {
   Clear();
@@ -61,7 +61,7 @@ void InteractionPredictor::Predict(
 
   if (!feature_ptr->lane().has_lane_graph()) {
     AERROR << "Obstacle [" << obstacle->id() << "] has no lane graph.";
-    return;
+    return false;
   }
   auto* lane_graph = feature_ptr->mutable_lane()->mutable_lane_graph();
 
@@ -144,6 +144,7 @@ void InteractionPredictor::Predict(
     obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
         trajectory);
   }
+  return true;
 }
 
 void InteractionPredictor::Clear() { Predictor::Clear(); }
