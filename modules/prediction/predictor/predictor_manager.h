@@ -115,28 +115,23 @@ class PredictorManager {
 
   void RunVehiclePredictor(
       const ADCTrajectoryContainer* adc_trajectory_container,
-      Obstacle* obstacle,
-      ObstaclesContainer* obstacles_container);
+      Obstacle* obstacle, ObstaclesContainer* obstacles_container);
 
   void RunPedestrianPredictor(
       const ADCTrajectoryContainer* adc_trajectory_container,
-      Obstacle* obstacle,
-      ObstaclesContainer* obstacles_container);
+      Obstacle* obstacle, ObstaclesContainer* obstacles_container);
 
   void RunCyclistPredictor(
       const ADCTrajectoryContainer* adc_trajectory_container,
-      Obstacle* obstacle,
-      ObstaclesContainer* obstacles_container);
+      Obstacle* obstacle, ObstaclesContainer* obstacles_container);
 
   void RunDefaultPredictor(
       const ADCTrajectoryContainer* adc_trajectory_container,
-      Obstacle* obstacle,
-      ObstaclesContainer* obstacles_container);
+      Obstacle* obstacle, ObstaclesContainer* obstacles_container);
 
-  void RunEmptyPredictor(
-      const ADCTrajectoryContainer* adc_trajectory_container,
-      Obstacle* obstacle,
-      ObstaclesContainer* obstacles_container);
+  void RunEmptyPredictor(const ADCTrajectoryContainer* adc_trajectory_container,
+                         Obstacle* obstacle,
+                         ObstaclesContainer* obstacles_container);
 
  private:
   std::map<ObstacleConf::PredictorType, std::unique_ptr<Predictor>> predictors_;

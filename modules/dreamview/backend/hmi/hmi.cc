@@ -141,11 +141,11 @@ void HMI::RegisterMessageHandlers() {
         }
       });
 
-websocket_->RegisterMessageHandler(
-    "HMIStatus",
-    [this](const Json &json, WebSocketHandler::Connection* conn) {
-      SendStatus(conn);
-    });
+  websocket_->RegisterMessageHandler(
+      "HMIStatus",
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
+        SendStatus(conn);
+      });
 }
 
 void HMI::SendVehicleParam(WebSocketHandler::Connection* conn) {
