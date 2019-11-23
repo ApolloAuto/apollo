@@ -233,14 +233,12 @@ void PredictorManager::PredictObstacle(
 
   if (obstacle->ToIgnore()) {
     ADEBUG << "Ignore obstacle [" << obstacle->id() << "]";
-    RunEmptyPredictor(adc_trajectory_container, obstacle,
-                      obstacles_container);
+    RunEmptyPredictor(adc_trajectory_container, obstacle, obstacles_container);
     prediction_obstacle->mutable_priority()->set_priority(
         ObstaclePriority::IGNORE);
   } else if (obstacle->IsStill()) {
     ADEBUG << "Still obstacle [" << obstacle->id() << "]";
-    RunEmptyPredictor(adc_trajectory_container, obstacle,
-                      obstacles_container);
+    RunEmptyPredictor(adc_trajectory_container, obstacle, obstacles_container);
   } else {
     switch (obstacle->type()) {
       case PerceptionObstacle::VEHICLE: {
@@ -392,8 +390,7 @@ void PredictorManager::InitDefaultPredictors(const ObstacleConf& conf) {
 }
 
 void PredictorManager::RunVehiclePredictor(
-    const ADCTrajectoryContainer* adc_trajectory_container,
-    Obstacle* obstacle,
+    const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
     ObstaclesContainer* obstacles_container) {
   Predictor* predictor = nullptr;
   if (obstacle->IsCaution()) {
@@ -435,8 +432,7 @@ void PredictorManager::RunVehiclePredictor(
 }
 
 void PredictorManager::RunPedestrianPredictor(
-    const ADCTrajectoryContainer* adc_trajectory_container,
-    Obstacle* obstacle,
+    const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
     ObstaclesContainer* obstacles_container) {
   Predictor* predictor = nullptr;
   predictor = GetPredictor(pedestrian_predictor_);
@@ -448,8 +444,7 @@ void PredictorManager::RunPedestrianPredictor(
 }
 
 void PredictorManager::RunCyclistPredictor(
-    const ADCTrajectoryContainer* adc_trajectory_container,
-    Obstacle* obstacle,
+    const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
     ObstaclesContainer* obstacles_container) {
   Predictor* predictor = nullptr;
   if (obstacle->IsOnLane()) {
@@ -465,8 +460,7 @@ void PredictorManager::RunCyclistPredictor(
 }
 
 void PredictorManager::RunDefaultPredictor(
-    const ADCTrajectoryContainer* adc_trajectory_container,
-    Obstacle* obstacle,
+    const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
     ObstaclesContainer* obstacles_container) {
   Predictor* predictor = nullptr;
   if (obstacle->IsOnLane()) {
@@ -482,8 +476,7 @@ void PredictorManager::RunDefaultPredictor(
 }
 
 void PredictorManager::RunEmptyPredictor(
-    const ADCTrajectoryContainer* adc_trajectory_container,
-    Obstacle* obstacle,
+    const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
     ObstaclesContainer* obstacles_container) {
   Predictor* predictor = GetPredictor(ObstacleConf::EMPTY_PREDICTOR);
   if (predictor == nullptr) {

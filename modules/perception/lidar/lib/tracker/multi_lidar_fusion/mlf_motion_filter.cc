@@ -103,8 +103,7 @@ void MlfMotionFilter::UpdateWithObject(const MlfFilterOptions& options,
 
 void MlfMotionFilter::UpdateWithoutObject(const MlfFilterOptions& options,
                                           double timestamp,
-                                          MlfTrackDataPtr track_data) {
-}
+                                          MlfTrackDataPtr track_data) {}
 
 void MlfMotionFilter::InitializeTrackState(TrackedObjectPtr new_object) {
   new_object->boostup_need_history_size =

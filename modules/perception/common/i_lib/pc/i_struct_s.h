@@ -548,7 +548,6 @@ void VoxelGridXY<T>::Reserve() {
     m = IMax(8, static_cast<int>(s_nr_max_reserved_points_ * kernel[i]));
     voxels_[i].Reserve(m);
   }
-
 }
 
 template <typename T>

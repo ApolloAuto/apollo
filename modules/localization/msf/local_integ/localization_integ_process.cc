@@ -129,7 +129,6 @@ void LocalizationIntegProcess::RawImuProcess(const ImuData &imu_msg) {
   }
 
   pre_imu_time = cur_imu_time;
-
 }
 
 void LocalizationIntegProcess::GetValidFromOK() {

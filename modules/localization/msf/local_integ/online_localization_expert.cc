@@ -95,7 +95,6 @@ void OnlineLocalizationExpert::AddGnssBestPose(
   latest_gnsspos_timestamp_mutex_.lock();
   latest_gnsspos_timestamp_ = data.time;
   latest_gnsspos_timestamp_mutex_.unlock();
-
 }
 
 void OnlineLocalizationExpert::CheckImuDelayStatus(const double &cur_imu_time) {

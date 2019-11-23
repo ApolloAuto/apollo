@@ -201,7 +201,6 @@ void MSFLocalization::OnPointCloud(
     // publish lidar message to debug
     publisher_->PublishLocalizationMsfLidar(result.localization());
   }
-
 }
 
 void MSFLocalization::OnRawImu(
@@ -236,7 +235,6 @@ void MSFLocalization::OnRawImu(
   }
 
   localization_state_ = result.state();
-
 }
 
 void MSFLocalization::OnGnssBestPose(
@@ -255,7 +253,6 @@ void MSFLocalization::OnGnssBestPose(
       result.state() == msf::LocalizationMeasureState::VALID) {
     publisher_->PublishLocalizationMsfGnss(result.localization());
   }
-
 }
 
 void MSFLocalization::OnGnssRtkObs(
@@ -274,7 +271,6 @@ void MSFLocalization::OnGnssRtkObs(
       result.state() == msf::LocalizationMeasureState::VALID) {
     publisher_->PublishLocalizationMsfGnss(result.localization());
   }
-
 }
 
 void MSFLocalization::OnGnssRtkEph(
