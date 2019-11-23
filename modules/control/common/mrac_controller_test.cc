@@ -67,14 +67,14 @@ TEST_F(MracControllerTest, MracControl) {
   state(0, 0) = 10.0;
   EXPECT_NEAR(mrac_controller.Control(18.0, state, limit, rate_limit), -8.48,
               1e-6);
-  EXPECT_NEAR(mrac_controller.CurrentReferenceState(), 6.0, 1e-6);
-  EXPECT_NEAR(mrac_controller.CurrentStateAdaptionGain(), -0.2, 1e-6);
-  EXPECT_NEAR(mrac_controller.CurrentInputAdaptionGain(), -0.36, 1e-6);
+  EXPECT_NEAR(mrac_controller.CurrentReferenceState()(0, 0), 6.0, 1e-6);
+  EXPECT_NEAR(mrac_controller.CurrentStateAdaptionGain()(0, 0), -0.2, 1e-6);
+  EXPECT_NEAR(mrac_controller.CurrentInputAdaptionGain()(0, 0), -0.36, 1e-6);
   EXPECT_NEAR(mrac_controller.Control(18.0, state, limit, rate_limit), -8.48,
               1e-6);
-  EXPECT_NEAR(mrac_controller.CurrentReferenceState(), 14.0, 1e-6);
-  EXPECT_NEAR(mrac_controller.CurrentStateAdaptionGain(), -0.2, 1e-6);
-  EXPECT_NEAR(mrac_controller.CurrentInputAdaptionGain(), -0.36, 1e-6);
+  EXPECT_NEAR(mrac_controller.CurrentReferenceState()(0, 0), 14.0, 1e-6);
+  EXPECT_NEAR(mrac_controller.CurrentStateAdaptionGain()(0, 0), -0.2, 1e-6);
+  EXPECT_NEAR(mrac_controller.CurrentInputAdaptionGain()(0, 0), -0.36, 1e-6);
   mrac_controller.Reset();
   state(0, 0) = -10.0;
   double control_value =
@@ -92,12 +92,12 @@ TEST_F(MracControllerTest, MracControl) {
   state(0, 0) = 10.0;
   EXPECT_NEAR(mrac_controller.Control(18.0, state, 10.0, 100.0 / dt), -8.48,
               1e-6);
-  EXPECT_NEAR(mrac_controller.CurrentReferenceState(), 6.0, 1e-6);
+  EXPECT_NEAR(mrac_controller.CurrentReferenceState()(0, 0), 6.0, 1e-6);
   EXPECT_EQ(mrac_controller.ReferenceSaturationStatus(), 0);
   EXPECT_EQ(mrac_controller.ControlSaturationStatus(), 0);
   EXPECT_NEAR(mrac_controller.Control(18.0, state, 10.0, 100.0 / dt), -10.0,
               1e-6);
-  EXPECT_NEAR(mrac_controller.CurrentReferenceState(), 10.0, 1e-6);
+  EXPECT_NEAR(mrac_controller.CurrentReferenceState()(0, 0), 10.0, 1e-6);
   EXPECT_EQ(mrac_controller.ReferenceSaturationStatus(), 1);
   EXPECT_EQ(mrac_controller.ControlSaturationStatus(), -1);
 }
@@ -149,7 +149,7 @@ TEST_F(MracControllerTest, HighOrderMracControl) {
   for (int i = 0; i < settling_cycle; ++i) {
     mrac_controller.Control(15.0, state, limit, rate_limit);
   }
-  EXPECT_NEAR(mrac_controller.CurrentReferenceState(), 15.0, 0.05);
+  EXPECT_NEAR(mrac_controller.CurrentReferenceState()(0, 0), 15.0, 0.05);
 }
 
 // test the judgement of the symmetric positive definite solution of the

@@ -457,16 +457,20 @@ int MracController::ControlSaturationStatus() const {
   return saturation_status_control_;
 }
 
-double MracController::CurrentReferenceState() const {
-  return state_reference_(0, 0);
+Matrix MracController::CurrentReferenceState() const {
+  return state_reference_;
 }
 
-double MracController::CurrentStateAdaptionGain() const {
-  return gain_state_adaption_(0, 0);
+Matrix MracController::CurrentStateAdaptionGain() const {
+  return gain_state_adaption_;
 }
 
-double MracController::CurrentInputAdaptionGain() const {
-  return gain_input_adaption_(0, 0);
+Matrix MracController::CurrentInputAdaptionGain() const {
+  return gain_input_adaption_;
+}
+
+Matrix MracController::CurrentNonlinearAdaptionGain() const {
+  return gain_nonlinear_adaption_;
 }
 
 }  // namespace control
