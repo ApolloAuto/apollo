@@ -49,7 +49,7 @@ bool ExtrapolationPredictor::Predict(
     AERROR << "Obstacle [" << obstacle->id() << "] has no lane graph.";
     return false;
   }
-  if (feature_ptr->predicted_trajectory_size() == 0) {
+  if (feature_ptr->predicted_trajectory().empty()) {
     AERROR << "Obstacle [" << obstacle->id()
            << "] has no short-term trajectories.";
     return false;
