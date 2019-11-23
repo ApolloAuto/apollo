@@ -39,10 +39,10 @@ class RecordItemReader:
                 location_est = localization_pb2.LocalizationEstimate()
                 location_est.ParseFromString(msg.message)
                 data = {"pose": location_est}
-                yield data                   
+                yield data
 
             if msg.topic == "/apollo/planning":
                 planning = planning_pb2.ADCTrajectory()
                 planning.ParseFromString(msg.message)
                 data = {"planning": planning}
-                yield data                   
+                yield data
