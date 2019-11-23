@@ -34,13 +34,14 @@ using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterConfig;
 using apollo::hdmap::LaneInfo;
 
-void SequencePredictor::Predict(
+bool SequencePredictor::Predict(
     const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
     ObstaclesContainer* obstacles_container) {
   Clear();
 
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
+  return true;
 }
 
 void SequencePredictor::Clear() { Predictor::Clear(); }
