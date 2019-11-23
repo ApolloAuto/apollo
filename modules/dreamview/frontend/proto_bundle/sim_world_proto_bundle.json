@@ -5159,7 +5159,7 @@
                     "default": 500
                   }
                 },
-                "refSWeight": {
+                "sPotentialWeight": {
                   "type": "double",
                   "id": 4,
                   "options": {
@@ -5173,23 +5173,37 @@
                     "default": 10
                   }
                 },
-                "endSWeight": {
+                "refSWeight": {
                   "type": "double",
                   "id": 6,
                   "options": {
                     "default": 10
                   }
                 },
-                "endVWeight": {
+                "endSWeight": {
                   "type": "double",
                   "id": 7,
                   "options": {
                     "default": 10
                   }
                 },
-                "endAWeight": {
+                "endVWeight": {
                   "type": "double",
                   "id": 8,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "endAWeight": {
+                  "type": "double",
+                  "id": 9,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "softSBoundWeight": {
+                  "type": "double",
+                  "id": 10,
                   "options": {
                     "default": 10
                   }
@@ -7131,6 +7145,13 @@
                   "options": {
                     "default": false
                   }
+                },
+                "isClearToChangeLane": {
+                  "type": "bool",
+                  "id": 8,
+                  "options": {
+                    "default": false
+                  }
                 }
               },
               "nested": {
@@ -7217,6 +7238,10 @@
                 "adcInitHeading": {
                   "type": "double",
                   "id": 2
+                },
+                "inCheckStage": {
+                  "type": "bool",
+                  "id": 3
                 }
               }
             },

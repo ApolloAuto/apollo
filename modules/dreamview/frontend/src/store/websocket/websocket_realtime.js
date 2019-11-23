@@ -16,6 +16,8 @@ export default class RealtimeWebSocketEndpoint {
         this.routingTime = undefined;
         this.currentMode = null;
         this.worker = new Worker();
+
+        this.requestHmiStatus = this.requestHmiStatus.bind(this);
     }
 
     initialize() {
@@ -269,6 +271,8 @@ export default class RealtimeWebSocketEndpoint {
             type: "HMIAction",
             action: action,
         }));
+
+        setTimeout(this.requestHmiStatus, 5000);
     }
 
     executeModuleCommand(moduleName, command) {
@@ -282,6 +286,8 @@ export default class RealtimeWebSocketEndpoint {
             action: command,
             value: moduleName
         }));
+
+        setTimeout(this.requestHmiStatus, 5000);
     }
 
     submitDriveEvent(eventTimeMs, eventMessage, eventTypes, isReportable) {
@@ -304,6 +310,12 @@ export default class RealtimeWebSocketEndpoint {
     requestRoutePath() {
         this.websocket.send(JSON.stringify({
             type: "RequestRoutePath",
+        }));
+    }
+
+    requestHmiStatus() {
+        this.websocket.send(JSON.stringify({
+            type: "HMIStatus"
         }));
     }
 
