@@ -153,7 +153,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
 }
 
 /*
- * kee_clear: keep clear zone clear
+ * keep_clear: keep clear zone clear
  * bag: 2018-05-22-13-59-27/2018-05-22-14-09-29_10.bag
  * decision: not stopped by KEEP_CLEAR
  */
@@ -173,7 +173,7 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
 }
 
 /*
- * kee_clear: vehicle inside KEEP Clear zone, with speed and BLOCKING
+ * keep_clear: vehicle inside KEEP Clear zone, with speed and BLOCKING
  * bag: 2018-05-22-13-59-27/2018-05-22-14-13-29_14.bag
  * decision: STOP
  */
@@ -193,7 +193,7 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_02) {
 }
 
 /*
- * kee_clear: vehicle inside KEEP Clear zone, with speed and NOT BLOCKING
+ * keep_clear: vehicle inside KEEP Clear zone, with speed and NOT BLOCKING
  * bag: 2018-05-22-13-59-27/2018-05-22-14-13-29_14.bag
  * decision: CRUISE
  */
