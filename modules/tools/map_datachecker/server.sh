@@ -66,7 +66,7 @@ function start_server() {
 function stop_server() {
   kill_cmd="kill -INT $(ps -ef | grep map_datachecker_server | grep -v grep | awk '{print $2}')"
   server_count=`ps -ef | grep map_datachecker_server | grep -v grep | wc -l`
-  
+
   if [ ${server_count} -eq 1 ];then
     ${kill_cmd}
     echo "stop server done"

@@ -29,11 +29,11 @@ class SpeedDsteeringData:
         self.last_timestamp_sec = None
         self.speed_data = []
         self.d_steering_data = []
-    
+
     def add(self, chassis):
         steering_percentage = chassis.steering_percentage
         speed_mps = chassis.speed_mps
-        timestamp_sec = chassis.header.timestamp_sec        
+        timestamp_sec = chassis.header.timestamp_sec
 
         if self.last_timestamp_sec is None:
             self.last_steering_percentage = steering_percentage
@@ -52,7 +52,7 @@ class SpeedDsteeringData:
             self.last_timestamp_sec = timestamp_sec
 
     def get_speed_dsteering(self):
-        return self.speed_data, self.d_steering_data 
+        return self.speed_data, self.d_steering_data
 
 if __name__ == "__main__":
     import sys
