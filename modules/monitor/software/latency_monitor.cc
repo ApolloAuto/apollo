@@ -27,6 +27,7 @@
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/monitor/common/monitor_manager.h"
+#include "modules/monitor/software/summary_monitor.h"
 
 DEFINE_string(latency_monitor_name, "LatencyMonitor",
               "Name of the latency monitor.");
@@ -238,6 +239,41 @@ void LatencyMonitor::AggregateLatency() {
     module_latency->set_module_name(module_name);
     SetStat(GenerateStat(tracks[module_name]),
             module_latency->mutable_module_stat());
+  }
+}
+
+void LatencyMonitor::ValidateMaxLatency() {
+  auto manager = MonitorManager::Instance();
+  const auto& mode = manager->GetHMIMode();
+  auto* components = manager->GetStatus()->mutable_components();
+  for (const auto& iter : mode.monitored_components()) {
+    const std::string& name = iter.first;
+    if (iter.second.has_channel()) {
+      const auto config = iter.second.channel();
+      if (!config.has_max_latency_allowed()) {
+        continue;
+      }
+
+      auto* status = components->at(name).mutable_channel_status();
+      status->clear_status();
+
+      for (const auto& latency :
+           latency_report_.latency_tracks().module_latency()) {
+        if (latency.module_name() == name &&
+            latency.module_stat().aver_duration() >
+                config.max_latency_allowed()) {
+          // send out alert
+          SummaryMonitor::EscalateStatus(
+              ComponentStatus::WARN,
+              absl::StrCat(config.name(), " has average latency ",
+                           latency.module_stat().aver_duration(),
+                           "bigger than ", config.max_latency_allowed()),
+              status);
+        }
+      }
+
+      SummaryMonitor::EscalateStatus(ComponentStatus::OK, "", status);
+    }
   }
 }
 
