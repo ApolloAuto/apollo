@@ -157,6 +157,9 @@ message SimpleLateralDebug {
 
   // Augmented feedback control term in addition to LQR control
   optional double steer_angle_feedback_augment = 31;
+
+  // Mrac control status and feedback states for steer control
+  optional MracDebug steer_mrac_debug = 32;
 }
 
 message SimpleMPCDebug {
@@ -220,6 +223,21 @@ message SimpleMPCDebug {
   optional double jerk_reference = 47;
   optional double jerk_feedback = 48;
   optional double jerk_error = 49;
+}
+
+message MracDebug {
+  optional int32 mrac_model_order = 1;
+  repeated double mrac_reference_state = 2;
+  repeated double mrac_state_error = 3;
+  optional MracAdaptiveGain mrac_adaptive_gain = 4;
+  optional int32 mrac_reference_saturation_status = 5;
+  optional int32 mrac_control_saturation_status = 6;
+}
+
+message MracAdaptiveGain {
+  repeated double state_adaptive_gain = 1;
+  repeated double input_adaptive_gain = 2;
+  repeated double nonlinear_adaptive_gain = 3;
 }
 
 message InputDebug {
