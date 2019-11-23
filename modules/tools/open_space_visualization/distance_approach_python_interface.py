@@ -31,11 +31,11 @@ lib.DistanceCreateObstaclesPtr.argtypes = []
 lib.DistanceCreateObstaclesPtr.restype = c_void_p
 lib.AddObstacle.argtypes = [c_void_p, POINTER(c_double)]
 lib.DistancePlan.restype = c_bool
-lib.DistancePlan.argtypes = [c_void_p, c_void_p, c_void_p, c_double, c_double, c_double, c_double, 
+lib.DistancePlan.argtypes = [c_void_p, c_void_p, c_void_p, c_double, c_double, c_double, c_double,
                      c_double, c_double, POINTER(c_double)]
 lib.DistanceGetResult.argtypes = [c_void_p, c_void_p, POINTER(c_double), POINTER(c_double), POINTER(c_double),
-                    POINTER(c_double), POINTER(c_double), POINTER(c_double), POINTER(c_double), 
-                    POINTER(c_double), POINTER(c_double), POINTER(c_double), POINTER(c_double), 
+                    POINTER(c_double), POINTER(c_double), POINTER(c_double), POINTER(c_double),
+                    POINTER(c_double), POINTER(c_double), POINTER(c_double), POINTER(c_double),
                     POINTER(c_double), POINTER(c_double), POINTER(c_double), POINTER(c_double),
                     POINTER(c_ushort), POINTER(c_double), POINTER(c_double), POINTER(c_double)]
 

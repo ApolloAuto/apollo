@@ -19,9 +19,9 @@ Note: Side Pass
 While the functionality of side pass still exists, it has now been made universal rather than limiting it to a type of scenario. The side-pass feature is incorporated as part of the path-bounds decider task. You can choose to turn it on or off by properly configuring the path-lane-borrow decider task. For example, if you want the vehicle to be agile, then turn side-pass on for all scenarios; if you feel it not safe to side-pass in intersections, then turn it off for those related scenarios.
 ```
 
-### Intersection 
+### Intersection
 
-The new intersection scenario includes STOP Signs, Traffic Lights and Bare Intersections which do not have either a light or a sign. 
+The new intersection scenario includes STOP Signs, Traffic Lights and Bare Intersections which do not have either a light or a sign.
 
 #### STOP Sign
 
@@ -50,10 +50,10 @@ Note: The team is working to add additional driving scenarios into our planner. 
 
 #### Traffic Light
 
-In order to safely and smoothly pass through a traffic light, we created 3 driving scenarios:  
+In order to safely and smoothly pass through a traffic light, we created 3 driving scenarios:
 
 - **Protected**: In this scenario, our ego car has to pass through an intersection with a clear traffic light indicator. A left arrow or right arrow in green for the corresponding turn.
-- **Unprotected Left**: In this scenario, our ego car will have to make a left turn without a distinct light, meaning the car would need to yield to oncoming traffic. Just like in the unprotected STOP scenario, our ego car would have to creep to ensure that it is safe to cross the intersection before safely moving through the lane. 
+- **Unprotected Left**: In this scenario, our ego car will have to make a left turn without a distinct light, meaning the car would need to yield to oncoming traffic. Just like in the unprotected STOP scenario, our ego car would have to creep to ensure that it is safe to cross the intersection before safely moving through the lane.
 - **Unprotected Right**: In this scenario, our ego car is expected to make an unprotected right turn while yielding to oncoming traffic. Our ego car will need to creep slowly and gauge the traffic and then make a safe turn.
 
 As discussed above, based on the three driving scenarios, the following 3 steps are performed:
@@ -66,7 +66,7 @@ As discussed above, based on the three driving scenarios, the following 3 steps 
 
 Bare intersection is a scenario designated to an intersection without either a STOP sign or a traffic light. In this scenario, the following steps are performed:
 
-- **Approach**: Reach the intersection 
+- **Approach**: Reach the intersection
 - **Move forward slightly (Creep)**: Check to see if any other car is moving or in the case of unprotected stop, check to see if there are any oncoming vehicles on either side of the lane
 - **Move**: Safely move through the intersection
 
@@ -81,7 +81,7 @@ The Apollo team is proud to introduce Open Space Planner, a new planning algorit
 
     2. **Parking**: In this stage, Open Space Planner algorithm is used to generate a zig-zag trajectory which involves both forward and reverse driving (gear changes) in order to safely park the ego car. A sample trajectory generated for the scenario in the previous image, can be seen below:
 
-        ![](images/parking1.png) 
+        ![](images/parking1.png)
 
 - **Pull Over**: The Pull Over scenario was designed especially for maneuvering to the side of the road upon reaching your destination like for curb-side parallel parking. There are 3 main stages to accomplish the pull over scenario.
     1. **Approaching**: In this stage, as there is no clear designated parking spot, the ego car simply approaches the side of the road where it seems feasible to park. Standard Planning algorithms are used for this stage. Once it comes to a halt, the second stage begins. An example of stage 1 can be seen in the image below:
@@ -89,7 +89,7 @@ The Apollo team is proud to introduce Open Space Planner, a new planning algorit
         ![](images/pull_over.png)
 
     2. **Retry Approach Parking**: In this stage the ego car adjusts itself to enter the parking spot. It is similar to the `Approach Parking Spot` case in the Valet scenario. An example of stage 2 can be seen in the image below:
-    
+
         ![](images/pull_over1.png)
     3. **Retry Parking**: This stage uses Open Space Planner to parallel park the vehicle. A zig-zag trajectory is generated to help the ego car park itself on the side of the road. A sample trajectory generated for the scenario in the previous image, can be seen below:
 
