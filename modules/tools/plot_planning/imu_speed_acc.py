@@ -78,7 +78,7 @@ if __name__ == "__main__":
     def plot_freq(x, y, ax, color):
         Fs = len(y) / float(x[-1] - x[0])
         n = len(y)
-        k = np.arange(n)
+        k = np.arrange(n)
         T = n/Fs
         frq = k/T
         frq = frq[range(n/2)]

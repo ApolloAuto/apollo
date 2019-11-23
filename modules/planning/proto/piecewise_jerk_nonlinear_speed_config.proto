@@ -11,7 +11,7 @@ message PiecewiseJerkNonlinearSpeedConfig {
   // Minimal traversal time weight
   optional double s_potential_weight = 4 [default = 10.0];
 
-  // Preferred crusing speed weight
+  // Preferred cruising speed weight
   optional double ref_v_weight = 5 [default = 10.0];
 
   // Optional reference speed profile weight

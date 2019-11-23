@@ -57,7 +57,7 @@ def sort_files_by_timestamp(in_path, out_path,
     ts_map = np.loadtxt(ts_file)
     sorted_ids = np.argsort(ts_map[:,1])
     ts_map = ts_map[sorted_ids]
-    # sorted_ts = np.vstack((np.arange(sorted_ids), ts_map[:,1])).T
+    # sorted_ts = np.vstack((np.arrange(sorted_ids), ts_map[:,1])).T
     # np.savetxt(out_ts_file, ts_map, sorted_ts)
     ts_obj = TimestampFileObject(file_path=out_ts_file);
     ts_obj.save_to_file(ts_map[:,1])
