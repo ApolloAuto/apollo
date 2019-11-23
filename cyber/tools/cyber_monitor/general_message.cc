@@ -14,14 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "./general_message.h"
-#include "./general_channel_message.h"
-#include "./screen.h"
+#include "cyber/tools/cyber_monitor/general_message.h"
 
 #include <iomanip>
 #include <numeric>
 #include <sstream>
 #include <vector>
+
+#include "cyber/tools/cyber_monitor/general_channel_message.h"
+#include "cyber/tools/cyber_monitor/screen.h"
 
 namespace {
 
