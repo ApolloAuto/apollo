@@ -215,7 +215,6 @@ void LocalizationLidarProcess::GetResult(int* lidar_status,
   *lidar_status = static_cast<int>(lidar_status_);
   *location = location_;
   *covariance = location_covariance_;
-  return;
 }
 
 int LocalizationLidarProcess::GetResult(LocalizationEstimate* lidar_local_msg) {
@@ -266,12 +265,10 @@ int LocalizationLidarProcess::GetResult(LocalizationEstimate* lidar_local_msg) {
 
 void LocalizationLidarProcess::IntegPvaProcess(const InsPva& sins_pva_msg) {
   pose_forecastor_->PushInspvaData(sins_pva_msg);
-  return;
 }
 
 void LocalizationLidarProcess::RawImuProcess(const ImuData& imu_msg) {
   pose_forecastor_->PushImuData(imu_msg);
-  return;
 }
 
 bool LocalizationLidarProcess::GetPredictPose(const double lidar_time,

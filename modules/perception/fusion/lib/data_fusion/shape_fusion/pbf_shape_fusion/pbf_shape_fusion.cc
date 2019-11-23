@@ -62,7 +62,6 @@ void PbfShapeFusion::UpdateWithMeasurement(const SensorObjectPtr measurement,
 void PbfShapeFusion::UpdateWithoutMeasurement(const std::string& sensor_id,
                                               double measurement_timestamp,
                                               double target_timestamp) {
-  return;
 }
 
 std::string PbfShapeFusion::Name() const { return "PbfShapeFusion"; }

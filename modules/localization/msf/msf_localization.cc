@@ -202,7 +202,6 @@ void MSFLocalization::OnPointCloud(
     publisher_->PublishLocalizationMsfLidar(result.localization());
   }
 
-  return;
 }
 
 void MSFLocalization::OnRawImu(
@@ -238,7 +237,6 @@ void MSFLocalization::OnRawImu(
 
   localization_state_ = result.state();
 
-  return;
 }
 
 void MSFLocalization::OnGnssBestPose(
@@ -258,7 +256,6 @@ void MSFLocalization::OnGnssBestPose(
     publisher_->PublishLocalizationMsfGnss(result.localization());
   }
 
-  return;
 }
 
 void MSFLocalization::OnGnssRtkObs(
@@ -278,7 +275,6 @@ void MSFLocalization::OnGnssRtkObs(
     publisher_->PublishLocalizationMsfGnss(result.localization());
   }
 
-  return;
 }
 
 void MSFLocalization::OnGnssRtkEph(
@@ -290,7 +286,6 @@ void MSFLocalization::OnGnssRtkEph(
   }
 
   localization_integ_.RawEphemerisProcess(*gnss_orbit_msg);
-  return;
 }
 
 void MSFLocalization::OnGnssHeading(
@@ -301,7 +296,6 @@ void MSFLocalization::OnGnssHeading(
     return;
   }
   localization_integ_.GnssHeadingProcess(*gnss_heading_msg);
-  return;
 }
 
 void MSFLocalization::SetPublisher(

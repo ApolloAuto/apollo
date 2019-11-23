@@ -847,7 +847,6 @@ void PathBoundsDecider::RemoveRedundantPathBoundaries(
       break;
     }
   }
-  return;
 }
 
 bool PathBoundsDecider::IsContained(
@@ -1841,7 +1840,6 @@ void PathBoundsDecider::RecordDebugInfo(
       {right_path_data.discretized_path().begin(),
        right_path_data.discretized_path().end()});
 
-  return;
 }
 
 }  // namespace planning

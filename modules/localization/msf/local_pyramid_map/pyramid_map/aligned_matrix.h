@@ -151,7 +151,6 @@ void AlignedMatrix<Scalar, aligned_len>::Init(int rows, int cols) {
   MakeEmpty();
 
   // printf("aligned addr: %p\n", (void*)data_);
-  return;
 }
 
 template <typename Scalar, int aligned_len>

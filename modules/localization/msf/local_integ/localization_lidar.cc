@@ -88,28 +88,23 @@ void LocalizationLidar::SetVelodyneExtrinsic(const Eigen::Affine3d& pose) {
 
   lidar_locator_->SetVelodyneExtrinsic(trans.x(), trans.y(), trans.z(),
                                        quat.x(), quat.y(), quat.z(), quat.w());
-  return;
 }
 
 void LocalizationLidar::SetVehicleHeight(double height) {
   vehicle_lidar_height_ = height;
   AINFO << "Set height: " << vehicle_lidar_height_;
-  return;
 }
 
 void LocalizationLidar::SetValidThreshold(float valid_threashold) {
   lidar_locator_->SetValidThreshold(valid_threashold);
-  return;
 }
 
 void LocalizationLidar::SetImageAlignMode(int mode) {
   lidar_locator_->SetImageAlignMode(mode);
-  return;
 }
 
 void LocalizationLidar::SetLocalizationMode(int mode) {
   lidar_locator_->SetLocalizationMode(mode);
-  return;
 }
 
 void LocalizationLidar::SetDeltaYawLimit(double limit) {
@@ -206,7 +201,6 @@ void LocalizationLidar::GetResult(Eigen::Affine3d* location,
       }
     }
   }
-  return;
 }
 
 void LocalizationLidar::GetLocalizationDistribution(
@@ -226,7 +220,6 @@ void LocalizationLidar::GetLocalizationDistribution(
       }
     }
   }
-  return;
 }
 
 void LocalizationLidar::RefineAltitudeFromMap(Eigen::Affine3d* pose) {
@@ -275,7 +268,6 @@ void LocalizationLidar::RefineAltitudeFromMap(Eigen::Affine3d* pose) {
   lidar_pose.translation()(2) = vehicle_ground_alt + height_diff;
   Eigen::Affine3d transform_tmp = lidar_pose * velodyne_extrinsic_.inverse();
   pose->translation() = transform_tmp.translation();
-  return;
 }
 
 void LocalizationLidar::ComposeMapNode(const Eigen::Vector3d& trans) {
@@ -379,7 +371,6 @@ void LocalizationLidar::ComposeMapNode(const Eigen::Vector3d& trans) {
       }
     }
   }
-  return;
 }
 
 }  // namespace msf

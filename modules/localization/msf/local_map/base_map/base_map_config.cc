@@ -75,7 +75,6 @@ void BaseMapConfig::CreateXml(boost::property_tree::ptree* config) const {
   for (size_t i = 0; i < map_datasets_.size(); ++i) {
     config->add("map.map_record.datasets.dataset", map_datasets_[i]);
   }
-  return;
 }
 
 void BaseMapConfig::LoadXml(const boost::property_tree::ptree& config) {

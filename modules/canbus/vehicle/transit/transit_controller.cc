@@ -396,7 +396,6 @@ void TransitController::Gear(Chassis::GearPosition gear_position) {
       break;
     }
   }
-  return;
 }
 
 // brake with new acceleration

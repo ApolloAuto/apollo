@@ -68,7 +68,6 @@ void Spline1dSolver::GenerateProblemProto(
     }
   }
 
-  return;
 }
 
 void Spline1dSolver::ConvertMatrixXdToProto(const Eigen::MatrixXd& matrix,
