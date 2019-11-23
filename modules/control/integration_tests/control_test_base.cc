@@ -132,7 +132,7 @@ bool ControlTestBase::test_control() {
     return false;
   }
   return true;
-}  // namespace control
+}
 
 void ControlTestBase::trim_control_command(ControlCommand *origin) {
   origin->mutable_header()->clear_radar_timestamp();
