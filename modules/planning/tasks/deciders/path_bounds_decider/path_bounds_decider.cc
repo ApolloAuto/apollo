@@ -695,8 +695,8 @@ bool PathBoundsDecider::SearchPullOverPosition(
     common::PointENU hdmap_point;
     hdmap_point.set_x(pt_xy.x());
     hdmap_point.set_y(pt_xy.y());
-    ADEBUG << "Pull-over position might be around (" << pt_xy.x()
-           << ", " << pt_xy.y() << ")";
+    ADEBUG << "Pull-over position might be around (" << pt_xy.x() << ", "
+           << pt_xy.y() << ")";
     std::vector<std::shared_ptr<const JunctionInfo>> junctions;
     HDMapUtil::BaseMap().GetJunctions(hdmap_point, 1.0, &junctions);
     if (!junctions.empty()) {
@@ -717,9 +717,9 @@ bool PathBoundsDecider::SearchPullOverPosition(
       double curr_road_right_width = 0;
       reference_line_info.reference_line().GetRoadWidth(
           curr_s, &curr_road_left_width, &curr_road_right_width);
-      ADEBUG << "At s = " << curr_s << ", the road left width = "
-             << curr_road_left_width << ", and the road right width = "
-             << curr_road_right_width;
+      ADEBUG << "At s = " << curr_s
+             << ", the road left width = " << curr_road_left_width
+             << ", and the road right width = " << curr_road_right_width;
       if (curr_road_right_width - (curr_right_bound + adc_half_width) >
           config_.path_bounds_decider_config().pull_over_road_edge_buffer()) {
         AERROR << "Not close enough to road-edge. Not feasible for pull-over.";
@@ -1839,7 +1839,6 @@ void PathBoundsDecider::RecordDebugInfo(
   ptr_display_path_2->mutable_path_point()->CopyFrom(
       {right_path_data.discretized_path().begin(),
        right_path_data.discretized_path().end()});
-
 }
 
 }  // namespace planning

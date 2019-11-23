@@ -111,7 +111,6 @@ void Screen::Init(void) {
   clear();
 
   canRun_ = true;
-
 }
 
 int Screen::Width(void) const { return COLS; }

@@ -176,7 +176,6 @@ void NaviPathDecider::MoveToDestLane(
                    new_path_point.set_y(new_path_point_y);
                    return new_path_point;
                  });
-
 }
 
 void NaviPathDecider::KeepLane(
@@ -216,7 +215,6 @@ void NaviPathDecider::KeepLane(
           return new_path_point;
         });
   }
-
 }
 
 void NaviPathDecider::RecordDebugInfo(const PathData& path_data) {
