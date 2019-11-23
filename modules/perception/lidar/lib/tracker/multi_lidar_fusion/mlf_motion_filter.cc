@@ -104,7 +104,6 @@ void MlfMotionFilter::UpdateWithObject(const MlfFilterOptions& options,
 void MlfMotionFilter::UpdateWithoutObject(const MlfFilterOptions& options,
                                           double timestamp,
                                           MlfTrackDataPtr track_data) {
-  return;
 }
 
 void MlfMotionFilter::InitializeTrackState(TrackedObjectPtr new_object) {

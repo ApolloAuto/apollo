@@ -324,7 +324,6 @@ void RoadGraph::ConstructLaneSequence(
   } else {
     lane_segments->pop_front();
   }
-  return;
 }
 
 }  // namespace prediction

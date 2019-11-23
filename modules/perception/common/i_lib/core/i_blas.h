@@ -3651,7 +3651,6 @@ inline void IMinMaxElements(const T *a, int n, T *min_val, T *max_val) {
       *min_val = temp;
     }
   }
-  return;
 }
 
 // Compute the minimum and maximum elements in an array, ingoring the

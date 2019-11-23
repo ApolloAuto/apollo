@@ -264,7 +264,6 @@ void OnlineVisualizerComponent::ParsePointCloudMessage(
       }
     }
   }
-  return;
 }
 
 }  // namespace msf

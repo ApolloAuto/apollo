@@ -50,7 +50,6 @@ QuinticPolynomialCurve1d::QuinticPolynomialCurve1d(
     const QuinticPolynomialCurve1d& other) {
   param_ = other.param_;
   coef_ = other.coef_;
-  return;
 }
 
 double QuinticPolynomialCurve1d::Evaluate(const uint32_t order,

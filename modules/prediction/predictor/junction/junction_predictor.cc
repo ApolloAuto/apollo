@@ -137,7 +137,6 @@ void JunctionPredictor::DrawJunctionTrajectoryPoints(
     }
     t += period;
   }
-  return;
 }
 
 std::vector<JunctionExit> JunctionPredictor::MostLikelyJunctions(

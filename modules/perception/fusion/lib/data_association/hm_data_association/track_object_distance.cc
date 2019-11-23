@@ -65,7 +65,6 @@ void TrackObjectDistance::GetModified2DRadarBoxVertices(
         camera_intrinsic->Project(local_box_vertex.head(3).cast<float>());
     radar_box2d_vertices->push_back(temp_vertex.cast<double>());
   }
-  return;
 }
 
 base::BaseCameraModelPtr TrackObjectDistance::QueryCameraModel(

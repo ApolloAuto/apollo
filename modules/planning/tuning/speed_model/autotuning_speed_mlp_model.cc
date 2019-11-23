@@ -177,7 +177,6 @@ void AutotuningSpeedMLPModel::FlattenFeatures(
   (*flat_feature)(row, 18) = sidepass_front_v_rel;
   (*flat_feature)(row, 19) = sidepass_rear_distance;
   (*flat_feature)(row, 20) = sidepass_rear_v_rel;
-  return;
 }
 
 }  // namespace planning

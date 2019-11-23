@@ -316,7 +316,6 @@ void MeasureRepublishProcess::GnssLocalProcess(
          << "[std_x:" << measure_data.variance[0][0] << "]"
          << "[std_y:" << measure_data.variance[1][1] << "]"
          << "[std_z:" << measure_data.variance[2][2] << "]";
-  return;
 }
 
 void MeasureRepublishProcess::IntegPvaProcess(const InsPva& inspva_msg) {
@@ -429,7 +428,6 @@ void MeasureRepublishProcess::TransferXYZFromBestgnsspose(
   }
   height_mutex_.unlock();
   measure->is_have_variance = true;
-  return;
 }
 
 void MeasureRepublishProcess::TransferFirstMeasureFromBestgnsspose(
@@ -447,7 +445,6 @@ void MeasureRepublishProcess::TransferFirstMeasureFromBestgnsspose(
   measure->gnss_vel.vu = 0.0;
   AINFO << "Novatel bestgnsspose publish: "
         << "send sins init position using novatel bestgnsspos!";
-  return;
 }
 
 bool MeasureRepublishProcess::CalculateVelFromBestgnsspose(

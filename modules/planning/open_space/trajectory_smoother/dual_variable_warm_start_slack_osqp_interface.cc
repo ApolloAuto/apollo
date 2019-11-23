@@ -302,7 +302,6 @@ bool DualVariableWarmStartSlackOSQPInterface::optimize() {
 void DualVariableWarmStartSlackOSQPInterface::checkSolution(
     const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up) {
   // TODO(Runxin): extend
-  return;
 }
 
 void DualVariableWarmStartSlackOSQPInterface::assembleP(
