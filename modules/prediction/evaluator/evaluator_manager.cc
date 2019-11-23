@@ -238,8 +238,7 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
   // Select different evaluators depending on the obstacle's type.
   switch (obstacle->type()) {
     case PerceptionObstacle::VEHICLE: {
-      if (obstacle->latest_feature().priority().priority() ==
-          ObstaclePriority::CAUTION) {
+      if (obstacle->IsCaution() && !obstacle->IsSlow()) {
         if (obstacle->IsNearJunction()) {
           evaluator = GetEvaluator(vehicle_in_junction_caution_evaluator_);
         } else if (obstacle->IsOnLane()) {
