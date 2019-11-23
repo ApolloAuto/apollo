@@ -195,6 +195,7 @@ void LatencyMonitor::PublishLatencyReport() {
       FLAGS_latency_reporting_topic);
   apollo::common::util::FillHeader("LatencyReport", &latency_report_);
   AggregateLatency();
+  ValidateMaxLatency();
   writer->Write(latency_report_);
   latency_report_.clear_header();
   track_map_.clear();
