@@ -211,14 +211,15 @@ double ExtrapolationPredictor::ComputeExtraplationSpeed(
     const int num_tail_point, const Trajectory& trajectory) {
   int num_trajectory_point = trajectory.trajectory_point_size();
   CHECK_GT(num_trajectory_point, num_tail_point);
-  double time_resolution = FLAGS_prediction_trajectory_time_resolution;
-  const TrajectoryPoint& last_point =
-      trajectory.trajectory_point(num_trajectory_point - 1);
-  const TrajectoryPoint& mid_point =
-      trajectory.trajectory_point(num_trajectory_point - num_tail_point);
-  double diff_x = last_point.path_point().x() - mid_point.path_point().x();
-  double diff_y = last_point.path_point().y() - mid_point.path_point().y();
-  return std::hypot(diff_x, diff_y) / (num_tail_point * time_resolution);
+  CHECK_GT(num_tail_point, 0);
+  double v_sum = 0.0;
+  int v_count = 0;
+  int mid_index = num_trajectory_point - num_tail_point;
+  for (int i = mid_index; i < num_trajectory_point; ++i) {
+    v_sum += trajectory.trajectory_point(i).v();
+    ++v_count;
+  }
+  return v_sum / static_cast<double>(v_count);
 }
 
 }  // namespace prediction
