@@ -19,9 +19,6 @@ module_config {
             readers: [
                 {
                     channel:"/apollo/control/localview"
-                },
-                {
-                    channel:"/apollo/pad"
                 }
             ]
         }
