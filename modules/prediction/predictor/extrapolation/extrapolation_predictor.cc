@@ -213,13 +213,11 @@ double ExtrapolationPredictor::ComputeExtraplationSpeed(
   CHECK_GT(num_trajectory_point, num_tail_point);
   CHECK_GT(num_tail_point, 0);
   double v_sum = 0.0;
-  int v_count = 0;
   int mid_index = num_trajectory_point - num_tail_point;
   for (int i = mid_index; i < num_trajectory_point; ++i) {
     v_sum += trajectory.trajectory_point(i).v();
-    ++v_count;
   }
-  return v_sum / static_cast<double>(v_count);
+  return v_sum / static_cast<double>(num_tail_point);
 }
 
 }  // namespace prediction
