@@ -20,7 +20,7 @@
 #include <map>
 #include <string>
 
-#include "./renderable_message.h"
+#include "cyber/tools/cyber_monitor/renderable_message.h"
 
 namespace apollo {
 namespace cyber {

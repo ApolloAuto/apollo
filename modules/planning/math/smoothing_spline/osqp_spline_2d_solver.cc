@@ -106,8 +106,8 @@ bool OsqpSpline2dSolver::Solve() {
   auto constraint_num = inequality_constraint_boundary.rows() +
                         equality_constraint_boundary.rows();
 
-  constexpr float kEpsilon = 1e-9f;
-  constexpr float kUpperLimit = 1e9f;
+  static constexpr float kEpsilon = 1e-9f;
+  static constexpr float kUpperLimit = 1e9f;
   c_float l[constraint_num];  // NOLINT
   c_float u[constraint_num];  // NOLINT
   for (int i = 0; i < constraint_num; ++i) {

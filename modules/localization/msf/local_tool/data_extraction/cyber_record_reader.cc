@@ -45,8 +45,6 @@ void CyberRecordReader::Read(const std::string &file_name) {
       itr->second(message.content);
     }
   }
-
-  return;
 }
 
 }  // namespace msf

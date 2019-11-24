@@ -33,7 +33,7 @@ SingleLanePredictor::SingleLanePredictor() {
   predictor_type_ = ObstacleConf::SINGLE_LANE_PREDICTOR;
 }
 
-void SingleLanePredictor::Predict(
+bool SingleLanePredictor::Predict(
     const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
     ObstaclesContainer* obstacles_container) {
   Clear();
@@ -47,7 +47,7 @@ void SingleLanePredictor::Predict(
 
   if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
     AERROR << "Obstacle [" << obstacle->id() << "] has no lane graph.";
-    return;
+    return false;
   }
 
   std::string lane_id = "";
@@ -81,6 +81,7 @@ void SingleLanePredictor::Predict(
     obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
         trajectory);
   }
+  return true;
 }
 
 void SingleLanePredictor::GenerateTrajectoryPoints(

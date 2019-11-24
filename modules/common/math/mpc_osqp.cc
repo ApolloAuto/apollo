@@ -108,7 +108,7 @@ void MpcOsqp::CalculateGradient() {
 void MpcOsqp::CalculateEqualityConstraint(std::vector<c_float> *A_data,
                                           std::vector<c_int> *A_indices,
                                           std::vector<c_int> *A_indptr) {
-  constexpr double kEpsilon = 1e-6;
+  static constexpr double kEpsilon = 1e-6;
   // block matrix
   Eigen::MatrixXd matrix_constraint = Eigen::MatrixXd::Zero(
       state_dim_ * (horizon_ + 1) + state_dim_ * (horizon_ + 1) +

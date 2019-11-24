@@ -116,7 +116,7 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
     return APPROACHING;
   }
 
-  constexpr double kStartParkCheckRange = 3.0;  // meter
+  static constexpr double kStartParkCheckRange = 3.0;  // meter
   if (distance <= -kStartParkCheckRange) {
     ADEBUG << "ADC still far: distance[" << distance << "]";
     return APPROACHING;

@@ -124,19 +124,16 @@ void RTKLocalizationComponent::PublishPoseBroadcastTF(
   mutable_rotation->set_qw(localization.pose().orientation().qw());
 
   tf2_broadcaster_->SendTransform(tf2_msg);
-  return;
 }
 
 void RTKLocalizationComponent::PublishPoseBroadcastTopic(
     const LocalizationEstimate& localization) {
   localization_talker_->Write(localization);
-  return;
 }
 
 void RTKLocalizationComponent::PublishLocalizationStatus(
     const LocalizationStatus& localization_status) {
   localization_status_talker_->Write(localization_status);
-  return;
 }
 
 }  // namespace localization

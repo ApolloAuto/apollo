@@ -35,7 +35,7 @@ using apollo::common::time::Clock;
 Rerouting::Rerouting(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 bool Rerouting::ChangeLaneFailRerouting() {
-  constexpr double kRerouteThresholdToEnd = 20.0;
+  static constexpr double kRerouteThresholdToEnd = 20.0;
   for (const auto& ref_line_info : frame_->reference_line_info()) {
     if (ref_line_info.ReachedDestination() ||
         ref_line_info.SDistanceToDestination() < kRerouteThresholdToEnd) {

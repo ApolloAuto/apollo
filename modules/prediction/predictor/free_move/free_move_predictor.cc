@@ -32,7 +32,7 @@ FreeMovePredictor::FreeMovePredictor() {
   predictor_type_ = ObstacleConf::FREE_MOVE_PREDICTOR;
 }
 
-void FreeMovePredictor::Predict(
+bool FreeMovePredictor::Predict(
     const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
     ObstaclesContainer* obstacles_container) {
   Clear();
@@ -48,7 +48,7 @@ void FreeMovePredictor::Predict(
       !feature.position().has_x() || !feature.position().has_y()) {
     AERROR << "Obstacle [" << obstacle->id()
            << " is missing position or velocity";
-    return;
+    return false;
   }
 
   double prediction_total_time = FLAGS_prediction_trajectory_time_length;
@@ -102,6 +102,7 @@ void FreeMovePredictor::Predict(
       }
     }
   }
+  return true;
 }
 
 void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(

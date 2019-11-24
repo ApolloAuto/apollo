@@ -47,7 +47,7 @@ void VehicleModel::RearCenteredKinematicBicycleModel(
 
   double countdown_time = predicted_time_horizon;
   bool finish_flag = false;
-  constexpr double kepsilon = 1e-8;
+  static constexpr double kepsilon = 1e-8;
   while (countdown_time > kepsilon && !finish_flag) {
     countdown_time -= dt;
     if (countdown_time < kepsilon) {

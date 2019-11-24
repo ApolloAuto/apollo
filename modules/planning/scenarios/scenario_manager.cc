@@ -225,7 +225,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
 
   // check around junction
   if (pull_over_scenario) {
-    constexpr double kDistanceToAvoidJunction = 8.0;  // meter
+    static constexpr double kDistanceToAvoidJunction = 8.0;  // meter
     for (const auto& overlap : first_encountered_overlap_map_) {
       if (overlap.first == ReferenceLineInfo::PNC_JUNCTION ||
           overlap.first == ReferenceLineInfo::SIGNAL ||
@@ -246,7 +246,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
   // check rightmost driving lane along pull-over path
   if (pull_over_scenario) {
     double check_s = adc_front_edge_s;
-    constexpr double kDistanceUnit = 5.0;
+    static constexpr double kDistanceUnit = 5.0;
     while (check_s < dest_sl.s()) {
       check_s += kDistanceUnit;
 
@@ -374,7 +374,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectInterceptionScenario(
 
   // pick a closer one between consecutive bare_intersection and traffic_sign
   if (traffic_sign_overlap && pnc_junction_overlap) {
-    constexpr double kJunctionDelta = 10.0;
+    static constexpr double kJunctionDelta = 10.0;
     double s_diff = std::fabs(traffic_sign_overlap->start_s -
                               pnc_junction_overlap->start_s);
     if (s_diff >= kJunctionDelta) {
@@ -489,7 +489,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
   // find all the traffic light belong to
   // the same group as first encountered traffic light
   std::vector<hdmap::PathOverlap> next_traffic_lights;
-  constexpr double kTrafficLightGroupingMaxDist = 2.0;  // unit: m
+  static constexpr double kTrafficLightGroupingMaxDist = 2.0;  // unit: m
   const std::vector<PathOverlap>& traffic_light_overlaps =
       reference_line_info.reference_line().map_path().signal_overlaps();
   for (const auto& traffic_light_overlap : traffic_light_overlaps) {
@@ -1049,7 +1049,7 @@ void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
     return;
   }
 
-  constexpr double kTrafficLightGroupingMaxDist = 2.0;  // unit: m
+  static constexpr double kTrafficLightGroupingMaxDist = 2.0;  // unit: m
   const double current_traffic_light_overlap_start_s =
       traffic_light_overlap_itr->start_s;
   for (const auto& traffic_light_overlap : traffic_light_overlaps) {
@@ -1116,7 +1116,7 @@ void ScenarioManager::UpdatePlanningContextYieldSignScenario(
     return;
   }
 
-  constexpr double kTrafficLightGroupingMaxDist = 2.0;  // unit: m
+  static constexpr double kTrafficLightGroupingMaxDist = 2.0;  // unit: m
   const double current_yield_sign_overlap_start_s =
       yield_sign_overlap_itr->start_s;
   for (const auto& yield_sign_overlap : yield_sign_overlaps) {
@@ -1174,7 +1174,7 @@ void ScenarioManager::UpdatePlanningContextPullOverScenario(
           {pull_over_status.position().x(), pull_over_status.position().y()},
           &pull_over_sl);
 
-      constexpr double kDestMaxDelta = 30.0;  // meter
+      static constexpr double kDestMaxDelta = 30.0;  // meter
       if (std::fabs(dest_sl.s() - pull_over_sl.s()) > kDestMaxDelta) {
         PlanningContext::Instance()
             ->mutable_planning_status()

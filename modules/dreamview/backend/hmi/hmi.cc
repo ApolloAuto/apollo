@@ -68,9 +68,7 @@ void HMI::RegisterMessageHandlers() {
   // Send current status and vehicle param to newly joined client.
   websocket_->RegisterConnectionReadyHandler(
       [this](WebSocketHandler::Connection* conn) {
-        const auto status_json =
-            JsonUtil::ProtoToTypedJson("HMIStatus", hmi_worker_->GetStatus());
-        websocket_->SendData(conn, status_json.dump());
+        SendStatus(conn);
         SendVehicleParam(conn);
       });
 
@@ -142,6 +140,12 @@ void HMI::RegisterMessageHandlers() {
           monitor_log_buffer_.WARN("Failed to submit a drive event.");
         }
       });
+
+  websocket_->RegisterMessageHandler(
+      "HMIStatus",
+      [this](const Json& json, WebSocketHandler::Connection* conn) {
+        SendStatus(conn);
+      });
 }
 
 void HMI::SendVehicleParam(WebSocketHandler::Connection* conn) {
@@ -158,6 +162,12 @@ void HMI::SendVehicleParam(WebSocketHandler::Connection* conn) {
   } else {
     websocket_->BroadcastData(json_str);
   }
+}
+
+void HMI::SendStatus(WebSocketHandler::Connection* conn) {
+  const auto status_json =
+      JsonUtil::ProtoToTypedJson("HMIStatus", hmi_worker_->GetStatus());
+  websocket_->SendData(conn, status_json.dump());
 }
 
 }  // namespace dreamview

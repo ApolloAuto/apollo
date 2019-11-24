@@ -244,7 +244,7 @@ bool STBoundary::GetBoundarySlopes(const double curr_time, double* ds_upper,
     return false;
   }
 
-  constexpr double kTimeIncrement = 0.05;
+  static constexpr double kTimeIncrement = 0.05;
   double t_prev = curr_time - kTimeIncrement;
   double prev_s_upper = 0.0;
   double prev_s_lower = 0.0;
@@ -444,8 +444,8 @@ bool STBoundary::IsValid(
     return false;
   }
 
-  constexpr double kStBoundaryEpsilon = 1e-9;
-  constexpr double kMinDeltaT = 1e-6;
+  static constexpr double kStBoundaryEpsilon = 1e-9;
+  static constexpr double kMinDeltaT = 1e-6;
   for (size_t i = 0; i < point_pairs.size(); ++i) {
     const auto& curr_lower = point_pairs[i].first;
     const auto& curr_upper = point_pairs[i].second;

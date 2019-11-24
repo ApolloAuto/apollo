@@ -23,10 +23,11 @@ EmptyPredictor::EmptyPredictor() {
   predictor_type_ = ObstacleConf::EMPTY_PREDICTOR;
 }
 
-void EmptyPredictor::Predict(
+bool EmptyPredictor::Predict(
     const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
     ObstaclesContainer* obstacles_container) {
   obstacle->SetPredictorType(predictor_type_);
+  return true;
 }
 
 }  // namespace prediction

@@ -363,8 +363,8 @@ void NaviPlanning::ProcessPadMsg(DrivingAction drvie_action) {
     }
 
     if (!target_lane_id_.empty()) {
-      constexpr uint32_t KTargetRefLinePriority = 0;
-      constexpr uint32_t kOtherRefLinePriority = 10;
+      static constexpr uint32_t KTargetRefLinePriority = 0;
+      static constexpr uint32_t kOtherRefLinePriority = 10;
       for (auto& ref_line_info : ref_line_info_group) {
         auto lane_id = ref_line_info.Lanes().Id();
         ADEBUG << "lane_id : " << lane_id;

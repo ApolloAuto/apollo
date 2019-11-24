@@ -60,7 +60,7 @@ std::vector<Condition> EndConditionSampler::SampleLonEndConditionsForCruising(
   CHECK_GT(FLAGS_num_velocity_sample, 1);
 
   // time interval is one second plus the last one 0.01
-  constexpr size_t num_of_time_samples = 9;
+  static constexpr size_t num_of_time_samples = 9;
   std::array<double, num_of_time_samples> time_samples;
   for (size_t i = 1; i < num_of_time_samples; ++i) {
     auto ratio =
@@ -102,7 +102,7 @@ std::vector<Condition> EndConditionSampler::SampleLonEndConditionsForCruising(
 std::vector<Condition> EndConditionSampler::SampleLonEndConditionsForStopping(
     const double ref_stop_point) const {
   // time interval is one second plus the last one 0.01
-  constexpr size_t num_of_time_samples = 9;
+  static constexpr size_t num_of_time_samples = 9;
   std::array<double, num_of_time_samples> time_samples;
   for (size_t i = 1; i < num_of_time_samples; ++i) {
     auto ratio =

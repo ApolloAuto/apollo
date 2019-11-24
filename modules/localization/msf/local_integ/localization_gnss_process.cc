@@ -73,7 +73,6 @@ void LocalizationGnssProcess::SetDefaultOption() {
   gnss_lever_arm_.arm_x = -0.030;
   gnss_lever_arm_.arm_y = 0.338;
   gnss_lever_arm_.arm_z = 1.291;
-  return;
 }
 
 void LocalizationGnssProcess::RawObservationProcess(
@@ -157,7 +156,6 @@ void LocalizationGnssProcess::RawEphemerisProcess(
   GnssEphemerisMsg gnss_orbit_msg;
   GnssMagTransfer::Transfer(gnss_orbit, &gnss_orbit_msg);
   gnss_solver_->save_gnss_ephemris(gnss_orbit_msg);
-  return;
 }
 
 void LocalizationGnssProcess::IntegSinsPvaProcess(const InsPva &sins_pva_msg,
@@ -191,7 +189,6 @@ void LocalizationGnssProcess::IntegSinsPvaProcess(const InsPva &sins_pva_msg,
 
   gnss_solver_->motion_update(sec_s, llh, std_pos, velocity, std_vel, euler,
                               lever_arm);
-  return;
 }
 
 LocalizationMeasureState LocalizationGnssProcess::GetResult(

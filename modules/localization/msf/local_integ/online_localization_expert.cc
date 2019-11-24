@@ -57,13 +57,11 @@ void OnlineLocalizationExpert::AddImu(const ImuData &data) {
   CheckImuDelayStatus(cur_imu_time);
   CheckImuMissingStatus(cur_imu_time);
   CheckGnssLidarMsfStatus(cur_imu_time);
-  return;
 }
 
 void OnlineLocalizationExpert::AddFusionLocalization(
     const LocalizationEstimate &data) {
   SetLocalizationStatus(data);
-  return;
 }
 
 void OnlineLocalizationExpert::AddLidarLocalization(
@@ -75,7 +73,6 @@ void OnlineLocalizationExpert::AddLidarLocalization(
   latest_lidar_timestamp_mutex_.lock();
   latest_lidar_timestamp_ = data.measurement_time();
   latest_lidar_timestamp_mutex_.unlock();
-  return;
 }
 
 void OnlineLocalizationExpert::AddGnssBestPose(
@@ -98,8 +95,6 @@ void OnlineLocalizationExpert::AddGnssBestPose(
   latest_gnsspos_timestamp_mutex_.lock();
   latest_gnsspos_timestamp_ = data.time;
   latest_gnsspos_timestamp_mutex_.unlock();
-
-  return;
 }
 
 void OnlineLocalizationExpert::CheckImuDelayStatus(const double &cur_imu_time) {
@@ -122,7 +117,6 @@ void OnlineLocalizationExpert::CheckImuDelayStatus(const double &cur_imu_time) {
            << ", the imu timestamp is " << cur_imu_time;
     sensor_status_.set_imu_delay_status(apollo::localization::IMU_DELAY_1);
   }
-  return;
 }
 
 void OnlineLocalizationExpert::CheckImuMissingStatus(
@@ -155,7 +149,6 @@ void OnlineLocalizationExpert::CheckImuMissingStatus(
         ImuMsgMissingStatus::IMU_MISSING_ABNORMAL);
   }
   pre_imu_time = cur_imu_time;
-  return;
 }
 
 void OnlineLocalizationExpert::CheckGnssLidarMsfStatus(

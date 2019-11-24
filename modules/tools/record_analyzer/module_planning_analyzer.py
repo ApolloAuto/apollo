@@ -184,7 +184,7 @@ class PlannigAnalyzer:
         # jerk
         v2_results["acc_jerk"] = self.lon_acceleration_analyzer.get_acc_jerk()
         v2_results["dec_jerk"] = self.lon_acceleration_analyzer.get_dec_jerk()
-        
+
         # centripetal_jerk
         v2_results["lat_jerk"] = self.lat_acceleration_analyzer.get_jerk()
 

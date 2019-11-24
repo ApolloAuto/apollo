@@ -234,17 +234,18 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
         case STBoundary::BoundaryType::STOP:
         case STBoundary::BoundaryType::YIELD:
           s_upper_bound = std::fmin(s_upper_bound, s_upper);
-          s_soft_upper_bound = s_upper_bound;
+          s_soft_upper_bound = std::fmin(s_soft_upper_bound, s_upper);
           break;
         case STBoundary::BoundaryType::FOLLOW:
           // TODO(Hongyi): unify follow buffer on decision side
           s_upper_bound =
               std::fmin(s_upper_bound, s_upper - FLAGS_follow_min_distance);
-          s_soft_upper_bound = s_upper_bound - 5.0;
+          s_soft_upper_bound = std::fmin(
+              s_soft_upper_bound, s_upper - FLAGS_follow_min_distance - 5.0);
           break;
         case STBoundary::BoundaryType::OVERTAKE:
           s_lower_bound = std::fmax(s_lower_bound, s_lower);
-          s_soft_lower_bound = s_lower_bound;
+          s_soft_lower_bound = std::fmax(s_soft_lower_bound, s_lower);
           break;
         default:
           break;
@@ -265,7 +266,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
 
 bool PiecewiseJerkSpeedNonlinearOptimizer::CheckSpeedLimitFeasibility() {
   // a naive check on first point of speed limit
-  constexpr double kEpsilon = 1e-6;
+  static constexpr double kEpsilon = 1e-6;
   const double init_speed_limit = speed_limit_.GetSpeedLimitByS(s_init_);
   if (init_speed_limit + kEpsilon < s_dot_init_) {
     AERROR << "speed limit [" << init_speed_limit

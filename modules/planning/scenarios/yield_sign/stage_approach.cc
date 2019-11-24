@@ -73,7 +73,7 @@ Stage::StageStatus YieldSignStageApproach::Process(
     reference_line_info.SetJunctionRightOfWay(
         current_yield_sign_overlap->start_s, false);
 
-    constexpr double kPassStopLineBuffer = 0.3;  // unit: m
+    static constexpr double kPassStopLineBuffer = 0.3;  // unit: m
     const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
     const double distance_adc_pass_stop_sign =
         adc_front_edge_s - current_yield_sign_overlap->start_s;
@@ -108,7 +108,7 @@ Stage::StageStatus YieldSignStageApproach::Process(
           continue;
         }
 
-        constexpr double kMinSTBoundaryT = 6.0;  // sec
+        static constexpr double kMinSTBoundaryT = 6.0;  // sec
         if (obstacle->reference_line_st_boundary().min_t() > kMinSTBoundaryT) {
           continue;
         }
@@ -124,8 +124,10 @@ Stage::StageStatus YieldSignStageApproach::Process(
 
         // ignore the obstacle which is already on reference line and moving
         // along the direction of ADC
-        constexpr double kIgnoreMaxSTMinT = 0.1;  // max st_min_t(sec) to ignore
-        constexpr double kIgnoreMinSTMinS = 15.0;  // min st_min_s(m) to ignore
+        // max st_min_t(sec) to ignore
+        static constexpr double kIgnoreMaxSTMinT = 0.1;
+        // min st_min_s(m) to ignore
+        static constexpr double kIgnoreMinSTMinS = 15.0;
         if (obstacle_traveled_s < kepsilon &&
             obstacle->reference_line_st_boundary().min_t() < kIgnoreMaxSTMinT &&
             obstacle->reference_line_st_boundary().min_s() > kIgnoreMinSTMinS) {

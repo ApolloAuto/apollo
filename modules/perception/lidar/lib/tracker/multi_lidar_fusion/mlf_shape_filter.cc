@@ -91,7 +91,6 @@ void MlfShapeFilter::UpdateWithoutObject(const MlfFilterOptions& options,
                                          double timestamp,
                                          MlfTrackDataPtr track_data) {
   // TODO(.)
-  return;
 }
 
 PERCEPTION_REGISTER_MLFFILTER(MlfShapeFilter);

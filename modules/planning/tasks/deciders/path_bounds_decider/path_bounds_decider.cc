@@ -695,8 +695,8 @@ bool PathBoundsDecider::SearchPullOverPosition(
     common::PointENU hdmap_point;
     hdmap_point.set_x(pt_xy.x());
     hdmap_point.set_y(pt_xy.y());
-    ADEBUG << "Pull-over position might be around (" << pt_xy.x()
-           << ", " << pt_xy.y() << ")";
+    ADEBUG << "Pull-over position might be around (" << pt_xy.x() << ", "
+           << pt_xy.y() << ")";
     std::vector<std::shared_ptr<const JunctionInfo>> junctions;
     HDMapUtil::BaseMap().GetJunctions(hdmap_point, 1.0, &junctions);
     if (!junctions.empty()) {
@@ -717,9 +717,9 @@ bool PathBoundsDecider::SearchPullOverPosition(
       double curr_road_right_width = 0;
       reference_line_info.reference_line().GetRoadWidth(
           curr_s, &curr_road_left_width, &curr_road_right_width);
-      ADEBUG << "At s = " << curr_s << ", the road left width = "
-             << curr_road_left_width << ", and the road right width = "
-             << curr_road_right_width;
+      ADEBUG << "At s = " << curr_s
+             << ", the road left width = " << curr_road_left_width
+             << ", and the road right width = " << curr_road_right_width;
       if (curr_road_right_width - (curr_right_bound + adc_half_width) >
           config_.path_bounds_decider_config().pull_over_road_edge_buffer()) {
         AERROR << "Not close enough to road-edge. Not feasible for pull-over.";
@@ -847,7 +847,6 @@ void PathBoundsDecider::RemoveRedundantPathBoundaries(
       break;
     }
   }
-  return;
 }
 
 bool PathBoundsDecider::IsContained(
@@ -1055,7 +1054,7 @@ bool PathBoundsDecider::GetBoundaryFromADC(
   CHECK(!path_bound->empty());
 
   // Calculate the ADC's lateral boundary.
-  constexpr double kMaxLateralAccelerations = 1.5;
+  static constexpr double kMaxLateralAccelerations = 1.5;
   double ADC_lat_decel_buffer = (adc_frenet_ld_ > 0 ? 1.0 : -1.0) *
                                 adc_frenet_ld_ * adc_frenet_ld_ /
                                 kMaxLateralAccelerations / 2.0;
@@ -1151,7 +1150,7 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
 
     // 3. Calculate the proper boundary based on lane-width, ADC's position,
     //    and ADC's velocity.
-    constexpr double kMaxLateralAccelerations = 1.5;
+    static constexpr double kMaxLateralAccelerations = 1.5;
     double offset_to_map = 0.0;
     reference_line.GetOffsetToMap(curr_s, &offset_to_map);
 
@@ -1690,7 +1689,7 @@ double PathBoundsDecider::GetBufferBetweenADCCenterAndEdge() {
       VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
   // TODO(all): currently it's a fixed number. But it can take into account many
   // factors such as: ADC length, possible turning angle, speed, etc.
-  constexpr double kAdcEdgeBuffer = 0.0;
+  static constexpr double kAdcEdgeBuffer = 0.0;
 
   return (adc_half_width + kAdcEdgeBuffer);
 }
@@ -1840,8 +1839,6 @@ void PathBoundsDecider::RecordDebugInfo(
   ptr_display_path_2->mutable_path_point()->CopyFrom(
       {right_path_data.discretized_path().begin(),
        right_path_data.discretized_path().end()});
-
-  return;
 }
 
 }  // namespace planning

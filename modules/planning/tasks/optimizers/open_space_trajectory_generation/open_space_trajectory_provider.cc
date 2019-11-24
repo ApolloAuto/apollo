@@ -332,7 +332,7 @@ bool OpenSpaceTrajectoryProvider::IsVehicleStopDueToFallBack(
   if (!is_on_fallback) {
     return false;
   }
-  constexpr double kEpsilon = 1.0e-1;
+  static constexpr double kEpsilon = 1.0e-1;
   const double adc_speed = vehicle_state.linear_velocity();
   const double adc_acceleration = vehicle_state.linear_acceleration();
   if (std::abs(adc_speed) < kEpsilon && std::abs(adc_acceleration) < kEpsilon) {
@@ -346,9 +346,9 @@ void OpenSpaceTrajectoryProvider::GenerateStopTrajectory(
     DiscretizedTrajectory* const trajectory_data) {
   double relative_time = 0.0;
   // TODO(Jinyun) Move to conf
-  constexpr int stop_trajectory_length = 10;
-  constexpr double relative_stop_time = 0.1;
-  constexpr double vEpsilon = 0.00001;
+  static constexpr int stop_trajectory_length = 10;
+  static constexpr double relative_stop_time = 0.1;
+  static constexpr double vEpsilon = 0.00001;
   double standstill_acceleration =
       frame_->vehicle_state().linear_velocity() >= -vEpsilon
           ? -FLAGS_open_space_standstill_acceleration

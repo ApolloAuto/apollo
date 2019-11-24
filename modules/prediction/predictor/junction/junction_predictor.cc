@@ -37,7 +37,7 @@ JunctionPredictor::JunctionPredictor() {
   predictor_type_ = ObstacleConf::JUNCTION_PREDICTOR;
 }
 
-void JunctionPredictor::Predict(
+bool JunctionPredictor::Predict(
     const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
     ObstaclesContainer* obstacles_container) {
   Clear();
@@ -58,6 +58,7 @@ void JunctionPredictor::Predict(
     obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
         trajectory);
   }
+  return true;
 }
 
 void JunctionPredictor::DrawJunctionTrajectoryPoints(
@@ -136,7 +137,6 @@ void JunctionPredictor::DrawJunctionTrajectoryPoints(
     }
     t += period;
   }
-  return;
 }
 
 std::vector<JunctionExit> JunctionPredictor::MostLikelyJunctions(

@@ -80,8 +80,6 @@ TEST(ClassLoaderTest, multiTimesLoadunload) {
   ASSERT_TRUE(IsLibraryLoadedByAnybody(LIBRARY_1));
   loader1.UnloadLibrary();
   ASSERT_FALSE(IsLibraryLoadedByAnybody(LIBRARY_1));
-
-  return;
 }
 
 TEST(ClassLoaderManagerTest, testClassLoaderManager) {

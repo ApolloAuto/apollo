@@ -54,8 +54,7 @@ bool StageIntersectionCruiseImpl::CheckDone(
       const std::string traffic_sign_overlap_id =
           stop_sign_status.current_stop_sign_overlap_id();
       traffic_sign_overlap = scenario::util::GetOverlapOnReferenceLine(
-          reference_line_info,
-          traffic_sign_overlap_id,
+          reference_line_info, traffic_sign_overlap_id,
           ReferenceLineInfo::STOP_SIGN);
     } else if (scenario_type == ScenarioConfig::TRAFFIC_LIGHT_PROTECTED ||
                scenario_type ==
@@ -70,8 +69,7 @@ bool StageIntersectionCruiseImpl::CheckDone(
               ? traffic_light_status.current_traffic_light_overlap_id(0)
               : "";
       traffic_sign_overlap = scenario::util::GetOverlapOnReferenceLine(
-          reference_line_info,
-          traffic_sign_overlap_id,
+          reference_line_info, traffic_sign_overlap_id,
           ReferenceLineInfo::SIGNAL);
     } else if (scenario_type == ScenarioConfig::YIELD_SIGN) {
       // yield_sign scenarios
@@ -82,8 +80,7 @@ bool StageIntersectionCruiseImpl::CheckDone(
               ? yield_sign_status.current_yield_sign_overlap_id(0)
               : "";
       traffic_sign_overlap = scenario::util::GetOverlapOnReferenceLine(
-          reference_line_info,
-          traffic_sign_overlap_id,
+          reference_line_info, traffic_sign_overlap_id,
           ReferenceLineInfo::YIELD_SIGN);
     }
 
@@ -91,7 +88,7 @@ bool StageIntersectionCruiseImpl::CheckDone(
       return true;
     }
 
-    constexpr double kIntersectionPassDist = 20.0;  // unit: m
+    static constexpr double kIntersectionPassDist = 20.0;  // unit: m
     const double adc_back_edge_s =
         reference_line_info.AdcSlBoundary().start_s();
     const double distance_adc_pass_traffic_sign =

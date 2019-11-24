@@ -1209,7 +1209,7 @@ bool OpenSpaceRoiDecider::CheckDistanceToParkingSpot(
 
 bool OpenSpaceRoiDecider::FuseLineSegments(
     std::vector<std::vector<common::math::Vec2d>> *line_segments_vec) {
-  constexpr double kEpsilon = 1.0e-8;
+  static constexpr double kEpsilon = 1.0e-8;
   auto cur_segment = line_segments_vec->begin();
   while (cur_segment != line_segments_vec->end() - 1) {
     auto next_segment = cur_segment + 1;

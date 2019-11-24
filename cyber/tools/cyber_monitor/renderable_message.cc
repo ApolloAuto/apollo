@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "./renderable_message.h"
-#include "./screen.h"
+#include "cyber/tools/cyber_monitor/renderable_message.h"
 
 #include <ncurses.h>
+
+#include "cyber/tools/cyber_monitor/screen.h"
 
 void RenderableMessage::SplitPages(int key) {
   switch (key) {

@@ -14,10 +14,14 @@ message ProcessMonitorConfig {
 message ChannelMonitorConfig {
   optional string name = 1;
   optional double delay_fatal = 2 [default = 3.0];  // In seconds.
-  
+
   // The fields will be checked to make sure they are existing
   // Specify in the format of "a.b.c"
   repeated string mandatory_fields = 3;
+
+  // Maximum latency allowed for this channel
+  // Alert may be triggered if average latency exceeds this value.
+  optional uint64 max_latency_allowed = 4;  // In nano seconds.
 }
 
 // For ResourceMonitor.
@@ -32,7 +36,7 @@ message ResourceMonitorConfig {
 
   message CPUUsage {
     optional float high_cpu_usage_warning = 1;
-    optional float high_cpu_usage_error = 2; 
+    optional float high_cpu_usage_error = 2;
   }
 
   message MemoryUsage {

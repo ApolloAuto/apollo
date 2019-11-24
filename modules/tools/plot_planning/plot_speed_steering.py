@@ -22,7 +22,7 @@ def process(reader):
             if chassis.driving_mode != chassis_pb2.Chassis.COMPLETE_AUTO_DRIVE:
                 last_steering_percentage = steering_percentage
                 last_speed_mps = speed_mps
-                last_timestamp_sec = timestamp_sec               
+                last_timestamp_sec = timestamp_sec
                 continue
 
             if last_timestamp_sec is None:
@@ -53,5 +53,5 @@ if __name__ == "__main__":
         ax.scatter(speed_data, d_steering_data)
     ax.set_xlim(-5, 40)
     ax.set_ylim(-300, 300)
-    plt.show()    
+    plt.show()
 

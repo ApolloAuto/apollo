@@ -260,7 +260,6 @@ void NDTLocalization::FillLocalizationMsgHeader(
   header->set_module_name(module_name_);
   header->set_timestamp_sec(timestamp);
   header->set_sequence_num(++localization_seq_num_);
-  return;
 }
 
 void NDTLocalization::ComposeLocalizationEstimate(
@@ -529,7 +528,6 @@ void NDTLocalization::LidarMsgTransfer(
           << "][height:" << msg->height() << "][width:" << msg->width()
           << "][point_cnt:" << msg->point_size() << "]";
   }
-  return;
 }
 
 bool NDTLocalization::LoadLidarExtrinsic(const std::string& file_path,

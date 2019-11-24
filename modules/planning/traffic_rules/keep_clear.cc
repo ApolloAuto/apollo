@@ -169,7 +169,7 @@ bool KeepClear::IsCreeping(const double pnc_junction_start_s,
   }
 
   // check distance
-  constexpr double kDistance = 5.0;
+  static constexpr double kDistance = 5.0;
   return (fabs(adc_front_edge_s - pnc_junction_start_s) <= kDistance);
 }
 
