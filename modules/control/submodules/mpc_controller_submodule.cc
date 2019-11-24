@@ -57,13 +57,18 @@ bool MPCControllerSubmodule::Init() {
   }
   mpc_controller_conf_.mutable_mpc_controller_conf()
       ->set_allocated_calibration_table(&calibration_table_);
+
+  control_command_writer_ =
+      node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
   return true;
 }
 
 bool MPCControllerSubmodule::Proc(
     const std::shared_ptr<Preprocessor>& preprocessor_status) {
   ControlCommand control_command;
+  AERROR << "MPC controller submodule started ....";
   local_view_ = preprocessor_status->mutable_local_view();
+  //   AERROR << local_view_->ShortDebugString();
 
   // skip produce control command when estop for MPC controller
   if (preprocessor_status->estop()) {
@@ -80,17 +85,24 @@ bool MPCControllerSubmodule::Proc(
 
 Status MPCControllerSubmodule::ProduceControlCommand(
     ControlCommand* control_command) {
-  std::lock_guard<std::mutex> lock(mutex_);
+  //   std::lock_guard<std::mutex> lock(mutex_);
 
   if (local_view_->mutable_chassis()->driving_mode() ==
       Chassis::COMPLETE_MANUAL) {
     mpc_controller_.Reset();
     AINFO_EVERY(100) << "Reset Controllers in Manual Mode";
   }
+  AERROR << local_view_->mutable_chassis()->ShortDebugString();
+  AERROR << "Trajectory: ";
+  AERROR << local_view_->mutable_trajectory()->ShortDebugString();
+  AERROR << "Localization: ";
+  AERROR << local_view_->mutable_localization()->ShortDebugString();
 
   Status status = mpc_controller_.ComputeControlCommand(
       local_view_->mutable_localization(), local_view_->mutable_chassis(),
       local_view_->mutable_trajectory(), control_command);
+
+  AERROR << "MPC controller submodule finished.";
 
   return status;
 }
