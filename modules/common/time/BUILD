@@ -15,6 +15,7 @@ cc_library(
     deps = [
         "//cyber/time",
         "//modules/common/configs:config_gflags",
+        "@com_google_absl//absl/time",
     ],
 )
 
