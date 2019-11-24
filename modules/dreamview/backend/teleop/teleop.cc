@@ -235,20 +235,20 @@ void TeleopService::RegisterMessageHandlers() {
   // Issue pull-over command to remote
   websocket_->RegisterMessageHandler(
       "PullOver", [this](const Json &json, WebSocketHandler::Connection *conn) {
-        boost::shared_lock<boost::shared_mutex> writer_lock(mutex_);
+        boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
         SendPullOverCmd();
       });
   // Issue emergency-stop command to remote
   websocket_->RegisterMessageHandler(
       "EStop", [this](const Json &json, WebSocketHandler::Connection *conn) {
-        boost::shared_lock<boost::shared_mutex> writer_lock(mutex_);
+        boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
         SendEstopCmd();
       });
   // Issue resume-cruise command to remote
   websocket_->RegisterMessageHandler(
       "ResumeCruise",
       [this](const Json &json, WebSocketHandler::Connection *conn) {
-        boost::shared_lock<boost::shared_mutex> writer_lock(mutex_);
+        boost::shared_lock<boost::shared_mutex> reader_lock(mutex_);
         SendResumeCruiseCmd();
       });
   // Request to get updated modem info for client display
