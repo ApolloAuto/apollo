@@ -60,6 +60,10 @@ bool LatLonControllerSubmodule::Init() {
         "Control init longitudinal controller failed! Stopping...");
     return false;
   }
+
+  control_command_writer_ =
+      node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
+
   return true;
 }
 
