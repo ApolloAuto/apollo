@@ -55,12 +55,23 @@ bool PreprocessorSubmodule::Init() {
     return false;
   }
 
-  cyber::ReaderConfig local_view_reader_config;
-  local_view_reader_config.channel_name = "/apollo/control/localview";
-  local_view_reader_config.pending_queue_size = 1;
+  //   cyber::ReaderConfig local_view_reader_config;
+  //   local_view_reader_config.channel_name = "/apollo/control/localview";
+  //   local_view_reader_config.pending_queue_size = 1;
+  //   local_view_reader_ =
+  //       node_->CreateReader<LocalView>(FLAGS_control_local_view_topic,
+  //       nullptr);
+  //   AERROR << "create local view reader ....";
+  //   local_view_reader_ =
+  //       node_->CreateReader<LocalView>("/apollo/control/localview", nullptr);
 
-  local_view_reader_ =
-      node_->CreateReader<LocalView>(FLAGS_control_local_view_topic, nullptr);
+  //   local_view_reader_ = node_->CreateReader<LocalView>(
+  //       FLAGS_control_local_view_topic,
+  //       [this](const std::shared_ptr<LocalView> &localview) {
+  //         AINFO << "Received local view data: run local view callback.";
+  //         std::lock_guard<std::mutex> lock(mutex_);
+  //         local_view_->CopyFrom(*localview);
+  //       });
   // CHECK(local_view_reader_);
 
   // Preprocessor writer
@@ -75,20 +86,25 @@ bool PreprocessorSubmodule::Init() {
 bool PreprocessorSubmodule::Proc(const std::shared_ptr<LocalView> &local_view) {
   AERROR << "Preprocessor started ....";
   Preprocessor control_preprocessor;
+  //   {
+  //     std::lock_guard<std::mutex> lock(mutex_);
+  //     local_view_reader_->Observe();
+  //     const auto &local_view_msg = local_view_reader_->GetLatestObserved();
+  //     if (local_view_msg == nullptr) {
+  //       AERROR << "local view msg is not ready!";
+  //       return false;
+  //     }
+  //     // TODO(SHU): to avoid redundent copy
+  //     // local_view_->CopyFrom(*local_view_msg);
+  //     control_preprocessor.mutable_local_view()->CopyFrom(*local_view_msg);
+  //     local_view_ = control_preprocessor.mutable_local_view();
+  //   }
+
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    local_view_reader_->Observe();
-    const auto &local_view_msg = local_view_reader_->GetLatestObserved();
-    if (local_view_msg == nullptr) {
-      AERROR << "local view msg is not ready!";
-      return false;
-    }
-    // TODO(SHU): to avoid redundent copy
-    // local_view_->CopyFrom(*local_view_msg);
-    control_preprocessor.mutable_local_view()->CopyFrom(*local_view_msg);
-    local_view_ = control_preprocessor.mutable_local_view();
+    control_preprocessor.mutable_local_view()->CopyFrom(*local_view);
   }
-
+  local_view_ = control_preprocessor.mutable_local_view();
   Status status = ProducePreprocessorStatus(&control_preprocessor);
   AERROR_IF(!status.ok()) << "Failed to produce control preprocessor:"
                           << status.error_message();
@@ -101,9 +117,10 @@ bool PreprocessorSubmodule::Proc(const std::shared_ptr<LocalView> &local_view) {
       estop_reason_.clear();
     }
     pad_received_ = true;
+    std::lock_guard<std::mutex> lock(mutex_);
     control_preprocessor.set_received_pad_msg(pad_received_);
   }
-  AERROR << control_preprocessor.ShortDebugString();
+//   AERROR << control_preprocessor.ShortDebugString();
 
   preprocessor_writer_->Write(
       std::make_shared<Preprocessor>(control_preprocessor));
@@ -174,22 +191,22 @@ Status PreprocessorSubmodule::ProducePreprocessorStatus(
   }
 
   if (!estop_) {
-    auto debug = control_preprocessor->mutable_input_debug();
-    debug->mutable_localization_header()->CopyFrom(
-        local_view_->localization().header());
-    debug->mutable_canbus_header()->CopyFrom(local_view_->chassis().header());
-    debug->mutable_trajectory_header()->CopyFrom(
-        local_view_->trajectory().header());
+    // auto debug = control_preprocessor->mutable_input_debug();
+    // debug->mutable_localization_header()->CopyFrom(
+    //     local_view_->localization().header());
+    // debug->mutable_canbus_header()->CopyFrom(local_view_->chassis().header());
+    // debug->mutable_trajectory_header()->CopyFrom(
+    //     local_view_->trajectory().header());
 
     if (local_view_->trajectory().is_replan()) {
       latest_replan_trajectory_header_.CopyFrom(
           local_view_->trajectory().header());
     }
 
-    if (latest_replan_trajectory_header_.has_sequence_num()) {
-      debug->mutable_latest_replan_trajectory_header()->CopyFrom(
-          latest_replan_trajectory_header_);
-    }
+    // if (latest_replan_trajectory_header_.has_sequence_num()) {
+    //   debug->mutable_latest_replan_trajectory_header()->CopyFrom(
+    //       latest_replan_trajectory_header_);
+    // }
   } else {
     control_preprocessor->set_estop(estop_);
     control_preprocessor->set_estop_reason(estop_reason_);
