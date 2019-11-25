@@ -64,7 +64,7 @@ using WLock = boost::unique_lock<boost::shared_mutex>;
 constexpr char kNavigationModeName[] = "Navigation";
 
 // Convert a string to be title-like. E.g.: "hello_world" -> "Hello World".
-std::string TitleCase(const std::string& origin) {
+std::string TitleCase(absl::string_view origin) {
   std::vector<std::string> parts = absl::StrSplit(origin, '_');
   for (auto& part : parts) {
     if (!part.empty()) {
@@ -89,8 +89,8 @@ Map<std::string, std::string> ListDirAsDict(const std::string& dir) {
 }
 
 // List files by pattern and return a dict of {file_title: file_path}.
-Map<std::string, std::string> ListFilesAsDict(const std::string& dir,
-                                              const std::string& extension) {
+Map<std::string, std::string> ListFilesAsDict(absl::string_view dir,
+                                              absl::string_view extension) {
   Map<std::string, std::string> result;
   const std::string pattern = absl::StrCat(dir, "/*", extension);
   for (const std::string& file_path : cyber::common::Glob(pattern)) {
@@ -104,7 +104,7 @@ Map<std::string, std::string> ListFilesAsDict(const std::string& dir,
 }
 
 template <class FlagType, class ValueType>
-void SetGlobalFlag(const std::string& flag_name, const ValueType& value,
+void SetGlobalFlag(absl::string_view flag_name, const ValueType& value,
                    FlagType* flag) {
   static constexpr char kGlobalFlagfile[] =
       "/apollo/modules/common/data/global_flagfile.txt";
@@ -117,8 +117,8 @@ void SetGlobalFlag(const std::string& flag_name, const ValueType& value,
   }
 }
 
-void System(const std::string& cmd) {
-  const int ret = std::system(cmd.c_str());
+void System(absl::string_view cmd) {
+  const int ret = std::system(cmd.data());
   if (ret == 0) {
     AINFO << "SUCCESS: " << cmd;
   } else {
