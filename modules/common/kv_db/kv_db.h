@@ -18,6 +18,8 @@
 
 #include <string>
 
+#include "absl/strings/string_view.h"
+
 /**
  * @namespace apollo::common
  * @brief apollo::common
@@ -38,19 +40,19 @@ class KVDB {
    * @param sync Whether flush right after writing.
    * @return Success or not.
    */
-  static bool Put(const std::string &key, const std::string &value);
+  static bool Put(absl::string_view key, absl::string_view value);
 
   /**
    * @brief Delete a key.
    * @param sync Whether flush right after writing.
    * @return Success or not.
    */
-  static bool Delete(const std::string &key);
+  static bool Delete(absl::string_view key);
 
-  static bool Has(const std::string &key);
+  static bool Has(absl::string_view key);
 
-  static std::string Get(const std::string &key,
-                         const std::string &default_value = "");
+  static std::string Get(absl::string_view key,
+                         absl::string_view default_value = "");
 };
 
 }  // namespace common
