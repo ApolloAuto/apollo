@@ -19,10 +19,10 @@
 """
 This is a bunch of classes to manage cyber record channel FileIO.
 """
+import numpy as np
 import os
 import sys
 import struct
-import numpy as np
 
 class FileObject(object):
     """Wrapper for file object"""
@@ -64,7 +64,7 @@ class TimestampFileObject(FileObject):
             raise ValueError("timestamps must be in a list")
 
         for i, ts in enumerate(data):
-            self._file_object.write("%05d %.6f\n" %(i+1, ts))
+            self._file_object.write("%05d %.6f\n" %(i + 1, ts))
 
 class OdometryFileObject(FileObject):
     """class to handle gnss/odometry topic"""

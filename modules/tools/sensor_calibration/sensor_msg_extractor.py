@@ -19,19 +19,18 @@
 """
 This is a bunch of classes to manage cyber record channel extractor.
 """
+import cv2
+import numpy as np
 import os
+import pypcd
 import sys
 import struct
-import numpy as np
-
-import cv2
-import pypcd
 
 from modules.drivers.proto import sensor_image_pb2
 from modules.drivers.proto import pointcloud_pb2
 from modules.localization.proto import gps_pb2
 
-from data_file_object import *
+from data_file_object import TimestampFileObject, OdometryFileObject
 
 class SensorMessageParser(object):
     """Wrapper for cyber channel message extractor"""
@@ -84,8 +83,7 @@ class GpsParser(SensorMessageParser):
         super(GpsParser, self).__init__(output_path, instance_saving)
         if not self._instance_saving:
             self._parsed_data = []
-            self._odomotry_output_file =\
-             os.path.join(self._output_path, "odometry")
+            self._odomotry_output_file = os.path.join(self._output_path, "odometry")
 
     def _init_parser(self):
         self._msg_parser = gps_pb2.Gps()

@@ -20,25 +20,22 @@
 This is a tool to etract useful information from already extracted sensor data,
 mainly for camera lidar calibration.
 """
-
-from datetime import datetime
 import argparse
-import os
-import sys
-import shutil
-import six
-import numpy as np
 import cv2
+from datetime import datetime
+import numpy as np
+import os
 from shutil import copyfile
+import six
+import sys
+
 from google.protobuf import text_format
 
 from cyber_py.record import RecordReader
 from cyber.proto import record_pb2
+from configuration_yaml_generator import ConfigYaml
+from data_file_object import TimestampFileObject, OdometryFileObject
 from modules.tools.sensor_calibration.proto import extractor_config_pb2
-
-from sensor_msg_extractor import *
-from data_file_object import *
-
 
 CYBER_PATH = os.environ['CYBER_PATH']
 CYBER_RECORD_HEADER_LENGTH = 2048
@@ -46,6 +43,11 @@ CYBER_RECORD_HEADER_LENGTH = 2048
 def mkdir_p(path):
     if not os.path.isdir(path):
         os.makedirs(path)
+def get_subfolder_list(d):
+    """list the 1st-level directories under the root directory
+    ignore hidden folders"""
+    return [f for f in os.listdir(d) if not f.startswith('.') and
+            os.path.isdir(os.path.join(d, f))]
 
 
 def sort_files_by_timestamp(in_path, out_path,
@@ -62,13 +64,13 @@ def sort_files_by_timestamp(in_path, out_path,
     ts_obj = TimestampFileObject(file_path=out_ts_file);
     ts_obj.save_to_file(ts_map[:,1])
 
-    if extension=='.png' or extension=='.pcd':
+    if extension == '.png' or extension == '.pcd':
         for i, idx in enumerate(ts_map[:,0]):
             in_file_name = os.path.join(in_path, ("%06d"%(idx+1)) + extension)
             out_file_name = os.path.join(out_path, ("%06d"%(i+1)) + extension)
             copyfile(in_file_name, out_file_name)
 
-    elif extension=='odometry':
+    elif extension == 'odometry':
         tmp_file = os.path.join(in_path, 'odometry')
         in_odm = OdometryFileObject(file_path=tmp_file,
                                     operation='read',
@@ -169,15 +171,15 @@ def select_static_image_pcd(path, min_distance=5, stop_times=5,
                             image_static_diff_threshold=0.005,
                             image_suffix='.png', pcd_suffix='.pcd'):
     """select pairs of images and pcds"""
-    subfolders = [x[0] for x in os.walk(path) if '_apollo_' in x[0] \
-                    and 'camera-lidar-pairs' not in x[0]]
-    lidar_subfolder = [x for x in subfolders if '_lidar' in x]
+    subfolders = [x for x in get_subfolder_list(path)
+                if '_apollo_sensor_' in x]
+    lidar_subfolder = [x for x in subfolders if 'PointCloud2' in x]
     odometry_subfolder = [x for x in subfolders if'_odometry' in x]
     camera_subfolders = [x for x in subfolders if'_camera' in x]
     if len(lidar_subfolder) is not 1 or \
         len(odometry_subfolder) is not 1:
-        raise ValueError("only one main lidar and one Odometry \
-                        sensor is needed for sensor calibration")
+        raise ValueError('only one main lidar and one Odometry'
+                        'sensor is needed for sensor calibration')
 
     lidar_subfolder = lidar_subfolder[0]
     odometry_subfolder = odometry_subfolder[0]
@@ -216,7 +218,7 @@ def select_static_image_pcd(path, min_distance=5, stop_times=5,
         camera_folder_path = os.path.join(path, camera)
         camera_diff = get_difference_score_between_images(
             camera_folder_path, timestamp_dict[camera][:,0])
-        valid_image_indexes =  [x for x, v in enumerate(camera_diff) \
+        valid_image_indexes =  [x for x, v in enumerate(camera_diff)
                                 if v <= image_static_diff_threshold]
         valid_images = (timestamp_dict[camera][valid_image_indexes, 0]).astype(int)
         # generate valid camera frame
@@ -252,8 +254,8 @@ def select_static_image_pcd(path, min_distance=5, stop_times=5,
         #  check candidate number and select best stop according to camera_diff score
         print("all valid static image index: ", candidate_idx)
         if len(candidate_idx) < stop_times:
-            raise ValueError("not enough stops detected, \
-                thus no sufficient data for camera-lidar calibration")
+            raise ValueError('not enough stops detected,'
+                'thus no sufficient data for camera-lidar calibration')
         elif len(candidate_idx) > stop_times:
             tmp_diff = camera_diff[candidate_idx]
 
