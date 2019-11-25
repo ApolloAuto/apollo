@@ -233,8 +233,9 @@ void STBoundsDecider::RankDecisions(
         if (A_room < B_room) {
           swap(available_choices->at(i + 1), available_choices->at(i));
           has_swaps = true;
-          continue;
+          ADEBUG << "Swapping to favor larger room.";
         }
+        continue;
       }
 
       // Should select the one with overlap to guide-line
@@ -246,8 +247,9 @@ void STBoundsDecider::RankDecisions(
         if (!A_contains_guideline) {
           swap(available_choices->at(i + 1), available_choices->at(i));
           has_swaps = true;
-          continue;
+          ADEBUG << "Swapping to favor overlapping with guide-line.";
         }
+        continue;
       }
     }
   }
