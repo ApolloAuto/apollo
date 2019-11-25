@@ -76,7 +76,7 @@ Stage::StageStatus StopSignUnprotectedStagePreStop::Process(
     return FinishScenario();
   }
 
-  constexpr double kPassStopLineBuffer = 0.3;  // unit: m
+  static constexpr double kPassStopLineBuffer = 0.3;  // unit: m
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double distance_adc_pass_stop_sign =
       adc_front_edge_s - current_stop_sign_overlap->start_s;

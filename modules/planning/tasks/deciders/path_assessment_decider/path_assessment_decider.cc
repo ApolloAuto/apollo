@@ -296,8 +296,8 @@ bool ComparePathData(const PathData& lhs, const PathData& rhs,
   // If roughly same length, then select self-lane path.
   bool lhs_on_selflane = lhs.path_label().find("self") != std::string::npos;
   bool rhs_on_selflane = rhs.path_label().find("self") != std::string::npos;
-  constexpr double kSelfPathLengthComparisonTolerance = 15.0;
-  constexpr double kNeighborPathLengthComparisonTolerance = 25.0;
+  static constexpr double kSelfPathLengthComparisonTolerance = 15.0;
+  static constexpr double kNeighborPathLengthComparisonTolerance = 25.0;
   double lhs_path_length = lhs.frenet_frame_path().back().s();
   double rhs_path_length = rhs.frenet_frame_path().back().s();
   if (lhs_on_selflane || rhs_on_selflane) {
@@ -325,7 +325,7 @@ bool ComparePathData(const PathData& lhs, const PathData& rhs,
   }
   // If same length, both neighbor lane are forward,
   // then select the one that returns to in-lane earlier.
-  constexpr double kBackToSelfLaneComparisonTolerance = 20.0;
+  static constexpr double kBackToSelfLaneComparisonTolerance = 20.0;
   int lhs_back_idx = GetBackToInLaneIndex(lhs.path_point_decision_guide());
   int rhs_back_idx = GetBackToInLaneIndex(rhs.path_point_decision_guide());
   double lhs_back_s = lhs.frenet_frame_path()[lhs_back_idx].s();
@@ -458,7 +458,7 @@ void PathAssessmentDecider::TrimTailingOutLanePoints(
 
 bool PathAssessmentDecider::IsGreatlyOffReferenceLine(
     const PathData& path_data) {
-  constexpr double kOffReferenceLineThreshold = 20.0;
+  static constexpr double kOffReferenceLineThreshold = 20.0;
   const auto& frenet_path = path_data.frenet_frame_path();
   for (const auto& frenet_path_point : frenet_path) {
     if (std::fabs(frenet_path_point.l()) > kOffReferenceLineThreshold) {
@@ -472,7 +472,7 @@ bool PathAssessmentDecider::IsGreatlyOffReferenceLine(
 
 bool PathAssessmentDecider::IsGreatlyOffRoad(
     const ReferenceLineInfo& reference_line_info, const PathData& path_data) {
-  constexpr double kOffRoadThreshold = 10.0;
+  static constexpr double kOffRoadThreshold = 10.0;
   const auto& frenet_path = path_data.frenet_frame_path();
   for (const auto& frenet_path_point : frenet_path) {
     double road_left_width = 0.0;
@@ -566,7 +566,8 @@ bool PathAssessmentDecider::IsStopOnReverseNeighborLane(
   }
 
   double check_s = 0.0;
-  constexpr double kLookForwardBuffer = 5.0;  // filter out sidepass stop fence
+  static constexpr double kLookForwardBuffer =
+      5.0;  // filter out sidepass stop fence
   const double adc_end_s = reference_line_info.AdcSlBoundary().end_s();
   for (const auto& stop_point_sl : all_stop_point_sl) {
     if (stop_point_sl.s() - adc_end_s < kLookForwardBuffer) {
@@ -586,7 +587,7 @@ bool PathAssessmentDecider::IsStopOnReverseNeighborLane(
     return false;
   }
 
-  constexpr double kSDelta = 0.3;
+  static constexpr double kSDelta = 0.3;
   common::SLPoint path_point_sl;
   for (const auto& frenet_path_point : path_data.frenet_frame_path()) {
     if (std::fabs(frenet_path_point.s() - check_s) < kSDelta) {

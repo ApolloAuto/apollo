@@ -416,7 +416,7 @@ common::PathPoint NavigationLane::GetPathPointByS(const common::Path &path,
     return path.path_point(size - 1);
   }
 
-  constexpr double kEpsilon = 1e-9;
+  static constexpr double kEpsilon = 1e-9;
   if (std::fabs(path.path_point(start_index).s() - s) < kEpsilon) {
     *matched_index = start_index;
     return path.path_point(start_index);
@@ -831,7 +831,7 @@ void NavigationLane::UpdateStitchIndexInfo() {
     return;
   }
 
-  constexpr int kMinPathPointSize = 10;
+  static constexpr int kMinPathPointSize = 10;
   for (int i = 0; i < navigation_line_num; ++i) {
     const auto &navigation_path = navigation_info_.navigation_path(i).path();
     if (!navigation_info_.navigation_path(i).has_path() ||

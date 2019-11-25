@@ -108,7 +108,6 @@ void BaseMapNodePool::FreeMapNodeTask(BaseMapNode* map_node) {
 
 void BaseMapNodePool::InitNewMapNode(BaseMapNode* node) {
   node->Init(map_config_);
-  return;
 }
 
 void BaseMapNodePool::FinalizeMapNode(BaseMapNode* node) {

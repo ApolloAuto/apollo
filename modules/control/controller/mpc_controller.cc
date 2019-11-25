@@ -94,7 +94,7 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
 
   // TODO(Shu, Qi, Yu): add sanity check for conf values
   // steering ratio should be positive
-  constexpr double kEpsilon = 1e-6;
+  static constexpr double kEpsilon = 1e-6;
   if (std::isnan(steer_ratio_) || steer_ratio_ < kEpsilon) {
     AERROR << "[MPCController] steer_ratio = 0";
     return false;

@@ -436,7 +436,6 @@ void DarkSCNNLanePostprocessor::ConvertImagePoint2Camera(CameraFrame* frame) {
       camera_point_set.push_back(camera_point);
     }
   }
-  return;
 }
 
 // @brief: Fit camera lane line using polynomial
@@ -474,7 +473,6 @@ void DarkSCNNLanePostprocessor::PolyFitCameraLaneline(CameraFrame* frame) {
     lane_objects[line_index].curve_camera_coord.x_end = x_end;
     lane_objects[line_index].use_type = base::LaneLineUseType::REAL;
   }
-  return;
 }
 
 std::string DarkSCNNLanePostprocessor::Name() const {

@@ -44,8 +44,6 @@ void LpfCoefficients(const double ts, const double cutoff_freq,
   numerators->push_back(gain);
   numerators->push_back(2.0 * gain);
   numerators->push_back(gain);
-
-  return;
 }
 
 void LpFirstOrderCoefficients(const double ts, const double settling_time,

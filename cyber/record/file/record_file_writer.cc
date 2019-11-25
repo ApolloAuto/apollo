@@ -241,7 +241,6 @@ void RecordFileWriter::Flush() {
     }
     chunk_flush_->clear();
   }
-  return;
 }
 
 uint64_t RecordFileWriter::GetMessageNumber(

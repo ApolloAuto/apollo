@@ -84,7 +84,7 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
           << " is not on reference line:[0, " << reference_line_.Length()
           << "]";
   }
-  constexpr double kOutOfReferenceLineL = 10.0;  // in meters
+  static constexpr double kOutOfReferenceLineL = 10.0;  // in meters
   if (adc_sl_boundary_.start_l() > kOutOfReferenceLineL ||
       adc_sl_boundary_.end_l() < -kOutOfReferenceLineL) {
     AERROR << "Ego vehicle is too far away from reference line.";
@@ -213,7 +213,7 @@ bool ReferenceLineInfo::GetFirstOverlap(
     hdmap::PathOverlap* path_overlap) {
   CHECK_NOTNULL(path_overlap);
   const double start_s = adc_sl_boundary_.end_s();
-  constexpr double kMaxOverlapRange = 500.0;
+  static constexpr double kMaxOverlapRange = 500.0;
   double overlap_min_s = kMaxOverlapRange;
 
   auto overlap_min_s_iter = path_overlaps.end();
@@ -286,7 +286,7 @@ void ReferenceLineInfo::InitFirstOverlaps() {
 }
 
 bool WithinOverlap(const hdmap::PathOverlap& overlap, double s) {
-  constexpr double kEpsilon = 1e-2;
+  static constexpr double kEpsilon = 1e-2;
   return overlap.start_s - kEpsilon <= s && s <= overlap.end_s + kEpsilon;
 }
 
@@ -630,7 +630,7 @@ void ReferenceLineInfo::ExportVehicleSignal(
 }
 
 bool ReferenceLineInfo::ReachedDestination() const {
-  constexpr double kDestinationDeltaS = 0.05;
+  static constexpr double kDestinationDeltaS = 0.05;
   return SDistanceToDestination() <= kDestinationDeltaS;
 }
 
@@ -783,7 +783,7 @@ void ReferenceLineInfo::SetObjectDecisions(
 }
 
 void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
-  constexpr double kMaxAngleDiff = M_PI / 6.0;
+  static constexpr double kMaxAngleDiff = M_PI / 6.0;
   auto* prev_advice = PlanningContext::Instance()
                           ->mutable_planning_status()
                           ->mutable_engage_advice();
@@ -889,7 +889,7 @@ int ReferenceLineInfo::GetPnCJunction(
   const std::vector<hdmap::PathOverlap>& pnc_junction_overlaps =
       reference_line_.map_path().pnc_junction_overlaps();
 
-  constexpr double kError = 1.0;  // meter
+  static constexpr double kError = 1.0;  // meter
   for (const auto& overlap : pnc_junction_overlaps) {
     if (s >= overlap.start_s - kError && s <= overlap.end_s + kError) {
       *pnc_junction_overlap = overlap;

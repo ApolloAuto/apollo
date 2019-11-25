@@ -118,7 +118,7 @@ double DistanceXY(const U& u, const V& v) {
  */
 template <typename U, typename V>
 bool SamePointXY(const U& u, const V& v) {
-  constexpr double kMathEpsilonSqr = 1e-8 * 1e-8;
+  static constexpr double kMathEpsilonSqr = 1e-8 * 1e-8;
   return (u.x() - v.x()) * (u.x() - v.x()) < kMathEpsilonSqr &&
          (u.y() - v.y()) * (u.y() - v.y()) < kMathEpsilonSqr;
 }

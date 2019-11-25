@@ -337,7 +337,6 @@ NdtMapMatrix::NdtMapMatrix(const NdtMapMatrix& cells) {
 
 void NdtMapMatrix::Init(const BaseMapConfig* config) {
   Init(config->map_node_size_y_, config->map_node_size_x_);
-  return;
 }
 
 void NdtMapMatrix::Reset(const BaseMapConfig* config) {

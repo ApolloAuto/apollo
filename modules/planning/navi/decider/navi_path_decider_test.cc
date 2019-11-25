@@ -93,7 +93,7 @@ TEST_F(NaviPathDeciderTest, MoveToDestLane) {
   navi_path_decider.Init(config);
 
   // generate path point
-  constexpr double kMaxS = 152.0;
+  static constexpr double kMaxS = 152.0;
   std::vector<common::PathPoint> path_points;
 
   // 1.std::fabs(target_path_init_y) < max_keep_lane_distance not need move to
@@ -140,7 +140,7 @@ TEST_F(NaviPathDeciderTest, KeepLane) {
   navi_path_decider.Init(config);
 
   // generate path point
-  constexpr double kMaxS = 152.0;
+  static constexpr double kMaxS = 152.0;
   std::vector<common::PathPoint> path_points;
 
   // 1.std::fabs(target_path_init_y) > max_keep_lane_distance not need keep lane

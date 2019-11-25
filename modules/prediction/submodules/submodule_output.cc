@@ -66,9 +66,7 @@ const std::vector<Obstacle>& SubmoduleOutput::curr_frame_obstacles() const {
   return curr_frame_obstacles_;
 }
 
-const Obstacle& SubmoduleOutput::GetEgoVehicle() const {
-  return ego_vehicle_;
-}
+const Obstacle& SubmoduleOutput::GetEgoVehicle() const { return ego_vehicle_; }
 
 const std::vector<apollo::perception::PerceptionObstacle>&
 SubmoduleOutput::curr_frame_perception_obstacles() const {

@@ -294,7 +294,7 @@ double Obstacle::MinRadiusStopDistance(
   if (min_radius_stop_distance_ > 0) {
     return min_radius_stop_distance_;
   }
-  constexpr double stop_distance_buffer = 0.5;
+  static constexpr double stop_distance_buffer = 0.5;
   const double min_turn_radius = VehicleConfigHelper::MinSafeTurnRadius();
   double lateral_diff =
       vehicle_param.width() / 2.0 + std::max(std::fabs(sl_boundary_.start_l()),
@@ -419,7 +419,7 @@ bool Obstacle::BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
     last_index = i;
 
     // skip if object is entirely on one side of reference line.
-    constexpr double kSkipLDistanceFactor = 0.4;
+    static constexpr double kSkipLDistanceFactor = 0.4;
     const double skip_l_distance =
         (object_boundary.end_s() - object_boundary.start_s()) *
             kSkipLDistanceFactor +
@@ -437,7 +437,7 @@ bool Obstacle::BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
       // skip if behind reference line
       continue;
     }
-    constexpr double kSparseMappingS = 20.0;
+    static constexpr double kSparseMappingS = 20.0;
     const double st_boundary_delta_s =
         (std::fabs(object_boundary.start_s() - adc_start_s) > kSparseMappingS)
             ? kStBoundarySparseDeltaS

@@ -78,7 +78,7 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
   const double stop_sign_start_s = current_stop_sign_overlap->start_s;
   reference_line_info.SetJunctionRightOfWay(stop_sign_start_s, false);
 
-  constexpr double kPassStopLineBuffer = 1.0;  // unit: m
+  static constexpr double kPassStopLineBuffer = 1.0;  // unit: m
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double distance_adc_pass_stop_sign =
       adc_front_edge_s - stop_sign_start_s;
@@ -206,8 +206,8 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
 
       double distance =
           common::util::DistanceXY(stop_sign_point, obstacle_point);
-      ADEBUG << "obstacle_id[" << perception_obstacle_id
-             << "] distance[" << distance << "]";
+      ADEBUG << "obstacle_id[" << perception_obstacle_id << "] distance["
+             << distance << "]";
 
       // TODO(all): move 10.0 to conf
       if (distance > 10.0) {

@@ -132,7 +132,7 @@ LaneWaypoint LeftNeighborWaypoint(const LaneWaypoint& waypoint) {
 }
 
 void LaneSegment::Join(std::vector<LaneSegment>* segments) {
-  constexpr double kSegmentDelta = 0.5;
+  static constexpr double kSegmentDelta = 0.5;
   std::size_t k = 0;
   std::size_t i = 0;
   while (i < segments->size()) {
@@ -235,8 +235,9 @@ std::vector<MapPathPoint> MapPathPoint::GetPointsFromLane(LaneInfoConstPtr lane,
 }
 
 void MapPathPoint::RemoveDuplicates(std::vector<MapPathPoint>* points) {
-  constexpr double kDuplicatedPointsEpsilon = 1e-7;
-  constexpr double limit = kDuplicatedPointsEpsilon * kDuplicatedPointsEpsilon;
+  static constexpr double kDuplicatedPointsEpsilon = 1e-7;
+  static constexpr double limit =
+      kDuplicatedPointsEpsilon * kDuplicatedPointsEpsilon;
   CHECK_NOTNULL(points);
   int count = 0;
   for (size_t i = 0; i < points->size(); ++i) {

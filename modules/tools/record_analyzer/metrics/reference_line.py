@@ -20,7 +20,7 @@ import sys
 import numpy as np
 
 class ReferenceLine:
-    
+
     def __init__(self):
         self.rl_is_offroad_cnt = 0
         self.rl_minimum_boundary = sys.float_info.max

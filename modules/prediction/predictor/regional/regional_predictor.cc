@@ -64,7 +64,7 @@ double CrossProduct(const Eigen::Vector2d& vec1, const Eigen::Vector2d& vec2) {
 
 }  // namespace
 
-void RegionalPredictor::Predict(
+bool RegionalPredictor::Predict(
     const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
     ObstaclesContainer* obstacles_container) {
   Clear();
@@ -75,7 +75,7 @@ void RegionalPredictor::Predict(
   const Feature& feature = obstacle->latest_feature();
   if (feature.is_still()) {
     ADEBUG << "Obstacle [" << obstacle->id() << "] is still.";
-    return;
+    return false;
   }
 
   if (feature.speed() > FLAGS_still_speed) {
@@ -83,6 +83,7 @@ void RegionalPredictor::Predict(
   } else {
     GenerateStillTrajectory(1.0, obstacle);
   }
+  return true;
 }
 
 void RegionalPredictor::GenerateStillTrajectory(const double probability,

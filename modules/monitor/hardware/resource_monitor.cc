@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "boost/filesystem.hpp"
@@ -176,10 +177,11 @@ void ResourceMonitor::CheckCPUUsage(
     const int pid, const apollo::dreamview::ResourceMonitorConfig& config,
     ComponentStatus* status) {
   const auto process_dag_path = config.process_dag_path();
-  if (prev_jiffies_map_.find(process_dag_path) == prev_jiffies_map_.end()) {
-    prev_jiffies_map_[process_dag_path] = 0;
+  static std::unordered_map<std::string, uint64_t> prev_jiffies_map;
+  if (prev_jiffies_map.find(process_dag_path) == prev_jiffies_map.end()) {
+    prev_jiffies_map[process_dag_path] = 0;
   }
-  const auto cpu_usage = GetCPUUsage(pid, process_dag_path, &prev_jiffies_map_);
+  const auto cpu_usage = GetCPUUsage(pid, process_dag_path, &prev_jiffies_map);
   const auto high_cpu_warning = config.cpu_usage().high_cpu_usage_warning(),
              high_cpu_error = config.cpu_usage().high_cpu_usage_error();
   if (cpu_usage > high_cpu_error) {

@@ -14,15 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "./general_channel_message.h"
-#include "./general_message.h"
-#include "./screen.h"
-#include "cyber/record/record_message.h"
+#include "cyber/tools/cyber_monitor/general_channel_message.h"
 
 #include <iomanip>
 #include <sstream>
 #include <string>
 #include <vector>
+
+#include "cyber/record/record_message.h"
+#include "cyber/tools/cyber_monitor/general_message.h"
+#include "cyber/tools/cyber_monitor/screen.h"
 
 namespace {
 constexpr int ReaderWriterOffset = 4;

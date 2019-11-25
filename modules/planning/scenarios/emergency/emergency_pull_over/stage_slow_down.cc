@@ -70,7 +70,7 @@ Stage::StageStatus EmergencyPullOverStageSlowDown::Process(
   }
 
   // check slow enough
-  constexpr double kSpeedTolarence = 1.0;
+  static constexpr double kSpeedTolarence = 1.0;
   if (adc_speed - target_slow_down_speed <= kSpeedTolarence) {
     return FinishStage();
   }

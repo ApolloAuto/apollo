@@ -38,6 +38,7 @@ namespace emergency_pull_over {
 
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
+using apollo::common::VehicleSignal;
 
 Stage::StageStatus EmergencyPullOverStageStandby::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -50,6 +51,7 @@ Stage::StageStatus EmergencyPullOverStageStandby::Process(
 
   // set vehicle signal
   reference_line_info.SetEmergencyLight();
+  reference_line_info.SetTurnSignal(VehicleSignal::TURN_NONE);
 
   // reset cruise_speed
   reference_line_info.SetCruiseSpeed(FLAGS_default_cruise_speed);

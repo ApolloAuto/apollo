@@ -534,7 +534,7 @@ bool PncMap::GetNearestPointFromRouting(const VehicleState &state,
         return false;
       }
       // Use large epsilon to allow projection diff
-      constexpr double kEpsilon = 0.5;
+      static constexpr double kEpsilon = 0.5;
       if (s > (lane->total_length() + kEpsilon) || (s + kEpsilon) < 0.0) {
         continue;
       }
@@ -619,7 +619,7 @@ bool PncMap::ExtendSegments(const RouteSegments &segments, double start_s,
     return false;
   }
   std::unordered_set<std::string> unique_lanes;
-  constexpr double kRouteEpsilon = 1e-3;
+  static constexpr double kRouteEpsilon = 1e-3;
   // Extend the trajectory towards the start of the trajectory.
   if (start_s < 0) {
     const auto &first_segment = *segments.begin();

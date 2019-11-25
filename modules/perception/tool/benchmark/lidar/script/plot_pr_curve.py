@@ -25,14 +25,14 @@ def plot_curve(in_path, out_path, x_label, y_label, title):
     plt.ylabel(y_label)
     plt.title(title)
     plt.ylim(0, 1.1)
-    #plt.legend(bbox_to_anchor=(0.98, 0.99), ncol=len(names), labels=names, prop={'size': 10}) 
-    plt.legend(ncol=len(names), labels=names, prop={'size': 10}) 
+    #plt.legend(bbox_to_anchor=(0.98, 0.99), ncol=len(names), labels=names, prop={'size': 10})
+    plt.legend(ncol=len(names), labels=names, prop={'size': 10})
 
     plt.savefig(out_path, dpi=150)
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        parent = '.' 
+        parent = '.'
     else:
         parent = sys.argv[1]
     prc_in = parent + '/prc_sample'

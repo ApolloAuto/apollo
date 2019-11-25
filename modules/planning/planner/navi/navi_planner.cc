@@ -210,7 +210,7 @@ Status NaviPlanner::PlanOnReferenceLine(
       continue;
     }
     if (obstacle->LongitudinalDecision().has_stop()) {
-      constexpr double kRefrenceLineStaticObsCost = 1e3;
+      static constexpr double kRefrenceLineStaticObsCost = 1e3;
       reference_line_info->AddCost(kRefrenceLineStaticObsCost);
     }
   }
@@ -435,14 +435,14 @@ SpeedData NaviPlanner::GenerateStopProfile(const double init_speed,
 SpeedData NaviPlanner::GenerateStopProfileFromPolynomial(
     const double init_speed, const double init_acc) const {
   AERROR << "Slowing down the car with polynomial.";
-  constexpr double kMaxT = 4.0;
+  static constexpr double kMaxT = 4.0;
   for (double t = 2.0; t <= kMaxT; t += 0.5) {
     for (double s = 0.0; s < 50.0; s += 1.0) {
       QuinticPolynomialCurve1d curve(0.0, init_speed, init_acc, s, 0.0, 0.0, t);
       if (!IsValidProfile(curve)) {
         continue;
       }
-      constexpr double kUnitT = 0.02;
+      static constexpr double kUnitT = 0.02;
       SpeedData speed_data;
       for (double curve_t = 0.0; curve_t <= t; curve_t += kUnitT) {
         const double curve_s = curve.Evaluate(0, curve_t);
@@ -463,7 +463,7 @@ bool NaviPlanner::IsValidProfile(const QuinticPolynomialCurve1d& curve) const {
        evaluate_t += 0.2) {
     const double v = curve.Evaluate(1, evaluate_t);
     const double a = curve.Evaluate(2, evaluate_t);
-    constexpr double kEpsilon = 1e-3;
+    static constexpr double kEpsilon = 1e-3;
     if (v < -kEpsilon || a < -5.0) {
       return false;
     }

@@ -45,45 +45,38 @@ void LocalizationInteg::PcdProcess(const drivers::PointCloud &message) {
   LidarMsgTransfer transfer;
   transfer.Transfer(message, &lidar_frame);
   localization_integ_impl_->PcdProcess(lidar_frame);
-  return;
 }
 
 void LocalizationInteg::RawImuProcessFlu(const drivers::gnss::Imu &imu_msg) {
   ImuData imu;
   TransferImuFlu(imu_msg, &imu);
   localization_integ_impl_->RawImuProcessRfu(imu);
-  return;
 }
 
 void LocalizationInteg::RawImuProcessRfu(const drivers::gnss::Imu &imu_msg) {
   ImuData imu;
   TransferImuRfu(imu_msg, &imu);
   localization_integ_impl_->RawImuProcessRfu(imu);
-  return;
 }
 
 void LocalizationInteg::RawObservationProcess(
     const drivers::gnss::EpochObservation &raw_obs_msg) {
   localization_integ_impl_->RawObservationProcess(raw_obs_msg);
-  return;
 }
 
 void LocalizationInteg::RawEphemerisProcess(
     const drivers::gnss::GnssEphemeris &gnss_orbit_msg) {
   localization_integ_impl_->RawEphemerisProcess(gnss_orbit_msg);
-  return;
 }
 
 void LocalizationInteg::GnssBestPoseProcess(
     const drivers::gnss::GnssBestPose &bestgnsspos_msg) {
   localization_integ_impl_->GnssBestPoseProcess(bestgnsspos_msg);
-  return;
 }
 
 void LocalizationInteg::GnssHeadingProcess(
     const drivers::gnss::Heading &gnssheading_msg) {
   localization_integ_impl_->GnssHeadingProcess(gnssheading_msg);
-  return;
 }
 
 const LocalizationResult &LocalizationInteg::GetLastestLidarLocalization()
@@ -114,7 +107,6 @@ void LocalizationInteg::TransferImuRfu(const drivers::gnss::Imu &imu_msg,
   imu_rfu->wibb[0] = imu_msg.angular_velocity().x() * FLAGS_imu_rate;
   imu_rfu->wibb[1] = imu_msg.angular_velocity().y() * FLAGS_imu_rate;
   imu_rfu->wibb[2] = imu_msg.angular_velocity().z() * FLAGS_imu_rate;
-  return;
 }
 
 void LocalizationInteg::TransferImuFlu(const drivers::gnss::Imu &imu_msg,
@@ -130,7 +122,6 @@ void LocalizationInteg::TransferImuFlu(const drivers::gnss::Imu &imu_msg,
   imu_flu->wibb[0] = -imu_msg.angular_velocity().y() * FLAGS_imu_rate;
   imu_flu->wibb[1] = imu_msg.angular_velocity().x() * FLAGS_imu_rate;
   imu_flu->wibb[2] = imu_msg.angular_velocity().z() * FLAGS_imu_rate;
-  return;
 }
 
 }  // namespace msf

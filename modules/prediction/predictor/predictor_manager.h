@@ -113,11 +113,25 @@ class PredictorManager {
 
   void InitDefaultPredictors(const ObstacleConf& conf);
 
-  Predictor* GetVehiclePredictor(const Obstacle& obstacle);
+  void RunVehiclePredictor(
+      const ADCTrajectoryContainer* adc_trajectory_container,
+      Obstacle* obstacle, ObstaclesContainer* obstacles_container);
 
-  Predictor* GetCyclistPredictor(const Obstacle& obstacle);
+  void RunPedestrianPredictor(
+      const ADCTrajectoryContainer* adc_trajectory_container,
+      Obstacle* obstacle, ObstaclesContainer* obstacles_container);
 
-  Predictor* GetDefaultPredictor(const Obstacle& obstacle);
+  void RunCyclistPredictor(
+      const ADCTrajectoryContainer* adc_trajectory_container,
+      Obstacle* obstacle, ObstaclesContainer* obstacles_container);
+
+  void RunDefaultPredictor(
+      const ADCTrajectoryContainer* adc_trajectory_container,
+      Obstacle* obstacle, ObstaclesContainer* obstacles_container);
+
+  void RunEmptyPredictor(const ADCTrajectoryContainer* adc_trajectory_container,
+                         Obstacle* obstacle,
+                         ObstaclesContainer* obstacles_container);
 
  private:
   std::map<ObstacleConf::PredictorType, std::unique_ptr<Predictor>> predictors_;
@@ -151,6 +165,9 @@ class PredictorManager {
 
   ObstacleConf::PredictorType vehicle_in_junction_caution_predictor_ =
       ObstacleConf::INTERACTION_PREDICTOR;
+
+  ObstacleConf::PredictorType vehicle_default_caution_predictor_ =
+      ObstacleConf::EXTRAPOLATION_PREDICTOR;
 
   PredictionObstacles prediction_obstacles_;
 

@@ -260,7 +260,7 @@ if __name__ == '__main__':
 
     test_count = 0
     success_count = 0
-    for sx in np.arange(-10, 10, 1.0): 
+    for sx in np.arange(-10, 10, 1.0):
         for sy in np.arange(2, 4, 0.5):
             print("sx is "+ str(sx) + " and sy is " + str(sy))
             test_count += 1
@@ -272,7 +272,7 @@ if __name__ == '__main__':
                 dual_time_stats.append(result[-3][0])
                 hybrid_time_stats.append(result[-4][0])
 
-    print("success rate is "+ str(float(success_count) / float(test_count)))            
+    print("success rate is "+ str(float(success_count) / float(test_count)))
     print("min is " + str(min(planning_time_stats)))
     print("max is " + str(max(planning_time_stats)))
     print("average is " + str(sum(planning_time_stats) / len(planning_time_stats)))

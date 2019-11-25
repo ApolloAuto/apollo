@@ -88,6 +88,7 @@ cc_library(
     srcs = ["latency_monitor.cc"],
     hdrs = ["latency_monitor.h"],
     deps = [
+        ":summary_monitor",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/latency_recorder/proto:latency_record_proto",
         "//modules/monitor/common:monitor_manager",
