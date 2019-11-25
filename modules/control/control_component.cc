@@ -307,6 +307,13 @@ bool ControlComponent::Proc() {
   const auto &pad_msg = pad_msg_reader_->GetLatestObserved();
   if (pad_msg != nullptr) {
     OnPad(pad_msg);
+    // do something according to pad message
+    if (pad_msg_.action() == DrivingAction::RESET) {
+      AINFO << "Control received RESET action!";
+      estop_ = false;
+      estop_reason_.clear();
+    }
+    pad_received_ = true;
   }
 
   {
@@ -324,14 +331,6 @@ bool ControlComponent::Proc() {
   if (FLAGS_use_control_submodules) {
     local_view_writer_->Write(std::make_shared<LocalView>(local_view_));
     return true;
-  }
-
-  // do something according to pad message
-  if (pad_msg != nullptr && pad_msg_.action() == DrivingAction::RESET) {
-    AINFO << "Control received RESET action!";
-    estop_ = false;
-    estop_reason_.clear();
-    pad_received_ = true;
   }
 
   if (control_conf_.is_control_test_mode() &&

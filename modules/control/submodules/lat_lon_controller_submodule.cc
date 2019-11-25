@@ -62,7 +62,7 @@ bool LatLonControllerSubmodule::Init() {
   }
 
   control_command_writer_ =
-      node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
+      node_->CreateWriter<ControlCommand>(FLAGS_control_pre_command_topic);
 
   return true;
 }
