@@ -241,7 +241,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
           s_upper_bound =
               std::fmin(s_upper_bound, s_upper - FLAGS_follow_min_distance);
           s_soft_upper_bound = std::fmin(
-              s_soft_upper_bound, s_upper - FLAGS_follow_min_distance - 5.0);
+              s_soft_upper_bound, s_upper - FLAGS_follow_min_distance - 7.0);
           break;
         case STBoundary::BoundaryType::OVERTAKE:
           s_lower_bound = std::fmax(s_lower_bound, s_lower);
