@@ -36,7 +36,7 @@ std::string LatLonControllerSubmodule::Name() const {
 }
 
 bool LatLonControllerSubmodule::Init() {
-  /* lateral controller*/
+  // lateral controller initialization
   if (!cyber::common::GetProtoFromFile(FLAGS_lateral_controller_conf_file,
                                        &lateral_controller_conf_)) {
     AERROR << "Unable to load lateral controller conf file: " +
@@ -48,7 +48,7 @@ bool LatLonControllerSubmodule::Init() {
         "Control init lateral controller failed! Stopping...");
     return false;
   }
-  /* longitudinal controller*/
+  // longitudinal controller
   if (!cyber::common::GetProtoFromFile(FLAGS_longitudinal_controller_conf_file,
                                        &longitudinal_controller_conf_)) {
     AERROR << "Unable to load longitudinal controller conf file: " +
@@ -61,8 +61,8 @@ bool LatLonControllerSubmodule::Init() {
     return false;
   }
 
-  control_command_writer_ =
-      node_->CreateWriter<ControlCommand>(FLAGS_control_pre_command_topic);
+  control_core_writer_ =
+      node_->CreateWriter<ControlCommand>(FLAGS_control_core_command_topic);
 
   return true;
 }
@@ -71,26 +71,24 @@ bool LatLonControllerSubmodule::Proc(
     const std::shared_ptr<Preprocessor>& preprocessor_status) {
   ControlCommand control_command;
 
-  local_view_ = preprocessor_status->mutable_local_view();
-
   // skip produce control command when estop for MPC controller
   if (preprocessor_status->estop()) {
     return true;
   }
 
-  Status status = ProduceControlCommand(&control_command);
+  Status status = ProduceControlCommand(preprocessor_status->local_view(),
+                                        &control_command);
   AERROR_IF(!status.ok()) << "Failed to produce control command:"
                           << status.error_message();
-  control_command_writer_->Write(
+  control_core_writer_->Write(
       std::make_shared<ControlCommand>(control_command));
   return true;
 }
 
 Status LatLonControllerSubmodule::ProduceControlCommand(
-    ControlCommand* control_command) {
+    const LocalView& local_view, ControlCommand* control_command) {
   std::lock_guard<std::mutex> lock(mutex_);
-  if (local_view_->mutable_chassis()->driving_mode() ==
-      Chassis::COMPLETE_MANUAL) {
+  if (local_view.chassis().driving_mode() == Chassis::COMPLETE_MANUAL) {
     lateral_controller_.Reset();
     longitudinal_controller_.Reset();
     AINFO_EVERY(100) << "Reset Controllers in Manual Mode";
@@ -98,8 +96,8 @@ Status LatLonControllerSubmodule::ProduceControlCommand(
 
   // fill out control command sequentially
   Status lateral_status = lateral_controller_.ComputeControlCommand(
-      local_view_->mutable_localization(), local_view_->mutable_chassis(),
-      local_view_->mutable_trajectory(), control_command);
+      &local_view.localization(), &local_view.chassis(),
+      &local_view.trajectory(), control_command);
 
   // return error if lateral status has error
   if (!lateral_status.ok()) {
@@ -107,8 +105,8 @@ Status LatLonControllerSubmodule::ProduceControlCommand(
   }
 
   Status longitudinal_status = longitudinal_controller_.ComputeControlCommand(
-      local_view_->mutable_localization(), local_view_->mutable_chassis(),
-      local_view_->mutable_trajectory(), control_command);
+      &local_view.localization(), &local_view.chassis(),
+      &local_view.trajectory(), control_command);
   return longitudinal_status;
 }
 
