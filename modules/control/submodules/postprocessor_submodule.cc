@@ -86,8 +86,7 @@ bool PostprocessorSubmodule::Proc(
 
   common::util::FillHeader(Name(), &post_processor);
 
-  postprocessor_writer_->Write(
-      std::make_shared<ControlCommand>(post_processor));
+  postprocessor_writer_->Write(post_processor);
 
   // TODO(SHU): add debug info; add latency time
   return true;

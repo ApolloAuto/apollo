@@ -74,6 +74,9 @@ bool MPCControllerSubmodule::Proc(
                                             &control_core_command);
   AERROR_IF(!status.ok()) << "Failed to produce control command:"
                           << status.error_message();
+
+  common::util::FillHeader(Name(), &control_core_command);
+
   control_core_writer_->Write(control_core_command);
   return true;
 }
