@@ -31,7 +31,9 @@
 ```
     cd apollo
     bash docker/scripts/dev_start.sh
-    bash docker/scts/bootstrap.sh
+    bash docker/scripts/dev_into.sh
+    bash apollo.sh build_gpu
+    bash scripts/bootstrap.sh
 ```
 
 2. 选择车辆相应配置（ch），选择相应高精地图，在module Controller标签页启动gps、localization、Radar、canbus、control模块
