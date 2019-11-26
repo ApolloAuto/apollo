@@ -282,7 +282,6 @@ DECLARE_double(open_space_standstill_acceleration);
 
 DECLARE_bool(enable_cuda);
 
-DECLARE_bool(enable_nonscenario_side_pass);
 DECLARE_bool(enable_dp_reference_speed);
 
 DECLARE_double(message_latency_threshold);
