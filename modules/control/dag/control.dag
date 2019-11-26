@@ -9,4 +9,49 @@ module_config {
             interval: 10
         }
     }
+
+    components {
+        class_name : "PreprocessorSubmodule"
+        config {
+            name: "PreprocessorSubmodule"
+            config_file_path: "/apollo/modules/control/conf/control_common_conf.pb.txt"
+            flag_file_path: "/apollo/modules/control/conf/control.conf"
+            readers: [
+                {
+                    channel:"/apollo/control/localview"
+                }
+            ]
+        }
+    }
+
+    components {
+        class_name : "LatLonControllerSubmodule"
+        config {
+            name: "LatLonControllerSubmodule"
+            config_file_path: "/apollo/modules/control/conf/control_common_conf.pb.txt"
+            flag_file_path: "/apollo/modules/control/conf/control.conf"
+            readers: [
+                {
+                    channel:"/apollo/control/preprocessor"
+                }
+            ]
+        }
+    }
+
+    components {
+        class_name : "PostprocessorSubmodule"
+        config {
+            name: "PostprocessorSubmodule"
+            config_file_path: "/apollo/modules/control/conf/control_common_conf.pb.txt"
+            flag_file_path: "/apollo/modules/control/conf/control.conf"
+            readers: [
+                {
+                    channel:"/apollo/control/preprocessor"
+                },
+                {
+                    channel:"/apollo/control/controlcore"
+                }
+            ]
+        }
+    }
 }

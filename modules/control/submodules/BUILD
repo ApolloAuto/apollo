@@ -84,6 +84,7 @@ cc_library(
         "//modules/localization/proto:localization_proto",
         "//modules/planning/proto:planning_proto",
     ],
+    alwayslink = True,
 )
 
 cc_binary(
@@ -121,6 +122,7 @@ cc_library(
         "//modules/localization/proto:localization_proto",
         "//modules/planning/proto:planning_proto",
     ],
+    alwayslink = True,
 )
 
 cc_binary(
@@ -158,6 +160,7 @@ cc_library(
         "//modules/localization/proto:localization_proto",
         "//modules/planning/proto:planning_proto",
     ],
+    alwayslink = True,
 )
 
 cc_binary(
