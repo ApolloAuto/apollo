@@ -575,9 +575,6 @@ DEFINE_double(open_space_standstill_acceleration, 0.0,
 
 DEFINE_bool(enable_cuda, false, "True to enable cuda parallel implementation.");
 
-DEFINE_bool(enable_nonscenario_side_pass, false,
-            "True to enable side pass without scenario management");
-
 DEFINE_bool(enable_dp_reference_speed, true,
             "True to penalize dp result towards default cruise speed");
 
