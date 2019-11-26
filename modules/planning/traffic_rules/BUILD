@@ -7,7 +7,6 @@ cc_library(
     srcs = [
         # TODO(all): Split to separate targets to gain better building cache.
         "backside_vehicle.cc",
-        "change_lane.cc",
         "crosswalk.cc",
         "destination.cc",
         "keep_clear.cc",
@@ -19,7 +18,6 @@ cc_library(
     ],
     hdrs = [
         "backside_vehicle.h",
-        "change_lane.h",
         "crosswalk.h",
         "destination.h",
         "keep_clear.h",
