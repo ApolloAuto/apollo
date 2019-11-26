@@ -50,8 +50,6 @@ class ScenarioManager final {
   ScenarioConfig::ScenarioType SelectBareIntersectionScenario(
       const Frame& frame, const hdmap::PathOverlap& pnc_junction_overlap);
 
-  ScenarioConfig::ScenarioType SelectChangeLaneScenario(const Frame& frame);
-
   ScenarioConfig::ScenarioType SelectPullOverScenario(const Frame& frame);
 
   ScenarioConfig::ScenarioType SelectPadMsgScenario(const Frame& frame);
