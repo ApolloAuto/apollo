@@ -153,10 +153,11 @@ Status STBoundsDecider::GenerateRegularSTBound(STBound* const st_bound,
                           available_s_bounds[j].second),
           available_obs_decisions[j]);
     }
+    RemoveInvalidDecisions(driving_limits_bound, &available_choices);
 
-    if (available_s_bounds.size() >= 1) {
+    if (!available_choices.empty()) {
       ADEBUG << "One decision needs to be made among "
-             << available_s_bounds.size() << " choices.";
+             << available_choices.size() << " choices.";
       RankDecisions(st_guide_line_.GetGuideSFromT(t), driving_limits_bound,
                     &available_choices);
       // Select the top decision.
@@ -192,6 +193,10 @@ Status STBoundsDecider::GenerateRegularSTBound(STBound* const st_bound,
           upper_obs_v = limiting_speed_info.second;
         }
       }
+    } else {
+      const std::string msg = "No valid st-boundary exists.";
+      AERROR << msg;
+      return Status(ErrorCode::PLANNING_ERROR, msg);
     }
 
     // Update into st_bound
@@ -202,9 +207,33 @@ Status STBoundsDecider::GenerateRegularSTBound(STBound* const st_bound,
   return Status::OK();
 }
 
+void STBoundsDecider::RemoveInvalidDecisions(
+    std::pair<double, double> driving_limit,
+    std::vector<std::pair<STBoundPoint, ObsDecSet>>* available_choices) {
+  // Remove those choices that don't even fall within driving-limits.
+  size_t i = 0;
+  while (i < available_choices->size()) {
+    double s_lower = 0.0;
+    double s_upper = 0.0;
+    std::tie(std::ignore, s_lower, s_upper) = available_choices->at(i).first;
+    if (s_lower > driving_limit.second || s_upper < driving_limit.first) {
+      // Invalid bound, should be removed.
+      if (i != available_choices->size() - 1) {
+        swap(available_choices->at(i),
+             available_choices->at(available_choices->size() - 1));
+      }
+      available_choices->pop_back();
+    } else {
+      // Valid bound, proceed to the next one.
+      ++i;
+    }
+  }
+}
+
 void STBoundsDecider::RankDecisions(
     double s_guide_line, std::pair<double, double> driving_limit,
     std::vector<std::pair<STBoundPoint, ObsDecSet>>* available_choices) {
+  // Perform sorting of the existing decisions.
   bool has_swaps = true;
   while (has_swaps) {
     has_swaps = false;
