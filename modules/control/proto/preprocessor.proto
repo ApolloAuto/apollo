@@ -4,7 +4,7 @@ package apollo.control;
 
 import "modules/common/proto/header.proto";
 import "modules/common/proto/drive_state.proto";
-import "modules/control/proto/control_cmd.proto";
+import "modules/control/proto/input_debug.proto";
 import "modules/control/proto/local_view.proto";
 
 message Preprocessor {
