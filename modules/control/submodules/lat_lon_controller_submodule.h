@@ -70,8 +70,8 @@ class LatLonControllerSubmodule final : public cyber::Component<Preprocessor> {
   bool Proc(const std::shared_ptr<Preprocessor>& preprocessor_status) override;
 
  private:
-  common::Status ProduceControlCommand(const LocalView& local_view,
-                                       ControlCommand* control_command);
+  common::Status ProduceControlCoreCommand(
+      const LocalView& local_view, ControlCommand* control_core_command);
 
  private:
   bool estop_ = false;
