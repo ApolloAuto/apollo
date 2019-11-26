@@ -52,7 +52,7 @@ module_config {
                     channel:"/apollo/control/preprocessor"
                 },
                 {
-                    channel:"/apollo/control"
+                    channel:"/apollo/control/controlcore"
                 }
             ]
         }

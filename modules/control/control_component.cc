@@ -38,6 +38,8 @@ ControlComponent::ControlComponent()
     : monitor_logger_buffer_(common::monitor::MonitorMessageItem::CONTROL) {}
 
 bool ControlComponent::Init() {
+  init_time_ = Clock::NowInSeconds();
+
   AINFO << "Control init, starting ...";
 
   CHECK(
