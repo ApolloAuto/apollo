@@ -56,6 +56,13 @@ class STBoundsDecider : public Decider {
       std::vector<std::tuple<double, double, double>>* const st_bound,
       std::vector<std::tuple<double, double, double>>* const vt_bound);
 
+  void RemoveInvalidDecisions(
+      std::pair<double, double> driving_limit,
+      std::vector<
+          std::pair<std::tuple<double, double, double>,
+                    std::vector<std::pair<std::string, ObjectDecisionType>>>>*
+          available_choices);
+
   void RankDecisions(
       double s_guide_line, std::pair<double, double> driving_limit,
       std::vector<
