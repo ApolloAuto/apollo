@@ -60,15 +60,13 @@ export default class PlaybackControls extends React.Component {
     }
 
     handleScreenModeChange() {
-        const { options } = this.props.store;
-
         switch (this.state.nextScreenMode) {
             case 'fullscreen':
-                options.showMenu = false;
+                this.props.store.setOptionStatus('showMenu', false);
                 this.setState({ nextScreenMode: 'normalscreen' });
                 break;
             case 'normalscreen':
-                options.showMenu = true;
+                this.props.store.setOptionStatus('showMenu', true);
                 this.setState({ nextScreenMode: 'fullscreen' });
                 break;
         }
@@ -113,7 +111,12 @@ export default class PlaybackControls extends React.Component {
                 <div className="rate-selector">
                     <select onChange={this.handleRateChange} value={this.state.rate}>
                         {PLAY_BACK_SPEED.map(
-                            (speed) => <option value={speed}>{`x ${speed.toFixed(1)}`}</option>)}
+                            (speed) => (
+                                <option key={speed} value={speed}>
+                                    {`x ${speed.toFixed(1)}`}
+                                </option>
+                            ))
+                        }
                     </select>
                     <span className="arrow"></span>
                 </div>
