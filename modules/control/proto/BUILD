@@ -49,8 +49,8 @@ proto_library(
         "preprocessor.proto",
     ],
     deps = [
-        ":local_view_proto_lib",
         ":input_debug_lib",
+        ":local_view_proto_lib",
         "//modules/common/proto:drive_state_proto_lib",
         "//modules/common/proto:header_proto_lib",
     ],
@@ -93,8 +93,8 @@ proto_library(
         "control_cmd.proto",
     ],
     deps = [
-        ":pad_msg_lib",
         ":input_debug_lib",
+        ":pad_msg_lib",
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/proto:drive_state_proto_lib",
         "//modules/common/proto:geometry_proto_lib",

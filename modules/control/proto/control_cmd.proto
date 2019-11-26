@@ -2,12 +2,12 @@ syntax = "proto2";
 package apollo.control;
 
 import "modules/canbus/proto/chassis.proto";
-import "modules/common/proto/header.proto";
-import "modules/common/proto/vehicle_signal.proto";
-import "modules/control/proto/pad_msg.proto";
 import "modules/common/proto/drive_state.proto";
+import "modules/common/proto/header.proto";
 import "modules/common/proto/pnc_point.proto";
+import "modules/common/proto/vehicle_signal.proto";
 import "modules/control/proto/input_debug.proto";
+import "modules/control/proto/pad_msg.proto";
 
 enum TurnSignal {
   TURN_NONE = 0;
