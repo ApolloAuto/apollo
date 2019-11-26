@@ -163,7 +163,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
                                0.0);
   for (int i = 1; i < num_of_knots_; ++i) {
     // Avoid the very last points when already stopped
-    if (velocity[i] <= 0.0) {
+    if (velocity[i] < 0.0) {
       break;
     }
     speed_data->AppendSpeedPoint(
