@@ -13,7 +13,7 @@ module_config {
     components {
         class_name : "PreprocessorSubmodule"
         config {
-            name: "preprocessor submodule"
+            name: "PreprocessorSubmodule"
             config_file_path: "/apollo/modules/control/conf/control_common_conf.pb.txt"
             flag_file_path: "/apollo/modules/control/conf/control.conf"
             readers: [
@@ -30,7 +30,7 @@ module_config {
     components {
         class_name : "MPCControllerSubmodule"
         config {
-            name: "MPC controller"
+            name: "MPCControllerSubmodule"
             config_file_path: "/apollo/modules/control/conf/calibration_table.pb.txt"
             flag_file_path: "/apollo/modules/control/conf/control.conf"
             readers: [
@@ -44,7 +44,7 @@ module_config {
     components {
         class_name : "PostprocessorSubmodule"
         config {
-            name: "postprocessor submodule"
+            name: "PostprocessorSubmodule"
             config_file_path: "/apollo/modules/control/conf/control_common_conf.pb.txt"
             flag_file_path: "/apollo/modules/control/conf/control.conf"
             readers: [
