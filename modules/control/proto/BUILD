@@ -24,6 +24,7 @@ proto_library(
         ":leadlag_conf_proto_lib",
         ":mpc_controller_conf_proto_lib",
         ":mrac_conf_proto_lib",
+        ":input_debug_lib",
         ":pad_msg_lib",
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/proto:drive_state_proto_lib",
@@ -48,8 +49,8 @@ proto_library(
         "preprocessor.proto",
     ],
     deps = [
-        ":control_command_proto_lib",
         ":local_view_proto_lib",
+        ":input_debug_lib",
         "//modules/common/proto:drive_state_proto_lib",
         "//modules/common/proto:header_proto_lib",
     ],
@@ -93,6 +94,7 @@ proto_library(
     ],
     deps = [
         ":pad_msg_lib",
+        ":input_debug_lib",
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/proto:drive_state_proto_lib",
         "//modules/common/proto:geometry_proto_lib",
@@ -215,6 +217,24 @@ proto_library(
     ],
     deps = [
         "//modules/canbus/proto:canbus_proto_lib",
+        "//modules/common/proto:header_proto_lib",
+    ],
+)
+
+# input_debug_proto
+cc_proto_library(
+    name = "input_debug",
+    deps = [
+        ":input_debug_lib",
+    ],
+)
+
+proto_library(
+    name = "input_debug_lib",
+    srcs = [
+        "input_debug.proto",
+    ],
+    deps = [
         "//modules/common/proto:header_proto_lib",
     ],
 )
