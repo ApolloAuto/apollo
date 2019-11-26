@@ -52,6 +52,10 @@ class STBoundsDecider : public Decider {
   void InitSTBoundsDecider(const Frame& frame,
                            ReferenceLineInfo* const reference_line_info);
 
+  common::Status GenerateFallbackSTBound(
+      std::vector<std::tuple<double, double, double>>* const st_bound,
+      std::vector<std::tuple<double, double, double>>* const vt_bound);
+
   common::Status GenerateRegularSTBound(
       std::vector<std::tuple<double, double, double>>* const st_bound,
       std::vector<std::tuple<double, double, double>>* const vt_bound);
