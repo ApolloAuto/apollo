@@ -48,18 +48,15 @@ bool MPCControllerSubmodule::Init() {
                   FLAGS_mpc_controller_conf_file;
     return false;
   }
-  // load calibration table
-  if (!cyber::common::GetProtoFromFile(FLAGS_calibration_table_file,
-                                       &calibration_table_)) {
-    AERROR << "Unable to load calibration table file: " +
-                  FLAGS_calibration_table_file;
+
+  if (!mpc_controller_.Init(&mpc_controller_conf_).ok()) {
+    monitor_logger_buffer_.ERROR(
+        "Control init MPC controller failed! Stopping...");
     return false;
   }
-  mpc_controller_conf_.mutable_mpc_controller_conf()
-      ->set_allocated_calibration_table(&calibration_table_);
 
   control_command_writer_ =
-      node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
+      node_->CreateWriter<ControlCommand>(FLAGS_control_core_command_topic);
   return true;
 }
 
