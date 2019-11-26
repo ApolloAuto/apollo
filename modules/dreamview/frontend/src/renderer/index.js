@@ -6,6 +6,7 @@ const _ = require('lodash');
 
 import Coordinates from "renderer/coordinates";
 import AutoDrivingCar from "renderer/adc";
+import CheckPoints from "renderer/check_points.js";
 import Ground from "renderer/ground";
 import TileGround from "renderer/tileground";
 import Map from "renderer/map";
@@ -32,6 +33,9 @@ class Renderer {
             alpha: true,
         });
         this.scene = new THREE.Scene();
+        if (OFFLINE_PLAYBACK) {
+            this.scene.background = new THREE.Color(0x000C17);
+        }
 
         // The dimension of the scene
         this.dimension = {
@@ -80,6 +84,8 @@ class Renderer {
         this.gnss = new Gnss();
 
         this.pointCloud = new PointCloud();
+
+        this.checkPoints = OFFLINE_PLAYBACK && new CheckPoints(this.coordinates, this.scene);
 
         // The Performance Monitor
         this.stats = null;
