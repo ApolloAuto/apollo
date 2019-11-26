@@ -49,9 +49,29 @@ proto_library(
     ],
     deps = [
         ":control_command_proto_lib",
+        ":local_view_proto_lib",
+        "//modules/common/proto:drive_state_proto_lib",
+        "//modules/common/proto:header_proto_lib",
+    ],
+)
+
+
+# local_view_proto
+cc_proto_library(
+    name = "local_view_proto",
+    deps = [
+        ":local_view_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "local_view_proto_lib",
+    srcs = [
+        "local_view.proto",
+    ],
+    deps = [
         ":pad_msg_lib",
         "//modules/canbus/proto:canbus_proto_lib",
-        "//modules/common/proto:drive_state_proto_lib",
         "//modules/common/proto:header_proto_lib",
         "//modules/localization/proto:localization_proto_lib",
         "//modules/planning/proto:planning_proto_lib",

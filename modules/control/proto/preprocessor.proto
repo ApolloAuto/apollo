@@ -2,20 +2,10 @@ syntax = "proto2";
 
 package apollo.control;
 
-import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/header.proto";
 import "modules/common/proto/drive_state.proto";
 import "modules/control/proto/control_cmd.proto";
-import "modules/control/proto/pad_msg.proto";
-import "modules/localization/proto/localization.proto";
-import "modules/planning/proto/planning.proto";
-
-message LocalView {
-  optional apollo.canbus.Chassis chassis = 1;
-  optional apollo.planning.ADCTrajectory trajectory = 2;
-  optional apollo.localization.LocalizationEstimate localization = 3;
-  optional PadMessage pad_msg = 4;
-}
+import "modules/control/proto/local_view.proto";
 
 message Preprocessor {
   optional apollo.common.Header header = 1;
