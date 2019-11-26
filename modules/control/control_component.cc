@@ -318,6 +318,7 @@ bool ControlComponent::Proc() {
     if (pad_msg != nullptr) {
       local_view_.mutable_pad_msg()->CopyFrom(pad_msg_);
     }
+    common::util::FillHeader(FLAGS_control_local_view_topic, &local_view_);
   }
 
   // use control submodules

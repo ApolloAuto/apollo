@@ -84,8 +84,9 @@ bool PreprocessorSubmodule::Proc(const std::shared_ptr<LocalView> &local_view) {
     control_preprocessor.set_received_pad_msg(true);
   }
 
-  preprocessor_writer_->Write(
-      std::make_shared<Preprocessor>(control_preprocessor));
+  common::util::FillHeader(Name(), &control_preprocessor);
+
+  preprocessor_writer_->Write(control_preprocessor);
   ADEBUG << "Preprocessor finished.";
 
   return true;
