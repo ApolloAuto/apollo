@@ -36,8 +36,7 @@
 namespace apollo {
 namespace control {
 
-class PreprocessorSubmodule final
-    : public cyber::Component<LocalView> {
+class PreprocessorSubmodule final : public cyber::Component<LocalView> {
  public:
   /**
    * @brief Construct a new Preprocessor Submodule object
@@ -77,7 +76,7 @@ class PreprocessorSubmodule final
    * @param local_view
    * @return common::Status
    */
-  common::Status CheckTimestamp(LocalView *local_view);
+  common::Status CheckTimestamp(const LocalView &local_view);
 
   common::Status ProducePreprocessorStatus(Preprocessor *preprocessor_status);
 
@@ -85,8 +84,8 @@ class PreprocessorSubmodule final
   double init_time_ = 0.0;
 
   bool estop_ = false;
+
   std::string estop_reason_;
-  bool pad_received_ = false;
 
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
@@ -99,9 +98,6 @@ class PreprocessorSubmodule final
   std::shared_ptr<cyber::Writer<Preprocessor>> preprocessor_writer_;
 
   ControlCommonConf control_common_conf_;
-
-  LocalView *local_view_;
-  //   PadMessage pad_msg_;
 };
 
 CYBER_REGISTER_COMPONENT(PreprocessorSubmodule);
