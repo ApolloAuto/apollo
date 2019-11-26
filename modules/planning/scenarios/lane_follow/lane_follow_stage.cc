@@ -303,26 +303,8 @@ void LaneFollowStage::PlanFallbackTrajectory(
   }
 
   AERROR << "Speed fallback due to algorithm failure";
-  // TODO(Hongyi): refine the fall-back handling here.
-  // To use piecewise jerk speed fallback, stop distance here
-  // is an upper bound of s, not a target.
-  // TODO(Jiacheng): move this stop_path_threshold to a gflag
-  const double path_stop_distance =
-      reference_line_info->path_data().discretized_path().Length();
-
-  const double obstacle_stop_distance =
-      reference_line_info->st_graph_data().is_initialized()
-          ? reference_line_info->st_graph_data().min_s_on_st_boundaries()
-          : std::numeric_limits<double>::infinity();
-
-  const double curr_speed_distance =
-      FLAGS_fallback_total_time *
-      std::min({reference_line_info->GetCruiseSpeed(),
-                reference_line_info->vehicle_state().linear_velocity()});
-
   *reference_line_info->mutable_speed_data() =
-      SpeedProfileGenerator::GenerateFallbackSpeed(std::min(
-          {path_stop_distance, obstacle_stop_distance, curr_speed_distance}));
+      SpeedProfileGenerator::GenerateFallbackSpeed();
 
   if (reference_line_info->trajectory_type() != ADCTrajectory::PATH_FALLBACK) {
     reference_line_info->AddCost(kSpeedOptimizationFallbackCost);

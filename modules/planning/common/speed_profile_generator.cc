@@ -57,7 +57,6 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   }
 
   std::array<double, 3> init_s = {0.0, init_v, init_a};
-  std::array<double, 3> end_s = {stop_distance, 0.0, 0.0};
 
   // TODO(all): dt is too small;
   double delta_t = FLAGS_fallback_time_unit;
@@ -67,7 +66,8 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(num_of_knots, delta_t,
                                                    init_s);
 
-  piecewise_jerk_problem.set_end_state_ref({1000.0, 0.0, 0.0}, end_s);
+  std::vector<double> end_state_ref(num_of_knots, stop_distance);
+  piecewise_jerk_problem.set_x_ref(1000.0, end_state_ref);
 
   // TODO(Hongyi): tune the params and move to a config
   piecewise_jerk_problem.set_weight_ddx(1.0);
