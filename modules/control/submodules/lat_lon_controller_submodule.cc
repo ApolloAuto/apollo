@@ -69,24 +69,24 @@ bool LatLonControllerSubmodule::Init() {
 
 bool LatLonControllerSubmodule::Proc(
     const std::shared_ptr<Preprocessor>& preprocessor_status) {
-  ControlCommand control_command;
+  ControlCommand control_core_command;
 
   // skip produce control command when estop for MPC controller
   if (preprocessor_status->estop()) {
     return true;
   }
 
-  Status status = ProduceControlCommand(preprocessor_status->local_view(),
-                                        &control_command);
+  Status status = ProduceControlCoreCommand(preprocessor_status->local_view(),
+                                            &control_core_command);
   AERROR_IF(!status.ok()) << "Failed to produce control command:"
                           << status.error_message();
   control_core_writer_->Write(
-      std::make_shared<ControlCommand>(control_command));
+      std::make_shared<ControlCommand>(control_core_command));
   return true;
 }
 
-Status LatLonControllerSubmodule::ProduceControlCommand(
-    const LocalView& local_view, ControlCommand* control_command) {
+Status LatLonControllerSubmodule::ProduceControlCoreCommand(
+    const LocalView& local_view, ControlCommand* control_core_command) {
   std::lock_guard<std::mutex> lock(mutex_);
   if (local_view.chassis().driving_mode() == Chassis::COMPLETE_MANUAL) {
     lateral_controller_.Reset();
@@ -97,7 +97,7 @@ Status LatLonControllerSubmodule::ProduceControlCommand(
   // fill out control command sequentially
   Status lateral_status = lateral_controller_.ComputeControlCommand(
       &local_view.localization(), &local_view.chassis(),
-      &local_view.trajectory(), control_command);
+      &local_view.trajectory(), control_core_command);
 
   // return error if lateral status has error
   if (!lateral_status.ok()) {
@@ -106,7 +106,7 @@ Status LatLonControllerSubmodule::ProduceControlCommand(
 
   Status longitudinal_status = longitudinal_controller_.ComputeControlCommand(
       &local_view.localization(), &local_view.chassis(),
-      &local_view.trajectory(), control_command);
+      &local_view.trajectory(), control_core_command);
   return longitudinal_status;
 }
 
