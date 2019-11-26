@@ -68,26 +68,20 @@ bool PreprocessorSubmodule::Proc(const std::shared_ptr<LocalView> &local_view) {
   ADEBUG << "Preprocessor started ....";
   Preprocessor control_preprocessor;
 
-  {
-    std::lock_guard<std::mutex> lock(mutex_);
-    control_preprocessor.mutable_local_view()->CopyFrom(*local_view);
-  }
+  control_preprocessor.mutable_local_view()->CopyFrom(*local_view);
 
-  local_view_ = control_preprocessor.mutable_local_view();
   Status status = ProducePreprocessorStatus(&control_preprocessor);
   AERROR_IF(!status.ok()) << "Failed to produce control preprocessor:"
                           << status.error_message();
 
-  if (local_view_->mutable_pad_msg() != nullptr) {
-    auto pad_message = local_view_->mutable_pad_msg();
-    if (pad_message->action() == DrivingAction::RESET) {
+  if (control_preprocessor.local_view().has_pad_msg()) {
+    auto pad_message = control_preprocessor.local_view().pad_msg();
+    if (pad_message.action() == DrivingAction::RESET) {
       AINFO << "Control received RESET action!";
       estop_ = false;
       estop_reason_.clear();
     }
-    pad_received_ = true;
-    std::lock_guard<std::mutex> lock(mutex_);
-    control_preprocessor.set_received_pad_msg(pad_received_);
+    control_preprocessor.set_received_pad_msg(true);
   }
 
   preprocessor_writer_->Write(
@@ -99,7 +93,9 @@ bool PreprocessorSubmodule::Proc(const std::shared_ptr<LocalView> &local_view) {
 
 Status PreprocessorSubmodule::ProducePreprocessorStatus(
     Preprocessor *control_preprocessor) {
-  Status status = CheckInput(local_view_);
+  // TODO(SJiang): rename this function since local view got changed in this
+  // function.
+  Status status = CheckInput(control_preprocessor->mutable_local_view());
 
   if (!status.ok()) {
     AERROR_EVERY(100) << "Control input data failed: "
@@ -111,12 +107,12 @@ Status PreprocessorSubmodule::ProducePreprocessorStatus(
     estop_ = true;
     estop_reason_ = status.error_message();
   } else {
-    Status status_ts = CheckTimestamp(local_view_);
+    Status status_ts = CheckTimestamp(control_preprocessor->local_view());
 
     if (!status_ts.ok()) {
       AERROR << "Input messages timeout";
       status = status_ts;
-      if (local_view_->chassis().driving_mode() !=
+      if (control_preprocessor->local_view().chassis().driving_mode() !=
           apollo::canbus::Chassis::COMPLETE_AUTO_DRIVE) {
         control_preprocessor->mutable_engage_advice()->set_advice(
             apollo::common::EngageAdvice::DISALLOW_ENGAGE);
@@ -130,28 +126,41 @@ Status PreprocessorSubmodule::ProducePreprocessorStatus(
   }
 
   // check estop
-  estop_ = control_common_conf_.enable_persistent_estop()
-               ? estop_ || local_view_->trajectory().estop().is_estop()
-               : local_view_->trajectory().estop().is_estop();
+  estop_ =
+      control_common_conf_.enable_persistent_estop()
+          ? estop_ || control_preprocessor->local_view()
+                          .trajectory()
+                          .estop()
+                          .is_estop()
+          : control_preprocessor->local_view().trajectory().estop().is_estop();
 
-  if (local_view_->trajectory().estop().is_estop()) {
+  if (control_preprocessor->local_view().trajectory().estop().is_estop()) {
     estop_ = true;
-    estop_reason_ = absl::StrCat("estop from planning : ",
-                                 local_view_->trajectory().estop().reason());
+    estop_reason_ = absl::StrCat(
+        "estop from planning : ",
+        control_preprocessor->local_view().trajectory().estop().reason());
   }
 
-  if (local_view_->trajectory().trajectory_point().empty()) {
+  if (control_preprocessor->local_view()
+          .trajectory()
+          .trajectory_point()
+          .empty()) {
     AWARN_EVERY(100) << "planning has no trajectory point. ";
     estop_ = true;
     estop_reason_ =
         absl::StrCat("estop for empty planning trajectory, planning headers: ",
-                     local_view_->trajectory().header().ShortDebugString());
+                     control_preprocessor->local_view()
+                         .trajectory()
+                         .header()
+                         .ShortDebugString());
   }
 
   if (FLAGS_enable_gear_drive_negative_speed_protection) {
     const double kEpsilon = 0.001;
-    auto first_trajectory_point = local_view_->trajectory().trajectory_point(0);
-    if (local_view_->chassis().gear_location() == Chassis::GEAR_DRIVE &&
+    auto first_trajectory_point =
+        control_preprocessor->local_view().trajectory().trajectory_point(0);
+    if (control_preprocessor->local_view().chassis().gear_location() ==
+            Chassis::GEAR_DRIVE &&
         first_trajectory_point.v() < -1 * kEpsilon) {
       estop_ = true;
       estop_reason_ = "estop for negative speed when gear_drive";
@@ -161,14 +170,15 @@ Status PreprocessorSubmodule::ProducePreprocessorStatus(
   if (!estop_) {
     auto debug = control_preprocessor->mutable_input_debug();
     debug->mutable_localization_header()->CopyFrom(
-        local_view_->localization().header());
-    debug->mutable_canbus_header()->CopyFrom(local_view_->chassis().header());
+        control_preprocessor->local_view().localization().header());
+    debug->mutable_canbus_header()->CopyFrom(
+        control_preprocessor->local_view().chassis().header());
     debug->mutable_trajectory_header()->CopyFrom(
-        local_view_->trajectory().header());
+        control_preprocessor->local_view().trajectory().header());
 
-    if (local_view_->trajectory().is_replan()) {
+    if (control_preprocessor->local_view().trajectory().is_replan()) {
       latest_replan_trajectory_header_.CopyFrom(
-          local_view_->trajectory().header());
+          control_preprocessor->local_view().trajectory().header());
     }
 
     if (latest_replan_trajectory_header_.has_sequence_num()) {
@@ -214,7 +224,7 @@ Status PreprocessorSubmodule::CheckInput(LocalView *local_view) {
   return Status::OK();
 }
 
-Status PreprocessorSubmodule::CheckTimestamp(LocalView *local_view) {
+Status PreprocessorSubmodule::CheckTimestamp(const LocalView &local_view) {
   if (!control_common_conf_.enable_input_timestamp_check() ||
       control_common_conf_.is_control_test_mode()) {
     ADEBUG << "Skip input timestamp check by gflags.";
@@ -223,7 +233,7 @@ Status PreprocessorSubmodule::CheckTimestamp(LocalView *local_view) {
 
   double current_timestamp = Clock::NowInSeconds();
   double localization_diff =
-      current_timestamp - local_view->localization().header().timestamp_sec();
+      current_timestamp - local_view.localization().header().timestamp_sec();
 
   if (localization_diff > (control_common_conf_.max_localization_miss_num() *
                            control_common_conf_.localization_period())) {
@@ -234,7 +244,7 @@ Status PreprocessorSubmodule::CheckTimestamp(LocalView *local_view) {
   }
 
   double chassis_diff =
-      current_timestamp - local_view->chassis().header().timestamp_sec();
+      current_timestamp - local_view.chassis().header().timestamp_sec();
 
   if (chassis_diff > (control_common_conf_.max_chassis_miss_num() *
                       control_common_conf_.chassis_period())) {
@@ -245,7 +255,7 @@ Status PreprocessorSubmodule::CheckTimestamp(LocalView *local_view) {
   }
 
   double trajectory_diff =
-      current_timestamp - local_view->trajectory().header().timestamp_sec();
+      current_timestamp - local_view.trajectory().header().timestamp_sec();
 
   if (trajectory_diff > (control_common_conf_.max_planning_miss_num() *
                          control_common_conf_.trajectory_period())) {
