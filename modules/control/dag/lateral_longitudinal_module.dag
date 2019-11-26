@@ -48,7 +48,7 @@ module_config {
                     channel:"/apollo/control/preprocessor"
                 },
                 {
-                    channel:"/apollo/control/precommand"
+                    channel:"/apollo/control/controlcore"
                 }
             ]
         }
