@@ -19,19 +19,18 @@
 """
 This is a bunch of classes to manage cyber record channel extractor.
 """
+import cv2
+import numpy as np
 import os
+import pypcd
 import sys
 import struct
-import numpy as np
-
-import cv2
-import pypcd
 
 from modules.drivers.proto import sensor_image_pb2
 from modules.drivers.proto import pointcloud_pb2
 from modules.localization.proto import gps_pb2
 
-from data_file_object import *
+from data_file_object import TimestampFileObject, OdometryFileObject
 
 class SensorMessageParser(object):
     """Wrapper for cyber channel message extractor"""
@@ -49,7 +48,7 @@ class SensorMessageParser(object):
         self._init_parser()
         self._parsed_data = None
         self._output_path = output_path
-        self._timestamp_file = os.path.join(self._output_path, "timestamps.txt")
+        self._timestamp_file = os.path.join(self._output_path, "timestamps")
         self._instance_saving = instance_saving
 
     #initializing msg and proto parser
@@ -84,8 +83,7 @@ class GpsParser(SensorMessageParser):
         super(GpsParser, self).__init__(output_path, instance_saving)
         if not self._instance_saving:
             self._parsed_data = []
-            self._odomotry_output_file =\
-             os.path.join(self._output_path, "Odometry.bin")
+            self._odomotry_output_file = os.path.join(self._output_path, "odometry")
 
     def _init_parser(self):
         self._msg_parser = gps_pb2.Gps()
@@ -99,7 +97,7 @@ class GpsParser(SensorMessageParser):
         ts = gps.header.timestamp_sec
         self._timestamps.append(ts)
 
-        point_type = 0
+        point_type = 56
         qw = gps.localization.orientation.qw
         qx = gps.localization.orientation.qx
         qy = gps.localization.orientation.qy
@@ -191,7 +189,7 @@ class PointCloudParser(SensorMessageParser):
         self._parsed_data = self.make_xyzit_point_cloud(pointcloud.point)
 
         if self._instance_saving:
-            file_name = "%06d.pcd" % self.get_msg_count()
+            file_name = "%05d.pcd" % self.get_msg_count()
             output_file = os.path.join(self._output_path, file_name)
             self.save_pointcloud_meta_to_file(pc_meta=self._parsed_data, pcd_file=output_file)
         else:
@@ -244,7 +242,7 @@ class ImageParser(SensorMessageParser):
             (image.height, image.width, channel_num))
 
         if self._instance_saving:
-            file_name = "%06d.png" % self.get_msg_count()
+            file_name = "%05d.png" % self.get_msg_count()
             output_file = os.path.join(self._output_path, file_name)
             self.save_image_mat_to_file(image_file=output_file)
         else:
