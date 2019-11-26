@@ -27,14 +27,13 @@ TEST(TimeTest, MockTime) {
   EXPECT_EQ(Clock::SYSTEM, Clock::mode());
   Clock::SetMode(Clock::MOCK);
   EXPECT_EQ(Clock::MOCK, Clock::mode());
-
   EXPECT_EQ(0, absl::ToUnixMicros(Clock::Now()));
-  Clock::SetNow(absl::FromUnixMicros(123));
 
-  EXPECT_EQ(123, absl::ToUnixMicros(Clock::Now()));
+  Clock::SetNow(absl::FromUnixNanos(1));
+  EXPECT_EQ(1, absl::ToUnixNanos(Clock::Now()));
 
   Clock::SetNowInSeconds(123.456);
-  EXPECT_EQ(123.456, Clock::NowInSeconds());
+  EXPECT_DOUBLE_EQ(123.456, Clock::NowInSeconds());
 }
 
 }  // namespace time
