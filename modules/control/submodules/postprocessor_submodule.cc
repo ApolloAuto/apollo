@@ -48,44 +48,45 @@ bool PostprocessorSubmodule::Init() {
 
 bool PostprocessorSubmodule::Proc(
     const std::shared_ptr<Preprocessor>& preprocessor_status,
-    const std::shared_ptr<ControlCommand>& control_command) {
-  ControlCommand post_processor;
+    const std::shared_ptr<ControlCommand>& control_core_command) {
+  ControlCommand control_command;
   if (preprocessor_status->received_pad_msg()) {
-    post_processor.mutable_pad_msg()->CopyFrom(
+    control_command.mutable_pad_msg()->CopyFrom(
         preprocessor_status->mutable_local_view()->pad_msg());
   }
 
   // forward estop reason among following control frames.
+  // TODO(SJiang: remove preprocessor_status)
   if (preprocessor_status->estop()) {
     AWARN_EVERY(100) << "Estop triggered! No control core method executed!";
-    post_processor.mutable_header()->mutable_status()->set_msg(
+    control_command.mutable_header()->mutable_status()->set_msg(
         preprocessor_status->estop_reason());
-    post_processor.set_speed(0);
-    post_processor.set_throttle(0);
-    post_processor.set_brake(control_common_conf_.soft_estop_brake());
-    post_processor.set_gear_location(Chassis::GEAR_DRIVE);
+    control_command.set_speed(0);
+    control_command.set_throttle(0);
+    control_command.set_brake(control_common_conf_.soft_estop_brake());
+    control_command.set_gear_location(Chassis::GEAR_DRIVE);
   } else {
     // set control command
-    post_processor.set_brake(control_command->brake());
-    post_processor.set_throttle(control_command->throttle());
-    post_processor.set_steering_target(control_command->steering_target());
-    post_processor.set_steering_rate(control_command->steering_rate());
-    post_processor.set_gear_location(control_command->gear_location());
-    post_processor.set_acceleration(control_command->acceleration());
+    control_command.set_brake(control_core_command->brake());
+    control_command.set_throttle(control_core_command->throttle());
+    control_command.set_steering_target(
+        control_core_command->steering_target());
+    control_command.set_steering_rate(control_core_command->steering_rate());
+    control_command.set_gear_location(control_core_command->gear_location());
+    control_command.set_acceleration(control_core_command->acceleration());
   }
 
   // set header
-  LocalView local_view = preprocessor_status->local_view();
-  post_processor.mutable_header()->set_lidar_timestamp(
-      local_view.mutable_trajectory()->header().lidar_timestamp());
-  post_processor.mutable_header()->set_camera_timestamp(
-      local_view.mutable_trajectory()->header().camera_timestamp());
-  post_processor.mutable_header()->set_radar_timestamp(
-      local_view.mutable_trajectory()->header().radar_timestamp());
+  control_command.mutable_header()->set_lidar_timestamp(
+      control_core_command->header().lidar_timestamp());
+  control_command.mutable_header()->set_camera_timestamp(
+      control_core_command->header().camera_timestamp());
+  control_command.mutable_header()->set_radar_timestamp(
+      control_core_command->header().radar_timestamp());
 
-  common::util::FillHeader(Name(), &post_processor);
+  common::util::FillHeader(Name(), &control_command);
 
-  postprocessor_writer_->Write(post_processor);
+  postprocessor_writer_->Write(control_command);
 
   // TODO(SHU): add debug info; add latency time
   return true;

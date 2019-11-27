@@ -76,9 +76,9 @@ bool MPCControllerSubmodule::Proc(
   control_core_command.mutable_header()->set_lidar_timestamp(
       preprocessor_status->header().lidar_timestamp());
   control_core_command.mutable_header()->set_camera_timestamp(
-      preprocessor_status->trajectory().header().camera_timestamp());
+      preprocessor_status->header().camera_timestamp());
   control_core_command.mutable_header()->set_radar_timestamp(
-      preprocessor_status->trajectory().header().radar_timestamp());
+      preprocessor_status->header().radar_timestamp());
   common::util::FillHeader(Name(), &control_core_command);
   control_core_writer_->Write(control_core_command);
   return status.ok();
