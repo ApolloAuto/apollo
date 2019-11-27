@@ -19,7 +19,6 @@
 #include "gflags/gflags.h"
 
 DECLARE_bool(planning_test_mode);
-DECLARE_double(test_duration);
 
 DECLARE_string(planning_config_file);
 
@@ -56,7 +55,6 @@ DECLARE_bool(enable_force_pull_over_open_space_parking_test);
 
 DECLARE_string(traffic_rule_config_filename);
 DECLARE_string(smoother_config_filename);
-DECLARE_string(reopt_smoother_config_filename);
 DECLARE_int32(planning_loop_rate);
 DECLARE_string(rtk_trajectory_filename);
 DECLARE_uint64(rtk_trajectory_forward);
@@ -72,11 +70,7 @@ DECLARE_bool(reckless_change_lane);
 DECLARE_double(change_lane_fail_freeze_time);
 DECLARE_double(change_lane_success_freeze_time);
 DECLARE_double(change_lane_min_length);
-DECLARE_bool(enable_change_lane_decider);
-DECLARE_double(change_lane_speed_relax_percentage);
 
-DECLARE_double(max_collision_distance);
-DECLARE_bool(ignore_overlapped_obstacle);
 DECLARE_bool(publish_estop);
 DECLARE_bool(enable_trajectory_stitcher);
 
@@ -106,12 +100,9 @@ DECLARE_double(longitudinal_acceleration_upper_bound);
 
 DECLARE_double(longitudinal_jerk_lower_bound);
 DECLARE_double(longitudinal_jerk_upper_bound);
-DECLARE_double(longitudinal_jerk_bound);
 DECLARE_double(lateral_jerk_bound);
 
-DECLARE_double(dl_bound);
 DECLARE_double(kappa_bound);
-DECLARE_double(dkappa_bound);
 
 // STBoundary
 DECLARE_double(st_max_s);
@@ -130,13 +121,9 @@ DECLARE_double(max_stop_distance_obstacle);
 DECLARE_double(follow_min_distance);
 DECLARE_double(follow_min_obs_lateral_distance);
 DECLARE_double(yield_distance);
-DECLARE_double(yield_distance_pedestrian_bicycle);
 DECLARE_double(follow_time_buffer);
 DECLARE_double(follow_min_time_sec);
-DECLARE_double(stop_line_stop_distance);
-DECLARE_double(signal_light_min_pass_s_distance);
 DECLARE_double(signal_expire_time_sec);
-DECLARE_bool(enable_side_radar);
 
 // Path Deciders
 DECLARE_bool(enable_skip_path_tasks);
@@ -156,12 +143,7 @@ DECLARE_double(virtual_stop_wall_height);
 
 DECLARE_double(prediction_total_time);
 DECLARE_bool(align_prediction_time);
-DECLARE_bool(enable_lag_prediction);
-DECLARE_int32(lag_prediction_min_appear_num);
-DECLARE_double(lag_prediction_max_disappear_num);
 DECLARE_int32(trajectory_point_num_for_debug);
-DECLARE_double(lag_prediction_protection_distance);
-DECLARE_double(perception_confidence_threshold);
 DECLARE_double(lane_change_prepare_length);
 DECLARE_double(min_lane_change_prepare_length);
 DECLARE_double(allowed_lane_change_failure_time);
@@ -171,19 +153,16 @@ DECLARE_double(turn_signal_distance);
 
 // QpSt optimizer
 DECLARE_double(slowdown_profile_deceleration);
-DECLARE_bool(enable_follow_accel_constraint);
 
 DECLARE_bool(enable_sqp_solver);
 
 /// thread pool
-DECLARE_uint64(max_planning_thread_pool_size);
 DECLARE_bool(use_multi_thread_to_add_obstacles);
 DECLARE_bool(enable_multi_thread_in_dp_st_graph);
 
 DECLARE_double(numerical_epsilon);
 DECLARE_double(default_cruise_speed);
 
-DECLARE_bool(enable_auto_tuning);
 DECLARE_double(trajectory_time_resolution);
 DECLARE_double(trajectory_space_resolution);
 DECLARE_double(lateral_acceleration_bound);
@@ -234,14 +213,10 @@ DECLARE_double(nudge_buffer);
 DECLARE_bool(use_planning_fallback);
 DECLARE_double(fallback_total_time);
 DECLARE_double(fallback_time_unit);
-DECLARE_double(fallback_distance_buffer);
-DECLARE_double(polynomial_speed_fallback_velocity);
 
 DECLARE_double(speed_bump_speed_limit);
 
 // navigation mode
-DECLARE_double(navigation_fallback_cruise_time);
-
 DECLARE_bool(enable_planning_pad_msg);
 
 // open space planner
@@ -277,10 +252,7 @@ DECLARE_double(side_pass_driving_width_l_buffer);
 
 DECLARE_bool(enable_parallel_hybrid_a);
 
-DECLARE_double(vehicle_low_speed_threshold);
 DECLARE_double(open_space_standstill_acceleration);
-
-DECLARE_bool(enable_cuda);
 
 DECLARE_bool(enable_dp_reference_speed);
 

@@ -20,10 +20,6 @@
 
 DEFINE_bool(planning_test_mode, false, "Enable planning test mode.");
 
-DEFINE_double(test_duration, -1.0,
-              "The runtime duration in test mode. There is no runtime limit if "
-              "the value is not positive");
-
 DEFINE_int32(planning_loop_rate, 10, "Loop rate for planning node");
 
 DEFINE_int32(history_max_record_num, 5,
@@ -123,10 +119,6 @@ DEFINE_string(smoother_config_filename,
               "/apollo/modules/planning/conf/qp_spline_smoother_config.pb.txt",
               "The configuration file for qp_spline smoother");
 
-DEFINE_string(reopt_smoother_config_filename,
-              "/apollo/modules/planning/conf/qp_spline_smoother_config.pb.txt",
-              "The configuration file for qp_spline smoother");
-
 DEFINE_string(rtk_trajectory_filename, "modules/planning/data/garage.csv",
               "Loop rate for planning node");
 
@@ -167,18 +159,6 @@ DEFINE_double(change_lane_success_freeze_time, 1.5,
 DEFINE_double(change_lane_min_length, 30.0,
               "meters. If the change lane target has longer length than this "
               "threshold, it can shortcut the default lane.");
-DEFINE_bool(enable_change_lane_decider, false,
-            "True to use change lane state machine decider.");
-DEFINE_double(change_lane_speed_relax_percentage, 0.05,
-              "The percentage of change lane speed relaxation.");
-
-DEFINE_double(max_collision_distance, 0.1,
-              "considered as collision if distance (meters) is smaller than or "
-              "equal to this (meters)");
-
-DEFINE_bool(ignore_overlapped_obstacle, false,
-            "ignore obstacle that overlapps with ADC. Only enable this flag "
-            "when you found fake obstacle result from poorly lidar");
 
 DEFINE_double(replan_lateral_distance_threshold, 0.5,
               "The lateral distance threshold of replan");
@@ -228,16 +208,10 @@ DEFINE_double(longitudinal_jerk_lower_bound, -4.0,
               "The lower bound of longitudinal jerk.");
 DEFINE_double(longitudinal_jerk_upper_bound, 2.0,
               "The upper bound of longitudinal jerk.");
-DEFINE_double(longitudinal_jerk_bound, 4.0,
-              "Bound of longitudinal jerk; symmetric for front and back");
 DEFINE_double(lateral_jerk_bound, 4.0,
               "Bound of lateral jerk; symmetric for left and right");
 
-DEFINE_double(dl_bound, 0.10,
-              "The bound for derivative l in s-l coordinate system.");
 DEFINE_double(kappa_bound, 0.1979, "The bound for trajectory curvature");
-DEFINE_double(dkappa_bound, 0.02,
-              "The bound for trajectory curvature change rate");
 
 // ST Boundary
 DEFINE_double(st_max_s, 100, "the maximum s of st boundary");
@@ -250,8 +224,6 @@ DEFINE_bool(enable_nudge_slowdown, true,
 DEFINE_bool(enable_always_stop_for_pedestrian, true,
             "True to always STOP for pedestrian when path cross");
 
-DEFINE_bool(enable_side_radar, false,
-            "If there is no radar on the side,ignore it");
 DEFINE_double(static_obstacle_nudge_l_buffer, 0.3,
               "minimum l-distance to nudge a static obstacle (meters)");
 DEFINE_double(nonstatic_obstacle_nudge_l_buffer, 0.4,
@@ -272,18 +244,12 @@ DEFINE_double(follow_min_obs_lateral_distance, 2.5,
 DEFINE_double(yield_distance, 5.0,
               "min yield distance for vehicles/moving objects "
               "other than pedestrians/bicycles");
-DEFINE_double(yield_distance_pedestrian_bicycle, 5.0,
-              "min yield distance for pedestrians/bicycles");
 DEFINE_double(follow_time_buffer, 2.5,
               "time buffer in second to calculate the following distance.");
 DEFINE_double(follow_min_time_sec, 2.0,
               "min follow time in st region before considering a valid follow,"
               " this is to differentiate a moving obstacle cross adc's"
               " current lane and move to a different direction");
-DEFINE_double(stop_line_stop_distance, 1.0, "stop distance from stop line");
-DEFINE_double(signal_light_min_pass_s_distance, 4.0,
-              "min s_distance for adc to be considered "
-              "have passed signal_light (stop_line_end_s)");
 DEFINE_double(signal_expire_time_sec, 5.0,
               "traffic light signal info read expire time in sec");
 DEFINE_string(destination_obstacle_id, "DEST",
@@ -338,21 +304,6 @@ DEFINE_string(planning_config_file,
 DEFINE_int32(trajectory_point_num_for_debug, 10,
              "number of output trajectory points for debugging");
 
-DEFINE_bool(enable_lag_prediction, true,
-            "Enable lagged prediction, which is more tolerant to obstacles "
-            "that appear and disappear quickly");
-DEFINE_int32(lag_prediction_min_appear_num, 5,
-             "The minimum of appearance of the obstacle for lagged prediction");
-DEFINE_double(lag_prediction_max_disappear_num, 3,
-              "In lagged prediction, ignore obstacle disappeared for more "
-              "than this value");
-DEFINE_double(lag_prediction_protection_distance, 30,
-              "Within this distance, we do not use lagged prediction");
-
-DEFINE_double(perception_confidence_threshold, 0.4,
-              "Skip the obstacle if its confidence is lower than "
-              "this threshold.");
-
 DEFINE_double(lane_change_prepare_length, 80.0,
               "The distance of lane-change preparation on current lane.");
 
@@ -369,15 +320,11 @@ DEFINE_bool(enable_smarter_lane_change, false,
 // QpSt optimizer
 DEFINE_double(slowdown_profile_deceleration, -4.0,
               "The deceleration to generate slowdown profile. unit: m/s^2.");
-DEFINE_bool(enable_follow_accel_constraint, true,
-            "Enable follow acceleration constraint.");
 
 // SQP solver
 DEFINE_bool(enable_sqp_solver, true, "True to enable SQP solver.");
 
 /// thread pool
-DEFINE_uint64(max_planning_thread_pool_size, 15,
-              "num of thread used in planning thread pool.");
 DEFINE_bool(use_multi_thread_to_add_obstacles, false,
             "use multiple thread to add obstacles.");
 DEFINE_bool(enable_multi_thread_in_dp_st_graph, false,
@@ -386,7 +333,6 @@ DEFINE_bool(enable_multi_thread_in_dp_st_graph, false,
 /// Lattice Planner
 DEFINE_double(numerical_epsilon, 1e-6, "Epsilon in lattice planner.");
 DEFINE_double(default_cruise_speed, 5.0, "default cruise speed");
-DEFINE_bool(enable_auto_tuning, false, "enable auto tuning data emission");
 DEFINE_double(trajectory_time_resolution, 0.1,
               "Trajectory time resolution in planning");
 DEFINE_double(trajectory_space_resolution, 1.0,
@@ -476,20 +422,12 @@ DEFINE_bool(use_planning_fallback, true,
 DEFINE_double(fallback_total_time, 3.0, "total fallback trajectory time");
 DEFINE_double(fallback_time_unit, 0.1,
               "fallback trajectory unit time in seconds");
-DEFINE_double(
-    fallback_distance_buffer, 0.5,
-    "fallback distance to end buffer when doing fixed distance speed fallback");
-DEFINE_double(polynomial_speed_fallback_velocity, 3.5,
-              "velocity to use polynomial speed fallback.");
 
 DEFINE_double(speed_bump_speed_limit, 4.4704,
               "the speed limit when passing a speed bump, m/s. The default "
               "speed limit is 10 mph.");
 
 // navigation mode
-DEFINE_double(navigation_fallback_cruise_time, 8.0,
-              "The time range of fallback cruise under navigation mode.");
-
 DEFINE_bool(enable_planning_pad_msg, false,
             "To control whether to enable planning pad message.");
 
@@ -568,12 +506,8 @@ DEFINE_double(smoother_stop_distance, 10.0,
 DEFINE_bool(enable_parallel_hybrid_a, false,
             "True to enable hybrid a* parallel implementation.");
 
-DEFINE_double(vehicle_low_speed_threshold, 1.0, "Vehicle low speed threshold.");
-
 DEFINE_double(open_space_standstill_acceleration, 0.0,
               "(unit: meter/sec^2) for open space stand still at destination");
-
-DEFINE_bool(enable_cuda, false, "True to enable cuda parallel implementation.");
 
 DEFINE_bool(enable_dp_reference_speed, true,
             "True to penalize dp result towards default cruise speed");
