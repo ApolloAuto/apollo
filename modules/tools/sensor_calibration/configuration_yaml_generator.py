@@ -1,4 +1,5 @@
 import os
+import shutil
 import yaml
 
 class ConfigYaml(object):
@@ -28,8 +29,44 @@ class ConfigYaml(object):
         in_data['odometry_file'] = os.path.join('.', gnss_folder_name,'odometry')
         return in_data
 
-    def _generate_camera_to_lidar_calibration_yaml(self):
-        raise ValueError("not implemented yet: camera_to_lidar calibration yaml file generator")
+    def _generate_camera_init_param_yaml(self, root_path, in_data):
+        init_param_folder = os.path.join(os.path.dirname(__file__), 'config/init_params')
+        out_param_folder = os.path.join(root_path, 'init_params')
+        if os.path.exists(out_param_folder):
+            print('folder: %s exists' % out_param_folder)
+        else:
+            print('create folder: %s' % out_param_folder)
+            os.makedirs(out_param_folder)
+        # copy sample intrinsic yaml file to correct location
+        # wait for user input about intrinsics
+        sample_intrinsic_yaml = os.path.join(init_param_folder, 'sample_intrinsics.yaml')
+        out_intrinsic_yaml = os.path.join(out_param_folder,
+                    in_data['source_sensor'] + '_intrinsics.yaml')
+        shutil.copyfile(sample_intrinsic_yaml, out_intrinsic_yaml)
+        # load extrinsics sample yaml, rename source sensor and destination sensor
+        sample_extrinsic_yaml = os.path.join(init_param_folder, 'sample_extrinsics.yaml')
+        extrinsic_data = self.load_sample_yaml_file(self._task_name,
+                    sample_file=sample_extrinsic_yaml)
+         # set up the source_sensor(camera name) to dest sensor(lidar name)
+        extrinsic_data['header']['frame_id'] = in_data['destination_sensor']
+        extrinsic_data['child_frame_id'] = in_data['source_sensor']
+        # dump the extrinsic yaml data
+        out_extrinsic_yaml = os.path.join(out_param_folder, in_data['source_sensor'] +\
+                '_' + in_data['destination_sensor'] + '_extrinsics.yaml')
+        try:
+            with  open(out_extrinsic_yaml, 'w') as f:
+                yaml.safe_dump(extrinsic_data, f)
+        except:
+            raise ValueError('cannot generate the task config yaml'
+                            'file at {}'.format(out_extrinsic_yaml))
+
+    def _generate_camera_to_lidar_calibration_yaml(self, in_data):
+        in_data['intrinsic'] = os.path.join('.', 'init_params',
+            in_data['source_sensor'] + '_intrinsics.yaml')
+        in_data['extrinsic'] = os.path.join('.', 'init_params',  in_data['source_sensor'] +\
+                '_' + in_data['destination_sensor'] + '_extrinsics.yaml')
+
+        return in_data
 
     def get_task_name(self):
         if self._task_name == 'unknown':
@@ -52,7 +89,12 @@ class ConfigYaml(object):
             out_data = self._generate_lidar_to_gnss_calibration_yaml(
                         out_data, source_folder, dest_folder)
         elif self._task_name == 'camera_to_lidar':
-            out_data = self._generate_camera_to_lidar_calibration_yaml()
+            if source_folder != dest_folder:
+                raise ValueError('camera frame and lidar frame should be in same folder')
+            out_root_path = os.path.dirname(out_config_file)
+            self._generate_camera_init_param_yaml(out_root_path, out_data)
+            out_data = self._generate_camera_to_lidar_calibration_yaml(out_data)
+
 
         print(out_data)
         try:
