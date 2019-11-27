@@ -218,7 +218,6 @@ DEFINE_double(st_max_s, 100, "the maximum s of st boundary");
 DEFINE_double(st_max_t, 8, "the maximum t of st boundary");
 
 // Decision Part
-DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
 DEFINE_bool(enable_nudge_slowdown, true,
             "True to slow down when nudge obstacles.");
 DEFINE_bool(enable_always_stop_for_pedestrian, true,
