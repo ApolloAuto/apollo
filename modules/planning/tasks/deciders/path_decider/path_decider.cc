@@ -181,7 +181,7 @@ bool PathDecider::MakeStaticObstacleDecision(
         path_decision->AddLongitudinalDecision("PathDecider/not-nearest-stop",
                                                obstacle->Id(), object_decision);
       }
-    } else if (FLAGS_enable_nudge_decision) {
+    } else {
       // 3. NUDGE if laterally very close.
       if (sl_boundary.end_l() < curr_l - min_nudge_l) {  // &&
         // sl_boundary.end_l() > curr_l - min_nudge_l - 0.3) {

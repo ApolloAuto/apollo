@@ -336,11 +336,6 @@ double NaviPathDecider::NudgeProcess(
     const common::VehicleState& vehicle_state) {
   double nudge_position_y = 0.0;
 
-  if (!FLAGS_enable_nudge_decision) {
-    nudge_position_y = path_data_points[0].y();
-    return nudge_position_y;
-  }
-
   // get nudge latteral position
   int lane_obstacles_num = 0;
   static constexpr double KNudgeEpsilon = 1e-6;
