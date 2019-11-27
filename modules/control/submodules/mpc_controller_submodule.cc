@@ -65,7 +65,7 @@ bool MPCControllerSubmodule::Proc(
 
   // skip produce control command when estop for MPC controller
   if (preprocessor_status->estop()) {
-    return true;
+    return false;
   }
 
   Status status = ProduceControlCoreCommand(preprocessor_status->local_view(),
@@ -76,7 +76,7 @@ bool MPCControllerSubmodule::Proc(
   common::util::FillHeader(Name(), &control_core_command);
 
   control_core_writer_->Write(control_core_command);
-  return true;
+  return status.ok();
 }
 
 Status MPCControllerSubmodule::ProduceControlCoreCommand(
