@@ -66,9 +66,6 @@ DECLARE_double(reference_line_stitch_overlap_distance);
 DECLARE_bool(enable_smooth_reference_line);
 
 DECLARE_bool(prioritize_change_lane);
-DECLARE_bool(reckless_change_lane);
-DECLARE_double(change_lane_fail_freeze_time);
-DECLARE_double(change_lane_success_freeze_time);
 DECLARE_double(change_lane_min_length);
 
 DECLARE_bool(publish_estop);
@@ -260,7 +257,3 @@ DECLARE_double(short_path_length_threshold);
 DECLARE_uint64(trajectory_stitching_preserved_length);
 
 DECLARE_bool(use_st_drivable_boundary);
-
-DECLARE_bool(enable_prioritize_change_lane);
-
-DECLARE_bool(enable_remove_change_lane);
