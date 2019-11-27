@@ -147,15 +147,6 @@ DEFINE_bool(enable_smooth_reference_line, true,
 DEFINE_bool(prioritize_change_lane, false,
             "change lane strategy has higher priority, always use a valid "
             "change lane path if such path exists");
-DEFINE_bool(reckless_change_lane, false,
-            "Always allow the vehicle change lane. The vehicle may continue "
-            "changing lane. This is mainly test purpose");
-DEFINE_double(change_lane_fail_freeze_time, 1.0,
-              "seconds. Not allowed to change lane this amount of time "
-              "if it just failed to change lane");
-DEFINE_double(change_lane_success_freeze_time, 1.5,
-              "seconds. Not allowed to change lane this amount of time "
-              "if it just finished change lane");
 DEFINE_double(change_lane_min_length, 30.0,
               "meters. If the change lane target has longer length than this "
               "threshold, it can shortcut the default lane.");
@@ -521,9 +512,3 @@ DEFINE_double(side_pass_driving_width_l_buffer, 0.1,
 
 DEFINE_bool(use_st_drivable_boundary, false,
             "True to use st_drivable boundary in speed planning");
-
-DEFINE_bool(enable_prioritize_change_lane, false,
-            "True to enable prioritize change_lane reference line");
-
-DEFINE_bool(enable_remove_change_lane, false,
-            "True to enable remove change_lane reference line");
