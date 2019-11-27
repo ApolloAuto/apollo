@@ -110,7 +110,6 @@ DECLARE_double(st_max_t);
 
 // Decision Part
 DECLARE_bool(enable_nudge_slowdown);
-DECLARE_bool(enable_always_stop_for_pedestrian);
 DECLARE_double(static_obstacle_nudge_l_buffer);
 DECLARE_double(nonstatic_obstacle_nudge_l_buffer);
 DECLARE_double(lane_change_obstacle_nudge_l_buffer);
