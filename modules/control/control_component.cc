@@ -318,11 +318,17 @@ bool ControlComponent::Proc() {
     if (pad_msg != nullptr) {
       local_view_.mutable_pad_msg()->CopyFrom(pad_msg_);
     }
-    common::util::FillHeader(FLAGS_control_local_view_topic, &local_view_);
   }
 
   // use control submodules
   if (FLAGS_use_control_submodules) {
+    local_view_.mutable_header()->set_lidar_timestamp(
+        local_view_.trajectory().header().lidar_timestamp());
+    local_view_.mutable_header()->set_camera_timestamp(
+        local_view_.trajectory().header().camera_timestamp());
+    local_view_.mutable_header()->set_radar_timestamp(
+        local_view_.trajectory().header().radar_timestamp());
+    common::util::FillHeader(FLAGS_control_local_view_topic, &local_view_);
     local_view_writer_->Write(std::make_shared<LocalView>(local_view_));
     return true;
   }
