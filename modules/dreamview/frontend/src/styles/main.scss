@@ -719,6 +719,8 @@ body {
             font-weight: lighter;
             font-size: 35px;
             color: #ffffff;
+
+            cursor: pointer;
         }
 
         .speed-unit {
@@ -728,6 +730,8 @@ body {
 
             color: #ffffff;
             font-size: 15px;
+
+            cursor: pointer;
         }
 
         .brake-panel {
@@ -816,7 +820,7 @@ body {
             height: 0px;
             border-style: solid;
             border-width: 12px 15px 12px 0px;
-            border-color: transparent;
+            border-color: transparent #30435e transparent transparent;
         }
 
         .right-arrow {
@@ -826,8 +830,30 @@ body {
             width: 0px;
             height: 0px;
             border-style: solid;
-            border-width: 12px 0 12px 15px;
+            border-width: 12px 0px 12px 15px;
             border-color: transparent transparent transparent #30435e;
+        }
+
+        @mixin blink($name, $property) {
+            animation: $name 0.5s linear infinite alternate;
+            animation-play-state: running;
+
+            @keyframes #{$name} {
+                from {
+                    #{$property}: #006AFF;
+                }
+                to {
+                    #{$property}: #30435E;
+                }
+            }
+        }
+
+        .blink-left {
+            @include blink(left, 'border-right-color');
+        }
+
+        .blink-right {
+            @include blink(right, 'border-left-color');
         }
 
         .wheel {
