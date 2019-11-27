@@ -107,7 +107,7 @@ float GetCPUUsage(const int pid, const std::string& process_name,
   if (prev_jiffies == 0) {
     return 0.0;
   }
-  return 100f * (static_cast<float>(jiffies - prev_jiffies) / hertz /
+  return 100.0f * (static_cast<float>(jiffies - prev_jiffies) / hertz /
                   FLAGS_resource_monitor_interval);
 }
 
