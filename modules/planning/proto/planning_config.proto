@@ -197,27 +197,26 @@ message ScenarioYieldSignConfig {
 message ScenarioConfig {
   enum ScenarioType {
     LANE_FOLLOW = 0;  // default scenario
-    CHANGE_LANE = 1;
 
     // intersection involved
-    BARE_INTERSECTION_UNPROTECTED = 3;
-    STOP_SIGN_PROTECTED = 4;
-    STOP_SIGN_UNPROTECTED = 5;
-    TRAFFIC_LIGHT_PROTECTED = 6;
-    TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN = 7;
-    TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN = 8;
-    YIELD_SIGN = 9;
+    BARE_INTERSECTION_UNPROTECTED = 2;
+    STOP_SIGN_PROTECTED = 3;
+    STOP_SIGN_UNPROTECTED = 4;
+    TRAFFIC_LIGHT_PROTECTED = 5;
+    TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN = 6;
+    TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN = 7;
+    YIELD_SIGN = 8;
 
     // parking
-    PULL_OVER = 10;
-    VALET_PARKING = 11;
+    PULL_OVER = 9;
+    VALET_PARKING = 10;
 
-    EMERGENCY_PULL_OVER = 12;
-    EMERGENCY_STOP = 13;
+    EMERGENCY_PULL_OVER = 11;
+    EMERGENCY_STOP = 12;
 
     // misc
-    NARROW_STREET_U_TURN = 14;
-    PARK_AND_GO = 15;
+    NARROW_STREET_U_TURN = 13;
+    PARK_AND_GO = 14;
   }
 
   // StageType is a superset of stages from all scenarios.
