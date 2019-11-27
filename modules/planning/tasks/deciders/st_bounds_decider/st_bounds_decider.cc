@@ -55,7 +55,7 @@ Status STBoundsDecider::Process(Frame* const frame,
   // Sweep the t-axis, and determine the s-boundaries step by step.
   STBound regular_st_bound;
   STBound regular_vt_bound;
-  Status ret = GenerateFallbackSTBound(&regular_st_bound, &regular_vt_bound);
+  Status ret = GenerateRegularSTBound(&regular_st_bound, &regular_vt_bound);
   if (!ret.ok()) {
     ADEBUG << "Cannot generate a regular ST-boundary.";
     return Status(ErrorCode::PLANNING_ERROR, ret.error_message());
