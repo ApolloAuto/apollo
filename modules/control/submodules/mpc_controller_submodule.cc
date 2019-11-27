@@ -42,12 +42,9 @@ std::string MPCControllerSubmodule::Name() const {
 
 bool MPCControllerSubmodule::Init() {
   // TODO(SHU): separate common_control conf from controller conf
-  if (!cyber::common::GetProtoFromFile(FLAGS_mpc_controller_conf_file,
-                                       &mpc_controller_conf_)) {
-    AERROR << "Unable to load control conf file: " +
-                  FLAGS_mpc_controller_conf_file;
-    return false;
-  }
+  CHECK(cyber::common::GetProtoFromFile(FLAGS_mpc_controller_conf_file,
+                                        &mpc_controller_conf_))
+      << "Unable to load control conf file: " << FLAGS_mpc_controller_conf_file;
 
   if (!mpc_controller_.Init(&mpc_controller_conf_).ok()) {
     monitor_logger_buffer_.ERROR(
@@ -57,6 +54,7 @@ bool MPCControllerSubmodule::Init() {
 
   control_core_writer_ =
       node_->CreateWriter<ControlCommand>(FLAGS_control_core_command_topic);
+  CHECK(control_core_writer_ != nullptr);
   return true;
 }
 

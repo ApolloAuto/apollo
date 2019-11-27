@@ -35,12 +35,11 @@ std::string PostprocessorSubmodule::Name() const {
 }
 
 bool PostprocessorSubmodule::Init() {
-  if (!cyber::common::GetProtoFromFile(FLAGS_control_common_conf_file,
-                                       &control_common_conf_)) {
-    AERROR << "Unable to load control common conf file: "
-           << FLAGS_control_common_conf_file;
-    return false;
-  }
+  CHECK(cyber::common::GetProtoFromFile(FLAGS_control_common_conf_file,
+                                        &control_common_conf_))
+      << "Unable to load control common conf file: "
+      << FLAGS_control_common_conf_file;
+
   postprocessor_writer_ =
       node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
   CHECK(postprocessor_writer_ != nullptr);
