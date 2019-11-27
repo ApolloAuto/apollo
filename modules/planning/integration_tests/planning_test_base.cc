@@ -163,9 +163,6 @@ void PlanningTestBase::SetUp() {
 
   CHECK(planning_->Init(config_).ok()) << "Failed to init planning module";
 
-  // Do not use fallback trajectory during testing
-  FLAGS_use_planning_fallback = false;
-
   if (!FLAGS_test_previous_planning_file.empty()) {
     const auto prev_planning_file =
         FLAGS_test_data_dir + "/" + FLAGS_test_previous_planning_file;
