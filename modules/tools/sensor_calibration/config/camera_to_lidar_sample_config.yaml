@@ -1,0 +1,13 @@
+# calibration from camera to lidar.
+calibration_task: "camera_to_lidar"
+source_sensor: camera_head_left
+destination_sensor: velodyne64
+# beam number of the lidar sensor. For example, Velodyne-128 has 128 beams, Velodyne-16 has 16 beams
+beams: 64 # will change to velodyne lidar model later
+# relative path of camera intrinsic and initial extrinsic YAML files.
+intrinsic: "./init_params/camera_head_left_intrinsics.yaml"
+extrinsic: "./init_params/camera_head_left_to_velodyne64_extrinsics.yaml"
+# relative path of camera-lidar data pair for calibrations.
+data_path: "./camera-lidar-pairs"
+
+#save result params:

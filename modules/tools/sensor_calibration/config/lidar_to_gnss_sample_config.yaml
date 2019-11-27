@@ -10,12 +10,13 @@ odometry_file: "./_sensor_novatel_Odometry/odometry"
 sensor_files_directory: "./_sensor_velodyne64_VelodyneScan/"
 #initial calibration paramters, including translation and raotation, to project a point in source
 #source_sensor coordinate to destination_sensor coordinate. translation is in meter. rotation is in quaternion
-translation:
-       x: 0.0
-       y: 0.0
-       z: 0.0
-rotation:
-       x: 0.0
-       y: 0.0
-       z: 0.7071
-       w: 0.7071
+transform:
+  translation:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  rotation:
+    x: 0.0
+    y: 0.0
+    z: 0.7071
+    w: 0.7071
