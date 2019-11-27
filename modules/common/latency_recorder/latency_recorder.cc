@@ -27,7 +27,7 @@ namespace {
 using apollo::cyber::Time;
 
 uint64_t ToNanoSeconds(const double seconds) {
-  static constexpr uint64_t kNanoSecondsFactor = 1000000000UL;
+  static constexpr double kNanoSecondsFactor = 1e9;
   return static_cast<uint64_t>(kNanoSecondsFactor * seconds);
 }
 
