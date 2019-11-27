@@ -81,6 +81,12 @@ bool PreprocessorSubmodule::Proc(const std::shared_ptr<LocalView> &local_view) {
     control_preprocessor.set_received_pad_msg(true);
   }
 
+  control_preprocessor.mutable_header()->set_lidar_timestamp(
+      local_view->header().lidar_timestamp());
+  control_preprocessor.mutable_header()->set_camera_timestamp(
+      local_view->trajectory().header().camera_timestamp());
+  control_preprocessor.mutable_header()->set_radar_timestamp(
+      local_view->trajectory().header().radar_timestamp());
   common::util::FillHeader(Name(), &control_preprocessor);
   preprocessor_writer_->Write(control_preprocessor);
   ADEBUG << "Preprocessor finished.";
