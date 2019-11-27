@@ -32,11 +32,14 @@
 DEFINE_string(latency_monitor_name, "LatencyMonitor",
               "Name of the latency monitor.");
 
-DEFINE_double(latency_monitor_interval, 2.0,
+DEFINE_double(latency_monitor_interval, 1.5,
               "Latency report interval in seconds.");
 
-DEFINE_double(latency_report_interval, 10.0,
+DEFINE_double(latency_report_interval, 15.0,
               "Latency report interval in seconds.");
+
+DEFINE_int32(latency_reader_capacity, 30,
+             "The max message numbers in latency reader queue.");
 
 namespace apollo {
 namespace monitor {
@@ -167,17 +170,29 @@ void LatencyMonitor::RunOnce(const double current_time) {
   static auto reader =
       MonitorManager::Instance()->CreateReader<LatencyRecordMap>(
           FLAGS_latency_recording_topic);
+  reader->SetHistoryDepth(FLAGS_latency_reader_capacity);
   reader->Observe();
-  const auto records = reader->GetLatestObserved();
-  if (records == nullptr || records->latency_records().empty()) {
-    return;
-  }
 
-  UpdateLatencyStat(records);
+  static std::string last_processed_key;
+  std::string first_key_of_current_round;
+  for (auto it = reader->Begin(); it != reader->End(); ++it) {
+    const std::string current_key =
+        absl::StrCat((*it)->module_name(), (*it)->header().sequence_num());
+    if (it == reader->Begin()) {
+      first_key_of_current_round = current_key;
+    }
+    if (current_key == last_processed_key) {
+      break;
+    }
+    UpdateLatencyStat(*it);
+  }
+  last_processed_key = first_key_of_current_round;
 
   if (current_time - flush_time_ > FLAGS_latency_report_interval) {
     flush_time_ = current_time;
-    PublishLatencyReport();
+    if (!track_map_.empty()) {
+      PublishLatencyReport();
+    }
   }
 }
 
