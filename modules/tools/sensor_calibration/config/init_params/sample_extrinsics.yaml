@@ -1,0 +1,17 @@
+header:
+  frame_id: velodyne64
+  stamp:
+    nsecs: 0
+    secs: 0
+  seq: 0
+child_frame_id: camera_head_left
+transform:
+  rotation:
+    x: -0.5
+    y: 0.5
+    z: -0.5
+    w: 0.5
+  translation:
+    x: 0
+    y: 0
+    z: 0
