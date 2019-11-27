@@ -220,8 +220,6 @@ DEFINE_double(st_max_t, 8, "the maximum t of st boundary");
 // Decision Part
 DEFINE_bool(enable_nudge_slowdown, true,
             "True to slow down when nudge obstacles.");
-DEFINE_bool(enable_always_stop_for_pedestrian, true,
-            "True to always STOP for pedestrian when path cross");
 
 DEFINE_double(static_obstacle_nudge_l_buffer, 0.3,
               "minimum l-distance to nudge a static obstacle (meters)");
