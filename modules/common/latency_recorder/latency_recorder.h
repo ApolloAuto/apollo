@@ -45,7 +45,7 @@ class LatencyRecorder {
   std::mutex mutex_;
   std::unique_ptr<LatencyRecordMap> records_ = nullptr;
   uint64_t current_timestamp_ = 0;
-  const double publish_interval_ = 5.0;
+  const double publish_interval_ = 3.0;
   std::shared_ptr<apollo::cyber::Node> node_ = nullptr;
 };
 
