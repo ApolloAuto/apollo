@@ -102,23 +102,16 @@ bool KVDB::Delete(absl::string_view key) {
       absl::StrCat("DELETE FROM key_value WHERE key='", key, "';"));
 }
 
-bool KVDB::Has(absl::string_view key) {
+absl::optional<std::string> KVDB::Get(absl::string_view key) {
   SqliteWraper sqlite;
   std::string value;
   const bool ret = sqlite.SQL(
       absl::StrCat("SELECT value FROM key_value WHERE key='", key, "';"),
       &value);
-  // Take empty field as non-exist.
-  return ret && !value.empty();
-}
-
-std::string KVDB::Get(absl::string_view key, absl::string_view default_value) {
-  SqliteWraper sqlite;
-  std::string value;
-  const bool ret = sqlite.SQL(
-      absl::StrCat("SELECT value FROM key_value WHERE key='", key, "';"),
-      &value);
-  return (ret && !value.empty()) ? value : std::string(default_value);
+  if (ret && !value.empty()) {
+    return value;
+  }
+  return {};
 }
 
 }  // namespace common

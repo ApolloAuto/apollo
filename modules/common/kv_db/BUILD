@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "kv_db",
-    srcs = [
-        "kv_db.cc",
-    ],
-    hdrs = [
-        "kv_db.h",
-    ],
+    srcs = ["kv_db.cc"],
+    hdrs = ["kv_db.h"],
     linkopts = [
         "-lsqlite3",
     ],
@@ -17,15 +13,14 @@ cc_library(
         "//cyber/common:log",
         "//external:gflags",
         "//modules/common/util",
+        "@com_google_absl//absl/types:optional",
     ],
 )
 
 cc_test(
     name = "kv_db_test",
     size = "small",
-    srcs = [
-        "kv_db_test.cc",
-    ],
+    srcs = ["kv_db_test.cc"],
     deps = [
         ":kv_db",
         "@gtest//:main",

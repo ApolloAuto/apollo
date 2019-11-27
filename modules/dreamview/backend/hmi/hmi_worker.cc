@@ -236,7 +236,8 @@ void HMIWorker::InitStatus() {
   //   2. CachedMode if it's stored in KV database.
   //   3. default_hmi_mode if it is available.
   //   4. Pick the first available mode.
-  const std::string cached_mode = KVDB::Get(FLAGS_current_mode_db_key);
+  const std::string cached_mode =
+      KVDB::Get(FLAGS_current_mode_db_key).value_or("");
   if (FLAGS_use_navigation_mode && ContainsKey(modes, kNavigationModeName)) {
     ChangeMode(kNavigationModeName);
   } else if (ContainsKey(modes, cached_mode)) {
