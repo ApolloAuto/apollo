@@ -275,7 +275,7 @@ void LatencyMonitor::ValidateMaxLatency() {
 
       for (const auto& latency :
            latency_report_.latency_tracks().module_latency()) {
-        if (latency.module_name() == name &&
+        if (latency.module_name() == config.name() &&
             latency.module_stat().aver_duration() >
                 config.max_latency_allowed()) {
           // send out alert
@@ -283,7 +283,7 @@ void LatencyMonitor::ValidateMaxLatency() {
               ComponentStatus::WARN,
               absl::StrCat(config.name(), " has average latency ",
                            latency.module_stat().aver_duration(),
-                           "bigger than ", config.max_latency_allowed()),
+                           " > ", config.max_latency_allowed()),
               status);
         }
       }
