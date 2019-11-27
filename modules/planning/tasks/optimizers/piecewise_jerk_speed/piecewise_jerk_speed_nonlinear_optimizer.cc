@@ -215,9 +215,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
   // Set s boundary
   s_bounds_.clear();
   s_soft_bounds_.clear();
-  // TODO(Jinyun): soft bound only takes effect in follow fence, will use in
-  // other speed decision as well and use more sophisticated bound for follow
-  // fence
+  // TODO(Jinyun): move to confs
   for (int i = 0; i < num_of_knots_; ++i) {
     double curr_t = i * delta_t_;
     double s_lower_bound = 0.0;
@@ -237,7 +235,6 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
           s_soft_upper_bound = std::fmin(s_soft_upper_bound, s_upper);
           break;
         case STBoundary::BoundaryType::FOLLOW:
-          // TODO(Hongyi): unify follow buffer on decision side
           s_upper_bound =
               std::fmin(s_upper_bound, s_upper - FLAGS_follow_min_distance);
           s_soft_upper_bound = std::fmin(
@@ -245,7 +242,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
           break;
         case STBoundary::BoundaryType::OVERTAKE:
           s_lower_bound = std::fmax(s_lower_bound, s_lower);
-          s_soft_lower_bound = std::fmax(s_soft_lower_bound, s_lower);
+          s_soft_lower_bound = std::fmax(s_soft_lower_bound, s_lower + 10.0);
           break;
         default:
           break;
