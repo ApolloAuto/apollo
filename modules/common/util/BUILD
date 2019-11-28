@@ -14,6 +14,7 @@ cc_library(
     deps = [
         ":color",
         ":disjoint_set",
+        ":future",
         ":http_client",
         ":json_util",
         ":lru_cache",
@@ -23,7 +24,17 @@ cc_library(
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/time",
+    ],
+)
+
+cc_library(
+    name = "future",
+    hdrs = ["future.h"],
+    deps = [
         "@com_google_absl//absl/memory",
+        "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/types:optional",
+        "@com_google_absl//absl/utility",
     ],
 )
 
@@ -82,7 +93,7 @@ cc_library(
     srcs = ["string_util.cc"],
     hdrs = ["string_util.h"],
     deps = [
-        "@com_google_absl//absl/strings",
+        ":future",
         "@com_google_protobuf//:protobuf",
     ],
 )
