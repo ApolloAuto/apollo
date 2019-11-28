@@ -13,7 +13,7 @@ cc_library(
         "//cyber/common:log",
         "//external:gflags",
         "//modules/common/util",
-        "@com_google_absl//absl/types:optional",
+        "//modules/common/util:future",
     ],
 )
 
