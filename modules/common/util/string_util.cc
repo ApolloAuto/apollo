@@ -45,7 +45,7 @@ std::string Base64Piece(const char in0, const char in1, const char in2) {
 
 }  // namespace
 
-std::string EncodeBase64(absl::string_view in) {
+std::string EncodeBase64(std::string_view in) {
   std::string out;
   if (in.empty()) {
     return out;

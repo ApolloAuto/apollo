@@ -18,8 +18,7 @@
 
 #include <string>
 
-#include "absl/strings/string_view.h"
-#include "absl/types/optional.h"
+#include "modules/common/util/future.h"
 
 /**
  * @namespace apollo::common
@@ -40,13 +39,13 @@ class KVDB {
    * @brief Store {key, value} to DB.
    * @return Success or not.
    */
-  static bool Put(absl::string_view key, absl::string_view value);
+  static bool Put(std::string_view key, std::string_view value);
 
   /**
    * @brief Delete a key.
    * @return Success or not.
    */
-  static bool Delete(absl::string_view key);
+  static bool Delete(std::string_view key);
 
   /**
    * @brief Get value of a key.
@@ -55,7 +54,7 @@ class KVDB {
    *     Use `value()` to get real value.
    *     Use `value_or("")` to get existing value or fallback to default.
    */
-  static absl::optional<std::string> Get(absl::string_view key);
+  static std::optional<std::string> Get(std::string_view key);
 };
 
 }  // namespace common
