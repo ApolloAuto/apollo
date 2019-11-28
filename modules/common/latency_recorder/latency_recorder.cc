@@ -22,11 +22,27 @@
 namespace apollo {
 namespace common {
 
+namespace {
+
 using apollo::cyber::Time;
+
+uint64_t ToNanoSeconds(const double seconds) {
+  static constexpr double kNanoSecondsFactor = 1e9;
+  return static_cast<uint64_t>(kNanoSecondsFactor * seconds);
+}
+
+};  // namespace
 
 LatencyRecorder::LatencyRecorder(const std::string& module_name)
     : module_name_(module_name) {
   records_.reset(new LatencyRecordMap);
+}
+
+void LatencyRecorder::AppendLatencyRecord(const uint64_t message_id,
+                                          const double begin_time,
+                                          const double end_time) {
+  AppendLatencyRecord(message_id, ToNanoSeconds(begin_time),
+                      ToNanoSeconds(end_time));
 }
 
 void LatencyRecorder::AppendLatencyRecord(const uint64_t message_id,

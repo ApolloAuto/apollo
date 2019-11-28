@@ -35,6 +35,9 @@ class LatencyRecorder {
   void AppendLatencyRecord(const uint64_t message_id, const uint64_t begin_time,
                            const uint64_t end_time);
 
+  void AppendLatencyRecord(const uint64_t message_id, const double begin_time,
+                           const double end_time);
+
  private:
   LatencyRecorder() = default;
   std::shared_ptr<apollo::cyber::Writer<LatencyRecordMap>> CreateWriter();
