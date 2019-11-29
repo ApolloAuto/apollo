@@ -35,9 +35,9 @@ struct TimerTask;
 
 static const uint64_t WORK_WHEEL_SIZE = 512;
 static const uint64_t ASSISTANT_WHEEL_SIZE = 64;
-static const uint64_t TIMER_RESOLUTION_MS = 1;
+static const uint64_t TIMER_RESOLUTION_MS = 2;
 static const uint64_t TIMER_MAX_INTERVAL_MS =
-    WORK_WHEEL_SIZE * ASSISTANT_WHEEL_SIZE;
+    WORK_WHEEL_SIZE * ASSISTANT_WHEEL_SIZE * TIMER_RESOLUTION_MS;
 
 class TimingWheel {
  public:
@@ -78,7 +78,9 @@ class TimingWheel {
   TimerBucket work_wheel_[WORK_WHEEL_SIZE];
   TimerBucket assistant_wheel_[ASSISTANT_WHEEL_SIZE];
   uint64_t current_work_wheel_index_ = 0;
+  std::mutex current_work_wheel_index_mutex_;
   uint64_t current_assistant_wheel_index_ = 0;
+  std::mutex current_assistant_wheel_index_mutex_;
   std::thread tick_thread_;
 
   DECLARE_SINGLETON(TimingWheel)

@@ -32,9 +32,9 @@ struct TimerTask {
   uint64_t interval_ms = 0;
   uint64_t remainder_interval_ms = 0;
   uint64_t next_fire_duration_ms = 0;
-  int64_t accumulated_error_ns_ = 0;
-  uint64_t last_execute_time_ns_ = 0;
-  std::mutex mtx_;
+  int64_t accumulated_error_ns = 0;
+  uint64_t last_execute_time_ns = 0;
+  std::mutex mutex;
 };
 
 }  // namespace cyber
