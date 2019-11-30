@@ -19,16 +19,16 @@ cc_library(
         "//modules/common/util",
         "//modules/control/common",
         "//modules/control/controller",
-        "//modules/control/submodules:preprocessor_submodule_lib",
+        "//modules/control/proto:control_proto",
+        "//modules/control/proto:preprocessor_proto",
         "//modules/control/submodules:lat_lon_controller_submodule_lib",
         "//modules/control/submodules:mpc_controller_submodule_lib",
         "//modules/control/submodules:postprocessor_submodule_lib",
-        "//modules/control/proto:control_proto",
-        "//modules/control/proto:preprocessor_proto",
+        "//modules/control/submodules:preprocessor_submodule_lib",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/proto:planning_proto",
-        "//modules/prediction/proto:prediction_proto"
+        "//modules/prediction/proto:prediction_proto",
     ],
 )
 
