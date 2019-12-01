@@ -496,8 +496,6 @@ bool PiecewiseJerkSpeedNonlinearIpoptInterface::eval_g(int n, const double *x,
       g[coffset_soft_upper_s + i] =
           s - soft_safety_bounds_[i].second - upper_s_slack;
     }
-
-    offset += num_of_points_;
   }
 
   return true;

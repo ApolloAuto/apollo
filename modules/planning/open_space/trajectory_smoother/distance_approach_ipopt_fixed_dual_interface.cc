@@ -777,7 +777,6 @@ void DistanceApproachIPOPTFixedDualInterface::eval_constraints(int n,
   g[constraint_index + 2] = x[state_index + 2];
   g[constraint_index + 3] = x[state_index + 3];
   constraint_index += 4;
-  state_index += 4;
 
   for (int i = 0; i < horizon_; ++i) {
     g[constraint_index] = x[control_index];
@@ -792,8 +791,7 @@ void DistanceApproachIPOPTFixedDualInterface::eval_constraints(int n,
     time_index++;
   }
 
-  ADEBUG << "constraint_index after adding variable box constraints "
-            "updated: "
+  ADEBUG << "constraint_index after adding variable box constraints updated: "
          << constraint_index;
 }
 

@@ -88,16 +88,15 @@ common::Status AutotuningRawFeatureGenerator::EvaluateSpeedPoint(
 
   autotuning::SpeedPointRawFeature_ObjectDecisionFeature* decision_obj =
       nullptr;
-  double distance = kMaxAwareDistance;
   for (const auto& stop_obs : stop_boundaries_[index]) {
     double lower_s = stop_obs[0];
     double speed = stop_obs[2];
+    double distance = 0.0;
     // stop line is in the front
     if (lower_s < s) {
       distance = lower_s - s;
       decision_obj = speed_feature->add_stop();
     } else {
-      distance = 0.0;
       decision_obj = speed_feature->add_collision();
     }
     decision_obj->set_relative_s(distance);
@@ -108,6 +107,7 @@ common::Status AutotuningRawFeatureGenerator::EvaluateSpeedPoint(
     double lower_s = obs[0];
     double upper_s = obs[1];
     double speed = obs[2];
+    double distance = 0.0;
     if (upper_s < s) {
       decision_obj = speed_feature->add_overtake();
       distance = s - upper_s;
@@ -116,7 +116,6 @@ common::Status AutotuningRawFeatureGenerator::EvaluateSpeedPoint(
       distance = lower_s - s;
     } else {
       decision_obj = speed_feature->add_collision();
-      distance = 0.0;
     }
     decision_obj->set_relative_s(distance);
     decision_obj->set_relative_v(speed - speed_point.v());
