@@ -31,7 +31,7 @@ git clone https://github.com/CSCsw/ColPack.git
 pushd ColPack
 pushd build/automake      # automake folder
 sudo autoreconf -vif        # generate configure files based on the machince
-sudo mkdir mywork           
+sudo mkdir mywork
 pushd mywork
 fullpath=$(pwd)        # modify fullpath to your destination folder if need
 sudo ../configure --prefix=${fullpath}
@@ -65,7 +65,7 @@ sudo cp -r include /usr/local/adolc/ && sudo cp -r lib64 /usr/local/adolc/
 sudo cp LICENSE /usr/local/adolc/
 popd
 
-export LD_LIBRARY_PATH=/usr/local/adolc/lib64:$LD_LIBRARY_PATH 
+export LD_LIBRARY_PATH=/usr/local/adolc/lib64:$LD_LIBRARY_PATH
 
 # Clean up.
 sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*

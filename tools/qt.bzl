@@ -7,7 +7,7 @@ def _file_name(filePathName):
 def _base_name(fileName):
     return fileName.split('.')[0]
 
-def qt_cc_library(name, src, hdr, uis = [], res = [], normal_hdrs = [], deps = None, **kwargs):  
+def qt_cc_library(name, src, hdr, uis = [], res = [], normal_hdrs = [], deps = None, **kwargs):
     srcs = src
     for hItem in hdr:
         base_name = _base_name(_file_name(hItem))
