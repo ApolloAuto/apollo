@@ -72,7 +72,7 @@ class Clock {
 
   /**
    * @brief get current time.
-   * @return a absl::Time object representing the current time. Check
+   * @return an absl::Time object representing the current time. Check
    * https://abseil.io/docs/cpp/guides/time for usage.
    */
   static absl::Time Now() {
