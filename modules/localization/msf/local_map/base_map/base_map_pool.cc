@@ -46,18 +46,14 @@ void BaseMapNodePool::Release() {
   if (node_reset_workers_.valid()) {
     node_reset_workers_.get();
   }
-  typename std::list<BaseMapNode*>::iterator i = free_list_.begin();
-  while (i != free_list_.end()) {
-    FinalizeMapNode(*i);
-    DellocMapNode(*i);
-    i++;
+  for (BaseMapNode* node : free_list_) {
+    FinalizeMapNode(node);
+    DellocMapNode(node);
   }
   free_list_.clear();
-  typename std::set<BaseMapNode*>::iterator j = busy_nodes_.begin();
-  while (j != busy_nodes_.end()) {
-    FinalizeMapNode(*j);
-    DellocMapNode(*j);
-    j++;
+  for (BaseMapNode* node : busy_nodes_) {
+    FinalizeMapNode(node);
+    DellocMapNode(node);
   }
   busy_nodes_.clear();
   pool_size_ = 0;
