@@ -413,7 +413,7 @@ void NaviPlanning::GetLeftNeighborLanesInfo(
     double y = ref_point.y();
     // in FLU positive on the left
     if (y > 0.0) {
-      lane_info_group->emplace_back(std::make_pair(lane_id, y));
+      lane_info_group->emplace_back(lane_id, y);
     }
   }
   // sort neighbor lanes from near to far
@@ -441,7 +441,7 @@ void NaviPlanning::GetRightNeighborLanesInfo(
     double y = ref_point.y();
     // in FLU negative on the right
     if (y < 0.0) {
-      lane_info_group->emplace_back(std::make_pair(lane_id, y));
+      lane_info_group->emplace_back(lane_id, y);
     }
   }
 

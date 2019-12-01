@@ -132,7 +132,7 @@ std::shared_ptr<Node3d> HybridAStar::LoadRSPinCS(
       reeds_shepp_to_end->x, reeds_shepp_to_end->y, reeds_shepp_to_end->phi,
       XYbounds_, planner_open_space_config_));
   end_node->SetPre(current_node);
-  close_set_.insert(std::make_pair(end_node->GetIndex(), end_node));
+  close_set_.emplace(end_node->GetIndex(), end_node);
   return end_node;
 }
 
@@ -675,9 +675,8 @@ bool HybridAStar::Plan(
                                                   obstacles_linesegments_vec_);
   ADEBUG << "map time " << Clock::NowInSeconds() - map_time;
   // load open set, pq
-  open_set_.insert(std::make_pair(start_node_->GetIndex(), start_node_));
-  open_pq_.push(
-      std::make_pair(start_node_->GetIndex(), start_node_->GetCost()));
+  open_set_.emplace(start_node_->GetIndex(), start_node_);
+  open_pq_.emplace(start_node_->GetIndex(), start_node_->GetCost());
 
   // Hybrid A* begins
   size_t explored_node_num = 0;
@@ -698,7 +697,7 @@ bool HybridAStar::Plan(
     }
     const double rs_end_time = Clock::NowInSeconds();
     rs_time += rs_end_time - rs_start_time;
-    close_set_.insert(std::make_pair(current_node->GetIndex(), current_node));
+    close_set_.emplace(current_node->GetIndex(), current_node);
     for (size_t i = 0; i < next_node_num_; ++i) {
       std::shared_ptr<Node3d> next_node = Next_node_generator(current_node, i);
       // boundary check failure handle
