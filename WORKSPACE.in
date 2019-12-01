@@ -70,15 +70,6 @@ new_http_archive(
     url = "file:///home/tmp/v1.11.tar.gz",
 )
 
-# curlpp
-new_http_archive(
-    name = "curlpp",
-    build_file = "third_party/curlpp.BUILD",
-    sha256 = "97e3819bdcffc3e4047b6ac57ca14e04af85380bd93afe314bee9dd5c7f46a0a",
-    strip_prefix = "curlpp-0.8.1",
-    url = "file:///home/tmp/curlpp-0.8.1.tar.gz",
-)
-
 #ros
 new_local_repository(
     name = "ros",
