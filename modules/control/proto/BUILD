@@ -21,10 +21,10 @@ proto_library(
         ":calibration_table_proto_lib",
         ":control_command_proto_lib",
         ":gain_scheduler_conf_proto_lib",
+        ":input_debug_lib",
         ":leadlag_conf_proto_lib",
         ":mpc_controller_conf_proto_lib",
         ":mrac_conf_proto_lib",
-        ":input_debug_lib",
         ":pad_msg_lib",
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/proto:drive_state_proto_lib",
@@ -55,7 +55,6 @@ proto_library(
         "//modules/common/proto:header_proto_lib",
     ],
 )
-
 
 # local_view_proto
 cc_proto_library(
