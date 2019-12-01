@@ -15,7 +15,6 @@ cc_library(
         ":color",
         ":disjoint_set",
         ":future",
-        ":http_client",
         ":json_util",
         ":lru_cache",
         ":message_util",
@@ -227,20 +226,6 @@ cc_test(
         ":json_util",
         "//modules/common/proto:error_code_proto",
         "@gtest//:main",
-    ],
-)
-
-cc_library(
-    name = "http_client",
-    srcs = ["http_client.cc"],
-    hdrs = ["http_client.h"],
-    deps = [
-        "//cyber/common",
-        "//modules/common/status",
-        "//modules/common/util:string_util",
-        "//third_party/json",
-        "@com_google_absl//absl/strings",
-        "@curlpp",
     ],
 )
 
