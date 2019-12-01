@@ -62,13 +62,13 @@ function print_usage() {
 
 function start_build_docker() {
   docker ps --format "{{.Names}}" | grep apollo_dev_$USER 1>/dev/null 2>&1
-  if [ $? != 0 ]; then    
-    # If Google is reachable, we fetch the docker image directly. 
+  if [ $? != 0 ]; then
+    # If Google is reachable, we fetch the docker image directly.
     if ping -q -c 1 -W 1 www.google.com 1>/dev/null 2>&1; then
       opt=""
     else
       ping -q -c 1 -W 1 www.baidu.com 1>/dev/null 2>&1
-      # If Baidu is unreachable, we use local images. 
+      # If Baidu is unreachable, we use local images.
       if [ $? -ne 0 ]; then
         opt="-l"
       fi
