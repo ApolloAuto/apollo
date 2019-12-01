@@ -13,7 +13,6 @@ cc_library(
     ],
     deps = [
         ":color",
-        ":disjoint_set",
         ":future",
         ":json_util",
         ":lru_cache",
@@ -55,24 +54,6 @@ cc_test(
     deps = [
         ":util",
         "//modules/common/util/testdata:simple_proto",
-        "@gtest//:main",
-    ],
-)
-
-cc_library(
-    name = "disjoint_set",
-    hdrs = ["disjoint_set.h"],
-)
-
-cc_test(
-    name = "disjoint_set_test",
-    size = "small",
-    srcs = [
-        "disjoint_set_test.cc",
-    ],
-    deps = [
-        ":disjoint_set",
-        "//cyber/common",
         "@gtest//:main",
     ],
 )
