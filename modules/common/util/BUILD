@@ -4,13 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "util",
-    srcs = [
-        "util.cc",
-    ],
-    hdrs = [
-        "blocking_queue.h",
-        "util.h",
-    ],
+    srcs = ["util.cc"],
+    hdrs = ["util.h"],
     deps = [
         ":color",
         ":future",
