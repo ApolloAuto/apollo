@@ -8,7 +8,7 @@ destination_sensor: "novatel"
 #provide the local file directory( relevant to this config file), for the sensor message storage.
 odometry_file: "./_sensor_novatel_Odometry/odometry"
 sensor_files_directory: "./_sensor_velodyne64_VelodyneScan/"
-#initial calibration paramters, including tranlation and raotation, to project a point in source
+#initial calibration paramters, including translation and raotation, to project a point in source
 #source_sensor coordinate to destination_sensor coordinate. translation is in meter. rotation is in quaternion
 translation:
        x: 0.0
