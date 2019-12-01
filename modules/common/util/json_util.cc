@@ -47,8 +47,8 @@ nlohmann::json JsonUtil::ProtoToTypedJson(
   return json_obj;
 }
 
-bool JsonUtil::GetStringFromJson(const Json &json, const std::string &key,
-                                 std::string *value) {
+bool JsonUtil::GetString(const Json &json, const std::string &key,
+                         std::string *value) {
   const auto iter = json.find(key);
   if (iter == json.end()) {
     AERROR << "The json has no such key: " << key;
@@ -62,8 +62,8 @@ bool JsonUtil::GetStringFromJson(const Json &json, const std::string &key,
   return true;
 }
 
-bool JsonUtil::GetStringVectorFromJson(const Json &json, const std::string &key,
-                                       std::vector<std::string> *value) {
+bool JsonUtil::GetStringVector(const Json &json, const std::string &key,
+                               std::vector<std::string> *value) {
   const auto iter = json.find(key);
   if (iter == json.end()) {
     AERROR << "The json has no such key: " << key;
@@ -90,8 +90,8 @@ bool JsonUtil::GetStringVectorFromJson(const Json &json, const std::string &key,
   return ret;
 }
 
-bool JsonUtil::GetBooleanFromJson(const nlohmann::json &json,
-                                  const std::string &key, bool *value) {
+bool JsonUtil::GetBoolean(const nlohmann::json &json, const std::string &key,
+                          bool *value) {
   const auto iter = json.find(key);
   if (iter == json.end()) {
     AERROR << "The json has no such key: " << key;
