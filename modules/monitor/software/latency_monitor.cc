@@ -282,8 +282,8 @@ void LatencyMonitor::ValidateMaxLatency() {
           SummaryMonitor::EscalateStatus(
               ComponentStatus::WARN,
               absl::StrCat(config.name(), " has average latency ",
-                           latency.module_stat().aver_duration(),
-                           " > ", config.max_latency_allowed()),
+                           latency.module_stat().aver_duration(), " > ",
+                           config.max_latency_allowed()),
               status);
         }
       }
