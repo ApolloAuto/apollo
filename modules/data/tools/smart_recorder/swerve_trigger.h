@@ -25,8 +25,6 @@
 namespace apollo {
 namespace data {
 
-using apollo::canbus::Chassis;
-
 /**
  * @class SwerveTrigger
  * @brief Swerve trigger that fires when swerve is engaged
@@ -35,8 +33,10 @@ class SwerveTrigger : public TriggerBase {
  public:
   SwerveTrigger();
 
-  void Pull(const RecordMessage& msg) override;
-  bool ShouldRestore(const RecordMessage& msg) const override { return false; };
+  void Pull(const cyber::record::RecordMessage& msg) override;
+  bool ShouldRestore(const cyber::record::RecordMessage& msg) const override {
+    return false;
+  };
 
   virtual ~SwerveTrigger() = default;
 
