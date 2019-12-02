@@ -61,10 +61,18 @@ bool MPCControllerSubmodule::Init() {
 bool MPCControllerSubmodule::Proc(
     const std::shared_ptr<Preprocessor>& preprocessor_status) {
   ControlCommand control_core_command;
+  // recording pad msg
+  if (preprocessor_status->received_pad_msg()) {
+    control_core_command.mutable_pad_msg()->CopyFrom(
+        preprocessor_status->mutable_local_view()->pad_msg());
+  }
   ADEBUG << "MPC controller submodule started ....";
 
   // skip produce control command when estop for MPC controller
   if (preprocessor_status->estop()) {
+    // recording estop reason
+    control_core_command.mutable_header()->mutable_status()->set_msg(
+        preprocessor_status->estop_reason());
     return false;
   }
 
