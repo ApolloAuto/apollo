@@ -29,6 +29,8 @@ namespace apollo {
 namespace control {
 
 using apollo::canbus::Chassis;
+using apollo::common::ErrorCode;
+using apollo::common::Status;
 
 std::string PostprocessorSubmodule::Name() const {
   return FLAGS_postprocessor_submodule_name;
@@ -50,10 +52,13 @@ bool PostprocessorSubmodule::Proc(
     const std::shared_ptr<ControlCommand>& control_core_command) {
   ControlCommand control_command;
   // get all fields from control_core_command for now
-  control_command.CopyFrom(*control_core_command);
+  control_command = *control_core_command;
 
   // estop handling
-  if (control_core_command->header().has_status()) {
+  // TODO(SHU): fix this by adding error code and error msg in previous
+  // submodules
+  if (control_core_command->header().has_status() &&
+      control_core_command->header().status().error_code() != ErrorCode::OK) {
     AWARN_EVERY(100) << "Estop triggered! No control core method executed!";
     control_command.set_speed(0);
     control_command.set_throttle(0);
@@ -73,7 +78,6 @@ bool PostprocessorSubmodule::Proc(
 
   postprocessor_writer_->Write(control_command);
 
-  // TODO(SHU): add debug info; add latency time
   return true;
 }
 
