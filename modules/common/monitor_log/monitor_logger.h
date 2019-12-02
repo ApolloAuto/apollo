@@ -39,8 +39,6 @@ namespace common {
 namespace monitor {
 
 using MessageItem = std::pair<MonitorMessageItem::LogLevel, std::string>;
-using apollo::cyber::Node;
-using apollo::cyber::Writer;
 
 /**
  * class MonitorLogger
@@ -65,8 +63,8 @@ class MonitorLogger {
   virtual void DoPublish(MonitorMessage *message) const;
 
   MonitorMessageItem::MessageSource source_;
-  std::unique_ptr<Node> node_;
-  std::shared_ptr<Writer<MonitorMessage>> monitor_msg_writer_;
+  std::unique_ptr<cyber::Node> node_;
+  std::shared_ptr<cyber::Writer<MonitorMessage>> monitor_msg_writer_;
 
   DECLARE_SINGLETON(MonitorLogger)
 };
