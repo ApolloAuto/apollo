@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "flood_fill",
-    srcs = [
-        "flood_fill.cc",
-    ],
-    hdrs = [
-        "flood_fill.h",
-    ],
+    srcs = ["flood_fill.cc"],
+    hdrs = ["flood_fill.h"],
     deps = [
         "//cyber",
         "//modules/perception/base",
@@ -18,9 +14,7 @@ cc_library(
 
 cc_library(
     name = "lr_classifier",
-    hdrs = [
-        "lr_classifier.h",
-    ],
+    hdrs = ["lr_classifier.h"],
     deps = [
         "//cyber",
         "//modules/perception/base",

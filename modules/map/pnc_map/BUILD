@@ -5,12 +5,8 @@ package(default_visibility = ["//visibility:public"])
 
 cuda_library(
     name = "cuda_pnc_util",
-    srcs = [
-        "cuda_util.cu",
-    ],
-    hdrs = [
-        "cuda_util.h",
-    ],
+    srcs = ["cuda_util.cu"],
+    hdrs = ["cuda_util.h"],
     deps = [
         "//cyber/common:log",
         "@cuda",
@@ -34,12 +30,8 @@ cc_test(
 
 cc_library(
     name = "path",
-    srcs = [
-        "path.cc",
-    ],
-    hdrs = [
-        "path.h",
-    ],
+    srcs = ["path.cc"],
+    hdrs = ["path.h"],
     copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         "//modules/common/math",
@@ -52,12 +44,8 @@ cc_library(
 
 cc_library(
     name = "route_segments",
-    srcs = [
-        "route_segments.cc",
-    ],
-    hdrs = [
-        "route_segments.h",
-    ],
+    srcs = ["route_segments.cc"],
+    hdrs = ["route_segments.h"],
     copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         "//modules/common/vehicle_state/proto:vehicle_state_proto",
@@ -69,12 +57,8 @@ cc_library(
 
 cc_library(
     name = "pnc_map",
-    srcs = [
-        "pnc_map.cc",
-    ],
-    hdrs = [
-        "pnc_map.h",
-    ],
+    srcs = ["pnc_map.cc"],
+    hdrs = ["pnc_map.h"],
     copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         ":path",
@@ -98,9 +82,7 @@ filegroup(
 cc_test(
     name = "pnc_path_test",
     size = "small",
-    srcs = [
-        "path_test.cc",
-    ],
+    srcs = ["path_test.cc"],
     deps = [
         ":path",
         "//modules/common/util",
@@ -111,9 +93,7 @@ cc_test(
 cc_test(
     name = "pnc_map_test",
     size = "small",
-    srcs = [
-        "pnc_map_test.cc",
-    ],
+    srcs = ["pnc_map_test.cc"],
     data = [
         ":testdata",
         "//modules/map/data:map_sunnyvale_loop",
@@ -128,9 +108,7 @@ cc_test(
 cc_test(
     name = "route_segments_test",
     size = "small",
-    srcs = [
-        "route_segments_test.cc",
-    ],
+    srcs = ["route_segments_test.cc"],
     data = [
         ":testdata",
         "//modules/map/data:map_sunnyvale_loop",

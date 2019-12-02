@@ -4,9 +4,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "lossless_map_creator",
-    srcs = [
-        "lossless_map_creator.cc",
-    ],
+    srcs = ["lossless_map_creator.cc"],
     linkopts = [
         "-llz4",
     ],
@@ -25,9 +23,7 @@ cc_binary(
 
 cc_binary(
     name = "lossless_map_to_lossy_map",
-    srcs = [
-        "lossless_map_to_lossy_map.cc",
-    ],
+    srcs = ["lossless_map_to_lossy_map.cc"],
     linkstatic = 0,
     deps = [
         "//cyber",
@@ -41,9 +37,7 @@ cc_binary(
 
 cc_binary(
     name = "poses_interpolator",
-    srcs = [
-        "poses_interpolator.cc",
-    ],
+    srcs = ["poses_interpolator.cc"],
     linkstatic = 0,
     deps = [
         "//modules/localization/msf/local_tool/map_creation/poses_interpolation:poses_interpolation_lib",

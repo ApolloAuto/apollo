@@ -61,9 +61,7 @@ cc_test(
     name = "msf_localization_test",
     size = "small",
     timeout = "short",
-    srcs = [
-        "msf_localization_test.cc",
-    ],
+    srcs = ["msf_localization_test.cc"],
     copts = [
         "-Dprivate=public",
     ],

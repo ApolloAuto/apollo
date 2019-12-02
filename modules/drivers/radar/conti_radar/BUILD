@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "conti_radar_message_manager",
-    srcs = [
-        "conti_radar_message_manager.cc",
-    ],
-    hdrs = [
-        "conti_radar_message_manager.h",
-    ],
+    srcs = ["conti_radar_message_manager.cc"],
+    hdrs = ["conti_radar_message_manager.h"],
     deps = [
         "//modules/common/util:message_util",
         "//modules/drivers/canbus/can_client:can_client_factory",
@@ -21,12 +17,8 @@ cc_library(
 
 cc_library(
     name = "conti_radar_canbus_lib",
-    srcs = [
-        "conti_radar_canbus_component.cc",
-    ],
-    hdrs = [
-        "conti_radar_canbus_component.h",
-    ],
+    srcs = ["conti_radar_canbus_component.cc"],
+    hdrs = ["conti_radar_canbus_component.h"],
     copts = ['-DMODULE_NAME=\\"conti_radar\\"'],
     deps = [
         ":conti_radar_message_manager",

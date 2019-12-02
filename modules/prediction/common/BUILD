@@ -12,8 +12,6 @@ cc_library(
         "prediction_gflags.h",
         "prediction_system_gflags.h",
     ],
-    deps = [
-    ],
 )
 
 cc_library(
@@ -126,8 +124,6 @@ cc_test(
 cc_library(
     name = "kml_map_based_test",
     hdrs = ["kml_map_based_test.h"],
-    deps = [
-    ],
 )
 
 cc_library(
@@ -206,9 +202,7 @@ cc_test(
 cc_library(
     name = "message_process",
     srcs = ["message_process.cc"],
-    hdrs = [
-        "message_process.h",
-    ],
+    hdrs = ["message_process.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],

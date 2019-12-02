@@ -5,12 +5,8 @@ package(default_visibility = ["//visibility:public"])
 
 cuda_library(
     name = "similar_cuda",
-    srcs = [
-        "similar.cu",
-    ],
-    hdrs = [
-        "similar.h",
-    ],
+    srcs = ["similar.cu"],
+    hdrs = ["similar.h"],
     deps = [
         "//cyber",
         "//modules/perception/camera/common:camera_frame",
@@ -25,9 +21,7 @@ cc_library(
         "similar.cc",
         ":similar_cuda",
     ],
-    hdrs = [
-        "similar.h",
-    ],
+    hdrs = ["similar.h"],
     deps = [
         "//modules/perception/base",
         "//modules/perception/camera/common",
@@ -37,12 +31,8 @@ cc_library(
 
 cc_library(
     name = "half_circle_angle",
-    srcs = [
-        "half_circle_angle.cc",
-    ],
-    hdrs = [
-        "half_circle_angle.h",
-    ],
+    srcs = ["half_circle_angle.cc"],
+    hdrs = ["half_circle_angle.h"],
     deps = [
         "//modules/perception/camera/common",
     ],
@@ -50,12 +40,8 @@ cc_library(
 
 cc_library(
     name = "kalman_filter",
-    srcs = [
-        "kalman_filter.cc",
-    ],
-    hdrs = [
-        "kalman_filter.h",
-    ],
+    srcs = ["kalman_filter.cc"],
+    hdrs = ["kalman_filter.h"],
     deps = [
         "//cyber",
         "@eigen",

@@ -46,12 +46,8 @@ cc_library(
 
 cc_library(
     name = "traffic_decider",
-    srcs = [
-        "traffic_decider.cc",
-    ],
-    hdrs = [
-        "traffic_decider.h",
-    ],
+    srcs = ["traffic_decider.cc"],
+    hdrs = ["traffic_decider.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":traffic_rules",

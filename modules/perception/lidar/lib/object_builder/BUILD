@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "object_builder",
-    srcs = [
-        "object_builder.cc",
-    ],
-    hdrs = [
-        "object_builder.h",
-    ],
+    srcs = ["object_builder.cc"],
+    hdrs = ["object_builder.h"],
     deps = [
         "//modules/perception/base",
         "//modules/perception/common/geometry:common",

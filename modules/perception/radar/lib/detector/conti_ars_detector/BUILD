@@ -5,9 +5,7 @@ package(default_visibility = ["//visibility:public"])
 cc_test(
     name = "conti_ars_detector_test",
     size = "small",
-    srcs = [
-        "conti_ars_detector_test.cc",
-    ],
+    srcs = ["conti_ars_detector_test.cc"],
     deps = [
         ":conti_ars_detector",
         "@gtest//:main",
@@ -16,12 +14,8 @@ cc_test(
 
 cc_library(
     name = "conti_ars_detector",
-    srcs = [
-        "conti_ars_detector.cc",
-    ],
-    hdrs = [
-        "conti_ars_detector.h",
-    ],
+    srcs = ["conti_ars_detector.cc"],
+    hdrs = ["conti_ars_detector.h"],
     deps = [
         "//modules/drivers/proto:sensor_proto",
         "//modules/perception/base",

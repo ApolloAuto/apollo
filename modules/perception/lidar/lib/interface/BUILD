@@ -17,9 +17,7 @@ cc_library(
 
 cc_library(
     name = "base_bipartite_graph_matcher",
-    hdrs = [
-        "base_bipartite_graph_matcher.h",
-    ],
+    hdrs = ["base_bipartite_graph_matcher.h"],
     deps = [
         "//modules/perception/common/graph:secure_matrix",
         "//modules/perception/lib/registerer",
@@ -29,9 +27,7 @@ cc_library(
 
 cc_library(
     name = "base_segmentation",
-    hdrs = [
-        "base_segmentation.h",
-    ],
+    hdrs = ["base_segmentation.h"],
     deps = [
         "//modules/perception/lib/registerer",
         "//modules/perception/lidar/common:lidar_frame",
@@ -40,9 +36,7 @@ cc_library(
 
 cc_library(
     name = "base_classifier",
-    hdrs = [
-        "base_classifier.h",
-    ],
+    hdrs = ["base_classifier.h"],
     deps = [
         "//modules/perception/lib/registerer",
         "//modules/perception/lidar/common:lidar_frame",
@@ -51,9 +45,7 @@ cc_library(
 
 cc_library(
     name = "base_ground_detector",
-    hdrs = [
-        "base_ground_detector.h",
-    ],
+    hdrs = ["base_ground_detector.h"],
     deps = [
         "//modules/perception/lib/registerer",
         "//modules/perception/lidar/common:lidar_frame",
@@ -62,9 +54,7 @@ cc_library(
 
 cc_library(
     name = "base_multi_target_tracker",
-    hdrs = [
-        "base_multi_target_tracker.h",
-    ],
+    hdrs = ["base_multi_target_tracker.h"],
     deps = [
         "//modules/perception/lib/registerer",
         "//modules/perception/lidar/common:lidar_frame",
@@ -73,9 +63,7 @@ cc_library(
 
 cc_library(
     name = "base_object_filter",
-    hdrs = [
-        "base_object_filter.h",
-    ],
+    hdrs = ["base_object_filter.h"],
     deps = [
         "//modules/perception/lib/registerer",
         "//modules/perception/lidar/common:lidar_frame",
@@ -84,9 +72,7 @@ cc_library(
 
 cc_library(
     name = "base_roi_filter",
-    hdrs = [
-        "base_roi_filter.h",
-    ],
+    hdrs = ["base_roi_filter.h"],
     deps = [
         "//modules/perception/lib/registerer",
         "//modules/perception/lidar/common:lidar_frame",

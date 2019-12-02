@@ -46,9 +46,7 @@ cc_test(
 cc_test(
     name = "stage_creep_test",
     size = "small",
-    srcs = [
-        "stage_creep_test.cc",
-    ],
+    srcs = ["stage_creep_test.cc"],
     data = [
         "//modules/planning:planning_conf",
     ],
@@ -61,9 +59,7 @@ cc_test(
 cc_test(
     name = "stage_stop_test",
     size = "small",
-    srcs = [
-        "stage_stop_test.cc",
-    ],
+    srcs = ["stage_stop_test.cc"],
     data = [
         "//modules/planning:planning_conf",
     ],

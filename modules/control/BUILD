@@ -4,8 +4,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "control_lib",
-    srcs = [
-    ],
+    srcs = [],
     copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         "//cyber",
@@ -34,12 +33,8 @@ cc_library(
 
 cc_library(
     name = "control_component_lib",
-    srcs = [
-        "control_component.cc",
-    ],
-    hdrs = [
-        "control_component.h",
-    ],
+    srcs = ["control_component.cc"],
+    hdrs = ["control_component.h"],
     copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         ":control_lib",
@@ -56,9 +51,7 @@ cc_binary(
 cc_test(
     name = "control_component_test",
     size = "small",
-    srcs = [
-        "control_component_test.cc",
-    ],
+    srcs = ["control_component_test.cc"],
     data = ["//modules/control:control_testdata"],
     deps = [
         ":control_component_lib",

@@ -18,17 +18,13 @@ cc_library(
 
 cc_library(
     name = "cache_buffer",
-    srcs = [
-        "cache_buffer.h",
-    ],
+    srcs = ["cache_buffer.h"],
 )
 
 cc_test(
     name = "cache_buffer_test",
     size = "small",
-    srcs = [
-        "cache_buffer_test.cc",
-    ],
+    srcs = ["cache_buffer_test.cc"],
     deps = [
         ":cache_buffer",
         "@gtest//:main",
@@ -37,9 +33,7 @@ cc_test(
 
 cc_library(
     name = "channel_buffer",
-    hdrs = [
-        "channel_buffer.h",
-    ],
+    hdrs = ["channel_buffer.h"],
     deps = [
         ":data_notifier",
         "//cyber/proto:component_conf_cc_proto",
@@ -48,9 +42,7 @@ cc_library(
 
 cc_library(
     name = "data_dispatcher",
-    hdrs = [
-        "data_dispatcher.h",
-    ],
+    hdrs = ["data_dispatcher.h"],
     deps = [
         ":channel_buffer",
     ],
@@ -58,17 +50,13 @@ cc_library(
 
 cc_library(
     name = "data_visitor",
-    hdrs = [
-        "data_visitor.h",
-    ],
+    hdrs = ["data_visitor.h"],
 )
 
 cc_test(
     name = "data_visitor_test",
     size = "small",
-    srcs = [
-        "data_visitor_test.cc",
-    ],
+    srcs = ["data_visitor_test.cc"],
     deps = [
         "//cyber",
         "@gtest//:main",
@@ -77,16 +65,12 @@ cc_test(
 
 cc_library(
     name = "data_visitor_base",
-    hdrs = [
-        "data_visitor_base.h",
-    ],
+    hdrs = ["data_visitor_base.h"],
 )
 
 cc_library(
     name = "data_notifier",
-    hdrs = [
-        "data_notifier.h",
-    ],
+    hdrs = ["data_notifier.h"],
     deps = [
         ":cache_buffer",
     ],
@@ -95,9 +79,7 @@ cc_library(
 cc_test(
     name = "data_dispatcher_test",
     size = "small",
-    srcs = [
-        "data_dispatcher_test.cc",
-    ],
+    srcs = ["data_dispatcher_test.cc"],
     deps = [
         "//cyber",
         "@gtest//:main",
@@ -107,9 +89,7 @@ cc_test(
 cc_test(
     name = "channel_buffer_test",
     size = "small",
-    srcs = [
-        "channel_buffer_test.cc",
-    ],
+    srcs = ["channel_buffer_test.cc"],
     deps = [
         "//cyber",
         "@gtest//:main",
@@ -118,16 +98,12 @@ cc_test(
 
 cc_library(
     name = "data_fusion",
-    hdrs = [
-        "fusion/data_fusion.h",
-    ],
+    hdrs = ["fusion/data_fusion.h"],
 )
 
 cc_library(
     name = "all_latest",
-    hdrs = [
-        "fusion/all_latest.h",
-    ],
+    hdrs = ["fusion/all_latest.h"],
     deps = [
         ":channel_buffer",
         ":data_fusion",
@@ -137,9 +113,7 @@ cc_library(
 cc_test(
     name = "all_latest_test",
     size = "small",
-    srcs = [
-        "fusion/all_latest_test.cc",
-    ],
+    srcs = ["fusion/all_latest_test.cc"],
     deps = [
         "//cyber",
         "@gtest//:main",

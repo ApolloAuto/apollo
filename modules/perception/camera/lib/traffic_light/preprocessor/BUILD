@@ -11,19 +11,13 @@ cc_proto_library(
 
 proto_library(
     name = "tl_preprocess_proto_lib",
-    srcs = [
-        "tl_preprocess.proto",
-    ],
+    srcs = ["tl_preprocess.proto"],
 )
 
 cc_library(
     name = "multi_camera_projection",
-    srcs = [
-        "multi_camera_projection.cc",
-    ],
-    hdrs = [
-        "multi_camera_projection.h",
-    ],
+    srcs = ["multi_camera_projection.cc"],
+    hdrs = ["multi_camera_projection.h"],
     deps = [
         ":pose",
         "//cyber",
@@ -36,12 +30,8 @@ cc_library(
 
 cc_library(
     name = "pose",
-    srcs = [
-        "pose.cc",
-    ],
-    hdrs = [
-        "pose.h",
-    ],
+    srcs = ["pose.cc"],
+    hdrs = ["pose.h"],
     deps = [
         "//cyber",
         "//modules/perception/base",
@@ -50,12 +40,8 @@ cc_library(
 
 cc_library(
     name = "tl_preprocessor",
-    srcs = [
-        "tl_preprocessor.cc",
-    ],
-    hdrs = [
-        "tl_preprocessor.h",
-    ],
+    srcs = ["tl_preprocessor.cc"],
+    hdrs = ["tl_preprocessor.h"],
     deps = [
         ":multi_camera_projection",
         "//cyber",

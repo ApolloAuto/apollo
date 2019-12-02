@@ -9,9 +9,7 @@ cc_proto_library(
 
 proto_library(
     name = "vehicle_state_proto_lib",
-    srcs = [
-        "vehicle_state.proto",
-    ],
+    srcs = ["vehicle_state.proto"],
     deps = [
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/localization/proto:pose_proto_lib",

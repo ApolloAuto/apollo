@@ -9,9 +9,7 @@ cc_proto_library(
 
 proto_library(
     name = "tick_conf_proto_lib",
-    srcs = [
-        "tick_conf.proto",
-    ],
+    srcs = ["tick_conf.proto"],
 )
 
 cc_proto_library(
@@ -23,9 +21,7 @@ cc_proto_library(
 
 proto_library(
     name = "tick_proto_lib",
-    srcs = [
-        "tick.proto",
-    ],
+    srcs = ["tick.proto"],
     deps = [
         "//modules/common/proto:header_proto_lib",
     ],

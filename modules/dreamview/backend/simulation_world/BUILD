@@ -38,9 +38,7 @@ cc_library(
 cc_test(
     name = "simulation_world_service_test",
     size = "small",
-    srcs = [
-        "simulation_world_service_test.cc",
-    ],
+    srcs = ["simulation_world_service_test.cc"],
     data = [
         "//modules/dreamview/backend/testdata",
     ],
@@ -53,12 +51,8 @@ cc_test(
 
 cc_library(
     name = "simulation_world_updater",
-    srcs = [
-        "simulation_world_updater.cc",
-    ],
-    hdrs = [
-        "simulation_world_updater.h",
-    ],
+    srcs = ["simulation_world_updater.cc"],
+    hdrs = ["simulation_world_updater.h"],
     copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
         ":simulation_world_service",

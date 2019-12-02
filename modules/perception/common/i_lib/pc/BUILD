@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "i_ground",
-    srcs = [
-        "i_ground.cc",
-    ],
-    hdrs = [
-        "i_ground.h",
-    ],
+    srcs = ["i_ground.cc"],
+    hdrs = ["i_ground.h"],
     copts = ["-msse4.1"],
     deps = [
         ":i_struct_s",
@@ -23,20 +19,12 @@ cc_library(
 
 cc_library(
     name = "i_struct_s",
-    hdrs = [
-        "i_struct_s.h",
-    ],
-    deps = [
-    ],
+    hdrs = ["i_struct_s.h"],
 )
 
 cc_library(
     name = "i_util",
-    hdrs = [
-        "i_util.h",
-    ],
-    deps = [
-    ],
+    hdrs = ["i_util.h"],
 )
 
 cpplint()

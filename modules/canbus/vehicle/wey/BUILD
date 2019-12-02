@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "wey_vehicle_factory",
-    srcs = [
-        "wey_vehicle_factory.cc",
-    ],
-    hdrs = [
-        "wey_vehicle_factory.h",
-    ],
+    srcs = ["wey_vehicle_factory.cc"],
+    hdrs = ["wey_vehicle_factory.h"],
     deps = [
         ":wey_controller",
         ":wey_message_manager",
@@ -29,12 +25,8 @@ cc_test(
 
 cc_library(
     name = "wey_message_manager",
-    srcs = [
-        "wey_message_manager.cc",
-    ],
-    hdrs = [
-        "wey_message_manager.h",
-    ],
+    srcs = ["wey_message_manager.cc"],
+    hdrs = ["wey_message_manager.h"],
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/canbus/vehicle/wey/protocol:canbus_wey_protocol",
@@ -46,9 +38,7 @@ cc_library(
 cc_test(
     name = "wey_message_manager_test",
     size = "small",
-    srcs = [
-        "wey_message_manager_test.cc",
-    ],
+    srcs = ["wey_message_manager_test.cc"],
     deps = [
         ":wey_message_manager",
         "@gtest//:main",
@@ -57,12 +47,8 @@ cc_test(
 
 cc_library(
     name = "wey_controller",
-    srcs = [
-        "wey_controller.cc",
-    ],
-    hdrs = [
-        "wey_controller.h",
-    ],
+    srcs = ["wey_controller.cc"],
+    hdrs = ["wey_controller.h"],
     deps = [
         ":wey_message_manager",
         "//modules/canbus/proto:canbus_proto",
@@ -77,9 +63,7 @@ cc_library(
 cc_test(
     name = "wey_controller_test",
     size = "small",
-    srcs = [
-        "wey_controller_test.cc",
-    ],
+    srcs = ["wey_controller_test.cc"],
     data = ["//modules/canbus:canbus_testdata"],
     deps = [
         ":wey_controller",

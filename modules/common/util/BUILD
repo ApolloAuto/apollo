@@ -43,9 +43,7 @@ cc_library(
 cc_test(
     name = "util_test",
     size = "small",
-    srcs = [
-        "util_test.cc",
-    ],
+    srcs = ["util_test.cc"],
     deps = [
         ":util",
         "//modules/common/util/testdata:simple_proto",
@@ -86,9 +84,7 @@ cc_library(
 cc_test(
     name = "message_util_test",
     size = "small",
-    srcs = [
-        "message_util_test.cc",
-    ],
+    srcs = ["message_util_test.cc"],
     tags = [
         "external",
     ],
@@ -102,9 +98,7 @@ cc_test(
 cc_test(
     name = "string_util_test",
     size = "small",
-    srcs = [
-        "string_util_test.cc",
-    ],
+    srcs = ["string_util_test.cc"],
     deps = [
         ":string_util",
         "@gtest//:main",
@@ -121,9 +115,7 @@ cc_library(
 
 cc_library(
     name = "factory",
-    hdrs = [
-        "factory.h",
-    ],
+    hdrs = ["factory.h"],
     deps = [
         "//cyber/common",
     ],
@@ -132,9 +124,7 @@ cc_library(
 cc_test(
     name = "factory_test",
     size = "small",
-    srcs = [
-        "factory_test.cc",
-    ],
+    srcs = ["factory_test.cc"],
     deps = [
         ":factory",
         "//modules/common",
@@ -145,9 +135,7 @@ cc_test(
 cc_test(
     name = "lru_cache_test",
     size = "small",
-    srcs = [
-        "lru_cache_test.cc",
-    ],
+    srcs = ["lru_cache_test.cc"],
     deps = [
         "//modules/common/util:lru_cache",
         "@gtest//:main",
@@ -156,9 +144,7 @@ cc_test(
 
 cc_library(
     name = "points_downsampler",
-    hdrs = [
-        "points_downsampler.h",
-    ],
+    hdrs = ["points_downsampler.h"],
     deps = [
         "//cyber/common",
         "//modules/common/math:geometry",
@@ -168,9 +154,7 @@ cc_library(
 cc_test(
     name = "points_downsampler_test",
     size = "small",
-    srcs = [
-        "points_downsampler_test.cc",
-    ],
+    srcs = ["points_downsampler_test.cc"],
     deps = [
         ":points_downsampler",
         "@gtest//:main",
@@ -179,12 +163,8 @@ cc_test(
 
 cc_library(
     name = "json_util",
-    srcs = [
-        "json_util.cc",
-    ],
-    hdrs = [
-        "json_util.h",
-    ],
+    srcs = ["json_util.cc"],
+    hdrs = ["json_util.h"],
     deps = [
         "//cyber/common",
         "//third_party/json",
@@ -195,9 +175,7 @@ cc_library(
 cc_test(
     name = "json_util_test",
     size = "small",
-    srcs = [
-        "json_util_test.cc",
-    ],
+    srcs = ["json_util_test.cc"],
     deps = [
         ":json_util",
         "//modules/common/proto:error_code_proto",

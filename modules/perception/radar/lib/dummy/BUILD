@@ -5,9 +5,7 @@ package(default_visibility = ["//visibility:public"])
 cc_test(
     name = "dummy_algorithms_test",
     size = "small",
-    srcs = [
-        "dummy_algorithms_test.cc",
-    ],
+    srcs = ["dummy_algorithms_test.cc"],
     deps = [
         ":dummy_algorithms",
         "@gtest//:main",
@@ -16,12 +14,8 @@ cc_test(
 
 cc_library(
     name = "dummy_algorithms",
-    srcs = [
-        "dummy_algorithms.cc",
-    ],
-    hdrs = [
-        "dummy_algorithms.h",
-    ],
+    srcs = ["dummy_algorithms.cc"],
+    hdrs = ["dummy_algorithms.h"],
     deps = [
         "//modules/drivers/proto:sensor_proto",
         "//modules/perception/base",

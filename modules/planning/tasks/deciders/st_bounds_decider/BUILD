@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "st_bounds_decider",
-    srcs = [
-        "st_bounds_decider.cc",
-    ],
-    hdrs = [
-        "st_bounds_decider.h",
-    ],
+    srcs = ["st_bounds_decider.cc"],
+    hdrs = ["st_bounds_decider.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":st_driving_limits",
@@ -27,12 +23,8 @@ cc_library(
 
 cc_library(
     name = "st_guide_line",
-    srcs = [
-        "st_guide_line.cc",
-    ],
-    hdrs = [
-        "st_guide_line.h",
-    ],
+    srcs = ["st_guide_line.cc"],
+    hdrs = ["st_guide_line.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
@@ -60,12 +52,8 @@ cc_library(
 
 cc_library(
     name = "st_driving_limits",
-    srcs = [
-        "st_driving_limits.cc",
-    ],
-    hdrs = [
-        "st_driving_limits.h",
-    ],
+    srcs = ["st_driving_limits.cc"],
+    hdrs = ["st_driving_limits.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
@@ -93,12 +81,8 @@ cc_library(
 
 cc_library(
     name = "st_obstacles_processor",
-    srcs = [
-        "st_obstacles_processor.cc",
-    ],
-    hdrs = [
-        "st_obstacles_processor.h",
-    ],
+    srcs = ["st_obstacles_processor.cc"],
+    hdrs = ["st_obstacles_processor.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
