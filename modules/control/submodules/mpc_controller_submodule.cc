@@ -64,7 +64,7 @@ bool MPCControllerSubmodule::Proc(
   // recording pad msg
   if (preprocessor_status->received_pad_msg()) {
     control_core_command.mutable_pad_msg()->CopyFrom(
-        preprocessor_status->mutable_local_view()->pad_msg());
+        preprocessor_status->local_view().pad_msg());
   }
   ADEBUG << "MPC controller submodule started ....";
 
