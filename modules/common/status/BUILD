@@ -7,6 +7,7 @@ cc_library(
     hdrs = ["status.h"],
     deps = [
         "//modules/common/proto:error_code_proto",
+        "//modules/common/util:future",
         "@com_google_protobuf//:protobuf",
     ],
 )
