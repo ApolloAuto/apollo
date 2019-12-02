@@ -45,9 +45,6 @@ module_config {
             flag_file_path: "/apollo/modules/control/conf/control.conf"
             readers: [
                 {
-                    channel:"/apollo/control/preprocessor"
-                },
-                {
                     channel:"/apollo/control/controlcore"
                 }
             ]
