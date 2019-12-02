@@ -22,12 +22,8 @@ cc_library(
 
 cc_library(
     name = "adc_auxiliarycontrol_110",
-    srcs = [
-        "adc_auxiliarycontrol_110.cc",
-    ],
-    hdrs = [
-        "adc_auxiliarycontrol_110.h",
-    ],
+    srcs = ["adc_auxiliarycontrol_110.cc"],
+    hdrs = ["adc_auxiliarycontrol_110.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//modules/canbus/proto:canbus_proto",
@@ -49,12 +45,8 @@ cc_test(
 
 cc_library(
     name = "adc_motioncontrol1_10",
-    srcs = [
-        "adc_motioncontrol1_10.cc",
-    ],
-    hdrs = [
-        "adc_motioncontrol1_10.h",
-    ],
+    srcs = ["adc_motioncontrol1_10.cc"],
+    hdrs = ["adc_motioncontrol1_10.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//modules/canbus/proto:canbus_proto",
@@ -76,12 +68,8 @@ cc_test(
 
 cc_library(
     name = "adc_motioncontrollimits1_12",
-    srcs = [
-        "adc_motioncontrollimits1_12.cc",
-    ],
-    hdrs = [
-        "adc_motioncontrollimits1_12.h",
-    ],
+    srcs = ["adc_motioncontrollimits1_12.cc"],
+    hdrs = ["adc_motioncontrollimits1_12.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//modules/canbus/proto:canbus_proto",
@@ -103,12 +91,8 @@ cc_test(
 
 cc_library(
     name = "llc_auxiliaryfeedback_120",
-    srcs = [
-        "llc_auxiliaryfeedback_120.cc",
-    ],
-    hdrs = [
-        "llc_auxiliaryfeedback_120.h",
-    ],
+    srcs = ["llc_auxiliaryfeedback_120.cc"],
+    hdrs = ["llc_auxiliaryfeedback_120.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//modules/canbus/proto:canbus_proto",
@@ -130,12 +114,8 @@ cc_test(
 
 cc_library(
     name = "llc_diag_brakecontrol_721",
-    srcs = [
-        "llc_diag_brakecontrol_721.cc",
-    ],
-    hdrs = [
-        "llc_diag_brakecontrol_721.h",
-    ],
+    srcs = ["llc_diag_brakecontrol_721.cc"],
+    hdrs = ["llc_diag_brakecontrol_721.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//modules/canbus/proto:canbus_proto",
@@ -157,12 +137,8 @@ cc_test(
 
 cc_library(
     name = "llc_diag_fault_620",
-    srcs = [
-        "llc_diag_fault_620.cc",
-    ],
-    hdrs = [
-        "llc_diag_fault_620.h",
-    ],
+    srcs = ["llc_diag_fault_620.cc"],
+    hdrs = ["llc_diag_fault_620.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//modules/canbus/proto:canbus_proto",
@@ -184,12 +160,8 @@ cc_test(
 
 cc_library(
     name = "llc_diag_steeringcontrol_722",
-    srcs = [
-        "llc_diag_steeringcontrol_722.cc",
-    ],
-    hdrs = [
-        "llc_diag_steeringcontrol_722.h",
-    ],
+    srcs = ["llc_diag_steeringcontrol_722.cc"],
+    hdrs = ["llc_diag_steeringcontrol_722.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//modules/canbus/proto:canbus_proto",
@@ -211,12 +183,8 @@ cc_test(
 
 cc_library(
     name = "llc_motioncommandfeedback1_22",
-    srcs = [
-        "llc_motioncommandfeedback1_22.cc",
-    ],
-    hdrs = [
-        "llc_motioncommandfeedback1_22.h",
-    ],
+    srcs = ["llc_motioncommandfeedback1_22.cc"],
+    hdrs = ["llc_motioncommandfeedback1_22.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//modules/canbus/proto:canbus_proto",
@@ -238,12 +206,8 @@ cc_test(
 
 cc_library(
     name = "llc_motionfeedback1_20",
-    srcs = [
-        "llc_motionfeedback1_20.cc",
-    ],
-    hdrs = [
-        "llc_motionfeedback1_20.h",
-    ],
+    srcs = ["llc_motionfeedback1_20.cc"],
+    hdrs = ["llc_motionfeedback1_20.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//modules/canbus/proto:canbus_proto",
@@ -265,12 +229,8 @@ cc_test(
 
 cc_library(
     name = "llc_motionfeedback2_21",
-    srcs = [
-        "llc_motionfeedback2_21.cc",
-    ],
-    hdrs = [
-        "llc_motionfeedback2_21.h",
-    ],
+    srcs = ["llc_motionfeedback2_21.cc"],
+    hdrs = ["llc_motionfeedback2_21.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//modules/canbus/proto:canbus_proto",
@@ -292,12 +252,8 @@ cc_test(
 
 cc_library(
     name = "llc_vehiclelimits_24",
-    srcs = [
-        "llc_vehiclelimits_24.cc",
-    ],
-    hdrs = [
-        "llc_vehiclelimits_24.h",
-    ],
+    srcs = ["llc_vehiclelimits_24.cc"],
+    hdrs = ["llc_vehiclelimits_24.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//modules/canbus/proto:canbus_proto",
@@ -319,12 +275,8 @@ cc_test(
 
 cc_library(
     name = "llc_vehiclestatus_25",
-    srcs = [
-        "llc_vehiclestatus_25.cc",
-    ],
-    hdrs = [
-        "llc_vehiclestatus_25.h",
-    ],
+    srcs = ["llc_vehiclestatus_25.cc"],
+    hdrs = ["llc_vehiclestatus_25.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
         "//modules/canbus/proto:canbus_proto",

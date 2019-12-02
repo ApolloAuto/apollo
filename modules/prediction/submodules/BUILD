@@ -5,9 +5,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "container_submodule_lib",
     srcs = ["container_submodule.cc"],
-    hdrs = [
-        "container_submodule.h",
-    ],
+    hdrs = ["container_submodule.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
@@ -75,9 +73,7 @@ cc_binary(
 cc_library(
     name = "evaluator_submodule_lib",
     srcs = ["evaluator_submodule.cc"],
-    hdrs = [
-        "evaluator_submodule.h",
-    ],
+    hdrs = ["evaluator_submodule.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
@@ -104,9 +100,7 @@ cc_binary(
 cc_library(
     name = "predictor_submodule_lib",
     srcs = ["predictor_submodule.cc"],
-    hdrs = [
-        "predictor_submodule.h",
-    ],
+    hdrs = ["predictor_submodule.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],

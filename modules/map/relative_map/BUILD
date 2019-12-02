@@ -9,12 +9,8 @@ filegroup(
 
 cc_library(
     name = "relative_map_lib",
-    srcs = [
-        "relative_map.cc",
-    ],
-    hdrs = [
-        "relative_map.h",
-    ],
+    srcs = ["relative_map.cc"],
+    hdrs = ["relative_map.h"],
     copts = ["-DMODULE_NAME=\\\"map\\\""],
     data = [
         ":relative_map_conf",
@@ -35,12 +31,8 @@ cc_library(
 
 cc_library(
     name = "navigation_lane_lib",
-    srcs = [
-        "navigation_lane.cc",
-    ],
-    hdrs = [
-        "navigation_lane.h",
-    ],
+    srcs = ["navigation_lane.cc"],
+    hdrs = ["navigation_lane.h"],
     copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         "//cyber",
@@ -56,12 +48,8 @@ cc_library(
 
 cc_library(
     name = "relative_map_component_lib",
-    srcs = [
-        "relative_map_component.cc",
-    ],
-    hdrs = [
-        "relative_map_component.h",
-    ],
+    srcs = ["relative_map_component.cc"],
+    hdrs = ["relative_map_component.h"],
     copts = ["-DMODULE_NAME=\\\"map\\\""],
     deps = [
         ":relative_map_lib",
@@ -89,9 +77,7 @@ filegroup(
 cc_test(
     name = "navigation_lane_test",
     size = "small",
-    srcs = [
-        "navigation_lane_test.cc",
-    ],
+    srcs = ["navigation_lane_test.cc"],
     data = [
         ":relative_map_conf",
         ":testdata",

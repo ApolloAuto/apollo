@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "task",
-    srcs = [
-        "task.cc",
-    ],
-    hdrs = [
-        "task.h",
-    ],
+    srcs = ["task.cc"],
+    hdrs = ["task.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/status",
@@ -23,12 +19,8 @@ cc_library(
 
 cc_library(
     name = "task_factory",
-    srcs = [
-        "task_factory.cc",
-    ],
-    hdrs = [
-        "task_factory.h",
-    ],
+    srcs = ["task_factory.cc"],
+    hdrs = ["task_factory.h"],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
         "-fopenmp",

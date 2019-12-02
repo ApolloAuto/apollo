@@ -9,9 +9,7 @@ cc_proto_library(
 
 proto_library(
     name = "guardian_proto_lib",
-    srcs = [
-        "guardian.proto",
-    ],
+    srcs = ["guardian.proto"],
     deps = [
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/proto:drive_state_proto_lib",
@@ -32,7 +30,5 @@ cc_proto_library(
 
 proto_library(
     name = "guardian_conf_proto_lib",
-    srcs = [
-        "guardian_conf.proto",
-    ],
+    srcs = ["guardian_conf.proto"],
 )

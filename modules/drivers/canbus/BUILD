@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "sensor_gflags",
-    srcs = [
-        "sensor_gflags.cc",
-    ],
-    hdrs = [
-        "sensor_gflags.h",
-    ],
+    srcs = ["sensor_gflags.cc"],
+    hdrs = ["sensor_gflags.h"],
     deps = [
         "//external:gflags",
     ],

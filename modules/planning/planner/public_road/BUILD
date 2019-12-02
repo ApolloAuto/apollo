@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "public_road_planner",
-    srcs = [
-        "public_road_planner.cc",
-    ],
-    hdrs = [
-        "public_road_planner.h",
-    ],
+    srcs = ["public_road_planner.cc"],
+    hdrs = ["public_road_planner.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
@@ -42,9 +38,7 @@ cc_library(
 cc_test(
     name = "public_road_planner_test",
     size = "small",
-    srcs = [
-        "public_road_planner_test.cc",
-    ],
+    srcs = ["public_road_planner_test.cc"],
     deps = [
         ":public_road_planner",
         "@gtest//:main",

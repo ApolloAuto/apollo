@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "probabilistic_fusion",
-    srcs = [
-        "probabilistic_fusion.cc",
-    ],
-    hdrs = [
-        "probabilistic_fusion.h",
-    ],
+    srcs = ["probabilistic_fusion.cc"],
+    hdrs = ["probabilistic_fusion.h"],
     deps = [
         "//cyber",
         "//modules/common/time",
@@ -41,9 +37,7 @@ cc_library(
 cc_test(
     name = "probabilistic_fusion_test",
     size = "small",
-    srcs = [
-        "probabilistic_fusion_test.cc",
-    ],
+    srcs = ["probabilistic_fusion_test.cc"],
     deps = [
         ":probabilistic_fusion",
         "@gtest//:main",

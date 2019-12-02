@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "smoother",
-    srcs = [
-        "smoother.cc",
-    ],
-    hdrs = [
-        "smoother.h",
-    ],
+    srcs = ["smoother.cc"],
+    hdrs = ["smoother.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/status",

@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "offline_local_visualizer_lib",
-    srcs = [
-        "offline_local_visualizer.cc",
-    ],
-    hdrs = [
-        "offline_local_visualizer.h",
-    ],
+    srcs = ["offline_local_visualizer.cc"],
+    hdrs = ["offline_local_visualizer.h"],
     deps = [
         "//cyber",
         "//modules/common/util",
@@ -23,9 +19,7 @@ cc_library(
 
 cc_binary(
     name = "offline_local_visualizer",
-    srcs = [
-        "offline_local_visualizer_main.cc",
-    ],
+    srcs = ["offline_local_visualizer_main.cc"],
     linkstatic = 0,
     deps = [
         ":offline_local_visualizer_lib",

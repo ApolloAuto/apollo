@@ -4,9 +4,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "ndt_map_creator",
-    srcs = [
-        "ndt_map_creator.cc",
-    ],
+    srcs = ["ndt_map_creator.cc"],
     linkopts = [
         "-lboost_filesystem",
         "-lboost_system",

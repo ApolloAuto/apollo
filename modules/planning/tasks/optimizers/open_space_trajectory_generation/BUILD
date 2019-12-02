@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "open_space_trajectory_provider",
-    srcs = [
-        "open_space_trajectory_provider.cc",
-    ],
-    hdrs = [
-        "open_space_trajectory_provider.h",
-    ],
+    srcs = ["open_space_trajectory_provider.cc"],
+    hdrs = ["open_space_trajectory_provider.h"],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
         "-fopenmp",
@@ -28,12 +24,8 @@ cc_library(
 
 cc_library(
     name = "open_space_trajectory_optimizer",
-    srcs = [
-        "open_space_trajectory_optimizer.cc",
-    ],
-    hdrs = [
-        "open_space_trajectory_optimizer.h",
-    ],
+    srcs = ["open_space_trajectory_optimizer.cc"],
+    hdrs = ["open_space_trajectory_optimizer.h"],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
         "-fopenmp",
@@ -58,9 +50,7 @@ cc_library(
 cc_test(
     name = "open_space_trajectory_provider_test",
     size = "small",
-    srcs = [
-        "open_space_trajectory_provider_test.cc",
-    ],
+    srcs = ["open_space_trajectory_provider_test.cc"],
     copts = [
         "-fopenmp",
     ],
@@ -73,9 +63,7 @@ cc_test(
 cc_test(
     name = "open_space_trajectory_optimizer_test",
     size = "small",
-    srcs = [
-        "open_space_trajectory_optimizer_test.cc",
-    ],
+    srcs = ["open_space_trajectory_optimizer_test.cc"],
     copts = [
         "-fopenmp",
     ],

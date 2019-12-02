@@ -11,9 +11,7 @@ cc_binary(
 
 cc_library(
     name = "map_datachecker_client_lib",
-    srcs = [
-        "main.cc",
-    ],
+    srcs = ["main.cc"],
     linkopts = [
         "-lboost_filesystem",
         "-lgrpc++",
@@ -26,9 +24,7 @@ cc_library(
 
 cc_library(
     name = "client",
-    srcs = [
-        "client.cc",
-    ],
+    srcs = ["client.cc"],
     hdrs = [
         "client.h",
         "client_alignment.h",
@@ -49,12 +45,8 @@ cc_library(
 
 cc_library(
     name = "client_channel_checker",
-    srcs = [
-        "client_channel_checker.cc",
-    ],
-    hdrs = [
-        "client_channel_checker.h",
-    ],
+    srcs = ["client_channel_checker.cc"],
+    hdrs = ["client_channel_checker.h"],
     linkopts = [
         "-lboost_filesystem",
         "-lgrpc++",
@@ -71,12 +63,8 @@ cc_library(
 
 cc_library(
     name = "client_common",
-    srcs = [
-        "client_common.cc",
-    ],
-    hdrs = [
-        "client_common.h",
-    ],
+    srcs = ["client_common.cc"],
+    hdrs = ["client_common.h"],
     linkopts = [
         "-lboost_filesystem",
         "-lgrpc++",
@@ -88,12 +76,8 @@ cc_library(
 
 cc_library(
     name = "client_gflags",
-    srcs = [
-        "client_gflags.cc",
-    ],
-    hdrs = [
-        "client_gflags.h",
-    ],
+    srcs = ["client_gflags.cc"],
+    hdrs = ["client_gflags.h"],
     deps = [
         "//external:gflags",
     ],
@@ -101,12 +85,8 @@ cc_library(
 
 cc_library(
     name = "client_loops_check",
-    srcs = [
-        "client_loops_check.cc",
-    ],
-    hdrs = [
-        "client_loops_check.h",
-    ],
+    srcs = ["client_loops_check.cc"],
+    hdrs = ["client_loops_check.h"],
     linkopts = [
         "-lboost_filesystem",
         "-lgrpc++",
@@ -123,12 +103,8 @@ cc_library(
 
 cc_library(
     name = "exception_handler",
-    srcs = [
-        "exception_handler.cc",
-    ],
-    hdrs = [
-        "exception_handler.h",
-    ],
+    srcs = ["exception_handler.cc"],
+    hdrs = ["exception_handler.h"],
     deps = [
         ":client_common",
         "//cyber",

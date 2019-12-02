@@ -5,20 +5,14 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "controller_interface",
     srcs = [],
-    hdrs = [
-        "controller.h",
-    ],
+    hdrs = ["controller.h"],
     copts = ['-DMODULE_NAME=\\"control\\"'],
 )
 
 cc_library(
     name = "lat_controller",
-    srcs = [
-        "lat_controller.cc",
-    ],
-    hdrs = [
-        "lat_controller.h",
-    ],
+    srcs = ["lat_controller.cc"],
+    hdrs = ["lat_controller.h"],
     copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         ":controller_interface",
@@ -46,12 +40,8 @@ cc_library(
 
 cc_library(
     name = "lon_controller",
-    srcs = [
-        "lon_controller.cc",
-    ],
-    hdrs = [
-        "lon_controller.h",
-    ],
+    srcs = ["lon_controller.cc"],
+    hdrs = ["lon_controller.h"],
     copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         ":controller_interface",
@@ -73,12 +63,8 @@ cc_library(
 
 cc_library(
     name = "mpc_controller",
-    srcs = [
-        "mpc_controller.cc",
-    ],
-    hdrs = [
-        "mpc_controller.h",
-    ],
+    srcs = ["mpc_controller.cc"],
+    hdrs = ["mpc_controller.h"],
     copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         ":controller_interface",
@@ -118,12 +104,8 @@ cc_library(
 
 cc_library(
     name = "controller_agent",
-    srcs = [
-        "controller_agent.cc",
-    ],
-    hdrs = [
-        "controller_agent.h",
-    ],
+    srcs = ["controller_agent.cc"],
+    hdrs = ["controller_agent.h"],
     copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         ":controller_interface",
@@ -142,9 +124,7 @@ cc_library(
 cc_test(
     name = "lon_controller_test",
     size = "small",
-    srcs = [
-        "lon_controller_test.cc",
-    ],
+    srcs = ["lon_controller_test.cc"],
     data = ["//modules/control/testdata:control_testdata"],
     deps = [
         ":lon_controller",
@@ -162,9 +142,7 @@ cc_test(
 cc_test(
     name = "lat_controller_test",
     size = "small",
-    srcs = [
-        "lat_controller_test.cc",
-    ],
+    srcs = ["lat_controller_test.cc"],
     data = ["//modules/control/testdata:control_testdata"],
     deps = [
         ":lat_controller",
@@ -182,9 +160,7 @@ cc_test(
 cc_test(
     name = "mpc_controller_test",
     size = "small",
-    srcs = [
-        "mpc_controller_test.cc",
-    ],
+    srcs = ["mpc_controller_test.cc"],
     data = ["//modules/control/testdata:control_testdata"],
     deps = [
         ":mpc_controller",

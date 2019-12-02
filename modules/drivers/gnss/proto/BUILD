@@ -25,9 +25,7 @@ cc_proto_library(
 
 proto_library(
     name = "ins_proto_lib",
-    srcs = [
-        "ins.proto",
-    ],
+    srcs = ["ins.proto"],
     deps = [
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:geometry_proto_lib",
@@ -79,8 +77,6 @@ cc_proto_library(
 proto_library(
     name = "config_lib",
     srcs = ["config.proto"],
-    deps = [
-    ],
 )
 
 cc_proto_library(
@@ -109,9 +105,7 @@ cc_proto_library(
 
 proto_library(
     name = "gnss_status_proto_lib",
-    srcs = [
-        "gnss_status.proto",
-    ],
+    srcs = ["gnss_status.proto"],
     deps = [
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:geometry_proto_lib",
@@ -128,9 +122,7 @@ cc_proto_library(
 
 proto_library(
     name = "gnss_proto_lib",
-    srcs = [
-        "gnss.proto",
-    ],
+    srcs = ["gnss.proto"],
     deps = [
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:geometry_proto_lib",
@@ -147,9 +139,7 @@ cc_proto_library(
 
 proto_library(
     name = "heading_proto_lib",
-    srcs = [
-        "heading.proto",
-    ],
+    srcs = ["heading.proto"],
     deps = [
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:geometry_proto_lib",

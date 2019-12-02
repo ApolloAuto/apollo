@@ -11,12 +11,8 @@ cc_library(
 
 cc_library(
     name = "routing_navigator",
-    srcs = [
-        "navigator.cc",
-    ],
-    hdrs = [
-        "navigator.h",
-    ],
+    srcs = ["navigator.cc"],
+    hdrs = ["navigator.h"],
     copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
         ":routing_black_list_range_generator",
@@ -28,12 +24,8 @@ cc_library(
 
 cc_library(
     name = "routing_black_list_range_generator",
-    srcs = [
-        "black_list_range_generator.cc",
-    ],
-    hdrs = [
-        "black_list_range_generator.h",
-    ],
+    srcs = ["black_list_range_generator.cc"],
+    hdrs = ["black_list_range_generator.h"],
     copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
         "//modules/routing/graph",
@@ -42,12 +34,8 @@ cc_library(
 
 cc_library(
     name = "routing_result_generator",
-    srcs = [
-        "result_generator.cc",
-    ],
-    hdrs = [
-        "result_generator.h",
-    ],
+    srcs = ["result_generator.cc"],
+    hdrs = ["result_generator.h"],
     copts = ['-DMODULE_NAME=\\"routing\\"'],
     deps = [
         "//modules/routing/graph",

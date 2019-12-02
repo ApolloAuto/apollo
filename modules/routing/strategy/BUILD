@@ -11,9 +11,7 @@ cc_library(
 
 cc_library(
     name = "routing_a_star_strategy",
-    srcs = [
-        "a_star_strategy.cc",
-    ],
+    srcs = ["a_star_strategy.cc"],
     hdrs = [
         "a_star_strategy.h",
         "strategy.h",

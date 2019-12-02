@@ -13,12 +13,8 @@ cc_library(
 
 cc_library(
     name = "lane_follow_stage",
-    srcs = [
-        "lane_follow_stage.cc",
-    ],
-    hdrs = [
-        "lane_follow_stage.h",
-    ],
+    srcs = ["lane_follow_stage.cc"],
+    hdrs = ["lane_follow_stage.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
@@ -51,12 +47,8 @@ cc_library(
 
 cc_library(
     name = "lane_follow_scenario",
-    srcs = [
-        "lane_follow_scenario.cc",
-    ],
-    hdrs = [
-        "lane_follow_scenario.h",
-    ],
+    srcs = ["lane_follow_scenario.cc"],
+    hdrs = ["lane_follow_scenario.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":lane_follow_stage",
@@ -90,9 +82,7 @@ cc_library(
 cc_test(
     name = "lane_follow_scenario_test",
     size = "small",
-    srcs = [
-        "lane_follow_scenario_test.cc",
-    ],
+    srcs = ["lane_follow_scenario_test.cc"],
     data = [
         "//modules/planning:planning_conf",
     ],

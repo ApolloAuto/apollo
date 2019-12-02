@@ -35,8 +35,6 @@ cc_test(
 cc_library(
     name = "container",
     hdrs = ["container.h"],
-    deps = [
-    ],
 )
 
 cpplint()

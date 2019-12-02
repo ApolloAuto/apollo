@@ -4,9 +4,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "obu_interface_grpc_impl",
-    srcs = [
-        "obu_interface_grpc_impl.cc",
-    ],
+    srcs = ["obu_interface_grpc_impl.cc"],
     hdrs = [
         "obu_interface_abstract_class.h",
         "obu_interface_grpc_impl.h",
@@ -23,9 +21,7 @@ cc_library(
 cc_test(
     name = "obu_interface_grpc_impl_test",
     size = "small",
-    srcs = [
-        "obu_interface_grpc_impl_test.cc",
-    ],
+    srcs = ["obu_interface_grpc_impl_test.cc"],
     deps = [
         ":obu_interface_grpc_impl",
         "@gtest//:main",

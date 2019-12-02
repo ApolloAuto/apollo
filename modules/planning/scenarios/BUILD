@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "scenario",
-    srcs = [
-        "scenario.cc",
-    ],
-    hdrs = [
-        "scenario.h",
-    ],
+    srcs = ["scenario.cc"],
+    hdrs = ["scenario.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":stage",
@@ -22,12 +18,8 @@ cc_library(
 
 cc_library(
     name = "stage",
-    srcs = [
-        "stage.cc",
-    ],
-    hdrs = [
-        "stage.h",
-    ],
+    srcs = ["stage.cc"],
+    hdrs = ["stage.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common",
@@ -40,12 +32,8 @@ cc_library(
 
 cc_library(
     name = "stage_intersection_cruise_impl",
-    srcs = [
-        "stage_intersection_cruise_impl.cc",
-    ],
-    hdrs = [
-        "stage_intersection_cruise_impl.h",
-    ],
+    srcs = ["stage_intersection_cruise_impl.cc"],
+    hdrs = ["stage_intersection_cruise_impl.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common",
@@ -57,12 +45,8 @@ cc_library(
 
 cc_library(
     name = "scenario_manager",
-    srcs = [
-        "scenario_manager.cc",
-    ],
-    hdrs = [
-        "scenario_manager.h",
-    ],
+    srcs = ["scenario_manager.cc"],
+    hdrs = ["scenario_manager.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common",

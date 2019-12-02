@@ -33,9 +33,7 @@ cc_library(
 cc_test(
     name = "yield_sign_scenario_test",
     size = "small",
-    srcs = [
-        "yield_sign_scenario_test.cc",
-    ],
+    srcs = ["yield_sign_scenario_test.cc"],
     data = [
         "//modules/planning:planning_conf",
     ],
@@ -48,9 +46,7 @@ cc_test(
 cc_test(
     name = "stage_approach_test",
     size = "small",
-    srcs = [
-        "stage_approach_test.cc",
-    ],
+    srcs = ["stage_approach_test.cc"],
     data = [
         "//modules/planning:planning_conf",
     ],
@@ -63,9 +59,7 @@ cc_test(
 cc_test(
     name = "stage_creep_test",
     size = "small",
-    srcs = [
-        "stage_creep_test.cc",
-    ],
+    srcs = ["stage_creep_test.cc"],
     data = [
         "//modules/planning:planning_conf",
     ],

@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "pedestrian_interaction_evaluator",
-    srcs = [
-        "pedestrian_interaction_evaluator.cc",
-    ],
-    hdrs = [
-        "pedestrian_interaction_evaluator.h",
-    ],
+    srcs = ["pedestrian_interaction_evaluator.cc"],
+    hdrs = ["pedestrian_interaction_evaluator.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
@@ -30,9 +26,7 @@ cc_library(
 cc_test(
     name = "pedestrian_interaction_evaluator_test",
     size = "small",
-    srcs = [
-        "pedestrian_interaction_evaluator_test.cc",
-    ],
+    srcs = ["pedestrian_interaction_evaluator_test.cc"],
     data = [
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",

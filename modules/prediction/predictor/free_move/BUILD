@@ -19,9 +19,7 @@ cc_library(
 cc_test(
     name = "free_move_predictor_test",
     size = "small",
-    srcs = [
-        "free_move_predictor_test.cc",
-    ],
+    srcs = ["free_move_predictor_test.cc"],
     data = [
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",

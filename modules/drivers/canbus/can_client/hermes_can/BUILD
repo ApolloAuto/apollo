@@ -4,9 +4,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "hermes_can_client",
-    srcs = [
-        "hermes_can_client.cc",
-    ],
+    srcs = ["hermes_can_client.cc"],
     hdrs = [
         "bcan.h",
         "bcan_defs.h",
@@ -21,9 +19,7 @@ cc_library(
 cc_test(
     name = "hermes_can_client_test",
     size = "small",
-    srcs = [
-        "hermes_can_client_test.cc",
-    ],
+    srcs = ["hermes_can_client_test.cc"],
     deps = [
         "//cyber",
         "//modules/drivers/canbus/can_client/hermes_can:hermes_can_client",

@@ -51,9 +51,7 @@ cc_test(
     name = "ndt_localization_test",
     size = "small",
     timeout = "short",
-    srcs = [
-        "ndt_localization_test.cc",
-    ],
+    srcs = ["ndt_localization_test.cc"],
     deps = [
         "//cyber",
         "//modules/localization/ndt:ndt_localization_component_lib",
@@ -65,9 +63,7 @@ cc_test(
     name = "ndt_localization_pose_buffer_test",
     size = "small",
     timeout = "short",
-    srcs = [
-        "localization_pose_buffer_test.cc",
-    ],
+    srcs = ["localization_pose_buffer_test.cc"],
     deps = [
         "//cyber",
         "//modules/localization/ndt:ndt_localization_component_lib",

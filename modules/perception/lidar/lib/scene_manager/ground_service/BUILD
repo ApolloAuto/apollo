@@ -4,9 +4,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "ground_struct",
-    hdrs = [
-        "ground_struct.h",
-    ],
+    hdrs = ["ground_struct.h"],
     deps = [
         "@eigen",
     ],
@@ -14,12 +12,8 @@ cc_library(
 
 cc_library(
     name = "ground_service",
-    srcs = [
-        "ground_service.cc",
-    ],
-    hdrs = [
-        "ground_service.h",
-    ],
+    srcs = ["ground_service.cc"],
+    hdrs = ["ground_service.h"],
     deps = [
         ":ground_struct",
         "//modules/perception/common/i_lib",

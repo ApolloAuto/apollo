@@ -29,9 +29,7 @@ cc_library(
 cc_test(
     name = "node_channel_impl_test",
     size = "small",
-    srcs = [
-        "node_channel_impl_test.cc",
-    ],
+    srcs = ["node_channel_impl_test.cc"],
     deps = [
         "//cyber",
         "//cyber/proto:unit_test_cc_proto",
@@ -55,9 +53,7 @@ cc_library(
 cc_test(
     name = "node_test",
     size = "small",
-    srcs = [
-        "node_test.cc",
-    ],
+    srcs = ["node_test.cc"],
     deps = [
         "//cyber",
         "//cyber/proto:unit_test_cc_proto",

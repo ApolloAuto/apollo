@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "msg_serializer",
-    srcs = [
-        "msg_serializer.cc",
-    ],
-    hdrs = [
-        "msg_serializer.h",
-    ],
+    srcs = ["msg_serializer.cc"],
+    hdrs = ["msg_serializer.h"],
     deps = [
         "//cyber",
         "//modules/common/time",

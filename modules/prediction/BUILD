@@ -5,9 +5,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "prediction_component_lib",
     srcs = ["prediction_component.cc"],
-    hdrs = [
-        "prediction_component.h",
-    ],
+    hdrs = ["prediction_component.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],

@@ -11,9 +11,7 @@ cc_proto_library(
 
 proto_library(
     name = "pbf_gatekeeper_config_proto_lib",
-    srcs = [
-        "pbf_gatekeeper_config.proto",
-    ],
+    srcs = ["pbf_gatekeeper_config.proto"],
 )
 
 cpplint()

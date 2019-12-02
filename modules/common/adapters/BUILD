@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "adapter_gflags",
-    srcs = [
-        "adapter_gflags.cc",
-    ],
-    hdrs = [
-        "adapter_gflags.h",
-    ],
+    srcs = ["adapter_gflags.cc"],
+    hdrs = ["adapter_gflags.h"],
     deps = [
         "//external:gflags",
     ],

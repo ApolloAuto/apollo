@@ -11,9 +11,7 @@ cc_proto_library(
 
 proto_library(
     name = "filter_bank_config_proto_lib",
-    srcs = [
-        "filter_bank_config.proto",
-    ],
+    srcs = ["filter_bank_config.proto"],
 )
 
 cpplint()

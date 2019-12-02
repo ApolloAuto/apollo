@@ -22,12 +22,8 @@ cc_library(
 
 cc_library(
     name = "compensator_lib",
-    srcs = [
-        "compensator.cc",
-    ],
-    hdrs = [
-        "compensator.h",
-    ],
+    srcs = ["compensator.cc"],
+    hdrs = ["compensator.h"],
     copts = ['-DMODULE_NAME=\\"velodyne\\"'],
     deps = [
         "//cyber",
