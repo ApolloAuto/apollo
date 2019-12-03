@@ -81,7 +81,7 @@ function check_in_docker() {
 }
 
 function set_lib_path() {
-  export LD_LIBRARY_PATH=/usr/lib:/usr/lib/x86_64-linux-gnu
+  export LD_LIBRARY_PATH=/usr/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-nvidia
 
   if [ "$RELEASE_DOCKER" == 1 ]; then
     local CYBER_SETUP="/apollo/cyber/setup.bash"
