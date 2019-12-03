@@ -275,16 +275,24 @@ void LatencyMonitor::ValidateMaxLatency() {
 
       for (const auto& latency :
            latency_report_.latency_tracks().module_latency()) {
-        if (latency.module_name() == config.name() &&
-            latency.module_stat().aver_duration() >
-                config.max_latency_allowed()) {
-          // send out alert
-          SummaryMonitor::EscalateStatus(
-              ComponentStatus::WARN,
-              absl::StrCat(config.name(), " has average latency ",
-                           latency.module_stat().aver_duration(), " > ",
-                           config.max_latency_allowed()),
-              status);
+        if (latency.module_name() == config.name()) {
+          if (latency.module_stat().aver_duration() >
+              config.max_latency_allowed()) {
+            SummaryMonitor::EscalateStatus(
+                ComponentStatus::WARN,
+                absl::StrCat(config.name(), " has average latency ",
+                             latency.module_stat().aver_duration(),
+                             " > maximum ", config.max_latency_allowed()),
+                status);
+          } else if (latency.module_stat().aver_duration() <
+                     config.min_latency_allowed()) {
+            SummaryMonitor::EscalateStatus(
+                ComponentStatus::WARN,
+                absl::StrCat(config.name(), " has average latency ",
+                             latency.module_stat().aver_duration(),
+                             " < minimum ", config.min_latency_allowed()),
+                status);
+          }
         }
       }
 
