@@ -261,7 +261,7 @@ bool CheckADCReadyToCruise(Frame* frame,
            canbus::Chassis::GEAR_DRIVE ||
        std::fabs(common::VehicleStateProvider::Instance()
                      ->vehicle_state()
-                     .linear_velocity() < kMinSpeed)) &&
+                     .linear_velocity()) < kMinSpeed) &&
       !is_near_front_obstacle && heading_align_w_reference_line) {
     return true;
   }
@@ -329,11 +329,6 @@ bool CheckADCHeading(const common::math::Vec2d adc_position,
   }
   return false;
 }
-
-// TODO(SHU): add stop trajectory when near end_pose of adjust stage and ddl is
-// large
-// 1. current ddl is large
-// 2. status is at the end of end_pose of adjust stage
 
 }  // namespace util
 }  // namespace scenario
