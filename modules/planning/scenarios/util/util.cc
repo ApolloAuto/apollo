@@ -255,8 +255,13 @@ bool CheckADCReadyToCruise(Frame* frame,
   ADEBUG << "heading_align_w_reference_line: "
          << heading_align_w_reference_line;
   // check gear status
+  // TODO(SHU): align with vehicle parameters
+  static constexpr double kMinSpeed = 0.1;  // m/s
   if ((common::VehicleStateProvider::Instance()->gear() ==
-       canbus::Chassis::GEAR_DRIVE) &&
+           canbus::Chassis::GEAR_DRIVE ||
+       std::fabs(common::VehicleStateProvider::Instance()
+                     ->vehicle_state()
+                     .linear_velocity() < kMinSpeed)) &&
       !is_near_front_obstacle && heading_align_w_reference_line) {
     return true;
   }
@@ -305,7 +310,7 @@ bool CheckADCHeading(const common::math::Vec2d adc_position,
                      const double adc_heading,
                      const ReferenceLineInfo& reference_line_info,
                      const double heading_diff_to_reference_line) {
-  const double kReducedHeadingBuffer = 0.3;  // (rad) TODO(Shu) move to config
+  const double kReducedHeadingBuffer = 0.2;  // (rad) TODO(Shu) move to config
   const auto& reference_line = reference_line_info.reference_line();
   common::SLPoint adc_position_sl;
   reference_line.XYToSL(adc_position, &adc_position_sl);
@@ -324,6 +329,11 @@ bool CheckADCHeading(const common::math::Vec2d adc_position,
   }
   return false;
 }
+
+// TODO(SHU): add stop trajectory when near end_pose of adjust stage and ddl is
+// large
+// 1. current ddl is large
+// 2. status is at the end of end_pose of adjust stage
 
 }  // namespace util
 }  // namespace scenario
