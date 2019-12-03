@@ -512,3 +512,6 @@ DEFINE_double(side_pass_driving_width_l_buffer, 0.1,
 
 DEFINE_bool(use_st_drivable_boundary, false,
             "True to use st_drivable boundary in speed planning");
+
+DEFINE_bool(enable_reuse_path_in_lane_follow, false,
+            "True to enable reuse path in lane follow");

@@ -62,7 +62,8 @@ Status PathReuseDecider::Process(Frame* const frame,
          << lane_change_status->is_current_opt_succeed();
 
   if (!Decider::config_.path_reuse_decider_config().reuse_path() ||
-      lane_change_status->status() != ChangeLaneStatus::IN_CHANGE_LANE) {
+      (lane_change_status->status() != ChangeLaneStatus::IN_CHANGE_LANE &&
+       !FLAGS_enable_reuse_path_in_lane_follow)) {
     ADEBUG << "skipping reusing path";
     return Status::OK();
   }
@@ -299,7 +300,7 @@ bool PathReuseDecider::IsCollisionFree(
 // check the length of the path
 bool PathReuseDecider::NotShortPath(const DiscretizedPath& current_path) {
   // TODO(shu): use gflag
-  static constexpr double kShortPathThreshold = 15;
+  static constexpr double kShortPathThreshold = 60;
   return current_path.size() >= kShortPathThreshold;
 }
 
