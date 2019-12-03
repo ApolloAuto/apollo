@@ -122,6 +122,7 @@ DECLARE_double(signal_expire_time_sec);
 
 // Path Deciders
 DECLARE_bool(enable_skip_path_tasks);
+DECLARE_bool(enable_reuse_path_in_lane_follow);
 
 DECLARE_double(obstacle_lat_buffer);
 DECLARE_double(obstacle_lon_start_buffer);
