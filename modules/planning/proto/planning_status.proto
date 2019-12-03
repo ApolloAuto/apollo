@@ -73,6 +73,7 @@ message ParkAndGoStatus {
   optional apollo.common.PointENU adc_init_position = 1;
   optional double adc_init_heading = 2;
   optional bool in_check_stage = 3;
+  optional apollo.common.PointENU adc_adjust_end_pose = 4;
 }
 
 message PathDeciderStatus {
