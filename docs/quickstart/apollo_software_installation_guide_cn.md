@@ -64,6 +64,7 @@ Docker容器是设置Apollo构建环境的最简单方法。
     ```
     DOCKER_OPTS = "-s overlay"
     ```
+4. 安装最新的 [nvidia-container-toolkit](https://github.com/NVIDIA/nvidia-docker).
 
 ## 使用你的Release Container
 

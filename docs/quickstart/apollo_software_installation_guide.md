@@ -41,18 +41,9 @@ The Docker container is the simplest way to set up the build environment for Apo
 
 For more information, see the detailed Docker tutorial [here](https://docs.docker.com/).
 
-1. If you are working on Ubuntu 16.04+, the easiest way is to leverage the
-modern snap package manager which is available out of the box:
+1. Please follow the [official guide to install the docker-ce 19.03+](https://docs.docker.com/install/linux/docker-ce/ubuntu).
 
-```bash
-sudo snap install docker
-```
-
-Otherwise, please follow the
-[official guide to install the docker-ce](https://docs.docker.com/install/linux/docker-ce/ubuntu).
-
-Don't forget the
-[post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall).
+Don't forget the [post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall).
 
 2. After the installation, log out and then log back into the system to enable Docker.
 
@@ -61,6 +52,8 @@ Don't forget the
     ```
     DOCKER_OPTS = "-s overlay"
     ```
+
+4. Install latest nvidia-container-toolkit by following the [official doc](https://github.com/NVIDIA/nvidia-docker).
 
 We encourage you to continue the Build process using [Build the Dev docker environment](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md#build_release) if you have not already set it up.
 
