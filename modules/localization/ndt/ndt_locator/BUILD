@@ -4,9 +4,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "ndt_lidar_locator",
-    srcs = [
-        "lidar_locator_ndt.cc",
-    ],
+    srcs = ["lidar_locator_ndt.cc"],
     hdrs = [
         "lidar_locator_ndt.h",
         "ndt_solver.h",

@@ -2,7 +2,7 @@ scenario_type: PARK_AND_GO
 park_and_go_config:
 {
   front_obstacle_buffer: 10.0
-  heading_buffer: 0.5
+  heading_buffer: 0.3
   min_dist_to_dest: 10.0
 }
 

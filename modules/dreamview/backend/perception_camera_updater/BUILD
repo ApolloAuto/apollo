@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "perception_camera_updater",
-    srcs = [
-        "perception_camera_updater.cc",
-    ],
-    hdrs = [
-        "perception_camera_updater.h",
-    ],
+    srcs = ["perception_camera_updater.cc"],
+    hdrs = ["perception_camera_updater.h"],
     copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     linkopts = [
         "-lopencv_core",

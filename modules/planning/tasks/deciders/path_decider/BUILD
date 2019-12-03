@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "path_decider",
-    srcs = [
-        "path_decider.cc",
-    ],
-    hdrs = [
-        "path_decider.h",
-    ],
+    srcs = ["path_decider.cc"],
+    hdrs = ["path_decider.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/configs:vehicle_config_helper",

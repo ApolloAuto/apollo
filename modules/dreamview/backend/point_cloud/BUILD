@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "point_cloud_updater",
-    srcs = [
-        "point_cloud_updater.cc",
-    ],
-    hdrs = [
-        "point_cloud_updater.h",
-    ],
+    srcs = ["point_cloud_updater.cc"],
+    hdrs = ["point_cloud_updater.h"],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",

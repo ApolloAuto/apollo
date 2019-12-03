@@ -30,7 +30,7 @@ using apollo::canbus::Chassis;
 
 HardBrakeTrigger::HardBrakeTrigger() { trigger_name_ = "HardBrakeTrigger"; }
 
-void HardBrakeTrigger::Pull(const RecordMessage& msg) {
+void HardBrakeTrigger::Pull(const cyber::record::RecordMessage& msg) {
   if (!trigger_obj_->enabled()) {
     return;
   }

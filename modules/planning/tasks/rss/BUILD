@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "decider_rss",
-    srcs = [
-        "decider_rss.cc",
-    ],
-    hdrs = [
-        "decider_rss.h",
-    ],
+    srcs = ["decider_rss.cc"],
+    hdrs = ["decider_rss.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/status",
@@ -25,9 +21,7 @@ cc_library(
 cc_test(
     name = "decider_rss_test",
     size = "small",
-    srcs = [
-        "decider_rss_test.cc",
-    ],
+    srcs = ["decider_rss_test.cc"],
     deps = [
         ":decider_rss",
         "@ad_rss_lib//:ad_rss",

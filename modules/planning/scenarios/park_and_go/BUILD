@@ -35,9 +35,7 @@ cc_library(
 cc_test(
     name = "park_and_go_scenario_test",
     size = "small",
-    srcs = [
-        "park_and_go_scenario_test.cc",
-    ],
+    srcs = ["park_and_go_scenario_test.cc"],
     data = [
         "//modules/planning:planning_conf",
     ],

@@ -33,9 +33,7 @@ cc_library(
 cc_test(
     name = "emergency_stop_scenario_test",
     size = "small",
-    srcs = [
-        "emergency_stop_scenario_test.cc",
-    ],
+    srcs = ["emergency_stop_scenario_test.cc"],
     data = [
         "//modules/planning:planning_conf",
     ],
@@ -48,9 +46,7 @@ cc_test(
 cc_test(
     name = "stage_approach_test",
     size = "small",
-    srcs = [
-        "stage_approach_test.cc",
-    ],
+    srcs = ["stage_approach_test.cc"],
     data = [
         "//modules/planning:planning_conf",
     ],
@@ -63,9 +59,7 @@ cc_test(
 cc_test(
     name = "stage_standby_test",
     size = "small",
-    srcs = [
-        "stage_standby_test.cc",
-    ],
+    srcs = ["stage_standby_test.cc"],
     data = [
         "//modules/planning:planning_conf",
     ],

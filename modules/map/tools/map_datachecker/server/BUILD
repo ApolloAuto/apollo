@@ -11,9 +11,7 @@ cc_binary(
 
 cc_library(
     name = "map_datachecker_server_lib",
-    srcs = [
-        "main.cc",
-    ],
+    srcs = ["main.cc"],
     deps = [
         ":worker",
         "//cyber",
@@ -22,12 +20,8 @@ cc_library(
 
 cc_library(
     name = "channel_verify",
-    srcs = [
-        "channel_verify.cc",
-    ],
-    hdrs = [
-        "channel_verify.h",
-    ],
+    srcs = ["channel_verify.cc"],
+    hdrs = ["channel_verify.h"],
     linkopts = [
         "-lboost_filesystem",
     ],
@@ -40,12 +34,8 @@ cc_library(
 
 cc_library(
     name = "channel_verify_agent",
-    srcs = [
-        "channel_verify_agent.cc",
-    ],
-    hdrs = [
-        "channel_verify_agent.h",
-    ],
+    srcs = ["channel_verify_agent.cc"],
+    hdrs = ["channel_verify_agent.h"],
     linkopts = [
         "-lgrpc++",
     ],
@@ -58,12 +48,8 @@ cc_library(
 
 cc_library(
     name = "common",
-    srcs = [
-        "common.cc",
-    ],
-    hdrs = [
-        "common.h",
-    ],
+    srcs = ["common.cc"],
+    hdrs = ["common.h"],
     linkopts = [
         "-lboost_filesystem",
     ],
@@ -74,9 +60,7 @@ cc_library(
 
 cc_library(
     name = "eight_route",
-    srcs = [
-        "eight_route.cc",
-    ],
+    srcs = ["eight_route.cc"],
     hdrs = [
         "alignment.h",
         "eight_route.h",
@@ -94,12 +78,8 @@ cc_library(
 
 cc_library(
     name = "laps_checker",
-    srcs = [
-        "laps_checker.cc",
-    ],
-    hdrs = [
-        "laps_checker.h",
-    ],
+    srcs = ["laps_checker.cc"],
+    hdrs = ["laps_checker.h"],
     linkopts = [
         "-lboost_filesystem",
     ],
@@ -111,12 +91,8 @@ cc_library(
 
 cc_library(
     name = "loops_verify_agent",
-    srcs = [
-        "loops_verify_agent.cc",
-    ],
-    hdrs = [
-        "loops_verify_agent.h",
-    ],
+    srcs = ["loops_verify_agent.cc"],
+    hdrs = ["loops_verify_agent.h"],
     linkopts = [
         "-lgrpc++",
     ],
@@ -129,12 +105,8 @@ cc_library(
 
 cc_library(
     name = "pj_transformer",
-    srcs = [
-        "pj_transformer.cc",
-    ],
-    hdrs = [
-        "pj_transformer.h",
-    ],
+    srcs = ["pj_transformer.cc"],
+    hdrs = ["pj_transformer.h"],
     deps = [
         "//cyber",
         "@proj4",
@@ -143,12 +115,8 @@ cc_library(
 
 cc_library(
     name = "pose_collection",
-    srcs = [
-        "pose_collection.cc",
-    ],
-    hdrs = [
-        "pose_collection.h",
-    ],
+    srcs = ["pose_collection.cc"],
+    hdrs = ["pose_collection.h"],
     deps = [
         ":common",
         ":pj_transformer",
@@ -159,12 +127,8 @@ cc_library(
 
 cc_library(
     name = "pose_collection_agent",
-    srcs = [
-        "pose_collection_agent.cc",
-    ],
-    hdrs = [
-        "pose_collection_agent.h",
-    ],
+    srcs = ["pose_collection_agent.cc"],
+    hdrs = ["pose_collection_agent.h"],
     deps = [
         ":common",
         ":pj_transformer",
@@ -176,9 +140,7 @@ cc_library(
 
 cc_library(
     name = "static_align",
-    srcs = [
-        "static_align.cc",
-    ],
+    srcs = ["static_align.cc"],
     hdrs = [
         "alignment.h",
         "static_align.h",
@@ -191,12 +153,8 @@ cc_library(
 
 cc_library(
     name = "worker",
-    srcs = [
-        "worker.cc",
-    ],
-    hdrs = [
-        "worker.h",
-    ],
+    srcs = ["worker.cc"],
+    hdrs = ["worker.h"],
     linkopts = [
         "-lgrpc++",
     ],
@@ -212,9 +170,7 @@ cc_library(
 
 cc_library(
     name = "worker_agent",
-    srcs = [
-        "worker_agent.cc",
-    ],
+    srcs = ["worker_agent.cc"],
     hdrs = [
         "alignment_agent.h",
         "worker_agent.h",
@@ -236,12 +192,8 @@ cc_library(
 
 cc_library(
     name = "worker_cyber_node",
-    srcs = [
-        "worker_cyber_node.cc",
-    ],
-    hdrs = [
-        "worker_cyber_node.h",
-    ],
+    srcs = ["worker_cyber_node.cc"],
+    hdrs = ["worker_cyber_node.h"],
     deps = [
         ":worker_agent",
         ":worker_gflags",
@@ -254,12 +206,8 @@ cc_library(
 
 cc_library(
     name = "worker_gflags",
-    srcs = [
-        "worker_gflags.cc",
-    ],
-    hdrs = [
-        "worker_gflags.h",
-    ],
+    srcs = ["worker_gflags.cc"],
+    hdrs = ["worker_gflags.h"],
     deps = [
         "//external:gflags",
     ],

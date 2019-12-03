@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "rt_common",
-    srcs = [
-        "rt_common.cc",
-    ],
-    hdrs = [
-        "rt_common.h",
-    ],
+    srcs = ["rt_common.cc"],
+    hdrs = ["rt_common.h"],
     deps = [
         "//cyber",
         "//modules/perception/base:common",
@@ -31,12 +27,8 @@ cc_test(
 
 cc_library(
     name = "rt_utils",
-    srcs = [
-        "rt_utils.cc",
-    ],
-    hdrs = [
-        "rt_utils.h",
-    ],
+    srcs = ["rt_utils.cc"],
+    hdrs = ["rt_utils.h"],
     deps = [
         "//cyber",
         "//modules/perception/proto:rt_proto",
@@ -56,9 +48,7 @@ cc_test(
 
 cc_library(
     name = "rt_net",
-    srcs = [
-        "rt_net.cc",
-    ],
+    srcs = ["rt_net.cc"],
     hdrs = [
         "entropy_calibrator.h",
         "rt_net.h",
@@ -96,9 +86,7 @@ cc_test(
 
 cc_library(
     name = "entropy_calibrator",
-    hdrs = [
-        "entropy_calibrator.h",
-    ],
+    hdrs = ["entropy_calibrator.h"],
     linkopts = ["-lopencv_core -lnvinfer_plugin -lopencv_imgproc -lopencv_highgui"],
     deps = [
         ":batch_stream",

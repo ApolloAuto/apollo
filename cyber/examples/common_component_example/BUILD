@@ -11,12 +11,8 @@ cc_binary(
 
 cc_library(
     name = "common_component_example_lib",
-    srcs = [
-        "common_component_example.cc",
-    ],
-    hdrs = [
-        "common_component_example.h",
-    ],
+    srcs = ["common_component_example.cc"],
+    hdrs = ["common_component_example.h"],
     deps = [
         "//cyber",
         "//cyber/examples/proto:examples_cc_proto",

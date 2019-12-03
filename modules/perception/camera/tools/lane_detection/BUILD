@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "lane_common",
-    srcs = [
-        "lane_common.cc",
-    ],
-    hdrs = [
-        "lane_common.h",
-    ],
+    srcs = ["lane_common.cc"],
+    hdrs = ["lane_common.h"],
     deps = [
         "//cyber",
         "//modules/perception/base",
@@ -19,9 +15,7 @@ cc_library(
 
 cc_binary(
     name = "lane_denseline_eval",
-    srcs = [
-        "lane_denseline_eval.cc",
-    ],
+    srcs = ["lane_denseline_eval.cc"],
     linkopts = [
         "-lopencv_core",
         "-lopencv_imgproc",

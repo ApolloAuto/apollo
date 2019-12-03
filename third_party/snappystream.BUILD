@@ -10,6 +10,4 @@ cc_library(
     hdrs = glob([
         "include/*.h",
     ]),
-    linkopts = [
-    ],
 )

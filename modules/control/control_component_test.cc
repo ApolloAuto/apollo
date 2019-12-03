@@ -33,6 +33,8 @@ namespace control {
 using apollo::canbus::Chassis;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::time::Clock;
+using apollo::cyber::Reader;
+using apollo::cyber::Writer;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 

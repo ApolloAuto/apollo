@@ -30,7 +30,8 @@ SmallTopicsTrigger::SmallTopicsTrigger() {
   trigger_name_ = "SmallTopicsTrigger";
 }
 
-bool SmallTopicsTrigger::ShouldRestore(const RecordMessage& msg) const {
+bool SmallTopicsTrigger::ShouldRestore(
+    const cyber::record::RecordMessage& msg) const {
   const std::set<std::string>& small_channels =
       ChannelPool::Instance()->GetSmallChannels();
   return trigger_obj_->enabled() &&

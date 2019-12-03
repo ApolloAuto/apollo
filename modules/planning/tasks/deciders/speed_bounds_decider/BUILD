@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "speed_bounds_decider",
-    srcs = [
-        "speed_bounds_decider.cc",
-    ],
-    hdrs = [
-        "speed_bounds_decider.h",
-    ],
+    srcs = ["speed_bounds_decider.cc"],
+    hdrs = ["speed_bounds_decider.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":st_boundary_mapper",
@@ -62,9 +58,7 @@ cc_library(
 cc_test(
     name = "speed_limit_decider_test",
     size = "small",
-    srcs = [
-        "speed_limit_decider_test.cc",
-    ],
+    srcs = ["speed_limit_decider_test.cc"],
     data = [
         "//modules/planning:planning_testdata",
     ],
@@ -80,9 +74,7 @@ cc_test(
 cc_test(
     name = "st_boundary_mapper_test",
     size = "small",
-    srcs = [
-        "st_boundary_mapper_test.cc",
-    ],
+    srcs = ["st_boundary_mapper_test.cc"],
     data = [
         "//modules/planning:planning_testdata",
     ],

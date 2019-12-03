@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "croutine",
-    srcs = [
-        "croutine.cc",
-    ],
-    hdrs = [
-        "croutine.h",
-    ],
+    srcs = ["croutine.cc"],
+    hdrs = ["croutine.h"],
     linkopts = ["-latomic"],
     deps = [
         "//cyber/base:atomic_hash_map",
@@ -29,12 +25,8 @@ cc_library(
 
 cc_library(
     name = "routine_context",
-    srcs = [
-        "detail/routine_context.cc",
-    ],
-    hdrs = [
-        "detail/routine_context.h",
-    ],
+    srcs = ["detail/routine_context.cc"],
+    hdrs = ["detail/routine_context.h"],
     deps = [
         "//cyber/common",
     ],
@@ -42,9 +34,7 @@ cc_library(
 
 cc_library(
     name = "routine_factory",
-    hdrs = [
-        "routine_factory.h",
-    ],
+    hdrs = ["routine_factory.h"],
     deps = [
         "//cyber/common",
         "//cyber/event:perf_event_cache",
@@ -69,9 +59,7 @@ cc_library(
 cc_test(
     name = "croutine_test",
     size = "small",
-    srcs = [
-        "croutine_test.cc",
-    ],
+    srcs = ["croutine_test.cc"],
     deps = [
         "//cyber",
         "@gtest//:main",

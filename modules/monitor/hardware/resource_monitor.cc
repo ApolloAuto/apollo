@@ -107,7 +107,7 @@ float GetCPUUsage(const int pid, const std::string& process_name,
     return 0.0;
   }
   return 100.0f * (static_cast<float>(jiffies - prev_jiffies) / hertz /
-                  FLAGS_resource_monitor_interval);
+                   FLAGS_resource_monitor_interval);
 }
 
 }  // namespace

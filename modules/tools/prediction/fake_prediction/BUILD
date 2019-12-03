@@ -4,9 +4,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "libfake_prediction_component.so",
-    srcs = [
-        "fake_prediction.cc",
-    ],
+    srcs = ["fake_prediction.cc"],
     linkshared = True,
     linkstatic = False,
     deps = [

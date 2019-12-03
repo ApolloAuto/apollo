@@ -61,11 +61,19 @@ bool MPCControllerSubmodule::Init() {
 bool MPCControllerSubmodule::Proc(
     const std::shared_ptr<Preprocessor>& preprocessor_status) {
   ControlCommand control_core_command;
+  // recording pad msg
+  if (preprocessor_status->received_pad_msg()) {
+    control_core_command.mutable_pad_msg()->CopyFrom(
+        preprocessor_status->local_view().pad_msg());
+  }
   ADEBUG << "MPC controller submodule started ....";
 
   // skip produce control command when estop for MPC controller
   if (preprocessor_status->estop()) {
-    return true;
+    // recording estop reason
+    control_core_command.mutable_header()->mutable_status()->set_msg(
+        preprocessor_status->estop_reason());
+    return false;
   }
 
   Status status = ProduceControlCoreCommand(preprocessor_status->local_view(),
@@ -73,10 +81,15 @@ bool MPCControllerSubmodule::Proc(
   AERROR_IF(!status.ok()) << "Failed to produce control command:"
                           << status.error_message();
 
+  control_core_command.mutable_header()->set_lidar_timestamp(
+      preprocessor_status->header().lidar_timestamp());
+  control_core_command.mutable_header()->set_camera_timestamp(
+      preprocessor_status->header().camera_timestamp());
+  control_core_command.mutable_header()->set_radar_timestamp(
+      preprocessor_status->header().radar_timestamp());
   common::util::FillHeader(Name(), &control_core_command);
-
   control_core_writer_->Write(control_core_command);
-  return true;
+  return status.ok();
 }
 
 Status MPCControllerSubmodule::ProduceControlCoreCommand(

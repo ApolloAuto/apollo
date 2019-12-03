@@ -18,9 +18,7 @@ cc_library(
 cc_test(
     name = "regional_predictor_test",
     size = "small",
-    srcs = [
-        "regional_predictor_test.cc",
-    ],
+    srcs = ["regional_predictor_test.cc"],
     data = [
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",

@@ -8,9 +8,7 @@ cc_library(
         "dreamview.cc",
         "main.cc",
     ],
-    hdrs = [
-        "dreamview.h",
-    ],
+    hdrs = ["dreamview.h"],
     copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
         "//modules/common/configs:vehicle_config_helper",

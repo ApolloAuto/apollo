@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "grpc_client",
-    srcs = [
-        "grpc_client.cc",
-    ],
-    hdrs = [
-        "grpc_client.h",
-    ],
+    srcs = ["grpc_client.cc"],
+    hdrs = ["grpc_client.h"],
     linkopts = [
         "-lgrpc++",
     ],
@@ -22,12 +18,8 @@ cc_library(
 
 cc_library(
     name = "grpc_server",
-    srcs = [
-        "grpc_server.cc",
-    ],
-    hdrs = [
-        "grpc_server.h",
-    ],
+    srcs = ["grpc_server.cc"],
+    hdrs = ["grpc_server.h"],
     linkopts = [
         "-lgrpc++",
     ],
@@ -40,9 +32,7 @@ cc_library(
 cc_test(
     name = "grpc_client_test",
     size = "small",
-    srcs = [
-        "grpc_client_test.cc",
-    ],
+    srcs = ["grpc_client_test.cc"],
     deps = [
         ":grpc_client",
         "@gtest//:main",
@@ -52,9 +42,7 @@ cc_test(
 cc_test(
     name = "grpc_server_test",
     size = "small",
-    srcs = [
-        "grpc_server_test.cc",
-    ],
+    srcs = ["grpc_server_test.cc"],
     deps = [
         ":grpc_server",
         "@gtest//:main",

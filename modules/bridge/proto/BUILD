@@ -11,7 +11,5 @@ cc_proto_library(
 
 proto_library(
     name = "udp_bridge_remote_info_proto_lib",
-    srcs = [
-        "udp_bridge_remote_info.proto",
-    ],
+    srcs = ["udp_bridge_remote_info.proto"],
 )

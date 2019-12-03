@@ -11,9 +11,7 @@ cc_proto_library(
 
 proto_library(
     name = "yolo_proto_lib",
-    srcs = [
-        "yolo.proto",
-    ],
+    srcs = ["yolo.proto"],
 )
 
 cpplint()

@@ -22,9 +22,7 @@ cc_library(
 cc_test(
     name = "io_util_test",
     size = "small",
-    srcs = [
-        "io_util_test.cc",
-    ],
+    srcs = ["io_util_test.cc"],
     data = [
         "//modules/perception:perception_testdata",
     ],

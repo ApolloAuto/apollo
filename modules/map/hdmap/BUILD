@@ -73,9 +73,7 @@ cc_test(
     name = "hdmap_util_test",
     size = "small",
     timeout = "short",
-    srcs = [
-        "hdmap_util_test.cc",
-    ],
+    srcs = ["hdmap_util_test.cc"],
     data = [
         ":testdata",
     ],

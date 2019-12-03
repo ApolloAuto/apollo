@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "ncut",
-    srcs = [
-        "ncut.cc",
-    ],
-    hdrs = [
-        "ncut.h",
-    ],
+    srcs = ["ncut.cc"],
+    hdrs = ["ncut.h"],
     deps = [
         "//cyber",
         "//modules/perception/base",
@@ -21,12 +17,8 @@ cc_library(
 
 cc_library(
     name = "ncut_segmentation",
-    srcs = [
-        "ncut_segmentation.cc",
-    ],
-    hdrs = [
-        "ncut_segmentation.h",
-    ],
+    srcs = ["ncut_segmentation.cc"],
+    hdrs = ["ncut_segmentation.h"],
     copts = [
         "-fopenmp",
         #"-DDEBUG_NCUT",

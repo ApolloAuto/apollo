@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "tracked_object",
-    srcs = [
-        "tracked_object.cc",
-    ],
-    hdrs = [
-        "tracked_object.h",
-    ],
+    srcs = ["tracked_object.cc"],
+    hdrs = ["tracked_object.h"],
     deps = [
         "//cyber",
         "//modules/perception/base:object",
@@ -22,12 +18,8 @@ cc_library(
 
 cc_library(
     name = "track_data",
-    srcs = [
-        "track_data.cc",
-    ],
-    hdrs = [
-        "track_data.h",
-    ],
+    srcs = ["track_data.cc"],
+    hdrs = ["track_data.h"],
     deps = [
         ":tracked_object",
         "//cyber",

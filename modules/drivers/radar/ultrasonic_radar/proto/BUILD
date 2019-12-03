@@ -9,9 +9,7 @@ cc_proto_library(
 
 proto_library(
     name = "ultrasonic_radar_proto_lib",
-    srcs = [
-        "ultrasonic_radar_conf.proto",
-    ],
+    srcs = ["ultrasonic_radar_conf.proto"],
     deps = [
         "//modules/drivers/canbus/proto:canbus_proto_lib",
     ],
