@@ -40,7 +40,8 @@ class PiecewiseJerkSpeedNonlinearOptimizer : public SpeedOptimizer {
                          const common::TrajectoryPoint& init_point,
                          SpeedData* const speed_data) override;
 
-  common::Status SetUpStatesAndBounds(const PathData& path_data);
+  common::Status SetUpStatesAndBounds(const PathData& path_data,
+                                      const SpeedData& speed_data);
 
   bool CheckSpeedLimitFeasibility();
 
