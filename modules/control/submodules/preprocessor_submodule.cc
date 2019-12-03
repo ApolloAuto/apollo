@@ -81,6 +81,19 @@ bool PreprocessorSubmodule::Proc(const std::shared_ptr<LocalView> &local_view) {
     control_preprocessor.set_received_pad_msg(true);
   }
 
+  // handling estop
+  auto *preprocessor_status =
+      control_preprocessor.mutable_header()->mutable_status();
+  if (!estop_ && status.ok()) {
+    preprocessor_status->set_error_code(ErrorCode::OK);
+  } else if (estop_) {
+    preprocessor_status->set_error_code(ErrorCode::CONTROL_ESTOP_ERROR);
+    preprocessor_status->set_msg(estop_reason_);
+  } else if (status.code() == ErrorCode::CONTROL_COMPUTE_ERROR) {
+    preprocessor_status->set_error_code(status.code());
+    preprocessor_status->set_msg(status.error_message());
+  }
+
   control_preprocessor.mutable_header()->set_lidar_timestamp(
       local_view->header().lidar_timestamp());
   control_preprocessor.mutable_header()->set_camera_timestamp(
@@ -188,9 +201,6 @@ Status PreprocessorSubmodule::ProducePreprocessorStatus(
       debug->mutable_latest_replan_trajectory_header()->CopyFrom(
           latest_replan_trajectory_header_);
     }
-  } else {
-    control_preprocessor->set_estop(estop_);
-    control_preprocessor->set_estop_reason(estop_reason_);
   }
 
   return status;
