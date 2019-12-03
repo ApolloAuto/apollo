@@ -377,11 +377,11 @@ function main(){
         -v /usr/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-nvidia \
         $IMG \
         /bin/bash
-    set +x
     if [ $? -ne 0 ];then
         error "Failed to start docker container \"${APOLLO_DEV}\" based on image: $IMG"
         exit 1
     fi
+    set +x
 
     if [ "${USER}" != "root" ]; then
         docker exec $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
