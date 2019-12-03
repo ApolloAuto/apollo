@@ -134,17 +134,11 @@ default_task_config: {
   speed_bounds_decider_config {
     total_time: 7.0
     boundary_buffer: 0.25
-    high_speed_centric_acceleration_limit: 2.0
-    low_speed_centric_acceleration_limit: 1.5
-    high_speed_threshold: 12.58
-    low_speed_threshold: 7.5
-    minimal_kappa: 0.00001
+    max_centric_acceleration_limit: 2.0
     point_extension: 0.0
     lowest_speed: 2.5
-    num_points_to_avg_kappa: 2
     static_obs_nudge_speed_ratio: 0.6
     dynamic_obs_nudge_speed_ratio: 0.8
-    centri_jerk_speed_coeff: 1.0
   }
 }
 default_task_config: {
@@ -152,17 +146,11 @@ default_task_config: {
   speed_bounds_decider_config {
     total_time: 7.0
     boundary_buffer: 0.1
-    high_speed_centric_acceleration_limit: 2.0
-    low_speed_centric_acceleration_limit: 1.5
-    high_speed_threshold: 12.58
-    low_speed_threshold: 7.5
-    minimal_kappa: 0.00001
+    max_centric_acceleration_limit: 2.0
     point_extension: 0.0
     lowest_speed: 2.5
-    num_points_to_avg_kappa: 2
     static_obs_nudge_speed_ratio: 0.6
     dynamic_obs_nudge_speed_ratio: 0.8
-    centri_jerk_speed_coeff: 1.0
   }
 }
 default_task_config: {
