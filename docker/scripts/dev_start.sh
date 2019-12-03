@@ -374,6 +374,7 @@ function main(){
         --shm-size 2G \
         --pid=host \
         -v /dev/null:/dev/raw1394 \
+        -v /usr/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu \
         $IMG \
         /bin/bash
     if [ $? -ne 0 ];then
