@@ -32,7 +32,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Add udev rules.
-sudo cp -r ${APOLLO_ROOT_DIR}/docker/setup_host/etc/* /etc/
+sudo cp -r ${APOLLO_ROOT_DIR}/docker/setup_host/etc/* /etc/dev/rules.d/
 
 # Add uvcvideo clock config.
 grep -q uvcvideo /etc/modules
