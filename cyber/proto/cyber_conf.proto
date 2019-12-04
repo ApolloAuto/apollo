@@ -8,8 +8,8 @@ import "cyber/proto/run_mode_conf.proto";
 import "cyber/proto/perf_conf.proto";
 
 message CyberConfig {
-    optional SchedulerConf scheduler_conf = 1;
-    optional TransportConf transport_conf = 2;
-    optional RunModeConf run_mode_conf = 3;
-    optional PerfConf perf_conf = 4;
+  optional SchedulerConf scheduler_conf = 1;
+  optional TransportConf transport_conf = 2;
+  optional RunModeConf run_mode_conf = 3;
+  optional PerfConf perf_conf = 4;
 }

@@ -3,88 +3,88 @@ syntax = "proto2";
 package apollo.cyber.proto;
 
 enum SectionType {
-    SECTION_HEADER       = 0;
-    SECTION_CHUNK_HEADER = 1;
-    SECTION_CHUNK_BODY   = 2;
-    SECTION_INDEX        = 3;
-    SECTION_CHANNEL      = 4;
+  SECTION_HEADER = 0;
+  SECTION_CHUNK_HEADER = 1;
+  SECTION_CHUNK_BODY = 2;
+  SECTION_INDEX = 3;
+  SECTION_CHANNEL = 4;
 };
 
 enum CompressType {
-    COMPRESS_NONE = 0;
-    COMPRESS_BZ2  = 1;
-    COMPRESS_LZ4  = 2;
+  COMPRESS_NONE = 0;
+  COMPRESS_BZ2 = 1;
+  COMPRESS_LZ4 = 2;
 };
 
 message SingleIndex {
-    optional SectionType type = 1;
-    optional uint64 position  = 2;
-    oneof cache {
-        ChannelCache channel_cache          = 101;
-        ChunkHeaderCache chunk_header_cache = 102;
-        ChunkBodyCache chunk_body_cache     = 103;
-    }
+  optional SectionType type = 1;
+  optional uint64 position = 2;
+  oneof cache {
+    ChannelCache channel_cache = 101;
+    ChunkHeaderCache chunk_header_cache = 102;
+    ChunkBodyCache chunk_body_cache = 103;
+  }
 }
 
 message ChunkHeaderCache {
-    optional uint64 message_number = 1;
-    optional uint64 begin_time     = 2;
-    optional uint64 end_time       = 3;
-    optional uint64 raw_size       = 4;
+  optional uint64 message_number = 1;
+  optional uint64 begin_time = 2;
+  optional uint64 end_time = 3;
+  optional uint64 raw_size = 4;
 }
 
 message ChunkBodyCache {
-    optional uint64 message_number = 1;
+  optional uint64 message_number = 1;
 }
 
 message ChannelCache {
-    optional uint64 message_number = 1;
-    optional string name           = 2;
-    optional string message_type   = 3;
-    optional bytes proto_desc      = 4;
+  optional uint64 message_number = 1;
+  optional string name = 2;
+  optional string message_type = 3;
+  optional bytes proto_desc = 4;
 }
 
 message SingleMessage {
-    optional string channel_name = 1;
-    optional uint64 time         = 2;
-    optional bytes  content      = 3;
+  optional string channel_name = 1;
+  optional uint64 time = 2;
+  optional bytes content = 3;
 }
 
 message Header {
-    optional uint32 major_version    = 1;
-    optional uint32 minor_version    = 2;
-    optional CompressType compress   = 3;
-    optional uint64 chunk_interval   = 4;
-    optional uint64 segment_interval = 5;
-    optional uint64 index_position   = 6 [default = 0];
-    optional uint64 chunk_number     = 7 [default = 0];
-    optional uint64 channel_number   = 8 [default = 0];
-    optional uint64 begin_time       = 9 [default = 0];
-    optional uint64 end_time         = 10 [default = 0];
-    optional uint64 message_number   = 11 [default = 0];
-    optional uint64 size             = 12 [default = 0];
-    optional bool is_complete        = 13 [default = false];
-    optional uint64 chunk_raw_size   = 14;
-    optional uint64 segment_raw_size = 15;
+  optional uint32 major_version = 1;
+  optional uint32 minor_version = 2;
+  optional CompressType compress = 3;
+  optional uint64 chunk_interval = 4;
+  optional uint64 segment_interval = 5;
+  optional uint64 index_position = 6 [default = 0];
+  optional uint64 chunk_number = 7 [default = 0];
+  optional uint64 channel_number = 8 [default = 0];
+  optional uint64 begin_time = 9 [default = 0];
+  optional uint64 end_time = 10 [default = 0];
+  optional uint64 message_number = 11 [default = 0];
+  optional uint64 size = 12 [default = 0];
+  optional bool is_complete = 13 [default = false];
+  optional uint64 chunk_raw_size = 14;
+  optional uint64 segment_raw_size = 15;
 }
 
 message Channel {
-    optional string name         = 1;
-    optional string message_type = 2;
-    optional bytes proto_desc    = 3;
+  optional string name = 1;
+  optional string message_type = 2;
+  optional bytes proto_desc = 3;
 }
 
 message ChunkHeader {
-    optional uint64 begin_time     = 1;
-    optional uint64 end_time       = 2;
-    optional uint64 message_number = 3;
-    optional uint64 raw_size       = 4;
+  optional uint64 begin_time = 1;
+  optional uint64 end_time = 2;
+  optional uint64 message_number = 3;
+  optional uint64 raw_size = 4;
 }
 
 message ChunkBody {
-    repeated SingleMessage messages = 1;
+  repeated SingleMessage messages = 1;
 }
 
 message Index {
-    repeated SingleIndex indexes = 1;
+  repeated SingleIndex indexes = 1;
 }
