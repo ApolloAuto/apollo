@@ -28,6 +28,7 @@ namespace control {
 using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::StatusPb;
 using apollo::common::VehicleStateProvider;
 using apollo::common::time::Clock;
 using apollo::localization::LocalizationEstimate;
@@ -73,10 +74,13 @@ bool MPCControllerSubmodule::Proc(
   ADEBUG << "MPC controller submodule started ....";
 
   // skip produce control command when estop for MPC controller
-  if (preprocessor_status->estop()) {
-    // recording estop reason
+  StatusPb pre_status = preprocessor_status->header().status();
+  if (pre_status.error_code() != ErrorCode::OK) {
+    control_core_command.mutable_header()->mutable_status()->set_error_code(
+        pre_status.error_code());
     control_core_command.mutable_header()->mutable_status()->set_msg(
-        preprocessor_status->estop_reason());
+        pre_status.msg());
+    AERROR << "Error in preprocessor submodule.";
     return false;
   }
 
@@ -100,6 +104,11 @@ bool MPCControllerSubmodule::Proc(
   latency_recorder.AppendLatencyRecord(
       control_core_command.header().lidar_timestamp(), start_timestamp,
       end_timestamp);
+
+  control_core_command.mutable_header()->mutable_status()->set_error_code(
+      status.code());
+  control_core_command.mutable_header()->mutable_status()->set_msg(
+      status.error_message());
 
   control_core_writer_->Write(control_core_command);
 
