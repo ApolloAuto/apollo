@@ -23,6 +23,7 @@
 #include <string>
 
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/latency_recorder/latency_recorder.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/common/control_gflags.h"
@@ -63,6 +64,8 @@ bool PreprocessorSubmodule::Init() {
 
 bool PreprocessorSubmodule::Proc(const std::shared_ptr<LocalView> &local_view) {
   ADEBUG << "Preprocessor started ....";
+  const double start_timestamp = Clock::NowInSeconds();
+
   Preprocessor control_preprocessor;
   // handling estop
   auto *preprocessor_status =
@@ -100,6 +103,14 @@ bool PreprocessorSubmodule::Proc(const std::shared_ptr<LocalView> &local_view) {
   control_preprocessor.mutable_header()->set_radar_timestamp(
       local_view->trajectory().header().radar_timestamp());
   common::util::FillHeader(Name(), &control_preprocessor);
+
+  const double end_timestamp = Clock::NowInSeconds();
+
+  static apollo::common::LatencyRecorder latency_recorder(
+      FLAGS_control_preprocessor_topic);
+  latency_recorder.AppendLatencyRecord(
+      control_preprocessor.header().lidar_timestamp(), start_timestamp,
+      end_timestamp);
 
   preprocessor_writer_->Write(control_preprocessor);
   ADEBUG << "Preprocessor finished.";
@@ -175,12 +186,12 @@ Status PreprocessorSubmodule::ProducePreprocessorStatus(
     }
   }
 
-  auto debug = control_preprocessor->mutable_input_debug();
-  debug->mutable_localization_header()->CopyFrom(
+  auto input_debug = control_preprocessor->mutable_input_debug();
+  input_debug->mutable_localization_header()->CopyFrom(
       control_preprocessor->local_view().localization().header());
-  debug->mutable_canbus_header()->CopyFrom(
+  input_debug->mutable_canbus_header()->CopyFrom(
       control_preprocessor->local_view().chassis().header());
-  debug->mutable_trajectory_header()->CopyFrom(
+  input_debug->mutable_trajectory_header()->CopyFrom(
       control_preprocessor->local_view().trajectory().header());
 
   if (control_preprocessor->local_view().trajectory().is_replan()) {
@@ -189,7 +200,7 @@ Status PreprocessorSubmodule::ProducePreprocessorStatus(
   }
 
   if (latest_replan_trajectory_header_.has_sequence_num()) {
-    debug->mutable_latest_replan_trajectory_header()->CopyFrom(
+    input_debug->mutable_latest_replan_trajectory_header()->CopyFrom(
         latest_replan_trajectory_header_);
   }
 

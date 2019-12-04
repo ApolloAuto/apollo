@@ -277,7 +277,7 @@ Status ControlComponent::ProduceControlCommand(
 }
 
 bool ControlComponent::Proc() {
-  double start_timestamp = Clock::NowInSeconds();
+  const double start_timestamp = Clock::NowInSeconds();
 
   chassis_reader_->Observe();
   const auto &chassis_msg = chassis_reader_->GetLatestObserved();
@@ -357,28 +357,10 @@ bool ControlComponent::Proc() {
   AERROR_IF(!status.ok()) << "Failed to produce control command:"
                           << status.error_message();
 
-  double end_timestamp = Clock::NowInSeconds();
-
-  // measure latency
-  if (local_view_.trajectory().header().has_lidar_timestamp()) {
-    static apollo::common::LatencyRecorder latency_recorder(
-        FLAGS_control_command_topic);
-    latency_recorder.AppendLatencyRecord(
-        local_view_.trajectory().header().lidar_timestamp(), start_timestamp,
-        end_timestamp);
-  }
-
   if (pad_received_) {
     control_command.mutable_pad_msg()->CopyFrom(pad_msg_);
     pad_received_ = false;
   }
-
-  const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
-  control_command.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
-  control_command.mutable_latency_stats()->set_total_time_exceeded(
-      time_diff_ms > control_conf_.control_period());
-  ADEBUG << "control cycle time is: " << time_diff_ms << " ms.";
-  status.Save(control_command.mutable_header()->mutable_status());
 
   // forward estop reason among following control frames.
   if (estop_) {
@@ -399,6 +381,24 @@ bool ControlComponent::Proc() {
   if (control_conf_.is_control_test_mode()) {
     ADEBUG << "Skip publish control command in test mode";
     return true;
+  }
+
+  const double end_timestamp = Clock::NowInSeconds();
+
+  const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
+  control_command.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
+  control_command.mutable_latency_stats()->set_total_time_exceeded(
+      time_diff_ms > control_conf_.control_period());
+  ADEBUG << "control cycle time is: " << time_diff_ms << " ms.";
+  status.Save(control_command.mutable_header()->mutable_status());
+
+  // measure latency
+  if (local_view_.trajectory().header().has_lidar_timestamp()) {
+    static apollo::common::LatencyRecorder latency_recorder(
+        FLAGS_control_command_topic);
+    latency_recorder.AppendLatencyRecord(
+        local_view_.trajectory().header().lidar_timestamp(), start_timestamp,
+        end_timestamp);
   }
 
   control_cmd_writer_->Write(std::make_shared<ControlCommand>(control_command));
