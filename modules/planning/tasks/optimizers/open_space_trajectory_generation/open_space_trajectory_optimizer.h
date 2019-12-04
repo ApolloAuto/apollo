@@ -66,7 +66,7 @@ class OpenSpaceTrajectoryOptimizer {
 
   void RecordDebugInfo(
       const common::TrajectoryPoint& trajectory_stitching_point,
-      const Vec2d& translate_origin, const double rotate_angle,
+      const common::math::Vec2d& translate_origin, const double rotate_angle,
       const std::vector<double>& end_pose, const Eigen::MatrixXd& xWS,
       const Eigen::MatrixXd& uWs, const Eigen::MatrixXd& l_warm_up,
       const Eigen::MatrixXd& n_warm_up, const Eigen::MatrixXd& dual_l_result_ds,
@@ -89,7 +89,7 @@ class OpenSpaceTrajectoryOptimizer {
   bool IsInitPointNearDestination(
       const common::TrajectoryPoint& planning_init_point,
       const std::vector<double>& end_pose, double rotate_angle,
-      const Vec2d& translate_origin);
+      const common::math::Vec2d& translate_origin);
 
   void PathPointNormalizing(double rotate_angle,
                             const common::math::Vec2d& translate_origin,

@@ -30,6 +30,8 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::math::Vec2d;
+
 class HybridATest : public ::testing::Test {
  public:
   virtual void SetUp() {
@@ -58,7 +60,7 @@ TEST_F(HybridATest, test1) {
   double ex = 15.0;
   double ey = 0.0;
   double ephi = 0.0;
-  std::vector<std::vector<common::math::Vec2d>> obstacles_list;
+  std::vector<std::vector<Vec2d>> obstacles_list;
   HybridAStartResult result;
   Vec2d obstacle_vertice_a(1.0, 0.0);
   Vec2d obstacle_vertice_b(-1.0, 0.0);
