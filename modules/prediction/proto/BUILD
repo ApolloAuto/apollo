@@ -159,18 +159,6 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "prediction_output_evaluation_proto",
-    deps = [
-        ":prediction_output_evaluation_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "prediction_output_evaluation_proto_lib",
-    srcs = ["prediction_output_evaluation.proto"],
-)
-
-cc_proto_library(
     name = "semantic_map_config_proto",
     deps = [
         ":semantic_map_config_proto_lib",
