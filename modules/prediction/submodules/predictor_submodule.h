@@ -33,7 +33,7 @@ namespace apollo {
 namespace prediction {
 
 class PredictorSubmodule
-    : public cyber::Component<EvaluatorOutput, ADCTrajectoryContainer> {
+    : public cyber::Component<ADCTrajectoryContainer, EvaluatorOutput> {
  public:
   /**
    * @brief Destructor
@@ -54,11 +54,11 @@ class PredictorSubmodule
 
   /**
    * @brief Data callback upon receiving a prediction evaluator output.
-   * @param Prediction evaluator output.
    * @param Prediction adc trajectory container.
+   * @param Prediction evaluator output.
    */
-  bool Proc(const std::shared_ptr<EvaluatorOutput>&,
-            const std::shared_ptr<ADCTrajectoryContainer>&) override;
+  bool Proc(const std::shared_ptr<ADCTrajectoryContainer>&,
+            const std::shared_ptr<EvaluatorOutput>&) override;
 
  private:
   std::shared_ptr<cyber::Writer<PredictionObstacles>> predictor_writer_;

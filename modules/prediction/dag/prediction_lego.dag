@@ -2,9 +2,9 @@ module_config {
     module_library : "/apollo/bazel-bin/modules/prediction/submodules/prediction_lego.so"
 
     components {
-        class_name : "ContainerSubmodule"
+        class_name : "PredictionComponent"
         config {
-            name: "container_submodule"
+            name: "prediction"
             config_file_path: "/apollo/modules/prediction/conf/prediction_conf.pb.txt"
             flag_file_path: "/apollo/modules/prediction/conf/prediction.conf"
             readers: [
@@ -43,13 +43,13 @@ module_config {
             flag_file_path: "/apollo/modules/prediction/conf/prediction.conf"
             readers: [
                 {
-                    channel:"/apollo/prediction/evaluator"
+                    channel:"/apollo/prediction/adccontainer"
                     qos_profile: {
                         depth : 1
                     }
                 },
                 {
-                    channel:"/apollo/prediction/adccontainer"
+                    channel:"/apollo/prediction/evaluator"
                     qos_profile: {
                         depth : 1
                     }
