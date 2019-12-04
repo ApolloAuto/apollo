@@ -20,9 +20,9 @@
 #include <string>
 #include <vector>
 
+#include "modules/planning/common/smoothers/smoother.h"
 #include "modules/planning/planner/on_lane_planner_dispatcher.h"
 #include "modules/planning/planning_base.h"
-#include "modules/planning/tasks/smoothers/smoother.h"
 
 /**
  * @namespace apollo::planning
