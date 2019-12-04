@@ -38,21 +38,24 @@ message ResourceMonitorConfig {
   message CPUUsage {
     optional float high_cpu_usage_warning = 1;
     optional float high_cpu_usage_error = 2;
-    // The process's dag path, if not set it will check the system's overall CPU usage
+    // The process's dag path, if not set it will check the system's overall CPU
+    // usage
     optional string process_dag_path = 3;
   }
 
   message MemoryUsage {
     optional int32 high_memory_usage_warning = 1;
     optional int32 high_memory_usage_error = 2;
-    // The process's dag path, if not set it will check the system's overall memory usage
+    // The process's dag path, if not set it will check the system's overall
+    // memory usage
     optional string process_dag_path = 3;
   }
 
   message DiskLoad {
     optional int32 high_disk_load_warning = 1;
     optional int32 high_disk_load_error = 2;
-    optional string device_name = 3; // Disk device name, such as sda, sdb and etc
+    // Disk device name, such as sda, sdb and etc
+    optional string device_name = 3;
   }
 
   repeated DiskSpace disk_spaces = 1;

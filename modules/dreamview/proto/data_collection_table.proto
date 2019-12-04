@@ -3,12 +3,12 @@ syntax = "proto2";
 package apollo.dreamview;
 
 enum ComparisonOperator {
-    EQUAL = 0;
-    NOT_EQUAL = 1;
-    GREATER_THAN = 2;
-    GREATER_THAN_OR_EQUAL = 3;
-    LESS_THAN = 4;
-    LESS_THAN_OR_EQUAL = 5;
+  EQUAL = 0;
+  NOT_EQUAL = 1;
+  GREATER_THAN = 2;
+  GREATER_THAN_OR_EQUAL = 3;
+  LESS_THAN = 4;
+  LESS_THAN_OR_EQUAL = 5;
 }
 
 message Criterion {
