@@ -117,7 +117,8 @@ message Feature {
   repeated PredictionTrajectoryPoint future_trajectory_points = 31;
 
   // Obstacle short-term predicted trajectory points
-  repeated apollo.common.TrajectoryPoint short_term_predicted_trajectory_points = 32;
+  repeated apollo.common.TrajectoryPoint
+      short_term_predicted_trajectory_points = 32;
 
   // Obstacle predicted trajectories
   repeated Trajectory predicted_trajectory = 33;
