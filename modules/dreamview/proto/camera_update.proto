@@ -3,17 +3,17 @@ syntax = "proto2";
 package apollo.dreamview;
 
 message CameraUpdate {
-    // The transformation matrix of localization in world coordinate system
-    // are stored in the double array in column-major order
-    repeated double localization = 1;
+  // The transformation matrix of localization in world coordinate system
+  // are stored in the double array in column-major order
+  repeated double localization = 1;
 
-    // The transformation matrix of localization to camera are stored in the
-    // double array in column-major order
-    repeated double localization2camera_tf = 2;
+  // The transformation matrix of localization to camera are stored in the
+  // double array in column-major order
+  repeated double localization2camera_tf = 2;
 
-    // Camera image data
-    optional bytes image = 3;
+  // Camera image data
+  optional bytes image = 3;
 
-    // Camera image aspect ratio = width / height
-    optional double image_aspect_ratio = 4;
+  // Camera image aspect ratio = width / height
+  optional double image_aspect_ratio = 4;
 }
