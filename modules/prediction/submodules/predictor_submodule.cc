@@ -46,8 +46,8 @@ bool PredictorSubmodule::Init() {
 }
 
 bool PredictorSubmodule::Proc(
-    const std::shared_ptr<EvaluatorOutput>& evaluator_output,
-    const std::shared_ptr<ADCTrajectoryContainer>& adc_trajectory_container) {
+    const std::shared_ptr<ADCTrajectoryContainer>& adc_trajectory_container,
+    const std::shared_ptr<EvaluatorOutput>& evaluator_output) {
   const apollo::common::Header& perception_header =
       evaluator_output->submodule_output().perception_header();
   const apollo::common::ErrorCode& perception_error_code =
