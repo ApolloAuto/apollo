@@ -3,5 +3,5 @@ syntax = "proto2";
 package apollo.tick;
 
 message Conf {
-    required bool whole_stack_sim = 1;
+  required bool whole_stack_sim = 1;
 }
