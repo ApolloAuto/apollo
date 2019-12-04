@@ -8,14 +8,14 @@ import "modules/control/proto/gain_scheduler_conf.proto";
 
 // model predictive control param
 message MPCControllerConf {
-  optional double ts = 1;  // sample time (dt) 0.01 sec, configurable
-  optional double cf = 2;  // corner stiffness front: N/rad
-  optional double cr = 3;  // corner stiffness rear: N/rad
+  optional double ts = 1;      // sample time (dt) 0.01 sec, configurable
+  optional double cf = 2;      // corner stiffness front: N/rad
+  optional double cr = 3;      // corner stiffness rear: N/rad
   optional int32 mass_fl = 4;  // mass forward left
   optional int32 mass_fr = 5;  // mass forward right
   optional int32 mass_rl = 6;  // mass rear left
   optional int32 mass_rr = 7;  // mass rear right
-  optional double eps = 8;  // converge threshold
+  optional double eps = 8;     // converge threshold
 
   // output variable (control state) weight matrix
   // (lateral_error, lateral_error_rate, heading_error, heading_error_rate,
