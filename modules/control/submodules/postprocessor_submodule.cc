@@ -23,6 +23,7 @@
 #include <string>
 
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/latency_recorder/latency_recorder.h"
 #include "modules/control/common/control_gflags.h"
 
 namespace apollo {
@@ -50,6 +51,7 @@ bool PostprocessorSubmodule::Init() {
 
 bool PostprocessorSubmodule::Proc(
     const std::shared_ptr<ControlCommand>& control_core_command) {
+  const double start_timestamp = Clock::NowInSeconds();
   ControlCommand control_command;
   // get all fields from control_core_command for now
   control_command = *control_core_command;
@@ -76,6 +78,14 @@ bool PostprocessorSubmodule::Proc(
       control_core_command->header().radar_timestamp());
 
   common::util::FillHeader(Name(), &control_command);
+  const double end_timestamp = Clock::NowInSeconds();
+
+  // measure latency
+  static apollo::common::LatencyRecorder latency_recorder(
+      FLAGS_control_command_topic);
+  latency_recorder.AppendLatencyRecord(
+      control_command.header().lidar_timestamp(), start_timestamp,
+      end_timestamp);
 
   postprocessor_writer_->Write(control_command);
 
