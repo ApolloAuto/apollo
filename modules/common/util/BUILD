@@ -7,7 +7,6 @@ cc_library(
     srcs = ["util.cc"],
     hdrs = ["util.h"],
     deps = [
-        ":color",
         ":future",
         ":json_util",
         ":lru_cache",
