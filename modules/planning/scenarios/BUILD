@@ -31,19 +31,6 @@ cc_library(
 )
 
 cc_library(
-    name = "stage_intersection_cruise_impl",
-    srcs = ["stage_intersection_cruise_impl.cc"],
-    hdrs = ["stage_intersection_cruise_impl.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
-    deps = [
-        "//modules/common",
-        "//modules/planning/common:planning_common",
-        "//modules/planning/common/util:util_lib",
-        "//modules/planning/scenarios/util:scenario_util_lib",
-    ],
-)
-
-cc_library(
     name = "scenario_manager",
     srcs = ["scenario_manager.cc"],
     hdrs = ["scenario_manager.h"],
