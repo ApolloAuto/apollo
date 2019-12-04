@@ -502,7 +502,7 @@ function citest_basic() {
 #   BUILD_TARGETS="
 #    `bazel query //modules/... union //cyber/...`
 #  "
-  BUILD_TARGETS=`bazel query //modules/... union //cyber/... except //modules/tools/visualizer/... except //modules/data/tools/rosbag_to_record/...  except //modules/v2x/... except //modules/drivers/video/tools/decode_video/... except //modules/map/tools/map_datachecker/... `
+  BUILD_TARGETS=`bazel query //modules/... union //cyber/... except //modules/tools/visualizer/... except //modules/v2x/... except //modules/drivers/video/tools/decode_video/... except //modules/map/tools/map_datachecker/... `
 
   JOB_ARG="--jobs=12 --ram_utilization_factor 80"
 
