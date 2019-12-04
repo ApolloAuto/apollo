@@ -64,7 +64,7 @@ Status PathBoundsDecider::Process(
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  // skip path_bounds_decider if reused path
+  // Skip the path boundary decision if reusing the path.
   if (FLAGS_enable_skip_path_tasks && PlanningContext::Instance()
                                           ->mutable_planning_status()
                                           ->mutable_path_reuse_decider()
@@ -270,6 +270,11 @@ void PathBoundsDecider::InitPathBoundsDecider(
   const common::TrajectoryPoint& planning_start_point =
       frame.PlanningStartPoint();
 
+  ADEBUG << "Plan at the starting point: x = "
+         << planning_start_point.path_point().x() << ", y = "
+         << planning_start_point.path_point().y() << ", and angle = "
+         << planning_start_point.path_point().theta();
+
   // Initialize some private variables.
   // ADC s/l info.
   auto adc_sl_info = reference_line.ToFrenetFrame(planning_start_point);
@@ -291,6 +296,20 @@ void PathBoundsDecider::InitPathBoundsDecider(
   } else {
     adc_lane_width_ = lane_left_width + lane_right_width;
   }
+}
+
+common::TrajectoryPoint PathBoundsDecider::InferFrontAxeCenterFromRearAxeCenter(
+      const common::TrajectoryPoint& traj_point) {
+  double front_to_rear_axe_distance =
+      VehicleConfigHelper::GetConfig().vehicle_param().wheel_base();
+  common::TrajectoryPoint ret = traj_point;
+  ret.mutable_path_point()->set_x(
+      traj_point.path_point().x() +
+      front_to_rear_axe_distance * std::cos(traj_point.path_point().theta()));
+  ret.mutable_path_point()->set_y(
+      traj_point.path_point().y() +
+      front_to_rear_axe_distance * std::sin(traj_point.path_point().theta()));
+  return ret;
 }
 
 Status PathBoundsDecider::GenerateRegularPathBound(
@@ -870,8 +889,8 @@ bool PathBoundsDecider::InitPathBoundary(
   // Sanity checks.
   CHECK_NOTNULL(path_bound);
   path_bound->clear();
-
   const auto& reference_line = reference_line_info.reference_line();
+
   // Starting from ADC's current position, increment until the horizon, and
   // set lateral bounds to be infinite at every spot.
   for (double curr_s = adc_frenet_s_;
@@ -885,7 +904,7 @@ bool PathBoundsDecider::InitPathBoundary(
                              std::numeric_limits<double>::max());
   }
 
-  // return.
+  // Return.
   if (path_bound->empty()) {
     ADEBUG << "Empty path boundary in InitPathBoundary";
     return false;

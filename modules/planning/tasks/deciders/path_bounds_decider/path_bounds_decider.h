@@ -72,6 +72,9 @@ class PathBoundsDecider : public Decider {
   void InitPathBoundsDecider(const Frame& frame,
                              const ReferenceLineInfo& reference_line_info);
 
+  common::TrajectoryPoint InferFrontAxeCenterFromRearAxeCenter(
+      const common::TrajectoryPoint& traj_point);
+
   /** @brief The regular path boundary generation considers the ADC itself
    *   and other static environments:
    *   - ADC's position (lane-changing considerations)
@@ -147,9 +150,6 @@ class PathBoundsDecider : public Decider {
 
   /////////////////////////////////////////////////////////////////////////////
   // Below are functions called when generating path bounds.
-  //  1. InitPathBoundary
-  //  2. GetBoundaryFromLanesAndADC
-  //  3. GetBoundaryFromStaticObstacles
 
   /** @brief Initializes an empty path boundary.
    */
