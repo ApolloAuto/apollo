@@ -74,21 +74,23 @@ bool PreprocessorSubmodule::Proc(const std::shared_ptr<LocalView> &local_view) {
   AERROR_IF(!status.ok()) << "Failed to produce control preprocessor:"
                           << status.error_message();
 
+  if (status.ok() && !estop_) {
+    preprocessor_status->set_error_code(ErrorCode::OK);
+  } else {
+    estop_ = true;
+    preprocessor_status->set_error_code(status.code());
+    preprocessor_status->set_msg(status.error_message());
+  }
+
   if (control_preprocessor.local_view().has_pad_msg()) {
-    auto pad_message = control_preprocessor.local_view().pad_msg();
+    const auto &pad_message = control_preprocessor.local_view().pad_msg();
     if (pad_message.action() == DrivingAction::RESET) {
       AINFO << "Control received RESET action!";
+      estop_ = false;
       preprocessor_status->set_error_code(ErrorCode::OK);
       preprocessor_status->set_msg("");
     }
     control_preprocessor.set_received_pad_msg(true);
-  }
-
-  if (status.ok()) {
-    preprocessor_status->set_error_code(ErrorCode::OK);
-  } else {
-    preprocessor_status->set_error_code(status.code());
-    preprocessor_status->set_msg(status.error_message());
   }
 
   control_preprocessor.mutable_header()->set_lidar_timestamp(
@@ -98,22 +100,7 @@ bool PreprocessorSubmodule::Proc(const std::shared_ptr<LocalView> &local_view) {
   control_preprocessor.mutable_header()->set_radar_timestamp(
       local_view->trajectory().header().radar_timestamp());
   common::util::FillHeader(Name(), &control_preprocessor);
-  if (control_preprocessor.local_view().has_pad_msg()) {
-    auto pad_message = control_preprocessor.local_view().pad_msg();
-    if (pad_message.action() == DrivingAction::RESET) {
-      AINFO << "Control received RESET action!";
-      preprocessor_status->set_error_code(ErrorCode::OK);
-      preprocessor_status->set_msg("");
-    }
-    control_preprocessor.set_received_pad_msg(true);
-  }
 
-  if (status.ok()) {
-    preprocessor_status->set_error_code(ErrorCode::OK);
-  } else {
-    preprocessor_status->set_error_code(status.code());
-    preprocessor_status->set_msg(status.error_message());
-  }
   preprocessor_writer_->Write(control_preprocessor);
   ADEBUG << "Preprocessor finished.";
 
@@ -154,15 +141,13 @@ Status PreprocessorSubmodule::ProducePreprocessorStatus(
   control_preprocessor->mutable_engage_advice()->set_advice(
       apollo::common::EngageAdvice::READY_TO_ENGAGE);
 
-  // TODO(SHU): add it back
-  // estop_ =
-  //     control_common_conf_.enable_persistent_estop()
-  //         ? estop_ || control_preprocessor->local_view()
-  //                         .trajectory()
-  //                         .estop()
-  //                         .is_estop()
-  //         :
-  //         control_preprocessor->local_view().trajectory().estop().is_estop();
+  estop_ =
+      control_common_conf_.enable_persistent_estop()
+          ? estop_ || control_preprocessor->local_view()
+                          .trajectory()
+                          .estop()
+                          .is_estop()
+          : control_preprocessor->local_view().trajectory().estop().is_estop();
 
   if (control_preprocessor->local_view().trajectory().estop().is_estop()) {
     return Status(
