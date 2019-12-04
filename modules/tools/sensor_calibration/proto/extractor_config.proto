@@ -18,29 +18,29 @@
 
 syntax = "proto2";
 
-message IoConfig{
-	required string task_name = 1 [default = "tmp"];
-	required string output_path = 2 [default ="extracted_data"];
-	optional string start_timestamp = 3 [default = "FLOAT_MIN"];
-	optional string end_timestamp = 4 [default = "FLOAT_MAX"];
+message IoConfig {
+  required string task_name = 1 [default = "tmp"];
+  required string output_path = 2 [default = "extracted_data"];
+  optional string start_timestamp = 3 [default = "FLOAT_MIN"];
+  optional string end_timestamp = 4 [default = "FLOAT_MAX"];
 };
 
-message ChannelConfig{
-	optional string descriptor = 1 [default = ""];
-	required string name = 2;
-	required uint32 extraction_rate = 3 [default = 1];
+message ChannelConfig {
+  optional string descriptor = 1 [default = ""];
+  required string name = 2;
+  required uint32 extraction_rate = 3 [default = 1];
 };
 
-message Channels{
-	repeated ChannelConfig channel = 1;
+message Channels {
+  repeated ChannelConfig channel = 1;
 };
 
 message Records {
-	repeated string record_path = 1;
+  repeated string record_path = 1;
 };
 
-message DataExtractionConfig{
-	required IoConfig io_config = 1;
-	required Channels channels = 2;
-	required Records records = 3;
+message DataExtractionConfig {
+  required IoConfig io_config = 1;
+  required Channels channels = 2;
+  required Records records = 3;
 };
