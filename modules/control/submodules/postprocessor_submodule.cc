@@ -58,17 +58,13 @@ bool PostprocessorSubmodule::Proc(
   control_command = *control_core_command;
 
   // estop handling
-  // TODO(SHU): fix this by adding error code and error msg in previous
-  // submodules
-  // if (control_core_command->header().has_status() &&
-  //     control_core_command->header().status().error_code() != ErrorCode::OK)
-  //     {
-  //   AWARN_EVERY(100) << "Estop triggered! No control core method executed!";
-  //   control_command.set_speed(0);
-  //   control_command.set_throttle(0);
-  //   control_command.set_brake(control_common_conf_.soft_estop_brake());
-  //   control_command.set_gear_location(Chassis::GEAR_DRIVE);
-  // }
+  if (control_core_command->header().status().error_code() != ErrorCode::OK) {
+    AWARN_EVERY(100) << "Estop triggered! No control core method executed!";
+    control_command.set_speed(0);
+    control_command.set_throttle(0);
+    control_command.set_brake(control_common_conf_.soft_estop_brake());
+    control_command.set_gear_location(Chassis::GEAR_DRIVE);
+  }
 
   // set header
   control_command.mutable_header()->set_lidar_timestamp(
