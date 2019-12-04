@@ -349,6 +349,12 @@ function main(){
 
     set -x
 
+    LIB_GNU=/usr/lib/${ARCH}-linux-gnu
+    LIB_GNU_VOLUME=""
+    if [ -d "${LIB_GNU}" ]; then
+       LIB_GNU_VOLUME="-v ${LIB_GNU}:/usr/lib/${ARCH}-linux-$USER" 
+    fi
+
     ${DOCKER_RUN} -it \
         -d \
         --privileged \
@@ -374,7 +380,7 @@ function main(){
         --shm-size 2G \
         --pid=host \
         -v /dev/null:/dev/raw1394 \
-        -v /usr/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-nvidia \
+        ${LIB_GNU_VOLUME} \
         $IMG \
         /bin/bash
     if [ $? -ne 0 ];then
