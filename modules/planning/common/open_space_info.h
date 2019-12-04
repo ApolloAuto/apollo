@@ -45,7 +45,6 @@
 
 namespace apollo {
 namespace planning {
-using apollo::planning_internal::Debug;
 
 typedef std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>
     TrajGearPair;

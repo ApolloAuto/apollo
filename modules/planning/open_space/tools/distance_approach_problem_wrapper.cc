@@ -27,6 +27,8 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::math::Vec2d;
+
 class ObstacleContainer {
  public:
   ObstacleContainer() = default;

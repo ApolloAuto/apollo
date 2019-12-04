@@ -32,9 +32,6 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::math::Box2d;
-using apollo::common::math::Vec2d;
-
 class Node3d {
  public:
   Node3d(const double x, const double y, const double phi);
@@ -47,8 +44,9 @@ class Node3d {
          const std::vector<double>& XYbounds,
          const PlannerOpenSpaceConfig& open_space_conf);
   virtual ~Node3d() = default;
-  static Box2d GetBoundingBox(const common::VehicleParam& vehicle_param_,
-                              const double x, const double y, const double phi);
+  static apollo::common::math::Box2d GetBoundingBox(
+      const common::VehicleParam& vehicle_param_, const double x,
+      const double y, const double phi);
   double GetCost() const { return traj_cost_ + heuristic_cost_; }
   double GetTrajCost() const { return traj_cost_; }
   double GetHeuCost() const { return heuristic_cost_; }

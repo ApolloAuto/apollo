@@ -26,7 +26,9 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::ErrorCode;
+using apollo::common::Status;
 using apollo::common::VehicleState;
+using apollo::common::math::Vec2d;
 
 OpenSpaceTrajectoryOptimizer::OpenSpaceTrajectoryOptimizer(
     const OpenSpaceTrajectoryOptimizerConfig& config)
@@ -50,14 +52,13 @@ OpenSpaceTrajectoryOptimizer::OpenSpaceTrajectoryOptimizer(
       new IterativeAnchoringSmoother(config.planner_open_space_config()));
 }
 
-common::Status OpenSpaceTrajectoryOptimizer::Plan(
+Status OpenSpaceTrajectoryOptimizer::Plan(
     const std::vector<common::TrajectoryPoint>& stitching_trajectory,
     const std::vector<double>& end_pose, const std::vector<double>& XYbounds,
-    double rotate_angle, const common::math::Vec2d& translate_origin,
+    double rotate_angle, const Vec2d& translate_origin,
     const Eigen::MatrixXi& obstacles_edges_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-    const std::vector<std::vector<common::math::Vec2d>>&
-        obstacles_vertices_vec) {
+    const std::vector<std::vector<Vec2d>>& obstacles_vertices_vec) {
   if (XYbounds.empty() || end_pose.empty() || obstacles_edges_num.cols() == 0 ||
       obstacles_A.cols() == 0 || obstacles_b.cols() == 0) {
     ADEBUG << "OpenSpaceTrajectoryOptimizer input data not ready";
@@ -270,8 +271,7 @@ void OpenSpaceTrajectoryOptimizer::RecordDebugInfo(
     const Eigen::MatrixXd& state_result_ds,
     const Eigen::MatrixXd& control_result_ds,
     const Eigen::MatrixXd& time_result_ds, const std::vector<double>& XYbounds,
-    const std::vector<std::vector<common::math::Vec2d>>&
-        obstacles_vertices_vec) {
+    const std::vector<std::vector<Vec2d>>& obstacles_vertices_vec) {
   // load information about trajectory stitching point
 
   open_space_debug_.mutable_trajectory_stitching_point()->CopyFrom(
@@ -420,8 +420,8 @@ bool OpenSpaceTrajectoryOptimizer::IsInitPointNearDestination(
 }
 
 void OpenSpaceTrajectoryOptimizer::PathPointNormalizing(
-    double rotate_angle, const common::math::Vec2d& translate_origin, double* x,
-    double* y, double* phi) {
+    double rotate_angle, const Vec2d& translate_origin, double* x, double* y,
+    double* phi) {
   *x -= translate_origin.x();
   *y -= translate_origin.y();
   double tmp_x = *x;
@@ -431,8 +431,8 @@ void OpenSpaceTrajectoryOptimizer::PathPointNormalizing(
 }
 
 void OpenSpaceTrajectoryOptimizer::PathPointDeNormalizing(
-    double rotate_angle, const common::math::Vec2d& translate_origin, double* x,
-    double* y, double* phi) {
+    double rotate_angle, const Vec2d& translate_origin, double* x, double* y,
+    double* phi) {
   double tmp_x = *x;
   *x = (*x) * std::cos(rotate_angle) - (*y) * std::sin(rotate_angle);
   *y = tmp_x * std::sin(rotate_angle) + (*y) * std::cos(rotate_angle);
@@ -455,14 +455,14 @@ void OpenSpaceTrajectoryOptimizer::LoadTrajectory(
   CHECK_EQ(states_size, controls_size + 1);
   double relative_time = 0.0;
   double relative_s = 0.0;
-  common::math::Vec2d last_path_point(state_result(0, 0), state_result(1, 0));
+  Vec2d last_path_point(state_result(0, 0), state_result(1, 0));
   for (size_t i = 0; i < states_size; ++i) {
     common::TrajectoryPoint point;
     point.mutable_path_point()->set_x(state_result(0, i));
     point.mutable_path_point()->set_y(state_result(1, i));
     point.mutable_path_point()->set_theta(state_result(2, i));
     point.set_v(state_result(3, i));
-    common::math::Vec2d cur_path_point(state_result(0, i), state_result(1, i));
+    Vec2d cur_path_point(state_result(0, i), state_result(1, i));
     relative_s += cur_path_point.DistanceTo(last_path_point);
     point.mutable_path_point()->set_s(relative_s);
     // TODO(Jinyun): Evaluate how to set end states control input
@@ -509,7 +509,7 @@ bool OpenSpaceTrajectoryOptimizer::GenerateDistanceApproachTraj(
     const std::vector<double>& XYbounds,
     const Eigen::MatrixXi& obstacles_edges_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
-    const std::vector<std::vector<common::math::Vec2d>>& obstacles_vertices_vec,
+    const std::vector<std::vector<Vec2d>>& obstacles_vertices_vec,
     const Eigen::MatrixXd& last_time_u, const double init_v,
     Eigen::MatrixXd* state_result_ds, Eigen::MatrixXd* control_result_ds,
     Eigen::MatrixXd* time_result_ds, Eigen::MatrixXd* l_warm_up,
@@ -806,7 +806,7 @@ void OpenSpaceTrajectoryOptimizer::CombineTrajectories(
 
 bool OpenSpaceTrajectoryOptimizer::GenerateDecoupledTraj(
     const Eigen::MatrixXd& xWS, const double init_a, const double init_v,
-    const std::vector<std::vector<common::math::Vec2d>>& obstacles_vertices_vec,
+    const std::vector<std::vector<Vec2d>>& obstacles_vertices_vec,
     Eigen::MatrixXd* state_result_dc, Eigen::MatrixXd* control_result_dc,
     Eigen::MatrixXd* time_result_dc) {
   DiscretizedTrajectory smoothed_trajectory;

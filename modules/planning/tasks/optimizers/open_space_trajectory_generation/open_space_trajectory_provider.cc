@@ -36,6 +36,7 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
+using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
 
 OpenSpaceTrajectoryProvider::OpenSpaceTrajectoryProvider(
