@@ -32,6 +32,7 @@ namespace control {
 using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::time::Clock;
 
 std::string PostprocessorSubmodule::Name() const {
   return FLAGS_postprocessor_submodule_name;
