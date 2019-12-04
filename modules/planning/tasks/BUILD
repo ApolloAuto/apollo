@@ -38,6 +38,7 @@ cc_library(
         "//modules/planning/tasks/deciders/path_decider",
         "//modules/planning/tasks/deciders/path_lane_borrow_decider",
         "//modules/planning/tasks/deciders/path_reuse_decider",
+        "//modules/planning/tasks/deciders/rss_decider",
         "//modules/planning/tasks/deciders/rule_based_stop_decider",
         "//modules/planning/tasks/deciders/speed_bounds_decider",
         "//modules/planning/tasks/deciders/speed_decider",
@@ -48,7 +49,6 @@ cc_library(
         "//modules/planning/tasks/optimizers/piecewise_jerk_path:piecewise_jerk_path_optimizer",
         "//modules/planning/tasks/optimizers/piecewise_jerk_speed:piecewise_jerk_speed_nonlinear_optimizer",
         "//modules/planning/tasks/optimizers/piecewise_jerk_speed:piecewise_jerk_speed_optimizer",
-        "//modules/planning/tasks/rss:decider_rss",
     ],
 )
 

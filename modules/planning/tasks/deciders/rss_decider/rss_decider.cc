@@ -18,7 +18,8 @@
  * @file
  **/
 
-#include "modules/planning/tasks/rss/decider_rss.h"
+#include "modules/planning/tasks/deciders/rss_decider/rss_decider.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planning.pb.h"
