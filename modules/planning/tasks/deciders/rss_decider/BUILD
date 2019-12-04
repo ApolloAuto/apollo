@@ -3,9 +3,9 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "decider_rss",
-    srcs = ["decider_rss.cc"],
-    hdrs = ["decider_rss.h"],
+    name = "rss_decider",
+    srcs = ["rss_decider.cc"],
+    hdrs = ["rss_decider.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/status",
@@ -19,11 +19,11 @@ cc_library(
 )
 
 cc_test(
-    name = "decider_rss_test",
+    name = "rss_decider_test",
     size = "small",
-    srcs = ["decider_rss_test.cc"],
+    srcs = ["rss_decider_test.cc"],
     deps = [
-        ":decider_rss",
+        ":rss_decider",
         "@ad_rss_lib//:ad_rss",
         "@gtest//:main",
     ],
