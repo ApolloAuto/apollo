@@ -3,6 +3,6 @@ syntax = "proto2";
 package apollo.cyber.proto;
 
 message ProtoDesc {
-    optional bytes desc = 1;
-    repeated ProtoDesc dependencies = 2;
+  optional bytes desc = 1;
+  repeated ProtoDesc dependencies = 2;
 }

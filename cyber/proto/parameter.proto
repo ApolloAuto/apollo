@@ -3,39 +3,39 @@ syntax = "proto2";
 package apollo.cyber.proto;
 
 enum ParamType {
-    NOT_SET = 0;
-    BOOL = 1;
-    INT = 2;
-    DOUBLE = 3;
-    STRING = 4;
-    PROTOBUF = 5;
+  NOT_SET = 0;
+  BOOL = 1;
+  INT = 2;
+  DOUBLE = 3;
+  STRING = 4;
+  PROTOBUF = 5;
 }
 
 message Param {
-    optional string name = 1;
-    optional ParamType type = 2;
-    optional string type_name = 3;
-    oneof oneof_value {
-        bool bool_value = 4;
-        int64 int_value = 5;
-        double double_value = 6;
-        string string_value = 7;
-    }
-    optional bytes proto_desc = 8;
+  optional string name = 1;
+  optional ParamType type = 2;
+  optional string type_name = 3;
+  oneof oneof_value {
+    bool bool_value = 4;
+    int64 int_value = 5;
+    double double_value = 6;
+    string string_value = 7;
+  }
+  optional bytes proto_desc = 8;
 }
 
 message NodeName {
-    optional string value = 1;
+  optional string value = 1;
 }
 
 message ParamName {
-    optional string value = 1;
+  optional string value = 1;
 }
 
 message BoolResult {
-    optional bool value = 1;
+  optional bool value = 1;
 }
 
 message Params {
-    repeated Param param = 1;
+  repeated Param param = 1;
 }

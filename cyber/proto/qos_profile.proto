@@ -23,7 +23,8 @@ enum QosDurabilityPolicy {
 message QosProfile {
   optional QosHistoryPolicy history = 1 [default = HISTORY_KEEP_LAST];
   optional uint32 depth = 2 [default = 1];  // capacity of history
-  optional uint32 mps = 3 [default = 0];  // messages per second
-  optional QosReliabilityPolicy reliability = 4 [default = RELIABILITY_RELIABLE];
+  optional uint32 mps = 3 [default = 0];    // messages per second
+  optional QosReliabilityPolicy reliability = 4
+      [default = RELIABILITY_RELIABLE];
   optional QosDurabilityPolicy durability = 5 [default = DURABILITY_VOLATILE];
 };
