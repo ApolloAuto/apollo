@@ -1,7 +1,6 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
 
-import Header from "components/Header";
 import MainView from "components/Layouts/MainView";
 import ToolView from "components/Layouts/ToolView";
 import Loader from "components/common/Loader";

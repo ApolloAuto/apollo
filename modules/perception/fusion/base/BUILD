@@ -18,26 +18,18 @@ cc_library(
 
 cc_library(
     name = "base_forward_declaration",
-    hdrs = [
-        "base_forward_declaration.h",
-    ],
+    hdrs = ["base_forward_declaration.h"],
 )
 
 cc_library(
     name = "fusion_log",
-    hdrs = [
-        "fusion_log.h",
-    ],
+    hdrs = ["fusion_log.h"],
 )
 
 cc_library(
     name = "base_init_options",
-    srcs = [
-        "base_init_options.cc",
-    ],
-    hdrs = [
-        "base_init_options.h",
-    ],
+    srcs = ["base_init_options.cc"],
+    hdrs = ["base_init_options.h"],
     deps = [
         "//modules/perception/lib/config_manager",
     ],
@@ -45,12 +37,8 @@ cc_library(
 
 cc_library(
     name = "scene",
-    srcs = [
-        "scene.cc",
-    ],
-    hdrs = [
-        "scene.h",
-    ],
+    srcs = ["scene.cc"],
+    hdrs = ["scene.h"],
     deps = [
         ":sensor",
         ":track",
@@ -85,9 +73,7 @@ cc_library(
 cc_test(
     name = "sensor_frame_test",
     size = "small",
-    srcs = [
-        "sensor_frame_test.cc",
-    ],
+    srcs = ["sensor_frame_test.cc"],
     deps = [
         ":sensor",
         "@gtest//:main",
@@ -97,9 +83,7 @@ cc_test(
 cc_test(
     name = "sensor_test",
     size = "small",
-    srcs = [
-        "sensor_test.cc",
-    ],
+    srcs = ["sensor_test.cc"],
     deps = [
         ":sensor",
         "@gtest//:main",
@@ -109,9 +93,7 @@ cc_test(
 cc_test(
     name = "sensor_object_test",
     size = "small",
-    srcs = [
-        "sensor_object_test.cc",
-    ],
+    srcs = ["sensor_object_test.cc"],
     deps = [
         ":sensor",
         "@gtest//:main",
@@ -120,12 +102,8 @@ cc_test(
 
 cc_library(
     name = "sensor_data_manager",
-    srcs = [
-        "sensor_data_manager.cc",
-    ],
-    hdrs = [
-        "sensor_data_manager.h",
-    ],
+    srcs = ["sensor_data_manager.cc"],
+    hdrs = ["sensor_data_manager.h"],
     deps = [
         ":sensor",
         "//modules/perception/base:frame",
@@ -137,9 +115,7 @@ cc_library(
 cc_test(
     name = "sensor_data_manager_test",
     size = "small",
-    srcs = [
-        "sensor_data_manager_test.cc",
-    ],
+    srcs = ["sensor_data_manager_test.cc"],
     data = [
         "//modules/perception:perception_testdata",
     ],
@@ -151,12 +127,8 @@ cc_test(
 
 cc_library(
     name = "track",
-    srcs = [
-        "track.cc",
-    ],
-    hdrs = [
-        "track.h",
-    ],
+    srcs = ["track.cc"],
+    hdrs = ["track.h"],
     deps = [
         ":sensor",
     ],
@@ -165,9 +137,7 @@ cc_library(
 cc_test(
     name = "track_test",
     size = "small",
-    srcs = [
-        "track_test.cc",
-    ],
+    srcs = ["track_test.cc"],
     deps = [
         ":track",
         "@gtest//:main",
@@ -176,12 +146,8 @@ cc_test(
 
 cc_library(
     name = "track_pool_types",
-    srcs = [
-        "track_pool_types.cc",
-    ],
-    hdrs = [
-        "track_pool_types.h",
-    ],
+    srcs = ["track_pool_types.cc"],
+    hdrs = ["track_pool_types.h"],
     deps = [
         ":track",
         "//modules/perception/base:object_pool",

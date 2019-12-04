@@ -36,60 +36,45 @@ TEST(JsonUtilTest, ProtoToTypedJson) {
   EXPECT_EQ("MsgA", json_obj["data"]["msg"]);
 }
 
-TEST(JsonUtilTest, GetStringFromJson) {
-  Json json_obj;
-  json_obj["key1"] = 0;
-  json_obj["key2"] = "";
-  json_obj["key3"] = "value2";
+TEST(JsonUtilTest, GetString) {
+  Json json_obj = {{"int", 0}, {"empty_str", ""}, {"str", "value2"}};
 
   std::string value;
   // No such key.
-  EXPECT_FALSE(JsonUtil::GetStringFromJson(json_obj, "key0", &value));
+  EXPECT_FALSE(JsonUtil::GetString(json_obj, "no_such_key", &value));
   // Value is not string.
-  EXPECT_FALSE(JsonUtil::GetStringFromJson(json_obj, "key1", &value));
+  EXPECT_FALSE(JsonUtil::GetString(json_obj, "int", &value));
   // Empty string.
-  EXPECT_TRUE(JsonUtil::GetStringFromJson(json_obj, "key2", &value));
+  EXPECT_TRUE(JsonUtil::GetString(json_obj, "empty_str", &value));
   EXPECT_TRUE(value.empty());
   // Non empty string.
-  EXPECT_TRUE(JsonUtil::GetStringFromJson(json_obj, "key3", &value));
+  EXPECT_TRUE(JsonUtil::GetString(json_obj, "str", &value));
   EXPECT_EQ("value2", value);
 }
 
-TEST(JsonUtilTest, GetStringVectorFromJson) {
-  Json json_obj;
-  json_obj["key1"] = 0;
-  json_obj["key2"] = Json::array();
-
-  auto int_array = Json::array();
-  int_array.push_back(0);
-  json_obj["key3"] = int_array;
-
-  auto mixed_array = Json::array();
-  mixed_array.push_back(0);
-  mixed_array.push_back("str1");
-  json_obj["key4"] = mixed_array;
-
-  auto str_array = Json::array();
-  str_array.push_back("str1");
-  str_array.push_back("str2");
-  json_obj["key5"] = str_array;
+TEST(JsonUtilTest, GetStringVector) {
+  Json json_obj = {{"int", 0},
+                   {"empty_array", Json::array()},
+                   {"int_array", {0}},
+                   {"any_array", {0, "str1"}},
+                   {"str_array", {"str1", "str2"}}};
 
   std::vector<std::string> value;
   // No such key.
-  EXPECT_FALSE(JsonUtil::GetStringVectorFromJson(json_obj, "key0", &value));
+  EXPECT_FALSE(JsonUtil::GetStringVector(json_obj, "no_such_key", &value));
   // Value is not array.
-  EXPECT_FALSE(JsonUtil::GetStringVectorFromJson(json_obj, "key1", &value));
+  EXPECT_FALSE(JsonUtil::GetStringVector(json_obj, "int", &value));
   // Empty array.
-  EXPECT_TRUE(JsonUtil::GetStringVectorFromJson(json_obj, "key2", &value));
+  EXPECT_TRUE(JsonUtil::GetStringVector(json_obj, "empty_array", &value));
   EXPECT_TRUE(value.empty());
   // Non-string array.
-  EXPECT_FALSE(JsonUtil::GetStringVectorFromJson(json_obj, "key3", &value));
+  EXPECT_FALSE(JsonUtil::GetStringVector(json_obj, "int_array", &value));
   EXPECT_TRUE(value.empty());
   // Array contains non-string element.
-  EXPECT_FALSE(JsonUtil::GetStringVectorFromJson(json_obj, "key4", &value));
+  EXPECT_FALSE(JsonUtil::GetStringVector(json_obj, "any_array", &value));
   EXPECT_THAT(value, testing::ElementsAre("str1"));
   // String array.
-  EXPECT_TRUE(JsonUtil::GetStringVectorFromJson(json_obj, "key5", &value));
+  EXPECT_TRUE(JsonUtil::GetStringVector(json_obj, "str_array", &value));
   EXPECT_THAT(value, testing::ElementsAre("str1", "str2"));
 }
 

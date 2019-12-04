@@ -198,8 +198,7 @@ bool CanbusComponent::Proc() {
 }
 
 void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
-  int64_t current_timestamp =
-      apollo::common::time::AsInt64<common::time::micros>(Clock::Now());
+  int64_t current_timestamp = absl::ToUnixMicros(Clock::Now());
   // if command coming too soon, just ignore it.
   if (current_timestamp - last_timestamp_ < FLAGS_min_cmd_interval * 1000) {
     ADEBUG << "Control command comes too soon. Ignore.\n Required "
@@ -213,7 +212,9 @@ void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
   ADEBUG << "Control_sequence_number:"
          << control_command.header().sequence_num() << ", Time_of_delay:"
          << current_timestamp -
-                static_cast<int64_t>(control_command.header().timestamp_sec());
+                static_cast<int64_t>(control_command.header().timestamp_sec() *
+                                     1e6)
+         << " micro seconds";
 
   if (vehicle_controller_->Update(control_command) != ErrorCode::OK) {
     AERROR << "Failed to process callback function OnControlCommand because "

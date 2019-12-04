@@ -4,9 +4,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "visualizer",
-    srcs = [
-        "visualizer.cc",
-    ],
+    srcs = ["visualizer.cc"],
     hdrs = [
         "colormap.h",
         "keycode.h",
@@ -28,12 +26,8 @@ cc_library(
 
 cc_library(
     name = "transform_server",
-    srcs = [
-        "transform_server.cc",
-    ],
-    hdrs = [
-        "transform_server.h",
-    ],
+    srcs = ["transform_server.cc"],
+    hdrs = ["transform_server.h"],
     deps = [
         "//cyber",
         "//modules/perception/base",

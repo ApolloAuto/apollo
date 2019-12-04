@@ -35,17 +35,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
-
-// The helper function "std::make_unique()" is defined since C++14.
-// The definition of "std::make_unique()" borrowed from C++14 is given here
-// so that it can be used in C++11.
-#if __cplusplus == 201103L
-namespace std {
-
-using absl::make_unique;
-
-}  // namespace std
-#endif
+#include "modules/common/util/future.h"
 
 /**
  * @namespace apollo::common::util

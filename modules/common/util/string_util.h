@@ -23,8 +23,8 @@
 
 #include <string>
 
-#include "absl/strings/string_view.h"
 #include "google/protobuf/stubs/stringprintf.h"
+#include "modules/common/util/future.h"
 
 /**
  * @namespace apollo::common::util
@@ -44,7 +44,7 @@ struct DebugStringFormatter {
   }
 };
 
-std::string EncodeBase64(absl::string_view in);
+std::string EncodeBase64(std::string_view in);
 
 }  // namespace util
 }  // namespace common

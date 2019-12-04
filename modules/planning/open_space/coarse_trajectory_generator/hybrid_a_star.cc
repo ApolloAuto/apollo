@@ -132,14 +132,13 @@ std::shared_ptr<Node3d> HybridAStar::LoadRSPinCS(
       reeds_shepp_to_end->x, reeds_shepp_to_end->y, reeds_shepp_to_end->phi,
       XYbounds_, planner_open_space_config_));
   end_node->SetPre(current_node);
-  close_set_.insert(std::make_pair(end_node->GetIndex(), end_node));
+  close_set_.emplace(end_node->GetIndex(), end_node);
   return end_node;
 }
 
 std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
     std::shared_ptr<Node3d> current_node, size_t next_node_index) {
   double steering = 0.0;
-  size_t index = 0;
   double traveled_distance = 0.0;
   if (next_node_index < static_cast<double>(next_node_num_) / 2) {
     steering =
@@ -148,7 +147,7 @@ std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
             static_cast<double>(next_node_index);
     traveled_distance = step_size_;
   } else {
-    index = next_node_index - next_node_num_ / 2;
+    size_t index = next_node_index - next_node_num_ / 2;
     steering =
         -max_steer_angle_ +
         (2 * max_steer_angle_ / (static_cast<double>(next_node_num_) / 2 - 1)) *
@@ -676,17 +675,14 @@ bool HybridAStar::Plan(
                                                   obstacles_linesegments_vec_);
   ADEBUG << "map time " << Clock::NowInSeconds() - map_time;
   // load open set, pq
-  open_set_.insert(std::make_pair(start_node_->GetIndex(), start_node_));
-  open_pq_.push(
-      std::make_pair(start_node_->GetIndex(), start_node_->GetCost()));
+  open_set_.emplace(start_node_->GetIndex(), start_node_);
+  open_pq_.emplace(start_node_->GetIndex(), start_node_->GetCost());
 
   // Hybrid A* begins
   size_t explored_node_num = 0;
   double astar_start_time = Clock::NowInSeconds();
   double heuristic_time = 0.0;
   double rs_time = 0.0;
-  double start_time = 0.0;
-  double end_time = 0.0;
   while (!open_pq_.empty()) {
     // take out the lowest cost neighboring node
     const std::string current_id = open_pq_.top().first;
@@ -695,13 +691,13 @@ bool HybridAStar::Plan(
     // check if an analystic curve could be connected from current
     // configuration to the end configuration without collision. if so, search
     // ends.
-    start_time = Clock::NowInSeconds();
+    const double rs_start_time = Clock::NowInSeconds();
     if (AnalyticExpansion(current_node)) {
       break;
     }
-    end_time = Clock::NowInSeconds();
-    rs_time += end_time - start_time;
-    close_set_.insert(std::make_pair(current_node->GetIndex(), current_node));
+    const double rs_end_time = Clock::NowInSeconds();
+    rs_time += rs_end_time - rs_start_time;
+    close_set_.emplace(current_node->GetIndex(), current_node);
     for (size_t i = 0; i < next_node_num_; ++i) {
       std::shared_ptr<Node3d> next_node = Next_node_generator(current_node, i);
       // boundary check failure handle
@@ -718,9 +714,9 @@ bool HybridAStar::Plan(
       }
       if (open_set_.find(next_node->GetIndex()) == open_set_.end()) {
         explored_node_num++;
-        start_time = Clock::NowInSeconds();
+        const double start_time = Clock::NowInSeconds();
         CalculateNodeCost(current_node, next_node);
-        end_time = Clock::NowInSeconds();
+        const double end_time = Clock::NowInSeconds();
         heuristic_time += end_time - start_time;
         open_set_.emplace(next_node->GetIndex(), next_node);
         open_pq_.emplace(next_node->GetIndex(), next_node->GetCost());

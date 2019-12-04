@@ -23,6 +23,7 @@
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/kv_db/kv_db.h"
+#include "modules/common/util/future.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/message_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
@@ -64,7 +65,7 @@ using WLock = boost::unique_lock<boost::shared_mutex>;
 constexpr char kNavigationModeName[] = "Navigation";
 
 // Convert a string to be title-like. E.g.: "hello_world" -> "Hello World".
-std::string TitleCase(const std::string& origin) {
+std::string TitleCase(std::string_view origin) {
   std::vector<std::string> parts = absl::StrSplit(origin, '_');
   for (auto& part : parts) {
     if (!part.empty()) {
@@ -89,8 +90,8 @@ Map<std::string, std::string> ListDirAsDict(const std::string& dir) {
 }
 
 // List files by pattern and return a dict of {file_title: file_path}.
-Map<std::string, std::string> ListFilesAsDict(const std::string& dir,
-                                              const std::string& extension) {
+Map<std::string, std::string> ListFilesAsDict(std::string_view dir,
+                                              std::string_view extension) {
   Map<std::string, std::string> result;
   const std::string pattern = absl::StrCat(dir, "/*", extension);
   for (const std::string& file_path : cyber::common::Glob(pattern)) {
@@ -104,7 +105,7 @@ Map<std::string, std::string> ListFilesAsDict(const std::string& dir,
 }
 
 template <class FlagType, class ValueType>
-void SetGlobalFlag(const std::string& flag_name, const ValueType& value,
+void SetGlobalFlag(std::string_view flag_name, const ValueType& value,
                    FlagType* flag) {
   static constexpr char kGlobalFlagfile[] =
       "/apollo/modules/common/data/global_flagfile.txt";
@@ -117,8 +118,8 @@ void SetGlobalFlag(const std::string& flag_name, const ValueType& value,
   }
 }
 
-void System(const std::string& cmd) {
-  const int ret = std::system(cmd.c_str());
+void System(std::string_view cmd) {
+  const int ret = std::system(cmd.data());
   if (ret == 0) {
     AINFO << "SUCCESS: " << cmd;
   } else {
@@ -236,7 +237,8 @@ void HMIWorker::InitStatus() {
   //   2. CachedMode if it's stored in KV database.
   //   3. default_hmi_mode if it is available.
   //   4. Pick the first available mode.
-  const std::string cached_mode = KVDB::Get(FLAGS_current_mode_db_key);
+  const std::string cached_mode =
+      KVDB::Get(FLAGS_current_mode_db_key).value_or("");
   if (FLAGS_use_navigation_mode && ContainsKey(modes, kNavigationModeName)) {
     ChangeMode(kNavigationModeName);
   } else if (ContainsKey(modes, cached_mode)) {

@@ -25,13 +25,13 @@ decision {
       perception_id: 11511
       object_decision {
         yield {
-          distance_s: -3
+          distance_s: -5
           fence_point {
-            x: 586260.940854132
-            y: 4141282.23052737
+            x: 586260.355368626
+            y: 4141284.1422478016
             z: 0
           }
-          fence_heading: -1.2301434845598906
+          fence_heading: -1.3338289826636047
         }
       }
     }
@@ -40,13 +40,13 @@ decision {
       perception_id: 11511
       object_decision {
         yield {
-          distance_s: -3
+          distance_s: -5
           fence_point {
-            x: 586260.87535046809
-            y: 4141282.4194931639
+            x: 586260.30678834254
+            y: 4141284.3362579974
             z: 0
           }
-          fence_heading: -1.2478322159946527
+          fence_heading: -1.3338289826636047
         }
       }
     }

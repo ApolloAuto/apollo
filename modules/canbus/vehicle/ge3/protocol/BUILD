@@ -50,9 +50,7 @@ cc_library(
 cc_test(
     name = "pc_bcm_201_test",
     size = "small",
-    srcs = [
-        "pc_bcm_201_test.cc",
-    ],
+    srcs = ["pc_bcm_201_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
@@ -62,9 +60,7 @@ cc_test(
 cc_test(
     name = "pc_bcs_202_test",
     size = "small",
-    srcs = [
-        "pc_bcs_202_test.cc",
-    ],
+    srcs = ["pc_bcs_202_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
@@ -74,9 +70,7 @@ cc_test(
 cc_test(
     name = "pc_epb_203_test",
     size = "small",
-    srcs = [
-        "pc_epb_203_test.cc",
-    ],
+    srcs = ["pc_epb_203_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
@@ -86,9 +80,7 @@ cc_test(
 cc_test(
     name = "pc_eps_204_test",
     size = "small",
-    srcs = [
-        "pc_eps_204_test.cc",
-    ],
+    srcs = ["pc_eps_204_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
@@ -98,9 +90,7 @@ cc_test(
 cc_test(
     name = "pc_vcu_205_test",
     size = "small",
-    srcs = [
-        "pc_vcu_205_test.cc",
-    ],
+    srcs = ["pc_vcu_205_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
@@ -110,9 +100,7 @@ cc_test(
 cc_test(
     name = "scu_1_301_test",
     size = "small",
-    srcs = [
-        "scu_1_301_test.cc",
-    ],
+    srcs = ["scu_1_301_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
@@ -122,9 +110,7 @@ cc_test(
 cc_test(
     name = "scu_2_302_test",
     size = "small",
-    srcs = [
-        "scu_2_302_test.cc",
-    ],
+    srcs = ["scu_2_302_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
@@ -134,9 +120,7 @@ cc_test(
 cc_test(
     name = "scu_3_303_test",
     size = "small",
-    srcs = [
-        "scu_3_303_test.cc",
-    ],
+    srcs = ["scu_3_303_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
@@ -146,9 +130,7 @@ cc_test(
 cc_test(
     name = "scu_bcm_304_test",
     size = "small",
-    srcs = [
-        "scu_bcm_304_test.cc",
-    ],
+    srcs = ["scu_bcm_304_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
@@ -158,9 +140,7 @@ cc_test(
 cc_test(
     name = "scu_bcs_1_306_test",
     size = "small",
-    srcs = [
-        "scu_bcs_1_306_test.cc",
-    ],
+    srcs = ["scu_bcs_1_306_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
@@ -170,9 +150,7 @@ cc_test(
 cc_test(
     name = "scu_bcs_2_307_test",
     size = "small",
-    srcs = [
-        "scu_bcs_2_307_test.cc",
-    ],
+    srcs = ["scu_bcs_2_307_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
@@ -182,9 +160,7 @@ cc_test(
 cc_test(
     name = "scu_bcs_3_308_test",
     size = "small",
-    srcs = [
-        "scu_bcs_3_308_test.cc",
-    ],
+    srcs = ["scu_bcs_3_308_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
@@ -194,9 +170,7 @@ cc_test(
 cc_test(
     name = "scu_epb_310_test",
     size = "small",
-    srcs = [
-        "scu_epb_310_test.cc",
-    ],
+    srcs = ["scu_epb_310_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
@@ -206,9 +180,7 @@ cc_test(
 cc_test(
     name = "scu_eps_311_test",
     size = "small",
-    srcs = [
-        "scu_eps_311_test.cc",
-    ],
+    srcs = ["scu_eps_311_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
@@ -218,9 +190,7 @@ cc_test(
 cc_test(
     name = "scu_vcu_1_312_test",
     size = "small",
-    srcs = [
-        "scu_vcu_1_312_test.cc",
-    ],
+    srcs = ["scu_vcu_1_312_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",
@@ -230,9 +200,7 @@ cc_test(
 cc_test(
     name = "scu_vcu_2_313_test",
     size = "small",
-    srcs = [
-        "scu_vcu_2_313_test.cc",
-    ],
+    srcs = ["scu_vcu_2_313_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
         "@gtest//:main",

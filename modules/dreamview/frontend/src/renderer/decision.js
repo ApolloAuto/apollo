@@ -30,7 +30,7 @@ import reasonPullover from "assets/images/decision/pullover.png";
 import iconChangeLaneRight from "assets/images/decision/change-lane-right.png";
 import iconChangeLaneLeft from "assets/images/decision/change-lane-left.png";
 
-import { copyProperty, hideArrayObjects } from "utils/misc";
+import { hideArrayObjects } from "utils/misc";
 import { drawImage, drawDashedLineFromPoints, drawShapeFromPoints } from "utils/draw";
 
 const _ = require('lodash');

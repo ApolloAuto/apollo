@@ -32,11 +32,14 @@
 DEFINE_string(latency_monitor_name, "LatencyMonitor",
               "Name of the latency monitor.");
 
-DEFINE_double(latency_monitor_interval, 2.0,
+DEFINE_double(latency_monitor_interval, 1.5,
               "Latency report interval in seconds.");
 
-DEFINE_double(latency_report_interval, 10.0,
+DEFINE_double(latency_report_interval, 15.0,
               "Latency report interval in seconds.");
+
+DEFINE_int32(latency_reader_capacity, 30,
+             "The max message numbers in latency reader queue.");
 
 namespace apollo {
 namespace monitor {
@@ -167,17 +170,29 @@ void LatencyMonitor::RunOnce(const double current_time) {
   static auto reader =
       MonitorManager::Instance()->CreateReader<LatencyRecordMap>(
           FLAGS_latency_recording_topic);
+  reader->SetHistoryDepth(FLAGS_latency_reader_capacity);
   reader->Observe();
-  const auto records = reader->GetLatestObserved();
-  if (records == nullptr || records->latency_records().empty()) {
-    return;
-  }
 
-  UpdateLatencyStat(records);
+  static std::string last_processed_key;
+  std::string first_key_of_current_round;
+  for (auto it = reader->Begin(); it != reader->End(); ++it) {
+    const std::string current_key =
+        absl::StrCat((*it)->module_name(), (*it)->header().sequence_num());
+    if (it == reader->Begin()) {
+      first_key_of_current_round = current_key;
+    }
+    if (current_key == last_processed_key) {
+      break;
+    }
+    UpdateLatencyStat(*it);
+  }
+  last_processed_key = first_key_of_current_round;
 
   if (current_time - flush_time_ > FLAGS_latency_report_interval) {
     flush_time_ = current_time;
-    PublishLatencyReport();
+    if (!track_map_.empty()) {
+      PublishLatencyReport();
+    }
   }
 }
 
@@ -260,16 +275,24 @@ void LatencyMonitor::ValidateMaxLatency() {
 
       for (const auto& latency :
            latency_report_.latency_tracks().module_latency()) {
-        if (latency.module_name() == name &&
-            latency.module_stat().aver_duration() >
-                config.max_latency_allowed()) {
-          // send out alert
-          SummaryMonitor::EscalateStatus(
-              ComponentStatus::WARN,
-              absl::StrCat(config.name(), " has average latency ",
-                           latency.module_stat().aver_duration(),
-                           "bigger than ", config.max_latency_allowed()),
-              status);
+        if (latency.module_name() == config.name()) {
+          if (latency.module_stat().aver_duration() >
+              config.max_latency_allowed()) {
+            SummaryMonitor::EscalateStatus(
+                ComponentStatus::WARN,
+                absl::StrCat(config.name(), " has average latency ",
+                             latency.module_stat().aver_duration(),
+                             " > maximum ", config.max_latency_allowed()),
+                status);
+          } else if (latency.module_stat().aver_duration() <
+                     config.min_latency_allowed()) {
+            SummaryMonitor::EscalateStatus(
+                ComponentStatus::WARN,
+                absl::StrCat(config.name(), " has average latency ",
+                             latency.module_stat().aver_duration(),
+                             " < minimum ", config.min_latency_allowed()),
+                status);
+          }
         }
       }
 

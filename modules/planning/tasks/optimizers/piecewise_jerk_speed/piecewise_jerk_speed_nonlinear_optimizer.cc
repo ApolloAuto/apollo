@@ -20,6 +20,7 @@
 
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_optimizer.h"
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <tuple>
@@ -74,7 +75,8 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
     return Status::OK();
   }
 
-  const auto& problem_setups_status = SetUpStatesAndBounds(path_data);
+  const auto problem_setups_status =
+      SetUpStatesAndBounds(path_data, *speed_data);
   if (!problem_setups_status.ok()) {
     speed_data->clear();
     return problem_setups_status;
@@ -86,7 +88,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
 
   const auto qp_start = std::chrono::system_clock::now();
 
-  const auto& qp_smooth_status =
+  const auto qp_smooth_status =
       OptimizeByQP(speed_data, &distance, &velocity, &acceleration);
 
   const auto qp_end = std::chrono::system_clock::now();
@@ -103,7 +105,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
   if (speed_limit_check_status) {
     const auto curvature_smooth_start = std::chrono::system_clock::now();
 
-    const auto& path_curvature_smooth_status = SmoothPathCurvature(path_data);
+    const auto path_curvature_smooth_status = SmoothPathCurvature(path_data);
 
     const auto curvature_smooth_end = std::chrono::system_clock::now();
     std::chrono::duration<double> curvature_smooth_diff =
@@ -118,7 +120,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
 
     const auto speed_limit_smooth_start = std::chrono::system_clock::now();
 
-    const auto& speed_limit_smooth_status = SmoothSpeedLimit();
+    const auto speed_limit_smooth_status = SmoothSpeedLimit();
 
     const auto speed_limit_smooth_end = std::chrono::system_clock::now();
     std::chrono::duration<double> speed_limit_smooth_diff =
@@ -133,7 +135,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
 
     const auto nlp_start = std::chrono::system_clock::now();
 
-    const auto& nlp_smooth_status =
+    const auto nlp_smooth_status =
         OptimizeByNLP(&distance, &velocity, &acceleration);
 
     const auto nlp_end = std::chrono::system_clock::now();
@@ -163,7 +165,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
                                0.0);
   for (int i = 1; i < num_of_knots_; ++i) {
     // Avoid the very last points when already stopped
-    if (velocity[i] <= 0.0) {
+    if (velocity[i] < 0.0) {
       break;
     }
     speed_data->AppendSpeedPoint(
@@ -178,7 +180,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::Process(
 }
 
 Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
-    const PathData& path_data) {
+    const PathData& path_data, const SpeedData& speed_data) {
   // Set st problem dimensions
   const StGraphData& st_graph_data =
       *reference_line_info_->mutable_st_graph_data();
@@ -215,9 +217,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
   // Set s boundary
   s_bounds_.clear();
   s_soft_bounds_.clear();
-  // TODO(Jinyun): soft bound only takes effect in follow fence, will use in
-  // other speed decision as well and use more sophisticated bound for follow
-  // fence
+  // TODO(Jinyun): move to confs
   for (int i = 0; i < num_of_knots_; ++i) {
     double curr_t = i * delta_t_;
     double s_lower_bound = 0.0;
@@ -230,6 +230,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
       if (!boundary->GetUnblockSRange(curr_t, &s_upper, &s_lower)) {
         continue;
       }
+      SpeedPoint sp;
       switch (boundary->boundary_type()) {
         case STBoundary::BoundaryType::STOP:
         case STBoundary::BoundaryType::YIELD:
@@ -237,15 +238,22 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
           s_soft_upper_bound = std::fmin(s_soft_upper_bound, s_upper);
           break;
         case STBoundary::BoundaryType::FOLLOW:
-          // TODO(Hongyi): unify follow buffer on decision side
           s_upper_bound =
               std::fmin(s_upper_bound, s_upper - FLAGS_follow_min_distance);
-          s_soft_upper_bound = std::fmin(
-              s_soft_upper_bound, s_upper - FLAGS_follow_min_distance - 5.0);
+          if (!speed_data.EvaluateByTime(curr_t, &sp)) {
+            std::string msg(
+                "rough speed profile estimation for soft follow fence failed");
+            AERROR << msg;
+            return Status(ErrorCode::PLANNING_ERROR, msg);
+          }
+          s_soft_upper_bound =
+              std::fmin(s_soft_upper_bound,
+                        s_upper - FLAGS_follow_min_distance -
+                            std::min(7.0, FLAGS_follow_time_buffer * sp.v()));
           break;
         case STBoundary::BoundaryType::OVERTAKE:
           s_lower_bound = std::fmax(s_lower_bound, s_lower);
-          s_soft_lower_bound = std::fmax(s_soft_lower_bound, s_lower);
+          s_soft_lower_bound = std::fmax(s_soft_lower_bound, s_lower + 10.0);
           break;
         default:
           break;

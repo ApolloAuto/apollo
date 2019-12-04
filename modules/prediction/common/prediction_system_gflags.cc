@@ -70,6 +70,7 @@ DEFINE_int32(max_num_dump_dataforlearn, 5000,
              "Max number of dataforlearn to dump");
 
 // Submodules
+DEFINE_bool(use_lego, false, "If use lego architecture");
 DEFINE_string(container_topic_name, "/apollo/prediction/container",
               "Container topic name");
 DEFINE_string(adccontainer_topic_name, "/apollo/prediction/adccontainer",

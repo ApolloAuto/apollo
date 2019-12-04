@@ -4,9 +4,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "camera_frame",
-    hdrs = [
-        "camera_frame.h",
-    ],
+    hdrs = ["camera_frame.h"],
     deps = [
         ":data_provider",
         "//modules/perception/base",
@@ -15,12 +13,8 @@ cc_library(
 
 cc_library(
     name = "camera_ground_plane",
-    srcs = [
-        "camera_ground_plane.cc",
-    ],
-    hdrs = [
-        "camera_ground_plane.h",
-    ],
+    srcs = ["camera_ground_plane.cc"],
+    hdrs = ["camera_ground_plane.h"],
     deps = [
         "//modules/perception/common/i_lib/algorithm:i_sort",
         "//modules/perception/common/i_lib/core",
@@ -31,12 +25,8 @@ cc_library(
 
 cc_library(
     name = "data_provider",
-    srcs = [
-        "data_provider.cc",
-    ],
-    hdrs = [
-        "data_provider.h",
-    ],
+    srcs = ["data_provider.cc"],
+    hdrs = ["data_provider.h"],
     deps = [
         ":undistortion_handler",
         "//modules/perception/base",
@@ -45,9 +35,7 @@ cc_library(
 
 cc_library(
     name = "global_config",
-    hdrs = [
-        "global_config.h",
-    ],
+    hdrs = ["global_config.h"],
 )
 
 cc_library(
@@ -60,12 +48,8 @@ cc_library(
 
 cc_library(
     name = "object_template_manager",
-    srcs = [
-        "object_template_manager.cc",
-    ],
-    hdrs = [
-        "object_template_manager.h",
-    ],
+    srcs = ["object_template_manager.cc"],
+    hdrs = ["object_template_manager.h"],
     deps = [
         "//cyber",
         "//external:gflags",
@@ -79,16 +63,12 @@ cc_library(
 
 cc_library(
     name = "timer",
-    hdrs = [
-        "timer.h",
-    ],
+    hdrs = ["timer.h"],
 )
 
 cc_library(
     name = "twod_threed_util",
-    hdrs = [
-        "twod_threed_util.h",
-    ],
+    hdrs = ["twod_threed_util.h"],
     deps = [
         "//modules/perception/common/i_lib/core",
         "//modules/perception/common/i_lib/geometry:i_plane",
@@ -98,12 +78,8 @@ cc_library(
 
 cc_library(
     name = "undistortion_handler",
-    srcs = [
-        "undistortion_handler.cc",
-    ],
-    hdrs = [
-        "undistortion_handler.h",
-    ],
+    srcs = ["undistortion_handler.cc"],
+    hdrs = ["undistortion_handler.h"],
     deps = [
         "//modules/perception/base",
         "//modules/perception/base:blob",
@@ -113,12 +89,8 @@ cc_library(
 
 cc_library(
     name = "util",
-    srcs = [
-        "util.cc",
-    ],
-    hdrs = [
-        "util.h",
-    ],
+    srcs = ["util.cc"],
+    hdrs = ["util.h"],
     deps = [
         "//modules/perception/base",
     ],
@@ -126,9 +98,7 @@ cc_library(
 
 cc_library(
     name = "lane_object",
-    hdrs = [
-        "lane_object.h",
-    ],
+    hdrs = ["lane_object.h"],
 )
 
 cc_library(

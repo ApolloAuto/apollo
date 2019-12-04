@@ -21,12 +21,8 @@ cc_library(
 
 cuda_library(
     name = "perception_inference_tensorrt_plugins_slice_cuda",
-    srcs = [
-        "slice_plugin.cu",
-    ],
-    hdrs = [
-        "slice_plugin.h",
-    ],
+    srcs = ["slice_plugin.cu"],
+    hdrs = ["slice_plugin.h"],
     deps = [
         "//modules/perception/inference/tensorrt:rt_common",
         "@cuda",
@@ -37,12 +33,8 @@ cuda_library(
 
 cuda_library(
     name = "perception_inference_tensorrt_plugins_argmax_cuda",
-    srcs = [
-        "argmax_plugin.cu",
-    ],
-    hdrs = [
-        "argmax_plugin.h",
-    ],
+    srcs = ["argmax_plugin.cu"],
+    hdrs = ["argmax_plugin.h"],
     deps = [
         "//modules/perception/inference/tensorrt:rt_common",
         "@cuda",
@@ -53,12 +45,8 @@ cuda_library(
 
 cuda_library(
     name = "perception_inference_tensorrt_plugins_softmax_cuda",
-    srcs = [
-        "softmax_plugin.cu",
-    ],
-    hdrs = [
-        "softmax_plugin.h",
-    ],
+    srcs = ["softmax_plugin.cu"],
+    hdrs = ["softmax_plugin.h"],
     deps = [
         "//modules/perception/inference/tensorrt:rt_common",
         "@cuda",
@@ -69,12 +57,8 @@ cuda_library(
 
 cuda_library(
     name = "perception_inference_tensorrt_plugins_leakyrelu_cuda",
-    srcs = [
-        "leakyReLU_plugin.cu",
-    ],
-    hdrs = [
-        "leakyReLU_plugin.h",
-    ],
+    srcs = ["leakyReLU_plugin.cu"],
+    hdrs = ["leakyReLU_plugin.h"],
     deps = [
         "//modules/perception/inference/tensorrt:rt_common",
         "@cuda",
@@ -86,9 +70,7 @@ cuda_library(
 cc_test(
     name = "slice_plugin_test",
     size = "small",
-    srcs = [
-        "slice_plugin_test.cc",
-    ],
+    srcs = ["slice_plugin_test.cc"],
     deps = [
         ":perception_inference_tensorrt_plugins",
         "//modules/perception/inference/tensorrt:rt_common",
@@ -99,9 +81,7 @@ cc_test(
 cc_test(
     name = "argmax_plugin_test",
     size = "small",
-    srcs = [
-        "argmax_plugin_test.cc",
-    ],
+    srcs = ["argmax_plugin_test.cc"],
     deps = [
         ":perception_inference_tensorrt_plugins",
         "//modules/perception/inference/tensorrt:rt_common",

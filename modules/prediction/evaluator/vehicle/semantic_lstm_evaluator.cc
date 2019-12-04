@@ -114,7 +114,7 @@ bool SemanticLSTMEvaluator::Evaluate(Obstacle* obstacle_ptr,
 
   auto end_time = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_time - start_time;
-  AERROR << "Semantic_LSTM_evaluator used time: " << diff.count() * 1000
+  ADEBUG << "Semantic_LSTM_evaluator used time: " << diff.count() * 1000
          << " ms.";
   auto torch_output = torch_output_tensor.accessor<float, 3>();
 

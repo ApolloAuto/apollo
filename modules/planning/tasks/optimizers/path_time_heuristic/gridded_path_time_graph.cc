@@ -381,13 +381,12 @@ void GriddedPathTimeGraph::CalculateCostAt(
         std::distance(spatial_distance_by_index_.begin(), pre_lowest_itr));
   }
   const uint32_t r_pre_size = r - r_low + 1;
-  uint32_t r_pre = r;
   const auto& pre_col = cost_table_[c - 1];
   double curr_speed_limit = speed_limit;
 
   if (c == 2) {
     for (uint32_t i = 0; i < r_pre_size; ++i) {
-      r_pre = r - i;
+      uint32_t r_pre = r - i;
       if (std::isinf(pre_col[r_pre].total_cost()) ||
           pre_col[r_pre].pre_point() == nullptr) {
         continue;
@@ -438,7 +437,7 @@ void GriddedPathTimeGraph::CalculateCostAt(
   }
 
   for (uint32_t i = 0; i < r_pre_size; ++i) {
-    r_pre = r - i;
+    uint32_t r_pre = r - i;
     if (std::isinf(pre_col[r_pre].total_cost()) ||
         pre_col[r_pre].pre_point() == nullptr) {
       continue;

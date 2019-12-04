@@ -30,9 +30,7 @@ cc_library(
 
 cc_binary(
     name = "cyber_record_parser",
-    srcs = [
-        "cyber_record_parser.cc",
-    ],
+    srcs = ["cyber_record_parser.cc"],
     linkstatic = 0,
     deps = [
         ":data_extraction",
@@ -45,9 +43,7 @@ cc_binary(
 
 cc_binary(
     name = "compare_poses",
-    srcs = [
-        "compare_poses.cc",
-    ],
+    srcs = ["compare_poses.cc"],
     deps = [
         ":data_extraction",
         "//cyber",

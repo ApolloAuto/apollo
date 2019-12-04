@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "path_reuse_decider",
-    srcs = [
-        "path_reuse_decider.cc",
-    ],
-    hdrs = [
-        "path_reuse_decider.h",
-    ],
+    srcs = ["path_reuse_decider.cc"],
+    hdrs = ["path_reuse_decider.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/planning/common:history",
@@ -24,9 +20,7 @@ cc_library(
 cc_test(
     name = "path_reuse_decider_test",
     size = "small",
-    srcs = [
-        "path_reuse_decider_test.cc",
-    ],
+    srcs = ["path_reuse_decider_test.cc"],
     deps = [
         "path_reuse_decider",
         "@gtest//:main",

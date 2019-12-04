@@ -792,8 +792,7 @@ void DistanceApproachIPOPTFixedDualInterface::eval_constraints(int n,
     time_index++;
   }
 
-  ADEBUG << "constraint_index after adding variable box constraints "
-            "updated: "
+  ADEBUG << "constraint_index after adding variable box constraints updated: "
          << constraint_index;
 }
 

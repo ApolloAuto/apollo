@@ -11,9 +11,7 @@ cc_proto_library(
 
 proto_library(
     name = "cnnseg_config_proto_lib",
-    srcs = [
-        "cnnseg_config.proto",
-    ],
+    srcs = ["cnnseg_config.proto"],
 )
 
 cc_proto_library(
@@ -25,9 +23,7 @@ cc_proto_library(
 
 proto_library(
     name = "cnnseg_param_proto_lib",
-    srcs = [
-        "cnnseg_param.proto",
-    ],
+    srcs = ["cnnseg_param.proto"],
 )
 
 cc_proto_library(
@@ -39,9 +35,7 @@ cc_proto_library(
 
 proto_library(
     name = "spp_engine_config_proto_lib",
-    srcs = [
-        "spp_engine_config.proto",
-    ],
+    srcs = ["spp_engine_config.proto"],
 )
 
 cpplint()

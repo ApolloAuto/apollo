@@ -36,10 +36,10 @@
 namespace apollo {
 namespace control {
 
-class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
+class PreprocessorSubmodule final : public cyber::Component<LocalView> {
  public:
   /**
-   * @brief Construct a new PreprocessorSubmodule object
+   * @brief Construct a new Preprocessor Submodule object
    *
    */
   PreprocessorSubmodule();
@@ -47,7 +47,6 @@ class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
    * @brief Destructor
    */
   ~PreprocessorSubmodule();
-
   /**
    * @brief Get name of the node
    * @return Name of the node
@@ -60,48 +59,9 @@ class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
    */
   bool Init() override;
 
-  bool Proc() override;
+  bool Proc(const std::shared_ptr<LocalView> &local_view) override;
 
  private:
-  /**
-   * @brief upon receiving chassis message
-   *
-   * @param chassis
-   */
-  void OnChassis(const std::shared_ptr<apollo::canbus::Chassis> &chassis);
-
-  /**
-   * @brief upon receiving pad message
-   *
-   * @param pad
-   */
-  void OnPad(const std::shared_ptr<PadMessage> &pad);
-
-  /**
-   * @brief upon receiving planning message
-   *
-   * @param trajectory
-   */
-  void OnPlanning(
-      const std::shared_ptr<apollo::planning::ADCTrajectory> &trajectory);
-
-  /**
-   * @brief upon receiving localization message
-   *
-   * @param localization
-   */
-  void OnLocalization(
-      const std::shared_ptr<apollo::localization::LocalizationEstimate>
-          &localization);
-
-  /**
-   * @brief upon receiving monitor message
-   *
-   * @param monitor_message
-   */
-  void OnMonitor(
-      const apollo::common::monitor::MonitorMessage &monitor_message);
-
   /**
    * @brief check controller submodule input (local_view)
    *
@@ -116,14 +76,7 @@ class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
    * @param local_view
    * @return common::Status
    */
-  common::Status CheckTimestamp(LocalView *local_view);
-
-  /**
-   * @brief check pad message
-   *
-   * @return common::Status
-   */
-  common::Status CheckPad();
+  common::Status CheckTimestamp(const LocalView &local_view);
 
   common::Status ProducePreprocessorStatus(Preprocessor *preprocessor_status);
 
@@ -131,30 +84,18 @@ class PreprocessorSubmodule : public apollo::cyber::TimerComponent {
   double init_time_ = 0.0;
 
   bool estop_ = false;
-  std::string estop_reason_;
-  bool pad_received_ = false;
 
-  localization::LocalizationEstimate latest_localization_;
-  canbus::Chassis latest_chassis_;
-  planning::ADCTrajectory latest_trajectory_;
-  PadMessage pad_msg_;
+  common::monitor::MonitorLogBuffer monitor_logger_buffer_;
+
   common::Header latest_replan_trajectory_header_;
 
   std::mutex mutex_;
 
-  std::shared_ptr<cyber::Reader<apollo::canbus::Chassis>> chassis_reader_;
-  std::shared_ptr<cyber::Reader<PadMessage>> pad_msg_reader_;
-  std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
-      localization_reader_;
-  std::shared_ptr<cyber::Reader<planning::ADCTrajectory>> trajectory_reader_;
+  std::shared_ptr<cyber::Reader<LocalView>> local_view_reader_;
 
   std::shared_ptr<cyber::Writer<Preprocessor>> preprocessor_writer_;
 
-  common::monitor::MonitorLogBuffer monitor_logger_buffer_;
-
   ControlCommonConf control_common_conf_;
-
-  LocalView *local_view_;
 };
 
 CYBER_REGISTER_COMPONENT(PreprocessorSubmodule);

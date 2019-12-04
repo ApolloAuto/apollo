@@ -32,7 +32,7 @@ constexpr float MIN_STEER_PER = -100.0;
 
 SwerveTrigger::SwerveTrigger() { trigger_name_ = "SwerveTrigger"; }
 
-void SwerveTrigger::Pull(const RecordMessage& msg) {
+void SwerveTrigger::Pull(const cyber::record::RecordMessage& msg) {
   if (!trigger_obj_->enabled()) {
     return;
   }

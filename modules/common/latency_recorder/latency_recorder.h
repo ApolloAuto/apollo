@@ -35,6 +35,9 @@ class LatencyRecorder {
   void AppendLatencyRecord(const uint64_t message_id, const uint64_t begin_time,
                            const uint64_t end_time);
 
+  void AppendLatencyRecord(const uint64_t message_id, const double begin_time,
+                           const double end_time);
+
  private:
   LatencyRecorder() = default;
   std::shared_ptr<apollo::cyber::Writer<LatencyRecordMap>> CreateWriter();
@@ -45,7 +48,7 @@ class LatencyRecorder {
   std::mutex mutex_;
   std::unique_ptr<LatencyRecordMap> records_ = nullptr;
   uint64_t current_timestamp_ = 0;
-  const double publish_interval_ = 5.0;
+  const double publish_interval_ = 3.0;
   std::shared_ptr<apollo::cyber::Node> node_ = nullptr;
 };
 

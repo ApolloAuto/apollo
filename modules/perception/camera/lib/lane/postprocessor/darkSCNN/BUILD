@@ -11,19 +11,13 @@ cc_proto_library(
 
 proto_library(
     name = "darkSCNN_postprocessor_proto_lib",
-    srcs = [
-        "darkSCNN_postprocessor.proto",
-    ],
+    srcs = ["darkSCNN_postprocessor.proto"],
 )
 
 cc_library(
     name = "darkSCNN_lane_postprocessor",
-    srcs = [
-        "darkSCNN_lane_postprocessor.cc",
-    ],
-    hdrs = [
-        "darkSCNN_lane_postprocessor.h",
-    ],
+    srcs = ["darkSCNN_lane_postprocessor.cc"],
+    hdrs = ["darkSCNN_lane_postprocessor.h"],
     deps = [
         ":darkSCNN_postprocessor_proto",
         "//modules/perception/base",

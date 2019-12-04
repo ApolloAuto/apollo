@@ -7,12 +7,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "msg_buffer",
-    srcs = [
-        "msg_buffer.cc",
-    ],
-    hdrs = [
-        "msg_buffer.h",
-    ],
+    srcs = ["msg_buffer.cc"],
+    hdrs = ["msg_buffer.h"],
     deps = [
         "//cyber",
     ],

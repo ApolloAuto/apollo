@@ -2,8 +2,8 @@ obstacle_conf {
   obstacle_type: VEHICLE
   obstacle_status: ON_LANE
   priority_type: CAUTION
-  evaluator_type: CRUISE_MLP_EVALUATOR
-  predictor_type: MOVE_SEQUENCE_PREDICTOR
+  evaluator_type: SEMANTIC_LSTM_EVALUATOR
+  predictor_type: EXTRAPOLATION_PREDICTOR
 }
 obstacle_conf {
   obstacle_type: VEHICLE
@@ -16,8 +16,8 @@ obstacle_conf {
   obstacle_type: VEHICLE
   obstacle_status: IN_JUNCTION
   priority_type: CAUTION
-  evaluator_type: JUNCTION_MAP_EVALUATOR
-  predictor_type: LANE_SEQUENCE_PREDICTOR
+  evaluator_type: SEMANTIC_LSTM_EVALUATOR
+  predictor_type: EXTRAPOLATION_PREDICTOR
 }
 obstacle_conf {
   obstacle_type: VEHICLE

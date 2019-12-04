@@ -32,10 +32,6 @@
 namespace apollo {
 namespace data {
 
-using cyber::Node;
-using cyber::Writer;
-using cyber::record::Recorder;
-
 /**
  * @class RealtimeRecordProcessor
  * @brief Realtime processor against recorded tasks that are being recorded
@@ -58,9 +54,9 @@ class RealtimeRecordProcessor : public RecordProcessor {
   void PublishStatus(const RecordingState state,
                      const std::string& message) const;
 
-  std::shared_ptr<Recorder> recorder_ = nullptr;
-  std::shared_ptr<Node> smart_recorder_node_ = nullptr;
-  std::shared_ptr<Writer<SmartRecorderStatus>> recorder_status_writer_ =
+  std::shared_ptr<cyber::record::Recorder> recorder_ = nullptr;
+  std::shared_ptr<cyber::Node> smart_recorder_node_ = nullptr;
+  std::shared_ptr<cyber::Writer<SmartRecorderStatus>> recorder_status_writer_ =
       nullptr;
   std::string default_output_filename_;
   std::string restore_path_;

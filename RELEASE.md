@@ -14,7 +14,7 @@ Apollo 5.0 is an effort to support volume production for Geo-Fenced Autonomous D
 * Prediction Evaluators
 * Simulation web platform - Dreamland
     * Scenario Editor
-    * Control-in-loop Simulation 
+    * Control-in-loop Simulation
 * Apollo Synthetic Data Set
 
 ## Autonomous Drive Capabilities

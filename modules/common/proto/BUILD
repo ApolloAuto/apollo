@@ -9,9 +9,7 @@ cc_proto_library(
 
 proto_library(
     name = "error_code_proto_lib",
-    srcs = [
-        "error_code.proto",
-    ],
+    srcs = ["error_code.proto"],
 )
 
 cc_proto_library(
@@ -23,9 +21,7 @@ cc_proto_library(
 
 proto_library(
     name = "header_proto_lib",
-    srcs = [
-        "header.proto",
-    ],
+    srcs = ["header.proto"],
     deps = [
         ":error_code_proto_lib",
     ],
@@ -40,9 +36,7 @@ cc_proto_library(
 
 proto_library(
     name = "vehicle_signal_proto_lib",
-    srcs = [
-        "vehicle_signal.proto",
-    ],
+    srcs = ["vehicle_signal.proto"],
 )
 
 cc_proto_library(
@@ -54,9 +48,7 @@ cc_proto_library(
 
 proto_library(
     name = "geometry_proto_lib",
-    srcs = [
-        "geometry.proto",
-    ],
+    srcs = ["geometry.proto"],
 )
 
 cc_proto_library(
@@ -68,9 +60,7 @@ cc_proto_library(
 
 proto_library(
     name = "pnc_point_proto_lib",
-    srcs = [
-        "pnc_point.proto",
-    ],
+    srcs = ["pnc_point.proto"],
 )
 
 cc_proto_library(
@@ -82,9 +72,7 @@ cc_proto_library(
 
 proto_library(
     name = "drive_event_proto_lib",
-    srcs = [
-        "drive_event.proto",
-    ],
+    srcs = ["drive_event.proto"],
     deps = [
         ":header_proto_lib",
         "//modules/localization/proto:pose_proto_lib",
@@ -93,9 +81,7 @@ proto_library(
 
 proto_library(
     name = "drive_state_proto_lib",
-    srcs = [
-        "drive_state.proto",
-    ],
+    srcs = ["drive_state.proto"],
 )
 
 cc_proto_library(

@@ -45,11 +45,7 @@ struct Node {
 template <class K, class V>
 class LRUCache {
  public:
-  LRUCache() : capacity_(kDefaultCapacity), map_(0), head_(), tail_() {
-    Init();
-  }
-
-  explicit LRUCache(const size_t capacity)
+  explicit LRUCache(const size_t capacity = kDefaultCapacity)
       : capacity_(capacity), map_(0), head_(), tail_() {
     Init();
   }
@@ -58,7 +54,7 @@ class LRUCache {
 
   void GetCache(std::unordered_map<K, V>* cache) {
     for (auto it = map_.begin(); it != map_.end(); ++it) {
-      cache->operator[](it->first) = it->second.val;
+      cache->emplace(it->first, it->second.val);
     }
   }
 

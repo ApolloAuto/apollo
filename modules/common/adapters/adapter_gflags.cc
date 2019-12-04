@@ -38,6 +38,10 @@ DEFINE_string(control_command_topic, "/apollo/control",
               "control command topic name");
 DEFINE_string(control_preprocessor_topic, "/apollo/control/preprocessor",
               "control preprocessor topic name");
+DEFINE_string(control_local_view_topic, "/apollo/control/localview",
+              "control local view topic name");
+DEFINE_string(control_core_command_topic, "/apollo/control/controlcore",
+              "control command core algorithm topic name");
 DEFINE_string(pointcloud_topic,
               "/apollo/sensor/lidar128/compensator/PointCloud2",
               "pointcloud topic name");

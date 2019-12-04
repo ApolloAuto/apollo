@@ -13,12 +13,8 @@ cc_binary(
 
 cc_library(
     name = "channel_info",
-    srcs = [
-        "channel_info.cc",
-    ],
-    hdrs = [
-        "channel_info.h",
-    ],
+    srcs = ["channel_info.cc"],
+    hdrs = ["channel_info.h"],
     deps = [
         "//cyber",
         "//modules/canbus/proto:canbus_proto",

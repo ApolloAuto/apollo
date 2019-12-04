@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "piecewise_jerk_speed_optimizer",
-    srcs = [
-        "piecewise_jerk_speed_optimizer.cc",
-    ],
-    hdrs = [
-        "piecewise_jerk_speed_optimizer.h",
-    ],
+    srcs = ["piecewise_jerk_speed_optimizer.cc"],
+    hdrs = ["piecewise_jerk_speed_optimizer.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/proto:error_code_proto",
@@ -23,12 +19,8 @@ cc_library(
 
 cc_library(
     name = "piecewise_jerk_speed_nonlinear_optimizer",
-    srcs = [
-        "piecewise_jerk_speed_nonlinear_optimizer.cc",
-    ],
-    hdrs = [
-        "piecewise_jerk_speed_nonlinear_optimizer.h",
-    ],
+    srcs = ["piecewise_jerk_speed_nonlinear_optimizer.cc"],
+    hdrs = ["piecewise_jerk_speed_nonlinear_optimizer.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":piecewise_jerk_speed_nonlinear_ipopt_interface",
@@ -47,12 +39,8 @@ cc_library(
 
 cc_library(
     name = "piecewise_jerk_speed_nonlinear_ipopt_interface",
-    srcs = [
-        "piecewise_jerk_speed_nonlinear_ipopt_interface.cc",
-    ],
-    hdrs = [
-        "piecewise_jerk_speed_nonlinear_ipopt_interface.h",
-    ],
+    srcs = ["piecewise_jerk_speed_nonlinear_ipopt_interface.cc"],
+    hdrs = ["piecewise_jerk_speed_nonlinear_ipopt_interface.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/proto:pnc_point_proto",

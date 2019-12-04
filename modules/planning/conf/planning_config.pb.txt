@@ -33,11 +33,11 @@ default_task_config: {
 default_task_config: {
   task_type: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
   piecewise_jerk_nonlinear_speed_config {
-    acc_weight: 1.0
+    acc_weight: 2.0
     jerk_weight: 3.0
     lat_acc_weight: 1000.0
-    s_potential_weight: 0.1
-    ref_v_weight: 10.0
+    s_potential_weight: 0.05
+    ref_v_weight: 5.0
     ref_s_weight: 100.0
     soft_s_bound_weight: 1e6
     use_warm_start: true
@@ -134,17 +134,11 @@ default_task_config: {
   speed_bounds_decider_config {
     total_time: 7.0
     boundary_buffer: 0.25
-    high_speed_centric_acceleration_limit: 2.0
-    low_speed_centric_acceleration_limit: 1.5
-    high_speed_threshold: 12.58
-    low_speed_threshold: 7.5
-    minimal_kappa: 0.00001
+    max_centric_acceleration_limit: 2.0
     point_extension: 0.0
     lowest_speed: 2.5
-    num_points_to_avg_kappa: 2
     static_obs_nudge_speed_ratio: 0.6
     dynamic_obs_nudge_speed_ratio: 0.8
-    centri_jerk_speed_coeff: 1.0
   }
 }
 default_task_config: {
@@ -152,17 +146,11 @@ default_task_config: {
   speed_bounds_decider_config {
     total_time: 7.0
     boundary_buffer: 0.1
-    high_speed_centric_acceleration_limit: 2.0
-    low_speed_centric_acceleration_limit: 1.5
-    high_speed_threshold: 12.58
-    low_speed_threshold: 7.5
-    minimal_kappa: 0.00001
+    max_centric_acceleration_limit: 2.0
     point_extension: 0.0
     lowest_speed: 2.5
-    num_points_to_avg_kappa: 2
     static_obs_nudge_speed_ratio: 0.6
     dynamic_obs_nudge_speed_ratio: 0.8
-    centri_jerk_speed_coeff: 1.0
   }
 }
 default_task_config: {
@@ -367,6 +355,11 @@ default_task_config: {
   task_type: LANE_CHANGE_DECIDER
   lane_change_decider_config {
     enable_lane_change_urgency_check: false
+    enable_prioritize_change_lane: false
+    enable_remove_change_lane: false
+    reckless_change_lane: false
+    change_lane_success_freeze_time: 1.5
+    change_lane_fail_freeze_time: 1.0
   }
 }
 default_task_config: {

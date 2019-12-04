@@ -298,8 +298,8 @@ void OpenSpaceRoiDecider::SetPullOverSpotEndPose(Frame *const frame) {
 }
 
 void OpenSpaceRoiDecider::SetParkAndGoEndPose(Frame *const frame) {
-  const double kSTargetBuffer = 5.0;
-  const double kSpeedRatio = 0.8;  // after adjust speed is 80% of speed limit
+  const double kSTargetBuffer = 8.0;
+  const double kSpeedRatio = 0.3;  // after adjust speed is 30% of speed limit
   // get vehicle current location
   const ReferenceLineInfo &reference_line_info =
       frame->reference_line_info().front();
@@ -307,11 +307,12 @@ void OpenSpaceRoiDecider::SetParkAndGoEndPose(Frame *const frame) {
   ADEBUG << "reference_line ID: " << reference_line_info.Lanes().Id();
   const auto &reference_line = reference_line_info.reference_line();
   // get vehicle s,l info
-  const auto &park_and_go_status =
-      PlanningContext::Instance()->planning_status().park_and_go();
+  auto park_and_go_status = PlanningContext::Instance()
+                                ->mutable_planning_status()
+                                ->mutable_park_and_go();
 
-  const double adc_init_x = park_and_go_status.adc_init_position().x();
-  const double adc_init_y = park_and_go_status.adc_init_position().y();
+  const double adc_init_x = park_and_go_status->adc_init_position().x();
+  const double adc_init_y = park_and_go_status->adc_init_position().y();
 
   ADEBUG << "ADC position (x): " << std::setprecision(9) << adc_init_x;
   ADEBUG << "ADC position (y): " << std::setprecision(9) << adc_init_y;
@@ -326,6 +327,9 @@ void OpenSpaceRoiDecider::SetParkAndGoEndPose(Frame *const frame) {
   const double target_x = reference_point.x();
   const double target_y = reference_point.y();
   double target_theta = reference_point.heading();
+
+  park_and_go_status->mutable_adc_adjust_end_pose()->set_x(target_x);
+  park_and_go_status->mutable_adc_adjust_end_pose()->set_y(target_y);
 
   ADEBUG << "center.x(): " << std::setprecision(9) << target_x;
   ADEBUG << "center.y(): " << std::setprecision(9) << target_y;

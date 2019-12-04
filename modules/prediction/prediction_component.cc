@@ -88,10 +88,72 @@ bool PredictionComponent::Init() {
   prediction_writer_ =
       node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
 
+  container_writer_ =
+      node_->CreateWriter<ContainerOutput>(FLAGS_container_topic_name);
+
+  adc_container_writer_ = node_->CreateWriter<ADCTrajectoryContainer>(
+      FLAGS_adccontainer_topic_name);
+
   return true;
 }
 
 bool PredictionComponent::Proc(
+    const std::shared_ptr<PerceptionObstacles>& perception_obstacles) {
+  if (FLAGS_use_lego) {
+    return ContainerSubmoduleProcess(perception_obstacles);
+  }
+  return PredictionEndToEndProc(perception_obstacles);
+}
+
+bool PredictionComponent::ContainerSubmoduleProcess(
+    const std::shared_ptr<PerceptionObstacles>& perception_obstacles) {
+  const double frame_start_time = Clock::NowInSeconds();
+  // Read localization info. and call OnLocalization to update
+  // the PoseContainer.
+  localization_reader_->Observe();
+  auto ptr_localization_msg = localization_reader_->GetLatestObserved();
+  if (ptr_localization_msg == nullptr) {
+    AERROR << "Prediction: cannot receive any localization message.";
+    return false;
+  }
+  auto localization_msg = *ptr_localization_msg;
+  MessageProcess::OnLocalization(localization_msg);
+
+  // Read planning info. of last frame and call OnPlanning to update
+  // the ADCTrajectoryContainer
+  planning_reader_->Observe();
+  auto ptr_trajectory_msg = planning_reader_->GetLatestObserved();
+  if (ptr_trajectory_msg != nullptr) {
+    auto trajectory_msg = *ptr_trajectory_msg;
+    MessageProcess::OnPlanning(trajectory_msg);
+  }
+  MessageProcess::ContainerProcess(*perception_obstacles);
+
+  auto obstacles_container_ptr =
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
+  CHECK_NOTNULL(obstacles_container_ptr);
+
+  auto adc_trajectory_container_ptr =
+      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
+          AdapterConfig::PLANNING_TRAJECTORY);
+  CHECK_NOTNULL(adc_trajectory_container_ptr);
+
+  SubmoduleOutput submodule_output =
+      obstacles_container_ptr->GetSubmoduleOutput();
+  submodule_output.set_perception_header(perception_obstacles->header());
+  submodule_output.set_perception_error_code(
+      perception_obstacles->error_code());
+  submodule_output.set_frame_start_time(frame_start_time);
+  ContainerOutput container_output(std::move(submodule_output));
+  container_writer_->Write(std::make_shared<ContainerOutput>(container_output));
+  ADCTrajectoryContainer adc_container = *adc_trajectory_container_ptr;
+  adc_container_writer_->Write(
+      std::make_shared<ADCTrajectoryContainer>(adc_container));
+  return true;
+}
+
+bool PredictionComponent::PredictionEndToEndProc(
     const std::shared_ptr<PerceptionObstacles>& perception_obstacles) {
   if (FLAGS_prediction_test_mode &&
       (Clock::NowInSeconds() - component_start_time_ >

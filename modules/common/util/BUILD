@@ -4,17 +4,11 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "util",
-    srcs = [
-        "util.cc",
-    ],
-    hdrs = [
-        "blocking_queue.h",
-        "util.h",
-    ],
+    srcs = ["util.cc"],
+    hdrs = ["util.h"],
     deps = [
         ":color",
-        ":disjoint_set",
-        ":http_client",
+        ":future",
         ":json_util",
         ":lru_cache",
         ":message_util",
@@ -23,7 +17,17 @@ cc_library(
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/time",
+    ],
+)
+
+cc_library(
+    name = "future",
+    hdrs = ["future.h"],
+    deps = [
         "@com_google_absl//absl/memory",
+        "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/types:optional",
+        "@com_google_absl//absl/utility",
     ],
 )
 
@@ -39,30 +43,10 @@ cc_library(
 cc_test(
     name = "util_test",
     size = "small",
-    srcs = [
-        "util_test.cc",
-    ],
+    srcs = ["util_test.cc"],
     deps = [
         ":util",
         "//modules/common/util/testdata:simple_proto",
-        "@gtest//:main",
-    ],
-)
-
-cc_library(
-    name = "disjoint_set",
-    hdrs = ["disjoint_set.h"],
-)
-
-cc_test(
-    name = "disjoint_set_test",
-    size = "small",
-    srcs = [
-        "disjoint_set_test.cc",
-    ],
-    deps = [
-        ":disjoint_set",
-        "//cyber/common",
         "@gtest//:main",
     ],
 )
@@ -82,7 +66,7 @@ cc_library(
     srcs = ["string_util.cc"],
     hdrs = ["string_util.h"],
     deps = [
-        "@com_google_absl//absl/strings",
+        ":future",
         "@com_google_protobuf//:protobuf",
     ],
 )
@@ -100,9 +84,7 @@ cc_library(
 cc_test(
     name = "message_util_test",
     size = "small",
-    srcs = [
-        "message_util_test.cc",
-    ],
+    srcs = ["message_util_test.cc"],
     tags = [
         "external",
     ],
@@ -116,9 +98,7 @@ cc_test(
 cc_test(
     name = "string_util_test",
     size = "small",
-    srcs = [
-        "string_util_test.cc",
-    ],
+    srcs = ["string_util_test.cc"],
     deps = [
         ":string_util",
         "@gtest//:main",
@@ -135,9 +115,7 @@ cc_library(
 
 cc_library(
     name = "factory",
-    hdrs = [
-        "factory.h",
-    ],
+    hdrs = ["factory.h"],
     deps = [
         "//cyber/common",
     ],
@@ -146,9 +124,7 @@ cc_library(
 cc_test(
     name = "factory_test",
     size = "small",
-    srcs = [
-        "factory_test.cc",
-    ],
+    srcs = ["factory_test.cc"],
     deps = [
         ":factory",
         "//modules/common",
@@ -159,9 +135,7 @@ cc_test(
 cc_test(
     name = "lru_cache_test",
     size = "small",
-    srcs = [
-        "lru_cache_test.cc",
-    ],
+    srcs = ["lru_cache_test.cc"],
     deps = [
         "//modules/common/util:lru_cache",
         "@gtest//:main",
@@ -170,9 +144,7 @@ cc_test(
 
 cc_library(
     name = "points_downsampler",
-    hdrs = [
-        "points_downsampler.h",
-    ],
+    hdrs = ["points_downsampler.h"],
     deps = [
         "//cyber/common",
         "//modules/common/math:geometry",
@@ -182,9 +154,7 @@ cc_library(
 cc_test(
     name = "points_downsampler_test",
     size = "small",
-    srcs = [
-        "points_downsampler_test.cc",
-    ],
+    srcs = ["points_downsampler_test.cc"],
     deps = [
         ":points_downsampler",
         "@gtest//:main",
@@ -193,12 +163,8 @@ cc_test(
 
 cc_library(
     name = "json_util",
-    srcs = [
-        "json_util.cc",
-    ],
-    hdrs = [
-        "json_util.h",
-    ],
+    srcs = ["json_util.cc"],
+    hdrs = ["json_util.h"],
     deps = [
         "//cyber/common",
         "//third_party/json",
@@ -209,27 +175,11 @@ cc_library(
 cc_test(
     name = "json_util_test",
     size = "small",
-    srcs = [
-        "json_util_test.cc",
-    ],
+    srcs = ["json_util_test.cc"],
     deps = [
         ":json_util",
         "//modules/common/proto:error_code_proto",
         "@gtest//:main",
-    ],
-)
-
-cc_library(
-    name = "http_client",
-    srcs = ["http_client.cc"],
-    hdrs = ["http_client.h"],
-    deps = [
-        "//cyber/common",
-        "//modules/common/status",
-        "//modules/common/util:string_util",
-        "//third_party/json",
-        "@com_google_absl//absl/strings",
-        "@curlpp",
     ],
 )
 

@@ -720,8 +720,7 @@ void Ge3Controller::SecurityDogThreadFunc() {
   int64_t start = 0;
   int64_t end = 0;
   while (can_sender_->IsRunning()) {
-    start = ::apollo::common::time::AsInt64<::apollo::common::time::micros>(
-        ::apollo::common::time::Clock::Now());
+    start = absl::ToUnixMicros(::apollo::common::time::Clock::Now());
     const Chassis::DrivingMode mode = driving_mode();
     bool emergency_mode = false;
 
@@ -759,8 +758,7 @@ void Ge3Controller::SecurityDogThreadFunc() {
       set_driving_mode(Chassis::EMERGENCY_MODE);
       message_manager_->ResetSendMessages();
     }
-    end = ::apollo::common::time::AsInt64<::apollo::common::time::micros>(
-        ::apollo::common::time::Clock::Now());
+    end = absl::ToUnixMicros(::apollo::common::time::Clock::Now());
     std::chrono::duration<double, std::micro> elapsed{end - start};
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);

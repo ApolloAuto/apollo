@@ -1,5 +1,5 @@
 header {
-  timestamp_sec: 1527023638.1240931
+  timestamp_sec: 1527023638.1240928
   lidar_timestamp: 0
   camera_timestamp: 0
   radar_timestamp: 0
@@ -12,10 +12,10 @@ decision {
       reason_code: STOP_REASON_CLEAR_ZONE
       reason: "stop by KC_1254"
       stop_point {
-        x: 586425.59884183237
-        y: 4140681.77113268
+        x: 586425.59884182783
+        y: 4140681.7711326834
       }
-      stop_heading: 1.332387711557965
+      stop_heading: 1.3323877121237815
       change_lane_type: FORWARD
     }
   }
@@ -27,11 +27,11 @@ decision {
         follow {
           distance_s: -5.08480716496706
           fence_point {
-            x: 586426.83564442291
-            y: 4140687.0030825031
+            x: 586426.83564429672
+            y: 4140687.0030820039
             z: 0
           }
-          fence_heading: 1.3424711132391083
+          fence_heading: 1.3424711139179113
         }
       }
     }
@@ -43,11 +43,11 @@ decision {
           reason_code: STOP_REASON_CLEAR_ZONE
           distance_s: 0
           stop_point {
-            x: 586425.59884183237
-            y: 4140681.77113268
+            x: 586425.59884182783
+            y: 4140681.7711326834
             z: 0
           }
-          stop_heading: 1.332387711557965
+          stop_heading: 1.3323877121237815
         }
       }
     }

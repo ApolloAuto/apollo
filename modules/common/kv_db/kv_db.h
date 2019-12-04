@@ -18,6 +18,8 @@
 
 #include <string>
 
+#include "modules/common/util/future.h"
+
 /**
  * @namespace apollo::common
  * @brief apollo::common
@@ -35,22 +37,24 @@ class KVDB {
  public:
   /**
    * @brief Store {key, value} to DB.
-   * @param sync Whether flush right after writing.
    * @return Success or not.
    */
-  static bool Put(const std::string &key, const std::string &value);
+  static bool Put(std::string_view key, std::string_view value);
 
   /**
    * @brief Delete a key.
-   * @param sync Whether flush right after writing.
    * @return Success or not.
    */
-  static bool Delete(const std::string &key);
+  static bool Delete(std::string_view key);
 
-  static bool Has(const std::string &key);
-
-  static std::string Get(const std::string &key,
-                         const std::string &default_value = "");
+  /**
+   * @brief Get value of a key.
+   * @return An optional value.
+   *     Use `has_value()` to check if there is non-empty value.
+   *     Use `value()` to get real value.
+   *     Use `value_or("")` to get existing value or fallback to default.
+   */
+  static std::optional<std::string> Get(std::string_view key);
 };
 
 }  // namespace common

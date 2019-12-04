@@ -1,5 +1,5 @@
 header {
-  timestamp_sec: 1517713744.0523665
+  timestamp_sec: 1517713744.0523663
   lidar_timestamp: 0
   camera_timestamp: 0
   radar_timestamp: 0

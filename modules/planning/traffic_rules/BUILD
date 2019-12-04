@@ -7,7 +7,6 @@ cc_library(
     srcs = [
         # TODO(all): Split to separate targets to gain better building cache.
         "backside_vehicle.cc",
-        "change_lane.cc",
         "crosswalk.cc",
         "destination.cc",
         "keep_clear.cc",
@@ -19,7 +18,6 @@ cc_library(
     ],
     hdrs = [
         "backside_vehicle.h",
-        "change_lane.h",
         "crosswalk.h",
         "destination.h",
         "keep_clear.h",
@@ -48,12 +46,8 @@ cc_library(
 
 cc_library(
     name = "traffic_decider",
-    srcs = [
-        "traffic_decider.cc",
-    ],
-    hdrs = [
-        "traffic_decider.h",
-    ],
+    srcs = ["traffic_decider.cc"],
+    hdrs = ["traffic_decider.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":traffic_rules",

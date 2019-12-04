@@ -25,8 +25,6 @@
 namespace apollo {
 namespace data {
 
-using apollo::canbus::Chassis;
-
 /**
  * @class HardBrakeTrigger
  * @brief HardBrake trigger that fires when hard break is engaged
@@ -35,8 +33,10 @@ class HardBrakeTrigger : public TriggerBase {
  public:
   HardBrakeTrigger();
 
-  void Pull(const RecordMessage& msg) override;
-  bool ShouldRestore(const RecordMessage& msg) const override { return false; };
+  void Pull(const cyber::record::RecordMessage& msg) override;
+  bool ShouldRestore(const cyber::record::RecordMessage& msg) const override {
+    return false;
+  };
 
   virtual ~HardBrakeTrigger() = default;
 

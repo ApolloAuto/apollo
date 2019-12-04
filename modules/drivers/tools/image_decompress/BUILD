@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "image_decompress_lib",
-    srcs = [
-        "image_decompress.cc",
-    ],
-    hdrs = [
-        "image_decompress.h",
-    ],
+    srcs = ["image_decompress.cc"],
+    hdrs = ["image_decompress.h"],
     copts = ['-DMODULE_NAME=\\"image_decompress\\"'],
     linkopts = [
         "-lopencv_core",

@@ -70,7 +70,8 @@ class MPCControllerSubmodule final : public cyber::Component<Preprocessor> {
   bool Proc(const std::shared_ptr<Preprocessor>& preprocessor_status) override;
 
  private:
-  common::Status ProduceControlCommand(ControlCommand* control_command);
+  common::Status ProduceControlCoreCommand(
+      const LocalView& local_view, ControlCommand* control_core_command);
 
  private:
   bool estop_ = false;
@@ -82,9 +83,7 @@ class MPCControllerSubmodule final : public cyber::Component<Preprocessor> {
   std::mutex mutex_;
   // TODO(SHU): separate conf
   ControlConf mpc_controller_conf_;
-  calibrationtable::ControlCalibrationTable calibration_table_;
-  LocalView* local_view_;
-  std::shared_ptr<cyber::Writer<ControlCommand>> control_command_writer_;
+  std::shared_ptr<cyber::Writer<ControlCommand>> control_core_writer_;
 };
 
 CYBER_REGISTER_COMPONENT(MPCControllerSubmodule)

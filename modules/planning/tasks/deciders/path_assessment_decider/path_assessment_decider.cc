@@ -265,33 +265,6 @@ bool ComparePathData(const PathData& lhs, const PathData& rhs,
   if (lhs_is_regular != rhs_is_regular) {
     return lhs_is_regular;
   }
-  // For two lane-borrow directions, based on ADC's position,
-  // select the more convenient one.
-  if ((lhs.path_label().find("left") != std::string::npos &&
-       rhs.path_label().find("right") != std::string::npos) ||
-      (lhs.path_label().find("right") != std::string::npos &&
-       rhs.path_label().find("left") != std::string::npos)) {
-    if (blocking_obstacle) {
-      // select left/right path based on blocking_obstacle's position
-      const double obstacle_l =
-          (blocking_obstacle->PerceptionSLBoundary().start_l() +
-           blocking_obstacle->PerceptionSLBoundary().end_l()) /
-          2;
-      ADEBUG << "obstacle[" << blocking_obstacle->Id() << "] l[" << obstacle_l
-             << "]";
-      return (obstacle_l > 0.0
-                  ? (lhs.path_label().find("right") != std::string::npos)
-                  : (lhs.path_label().find("left") != std::string::npos));
-    } else {
-      // select left/right path based on ADC's position
-      double adc_l = lhs.frenet_frame_path().front().l();
-      if (adc_l < -1.0) {
-        return lhs.path_label().find("right") != std::string::npos;
-      } else if (adc_l > 1.0) {
-        return lhs.path_label().find("left") != std::string::npos;
-      }
-    }
-  }
   // Select longer path.
   // If roughly same length, then select self-lane path.
   bool lhs_on_selflane = lhs.path_label().find("self") != std::string::npos;
@@ -322,6 +295,33 @@ bool ComparePathData(const PathData& lhs, const PathData& rhs,
   // TODO(jiacheng): make this a flag.
   if (std::abs(lhs_on_reverse - rhs_on_reverse) > 6) {
     return lhs_on_reverse < rhs_on_reverse;
+  }
+  // For two lane-borrow directions, based on ADC's position,
+  // select the more convenient one.
+  if ((lhs.path_label().find("left") != std::string::npos &&
+       rhs.path_label().find("right") != std::string::npos) ||
+      (lhs.path_label().find("right") != std::string::npos &&
+       rhs.path_label().find("left") != std::string::npos)) {
+    if (blocking_obstacle) {
+      // select left/right path based on blocking_obstacle's position
+      const double obstacle_l =
+          (blocking_obstacle->PerceptionSLBoundary().start_l() +
+           blocking_obstacle->PerceptionSLBoundary().end_l()) /
+          2;
+      ADEBUG << "obstacle[" << blocking_obstacle->Id() << "] l[" << obstacle_l
+             << "]";
+      return (obstacle_l > 0.0
+                  ? (lhs.path_label().find("right") != std::string::npos)
+                  : (lhs.path_label().find("left") != std::string::npos));
+    } else {
+      // select left/right path based on ADC's position
+      double adc_l = lhs.frenet_frame_path().front().l();
+      if (adc_l < -1.0) {
+        return lhs.path_label().find("right") != std::string::npos;
+      } else if (adc_l > 1.0) {
+        return lhs.path_label().find("left") != std::string::npos;
+      }
+    }
   }
   // If same length, both neighbor lane are forward,
   // then select the one that returns to in-lane earlier.

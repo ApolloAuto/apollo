@@ -70,7 +70,6 @@ void PlanningTestBase::SetUpTestCase() {
   // and LatticePlanner can't pass the unit test.
   FLAGS_enable_trajectory_check = false;
   FLAGS_planning_test_mode = true;
-  FLAGS_enable_lag_prediction = false;
   FLAGS_use_osqp_optimizer_for_reference_line = false;
 }
 
@@ -163,9 +162,6 @@ void PlanningTestBase::SetUp() {
       << "failed to load planning config file " << FLAGS_planning_config_file;
 
   CHECK(planning_->Init(config_).ok()) << "Failed to init planning module";
-
-  // Do not use fallback trajectory during testing
-  FLAGS_use_planning_fallback = false;
 
   if (!FLAGS_test_previous_planning_file.empty()) {
     const auto prev_planning_file =

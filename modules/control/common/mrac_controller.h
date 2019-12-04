@@ -236,19 +236,25 @@ class MracController {
    * @brief get current state for reference system
    * @return current state
    */
-  double CurrentReferenceState() const;
+  Eigen::MatrixXd CurrentReferenceState() const;
 
   /**
-   * @brief get current state adaptive gain for reference system
+   * @brief get current state adaptive gain for mrac control
    * @return current state adaptive gain
    */
-  double CurrentStateAdaptionGain() const;
+  Eigen::MatrixXd CurrentStateAdaptionGain() const;
 
   /**
-   * @brief get current input adaptive gain for reference system
+   * @brief get current input adaptive gain for mrac control
    * @return current input adaptive gain
    */
-  double CurrentInputAdaptionGain() const;
+  Eigen::MatrixXd CurrentInputAdaptionGain() const;
+
+  /**
+   * @brief get current nonlinear adaptive gain for mrac control
+   * @return current nonlinear adaptive gain
+   */
+  Eigen::MatrixXd CurrentNonlinearAdaptionGain() const;
 
  protected:
   // indicator if the reference/adaption model is valid

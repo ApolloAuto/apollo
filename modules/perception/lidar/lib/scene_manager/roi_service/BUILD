@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "roi_service",
-    srcs = [
-        "roi_service.cc",
-    ],
-    hdrs = [
-        "roi_service.h",
-    ],
+    srcs = ["roi_service.cc"],
+    hdrs = ["roi_service.h"],
     deps = [
         "//modules/common/util",
         "//modules/perception/lib/config_manager",

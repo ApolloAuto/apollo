@@ -8,12 +8,8 @@
 * [6. Legal Disclaimer](#legal-disclaimer)
 
 ## Install Docker
-The system requirement for building Apollo is Ubuntu 14.04. Using a Docker container is the simplest way to set up the build environment for Apollo project. A Detailed docker tutorial can be found [here](https://docs.docker.com/).
 
-To install docker, you may refer to
-[Official guide to install the Docker-ce](https://docs.docker.com/install/linux/docker-ce/ubuntu).
-Don't forget to test it using
-[post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall).
+Please follow the [Apollo Software Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_software_installation_guide.md#Set-up-the-Docker-environment).
 
 ## Build Apollo
 

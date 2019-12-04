@@ -37,12 +37,8 @@ cc_library(
 
 cc_library(
     name = "grid_search",
-    srcs = [
-        "grid_search.cc",
-    ],
-    hdrs = [
-        "grid_search.h",
-    ],
+    srcs = ["grid_search.cc"],
+    hdrs = ["grid_search.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
@@ -63,12 +59,8 @@ cc_library(
 
 cc_library(
     name = "hybrid_a_star",
-    srcs = [
-        "hybrid_a_star.cc",
-    ],
-    hdrs = [
-        "hybrid_a_star.h",
-    ],
+    srcs = ["hybrid_a_star.cc"],
+    hdrs = ["hybrid_a_star.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "open_space_utils",
@@ -109,9 +101,7 @@ cc_test(
 cc_test(
     name = "hybrid_a_star_test",
     size = "small",
-    srcs = [
-        "hybrid_a_star_test.cc",
-    ],
+    srcs = ["hybrid_a_star_test.cc"],
     deps = [
         "hybrid_a_star",
         "@gtest//:main",

@@ -33,6 +33,7 @@
 #include "modules/common/util/util.h"
 #include "modules/control/controller/controller_agent.h"
 #include "modules/control/proto/preprocessor.pb.h"
+#include "modules/control/submodules/preprocessor_submodule.h"
 
 /**
  * @namespace apollo::control
@@ -41,8 +42,6 @@
 namespace apollo {
 namespace control {
 
-using apollo::cyber::Reader;
-using apollo::cyber::Writer;
 /**
  * @class Control
  *
@@ -60,7 +59,7 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
 
  private:
   // Upon receiving pad message
-  void OnPad(const std::shared_ptr<apollo::control::PadMessage> &pad);
+  void OnPad(const std::shared_ptr<PadMessage> &pad);
 
   void OnChassis(const std::shared_ptr<apollo::canbus::Chassis> &chassis);
 
@@ -75,8 +74,7 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
   void OnMonitor(
       const apollo::common::monitor::MonitorMessage &monitor_message);
 
-  common::Status ProduceControlCommand(
-      apollo::control::ControlCommand *control_command);
+  common::Status ProduceControlCommand(ControlCommand *control_command);
   common::Status CheckInput(LocalView *local_view);
   common::Status CheckTimestamp(const LocalView &local_view);
   common::Status CheckPad();
@@ -105,12 +103,17 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
 
   std::mutex mutex_;
 
-  std::shared_ptr<Reader<apollo::canbus::Chassis>> chassis_reader_;
-  std::shared_ptr<Reader<apollo::control::PadMessage>> pad_msg_reader_;
-  std::shared_ptr<Reader<apollo::localization::LocalizationEstimate>>
+  std::shared_ptr<cyber::Reader<apollo::canbus::Chassis>> chassis_reader_;
+  std::shared_ptr<cyber::Reader<PadMessage>> pad_msg_reader_;
+  std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
       localization_reader_;
-  std::shared_ptr<Reader<apollo::planning::ADCTrajectory>> trajectory_reader_;
-  std::shared_ptr<Writer<apollo::control::ControlCommand>> control_cmd_writer_;
+  std::shared_ptr<cyber::Reader<apollo::planning::ADCTrajectory>>
+      trajectory_reader_;
+
+  std::shared_ptr<cyber::Writer<ControlCommand>> control_cmd_writer_;
+  // when using control submodules
+  std::shared_ptr<cyber::Writer<LocalView>> local_view_writer_;
+
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
   LocalView local_view_;

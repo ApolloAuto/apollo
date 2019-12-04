@@ -176,16 +176,6 @@ void ScenarioManager::RegisterScenarios() {
                              &config_map_[ScenarioConfig::YIELD_SIGN]));
 }
 
-ScenarioConfig::ScenarioType ScenarioManager::SelectChangeLaneScenario(
-    const Frame& frame) {
-  if (frame.reference_line_info().size() > 1) {
-    // TODO(all): to be implemented
-    return default_scenario_type_;
-  }
-
-  return default_scenario_type_;
-}
-
 ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
     const Frame& frame) {
   const auto& scenario_config =
@@ -296,7 +286,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
       break;
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
     case ScenarioConfig::EMERGENCY_PULL_OVER:
-    case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::PARK_AND_GO:
     case ScenarioConfig::PULL_OVER:
     case ScenarioConfig::STOP_SIGN_PROTECTED:
@@ -440,7 +429,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
 
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
-    case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::PARK_AND_GO:
     case ScenarioConfig::PULL_OVER:
       if (stop_sign_scenario) {
@@ -575,7 +563,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
 
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
-    case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::PARK_AND_GO:
     case ScenarioConfig::PULL_OVER:
       if (traffic_light_unprotected_left_turn_scenario) {
@@ -629,7 +616,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectYieldSignScenario(
 
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
-    case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::PARK_AND_GO:
     case ScenarioConfig::PULL_OVER:
       if (yield_sign_scenario) {
@@ -684,7 +670,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectBareIntersectionScenario(
 
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
-    case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::PARK_AND_GO:
     case ScenarioConfig::PULL_OVER:
       if (bare_junction_scenario) {
@@ -819,7 +804,6 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
     // check current_scenario (not switchable)
     switch (current_scenario_->scenario_type()) {
       case ScenarioConfig::LANE_FOLLOW:
-      case ScenarioConfig::CHANGE_LANE:
       case ScenarioConfig::PULL_OVER:
         break;
       case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
@@ -855,12 +839,6 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
   // intersection scenarios
   if (scenario_type == default_scenario_type_) {
     scenario_type = SelectInterceptionScenario(frame);
-  }
-
-  ////////////////////////////////////////
-  // CHANGE_LANE scenario
-  if (scenario_type == default_scenario_type_) {
-    scenario_type = SelectChangeLaneScenario(frame);
   }
 
   ////////////////////////////////////////

@@ -27,9 +27,7 @@ cc_library(
 cc_test(
     name = "rtk_replay_planner_test",
     size = "small",
-    srcs = [
-        "rtk_replay_planner_test.cc",
-    ],
+    srcs = ["rtk_replay_planner_test.cc"],
     data = ["//modules/planning:planning_testdata"],
     deps = [
         ":rtk_planner",

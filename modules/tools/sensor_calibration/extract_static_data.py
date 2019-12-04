@@ -20,32 +20,39 @@
 This is a tool to etract useful information from already extracted sensor data,
 mainly for camera lidar calibration.
 """
-
-from datetime import datetime
 import argparse
-import os
-import sys
-import shutil
-import six
-import numpy as np
 import cv2
+from datetime import datetime
+import numpy as np
+import os
 from shutil import copyfile
+import six
+import sys
+
 from google.protobuf import text_format
 
 from cyber_py.record import RecordReader
 from cyber.proto import record_pb2
+from configuration_yaml_generator import ConfigYaml
+from data_file_object import TimestampFileObject, OdometryFileObject
 from modules.tools.sensor_calibration.proto import extractor_config_pb2
-
-from sensor_msg_extractor import *
-from data_file_object import *
-
 
 CYBER_PATH = os.environ['CYBER_PATH']
 CYBER_RECORD_HEADER_LENGTH = 2048
 
+Z_FILL_LEN = 5
+
 def mkdir_p(path):
     if not os.path.isdir(path):
         os.makedirs(path)
+    else:
+        print('folder {} exists'.format(path))
+
+def get_subfolder_list(d):
+    """list the 1st-level directories under the root directory
+    ignore hidden folders"""
+    return [f for f in os.listdir(d) if not f.startswith('.') and
+            os.path.isdir(os.path.join(d, f))]
 
 
 def sort_files_by_timestamp(in_path, out_path,
@@ -62,14 +69,14 @@ def sort_files_by_timestamp(in_path, out_path,
     ts_obj = TimestampFileObject(file_path=out_ts_file);
     ts_obj.save_to_file(ts_map[:,1])
 
-    if extension=='.png' or extension=='.pcd':
+    if extension == '.png' or extension == '.pcd':
         for i, idx in enumerate(ts_map[:,0]):
-            in_file_name = os.path.join(in_path, ("%06d"%(idx+1)) + extension)
-            out_file_name = os.path.join(out_path, ("%06d"%(i+1)) + extension)
+            in_file_name = os.path.join(in_path, ("%06d"%(idx + 1)) + extension)
+            out_file_name = os.path.join(out_path, ("%06d"%(i + 1)) + extension)
             copyfile(in_file_name, out_file_name)
 
-    elif extension=='Odometry.bin':
-        tmp_file = os.path.join(in_path, 'Odometry.bin')
+    elif extension == 'odometry':
+        tmp_file = os.path.join(in_path, 'odometry')
         in_odm = OdometryFileObject(file_path=tmp_file,
                                     operation='read',
                                     file_type='binary')
@@ -79,7 +86,7 @@ def sort_files_by_timestamp(in_path, out_path,
             d = data[idx]
             sorted_data.append(d)
 
-        tmp_file = os.path.join(out_path, 'Odometry.bin')
+        tmp_file = os.path.join(out_path, 'odometry')
         out_odm = OdometryFileObject(file_path=tmp_file,
                                     operation='write',
                                     file_type='binary')
@@ -132,7 +139,7 @@ def get_difference_score_between_images(path, file_indexes,
     image_diff = np.zeros(len(file_indexes), dtype=np.float32)
     image_thumbnails = []
     for c, idx in enumerate(file_indexes):
-        image_file = os.path.join(path, str(int(idx)).zfill(6)+suffix)
+        image_file = os.path.join(path, str(int(idx)).zfill(Z_FILL_LEN) + suffix)
         image = cv2.imread(image_file)
         image_thumbnails.append(cv2.resize(image,
             (thumbnail_size, thumbnail_size),interpolation=cv2.INTER_AREA))
@@ -167,17 +174,17 @@ def check_static_by_odometry(data, index, check_range=40,
 def select_static_image_pcd(path, min_distance=5, stop_times=5,
                             wait_time=3, check_range=50,
                             image_static_diff_threshold=0.005,
-                            image_suffix='.png', pcd_suffix='.pcd'):
+                            image_suffix='.png', pcd_suffix='.pcd',
+                            output_folder_name='camera-lidar-pairs'):
     """select pairs of images and pcds"""
-    subfolders = [x[0] for x in os.walk(path) if '_apollo_' in x[0] \
-                    and 'camera-lidar-pairs' not in x[0]]
-    lidar_subfolder = [x for x in subfolders if '_lidar' in x]
+    subfolders = [x for x in get_subfolder_list(path) if '_apollo_sensor_' in x]
+    lidar_subfolder = [x for x in subfolders if '_PointCloud2' in x]
     odometry_subfolder = [x for x in subfolders if'_odometry' in x]
-    camera_subfolders = [x for x in subfolders if'_camera' in x]
+    camera_subfolders = [x for x in subfolders if'_image' in x]
     if len(lidar_subfolder) is not 1 or \
         len(odometry_subfolder) is not 1:
-        raise ValueError("only one main lidar and one Odometry \
-                        sensor is needed for sensor calibration")
+        raise ValueError('only one main lidar and one Odometry'
+                        'sensor is needed for sensor calibration')
 
     lidar_subfolder = lidar_subfolder[0]
     odometry_subfolder = odometry_subfolder[0]
@@ -185,11 +192,11 @@ def select_static_image_pcd(path, min_distance=5, stop_times=5,
     timestamp_dict = {}
     for f in subfolders:
         f_abs_path = os.path.join(path, f)
-        ts_file = os.path.join(f_abs_path, 'timestamps.txt')
+        ts_file = os.path.join(f_abs_path, 'timestamps')
         ts_map = np.loadtxt(ts_file)
         timestamp_dict[f] = ts_map
     #  load odometry binary file
-    odometry_file = os.path.join(path, odometry_subfolder, 'Odometry.bin')
+    odometry_file = os.path.join(path, odometry_subfolder, 'odometry')
     in_odm = OdometryFileObject(file_path=odometry_file,
                       operation='read',
                       file_type='binary')
@@ -214,9 +221,10 @@ def select_static_image_pcd(path, min_distance=5, stop_times=5,
                 del camera_lidar_nearest_pairs[key]
 
         camera_folder_path = os.path.join(path, camera)
+        print('foder: {}'.format(camera_folder_path))
         camera_diff = get_difference_score_between_images(
             camera_folder_path, timestamp_dict[camera][:,0])
-        valid_image_indexes =  [x for x, v in enumerate(camera_diff) \
+        valid_image_indexes =  [x for x, v in enumerate(camera_diff)
                                 if v <= image_static_diff_threshold]
         valid_images = (timestamp_dict[camera][valid_image_indexes, 0]).astype(int)
         # generate valid camera frame
@@ -252,8 +260,8 @@ def select_static_image_pcd(path, min_distance=5, stop_times=5,
         #  check candidate number and select best stop according to camera_diff score
         print("all valid static image index: ", candidate_idx)
         if len(candidate_idx) < stop_times:
-            raise ValueError("not enough stops detected, \
-                thus no sufficient data for camera-lidar calibration")
+            raise ValueError('not enough stops detected,'
+                'thus no sufficient data for camera-lidar calibration')
         elif len(candidate_idx) > stop_times:
             tmp_diff = camera_diff[candidate_idx]
 
@@ -264,52 +272,20 @@ def select_static_image_pcd(path, min_distance=5, stop_times=5,
         image_idx = candidate_idx
         print("selected best static image index: ", image_idx)
         lidar_idx = [ camera_lidar_nearest_pairs[x] for x in image_idx ]
-        output_path = os.path.join(camera_folder_path, 'camera-lidar-pairs')
+        output_path = os.path.join(camera_folder_path, output_folder_name)
         mkdir_p(output_path)
         for count, i in enumerate(image_idx):
             #  save images
-            in_file = os.path.join(camera_folder_path, str(int(i)).zfill(6)+image_suffix)
-            out_file = os.path.join(output_path, str(int(count)).zfill(6)+image_suffix)
+            in_file = os.path.join(camera_folder_path, str(int(i)).zfill(Z_FILL_LEN) + image_suffix)
+            out_file = os.path.join(output_path, str(int(count)).zfill(Z_FILL_LEN) + image_suffix)
             copyfile(in_file, out_file)
             j = camera_lidar_nearest_pairs[i]
             #  save pcd
-            in_file = os.path.join(path, lidar_subfolder, str(int(j)).zfill(6)+pcd_suffix)
-            out_file = os.path.join(output_path, str(int(count)).zfill(6)+pcd_suffix)
+            in_file = os.path.join(path, lidar_subfolder, str(int(j)).zfill(Z_FILL_LEN) + pcd_suffix)
+            out_file = os.path.join(output_path, str(int(count)).zfill(Z_FILL_LEN) + pcd_suffix)
             copyfile(in_file, out_file)
             print("generate image-lidar-pair:[%d, %d]" % (i, j))
-
-"""
-    # load odometry
-    odometry_file = os.path.join(path, odometry_subfolder, 'Odometry.bin')
-    in_odm = Odometry(file_path=odometry_file, operation='read', file_type='binary')
-    data = in_odm.load_file()
-    select_ts_array = np.zeros((5,), datatype=float64)
-    count = 0
-    last_ts = data[0,:]
-
-    for i in range(check_range, data.shape[0]-check_range):
-        cur_ts = data[i,:]
-        if cur_ts[0] - last_ts[0] > wait_time:
-            dis = np.linalg.norm(cur_ts[-3:], last_ts[-3,:])
-            if dis > min_distance:
-                cur_id = i
-                start_id = i - check_range
-                end_id = i + check_range
-                dist_range = np.linalg.norm(data[start_id, -3:],
-                                            data[end_id, -3:])
-                if dist_range < 0.05: # static based on GPS
-                    # 1. find closest image time
-                    # 2. check if image static
-                    # if not, move image timestamp?
-                    # 3. after find image static, search nearest pcd
-                    # move the pairs to a folder, created inside each camera folder?
-                    # 4. done for this camera, move to next camera.
-                    for camera in camera_subfolders:
-                        camera_path = os.path.join(path, camera)
-                        camera_ts = timestamp_dict[camera]
-                        idx = find_nearsest(camera_ts[:,1], cur_ts[0])
-                        if np.abs(camera_ts[idx,1] - cur_ts[0]) < 0.06: # suppose 20HZ
-"""
+    return camera_subfolders, lidar_subfolder
 
 def main2():
     for str in ['_apollo_sensor_lidar16_front_center_PointCloud2',
@@ -328,7 +304,7 @@ def main2():
     out_path = os.path.join(in_path, 'new')
     mkdir_p(out_path)
     timestamp_filename = 'timestamps.txt'
-    extension = 'Odometry.bin'
+    extension = 'odometry'
     sort_files_by_timestamp(in_path, out_path, timestamp_filename, extension=extension)
 
 def main():
@@ -340,7 +316,7 @@ def main():
     os.chdir(CYBER_PATH)
 
     parser = argparse.ArgumentParser(
-        description='A tool to extract useful data information for lidar-to-camera calibration.')
+        description='A tool to extract useful data information for camera-to-lidar calibration.')
     parser.add_argument("-i", "--workspace_path", action="store", default="", required=True,
                         dest='workspace',
                         help="Specify the worksapce where storing extracted sensor messages")

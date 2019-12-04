@@ -11,9 +11,7 @@ cc_proto_library(
 
 proto_library(
     name = "object_template_meta_schema_proto_lib",
-    srcs = [
-        "object_template_meta_schema.proto",
-    ],
+    srcs = ["object_template_meta_schema.proto"],
 )
 
 cpplint()

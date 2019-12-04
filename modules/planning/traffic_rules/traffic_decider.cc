@@ -25,7 +25,6 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/traffic_rules/backside_vehicle.h"
-#include "modules/planning/traffic_rules/change_lane.h"
 #include "modules/planning/traffic_rules/crosswalk.h"
 #include "modules/planning/traffic_rules/destination.h"
 #include "modules/planning/traffic_rules/keep_clear.h"
@@ -47,10 +46,6 @@ void TrafficDecider::RegisterRules() {
   s_rule_factory.Register(TrafficRuleConfig::BACKSIDE_VEHICLE,
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
                             return new BacksideVehicle(config);
-                          });
-  s_rule_factory.Register(TrafficRuleConfig::CHANGE_LANE,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new ChangeLane(config);
                           });
   s_rule_factory.Register(TrafficRuleConfig::CROSSWALK,
                           [](const TrafficRuleConfig &config) -> TrafficRule * {

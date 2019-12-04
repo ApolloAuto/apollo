@@ -5,9 +5,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "container_submodule_lib",
     srcs = ["container_submodule.cc"],
-    hdrs = [
-        "container_submodule.h",
-    ],
+    hdrs = ["container_submodule.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
@@ -24,6 +22,7 @@ cc_library(
         "//modules/prediction/proto:submodule_messages_proto",
         "//modules/storytelling/proto:story_proto",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -75,9 +74,7 @@ cc_binary(
 cc_library(
     name = "evaluator_submodule_lib",
     srcs = ["evaluator_submodule.cc"],
-    hdrs = [
-        "evaluator_submodule.h",
-    ],
+    hdrs = ["evaluator_submodule.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
@@ -92,6 +89,7 @@ cc_library(
         "//modules/prediction/evaluator:evaluator_manager",
         "//modules/prediction/submodules:evaluator_output",
     ],
+    alwayslink = True,
 )
 
 cc_binary(
@@ -104,9 +102,7 @@ cc_binary(
 cc_library(
     name = "predictor_submodule_lib",
     srcs = ["predictor_submodule.cc"],
-    hdrs = [
-        "predictor_submodule.h",
-    ],
+    hdrs = ["predictor_submodule.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
@@ -123,6 +119,7 @@ cc_library(
         "//modules/prediction/proto:prediction_proto",
         "//modules/prediction/submodules:evaluator_output",
     ],
+    alwayslink = True,
 )
 
 cc_binary(
@@ -135,7 +132,7 @@ cc_binary(
 cc_library(
     name = "prediction_lego_lib",
     deps = [
-        ":container_submodule_lib",
+        "//modules/prediction:prediction_component_lib",
         ":evaluator_submodule_lib",
         ":predictor_submodule_lib",
     ],

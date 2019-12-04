@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "v2x_proxy_gflags",
-    srcs = [
-        "v2x_proxy_gflags.cc",
-    ],
-    hdrs = [
-        "v2x_proxy_gflags.h",
-    ],
+    srcs = ["v2x_proxy_gflags.cc"],
+    hdrs = ["v2x_proxy_gflags.h"],
     deps = [
         "//external:gflags",
     ],

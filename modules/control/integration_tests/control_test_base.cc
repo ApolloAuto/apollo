@@ -120,6 +120,12 @@ bool ControlTestBase::test_control() {
     control_.OnMonitor(monitor_message);
   }
 
+  control_.local_view_.mutable_chassis()->CopyFrom(control_.latest_chassis_);
+  control_.local_view_.mutable_trajectory()->CopyFrom(
+      control_.latest_trajectory_);
+  control_.local_view_.mutable_localization()->CopyFrom(
+      control_.latest_localization_);
+
   auto err = control_.ProduceControlCommand(&control_command_);
   if (!err.ok()) {
     ADEBUG << "control ProduceControlCommand failed";

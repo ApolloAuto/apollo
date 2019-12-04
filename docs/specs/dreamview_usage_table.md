@@ -74,10 +74,10 @@ Elements in the main view are listed in the table below:
 | Visual Element                           | Depiction Explanation                    |
 | ---------------------------------------- | ---------------------------------------- |
 | ![](images/dreamview_usage_table/0clip_image002.png) | <ul><li>The autonomous car    </li></ul>                  |
-| ![](images/dreamview_usage_table/0clip_image004.png) | <ul><li>The wheel steering percentage.</li> <li>The status of left/right turn signals</li></ul> |
+| ![](images/dreamview_usage_table/0clip_image004.png) | <ul><li>The wheel steering percentage.</li> <li>The status of left/right turn signals (In an emergency situation, both signals will be on.)</li></ul> |
 | ![](images/dreamview_usage_table/0clip_image003.png) | <ul><li>  The traffic signal detected     </li></ul>          |
 | ![](images/dreamview_usage_table/0clip_image005.png) |<ul><li>  The driving mode (AUTO/DISENGAGED/MANUAL/etc.) </li></ul>  |
-| ![](images/dreamview_usage_table/0clip_image006.png) | <ul><li>The driving speed in km/h.</li> <li>The accelerator/brake percentage</li></ul> |
+| ![](images/dreamview_usage_table/0clip_image006.png) | <ul><li>The driving speed in km/h as default. Click on the unit to change the unit.</li> <li>The accelerator/brake percentage</li></ul> |
 | ![](images/dreamview_usage_table/0clip_image026.png) | <ul><li> The  red thick line shows the routing suggestion</li></ul>  |
 | ![](images/dreamview_usage_table/0clip_image038.png) |<ul><li>  Nudge object decision -- the orange zone indicates the area to avoid </li></ul> |
 | ![](images/dreamview_usage_table/0clip_image062.png) |<ul><li>  The  green thick curvy band indicates the planned trajectory </li></ul> |

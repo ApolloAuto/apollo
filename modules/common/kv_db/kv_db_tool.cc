@@ -36,14 +36,14 @@ int main(int32_t argc, char **argv) {
   }
 
   if (FLAGS_op == "get") {
-    std::cout << KVDB::Get(FLAGS_key);
+    std::cout << KVDB::Get(FLAGS_key).value() << std::endl;
   } else if (FLAGS_op == "put") {
     if (FLAGS_value.empty()) {
       AFATAL << "Please specify --value.";
     }
-    std::cout << KVDB::Put(FLAGS_key, FLAGS_value);
+    std::cout << KVDB::Put(FLAGS_key, FLAGS_value) << std::endl;
   } else if (FLAGS_op == "del") {
-    std::cout << KVDB::Delete(FLAGS_key);
+    std::cout << KVDB::Delete(FLAGS_key) << std::endl;
   } else {
     AFATAL << "Unknown op: " << FLAGS_op;
   }

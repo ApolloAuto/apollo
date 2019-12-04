@@ -38,8 +38,7 @@
 
 namespace apollo {
 namespace control {
-class PostprocessorSubmodule final
-    : public cyber::Component<Preprocessor, ControlCommand> {
+class PostprocessorSubmodule final : public cyber::Component<ControlCommand> {
  public:
   /**
    * @brief Get name of the node
@@ -56,13 +55,11 @@ class PostprocessorSubmodule final
   /**
    * @brief
    *
-   * @param preprocessor_status
    * @param control_command
    * @return true
    * @return false
    */
-  bool Proc(const std::shared_ptr<Preprocessor>& preprocessor_status,
-            const std::shared_ptr<ControlCommand>& control_command) override;
+  bool Proc(const std::shared_ptr<ControlCommand>& control_command) override;
 
  private:
   std::shared_ptr<cyber::Writer<ControlCommand>> postprocessor_writer_;

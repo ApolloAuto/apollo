@@ -9,9 +9,7 @@ cc_proto_library(
 
 proto_library(
     name = "monitor_log_proto_lib",
-    srcs = [
-        "monitor_log.proto",
-    ],
+    srcs = ["monitor_log.proto"],
     deps = [
         "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:header_proto_lib",

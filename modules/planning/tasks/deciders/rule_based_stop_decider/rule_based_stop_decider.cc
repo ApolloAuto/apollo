@@ -50,9 +50,7 @@ RuleBasedStopDecider::RuleBasedStopDecider(const TaskConfig &config)
 apollo::common::Status RuleBasedStopDecider::Process(
     Frame *const frame, ReferenceLineInfo *const reference_line_info) {
   // 1. Rule_based stop for side pass onto reverse lane
-  if (FLAGS_enable_nonscenario_side_pass) {
-    StopOnSidePass(frame, reference_line_info);
-  }
+  StopOnSidePass(frame, reference_line_info);
 
   // 2. Rule_based stop for urgent lane change
   if (FLAGS_enable_lane_change_urgency_checking) {

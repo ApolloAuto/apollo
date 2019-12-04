@@ -94,9 +94,7 @@ class CanAgent {
 
   void SendThreadFunc() {
     using common::ErrorCode;
-    using common::time::AsInt64;
     using common::time::Clock;
-    using common::time::micros;
     AINFO << "Send thread starting...";
     TestCanParam *param = param_ptr();
     CanClient *client = param->can_client;
@@ -123,7 +121,7 @@ class CanAgent {
     while (!other_agent()->is_receiving()) {
       std::this_thread::yield();
     }
-    int64_t start = AsInt64<micros>(Clock::Now());
+    int64_t start = absl::ToUnixMicros(Clock::Now());
     while (true) {
       // param->print();
       if (count >= FLAGS_agent_mutual_send_frames) {
@@ -158,7 +156,7 @@ class CanAgent {
               << ", conf:" << param->conf.ShortDebugString();
       }
     }
-    int64_t end = AsInt64<micros>(Clock::Now());
+    int64_t end = absl::ToUnixMicros(Clock::Now());
     param->send_time = static_cast<int32_t>(end - start);
     // In case for finish too quick to receiver miss some msg
     sleep(2);
@@ -179,9 +177,7 @@ class CanAgent {
 
   void RecvThreadFunc() {
     using common::ErrorCode;
-    using common::time::AsInt64;
     using common::time::Clock;
-    using common::time::micros;
     AINFO << "Receive thread starting...";
     TestCanParam *param = param_ptr();
     CanClient *client = param->can_client;
@@ -198,7 +194,7 @@ class CanAgent {
         continue;
       }
       if (first) {
-        start = AsInt64<micros>(Clock::Now());
+        start = absl::ToUnixMicros(Clock::Now());
         first = false;
       }
       if (ret != ErrorCode::OK || len == 0) {
@@ -214,7 +210,7 @@ class CanAgent {
               << ",recv_cnt: " << param->recv_cnt;
       }
     }
-    int64_t end = AsInt64<micros>(Clock::Now());
+    int64_t end = absl::ToUnixMicros(Clock::Now());
     param->recv_time = static_cast<int32_t>(end - start);
     AINFO << "Recv thread stopping..., conf:" << param->conf.ShortDebugString();
     return;

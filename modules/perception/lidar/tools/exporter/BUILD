@@ -2,12 +2,8 @@ load("//tools:cpplint.bzl", "cpplint")
 
 cc_library(
     name = "msgexporterlib",
-    srcs = [
-        "msg_exporter.cc",
-    ],
-    hdrs = [
-        "msg_exporter.h",
-    ],
+    srcs = ["msg_exporter.cc"],
+    hdrs = ["msg_exporter.h"],
     deps = [
         "//cyber",
         "//modules/drivers/proto:sensor_proto",
