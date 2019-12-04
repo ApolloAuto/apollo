@@ -98,6 +98,22 @@ bool PreprocessorSubmodule::Proc(const std::shared_ptr<LocalView> &local_view) {
   control_preprocessor.mutable_header()->set_radar_timestamp(
       local_view->trajectory().header().radar_timestamp());
   common::util::FillHeader(Name(), &control_preprocessor);
+  if (control_preprocessor.local_view().has_pad_msg()) {
+    auto pad_message = control_preprocessor.local_view().pad_msg();
+    if (pad_message.action() == DrivingAction::RESET) {
+      AINFO << "Control received RESET action!";
+      preprocessor_status->set_error_code(ErrorCode::OK);
+      preprocessor_status->set_msg("");
+    }
+    control_preprocessor.set_received_pad_msg(true);
+  }
+
+  if (status.ok()) {
+    preprocessor_status->set_error_code(ErrorCode::OK);
+  } else {
+    preprocessor_status->set_error_code(status.code());
+    preprocessor_status->set_msg(status.error_message());
+  }
   preprocessor_writer_->Write(control_preprocessor);
   ADEBUG << "Preprocessor finished.";
 
@@ -119,27 +135,26 @@ Status PreprocessorSubmodule::ProducePreprocessorStatus(
     mutable_engage_advice->set_reason(status.error_message());
     // skip checking time stamp when failed input check
     return status;
-  } else {
-    Status status_ts = CheckTimestamp(control_preprocessor->local_view());
-
-    if (!status_ts.ok()) {
-      AERROR << "Input messages timeout";
-      status = status_ts;
-      if (control_preprocessor->local_view().chassis().driving_mode() !=
-          apollo::canbus::Chassis::COMPLETE_AUTO_DRIVE) {
-        control_preprocessor->mutable_engage_advice()->set_advice(
-            apollo::common::EngageAdvice::DISALLOW_ENGAGE);
-        control_preprocessor->mutable_engage_advice()->set_reason(
-            status.error_message());
-      }
-      return status;
-    } else {
-      control_preprocessor->mutable_engage_advice()->set_advice(
-          apollo::common::EngageAdvice::READY_TO_ENGAGE);
-    }
   }
 
-  // check estop
+  Status status_ts = CheckTimestamp(control_preprocessor->local_view());
+
+  if (!status_ts.ok()) {
+    AERROR << "Input messages timeout";
+    status = status_ts;
+    if (control_preprocessor->local_view().chassis().driving_mode() !=
+        apollo::canbus::Chassis::COMPLETE_AUTO_DRIVE) {
+      control_preprocessor->mutable_engage_advice()->set_advice(
+          apollo::common::EngageAdvice::DISALLOW_ENGAGE);
+      control_preprocessor->mutable_engage_advice()->set_reason(
+          status.error_message());
+    }
+    return status;
+  }
+  control_preprocessor->mutable_engage_advice()->set_advice(
+      apollo::common::EngageAdvice::READY_TO_ENGAGE);
+
+  // TODO(SHU): add it back
   // estop_ =
   //     control_common_conf_.enable_persistent_estop()
   //         ? estop_ || control_preprocessor->local_view()
@@ -155,20 +170,6 @@ Status PreprocessorSubmodule::ProducePreprocessorStatus(
         absl::StrCat(
             "estop from planning : ",
             control_preprocessor->local_view().trajectory().estop().reason()));
-  }
-
-  if (control_preprocessor->local_view()
-          .trajectory()
-          .trajectory_point()
-          .empty()) {
-    AWARN_EVERY(100) << "planning has no trajectory point. ";
-    return Status(
-        ErrorCode::CONTROL_ESTOP_ERROR,
-        absl::StrCat("estop for empty planning trajectory, planning headers: ",
-                     control_preprocessor->local_view()
-                         .trajectory()
-                         .header()
-                         .ShortDebugString()));
   }
 
   if (FLAGS_enable_gear_drive_negative_speed_protection) {
