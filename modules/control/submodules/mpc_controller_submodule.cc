@@ -76,10 +76,8 @@ bool MPCControllerSubmodule::Proc(
   // skip produce control command when estop for MPC controller
   StatusPb pre_status = preprocessor_status->header().status();
   if (pre_status.error_code() != ErrorCode::OK) {
-    control_core_command.mutable_header()->mutable_status()->set_error_code(
-        pre_status.error_code());
-    control_core_command.mutable_header()->mutable_status()->set_msg(
-        pre_status.msg());
+    control_core_command.mutable_header()->mutable_status()->CopyFrom(
+        pre_status);
     AERROR << "Error in preprocessor submodule.";
     return false;
   }
