@@ -83,20 +83,20 @@ float GetMemoryUsage(const int pid, const std::string& process_name) {
   const std::string memory_stat_file = absl::StrCat("/proc/", pid, "/statm");
   const uint32_t page_size_kb = (sysconf(_SC_PAGE_SIZE) >> 10);
   const int resident_idx = 1, gb_2_kb = (1 << 20);
-  constexpr int memory_info = 0;
+  constexpr static int kMemoryInfo = 0;
 
-  const auto stat_lines = GetStatsLines(memory_stat_file, memory_info + 1);
-  if (stat_lines.size() <= memory_info) {
+  const auto stat_lines = GetStatsLines(memory_stat_file, kMemoryInfo + 1);
+  if (stat_lines.size() <= kMemoryInfo) {
     AERROR << "failed to load contents from " << memory_stat_file;
     return 0.f;
   }
   const std::vector<std::string> stats =
-      absl::StrSplit(stat_lines[memory_info], ' ');
+      absl::StrSplit(stat_lines[kMemoryInfo], ' ', absl::SkipWhitespace());
   if (stats.size() <= resident_idx) {
     AERROR << "failed to get memory info for process " << process_name;
     return 0.f;
   }
-  return static_cast<float>(std::stoi(stats[resident_idx]) * page_size_kb) /
+  return static_cast<float>(std::stoll(stats[resident_idx]) * page_size_kb) /
          gb_2_kb;
 }
 
@@ -105,38 +105,40 @@ float GetCPUUsage(const int pid, const std::string& process_name,
   const std::string cpu_stat_file = absl::StrCat("/proc/", pid, "/stat");
   const int hertz = sysconf(_SC_CLK_TCK);
   const int utime = 13, stime = 14, cutime = 15, cstime = 16;
-  constexpr int cpu_info = 0;
+  constexpr static int kCpuInfo = 0;
 
-  const auto stat_lines = GetStatsLines(cpu_stat_file, cpu_info + 1);
-  if (stat_lines.size() <= cpu_info) {
+  const auto stat_lines = GetStatsLines(cpu_stat_file, kCpuInfo + 1);
+  if (stat_lines.size() <= kCpuInfo) {
     AERROR << "failed to load contents from " << cpu_stat_file;
     return 0.f;
   }
   const std::vector<std::string> stats =
-      absl::StrSplit(stat_lines[cpu_info], ' ');
+      absl::StrSplit(stat_lines[kCpuInfo], ' ', absl::SkipWhitespace());
   if (stats.size() <= cstime) {
     AERROR << "failed to get CPU info for process " << process_name;
     return 0.f;
   }
-  const uint64_t jiffies = std::stoi(stats[utime]) + std::stoi(stats[stime]) +
-                           std::stoi(stats[cutime]) + std::stoi(stats[cstime]);
+  const uint64_t jiffies = std::stoll(stats[utime]) + std::stoll(stats[stime]) +
+                           std::stoll(stats[cutime]) +
+                           std::stoll(stats[cstime]);
   const uint64_t prev_jiffies = (*prev_jiffies_map)[process_name];
   (*prev_jiffies_map)[process_name] = jiffies;
   if (prev_jiffies == 0) {
     return 0.f;
   }
   return 100.f * (static_cast<float>(jiffies - prev_jiffies) / hertz /
-                  FLAGS_resource_monitor_interval);
+                  static_cast<float>(FLAGS_resource_monitor_interval));
 }
 
 uint64_t GetSystemMemoryValueFromLine(std::string stat_line) {
-  constexpr int memory_value_idx = 1;
-  const std::vector<std::string> stats = absl::StrSplit(stat_line, ' ');
-  if (stats.size() <= memory_value_idx) {
+  constexpr static int kMemoryValueIdx = 1;
+  const std::vector<std::string> stats =
+      absl::StrSplit(stat_line, ' ', absl::SkipWhitespace());
+  if (stats.size() <= kMemoryValueIdx) {
     AERROR << "failed to parse memory from line " << stat_line;
     return 0;
   }
-  return std::stoi(stats[memory_value_idx]);
+  return std::stoll(stats[kMemoryValueIdx]);
 }
 
 float GetSystemMemoryUsage() {
@@ -164,56 +166,54 @@ float GetSystemMemoryUsage() {
 
 float GetSystemCPUUsage() {
   const std::string system_cpu_stat_file = "/proc/stat";
-  const int system = 2, total = 6;
-  constexpr int system_cpu_info = 0;
-  static int prev_jiffies = 0, prev_work_jiffies = 0;
-
+  const int users = 1, system = 3, total = 7;
+  constexpr static int kSystemCpuInfo = 0;
+  static uint64_t prev_jiffies = 0, prev_work_jiffies = 0;
   const auto stat_lines =
-      GetStatsLines(system_cpu_stat_file, system_cpu_info + 1);
-  if (stat_lines.size() <= system_cpu_info) {
+      GetStatsLines(system_cpu_stat_file, kSystemCpuInfo + 1);
+  if (stat_lines.size() <= kSystemCpuInfo) {
     AERROR << "failed to load contents from " << system_cpu_stat_file;
     return 0.f;
   }
   const std::vector<std::string> jiffies_stats =
-      absl::StrSplit(stat_lines[system_cpu_info - 1], ' ');
+      absl::StrSplit(stat_lines[kSystemCpuInfo], ' ', absl::SkipWhitespace());
   if (jiffies_stats.size() <= total) {
     AERROR << "failed to get system CPU info from " << system_cpu_stat_file;
     return 0.f;
   }
-
-  int jiffies = 0, work_jiffies = 0;
-  for (int cur_stat = 0; cur_stat <= total; ++cur_stat) {
-    const auto cur_stat_value = std::stoi(jiffies_stats[cur_stat]);
+  uint64_t jiffies = 0, work_jiffies = 0;
+  for (int cur_stat = users; cur_stat <= total; ++cur_stat) {
+    const auto cur_stat_value = std::stoll(jiffies_stats[cur_stat]);
     jiffies += cur_stat_value;
     if (cur_stat <= system) {
       work_jiffies += cur_stat_value;
     }
   }
-  const int tmp_prev_jiffies = prev_jiffies,
-            tmp_prev_work_jiffies = prev_work_jiffies;
+  const uint64_t tmp_prev_jiffies = prev_jiffies;
+  const uint64_t tmp_prev_work_jiffies = prev_work_jiffies;
   prev_jiffies = jiffies;
   prev_work_jiffies = work_jiffies;
   if (tmp_prev_jiffies == 0) {
     return 0.f;
   }
-  return 100.f *
-         (static_cast<float>(work_jiffies - tmp_prev_work_jiffies) /
-          (jiffies - tmp_prev_jiffies) / FLAGS_resource_monitor_interval);
+  return 100.f * (static_cast<float>(work_jiffies - tmp_prev_work_jiffies) /
+                  (jiffies - tmp_prev_jiffies));
 }
 
 float GetSystemDiskload(const std::string& device_name) {
   const std::string disks_stat_file = "/proc/diskstats";
   const int device = 2, in_out_ms = 12;
   const int seconds_to_ms = 1000;
-  constexpr int diststats_info = 128;
+  constexpr static int kDiskInfo = 128;
   static uint64_t prev_disk_stats = 0;
 
-  const auto stat_lines = GetStatsLines(disks_stat_file, diststats_info);
+  const auto stat_lines = GetStatsLines(disks_stat_file, kDiskInfo);
   uint64_t disk_stats = 0;
   for (const auto& line : stat_lines) {
-    const std::vector<std::string> stats = absl::StrSplit(line, ' ');
+    const std::vector<std::string> stats =
+        absl::StrSplit(line, ' ', absl::SkipWhitespace());
     if (stats[device] == device_name) {
-      disk_stats = std::stoi(stats[in_out_ms]);
+      disk_stats = std::stoll(stats[in_out_ms]);
       break;
     }
   }
@@ -222,8 +222,9 @@ float GetSystemDiskload(const std::string& device_name) {
   if (tmp_prev_disk_stats == 0) {
     return 0.f;
   }
-  return 100.f * (static_cast<float>(disk_stats - tmp_prev_disk_stats) /
-                  (FLAGS_resource_monitor_interval * seconds_to_ms));
+  return 100.f *
+         (static_cast<float>(disk_stats - tmp_prev_disk_stats) /
+          static_cast<float>(FLAGS_resource_monitor_interval * seconds_to_ms));
 }
 
 }  // namespace
@@ -236,6 +237,7 @@ void ResourceMonitor::RunOnce(const double current_time) {
   auto manager = MonitorManager::Instance();
   const auto& mode = manager->GetHMIMode();
   auto* components = manager->GetStatus()->mutable_components();
+
   for (const auto& iter : mode.monitored_components()) {
     const std::string& name = iter.first;
     const auto& config = iter.second;
@@ -298,8 +300,8 @@ void ResourceMonitor::CheckCPUUsage(
         cpu_usage_value = GetCPUUsage(pid, process_dag_path, &prev_jiffies_map);
       }
     }
-    const auto high_cpu_warning = cpu_usage.high_cpu_usage_warning(),
-               high_cpu_error = cpu_usage.high_cpu_usage_error();
+    const auto high_cpu_warning = cpu_usage.high_cpu_usage_warning();
+    const auto high_cpu_error = cpu_usage.high_cpu_usage_error();
     if (cpu_usage_value > high_cpu_error) {
       const std::string err = absl::StrCat(
           process_dag_path, " has high cpu usage: ", cpu_usage_value, "% > ",
@@ -328,8 +330,8 @@ void ResourceMonitor::CheckMemoryUsage(
         memory_usage_value = GetMemoryUsage(pid, process_dag_path);
       }
     }
-    const auto high_memory_warning = memory_usage.high_memory_usage_warning(),
-               high_memory_error = memory_usage.high_memory_usage_error();
+    const auto high_memory_warning = memory_usage.high_memory_usage_warning();
+    const auto high_memory_error = memory_usage.high_memory_usage_error();
     if (memory_usage_value > static_cast<float>(high_memory_error)) {
       const std::string err = absl::StrCat(
           process_dag_path, " has high memory usage: ", memory_usage_value,
@@ -349,8 +351,8 @@ void ResourceMonitor::CheckDiskLoads(
     ComponentStatus* status) {
   for (const auto& disk_load : config.disk_load_usages()) {
     const auto disk_load_value = GetSystemDiskload(disk_load.device_name());
-    const auto high_disk_load_warning = disk_load.high_disk_load_warning(),
-               high_disk_load_error = disk_load.high_disk_load_error();
+    const auto high_disk_load_warning = disk_load.high_disk_load_warning();
+    const auto high_disk_load_error = disk_load.high_disk_load_error();
     if (disk_load_value > static_cast<float>(high_disk_load_error)) {
       const std::string err = absl::StrCat(
           disk_load.device_name(), " has high disk load: ", disk_load_value,
