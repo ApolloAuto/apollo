@@ -352,7 +352,7 @@ function main(){
     LIB_GNU=/usr/lib/${ARCH}-linux-gnu
     LIB_GNU_VOLUME=""
     if [ -d "${LIB_GNU}" ]; then
-       LIB_GNU_VOLUME="-v ${LIB_GNU}:/usr/lib/${ARCH}-linux-$USER" 
+       LIB_GNU_VOLUME="-v ${LIB_GNU}:/usr/lib/${ARCH}-linux-$USER"
     fi
 
     ${DOCKER_RUN} -it \
