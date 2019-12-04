@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/tasks/smoothers/smoother.h"
+#include "modules/planning/common/smoothers/smoother.h"
 
 #include <string>
 
