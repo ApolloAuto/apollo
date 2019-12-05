@@ -5,12 +5,15 @@ package apollo.planning;
 message PathBoundsDeciderConfig {
   optional bool is_lane_borrowing = 1;
   optional bool is_pull_over = 2;
-  // not search pull-over position if the destination is within this distance from ADC
+  // not search pull-over position if the destination is within this distance
+  // from ADC
   optional double pull_over_destination_to_adc_buffer = 3 [default = 25.0];
-  // not search pull-over position if the destination is within this distance to path-end
+  // not search pull-over position if the destination is within this distance to
+  // path-end
   optional double pull_over_destination_to_pathend_buffer = 4 [default = 10.0];
-  // disquality a pull-over position if the available path boundary's edge is not
-  // within this distance from the road edge
+  // disquality a pull-over position if the available path boundary's edge is
+  // not within this distance from the road edge
   optional double pull_over_road_edge_buffer = 5 [default = 0.15];
-  optional double pull_over_approach_lon_distance_adjust_factor = 6 [default = 1.5];
+  optional double pull_over_approach_lon_distance_adjust_factor = 6
+      [default = 1.5];
 }
