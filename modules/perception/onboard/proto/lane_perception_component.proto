@@ -3,24 +3,31 @@ syntax = "proto2";
 package apollo.perception.onboard;
 
 message LaneDetection {
-    optional string camera_names = 1 [default = "front_6mm,front_12mm"];
-    optional string input_camera_channel_names = 2 [default = "/apollo/sensor/camera/front_6mm/image,/apollo/sensor/camera/front_12mm/image"];
-    optional double timestamp_offset = 3 [default = 0.0];
-    optional string camera_lane_perception_conf_dir = 4 [default = "conf/perception/camera"];
-    optional string camera_lane_perception_conf_file = 5 [default = "lane.pt"];
-    optional int32 frame_capacity = 6 [default = 20];
-    optional int32 image_channel_num = 7 [default = 3];
-    optional bool enable_undistortion = 8 [default = false];
-    optional bool enable_visualization = 9 [default = false];
-    optional string output_lanes_channel_name = 10 [default = "/perception/lanes"];
-    optional double default_camera_pitch = 11 [default = 0.0];
-    optional double default_camera_height = 12 [default = 1.5];
-    optional string lane_calibration_working_sensor_name = 13 [default = "front_6mm"];
-    optional string calibrator_method = 14 [default = "LaneLineCalibrator"];
-    optional string calib_service_name = 15 [default = "OnlineCalibrationService"];
-    optional bool run_calib_service = 16 [default = true];
-    optional double ts_diff = 17 [default = 0.1];
-    optional string visual_debug_folder = 18 [default = "/apollo/debug_output"];
-    optional string visual_camera = 19 [default = "front_6mm"];
-    optional bool write_visual_img = 20 [default = false];
+  optional string camera_names = 1 [default = "front_6mm,front_12mm"];
+  optional string input_camera_channel_names = 2
+      [default =
+           "/apollo/sensor/camera/front_6mm/image,/apollo/sensor/camera/"
+           "front_12mm/image"];
+  optional double timestamp_offset = 3 [default = 0.0];
+  optional string camera_lane_perception_conf_dir = 4
+      [default = "conf/perception/camera"];
+  optional string camera_lane_perception_conf_file = 5 [default = "lane.pt"];
+  optional int32 frame_capacity = 6 [default = 20];
+  optional int32 image_channel_num = 7 [default = 3];
+  optional bool enable_undistortion = 8 [default = false];
+  optional bool enable_visualization = 9 [default = false];
+  optional string output_lanes_channel_name = 10
+      [default = "/perception/lanes"];
+  optional double default_camera_pitch = 11 [default = 0.0];
+  optional double default_camera_height = 12 [default = 1.5];
+  optional string lane_calibration_working_sensor_name = 13
+      [default = "front_6mm"];
+  optional string calibrator_method = 14 [default = "LaneLineCalibrator"];
+  optional string calib_service_name = 15
+      [default = "OnlineCalibrationService"];
+  optional bool run_calib_service = 16 [default = true];
+  optional double ts_diff = 17 [default = 0.1];
+  optional string visual_debug_folder = 18 [default = "/apollo/debug_output"];
+  optional string visual_camera = 19 [default = "front_6mm"];
+  optional bool write_visual_img = 20 [default = false];
 }

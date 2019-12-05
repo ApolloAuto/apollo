@@ -3,11 +3,17 @@ package apollo.perception.lidar;
 
 message CNNSegConfig {
   optional string param_file = 1 [default = "./data/models/cnnseg/param.conf"];
-  optional string proto_file = 2 [default = "./data/models/cnnseg/deploy.prototxt"];
-  optional string weight_file = 3 [default = "./data/models/cnnseg/deploy.caffemodel"];
-  optional string engine_file = 4 [default = "./data/models/cnnseg/engine.conf"];
-  optional string paddle_param_file = 5 [default = "./data/models/cnnseg/paddle_param.conf"];
-  optional string paddle_proto_file = 6 [default = "./data/models/cnnseg/model"];
-  optional string paddle_weight_file = 7 [default = "./data/models/cnnseg/params"];
+  optional string proto_file = 2
+      [default = "./data/models/cnnseg/deploy.prototxt"];
+  optional string weight_file = 3
+      [default = "./data/models/cnnseg/deploy.caffemodel"];
+  optional string engine_file = 4
+      [default = "./data/models/cnnseg/engine.conf"];
+  optional string paddle_param_file = 5
+      [default = "./data/models/cnnseg/paddle_param.conf"];
+  optional string paddle_proto_file = 6
+      [default = "./data/models/cnnseg/model"];
+  optional string paddle_weight_file = 7
+      [default = "./data/models/cnnseg/params"];
   optional bool use_paddle = 8 [default = false];
 }

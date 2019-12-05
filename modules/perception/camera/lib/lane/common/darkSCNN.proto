@@ -3,34 +3,34 @@ syntax = "proto2";
 package apollo.perception.camera.darkSCNN;
 
 message DarkSCNNParam {
-    optional ModelParam model_param = 1;
-    optional NetworkParam net_param = 2;
+  optional ModelParam model_param = 1;
+  optional NetworkParam net_param = 2;
 }
 
 message ModelParam {
-    optional string model_name = 1 [default = "darkSCNN"];
-    optional string proto_file = 2 [default = "deploy.prototxt"];
-    optional string weight_file = 3 [default = "deploy.caffemodel"];
-    optional uint32 input_offset_y = 4 [default = 0];
-    optional uint32 input_offset_x = 5 [default = 0];
-    optional uint32 crop_height = 6 [default = 1080];
-    optional uint32 crop_width = 7 [default = 1920];
-    optional uint32 resize_height = 8 [default = 512];
-    optional uint32 resize_width = 9 [default = 512];
-    optional uint32 mean_b = 10 [default = 95];
-    optional uint32 mean_g = 11 [default = 99];
-    optional uint32 mean_r = 12 [default = 96];
-    optional bool is_bgr = 13 [default = true];
-    optional float confidence_threshold = 14 [default = 0.5];
-    optional float vpt_mean_dx = 15 [default = 0.0];
-    optional float vpt_mean_dy = 16 [default = -77.284];
-    optional float vpt_std_dx = 17 [default = 103.109];
-    optional float vpt_std_dy = 18 [default = 95.273];
-    optional string model_type = 19 [default = "CaffeNet"];
+  optional string model_name = 1 [default = "darkSCNN"];
+  optional string proto_file = 2 [default = "deploy.prototxt"];
+  optional string weight_file = 3 [default = "deploy.caffemodel"];
+  optional uint32 input_offset_y = 4 [default = 0];
+  optional uint32 input_offset_x = 5 [default = 0];
+  optional uint32 crop_height = 6 [default = 1080];
+  optional uint32 crop_width = 7 [default = 1920];
+  optional uint32 resize_height = 8 [default = 512];
+  optional uint32 resize_width = 9 [default = 512];
+  optional uint32 mean_b = 10 [default = 95];
+  optional uint32 mean_g = 11 [default = 99];
+  optional uint32 mean_r = 12 [default = 96];
+  optional bool is_bgr = 13 [default = true];
+  optional float confidence_threshold = 14 [default = 0.5];
+  optional float vpt_mean_dx = 15 [default = 0.0];
+  optional float vpt_mean_dy = 16 [default = -77.284];
+  optional float vpt_std_dx = 17 [default = 103.109];
+  optional float vpt_std_dy = 18 [default = 95.273];
+  optional string model_type = 19 [default = "CaffeNet"];
 }
 
 message NetworkParam {
-    optional string seg_blob = 1 [default = "softmax"];
-    optional string vpt_blob = 2 [default = "fc_out"];
-    optional string input_blob = 3 [default = "data"];
+  optional string seg_blob = 1 [default = "softmax"];
+  optional string vpt_blob = 2 [default = "fc_out"];
+  optional string input_blob = 3 [default = "data"];
 }
