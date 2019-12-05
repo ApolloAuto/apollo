@@ -18,7 +18,7 @@ cc_library(
     srcs = ["file_utility.cc"],
     hdrs = ["file_utility.h"],
     deps = [
-        "//modules/common",
+        "//cyber/common:log",
         "@boost",
         "@eigen",
         "@fastrtps",
