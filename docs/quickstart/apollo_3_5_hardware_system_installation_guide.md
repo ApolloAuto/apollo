@@ -72,6 +72,12 @@ The key hardware components to install include:
 - Controller Area Network (CAN) Card ─ ESD CAN-PCIe/402-B4
 - Global Positioning System (GPS) and Inertial Measurement Unit (IMU) ─
   You can select one of the following options:
+  - [Inertial Labs GPS-Aided INS-B] (single antenna) https://inertiallabs.com/static/pdf/INS-Datasheet.rev3.9_Oct1_2019.pdf
+  - [Inertial Labs GPS-Aided INS-P] (single antenna) https://inertiallabs.com/static/pdf/INS-Datasheet.rev3.9_Oct1_2019.pdf
+  - [Inertial Labs GPS-Aided INS-D] (dual antenna) https://inertiallabs.com/static/pdf/INS-Datasheet.rev3.9_Oct1_2019.pdf
+  - [Inertial Labs GPS-Aided INS-DL]  (dual antenna) https://inertiallabs.com/static/pdf/INS-Datasheet.rev3.9_Oct1_2019.pdf
+  - [OEM version of Inertial Labs INS-D and INS-DL] https://inertiallabs.com/static/pdf/INS-D-OEM-Datasheet.rev1.7_Oct_2019.pdf
+  - [OEM version of Inertial Labs INS-B] https://inertiallabs.com/static/pdf/INS-B-OEM-Datasheet.rev3.5_Oct_2019.pdf
   - NovAtel SPAN-IGM-A1
   - NovAtel SPAN® ProPak6™ and NovAtel IMU-IGM-A1
   - NovAtel SPAN® PwrPak7™ 
