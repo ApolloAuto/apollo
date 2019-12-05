@@ -25,8 +25,7 @@ cc_test(
 
 #cc_test(
 #    name = "camera_app_traffic_light_camera_perception_test",
-#    srcs = [#        "camera_app_traffic_light_camera_perception_test.cc"
-#    ],
+#    srcs = ["camera_app_traffic_light_camera_perception_test.cc"],
 #    linkopts = [
 #        "-lnvinfer_plugin",
 #    ],
@@ -117,8 +116,7 @@ cc_library(
 
 #cc_test(
 #    name = "camera_common_undistortion_handler_test",
-#    srcs = [#        "camera_common_undistortion_handler_test.cc"
-#    ],
+#    srcs = ["camera_common_undistortion_handler_test.cc"],
 #    linkopts = [
 #        "-lnvinfer_plugin",
 #    ],
@@ -245,8 +243,7 @@ cc_library(
 
 # cc_test(
 #     name = "camera_lib_calibrator_laneline_laneline_calibrator_test",
-#     srcs = [#         "camera_lib_calibrator_laneline_laneline_calibrator_test.cc"
-#     ],
+#     srcs = ["camera_lib_calibrator_laneline_laneline_calibrator_test.cc"],
 #     deps = [
 #         ":camera_lib_calibrator_laneline_app_util",
 #         ":camera_lib_calibrator_laneline_lane_calibrator_util",
@@ -446,8 +443,7 @@ cc_test(
 # TODO(private)
 # cc_test(
 #     name = "camera_lib_obstacle_tracker_omt_omt_obstacle_tracker_test",
-#     srcs = [#         "camera_lib_obstacle_tracker_omt_omt_obstacle_tracker_test.cc"
-#     ],
+#     srcs = ["camera_lib_obstacle_tracker_omt_omt_obstacle_tracker_test.cc"],
 #     deps = [
 #         "//cyber",
 #         "//modules/perception/base:base",
@@ -465,8 +461,7 @@ cc_test(
 # TODO(private)
 # cc_test(
 #     name = "camera_lib_obstacle_tracker_omt_reference_test",
-#     srcs = [#         "camera_lib_obstacle_tracker_omt_reference_test.cc"
-#     ],
+#     srcs = ["camera_lib_obstacle_tracker_omt_reference_test.cc"],
 #     deps = [
 #         "//cyber/common:file",
 #         "//modules/perception/base:base",
@@ -531,8 +526,7 @@ cc_test(
 
 # cc_test(
 #     name = "camera_lib_traffic_light_detector_detection_test",
-#     srcs = [#         "camera_lib_traffic_light_detector_detection_test.cc"
-#     ],
+#     srcs = ["camera_lib_traffic_light_detector_detection_test.cc"],
 #     linkopts = [
 #         "-lnvinfer_plugin",
 #     ],
@@ -551,8 +545,7 @@ cc_test(
 
 #cc_test(
 #    name = "camera_lib_traffic_light_detector_recognition_test",
-#    srcs = [#        "camera_lib_traffic_light_detector_recognition_test.cc"
-#    ],
+#    srcs = ["camera_lib_traffic_light_detector_recognition_test.cc"],
 #    linkopts = [
 #        "-lnvinfer_plugin",
 #    ],
@@ -591,8 +584,7 @@ cc_test(
 # TODO(private)
 #cc_test(
 #    name = "camera_lib_traffic_light_preprocessor_test",
-#    srcs = [#        "camera_lib_traffic_light_preprocessor_test.cc"
-#    ],
+#    srcs = ["camera_lib_traffic_light_preprocessor_test.cc"],
 #    linkopts = [
 #        "-lnvinfer_plugin",
 #    ],

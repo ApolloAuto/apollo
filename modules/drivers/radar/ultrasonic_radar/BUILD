@@ -19,8 +19,7 @@ cc_library(
 #  cc_test(
 #    name = "ultrasonic_radar_message_manager_test",
 #    size = "small",
-#     srcs = [#         "ultrasonic_radar_message_manager_test.cc"
-#     ],
+#     srcs = ["ultrasonic_radar_message_manager_test.cc"],
 #     deps = [
 #         "ultrasonic_radar_message_manager",
 #         "@gtest//:main",

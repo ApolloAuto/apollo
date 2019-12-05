@@ -31,8 +31,7 @@ cc_library(
 #cc_test(
 #    name = "hdmap_input_test",
 #    size = "small",
-#    srcs = [#        "hdmap_input_test.cc"
-#    ],
+#    srcs = ["hdmap_input_test.cc"],
 #    deps = [
 #        ":hdmap_input",
 #        "@gtest//:main",
