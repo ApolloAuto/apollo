@@ -23,6 +23,7 @@
 #include "gflags/gflags.h"
 
 #include "modules/common/math/vec2d.h"
+#include "modules/common/util/future.h"
 #include "modules/common/util/util.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_gflags.h"
