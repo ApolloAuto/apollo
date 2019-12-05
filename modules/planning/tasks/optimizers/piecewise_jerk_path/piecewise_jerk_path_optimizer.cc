@@ -58,7 +58,8 @@ common::Status PiecewiseJerkPathOptimizer::Process(
          << init_point.path_point().x() << ", y = "
          << init_point.path_point().y() << ", and angle = "
          << init_point.path_point().theta();
-  const auto init_frenet_state = reference_line.ToFrenetFrame(init_point);
+  const auto init_frenet_state = reference_line.ToFrenetFrame(
+      InferFrontAxeCenterFromRearAxeCenter(init_point));
 
   // Choose lane_change_path_config for lane-change cases
   // Otherwise, choose default_path_config for normal path planning
@@ -149,7 +150,12 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       PathData path_data = *final_path_data;
       path_data.SetReferenceLine(&reference_line);
       path_data.SetFrenetPath(std::move(frenet_frame_path));
-      ConvertPathPointRefFromFrontAxeToRearAxe(path_data);
+      auto discretized_path =
+          DiscretizedPath(
+              ConvertPathPointRefFromFrontAxeToRearAxe(path_data));
+      path_data = *final_path_data;
+      path_data.SetReferenceLine(&reference_line);
+      path_data.SetDiscretizedPath(discretized_path);
       path_data.set_path_label(path_boundary.label());
       path_data.set_blocking_obstacle_id(path_boundary.blocking_obstacle_id());
       candidate_path_data.push_back(std::move(path_data));
@@ -161,6 +167,21 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   }
   reference_line_info_->SetCandidatePathData(std::move(candidate_path_data));
   return Status::OK();
+}
+
+common::TrajectoryPoint
+PiecewiseJerkPathOptimizer::InferFrontAxeCenterFromRearAxeCenter(
+      const common::TrajectoryPoint& traj_point) {
+  double front_to_rear_axe_distance =
+      VehicleConfigHelper::GetConfig().vehicle_param().wheel_base();
+  common::TrajectoryPoint ret = traj_point;
+  ret.mutable_path_point()->set_x(
+      traj_point.path_point().x() +
+      front_to_rear_axe_distance * std::cos(traj_point.path_point().theta()));
+  ret.mutable_path_point()->set_y(
+      traj_point.path_point().y() +
+      front_to_rear_axe_distance * std::sin(traj_point.path_point().theta()));
+  return ret;
 }
 
 std::vector<common::PathPoint>
