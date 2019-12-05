@@ -40,6 +40,9 @@ class PiecewiseJerkPathOptimizer : public PathOptimizer {
                          const common::TrajectoryPoint& init_point,
                          PathData* const path_data) override;
 
+  std::vector<common::PathPoint> ConvertPathPointRefFromFrontAxeToRearAxe(
+      const PathData& path_data);
+
   bool OptimizePath(
       const std::array<double, 3>& init_state,
       const std::array<double, 3>& end_state, const double delta_s,

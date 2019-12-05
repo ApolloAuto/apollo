@@ -36,6 +36,7 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::VehicleConfigHelper;
 
 PiecewiseJerkPathOptimizer::PiecewiseJerkPathOptimizer(const TaskConfig& config)
     : PathOptimizer(config) {
@@ -53,6 +54,10 @@ common::Status PiecewiseJerkPathOptimizer::Process(
                                           ->reused_path()) {
     return Status::OK();
   }
+  ADEBUG << "Plan at the starting point: x = "
+         << init_point.path_point().x() << ", y = "
+         << init_point.path_point().y() << ", and angle = "
+         << init_point.path_point().theta();
   const auto init_frenet_state = reference_line.ToFrenetFrame(init_point);
 
   // Choose lane_change_path_config for lane-change cases
@@ -144,6 +149,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       PathData path_data = *final_path_data;
       path_data.SetReferenceLine(&reference_line);
       path_data.SetFrenetPath(std::move(frenet_frame_path));
+      ConvertPathPointRefFromFrontAxeToRearAxe(path_data);
       path_data.set_path_label(path_boundary.label());
       path_data.set_blocking_obstacle_id(path_boundary.blocking_obstacle_id());
       candidate_path_data.push_back(std::move(path_data));
@@ -155,6 +161,23 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   }
   reference_line_info_->SetCandidatePathData(std::move(candidate_path_data));
   return Status::OK();
+}
+
+std::vector<common::PathPoint>
+PiecewiseJerkPathOptimizer::ConvertPathPointRefFromFrontAxeToRearAxe(
+    const PathData& path_data) {
+  std::vector<common::PathPoint> ret;
+  double front_to_rear_axe_distance =
+      VehicleConfigHelper::GetConfig().vehicle_param().wheel_base();
+  for (auto path_point : path_data.discretized_path()) {
+    common::PathPoint new_path_point = path_point;
+    new_path_point.set_x(path_point.x() -
+        front_to_rear_axe_distance * std::cos(path_point.theta()));
+    new_path_point.set_y(path_point.y() -
+        front_to_rear_axe_distance * std::sin(path_point.theta()));
+    ret.push_back(new_path_point);
+  }
+  return ret;
 }
 
 bool PiecewiseJerkPathOptimizer::OptimizePath(
