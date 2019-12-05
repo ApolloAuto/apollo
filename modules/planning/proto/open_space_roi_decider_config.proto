@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.planning;
 
-message OpenSpaceRoiDeciderConfig{
+message OpenSpaceRoiDeciderConfig {
   // roi scenario definitions
   enum RoiType {
     NOT_DEFINED = 0;

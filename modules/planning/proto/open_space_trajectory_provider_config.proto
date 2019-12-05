@@ -5,8 +5,10 @@ package apollo.planning;
 import "modules/planning/proto/planner_open_space_config.proto";
 
 message OpenSpaceTrajectoryProviderConfig {
-  //TODO(Jinyun) Move PlannerOpenSpaceConfig to OpenSpaceTrajectoryOptimizerConfig
-  optional OpenSpaceTrajectoryOptimizerConfig open_space_trajectory_optimizer_config = 1;
+  // TODO(Jinyun) Move PlannerOpenSpaceConfig to
+  // OpenSpaceTrajectoryOptimizerConfig
+  optional OpenSpaceTrajectoryOptimizerConfig
+      open_space_trajectory_optimizer_config = 1;
 }
 
 message OpenSpaceTrajectoryOptimizerConfig {
@@ -15,7 +17,8 @@ message OpenSpaceTrajectoryOptimizerConfig {
   // Dual variable configs
   optional DualVariableConfig dual_variable_warm_start_config = 2;
   // Distance approach trajectory smoothing configs
-  optional DistanceApproachTrajectorySmootherConfig distance_approach_trajectory_smoother_config = 3;
+  optional DistanceApproachTrajectorySmootherConfig
+      distance_approach_trajectory_smoother_config = 3;
   optional float delta_t = 4 [default = 0.5];
   optional double is_near_destination_threshold = 5 [default = 0.001];
   // (TODO:(QiL) tmp message during refactoring, deprecate when all tuning done.
@@ -44,7 +47,8 @@ enum DualVariableMode {
   DUAL_VARIABLE_DEBUG = 3;
 }
 
-// Dual variable configs for warm starting distance approach trajectory smoothing
+// Dual variable configs for warm starting distance approach trajectory
+// smoothing
 message DualVariableConfig {
   optional double weight_d = 1 [default = 1.0];
   optional IpoptSolverConfig ipopt_config = 2;
