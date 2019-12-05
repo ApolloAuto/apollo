@@ -18,7 +18,6 @@ message Passage {
     EXIT = 2;
   };
   optional Type type = 6;
-
 };
 
 message PassageGroup {
