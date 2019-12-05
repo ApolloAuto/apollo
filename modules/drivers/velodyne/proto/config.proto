@@ -46,4 +46,3 @@ message CompensatorConfig {
   optional string target_frame_id = 4;
   optional uint32 point_cloud_size = 5;
 }
-
