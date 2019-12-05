@@ -34,9 +34,9 @@ cc_library(
     deps = [
         ":racobit_radar_message_manager",
         "//cyber",
-        "//modules/common",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
+        "//modules/common/status",
         "//modules/drivers/canbus:sensor_gflags",
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",
