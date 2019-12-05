@@ -268,7 +268,8 @@ void PathBoundsDecider::InitPathBoundsDecider(
     const Frame& frame, const ReferenceLineInfo& reference_line_info) {
   const ReferenceLine& reference_line = reference_line_info.reference_line();
   const common::TrajectoryPoint& planning_start_point =
-      frame.PlanningStartPoint();
+      InferFrontAxeCenterFromRearAxeCenter(
+          frame.PlanningStartPoint());
 
   ADEBUG << "Plan at the starting point: x = "
          << planning_start_point.path_point().x() << ", y = "
