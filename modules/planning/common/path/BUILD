@@ -10,7 +10,6 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-        "//modules/common",
         "//modules/common/math:linear_interpolation",
         "//modules/common/proto:pnc_point_proto",
     ],
@@ -22,6 +21,7 @@ cc_test(
     srcs = ["discretized_path_test.cc"],
     deps = [
         ":discretized_path",
+        "//modules/common/util",
         "//modules/common/util:point_factory",
         "@gtest//:main",
     ],

@@ -123,7 +123,7 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-        "//cyber/common:log",
+        "//modules/common/util",
         "//modules/planning/common/trajectory1d:piecewise_jerk_trajectory1d",
     ],
 )
