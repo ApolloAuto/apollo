@@ -26,6 +26,7 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 namespace util {
+
 using apollo::common::VehicleConfigHelper;
 using apollo::common::math::Box2d;
 using apollo::common::math::Polygon2d;
@@ -163,32 +164,6 @@ PullOverStatus CheckADCPullOverPathPoint(
   return position_check ? PARK_COMPLETE : PARK_FAIL;
 }
 
-PullOverStatus CheckADCPullOverOpenSpace(
-    const ScenarioPullOverConfig& scenario_config) {
-  const auto& pull_over_status =
-      PlanningContext::Instance()->planning_status().pull_over();
-  if (!pull_over_status.has_position() ||
-      !pull_over_status.position().has_x() ||
-      !pull_over_status.position().has_y() || !pull_over_status.has_theta()) {
-    ADEBUG << "pull_over status not set properly: "
-           << pull_over_status.DebugString();
-    return UNKNOWN;
-  }
-
-  const common::math::Vec2d adc_position = {
-      common::VehicleStateProvider::Instance()->x(),
-      common::VehicleStateProvider::Instance()->y()};
-  const common::math::Vec2d target_position = {pull_over_status.position().x(),
-                                               pull_over_status.position().y()};
-
-  const bool position_check = CheckPullOverPositionByDistance(
-      scenario_config, adc_position,
-      common::VehicleStateProvider::Instance()->heading(), target_position,
-      pull_over_status.theta());
-
-  return position_check ? PARK_COMPLETE : PARK_FAIL;
-}
-
 bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
                                const ScenarioPullOverConfig& scenario_config,
                                const common::math::Vec2d& adc_position,
@@ -220,20 +195,6 @@ bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
   }
 
   return ret;
-}
-
-bool CheckPullOverPositionByDistance(
-    const ScenarioPullOverConfig& scenario_config,
-    const common::math::Vec2d& adc_position, const double adc_theta,
-    const common::math::Vec2d& target_position, const double target_theta) {
-  const double distance_diff = adc_position.DistanceTo(target_position);
-  const double theta_diff =
-      std::fabs(common::math::NormalizeAngle(target_theta - adc_theta));
-  ADEBUG << "distance_diff[" << distance_diff << "] theta_diff[" << theta_diff
-         << "]";
-  // check distance/theta diff
-  return (distance_diff <= scenario_config.max_distance_error_to_end_point() &&
-          theta_diff <= scenario_config.max_theta_error_to_end_point());
 }
 
 bool CheckADCReadyToCruise(Frame* frame,
