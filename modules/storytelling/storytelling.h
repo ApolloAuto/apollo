@@ -13,43 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/storytelling/storytelling.h"
+#pragma once
 
+#include <memory>
+#include <vector>
+
+#include "cyber/component/component.h"
+#include "cyber/component/timer_component.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/storytelling/frame_manager.h"
-#include "modules/storytelling/story_tellers/close_to_junction_teller.h"
+#include "modules/storytelling/story_tellers/base_teller.h"
 
 namespace apollo {
 namespace storytelling {
 
-bool Storytelling::Init() {
-  FrameManager::Instance()->Init(node_);
-  story_tellers_.emplace_back(new CloseToJunctionTeller());
+class Storytelling final : public apollo::cyber::TimerComponent {
+ public:
+  Storytelling() = default;
+  ~Storytelling() = default;
 
-  // Init all tellers.
-  for (const auto& teller : story_tellers_) {
-    teller->Init();
-  }
-  return true;
-}
+  bool Init() override;
 
-bool Storytelling::Proc() {
-  auto* manager = FrameManager::Instance();
-  manager->StartFrame();
+  bool Proc() override;
 
-  // Query all tellers.
-  for (const auto& teller : story_tellers_) {
-    teller->Update(&stories_);
-  }
+ private:
+  std::vector<std::unique_ptr<BaseTeller>> story_tellers_;
+  Stories stories_;
+};
 
-  // Send stories.
-  static auto writer = manager->CreateWriter<Stories>(FLAGS_storytelling_topic);
-  apollo::common::util::FillHeader("Storytelling", &stories_);
-  writer->Write(stories_);
-
-  manager->EndFrame();
-  return true;
-}
-
+CYBER_REGISTER_COMPONENT(Storytelling)
 }  // namespace storytelling
 }  // namespace apollo
