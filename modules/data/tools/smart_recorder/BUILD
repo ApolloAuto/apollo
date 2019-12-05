@@ -149,7 +149,8 @@ cc_library(
     hdrs = ["interval_pool.h"],
     deps = [
         "//cyber/common:log",
-        "//modules/common/util",
+        "//cyber/common:macros",
+        "@com_google_absl//absl/strings",
     ],
 )
 
@@ -158,8 +159,8 @@ cc_library(
     srcs = ["channel_pool.cc"],
     hdrs = ["channel_pool.h"],
     deps = [
+        "//cyber/common:macros",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/util",
     ],
 )
 
