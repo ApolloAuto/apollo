@@ -38,7 +38,6 @@ cc_test(
         ":digital_filter",
         ":digital_filter_coefficients",
         "//cyber",
-        "//modules/common",
         "@gtest//:main",
     ],
 )

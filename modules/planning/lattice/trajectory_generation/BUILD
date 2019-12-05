@@ -20,7 +20,6 @@ cc_library(
     srcs = ["end_condition_sampler.cc"],
     hdrs = ["end_condition_sampler.h"],
     deps = [
-        "//modules/common",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/lattice/behavior:feasible_region",
@@ -38,7 +37,6 @@ cc_library(
         ":end_condition_sampler",
         ":lateral_osqp_optimizer",
         ":lateral_qp_optimizer",
-        "//modules/common",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory1d:constant_deceleration_trajectory1d",
         "//modules/planning/common/trajectory1d:piecewise_acceleration_trajectory1d",
@@ -62,7 +60,6 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-        "//modules/common",
         "//modules/common/math:path_matcher",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory1d:piecewise_acceleration_trajectory1d",
@@ -79,7 +76,6 @@ cc_library(
     srcs = ["backup_trajectory_generator.cc"],
     hdrs = ["backup_trajectory_generator.h"],
     deps = [
-        "//modules/common",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory1d:constant_deceleration_trajectory1d",
@@ -95,7 +91,6 @@ cc_library(
     srcs = ["trajectory_combiner.cc"],
     hdrs = ["trajectory_combiner.h"],
     deps = [
-        "//modules/common",
         "//modules/common/math:cartesian_frenet_conversion",
         "//modules/common/math:path_matcher",
         "//modules/planning/common:planning_gflags",
@@ -109,7 +104,6 @@ cc_library(
     srcs = ["piecewise_braking_trajectory_generator.cc"],
     hdrs = ["piecewise_braking_trajectory_generator.h"],
     deps = [
-        "//modules/common",
         "//modules/planning/common/trajectory1d:piecewise_acceleration_trajectory1d",
         "//modules/planning/math/curve1d",
     ],

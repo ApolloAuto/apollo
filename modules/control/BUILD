@@ -10,7 +10,6 @@ cc_library(
         "//cyber",
         "//external:gflags",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/common",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/latency_recorder",
         "//modules/common/monitor_log",

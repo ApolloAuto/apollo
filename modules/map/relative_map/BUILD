@@ -17,7 +17,6 @@ cc_library(
     ],
     deps = [
         ":navigation_lane_lib",
-        "//modules/common",
         "//modules/common/math:geometry",
         "//modules/common/monitor_log",
         "//modules/common/status",
@@ -84,7 +83,6 @@ cc_test(
     ],
     deps = [
         ":relative_map_component_lib",
-        "//modules/common",
         "//third_party/json",
         "@gtest//:main",
     ],

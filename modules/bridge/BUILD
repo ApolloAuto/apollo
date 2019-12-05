@@ -16,7 +16,6 @@ cc_library(
         "//modules/bridge/common:macro",
         "//modules/bridge/common:util",
         "//modules/bridge/proto:udp_bridge_remote_info_proto",
-        "//modules/common",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
         "//modules/common/time",

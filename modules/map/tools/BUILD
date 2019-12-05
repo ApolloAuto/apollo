@@ -19,7 +19,6 @@ cc_binary(
     srcs = ["map_xysl.cc"],
     deps = [
         "//external:gflags",
-        "//modules/common",
         "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/map/hdmap:hdmap_util",
@@ -43,7 +42,6 @@ cc_binary(
     srcs = ["sim_map_generator.cc"],
     deps = [
         "//external:gflags",
-        "//modules/common",
         "//modules/common/configs:config_gflags",
         "//modules/common/util",
         "//modules/common/util:points_downsampler",
@@ -70,7 +68,6 @@ cc_binary(
     srcs = ["bin_map_generator.cc"],
     deps = [
         "//external:gflags",
-        "//modules/common",
         "//modules/common/util",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/hdmap/adapter:opendrive_adapter",
@@ -83,7 +80,6 @@ cc_binary(
     srcs = ["quaternion_euler.cc"],
     deps = [
         "//external:gflags",
-        "//modules/common",
         "//modules/common/math",
         "//modules/common/util",
     ],

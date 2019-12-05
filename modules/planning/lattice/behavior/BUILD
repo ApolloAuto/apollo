@@ -21,7 +21,6 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
-        "//modules/common",
         "//modules/common/math:linear_interpolation",
         "//modules/common/math:path_matcher",
         "//modules/common/proto:pnc_point_proto",

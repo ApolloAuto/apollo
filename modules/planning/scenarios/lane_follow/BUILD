@@ -19,7 +19,6 @@ cc_library(
     deps = [
         "//cyber/common:log",
         "//external:gflags",
-        "//modules/common",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
         "//modules/common/time",
@@ -54,7 +53,6 @@ cc_library(
         ":lane_follow_stage",
         "//cyber/common:log",
         "//external:gflags",
-        "//modules/common",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
         "//modules/common/time",

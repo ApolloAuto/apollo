@@ -17,7 +17,6 @@ cc_library(
     srcs = ["piecewise_acceleration_trajectory1d.cc"],
     hdrs = ["piecewise_acceleration_trajectory1d.h"],
     deps = [
-        "//modules/common",
         "//modules/common/math:linear_interpolation",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/math/curve1d",
@@ -40,7 +39,6 @@ cc_library(
     srcs = ["piecewise_trajectory1d.cc"],
     hdrs = ["piecewise_trajectory1d.h"],
     deps = [
-        "//modules/common",
         "//modules/common/math:linear_interpolation",
         "//modules/planning/math/curve1d",
     ],
