@@ -13,6 +13,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
+        "//modules/common/util:message_util",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/backend/map:map_service",
         "//modules/map/relative_map/proto:navigation_proto",
