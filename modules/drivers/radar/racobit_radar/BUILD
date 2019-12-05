@@ -7,6 +7,7 @@ cc_library(
     srcs = ["racobit_radar_message_manager.cc"],
     hdrs = ["racobit_radar_message_manager.h"],
     deps = [
+        "//modules/common/util:message_util",
         "//modules/drivers/canbus:sensor_gflags",
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_sender",

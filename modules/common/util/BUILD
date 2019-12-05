@@ -10,7 +10,6 @@ cc_library(
         ":future",
         ":json_util",
         ":lru_cache",
-        ":message_util",
         ":points_downsampler",
         ":string_util",
         "//modules/common/math",
