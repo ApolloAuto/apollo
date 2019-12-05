@@ -26,7 +26,9 @@ namespace apollo {
 namespace control {
 
 using apollo::canbus::Chassis;
+using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::StatusPb;
 using apollo::common::time::Clock;
 
 LatLonControllerSubmodule::LatLonControllerSubmodule()
@@ -75,8 +77,12 @@ bool LatLonControllerSubmodule::Proc(
   const double start_timestamp = Clock::NowInSeconds();
   ControlCommand control_core_command;
 
-  // skip produce control command when estop for MPC controller
-  if (preprocessor_status->estop()) {
+  // skip produce control command when estop for lat+lon controller
+  StatusPb pre_status = preprocessor_status->header().status();
+  if (pre_status.error_code() != ErrorCode::OK) {
+    control_core_command.mutable_header()->mutable_status()->CopyFrom(
+        pre_status);
+    AERROR << "Error in preprocessor submodule.";
     return false;
   }
 
@@ -100,6 +106,11 @@ bool LatLonControllerSubmodule::Proc(
   latency_recorder.AppendLatencyRecord(
       control_core_command.header().lidar_timestamp(), start_timestamp,
       end_timestamp);
+
+  control_core_command.mutable_header()->mutable_status()->set_error_code(
+      status.code());
+  control_core_command.mutable_header()->mutable_status()->set_msg(
+      status.error_message());
 
   control_core_writer_->Write(
       std::make_shared<ControlCommand>(control_core_command));
