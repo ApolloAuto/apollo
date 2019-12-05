@@ -152,9 +152,9 @@ message AnnotationGroup {
 // An extension of Datum which contains "rich" annotations.
 message AnnotatedDatum {
   enum AnnotationType {
-    BBOX = 0;       // normal 2D bbox
-    BBOX3D = 1;     // BBOX with 3D info
-    BBOX3DFR = 2;   // BBOX3D with front & rear 2D bbox
+    BBOX = 0;      // normal 2D bbox
+    BBOX3D = 1;    // BBOX with 3D info
+    BBOX3DFR = 2;  // BBOX3D with front & rear 2D bbox
   }
   optional Datum datum = 1;
   // If there are "rich" annotations, specify the type of annotation.
@@ -168,11 +168,11 @@ message AnnotatedDatum {
 message FillerParameter {
   // The filler type.
   optional string type = 1 [default = 'constant'];
-  optional float value = 2 [default = 0]; // the value in constant filler
-  optional float min = 3 [default = 0]; // the min value in uniform filler
-  optional float max = 4 [default = 1]; // the max value in uniform filler
-  optional float mean = 5 [default = 0]; // the mean value in Gaussian filler
-  optional float std = 6 [default = 1]; // the std value in Gaussian filler
+  optional float value = 2 [default = 0];  // the value in constant filler
+  optional float min = 3 [default = 0];    // the min value in uniform filler
+  optional float max = 4 [default = 1];    // the max value in uniform filler
+  optional float mean = 5 [default = 0];   // the mean value in Gaussian filler
+  optional float std = 6 [default = 1];    // the std value in Gaussian filler
   // The expected number of non-zero output weights for a given input in
   // Gaussian filler -- the default -1 means don't perform sparsification.
   optional int32 sparse = 7 [default = -1];
@@ -187,7 +187,7 @@ message FillerParameter {
 }
 
 message NetParameter {
-  optional string name = 1; // consider giving the network a name
+  optional string name = 1;  // consider giving the network a name
   // DEPRECATED. See InputParameter. The input blobs to the network.
   repeated string input = 3;
   // DEPRECATED. See InputParameter. The shape of the input blobs.
@@ -221,8 +221,8 @@ message NetParameter {
 }
 
 enum Phase {
-   TRAIN = 0;
-   TEST = 1;
+  TRAIN = 0;
+  TEST = 1;
 }
 
 message NetState {
@@ -277,12 +277,13 @@ message ParamSpec {
 // NOTE
 // Update the next available ID when you add a new LayerParameter field.
 //
-// LayerParameter next available layer-specific ID: 147 (last added: recurrent_param)
+// LayerParameter next available layer-specific ID: 147 (last added:
+// recurrent_param)
 message LayerParameter {
-  optional string name = 1; // the layer name
-  optional string type = 2; // the layer type
-  repeated string bottom = 3; // the name of each bottom blob
-  repeated string top = 4; // the name of each top blob
+  optional string name = 1;    // the layer name
+  optional string type = 2;    // the layer type
+  repeated string bottom = 3;  // the name of each bottom blob
+  repeated string top = 4;     // the name of each top blob
 
   // The train / test phase for computation.
   optional Phase phase = 10;
@@ -413,9 +414,9 @@ message TransformationParameter {
 
   // mean_file and mean_value cannot be specified at the same time
   optional string mean_file = 4;
-  // if specified can be repeated once (would substract it from all the channels)
-  // or can be repeated the same number of times as channels
-  // (would subtract them from the corresponding channel)
+  // if specified can be repeated once (would substract it from all the
+  // channels) or can be repeated the same number of times as channels (would
+  // subtract them from the corresponding channel)
   repeated float mean_value = 5;
   // Force the decoded image to have 3 color channels.
   optional bool force_color = 6 [default = false];
@@ -430,14 +431,14 @@ message TransformationParameter {
   // Expand policy
   optional ExpansionParameter expand_param = 14;
   // Crop policy
-  optional float jitter=15;
+  optional float jitter = 15;
   // Constraint for emitting the annotation after transformation.
   optional EmitConstraint emit_constraint = 10;
 }
 
 // Message that stores parameters used by data transformer for resize policy
 message ResizeParameter {
-  //Probability of using this resize policy
+  // Probability of using this resize policy
   optional float prob = 1 [default = 1];
 
   enum Resize_mode {
@@ -464,19 +465,19 @@ message ResizeParameter {
   // (would use it them to the corresponding channel)
   repeated float pad_value = 6;
 
-  enum Interp_mode { //Same as in OpenCV
+  enum Interp_mode {  // Same as in OpenCV
     LINEAR = 1;
     AREA = 2;
     NEAREST = 3;
     CUBIC = 4;
     LANCZOS4 = 5;
   }
-  //interpolation for for resizing
+  // interpolation for for resizing
   repeated Interp_mode interp_mode = 7;
 }
 
 message SaltPepperParameter {
-  //Percentage of pixels
+  // Percentage of pixels
   optional float fraction = 1 [default = 0];
   repeated float value = 2;
 }
@@ -484,7 +485,7 @@ message SaltPepperParameter {
 // Message that stores parameters used by data transformer for transformation
 // policy
 message NoiseParameter {
-  //Probability of using this resize policy
+  // Probability of using this resize policy
   optional float prob = 1 [default = 0];
   // Histogram equalized
   optional bool hist_eq = 2 [default = false];
@@ -553,7 +554,7 @@ message DistortionParameter {
 
 // Message that stores parameters used by data transformer for expansion policy
 message ExpansionParameter {
-  //Probability of using this expansion policy
+  // Probability of using this expansion policy
   optional float prob = 1 [default = 1];
 
   // The ratio to expand the image.
@@ -700,32 +701,32 @@ message ContrastiveLossParameter {
 }
 
 message ConvolutionParameter {
-  optional uint32 num_output = 1; // The number of outputs for the layer
-  optional bool bias_term = 2 [default = true]; // whether to have bias terms
+  optional uint32 num_output = 1;  // The number of outputs for the layer
+  optional bool bias_term = 2 [default = true];  // whether to have bias terms
 
   // Pad, kernel size, and stride are all given as a single value for equal
   // dimensions in all spatial dimensions, or once per spatial dimension.
-  repeated uint32 pad = 3; // The padding size; defaults to 0
-  repeated uint32 kernel_size = 4; // The kernel size
-  repeated uint32 stride = 6; // The stride; defaults to 1
+  repeated uint32 pad = 3;          // The padding size; defaults to 0
+  repeated uint32 kernel_size = 4;  // The kernel size
+  repeated uint32 stride = 6;       // The stride; defaults to 1
   // Factor used to dilate the kernel, (implicitly) zero-filling the resulting
   // holes. (Kernel dilation is sometimes referred to by its use in the
   // algorithme à trous from Holschneider et al. 1987.)
-  repeated uint32 dilation = 18; // The dilation; defaults to 1
+  repeated uint32 dilation = 18;  // The dilation; defaults to 1
 
   // For 2D convolution only, the *_h and *_w versions may also be used to
   // specify both spatial dimensions.
-  optional uint32 pad_h = 9 [default = 0]; // The padding height (2D only)
-  optional uint32 pad_w = 10 [default = 0]; // The padding width (2D only)
-  optional uint32 kernel_h = 11; // The kernel height (2D only)
-  optional uint32 kernel_w = 12; // The kernel width (2D only)
-  optional uint32 stride_h = 13; // The stride height (2D only)
-  optional uint32 stride_w = 14; // The stride width (2D only)
+  optional uint32 pad_h = 9 [default = 0];   // The padding height (2D only)
+  optional uint32 pad_w = 10 [default = 0];  // The padding width (2D only)
+  optional uint32 kernel_h = 11;             // The kernel height (2D only)
+  optional uint32 kernel_w = 12;             // The kernel width (2D only)
+  optional uint32 stride_h = 13;             // The stride height (2D only)
+  optional uint32 stride_w = 14;             // The stride width (2D only)
 
-  optional uint32 group = 5 [default = 1]; // The group size for group conv
+  optional uint32 group = 5 [default = 1];  // The group size for group conv
 
-  optional FillerParameter weight_filler = 7; // The filler for the weight
-  optional FillerParameter bias_filler = 8; // The filler for the bias
+  optional FillerParameter weight_filler = 7;  // The filler for the weight
+  optional FillerParameter bias_filler = 8;    // The filler for the bias
   enum Engine {
     DEFAULT = 0;
     CAFFE = 1;
@@ -791,11 +792,11 @@ message DataParameter {
   // mean subtraction is always carried out before scaling.
   optional float scale = 2 [default = 1];
   optional string mean_file = 3;
-  // DEPRECATED. See TransformationParameter. Specify if we would like to randomly
-  // crop an image.
+  // DEPRECATED. See TransformationParameter. Specify if we would like to
+  // randomly crop an image.
   optional uint32 crop_size = 5 [default = 0];
-  // DEPRECATED. See TransformationParameter. Specify if we want to randomly mirror
-  // data.
+  // DEPRECATED. See TransformationParameter. Specify if we want to randomly
+  // mirror data.
   optional bool mirror = 6 [default = false];
   // Force the encoded image to have 3 color channels
   optional bool force_encoded_color = 9 [default = false];
@@ -906,14 +907,14 @@ message RegionOutputParameter {
 }
 
 message DropoutParameter {
-  optional float dropout_ratio = 1 [default = 0.5]; // dropout ratio
+  optional float dropout_ratio = 1 [default = 0.5];  // dropout ratio
 }
 
 // DummyDataLayer fills any number of arbitrarily shaped blobs with random
 // (or constant) data generated by "Fillers" (see "message FillerParameter").
 message DummyDataParameter {
-  // This layer produces N >= 1 top blobs.  DummyDataParameter must specify 1 or N
-  // shape fields, and 0, 1 or N data_fillers.
+  // This layer produces N >= 1 top blobs.  DummyDataParameter must specify 1 or
+  // N shape fields, and 0, 1 or N data_fillers.
   //
   // If 0 data_fillers are specified, ConstantFiller with a value of 0 is used.
   // If 1 data_filler is specified, it is applied to all top blobs.  If N are
@@ -934,8 +935,8 @@ message EltwiseParameter {
     SUM = 1;
     MAX = 2;
   }
-  optional EltwiseOp operation = 1 [default = SUM]; // element-wise operation
-  repeated float coeff = 2; // blob-wise coefficient for SUM operation
+  optional EltwiseOp operation = 1 [default = SUM];  // element-wise operation
+  repeated float coeff = 2;  // blob-wise coefficient for SUM operation
 
   // Whether to use an asymptotically slower (for >2 inputs) but stabler method
   // of computing the gradient for the PROD operation. (No effect for SUM op.)
@@ -952,16 +953,15 @@ message ELUParameter {
 
 // Message that stores parameters used by EmbedLayer
 message EmbedParameter {
-  optional uint32 num_output = 1; // The number of outputs for the layer
+  optional uint32 num_output = 1;  // The number of outputs for the layer
   // The input is given as integers to be interpreted as one-hot
   // vector indices with dimension num_input.  Hence num_input should be
   // 1 greater than the maximum possible input value.
   optional uint32 input_dim = 2;
 
-  optional bool bias_term = 3 [default = true]; // Whether to use a bias term
-  optional FillerParameter weight_filler = 4; // The filler for the weight
-  optional FillerParameter bias_filler = 5; // The filler for the bias
-
+  optional bool bias_term = 3 [default = true];  // Whether to use a bias term
+  optional FillerParameter weight_filler = 4;    // The filler for the weight
+  optional FillerParameter bias_filler = 5;      // The filler for the bias
 }
 
 // Message that stores parameters used by ExpLayer
@@ -1015,22 +1015,22 @@ message HingeLossParameter {
 }
 
 message RepeatedList {
-    optional string list_path = 1;
-    optional uint32 num_repeat = 2 [default = 1];
+  optional string list_path = 1;
+  optional uint32 num_repeat = 2 [default = 1];
 }
 
 message DatasetParameter {
-    // type of dataset
-    enum DatasetType {
-        LIST = 1;   // list of paired image and label paths
-        BLOCK = 2;  // list of paired image and label block paths
-    }
-    optional string source = 1;
-    optional string root_folder = 2;
-    optional float weight = 3 [default = 1.0];
-    optional DatasetType type = 4 [default = LIST];
-    optional bool shuffle = 5 [default = true];
-    repeated RepeatedList repeated_list = 6;
+  // type of dataset
+  enum DatasetType {
+    LIST = 1;   // list of paired image and label paths
+    BLOCK = 2;  // list of paired image and label block paths
+  }
+  optional string source = 1;
+  optional string root_folder = 2;
+  optional float weight = 3 [default = 1.0];
+  optional DatasetType type = 4 [default = LIST];
+  optional bool shuffle = 5 [default = true];
+  repeated RepeatedList repeated_list = 6;
 }
 
 message ImageDataParameter {
@@ -1055,11 +1055,11 @@ message ImageDataParameter {
   // mean subtraction is always carried out before scaling.
   optional float scale = 2 [default = 1];
   optional string mean_file = 3;
-  // DEPRECATED. See TransformationParameter. Specify if we would like to randomly
-  // crop an image.
+  // DEPRECATED. See TransformationParameter. Specify if we would like to
+  // randomly crop an image.
   optional uint32 crop_size = 5 [default = 0];
-  // DEPRECATED. See TransformationParameter. Specify if we want to randomly mirror
-  // data.
+  // DEPRECATED. See TransformationParameter. Specify if we want to randomly
+  // mirror data.
   optional bool mirror = 6 [default = false];
   optional string root_folder = 12 [default = ""];
   // Prefetch queue (Number of batches to prefetch to host memory, increase if
@@ -1074,10 +1074,10 @@ message InfogainLossParameter {
 }
 
 message InnerProductParameter {
-  optional uint32 num_output = 1; // The number of outputs for the layer
-  optional bool bias_term = 2 [default = true]; // whether to have bias terms
-  optional FillerParameter weight_filler = 3; // The filler for the weight
-  optional FillerParameter bias_filler = 4; // The filler for the bias
+  optional uint32 num_output = 1;  // The number of outputs for the layer
+  optional bool bias_term = 2 [default = true];  // whether to have bias terms
+  optional FillerParameter weight_filler = 3;    // The filler for the weight
+  optional FillerParameter bias_filler = 4;      // The filler for the bias
 
   // The first axis to be lumped into a single inner product computation;
   // all preceding axes are retained in the output.
@@ -1085,8 +1085,9 @@ message InnerProductParameter {
   optional int32 axis = 5 [default = 1];
   // Specify whether to transpose the weight matrix or not.
   // If transpose == true, any operations will be performed on the transpose
-  // of the weight matrix. The weight matrix itself is not going to be transposed
-  // but rather the transfer flag of operations will be toggled accordingly.
+  // of the weight matrix. The weight matrix itself is not going to be
+  // transposed but rather the transfer flag of operations will be toggled
+  // accordingly.
   optional bool transpose = 6 [default = false];
 }
 
@@ -1181,8 +1182,8 @@ message MultiBoxLossParameter {
   // If true, encode the variance of prior box in the loc loss target instead of
   // in bbox.
   optional bool encode_variance_in_target = 16 [default = false];
-  // If true, map all object classes to agnostic class. It is useful for learning
-  // objectness detector.
+  // If true, map all object classes to agnostic class. It is useful for
+  // learning objectness detector.
   optional bool map_object_to_agnostic = 17 [default = false];
   // If true, ignore cross boundary bbox during matching.
   // Cross boundary bbox is a bbox who is outside of the image region.
@@ -1193,7 +1194,8 @@ message MultiBoxLossParameter {
   // Mining type during training.
   //   NONE : use all negatives.
   //   MAX_NEGATIVE : select negatives based on the score.
-  //   HARD_EXAMPLE : select hard examples based on "Training Region-based Object Detectors with Online Hard Example Mining", Shrivastava et.al.
+  //   HARD_EXAMPLE : select hard examples based on "Training Region-based
+  //   Object Detectors with Online Hard Example Mining", Shrivastava et.al.
   enum MiningType {
     NONE = 0;
     MAX_NEGATIVE = 1;
@@ -1245,18 +1247,18 @@ message PoolingParameter {
     AVE = 1;
     STOCHASTIC = 2;
   }
-  optional PoolMethod pool = 1 [default = MAX]; // The pooling method
+  optional PoolMethod pool = 1 [default = MAX];  // The pooling method
   // Pad, kernel size, and stride are all given as a single value for equal
   // dimensions in height and width or as Y, X pairs.
-  optional uint32 pad = 4 [default = 0]; // The padding size (equal in Y, X)
-  optional uint32 pad_h = 9 [default = 0]; // The padding height
-  optional uint32 pad_w = 10 [default = 0]; // The padding width
-  optional uint32 kernel_size = 2; // The kernel size (square)
-  optional uint32 kernel_h = 5; // The kernel height
-  optional uint32 kernel_w = 6; // The kernel width
-  optional uint32 stride = 3 [default = 1]; // The stride (equal in Y, X)
-  optional uint32 stride_h = 7; // The stride height
-  optional uint32 stride_w = 8; // The stride width
+  optional uint32 pad = 4 [default = 0];     // The padding size (equal in Y, X)
+  optional uint32 pad_h = 9 [default = 0];   // The padding height
+  optional uint32 pad_w = 10 [default = 0];  // The padding width
+  optional uint32 kernel_size = 2;           // The kernel size (square)
+  optional uint32 kernel_h = 5;              // The kernel height
+  optional uint32 kernel_w = 6;              // The kernel width
+  optional uint32 stride = 3 [default = 1];  // The stride (equal in Y, X)
+  optional uint32 stride_h = 7;              // The stride height
+  optional uint32 stride_w = 8;              // The stride width
   enum Engine {
     DEFAULT = 0;
     CAFFE = 1;
@@ -1326,9 +1328,9 @@ message PythonParameter {
   // string, dictionary in Python dict format, JSON, etc. You may parse this
   // string in `setup` method and use it in `forward` and `backward`.
   optional string param_str = 3 [default = ''];
-  // Whether this PythonLayer is shared among worker solvers during data parallelism.
-  // If true, each worker solver sequentially run forward from this layer.
-  // This value should be set true if you are using it as a data layer.
+  // Whether this PythonLayer is shared among worker solvers during data
+  // parallelism. If true, each worker solver sequentially run forward from this
+  // layer. This value should be set true if you are using it as a data layer.
   optional bool share_in_parallel = 4 [default = false];
 }
 
@@ -1338,8 +1340,8 @@ message RecurrentParameter {
   // must be explicitly set to non-zero.
   optional uint32 num_output = 1 [default = 0];
 
-  optional FillerParameter weight_filler = 2; // The filler for the weight
-  optional FillerParameter bias_filler = 3; // The filler for the bias
+  optional FillerParameter weight_filler = 2;  // The filler for the weight
+  optional FillerParameter bias_filler = 3;    // The filler for the bias
 
   // Whether to enable displaying debug_info in the unrolled recurrent net.
   optional bool debug_info = 4 [default = false];
@@ -1360,7 +1362,7 @@ message ReductionParameter {
     MEAN = 4;
   }
 
-  optional ReductionOp operation = 1 [default = SUM]; // reduction operation
+  optional ReductionOp operation = 1 [default = SUM];  // reduction operation
 
   // The first axis to reduce to a scalar -- may be negative to index from the
   // end (e.g., -1 for the last axis).
@@ -1377,7 +1379,7 @@ message ReductionParameter {
   // often useful for creating new loss functions.
   optional int32 axis = 2 [default = 0];
 
-  optional float coeff = 3 [default = 1.0]; // coefficient for output
+  optional float coeff = 3 [default = 1.0];  // coefficient for output
 }
 
 // Message that stores parameters used by ReLULayer
@@ -1464,8 +1466,8 @@ message ReshapeParameter {
 message ROIPoolingParameter {
   // Pad, kernel size, and stride are all given as a single value for equal
   // dimensions in height and width or as Y, X pairs.
-  optional uint32 pooled_h = 1 [default = 0]; // The pooled output height
-  optional uint32 pooled_w = 2 [default = 0]; // The pooled output width
+  optional uint32 pooled_h = 1 [default = 0];  // The pooled output height
+  optional uint32 pooled_w = 2 [default = 0];  // The pooled output width
   // Multiplicative spatial scale factor to translate ROI coords from their
   // input scale to the scale used when pooling
   optional float spatial_scale = 3 [default = 1];
@@ -1566,10 +1568,10 @@ message TileParameter {
 
 // Message that stores parameters used by ThresholdLayer
 message ThresholdParameter {
-  optional float threshold = 1 [default = 0]; // Strictly positive values
+  optional float threshold = 1 [default = 0];  // Strictly positive values
 }
 
-message VideoDataParameter{
+message VideoDataParameter {
   enum VideoType {
     WEBCAM = 0;
     VIDEO = 1;
@@ -1621,7 +1623,7 @@ message SPPParameter {
     STOCHASTIC = 2;
   }
   optional uint32 pyramid_height = 1;
-  optional PoolMethod pool = 2 [default = MAX]; // The pooling method
+  optional PoolMethod pool = 2 [default = MAX];  // The pooling method
   enum Engine {
     DEFAULT = 0;
     CAFFE = 1;
@@ -1726,30 +1728,30 @@ message V1LayerParameter {
 // DEPRECATED: V0LayerParameter is the old way of specifying layer parameters
 // in Caffe.  We keep this message type around for legacy support.
 message V0LayerParameter {
-  optional string name = 1; // the layer name
-  optional string type = 2; // the string to specify the layer type
+  optional string name = 1;  // the layer name
+  optional string type = 2;  // the string to specify the layer type
 
   // Parameters to specify layers with inner products.
-  optional uint32 num_output = 3; // The number of outputs for the layer
-  optional bool biasterm = 4 [default = true]; // whether to have bias terms
-  optional FillerParameter weight_filler = 5; // The filler for the weight
-  optional FillerParameter bias_filler = 6; // The filler for the bias
+  optional uint32 num_output = 3;  // The number of outputs for the layer
+  optional bool biasterm = 4 [default = true];  // whether to have bias terms
+  optional FillerParameter weight_filler = 5;   // The filler for the weight
+  optional FillerParameter bias_filler = 6;     // The filler for the bias
 
-  optional uint32 pad = 7 [default = 0]; // The padding size
-  optional uint32 kernelsize = 8; // The kernel size
-  optional uint32 group = 9 [default = 1]; // The group size for group conv
-  optional uint32 stride = 10 [default = 1]; // The stride
+  optional uint32 pad = 7 [default = 0];      // The padding size
+  optional uint32 kernelsize = 8;             // The kernel size
+  optional uint32 group = 9 [default = 1];    // The group size for group conv
+  optional uint32 stride = 10 [default = 1];  // The stride
   enum PoolMethod {
     MAX = 0;
     AVE = 1;
     STOCHASTIC = 2;
   }
-  optional PoolMethod pool = 11 [default = MAX]; // The pooling method
-  optional float dropout_ratio = 12 [default = 0.5]; // dropout ratio
+  optional PoolMethod pool = 11 [default = MAX];      // The pooling method
+  optional float dropout_ratio = 12 [default = 0.5];  // dropout ratio
 
-  optional uint32 local_size = 13 [default = 5]; // for local response norm
-  optional float alpha = 14 [default = 1.]; // for local response norm
-  optional float beta = 15 [default = 0.75]; // for local response norm
+  optional uint32 local_size = 13 [default = 5];  // for local response norm
+  optional float alpha = 14 [default = 1.];       // for local response norm
+  optional float beta = 15 [default = 0.75];      // for local response norm
   optional float k = 22 [default = 1.];
 
   // For data layers, specify the data source
@@ -1864,9 +1866,9 @@ message DimensionStatistics {
 
 message YoloTargetParameter {
   optional float neg_rois_ratio = 1 [default = 1.0];
-  optional float ign_threshold = 2 [default = 0.6];     // ignore iou threshold
-  optional float neg_threshold = 3 [default = 0.1];     // negative iou threshold
-  optional float min_height = 4 [default = 0.05];       // min height for neg roi
+  optional float ign_threshold = 2 [default = 0.6];  // ignore iou threshold
+  optional float neg_threshold = 3 [default = 0.1];  // negative iou threshold
+  optional float min_height = 4 [default = 0.05];    // min height for neg roi
   optional bool bias_match = 5 [default = true];
   optional bool rescore = 6 [default = true];
   optional int32 ori_cyc = 7 [default = 1];
@@ -1895,8 +1897,7 @@ message RegionProposalParameter {
   optional int32 keep_top_k = 16 [default = -1];
   optional float pos_threshold = 17;
   optional float neg_threshold = 18;
-  optional int32 neg_ratio = 19[default = 3];
-
+  optional int32 neg_ratio = 19 [default = 3];
 }
 message RegionParameter {
   repeated AnchorBox anchorbox = 1;
@@ -1917,17 +1918,17 @@ message RegionParameter {
   optional float threshold = 12;
   optional uint32 tricky_iter = 13 [default = 400];
   optional bool use_l1_loss = 16 [default = false];
-  optional bool use_twice_softmax=17 [default = false];
-  optional bool is_anchor_normalized=18 [default = false];
-  repeated bool ori_enable=21;
-  optional string anchorfile=22 [default="anchor.txt"];
-  optional bool use_side_box_v2=23 [default=false];
-  optional bool use_side_box_v3=24 [default=false];
+  optional bool use_twice_softmax = 17 [default = false];
+  optional bool is_anchor_normalized = 18 [default = false];
+  repeated bool ori_enable = 21;
+  optional string anchorfile = 22 [default = "anchor.txt"];
+  optional bool use_side_box_v2 = 23 [default = false];
+  optional bool use_side_box_v3 = 24 [default = false];
   optional int32 ori_cycle = 25 [default = 1];
 }
-message AnchorBox{
-  optional float w=1;
-  optional float h=2;
+message AnchorBox {
+  optional float w = 1;
+  optional float h = 2;
 }
 message ReorgParameter {
   optional uint32 stride = 1;

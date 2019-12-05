@@ -2,6 +2,6 @@ syntax = "proto2";
 
 package apollo.perception.camera.multicue;
 message MulticueParam {
-    optional float min_dimension_val = 1 [default = 0.2];
-    optional bool check_dimension = 2 [default = true];
+  optional float min_dimension_val = 1 [default = 0.2];
+  optional bool check_dimension = 2 [default = true];
 }

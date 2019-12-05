@@ -14,5 +14,5 @@ message ImpendingCollisionEdge {
 
 message ImpendingCollisionEdges {
   repeated ImpendingCollisionEdge impending_collision_edge = 1;  // obstacles
-  optional apollo.common.Header header = 2;                             // Header
+  optional apollo.common.Header header = 2;                      // Header
 }
