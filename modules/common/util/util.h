@@ -29,7 +29,6 @@
 #include <utility>
 #include <vector>
 
-#include "absl/memory/memory.h"
 #include "cyber/common/log.h"
 #include "cyber/common/types.h"
 #include "modules/common/math/vec2d.h"

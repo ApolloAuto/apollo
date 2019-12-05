@@ -7,10 +7,6 @@ cc_library(
     srcs = ["util.cc"],
     hdrs = ["util.h"],
     deps = [
-        ":json_util",
-        ":lru_cache",
-        ":points_downsampler",
-        ":string_util",
         "//cyber/common:types",
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
