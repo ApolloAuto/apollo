@@ -179,8 +179,18 @@ bool SpeedDecider::IsFollowTooClose(const Obstacle& obstacle) const {
   }
   const double distance =
       obstacle.path_st_boundary().min_s() - FLAGS_min_stop_distance_obstacle;
-  static constexpr double decel = 1.0;
-  return distance < std::pow((ego_speed - obs_speed), 2) * 0.5 / decel;
+  static constexpr double lane_follow_max_decel = 1.0;
+  static constexpr double lane_change_max_decel = 3.0;
+  auto* planning_status = PlanningContext::Instance()
+                              ->mutable_planning_status()
+                              ->mutable_change_lane();
+  double distance_numerator = std::pow((ego_speed - obs_speed), 2) * 0.5;
+  double distance_denominator = lane_follow_max_decel;
+  if (planning_status->has_status() &&
+      planning_status->status() == ChangeLaneStatus::IN_CHANGE_LANE) {
+    distance_denominator = lane_change_max_decel;
+  }
+  return distance < distance_numerator / distance_denominator;
 }
 
 Status SpeedDecider::MakeObjectDecision(
