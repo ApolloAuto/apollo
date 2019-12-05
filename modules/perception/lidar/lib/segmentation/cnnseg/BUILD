@@ -85,8 +85,7 @@ cc_test(
 #cc_test(
 #    name = "feature_generator_test",
 #    size = "small",
-#    srcs = [#        "feature_generator_test.cc"
-#    ],
+#    srcs = ["feature_generator_test.cc"],
 #    deps = [
 #        ":feature_generator",
 #        "//modules/perception/common:perception_gflags",

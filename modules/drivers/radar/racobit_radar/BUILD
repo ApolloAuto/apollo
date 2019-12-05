@@ -18,8 +18,7 @@ cc_library(
 # cc_test(
 #     name = "racobit_radar_message_manager_test",
 #     size = "small",
-#     srcs = [#         "racobit_radar_message_manager_test.cc"
-#     ],
+#     srcs = ["racobit_radar_message_manager_test.cc"],
 #     deps = [
 #         "racobit_radar_message_manager",
 #         "@gtest//:main",

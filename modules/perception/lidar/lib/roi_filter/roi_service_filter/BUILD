@@ -32,8 +32,7 @@ cc_library(
 #cc_test(
 #    name = "roi_service_filter_test",
 #    size = "small",
-#    srcs = [#        "roi_service_filter_test.cc"
-#    ],
+#    srcs = ["roi_service_filter_test.cc"],
 #    deps = [
 #        ":roi_service_filter",
 #        "//modules/perception/common:perception_gflags",
