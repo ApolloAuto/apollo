@@ -238,13 +238,13 @@ bool CheckPullOverPositionByDistance(
 
 bool CheckADCReadyToCruise(Frame* frame,
                            const ScenarioParkAndGoConfig& scenario_config) {
-  common::math::Vec2d adc_position = {
-      common::VehicleStateProvider::Instance()->x(),
-      common::VehicleStateProvider::Instance()->y()};
-  const double adc_heading =
-      common::VehicleStateProvider::Instance()->heading();
+  auto vehicle_status = common::VehicleStateProvider::Instance();
+  common::math::Vec2d adc_position = {vehicle_status->x(), vehicle_status->y()};
+  const double adc_heading = vehicle_status->heading();
   const ReferenceLineInfo& reference_line_info =
       frame->reference_line_info().front();
+  common::SLPoint adc_position_sl;
+  reference_line_info.reference_line().XYToSL(adc_position, &adc_position_sl);
   bool is_near_front_obstacle =
       CheckADCSurroundObstacles(adc_position, adc_heading, frame,
                                 scenario_config.front_obstacle_buffer());
@@ -257,15 +257,11 @@ bool CheckADCReadyToCruise(Frame* frame,
   // check gear status
   // TODO(SHU): align with vehicle parameters
   static constexpr double kMinSpeed = 0.1;  // m/s
-  if ((common::VehicleStateProvider::Instance()->gear() ==
-           canbus::Chassis::GEAR_DRIVE ||
-       std::fabs(common::VehicleStateProvider::Instance()
-                     ->vehicle_state()
-                     .linear_velocity()) < kMinSpeed) &&
-      !is_near_front_obstacle && heading_align_w_reference_line) {
-    return true;
-  }
-  return false;
+  return ((vehicle_status->gear() == canbus::Chassis::GEAR_DRIVE ||
+           std::fabs(vehicle_status->vehicle_state().linear_velocity()) <
+               kMinSpeed) &&
+          !is_near_front_obstacle && heading_align_w_reference_line &&
+          std::fabs(adc_position_sl.l()) < 0.5);
 }
 
 /**
