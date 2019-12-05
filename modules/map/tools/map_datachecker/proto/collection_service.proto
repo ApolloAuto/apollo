@@ -4,14 +4,19 @@ package apollo.hdmap;
 import "modules/map/tools/map_datachecker/proto/collection_check_message.proto";
 // MAP
 service CollectionCheckerService {
+  rpc ServiceDynamicAlign(DynamicAlignRequest) returns (DynamicAlignResponse) {
+  }
 
-    rpc ServiceDynamicAlign (DynamicAlignRequest) returns (DynamicAlignResponse) {}
+  rpc ServiceStaticAlign(StaticAlignRequest) returns (StaticAlignResponse) {
+  }
 
-    rpc ServiceStaticAlign (StaticAlignRequest) returns (StaticAlignResponse) {}
+  rpc ServiceEightRoute(EightRouteRequest) returns (EightRouteResponse) {
+  }
 
-    rpc ServiceEightRoute (EightRouteRequest) returns (EightRouteResponse) {}
+  rpc ServiceChannelVerify(ChannelVerifyRequest)
+      returns (ChannelVerifyResponse) {
+  }
 
-    rpc ServiceChannelVerify (ChannelVerifyRequest) returns (ChannelVerifyResponse) {}
-
-    rpc ServiceLoopsVerify (LoopsVerifyRequest) returns (LoopsVerifyResponse) {}
+  rpc ServiceLoopsVerify(LoopsVerifyRequest) returns (LoopsVerifyResponse) {
+  }
 }
