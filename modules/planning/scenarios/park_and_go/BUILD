@@ -20,7 +20,6 @@ cc_library(
     deps = [
         "//cyber/common:log",
         "//external:gflags",
-        "//modules/common",
         "//modules/common/util:factory",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:planning_common",

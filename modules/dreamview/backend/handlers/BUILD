@@ -8,7 +8,6 @@ cc_library(
     hdrs = ["websocket_handler.h"],
     copts = ['-DMODULE_NAME=\\"dreamview\\"'],
     deps = [
-        "//modules/common",
         "//modules/common/time",
         "//modules/common/util:map_util",
         "//third_party/json",

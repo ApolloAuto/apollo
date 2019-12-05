@@ -120,7 +120,6 @@ cc_test(
     srcs = ["factory_test.cc"],
     deps = [
         ":factory",
-        "//modules/common",
         "@gtest//:main",
     ],
 )

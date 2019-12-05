@@ -23,7 +23,6 @@ cc_library(
     deps = [
         ":conti_radar_message_manager",
         "//cyber",
-        "//modules/common",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
         "//modules/drivers/canbus/can_client:can_client_factory",

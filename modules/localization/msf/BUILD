@@ -20,7 +20,6 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//modules/common",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
         "//modules/common/proto:geometry_proto",
