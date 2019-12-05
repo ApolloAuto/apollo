@@ -7,7 +7,6 @@ cc_library(
     srcs = ["util.cc"],
     hdrs = ["util.h"],
     deps = [
-        ":future",
         ":json_util",
         ":lru_cache",
         ":points_downsampler",
