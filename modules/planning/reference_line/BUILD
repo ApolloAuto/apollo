@@ -100,6 +100,7 @@ cc_library(
         ":reference_line",
         ":reference_line_smoother",
         "//modules/common/math",
+        "//modules/common/time",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/math:discrete_points_math",
         "//modules/planning/math/discretized_points_smoothing:cos_theta_smoother",

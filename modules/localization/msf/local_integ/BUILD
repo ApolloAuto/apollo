@@ -18,6 +18,7 @@ cc_library(
     deps = [
         "//external:gflags",
         "//modules/common/status",
+        "//modules/common/time",
         "//modules/drivers/gnss/proto:gnss_best_pose_proto",
         "//modules/drivers/gnss/proto:gnss_proto",
         "//modules/drivers/gnss/proto:gnss_raw_observation_proto",

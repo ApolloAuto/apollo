@@ -15,7 +15,6 @@ cc_library(
         "//cyber/common:types",
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
-        "//modules/common/time",
     ],
 )
 

@@ -38,7 +38,7 @@ cc_binary(
     srcs = ["can_client_tool.cc"],
     deps = [
         "//external:gflags",
-        "//modules/common",
+        "//modules/common/time",
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/proto:canbus_proto",
     ],
