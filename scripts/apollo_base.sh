@@ -81,6 +81,8 @@ function check_in_docker() {
 }
 
 function set_lib_path() {
+  export LD_LIBRARY_PATH=/usr/lib:/usr/lib/x86_64-linux-gnu
+
   LIB_USER=/usr/lib/$(uname -m)-linux-$USER
 
   if [ -d "${LIB_USER}" ]; then
