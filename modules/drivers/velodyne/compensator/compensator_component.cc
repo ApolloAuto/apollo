@@ -62,10 +62,14 @@ bool CompensatorComponent::Proc(
   }
   point_cloud_compensated->Clear();
   if (compensator_->MotionCompensation(point_cloud, point_cloud_compensated)) {
-    uint64_t diff = cyber::Time().Now().ToNanosecond() - start;
-    AINFO << "compenstator diff:" << diff
+    const auto now = cyber::Time().Now().ToNanosecond();
+    auto diff = now - start;
+    auto meta_diff = now - point_cloud_compensated->header().lidar_timestamp();
+    AINFO << "compenstator diff:" << diff /1000000 << "ms"
+          << "meta diff: " << meta_diff / 1000000 << "ms"
           << ";meta:" << point_cloud_compensated->header().lidar_timestamp();
     point_cloud_compensated->mutable_header()->set_sequence_num(seq_);
+
     writer_->Write(point_cloud_compensated);
     seq_++;
   }
