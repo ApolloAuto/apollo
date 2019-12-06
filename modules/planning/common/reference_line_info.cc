@@ -790,6 +790,20 @@ void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
   if (!prev_advice->has_advice()) {
     prev_advice->set_advice(EngageAdvice::DISALLOW_ENGAGE);
   }
+
+  // when started from offlane
+  if (prev_advice->advice() == EngageAdvice::READY_TO_ENGAGE) {
+    if (vehicle_state_.driving_mode() !=
+        Chassis::DrivingMode::Chassis_DrivingMode_COMPLETE_AUTO_DRIVE) {
+      prev_advice->set_advice(EngageAdvice::READY_TO_ENGAGE);
+    } else {
+      prev_advice->set_advice(EngageAdvice::KEEP_ENGAGED);
+    }
+    prev_advice->clear_reason();
+    engage_advice->CopyFrom(*prev_advice);
+    return;
+  }
+
   if (!IsDrivable()) {
     if (prev_advice->advice() != EngageAdvice::DISALLOW_ENGAGE) {
       prev_advice->set_advice(EngageAdvice::PREPARE_DISENGAGE);
