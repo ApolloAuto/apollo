@@ -57,9 +57,9 @@ class StoryTellingContainer : public Container {
 
   /**
    * @brief Get ADC junction id
-   * @return A pointer to ADC junction id
+   * @return A reference of ADC_junction_id
    */
-  std::string ADCJunctionId() const;
+  const std::string& ADCJunctionId() const;
 
   /**
    * @brief Compute ADC's distance to junction
