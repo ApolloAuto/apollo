@@ -34,7 +34,6 @@ namespace planning {
 namespace scenario {
 namespace park_and_go {
 
-using apollo::common::EngageAdvice;
 using apollo::common::TrajectoryPoint;
 
 Stage::StageStatus ParkAndGoStageCruise::Process(
@@ -51,7 +50,6 @@ Stage::StageStatus ParkAndGoStageCruise::Process(
 
   const ReferenceLineInfo& reference_line_info =
       frame->reference_line_info().front();
-
   // check ADC status:
   // 1. At routing beginning: stage finished
   ParkAndGoStatus status =
