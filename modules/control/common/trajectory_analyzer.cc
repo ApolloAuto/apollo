@@ -183,8 +183,6 @@ TrajectoryPoint TrajectoryAnalyzer::QueryNearestPointByRelativeTime(
 
 TrajectoryPoint TrajectoryAnalyzer::QueryNearestPointByPosition(
     const double x, const double y) const {
-  CHECK_GT(trajectory_points_.size(), 0);
-
   double d_min = PointDistanceSquare(trajectory_points_.front(), x, y);
   size_t index_min = 0;
 
