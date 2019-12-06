@@ -54,16 +54,18 @@
 执行如下步骤将主机和天线连接到Apollo系统：
 
 - 将两根射频线的TNC公头连接上卫星天线的TNC母口
+![IMU_ANTE](../images/imu_ante.png)
 - 将射频线的SMA母口连接上IMU主机的SMA公口，车尾天线为主天线，将其连接在IMU的Primary接口上
+![IMU_TNC](../images/imu_tnc.png)
 - 将数据/电源线缆的公口和IMU主机的母口连接
+![IMU_POWER_DATA](../images/imu_power_data.png)
 - 将数据/电源线缆的串口母头连接上工控机的串口公口COM1，此线若过短，请使用串口延长线。
+![IMU_COM](../images/imu_com.png)
 - 将数据/电源线缆的网线母头和路由器LAN口接出来的有线网的水晶头相连接
+![IMU_ETHERNET](../images/imu_ethernet.png)
 - 将数据/电源线缆的USB接口连接上IPC的USB接口
+![IMU_USB](../images/imu_usb.png)
 - 将数据/电源线缆的电源线接口和小车的12V电源接口连接起来
-
-请参考下述图片：
-
-![M2_connection](../images/gps_connection.jpeg)
 
 #### 量取杆臂值
 
