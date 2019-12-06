@@ -32,6 +32,10 @@ std::shared_ptr<const hdmap::JunctionInfo> StoryTellingContainer::ADCJunction()
   return PredictionMap::JunctionById(adc_junction_id);
 }
 
+std::string StoryTellingContainer::ADCJunctionId() const {
+  return close_to_junction_.junction_id();
+}
+
 double StoryTellingContainer::ADCDistanceToJunction() const {
   return close_to_junction_.distance();
 }
