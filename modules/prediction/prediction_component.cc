@@ -89,7 +89,7 @@ bool PredictionComponent::Init() {
       node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
 
   container_writer_ =
-      node_->CreateWriter<ContainerOutput>(FLAGS_container_topic_name);
+      node_->CreateWriter<SubmoduleOutput>(FLAGS_container_topic_name);
 
   adc_container_writer_ = node_->CreateWriter<ADCTrajectoryContainer>(
       FLAGS_adccontainer_topic_name);
@@ -145,8 +145,7 @@ bool PredictionComponent::ContainerSubmoduleProcess(
   submodule_output.set_perception_error_code(
       perception_obstacles->error_code());
   submodule_output.set_frame_start_time(frame_start_time);
-  ContainerOutput container_output(std::move(submodule_output));
-  container_writer_->Write(std::make_shared<ContainerOutput>(container_output));
+  container_writer_->Write(std::make_shared<SubmoduleOutput>(submodule_output));
   ADCTrajectoryContainer adc_container = *adc_trajectory_container_ptr;
   adc_container_writer_->Write(
       std::make_shared<ADCTrajectoryContainer>(adc_container));

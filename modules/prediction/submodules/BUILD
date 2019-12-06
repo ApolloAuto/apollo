@@ -3,28 +3,6 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "container_submodule_lib",
-    srcs = ["container_submodule.cc"],
-    hdrs = ["container_submodule.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"prediction\\\"",
-    ],
-    deps = [
-        "//cyber",
-        "//modules/common/adapters:adapter_gflags",
-        "//modules/common/adapters/proto:adapter_config_proto",
-        "//modules/common/time",
-        "//modules/perception/proto:perception_proto",
-        "//modules/prediction/common:message_process",
-        "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/container:container_manager",
-        "//modules/prediction/container/obstacles:obstacles_container",
-        "//modules/storytelling/proto:story_proto",
-    ],
-    alwayslink = True,
-)
-
-cc_library(
     name = "submodule_output",
     srcs = ["submodule_output.cc"],
     hdrs = ["submodule_output.h"],
@@ -37,37 +15,6 @@ cc_library(
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container/obstacles:obstacle",
     ],
-)
-
-cc_library(
-    name = "container_output",
-    srcs = ["container_output.cc"],
-    hdrs = ["container_output.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"prediction\\\"",
-    ],
-    deps = [
-        "//modules/prediction/submodules:submodule_output",
-    ],
-)
-
-cc_library(
-    name = "evaluator_output",
-    srcs = ["evaluator_output.cc"],
-    hdrs = ["evaluator_output.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"prediction\\\"",
-    ],
-    deps = [
-        "//modules/prediction/submodules:submodule_output",
-    ],
-)
-
-cc_binary(
-    name = "container_submodule.so",
-    linkshared = True,
-    linkstatic = False,
-    deps = [":container_submodule_lib"],
 )
 
 cc_library(
@@ -86,7 +33,6 @@ cc_library(
         "//modules/prediction/common:message_process",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/evaluator:evaluator_manager",
-        "//modules/prediction/submodules:evaluator_output",
     ],
     alwayslink = True,
 )
@@ -116,7 +62,6 @@ cc_library(
         "//modules/prediction/container/adc_trajectory:adc_trajectory_container",
         "//modules/prediction/predictor:predictor_manager",
         "//modules/prediction/proto:prediction_proto",
-        "//modules/prediction/submodules:evaluator_output",
     ],
     alwayslink = True,
 )

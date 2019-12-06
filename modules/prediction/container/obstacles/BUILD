@@ -16,7 +16,7 @@ cc_library(
         "//modules/prediction/container",
         "//modules/prediction/container/obstacles:obstacle",
         "//modules/prediction/proto:prediction_proto",
-        "//modules/prediction/submodules:container_output",
+        "//modules/prediction/submodules:submodule_output",
     ],
 )
 
