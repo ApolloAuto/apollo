@@ -29,6 +29,7 @@
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
 #include "modules/prediction/container/pose/pose_container.h"
+#include "modules/prediction/container/storytelling/storytelling_container.h"
 
 namespace apollo {
 namespace prediction {
@@ -171,7 +172,7 @@ void ObstaclesPrioritizer::AssignIgnoreLevel() {
   obstacles_container->SetConsideredObstacleIds();
 }
 
-void ObstaclesPrioritizer::AssignCautionLevel(const Scenario& scenario) {
+void ObstaclesPrioritizer::AssignCautionLevel() {
   auto obstacles_container =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
@@ -189,10 +190,13 @@ void ObstaclesPrioritizer::AssignCautionLevel(const Scenario& scenario) {
     AERROR << "Ego vehicle has no history";
     return;
   }
-
-  if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id()) {
+  auto storytelling_container =
+      ContainerManager::Instance()->GetContainer<StoryTellingContainer>(
+          AdapterConfig::STORYTELLING);
+  if (storytelling_container->ADCDistanceToJunction() <
+      FLAGS_junction_distance_threshold) {
     AssignCautionLevelInJunction(*ego_vehicle, obstacles_container,
-                                 scenario.junction_id());
+                                 storytelling_container->ADCJunctionId());
   }
   AssignCautionLevelCruiseKeepLane(*ego_vehicle, obstacles_container);
   AssignCautionLevelCruiseChangeLane(*ego_vehicle, obstacles_container);
@@ -385,10 +389,12 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine(
     }
     double start_x = latest_feature_ptr->position().x();
     double start_y = latest_feature_ptr->position().y();
-    double end_x = start_x + FLAGS_caution_pedestrian_approach_time *
-                                 latest_feature_ptr->raw_velocity().x();
-    double end_y = start_y + FLAGS_caution_pedestrian_approach_time *
-                                 latest_feature_ptr->raw_velocity().y();
+    double end_x = start_x +
+                   FLAGS_caution_pedestrian_approach_time *
+                       latest_feature_ptr->raw_velocity().x();
+    double end_y = start_y +
+                   FLAGS_caution_pedestrian_approach_time *
+                       latest_feature_ptr->raw_velocity().y();
     std::vector<std::string> nearby_lane_ids = PredictionMap::NearbyLaneIds(
         {start_x, start_y}, FLAGS_pedestrian_nearby_lane_search_radius);
     if (nearby_lane_ids.empty()) {
