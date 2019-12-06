@@ -258,3 +258,7 @@ DECLARE_double(short_path_length_threshold);
 DECLARE_uint64(trajectory_stitching_preserved_length);
 
 DECLARE_bool(use_st_drivable_boundary);
+
+DECLARE_bool(use_smoothed_dp_guide_line);
+
+DECLARE_bool(use_soft_bound_in_nonlinear_speed_opt);

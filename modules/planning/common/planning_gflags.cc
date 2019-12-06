@@ -515,3 +515,9 @@ DEFINE_bool(use_st_drivable_boundary, false,
 
 DEFINE_bool(enable_reuse_path_in_lane_follow, false,
             "True to enable reuse path in lane follow");
+DEFINE_bool(
+    use_smoothed_dp_guide_line, false,
+    "True to penalize speed optimization result to be close to dp guide line");
+
+DEFINE_bool(use_soft_bound_in_nonlinear_speed_opt, true,
+            "False to disallow soft bound in nonlinear speed opt");
