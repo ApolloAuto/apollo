@@ -24,6 +24,7 @@ namespace planning {
 namespace scenario {
 namespace park_and_go {
 
+using apollo::common::EngageAdvice;
 using apollo::common::TrajectoryPoint;
 
 Stage::StageStatus ParkAndGoStageCheck::Process(
@@ -39,6 +40,12 @@ Stage::StageStatus ParkAndGoStageCheck::Process(
     AERROR << "ParkAndGoStageAdjust planning error";
     return StageStatus::ERROR;
   }
+
+  // allow engage
+  auto* engage_advice = PlanningContext::Instance()
+                            ->mutable_planning_status()
+                            ->mutable_engage_advice();
+  engage_advice->set_advice(EngageAdvice::READY_TO_ENGAGE);
 
   bool ready_to_cruise =
       scenario::util::CheckADCReadyToCruise(frame, scenario_config_);
