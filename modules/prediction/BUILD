@@ -18,9 +18,9 @@ cc_library(
         "//modules/prediction/proto:offline_features_proto",
         "//modules/prediction/scenario:scenario_manager",
         "//modules/prediction/util:data_extraction",
-        "//modules/prediction/submodules:container_submodule_lib",
         "//modules/prediction/submodules:evaluator_submodule_lib",
         "//modules/prediction/submodules:predictor_submodule_lib",
+        "//modules/prediction/submodules:submodule_output",
     ],
     alwayslink = True,
 )

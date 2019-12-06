@@ -27,7 +27,7 @@
 #include "cyber/component/component.h"
 #include "modules/prediction/common/message_process.h"
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
-#include "modules/prediction/submodules/container_output.h"
+#include "modules/prediction/submodules/submodule_output.h"
 #include "modules/storytelling/proto/story.pb.h"
 
 /**
@@ -89,7 +89,7 @@ class PredictionComponent
 
   std::shared_ptr<cyber::Writer<PredictionObstacles>> prediction_writer_;
 
-  std::shared_ptr<cyber::Writer<ContainerOutput>> container_writer_;
+  std::shared_ptr<cyber::Writer<SubmoduleOutput>> container_writer_;
 
   std::shared_ptr<cyber::Writer<ADCTrajectoryContainer>> adc_container_writer_;
 };
