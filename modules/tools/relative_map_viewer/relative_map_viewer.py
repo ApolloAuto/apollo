@@ -173,7 +173,7 @@ def update(frame_number):
     while y < 200:
         ax.plot([10, -10], [y, y], ls='-', c='g', alpha=0.3)
         y = y + 10
-    plt.yticks(np.arange(10, 200, 10))
+    plt.yticks(np.arrange(10, 200, 10))
     adc = plt.Circle((0, 0), 0.3, color='r')
     plt.gcf().gca().add_artist(adc)
     ax.relim()
