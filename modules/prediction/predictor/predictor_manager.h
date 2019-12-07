@@ -59,7 +59,8 @@ class PredictorManager {
    * @param Adc trajectory container
    * @param Obstacles container
    */
-  void Run(const ADCTrajectoryContainer* adc_trajectory_container,
+  void Run(const apollo::perception::PerceptionObstacles& perception_obstacles,
+           const ADCTrajectoryContainer* adc_trajectory_container,
            ObstaclesContainer* obstacles_container);
 
   /**
@@ -100,10 +101,13 @@ class PredictorManager {
    */
   void RegisterPredictors();
 
-  void PredictObstacles(const ADCTrajectoryContainer* adc_trajectory_container,
-                        ObstaclesContainer* obstacles_container);
+  void PredictObstacles(
+      const apollo::perception::PerceptionObstacles& perception_obstacles,
+      const ADCTrajectoryContainer* adc_trajectory_container,
+      ObstaclesContainer* obstacles_container);
 
   void PredictObstaclesInParallel(
+      const apollo::perception::PerceptionObstacles& perception_obstacles,
       const ADCTrajectoryContainer* adc_trajectory_container,
       ObstaclesContainer* obstacles_container);
 

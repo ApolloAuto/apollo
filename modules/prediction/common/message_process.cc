@@ -236,8 +236,9 @@ void MessageProcess::OnPerception(
     return;
   }
   // Make predictions
-  PredictorManager::Instance()->Run(ptr_ego_trajectory_container,
-                                    ptr_obstacles_container);
+  PredictorManager::Instance()->Run(
+      perception_obstacles, ptr_ego_trajectory_container,
+      ptr_obstacles_container);
 
   // Get predicted obstacles
   *prediction_obstacles = PredictorManager::Instance()->prediction_obstacles();

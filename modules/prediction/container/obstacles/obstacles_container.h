@@ -151,8 +151,6 @@ class ObstaclesContainer : public Container {
   std::vector<int> curr_frame_movable_obstacle_ids_;
   std::vector<int> curr_frame_unmovable_obstacle_ids_;
   std::vector<int> curr_frame_considered_obstacle_ids_;
-  std::unordered_map<int, apollo::perception::PerceptionObstacle>
-      curr_frame_id_perception_obstacle_map_;
 };
 
 }  // namespace prediction

@@ -41,6 +41,7 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
+using apollo::perception::PerceptionObstacles;
 using apollo::perception::PerceptionObstacle;
 using IdObstacleListMap = std::unordered_map<int, std::list<Obstacle*>>;
 using IdPredictionObstacleMap =
@@ -134,21 +135,27 @@ Predictor* PredictorManager::GetPredictor(
 }
 
 void PredictorManager::Run(
+    const PerceptionObstacles& perception_obstacles,
     const ADCTrajectoryContainer* adc_trajectory_container,
     ObstaclesContainer* obstacles_container) {
   prediction_obstacles_.Clear();
 
   if (FLAGS_enable_multi_thread) {
-    PredictObstaclesInParallel(adc_trajectory_container, obstacles_container);
+    PredictObstaclesInParallel(
+        perception_obstacles, adc_trajectory_container, obstacles_container);
   } else {
-    PredictObstacles(adc_trajectory_container, obstacles_container);
+    PredictObstacles(
+        perception_obstacles, adc_trajectory_container, obstacles_container);
   }
 }
 
 void PredictorManager::PredictObstacles(
+    const PerceptionObstacles& perception_obstacles,
     const ADCTrajectoryContainer* adc_trajectory_container,
     ObstaclesContainer* obstacles_container) {
-  for (const int id : obstacles_container->curr_frame_obstacle_ids()) {
+  for (const PerceptionObstacle& perception_obstacle :
+       perception_obstacles.perception_obstacle()) {
+    int id = perception_obstacle.id();
     if (id < 0) {
       ADEBUG << "The obstacle has invalid id [" << id << "].";
       continue;
@@ -157,8 +164,6 @@ void PredictorManager::PredictObstacles(
     PredictionObstacle prediction_obstacle;
     Obstacle* obstacle = obstacles_container->GetObstacle(id);
 
-    PerceptionObstacle perception_obstacle =
-        obstacles_container->GetPerceptionObstacle(id);
     // if obstacle == nullptr, that means obstacle is unmovable
     // Checkout the logic of unmovable in obstacle.cc
     if (obstacle != nullptr) {
@@ -180,17 +185,20 @@ void PredictorManager::PredictObstacles(
 }
 
 void PredictorManager::PredictObstaclesInParallel(
+    const PerceptionObstacles& perception_obstacles,
     const ADCTrajectoryContainer* adc_trajectory_container,
     ObstaclesContainer* obstacles_container) {
   IdPredictionObstacleMap id_prediction_obstacle_map;
-  for (int id : obstacles_container->curr_frame_obstacle_ids()) {
+  for (const PerceptionObstacle& perception_obstacle :
+       perception_obstacles.perception_obstacle()) {
+    int id = perception_obstacle.id();
     id_prediction_obstacle_map[id] = std::make_shared<PredictionObstacle>();
   }
   IdObstacleListMap id_obstacle_map;
-  for (int id : obstacles_container->curr_frame_obstacle_ids()) {
+  for (const auto& perception_obstacle :
+       perception_obstacles.perception_obstacle()) {
+    int id = perception_obstacle.id();
     Obstacle* obstacle = obstacles_container->GetObstacle(id);
-    const PerceptionObstacle& perception_obstacle =
-        obstacles_container->GetPerceptionObstacle(id);
     if (obstacle == nullptr) {
       std::shared_ptr<PredictionObstacle> prediction_obstacle_ptr =
           id_prediction_obstacle_map[id];
@@ -210,11 +218,14 @@ void PredictorManager::PredictObstaclesInParallel(
                           id_prediction_obstacle_map[id].get());
         }
       });
-  for (auto& item : id_prediction_obstacle_map) {
-    int id = item.first;
-    auto prediction_obstacle_ptr = item.second;
-    const PerceptionObstacle& perception_obstacle =
-        obstacles_container->GetPerceptionObstacle(id);
+  for (const PerceptionObstacle& perception_obstacle :
+       perception_obstacles.perception_obstacle()) {
+    int id = perception_obstacle.id();
+    auto prediction_obstacle_ptr = id_prediction_obstacle_map[id];
+    if (prediction_obstacle_ptr == nullptr) {
+      AERROR << "Prediction obstacle [" << id << "] not found.";
+      continue;
+    }
     prediction_obstacle_ptr->set_predicted_period(
         FLAGS_prediction_trajectory_time_length);
     prediction_obstacle_ptr->mutable_perception_obstacle()->CopyFrom(
