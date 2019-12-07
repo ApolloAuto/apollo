@@ -29,6 +29,7 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::time::Clock;
+using apollo::perception::PerceptionObstacles;
 
 PredictorSubmodule::~PredictorSubmodule() {}
 
@@ -46,16 +47,18 @@ bool PredictorSubmodule::Init() {
 }
 
 bool PredictorSubmodule::Proc(
+    const std::shared_ptr<PerceptionObstacles>& perception_obstacles,
     const std::shared_ptr<ADCTrajectoryContainer>& adc_trajectory_container,
     const std::shared_ptr<SubmoduleOutput>& submodule_output) {
   const apollo::common::Header& perception_header =
-      submodule_output->perception_header();
+      perception_obstacles->header();
   const apollo::common::ErrorCode& perception_error_code =
-      submodule_output->perception_error_code();
+      perception_obstacles->error_code();
   const double frame_start_time = submodule_output->frame_start_time();
   ObstaclesContainer obstacles_container(*submodule_output);
-  PredictorManager::Instance()->Run(adc_trajectory_container.get(),
-                                    &obstacles_container);
+  PredictorManager::Instance()->Run(
+      *perception_obstacles, adc_trajectory_container.get(),
+      &obstacles_container);
   PredictionObstacles prediction_obstacles =
       PredictorManager::Instance()->prediction_obstacles();
 
@@ -72,6 +75,10 @@ bool PredictorSubmodule::Proc(
   common::util::FillHeader(node_->Name(), &prediction_obstacles);
   predictor_writer_->Write(
       std::make_shared<PredictionObstacles>(prediction_obstacles));
+
+  double end_time = apollo::cyber::Time::Now().ToNanosecond();
+  double start_time = submodule_output->frame_start_time();
+  ADEBUG << "End to end time = " << (end_time - start_time) / 1e6 << " ms";
 
   return true;
 }

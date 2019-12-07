@@ -65,8 +65,9 @@ TEST_F(PredictorManagerTest, General) {
           AdapterConfig::PLANNING_TRAJECTORY);
 
   EvaluatorManager::Instance()->Run(obstacles_container);
-  PredictorManager::Instance()->Run(adc_trajectory_container,
-                                    obstacles_container);
+  PredictorManager::Instance()->Run(
+      perception_obstacles_, adc_trajectory_container,
+      obstacles_container);
 
   const PredictionObstacles& prediction_obstacles =
       PredictorManager::Instance()->prediction_obstacles();

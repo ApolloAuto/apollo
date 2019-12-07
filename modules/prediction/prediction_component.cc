@@ -94,6 +94,9 @@ bool PredictionComponent::Init() {
   adc_container_writer_ = node_->CreateWriter<ADCTrajectoryContainer>(
       FLAGS_adccontainer_topic_name);
 
+  perception_obstacles_writer_ = node_->CreateWriter<PerceptionObstacles>(
+      FLAGS_perception_obstacles_topic_name);
+
   return true;
 }
 
@@ -107,7 +110,7 @@ bool PredictionComponent::Proc(
 
 bool PredictionComponent::ContainerSubmoduleProcess(
     const std::shared_ptr<PerceptionObstacles>& perception_obstacles) {
-  const double frame_start_time = Clock::NowInSeconds();
+  const double frame_start_time = apollo::cyber::Time::Now().ToNanosecond();
   // Read localization info. and call OnLocalization to update
   // the PoseContainer.
   localization_reader_->Observe();
@@ -118,6 +121,8 @@ bool PredictionComponent::ContainerSubmoduleProcess(
   }
   auto localization_msg = *ptr_localization_msg;
   MessageProcess::OnLocalization(localization_msg);
+
+  perception::PerceptionObstacles perception_msg = *perception_obstacles;
 
   // Read planning info. of last frame and call OnPlanning to update
   // the ADCTrajectoryContainer
@@ -141,14 +146,13 @@ bool PredictionComponent::ContainerSubmoduleProcess(
 
   SubmoduleOutput submodule_output =
       obstacles_container_ptr->GetSubmoduleOutput();
-  submodule_output.set_perception_header(perception_obstacles->header());
-  submodule_output.set_perception_error_code(
-      perception_obstacles->error_code());
   submodule_output.set_frame_start_time(frame_start_time);
   container_writer_->Write(std::make_shared<SubmoduleOutput>(submodule_output));
   ADCTrajectoryContainer adc_container = *adc_trajectory_container_ptr;
   adc_container_writer_->Write(
       std::make_shared<ADCTrajectoryContainer>(adc_container));
+  perception_obstacles_writer_->Write(std::make_shared<PerceptionObstacles>(
+      perception_msg));
   return true;
 }
 

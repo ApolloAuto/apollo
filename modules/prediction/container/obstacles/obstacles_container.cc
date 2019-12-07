@@ -50,11 +50,6 @@ ObstaclesContainer::ObstaclesContainer(const SubmoduleOutput& submodule_output)
   std::unique_ptr<Obstacle> ptr_ego_vehicle(new Obstacle(ego_vehicle));
   ptr_obstacles_.Put(ego_vehicle.id(), std::move(ptr_ego_vehicle));
 
-  for (const auto& perception_obstacle :
-       submodule_output.curr_frame_perception_obstacles()) {
-    int id = perception_obstacle.id();
-    curr_frame_id_perception_obstacle_map_[id] = perception_obstacle;
-  }
   curr_frame_movable_obstacle_ids_ =
       submodule_output.curr_frame_movable_obstacle_ids();
   curr_frame_unmovable_obstacle_ids_ =
@@ -68,7 +63,6 @@ void ObstaclesContainer::CleanUp() {
   curr_frame_movable_obstacle_ids_.clear();
   curr_frame_unmovable_obstacle_ids_.clear();
   curr_frame_considered_obstacle_ids_.clear();
-  curr_frame_id_perception_obstacle_map_.clear();
 }
 
 // This is called by Perception module at every frame to insert all
@@ -184,13 +178,6 @@ void ObstaclesContainer::Clear() {
   timestamp_ = -1.0;
 }
 
-const PerceptionObstacle& ObstaclesContainer::GetPerceptionObstacle(
-    const int id) {
-  CHECK(curr_frame_id_perception_obstacle_map_.find(id) !=
-        curr_frame_id_perception_obstacle_map_.end());
-  return curr_frame_id_perception_obstacle_map_[id];
-}
-
 const std::vector<int>& ObstaclesContainer::curr_frame_movable_obstacle_ids() {
   return curr_frame_movable_obstacle_ids_;
 }
@@ -237,7 +224,6 @@ void ObstaclesContainer::InsertPerceptionObstacle(
     AERROR << "Invalid ID [" << id << "]";
     return;
   }
-  curr_frame_id_perception_obstacle_map_[id] = perception_obstacle;
   if (!IsMovable(perception_obstacle)) {
     ADEBUG << "Perception obstacle [" << perception_obstacle.id()
            << "] is unmovable.";
@@ -350,10 +336,7 @@ double ObstaclesContainer::timestamp() const { return timestamp_; }
 
 SubmoduleOutput ObstaclesContainer::GetSubmoduleOutput() {
   SubmoduleOutput container_output;
-  for (const auto& perception_obstacle_pair :
-       curr_frame_id_perception_obstacle_map_) {
-    int id = perception_obstacle_pair.first;
-    container_output.InsertPerceptionObstacle(perception_obstacle_pair.second);
+  for (int id : curr_frame_considered_obstacle_ids_) {
     Obstacle* obstacle = GetObstacle(id);
     if (obstacle == nullptr) {
       AERROR << "Nullptr found for obstacle [" << id << "]";

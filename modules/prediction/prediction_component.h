@@ -92,6 +92,9 @@ class PredictionComponent
   std::shared_ptr<cyber::Writer<SubmoduleOutput>> container_writer_;
 
   std::shared_ptr<cyber::Writer<ADCTrajectoryContainer>> adc_container_writer_;
+
+  std::shared_ptr<cyber::Writer<perception::PerceptionObstacles>>
+      perception_obstacles_writer_;
 };
 
 CYBER_REGISTER_COMPONENT(PredictionComponent)
