@@ -128,7 +128,7 @@ def process(data):
 
         speedmin = np.min(speedsection)
         speedmax = np.max(speedsection)
-        speedrange = np.arrange(
+        speedrange = np.arange(
             max(0, round(speedmin / SPEED_INTERVAL) * SPEED_INTERVAL),
             min(speedmax, 10.01), SPEED_INTERVAL)
         #print "Speed min, max", speedmin, speedmax, is_increase, firstindex, lastindex, speedsection[-1]
