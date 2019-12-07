@@ -88,7 +88,7 @@ function set_lib_path() {
   if [ -d "${LIB_USER}" ]; then
     export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${LIB_USER}
   else
-    warn "${LIB_USER} doesn't exist"
+    warning "${LIB_USER} doesn't exist"
   fi
 
   if [ "$RELEASE_DOCKER" == 1 ]; then
