@@ -260,8 +260,8 @@ if __name__ == '__main__':
 
     test_count = 0
     success_count = 0
-    for sx in np.arrange(-10, 10, 1.0):
-        for sy in np.arrange(2, 4, 0.5):
+    for sx in np.arange(-10, 10, 1.0):
+        for sy in np.arange(2, 4, 0.5):
             print("sx is "+ str(sx) + " and sy is " + str(sy))
             test_count += 1
             result = SmoothTrajectory(visualize_flag, sx, sy)
