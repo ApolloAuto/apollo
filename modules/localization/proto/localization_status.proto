@@ -67,9 +67,9 @@ enum GnssPositionType {
                     // position averaging
   FIXEDHEIGHT = 2;  // Position has been fixed by the FIX HEIGHT, or FIX AUTO,
                     // command or by position averaging
-  FLOATCONV = 4;   // Solution from floating point carrier phase anbiguities
-  WIDELANE = 5;    // Solution from wide-lane ambiguities
-  NARROWLANE = 6;  // Solution from narrow-lane ambiguities
+  FLOATCONV = 4;    // Solution from floating point carrier phase anbiguities
+  WIDELANE = 5;     // Solution from wide-lane ambiguities
+  NARROWLANE = 6;   // Solution from narrow-lane ambiguities
   DOPPLER_VELOCITY = 8;  // Velocity computed using instantaneous Doppler
   SINGLE = 16;           // Single point position
   PSRDIFF = 17;          // Pseudorange differential solution
