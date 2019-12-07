@@ -389,12 +389,10 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine(
     }
     double start_x = latest_feature_ptr->position().x();
     double start_y = latest_feature_ptr->position().y();
-    double end_x = start_x +
-                   FLAGS_caution_pedestrian_approach_time *
-                       latest_feature_ptr->raw_velocity().x();
-    double end_y = start_y +
-                   FLAGS_caution_pedestrian_approach_time *
-                       latest_feature_ptr->raw_velocity().y();
+    double end_x = start_x + FLAGS_caution_pedestrian_approach_time *
+                                 latest_feature_ptr->raw_velocity().x();
+    double end_y = start_y + FLAGS_caution_pedestrian_approach_time *
+                                 latest_feature_ptr->raw_velocity().y();
     std::vector<std::string> nearby_lane_ids = PredictionMap::NearbyLaneIds(
         {start_x, start_y}, FLAGS_pedestrian_nearby_lane_search_radius);
     if (nearby_lane_ids.empty()) {
