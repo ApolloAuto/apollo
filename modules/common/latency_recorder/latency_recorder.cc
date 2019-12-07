@@ -55,10 +55,10 @@ void LatencyRecorder::AppendLatencyRecord(const uint64_t message_id,
 
   std::lock_guard<std::mutex> lock(mutex_);
 
-  LatencyRecord record;
-  record.set_begin_time(begin_time);
-  record.set_end_time(end_time);
-  records_->mutable_latency_records()->insert({message_id, record});
+  auto* latency_record = records_->add_latency_records();
+  latency_record->set_begin_time(begin_time);
+  latency_record->set_end_time(end_time);
+  latency_record->set_message_id(message_id);
 
   const auto now_nano_time = Time::Now().ToNanosecond();
   if (now_nano_time - current_timestamp_ >

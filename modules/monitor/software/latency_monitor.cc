@@ -116,7 +116,7 @@ std::vector<std::pair<std::string, uint64_t>> GetFlowTrackStats(
   uint64_t begin_time = 0, end_time, prev_end_time = 0;
   while (iter != module_durations.end()) {
     std::tie(begin_time, end_time, module_name) = *iter;
-    if (!prev_name.empty()) {
+    if (!prev_name.empty() && prev_name != module_name) {
       const std::string mid_name =
           absl::StrCat(prev_name, module_connector, module_name);
       FillInStat(mid_name, begin_time - prev_end_time, &stats, total_duration);
@@ -178,6 +178,7 @@ void LatencyMonitor::RunOnce(const double current_time) {
   for (auto it = reader->Begin(); it != reader->End(); ++it) {
     const std::string current_key =
         absl::StrCat((*it)->module_name(), (*it)->header().sequence_num());
+
     if (it == reader->Begin()) {
       first_key_of_current_round = current_key;
     }
@@ -199,9 +200,9 @@ void LatencyMonitor::RunOnce(const double current_time) {
 void LatencyMonitor::UpdateLatencyStat(
     const std::shared_ptr<LatencyRecordMap>& records) {
   for (const auto& record : records->latency_records()) {
-    track_map_[record.first].emplace(record.second.begin_time(),
-                                     record.second.end_time(),
-                                     records->module_name());
+    track_map_[record.message_id()].emplace(record.begin_time(),
+                                            record.end_time(),
+                                            records->module_name());
   }
 }
 
@@ -229,6 +230,7 @@ void LatencyMonitor::AggregateLatency() {
     uint64_t total_duration = 0;
     const auto stats =
         GetFlowTrackStats(message.second, &total_duration, &topo);
+
     std::string module_name;
     uint64_t duration = 0;
     totals.push_back(total_duration);
