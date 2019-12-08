@@ -145,7 +145,7 @@ bool PredictionComponent::ContainerSubmoduleProcess(
   CHECK_NOTNULL(adc_trajectory_container_ptr);
 
   SubmoduleOutput submodule_output =
-      obstacles_container_ptr->GetSubmoduleOutput();
+      obstacles_container_ptr->GetSubmoduleOutput(10);
   submodule_output.set_frame_start_time(frame_start_time);
   container_writer_->Write(std::make_shared<SubmoduleOutput>(submodule_output));
   ADCTrajectoryContainer adc_container = *adc_trajectory_container_ptr;

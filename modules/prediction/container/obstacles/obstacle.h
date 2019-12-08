@@ -79,6 +79,8 @@ class Obstacle {
    */
   bool InsertFeature(const Feature& feature);
 
+  void TrimHistory(const size_t remain_size);
+
   /**
    * @brief Get the type of perception obstacle's type.
    * @return The type pf perception obstacle.

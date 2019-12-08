@@ -334,7 +334,8 @@ bool ObstaclesContainer::IsMovable(
 
 double ObstaclesContainer::timestamp() const { return timestamp_; }
 
-SubmoduleOutput ObstaclesContainer::GetSubmoduleOutput() {
+SubmoduleOutput ObstaclesContainer::GetSubmoduleOutput(
+    const size_t history_size) {
   SubmoduleOutput container_output;
   for (int id : curr_frame_considered_obstacle_ids_) {
     Obstacle* obstacle = GetObstacle(id);
@@ -342,6 +343,7 @@ SubmoduleOutput ObstaclesContainer::GetSubmoduleOutput() {
       AERROR << "Nullptr found for obstacle [" << id << "]";
       continue;
     }
+    obstacle->TrimHistory(history_size);
     container_output.InsertObstacle(*obstacle);
   }
 
