@@ -18,6 +18,8 @@
 
 #include <utility>
 
+#include "absl/time/time.h"
+
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/time/time.h"
@@ -54,7 +56,7 @@ bool PredictorSubmodule::Proc(
       perception_obstacles->header();
   const apollo::common::ErrorCode& perception_error_code =
       perception_obstacles->error_code();
-  const double frame_start_time = submodule_output->frame_start_time();
+  const absl::Time& frame_start_time = submodule_output->frame_start_time();
   ObstaclesContainer obstacles_container(*submodule_output);
   PredictorManager::Instance()->Run(
       *perception_obstacles, adc_trajectory_container.get(),
@@ -70,15 +72,14 @@ bool PredictorSubmodule::Proc(
   prediction_obstacles.mutable_header()->set_radar_timestamp(
       perception_header.radar_timestamp());
   prediction_obstacles.set_perception_error_code(perception_error_code);
-  prediction_obstacles.set_start_timestamp(frame_start_time);
 
   common::util::FillHeader(node_->Name(), &prediction_obstacles);
   predictor_writer_->Write(
       std::make_shared<PredictionObstacles>(prediction_obstacles));
 
-  double end_time = apollo::cyber::Time::Now().ToNanosecond();
-  double start_time = submodule_output->frame_start_time();
-  ADEBUG << "End to end time = " << (end_time - start_time) / 1e6 << " ms";
+  const absl::Time& end_time = absl::Now();
+  ADEBUG << "End to end time = "
+         << absl::ToDoubleMilliseconds(end_time - frame_start_time) << " ms";
 
   return true;
 }

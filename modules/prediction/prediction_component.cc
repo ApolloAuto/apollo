@@ -110,7 +110,7 @@ bool PredictionComponent::Proc(
 
 bool PredictionComponent::ContainerSubmoduleProcess(
     const std::shared_ptr<PerceptionObstacles>& perception_obstacles) {
-  const double frame_start_time = apollo::cyber::Time::Now().ToNanosecond();
+  const auto frame_start_time = absl::Now();
   // Read localization info. and call OnLocalization to update
   // the PoseContainer.
   localization_reader_->Observe();

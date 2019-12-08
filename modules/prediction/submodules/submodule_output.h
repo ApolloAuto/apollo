@@ -23,6 +23,8 @@
 
 #include <vector>
 
+#include "absl/time/time.h"
+
 #include "modules/common/util/lru_cache.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
@@ -55,7 +57,7 @@ class SubmoduleOutput {
   void set_curr_frame_considered_obstacle_ids(
       const std::vector<int>& curr_frame_considered_obstacle_ids);
 
-  void set_frame_start_time(const double frame_start_time);
+  void set_frame_start_time(const absl::Time& frame_start_time);
 
   const std::vector<Obstacle>& curr_frame_obstacles() const;
 
@@ -70,7 +72,7 @@ class SubmoduleOutput {
 
   std::vector<int> curr_frame_considered_obstacle_ids() const;
 
-  double frame_start_time() const;
+  const absl::Time& frame_start_time() const;
 
  protected:
   std::vector<Obstacle> curr_frame_obstacles_;
@@ -78,7 +80,7 @@ class SubmoduleOutput {
   std::vector<int> curr_frame_movable_obstacle_ids_;
   std::vector<int> curr_frame_unmovable_obstacle_ids_;
   std::vector<int> curr_frame_considered_obstacle_ids_;
-  double frame_start_time_;
+  absl::Time frame_start_time_;
 };
 
 }  // namespace prediction

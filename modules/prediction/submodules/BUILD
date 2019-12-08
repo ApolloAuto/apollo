@@ -14,6 +14,7 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container/obstacles:obstacle",
+        "@com_google_absl//absl/time",
     ],
 )
 

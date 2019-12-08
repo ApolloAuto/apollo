@@ -24,6 +24,8 @@
 #include <string>
 #include <utility>
 
+#include "absl/time/time.h"
+
 #include "cyber/component/component.h"
 #include "modules/prediction/common/message_process.h"
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
