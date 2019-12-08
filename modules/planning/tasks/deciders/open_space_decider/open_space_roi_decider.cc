@@ -301,11 +301,6 @@ void OpenSpaceRoiDecider::SetParkAndGoEndPose(Frame *const frame) {
   const double kSTargetBuffer = 8.0;
   const double kSpeedRatio = 0.3;  // after adjust speed is 30% of speed limit
   // get vehicle current location
-  const ReferenceLineInfo &reference_line_info =
-      frame->reference_line_info().front();
-
-  ADEBUG << "reference_line ID: " << reference_line_info.Lanes().Id();
-  const auto &reference_line = reference_line_info.reference_line();
   // get vehicle s,l info
   auto park_and_go_status = PlanningContext::Instance()
                                 ->mutable_planning_status()
@@ -319,6 +314,22 @@ void OpenSpaceRoiDecider::SetParkAndGoEndPose(Frame *const frame) {
 
   const common::math::Vec2d adc_position = {adc_init_x, adc_init_y};
   common::SLPoint adc_position_sl;
+
+  // get nearest reference line
+  const auto &reference_line_list = frame->reference_line_info();
+  ADEBUG << reference_line_list.size();
+  const auto reference_line_info = std::min_element(
+      reference_line_list.begin(), reference_line_list.end(),
+      [&](const ReferenceLineInfo &ref_a, const ReferenceLineInfo &ref_b) {
+        common::SLPoint adc_position_sl_a;
+        common::SLPoint adc_position_sl_b;
+        ref_a.reference_line().XYToSL(adc_position, &adc_position_sl_a);
+        ref_b.reference_line().XYToSL(adc_position, &adc_position_sl_b);
+        return std::fabs(adc_position_sl_a.l()) <
+               std::fabs(adc_position_sl_b.l());
+      });
+
+  const auto &reference_line = reference_line_info->reference_line();
   reference_line.XYToSL(adc_position, &adc_position_sl);
 
   // target is at reference line
@@ -349,6 +360,10 @@ void OpenSpaceRoiDecider::SetParkAndGoEndPose(Frame *const frame) {
   end_pose->push_back(center.x());
   end_pose->push_back(center.y());
   end_pose->push_back(target_theta);
+
+  ADEBUG << "ADC position (x): " << std::setprecision(9) << (*end_pose)[0];
+  ADEBUG << "ADC position (y): " << std::setprecision(9) << (*end_pose)[1];
+  ADEBUG << "reference_line ID: " << reference_line_info->Lanes().Id();
 
   // end pose velocity set to be speed limit
   double target_speed = reference_line.GetSpeedLimitFromS(target_s);

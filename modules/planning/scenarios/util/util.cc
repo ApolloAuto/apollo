@@ -202,15 +202,26 @@ bool CheckADCReadyToCruise(Frame* frame,
   auto vehicle_status = common::VehicleStateProvider::Instance();
   common::math::Vec2d adc_position = {vehicle_status->x(), vehicle_status->y()};
   const double adc_heading = vehicle_status->heading();
-  const ReferenceLineInfo& reference_line_info =
-      frame->reference_line_info().front();
+
   common::SLPoint adc_position_sl;
-  reference_line_info.reference_line().XYToSL(adc_position, &adc_position_sl);
+  // get nearest reference line
+  const auto& reference_line_list = frame->reference_line_info();
+  const auto reference_line_info = std::min_element(
+      reference_line_list.begin(), reference_line_list.end(),
+      [&](const ReferenceLineInfo& ref_a, const ReferenceLineInfo& ref_b) {
+        common::SLPoint adc_position_sl_a;
+        common::SLPoint adc_position_sl_b;
+        ref_a.reference_line().XYToSL(adc_position, &adc_position_sl_a);
+        ref_b.reference_line().XYToSL(adc_position, &adc_position_sl_b);
+        return std::fabs(adc_position_sl_a.l()) <
+               std::fabs(adc_position_sl_b.l());
+      });
+  reference_line_info->reference_line().XYToSL(adc_position, &adc_position_sl);
   bool is_near_front_obstacle =
       CheckADCSurroundObstacles(adc_position, adc_heading, frame,
                                 scenario_config.front_obstacle_buffer());
   bool heading_align_w_reference_line =
-      CheckADCHeading(adc_position, adc_heading, reference_line_info,
+      CheckADCHeading(adc_position, adc_heading, *reference_line_info,
                       scenario_config.heading_buffer());
   ADEBUG << "is_near_front_obstacle: " << is_near_front_obstacle;
   ADEBUG << "heading_align_w_reference_line: "
