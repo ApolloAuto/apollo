@@ -90,10 +90,6 @@ Feature* Obstacle::mutable_latest_feature() {
 
 size_t Obstacle::history_size() const { return feature_history_.size(); }
 
-const KalmanFilter<double, 6, 2, 0>& Obstacle::kf_motion_tracker() const {
-  return kf_motion_tracker_;
-}
-
 const KalmanFilter<double, 2, 2, 4>& Obstacle::kf_pedestrian_tracker() const {
   return kf_pedestrian_tracker_;
 }
@@ -171,20 +167,11 @@ bool Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
 
   // Set obstacle observation for KF tracking
   if (!FLAGS_use_navigation_mode) {
-    // Update KF
-    if (!kf_motion_tracker_.IsInitialized()) {
-      InitKFMotionTracker(feature);
-    }
-    UpdateKFMotionTracker(feature);
     if (type_ == PerceptionObstacle::PEDESTRIAN) {
       if (!kf_pedestrian_tracker_.IsInitialized()) {
         InitKFPedestrianTracker(feature);
       }
       UpdateKFPedestrianTracker(feature);
-    }
-    // Update obstacle status based on KF if enabled
-    if (FLAGS_enable_kf_tracking) {
-      UpdateStatus(&feature);
     }
   }
 
@@ -342,81 +329,6 @@ void Obstacle::SetStatus(const PerceptionObstacle& perception_obstacle,
   SetTheta(perception_obstacle, feature);
   SetLengthWidthHeight(perception_obstacle, feature);
   SetIsNearJunction(perception_obstacle, feature);
-}
-
-void Obstacle::UpdateStatus(Feature* feature) {
-  // Update motion belief
-  if (!kf_motion_tracker_.IsInitialized()) {
-    ADEBUG << "Obstacle [" << id_ << "] has not initialized motion tracker.";
-    return;
-  }
-  auto state = kf_motion_tracker_.GetStateEstimate();
-
-  feature->mutable_t_position()->set_x(state(0, 0));
-  feature->mutable_t_position()->set_y(state(1, 0));
-  feature->mutable_t_position()->set_z(feature->position().z());
-
-  double velocity_x = state(2, 0);
-  double velocity_y = state(3, 0);
-  double speed = std::hypot(velocity_x, velocity_y);
-  double velocity_heading = std::atan2(velocity_y, velocity_x);
-  if (FLAGS_adjust_velocity_by_position_shift) {
-    UpdateVelocity(feature->theta(), &velocity_x, &velocity_y,
-                   &velocity_heading, &speed);
-  }
-  feature->mutable_velocity()->set_x(velocity_x);
-  feature->mutable_velocity()->set_y(velocity_y);
-  feature->mutable_velocity()->set_z(velocity_heading);
-  feature->set_speed(speed);
-  feature->set_velocity_heading(std::atan2(state(3, 0), state(2, 0)));
-
-  double acc_x = common::math::Clamp(state(4, 0), FLAGS_vehicle_min_linear_acc,
-                                     FLAGS_vehicle_max_linear_acc);
-  double acc_y = common::math::Clamp(state(5, 0), FLAGS_vehicle_min_linear_acc,
-                                     FLAGS_vehicle_max_linear_acc);
-  double acc =
-      acc_x * std::cos(velocity_heading) + acc_y * std::sin(velocity_heading);
-  feature->mutable_acceleration()->set_x(acc_x);
-  feature->mutable_acceleration()->set_y(acc_y);
-  feature->mutable_acceleration()->set_z(feature->acceleration().z());
-  feature->set_acc(acc);
-
-  ADEBUG << "Obstacle [" << id_ << "] has tracked position [" << std::fixed
-         << std::setprecision(6) << feature->t_position().x() << ", "
-         << std::fixed << std::setprecision(6) << feature->t_position().y()
-         << ", " << std::fixed << std::setprecision(6)
-         << feature->t_position().z() << "]";
-  ADEBUG << "Obstacle [" << id_ << "] has tracked velocity [" << std::fixed
-         << std::setprecision(6) << feature->velocity().x() << ", "
-         << std::fixed << std::setprecision(6) << feature->velocity().y()
-         << ", " << std::fixed << std::setprecision(6)
-         << feature->velocity().z() << "]";
-  ADEBUG << "Obstacle [" << id_ << "] has tracked acceleration [" << std::fixed
-         << std::setprecision(6) << feature->acceleration().x() << ", "
-         << std::fixed << std::setprecision(6) << feature->acceleration().y()
-         << ", " << std::fixed << std::setprecision(6)
-         << feature->acceleration().z() << "]";
-  ADEBUG << "Obstacle [" << id_ << "] has tracked velocity heading ["
-         << std::fixed << std::setprecision(6) << feature->velocity_heading()
-         << "].";
-
-  // Update pedestrian motion belief
-  if (type_ == PerceptionObstacle::PEDESTRIAN) {
-    if (!kf_pedestrian_tracker_.IsInitialized()) {
-      ADEBUG << "Obstacle [" << id_
-             << "] has not initialized pedestrian tracker.";
-      return;
-    }
-    feature->mutable_t_position()->set_x(
-        kf_pedestrian_tracker_.GetStateEstimate()(0, 0));
-    feature->mutable_t_position()->set_y(
-        kf_pedestrian_tracker_.GetStateEstimate()(1, 0));
-    ADEBUG << "Obstacle [" << id_ << "] has tracked pedestrian position ["
-           << std::setprecision(6) << feature->t_position().x() << std::fixed
-           << ", " << std::setprecision(6) << feature->t_position().y()
-           << std::fixed << ", " << std::setprecision(6)
-           << feature->t_position().z() << std::fixed << "]";
-  }
 }
 
 bool Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
@@ -701,76 +613,6 @@ bool Obstacle::HasJunctionFeatureWithExits() const {
   }
   return latest_feature().has_junction_feature() &&
          latest_feature().junction_feature().junction_exit_size() > 0;
-}
-
-void Obstacle::InitKFMotionTracker(const Feature& feature) {
-  // Set transition matrix F
-  // constant acceleration dynamic model
-  Eigen::Matrix<double, 6, 6> F;
-  F.setIdentity();
-  kf_motion_tracker_.SetTransitionMatrix(F);
-
-  // Set observation matrix H
-  Eigen::Matrix<double, 2, 6> H;
-  H.setIdentity();
-  kf_motion_tracker_.SetObservationMatrix(H);
-
-  // Set covariance of transition noise matrix Q
-  // make the noise this order:
-  // noise(x/y) < noise(vx/vy) < noise(ax/ay)
-  Eigen::Matrix<double, 6, 6> Q;
-  Q.setIdentity();
-  Q *= FLAGS_q_var;
-  kf_motion_tracker_.SetTransitionNoise(Q);
-
-  // Set observation noise matrix R
-  Eigen::Matrix<double, 2, 2> R;
-  R.setIdentity();
-  R *= FLAGS_r_var;
-  kf_motion_tracker_.SetObservationNoise(R);
-
-  // Set current state covariance matrix P
-  // make the covariance this order:
-  // cov(x/y) < cov(vx/vy) < cov(ax/ay)
-  Eigen::Matrix<double, 6, 6> P;
-  P.setIdentity();
-  P *= FLAGS_p_var;
-
-  // Set initial state
-  Eigen::Matrix<double, 6, 1> x;
-  x(0, 0) = feature.position().x();
-  x(1, 0) = feature.position().y();
-  x(2, 0) = feature.velocity().x();
-  x(3, 0) = feature.velocity().y();
-  x(4, 0) = feature.acceleration().x();
-  x(5, 0) = feature.acceleration().y();
-
-  kf_motion_tracker_.SetStateEstimate(x, P);
-}
-
-void Obstacle::UpdateKFMotionTracker(const Feature& feature) {
-  double delta_ts = 0.0;
-  if (feature_history_.size() > 0) {
-    delta_ts = feature.timestamp() - feature_history_.front().timestamp();
-  }
-  if (delta_ts > FLAGS_double_precision) {
-    // Set transition matrix and predict
-    auto F = kf_motion_tracker_.GetTransitionMatrix();
-    F(0, 2) = delta_ts;
-    F(0, 4) = 0.5 * delta_ts * delta_ts;
-    F(1, 3) = delta_ts;
-    F(1, 5) = 0.5 * delta_ts * delta_ts;
-    F(2, 4) = delta_ts;
-    F(3, 5) = delta_ts;
-    kf_motion_tracker_.SetTransitionMatrix(F);
-    kf_motion_tracker_.Predict();
-
-    // Set observation and correct
-    Eigen::Matrix<double, 2, 1> z;
-    z(0, 0) = feature.position().x();
-    z(1, 0) = feature.position().y();
-    kf_motion_tracker_.Correct(z);
-  }
 }
 
 void Obstacle::InitKFPedestrianTracker(const Feature& feature) {
@@ -1643,29 +1485,6 @@ void Obstacle::DiscardOutdatedHistory() {
            << " historical features";
   }
 }
-
-void Obstacle::SetRNNStates(const std::vector<Eigen::MatrixXf>& rnn_states) {
-  rnn_states_ = rnn_states;
-}
-
-void Obstacle::GetRNNStates(std::vector<Eigen::MatrixXf>* rnn_states) {
-  rnn_states->clear();
-  rnn_states->insert(rnn_states->end(), rnn_states_.begin(), rnn_states_.end());
-}
-
-void Obstacle::InitRNNStates() {
-  if (network::RnnModel::Instance()->IsOk()) {
-    network::RnnModel::Instance()->ResetState();
-    network::RnnModel::Instance()->State(&rnn_states_);
-    rnn_enabled_ = true;
-    ADEBUG << "Success to initialize rnn model.";
-  } else {
-    AWARN << "Fail to initialize rnn model.";
-    rnn_enabled_ = false;
-  }
-}
-
-bool Obstacle::RNNEnabled() const { return rnn_enabled_; }
 
 void Obstacle::SetCaution() {
   CHECK_GT(feature_history_.size(), 0);
