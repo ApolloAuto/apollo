@@ -568,8 +568,7 @@ bool PathBoundsDecider::FindDestinationPullOverS(
   common::SLPoint destination_sl;
   const auto& routing = frame.local_view().routing;
   const auto& routing_end = *(routing->routing_request().waypoint().rbegin());
-  reference_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()},
-                        &destination_sl);
+  reference_line.XYToSL(routing_end.pose(), &destination_sl);
   const double destination_s = destination_sl.s();
   const double adc_end_s = reference_line_info.AdcSlBoundary().end_s();
 
@@ -1240,10 +1239,8 @@ void PathBoundsDecider::GetBoundaryFromLaneChangeForbiddenZone(
   double lane_change_start_s = 0.0;
   if (lane_change_status->exist_lane_change_start_position()) {
     common::SLPoint point_sl;
-    reference_line.XYToSL(
-        {lane_change_status->lane_change_start_position().x(),
-         lane_change_status->lane_change_start_position().y()},
-        &point_sl);
+    reference_line.XYToSL(lane_change_status->lane_change_start_position(),
+                          &point_sl);
     lane_change_start_s = point_sl.s();
   } else {
     // TODO(jiacheng): train ML model to learn this.

@@ -91,7 +91,7 @@ void RuleBasedStopDecider::CheckLaneChangeUrgency(Frame *const frame) {
     auto *reference_line = reference_line_info.mutable_reference_line();
     common::SLPoint sl_point;
     // Project the end point to sl_point on current reference lane
-    if (reference_line->XYToSL({point.x(), point.y()}, &sl_point) &&
+    if (reference_line->XYToSL(point, &sl_point) &&
         reference_line->IsOnLane(sl_point)) {
       // Check the distance from ADC to the end point of current routing
       double distance_to_passage_end =
@@ -298,8 +298,7 @@ bool RuleBasedStopDecider::CheckClearDone(
       (adc_front_edge_s + adc_back_edge_s) / 2.0, &lane_left_width,
       &lane_right_width);
   SLPoint stop_sl_point;
-  reference_line_info.reference_line().XYToSL({stop_point.x(), stop_point.y()},
-                                              &stop_sl_point);
+  reference_line_info.reference_line().XYToSL(stop_point, &stop_sl_point);
   // use distance to last stop point to determine if needed to check clear
   // again
   if (adc_back_edge_s > stop_sl_point.s()) {

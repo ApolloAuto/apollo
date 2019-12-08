@@ -55,9 +55,7 @@ bool DpRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
   CHECK_NOTNULL(path_data);
 
   init_point_ = init_point;
-  if (!reference_line_.XYToSL(
-          {init_point_.path_point().x(), init_point_.path_point().y()},
-          &init_sl_point_)) {
+  if (!reference_line_.XYToSL(init_point_.path_point(), &init_sl_point_)) {
     AERROR << "Fail to create init_sl_point from : "
            << init_point.DebugString();
     return false;

@@ -187,8 +187,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
   common::SLPoint dest_sl;
   const auto& reference_line_info = frame.reference_line_info().front();
   const auto& reference_line = reference_line_info.reference_line();
-  reference_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()},
-                        &dest_sl);
+  reference_line.XYToSL(routing_end.pose(), &dest_sl);
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
 
   const double adc_distance_to_dest = dest_sl.s() - adc_front_edge_s;
@@ -739,8 +738,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectParkAndGoScenario(
   common::SLPoint dest_sl;
   const auto& reference_line_info = frame.reference_line_info().front();
   const auto& reference_line = reference_line_info.reference_line();
-  reference_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()},
-                        &dest_sl);
+  reference_line.XYToSL(routing_end.pose(), &dest_sl);
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
 
   const double adc_distance_to_dest = dest_sl.s() - adc_front_edge_s;
@@ -1144,13 +1142,10 @@ void ScenarioManager::UpdatePlanningContextPullOverScenario(
       common::SLPoint dest_sl;
       const auto& routing_end =
           *(routing->routing_request().waypoint().rbegin());
-      reference_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()},
-                            &dest_sl);
+      reference_line.XYToSL(routing_end.pose(), &dest_sl);
 
       common::SLPoint pull_over_sl;
-      reference_line.XYToSL(
-          {pull_over_status.position().x(), pull_over_status.position().y()},
-          &pull_over_sl);
+      reference_line.XYToSL(pull_over_status.position(), &pull_over_sl);
 
       static constexpr double kDestMaxDelta = 30.0;  // meter
       if (std::fabs(dest_sl.s() - pull_over_sl.s()) > kDestMaxDelta) {

@@ -157,7 +157,7 @@ bool SpiralReferenceLineSmoother::Smooth(
     const double dkappa = p.dkappa();
 
     common::SLPoint ref_sl_point;
-    if (!raw_reference_line.XYToSL({p.x(), p.y()}, &ref_sl_point)) {
+    if (!raw_reference_line.XYToSL(p, &ref_sl_point)) {
       return false;
     }
     if (ref_sl_point.s() < 0 ||

@@ -68,8 +68,7 @@ int Destination::MakeDecisions(Frame* frame,
   common::SLPoint dest_sl;
   const auto& reference_line = reference_line_info->reference_line();
   const auto& routing_end = *(routing->routing_request().waypoint().rbegin());
-  reference_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()},
-                        &dest_sl);
+  reference_line.XYToSL(routing_end.pose(), &dest_sl);
   const auto& adc_sl = reference_line_info->AdcSlBoundary();
   const auto& dest =
       PlanningContext::Instance()->mutable_planning_status()->destination();
@@ -90,9 +89,7 @@ int Destination::MakeDecisions(Frame* frame,
       // build stop decision based on pull-over position
       ADEBUG << "BuildStopDecision: pull-over position";
       common::SLPoint pull_over_sl;
-      reference_line.XYToSL(
-          {pull_over_status.position().x(), pull_over_status.position().y()},
-          &pull_over_sl);
+      reference_line.XYToSL(pull_over_status.position(), &pull_over_sl);
 
       const double stop_line_s = pull_over_sl.s() +
                                  VehicleConfigHelper::GetConfig()

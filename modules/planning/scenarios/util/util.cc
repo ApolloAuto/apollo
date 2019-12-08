@@ -95,9 +95,7 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
 
   const auto& reference_line = reference_line_info.reference_line();
   common::SLPoint pull_over_sl;
-  reference_line.XYToSL(
-      {pull_over_status.position().x(), pull_over_status.position().y()},
-      &pull_over_sl);
+  reference_line.XYToSL(pull_over_status.position(), &pull_over_sl);
 
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   double distance = adc_front_edge_s - pull_over_sl.s();

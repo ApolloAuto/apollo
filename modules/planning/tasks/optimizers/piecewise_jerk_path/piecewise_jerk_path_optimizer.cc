@@ -107,9 +107,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
           pull_over_status.position().has_y() &&
           path_boundary.label().find("pullover") != std::string::npos) {
         common::SLPoint pull_over_sl;
-        reference_line.XYToSL(
-            {pull_over_status.position().x(), pull_over_status.position().y()},
-            &pull_over_sl);
+        reference_line.XYToSL(pull_over_status.position(), &pull_over_sl);
         end_state[0] = pull_over_sl.l();
       }
     }
