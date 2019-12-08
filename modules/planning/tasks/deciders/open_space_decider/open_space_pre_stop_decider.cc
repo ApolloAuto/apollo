@@ -86,9 +86,7 @@ bool OpenSpacePreStopDecider::CheckPullOverPreStop(
       pull_over_status.position().has_y()) {
     common::SLPoint pull_over_sl;
     const auto& reference_line = reference_line_info->reference_line();
-    reference_line.XYToSL(
-        {pull_over_status.position().x(), pull_over_status.position().y()},
-        &pull_over_sl);
+    reference_line.XYToSL(pull_over_status.position(), &pull_over_sl);
     *target_s = pull_over_sl.s();
   }
   return true;

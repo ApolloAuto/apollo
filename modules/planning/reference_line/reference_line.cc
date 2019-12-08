@@ -187,7 +187,7 @@ common::FrenetFramePoint ReferenceLine::GetFrenetPoint(
   }
 
   common::SLPoint sl_point;
-  XYToSL({path_point.x(), path_point.y()}, &sl_point);
+  XYToSL(path_point, &sl_point);
   common::FrenetFramePoint frenet_frame_point;
   frenet_frame_point.set_s(sl_point.s());
   frenet_frame_point.set_l(sl_point.l());
@@ -217,7 +217,7 @@ ReferenceLine::ToFrenetFrame(const common::TrajectoryPoint& traj_point) const {
   CHECK(!reference_points_.empty());
 
   common::SLPoint sl_point;
-  XYToSL({traj_point.path_point().x(), traj_point.path_point().y()}, &sl_point);
+  XYToSL(traj_point.path_point(), &sl_point);
 
   std::array<double, 3> s_condition;
   std::array<double, 3> l_condition;

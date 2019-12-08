@@ -169,7 +169,7 @@ class SmootherUtil {
     common::util::uniform_slice(0.0, ref_line.Length(), num_of_anchors - 1,
                                 &anchor_s);
     common::SLPoint sl;
-    if (!ref_line.XYToSL(Vec2d(init_point.x(), init_point.y()), &sl)) {
+    if (!ref_line.XYToSL(init_point, &sl)) {
       AERROR << "Failed to project init point to reference line";
       return anchor_points;
     }

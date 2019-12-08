@@ -226,8 +226,7 @@ bool PathData::XYToSL(const DiscretizedPath &discretized_path,
         reference_line_->GetFrenetPoint(path_point);
     if (!frenet_point.has_s()) {
       SLPoint sl_point;
-      if (!reference_line_->XYToSL({path_point.x(), path_point.y()},
-                                   &sl_point)) {
+      if (!reference_line_->XYToSL(path_point, &sl_point)) {
         AERROR << "Fail to transfer cartesian point to frenet point.";
         return false;
       }

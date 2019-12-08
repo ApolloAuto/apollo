@@ -722,7 +722,7 @@ int ReferenceLineInfo::MakeMainStopDecision(
 
     apollo::common::PointENU stop_point = object_decision.stop().stop_point();
     common::SLPoint stop_line_sl;
-    reference_line_.XYToSL({stop_point.x(), stop_point.y()}, &stop_line_sl);
+    reference_line_.XYToSL(stop_point, &stop_line_sl);
 
     double stop_line_s = stop_line_sl.s();
     if (stop_line_s < 0 || stop_line_s > reference_line_.Length()) {
@@ -914,7 +914,7 @@ std::vector<common::SLPoint> ReferenceLineInfo::GetAllStopDecisionSLPoint()
     }
     apollo::common::PointENU stop_point = object_decision.stop().stop_point();
     common::SLPoint stop_line_sl;
-    reference_line_.XYToSL({stop_point.x(), stop_point.y()}, &stop_line_sl);
+    reference_line_.XYToSL(stop_point, &stop_line_sl);
     if (stop_line_sl.s() <= 0 || stop_line_sl.s() >= reference_line_.Length()) {
       continue;
     }
