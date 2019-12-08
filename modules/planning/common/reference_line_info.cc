@@ -791,25 +791,12 @@ void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
     prev_advice->set_advice(EngageAdvice::DISALLOW_ENGAGE);
   }
 
-  // when started from offlane
-  if (prev_advice->advice() == EngageAdvice::READY_TO_ENGAGE) {
-    if (vehicle_state_.driving_mode() !=
-        Chassis::DrivingMode::Chassis_DrivingMode_COMPLETE_AUTO_DRIVE) {
-      prev_advice->set_advice(EngageAdvice::READY_TO_ENGAGE);
-    } else {
-      prev_advice->set_advice(EngageAdvice::KEEP_ENGAGED);
-    }
-    prev_advice->clear_reason();
-    engage_advice->CopyFrom(*prev_advice);
-    return;
-  }
-
   if (!IsDrivable()) {
     if (prev_advice->advice() != EngageAdvice::DISALLOW_ENGAGE) {
       prev_advice->set_advice(EngageAdvice::PREPARE_DISENGAGE);
     }
     prev_advice->set_reason("Reference line not drivable");
-  } else if (!is_on_reference_line_) {
+  } else if (!is_on_reference_line_ && !FLAGS_enable_start_auto_from_off_lane) {
     if (prev_advice->advice() != EngageAdvice::DISALLOW_ENGAGE) {
       prev_advice->set_advice(EngageAdvice::PREPARE_DISENGAGE);
     }
@@ -821,6 +808,8 @@ void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
     if (common::math::AngleDiff(vehicle_state_.heading(), ref_point.heading()) >
         kMaxAngleDiff) {
       if (prev_advice->advice() != EngageAdvice::DISALLOW_ENGAGE) {
+        prev_advice->set_advice(EngageAdvice::DISALLOW_ENGAGE);
+      } else {
         prev_advice->set_advice(EngageAdvice::PREPARE_DISENGAGE);
       }
       prev_advice->set_reason("Vehicle heading is not aligned");

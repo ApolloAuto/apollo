@@ -525,3 +525,6 @@ DEFINE_bool(use_soft_bound_in_nonlinear_speed_opt, true,
 DEFINE_bool(use_front_axe_center_in_path_planning, false,
             "If using front axe center in path planning, the path can be "
             "more agile.");
+
+DEFINE_bool(enable_start_auto_from_off_lane, false,
+            "Enable start auto when not on reference line");

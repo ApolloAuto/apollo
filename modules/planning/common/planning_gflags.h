@@ -264,3 +264,5 @@ DECLARE_bool(use_smoothed_dp_guide_line);
 DECLARE_bool(use_soft_bound_in_nonlinear_speed_opt);
 
 DECLARE_bool(use_front_axe_center_in_path_planning);
+
+DECLARE_bool(enable_start_auto_from_off_lane);
