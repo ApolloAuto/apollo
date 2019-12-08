@@ -33,7 +33,6 @@
 #include "modules/prediction/predictor/junction/junction_predictor.h"
 #include "modules/prediction/predictor/lane_sequence/lane_sequence_predictor.h"
 #include "modules/prediction/predictor/move_sequence/move_sequence_predictor.h"
-#include "modules/prediction/predictor/regional/regional_predictor.h"
 #include "modules/prediction/predictor/single_lane/single_lane_predictor.h"
 #include "modules/prediction/scenario/scenario_manager.h"
 
@@ -70,7 +69,6 @@ void PredictorManager::RegisterPredictors() {
   RegisterPredictor(ObstacleConf::MOVE_SEQUENCE_PREDICTOR);
   RegisterPredictor(ObstacleConf::SINGLE_LANE_PREDICTOR);
   RegisterPredictor(ObstacleConf::FREE_MOVE_PREDICTOR);
-  RegisterPredictor(ObstacleConf::REGIONAL_PREDICTOR);
   RegisterPredictor(ObstacleConf::EMPTY_PREDICTOR);
   RegisterPredictor(ObstacleConf::JUNCTION_PREDICTOR);
   RegisterPredictor(ObstacleConf::EXTRAPOLATION_PREDICTOR);
@@ -309,10 +307,6 @@ std::unique_ptr<Predictor> PredictorManager::CreatePredictor(
     }
     case ObstacleConf::FREE_MOVE_PREDICTOR: {
       predictor_ptr.reset(new FreeMovePredictor());
-      break;
-    }
-    case ObstacleConf::REGIONAL_PREDICTOR: {
-      predictor_ptr.reset(new RegionalPredictor());
       break;
     }
     case ObstacleConf::JUNCTION_PREDICTOR: {
