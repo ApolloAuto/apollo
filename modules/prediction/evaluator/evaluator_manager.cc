@@ -38,7 +38,6 @@
 #include "modules/prediction/evaluator/vehicle/lane_aggregating_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/lane_scanning_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
-#include "modules/prediction/evaluator/vehicle/rnn_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/semantic_lstm_evaluator.h"
 
 namespace apollo {
@@ -102,7 +101,6 @@ EvaluatorManager::EvaluatorManager() { RegisterEvaluators(); }
 
 void EvaluatorManager::RegisterEvaluators() {
   RegisterEvaluator(ObstacleConf::MLP_EVALUATOR);
-  RegisterEvaluator(ObstacleConf::RNN_EVALUATOR);
   RegisterEvaluator(ObstacleConf::COST_EVALUATOR);
   RegisterEvaluator(ObstacleConf::CRUISE_MLP_EVALUATOR);
   RegisterEvaluator(ObstacleConf::JUNCTION_MLP_EVALUATOR);
@@ -377,10 +375,6 @@ std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
     }
     case ObstacleConf::JUNCTION_MLP_EVALUATOR: {
       evaluator_ptr.reset(new JunctionMLPEvaluator());
-      break;
-    }
-    case ObstacleConf::RNN_EVALUATOR: {
-      evaluator_ptr.reset(new RNNEvaluator());
       break;
     }
     case ObstacleConf::COST_EVALUATOR: {

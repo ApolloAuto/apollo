@@ -78,7 +78,7 @@ bool PredictorSubmodule::Proc(
       std::make_shared<PredictionObstacles>(prediction_obstacles));
 
   const absl::Time& end_time = absl::Now();
-  ADEBUG << "End to end time = "
+  AERROR << "End to end time = "
          << absl::ToDoubleMilliseconds(end_time - frame_start_time) << " ms";
 
   return true;
