@@ -49,7 +49,7 @@ bool EvaluatorSubmodule::Proc(
   const auto frame_start_time = container_output->frame_start_time();
   ObstaclesContainer obstacles_container(*container_output);
   EvaluatorManager::Instance()->Run(&obstacles_container);
-  SubmoduleOutput submodule_output = obstacles_container.GetSubmoduleOutput();
+  SubmoduleOutput submodule_output = obstacles_container.GetSubmoduleOutput(1);
   submodule_output.set_frame_start_time(frame_start_time);
   evaluator_writer_->Write(std::make_shared<SubmoduleOutput>(submodule_output));
   return true;

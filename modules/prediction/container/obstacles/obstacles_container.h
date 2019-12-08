@@ -133,7 +133,7 @@ class ObstaclesContainer : public Container {
 
   double timestamp() const;
 
-  SubmoduleOutput GetSubmoduleOutput();
+  SubmoduleOutput GetSubmoduleOutput(const size_t history_size);
 
  private:
   Obstacle* GetObstacleWithLRUUpdate(const int obstacle_id);

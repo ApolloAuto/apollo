@@ -194,6 +194,12 @@ bool Obstacle::InsertFeature(const Feature& feature) {
   return true;
 }
 
+void Obstacle::TrimHistory(const size_t remain_size) {
+  while (feature_history_.size() > remain_size) {
+    feature_history_.pop_back();
+  }
+}
+
 bool Obstacle::IsInJunction(const std::string& junction_id) const {
   // TODO(all) Consider if need to use vehicle front rather than position
   if (feature_history_.empty()) {
