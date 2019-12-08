@@ -43,7 +43,7 @@ void SubmoduleOutput::set_curr_frame_considered_obstacle_ids(
   curr_frame_considered_obstacle_ids_ = curr_frame_considered_obstacle_ids;
 }
 
-void SubmoduleOutput::set_frame_start_time(const double frame_start_time) {
+void SubmoduleOutput::set_frame_start_time(const absl::Time& frame_start_time) {
   frame_start_time_ = frame_start_time;
 }
 
@@ -65,7 +65,9 @@ std::vector<int> SubmoduleOutput::curr_frame_considered_obstacle_ids() const {
   return curr_frame_considered_obstacle_ids_;
 }
 
-double SubmoduleOutput::frame_start_time() const { return frame_start_time_; }
+const absl::Time& SubmoduleOutput::frame_start_time() const {
+  return frame_start_time_;
+}
 
 }  // namespace prediction
 }  // namespace apollo

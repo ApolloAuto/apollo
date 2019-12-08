@@ -46,7 +46,7 @@ bool EvaluatorSubmodule::Init() {
 
 bool EvaluatorSubmodule::Proc(
     const std::shared_ptr<SubmoduleOutput>& container_output) {
-  const double frame_start_time = container_output->frame_start_time();
+  const auto frame_start_time = container_output->frame_start_time();
   ObstaclesContainer obstacles_container(*container_output);
   EvaluatorManager::Instance()->Run(&obstacles_container);
   SubmoduleOutput submodule_output = obstacles_container.GetSubmoduleOutput();
