@@ -156,7 +156,7 @@ class PredictorManager {
       ObstacleConf::FREE_MOVE_PREDICTOR;
 
   ObstacleConf::PredictorType pedestrian_predictor_ =
-      ObstacleConf::REGIONAL_PREDICTOR;
+      ObstacleConf::FREE_MOVE_PREDICTOR;
 
   ObstacleConf::PredictorType default_on_lane_predictor_ =
       ObstacleConf::LANE_SEQUENCE_PREDICTOR;

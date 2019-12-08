@@ -143,13 +143,6 @@ class Obstacle {
   size_t history_size() const;
 
   /**
-   * @brief Get the pedestrian Kalman filter.
-   * @return The pedestrian Kalman filter.
-   */
-  const common::math::KalmanFilter<double, 2, 2, 4>& kf_pedestrian_tracker()
-      const;
-
-  /**
    * @brief Check if the obstacle is still.
    * @return If the obstacle is still.
    */
@@ -291,10 +284,6 @@ class Obstacle {
    */
   void SetLaneSequencePath(LaneGraph* const lane_graph);
 
-  void InitKFPedestrianTracker(const Feature& feature);
-
-  void UpdateKFPedestrianTracker(const Feature& feature);
-
   void SetMotionStatus();
 
   void SetMotionStatusBySpeed();
@@ -325,8 +314,6 @@ class Obstacle {
       perception::PerceptionObstacle::UNKNOWN_UNMOVABLE;
 
   std::deque<Feature> feature_history_;
-
-  common::math::KalmanFilter<double, 2, 2, 4> kf_pedestrian_tracker_;
 
   std::vector<std::shared_ptr<const hdmap::LaneInfo>> current_lanes_;
 
