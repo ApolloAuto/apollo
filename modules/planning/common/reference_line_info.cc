@@ -323,7 +323,7 @@ ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
 
 const hdmap::RouteSegments& ReferenceLineInfo::Lanes() const { return lanes_; }
 
-const std::list<hdmap::Id> ReferenceLineInfo::TargetLaneId() const {
+std::list<hdmap::Id> ReferenceLineInfo::TargetLaneId() const {
   std::list<hdmap::Id> lane_ids;
   for (const auto& lane_seg : lanes_) {
     lane_ids.push_back(lane_seg.lane->id());
@@ -850,8 +850,7 @@ void ReferenceLineInfo::MakeEStopDecision(
   }
 }
 
-const hdmap::Lane::LaneTurn ReferenceLineInfo::GetPathTurnType(
-    const double s) const {
+hdmap::Lane::LaneTurn ReferenceLineInfo::GetPathTurnType(const double s) const {
   const double forward_buffer = 20.0;
   double route_s = 0.0;
   for (const auto& seg : Lanes()) {
@@ -873,7 +872,7 @@ const hdmap::Lane::LaneTurn ReferenceLineInfo::GetPathTurnType(
   return hdmap::Lane::NO_TURN;
 }
 
-const bool ReferenceLineInfo::GetIntersectionRightofWayStatus(
+bool ReferenceLineInfo::GetIntersectionRightofWayStatus(
     const hdmap::PathOverlap& pnc_junction_overlap) const {
   if (GetPathTurnType(pnc_junction_overlap.start_s) != hdmap::Lane::NO_TURN) {
     return false;

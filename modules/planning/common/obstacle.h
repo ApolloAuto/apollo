@@ -142,7 +142,7 @@ class Obstacle {
    **/
   const ObjectDecisionType& LongitudinalDecision() const;
 
-  const std::string DebugString() const;
+  std::string DebugString() const;
 
   const SLBoundary& PerceptionSLBoundary() const;
 

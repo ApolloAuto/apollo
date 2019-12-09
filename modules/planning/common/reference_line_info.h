@@ -152,7 +152,7 @@ class ReferenceLineInfo {
   void ExportEngageAdvice(common::EngageAdvice* engage_advice) const;
 
   const hdmap::RouteSegments& Lanes() const;
-  const std::list<hdmap::Id> TargetLaneId() const;
+  std::list<hdmap::Id> TargetLaneId() const;
 
   void ExportDecision(DecisionResult* decision_result) const;
 
@@ -161,9 +161,9 @@ class ReferenceLineInfo {
 
   ADCTrajectory::RightOfWayStatus GetRightOfWayStatus() const;
 
-  const hdmap::Lane::LaneTurn GetPathTurnType(const double s) const;
+  hdmap::Lane::LaneTurn GetPathTurnType(const double s) const;
 
-  const bool GetIntersectionRightofWayStatus(
+  bool GetIntersectionRightofWayStatus(
       const hdmap::PathOverlap& pnc_junction_overlap) const;
 
   double OffsetToOtherReferenceLine() const {

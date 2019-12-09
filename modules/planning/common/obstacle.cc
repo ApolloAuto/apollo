@@ -671,7 +671,7 @@ void Obstacle::AddLateralDecision(const std::string& decider_tag,
   decider_tags_.push_back(decider_tag);
 }
 
-const std::string Obstacle::DebugString() const {
+std::string Obstacle::DebugString() const {
   std::stringstream ss;
   ss << "Obstacle id: " << id_;
   for (size_t i = 0; i < decisions_.size(); ++i) {
