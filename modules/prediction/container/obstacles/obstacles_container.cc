@@ -42,13 +42,12 @@ ObstaclesContainer::ObstaclesContainer(const SubmoduleOutput& submodule_output)
     : ptr_obstacles_(FLAGS_max_num_obstacles) {
   for (const Obstacle& obstacle : submodule_output.curr_frame_obstacles()) {
     // Deep copy of obstacle is needed for modification
-    std::unique_ptr<Obstacle> ptr_obstacle(new Obstacle(std::move(obstacle)));
+    std::unique_ptr<Obstacle> ptr_obstacle(new Obstacle(obstacle));
     ptr_obstacles_.Put(obstacle.id(), std::move(ptr_obstacle));
   }
 
   const Obstacle& ego_vehicle = submodule_output.GetEgoVehicle();
-  std::unique_ptr<Obstacle> ptr_ego_vehicle(
-      new Obstacle(std::move(ego_vehicle)));
+  std::unique_ptr<Obstacle> ptr_ego_vehicle(new Obstacle(ego_vehicle));
   ptr_obstacles_.Put(ego_vehicle.id(), std::move(ptr_ego_vehicle));
 
   curr_frame_movable_obstacle_ids_ =
