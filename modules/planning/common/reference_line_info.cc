@@ -791,16 +791,12 @@ void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
     prev_advice->set_advice(EngageAdvice::DISALLOW_ENGAGE);
   }
   if (!IsDrivable()) {
-    if (prev_advice->advice() == EngageAdvice::DISALLOW_ENGAGE) {
-      prev_advice->set_advice(EngageAdvice::DISALLOW_ENGAGE);
-    } else {
+    if (prev_advice->advice() != EngageAdvice::DISALLOW_ENGAGE) {
       prev_advice->set_advice(EngageAdvice::PREPARE_DISENGAGE);
     }
     prev_advice->set_reason("Reference line not drivable");
   } else if (!is_on_reference_line_) {
-    if (prev_advice->advice() == EngageAdvice::DISALLOW_ENGAGE) {
-      prev_advice->set_advice(EngageAdvice::DISALLOW_ENGAGE);
-    } else {
+    if (prev_advice->advice() != EngageAdvice::DISALLOW_ENGAGE) {
       prev_advice->set_advice(EngageAdvice::PREPARE_DISENGAGE);
     }
     prev_advice->set_reason("Not on reference line");
@@ -810,9 +806,7 @@ void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
         reference_line_.GetReferencePoint(adc_sl_boundary_.end_s());
     if (common::math::AngleDiff(vehicle_state_.heading(), ref_point.heading()) >
         kMaxAngleDiff) {
-      if (prev_advice->advice() == EngageAdvice::DISALLOW_ENGAGE) {
-        prev_advice->set_advice(EngageAdvice::DISALLOW_ENGAGE);
-      } else {
+      if (prev_advice->advice() != EngageAdvice::DISALLOW_ENGAGE) {
         prev_advice->set_advice(EngageAdvice::PREPARE_DISENGAGE);
       }
       prev_advice->set_reason("Vehicle heading is not aligned");
