@@ -133,6 +133,16 @@ bool PredictionComponent::ContainerSubmoduleProcess(
     auto trajectory_msg = *ptr_trajectory_msg;
     MessageProcess::OnPlanning(trajectory_msg);
   }
+
+  // Read storytelling message and call OnStorytelling to update the
+  // StoryTellingContainer
+  storytelling_reader_->Observe();
+  auto ptr_storytelling_msg = storytelling_reader_->GetLatestObserved();
+  if (ptr_storytelling_msg != nullptr) {
+    auto storytelling_msg = *ptr_storytelling_msg;
+    MessageProcess::OnStoryTelling(storytelling_msg);
+  }
+
   MessageProcess::ContainerProcess(*perception_obstacles);
 
   auto obstacles_container_ptr =
@@ -152,8 +162,8 @@ bool PredictionComponent::ContainerSubmoduleProcess(
   ADCTrajectoryContainer adc_container = *adc_trajectory_container_ptr;
   adc_container_writer_->Write(
       std::make_shared<ADCTrajectoryContainer>(adc_container));
-  perception_obstacles_writer_->Write(std::make_shared<PerceptionObstacles>(
-      perception_msg));
+  perception_obstacles_writer_->Write(
+      std::make_shared<PerceptionObstacles>(perception_msg));
   return true;
 }
 
@@ -201,6 +211,15 @@ bool PredictionComponent::PredictionEndToEndProc(
   diff = end_time3 - end_time2;
   ADEBUG << "Time for updating ADCTrajectoryContainer: " << diff.count() * 1000
          << " msec.";
+
+  // Read storytelling message and call OnStorytelling to update the
+  // StoryTellingContainer
+  storytelling_reader_->Observe();
+  auto ptr_storytelling_msg = storytelling_reader_->GetLatestObserved();
+  if (ptr_storytelling_msg != nullptr) {
+    auto storytelling_msg = *ptr_storytelling_msg;
+    MessageProcess::OnStoryTelling(storytelling_msg);
+  }
 
   // Get all perception_obstacles of this frame and call OnPerception to
   // process them all.
