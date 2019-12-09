@@ -521,3 +521,7 @@ DEFINE_bool(
 
 DEFINE_bool(use_soft_bound_in_nonlinear_speed_opt, true,
             "False to disallow soft bound in nonlinear speed opt");
+
+DEFINE_bool(use_front_axe_center_in_path_planning, false,
+            "If using front axe center in path planning, the path can be "
+            "more agile.");
