@@ -79,6 +79,8 @@ class Obstacle {
    */
   bool InsertFeature(const Feature& feature);
 
+  void ClearOldInformation();
+
   void TrimHistory(const size_t remain_size);
 
   /**

@@ -44,9 +44,9 @@ class SubmoduleOutput {
    */
   virtual ~SubmoduleOutput() = default;
 
-  void InsertObstacle(const Obstacle& obstacle);
+  void InsertObstacle(const Obstacle&& obstacle);
 
-  void InsertEgoVehicle(const Obstacle& ego_vehicle);
+  void InsertEgoVehicle(const Obstacle&& ego_vehicle);
 
   void set_curr_frame_movable_obstacle_ids(
       const std::vector<int>& curr_frame_movable_obstacle_ids);
