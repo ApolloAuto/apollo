@@ -207,8 +207,8 @@ void Obstacle::ClearOldInformation() {
 }
 
 void Obstacle::TrimHistory(const size_t remain_size) {
-  while (feature_history_.size() > remain_size) {
-    feature_history_.pop_back();
+  if (feature_history_.size() > remain_size) {
+    feature_history_.resize(remain_size);
   }
 }
 
