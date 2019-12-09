@@ -267,10 +267,11 @@ Status PathBoundsDecider::Process(
 void PathBoundsDecider::InitPathBoundsDecider(
     const Frame& frame, const ReferenceLineInfo& reference_line_info) {
   const ReferenceLine& reference_line = reference_line_info.reference_line();
-  const common::TrajectoryPoint& planning_start_point =
-      InferFrontAxeCenterFromRearAxeCenter(
-          frame.PlanningStartPoint());
-
+  common::TrajectoryPoint planning_start_point = frame.PlanningStartPoint();
+  if (FLAGS_use_front_axe_center_in_path_planning) {
+    planning_start_point = InferFrontAxeCenterFromRearAxeCenter(
+        planning_start_point);
+  }
   ADEBUG << "Plan at the starting point: x = "
          << planning_start_point.path_point().x() << ", y = "
          << planning_start_point.path_point().y() << ", and angle = "
