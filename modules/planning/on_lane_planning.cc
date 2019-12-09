@@ -461,6 +461,7 @@ Status OnLanePlanning::Plan(
       EgoInfo::Instance()->front_clear_distance());
 
   if (frame_->open_space_info().is_on_open_space_trajectory()) {
+    frame_->mutable_open_space_info()->sync_debug_instance();
     const auto& publishable_trajectory =
         frame_->open_space_info().publishable_trajectory_data().first;
     const auto& publishable_trajectory_gear =
