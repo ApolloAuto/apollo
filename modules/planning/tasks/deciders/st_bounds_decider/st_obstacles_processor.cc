@@ -155,9 +155,9 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
       // Obstacle is dynamic.
       if (boundary.bottom_left_point().s() - adc_path_init_s_ <
           kSIgnoreThreshold) {
-        // Ignore backward obstacles.
+        // Ignore obstacles that are behind.
         // TODO(jiacheng): don't ignore if ADC is in dangerous segments.
-        // continue;
+        continue;
       }
       obs_id_to_st_boundary_[obs_ptr->Id()] = boundary;
       obs_ptr->set_path_st_boundary(boundary);
