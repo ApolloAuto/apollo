@@ -48,6 +48,7 @@ using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using apollo::planning::ADCTrajectory;
+using apollo::storytelling::Stories;
 using cyber::record::RecordMessage;
 using cyber::record::RecordReader;
 
@@ -236,9 +237,9 @@ void MessageProcess::OnPerception(
     return;
   }
   // Make predictions
-  PredictorManager::Instance()->Run(
-      perception_obstacles, ptr_ego_trajectory_container,
-      ptr_obstacles_container);
+  PredictorManager::Instance()->Run(perception_obstacles,
+                                    ptr_ego_trajectory_container,
+                                    ptr_obstacles_container);
 
   // Get predicted obstacles
   *prediction_obstacles = PredictorManager::Instance()->prediction_obstacles();
@@ -264,6 +265,17 @@ void MessageProcess::OnPlanning(const planning::ADCTrajectory& adc_trajectory) {
   ptr_ego_trajectory_container->Insert(adc_trajectory);
 
   ADEBUG << "Received a planning message [" << adc_trajectory.ShortDebugString()
+         << "].";
+}
+
+void MessageProcess::OnStoryTelling(const Stories& story) {
+  auto ptr_storytelling_container =
+      ContainerManager::Instance()->GetContainer<StoryTellingContainer>(
+          AdapterConfig::STORYTELLING);
+  CHECK_NOTNULL(ptr_storytelling_container);
+  ptr_storytelling_container->Insert(story);
+
+  ADEBUG << "Received a storytelling message [" << story.ShortDebugString()
          << "].";
 }
 
