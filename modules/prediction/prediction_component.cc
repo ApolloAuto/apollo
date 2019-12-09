@@ -120,18 +120,14 @@ bool PredictionComponent::ContainerSubmoduleProcess(
     AERROR << "Prediction: cannot receive any localization message.";
     return false;
   }
-  auto localization_msg = *ptr_localization_msg;
-  MessageProcess::OnLocalization(localization_msg);
-
-  perception::PerceptionObstacles perception_msg = *perception_obstacles;
+  MessageProcess::OnLocalization(*ptr_localization_msg);
 
   // Read planning info. of last frame and call OnPlanning to update
   // the ADCTrajectoryContainer
   planning_reader_->Observe();
   auto ptr_trajectory_msg = planning_reader_->GetLatestObserved();
   if (ptr_trajectory_msg != nullptr) {
-    auto trajectory_msg = *ptr_trajectory_msg;
-    MessageProcess::OnPlanning(trajectory_msg);
+    MessageProcess::OnPlanning(*ptr_trajectory_msg);
   }
 
   // Read storytelling message and call OnStorytelling to update the
@@ -139,8 +135,7 @@ bool PredictionComponent::ContainerSubmoduleProcess(
   storytelling_reader_->Observe();
   auto ptr_storytelling_msg = storytelling_reader_->GetLatestObserved();
   if (ptr_storytelling_msg != nullptr) {
-    auto storytelling_msg = *ptr_storytelling_msg;
-    MessageProcess::OnStoryTelling(storytelling_msg);
+    MessageProcess::OnStoryTelling(*ptr_storytelling_msg);
   }
 
   MessageProcess::ContainerProcess(*perception_obstacles);
@@ -158,12 +153,9 @@ bool PredictionComponent::ContainerSubmoduleProcess(
   SubmoduleOutput submodule_output =
       obstacles_container_ptr->GetSubmoduleOutput(kHistorySize,
                                                   frame_start_time);
-  container_writer_->Write(std::make_shared<SubmoduleOutput>(submodule_output));
-  ADCTrajectoryContainer adc_container = *adc_trajectory_container_ptr;
-  adc_container_writer_->Write(
-      std::make_shared<ADCTrajectoryContainer>(adc_container));
-  perception_obstacles_writer_->Write(
-      std::make_shared<PerceptionObstacles>(perception_msg));
+  container_writer_->Write(submodule_output);
+  adc_container_writer_->Write(*adc_trajectory_container_ptr);
+  perception_obstacles_writer_->Write(*perception_obstacles);
   return true;
 }
 
@@ -192,8 +184,7 @@ bool PredictionComponent::PredictionEndToEndProc(
     AERROR << "Prediction: cannot receive any localization message.";
     return false;
   }
-  auto localization_msg = *ptr_localization_msg;
-  MessageProcess::OnLocalization(localization_msg);
+  MessageProcess::OnLocalization(*ptr_localization_msg);
   auto end_time2 = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_time2 - end_time1;
   ADEBUG << "Time for updating PoseContainer: " << diff.count() * 1000
@@ -204,8 +195,7 @@ bool PredictionComponent::PredictionEndToEndProc(
   planning_reader_->Observe();
   auto ptr_trajectory_msg = planning_reader_->GetLatestObserved();
   if (ptr_trajectory_msg != nullptr) {
-    auto trajectory_msg = *ptr_trajectory_msg;
-    MessageProcess::OnPlanning(trajectory_msg);
+    MessageProcess::OnPlanning(*ptr_trajectory_msg);
   }
   auto end_time3 = std::chrono::system_clock::now();
   diff = end_time3 - end_time2;
@@ -217,8 +207,7 @@ bool PredictionComponent::PredictionEndToEndProc(
   storytelling_reader_->Observe();
   auto ptr_storytelling_msg = storytelling_reader_->GetLatestObserved();
   if (ptr_storytelling_msg != nullptr) {
-    auto storytelling_msg = *ptr_storytelling_msg;
-    MessageProcess::OnStoryTelling(storytelling_msg);
+    MessageProcess::OnStoryTelling(*ptr_storytelling_msg);
   }
 
   // Get all perception_obstacles of this frame and call OnPerception to
@@ -264,8 +253,7 @@ bool PredictionComponent::PredictionEndToEndProc(
 
   // Publish output
   common::util::FillHeader(node_->Name(), &prediction_obstacles);
-  prediction_writer_->Write(
-      std::make_shared<PredictionObstacles>(prediction_obstacles));
+  prediction_writer_->Write(prediction_obstacles);
   return true;
 }
 
