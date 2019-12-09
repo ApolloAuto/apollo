@@ -338,13 +338,7 @@ PyObject* cyber_PyParameter_clt_set_parameter(PyObject* self, PyObject* args) {
     Py_RETURN_FALSE;
   }
 
-  auto* param = pyparam->get_param();
-  if (nullptr == param) {
-    AERROR << "param ptr is null!";
-    Py_RETURN_FALSE;
-  }
-
-  if (!pyparam_clt->set_parameter(*param)) {
+  if (!pyparam_clt->set_parameter(pyparam->get_param())) {
     Py_RETURN_FALSE;
   } else {
     Py_RETURN_TRUE;
@@ -498,14 +492,7 @@ PyObject* cyber_PyParameter_srv_set_parameter(PyObject* self, PyObject* args) {
     return Py_None;
   }
 
-  auto* param = pyparam->get_param();
-  if (nullptr == param) {
-    AERROR << "param ptr is null!";
-    Py_INCREF(Py_None);
-    return Py_None;
-  }
-
-  pyparam_srv->set_parameter(*param);
+  pyparam_srv->set_parameter(pyparam->get_param());
   Py_INCREF(Py_None);
   return Py_None;
 }

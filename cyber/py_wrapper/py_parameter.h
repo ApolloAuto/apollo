@@ -34,82 +34,75 @@ namespace cyber {
 
 class PyParameter {
  public:
-  PyParameter() { parameter_ = std::make_shared<Parameter>(); }
-  explicit PyParameter(Parameter* param) { parameter_.reset(param); }
+  PyParameter() {}
+  explicit PyParameter(Parameter* param) : parameter_(*param) {}
 
-  PyParameter(const std::string& name, const int64_t int_value) {
-    parameter_ = std::make_shared<Parameter>(name, int_value);
-  }
-  PyParameter(const std::string& name, const double double_value) {
-    parameter_ = std::make_shared<Parameter>(name, double_value);
-  }
-  PyParameter(const std::string& name, const std::string& string_value) {
-    parameter_ = std::make_shared<Parameter>(name, string_value);
-  }
+  PyParameter(const std::string& name, const int64_t int_value)
+      : parameter_(name, int_value) {}
+  PyParameter(const std::string& name, const double double_value)
+      : parameter_(name, double_value) {}
+  PyParameter(const std::string& name, const std::string& string_value)
+      : parameter_(name, string_value) {}
   PyParameter(const std::string& name, const std::string& msg_str,
-              const std::string& full_name, const std::string& proto_desc) {
-    parameter_ =
-        std::make_shared<Parameter>(name, msg_str, full_name, proto_desc);
-  }
+              const std::string& full_name, const std::string& proto_desc)
+      : parameter_(name, msg_str, full_name, proto_desc) {}
 
-  uint type() { return parameter_->Type(); }
+  uint type() { return parameter_.Type(); }
 
-  std::string type_name() { return parameter_->TypeName(); }
+  std::string type_name() { return parameter_.TypeName(); }
 
-  std::string descriptor() { return parameter_->Descriptor(); }
+  std::string descriptor() { return parameter_.Descriptor(); }
 
-  std::string name() { return parameter_->Name(); }
+  std::string name() { return parameter_.Name(); }
 
-  int64_t as_int64() { return parameter_->AsInt64(); }
-  double as_double() { return parameter_->AsDouble(); }
-  std::string as_string() { return parameter_->AsString(); }
-  std::string debug_string() { return parameter_->DebugString(); }
+  int64_t as_int64() { return parameter_.AsInt64(); }
+  double as_double() { return parameter_.AsDouble(); }
+  std::string as_string() { return parameter_.AsString(); }
+  std::string debug_string() { return parameter_.DebugString(); }
 
-  Parameter* get_param() { return parameter_.get(); }
+  Parameter& get_param() { return parameter_; }
 
  private:
-  std::shared_ptr<Parameter> parameter_ = nullptr;
+  Parameter parameter_;
 };
 
 class PyParameterClient {
  public:
-  PyParameterClient(std::shared_ptr<Node> node,
-                    const std::string& service_node_name) {
-    parameter_clt_ = std::make_shared<ParameterClient>(node, service_node_name);
-  }
+  PyParameterClient(const std::shared_ptr<Node>& node,
+                    const std::string& service_node_name)
+      : parameter_clt_(node, service_node_name) {}
 
   bool set_parameter(const Parameter& parameter) {
-    return parameter_clt_->SetParameter(parameter);
+    return parameter_clt_.SetParameter(parameter);
   }
   bool get_parameter(const std::string& param_name, Parameter* parameter) {
-    return parameter_clt_->GetParameter(param_name, parameter);
+    return parameter_clt_.GetParameter(param_name, parameter);
   }
   bool list_parameters(std::vector<Parameter>* parameters) {
-    return parameter_clt_->ListParameters(parameters);
+    return parameter_clt_.ListParameters(parameters);
   }
 
  private:
-  std::shared_ptr<ParameterClient> parameter_clt_ = nullptr;
+  ParameterClient parameter_clt_;
 };
 
 class PyParameterServer {
  public:
-  explicit PyParameterServer(std::shared_ptr<Node> node) {
-    parameter_srv_ = std::make_shared<ParameterServer>(node);
-  }
+  explicit PyParameterServer(const std::shared_ptr<Node>& node)
+      : parameter_srv_(node) {}
 
   void set_parameter(const Parameter& parameter) {
-    parameter_srv_->SetParameter(parameter);
+    parameter_srv_.SetParameter(parameter);
   }
   bool get_parameter(const std::string& param_name, Parameter* parameter) {
-    return parameter_srv_->GetParameter(param_name, parameter);
+    return parameter_srv_.GetParameter(param_name, parameter);
   }
   void list_parameters(std::vector<Parameter>* parameters) {
-    parameter_srv_->ListParameters(parameters);
+    parameter_srv_.ListParameters(parameters);
   }
 
  private:
-  std::shared_ptr<ParameterServer> parameter_srv_ = nullptr;
+  ParameterServer parameter_srv_;
 };
 
 }  // namespace cyber
