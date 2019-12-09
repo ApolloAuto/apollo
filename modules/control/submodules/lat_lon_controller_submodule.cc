@@ -112,8 +112,7 @@ bool LatLonControllerSubmodule::Proc(
   control_core_command.mutable_header()->mutable_status()->set_msg(
       status.error_message());
 
-  control_core_writer_->Write(
-      std::make_shared<ControlCommand>(control_core_command));
+  control_core_writer_->Write(control_core_command);
   return status.ok();
 }
 

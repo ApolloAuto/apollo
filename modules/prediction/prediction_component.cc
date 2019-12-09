@@ -148,12 +148,10 @@ bool PredictionComponent::ContainerSubmoduleProcess(
   SubmoduleOutput submodule_output =
       obstacles_container_ptr->GetSubmoduleOutput(kHistorySize,
                                                   frame_start_time);
-  container_writer_->Write(std::make_shared<SubmoduleOutput>(submodule_output));
+  container_writer_->Write(submodule_output);
   ADCTrajectoryContainer adc_container = *adc_trajectory_container_ptr;
-  adc_container_writer_->Write(
-      std::make_shared<ADCTrajectoryContainer>(adc_container));
-  perception_obstacles_writer_->Write(std::make_shared<PerceptionObstacles>(
-      perception_msg));
+  adc_container_writer_->Write(adc_container);
+  perception_obstacles_writer_->Write(perception_msg);
   return true;
 }
 
@@ -245,8 +243,7 @@ bool PredictionComponent::PredictionEndToEndProc(
 
   // Publish output
   common::util::FillHeader(node_->Name(), &prediction_obstacles);
-  prediction_writer_->Write(
-      std::make_shared<PredictionObstacles>(prediction_obstacles));
+  prediction_writer_->Write(prediction_obstacles);
   return true;
 }
 
