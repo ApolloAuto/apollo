@@ -46,8 +46,9 @@ ObstaclesContainer::ObstaclesContainer(const SubmoduleOutput& submodule_output)
     ptr_obstacles_.Put(obstacle.id(), std::move(ptr_obstacle));
   }
 
-  const Obstacle& ego_vehicle = submodule_output.GetEgoVehicle();
-  std::unique_ptr<Obstacle> ptr_ego_vehicle(new Obstacle(ego_vehicle));
+  Obstacle ego_vehicle = submodule_output.GetEgoVehicle();
+  std::unique_ptr<Obstacle> ptr_ego_vehicle(
+      new Obstacle(std::move(ego_vehicle)));
   ptr_obstacles_.Put(ego_vehicle.id(), std::move(ptr_ego_vehicle));
 
   curr_frame_movable_obstacle_ids_ =
