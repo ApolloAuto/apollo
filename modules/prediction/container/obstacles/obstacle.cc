@@ -194,6 +194,18 @@ bool Obstacle::InsertFeature(const Feature& feature) {
   return true;
 }
 
+void Obstacle::ClearOldInformation() {
+  if (feature_history_.size() <= 1) {
+    return;
+  }
+  feature_history_[1].clear_predicted_trajectory();
+  Lane* lane = feature_history_[1].mutable_lane();
+  lane->clear_current_lane_feature();
+  lane->clear_nearby_lane_feature();
+  lane->clear_lane_graph();
+  lane->clear_lane_graph_ordered();
+}
+
 void Obstacle::TrimHistory(const size_t remain_size) {
   while (feature_history_.size() > remain_size) {
     feature_history_.pop_back();

@@ -133,7 +133,8 @@ class ObstaclesContainer : public Container {
 
   double timestamp() const;
 
-  SubmoduleOutput GetSubmoduleOutput(const size_t history_size);
+  SubmoduleOutput GetSubmoduleOutput(
+      const size_t history_size, const absl::Time& frame_start_time);
 
  private:
   Obstacle* GetObstacleWithLRUUpdate(const int obstacle_id);

@@ -46,11 +46,12 @@ bool EvaluatorSubmodule::Init() {
 
 bool EvaluatorSubmodule::Proc(
     const std::shared_ptr<SubmoduleOutput>& container_output) {
+  constexpr static size_t kHistorySize = 1;
   const auto frame_start_time = container_output->frame_start_time();
   ObstaclesContainer obstacles_container(*container_output);
   EvaluatorManager::Instance()->Run(&obstacles_container);
-  SubmoduleOutput submodule_output = obstacles_container.GetSubmoduleOutput(1);
-  submodule_output.set_frame_start_time(frame_start_time);
+  SubmoduleOutput submodule_output =
+      obstacles_container.GetSubmoduleOutput(kHistorySize, frame_start_time);
   evaluator_writer_->Write(std::make_shared<SubmoduleOutput>(submodule_output));
   return true;
 }

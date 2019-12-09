@@ -20,11 +20,11 @@
 namespace apollo {
 namespace prediction {
 
-void SubmoduleOutput::InsertObstacle(const Obstacle& obstacle) {
+void SubmoduleOutput::InsertObstacle(const Obstacle&& obstacle) {
   curr_frame_obstacles_.push_back(obstacle);
 }
 
-void SubmoduleOutput::InsertEgoVehicle(const Obstacle& ego_vehicle) {
+void SubmoduleOutput::InsertEgoVehicle(const Obstacle&& ego_vehicle) {
   ego_vehicle_ = ego_vehicle;
 }
 
