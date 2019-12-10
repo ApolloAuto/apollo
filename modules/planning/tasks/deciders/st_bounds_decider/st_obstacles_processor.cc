@@ -409,6 +409,8 @@ bool STObstaclesProcessor::ComputeObstacleSTBoundary(
       upper_points->emplace_back(overlapping_s.second, 0.0);
       upper_points->emplace_back(overlapping_s.second, planning_time_);
     }
+    *is_caution_obstacle = true;
+    *obs_caution_end_t = planning_time_;
   } else {
     // Processing a dynamic obstacle.
     // Go through every occurrence of the obstacle at all timesteps, and
