@@ -808,8 +808,6 @@ void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
     if (common::math::AngleDiff(vehicle_state_.heading(), ref_point.heading()) >
         kMaxAngleDiff) {
       if (prev_advice->advice() != EngageAdvice::DISALLOW_ENGAGE) {
-        prev_advice->set_advice(EngageAdvice::DISALLOW_ENGAGE);
-      } else {
         prev_advice->set_advice(EngageAdvice::PREPARE_DISENGAGE);
       }
       prev_advice->set_reason("Vehicle heading is not aligned");
