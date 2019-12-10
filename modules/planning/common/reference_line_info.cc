@@ -794,7 +794,10 @@ void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
     const auto& scenario_type = PlanningContext::Instance()->planning_status()
                                                            .scenario()
                                                            .scenario_type();
-    if (scenario_type == ScenarioConfig::PARK_AND_GO) {
+    if (scenario_type == ScenarioConfig::PARK_AND_GO || IsChangeLanePath()) {
+      // note: when NOT is_on_reference_line_
+      //   (1) always engage while in PARK_AND_GO scenario
+      //   (2) engage since "ChangeLanePath" is most likely NOT on ref line
       engage = true;
     } else {
       prev_advice.set_reason("Not on reference line");
