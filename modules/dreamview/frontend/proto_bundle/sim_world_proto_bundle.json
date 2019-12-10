@@ -878,6 +878,7 @@
                 "CONTROL_ERROR": 1000,
                 "CONTROL_INIT_ERROR": 1001,
                 "CONTROL_COMPUTE_ERROR": 1002,
+                "CONTROL_ESTOP_ERROR": 1003,
                 "CANBUS_ERROR": 2000,
                 "CAN_CLIENT_ERROR_BASE": 2100,
                 "CAN_CLIENT_ERROR_OPEN_DEVICE_FAILED": 2101,
@@ -909,7 +910,8 @@
                 "RELATIVE_MAP_ERROR": 11000,
                 "RELATIVE_MAP_NOT_READY": 11001,
                 "DRIVER_ERROR_GNSS": 12000,
-                "DRIVER_ERROR_VELODYNE": 13000
+                "DRIVER_ERROR_VELODYNE": 13000,
+                "STORYTELLING_ERROR": 14000
               }
             },
             "StatusPb": {
@@ -3982,6 +3984,41 @@
                 "enableLaneChangeUrgencyCheck": {
                   "type": "bool",
                   "id": 1
+                },
+                "enablePrioritizeChangeLane": {
+                  "type": "bool",
+                  "id": 2,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "enableRemoveChangeLane": {
+                  "type": "bool",
+                  "id": 3,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "recklessChangeLane": {
+                  "type": "bool",
+                  "id": 4,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "changeLaneSuccessFreezeTime": {
+                  "type": "double",
+                  "id": 5,
+                  "options": {
+                    "default": 1.5
+                  }
+                },
+                "changeLaneFailFreezeTime": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 1
+                  }
                 }
               }
             },
@@ -7241,6 +7278,10 @@
                 "inCheckStage": {
                   "type": "bool",
                   "id": 3
+                },
+                "adcAdjustEndPose": {
+                  "type": "apollo.common.PointENU",
+                  "id": 4
                 }
               }
             },
@@ -7969,80 +8010,48 @@
                     "default": 0.1
                   }
                 },
-                "highSpeedCentricAccelerationLimit": {
+                "maxCentricAccelerationLimit": {
                   "type": "double",
                   "id": 3,
                   "options": {
-                    "default": 1.2
-                  }
-                },
-                "lowSpeedCentricAccelerationLimit": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 1.4
-                  }
-                },
-                "highSpeedThreshold": {
-                  "type": "double",
-                  "id": 5,
-                  "options": {
-                    "default": 20
-                  }
-                },
-                "lowSpeedThreshold": {
-                  "type": "double",
-                  "id": 6,
-                  "options": {
-                    "default": 7
+                    "default": 2
                   }
                 },
                 "minimalKappa": {
                   "type": "double",
-                  "id": 7,
+                  "id": 4,
                   "options": {
                     "default": 0.00001
                   }
                 },
                 "pointExtension": {
                   "type": "double",
-                  "id": 8,
+                  "id": 5,
                   "options": {
                     "default": 1
                   }
                 },
                 "lowestSpeed": {
                   "type": "double",
-                  "id": 9,
+                  "id": 6,
                   "options": {
                     "default": 2.5
                   }
                 },
-                "numPointsToAvgKappa": {
-                  "type": "uint32",
-                  "id": 10,
-                  "options": {
-                    "default": 4
-                  }
-                },
                 "collisionSafetyRange": {
                   "type": "double",
-                  "id": 11,
+                  "id": 7,
                   "options": {
                     "default": 1
                   }
                 },
                 "staticObsNudgeSpeedRatio": {
                   "type": "double",
-                  "id": 12
+                  "id": 8
                 },
                 "dynamicObsNudgeSpeedRatio": {
                   "type": "double",
-                  "id": 13
-                },
-                "centriJerkSpeedCoeff": {
-                  "type": "double",
-                  "id": 14
+                  "id": 9
                 }
               }
             },
