@@ -23,6 +23,7 @@
 #include <algorithm>
 
 #include "cyber/task/task.h"
+#include "modules/planning/proto/planning_status.pb.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
 
 #include "absl/strings/str_cat.h"
@@ -783,45 +784,49 @@ void ReferenceLineInfo::SetObjectDecisions(
 }
 
 void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
+  static EngageAdvice prev_advice;
   static constexpr double kMaxAngleDiff = M_PI / 6.0;
-  auto* prev_advice = PlanningContext::Instance()
-                          ->mutable_planning_status()
-                          ->mutable_engage_advice();
-  if (!prev_advice->has_advice()) {
-    prev_advice->set_advice(EngageAdvice::DISALLOW_ENGAGE);
-  }
 
+  bool engage = false;
   if (!IsDrivable()) {
-    if (prev_advice->advice() != EngageAdvice::DISALLOW_ENGAGE) {
-      prev_advice->set_advice(EngageAdvice::PREPARE_DISENGAGE);
+    prev_advice.set_reason("Reference line not drivable");
+  } else if (!is_on_reference_line_) {
+    const auto& scenario_type = PlanningContext::Instance()->planning_status()
+                                                           .scenario()
+                                                           .scenario_type();
+    if (scenario_type == ScenarioConfig::PARK_AND_GO) {
+      engage = true;
+    } else {
+      prev_advice.set_reason("Not on reference line");
     }
-    prev_advice->set_reason("Reference line not drivable");
-  } else if (!is_on_reference_line_ && !FLAGS_enable_start_auto_from_off_lane) {
-    if (prev_advice->advice() != EngageAdvice::DISALLOW_ENGAGE) {
-      prev_advice->set_advice(EngageAdvice::PREPARE_DISENGAGE);
-    }
-    prev_advice->set_reason("Not on reference line");
   } else {
     // check heading
     auto ref_point =
         reference_line_.GetReferencePoint(adc_sl_boundary_.end_s());
-    if (common::math::AngleDiff(vehicle_state_.heading(), ref_point.heading()) >
+    if (common::math::AngleDiff(vehicle_state_.heading(), ref_point.heading()) <
         kMaxAngleDiff) {
-      if (prev_advice->advice() != EngageAdvice::DISALLOW_ENGAGE) {
-        prev_advice->set_advice(EngageAdvice::PREPARE_DISENGAGE);
-      }
-      prev_advice->set_reason("Vehicle heading is not aligned");
+      engage = true;
     } else {
-      if (vehicle_state_.driving_mode() !=
-          Chassis::DrivingMode::Chassis_DrivingMode_COMPLETE_AUTO_DRIVE) {
-        prev_advice->set_advice(EngageAdvice::READY_TO_ENGAGE);
-      } else {
-        prev_advice->set_advice(EngageAdvice::KEEP_ENGAGED);
-      }
-      prev_advice->clear_reason();
+      prev_advice.set_reason("Vehicle heading is not aligned");
     }
   }
-  engage_advice->CopyFrom(*prev_advice);
+
+  if (engage) {
+    if (vehicle_state_.driving_mode() !=
+        Chassis::DrivingMode::Chassis_DrivingMode_COMPLETE_AUTO_DRIVE) {
+      // READY_TO_ENGAGE when in auto mode
+      prev_advice.set_advice(EngageAdvice::READY_TO_ENGAGE);
+    } else {
+      // KEEP_ENGAGED when in manual mode
+      prev_advice.set_advice(EngageAdvice::KEEP_ENGAGED);
+    }
+    prev_advice.clear_reason();
+  } else {
+    if (prev_advice.advice() != EngageAdvice::DISALLOW_ENGAGE) {
+      prev_advice.set_advice(EngageAdvice::PREPARE_DISENGAGE);
+    }
+  }
+  engage_advice->CopyFrom(prev_advice);
 }
 
 void ReferenceLineInfo::MakeEStopDecision(
