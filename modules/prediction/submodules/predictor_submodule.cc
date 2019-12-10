@@ -74,8 +74,7 @@ bool PredictorSubmodule::Proc(
   prediction_obstacles.set_perception_error_code(perception_error_code);
 
   common::util::FillHeader(node_->Name(), &prediction_obstacles);
-  predictor_writer_->Write(
-      std::make_shared<PredictionObstacles>(prediction_obstacles));
+  predictor_writer_->Write(prediction_obstacles);
 
   const absl::Time& end_time = absl::Now();
   ADEBUG << "End to end time = "

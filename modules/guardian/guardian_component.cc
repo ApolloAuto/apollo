@@ -77,7 +77,7 @@ bool GuardianComponent::Proc() {
   }
 
   common::util::FillHeader(node_->Name(), &guardian_cmd_);
-  guardian_writer_->Write(std::make_shared<GuardianCommand>(guardian_cmd_));
+  guardian_writer_->Write(guardian_cmd_);
   return true;
 }
 

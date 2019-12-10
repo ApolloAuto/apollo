@@ -391,8 +391,7 @@ class Teleop {
 
   void Send() {
     apollo::common::util::FillHeader("control", &control_command_);
-    control_command_writer_->Write(
-        std::make_shared<ControlCommand>(control_command_));
+    control_command_writer_->Write(control_command_);
     ADEBUG << "Control Command send OK:" << control_command_.ShortDebugString();
   }
 

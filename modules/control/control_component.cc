@@ -330,7 +330,7 @@ bool ControlComponent::Proc() {
     local_view_.mutable_header()->set_radar_timestamp(
         local_view_.trajectory().header().radar_timestamp());
     common::util::FillHeader(FLAGS_control_local_view_topic, &local_view_);
-    local_view_writer_->Write(std::make_shared<LocalView>(local_view_));
+    local_view_writer_->Write(local_view_);
     return true;
   }
 
@@ -401,7 +401,7 @@ bool ControlComponent::Proc() {
         end_timestamp);
   }
 
-  control_cmd_writer_->Write(std::make_shared<ControlCommand>(control_command));
+  control_cmd_writer_->Write(control_command);
   return true;
 }
 

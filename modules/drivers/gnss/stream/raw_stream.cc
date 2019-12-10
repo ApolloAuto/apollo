@@ -173,7 +173,7 @@ bool RawStream::Init() {
   stream_writer_ = node_->CreateWriter<StreamStatus>(FLAGS_stream_status_topic);
 
   common::util::FillHeader("gnss", &stream_status_);
-  stream_writer_->Write(std::make_shared<StreamStatus>(stream_status_));
+  stream_writer_->Write(stream_status_);
 
   // Creates streams.
   Stream *s = nullptr;
@@ -470,13 +470,13 @@ void RawStream::StreamStatusCheck() {
 
   if (status_report) {
     common::util::FillHeader("gnss", &stream_status_);
-    stream_writer_->Write(std::make_shared<StreamStatus>(stream_status_));
+    stream_writer_->Write(stream_status_);
   }
 }
 
 void RawStream::DataSpin() {
   common::util::FillHeader("gnss", &stream_status_);
-  stream_writer_->Write(std::make_shared<StreamStatus>(stream_status_));
+  stream_writer_->Write(stream_status_);
   while (cyber::OK()) {
     size_t length = data_stream_->read(buffer_, BUFFER_SIZE);
     if (length > 0) {

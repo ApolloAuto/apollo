@@ -52,7 +52,7 @@ bool EvaluatorSubmodule::Proc(
   EvaluatorManager::Instance()->Run(&obstacles_container);
   SubmoduleOutput submodule_output =
       obstacles_container.GetSubmoduleOutput(kHistorySize, frame_start_time);
-  evaluator_writer_->Write(std::make_shared<SubmoduleOutput>(submodule_output));
+  evaluator_writer_->Write(submodule_output);
   return true;
 }
 

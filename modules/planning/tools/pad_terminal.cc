@@ -70,7 +70,7 @@ class PadTerminal {
       AINFO << "sending RESUME CRUISE action command.";
     }
     apollo::common::util::FillHeader("terminal", &pad);
-    pad_writer_->Write(std::make_shared<PadMessage>(pad));
+    pad_writer_->Write(pad);
     AINFO << "send pad_message OK";
   }
 
