@@ -80,7 +80,7 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
   common::Status CheckPad();
 
  private:
-  double init_time_ = 0.0;
+  absl::Time init_time_;
 
   localization::LocalizationEstimate latest_localization_;
   canbus::Chassis latest_chassis_;
