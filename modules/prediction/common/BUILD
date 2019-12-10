@@ -4,14 +4,14 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "prediction_gflags",
-    srcs = [
-        "prediction_gflags.cc",
-        "prediction_system_gflags.cc",
-    ],
-    hdrs = [
-        "prediction_gflags.h",
-        "prediction_system_gflags.h",
-    ],
+    srcs = ["prediction_gflags.cc"],
+    hdrs = ["prediction_gflags.h"],
+)
+
+cc_library(
+    name = "prediction_system_gflags",
+    srcs = ["prediction_system_gflags.cc"],
+    hdrs = ["prediction_system_gflags.h"],
 )
 
 cc_library(
@@ -102,6 +102,7 @@ cc_library(
         ":prediction_map",
         "//modules/prediction/common:prediction_constants",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/common:prediction_system_gflags",
         "//modules/prediction/proto:lane_graph_proto",
     ],
 )
