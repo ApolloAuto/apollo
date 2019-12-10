@@ -117,16 +117,14 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
   std::tuple<std::string, STBoundary, Obstacle*> closest_stop_obstacle;
   std::get<0>(closest_stop_obstacle) = "NULL";
   for (const auto* obs_item_ptr : path_decision->obstacles().Items()) {
+    // Sanity checks.
     Obstacle* obs_ptr = path_decision->Find(obs_item_ptr->Id());
     if (obs_ptr == nullptr) {
       const std::string msg = "Null obstacle pointer.";
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
-    // Temporarily ignore
-    if (obs_item_ptr->Id().find("KC_JC") != std::string::npos) {
-      continue;
-    }
 
+    // Draw the obstacle's st-boundary.
     std::vector<STPoint> lower_points;
     std::vector<STPoint> upper_points;
     bool is_caution_obstacle = false;
@@ -139,6 +137,14 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     auto boundary =
         STBoundary::CreateInstanceAccurate(lower_points, upper_points);
     boundary.set_id(obs_ptr->Id());
+
+    // Store all Keep-Clear zone together.
+    if (obs_item_ptr->Id().find("KC_JC") != std::string::npos) {
+      candidate_clear_zones_.emplace_back(obs_ptr->Id(), boundary, obs_ptr);
+      continue;
+    }
+
+    // Process all other obstacles than Keep-Clear zone.
     if (is_caution_obstacle) {
       boundary.set_obstacle_road_right_ending_t(obs_caution_end_t);
     }
@@ -163,12 +169,33 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
       obs_ptr->set_path_st_boundary(boundary);
     }
   }
-  // For static obstacles, only retain the closest one.
+  // For static obstacles, only retain the closest one (also considers
+  // Keep-Clear zone here).
+  // Note: We only need to check the overlapping between the closest obstacle
+  //       and all the Keep-Clear zones. Because if there is another obstacle
+  //       overlapping with a Keep-Clear zone, which results in a even closer
+  //       stop fence, then that very Keep-Clear zone must also overlap with
+  //       the closest obstacle. (Proof omitted here)
   if (std::get<0>(closest_stop_obstacle) != "NULL") {
-    obs_id_to_st_boundary_[std::get<0>(closest_stop_obstacle)] =
-        std::get<1>(closest_stop_obstacle);
-    std::get<2>(closest_stop_obstacle)
-        ->set_path_st_boundary(std::get<1>(closest_stop_obstacle));
+    std::string closest_stop_obs_id;
+    STBoundary closest_stop_obs_boundary;
+    Obstacle* closest_stop_obs_ptr;
+    std::tie(closest_stop_obs_id, closest_stop_obs_boundary,
+             closest_stop_obs_ptr) = closest_stop_obstacle;
+    // Go through all Keep-Clear zones, and see if there is a even closer
+    // stop fence due to them.
+    for (const auto& clear_zone : candidate_clear_zones_) {
+      if (closest_stop_obs_boundary.min_s() >=
+              std::get<1>(clear_zone).min_s() &&
+          closest_stop_obs_boundary.min_s() <=
+              std::get<1>(clear_zone).max_s()) {
+        std::tie(closest_stop_obs_id, closest_stop_obs_boundary,
+                 closest_stop_obs_ptr) = clear_zone;
+        break;
+      }
+    }
+    obs_id_to_st_boundary_[closest_stop_obs_id] = closest_stop_obs_boundary;
+    closest_stop_obs_ptr->set_path_st_boundary(closest_stop_obs_boundary);
   }
 
   // Preprocess the obstacles for sweep-line algorithms.

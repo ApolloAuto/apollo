@@ -207,6 +207,9 @@ class STObstaclesProcessor {
   std::unordered_map<std::string, STBoundary> obs_id_to_st_boundary_;
   std::unordered_map<std::string, ObjectDecisionType> obs_id_to_decision_;
 
+  std::vector<std::tuple<std::string, STBoundary, Obstacle*>>
+      candidate_clear_zones_;
+
   std::vector<std::pair<double, double>> adc_low_road_right_segments_;
 };
 
