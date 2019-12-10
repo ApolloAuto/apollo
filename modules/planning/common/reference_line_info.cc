@@ -815,13 +815,13 @@ void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
   }
 
   if (engage) {
-    if (vehicle_state_.driving_mode() !=
+    if (vehicle_state_.driving_mode() ==
         Chassis::DrivingMode::Chassis_DrivingMode_COMPLETE_AUTO_DRIVE) {
-      // READY_TO_ENGAGE when in auto mode
-      prev_advice.set_advice(EngageAdvice::READY_TO_ENGAGE);
-    } else {
-      // KEEP_ENGAGED when in manual mode
+      // KEEP_ENGAGED when in auto mode
       prev_advice.set_advice(EngageAdvice::KEEP_ENGAGED);
+    } else {
+      // READY_TO_ENGAGE when in manual mode
+      prev_advice.set_advice(EngageAdvice::READY_TO_ENGAGE);
     }
     prev_advice.clear_reason();
   } else {
