@@ -330,6 +330,16 @@ bool ControlComponent::Proc() {
     local_view_.mutable_header()->set_radar_timestamp(
         local_view_.trajectory().header().radar_timestamp());
     common::util::FillHeader(FLAGS_control_local_view_topic, &local_view_);
+
+    const double end_timestamp = Clock::NowInSeconds();
+
+    // measure latency
+    static apollo::common::LatencyRecorder latency_recorder(
+        FLAGS_control_local_view_topic);
+    latency_recorder.AppendLatencyRecord(
+        local_view_.trajectory().header().lidar_timestamp(), start_timestamp,
+        end_timestamp);
+
     local_view_writer_->Write(local_view_);
     return true;
   }
