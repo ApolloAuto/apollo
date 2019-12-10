@@ -255,16 +255,6 @@ cc_library(
 # )
 
 cc_test(
-    name = "camera_lib_dummy_algorithms_test",
-    size = "small",
-    srcs = ["camera_lib_dummy_algorithms_test.cc"],
-    deps = [
-        "//modules/perception/camera/lib/dummy:dummy_algorithms",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
     name = "camera_lib_feature_extractor_tfe_tracking_feat_extractor_test",
     size = "small",
     srcs = ["camera_lib_feature_extractor_tfe_tracking_feat_extractor_test.cc"],
