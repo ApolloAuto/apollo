@@ -120,29 +120,4 @@ cc_test(
     ],
 )
 
-cc_library(
-    name = "inference_binary_data_lib",
-    srcs = ["binary_data.cc"],
-    hdrs = ["binary_data.h"],
-    linkopts = ["-lnvinfer_plugin"],
-    deps = [
-        "//modules/perception/base:blob",
-        "@caffe",
-        "@opencv",
-    ],
-)
-
-cc_test(
-    name = "inference_binary_data_test",
-    size = "small",
-    srcs = ["binary_data_test.cc"],
-    data = [
-        "//modules/perception/inference:inference_test_data",
-    ],
-    deps = [
-        ":inference_binary_data_lib",
-        "@gtest//:main",
-    ],
-)
-
 cpplint()
