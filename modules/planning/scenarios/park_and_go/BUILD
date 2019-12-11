@@ -9,12 +9,14 @@ cc_library(
         "stage_adjust.cc",
         "stage_check.cc",
         "stage_cruise.cc",
+        "stage_pre_cruise.cc",
     ],
     hdrs = [
         "park_and_go_scenario.h",
         "stage_adjust.h",
         "stage_check.h",
         "stage_cruise.h",
+        "stage_pre_cruise.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
