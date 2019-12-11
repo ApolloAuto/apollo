@@ -266,6 +266,14 @@ void MessageProcess::OnPlanning(const planning::ADCTrajectory& adc_trajectory) {
 
   ADEBUG << "Received a planning message [" << adc_trajectory.ShortDebugString()
          << "].";
+
+  auto ptr_storytelling_container =
+      ContainerManager::Instance()->GetContainer<StoryTellingContainer>(
+          AdapterConfig::STORYTELLING);
+  CHECK_NOTNULL(ptr_storytelling_container);
+  ptr_ego_trajectory_container->SetJunction(
+      ptr_storytelling_container->ADCJunctionId(),
+      ptr_storytelling_container->ADCDistanceToJunction());
 }
 
 void MessageProcess::OnStoryTelling(const Stories& story) {
