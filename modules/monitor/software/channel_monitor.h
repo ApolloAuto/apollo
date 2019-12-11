@@ -35,7 +35,7 @@ class ChannelMonitor : public RecurrentRunner {
   static void UpdateStatus(
       const apollo::dreamview::ChannelMonitorConfig& config,
       ComponentStatus* status, const bool update_freq, const double freq);
-  std::shared_ptr<LatencyMonitor> latency_monitor;
+  std::shared_ptr<LatencyMonitor> latency_monitor_;
 };
 
 }  // namespace monitor

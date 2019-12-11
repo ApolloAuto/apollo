@@ -66,10 +66,13 @@ bool CompensatorComponent::Proc(
   point_cloud_compensated->Clear();
   if (compensator_->MotionCompensation(point_cloud, point_cloud_compensated)) {
     const auto end_time = common::time::Clock::Now();
-    AINFO << "compenstator diff:"
-          << absl::ToInt64Nanoseconds(end_time - start_time)
-          << ";meta:" << point_cloud_compensated->header().lidar_timestamp();
-
+    const auto diff = end_time - start_time;
+    const auto meta_diff =
+        end_time - absl::FromUnixNanos(
+                       point_cloud_compensated->header().lidar_timestamp());
+    AINFO << "compenstator diff:" << absl::ToInt64Milliseconds(diff) << " ms"
+          << ";meta:" << point_cloud_compensated->header().lidar_timestamp()
+          << ";meta diff: " << absl::ToInt64Milliseconds(meta_diff) << " ms";
     static common::LatencyRecorder latency_recorder(FLAGS_pointcloud_topic);
     latency_recorder.AppendLatencyRecord(
         point_cloud_compensated->header().lidar_timestamp(), start_time,

@@ -169,10 +169,11 @@ void LatencyMonitor::AggregateLatency() {
     }
   }
   // Aggregate E2E latencies
+  std::unordered_map<std::string, uint64_t> e2e_latencies;
   for (const auto& message : track_map_) {
     uint64_t e2e_begin_time = 0;
-    std::unordered_map<std::string, uint64_t> e2e_latencies;
     auto iter = message.second.begin();
+    e2e_latencies.clear();
     while (iter != message.second.end()) {
       std::tie(begin_time, std::ignore, module_name) = *iter;
       if (e2e_begin_time == 0 && module_name == kE2EStartPoint) {
