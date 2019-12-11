@@ -119,11 +119,6 @@ message ScenarioStatus {
   optional ScenarioConfig.StageType stage_type = 2;
 }
 
-message SidePassStatus {
-  optional apollo.common.PathPoint change_lane_stop_path_point = 1;
-  optional bool check_clear_flag = 2;
-}
-
 message StopSignStatus {
   optional string current_stop_sign_overlap_id = 1;
   optional string done_stop_sign_overlap_id = 2;
@@ -155,8 +150,7 @@ message PlanningStatus {
   optional PullOverStatus pull_over = 10;
   optional ReroutingStatus rerouting = 11;
   optional ScenarioStatus scenario = 12;
-  optional SidePassStatus side_pass = 13;
-  optional StopSignStatus stop_sign = 14;
-  optional TrafficLightStatus traffic_light = 15;
-  optional YieldSignStatus yield_sign = 16;
+  optional StopSignStatus stop_sign = 13;
+  optional TrafficLightStatus traffic_light = 14;
+  optional YieldSignStatus yield_sign = 15;
 }
