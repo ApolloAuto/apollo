@@ -90,10 +90,13 @@ SpeedDecider::STLocation SpeedDecider::GetSTLocation(
       ADEBUG << "speed profile cross st_boundaries.";
       st_location = CROSS;
 
-      if (st_boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
-        if (!CheckKeepClearCrossable(path_decision, speed_profile,
-                                     st_boundary)) {
-          st_location = BELOW;
+      if (!FLAGS_use_st_drivable_boundary) {
+        if (st_boundary.boundary_type() ==
+            STBoundary::BoundaryType::KEEP_CLEAR) {
+          if (!CheckKeepClearCrossable(path_decision, speed_profile,
+                                       st_boundary)) {
+            st_location = BELOW;
+          }
         }
       }
       break;
@@ -238,9 +241,12 @@ Status SpeedDecider::MakeObjectDecision(
     }
 
     auto location = GetSTLocation(path_decision, speed_profile, boundary);
-    if (boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
-      if (CheckKeepClearBlocked(path_decision, *obstacle)) {
-        location = BELOW;
+
+    if (!FLAGS_use_st_drivable_boundary) {
+      if (boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
+        if (CheckKeepClearBlocked(path_decision, *obstacle)) {
+          location = BELOW;
+        }
       }
     }
 
