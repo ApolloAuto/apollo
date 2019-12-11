@@ -41,6 +41,7 @@ class ParkAndGoStageAdjust : public Stage {
   }
 
  private:
+  void ResetInitPostion(Frame* frame);
   ScenarioParkAndGoConfig scenario_config_;
 };
 
