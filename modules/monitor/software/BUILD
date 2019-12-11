@@ -20,7 +20,9 @@ cc_library(
     srcs = ["channel_monitor.cc"],
     hdrs = ["channel_monitor.h"],
     deps = [
+        ":latency_monitor",
         ":summary_monitor",
+        "//modules/common/latency_recorder/proto:latency_record_proto",
         "//modules/control/proto:control_proto",
         "//modules/dreamview/proto:hmi_mode_proto",
         "//modules/drivers/proto:sensor_proto",
