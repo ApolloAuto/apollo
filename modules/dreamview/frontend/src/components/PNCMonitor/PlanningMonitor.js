@@ -31,9 +31,9 @@ export default class PlanningMonitor extends React.Component {
     }
 
     render() {
-        const { planningTime, data, chartData, scenarioHistory } = this.props.store.planningData;
+        const { planningTimeSec, data, chartData, scenarioHistory } = this.props.store.planningData;
 
-        if (!planningTime) {
+        if (!planningTimeSec) {
             return null;
         }
 

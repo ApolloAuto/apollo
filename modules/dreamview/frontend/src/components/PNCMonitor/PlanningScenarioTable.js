@@ -11,7 +11,7 @@ class PlanningScenarioItem extends React.Component {
 
         return (
             <tr className="monitor-table-item">
-                <td className="text time">{timestampMsToTimeString(scenario.time, true)}</td>
+                <td className="text time">{timestampMsToTimeString(scenario.timeSec * 1000, true)}</td>
                 <td className="text">{type}</td>
                 <td className="text">{stage}</td>
             </tr>
@@ -29,7 +29,7 @@ export default class PlanningScenarioTable extends React.Component {
                 <table className="monitor-table">
                     <tbody>
                         {scenarios.map(scenario => (
-                            <PlanningScenarioItem key={`scenario_${scenario.time}`}
+                            <PlanningScenarioItem key={`scenario_${scenario.timeSec}`}
                                                   scenario={scenario} />
                         ))}
                     </tbody>
