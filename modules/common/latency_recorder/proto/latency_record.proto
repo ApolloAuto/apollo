@@ -25,15 +25,15 @@ message LatencyStat {
 };
 
 message LatencyTrack {
-  message ModuleLatencyTrack {
-    optional string module_name = 1;
-    optional LatencyStat module_stat = 2;
+  message LatencyTrackMessage {
+    optional string latency_name = 1;
+    optional LatencyStat latency_stat = 2;
   }
-  repeated ModuleLatencyTrack module_latency = 1;
+  repeated LatencyTrackMessage latency_track = 1;
 }
 
 message LatencyReport {
   optional apollo.common.Header header = 1;
-  optional LatencyStat total_duration = 2;
-  optional LatencyTrack latency_tracks = 3;
+  optional LatencyTrack e2es_latency = 2;
+  optional LatencyTrack modules_latency = 3;
 };

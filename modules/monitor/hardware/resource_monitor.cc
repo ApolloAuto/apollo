@@ -150,14 +150,13 @@ float GetSystemMemoryUsage() {
     AERROR << "failed to load contents from " << system_mem_stat_file;
     return 0.f;
   }
-  const auto total_memory = GetSystemMemoryValueFromLine(stat_lines[mem_total]);
-  int64_t used_memory = 0;
-  for (int cur_line = 0; cur_line <= slab; ++cur_line) {
-    if (cur_line == mem_total || cur_line == swap_total) {
-      used_memory += GetSystemMemoryValueFromLine(stat_lines[cur_line]);
-    } else if (cur_line == mem_free || cur_line == buffers ||
-               cur_line == cached || cur_line == swap_free ||
-               cur_line == slab) {
+  const auto total_memory =
+      GetSystemMemoryValueFromLine(stat_lines[mem_total]) +
+      GetSystemMemoryValueFromLine(stat_lines[swap_total]);
+  int64_t used_memory = total_memory;
+  for (int cur_line = mem_free; cur_line <= slab; ++cur_line) {
+    if (cur_line == mem_free || cur_line == buffers || cur_line == cached ||
+        cur_line == swap_free || cur_line == slab) {
       used_memory -= GetSystemMemoryValueFromLine(stat_lines[cur_line]);
     }
   }
