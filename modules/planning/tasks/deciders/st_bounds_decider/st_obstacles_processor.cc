@@ -188,20 +188,23 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     ADEBUG << "Closest obstacle ID = " << closest_stop_obs_id;
     // Go through all Keep-Clear zones, and see if there is a even closer
     // stop fence due to them.
-    for (const auto& clear_zone : candidate_clear_zones_) {
-      if (closest_stop_obs_boundary.min_s() >=
-              std::get<1>(clear_zone).min_s() &&
-          closest_stop_obs_boundary.min_s() <=
-              std::get<1>(clear_zone).max_s()) {
-        std::tie(closest_stop_obs_id, closest_stop_obs_boundary,
-                 closest_stop_obs_ptr) = clear_zone;
-        ADEBUG << "Clear zone " << closest_stop_obs_id << " is closer.";
-        break;
+    if (closest_stop_obs_id.find("Side_Pass_Stop") == std::string::npos) {
+      for (const auto& clear_zone : candidate_clear_zones_) {
+        if (closest_stop_obs_boundary.min_s() >=
+                std::get<1>(clear_zone).min_s() &&
+            closest_stop_obs_boundary.min_s() <=
+                std::get<1>(clear_zone).max_s()) {
+          std::tie(closest_stop_obs_id, closest_stop_obs_boundary,
+                   closest_stop_obs_ptr) = clear_zone;
+          ADEBUG << "Clear zone " << closest_stop_obs_id << " is closer.";
+          break;
+        }
       }
     }
     obs_id_to_st_boundary_[closest_stop_obs_id] = closest_stop_obs_boundary;
     closest_stop_obs_ptr->set_path_st_boundary(closest_stop_obs_boundary);
     ADEBUG << "Adding " << closest_stop_obs_ptr->Id() << " into the ST-graph.";
+    ADEBUG << "min_s = " << closest_stop_obs_boundary.min_s();
   }
 
   // Preprocess the obstacles for sweep-line algorithms.

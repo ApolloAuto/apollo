@@ -73,7 +73,7 @@ class STBoundsDecider : public Decider {
                     std::vector<std::pair<std::string, ObjectDecisionType>>>>*
           available_choices);
 
-  void BackwardFlatten(
+  bool BackwardFlatten(
       std::vector<std::tuple<double, double, double>>* const st_bound);
 
   void RecordSTGraphDebug(
