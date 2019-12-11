@@ -112,6 +112,7 @@ bool PathLaneBorrowDecider::IsNecessaryToBorrowLane(
       CheckLaneBorrow(reference_line_info, &left_borrowable, &right_borrowable);
       if (!left_borrowable && !right_borrowable) {
         mutable_path_decider_status->set_is_in_path_lane_borrow_scenario(false);
+        return false;
       } else {
         mutable_path_decider_status->set_is_in_path_lane_borrow_scenario(true);
         if (left_borrowable) {
