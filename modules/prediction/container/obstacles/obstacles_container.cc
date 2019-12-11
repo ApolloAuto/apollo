@@ -132,6 +132,7 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
     }
     default: {
       // No data dump
+      FeatureOutput::Clear();
       break;
     }
   }
