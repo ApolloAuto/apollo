@@ -8,6 +8,7 @@ park_and_go_config: {
 
 stage_type: PARK_AND_GO_CHECK
 stage_type: PARK_AND_GO_ADJUST
+stage_type: PARK_AND_GO_PRE_CRUISE
 stage_type: PARK_AND_GO_CRUISE
 
 stage_config: {
@@ -37,6 +38,46 @@ stage_config: {
 
 stage_config:{
   stage_type: PARK_AND_GO_ADJUST
+  enabled: true
+  task_type: OPEN_SPACE_ROI_DECIDER
+  task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
+  task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+  task_type: OPEN_SPACE_FALLBACK_DECIDER
+  task_config: {
+    task_type: OPEN_SPACE_ROI_DECIDER
+    open_space_roi_decider_config {
+      roi_type: PARK_AND_GO
+      perception_obstacle_buffer: 0.5
+    }
+  }
+  task_config: {
+    task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
+    open_space_trajectory_provider_config {
+      open_space_trajectory_optimizer_config {
+        planner_open_space_config {
+          iterative_anchoring_smoother_config {
+            s_curve_config {
+              acc_weight: 1.0
+              jerk_weight: 1.0
+              kappa_penalty_weight: 100.0
+              ref_s_weight: 100.0
+              ref_v_weight: 0.0
+            }
+          }
+        }
+      }
+    }
+  }
+  task_config: {
+    task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+  }
+  task_config: {
+    task_type: OPEN_SPACE_FALLBACK_DECIDER
+  }
+}
+
+stage_config:{
+  stage_type: PARK_AND_GO_PRE_CRUISE
   enabled: true
   task_type: OPEN_SPACE_ROI_DECIDER
   task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
