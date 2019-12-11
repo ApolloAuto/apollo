@@ -299,7 +299,7 @@ void OpenSpaceRoiDecider::SetPullOverSpotEndPose(Frame *const frame) {
 
 void OpenSpaceRoiDecider::SetParkAndGoEndPose(Frame *const frame) {
   const double kSTargetBuffer = 8.0;
-  const double kSpeedRatio = 0.3;  // after adjust speed is 30% of speed limit
+  const double kSpeedRatio = 0.1;  // after adjust speed is 10% of speed limit
   // get vehicle current location
   // get vehicle s,l info
   auto park_and_go_status = PlanningContext::Instance()
