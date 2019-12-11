@@ -165,7 +165,7 @@ class Obstacle {
 
   bool is_path_st_boundary_initialized() {
     return path_st_boundary_initialized_;
-  };
+  }
 
   void SetStBoundaryType(const STBoundary::BoundaryType type);
 
