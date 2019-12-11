@@ -118,11 +118,6 @@ message ReroutingStatus {
   optional apollo.routing.RoutingRequest routing_request = 3;
 }
 
-message RightOfWayStatus {
-  // whether the vehicle has right of way in junction
-  map<string, bool> junction = 1;
-}
-
 message ScenarioStatus {
   optional ScenarioConfig.ScenarioType scenario_type = 1;
   optional ScenarioConfig.StageType stage_type = 2;
@@ -150,6 +145,7 @@ message YieldSignStatus {
   repeated string wait_for_obstacle_id = 3;
 }
 
+// note: please keep this one as minimal as possible. do NOT polute it.
 message PlanningStatus {
   optional BareIntersectionStatus bare_intersection = 1;
   optional ChangeLaneStatus change_lane = 2;
@@ -163,10 +159,9 @@ message PlanningStatus {
   optional PathReuseDeciderStatus path_reuse_decider = 10;
   optional PullOverStatus pull_over = 11;
   optional ReroutingStatus rerouting = 12;
-  optional RightOfWayStatus right_of_way = 13;
-  optional ScenarioStatus scenario = 14;
-  optional SidePassStatus side_pass = 15;
-  optional StopSignStatus stop_sign = 16;
-  optional TrafficLightStatus traffic_light = 17;
-  optional YieldSignStatus yield_sign = 18;
+  optional ScenarioStatus scenario = 13;
+  optional SidePassStatus side_pass = 14;
+  optional StopSignStatus stop_sign = 15;
+  optional TrafficLightStatus traffic_light = 16;
+  optional YieldSignStatus yield_sign = 17;
 }

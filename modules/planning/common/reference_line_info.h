@@ -25,6 +25,7 @@
 #include <memory>
 #include <string>
 #include <tuple>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -261,6 +262,7 @@ class ReferenceLineInfo {
                        hdmap::PathOverlap* path_overlap);
 
  private:
+  static std::unordered_map<std::string, bool> junction_right_of_way_map_;
   const common::VehicleState vehicle_state_;
   const common::TrajectoryPoint adc_planning_point_;
   ReferenceLine reference_line_;
