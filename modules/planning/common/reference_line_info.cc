@@ -795,9 +795,10 @@ void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
                                                            .scenario()
                                                            .scenario_type();
     if (scenario_type == ScenarioConfig::PARK_AND_GO || IsChangeLanePath()) {
-      // note: when NOT is_on_reference_line_
+      // note: when is_on_reference_line_ is FALSE
       //   (1) always engage while in PARK_AND_GO scenario
-      //   (2) engage since "ChangeLanePath" is most likely NOT on ref line
+      //   (2) engage when "ChangeLanePath" is picked as Drivable ref line
+      //       where most likely ADC not OnLane yet
       engage = true;
     } else {
       prev_advice.set_reason("Not on reference line");
@@ -815,13 +816,13 @@ void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
   }
 
   if (engage) {
-    if (vehicle_state_.driving_mode() ==
+    if (vehicle_state_.driving_mode() !=
         Chassis::DrivingMode::Chassis_DrivingMode_COMPLETE_AUTO_DRIVE) {
-      // KEEP_ENGAGED when in auto mode
-      prev_advice.set_advice(EngageAdvice::KEEP_ENGAGED);
-    } else {
-      // READY_TO_ENGAGE when in manual mode
+      // READY_TO_ENGAGE when in non-AUTO mode
       prev_advice.set_advice(EngageAdvice::READY_TO_ENGAGE);
+    } else {
+      // KEEP_ENGAGED when in AUTO mode
+      prev_advice.set_advice(EngageAdvice::KEEP_ENGAGED);
     }
     prev_advice.clear_reason();
   } else {
