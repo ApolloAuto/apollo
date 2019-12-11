@@ -40,7 +40,8 @@ from modules.tools.sensor_calibration.proto import extractor_config_pb2
 CYBER_PATH = os.environ['CYBER_PATH']
 CYBER_RECORD_HEADER_LENGTH = 2048
 
-Z_FILL_LEN = 5
+Z_FILL_LEN = 4
+Z_DEFAULT_LEN = 5
 
 def mkdir_p(path):
     if not os.path.isdir(path):
@@ -139,7 +140,7 @@ def get_difference_score_between_images(path, file_indexes,
     image_diff = np.zeros(len(file_indexes), dtype=np.float32)
     image_thumbnails = []
     for c, idx in enumerate(file_indexes):
-        image_file = os.path.join(path, str(int(idx)).zfill(Z_FILL_LEN) + suffix)
+        image_file = os.path.join(path, str(int(idx)).zfill(Z_DEFAULT_LEN) + suffix)
         image = cv2.imread(image_file)
         image_thumbnails.append(cv2.resize(image,
             (thumbnail_size, thumbnail_size),interpolation=cv2.INTER_AREA))
@@ -164,7 +165,7 @@ def check_static_by_odometry(data, index, check_range=40,
     start_idx = np.maximum(index - check_range, 0)
     end_idx = np.minimum(index + check_range, data.shape[0]-1)
     #  skip if start and end index are too nearby.
-    if end_idx - start_idx <= check_range:
+    if end_idx - start_idx < 2 * check_range:
         return False
     #  calculate x-y plane distance
     distance = get_distance_by_odometry(data, start_idx, end_idx)
@@ -174,12 +175,15 @@ def check_static_by_odometry(data, index, check_range=40,
 def select_static_image_pcd(path, min_distance=5, stop_times=5,
                             wait_time=3, check_range=50,
                             image_static_diff_threshold=0.005,
-                            image_suffix='.png', pcd_suffix='.pcd',
-                            output_folder_name='camera-lidar-pairs'):
-    """select pairs of images and pcds"""
+                            output_folder_name='camera-lidar-pairs',
+                            image_suffix='.jpg', pcd_suffix='.pcd'):
+    """
+    select pairs of images and pcds, odometry information may
+    come from /apollolocalization/pose as well
+    """
     subfolders = [x for x in get_subfolder_list(path) if '_apollo_sensor_' in x]
     lidar_subfolder = [x for x in subfolders if '_PointCloud2' in x]
-    odometry_subfolder = [x for x in subfolders if'_odometry' in x]
+    odometry_subfolder = [x for x in subfolders if'_odometry' in x  or '_pose' in x]
     camera_subfolders = [x for x in subfolders if'_image' in x]
     if len(lidar_subfolder) is not 1 or \
         len(odometry_subfolder) is not 1:
@@ -223,7 +227,7 @@ def select_static_image_pcd(path, min_distance=5, stop_times=5,
         camera_folder_path = os.path.join(path, camera)
         print('foder: {}'.format(camera_folder_path))
         camera_diff = get_difference_score_between_images(
-            camera_folder_path, timestamp_dict[camera][:,0])
+            camera_folder_path, timestamp_dict[camera][:,0], suffix=image_suffix)
         valid_image_indexes =  [x for x, v in enumerate(camera_diff)
                                 if v <= image_static_diff_threshold]
         valid_images = (timestamp_dict[camera][valid_image_indexes, 0]).astype(int)
@@ -242,6 +246,7 @@ def select_static_image_pcd(path, min_distance=5, stop_times=5,
                 if last_idx is -1:
                     last_idx = i
                     last_odometry_idx = odometry_idx
+                    candidate_idx.append(i)
                     continue
                 time_interval = timestamp_dict[camera][i,1] - timestamp_dict[camera][last_idx, 1]
                 odomerty_interval = \
@@ -276,13 +281,13 @@ def select_static_image_pcd(path, min_distance=5, stop_times=5,
         mkdir_p(output_path)
         for count, i in enumerate(image_idx):
             #  save images
-            in_file = os.path.join(camera_folder_path, str(int(i)).zfill(Z_FILL_LEN) + image_suffix)
-            out_file = os.path.join(output_path, str(int(count)).zfill(Z_FILL_LEN) + image_suffix)
+            in_file = os.path.join(camera_folder_path, str(int(i)).zfill(Z_DEFAULT_LEN) + image_suffix)
+            out_file = os.path.join(output_path, str(int(count)).zfill(Z_FILL_LEN) + '_00' + image_suffix)
             copyfile(in_file, out_file)
             j = camera_lidar_nearest_pairs[i]
             #  save pcd
-            in_file = os.path.join(path, lidar_subfolder, str(int(j)).zfill(Z_FILL_LEN) + pcd_suffix)
-            out_file = os.path.join(output_path, str(int(count)).zfill(Z_FILL_LEN) + pcd_suffix)
+            in_file = os.path.join(path, lidar_subfolder, str(int(j)).zfill(Z_DEFAULT_LEN) + pcd_suffix)
+            out_file = os.path.join(output_path, str(int(count)).zfill(Z_FILL_LEN) + '_00' + pcd_suffix)
             copyfile(in_file, out_file)
             print("generate image-lidar-pair:[%d, %d]" % (i, j))
     return camera_subfolders, lidar_subfolder
@@ -324,8 +329,7 @@ def main():
 
     select_static_image_pcd(path=args.workspace, min_distance=5, stop_times=5,
                             wait_time=3, check_range=50,
-                            image_static_diff_threshold=0.005,
-                            image_suffix='.png', pcd_suffix='.pcd')
+                            image_static_diff_threshold=0.005)
 
 if __name__ == '__main__':
     main()
