@@ -44,6 +44,8 @@ using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
 using apollo::perception::PerceptionObstacle;
 
+std::unordered_map<std::string, double> SpeedDecider::pedestrian_stop_timer_;
+
 SpeedDecider::SpeedDecider(const TaskConfig& config) : Task(config) {}
 
 common::Status SpeedDecider::Execute(Frame* frame,
@@ -201,16 +203,6 @@ Status SpeedDecider::MakeObjectDecision(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  // read pedestrian_stop_timer from saved status
-  std::unordered_map<std::string, double> pedestrian_stop_times;
-  auto* mutable_pedestrian_status = PlanningContext::Instance()
-                                        ->mutable_planning_status()
-                                        ->mutable_pedestrian();
-  for (const auto& stop_time : mutable_pedestrian_status->stop_time()) {
-    pedestrian_stop_times.emplace(stop_time.obstacle_id(),
-                                  stop_time.obstacle_stop_timestamp());
-  }
-
   for (const auto* obstacle : path_decision->obstacles().Items()) {
     auto* mutable_obstacle = path_decision->Find(obstacle->Id());
     const auto& boundary = mutable_obstacle->path_st_boundary();
@@ -235,7 +227,7 @@ Status SpeedDecider::MakeObjectDecision(
     }
 
     // always STOP for pedestrian
-    if (CheckStopForPedestrian(*mutable_obstacle, &pedestrian_stop_times)) {
+    if (CheckStopForPedestrian(*mutable_obstacle)) {
       ObjectDecisionType stop_decision;
       if (CreateStopDecision(*mutable_obstacle, &stop_decision,
                              -FLAGS_min_stop_distance_obstacle)) {
@@ -319,16 +311,6 @@ Status SpeedDecider::MakeObjectDecision(
         AERROR << "Unknown position:" << location;
     }
     AppendIgnoreDecision(mutable_obstacle);
-  }
-
-  // update PedestrianStatus to record stop_timer
-  mutable_pedestrian_status->Clear();
-  for (const auto& pedestrian_stop_time : pedestrian_stop_times) {
-    auto* stop_time = mutable_pedestrian_status->add_stop_time();
-    stop_time->set_obstacle_id(pedestrian_stop_time.first);
-    stop_time->set_obstacle_stop_timestamp(pedestrian_stop_time.second);
-    ADEBUG << "UPDATE stop_time: obstacle_id[" << pedestrian_stop_time.first
-           << "] stop_timestamp[" << pedestrian_stop_time.second << "]";
   }
 
   return Status::OK();
@@ -530,11 +512,7 @@ bool SpeedDecider::CheckIsFollow(const Obstacle& obstacle,
   return true;
 }
 
-bool SpeedDecider::CheckStopForPedestrian(
-    const Obstacle& obstacle,
-    std::unordered_map<std::string, double>* pedestrian_stop_times) const {
-  CHECK_NOTNULL(pedestrian_stop_times);
-
+bool SpeedDecider::CheckStopForPedestrian(const Obstacle& obstacle) const {
   const auto& perception_obstacle = obstacle.Perception();
   if (perception_obstacle.type() != PerceptionObstacle::PEDESTRIAN) {
     return false;
@@ -556,21 +534,21 @@ bool SpeedDecider::CheckStopForPedestrian(
     const auto obstacle_speed = std::hypot(perception_obstacle.velocity().x(),
                                            perception_obstacle.velocity().y());
     if (obstacle_speed > kMaxStopSpeed) {
-      (*pedestrian_stop_times).erase(obstacle_id);
+      pedestrian_stop_timer_.erase(obstacle_id);
     } else {
-      if (pedestrian_stop_times->find(obstacle_id) ==
-          pedestrian_stop_times->end()) {
+      if (pedestrian_stop_timer_.find(obstacle_id) ==
+          pedestrian_stop_timer_.end()) {
         // add timestamp
-        (*pedestrian_stop_times)[obstacle_id] = Clock::NowInSeconds();
+        pedestrian_stop_timer_[obstacle_id] = Clock::NowInSeconds();
         ADEBUG << "add timestamp: obstacle_id[" << obstacle_id << "] timestamp["
                << Clock::NowInSeconds() << "]";
       } else {
         // check timeout
-        double stop_time =
-            Clock::NowInSeconds() - (*pedestrian_stop_times)[obstacle_id];
-        ADEBUG << "stop_time: obstacle_id[" << obstacle_id << "] stop_time["
-               << stop_time << "]";
-        if (stop_time >= kPedestrianStopTimeout) {
+        double stop_timer =
+            Clock::NowInSeconds() - pedestrian_stop_timer_[obstacle_id];
+        ADEBUG << "stop_timer: obstacle_id[" << obstacle_id << "] stop_timer["
+               << stop_timer << "]";
+        if (stop_timer >= kPedestrianStopTimeout) {
           return false;
         }
       }
