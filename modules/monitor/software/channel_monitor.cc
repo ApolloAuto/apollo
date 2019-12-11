@@ -163,7 +163,7 @@ ChannelMonitor::ChannelMonitor(
     const std::shared_ptr<LatencyMonitor>& latency_monitor)
     : RecurrentRunner(FLAGS_channel_monitor_name,
                       FLAGS_channel_monitor_interval),
-      latency_monitor(latency_monitor) {}
+      latency_monitor_(latency_monitor) {}
 
 void ChannelMonitor::RunOnce(const double current_time) {
   auto manager = MonitorManager::Instance();
@@ -175,7 +175,7 @@ void ChannelMonitor::RunOnce(const double current_time) {
     if (config.has_channel()) {
       double freq;
       const auto update_freq =
-          latency_monitor->GetFrequency(config.channel().name(), &freq);
+          latency_monitor_->GetFrequency(config.channel().name(), &freq);
       UpdateStatus(config.channel(),
                    components->at(name).mutable_channel_status(), update_freq,
                    freq);
