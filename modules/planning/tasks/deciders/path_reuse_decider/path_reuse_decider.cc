@@ -44,6 +44,20 @@ Status PathReuseDecider::Process(Frame* const frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
+  auto* mutable_path_reuse_decider_status = PlanningContext::Instance()
+                                                ->mutable_planning_status()
+                                                ->mutable_path_reuse_decider();
+
+  // skip path reuse if not in LANE_FOLLOW_SCENARIO
+  const ScenarioConfig_ScenarioType scenario_type =
+      PlanningContext::Instance()->planning_status().scenario().scenario_type();
+
+  if (scenario_type != ScenarioConfig::LANE_FOLLOW) {
+    mutable_path_reuse_decider_status->set_reused_path(false);
+    ADEBUG << "skipping reusing path";
+    return Status::OK();
+  }
+
   bool is_change_lane_path = reference_line_info->IsChangeLanePath();
 
   // active path reuse during change_lane only
@@ -55,15 +69,14 @@ Status PathReuseDecider::Process(Frame* const frame,
   ADEBUG << "lane change status: " << lane_change_status->ShortDebugString();
 
   // check front static blocking obstacle
-  auto* mutable_path_reuse_decider_status = PlanningContext::Instance()
-                                                ->mutable_planning_status()
-                                                ->mutable_path_reuse_decider();
+
   ADEBUG << "lane_change_status->is_current_opt_succeed(): "
          << lane_change_status->is_current_opt_succeed();
 
   if (!Decider::config_.path_reuse_decider_config().reuse_path() ||
       (lane_change_status->status() != ChangeLaneStatus::IN_CHANGE_LANE &&
        !FLAGS_enable_reuse_path_in_lane_follow)) {
+    mutable_path_reuse_decider_status->set_reused_path(false);
     ADEBUG << "skipping reusing path";
     return Status::OK();
   }
