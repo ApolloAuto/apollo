@@ -177,9 +177,9 @@ void LatencyMonitor::AggregateLatency() {
       std::tie(begin_time, std::ignore, module_name) = *iter;
       if (e2e_begin_time == 0 && module_name == kE2EStartPoint) {
         e2e_begin_time = begin_time;
-      }
-      if (module_name != kE2EStartPoint &&
-          e2e_latencies.find(module_name) == e2e_latencies.end()) {
+      } else if (module_name != kE2EStartPoint &&
+                 e2e_begin_time != 0 &&
+                 e2e_latencies.find(module_name) == e2e_latencies.end()) {
         const auto duration = begin_time - e2e_begin_time;
         e2e_latencies[module_name] = duration;
         e2es_track[module_name].push_back(duration);
