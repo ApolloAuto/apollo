@@ -21,6 +21,7 @@
 
 #include "cyber/common/log.h"
 
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/common.h"
@@ -49,14 +50,20 @@ Stage::StageStatus ParkAndGoStageAdjust::Process(
   }
   const bool ready_to_cruise =
       scenario::util::CheckADCReadyToCruise(frame, scenario_config_);
-  if (ready_to_cruise) {
-    return FinishStage();
-  }
-  return StageStatus::RUNNING;
-}
+  const auto vehicle_status = common::VehicleStateProvider::Instance();
+  AWARN << vehicle_status->steering_percentage();
 
-Stage::StageStatus ParkAndGoStageAdjust::FinishStage() {
-  next_stage_ = ScenarioConfig::PARK_AND_GO_CRUISE;
+  bool small_steering =
+      (vehicle_status->steering_percentage() <
+       scenario_config_.max_steering_percentage_when_cruise());
+  if (!ready_to_cruise) {
+    return StageStatus::RUNNING;
+  }
+  if (small_steering) {
+    next_stage_ = ScenarioConfig::PARK_AND_GO_CRUISE;
+  } else {
+    next_stage_ = ScenarioConfig::PARK_AND_GO_PRE_CRUISE;
+  }
   return Stage::FINISHED;
 }
 

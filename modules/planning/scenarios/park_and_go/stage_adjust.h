@@ -40,8 +40,6 @@ class ParkAndGoStageAdjust : public Stage {
     return Stage::GetContextAs<ParkAndGoContext>();
   }
 
-  Stage::StageStatus FinishStage();
-
  private:
   ScenarioParkAndGoConfig scenario_config_;
 };
