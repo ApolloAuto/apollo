@@ -29,7 +29,8 @@ namespace monitor {
 
 class ChannelMonitor : public RecurrentRunner {
  public:
-  ChannelMonitor(const std::shared_ptr<LatencyMonitor>& latency_monitor);
+  explicit ChannelMonitor(
+      const std::shared_ptr<LatencyMonitor>& latency_monitor);
   void RunOnce(const double current_time) override;
 
  private:
