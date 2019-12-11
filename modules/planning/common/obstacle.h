@@ -163,6 +163,10 @@ class Obstacle {
 
   void set_path_st_boundary(const STBoundary& boundary);
 
+  bool is_path_st_boundary_initialized() {
+    return path_st_boundary_initialized_;
+  };
+
   void SetStBoundaryType(const STBoundary::BoundaryType type);
 
   void EraseStBoundary();
@@ -239,6 +243,8 @@ class Obstacle {
   bool is_static_ = false;
   bool is_virtual_ = false;
   double speed_ = 0.0;
+
+  bool path_st_boundary_initialized_ = false;
 
   prediction::Trajectory trajectory_;
   perception::PerceptionObstacle perception_obstacle_;

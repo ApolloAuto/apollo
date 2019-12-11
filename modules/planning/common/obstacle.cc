@@ -696,6 +696,7 @@ const SLBoundary& Obstacle::PerceptionSLBoundary() const {
 
 void Obstacle::set_path_st_boundary(const STBoundary& boundary) {
   path_st_boundary_ = boundary;
+  path_st_boundary_initialized_ = true;
 }
 
 void Obstacle::SetStBoundaryType(const STBoundary::BoundaryType type) {
