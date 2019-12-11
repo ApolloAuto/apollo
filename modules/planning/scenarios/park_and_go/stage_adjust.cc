@@ -53,18 +53,31 @@ Stage::StageStatus ParkAndGoStageAdjust::Process(
   const auto vehicle_status = common::VehicleStateProvider::Instance();
   AWARN << vehicle_status->steering_percentage();
 
-  bool small_steering =
-      (vehicle_status->steering_percentage() <
-       scenario_config_.max_steering_percentage_when_cruise());
   if (!ready_to_cruise) {
     return StageStatus::RUNNING;
   }
-  if (small_steering) {
+  if (std::fabs(vehicle_status->steering_percentage()) <
+      scenario_config_.max_steering_percentage_when_cruise()) {
     next_stage_ = ScenarioConfig::PARK_AND_GO_CRUISE;
   } else {
     next_stage_ = ScenarioConfig::PARK_AND_GO_PRE_CRUISE;
+    // reset init position at current position for pre_cruise stage
+    ResetInitPostion(frame);
   }
   return Stage::FINISHED;
+}
+
+void ParkAndGoStageAdjust::ResetInitPostion(Frame* frame) {
+  auto* park_and_go_status = PlanningContext::Instance()
+                                 ->mutable_planning_status()
+                                 ->mutable_park_and_go();
+  park_and_go_status->mutable_adc_init_position()->set_x(
+      common::VehicleStateProvider::Instance()->x());
+  park_and_go_status->mutable_adc_init_position()->set_y(
+      common::VehicleStateProvider::Instance()->y());
+  park_and_go_status->mutable_adc_init_position()->set_z(0.0);
+  park_and_go_status->set_adc_init_heading(
+      common::VehicleStateProvider::Instance()->heading());
 }
 
 }  // namespace park_and_go
