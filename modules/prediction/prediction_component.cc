@@ -190,6 +190,14 @@ bool PredictionComponent::PredictionEndToEndProc(
   ADEBUG << "Time for updating PoseContainer: " << diff.count() * 1000
          << " msec.";
 
+  // Read storytelling message and call OnStorytelling to update the
+  // StoryTellingContainer
+  storytelling_reader_->Observe();
+  auto ptr_storytelling_msg = storytelling_reader_->GetLatestObserved();
+  if (ptr_storytelling_msg != nullptr) {
+    MessageProcess::OnStoryTelling(*ptr_storytelling_msg);
+  }
+
   // Read planning info. of last frame and call OnPlanning to update
   // the ADCTrajectoryContainer
   planning_reader_->Observe();
@@ -201,14 +209,6 @@ bool PredictionComponent::PredictionEndToEndProc(
   diff = end_time3 - end_time2;
   ADEBUG << "Time for updating ADCTrajectoryContainer: " << diff.count() * 1000
          << " msec.";
-
-  // Read storytelling message and call OnStorytelling to update the
-  // StoryTellingContainer
-  storytelling_reader_->Observe();
-  auto ptr_storytelling_msg = storytelling_reader_->GetLatestObserved();
-  if (ptr_storytelling_msg != nullptr) {
-    MessageProcess::OnStoryTelling(*ptr_storytelling_msg);
-  }
 
   // Get all perception_obstacles of this frame and call OnPerception to
   // process them all.
