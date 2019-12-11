@@ -225,9 +225,7 @@ void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
 
 void CanbusComponent::OnGuardianCommand(
     const GuardianCommand &guardian_command) {
-  apollo::control::ControlCommand control_command;
-  control_command.CopyFrom(guardian_command.control_command());
-  OnControlCommand(control_command);
+  OnControlCommand(guardian_command.control_command());
 }
 
 common::Status CanbusComponent::OnError(const std::string &error_msg) {
