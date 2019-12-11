@@ -38,7 +38,7 @@ using apollo::common::TrajectoryPoint;
 
 Stage::StageStatus ParkAndGoStagePreCruise::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
-  AWARN << "stage: Pre Cruise";
+  ADEBUG << "stage: Pre Cruise";
   CHECK_NOTNULL(frame);
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
@@ -49,14 +49,14 @@ Stage::StageStatus ParkAndGoStagePreCruise::Process(
     AERROR << "ParkAndGoStagePreCruise planning error";
     return StageStatus::ERROR;
   }
-  const bool ready_to_cruise =
-      scenario::util::CheckADCReadyToCruise(frame, scenario_config_);
+  // const bool ready_to_cruise =
+  //     scenario::util::CheckADCReadyToCruise(frame, scenario_config_);
   auto vehicle_status = common::VehicleStateProvider::Instance();
-  AWARN << vehicle_status->steering_percentage();
+  ADEBUG << vehicle_status->steering_percentage();
 
-  if (ready_to_cruise &&
-      std::fabs(vehicle_status->steering_percentage()) <
-          scenario_config_.max_steering_percentage_when_cruise()) {
+  if ((std::fabs(vehicle_status->steering_percentage()) <
+       scenario_config_.max_steering_percentage_when_cruise()) &&
+      scenario::util::CheckADCReadyToCruise(frame, scenario_config_)) {
     return FinishStage();
   }
   return StageStatus::RUNNING;

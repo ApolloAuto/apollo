@@ -53,6 +53,7 @@ cc_test(
         "stage_adjust_test.cc",
         "stage_check_test.cc",
         "stage_cruise_test.cc",
+        "stage_pre_cruise_test.cc",
     ],
     data = [
         "//modules/planning:planning_conf",

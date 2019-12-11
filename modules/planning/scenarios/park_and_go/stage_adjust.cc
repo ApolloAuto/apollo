@@ -50,24 +50,27 @@ Stage::StageStatus ParkAndGoStageAdjust::Process(
   }
   const bool ready_to_cruise =
       scenario::util::CheckADCReadyToCruise(frame, scenario_config_);
-  const auto vehicle_status = common::VehicleStateProvider::Instance();
-  AWARN << vehicle_status->steering_percentage();
 
   if (!ready_to_cruise) {
     return StageStatus::RUNNING;
   }
+  return FinishStage();
+}
+
+Stage::StageStatus ParkAndGoStageAdjust::FinishStage() {
+  const auto vehicle_status = common::VehicleStateProvider::Instance();
+  ADEBUG << vehicle_status->steering_percentage();
   if (std::fabs(vehicle_status->steering_percentage()) <
       scenario_config_.max_steering_percentage_when_cruise()) {
     next_stage_ = ScenarioConfig::PARK_AND_GO_CRUISE;
   } else {
+    ResetInitPostion();
     next_stage_ = ScenarioConfig::PARK_AND_GO_PRE_CRUISE;
-    // reset init position at current position for pre_cruise stage
-    ResetInitPostion(frame);
   }
   return Stage::FINISHED;
 }
 
-void ParkAndGoStageAdjust::ResetInitPostion(Frame* frame) {
+void ParkAndGoStageAdjust::ResetInitPostion() {
   auto* park_and_go_status = PlanningContext::Instance()
                                  ->mutable_planning_status()
                                  ->mutable_park_and_go();
