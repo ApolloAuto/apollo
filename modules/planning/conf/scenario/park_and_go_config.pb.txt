@@ -3,7 +3,7 @@ park_and_go_config: {
   front_obstacle_buffer: 10.0
   heading_buffer: 0.3
   min_dist_to_dest: 10.0
-  max_steering_percentage_when_cruise: 90.0
+  max_steering_percentage_when_cruise: 20.0
 }
 
 stage_type: PARK_AND_GO_CHECK
@@ -48,6 +48,7 @@ stage_config:{
     open_space_roi_decider_config {
       roi_type: PARK_AND_GO
       perception_obstacle_buffer: 0.5
+      end_pose_s_distance: 10.0
     }
   }
   task_config: {
@@ -88,6 +89,7 @@ stage_config:{
     open_space_roi_decider_config {
       roi_type: PARK_AND_GO
       perception_obstacle_buffer: 0.5
+      end_pose_s_distance: 5.0
     }
   }
   task_config: {

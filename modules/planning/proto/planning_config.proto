@@ -186,8 +186,6 @@ message ScenarioParkAndGoConfig {
   optional double heading_buffer = 2 [default = 0.5];         // rad
   optional double min_dist_to_dest = 3 [default = 25.0];      // meter
   optional double max_steering_percentage_when_cruise = 4 [default = 90.0];
-  optional double adjust_end_pose_s_distance = 5 [default = 10.0];     // meter
-  optional double pre_curise_end_pose_s_distance = 6 [default = 2.0];  // meter
 }
 
 message ScenarioYieldSignConfig {

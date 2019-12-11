@@ -32,4 +32,6 @@ message OpenSpaceRoiDeciderConfig {
   optional double perception_obstacle_buffer = 10;
   // tolerance limit for road_bound_width abnormal changes
   optional double curb_heading_tangent_change_uppper_limit = 11 [default = 1.0];
+  // end pose s distance to current vehicle
+  optional double end_pose_s_distance = 12 [default = 10.0];
 }
