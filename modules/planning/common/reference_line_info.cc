@@ -46,6 +46,9 @@ using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 using apollo::common::util::PointFactory;
 
+std::unordered_map<std::string, bool>
+ReferenceLineInfo::junction_right_of_way_map_;
+
 ReferenceLineInfo::ReferenceLineInfo(const common::VehicleState& vehicle_state,
                                      const TrajectoryPoint& adc_planning_point,
                                      const ReferenceLine& reference_line,
@@ -293,27 +296,19 @@ bool WithinOverlap(const hdmap::PathOverlap& overlap, double s) {
 
 void ReferenceLineInfo::SetJunctionRightOfWay(const double junction_s,
                                               const bool is_protected) const {
-  auto* right_of_way = PlanningContext::Instance()
-                           ->mutable_planning_status()
-                           ->mutable_right_of_way();
-  auto* junction_right_of_way = right_of_way->mutable_junction();
   for (const auto& overlap : reference_line_.map_path().junction_overlaps()) {
     if (WithinOverlap(overlap, junction_s)) {
-      (*junction_right_of_way)[overlap.object_id] = is_protected;
+      junction_right_of_way_map_[overlap.object_id] = is_protected;
     }
   }
 }
 
 ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
-  auto* right_of_way = PlanningContext::Instance()
-                           ->mutable_planning_status()
-                           ->mutable_right_of_way();
-  auto* junction_right_of_way = right_of_way->mutable_junction();
   for (const auto& overlap : reference_line_.map_path().junction_overlaps()) {
     if (overlap.end_s < adc_sl_boundary_.start_s()) {
-      junction_right_of_way->erase(overlap.object_id);
+      junction_right_of_way_map_.erase(overlap.object_id);
     } else if (WithinOverlap(overlap, adc_sl_boundary_.end_s())) {
-      auto is_protected = (*junction_right_of_way)[overlap.object_id];
+      auto is_protected = junction_right_of_way_map_[overlap.object_id];
       if (is_protected) {
         return ADCTrajectory::PROTECTED;
       }
