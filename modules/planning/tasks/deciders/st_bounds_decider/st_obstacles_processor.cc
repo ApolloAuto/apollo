@@ -24,6 +24,7 @@
 #include <limits>
 #include <tuple>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -68,9 +69,6 @@ void STObstaclesProcessor::Init(const double planning_distance,
   candidate_clear_zones_.clear();
 }
 
-// TODO(jiacheng):
-//  1. Properly deal with clear-zone type obstacles.
-//  2. Further speed up by early terminating processing non-related obstacles.
 Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     PathDecision* const path_decision) {
   // Sanity checks.
@@ -115,6 +113,7 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
 
   // Map obstacles into ST-graph.
   // Go through every obstacle and plot them in ST-graph.
+  std::unordered_set<std::string> non_ignore_obstacles;
   std::tuple<std::string, STBoundary, Obstacle*> closest_stop_obstacle;
   std::get<0>(closest_stop_obstacle) = "NULL";
   for (const auto* obs_item_ptr : path_decision->obstacles().Items()) {
@@ -169,6 +168,7 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
       }
       obs_id_to_st_boundary_[obs_ptr->Id()] = boundary;
       obs_ptr->set_path_st_boundary(boundary);
+      non_ignore_obstacles.insert(obs_ptr->Id());
       ADEBUG << "Adding " << obs_ptr->Id() << " into the ST-graph.";
     }
   }
@@ -203,8 +203,26 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     }
     obs_id_to_st_boundary_[closest_stop_obs_id] = closest_stop_obs_boundary;
     closest_stop_obs_ptr->set_path_st_boundary(closest_stop_obs_boundary);
+    non_ignore_obstacles.insert(closest_stop_obs_id);
     ADEBUG << "Adding " << closest_stop_obs_ptr->Id() << " into the ST-graph.";
     ADEBUG << "min_s = " << closest_stop_obs_boundary.min_s();
+  }
+
+  // Set IGNORE decision for those that are not in ST-graph:
+  for (const auto* obs_item_ptr : path_decision->obstacles().Items()) {
+    Obstacle* obs_ptr = path_decision->Find(obs_item_ptr->Id());
+    if (non_ignore_obstacles.count(obs_ptr->Id()) == 0) {
+      ObjectDecisionType ignore_decision;
+      ignore_decision.mutable_ignore();
+      if (!obs_ptr->HasLongitudinalDecision()) {
+        obs_ptr->AddLongitudinalDecision(
+            "st_obstacle_processor", ignore_decision);
+      }
+      if (!obs_ptr->HasLateralDecision()) {
+        obs_ptr->AddLateralDecision(
+            "st_obstacle_processor", ignore_decision);
+      }
+    }
   }
 
   // Preprocess the obstacles for sweep-line algorithms.
