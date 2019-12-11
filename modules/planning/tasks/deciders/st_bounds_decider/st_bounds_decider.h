@@ -27,7 +27,6 @@
 
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/st_graph_data.h"
-#include "modules/planning/proto/decider_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/st_bounds_decider_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"

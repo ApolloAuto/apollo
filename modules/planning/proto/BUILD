@@ -35,15 +35,15 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "decider_config_proto",
+    name = "creep_decider_config_proto",
     deps = [
-        ":decider_config_proto_lib",
+        ":creep_decider_config_proto_lib",
     ],
 )
 
 proto_library(
-    name = "decider_config_proto_lib",
-    srcs = ["decider_config.proto"],
+    name = "creep_decider_config_proto_lib",
+    srcs = ["creep_decider_config.proto"],
 )
 
 cc_proto_library(
@@ -134,7 +134,7 @@ proto_library(
     name = "planning_config_proto_lib",
     srcs = ["planning_config.proto"],
     deps = [
-        ":decider_config_proto_lib",
+        ":creep_decider_config_proto_lib",
         ":dp_st_speed_config_proto_lib",
         ":lane_change_decider_config_proto_lib",
         ":navi_obstacle_decider_config_proto_lib",
