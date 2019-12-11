@@ -97,8 +97,7 @@ ErrorCode VehicleController::Update(const ControlCommand &command) {
     return ErrorCode::CANBUS_ERROR;
   }
 
-  ControlCommand control_command;
-  control_command.CopyFrom(command);
+  ControlCommand control_command = command;
 
   // Execute action to transform driving mode
   if (control_command.has_pad_msg() && control_command.pad_msg().has_action()) {

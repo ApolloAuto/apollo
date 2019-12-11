@@ -50,8 +50,7 @@ void ParseNetParam(const NetParameter &net_param,
                    std::map<std::string, std::string> *tensor_modify_map,
                    std::vector<LayerParameter> *order) {
   for (int i = 0; i < net_param.layer_size(); ++i) {
-    LayerParameter tensorrt_layer_param;
-    tensorrt_layer_param.CopyFrom(net_param.layer(i));
+    LayerParameter tensorrt_layer_param = net_param.layer(i);
     if (tensorrt_layer_param.type() == "Input") {
       InputParameter input = tensorrt_layer_param.input_param();
       nvinfer1::DimsCHW dims{static_cast<int>(input.shape(0).dim(1)),
@@ -69,8 +68,7 @@ void ParseNetParam(const NetParameter &net_param,
         order->push_back(tensorrt_layer_param);
         continue;
       }
-      LayerParameter fake_layer_param;
-      fake_layer_param.CopyFrom(tensorrt_layer_param);
+      LayerParameter fake_layer_param = tensorrt_layer_param;
       fake_layer_param.set_type("Padding");
       fake_layer_param.set_name(absl::StrCat("padding_split_", i));
       fake_layer_param.clear_pooling_param();

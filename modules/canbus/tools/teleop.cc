@@ -143,10 +143,10 @@ class Teleop {
     Chassis::GearPosition gear = Chassis::GEAR_INVALID;
     PadMessage pad_msg;
     ControlCommand &control_command_ = control_command();
-    apollo::common::VehicleParam vehicle_params_;
-    vehicle_params_.CopyFrom(apollo::common::VehicleConfigHelper::Instance()
-                                 ->GetConfig()
-                                 .vehicle_param());
+    apollo::common::VehicleParam vehicle_params_ =
+        apollo::common::VehicleConfigHelper::Instance()
+            ->GetConfig()
+            .vehicle_param();
 
     // get the console in raw mode
     tcgetattr(kfd_, &cooked_);

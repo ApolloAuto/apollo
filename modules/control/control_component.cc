@@ -232,8 +232,7 @@ Status ControlComponent::ProduceControlCommand(
         local_view_.trajectory().header());
 
     if (local_view_.trajectory().is_replan()) {
-      latest_replan_trajectory_header_.CopyFrom(
-          local_view_.trajectory().header());
+      latest_replan_trajectory_header_ = local_view_.trajectory().header();
     }
 
     if (latest_replan_trajectory_header_.has_sequence_num()) {
