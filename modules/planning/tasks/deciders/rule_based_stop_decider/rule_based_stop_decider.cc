@@ -20,6 +20,8 @@
 #include <tuple>
 #include <vector>
 
+#include "modules/common/proto/pnc_point.pb.h"
+
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -133,27 +135,24 @@ void RuleBasedStopDecider::AddPathEndStop(
 
 void RuleBasedStopDecider::StopOnSidePass(
     Frame *const frame, ReferenceLineInfo *const reference_line_info) {
+  static bool check_clear;
+  static common::PathPoint change_lane_stop_path_point;
+
   const PathData &path_data = reference_line_info->path_data();
   double stop_s_on_pathdata = 0.0;
-  const auto &side_pass_status =
-      PlanningContext::Instance()->planning_status().side_pass();
-  auto *mutable_side_pass_status = PlanningContext::Instance()
-                                       ->mutable_planning_status()
-                                       ->mutable_side_pass();
 
   if (path_data.path_label().find("self") != std::string::npos) {
-    mutable_side_pass_status->set_check_clear_flag(false);
-    mutable_side_pass_status->mutable_change_lane_stop_path_point()->Clear();
+    check_clear = false;
+    change_lane_stop_path_point.Clear();
     return;
   }
 
-  if (side_pass_status.check_clear_flag() &&
-      CheckClearDone(*reference_line_info,
-                     side_pass_status.change_lane_stop_path_point())) {
-    mutable_side_pass_status->set_check_clear_flag(false);
+  if (check_clear &&
+      CheckClearDone(*reference_line_info, change_lane_stop_path_point)) {
+    check_clear = false;
   }
 
-  if (!side_pass_status.check_clear_flag() &&
+  if (!check_clear &&
       CheckSidePassStop(path_data, *reference_line_info, &stop_s_on_pathdata)) {
     if (!LaneChangeDecider::IsPerceptionBlocked(
             *reference_line_info,
@@ -167,13 +166,13 @@ void RuleBasedStopDecider::StopOnSidePass(
     if (!CheckADCStop(path_data, *reference_line_info, stop_s_on_pathdata)) {
       if (!BuildSidePassStopFence(
               path_data, stop_s_on_pathdata,
-              mutable_side_pass_status->mutable_change_lane_stop_path_point(),
+              &change_lane_stop_path_point,
               frame, reference_line_info)) {
         AERROR << "Set side pass stop fail";
       }
     } else {
       if (LaneChangeDecider::IsClearToChangeLane(reference_line_info)) {
-        mutable_side_pass_status->set_check_clear_flag(true);
+        check_clear = true;
       }
     }
   }
