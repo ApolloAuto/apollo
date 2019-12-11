@@ -50,6 +50,9 @@ static constexpr double kDoubleEpsilon = 1.0e-6;
 // dynamics
 bool CheckOverlapOnDpStGraph(const std::vector<const STBoundary*>& boundaries,
                              const StGraphPoint& p1, const StGraphPoint& p2) {
+  if (FLAGS_use_st_drivable_boundary) {
+    return false;
+  }
   for (const auto* boundary : boundaries) {
     if (boundary->boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
       continue;
@@ -398,9 +401,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
       // Current acc estimate: curr_a = (curr_v - pre_v) / unit_t
       // = (point.s + prepre_point.s - 2 * pre_point.s) / (unit_t * unit_t)
       const double curr_a =
-          2 *
-          ((cost_cr.point().s() - pre_col[r_pre].point().s()) / unit_t_ -
-           pre_col[r_pre].GetOptimalSpeed()) /
+          2 * ((cost_cr.point().s() - pre_col[r_pre].point().s()) / unit_t_ -
+               pre_col[r_pre].GetOptimalSpeed()) /
           unit_t_;
       if (curr_a < max_deceleration_ || curr_a > max_acceleration_) {
         continue;
@@ -447,9 +449,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
     // Current acc estimate: curr_a = (curr_v - pre_v) / unit_t
     // = (point.s + prepre_point.s - 2 * pre_point.s) / (unit_t * unit_t)
     const double curr_a =
-        2 *
-        ((cost_cr.point().s() - pre_col[r_pre].point().s()) / unit_t_ -
-         pre_col[r_pre].GetOptimalSpeed()) /
+        2 * ((cost_cr.point().s() - pre_col[r_pre].point().s()) / unit_t_ -
+             pre_col[r_pre].GetOptimalSpeed()) /
         unit_t_;
     if (curr_a > max_acceleration_ || curr_a < max_deceleration_) {
       continue;
