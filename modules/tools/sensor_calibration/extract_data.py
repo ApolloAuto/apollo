@@ -36,7 +36,7 @@ from cyber.proto import record_pb2
 from configuration_yaml_generator import ConfigYaml
 from extract_static_data import get_subfolder_list, select_static_image_pcd
 from modules.tools.sensor_calibration.proto import extractor_config_pb2
-from sensor_msg_extractor import GpsParser, ImageParser, PointCloudParser
+from sensor_msg_extractor import GpsParser, ImageParser, PointCloudParser, PoseParser
 
 #from scripts.record_bag import SMALL_TOPICS
 
@@ -108,7 +108,7 @@ def get_sensor_channel_list(record_file):
     """Get the channel list of sensors for calibration."""
     record_reader = RecordReader(record_file)
     return set(channel_name for channel_name in record_reader.get_channellist()
-               if 'sensor' in channel_name)
+               if 'sensor' in channel_name or '/localization/pose' in channel_name)
 
 def validate_channel_list(channels, dictionary):
     ret = True
@@ -131,6 +131,8 @@ def build_parser(channel, output_path):
         parser = PointCloudParser(output_path=output_path, instance_saving=True)
     elif channel.endswith("/gnss/odometry"):
         parser = GpsParser(output_path=output_path, instance_saving=False)
+    elif channel.endswith("/localization/pose"):
+        parser = PoseParser(output_path=output_path, instance_saving=False)
     else:
         raise ValueError("Not Support this channel type: %s" %channel)
 
@@ -368,8 +370,8 @@ def reorganize_extracted_data(tmp_data_path, task_name, remove_input_data_cache=
     if task_name == 'lidar_to_gnss':
         print (get_subfolder_list(tmp_data_path))
         subfolders = [x for x in get_subfolder_list(tmp_data_path)
-                    if '_apollo_sensor_' in x]
-        odometry_subfolders = [x for x in subfolders if'_odometry' in x]
+                    if '_apollo_sensor_' in x or '_localization_pose']
+        odometry_subfolders = [x for x in subfolders if '_odometry' in x or '_pose' in x]
         lidar_subfolders = [x for x in subfolders if '_PointCloud2' in x]
         print(lidar_subfolders)
         print(odometry_subfolders)
@@ -405,11 +407,11 @@ def reorganize_extracted_data(tmp_data_path, task_name, remove_input_data_cache=
         # data selection.
         pair_data_folder_name = 'camera-lidar-pairs'
         cameras, lidar = select_static_image_pcd(path=tmp_data_path,
-                                    min_distance=5, stop_times=5,
+                                    min_distance=5, stop_times=4,
                                     wait_time=3, check_range=50,
                                     image_static_diff_threshold=0.005,
-                                    image_suffix='.png', pcd_suffix='.pcd',
-                                    output_folder_name=pair_data_folder_name)
+                                    output_folder_name=pair_data_folder_name,
+                                    image_suffix='.jpg', pcd_suffix='.pcd')
         lidar_name = get_substring(str=lidar, prefix='_apollo_sensor_', suffix='_PointCloud2')
         for camera in cameras:
             camera_name = get_substring(str=camera, prefix='_apollo_sensor_', suffix='_image')
@@ -512,9 +514,7 @@ def main():
 
     ret = extract_data(valid_record_list, output_abs_path, channels,
                        start_timestamp, end_timestamp, extraction_rates)
-    if not ret:
-        raise ValueError('Failed to extract data!')
-
+    # output_abs_path='/apollo/data/extracted_data/CoolHigh-2019-09-20/lidar_to_gnss-2019-12-10-15-56/tmp'
     reorganize_extracted_data(tmp_data_path=output_abs_path,
                             task_name=config.io_config.task_name)
     # generate_compressed_file(input_path=config.io_config.output_path,

@@ -29,6 +29,7 @@ import struct
 from modules.drivers.proto import sensor_image_pb2
 from modules.drivers.proto import pointcloud_pb2
 from modules.localization.proto import gps_pb2
+from modules.localization.proto import localization_pb2
 
 from data_file_object import TimestampFileObject, OdometryFileObject
 
@@ -121,13 +122,47 @@ class GpsParser(SensorMessageParser):
         odometry_file_obj.save_to_file(self._parsed_data)
         return True
 
+class PoseParser(GpsParser):
+    """
+    inherit similar data saver and data structure from GpsParser
+    save the ego-localization information same as odometry
+    """
+    def _init_parser(self):
+        self._msg_parser = localization_pb2.LocalizationEstimate()
+
+    def parse_sensor_message(self, msg):
+        """ parse localization information from localization estimate channel"""
+        loc_est = self._msg_parser
+        loc_est.ParseFromString(msg.message)
+
+        # all double, except point_type is int32
+        ts = loc_est.header.timestamp_sec
+        self._timestamps.append(ts)
+
+        point_type = 56
+        qw = loc_est.pose.orientation.qw
+        qx = loc_est.pose.orientation.qx
+        qy = loc_est.pose.orientation.qy
+        qz = loc_est.pose.orientation.qz
+        x = loc_est.pose.position.x
+        y = loc_est.pose.position.y
+        z = loc_est.pose.position.z
+        # save 9 values as a tuple, for eaisier struct packing during storage
+        if self._instance_saving:
+            raise ValueError("localization--pseudo odometry-- should be saved in a file")
+        else:
+            self._parsed_data.append((ts, point_type, qw, qx, qy, qz, x, y, z))
+
+        return True
+
 class PointCloudParser(SensorMessageParser):
     """
     class to parse apollo/$(lidar)/PointCloud2 channels.
     saving separately each parsed msg
     """
-    def __init__(self, output_path, instance_saving=True):
+    def __init__(self, output_path, instance_saving=True, suffix='.pcd'):
         super(PointCloudParser, self).__init__(output_path, instance_saving)
+        self._suffix = suffix
 
     def convert_xyzit_pb_to_array(self, xyz_i_t, data_type):
         arr = np.zeros(len(xyz_i_t), dtype=data_type)
@@ -189,7 +224,7 @@ class PointCloudParser(SensorMessageParser):
         self._parsed_data = self.make_xyzit_point_cloud(pointcloud.point)
 
         if self._instance_saving:
-            file_name = "%05d.pcd" % self.get_msg_count()
+            file_name = "%05d" % self.get_msg_count() + self._suffix
             output_file = os.path.join(self._output_path, file_name)
             self.save_pointcloud_meta_to_file(pc_meta=self._parsed_data, pcd_file=output_file)
         else:
@@ -203,9 +238,9 @@ class ImageParser(SensorMessageParser):
     class to parse apollo/$(camera)/image channels.
     saving separately each parsed msg
     """
-    def __init__(self, output_path, instance_saving=True):
+    def __init__(self, output_path, instance_saving=True, suffix='.jpg'):
         super(ImageParser, self).__init__(output_path, instance_saving)
-
+        self._suffix = suffix
     def _init_parser(self):
         self._msg_parser = sensor_image_pb2.Image()
 
@@ -242,7 +277,7 @@ class ImageParser(SensorMessageParser):
             (image.height, image.width, channel_num))
 
         if self._instance_saving:
-            file_name = "%05d.png" % self.get_msg_count()
+            file_name = "%05d" % self.get_msg_count() + self._suffix
             output_file = os.path.join(self._output_path, file_name)
             self.save_image_mat_to_file(image_file=output_file)
         else:
