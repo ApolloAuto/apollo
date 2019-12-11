@@ -65,6 +65,7 @@ void STObstaclesProcessor::Init(const double planning_distance,
 
   obs_id_to_st_boundary_.clear();
   obs_id_to_decision_.clear();
+  candidate_clear_zones_.clear();
 }
 
 // TODO(jiacheng):
@@ -139,8 +140,9 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     boundary.set_id(obs_ptr->Id());
 
     // Store all Keep-Clear zone together.
-    if (obs_item_ptr->Id().find("KC_JC") != std::string::npos) {
-      candidate_clear_zones_.emplace_back(obs_ptr->Id(), boundary, obs_ptr);
+    if (obs_item_ptr->Id().find("KC") != std::string::npos) {
+      candidate_clear_zones_.push_back(make_tuple(
+          obs_ptr->Id(), boundary, obs_ptr));
       continue;
     }
 
@@ -167,6 +169,7 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
       }
       obs_id_to_st_boundary_[obs_ptr->Id()] = boundary;
       obs_ptr->set_path_st_boundary(boundary);
+      ADEBUG << "Adding " << obs_ptr->Id() << " into the ST-graph.";
     }
   }
   // For static obstacles, only retain the closest one (also considers
@@ -182,6 +185,7 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     Obstacle* closest_stop_obs_ptr;
     std::tie(closest_stop_obs_id, closest_stop_obs_boundary,
              closest_stop_obs_ptr) = closest_stop_obstacle;
+    ADEBUG << "Closest obstacle ID = " << closest_stop_obs_id;
     // Go through all Keep-Clear zones, and see if there is a even closer
     // stop fence due to them.
     for (const auto& clear_zone : candidate_clear_zones_) {
@@ -191,11 +195,13 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
               std::get<1>(clear_zone).max_s()) {
         std::tie(closest_stop_obs_id, closest_stop_obs_boundary,
                  closest_stop_obs_ptr) = clear_zone;
+        ADEBUG << "Clear zone " << closest_stop_obs_id << " is closer.";
         break;
       }
     }
     obs_id_to_st_boundary_[closest_stop_obs_id] = closest_stop_obs_boundary;
     closest_stop_obs_ptr->set_path_st_boundary(closest_stop_obs_boundary);
+    ADEBUG << "Adding " << closest_stop_obs_ptr->Id() << " into the ST-graph.";
   }
 
   // Preprocess the obstacles for sweep-line algorithms.
