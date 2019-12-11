@@ -180,7 +180,9 @@ void LatencyMonitor::AggregateLatency() {
       }
       if (module_name != kE2EStartPoint &&
           e2e_latencies.find(module_name) == e2e_latencies.end()) {
-        e2e_latencies[module_name] = begin_time - e2e_begin_time;
+        const auto duration = begin_time - e2e_begin_time;
+        e2e_latencies[module_name] = duration;
+        e2es_track[module_name].push_back(duration);
       }
       ++iter;
     }
