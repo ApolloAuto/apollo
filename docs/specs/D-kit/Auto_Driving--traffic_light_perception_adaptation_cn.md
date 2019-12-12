@@ -3,8 +3,11 @@
 ## 前提条件
 
 基于开发套件完成了循迹场景验证。
-完成camera-lidar，camera-camera，lidar-imu设备标定
+
+完成camera-lidar，camera-camera，lidar-imu设备标定。
+
 安全的红绿灯路口测试场地。
+
 包含测试场地红绿灯路口信息的高精地图，参见下图（如需要制作高精地图，可以联系百度商务）。
 
    ![图片](../images/traffic_light/traffic_light_on_map.png)
@@ -67,7 +70,7 @@ rostopic echo /apollo/sensor/gnss/best_pose
 ```
 rostopic echo /apollo/localization/pose
 ```
-会输出UTM坐标数据，如下图所示。如果还没有，说明定位信号还没有准备好，请耐心等待2分钟。
+会输出相关定位信息，如下图所示。如果还没有，说明定位信号还没有准备好，请耐心等待2分钟。
 ![图片](../images/traffic_light/localization_topic.png)
 
 
