@@ -76,18 +76,6 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "proceed_with_caution_speed_config_proto",
-    deps = [
-        ":proceed_with_caution_speed_config_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "proceed_with_caution_speed_config_proto_lib",
-    srcs = ["proceed_with_caution_speed_config.proto"],
-)
-
-cc_proto_library(
     name = "navi_path_decider_config_proto",
     deps = [
         ":navi_path_decider_config_proto_lib",
@@ -154,7 +142,6 @@ proto_library(
         ":piecewise_jerk_path_config_proto_lib",
         ":piecewise_jerk_speed_config_proto_lib",
         ":planner_open_space_config_proto_lib",
-        ":proceed_with_caution_speed_config_proto_lib",
         ":reference_line_smoother_config_proto_lib",
         ":rule_based_stop_decider_config_proto_lib",
         ":speed_bounds_decider_config_proto_lib",
