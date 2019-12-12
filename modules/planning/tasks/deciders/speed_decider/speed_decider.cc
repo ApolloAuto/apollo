@@ -85,21 +85,23 @@ SpeedDecider::STLocation SpeedDecider::GetSTLocation(
       break;
     }
 
-    common::math::LineSegment2d speed_line(curr_st, next_st);
-    if (st_boundary.HasOverlap(speed_line)) {
-      ADEBUG << "speed profile cross st_boundaries.";
-      st_location = CROSS;
+    if (!FLAGS_use_st_drivable_boundary) {
+      common::math::LineSegment2d speed_line(curr_st, next_st);
+      if (st_boundary.HasOverlap(speed_line)) {
+        ADEBUG << "speed profile cross st_boundaries.";
+        st_location = CROSS;
 
-      if (!FLAGS_use_st_drivable_boundary) {
-        if (st_boundary.boundary_type() ==
-            STBoundary::BoundaryType::KEEP_CLEAR) {
-          if (!CheckKeepClearCrossable(path_decision, speed_profile,
-                                       st_boundary)) {
-            st_location = BELOW;
+        if (!FLAGS_use_st_drivable_boundary) {
+          if (st_boundary.boundary_type() ==
+              STBoundary::BoundaryType::KEEP_CLEAR) {
+            if (!CheckKeepClearCrossable(path_decision, speed_profile,
+                                         st_boundary)) {
+              st_location = BELOW;
+            }
           }
         }
+        break;
       }
-      break;
     }
 
     // note: st_position can be calculated by checking two st points once
