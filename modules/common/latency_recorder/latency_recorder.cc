@@ -30,7 +30,14 @@ LatencyRecorder::LatencyRecorder(const std::string& module_name)
 void LatencyRecorder::AppendLatencyRecord(const uint64_t message_id,
                                           const absl::Time& begin_time,
                                           const absl::Time& end_time) {
-  CHECK(begin_time <= end_time);
+  // TODO(michael): ALERT for now for trouble shooting,
+  // CHECK_LT(begin_time, end_time) in the future to enforce the validation
+  if (begin_time >= end_time) {
+    AERROR << "latency begin_time: " << begin_time
+           << " greater than or equal to end_time: " << end_time;
+    return;
+  }
+
   static auto writer = CreateWriter();
   if (writer == nullptr || message_id == 0) {
     return;
@@ -60,9 +67,8 @@ LatencyRecorder::CreateWriter() {
   }
   if (node_ == nullptr) {
     current_time_ = absl::Now();
-    node_ = apollo::cyber::CreateNode(
-        absl::StrCat(node_name_prefix, module_name_,
-                     absl::ToUnixNanos(current_time_)));
+    node_ = apollo::cyber::CreateNode(absl::StrCat(
+        node_name_prefix, module_name_, absl::ToUnixNanos(current_time_)));
     if (node_ == nullptr) {
       AERROR << "unable to create node for latency recording";
       return nullptr;
