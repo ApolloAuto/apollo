@@ -102,9 +102,11 @@ class History {
   int Add(const ADCTrajectory& adc_trajectory_pb);
   void Clear();
   size_t Size() const;
+  HistoryStatus* mutable_history_status() { return &history_status_; }
 
  private:
   std::list<HistoryFrame> history_frames_;
+  HistoryStatus history_status_;
 
   // this is a singleton class
   DECLARE_SINGLETON(History)

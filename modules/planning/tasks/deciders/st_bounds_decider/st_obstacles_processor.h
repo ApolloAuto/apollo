@@ -31,6 +31,7 @@
 #include "modules/planning/proto/st_bounds_decider_config.pb.h"
 
 #include "modules/common/status/status.h"
+#include "modules/planning/common/history.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
@@ -215,6 +216,8 @@ class STObstaclesProcessor {
       obs_id_to_alternative_st_boundary_;
 
   std::vector<std::pair<double, double>> adc_low_road_right_segments_;
+
+  History* history_ = History::Instance();
 };
 
 }  // namespace planning

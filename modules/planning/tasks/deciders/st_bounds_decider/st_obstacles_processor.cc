@@ -442,13 +442,18 @@ bool STObstaclesProcessor::GetSBoundsFromDecisions(
 void STObstaclesProcessor::SetObstacleDecision(
     const std::string& obs_id, const ObjectDecisionType& obs_decision) {
   obs_id_to_decision_[obs_id] = obs_decision;
+  ObjectStatus object_status;
+  object_status.mutable_motion_type()->mutable_dynamic();
   if (obs_decision.has_yield() || obs_decision.has_stop()) {
     obs_id_to_st_boundary_[obs_id].SetBoundaryType(
         STBoundary::BoundaryType::YIELD);
+    object_status.mutable_decision_type()->mutable_yield();
   } else if (obs_decision.has_overtake()) {
     obs_id_to_st_boundary_[obs_id].SetBoundaryType(
         STBoundary::BoundaryType::OVERTAKE);
+    object_status.mutable_decision_type()->mutable_overtake();
   }
+  history_->mutable_history_status()->SetObjectStatus(obs_id, object_status);
 }
 
 void STObstaclesProcessor::SetObstacleDecision(
