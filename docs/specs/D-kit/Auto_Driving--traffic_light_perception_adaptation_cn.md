@@ -2,31 +2,23 @@
 
 ## 前提条件
 
-### 硬件准备：
-  
-   1 开发套件
-
-   2 摄像头（6mm, 12mm)、GPS-IMU、工控机等硬件、CAN卡等
-
-   3 空旷安全的红绿灯道路口测试场地
-       
-### 软件准备：
-
-   1 包含待适配的红绿灯路口相关信息的高精度地图，参见下图（如果没有高精度地图，需要制作，可以联系百度商务。）
+基于开发套件完成了循迹场景验证。
+完成camera-lidar，camera-camera，lidar-imu设备标定
+安全的红绿灯路口测试场地。
+包含测试场地红绿灯路口信息的高精地图，参见下图（如需要制作高精地图，可以联系百度商务）。
 
    ![图片](../images/traffic_light/traffic_light_on_map.png)
 
-   2 摄像头内外参标定已经完成，摄像头可以正常输出数据。
+   
 
 
 ## 操作步骤
 
-### 拷贝高精地图文件
+### 安装地图
   
 在/apollo/modules/map/data/目录下新建一个文件夹（该文件夹名称即为我们要使用的地图名称）, 例如我们本次地图叫做Demo。拷贝我们的地图数据文件到该目录下，如下图所示。
 ![图片](../images/traffic_light/map_data.png)
 
-### 进入apollo docker环境
 
 进入apollo目录，执行以下命令，进入docker，
 ```
@@ -34,16 +26,13 @@ bash docker/scripts/dev_start.sh
 bash docker/scripts/dev_into.sh
 ```
 
-
-### 打开dreamview,并选择车型和地图
-
-执行以下命令打开dreamview
+执行以下命令打开dreamview，
 ```
 cd /apollo/scripts
 bash bootstrap.sh
 ```
-在浏览器中，打开dreaview，选择车型（例如Ch)并选择使用的地图，
-例如我们实验中的地图叫Demo
+在浏览器中，打开dreaview，选择车型（例如Ch)并选择使用的地图。
+
 ![图片](../images/traffic_light/select_map_vehicle.png)
 
 ### 打开摄像头模块
@@ -53,7 +42,7 @@ bash bootstrap.sh
 ![图片](../images/traffic_light/open_camera_sensor_dreamview.png)
 
 
-只需要保证上图中Camera Sensor打开（前面按钮变为蓝色）就可以了，左上角如果暂时没有出现摄像头的画面也没有关系，继续往下操作
+只需要保证上图中Camera Sensor打开（前面按钮变为蓝色）就可以了，左上角如果暂时没有出现摄像头的画面也没有关系，继续往下操作，
 
 点击选择左侧的Module Controller，在页面中点击Camera, 等几秒钟，左上角就应该有摄像头拍摄到的画面，如下图所示：
 ![图片](../images/traffic_light/opened_camera_result_dreamview.png)
@@ -78,13 +67,13 @@ rostopic echo /apollo/sensor/gnss/best_pose
 ```
 rostopic echo /apollo/localization/pose
 ```
-会输出很多带有z,y,z坐标的数据，不断更新刷屏，如果还没有，说明定位信号还没有准备好，请耐心等待2分钟。
-
+会输出UTM坐标数据，如下图所示。如果还没有，说明定位信号还没有准备好，请耐心等待2分钟。
+![图片](../images/traffic_light/localization_topic.png)
 
 
 ### 打开感知模块
 
-在dreamview界面中点击选择左侧的Module Controller，在页面中打开Perception。此时界面中的Perception模块按钮会变成蓝色
+在dreamview界面中点击选择左侧的Module Controller，在页面中打开Perception。此时界面中的Perception模块按钮会变成蓝色。
 
 
 ### 验证红绿灯感知结果
@@ -94,7 +83,7 @@ rostopic echo /apollo/localization/pose
 ```
 rostopic echo /apollo/perception/traffic_light
 ```
-其中有color一行显示了检测到的当前交通灯颜色，如下图所示
+其中有color一行显示了检测到的当前交通灯颜色，如下图所示：
 
 ![图片](../images/traffic_light/traffic_light_topic.png)
 
