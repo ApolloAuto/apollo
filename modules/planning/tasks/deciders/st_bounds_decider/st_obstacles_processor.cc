@@ -163,8 +163,8 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
 
     // Store all Keep-Clear zone together.
     if (obs_item_ptr->Id().find("KC") != std::string::npos) {
-      candidate_clear_zones_.push_back(make_tuple(
-          obs_ptr->Id(), boundary, obs_ptr));
+      candidate_clear_zones_.push_back(
+          make_tuple(obs_ptr->Id(), boundary, obs_ptr));
       continue;
     }
 
@@ -208,12 +208,12 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     ADEBUG << "Closest obstacle ID = " << closest_stop_obs_id;
     // Go through all Keep-Clear zones, and see if there is a even closer
     // stop fence due to them.
-    if (closest_stop_obs_id.find("Side_Pass_Stop") == std::string::npos) {
+    if (closest_stop_obs_id.find("Side_Pass_Stop") == std::string::npos &&
+        closest_stop_obs_id.find("DEST") == std::string::npos) {
       for (const auto& clear_zone : candidate_clear_zones_) {
-        if (closest_stop_obs_boundary.min_s() >=
-                std::get<1>(clear_zone).min_s() &&
-            closest_stop_obs_boundary.min_s() <=
-                std::get<1>(clear_zone).max_s()) {
+        const auto& clear_zone_boundary = std::get<1>(clear_zone);
+        if (closest_stop_obs_boundary.min_s() >= clear_zone_boundary.min_s() &&
+            closest_stop_obs_boundary.min_s() <= clear_zone_boundary.max_s()) {
           std::tie(closest_stop_obs_id, closest_stop_obs_boundary,
                    closest_stop_obs_ptr) = clear_zone;
           ADEBUG << "Clear zone " << closest_stop_obs_id << " is closer.";
@@ -235,12 +235,11 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
       ObjectDecisionType ignore_decision;
       ignore_decision.mutable_ignore();
       if (!obs_ptr->HasLongitudinalDecision()) {
-        obs_ptr->AddLongitudinalDecision(
-            "st_obstacle_processor", ignore_decision);
+        obs_ptr->AddLongitudinalDecision("st_obstacle_processor",
+                                         ignore_decision);
       }
       if (!obs_ptr->HasLateralDecision()) {
-        obs_ptr->AddLateralDecision(
-            "st_obstacle_processor", ignore_decision);
+        obs_ptr->AddLateralDecision("st_obstacle_processor", ignore_decision);
       }
     }
   }
@@ -363,9 +362,8 @@ bool STObstaclesProcessor::GetSBoundsFromDecisions(
       obs_id_to_st_boundary_[obs_id] =
           obs_id_to_alternative_st_boundary_[obs_id];
       obs_id_to_st_boundary_[obs_id].SetBoundaryType(
-        STBoundary::BoundaryType::OVERTAKE);
-      obs_ptr->set_path_st_boundary(
-          obs_id_to_alternative_st_boundary_[obs_id]);
+          STBoundary::BoundaryType::OVERTAKE);
+      obs_ptr->set_path_st_boundary(obs_id_to_alternative_st_boundary_[obs_id]);
     }
   }
 
