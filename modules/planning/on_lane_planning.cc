@@ -520,10 +520,10 @@ Status OnLanePlanning::Plan(
               std::back_inserter(current_frame_planned_path));
     frame_->set_current_frame_planned_path(current_frame_planned_path);
 
+    ptr_debug->MergeFrom(best_ref_info->debug());
     if (FLAGS_export_chart) {
       ExportOnLaneChart(best_ref_info->debug(), ptr_debug);
     } else {
-      ptr_debug->MergeFrom(best_ref_info->debug());
       ExportReferenceLineDebug(ptr_debug);
       // Export additional ST-chart for failed lane-change speed planning
       const auto* failed_ref_info = frame_->FindFailedReferenceLineInfo();
