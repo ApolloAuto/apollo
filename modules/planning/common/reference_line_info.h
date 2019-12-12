@@ -187,7 +187,7 @@ class ReferenceLineInfo {
   void SetBlockingObstacle(const std::string& blocking_obstacle_id);
 
   bool is_path_lane_borrow() const { return is_path_lane_borrow_; }
-  void set_is_path_lane_borrow(bool is_path_lane_borrow) {
+  void set_is_path_lane_borrow(const bool is_path_lane_borrow) {
     is_path_lane_borrow_ = is_path_lane_borrow;
   }
 
@@ -234,7 +234,7 @@ class ReferenceLineInfo {
   void SetTurnSignal(const common::VehicleSignal::TurnSignal& turn_signal);
   void SetEmergencyLight();
 
-  void set_path_reusable(bool path_reusable) {
+  void set_path_reusable(const bool path_reusable) {
     path_reusable_ = path_reusable; }
 
   bool path_reusable() const { return path_reusable_; }

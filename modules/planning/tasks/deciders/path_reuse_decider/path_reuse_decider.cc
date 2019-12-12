@@ -51,7 +51,7 @@ Status PathReuseDecider::Process(Frame* const frame,
   }
 
   // skip path reuse if not in LANE_FOLLOW_SCENARIO
-  const ScenarioConfig_ScenarioType& scenario_type =
+  const auto scenario_type =
       PlanningContext::Instance()->planning_status().scenario().scenario_type();
   if (scenario_type != ScenarioConfig::LANE_FOLLOW) {
     ADEBUG << "skipping reusing path: not in LANE_FOLLOW scenario";
@@ -97,8 +97,8 @@ Status PathReuseDecider::Process(Frame* const frame,
   } else {
     // disable reuse path
     ADEBUG << "stop reuse path";
-  }
-  /* TODO(all): to be updated soon
+
+    /* TODO(all): to be updated soon
     // F -> T
     auto* mutable_path_decider_status = PlanningContext::Instance()
                                             ->mutable_planning_status()
@@ -119,8 +119,8 @@ Status PathReuseDecider::Process(Frame* const frame,
       ADEBUG << "reuse path: front_blocking_obstacle ignorable";
       ++reusable_path_counter_;
     }
+    */
   }
-  */
 
   reference_line_info->set_path_reusable(path_reusable);
 

@@ -87,12 +87,6 @@ message PathDeciderStatus {
   repeated LaneBorrowDirection decided_side_pass_direction = 5;
 }
 
-message PathReuseDeciderStatus {
-  optional bool reused_path = 1 [default = true];
-  // count lane_change optimization failure frames
-  optional int32 lane_change_failure_counter = 2;
-}
-
 message PullOverStatus {
   enum PullOverType {
     PULL_OVER = 1;            // pull-over upon destination arrival
@@ -146,11 +140,10 @@ message PlanningStatus {
   optional OpenSpaceStatus open_space = 6;
   optional ParkAndGoStatus park_and_go = 7;
   optional PathDeciderStatus path_decider = 8;
-//  optional PathReuseDeciderStatus path_reuse_decider = 9;
-  optional PullOverStatus pull_over = 10;
-  optional ReroutingStatus rerouting = 11;
-  optional ScenarioStatus scenario = 12;
-  optional StopSignStatus stop_sign = 13;
-  optional TrafficLightStatus traffic_light = 14;
-  optional YieldSignStatus yield_sign = 15;
+  optional PullOverStatus pull_over = 9;
+  optional ReroutingStatus rerouting = 10;
+  optional ScenarioStatus scenario = 11;
+  optional StopSignStatus stop_sign = 12;
+  optional TrafficLightStatus traffic_light = 13;
+  optional YieldSignStatus yield_sign = 14;
 }
