@@ -1,7 +1,6 @@
 cyber_modules {
   key: "Computer"
   value: {
-    dag_files: "/apollo/modules/tick/dag/tick.dag"
     dag_files: "/apollo/modules/drivers/camera/dag/camera_no_compress.dag"
     dag_files: "/apollo/modules/drivers/gnss/dag/gnss.dag"
     dag_files: "/apollo/modules/drivers/radar/conti_radar/dag/conti_radar.dag"

@@ -28,12 +28,6 @@ cyber_modules {
     dag_files: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
   }
 }
-cyber_modules {
-  key: "Tick"
-  value: {
-    dag_files: "/apollo/modules/tick/dag/tick.dag"
-  }
-}
 modules {
   key: "RTK Recorder"
   value: {
