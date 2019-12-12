@@ -65,10 +65,7 @@ Status PathBoundsDecider::Process(
   CHECK_NOTNULL(reference_line_info);
 
   // Skip the path boundary decision if reusing the path.
-  if (FLAGS_enable_skip_path_tasks && PlanningContext::Instance()
-                                          ->mutable_planning_status()
-                                          ->mutable_path_reuse_decider()
-                                          ->reused_path()) {
+  if (FLAGS_enable_skip_path_tasks && reference_line_info->path_reusable()) {
     return Status::OK();
   }
 

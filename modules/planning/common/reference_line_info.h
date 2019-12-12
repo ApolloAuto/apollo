@@ -234,6 +234,11 @@ class ReferenceLineInfo {
   void SetTurnSignal(const common::VehicleSignal::TurnSignal& turn_signal);
   void SetEmergencyLight();
 
+  void set_path_reusable(bool path_reusable) {
+    path_reusable_ = path_reusable; }
+
+  bool path_reusable() const { return path_reusable_; }
+
  private:
   void InitFirstOverlaps();
 
@@ -331,6 +336,8 @@ class ReferenceLineInfo {
   common::VehicleSignal vehicle_signal_;
 
   double cruise_speed_ = 0.0;
+
+  bool path_reusable_ = false;
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };

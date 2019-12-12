@@ -50,10 +50,7 @@ Status PathDecider::Process(const ReferenceLineInfo *reference_line_info,
   CHECK_NOTNULL(path_decision);
 
   // skip path_decider if reused path
-  if (FLAGS_enable_skip_path_tasks && PlanningContext::Instance()
-                                          ->mutable_planning_status()
-                                          ->mutable_path_reuse_decider()
-                                          ->reused_path()) {
+  if (FLAGS_enable_skip_path_tasks && reference_line_info->path_reusable()) {
     return Status::OK();
   }
 
