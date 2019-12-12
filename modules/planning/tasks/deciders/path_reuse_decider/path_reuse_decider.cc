@@ -44,40 +44,32 @@ Status PathReuseDecider::Process(Frame* const frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  auto* mutable_path_reuse_decider_status = PlanningContext::Instance()
-                                                ->mutable_planning_status()
-                                                ->mutable_path_reuse_decider();
-
-  // skip path reuse if not in LANE_FOLLOW_SCENARIO
-  const ScenarioConfig_ScenarioType scenario_type =
-      PlanningContext::Instance()->planning_status().scenario().scenario_type();
-
-  if (scenario_type != ScenarioConfig::LANE_FOLLOW) {
-    mutable_path_reuse_decider_status->set_reused_path(false);
-    ADEBUG << "skipping reusing path";
+  if (!Decider::config_.path_reuse_decider_config().reuse_path()) {
+    ADEBUG << "skipping reusing path: conf";
+    reference_line_info->set_path_reusable(false);
     return Status::OK();
   }
 
-  bool is_change_lane_path = reference_line_info->IsChangeLanePath();
+  // skip path reuse if not in LANE_FOLLOW_SCENARIO
+  const ScenarioConfig_ScenarioType& scenario_type =
+      PlanningContext::Instance()->planning_status().scenario().scenario_type();
+  if (scenario_type != ScenarioConfig::LANE_FOLLOW) {
+    ADEBUG << "skipping reusing path: not in LANE_FOLLOW scenario";
+    reference_line_info->set_path_reusable(false);
+    return Status::OK();
+  }
 
   // active path reuse during change_lane only
   auto* lane_change_status = PlanningContext::Instance()
                                  ->mutable_planning_status()
                                  ->mutable_change_lane();
-
-  // skip path reuse if not in_change_lane
   ADEBUG << "lane change status: " << lane_change_status->ShortDebugString();
 
-  // check front static blocking obstacle
-
-  ADEBUG << "lane_change_status->is_current_opt_succeed(): "
-         << lane_change_status->is_current_opt_succeed();
-
-  if (!Decider::config_.path_reuse_decider_config().reuse_path() ||
-      (lane_change_status->status() != ChangeLaneStatus::IN_CHANGE_LANE &&
-       !FLAGS_enable_reuse_path_in_lane_follow)) {
-    mutable_path_reuse_decider_status->set_reused_path(false);
-    ADEBUG << "skipping reusing path";
+  // skip path reuse if not in_change_lane
+  if (lane_change_status->status() != ChangeLaneStatus::IN_CHANGE_LANE &&
+       !FLAGS_enable_reuse_path_in_lane_follow) {
+    ADEBUG << "skipping reusing path: not in lane_change";
+    reference_line_info->set_path_reusable(false);
     return Status::OK();
   }
 
@@ -87,60 +79,53 @@ Status PathReuseDecider::Process(Frame* const frame,
   /*reuse path when in non_change_lane reference line or
     optimization succeeded in change_lane reference line
   */
-  if (!is_change_lane_path || lane_change_status->is_current_opt_succeed()) {
-    mutable_path_reuse_decider_status->set_reused_path(true);
-  } else {
-    mutable_path_reuse_decider_status->set_reused_path(false);
-    ADEBUG << "reusable_path_counter_" << reusable_path_counter_;
-    ADEBUG << "total_path_counter_" << total_path_counter_;
+  bool is_change_lane_path = reference_line_info->IsChangeLanePath();
+  if (is_change_lane_path && !lane_change_status->is_current_opt_succeed()) {
+    reference_line_info->set_path_reusable(false);
+    ADEBUG << "reusable_path_counter[" << reusable_path_counter_
+           << "] total_path_counter[" << total_path_counter_ << "]";
     return Status::OK();
   }
 
-  auto* mutable_path_decider_status = PlanningContext::Instance()
-                                          ->mutable_planning_status()
-                                          ->mutable_path_decider();
-  static constexpr int kWaitCycle = -2;  // wait 2 cycle
-
-  ADEBUG << "reuse or not: "
-         << mutable_path_reuse_decider_status->reused_path();
-  ADEBUG << "is replane: "
-         << frame->current_frame_planned_trajectory().is_replan();
-
-  // T -> F
-  if (mutable_path_reuse_decider_status->reused_path()) {
-    bool trimmed = TrimHistoryPath(frame, reference_line_info);
-    ADEBUG << "reusing path....";
-    ADEBUG << "is replane: "
-           << frame->current_frame_planned_trajectory().is_replan();
-    ADEBUG << "is reusable: " << CheckPathReusable(frame, reference_line_info);
-    ADEBUG << "is trim successful: " << trimmed;
-    if (!frame->current_frame_planned_trajectory().is_replan() &&
-        CheckPathReusable(frame, reference_line_info) && trimmed) {
-      ++reusable_path_counter_;  // count reusable path
-    } else {
-      // disable reuse path
-      ADEBUG << "stop reuse path";
-      mutable_path_reuse_decider_status->set_reused_path(false);
-    }
+  bool path_reusable = false;
+  if (!frame->current_frame_planned_trajectory().is_replan() &&
+      CheckPathReusable(frame, reference_line_info) &&
+      TrimHistoryPath(frame, reference_line_info)) {
+    ADEBUG << "reuse path";
+    path_reusable = true;
+    ++reusable_path_counter_;  // count reusable path
   } else {
+    // disable reuse path
+    ADEBUG << "stop reuse path";
+  }
+  /* TODO(all): to be updated soon
     // F -> T
-    ADEBUG
-        << "counter: "
-        << mutable_path_decider_status->front_static_obstacle_cycle_counter();
-    ADEBUG << "IsIgnoredBlockingObstacle: "
-           << IsIgnoredBlockingObstacle(reference_line_info);
+    auto* mutable_path_decider_status = PlanningContext::Instance()
+                                            ->mutable_planning_status()
+                                            ->mutable_path_decider();
+    static constexpr int kWaitCycle = -2;  // wait 2 cycle
+
+    const int front_static_obstacle_cycle_counter =
+        mutable_path_decider_status->front_static_obstacle_cycle_counter();
+    const bool ignore_blocking_obstacle =
+        IsIgnoredBlockingObstacle(reference_line_info);
+    ADEBUG << "counter[" << front_static_obstacle_cycle_counter
+           << "] IsIgnoredBlockingObstacle[" << ignore_blocking_obstacle << "]";
     // far from blocking obstacle or no blocking obstacle for a while
-    if ((mutable_path_decider_status->front_static_obstacle_cycle_counter() <=
-             kWaitCycle ||
-         IsIgnoredBlockingObstacle(reference_line_info)) &&
+    if ((front_static_obstacle_cycle_counter <= kWaitCycle ||
+        ignore_blocking_obstacle) &&
         TrimHistoryPath(frame, reference_line_info)) {
       // enable reuse path
+      ADEBUG << "reuse path: front_blocking_obstacle ignorable";
       ++reusable_path_counter_;
-      mutable_path_reuse_decider_status->set_reused_path(true);
     }
   }
-  ADEBUG << "reusable_path_counter_" << reusable_path_counter_;
-  ADEBUG << "total_path_counter_" << total_path_counter_;
+  */
+
+  reference_line_info->set_path_reusable(path_reusable);
+
+  ADEBUG << "reusable_path_counter[" << reusable_path_counter_
+         << "] total_path_counter[" << total_path_counter_ << "]";
   return Status::OK();
 }
 

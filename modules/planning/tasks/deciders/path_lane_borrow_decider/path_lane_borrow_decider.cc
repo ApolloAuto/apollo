@@ -41,10 +41,7 @@ Status PathLaneBorrowDecider::Process(
   CHECK_NOTNULL(reference_line_info);
 
   // skip path_lane_borrow_decider if reused path
-  if (FLAGS_enable_skip_path_tasks && PlanningContext::Instance()
-                                          ->mutable_planning_status()
-                                          ->mutable_path_reuse_decider()
-                                          ->reused_path()) {
+  if (FLAGS_enable_skip_path_tasks && reference_line_info->path_reusable()) {
     // for debug
     AINFO << "skip due to reusing path";
     return Status::OK();

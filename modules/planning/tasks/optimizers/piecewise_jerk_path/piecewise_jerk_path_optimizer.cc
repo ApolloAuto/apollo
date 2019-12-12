@@ -46,12 +46,10 @@ PiecewiseJerkPathOptimizer::PiecewiseJerkPathOptimizer(const TaskConfig& config)
 common::Status PiecewiseJerkPathOptimizer::Process(
     const SpeedData& speed_data, const ReferenceLine& reference_line,
     const common::TrajectoryPoint& init_point,
+    const bool path_reusable,
     PathData* const final_path_data) {
   // skip piecewise_jerk_path_optimizer if reused path
-  if (FLAGS_enable_skip_path_tasks && PlanningContext::Instance()
-                                          ->mutable_planning_status()
-                                          ->mutable_path_reuse_decider()
-                                          ->reused_path()) {
+  if (FLAGS_enable_skip_path_tasks && path_reusable) {
     return Status::OK();
   }
   ADEBUG << "Plan at the starting point: x = "

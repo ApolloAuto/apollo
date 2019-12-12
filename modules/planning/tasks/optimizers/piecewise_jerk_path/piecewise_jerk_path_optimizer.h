@@ -38,6 +38,7 @@ class PiecewiseJerkPathOptimizer : public PathOptimizer {
   common::Status Process(const SpeedData& speed_data,
                          const ReferenceLine& reference_line,
                          const common::TrajectoryPoint& init_point,
+                         const bool path_reusable,
                          PathData* const path_data) override;
 
   common::TrajectoryPoint InferFrontAxeCenterFromRearAxeCenter(

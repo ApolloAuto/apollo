@@ -146,7 +146,7 @@ message PlanningStatus {
   optional OpenSpaceStatus open_space = 6;
   optional ParkAndGoStatus park_and_go = 7;
   optional PathDeciderStatus path_decider = 8;
-  optional PathReuseDeciderStatus path_reuse_decider = 9;
+//  optional PathReuseDeciderStatus path_reuse_decider = 9;
   optional PullOverStatus pull_over = 10;
   optional ReroutingStatus rerouting = 11;
   optional ScenarioStatus scenario = 12;
