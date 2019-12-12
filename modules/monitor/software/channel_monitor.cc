@@ -223,13 +223,16 @@ void ChannelMonitor::UpdateStatus(
 
   // Check channel frequency
   if (update_freq) {
-    if (freq > config.max_frequency_allowed()) {
+    if (config.has_max_frequency_allowed() &&
+        freq > config.max_frequency_allowed()) {
       SummaryMonitor::EscalateStatus(
           ComponentStatus::WARN,
           absl::StrCat(config.name(), " has frequency ", freq,
                        " > max allowed ", config.max_frequency_allowed()),
           status);
-    } else if (freq < config.min_frequency_allowed()) {
+    }
+    if (config.has_min_frequency_allowed() &&
+        freq < config.min_frequency_allowed()) {
       SummaryMonitor::EscalateStatus(
           ComponentStatus::WARN,
           absl::StrCat(config.name(), " has frequency ", freq,
