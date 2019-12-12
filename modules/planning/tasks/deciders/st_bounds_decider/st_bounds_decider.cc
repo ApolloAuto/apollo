@@ -91,7 +91,8 @@ void STBoundsDecider::InitSTBoundsDecider(
   // Map all related obstacles onto ST-Graph.
   auto time1 = std::chrono::system_clock::now();
   st_obstacles_processor_.Init(path_data.discretized_path().Length(),
-                               st_bounds_config_.total_time(), path_data);
+                               st_bounds_config_.total_time(), path_data,
+                               path_decision);
   st_obstacles_processor_.MapObstaclesToSTBoundaries(path_decision);
   auto time2 = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = time2 - time1;
