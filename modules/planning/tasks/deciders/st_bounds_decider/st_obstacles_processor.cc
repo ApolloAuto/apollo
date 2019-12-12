@@ -208,8 +208,7 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     ADEBUG << "Closest obstacle ID = " << closest_stop_obs_id;
     // Go through all Keep-Clear zones, and see if there is a even closer
     // stop fence due to them.
-    if (closest_stop_obs_id.find("Side_Pass_Stop") == std::string::npos &&
-        closest_stop_obs_id.find("DEST") == std::string::npos) {
+    if (!closest_stop_obs_ptr->IsVirtual()) {
       for (const auto& clear_zone : candidate_clear_zones_) {
         const auto& clear_zone_boundary = std::get<1>(clear_zone);
         if (closest_stop_obs_boundary.min_s() >= clear_zone_boundary.min_s() &&
