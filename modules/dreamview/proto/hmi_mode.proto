@@ -20,8 +20,8 @@ message ChannelMonitorConfig {
   repeated string mandatory_fields = 3;
 
   // Minimum and maximum frequency allowed for this channel
-  optional double min_frequency_allowed = 4;
-  optional double max_frequency_allowed = 5;
+  optional double min_frequency_allowed = 4 [default = 0.0];
+  optional double max_frequency_allowed = 5 [default = 1000.0];
 }
 
 // For ResourceMonitor.

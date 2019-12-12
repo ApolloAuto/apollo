@@ -30,8 +30,9 @@ LatencyRecorder::LatencyRecorder(const std::string& module_name)
 void LatencyRecorder::AppendLatencyRecord(const uint64_t message_id,
                                           const absl::Time& begin_time,
                                           const absl::Time& end_time) {
+  CHECK(begin_time <= end_time);
   static auto writer = CreateWriter();
-  if (writer == nullptr || message_id == 0 || end_time < begin_time) {
+  if (writer == nullptr || message_id == 0) {
     return;
   }
 
