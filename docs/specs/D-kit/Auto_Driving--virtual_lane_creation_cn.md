@@ -91,6 +91,7 @@ routing_map用于routing模块，如果没有事先生成routing_map，那么无
 bash bootstrap.sh
 ```
 浏览器中打开dreamview，选择地图(以xishan为例)，选择车辆和模式( 不能选择navigation 模式），打开gps，localization，等待localization信号稳定，把车辆开到虚拟车道线录制路段，就会看到dreamview上面有黄色虚线构成的车道线出现。
+
 ![图片](../images/virtual_lane/virtual_lane_creation.png)
 
 
