@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -88,9 +89,16 @@ Status PathReuseDecider::Process(Frame* const frame,
   }
 
   bool path_reusable = false;
+  // stop reusing current path:
+  // 1. replan path
+  // 2. collision
+  // 3. failed to trim previous path
+  // 4. speed optimization failed on previous path
   if (!frame->current_frame_planned_trajectory().is_replan() &&
       CheckPathReusable(frame, reference_line_info) &&
-      TrimHistoryPath(frame, reference_line_info)) {
+      TrimHistoryPath(frame, reference_line_info) &&
+      (reference_line_info->trajectory_type() !=
+       ADCTrajectory::SPEED_FALLBACK)) {
     ADEBUG << "reuse path";
     path_reusable = true;
     ++reusable_path_counter_;  // count reusable path
@@ -98,7 +106,6 @@ Status PathReuseDecider::Process(Frame* const frame,
     // disable reuse path
     ADEBUG << "stop reuse path";
 
-    /* TODO(all): to be updated soon
     // F -> T
     auto* mutable_path_decider_status = PlanningContext::Instance()
                                             ->mutable_planning_status()
@@ -111,15 +118,17 @@ Status PathReuseDecider::Process(Frame* const frame,
         IsIgnoredBlockingObstacle(reference_line_info);
     ADEBUG << "counter[" << front_static_obstacle_cycle_counter
            << "] IsIgnoredBlockingObstacle[" << ignore_blocking_obstacle << "]";
-    // far from blocking obstacle or no blocking obstacle for a while
+    // stop reusing current path:
+    // 1. blocking obstacle disappeared or moving far away
+    // 2. trimming successful
+    // 3. no statical obstacle collision.
     if ((front_static_obstacle_cycle_counter <= kWaitCycle ||
-        ignore_blocking_obstacle) &&
+         ignore_blocking_obstacle) &&
         TrimHistoryPath(frame, reference_line_info)) {
       // enable reuse path
       ADEBUG << "reuse path: front_blocking_obstacle ignorable";
       ++reusable_path_counter_;
     }
-    */
   }
 
   reference_line_info->set_path_reusable(path_reusable);
