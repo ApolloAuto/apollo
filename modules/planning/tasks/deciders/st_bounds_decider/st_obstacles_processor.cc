@@ -54,12 +54,14 @@ using ObsTEdge = std::tuple<int, double, double, double, std::string>;
 
 void STObstaclesProcessor::Init(const double planning_distance,
                                 const double planning_time,
-                                const PathData& path_data) {
+                                const PathData& path_data,
+                                PathDecision* const path_decision) {
   planning_time_ = planning_time;
   planning_distance_ = planning_distance;
   path_data_ = path_data;
   vehicle_param_ = common::VehicleConfigHelper::GetConfig().vehicle_param();
   adc_path_init_s_ = path_data_.discretized_path().front().s();
+  path_decision_ = path_decision;
 
   obs_t_edges_.clear();
   obs_t_edges_idx_ = 0;
@@ -67,6 +69,7 @@ void STObstaclesProcessor::Init(const double planning_distance,
   obs_id_to_st_boundary_.clear();
   obs_id_to_decision_.clear();
   candidate_clear_zones_.clear();
+  obs_id_to_alternative_st_boundary_.clear();
 }
 
 Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
@@ -137,6 +140,26 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     auto boundary =
         STBoundary::CreateInstanceAccurate(lower_points, upper_points);
     boundary.set_id(obs_ptr->Id());
+    if (is_caution_obstacle) {
+      boundary.set_obstacle_road_right_ending_t(obs_caution_end_t);
+    }
+    // Update the trimmed obstacle into alternative st-bound storage
+    // for later uses.
+    while (lower_points.size() > 2 &&
+           lower_points.back().t() > obs_caution_end_t) {
+      lower_points.pop_back();
+    }
+    while (upper_points.size() > 2 &&
+           upper_points.back().t() > obs_caution_end_t) {
+      upper_points.pop_back();
+    }
+    auto alternative_boundary =
+        STBoundary::CreateInstanceAccurate(lower_points, upper_points);
+    alternative_boundary.set_id(obs_ptr->Id());
+    obs_id_to_alternative_st_boundary_[obs_ptr->Id()] = alternative_boundary;
+    ADEBUG << "Obstacle " << obs_ptr->Id()
+           << " has an alternative st-boundary with "
+           << lower_points.size() + upper_points.size() << " points.";
 
     // Store all Keep-Clear zone together.
     if (obs_item_ptr->Id().find("KC") != std::string::npos) {
@@ -146,9 +169,6 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     }
 
     // Process all other obstacles than Keep-Clear zone.
-    if (is_caution_obstacle) {
-      boundary.set_obstacle_road_right_ending_t(obs_caution_end_t);
-    }
     if (obs_ptr->Trajectory().trajectory_point().empty()) {
       // Obstacle is static.
       if (std::get<0>(closest_stop_obstacle) == "NULL" ||
@@ -337,6 +357,16 @@ bool STObstaclesProcessor::GetSBoundsFromDecisions(
   }
   for (const auto& obs_id : obs_id_to_remove) {
     obs_id_to_decision_.erase(obs_id);
+    // Change the displayed st-boundary to the alternative one:
+    if (obs_id_to_alternative_st_boundary_.count(obs_id) > 0) {
+      Obstacle* obs_ptr = path_decision_->Find(obs_id);
+      obs_id_to_st_boundary_[obs_id] =
+          obs_id_to_alternative_st_boundary_[obs_id];
+      obs_id_to_st_boundary_[obs_id].SetBoundaryType(
+        STBoundary::BoundaryType::OVERTAKE);
+      obs_ptr->set_path_st_boundary(
+          obs_id_to_alternative_st_boundary_[obs_id]);
+    }
   }
 
   // Based on existing decisions, get the s-boundary.

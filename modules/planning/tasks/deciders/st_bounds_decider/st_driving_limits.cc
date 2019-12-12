@@ -73,13 +73,15 @@ void STDrivingLimits::UpdateBlockingInfo(const double t, const double lower_s,
                                          const double upper_v) {
   auto curr_bounds = GetVehicleDynamicsLimits(t);
   if (curr_bounds.first < lower_s) {
+    // lower_v0_ = std::fmax(lower_v, 0.0);
+    lower_v0_ = std::fmax(0.0, lower_v0_ - max_dec_ * (t - lower_t0_));
     lower_t0_ = t;
-    lower_v0_ = std::fmax(lower_v, 0.0);
     lower_s0_ = lower_s;
   }
   if (curr_bounds.second > upper_s) {
+    // upper_v0_ = std::fmax(upper_v, 0.0);
+    upper_v0_ = std::fmin(max_v_, upper_v0_ + max_acc_ * (t - upper_t0_));
     upper_t0_ = t;
-    upper_v0_ = std::fmax(upper_v, 0.0);
     upper_s0_ = upper_s;
   }
 }
