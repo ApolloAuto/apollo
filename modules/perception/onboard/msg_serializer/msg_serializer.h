@@ -30,7 +30,8 @@ class MsgSerializer {
   MsgSerializer() = default;
   ~MsgSerializer() = default;
 
-  static bool SerializeMsg(double timestamp, int seq_num,
+  static bool SerializeMsg(double timestamp, uint64_t lidar_timestamp,
+                           int seq_num,
                            const std::vector<base::ObjectPtr>& objects,
                            const apollo::common::ErrorCode& error_code,
                            PerceptionObstacles* obstacles);
