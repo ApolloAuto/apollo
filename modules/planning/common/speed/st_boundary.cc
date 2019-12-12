@@ -199,6 +199,7 @@ bool STBoundary::GetUnblockSRange(const double curr_time, double* s_upper,
   } else {
     ADEBUG << "boundary_type is not supported. boundary_type: "
            << static_cast<int>(boundary_type_);
+    return false;
   }
   return true;
 }
