@@ -48,8 +48,8 @@ default_task_config: {
   speed_heuristic_config {
     default_speed_config {
       unit_t: 1.0
-      dense_dimension_s: 21
-      dense_unit_s: 0.25
+      dense_dimension_s: 101
+      dense_unit_s: 0.1
       sparse_unit_s: 1.0
       speed_weight: 0.0
       accel_weight: 10.0
@@ -74,7 +74,7 @@ default_task_config: {
 
       max_acceleration: 2.0
       max_deceleration: -4.0
-      spatial_potential_penalty: 1
+      spatial_potential_penalty: 1.0e2
     }
     lane_change_speed_config {
       unit_t: 1.0
