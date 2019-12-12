@@ -16,7 +16,7 @@
 
 ### 安装地图
   
-在/apollo/modules/map/data/目录下新建一个文件夹（该文件夹名称即为我们要使用的地图名称）, 例如我们本次地图叫做Demo。拷贝我们的地图数据文件到该目录下，如下图所示。
+在/apollo/modules/map/data/目录下新建一个文件夹（该文件夹名称即为我们要使用的地图名称），例如我们本次地图叫做Demo。拷贝我们的地图数据文件到该目录下，如下图所示。
 ![图片](../images/traffic_light/map_data.png)
 
 
@@ -44,7 +44,7 @@ bash bootstrap.sh
 
 只需要保证上图中Camera Sensor打开（前面按钮变为蓝色）就可以了，左上角如果暂时没有出现摄像头的画面也没有关系，继续往下操作，
 
-点击选择左侧的Module Controller，在页面中点击Camera, 等几秒钟，左上角就应该有摄像头拍摄到的画面，如下图所示：
+点击选择左侧的Module Controller，在页面中点击Camera，等几秒钟，左上角就应该有摄像头拍摄到的画面，如下图所示：
 ![图片](../images/traffic_light/opened_camera_result_dreamview.png)
 
 为确保摄像头数据无误，我们也可以在命令行中输入以下命令查看：
@@ -57,7 +57,7 @@ rostopic echo /apollo/sensor/camera/front_12mm/image
 
 ### 打开定位模块
 
-在dreamview界面中点击选择左侧的Module Controller，在页面中打开GPS, Localization。此时界面中的GPS和Localization模块按钮会变成蓝色，为了确保定位数据已经准备好，我们还需要在命令行中查看两个topic的数据：
+在dreamview界面中点击选择左侧的Module Controller，在页面中打开GPS，Localization。此时界面中的GPS和Localization模块按钮会变成蓝色，为了确保定位数据已经准备好，我们还需要在命令行中查看两个topic的数据：
 输入以下命令：
 ```
 rostopic echo /apollo/sensor/gnss/best_pose
