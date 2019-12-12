@@ -1,7 +1,6 @@
 cyber_modules {
   key: "Sensors"
   value: {
-    dag_files: "/apollo/modules/tick/dag/tick.dag"
     dag_files: "/apollo/modules/drivers/gnss/dag/gnss.dag"
     dag_files: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
     process_group: "compute_sched"

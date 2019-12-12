@@ -1,7 +1,6 @@
 cyber_modules {
   key: "GPS"
   value: {
-    dag_files: "/apollo/modules/tick/dag/tick.dag"
     dag_files: "/apollo/modules/drivers/gnss/dag/gnss.dag"
     dag_files: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
     dag_files: "/apollo/modules/transform/dag/static_transform.dag"
