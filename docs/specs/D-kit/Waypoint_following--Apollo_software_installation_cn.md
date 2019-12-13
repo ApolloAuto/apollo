@@ -250,7 +250,7 @@ cd can-utils/
 ![图片](https://agroup-bos.cdn.bcebos.com/0d1f81329fa9f84ad143af20166b8adf38c95d91)
 则表示Can驱动安装成功。
 d.注意事项：
-在后续启动apollo的canbus模块时，需要先在doc外运行start.sh脚本。
+在后续启动apollo的canbus模块时，需要先在docker外运行start.sh脚本。
 
 ### 安装Docker
 
