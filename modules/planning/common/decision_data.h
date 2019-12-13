@@ -43,9 +43,8 @@ struct EnumClassHash {
 
 class DecisionData {
  public:
-  explicit DecisionData(
-      const prediction::PredictionObstacles& prediction_obstacles,
-      const ReferenceLine& reference_line);
+  DecisionData(const prediction::PredictionObstacles& prediction_obstacles,
+               const ReferenceLine& reference_line);
   ~DecisionData() = default;
 
  public:

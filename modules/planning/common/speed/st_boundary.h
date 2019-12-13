@@ -47,7 +47,7 @@ class STBoundary : public common::math::Polygon2d {
   STBoundary() = default;
   explicit STBoundary(
       const std::vector<std::pair<STPoint, STPoint>>& point_pairs,
-      bool is_accurate_boundary=false);
+      bool is_accurate_boundary = false);
   explicit STBoundary(const common::math::Box2d& box) = delete;
   explicit STBoundary(std::vector<common::math::Vec2d> points) = delete;
 
