@@ -33,7 +33,7 @@ Stage::StageStatus ParkAndGoStageCheck::Process(
   CHECK_NOTNULL(frame);
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
-  ADCInitStatus(frame);
+  ADCInitStatus();
   frame->mutable_open_space_info()->set_is_on_open_space_trajectory(true);
   bool plan_ok = ExecuteTaskOnOpenSpace(frame);
   if (!plan_ok) {
@@ -59,7 +59,7 @@ Stage::StageStatus ParkAndGoStageCheck::FinishStage(const bool success) {
   return Stage::FINISHED;
 }
 
-void ParkAndGoStageCheck::ADCInitStatus(Frame* frame) {
+void ParkAndGoStageCheck::ADCInitStatus() {
   auto* park_and_go_status = PlanningContext::Instance()
                                  ->mutable_planning_status()
                                  ->mutable_park_and_go();
