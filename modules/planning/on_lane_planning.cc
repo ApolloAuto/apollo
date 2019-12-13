@@ -238,6 +238,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     History::Instance()->Clear();
     PlanningContext::Instance()->mutable_planning_status()->Clear();
     reference_line_provider_->UpdateRoutingResponse(*local_view_.routing);
+    planner_->Init(config_);
   }
 
   // Update reference line provider and reset pull over if necessary
