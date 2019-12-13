@@ -120,7 +120,14 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
 
     ADEBUG << "nearby_path: " << nearby_path.DebugString();
     ADEBUG << "found nearby_path";
-
+    if (!PlanningContext::Instance()
+             ->planning_status()
+             .park_and_go()
+             .has_adc_init_position()) {
+      const std::string msg = "ADC initial position is unavailable";
+      AERROR << msg;
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+    }
     SetOriginFromADC(frame, nearby_path);
     ADEBUG << "SetOrigin";
     SetParkAndGoEndPose(frame);
@@ -152,6 +159,7 @@ void OpenSpaceRoiDecider::SetOriginFromADC(Frame *const frame,
   // get ADC box
   const auto &park_and_go_status =
       PlanningContext::Instance()->planning_status().park_and_go();
+
   const double adc_init_x = park_and_go_status.adc_init_position().x();
   const double adc_init_y = park_and_go_status.adc_init_position().y();
   const double adc_init_heading = park_and_go_status.adc_init_heading();
