@@ -41,9 +41,6 @@ class PathReuseDecider : public Decider {
   common::Status Process(Frame* frame,
                          ReferenceLineInfo* reference_line_info) override;
 
-  // check if previous path reusable
-  bool CheckPathReusable(Frame* frame, ReferenceLineInfo* reference_line_info);
-
   void GetCurrentStopPositions(
       Frame* frame,
       std::vector<const common::PointENU*>* current_stop_positions);
@@ -77,6 +74,7 @@ class PathReuseDecider : public Decider {
   History* history_ = History::Instance();
   static int reusable_path_counter_;  // count reused path
   static int total_path_counter_;     // count total path
+  static bool path_reusable_;
 };
 
 }  // namespace planning
