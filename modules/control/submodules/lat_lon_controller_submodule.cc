@@ -77,6 +77,13 @@ bool LatLonControllerSubmodule::Proc(
   const auto start_time = Clock::Now();
   ControlCommand control_core_command;
 
+  // recording pad msg
+  if (preprocessor_status->received_pad_msg()) {
+    control_core_command.mutable_pad_msg()->CopyFrom(
+        preprocessor_status->local_view().pad_msg());
+  }
+  ADEBUG << "Lat+Lon controller submodule started ....";
+
   // skip produce control command when estop for lat+lon controller
   StatusPb pre_status = preprocessor_status->header().status();
   if (pre_status.error_code() != ErrorCode::OK) {
