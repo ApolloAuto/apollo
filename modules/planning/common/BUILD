@@ -235,14 +235,8 @@ cc_library(
 
 cc_library(
     name = "frame",
-    srcs = [
-        "frame.cc",
-        "frame_manager.cc",
-    ],
-    hdrs = [
-        "frame.h",
-        "frame_manager.h",
-    ],
+    srcs = ["frame.cc"],
+    hdrs = ["frame.h"],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
