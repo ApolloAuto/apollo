@@ -61,17 +61,15 @@ namespace planning {
 class Obstacle {
  public:
   Obstacle() = default;
-  explicit Obstacle(
-      const std::string& id,
-      const perception::PerceptionObstacle& perception_obstacle,
-      const prediction::ObstaclePriority::Priority& obstacle_priority,
-      const bool is_static);
-  explicit Obstacle(
-      const std::string& id,
-      const perception::PerceptionObstacle& perception_obstacle,
-      const prediction::Trajectory& trajectory,
-      const prediction::ObstaclePriority::Priority& obstacle_priority,
-      const bool is_static);
+  Obstacle(const std::string& id,
+           const perception::PerceptionObstacle& perception_obstacle,
+           const prediction::ObstaclePriority::Priority& obstacle_priority,
+           const bool is_static);
+  Obstacle(const std::string& id,
+           const perception::PerceptionObstacle& perception_obstacle,
+           const prediction::Trajectory& trajectory,
+           const prediction::ObstaclePriority::Priority& obstacle_priority,
+           const bool is_static);
 
   const std::string& Id() const { return id_; }
   void SetId(const std::string& id) { id_ = id; }
