@@ -263,11 +263,16 @@ class MracController {
   // indicator if the reference/adaption model is valid
   bool reference_model_enabled_ = false;
   bool adaption_model_enabled_ = false;
+
+  // indicator if clamp the adaption laws
+  bool adaption_clamping_enabled = false;
+
   // The order of the reference/adaption model
   int model_order_ = 1;
 
   // 1st-order Reference system coefficients in continuous-time domain
   double tau_reference_ = 0.0;
+  double tau_clamping_ = 0.0;
   // 2nd-order Reference system coefficients in continuous-time domain
   double wn_reference_ = 0.0;
   double zeta_reference_ = 0.0;
@@ -303,6 +308,10 @@ class MracController {
   Eigen::MatrixXd gain_state_adaption_;      // State adaption vector
   Eigen::MatrixXd gain_input_adaption_;      // Desired command adaption vector
   Eigen::MatrixXd gain_nonlinear_adaption_;  // Nonlinear adaption vector
+
+  Eigen::MatrixXd gain_state_clamping_;      // To clamp the state adaption
+  Eigen::MatrixXd gain_input_clamping_;      // To clamp the command adaption
+  Eigen::MatrixXd gain_nonlinear_clamping_;  // To clamp the nonlinear adaption
 
   // Mrac control output in the last step
   double control_previous_ = 0.0;

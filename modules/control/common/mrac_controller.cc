@@ -80,6 +80,16 @@ double MracController::Control(const double command, const Matrix state,
   UpdateAdaption(&gain_input_adaption_, input_desired_,
                  gamma_input_adaption_ * gamma_ratio_input_);
 
+  // revert the adaption law updates if they are beyond the clamping values
+  if (model_order_ == 1 && adaption_clamping_enabled &&
+      (gain_state_adaption_(0, 0) > 0.0 ||
+       gain_state_adaption_(0, 0) < gain_state_clamping_(0, 0) ||
+       gain_input_adaption_(0, 0) > gain_input_clamping_(0, 0) ||
+       gain_input_adaption_(0, 0) < 1.0)) {
+    gain_state_adaption_.col(0) = gain_state_adaption_.col(1);
+    gain_input_adaption_.col(0) = gain_input_adaption_.col(1);
+  }
+
   // update the generated control based on the adaptive law
   double control_unbounded =
       gain_state_adaption_.col(0).transpose() * state_action_.col(0) +
@@ -93,6 +103,8 @@ double MracController::Control(const double command, const Matrix state,
   AntiWindupCompensation(control_unbounded, control_previous_);
 
   // update the previous value for next iteration
+  gain_state_adaption_.col(1) = gain_state_adaption_.col(0);
+  gain_input_adaption_.col(1) = gain_input_adaption_.col(0);
   state_reference_.col(1) = state_reference_.col(0);
   state_action_.col(1) = state_action_.col(0);
   input_desired_.col(1) = input_desired_.col(0);
@@ -146,6 +158,9 @@ void MracController::Init(const MracConf &mrac_conf,
   gain_state_adaption_ = Matrix::Zero(model_order_, 2);
   gain_input_adaption_ = Matrix::Zero(1, 2);
   gain_nonlinear_adaption_ = Matrix::Zero(1, 2);
+  gain_state_clamping_ = Matrix::Zero(model_order_, 1);
+  gain_input_clamping_ = Matrix::Zero(1, 1);
+  gain_nonlinear_clamping_ = Matrix::Zero(1, 1);
   gamma_state_adaption_ = Matrix::Zero(model_order_, model_order_);
   gamma_input_adaption_ = Matrix::Zero(1, 1);
   gamma_nonlinear_adaption_ = Matrix::Zero(1, 1);
@@ -183,6 +198,8 @@ Status MracController::SetReferenceModel(const MracConf &mrac_conf) {
   tau_reference_ = mrac_conf.reference_time_constant();
   wn_reference_ = mrac_conf.reference_natural_frequency();
   zeta_reference_ = mrac_conf.reference_damping_ratio();
+  tau_clamping_ = mrac_conf.clamping_time_constant();
+  adaption_clamping_enabled = (tau_clamping_ >= Epsilon);
   return Status::OK();
 }
 
@@ -278,11 +295,14 @@ void MracController::EstimateInitialGains(const LatencyParam &latency_param) {
       latency_param.dead_time() + latency_param.settling_time();
   Matrix matrix_a_estimate = Matrix::Zero(model_order_, model_order_);
   Matrix matrix_b_estimate = Matrix::Zero(model_order_, 1);
+  Matrix matrix_a_clamping = Matrix::Zero(model_order_, model_order_);
+  Matrix matrix_b_clamping = Matrix::Zero(model_order_, 1);
   if (model_order_ == 1 &&
       (rise_time_estimate >= ts_ || settling_time_estimate >= ts_)) {
     const double tau_estimate = (rise_time_estimate >= ts_)
                                     ? rise_time_estimate / 2.2
                                     : settling_time_estimate / 4.0;
+    // generate the initial adaptive gains
     matrix_a_estimate(0, 0) = -1.0 / tau_estimate;
     matrix_b_estimate(0, 0) = 1.0 / tau_estimate;
     gain_state_adaption_(0, 1) =
@@ -290,6 +310,16 @@ void MracController::EstimateInitialGains(const LatencyParam &latency_param) {
         matrix_b_estimate(0, 0);
     gain_input_adaption_(0, 1) =
         matrix_b_reference_(0, 0) / matrix_b_estimate(0, 0);
+    // generate the clamping bounds for adaptive gains
+    if (adaption_clamping_enabled) {
+      matrix_a_clamping(0, 0) = -1.0 / tau_clamping_;
+      matrix_b_clamping(0, 0) = 1.0 / tau_clamping_;
+      gain_state_clamping_(0, 0) =
+          (matrix_a_clamping(0, 0) - matrix_a_estimate(0, 0)) /
+          matrix_b_estimate(0, 0);
+      gain_input_clamping_(0, 0) =
+          matrix_b_clamping(0, 0) / matrix_b_estimate(0, 0);
+    }
   } else if (model_order_ == 2 &&
              (rise_time_estimate >= ts_ && settling_time_estimate >= ts_)) {
     const double wn_estimate = 1.8 / rise_time_estimate;
@@ -333,7 +363,6 @@ void MracController::UpdateAdaption(Matrix *law_adp, const Matrix state_adp,
            state_adp.col(1) * (state_error.col(1).transpose() +
                                compensation_anti_windup_.col(1).transpose())) *
           matrix_p_adaption_ * matrix_b_adaption_;
-  law_adp->col(1) = law_adp->col(0);
 }
 
 void MracController::AntiWindupCompensation(const double control_command,
