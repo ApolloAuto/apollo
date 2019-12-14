@@ -47,7 +47,7 @@ using apollo::common::math::Vec2d;
 using apollo::common::util::PointFactory;
 
 std::unordered_map<std::string, bool>
-ReferenceLineInfo::junction_right_of_way_map_;
+    ReferenceLineInfo::junction_right_of_way_map_;
 
 ReferenceLineInfo::ReferenceLineInfo(const common::VehicleState& vehicle_state,
                                      const TrajectoryPoint& adc_planning_point,
@@ -786,9 +786,10 @@ void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
   if (!IsDrivable()) {
     prev_advice.set_reason("Reference line not drivable");
   } else if (!is_on_reference_line_) {
-    const auto& scenario_type = PlanningContext::Instance()->planning_status()
-                                                           .scenario()
-                                                           .scenario_type();
+    const auto& scenario_type = PlanningContext::Instance()
+                                    ->planning_status()
+                                    .scenario()
+                                    .scenario_type();
     if (scenario_type == ScenarioConfig::PARK_AND_GO || IsChangeLanePath()) {
       // note: when is_on_reference_line_ is FALSE
       //   (1) always engage while in PARK_AND_GO scenario
