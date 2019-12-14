@@ -55,8 +55,8 @@ cc_binary(
     name = "proto_map_generator",
     srcs = ["proto_map_generator.cc"],
     deps = [
-        "//external:gflags",
         "//cyber/common:file",
+        "//external:gflags",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/hdmap/adapter:opendrive_adapter",
         "//modules/map/proto:map_proto",

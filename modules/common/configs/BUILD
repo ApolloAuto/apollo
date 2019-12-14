@@ -25,8 +25,8 @@ cc_library(
         ":config_gflags",
         "//cyber/common:file",
         "//cyber/common:macros",
-        "//modules/common/util",
         "//modules/common/configs/proto:vehicle_config_proto",
+        "//modules/common/util",
         "@glog",
     ],
 )
