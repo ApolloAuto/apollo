@@ -259,7 +259,7 @@ void JunctionMLPEvaluator::SetEgoVehicleFeatureValues(
   auto ego_pose_obstacle_ptr =
       obstacles_container->GetObstacle(FLAGS_ego_vehicle_id);
   if (ego_pose_obstacle_ptr == nullptr ||
-      ego_pose_obstacle_ptr->history_size() == 0) {
+      ego_pose_obstacle_ptr->history().empty()) {
     (*feature_values)[0] = 100.0;
     (*feature_values)[1] = 100.0;
     return;
