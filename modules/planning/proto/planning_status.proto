@@ -130,7 +130,7 @@ message YieldSignStatus {
   repeated string wait_for_obstacle_id = 3;
 }
 
-// note: please keep this one as minimal as possible. do NOT polute it.
+// note: please keep this one as minimal as possible. do NOT pollute it.
 message PlanningStatus {
   optional BareIntersectionStatus bare_intersection = 1;
   optional ChangeLaneStatus change_lane = 2;

@@ -196,7 +196,7 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
   // Keep-Clear zone here).
   // Note: We only need to check the overlapping between the closest obstacle
   //       and all the Keep-Clear zones. Because if there is another obstacle
-  //       overlapping with a Keep-Clear zone, which results in a even closer
+  //       overlapping with a Keep-Clear zone, which results in an even closer
   //       stop fence, then that very Keep-Clear zone must also overlap with
   //       the closest obstacle. (Proof omitted here)
   if (std::get<0>(closest_stop_obstacle) != "NULL") {
@@ -206,7 +206,7 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     std::tie(closest_stop_obs_id, closest_stop_obs_boundary,
              closest_stop_obs_ptr) = closest_stop_obstacle;
     ADEBUG << "Closest obstacle ID = " << closest_stop_obs_id;
-    // Go through all Keep-Clear zones, and see if there is a even closer
+    // Go through all Keep-Clear zones, and see if there is an even closer
     // stop fence due to them.
     if (!closest_stop_obs_ptr->IsVirtual()) {
       for (const auto& clear_zone : candidate_clear_zones_) {
