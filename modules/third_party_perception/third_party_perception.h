@@ -56,7 +56,7 @@ class ThirdPartyPerception {
   // Upon receiving localization data
   void OnLocalization(
       const apollo::localization::LocalizationEstimate& message);
-  // Upont receiving chassis data
+  // Upon receiving chassis data
   void OnChassis(const apollo::canbus::Chassis& message);
   // publish perception obstacles when timer is triggered
   bool Process(apollo::perception::PerceptionObstacles* const response);
