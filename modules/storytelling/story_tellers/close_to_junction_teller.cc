@@ -34,7 +34,7 @@ using apollo::prediction::PredictionMap;
 
 bool IsPointInPNCJunction(const PathPoint& point, std::string* junction_id) {
   const auto junctions = PredictionMap::GetPNCJunctions(
-      Eigen::Vector2d(point.x(), point.y()), FLAGS_junction_search_radius);
+      {point.x(), point.y()}, FLAGS_junction_search_radius);
   if (junctions.empty() || junctions.front() == nullptr) {
     return false;
   }
@@ -50,7 +50,7 @@ bool IsPointInPNCJunction(const PathPoint& point, std::string* junction_id) {
 bool IsPointInRegularJunction(const PathPoint& point,
                               std::string* junction_id) {
   const auto junctions = PredictionMap::GetJunctions(
-      Eigen::Vector2d(point.x(), point.y()), FLAGS_junction_search_radius);
+      {point.x(), point.y()}, FLAGS_junction_search_radius);
   if (junctions.empty() || junctions.front() == nullptr) {
     return false;
   }
@@ -101,6 +101,7 @@ double DistanceToJunction(const ADCTrajectory& adc_trajectory,
 void CloseToJunctionTeller::Init() {
   auto* manager = FrameManager::Instance();
   manager->CreateOrGetReader<ADCTrajectory>(FLAGS_planning_trajectory_topic);
+  CHECK(PredictionMap::Ready()) << "PredictionMap not ready";
 }
 
 void CloseToJunctionTeller::Update(Stories* stories) {
