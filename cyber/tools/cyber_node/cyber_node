@@ -30,23 +30,23 @@ def print_node_info(node_name, sleep_s=2):
         msg.ParseFromString(roleattr_rawdata)
         assert(node_name == msg.node_name)
     except:
-        print "RoleAttributes ParseFromString failed. size is ", len(roleattr_rawdata)
+        print("RoleAttributes ParseFromString failed. size is ", len(roleattr_rawdata))
         return
-    print "nodename\t", msg.node_name
-    print "processid\t", msg.process_id
-    print "hostname\t", msg.host_name
+    print("nodename\t", msg.node_name)
+    print("processid\t", msg.process_id)
+    print("hostname\t", msg.host_name)
 
-    print "[Reading Channels]:"
+    print("[Reading Channels]:")
     reader_channels = sorted(cyber.NodeUtils.get_readersofnode(node_name, 0))
     for channel in reader_channels:
-        print channel
-    print ""
+        print(channel)
+    print("")
 
-    print "[Writing Channels]:"
+    print("[Writing Channels]:")
     writer_channels = sorted(cyber.NodeUtils.get_writersofnode(node_name, 0))
     for channel in writer_channels:
-        print channel
-    print ""
+        print(channel)
+    print("")
 
 
 def _node_cmd_info(argv):
@@ -77,10 +77,10 @@ def _node_cmd_info(argv):
 
 def print_node_list():
     nodes = cyber.NodeUtils.get_nodes()
-    print "The number of nodes is: ", len(nodes)
+    print("The number of nodes is: ", len(nodes))
     nodes.sort()
     for node_name in nodes:
-        print node_name
+        print(node_name)
 
 
 def _node_cmd_list(argv):
