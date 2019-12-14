@@ -40,8 +40,8 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
-using apollo::perception::PerceptionObstacles;
 using apollo::perception::PerceptionObstacle;
+using apollo::perception::PerceptionObstacles;
 using IdObstacleListMap = std::unordered_map<int, std::list<Obstacle*>>;
 using IdPredictionObstacleMap =
     std::unordered_map<int, std::shared_ptr<PredictionObstacle>>;
@@ -139,11 +139,11 @@ void PredictorManager::Run(
   prediction_obstacles_.Clear();
 
   if (FLAGS_enable_multi_thread) {
-    PredictObstaclesInParallel(
-        perception_obstacles, adc_trajectory_container, obstacles_container);
+    PredictObstaclesInParallel(perception_obstacles, adc_trajectory_container,
+                               obstacles_container);
   } else {
-    PredictObstacles(
-        perception_obstacles, adc_trajectory_container, obstacles_container);
+    PredictObstacles(perception_obstacles, adc_trajectory_container,
+                     obstacles_container);
   }
 }
 

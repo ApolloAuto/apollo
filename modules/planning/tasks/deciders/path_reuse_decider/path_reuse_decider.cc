@@ -67,7 +67,7 @@ Status PathReuseDecider::Process(Frame* const frame,
 
   // skip path reuse if not in_change_lane
   if (lane_change_status->status() != ChangeLaneStatus::IN_CHANGE_LANE &&
-       !FLAGS_enable_reuse_path_in_lane_follow) {
+      !FLAGS_enable_reuse_path_in_lane_follow) {
     ADEBUG << "skipping reusing path: not in lane_change";
     reference_line_info->set_path_reusable(false);
     return Status::OK();

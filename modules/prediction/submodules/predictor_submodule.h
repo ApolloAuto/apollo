@@ -34,8 +34,7 @@ namespace prediction {
 
 class PredictorSubmodule
     : public cyber::Component<apollo::perception::PerceptionObstacles,
-                              ADCTrajectoryContainer,
-                              SubmoduleOutput> {
+                              ADCTrajectoryContainer, SubmoduleOutput> {
  public:
   /**
    * @brief Destructor

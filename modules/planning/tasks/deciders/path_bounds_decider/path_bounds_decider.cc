@@ -266,13 +266,13 @@ void PathBoundsDecider::InitPathBoundsDecider(
   const ReferenceLine& reference_line = reference_line_info.reference_line();
   common::TrajectoryPoint planning_start_point = frame.PlanningStartPoint();
   if (FLAGS_use_front_axe_center_in_path_planning) {
-    planning_start_point = InferFrontAxeCenterFromRearAxeCenter(
-        planning_start_point);
+    planning_start_point =
+        InferFrontAxeCenterFromRearAxeCenter(planning_start_point);
   }
   ADEBUG << "Plan at the starting point: x = "
-         << planning_start_point.path_point().x() << ", y = "
-         << planning_start_point.path_point().y() << ", and angle = "
-         << planning_start_point.path_point().theta();
+         << planning_start_point.path_point().x()
+         << ", y = " << planning_start_point.path_point().y()
+         << ", and angle = " << planning_start_point.path_point().theta();
 
   // Initialize some private variables.
   // ADC s/l info.
@@ -298,7 +298,7 @@ void PathBoundsDecider::InitPathBoundsDecider(
 }
 
 common::TrajectoryPoint PathBoundsDecider::InferFrontAxeCenterFromRearAxeCenter(
-      const common::TrajectoryPoint& traj_point) {
+    const common::TrajectoryPoint& traj_point) {
   double front_to_rear_axe_distance =
       VehicleConfigHelper::GetConfig().vehicle_param().wheel_base();
   common::TrajectoryPoint ret = traj_point;

@@ -45,24 +45,22 @@ PiecewiseJerkPathOptimizer::PiecewiseJerkPathOptimizer(const TaskConfig& config)
 
 common::Status PiecewiseJerkPathOptimizer::Process(
     const SpeedData& speed_data, const ReferenceLine& reference_line,
-    const common::TrajectoryPoint& init_point,
-    const bool path_reusable,
+    const common::TrajectoryPoint& init_point, const bool path_reusable,
     PathData* const final_path_data) {
   // skip piecewise_jerk_path_optimizer if reused path
   if (FLAGS_enable_skip_path_tasks && path_reusable) {
     return Status::OK();
   }
-  ADEBUG << "Plan at the starting point: x = "
-         << init_point.path_point().x() << ", y = "
-         << init_point.path_point().y() << ", and angle = "
-         << init_point.path_point().theta();
+  ADEBUG << "Plan at the starting point: x = " << init_point.path_point().x()
+         << ", y = " << init_point.path_point().y()
+         << ", and angle = " << init_point.path_point().theta();
   common::TrajectoryPoint planning_start_point = init_point;
   if (FLAGS_use_front_axe_center_in_path_planning) {
-    planning_start_point = InferFrontAxeCenterFromRearAxeCenter(
-        planning_start_point);
+    planning_start_point =
+        InferFrontAxeCenterFromRearAxeCenter(planning_start_point);
   }
-  const auto init_frenet_state = reference_line.ToFrenetFrame(
-      planning_start_point);
+  const auto init_frenet_state =
+      reference_line.ToFrenetFrame(planning_start_point);
 
   // Choose lane_change_path_config for lane-change cases
   // Otherwise, choose default_path_config for normal path planning
@@ -175,7 +173,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
 
 common::TrajectoryPoint
 PiecewiseJerkPathOptimizer::InferFrontAxeCenterFromRearAxeCenter(
-      const common::TrajectoryPoint& traj_point) {
+    const common::TrajectoryPoint& traj_point) {
   double front_to_rear_axe_distance =
       VehicleConfigHelper::GetConfig().vehicle_param().wheel_base();
   common::TrajectoryPoint ret = traj_point;
@@ -196,10 +194,10 @@ PiecewiseJerkPathOptimizer::ConvertPathPointRefFromFrontAxeToRearAxe(
       VehicleConfigHelper::GetConfig().vehicle_param().wheel_base();
   for (auto path_point : path_data.discretized_path()) {
     common::PathPoint new_path_point = path_point;
-    new_path_point.set_x(path_point.x() -
-        front_to_rear_axe_distance * std::cos(path_point.theta()));
-    new_path_point.set_y(path_point.y() -
-        front_to_rear_axe_distance * std::sin(path_point.theta()));
+    new_path_point.set_x(path_point.x() - front_to_rear_axe_distance *
+                                              std::cos(path_point.theta()));
+    new_path_point.set_y(path_point.y() - front_to_rear_axe_distance *
+                                              std::sin(path_point.theta()));
     ret.push_back(new_path_point);
   }
   return ret;
