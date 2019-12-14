@@ -235,7 +235,8 @@ class ReferenceLineInfo {
   void SetEmergencyLight();
 
   void set_path_reusable(const bool path_reusable) {
-    path_reusable_ = path_reusable; }
+    path_reusable_ = path_reusable;
+  }
 
   bool path_reusable() const { return path_reusable_; }
 

@@ -58,9 +58,9 @@ bool PredictorSubmodule::Proc(
       perception_obstacles->error_code();
   const absl::Time& frame_start_time = submodule_output->frame_start_time();
   ObstaclesContainer obstacles_container(*submodule_output);
-  PredictorManager::Instance()->Run(
-      *perception_obstacles, adc_trajectory_container.get(),
-      &obstacles_container);
+  PredictorManager::Instance()->Run(*perception_obstacles,
+                                    adc_trajectory_container.get(),
+                                    &obstacles_container);
   PredictionObstacles prediction_obstacles =
       PredictorManager::Instance()->prediction_obstacles();
 

@@ -164,10 +164,9 @@ void RuleBasedStopDecider::StopOnSidePass(
       return;
     }
     if (!CheckADCStop(path_data, *reference_line_info, stop_s_on_pathdata)) {
-      if (!BuildSidePassStopFence(
-              path_data, stop_s_on_pathdata,
-              &change_lane_stop_path_point,
-              frame, reference_line_info)) {
+      if (!BuildSidePassStopFence(path_data, stop_s_on_pathdata,
+                                  &change_lane_stop_path_point, frame,
+                                  reference_line_info)) {
         AERROR << "Set side pass stop fail";
       }
     } else {
