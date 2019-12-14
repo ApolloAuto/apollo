@@ -27,7 +27,7 @@ from cyber_py import cyber_time
 
 def print_channel_type(channel_name):
     msgtype = cyber.ChannelUtils.get_msgtype(channel_name)
-    print channel_name, " type is [", msgtype, "]"
+    print(channel_name, " type is [", msgtype, "]")
 
 
 def _channel_cmd_type(argv):
@@ -56,7 +56,7 @@ class CyberChannelBw(object):
         self.window_size = window_size
         if window_size <= 0 or window_size > 50000:
             self.window_size = 100
-        print "bw window_size: ", self.window_size
+        print("bw window_size: ", self.window_size)
 
     def callback_bw(self, rawdata):
         with self.lock:
@@ -158,7 +158,7 @@ class CyberChannelHz(object):
         if window_size <= 0 or window_size > 50000:
             window_size = 50000
         self.window_size = window_size
-        print "hz window_size: ", window_size
+        print("hz window_size: ", window_size)
 
     def callback_hz(self, m):
         with self.lock:
@@ -255,33 +255,33 @@ def print_role(rolsattr_rawdata):
         msg = RoleAttributes()
         msg.ParseFromString(rolsattr_rawdata)
     except DecodeError:
-        print "RoleAttributes ParseFromString failed. size is ", len(rolsattr_rawdata)
+        print("RoleAttributes ParseFromString failed. size is ", len(rolsattr_rawdata))
         return
-    print "\troleid\t\t", msg.id
-    print "\thostname\t", msg.host_name
-    print "\tprocessid\t", msg.process_id
-    print "\tnodename\t", msg.node_name
-    print "\tmsgtype\t\t", msg.message_type
+    print("\troleid\t\t", msg.id)
+    print("\thostname\t", msg.host_name)
+    print("\tprocessid\t", msg.process_id)
+    print("\tnodename\t", msg.node_name)
+    print("\tmsgtype\t\t", msg.message_type)
 
 
 def channel_info(channel_name):
     channlesinfo_dict = cyber.ChannelUtils.get_channels_info()
     time.sleep(1)
     if len(channlesinfo_dict) == 0:
-        print "channelsinfo dict is null"
+        print("channelsinfo dict is null")
         return
 
     # for key in channlesinfo_dict.keys():
     #     print key
     if channel_name != "":
-        print channel_name
+        print(channel_name)
         for role_data in channlesinfo_dict[channel_name]:
             print_role(role_data)
     else:
         channels = sorted(channlesinfo_dict.keys())
-        print "The number of channels is: ", len(channels)
+        print("The number of channels is: ", len(channels))
         for channel in channels:
-            print channel
+            print(channel)
             for role_data in channlesinfo_dict[channel]:
                 print_role(role_data)
 
@@ -312,9 +312,9 @@ def _channel_cmd_info(argv):
 
 def print_channel_list():
     channels = sorted(cyber.ChannelUtils.get_channels())
-    print "The number of channels is: ", len(channels)
+    print("The number of channels is: ", len(channels))
     for channel in channels:
-        print channel
+        print(channel)
 
 
 def _channel_cmd_list(argv):
@@ -346,7 +346,7 @@ class CyberChannelecho(object):
         # print raw_data # str
 
         msgtype = cyber.ChannelUtils.get_msgtype(self.channel_name, 0)
-        print cyber.ChannelUtils.get_debugstring_rawmsgdata(msgtype, raw_data)
+        print(cyber.ChannelUtils.get_debugstring_rawmsgdata(msgtype, raw_data))
 
 
 def channel_echo(channel_name):
