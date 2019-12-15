@@ -37,8 +37,6 @@ namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
 using apollo::common::time::Clock;
-using apollo::localization::LocalizationEstimate;
-using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using apollo::planning::ADCTrajectory;
 

@@ -23,12 +23,11 @@
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::PathPoint;
-using ::apollo::common::math::Polygon2d;
-using ::apollo::common::math::Vec2d;
-using ::apollo::hdmap::JunctionInfo;
-using ::apollo::hdmap::PNCJunctionInfo;
-using ::apollo::planning::ADCTrajectory;
+using apollo::common::PathPoint;
+using apollo::common::math::Polygon2d;
+using apollo::common::math::Vec2d;
+using apollo::hdmap::JunctionInfo;
+using apollo::planning::ADCTrajectory;
 
 ADCTrajectoryContainer::ADCTrajectoryContainer()
     : adc_junction_info_ptr_(nullptr), s_dist_to_junction_(0.0) {}

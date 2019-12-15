@@ -27,7 +27,6 @@ namespace prediction {
 
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
-using apollo::hdmap::LaneInfo;
 
 ExtrapolationPredictor::ExtrapolationPredictor() {
   predictor_type_ = ObstacleConf::EXTRAPOLATION_PREDICTOR;

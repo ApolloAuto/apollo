@@ -32,13 +32,13 @@
 namespace apollo {
 namespace prediction {
 
+using apollo::common::Point3D;
+using apollo::common::adapter::AdapterConfig;
+using apollo::common::math::Box2d;
+using apollo::common::math::Vec2d;
+using apollo::hdmap::LaneInfo;
+using apollo::hdmap::OverlapInfo;
 using apollo::perception::PerceptionObstacle;
-using common::Point3D;
-using common::adapter::AdapterConfig;
-using common::math::Box2d;
-using common::math::Vec2d;
-using hdmap::LaneInfo;
-using hdmap::OverlapInfo;
 using ConstLaneInfoPtr = std::shared_ptr<const LaneInfo>;
 
 static constexpr double kCautionDistanceThreshold = 60.0;

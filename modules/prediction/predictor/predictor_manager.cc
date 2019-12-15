@@ -37,15 +37,11 @@
 
 namespace apollo {
 namespace prediction {
+namespace {
 
-using apollo::common::adapter::AdapterConfig;
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
 using IdObstacleListMap = std::unordered_map<int, std::list<Obstacle*>>;
-using IdPredictionObstacleMap =
-    std::unordered_map<int, std::shared_ptr<PredictionObstacle>>;
-
-namespace {
 
 void GroupObstaclesByObstacleId(const int obstacle_id,
                                 ObstaclesContainer* const obstacles_container,
@@ -185,7 +181,8 @@ void PredictorManager::PredictObstaclesInParallel(
     const PerceptionObstacles& perception_obstacles,
     const ADCTrajectoryContainer* adc_trajectory_container,
     ObstaclesContainer* obstacles_container) {
-  IdPredictionObstacleMap id_prediction_obstacle_map;
+  std::unordered_map<int, std::shared_ptr<PredictionObstacle>>
+      id_prediction_obstacle_map;
   for (const PerceptionObstacle& perception_obstacle :
        perception_obstacles.perception_obstacle()) {
     int id = perception_obstacle.id();
