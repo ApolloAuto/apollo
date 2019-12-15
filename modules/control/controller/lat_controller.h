@@ -215,6 +215,7 @@ class LatController : public Controller {
   common::MeanFilter heading_error_filter_;
 
   // Lead/Lag controller
+  bool enable_leadlag_ = false;
   LeadlagController leadlag_controller_;
 
   // Mrac controller

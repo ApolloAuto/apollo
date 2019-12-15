@@ -247,9 +247,9 @@ Status LatController::Init(const ControlConf *control_conf) {
   LoadLatGainScheduler(lat_controller_conf);
   LogInitParameters();
 
-  bool enable_leadlag = control_conf_->lat_controller_conf()
-                            .enable_reverse_leadlag_compensation();
-  if (enable_leadlag) {
+  bool enable_leadlag_ = control_conf_->lat_controller_conf()
+                             .enable_reverse_leadlag_compensation();
+  if (enable_leadlag_) {
     leadlag_controller_.Init(lat_controller_conf.reverse_leadlag_conf(), ts_);
   }
 
@@ -488,10 +488,8 @@ Status LatController::ComputeControlCommand(
 
   double steer_angle = 0.0;
   double steer_angle_feedback_augment = 0.0;
-  bool enable_leadlag = control_conf_->lat_controller_conf()
-                            .enable_reverse_leadlag_compensation();
   // Augment the feedback control on lateral error at the desired speed domain
-  if (enable_leadlag) {
+  if (enable_leadlag_) {
     if (FLAGS_enable_feedback_augment_on_high_speed ||
         std::fabs(vehicle_state->linear_velocity()) <= low_speed_bound_) {
       steer_angle_feedback_augment =
