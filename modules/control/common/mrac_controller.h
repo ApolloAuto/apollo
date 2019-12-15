@@ -313,6 +313,10 @@ class MracController {
   Eigen::MatrixXd gain_input_clamping_;      // To clamp the command adaption
   Eigen::MatrixXd gain_nonlinear_clamping_;  // To clamp the nonlinear adaption
 
+  Eigen::MatrixXd gain_state_adaption_init_;      // Initial state adaption
+  Eigen::MatrixXd gain_input_adaption_init_;      // Initial input adaption
+  Eigen::MatrixXd gain_nonlinear_adaption_init_;  // Initial nonlinear adaption
+
   // Mrac control output in the last step
   double control_previous_ = 0.0;
 
