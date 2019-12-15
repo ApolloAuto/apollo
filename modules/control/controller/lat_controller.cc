@@ -253,9 +253,9 @@ Status LatController::Init(const ControlConf *control_conf) {
     leadlag_controller_.Init(lat_controller_conf.reverse_leadlag_conf(), ts_);
   }
 
-  bool enable_mrac =
+  bool enable_mrac_ =
       control_conf_->lat_controller_conf().enable_steer_mrac_control();
-  if (enable_mrac) {
+  if (enable_mrac_) {
     mrac_controller_.Init(lat_controller_conf.steer_mrac_conf(),
                           vehicle_param_.steering_latency_param(), ts_);
   }
@@ -522,9 +522,7 @@ Status LatController::ComputeControlCommand(
 
   // Re-compute the steering command if the MRAC control is enabled, with steer
   // angle limitation and steer rate limitation
-  bool enable_mrac =
-      control_conf_->lat_controller_conf().enable_steer_mrac_control();
-  if (enable_mrac) {
+  if (enable_mrac_) {
     const int mrac_model_order = control_conf_->lat_controller_conf()
                                      .steer_mrac_conf()
                                      .mrac_model_order();
@@ -622,6 +620,9 @@ Status LatController::ComputeControlCommand(
 
 Status LatController::Reset() {
   matrix_state_.setZero();
+  if (enable_mrac_) {
+    mrac_controller_.Reset();
+  }
   return Status::OK();
 }
 

@@ -218,6 +218,7 @@ class LatController : public Controller {
   LeadlagController leadlag_controller_;
 
   // Mrac controller
+  bool enable_mrac_ = false;
   MracController mrac_controller_;
 
   // for compute the differential valute to estimate acceleration/lon_jerk
