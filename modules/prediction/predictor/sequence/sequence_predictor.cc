@@ -18,7 +18,6 @@
 
 #include <limits>
 #include <memory>
-#include <utility>
 
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"

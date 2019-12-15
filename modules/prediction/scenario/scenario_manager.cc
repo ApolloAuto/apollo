@@ -16,8 +16,6 @@
 
 #include "modules/prediction/scenario/scenario_manager.h"
 
-#include <algorithm>
-
 #include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {

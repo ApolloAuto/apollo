@@ -16,8 +16,6 @@
 
 #include "modules/prediction/predictor/free_move/free_move_predictor.h"
 
-#include <utility>
-
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"

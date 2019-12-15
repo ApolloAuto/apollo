@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
 
 #include "modules/localization/proto/localization.pb.h"

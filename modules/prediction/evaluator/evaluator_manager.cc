@@ -17,8 +17,6 @@
 #include "modules/prediction/evaluator/evaluator_manager.h"
 
 #include <algorithm>
-#include <unordered_map>
-#include <vector>
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/prediction/common/feature_output.h"

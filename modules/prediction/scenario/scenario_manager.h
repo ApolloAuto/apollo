@@ -14,13 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- */
-
 #pragma once
-
-#include <memory>
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/scenario/analyzer/scenario_analyzer.h"

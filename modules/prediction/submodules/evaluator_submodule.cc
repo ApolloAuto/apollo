@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <utility>
-
 #include "modules/prediction/submodules/evaluator_submodule.h"
 
 #include "modules/common/adapters/adapter_gflags.h"

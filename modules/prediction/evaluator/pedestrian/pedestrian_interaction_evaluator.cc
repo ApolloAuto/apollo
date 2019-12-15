@@ -17,7 +17,6 @@
 #include "modules/prediction/evaluator/pedestrian/pedestrian_interaction_evaluator.h"
 
 #include <utility>
-#include <vector>
 
 #include "modules/common/math/vec2d.h"
 #include "modules/prediction/common/feature_output.h"

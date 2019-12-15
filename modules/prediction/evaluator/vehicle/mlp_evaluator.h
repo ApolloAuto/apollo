@@ -18,7 +18,6 @@
 
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"

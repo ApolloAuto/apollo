@@ -16,8 +16,6 @@
 
 #include "modules/prediction/common/semantic_map.h"
 
-#include <cmath>
-#include <string>
 #include <utility>
 #include <vector>
 

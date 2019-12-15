@@ -16,11 +16,6 @@
 
 #include "modules/prediction/common/message_process.h"
 
-#include <algorithm>
-#include <iomanip>
-#include <limits>
-#include <vector>
-
 #include "cyber/common/file.h"
 #include "cyber/record/record_reader.h"
 

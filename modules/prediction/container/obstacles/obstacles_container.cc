@@ -17,8 +17,6 @@
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 
 #include <iomanip>
-#include <limits>
-#include <unordered_set>
 #include <utility>
 
 #include "modules/prediction/common/feature_output.h"

@@ -16,8 +16,6 @@
 
 #include "modules/prediction/common/prediction_thread_pool.h"
 
-#include <chrono>
-
 #include "gtest/gtest.h"
 
 namespace apollo {
