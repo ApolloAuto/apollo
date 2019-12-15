@@ -17,7 +17,6 @@
 #include "modules/prediction/predictor/predictor_manager.h"
 
 #include <list>
-#include <memory>
 #include <unordered_map>
 
 #include "modules/prediction/common/feature_output.h"

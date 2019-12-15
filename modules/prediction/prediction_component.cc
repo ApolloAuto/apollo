@@ -16,9 +16,6 @@
 
 #include "modules/prediction/prediction_component.h"
 
-#include <algorithm>
-#include <vector>
-
 #include "cyber/common/file.h"
 #include "cyber/record/record_reader.h"
 #include "modules/common/adapters/adapter_gflags.h"

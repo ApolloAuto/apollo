@@ -23,7 +23,6 @@
 
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "modules/common/util/lru_cache.h"

@@ -16,8 +16,6 @@
 
 #include "modules/prediction/submodules/predictor_submodule.h"
 
-#include <utility>
-
 #include "absl/time/time.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
@@ -32,8 +30,6 @@ namespace prediction {
 
 using apollo::common::time::Clock;
 using apollo::perception::PerceptionObstacles;
-
-PredictorSubmodule::~PredictorSubmodule() {}
 
 std::string PredictorSubmodule::Name() const {
   return FLAGS_evaluator_submodule_name;

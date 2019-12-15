@@ -16,9 +16,7 @@
 
 #include "modules/prediction/scenario/prioritization/obstacles_prioritizer.h"
 
-#include <algorithm>
 #include <limits>
-#include <memory>
 #include <queue>
 #include <unordered_map>
 #include <utility>

@@ -19,7 +19,6 @@
 #include <omp.h>
 
 #include <algorithm>
-#include <limits>
 #include <utility>
 
 #include "cyber/common/file.h"

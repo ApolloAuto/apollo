@@ -20,7 +20,6 @@
 #include <limits>
 #include <memory>
 #include <string>
-#include <vector>
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/prediction/common/feature_output.h"

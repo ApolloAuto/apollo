@@ -39,7 +39,7 @@ class PredictorSubmodule
   /**
    * @brief Destructor
    */
-  ~PredictorSubmodule();
+  ~PredictorSubmodule() = default;
 
   /**
    * @brief Get name of the node

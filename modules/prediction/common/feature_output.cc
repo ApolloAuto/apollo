@@ -16,8 +16,6 @@
 
 #include "modules/prediction/common/feature_output.h"
 
-#include <vector>
-
 #include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "modules/prediction/common/prediction_system_gflags.h"

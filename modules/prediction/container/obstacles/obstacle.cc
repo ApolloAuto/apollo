@@ -19,8 +19,6 @@
 #include <algorithm>
 #include <iomanip>
 #include <limits>
-#include <list>
-#include <unordered_set>
 
 #include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
