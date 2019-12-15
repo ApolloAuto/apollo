@@ -117,7 +117,7 @@ void MracController::Reset() {
   ResetStates();
   // reset the adaptive gains
   ResetGains();
-  // reset all the externally-setting control parameters
+  // reset all the externally-setting, non-conf control parameters
   gamma_ratio_state_ = 1.0;
   gamma_ratio_input_ = 1.0;
   gamma_ratio_nonlinear_ = 1.0;
@@ -139,6 +139,8 @@ void MracController::ResetGains() {
   gain_state_adaption_.setZero(model_order_, 2);
   gain_input_adaption_.setZero(1, 2);
   gain_nonlinear_adaption_.setZero(1, 2);
+  gain_state_adaption_.col(1) = gain_state_adaption_init_;
+  gain_input_adaption_.col(1) = gain_input_adaption_init_;
 }
 
 void MracController::Init(const MracConf &mrac_conf,
@@ -155,12 +157,17 @@ void MracController::Init(const MracConf &mrac_conf,
   input_desired_ = Matrix::Zero(1, 2);
   state_action_ = Matrix::Zero(model_order_, 2);
   state_reference_ = Matrix::Zero(model_order_, 2);
+  // Initialize the adaptive control gains
   gain_state_adaption_ = Matrix::Zero(model_order_, 2);
   gain_input_adaption_ = Matrix::Zero(1, 2);
   gain_nonlinear_adaption_ = Matrix::Zero(1, 2);
   gain_state_clamping_ = Matrix::Zero(model_order_, 1);
   gain_input_clamping_ = Matrix::Zero(1, 1);
   gain_nonlinear_clamping_ = Matrix::Zero(1, 1);
+  gain_state_adaption_init_ = Matrix::Zero(model_order_, 1);
+  gain_input_adaption_init_ = Matrix::Zero(1, 1);
+  gain_nonlinear_adaption_init_ = Matrix::Zero(1, 1);
+  // Initialize the adaptive convergence gains and anti-windup gains
   gamma_state_adaption_ = Matrix::Zero(model_order_, model_order_);
   gamma_input_adaption_ = Matrix::Zero(1, 1);
   gamma_nonlinear_adaption_ = Matrix::Zero(1, 1);
@@ -177,6 +184,8 @@ void MracController::Init(const MracConf &mrac_conf,
   adaption_model_enabled_ =
       (SetAdaptionModel(mrac_conf).ok() && BuildAdaptionModel().ok());
   EstimateInitialGains(latency_param);
+  gain_state_adaption_.col(1) = gain_state_adaption_init_;
+  gain_input_adaption_.col(1) = gain_input_adaption_init_;
 }
 
 Status MracController::SetReferenceModel(const MracConf &mrac_conf) {
@@ -305,10 +314,10 @@ void MracController::EstimateInitialGains(const LatencyParam &latency_param) {
     // generate the initial adaptive gains
     matrix_a_estimate(0, 0) = -1.0 / tau_estimate;
     matrix_b_estimate(0, 0) = 1.0 / tau_estimate;
-    gain_state_adaption_(0, 1) =
+    gain_state_adaption_init_(0, 0) =
         (matrix_a_reference_(0, 0) - matrix_a_estimate(0, 0)) /
         matrix_b_estimate(0, 0);
-    gain_input_adaption_(0, 1) =
+    gain_input_adaption_init_(0, 0) =
         matrix_b_reference_(0, 0) / matrix_b_estimate(0, 0);
     // generate the clamping bounds for adaptive gains
     if (adaption_clamping_enabled) {
@@ -329,11 +338,11 @@ void MracController::EstimateInitialGains(const LatencyParam &latency_param) {
     matrix_a_estimate(1, 0) = -wn_estimate * wn_estimate;
     matrix_a_estimate(1, 1) = -2 * zeta_estimate * wn_estimate;
     matrix_b_estimate(1, 0) = wn_estimate * wn_estimate;
-    gain_state_adaption_.col(1) =
+    gain_state_adaption_init_.col(0) =
         (common::math::PseudoInverse<double, 2, 1>(matrix_b_estimate) *
          (matrix_a_reference_ - matrix_a_estimate))
             .transpose();
-    gain_input_adaption_.col(1) =
+    gain_input_adaption_init_.col(0) =
         (common::math::PseudoInverse<double, 2, 1>(matrix_b_estimate) *
          matrix_b_reference_)
             .transpose();
