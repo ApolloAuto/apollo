@@ -30,7 +30,6 @@ namespace prediction {
 using apollo::common::PathPoint;
 using apollo::common::Point3D;
 using apollo::common::TrajectoryPoint;
-using apollo::common::adapter::AdapterConfig;
 using apollo::hdmap::LaneInfo;
 
 bool SequencePredictor::Predict(

@@ -31,7 +31,6 @@ namespace prediction {
 
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
-using apollo::prediction::PredictionConstants;
 
 ObstaclesContainer::ObstaclesContainer()
     : ptr_obstacles_(FLAGS_max_num_obstacles) {}

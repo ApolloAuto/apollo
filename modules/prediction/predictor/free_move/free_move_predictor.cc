@@ -23,8 +23,8 @@
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::TrajectoryPoint;
-using ::apollo::perception::PerceptionObstacle;
+using apollo::common::TrajectoryPoint;
+using apollo::perception::PerceptionObstacle;
 
 FreeMovePredictor::FreeMovePredictor() {
   predictor_type_ = ObstacleConf::FREE_MOVE_PREDICTOR;

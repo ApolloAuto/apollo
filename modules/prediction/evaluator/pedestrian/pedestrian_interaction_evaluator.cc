@@ -30,12 +30,7 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::Point3D;
 using apollo::common::TrajectoryPoint;
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::math::Vec2d;
-using apollo::perception::PerceptionObstacle;
-using apollo::perception::PerceptionObstacles;
 
 PedestrianInteractionEvaluator::PedestrianInteractionEvaluator()
     : device_(torch::kCPU) {
