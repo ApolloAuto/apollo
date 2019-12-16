@@ -42,7 +42,7 @@
 ```
     rostopic echo /apollo/localization/pose
     #如果有正常输出就查看下一条topic 
-    rostopic echo /apollo/tf_static #确保里面child_frame_id是velodyne16
+    rostopic echo /tf_static #确保里面child_frame_id是velodyne16
     rostopic echo /apollo/sensor/velodyne16/compensator/PointCloud2 #确保有点云输出
 ```
 
