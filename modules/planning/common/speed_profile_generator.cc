@@ -67,11 +67,9 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
                                                    init_s);
 
   std::vector<double> end_state_ref(num_of_knots, stop_distance);
-  piecewise_jerk_problem.set_x_ref(1000.0, end_state_ref);
+  piecewise_jerk_problem.set_x_ref(1.0, end_state_ref);
 
-  // TODO(Hongyi): tune the params and move to a config
-  piecewise_jerk_problem.set_weight_ddx(1.0);
-  piecewise_jerk_problem.set_weight_dddx(0.01);
+  piecewise_jerk_problem.set_scale_factor({1.0, 10.0, 100.0});
 
   piecewise_jerk_problem.set_x_bounds(0.0, std::fmax(stop_distance, 100.0));
   piecewise_jerk_problem.set_dx_bounds(
