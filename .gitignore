@@ -1,21 +1,14 @@
 # Bazel
-bazel-apollo
-bazel-apollo_dev
-bazel-bin
-bazel-genfiles
-bazel-out
-bazel-testlogs
-/Debug/
-*.pyc
-*genrule.log
+bazel-*
 WORKSPACE
-# temporary files
+
+# Temporary files
+*.pyc
 *.swp
 *.swo
-# generated files
-generated_data_warehouse.conf
-modules/common/data/ssl_keys
-modules/perception/cuda_util/cmake_build
+
+# Generated files
+*.result
 
 # Eclipse IDE files
 .project
@@ -26,35 +19,23 @@ modules/perception/cuda_util/cmake_build
 # IntelliJ files
 .idea
 
-# Vscode files
+# VS Code files
 .vscode
 
-# atom.io files
+# Atom IDE files
 *.gch
 
-# Logs.
-*.stdout
-*.stderr
+# Logs
 nohup.out
 *.bak
-*.csv.result
+*.stderr
+*.stdout
 
 # Editor configs
 .ycm_extra_conf.py
 
-# ROS
-ros_param_server.pid
-.master_snapshot
-
-# third_party
-third_party/ros
-third_party/ros_aarch64/
-third_party/ros_x86_64/
-modules/ros/third_party/fast-rtps
-
 # Data
 /data
-modules/data/conf/task_info_template.pb.txt
 modules/tools/ota/update.ini
 modules/tools/ota/vehicle_info.pb.txt
 
@@ -75,20 +56,13 @@ modules/map/data
 
 # python proto
 py_proto
-cyber/python/cyber/proto/
-
-# gnss conf files
-modules/drivers/gnss/conf/conf_beijing
-modules/drivers/gnss/conf/conf_us
 
 # calibration files
 modules/calibration/data/
 
 # Data bag
 docs/demo_guide/*.bag
-
-# Logs
-cyber/log/*
+docs/demo_guide/*.record
 
 # Bash Environment
 .dev_bash_hist
