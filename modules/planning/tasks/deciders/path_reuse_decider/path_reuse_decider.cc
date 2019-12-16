@@ -95,6 +95,15 @@ Status PathReuseDecider::Process(Frame* const frame,
   // 2. collision
   // 3. failed to trim previous path
   // 4. speed optimization failed on previous path
+  bool speed_optimization_successful = false;
+  const auto& history_frame = FrameHistory::Instance()->Latest();
+  if (history_frame) {
+    const auto history_trajectory_type =
+        history_frame->reference_line_info().front().trajectory_type();
+    speed_optimization_successful =
+        (history_trajectory_type != ADCTrajectory::SPEED_FALLBACK);
+  }
+
   // const auto history_trajectory_type = FrameHistory::Instance()
   //                                          ->Latest()
   //                                          ->reference_line_info()
@@ -102,7 +111,7 @@ Status PathReuseDecider::Process(Frame* const frame,
   //                                          .trajectory_type();
   if (path_reusable_) {
     if (!frame->current_frame_planned_trajectory().is_replan() &&
-        IsCollisionFree(reference_line_info) &&
+        speed_optimization_successful && IsCollisionFree(reference_line_info) &&
         TrimHistoryPath(frame, reference_line_info)) {
       ADEBUG << "reuse path";
       ++reusable_path_counter_;  // count reusable path
@@ -130,7 +139,7 @@ Status PathReuseDecider::Process(Frame* const frame,
     // 3. no statical obstacle collision.
     if ((front_static_obstacle_cycle_counter <= kWaitCycle ||
          ignore_blocking_obstacle) &&
-        IsCollisionFree(reference_line_info) &&
+        speed_optimization_successful && IsCollisionFree(reference_line_info) &&
         TrimHistoryPath(frame, reference_line_info)) {
       // enable reuse path
       ADEBUG << "reuse path: front_blocking_obstacle ignorable";
