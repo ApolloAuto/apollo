@@ -47,6 +47,8 @@ import psutil
 SMALL_TOPICS = [
     '/apollo/canbus/chassis',
     '/apollo/canbus/chassis_detail',
+    '/apollo/common/latency_records',
+    '/apollo/common/latency_reports',
     '/apollo/control',
     '/apollo/control/pad',
     '/apollo/drive_event',
