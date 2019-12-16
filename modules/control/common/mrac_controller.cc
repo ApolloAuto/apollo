@@ -137,7 +137,7 @@ void MracController::ResetStates() {
 
 void MracController::ResetGains() {
   gain_state_adaption_.setZero(model_order_, 2);
-  gain_input_adaption_.setZero(1, 2);
+  gain_input_adaption_ = Matrix::Ones(1, 2);
   gain_nonlinear_adaption_.setZero(1, 2);
   gain_state_adaption_.col(1) = gain_state_adaption_init_;
   gain_input_adaption_.col(1) = gain_input_adaption_init_;
@@ -159,13 +159,13 @@ void MracController::Init(const MracConf &mrac_conf,
   state_reference_ = Matrix::Zero(model_order_, 2);
   // Initialize the adaptive control gains
   gain_state_adaption_ = Matrix::Zero(model_order_, 2);
-  gain_input_adaption_ = Matrix::Zero(1, 2);
+  gain_input_adaption_ = Matrix::Ones(1, 2);
   gain_nonlinear_adaption_ = Matrix::Zero(1, 2);
   gain_state_clamping_ = Matrix::Zero(model_order_, 1);
-  gain_input_clamping_ = Matrix::Zero(1, 1);
+  gain_input_clamping_ = Matrix::Ones(1, 1);
   gain_nonlinear_clamping_ = Matrix::Zero(1, 1);
   gain_state_adaption_init_ = Matrix::Zero(model_order_, 1);
-  gain_input_adaption_init_ = Matrix::Zero(1, 1);
+  gain_input_adaption_init_ = Matrix::Ones(1, 1);
   gain_nonlinear_adaption_init_ = Matrix::Zero(1, 1);
   // Initialize the adaptive convergence gains and anti-windup gains
   gamma_state_adaption_ = Matrix::Zero(model_order_, model_order_);
@@ -426,7 +426,7 @@ int MracController::BoundOutput(const double output_unbounded,
 }
 
 void MracController::SetInitialReferenceState(
-    const Matrix state_reference_init) {
+    const Matrix &state_reference_init) {
   if (state_reference_init.rows() != model_order_ ||
       state_reference_init.cols() != 1) {
     AWARN << "failed to set the initial reference states, due to the given "
@@ -438,7 +438,7 @@ void MracController::SetInitialReferenceState(
   }
 }
 
-void MracController::SetInitialActionState(const Matrix state_action_init) {
+void MracController::SetInitialActionState(const Matrix &state_action_init) {
   if (state_action_init.rows() != model_order_ ||
       state_action_init.cols() != 1) {
     AWARN << "failed to set the initial action states, due to the given "
@@ -452,6 +452,30 @@ void MracController::SetInitialActionState(const Matrix state_action_init) {
 
 void MracController::SetInitialCommand(const double command_init) {
   input_desired_(0, 1) = command_init;
+}
+
+void MracController::SetInitialStateAdaptionGain(
+    const Matrix &gain_state_adaption_init) {
+  if (gain_state_adaption_init.rows() != model_order_ ||
+      gain_state_adaption_init.cols() != 1) {
+    AWARN << "failed to set the initial state adaption gains, due to the given "
+             "state size: "
+          << gain_state_adaption_init.rows() << " x "
+          << gain_state_adaption_init.cols()
+          << " doesn't match the model order: " << model_order_;
+  } else {
+    gain_state_adaption_.col(1) = gain_state_adaption_init;
+  }
+}
+
+void MracController::SetInitialInputAdaptionGain(
+    const double gain_input_adaption_init) {
+  gain_input_adaption_(0, 1) = gain_input_adaption_init;
+}
+
+void MracController::SetInitialNonlinearAdaptionGain(
+    const double gain_nonlinear_adaption_init) {
+  gain_nonlinear_adaption_(0, 1) = gain_nonlinear_adaption_init;
 }
 
 void MracController::SetStateAdaptionRate(const double ratio_state) {
