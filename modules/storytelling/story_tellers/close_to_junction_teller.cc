@@ -114,19 +114,18 @@ void CloseToJunctionTeller::Update(Stories* stories) {
     return;
   }
 
-  auto& logger = manager->LogBuffer();
   std::string junction_id;
   const double distance = DistanceToJunction(*trajectory, &junction_id);
   const bool close_to_junction = distance >= 0;
   if (close_to_junction) {
     if (!stories->has_close_to_junction()) {
-      logger.INFO("Enter CloseToJunction Story");
+      AINFO << "Enter CloseToJunction story";
     }
     auto* story = stories->mutable_close_to_junction();
     story->set_distance(distance);
     story->set_junction_id(junction_id);
   } else if (stories->has_close_to_junction()) {
-    logger.INFO("Exit CloseToJunction Story");
+    AINFO << "Exit CloseToJunction story";
     stories->clear_close_to_junction();
   }
 }
