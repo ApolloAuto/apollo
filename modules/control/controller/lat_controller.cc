@@ -247,13 +247,13 @@ Status LatController::Init(const ControlConf *control_conf) {
   LoadLatGainScheduler(lat_controller_conf);
   LogInitParameters();
 
-  bool enable_leadlag_ = control_conf_->lat_controller_conf()
-                             .enable_reverse_leadlag_compensation();
+  enable_leadlag_ = control_conf_->lat_controller_conf()
+                        .enable_reverse_leadlag_compensation();
   if (enable_leadlag_) {
     leadlag_controller_.Init(lat_controller_conf.reverse_leadlag_conf(), ts_);
   }
 
-  bool enable_mrac_ =
+  enable_mrac_ =
       control_conf_->lat_controller_conf().enable_steer_mrac_control();
   if (enable_mrac_) {
     mrac_controller_.Init(lat_controller_conf.steer_mrac_conf(),
