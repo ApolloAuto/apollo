@@ -44,6 +44,7 @@ namespace planning {
 
 constexpr double kADCSafetyLBuffer = 0.1;
 constexpr double kSIgnoreThreshold = 0.01;
+constexpr double kTIgnoreThreshold = 0.1;
 constexpr double kOvertakenObsCautionTime = 0.5;
 
 class STObstaclesProcessor {
