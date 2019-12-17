@@ -34,14 +34,14 @@ void LatencyRecorder::AppendLatencyRecord(const uint64_t message_id,
   // TODO(michael): ALERT for now for trouble shooting,
   // CHECK_LT(begin_time, end_time) in the future to enforce the validation
   if (begin_time >= end_time) {
-    // In Simulation mode, there might be many cases where begin_time
-    // is equal to end_time, reduce the error frequency in this mode
-    const static kErrorSampeRate = 1000;
+    // In Simulation mode, there might be large number of cases where
+    // begin_times equal to end_times, reduce the error frequency in this mode
+    static const int kErrorReduceBase = 1000;
     if (!cyber::common::GlobalData::Instance()->IsRealityMode()) {
-      AERROR_EVERY(kErrorSampeRate)
+      AERROR_EVERY(kErrorReduceBase)
           << "latency begin_time: " << begin_time
           << " greater than or equal to end_time: " << end_time << ", "
-          << kErrorSampeRate << " times";
+          << kErrorReduceBase << " times";
       return;
     }
     AERROR << "latency begin_time: " << begin_time
