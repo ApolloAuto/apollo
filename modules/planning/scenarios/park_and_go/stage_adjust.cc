@@ -56,8 +56,10 @@ Stage::StageStatus ParkAndGoStageAdjust::Process(
   if (history_frame) {
     const auto& trajectory_points =
         history_frame->current_frame_planned_trajectory().trajectory_point();
-    CHECK(trajectory_points.empty());
-    is_end_of_trajectory = (trajectory_points.rbegin()->relative_time() < 0.0);
+    if (!trajectory_points.empty()) {
+      is_end_of_trajectory =
+          (trajectory_points.rbegin()->relative_time() < 0.0);
+    }
   }
 
   if (!is_ready_to_cruise && !is_end_of_trajectory) {
