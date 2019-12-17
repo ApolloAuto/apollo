@@ -36,7 +36,7 @@ from cyber.proto import record_pb2
 from configuration_yaml_generator import ConfigYaml
 from extract_static_data import get_subfolder_list, select_static_image_pcd
 from modules.tools.sensor_calibration.proto import extractor_config_pb2
-from sensor_msg_extractor import GpsParser, ImageParser, PointCloudParser, PoseParser
+from sensor_msg_extractor import GpsParser, ImageParser, PointCloudParser, PoseParser, ContiRadarParser
 
 #from scripts.record_bag import SMALL_TOPICS
 
@@ -133,6 +133,8 @@ def build_parser(channel, output_path):
         parser = GpsParser(output_path=output_path, instance_saving=False)
     elif channel.endswith("/localization/pose"):
         parser = PoseParser(output_path=output_path, instance_saving=False)
+    elif channel.startswith("/apollo/sensor/radar"):
+        parser = ContiRadarParser(output_path=output_path, instance_saving=True)
     else:
         raise ValueError("Not Support this channel type: %s" %channel)
 
@@ -370,7 +372,7 @@ def reorganize_extracted_data(tmp_data_path, task_name, remove_input_data_cache=
     if task_name == 'lidar_to_gnss':
         print (get_subfolder_list(tmp_data_path))
         subfolders = [x for x in get_subfolder_list(tmp_data_path)
-                    if '_apollo_sensor_' in x or '_localization_pose']
+                    if '_apollo_sensor_' in x or '_localization_pose' in x]
         odometry_subfolders = [x for x in subfolders if '_odometry' in x or '_pose' in x]
         lidar_subfolders = [x for x in subfolders if '_PointCloud2' in x]
         print(lidar_subfolders)
@@ -431,6 +433,8 @@ def reorganize_extracted_data(tmp_data_path, task_name, remove_input_data_cache=
                 source_sensor=camera_name, dest_sensor=lidar_name,
                 source_folder=None, dest_folder=None,
                 out_config_file=generated_config_yaml)
+    elif task_name == 'radar_to_gnss':
+        print('not ready. stay tuned')
     else:
         raise ValueError('Unsupported data extraction task for{}'.format(task_name))
 
@@ -514,7 +518,7 @@ def main():
 
     ret = extract_data(valid_record_list, output_abs_path, channels,
                        start_timestamp, end_timestamp, extraction_rates)
-    # output_abs_path='/apollo/data/extracted_data/CoolHigh-2019-09-20/lidar_to_gnss-2019-12-10-15-56/tmp'
+    # output_abs_path='/apollo/data/extracted_data/CoolHigh-2019-09-20/camera_to_lidar-2019-12-16-16-33/tmp'
     reorganize_extracted_data(tmp_data_path=output_abs_path,
                             task_name=config.io_config.task_name)
     # generate_compressed_file(input_path=config.io_config.output_path,
