@@ -181,9 +181,9 @@ def select_static_image_pcd(path, min_distance=5, stop_times=5,
     select pairs of images and pcds, odometry information may
     come from /apollolocalization/pose as well
     """
-    subfolders = [x for x in get_subfolder_list(path) if '_apollo_sensor_' in x]
+    subfolders = [x for x in get_subfolder_list(path) if '_apollo_sensor_' in x or '_localization_pose' in x]
     lidar_subfolder = [x for x in subfolders if '_PointCloud2' in x]
-    odometry_subfolder = [x for x in subfolders if'_odometry' in x  or '_pose' in x]
+    odometry_subfolder = [x for x in subfolders if'_odometry' in x  or '_localization_pose' in x]
     camera_subfolders = [x for x in subfolders if'_image' in x]
     if len(lidar_subfolder) is not 1 or \
         len(odometry_subfolder) is not 1:
@@ -219,10 +219,13 @@ def select_static_image_pcd(path, min_distance=5, stop_times=5,
                 timestamp_dict[lidar_subfolder][:,1],
                 max_threshold=0.5)
 
-         # clean camera-lidar paris not exist in both dictionary
+        # clean camera-lidar paris not exist in both dictionary
+        del_ids = []
         for key in camera_lidar_nearest_pairs:
             if key not in camera_gps_nearest_pairs:
-                del camera_lidar_nearest_pairs[key]
+                del_ids.append(key)
+        for key in del_ids:
+            del camera_lidar_nearest_pairs[key]
 
         camera_folder_path = os.path.join(path, camera)
         print('foder: {}'.format(camera_folder_path))
