@@ -28,6 +28,7 @@ import struct
 
 from modules.drivers.proto import sensor_image_pb2
 from modules.drivers.proto import pointcloud_pb2
+from modules.drivers.proto import conti_radar_pb2
 from modules.localization.proto import gps_pb2
 from modules.localization.proto import localization_pb2
 
@@ -292,3 +293,92 @@ class ImageParser(SensorMessageParser):
             cv2.imwrite(image_file, cv2.cvtColor(image_mat, cv2.COLOR_RGB2BGR))
         else:
             cv2.imwrite(image_file, image_mat)
+
+class ContiRadarParser(SensorMessageParser):
+    """
+    class to parse apollo/sensor/radar/$(position) channels.
+    saving separately each parsed msg
+    """
+    def __init__(self, output_path, instance_saving=True, suffix='.pcd'):
+        super(ContiRadarParser, self).__init__(output_path, instance_saving)
+        self._suffix = suffix
+
+    def convert_contiobs_pb_to_array(self, obs, data_type):
+        arr = np.zeros(len(obs), dtype=data_type)
+        for i, ob in enumerate(obs):
+            # change timestamp to timestamp_sec
+            # z value is 0
+            # now using x, y, z, and t. later more information will be added
+            arr[i] = (ob.longitude_dist, ob.lateral_dist, 0, ob.header.timestamp_sec)
+        return arr
+
+    def make_contidata_point_cloud(self, contiobs):
+        """
+        Make a pointcloud object from contiradar message, as conti_radar.proto.
+        message ContiRadarObs {
+          //                x axis  ^
+          //                        | longitude_dist
+          //                        |
+          //                        |
+          //                        |
+          //          lateral_dist  |
+          //          y axis        |
+          //        <----------------
+          //        ooooooooooooo   //radar front surface
+
+          optional apollo.common.Header header = 1;
+          // longitude distance to the radar; (+) = forward; unit = m
+          optional double longitude_dist = 4;
+          // lateral distance to the radar; (+) = left; unit = m
+          optional double lateral_dist = 5;
+          .......
+        }
+        """
+
+        md = {'version': .7,
+              'fields': ['x', 'y', 'z', 'timestamp'],
+              'count': [1, 1, 1, 1],
+              'width': len(contiobs),
+              'height': 1,
+              'viewpoint': [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+              'points': len(contiobs),
+              'type': ['F', 'F', 'F', 'F'],
+              'size': [4, 4, 4, 8],
+              'data': 'binary'}
+
+        typenames = []
+        for t, s in zip(md['type'], md['size']):
+            np_type = pypcd.pcd_type_to_numpy_type[(t, s)]
+            typenames.append(np_type)
+
+        np_dtype = np.dtype(zip(md['fields'], typenames))
+        pc_data = self.convert_contiobs_pb_to_array(contiobs, data_type=np_dtype)
+        pc = pypcd.PointCloud(md, pc_data)
+        return pc
+
+    def save_pointcloud_meta_to_file(self, pc_meta, pcd_file):
+            pypcd.save_point_cloud_bin(pc_meta, pcd_file)
+
+    def _init_parser(self):
+        self._msg_parser = conti_radar_pb2.ContiRadar()
+
+    def parse_sensor_message(self, msg):
+        """
+        Transform protobuf radar message to standard PCL bin_file(*.pcd).
+        """
+        radar_data = self._msg_parser
+        radar_data.ParseFromString(msg.message)
+
+        self._timestamps.append(radar_data.header.timestamp_sec)
+        # self._timestamps.append(pointcloud.header.timestamp_sec)
+
+        self._parsed_data = self.make_contidata_point_cloud(radar_data.contiobs)
+
+        if self._instance_saving:
+            file_name = "%05d" % self.get_msg_count() + self._suffix
+            output_file = os.path.join(self._output_path, file_name)
+            self.save_pointcloud_meta_to_file(pc_meta=self._parsed_data, pcd_file=output_file)
+        else:
+            raise ValueError("not implement multiple message concatenation for COontiRadar topic")
+        # TODO(gchen-Apollo): add saint check
+        return True
