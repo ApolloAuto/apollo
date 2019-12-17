@@ -16,6 +16,7 @@
 
 #include "modules/common/latency_recorder/latency_recorder.h"
 
+#include "cyber/common/global_data.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
 
@@ -33,6 +34,16 @@ void LatencyRecorder::AppendLatencyRecord(const uint64_t message_id,
   // TODO(michael): ALERT for now for trouble shooting,
   // CHECK_LT(begin_time, end_time) in the future to enforce the validation
   if (begin_time >= end_time) {
+    // In Simulation mode, there might be many cases where begin_time
+    // is equal to end_time, reduce the error frequency in this mode
+    const static kErrorSampeRate = 1000;
+    if (!cyber::common::GlobalData::Instance()->IsRealityMode()) {
+      AERROR_EVERY(kErrorSampeRate)
+          << "latency begin_time: " << begin_time
+          << " greater than or equal to end_time: " << end_time << ", "
+          << kErrorSampeRate << " times";
+      return;
+    }
     AERROR << "latency begin_time: " << begin_time
            << " greater than or equal to end_time: " << end_time;
     return;
