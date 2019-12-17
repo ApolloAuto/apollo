@@ -181,7 +181,8 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     } else {
       // Obstacle is dynamic.
       if (boundary.bottom_left_point().s() - adc_path_init_s_ <
-          kSIgnoreThreshold) {
+          kSIgnoreThreshold &&
+          boundary.bottom_left_point().t() > kTIgnoreThreshold) {
         // Ignore obstacles that are behind.
         // TODO(jiacheng): don't ignore if ADC is in dangerous segments.
         continue;
@@ -508,9 +509,11 @@ bool STObstaclesProcessor::ComputeObstacleSTBoundary(
       // In the future, this could be considered in greater details rather
       // than being approximated.
       const Box2d& obs_box = obstacle.GetBoundingBox(obs_traj_pt);
+      ADEBUG << obs_box.DebugString();
       std::pair<double, double> overlapping_s;
       if (GetOverlappingS(adc_path_points, obs_box, kADCSafetyLBuffer,
                           &overlapping_s)) {
+        ADEBUG << "Obstacle instance is overlapping with ADC path.";
         lower_points->emplace_back(overlapping_s.first,
                                    obs_traj_pt.relative_time());
         upper_points->emplace_back(overlapping_s.second,
@@ -549,9 +552,11 @@ bool STObstaclesProcessor::GetOverlappingS(
   int pt_before_idx = GetSBoundingPathPointIndex(
       adc_path_points, obstacle_instance, vehicle_param_.front_edge_to_center(),
       true, 0, static_cast<int>(adc_path_points.size()) - 2);
+  ADEBUG << "The index before is " << pt_before_idx;
   int pt_after_idx = GetSBoundingPathPointIndex(
       adc_path_points, obstacle_instance, vehicle_param_.back_edge_to_center(),
       false, 0, static_cast<int>(adc_path_points.size()) - 2);
+  ADEBUG << "The index after is " << pt_after_idx;
   if (pt_before_idx == static_cast<int>(adc_path_points.size()) - 2) {
     return false;
   }
@@ -572,10 +577,12 @@ bool STObstaclesProcessor::GetOverlappingS(
   // Detailed searching.
   bool has_overlapping = false;
   for (int i = pt_before_idx; i <= pt_after_idx; ++i) {
+    ADEBUG << "At ADC path index = " << i << " :";
     if (IsADCOverlappingWithObstacle(adc_path_points[i], obstacle_instance,
                                      adc_l_buffer)) {
       overlapping_s->first = adc_path_points[std::max(i - 1, 0)].s();
       has_overlapping = true;
+      ADEBUG << "There is overlapping.";
       break;
     }
   }
@@ -583,9 +590,11 @@ bool STObstaclesProcessor::GetOverlappingS(
     return false;
   }
   for (int i = pt_after_idx; i >= pt_before_idx; --i) {
+    ADEBUG << "At ADC path index = " << i << " :";
     if (IsADCOverlappingWithObstacle(adc_path_points[i], obstacle_instance,
                                      adc_l_buffer)) {
       overlapping_s->second = adc_path_points[i + 1].s();
+      ADEBUG << "There is overlapping.";
       break;
     }
   }
@@ -676,6 +685,9 @@ bool STObstaclesProcessor::IsADCOverlappingWithObstacle(
   // Compute the ADC bounding box.
   Box2d adc_box(ego_center_map_frame, adc_path_point.theta(),
                 vehicle_param_.length(), vehicle_param_.width() + l_buffer * 2);
+
+  ADEBUG << "    ADC box is: " << adc_box.DebugString();
+  ADEBUG << "    Obs box is: " << obs_box.DebugString();
 
   // Check whether ADC bounding box overlaps with obstacle bounding box.
   return obs_box.HasOverlap(adc_box);
