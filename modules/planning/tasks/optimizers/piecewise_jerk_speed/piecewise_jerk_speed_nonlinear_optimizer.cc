@@ -204,9 +204,6 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SetUpStatesAndBounds(
       common::VehicleConfigHelper::GetConfig().vehicle_param();
   s_ddot_max_ = veh_param.max_acceleration();
   s_ddot_min_ = -1.0 * std::abs(veh_param.max_deceleration());
-  // TODO(Hongyi): delete this when ready to use vehicle_params
-  s_ddot_max_ = 2.0;
-  s_ddot_min_ = -4.0;
 
   // Set s_dddot boundary
   // TODO(Jinyun): allow the setting of jerk_lower_bound and move jerk config to
@@ -440,8 +437,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::OptimizeByQP(
                                                    init_states);
   piecewise_jerk_problem.set_dx_bounds(
       0.0, std::fmax(FLAGS_planning_upper_speed_limit, init_states[1]));
-  // TODO(Hongyi): delete this when ready to use vehicle_params
-  piecewise_jerk_problem.set_ddx_bounds(-4.0, 2.0);
+  piecewise_jerk_problem.set_ddx_bounds(s_ddot_min_, s_ddot_max_);
   piecewise_jerk_problem.set_dddx_bound(s_dddot_min_, s_dddot_max_);
   piecewise_jerk_problem.set_x_bounds(s_bounds_);
 
