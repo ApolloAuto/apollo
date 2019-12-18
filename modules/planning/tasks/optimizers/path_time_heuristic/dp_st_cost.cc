@@ -128,7 +128,6 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
     if (s > upper_bound || s < lower_bound) {
       return kInf;
     }
-    return cost * unit_t_;
   }
 
   for (const auto* obstacle : obstacles_) {
@@ -161,10 +160,7 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
       s_lower = boundary_cost_[boundary_index][st_graph_point.index_t()].second;
     }
     if (s < s_lower) {
-      const double follow_distance_s =
-          config_.is_lane_changing()
-              ? config_.safe_distance()
-              : StGapEstimator::EstimateSafeFollowingGap(obstacle->speed());
+      const double follow_distance_s = config_.safe_distance();
       if (s + follow_distance_s < s_lower) {
         continue;
       } else {
