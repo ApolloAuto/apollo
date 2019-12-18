@@ -31,7 +31,6 @@ namespace util {
 
 using apollo::common::VehicleState;
 using apollo::hdmap::PathOverlap;
-using apollo::perception::TrafficLight;
 using apollo::routing::RoutingResponse;
 
 bool IsVehicleStateValid(const VehicleState& vehicle_state) {

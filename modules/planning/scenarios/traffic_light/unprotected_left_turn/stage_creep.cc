@@ -41,7 +41,6 @@ namespace traffic_light {
 using apollo::common::TrajectoryPoint;
 using apollo::common::time::Clock;
 using apollo::hdmap::PathOverlap;
-using apollo::perception::TrafficLight;
 
 Stage::StageStatus TrafficLightUnprotectedLeftTurnStageCreep::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
