@@ -33,7 +33,6 @@
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
 
-using apollo::common::PathPoint;
 using apollo::common::util::PointFactory;
 using apollo::perception::PerceptionObstacle;
 using apollo::prediction::ObstaclePriority;

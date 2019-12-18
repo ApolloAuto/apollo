@@ -34,8 +34,6 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::TrajectoryPoint;
-using apollo::planning_internal::STGraphDebug;
 
 PathTimeHeuristicOptimizer::PathTimeHeuristicOptimizer(const TaskConfig& config)
     : SpeedOptimizer(config) {

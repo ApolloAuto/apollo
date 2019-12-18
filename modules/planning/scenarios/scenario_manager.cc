@@ -47,7 +47,6 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 
-using apollo::common::VehicleState;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::PathOverlap;
 

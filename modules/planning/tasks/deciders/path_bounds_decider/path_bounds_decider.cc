@@ -44,7 +44,6 @@ using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::JunctionInfo;
-using apollo::hdmap::PNCJunctionInfo;
 
 namespace {
 // PathBoundPoint contains: (s, l_min, l_max).

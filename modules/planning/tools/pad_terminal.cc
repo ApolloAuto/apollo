@@ -29,7 +29,6 @@ namespace {
 
 using apollo::cyber::CreateNode;
 using apollo::cyber::Node;
-using apollo::cyber::Reader;
 using apollo::cyber::Writer;
 using apollo::planning::DrivingAction;
 using apollo::planning::PadMessage;

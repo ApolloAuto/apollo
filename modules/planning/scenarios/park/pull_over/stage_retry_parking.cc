@@ -33,8 +33,6 @@ namespace scenario {
 namespace pull_over {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::VehicleConfigHelper;
-using apollo::common::math::Vec2d;
 
 PullOverStageRetryParking::PullOverStageRetryParking(
     const ScenarioConfig::StageConfig& config)

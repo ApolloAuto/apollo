@@ -32,7 +32,6 @@ namespace planning {
 
 using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
-using apollo::hdmap::HDMapUtil;
 
 Destination::Destination(const TrafficRuleConfig& config)
     : TrafficRule(config) {}

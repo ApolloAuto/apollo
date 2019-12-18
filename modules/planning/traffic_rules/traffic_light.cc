@@ -37,8 +37,6 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
-using apollo::common::VehicleState;
-using apollo::common::math::Vec2d;
 using apollo::hdmap::PathOverlap;
 
 TrafficLight::TrafficLight(const TrafficRuleConfig& config)

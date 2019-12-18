@@ -33,12 +33,9 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::VehicleConfigHelper;
 using apollo::common::math::Box2d;
-using apollo::common::math::NormalizeAngle;
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
-using apollo::hdmap::HDMapUtil;
 
 namespace {
 // PointDecision contains (s, PathPointType, distance to closest obstacle).

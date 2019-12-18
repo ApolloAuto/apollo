@@ -33,11 +33,6 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::TrajectoryPoint;
-using apollo::common::math::Box2d;
-using apollo::common::math::Sigmoid;
-using apollo::common::math::Vec2d;
-
 TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
                                const ReferenceLine &reference_line,
                                const bool is_change_lane_path,

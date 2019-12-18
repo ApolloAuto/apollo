@@ -37,8 +37,6 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::SLPoint;
-
 void WaypointSampler::Init(
     const ReferenceLineInfo *reference_line_info,
     const common::SLPoint &init_sl_point,
