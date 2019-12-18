@@ -20,8 +20,6 @@
 
 #include "modules/planning/tasks/deciders/path_decider/path_decider.h"
 
-#include <string>
-
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_context.h"

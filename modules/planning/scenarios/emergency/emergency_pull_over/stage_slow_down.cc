@@ -20,10 +20,6 @@
 
 #include "modules/planning/scenarios/emergency/emergency_pull_over/stage_slow_down.h"
 
-#include <algorithm>
-#include <string>
-#include <vector>
-
 #include "cyber/common/log.h"
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"

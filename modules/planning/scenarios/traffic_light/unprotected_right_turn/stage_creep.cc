@@ -19,7 +19,6 @@
  **/
 
 #include <string>
-#include <vector>
 
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/stage_creep.h"
 

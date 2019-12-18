@@ -16,8 +16,6 @@
 
 #include "modules/planning/planner/public_road/public_road_planner.h"
 
-#include <set>
-
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {

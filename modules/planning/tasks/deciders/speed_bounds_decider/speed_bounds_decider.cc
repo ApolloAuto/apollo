@@ -19,7 +19,6 @@
 #include <algorithm>
 #include <limits>
 #include <string>
-#include <tuple>
 #include <vector>
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"

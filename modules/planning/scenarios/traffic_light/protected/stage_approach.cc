@@ -18,8 +18,6 @@
  * @file
  **/
 
-#include <vector>
-
 #include "modules/planning/scenarios/traffic_light/protected/stage_approach.h"
 
 #include "cyber/common/log.h"

@@ -18,8 +18,6 @@
  * @file
  **/
 
-#include <vector>
-
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/stage_stop.h"
 
 #include "cyber/common/log.h"

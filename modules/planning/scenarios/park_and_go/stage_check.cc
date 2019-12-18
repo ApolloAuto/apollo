@@ -16,9 +16,6 @@
 
 #include "modules/planning/scenarios/park_and_go/stage_check.h"
 
-#include <string>
-#include <vector>
-
 namespace apollo {
 namespace planning {
 namespace scenario {

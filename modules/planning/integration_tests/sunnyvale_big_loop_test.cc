@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <thread>
-
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/time/time.h"
 #include "modules/map/hdmap/hdmap_util.h"

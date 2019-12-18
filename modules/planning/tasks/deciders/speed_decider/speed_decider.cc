@@ -21,7 +21,6 @@
 #include "modules/planning/tasks/deciders/speed_decider/speed_decider.h"
 
 #include <algorithm>
-#include <string>
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/decision.pb.h"

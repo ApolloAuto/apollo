@@ -20,8 +20,6 @@
 
 #include "modules/planning/tasks/deciders/st_bounds_decider/st_driving_limits.h"
 
-#include <utility>
-
 namespace apollo {
 namespace planning {
 

@@ -20,8 +20,6 @@
 
 #include "modules/planning/tasks/optimizers/path_time_heuristic/path_time_heuristic_optimizer.h"
 
-#include <vector>
-
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"

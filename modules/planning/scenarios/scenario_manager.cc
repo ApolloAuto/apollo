@@ -16,9 +16,7 @@
 
 #include "modules/planning/scenarios/scenario_manager.h"
 
-#include <limits>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "modules/common/configs/vehicle_config_helper.h"
