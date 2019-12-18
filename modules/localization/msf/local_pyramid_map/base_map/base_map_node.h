@@ -38,7 +38,7 @@ class BaseMapNode {
   /**@brief Construct a map node. */
   BaseMapNode();
   /**@brief Construct a map node. */
-  explicit BaseMapNode(BaseMapMatrix* matrix, CompressionStrategy* strategy);
+  BaseMapNode(BaseMapMatrix* matrix, CompressionStrategy* strategy);
   /**@brief Destruct a map node. */
   virtual ~BaseMapNode();
 

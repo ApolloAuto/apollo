@@ -37,7 +37,7 @@ class UDPListener {
  public:
   typedef bool (T::*func)(int fd);
   UDPListener() {}
-  explicit UDPListener(T *receiver, uint16_t port, func msg_handle) {
+  UDPListener(T *receiver, uint16_t port, func msg_handle) {
     receiver_ = receiver;
     listened_port_ = port;
     msg_handle_ = msg_handle;
