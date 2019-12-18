@@ -130,7 +130,6 @@ void UdpStream::open() {
   }
 
   sockfd_ = fd;
-  return;
 }
 
 void UdpStream::close() {

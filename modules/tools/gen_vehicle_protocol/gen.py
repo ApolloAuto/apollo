@@ -41,7 +41,7 @@ def gen(conf):
     sender = conf["sender"]
     output_dir = conf["output_dir"]
 
-    # extract dbc file meta to a internal config file
+    # extract dbc file meta to an internal config file
     if not extract_dbc_meta(dbc_file, protocol_conf_file, car_type, black_list,
                             sender_list, sender):
         return
@@ -61,8 +61,8 @@ def gen(conf):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print "usage:\npython %s some_config.yml" % sys.argv[0]
-        sys.exit(1)
+        print("usage:\npython %s some_config.yml" % sys.argv[0])
+        sys.exit(0)
     with open(sys.argv[1], 'r') as fp:
         conf = yaml.load(fp)
     gen(conf)

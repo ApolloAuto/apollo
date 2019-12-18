@@ -204,7 +204,7 @@ inline int IRound(double a) {
                      : (static_cast<int>(a - 0.5)));
 }
 
-// Rounds a upward, returning the smallest integral value that is not less than
+// Rounds an upward, returning the smallest integral value that is not less than
 //  * a
 inline int ICeil(int a) { return (a); }
 inline int ICeil(float a) { return static_cast<int>(ceilf(a)); }
@@ -219,23 +219,39 @@ inline float ITan(float alpha) { return tanf(alpha); }
 inline double ITan(double alpha) { return tan(alpha); }
 
 inline float IAsin(float alpha) {
-  if (alpha >= 1.f) return Constant<float>::HALF_PI();
-  if (alpha < -1.f) return -Constant<float>::HALF_PI();
+  if (alpha >= 1.f) {
+    return Constant<float>::HALF_PI();
+  }
+  if (alpha < -1.f) {
+    return -Constant<float>::HALF_PI();
+  }
   return asinf(alpha);
 }
 inline double IAsin(double alpha) {
-  if (alpha >= 1.0) return Constant<double>::HALF_PI();
-  if (alpha < -1.0) return -Constant<double>::HALF_PI();
+  if (alpha >= 1.0) {
+    return Constant<double>::HALF_PI();
+  }
+  if (alpha < -1.0) {
+    return -Constant<double>::HALF_PI();
+  }
   return asin(alpha);
 }
 inline float IAcos(float alpha) {
-  if (alpha >= 1.f) return 0.f;
-  if (alpha < -1.f) return Constant<float>::PI();
+  if (alpha >= 1.f) {
+    return 0.f;
+  }
+  if (alpha < -1.f) {
+    return Constant<float>::PI();
+  }
   return acosf(alpha);
 }
 inline double IAcos(double alpha) {
-  if (alpha >= 1.0) return 0.0;
-  if (alpha < -1.0) return Constant<double>::PI();
+  if (alpha >= 1.0) {
+    return 0.0;
+  }
+  if (alpha < -1.0) {
+    return Constant<double>::PI();
+  }
   return acos(alpha);
 }
 inline float IAtan2(float y, float x) { return atan2f(y, x); }
@@ -288,7 +304,9 @@ inline void ISwap(T &a, T &b) {
 }
 template <typename T>
 inline void ISwap(T *a, T *b, int n) {
-  for (int i = 0; i < n; i++) ISwap(a[i], b[i]);
+  for (int i = 0; i < n; i++) {
+    ISwap(a[i], b[i]);
+  }
 }
 template <typename T>
 inline void ISwap2(T *a, T *b) {
@@ -314,15 +332,23 @@ inline void ISwap4(T *a, T *b) {
 // max_val if a >= max_val
 template <typename T>
 inline T IInterval(T a, T min_val, T max_val) {
-  if (a <= min_val) return (min_val);
-  if (a >= max_val) return (max_val);
+  if (a <= min_val) {
+    return (min_val);
+  }
+  if (a >= max_val) {
+    return (max_val);
+  }
   return (a);
 }
 
 template <typename T>
 inline T IIntervalHalfopen(T a, T min_val, T max_val) {
-  if (a <= min_val) return (min_val);
-  if (a >= max_val) return (max_val - 1);
+  if (a <= min_val) {
+    return (min_val);
+  }
+  if (a >= max_val) {
+    return (max_val - 1);
+  }
   return (a);
 }
 
@@ -534,7 +560,7 @@ inline void IGaussian2D(double *kernel, int n, const double sigma) {
   }
 }
 
-// Move a into b, without necessarily preserving the value of a. This function
+// Move an into b, without necessarily preserving the value of a. This function
 // is * specialized for types that are expensive to copy
 template <typename T>
 inline void IMove(const T &a, T *b) {

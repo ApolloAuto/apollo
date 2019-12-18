@@ -45,7 +45,7 @@ class Map:
 
     def load(self, map_file_name):
         res = proto_utils.get_pb_from_file(map_file_name, self.map_pb)
-        return res != None
+        return res is not None
 
     def draw_roads(self, ax):
         cnt = 1
@@ -82,7 +82,7 @@ class Map:
             elif is_show_lane_details:
                 self._draw_lane_details(lane, ax, color_val)
             elif lane.id.id in laneids:
-                print str(lane)
+                print(str(lane))
                 self._draw_lane_id(lane, ax, color_val)
             cnt += 1
 
@@ -261,6 +261,13 @@ class Map:
             for stop_line in stop_sign.stop_line:
                 for curve in stop_line.segment:
                     self._draw_stop_line(curve.line_segment, stop_sign.id.id, ax, "yellow")
+
+    def draw_yield_signs(self, ax):
+        """draw_yield_signs"""
+        for yieldsign in getattr(self.map_pb, "yield"):
+            for stop_line in yieldsign.stop_line:
+                for curve in stop_line.segment:
+                    self._draw_stop_line(curve.line_segment, yieldsign.id.id, ax, "powderblue")
 
     @staticmethod
     def _draw_stop_line(line_segment, label, ax, label_color_val):

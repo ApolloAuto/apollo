@@ -107,9 +107,12 @@ __global__ void get_object_kernel(int n,
                                   bool with_frbox,
                                   bool with_lights,
                                   bool with_ratios,
+                                  bool multi_scale,
                                   int num_areas,
                                   float *res_box_data,
-                                  float *res_cls_data) {
+                                  float *res_cls_data,
+                                  int res_cls_offset,
+                                  int all_scales_num_candidates) {
   for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < (n);
        i += blockDim.x * gridDim.x) {
     int box_block = kBoxBlockSize;
@@ -126,21 +129,26 @@ __global__ void get_object_kernel(int n,
     float scale = obj_data[loc_index];
     float cx = (w + sigmoid_gpu(loc_data[offset_loc + 0])) / width;
     float cy = (h + sigmoid_gpu(loc_data[offset_loc + 1])) / height;
-    float hw = exp(loc_data[offset_loc + 2]) * anchor_data[2 * c] / width * 0.5;
+    float hw =
+        exp(max(minExpPower, min(loc_data[offset_loc + 2], maxExpPower))) *
+        anchor_data[2 * c] / width * 0.5;
     float hh =
-        exp(loc_data[offset_loc + 3]) * anchor_data[2 * c + 1] / height * 0.5;
+        exp(max(minExpPower, min(loc_data[offset_loc + 3], maxExpPower))) *
+        anchor_data[2 * c + 1] / height * 0.5;
 
     float max_prob = 0.f;
     int max_index = 0;
     for (int k = 0; k < num_classes; ++k) {
       float prob = cls_data[offset_cls + k] * scale;
-      res_cls_data[k * width * height * num_anchors + i] = prob;
+      res_cls_data[k * all_scales_num_candidates
+                   + res_cls_offset + i] = prob;
       if (prob > max_prob) {
         max_prob = prob;
         max_index = k;
       }
     }
-    res_cls_data[num_classes * width * height * num_anchors + i] = max_prob;
+    res_cls_data[num_classes * all_scales_num_candidates
+                 + res_cls_offset + i] = max_prob;
 
     auto &&dst_ptr = res_box_data + i * box_block;
     hw += expand_data[max_index];
@@ -154,6 +162,9 @@ __global__ void get_object_kernel(int n,
       dst_ptr[4] = atan2(ori_data[offset_ori + 1], ori_data[offset_ori]);
 
       int offset_dim = loc_index * 3;
+      if (multi_scale){
+        offset_dim = loc_index * num_classes * 3 + max_index * 3;
+      }
       dst_ptr[5] = dim_data[offset_dim + 0];
       dst_ptr[6] = dim_data[offset_dim + 1];
       dst_ptr[7] = dim_data[offset_dim + 2];
@@ -439,23 +450,56 @@ void get_objects_gpu(const YoloBlobs &yolo_blobs,
                      base::Blob<bool> *overlapped,
                      base::Blob<int> *idx_sm,
                      std::vector<base::ObjectPtr> *objects) {
+  bool multi_scale = false;
+  if (yolo_blobs.det2_obj_blob){
+    multi_scale = true;
+  }
   int num_classes = types.size();
-  int batch = yolo_blobs.obj_blob->shape(0);
-  int height = yolo_blobs.obj_blob->shape(1);
-  int width = yolo_blobs.obj_blob->shape(2);
+  int batch = yolo_blobs.det1_obj_blob->shape(0);
   int num_anchor = yolo_blobs.anchor_blob->shape(2);
-  int num_candidates = height * width * num_anchor;
-
+  int num_anchor_per_scale = num_anchor;
+  if (multi_scale){
+    num_anchor_per_scale /= numScales;
+  }
   CHECK_EQ(batch, 1) << "batch size should be 1!";
-  const float *loc_data = yolo_blobs.loc_blob->gpu_data();
-  const float *obj_data = yolo_blobs.obj_blob->gpu_data();
-  const float *cls_data = yolo_blobs.cls_blob->gpu_data();
 
-  const float *ori_data = get_gpu_data(
-          model_param.with_box3d(), *yolo_blobs.ori_blob);
-  const float *dim_data = get_gpu_data(
-          model_param.with_box3d(), *yolo_blobs.dim_blob);
+  std::vector<int> height_vec, width_vec, num_candidates_vec;
+  height_vec.push_back(yolo_blobs.det1_obj_blob->shape(1));
+  width_vec.push_back(yolo_blobs.det1_obj_blob->shape(2));
+  if (multi_scale){
+    height_vec.push_back(yolo_blobs.det2_obj_blob->shape(1));
+    height_vec.push_back(yolo_blobs.det3_obj_blob->shape(1));
+    width_vec.push_back(yolo_blobs.det2_obj_blob->shape(2));
+    width_vec.push_back(yolo_blobs.det3_obj_blob->shape(2));
+  }
+  for (size_t i=0; i<height_vec.size(); i++){
+    num_candidates_vec.push_back(
+      height_vec[i] * width_vec[i] * num_anchor_per_scale);
+  }
 
+  const float* loc_data_vec[3] = {yolo_blobs.det1_loc_blob->gpu_data(),
+    yolo_blobs.det2_loc_blob? yolo_blobs.det2_loc_blob->gpu_data() : nullptr,
+    yolo_blobs.det3_loc_blob? yolo_blobs.det3_loc_blob->gpu_data() : nullptr};
+  const float* obj_data_vec[3] = {yolo_blobs.det1_obj_blob->gpu_data(),
+    yolo_blobs.det2_obj_blob? yolo_blobs.det2_obj_blob->gpu_data() : nullptr,
+    yolo_blobs.det3_obj_blob? yolo_blobs.det3_obj_blob->gpu_data() : nullptr};
+  const float* cls_data_vec[3] = {yolo_blobs.det1_cls_blob->gpu_data(),
+    yolo_blobs.det2_cls_blob? yolo_blobs.det2_cls_blob->gpu_data() : nullptr,
+    yolo_blobs.det3_cls_blob? yolo_blobs.det3_cls_blob->gpu_data() : nullptr};
+  const float* ori_data_vec[3] = {get_gpu_data(model_param.with_box3d(),
+                                    *yolo_blobs.det1_ori_blob),
+                    multi_scale? get_gpu_data(model_param.with_box3d(),
+                                    *yolo_blobs.det2_ori_blob) : nullptr,
+                    multi_scale? get_gpu_data(model_param.with_box3d(),
+                                    *yolo_blobs.det3_ori_blob) : nullptr};
+  const float* dim_data_vec[3] = {get_gpu_data(model_param.with_box3d(),
+                                    *yolo_blobs.det1_dim_blob),
+                    multi_scale? get_gpu_data(model_param.with_box3d(),
+                                    *yolo_blobs.det2_dim_blob) : nullptr,
+                    multi_scale? get_gpu_data(model_param.with_box3d(),
+                                    *yolo_blobs.det3_dim_blob) : nullptr};
+
+  //TODO[KaWai]: add 3 scale frbox data and light data.
   const float *lof_data = get_gpu_data(
           model_param.with_frbox(), *yolo_blobs.lof_blob);
   const float *lor_data = get_gpu_data(
@@ -476,35 +520,57 @@ void get_objects_gpu(const YoloBlobs &yolo_blobs,
   const float *rtvis_data = get_gpu_data(with_lights, *yolo_blobs.rtvis_blob);
   const float *rtswt_data = get_gpu_data(with_lights, *yolo_blobs.rtswt_blob);
 
+  int all_scales_num_candidates = 0;
+  for (size_t i = 0; i < num_candidates_vec.size(); i++){
+    all_scales_num_candidates += num_candidates_vec[i];
+  }
   yolo_blobs.res_box_blob->Reshape(
-      std::vector<int>{1, 1, num_candidates, kBoxBlockSize});
+      std::vector<int>{1, 1, all_scales_num_candidates, kBoxBlockSize});
   yolo_blobs.res_cls_blob->Reshape(
-      std::vector<int>{1, 1, num_classes + 1, num_candidates});
+      std::vector<int>{1, 1, num_classes + 1, all_scales_num_candidates});
 
   float *res_box_data = yolo_blobs.res_box_blob->mutable_gpu_data();
   float *res_cls_data = yolo_blobs.res_cls_blob->mutable_gpu_data();
   const int thread_size = 512;
-
-  int block_size = (num_candidates + thread_size - 1) / thread_size;
-  get_object_kernel <<< block_size, thread_size, 0, stream >>> (
-          num_candidates, loc_data, obj_data, cls_data, ori_data, dim_data,
-          lof_data, lor_data, area_id_data,
-          visible_ratio_data, cut_off_ratio_data,
-          brvis_data, brswt_data, ltvis_data, ltswt_data,
-          rtvis_data, rtswt_data,
-          yolo_blobs.anchor_blob->gpu_data(),
-          yolo_blobs.expand_blob->gpu_data(),
-          width, height,
-          num_anchor, num_classes, model_param.confidence_threshold(),
-          light_vis_conf_threshold, light_swt_conf_threshold,
-          model_param.with_box3d(), model_param.with_frbox(),
-          model_param.with_lights(), model_param.with_ratios(),
-          model_param.num_areas(),
-          res_box_data, res_cls_data);
-  cudaStreamSynchronize(stream);
+  //TODO[KaWai]: use different stream to process scales in parallel.
+  int num_candidates_offset = 0;
+  for (int i = 0; i < num_candidates_vec.size(); i++){
+    int block_size = (num_candidates_vec[i] + thread_size - 1) / thread_size;
+    const float *loc_data = loc_data_vec[i];
+    const float *obj_data = obj_data_vec[i];
+    const float *cls_data = cls_data_vec[i];
+    const float *ori_data = ori_data_vec[i];
+    const float *dim_data = dim_data_vec[i];
+    const float *anchor_data = yolo_blobs.anchor_blob->gpu_data()
+                               + num_anchor_per_scale * 2 * i;
+    const float *expand_data = yolo_blobs.expand_blob->gpu_data();
+    const int width = width_vec[i];
+    const int height = height_vec[i];
+    get_object_kernel <<< block_size, thread_size, 0, stream >>> (
+            num_candidates_vec[i], loc_data, obj_data,
+            cls_data, ori_data, dim_data,
+            lof_data, lor_data, area_id_data,
+            visible_ratio_data, cut_off_ratio_data,
+            brvis_data, brswt_data, ltvis_data, ltswt_data,
+            rtvis_data, rtswt_data,
+            anchor_data,
+            yolo_blobs.expand_blob->gpu_data(),
+            width, height, num_anchor_per_scale,
+            num_classes, model_param.confidence_threshold(),
+            light_vis_conf_threshold, light_swt_conf_threshold,
+            model_param.with_box3d(), model_param.with_frbox(),
+            model_param.with_lights(), model_param.with_ratios(),
+            multi_scale,
+            model_param.num_areas(),
+            res_box_data + num_candidates_offset * kBoxBlockSize,
+            res_cls_data, num_candidates_offset,
+            all_scales_num_candidates);
+    cudaStreamSynchronize(stream);
+    num_candidates_offset += num_candidates_vec[i];
+  }
   const float *cpu_cls_data = yolo_blobs.res_cls_blob->cpu_data();
 
-  std::vector<int> all_indices(num_candidates);
+  std::vector<int> all_indices(all_scales_num_candidates);
   std::iota(all_indices.begin(), all_indices.end(), 0);
   std::vector<int> rest_indices;
 
@@ -515,7 +581,7 @@ void get_objects_gpu(const YoloBlobs &yolo_blobs,
   int num_kept = 0;
   // inter-cls NMS
   apply_nms_gpu(res_box_data,
-                cpu_cls_data + num_classes * num_candidates,
+                cpu_cls_data + num_classes * all_scales_num_candidates,
                 all_indices,
                 kBoxBlockSize,
                 nms.inter_cls_conf_thresh,
@@ -527,7 +593,7 @@ void get_objects_gpu(const YoloBlobs &yolo_blobs,
                 stream);
   for (int k = 0; k < num_classes; ++k) {
     apply_nms_gpu(res_box_data,
-                  cpu_cls_data + k * num_candidates,
+                  cpu_cls_data + k * all_scales_num_candidates,
                   rest_indices,
                   kBoxBlockSize,
                   model_param.confidence_threshold(),
@@ -538,8 +604,9 @@ void get_objects_gpu(const YoloBlobs &yolo_blobs,
                   idx_sm,
                   stream);
     num_kept += indices[types[k]].size();
-    std::vector<float> conf_score(cpu_cls_data + k * num_candidates,
-                                  cpu_cls_data + (k + 1) * num_candidates);
+    std::vector<float> conf_score(
+                         cpu_cls_data + k * all_scales_num_candidates,
+                         cpu_cls_data + (k + 1) * all_scales_num_candidates);
     conf_scores.insert(std::make_pair(types[k], conf_score));
     cudaStreamSynchronize(stream);
   }

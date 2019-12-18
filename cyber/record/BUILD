@@ -63,6 +63,22 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "record_file_integration_test",
+    size = "small",
+    srcs = ["file/record_file_integration_test.cc"],
+    tags = [
+        "cpu:3",
+        "exclusive",
+        "manual",
+    ],
+    deps = [
+        "//cyber",
+        "//cyber/proto:record_cc_proto",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "header_builder",
     srcs = ["header_builder.cc"],
@@ -136,6 +152,7 @@ cc_library(
         ":header_builder",
         ":record_base",
         ":record_file_writer",
+        "//cyber/message:message_traits",
         "//cyber/message:raw_message",
         "//cyber/proto:record_cc_proto",
     ],

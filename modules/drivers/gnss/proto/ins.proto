@@ -11,7 +11,7 @@ message InsStat {
   optional uint32 pos_type = 3;
 }
 
-// Solution from a inertial navigation system (INS), which usually fuses GNSS
+// Solution from an inertial navigation system (INS), which usually fuses GNSS
 // and IMU measurements.
 message Ins {
   optional apollo.common.Header header = 1;

@@ -1,6 +1,8 @@
+#!/usr/bin/env python2
+
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
-
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
@@ -16,25 +18,23 @@
 # -*- coding: utf-8 -*-
 """Module for init environment."""
 
-import sys
-import os
 import importlib
-import time
+import os
+import sys
+
 
 # init vars
 CYBER_PATH = os.environ['CYBER_PATH']
 CYBER_DIR = os.path.split(CYBER_PATH)[0]
 sys.path.append(CYBER_PATH + "/third_party/")
 sys.path.append(CYBER_PATH + "/lib/")
-sys.path.append(CYBER_PATH + "/python/cyber")
-sys.path.append(CYBER_PATH + "/python/cyber_py")
 
 sys.path.append(CYBER_PATH + "/lib/python/")
 
 sys.path.append(CYBER_DIR + "/python/")
 sys.path.append(CYBER_DIR + "/cyber/")
 
-_CYBER_INIT = importlib.import_module('_cyber_init')
+_CYBER = importlib.import_module('_cyber')
 _CYBER_TIME = importlib.import_module('_cyber_time')
 
 
@@ -59,15 +59,24 @@ class Duration(object):
         _CYBER_TIME.delete_PyDuration(self.duration_)
 
     def sleep(self):
+        """
+        sleep for the amount of time specified by the duration.
+        """
         _CYBER_TIME.PyDuration_sleep(self.duration_)
 
     def __str__(self):
         return str(self.nanoseconds_)
 
     def to_sec(self):
+        """
+        convert to second.
+        """
         return float(self.nanoseconds_) / 1000000000
 
     def to_nsec(self):
+        """
+        convert to nanosecond.
+        """
         return self.nanoseconds_
 
     def iszero(self):
@@ -107,6 +116,11 @@ class Time(object):
     Class for cyber time wrapper.
     """
 
+    ##
+    # @brief Constructor, creates a Time.
+    #
+    # @param other float means seconds unit.
+    # int or long means nanoseconds.
     def __init__(self, other):
         nanoseconds = 0
         if isinstance(other, int):
@@ -131,6 +145,9 @@ class Time(object):
 
     @staticmethod
     def now():
+        """
+        return current time.
+        """
         # print _CYBER_TIME.PyTime_now()
         # print type(_CYBER_TIME.PyTime_now())
         time_now = Time(_CYBER_TIME.PyTime_now())
@@ -142,13 +159,25 @@ class Time(object):
         return mono_time
 
     def to_sec(self):
+        """
+        convert to second.
+        """
         return _CYBER_TIME.PyTime_to_sec(self.time)
 
     def to_nsec(self):
+        """
+        convert to nanosecond.
+        """
         return _CYBER_TIME.PyTime_to_nsec(self.time)
 
-    def sleep_until(self, nanoseconds):
-        return _CYBER_TIME.PyTime_sleep_until(self.time, nanoseconds)
+    def sleep_until(self, cyber_time):
+        """
+        sleep until time.
+        """
+        if isinstance(time, Time):
+            return _CYBER_TIME.PyTime_sleep_until(self.time,
+                                                  cyber_time.to_nsec())
+        return NotImplemented
 
     def __sub__(self, other):
         if isinstance(other, Time):
@@ -185,9 +214,14 @@ class Time(object):
 class Rate(object):
 
     """
-    Class for cyber Rate wrapper.
+    Class for cyber Rate wrapper. Help run loops at a desired frequency.
     """
 
+    ##
+    # @brief Constructor, creates a Rate.
+    #
+    # @param other float means frequency the desired rate to run at in Hz.
+    # int or long means the expected_cycle_time.
     def __init__(self, other):
         if isinstance(other, int) or isinstance(other, long):
             self.rate_ = _CYBER_TIME.new_PyRate(long(other))
@@ -203,13 +237,25 @@ class Rate(object):
         return "cycle_time = %s, exp_cycle_time = %s" % (str(self.get_cycle_time()), str(self.get_expected_cycle_time()))
 
     def sleep(self):
+        """
+        Sleeps for any leftover time in a cycle.
+        """
         _CYBER_TIME.PyRate_sleep(self.rate_)
 
     def reset(self):
+        """
+        Sets the start time for the rate to now.
+        """
         _CYBER_TIME.PyRate_PyRate_reset(self.rate_)
 
     def get_cycle_time(self):
+        """
+        Get the actual run time of a cycle from start to sleep.
+        """
         return Duration(_CYBER_TIME.PyRate_get_cycle_time(self.rate_))
 
     def get_expected_cycle_time(self):
+        """
+        Get the expected cycle time.
+        """
         return Duration(_CYBER_TIME.PyRate_get_expected_cycle_time(self.rate_))

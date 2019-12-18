@@ -33,18 +33,18 @@ function stop() {
     pkill -SIGKILL -f navigation_routing.py
 }
 
-case $1 in                                                                                          
-start)                                                                                              
-    start                                                                                           
-    ;;                                                                                              
-help)                                                                                               
-    echo "$0 start|stop|help"                                                             
-    ;;                                                                                              
-stop)                                                                                               
-    stop                                                                                       
-    ;;                                                                                              
-*)                                                                                                  
-    stop                                                                                           
-    start                                                                                           
+case $1 in
+start)
+    start
+    ;;
+help)
+    echo "$0 start|stop|help"
+    ;;
+stop)
+    stop
+    ;;
+*)
+    stop
+    start
     ;;
 esac

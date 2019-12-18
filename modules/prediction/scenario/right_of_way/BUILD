@@ -6,6 +6,9 @@ cc_library(
     name = "right_of_way",
     srcs = ["right_of_way.cc"],
     hdrs = ["right_of_way.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",

@@ -29,8 +29,8 @@ namespace planning {
 
 using apollo::common::PathPoint;
 
-DiscretizedPath::DiscretizedPath(const std::vector<PathPoint> &path_points)
-    : std::vector<PathPoint>(path_points) {}
+DiscretizedPath::DiscretizedPath(std::vector<PathPoint> path_points)
+    : std::vector<PathPoint>(std::move(path_points)) {}
 
 double DiscretizedPath::Length() const {
   if (empty()) {

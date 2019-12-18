@@ -22,21 +22,9 @@ DEFINE_string(localization_module_name, "localization",
 DEFINE_double(localization_publish_freq, 100,
               "localization publishing frequency.");
 
-DEFINE_string(rtk_adapter_config_file,
-              "/apollo/modules/localization/conf/rtk_adapter.conf",
-              "rtk adapter configuration");
-
 DEFINE_string(localization_config_file,
               "/apollo/modules/localization/conf/localization_config.pb.txt",
               "localization config file");
-
-DEFINE_string(msf_adapter_config_file,
-              "/apollo/modules/localization/conf/msf_adapter.conf",
-              "msf adapter configuration");
-
-DEFINE_string(msf_visual_adapter_config_file,
-              "/apollo/modules/localization/conf/msf_visual_adapter.conf",
-              "msf visualization adapter configuration");
 
 // features
 DEFINE_bool(enable_gps_imu_interprolate, true, "enable GPU/IMU interprolate");
@@ -86,7 +74,7 @@ DEFINE_int32(lidar_filter_size, 17, "Lidar filter size");
 DEFINE_double(lidar_imu_max_delay_time, 0.4,
               "Lidar msg and imu msg max delay time");
 DEFINE_double(lidar_map_coverage_theshold, 0.9,
-              "Threshold to detect wether vehicle is out of map");
+              "Threshold to detect whether vehicle is out of map");
 DEFINE_bool(lidar_debug_log_flag, false, "Lidar Debug switch.");
 DEFINE_int32(point_cloud_step, 2, "Point cloud step");
 DEFINE_bool(if_use_avx, false,

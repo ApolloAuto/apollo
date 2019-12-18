@@ -29,7 +29,7 @@ def update(perception_obstacles):
     now = cyber_time.Time.now().to_sec()
     perception_obstacles.header.timestamp_sec = now
     perception_obstacles.header.lidar_timestamp = \
-        (long(now) - long(0.5)) * long(1e9)
+        (int(now) - int(0.5)) * int(1e9)
 
     for perception_obstacle in perception_obstacles.perception_obstacle:
         perception_obstacle.timestamp = now - 0.5

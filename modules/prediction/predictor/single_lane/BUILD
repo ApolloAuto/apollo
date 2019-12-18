@@ -6,6 +6,9 @@ cc_library(
     name = "single_lane_predictor",
     srcs = ["single_lane_predictor.cc"],
     hdrs = ["single_lane_predictor.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/predictor/sequence:sequence_predictor",
     ],
@@ -14,9 +17,7 @@ cc_library(
 cc_test(
     name = "single_lane_predictor_test",
     size = "small",
-    srcs = [
-        "single_lane_predictor_test.cc",
-    ],
+    srcs = ["single_lane_predictor_test.cc"],
     data = [
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",

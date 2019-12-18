@@ -24,7 +24,7 @@ const int CONTIID_START = 0x600;
 const int CONTIID_END = 0x702;
 const int WAIT_TIME = 4000;
 
-// Try this many times when reciving using bcan, by default.
+// Try this many times when receiving using bcan, by default.
 const int BCAN_RECV_TRIES = 4;
 
 const int RADAR_CONFIG = 0x200;

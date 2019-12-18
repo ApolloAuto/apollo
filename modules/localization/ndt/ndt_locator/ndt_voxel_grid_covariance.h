@@ -247,8 +247,9 @@ class VoxelGridCovariance {
     leaf_size_[1] = ly;
     leaf_size_[2] = lz;
     // Avoid division errors
-    if (leaf_size_[3] == 0) leaf_size_[3] = 1;
-    // Use multiplications instead of divisions
+    if (leaf_size_[3] == 0) {
+      leaf_size_[3] = 1;
+    }  // Use multiplications instead of divisions
     inverse_leaf_size_ = Eigen::Array4f::Ones() / leaf_size_.array();
   }
 

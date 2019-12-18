@@ -146,8 +146,7 @@ TEST(YoloCameraDetectorTest, inference_init_test) {
       GetAbsolutePath(init_options.root_dir, init_options.conf_file);
   yolo::YoloParam yolo_param;
   cyber::common::GetProtoFromFile(config_path, &yolo_param);
-  yolo::YoloParam origin_yolo_param;
-  origin_yolo_param.CopyFrom(yolo_param);
+  yolo::YoloParam origin_yolo_param = yolo_param;
   yolo_param.mutable_model_param()->set_model_type("Unknownnet");
 
   {

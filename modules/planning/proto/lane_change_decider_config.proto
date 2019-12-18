@@ -4,4 +4,16 @@ package apollo.planning;
 
 message LaneChangeDeciderConfig {
   optional bool enable_lane_change_urgency_check = 1;
+  // True to enable prioritize change_lane reference line
+  optional bool enable_prioritize_change_lane = 2 [default = false];
+  // True to enable remove change_lane reference line");
+  optional bool enable_remove_change_lane = 3 [default = false];
+  // always allow the vehicle change lane. The vehicle may continue changing
+  // lane
+  optional bool reckless_change_lane = 4 [default = false];
+  // not allowed to change lane this amount of time if just finished
+  optional double change_lane_success_freeze_time = 5
+      [default = 1.5];  // second
+  // not allowed to change lane this amount of time if just failed
+  optional double change_lane_fail_freeze_time = 6 [default = 1.0];  // second
 }

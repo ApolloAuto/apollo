@@ -41,7 +41,7 @@ class ReferenceLine {
   ReferenceLine() = default;
   explicit ReferenceLine(const ReferenceLine& reference_line) = default;
   template <typename Iterator>
-  explicit ReferenceLine(const Iterator begin, const Iterator end)
+  ReferenceLine(const Iterator begin, const Iterator end)
       : reference_points_(begin, end),
         map_path_(std::move(std::vector<hdmap::MapPathPoint>(begin, end))) {}
   explicit ReferenceLine(const std::vector<ReferencePoint>& reference_points);
@@ -71,9 +71,11 @@ class ReferenceLine {
    */
   bool Stitch(const ReferenceLine& other);
 
-  bool Shrink(const common::math::Vec2d& point, double look_backward,
-              double look_forward);
-  bool Shrink(const double s, double look_backward, double look_forward);
+  bool Segment(const common::math::Vec2d& point, const double distance_backward,
+               const double distance_forward);
+
+  bool Segment(const double s, const double distance_backward,
+               const double distance_forward);
 
   const hdmap::Path& map_path() const;
   const std::vector<ReferencePoint>& reference_points() const;

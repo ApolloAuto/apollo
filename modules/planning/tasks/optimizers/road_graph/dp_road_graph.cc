@@ -55,9 +55,7 @@ bool DpRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
   CHECK_NOTNULL(path_data);
 
   init_point_ = init_point;
-  if (!reference_line_.XYToSL(
-          {init_point_.path_point().x(), init_point_.path_point().y()},
-          &init_sl_point_)) {
+  if (!reference_line_.XYToSL(init_point_.path_point(), &init_sl_point_)) {
     AERROR << "Fail to create init_sl_point from : "
            << init_point.DebugString();
     return false;
@@ -103,9 +101,8 @@ bool DpRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
       accumulated_s += path_length;
     }
   }
-  FrenetFramePath tunnel(frenet_path);
   path_data->SetReferenceLine(&reference_line_);
-  path_data->SetFrenetPath(tunnel);
+  path_data->SetFrenetPath(FrenetFramePath(std::move(frenet_path)));
   return true;
 }
 
@@ -250,7 +247,7 @@ void DpRoadGraph::UpdateNode(const std::shared_ptr<RoadGraphMessage> &msg) {
 }
 
 bool DpRoadGraph::IsValidCurve(const QuinticPolynomialCurve1d &curve) const {
-  constexpr double kMaxLateralDistance = 20.0;
+  static constexpr double kMaxLateralDistance = 20.0;
   for (double s = 0.0; s < curve.ParamLength(); s += 2.0) {
     const double l = curve.Evaluate(0, s);
     if (std::fabs(l) > kMaxLateralDistance) {

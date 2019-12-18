@@ -535,8 +535,9 @@ bool DualVariableWarmStartIPOPTInterface::eval_h(int n, const double* x,
     // return the values. This is a symmetric matrix, fill the lower left
     // triangle only
     obj_lam[0] = obj_factor;
-    for (int idx = 0; idx < m; idx++) obj_lam[1 + idx] = lambda[idx];
-
+    for (int idx = 0; idx < m; idx++) {
+      obj_lam[1 + idx] = lambda[idx];
+    }
     set_param_vec(tag_L, m + 1, obj_lam);
     sparse_hess(tag_L, n, 1, const_cast<double*>(x), &nnz_L, &rind_L, &cind_L,
                 &hessval, options_L);
@@ -707,7 +708,7 @@ void DualVariableWarmStartIPOPTInterface::generate_tapes(int n, int m,
   double sig;
   adouble obj_value;
 
-  double dummy;
+  double dummy = 0.0;
 
   obj_lam = new double[m + 1];
 

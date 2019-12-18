@@ -22,7 +22,7 @@ target_param {
         measure_variance: 400.0
         process_variance: 200.0
     }
-    image_wh_update_rate : 0.6  
+    image_wh_update_rate : 0.6
     world_lhw_history: 10
 }
 target_combine_iou_threshold: 0.4

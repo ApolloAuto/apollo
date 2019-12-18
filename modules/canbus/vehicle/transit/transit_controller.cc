@@ -228,12 +228,15 @@ Chassis TransitController::chassis() {
       case Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_LEFT:
         chassis_.mutable_signal()->set_turn_signal(
             common::VehicleSignal::TURN_LEFT);
+        break;
       case Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_RIGHT:
         chassis_.mutable_signal()->set_turn_signal(
             common::VehicleSignal::TURN_RIGHT);
+        break;
       case Adc_auxiliarycontrol_110::ADC_CMD_TURNSIGNAL_NONE:
         chassis_.mutable_signal()->set_turn_signal(
             common::VehicleSignal::TURN_NONE);
+        break;
       default:
         break;
     }
@@ -393,7 +396,6 @@ void TransitController::Gear(Chassis::GearPosition gear_position) {
       break;
     }
   }
-  return;
 }
 
 // brake with new acceleration
@@ -548,8 +550,7 @@ void TransitController::SecurityDogThreadFunc() {
   int64_t start = 0;
   int64_t end = 0;
   while (can_sender_->IsRunning()) {
-    start = ::apollo::common::time::AsInt64<::apollo::common::time::micros>(
-        ::apollo::common::time::Clock::Now());
+    start = absl::ToUnixMicros(::apollo::common::time::Clock::Now());
     const Chassis::DrivingMode mode = driving_mode();
     bool emergency_mode = false;
 
@@ -583,8 +584,7 @@ void TransitController::SecurityDogThreadFunc() {
       set_driving_mode(Chassis::EMERGENCY_MODE);
       message_manager_->ResetSendMessages();
     }
-    end = ::apollo::common::time::AsInt64<::apollo::common::time::micros>(
-        ::apollo::common::time::Clock::Now());
+    end = absl::ToUnixMicros(::apollo::common::time::Clock::Now());
     std::chrono::duration<double, std::micro> elapsed{end - start};
     if (elapsed < default_period) {
       std::this_thread::sleep_for(default_period - elapsed);
@@ -597,7 +597,7 @@ void TransitController::SecurityDogThreadFunc() {
 }
 
 bool TransitController::CheckResponse() {
-  // TODO(Udelv): Add seperate indicators
+  // TODO(Udelv): Add separate indicators
   ChassisDetail chassis_detail;
   if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
     AERROR_EVERY(100) << "get chassis detail failed.";

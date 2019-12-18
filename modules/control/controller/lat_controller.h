@@ -34,6 +34,7 @@
 #include "modules/common/filters/mean_filter.h"
 #include "modules/control/common/interpolation_1d.h"
 #include "modules/control/common/leadlag_controller.h"
+#include "modules/control/common/mrac_controller.h"
 #include "modules/control/common/trajectory_analyzer.h"
 #include "modules/control/controller/controller.h"
 
@@ -214,7 +215,12 @@ class LatController : public Controller {
   common::MeanFilter heading_error_filter_;
 
   // Lead/Lag controller
+  bool enable_leadlag_ = false;
   LeadlagController leadlag_controller_;
+
+  // Mrac controller
+  bool enable_mrac_ = false;
+  MracController mrac_controller_;
 
   // for compute the differential valute to estimate acceleration/lon_jerk
   double previous_lateral_acceleration_ = 0.0;
@@ -234,6 +240,8 @@ class LatController : public Controller {
 
   double pre_steer_angle_ = 0.0;
 
+  double pre_steering_position_ = 0.0;
+
   double minimum_speed_protection_ = 0.1;
 
   double current_trajectory_timestamp_ = -1.0;
@@ -244,7 +252,7 @@ class LatController : public Controller {
 
   double init_vehicle_heading_ = 0.0;
 
-  double min_turn_radius_ = 0.0;
+  double low_speed_bound_ = 0.0;
 
   double driving_orientation_ = 0.0;
 };

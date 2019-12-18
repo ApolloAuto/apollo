@@ -64,7 +64,10 @@ bool DstManager::IsAppAdded(const std::string &app_name) {
 }
 
 DstCommonDataPtr DstManager::GetAppDataPtr(const std::string &app_name) {
-  CHECK(IsAppAdded(app_name));
+  if (!IsAppAdded(app_name)) {
+    AERROR << "app_name is not available";
+    return nullptr;
+  }
   auto iter = dst_common_data_.find(app_name);
   if (iter != dst_common_data_.end()) {
     return &iter->second;
@@ -179,8 +182,8 @@ void DstManager::BuildNamesMap(const std::vector<std::string> &fod_subset_names,
     dst_data->fod_subset_names_[i] =
         std::bitset<64>(dst_data->fod_subsets_[i]).to_string();
   }
-  // set fod to unkown
-  dst_data->fod_subset_names_[dst_data->fod_loc_] = "unkown";
+  // set fod to unknown
+  dst_data->fod_subset_names_[dst_data->fod_loc_] = "unknown";
   for (size_t i = 0;
        i < std::min(fod_subset_names.size(), dst_data->fod_subsets_.size());
        ++i) {

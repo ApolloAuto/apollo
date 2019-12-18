@@ -1,0 +1,39 @@
+syntax = "proto2";
+
+package apollo.common;
+
+import "modules/common/proto/header.proto";
+
+message LatencyRecord {
+  optional uint64 begin_time = 1;
+  optional uint64 end_time = 2;
+  optional uint64 message_id = 3;
+};
+
+message LatencyRecordMap {
+  optional apollo.common.Header header = 1;
+  optional string module_name = 2;
+  repeated LatencyRecord latency_records = 3;
+};
+
+message LatencyStat {
+  optional uint64 min_duration = 1
+      [default = 9223372036854775808];  // (1 << 63)
+  optional uint64 max_duration = 2;
+  optional uint64 aver_duration = 3;
+  optional uint32 sample_size = 4;
+};
+
+message LatencyTrack {
+  message LatencyTrackMessage {
+    optional string latency_name = 1;
+    optional LatencyStat latency_stat = 2;
+  }
+  repeated LatencyTrackMessage latency_track = 1;
+}
+
+message LatencyReport {
+  optional apollo.common.Header header = 1;
+  optional LatencyTrack e2es_latency = 2;
+  optional LatencyTrack modules_latency = 3;
+};

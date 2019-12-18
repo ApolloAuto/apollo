@@ -26,17 +26,36 @@ namespace cyber {
 
 class Timer;
 
+/**
+ * @brief .
+ * TimerComponent is a timer component. Your component can inherit from
+ * Component, and implement Init() & Proc(), They are called by the CyberRT
+ * frame.
+ */
 class TimerComponent : public ComponentBase {
  public:
   TimerComponent();
   ~TimerComponent() override;
 
+  /**
+   * @brief init the component by protobuf object.
+   *
+   * @param config which is define in 'cyber/proto/component_conf.proto'
+   *
+   * @return returns true if successful, otherwise returns false
+   */
   bool Initialize(const TimerComponentConfig& config) override;
+  void Clear() override;
   bool Process();
+  uint64_t GetInterval() const;
 
  private:
+  /**
+   * @brief The Proc logic of the component, which called by the CyberRT frame.
+   *
+   * @return returns true if successful, otherwise returns false
+   */
   virtual bool Proc() = 0;
-  virtual bool Init() = 0;
 
   uint64_t interval_ = 0;
   std::unique_ptr<Timer> timer_;

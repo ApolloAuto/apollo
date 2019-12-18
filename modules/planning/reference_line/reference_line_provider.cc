@@ -30,6 +30,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
+#include "modules/common/util/point_factory.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
@@ -177,7 +178,7 @@ void ReferenceLineProvider::UpdateReferenceLine(
   // update history
   reference_line_history_.push(reference_lines_);
   route_segments_history_.push(route_segments_);
-  constexpr int kMaxHistoryNum = 3;
+  static constexpr int kMaxHistoryNum = 3;
   if (reference_line_history_.size() > kMaxHistoryNum) {
     reference_line_history_.pop();
     route_segments_history_.pop();
@@ -186,7 +187,7 @@ void ReferenceLineProvider::UpdateReferenceLine(
 
 void ReferenceLineProvider::GenerateThread() {
   while (!is_stop_) {
-    constexpr int32_t kSleepTime = 50;  // milliseconds
+    static constexpr int32_t kSleepTime = 50;  // milliseconds
     cyber::SleepFor(std::chrono::milliseconds(kSleepTime));
     const double start_time = Clock::NowInSeconds();
     if (!has_routing_) {
@@ -455,7 +456,7 @@ bool ReferenceLineProvider::GetNearestWayPointFromNavigationPath(
   const double kMaxDistance = 10.0;
   waypoint->lane = nullptr;
   std::vector<hdmap::LaneInfoConstPtr> lanes;
-  auto point = common::util::MakePointENU(state.x(), state.y(), state.z());
+  auto point = common::util::PointFactory::ToPointENU(state);
   if (std::isnan(point.x()) || std::isnan(point.y())) {
     AERROR << "vehicle state is invalid";
     return false;
@@ -496,7 +497,7 @@ bool ReferenceLineProvider::GetNearestWayPointFromNavigationPath(
     if (!lane->GetProjection({point.x(), point.y()}, &s, &l)) {
       continue;
     }
-    constexpr double kEpsilon = 1e-6;
+    static constexpr double kEpsilon = 1e-6;
     if (s > (lane->total_length() + kEpsilon) || (s + kEpsilon) < 0.0) {
       continue;
     }
@@ -563,6 +564,7 @@ bool ReferenceLineProvider::CreateReferenceLine(
   bool is_new_routing = false;
   {
     // Update routing in pnc_map
+    std::lock_guard<std::mutex> lock(pnc_map_mutex_);
     if (pnc_map_->IsNewRouting(routing)) {
       is_new_routing = true;
       if (!pnc_map_->UpdateRoutingResponse(routing)) {
@@ -584,11 +586,10 @@ bool ReferenceLineProvider::CreateReferenceLine(
         reference_lines->pop_back();
         iter = segments->erase(iter);
       } else {
-        Vec2d vec2d(vehicle_state.x(), vehicle_state.y());
         common::SLPoint sl;
-        if (!reference_lines->back().XYToSL(vec2d, &sl)) {
-          AWARN << "Failed to project point: " << vec2d.DebugString()
-                << " to stitched reference line";
+        if (!reference_lines->back().XYToSL(vehicle_state, &sl)) {
+          AWARN << "Failed to project point: {" << vehicle_state.x() << ","
+                << vehicle_state.y() << "} to stitched reference line";
         }
         Shrink(sl, &reference_lines->back(), &(*iter));
         ++iter;
@@ -701,7 +702,7 @@ bool ReferenceLineProvider::ExtendReferenceLine(const VehicleState &state,
 bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
                                    ReferenceLine *reference_line,
                                    RouteSegments *segments) {
-  constexpr double kMaxHeadingDiff = M_PI * 5.0 / 6.0;
+  static constexpr double kMaxHeadingDiff = M_PI * 5.0 / 6.0;
   // shrink reference line
   double new_backward_distance = sl.s();
   double new_forward_distance = reference_line->Length() - sl.s();
@@ -727,14 +728,12 @@ bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
   if (last_index != ref_points.size() - 1) {
     need_shrink = true;
     common::SLPoint forward_sl;
-    common::math::Vec2d vec2d{ref_points[last_index].x(),
-                              ref_points[last_index].y()};
     reference_line->XYToSL(ref_points[last_index], &forward_sl);
     new_forward_distance = forward_sl.s() - sl.s();
   }
   if (need_shrink) {
-    if (!reference_line->Shrink(sl.s(), new_backward_distance,
-                                new_forward_distance)) {
+    if (!reference_line->Segment(sl.s(), new_backward_distance,
+                                 new_forward_distance)) {
       AWARN << "Failed to shrink reference line";
     }
     if (!segments->Shrink(sl.s(), new_backward_distance,
@@ -747,7 +746,7 @@ bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
 
 bool ReferenceLineProvider::IsReferenceLineSmoothValid(
     const ReferenceLine &raw, const ReferenceLine &smoothed) const {
-  constexpr double kReferenceLineDiffCheckStep = 10.0;
+  static constexpr double kReferenceLineDiffCheckStep = 10.0;
   for (double s = 0.0; s < smoothed.Length();
        s += kReferenceLineDiffCheckStep) {
     auto xy_new = smoothed.GetReferencePoint(s);
@@ -777,7 +776,7 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
   auto ref_point = reference_line.GetReferencePoint(s);
   if (ref_point.lane_waypoints().empty()) {
     anchor.path_point = ref_point.ToPathPoint(s);
-    anchor.lateral_bound = smoother_config_.lateral_boundary_bound();
+    anchor.lateral_bound = smoother_config_.max_lateral_boundary_bound();
     return anchor;
   }
 
@@ -796,28 +795,33 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
   double safe_lane_width = left_width + right_width;
   safe_lane_width -= adc_width;
   bool is_lane_width_safe = true;
+
   if (safe_lane_width < kEpislon) {
-    AERROR << "lane width smaller than adc width";
+    ADEBUG << "lane width [" << left_width + right_width << "] "
+           << "is smaller than adc width [" << adc_width << "]";
     effective_width = kEpislon;
     is_lane_width_safe = false;
   }
+
   double center_shift = 0.0;
-  if (hdmap::LeftBoundaryType(waypoint) == hdmap::LaneBoundaryType::CURB) {
-    safe_lane_width -= smoother_config_.curb_shift();
-    center_shift -= 0.5 * smoother_config_.curb_shift();
-    if (safe_lane_width < kEpislon) {
-      AERROR << "lane width smaller than adc width and left curb shift";
-      effective_width = kEpislon;
-      is_lane_width_safe = false;
-    }
-  }
   if (hdmap::RightBoundaryType(waypoint) == hdmap::LaneBoundaryType::CURB) {
     safe_lane_width -= smoother_config_.curb_shift();
-    center_shift += 0.5 * smoother_config_.curb_shift();
     if (safe_lane_width < kEpislon) {
-      AERROR << "lane width smaller than adc width and left curb shift";
+      ADEBUG << "lane width smaller than adc width and right curb shift";
       effective_width = kEpislon;
       is_lane_width_safe = false;
+    } else {
+      center_shift += 0.5 * smoother_config_.curb_shift();
+    }
+  }
+  if (hdmap::LeftBoundaryType(waypoint) == hdmap::LaneBoundaryType::CURB) {
+    safe_lane_width -= smoother_config_.curb_shift();
+    if (safe_lane_width < kEpislon) {
+      ADEBUG << "lane width smaller than adc width and left curb shift";
+      effective_width = kEpislon;
+      is_lane_width_safe = false;
+    } else {
+      center_shift -= 0.5 * smoother_config_.curb_shift();
     }
   }
 
@@ -828,29 +832,15 @@ AnchorPoint ReferenceLineProvider::GetAnchorPoint(
       buffered_width < kEpislon ? safe_lane_width : buffered_width;
 
   // shift center depending on the road width
-  double shifted_left_width = 0.5 * safe_lane_width;
   if (is_lane_width_safe) {
-    if (smoother_config_.wide_lane_threshold_factor() > 0 &&
-        safe_lane_width >
-            adc_width * smoother_config_.wide_lane_threshold_factor()) {
-      if (smoother_config_.driving_side() ==
-          ReferenceLineSmootherConfig::RIGHT) {
-        shifted_left_width *= smoother_config_.wide_lane_shift_ratio();
-      } else {
-        shifted_left_width =
-            safe_lane_width -
-            shifted_left_width * smoother_config_.wide_lane_shift_ratio();
-      }
-      center_shift -= (shifted_left_width - 0.5 * safe_lane_width);
-    }
-    auto shifted_right_width = safe_lane_width - shifted_left_width;
-    effective_width = std::min(shifted_left_width, shifted_right_width);
+    effective_width = 0.5 * safe_lane_width;
   }
 
   ref_point += left_vec * center_shift;
   anchor.path_point = ref_point.ToPathPoint(s);
-  anchor.lateral_bound =
-      std::min(smoother_config_.lateral_boundary_bound(), effective_width);
+  anchor.lateral_bound = common::math::Clamp(
+      effective_width, smoother_config_.min_lateral_boundary_bound(),
+      smoother_config_.max_lateral_boundary_bound());
   return anchor;
 }
 
@@ -895,8 +885,7 @@ bool ReferenceLineProvider::SmoothPrefixedReferenceLine(
   // modify anchor points based on prefix_ref
   for (auto &point : anchor_points) {
     common::SLPoint sl_point;
-    Vec2d xy{point.path_point.x(), point.path_point.y()};
-    if (!prefix_ref.XYToSL(xy, &sl_point)) {
+    if (!prefix_ref.XYToSL(point.path_point, &sl_point)) {
       continue;
     }
     if (sl_point.s() < 0 || sl_point.s() > prefix_ref.Length()) {

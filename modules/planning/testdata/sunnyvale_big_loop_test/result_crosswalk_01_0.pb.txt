@@ -1,5 +1,5 @@
 header {
-  timestamp_sec: 1517275942.8603508
+  timestamp_sec: 1517275942.8603506
   lidar_timestamp: 0
   camera_timestamp: 0
   radar_timestamp: 0
@@ -20,16 +20,6 @@ decision {
     }
   }
   object_decision {
-    decision {
-      id: "11720"
-      perception_id: 11720
-      object_decision {
-        nudge {
-          type: RIGHT_NUDGE
-          distance_l: -0.3
-        }
-      }
-    }
     decision {
       id: "CW_2832"
       perception_id: -1198750198
@@ -106,3 +96,30 @@ engage_advice {
 }
 trajectory_type: SPEED_FALLBACK
 replan_reason: "replan for no previous trajectory."
+target_lane_id {
+  id: "188_1_-1"
+}
+target_lane_id {
+  id: "2726_1_-1"
+}
+target_lane_id {
+  id: "382_1_-1"
+}
+target_lane_id {
+  id: "10898_1_-1"
+}
+target_lane_id {
+  id: "300_1_-1"
+}
+target_lane_id {
+  id: "10771_1_-1"
+}
+target_lane_id {
+  id: "201_1_-1"
+}
+target_lane_id {
+  id: "2811_1_-1"
+}
+target_lane_id {
+  id: "2813_1_-1"
+}

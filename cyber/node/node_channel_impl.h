@@ -33,7 +33,7 @@ namespace cyber {
 
 class Node;
 
-struct ReaderConfig {
+struct ReaderConfig {  ///< configurations for a Reader
   ReaderConfig() {
     qos_profile.set_history(proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
     qos_profile.set_depth(1);
@@ -49,17 +49,31 @@ struct ReaderConfig {
         qos_profile(other.qos_profile),
         pending_queue_size(other.pending_queue_size) {}
 
-  std::string channel_name;
-  proto::QosProfile qos_profile;
+  std::string channel_name;       //< channel reads
+  proto::QosProfile qos_profile;  //< the qos configuration
+  /**
+   * @brief configuration for responding ChannelBuffer.
+   * Older messages will dropped if you have no time to handle
+   */
   uint32_t pending_queue_size;
 };
 
+/**
+ * @class NodeChannelImpl
+ * @brief The implementation for Node to create Objects connected by Channels.
+ * e.g. Channel Reader and Writer
+ */
 class NodeChannelImpl {
   friend class Node;
 
  public:
   using NodeManagerPtr = std::shared_ptr<service_discovery::NodeManager>;
 
+  /**
+   * @brief Construct a new Node Channel Impl object
+   *
+   * @param node_name node name
+   */
   explicit NodeChannelImpl(const std::string& node_name)
       : is_reality_mode_(true), node_name_(node_name) {
     node_attr_.set_host_name(common::GlobalData::Instance()->HostName());
@@ -77,6 +91,10 @@ class NodeChannelImpl {
       node_manager_->Join(node_attr_, RoleType::ROLE_NODE);
     }
   }
+
+  /**
+   * @brief Destroy the Node Channel Impl object
+   */
   virtual ~NodeChannelImpl() {
     if (is_reality_mode_) {
       node_manager_->Leave(node_attr_, RoleType::ROLE_NODE);
@@ -84,6 +102,11 @@ class NodeChannelImpl {
     }
   }
 
+  /**
+   * @brief get name of this node
+   *
+   * @return const std::string& actual node name
+   */
   const std::string& NodeName() const { return node_name_; }
 
  private:

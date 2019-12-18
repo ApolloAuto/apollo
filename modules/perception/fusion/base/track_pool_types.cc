@@ -21,7 +21,7 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-// @brief call pool instance once to intialize memory
+// @brief call pool instance once to initialize memory
 __attribute__((constructor)) void FusionPoolInitialize() {
   TrackPool::Instance();
   AINFO << "Initialize FusionPool";

@@ -21,7 +21,6 @@ username@computername:~$: source /your-path-to-apollo-install-dir/cyber/setup.ba
 username@computername:~$: cyber_visualizer
 ```
 
-
 ### Interacting with cyber_visualizer
 
 - After launching cyber_visualizer, you will see the following interface:
@@ -32,9 +31,9 @@ username@computername:~$: cyber_visualizer
 
 	![channel information](images/cyber_visualizer2.png)
 
-- By clicking on options in toolbar, you can enable reference grid, display point clouds, add images, or display multiple camera's data at the same time. If you have `Show Grid` option enabled, you can set the color of the grid by double-clicking the `Color` item of the `Grid` list below `ChannelNames`. The default color is gray. You can also edit the value of `Cellcount` to adjust the number of cells in the grid.
+- By clicking on options in toolbar, you can enable reference grid, display point clouds, add images, or display multiple camera's data at the same time. If you have `Show Grid` option enabled, you can set the color of the grid by double-clicking the `Color` item of the `Grid` list below `ChannelNames`. The default color is gray. You can also edit the value of `CellCount` to adjust the number of cells in the grid.
 As for a point cloud or an image, you can select the source channel through its `ChannelName` sub-item, and `Action` sub-item to play or stop the data from the corresponding channel.
-As shown in figure below, three cameras' channel data on the buttom sections and one point cloud channel data on the top section are displayed simultaneously.
+As shown in figure below, three cameras' channel data on the button sections and one point cloud channel data on the top section are displayed simultaneously.
 
     ![visualization](images/cyber_visualizer3.png)
 
@@ -49,14 +48,14 @@ As shown in figure below, three cameras' channel data on the buttom sections and
    You can also modify the camera information directly in the dialog box to change the camera's observation status in the point cloud scene. And the "Step" item is the step value from the dialog box.
 
    Place the mouse on the image of the camera channel, you can double-click the left button to highlight the corresponding data channel on the left menu bar. Right click on the image to bring up menu for deleting the camera channel.
-   
-   Play and Pause buttons: when clicking the `Play` button, all channels will be showed. While when clicking the `Pause` button, all channels will stop showing on the tool.
+
+   Play and Pause buttons: when clicking the `Play` button, all channels will be shown. While when clicking the `Pause` button, all channels will stop showing on the tool.
 
 ## Cyber_monitor
 
 ### Install and run
 
-The command line tool `cyber_monitor` provides a clear view of the list of real time channel information Apollo Cyber RT in the terminal. 
+The command line tool `cyber_monitor` provides a clear view of the list of real time channel information Apollo Cyber RT in the terminal.
 
 ```bash
 username@computername:~$: source /your-path-to-apollo-install-dir/cyber/setup.bash
@@ -118,7 +117,7 @@ t | T ----- Display channel message type
 Space ----- Close|Open channel (only valid for channels with data arrival; yellow color after channel is closed)
 ```
 
-#### Commands only for channel 
+#### Commands only for channel
 
 ```
 i | I ----- Display channel Reader and Writer information
@@ -131,7 +130,6 @@ b | B ------ Display channel message content
 n | N ---- Repeat the next data in the domain
 m | M ---- Repeat one data on the domain
 ```
-
 
 ## Cyber_recorder
 
@@ -146,7 +144,7 @@ $ source /your-path-to-apollo-install-dir/cyber/setup.bash
 $ cyber_recorder
 usage: cyber_recorder <command>> [<args>]
 The cyber_recorder commands are:
-    info                               Show infomation of an exist record.
+    info                               Show information of an exist record.
     play                               Play an exist record.
     record                             Record same topic.
     split                              Split an exist record.
@@ -158,7 +156,7 @@ The cyber_recorder commands are:
 - To view the information of a record file:
 
 ```
- cyber_recorder info -h
+$ cyber_recorder info -h
 usage: cyber_recorder info [options]
 	-h, --help				show help message
 ```
@@ -186,14 +184,14 @@ usage: cyber_recorder play [options]
     -a, --all				play all
     -c, --white-channel <name>		only play the specified channel
     -k, --black-channel <name>		not play the specified channel
-    -l, --loop				loop play  
-    -r, --rate <1.0>			multiply the play rate by FACTOR  
-    -b, --begin <2018-07-01 00:00:00>	play the record begin at  
-    -e, --end <2018-07-01 00:01:00>	play the record end at  
-    -s, --start <seconds>		play started at n seconds  
-    -d, --delay <seconds>		play delayed n seconds  
-    -p, --preload <seconds>		play after trying to preload n second(s)  
-    -h, --help				show help message  
+    -l, --loop				loop play
+    -r, --rate <1.0>			multiply the play rate by FACTOR
+    -b, --begin <2018-07-01 00:00:00>	play the record begin at
+    -e, --end <2018-07-01 00:01:00>	play the record end at
+    -s, --start <seconds>		play started at n seconds
+    -d, --delay <seconds>		play delayed n seconds
+    -p, --preload <seconds>		play after trying to preload n second(s)
+    -h, --help				show help message
 ```
 
 - To split a record file:
@@ -204,9 +202,12 @@ usage: cyber_recorder split [options]
     -f, --file <file>                  input record file
     -o, --output <file>                output record file
     -a, --all                          all channels
-    -c, --channel <name>               channel name
+    -c, --white-channel <name>         only split the specified channel
+    -k, --black-channel <name>         not split the specified channel
     -b, --begin <2018-07-01 00:00:00>  begin at assigned time
+                                       (in the form of String, e.g. "2018-07-01 00:00:00")
     -e, --end <2018-07-01 01:00:00>    end at assigned time
+                                       (in the form of String, e.g. "2018-07-01 00:00:00")
 ```
 
 - To repair a record file:
@@ -218,7 +219,7 @@ usage: cyber_recorder recover [options]
     -o, --output <file>                output record file
 ```
 
-### Examples of using cyber_recorder 
+### Examples of using cyber_recorder
 
 #### Check the details of a record file
 
@@ -271,7 +272,6 @@ Hit Ctrl+C to stop replay, or Space to pause.
 play finished. file: 20180720202307.record
 ```
 
-
 ## rosbag_to\_record
 
 `rosbag_to_record` is a tool which can convert rosbag to recorder file provided by Apollo Cyber RT. Now the tool support following channel:
@@ -318,7 +318,7 @@ Usage:
 ```
 
 ### Example
- 
+
 We can convert [Apollo2.5 demo bag](https://github.com/ApolloAuto/apollo/releases/download/v2.5.0/demo_2.5.bag) to record file.
 
 ```bash
@@ -348,5 +348,5 @@ channel_info:   /apollo/localization/pose                             2000 messa
                 /apollo/monitor/static_info                              1 messages : apollo.data.StaticInfo
                 /apollo/sensor/gnss/rtk_eph                             25 messages : apollo.drivers.gnss.GnssEphemeris
                 /apollo/monitor                                          3 messages : apollo.common.monitor.MonitorMessage
-Convertion finished! Took 0.505623051 seconds in total.
+Conversion finished! Took 0.505623051 seconds in total.
 ```

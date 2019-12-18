@@ -1,19 +1,15 @@
 import React from "react";
 import { inject, observer } from "mobx-react";
-import { Tab } from "react-tabs";
 
 import SplitPane from 'react-split-pane';
 import Header from "components/Header";
 import MainView from "components/Layouts/MainView";
 import ToolView from "components/Layouts/ToolView";
-import PNCMonitor from "components/PNCMonitor";
-import DataCollectionMonitor from "components/DataCollectionMonitor";
+import MonitorPanel from "components/Layouts/MonitorPanel";
 import SideBar from "components/SideBar";
-import AudioCapture from "components/AudioCapture";
-import { CameraVideo } from "components/Tasks/SensorCamera";
 
 import HOTKEYS_CONFIG from "store/config/hotkeys.yml";
-import WS, { MAP_WS, POINT_CLOUD_WS } from "store/websocket";
+import WS, { MAP_WS, POINT_CLOUD_WS, CAMERA_WS } from "store/websocket";
 
 
 @inject("store") @observer
@@ -22,14 +18,18 @@ export default class Dreamview extends React.Component {
         super(props);
         this.handleDrag = this.handleDrag.bind(this);
         this.handleKeyPress = this.handleKeyPress.bind(this);
-        this.updateDimension = this.props.store.updateDimension.bind(this.props.store);
+        this.updateDimension = this.props.store.dimension.update.bind(this.props.store.dimension);
     }
 
     handleDrag(masterViewWidth) {
-        const { options } = this.props.store;
+        const { options, dimension } = this.props.store;
         if (options.showMonitor) {
-            this.props.store.updateWidthInPercentage(
-                Math.min(1.00, masterViewWidth / window.innerWidth));
+            dimension.updateMonitorWidth(
+                Math.min(
+                    Math.max(window.innerWidth - masterViewWidth, 0),
+                    window.innerWidth
+                )
+            );
         }
     }
 
@@ -52,13 +52,14 @@ export default class Dreamview extends React.Component {
     }
 
     componentWillMount() {
-        this.props.store.updateDimension();
+        this.props.store.dimension.initialize();
     }
 
     componentDidMount() {
         WS.initialize();
         MAP_WS.initialize();
         POINT_CLOUD_WS.initialize();
+        CAMERA_WS.initialize();
         window.addEventListener("resize", this.updateDimension, false);
         window.addEventListener("keypress", this.handleKeyPress, false);
     }
@@ -69,14 +70,14 @@ export default class Dreamview extends React.Component {
     }
 
     render() {
-        const { isInitialized, dimension, sceneDimension, options, hmi } = this.props.store;
+        const { dimension, options, hmi } = this.props.store;
 
         return (
             <div>
                 <Header />
                 <div className="pane-container">
                     <SplitPane split="vertical"
-                        size={dimension.width}
+                        size={dimension.pane.width}
                         onChange={this.handleDrag}
                         allowResize={options.showMonitor}>
                         <div className="left-pane">
@@ -86,25 +87,11 @@ export default class Dreamview extends React.Component {
                                 <ToolView />
                             </div>
                         </div>
-                        <div className="right-pane">
-                            {options.showPNCMonitor && options.showVideo &&
-                                <div>
-                                    <Tab><span>Camera View</span></Tab>
-                                    <CameraVideo />
-                                </div>
-                            }
-                            {options.showPNCMonitor && <PNCMonitor options={options} />}
-                            {options.showDataCollectionMonitor &&
-                                <DataCollectionMonitor
-                                    dataCollectionUpdateStatus={hmi.dataCollectionUpdateStatus}
-                                    dataCollectionProgress={hmi.dataCollectionProgress}
-                                />
-                            }
-                        </div>
+                        <MonitorPanel
+                            hmi={hmi}
+                            viewName={options.monitorName}
+                            showVideo={options.showVideo} />
                     </SplitPane>
-                </div>
-                <div className="hidden">
-                    {options.enableAudioCapture && <AudioCapture />}
                 </div>
             </div>
         );

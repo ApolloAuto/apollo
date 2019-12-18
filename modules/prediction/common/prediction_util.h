@@ -37,13 +37,6 @@ namespace math_util {
 double Normalize(const double value, const double mean, const double std);
 
 /**
- * @brief Sigmoid function used in neural networks as an activation function.
- * @param value The input.
- * @return The output of sigmoid function.
- */
-double Sigmoid(const double value);
-
-/**
  * @brief RELU function used in neural networks as an activation function.
  * @param value The input.
  * @return The output of RELU function.
@@ -143,6 +136,7 @@ void TranslatePoint(const double translate_x, const double translate_y,
  * @param state matrix
  * @param transition matrix
  * @param heading
+ * @param start time
  * @param total number of generated trajectory points required
  * @param trajectory point interval period
  * @param generated trajectory points
@@ -150,7 +144,7 @@ void TranslatePoint(const double translate_x, const double translate_y,
 void GenerateFreeMoveTrajectoryPoints(
     Eigen::Matrix<double, 6, 1>* state,
     const Eigen::Matrix<double, 6, 6>& transition, double theta,
-    const std::size_t num, const double period,
+    const double start_time, const std::size_t num, const double period,
     std::vector<common::TrajectoryPoint>* points);
 
 /**

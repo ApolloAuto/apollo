@@ -50,7 +50,11 @@ bool RecordWriter::Open(const std::string& file) {
     AERROR << "Failed to open output record file: " << path_;
     return false;
   }
-  file_writer_->WriteHeader(header_);
+  if (!file_writer_->WriteHeader(header_)) {
+    AERROR << "Failed to write header: " << path_;
+    file_writer_->Close();
+    return false;
+  }
   is_opened_ = true;
   return is_opened_;
 }
@@ -165,7 +169,7 @@ bool RecordWriter::SetIntervalOfFileSegmentation(uint64_t time_sec) {
   return true;
 }
 
-bool RecordWriter::IsNewChannel(const std::string& channel_name) {
+bool RecordWriter::IsNewChannel(const std::string& channel_name) const {
   return channel_message_number_map_.find(channel_name) ==
          channel_message_number_map_.end();
 }
@@ -211,6 +215,14 @@ const std::string& RecordWriter::GetProtoDesc(
     return search->second;
   }
   return null_type_;
+}
+
+std::set<std::string> RecordWriter::GetChannelList() const {
+  std::set<std::string> channel_list;
+  for (auto& item : channel_message_number_map_) {
+    channel_list.insert(item.first);
+  }
+  return channel_list;
 }
 
 }  // namespace record

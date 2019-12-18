@@ -73,9 +73,12 @@ bool RadarObstaclePerception::Perceive(
   const std::string& sensor_name = options.sensor_name;
   PERCEPTION_PERF_BLOCK_START();
   base::FramePtr detect_frame_ptr(new base::Frame());
-  CHECK(detector_->Detect(corrected_obstacles, options.detector_options,
-                          detect_frame_ptr))
-      << "radar detect error";
+
+  if (!detector_->Detect(corrected_obstacles, options.detector_options,
+                         detect_frame_ptr)) {
+    AERROR << "radar detect error";
+    return false;
+  }
   ADEBUG << "Detected frame objects number: "
          << detect_frame_ptr->objects.size();
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "detector");
@@ -87,9 +90,11 @@ bool RadarObstaclePerception::Perceive(
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "roi_filter");
 
   base::FramePtr tracker_frame_ptr = std::make_shared<base::Frame>();
-  CHECK(tracker_->Track(*detect_frame_ptr, options.track_options,
-                        tracker_frame_ptr))
-      << "radar track error";
+  if (!tracker_->Track(*detect_frame_ptr, options.track_options,
+                       tracker_frame_ptr)) {
+    AERROR << "radar track error";
+    return false;
+  }
   ADEBUG << "tracked frame objects number: "
          << tracker_frame_ptr->objects.size();
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "tracker");

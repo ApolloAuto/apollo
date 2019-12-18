@@ -30,33 +30,31 @@ namespace cyber {
 
 class PyTime {
  public:
-  PyTime() {}
-  ~PyTime() {}
-
-  explicit PyTime(uint64_t nanoseconds) { _time = Time(nanoseconds); }
+  PyTime() = default;
+  explicit PyTime(uint64_t nanoseconds) { time_ = Time(nanoseconds); }
 
   static PyTime now() {
     PyTime t;
-    t._time = cyber::Time::Now();
+    t.time_ = Time::Now();
     return t;
   }
 
   static PyTime mono_time() {
     PyTime t;
-    t._time = cyber::Time::MonoTime();
+    t.time_ = Time::MonoTime();
     return t;
   }
 
   static void sleep_until(uint64_t nanoseconds) {
-    cyber::Time::SleepUntil(cyber::Time(nanoseconds));
+    Time::SleepUntil(Time(nanoseconds));
   }
 
-  double to_sec() const { return _time.ToSecond(); }
+  double to_sec() const { return time_.ToSecond(); }
 
-  uint64_t to_nsec() const { return _time.ToNanosecond(); }
+  uint64_t to_nsec() const { return time_.ToNanosecond(); }
 
  private:
-  cyber::Time _time;
+  Time time_;
 };
 
 class PyDuration {
@@ -64,7 +62,6 @@ class PyDuration {
   explicit PyDuration(int64_t nanoseconds) {
     duration_ = std::make_shared<Duration>(nanoseconds);
   }
-  ~PyDuration() {}
 
   void sleep() const { return duration_->Sleep(); }
 
@@ -77,7 +74,6 @@ class PyRate {
   explicit PyRate(uint64_t nanoseconds) {
     rate_ = std::make_shared<Rate>(nanoseconds);
   }
-  ~PyRate() {}
 
   void sleep() const { return rate_->Sleep(); }
   void reset() const { return rate_->Reset(); }

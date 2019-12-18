@@ -11,24 +11,19 @@ cc_proto_library(
 
 proto_library(
     name = "trafficlight_tracker_semantic_lib",
-    srcs = [
-        "semantic.proto",
-    ],
+    srcs = ["semantic.proto"],
 )
 
 cc_library(
     name = "semantic_decision",
-    srcs = [
-        "semantic_decision.cc",
-    ],
-    hdrs = [
-        "semantic_decision.h",
-    ],
+    srcs = ["semantic_decision.cc"],
+    hdrs = ["semantic_decision.h"],
     deps = [
         ":trafficlight_tracker_semantic_proto",
         "//cyber/common:file",
         "//modules/perception/camera/lib/interface",
     ],
+    alwayslink = True,
 )
 
 cpplint()

@@ -43,7 +43,7 @@ class FrenetFramePathTest : public ::testing::Test {
       point.set_dl(dl[i]);
       point.set_ddl(ddl[i]);
     }
-    path_.reset(new FrenetFramePath(sl_points));
+    path_.reset(new FrenetFramePath(std::move(sl_points)));
   }
   void SetUp() { InitFrenetFramePath(); }
 

@@ -234,7 +234,7 @@ bool TrafficLightDetection::Inference(
 
 bool TrafficLightDetection::Detect(const TrafficLightDetectorOptions &options,
                                    CameraFrame *frame) {
-  if (frame->traffic_lights.size() <= 0) {
+  if (frame->traffic_lights.empty()) {
     AINFO << "no lights to detect";
     return true;
   }
@@ -374,7 +374,10 @@ bool TrafficLightDetection::SelectOutputBoxes(
 
 void TrafficLightDetection::ApplyNMS(std::vector<base::TrafficLightPtr> *lights,
                                      double iou_thresh) {
-  CHECK_NOTNULL(lights);
+  if (lights == nullptr) {
+    AERROR << "lights are not available";
+    return;
+  }
 
   // (score, index) pairs sorted by detect score
   std::vector<std::pair<float, int>> score_index_vec(lights->size());

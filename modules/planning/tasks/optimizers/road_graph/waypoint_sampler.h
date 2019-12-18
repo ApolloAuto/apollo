@@ -42,7 +42,7 @@ class WaypointSampler {
  public:
   explicit WaypointSampler(const WaypointSamplerConfig &config)
       : config_(config) {}
-  ~WaypointSampler() = default;
+  virtual ~WaypointSampler() = default;
 
   virtual void Init(const ReferenceLineInfo *reference_line_info,
                     const common::SLPoint &init_sl_point_,
@@ -62,8 +62,6 @@ class WaypointSampler {
   common::SLPoint init_sl_point_;
   common::FrenetFramePoint init_frenet_frame_point_;
   apollo::planning_internal::Debug *planning_debug_ = nullptr;
-
-  ObjectSidePass sidepass_;
 };
 
 }  // namespace planning

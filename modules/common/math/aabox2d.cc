@@ -19,8 +19,8 @@
 #include <algorithm>
 #include <cmath>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/string_util.h"
 
 #include "modules/common/math/math_utils.h"
 
@@ -146,7 +146,7 @@ void AABox2d::MergeFrom(const Vec2d &other_point) {
 }
 
 std::string AABox2d::DebugString() const {
-  return util::StrCat("aabox2d ( center = ", center_.DebugString(),
+  return absl::StrCat("aabox2d ( center = ", center_.DebugString(),
                       "  length = ", length_, "  width = ", width_, " )");
 }
 

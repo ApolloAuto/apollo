@@ -59,7 +59,7 @@ Ads1111* Ads1111::set_ads_dectostop(Ads1_111::Ads_dectostopType ads_dectostop) {
   return this;
 }
 
-// config detail: {'description': 'ADS request ESP/VLC to decelerate untill
+// config detail: {'description': 'ADS request ESP/VLC to decelerate until
 // standstill.', 'enum': {0: 'ADS_DECTOSTOP_NO_DEMAND', 1:
 // 'ADS_DECTOSTOP_DEMAND'}, 'precision': 1.0, 'len': 1, 'name': 'ADS_DecToStop',
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 17,

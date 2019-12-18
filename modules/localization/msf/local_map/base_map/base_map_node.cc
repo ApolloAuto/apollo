@@ -50,7 +50,6 @@ void BaseMapNode::Init(const BaseMapConfig* map_config,
   if (create_map_cells) {
     InitMapMatrix(map_config_);
   }
-  return;
 }
 
 void BaseMapNode::InitMapMatrix(const BaseMapConfig* map_config) {
@@ -297,7 +296,11 @@ unsigned int BaseMapNode::LoadBodyBinary(std::vector<unsigned char>* buf) {
     return map_matrix_->LoadBinary(&((*buf)[0]));
   }
   std::vector<unsigned char> buf_uncompressed;
-  compression_strategy_->Decode(buf, &buf_uncompressed);
+  int ret = compression_strategy_->Decode(buf, &buf_uncompressed);
+  if (ret < 0) {
+    AERROR << "compression Decode error: " << ret;
+    return 0;
+  }
   AERROR << "map node compress ratio: "
          << static_cast<float>(buf->size()) /
                 static_cast<float>(buf_uncompressed.size());

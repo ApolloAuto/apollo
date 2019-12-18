@@ -97,7 +97,7 @@ double ComputePtsBoxLocationSimilarity(const ProjectionCachePtr& cache,
 // @brief: calculate the shape similarity between cloud and camera box
 // @return the shape similarity which belongs to [0, 1].
 // @key idea:
-// 1. calcuate box size diff between velo box and camera box
+// 1. calculate box size diff between velo box and camera box
 // 2. normalize box size diff according to the std of x/y
 // 3. generate shape similarity from Chi-Squared distribution
 // @NOTE: original method name is compute_pts_box_shape_score
@@ -167,7 +167,7 @@ double ComputePtsBoxSimilarity(const ProjectionCachePtr& cache,
 // @brief: calculate the x/y/h similarity between radar and camera
 // @return the similarity which belongs to [0, 1].
 // @key idea:
-// 1. compute the differnece on x/y/h
+// 1. compute the difference on x/y/h
 // 2. compute similarity according to the WelshVarLoss/ChiSquareProb
 // 3. scale the similarity above
 double ComputeRadarCameraXSimilarity(const double velo_ct_x,

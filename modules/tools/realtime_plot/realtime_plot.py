@@ -81,7 +81,7 @@ class Plotter(object):
 
         else:
             if len(data.trajectory_point) == 0:
-                print data
+                print(data)
                 return
 
             x, y, speed, theta, kappa, acc, relative_time = np.array(
@@ -165,7 +165,7 @@ def main(argv):
     """Main function"""
     argv = FLAGS(argv)
 
-    print """
+    print("""
     Keyboard Shortcut:
         [q]: Quit Tool
         [s]: Save Figure
@@ -181,7 +181,7 @@ def main(argv):
         Blue Line: Past Car Status History
         Green Line: Past Planning Target History at every Car Status Frame
         Cyan Dashed Line: Past Planning Trajectory Frames
-    """
+    """)
     cyber.init()
     planning_sub = cyber.Node("stat_planning")
 

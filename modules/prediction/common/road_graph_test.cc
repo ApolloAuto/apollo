@@ -57,6 +57,7 @@ TEST_F(RoadGraphTest, General) {
   }
 }
 
+/*
 TEST_F(RoadGraphTest, NegativeStartS) {
   auto lane = PredictionMap::LaneById("l9");
   EXPECT_NE(lane, nullptr);
@@ -79,6 +80,7 @@ TEST_F(RoadGraphTest, NegativeStartS) {
     EXPECT_DOUBLE_EQ(length, total_length);
   }
 }
+*/
 
 TEST_F(RoadGraphTest, LengthLongerThanEnd) {
   auto lane = PredictionMap::LaneById("l22");

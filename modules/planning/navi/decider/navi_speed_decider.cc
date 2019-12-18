@@ -323,8 +323,9 @@ Status NaviSpeedDecider::MakeSpeedDecision(
       ts_point.v = hard_speed_limit_;
     }
 
-    if (std::abs(ts_point.v) < kZeroSpeedEpsilon) ts_point.v = 0.0;
-
+    if (std::abs(ts_point.v) < kZeroSpeedEpsilon) {
+      ts_point.v = 0.0;
+    }
     if (ts_point.a > hard_accel_limit_) {
       AERROR << "The a: " << ts_point.a << " of point with s: " << ts_point.s
              << " and t: " << ts_point.t << "is greater than hard_accel_limit "
@@ -332,8 +333,9 @@ Status NaviSpeedDecider::MakeSpeedDecision(
       ts_point.a = hard_accel_limit_;
     }
 
-    if (std::abs(ts_point.a) < kZeroAccelEpsilon) ts_point.a = 0.0;
-
+    if (std::abs(ts_point.a) < kZeroAccelEpsilon) {
+      ts_point.a = 0.0;
+    }
     // apply acceleration adjust
     if (enable_accel_auto_compensation_) {
       if (ts_point.a > 0)
@@ -444,8 +446,9 @@ Status NaviSpeedDecider::AddCentricAccelerationConstraints(
     auto start_k = prev.has_kappa() ? prev.kappa() : 0.0;
     auto end_k = cur.has_kappa() ? cur.kappa() : 0.0;
     auto kappa = std::abs((start_k + end_k) / 2.0);
-    if (std::abs(kappa) < kappa_threshold_) kappa /= kKappaAdjustRatio;
-
+    if (std::abs(kappa) < kappa_threshold_) {
+      kappa /= kKappaAdjustRatio;
+    }
     auto v_preffered = std::min(std::sqrt(soft_centric_accel_limit_ / kappa),
                                 std::numeric_limits<double>::max());
     auto v_max = std::min(std::sqrt(hard_centric_accel_limit_ / kappa),

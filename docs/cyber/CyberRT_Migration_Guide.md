@@ -1,12 +1,14 @@
-# Migration guide from Apollo ROS 
-This article describes the essential changes for projects to migrate from Apollo ROS(3.0 and before) to Apollo Cyber-RT(3.5). We will be using the very first ROS project talker/listener as example to demostrate step by step migration instruction.
+# Migration guide from Apollo ROS
+
+This article describes the essential changes for projects to migrate from Apollo ROS (Apollo 3.0 and before) to Apollo Cyber RT (Apollo 3.5 and after). We will be using the very first ROS project talker/listener as example to demonstrate step by step migration instruction.
 
 ## Build system
-ROS use `CMake` as its build system but Cyber-RT use `bazel`. In a ROS project, CmakeLists.txt and package.xml are required for defining build configs like build target, dependency, message files and so on. As for a Cyber-RT component, a single bazel BUILD file covers. Some key build config mappings are listed below.
+
+ROS use `CMake` as its build system but Cyber RT use `bazel`. In a ROS project, CmakeLists.txt and package.xml are required for defining build configs like build target, dependency, message files and so on. As for a Cyber RT component, a single bazel BUILD file covers. Some key build config mappings are listed below.
 
 Cmake
 
-```
+``` cmake
 project(pb_msgs_example)
 add_proto_files(
   DIRECTORY proto
@@ -17,11 +19,11 @@ add_executable(pb_talker src/talker.cpp)
 target_link_libraries(pb_talker ${catkin_LIBRARIES}pb_msgs_example_proto)
 add_executable(pb_listener src/listener.cpp)
 target_link_libraries(pb_listener ${catkin_LIBRARIES}  pb_msgs_example_proto)
-```  
+```
 
 Bazel
 
-```
+```python
 cc_binary(
   name = "talker",
   srcs = ["talker.cc"],
@@ -39,11 +41,14 @@ cc_binary(
     ],
   )
 ```
-We can find the mapping easily from the 2 file snippets. For example, `pb_talker` and `src/talker.cpp` in cmake `add_executable` setting map to `name = "talker"` and `srcs = ["talker.cc"]` in BUILD file `cc_binary`.
-### Proto
-Apollo ROS has customized to support proto message formate that a separate section `add_proto_files` and projectName_proto(`pb_msgs_example_proto`) in `target_link_libraries` are required to send message in proto formate. For config proto message in Cyber-RT, it's as simple as adding the target proto file path concantenated with name of `cc_proto_library` in `deps` setting. The `cc_proto_library` is set up in BUILD file under proto folder. 
 
-```C
+We can find the mapping easily from the 2 file snippets. For example, `pb_talker` and `src/talker.cpp` in cmake `add_executable` setting map to `name = "talker"` and `srcs = ["talker.cc"]` in BUILD file `cc_binary`.
+
+### Proto
+
+Apollo ROS has customized to support proto message formate that a separate section `add_proto_files` and projectName_proto(`pb_msgs_example_proto`) in `target_link_libraries` are required to send message in proto formate. For config proto message in Cyber RT, it's as simple as adding the target proto file path concantenated with name of `cc_proto_library` in `deps` setting. The `cc_proto_library` is set up in BUILD file under proto folder.
+
+```python
 cc_proto_library(
   name = "examples_cc_proto",
   deps = [
@@ -56,36 +61,40 @@ proto_library(
     "examples.proto",
   ],
 )
-``` 
+```
 
-The package definition has also changed in Cyber-RT. In Apollo ROS a fixed package `package pb_msgs;` is used for proto files, but in Cyber-RT, the proto file path `package apollo.cyber.examples.proto;` is used instead. 
+The package definition has also changed in Cyber RT. In Apollo ROS a fixed package `package pb_msgs;` is used for proto files, but in Cyber RT, the proto file path `package apollo.cyber.examples.proto;` is used instead.
 
 ## Folder structure
-As shown below, Cyber-RT remove the src folder and pull all source code in the same folder as BUILD file. BUILD file plays the same role as CMakeLists.txt plus package.xml. Both Cyber-RT and Apollo ROS talker/listener example have a proto folder for message proto files but Cyber-RT requires a separate BUILD file for proto folder to set up the proto library.
- 
+
+As shown below, Cyber RT remove the src folder and pull all source code in the same folder as BUILD file. BUILD file plays the same role as CMakeLists.txt plus package.xml. Both Cyber RT and Apollo ROS talker/listener example have a proto folder for message proto files but Cyber RT requires a separate BUILD file for proto folder to set up the proto library.
+
 ### Apollo ROS
+
 - CMakeLists.txt
 - package.xml
 - proto
-  - chatter.proto  
+  - chatter.proto
 - src
   - listener.cpp
   - talker.cpp
 
-### Cyber-RT
+### Cyber RT
+
 - BUILD
 - listener.cc
 - talker.cc
 - proto
   - BUILD
-  - examples.proto (with chatter message)   
-     
+  - examples.proto (with chatter message)
+
 ## Update source code
 
 ### Listener
-Cyber-RT
 
-```c
+Cyber RT
+
+```cpp
 #include "cyber/cyber.h"
 #include "cyber/examples/proto/examples.pb.h"
 
@@ -108,9 +117,10 @@ int main(int argc, char* argv[]) {
   return 0;
 }
 ```
+
 ROS
 
-```c
+```cpp
 #include "ros/ros.h"
 #include "chatter.pb.h"
 
@@ -128,7 +138,7 @@ int main(int argc, char** argv) {
 }
 ```
 
-You can see easily from the two listener code above that Cyber-RT provides very similar API to for developers to migrate from ROS.  
+You can see easily from the two listener code above that Cyber RT provides very similar API to for developers to migrate from ROS.
 
 - `ros::init(argc, argv, "listener");` --> `apollo::cyber::Init(argv[0]);`
 - `ros::NodeHandle n;` --> `auto listener_node = apollo::cyber::CreateNode("listener");`
@@ -136,13 +146,13 @@ You can see easily from the two listener code above that Cyber-RT provides very 
       listener_node->CreateReader("channel/chatter", MessageCallback);`
 - `ros::spin();` --> `apollo::cyber::WaitForShutdown();`
 
-Note: for Cyber-RT, a listener node has to use `node->CreateReader<messageType>(channelName, callback)` to read data from channel.
+Note: for Cyber RT, a listener node has to use `node->CreateReader<messageType>(channelName, callback)` to read data from channel.
 
 ### Talker
 
-Cyber-RT
+Cyber RT
 
-```C
+```cpp
 #include "cyber/cyber.h"
 #include "cyber/examples/proto/examples.pb.h"
 
@@ -169,11 +179,11 @@ int main(int argc, char *argv[]) {
   }
   return 0;
 }
-``` 
+```
 
 ROS
 
-```c
+```cpp
 #include "ros/ros.h"
 #include "chatter.pb.h"
 
@@ -190,33 +200,34 @@ int main(int argc, char** argv) {
     ros::Time now = ros::Time::now();
     msg.mutable_stamp()->set_sec(now.sec);
     msg.mutable_stamp()->set_nsec(now.nsec);
-    std::stringstream ss; 
+    std::stringstream ss;
     ss << "Hello world " << count;
     msg.set_content(ss.str());
-    chatter_pub.publish(msg);   
+    chatter_pub.publish(msg);
     ros::spinOnce();
     loop_rate.sleep();
   }
   return 0;
 }
 ```
-Most of the mappings are illustrated in listener code above, the rest are listed here. 
+
+Most of the mappings are illustrated in listener code above, the rest are listed here.
 
 - `ros::Publisher chatter_pub = n.advertise<pb_msgs::Chatter>("chatter", 1000);` --> `auto talker = talker_node->CreateWriter<Chatter>("channel/chatter");`
 
 - `chatter_pub.publish(msg);` --> ` talker->Write(msg);`
 
-
 ## Tools mapping
-ROS | Cyber-RT | Note
-------------- | ------------- | --------------
+
+ROS | Cyber RT | Note
+:------------- | :------------- | :--------------
 rosbag    |   cyber_recorder |   data file
 scripts/diagnostics.sh | cyber_monitor | channel debug
 offline_lidar_visualizer_tool   | cyber_visualizer |point cloud visualizer
- 
-## ROS bag data migration 
 
-The data file changed from ROS bag to Cyber record in Cyber-RT. Cyber-RT has a data migration tool `rosbag_to_record` for users to easily migrate data files before Apollo 3.0 (ROS) to Cyber-RT like the sample usage below. 
+## ROS bag data migration
+
+The data file changed from ROS bag to Cyber record in Cyber RT. Cyber RT has a data migration tool `rosbag_to_record` for users to easily migrate data files before Apollo 3.0 (ROS) to Cyber RT like the sample usage below.
 
 ```bash
 rosbag_to_record demo_3.0.bag demo_3.5.record

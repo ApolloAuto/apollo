@@ -1,6 +1,5 @@
 syntax = "proto2";
 
-
 // Helpers:
 
 message TensorParameter {
@@ -13,7 +12,6 @@ message InputParameter {
   optional string dtype = 2;  // data type of the input
   optional bool sparse = 3;
 }
-
 
 // Basic layers
 
@@ -46,7 +44,6 @@ message AvgPool1dParameter {
   optional int32 kernel_size = 1;
   optional int32 stride = 2;
 }
-
 
 // Intermediate building blocks:
 
@@ -86,7 +83,6 @@ message RegressParameter {
   optional DenseParameter linear_9 = 7;
   optional ActivationParameter activation_10 = 8;
 }
-
 
 // Final model
 

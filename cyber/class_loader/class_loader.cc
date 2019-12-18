@@ -33,7 +33,7 @@ bool ClassLoader::IsLibraryLoaded() {
 
 bool ClassLoader::LoadLibrary() {
   std::lock_guard<std::mutex> lck(loadlib_ref_count_mutex_);
-  loadlib_ref_count_ = loadlib_ref_count_ + 1;
+  ++loadlib_ref_count_;
   AINFO << "Begin LoadLibrary: " << library_path_;
   return utility::LoadLibrary(library_path_, this);
 }
@@ -47,7 +47,7 @@ int ClassLoader::UnloadLibrary() {
              "classobj_ref_count_: "
           << classobj_ref_count_;
   } else {
-    loadlib_ref_count_ = loadlib_ref_count_ - 1;
+    --loadlib_ref_count_;
     if (loadlib_ref_count_ == 0) {
       utility::UnloadLibrary(library_path_, this);
     } else {

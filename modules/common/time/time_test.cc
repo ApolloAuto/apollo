@@ -23,48 +23,17 @@ namespace apollo {
 namespace common {
 namespace time {
 
-TEST(TimeTest, DurationToMicros) {
-  Duration duration = std::chrono::milliseconds(12);
-  EXPECT_EQ(12000, AsInt64<micros>(duration));
-}
-
-TEST(TimeTest, DurationToMillis) {
-  Duration duration = std::chrono::microseconds(1234567);
-  EXPECT_EQ(1234, AsInt64<millis>(duration));
-}
-
-TEST(TimeTest, AsDouble) {
-  Duration duration = std::chrono::microseconds(123456789012);
-  EXPECT_DOUBLE_EQ(123456.789012, ToSecond(duration));
-}
-
-TEST(TimeTest, TimestampAsDouble) {
-  Timestamp timestamp = FromInt64<nanos>(123456789012345);
-  EXPECT_DOUBLE_EQ(123456.789012345, ToSecond(timestamp));
-}
-
-TEST(TimeTest, TimestampFromAndTo) {
-  Timestamp timestamp = FromInt64<micros>(1234567);
-  EXPECT_EQ(1234, AsInt64<millis>(timestamp));
-}
-
-TEST(TimeTest, TimestampFromAndToDouble) {
-  Timestamp timestamp = From(1234567.889923456);
-  EXPECT_DOUBLE_EQ(1234567.889923456, ToSecond(timestamp));
-}
-
 TEST(TimeTest, MockTime) {
   EXPECT_EQ(Clock::SYSTEM, Clock::mode());
   Clock::SetMode(Clock::MOCK);
   EXPECT_EQ(Clock::MOCK, Clock::mode());
+  EXPECT_EQ(0, absl::ToUnixMicros(Clock::Now()));
 
-  EXPECT_EQ(0, AsInt64<micros>(Clock::Now()));
-  Clock::SetNow(micros(123));
-
-  EXPECT_EQ(123, AsInt64<micros>(Clock::Now()));
+  Clock::SetNow(absl::FromUnixNanos(1));
+  EXPECT_EQ(1, absl::ToUnixNanos(Clock::Now()));
 
   Clock::SetNowInSeconds(123.456);
-  EXPECT_EQ(123.456, Clock::NowInSeconds());
+  EXPECT_DOUBLE_EQ(123.456, Clock::NowInSeconds());
 }
 
 }  // namespace time

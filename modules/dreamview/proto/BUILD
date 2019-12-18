@@ -101,3 +101,15 @@ proto_library(
     name = "data_collection_table_proto_lib",
     srcs = ["data_collection_table.proto"],
 )
+
+cc_proto_library(
+    name = "camera_update_proto",
+    deps = [
+        ":camera_update_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "camera_update_proto_lib",
+    srcs = ["camera_update.proto"],
+)

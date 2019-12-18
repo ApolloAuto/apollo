@@ -47,7 +47,7 @@ bash docker/scripts/dev_into.sh
 The scripts to build the dev-image are also available at docker/build.
 
 ```
-Note: 
+Note:
 Within the scripts in this directory, only standard tools that are expected to be available in most Linux distributions should be used (e.g., don't use realpath).
 ```
 

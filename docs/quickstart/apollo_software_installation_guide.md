@@ -14,25 +14,6 @@ This section includes:
 
 Before getting started, please make sure you have installed Ubuntu Linux 14.04.3 and the Apollo Kernel following the steps in the [Apollo core Software Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md#installing-the-software-for-the-ipc).
 
-## *New - Git LFS*
-
-Now we leverage [git-lfs](https://git-lfs.github.com) to manage large files in
-Apollo. Please make sure you installed the plugin by following the steps on its webpage or refer to [the Migration Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_migrate_to_the_updated_apollo_master_from_old_versions.md) for additional information
-
-```bash
-# Required for Ubuntu 14.04 / 16.04.
-curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
-
-# Ubuntu 14.04 / 16.04 / 18.04.
-sudo apt-get install -y git-lfs
-```
-
-For latest Git versions, the lfs plugin works automatically and transparently
-along with the commands you are familiar with, such as `git clone` and `git pull`.
-
-But for old versions like Git 1.x, you may need to call it explicitly with
-`git lfs clone` and `git lfs pull`.
-
 ## Download Apollo Source
 
 1. Download Apollo source code from the [github source](https://github.com/ApolloAuto/apollo/) and check out the correct branch:
@@ -60,18 +41,9 @@ The Docker container is the simplest way to set up the build environment for Apo
 
 For more information, see the detailed Docker tutorial [here](https://docs.docker.com/).
 
-1. If you are working on Ubuntu 16.04+, the easiest way is to leverage the
-modern snap package manager which is available out of the box:
+1. Please follow the [official guide to install the docker-ce 19.03+](https://docs.docker.com/install/linux/docker-ce/ubuntu).
 
-```bash
-sudo snap install docker
-```
-
-Otherwise, please follow the
-[official guide to install the docker-ce](https://docs.docker.com/install/linux/docker-ce/ubuntu).
-
-Don't forget the
-[post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall).
+Don't forget the [post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall).
 
 2. After the installation, log out and then log back into the system to enable Docker.
 
@@ -80,6 +52,8 @@ Don't forget the
     ```
     DOCKER_OPTS = "-s overlay"
     ```
+
+4. Install latest nvidia-container-toolkit by following the [official doc](https://github.com/NVIDIA/nvidia-docker).
 
 We encourage you to continue the Build process using [Build the Dev docker environment](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md#build_release) if you have not already set it up.
 

@@ -11,7 +11,7 @@ enum DrivingAction {
 };
 
 message PadMessage {
-  // control mode, set mode according to low level defination
+  // control mode, set mode according to low level definition
   optional apollo.common.Header header = 1;
 
   // send driving mode to drive

@@ -26,7 +26,7 @@ namespace transport {
 
 const std::size_t MessageInfo::kSize = 2 * ID_SIZE + sizeof(uint64_t);
 
-MessageInfo::MessageInfo() : sender_id_(false), seq_num_(0), spare_id_(false) {}
+MessageInfo::MessageInfo() : sender_id_(false), spare_id_(false) {}
 
 MessageInfo::MessageInfo(const Identity& sender_id, uint64_t seq_num)
     : sender_id_(sender_id), seq_num_(seq_num), spare_id_(false) {}
@@ -37,6 +37,7 @@ MessageInfo::MessageInfo(const Identity& sender_id, uint64_t seq_num,
 
 MessageInfo::MessageInfo(const MessageInfo& another)
     : sender_id_(another.sender_id_),
+      channel_id_(another.channel_id_),
       seq_num_(another.seq_num_),
       spare_id_(another.spare_id_) {}
 
@@ -45,6 +46,7 @@ MessageInfo::~MessageInfo() {}
 MessageInfo& MessageInfo::operator=(const MessageInfo& another) {
   if (this != &another) {
     sender_id_ = another.sender_id_;
+    channel_id_ = another.channel_id_;
     seq_num_ = another.seq_num_;
     spare_id_ = another.spare_id_;
   }
@@ -52,18 +54,13 @@ MessageInfo& MessageInfo::operator=(const MessageInfo& another) {
 }
 
 bool MessageInfo::operator==(const MessageInfo& another) const {
-  if (sender_id_ != another.sender_id_) {
-    return false;
-  }
+  return sender_id_ == another.sender_id_ &&
+         channel_id_ == another.channel_id_ && seq_num_ == another.seq_num_ &&
+         spare_id_ == another.spare_id_;
+}
 
-  if (seq_num_ != another.seq_num_) {
-    return false;
-  }
-
-  if (spare_id_ != another.spare_id_) {
-    return false;
-  }
-  return true;
+bool MessageInfo::operator!=(const MessageInfo& another) const {
+  return !(*this == another);
 }
 
 bool MessageInfo::SerializeTo(std::string* dst) const {

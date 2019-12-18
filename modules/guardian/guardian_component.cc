@@ -69,7 +69,7 @@ bool GuardianComponent::Proc() {
   }
 
   if (safety_mode_triggered) {
-    ADEBUG << "Safety mode triggered, enable safty mode";
+    ADEBUG << "Safety mode triggered, enable safety mode";
     TriggerSafetyMode();
   } else {
     ADEBUG << "Safety mode not triggered, bypass control command";
@@ -77,7 +77,7 @@ bool GuardianComponent::Proc() {
   }
 
   common::util::FillHeader(node_->Name(), &guardian_cmd_);
-  guardian_writer_->Write(std::make_shared<GuardianCommand>(guardian_cmd_));
+  guardian_writer_->Write(guardian_cmd_);
   return true;
 }
 

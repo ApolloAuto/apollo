@@ -74,6 +74,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "multi_value_warehouse_test",
+    size = "small",
+    srcs = ["container/multi_value_warehouse_test.cc"],
+    deps = [
+        ":multi_value_warehouse",
+        "@gtest//:main",
+    ],
+)
+
 cc_library(
     name = "single_value_warehouse",
     srcs = ["container/single_value_warehouse.cc"],
@@ -81,6 +91,16 @@ cc_library(
     deps = [
         ":warehouse_base",
         "//cyber/base:atomic_rw_lock",
+    ],
+)
+
+cc_test(
+    name = "single_value_warehouse_test",
+    size = "small",
+    srcs = ["container/single_value_warehouse_test.cc"],
+    deps = [
+        ":single_value_warehouse",
+        "@gtest//:main",
     ],
 )
 

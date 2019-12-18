@@ -120,6 +120,12 @@ bool ControlTestBase::test_control() {
     control_.OnMonitor(monitor_message);
   }
 
+  control_.local_view_.mutable_chassis()->CopyFrom(control_.latest_chassis_);
+  control_.local_view_.mutable_trajectory()->CopyFrom(
+      control_.latest_trajectory_);
+  control_.local_view_.mutable_localization()->CopyFrom(
+      control_.latest_localization_);
+
   auto err = control_.ProduceControlCommand(&control_command_);
   if (!err.ok()) {
     ADEBUG << "control ProduceControlCommand failed";
@@ -137,8 +143,8 @@ void ControlTestBase::trim_control_command(ControlCommand *origin) {
 
 bool ControlTestBase::test_control(const std::string &test_case_name,
                                    int case_num) {
-  const std::string golden_result_file = apollo::common::util::StrCat(
-      "result_", test_case_name, "_", case_num, ".pb.txt");
+  const std::string golden_result_file =
+      absl::StrCat("result_", test_case_name, "_", case_num, ".pb.txt");
   std::string tmp_golden_path = "/tmp/" + golden_result_file;
   std::string full_golden_path = FLAGS_test_data_dir + "/" + golden_result_file;
   control_command_.Clear();

@@ -24,8 +24,10 @@ namespace planning {
 
 std::unique_ptr<Planner> NaviPlannerDispatcher::DispatchPlanner() {
   PlanningConfig planning_config;
-  apollo::cyber::common::GetProtoFromFile(FLAGS_planning_config_file,
-                                          &planning_config);
+  if (!apollo::cyber::common::GetProtoFromFile(FLAGS_planning_config_file,
+                                               &planning_config)) {
+    return nullptr;
+  }
 
   auto planner_type = PlannerType::NAVI;
   if (planning_config.has_navigation_planning_config()) {

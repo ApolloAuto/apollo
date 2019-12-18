@@ -149,7 +149,7 @@ bool Poller::Init() {
   ctrl_param.event.events = EPOLLIN;
   ctrl_params_[ctrl_param.fd] = ctrl_param;
 
-  is_shutdown_.exchange(false);
+  is_shutdown_.store(false);
   thread_ = std::thread(&Poller::ThreadFunc, this);
   scheduler::Instance()->SetInnerThreadAttr("io_poller", &thread_);
   return true;

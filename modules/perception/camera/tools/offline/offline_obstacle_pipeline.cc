@@ -19,8 +19,8 @@
 #include <fstream>
 #include <iomanip>
 
+#include "absl/strings/str_split.h"
 #include "cyber/common/file.h"
-#include "modules/common/util/string_util.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/app/obstacle_camera_perception.h"
 #include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"
@@ -55,7 +55,6 @@ DEFINE_string(config_root,
               "config_root");
 DEFINE_string(tf_file, "", "tf file");
 DEFINE_string(config_file, "obstacle.pt", "config_file");
-DEFINE_string(narrow_name, "front_12mm", " camera for projecting");
 DEFINE_string(base_camera_name, "front_6mm", "camera to be projected");
 DEFINE_string(sensor_name, "front_6mm,front_12mm", "camera to use");
 DEFINE_string(params_dir, "/apollo/modules/perception/data/params",
@@ -127,8 +126,8 @@ int work() {
   }
 
   // Init camera list
-  std::vector<std::string> camera_names;
-  apollo::common::util::Split(FLAGS_sensor_name, ',', &camera_names);
+  const std::vector<std::string> camera_names =
+      absl::StrSplit(FLAGS_sensor_name, ',');
 
   // Init data provider
   DataProvider::InitOptions data_options;
@@ -220,8 +219,7 @@ int work() {
   std::string camera_name;
 
   while (fin >> line) {
-    std::vector<std::string> temp_strs;
-    apollo::common::util::Split(line, '/', &temp_strs);
+    const std::vector<std::string> temp_strs = absl::StrSplit(line, '/');
     if (temp_strs.size() != 2) {
       AERROR << "invaid format in " << FLAGS_test_list;
     }

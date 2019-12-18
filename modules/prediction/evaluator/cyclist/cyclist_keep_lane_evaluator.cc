@@ -19,12 +19,20 @@
 namespace apollo {
 namespace prediction {
 
-void CyclistKeepLaneEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+CyclistKeepLaneEvaluator::CyclistKeepLaneEvaluator() {
+  evaluator_type_ = ObstacleConf::CYCLIST_KEEP_LANE_EVALUATOR;
+}
+
+bool CyclistKeepLaneEvaluator::Evaluate(
+    Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container) {
   CHECK_NOTNULL(obstacle_ptr);
+
+  obstacle_ptr->SetEvaluatorType(evaluator_type_);
+
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
     AERROR << "Obstacle [" << id << "] has no latest feature.";
-    return;
+    return false;
   }
 
   Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
@@ -33,15 +41,15 @@ void CyclistKeepLaneEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       !latest_feature_ptr->lane().has_lane_graph() ||
       !latest_feature_ptr->lane().has_lane_feature()) {
     ADEBUG << "Obstacle [" << id << "] has no lane graph.";
-    return;
+    return false;
   }
 
   LaneGraph* lane_graph_ptr =
       latest_feature_ptr->mutable_lane()->mutable_lane_graph();
   CHECK_NOTNULL(lane_graph_ptr);
-  if (lane_graph_ptr->lane_sequence_size() == 0) {
+  if (lane_graph_ptr->lane_sequence().empty()) {
     AERROR << "Obstacle [" << id << "] has no lane sequences.";
-    return;
+    return false;
   }
 
   std::string curr_lane_id =
@@ -51,11 +59,12 @@ void CyclistKeepLaneEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     const double probability = ComputeProbability(curr_lane_id, lane_sequence);
     lane_sequence.set_probability(probability);
   }
+  return true;
 }
 
 double CyclistKeepLaneEvaluator::ComputeProbability(
     const std::string& curr_lane_id, const LaneSequence& lane_sequence) {
-  if (lane_sequence.lane_segment_size() == 0) {
+  if (lane_sequence.lane_segment().empty()) {
     AWARN << "Empty lane sequence.";
     return 0.0;
   }

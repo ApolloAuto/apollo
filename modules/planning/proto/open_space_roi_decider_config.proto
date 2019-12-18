@@ -2,13 +2,14 @@ syntax = "proto2";
 
 package apollo.planning;
 
-message OpenSpaceRoiDeciderConfig{
+message OpenSpaceRoiDeciderConfig {
   // roi scenario definitions
   enum RoiType {
     NOT_DEFINED = 0;
     PARKING = 1;
     PULL_OVER = 2;
-    NARROW_STREET_U_TURN = 3;
+    PARK_AND_GO = 3;
+    NARROW_STREET_U_TURN = 4;
   }
   optional RoiType roi_type = 1;
   // longitudinal range of parking roi
@@ -29,4 +30,8 @@ message OpenSpaceRoiDeciderConfig{
   optional double perception_obstacle_filtering_distance = 9 [default = 1000.0];
   // buffer distance for perception obstacle
   optional double perception_obstacle_buffer = 10;
+  // tolerance limit for road_bound_width abnormal changes
+  optional double curb_heading_tangent_change_uppper_limit = 11 [default = 1.0];
+  // end pose s distance to current vehicle
+  optional double end_pose_s_distance = 12 [default = 10.0];
 }

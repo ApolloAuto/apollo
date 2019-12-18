@@ -9,9 +9,7 @@ cc_proto_library(
 
 proto_library(
     name = "vehicle_config_proto_lib",
-    srcs = [
-        "vehicle_config.proto",
-    ],
+    srcs = ["vehicle_config.proto"],
     deps = [
         "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:header_proto_lib",

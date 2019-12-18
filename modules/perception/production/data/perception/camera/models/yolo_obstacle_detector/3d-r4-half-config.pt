@@ -23,11 +23,11 @@ model_param {
   border_ratio: 0.01
 }
 net_param {
-  loc_blob: "loc_pred"
-  obj_blob: "obj_pred"
-  cls_blob: "cls_pred"
-  ori_blob: "ori_pred"
-  dim_blob: "dim_pred"
+  det1_loc_blob: "loc_pred"
+  det1_obj_blob: "obj_pred"
+  det1_cls_blob: "cls_pred"
+  det1_ori_blob: "ori_pred"
+  det1_dim_blob: "dim_pred"
   input_blob: "data"
   feat_blob: "conv3_3"
 }

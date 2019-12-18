@@ -49,9 +49,8 @@ class KeepClear : public TrafficRule {
                               const double keep_clear_end_s);
 
  private:
-  static constexpr char const* const KEEP_CLEAR_VO_ID_PREFIX = "KC_";
-  static constexpr char const* const KEEP_CLEAR_JUNCTION_VO_ID_PREFIX =
-      "KC_JC_";
+  static constexpr char const* KEEP_CLEAR_VO_ID_PREFIX = "KC_";
+  static constexpr char const* KEEP_CLEAR_JUNCTION_VO_ID_PREFIX = "KC_JC_";
 };
 
 }  // namespace planning

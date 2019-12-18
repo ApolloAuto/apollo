@@ -19,7 +19,6 @@
 #include <omp.h>
 
 #include <algorithm>
-#include <limits>
 #include <utility>
 
 #include "cyber/common/file.h"
@@ -30,48 +29,52 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/container_manager.h"
-#include "modules/prediction/container/obstacles/obstacles_container.h"
 
 namespace apollo {
 namespace prediction {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::adapter::AdapterConfig;
 using apollo::common::math::Vec2d;
-using apollo::cyber::common::GetProtoFromFile;
 
 LaneScanningEvaluator::LaneScanningEvaluator() : device_(torch::kCPU) {
+  evaluator_type_ = ObstacleConf::LANE_SCANNING_EVALUATOR;
   LoadModel();
 }
 
-void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
+                                     ObstaclesContainer* obstacles_container) {
   std::vector<Obstacle*> dummy_dynamic_env;
-  Evaluate(obstacle_ptr, dummy_dynamic_env);
+  Evaluate(obstacle_ptr, obstacles_container, dummy_dynamic_env);
+  return true;
 }
 
-void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
+bool LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
+                                     ObstaclesContainer* obstacles_container,
                                      std::vector<Obstacle*> dynamic_env) {
   // Sanity checks.
   omp_set_num_threads(1);
   CHECK_NOTNULL(obstacle_ptr);
+
+  obstacle_ptr->SetEvaluatorType(evaluator_type_);
+
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
     AERROR << "Obstacle [" << id << "] has no latest feature.";
-    return;
+    return false;
   }
   Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
   CHECK_NOTNULL(latest_feature_ptr);
   if (!latest_feature_ptr->has_lane() ||
       !latest_feature_ptr->lane().has_lane_graph_ordered()) {
     AERROR << "Obstacle [" << id << "] has no lane graph.";
-    return;
+    return false;
   }
   LaneGraph* lane_graph_ptr =
       latest_feature_ptr->mutable_lane()->mutable_lane_graph_ordered();
   CHECK_NOTNULL(lane_graph_ptr);
-  if (lane_graph_ptr->lane_sequence_size() == 0) {
+  if (lane_graph_ptr->lane_sequence().empty()) {
     AERROR << "Obstacle [" << id << "] has no lane sequences.";
-    return;
+    return false;
   }
   ADEBUG << "There are " << lane_graph_ptr->lane_sequence_size()
          << " lane sequences to scan.";
@@ -85,12 +88,17 @@ void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
   ExtractStringFeatures(*lane_graph_ptr, &string_feature_values);
 
   std::vector<double> labels = {0.0};
-  if (FLAGS_prediction_offline_mode == 2) {
+  if (FLAGS_prediction_offline_mode ==
+      PredictionConstants::kDumpDataForLearning) {
+    std::string learning_data_tag = "vehicle_cruise";
+    if (latest_feature_ptr->has_junction_feature()) {
+      learning_data_tag = "vehicle_junction";
+    }
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
-                                         string_feature_values, "cruise",
-                                         nullptr);
+                                         string_feature_values,
+                                         learning_data_tag, nullptr);
     ADEBUG << "Save extracted features for learning locally.";
-    return;
+    return true;
   }
 
   feature_values.push_back(static_cast<double>(MAX_NUM_LANE));
@@ -102,8 +110,8 @@ void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
     torch_input[0][i] = static_cast<float>(feature_values[i]);
   }
   torch_inputs.push_back(std::move(torch_input));
-  ModelInference(torch_inputs, torch_lane_scanning_model_ptr_,
-                 latest_feature_ptr);
+  ModelInference(torch_inputs, torch_lane_scanning_model_, latest_feature_ptr);
+  return true;
 }
 
 bool LaneScanningEvaluator::ExtractStringFeatures(
@@ -111,8 +119,9 @@ bool LaneScanningEvaluator::ExtractStringFeatures(
     std::vector<std::string>* const string_feature_values) {
   for (const LaneSequence& lane_sequence : lane_graph.lane_sequence()) {
     string_feature_values->push_back("|");
-    for (const LaneSegment& lane_segment : lane_sequence.lane_segment()) {
-      string_feature_values->push_back(lane_segment.lane_id());
+    for (int i = lane_sequence.adc_lane_segment_idx();
+         i < static_cast<int>(lane_sequence.lane_segment_size()); ++i) {
+      string_feature_values->push_back(lane_sequence.lane_segment(i).lane_id());
     }
   }
   return true;
@@ -143,15 +152,18 @@ bool LaneScanningEvaluator::ExtractFeatures(
 
   // Extract static environmental (lane-related) features.
   std::vector<double> static_feature_values;
+  std::vector<int> lane_sequence_idx_to_remove;
   if (!ExtractStaticEnvFeatures(obstacle_ptr, lane_graph_ptr,
-                                &static_feature_values)) {
-    ADEBUG << "Failed to extract static environmental features around obs_id = "
+                                &static_feature_values,
+                                &lane_sequence_idx_to_remove)) {
+    AERROR << "Failed to extract static environmental features around obs_id = "
            << id;
   }
   if (static_feature_values.size() %
-          (SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) !=
+          (SINGLE_LANE_FEATURE_SIZE *
+           (LANE_POINTS_SIZE + BACKWARD_LANE_POINTS_SIZE)) !=
       0) {
-    ADEBUG << "Obstacle [" << id << "] has incorrect static env feature size: "
+    AERROR << "Obstacle [" << id << "] has incorrect static env feature size: "
            << static_feature_values.size() << ".";
     return false;
   }
@@ -167,6 +179,7 @@ bool LaneScanningEvaluator::ExtractObstacleFeatures(
   CHECK_NOTNULL(obstacle_ptr);
   feature_values->clear();
   FLAGS_cruise_historical_frame_length = 20;
+  int max_num_poly_pt = 20;
   std::vector<double> has_history(FLAGS_cruise_historical_frame_length, 1.0);
   std::vector<std::pair<double, double>> pos_history(
       FLAGS_cruise_historical_frame_length, std::make_pair(0.0, 0.0));
@@ -178,6 +191,10 @@ bool LaneScanningEvaluator::ExtractObstacleFeatures(
                                           0.0);
   std::vector<double> vel_heading_changing_rate_history(
       FLAGS_cruise_historical_frame_length, 0.0);
+  std::vector<std::vector<std::pair<double, double>>> polygon_points_history(
+      FLAGS_cruise_historical_frame_length,
+      std::vector<std::pair<double, double>>(max_num_poly_pt,
+                                             std::make_pair(0.0, 0.0)));
 
   // Get obstacle's current position to set up the relative coord. system.
   const Feature& obs_curr_feature = obstacle_ptr->latest_feature();
@@ -203,9 +220,8 @@ bool LaneScanningEvaluator::ExtractObstacleFeatures(
     }
     // Extract normalized position info.
     if (feature.has_position()) {
-      pos_history[i] = WorldCoordToObjCoord(
-          std::make_pair(feature.position().x(), feature.position().y()),
-          obs_curr_pos, obs_curr_heading);
+      pos_history[i] =
+          std::make_pair(feature.position().x(), feature.position().y());
     } else {
       has_history[i] = 0.0;
     }
@@ -236,8 +252,7 @@ bool LaneScanningEvaluator::ExtractObstacleFeatures(
     }
     // Extract velocity heading info.
     if (feature.has_velocity_heading()) {
-      vel_heading_history[i] =
-          WorldAngleToObjAngle(feature.velocity_heading(), obs_curr_heading);
+      vel_heading_history[i] = feature.velocity_heading();
       if (i != 0) {
         vel_heading_changing_rate_history[i] =
             (vel_heading_history[i] - vel_heading_history[i - 1]) /
@@ -246,6 +261,14 @@ bool LaneScanningEvaluator::ExtractObstacleFeatures(
       }
     } else {
       has_history[i] = 0.0;
+    }
+    // Extract polygon-point info.
+    for (int j = 0; j < feature.polygon_point_size(); ++j) {
+      if (j >= max_num_poly_pt) {
+        break;
+      }
+      polygon_points_history[i][j].first = feature.polygon_point(j).x();
+      polygon_points_history[i][j].second = feature.polygon_point(j).y();
     }
   }
 
@@ -265,6 +288,10 @@ bool LaneScanningEvaluator::ExtractObstacleFeatures(
     feature_values->push_back(acc_history[i].second);
     feature_values->push_back(vel_heading_history[i]);
     feature_values->push_back(vel_heading_changing_rate_history[i]);
+    for (int j = 0; j < max_num_poly_pt; ++j) {
+      feature_values->push_back(polygon_points_history[i][j].first);
+      feature_values->push_back(polygon_points_history[i][j].second);
+    }
   }
 
   return true;
@@ -272,7 +299,8 @@ bool LaneScanningEvaluator::ExtractObstacleFeatures(
 
 bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
     const Obstacle* obstacle_ptr, const LaneGraph* lane_graph_ptr,
-    std::vector<double>* feature_values) {
+    std::vector<double>* feature_values,
+    std::vector<int>* lane_sequence_idx_to_remove) {
   // Sanity checks.
   CHECK_NOTNULL(lane_graph_ptr);
   feature_values->clear();
@@ -286,16 +314,80 @@ bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
   // Go through every lane-sequence (ordered from left to right) and
   // extract needed features.
   for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
-    size_t count = 0;
     // Get all the properties of the current lane-sequence.
     // Go through all the lane-points to fill up the feature_values.
     const LaneSequence& lane_sequence = lane_graph_ptr->lane_sequence(i);
-    for (int j = 0; j < lane_sequence.lane_segment_size(); ++j) {
+
+    // Extract features from backward lane-points.
+    size_t count = 0;
+    std::vector<double> backward_feature_values;
+    for (int j = lane_sequence.adc_lane_segment_idx(); j >= 0; --j) {
+      if (count >= SINGLE_LANE_FEATURE_SIZE * BACKWARD_LANE_POINTS_SIZE) {
+        break;
+      }
+      const LaneSegment& lane_segment = lane_sequence.lane_segment(j);
+      int k_starting_idx = lane_segment.lane_point_size() - 1;
+      if (j == lane_sequence.adc_lane_segment_idx()) {
+        k_starting_idx = std::min(lane_segment.adc_lane_point_idx(),
+                                  lane_segment.lane_point_size() - 1);
+      }
+      for (int k = k_starting_idx; k >= 0; --k) {
+        if (count >= SINGLE_LANE_FEATURE_SIZE * BACKWARD_LANE_POINTS_SIZE) {
+          break;
+        }
+        const LanePoint& lane_point = lane_segment.lane_point(k);
+        std::pair<double, double> relative_s_l =
+            WorldCoordToObjCoord(std::make_pair(lane_point.position().x(),
+                                                lane_point.position().y()),
+                                 obs_curr_pos, obs_curr_heading);
+        double relative_ang =
+            WorldAngleToObjAngle(lane_point.heading(), obs_curr_heading);
+
+        backward_feature_values.push_back(lane_point.kappa());
+        backward_feature_values.push_back(relative_ang);
+        backward_feature_values.push_back(relative_s_l.first);
+        backward_feature_values.push_back(relative_s_l.second);
+
+        count += 4;
+      }
+    }
+    // If lane-points are not enough, then extrapolate linearly.
+    while (count >= SINGLE_LANE_FEATURE_SIZE * 2 &&
+           count < SINGLE_LANE_FEATURE_SIZE * BACKWARD_LANE_POINTS_SIZE) {
+      std::size_t s = backward_feature_values.size();
+      double relative_l_new =
+          2 * backward_feature_values[s - 1] - backward_feature_values[s - 5];
+      double relative_s_new =
+          2 * backward_feature_values[s - 2] - backward_feature_values[s - 6];
+      double relative_ang_new = backward_feature_values[s - 3];
+
+      backward_feature_values.push_back(0.0);
+      backward_feature_values.push_back(relative_ang_new);
+      backward_feature_values.push_back(relative_s_new);
+      backward_feature_values.push_back(relative_l_new);
+
+      count += 4;
+    }
+
+    for (int j = static_cast<int>(backward_feature_values.size()) - 1; j >= 0;
+         --j) {
+      feature_values->push_back(backward_feature_values[j]);
+    }
+
+    // Extract features from forward lane-points.
+    count = 0;
+    for (int j = lane_sequence.adc_lane_segment_idx();
+         j < lane_sequence.lane_segment_size(); ++j) {
       if (count >= SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
         break;
       }
       const LaneSegment& lane_segment = lane_sequence.lane_segment(j);
-      for (int k = 0; k < lane_segment.lane_point_size(); ++k) {
+      int k_starting_idx = 0;
+      if (j == lane_sequence.adc_lane_segment_idx()) {
+        k_starting_idx = std::min(lane_segment.adc_lane_point_idx(),
+                                  lane_segment.lane_point_size() - 1);
+      }
+      for (int k = k_starting_idx; k < lane_segment.lane_point_size(); ++k) {
         if (count >= SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
           break;
         }
@@ -314,7 +406,6 @@ bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
         count += 4;
       }
     }
-
     // If lane-points are not enough, then extrapolate linearly.
     while (count >= SINGLE_LANE_FEATURE_SIZE * 2 &&
            count < SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
@@ -349,21 +440,19 @@ bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
 }
 
 void LaneScanningEvaluator::LoadModel() {
-  // TODO(all) uncomment the following when cuda issue is resolved
-  // if (torch::cuda::is_available()) {
-  //   ADEBUG << "CUDA is available";
-  //   device_ = torch::Device(torch::kCUDA);
-  // }
+  if (FLAGS_use_cuda && torch::cuda::is_available()) {
+    ADEBUG << "CUDA is available";
+    device_ = torch::Device(torch::kCUDA);
+  }
   torch::set_num_threads(1);
-  torch_lane_scanning_model_ptr_ =
+  torch_lane_scanning_model_ =
       torch::jit::load(FLAGS_torch_vehicle_lane_scanning_file, device_);
 }
 
 void LaneScanningEvaluator::ModelInference(
     const std::vector<torch::jit::IValue>& torch_inputs,
-    std::shared_ptr<torch::jit::script::Module> torch_model_ptr,
-    Feature* feature_ptr) {
-  auto torch_output_tensor = torch_model_ptr->forward(torch_inputs).toTensor();
+    torch::jit::script::Module torch_model, Feature* feature_ptr) {
+  auto torch_output_tensor = torch_model.forward(torch_inputs).toTensor();
   auto torch_output = torch_output_tensor.accessor<float, 3>();
   for (size_t i = 0; i < SHORT_TERM_TRAJECTORY_SIZE; ++i) {
     TrajectoryPoint point;

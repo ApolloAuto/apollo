@@ -12,19 +12,19 @@ sensor_meta {
 
 sensor_meta {
     name: "camera_front_obstacle"
-    type: MONOCULAR_CAMERA 
+    type: MONOCULAR_CAMERA
     orientation: FRONT
 }
 
 sensor_meta {
     name: "camera_front_narrow"
-    type: MONOCULAR_CAMERA 
+    type: MONOCULAR_CAMERA
     orientation: FRONT
 }
 
 sensor_meta {
     name: "onsemi_narrow"
-    type: MONOCULAR_CAMERA 
+    type: MONOCULAR_CAMERA
     orientation: FRONT
 }
 
@@ -36,6 +36,6 @@ sensor_meta {
 
 sensor_meta {
     name: "onsemi_obstacle"
-    type: MONOCULAR_CAMERA 
+    type: MONOCULAR_CAMERA
     orientation: FRONT
 }

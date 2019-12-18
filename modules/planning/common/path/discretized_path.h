@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <utility>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -31,7 +32,7 @@ class DiscretizedPath : public std::vector<common::PathPoint> {
  public:
   DiscretizedPath() = default;
 
-  explicit DiscretizedPath(const std::vector<common::PathPoint>& path_points);
+  explicit DiscretizedPath(std::vector<common::PathPoint> path_points);
 
   double Length() const;
 

@@ -20,7 +20,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-// @brief call pool instance once to intialize memory
+// @brief call pool instance once to initialize memory
 __attribute__((constructor)) void TrackPoolInitialize() {
   TrackedObjectPool::Instance();
   TrackDataPool::Instance();

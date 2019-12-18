@@ -11,9 +11,7 @@ cc_proto_library(
 
 proto_library(
     name = "vehicle_model_config_proto_lib",
-    srcs = [
-        "vehicle_model_config.proto",
-    ],
+    srcs = ["vehicle_model_config.proto"],
 )
 
 cpplint()

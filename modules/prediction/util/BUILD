@@ -6,14 +6,13 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "data_extraction",
     srcs = ["data_extraction.cc"],
-    hdrs = [
-        "data_extraction.h",
-    ],
-    linkopts = [
-        "-lboost_filesystem",
+    hdrs = ["data_extraction.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
         "//cyber",
+        "@boost",
     ],
 )
 

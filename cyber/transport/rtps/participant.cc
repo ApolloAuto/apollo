@@ -96,6 +96,13 @@ void Participant::CreateFastRtpsParticipant(
   attr.rtps.builtin.m_simpleEDP.use_PublicationWriterANDSubscriptionReader =
       true;
   attr.rtps.builtin.domainId = domain_id;
+
+  /**
+   * The user should set the lease_duration and the announcement_period with
+   * values that differ in at least 30%. Values too close to each other may
+   * cause the failure of the writer liveliness assertion in networks with high
+   * latency or with lots of communication errors.
+   */
   attr.rtps.builtin.leaseDuration.seconds = part_attr_conf->lease_duration();
   attr.rtps.builtin.leaseDuration_announcementperiod.seconds =
       part_attr_conf->announcement_period();
@@ -106,7 +113,7 @@ void Participant::CreateFastRtpsParticipant(
   const char* ip_val = ::getenv("CYBER_IP");
   if (ip_val != nullptr) {
     ip_env = ip_val;
-    if (ip_env.size() == 0) {
+    if (ip_env.empty()) {
       AERROR << "invalid CYBER_IP (an empty string)";
       return;
     }

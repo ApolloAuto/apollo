@@ -35,6 +35,13 @@ namespace apollo {
 namespace drivers {
 namespace conti_radar {
 
+using Clock = apollo::common::time::Clock;
+using micros = std::chrono::microseconds;
+using apollo::cyber::Writer;
+using apollo::drivers::canbus::CanClient;
+using apollo::drivers::canbus::ProtocolData;
+using apollo::drivers::canbus::SenderMessage;
+
 ContiRadarMessageManager::ContiRadarMessageManager(
     const std::shared_ptr<Writer<ContiRadar>> &writer)
     : conti_radar_writer_(writer) {
@@ -90,11 +97,11 @@ void ContiRadarMessageManager::Parse(const uint32_t message_id,
 
     if (sensor_data_.contiobs_size() <=
         sensor_data_.object_list_status().nof_objects()) {
-      // maybe lost a object_list_status msg
-      conti_radar_writer_->Write(std::make_shared<ContiRadar>(sensor_data_));
+      // maybe lost an object_list_status msg
+      conti_radar_writer_->Write(sensor_data_);
     }
     sensor_data_.Clear();
-    // fill header when recieve the general info message
+    // fill header when receive the general info message
     common::util::FillHeader("conti_radar", &sensor_data_);
   }
 
@@ -128,7 +135,7 @@ void ContiRadarMessageManager::Parse(const uint32_t message_id,
   // check if need to check period
   const auto it = check_ids_.find(message_id);
   if (it != check_ids_.end()) {
-    const int64_t time = common::time::AsInt64<micros>(Clock::Now());
+    const int64_t time = absl::ToUnixMicros(Clock::Now());
     it->second.real_period = time - it->second.last_time;
     // if period 1.5 large than base period, inc error_count
     const double period_multiplier = 1.5;

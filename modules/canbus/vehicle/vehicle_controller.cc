@@ -91,16 +91,13 @@ ErrorCode VehicleController::SetDrivingMode(
   return ErrorCode::OK;
 }
 
-ErrorCode VehicleController::Update(const ControlCommand &command) {
+ErrorCode VehicleController::Update(const ControlCommand &control_command) {
   if (!is_initialized_) {
     AERROR << "Controller is not initialized.";
     return ErrorCode::CANBUS_ERROR;
   }
 
-  ControlCommand control_command;
-  control_command.CopyFrom(command);
-
-  // Execute action to tranform driving mode
+  // Execute action to transform driving mode
   if (control_command.has_pad_msg() && control_command.pad_msg().has_action()) {
     AINFO << "Canbus received pad msg: "
           << control_command.pad_msg().ShortDebugString();

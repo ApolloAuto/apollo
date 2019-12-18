@@ -34,13 +34,13 @@ namespace control {
 /**
  * @class PIDBCController
  * @brief A proportional-integral-derivative controller for speed and steering
-with backward-caculation-anti-windup
+with backward-calculation-anti-windup
  */
 class PIDBCController : public PIDController {
  public:
   /**
    * @brief compute control value based on the error,
-   with backward-caculation-anti-windup
+   with backward-calculation-anti-windup
    * @param error error value, the difference between
    * a desired value and a measured value
    * @param dt sampling time interval

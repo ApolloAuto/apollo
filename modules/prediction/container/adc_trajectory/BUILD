@@ -6,6 +6,9 @@ cc_library(
     name = "adc_trajectory_container",
     srcs = ["adc_trajectory_container.cc"],
     hdrs = ["adc_trajectory_container.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/common:prediction_map",

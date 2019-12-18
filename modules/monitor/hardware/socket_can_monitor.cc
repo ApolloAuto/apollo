@@ -42,13 +42,8 @@ namespace apollo {
 namespace monitor {
 namespace {
 
-bool SocketCanTest(std::string* message) {
-  const int dev_handler = socket(PF_CAN, SOCK_RAW, CAN_RAW);
-  if (dev_handler < 0) {
-    *message = "Open can device failed";
-    return false;
-  }
-
+// Test Socket CAN on an open handler.
+bool SocketCanHandlerTest(const int dev_handler, std::string* message) {
   // init config and state
   // 1. set receive message_id filter, ie white list
   struct can_filter filter[1];
@@ -91,6 +86,18 @@ bool SocketCanTest(std::string* message) {
   }
 
   return true;
+}
+
+// Open a Socket CAN handler and test.
+bool SocketCanTest(std::string* message) {
+  const int dev_handler = socket(PF_CAN, SOCK_RAW, CAN_RAW);
+  if (dev_handler < 0) {
+    *message = "Open can device failed";
+    return false;
+  }
+  const bool ret = SocketCanHandlerTest(dev_handler, message);
+  close(dev_handler);
+  return ret;
 }
 
 }  // namespace

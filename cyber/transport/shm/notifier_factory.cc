@@ -30,7 +30,7 @@ namespace transport {
 using common::GlobalData;
 
 auto NotifierFactory::CreateNotifier() -> NotifierPtr {
-  std::string notifier_type(MulticastNotifier::Type());
+  std::string notifier_type(ConditionNotifier::Type());
   auto& g_conf = GlobalData::Instance()->Config();
   if (g_conf.has_transport_conf() && g_conf.transport_conf().has_shm_conf() &&
       g_conf.transport_conf().shm_conf().has_notifier_type()) {
@@ -46,7 +46,7 @@ auto NotifierFactory::CreateNotifier() -> NotifierPtr {
   }
 
   AINFO << "unknown notifier, we use default notifier: " << notifier_type;
-  return CreateMulticastNotifier();
+  return CreateConditionNotifier();
 }
 
 auto NotifierFactory::CreateConditionNotifier() -> NotifierPtr {

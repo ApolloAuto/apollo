@@ -26,7 +26,7 @@
 
 DEFINE_string(gps_monitor_name, "GpsMonitor", "Name of the GPS monitor.");
 DEFINE_double(gps_monitor_interval, 3, "GPS status checking interval (s).");
-DEFINE_string(gps_component_name, "GPS", "Localization component name.");
+DEFINE_string(gps_component_name, "GPS", "GPS component name.");
 
 namespace apollo {
 namespace monitor {

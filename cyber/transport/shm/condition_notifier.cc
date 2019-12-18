@@ -84,7 +84,9 @@ bool ConditionNotifier::Listen(int timeout_ms, ReadableInfo* info) {
     uint64_t seq = indicator_->next_seq.load();
     if (seq != next_seq_) {
       auto idx = next_seq_ % kBufLength;
-      if (indicator_->seqs[idx] == next_seq_) {
+      auto actual_seq = indicator_->seqs[idx];
+      if (actual_seq >= next_seq_) {
+        next_seq_ = actual_seq;
         *info = indicator_->infos[idx];
         ++next_seq_;
         return true;
@@ -159,14 +161,14 @@ bool ConditionNotifier::OpenOnly() {
   // get managed_shm_
   int shmid = shmget(key_, 0, 0644);
   if (shmid == -1) {
-    AERROR << "get shm failed.";
+    AERROR << "get shm failed, error: " << strerror(errno);
     return false;
   }
 
   // attach managed_shm_
   managed_shm_ = shmat(shmid, nullptr, 0);
   if (managed_shm_ == reinterpret_cast<void*>(-1)) {
-    AERROR << "attach shm failed.";
+    AERROR << "attach shm failed, error: " << strerror(errno);
     return false;
   }
 

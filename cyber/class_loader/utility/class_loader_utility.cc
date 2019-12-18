@@ -60,7 +60,7 @@ std::string& GetCurLoadingLibraryNameReference() {
 }
 
 std::string GetCurLoadingLibraryName() {
-  return (GetCurLoadingLibraryNameReference());
+  return GetCurLoadingLibraryNameReference();
 }
 
 void SetCurLoadingLibraryName(const std::string& library_name) {
@@ -168,11 +168,7 @@ bool IsLibraryLoadedByAnybody(const std::string& library_path) {
 
   LibpathPocolibVector& opened_libraries = GetLibPathPocoShareLibVector();
   LibpathPocolibVector::iterator itr = FindLoadedLibrary(library_path);
-  if (itr != opened_libraries.end()) {
-    return true;
-  }
-
-  return false;
+  return itr != opened_libraries.end();
 }
 
 bool IsLibraryLoaded(const std::string& library_path,
@@ -236,14 +232,14 @@ bool LoadLibrary(const std::string& library_path, ClassLoader* loader) {
     SetCurActiveClassLoader(nullptr);
   }
 
-  if (nullptr == poco_library) {
-    AERROR << "poco sharedlibrary failed:" << library_path;
+  if (poco_library == nullptr) {
+    AERROR << "poco shared library failed: " << library_path;
     return false;
   }
 
   auto num_lib_objs = GetAllClassFactoryObjectsOfLibrary(library_path).size();
   if (num_lib_objs == 0) {
-    AWARN << "class factory objs counts is 0, maybe registerclass failed";
+    AWARN << "Class factory objs counts is 0, maybe registerclass failed.";
   }
 
   std::lock_guard<std::recursive_mutex> lck(GetLibPathPocoShareLibMutex());
@@ -259,7 +255,7 @@ void UnloadLibrary(const std::string& library_path, ClassLoader* loader) {
     LibpathPocolibVector& opened_libraries = GetLibPathPocoShareLibVector();
     LibpathPocolibVector::iterator itr = FindLoadedLibrary(library_path);
     if (itr == opened_libraries.end()) {
-      AERROR << "attempt to UnloadLibrary lib,but can't find lib "
+      AERROR << "Attempt to UnloadLibrary lib, but can't find lib: "
              << library_path;
       return;
     }

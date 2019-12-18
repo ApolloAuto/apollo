@@ -13,12 +13,14 @@ message VehicleInfo {
   enum Brand {
     LINCOLN = 1;
     FORD = 2;
+    LEXUS = 3;
   }
   optional Brand brand = 2;
   enum Model {
     // Lincoln model
     MKZ = 1;
     TRANSIT = 2;
+    RX450H = 3;
   }
   optional Model model = 3;
   optional apollo.canbus.License license = 4 [deprecated = true];

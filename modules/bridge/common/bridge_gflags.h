@@ -19,3 +19,4 @@
 #include "gflags/gflags.h"
 
 DECLARE_string(bridge_module_name);
+DECLARE_double(timeout);

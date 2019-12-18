@@ -6,7 +6,7 @@ Pandora is an all-in-one sensor kit for environmental sensing for self-driving c
 
 #### Mounting
 
-A customized mounting structure is required to successfully mount a Pandora kit on top of a vehicle. This structure must provide rigid support to the LiDAR system while raising the LiDAR to a certain height above the ground under driving conditions. This height should prevent the laser beams from the LiDAR being blocked by the front and/or rear of the vehicle. The actual height needed for the LiDAR depends on the design of the vehicle and the mounting point of the LiDAR relative to the vehicle. While planning the mounting height and angle, please read through the manual for additional details. 
+A customized mounting structure is required to successfully mount a Pandora kit on top of a vehicle. This structure must provide rigid support to the LiDAR system while raising the LiDAR to a certain height above the ground under driving conditions. This height should prevent the laser beams from the LiDAR being blocked by the front and/or rear of the vehicle. The actual height needed for the LiDAR depends on the design of the vehicle and the mounting point of the LiDAR relative to the vehicle. While planning the mounting height and angle, please read through the manual for additional details.
 
 ```
 If for some reason, the LiDAR beam has to be blocked by the vehicle, it might be necessary to apply a filter to remove these points while processing the data received.
@@ -14,7 +14,7 @@ If for some reason, the LiDAR beam has to be blocked by the vehicle, it might be
 
 #### Wiring
 
-Each Pandora includes a cable connection box and a corresponding cable bundle to connect to the power supply, the computer (ethernet) and the GPS timesync source. 
+Each Pandora includes a cable connection box and a corresponding cable bundle to connect to the power supply, the computer (ethernet) and the GPS timesync source.
 
 ![LiDAR_Cable](images/pandora_cable.png)
 
@@ -28,10 +28,10 @@ Each Pandora includes a cable connection box and a corresponding cable bundle to
 
 3. **Connection to the GPS**
 
-   The Pandora kit requires the recommended minimum specific GPS/Transit data (GPRMC) and pulse per second (PPS) signal to synchronize to GPS time. A customized connection is needed to establish the communication between the GPS receiver and the LiDAR. Please read your GPS manual for information on how to collect the output of those signals.  
+   The Pandora kit requires the recommended minimum specific GPS/Transit data (GPRMC) and pulse per second (PPS) signal to synchronize to GPS time. A customized connection is needed to establish the communication between the GPS receiver and the LiDAR. Please read your GPS manual for information on how to collect the output of those signals.
 
-   On the interface box, a GPS port (SM06B-SRSS-TB) is provided to send the GPS signals as an input to the LiDAR. The detailed pinout is shown in the image below. 
-    
+   On the interface box, a GPS port (SM06B-SRSS-TB) is provided to send the GPS signals as an input to the LiDAR. The detailed pinout is shown in the image below.
+
    | Pin # | Input/output | Comment                                         |
    | ----- | ------------ | ----------------------------------------------- |
    | 1     | Input        | PPS signal (3.3V)                               |

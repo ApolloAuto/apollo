@@ -4,11 +4,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "constraint_checker",
-    srcs = [
-        "constraint_checker.cc",
-    ],
-    hdrs = [
-        "constraint_checker.h",
+    srcs = ["constraint_checker.cc"],
+    hdrs = ["constraint_checker.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         "//cyber/common:log",
@@ -21,11 +20,10 @@ cc_library(
 
 cc_library(
     name = "constraint_checker1d",
-    srcs = [
-        "constraint_checker1d.cc",
-    ],
-    hdrs = [
-        "constraint_checker1d.h",
+    srcs = ["constraint_checker1d.cc"],
+    hdrs = ["constraint_checker1d.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         "//cyber/common:log",
@@ -38,11 +36,10 @@ cc_library(
 
 cc_library(
     name = "collision_checker",
-    srcs = [
-        "collision_checker.cc",
-    ],
-    hdrs = [
-        "collision_checker.h",
+    srcs = ["collision_checker.cc"],
+    hdrs = ["collision_checker.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
         "//cyber/common:log",

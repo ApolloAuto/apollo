@@ -46,7 +46,6 @@ using apollo::common::TrajectoryPoint;
 PiecewiseJerkSpeedOptimizer::PiecewiseJerkSpeedOptimizer(
     const TaskConfig& config)
     : SpeedOptimizer(config) {
-  SetName("PiecewiseJerkSpeedOptimizer");
   CHECK(config_.has_piecewise_jerk_speed_config());
 }
 
@@ -73,7 +72,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
   std::array<double, 3> init_s = {0.0, st_graph_data.init_point().v(),
                                   st_graph_data.init_point().a()};
   double delta_t = 0.1;
-  double total_length = st_graph_data.path_length_by_conf();
+  double total_length = st_graph_data.path_length();
   double total_time = st_graph_data.total_time_by_conf();
   int num_of_knots = static_cast<int>(total_time / delta_t) + 1;
 
@@ -93,13 +92,11 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
                      st_graph_data.init_point().v()));
   piecewise_jerk_problem.set_ddx_bounds(veh_param.max_deceleration(),
                                         veh_param.max_acceleration());
-  piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_bound);
-
-  // TODO(Hongyi): delete this when ready to use vehicle_params
-  piecewise_jerk_problem.set_ddx_bounds(-4.0, 2.0);
+  piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_lower_bound,
+                                        FLAGS_longitudinal_jerk_upper_bound);
 
   piecewise_jerk_problem.set_dx_ref(piecewise_jerk_speed_config.ref_v_weight(),
-                                    FLAGS_default_cruise_speed);
+                                    reference_line_info_->GetCruiseSpeed());
 
   // Update STBoundary
   std::vector<std::pair<double, double>> s_bounds;

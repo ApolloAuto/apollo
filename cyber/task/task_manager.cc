@@ -52,7 +52,9 @@ TaskManager::TaskManager()
   for (uint32_t i = 0; i < num_threads_; i++) {
     auto task_name = task_prefix + std::to_string(i);
     tasks_.push_back(common::GlobalData::RegisterTaskName(task_name));
-    scheduler::Instance()->CreateTask(factory, task_name);
+    if (!scheduler::Instance()->CreateTask(factory, task_name)) {
+      AERROR << "CreateTask failed:" << task_name;
+    }
   }
 }
 
@@ -62,7 +64,6 @@ void TaskManager::Shutdown() {
   if (stop_.exchange(true)) {
     return;
   }
-
   for (uint32_t i = 0; i < num_threads_; i++) {
     scheduler::Instance()->RemoveTask(task_prefix + std::to_string(i));
   }

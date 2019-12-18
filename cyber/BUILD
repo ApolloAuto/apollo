@@ -31,19 +31,13 @@ cc_binary(
 
 cc_library(
     name = "binary",
-    hdrs = [
-        "binary.h",
-    ],
+    hdrs = ["binary.h"],
 )
 
 cc_library(
     name = "state",
-    srcs = [
-        "state.cc",
-    ],
-    hdrs = [
-        "state.h",
-    ],
+    srcs = ["state.cc"],
+    hdrs = ["state.h"],
     deps = [
         "//cyber/common",
     ],
@@ -51,33 +45,27 @@ cc_library(
 
 cc_library(
     name = "init",
-    srcs = [
-        "init.cc",
-    ],
-    hdrs = [
-        "init.h",
-    ],
+    srcs = ["init.cc"],
+    hdrs = ["init.h"],
     deps = [
         "//cyber:state",
         "//cyber/logger:async_logger",
         "//cyber/node",
+        "//cyber/sysmo",
         "//cyber/timer:timing_wheel",
     ],
 )
 
 cc_library(
     name = "cyber_core",
-    srcs = [
-        "cyber.cc",
-    ],
-    hdrs = [
-        "cyber.h",
-    ],
+    srcs = ["cyber.cc"],
+    hdrs = ["cyber.h"],
     linkopts = [
         "-lglog",
         "-lgflags",
         "-lprotobuf",
         "-luuid",
+        "-lrt",
     ],
     deps = [
         "//cyber:binary",
@@ -110,6 +98,7 @@ cc_library(
         "//cyber/service",
         "//cyber/service:client",
         "//cyber/service_discovery:topology_manager",
+        "//cyber/sysmo",
         "//cyber/task",
         "//cyber/time",
         "//cyber/time:duration",

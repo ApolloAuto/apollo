@@ -33,7 +33,7 @@ class MenuItemCheckbox extends React.Component {
     render() {
         const {id, title, optionName, options, isCustomized} = this.props;
         return (
-            <ul>
+            <ul className="item">
                 <li id={id} onClick={() => {
                     options.toggle(optionName, isCustomized);
                     if (id === "perceptionPointCloud") {
@@ -87,7 +87,7 @@ class SubMenu extends React.Component {
                 });
             if (tabId === 'planning' && options.customizedToggles.size > 0) {
                 const extraEntries = options.customizedToggles.keys().map(pathName => {
-                    const title = _.startCase(pathName);
+                    const title = _.startCase(_.snakeCase(pathName));
                     return (
                         <MenuItemCheckbox
                             key={pathName} id={pathName} title={title}
@@ -99,21 +99,21 @@ class SubMenu extends React.Component {
                 entries = entries.concat(extraEntries);
             }
         } else if (tabType === 'radio') {
-            entries = Object.keys(data)
-                .map(key => {
-                    const item = data[key];
-                    if (options.togglesToHide[key]) {
-                        return null;
-                    }
+            // Now we only have camera tab using radio in menu
+            if (tabId === 'camera') {
+                const cameraAngles = Object.values(data)
+                    .filter(angle => PARAMETERS.options.cameraAngle[`has${angle}`] !== false);
+                entries = cameraAngles.map((item) => {
                     return (
-                        <RadioItem key={`${tabId}_${key}`} id={tabId}
-                                   onClick={() => {
+                        <RadioItem key={`${tabId}_${item}`} id={tabId}
+                                    onClick={() => {
                                             options.selectCamera(item);
-                                   }}
-                                   checked={options.cameraAngle === item}
-                                   title={item} options={options}/>
+                                    }}
+                                    checked={options.cameraAngle === item}
+                                    title={_.startCase(item)} options={options}/>
                     );
                 });
+            }
         }
         const result = (
             <div className="card">
@@ -131,7 +131,7 @@ class SubMenu extends React.Component {
 }
 
 @observer
-export default class Menu extends React.Component {
+export default class LayerMenu extends React.Component {
     render() {
         const { options } = this.props;
 

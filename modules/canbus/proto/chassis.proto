@@ -120,7 +120,8 @@ message Chassis {
   optional License license = 32 [deprecated = true];
 
   // Real gear location.
-  // optional int32 gear_location = 10 [deprecated = true]; deprecated use enum replace this [id 23]
+  // optional int32 gear_location = 10 [deprecated = true]; deprecated use enum
+  // replace this [id 23]
 
   optional apollo.common.VehicleID vehicle_id = 33;
 }

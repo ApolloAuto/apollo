@@ -12,7 +12,7 @@
     // Require a semi colon at the end of a statement.
     "semi": ["error", "always"],
     // Maximum line length is 100.
-    "max-len": ["error", 100],
+    "max-len": ["error", 100, { "ignoreStrings": true }],
     // Always require curly brackets.
     "curly": "error",
 

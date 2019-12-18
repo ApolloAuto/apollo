@@ -18,8 +18,6 @@
  * @file
  **/
 
-#define protected public
-#define private public
 #include "modules/planning/scenarios/narrow_street_u_turn/narrow_street_u_turn_scenario.h"
 
 #include "gtest/gtest.h"
@@ -41,20 +39,10 @@ class NarrowStreetUTurnTest : public ::testing::Test {
   std::unique_ptr<NarrowStreetUTurnScenario> scenario_;
 };
 
-TEST_F(NarrowStreetUTurnTest, VerifyConf) {
+TEST_F(NarrowStreetUTurnTest, Init) {
   FLAGS_scenario_narrow_street_u_turn_config_file =
       "/apollo/modules/planning/conf/scenario/"
       "narrow_street_u_turn_config.pb.txt";
-
-  ScenarioConfig config;
-  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_narrow_street_u_turn_config_file, &config));
-}
-
-TEST_F(NarrowStreetUTurnTest, Init) {
-  FLAGS_scenario_narrow_street_u_turn_config_file =
-      "/apollo/modules/planning/testdata/conf/"
-      "scenario/narrow_street_u_turn_config.pb.txt";
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(

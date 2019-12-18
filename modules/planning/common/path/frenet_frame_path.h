@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <utility>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -31,7 +32,7 @@ namespace planning {
 class FrenetFramePath : public std::vector<common::FrenetFramePoint> {
  public:
   FrenetFramePath() = default;
-  explicit FrenetFramePath(const std::vector<common::FrenetFramePoint> &points);
+  explicit FrenetFramePath(std::vector<common::FrenetFramePoint> points);
 
   double Length() const;
   common::FrenetFramePoint EvaluateByS(const double s) const;

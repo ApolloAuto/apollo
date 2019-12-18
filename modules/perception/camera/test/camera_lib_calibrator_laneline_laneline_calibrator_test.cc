@@ -16,6 +16,7 @@
 
 #include "modules/perception/camera/lib/calibrator/laneline/laneline_calibrator.h"
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
 #include "modules/perception/camera/test/camera_lib_calibrator_laneline_app_util.h"
 #include "modules/perception/camera/test/camera_lib_calibrator_laneline_lane_calibrator_util.h"
@@ -255,12 +256,11 @@ TEST(LanelineCalibratorTest, laneline_calibrator_test) {
     AINFO << "pitch_calib: " << pitch_calib;
     // end-of-process
 
-    std::string timediff_yawrate_velocity_text =
-        "time_diff_: " + std::to_string(calibrator.GetTimeDiff()).substr(0, 4) +
-        " | " +
-        "yaw_rate_: " + std::to_string(calibrator.GetYawRate()).substr(0, 4) +
-        " | " +
-        "velocity_: " + std::to_string(calibrator.GetVelocity()).substr(0, 4);
+    const std::string timediff_yawrate_velocity_text = absl::StrCat(
+        "time_diff_: ", std::to_string(calibrator.GetTimeDiff()).substr(0, 4),
+        " | yaw_rate_: ", std::to_string(calibrator.GetYawRate()).substr(0, 4),
+        " | velocity_: ",
+        std::to_string(calibrator.GetVelocity()).substr(0, 4));
     AINFO << timediff_yawrate_velocity_text;
 
     cv::Mat test_image_half_result;

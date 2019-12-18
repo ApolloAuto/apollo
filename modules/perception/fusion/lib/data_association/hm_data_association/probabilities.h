@@ -42,7 +42,7 @@ double ScalePositiveProbability(double p, double max_p, double th_p);
 
 // @brief: calculate the Welsh Loss
 // @return Welsh Loss of input dist
-// @NOTE: original method name is welsh_var_loss_fun
+// @NOTE: original method name is Welsh_var_loss_fun
 double WelshVarLossFun(double dist, double th, double scale);
 
 // @brief: fuse two probabilities, fused prob is greater than 0.5, if

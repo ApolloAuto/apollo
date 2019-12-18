@@ -35,6 +35,8 @@ LocalizationIntegProcess::LocalizationIntegProcess()
       integ_state_(IntegState::NOT_INIT),
       ins_pva_(),
       pva_covariance_{0.0},
+      corrected_imu_(),
+      earth_param_(),
       keep_running_(false),
       measure_data_queue_size_(150),
       delay_output_counter_(0) {}
@@ -102,6 +104,8 @@ void LocalizationIntegProcess::RawImuProcess(const ImuData &imu_msg) {
   // add imu msg and get current predict pose
   sins_->AddImu(imu_msg);
   sins_->GetPose(&ins_pva_, pva_covariance_);
+  sins_->GetRemoveBiasImu(&corrected_imu_);
+  sins_->GetEarthParameter(&earth_param_);
 
   if (sins_->IsSinsAligned()) {
     integ_state_ = IntegState::NOT_STABLE;
@@ -125,8 +129,6 @@ void LocalizationIntegProcess::RawImuProcess(const ImuData &imu_msg) {
   }
 
   pre_imu_time = cur_imu_time;
-
-  return;
 }
 
 void LocalizationIntegProcess::GetValidFromOK() {
@@ -140,14 +142,12 @@ void LocalizationIntegProcess::GetValidFromOK() {
       pva_covariance_[2][2] < 0.3 * 0.3 && pva_covariance_[8][8] < 0.1 * 0.1) {
     integ_state_ = IntegState::VALID;
   }
-  return;
 }
 
 void LocalizationIntegProcess::GetState(IntegState *state) {
   CHECK_NOTNULL(state);
 
   *state = integ_state_;
-  return;
 }
 
 void LocalizationIntegProcess::GetResult(IntegState *state,
@@ -226,7 +226,6 @@ void LocalizationIntegProcess::GetResult(IntegState *state,
   orientation_std_dev->set_x(std::sqrt(pva_covariance_[6][6]));
   orientation_std_dev->set_y(std::sqrt(pva_covariance_[7][7]));
   orientation_std_dev->set_z(std::sqrt(pva_covariance_[8][8]));
-  return;
 }
 
 void LocalizationIntegProcess::GetResult(IntegState *state, InsPva *sins_pva,
@@ -238,7 +237,19 @@ void LocalizationIntegProcess::GetResult(IntegState *state, InsPva *sins_pva,
   *state = integ_state_;
   *sins_pva = ins_pva_;
   memcpy(pva_covariance, pva_covariance_, sizeof(double) * 9 * 9);
-  return;
+}
+
+void LocalizationIntegProcess::GetCorrectedImu(ImuData *imu_data) {
+  CHECK_NOTNULL(imu_data);
+
+  *imu_data = corrected_imu_;
+}
+
+void LocalizationIntegProcess::GetEarthParameter(
+    InertialParameter *earth_param) {
+  CHECK_NOTNULL(earth_param);
+
+  *earth_param = earth_param_;
 }
 
 void LocalizationIntegProcess::MeasureDataProcess(
@@ -307,7 +318,6 @@ void LocalizationIntegProcess::MeasureDataProcessImpl(
   sins_->AddMeasurement(measure_msg);
 
   timer.End("time of integrated navigation measure update");
-  return;
 }
 
 bool LocalizationIntegProcess::CheckIntegMeasureData(

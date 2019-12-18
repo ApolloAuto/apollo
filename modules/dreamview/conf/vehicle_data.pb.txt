@@ -82,3 +82,31 @@ data_files {
   source_path: "cyber_conf"
   dest_path: "/apollo/cyber/conf"
 }
+data_files {
+  source_path: "teleop_conf/teleop/daemon_service_conf.pb.txt"
+  dest_path: "/apollo/modules/teleop/teleop/daemon_service_conf.pb.txt"
+}
+data_files {
+  source_path: "teleop_conf/voip/voip_decoder_conf.pb.txt"
+  dest_path: "/apollo/modules/teleop/voip/conf/voip_decoder_conf.pb.txt"
+}
+data_files {
+  source_path: "teleop_conf/voip/voip_encoder_conf.pb.txt"
+  dest_path: "/apollo/modules/teleop/voip/conf/voip_encoder_conf.pb.txt"
+}
+data_files {
+  source_path: "teleop_conf/teleop/daemon_service_conf.pb.txt"
+  dest_path: "/apollo/modules/teleop/teleop/conf/daemon_service_conf.pb.txt"
+}
+data_files {
+  source_path: "teleop_conf/network/modem_monitor_node_conf.pb.txt"
+  dest_path: "/apollo/modules/teleop/network/conf/modem_monitor_node_conf.pb.txt"
+}
+data_files {
+  source_path: "teleop_conf/network/modem_router_node_conf.pb.txt"
+  dest_path: "/apollo/modules/teleop/network/conf/modem_router_node_conf.pb.txt"
+}
+data_files {
+  source_path: "teleop_conf/network/initial_routes_and_filters.pb.txt"
+  dest_path: "/apollo/modules/teleop/network/conf/initial_routes_and_filters.pb.txt"
+}

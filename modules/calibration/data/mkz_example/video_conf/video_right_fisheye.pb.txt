@@ -1,0 +1,30 @@
+
+udp_port: 2001
+frame_id: "video_right_fisheye"
+pixel_format: "yuyv"
+trigger_param: "f2ff"
+metric_error_code: 33
+record:0
+width: 1920
+height: 1080
+frame_rate: 20
+monochrome: false
+brightness: -1
+contrast: -1
+saturation: -1
+sharpness: -1
+gain: -1
+auto_focus: false
+focus: -1
+auto_exposure: true
+exposure: 100
+auto_white_balance: true
+white_balance: 4000
+bytes_per_pixel: 3
+fpga_dev_number: 0
+camera_seq_number: 7
+
+compress_conf {
+    output_channel: "/apollo/sensor/camera/right_fisheye/video/compressed"
+    image_pool_size: 100
+}

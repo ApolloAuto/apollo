@@ -22,8 +22,18 @@
 namespace apollo {
 namespace cyber {
 
+/**
+ * @class ServiceBase
+ * @brief Base class for Service
+ *
+ */
 class ServiceBase {
  public:
+  /**
+   * @brief Construct a new Service Base object
+   *
+   * @param service_name name of this Service
+   */
   explicit ServiceBase(const std::string& service_name)
       : service_name_(service_name) {}
 
@@ -31,6 +41,9 @@ class ServiceBase {
 
   virtual void destroy() = 0;
 
+  /**
+   * @brief Get the service name
+   */
   const std::string& service_name() const { return service_name_; }
 
  protected:

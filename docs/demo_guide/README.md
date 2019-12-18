@@ -3,7 +3,8 @@
 Apollo provides a method to run simulation if you do not have the required
 hardware.
 
-First fork and then clone Apollo's GitHub code and then set up the docker release environment by following the instructions in the
+First fork and then clone Apollo's GitHub code and then set up the docker
+release environment by following the instructions in the
 [Install docker](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md#docker)
 section of the
 [Build and Release](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md)

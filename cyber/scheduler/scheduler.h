@@ -36,6 +36,7 @@
 #include "cyber/croutine/routine_factory.h"
 #include "cyber/proto/choreography_conf.pb.h"
 #include "cyber/scheduler/common/mutex_wrapper.h"
+#include "cyber/scheduler/common/pin_thread.h"
 
 namespace apollo {
 namespace cyber {
@@ -66,11 +67,15 @@ class Scheduler {
   uint32_t TaskPoolSize() { return task_pool_size_; }
 
   virtual bool RemoveTask(const std::string& name) = 0;
+
+  void ProcessLevelResourceControl();
   void SetInnerThreadAttr(const std::string& name, std::thread* thr);
 
   virtual bool DispatchTask(const std::shared_ptr<CRoutine>&) = 0;
   virtual bool NotifyProcessor(uint64_t crid) = 0;
   virtual bool RemoveCRoutine(uint64_t crid) = 0;
+
+  void CheckSchedStatus();
 
   void SetInnerThreadConfs(
       const std::unordered_map<std::string, InnerThread>& confs) {
@@ -79,7 +84,6 @@ class Scheduler {
 
  protected:
   Scheduler() : stop_(false) {}
-  void ParseCpuset(const std::string&, std::vector<int>*);
 
   AtomicRWLock id_cr_lock_;
   AtomicHashMap<uint64_t, MutexWrapper*> id_map_mutex_;
@@ -91,6 +95,7 @@ class Scheduler {
 
   std::unordered_map<std::string, InnerThread> inner_thr_confs_;
 
+  std::string process_level_cpuset_;
   uint32_t proc_num_ = 0;
   uint32_t task_pool_size_ = 0;
   std::atomic<bool> stop_;

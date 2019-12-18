@@ -16,6 +16,7 @@
 
 #include <boost/program_options.hpp>
 
+#include "cyber/common/log.h"
 #include "modules/localization/msf/local_tool/map_creation/poses_interpolation/poses_interpolation.h"
 
 int main(int argc, char **argv) {
@@ -40,7 +41,7 @@ int main(int argc, char **argv) {
       !boost_args.count("ref_timestamps_path") ||
       !boost_args.count("extrinsic_path") ||
       !boost_args.count("output_poses_path")) {
-    std::cout << boost_desc << std::endl;
+    AERROR << boost_desc;
     return 0;
   }
 

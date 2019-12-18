@@ -16,6 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
+import math
 import numpy as np
 
 class LatAcceleration:
@@ -29,12 +30,15 @@ class LatAcceleration:
         centripetal_jerk = 2 * init_point.v * init_point.a \
             * init_point.path_point.kappa + init_point.v \
                 * init_point.v * init_point.path_point.dkappa
-        self.centripetal_jerk_list.append(centripetal_jerk)
+        if not math.isnan(centripetal_jerk):
+            self.centripetal_jerk_list.append(centripetal_jerk)
 
         # centripetal_accel
         centripetal_accel = init_point.v * init_point.v \
             * init_point.path_point.kappa
-        self.centripetal_accel_list.append(centripetal_accel)
+
+        if not math.isnan(centripetal_accel):
+            self.centripetal_accel_list.append(centripetal_accel)
 
     def get_acceleration(self):
         # [1, 2) [-2, -1)

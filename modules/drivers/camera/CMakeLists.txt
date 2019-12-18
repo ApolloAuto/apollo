@@ -99,7 +99,7 @@ install(DIRECTORY launch/
   FILES_MATCHING PATTERN "*.launch"
 )
 
-# Copy libjsoncpp.so 
+# Copy libjsoncpp.so
 install(
   DIRECTORY /usr/local/apollo/jsoncpp/lib
   DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}/..

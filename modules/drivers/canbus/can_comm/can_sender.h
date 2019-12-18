@@ -70,7 +70,7 @@ class SenderMessage {
    * @param protocol_data A pointer of ProtocolData
    *        which contains the content to send.
    * @param init_with_one If it is true, then initialize all bits in
-   *        the protocal data as one.
+   *        the protocol data as one.
    */
   SenderMessage(const uint32_t message_id,
                 ProtocolData<SensorType> *protocol_data, bool init_with_one);
@@ -78,7 +78,7 @@ class SenderMessage {
   /**
    * @brief Destructor.
    */
-  ~SenderMessage() = default;
+  virtual ~SenderMessage() = default;
 
   /**
    * @brief Update the current period for sending messages by a difference.
@@ -155,7 +155,7 @@ class CanSender {
    * @param protocol_data A pointer of ProtocolData
    *        which contains the content to send.
    * @param init_with_one If it is true, then initialize all bits in
-   *        the protocal data as one. By default, it is false.
+   *        the protocol data as one. By default, it is false.
    */
   void AddMessage(uint32_t message_id, ProtocolData<SensorType> *protocol_data,
                   bool init_one = false);
@@ -287,8 +287,7 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
   AINFO << "Can client sender thread starts.";
 
   while (is_running_) {
-    tm_start =
-        common::time::AsInt64<common::time::micros>(common::time::Clock::Now());
+    tm_start = absl::ToUnixMicros(common::time::Clock::Now());
     new_delta_period = INIT_PERIOD;
 
     for (auto &message : send_messages_) {
@@ -310,8 +309,7 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
       }
     }
     delta_period = new_delta_period;
-    tm_end =
-        common::time::AsInt64<common::time::micros>(common::time::Clock::Now());
+    tm_end = absl::ToUnixMicros(common::time::Clock::Now());
     sleep_interval = delta_period - (tm_end - tm_start);
 
     if (sleep_interval > 0) {

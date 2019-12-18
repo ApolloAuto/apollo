@@ -16,17 +16,10 @@
 
 #include "modules/prediction/scenario/scenario_manager.h"
 
-#include <algorithm>
-
 #include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
 namespace prediction {
-
-using apollo::perception::PerceptionObstacle;
-using common::adapter::AdapterConfig;
-using common::math::Box2d;
-using common::math::Vec2d;
 
 ScenarioManager::ScenarioManager() {}
 

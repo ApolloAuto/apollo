@@ -61,4 +61,6 @@ message ControlConf {
 
   optional double query_relative_time = 35;
   optional double minimum_speed_protection = 36;
+
+  optional double max_path_remain_when_stopped = 37 [default = 0.3];
 }

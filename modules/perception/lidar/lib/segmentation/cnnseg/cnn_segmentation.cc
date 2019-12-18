@@ -26,6 +26,7 @@
 #include "modules/perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/proto/cnnseg_config.pb.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/util.h"
+#include "modules/perception/lidar/lib/segmentation/ncut/ncut_segmentation.h"
 
 namespace apollo {
 namespace perception {
@@ -126,6 +127,14 @@ bool CNNSegmentation::Init(const SegmentationInitOptions& options) {
   // init cluster and background segmentation methods
   CHECK(InitClusterAndBackgroundSegmentation());
 
+  // secondary segmentor
+  /*if (cnnseg_param_.fill_recall_with_ncut()) {
+     secondary_segmentor.reset(new NCutSegmentation());
+     if(!secondary_segmentor->Init(SegmentationInitOptions())) {
+         AERROR<<"initialized secondary segmentor fails";
+         return false;
+     }
+  }*/
   return true;
 }
 
@@ -337,6 +346,9 @@ void CNNSegmentation::GetObjectsFromSppEngine(
   memcpy(&original_world_cloud_->mutable_points_height()->at(0),
          &original_cloud_->points_height().at(0),
          sizeof(float) * original_cloud_->size());
+  memcpy(&original_world_cloud_->mutable_points_label()->at(0),
+         &original_cloud_->points_label().at(0),
+         sizeof(uint8_t) * original_cloud_->size());
   if (cnnseg_param_.remove_ground_points()) {
     num_foreground = spp_engine_.RemoveGroundPointsInForegroundCluster(
         original_cloud_, lidar_frame_ref_->roi_indices,
@@ -350,6 +362,16 @@ void CNNSegmentation::GetObjectsFromSppEngine(
   objects->clear();
   base::ObjectPool::Instance().BatchGet(clusters.size(), objects);
   size_t valid = 0;
+
+  // prepare for valid point cloud for seconary segmentor
+  // after removing pts from primary segmentor, ground and non roi pts
+  /*CloudMask mask;
+  if (cnnseg_param_.fill_recall_with_ncut()) {
+     mask.Set(original_cloud_.size(), 0);
+     mask.AddIndicesOfIndices(lidar_frame_ref->roi_indices,
+  lidar_frame_ref->non_ground_indices, 1);
+  }*/
+
   for (int i = 0; i < static_cast<int>(clusters.size()); ++i) {
     if (clusters[i]->points.size() <= cnnseg_param_.min_pts_num() &&
         clusters[i]->pixels.size() < cnnseg_param_.min_pts_num()) {
@@ -367,6 +389,14 @@ void CNNSegmentation::GetObjectsFromSppEngine(
                                                   cluster->point_ids);
     object->lidar_supplement.cloud_world.CopyPointCloud(*original_world_cloud_,
                                                         cluster->point_ids);
+
+    // for miss detection, try to fill recall with ncut
+    /*if (cnnseg_param_.fill_recall_with_ncut()) {
+         base::PointIndices ind;
+         ind.indices = cluster->point_ids; // ? valid
+         mask.RemoveIndices(ind);
+    }*/
+
     // for (auto& id : cluster->point_ids) {
     //  original_cloud_->points_label(id)
     //    = static_cast<uint8_t>(LidarPointLabel::OBJECT);
@@ -399,6 +429,7 @@ void CNNSegmentation::GetObjectsFromSppEngine(
                         std::max_element(object->type_probs.begin(),
                                          object->type_probs.end())));
     }
+
     if (cnnseg_param_.do_heading()) {
       // object->theta = cluster->yaw;
       // object->direction[0] = cos(cluster->yaw);
@@ -415,6 +446,14 @@ void CNNSegmentation::GetObjectsFromSppEngine(
     ++valid;
   }
   objects->resize(valid);
+
+  // add additional object seg logic with ncut if cnnseg miss detects
+  /*if (cnnseg_param_.fill_recall_with_ncut() && secondary_segmentor) {
+      mask.GetValidIndices(lidar_frame_ref_->secondary_indices);
+      secondary_segmentor->Segment(SegmentationOptions(), lidar_frame_ref_);
+  //segment based on lidar frame ref
+  }*/
+
   collect_time_ = timer.toc(true);
 }
 
@@ -439,9 +478,15 @@ bool CNNSegmentation::GetConfigs(std::string* param_file,
   CNNSegConfig config;
   CHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config))
       << "Failed to parse CNNSeg config file";
-  *param_file = GetAbsolutePath(work_root, config.param_file());
-  *proto_file = GetAbsolutePath(work_root, config.proto_file());
-  *weight_file = GetAbsolutePath(work_root, config.weight_file());
+  if (config.use_paddle()) {
+    *proto_file = GetAbsolutePath(work_root, config.paddle_proto_file());
+    *weight_file = GetAbsolutePath(work_root, config.paddle_weight_file());
+    *param_file = GetAbsolutePath(work_root, config.paddle_param_file());
+  } else {
+    *proto_file = GetAbsolutePath(work_root, config.proto_file());
+    *weight_file = GetAbsolutePath(work_root, config.weight_file());
+    *param_file = GetAbsolutePath(work_root, config.param_file());
+  }
   *engine_file = GetAbsolutePath(work_root, config.engine_file());
 
   return true;

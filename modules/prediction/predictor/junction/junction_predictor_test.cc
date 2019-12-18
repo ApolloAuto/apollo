@@ -49,13 +49,14 @@ TEST_F(JunctionPredictorTest, InJunctionCase) {
   EXPECT_EQ(perception_obstacle.id(), 1);
   JunctionMLPEvaluator junction_mlp_evaluator;
   ObstaclesContainer container;
+  ADCTrajectoryContainer adc_trajectory_container;
   container.Insert(perception_obstacles_);
   container.BuildJunctionFeature();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_NE(obstacle_ptr, nullptr);
-  junction_mlp_evaluator.Evaluate(obstacle_ptr);
+  junction_mlp_evaluator.Evaluate(obstacle_ptr, &container);
   JunctionPredictor predictor;
-  predictor.Predict(obstacle_ptr);
+  predictor.Predict(&adc_trajectory_container, obstacle_ptr, &container);
   // EXPECT_EQ(predictor.NumOfTrajectories(), 2);
 }
 

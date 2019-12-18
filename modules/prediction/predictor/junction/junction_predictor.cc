@@ -33,10 +33,18 @@ using apollo::hdmap::LaneInfo;
 using apollo::prediction::math_util::ComputePolynomial;
 using apollo::prediction::math_util::EvaluateCubicPolynomial;
 
-void JunctionPredictor::Predict(Obstacle* obstacle) {
+JunctionPredictor::JunctionPredictor() {
+  predictor_type_ = ObstacleConf::JUNCTION_PREDICTOR;
+}
+
+bool JunctionPredictor::Predict(
+    const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
+    ObstaclesContainer* obstacles_container) {
   Clear();
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
+
+  obstacle->SetPredictorType(predictor_type_);
 
   const Feature& latest_feature = obstacle->latest_feature();
   std::vector<JunctionExit> junction_exits =
@@ -50,6 +58,7 @@ void JunctionPredictor::Predict(Obstacle* obstacle) {
     obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
         trajectory);
   }
+  return true;
 }
 
 void JunctionPredictor::DrawJunctionTrajectoryPoints(
@@ -128,7 +137,6 @@ void JunctionPredictor::DrawJunctionTrajectoryPoints(
     }
     t += period;
   }
-  return;
 }
 
 std::vector<JunctionExit> JunctionPredictor::MostLikelyJunctions(

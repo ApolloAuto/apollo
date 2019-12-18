@@ -88,7 +88,7 @@ void SocketInput::Init(uint32_t port) {
 
   const int rbuf = 4 * 1024 * 1024;
   if (setsockopt(sockfd_, SOL_SOCKET, SO_RCVBUF, &rbuf, sizeof(int)) < 0) {
-    AERROR << "Failed to enable socket recieve buffer.";
+    AERROR << "Failed to enable socket receive buffer.";
   }
 
   int enable = 1;
@@ -131,7 +131,7 @@ int SocketInput::GetFramePacket(std::shared_ptr<CompressedImage> h265Pb) {
       }
     }
 
-    AINFO << "Recived pdu length: " << pdu_len << " from port: " << port_;
+    AINFO << "Received pdu length: " << pdu_len << " from port: " << port_;
     HwPduPacket *pdu_pkg = reinterpret_cast<HwPduPacket *>(&pdu_[0]);
     uint16_t local_seq = ntohs(pdu_pkg->rtp_header.seq);
     AINFO << "Package seq number: " << local_seq;

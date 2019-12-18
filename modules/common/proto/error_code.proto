@@ -11,6 +11,7 @@ enum ErrorCode {
   CONTROL_ERROR = 1000;
   CONTROL_INIT_ERROR = 1001;
   CONTROL_COMPUTE_ERROR = 1002;
+  CONTROL_ESTOP_ERROR = 1003;
 
   // Canbus module error codes start from here.
   CANBUS_ERROR = 2000;
@@ -65,6 +66,9 @@ enum ErrorCode {
   // Driver error codes.
   DRIVER_ERROR_GNSS = 12000;
   DRIVER_ERROR_VELODYNE = 13000;
+
+  // Storytelling error codes.
+  STORYTELLING_ERROR = 14000;
 }
 
 message StatusPb {

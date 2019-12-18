@@ -67,7 +67,7 @@ def gen_report_cpp(car_type, protocol, output_dir):
         classname = protocol["name"].replace('_', '').capitalize()
         fmt_val["classname"] = classname
         protocol_id = int(protocol["id"].upper(), 16)
-        if id > 2048:
+        if protocol_id > 2048:
             fmt_val["id_upper"] = gen_esd_can_extended(protocol["id"].upper())
         else:
             fmt_val["id_upper"] = protocol["id"].upper()
@@ -111,7 +111,7 @@ def gen_report_value_offset_precision(var, protocol):
     impl = ""
     if var["is_signed_var"]:
         fmt = "\n  x <<= %d;\n  x >>= %d;\n"
-        # x is a int32_t var
+        # x is an int32_t var
         shift_bit = 32 - var["len"]
         impl = impl + fmt % (shift_bit, shift_bit)
 
@@ -322,9 +322,9 @@ def gen_control_value_func_impl(classname, var, protocol):
     """
     impl = ""
     if var["len"] > 32:
-        print "This generator not support big than four bytes var." + \
+        print("This generator not support big than four bytes var." + \
               "protocol classname: %s, var_name:%s " % (
-                  class_name, var["name"])
+                  class_name, var["name"]))
         return impl
 
     fmt = """
@@ -372,7 +372,7 @@ def gen_control_cpp(car_type, protocol, output_dir):
         fmt_val["car_type_lower"] = car_type
         fmt_val["protocol_name_lower"] = protocol["name"]
         protocol_id = int(protocol["id"].upper(), 16)
-        if id > 2048:
+        if protocol_id > 2048:
             fmt_val["id_upper"] = gen_esd_can_extended(protocol["id"].upper())
         else:
             fmt_val["id_upper"] = protocol["id"].upper()
@@ -436,7 +436,7 @@ def gen_protocols(protocol_conf_file, protocol_dir):
     """
         doc string:
     """
-    print "Generating protocols"
+    print("Generating protocols")
     if not os.path.exists(protocol_dir):
         os.makedirs(protocol_dir)
     with open(protocol_conf_file, 'r') as fp:
@@ -454,7 +454,7 @@ def gen_protocols(protocol_conf_file, protocol_dir):
                 gen_control_cpp(car_type, protocol, protocol_dir)
 
             else:
-                print "Unknown protocol_type:%s" % protocol["protocol_type"]
+                print("Unknown protocol_type:%s" % protocol["protocol_type"])
         gen_build_file(car_type, protocol_dir)
 
 def gen_esd_can_extended(str):
@@ -469,8 +469,8 @@ def gen_esd_can_extended(str):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print "Usage:\npython %s some_config.yml" % sys.argv[0]
-        sys.exit(1)
+        print("Usage:\npython %s some_config.yml" % sys.argv[0])
+        sys.exit(0)
     with open(sys.argv[1], 'r') as fp:
         conf = yaml.load(fp)
     protocol_conf = conf["protocol_conf"]

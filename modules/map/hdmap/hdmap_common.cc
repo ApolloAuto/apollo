@@ -168,7 +168,7 @@ void LaneInfo::Init() {
 
   if (lane_.has_type()) {
     if (lane_.type() == Lane::CITY_DRIVING) {
-      constexpr double kMinHalfWidth = 1.05;
+      static constexpr double kMinHalfWidth = 1.05;
       for (const auto &p : sampled_left_width_) {
         if (p.second < kMinHalfWidth) {
           AERROR
@@ -627,7 +627,7 @@ void StopSignInfo::UpdateOverlaps(const HDMapImpl &map_instance) {
       }
     }
   }
-  if (overlap_junction_ids_.size() <= 0) {
+  if (overlap_junction_ids_.empty()) {
     AWARN << "stop sign " << id().id() << "has no overlap with any junction.";
   }
 }

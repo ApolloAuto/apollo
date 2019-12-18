@@ -37,18 +37,52 @@ namespace cyber {
 using apollo::cyber::common::GlobalData;
 using apollo::cyber::proto::RoleAttributes;
 
+/**
+ * @brief .
+ * The Component can process up to four channels of messages. The message type
+ * is specified when the component is created. The Component is inherited from
+ * ComponentBase. Your component can inherit from Component, and implement
+ * Init() & Proc(...), They are picked up by the CyberRT. There are 4
+ * specialization implementations.
+ *
+ * @tparam M0 the first message.
+ * @tparam M1 the second message.
+ * @tparam M2 the third message.
+ * @tparam M3 the fourth message.
+ * @warning The Init & Proc functions need to be overloaded, but don't want to
+ * be called. They are called by the CyberRT Frame.
+ *
+ */
 template <typename M0 = NullType, typename M1 = NullType,
           typename M2 = NullType, typename M3 = NullType>
 class Component : public ComponentBase {
  public:
   Component() {}
   ~Component() override {}
+
+  /**
+   * @brief init the component by protobuf object.
+   *
+   * @param config which is defined in 'cyber/proto/component_conf.proto'
+   *
+   * @return returns true if successful, otherwise returns false
+   */
   bool Initialize(const ComponentConfig& config) override;
   bool Process(const std::shared_ptr<M0>& msg0, const std::shared_ptr<M1>& msg1,
                const std::shared_ptr<M2>& msg2,
                const std::shared_ptr<M3>& msg3);
 
  private:
+  /**
+   * @brief The process logical of yours.
+   *
+   * @param msg0 the first channel message.
+   * @param msg1 the second channel message.
+   * @param msg2 the third channel message.
+   * @param msg3 the fourth channel message.
+   *
+   * @return returns true if successful, otherwise returns false
+   */
   virtual bool Proc(const std::shared_ptr<M0>& msg0,
                     const std::shared_ptr<M1>& msg1,
                     const std::shared_ptr<M2>& msg2,
@@ -160,7 +194,7 @@ bool Component<M0, NullType, NullType, NullType>::Initialize(
 
   std::shared_ptr<Reader<M0>> reader = nullptr;
 
-  if (likely(is_reality_mode)) {
+  if (cyber_likely(is_reality_mode)) {
     reader = node_->CreateReader<M0>(reader_cfg);
   } else {
     reader = node_->CreateReader<M0>(reader_cfg, func);
@@ -172,7 +206,7 @@ bool Component<M0, NullType, NullType, NullType>::Initialize(
   }
   readers_.emplace_back(std::move(reader));
 
-  if (unlikely(!is_reality_mode)) {
+  if (cyber_unlikely(!is_reality_mode)) {
     return true;
   }
 
@@ -224,7 +258,7 @@ bool Component<M0, M1, NullType, NullType>::Initialize(
   reader_cfg.pending_queue_size = config.readers(0).pending_queue_size();
 
   std::shared_ptr<Reader<M0>> reader0 = nullptr;
-  if (likely(is_reality_mode)) {
+  if (cyber_likely(is_reality_mode)) {
     reader0 = node_->template CreateReader<M0>(reader_cfg);
   } else {
     std::weak_ptr<Component<M0, M1>> self =
@@ -254,7 +288,7 @@ bool Component<M0, M1, NullType, NullType>::Initialize(
   readers_.push_back(std::move(reader0));
   readers_.push_back(std::move(reader1));
 
-  if (unlikely(!is_reality_mode)) {
+  if (cyber_unlikely(!is_reality_mode)) {
     return true;
   }
 
@@ -326,7 +360,7 @@ bool Component<M0, M1, M2, NullType>::Initialize(
   reader_cfg.qos_profile.CopyFrom(config.readers(0).qos_profile());
   reader_cfg.pending_queue_size = config.readers(0).pending_queue_size();
   std::shared_ptr<Reader<M0>> reader0 = nullptr;
-  if (likely(is_reality_mode)) {
+  if (cyber_likely(is_reality_mode)) {
     reader0 = node_->template CreateReader<M0>(reader_cfg);
   } else {
     std::weak_ptr<Component<M0, M1, M2, NullType>> self =
@@ -362,7 +396,7 @@ bool Component<M0, M1, M2, NullType>::Initialize(
   readers_.push_back(std::move(reader1));
   readers_.push_back(std::move(reader2));
 
-  if (unlikely(!is_reality_mode)) {
+  if (cyber_unlikely(!is_reality_mode)) {
     return true;
   }
 
@@ -443,7 +477,7 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
   reader_cfg.pending_queue_size = config.readers(0).pending_queue_size();
 
   std::shared_ptr<Reader<M0>> reader0 = nullptr;
-  if (likely(is_reality_mode)) {
+  if (cyber_likely(is_reality_mode)) {
     reader0 = node_->template CreateReader<M0>(reader_cfg);
   } else {
     std::weak_ptr<Component<M0, M1, M2, M3>> self =
@@ -486,7 +520,7 @@ bool Component<M0, M1, M2, M3>::Initialize(const ComponentConfig& config) {
   readers_.push_back(std::move(reader2));
   readers_.push_back(std::move(reader3));
 
-  if (unlikely(!is_reality_mode)) {
+  if (cyber_unlikely(!is_reality_mode)) {
     return true;
   }
 

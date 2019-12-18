@@ -43,7 +43,7 @@ void LoadPcds(const std::string& file_path, const unsigned int frame_index,
   pcl::PointCloud<PointXYZIT>::Ptr cloud(new pcl::PointCloud<PointXYZIT>);
   if (pcl::io::loadPCDFile(file_path, *cloud) >= 0) {
     if (cloud->height == 1 || cloud->width == 1) {
-      AERROR << "Un-organized-point-cloud";
+      AINFO << "Un-organized-point-cloud";
       for (unsigned int i = 0; i < cloud->size(); ++i) {
         Eigen::Vector3d pt3d;
         pt3d[0] = (*cloud)[i].x;
@@ -111,7 +111,7 @@ void LoadPcdPoses(const std::string& file_path,
     double timestamp;
     double x, y, z;
     double qx, qy, qz, qr;
-    constexpr int kSize = 9;
+    static constexpr int kSize = 9;
     while (fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf\n", &index,
                   &timestamp, &x, &y, &z, &qx, &qy, &qz, &qr) == kSize) {
       Eigen::Translation3d trans(Eigen::Vector3d(x, y, z));
@@ -141,7 +141,7 @@ void LoadPosesAndStds(const std::string& file_path,
     double x, y, z;
     double qx, qy, qz, qr;
     double std_x, std_y, std_z;
-    constexpr int kSize = 12;
+    static constexpr int kSize = 12;
     while (fscanf(file, "%u %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
                   &index, &timestamp, &x, &y, &z, &qx, &qy, &qz, &qr, &std_x,
                   &std_y, &std_z) == kSize) {

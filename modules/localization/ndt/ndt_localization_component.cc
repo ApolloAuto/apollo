@@ -31,7 +31,6 @@ NDTLocalizationComponent::NDTLocalizationComponent()
     : localization_(new NDTLocalization()) {}
 
 bool NDTLocalizationComponent::Init() {
-  Clock::SetMode(Clock::CYBER);
   tf2_broadcaster_.reset(new apollo::transform::TransformBroadcaster(node_));
   if (!InitConfig()) {
     AERROR << "Init Config false.";

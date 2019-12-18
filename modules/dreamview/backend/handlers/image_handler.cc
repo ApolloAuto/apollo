@@ -53,7 +53,8 @@ void ImageHandler::OnImage(const std::shared_ptr<Image> &image) {
 template <>
 void ImageHandler::OnImage(
     const std::shared_ptr<CompressedImage> &compressed_image) {
-  if (requests_ == 0) {
+  if (requests_ == 0 ||
+      compressed_image->format() == "h265" /* skip video format */) {
     return;
   }
 

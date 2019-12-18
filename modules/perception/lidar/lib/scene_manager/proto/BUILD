@@ -11,9 +11,7 @@ cc_proto_library(
 
 proto_library(
     name = "scene_manager_config_proto_lib",
-    srcs = [
-        "scene_manager_config.proto",
-    ],
+    srcs = ["scene_manager_config.proto"],
 )
 
 cpplint()

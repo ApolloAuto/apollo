@@ -1,0 +1,12 @@
+module_config {
+    module_library: "/apollo/bazel-bin/modules/bridge/libudp_bridge_receiver_component.so"
+
+    components {
+
+        class_name: "UDPBridgeReceiverComponent<canbus::Chassis>"
+        config {
+            name: "bridge_receiver_Chassis"
+            config_file_path: "/apollo/modules/bridge/conf/udp_bridge_receiver_chassis.pb.txt"
+      }
+   }
+}

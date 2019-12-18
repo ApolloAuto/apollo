@@ -20,15 +20,47 @@ DEFINE_string(control_conf_file,
               "/apollo/modules/control/conf/control_conf.pb.txt",
               "default control conf data file");
 
+DEFINE_string(control_common_conf_file,
+              "/apollo/modules/control/conf/control_common_conf.pb.txt",
+              "common control conf data file");
+
+DEFINE_string(mpc_controller_conf_file,
+              "/apollo/modules/control/conf/mpc_controller_conf.pb.txt",
+              "mpc controller conf data file");
+
+DEFINE_string(lateral_controller_conf_file,
+              "/apollo/modules/control/conf/lateral_controller_conf.pb.txt",
+              "lateral controller conf data file");
+
+DEFINE_string(
+    longitudinal_controller_conf_file,
+    "/apollo/modules/control/conf/longitudinal_controller_conf.pb.txt",
+    "longitudinal controller conf data file");
+
+DEFINE_string(calibration_table_file,
+              "/apollo/modules/control/conf/calibration_table.pb.txt",
+              "calibration table file");
+
 DEFINE_bool(enable_csv_debug, false, "True to write out csv debug file.");
 DEFINE_bool(enable_speed_station_preview, true, "enable speed/station preview");
+
 DEFINE_string(control_node_name, "control", "The control node name in proto");
+
+DEFINE_string(mpc_controller_submodule_name, "MPCControllerSubmodule",
+              "MPC controller node name in proto");
+
+DEFINE_string(lat_lon_controller_submodule_name, "LatLonControllerSubmodule",
+              "lateral+longitudinal controller node name in proto");
+
+DEFINE_string(preprocessor_submodule_name, "PreprocessorSubmodule",
+              "preprocessor submodule name in proto");
+
+DEFINE_string(postprocessor_submodule_name, "PostprocessorSubmodule",
+              "postprocessor submodule name in proto");
+
 DEFINE_bool(is_control_test_mode, false, "True to run control in test mode");
 DEFINE_bool(use_preview_speed_for_table, false,
             "True to use preview speed for table lookup");
-
-DEFINE_double(max_acceleration_when_stopped, 0.01,
-              "max acceleration can be observed when vehicle is stopped");
 
 DEFINE_double(steer_angle_rate, 100.0,
               "Steer angle change rate in percentage.");
@@ -65,3 +97,24 @@ DEFINE_bool(
     trajectory_transform_to_com_drive, false,
     "Enable planning trajectory coordinate transformation from center of "
     "rear-axis to center of mass, during forward driving");
+
+DEFINE_bool(enable_maximum_steer_rate_limit, false,
+            "Enable steer rate limit obtained from vehicle_param.pb.txt");
+
+DEFINE_bool(query_time_nearest_point_only, false,
+            "only use the trajectory point at nearest time as target point");
+
+DEFINE_bool(query_forward_time_point_only, false,
+            "only use the trajectory point in future");
+
+DEFINE_bool(enable_feedback_augment_on_high_speed, false,
+            "Enable augmented control on lateral error on high speed");
+
+DEFINE_bool(
+    enable_gear_drive_negative_speed_protection, false,
+    "Enable estop to prevent following negative speed during gear drive");
+
+DEFINE_bool(use_osqp_solver, false, "use OSQP solver for MPC controller");
+
+DEFINE_bool(use_control_submodules, false,
+            "use control submodules instead of controller agent");

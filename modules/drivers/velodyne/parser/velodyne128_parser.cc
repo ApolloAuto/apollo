@@ -115,7 +115,7 @@ void Velodyne128Parser::Unpack(const VelodynePacket& pkt,
       uint64_t timestamp = static_cast<uint64_t>(GetTimestamp(
           basetime, (*inner_time_)[block][j], static_cast<uint16_t>(block)));
       if (!is_scan_valid(azimuth, distance)) {
-        // todo orgnized
+        // todo organized
         if (config_.organized()) {
           apollo::drivers::PointXYZIT* point_new = pc->add_point();
           point_new->set_x(nan);

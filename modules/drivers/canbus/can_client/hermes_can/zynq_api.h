@@ -29,7 +29,7 @@
 #define ZYNQ_DEV_NAME_CAN "zynq_can"
 
 /*
- * ioctl argument defintion for CAN send/recv
+ * ioctl argument definition for CAN send/recv
  */
 typedef struct ioc_bcan_msg {
   bcan_msg_t *ioc_msgs;

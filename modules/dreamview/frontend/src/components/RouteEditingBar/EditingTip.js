@@ -49,6 +49,37 @@ For Mobile device:
         });
     }
 
+    renderTipContent() {
+        return (
+            <table>
+                <thead>
+                    <tr>
+                        <th />
+                        <th>Zooming</th>
+                        <th>Panning</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Mouse</td>
+                        <td>Scroll your mouse wheel</td>
+                        <td>Right-click and drag</td>
+                    </tr>
+                    <tr>
+                        <td>Trackpad</td>
+                        <td>Pinch or spread with two fingers</td>
+                        <td>Press and swipe with two fingers</td>
+                    </tr>
+                    <tr>
+                        <td>Keyboard</td>
+                        <td>-</td>
+                        <td>Press arrow keys</td>
+                    </tr>
+                </tbody>
+            </table>
+        );
+    }
+
     render() {
         const textStyle = {
             display: this.state.active ? 'block' : 'none'
@@ -64,7 +95,10 @@ For Mobile device:
                  onMouseOver={this.handleMouseIn}
                  onMouseOut={this.handleMouseOut}>
                 <img src={helpIcon} />
-                <p style={textStyle}>{this.text}</p>
+                <div style={textStyle} className="tip-popup">
+                    <div className="title">To navigate through the map</div>
+                    {this.renderTipContent()}
+                </div>
             </button>
         );
     }

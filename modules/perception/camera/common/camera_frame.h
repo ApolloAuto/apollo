@@ -56,6 +56,7 @@ struct CameraFrame {
   // feature of all detected object ( num x dim)
   // detect lane mark info
   std::vector<base::LaneLine> lane_objects;
+  std::vector<float> pred_vpt;
   std::shared_ptr<base::Blob<float>> track_feature_blob = nullptr;
   std::shared_ptr<base::Blob<float>> lane_detected_blob = nullptr;
   // detected traffic lights

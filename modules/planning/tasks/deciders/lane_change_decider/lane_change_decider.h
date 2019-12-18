@@ -26,7 +26,6 @@
 #include "modules/planning/proto/planning_status.pb.h"
 
 #include "modules/map/pnc_map/route_segments.h"
-#include "modules/planning/proto/decider_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
 
@@ -52,7 +51,7 @@ class LaneChangeDecider : public Decider {
    * @param search_beam_radius_intensity is the resolution of scanning
    * @param search_range is the scanning range centering at ADV heading
    * @param is_block_angle_threshold is the threshold to tell how big a block
-   *        angle range is percption blocking
+   *        angle range is perception blocking
    */
   static bool IsPerceptionBlocked(const ReferenceLineInfo& reference_line_info,
                                   const double search_beam_length,
@@ -60,8 +59,14 @@ class LaneChangeDecider : public Decider {
                                   const double search_range,
                                   const double is_block_angle_threshold);
 
+  static void UpdatePreparationDistance(
+      const bool is_opt_succeed, const Frame* frame,
+      const ReferenceLineInfo* const reference_line_info);
+
  private:
-  common::Status Process(Frame* frame) override;
+  common::Status Process(
+      Frame* frame,
+      ReferenceLineInfo* const current_reference_line_info) override;
 
   static bool HysteresisFilter(const double obstacle_distance,
                                const double safe_distance,
@@ -74,6 +79,7 @@ class LaneChangeDecider : public Decider {
                     const std::string& path_id);
 
   void PrioritizeChangeLane(
+      const bool is_prioritize_change_lane,
       std::list<ReferenceLineInfo>* reference_line_info) const;
 
   void RemoveChangeLane(

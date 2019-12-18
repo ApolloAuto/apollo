@@ -84,7 +84,7 @@ class PredictionMap {
       const std::string& id);
 
   /**
-   * @brief Get a shared pointer to a overlap by overlap ID.
+   * @brief Get a shared pointer to an overlap by overlap ID.
    * @param id The ID of the target overlap ID in the form of string.
    * @return A shared pointer to the overlap with the input overlap ID.
    */
@@ -402,6 +402,24 @@ class PredictionMap {
    */
   static std::vector<std::shared_ptr<const hdmap::LaneInfo>> GetNearbyLanes(
       const common::PointENU& position, const double nearby_radius);
+
+  /**
+   * @brief Get the pointer to the lane with the smallest average curvature
+   * @param The vector of lane infos
+   * @return The pointer to the lane with the smallest average curvature
+   */
+  static std::shared_ptr<const hdmap::LaneInfo>
+  LaneWithSmallestAverageCurvature(
+      const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lane_infos);
+
+  /**
+   * @brief Get the average curvature along a lane with the ID lane_id
+   * @param The ID of the lane
+   * @param The size of samples alone the lane to compute the average curvature
+   * @return The average curvature
+   */
+  static double AverageCurvature(const std::string& lane_id,
+                                 const size_t sample_size);
 
  private:
   static std::shared_ptr<const hdmap::LaneInfo> GetNeighborLane(

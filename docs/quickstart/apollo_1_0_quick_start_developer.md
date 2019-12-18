@@ -56,7 +56,7 @@ cd install
 sudo ./install_kernel.sh
 ```
 3. Reboot your system by the `reboot` command
-4. Build the ESD CAN driver source code 
+4. Build the ESD CAN driver source code
 Now you need to build the ESD CAN driver source code according to [ESDCAN-README.md](https://github.com/ApolloAuto/apollo-kernel/blob/master/linux/ESDCAN-README.md)
 
 ## Build your own kernel.

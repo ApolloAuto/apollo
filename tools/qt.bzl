@@ -7,7 +7,7 @@ def _file_name(filePathName):
 def _base_name(fileName):
     return fileName.split('.')[0]
 
-def qt_cc_library(name, src, hdr, uis = [], res = [], normal_hdrs = [], deps = None, **kwargs):  
+def qt_cc_library(name, src, hdr, uis = [], res = [], normal_hdrs = [], deps = None, **kwargs):
     srcs = src
     for hItem in hdr:
         base_name = _base_name(_file_name(hItem))
@@ -16,7 +16,7 @@ def qt_cc_library(name, src, hdr, uis = [], res = [], normal_hdrs = [], deps = N
             srcs = [hItem],
             outs = [ "moc_%s.cpp" % base_name ],
             cmd =  "if [[ `grep 'Q_OBJECT' $(location %s)` ]] ; \
-            then /usr/local/Qt5.5.1/5.5/gcc_64/bin/moc $(location %s) -o $@ -f'%s'; \
+            then /usr/lib/qt5/bin/moc $(location %s) -o $@ -f'%s'; \
             else echo '' > $@ ; fi"  % (hItem, hItem, '%s/%s' % (PACKAGE_NAME, hItem))
         )
         srcs.append("moc_%s.cpp" % base_name)
@@ -27,7 +27,7 @@ def qt_cc_library(name, src, hdr, uis = [], res = [], normal_hdrs = [], deps = N
           name = "%s_ui" % base_name,
           srcs = [uitem],
           outs = ["ui_%s.h" % base_name],
-          cmd = "/usr/local/Qt5.5.1/5.5/gcc_64/bin/uic $(locations %s) -o $@" % uitem,
+          cmd = "/usr/lib/qt5/bin/uic $(locations %s) -o $@" % uitem,
       )
       hdr.append("ui_%s.h" % base_name)
 
@@ -37,7 +37,7 @@ def qt_cc_library(name, src, hdr, uis = [], res = [], normal_hdrs = [], deps = N
           name = "%s_res" % base_name,
           srcs = [ritem] + deps,
           outs = ["res_%s.cpp" % base_name],
-          cmd = "/usr/local/Qt5.5.1/5.5/gcc_64/bin/rcc --name res --output $(OUTS) $(location %s)" % ritem,
+          cmd = "/usr/lib/qt5/bin/rcc --name res --output $(OUTS) $(location %s)" % ritem,
       )
       srcs.append("res_%s.cpp" % base_name)
 

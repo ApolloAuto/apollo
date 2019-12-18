@@ -58,7 +58,7 @@ Chart.plugins.register({
                 chart.ctx.translate(position.x, position.y);
                 chart.ctx.rotate(-rotationInPixels); // ChartJS's rotation is clockwise
                 chart.ctx.fillStyle = dataset.borderColor;
-                chart.ctx.fillText("➡", 0, 0);
+                chart.ctx.fillText('\u27A1︎\uFE0E' /* ➡ */, 0, 0);
 
                 chart.ctx.restore();
             }
@@ -177,6 +177,36 @@ export default class ScatterGraph extends React.Component {
                         minRotation: 0,
                         maxRotation: 0,
                         stepSize: setting.stepSize,
+                        // Overwrite chartjs tick formatter to keep maximum 4 decimals
+                        // and avoid scientific notation
+                        callback: function(tickValue, index, ticks) {
+                            // If we have lots of ticks, don't use the ones
+                            let delta = ticks.length > 3
+                                ? ticks[2] - ticks[1]
+                                : ticks[1] - ticks[0];
+
+                            // If we have a number like 2.5 as the delta,
+                            // figure out how many decimal places we need
+                            if (Math.abs(delta) > 1) {
+                                if (tickValue !== Math.floor(tickValue)) {
+                                    // not an integer
+                                    delta = tickValue - Math.floor(tickValue);
+                                }
+                            }
+
+                            const logDelta = Math.log10(Math.abs(delta));
+                            let tickString = '';
+
+                            if (Math.abs(tickValue) >= 1e-4) {
+                                let numDecimal = -1 * Math.floor(logDelta);
+                                numDecimal = Math.max(Math.min(numDecimal, 4), 0);
+                                tickString = tickValue.toFixed(numDecimal);
+                            } else {
+                                tickString = '0'; // never show decimal places for 0
+                            }
+
+                            return tickString;
+                        },
                     },
                     gridLines: {
                         color: 'rgba(153, 153, 153, 0.5)',
@@ -201,31 +231,40 @@ export default class ScatterGraph extends React.Component {
         this.chart = new Chart(ctx, { type: "scatter", options: chartOptions });
     }
 
-    updateData(idx, name, properties, data) {
-        if (this.chart.data.datasets[idx] === undefined) {
-            // basic properties
-            const config = {
-                label: name, //legend
-                hideLabelInLegend: properties.hideLabelInLegend,
-                showText: properties.showText,
-                text: name, // text in the graph
+    constructDataConfig(properties) {
+        // basic properties
+        const config = {
+            label: null, // legend
+            hideLabelInLegend: properties.hideLabelInLegend,
+            showText: properties.showText,
+            text: null, // text in the graph
 
-                backgroundColor: properties.color,
-                borderColor: properties.color,
+            backgroundColor: properties.color,
+            borderColor: properties.color,
 
-                data: data
-            };
+            data: null
+        };
 
-            // additional properties
-            for (const key in properties) {
-                config[key] = properties[key];
-            }
-
-            this.chart.data.datasets.push(config);
-        } else {
-            this.chart.data.datasets[idx].text = name;
-            this.chart.data.datasets[idx].data = data;
+        // additional properties
+        for (const key in properties) {
+            config[key] = properties[key];
         }
+
+        return config;
+    }
+
+    updateData(idx, name, properties, data) {
+        const datasets = this.chart.data.datasets;
+        const config = this.constructDataConfig(properties);
+        if (datasets[idx] === undefined) {
+            datasets.push(config);
+        } else if (datasets[idx].text !== name) {
+            datasets[idx] = config;
+        }
+
+        datasets[idx].label = name;
+        datasets[idx].text = name;
+        datasets[idx].data = data;
     }
 
     updateCar(name, point, properties) {
@@ -342,8 +381,13 @@ export default class ScatterGraph extends React.Component {
 }
 
 function generateScatterGraph(setting, lineDatasets, carDatasets, polygonsDatasets) {
-    if (!lineDatasets || !setting || !setting.properties || !setting.options) {
-        console.error("Graph setting or data not found:", setting.title);
+    if (!lineDatasets) {
+        console.error("Graph data not found:", setting.title);
+        return null;
+    }
+
+    if (!setting || !setting.properties || !setting.options) {
+        console.error("Graph setting not found:", setting.title);
         return null;
     }
 

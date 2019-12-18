@@ -110,7 +110,9 @@ Element *LRUCache<Key, Element>::Put(const Key &key, Element *value) {
     // move the corresponding key to list front
     list_.splice(list_.begin(), list_, found_iter->second);
     node_remove = found_iter->second->second;
-    if (node_remove == value) return nullptr;
+    if (node_remove == value) {
+      return nullptr;
+    }
     if (Destroy(&node_remove)) {
       found_iter->second->second = value;
     } else {

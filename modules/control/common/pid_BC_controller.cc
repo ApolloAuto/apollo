@@ -39,7 +39,7 @@ double PIDBCController::Control(const double error, const double dt) {
     diff = (error - previous_error_) / dt;
   }
 
-  // backward caculation
+  // backward calculation
   if (!integrator_enabled_) {
     integral_ = 0;
   } else {

@@ -20,8 +20,8 @@ limitations under the License.
 #include <set>
 #include <unordered_set>
 
+#include "absl/strings/match.h"
 #include "cyber/common/file.h"
-#include "modules/common/util/string_util.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
 
 namespace apollo {
@@ -49,7 +49,7 @@ int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
   Clear();
   // TODO(All) seems map_ can be changed to a local variable of this
   // function, but test will fail if I do so. if so.
-  if (apollo::common::util::EndWith(map_filename, ".xml")) {
+  if (absl::EndsWith(map_filename, ".xml")) {
     if (!adapter::OpendriveAdapter::LoadData(map_filename, &map_)) {
       return -1;
     }
@@ -584,7 +584,7 @@ int HDMapImpl::GetLanesWithHeading(const Vec2d& point, const double distance,
   CHECK_NOTNULL(lanes);
   std::vector<LaneInfoConstPtr> all_lanes;
   const int status = GetLanes(point, distance, &all_lanes);
-  if (status < 0 || all_lanes.size() <= 0) {
+  if (status < 0 || all_lanes.empty()) {
     return -1;
   }
 
@@ -618,7 +618,7 @@ int HDMapImpl::GetRoadBoundaries(
   junctions->clear();
 
   std::vector<LaneInfoConstPtr> lanes;
-  if (GetLanes(point, radius, &lanes) != 0 || lanes.size() <= 0) {
+  if (GetLanes(point, radius, &lanes) != 0 || lanes.empty()) {
     return -1;
   }
 
@@ -633,7 +633,10 @@ int HDMapImpl::GetRoadBoundaries(
     }
     road_section_id_set.insert(unique_id);
     const auto road_ptr = GetRoadById(road_id);
-    CHECK_NOTNULL(road_ptr);
+    if (road_ptr == nullptr) {
+      AERROR << "road id [" << road_id.id() << "] is not found.";
+      continue;
+    }
     if (road_ptr->has_junction_id()) {
       const Id junction_id = road_ptr->junction_id();
       if (junction_id_set.count(junction_id.id()) > 0) {
@@ -642,7 +645,10 @@ int HDMapImpl::GetRoadBoundaries(
       junction_id_set.insert(junction_id.id());
       JunctionBoundaryPtr junction_boundary_ptr(new JunctionBoundary());
       junction_boundary_ptr->junction_info = GetJunctionById(junction_id);
-      CHECK_NOTNULL(junction_boundary_ptr->junction_info);
+      if (junction_boundary_ptr->junction_info == nullptr) {
+        AERROR << "junction id [" << junction_id.id() << "] is not found.";
+        continue;
+      }
       junctions->push_back(junction_boundary_ptr);
     } else {
       RoadROIBoundaryPtr road_boundary_ptr(new RoadROIBoundary());
@@ -1153,7 +1159,10 @@ int HDMapImpl::GetLocalMap(const apollo::common::PointENU& point,
 
   for (auto& overlap_id : overlap_ids) {
     auto overlap_ptr = GetOverlapById(overlap_id);
-    CHECK_NOTNULL(overlap_ptr);
+    if (overlap_ptr == nullptr) {
+      AERROR << "overlpa id [" << overlap_id.id() << "] is not found.";
+      continue;
+    }
 
     bool need_delete = false;
     for (auto& overlap_object : overlap_ptr->overlap().object()) {

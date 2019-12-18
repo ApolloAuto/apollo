@@ -39,14 +39,13 @@ namespace traffic_light {
 struct TrafficLightUnprotectedLeftTurnContext {
   ScenarioTrafficLightUnprotectedLeftTurnConfig scenario_config;
   std::vector<std::string> current_traffic_light_overlap_ids;
-  double stop_start_time = 0.0;
   double creep_start_time;
 };
 
 class TrafficLightUnprotectedLeftTurnScenario : public Scenario {
  public:
-  explicit TrafficLightUnprotectedLeftTurnScenario(
-      const ScenarioConfig& config, const ScenarioContext* context)
+  TrafficLightUnprotectedLeftTurnScenario(const ScenarioConfig& config,
+                                          const ScenarioContext* context)
       : Scenario(config, context) {}
 
   void Init() override;

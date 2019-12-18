@@ -6,6 +6,9 @@ cc_library(
     name = "feature_extractor",
     srcs = ["feature_extractor.cc"],
     hdrs = ["feature_extractor.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/container:container_manager",
     ],

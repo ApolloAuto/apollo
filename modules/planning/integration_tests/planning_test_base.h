@@ -55,9 +55,7 @@ namespace planning {
     ::apollo::cyber::Init("planning_test");              \
     ::testing::InitGoogleTest(&argc, argv);              \
     ::google::ParseCommandLineFlags(&argc, &argv, true); \
-    using apollo::common::time::Clock;                   \
-    int ret = RUN_ALL_TESTS();                           \
-    return ret;                                          \
+    return RUN_ALL_TESTS();                              \
   }
 
 #define ENABLE_RULE(RULE_ID, ENABLED) this->rule_enabled_[RULE_ID] = ENABLED
@@ -73,6 +71,8 @@ DECLARE_string(test_previous_planning_file);
 
 class PlanningTestBase : public ::testing::Test {
  public:
+  virtual ~PlanningTestBase() = default;
+
   static void SetUpTestCase();
   virtual void SetUp();
   void UpdateData();

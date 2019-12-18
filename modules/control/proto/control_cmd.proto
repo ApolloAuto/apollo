@@ -2,11 +2,12 @@ syntax = "proto2";
 package apollo.control;
 
 import "modules/canbus/proto/chassis.proto";
-import "modules/common/proto/header.proto";
-import "modules/common/proto/vehicle_signal.proto";
-import "modules/control/proto/pad_msg.proto";
 import "modules/common/proto/drive_state.proto";
+import "modules/common/proto/header.proto";
 import "modules/common/proto/pnc_point.proto";
+import "modules/common/proto/vehicle_signal.proto";
+import "modules/control/proto/input_debug.proto";
+import "modules/control/proto/pad_msg.proto";
 
 enum TurnSignal {
   TURN_NONE = 0;
@@ -103,6 +104,9 @@ message SimpleLongitudinalDebug {
   optional double jerk_reference = 29;
   optional double current_jerk = 30;
   optional double jerk_error = 31;
+  optional apollo.common.TrajectoryPoint current_matched_point = 32;
+  optional apollo.common.TrajectoryPoint current_reference_point = 33;
+  optional apollo.common.TrajectoryPoint preview_reference_point = 34;
 }
 
 message SimpleLateralDebug {
@@ -144,13 +148,19 @@ message SimpleLateralDebug {
   optional double heading_jerk = 26;
   optional double heading_error_jerk = 27;
 
-  // modified lateral_error with look-ahead or look-back station, as the feedback
-  // term for control usage
+  // modified lateral_error and heading_error with look-ahead or look-back
+  // station, as the feedback term for control usage
   optional double lateral_error_feedback = 28;
   optional double heading_error_feedback = 29;
 
   // current planning target point
   optional apollo.common.TrajectoryPoint current_target_point = 30;
+
+  // Augmented feedback control term in addition to LQR control
+  optional double steer_angle_feedback_augment = 31;
+
+  // Mrac control status and feedback states for steer control
+  optional MracDebug steer_mrac_debug = 32;
 }
 
 message SimpleMPCDebug {
@@ -184,7 +194,7 @@ message SimpleMPCDebug {
   optional double acceleration_lookup = 28;
   optional double speed_lookup = 29;
   optional double calibration_value = 30;
-  optional double steer_unconstraint_control_diff = 31;
+  optional double steer_unconstrained_control_diff = 31;
   optional double steer_angle_feedforward_compensation = 32;
   repeated double matrix_q_updated = 33;  // matrix_q_updated_ size = 6
   repeated double matrix_r_updated = 34;  // matrix_r_updated_ size = 2
@@ -216,11 +226,19 @@ message SimpleMPCDebug {
   optional double jerk_error = 49;
 }
 
-message InputDebug {
-  optional apollo.common.Header localization_header = 1;
-  optional apollo.common.Header canbus_header = 2;
-  optional apollo.common.Header trajectory_header = 3;
-  optional apollo.common.Header latest_replan_trajectory_header = 4;
+message MracDebug {
+  optional int32 mrac_model_order = 1;
+  repeated double mrac_reference_state = 2;
+  repeated double mrac_state_error = 3;
+  optional MracAdaptiveGain mrac_adaptive_gain = 4;
+  optional int32 mrac_reference_saturation_status = 5;
+  optional int32 mrac_control_saturation_status = 6;
+}
+
+message MracAdaptiveGain {
+  repeated double state_adaptive_gain = 1;
+  repeated double input_adaptive_gain = 2;
+  repeated double nonlinear_adaptive_gain = 3;
 }
 
 message Debug {

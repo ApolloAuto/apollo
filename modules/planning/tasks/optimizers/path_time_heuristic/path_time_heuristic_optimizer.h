@@ -49,6 +49,7 @@ class PathTimeHeuristicOptimizer : public SpeedOptimizer {
  private:
   common::TrajectoryPoint init_point_;
   SLBoundary adc_sl_boundary_;
+  SpeedHeuristicConfig speed_heuristic_config_;
   DpStSpeedConfig dp_st_speed_config_;
 };
 

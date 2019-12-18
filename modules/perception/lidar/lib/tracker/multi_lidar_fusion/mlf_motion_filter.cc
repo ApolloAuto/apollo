@@ -103,9 +103,7 @@ void MlfMotionFilter::UpdateWithObject(const MlfFilterOptions& options,
 
 void MlfMotionFilter::UpdateWithoutObject(const MlfFilterOptions& options,
                                           double timestamp,
-                                          MlfTrackDataPtr track_data) {
-  return;
-}
+                                          MlfTrackDataPtr track_data) {}
 
 void MlfMotionFilter::InitializeTrackState(TrackedObjectPtr new_object) {
   new_object->boostup_need_history_size =
@@ -218,7 +216,7 @@ void MlfMotionFilter::KalmanFilterUpdateWithPartialObservation(
       static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>(
           kalman_gain_matrix * (measurement - observation_transform * state));
 
-  // 3. gain adjustment and esitmate posterior
+  // 3. gain adjustment and estimate posterior
   StateGainAdjustment(track_data, latest_object, new_object, &state_gain);
 
   state = state + state_gain;
@@ -282,7 +280,7 @@ void MlfMotionFilter::OnlineCovarianceEstimation(
   size_t evaluate_window =
       std::min(track_data->history_objects_.size(),
                static_cast<size_t>(object->boostup_need_history_size));
-  if (evaluate_window <= 0) {
+  if (evaluate_window == 0) {
     // a default large covariance
     object->belief_velocity_online_covariance = Eigen::Matrix3d::Identity() *
                                                 predict_variance_per_sqrsec_ *
@@ -300,7 +298,7 @@ void MlfMotionFilter::OnlineCovarianceEstimation(
           Eigen::Vector3d::Identity() * noise_maximum_ * noise_maximum_;
     }
     ++cur_obj_pair;
-    object->belief_velocity_online_covariance.block<2, 2>(0, 0) =
+    object->belief_velocity_online_covariance.block<2, 2>(0, 0) +=
         velocity_resisual.head<2>() * velocity_resisual.head<2>().transpose();
   }
   object->belief_velocity_online_covariance /=
@@ -323,11 +321,11 @@ void MlfMotionFilter::ConvergenceEstimationAndBoostUp(
   // -1 means first object without measure velocity not considered
   size_t window_size = 1 + track_data->history_objects_.size() - 1;
 
-  // Boostup convergence when its confidence is samll than minimum
+  // Boostup convergence when its confidence is small than minimum
   ComputeConvergenceConfidence(track_data, new_object, true);
   UpdateConverged(track_data, new_object);
 
-  // do not boostup belief if useable measure velocity is not enough
+  // do not boostup belief if usable measure velocity is not enough
   if (window_size <
       static_cast<size_t>(new_object->boostup_need_history_size)) {
     return;
@@ -452,13 +450,13 @@ void MlfMotionFilter::BoostupState(const MlfTrackDataConstPtr& track_data,
   }
   // Increase belief when belief less than min boosted velocity
   // Decrease belief when belief greater than max boosted velocity
-  // now boosted_accelaration not used in orignal version, maybe use later
+  // now boosted_acceleration not used in original version, maybe use later
   if (min_boosted_velocity_norm > new_obj_belief_velocity.norm()) {
-    // Eigen::Vector3d boosted_accelaration =
+    // Eigen::Vector3d boosted_acceleration =
     // (min_boosted_velocity - new_obj_belief_velocity)/new_latest_time_diff_;
     new_obj_belief_velocity = min_boosted_velocity;
   } else if (max_boosted_velocity_norm < new_obj_belief_velocity.norm()) {
-    // Eigen::Vector3d boosted_accelaration =
+    // Eigen::Vector3d boosted_acceleration =
     // (max_boosted_velocity - new_obj_belief_velocity)/new_latest_time_diff_;
     new_obj_belief_velocity = max_boosted_velocity;
   }

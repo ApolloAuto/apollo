@@ -28,7 +28,7 @@ void TopoGraph::Clear() {
 }
 
 bool TopoGraph::LoadNodes(const Graph& graph) {
-  if (graph.node_size() == 0) {
+  if (graph.node().empty()) {
     AERROR << "No nodes found in topology graph.";
     return false;
   }
@@ -44,7 +44,7 @@ bool TopoGraph::LoadNodes(const Graph& graph) {
 
 // Need to execute load_nodes() firstly
 bool TopoGraph::LoadEdges(const Graph& graph) {
-  if (graph.edge_size() == 0) {
+  if (graph.edge().empty()) {
     AINFO << "0 edges found in topology graph, but it's fine";
     return true;
   }
@@ -80,7 +80,7 @@ bool TopoGraph::LoadGraph(const Graph& graph) {
     AERROR << "Failed to load edges from topology graph.";
     return false;
   }
-  AINFO << "Load Topo data succesful.";
+  AINFO << "Load Topo data successful.";
   return true;
 }
 

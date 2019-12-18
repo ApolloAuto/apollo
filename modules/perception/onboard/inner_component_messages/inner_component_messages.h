@@ -58,6 +58,7 @@ class SensorFrameMessage {
 
   std::string sensor_id_;
   double timestamp_ = 0.0;
+  uint64_t lidar_timestamp_ = 0;
   uint32_t seq_num_ = 0;
   std::string type_name_;
   base::HdmapStructConstPtr hdmap_;

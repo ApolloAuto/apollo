@@ -36,7 +36,7 @@ class Ads1111 : public ::apollo::drivers::canbus::ProtocolData<
 
   void Reset() override;
 
-  // config detail: {'description': 'ADS request ESP/VLC to decelerate untill
+  // config detail: {'description': 'ADS request ESP/VLC to decelerate until
   // standstill.', 'enum': {0: 'ADS_DECTOSTOP_NO_DEMAND', 1:
   // 'ADS_DECTOSTOP_DEMAND'}, 'precision': 1.0, 'len': 1, 'name':
   // 'ADS_DecToStop', 'is_signed_var': False, 'offset': 0.0,
@@ -82,7 +82,7 @@ class Ads1111 : public ::apollo::drivers::canbus::ProtocolData<
       Ads1_111::Ads_aeb_tgtdecel_reqType ads_aeb_tgtdecel_req);
 
  private:
-  // config detail: {'description': 'ADS request ESP/VLC to decelerate untill
+  // config detail: {'description': 'ADS request ESP/VLC to decelerate until
   // standstill.', 'enum': {0: 'ADS_DECTOSTOP_NO_DEMAND', 1:
   // 'ADS_DECTOSTOP_DEMAND'}, 'precision': 1.0, 'len': 1, 'name':
   // 'ADS_DecToStop', 'is_signed_var': False, 'offset': 0.0, 'physical_range':

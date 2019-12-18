@@ -1,11 +1,9 @@
 max_constraint_interval : 5.0
 longitudinal_boundary_bound : 2.0
-lateral_boundary_bound : 0.5
+max_lateral_boundary_bound : 0.5
+min_lateral_boundary_bound : 0.1
 num_of_total_points : 500
 curb_shift : 0.2
-driving_side : RIGHT
-wide_lane_threshold_factor : 1.0
-wide_lane_shift_ratio : 0.5
 lateral_buffer : 0.2
 
 qp_spline {

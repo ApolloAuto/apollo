@@ -16,7 +16,7 @@
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 
-#include <unordered_set>
+#include <iomanip>
 #include <utility>
 
 #include "modules/prediction/common/feature_output.h"
@@ -31,22 +31,41 @@ namespace prediction {
 
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
-using apollo::prediction::PredictionConstants;
 
 ObstaclesContainer::ObstaclesContainer()
-    : ptr_obstacles_(FLAGS_max_num_obstacles),
-      id_mapping_(FLAGS_max_num_obstacles) {}
+    : ptr_obstacles_(FLAGS_max_num_obstacles) {}
+
+ObstaclesContainer::ObstaclesContainer(const SubmoduleOutput& submodule_output)
+    : ptr_obstacles_(FLAGS_max_num_obstacles) {
+  for (const Obstacle& obstacle : submodule_output.curr_frame_obstacles()) {
+    // Deep copy of obstacle is needed for modification
+    std::unique_ptr<Obstacle> ptr_obstacle(new Obstacle(obstacle));
+    ptr_obstacles_.Put(obstacle.id(), std::move(ptr_obstacle));
+  }
+
+  Obstacle ego_vehicle = submodule_output.GetEgoVehicle();
+  std::unique_ptr<Obstacle> ptr_ego_vehicle(
+      new Obstacle(std::move(ego_vehicle)));
+  ptr_obstacles_.Put(ego_vehicle.id(), std::move(ptr_ego_vehicle));
+
+  curr_frame_movable_obstacle_ids_ =
+      submodule_output.curr_frame_movable_obstacle_ids();
+  curr_frame_unmovable_obstacle_ids_ =
+      submodule_output.curr_frame_unmovable_obstacle_ids();
+  curr_frame_considered_obstacle_ids_ =
+      submodule_output.curr_frame_considered_obstacle_ids();
+}
+
+void ObstaclesContainer::CleanUp() {
+  // Clean up the history and get the PerceptionObstacles
+  curr_frame_movable_obstacle_ids_.clear();
+  curr_frame_unmovable_obstacle_ids_.clear();
+  curr_frame_considered_obstacle_ids_.clear();
+}
 
 // This is called by Perception module at every frame to insert all
 // detected obstacles.
 void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
-  // Clean up the history and get the PerceptionObstacles
-  curr_frame_id_mapping_.clear();
-  curr_frame_movable_obstacle_ids_.clear();
-  curr_frame_unmovable_obstacle_ids_.clear();
-  curr_frame_considered_obstacle_ids_.clear();
-  curr_frame_id_perception_obstacle_map_.clear();
-
   PerceptionObstacles perception_obstacles;
   perception_obstacles.CopyFrom(
       dynamic_cast<const PerceptionObstacles&>(message));
@@ -56,7 +75,6 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   //   obstacle history.
   // - If it's not a valid time (earlier than history), continue.
   // - Also consider the offline_mode case.
-
   double timestamp = 0.0;
   if (perception_obstacles.has_header() &&
       perception_obstacles.header().has_timestamp_sec()) {
@@ -81,7 +99,8 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
     }
     case 2: {
       if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap ||
-          FeatureOutput::SizeOfDataForLearning() > FLAGS_max_num_dump_feature) {
+          FeatureOutput::SizeOfDataForLearning() >
+              FLAGS_max_num_dump_dataforlearn) {
         FeatureOutput::WriteDataForLearning();
       }
       break;
@@ -110,17 +129,14 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
     }
     default: {
       // No data dump
+      FeatureOutput::Clear();
       break;
     }
   }
 
   timestamp_ = timestamp;
-  ADEBUG << "Current timestamp is [" << timestamp_ << "]";
-
-  // Prediction tracking adaptation
-  if (FLAGS_enable_tracking_adaptation) {
-    BuildCurrentFrameIdMapping(perception_obstacles);
-  }
+  ADEBUG << "Current timestamp is [" << std::fixed << std::setprecision(6)
+         << timestamp_ << "]";
 
   // Set up the ObstacleClusters:
   // 1. Initialize ObstacleClusters
@@ -135,7 +151,8 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
     ADEBUG << "Perception obstacle [" << perception_obstacle.id() << "] "
            << "was inserted";
   }
-  // 3. Sort the Obstacles
+
+  SetConsideredObstacleIds();
   ObstacleClusters::SortObstacles();
 }
 
@@ -157,15 +174,7 @@ Obstacle* ObstaclesContainer::GetObstacleWithLRUUpdate(const int obstacle_id) {
 
 void ObstaclesContainer::Clear() {
   ptr_obstacles_.Clear();
-  id_mapping_.Clear();
   timestamp_ = -1.0;
-}
-
-const PerceptionObstacle& ObstaclesContainer::GetPerceptionObstacle(
-    const int id) {
-  CHECK(curr_frame_id_perception_obstacle_map_.find(id) !=
-        curr_frame_id_perception_obstacle_map_.end());
-  return curr_frame_id_perception_obstacle_map_[id];
 }
 
 const std::vector<int>& ObstaclesContainer::curr_frame_movable_obstacle_ids() {
@@ -209,13 +218,8 @@ std::vector<int> ObstaclesContainer::curr_frame_obstacle_ids() {
 void ObstaclesContainer::InsertPerceptionObstacle(
     const PerceptionObstacle& perception_obstacle, const double timestamp) {
   // Sanity checks.
-  int id = PerceptionIdToPredictionId(perception_obstacle.id());
-  if (id != perception_obstacle.id()) {
-    ADEBUG << "Obstacle have got AdaptTracking, with perception id: "
-           << perception_obstacle.id() << ", and prediction id: " << id;
-  }
-  curr_frame_id_perception_obstacle_map_[id] = perception_obstacle;
-  if (id < -1) {
+  int id = perception_obstacle.id();
+  if (id < FLAGS_ego_vehicle_id) {
     AERROR << "Invalid ID [" << id << "]";
     return;
   }
@@ -229,6 +233,8 @@ void ObstaclesContainer::InsertPerceptionObstacle(
   // Insert the obstacle and also update the LRUCache.
   auto obstacle_ptr = GetObstacleWithLRUUpdate(id);
   if (obstacle_ptr != nullptr) {
+    ADEBUG << "Current time = " << std::fixed << std::setprecision(6)
+           << timestamp;
     obstacle_ptr->Insert(perception_obstacle, timestamp, id);
     ADEBUG << "Refresh obstacle [" << id << "]";
   } else {
@@ -241,10 +247,11 @@ void ObstaclesContainer::InsertPerceptionObstacle(
     ADEBUG << "Insert obstacle [" << id << "]";
   }
 
-  if (id != -1) {
+  if (FLAGS_prediction_offline_mode ==
+          PredictionConstants::kDumpDataForLearning ||
+      id != FLAGS_ego_vehicle_id) {
     curr_frame_movable_obstacle_ids_.push_back(id);
   }
-  SetConsideredObstacleIds();
 }
 
 void ObstaclesContainer::InsertFeatureProto(const Feature& feature) {
@@ -266,77 +273,6 @@ void ObstaclesContainer::InsertFeatureProto(const Feature& feature) {
   }
 }
 
-void ObstaclesContainer::BuildCurrentFrameIdMapping(
-    const PerceptionObstacles& perception_obstacles) {
-  // Go through every obstacle in the current frame, after some
-  // sanity checks, build current_frame_id_mapping for every obstacle
-
-  std::unordered_set<int> seen_perception_ids;
-  // Loop all precept_id and find those in obstacles_LRU
-  for (const PerceptionObstacle& perception_obstacle :
-       perception_obstacles.perception_obstacle()) {
-    int perception_id = perception_obstacle.id();
-    if (GetObstacle(perception_id) != nullptr) {
-      seen_perception_ids.insert(perception_id);
-    }
-  }
-
-  for (const PerceptionObstacle& perception_obstacle :
-       perception_obstacles.perception_obstacle()) {
-    int perception_id = perception_obstacle.id();
-    curr_frame_id_mapping_[perception_id] = perception_id;
-    if (seen_perception_ids.find(perception_id) != seen_perception_ids.end()) {
-      // find this perception_id in LRUCache, treat it as a tracked obstacle
-      continue;
-    }
-    std::unordered_set<int> seen_prediction_ids;
-    int prediction_id = 0;
-    if (id_mapping_.GetCopy(perception_id, &prediction_id)) {
-      if (seen_perception_ids.find(prediction_id) ==
-          seen_perception_ids.end()) {
-        // find this perception_id in LRUMapping, map it to a tracked obstacle
-        curr_frame_id_mapping_[perception_id] = prediction_id;
-        seen_prediction_ids.insert(prediction_id);
-      }
-    } else {  // process adaption
-      common::util::Node<int, std::unique_ptr<Obstacle>>* curr =
-          ptr_obstacles_.First();
-      while (curr != nullptr) {
-        int obs_id = curr->key;
-        curr = curr->next;
-        if (obs_id < 0 ||
-            seen_perception_ids.find(obs_id) != seen_perception_ids.end() ||
-            seen_prediction_ids.find(obs_id) != seen_prediction_ids.end()) {
-          // this obs_id has already been processed
-          continue;
-        }
-        Obstacle* obstacle_ptr = GetObstacle(obs_id);
-        if (obstacle_ptr == nullptr) {
-          AERROR << "Obstacle id [" << obs_id << "] with empty obstacle_ptr.";
-          break;
-        }
-        if (timestamp_ - obstacle_ptr->timestamp() > FLAGS_max_tracking_time) {
-          ADEBUG << "Obstacle already reach time threshold.";
-          break;
-        }
-        if (AdaptTracking(perception_obstacle, obstacle_ptr)) {
-          id_mapping_.Put(perception_id, obs_id);
-          curr_frame_id_mapping_[perception_id] = obs_id;
-          break;
-        }
-      }
-    }
-  }
-}
-
-int ObstaclesContainer::PerceptionIdToPredictionId(const int perception_id) {
-  if (curr_frame_id_mapping_.find(perception_id) ==
-      curr_frame_id_mapping_.end()) {
-    return perception_id;
-  }
-  return curr_frame_id_mapping_[perception_id];
-}
-
 void ObstaclesContainer::BuildLaneGraph() {
   // Go through every obstacle in the current frame, after some
   // sanity checks, build lane graph for non-junction cases.
@@ -350,8 +286,10 @@ void ObstaclesContainer::BuildLaneGraph() {
         PredictionConstants::kDumpDataForLearning) {
       ADEBUG << "Building Lane Graph.";
       obstacle_ptr->BuildLaneGraph();
+      obstacle_ptr->BuildLaneGraphFromLeftToRight();
     } else {
       ADEBUG << "Building ordered Lane Graph.";
+      ADEBUG << "Building lane graph for id = " << id;
       obstacle_ptr->BuildLaneGraphFromLeftToRight();
     }
     obstacle_ptr->SetNearbyObstacles();
@@ -384,38 +322,6 @@ void ObstaclesContainer::BuildJunctionFeature() {
   }
 }
 
-bool ObstaclesContainer::AdaptTracking(
-    const PerceptionObstacle& perception_obstacle, Obstacle* obstacle_ptr) {
-  if (!perception_obstacle.has_type() ||
-      perception_obstacle.type() != obstacle_ptr->type()) {
-    // different obstacle type, can't be same obstacle
-    return false;
-  }
-  // test perception_obstacle position with possible obstacle position
-  if (perception_obstacle.has_position() &&
-      perception_obstacle.position().has_x() &&
-      perception_obstacle.position().has_y()) {
-    double obs_x = obstacle_ptr->latest_feature().position().x() +
-                   (timestamp_ - obstacle_ptr->latest_feature().timestamp()) *
-                       obstacle_ptr->latest_feature().raw_velocity().x();
-    double obs_y = obstacle_ptr->latest_feature().position().y() +
-                   (timestamp_ - obstacle_ptr->latest_feature().timestamp()) *
-                       obstacle_ptr->latest_feature().raw_velocity().y();
-    double vel_x = obstacle_ptr->latest_feature().raw_velocity().x();
-    double vel_y = obstacle_ptr->latest_feature().raw_velocity().y();
-    double vel = std::hypot(vel_x, vel_y);
-    double dist_x = perception_obstacle.position().x() - obs_x;
-    double dist_y = perception_obstacle.position().y() - obs_y;
-    double dot_prod = dist_x * vel_x + dist_y * vel_y;
-    double cross_prod = dist_x * vel_y - dist_y * vel_x;
-    if (std::abs(dot_prod) < FLAGS_max_tracking_dist * vel &&
-        std::abs(cross_prod) < FLAGS_max_tracking_dist * vel / 3) {
-      return true;
-    }
-  }
-  return false;
-}
-
 bool ObstaclesContainer::IsMovable(
     const PerceptionObstacle& perception_obstacle) {
   if (!perception_obstacle.has_type() ||
@@ -426,6 +332,36 @@ bool ObstaclesContainer::IsMovable(
 }
 
 double ObstaclesContainer::timestamp() const { return timestamp_; }
+
+SubmoduleOutput ObstaclesContainer::GetSubmoduleOutput(
+    const size_t history_size, const absl::Time& frame_start_time) {
+  SubmoduleOutput container_output;
+  for (int id : curr_frame_considered_obstacle_ids_) {
+    Obstacle* obstacle = GetObstacle(id);
+    if (obstacle == nullptr) {
+      AERROR << "Nullptr found for obstacle [" << id << "]";
+      continue;
+    }
+    obstacle->TrimHistory(history_size);
+    obstacle->ClearOldInformation();
+    container_output.InsertObstacle(std::move(*obstacle));
+  }
+
+  Obstacle* ego_obstacle = GetObstacle(FLAGS_ego_vehicle_id);
+  if (ego_obstacle != nullptr) {
+    container_output.InsertEgoVehicle(std::move(*ego_obstacle));
+  }
+
+  container_output.set_curr_frame_movable_obstacle_ids(
+      curr_frame_movable_obstacle_ids_);
+  container_output.set_curr_frame_unmovable_obstacle_ids(
+      curr_frame_unmovable_obstacle_ids_);
+  container_output.set_curr_frame_considered_obstacle_ids(
+      curr_frame_considered_obstacle_ids_);
+  container_output.set_frame_start_time(frame_start_time);
+
+  return container_output;
+}
 
 }  // namespace prediction
 }  // namespace apollo

@@ -53,7 +53,7 @@ For questions regarding Dreamview icons refer to the
    Note\: You'll be required to setup profile before doing anything else. Click
    the dropdown menu to select **Navigation** mode, the HDMap and vehicle you
    want to use. The lists are defined in
-   [HMI config file](https://raw.githubusercontent.com/ApolloAuto/apollo/master/modules/dreamview/conf/hmi.conf).
+   [HMI config file](https://github.com/ApolloAuto/apollo/tree/master/modules/dreamview/conf/hmi_modes).
 
    Note\: It's also possible to change the profile on the right panel of the
    HMI, but just remember to click `Reset All` on the top-right corner to

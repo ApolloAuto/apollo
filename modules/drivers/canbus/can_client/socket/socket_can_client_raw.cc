@@ -22,6 +22,8 @@
 
 #include "modules/drivers/canbus/can_client/socket/socket_can_client_raw.h"
 
+#include "absl/strings/str_cat.h"
+
 namespace apollo {
 namespace drivers {
 namespace canbus {
@@ -95,7 +97,7 @@ ErrorCode SocketCanClientRaw::Start() {
     return ErrorCode::CAN_CLIENT_ERROR_BASE;
   }
 
-  std::string can_name("can" + std::to_string(port_));
+  const std::string can_name = absl::StrCat("can", port_);
   std::strncpy(ifr.ifr_name, can_name.c_str(), IFNAMSIZ);
   if (ioctl(dev_handler_, SIOCGIFINDEX, &ifr) < 0) {
     AERROR << "ioctl error";
@@ -142,7 +144,7 @@ ErrorCode SocketCanClientRaw::Send(const std::vector<CanFrame> &frames,
     return ErrorCode::CAN_CLIENT_ERROR_SEND_FAILED;
   }
   for (size_t i = 0; i < frames.size() && i < MAX_CAN_SEND_FRAME_LEN; ++i) {
-    if (frames[i].len != CANBUS_MESSAGE_LENGTH) {
+    if (frames[i].len > CANBUS_MESSAGE_LENGTH || frames[i].len < 0) {
       AERROR << "frames[" << i << "].len = " << frames[i].len
              << ", which is not equal to can message data length ("
              << CANBUS_MESSAGE_LENGTH << ").";
@@ -187,7 +189,8 @@ ErrorCode SocketCanClientRaw::Receive(std::vector<CanFrame> *const frames,
       AERROR << "receive message failed, error code: " << ret;
       return ErrorCode::CAN_CLIENT_ERROR_BASE;
     }
-    if (recv_frames_[i].can_dlc != CANBUS_MESSAGE_LENGTH) {
+    if (recv_frames_[i].can_dlc > CANBUS_MESSAGE_LENGTH ||
+        recv_frames_[i].can_dlc < 0) {
       AERROR << "recv_frames_[" << i
              << "].can_dlc = " << recv_frames_[i].can_dlc
              << ", which is not equal to can message data length ("

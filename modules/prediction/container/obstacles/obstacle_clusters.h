@@ -40,12 +40,12 @@ class ObstacleClusters {
    * @brief Obtain a lane graph given a lane info and s
    * @param lane start s
    * @param lane total length
-   * @param if the obstacle is on lane
+   * @param if consider lane split ahead
    * @param lane info
    * @return a corresponding lane graph
    */
-  static const LaneGraph& GetLaneGraph(
-      const double start_s, const double length, const bool is_on_lane,
+  static LaneGraph GetLaneGraph(
+      const double start_s, const double length, const bool consider_lane_split,
       std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr);
 
   /**
@@ -131,7 +131,6 @@ class ObstacleClusters {
   static void Clear();
 
  private:
-  static std::unordered_map<std::string, LaneGraph> lane_graphs_;
   static std::unordered_map<std::string, std::vector<LaneObstacle>>
       lane_obstacles_;
   static std::unordered_map<std::string, StopSign> lane_id_stop_sign_map_;

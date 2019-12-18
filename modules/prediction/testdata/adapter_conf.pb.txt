@@ -1,5 +1,5 @@
 config {
-  type: PERCEPTION_OBSTACLES 
+  type: PERCEPTION_OBSTACLES
   mode: RECEIVE_ONLY
   message_history_limit: 1
 }

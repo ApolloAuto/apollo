@@ -6,6 +6,7 @@ export default class CheckboxItem extends React.Component {
         const { id, title, isChecked, onClick, disabled, extraClasses } = this.props;
         return (
             <ul className={classNames({
+                            "item": true,
                             "disabled": disabled
                         }, extraClasses)}>
                 <li id={id}

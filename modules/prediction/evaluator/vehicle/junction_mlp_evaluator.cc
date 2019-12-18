@@ -26,17 +26,17 @@
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/prediction/common/feature_output.h"
+#include "modules/prediction/common/prediction_constants.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/container/container_manager.h"
-#include "modules/prediction/container/pose/pose_container.h"
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 
 namespace apollo {
 namespace prediction {
 
-using apollo::common::adapter::AdapterConfig;
 using apollo::prediction::math_util::ComputePolynomial;
 using apollo::prediction::math_util::EvaluateCubicPolynomial;
 
@@ -55,20 +55,25 @@ double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
 }  // namespace
 
 JunctionMLPEvaluator::JunctionMLPEvaluator() : device_(torch::kCPU) {
+  evaluator_type_ = ObstacleConf::JUNCTION_MLP_EVALUATOR;
   LoadModel();
 }
 
 void JunctionMLPEvaluator::Clear() {}
 
-void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr,
+                                    ObstaclesContainer* obstacles_container) {
   // Sanity checks.
   omp_set_num_threads(1);
   Clear();
   CHECK_NOTNULL(obstacle_ptr);
+
+  obstacle_ptr->SetEvaluatorType(evaluator_type_);
+
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
     AERROR << "Obstacle [" << id << "] has no latest feature.";
-    return;
+    return false;
   }
   Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
   CHECK_NOTNULL(latest_feature_ptr);
@@ -77,18 +82,19 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   if (!latest_feature_ptr->has_junction_feature() ||
       latest_feature_ptr->junction_feature().junction_exit_size() < 1) {
     ADEBUG << "Obstacle [" << id << "] has no junction_exit.";
-    return;
+    return false;
   }
 
   std::vector<double> feature_values;
-  ExtractFeatureValues(obstacle_ptr, &feature_values);
+  ExtractFeatureValues(obstacle_ptr, obstacles_container, &feature_values);
 
   // Insert features to DataForLearning
-  if (FLAGS_prediction_offline_mode == 2) {
+  if (FLAGS_prediction_offline_mode ==
+      PredictionConstants::kDumpDataForLearning) {
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
                                          "junction", nullptr);
     ADEBUG << "Save extracted features for learning locally.";
-    return;  // Skip Compute probability for offline mode
+    return true;  // Skip Compute probability for offline mode
   }
   std::vector<torch::jit::IValue> torch_inputs;
   int input_dim = static_cast<int>(
@@ -97,12 +103,11 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   for (size_t i = 0; i < feature_values.size(); ++i) {
     torch_input[0][i] = static_cast<float>(feature_values[i]);
   }
-  torch_inputs.push_back(torch_input.to(device_));
+  torch_inputs.push_back(std::move(torch_input.to(device_)));
   std::vector<double> probability;
   if (latest_feature_ptr->junction_feature().junction_exit_size() > 1) {
-    CHECK_NOTNULL(torch_model_ptr_);
     at::Tensor torch_output_tensor =
-        torch_model_ptr_->forward(torch_inputs).toTensor();
+        torch_model_.forward(torch_inputs).toTensor().to(torch::kCPU);
     auto torch_output = torch_output_tensor.accessor<float, 2>();
     for (int i = 0; i < torch_output.size(1); ++i) {
       probability.push_back(static_cast<double>(torch_output[0][i]));
@@ -121,9 +126,9 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   LaneGraph* lane_graph_ptr =
       latest_feature_ptr->mutable_lane()->mutable_lane_graph();
   CHECK_NOTNULL(lane_graph_ptr);
-  if (lane_graph_ptr->lane_sequence_size() == 0) {
+  if (lane_graph_ptr->lane_sequence().empty()) {
     AERROR << "Obstacle [" << id << "] has no lane sequences.";
-    return;
+    return false;
   }
 
   std::unordered_map<std::string, double> junction_exit_prob;
@@ -138,11 +143,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
                                       latest_feature_ptr->raw_velocity().x());
     double d_idx = (angle / (2.0 * M_PI) + 1.0 / 24.0) * 12.0;
     int idx = static_cast<int>(floor(d_idx >= 0 ? d_idx : d_idx + 12));
-    int prev_idx = idx == 0 ? 11 : idx - 1;
-    int post_idx = idx == 11 ? 0 : idx + 1;
-    junction_exit_prob[junction_exit.exit_lane_id()] =
-        probability[idx] * 0.5 + probability[prev_idx] * 0.25 +
-        probability[post_idx] * 0.25;
+    junction_exit_prob[junction_exit.exit_lane_id()] = probability[idx];
   }
 
   for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
@@ -156,10 +157,12 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       }
     }
   }
+  return true;
 }
 
 void JunctionMLPEvaluator::ExtractFeatureValues(
-    Obstacle* obstacle_ptr, std::vector<double>* feature_values) {
+    Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container,
+    std::vector<double>* feature_values) {
   CHECK_NOTNULL(obstacle_ptr);
   int id = obstacle_ptr->id();
 
@@ -174,7 +177,8 @@ void JunctionMLPEvaluator::ExtractFeatureValues(
   }
 
   std::vector<double> ego_vehicle_feature_values;
-  SetEgoVehicleFeatureValues(obstacle_ptr, &ego_vehicle_feature_values);
+  SetEgoVehicleFeatureValues(obstacle_ptr, obstacles_container,
+                             &ego_vehicle_feature_values);
   if (ego_vehicle_feature_values.size() != EGO_VEHICLE_FEATURE_SIZE) {
     AERROR << "Obstacle [" << id << "] has fewer than "
            << "expected ego vehicle feature_values"
@@ -247,21 +251,20 @@ void JunctionMLPEvaluator::SetObstacleFeatureValues(
 }
 
 void JunctionMLPEvaluator::SetEgoVehicleFeatureValues(
-    Obstacle* obstacle_ptr, std::vector<double>* const feature_values) {
+    Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container,
+    std::vector<double>* const feature_values) {
   feature_values->clear();
   *feature_values = std::vector<double>(4, 0.0);
-  auto ego_pose_container_ptr =
-      ContainerManager::Instance()->GetContainer<PoseContainer>(
-          AdapterConfig::LOCALIZATION);
-  if (ego_pose_container_ptr == nullptr) {
+  auto ego_pose_obstacle_ptr =
+      obstacles_container->GetObstacle(FLAGS_ego_vehicle_id);
+  if (ego_pose_obstacle_ptr == nullptr ||
+      ego_pose_obstacle_ptr->history_size() == 0) {
     (*feature_values)[0] = 100.0;
     (*feature_values)[1] = 100.0;
     return;
   }
-  const auto ego_pose_obstacle_ptr =
-      ego_pose_container_ptr->ToPerceptionObstacle();
-  const auto ego_position = ego_pose_obstacle_ptr->position();
-  const auto ego_velocity = ego_pose_obstacle_ptr->velocity();
+  const auto ego_position = ego_pose_obstacle_ptr->latest_feature().position();
+  const auto ego_velocity = ego_pose_obstacle_ptr->latest_feature().velocity();
   CHECK_GT(obstacle_ptr->history_size(), 0);
   const Feature& obstacle_feature = obstacle_ptr->latest_feature();
   apollo::common::math::Vec2d ego_relative_position(
@@ -356,13 +359,12 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
 }
 
 void JunctionMLPEvaluator::LoadModel() {
-  // TODO(all) uncomment the following when cuda issue is resolved
-  // if (torch::cuda::is_available()) {
-  //   ADEBUG << "CUDA is available";
-  //   device_ = torch::Device(torch::kCUDA);
-  // }
+  if (FLAGS_use_cuda && torch::cuda::is_available()) {
+    ADEBUG << "CUDA is available";
+    device_ = torch::Device(torch::kCUDA);
+  }
   torch::set_num_threads(1);
-  torch_model_ptr_ =
+  torch_model_ =
       torch::jit::load(FLAGS_torch_vehicle_junction_mlp_file, device_);
 }
 

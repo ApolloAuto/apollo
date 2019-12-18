@@ -149,7 +149,7 @@ def local_device_setter(num_devices=1,
                         worker_device='/cpu:0',
                         ps_ops=None,
                         ps_strategy=None):
-    if ps_ops == None:
+    if ps_ops is None:
         ps_ops = ['Variable', 'VariableV2', 'VarHandleOp']
 
     if ps_strategy is None:
@@ -164,13 +164,11 @@ def local_device_setter(num_devices=1,
         if node_def.op in ps_ops:
             ps_device_spec = pydev.DeviceSpec.from_string('/{}:{}'.format(
                 ps_device_type, ps_strategy(op)))
-
             ps_device_spec.merge_from(current_device)
             return ps_device_spec.to_string()
-        else:
-            worker_device_spec = pydev.DeviceSpec.from_string(worker_device
-                                                              or "")
-            worker_device_spec.merge_from(current_device)
-            return worker_device_spec.to_string()
+
+        worker_device_spec = pydev.DeviceSpec.from_string(worker_device or "")
+        worker_device_spec.merge_from(current_device)
+        return worker_device_spec.to_string()
 
     return _local_device_chooser

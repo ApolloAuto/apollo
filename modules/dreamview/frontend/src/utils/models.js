@@ -51,3 +51,7 @@ export function loadObject(materialFile, objectFile, scale, callback) {
 export function loadTexture(textureFile, onLoadCallback, onErrorCallback) {
     textureLoader.load(textureFile, onLoadCallback, undefined, onErrorCallback);
 }
+
+export function loadMaterial(materialFile, onLoadCallback) {
+    mtlLoader.load(materialFile, onLoadCallback);
+}

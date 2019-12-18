@@ -34,8 +34,6 @@ wget -O benchmark-1.1.0.tar.gz \
     https://github.com/google/benchmark/archive/v1.1.0.tar.gz
 wget -O eigen-3.2.10.tar.gz \
     https://bitbucket.org/eigen/eigen/get/3.2.10.tar.gz
-wget -O civetweb-1.10.tar.gz \
-    https://github.com/civetweb/civetweb/archive/v1.10.tar.gz
 wget -O curlpp-0.8.1.tar.gz \
     https://github.com/jpbarrette/curlpp/archive/v0.8.1.tar.gz
 wget -O yaml-cpp-0.5.3.zip \

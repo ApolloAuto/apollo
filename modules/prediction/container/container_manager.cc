@@ -19,6 +19,7 @@
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
+#include "modules/prediction/container/storytelling/storytelling_container.h"
 
 namespace apollo {
 namespace prediction {
@@ -52,6 +53,8 @@ std::unique_ptr<Container> ContainerManager::CreateContainer(
     container_ptr.reset(new PoseContainer());
   } else if (type == AdapterConfig::PLANNING_TRAJECTORY) {
     container_ptr.reset(new ADCTrajectoryContainer());
+  } else if (type == AdapterConfig::STORYTELLING) {
+    container_ptr.reset(new StoryTellingContainer());
   }
   return container_ptr;
 }

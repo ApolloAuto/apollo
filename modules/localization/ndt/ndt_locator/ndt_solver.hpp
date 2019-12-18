@@ -555,7 +555,7 @@ void NormalDistributionsTransform<PointSource, PointTarget>::ComputeHessian(
 
   hessian->setZero();
 
-  // Precompute Angular Derivatives unessisary because only used after regular
+  // Precompute Angular Derivatives unnecessary because only used after regular
   // derivative calculation
 
   // Update hessian for each point, line 17 in Algorithm 2 [Magnusson 2009]
@@ -810,7 +810,7 @@ NormalDistributionsTransform<PointSource, PointTarget>::ComputeStepLengthMt(
   // New transformed point cloud
   transformPointCloud(*input_, *trans_cloud, final_transformation_);
 
-  // Updates score, gradient and hessian.  Hessian calculation is unessisary
+  // Updates score, gradient and hessian.  Hessian calculation is unnecessary
   // but testing showed that most step calculations use the initial step
   // suggestion and recalculation the reusable portions of the hessian would
   // intail more computation time.
@@ -906,7 +906,7 @@ NormalDistributionsTransform<PointSource, PointTarget>::ComputeStepLengthMt(
   }
 
   // If inner loop was run then hessian needs to be calculated.
-  // Hessian is unnessisary for step length determination but gradients are
+  // Hessian is unnecessary for step length determination but gradients are
   // required so derivative and transform data is stored for the next
   // iteration.
   if (step_iterations) ComputeHessian(hessian, *trans_cloud, &x_t);

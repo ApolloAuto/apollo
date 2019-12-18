@@ -75,7 +75,7 @@ struct alignas(16) Object {
   // @brief probability for each sub-type, optional
   std::vector<float> sub_type_probs;
 
-  // @brief existance confidence, required
+  // @brief existence confidence, required
   float confidence = 1.0f;
 
   // tracking information

@@ -436,7 +436,7 @@ if __name__ == '__main__':
         type=float,
         default=0.1,
         help="""\
-            This is the inital learning rate value. The learning rate will decrease
+            This is the initial learning rate value. The learning rate will decrease
             during training. For more details check the model_fn implementation in
             this file.\
             """)

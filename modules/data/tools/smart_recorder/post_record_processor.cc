@@ -21,11 +21,11 @@
 #include <algorithm>
 #include <memory>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/record/record_reader.h"
 #include "cyber/record/record_viewer.h"
-#include "modules/common/util/string_util.h"
 
 #include "modules/data/tools/smart_recorder/channel_pool.h"
 #include "modules/data/tools/smart_recorder/interval_pool.h"
@@ -33,7 +33,6 @@
 namespace apollo {
 namespace data {
 
-using apollo::common::util::StrCat;
 using cyber::common::DirectoryExists;
 using cyber::record::RecordReader;
 using cyber::record::RecordViewer;
@@ -60,8 +59,8 @@ bool PostRecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
 bool PostRecordProcessor::Process() {
   // First scan, get intervals
   for (const std::string& record : source_record_files_) {
-    const auto reader =
-        std::make_shared<RecordReader>(StrCat(source_record_dir_, "/", record));
+    const auto reader = std::make_shared<RecordReader>(
+        absl::StrCat(source_record_dir_, "/", record));
     RecordViewer viewer(reader, 0, UINT64_MAX,
                         ChannelPool::Instance()->GetAllChannels());
     AINFO << record << ":" << viewer.begin_time() << " - " << viewer.end_time();
@@ -75,8 +74,8 @@ bool PostRecordProcessor::Process() {
   IntervalPool::Instance()->ReorgIntervals();
   IntervalPool::Instance()->PrintIntervals();
   for (const std::string& record : source_record_files_) {
-    const auto reader =
-        std::make_shared<RecordReader>(StrCat(source_record_dir_, "/", record));
+    const auto reader = std::make_shared<RecordReader>(
+        absl::StrCat(source_record_dir_, "/", record));
     RecordViewer viewer(reader, 0, UINT64_MAX,
                         ChannelPool::Instance()->GetAllChannels());
     for (const auto& msg : viewer) {
@@ -99,11 +98,15 @@ std::string PostRecordProcessor::GetDefaultOutputFile() const {
   const std::string record_flag(".record");
   src_file_name.resize(src_file_name.size() - src_file_name.find(record_flag) +
                        record_flag.size() + 1);
-  return StrCat(restored_output_dir_, "/", src_file_name);
+  return absl::StrCat(restored_output_dir_, "/", src_file_name);
 }
 
 void PostRecordProcessor::LoadSourceRecords() {
   DIR* dirp = opendir(source_record_dir_.c_str());
+  if (dirp == nullptr) {
+    AERROR << "failed to open source dir: " << source_record_dir_;
+    return;
+  }
   struct dirent* dp = nullptr;
   while ((dp = readdir(dirp)) != nullptr) {
     const std::string file_name = dp->d_name;
@@ -112,6 +115,7 @@ void PostRecordProcessor::LoadSourceRecords() {
       source_record_files_.push_back(file_name);
     }
   }
+  closedir(dirp);
   std::sort(source_record_files_.begin(), source_record_files_.end());
 }
 

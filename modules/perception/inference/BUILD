@@ -47,6 +47,7 @@ cc_library(
     deps = [
         ":inference_lib",
         "//modules/perception/inference/caffe:caffe_net_lib",
+        "//modules/perception/inference/paddlepaddle:paddle_net_lib",
         "//modules/perception/inference/tensorrt:rt_net",
         "//modules/perception/inference/utils:inference_util_lib",
     ],

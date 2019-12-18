@@ -47,6 +47,7 @@ using RQ_LOCK_GROUP = std::unordered_map<std::string, LOCK_QUEUE>;
 
 using GRP_WQ_MUTEX = std::unordered_map<std::string, MutexWrapper>;
 using GRP_WQ_CV = std::unordered_map<std::string, CvWrapper>;
+using NOTIFY_GRP = std::unordered_map<std::string, int>;
 
 class ClassicContext : public ProcessorContext {
  public:
@@ -58,12 +59,13 @@ class ClassicContext : public ProcessorContext {
   void Shutdown() override;
 
   static void Notify(const std::string &group_name);
+  static bool RemoveCRoutine(const std::shared_ptr<CRoutine> &cr);
 
-  alignas(CACHELINE_SIZE) static RQ_LOCK_GROUP rq_locks_;
   alignas(CACHELINE_SIZE) static CR_GROUP cr_group_;
-
-  alignas(CACHELINE_SIZE) static GRP_WQ_MUTEX mtx_wq_;
+  alignas(CACHELINE_SIZE) static RQ_LOCK_GROUP rq_locks_;
   alignas(CACHELINE_SIZE) static GRP_WQ_CV cv_wq_;
+  alignas(CACHELINE_SIZE) static GRP_WQ_MUTEX mtx_wq_;
+  alignas(CACHELINE_SIZE) static NOTIFY_GRP notify_grp_;
 
  private:
   void InitGroup(const std::string &group_name);
@@ -75,6 +77,8 @@ class ClassicContext : public ProcessorContext {
   LOCK_QUEUE *lq_ = nullptr;
   MutexWrapper *mtx_wrapper_ = nullptr;
   CvWrapper *cw_ = nullptr;
+
+  std::string current_grp;
 };
 
 }  // namespace scheduler

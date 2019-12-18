@@ -16,10 +16,10 @@
 
 #include "cyber/service_discovery/topology_manager.h"
 
+#include <gtest/gtest.h>
 #include <memory>
 
 #include "cyber/common/log.h"
-#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {

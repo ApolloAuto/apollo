@@ -16,7 +16,7 @@ modules {
   key: "Recorder"
   value: {
     start_command: "/apollo/scripts/record_bag.py --start"
-    stop_command: "/apollo/scripts/record_bag.py --stop"
+    stop_command: "/apollo/scripts/record_bag.py --stop --stop_signal SIGINT"
     process_monitor_config {
       command_keywords: "cyber_recorder record"
     }

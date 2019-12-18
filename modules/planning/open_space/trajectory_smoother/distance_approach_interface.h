@@ -51,6 +51,8 @@ namespace planning {
 
 class DistanceApproachInterface : public Ipopt::TNLP {
  public:
+  virtual ~DistanceApproachInterface() = default;
+
   /** Method to return some info about the nlp */
   virtual bool get_nlp_info(int& n, int& m, int& nnz_jac_g,    // NOLINT
                             int& nnz_h_lag,                    // NOLINT

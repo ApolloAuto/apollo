@@ -248,7 +248,7 @@ class AvgPool1d : public Layer {
  * @class Activation
  * @brief Activation is an activation network layer.
  *        Activation layer output is y = f(x),
- *        where x is the input, y the output and f the activation funtion
+ *        where x is the input, y the output and f the activation function
  *
  *        Parameter f can be loaded from pb message
  */

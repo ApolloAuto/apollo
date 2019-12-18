@@ -42,10 +42,17 @@ DECLARE_double(junction_search_radius);
 DECLARE_double(pedestrian_nearby_lane_search_radius);
 DECLARE_int32(road_graph_max_search_horizon);
 
+// Semantic Map
+DECLARE_double(base_image_half_range);
+DECLARE_bool(img_show_semantic_map);
+
 // Scenario
 DECLARE_double(junction_distance_threshold);
 DECLARE_bool(enable_all_junction);
+DECLARE_int32(caution_obs_max_nums);
+DECLARE_double(caution_distance_threshold);
 DECLARE_double(caution_search_distance_ahead);
+DECLARE_double(caution_search_distance_backward);
 DECLARE_double(caution_search_distance_backward_for_merge);
 DECLARE_double(caution_search_distance_backward_for_overlap);
 DECLARE_double(caution_pedestrian_approach_time);
@@ -72,6 +79,7 @@ DECLARE_double(still_unknown_speed_threshold);
 DECLARE_double(still_obstacle_position_std);
 DECLARE_double(still_pedestrian_position_std);
 DECLARE_double(still_unknown_position_std);
+DECLARE_double(slow_obstacle_speed_threshold);
 DECLARE_double(max_history_time);
 DECLARE_double(target_lane_gap);
 DECLARE_double(dense_lane_gap);
@@ -87,9 +95,19 @@ DECLARE_double(pedestrian_max_acc);
 DECLARE_double(still_speed);
 DECLARE_string(evaluator_vehicle_mlp_file);
 DECLARE_string(torch_vehicle_junction_mlp_file);
+DECLARE_string(torch_vehicle_junction_map_file);
+DECLARE_string(torch_vehicle_semantic_lstm_file);
+DECLARE_string(torch_vehicle_semantic_lstm_cpu_file);
 DECLARE_string(torch_vehicle_cruise_go_file);
 DECLARE_string(torch_vehicle_cruise_cutin_file);
 DECLARE_string(torch_vehicle_lane_scanning_file);
+DECLARE_string(torch_pedestrian_interaction_position_embedding_file);
+DECLARE_string(torch_pedestrian_interaction_social_embedding_file);
+DECLARE_string(torch_pedestrian_interaction_single_lstm_file);
+DECLARE_string(torch_pedestrian_interaction_prediction_layer_file);
+DECLARE_string(torch_lane_aggregating_obstacle_encoding_file);
+DECLARE_string(torch_lane_aggregating_lane_encoding_file);
+DECLARE_string(torch_lane_aggregating_prediction_layer_file);
 DECLARE_string(evaluator_vehicle_rnn_file);
 DECLARE_string(evaluator_vehicle_cruise_mlp_file);
 DECLARE_int32(max_num_obstacles);

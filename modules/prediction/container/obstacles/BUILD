@@ -6,12 +6,17 @@ cc_library(
     name = "obstacles_container",
     srcs = ["obstacles_container.cc"],
     hdrs = ["obstacles_container.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/prediction/common:environment_features",
         "//modules/prediction/common:feature_output",
         "//modules/prediction/common:prediction_constants",
         "//modules/prediction/container",
         "//modules/prediction/container/obstacles:obstacle",
+        "//modules/prediction/proto:prediction_proto",
+        "//modules/prediction/submodules:submodule_output",
     ],
 )
 
@@ -19,11 +24,15 @@ cc_library(
     name = "obstacle",
     srcs = ["obstacle.cc"],
     hdrs = ["obstacle.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
+    ],
     deps = [
         "//modules/common/filters:digital_filter",
         "//modules/prediction/common:junction_analyzer",
         "//modules/prediction/container/obstacles:obstacle_clusters",
         "//modules/prediction/network/rnn_model",
+        "//modules/prediction/proto:prediction_conf_proto",
         "//modules/prediction/proto:prediction_proto",
     ],
 )
@@ -31,9 +40,7 @@ cc_library(
 cc_test(
     name = "obstacles_container_test",
     size = "small",
-    srcs = [
-        "obstacles_container_test.cc",
-    ],
+    srcs = ["obstacles_container_test.cc"],
     data = [
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",
@@ -48,9 +55,7 @@ cc_test(
 cc_test(
     name = "obstacle_test",
     size = "small",
-    srcs = [
-        "obstacle_test.cc",
-    ],
+    srcs = ["obstacle_test.cc"],
     data = [
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",
@@ -64,11 +69,10 @@ cc_test(
 
 cc_library(
     name = "obstacle_clusters",
-    srcs = [
-        "obstacle_clusters.cc",
-    ],
-    hdrs = [
-        "obstacle_clusters.h",
+    srcs = ["obstacle_clusters.cc"],
+    hdrs = ["obstacle_clusters.h"],
+    copts = [
+        "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
         "//modules/prediction/common:road_graph",
@@ -79,9 +83,7 @@ cc_library(
 cc_test(
     name = "obstacle_clusters_test",
     size = "small",
-    srcs = [
-        "obstacle_clusters_test.cc",
-    ],
+    srcs = ["obstacle_clusters_test.cc"],
     data = [
         "//modules/prediction:prediction_data",
         "//modules/prediction:prediction_testdata",

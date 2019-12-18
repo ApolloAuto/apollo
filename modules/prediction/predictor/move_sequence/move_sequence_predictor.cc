@@ -25,24 +25,31 @@
 namespace apollo {
 namespace prediction {
 
-using ::apollo::common::PathPoint;
-using ::apollo::common::TrajectoryPoint;
-using ::apollo::hdmap::LaneInfo;
-using ::apollo::prediction::math_util::EvaluateCubicPolynomial;
-using ::apollo::prediction::math_util::EvaluateQuarticPolynomial;
-using ::apollo::prediction::math_util::SolveQuadraticEquation;
+using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
+using apollo::hdmap::LaneInfo;
+using apollo::prediction::math_util::EvaluateCubicPolynomial;
+using apollo::prediction::math_util::EvaluateQuarticPolynomial;
 
-void MoveSequencePredictor::Predict(Obstacle* obstacle) {
+MoveSequencePredictor::MoveSequencePredictor() {
+  predictor_type_ = ObstacleConf::MOVE_SEQUENCE_PREDICTOR;
+}
+
+bool MoveSequencePredictor::Predict(
+    const ADCTrajectoryContainer* adc_trajectory_container, Obstacle* obstacle,
+    ObstaclesContainer* obstacles_container) {
   Clear();
 
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
 
+  obstacle->SetPredictorType(predictor_type_);
+
   const Feature& feature = obstacle->latest_feature();
 
   if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
     AERROR << "Obstacle [" << obstacle->id() << "] has no lane graph.";
-    return;
+    return false;
   }
 
   std::string lane_id = "";
@@ -51,11 +58,14 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
   }
   int num_lane_sequence = feature.lane().lane_graph().lane_sequence_size();
   std::vector<bool> enable_lane_sequence(num_lane_sequence, true);
-  FilterLaneSequences(feature, lane_id, &enable_lane_sequence);
+  Obstacle* ego_vehicle_ptr =
+      obstacles_container->GetObstacle(FLAGS_ego_vehicle_id);
+  FilterLaneSequences(feature, lane_id, ego_vehicle_ptr,
+                      adc_trajectory_container, &enable_lane_sequence);
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = feature.lane().lane_graph().lane_sequence(i);
-    if (sequence.lane_segment_size() <= 0 ||
-        sequence.lane_segment(0).lane_point_size() <= 0) {
+    if (sequence.lane_segment().empty() ||
+        sequence.lane_segment(0).lane_point().empty()) {
       ADEBUG << "Empty lane segments.";
       continue;
     }
@@ -100,6 +110,7 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
     obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
         trajectory);
   }
+  return true;
 }
 
 /**
@@ -151,7 +162,7 @@ bool MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
 
   // Get ready for the for-loop:
   // project the obstacle's position onto the lane's Frenet coordinates.
-  int lane_segment_index = 0;
+  int lane_segment_index = lane_sequence.adc_lane_segment_idx();
   std::string lane_id =
       lane_sequence.lane_segment(lane_segment_index).lane_id();
   std::shared_ptr<const LaneInfo> lane_info = PredictionMap::LaneById(lane_id);

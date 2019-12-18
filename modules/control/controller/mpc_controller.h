@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include "modules/common/math/mpc_osqp.h"
+
 #include <fstream>
 #include <memory>
 #include <string>
@@ -245,6 +247,10 @@ class MPCController : public Controller {
 
   const std::string name_;
 
+  double max_acceleration_when_stopped_ = 0.0;
+
+  double max_abs_speed_when_stopped_ = 0.0;
+
   double standstill_acceleration_ = 0.0;
 
   double throttle_lowerbound_ = 0.0;
@@ -271,9 +277,9 @@ class MPCController : public Controller {
   // term for steering control
   bool enable_mpc_feedforward_compensation_ = false;
 
-  // Limitation for judging if the unconstraint analytical control is close
-  // enough to the the solver's output with constraint
-  double unconstraint_control_diff_limit_ = 5.0;
+  // Limitation for judging if the unconstrained analytical control is close
+  // enough to the solver's output with constraint
+  double unconstrained_control_diff_limit_ = 5.0;
 };
 
 }  // namespace control

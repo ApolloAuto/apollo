@@ -35,36 +35,17 @@ namespace planning {
 class SpeedProfileGenerator {
  public:
   SpeedProfileGenerator() = delete;
-  ~SpeedProfileGenerator() = delete;
 
   static SpeedData GenerateFallbackSpeed(const double stop_distance = 0.0);
 
   static void FillEnoughSpeedPoints(SpeedData* const speed_data);
-
-  static SpeedData GenerateFallbackSpeedProfile();
-
-  static SpeedData GenerateFallbackSpeedProfileWithStopDistance(
-      const double stop_distance);
 
   static SpeedData GenerateFixedDistanceCreepProfile(const double distance,
                                                      const double max_speed);
 
  private:
   static SpeedData GenerateStopProfile(const double init_speed,
-                                       const double init_acc,
-                                       const double stop_distance);
-
-  static SpeedData GenerateStopProfileFromPolynomial(
-      const double init_speed, const double init_acc,
-      const double stop_distance);
-
-  static SpeedData GenerateStopProfile(const double init_speed,
                                        const double init_acc);
-
-  static SpeedData GenerateStopProfileFromPolynomial(const double init_speed,
-                                                     const double init_acc);
-
-  static bool IsValidProfile(const QuinticPolynomialCurve1d& curve);
 };
 
 }  // namespace planning

@@ -27,7 +27,6 @@
 using apollo::canbus::Chassis;
 using apollo::common::TrajectoryPoint;
 using apollo::common::monitor::MonitorMessage;
-using apollo::common::util::StrCat;
 using apollo::cyber::blocker::BlockerManager;
 using apollo::localization::LocalizationEstimate;
 using apollo::perception::PerceptionObstacle;
@@ -107,11 +106,11 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorRemove) {
 
   for (int i = 0; i < SimulationWorldService::kMaxMonitorItems; ++i) {
     auto* notification = sim_world_service_->world_.add_notification();
-    notification->mutable_item()->set_msg(StrCat("I am message ", i));
+    notification->mutable_item()->set_msg(absl::StrCat("I am message ", i));
     notification->set_timestamp_sec(1990);
   }
   int last = SimulationWorldService::kMaxMonitorItems - 1;
-  EXPECT_EQ(StrCat("I am message ", last),
+  EXPECT_EQ(absl::StrCat("I am message ", last),
             sim_world_service_->world_.notification(last).item().msg());
 
   sim_world_service_->UpdateSimulationWorld(monitor);
@@ -122,7 +121,7 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorRemove) {
             sim_world_service_->world_.notification(last).item().msg());
   EXPECT_EQ("I am message -1",
             sim_world_service_->world_.notification(last - 1).item().msg());
-  EXPECT_EQ(StrCat("I am message ", last),
+  EXPECT_EQ(absl::StrCat("I am message ", last),
             sim_world_service_->world_.notification(last - 2).item().msg());
   EXPECT_DOUBLE_EQ(
       2000, sim_world_service_->world_.notification(last).timestamp_sec());
@@ -136,11 +135,11 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorTruncate) {
   MonitorMessage monitor;
   int large_size = SimulationWorldService::kMaxMonitorItems + 10;
   for (int i = 0; i < large_size; ++i) {
-    monitor.add_item()->set_msg(StrCat("I am message ", i));
+    monitor.add_item()->set_msg(absl::StrCat("I am message ", i));
   }
   monitor.mutable_header()->set_timestamp_sec(2000);
   EXPECT_EQ(large_size, monitor.item_size());
-  EXPECT_EQ(StrCat("I am message ", large_size - 1),
+  EXPECT_EQ(absl::StrCat("I am message ", large_size - 1),
             monitor.item(large_size - 1).msg());
 
   sim_world_service_->UpdateSimulationWorld(monitor);
@@ -150,7 +149,7 @@ TEST_F(SimulationWorldServiceTest, UpdateMonitorTruncate) {
             sim_world_service_->world_.notification_size());
   EXPECT_EQ("I am message 0",
             sim_world_service_->world_.notification(0).item().msg());
-  EXPECT_EQ(StrCat("I am message ", last),
+  EXPECT_EQ(absl::StrCat("I am message ", last),
             sim_world_service_->world_.notification(last).item().msg());
   EXPECT_DOUBLE_EQ(2000,
                    sim_world_service_->world_.notification(0).timestamp_sec());
@@ -281,6 +280,7 @@ TEST_F(SimulationWorldServiceTest, UpdatePlanningTrajectory) {
     TrajectoryPoint* point = planning_trajectory.add_trajectory_point();
     point->mutable_path_point()->set_x(i * 10);
     point->mutable_path_point()->set_y(i * 10 + 10);
+    point->mutable_path_point()->set_theta(i * 0.1);
   }
 
   // Commit the update.
@@ -288,23 +288,23 @@ TEST_F(SimulationWorldServiceTest, UpdatePlanningTrajectory) {
 
   // Check the update result.
   const SimulationWorld& world = sim_world_service_->world();
-  EXPECT_EQ(29, world.planning_trajectory_size());
+  EXPECT_EQ(30, world.planning_trajectory_size());
 
   // Check first point.
   {
     const Object point = world.planning_trajectory(0);
     EXPECT_DOUBLE_EQ(0.0, point.position_x());
     EXPECT_DOUBLE_EQ(10.0, point.position_y());
-    EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
+    EXPECT_DOUBLE_EQ(0, point.heading());
   }
 
   // Check last point.
   {
     const Object point =
         world.planning_trajectory(world.planning_trajectory_size() - 1);
-    EXPECT_DOUBLE_EQ(280.0, point.position_x());
-    EXPECT_DOUBLE_EQ(290.0, point.position_y());
-    EXPECT_DOUBLE_EQ(atan2(100.0, 100.0), point.heading());
+    EXPECT_DOUBLE_EQ(290.0, point.position_x());
+    EXPECT_DOUBLE_EQ(300.0, point.position_y());
+    EXPECT_DOUBLE_EQ(2.9, point.heading());
   }
 }
 

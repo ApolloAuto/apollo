@@ -270,7 +270,7 @@ def perception_publisher(perception_channel, files, period):
     node = cyber.Node("perception")
     writer = node.create_writer(perception_channel, PerceptionObstacles)
     perception_description = load_descrptions(files)
-    sleep_time = int(1.0 / period)  # 10hz
+    sleep_time = int(1.0 / period)  # 10Hz
     global _s_delta_t
     _s_delta_t = period
     perception = None

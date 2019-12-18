@@ -19,8 +19,6 @@
 DEFINE_string(third_party_perception_node_name, "third_party_perception",
               "Node name");
 
-DEFINE_string(adapter_config_filename, "", "Path for adapter configuration");
-
 DEFINE_double(third_party_perception_freq, 10,
               "third party perception timer frequency.");
 DEFINE_bool(enable_mobileye, true, "switch to turn on/off mobileye obstacles");
@@ -74,7 +72,7 @@ DEFINE_int32(
     "if it is moving for consecutive movable_frames_count_threshold frames");
 DEFINE_int32(keep_radar_frames, 5, "number of delphi esr frames to keep");
 
-// TODO(QiL) : remove this temperary gflags
+// TODO(QiL) : remove this temporary gflags
 DEFINE_bool(use_conti_radar, true,
             "use conti or delphi radar, true is conti, false is delphi");
 

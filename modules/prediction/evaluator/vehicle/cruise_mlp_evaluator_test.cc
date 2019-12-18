@@ -47,7 +47,7 @@ TEST_F(CruiseMLPEvaluatorTest, OnLaneCase) {
   container.BuildLaneGraph();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
   EXPECT_NE(obstacle_ptr, nullptr);
-  cruise_mlp_evaluator.Evaluate(obstacle_ptr);
+  cruise_mlp_evaluator.Evaluate(obstacle_ptr, &container);
   const Feature& feature = obstacle_ptr->latest_feature();
   const LaneGraph& lane_graph = feature.lane().lane_graph();
   for (const auto& lane_sequence : lane_graph.lane_sequence()) {

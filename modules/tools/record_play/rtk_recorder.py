@@ -29,7 +29,7 @@ import time
 from cyber_py import cyber
 from gflags import FLAGS
 
-from logger import Logger
+from common.logger import Logger
 from modules.canbus.proto import chassis_pb2
 from modules.localization.proto import localization_pb2
 

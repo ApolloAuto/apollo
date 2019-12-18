@@ -44,7 +44,7 @@ class LincolnMessageManager
  public:
   /**
    * @brief construct a lincoln message manager. protocol data for send and
-   * receive are added in the contruction.
+   * receive are added in the construction.
    */
   LincolnMessageManager();
   virtual ~LincolnMessageManager();

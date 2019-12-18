@@ -52,7 +52,9 @@ TEST(NaviSpeedTsGraph, Solve1) {
   EXPECT_NEAR(5.0, points[25].t, 0.1);
   EXPECT_NEAR(10.0, points[25].v, 0.1);
   for (const auto& point : points)
-    if (point.s > 25.0) EXPECT_NEAR(10.0, point.v, 0.1);
+    if (point.s > 25.0) {
+      EXPECT_NEAR(10.0, point.v, 0.1);
+    }
 }
 
 TEST(NaviSpeedTsGraph, Solve2) {
@@ -77,7 +79,9 @@ TEST(NaviSpeedTsGraph, Solve2) {
   EXPECT_NEAR(0.0, points.front().t, 0.1);
   EXPECT_NEAR(0.0, points.front().v, 0.1);
   for (const auto& point : points)
-    if (point.s > 38.0) EXPECT_NEAR(0.0, point.v, 0.1);
+    if (point.s > 38.0) {
+      EXPECT_NEAR(0.0, point.v, 0.1);
+    }
   EXPECT_NEAR(0.0, points.back().v, 0.1);
 }
 

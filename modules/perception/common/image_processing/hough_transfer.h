@@ -50,13 +50,13 @@ class HoughTransfer {
   // @brief: HoughTransform in 2D binary image
   // @params[IN] image: 2D binary image.
   //             with_distribute: flag to control whether to calculate element
-  //                              lenght,vote_num,pts in HoughLine
+  //                              length,vote_num,pts in HoughLine
   bool ImageVote(const std::vector<int>& image, bool with_distribute);
 
   // @brief: transform one point to parameter space in polar coodinates and vote
   // @params[IN] x, y: pos in image.
   //             with_distribute: flag to control whether to calculate element
-  //                              lenght,vote_num,pts in HoughLine
+  //                              length,vote_num,pts in HoughLine
   void PointVote(int x, int y, bool with_distribute);
   // @params[IN] pos = y*img_w + x
   void PointVote(int pos, bool with_distribute);
@@ -66,7 +66,7 @@ class HoughTransfer {
   // @params[IN] min_pt_num: minimum points on the same line.
   //             r_neibor, theta_neibor: query region
   //             with_distribute: flag to control whether to calculate element
-  //                              lenght,vote_num,pts in HoughLine
+  //                              length,vote_num,pts in HoughLine
   //             lines: save lines detected.
   bool GetLines(int min_pt_num, int r_neibor, int theta_neibor,
                 bool with_distribute, std::vector<HoughLine>* lines) const;

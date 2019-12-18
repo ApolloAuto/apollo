@@ -21,11 +21,11 @@
 #include <utility>
 #include <vector>
 
-#include "modules/planning/proto/pad_msg.pb.h"
-
+#include "modules/common/util/future.h"
 #include "modules/planning/planner/navi_planner_dispatcher.h"
 #include "modules/planning/planner/planner_dispatcher.h"
 #include "modules/planning/planning_base.h"
+#include "modules/planning/proto/pad_msg.pb.h"
 
 /**
  * @namespace apollo::planning
@@ -78,11 +78,6 @@ class NaviPlanning : public PlanningBase {
   bool CheckPlanningConfig(const PlanningConfig& config);
 
   /**
-   * @brief receiving planning pad message
-   */
-  void OnPad(const PadMessage& pad);
-
-  /**
    * @brief make driving decisions by received planning pad msg
    */
   void ProcessPadMsg(DrivingAction drvie_action);
@@ -125,8 +120,6 @@ class NaviPlanning : public PlanningBase {
       const localization::LocalizationEstimate& localization) const;
 
   std::string target_lane_id_;
-  DrivingAction driving_action_;
-  bool is_received_pad_msg_ = false;
 
   std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
 };

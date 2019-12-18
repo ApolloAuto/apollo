@@ -39,14 +39,18 @@ using google::protobuf::util::MessageToJsonString;
 
 SimulationWorldUpdater::SimulationWorldUpdater(
     WebSocketHandler *websocket, WebSocketHandler *map_ws,
-    SimControl *sim_control, const MapService *map_service,
-    DataCollectionMonitor *data_collection_monitor, bool routing_from_file)
+    WebSocketHandler *camera_ws, SimControl *sim_control,
+    const MapService *map_service,
+    DataCollectionMonitor *data_collection_monitor,
+    PerceptionCameraUpdater *perception_camera_updater, bool routing_from_file)
     : sim_world_service_(map_service, routing_from_file),
       map_service_(map_service),
       websocket_(websocket),
       map_ws_(map_ws),
+      camera_ws_(camera_ws),
       sim_control_(sim_control),
-      data_collection_monitor_(data_collection_monitor) {
+      data_collection_monitor_(data_collection_monitor),
+      perception_camera_updater_(perception_camera_updater) {
   RegisterMessageHandlers();
 }
 
@@ -260,6 +264,16 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
         response["type"] = "DataCollectionProgress";
         response["data"] = data_collection_monitor_->GetProgressAsJson();
         websocket_->SendData(conn, response.dump());
+      });
+  camera_ws_->RegisterMessageHandler(
+      "RequestCameraData",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        if (!perception_camera_updater_->IsEnabled()) {
+          return;
+        }
+        std::string to_send;
+        perception_camera_updater_->GetUpdate(&to_send);
+        camera_ws_->SendBinaryData(conn, to_send, true);
       });
 }
 

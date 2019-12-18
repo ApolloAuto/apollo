@@ -1,0 +1,17 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message CosThetaSmootherConfig {
+  optional double weight_cos_included_angle = 1 [default = 10000.0];
+  optional double weight_anchor_points = 2 [default = 1.0];
+  optional double weight_length = 3 [default = 1.0];
+
+  // ipopt settings
+  optional int32 print_level = 4 [default = 0];
+  optional int32 max_num_of_iterations = 5 [default = 500];
+  optional int32 acceptable_num_of_iterations = 6 [default = 15];
+  optional double tol = 7 [default = 1e-8];
+  optional double acceptable_tol = 8 [default = 1e-1];
+  optional bool ipopt_use_automatic_differentiation = 9 [default = false];
+}

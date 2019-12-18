@@ -55,7 +55,6 @@ class ObstacleCameraPerception : public BaseCameraPerception {
   ~ObstacleCameraPerception() = default;
   bool Init(const CameraPerceptionInitOptions &options) override;
   void InitLane(const std::string &work_root,
-                const base::BaseCameraModelPtr model,
                 const app::PerceptionParam &perception_param);
   void InitCalibrationService(const std::string &work_root,
                               const base::BaseCameraModelPtr model,

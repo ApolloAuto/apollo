@@ -97,9 +97,9 @@ base::TLColor SemanticReviser::ReviseBySemantic(
     vote.at(static_cast<int>(color))++;
   }
 
-  if (vote.at(static_cast<size_t>(base::TLColor::TL_RED) == 0) &&
-      vote.at(static_cast<size_t>(base::TLColor::TL_GREEN) == 0) &&
-      vote.at(static_cast<size_t>(base::TLColor::TL_YELLOW)) == 0) {
+  if ((vote.at(static_cast<size_t>(base::TLColor::TL_RED)) == 0) &&
+      (vote.at(static_cast<size_t>(base::TLColor::TL_GREEN)) == 0) &&
+      (vote.at(static_cast<size_t>(base::TLColor::TL_YELLOW)) == 0)) {
     if (vote.at(static_cast<size_t>(base::TLColor::TL_BLACK)) > 0) {
       return base::TLColor::TL_BLACK;
     } else {
@@ -217,9 +217,9 @@ void SemanticReviser::ReviseByTimeSeries(
     ADEBUG << "semantic " << semantic_table.semantic << " color "
            << s_color_strs[iter->color] << " blink " << iter->blink << " cur "
            << s_color_strs[cur_color];
-    ADEBUG << "cur ts " << std::to_string(time_stamp);
-    ADEBUG << "bri ts " << std::to_string(iter->last_bright_time_stamp);
-    ADEBUG << "dar ts " << std::to_string(iter->last_dark_time_stamp);
+    ADEBUG << "cur ts " << time_stamp;
+    ADEBUG << "bri ts " << iter->last_bright_time_stamp;
+    ADEBUG << "dar ts " << iter->last_dark_time_stamp;
   } else {
     semantic_table.last_dark_time_stamp = semantic_table.time_stamp;
     semantic_table.last_bright_time_stamp = semantic_table.time_stamp;
@@ -234,7 +234,7 @@ bool SemanticReviser::Track(const TrafficLightTrackerOptions &options,
   std::vector<SemanticTable> semantic_table;
   ADEBUG << "start revise ";
 
-  if (lights_ref.size() <= 0) {
+  if (lights_ref.empty()) {
     history_semantic_.clear();
     ADEBUG << "no lights to revise, return";
     return true;

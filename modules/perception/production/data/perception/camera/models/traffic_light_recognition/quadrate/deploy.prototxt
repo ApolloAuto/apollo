@@ -38,7 +38,7 @@ layer {
 #  }
 #}
 
-layer{ 
+layer{
     name: "conv1"
     type: "Convolution"
     bottom: "data"
@@ -105,10 +105,10 @@ layer {
     stride_h: 2
     pad_w: 1
     pad_h: 1
-    round_mode: 1 
+    round_mode: 1
   }
 }
-layer{ 
+layer{
     name: "conv2"
     type: "Convolution"
     bottom: "pool1"
@@ -178,7 +178,7 @@ layer {
     round_mode: 1
   }
 }
-layer{ 
+layer{
     name: "conv3"
     type: "Convolution"
     bottom: "pool2"
@@ -248,7 +248,7 @@ layer {
     round_mode: 1
   }
 }
-layer{ 
+layer{
     name: "conv4"
     type: "Convolution"
     bottom: "pool3"
@@ -318,7 +318,7 @@ layer {
     round_mode: 1
   }
 }
-layer{ 
+layer{
     name: "conv5"
     type: "Convolution"
     bottom: "pool4"

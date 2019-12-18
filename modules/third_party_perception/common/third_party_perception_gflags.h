@@ -20,8 +20,6 @@
 
 DECLARE_string(third_party_perception_node_name);
 
-DECLARE_string(adapter_config_filename);
-
 DECLARE_double(third_party_perception_freq);
 DECLARE_bool(enable_mobileye);
 DECLARE_bool(enable_radar);
@@ -54,7 +52,7 @@ DECLARE_double(movable_heading_threshold);
 DECLARE_int32(movable_frames_count_threshold);
 DECLARE_int32(keep_radar_frames);
 
-// TODO(QiL) : remove this temperary gflags
+// TODO(QiL) : remove this temporary gflags
 DECLARE_bool(use_conti_radar);
 DECLARE_double(max_mobileye_obstacle_length);
 DECLARE_double(max_mobileye_obstacle_width);

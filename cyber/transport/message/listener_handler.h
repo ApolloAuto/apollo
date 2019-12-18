@@ -25,6 +25,7 @@
 #include "cyber/base/atomic_rw_lock.h"
 #include "cyber/base/signal.h"
 #include "cyber/common/log.h"
+#include "cyber/message/message_traits.h"
 #include "cyber/message/raw_message.h"
 #include "cyber/transport/message/message_info.h"
 
@@ -47,6 +48,8 @@ class ListenerHandlerBase {
   virtual void Disconnect(uint64_t self_id) = 0;
   virtual void Disconnect(uint64_t self_id, uint64_t oppo_id) = 0;
   inline bool IsRawMessage() const { return is_raw_message_; }
+  virtual void RunFromString(const std::string& str,
+                             const MessageInfo& msg_info) = 0;
 
  protected:
   bool is_raw_message_ = false;
@@ -73,6 +76,8 @@ class ListenerHandler : public ListenerHandlerBase {
   void Disconnect(uint64_t self_id, uint64_t oppo_id) override;
 
   void Run(const Message& msg, const MessageInfo& msg_info);
+  void RunFromString(const std::string& str,
+                     const MessageInfo& msg_info) override;
 
  private:
   using SignalPtr = std::shared_ptr<MessageSignal>;
@@ -116,7 +121,7 @@ void ListenerHandler<MessageT>::Connect(uint64_t self_id, uint64_t oppo_id,
 
   auto connection = signals_[oppo_id]->Connect(listener);
   if (!connection.IsConnected()) {
-    AWARN << oppo_id << " " << self_id << "connect failed!";
+    AWARN << oppo_id << " " << self_id << " connect failed!";
     return;
   }
 
@@ -164,6 +169,18 @@ void ListenerHandler<MessageT>::Run(const Message& msg,
   }
 
   (*signals_[oppo_id])(msg, msg_info);
+}
+
+template <typename MessageT>
+void ListenerHandler<MessageT>::RunFromString(const std::string& str,
+                                              const MessageInfo& msg_info) {
+  auto msg = std::make_shared<MessageT>();
+  if (message::ParseFromHC(str.data(), static_cast<int>(str.size()),
+                           msg.get())) {
+    Run(msg, msg_info);
+  } else {
+    AWARN << "Failed to parse message. Content: " << str;
+  }
 }
 
 }  // namespace transport

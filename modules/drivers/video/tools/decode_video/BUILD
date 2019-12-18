@@ -18,6 +18,7 @@ cc_library(
     deps = [
         ":h265_decoder",
         "//modules/common/util",
+        "@com_google_absl//absl/strings",
     ],
 )
 

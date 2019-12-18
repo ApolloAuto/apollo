@@ -64,7 +64,7 @@ struct alignas(16) LidarObjectSupplement {
   // @brief object height above ground
   float height_above_ground = FLT_MAX;
 
-  // @brief raw probablity of each classification method
+  // @brief raw probability of each classification method
   std::vector<std::vector<float>> raw_probs;
   std::vector<std::string> raw_classification_methods;
 };

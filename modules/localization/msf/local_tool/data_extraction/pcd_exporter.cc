@@ -82,7 +82,6 @@ void PCDExporter::WritePcdFile(const std::string &filename,
   }
 
   pcl::io::savePCDFileBinaryCompressed(filename, cloud);
-  return;
 }
 
 }  // namespace msf

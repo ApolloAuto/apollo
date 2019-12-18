@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "public_road_planner",
-    srcs = [
-        "public_road_planner.cc",
-    ],
-    hdrs = [
-        "public_road_planner.h",
-    ],
+    srcs = ["public_road_planner.cc"],
+    hdrs = ["public_road_planner.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
@@ -30,11 +26,11 @@ cc_library(
         "//modules/planning/reference_line",
         "//modules/planning/reference_line:qp_spline_reference_line_smoother",
         "//modules/planning/tasks:task",
+        "//modules/planning/tasks/deciders/path_decider",
+        "//modules/planning/tasks/deciders/speed_decider",
         "//modules/planning/tasks/optimizers:path_optimizer",
         "//modules/planning/tasks/optimizers:speed_optimizer",
-        "//modules/planning/tasks/optimizers/path_decider",
         "//modules/planning/tasks/optimizers/path_time_heuristic:path_time_heuristic_optimizer",
-        "//modules/planning/tasks/optimizers/speed_decider",
         "@eigen",
     ],
 )
@@ -42,9 +38,7 @@ cc_library(
 cc_test(
     name = "public_road_planner_test",
     size = "small",
-    srcs = [
-        "public_road_planner_test.cc",
-    ],
+    srcs = ["public_road_planner_test.cc"],
     deps = [
         ":public_road_planner",
         "@gtest//:main",

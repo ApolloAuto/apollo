@@ -21,14 +21,18 @@
 
 #include "modules/data/tools/smart_recorder/drive_event_trigger.h"
 #include "modules/data/tools/smart_recorder/emergency_mode_trigger.h"
+#include "modules/data/tools/smart_recorder/hard_brake_trigger.h"
 #include "modules/data/tools/smart_recorder/interval_pool.h"
+#include "modules/data/tools/smart_recorder/regular_interval_trigger.h"
 #include "modules/data/tools/smart_recorder/small_topics_trigger.h"
+#include "modules/data/tools/smart_recorder/swerve_trigger.h"
 
 namespace apollo {
 namespace data {
 
 using cyber::common::DirectoryExists;
 using cyber::common::EnsureDirectory;
+using cyber::common::GetFileName;
 using cyber::record::RecordWriter;
 
 RecordProcessor::RecordProcessor(const std::string& source_record_dir,
@@ -52,11 +56,12 @@ bool RecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
     return false;
   }
   // Init writer
+  static constexpr uint64_t kMBToKB = 1024UL;
   writer_.reset(new RecordWriter());
   writer_->SetIntervalOfFileSegmentation(
       trigger_conf.segment_setting().time_segment());
   writer_->SetSizeOfFileSegmentation(
-      trigger_conf.segment_setting().size_segment() * 1024UL);
+      trigger_conf.segment_setting().size_segment() * kMBToKB);
   const std::string output_file = GetDefaultOutputFile();
   AINFO << "output file path: " << output_file;
   if (!writer_->Open(output_file)) {
@@ -65,13 +70,18 @@ bool RecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
   }
   // Init intervals pool
   IntervalPool::Instance()->Reset();
+  IntervalPool::Instance()->SetIntervalEventLogFilePath(
+      trigger_conf.trigger_log_file_path(), GetFileName(restored_output_dir_));
   return true;
 }
 
 bool RecordProcessor::InitTriggers(const SmartRecordTrigger& trigger_conf) {
   triggers_.push_back(std::unique_ptr<TriggerBase>(new DriveEventTrigger));
   triggers_.push_back(std::unique_ptr<TriggerBase>(new EmergencyModeTrigger));
+  triggers_.push_back(std::unique_ptr<TriggerBase>(new HardBrakeTrigger));
   triggers_.push_back(std::unique_ptr<TriggerBase>(new SmallTopicsTrigger));
+  triggers_.push_back(std::unique_ptr<TriggerBase>(new RegularIntervalTrigger));
+  triggers_.push_back(std::unique_ptr<TriggerBase>(new SwerveTrigger));
   for (const auto& trigger : triggers_) {
     if (!trigger->Init(trigger_conf)) {
       AERROR << "unable to initiate trigger and collect channels";
@@ -81,7 +91,8 @@ bool RecordProcessor::InitTriggers(const SmartRecordTrigger& trigger_conf) {
   return true;
 }
 
-bool RecordProcessor::ShouldRestore(const RecordMessage& msg) const {
+bool RecordProcessor::ShouldRestore(
+    const cyber::record::RecordMessage& msg) const {
   for (const auto& trigger : triggers_) {
     if (trigger->ShouldRestore(msg)) {
       return true;

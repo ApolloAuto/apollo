@@ -21,15 +21,40 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-# apt-get install -y libblas-dev liblapack-dev gfortran
+ARCH=$(uname -m)
 
-wget https://github.com/ApolloAuto/osqp-contrib/archive/master.zip
-unzip master.zip
-
-pushd osqp-contrib-master
+if [ "$ARCH" == "x86_64" ]; then
+  wget https://github.com/ApolloAuto/osqp-contrib/archive/master.zip
+  unzip master.zip
+  pushd osqp-contrib-master
   mkdir -p /usr/local/include/osqp
   cp -r osqp/include /usr/local/include/osqp/
   cp osqp/libosqp.so /usr/local/lib/
-popd
-
-rm -fr master.zip osqp-contrib-master
+  popd
+elif [ "$ARCH" == "aarch64" ]; then
+  BUILD=$1
+  shift
+  if [ "$BUILD" == "build" ]; then
+    wget https://github.com/oxfordcontrol/osqp/archive/v0.4.1.zip
+    unzip v0.4.1.zip
+    pushd osqp-0.4.1/lin_sys/direct/qdldl/qdldl_sources/
+    wget https://apollocache.blob.core.windows.net/apollo-cache/qdldl.zip
+    unzip qdldl.zip
+    cd ../../../../
+    mkdir build && cd build
+    cmake ../
+    make
+    make install
+    popd
+  else
+    wget https://apollocache.blob.core.windows.net/apollo-cache/osqp.zip
+    unzip osqp.zip
+    pushd osqp
+    mkdir -p /usr/local/include/osqp/include
+    cp -r include/ /usr/local/include/osqp/
+    cp lib/libosqp.so /usr/local/lib/
+    popd
+  fi
+else
+    echo "not support $ARCH"
+fi

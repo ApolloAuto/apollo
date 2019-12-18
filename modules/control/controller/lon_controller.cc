@@ -18,11 +18,11 @@
 #include <algorithm>
 #include <utility>
 
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/string_util.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/localization/common/localization_gflags.h"
 
@@ -185,8 +185,8 @@ Status LonController::ComputeControlCommand(
       lon_controller_conf.enable_reverse_leadlag_compensation();
 
   if (preview_time < 0.0) {
-    const auto error_msg = common::util::StrCat(
-        "Preview time set as: ", preview_time, " less than 0");
+    const auto error_msg =
+        absl::StrCat("Preview time set as: ", preview_time, " less than 0");
     AERROR << error_msg;
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, error_msg);
   }
@@ -268,14 +268,22 @@ Status LonController::ComputeControlCommand(
   debug->set_is_full_stop(false);
   GetPathRemain(debug);
 
+  // At near-stop stage, replace the brake control command with the standstill
+  // acceleration if the former is even softer than the latter
   if ((trajectory_message_->trajectory_type() ==
        apollo::planning::ADCTrajectory::NORMAL) &&
       ((std::fabs(debug->preview_acceleration_reference()) <=
-            FLAGS_max_acceleration_when_stopped &&
+            control_conf_->max_acceleration_when_stopped() &&
         std::fabs(debug->preview_speed_reference()) <=
             vehicle_param_.max_abs_speed_when_stopped()) ||
-       std::abs(debug->path_remain()) < 0.3)) {
-    acceleration_cmd = lon_controller_conf.standstill_acceleration();
+       std::abs(debug->path_remain()) <
+           control_conf_->max_path_remain_when_stopped())) {
+    acceleration_cmd =
+        (chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)
+            ? std::max(acceleration_cmd,
+                       -lon_controller_conf.standstill_acceleration())
+            : std::min(acceleration_cmd,
+                       lon_controller_conf.standstill_acceleration());
     ADEBUG << "Stop location reached";
     debug->set_is_full_stop(true);
   }
@@ -401,6 +409,19 @@ void LonController::ComputeLongitudinalErrors(
       trajectory_analyzer->QueryNearestPointByAbsoluteTime(
           preview_control_time);
 
+  debug->mutable_current_matched_point()->mutable_path_point()->set_x(
+      matched_point.x());
+  debug->mutable_current_matched_point()->mutable_path_point()->set_y(
+      matched_point.y());
+  debug->mutable_current_reference_point()->mutable_path_point()->set_x(
+      reference_point.path_point().x());
+  debug->mutable_current_reference_point()->mutable_path_point()->set_y(
+      reference_point.path_point().y());
+  debug->mutable_preview_reference_point()->mutable_path_point()->set_x(
+      preview_point.path_point().x());
+  debug->mutable_preview_reference_point()->mutable_path_point()->set_y(
+      preview_point.path_point().y());
+
   ADEBUG << "matched point:" << matched_point.DebugString();
   ADEBUG << "reference point:" << reference_point.DebugString();
   ADEBUG << "preview point:" << preview_point.DebugString();
@@ -454,31 +475,38 @@ void LonController::SetDigitalFilter(double ts, double cutoff_freq,
 // TODO(all): Refactor and simplify
 void LonController::GetPathRemain(SimpleLongitudinalDebug *debug) {
   int stop_index = 0;
+  static constexpr double kSpeedThreshold = 1e-3;
+  static constexpr double kForwardAccThreshold = -1e-2;
+  static constexpr double kBackwardAccThreshold = 1e-1;
+  static constexpr double kParkingSpeed = 0.1;
 
   if (trajectory_message_->gear() == canbus::Chassis::GEAR_DRIVE) {
     while (stop_index < trajectory_message_->trajectory_point_size()) {
-      if (fabs(trajectory_message_->trajectory_point(stop_index).v()) < 1e-3 &&
-          trajectory_message_->trajectory_point(stop_index).a() > -0.01 &&
-          trajectory_message_->trajectory_point(stop_index).a() < 0.0) {
+      auto &current_trajectory_point =
+          trajectory_message_->trajectory_point(stop_index);
+      if (fabs(current_trajectory_point.v()) < kSpeedThreshold &&
+          current_trajectory_point.a() > kForwardAccThreshold &&
+          current_trajectory_point.a() < 0.0) {
         break;
-      } else {
-        ++stop_index;
       }
+      ++stop_index;
     }
   } else {
     while (stop_index < trajectory_message_->trajectory_point_size()) {
-      if (fabs(trajectory_message_->trajectory_point(stop_index).v()) < 1e-3 &&
-          trajectory_message_->trajectory_point(stop_index).a() < 0.1 &&
-          trajectory_message_->trajectory_point(stop_index).a() > 0.0) {
+      auto &current_trajectory_point =
+          trajectory_message_->trajectory_point(stop_index);
+      if (current_trajectory_point.v() < kSpeedThreshold &&
+          current_trajectory_point.a() < kBackwardAccThreshold &&
+          current_trajectory_point.a() > 0.0) {
         break;
-      } else {
-        ++stop_index;
       }
+      ++stop_index;
     }
   }
   if (stop_index == trajectory_message_->trajectory_point_size()) {
     --stop_index;
-    if (fabs(trajectory_message_->trajectory_point(stop_index).v()) < 0.1) {
+    if (fabs(trajectory_message_->trajectory_point(stop_index).v()) <
+        kParkingSpeed) {
       ADEBUG << "the last point is selected as parking point";
     } else {
       ADEBUG << "the last point found in path and speed > speed_deadzone";

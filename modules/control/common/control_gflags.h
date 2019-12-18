@@ -20,6 +20,16 @@
 
 // data file
 DECLARE_string(control_conf_file);
+// control common conf file
+DECLARE_string(control_common_conf_file);
+// mpc controller conf file
+DECLARE_string(mpc_controller_conf_file);
+// lateral controller conf file
+DECLARE_string(lateral_controller_conf_file);
+// longitudinal controller conf file
+DECLARE_string(longitudinal_controller_conf_file);
+// calibration table
+DECLARE_string(calibration_table_file);
 
 DECLARE_double(control_test_duration);
 
@@ -29,10 +39,14 @@ DECLARE_bool(enable_csv_debug);
 DECLARE_bool(enable_speed_station_preview);
 
 DECLARE_string(control_node_name);
+
+DECLARE_string(preprocessor_submodule_name);
+DECLARE_string(mpc_controller_submodule_name);
+DECLARE_string(postprocessor_submodule_name);
+DECLARE_string(lat_lon_controller_submodule_name);
+
 DECLARE_bool(is_control_test_mode);
 DECLARE_bool(use_preview_speed_for_table);
-
-DECLARE_double(max_acceleration_when_stopped);
 
 DECLARE_double(steer_angle_rate);
 DECLARE_bool(enable_gain_scheduler);
@@ -53,3 +67,16 @@ DECLARE_bool(reverse_heading_control);
 
 DECLARE_bool(trajectory_transform_to_com_reverse);
 DECLARE_bool(trajectory_transform_to_com_drive);
+
+DECLARE_bool(enable_maximum_steer_rate_limit);
+
+DECLARE_bool(query_time_nearest_point_only);
+DECLARE_bool(query_forward_time_point_only);
+
+DECLARE_bool(enable_feedback_augment_on_high_speed);
+
+DECLARE_bool(enable_gear_drive_negative_speed_protection);
+
+DECLARE_bool(use_osqp_solver);
+
+DECLARE_bool(use_control_submodules);

@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "third_party_perception_test_base",
-    srcs = [
-        "third_party_perception_test_base.cc",
-    ],
-    hdrs = [
-        "third_party_perception_test_base.h",
-    ],
+    srcs = ["third_party_perception_test_base.cc"],
+    hdrs = ["third_party_perception_test_base.h"],
     deps = [
         "//modules/third_party_perception:third_party_perception_lib",
     ],

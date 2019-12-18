@@ -11,9 +11,7 @@ cc_proto_library(
 
 proto_library(
     name = "pointcloud_preprocessor_config_proto_lib",
-    srcs = [
-        "pointcloud_preprocessor_config.proto",
-    ],
+    srcs = ["pointcloud_preprocessor_config.proto"],
 )
 
 cpplint()

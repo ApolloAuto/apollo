@@ -54,11 +54,11 @@ void AbstractClassFactoryBase::RemoveOwnedClassLoader(
 bool AbstractClassFactoryBase::IsOwnedBy(const ClassLoader* loader) {
   std::vector<ClassLoader*>::iterator itr = std::find(
       relative_class_loaders_.begin(), relative_class_loaders_.end(), loader);
-  return (itr != relative_class_loaders_.end());
+  return itr != relative_class_loaders_.end();
 }
 
 bool AbstractClassFactoryBase::IsOwnedByAnybody() {
-  return (relative_class_loaders_.size() > 0);
+  return !relative_class_loaders_.empty();
 }
 
 std::vector<ClassLoader*> AbstractClassFactoryBase::GetRelativeClassLoaders() {

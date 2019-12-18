@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/bridge/udp_bridge_component.h"
+
+#include "modules/bridge/udp_bridge_sender_component.h"
 
 #include "cyber/init.h"
 #include "gtest/gtest.h"
@@ -21,9 +22,9 @@
 namespace apollo {
 namespace bridge {
 
-TEST(PredictionComponentTest, Simple) {
+TEST(UDPBridgeSenderComponentTest, Simple) {
   cyber::Init("udp_bridge_component_test");
-  UDPBridgeComponent<planning::ADCTrajectory> udp_bridge_component;
+  UDPBridgeSenderComponent<planning::ADCTrajectory> udp_bridge_component;
   EXPECT_EQ(udp_bridge_component.Name(), "Bridge");
 }
 

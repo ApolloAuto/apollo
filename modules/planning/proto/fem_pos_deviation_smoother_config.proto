@@ -1,0 +1,32 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message FemPosDeviationSmootherConfig {
+  optional double weight_fem_pos_deviation = 2 [default = 1.0e10];
+  optional double weight_ref_deviation = 3 [default = 1.0];
+  optional double weight_path_length = 4 [default = 1.0];
+  optional bool apply_curvature_constraint = 5 [default = false];
+  optional double weight_curvature_constraint_slack_var = 6 [default = 1.0e2];
+  optional double curvature_constraint = 7 [default = 0.2];
+  optional bool use_sqp = 8 [default = false];
+  optional double sqp_ftol = 9 [default = 1e-4];
+  optional double sqp_ctol = 10 [default = 1e-3];
+  optional int32 sqp_pen_max_iter = 11 [default = 10];
+  optional int32 sqp_sub_max_iter = 12 [default = 100];
+
+  // osqp settings
+  optional int32 max_iter = 100 [default = 500];
+  // time_limit set to be 0.0 meaning no time limit
+  optional double time_limit = 101 [default = 0.0];
+  optional bool verbose = 102 [default = false];
+  optional bool scaled_termination = 103 [default = true];
+  optional bool warm_start = 104 [default = true];
+
+  // ipopt settings
+  optional int32 print_level = 200 [default = 0];
+  optional int32 max_num_of_iterations = 201 [default = 500];
+  optional int32 acceptable_num_of_iterations = 202 [default = 15];
+  optional double tol = 203 [default = 1e-8];
+  optional double acceptable_tol = 204 [default = 1e-1];
+}

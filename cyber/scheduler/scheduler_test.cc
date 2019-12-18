@@ -18,6 +18,7 @@
 
 #include <gtest/gtest.h>
 #include <string>
+#include <thread>
 
 #include "cyber/common/global_data.h"
 #include "cyber/cyber.h"
@@ -29,6 +30,8 @@
 namespace apollo {
 namespace cyber {
 namespace scheduler {
+
+using apollo::cyber::proto::InnerThread;
 
 void proc() {}
 
@@ -61,6 +64,25 @@ TEST(SchedulerTest, notify_task) {
   EXPECT_FALSE(sched->NotifyTask(id));
   EXPECT_TRUE(sched->CreateTask(&proc, name));
   EXPECT_TRUE(sched->NotifyTask(id));
+}
+
+TEST(SchedulerTest, set_inner_thread_attr) {
+  auto sched = Instance();
+  cyber::Init("scheduler_test");
+  std::thread t = std::thread([]() {});
+  std::unordered_map<std::string, InnerThread> thread_confs;
+  InnerThread inner_thread;
+  inner_thread.set_cpuset("0-1");
+  inner_thread.set_policy("SCHED_FIFO");
+  inner_thread.set_prio(10);
+  thread_confs["inner_thread_test"] = inner_thread;
+  sched->SetInnerThreadConfs(thread_confs);
+  sched->SetInnerThreadAttr("inner_thread_test", &t);
+  std::this_thread::sleep_for(std::chrono::milliseconds(5));
+  if (t.joinable()) {
+    t.join();
+  }
+  sched->Shutdown();
 }
 
 }  // namespace scheduler

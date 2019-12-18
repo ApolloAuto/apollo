@@ -62,4 +62,4 @@ uncertainty {
     z: 0.0061467432555478117
   }
 }
-measurement_time: 1518648377.3248789
+measurement_time: 1518648377.318433

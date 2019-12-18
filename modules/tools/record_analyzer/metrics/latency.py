@@ -36,6 +36,6 @@ class Latency:
             planning_latency = {
                 "max" : 0.0,
                 "min" : 0.0,
-                "avg" : 0.0            
+                "avg" : 0.0
             }
         return planning_latency

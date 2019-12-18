@@ -80,10 +80,10 @@ def print_help_command():
     Args:
 
     """
-    print 'type in command: [q] [r]'
-    print '         q               exit'
-    print '         r               plot route result'
-    print '         r_map           plot route result with map'
+    print('type in command: [q] [r]')
+    print('         q               exit')
+    print('         r               plot route result')
+    print('         r_map           plot route result with map')
 
 
 if __name__ == '__main__':
@@ -99,7 +99,7 @@ if __name__ == '__main__':
     plt.ion()
     while 1:
         print_help_command()
-        print 'cmd>',
+        print('cmd>', end=' ')
         instruction = raw_input()
         argv = instruction.strip(' ').split(' ')
         if len(argv) == 1:
@@ -111,9 +111,9 @@ if __name__ == '__main__':
                 plot_route(route, central_curves)
                 util.draw_map(plt.gca(), base_map)
             else:
-                print '[ERROR] wrong command'
+                print('[ERROR] wrong command')
             continue
 
         else:
-            print '[ERROR] wrong arguments'
+            print('[ERROR] wrong arguments')
             continue

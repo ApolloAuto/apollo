@@ -2,23 +2,37 @@
 
 ## 1. Preparation
  - Download source code of Apollo from [GitHub](https://github.com/ApolloAuto/apollo)
- - Follow the tutorial to set up [docker environment](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md) and [build Apollo](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_launch_Apollo.md).
- - Download localization data from [Apollo Data Open Platform](http://data.apollo.auto/?name=sensor%20data&data_key=multisensor&data_type=1&locale=en-us&lang=en)（US only)
+ - Follow the tutorial to set up [docker environment](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md).
+ - Download localization data from [Apollo Data Open Platform](http://data.apollo.auto/?name=sensor%20data&data_key=multisensor&data_type=1&locale=en-us&lang=en)（US only).
 
-## 2. Configuring Parameters
-Assume that the path to download localization data from is DATA_PATH.
-### 2.1. Configure Sensor Extrinsics
+## 2. Build Apollo
+
+First check and make sure you are in development docker container before you proceed. Now you will need to build from the source. 
 ```
-cp DATA_PATH/params/ant_imu_leverarm.yaml /apollo/modules/localization/msf/params/gnss_params/
-cp DATA_PATH/params/velodyne64_novatel_extrinsics_example.yaml /apollo/modules/localization/msf/params/velodyne_params/
-cp DATA_PATH/params/velodyne64_height.yaml /apollo/modules/localization/msf/params/velodyne_params/
+# To make sure you start clean
+bash apollo.sh clean
+# Build the full system
+bash apollo.sh build_opt
 ```
-The meaning of each file
+
+`note:` If the computer is very slow, you can enter the following command to limit the CPU.
+
+```
+bash apollo.sh build_opt --local_resources 2048,1.0,1.0
+```
+
+## 3. Configuring Parameters
+In the downloaded data, you can find a folder named *apollo3.5*. Let's assume the path of this folder as DATA_PATH.
+### 3.1 Configure Sensor Extrinsics
+```
+cp -r DATA_PATH/params/* /apollo/modules/localization/msf/params/
+```
+The meaning of each file in the folder
  - **ant_imu_leverarm.yaml**:  Lever arm value
- - **velodyne64_novatel_extrinsics_example.yaml**: Transform from IMU coord to LiDAR coord
- - **velodyne64_height.yaml**: Height of the LiDAR relative to the ground
+ - **velodyne128_novatel_extrinsics.yaml**: Transform from IMU coord to LiDAR coord
+ - **velodyne128_height.yaml**: Height of the LiDAR relative to the ground
 
-### 2.2. Configure Map Path
+### 3.2 Configure Map Path
 Add config of map path in /apollo/modules/localization/conf/localization.conf
 ```
 # Redefine the map_dir in global_flagfile.txt
@@ -26,15 +40,11 @@ Add config of map path in /apollo/modules/localization/conf/localization.conf
 ```
 This will overwrite the default config defined in global_flagfile.txt
 
-## 3. Run the multi-sensor fusion localization module
+## 4. Run the multi-sensor fusion localization module
 run the script in apollo directory
 ```
-./scripts/localization.sh
+cyber_launch start /apollo/modules/localization/launch/msf_localization.launch
 ```
-This script will run localization program in the background. You can check if the program is running by using the command.
-```
-ps -e | grep "localization".
-```     
 
 In /apollo/data/log directory, you can see the localization log files.     
  - localization.INFO : INFO log
@@ -43,26 +53,26 @@ In /apollo/data/log directory, you can see the localization log files.
  - localization.out : Redirect standard output
  - localizaiton.flags : A backup of configuration file
 
-## 4. Play ROS bag
+## 5. Play cyber records
 ```
-cd DATA_PATH/bag
-rosbag play *.bag
+cd DATA_PATH/records
+cyber_recorder play -f record.*
 ```
-The localization module will finish initialization and start publishing localization results after around 30 seconds.
+The localization module will finish initialization and start publishing localization results after around 50 seconds.
 
-## 5. Record and Visualize localization result (optional)
+## 6. Record and Visualize localization result (optional)
 ### Record localization result
 ```
-./scripts/record_bag.sh
+python /apollo/scripts/record_bag.py --start
 ```
 ### Visualize Localization result
 ```
-./scripts/localization_online_visualizer.sh
+cyber_launch start /apollo/modules/localization/launch/msf_visualizer.launch
 ```
-First, the visualization tool will generate a series of cache files from the localization map, which will be stored in the apollo/data/map_visual directory.
+First, the visualization tool will generate a series of cache files from the localization map, which will be stored in the /apollo/cyber/data/map_visual directory.
 
 Then it will receive the topics blew and draw them on screen.
- - /apollo/sensor/velodyne64/compensator/PointCloud2
+ - /apollo/sensor/lidar128/compensator/PointCloud2
  - /apollo/localization/msf_lidar
  - /apollo/localization/msf_gnss
  - /apollo/localization/pose
@@ -71,32 +81,30 @@ If everything is fine, you should see this on screen.
 
 ![1](images/msf_localization/online_visualizer.png)
 
-## 6. Stop localization module  
-You can stop localizaiton module by
+`Note:` The visualization tool will show up the windows after the localization module started to published localization msgs to topic /apollo/localization/pose. You can use command *cyber_monitor* to monitor the status of topics.
+
+## 7. Stop localization module  
+If you record localization result in step 6, you will also need to end the recording process:
 ```
-./scripts/localizaiton.sh stop
-```
-If you record localization result in step 5, you will also need to end the recording process:
-```
-./scripts/record_bag_local.sh stop
+python /apollo/scripts/record_bag.py --stop
 ```
 
-## 7. Verify the localization result (optional)
+## 8. Verify the localization result (optional)
 
 ```
-./scripts/msf_local_evaluation.sh OUTPUT_PATH ANT_IMU_PATH
+./scripts/msf_local_evaluation.sh OUTPUT_PATH
 ```
-OUTPUT_PATH is the folder stored recording bag in step 5, and ANT_IMU_PATH is the file stored lever arm value.
+OUTPUT_PATH is the folder stored recording bag in step 6.
 
 This script compares the localization results of MSF mode to RTK mode.
 
-(Aware that this comparison makes sense only when the RTK mode runs well.)
+`Note:` Aware that this comparison makes sense only when the RTK mode runs well.
 
 And we can get the statistical results like this
 
 ![2](images/msf_localization/localization_result.png)
 
-The first table is the statistical data of Fusion localization. The second table is the statistical result of Lidar localization. The third table is the statistical result of GNSS localization.
+The first table is the statistical data of Fusion localization. The second table is the statistical result of Lidar localization.
 
 The meaning of each row in the table
  - **error**：  the plane error, unit is meter

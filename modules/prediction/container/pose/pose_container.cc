@@ -18,6 +18,7 @@
 
 #include "cyber/common/log.h"
 #include "modules/common/math/quaternion.h"
+#include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
 namespace prediction {
@@ -55,7 +56,7 @@ void PoseContainer::Update(
   }
   obstacle_ptr_->Clear();
 
-  obstacle_ptr_->set_id(ID);
+  obstacle_ptr_->set_id(FLAGS_ego_vehicle_id);
   Point position;
   position.set_x(localization.pose().position().x());
   position.set_y(localization.pose().position().y());

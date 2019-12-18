@@ -137,5 +137,9 @@ bool Predictor::SupposedToStop(const Feature& feature,
          *acceleration >= FLAGS_vehicle_min_linear_acc;
 }
 
+const ObstacleConf::PredictorType& Predictor::predictor_type() {
+  return predictor_type_;
+}
+
 }  // namespace prediction
 }  // namespace apollo

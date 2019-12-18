@@ -82,7 +82,7 @@ def main():
     plotter = Plotter(file_path)
     plotter.process_data(file_path)
     plotter.save_data()
-    print 'save result to:', file_path + ".result"
+    print('save result to:', file_path + ".result")
 
 
 if __name__ == '__main__':

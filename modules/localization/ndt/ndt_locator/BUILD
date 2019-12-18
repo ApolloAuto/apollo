@@ -4,9 +4,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "ndt_lidar_locator",
-    srcs = [
-        "lidar_locator_ndt.cc",
-    ],
+    srcs = ["lidar_locator_ndt.cc"],
     hdrs = [
         "lidar_locator_ndt.h",
         "ndt_solver.h",
@@ -21,7 +19,8 @@ cc_library(
         "//modules/common/time",
         "//modules/localization/common:localization_common",
         "//modules/localization/msf/common/util:localization_msf_common_util",
-        "//modules/localization/msf/local_map/ndt_map:localization_msf_ndt_map",
+        "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map",
+        "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map_pool",
         "@eigen",
         "@glog",
         "@pcl",
@@ -56,6 +55,9 @@ cc_test(
     timeout = "short",
     srcs = ["ndt_solver_test.cc"],
     data = [":ndt_lidar_locator_test_data"],
+    linkopts = [
+        "-llz4",
+    ],
     deps = [
         "//cyber",
         "//modules/localization/msf/common/io:localization_msf_common_io",

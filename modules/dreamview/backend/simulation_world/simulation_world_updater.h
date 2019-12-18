@@ -29,10 +29,11 @@
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 
-#include "modules/common/util/string_util.h"
+#include "absl/strings/str_cat.h"
 #include "modules/dreamview/backend/data_collection_monitor/data_collection_monitor.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/map/map_service.h"
+#include "modules/dreamview/backend/perception_camera_updater/perception_camera_updater.h"
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
 #include "modules/routing/proto/poi.pb.h"
@@ -62,8 +63,10 @@ class SimulationWorldUpdater {
    * @param routing_from_file whether to read initial routing from file.
    */
   SimulationWorldUpdater(WebSocketHandler *websocket, WebSocketHandler *map_ws,
-                         SimControl *sim_control, const MapService *map_service,
+                         WebSocketHandler *camera_ws, SimControl *sim_control,
+                         const MapService *map_service,
                          DataCollectionMonitor *data_collection_monitor,
+                         PerceptionCameraUpdater *perception_camera_updater,
                          bool routing_from_file = false);
 
   /**
@@ -109,26 +112,6 @@ class SimulationWorldUpdater {
    */
   bool LoadPOI();
 
-  /**
-   * @brief Dumps the latest received message to file.
-   * @param adapter the adapter to perform dumping
-   * @param adapter_name the name of the adapter
-   */
-  template <typename AdapterType>
-  void DumpMessage(AdapterType *adapter, std::string adapter_name) {
-    if (adapter->DumpLatestMessage()) {
-      sim_world_service_.PublishMonitorMessage(
-          common::monitor::MonitorMessageItem::INFO,
-          common::util::StrCat("Dumped latest ", adapter_name,
-                               " message under /tmp/", adapter_name, "."));
-    } else {
-      sim_world_service_.PublishMonitorMessage(
-          common::monitor::MonitorMessageItem::WARN,
-          common::util::StrCat("Failed to dump latest ", adapter_name,
-                               " message."));
-    }
-  }
-
   void RegisterMessageHandlers();
 
   std::unique_ptr<cyber::Timer> timer_;
@@ -137,8 +120,10 @@ class SimulationWorldUpdater {
   const MapService *map_service_ = nullptr;
   WebSocketHandler *websocket_ = nullptr;
   WebSocketHandler *map_ws_ = nullptr;
+  WebSocketHandler *camera_ws_ = nullptr;
   SimControl *sim_control_ = nullptr;
   DataCollectionMonitor *data_collection_monitor_ = nullptr;
+  PerceptionCameraUpdater *perception_camera_updater_ = nullptr;
 
   // End point for requesting default route
   apollo::routing::POI poi_;

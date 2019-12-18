@@ -33,7 +33,7 @@ namespace planning {
 namespace scenario {
 namespace bare_intersection {
 
-using hdmap::HDMapUtil;
+using apollo::hdmap::HDMapUtil;
 
 void BareIntersectionUnprotectedScenario::Init() {
   if (init_) {
@@ -111,8 +111,7 @@ bool BareIntersectionUnprotectedScenario::GetScenarioConfig() {
     AERROR << "miss scenario specific config";
     return false;
   }
-  context_.scenario_config.CopyFrom(
-      config_.bare_intersection_unprotected_config());
+  context_.scenario_config = config_.bare_intersection_unprotected_config();
   return true;
 }
 

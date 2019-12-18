@@ -74,11 +74,25 @@ struct NMSParam {
   std::string type = BoxVote;
 };
 struct YoloBlobs {
-  std::shared_ptr<base::Blob<float>> loc_blob;
-  std::shared_ptr<base::Blob<float>> obj_blob;
-  std::shared_ptr<base::Blob<float>> cls_blob;
-  std::shared_ptr<base::Blob<float>> ori_blob;
-  std::shared_ptr<base::Blob<float>> dim_blob;
+  std::shared_ptr<base::Blob<float>> det1_loc_blob;
+  std::shared_ptr<base::Blob<float>> det1_obj_blob;
+  std::shared_ptr<base::Blob<float>> det1_cls_blob;
+  std::shared_ptr<base::Blob<float>> det1_ori_conf_blob;
+  std::shared_ptr<base::Blob<float>> det1_ori_blob;
+  std::shared_ptr<base::Blob<float>> det1_dim_blob;
+  std::shared_ptr<base::Blob<float>> det2_loc_blob;
+  std::shared_ptr<base::Blob<float>> det2_obj_blob;
+  std::shared_ptr<base::Blob<float>> det2_cls_blob;
+  std::shared_ptr<base::Blob<float>> det2_ori_conf_blob;
+  std::shared_ptr<base::Blob<float>> det2_ori_blob;
+  std::shared_ptr<base::Blob<float>> det2_dim_blob;
+  std::shared_ptr<base::Blob<float>> det3_loc_blob;
+  std::shared_ptr<base::Blob<float>> det3_obj_blob;
+  std::shared_ptr<base::Blob<float>> det3_cls_blob;
+  std::shared_ptr<base::Blob<float>> det3_ori_conf_blob;
+  std::shared_ptr<base::Blob<float>> det3_ori_blob;
+  std::shared_ptr<base::Blob<float>> det3_dim_blob;
+
   std::shared_ptr<base::Blob<float>> lof_blob;
   std::shared_ptr<base::Blob<float>> lor_blob;
   std::shared_ptr<base::Blob<float>> brvis_blob;
@@ -101,6 +115,11 @@ struct MinDims {
   float min_3d_length = 0.0f;
   float min_3d_width = 0.0f;
 };
+
+constexpr float minExpPower = -10.0f;
+constexpr float maxExpPower = 5.0f;
+constexpr int anchorSizeFactor = 2;
+constexpr int numScales = 3;
 
 __host__ __device__ float sigmoid_gpu(float x);
 __host__ __device__ float bbox_size_gpu(const float *bbox,

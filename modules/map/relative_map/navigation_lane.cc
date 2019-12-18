@@ -25,13 +25,13 @@
 #include <limits>
 #include <string>
 
-#include "modules/map/proto/map_lane.pb.h"
-
+#include "absl/strings/str_cat.h"
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/map/proto/map_lane.pb.h"
 #include "modules/map/relative_map/common/relative_map_gflags.h"
 
 namespace apollo {
@@ -53,7 +53,7 @@ namespace {
  * markings are used here.
  * @param hdmap The output single lane map in high-definition map format in the
  * relative map.
- * @param navigation_path The ouput navigation path map in the relative map.
+ * @param navigation_path The output navigation path map in the relative map.
  * @return True if the map is created; false otherwise.
  */
 bool CreateSingleLaneMap(
@@ -71,8 +71,8 @@ bool CreateSingleLaneMap(
     return false;
   }
   auto *lane = hdmap->add_lane();
-  lane->mutable_id()->set_id(std::to_string(navi_path->path_priority()) + "_" +
-                             path.name());
+  lane->mutable_id()->set_id(
+      absl::StrCat(navi_path->path_priority(), "_", path.name()));
   (*navigation_path)[lane->id().id()] = *navi_path;
   // lane types
   lane->set_type(Lane::CITY_DRIVING);
@@ -416,7 +416,7 @@ common::PathPoint NavigationLane::GetPathPointByS(const common::Path &path,
     return path.path_point(size - 1);
   }
 
-  constexpr double kEpsilon = 1e-9;
+  static constexpr double kEpsilon = 1e-9;
   if (std::fabs(path.path_point(start_index).s() - s) < kEpsilon) {
     *matched_index = start_index;
     return path.path_point(start_index);
@@ -572,7 +572,7 @@ ProjIndexPair NavigationLane::UpdateProjectionIndex(const common::Path &path,
     current_project_index = std::max(0, item_iter->second.first);
   }
 
-  // A lambda expression for checking the distance between the vehicle's inital
+  // A lambda expression for checking the distance between the vehicle's initial
   // position and the starting point of  the current navigation line.
   auto check_distance_func = [this, &path, &path_size](
                                  const int project_index,
@@ -831,7 +831,7 @@ void NavigationLane::UpdateStitchIndexInfo() {
     return;
   }
 
-  constexpr int kMinPathPointSize = 10;
+  static constexpr int kMinPathPointSize = 10;
   for (int i = 0; i < navigation_line_num; ++i) {
     const auto &navigation_path = navigation_info_.navigation_path(i).path();
     if (!navigation_info_.navigation_path(i).has_path() ||

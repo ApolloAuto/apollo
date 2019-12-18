@@ -22,8 +22,6 @@
 DECLARE_string(node_name);
 DECLARE_string(canbus_driver_name);
 
-DECLARE_string(adapter_config_filename);
-
 // data file
 DECLARE_string(sensor_conf_file);
 

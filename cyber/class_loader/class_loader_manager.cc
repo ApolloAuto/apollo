@@ -25,7 +25,7 @@ ClassLoaderManager::~ClassLoaderManager() {}
 
 ClassLoader* ClassLoaderManager::GetClassLoaderByLibPath(
     const std::string& library_path) {
-  return (libpath_loader_map_[library_path]);
+  return libpath_loader_map_[library_path];
 }
 
 std::vector<ClassLoader*> ClassLoaderManager::GetAllValidClassLoaders() {

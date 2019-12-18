@@ -14,17 +14,22 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "./general_channel_message.h"
-#include "./general_message.h"
-#include "./screen.h"
+#include "cyber/tools/cyber_monitor/general_channel_message.h"
 
 #include <iomanip>
 #include <sstream>
 #include <string>
 #include <vector>
 
+#include "cyber/record/record_message.h"
+#include "cyber/tools/cyber_monitor/general_message.h"
+#include "cyber/tools/cyber_monitor/screen.h"
+
 namespace {
 constexpr int ReaderWriterOffset = 4;
+using apollo::cyber::record::kGB;
+using apollo::cyber::record::kKB;
+using apollo::cyber::record::kMB;
 }  // namespace
 
 const char* GeneralChannelMessage::errCode2Str(
@@ -79,7 +84,9 @@ bool GeneralChannelMessage::isErrorCode(void* ptr) {
 }
 
 double GeneralChannelMessage::frame_ratio(void) {
-  if (!is_enabled() || !has_message_come()) return 0.0;
+  if (!is_enabled() || !has_message_come()) {
+    return 0.0;
+  }
   auto time_now = apollo::cyber::Time::MonoTime();
   auto interval = time_now - time_last_calc_;
   if (interval.ToNanosecond() > 1000000000) {
@@ -239,6 +246,16 @@ void GeneralChannelMessage::RenderDebugString(const Screen* s, int key,
         s->AddStr(0, lineNo++, "RawMessage Size: ");
         outStr.str("");
         outStr << channelMsg->message.size() << " Bytes";
+        if (channelMsg->message.size() >= kGB) {
+          outStr << " (" << static_cast<float>(channelMsg->message.size()) / kGB
+                 << " GB)";
+        } else if (channelMsg->message.size() >= kMB) {
+          outStr << " (" << static_cast<float>(channelMsg->message.size()) / kMB
+                 << " MB)";
+        } else if (channelMsg->message.size() >= kKB) {
+          outStr << " (" << static_cast<float>(channelMsg->message.size()) / kKB
+                 << " KB)";
+        }
         s->AddStr(outStr.str().c_str());
         if (raw_msg_class_->ParseFromString(channelMsg->message)) {
           int lcount = lineCount(*raw_msg_class_, s->Width());

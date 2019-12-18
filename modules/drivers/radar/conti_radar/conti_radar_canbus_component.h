@@ -30,12 +30,9 @@
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/util/util.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
-#include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
-#include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
 #include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
-#include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/drivers/radar/conti_radar/conti_radar_message_manager.h"
 #include "modules/drivers/radar/conti_radar/protocol/motion_input_speed_300.h"
@@ -57,18 +54,6 @@ namespace conti_radar {
  * @brief template of canbus-based sensor module main class (e.g., conti_radar).
  */
 
-using apollo::common::ErrorCode;
-// using apollo::common::monitor::MonitorMessageItem;
-using apollo::common::time::Clock;
-using apollo::cyber::Reader;
-using apollo::cyber::Writer;
-using apollo::drivers::canbus::CanClient;
-using apollo::drivers::canbus::CanClientFactory;
-using apollo::drivers::canbus::CanReceiver;
-using apollo::drivers::canbus::SenderMessage;
-using apollo::drivers::canbus::SensorCanbusConf;
-using apollo::localization::LocalizationEstimate;
-
 class ContiRadarCanbusComponent : public apollo::cyber::Component<> {
  public:
   ContiRadarCanbusComponent();
@@ -83,12 +68,15 @@ class ContiRadarCanbusComponent : public apollo::cyber::Component<> {
   void Stop();
 
   ContiRadarConf conti_radar_conf_;
-  std::shared_ptr<CanClient> can_client_;
-  CanReceiver<ContiRadar> can_receiver_;
+  std::shared_ptr<apollo::drivers::canbus::CanClient> can_client_;
+  apollo::drivers::canbus::CanReceiver<ContiRadar> can_receiver_;
   std::unique_ptr<ContiRadarMessageManager> sensor_message_manager_;
-  std::shared_ptr<Writer<ContiRadar>> conti_radar_writer_;
-  std::shared_ptr<Reader<LocalizationEstimate>> pose_reader_;
-  void PoseCallback(const std::shared_ptr<LocalizationEstimate>& pose);
+  std::shared_ptr<apollo::cyber::Writer<ContiRadar>> conti_radar_writer_;
+  std::shared_ptr<
+      apollo::cyber::Reader<apollo::localization::LocalizationEstimate>>
+      pose_reader_;
+  void PoseCallback(
+      const std::shared_ptr<apollo::localization::LocalizationEstimate>& pose);
   uint64_t last_nsec_ = 0;
 
   int64_t last_timestamp_ = 0;

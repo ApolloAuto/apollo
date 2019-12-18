@@ -16,7 +16,11 @@
 
 #include "modules/transform/buffer.h"
 
+#include <thread>
+
+#include "absl/strings/str_cat.h"
 #include "cyber/cyber.h"
+#include "modules/common/adapters/adapter_gflags.h"
 
 namespace apollo {
 namespace transform {
@@ -26,8 +30,8 @@ static constexpr float kSecondToNanoFactor = 1e9f;
 Buffer::Buffer() : BufferCore() { Init(); }
 
 int Buffer::Init() {
-  std::string node_name =
-      "transform_listener_" + std::to_string(cyber::Time::Now().ToNanosecond());
+  const std::string node_name =
+      absl::StrCat("transform_listener_", cyber::Time::Now().ToNanosecond());
   node_ = cyber::CreateNode(node_name);
   apollo::cyber::proto::RoleAttributes attr;
   attr.set_channel_name("/tf");
@@ -37,7 +41,7 @@ int Buffer::Init() {
       });
 
   apollo::cyber::proto::RoleAttributes attr_static;
-  attr_static.set_channel_name("/tf_static");
+  attr_static.set_channel_name(FLAGS_tf_static_topic);
   attr_static.mutable_qos_profile()->CopyFrom(
       apollo::cyber::transport::QosProfileConf::QOS_PROFILE_TF_STATIC);
   message_subscriber_tf_static_ = node_->CreateReader<TransformStampeds>(
@@ -105,9 +109,23 @@ void Buffer::SubscriptionCallbackImpl(
       setTransform(trans_stamped, authority, is_static);
     } catch (tf2::TransformException& ex) {
       std::string temp = ex.what();
-      AERROR << "Failure to set recieved transform:" << temp.c_str();
+      AERROR << "Failure to set received transform:" << temp.c_str();
     }
   }
+}
+
+bool Buffer::GetLatestStaticTF(const std::string& frame_id,
+                               const std::string& child_frame_id,
+                               TransformStamped* tf) {
+  for (auto reverse_iter = static_msgs_.rbegin();
+       reverse_iter != static_msgs_.rend(); ++reverse_iter) {
+    if ((*reverse_iter).header.frame_id == frame_id &&
+        (*reverse_iter).child_frame_id == child_frame_id) {
+      TF2MsgToCyber((*reverse_iter), (*tf));
+      return true;
+    }
+  }
+  return false;
 }
 
 void Buffer::TF2MsgToCyber(
@@ -178,7 +196,7 @@ bool Buffer::canTransform(const std::string& target_frame,
       cyber::Time::Now().ToNanosecond() < start_time + timeout_ns &&
       !canTransform(target_frame, source_frame, time.ToNanosecond(), errstr) &&
       !cyber::IsShutdown()) {
-    usleep(3000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(3));
   }
   bool retval =
       canTransform(target_frame, source_frame, time.ToNanosecond(), errstr);
@@ -202,7 +220,7 @@ bool Buffer::canTransform(const std::string& target_frame,
                        source_time.ToNanosecond(),
                        fixed_frame) &&
          !cyber::IsShutdown()) {  // Make sure we haven't been stopped
-    usleep(3000);
+    std::this_thread::sleep_for(std::chrono::milliseconds(3));
   }
   bool retval =
       canTransform(target_frame, target_time.ToNanosecond(), source_frame,

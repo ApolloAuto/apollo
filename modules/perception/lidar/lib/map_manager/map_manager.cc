@@ -81,7 +81,7 @@ bool MapManager::Update(const MapManagerOptions& options, LidarFrame* frame) {
   return true;
 }
 bool MapManager::QueryPose(Eigen::Affine3d* sensor2world_pose) const {
-  // TODO(...): map-based aligment to refine pose
+  // TODO(...): map-based alignment to refine pose
   return false;
 }
 

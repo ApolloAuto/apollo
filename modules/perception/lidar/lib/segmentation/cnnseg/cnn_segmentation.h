@@ -120,6 +120,10 @@ class CNNSegmentation : public BaseSegmentation {
   // sensor_name
   std::string sensor_name_;
 
+  // secondary segmentation to improve miss detection
+  // not found by neural networks !
+  std::shared_ptr<BaseSegmentation> secondary_segmentor;
+
  private:
   const int kDefaultPointCloudSize = 120000;
 

@@ -4,14 +4,11 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "motion_service_lib",
-    srcs = [
-        "motion_service.cc",
-    ],
-    hdrs = [
-        "motion_service.h",
-    ],
+    srcs = ["motion_service.cc"],
+    hdrs = ["motion_service.h"],
     deps = [
         "//cyber",
+        "//modules/common/math",
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/camera/common",

@@ -59,7 +59,7 @@ void print_m256_i16(const __m256i a) {
 }
 
 template <bool align>
-SIMD_INLINE void yuv_seperate_avx2(uint8_t* y, __m256i* y0, __m256i* y1,
+SIMD_INLINE void yuv_separate_avx2(uint8_t* y, __m256i* y0, __m256i* y1,
                                    __m256i* u0, __m256i* v0) {
   __m256i yuv_m256[4];
 
@@ -120,7 +120,7 @@ template <bool align>
 void yuv2rgb_avx2(uint8_t* yuv, uint8_t* rgb) {
   __m256i y0, y1, u0, v0;
 
-  yuv_seperate_avx2<align>(yuv, &y0, &y1, &u0, &v0);
+  yuv_separate_avx2<align>(yuv, &y0, &y1, &u0, &v0);
   __m256i u0_u0 = _mm256_permute4x64_epi64(u0, 0xD8);
   __m256i v0_v0 = _mm256_permute4x64_epi64(v0, 0xD8);
   yuv2rgb_avx2<align>(y0, _mm256_unpacklo_epi8(u0_u0, u0_u0),

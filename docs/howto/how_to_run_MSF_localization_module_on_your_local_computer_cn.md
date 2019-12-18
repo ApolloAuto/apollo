@@ -4,45 +4,71 @@
 
 ## 1. 事先准备
  - 从[GitHub网站](https://github.com/ApolloAuto/apollo)下载Apollo源代码
- - 按照[教程](https://github.com/ApolloAuto/apollo/blob/master/README_cn.md)设置Docker环境并搭建Apollo工程
- - 从[Apllo数据平台](http://data.apollo.auto/?name=sensor%20data&data_key=multisensor&data_type=1&locale=en-us&lang=en)下载多传感器融合定位数据（仅限美国地区）
+ - 按照[教程](https://github.com/ApolloAuto/apollo/blob/master/README_cn.md)设置Docker环境
+ - 从[Apollo数据平台](http://data.apollo.auto/?name=sensor%20data&data_key=multisensor&data_type=1&locale=en-us&lang=en)下载多传感器融合定位demo数据包（仅限美国地区），使用其中*apollo3.5*文件夹下的数据。
 
-## 2. 配置定位模块
+## 2. 编译apollo工程
+
+### 2.1 构建docker容器
+我们提供了一个叫做*dev-latest*的docker镜像，docker容器会将你本地的apollo工程挂载到 */apollo* 。
+```
+bash docker/scripts/dev_start.sh
+```
+### 2.2 进入docker容器
+```
+bash docker/scripts/dev_into.sh
+```
+### 2.3 编译工程
+```
+# To make sure you start clean
+bash apollo.sh clean
+# Build the full system
+bash apollo.sh build_opt
+```
+
+`注意:` 如果你的电脑比较慢，你可以通过以下命令限制编译消耗的资源。
+
+```
+bash apollo.sh build --local_resources 2048,1.0,1.0
+```
+
+## 3. 配置定位模块
 为了使定位模块正确运行，需要对地图路径和传感器外参进行配置。假设下载的定位数据的所在路径为DATA_PATH。
 
 在进行以下步骤前，首先确定你在docker容器中。
 
-### 2.1 配置传感器外参
+### 3.1 配置传感器外参
 将定位数据中的传感器外参拷贝至指定文件夹下。
 
 ```
-  cp DATA_PATH/params/ant_imu_leverarm.yaml /apollo/modules/localization/msf/params/gnss_params/
-  cp DATA_PATH/params/velodyne64_novatel_extrinsics_example.yaml /apollo/modules/localization/msf/params/velodyne_params/
-  cp DATA_PATH/params/velodyne64_height.yaml /apollo/modules/localization/msf/params/velodyne_params/
+  cp -r DATA_PATH/params/* /apollo/modules/localization/msf/params/
 ```
-各个外参的意义
+文件夹中各个外参的意义
  - ant_imu_leverarm.yaml： 杆臂值参数，GNSS天线相对Imu的距离
- - velodyne64_novatel_extrinsics_example.yaml： Lidar相对Imu的外参
- - velodyne64_height.yaml： Lidar相对地面的高度
+ - velodyne128_novatel_extrinsics.yaml： Lidar相对Imu的外参
+ - velodyne128_height.yaml： Lidar相对地面的高度
 
-### 2.2 配置地图路径
-在/apollo/modules/localization/conf/localization.conf中添加关于地图路径的配置
+### 3.2 配置地图和参数路径
+在/apollo/modules/localization/conf/localization.conf中配置地图和参数的路径
 
 ```
 # Redefine the map_dir in global_flagfile.txt
 --map_dir=DATA_PATH
+
+# The pointcloud topic name.
+--lidar_topic=/apollo/sensor/lidar128/compensator/PointCloud2
+
+# The lidar extrinsics file
+--lidar_extrinsics_file=/apollo/modules/localization/msf/params/velodyne_params/velodyne128_novatel_extrinsics.yaml
 ```
 这将会覆盖global_flagfile.txt中的默认值。
 
-## 3. 运行多传感器融合定位模块
+## 4. 运行多传感器融合定位模块
 ```
-./scripts/localization.sh
+cyber_launch start /apollo/modules/localization/launch/msf_localization.launch
 ```
-定位程序将在后台运行，可以通过以下命令进行查看。
-```
-ps -e | grep localization
-```
-在/apollo/data/log目录下，可以看到定位模块输出的相关文件。 
+
+在/apollo/data/log目录下，可以看到定位模块输出的相关log文件。 
 
  - localization.INFO : INFO级别的log信息
  - localization.WARNING : WARNING级别的log信息
@@ -50,32 +76,31 @@ ps -e | grep localization
  - localization.out : 标准输出重定向文件
  - localizaiton.flags : 启动localization模块使用的配置
 
-## 4. 播放演示rosbag
+## 5. 播放演示record文件
 ```
-cd DATA_PATH/bag
-rosbag play *.bag
+cd DATA_PATH/records
+cyber_recorder play -f record.*
 ```
-从播放数据到定位模块开始输出定位消息，大约需要30s左右。
+从播放数据到定位模块开始输出定位消息，大约需要50s左右时间。
 
-## 5. 记录与可视化定位结果（可选）
+## 6. 记录并可视化定位结果（可选）
 ### 记录定位结果
 ```
-./scripts/record_bag.sh
+python /apollo/scripts/record_bag.py --start
 ```
 该脚本会在后台运行录包程序，并将存放路径输出到终端上。
 
 ### 可视化定位结果
-
 运行可视化工具
 
 ```
-./scripts/localization_online_visualizer.sh
+cyber_launch start /apollo/modules/localization/launch/msf_visualizer.launch
 ```
-该可视化工具首先根据定位地图生成用于可视化的缓存文件，存放在/apollo/data/map_visual目录下。
+该可视化工具首先根据定位地图生成用于可视化的缓存文件，存放在/apollo/cyber/data/map_visual目录下。
 
 然后接收以下topic并进行可视化绘制。
 
- - /apollo/sensor/velodyne64/compensator/PointCloud2
+ - /apollo/sensor/lidar128/compensator/PointCloud2
  - /apollo/localization/msf_lidar
  - /apollo/localization/msf_gnss
  - /apollo/localization/pose
@@ -83,44 +108,33 @@ rosbag play *.bag
 可视化效果如下
 ![1](images/msf_localization/online_visualizer.png)
 
-如果发现可视化工具运行时卡顿，可使用如下命令重新编译可视化工具
+`注意:` 在定位模块正常工作之后(/apollo/localization/pose开始输出消息)，可视化模块才会弹出显示窗口。可以用*/cyber_monitor*命令查看topic情况。
 
+## 7. 结束运行定位模块
+
+退出定位程序和播包程序,如果有运行步骤6的录包脚本，需执行以下命令关闭后台录包程序。
 ```
-cd /apollo
-bazel build -c opt //modules/localization/msf/local_tool/local_visualization/online_visual:online_local_visualizer
-```
-
-编译选项-c opt优化程序性能，从而使可视化工具可以实时运行。
-
-## 6. 结束运行定位模块
-
-```
-./scripts/localization.sh stop
+python /apollo/scripts/record_bag.py --stop
 ```
 
-如果之前有运行步骤5的录包脚本，还需执行
+## 8. 验证定位结果（可选）
 
-```
-./scripts/record_bag.sh stop
-```
-
-## 7. 验证定位结果（可选）
-
-假设步骤5中录取的数据存放路径为OUTPUT_PATH，杆臂值外参的路径为ANT_IMU_PATH
+假设步骤6中录取的数据存放路径为OUTPUT_PATH，杆臂值外参的路径为ANT_IMU_PATH
 
 运行脚本
 ```
-./scripts/msf_local_evaluation.sh OUTPUT_PATH ANT_IMU_PATH
+/apollo/scripts/msf_local_evaluation.sh OUTPUT_PATH
 ```
-该脚本会以RTK定位模式为基准，将多传感器融合模式的定位结果进行对比。
+该脚本会以RTK模式的定位结果为基准，与多传感器融合模式的定位结果进行对比。
 
+`注意:` 
 (注意只有在GNSS信号良好，RTK定位模式运行良好的区域，这样的对比才是有意义的。)
 
 获得如下统计结果：
 
 ![2](images/msf_localization/localization_result.png)
 
-可以看到两组统计结果，第一组是组合导航(输出频率200hz)的统计结果，第二组是点云定位(输出频率5hz)的统计结果，第三组是GNSS定位(输出频率约1hz)的统计结果。
+可以看到两组统计结果，第一组是组合导航(输出频率200hz)的统计结果，第二组是点云定位(输出频率5hz)的统计结果。
 
 表格中各项的意义， 
  - error：  平面误差，单位为米

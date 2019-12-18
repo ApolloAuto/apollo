@@ -27,7 +27,7 @@ namespace routing {
 using apollo::common::util::ContainsKey;
 
 bool IsCloseEnough(double value_1, double value_2) {
-  constexpr double kEpsilon = 1e-6;
+  static constexpr double kEpsilon = 1e-6;
   return std::fabs(value_1 - value_2) < kEpsilon;
 }
 
@@ -274,7 +274,7 @@ double CalculateDistance(const std::vector<NodeWithRange>& nodes) {
   for (size_t i = 1; i < nodes.size(); ++i) {
     auto edge =
         nodes.at(i - 1).GetTopoNode()->GetOutEdgeTo(nodes.at(i).GetTopoNode());
-    if (edge->Type() != TET_FORWARD) {
+    if (edge == nullptr || edge->Type() != TET_FORWARD) {
       continue;
     }
     distance += nodes.at(i).EndS() - nodes.at(i).StartS();

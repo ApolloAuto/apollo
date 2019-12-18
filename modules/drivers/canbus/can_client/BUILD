@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "can_client_factory",
-    srcs = [
-        "can_client_factory.cc",
-    ],
-    hdrs = [
-        "can_client_factory.h",
-    ],
+    srcs = ["can_client_factory.cc"],
+    hdrs = ["can_client_factory.h"],
     deps = [
         "//cyber",
         "//modules/common/util:factory",
@@ -29,9 +25,7 @@ cc_library(
 
 cc_library(
     name = "can_client",
-    hdrs = [
-        "can_client.h",
-    ],
+    hdrs = ["can_client.h"],
     deps = [
         "//modules/common/util",
         "//modules/drivers/canbus/common:canbus_common",
@@ -44,7 +38,7 @@ cc_binary(
     srcs = ["can_client_tool.cc"],
     deps = [
         "//external:gflags",
-        "//modules/common",
+        "//modules/common/time",
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/proto:canbus_proto",
     ],

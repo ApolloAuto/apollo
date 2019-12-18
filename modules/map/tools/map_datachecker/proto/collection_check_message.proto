@@ -1,0 +1,99 @@
+// Define Collection map-data check messages
+syntax = "proto2";
+package apollo.hdmap;
+
+import "modules/map/tools/map_datachecker/proto/collection_error_code.proto";
+
+enum CmdType {
+  START = 1;
+  CHECK = 2;
+  STOP = 3;
+}
+
+enum DataType {
+  MAP_MAKING = 1;
+  MAP_CHECKOUT = 2;
+}
+
+message VerifyRange {
+  optional double start_time = 1;  // verify data's start timestamp
+  optional double end_time = 2;    // verify data's end timestamp
+}
+
+message LoopResult {
+  required bool is_reached = 1;
+  optional double loop_num = 2;  // is_reached==false, indicate current laps
+}
+
+message TopicResult {
+  repeated string topic_lack = 1;
+}
+
+message FrameRate {
+  optional string topic = 1;
+  optional double expected_rate = 2;
+  optional double current_rate = 3;
+  repeated string bad_record_name =
+      4;  // record path file name, maybe more than one.
+}
+
+message VerifyResult {
+  optional TopicResult topics = 1;
+  repeated FrameRate rates = 2;
+}
+
+// ChannelVerify API, multi-service used
+message ChannelVerifyRequest {
+  optional CmdType cmd = 1;
+  optional string collect_id = 2;
+  optional string path = 3;
+}
+
+message ChannelVerifyResponse {
+  optional ErrorCode code = 1;
+  optional VerifyResult result = 2;
+}
+
+// LoopsVerify API, multi-service used
+message LoopsVerifyRequest {
+  optional CmdType cmd = 1;
+  optional DataType type = 2;
+  repeated VerifyRange range = 3;  // used by map-worker. verify data's
+                                   // timestamp ranges, maybe has more than one.
+}
+
+message LoopsVerifyResponse {
+  optional ErrorCode code = 1;
+  optional double progress = 2;
+  optional LoopResult loop_result = 3;  // usable when progress==1
+}
+
+// DynamicAlign API, multi-service used
+message DynamicAlignRequest {
+  optional CmdType cmd = 1;
+}
+
+message DynamicAlignResponse {
+  optional ErrorCode code = 1;
+  optional double progress = 2;
+}
+
+// StaticAlign API, multi-service used
+message StaticAlignRequest {
+  optional CmdType cmd = 1;
+}
+
+message StaticAlignResponse {
+  optional ErrorCode code = 1;
+  optional double progress = 2;
+}
+
+// EightRoute API, multi-service used
+message EightRouteRequest {
+  optional CmdType cmd = 1;
+}
+
+message EightRouteResponse {
+  optional ErrorCode code = 1;
+  optional double progress = 2;
+}

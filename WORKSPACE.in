@@ -52,13 +52,12 @@ new_git_repository(
     remote = "https://github.com/intel/ad-rss-lib",
 )
 
-
 # eigen
 new_http_archive(
     name = "eigen",
     build_file = "third_party/eigen.BUILD",
-    sha256 = "04f8a4fa4afedaae721c1a1c756afeea20d3cdef0ce3293982cf1c518f178502",
-    strip_prefix = "eigen-eigen-b9cd8366d4e8",
+    sha256 = "ba4f95f9082ce99012d5ff320472a0e9fd0be921a20f11912f0bf7e6ca93f240",
+    strip_prefix = "eigen-git-mirror-3.2.10",
     url = "file:///home/tmp/eigen-3.2.10.tar.gz",
 )
 
@@ -71,15 +70,6 @@ new_http_archive(
     url = "file:///home/tmp/v1.11.tar.gz",
 )
 
-# curlpp
-new_http_archive(
-    name = "curlpp",
-    build_file = "third_party/curlpp.BUILD",
-    sha256 = "97e3819bdcffc3e4047b6ac57ca14e04af85380bd93afe314bee9dd5c7f46a0a",
-    strip_prefix = "curlpp-0.8.1",
-    url = "file:///home/tmp/curlpp-0.8.1.tar.gz",
-)
-
 #ros
 new_local_repository(
     name = "ros",
@@ -87,13 +77,11 @@ new_local_repository(
     path = "/home/tmp/ros",
 )
 
-# PCL 1.7
-# =======
-# This requires libpcl-dev to be installed in your Ubuntu/Debian.
+# PCL 1.9
 new_local_repository(
     name = "pcl",
     build_file = "third_party/pcl.BUILD",
-    path = "/usr/local/include/pcl-1.7",
+    path = "/usr/local/include/pcl-1.9",
 )
 
 new_local_repository(
@@ -184,6 +172,27 @@ new_local_repository(
     path = "/usr/local/apollo/local_integ",
 )
 
+# paddlepaddle
+new_local_repository(
+    name = "paddlepaddle",
+    build_file = "third_party/paddlepaddle.BUILD",
+    path = "/usr/local/apollo/paddlepaddle",
+)
+
+# mkldnn
+new_local_repository(
+    name = "mkldnn",
+    build_file = "third_party/mkldnn.BUILD",
+    path = "/usr/local/apollo/local_third_party/mkldnn",
+)
+
+# mklml
+new_local_repository(
+    name = "mklml",
+    build_file = "third_party/mklml.BUILD",
+    path = "/usr/local/apollo/local_third_party/mklml",
+)
+
 # Proj.4
 new_http_archive(
     name = "proj4",
@@ -214,19 +223,26 @@ new_local_repository(
     path = "/usr/local/apollo/jsoncpp/",
 )
 
+#xxhash
+new_local_repository(
+    name = "xxhash",
+    build_file = "third_party/xxhash.BUILD",
+    path = "/usr/local/apollo/paddlepaddle_dep/xxhash",
+)
+
+#snappystream
+new_local_repository(
+    name = "snappystream",
+    build_file = "third_party/snappystream.BUILD",
+    path = "/usr/local/apollo/paddlepaddle_dep/snappystream",
+)
+
 #adv_plat
 new_http_archive(
     name = "adv_plat",
     build_file = "third_party/adv_plat.BUILD",
     sha256 = "0a58dadab924b520d5b5a58ef82fc0f76c2aa4feaaabd49ec9873228c125d513",
     url = "https://github.com/ApolloAuto/apollo-contrib/releases/download/v3.0.0/plat-sw-3.0.0.1.zip",
-)
-
-# qt
-new_local_repository(
-    name = "qt",
-    build_file = "third_party/qt.BUILD",
-    path = "/usr/local/Qt5.5.1/5.5/gcc_64",
 )
 
 new_local_repository(
@@ -253,6 +269,12 @@ new_local_repository(
     path = "/usr",
 )
 
+new_local_repository(
+    name = "python3",
+    build_file = "third_party/python3.BUILD",
+    path = "/usr",
+)
+
 # PyTorch
 new_local_repository(
     name = "pytorch",
@@ -272,4 +294,17 @@ new_local_repository(
     name = "ffmpeg",
     build_file = "third_party/ffmpeg.BUILD",
     path = "/usr/local/apollo/ffmpeg",
+)
+
+# boost
+new_local_repository(
+    name = "boost",
+    build_file = "third_party/boost.BUILD",
+    path = "/usr/local/apollo/boost/include",
+)
+
+new_local_repository(
+    name = "opencv",
+    build_file = "third_party/opencv.BUILD",
+    path = "/usr/include",
 )

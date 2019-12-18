@@ -1,3 +1,13 @@
+# A map from path names defined planning_internal.proto
+# to display ones on Dreamview graphs.
+# This display names are used in the graph settings
+# such as speed graph as well.
+nameMapper:
+    planning_reference_line: ReferenceLine
+    DpStSpeedOptimizer: SpeedHeuristic
+    PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER: PlannedSpeed
+
+# Planning Graph settings
 slGraph:
     title: 'QP Path - sl graph'
     options:
@@ -102,8 +112,12 @@ stGraph:
                 pointRadius: 1
                 fill: false
                 showLine: false
+    datasets:
+        - name: DP_ST_SPEED_OPTIMIZER
+          graphTitle: Speed Heuristic
+        - name: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
+          graphTitle: Planning S-T Graph
 stSpeedGraph:
-    title: 'QP Speed - sv graph'
     options:
         legend:
             display: true
@@ -142,6 +156,9 @@ stSpeedGraph:
                 pointRadius: 0
                 fill: false
                 showLine: true
+    datasets:
+        - name: PIECEWISE_JERK_NONLINEAR_SPEED_OPTIMIZER
+          graphTitle: Planning V-T Graph
 speedGraph:
     title: 'Planning Speed'
     options:
@@ -158,24 +175,24 @@ speedGraph:
                 labelString: 'speed (m/s)'
     properties:
         lines:
-            finalSpeed:
+            VehicleSpeed:
                 color: 'rgba(255, 0, 0, 0.8)' # red
                 borderWidth: 1
                 pointRadius: 1
                 fill: false
                 showLine: false
-            DpStSpeedOptimizer:
+            SpeedHeuristic:
                 color: 'rgba(27, 249, 105, 0.5)' # green
                 borderWidth: 2
                 pointRadius: 0
                 fill: false
                 showLine: true
-            PiecewiseJerkSpeedOptimizer:
+            PlannedSpeed:
                 color: 'rgba(54, 162, 235, 1)' # blue
                 borderWidth: 2
                 pointRadius: 0
                 fill: false
-                showLine: ture
+                showLine: true
 accelerationGraph:
     title: 'Planning Acceleration'
     options:
@@ -197,9 +214,29 @@ accelerationGraph:
                 borderWidth: 2
                 pointRadius: 0
                 fill: false
-                showLine: ture
-kappaGraph:
+                showLine: true
+planningKappaGraph:
     title: 'Planning Kappa'
+    options:
+        legend:
+            display: true
+        axes:
+            x:
+                labelString: 't (sec)'
+            y:
+                min: -0.2
+                max: 0.2
+                labelString: 'kappa'
+    properties:
+        lines:
+            Trajectory:
+                color: 'rgba(1, 209, 193, 0.8)' # Turkish green
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: true
+referenceLineKappaGraph:
+    title: 'Reference Line Kappa'
     options:
         legend:
             display: true
@@ -218,8 +255,28 @@ kappaGraph:
                 pointRadius: 0
                 fill: false
                 showLine: true
-dkappaGraph:
-    title: 'Planning Dkappa'
+planningDkappaGraph:
+    title: 'Planning Kappa Derivative'
+    options:
+        legend:
+            display: true
+        axes:
+            x:
+                labelString: 't (sec)'
+            y:
+                min: -0.02
+                max: 0.02
+                labelString: 'dkappa'
+    properties:
+        lines:
+            Trajectory:
+                color: 'rgba(1, 209, 193, 0.8)' # Turkish green
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: true
+referenceLineDkappaGraph:
+    title: 'Reference Line Kappa Derivative'
     options:
         legend:
             display: true
@@ -238,14 +295,32 @@ dkappaGraph:
                 pointRadius: 0
                 fill: false
                 showLine: true
-            PiecewiseJerkSpeedOptimizer:
+            PlannedSpeed:
                 color: 'rgba(54, 162, 235, 1)' # blue
                 borderWidth: 5
                 pointRadius: 0
                 fill: false
                 showLine: true
-thetaGraph:
-    title: 'Planning theta'
+planningThetaGraph:
+    title: 'Planning Theta'
+    options:
+        legend:
+            display: true
+        axes:
+            x:
+                labelString: 't (sec)'
+            y:
+                labelString: 'theta'
+    properties:
+        lines:
+            Trajectory:
+                color: 'rgba(1, 209, 193, 0.8)' # Turkish green
+                borderWidth: 2
+                pointRadius: 0
+                fill: false
+                showLine: true
+referenceLineThetaGraph:
+    title: 'Reference Line Theta'
     options:
         legend:
             display: true

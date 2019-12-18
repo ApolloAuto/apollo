@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/bridge/common/bridge_buffer.h"
+
 #include <gtest/gtest.h>
 #include <stdio.h>
 #include <string>
@@ -27,14 +28,12 @@ TEST(BridgeBufferTest, bridge_buf_test) {
   char *p = buf;
   EXPECT_EQ(0, buf.capacity());
   EXPECT_EQ(0, buf.size());
-  EXPECT_TRUE((buf == nullptr));
 
   buf.reset(100);
   char *p1 = buf;
   EXPECT_EQ(100, buf.capacity());
   EXPECT_EQ(100, buf.size());
-  EXPECT_FALSE((p == p1));
-  EXPECT_FALSE((buf == nullptr));
+  EXPECT_NE(p, p1);
 
   std::string str("hello world");
   snprintf(buf, str.length() + 1, "%s", str.c_str());
@@ -45,7 +44,6 @@ TEST(BridgeBufferTest, bridge_buf_test) {
   EXPECT_EQ(100, buf.capacity());
   EXPECT_EQ(80, buf.size());
   EXPECT_EQ(p2, p1);
-  EXPECT_FALSE((buf == nullptr));
 
   std::string str1("hi world");
   snprintf(buf, str1.length() + 1, "%s", str1.c_str());

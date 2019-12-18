@@ -42,6 +42,14 @@ message VehicleID {
   optional string other_unique_id = 3;
 }
 
+message LatencyParam {
+  // latency parameters, in second (s)
+  optional double dead_time = 1;
+  optional double rise_time = 2;
+  optional double peak_time = 3;
+  optional double settling_time = 4;
+}
+
 message VehicleParam {
   optional VehicleBrand brand = 1;
   // Car center point is car reference point, i.e., center of rear axle.
@@ -82,6 +90,11 @@ message VehicleParam {
   optional double brake_deadzone = 20 [default = nan];
   // minimum value get from chassis.throttle, in percentage
   optional double throttle_deadzone = 21 [default = nan];
+
+  // vehicle latency parameters
+  optional LatencyParam steering_latency_param = 22;
+  optional LatencyParam throttle_latency_param = 23;
+  optional LatencyParam brake_latency_param = 24;
 }
 
 message VehicleConfig {

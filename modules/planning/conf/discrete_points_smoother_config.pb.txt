@@ -1,31 +1,17 @@
 max_constraint_interval : 0.25
 longitudinal_boundary_bound : 2.0
-lateral_boundary_bound : 0.5
-num_of_total_points : 500
+max_lateral_boundary_bound : 0.5
+min_lateral_boundary_bound : 0.1
 curb_shift : 0.2
-driving_side : RIGHT
-wide_lane_threshold_factor : 1.0
-wide_lane_shift_ratio : 0.5
 lateral_buffer : 0.2
 
 discrete_points {
-  cos_theta_smoothing {
-    use_cos_theta: false
-    weight_cos_included_angle: 1e5
-    weight_anchor_points: 1.0
-    weight_length: 1.0
-    print_level: 0
-    max_num_of_iterations: 500
-    acceptable_num_of_iterations: 15
-    tol: 1e-8
-    acceptable_tol: 1e-1
-    ipopt_use_automatic_differentiation: true
-  }
-  fem_pos_smoothing {
-    use_fem_pos: true
-    weight_fem_pose_deviation: 1e10
+  smoothing_method: FEM_POS_DEVIATION_SMOOTHING
+  fem_pos_deviation_smoothing {
+    weight_fem_pos_deviation: 1e10
     weight_ref_deviation: 1.0
     weight_path_length: 1.0
+    apply_curvature_constraint: false
     max_iter: 500
     time_limit: 0.0
     verbose: false

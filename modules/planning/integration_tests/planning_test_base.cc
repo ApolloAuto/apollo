@@ -65,13 +65,11 @@ void PlanningTestBase::SetUpTestCase() {
   FLAGS_test_previous_planning_file = "";
   FLAGS_test_prediction_file = "";
   FLAGS_align_prediction_time = false;
-  FLAGS_estimate_current_vehicle_state = false;
   FLAGS_enable_reference_line_provider_thread = false;
   // FLAGS_enable_trajectory_check is temporarily disabled, otherwise EMPlanner
   // and LatticePlanner can't pass the unit test.
   FLAGS_enable_trajectory_check = false;
   FLAGS_planning_test_mode = true;
-  FLAGS_enable_lag_prediction = false;
   FLAGS_use_osqp_optimizer_for_reference_line = false;
 }
 
@@ -165,9 +163,6 @@ void PlanningTestBase::SetUp() {
 
   CHECK(planning_->Init(config_).ok()) << "Failed to init planning module";
 
-  // Do not use fallback trajectory during testing
-  FLAGS_use_planning_fallback = false;
-
   if (!FLAGS_test_previous_planning_file.empty()) {
     const auto prev_planning_file =
         FLAGS_test_data_dir + "/" + FLAGS_test_previous_planning_file;
@@ -222,8 +217,8 @@ void PlanningTestBase::TrimPlanning(ADCTrajectory* origin,
 
 bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
                                    int case_num, bool no_trajectory_point) {
-  const std::string golden_result_file = apollo::common::util::StrCat(
-      "result_", test_case_name, "_", case_num, ".pb.txt");
+  const std::string golden_result_file =
+      absl::StrCat("result_", test_case_name, "_", case_num, ".pb.txt");
 
   std::string full_golden_path = FLAGS_test_data_dir + "/" + golden_result_file;
 

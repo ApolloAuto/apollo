@@ -31,7 +31,6 @@
 namespace {
 
 using apollo::canbus::Chassis;
-using apollo::common::time::AsInt64;
 using apollo::common::time::Clock;
 using apollo::control::DrivingAction;
 using apollo::control::PadMessage;
@@ -69,7 +68,7 @@ class PadTerminal {
       AINFO << "sending start action command.";
     }
     apollo::common::util::FillHeader("terminal", &pad);
-    pad_writer_->Write(std::make_shared<PadMessage>(pad));
+    pad_writer_->Write(pad);
     AINFO << "send pad_message OK";
   }
 
@@ -82,14 +81,13 @@ class PadTerminal {
     // manual
     if (chassis.driving_mode() == Chassis::EMERGENCY_MODE) {
       if (is_first_emergency_mode) {
-        count_start = AsInt64<std::chrono::microseconds>(Clock::Now());
+        count_start = absl::ToUnixMicros(Clock::Now());
         is_first_emergency_mode = false;
         AINFO << "detect emergency mode.";
       } else {
-        int64_t diff =
-            AsInt64<std::chrono::microseconds>(Clock::Now()) - count_start;
+        int64_t diff = absl::ToUnixMicros(Clock::Now()) - count_start;
         if (diff > EMERGENCY_MODE_HOLD_TIME) {
-          count_start = AsInt64<std::chrono::microseconds>(Clock::Now());
+          count_start = absl::ToUnixMicros(Clock::Now());
           waiting_reset = true;
           // send a reset command to control
           send(RESET_COMMAND);

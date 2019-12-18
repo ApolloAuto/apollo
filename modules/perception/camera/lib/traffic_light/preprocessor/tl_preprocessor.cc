@@ -19,7 +19,6 @@
 #include "cyber/common/log.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-#include "modules/perception/lib/utils/time_util.h"
 
 namespace apollo {
 namespace perception {
@@ -50,18 +49,17 @@ bool TLPreprocessor::UpdateCameraSelection(
   selected_camera_name_.first = timestamp;
   selected_camera_name_.second = GetMaxFocalLenWorkingCameraName();
 
-  AINFO << "TLPreprocessor Got signal number:" << lights->size()
-        << ", ts: " << std::to_string(timestamp);
-  if (lights->size() == 0) {
-    AINFO << "no signals, select camera with max focal length: "
+  AINFO << "TLPreprocessor Got signal number: " << lights->size()
+        << ", ts: " << timestamp;
+  if (lights->empty()) {
+    AINFO << "No signals, select camera with max focal length: "
           << selected_camera_name_.second;
     return true;
   }
 
   if (!ProjectLightsAndSelectCamera(pose, option,
                                     &(selected_camera_name_.second), lights)) {
-    AERROR << "project_lights_and_select_camera failed, ts: "
-           << std::to_string(timestamp);
+    AERROR << "project_lights_and_select_camera failed, ts: " << timestamp;
   }
 
   AINFO << "selected_camera_id: " << selected_camera_name_.second;
@@ -81,15 +79,13 @@ bool TLPreprocessor::SyncInformation(const double image_timestamp,
     return false;
   }
 
-  AINFO << "Enter TLPreprocessor::sync_image. proj_ts: "
-        << std::to_string(proj_ts) << " proj_camera_name: " << proj_camera_name
-        << " image_ts: " << std::to_string(image_timestamp)
+  AINFO << "Enter TLPreprocessor::sync_image. proj_ts: " << proj_ts
+        << " proj_camera_name: " << proj_camera_name
+        << " image_ts: " << image_timestamp
         << " image_camera_name: " << cam_name;
   if (image_timestamp < last_pub_img_ts_) {
-    AWARN << "TLPreprocessor reject the image pub ts:"
-          << std::to_string(image_timestamp)
-          << " which is earlier than last output ts:"
-          << std::to_string(last_pub_img_ts_)
+    AWARN << "TLPreprocessor reject the image pub ts:" << image_timestamp
+          << " which is earlier than last output ts:" << last_pub_img_ts_
           << ", image_camera_name: " << cam_name;
     return false;
   }
@@ -113,8 +109,8 @@ bool TLPreprocessor::UpdateLightsProjection(
 
   AINFO << "clear lights_outside_image_ " << lights_outside_image_.size();
 
-  if (lights->size() == 0) {
-    AINFO << "not lights to be projected";
+  if (lights->empty()) {
+    AINFO << "No lights to be projected";
     return true;
   }
 
@@ -128,24 +124,22 @@ bool TLPreprocessor::UpdateLightsProjection(
   if (lights_outside_image_.size() > 0) {
     AERROR << "update_lights_projection failed,"
            << "lights_outside_image->size() " << lights_outside_image_.size()
-           << " ts: " << std::to_string(pose.getTimestamp());
+           << " ts: " << pose.getTimestamp();
     return false;
   }
 
   auto min_focal_len_working_camera = GetMinFocalLenWorkingCameraName();
   if (camera_name == min_focal_len_working_camera) {
-    return (lights_on_image_.size() > 0);
-  } else {
-    for (const base::TrafficLightPtr &light : lights_on_image_) {
-      if (OutOfValidRegion(light->region.projection_roi,
-                           projection_.getImageWidth(camera_name),
-                           projection_.getImageHeight(camera_name),
-                           option.image_borders_size->at(camera_name))) {
-        AINFO << "update_lights_projection"
-              << " light project out of image region, "
-              << "camera_name: " << camera_name;
-        return false;
-      }
+    return lights_on_image_.size() > 0;
+  }
+  for (const base::TrafficLightPtr &light : lights_on_image_) {
+    if (OutOfValidRegion(light->region.projection_roi,
+                         projection_.getImageWidth(camera_name),
+                         projection_.getImageHeight(camera_name),
+                         option.image_borders_size->at(camera_name))) {
+      AINFO << "update_lights_projection light project out of image region. "
+            << "camera_name: " << camera_name;
+      return false;
     }
   }
 
@@ -282,8 +276,14 @@ bool TLPreprocessor::ProjectLightsAndSelectCamera(
     const CarPose &pose, const TLPreprocessorOption &option,
     std::string *selected_camera_name,
     std::vector<base::TrafficLightPtr> *lights) {
-  CHECK_NOTNULL(selected_camera_name);
-  CHECK_NOTNULL(lights);
+  if (selected_camera_name == nullptr) {
+    AERROR << "selected_camera_name is not available";
+    return false;
+  }
+  if (lights == nullptr) {
+    AERROR << "lights is not available";
+    return false;
+  }
 
   for (auto &light_ptrs : lights_on_image_array_) {
     light_ptrs.clear();
@@ -305,7 +305,7 @@ bool TLPreprocessor::ProjectLightsAndSelectCamera(
     }
   }
 
-  projections_outside_all_images_ = (lights->size() > 0);
+  projections_outside_all_images_ = !lights->empty();
   for (size_t cam_id = 0; cam_id < num_cameras_; ++cam_id) {
     projections_outside_all_images_ =
         projections_outside_all_images_ &&
@@ -341,7 +341,6 @@ std::string TLPreprocessor::GetMinFocalLenWorkingCameraName() const {
 }
 
 std::string TLPreprocessor::GetMaxFocalLenWorkingCameraName() const {
-  std::string max_focal_len_working_camera = "";
   const auto &camera_names = projection_.getCameraNamesByDescendingFocalLen();
   for (const auto &camera_name : camera_names) {
     bool is_working = false;

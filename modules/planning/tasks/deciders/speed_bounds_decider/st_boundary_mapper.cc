@@ -36,6 +36,7 @@
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -46,31 +47,22 @@ using apollo::common::PathPoint;
 using apollo::common::Status;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
-using apollo::common::util::StrCat;
 
-STBoundaryMapper::STBoundaryMapper(const SLBoundary& adc_sl_boundary,
-                                   const SpeedBoundsDeciderConfig& config,
+STBoundaryMapper::STBoundaryMapper(const SpeedBoundsDeciderConfig& config,
                                    const ReferenceLine& reference_line,
                                    const PathData& path_data,
                                    const double planning_distance,
                                    const double planning_time)
-    : adc_sl_boundary_(adc_sl_boundary),
-      speed_bounds_config_(config),
+    : speed_bounds_config_(config),
       reference_line_(reference_line),
       path_data_(path_data),
       vehicle_param_(common::VehicleConfigHelper::GetConfig().vehicle_param()),
-      planning_distance_(planning_distance),
-      planning_time_(planning_time) {}
+      planning_max_distance_(planning_distance),
+      planning_max_time_(planning_time) {}
 
-Status STBoundaryMapper::CreateStBoundary(PathDecision* path_decision) const {
-  const auto& obstacles = path_decision->obstacles();
-
-  if (planning_time_ < 0.0) {
-    const std::string msg = "Fail to get params since planning_time_ < 0.";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
-
+Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
+  // Sanity checks.
+  CHECK_GT(planning_max_time_, 0.0);
   if (path_data_.discretized_path().size() < 2) {
     AERROR << "Fail to get params because of too few path points. path points "
               "size: "
@@ -79,68 +71,44 @@ Status STBoundaryMapper::CreateStBoundary(PathDecision* path_decision) const {
                   "Fail to get params because of too few path points");
   }
 
+  // Go through every obstacle.
   Obstacle* stop_obstacle = nullptr;
   ObjectDecisionType stop_decision;
   double min_stop_s = std::numeric_limits<double>::max();
+  for (const auto* ptr_obstacle_item : path_decision->obstacles().Items()) {
+    Obstacle* ptr_obstacle = path_decision->Find(ptr_obstacle_item->Id());
+    CHECK(ptr_obstacle != nullptr);
 
-  for (const auto* const_obstacle : obstacles.Items()) {
-    auto* obstacle = path_decision->Find(const_obstacle->Id());
-
-    auto obstacle_type = obstacle->Perception().type();
-    bool is_bycycle_or_pedestrain =
-        (obstacle_type == perception::PerceptionObstacle::BICYCLE ||
-         obstacle_type == perception::PerceptionObstacle::PEDESTRIAN);
-
-    const auto& lat_decision = obstacle->LateralDecision();
-    if (!is_bycycle_or_pedestrain && obstacle->IsStatic() &&
-        lat_decision.has_nudge()) {
-      ADEBUG << "Do not map S-T Boundary for nudge decision: "
-             << lat_decision.DebugString();
+    // If no longitudinal decision has been made, then plot it onto ST-graph.
+    if (!ptr_obstacle->HasLongitudinalDecision()) {
+      ComputeSTBoundary(ptr_obstacle);
       continue;
     }
 
-    if (!obstacle->HasLongitudinalDecision()) {
-      if (!MapWithoutDecision(obstacle).ok()) {
-        std::string msg = StrCat("Fail to map obstacle ", obstacle->Id(),
-                                 " without decision.");
-        AERROR << msg;
-        return Status(ErrorCode::PLANNING_ERROR, msg);
-      }
-      continue;
-    }
-
-    const auto& decision = obstacle->LongitudinalDecision();
+    // If there is a longitudinal decision, then fine-tune boundary.
+    const auto& decision = ptr_obstacle->LongitudinalDecision();
     if (decision.has_stop()) {
-      const double stop_s = obstacle->PerceptionSLBoundary().start_s() +
-                            decision.stop().distance_s();
-      // this is a rough estimation based on reference line s, so that a large
-      // buffer is used.
-      constexpr double stop_buff = 15.0;
-      if (stop_s + stop_buff < adc_sl_boundary_.end_s()) {
-        AERROR << "Invalid stop decision. not stop at behind of current "
-                  "position. stop_s : "
-               << stop_s << ", and current adc_s is; "
-               << adc_sl_boundary_.end_s();
-        return Status(ErrorCode::PLANNING_ERROR, "invalid decision");
-      }
+      // 1. Store the closest stop fence info.
+      // TODO(all): store ref. s value in stop decision; refine the code then.
+      common::SLPoint stop_sl_point;
+      reference_line_.XYToSL(decision.stop().stop_point(), &stop_sl_point);
+      const double stop_s = stop_sl_point.s();
+
       if (stop_s < min_stop_s) {
-        stop_obstacle = obstacle;
+        stop_obstacle = ptr_obstacle;
         min_stop_s = stop_s;
         stop_decision = decision;
       }
     } else if (decision.has_follow() || decision.has_overtake() ||
                decision.has_yield()) {
-      if (!MapWithDecision(obstacle, decision).ok()) {
-        AERROR << "Fail to map obstacle " << obstacle->Id()
-               << " with decision: " << decision.DebugString();
-        return Status(ErrorCode::PLANNING_ERROR,
-                      "Fail to map overtake/yield decision");
-      }
+      // 2. Depending on the longitudinal overtake/yield decision,
+      //    fine-tune the upper/lower st-boundary of related obstacles.
+      ComputeSTBoundaryWithDecision(ptr_obstacle, decision);
     } else if (!decision.has_ignore()) {
+      // 3. Ignore those unrelated obstacles.
       AWARN << "No mapping for decision: " << decision.DebugString();
     }
   }
-
   if (stop_obstacle) {
     bool success = MapStopDecision(stop_obstacle, stop_decision);
     if (!success) {
@@ -156,16 +124,12 @@ Status STBoundaryMapper::CreateStBoundary(PathDecision* path_decision) const {
 bool STBoundaryMapper::MapStopDecision(
     Obstacle* stop_obstacle, const ObjectDecisionType& stop_decision) const {
   DCHECK(stop_decision.has_stop()) << "Must have stop decision";
-
-  if (stop_obstacle->PerceptionSLBoundary().start_s() >
-      adc_sl_boundary_.end_s() + planning_distance_) {
-    return true;
-  }
+  common::SLPoint stop_sl_point;
+  reference_line_.XYToSL(stop_decision.stop().stop_point(), &stop_sl_point);
 
   double st_stop_s = 0.0;
-  const double stop_ref_s = stop_obstacle->PerceptionSLBoundary().start_s() +
-                            stop_decision.stop().distance_s() -
-                            vehicle_param_.front_edge_to_center();
+  const double stop_ref_s =
+      stop_sl_point.s() - vehicle_param_.front_edge_to_center();
 
   if (stop_ref_s > path_data_.frenet_frame_path().back().s()) {
     st_stop_s = path_data_.discretized_path().back().s() +
@@ -173,47 +137,46 @@ bool STBoundaryMapper::MapStopDecision(
   } else {
     PathPoint stop_point;
     if (!path_data_.GetPathPointWithRefS(stop_ref_s, &stop_point)) {
-      AERROR << "Fail to get path point from reference s. The sl boundary of "
-                "stop obstacle "
-             << stop_obstacle->Id()
-             << " is: " << stop_obstacle->PerceptionSLBoundary().DebugString();
       return false;
     }
-
     st_stop_s = stop_point.s();
   }
 
-  constexpr double kStopEpsilon = 1e-2;
-  const double s_min = std::max(0.0, st_stop_s - kStopEpsilon);
-  const double s_max =
-      std::fmax(s_min, std::fmax(planning_distance_, reference_line_.Length()));
+  const double s_min = std::fmax(0.0, st_stop_s);
+  const double s_max = std::fmax(
+      s_min, std::fmax(planning_max_distance_, reference_line_.Length()));
 
   std::vector<std::pair<STPoint, STPoint>> point_pairs;
   point_pairs.emplace_back(STPoint(s_min, 0.0), STPoint(s_max, 0.0));
   point_pairs.emplace_back(
-      STPoint(s_min, planning_time_),
-      STPoint(s_max + speed_bounds_config_.boundary_buffer(), planning_time_));
+      STPoint(s_min, planning_max_time_),
+      STPoint(s_max + speed_bounds_config_.boundary_buffer(),
+              planning_max_time_));
   auto boundary = STBoundary(point_pairs);
   boundary.SetBoundaryType(STBoundary::BoundaryType::STOP);
   boundary.SetCharacteristicLength(speed_bounds_config_.boundary_buffer());
   boundary.set_id(stop_obstacle->Id());
-  stop_obstacle->SetStBoundary(boundary);
+  stop_obstacle->set_path_st_boundary(boundary);
   return true;
 }
 
-Status STBoundaryMapper::MapWithoutDecision(Obstacle* obstacle) const {
+void STBoundaryMapper::ComputeSTBoundary(Obstacle* obstacle) const {
+  if (FLAGS_use_st_drivable_boundary) {
+    return;
+  }
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
 
   if (!GetOverlapBoundaryPoints(path_data_.discretized_path(), *obstacle,
                                 &upper_points, &lower_points)) {
-    return Status::OK();
+    return;
   }
 
   auto boundary = STBoundary::CreateInstance(lower_points, upper_points);
-
   boundary.set_id(obstacle->Id());
-  const auto& prev_st_boundary = obstacle->st_boundary();
+
+  // TODO(all): potential bug here.
+  const auto& prev_st_boundary = obstacle->path_st_boundary();
   const auto& ref_line_st_boundary = obstacle->reference_line_st_boundary();
   if (!prev_st_boundary.IsEmpty()) {
     boundary.SetBoundaryType(prev_st_boundary.boundary_type());
@@ -221,56 +184,70 @@ Status STBoundaryMapper::MapWithoutDecision(Obstacle* obstacle) const {
     boundary.SetBoundaryType(ref_line_st_boundary.boundary_type());
   }
 
-  obstacle->SetStBoundary(boundary);
-  return Status::OK();
+  obstacle->set_path_st_boundary(boundary);
 }
 
 bool STBoundaryMapper::GetOverlapBoundaryPoints(
     const std::vector<PathPoint>& path_points, const Obstacle& obstacle,
     std::vector<STPoint>* upper_points,
     std::vector<STPoint>* lower_points) const {
+  // Sanity checks.
   DCHECK_NOTNULL(upper_points);
   DCHECK_NOTNULL(lower_points);
   DCHECK(upper_points->empty());
   DCHECK(lower_points->empty());
   DCHECK_GT(path_points.size(), 0);
-
   if (path_points.empty()) {
     AERROR << "No points in path_data_.discretized_path().";
     return false;
   }
 
+  const auto* planning_status = PlanningContext::Instance()
+                                    ->mutable_planning_status()
+                                    ->mutable_change_lane();
+
+  double l_buffer =
+      planning_status->status() == ChangeLaneStatus::IN_CHANGE_LANE
+          ? FLAGS_lane_change_obstacle_nudge_l_buffer
+          : FLAGS_nonstatic_obstacle_nudge_l_buffer;
+
+  // Draw the given obstacle on the ST-graph.
   const auto& trajectory = obstacle.Trajectory();
-  if (trajectory.trajectory_point_size() == 0) {
+  if (trajectory.trajectory_point().empty()) {
+    // For those with no predicted trajectories, just map the obstacle's
+    // current position to ST-graph and always assume it's static.
     if (!obstacle.IsStatic()) {
-      ADEBUG << "Non-static obstacle[" << obstacle.Id()
-             << "] has NO prediction trajectory."
-             << obstacle.Perception().ShortDebugString();
+      AWARN << "Non-static obstacle[" << obstacle.Id()
+            << "] has NO prediction trajectory."
+            << obstacle.Perception().ShortDebugString();
     }
     for (const auto& curr_point_on_path : path_points) {
-      if (curr_point_on_path.s() > planning_distance_) {
+      if (curr_point_on_path.s() > planning_max_distance_) {
         break;
       }
-      const Box2d& obs_box = obstacle.PerceptionBoundingBox();
 
-      if (CheckOverlap(curr_point_on_path, obs_box,
-                       speed_bounds_config_.boundary_buffer())) {
+      const Box2d& obs_box = obstacle.PerceptionBoundingBox();
+      if (CheckOverlap(curr_point_on_path, obs_box, l_buffer)) {
+        // If there is overlapping, then plot it on ST-graph.
         const double backward_distance = -vehicle_param_.front_edge_to_center();
-        const double forward_distance = vehicle_param_.length() +
-                                        vehicle_param_.width() +
-                                        obs_box.length() + obs_box.width();
+        const double forward_distance = obs_box.length();
         double low_s =
             std::fmax(0.0, curr_point_on_path.s() + backward_distance);
-        double high_s = std::fmin(planning_distance_,
+        double high_s = std::fmin(planning_max_distance_,
                                   curr_point_on_path.s() + forward_distance);
+        // It is an unrotated rectangle appearing on the ST-graph.
+        // TODO(jiacheng): reconsider the backward_distance, it might be
+        // unnecessary, but forward_distance is indeed meaningful though.
         lower_points->emplace_back(low_s, 0.0);
-        lower_points->emplace_back(low_s, planning_time_);
+        lower_points->emplace_back(low_s, planning_max_time_);
         upper_points->emplace_back(high_s, 0.0);
-        upper_points->emplace_back(high_s, planning_time_);
+        upper_points->emplace_back(high_s, planning_max_time_);
         break;
       }
     }
   } else {
+    // For those with predicted trajectories (moving obstacles):
+    // 1. Subsample to reduce computation time.
     const int default_num_point = 50;
     DiscretizedPath discretized_path;
     if (path_points.size() > 2 * default_num_point) {
@@ -281,16 +258,17 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
           sampled_path_points.push_back(path_points[i]);
         }
       }
-      discretized_path = DiscretizedPath(sampled_path_points);
+      discretized_path = DiscretizedPath(std::move(sampled_path_points));
     } else {
       discretized_path = DiscretizedPath(path_points);
     }
+    // 2. Go through every point of the predicted obstacle trajectory.
     for (int i = 0; i < trajectory.trajectory_point_size(); ++i) {
       const auto& trajectory_point = trajectory.trajectory_point(i);
       const Box2d obs_box = obstacle.GetBoundingBox(trajectory_point);
 
       double trajectory_point_time = trajectory_point.relative_time();
-      constexpr double kNegtiveTimeThreshold = -1.0;
+      static constexpr double kNegtiveTimeThreshold = -1.0;
       if (trajectory_point_time < kNegtiveTimeThreshold) {
         continue;
       }
@@ -298,12 +276,12 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
       const double step_length = vehicle_param_.front_edge_to_center();
       auto path_len =
           std::min(FLAGS_max_trajectory_len, discretized_path.Length());
+      // Go through every point of the ADC's path.
       for (double path_s = 0.0; path_s < path_len; path_s += step_length) {
         const auto curr_adc_path_point =
             discretized_path.Evaluate(path_s + discretized_path.front().s());
-        if (CheckOverlap(curr_adc_path_point, obs_box,
-                         speed_bounds_config_.boundary_buffer())) {
-          // found overlap, start searching with higher resolution
+        if (CheckOverlap(curr_adc_path_point, obs_box, l_buffer)) {
+          // Found overlap, start searching with higher resolution
           const double backward_distance = -step_length;
           const double forward_distance = vehicle_param_.length() +
                                           vehicle_param_.width() +
@@ -318,6 +296,8 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
           double high_s =
               std::fmin(discretized_path.Length(), path_s + forward_distance);
 
+          // Keep shrinking by the resolution bidirectionally until finally
+          // locating the tight upper and lower bounds.
           while (low_s < high_s) {
             if (find_low && find_high) {
               break;
@@ -325,8 +305,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
             if (!find_low) {
               const auto& point_low = discretized_path.Evaluate(
                   low_s + discretized_path.front().s());
-              if (!CheckOverlap(point_low, obs_box,
-                                speed_bounds_config_.boundary_buffer())) {
+              if (!CheckOverlap(point_low, obs_box, l_buffer)) {
                 low_s += fine_tuning_step_length;
               } else {
                 find_low = true;
@@ -335,8 +314,7 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
             if (!find_high) {
               const auto& point_high = discretized_path.Evaluate(
                   high_s + discretized_path.front().s());
-              if (!CheckOverlap(point_high, obs_box,
-                                speed_bounds_config_.boundary_buffer())) {
+              if (!CheckOverlap(point_high, obs_box, l_buffer)) {
                 high_s -= fine_tuning_step_length;
               } else {
                 find_high = true;
@@ -356,11 +334,13 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
       }
     }
   }
+
+  // Sanity checks and return.
   DCHECK_EQ(lower_points->size(), upper_points->size());
   return (lower_points->size() > 1 && upper_points->size() > 1);
 }
 
-Status STBoundaryMapper::MapWithDecision(
+void STBoundaryMapper::ComputeSTBoundaryWithDecision(
     Obstacle* obstacle, const ObjectDecisionType& decision) const {
   DCHECK(decision.has_follow() || decision.has_yield() ||
          decision.has_overtake())
@@ -370,21 +350,16 @@ Status STBoundaryMapper::MapWithDecision(
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
 
-  if (!GetOverlapBoundaryPoints(path_data_.discretized_path(), *obstacle,
-                                &upper_points, &lower_points)) {
-    return Status::OK();
-  }
-
-  if (decision.has_follow() && lower_points.back().t() < planning_time_) {
-    const double diff_s = lower_points.back().s() - lower_points.front().s();
-    const double diff_t = lower_points.back().t() - lower_points.front().t();
-    double extend_lower_s =
-        diff_s / diff_t * (planning_time_ - lower_points.front().t()) +
-        lower_points.front().s();
-    const double extend_upper_s =
-        extend_lower_s + (upper_points.back().s() - lower_points.back().s());
-    upper_points.emplace_back(extend_upper_s, planning_time_);
-    lower_points.emplace_back(extend_lower_s, planning_time_);
+  if (FLAGS_use_st_drivable_boundary &&
+      obstacle->is_path_st_boundary_initialized()) {
+    const auto& path_st_boundary = obstacle->path_st_boundary();
+    lower_points = path_st_boundary.lower_points();
+    upper_points = path_st_boundary.upper_points();
+  } else {
+    if (!GetOverlapBoundaryPoints(path_data_.discretized_path(), *obstacle,
+                                  &upper_points, &lower_points)) {
+      return;
+    }
   }
 
   auto boundary = STBoundary::CreateInstance(lower_points, upper_points);
@@ -410,27 +385,28 @@ Status STBoundaryMapper::MapWithDecision(
   boundary.SetBoundaryType(b_type);
   boundary.set_id(obstacle->Id());
   boundary.SetCharacteristicLength(characteristic_length);
-  obstacle->SetStBoundary(boundary);
-
-  return Status::OK();
+  obstacle->set_path_st_boundary(boundary);
 }
 
 bool STBoundaryMapper::CheckOverlap(const PathPoint& path_point,
                                     const Box2d& obs_box,
-                                    const double buffer) const {
+                                    const double l_buffer) const {
+  // Convert reference point from center of rear axis to center of ADC.
   Vec2d ego_center_map_frame((vehicle_param_.front_edge_to_center() -
                               vehicle_param_.back_edge_to_center()) *
                                  0.5,
                              (vehicle_param_.left_edge_to_center() -
                               vehicle_param_.right_edge_to_center()) *
                                  0.5);
-
   ego_center_map_frame.SelfRotate(path_point.theta());
   ego_center_map_frame.set_x(ego_center_map_frame.x() + path_point.x());
   ego_center_map_frame.set_y(ego_center_map_frame.y() + path_point.y());
 
+  // Compute the ADC bounding box.
   Box2d adc_box(ego_center_map_frame, path_point.theta(),
-                vehicle_param_.length(), vehicle_param_.width());
+                vehicle_param_.length(), vehicle_param_.width() + l_buffer * 2);
+
+  // Check whether ADC bounding box overlaps with obstacle bounding box.
   return obs_box.HasOverlap(adc_box);
 }
 

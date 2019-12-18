@@ -289,12 +289,10 @@ void LosslessMapMatrix::Init(const BaseMapConfig* config) {
     return;
   }
   Init(rows, cols);
-  return;
 }
 
 void LosslessMapMatrix::Reset(const BaseMapConfig* config) {
   Reset(config->map_node_size_y_, config->map_node_size_x_);
-  return;
 }
 
 void LosslessMapMatrix::Init(unsigned int rows, unsigned int cols) {

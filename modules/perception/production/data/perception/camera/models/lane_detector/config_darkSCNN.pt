@@ -13,10 +13,15 @@ model_param {
   mean_r: 96
   is_bgr: true
   confidence_threshold: 0.95
+  vpt_mean_dx: 0.0
+  vpt_mean_dy: -77.284
+  vpt_std_dx: 103.109
+  vpt_std_dy: 95.273
   model_type: "CaffeNet"
 }
 
 net_param {
   seg_blob: "softmax"
+  vpt_blob: "fc_out"
   input_blob: "data"
 }

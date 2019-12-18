@@ -1,0 +1,23 @@
+header:
+  seq: 0
+  stamp:
+    secs: 0
+    nsecs: 0
+  frame_id: ''
+#change image resolution if needs
+height: 1080
+width: 1920
+# change the distortion_model and R if needs.
+# change D and K for sure.
+distortion_model: plumb_bob
+D: [-0.5467789805057404, 0.2729182152572299, -0.0019514549064445735, -0.0004166085741949163, 0.0]
+K: [1998.5484365316602, 0.0, 917.7422426747606, 0.0, 1990.2872857509276, 567.1297837900606, 0.0, 0.0, 1.0]
+R: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+binning_x: 0
+binning_y: 0
+roi:
+  x_offset: 0
+  y_offset: 0
+  height: 0
+  width: 0
+  do_rectify: False

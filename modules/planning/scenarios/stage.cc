@@ -33,8 +33,8 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 
-using common::time::Clock;
-using hdmap::PathOverlap;
+using apollo::common::time::Clock;
+using apollo::hdmap::PathOverlap;
 
 namespace {
 // constexpr double kPathOptimizationFallbackCost = 2e4;
@@ -146,8 +146,9 @@ bool Stage::ExecuteTaskOnOpenSpace(Frame* frame) {
         std::move(publishable_traj_and_gear);
   } else {
     auto& trajectory =
-        frame->open_space_info().chosen_paritioned_trajectory().first;
-    auto& gear = frame->open_space_info().chosen_paritioned_trajectory().second;
+        frame->open_space_info().chosen_partitioned_trajectory().first;
+    auto& gear =
+        frame->open_space_info().chosen_partitioned_trajectory().second;
     PublishableTrajectory publishable_trajectory(Clock::NowInSeconds(),
                                                  trajectory);
     auto publishable_traj_and_gear =

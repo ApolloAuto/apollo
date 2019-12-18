@@ -71,6 +71,9 @@ message TrajectoryPoint {
   optional double da = 5;
   // The angle between vehicle front wheel and vehicle longitudinal axis
   optional double steer = 6;
+
+  // Gaussian probability information
+  optional GaussianInfo gaussian_info = 7;
 }
 
 message Trajectory {
@@ -90,3 +93,14 @@ message VehicleMotion {
   repeated VehicleMotionPoint vehicle_motion_point = 2;
 }
 
+message GaussianInfo {
+  // Information of gaussian distribution
+  optional double sigma_x = 1;
+  optional double sigma_y = 2;
+  optional double correlation = 3;
+  // Information of representative uncertainty area
+  optional double area_probability = 4;
+  optional double ellipse_a = 5;
+  optional double ellipse_b = 6;
+  optional double theta_a = 7;
+}

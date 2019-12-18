@@ -62,7 +62,7 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
       ptr = queue_.front();
       queue_.pop();
     }
-    // For efficiency consideration, intialization should be invoked
+    // For efficiency consideration, initialization should be invoked
     // after releasing the mutex
     kInitializer(ptr);
     return std::shared_ptr<ObjectType>(ptr, [&](ObjectType* obj_ptr) {
@@ -90,7 +90,7 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
         queue_.pop();
       }
     }
-    // For efficiency consideration, intialization should be invoked
+    // For efficiency consideration, initialization should be invoked
     // after releasing the mutex
     for (size_t i = 0; i < num; ++i) {
       kInitializer(buffer[i]);
@@ -124,7 +124,7 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
         queue_.pop();
       }
     }
-    // For efficiency consideration, intialization should be invoked
+    // For efficiency consideration, initialization should be invoked
     // after releasing the mutex
     for (size_t i = 0; i < num; ++i) {
       kInitializer(buffer[i]);

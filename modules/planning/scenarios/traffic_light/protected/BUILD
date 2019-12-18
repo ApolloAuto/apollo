@@ -18,12 +18,11 @@ cc_library(
     deps = [
         "//cyber/common:log",
         "//external:gflags",
-        "//modules/common",
         "//modules/common/util",
         "//modules/common/util:factory",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/scenarios:scenario",
-        "//modules/planning/scenarios:stage_intersection_cruise_impl",
+        "//modules/planning/scenarios/common:stage_intersection_cruise_impl",
         "//modules/planning/scenarios/util:scenario_util_lib",
         "@eigen",
     ],
@@ -34,6 +33,19 @@ cc_test(
     size = "small",
     srcs = ["traffic_light_protected_scenario_test.cc"],
     data = ["//modules/planning:planning_conf"],
+    deps = [
+        ":traffic_light_protected_scenario",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "stage_approach_test",
+    size = "small",
+    srcs = ["stage_approach_test.cc"],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
     deps = [
         ":traffic_light_protected_scenario",
         "@gtest//:main",

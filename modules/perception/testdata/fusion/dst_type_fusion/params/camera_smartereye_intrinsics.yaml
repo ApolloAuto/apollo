@@ -1,6 +1,6 @@
-header: 
+header:
   seq: 0
-  stamp: 
+  stamp:
     secs: 0
     nsecs:         0
   frame_id: camera_smartereye
@@ -14,7 +14,7 @@ R: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
 P: [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
 binning_x: 0
 binning_y: 0
-roi: 
+roi:
   x_offset: 0
   y_offset: 0
   height: 0

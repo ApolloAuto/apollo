@@ -69,7 +69,7 @@ class TransformWrapper {
             const std::string& novatel2world_tf2_frame_id,
             const std::string& novatel2world_tf2_child_frame_id);
 
-  // Attention: must initlize TransformWrapper first
+  // Attention: must initialize TransformWrapper first
   bool GetSensor2worldTrans(double timestamp,
                             Eigen::Affine3d* sensor2world_trans,
                             Eigen::Affine3d* novatel2world_trans = nullptr);

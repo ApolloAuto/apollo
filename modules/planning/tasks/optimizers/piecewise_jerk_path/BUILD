@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "piecewise_jerk_path_optimizer",
-    srcs = [
-        "piecewise_jerk_path_optimizer.cc",
-    ],
-    hdrs = [
-        "piecewise_jerk_path_optimizer.h",
-    ],
+    srcs = ["piecewise_jerk_path_optimizer.cc"],
+    hdrs = ["piecewise_jerk_path_optimizer.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
@@ -37,6 +33,18 @@ cc_library(
         "//modules/planning/reference_line",
         "//modules/planning/tasks/optimizers:path_optimizer",
         "@eigen",
+    ],
+)
+
+cc_library(
+    name = "piecewise_jerk_path_ipopt_solver",
+    srcs = ["piecewise_jerk_path_ipopt_solver.cc"],
+    hdrs = ["piecewise_jerk_path_ipopt_solver.h"],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        "//cyber",
+        "@eigen",
+        "@ipopt",
     ],
 )
 

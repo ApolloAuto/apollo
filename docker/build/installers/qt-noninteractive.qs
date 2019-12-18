@@ -9,7 +9,7 @@ function Controller() {
 }
 
 Controller.prototype.WelcomePageCallback = function() {
-    gui.clickButton(buttons.NextButton, 3000);
+    gui.clickButton(buttons.NextButton, 5000);
 }
 
 Controller.prototype.CredentialsPageCallback = function() {
@@ -31,7 +31,9 @@ Controller.prototype.ComponentSelectionPageCallback = function() {
 
     // it's easier to select default and
     // cleanup in the bash script
-    widget.selectDefault();
+    widget.deselectAll();
+    widget.selectComponent("qt.qt5.598");
+    widget.selectComponent("qt.qt5.598.gcc_64");
     gui.clickButton(buttons.NextButton);
 }
 
@@ -55,4 +57,9 @@ if (checkBoxForm && checkBoxForm.launchQtCreatorCheckBox) {
     checkBoxForm.launchQtCreatorCheckBox.checked = false;
 }
     gui.clickButton(buttons.FinishButton);
+}
+
+Controller.prototype.PerformInstallationPageCallback = function()
+{
+    gui.clickButton(buttons.CommitButton);
 }

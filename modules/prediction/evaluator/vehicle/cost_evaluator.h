@@ -20,6 +20,8 @@
 
 #include "modules/prediction/evaluator/evaluator.h"
 
+#include "modules/prediction/container/obstacles/obstacles_container.h"
+
 namespace apollo {
 namespace prediction {
 
@@ -28,7 +30,7 @@ class CostEvaluator : public Evaluator {
   /**
    * @brief Constructor
    */
-  CostEvaluator() = default;
+  CostEvaluator();
 
   /**
    * @brief Destructor
@@ -38,8 +40,10 @@ class CostEvaluator : public Evaluator {
   /**
    * @brief Override Evaluate
    * @param Obstacle pointer
+   * @param Obstacles container
    */
-  void Evaluate(Obstacle* obstacle_ptr) override;
+  bool Evaluate(Obstacle* obstacle_ptr,
+                ObstaclesContainer* obstacles_container) override;
 
   /**
    * @brief Get the name of evaluator.

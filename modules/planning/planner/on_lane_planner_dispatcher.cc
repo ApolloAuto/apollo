@@ -24,8 +24,12 @@ namespace planning {
 
 std::unique_ptr<Planner> OnLanePlannerDispatcher::DispatchPlanner() {
   PlanningConfig planning_config;
-  apollo::cyber::common::GetProtoFromFile(FLAGS_planning_config_file,
-                                          &planning_config);
+  bool res_load_config = apollo::cyber::common::GetProtoFromFile(
+      FLAGS_planning_config_file, &planning_config);
+  if (!res_load_config) {
+    return nullptr;
+  }
+
   return planner_factory_.CreateObject(
       planning_config.standard_planning_config().planner_type(0));
 }

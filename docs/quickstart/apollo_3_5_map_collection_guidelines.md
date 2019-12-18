@@ -126,7 +126,9 @@ The only special case is that the additional front lidar 16 (which is facing upw
 2. For Lidar topics:
     - For the vehicles that are needed for map data verification, all the LiDAR related point cloud topics (velodynescan, pointcloud2, compenstator/pointcloud2) must be saved and sent to us
     - After the vehicle passes the map verification, only velodynescan & pointcloud2 are needed for map creation
-3.  Compress the data collected to reduce the upload time.
+3.  In order to ensure a smooth upload process:
+    - If you are currently collecting data on Apollo 3.5, then Apollo Cyber will take care of reducing the size of the data files via a splitter
+    - If you are currently collecting data on Apollo 3.0 or lower based on ROS, you could split the file to a maximum size of 4GB per file. Please refer to the following [ROS guide](http://wiki.ros.org/rosbag/Commandline) and look for the keyword --split to learn how to split your bag.
 
 ## Data Upload
 

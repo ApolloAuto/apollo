@@ -57,6 +57,7 @@ enum MessageId : uint16_t {
   GPSEPHEMERIS = 7,
   RANGE = 43,
   HEADING = 971,
+  IMURATECORRIMUS = 1362,
 };
 
 // Every binary message has 32-bit CRC performed on all data including the

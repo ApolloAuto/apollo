@@ -100,7 +100,7 @@ Program terminated with signal SIGILL, Illegal instruction.
 #9  0x0000000000000000 in ?? ()
 (gdb) q
 
-@in_dev_docker:/apollo$ addr2line -C -f -e /usr/local/lib/libpcl_sample_consensus.so.1.7.2 0x375bec 
+@in_dev_docker:/apollo$ addr2line -C -f -e /usr/local/lib/libpcl_sample_consensus.so.1.7.2 0x375bec
 double boost::math::detail::erf_inv_imp<double, boost::math::policies::policy<boost::math::policies::promote_float<false>, boost::math::policies::promote_double<false>, boost::math::policies::default_policy, boost::math::policies::default_policy, boost::math::policies::default_policy, boost::math::policies::default_policy, boost::math::policies::default_policy, boost::math::policies::default_policy, boost::math::policies::default_policy, boost::math::policies::default_policy, boost::math::policies::default_policy, boost::math::policies::default_policy, boost::math::policies::default_policy> >(double const&, double const&, boost::math::policies::policy<boost::math::policies::promote_float<false>, boost::math::policies::promote_double<false>, boost::math::policies::default_policy, boost::math::policies::default_policy, boost::math::policies::default_policy, boost::math::policies::default_policy, boost::math::policies::default_policy, boost::math::policies::default_policy, boost::math::policies::default_policy, boost::math::policies::default_policy, boost::math::policies::default_policy, boost::math::policies::default_policy, boost::math::policies::default_policy> const&, mpl_::int_<64> const*)
 ??:?
 ```
@@ -118,17 +118,24 @@ apolloauto/apollo   map_volume-sunnyvale_big_loop-latest   80aca30fa08a        3
 apolloauto/apollo   localization_volume-x86_64-latest      be947abaa650        2 months ago        5.74MB
 apolloauto/apollo   map_volume-sunnyvale_loop-latest       36dc0d1c2551        2 months ago        906MB
 
-build cmd: 
+build cmd:
 in_dev_docker:/apollo$ ./apollo.sh build_no_perception dbg
 ```
 2. Compile pcl and copy the pcl library files to `/usr/local/lib`:
 
+See [/apollo/WORKSPACE.in](https://github.com/ApolloAuto/apollo/blob/master/WORKSPACE.in) to identify your pcl library version:
+- Prior to Apollo 5.0 (inclusive): pcl-1.7
+- After Apollo 5.0: pcl-1.9
+
 Inside docker:
 ```
 (to keep pcl in host, we save pcl under /apollo)
-cd /apollo 
+cd /apollo
 git clone https://github.com/PointCloudLibrary/pcl.git
-git checkout -b 1.7.2 pcl-1.7.2
+
+git checkout -b <your pcl-lib version> pcl-<your pcl-lib version>
+Ex: git checkout -b 1.7.2 pcl-1.7.2
+    git checkout -b 1.9.1 pcl-1.9.1
 ```
 then hack CMakeLists.txt with :
 ```
@@ -138,9 +145,9 @@ index f0a5600..42c182e 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -7,6 +7,15 @@ endif()
- 
+
  set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "possible configurations" FORCE)
- 
+
 +if (CMAKE_VERSION VERSION_LESS "3.1")
 +# if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 +    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
@@ -186,7 +193,7 @@ If CPU does not support AVX instructions, and you gdb the coredump file under /a
 
 ```
 Program terminated with signal SIGILL, Illegal instruction.
-#0  0x000000000112b70a in std::_Hashtable<std::string, std::string, std::allocator<std::string>, std::__detail::_Identity, std::equal_to<std::string>, google::protobuf::hash<std::string>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, true, true> >::_Hashtable (this=0x3640288, __bucket_hint=10, 
+#0  0x000000000112b70a in std::_Hashtable<std::string, std::string, std::allocator<std::string>, std::__detail::_Identity, std::equal_to<std::string>, google::protobuf::hash<std::string>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, true, true> >::_Hashtable (this=0x3640288, __bucket_hint=10,
     __h1=..., __h2=..., __h=..., __eq=..., __exk=..., __a=...)
 ---Type <return> to continue, or q <return> to quit---
     at /usr/include/c++/4.8/bits/hashtable.h:828

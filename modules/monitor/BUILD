@@ -21,6 +21,7 @@ cc_binary(
         "//modules/monitor/hardware:socket_can_monitor",
         "//modules/monitor/software:channel_monitor",
         "//modules/monitor/software:functional_safety_monitor",
+        "//modules/monitor/software:latency_monitor",
         "//modules/monitor/software:localization_monitor",
         "//modules/monitor/software:process_monitor",
         "//modules/monitor/software:recorder_monitor",

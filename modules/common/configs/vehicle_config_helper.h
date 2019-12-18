@@ -103,7 +103,7 @@ class VehicleConfigHelper {
    * D. XO is VehicleParam.min_turn_radius(), X to AD is left_edge_to_center,
    * X to AB is VehicleParam.front_edge_to_center(). Then
    *     AO = sqrt((XO +  left_edge_to_center) ^2 + front_edge_to_center^2).
-   * @return AO in the above figure, which is the maximum turn radius when the
+   * @return AO in the above figure, which is the minimum turn radius when the
    * vehicle turns with maximum steering angle
    */
 

@@ -61,23 +61,13 @@ Should you see this error while building Apollo, please confirm the following:
 
 ---
 
-## Git LFS is causing a Build Failure?
+## Build error "docker: Error response from daemon: failed to copy files: userspace copy failed": 
 
-The key to understanding whether the build failure is caused by Git LFS. Try the following command `git lfs fetch`. If it returns an output like the image below, the build was successful
-
-![](images/git_lfs.png)
-
-If it returns any other output, try the following steps:
-
-```bash
-git clone https://github.com/ApolloAuto/apollo.git
-# you only have to do this one time,
-# if you have never used git lfs, then that's why it's not working
-git lfs install
-git lfs fetch --all
+An error message like this means that your system does not have enough space to build Apollo and the build process will fail. To resolve this issue, run the following to free up some space:
 ```
-
-Additional material on Git LFS: https://git-lfs.github.com/
+docker/setup_host/cleanup_resources.sh 
+```
+If it does not work, delete the Apollo repo, free up some space and then try again.
 
 ---
 ## Bootstrap error: unix:///tmp/supervisor.sock refused connection

@@ -1,0 +1,45 @@
+# state:
+#   static_align:
+
+stages:
+  - "record_check_start"
+  - "static_align_befor_collect_data"
+  - "eight_route_befor_collect_data"
+  - "loops_check"
+  - "eight_route_after_collect_data"
+  - "static_align_after_collect_data"
+  - "record_check_end"
+
+flow:
+  record_check_start:
+    exception:
+      ERROR_VERIFY_NO_RECORDERS: "self"
+
+  static_align_befor_collect_data:
+    exception:
+      ERROR_VERIFY_NO_GNSSPOS:  "record_check_start"
+      ERROR_GNSS_SIGNAL_FAIL: "self"
+      ERROR_NOT_STATIC: "self"
+
+  eight_route_befor_collect_data:
+    exception:
+      ERROR_VERIFY_NO_GNSSPOS: "record_check_start"
+      ERROR_NOT_EIGHT_ROUTE: "self"
+
+  loops_check:
+    exception:
+      ERROR_LOOPS_NOT_REACHED: "self"
+
+  eight_route_after_collect_data:
+    exception:
+      ERROR_VERIFY_NO_GNSSPOS: "record_check_start"
+      ERROR_NOT_EIGHT_ROUTE: "self"
+
+  static_align_after_collect_data:
+    exception:
+      ERROR_VERIFY_NO_GNSSPOS:  "record_check_start"
+      ERROR_GNSS_SIGNAL_FAIL: "self"
+      ERROR_NOT_STATIC: "self"
+
+  record_check_end:
+    null

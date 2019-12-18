@@ -3,45 +3,43 @@ syntax = "proto2";
 package apollo.perception.camera.tracking_feature;
 
 message FeatureParam {
-    optional int32 feat_stride = 1 [default = 32];
-    repeated ExtractorParam extractor = 2;
-    optional string remap_model = 3;
+  optional int32 feat_stride = 1 [default = 32];
+  repeated ExtractorParam extractor = 2;
+  optional string remap_model = 3;
 }
 
 message ExtractorParam {
-    enum FeatureType {
-        ROIPooling = 0;
-    }
-    optional string feat_blob = 1;
-    optional FeatureType feat_type = 2 [default = ROIPooling];
-    optional ROIPoolingParam roi_pooling_param = 3;
-    optional PSROIPoolingParam ps_roi_pooling_param = 4;
+  enum FeatureType { ROIPooling = 0; }
+  optional string feat_blob = 1;
+  optional FeatureType feat_type = 2 [default = ROIPooling];
+  optional ROIPoolingParam roi_pooling_param = 3;
+  optional PSROIPoolingParam ps_roi_pooling_param = 4;
 }
 
 message ROIPoolingParam {
-    optional int32 pooled_h = 1 [default = 3];
-    optional int32 pooled_w = 2 [default = 3];
-    optional bool use_floor = 3 [default = false];
+  optional int32 pooled_h = 1 [default = 3];
+  optional int32 pooled_w = 2 [default = 3];
+  optional bool use_floor = 3 [default = false];
 }
 
 message PSROIPoolingParam {
-    optional int32 heat_map_a = 1 [default = 16];
-    optional int32 output_dim = 2 [default = 10];
-    optional int32 group_height = 3 [default = 7];
-    optional int32 group_width = 4 [default = 7];
-    optional int32 pooled_height = 5 [default = 7];
-    optional int32 pooled_width = 6 [default = 7];
-    optional int32 sample_per_part = 7 [default = 4];
+  optional int32 heat_map_a = 1 [default = 16];
+  optional int32 output_dim = 2 [default = 10];
+  optional int32 group_height = 3 [default = 7];
+  optional int32 group_width = 4 [default = 7];
+  optional int32 pooled_height = 5 [default = 7];
+  optional int32 pooled_width = 6 [default = 7];
+  optional int32 sample_per_part = 7 [default = 4];
 }
 
 message ExternalParam {
-    optional string model_type = 1 [default = "CaffeNet"];
-    optional string proto_file = 2 [default = "caffe.pt"];
-    optional string weight_file = 3 [default = "caffe.model"];
-    optional int32 resize_height = 4 [default = 1080];
-    optional int32 resize_width = 5 [default = 1920];
-    optional string input_blob = 6;
-    optional string feat_blob = 7;
-    optional float offset_ratio = 8 [default = 0.288889];
-    optional string feature_file = 9 [default = "feature.pt"];
+  optional string model_type = 1 [default = "CaffeNet"];
+  optional string proto_file = 2 [default = "caffe.pt"];
+  optional string weight_file = 3 [default = "caffe.model"];
+  optional int32 resize_height = 4 [default = 1080];
+  optional int32 resize_width = 5 [default = 1920];
+  optional string input_blob = 6;
+  optional string feat_blob = 7;
+  optional float offset_ratio = 8 [default = 0.288889];
+  optional string feature_file = 9 [default = "feature.pt"];
 }

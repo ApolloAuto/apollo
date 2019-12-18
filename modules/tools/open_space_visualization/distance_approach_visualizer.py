@@ -23,15 +23,19 @@ from matplotlib import animation
 import numpy as np
 import time
 import math
+result_file = "/tmp/open_space_osqp_ipopt.csv"
 
-def SmoothTrajectory(visualize_flag):
+
+# def SmoothTrajectory(visualize_flag):
+def SmoothTrajectory(visualize_flag, sx, sy):
     # initialze object
     OpenSpacePlanner = DistancePlanner()
 
     # parameter(except max, min and car size is defined in proto)
     num_output_buffer = 10000
-    sx = -8
-    sy = 4
+    # sx = -8
+    # sy = 1.5
+    # sphi = 0.5
     sphi = 0.0
 
     scenario = "backward"
@@ -86,6 +90,9 @@ def SmoothTrajectory(visualize_flag):
     opt_dual_n = (c_double * num_output_buffer)()
     size = (c_ushort * 1)()
     XYbounds_ctype = (c_double * 4)(*XYbounds)
+    hybrid_time = (c_double * 1)(0.0)
+    dual_time = (c_double * 1)(0.0)
+    ipopt_time = (c_double * 1)(0.0)
 
     success = True
     start = time.time()
@@ -117,7 +124,8 @@ def SmoothTrajectory(visualize_flag):
         # load result
         OpenSpacePlanner.DistanceGetResult(x, y, phi, v, a, steer, opt_x,
                                         opt_y, opt_phi, opt_v, opt_a, opt_steer, opt_time,
-                                        opt_dual_l, opt_dual_n, size)
+                                        opt_dual_l, opt_dual_n, size,
+                                        hybrid_time, dual_time, ipopt_time)
         for i in range(0, size[0]):
             x_out.append(float(x[i]))
             y_out.append(float(y[i]))
@@ -212,13 +220,15 @@ def SmoothTrajectory(visualize_flag):
         dual_n_graph.title.set_text('dual_n')
         dual_n_graph.plot(np.linspace(0, size[0] * 16, size[0] * 16), opt_dual_n_out)
         plt.show()
+        return True
 
     if not visualize_flag :
         if success :
             # load result
             OpenSpacePlanner.DistanceGetResult(x, y, phi, v, a, steer, opt_x,
                                             opt_y, opt_phi, opt_v, opt_a, opt_steer, opt_time,
-                                            opt_dual_l, opt_dual_n, size)
+                                            opt_dual_l, opt_dual_n, size,
+                                            hybrid_time, dual_time, ipopt_time)
             for i in range(0, size[0]):
                 x_out.append(float(x[i]))
                 y_out.append(float(y[i]))
@@ -233,8 +243,50 @@ def SmoothTrajectory(visualize_flag):
                 opt_a_out.append(float(opt_a[i]))
                 opt_steer_out.append(float(opt_steer[i]))
                 opt_time_out.append(float(opt_time[i]))
-        return success, opt_x_out, opt_y_out, opt_phi_out, opt_v_out, opt_a_out, opt_steer_out, opt_time_out, planning_time
+        return [success, opt_x_out, opt_y_out, opt_phi_out, opt_v_out, opt_a_out, opt_steer_out, opt_time_out, \
+            hybrid_time, dual_time, ipopt_time, planning_time]
+    return False
 
 if __name__ == '__main__':
-    visualize_flag = True
-    SmoothTrajectory(visualize_flag)
+    # visualize_flag = True
+    # SmoothTrajectory(visualize_flag)
+
+    visualize_flag = False
+    planning_time_stats = []
+    hybrid_time_stats = []
+    dual_time_stats = []
+    ipopt_time_stats = []
+
+
+    test_count = 0
+    success_count = 0
+    for sx in np.arange(-10, 10, 1.0):
+        for sy in np.arange(2, 4, 0.5):
+            print("sx is "+ str(sx) + " and sy is " + str(sy))
+            test_count += 1
+            result = SmoothTrajectory(visualize_flag, sx, sy)
+            if result[0] :
+                success_count += 1
+                planning_time_stats.append(result[-1])
+                ipopt_time_stats.append(result[-2][0])
+                dual_time_stats.append(result[-3][0])
+                hybrid_time_stats.append(result[-4][0])
+
+    print("success rate is "+ str(float(success_count) / float(test_count)))
+    print("min is " + str(min(planning_time_stats)))
+    print("max is " + str(max(planning_time_stats)))
+    print("average is " + str(sum(planning_time_stats) / len(planning_time_stats)))
+
+
+    module_timing = np.asarray([hybrid_time_stats, dual_time_stats, ipopt_time_stats])
+    np.savetxt(result_file, module_timing, delimiter=",")
+
+    print("average hybird time: %4.4f, with max: %4.4f, min: %4.4f" % (
+        sum(hybrid_time_stats) / len(hybrid_time_stats), max(hybrid_time_stats),
+        min(hybrid_time_stats)))
+    print("average dual time: %4.4f, with max: %4.4f, min: %4.4f" % (
+        sum(dual_time_stats) / len(dual_time_stats), max(dual_time_stats),
+        min(dual_time_stats)))
+    print("average ipopt time: %4.4f, with max: %4.4f, min: %4.4f" % (
+        sum(ipopt_time_stats) / len(ipopt_time_stats), max(ipopt_time_stats),
+        min(ipopt_time_stats)))

@@ -62,14 +62,14 @@ bool LocalizationLidar::Init(const std::string& map_path,
     LOG(FATAL) << "Reflectance map folder is invalid!";
     return false;
   }
-  map_node_pool_.Initial(&(map_.GetConfig()));
+  map_node_pool_.Initial(&(map_.GetMapConfig()));
   map_.InitMapNodeCaches(12, 24);
   map_.AttachMapNodePool(&map_node_pool_);
 
   // init locator
-  node_size_x_ = map_.GetConfig().map_node_size_x_;
-  node_size_y_ = map_.GetConfig().map_node_size_y_;
-  resolution_ = map_.GetConfig().map_resolutions_[resolution_id];
+  node_size_x_ = map_.GetMapConfig().map_node_size_x_;
+  node_size_y_ = map_.GetMapConfig().map_node_size_y_;
+  resolution_ = map_.GetMapConfig().map_resolutions_[resolution_id];
 
   lidar_map_node_ = new MapNodeData(node_size_x_, node_size_y_);
 
@@ -88,28 +88,23 @@ void LocalizationLidar::SetVelodyneExtrinsic(const Eigen::Affine3d& pose) {
 
   lidar_locator_->SetVelodyneExtrinsic(trans.x(), trans.y(), trans.z(),
                                        quat.x(), quat.y(), quat.z(), quat.w());
-  return;
 }
 
 void LocalizationLidar::SetVehicleHeight(double height) {
   vehicle_lidar_height_ = height;
   AINFO << "Set height: " << vehicle_lidar_height_;
-  return;
 }
 
 void LocalizationLidar::SetValidThreshold(float valid_threashold) {
   lidar_locator_->SetValidThreshold(valid_threashold);
-  return;
 }
 
 void LocalizationLidar::SetImageAlignMode(int mode) {
   lidar_locator_->SetImageAlignMode(mode);
-  return;
 }
 
 void LocalizationLidar::SetLocalizationMode(int mode) {
   lidar_locator_->SetLocalizationMode(mode);
-  return;
 }
 
 void LocalizationLidar::SetDeltaYawLimit(double limit) {
@@ -134,7 +129,6 @@ int LocalizationLidar::Update(const unsigned int frame_idx,
 
   Eigen::Affine3d imu_pose = pose;
   RefineAltitudeFromMap(&imu_pose);
-
   // load all needed map
   Eigen::Vector3d pose_trans = imu_pose.translation();
   Eigen::Quaterniond pose_quat(imu_pose.linear());
@@ -207,7 +201,6 @@ void LocalizationLidar::GetResult(Eigen::Affine3d* location,
       }
     }
   }
-  return;
 }
 
 void LocalizationLidar::GetLocalizationDistribution(
@@ -227,7 +220,6 @@ void LocalizationLidar::GetLocalizationDistribution(
       }
     }
   }
-  return;
 }
 
 void LocalizationLidar::RefineAltitudeFromMap(Eigen::Affine3d* pose) {
@@ -238,10 +230,11 @@ void LocalizationLidar::RefineAltitudeFromMap(Eigen::Affine3d* pose) {
 
   // Read the altitude from the map
   MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(
-      map_.GetConfig(), lidar_trans, resolution_id_, zone_id_);
-  LossyMapNode* node = static_cast<LossyMapNode*>(map_.GetMapNodeSafe(index));
-  LossyMapMatrix& matrix =
-      static_cast<LossyMapMatrix&>(node->GetMapCellMatrix());
+      map_.GetMapConfig(), lidar_trans, resolution_id_, zone_id_);
+  PyramidMapNode* node =
+      static_cast<PyramidMapNode*>(map_.GetMapNodeSafe(index));
+  PyramidMapMatrix& matrix =
+      static_cast<PyramidMapMatrix&>(node->GetMapCellMatrix());
 
   const double height_diff = vehicle_lidar_height_;
 
@@ -254,12 +247,18 @@ void LocalizationLidar::RefineAltitudeFromMap(Eigen::Affine3d* pose) {
   unsigned int x = 0;
   unsigned int y = 0;
   if (node->GetCoordinate(lidar_trans, &x, &y)) {
-    unsigned int count = matrix[y][x].count;
+    unsigned int count = *matrix.GetCountSafe(y, x);
     if (count > 0) {
-      if (matrix[y][x].is_ground_useful) {
-        vehicle_ground_alt = matrix[y][x].altitude_ground;
+      if (matrix.HasGroundAltitude()) {
+        const float* ground_alt = matrix.GetGroundAltitudeSafe(y, x);
+        if (ground_alt) {
+          vehicle_ground_alt = *ground_alt;
+        }
       } else {
-        vehicle_ground_alt = matrix[y][x].altitude;
+        const float* altitude = matrix.GetAltitudeSafe(y, x);
+        if (altitude) {
+          vehicle_ground_alt = *altitude;
+        }
       }
     } else {
       vehicle_ground_alt = static_cast<float>(pre_vehicle_ground_height_);
@@ -269,7 +268,6 @@ void LocalizationLidar::RefineAltitudeFromMap(Eigen::Affine3d* pose) {
   lidar_pose.translation()(2) = vehicle_ground_alt + height_diff;
   Eigen::Affine3d transform_tmp = lidar_pose * velodyne_extrinsic_.inverse();
   pose->translation() = transform_tmp.translation();
-  return;
 }
 
 void LocalizationLidar::ComposeMapNode(const Eigen::Vector3d& trans) {
@@ -281,7 +279,7 @@ void LocalizationLidar::ComposeMapNode(const Eigen::Vector3d& trans) {
   MapNodeIndex map_node_idx[2][2];
   // top left corner
   map_node_idx[0][0] = MapNodeIndex::GetMapNodeIndex(
-      map_.GetConfig(), left_top_corner, resolution_id_, zone_id_);
+      map_.GetMapConfig(), left_top_corner, resolution_id_, zone_id_);
   // top right corner
   map_node_idx[0][1] = map_node_idx[0][0];
   map_node_idx[0][1].n_ += 1;
@@ -294,11 +292,11 @@ void LocalizationLidar::ComposeMapNode(const Eigen::Vector3d& trans) {
   map_node_idx[1][1].m_ += 1;
 
   // get map node 2x2
-  LossyMapNode* map_node[2][2] = {nullptr};
+  PyramidMapNode* map_node[2][2] = {nullptr};
   for (unsigned int y = 0; y < 2; ++y) {
     for (unsigned int x = 0; x < 2; ++x) {
       map_node[y][x] =
-          static_cast<LossyMapNode*>(map_.GetMapNodeSafe(map_node_idx[y][x]));
+          static_cast<PyramidMapNode*>(map_.GetMapNodeSafe(map_node_idx[y][x]));
     }
   }
 
@@ -351,22 +349,28 @@ void LocalizationLidar::ComposeMapNode(const Eigen::Vector3d& trans) {
       int src_y = src_ys[i][j];
       int dst_x = dst_xs[i][j];
       int dst_y = dst_ys[i][j];
-      LossyMapMatrix& map_cells =
-          static_cast<LossyMapMatrix&>(map_node[i][j]->GetMapCellMatrix());
+      PyramidMapMatrix& map_cells =
+          static_cast<PyramidMapMatrix&>(map_node[i][j]->GetMapCellMatrix());
+      FloatMatrix* intensity_matrix = map_cells.GetIntensityMatrix(0);
+      FloatMatrix* intensity_var_matrix = map_cells.GetIntensityVarMatrix(0);
+      FloatMatrix* altitude_matrix = map_cells.GetAltitudeMatrix(0);
+      UIntMatrix* count_matrix = map_cells.GetCountMatrix(0);
       for (int y = 0; y < range_y; ++y) {
         int dst_base_x = (dst_y + y) * node_size_x_ + dst_x;
         for (int x = 0; x < range_x; ++x) {
-          auto& cell = map_cells[src_y + y][src_x + x];
           int dst_idx = dst_base_x + x;
-          lidar_map_node_->intensities[dst_idx] = cell.intensity;
-          lidar_map_node_->intensities_var[dst_idx] = cell.intensity_var;
-          lidar_map_node_->altitudes[dst_idx] = cell.altitude;
-          lidar_map_node_->count[dst_idx] = cell.count;
+          lidar_map_node_->intensities[dst_idx] =
+              (*intensity_matrix)[src_y + y][src_x + x];
+          lidar_map_node_->intensities_var[dst_idx] =
+              (*intensity_var_matrix)[src_y + y][src_x + x];
+          lidar_map_node_->altitudes[dst_idx] =
+              (*altitude_matrix)[src_y + y][src_x + x];
+          lidar_map_node_->count[dst_idx] =
+              (*count_matrix)[src_y + y][src_x + x];
         }
       }
     }
   }
-  return;
 }
 
 }  // namespace msf

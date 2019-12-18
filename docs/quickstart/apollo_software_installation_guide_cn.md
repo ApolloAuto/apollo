@@ -12,22 +12,6 @@ Apollo已经开始为汽车和自主驾驶行业的合作伙伴提供开放，�
 
 在开始之前，请确保您已经按照[Apollo 1.0 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md#installing-the-software-for-the-ipc)中的步骤安装了Ubuntu Linux 14.04.3和Apollo Kernel。
 
-## *New*
-
-我们最新引入了 [git-lfs](https://git-lfs.github.com) 管理Apollo中的大文件。请
-按照其官方文档安装该git插件。
-
-```bash
-# Required for Ubuntu 14.04 / 16.04.
-curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
-
-# Ubuntu 14.04 / 16.04 / 18.04.
-sudo apt-get install -y git-lfs
-```
-
-较新版本的Git会自动并透明地执行lfs插件，因此你只需如常执行 `git clone` 或 `git pull` 等命令。
-但对于旧版本的Git，你需要显式执行 `git lfs clone` 或 `git lfs pull` 。
-
 ## 下载Apollo源代码
 
 1. 从[github source](https://github.com/ApolloAuto/apollo/)下载Apollo的源代码：
@@ -64,6 +48,7 @@ Docker容器是设置Apollo构建环境的最简单方法。
     ```
     DOCKER_OPTS = "-s overlay"
     ```
+4. 安装最新的 [nvidia-container-toolkit](https://github.com/NVIDIA/nvidia-docker).
 
 ## 使用你的Release Container
 

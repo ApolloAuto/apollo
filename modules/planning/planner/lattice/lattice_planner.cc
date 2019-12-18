@@ -173,7 +173,7 @@ Status LatticePlanner::PlanOnReferenceLine(
 
   double speed_limit =
       reference_line_info->reference_line().GetSpeedLimitFromS(init_s[0]);
-  reference_line_info->SetCruiseSpeed(speed_limit);
+  reference_line_info->SetLatticeCruiseSpeed(speed_limit);
 
   PlanningTarget planning_target = reference_line_info->planning_target();
   if (planning_target.has_stop_point()) {

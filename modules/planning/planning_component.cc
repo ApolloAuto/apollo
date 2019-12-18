@@ -22,6 +22,7 @@
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/pnc_map.h"
+#include "modules/planning/common/history.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/navi_planning.h"
 #include "modules/planning/on_lane_planning.h"
@@ -48,9 +49,6 @@ bool PlanningComponent::Init() {
       << "failed to load planning config file " << FLAGS_planning_config_file;
   planning_base_->Init(config_);
 
-  if (FLAGS_use_sim_time) {
-    Clock::SetMode(Clock::MOCK);
-  }
   routing_reader_ = node_->CreateReader<RoutingResponse>(
       FLAGS_routing_response_topic,
       [this](const std::shared_ptr<RoutingResponse>& routing) {
@@ -67,14 +65,15 @@ bool PlanningComponent::Init() {
         traffic_light_.CopyFrom(*traffic_light);
       });
 
+  pad_msg_reader_ = node_->CreateReader<PadMessage>(
+      FLAGS_planning_pad_topic,
+      [this](const std::shared_ptr<PadMessage>& pad_msg) {
+        ADEBUG << "Received pad data: run pad callback.";
+        std::lock_guard<std::mutex> lock(mutex_);
+        pad_msg_.CopyFrom(*pad_msg);
+      });
+
   if (FLAGS_use_navigation_mode) {
-    pad_message_reader_ = node_->CreateReader<PadMessage>(
-        FLAGS_planning_pad_topic,
-        [this](const std::shared_ptr<PadMessage>& pad_message) {
-          ADEBUG << "Received pad data: run pad callback.";
-          std::lock_guard<std::mutex> lock(mutex_);
-          pad_message_.CopyFrom(*pad_message);
-        });
     relative_map_reader_ = node_->CreateReader<MapMsg>(
         FLAGS_relative_map_topic,
         [this](const std::shared_ptr<MapMsg>& map_message) {
@@ -100,9 +99,6 @@ bool PlanningComponent::Proc(
         localization_estimate) {
   CHECK(prediction_obstacles != nullptr);
 
-  if (FLAGS_use_sim_time) {
-    Clock::SetNowInSeconds(localization_estimate->header().timestamp_sec());
-  }
   // check and process possible rerouting request
   CheckRerouting();
 
@@ -124,6 +120,10 @@ bool PlanningComponent::Proc(
         std::make_shared<TrafficLightDetection>(traffic_light_);
     local_view_.relative_map = std::make_shared<MapMsg>(relative_map_);
   }
+  {
+    std::lock_guard<std::mutex> lock(mutex_);
+    local_view_.pad_msg = std::make_shared<PadMessage>(pad_msg_);
+  }
 
   if (!CheckInput()) {
     AERROR << "Input check failed";
@@ -140,7 +140,12 @@ bool PlanningComponent::Proc(
   for (auto& p : *adc_trajectory_pb.mutable_trajectory_point()) {
     p.set_relative_time(p.relative_time() + dt);
   }
-  planning_writer_->Write(std::make_shared<ADCTrajectory>(adc_trajectory_pb));
+  planning_writer_->Write(adc_trajectory_pb);
+
+  // record in history
+  auto* history = History::Instance();
+  history->Add(adc_trajectory_pb);
+
   return true;
 }
 
@@ -153,8 +158,7 @@ void PlanningComponent::CheckRerouting() {
   }
   common::util::FillHeader(node_->Name(), rerouting->mutable_routing_request());
   rerouting->set_need_rerouting(false);
-  rerouting_writer_->Write(
-      std::make_shared<RoutingRequest>(rerouting->routing_request()));
+  rerouting_writer_->Write(rerouting->routing_request());
 }
 
 bool PlanningComponent::CheckInput() {
@@ -186,7 +190,7 @@ bool PlanningComponent::CheckInput() {
   if (not_ready->has_reason()) {
     AERROR << not_ready->reason() << "; skip the planning cycle.";
     common::util::FillHeader(node_->Name(), &trajectory_pb);
-    planning_writer_->Write(std::make_shared<ADCTrajectory>(trajectory_pb));
+    planning_writer_->Write(trajectory_pb);
     return false;
   }
   return true;

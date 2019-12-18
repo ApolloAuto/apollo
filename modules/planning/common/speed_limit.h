@@ -32,17 +32,9 @@ class SpeedLimit {
 
   void AppendSpeedLimit(const double s, const double v);
 
-  void AppendSoftSpeedLimit(const double s, const double v);
-
   const std::vector<std::pair<double, double>>& speed_limit_points() const;
 
-  const std::vector<std::pair<double, double>>& soft_speed_limit_points() const;
-
   double GetSpeedLimitByS(const double s) const;
-
-  double GetSoftSpeedLimitByS(const double s) const;
-
-  double MinValidS() const;
 
   void Clear();
 
@@ -51,9 +43,6 @@ class SpeedLimit {
   // the first number is s, the second number is v
   // It means at distance s from the start point, the speed limit is v.
   std::vector<std::pair<double, double>> speed_limit_points_;
-  // soft_speed_limit is the limit which tolerates violation. It allows more
-  // subtle control on speed decision
-  std::vector<std::pair<double, double>> soft_speed_limit_points_;
 };
 
 }  // namespace planning

@@ -23,7 +23,6 @@
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/string_tokenizer.h"
 #include "modules/drivers/gnss/proto/config.pb.h"
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/localization/msf/msf_localization_component.h"
@@ -202,8 +201,6 @@ void MSFLocalization::OnPointCloud(
     // publish lidar message to debug
     publisher_->PublishLocalizationMsfLidar(result.localization());
   }
-
-  return;
 }
 
 void MSFLocalization::OnRawImu(
@@ -238,8 +235,6 @@ void MSFLocalization::OnRawImu(
   }
 
   localization_state_ = result.state();
-
-  return;
 }
 
 void MSFLocalization::OnGnssBestPose(
@@ -258,8 +253,6 @@ void MSFLocalization::OnGnssBestPose(
       result.state() == msf::LocalizationMeasureState::VALID) {
     publisher_->PublishLocalizationMsfGnss(result.localization());
   }
-
-  return;
 }
 
 void MSFLocalization::OnGnssRtkObs(
@@ -278,8 +271,6 @@ void MSFLocalization::OnGnssRtkObs(
       result.state() == msf::LocalizationMeasureState::VALID) {
     publisher_->PublishLocalizationMsfGnss(result.localization());
   }
-
-  return;
 }
 
 void MSFLocalization::OnGnssRtkEph(
@@ -291,7 +282,6 @@ void MSFLocalization::OnGnssRtkEph(
   }
 
   localization_integ_.RawEphemerisProcess(*gnss_orbit_msg);
-  return;
 }
 
 void MSFLocalization::OnGnssHeading(
@@ -302,7 +292,6 @@ void MSFLocalization::OnGnssHeading(
     return;
   }
   localization_integ_.GnssHeadingProcess(*gnss_heading_msg);
-  return;
 }
 
 void MSFLocalization::SetPublisher(

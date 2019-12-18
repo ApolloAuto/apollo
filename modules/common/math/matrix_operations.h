@@ -142,7 +142,7 @@ template <typename T, int M, int N, typename D>
 void DenseToCSCMatrix(const Eigen::Matrix<T, M, N> &dense_matrix,
                       std::vector<T> *data, std::vector<D> *indices,
                       std::vector<D> *indptr) {
-  constexpr double epsilon = 1e-9;
+  static constexpr double epsilon = 1e-9;
   int data_count = 0;
   for (int c = 0; c < dense_matrix.cols(); ++c) {
     indptr->emplace_back(data_count);

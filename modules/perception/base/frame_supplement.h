@@ -56,7 +56,7 @@ struct alignas(16) CameraFrameSupplement {
   // @brief valid only when on_use = true
   bool on_use = false;
 
-  // @brief only refrence of the image data
+  // @brief only reference of the image data
   Image8UPtr image_ptr = nullptr;
 
   // TODO(guiyilin): modify interfaces of visualizer, use Image8U
@@ -77,7 +77,7 @@ struct alignas(16) UltrasonicFrameSupplement {
   // @brief valid only when on_use = true
   bool on_use = false;
 
-  // @brief only refrence of the image data
+  // @brief only reference of the image data
   std::shared_ptr<ImpendingCollisionEdges> impending_collision_edges_ptr;
 
   void Reset() {

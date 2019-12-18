@@ -4,12 +4,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "roi_service_filter",
-    srcs = [
-        "roi_service_filter.cc",
-    ],
-    hdrs = [
-        "roi_service_filter.h",
-    ],
+    srcs = ["roi_service_filter.cc"],
+    hdrs = ["roi_service_filter.h"],
     deps = [
         "//cyber",
         "//modules/perception/base:base_type",
@@ -36,9 +32,7 @@ cc_library(
 #cc_test(
 #    name = "roi_service_filter_test",
 #    size = "small",
-#    srcs = [
-#        "roi_service_filter_test.cc",
-#    ],
+#    srcs = ["roi_service_filter_test.cc"],
 #    deps = [
 #        ":roi_service_filter",
 #        "//modules/perception/common:perception_gflags",

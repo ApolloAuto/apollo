@@ -15,9 +15,6 @@ module_config {
       name: "TrafficLightsComponent"
       config_file_path: "/apollo/modules/perception/production/conf/perception/camera/trafficlights_perception_component.config"
       flag_file_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
-      readers {
-          channel: "/apollo/perception/traffic_light_status"
-        }
     }
   }
 

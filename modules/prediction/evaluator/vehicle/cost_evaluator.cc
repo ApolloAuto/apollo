@@ -20,14 +20,20 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::prediction::math_util::Sigmoid;
+CostEvaluator::CostEvaluator() {
+  evaluator_type_ = ObstacleConf::COST_EVALUATOR;
+}
 
-void CostEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool CostEvaluator::Evaluate(Obstacle* obstacle_ptr,
+                             ObstaclesContainer* obstacles_container) {
   CHECK_NOTNULL(obstacle_ptr);
+
+  obstacle_ptr->SetEvaluatorType(evaluator_type_);
+
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
     AERROR << "Obstacle [" << id << "] has no latest feature.";
-    return;
+    return false;
   }
 
   Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
@@ -35,7 +41,7 @@ void CostEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   if (!latest_feature_ptr->has_lane() ||
       !latest_feature_ptr->lane().has_lane_graph()) {
     ADEBUG << "Obstacle [" << id << "] has no lane graph.";
-    return;
+    return false;
   }
 
   double obstacle_length = 0.0;
@@ -50,9 +56,9 @@ void CostEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   LaneGraph* lane_graph_ptr =
       latest_feature_ptr->mutable_lane()->mutable_lane_graph();
   CHECK_NOTNULL(lane_graph_ptr);
-  if (lane_graph_ptr->lane_sequence_size() == 0) {
+  if (lane_graph_ptr->lane_sequence().empty()) {
     AERROR << "Obstacle [" << id << "] has no lane sequences.";
-    return;
+    return false;
   }
 
   for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
@@ -62,6 +68,7 @@ void CostEvaluator::Evaluate(Obstacle* obstacle_ptr) {
         ComputeProbability(obstacle_length, obstacle_width, *lane_sequence_ptr);
     lane_sequence_ptr->set_probability(probability);
   }
+  return true;
 }
 
 double CostEvaluator::ComputeProbability(const double obstacle_length,
@@ -69,14 +76,14 @@ double CostEvaluator::ComputeProbability(const double obstacle_length,
                                          const LaneSequence& lane_sequence) {
   double front_lateral_distance_cost =
       FrontLateralDistanceCost(obstacle_length, obstacle_width, lane_sequence);
-  return Sigmoid(front_lateral_distance_cost);
+  return apollo::common::math::Sigmoid(front_lateral_distance_cost);
 }
 
 double CostEvaluator::FrontLateralDistanceCost(
     const double obstacle_length, const double obstacle_width,
     const LaneSequence& lane_sequence) {
-  if (lane_sequence.lane_segment_size() == 0 ||
-      lane_sequence.lane_segment(0).lane_point_size() == 0) {
+  if (lane_sequence.lane_segment().empty() ||
+      lane_sequence.lane_segment(0).lane_point().empty()) {
     AWARN << "Empty lane sequence.";
     return 0.0;
   }

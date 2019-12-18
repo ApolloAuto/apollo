@@ -22,6 +22,7 @@
 
 #include "cyber/common/file.h"
 #include "modules/prediction/common/feature_output.h"
+#include "modules/prediction/common/prediction_constants.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
@@ -30,10 +31,6 @@
 
 namespace apollo {
 namespace prediction {
-
-using apollo::common::adapter::AdapterConfig;
-using apollo::cyber::common::GetProtoFromFile;
-using apollo::prediction::math_util::Sigmoid;
 
 // Helper function for computing the mean value of a vector.
 double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
@@ -47,34 +44,39 @@ double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
 }
 
 CruiseMLPEvaluator::CruiseMLPEvaluator() : device_(torch::kCPU) {
+  evaluator_type_ = ObstacleConf::CRUISE_MLP_EVALUATOR;
   LoadModels();
 }
 
 void CruiseMLPEvaluator::Clear() {}
 
-void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
+bool CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr,
+                                  ObstaclesContainer* obstacles_container) {
   // Sanity checks.
   omp_set_num_threads(1);
   Clear();
   CHECK_NOTNULL(obstacle_ptr);
+
+  obstacle_ptr->SetEvaluatorType(evaluator_type_);
+
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
     AERROR << "Obstacle [" << id << "] has no latest feature.";
-    return;
+    return false;
   }
   Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
   CHECK_NOTNULL(latest_feature_ptr);
   if (!latest_feature_ptr->has_lane() ||
       !latest_feature_ptr->lane().has_lane_graph()) {
     ADEBUG << "Obstacle [" << id << "] has no lane graph.";
-    return;
+    return false;
   }
   LaneGraph* lane_graph_ptr =
       latest_feature_ptr->mutable_lane()->mutable_lane_graph();
   CHECK_NOTNULL(lane_graph_ptr);
-  if (lane_graph_ptr->lane_sequence_size() == 0) {
+  if (lane_graph_ptr->lane_sequence().empty()) {
     AERROR << "Obstacle [" << id << "] has no lane sequences.";
-    return;
+    return false;
   }
 
   ADEBUG << "There are " << lane_graph_ptr->lane_sequence_size()
@@ -95,15 +97,17 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     }
 
     // Insert features to DataForLearning
-    if (FLAGS_prediction_offline_mode == 2) {
+    if (FLAGS_prediction_offline_mode ==
+        PredictionConstants::kDumpDataForLearning) {
       std::vector<double> interaction_feature_values;
-      SetInteractionFeatureValues(obstacle_ptr, lane_sequence_ptr,
+      SetInteractionFeatureValues(obstacle_ptr, obstacles_container,
+                                  lane_sequence_ptr,
                                   &interaction_feature_values);
       if (interaction_feature_values.size() != INTERACTION_FEATURE_SIZE) {
         ADEBUG << "Obstacle [" << id << "] has fewer than "
                << "expected lane feature_values"
                << interaction_feature_values.size() << ".";
-        return;
+        return false;
       }
       ADEBUG << "Interaction feature size = "
              << interaction_feature_values.size();
@@ -113,7 +117,7 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
                                            "lane_scanning", lane_sequence_ptr);
       ADEBUG << "Save extracted features for learning locally.";
-      return;  // Skip Compute probability for offline mode
+      return true;  // Skip Compute probability for offline mode
     }
 
     std::vector<torch::jit::IValue> torch_inputs;
@@ -123,13 +127,14 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     for (size_t i = 0; i < feature_values.size(); ++i) {
       torch_input[0][i] = static_cast<float>(feature_values[i]);
     }
-    torch_inputs.push_back(torch_input.to(device_));
+    torch_inputs.push_back(std::move(torch_input.to(device_)));
     if (lane_sequence_ptr->vehicle_on_lane()) {
-      ModelInference(torch_inputs, torch_go_model_ptr_, lane_sequence_ptr);
+      ModelInference(torch_inputs, torch_go_model_, lane_sequence_ptr);
     } else {
-      ModelInference(torch_inputs, torch_cutin_model_ptr_, lane_sequence_ptr);
+      ModelInference(torch_inputs, torch_cutin_model_, lane_sequence_ptr);
     }
   }
+  return true;
 }
 
 void CruiseMLPEvaluator::ExtractFeatureValues(
@@ -403,8 +408,8 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
 }
 
 void CruiseMLPEvaluator::SetInteractionFeatureValues(
-    Obstacle* obstacle_ptr, LaneSequence* lane_sequence_ptr,
-    std::vector<double>* feature_values) {
+    Obstacle* obstacle_ptr, ObstaclesContainer* obstacles_container,
+    LaneSequence* lane_sequence_ptr, std::vector<double>* feature_values) {
   // forward / backward: relative_s, relative_l, speed, length
   feature_values->clear();
   // Initialize forward and backward obstacles
@@ -431,9 +436,6 @@ void CruiseMLPEvaluator::SetInteractionFeatureValues(
     }
   }
 
-  auto obstacles_container =
-      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
-          AdapterConfig::PERCEPTION_OBSTACLES);
   // Set feature values for forward obstacle
   feature_values->push_back(forward_obstacle.s());
   feature_values->push_back(forward_obstacle.l());
@@ -527,26 +529,27 @@ void CruiseMLPEvaluator::SetLaneFeatureValues(
 }
 
 void CruiseMLPEvaluator::LoadModels() {
-  // TODO(all) uncomment the following when cuda issue is resolved
-  // if (torch::cuda::is_available()) {
-  //   ADEBUG << "CUDA is available";
-  //   device_ = torch::Device(torch::kCUDA);
-  // }
+  if (FLAGS_use_cuda && torch::cuda::is_available()) {
+    ADEBUG << "CUDA is available";
+    device_ = torch::Device(torch::kCUDA);
+  }
   torch::set_num_threads(1);
-  torch_go_model_ptr_ =
+  torch_go_model_ =
       torch::jit::load(FLAGS_torch_vehicle_cruise_go_file, device_);
-  torch_cutin_model_ptr_ =
+  torch_cutin_model_ =
       torch::jit::load(FLAGS_torch_vehicle_cruise_cutin_file, device_);
 }
 
 void CruiseMLPEvaluator::ModelInference(
     const std::vector<torch::jit::IValue>& torch_inputs,
-    std::shared_ptr<torch::jit::script::Module> torch_model_ptr,
+    torch::jit::script::Module torch_model_ptr,
     LaneSequence* lane_sequence_ptr) {
-  auto torch_output_tuple = torch_model_ptr->forward(torch_inputs).toTuple();
-  auto probability_tensor = torch_output_tuple->elements()[0].toTensor();
-  auto finish_time_tensor = torch_output_tuple->elements()[1].toTensor();
-  lane_sequence_ptr->set_probability(Sigmoid(
+  auto torch_output_tuple = torch_model_ptr.forward(torch_inputs).toTuple();
+  auto probability_tensor =
+      torch_output_tuple->elements()[0].toTensor().to(torch::kCPU);
+  auto finish_time_tensor =
+      torch_output_tuple->elements()[1].toTensor().to(torch::kCPU);
+  lane_sequence_ptr->set_probability(apollo::common::math::Sigmoid(
       static_cast<double>(probability_tensor.accessor<float, 2>()[0][0])));
   lane_sequence_ptr->set_time_to_lane_center(
       static_cast<double>(finish_time_tensor.accessor<float, 2>()[0][0]));

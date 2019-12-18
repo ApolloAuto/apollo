@@ -12,6 +12,6 @@ sensor_meta {
 
 sensor_meta {
     name: "front_camera"
-    type: MONOCULAR_CAMERA 
+    type: MONOCULAR_CAMERA
     orientation: FRONT
 }

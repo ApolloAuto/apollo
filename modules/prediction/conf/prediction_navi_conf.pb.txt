@@ -14,7 +14,7 @@ obstacle_conf {
   predictor_type: FREE_MOVE_PREDICTOR
 }
 obstacle_conf {
-  obstacle_type: BICYCLE 
+  obstacle_type: BICYCLE
   obstacle_status: ON_LANE
   evaluator_type: COST_EVALUATOR
   predictor_type: SINGLE_LANE_PREDICTOR

@@ -1,0 +1,45 @@
+{
+    "topic_list": {
+        "/apollo/sensor/gnss/best_pose": 0.9,
+        "/apollo/sensor/velodyne16/VelodyneScanUnified": 9.0,
+        "/apollo/sensor/velodyne64/VelodyneScanUnified": 9.0,
+        "/apollo/sensor/camera/traffic/image_short": 6.0,
+        "/apollo/sensor/camera/traffic/image_long": 6.0,
+        "/apollo/sensor/gnss/odometry": 99
+    },
+    "use_system_time": false,
+    "topic_rate_tolerance": 1.0,
+    "channel_check_trigger_gap": 60,
+
+    "solution_status": 0,
+    "position_type": [48, 49, 50],
+    "diff_age": [0, 60],
+    "local_std_upper_limit": 0.15,
+
+    "alignment_featch_pose_sleep": 1,
+    "static_align_duration": 30,
+    "static_align_tolerance": 5,
+    "static_align_dist_thresh": 0.15,
+
+    "dynamic_align_turn_angle": 60,
+    "dynamic_align_straight_angle": 30,
+    "dynamic_align_vel": 5,
+    "dynamic_align_duration": 120,
+    "dynamic_align_bad_pose_tolerance": 20,
+    "dynamic_align_segment": 1,
+    "dynamic_align_dist_per_segment": 100,
+
+    "eight_angle": 1,
+    "eight_duration": 60,
+    "eight_vel": 1.0,
+    "eight_bad_pose_tolerance": 3,
+
+    "laps_frames_thresh": 1000,
+    "laps_alpha_err_thresh": 60,
+    "laps_time_err_thresh": 0.2,
+    "laps_search_diameter": 15,
+    "laps_number": 5,
+    "laps_number_additional": 1,
+    "laps_rate_thresh": 0.8,
+    "laps_inspva_downsample_freq": 10
+}

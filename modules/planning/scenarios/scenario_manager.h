@@ -33,7 +33,7 @@ class ScenarioManager final {
  public:
   ScenarioManager() = default;
 
-  bool Init(const std::set<ScenarioConfig::ScenarioType>& supported_scenarios);
+  bool Init();
 
   Scenario* mutable_scenario() { return current_scenario_.get(); }
 
@@ -50,9 +50,11 @@ class ScenarioManager final {
   ScenarioConfig::ScenarioType SelectBareIntersectionScenario(
       const Frame& frame, const hdmap::PathOverlap& pnc_junction_overlap);
 
-  ScenarioConfig::ScenarioType SelectChangeLaneScenario(const Frame& frame);
-
   ScenarioConfig::ScenarioType SelectPullOverScenario(const Frame& frame);
+
+  ScenarioConfig::ScenarioType SelectPadMsgScenario(const Frame& frame);
+
+  ScenarioConfig::ScenarioType SelectInterceptionScenario(const Frame& frame);
 
   ScenarioConfig::ScenarioType SelectStopSignScenario(
       const Frame& frame, const hdmap::PathOverlap& stop_sign_overlap);
@@ -65,15 +67,7 @@ class ScenarioManager final {
   ScenarioConfig::ScenarioType SelectYieldSignScenario(
       const Frame& frame, const hdmap::PathOverlap& yield_sign_overlap);
 
-  // functions for scenario voter implementation
-  // do NOT delete the code yet
-  // void ScenarioSelfVote(const common::TrajectoryPoint& ego_point,
-  //                       const Frame& frame);
-  // bool ReuseCurrentScenario(const common::TrajectoryPoint& ego_point,
-  //                           const Frame& frame);
-  // bool SelectScenario(const ScenarioConfig::ScenarioType type,
-  //                     const common::TrajectoryPoint& ego_point,
-  //                     const Frame& frame);
+  ScenarioConfig::ScenarioType SelectParkAndGoScenario(const Frame& frame);
 
   void ScenarioDispatch(const common::TrajectoryPoint& ego_point,
                         const Frame& frame);
@@ -83,11 +77,18 @@ class ScenarioManager final {
   bool IsStopSignScenario(const ScenarioConfig::ScenarioType& scenario_type);
   bool IsTrafficLightScenario(
       const ScenarioConfig::ScenarioType& scenario_type);
+  bool IsYieldSignScenario(const ScenarioConfig::ScenarioType& scenario_type);
 
   void UpdatePlanningContext(const Frame& frame,
                              const ScenarioConfig::ScenarioType& scenario_type);
 
   void UpdatePlanningContextBareIntersectionScenario(
+      const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
+
+  void UpdatePlanningContextEmergencyStopcenario(
+      const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
+
+  void UpdatePlanningContextPullOverScenario(
       const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
 
   void UpdatePlanningContextStopSignScenario(
@@ -96,7 +97,7 @@ class ScenarioManager final {
   void UpdatePlanningContextTrafficLightScenario(
       const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
 
-  void UpdatePlanningContextPullOverScenario(
+  void UpdatePlanningContextYieldSignScenario(
       const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
 
  private:
@@ -105,14 +106,10 @@ class ScenarioManager final {
       config_map_;
   std::unique_ptr<Scenario> current_scenario_;
   ScenarioConfig::ScenarioType default_scenario_type_;
-  std::set<ScenarioConfig::ScenarioType> supported_scenarios_;
   ScenarioContext scenario_context_;
   std::unordered_map<ReferenceLineInfo::OverlapType, hdmap::PathOverlap,
                      std::hash<int>>
       first_encountered_overlap_map_;
-
-  // TODO(all): move to scenario conf later
-  const double signal_expire_time_sec_ = 5.0;  // sec
 };
 
 }  // namespace scenario

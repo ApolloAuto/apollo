@@ -153,7 +153,7 @@ void CalculateMeanAndVariance(const std::vector<T> &data, T *mean,
   if (!mean || !variance) {
     return;
   }
-  if (data.size() == 0) {
+  if (data.empty()) {
     *mean = 0;
     *variance = 0;
     return;

@@ -32,14 +32,11 @@
 namespace apollo {
 namespace prediction {
 
+using apollo::common::adapter::AdapterConfig;
+using apollo::hdmap::LaneInfo;
 using apollo::perception::PerceptionObstacle;
-using common::adapter::AdapterConfig;
-using hdmap::LaneInfo;
-using hdmap::OverlapInfo;
-using ConstLaneInfoPtr = std::shared_ptr<const LaneInfo>;
 
 void RightOfWay::Analyze() {
-  // TODO(Hongyi): implement
   ObstaclesContainer* obstacles_container =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);

@@ -31,12 +31,12 @@ bool IsPtInRoi(
     const std::shared_ptr<const apollo::perception::base::HdmapStruct> roi,
     const apollo::perception::base::PointD pt);
 
-// @brief: whether a object's center is in ROI.
+// @brief: whether an object's center is in ROI.
 bool IsObjectInRoi(
     const std::shared_ptr<const apollo::perception::base::HdmapStruct> roi,
     const std::shared_ptr<const apollo::perception::base::Object> obj);
 
-// @brief: whether a object's bbox is in ROI.
+// @brief: whether an object's bbox is in ROI.
 bool IsObjectBboxInRoi(
     const std::shared_ptr<const apollo::perception::base::HdmapStruct> roi,
     const std::shared_ptr<const apollo::perception::base::Object> obj);

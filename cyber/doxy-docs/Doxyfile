@@ -1,7 +1,7 @@
 PROJECT_NAME      = "Cyber RT Documents"
 XML_OUTPUT        = xml
-INPUT             =  ../cyber.h ../init.h ../node ../record ../time ../timer ../component
-FILE_PATTERNS     = *.h
+INPUT             =  ../cyber.h ../init.h ../node ../record ../time ../timer ../component ../logger ../parameter ../service ../service_discovery ../python
+FILE_PATTERNS     = *.h *.py
 RECURSIVE         = YES
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO

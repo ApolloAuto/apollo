@@ -16,8 +16,6 @@
 
 #include "modules/planning/common/planning_context.h"
 
-#include "modules/planning/common/planning_gflags.h"
-
 namespace apollo {
 namespace planning {
 
@@ -25,11 +23,7 @@ PlanningContext::PlanningContext() {}
 
 void PlanningContext::Init() {}
 
-void PlanningContext::Clear() {
-  planning_status_.Clear();
-  fallback_info_ = {};
-  open_space_info_ = {};
-}
+void PlanningContext::Clear() { planning_status_.Clear(); }
 
 }  // namespace planning
 }  // namespace apollo

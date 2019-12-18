@@ -15,9 +15,9 @@
  *****************************************************************************/
 #include "modules/perception/onboard/component/segmentation_component.h"
 
+#include "modules/common/time/time.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/lib/utils/perf.h"
-#include "modules/perception/lib/utils/time_util.h"
 #include "modules/perception/lidar/common/lidar_error_code.h"
 #include "modules/perception/lidar/common/lidar_frame_pool.h"
 #include "modules/perception/lidar/common/lidar_log.h"
@@ -55,8 +55,8 @@ bool SegmentationComponent::Init() {
 bool SegmentationComponent::Proc(
     const std::shared_ptr<drivers::PointCloud>& message) {
   AINFO << "Enter segmentation component, message timestamp: "
-        << std::to_string(message->measurement_time()) << " current timestamp: "
-        << std::to_string(lib::TimeUtil::GetCurrentTime());
+        << message->measurement_time() << " current timestamp: "
+        << apollo::common::time::Clock::NowInSeconds();
 
   std::shared_ptr<LidarFrameMessage> out_message(new (std::nothrow)
                                                      LidarFrameMessage);
@@ -102,14 +102,15 @@ bool SegmentationComponent::InternalProc(
     s_seq_num_++;
   }
   const double timestamp = in_message->measurement_time();
-  const double cur_time = lib::TimeUtil::GetCurrentTime();
+  const double cur_time = apollo::common::time::Clock::NowInSeconds();
   const double start_latency = (cur_time - timestamp) * 1e3;
-  AINFO << "FRAME_STATISTICS:Lidar:Start:msg_time[" << std::to_string(timestamp)
-        << sensor_name_ << ":Start:msg_time["
-        << "]:cur_time[" << std::to_string(cur_time) << "]:cur_latency["
-        << start_latency << "]";
+  AINFO << "FRAME_STATISTICS:Lidar:Start:msg_time[" << timestamp << sensor_name_
+        << ":Start:msg_time["
+        << "]:cur_time[" << cur_time << "]:cur_latency[" << start_latency
+        << "]";
 
   out_message->timestamp_ = timestamp;
+  out_message->lidar_timestamp_ = in_message->header().lidar_timestamp();
   out_message->seq_num_ = s_seq_num_;
   out_message->process_stage_ = ProcessStage::LIDAR_SEGMENTATION;
   out_message->error_code_ = apollo::common::ErrorCode::OK;
@@ -127,8 +128,7 @@ bool SegmentationComponent::InternalProc(
   if (!lidar2world_trans_.GetSensor2worldTrans(lidar_query_tf_timestamp,
                                                &pose)) {
     out_message->error_code_ = apollo::common::ErrorCode::PERCEPTION_ERROR_TF;
-    AERROR << "Failed to get pose at time: "
-           << std::to_string(lidar_query_tf_timestamp);
+    AERROR << "Failed to get pose at time: " << lidar_query_tf_timestamp;
     return false;
   }
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(

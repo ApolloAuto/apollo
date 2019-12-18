@@ -51,7 +51,7 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -74,10 +74,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -118,7 +118,7 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -141,10 +141,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -164,7 +164,7 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -187,10 +187,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -217,7 +217,7 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -240,10 +240,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -281,7 +281,7 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -304,10 +304,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -334,7 +334,7 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -357,10 +357,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -398,7 +398,7 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -421,10 +421,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -451,7 +451,7 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -474,10 +474,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -535,10 +535,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -579,10 +579,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -630,10 +630,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -692,10 +692,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -743,10 +743,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -805,10 +805,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -856,10 +856,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -918,10 +918,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -969,10 +969,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -1031,10 +1031,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -1075,10 +1075,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -1126,10 +1126,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -1188,10 +1188,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -1239,10 +1239,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -1301,10 +1301,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -1352,10 +1352,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -1414,10 +1414,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -1465,10 +1465,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -1527,10 +1527,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -1578,10 +1578,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -1640,10 +1640,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -1691,10 +1691,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -1753,10 +1753,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -1797,10 +1797,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -1849,10 +1849,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -1912,10 +1912,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -1964,10 +1964,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -2027,10 +2027,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -2079,10 +2079,10 @@ layer {
     }
     param {
         lr_mult: 0.0
-    }    
+    }
     param {
         lr_mult: 0.0
-    }    
+    }
 }
 
 layer {
@@ -2104,9 +2104,9 @@ layer {
 }
 
 layer{
-  name: "rpn_deconv" 
+  name: "rpn_deconv"
   type: "Deconvolution"
-  bottom: "res4f" 
+  bottom: "res4f"
   top: "rpn/output"
   param{
     lr_mult: 1.000000
@@ -2138,9 +2138,9 @@ layer{
   top: "rpn/output"
 }
 layer{
-  name: "rpn_cls_score" 
+  name: "rpn_cls_score"
   type: "Convolution"
-  bottom: "rpn/output" 
+  bottom: "rpn/output"
   top: "rpn_cls_score"
   param{
     lr_mult: 1.000000
@@ -2155,7 +2155,7 @@ layer{
     kernel_size: 1
     pad: 0
     stride: 1
-    dilation: 1 
+    dilation: 1
     weight_filler {
       type: "msra"
       std: 0.010000
@@ -2167,9 +2167,9 @@ layer{
   }
 }
 layer{
-  name: "rpn_bbox_pred" 
+  name: "rpn_bbox_pred"
   type: "Convolution"
-  bottom: "rpn/output" 
+  bottom: "rpn/output"
   top: "rpn_bbox_pred"
   param{
     lr_mult: 1.000000
@@ -2184,7 +2184,7 @@ layer{
     kernel_size: 1
     pad: 0
     stride: 1
-    dilation: 1 
+    dilation: 1
     weight_filler {
       type: "msra"
       std: 0.010000
@@ -2219,9 +2219,9 @@ layer {
   reshape_param { shape { dim: 0 dim: 30 dim: -1 dim: 0 } }
 }
 layer{
-  name: "conv_new" 
+  name: "conv_new"
   type: "Deconvolution"
-  bottom: "res5c" 
+  bottom: "res5c"
   top: "conv_new"
   param{
     lr_mult: 1.000000
@@ -2253,9 +2253,9 @@ layer{
   top: "conv_new"
 }
 layer{
-  name: "conv_left_kx1" 
+  name: "conv_left_kx1"
   type: "Convolution"
-  bottom: "conv_new" 
+  bottom: "conv_new"
   top: "conv_left_kx1"
   param{
     lr_mult: 1.000000
@@ -2274,7 +2274,7 @@ layer{
     stride_h: 1
     stride_w: 1
     dilation: 1
-    dilation: 1 
+    dilation: 1
     weight_filler {
       type: "msra"
       std: 0.010000
@@ -2292,9 +2292,9 @@ layer{
   top: "conv_left_kx1"
 }
 layer{
-  name: "conv_left_1xk" 
+  name: "conv_left_1xk"
   type: "Convolution"
-  bottom: "conv_left_kx1" 
+  bottom: "conv_left_kx1"
   top: "conv_left_1xk"
   param{
     lr_mult: 1.000000
@@ -2313,7 +2313,7 @@ layer{
     stride_h: 1
     stride_w: 1
     dilation: 1
-    dilation: 1 
+    dilation: 1
     weight_filler {
       type: "msra"
       std: 0.010000
@@ -2331,9 +2331,9 @@ layer{
   top: "conv_left_1xk"
 }
 layer{
-  name: "conv_right_1xk" 
+  name: "conv_right_1xk"
   type: "Convolution"
-  bottom: "conv_new" 
+  bottom: "conv_new"
   top: "conv_right_1xk"
   param{
     lr_mult: 1.000000
@@ -2352,7 +2352,7 @@ layer{
     stride_h: 1
     stride_w: 1
     dilation: 1
-    dilation: 1 
+    dilation: 1
     weight_filler {
       type: "msra"
       std: 0.010000
@@ -2370,9 +2370,9 @@ layer{
   top: "conv_right_1xk"
 }
 layer{
-  name: "conv_right_kx1" 
+  name: "conv_right_kx1"
   type: "Convolution"
-  bottom: "conv_right_1xk" 
+  bottom: "conv_right_1xk"
   top: "conv_right_kx1"
   param{
     lr_mult: 1.000000
@@ -2391,7 +2391,7 @@ layer{
     stride_h: 1
     stride_w: 1
     dilation: 1
-    dilation: 1 
+    dilation: 1
     weight_filler {
       type: "msra"
       std: 0.010000
@@ -2507,15 +2507,15 @@ layer{
   bottom: "psroi_rois"
   top: "inner_rois"
   param{
-    name: "weight2d_inner_rois" 
+    name: "weight2d_inner_rois"
     lr_mult: 1.000000
     decay_mult: 1.000000
   }
-  param { 
-    name: "bias2d_inner_rois" 
+  param {
+    name: "bias2d_inner_rois"
     lr_mult: 2.000000
     decay_mult: 0.000000
-  } 
+  }
   inner_product_param {
     num_output: 2048
     weight_filler {
@@ -2526,7 +2526,7 @@ layer{
       type: "constant"
       value: 0.000000
     }
-  } 
+  }
 }
 layer{
   type: "ReLU"
@@ -2543,10 +2543,10 @@ layer{
     lr_mult: 1.000000
     decay_mult: 1.000000
   }
-  param { 
+  param {
     lr_mult: 2.000000
     decay_mult: 0.000000
-  } 
+  }
   inner_product_param {
     num_output: 4
     weight_filler {
@@ -2557,7 +2557,7 @@ layer{
       type: "constant"
       value: 0.000000
     }
-  } 
+  }
 }
 layer{
   type: "InnerProduct"
@@ -2568,10 +2568,10 @@ layer{
     lr_mult: 1.000000
     decay_mult: 1.000000
   }
-  param { 
+  param {
     lr_mult: 2.000000
     decay_mult: 0.000000
-  } 
+  }
   inner_product_param {
     num_output: 16
     weight_filler {
@@ -2582,7 +2582,7 @@ layer{
       type: "constant"
       value: 0.000000
     }
-  } 
+  }
 }
 layer {
   type: "Softmax"

@@ -69,6 +69,9 @@ import sys
 from xml.etree import ElementTree
 import yaml
 
+import six
+from six.moves import xrange  # pylint: disable=redefined-builtin
+
 # parse the command line
 usage = """usage: %prog infile.xml [outfile.yaml]
 
@@ -112,7 +115,8 @@ calibration = {'num_lasers': 0, 'lasers': []}
 cm2meters = 0.01                       # convert centimeters to meters
 
 def addLaserCalibration(laser_num, key, val):
-    'Define key and corresponding value for laser_num'
+    """Define key and corresponding value for laser_num"""
+
     global calibration
     if laser_num < len(calibration['lasers']):
         calibration['lasers'][laser_num][key] = val
@@ -123,7 +127,7 @@ def addLaserCalibration(laser_num, key, val):
 num_enabled = 0
 enabled_lasers = []
 enabled = db.find('DB/enabled_')
-if enabled == None:
+if enabled is None:
     print('no enabled tags found: assuming all 64 enabled')
     num_enabled = 64
     enabled_lasers = [True for i in xrange(num_enabled)]
@@ -142,7 +146,7 @@ print(str(num_enabled) + ' lasers')
 
 # add minimum laser intensities
 minIntensities = db.find('DB/minIntensity_')
-if minIntensities != None:
+if minIntensities is not None:
     index = 0
     for el in minIntensities:
         if el.tag == 'item':
@@ -154,7 +158,7 @@ if minIntensities != None:
 
 # add maximum laser intensities
 maxIntensities = db.find('DB/maxIntensity_')
-if maxIntensities != None:
+if maxIntensities is not None:
     index = 0
     for el in maxIntensities:
         if el.tag == 'item':
@@ -212,10 +216,6 @@ elif calibration['num_lasers'] != num_enabled:
 # (Which ones are required?)
 
 if calibrationGood:
-
     # write calibration data to YAML file
-    f = open(yamlFile, 'w')
-    try:
+    with open(yamlFile, 'w') as f:
         yaml.dump(calibration, f)
-    finally:
-        f.close()

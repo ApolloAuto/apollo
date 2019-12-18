@@ -95,12 +95,12 @@ void RacobitRadarMessageManager::Parse(const uint32_t message_id,
 
     if (sensor_data_.contiobs_size() <=
         sensor_data_.object_list_status().nof_objects()) {
-      // maybe lost a object_list_status msg
+      // maybe lost an object_list_status msg
       common::util::FillHeader("racobit_radar", &sensor_data_);
       writer_->Write(sensor_data_);
     }
     sensor_data_.Clear();
-    // fill header when recieve the general info message
+    // fill header when receive the general info message
   }
 
   sensor_protocol_data->Parse(data, length, &sensor_data_);
@@ -133,7 +133,7 @@ void RacobitRadarMessageManager::Parse(const uint32_t message_id,
   // check if need to check period
   const auto it = check_ids_.find(message_id);
   if (it != check_ids_.end()) {
-    const int64_t time = common::time::AsInt64<micros>(Clock::Now());
+    const int64_t time = absl::ToUnixMicros(Clock::Now());
     it->second.real_period = time - it->second.last_time;
     // if period 1.5 large than base period, inc error_count
     const double period_multiplier = 1.5;

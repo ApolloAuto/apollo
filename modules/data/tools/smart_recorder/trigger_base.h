@@ -26,8 +26,6 @@
 namespace apollo {
 namespace data {
 
-using cyber::record::RecordMessage;
-
 /**
  * @class TriggerBase
  * @brief Base class of triggers that defines interfaces
@@ -41,17 +39,22 @@ class TriggerBase {
 
   // Decide if the current trigger needs to be caught by input message,
   // and if yes record the time interval
-  virtual void Pull(const RecordMessage& msg) = 0;
+  virtual void Pull(const cyber::record::RecordMessage& msg) = 0;
 
   // Decide if the current message needs to be restored
-  virtual bool ShouldRestore(const RecordMessage& msg) const = 0;
+  virtual bool ShouldRestore(const cyber::record::RecordMessage& msg) const = 0;
 
   const std::string& GetTriggerName() const { return trigger_name_; }
+
+  uint64_t SecondsToNanoSeconds(const double seconds) const;
 
   virtual ~TriggerBase() = default;
 
  protected:
   void TriggerIt(const uint64_t msg_time) const;
+  uint64_t GetValidValueInRange(const double desired_value,
+                                const double min_limit,
+                                const double max_limit) const;
 
   std::string trigger_name_;
   std::unique_ptr<Trigger> trigger_obj_ = nullptr;

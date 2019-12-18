@@ -22,7 +22,7 @@ IMU-IGM-A1是一个IMU（惯性计算单元）并与一个SPAN-enabled GNSS接�
 - NovAtel IMU-IGM-A1
 - NovAtel GPS-703-GGG-HV Antenna
 - NovAtel GPS-C006 Cable (将天线连接到GPS)
-- NovAtel 01019014 Main Cable (连接GPS到IPC上的连续接口)
+- NovAtel 01019014 Main Cable (连接GPS到IPC上的串口)
 - Data Transport Unit (DTU) – 和4G路由器相同
 - 磁性适配器 (固定天线和DTU)
 - DB9 直通网线

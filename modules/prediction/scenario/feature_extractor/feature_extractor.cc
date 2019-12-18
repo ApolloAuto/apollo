@@ -86,7 +86,7 @@ void FeatureExtractor::ExtractEgoLaneFeatures(
     EnvironmentFeatures* ptr_environment_features,
     const LaneInfoPtr& ptr_ego_lane, const common::math::Vec2d& ego_position) {
   if (ptr_ego_lane == nullptr) {
-    AERROR << "Ego vehicle is not on any lane.";
+    ADEBUG << "Ego vehicle is not on any lane.";
     return;
   }
   ADEBUG << "Ego vehicle is on lane [" << ptr_ego_lane->id().id() << "]";
@@ -119,7 +119,7 @@ void FeatureExtractor::ExtractNeighborLaneFeatures(
     EnvironmentFeatures* ptr_environment_features,
     const LaneInfoPtr& ptr_ego_lane, const Vec2d& ego_position) {
   if (ptr_ego_lane == nullptr) {
-    AERROR << "Ego vehicle is not on any lane.";
+    ADEBUG << "Ego vehicle is not on any lane.";
     return;
   }
 
