@@ -21,11 +21,6 @@
 #include <limits>
 #include <memory>
 #include <set>
-#include <string>
-#include <tuple>
-#include <unordered_map>
-#include <utility>
-#include <vector>
 
 #include "absl/strings/str_cat.h"
 #include "modules/common/configs/vehicle_config_helper.h"

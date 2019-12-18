@@ -21,7 +21,6 @@
 #include "modules/planning/common/path/path_data.h"
 
 #include <algorithm>
-#include <vector>
 
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"

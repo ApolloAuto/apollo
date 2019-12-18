@@ -21,7 +21,6 @@
 
 #include <algorithm>
 #include <limits>
-#include <memory>
 
 #include "modules/routing/proto/routing.pb.h"
 

@@ -16,7 +16,6 @@
 
 #include "modules/planning/common/util/util.h"
 
-#include <cmath>
 #include <limits>
 #include <vector>
 

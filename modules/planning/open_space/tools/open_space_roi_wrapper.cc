@@ -18,9 +18,6 @@
  * @file
  **/
 
-#include <iostream>
-#include <vector>
-
 #include "Eigen/Dense"
 #include "cyber/common/file.h"
 

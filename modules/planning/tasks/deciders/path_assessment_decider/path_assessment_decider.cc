@@ -17,7 +17,6 @@
 #include "modules/planning/tasks/deciders/path_assessment_decider/path_assessment_decider.h"
 
 #include <algorithm>
-#include <cmath>
 #include <limits>
 #include <utility>
 

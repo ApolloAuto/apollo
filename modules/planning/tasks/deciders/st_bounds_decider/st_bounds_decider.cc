@@ -17,10 +17,6 @@
 #include "modules/planning/tasks/deciders/st_bounds_decider/st_bounds_decider.h"
 
 #include <limits>
-#include <string>
-#include <tuple>
-#include <utility>
-#include <vector>
 
 #include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/tasks/deciders/st_bounds_decider/st_obstacles_processor.h"

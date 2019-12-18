@@ -17,7 +17,6 @@
 #pragma once
 
 #include <memory>
-#include <set>
 #include <unordered_map>
 
 #include "modules/planning/proto/planning_config.pb.h"

@@ -18,8 +18,6 @@
  * @file
  **/
 
-#include <vector>
-
 #include "modules/planning/scenarios/yield_sign/stage_approach.h"
 
 #include "cyber/common/log.h"

@@ -20,8 +20,6 @@
 
 #include "modules/planning/tasks/optimizers/road_graph/dp_road_graph.h"
 
-#include <utility>
-
 #include "cyber/task/task.h"
 
 #include "modules/common/proto/error_code.pb.h"

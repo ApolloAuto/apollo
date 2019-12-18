@@ -18,8 +18,6 @@
  * @file
  **/
 
-#include <string>
-
 #include "modules/planning/scenarios/park/valet_parking/stage_approaching_parking_spot.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"

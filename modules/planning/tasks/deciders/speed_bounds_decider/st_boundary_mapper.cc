@@ -22,7 +22,6 @@
 
 #include <algorithm>
 #include <limits>
-#include <unordered_map>
 #include <utility>
 
 #include "modules/common/proto/pnc_point.pb.h"

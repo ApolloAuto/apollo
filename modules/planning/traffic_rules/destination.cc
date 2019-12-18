@@ -17,7 +17,6 @@
 /**
  * @file
  **/
-#include <algorithm>
 #include <vector>
 
 #include "modules/planning/traffic_rules/destination.h"

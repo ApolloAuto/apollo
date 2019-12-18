@@ -21,7 +21,6 @@
 
 #include <algorithm>
 #include <string>
-#include <vector>
 
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/proto/planning.pb.h"

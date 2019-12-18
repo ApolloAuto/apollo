@@ -21,11 +21,7 @@
 #include "modules/planning/tasks/deciders/st_bounds_decider/st_obstacles_processor.h"
 
 #include <algorithm>
-#include <limits>
-#include <tuple>
-#include <unordered_map>
 #include <unordered_set>
-#include <utility>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/decision.pb.h"

@@ -19,10 +19,8 @@
  */
 
 #pragma once
-#include <math.h>
 
 #include <limits>
-#include <utility>
 #include <vector>
 
 #include "Eigen/Dense"

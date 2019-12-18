@@ -19,7 +19,6 @@
  **/
 
 #include <string>
-#include <vector>
 
 #include "modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_provider.h"
 

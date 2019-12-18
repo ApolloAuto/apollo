@@ -21,8 +21,6 @@
 #include "modules/planning/common/speed_profile_generator.h"
 
 #include <algorithm>
-#include <limits>
-#include <memory>
 
 #include "cyber/common/log.h"
 #include "modules/planning/common/ego_info.h"

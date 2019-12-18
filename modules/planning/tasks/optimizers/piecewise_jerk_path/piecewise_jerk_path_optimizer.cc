@@ -20,10 +20,7 @@
 
 #include "modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_optimizer.h"
 
-#include <memory>
 #include <string>
-#include <utility>
-#include <vector>
 
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"

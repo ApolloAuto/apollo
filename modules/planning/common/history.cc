@@ -20,7 +20,6 @@
 
 #include "modules/planning/common/history.h"
 
-#include <algorithm>
 #include <utility>
 
 #include "cyber/common/log.h"

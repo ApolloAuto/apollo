@@ -21,11 +21,7 @@
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_nonlinear_optimizer.h"
 
 #include <algorithm>
-#include <memory>
 #include <string>
-#include <tuple>
-#include <utility>
-#include <vector>
 
 #include "IpIpoptApplication.hpp"
 #include "IpSolveStatistics.hpp"
