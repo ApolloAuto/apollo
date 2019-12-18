@@ -4,13 +4,6 @@ package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "map_datachecker_server",
-    deps = [
-        ":map_datachecker_server_lib",
-    ],
-)
-
-cc_library(
-    name = "map_datachecker_server_lib",
     srcs = ["main.cc"],
     deps = [
         ":worker",

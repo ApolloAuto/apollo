@@ -4,13 +4,6 @@ package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "map_datachecker_client",
-    deps = [
-        ":map_datachecker_client_lib",
-    ],
-)
-
-cc_library(
-    name = "map_datachecker_client_lib",
     srcs = ["main.cc"],
     linkopts = [
         "-lboost_filesystem",
