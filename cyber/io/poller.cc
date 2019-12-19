@@ -17,10 +17,10 @@
 #include "cyber/io/poller.h"
 
 #include <fcntl.h>
-#include <signal.h>
-#include <string.h>
 #include <sys/epoll.h>
 #include <unistd.h>
+#include <csignal>
+#include <cstring>
 
 #include "cyber/common/log.h"
 #include "cyber/scheduler/scheduler_factory.h"

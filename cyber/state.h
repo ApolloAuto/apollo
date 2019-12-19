@@ -17,10 +17,10 @@
 #ifndef CYBER_STATE_H_
 #define CYBER_STATE_H_
 
-#include <signal.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <cerrno>
+#include <csignal>
 #include <cstdint>
 #include <cstring>
 #include <thread>

@@ -19,13 +19,13 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <glob.h>
-#include <limits.h>
-#include <stddef.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <cerrno>
+#include <climits>
+#include <cstddef>
 #include <fstream>
 #include <string>
 

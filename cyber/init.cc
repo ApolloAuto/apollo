@@ -17,10 +17,10 @@
 #include "cyber/init.h"
 
 #include <libgen.h>
-#include <stdio.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <csignal>
+#include <cstdio>
 #include <ctime>
 #include <string>
 

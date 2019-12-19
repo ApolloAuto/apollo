@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 #include <limits>
 
 #include "modules/drivers/gnss/proto/config.pb.h"
