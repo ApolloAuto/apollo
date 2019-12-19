@@ -21,7 +21,7 @@
 #include "cyber/init.h"
 #include "cyber/service_discovery/topology_manager.h"
 
-#include <signal.h>
+#include <csignal>
 #include <iostream>
 
 namespace {

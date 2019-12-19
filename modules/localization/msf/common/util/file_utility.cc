@@ -17,7 +17,6 @@
 #include "modules/localization/msf/common/util/file_utility.h"
 
 #include <dirent.h>
-#include <limits.h>
 
 #define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
@@ -25,6 +24,7 @@
 
 #include <algorithm>
 #include <cerrno>
+#include <climits>
 #include <iostream>
 
 #include "cyber/common/log.h"
