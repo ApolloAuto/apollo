@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include <stdio.h>
 #include <unistd.h>
+#include <cstdio>
 
 #include "modules/drivers/velodyne/driver/input.h"
 

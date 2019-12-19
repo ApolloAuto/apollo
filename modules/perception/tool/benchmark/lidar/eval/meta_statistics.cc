@@ -15,8 +15,9 @@
  *****************************************************************************/
 
 #include "modules/perception/tool/benchmark/lidar/eval/meta_statistics.h"
-#include <math.h>
+
 #include <algorithm>
+#include <cmath>
 
 namespace apollo {
 namespace perception {

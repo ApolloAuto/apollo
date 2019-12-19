@@ -15,11 +15,11 @@
  *****************************************************************************/
 #pragma once
 
-#include <math.h>
-#include <stdlib.h>
 #include <Eigen/Core>
 #include <opencv2/opencv.hpp>
 
+#include <cmath>
+#include <cstdlib>
 #include <iostream>
 #include <map>
 #include <memory>

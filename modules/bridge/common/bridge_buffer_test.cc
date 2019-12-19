@@ -17,7 +17,7 @@
 #include "modules/bridge/common/bridge_buffer.h"
 
 #include <gtest/gtest.h>
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 
 namespace apollo {
