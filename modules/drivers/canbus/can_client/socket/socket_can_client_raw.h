@@ -21,9 +21,6 @@
 
 #pragma once
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 
 #include <net/if.h>
@@ -34,6 +31,9 @@
 #include <linux/can.h>
 #include <linux/can/raw.h>
 
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <string>
 #include <vector>
 

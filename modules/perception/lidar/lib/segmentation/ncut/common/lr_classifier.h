@@ -15,10 +15,10 @@
  *****************************************************************************/
 #pragma once
 
-#include <math.h>
-#include <stdlib.h>
 #include <Eigen/Core>
 #include <algorithm>
+#include <cmath>
+#include <cstdlib>
 #include <iostream>
 #include <map>
 #include <string>

@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <stdio.h>
 #include <termios.h>
+#include <cstdio>
 #include <iostream>
 #include <memory>
 #include <thread>

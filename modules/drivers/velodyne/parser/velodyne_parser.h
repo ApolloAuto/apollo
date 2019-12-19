@@ -50,10 +50,10 @@
 
 #pragma once
 
-#include <errno.h>
-#include <math.h>
-#include <stdint.h>
 #include <boost/format.hpp>
+#include <cerrno>
+#include <cmath>
+#include <cstdint>
 #include <limits>
 #include <memory>
 #include <string>
@@ -132,7 +132,7 @@ static const float SEQ_TDURATION = 55.296f;
  *  Each block contains data from either the upper or lower laser
  *  bank.  The device returns three times as many upper bank blocks.
  *
- *  use stdint.h types, so things work with both 64 and 32-bit machines
+ *  use cstdint types, so things work with both 64 and 32-bit machines
  */
 struct RawBlock {
   uint16_t laser_block_id;  ///< UPPER_BANK or LOWER_BANK
