@@ -131,8 +131,16 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
   }
 
   for (const auto* obstacle : obstacles_) {
-    // Not applying obstacle approaching cost to virtual obstacle
+    // Not applying obstacle approaching cost to virtual obstacle like created
+    // stop fences
     if (obstacle->IsVirtual()) {
+      continue;
+    }
+
+    // Stop obstacles are assumed to have a safety margin when mapping them out,
+    // so repelling force in dp st is not needed as it is designed to have adc
+    // stop right at the stop distance we design in prior mapping process
+    if (obstacle->LongitudinalDecision().has_stop()) {
       continue;
     }
 
