@@ -340,7 +340,7 @@ Status PiecewiseJerkSpeedNonlinearOptimizer::SmoothSpeedLimit() {
   piecewise_jerk_problem.set_weight_ddx(10.0);
   piecewise_jerk_problem.set_weight_dddx(10.0);
 
-  piecewise_jerk_problem.set_x_ref(1.0, speed_ref);
+  piecewise_jerk_problem.set_x_ref(10.0, speed_ref);
 
   if (!piecewise_jerk_problem.Optimize(4000)) {
     std::string msg("Smoothing speed limit failed");
