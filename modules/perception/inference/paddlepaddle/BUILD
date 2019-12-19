@@ -7,7 +7,6 @@ cc_library(
     srcs = ["paddle_net.cc"],
     hdrs = ["paddle_net.h"],
     linkopts = [
-        "-lglog",
         "-lsnappy",
         "-lz",
         "-lsnappy",
@@ -16,6 +15,7 @@ cc_library(
         "-lpthread",
     ],
     deps = [
+        "//cyber/common:log",
         "//external:gflags",
         "//modules/perception/inference:inference_lib",
         "@boost",
