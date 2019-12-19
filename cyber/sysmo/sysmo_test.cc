@@ -17,7 +17,7 @@
 #include "cyber/sysmo/sysmo.h"
 
 #include <gtest/gtest.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <thread>
 
 #include "cyber/common/environment.h"

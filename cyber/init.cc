@@ -19,9 +19,9 @@
 #include <libgen.h>
 #include <stdio.h>
 #include <sys/types.h>
-#include <time.h>
 #include <unistd.h>
 #include <csignal>
+#include <ctime>
 #include <string>
 
 #include "cyber/binary.h"
