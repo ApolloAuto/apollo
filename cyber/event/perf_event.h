@@ -17,7 +17,7 @@
 #ifndef CYBER_EVENT_PERF_EVENT_H_
 #define CYBER_EVENT_PERF_EVENT_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include <sstream>
 #include <string>
 

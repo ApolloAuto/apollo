@@ -17,7 +17,7 @@
 #ifndef CYBER_TRANSPORT_QOS_QOS_PROFILE_CONF_H_
 #define CYBER_TRANSPORT_QOS_QOS_PROFILE_CONF_H_
 
-#include <stdint.h>
+#include <cstdint>
 
 #include "cyber/proto/qos_profile.pb.h"
 
