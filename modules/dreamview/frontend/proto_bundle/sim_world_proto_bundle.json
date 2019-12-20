@@ -3083,31 +3083,6 @@
                 }
               }
             },
-            "SidePassSafetyConfig": {
-              "fields": {
-                "minObstacleLateralDistance": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "maxOverlapSRange": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 5
-                  }
-                },
-                "safeDurationReachRefLine": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 5
-                  }
-                }
-              }
-            },
             "TargetLane": {
               "fields": {
                 "id": {
@@ -4637,6 +4612,13 @@
                   "id": 11,
                   "options": {
                     "default": 1
+                  }
+                },
+                "endPoseSDistance": {
+                  "type": "double",
+                  "id": 12,
+                  "options": {
+                    "default": 10
                   }
                 }
               },
@@ -6224,7 +6206,6 @@
                   "oneof": [
                     "speedHeuristicConfig",
                     "pathDeciderConfig",
-                    "proceedWithCautionSpeedConfig",
                     "creepDeciderConfig",
                     "openSpacePreStopDeciderConfig",
                     "speedBoundsDeciderConfig",
@@ -6257,10 +6238,6 @@
                 "pathDeciderConfig": {
                   "type": "PathDeciderConfig",
                   "id": 7
-                },
-                "proceedWithCautionSpeedConfig": {
-                  "type": "ProceedWithCautionSpeedConfig",
-                  "id": 8
                 },
                 "creepDeciderConfig": {
                   "type": "CreepDeciderConfig",
@@ -6342,7 +6319,6 @@
                     "NAVI_OBSTACLE_DECIDER": 9,
                     "CREEP_DECIDER": 11,
                     "OPEN_SPACE_PRE_STOP_DECIDER": 12,
-                    "PROCEED_WITH_CAUTION_SPEED": 15,
                     "DECIDER_RSS": 16,
                     "SPEED_BOUNDS_PRIORI_DECIDER": 17,
                     "SPEED_BOUNDS_FINAL_DECIDER": 18,
@@ -6764,6 +6740,13 @@
                   "options": {
                     "default": 25
                   }
+                },
+                "maxSteeringPercentageWhenCruise": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 90
+                  }
                 }
               }
             },
@@ -6940,6 +6923,7 @@
                     "PARK_AND_GO_CHECK": 800,
                     "PARK_AND_GO_CRUISE": 801,
                     "PARK_AND_GO_ADJUST": 802,
+                    "PARK_AND_GO_PRE_CRUISE": 803,
                     "YIELD_SIGN_APPROACH": 900,
                     "YIELD_SIGN_CREEP": 901
                   }
@@ -7333,30 +7317,6 @@
                 }
               }
             },
-            "PathReuseDeciderStatus": {
-              "fields": {
-                "reusedPath": {
-                  "type": "bool",
-                  "id": 1,
-                  "options": {
-                    "default": true
-                  }
-                },
-                "laneChangeFailureCounter": {
-                  "type": "int32",
-                  "id": 2
-                }
-              }
-            },
-            "PedestrianStatus": {
-              "fields": {
-                "stopTime": {
-                  "rule": "repeated",
-                  "type": "StopTime",
-                  "id": 1
-                }
-              }
-            },
             "PullOverStatus": {
               "fields": {
                 "pullOverType": {
@@ -7423,15 +7383,6 @@
                 }
               }
             },
-            "RightOfWayStatus": {
-              "fields": {
-                "junction": {
-                  "keyType": "string",
-                  "type": "bool",
-                  "id": 1
-                }
-              }
-            },
             "ScenarioStatus": {
               "fields": {
                 "scenarioType": {
@@ -7440,18 +7391,6 @@
                 },
                 "stageType": {
                   "type": "ScenarioConfig.StageType",
-                  "id": 2
-                }
-              }
-            },
-            "SidePassStatus": {
-              "fields": {
-                "changeLaneStopPathPoint": {
-                  "type": "apollo.common.PathPoint",
-                  "id": 1
-                },
-                "checkClearFlag": {
-                  "type": "bool",
                   "id": 2
                 }
               }
@@ -7528,72 +7467,41 @@
                   "type": "EmergencyStopStatus",
                   "id": 5
                 },
-                "engageAdvice": {
-                  "type": "apollo.common.EngageAdvice",
-                  "id": 6
-                },
                 "openSpace": {
                   "type": "OpenSpaceStatus",
-                  "id": 7
-                },
-                "pedestrian": {
-                  "type": "PedestrianStatus",
-                  "id": 8
+                  "id": 6
                 },
                 "parkAndGo": {
                   "type": "ParkAndGoStatus",
-                  "id": 9
+                  "id": 7
                 },
                 "pathDecider": {
                   "type": "PathDeciderStatus",
-                  "id": 10
-                },
-                "pathReuseDecider": {
-                  "type": "PathReuseDeciderStatus",
-                  "id": 11
+                  "id": 8
                 },
                 "pullOver": {
                   "type": "PullOverStatus",
-                  "id": 12
+                  "id": 9
                 },
                 "rerouting": {
                   "type": "ReroutingStatus",
-                  "id": 13
-                },
-                "rightOfWay": {
-                  "type": "RightOfWayStatus",
-                  "id": 14
+                  "id": 10
                 },
                 "scenario": {
                   "type": "ScenarioStatus",
-                  "id": 15
-                },
-                "sidePass": {
-                  "type": "SidePassStatus",
-                  "id": 16
+                  "id": 11
                 },
                 "stopSign": {
                   "type": "StopSignStatus",
-                  "id": 17
+                  "id": 12
                 },
                 "trafficLight": {
                   "type": "TrafficLightStatus",
-                  "id": 18
+                  "id": 13
                 },
                 "yieldSign": {
                   "type": "YieldSignStatus",
-                  "id": 19
-                }
-              }
-            },
-            "ProceedWithCautionSpeedConfig": {
-              "fields": {
-                "maxDistance": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 5
-                  }
+                  "id": 14
                 }
               }
             },
