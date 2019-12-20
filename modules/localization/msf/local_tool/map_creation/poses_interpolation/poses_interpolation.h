@@ -21,10 +21,11 @@
 
 #pragma once
 
-#include <Eigen/Geometry>
 #include <iostream>
 #include <string>
 #include <vector>
+
+#include "Eigen/Geometry"
 
 /**
  * @namespace apollo::localization

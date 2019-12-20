@@ -15,9 +15,10 @@
  *****************************************************************************/
 #pragma once
 
-#include <Eigen/Core>
 #include <list>
 #include <set>
+
+#include "Eigen/Core"
 #include "boost/thread.hpp"
 
 #include "cyber/task/task.h"

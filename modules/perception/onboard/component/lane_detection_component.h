@@ -15,14 +15,14 @@
  *****************************************************************************/
 #pragma once
 
-#include <Eigen/Core>
-#include <Eigen/Dense>
-
 #include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
+
+#include "Eigen/Core"
+#include "Eigen/Dense"
 
 #include "cyber/component/component.h"
 #include "modules/common/util/util.h"
