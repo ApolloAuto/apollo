@@ -126,7 +126,7 @@ bool WebSocketHandler::SendData(Connection *conn, const std::string &data,
 
   // Note that while we are holding the connection lock, the connection won't be
   // closed and removed.
-  int ret;
+  int ret = 0;
   PERF_BLOCK(absl::StrCat(name_, ": Writing ", data.size(),
                           " bytes via websocket took"),
              0.1) {
