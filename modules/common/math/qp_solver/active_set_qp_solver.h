@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <qpOASES.hpp>
+#include "qpOASES.hpp"
 
 #include "modules/common/math/qp_solver/qp_solver.h"
 
