@@ -33,16 +33,12 @@ cc_test(
     size = "medium",
     timeout = "short",
     srcs = ["map_cache_test.cc"],
-    linkopts = [
-        "-lboost_filesystem",
-        "-lboost_system",
-        "-lboost_program_options",
-    ],
     deps = [
         "//cyber",
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/common/util:localization_msf_common_util_compression",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
+        "@boost",
         "@gtest//:main",
     ],
 )

@@ -15,13 +15,11 @@ cc_library(
     name = "channel_verify",
     srcs = ["channel_verify.cc"],
     hdrs = ["channel_verify.h"],
-    linkopts = [
-        "-lboost_filesystem",
-    ],
     deps = [
         ":common",
         "//cyber",
         "//modules/map/tools/map_datachecker/proto:map_datachecker_proto",
+        "@boost",
     ],
 )
 
@@ -41,11 +39,9 @@ cc_library(
     name = "common",
     srcs = ["common.cc"],
     hdrs = ["common.h"],
-    linkopts = [
-        "-lboost_filesystem",
-    ],
     deps = [
         "//cyber",
+        "@boost",
     ],
 )
 
@@ -69,12 +65,10 @@ cc_library(
     name = "laps_checker",
     srcs = ["laps_checker.cc"],
     hdrs = ["laps_checker.h"],
-    linkopts = [
-        "-lboost_filesystem",
-    ],
     deps = [
         ":common",
         "//modules/map/tools/map_datachecker/proto:map_datachecker_proto",
+        "@boost",
     ],
 )
 
