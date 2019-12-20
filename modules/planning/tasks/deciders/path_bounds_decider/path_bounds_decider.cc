@@ -1787,7 +1787,8 @@ bool PathBoundsDecider::CheckLaneBoundaryType(
   }
 
   const auto waypoint = ref_point.lane_waypoints().front();
-  hdmap::LaneBoundaryType::Type lane_boundary_type;
+  hdmap::LaneBoundaryType::Type lane_boundary_type =
+      hdmap::LaneBoundaryType::UNKNOWN;
   if (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW) {
     lane_boundary_type = hdmap::LeftBoundaryType(waypoint);
   } else if (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW) {
