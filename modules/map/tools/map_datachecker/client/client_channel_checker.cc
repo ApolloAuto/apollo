@@ -15,7 +15,6 @@
  *****************************************************************************/
 #include "modules/map/tools/map_datachecker/client/client_channel_checker.h"
 
-#include <yaml-cpp/yaml.h>
 #include <chrono>
 #include <fstream>
 #include <memory>
@@ -23,6 +22,7 @@
 
 #include "boost/filesystem.hpp"
 #include "grpc++/grpc++.h"
+#include "yaml-cpp/yaml.h"
 
 #include "cyber/cyber.h"
 #include "modules/map/tools/map_datachecker/client/client_common.h"
