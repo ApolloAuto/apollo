@@ -16,7 +16,7 @@
 
 #include "cyber/base/unbounded_queue.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {

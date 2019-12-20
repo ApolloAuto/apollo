@@ -16,9 +16,9 @@
 
 #include <fastcdr/Cdr.h>
 #include <fastcdr/exceptions/BadParamException.h>
-#include <gtest/gtest.h>
 #include <string>
 #include <utility>
+#include "gtest/gtest.h"
 
 #include "cyber/common/global_data.h"
 #include "cyber/common/log.h"

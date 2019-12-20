@@ -16,8 +16,8 @@
 
 #include "modules/perception/lib/utils/timer.h"
 
-#include <gtest/gtest.h>
 #include <thread>
+#include "gtest/gtest.h"
 
 #include "modules/perception/lib/utils/perf.h"
 

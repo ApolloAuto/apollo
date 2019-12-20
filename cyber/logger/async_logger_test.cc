@@ -16,9 +16,8 @@
 
 #include "cyber/logger/async_logger.h"
 
-#include <gtest/gtest.h>
-
 #include "glog/logging.h"
+#include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
 

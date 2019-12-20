@@ -16,11 +16,12 @@
 
 #include "modules/localization/msf/local_map/ndt_map/ndt_map.h"
 
-#include <gtest/gtest.h>
 #include <string>
 #include <vector>
 
 #include "absl/strings/str_cat.h"
+#include "gtest/gtest.h"
+
 #include "cyber/common/file.h"
 #include "modules/localization/msf/common/io/pcl_point_types.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"

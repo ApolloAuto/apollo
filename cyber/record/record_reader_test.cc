@@ -17,8 +17,8 @@
 #include "cyber/record/record_reader.h"
 #include "cyber/record/record_writer.h"
 
-#include <gtest/gtest.h>
 #include <string>
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {

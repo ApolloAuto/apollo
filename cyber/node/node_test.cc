@@ -16,7 +16,7 @@
 
 #include "cyber/node/node.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "cyber/cyber.h"
 #include "cyber/init.h"

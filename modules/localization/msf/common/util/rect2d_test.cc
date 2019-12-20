@@ -16,7 +16,7 @@
 
 #include "modules/localization/msf/common/util/rect2d.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace localization {
