@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <pcl/io/pcd_io.h>
 #include "gtest/gtest.h"
+#include "pcl/io/pcd_io.h"
 
 #define private public
 #include "modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector/spatio_temporal_ground_detector.h"
