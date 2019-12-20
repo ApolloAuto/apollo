@@ -191,8 +191,6 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
     std::vector<STPoint>* upper_points,
     std::vector<STPoint>* lower_points) const {
   // Sanity checks.
-  CHECK_NOTNULL(upper_points);
-  CHECK_NOTNULL(lower_points);
   DCHECK(upper_points->empty());
   DCHECK(lower_points->empty());
   DCHECK_GT(path_points.size(), 0);

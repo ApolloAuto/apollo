@@ -51,14 +51,11 @@ class NaviPathDeciderTest : public ::testing::Test {
   }
 
   static void InitPlannigConfig(PlanningConfig* const plannig_config) {
-    CHECK_NOTNULL(plannig_config);
     auto* navi_planner_config =
         plannig_config->mutable_navigation_planning_config()
             ->mutable_planner_navi_config();
-    CHECK_NOTNULL(navi_planner_config);
     auto* navi_path_decider_config =
         navi_planner_config->mutable_navi_path_decider_config();
-    CHECK_NOTNULL(navi_path_decider_config);
     navi_path_decider_config->set_min_path_length(5.0);
     navi_path_decider_config->set_min_look_forward_time(2.0);
     navi_path_decider_config->set_max_keep_lane_distance(0.4);
@@ -69,9 +66,7 @@ class NaviPathDeciderTest : public ::testing::Test {
     navi_path_decider_config->clear_move_dest_lane_config_talbe();
     auto* move_dest_lane_cfg_table =
         navi_path_decider_config->mutable_move_dest_lane_config_talbe();
-    CHECK_NOTNULL(move_dest_lane_cfg_table);
     auto* move_shift_config = move_dest_lane_cfg_table->add_lateral_shift();
-    CHECK_NOTNULL(move_shift_config);
     move_shift_config->set_max_speed(34);
     move_shift_config->set_max_move_dest_lane_shift_y(0.45);
   }
