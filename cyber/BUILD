@@ -61,7 +61,6 @@ cc_library(
     srcs = ["cyber.cc"],
     hdrs = ["cyber.h"],
     linkopts = [
-        "-lgflags",
         "-lprotobuf",
         "-luuid",
         "-lrt",
