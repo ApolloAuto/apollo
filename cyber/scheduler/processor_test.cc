@@ -15,9 +15,9 @@
  *****************************************************************************/
 #include "cyber/scheduler/processor.h"
 
-#include <gtest/gtest.h>
 #include <string>
 #include <vector>
+#include "gtest/gtest.h"
 
 #include "cyber/cyber.h"
 #include "cyber/scheduler/common/pin_thread.h"

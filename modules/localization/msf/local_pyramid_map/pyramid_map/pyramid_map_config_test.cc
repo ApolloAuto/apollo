@@ -15,7 +15,9 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_config.h"
-#include <gtest/gtest.h>
+
+#include "gtest/gtest.h"
+
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map_config.h"
 
 int main(int argc, char** argv) {

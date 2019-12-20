@@ -16,8 +16,8 @@
 
 #include "cyber/node/node_channel_impl.h"
 
-#include <gtest/gtest.h>
 #include <iostream>
+#include "gtest/gtest.h"
 
 #include "cyber/cyber.h"
 #include "cyber/init.h"

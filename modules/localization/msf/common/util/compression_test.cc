@@ -16,7 +16,7 @@
 
 #include "modules/localization/msf/common/util/compression.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace localization {
