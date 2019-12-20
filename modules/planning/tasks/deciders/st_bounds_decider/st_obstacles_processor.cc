@@ -177,7 +177,7 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     } else {
       // Obstacle is dynamic.
       if (boundary.bottom_left_point().s() - adc_path_init_s_ <
-          kSIgnoreThreshold &&
+              kSIgnoreThreshold &&
           boundary.bottom_left_point().t() > kTIgnoreThreshold) {
         // Ignore obstacles that are behind.
         // TODO(jiacheng): don't ignore if ADC is in dangerous segments.

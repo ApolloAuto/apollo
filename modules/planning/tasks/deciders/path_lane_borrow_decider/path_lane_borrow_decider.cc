@@ -282,7 +282,8 @@ void PathLaneBorrowDecider::CheckLaneBorrow(
     }
 
     const auto waypoint = ref_point.lane_waypoints().front();
-    hdmap::LaneBoundaryType::Type lane_boundary_type;
+    hdmap::LaneBoundaryType::Type lane_boundary_type =
+        hdmap::LaneBoundaryType::UNKNOWN;
 
     if (*left_neighbor_lane_borrowable) {
       lane_boundary_type = hdmap::LeftBoundaryType(waypoint);
