@@ -15,7 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-#include <Eigen/Core>
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
@@ -25,6 +24,9 @@
 #include <tuple>
 #include <unordered_set>
 #include <vector>
+
+#include "Eigen/Core"
+
 #include "modules/perception/base/point_cloud.h"
 
 namespace apollo {

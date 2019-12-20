@@ -17,7 +17,8 @@
 #include "modules/localization/ndt/ndt_localization.h"
 
 #include <yaml-cpp/yaml.h>
-#include <Eigen/Geometry>
+
+#include "Eigen/Geometry"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"

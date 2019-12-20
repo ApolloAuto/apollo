@@ -15,8 +15,9 @@
  *****************************************************************************/
 #pragma once
 
-#include <Eigen/Core>
 #include <vector>
+
+#include "Eigen/Core"
 
 namespace apollo {
 namespace perception {
