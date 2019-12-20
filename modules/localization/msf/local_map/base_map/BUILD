@@ -15,9 +15,6 @@ cc_library(
     hdrs = glob(["*.h"]),
     linkopts = [
         "-lz",
-        "-lopencv_core",
-        "-lopencv_highgui",
-        "-lopencv_imgproc",
     ],
     deps = [
         "//modules/common/util",
@@ -25,6 +22,7 @@ cc_library(
         "//modules/localization/msf/common/util:localization_msf_common_util_compression",
         "//modules/localization/msf/common/util:localization_msf_common_util_system_utility",
         "@eigen",
+        "@opencv",
     ],
 )
 

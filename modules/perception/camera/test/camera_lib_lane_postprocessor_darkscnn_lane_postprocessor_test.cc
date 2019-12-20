@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 #include <yaml-cpp/yaml.h>
-#include <opencv2/opencv.hpp>
 #include "gtest/gtest.h"
+#include "opencv2/opencv.hpp"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
