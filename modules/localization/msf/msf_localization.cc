@@ -16,7 +16,7 @@
 
 #include "modules/localization/msf/msf_localization.h"
 
-#include <yaml-cpp/yaml.h>
+#include "yaml-cpp/yaml.h"
 
 #include "cyber/common/file.h"
 #include "modules/common/math/euler_angles_zxy.h"

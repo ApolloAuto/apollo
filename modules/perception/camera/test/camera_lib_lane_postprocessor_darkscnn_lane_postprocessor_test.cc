@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <yaml-cpp/yaml.h>
 #include "gtest/gtest.h"
 #include "opencv2/opencv.hpp"
+#include "yaml-cpp/yaml.h"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"

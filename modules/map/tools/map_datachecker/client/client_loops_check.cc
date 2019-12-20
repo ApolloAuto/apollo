@@ -16,11 +16,11 @@
 
 #include "modules/map/tools/map_datachecker/client/client_loops_check.h"
 
-#include <yaml-cpp/yaml.h>
 #include <utility>
 
 #include "boost/algorithm/string.hpp"
 #include "grpc++/grpc++.h"
+#include "yaml-cpp/yaml.h"
 
 namespace apollo {
 namespace hdmap {

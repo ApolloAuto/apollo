@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <yaml-cpp/yaml.h>
+#include "yaml-cpp/yaml.h"
 
 #include "cyber/common/log.h"
 #include "modules/perception/camera/common/util.h"
