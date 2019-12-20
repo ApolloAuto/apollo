@@ -6,13 +6,11 @@ cc_library(
     name = "grpc_client",
     srcs = ["grpc_client.cc"],
     hdrs = ["grpc_client.h"],
-    linkopts = [
-        "-lgrpc++",
-    ],
     deps = [
         "//cyber",
         "//modules/v2x/common:v2x_proxy_gflags",
         "//modules/v2x/proto:v2x_service_car_to_obu_grpc",
+        "@com_github_grpc_grpc//:grpc++",
     ],
 )
 
@@ -20,12 +18,10 @@ cc_library(
     name = "grpc_server",
     srcs = ["grpc_server.cc"],
     hdrs = ["grpc_server.h"],
-    linkopts = [
-        "-lgrpc++",
-    ],
     deps = [
         "//cyber",
         "//modules/v2x/proto:v2x_service_obu_to_car_grpc",
+        "@com_github_grpc_grpc//:grpc++",
     ],
 )
 

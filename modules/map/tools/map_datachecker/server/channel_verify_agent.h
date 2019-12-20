@@ -15,13 +15,14 @@
  *****************************************************************************/
 #pragma once
 
-#include <grpc++/grpc++.h>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "grpc++/grpc++.h"
 
 #include "modules/map/tools/map_datachecker/proto/collection_error_code.pb.h"
 #include "modules/map/tools/map_datachecker/proto/collection_service.pb.h"
