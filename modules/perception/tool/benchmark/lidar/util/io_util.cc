@@ -14,12 +14,15 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/tool/benchmark/lidar/util/io_util.h"
-#include <pcl/io/pcd_io.h>
+
 #include <fstream>
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
+
+#include "pcl/io/pcd_io.h"
+
 #include "modules/perception/tool/benchmark/lidar/util/geo_util.h"
 
 namespace apollo {

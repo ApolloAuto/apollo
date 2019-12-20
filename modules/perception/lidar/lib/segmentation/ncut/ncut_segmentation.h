@@ -20,7 +20,7 @@
 #include <vector>
 
 #ifdef DEBUG_NCUT
-#include <pcl/visualization/pcl_visualizer.h>
+#include "pcl/visualization/pcl_visualizer.h"
 #endif
 
 #include "modules/perception/base/object.h"
