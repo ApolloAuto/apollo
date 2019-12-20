@@ -37,8 +37,7 @@ using Matrix = Eigen::MatrixXd;
 
 double MracController::Control(const double command, const Matrix state,
                                const double input_limit,
-                               const double input_rate_limit,
-                               const bool enable_adapt) {
+                               const double input_rate_limit) {
   // check if the current sampling time is valid and the reference/adaption
   // model well set up during the initialization
   if (ts_ <= 0.0 || !reference_model_enabled_ || !adaption_model_enabled_) {
@@ -51,11 +50,7 @@ double MracController::Control(const double command, const Matrix state,
   }
 
   // update the state in the real actuation system
-  if (enable_adapt) {
-    state_action_.col(0) = state;
-  } else {
-    state_action_.col(0) = state_reference_.col(0);
-  }
+  state_action_.col(0) = state;
 
   // update the desired command in the real actuation system
   input_desired_(0, 0) = command;
