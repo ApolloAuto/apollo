@@ -15,11 +15,12 @@
  *****************************************************************************/
 #include "modules/map/tools/map_datachecker/client/client_common.h"
 
-#include <grpc++/grpc++.h>
 #include <boost/algorithm/string.hpp>
 #include <fstream>
 #include <string>
 #include <vector>
+
+#include "grpc++/grpc++.h"
 
 namespace apollo {
 namespace hdmap {

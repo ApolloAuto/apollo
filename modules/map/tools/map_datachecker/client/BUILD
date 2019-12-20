@@ -7,11 +7,11 @@ cc_binary(
     srcs = ["main.cc"],
     linkopts = [
         "-lboost_filesystem",
-        "-lgrpc++",
     ],
     deps = [
         ":client",
         ":client_gflags",
+        "@com_github_grpc_grpc//:grpc++",
     ],
 )
 
@@ -24,7 +24,6 @@ cc_library(
     ],
     linkopts = [
         "-lboost_filesystem",
-        "-lgrpc++",
     ],
     deps = [
         ":client_channel_checker",
@@ -32,6 +31,7 @@ cc_library(
         ":client_gflags",
         ":client_loops_check",
         "//cyber",
+        "@com_github_grpc_grpc//:grpc++",
         "@yaml_cpp//:yaml",
     ],
 )
@@ -42,7 +42,6 @@ cc_library(
     hdrs = ["client_channel_checker.h"],
     linkopts = [
         "-lboost_filesystem",
-        "-lgrpc++",
     ],
     deps = [
         ":client_common",
@@ -50,6 +49,7 @@ cc_library(
         ":exception_handler",
         "//cyber",
         "//modules/map/tools/map_datachecker/proto:map_datachecker_grpc",
+        "@com_github_grpc_grpc//:grpc++",
         "@yaml_cpp//:yaml",
     ],
 )
@@ -60,10 +60,10 @@ cc_library(
     hdrs = ["client_common.h"],
     linkopts = [
         "-lboost_filesystem",
-        "-lgrpc++",
     ],
     deps = [
         "//cyber",
+        "@com_github_grpc_grpc//:grpc++",
     ],
 )
 
@@ -82,7 +82,6 @@ cc_library(
     hdrs = ["client_loops_check.h"],
     linkopts = [
         "-lboost_filesystem",
-        "-lgrpc++",
     ],
     deps = [
         ":client_common",
@@ -90,6 +89,7 @@ cc_library(
         ":exception_handler",
         "//cyber",
         "//modules/map/tools/map_datachecker/proto:map_datachecker_grpc",
+        "@com_github_grpc_grpc//:grpc++",
         "@yaml_cpp//:yaml",
     ],
 )
