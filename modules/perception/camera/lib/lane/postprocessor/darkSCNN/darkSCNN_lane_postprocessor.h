@@ -15,9 +15,9 @@
  *****************************************************************************/
 #pragma once
 
-#include <opencv2/opencv.hpp>
 #include <string>
 #include <vector>
+#include "opencv2/opencv.hpp"
 
 #include "modules/perception/base/point.h"
 #include "modules/perception/camera/common/camera_frame.h"
