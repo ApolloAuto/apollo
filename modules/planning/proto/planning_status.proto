@@ -3,7 +3,6 @@ syntax = "proto2";
 package apollo.planning;
 
 import "modules/common/proto/geometry.proto";
-import "modules/common/proto/pnc_point.proto";
 import "modules/planning/proto/planning_config.proto";
 import "modules/routing/proto/routing.proto";
 
