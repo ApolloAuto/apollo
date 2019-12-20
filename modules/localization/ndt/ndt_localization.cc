@@ -254,8 +254,6 @@ bool NDTLocalization::IsServiceStarted() { return is_service_started_; }
 
 void NDTLocalization::FillLocalizationMsgHeader(
     LocalizationEstimate* localization) {
-  CHECK_NOTNULL(localization);
-
   auto* header = localization->mutable_header();
   double timestamp = apollo::common::time::Clock::NowInSeconds();
   header->set_module_name(module_name_);

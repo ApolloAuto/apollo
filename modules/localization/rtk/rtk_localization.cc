@@ -188,8 +188,6 @@ void RTKLocalization::PrepareLocalizationMsg(
 
 void RTKLocalization::FillLocalizationMsgHeader(
     LocalizationEstimate *localization) {
-  CHECK_NOTNULL(localization);
-
   auto *header = localization->mutable_header();
   double timestamp = apollo::common::time::Clock::NowInSeconds();
   header->set_module_name(module_name_);
