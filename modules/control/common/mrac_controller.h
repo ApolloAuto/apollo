@@ -149,14 +149,11 @@ class MracController {
    * @param input_limit physical or designed bound of the input
    * @param input_rate_limit physical or designed bound of the input
    * changing-rate
-   * @param enable_adapt whether enable the adation process for the adaptive
-   * laws
    * @return control value based on mrac controller architecture
    */
   virtual double Control(const double command, const Eigen::MatrixXd state,
                          const double input_limit,
-                         const double input_rate_limit,
-                         const bool enable_adapt);
+                         const double input_rate_limit);
 
   /**
    * @brief bound the system output with the given bound and change-rate bound
