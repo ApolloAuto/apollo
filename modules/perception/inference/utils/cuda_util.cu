@@ -16,9 +16,9 @@
 
 #include "modules/perception/inference/utils/cuda_util.h"
 
-#include <boost/thread.hpp>
 #include <cuda_runtime_api.h>
 
+#include "boost/thread.hpp"
 #include "cyber/common/log.h"
 
 namespace apollo {

@@ -17,8 +17,9 @@
 
 #include <npp.h>
 #include <yaml-cpp/yaml.h>
-#include <boost/filesystem.hpp>
 #include <opencv2/opencv.hpp>
+
+#include "boost/filesystem.hpp"
 
 namespace apollo {
 namespace perception {

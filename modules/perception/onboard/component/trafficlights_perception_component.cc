@@ -15,7 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/onboard/component/trafficlights_perception_component.h"
 
-#include <boost/algorithm/string.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
@@ -24,6 +23,8 @@
 #include <utility>
 
 #include "absl/strings/str_cat.h"
+#include "boost/algorithm/string.hpp"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"

@@ -50,7 +50,6 @@
 
 #pragma once
 
-#include <boost/format.hpp>
 #include <cerrno>
 #include <cmath>
 #include <cstdint>
@@ -58,11 +57,12 @@
 #include <memory>
 #include <string>
 
+#include "boost/format.hpp"
+
+#include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/drivers/velodyne/parser/calibration.h"
 #include "modules/drivers/velodyne/parser/const_variables.h"
 #include "modules/drivers/velodyne/parser/online_calibration.h"
-
-#include "modules/drivers/proto/pointcloud.pb.h"
 #include "modules/drivers/velodyne/proto/config.pb.h"
 #include "modules/drivers/velodyne/proto/velodyne.pb.h"
 

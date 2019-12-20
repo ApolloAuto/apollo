@@ -5,12 +5,10 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "map_datachecker_client",
     srcs = ["main.cc"],
-    linkopts = [
-        "-lboost_filesystem",
-    ],
     deps = [
         ":client",
         ":client_gflags",
+        "@boost",
         "@com_github_grpc_grpc//:grpc++",
     ],
 )
@@ -22,15 +20,13 @@ cc_library(
         "client.h",
         "client_alignment.h",
     ],
-    linkopts = [
-        "-lboost_filesystem",
-    ],
     deps = [
         ":client_channel_checker",
         ":client_common",
         ":client_gflags",
         ":client_loops_check",
         "//cyber",
+        "@boost",
         "@com_github_grpc_grpc//:grpc++",
         "@yaml_cpp//:yaml",
     ],
@@ -40,15 +36,13 @@ cc_library(
     name = "client_channel_checker",
     srcs = ["client_channel_checker.cc"],
     hdrs = ["client_channel_checker.h"],
-    linkopts = [
-        "-lboost_filesystem",
-    ],
     deps = [
         ":client_common",
         ":client_gflags",
         ":exception_handler",
         "//cyber",
         "//modules/map/tools/map_datachecker/proto:map_datachecker_grpc",
+        "@boost",
         "@com_github_grpc_grpc//:grpc++",
         "@yaml_cpp//:yaml",
     ],
@@ -58,11 +52,9 @@ cc_library(
     name = "client_common",
     srcs = ["client_common.cc"],
     hdrs = ["client_common.h"],
-    linkopts = [
-        "-lboost_filesystem",
-    ],
     deps = [
         "//cyber",
+        "@boost",
         "@com_github_grpc_grpc//:grpc++",
     ],
 )
@@ -80,15 +72,13 @@ cc_library(
     name = "client_loops_check",
     srcs = ["client_loops_check.cc"],
     hdrs = ["client_loops_check.h"],
-    linkopts = [
-        "-lboost_filesystem",
-    ],
     deps = [
         ":client_common",
         ":client_gflags",
         ":exception_handler",
         "//cyber",
         "//modules/map/tools/map_datachecker/proto:map_datachecker_grpc",
+        "@boost",
         "@com_github_grpc_grpc//:grpc++",
         "@yaml_cpp//:yaml",
     ],
