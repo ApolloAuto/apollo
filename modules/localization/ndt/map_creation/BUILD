@@ -5,11 +5,6 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "ndt_map_creator",
     srcs = ["ndt_map_creator.cc"],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_highgui",
-        "-lopencv_imgproc",
-    ],
     linkstatic = 0,
     deps = [
         "//cyber",
@@ -21,6 +16,7 @@ cc_binary(
         "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map_pool",
         "@boost",
         "@eigen",
+        "@opencv",
         "@pcl",
     ],
 )

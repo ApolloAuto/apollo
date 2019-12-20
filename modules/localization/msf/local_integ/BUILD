@@ -10,11 +10,6 @@ cc_library(
         "-O2",
         "-DMODULE_NAME=\\\"localization\\\"",
     ],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_highgui",
-        "-lopencv_imgproc",
-    ],
     deps = [
         "//external:gflags",
         "//modules/common/status",
@@ -40,6 +35,7 @@ cc_library(
         "@eigen",
         "@glog",
         "@local_integ",
+        "@opencv",
         "@yaml_cpp//:yaml",
     ],
 )
