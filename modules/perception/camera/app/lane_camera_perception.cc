@@ -15,7 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/camera/app/lane_camera_perception.h"
 
-#include <gflags/gflags.h>
 #include <yaml-cpp/yaml.h>
 
 #include <algorithm>
@@ -25,6 +24,8 @@
 #include <vector>
 
 #include "absl/strings/str_cat.h"
+#include "gflags/gflags.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/perception/base/object.h"
