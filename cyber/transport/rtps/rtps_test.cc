@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <fastcdr/Cdr.h>
-#include <fastcdr/exceptions/BadParamException.h>
 #include <string>
 #include <utility>
+
+#include "fastcdr/Cdr.h"
+#include "fastcdr/exceptions/BadParamException.h"
 #include "gtest/gtest.h"
 
 #include "cyber/common/global_data.h"
