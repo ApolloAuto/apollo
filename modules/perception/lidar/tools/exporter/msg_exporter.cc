@@ -15,14 +15,13 @@
  *****************************************************************************/
 #include "modules/perception/lidar/tools/exporter/msg_exporter.h"
 
-#include <pcl/io/pcd_io.h>
-
 #include <fstream>
 #include <memory>
 #include <vector>
 
 #include "absl/strings/str_split.h"
 #include "opencv2/opencv.hpp"
+#include "pcl/io/pcd_io.h"
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
