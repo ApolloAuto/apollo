@@ -23,6 +23,7 @@
 
 #include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
+#include "cyber/common/log.h"
 #include "gtest/gtest_prod.h"
 
 #include "modules/routing/proto/routing.pb.h"
@@ -45,7 +46,7 @@
 
 namespace apollo {
 namespace planning {
-
+#define ADEBUG AINFO
 using apollo::canbus::Chassis;
 using apollo::common::EngageAdvice;
 using apollo::common::ErrorCode;
@@ -188,6 +189,7 @@ void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* ptr_trajectory_pb) {
 
 void OnLanePlanning::RunOnce(const LocalView& local_view,
                              ADCTrajectory* const ptr_trajectory_pb) {
+  static bool estop = false;
   local_view_ = local_view;
   const double start_timestamp = Clock::NowInSeconds();
   const double start_system_timestamp =
@@ -232,11 +234,21 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     vehicle_state = AlignTimeStamp(vehicle_state, start_timestamp);
   }
 
+  AERROR << "Is Different Routing:"
+         << util::IsDifferentRouting(last_routing_, *local_view_.routing);
+  AERROR << "reference_line_provider_->UpdatedReferenceLine(): "
+         << reference_line_provider_->UpdatedReferenceLine();
   if (util::IsDifferentRouting(last_routing_, *local_view_.routing)) {
     last_routing_ = *local_view_.routing;
+    AERROR << "last_routing_:" << last_routing_.ShortDebugString();
     History::Instance()->Clear();
     PlanningContext::Instance()->mutable_planning_status()->Clear();
     reference_line_provider_->UpdateRoutingResponse(*local_view_.routing);
+    // when failing to update reference line at given routing
+    AERROR << "reference_line_provider_->UpdatedReferenceLine(): "
+           << reference_line_provider_->UpdatedReferenceLine();
+    estop = (!reference_line_provider_->UpdatedReferenceLine());
+    AERROR << "estop:" << estop;
     planner_->Init(config_);
   }
 
@@ -259,7 +271,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
   status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
 
-  if (status.ok()) {
+  if (status.ok() && !estop) {
     EgoInfo::Instance()->CalculateFrontObstacleClearDistance(
         frame_->obstacles());
   }
@@ -269,8 +281,10 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   }
   ptr_trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
       Clock::NowInSeconds() - start_timestamp);
-  if (!status.ok()) {
+  if (!status.ok() || estop) {
+    AERROR << "estop:" << estop;
     AERROR << status.ToString();
+
     if (FLAGS_publish_estop) {
       // "estop" signal check in function "Control::ProduceControlCommand()"
       // estop_ = estop_ || local_view_.trajectory.estop().is_estop();
