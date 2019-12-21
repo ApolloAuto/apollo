@@ -42,7 +42,6 @@ class NaviPathDeciderTest : public ::testing::Test {
   static void GeneratePathData(
       double s, double init_y, double kappa,
       std::vector<common::PathPoint>* const path_points) {
-    CHECK_NOTNULL(path_points);
     for (double x = 0.0, y = init_y; x < s; ++x) {
       path_points->clear();
       path_points->push_back(

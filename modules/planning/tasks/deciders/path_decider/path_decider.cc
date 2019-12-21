@@ -45,8 +45,6 @@ Status PathDecider::Execute(Frame *frame,
 Status PathDecider::Process(const ReferenceLineInfo *reference_line_info,
                             const PathData &path_data,
                             PathDecision *const path_decision) {
-  CHECK_NOTNULL(path_decision);
-
   // skip path_decider if reused path
   if (FLAGS_enable_skip_path_tasks && reference_line_info->path_reusable()) {
     return Status::OK();
@@ -66,7 +64,6 @@ Status PathDecider::Process(const ReferenceLineInfo *reference_line_info,
 bool PathDecider::MakeObjectDecision(const PathData &path_data,
                                      const std::string &blocking_obstacle_id,
                                      PathDecision *const path_decision) {
-  CHECK_NOTNULL(path_decision);
   if (!MakeStaticObstacleDecision(path_data, blocking_obstacle_id,
                                   path_decision)) {
     AERROR << "Failed to make decisions for static obstacles";
@@ -82,7 +79,7 @@ bool PathDecider::MakeStaticObstacleDecision(
     const PathData &path_data, const std::string &blocking_obstacle_id,
     PathDecision *const path_decision) {
   // Sanity checks and get important values.
-  CHECK_NOTNULL(path_decision);
+  CHECK(path_decision);
   const auto &frenet_path = path_data.frenet_frame_path();
   if (frenet_path.empty()) {
     AERROR << "Path is empty.";
