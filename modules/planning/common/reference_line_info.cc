@@ -577,7 +577,8 @@ void ReferenceLineInfo::SetTurnSignalBasedOnLaneTurnType(
   if (path_data_.path_label().find("left") != std::string::npos) {
     vehicle_signal->set_turn_signal(VehicleSignal::TURN_LEFT);
     return;
-  } else if (path_data_.path_label().find("right") != std::string::npos) {
+  }
+  if (path_data_.path_label().find("right") != std::string::npos) {
     vehicle_signal->set_turn_signal(VehicleSignal::TURN_RIGHT);
     return;
   }
