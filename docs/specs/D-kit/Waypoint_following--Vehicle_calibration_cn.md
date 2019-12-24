@@ -60,7 +60,7 @@ bash /scripts/localization.sh
 
 2. 运行 modules/tools/calibration/  下的 `python data_collector.py`, 之后输入参数x y z, x 代表加速踏板开合度（百分比正值）, y 代表了速度限值(米／秒), z 代表刹车踏板开合度（百分比负值）。输入参数后，车辆即开始以x加速踏板值加速至y速度限值，之后再以z刹车踏板值减速直至车辆停止。 
 
-3. 产生对应x y z 参数的csv文件。 比如输出指令 `15 5.2 -10`,将会生成名为`t15b-10r0_recorded.csv`的文件。 
+3. 产生对应x y z 参数的csv文件。 比如输出指令 `15 5.2 -10`，将会生成名为`t15b-10r0_recorded.csv`的文件。 
 
 4. 根据车辆反应情况选取合适的x y z 参数，如加速踏板过小不能启动或者刹车踏板过小不能停车，需要相应调整命令参数。
 
