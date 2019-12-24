@@ -79,11 +79,7 @@ class Service : public ServiceBase {
   Service() = delete;
 
   ~Service() {
-    inited_ = false;
-    condition_.notify_all();
-    if (thread_.joinable()) {
-      thread_.join();
-    }
+    destroy();
   }
 
   /**
