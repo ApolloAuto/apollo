@@ -205,12 +205,12 @@ bool Client<Request, Response>::Init() {
   role.set_channel_id(channel_id);
   response_receiver_ = transport->CreateReceiver<Response>(
       role,
-      [=](const std::shared_ptr<Response>& request,
+      [=](const std::shared_ptr<Response>& response,
           const transport::MessageInfo& message_info,
           const proto::RoleAttributes& reader_attr) {
         (void)message_info;
         (void)reader_attr;
-        response_callback_(request, message_info);
+        response_callback_(response, message_info);
       },
       proto::OptionalMode::RTPS);
   if (response_receiver_ == nullptr) {
