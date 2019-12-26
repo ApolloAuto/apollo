@@ -112,6 +112,7 @@ class SocketCanClientRaw : public CanClient {
  private:
   int dev_handler_ = 0;
   CANCardParameter::CANChannelId port_;
+  CANCardParameter::CANInterface interface_;
   can_frame send_frames_[MAX_CAN_SEND_FRAME_LEN];
   can_frame recv_frames_[MAX_CAN_RECV_FRAME_LEN];
 };
