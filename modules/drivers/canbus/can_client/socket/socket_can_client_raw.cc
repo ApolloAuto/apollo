@@ -76,9 +76,9 @@ ErrorCode SocketCanClientRaw::Start() {
 
   // init config and state
   int ret;
-  
+
   // 1. for non virtual busses, set receive message_id filter, ie white list
-  if(interface_ != CANCardParameter::VIRTUAL) {
+  if (interface_ != CANCardParameter::VIRTUAL) {
     struct can_filter filter[2048];
     for (int i = 0; i < 2048; ++i) {
       filter[i].can_id = 0x000 + i;
@@ -107,10 +107,10 @@ ErrorCode SocketCanClientRaw::Start() {
     interface_prefix = "vcan";
   } else if (interface_ == CANCardParameter::SLCAN) {
     interface_prefix = "slcan";
-  } else { //default: CANCardParameter::NATIVE
+  } else {  // default: CANCardParameter::NATIVE
     interface_prefix = "can";
   }
-  
+
   const std::string can_name = absl::StrCat(interface_prefix, port_);
   std::strncpy(ifr.ifr_name, can_name.c_str(), IFNAMSIZ);
   if (ioctl(dev_handler_, SIOCGIFINDEX, &ifr) < 0) {
