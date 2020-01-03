@@ -236,6 +236,27 @@ The car now has 360-degree visibility, along with upgraded perception deep learn
     * Simulation
     * [Apollo Synthetic Data Set](http://apollo.auto/synthetic.html)
 
+[**Apollo 5.5:**](docs/quickstart/apollo_5_5_quick_start.md)
+
+Apollo 5.5 enhances the complex urban road autonomous driving capabilities of previous Apollo releases, by introducing curb-to-curb driving support. With this new addition, Apollo is now a leap closer to fully autonomous urban road driving.
+The car has complete 360-degree visibility, along with upgraded perception deep learning model and a brand new prediction model to handle the changing conditions of complex road and junction scenarios, making the car more secure and aware. 
+
+![](docs/demo_guide/images/Apollo_5_5_Architecture.png)
+
+**For Setup:**
+
+* Hardware:
+
+    * Same as Apollo 5.0
+
+* Software:
+
+    * [Data Pipeline](https://github.com/ApolloAuto/apollo/tree/master/modules/tools/fuel_proxy)
+    * Perception
+    * Planning
+    * Control
+    * Prediction
+    * Simulation
 
 ## Architecture
 
@@ -276,6 +297,8 @@ Congratulations! You have successfully built out Apollo without Hardware. If you
 * [Apollo 3.5 QuickStart Guide](docs/quickstart/apollo_3_5_quick_start.md)
 
 * [Apollo 5.0 QuickStart Guide](docs/quickstart/apollo_5_0_quick_start.md)
+
+* [Apollo 5.5 QuickStart Guide](docs/quickstart/apollo_5_5_quick_start.md)
 
 ## Documents
 
