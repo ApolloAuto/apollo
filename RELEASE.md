@@ -14,7 +14,8 @@ The car has complete 360-degree visibility, along with upgraded perception deep 
     * Semantic LSTM evaluator
     * Extrapolation predictor
 * Control module
-    * Control profiling
+    * Model Reference Adaptive Control (MRAC)
+    * Control profiling service
 * Simulation scenarios
 
 ## Autonomous Drive Capabilities
