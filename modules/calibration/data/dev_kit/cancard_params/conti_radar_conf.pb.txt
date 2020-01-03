@@ -1,9 +1,9 @@
 can_conf {
 
   can_card_parameter {
-    brand:HERMES_CAN
+    brand: SOCKET_CAN_RAW
     type: PCI_CARD
-    channel_id: CHANNEL_ID_TWO
+    channel_id: CHANNEL_ID_ONE
   }
 
   enable_debug_mode: false
