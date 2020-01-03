@@ -70,7 +70,7 @@ For those developers that would like to continue working with Ubuntu 14.04, plea
 
 The following diagram highlights the scope and features of each Apollo release:
 
-![](docs/demo_guide/images/Apollo_Roadmap.png)
+![](docs/demo_guide/images/Apollo_Roadmap_5.5.png)
 
 [**Apollo 1.0:**](docs/quickstart/apollo_1_0_hardware_system_installation_guide.md)
 
