@@ -1,17 +1,17 @@
-# Apollo 5.0 Technical Tutorial
+# Apollo 5.5 Technical Tutorial
 
 ## Overview
-> Learn how to setup Apollo 5.0
+> Learn how to setup Apollo 5.5
 
-  * [Apollo 5.0 quick start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_5_0_quick_start.md)
+  * [Apollo 5.5 quick start](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_5_5_quick_start.md)
 
 ## Hardware system installation
-> Learn the procedure of Apollo 5.0 hardware system installation
+> Learn the procedure of Apollo 5.5 hardware system installation
 
-  * [Apollo 5.0 Hardware System Installation guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_3_5_hardware_system_installation_guide.md)
+  * [Apollo 5.5 Hardware System Installation guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_3_5_hardware_system_installation_guide.md) - The Hardware setup for Apollo 5.5 remains the same as Apollo 3.5
 
 ## Software installation
-> Apollo 5.0 Software and Dreamview installation
+> Apollo 5.5 Software and Dreamview installation
 
 * [Apollo software installation guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_software_installation_guide.md)
 * [How to Build and Release](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md)
@@ -21,14 +21,14 @@
 ## Apollo Cyber
 > All you need to know about Apollo Cyber RT
 
-* [Apollo 5.0 all you need to know about Cyber RT](https://github.com/ApolloAuto/apollo/blob/master/docs/cyber/README.md)
+* [Apollo 5.5 all you need to know about Cyber RT](https://github.com/ApolloAuto/apollo/blob/master/docs/cyber/README.md)
 
 ## Software architecture and algorithms
 > Deep dive into Apollo's modules and algorithms
 
-  *  [Apollo 5.0 software architecture](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Apollo_3.5_Software_Architecture.md "Apollo software architecture") - The core software architecture for Apollo 5.5 remains the same as Apollo 3.5
+  * [Apollo 5.5 software architecture](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Apollo_3.5_Software_Architecture.md "Apollo software architecture") - The core software architecture for Apollo 5.5 remains the same as Apollo 3.5
   * [3D Obstacle Perception](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/3d_obstacle_perception.md)
-  * [Apollo 5.0 Perception](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/README.md)
+  * [Apollo 5.5 Perception](https://github.com/ApolloAuto/apollo/blob/master/modules/perception/README.md)
   * [Open Space Planner](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/Open_Space_Planner.md)
   * [QP-Spline-Path Optimizer](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/qp_spline_path_optimizer.md)
   * [QP-Spline-ST-Speed Optimizer](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/qp_spline_st_speed_optimizer.md)
