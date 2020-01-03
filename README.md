@@ -31,7 +31,7 @@ For business and partnership, please visit [our website](http://apollo.auto).
 
 ## Getting Started
 
-Apollo 5.0 is loaded with new modules and features but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding of Apollo's core technology and platform.
+Apollo 5.5 is loaded with new modules and features but needs to be calibrated and configured perfectly before you take it for a spin. Please review the prerequisites and installation steps in detail to ensure that you are well equipped to build and launch Apollo. You could also check out Apollo's architecture overview for a greater understanding of Apollo's core technology and platform.
 
 **[Attention]** The Apollo team is proud to announce that the platform has been migrated to Ubuntu 18.04, one of the most requested upgrades from our developers. We do not expect a disruption to your current work with the Apollo platform, but for perception related code, you would need to:
 
@@ -55,7 +55,7 @@ For those developers that would like to continue working with Ubuntu 14.04, plea
 
 * A machine with a 4-core processor and 8GB memory minimum (16GB for Apollo 3.5 and above)
 
-* Ubuntu 14.04
+* Ubuntu 18.04
 
 * Working knowledge of Docker
 
