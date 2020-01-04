@@ -15,8 +15,9 @@
  *****************************************************************************/
 #pragma once
 
-#include <Eigen/Core>
 #include <vector>
+
+#include "Eigen/Core"
 
 #include "cyber/common/log.h"
 #include "modules/perception/base/box.h"

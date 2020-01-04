@@ -16,10 +16,10 @@
 
 #include "cyber/scheduler/common/pin_thread.h"
 
-#include <gtest/gtest.h>
 #include <sys/syscall.h>
 #include <string>
 #include <vector>
+#include "gtest/gtest.h"
 
 #include "cyber/cyber.h"
 

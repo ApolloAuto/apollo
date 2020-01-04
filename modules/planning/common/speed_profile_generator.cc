@@ -21,8 +21,6 @@
 #include "modules/planning/common/speed_profile_generator.h"
 
 #include <algorithm>
-#include <limits>
-#include <memory>
 
 #include "cyber/common/log.h"
 #include "modules/planning/common/ego_info.h"
@@ -33,10 +31,7 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::SLPoint;
 using apollo::common::SpeedPoint;
-using apollo::common::TrajectoryPoint;
-using apollo::common::math::Vec2d;
 
 SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
     const double stop_distance) {

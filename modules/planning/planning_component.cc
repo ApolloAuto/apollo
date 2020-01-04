@@ -30,7 +30,6 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::perception::TrafficLightDetection;
 using apollo::relative_map::MapMsg;

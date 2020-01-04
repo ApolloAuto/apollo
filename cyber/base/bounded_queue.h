@@ -17,10 +17,10 @@
 #ifndef CYBER_BASE_BOUNDED_QUEUE_H_
 #define CYBER_BASE_BOUNDED_QUEUE_H_
 
-#include <stdint.h>
 #include <unistd.h>
 #include <algorithm>
 #include <atomic>
+#include <cstdint>
 #include <cstdlib>
 #include <memory>
 

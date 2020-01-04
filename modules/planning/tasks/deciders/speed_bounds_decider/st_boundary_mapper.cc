@@ -22,7 +22,6 @@
 
 #include <algorithm>
 #include <limits>
-#include <unordered_map>
 #include <utility>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -192,8 +191,6 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
     std::vector<STPoint>* upper_points,
     std::vector<STPoint>* lower_points) const {
   // Sanity checks.
-  DCHECK_NOTNULL(upper_points);
-  DCHECK_NOTNULL(lower_points);
   DCHECK(upper_points->empty());
   DCHECK(lower_points->empty());
   DCHECK_GT(path_points.size(), 0);

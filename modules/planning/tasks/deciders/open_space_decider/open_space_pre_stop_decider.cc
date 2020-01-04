@@ -20,7 +20,6 @@
 
 #include "modules/planning/tasks/deciders/open_space_decider/open_space_pre_stop_decider.h"
 
-#include <algorithm>
 #include <string>
 #include <vector>
 

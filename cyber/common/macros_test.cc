@@ -16,7 +16,7 @@
 
 #include "cyber/common/macros.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {

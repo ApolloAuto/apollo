@@ -16,7 +16,6 @@
 
 #include "modules/planning/common/util/util.h"
 
-#include <cmath>
 #include <limits>
 #include <vector>
 
@@ -31,7 +30,6 @@ namespace util {
 
 using apollo::common::VehicleState;
 using apollo::hdmap::PathOverlap;
-using apollo::perception::TrafficLight;
 using apollo::routing::RoutingResponse;
 
 bool IsVehicleStateValid(const VehicleState& vehicle_state) {

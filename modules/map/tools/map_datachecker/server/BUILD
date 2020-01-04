@@ -4,13 +4,6 @@ package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "map_datachecker_server",
-    deps = [
-        ":map_datachecker_server_lib",
-    ],
-)
-
-cc_library(
-    name = "map_datachecker_server_lib",
     srcs = ["main.cc"],
     deps = [
         ":worker",
@@ -22,13 +15,11 @@ cc_library(
     name = "channel_verify",
     srcs = ["channel_verify.cc"],
     hdrs = ["channel_verify.h"],
-    linkopts = [
-        "-lboost_filesystem",
-    ],
     deps = [
         ":common",
         "//cyber",
         "//modules/map/tools/map_datachecker/proto:map_datachecker_proto",
+        "@boost",
     ],
 )
 
@@ -36,13 +27,11 @@ cc_library(
     name = "channel_verify_agent",
     srcs = ["channel_verify_agent.cc"],
     hdrs = ["channel_verify_agent.h"],
-    linkopts = [
-        "-lgrpc++",
-    ],
     deps = [
         ":channel_verify",
         "//modules/map/tools/map_datachecker/proto:map_datachecker_grpc",
         "//modules/map/tools/map_datachecker/proto:map_datachecker_proto",
+        "@com_github_grpc_grpc//:grpc++",
     ],
 )
 
@@ -50,11 +39,9 @@ cc_library(
     name = "common",
     srcs = ["common.cc"],
     hdrs = ["common.h"],
-    linkopts = [
-        "-lboost_filesystem",
-    ],
     deps = [
         "//cyber",
+        "@boost",
     ],
 )
 
@@ -65,14 +52,12 @@ cc_library(
         "alignment.h",
         "eight_route.h",
     ],
-    linkopts = [
-        "-lgrpc++",
-    ],
     deps = [
         ":common",
         ":worker_gflags",
         "//cyber",
         "//modules/map/tools/map_datachecker/proto:map_datachecker_proto",
+        "@com_github_grpc_grpc//:grpc++",
     ],
 )
 
@@ -80,12 +65,10 @@ cc_library(
     name = "laps_checker",
     srcs = ["laps_checker.cc"],
     hdrs = ["laps_checker.h"],
-    linkopts = [
-        "-lboost_filesystem",
-    ],
     deps = [
         ":common",
         "//modules/map/tools/map_datachecker/proto:map_datachecker_proto",
+        "@boost",
     ],
 )
 
@@ -93,13 +76,11 @@ cc_library(
     name = "loops_verify_agent",
     srcs = ["loops_verify_agent.cc"],
     hdrs = ["loops_verify_agent.h"],
-    linkopts = [
-        "-lgrpc++",
-    ],
     deps = [
         ":laps_checker",
         ":pose_collection_agent",
         "//modules/map/tools/map_datachecker/proto:map_datachecker_grpc",
+        "@com_github_grpc_grpc//:grpc++",
     ],
 )
 
@@ -155,9 +136,6 @@ cc_library(
     name = "worker",
     srcs = ["worker.cc"],
     hdrs = ["worker.h"],
-    linkopts = [
-        "-lgrpc++",
-    ],
     deps = [
         ":eight_route",
         ":static_align",
@@ -165,6 +143,7 @@ cc_library(
         ":worker_cyber_node",
         ":worker_gflags",
         "//cyber",
+        "@com_github_grpc_grpc//:grpc++",
     ],
 )
 
@@ -175,9 +154,6 @@ cc_library(
         "alignment_agent.h",
         "worker_agent.h",
     ],
-    linkopts = [
-        "-lgrpc++",
-    ],
     deps = [
         ":channel_verify_agent",
         ":common",
@@ -187,6 +163,7 @@ cc_library(
         ":static_align",
         "//modules/map/tools/map_datachecker/proto:map_datachecker_grpc",
         "//modules/map/tools/map_datachecker/proto:map_datachecker_proto",
+        "@com_github_grpc_grpc//:grpc++",
     ],
 )
 

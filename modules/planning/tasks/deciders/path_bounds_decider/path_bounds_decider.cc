@@ -21,11 +21,6 @@
 #include <limits>
 #include <memory>
 #include <set>
-#include <string>
-#include <tuple>
-#include <unordered_map>
-#include <utility>
-#include <vector>
 
 #include "absl/strings/str_cat.h"
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -44,7 +39,6 @@ using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::JunctionInfo;
-using apollo::hdmap::PNCJunctionInfo;
 
 namespace {
 // PathBoundPoint contains: (s, l_min, l_max).
@@ -1793,7 +1787,8 @@ bool PathBoundsDecider::CheckLaneBoundaryType(
   }
 
   const auto waypoint = ref_point.lane_waypoints().front();
-  hdmap::LaneBoundaryType::Type lane_boundary_type;
+  hdmap::LaneBoundaryType::Type lane_boundary_type =
+      hdmap::LaneBoundaryType::UNKNOWN;
   if (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW) {
     lane_boundary_type = hdmap::LeftBoundaryType(waypoint);
   } else if (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW) {

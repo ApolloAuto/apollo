@@ -21,9 +21,9 @@
 #ifndef CYBER_COMMON_LOG_H_
 #define CYBER_COMMON_LOG_H_
 
-#include <stdarg.h>
-
+#include <cstdarg>
 #include <string>
+
 #include "cyber/binary.h"
 #include "glog/logging.h"
 #include "glog/raw_logging.h"

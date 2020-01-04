@@ -630,10 +630,7 @@ cc_test(
     size = "small",
     srcs = ["camera_app_cipv_camera_test.cc"],
     linkopts = [
-        "-lopencv_core",
         "-lnvinfer_plugin",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
     ],
     deps = [
         "//cyber",
@@ -641,6 +638,7 @@ cc_test(
         "//modules/perception/camera/app:cipv_camera",
         "//modules/perception/common/io:io_util",
         "@gtest//:main",
+        "@opencv",
     ],
 )
 

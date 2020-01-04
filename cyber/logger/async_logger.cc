@@ -16,7 +16,7 @@
 
 #include "cyber/logger/async_logger.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <string>
 #include <thread>
 #include <unordered_map>

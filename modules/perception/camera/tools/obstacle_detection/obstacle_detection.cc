@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
-#include <opencv2/opencv.hpp>
 
 #include <fstream>
+
+#include "gtest/gtest.h"
+#include "opencv2/opencv.hpp"
 
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/base/object_types.h"

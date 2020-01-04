@@ -9,10 +9,7 @@ cc_binary(
         ".",
     ],
     linkopts = [
-        "-lfastrtps",
         "-lconsole_bridge",
-        "-lprotobuf",
-        "-lglog",
         "-lpthread",
         "-lGL",
         "-lQt5Core",
@@ -22,6 +19,7 @@ cc_binary(
     ],
     deps = [
         ":visualizer_lib",
+        "@fastrtps",
     ],
 )
 

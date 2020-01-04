@@ -16,9 +16,9 @@
 
 #include "cyber/data/channel_buffer.h"
 
-#include <gtest/gtest.h>
 #include <memory>
 #include <vector>
+#include "gtest/gtest.h"
 
 #include "cyber/common/util.h"
 

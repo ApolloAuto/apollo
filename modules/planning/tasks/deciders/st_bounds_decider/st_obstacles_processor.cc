@@ -21,11 +21,7 @@
 #include "modules/planning/tasks/deciders/st_bounds_decider/st_obstacles_processor.h"
 
 #include <algorithm>
-#include <limits>
-#include <tuple>
-#include <unordered_map>
 #include <unordered_set>
-#include <utility>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/decision.pb.h"
@@ -181,7 +177,7 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     } else {
       // Obstacle is dynamic.
       if (boundary.bottom_left_point().s() - adc_path_init_s_ <
-          kSIgnoreThreshold &&
+              kSIgnoreThreshold &&
           boundary.bottom_left_point().t() > kTIgnoreThreshold) {
         // Ignore obstacles that are behind.
         // TODO(jiacheng): don't ignore if ADC is in dangerous segments.

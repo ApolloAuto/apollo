@@ -17,7 +17,7 @@
 #ifndef CYBER_TOOLS_CYBER_RECORDER_PLAYER_PLAY_PARAM_H_
 #define CYBER_TOOLS_CYBER_RECORDER_PLAYER_PLAY_PARAM_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include <set>
 #include <string>
 

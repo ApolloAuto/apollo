@@ -16,9 +16,9 @@
 
 #include "cyber/sysmo/sysmo.h"
 
-#include <gtest/gtest.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <thread>
+#include "gtest/gtest.h"
 
 #include "cyber/common/environment.h"
 #include "cyber/scheduler/scheduler_factory.h"

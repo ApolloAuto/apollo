@@ -60,7 +60,6 @@ using apollo::hdmap::HDMapUtil;
 using apollo::planning_internal::SLFrameDebug;
 using apollo::planning_internal::SpeedPlan;
 using apollo::planning_internal::STGraphDebug;
-using apollo::routing::RoutingResponse;
 
 OnLanePlanning::~OnLanePlanning() {
   if (reference_line_provider_) {

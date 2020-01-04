@@ -18,9 +18,9 @@
 #define CYBER_MESSAGE_MESSAGE_HEADER_H_
 
 #include <arpa/inet.h>
-#include <stdint.h>
-#include <string.h>
 #include <algorithm>
+#include <cstdint>
+#include <cstring>
 #include <string>
 
 namespace apollo {

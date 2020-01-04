@@ -20,12 +20,8 @@
 
 #include "modules/planning/tasks/deciders/st_bounds_decider/st_driving_limits.h"
 
-#include <utility>
-
 namespace apollo {
 namespace planning {
-
-using apollo::common::Status;
 
 void STDrivingLimits::Init(const double max_acc, const double max_dec,
                            const double max_v, double curr_v) {

@@ -20,9 +20,6 @@
 
 #pragma once
 
-#include <array>
-#include <cmath>
-
 namespace apollo {
 namespace planning {
 

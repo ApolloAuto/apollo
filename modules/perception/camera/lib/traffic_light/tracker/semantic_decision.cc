@@ -15,9 +15,9 @@
  *****************************************************************************/
 #include "modules/perception/camera/lib/traffic_light/tracker/semantic_decision.h"
 
-#include <boost/bind.hpp>
 #include <map>
 
+#include "boost/bind.hpp"
 #include "cyber/common/file.h"
 
 namespace apollo {

@@ -16,11 +16,13 @@
 
 #pragma once
 
-#include <Eigen/Eigenvalues>
 #include <limits>
 #include <memory>
 #include <unordered_map>
 #include <vector>
+
+#include "Eigen/Eigenvalues"
+
 #include "modules/localization/msf/local_map/base_map/base_map_config.h"
 #include "modules/localization/msf/local_map/base_map/base_map_matrix.h"
 

@@ -16,9 +16,6 @@
 
 #include "modules/planning/scenarios/park_and_go/stage_cruise.h"
 
-#include <string>
-#include <vector>
-
 #include "cyber/common/log.h"
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"

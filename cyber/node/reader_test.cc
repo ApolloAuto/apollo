@@ -16,8 +16,8 @@
 
 #include "cyber/node/reader.h"
 
-#include <gtest/gtest.h>
 #include <string>
+#include "gtest/gtest.h"
 
 #include "cyber/cyber.h"
 #include "cyber/init.h"

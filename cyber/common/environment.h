@@ -17,7 +17,7 @@
 #ifndef CYBER_COMMON_ENVIRONMENT_H_
 #define CYBER_COMMON_ENVIRONMENT_H_
 
-#include <assert.h>
+#include <cassert>
 #include <string>
 
 #include "cyber/common/log.h"

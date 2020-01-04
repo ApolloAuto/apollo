@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "cyber/init.h"
 #include "modules/localization/msf/local_map/lossless_map/lossless_map_config.h"

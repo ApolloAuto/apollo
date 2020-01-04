@@ -23,16 +23,10 @@
 namespace apollo {
 namespace perception {
 namespace inference {
-__global__ void resize_linear_kernel(const unsigned char *src,
-                     float *dst,
-                     int channel,
-                     int height,
-                     int width,
-                     int stepwidth,
-                     int dst_height,
-                     int dst_width,
-                     float fx,
-                     float fy) {
+__global__ void resize_linear_kernel(const unsigned char *src, float *dst,
+                                     int channel, int height, int width,
+                                     int stepwidth, int dst_height,
+                                     int dst_width, float fx, float fy) {
   const int dst_x = blockDim.x * blockIdx.x + threadIdx.x;
   const int dst_y = blockDim.y * blockIdx.y + threadIdx.y;
   if (dst_x < dst_width && dst_y < dst_height) {
@@ -83,13 +77,11 @@ int divup(int a, int b) {
   }
 }
 
-bool resize(int origin_channel,
-       int origin_height,
-       int origin_width,
-       int stepwidth,
-       std::shared_ptr <apollo::perception::base::Blob<float>> dst,
-       std::shared_ptr <apollo::perception::base::SyncedMemory> src_gpu,
-       int start_axis) {
+bool resize(int origin_channel, int origin_height, int origin_width,
+            int stepwidth,
+            std::shared_ptr<apollo::perception::base::Blob<float>> dst,
+            std::shared_ptr<apollo::perception::base::SyncedMemory> src_gpu,
+            int start_axis) {
   int width = dst->shape(2);
   int height = dst->shape(1);
   int channel = dst->shape(3);
@@ -108,10 +100,10 @@ bool resize(int origin_channel,
 
   const dim3 grid(divup(width, block.x), divup(height, block.y));
 
-  resize_linear_kernel << < grid, block >>
-      > ((const unsigned char *) src_gpu->gpu_data(), dst->mutable_gpu_data(),
-          origin_channel, origin_height, origin_width,
-          stepwidth, height, width, fx, fy);
+  resize_linear_kernel<<<grid, block>>>(
+      (const unsigned char *)src_gpu->gpu_data(), dst->mutable_gpu_data(),
+      origin_channel, origin_height, origin_width, stepwidth, height, width, fx,
+      fy);
   return true;
 }
 }  // namespace inference

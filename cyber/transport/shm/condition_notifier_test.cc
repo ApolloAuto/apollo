@@ -16,7 +16,7 @@
 
 #include "cyber/transport/shm/condition_notifier.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {

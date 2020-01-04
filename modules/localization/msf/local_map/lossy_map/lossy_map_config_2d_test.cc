@@ -16,7 +16,7 @@
 
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_config_2d.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace localization {

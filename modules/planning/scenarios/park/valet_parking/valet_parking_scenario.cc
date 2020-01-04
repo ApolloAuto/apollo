@@ -18,24 +18,18 @@
  * @file
  **/
 
-#include <string>
-#include <vector>
+#include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
 
 #include "modules/planning/scenarios/park/valet_parking/stage_approaching_parking_spot.h"
 #include "modules/planning/scenarios/park/valet_parking/stage_parking.h"
-#include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace valet_parking {
 
-using apollo::common::Status;
 using apollo::common::VehicleState;
-using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
-using apollo::hdmap::HDMapUtil;
-using apollo::hdmap::LaneSegment;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
 using apollo::hdmap::Path;
 using apollo::hdmap::PathOverlap;

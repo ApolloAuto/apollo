@@ -16,12 +16,14 @@
 
 #pragma once
 
-#include <pcl/point_cloud.h>
-#include <pcl/point_types.h>
-#include <Eigen/Core>
-#include <Eigen/Geometry>
 #include <string>
 #include <vector>
+
+#include "Eigen/Core"
+#include "Eigen/Geometry"
+#include "pcl/point_cloud.h"
+#include "pcl/point_types.h"
+
 #include "modules/localization/ndt/ndt_locator/ndt_solver.h"
 #include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map.h"
 #include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_node.h"
@@ -35,7 +37,7 @@
 #define VIS_USE_OPENCV_ON
 #endif
 #ifdef VIS_USE_OPENCV_ON
-#include <opencv2/opencv.hpp>
+#include "opencv2/opencv.hpp"
 void color_mapping(float value, float midvalue, unsigned char* r,
                    unsigned char* g, unsigned char* b) {
   if (value > 1.f) {

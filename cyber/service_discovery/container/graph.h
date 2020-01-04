@@ -17,7 +17,7 @@
 #ifndef CYBER_SERVICE_DISCOVERY_CONTAINER_GRAPH_H_
 #define CYBER_SERVICE_DISCOVERY_CONTAINER_GRAPH_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 #include <unordered_map>
 

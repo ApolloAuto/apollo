@@ -561,9 +561,9 @@ void ReferenceLineInfo::SetTurnSignalBasedOnLaneTurnType(
       vehicle_signal->turn_signal() != VehicleSignal::TURN_NONE) {
     return;
   }
-
-  // set turn signal based on change lane
   vehicle_signal->set_turn_signal(VehicleSignal::TURN_NONE);
+
+  // Set turn signal based on lane-change.
   if (IsChangeLanePath()) {
     if (Lanes().PreviousAction() == routing::ChangeLaneType::LEFT) {
       vehicle_signal->set_turn_signal(VehicleSignal::TURN_LEFT);
@@ -572,7 +572,18 @@ void ReferenceLineInfo::SetTurnSignalBasedOnLaneTurnType(
     }
     return;
   }
-  // check lane's turn type
+
+  // Set turn signal based on lane-borrow.
+  if (path_data_.path_label().find("left") != std::string::npos) {
+    vehicle_signal->set_turn_signal(VehicleSignal::TURN_LEFT);
+    return;
+  }
+  if (path_data_.path_label().find("right") != std::string::npos) {
+    vehicle_signal->set_turn_signal(VehicleSignal::TURN_RIGHT);
+    return;
+  }
+
+  // Set turn signal based on lane's turn type.
   double route_s = 0.0;
   const double adc_s = adc_sl_boundary_.end_s();
   for (const auto& seg : Lanes()) {

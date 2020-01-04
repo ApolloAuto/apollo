@@ -16,9 +16,7 @@
 
 #include "modules/planning/scenarios/scenario_manager.h"
 
-#include <limits>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -47,7 +45,6 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 
-using apollo::common::VehicleState;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::PathOverlap;
 

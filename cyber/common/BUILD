@@ -39,11 +39,9 @@ cc_test(
 cc_library(
     name = "log",
     hdrs = ["log.h"],
-    linkopts = [
-        "-lglog",
-    ],
     deps = [
         "//cyber:binary",
+        "@glog",
     ],
 )
 

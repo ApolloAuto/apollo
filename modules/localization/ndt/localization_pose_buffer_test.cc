@@ -15,10 +15,13 @@
  *****************************************************************************/
 
 #include "modules/localization/ndt/localization_pose_buffer.h"
-#include <Eigen/Core>
-#include <Eigen/Geometry>
+
 #include <memory>
+
+#include "Eigen/Core"
+#include "Eigen/Geometry"
 #include "gtest/gtest.h"
+
 #include "modules/common/time/time.h"
 
 namespace apollo {

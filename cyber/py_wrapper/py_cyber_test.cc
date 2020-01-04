@@ -16,10 +16,10 @@
 
 #include "cyber/py_wrapper/py_cyber.h"
 
-#include <gtest/gtest.h>
-
 #include <memory>
 #include <string>
+
+#include "gtest/gtest.h"
 
 #include "cyber/cyber.h"
 #include "cyber/message/py_message.h"

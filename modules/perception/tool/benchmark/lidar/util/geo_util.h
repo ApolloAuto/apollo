@@ -15,9 +15,11 @@
  *****************************************************************************/
 #pragma once
 
-#include <Eigen/Core>
 #include <algorithm>
 #include <limits>
+
+#include "Eigen/Core"
+
 #include "modules/perception/tool/benchmark/lidar/util/types.h"
 
 namespace apollo {

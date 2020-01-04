@@ -17,7 +17,7 @@
 #ifndef CYBER_RECORD_RECORD_BASE_H_
 #define CYBER_RECORD_RECORD_BASE_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include <set>
 #include <string>
 

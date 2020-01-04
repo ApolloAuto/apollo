@@ -17,8 +17,8 @@
 #ifndef CYBER_TOOLS_CYBER_RECORDER_PLAYER_PLAY_TASK_H_
 #define CYBER_TOOLS_CYBER_RECORDER_PLAYER_PLAY_TASK_H_
 
-#include <stdint.h>
 #include <atomic>
+#include <cstdint>
 #include <memory>
 
 #include "cyber/message/raw_message.h"

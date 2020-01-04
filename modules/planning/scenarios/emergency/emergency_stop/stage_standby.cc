@@ -37,7 +37,6 @@ namespace scenario {
 namespace emergency_stop {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::VehicleConfigHelper;
 
 Stage::StageStatus EmergencyStopStageStandby::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {

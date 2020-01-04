@@ -28,8 +28,6 @@
 namespace apollo {
 namespace planning {
 
-using apollo::perception::PerceptionObstacle;
-
 Obstacle *PathDecision::AddObstacle(const Obstacle &obstacle) {
   return obstacles_.Add(obstacle.Id(), obstacle);
 }

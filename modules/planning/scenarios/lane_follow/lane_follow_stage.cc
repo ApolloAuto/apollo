@@ -20,8 +20,6 @@
 
 #include "modules/planning/scenarios/lane_follow/lane_follow_stage.h"
 
-#include <algorithm>
-#include <limits>
 #include <utility>
 
 #include "cyber/common/log.h"

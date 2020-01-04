@@ -16,8 +16,9 @@
 
 #include "modules/dreamview/backend/perception_camera_updater/perception_camera_updater.h"
 
-#include <float.h>
+#include <cfloat>
 #include <string>
+
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/proto/geometry.pb.h"
