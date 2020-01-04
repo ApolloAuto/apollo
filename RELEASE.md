@@ -6,10 +6,10 @@ The car has complete 360-degree visibility, along with upgraded perception deep 
 ## Major Features And Improvements
 * Brand new Data Pipeline Service
     * Sensor Calibration service
-* Brand new module - Story Telling
+* Brand new module - Storytelling
 * Scenario - Based Planning with a new planning scenarios to support curb-to-curb driving
-    * Park and go
-    * Emergency pull over 
+    * Park-and-go
+    * Emergency
 * Prediction Model - Caution Obstacle 
     * Semantic LSTM evaluator
     * Extrapolation predictor
