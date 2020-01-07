@@ -96,7 +96,7 @@ ros使用yaml文件来描述两个传感器之间的位置、姿态的关系，�
 | localization.conf    | 确认`enable_lidar_localization`为`false`;所有传感器标定完成后，需要再改为`true`|
 |localization.conf     | 根据实际修改`lidar_height_default`参数|
 |localization.conf     |根据实际修改`local_utm_zone_id`参数|
-|localization.conf | 根据实际修改`imu_to_ant_offset_x`参数|
+|localization.conf | 根据IMU到天线的位置实际修改`imu_to_ant_offset_x`参数|
 |localization.conf| 根据实际修改`imu_to_ant_offset_y`参数|
 |localization.conf| 根据实际修改`imu_to_ant_offset_z`参数|
 |localization.conf| 根据实际修改`imu_to_ant_offset_ux`参数|
