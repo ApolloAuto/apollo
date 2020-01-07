@@ -34,9 +34,9 @@ using apollo::planning::DrivingAction;
 using apollo::planning::PadMessage;
 using apollo::planning::ScenarioConfig;
 using ::google::protobuf::util::MessageToJsonString;
-using modules::teleop::network::ModemInfo;
-using modules::teleop::teleop::DaemonServiceCmd;
-using modules::teleop::teleop::DaemonServiceRpt;
+using modules::teleop::modem::ModemInfo;
+using modules::teleop::daemon::DaemonServiceCmd;
+using modules::teleop::daemon::DaemonServiceRpt;
 
 // modem ids
 const std::string modem0_id = "0";
