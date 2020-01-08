@@ -46,7 +46,6 @@
 
 namespace apollo {
 namespace planning {
-#define ADEBUG AINFO
 using apollo::canbus::Chassis;
 using apollo::common::EngageAdvice;
 using apollo::common::ErrorCode;
@@ -189,7 +188,7 @@ void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* ptr_trajectory_pb) {
 
 void OnLanePlanning::RunOnce(const LocalView& local_view,
                              ADCTrajectory* const ptr_trajectory_pb) {
-  static bool estop = false;
+  static bool estop_after_rerouting = false;
   local_view_ = local_view;
   const double start_timestamp = Clock::NowInSeconds();
   const double start_system_timestamp =
@@ -233,10 +232,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
       FLAGS_message_latency_threshold) {
     vehicle_state = AlignTimeStamp(vehicle_state, start_timestamp);
   }
-
-  AERROR << "Is Different Routing:"
-         << util::IsDifferentRouting(last_routing_, *local_view_.routing);
-  AERROR << "reference_line_provider_->UpdatedReferenceLine(): "
+  AERROR << "is_reference_line_updated: "
          << reference_line_provider_->UpdatedReferenceLine();
   if (util::IsDifferentRouting(last_routing_, *local_view_.routing)) {
     last_routing_ = *local_view_.routing;
@@ -245,11 +241,46 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     PlanningContext::Instance()->mutable_planning_status()->Clear();
     reference_line_provider_->UpdateRoutingResponse(*local_view_.routing);
     // when failing to update reference line at given routing
-    AERROR << "reference_line_provider_->UpdatedReferenceLine(): "
-           << reference_line_provider_->UpdatedReferenceLine();
-    estop = (!reference_line_provider_->UpdatedReferenceLine());
-    AERROR << "estop:" << estop;
+    // estop_after_rerouting =
+    // (!reference_line_provider_->UpdatedReferenceLine()); AERROR << "estop:"
+    // << estop_after_rerouting;  // check if estop is triggered
+
+    // if (estop_after_rerouting) {
+    //   std::string msg("Failed to updated reference line after rerouting.");
+    //   AERROR << msg;
+    //   ptr_trajectory_pb->mutable_decision()
+    //       ->mutable_main_decision()
+    //       ->mutable_not_ready()
+    //       ->set_reason(msg);
+    //   AERROR << "estop:" << msg;  // check if estop is triggered
+    //   status.Save(ptr_trajectory_pb->mutable_header()->mutable_status());
+    //   ptr_trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
+    //   FillPlanningPb(start_timestamp, ptr_trajectory_pb);
+    //   GenerateStopTrajectory(ptr_trajectory_pb);
+    //   return;
+    // }
     planner_->Init(config_);
+  }
+
+  estop_after_rerouting =
+      ((!reference_line_provider_->UpdatedReferenceLine()) &&
+       (VehicleStateProvider::Instance()->vehicle_state().driving_mode() ==
+        Chassis::DrivingMode::Chassis_DrivingMode_COMPLETE_AUTO_DRIVE));
+  AERROR << "estop:" << estop_after_rerouting;  // check if estop is triggered
+
+  if (estop_after_rerouting) {
+    std::string msg("Failed to updated reference line after rerouting.");
+    AERROR << msg;
+    ptr_trajectory_pb->mutable_decision()
+        ->mutable_main_decision()
+        ->mutable_not_ready()
+        ->set_reason(msg);
+    AERROR << "estop:" << msg;  // check if estop is triggered
+    status.Save(ptr_trajectory_pb->mutable_header()->mutable_status());
+    ptr_trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
+    FillPlanningPb(start_timestamp, ptr_trajectory_pb);
+    GenerateStopTrajectory(ptr_trajectory_pb);
+    return;
   }
 
   // Update reference line provider and reset pull over if necessary
@@ -271,7 +302,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
   status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
 
-  if (status.ok() && !estop) {
+  if (status.ok() && !estop_after_rerouting) {
     EgoInfo::Instance()->CalculateFrontObstacleClearDistance(
         frame_->obstacles());
   }
@@ -281,10 +312,11 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   }
   ptr_trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
       Clock::NowInSeconds() - start_timestamp);
-  if (!status.ok() || estop) {
-    AERROR << "estop:" << estop;
-    AERROR << status.ToString();
 
+  // early return when reference line fails to update after rerouting
+  if (!status.ok() || estop_after_rerouting) {
+    AERROR << status.ToString();
+    AERROR << "estop:" << estop_after_rerouting;
     if (FLAGS_publish_estop) {
       // "estop" signal check in function "Control::ProduceControlCommand()"
       // estop_ = estop_ || local_view_.trajectory.estop().is_estop();
@@ -292,14 +324,27 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
       ADCTrajectory estop_trajectory;
       EStop* estop = estop_trajectory.mutable_estop();
       estop->set_is_estop(true);
-      estop->set_reason(status.error_message());
+      if (estop_after_rerouting) {
+        estop->set_reason("Failed to updated reference line after rerouting.");
+      } else {
+        estop->set_reason(status.error_message());
+      }
       status.Save(estop_trajectory.mutable_header()->mutable_status());
       ptr_trajectory_pb->CopyFrom(estop_trajectory);
     } else {
-      ptr_trajectory_pb->mutable_decision()
-          ->mutable_main_decision()
-          ->mutable_not_ready()
-          ->set_reason(status.ToString());
+      AERROR << "estop:" << estop_after_rerouting;
+      if (estop_after_rerouting) {
+        ptr_trajectory_pb->mutable_decision()
+            ->mutable_main_decision()
+            ->mutable_not_ready()
+            ->set_reason("Failed to updated reference line after rerouting.");
+        AERROR << "estop:" << estop_after_rerouting;
+      } else {
+        ptr_trajectory_pb->mutable_decision()
+            ->mutable_main_decision()
+            ->mutable_not_ready()
+            ->set_reason(status.ToString());
+      }
       status.Save(ptr_trajectory_pb->mutable_header()->mutable_status());
       GenerateStopTrajectory(ptr_trajectory_pb);
     }
