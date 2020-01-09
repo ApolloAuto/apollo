@@ -26,8 +26,8 @@
 #include "modules/planning/proto/pad_msg.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/teleop/modem/proto/modem_info.pb.h"
-#include "modules/teleop/daemon/proto/daemon_service_cmd.pb.h"
-#include "modules/teleop/daemon/proto/daemon_service_rpt.pb.h"
+#include "modules/teleop/daemon/proto/daemon_cmd.pb.h"
+#include "modules/teleop/daemon/proto/daemon_rpt.pb.h"
 #endif
 
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
@@ -82,17 +82,17 @@ class TeleopService {
 
   // daemon report readers and callback
   void UpdateCarDaemonRpt(
-      const std::shared_ptr<modules::teleop::daemon::DaemonServiceRpt> &rpt);
+      const std::shared_ptr<modules::teleop::daemon::DaemonRpt> &rpt);
   void UpdateOperatorDaemonRpt(
-      const std::shared_ptr<modules::teleop::daemon::DaemonServiceRpt> &rpt);
-  std::shared_ptr<cyber::Reader<modules::teleop::daemon::DaemonServiceRpt>>
+      const std::shared_ptr<modules::teleop::daemon::DaemonRpt> &rpt);
+  std::shared_ptr<cyber::Reader<modules::teleop::daemon::DaemonRpt>>
       remote_daemon_rpt_reader_;
-  std::shared_ptr<cyber::Reader<modules::teleop::daemon::DaemonServiceRpt>>
+  std::shared_ptr<cyber::Reader<modules::teleop::daemon::DaemonRpt>>
       local_daemon_rpt_reader_;
   // daemon commands writers
-  std::shared_ptr<cyber::Writer<modules::teleop::daemon::DaemonServiceCmd>>
+  std::shared_ptr<cyber::Writer<modules::teleop::daemon::DaemonCmd>>
       remote_daemon_cmd_writer_;
-  std::shared_ptr<cyber::Writer<modules::teleop::daemon::DaemonServiceCmd>>
+  std::shared_ptr<cyber::Writer<modules::teleop::daemon::DaemonCmd>>
       local_daemon_cmd_writer_;
 
   // planning driving actions  and feedback
