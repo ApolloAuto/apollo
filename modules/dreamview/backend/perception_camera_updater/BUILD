@@ -7,6 +7,11 @@ cc_library(
     srcs = ["perception_camera_updater.cc"],
     hdrs = ["perception_camera_updater.h"],
     copts = ['-DMODULE_NAME=\\"dreamview\\"'],
+    linkopts = [
+        "-lopencv_core",
+        "-lopencv_highgui",
+        "-lopencv_imgproc",
+    ],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
@@ -18,7 +23,6 @@ cc_library(
         "//modules/transform:tf2_buffer_lib",
         "//modules/transform/proto:transform_proto",
         "@eigen",
-        "@opencv",
     ],
 )
 
