@@ -83,8 +83,8 @@ data_files {
   dest_path: "/apollo/cyber/conf"
 }
 data_files {
-  source_path: "teleop_conf/teleop/daemon_service_conf.pb.txt"
-  dest_path: "/apollo/modules/teleop/daemon/daemon_service_conf.pb.txt"
+  source_path: "teleop_conf/teleop/daemon_conf.pb.txt"
+  dest_path: "/apollo/modules/teleop/daemon/daemon_conf.pb.txt"
 }
 data_files {
   source_path: "teleop_conf/voip_decoder/voip_decoder_conf.pb.txt"
@@ -95,8 +95,8 @@ data_files {
   dest_path: "/apollo/modules/teleop/voip_encoder/conf/voip_encoder_conf.pb.txt"
 }
 data_files {
-  source_path: "teleop_conf/daemon/daemon_service_conf.pb.txt"
-  dest_path: "/apollo/modules/teleop/daemon/conf/daemon_service_conf.pb.txt"
+  source_path: "teleop_conf/daemon/daemon_conf.pb.txt"
+  dest_path: "/apollo/modules/teleop/daemon/conf/daemon_conf.pb.txt"
 }
 data_files {
   source_path: "teleop_conf/modem/modem_monitor_node_conf.pb.txt"
