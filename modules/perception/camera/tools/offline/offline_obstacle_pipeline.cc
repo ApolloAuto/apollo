@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <opencv2/opencv.hpp>
+
 #include <fstream>
 #include <iomanip>
 
 #include "absl/strings/str_split.h"
-#include "opencv2/opencv.hpp"
-
 #include "cyber/common/file.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/app/obstacle_camera_perception.h"

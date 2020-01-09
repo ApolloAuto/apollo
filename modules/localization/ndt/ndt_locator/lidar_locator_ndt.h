@@ -37,7 +37,7 @@
 #define VIS_USE_OPENCV_ON
 #endif
 #ifdef VIS_USE_OPENCV_ON
-#include "opencv2/opencv.hpp"
+#include <opencv2/opencv.hpp>
 void color_mapping(float value, float midvalue, unsigned char* r,
                    unsigned char* g, unsigned char* b) {
   if (value > 1.f) {

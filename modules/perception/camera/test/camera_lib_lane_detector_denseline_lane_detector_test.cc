@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <opencv2/opencv.hpp>
 #include "gtest/gtest.h"
-#include "opencv2/opencv.hpp"
 
 #include "cyber/common/log.h"
 #include "modules/perception/base/distortion_model.h"
