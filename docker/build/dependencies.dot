@@ -1,0 +1,4 @@
+digraph {
+  "infra" -> "bazel 0.5.3" -> "GCC 4.8";
+  "bazel 0.5.3" -> "openjdk-8-jdk";
+}

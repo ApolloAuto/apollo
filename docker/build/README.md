@@ -37,3 +37,16 @@ The best practice of a new installer would be:
 
    It would be awesome to work perfectly for different architectures such as X86
    and ARM.
+
+## Understand the dependencies
+
+To help users to understand the dependencies, we are trying to compile a high
+level [dependency graph](dependencies.dot). You can build your own Dockerfile or
+ISO package according to it.
+
+To view the graph, please run:
+
+```bash
+sudo apt install xdot
+xdot dependencies.dot
+```
