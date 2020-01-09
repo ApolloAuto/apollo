@@ -56,13 +56,13 @@ const std::string modem0_channel = "/apollo/teleop/modem/modem0";
 const std::string modem1_channel = "/apollo/teleop/modem/modem1";
 const std::string modem2_channel = "/apollo/teleop/modem/modem2";
 const std::string remote_daemon_cmd_channel =
-    "/apollo/teleop/remote/daemon_service/cmd";
+    "/apollo/teleop/daemon/remote/cmd";
 const std::string remote_daemon_rpt_channel =
-    "/apollo/teleop/remote/daemon_service/rpt";
+    "/apollo/teleop/daemon/remote/rpt";
 const std::string local_daemon_cmd_channel =
-    "/apollo/teleop/local/daemon_service/cmd";
+    "/apollo/teleop/daemon/local/cmd";
 const std::string local_daemon_rpt_channel =
-    "/apollo/teleop/local/daemon_service/rpt";
+    "/apollo/teleop/daemon/local/rpt";
 const std::string planning_channel = "/apollo/planning";
 const std::string planning_pad_channel = "/apollo/planning/pad";
 
