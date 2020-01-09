@@ -401,7 +401,7 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
 
   // For the road boundary, add key points to left/right side boundary
   // separately. Iterate s_value to check key points at a step of
-  // roi_linesegment_length. Key points include: start_point, end_point, points
+  // roi_line_segment_length. Key points include: start_point, end_point, points
   // where path curvature is large, points near left/right road-curb corners
   while (check_point_s <= end_s) {
     hdmap::MapPathPoint check_point = nearby_path.GetSmoothPoint(check_point_s);
@@ -409,7 +409,7 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
     bool is_center_lane_heading_change =
         std::abs(common::math::NormalizeAngle(check_point_heading -
                                               last_check_point_heading)) >
-        config_.open_space_roi_decider_config().roi_linesegment_min_angle();
+        config_.open_space_roi_decider_config().roi_line_segment_min_angle();
     last_check_point_heading = check_point_heading;
 
     ADEBUG << "is is_center_lane_heading_change: "
@@ -436,7 +436,7 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
     check_point_s =
         start_s +
         index *
-            config_.open_space_roi_decider_config().roi_linesegment_length();
+            config_.open_space_roi_decider_config().roi_line_segment_length();
     check_point_s = check_point_s >= end_s ? end_s : check_point_s;
   }
 
@@ -477,12 +477,15 @@ void OpenSpaceRoiDecider::AddBoundaryKeyPoint(
   //                                \               /
   //                                 *-------------*
 
-  const double previous_distance_s =
-      std::min(config_.open_space_roi_decider_config().roi_linesegment_length(),
-               check_point_s - start_s);
-  const double next_distance_s =
-      std::min(config_.open_space_roi_decider_config().roi_linesegment_length(),
-               end_s - check_point_s);
+  // road width changes slightly at the turning point of a path
+  // TODO(SHU): 1. consider distortion introduced by curvy road; 2. use both
+  // round boundaries for single-track road
+  const double previous_distance_s = std::min(
+      config_.open_space_roi_decider_config().roi_line_segment_length(),
+      check_point_s - start_s);
+  const double next_distance_s = std::min(
+      config_.open_space_roi_decider_config().roi_line_segment_length(),
+      end_s - check_point_s);
 
   hdmap::MapPathPoint current_check_point =
       nearby_path.GetSmoothPoint(check_point_s);
@@ -532,7 +535,7 @@ void OpenSpaceRoiDecider::AddBoundaryKeyPoint(
   // a key point.
   if (std::abs(current_curb_point_delta_theta) >
       config_.open_space_roi_decider_config()
-          .curb_heading_tangent_change_uppper_limit()) {
+          .curb_heading_tangent_change_upper_limit()) {
     double point_vec_cos =
         is_left_curb ? std::cos(current_check_point_heading + M_PI / 2.0)
                      : std::cos(current_check_point_heading - M_PI / 2.0);
