@@ -15,9 +15,9 @@
  *****************************************************************************/
 #pragma once
 
-#include <vector>
+#include <opencv2/opencv.hpp>
 
-#include "opencv2/opencv.hpp"
+#include <vector>
 
 #include "modules/perception/common/i_lib/core/i_blas.h"
 #include "modules/perception/common/i_lib/core/i_rand.h"
