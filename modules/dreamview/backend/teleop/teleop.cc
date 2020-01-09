@@ -52,9 +52,9 @@ const std::string start_cmd = "start";
 const std::string stop_cmd = "kill";
 
 // channels
-const std::string modem0_channel = "/apollo/teleop/network/modem0";
-const std::string modem1_channel = "/apollo/teleop/network/modem1";
-const std::string modem2_channel = "/apollo/teleop/network/modem2";
+const std::string modem0_channel = "/apollo/teleop/modem/modem0";
+const std::string modem1_channel = "/apollo/teleop/modem/modem1";
+const std::string modem2_channel = "/apollo/teleop/modem/modem2";
 const std::string remote_daemon_cmd_channel =
     "/apollo/teleop/remote/daemon_service/cmd";
 const std::string remote_daemon_rpt_channel =
