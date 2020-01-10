@@ -24,7 +24,6 @@ message OpenSpaceRoiDeciderConfig {
   optional double parking_depth_buffer = 6 [default = 0.1];
   // min angle difference to stitch a new segment in roi representation
   optional double roi_line_segment_min_angle = 7 [default = 0.3];
-  // roi_line_segment_length
   optional double roi_line_segment_length = 8 [default = 1.0];
   // relative distance threshold to filter out ignored obstacle
   optional double perception_obstacle_filtering_distance = 9 [default = 1000.0];
