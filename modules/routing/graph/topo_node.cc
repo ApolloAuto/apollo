@@ -17,6 +17,7 @@
 #include "modules/routing/graph/topo_node.h"
 
 #include <algorithm>
+#include <cmath>
 #include <utility>
 
 #include "cyber/common/log.h"
