@@ -16,6 +16,7 @@
 #include "modules/routing/core/result_generator.h"
 
 #include <algorithm>
+#include <cmath>
 #include <unordered_set>
 
 #include "cyber/common/log.h"

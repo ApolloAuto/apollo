@@ -18,6 +18,7 @@
 #define CYBER_BASE_OBJECT_POOL_H_
 
 #include <algorithm>
+#include <functional>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
