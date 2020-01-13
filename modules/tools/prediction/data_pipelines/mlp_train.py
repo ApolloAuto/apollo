@@ -73,7 +73,7 @@ def load_data(filename):
 
     samples = dict()
     h5_file = h5py.File(filename, 'r')
-    for key in list(h5_file.keys()):
+    for key in h5_file.keys():
         samples[key] = h5_file[key][:]
 
     print("load file success")

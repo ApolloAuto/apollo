@@ -54,7 +54,7 @@ class PathSubplot:
     def show(self, planning, localization):
         cnt = 0
         planning.path_data_lock.acquire()
-        for name in list(planning.path_data_x.keys()):
+        for name in planning.path_data_x.keys():
             if cnt >= self.path_lines_size:
                 print("WARNING: number of path lines is more than " \
                       + str(self.path_lines_size))

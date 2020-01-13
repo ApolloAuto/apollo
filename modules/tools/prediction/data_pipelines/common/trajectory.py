@@ -406,7 +406,7 @@ class TrajectoryToSample(object, metaclass=abc.ABCMeta):
                                                             trajectory[j].raw_velocity.x),
                                                  trajectory[j].length,
                                                  trajectory[j].width)
-                for key, value in list(exit_dict.items()):
+                for key, value in exit_dict.items():
                     if car_bounding.overlap(value):
                         exit_pos = exit_pos_dict[key]
                         delta_pos = exit_pos - curr_pos

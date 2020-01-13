@@ -118,7 +118,7 @@ if __name__ == '__main__':
     argv = FLAGS(sys.argv)
     listener()
     fig, ax = plt.subplots()
-    X = list(range(FLAGS.data_length))
+    X = range(FLAGS.data_length)
     Xs = [i * -1 for i in X]
     Xs.sort()
     init_data_line, = ax.plot(

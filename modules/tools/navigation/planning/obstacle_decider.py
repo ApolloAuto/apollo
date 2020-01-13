@@ -52,7 +52,7 @@ class ObstacleDecider:
             path.append((path_x[i], path_y[i]))
         line = LineString(path)
 
-        for obs_id, obstacle in list(self.mobileye.obstacles.items()):
+        for obs_id, obstacle in self.mobileye.obstacles.items():
             point = Point(obstacle.x, obstacle.y)
             dist = line.distance(point)
             if dist < self.LAT_DIST + obstacle.width + self.left_edge_to_center:
@@ -97,7 +97,7 @@ class ObstacleDecider:
     def get_nudge_distance(self, left_nudgable, right_nudgable):
         left_nudge = None
         right_nudge = None
-        for obs_id, lat_dist in list(self.obstacle_lat_dist.items()):
+        for obs_id, lat_dist in self.obstacle_lat_dist.items():
             if lat_dist >= 0:
                 actual_dist = abs(lat_dist) \
                     - self.mobileye.obstacles[obs_id].width / 2.0 \
@@ -169,7 +169,7 @@ if __name__ == "__main__":
             return
         x = []
         y = []
-        for obs_id, obs in list(mobileye.obstacles.items()):
+        for obs_id, obs in mobileye.obstacles.items():
             x.append(obs.x)
             y.append(obs.y)
         obstacles_points.set_xdata(x)

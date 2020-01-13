@@ -111,7 +111,7 @@ class PbMessageManager:
 
     def parse_file(self, filename):
         """parse a file by guessing topic type"""
-        for topic, meta_msg in list(self.__topic_dict.items()):
+        for topic, meta_msg in self.__topic_dict.items():
             try:
                 message = meta_msg.parse_file(filename)
                 if message:

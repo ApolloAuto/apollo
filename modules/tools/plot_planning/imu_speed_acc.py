@@ -79,12 +79,12 @@ if __name__ == "__main__":
         Fs = len(y) / float(x[-1] - x[0])
         n = len(y)
         k = np.arange(n)
-        T = n/Fs
-        frq = k/T
-        frq = frq[list(range(n/2))]
+        T = n // Fs
+        frq = k / T
+        frq = frq[range(n // 2)]
 
-        Y = np.fft.fft(y)/n
-        Y = Y[list(range(n/2))]
+        Y = np.fft.fft(y) / n
+        Y = Y[range(n // 2)]
         ax.plot(frq, abs(Y), c=color)
 
     folders = sys.argv[1:]

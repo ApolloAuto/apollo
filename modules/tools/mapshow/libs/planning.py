@@ -383,7 +383,7 @@ class Planning:
         st_graph_boudnary_s = self.st_data_boundary_s[st_graph_name]
         st_graph_boudnary_t = self.st_data_boundary_t[st_graph_name]
         st_boundary_type = self.st_data_boundary_type[st_graph_name]
-        for boundary_name in list(st_graph_boudnary_s.keys()):
+        for boundary_name in st_graph_boudnary_s.keys():
             if cnt >= len(boundaries_pool):
                 print("WARNING: number of path lines is more than " \
                       + len(boundaries_pool))
@@ -436,7 +436,7 @@ class Planning:
     def replot_path_data(self, path_lines):
         cnt = 0
         self.path_data_lock.acquire()
-        for name in list(self.path_data_x.keys()):
+        for name in self.path_data_x.keys():
             if cnt >= len(path_lines):
                 print("WARNING: number of path lines is more than " \
                       + len(path_lines))
@@ -476,7 +476,7 @@ class Planning:
     def replot_speed_data(self, speed_lines):
         cnt = 0
         self.speed_data_lock.acquire()
-        for name in list(self.speed_data_time.keys()):
+        for name in self.speed_data_time.keys():
             if cnt >= len(speed_lines):
                 print("WARNING: number of speed lines is more than " \
                       + len(speed_lines))

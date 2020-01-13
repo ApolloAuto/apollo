@@ -286,7 +286,7 @@ def get_range_info(var):
         doc string:
     """
     info = {}
-    if "physical_range" not in list(var.keys()):
+    if "physical_range" not in var.keys():
         return info
     items = var["physical_range"].split('|')
     info["low"] = items[0].split('[')[1]
