@@ -185,8 +185,8 @@ modules {
 modules {
   key: "Modem"
   value: {
-    start_command: "run_teleop_modem_monitor.bash start"
-    stop_command: "run_teleop_modem_monitor.bash stop"
+    start_command: "run_teleop_modem.bash start"
+    stop_command: "run_teleop_modem.bash stop"
     process_monitor_config {
       command_keywords: "python"
       command_keywords: "modem.py"
