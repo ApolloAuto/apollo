@@ -118,6 +118,7 @@ cc_library(
         "//modules/common/util:factory",
         "//modules/control/proto:control_proto",
         "//modules/planning/proto:planning_proto",
+        "@osqp",
     ],
 )
 

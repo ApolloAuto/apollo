@@ -22,6 +22,7 @@ cc_library(
     hdrs = ["file.h"],
     deps = [
         "//cyber/common:log",
+        "@com_google_protobuf//:protobuf",
     ],
 )
 
