@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -17,11 +17,11 @@
 ###############################################################################
 
 from cyber_py import cyber
-from planning import Planning
+from .planning import Planning
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from subplot_st_main import StMainSubplot
-from subplot_st_speed import StSpeedSubplot
+from .subplot_st_main import StMainSubplot
+from .subplot_st_speed import StSpeedSubplot
 from modules.planning.proto import planning_pb2
 
 planning = Planning()

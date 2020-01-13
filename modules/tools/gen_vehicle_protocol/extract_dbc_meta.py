@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -69,7 +69,7 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
         5 segments, and segments[0] is "BO_", then begin parse every signal in the following line
 
     """
-    sender_list = map(str, sender_list)
+    sender_list = list(map(str, sender_list))
     with open(dbc_file) as fp:
         in_protocol = False
         protocols = {}
@@ -146,10 +146,10 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
             fp_write.write(yaml.dump(config))
 
         control_protocol_num =\
-            len([key for key in protocols.keys()
+            len([key for key in list(protocols.keys())
                  if protocols[key]["protocol_type"] == "control"])
         report_protocol_num =\
-            len([key for key in protocols.keys()
+            len([key for key in list(protocols.keys())
                  if protocols[key]["protocol_type"] == "report"])
         print("Extract car_type:%s's protocol meta info to file: %s" % (
             car_type.upper(), out_file))

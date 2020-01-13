@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -25,8 +25,8 @@ from google.protobuf.internal import decoder
 from google.protobuf.internal import encoder
 
 from modules.prediction.proto import offline_features_pb2
-from bounding_rectangle import BoundingRectangle
-from configure import parameters
+from .bounding_rectangle import BoundingRectangle
+from .configure import parameters
 
 param_fea = parameters['feature']
 
@@ -118,13 +118,13 @@ class LabelGenerator(object):
     def OrganizeFeatures(self, features):
         # Organize Feature by obstacle_ID (put those belonging to the same obstacle together)
         for feature in features:
-            if feature.id in self.feature_dict.keys():
+            if feature.id in list(self.feature_dict.keys()):
                 self.feature_dict[feature.id].append(feature)
             else:
                 self.feature_dict[feature.id] = [feature]
 
         # For the same obstacle, sort the Feature sequentially.
-        for obs_id in self.feature_dict.keys():
+        for obs_id in list(self.feature_dict.keys()):
             if len(self.feature_dict[obs_id]) < 2:
                 del self.feature_dict[obs_id]
                 continue
@@ -136,7 +136,7 @@ class LabelGenerator(object):
     @output: the complete observation_dict.
     '''
     def ObserveAllFeatureSequences(self):
-        for obs_id, feature_sequence in self.feature_dict.items():
+        for obs_id, feature_sequence in list(self.feature_dict.items()):
             for idx, feature in enumerate(feature_sequence):
                 if not feature.HasField('lane') or \
                    not feature.lane.HasField('lane_feature'):
@@ -161,7 +161,7 @@ class LabelGenerator(object):
         # Initialization.
         feature_curr = feature_sequence[idx_curr]
         dict_key = "{}@{:.3f}".format(feature_curr.id, feature_curr.timestamp)
-        if dict_key in self.observation_dict.keys():
+        if dict_key in list(self.observation_dict.keys()):
             return
 
         # Record all the lane segments belonging to the lane sequence that the
@@ -274,7 +274,7 @@ class LabelGenerator(object):
     '''
     def LabelSingleLane(self, period_of_interest=3.0):
         output_features = offline_features_pb2.Features()
-        for obs_id, feature_sequence in self.feature_dict.items():
+        for obs_id, feature_sequence in list(self.feature_dict.items()):
             feature_seq_len = len(feature_sequence)
             for idx, feature in enumerate(feature_sequence):
                 if not feature.HasField('lane') or \
@@ -394,7 +394,7 @@ class LabelGenerator(object):
 
     def LabelTrajectory(self, period_of_interest=3.0):
         output_features = offline_features_pb2.Features()
-        for obs_id, feature_sequence in self.feature_dict.items():
+        for obs_id, feature_sequence in list(self.feature_dict.items()):
             for idx, feature in enumerate(feature_sequence):
                 # Observe the subsequent Features
                 if "{}@{:.3f}".format(feature.id, feature.timestamp) not in self.observation_dict:
@@ -419,7 +419,7 @@ class LabelGenerator(object):
         label feature trajectory according to real future lane sequence in 7s
         '''
         output_features = offline_features_pb2.Features()
-        for obs_id, feature_sequence in self.feature_dict.items():
+        for obs_id, feature_sequence in list(self.feature_dict.items()):
             feature_seq_len = len(feature_sequence)
             for i, fea in enumerate(feature_sequence):
                 # Sanity check.
@@ -460,7 +460,7 @@ class LabelGenerator(object):
                                                                 feature_sequence[j].raw_velocity.x),
                                                      feature_sequence[j].length,
                                                      feature_sequence[j].width)
-                    for key, value in exit_dict.items():
+                    for key, value in list(exit_dict.items()):
                         if car_bounding.overlap(value):
                             exit_pos = exit_pos_dict[key]
                             delta_pos = exit_pos - curr_pos

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -125,7 +125,7 @@ def ParamEvaluation(params, tunning_object):
 
 def GetOptimalParams(params_lists, key_to_evaluations):
     tmp = []
-    for key, value in key_to_evaluations.items():
+    for key, value in list(key_to_evaluations.items()):
         tmptuple = (value, key)
         tmp.append(tmptuple)
 

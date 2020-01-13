@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -50,7 +50,7 @@ def load_hdf5(filename):
         os._exit(1)
 
     h5_file = h5py.File(filename, 'r')
-    values = h5_file.values()[0]
+    values = list(h5_file.values())[0]
     print ("load data size:", values.shape[0])
     return values
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -58,7 +58,7 @@ for stop_line in signal.stop_line:
         for point in segment.line_segment.point:
             stop_line_points.append((point.x, point.y))
     stop_line_string = LineString(stop_line_points)
-    for lane_id, lane_string in lanes.items():
+    for lane_id, lane_string in list(lanes.items()):
         p = stop_line_string.intersection(lane_string)
         if type(p) == Point:
             s = lane_string.project(p)

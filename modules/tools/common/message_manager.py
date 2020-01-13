@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -29,7 +29,7 @@ from modules.common.proto import drive_event_pb2
 from modules.map.relative_map.proto import navigation_pb2
 from modules.guardian.proto import guardian_pb2
 
-import proto_utils
+from . import proto_utils
 
 
 class MessageType:
@@ -111,7 +111,7 @@ class PbMessageManager:
 
     def parse_file(self, filename):
         """parse a file by guessing topic type"""
-        for topic, meta_msg in self.__topic_dict.items():
+        for topic, meta_msg in list(self.__topic_dict.items()):
             try:
                 message = meta_msg.parse_file(filename)
                 if message:

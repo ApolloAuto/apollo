@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -21,14 +21,12 @@ import logging
 import math
 import numpy as np
 
-from configure import parameters
+from .configure import parameters
 from common.bounding_rectangle import BoundingRectangle
 param_fea = parameters['feature']
 
 
-class TrajectoryToSample(object):
-
-    __metaclass__ = abc.ABCMeta
+class TrajectoryToSample(object, metaclass=abc.ABCMeta):
 
     def __call__(self, trajectory):
         self.clean(trajectory)
@@ -408,7 +406,7 @@ class TrajectoryToSample(object):
                                                             trajectory[j].raw_velocity.x),
                                                  trajectory[j].length,
                                                  trajectory[j].width)
-                for key, value in exit_dict.items():
+                for key, value in list(exit_dict.items()):
                     if car_bounding.overlap(value):
                         exit_pos = exit_pos_dict[key]
                         delta_pos = exit_pos - curr_pos

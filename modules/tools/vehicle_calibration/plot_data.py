@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -22,7 +22,7 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
-import tkFileDialog
+import tkinter.filedialog
 
 from process import get_start_index
 from process import preprocess
@@ -127,7 +127,7 @@ def main():
         # Get the latest file
         file_path = sys.argv[1]
     else:
-        file_path = tkFileDialog.askopenfilename(
+        file_path = tkinter.filedialog.askopenfilename(
             initialdir="/home/caros/.ros",
             filetypes=(("csv files", ".csv"), ("all files", "*.*")))
     print('File path: %s' % file_path)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -35,7 +35,7 @@ class Map:
     def init_colors(self):
         color_num = 6
         self.colors = []
-        values = range(color_num)
+        values = list(range(color_num))
         jet = plt.get_cmap('brg')
         color_norm = mcolors.Normalize(vmin=0, vmax=values[-1])
         scalar_map = cmx.ScalarMappable(norm=color_norm, cmap=jet)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -50,7 +50,7 @@ class TrajAccSubplot:
 
     def init_colors(self):
         self.colors = []
-        values = range(self.acc_lines_size)
+        values = list(range(self.acc_lines_size))
         jet = plt.get_cmap('brg')
         color_norm = mcolors.Normalize(vmin=0, vmax=values[-1])
         scalar_map = cmx.ScalarMappable(norm=color_norm, cmap=jet)

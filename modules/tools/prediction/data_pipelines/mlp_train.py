@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -39,15 +39,15 @@ from keras.utils import np_utils
 from keras.regularizers import l2, l1
 from sklearn.model_selection import train_test_split
 
-import proto.fnn_model_pb2
-from proto.fnn_model_pb2 import FnnModel, Layer
+from . import proto.fnn_model_pb2
+from .proto.fnn_model_pb2 import FnnModel, Layer
 
-import common.log
-from common.data_preprocess import load_h5
-from common.data_preprocess import down_sample
-from common.data_preprocess import train_test_split
-from common.configure import parameters
-from common.configure import labels
+from . import common.log
+from .common.data_preprocess import load_h5
+from .common.data_preprocess import down_sample
+from .common.data_preprocess import train_test_split
+from .common.configure import parameters
+from .common.configure import labels
 
 # Constants
 dim_input = parameters['mlp']['dim_input']
@@ -73,7 +73,7 @@ def load_data(filename):
 
     samples = dict()
     h5_file = h5py.File(filename, 'r')
-    for key in h5_file.keys():
+    for key in list(h5_file.keys()):
         samples[key] = h5_file[key][:]
 
     print("load file success")

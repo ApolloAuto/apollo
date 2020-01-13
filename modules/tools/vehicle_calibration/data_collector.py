@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -58,7 +58,7 @@ class DataCollector(object):
         signal.signal(signal.SIGINT, self.signal_handler)
 
         self.in_session = True
-        self.cmd = map(float, cmd)
+        self.cmd = list(map(float, cmd))
         out = ''
         if self.cmd[0] > 0:
             out += 't'
@@ -207,7 +207,7 @@ def main():
     print('Positive number for throttle and negative number for brake.')
 
     while True:
-        cmd = raw_input("Enter commands: ").split()
+        cmd = input("Enter commands: ").split()
         if len(cmd) == 0:
             print('Quiting.')
             break

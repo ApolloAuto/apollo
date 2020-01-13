@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -81,10 +81,10 @@ if __name__ == "__main__":
         k = np.arange(n)
         T = n/Fs
         frq = k/T
-        frq = frq[range(n/2)]
+        frq = frq[list(range(n/2))]
 
         Y = np.fft.fft(y)/n
-        Y = Y[range(n/2)]
+        Y = Y[list(range(n/2))]
         ax.plot(frq, abs(Y), c=color)
 
     folders = sys.argv[1:]

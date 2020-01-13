@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -21,13 +21,13 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from cyber_py import cyber
 from modules.planning.proto import planning_pb2
-from subplot_st_main import StMainSubplot
-from subplot_path import PathSubplot
-from subplot_sl_main import SlMainSubplot
-from subplot_st_speed import StSpeedSubplot
-from subplot_speed import SpeedSubplot
-from localization import Localization
-from planning import Planning
+from .subplot_st_main import StMainSubplot
+from .subplot_path import PathSubplot
+from .subplot_sl_main import SlMainSubplot
+from .subplot_st_speed import StSpeedSubplot
+from .subplot_speed import SpeedSubplot
+from .localization import Localization
+from .planning import Planning
 
 planning = Planning()
 localization = Localization()

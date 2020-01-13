@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -35,7 +35,7 @@ def load_h5(filename):
 
     samples = dict()
     h5_file = h5py.File(filename, 'r')
-    for key in h5_file.keys():
+    for key in list(h5_file.keys()):
         samples[key] = h5_file[key][:]
 
     return samples['data']

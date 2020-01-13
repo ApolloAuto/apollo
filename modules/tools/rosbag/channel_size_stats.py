@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -80,7 +80,7 @@ class ChannelSizeStats(object):
                     channel_size_stats[name]['num'] = 1.0
 
 
-        for channelname in channel_size_stats.keys():
+        for channelname in list(channel_size_stats.keys()):
             print(channelname, " num:", channel_size_stats[channelname]['num'],
                 " avg size:", channel_size_stats[channelname]['total'] / channel_size_stats[channelname]['num'])
         print('----- Finish processing record -----')

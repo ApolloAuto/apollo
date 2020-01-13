@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -89,11 +89,11 @@ def load_calibration_raw_data_old(fn):
 
 def get_calibration_table_pb(speed_table):
     calibration_table_pb = calibration_table_pb2.ControlCalibrationTable()
-    speeds = speed_table.keys()
+    speeds = list(speed_table.keys())
     speeds.sort()
     for speed in speeds:
         acc_table = speed_table[speed]
-        accs = acc_table.keys()
+        accs = list(acc_table.keys())
         accs.sort()
         for acc in accs:
             cmds = acc_table[acc]

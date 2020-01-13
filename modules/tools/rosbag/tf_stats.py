@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -42,7 +42,7 @@ def tf_stats(in_bag):
         tf_pb.ParseFromString(message)
         for transform in tf_pb.transforms:
             key = transform.header.frame_id + "=>" + transform.child_frame_id
-            if key in stats.keys():
+            if key in list(stats.keys()):
                 stats[key] += 1
             else:
                 stats[key] = 1

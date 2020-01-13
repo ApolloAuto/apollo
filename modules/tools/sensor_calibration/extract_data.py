@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -210,7 +210,7 @@ def extract_data(record_files, output_path, channels,
 
     # traverse the dict, if any channel topic stored as a list
     # then save the list as a summary file, mostly binary file
-    for channel, parser in channel_parsers.items():
+    for channel, parser in list(channel_parsers.items()):
         save_combined_messages_info(parser, channel)
 
     # Logging statics about channel extraction

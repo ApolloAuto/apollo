@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -45,7 +45,7 @@ class SpeedSubplot:
     def show(self, planning):
         cnt = 0
         planning.speed_data_lock.acquire()
-        for name in planning.speed_data_time.keys():
+        for name in list(planning.speed_data_time.keys()):
             if cnt >= self.speed_lines_size:
                 print("WARNING: number of path lines is more than " \
                       + str(self.speed_lines_size))

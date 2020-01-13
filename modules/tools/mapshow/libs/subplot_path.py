@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-from map import Map
+from .map import Map
 
 
 class PathSubplot:
@@ -54,7 +54,7 @@ class PathSubplot:
     def show(self, planning, localization):
         cnt = 0
         planning.path_data_lock.acquire()
-        for name in planning.path_data_x.keys():
+        for name in list(planning.path_data_x.keys()):
             if cnt >= self.path_lines_size:
                 print("WARNING: number of path lines is more than " \
                       + str(self.path_lines_size))

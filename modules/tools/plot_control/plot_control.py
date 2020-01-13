@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -83,7 +83,7 @@ if __name__ == '__main__':
     argv = FLAGS(sys.argv)
     listener()
     fig, ax = plt.subplots()
-    X = range(FLAGS.data_length)
+    X = list(range(FLAGS.data_length))
     Xs = [i * -1 for i in X]
     Xs.sort()
     steering_line, = ax.plot(

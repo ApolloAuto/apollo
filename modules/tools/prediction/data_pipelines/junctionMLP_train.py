@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -26,8 +26,8 @@ import logging
 import argparse
 import numpy as np
 import tensorflow as tf
-import proto.fnn_model_pb2
-from proto.fnn_model_pb2 import FnnModel, Layer
+from . import proto.fnn_model_pb2
+from .proto.fnn_model_pb2 import FnnModel, Layer
 from sklearn.model_selection import train_test_split
 
 dim_input = 7 + 72
@@ -46,7 +46,7 @@ def load_data(filename):
         os._exit(1)
     samples = dict()
     h5_file = h5py.File(filename, 'r')
-    for key in h5_file.keys():
+    for key in list(h5_file.keys()):
         samples[key] = h5_file[key][:]
     print("load file success")
     return samples['data']

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -49,7 +49,7 @@ class PathDecider:
         obstacle_decider.process_path_obstacle(final_path)
         left_dist = 999
         right_dist = 999
-        for obs_id, lat_dist in obstacle_decider.obstacle_lat_dist.items():
+        for obs_id, lat_dist in list(obstacle_decider.obstacle_lat_dist.items()):
             if lat_dist < 0:
                 left_dist = lat_dist
             else:

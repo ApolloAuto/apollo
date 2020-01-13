@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -88,12 +88,12 @@ def build_trajectory(features):
     """
     fea_dict = dict()
     for fea in features:
-        if fea.id in fea_dict.keys():
+        if fea.id in list(fea_dict.keys()):
             fea_dict[fea.id].append(fea)
         else:
             fea_dict[fea.id] = [fea]
 
-    for k in fea_dict.keys():
+    for k in list(fea_dict.keys()):
         if len(fea_dict[k]) < 2:
             del fea_dict[k]
             continue
