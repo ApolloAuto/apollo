@@ -6,13 +6,11 @@ cc_library(
     name = "kv_db",
     srcs = ["kv_db.cc"],
     hdrs = ["kv_db.h"],
-    linkopts = [
-        "-lsqlite3",
-    ],
     deps = [
         "//cyber/common:log",
         "//modules/common/util",
         "//modules/common/util:future",
+        "//third_party:sqlite3",
         "@com_github_gflags_gflags//:gflags",
     ],
 )

@@ -23,6 +23,11 @@ cc_library(
 )
 
 cc_library(
+    name = "sqlite3",
+    linkopts = ["-lsqlite3"],
+)
+
+cc_library(
     name = "uuid",
     linkopts = ["-luuid"],
 )
