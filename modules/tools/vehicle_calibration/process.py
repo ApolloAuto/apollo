@@ -38,8 +38,8 @@ def preprocess(filename):
     b, a = signal.butter(6, 0.05, 'low')
     data['imu'] = signal.filtfilt(b, a, data['imu'])
 
-    data['imu'] = np.append(data['imu'][-SPEED_DELAY / 10:],
-                            data['imu'][0:-SPEED_DELAY / 10])
+    data['imu'] = np.append(data['imu'][-SPEED_DELAY // 10:],
+                            data['imu'][0:-SPEED_DELAY // 10])
     return data
 
 def get_start_index(data):

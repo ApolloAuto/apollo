@@ -148,8 +148,8 @@ class RtkPlayer(object):
     def closest_dist(self):
         shortest_dist_sqr = float('inf')
         self.logger.info("before closest self.start=%s" % (self.start))
-        search_start = max(self.start - SEARCH_INTERVAL / 2, 0)
-        search_end = min(self.start + SEARCH_INTERVAL / 2, len(self.data))
+        search_start = max(self.start - SEARCH_INTERVAL // 2, 0)
+        search_end = min(self.start + SEARCH_INTERVAL // 2, len(self.data))
         self.logger.debug("search_start: %s" % search_start)
         self.logger.debug("search_end: %s" % search_end)
         closest_dist_point = self.start
@@ -285,10 +285,10 @@ class RtkPlayer(object):
             if CHANGE_TO_COM:
                 # translation vector length(length / 2 - back edge to center)
                 adc_point.path_point.x = adc_point.path_point.x + \
-                    (self.vehicle_param.length / 2 - self.vehicle_param.back_edge_to_center) * \
+                    (self.vehicle_param.length // 2 - self.vehicle_param.back_edge_to_center) * \
                     math.cos(adc_point.path_point.theta)
                 adc_point.path_point.y = adc_point.path_point.y + \
-                    (self.vehicle_param.length / 2 - self.vehicle_param.back_edge_to_center) * \
+                    (self.vehicle_param.length // 2 - self.vehicle_param.back_edge_to_center) * \
                     math.sin(adc_point.path_point.theta)
 
             if planningdata.gear == chassis_pb2.Chassis.GEAR_REVERSE:

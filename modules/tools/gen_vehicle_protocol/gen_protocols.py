@@ -215,7 +215,7 @@ def get_byte_info(var):
     bit = var["bit"]
     byte_info = []
     left_len = var["len"]
-    byte_idx = bit / 8
+    byte_idx = bit // 8
     bit_start = bit % 8
     if var["order"] == "motorola":
         while left_len > 0:

@@ -102,11 +102,11 @@ class MobileyeData:
             self.left_lane_x.append(x)
         self.lane_data_lock.release()
 
-        c0 = (rc0 + lc0) / 2
-        c1 = (rc1 + lc1) / 2
-        c2 = (rc2 + lc2) / 2
-        c3 = (rc3 + lc3) / 2
-        rangex = (lrangex + rrangex) / 2
+        c0 = (rc0 + lc0) // 2
+        c1 = (rc1 + lc1) // 2
+        c2 = (rc2 + lc2) // 2
+        c3 = (rc3 + lc3) // 2
+        rangex = (lrangex + rrangex) // 2
         self.lane_data_lock.acquire()
         for y in range(int(rangex)):
             self.ref_lane_y.append(y)

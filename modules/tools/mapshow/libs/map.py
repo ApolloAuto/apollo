@@ -180,18 +180,18 @@ class Map:
 
     @staticmethod
     def _find_lane_central_point(lane):
-        segment_idx = len(lane.left_boundary.curve.segment) / 2
+        segment_idx = len(lane.left_boundary.curve.segment) // 2
         median_segment = lane.left_boundary.curve.segment[segment_idx]
-        left_point_idx = len(median_segment.line_segment.point) / 2
+        left_point_idx = len(median_segment.line_segment.point) // 2
         left_median_point = median_segment.line_segment.point[left_point_idx]
 
-        segment_idx = len(lane.right_boundary.curve.segment) / 2
+        segment_idx = len(lane.right_boundary.curve.segment) // 2
         median_segment = lane.right_boundary.curve.segment[segment_idx]
-        right_point_idx = len(median_segment.line_segment.point) / 2
+        right_point_idx = len(median_segment.line_segment.point) // 2
         right_median_point = median_segment.line_segment.point[right_point_idx]
 
-        x = (left_median_point.x + right_median_point.x) / 2
-        y = (left_median_point.y + right_median_point.y) / 2
+        x = (left_median_point.x + right_median_point.x) // 2
+        y = (left_median_point.y + right_median_point.y) // 2
 
         return x, y
 
@@ -199,11 +199,11 @@ class Map:
     def _get_median_point(points):
         """get_median_point"""
         if len(points) % 2 == 1:
-            point = points[len(points) / 2]
+            point = points[len(points) // 2]
             return point.x, point.y
         else:
-            point1 = points[len(points) / 2 - 1]
-            point2 = points[len(points) / 2]
+            point1 = points[len(points) // 2 - 1]
+            point2 = points[len(points) // 2]
             return (point1.x + point2.x) / 2.0, (point1.y + point2.y) / 2.0
 
     @staticmethod
@@ -280,7 +280,7 @@ class Map:
         ax.plot(px, py, 'o-')
         lxy = [random.randint(20, 80) * random.sample([-1, 1], 1)[0],
                random.randint(20, 80) * random.sample([-1, 1], 1)[0]]
-        xy = (sum(px) / len(px), sum(py) / len(py))
+        xy = (sum(px) // len(px), sum(py) // len(py))
         plt.annotate(
             label,
             xy=xy, xytext=lxy,

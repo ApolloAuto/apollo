@@ -109,12 +109,12 @@ class Planning:
                 sl_sampled_s.append(s)
             for l in sl_frame.map_lower_bound:
                 if (l > 10 or l < -10):
-                    sl_map_lower_boundary.append(100 * l / abs(l))
+                    sl_map_lower_boundary.append(100 * l // abs(l))
                 else:
                     sl_map_lower_boundary.append(l)
             for l in sl_frame.map_upper_bound:
                 if (l > 10 or l < -10):
-                    sl_map_upper_boundary.append(100 * l / abs(l))
+                    sl_map_upper_boundary.append(100 * l // abs(l))
                 else:
                     sl_map_upper_boundary.append(l)
             for l in sl_frame.static_obstacle_lower_bound:

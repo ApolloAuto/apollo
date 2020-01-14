@@ -110,10 +110,10 @@ class Field(object):
            descriptor.type == descriptor.TYPE_MESSAGE:
             for descript, item in entity.ListFields():
                 if row >= self.winy - 1:
-                    if col >= (self.winx / 3) * 2:
+                    if col >= (self.winx // 3) * 2:
                         return row, col
                     row = self.basex
-                    col = col + self.winx / 3
+                    col = col + self.winx // 3
 
                 descript_path.append(descript.name)
                 if descript.label == descript.LABEL_REPEATED:

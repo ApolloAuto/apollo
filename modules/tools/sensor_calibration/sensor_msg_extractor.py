@@ -273,7 +273,7 @@ class ImageParser(SensorMessageParser):
             print('Unsupported image encoding type: %s.' % image.encoding)
             return False
 
-        channel_num = image.step / image.width
+        channel_num = image.step // image.width
         self._parsed_data = np.fromstring(image.data, dtype=np.uint8).reshape(
             (image.height, image.width, channel_num))
 
