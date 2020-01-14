@@ -8,7 +8,6 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         "//cyber",
-        "//external:gflags",
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/latency_recorder",
@@ -27,6 +26,7 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 

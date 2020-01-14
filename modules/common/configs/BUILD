@@ -10,7 +10,7 @@ cc_library(
         "//modules/common/data:global_flagfile",
     ],
     deps = [
-        "//external:gflags",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 

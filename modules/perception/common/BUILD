@@ -7,7 +7,7 @@ cc_library(
     srcs = ["perception_gflags.cc"],
     hdrs = ["perception_gflags.h"],
     deps = [
-        "//external:gflags",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 

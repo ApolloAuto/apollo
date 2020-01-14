@@ -28,11 +28,6 @@ new_local_repository(
     path = "/usr/local/include/gflags",
 )
 
-bind(
-    name = "gflags",
-    actual = "@com_github_gflags_gflags//:gflags",
-)
-
 # glog
 new_local_repository(
     name = "glog",

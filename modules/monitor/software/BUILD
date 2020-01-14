@@ -8,10 +8,10 @@ cc_library(
     hdrs = ["process_monitor.h"],
     deps = [
         ":summary_monitor",
-        "//external:gflags",
         "//modules/dreamview/proto:hmi_mode_proto",
         "//modules/monitor/common:monitor_manager",
         "//modules/monitor/common:recurrent_runner",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 

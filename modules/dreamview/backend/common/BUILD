@@ -7,7 +7,7 @@ cc_library(
     srcs = ["dreamview_gflags.cc"],
     hdrs = ["dreamview_gflags.h"],
     deps = [
-        "//external:gflags",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 

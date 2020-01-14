@@ -63,7 +63,9 @@ cc_library(
     name = "smart_recorder_gflags",
     srcs = ["smart_recorder_gflags.cc"],
     hdrs = ["smart_recorder_gflags.h"],
-    deps = ["//external:gflags"],
+    deps = [
+        "@com_github_gflags_gflags//:gflags",
+    ],
 )
 
 cc_library(

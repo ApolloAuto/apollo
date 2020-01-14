@@ -45,7 +45,6 @@ cc_library(
     deps = [
         ":multi_camera_projection",
         "//cyber",
-        "//external:gflags",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
@@ -53,6 +52,7 @@ cc_library(
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/utils",
         "@boost",
+        "@com_github_gflags_gflags//:gflags",
         "@eigen",
     ],
 )

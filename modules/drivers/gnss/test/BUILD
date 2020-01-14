@@ -7,8 +7,8 @@ cc_binary(
     srcs = ["parser_cli.cc"],
     deps = [
         "//cyber",
-        "//external:gflags",
         "//modules/drivers/gnss/stream:gnss_stream",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 

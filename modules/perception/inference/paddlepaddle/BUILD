@@ -13,11 +13,11 @@ cc_library(
     ],
     deps = [
         "//cyber/common:log",
-        "//external:gflags",
         "//modules/perception/inference:inference_lib",
         "//third_party:pthread",
         "//third_party:rt",
         "@boost",
+        "@com_github_gflags_gflags//:gflags",
         "@com_google_protobuf//:protobuf",
         "@cuda",
         "@eigen",

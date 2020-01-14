@@ -8,7 +8,7 @@ cc_library(
     hdrs = ["control_gflags.h"],
     copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
-        "//external:gflags",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
