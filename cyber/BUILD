@@ -62,7 +62,6 @@ cc_library(
     hdrs = ["cyber.h"],
     linkopts = [
         "-lprotobuf",
-        "-luuid",
         "-lrt",
     ],
     deps = [
@@ -105,6 +104,7 @@ cc_library(
         "//cyber/transport",
         "//cyber/transport:participant",
         "//cyber/transport:sub_listener",
+        "//third_party:uuid",
         "//third_party/tf2",
         "@fastrtps",
     ],
