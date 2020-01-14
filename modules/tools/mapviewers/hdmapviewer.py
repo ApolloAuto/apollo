@@ -21,6 +21,7 @@ from bokeh.plotting import figure, output_file, show
 import common.proto_utils as proto_utils
 from modules.map.proto import map_pb2
 
+
 def draw(map_pb, plot):
     for lane in map_pb.lane:
         for curve in lane.left_boundary.curve.segment:

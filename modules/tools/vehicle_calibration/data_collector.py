@@ -185,6 +185,7 @@ class DataCollector(object):
              self.driving_mode, self.throttle_percentage, self.brake_percentage,
              self.gear_location, self.acceleration))
 
+
 def main():
     """
     Main function
@@ -229,6 +230,7 @@ def main():
                     print('File does not exist: %s' % date_collector.outfile)
         elif len(cmd) == 3:
             data_collector.run(cmd)
+
 
 if __name__ == '__main__':
     cyber.init()

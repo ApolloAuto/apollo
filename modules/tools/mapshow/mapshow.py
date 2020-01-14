@@ -22,6 +22,7 @@ from libs.map import Map
 from libs.localization import Localization
 from libs.path import Path
 
+
 def draw(map):
     lane_ids = args.laneid
     if lane_ids is None:
@@ -37,6 +38,7 @@ def draw(map):
         map.draw_crosswalks(plt)
     if args.showyieldsigns:
         map.draw_yield_signs(plt)
+
 
 if __name__ == "__main__":
 

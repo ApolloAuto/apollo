@@ -56,7 +56,7 @@ def callback(planning_pb):
         LAST_TRAJ_T_DATA = []
 
         CURRENT_TRAJ_DATA = []
-        CURRENT_TRAJ_T_DATA =[]
+        CURRENT_TRAJ_T_DATA = []
 
         INIT_V_DATA = []
         INIT_T_DATA = []
@@ -81,6 +81,7 @@ def callback(planning_pb):
     lock.release()
 
     last_t = current_t
+
 
 def listener():
     cyber.init()

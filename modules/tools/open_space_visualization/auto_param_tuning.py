@@ -33,6 +33,7 @@ optimal_file_path = "/apollo/modules/planning/conf/optimal_planner_open_space_co
 # tunning_object = "coarse_trajectory"
 tunning_object = "smooth_trajectory"
 
+
 def load_open_space_protobuf(filename):
     open_space_params = planner_open_space_config_pb2.PlannerOpenSpaceConfig()
     proto_utils.get_pb_from_text_file(filename, open_space_params)

@@ -34,6 +34,7 @@ def grid(data_list, shift):
         data_grid.append(round(data) + shift / 10.0)
     return data_grid
 
+
 def generate_speed_jerk_dict(speed_jerk_dict, speed_list, jerk_list):
     for i in range(len(speed_list)):
         speed = int(speed_list[i])
@@ -42,8 +43,9 @@ def generate_speed_jerk_dict(speed_jerk_dict, speed_list, jerk_list):
             if jerk not in speed_jerk_dict[speed]:
                 speed_jerk_dict[speed].append(jerk)
         else:
-             speed_jerk_dict[speed] = [jerk]
+            speed_jerk_dict[speed] = [jerk]
     return speed_jerk_dict
+
 
 if __name__ == "__main__":
 

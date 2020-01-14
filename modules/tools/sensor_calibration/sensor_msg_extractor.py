@@ -34,6 +34,7 @@ from modules.localization.proto import localization_pb2
 
 from data_file_object import TimestampFileObject, OdometryFileObject
 
+
 class SensorMessageParser(object):
     """Wrapper for cyber channel message extractor"""
 
@@ -53,7 +54,7 @@ class SensorMessageParser(object):
         self._timestamp_file = os.path.join(self._output_path, "timestamps")
         self._instance_saving = instance_saving
 
-    #initializing msg and proto parser
+    # initializing msg and proto parser
     def _init_parser(self):
         raise NotImplementedError
 
@@ -70,17 +71,19 @@ class SensorMessageParser(object):
         return self._timestamps
 
     def save_timestamps_to_file(self):
-       timestamp_file_obj = TimestampFileObject(self._timestamp_file,
-                                                operation='write',
-                                                file_type='txt')
-       timestamp_file_obj.save_to_file(self._timestamps)
-       return True
+        timestamp_file_obj = TimestampFileObject(self._timestamp_file,
+                                                 operation='write',
+                                                 file_type='txt')
+        timestamp_file_obj.save_to_file(self._timestamps)
+        return True
+
 
 class GpsParser(SensorMessageParser):
     """
     class to parse GNSS odometry channel.
     saving this small topic as a whole.
     """
+
     def __init__(self, output_path, instance_saving=False):
         super(GpsParser, self).__init__(output_path, instance_saving)
         if not self._instance_saving:
@@ -123,11 +126,13 @@ class GpsParser(SensorMessageParser):
         odometry_file_obj.save_to_file(self._parsed_data)
         return True
 
+
 class PoseParser(GpsParser):
     """
     inherit similar data saver and data structure from GpsParser
     save the ego-localization information same as odometry
     """
+
     def _init_parser(self):
         self._msg_parser = localization_pb2.LocalizationEstimate()
 
@@ -156,11 +161,13 @@ class PoseParser(GpsParser):
 
         return True
 
+
 class PointCloudParser(SensorMessageParser):
     """
     class to parse apollo/$(lidar)/PointCloud2 channels.
     saving separately each parsed msg
     """
+
     def __init__(self, output_path, instance_saving=True, suffix='.pcd'):
         super(PointCloudParser, self).__init__(output_path, instance_saving)
         self._suffix = suffix
@@ -207,7 +214,7 @@ class PointCloudParser(SensorMessageParser):
         return pc
 
     def save_pointcloud_meta_to_file(self, pc_meta, pcd_file):
-            pypcd.save_point_cloud_bin_compressed(pc_meta, pcd_file)
+        pypcd.save_point_cloud_bin_compressed(pc_meta, pcd_file)
 
     def _init_parser(self):
         self._msg_parser = pointcloud_pb2.PointCloud()
@@ -239,9 +246,11 @@ class ImageParser(SensorMessageParser):
     class to parse apollo/$(camera)/image channels.
     saving separately each parsed msg
     """
+
     def __init__(self, output_path, instance_saving=True, suffix='.jpg'):
         super(ImageParser, self).__init__(output_path, instance_saving)
         self._suffix = suffix
+
     def _init_parser(self):
         self._msg_parser = sensor_image_pb2.Image()
 
@@ -294,11 +303,13 @@ class ImageParser(SensorMessageParser):
         else:
             cv2.imwrite(image_file, image_mat)
 
+
 class ContiRadarParser(SensorMessageParser):
     """
     class to parse apollo/sensor/radar/$(position) channels.
     saving separately each parsed msg
     """
+
     def __init__(self, output_path, instance_saving=True, suffix='.pcd'):
         super(ContiRadarParser, self).__init__(output_path, instance_saving)
         self._suffix = suffix
@@ -357,7 +368,7 @@ class ContiRadarParser(SensorMessageParser):
         return pc
 
     def save_pointcloud_meta_to_file(self, pc_meta, pcd_file):
-            pypcd.save_point_cloud_bin(pc_meta, pcd_file)
+        pypcd.save_point_cloud_bin(pc_meta, pcd_file)
 
     def _init_parser(self):
         self._msg_parser = conti_radar_pb2.ContiRadar()

@@ -67,7 +67,6 @@ def add_listener():
 
 
 @app.route('/routing', methods=["POST", "GET"])
-
 def request_routing(request_json):
     if "start_lat" not in request_json:
         return None

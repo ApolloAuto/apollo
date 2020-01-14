@@ -34,7 +34,8 @@ lib.Plan.restype = c_bool
 lib.Plan.argtypes = [c_void_p, c_void_p, c_void_p, c_double, c_double, c_double, c_double,
                      c_double, c_double, POINTER(c_double)]
 lib.GetResult.argtypes = [c_void_p, POINTER(c_double), POINTER(c_double), POINTER(c_double),
-                    POINTER(c_double), POINTER(c_double), POINTER(c_double), POINTER(c_ushort)]
+                          POINTER(c_double), POINTER(c_double), POINTER(c_double), POINTER(c_ushort)]
+
 
 class HybridAStarPlanner(object):
     def __init__(self):

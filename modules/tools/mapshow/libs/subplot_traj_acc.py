@@ -66,7 +66,7 @@ class TrajAccSubplot:
         planning.traj_data_lock.acquire()
         for i in range(len(planning.traj_speed_t_history)):
             if i >= self.acc_lines_size:
-                print("WARNING: number of path lines is more than " \
+                print("WARNING: number of path lines is more than "
                       + str(self.acc_lines_size))
                 continue
             speed_line = self.acc_lines[self.acc_lines_size - i - 1]

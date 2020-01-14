@@ -48,7 +48,7 @@ def load_calibration_raw_data(fn):
         cmd_table = speed_table[speed]
         for cmd in cmd_table:
             cmd_table[cmd] = round(np.mean(cmd_table[cmd]), 2)
-    #After this the acc_list converted to an average float number.
+    # After this the acc_list converted to an average float number.
 
     speed_table2 = {}
     for speed in speed_table:
@@ -103,6 +103,7 @@ def get_calibration_table_pb(speed_table):
             item.acceleration = acc
             item.command = cmd
     return calibration_table_pb
+
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:

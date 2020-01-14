@@ -33,6 +33,7 @@ if ret is False:
     print('Failed to initialize security environment!')
     sys.exit(1)
 
+
 def query():
     vehicle_info = VehicleInfo()
     VEHICLE_INFO_FILE = os.path.join(
@@ -99,6 +100,7 @@ def query():
         print('Cannot connect to server.')
 
     sys.exit(1)
+
 
 if __name__ == '__main__':
     query()

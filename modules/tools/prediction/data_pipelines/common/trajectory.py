@@ -391,11 +391,11 @@ class TrajectoryToSample(object, metaclass=abc.ABCMeta):
             for junction_exit in fea.junction_feature.junction_exit:
                 if junction_exit.HasField('exit_lane_id'):
                     exit_dict[junction_exit.exit_lane_id] = \
-                    BoundingRectangle(junction_exit.exit_position.x,
-                                      junction_exit.exit_position.y,
-                                      junction_exit.exit_heading,
-                                      0.01,
-                                      junction_exit.exit_width)
+                        BoundingRectangle(junction_exit.exit_position.x,
+                                          junction_exit.exit_position.y,
+                                          junction_exit.exit_heading,
+                                          0.01,
+                                          junction_exit.exit_width)
                     exit_pos_dict[junction_exit.exit_lane_id] = np.array(
                         [junction_exit.exit_position.x, junction_exit.exit_position.y])
             # Searching for up to 100 frames (10 seconds)
@@ -416,7 +416,7 @@ class TrajectoryToSample(object, metaclass=abc.ABCMeta):
                         label = [0 for idx in range(12)]
                         label[d_idx] = 1
                         fea.junction_feature.junction_mlp_label.extend(label)
-                        break # actually break two level
+                        break  # actually break two level
                 else:
                     continue
                 break

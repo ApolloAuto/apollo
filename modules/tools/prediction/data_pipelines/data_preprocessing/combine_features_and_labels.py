@@ -21,7 +21,7 @@ import re
 from features_labels_utils import *
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Merge all label_dicts in each'\
+    parser = argparse.ArgumentParser(description='Merge all label_dicts in each'
                                                  'terminal folder.')
     parser.add_argument('features_dirpath', type=str,
                         help='Path of terminal folder for data_for_learn.')

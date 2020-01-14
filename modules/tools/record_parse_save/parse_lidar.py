@@ -8,13 +8,16 @@ current implementation for:
 
 """
 
-import sys, os
+import sys
+import os
 
 from cyber_py import cyber
 from cyber_py import record
 
 from modules.drivers.proto.pointcloud_pb2 import PointCloud
 ###########################################################
+
+
 def parse_data(channelname, msg, out_folder):
     """
     """
@@ -30,7 +33,7 @@ def parse_data(channelname, msg, out_folder):
     tstamp = msg_lidar.measurement_time
     temp_time = str(tstamp).split('.')
 
-    if len(temp_time[1])==1:
+    if len(temp_time[1]) == 1:
         temp_time1_adj = temp_time[1] + '0'
     else:
         temp_time1_adj = temp_time[1]

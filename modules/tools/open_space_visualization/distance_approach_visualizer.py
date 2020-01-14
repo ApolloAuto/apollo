@@ -45,33 +45,32 @@ def SmoothTrajectory(visualize_flag, sx, sy):
         # obstacles for distance approach(vertices coords in clock wise order)
         ROI_distance_approach_parking_boundary = (
             c_double * 20)(*[-13.6407054776,
-                            0.0140634663703,
-                            0.0,
-                            0.0,
-                            0.0515703622475,
-                            -5.15258191624,
-                            0.0515703622475,
-                            -5.15258191624,
-                            2.8237895441,
-                            -5.15306980547,
-                            2.8237895441,
-                            -5.15306980547,
-                            2.7184833539,
-                            -0.0398078878812,
-                            16.3592013995,
-                            -0.011889513383,
-                            16.3591910364,
-                            5.60414234644,
-                            -13.6406951857,
-                            5.61797800844,
-                            ])
+                             0.0140634663703,
+                             0.0,
+                             0.0,
+                             0.0515703622475,
+                             -5.15258191624,
+                             0.0515703622475,
+                             -5.15258191624,
+                             2.8237895441,
+                             -5.15306980547,
+                             2.8237895441,
+                             -5.15306980547,
+                             2.7184833539,
+                             -0.0398078878812,
+                             16.3592013995,
+                             -0.011889513383,
+                             16.3591910364,
+                             5.60414234644,
+                             -13.6406951857,
+                             5.61797800844,
+                             ])
         OpenSpacePlanner.AddObstacle(
             ROI_distance_approach_parking_boundary)
         ex = 1.359
         ey = -3.86443643718
         ephi = 1.581
         XYbounds = [-13.6406951857, 16.3591910364, -5.15258191624, 5.61797800844]
-
 
     x = (c_double * num_output_buffer)()
     y = (c_double * num_output_buffer)()
@@ -123,9 +122,9 @@ def SmoothTrajectory(visualize_flag, sx, sy):
     if visualize_flag and success:
         # load result
         OpenSpacePlanner.DistanceGetResult(x, y, phi, v, a, steer, opt_x,
-                                        opt_y, opt_phi, opt_v, opt_a, opt_steer, opt_time,
-                                        opt_dual_l, opt_dual_n, size,
-                                        hybrid_time, dual_time, ipopt_time)
+                                           opt_y, opt_phi, opt_v, opt_a, opt_steer, opt_time,
+                                           opt_dual_l, opt_dual_n, size,
+                                           hybrid_time, dual_time, ipopt_time)
         for i in range(0, size[0]):
             x_out.append(float(x[i]))
             y_out.append(float(y[i]))
@@ -157,7 +156,7 @@ def SmoothTrajectory(visualize_flag, sx, sy):
             x_shift_leftbottom = x_out[i] + downx + leftx
             y_shift_leftbottom = y_out[i] + downy + lefty
             warm_start_car = patches.Rectangle((x_shift_leftbottom, y_shift_leftbottom), 3.89 + 1.043, 1.055*2,
-                                            angle=phi_out[i] * 180 / math.pi, linewidth=1, edgecolor='r', facecolor='none')
+                                               angle=phi_out[i] * 180 / math.pi, linewidth=1, edgecolor='r', facecolor='none')
             warm_start_arrow = patches.Arrow(
                 x_out[i], y_out[i], 0.25*math.cos(phi_out[i]), 0.25*math.sin(phi_out[i]), 0.2, edgecolor='r',)
             # ax.add_patch(warm_start_car)
@@ -170,7 +169,7 @@ def SmoothTrajectory(visualize_flag, sx, sy):
             x_shift_leftbottom = opt_x_out[i] + downx + leftx
             y_shift_leftbottom = opt_y_out[i] + downy + lefty
             smoothing_car = patches.Rectangle((x_shift_leftbottom, y_shift_leftbottom), 3.89 + 1.043, 1.055*2,
-                                            angle=opt_phi_out[i] * 180 / math.pi, linewidth=1, edgecolor='y', facecolor='none')
+                                              angle=opt_phi_out[i] * 180 / math.pi, linewidth=1, edgecolor='y', facecolor='none')
             smoothing_arrow = patches.Arrow(
                 opt_x_out[i], opt_y_out[i], 0.25*math.cos(opt_phi_out[i]), 0.25*math.sin(opt_phi_out[i]), 0.2, edgecolor='y',)
             ax.add_patch(smoothing_car)
@@ -222,13 +221,13 @@ def SmoothTrajectory(visualize_flag, sx, sy):
         plt.show()
         return True
 
-    if not visualize_flag :
-        if success :
+    if not visualize_flag:
+        if success:
             # load result
             OpenSpacePlanner.DistanceGetResult(x, y, phi, v, a, steer, opt_x,
-                                            opt_y, opt_phi, opt_v, opt_a, opt_steer, opt_time,
-                                            opt_dual_l, opt_dual_n, size,
-                                            hybrid_time, dual_time, ipopt_time)
+                                               opt_y, opt_phi, opt_v, opt_a, opt_steer, opt_time,
+                                               opt_dual_l, opt_dual_n, size,
+                                               hybrid_time, dual_time, ipopt_time)
             for i in range(0, size[0]):
                 x_out.append(float(x[i]))
                 y_out.append(float(y[i]))
@@ -243,9 +242,10 @@ def SmoothTrajectory(visualize_flag, sx, sy):
                 opt_a_out.append(float(opt_a[i]))
                 opt_steer_out.append(float(opt_steer[i]))
                 opt_time_out.append(float(opt_time[i]))
-        return [success, opt_x_out, opt_y_out, opt_phi_out, opt_v_out, opt_a_out, opt_steer_out, opt_time_out, \
-            hybrid_time, dual_time, ipopt_time, planning_time]
+        return [success, opt_x_out, opt_y_out, opt_phi_out, opt_v_out, opt_a_out, opt_steer_out, opt_time_out,
+                hybrid_time, dual_time, ipopt_time, planning_time]
     return False
+
 
 if __name__ == '__main__':
     # visualize_flag = True
@@ -257,26 +257,24 @@ if __name__ == '__main__':
     dual_time_stats = []
     ipopt_time_stats = []
 
-
     test_count = 0
     success_count = 0
     for sx in np.arange(-10, 10, 1.0):
         for sy in np.arange(2, 4, 0.5):
-            print("sx is "+ str(sx) + " and sy is " + str(sy))
+            print("sx is " + str(sx) + " and sy is " + str(sy))
             test_count += 1
             result = SmoothTrajectory(visualize_flag, sx, sy)
-            if result[0] :
+            if result[0]:
                 success_count += 1
                 planning_time_stats.append(result[-1])
                 ipopt_time_stats.append(result[-2][0])
                 dual_time_stats.append(result[-3][0])
                 hybrid_time_stats.append(result[-4][0])
 
-    print("success rate is "+ str(float(success_count) / float(test_count)))
+    print("success rate is " + str(float(success_count) / float(test_count)))
     print("min is " + str(min(planning_time_stats)))
     print("max is " + str(max(planning_time_stats)))
     print("average is " + str(sum(planning_time_stats) / len(planning_time_stats)))
-
 
     module_timing = np.asarray([hybrid_time_stats, dual_time_stats, ipopt_time_stats])
     np.savetxt(result_file, module_timing, delimiter=",")

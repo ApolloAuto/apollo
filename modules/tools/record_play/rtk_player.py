@@ -188,7 +188,7 @@ class RtkPlayer(object):
             # include gear_neutral at the beginning of a trajectory
             if (i < end - 1 and
                 self.data['gear'][i] in {1, 2} and
-                self.data['gear'][i + 1] != self.data['gear'][i]):
+                    self.data['gear'][i + 1] != self.data['gear'][i]):
                 self.logger.debug("enter i in while loop: [ %s ]" % i)
                 self.logger.debug("self.data['gear'][i] != 1: %s" % self.data['gear'][i])
                 self.logger.debug("self.data['gear'][i] != 2: %s" % self.data['gear'][i])

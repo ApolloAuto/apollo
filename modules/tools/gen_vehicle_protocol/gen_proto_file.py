@@ -131,7 +131,7 @@ def gen_proto_file(config_file, work_dir):
                 pb_var_seq = pb_var_seq + 1
             pb_fp.write("}\n")
 
-            #update_detail_pb(car_type)
+            # update_detail_pb(car_type)
 
 
 if __name__ == "__main__":

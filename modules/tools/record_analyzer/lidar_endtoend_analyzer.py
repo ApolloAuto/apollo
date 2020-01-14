@@ -51,8 +51,7 @@ class LidarEndToEndAnalyzer(object):
             del (self.unprocessed_lidar_timestamps[module_name][ind])
             self.endtoend_latency[module_name].append(
                 (pb_msg.header.timestamp_sec -
-                pb_msg.header.lidar_timestamp * 1.0e-9) * 1000.0)
-
+                 pb_msg.header.lidar_timestamp * 1.0e-9) * 1000.0)
 
     def put_lidar(self, point_cloud):
         """
@@ -69,10 +68,10 @@ class LidarEndToEndAnalyzer(object):
         print("\n\n")
         for m in self.modules:
             print(PrintColors.HEADER + "* End to End (" + m
-                + ") Latency (ms)" + PrintColors.ENDC)
+                  + ") Latency (ms)" + PrintColors.ENDC)
             analyzer = StatisticalAnalyzer()
             analyzer.print_statistical_results(self.endtoend_latency[m])
 
-            print(PrintColors.FAIL + "  - MISS # OF LIDAR: " + \
-                str(len(self.unprocessed_lidar_timestamps[m])) + \
-                PrintColors.ENDC)
+            print(PrintColors.FAIL + "  - MISS # OF LIDAR: " +
+                  str(len(self.unprocessed_lidar_timestamps[m])) +
+                  PrintColors.ENDC)

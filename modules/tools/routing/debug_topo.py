@@ -120,7 +120,7 @@ def plot_central_curve(central_curve, color):
             px, py = draw_line(curve.line_segment, color)
             node_x = node_x + px
             node_y = node_y + py
-        #if curve.HasField('arc'):
+        # if curve.HasField('arc'):
         #    draw_arc(curve.arc)
     return [node_x[len(node_x) // 2], node_y[len(node_y) // 2]]
 

@@ -64,7 +64,7 @@ def HybridAStarPlan(visualize_flag):
         ey = -3.86443643718
         ephi = 1.581
         XYbounds = [-13.6406951857, 16.3591910364, -
-            5.15258191624, 5.61797800844]
+                    5.15258191624, 5.61797800844]
 
     x = (c_double * num_output_buffer)()
     y = (c_double * num_output_buffer)()
@@ -148,8 +148,8 @@ def HybridAStarPlan(visualize_flag):
         steer_graph.title.set_text('steering')
         steer_graph.plot(np.linspace(0, size[0], size[0]), steer_out)
         plt.show()
-    if not visualize_flag :
-        if success :
+    if not visualize_flag:
+        if success:
             HybridAStar.GetResult(x, y, phi, v, a, steer, size)
             for i in range(0, size[0]):
                 x_out.append(float(x[i]))
@@ -159,6 +159,7 @@ def HybridAStarPlan(visualize_flag):
                 a_out.append(float(a[i]))
                 steer_out.append(float(steer[i]))
         return success, x_out, y_out, phi_out, v_out, a_out, steer_out, planning_time
+
 
 if __name__ == '__main__':
     visualize_flag = True

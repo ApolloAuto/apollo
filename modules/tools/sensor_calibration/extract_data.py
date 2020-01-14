@@ -83,6 +83,7 @@ SMALL_TOPICS = [
 CYBER_PATH = os.environ['CYBER_PATH']
 CYBER_RECORD_HEADER_LENGTH = 2048
 
+
 def process_dir(path, operation):
     """Create or remove directory."""
     try:
@@ -104,11 +105,13 @@ def process_dir(path, operation):
 
     return True
 
+
 def get_sensor_channel_list(record_file):
     """Get the channel list of sensors for calibration."""
     record_reader = RecordReader(record_file)
     return set(channel_name for channel_name in record_reader.get_channellist()
                if 'sensor' in channel_name or '/localization/pose' in channel_name)
+
 
 def validate_channel_list(channels, dictionary):
     ret = True
@@ -120,8 +123,10 @@ def validate_channel_list(channels, dictionary):
 
     return ret
 
+
 def in_range(v, s, e):
     return True if v >= s and v <= e else False
+
 
 def build_parser(channel, output_path):
     parser = None
@@ -136,9 +141,10 @@ def build_parser(channel, output_path):
     elif channel.startswith("/apollo/sensor/radar"):
         parser = ContiRadarParser(output_path=output_path, instance_saving=True)
     else:
-        raise ValueError("Not Support this channel type: %s" %channel)
+        raise ValueError("Not Support this channel type: %s" % channel)
 
     return parser
+
 
 def extract_data(record_files, output_path, channels,
                  start_timestamp, end_timestamp, extraction_rates):
@@ -223,13 +229,14 @@ def extract_data(record_files, output_path, channels,
 
     return True
 
+
 def save_combined_messages_info(parser, channel):
     if not parser.save_messages_to_file():
         raise ValueError("cannot save combined messages into single file for : %s " % channel)
 
-
     if not parser.save_timestamps_to_file():
         raise ValueError("cannot save tiemstamp info for %s " % channel)
+
 
 def generate_compressed_file(input_path, input_name,
                              output_path, compressed_file='sensor_data'):
@@ -243,6 +250,7 @@ def generate_compressed_file(input_path, input_name,
                         root_dir=input_path,
                         base_dir=input_name)
     os.chdir(cwd_path)
+
 
 def generate_extraction_rate_dict(channels, large_topic_extraction_rate,
                                   small_topic_extraction_rate=1):
@@ -265,6 +273,7 @@ def generate_extraction_rate_dict(channels, large_topic_extraction_rate,
             rates[channel] = large_topic_extraction_rate
 
     return rates
+
 
 def validate_record(record_file):
     """Validate the record file."""
@@ -303,6 +312,7 @@ def validate_record(record_file):
         return False
 
     return True
+
 
 def validate_record_files(record_files, kword='.record.'):
 
@@ -347,6 +357,7 @@ def validate_record_files(record_files, kword='.record.'):
 
     return file_abs_paths
 
+
 def parse_channel_config(channels):
     channel_list = set()
     extraction_rate_dict = dict()
@@ -359,39 +370,42 @@ def parse_channel_config(channels):
             extraction_rate_dict[channel.name] = channel.extraction_rate
 
     return channel_list, extraction_rate_dict
+
+
 def get_substring(str, prefix, suffix):
     """return substring, eclusive prefix or suffix"""
     str_p = str.rfind(prefix) + len(prefix)
     end_p = str.rfind(suffix)
     return str[str_p:end_p]
 
+
 def reorganize_extracted_data(tmp_data_path, task_name, remove_input_data_cache=False):
     root_path = os.path.dirname(os.path.normpath(tmp_data_path))
 
     config_yaml = ConfigYaml()
     if task_name == 'lidar_to_gnss':
-        print (get_subfolder_list(tmp_data_path))
+        print(get_subfolder_list(tmp_data_path))
         subfolders = [x for x in get_subfolder_list(tmp_data_path)
-                    if '_apollo_sensor_' in x or '_localization_pose' in x]
+                      if '_apollo_sensor_' in x or '_localization_pose' in x]
         odometry_subfolders = [x for x in subfolders if '_odometry' in x or '_pose' in x]
         lidar_subfolders = [x for x in subfolders if '_PointCloud2' in x]
         print(lidar_subfolders)
         print(odometry_subfolders)
         if len(lidar_subfolders) is 0 or len(odometry_subfolders) is not 1:
             raise ValueError(('one odometry and more than 0 lidar(s)'
-                        'sensor are needed for sensor calibration'))
+                              'sensor are needed for sensor calibration'))
         odometry_subfolder = odometry_subfolders[0]
         for lidar in lidar_subfolders:
             # get the lidar name from folder name string
             lidar_name = get_substring(str=lidar, prefix='_apollo_sensor_', suffix='_PointCloud2')
-            gnss_name ='novatel'
+            gnss_name = 'novatel'
 
             # reorganize folder structure: each lidar has its raw data,
             # corresponding odometry and configuration yaml file
             out_path = os.path.join(root_path, lidar_name + '_to_gnss_calibration')
             if not process_dir(out_path, 'create'):
                 raise ValueError('Failed to create directory: %s' % out_path)
-            lidar_in_path =os.path.join(tmp_data_path, lidar)
+            lidar_in_path = os.path.join(tmp_data_path, lidar)
             lidar_out_path = os.path.join(out_path, lidar)
             shutil.copytree(lidar_in_path, lidar_out_path)
             odometry_in_path = os.path.join(tmp_data_path, odometry_subfolder)
@@ -400,20 +414,20 @@ def reorganize_extracted_data(tmp_data_path, task_name, remove_input_data_cache=
 
             generated_config_yaml = os.path.join(out_path, 'sample_config.yaml')
             config_yaml.generate_task_config_yaml(task_name=task_name,
-                source_sensor=lidar_name, dest_sensor=gnss_name,
-                source_folder=lidar, dest_folder=odometry_subfolder,
-                out_config_file=generated_config_yaml)
+                                                  source_sensor=lidar_name, dest_sensor=gnss_name,
+                                                  source_folder=lidar, dest_folder=odometry_subfolder,
+                                                  out_config_file=generated_config_yaml)
             print('lidar {} calibration data and configuration'
-                    'are generated.'.format(lidar_name))
+                  'are generated.'.format(lidar_name))
     elif task_name == 'camera_to_lidar':
         # data selection.
         pair_data_folder_name = 'camera-lidar-pairs'
         cameras, lidar = select_static_image_pcd(path=tmp_data_path,
-                                    min_distance=5, stop_times=4,
-                                    wait_time=3, check_range=50,
-                                    image_static_diff_threshold=0.005,
-                                    output_folder_name=pair_data_folder_name,
-                                    image_suffix='.jpg', pcd_suffix='.pcd')
+                                                 min_distance=5, stop_times=4,
+                                                 wait_time=3, check_range=50,
+                                                 image_static_diff_threshold=0.005,
+                                                 output_folder_name=pair_data_folder_name,
+                                                 image_suffix='.jpg', pcd_suffix='.pcd')
         lidar_name = get_substring(str=lidar, prefix='_apollo_sensor_', suffix='_PointCloud2')
         for camera in cameras:
             camera_name = get_substring(str=camera, prefix='_apollo_sensor_', suffix='_image')
@@ -425,23 +439,23 @@ def reorganize_extracted_data(tmp_data_path, task_name, remove_input_data_cache=
             # intrinsics, and configuration yaml file
 
             in_pair_data_path = os.path.join(tmp_data_path, camera, pair_data_folder_name)
-            out_pair_data_path = os.path.join(out_path, pair_data_folder_name )
-            shutil.copytree(in_pair_data_path, out_pair_data_path )
+            out_pair_data_path = os.path.join(out_path, pair_data_folder_name)
+            shutil.copytree(in_pair_data_path, out_pair_data_path)
 
             generated_config_yaml = os.path.join(out_path, 'sample_config.yaml')
             config_yaml.generate_task_config_yaml(task_name=task_name,
-                source_sensor=camera_name, dest_sensor=lidar_name,
-                source_folder=None, dest_folder=None,
-                out_config_file=generated_config_yaml)
+                                                  source_sensor=camera_name, dest_sensor=lidar_name,
+                                                  source_folder=None, dest_folder=None,
+                                                  out_config_file=generated_config_yaml)
     elif task_name == 'radar_to_gnss':
         print('not ready. stay tuned')
     else:
         raise ValueError('Unsupported data extraction task for{}'.format(task_name))
 
-
     if remove_input_data_cache:
         print('removing the cache at {}'.format(tmp_data_path))
         os.system('rm -rf {}'.tmp_data_path)
+
 
 def main():
     """
@@ -486,7 +500,7 @@ def main():
         text_format.Merge(proto_block, config)
 
     records = []
-    for r in  config.records.record_path:
+    for r in config.records.record_path:
         records.append(str(r))
 
     valid_record_list = validate_record_files(records, kword='.record.')
@@ -520,7 +534,7 @@ def main():
                        start_timestamp, end_timestamp, extraction_rates)
     # output_abs_path='/apollo/data/extracted_data/CoolHigh-2019-09-20/camera_to_lidar-2019-12-16-16-33/tmp'
     reorganize_extracted_data(tmp_data_path=output_abs_path,
-                            task_name=config.io_config.task_name)
+                              task_name=config.io_config.task_name)
     # generate_compressed_file(input_path=config.io_config.output_path,
     #                          input_name=output_relative_path,
     #                          output_path=config.io_config.output_path,
@@ -528,6 +542,7 @@ def main():
 
     print('Data extraction is completed successfully!')
     sys.exit(0)
+
 
 if __name__ == '__main__':
     # root_path = '/apollo/data/extracted_data/MKZ5-2019-05-15/lidar_to_gnss-2019-11-25-11-02/tmp'

@@ -53,6 +53,7 @@ def frechet_distance(P, Q):
         print("calculate frechet_distance exception.")
     return dist
 
+
 if __name__ == "__main__":
     """test"""
     P = [[1, 1], [2, 1], [2, 2]]

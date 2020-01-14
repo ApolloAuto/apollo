@@ -100,13 +100,13 @@ class FCNN_CNN1D(torch.nn.Module):
         super(FCNN_CNN1D, self).__init__()
         self.lane_feature_conv = torch.nn.Sequential(
             nn.Conv1d(4, 10, 3, stride=1),\
-            #nn.BatchNorm1d(10),\
+            # nn.BatchNorm1d(10),\
             nn.ReLU(),\
             #nn.Conv1d(10, 16, 3, stride=2),\
-            #nn.BatchNorm1d(16),\
-            #nn.ReLU(),\
+            # nn.BatchNorm1d(16),\
+            # nn.ReLU(),\
             nn.Conv1d(10, 25, 3, stride=2),\
-            #nn.BatchNorm1d(25)
+            # nn.BatchNorm1d(25)
         )
         self.lane_feature_maxpool = nn.MaxPool1d(4)
         self.lane_feature_avgpool = nn.AvgPool1d(4)
@@ -135,7 +135,7 @@ class FCNN_CNN1D(torch.nn.Module):
             nn.Dropout(0.1),
 
             nn.Linear(11, 1),\
-            #nn.Sigmoid()
+            # nn.Sigmoid()
         )
         self.regress = torch.nn.Sequential(
             nn.Linear(125, 77),

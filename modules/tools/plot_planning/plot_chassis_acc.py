@@ -70,6 +70,7 @@ def callback(chassis_pb):
     last_t = current_t
     last_v = current_v
 
+
 def listener():
     cyber.init()
     test_node = cyber.Node("chassis_acc_listener")

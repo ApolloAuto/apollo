@@ -35,6 +35,7 @@ from metrics.lon_acceleration import LonAcceleration
 from metrics.latency import Latency
 from metrics.reference_line import ReferenceLine
 
+
 class PlannigAnalyzer:
     """planning analyzer"""
 
@@ -60,7 +61,6 @@ class PlannigAnalyzer:
 
         self.bag_start_time_t = None
         self.print_acc = arguments.showacc
-
 
     def put(self, adc_trajectory):
         self.total_cycle_num += 1
@@ -144,29 +144,29 @@ class PlannigAnalyzer:
     def print_latency_statistics(self):
         """print_latency_statistics"""
         print("\n\n")
-        print(PrintColors.HEADER + "--- Planning Latency (ms) ---" + \
-            PrintColors.ENDC)
+        print(PrintColors.HEADER + "--- Planning Latency (ms) ---" +
+              PrintColors.ENDC)
         StatisticalAnalyzer().print_statistical_results(self.module_latency)
 
-        print(PrintColors.HEADER + "--- Planning Trajectroy Type Distribution" \
+        print(PrintColors.HEADER + "--- Planning Trajectroy Type Distribution"
                                    " ---" + PrintColors.ENDC)
         DistributionAnalyzer().print_distribution_results(
             self.trajectory_type_dist)
 
-        print(PrintColors.HEADER + "--- Planning Estop Distribution" \
+        print(PrintColors.HEADER + "--- Planning Estop Distribution"
                                    " ---" + PrintColors.ENDC)
         DistributionAnalyzer().print_distribution_results(
             self.estop_reason_dist)
 
-        print(PrintColors.HEADER + "--- Planning Error Code Distribution---" + \
-            PrintColors.ENDC)
+        print(PrintColors.HEADER + "--- Planning Error Code Distribution---" +
+              PrintColors.ENDC)
         self.error_code_analyzer.print_results()
-        print(PrintColors.HEADER + "--- Planning Error Msg Distribution ---" + \
-            PrintColors.ENDC)
+        print(PrintColors.HEADER + "--- Planning Error Msg Distribution ---" +
+              PrintColors.ENDC)
         self.error_msg_analyzer.print_results()
 
-        print(PrintColors.HEADER + "--- Planning Trajectory Frechet Distance (m) ---" + \
-            PrintColors.ENDC)
+        print(PrintColors.HEADER + "--- Planning Trajectory Frechet Distance (m) ---" +
+              PrintColors.ENDC)
         StatisticalAnalyzer().print_statistical_results(self.frechet_distance_list)
 
     def print_sim_results(self):

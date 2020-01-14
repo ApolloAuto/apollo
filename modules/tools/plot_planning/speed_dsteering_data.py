@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 from cyber_py.record import RecordReader
 from modules.canbus.proto import chassis_pb2
 
+
 class SpeedDsteeringData:
     def __init__(self):
         self.last_steering_percentage = None
@@ -53,6 +54,7 @@ class SpeedDsteeringData:
 
     def get_speed_dsteering(self):
         return self.speed_data, self.d_steering_data
+
 
 if __name__ == "__main__":
     import sys

@@ -60,8 +60,8 @@ class RealTimeTest(object):
 
             self.accs.append(self.acc)
             if abs(self.acc) > self.acclimit:
-                print(t, "\t", (sum(self.buff) / len(self.buff)) * 3.6, "\t", \
-                    self.acc, "\t", self.count, "\t", self.acclimit)
+                print(t, "\t", (sum(self.buff) / len(self.buff)) * 3.6, "\t",
+                      self.acc, "\t", self.count, "\t", self.acclimit)
         self.last_acc = self.acc
         self.last_t = t
         self.last_speed = sum(self.buff) / len(self.buff)

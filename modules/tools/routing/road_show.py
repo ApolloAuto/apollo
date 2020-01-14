@@ -128,8 +128,8 @@ def draw_map(drivemap):
                 center_x, center_y = draw_line(curve.line_segment,
                                                g_color[road_idx % len(g_color)])
                 draw_id(center_x, center_y, str(road_idx))
-                #break
-            #if curve.HasField('arc'):
+                # break
+            # if curve.HasField('arc'):
             #    draw_arc(curve.arc)
 
         for curve in lane.left_boundary.curve.segment:
@@ -139,7 +139,7 @@ def draw_map(drivemap):
         for curve in lane.right_boundary.curve.segment:
             if curve.HasField('line_segment'):
                 draw_boundary(curve.line_segment)
-                #break
+                # break
 
     return drivemap
 

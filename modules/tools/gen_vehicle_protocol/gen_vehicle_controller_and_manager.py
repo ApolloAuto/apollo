@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 
 import datetime
 import os
@@ -239,7 +239,7 @@ if __name__ == "__main__":
     protocol_conf = conf["protocol_conf"]
 
     output_dir = conf["output_dir"] + "vehicle/" + conf["car_type"].lower() + \
-                 "/"
+        "/"
     shutil.rmtree(output_dir, True)
     os.makedirs(output_dir)
     gen_vehicle_controller_and_manager(protocol_conf, output_dir)

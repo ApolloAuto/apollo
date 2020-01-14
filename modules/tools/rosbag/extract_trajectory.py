@@ -39,6 +39,7 @@ def write_to_file(file_path, topic_pb):
     with open(file_path, 'w') as fp:
         fp.write(str(topic_pb))
 
+
 def extract_record(in_record, output):
     freader = record.RecordReader(in_record)
     print("begin to extract from record {}".format(in_record))
@@ -61,11 +62,13 @@ def extract_record(in_record, output):
                       pose.orientation.qw))
     print("Finished extracting from record {}".format(in_record))
 
+
 def main(args):
     out = open(args.output, 'w') if args.output or sys.stdout
     for record_file in args.in_record:
         extract_record(record_file, out)
     out.close()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
