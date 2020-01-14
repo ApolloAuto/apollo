@@ -126,8 +126,8 @@ cc_test(
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map",
         "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map_pool",
+        "@com_google_googletest//:gtest_main",
         "@eigen",
-        "@gtest//:main",
     ],
 )
 
@@ -139,8 +139,8 @@ cc_test(
     deps = [
         "//cyber",
         "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map_config",
+        "@com_google_googletest//:gtest_main",
         "@eigen",
-        "@gtest//:main",
     ],
 )
 

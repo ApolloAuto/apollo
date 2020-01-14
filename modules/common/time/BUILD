@@ -23,7 +23,7 @@ cc_test(
     srcs = ["time_test.cc"],
     deps = [
         ":time",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -33,7 +33,7 @@ cc_test(
     srcs = ["timer_test.cc"],
     deps = [
         ":time",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

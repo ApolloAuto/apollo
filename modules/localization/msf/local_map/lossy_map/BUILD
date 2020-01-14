@@ -46,7 +46,7 @@ cc_test(
         "//modules/localization/msf/local_map/lossless_map:localization_msf_lossless_map",
         "//modules/localization/msf/local_map/lossy_map:localization_msf_lossy_map",
         "@boost",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

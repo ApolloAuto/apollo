@@ -28,7 +28,7 @@ cc_test(
     deps = [
         ":camera_util",
         "//modules/perception/fusion/base",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -48,7 +48,7 @@ cc_test(
     deps = [
         ":dst_evidence",
         "//modules/perception/fusion/base",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -68,7 +68,7 @@ cc_test(
     deps = [
         ":information_filter",
         "//modules/perception/fusion/base",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -89,7 +89,7 @@ cc_test(
     deps = [
         ":kalman_filter",
         "//modules/perception/fusion/base",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

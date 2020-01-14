@@ -34,7 +34,7 @@ cc_test(
         "//cyber/common:log",
         "//modules/common/time",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

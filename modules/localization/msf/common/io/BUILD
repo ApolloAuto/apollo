@@ -21,7 +21,7 @@ cc_test(
     srcs = ["velodyne_utility_test.cc"],
     deps = [
         "//modules/localization/msf/common/io:localization_msf_common_io",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

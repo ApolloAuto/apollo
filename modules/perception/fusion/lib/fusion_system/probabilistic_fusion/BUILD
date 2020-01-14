@@ -40,7 +40,7 @@ cc_test(
     srcs = ["probabilistic_fusion_test.cc"],
     deps = [
         ":probabilistic_fusion",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

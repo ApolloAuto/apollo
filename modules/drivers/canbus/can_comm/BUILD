@@ -19,7 +19,7 @@ cc_library(
         "//modules/common/proto:error_code_proto",
         "//modules/drivers/canbus/can_client",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -46,7 +46,7 @@ cc_test(
         "//modules/drivers/canbus/can_client/fake:fake_can_client",
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/common:canbus_common",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -60,7 +60,7 @@ cc_test(
         "//modules/drivers/canbus/can_client/fake:fake_can_client",
         "//modules/drivers/canbus/can_comm:can_receiver",
         "//modules/drivers/canbus/common:canbus_common",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -71,7 +71,7 @@ cc_test(
     deps = [
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -83,7 +83,7 @@ cc_test(
         "//cyber",
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

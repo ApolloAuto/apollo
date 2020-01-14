@@ -86,7 +86,7 @@ cc_test(
     ],
     deps = [
         ":lane_follow",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

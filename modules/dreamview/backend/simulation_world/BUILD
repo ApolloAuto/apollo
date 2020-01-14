@@ -45,7 +45,7 @@ cc_test(
     deps = [
         ":simulation_world_service",
         "//modules/common/math:quaternion",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

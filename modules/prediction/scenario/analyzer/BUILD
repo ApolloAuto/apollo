@@ -26,7 +26,7 @@ cc_test(
     deps = [
         ":scenario_analyzer",
         "//modules/prediction/common:kml_map_based_test",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

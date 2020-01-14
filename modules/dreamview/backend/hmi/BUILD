@@ -34,7 +34,7 @@ cc_test(
     deps = [
         ":vehicle_manager",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -89,7 +89,7 @@ cc_test(
     srcs = ["hmi_worker_test.cc"],
     deps = [
         ":hmi_worker",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

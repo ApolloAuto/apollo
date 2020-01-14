@@ -25,7 +25,7 @@ cc_test(
     ],
     deps = [
         ":config_manager",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

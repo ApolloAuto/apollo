@@ -136,7 +136,7 @@ cc_test(
         "//modules/control/common:control_gflags",
         "//modules/control/proto:control_proto",
         "//modules/planning/proto:planning_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -154,7 +154,7 @@ cc_test(
         "//modules/control/common:control_gflags",
         "//modules/control/proto:control_proto",
         "//modules/planning/proto:planning_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -172,7 +172,7 @@ cc_test(
         "//modules/control/common:control_gflags",
         "//modules/control/proto:control_proto",
         "//modules/planning/proto:planning_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

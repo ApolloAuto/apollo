@@ -23,7 +23,7 @@ cc_test(
     srcs = ["dst_existance_fusion_test.cc"],
     deps = [
         ":dst_existance_fusion",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

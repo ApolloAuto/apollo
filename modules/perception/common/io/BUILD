@@ -28,7 +28,7 @@ cc_test(
     ],
     deps = [
         ":io_util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

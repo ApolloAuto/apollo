@@ -29,7 +29,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -40,7 +40,7 @@ cc_test(
     deps = [
         ":adc_auxiliarycontrol_110",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -53,7 +53,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -64,7 +64,7 @@ cc_test(
     deps = [
         ":adc_motioncontrol1_10",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -77,7 +77,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -88,7 +88,7 @@ cc_test(
     deps = [
         ":adc_motioncontrollimits1_12",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -101,7 +101,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -112,7 +112,7 @@ cc_test(
     deps = [
         ":llc_auxiliaryfeedback_120",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -125,7 +125,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -136,7 +136,7 @@ cc_test(
     deps = [
         ":llc_diag_brakecontrol_721",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -149,7 +149,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -160,7 +160,7 @@ cc_test(
     deps = [
         ":llc_diag_fault_620",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -173,7 +173,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -184,7 +184,7 @@ cc_test(
     deps = [
         ":llc_diag_steeringcontrol_722",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -197,7 +197,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -208,7 +208,7 @@ cc_test(
     deps = [
         ":llc_motioncommandfeedback1_22",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -221,7 +221,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -232,7 +232,7 @@ cc_test(
     deps = [
         ":llc_motionfeedback1_20",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -245,7 +245,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -256,7 +256,7 @@ cc_test(
     deps = [
         ":llc_motionfeedback2_21",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -269,7 +269,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -280,7 +280,7 @@ cc_test(
     deps = [
         ":llc_vehiclelimits_24",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -293,7 +293,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -304,7 +304,7 @@ cc_test(
     deps = [
         ":llc_vehiclestatus_25",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

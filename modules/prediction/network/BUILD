@@ -47,7 +47,7 @@ cc_test(
     srcs = ["net_util_test.cc"],
     deps = [
         "//modules/prediction/network:net_util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -57,7 +57,7 @@ cc_test(
     srcs = ["net_layer_test.cc"],
     deps = [
         "//modules/prediction/network:net_layer",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

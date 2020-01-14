@@ -8,7 +8,7 @@ cc_test(
     srcs = ["adaptive_kalman_filter_test.cc"],
     deps = [
         ":adaptive_kalman_filter",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

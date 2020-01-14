@@ -26,7 +26,7 @@ cc_test(
     srcs = ["curve_math_test.cc"],
     deps = [
         ":curve_math",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

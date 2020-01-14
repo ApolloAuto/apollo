@@ -8,7 +8,7 @@ cc_test(
     srcs = ["hdmap_radar_roi_filter_test.cc"],
     deps = [
         ":hdmap_radar_roi_filter",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

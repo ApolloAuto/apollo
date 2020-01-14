@@ -24,7 +24,7 @@ cc_test(
     srcs = ["path_reuse_decider_test.cc"],
     deps = [
         "path_reuse_decider",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -50,7 +50,7 @@ cc_test(
     srcs = ["on_lane_planner_dispatcher_test.cc"],
     deps = [
         ":planner_dispatcher",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -60,7 +60,7 @@ cc_test(
     srcs = ["navi_planner_dispatcher_test.cc"],
     deps = [
         ":planner_dispatcher",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -21,7 +21,7 @@ cc_test(
     srcs = ["rt_common_test.cc"],
     deps = [
         ":rt_common",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -42,7 +42,7 @@ cc_test(
     srcs = ["rt_utils_test.cc"],
     deps = [
         ":rt_utils",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -80,7 +80,7 @@ cc_test(
     deps = [
         ":rt_net",
         "//modules/perception/inference:inference_factory_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -107,7 +107,7 @@ cc_test(
     ],
     deps = [
         ":entropy_calibrator",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -135,7 +135,7 @@ cc_test(
     ],
     deps = [
         ":batch_stream",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -41,7 +41,7 @@ cc_test(
     srcs = ["public_road_planner_test.cc"],
     deps = [
         ":public_road_planner",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

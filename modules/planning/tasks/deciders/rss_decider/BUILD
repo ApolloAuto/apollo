@@ -25,7 +25,7 @@ cc_test(
     deps = [
         ":rss_decider",
         "@ad_rss_lib//:ad_rss",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

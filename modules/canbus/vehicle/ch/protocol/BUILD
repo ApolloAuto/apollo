@@ -40,7 +40,7 @@ cc_test(
     srcs = ["brake_command_111_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ch/protocol:canbus_ch_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -62,7 +62,7 @@ cc_test(
     srcs = ["brake_status__511_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ch/protocol:canbus_ch_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -84,7 +84,7 @@ cc_test(
     srcs = ["control_command_115_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ch/protocol:canbus_ch_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -106,7 +106,7 @@ cc_test(
     srcs = ["ecu_status_1_515_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ch/protocol:canbus_ch_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -128,7 +128,7 @@ cc_test(
     srcs = ["ecu_status_2_516_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ch/protocol:canbus_ch_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -150,7 +150,7 @@ cc_test(
     srcs = ["ecu_status_3_517_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ch/protocol:canbus_ch_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -172,7 +172,7 @@ cc_test(
     srcs = ["gear_command_114_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ch/protocol:canbus_ch_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -194,7 +194,7 @@ cc_test(
     srcs = ["gear_status_514_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ch/protocol:canbus_ch_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -216,7 +216,7 @@ cc_test(
     srcs = ["steer_command_112_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ch/protocol:canbus_ch_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -238,7 +238,7 @@ cc_test(
     srcs = ["steer_status__512_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ch/protocol:canbus_ch_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -260,7 +260,7 @@ cc_test(
     srcs = ["throttle_command_110_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ch/protocol:canbus_ch_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -282,7 +282,7 @@ cc_test(
     srcs = ["throttle_status__510_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ch/protocol:canbus_ch_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -304,7 +304,7 @@ cc_test(
     srcs = ["turnsignal_command_113_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ch/protocol:canbus_ch_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -326,7 +326,7 @@ cc_test(
     srcs = ["turnsignal_status__513_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ch/protocol:canbus_ch_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

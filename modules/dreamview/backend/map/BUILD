@@ -26,7 +26,7 @@ cc_test(
     ],
     deps = [
         ":map_service",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

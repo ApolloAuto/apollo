@@ -35,7 +35,7 @@ cc_test(
     data = ["//modules/planning:planning_conf"],
     deps = [
         ":traffic_light_protected_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -48,7 +48,7 @@ cc_test(
     ],
     deps = [
         ":traffic_light_protected_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

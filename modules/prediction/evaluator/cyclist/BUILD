@@ -27,7 +27,7 @@ cc_test(
         ":cyclist_keep_lane_evaluator",
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/container/obstacles:obstacles_container",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

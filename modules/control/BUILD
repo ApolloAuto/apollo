@@ -54,7 +54,7 @@ cc_test(
     data = ["//modules/control:control_testdata"],
     deps = [
         ":control_component_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

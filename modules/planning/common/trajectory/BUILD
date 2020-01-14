@@ -25,7 +25,7 @@ cc_test(
     deps = [
         ":discretized_trajectory",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -49,7 +49,7 @@ cc_test(
     deps = [
         ":publishable_trajectory",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

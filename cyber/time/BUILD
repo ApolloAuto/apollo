@@ -18,7 +18,7 @@ cc_test(
     srcs = ["time_test.cc"],
     deps = [
         "//cyber:cyber_core",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -48,7 +48,7 @@ cc_test(
     srcs = ["duration_test.cc"],
     deps = [
         "//cyber:cyber_core",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

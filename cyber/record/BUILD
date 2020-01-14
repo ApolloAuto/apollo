@@ -59,7 +59,7 @@ cc_test(
     deps = [
         "//cyber",
         "//cyber/proto:record_cc_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -75,7 +75,7 @@ cc_test(
     deps = [
         "//cyber",
         "//cyber/proto:record_cc_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -119,7 +119,7 @@ cc_test(
     deps = [
         "//cyber",
         "//cyber/proto:record_cc_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -140,7 +140,7 @@ cc_test(
     deps = [
         "//cyber",
         "//cyber/proto:record_cc_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

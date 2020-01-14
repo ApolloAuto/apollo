@@ -23,7 +23,7 @@ cc_test(
         ":discretized_path",
         "//modules/common/util",
         "//modules/common/util:point_factory",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -46,7 +46,7 @@ cc_test(
     srcs = ["frenet_frame_path_test.cc"],
     deps = [
         ":frenet_frame_path",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

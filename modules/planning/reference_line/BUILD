@@ -87,7 +87,7 @@ cc_test(
     ],
     deps = [
         ":spiral_reference_line_smoother",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -121,7 +121,7 @@ cc_test(
     deps = [
         ":qp_spline_reference_line_smoother",
         "//modules/map/hdmap",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -136,7 +136,7 @@ cc_test(
     deps = [
         ":discrete_points_reference_line_smoother",
         "//modules/map/hdmap",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
