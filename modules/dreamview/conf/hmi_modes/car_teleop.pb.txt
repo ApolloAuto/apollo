@@ -196,8 +196,8 @@ modules {
 modules {
   key: "Router"
   value: {
-    start_command: "run_teleop_router_vehicle.bash start"
-    stop_command: "run_teleop_router_vehicle.bash stop"
+    start_command: "run_teleop_router.bash start"
+    stop_command: "run_teleop_router.bash stop"
     process_monitor_config {
       command_keywords: "python"
       command_keywords: "router.py"
