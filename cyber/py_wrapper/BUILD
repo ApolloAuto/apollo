@@ -37,7 +37,7 @@ cc_library(
     defines = ["PY_MAJOR_VERSION=3"],
     deps = [
         "//cyber:cyber_core",
-        "@python3",
+        "//third_party:python3",
     ],
 )
 
@@ -86,7 +86,7 @@ cc_library(
     deps = [
         "//cyber/message:py_message",
         "//cyber/record",
-        "@python3",
+        "//third_party:python3",
     ],
 )
 
@@ -136,8 +136,8 @@ cc_library(
     defines = ["PY_MAJOR_VERSION=3"],
     deps = [
         "//cyber:cyber_core",
+        "//third_party:python3",
         "@fastrtps",
-        "@python3",
     ],
 )
 
@@ -174,7 +174,7 @@ cc_library(
     defines = ["PY_MAJOR_VERSION=3"],
     deps = [
         "//cyber:cyber_core",
-        "@python3",
+        "//third_party:python3",
     ],
 )
 
@@ -213,7 +213,7 @@ cc_library(
     deps = [
         ":py3_cyber",
         "//cyber:cyber_core",
-        "@python3",
+        "//third_party:python3",
     ],
 )
 
