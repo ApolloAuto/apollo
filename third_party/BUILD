@@ -14,3 +14,8 @@ cc_library(
     name = "pthread",
     linkopts = ["-pthread"],
 )
+
+cc_library(
+    name = "ncurses",
+    linkopts = ["-lncurses"],
+)
