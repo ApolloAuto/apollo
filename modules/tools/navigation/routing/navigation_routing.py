@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -19,7 +19,7 @@
 import os
 import rospy
 import math
-import thread
+import _thread
 import requests
 import json
 import pyproj
@@ -293,6 +293,6 @@ if __name__ == "__main__":
 
     load_drive_data()
     add_listener()
-    thread.start_new_thread(run_flask, ())
+    _thread.start_new_thread(run_flask, ())
     # app.run(debug=False, port=5001, host='localhost')
     rospy.spin()

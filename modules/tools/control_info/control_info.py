@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -27,7 +27,7 @@ import time
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy
-import tkFileDialog
+import tkinter.filedialog
 from matplotlib import patches
 from matplotlib import lines
 from cyber_py import cyber
@@ -379,7 +379,7 @@ if __name__ == "__main__":
         canbussub = node.create_reader('/apollo/canbus/chassis',
                                        chassis_pb2.Chassis,
                                        controlinfo.callback_canbus)
-        raw_input("Press Enter To Stop")
+        input("Press Enter To Stop")
 
     mng = plt.get_current_fig_manager()
     controlinfo.longitudinal()

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -25,8 +25,8 @@ from google.protobuf.internal import decoder
 from google.protobuf.internal import encoder
 
 from modules.prediction.proto import offline_features_pb2
-from bounding_rectangle import BoundingRectangle
-from configure import parameters
+from .bounding_rectangle import BoundingRectangle
+from .configure import parameters
 
 param_fea = parameters['feature']
 

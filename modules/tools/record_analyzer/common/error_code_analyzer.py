@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -17,8 +17,8 @@
 ###############################################################################
 
 from modules.common.proto import error_code_pb2
-from statistical_analyzer import PrintColors
-from distribution_analyzer import DistributionAnalyzer
+from .statistical_analyzer import PrintColors
+from .distribution_analyzer import DistributionAnalyzer
 
 
 class ErrorCodeAnalyzer:

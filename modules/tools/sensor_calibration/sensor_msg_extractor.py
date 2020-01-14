@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -201,7 +201,7 @@ class PointCloudParser(SensorMessageParser):
             np_type = pypcd.pcd_type_to_numpy_type[(t, s)]
             typenames.append(np_type)
 
-        np_dtype = np.dtype(zip(md['fields'], typenames))
+        np_dtype = np.dtype(list(zip(md['fields'], typenames)))
         pc_data = self.convert_xyzit_pb_to_array(xyz_i_t, data_type=np_dtype)
         pc = pypcd.PointCloud(md, pc_data)
         return pc
@@ -273,7 +273,7 @@ class ImageParser(SensorMessageParser):
             print('Unsupported image encoding type: %s.' % image.encoding)
             return False
 
-        channel_num = image.step / image.width
+        channel_num = image.step // image.width
         self._parsed_data = np.fromstring(image.data, dtype=np.uint8).reshape(
             (image.height, image.width, channel_num))
 
@@ -351,7 +351,7 @@ class ContiRadarParser(SensorMessageParser):
             np_type = pypcd.pcd_type_to_numpy_type[(t, s)]
             typenames.append(np_type)
 
-        np_dtype = np.dtype(zip(md['fields'], typenames))
+        np_dtype = np.dtype(list(zip(md['fields'], typenames)))
         pc_data = self.convert_contiobs_pb_to_array(contiobs, data_type=np_dtype)
         pc = pypcd.PointCloud(md, pc_data)
         return pc

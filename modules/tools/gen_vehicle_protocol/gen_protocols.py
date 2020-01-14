@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -215,7 +215,7 @@ def get_byte_info(var):
     bit = var["bit"]
     byte_info = []
     left_len = var["len"]
-    byte_idx = bit / 8
+    byte_idx = bit // 8
     bit_start = bit % 8
     if var["order"] == "motorola":
         while left_len > 0:
@@ -399,7 +399,7 @@ def gen_control_cpp(car_type, protocol, output_dir):
                     ) + "::" + var["enum"][0].upper()
                 else:
                     init_val = protocol["name"].capitalize(
-                    ) + "::" + var["enum"].values()[0].upper()
+                    ) + "::" + list(var["enum"].values())[0].upper()
 
             set_private_var_init_list.append("  %s_ = %s;" %
                                              (var["name"].lower(), init_val))
