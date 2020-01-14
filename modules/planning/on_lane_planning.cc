@@ -921,7 +921,7 @@ void OnLanePlanning::AddPartitionedTrajectory(
        open_space_debug.partitioned_trajectories().trajectory()) {
     auto* partition_line = chart->add_line();
     partition_line->set_label(
-        absl::StrCat("Patitioned ", partitioned_trajectory_label));
+        absl::StrCat("Partitioned ", partitioned_trajectory_label));
     ++partitioned_trajectory_label;
     for (const auto& point : partitioned_trajectory.trajectory_point()) {
       auto* point_debug = partition_line->add_point();
