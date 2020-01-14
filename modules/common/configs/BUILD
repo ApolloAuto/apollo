@@ -27,7 +27,7 @@ cc_library(
         "//cyber/common:macros",
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/util",
-        "@glog",
+        "@com_google_glog//:glog",
     ],
 )
 

@@ -34,8 +34,8 @@ cc_library(
         "//modules/transform:tf2_buffer_lib",
         "//modules/transform:transform_broadcaster_lib",
         "@boost",
+        "@com_google_glog//:glog",
         "@eigen",
-        "@glog",
         "@yaml_cpp//:yaml",
     ],
 )

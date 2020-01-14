@@ -30,7 +30,7 @@ new_local_repository(
 
 # glog
 new_local_repository(
-    name = "glog",
+    name = "com_google_glog",
     build_file = "third_party/glog.BUILD",
     path = "/usr/local/include/glog",
 )
