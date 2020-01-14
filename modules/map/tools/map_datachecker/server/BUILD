@@ -186,7 +186,7 @@ cc_library(
     srcs = ["worker_gflags.cc"],
     hdrs = ["worker_gflags.h"],
     deps = [
-        "//external:gflags",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 

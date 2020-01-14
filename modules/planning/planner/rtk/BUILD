@@ -9,7 +9,6 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
-        "//external:gflags",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/util",
         "//modules/common/util:factory",
@@ -19,6 +18,7 @@ cc_library(
         "//modules/planning/planner",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
+        "@com_github_gflags_gflags//:gflags",
         "@com_google_absl//absl/strings",
         "@eigen",
     ],

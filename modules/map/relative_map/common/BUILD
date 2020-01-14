@@ -7,7 +7,7 @@ cc_library(
     srcs = ["relative_map_gflags.cc"],
     hdrs = ["relative_map_gflags.h"],
     deps = [
-        "//external:gflags",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 

@@ -32,7 +32,6 @@ cc_library(
     ],
     deps = [
         "//cyber/common:log",
-        "//external:gflags",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
         "//modules/common/util",
@@ -43,6 +42,7 @@ cc_library(
         "//modules/planning/open_space/trajectory_smoother:dual_variable_warm_start_problem",
         "//modules/planning/open_space/trajectory_smoother:iterative_anchoring_smoother",
         "//modules/planning/proto:planning_config_proto",
+        "@com_github_gflags_gflags//:gflags",
         "@eigen",
     ],
 )

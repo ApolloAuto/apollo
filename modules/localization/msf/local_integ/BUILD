@@ -16,7 +16,6 @@ cc_library(
         "-lopencv_imgproc",
     ],
     deps = [
-        "//external:gflags",
         "//modules/common/status",
         "//modules/common/time",
         "//modules/drivers/gnss/proto:gnss_best_pose_proto",
@@ -37,6 +36,7 @@ cc_library(
         "//modules/localization/proto:pose_proto",
         "//modules/localization/proto:sins_pva_proto",
         "@boost",
+        "@com_github_gflags_gflags//:gflags",
         "@eigen",
         "@glog",
         "@local_integ",

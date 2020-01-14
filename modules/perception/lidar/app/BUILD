@@ -54,8 +54,8 @@ cc_test(
     srcs = ["lidar_app_lidar_pipeline_test.cc"],
     deps = [
         ":app",
-        "//external:gflags",
         "//modules/perception/common/io:io_util",
+        "@com_github_gflags_gflags//:gflags",
         "@com_google_googletest//:gtest_main",
     ],
 )

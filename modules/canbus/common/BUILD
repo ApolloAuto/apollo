@@ -8,7 +8,7 @@ cc_library(
     hdrs = ["canbus_gflags.h"],
     copts = ["-DMODULE_NAME=\\\"canbus\\\""],
     deps = [
-        "//external:gflags",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
