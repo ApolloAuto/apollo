@@ -27,7 +27,6 @@
 
 namespace apollo {
 namespace planning {
-// #define ADEBUG AINFO
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
@@ -161,10 +160,8 @@ void OpenSpaceRoiDecider::SetOriginFromADC(Frame *const frame,
   const double adc_init_y = park_and_go_status.adc_init_position().y();
   const double adc_init_heading = park_and_go_status.adc_init_heading();
   common::math::Vec2d adc_init_position = {adc_init_x, adc_init_y};
-  const auto &vehicle_config =
-      common::VehicleConfigHelper::Instance()->GetConfig();
-  const double adc_length = vehicle_config.vehicle_param().length();
-  const double adc_width = vehicle_config.vehicle_param().width();
+  const double adc_length = vehicle_params_.length();
+  const double adc_width = vehicle_params_.width();
   // ADC box
   Box2d adc_box(adc_init_position, adc_init_heading, adc_length, adc_width);
   // get vertices from ADC box
@@ -945,10 +942,8 @@ bool OpenSpaceRoiDecider::GetParkAndGoBoundary(
   const double adc_init_y = park_and_go_status.adc_init_position().y();
   const double adc_init_heading = park_and_go_status.adc_init_heading();
   common::math::Vec2d adc_init_position = {adc_init_x, adc_init_y};
-  const auto &vehicle_config =
-      common::VehicleConfigHelper::Instance()->GetConfig();
-  const double adc_length = vehicle_config.vehicle_param().length();
-  const double adc_width = vehicle_config.vehicle_param().width();
+  const double adc_length = vehicle_params_.length();
+  const double adc_width = vehicle_params_.width();
   // ADC box
   Box2d adc_box(adc_init_position, adc_init_heading, adc_length, adc_width);
   // get vertices from ADC box
