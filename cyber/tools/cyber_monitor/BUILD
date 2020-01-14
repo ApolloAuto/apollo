@@ -14,7 +14,6 @@ cc_binary(
         "screen.cc",
     ],
     linkopts = [
-        "-pthread",
         "-lncurses",
     ],
     deps = [
@@ -23,6 +22,7 @@ cc_binary(
         ":screen",
         "//cyber:init",
         "//cyber/service_discovery:topology_manager",
+        "//third_party:pthread",
     ],
 )
 
