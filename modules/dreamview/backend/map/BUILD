@@ -13,7 +13,7 @@ cc_library(
         "//modules/map/pnc_map",
         "//third_party/json",
         "@boost",
-        "@glog",
+        "@com_google_glog//:glog",
     ],
 )
 

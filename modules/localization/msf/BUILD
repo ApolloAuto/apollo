@@ -43,8 +43,8 @@ cc_library(
         "//modules/localization/proto:sins_pva_proto",
         "//modules/transform:transform_broadcaster_lib",
         "@boost",
+        "@com_google_glog//:glog",
         "@com_google_googletest//:gtest",
-        "@glog",
         "@yaml_cpp//:yaml",
     ],
 )
