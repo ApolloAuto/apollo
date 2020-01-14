@@ -9,8 +9,6 @@ cc_library(
     linkopts = [
         "-lsnappy",
         "-lz",
-        "-lsnappy",
-        "-lrt",
         "-ldl",
         "-lpthread",
     ],
@@ -18,6 +16,7 @@ cc_library(
         "//cyber/common:log",
         "//external:gflags",
         "//modules/perception/inference:inference_lib",
+        "//third_party:rt",
         "@boost",
         "@com_google_protobuf//:protobuf",
         "@cuda",
