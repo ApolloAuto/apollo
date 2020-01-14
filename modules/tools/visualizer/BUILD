@@ -10,7 +10,6 @@ cc_binary(
     ],
     linkopts = [
         "-lconsole_bridge",
-        "-lpthread",
         "-lGL",
         "-lQt5Core",
         "-lQt5Widgets",
@@ -19,6 +18,7 @@ cc_binary(
     ],
     deps = [
         ":visualizer_lib",
+        "//third_party:pthread",
         "@fastrtps",
     ],
 )

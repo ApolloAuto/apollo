@@ -19,13 +19,11 @@ cc_binary(
         "mainboard/module_controller.cc",
         "mainboard/module_controller.h",
     ],
-    copts = [
-        "-pthread",
-    ],
     linkstatic = False,
     deps = [
         ":cyber_core",
         "//cyber/proto:dag_conf_cc_proto",
+        "//third_party:pthread",
     ],
 )
 

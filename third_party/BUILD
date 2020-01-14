@@ -9,3 +9,8 @@ cc_library(
     name = "rt",
     linkopts = ["-lrt"],
 )
+
+cc_library(
+    name = "pthread",
+    linkopts = ["-pthread"],
+)
