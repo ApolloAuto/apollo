@@ -97,7 +97,7 @@ cc_test(
     srcs = ["topo_node_test.cc"],
     deps = [
         ":routing_topo_test_utils",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -107,7 +107,7 @@ cc_test(
     srcs = ["topo_range_test.cc"],
     deps = [
         ":routing_node_with_range",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -117,7 +117,7 @@ cc_test(
     srcs = ["topo_graph_test.cc"],
     deps = [
         ":routing_topo_test_utils",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -128,7 +128,7 @@ cc_test(
     deps = [
         ":routing_sub_topo_graph",
         ":routing_topo_test_utils",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

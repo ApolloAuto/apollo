@@ -29,7 +29,7 @@ cc_test(
     deps = [
         ":vehicle_state_provider",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

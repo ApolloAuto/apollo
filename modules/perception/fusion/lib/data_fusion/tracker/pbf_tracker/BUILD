@@ -24,7 +24,7 @@ cc_test(
     deps = [
         ":pbf_tracker",
         "//modules/perception/common:perception_gflags",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

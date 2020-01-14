@@ -139,7 +139,7 @@ cc_test(
     srcs = ["hysteresis_filter_test.cc"],
     deps = [
         ":hysteresis_filter",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -153,7 +153,7 @@ cc_test(
         "//cyber",
         "//modules/common/util",
         "//modules/control/proto:control_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -167,7 +167,7 @@ cc_test(
         "//cyber",
         "//modules/common/util",
         "//modules/control/proto:control_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -180,7 +180,7 @@ cc_test(
         ":leadlag_controller",
         "//modules/common/util",
         "//modules/control/proto:control_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -193,7 +193,7 @@ cc_test(
         ":mrac_controller",
         "//modules/common/util",
         "//modules/control/proto:control_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -206,7 +206,7 @@ cc_test(
         ":pid_controller",
         "//modules/common/util",
         "//modules/control/proto:control_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -219,7 +219,7 @@ cc_test(
         ":pid_BC_controller",
         "//modules/common/util",
         "//modules/control/proto:control_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -232,7 +232,7 @@ cc_test(
         ":pid_IC_controller",
         "//modules/common/util",
         "//modules/control/proto:control_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -243,7 +243,7 @@ cc_test(
     deps = [
         ":trajectory_analyzer",
         "//modules/common/time",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

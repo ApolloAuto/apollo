@@ -42,7 +42,7 @@ cc_test(
     srcs = ["spp_cluster_list_test.cc"],
     deps = [
         ":spp_cluster_list",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

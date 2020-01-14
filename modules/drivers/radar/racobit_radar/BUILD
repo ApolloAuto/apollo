@@ -22,7 +22,7 @@ cc_library(
 #     srcs = ["racobit_radar_message_manager_test.cc"],
 #     deps = [
 #         "racobit_radar_message_manager",
-#         "@gtest//:main",
+#         "@com_google_googletest//:gtest_main",
 #     ],
 # )
 

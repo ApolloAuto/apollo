@@ -37,8 +37,8 @@ cc_test(
         "//cyber",
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/local_map/ndt_map:localization_msf_ndt_map",
+        "@com_google_googletest//:gtest_main",
         "@eigen",
-        "@gtest//:main",
     ],
 )
 
@@ -50,8 +50,8 @@ cc_test(
     deps = [
         "//cyber",
         "//modules/localization/msf/local_map/ndt_map:localization_msf_ndt_map",
+        "@com_google_googletest//:gtest_main",
         "@eigen",
-        "@gtest//:main",
     ],
 )
 

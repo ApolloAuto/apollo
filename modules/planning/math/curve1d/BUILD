@@ -39,7 +39,7 @@ cc_test(
         ":quartic_polynomial_curve1d",
         ":quintic_polynomial_curve1d",
         "//cyber/common:log",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -78,7 +78,7 @@ cc_test(
         ":cubic_polynomial_curve1d",
         ":quartic_polynomial_curve1d",
         "//cyber/common:log",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -126,7 +126,7 @@ cc_test(
         ":quartic_polynomial_curve1d",
         ":quintic_polynomial_curve1d",
         "//cyber/common:log",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -140,7 +140,7 @@ cc_test(
     deps = [
         ":piecewise_quintic_spiral_path",
         "//cyber/common:log",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

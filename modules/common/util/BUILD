@@ -40,7 +40,7 @@ cc_test(
     deps = [
         ":util",
         "//modules/common/util/testdata:simple_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -84,7 +84,7 @@ cc_test(
     deps = [
         ":message_util",
         "//modules/common/util/testdata:simple_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -94,7 +94,7 @@ cc_test(
     srcs = ["string_util_test.cc"],
     deps = [
         ":string_util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -120,7 +120,7 @@ cc_test(
     srcs = ["factory_test.cc"],
     deps = [
         ":factory",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -130,7 +130,7 @@ cc_test(
     srcs = ["lru_cache_test.cc"],
     deps = [
         "//modules/common/util:lru_cache",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -149,7 +149,7 @@ cc_test(
     srcs = ["points_downsampler_test.cc"],
     deps = [
         ":points_downsampler",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -171,7 +171,7 @@ cc_test(
     deps = [
         ":json_util",
         "//modules/common/proto:error_code_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

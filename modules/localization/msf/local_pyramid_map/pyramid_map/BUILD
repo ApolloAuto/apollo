@@ -117,7 +117,7 @@ cc_test(
     srcs = ["pyramid_map_config_test.cc"],
     deps = [
         ":localization_pyramid_map_pyramid_map_config",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -128,7 +128,7 @@ cc_test(
     srcs = ["pyramid_map_matrix_handler_test.cc"],
     deps = [
         ":localization_pyramid_map_pyramid_map_matrix_handler",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -140,7 +140,7 @@ cc_test(
     copts = ["-Dprivate=public"],
     deps = [
         ":localization_pyramid_map_pyramid_map_matrix",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -151,7 +151,7 @@ cc_test(
     srcs = ["pyramid_map_node_test.cc"],
     deps = [
         ":localization_pyramid_map_pyramid_map_node",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -164,7 +164,7 @@ cc_test(
         ":localization_pyramid_map_pyramid_map",
         ":localization_pyramid_map_pyramid_map_pool",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -176,7 +176,7 @@ cc_test(
     deps = [
         ":localization_pyramid_map_pyramid_map",
         ":localization_pyramid_map_pyramid_map_pool",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -32,7 +32,7 @@ cc_test(
     srcs = ["timer_test.cc"],
     deps = [
         ":perception_timer",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -47,7 +47,7 @@ cc_test(
     srcs = ["time_util_test.cc"],
     deps = [
         ":perception_time_util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

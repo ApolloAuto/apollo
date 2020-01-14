@@ -76,7 +76,7 @@ cc_test(
     srcs = ["sensor_frame_test.cc"],
     deps = [
         ":sensor",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -86,7 +86,7 @@ cc_test(
     srcs = ["sensor_test.cc"],
     deps = [
         ":sensor",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -96,7 +96,7 @@ cc_test(
     srcs = ["sensor_object_test.cc"],
     deps = [
         ":sensor",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -121,7 +121,7 @@ cc_test(
     ],
     deps = [
         ":sensor_data_manager",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -140,7 +140,7 @@ cc_test(
     srcs = ["track_test.cc"],
     deps = [
         ":track",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

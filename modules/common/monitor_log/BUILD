@@ -19,7 +19,7 @@ cc_library(
         "//modules/common/proto:geometry_proto",
         "//modules/common/time",
         "//modules/common/util:message_util",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -29,7 +29,7 @@ cc_test(
     srcs = ["monitor_log_buffer_test.cc"],
     deps = [
         ":monitor_log",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -39,7 +39,7 @@ cc_test(
 #     srcs = ["monitor_logger_test.cc"],
 #     deps = [
 #         ":monitor_log",
-#         "@gtest//:main",
+#         "@com_google_googletest//:gtest_main",
 #     ],
 # )
 

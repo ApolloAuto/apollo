@@ -50,7 +50,7 @@ cc_test(
     srcs = ["transit_vehicle_factory_test.cc"],
     deps = [
         ":transit_vehicle_factory",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -62,7 +62,7 @@ cc_test(
     deps = [
         ":transit_controller",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

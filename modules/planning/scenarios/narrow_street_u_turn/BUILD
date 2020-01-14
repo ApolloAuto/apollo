@@ -31,7 +31,7 @@ cc_test(
     ],
     deps = [
         ":narrow_street_u_turn",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

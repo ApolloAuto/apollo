@@ -74,7 +74,7 @@ cc_test(
     deps = [
         ":perception_inference_tensorrt_plugins",
         "//modules/perception/inference/tensorrt:rt_common",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -85,7 +85,7 @@ cc_test(
     deps = [
         ":perception_inference_tensorrt_plugins",
         "//modules/perception/inference/tensorrt:rt_common",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

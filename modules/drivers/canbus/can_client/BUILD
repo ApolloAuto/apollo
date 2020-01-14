@@ -51,7 +51,7 @@ cc_test(
     deps = [
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/proto:canbus_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

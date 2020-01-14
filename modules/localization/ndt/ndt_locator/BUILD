@@ -45,7 +45,7 @@ cc_test(
         "//cyber",
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -62,7 +62,7 @@ cc_test(
         "//cyber",
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

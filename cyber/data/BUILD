@@ -27,7 +27,7 @@ cc_test(
     srcs = ["cache_buffer_test.cc"],
     deps = [
         ":cache_buffer",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -59,7 +59,7 @@ cc_test(
     srcs = ["data_visitor_test.cc"],
     deps = [
         "//cyber",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -82,7 +82,7 @@ cc_test(
     srcs = ["data_dispatcher_test.cc"],
     deps = [
         "//cyber",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -92,7 +92,7 @@ cc_test(
     srcs = ["channel_buffer_test.cc"],
     deps = [
         "//cyber",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -116,7 +116,7 @@ cc_test(
     srcs = ["fusion/all_latest_test.cc"],
     deps = [
         "//cyber",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

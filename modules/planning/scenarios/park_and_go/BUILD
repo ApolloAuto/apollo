@@ -42,7 +42,7 @@ cc_test(
     ],
     deps = [
         ":park_and_go_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -60,7 +60,7 @@ cc_test(
     ],
     deps = [
         ":park_and_go_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -42,7 +42,7 @@ cc_test(
     deps = [
         ":websocket_handler",
         "//cyber",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

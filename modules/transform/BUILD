@@ -49,7 +49,7 @@ cc_test(
     srcs = ["static_transform_component_test.cc"],
     deps = [
         ":static_transform_component_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

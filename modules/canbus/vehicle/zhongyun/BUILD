@@ -47,7 +47,7 @@ cc_test(
     data = ["//modules/canbus:canbus_testdata"],
     deps = [
         ":zhongyun_message_manager",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -58,7 +58,7 @@ cc_test(
     data = ["//modules/canbus:canbus_testdata"],
     deps = [
         ":zhongyun_vehicle_factory",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -70,7 +70,7 @@ cc_test(
     deps = [
         ":zhongyun_controller",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

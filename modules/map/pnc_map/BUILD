@@ -23,8 +23,8 @@ cc_test(
     ],
     deps = [
         "//modules/common/math",
+        "@com_google_googletest//:gtest_main",
         "@cuda",
-        "@gtest//:main",
     ],
 )
 
@@ -68,7 +68,7 @@ cc_library(
         "//modules/map/hdmap",
         "//modules/planning/common:planning_gflags",
         "//modules/routing/common:routing_gflags",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -86,7 +86,7 @@ cc_test(
     deps = [
         ":path",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -101,7 +101,7 @@ cc_test(
     deps = [
         ":pnc_map",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -116,7 +116,7 @@ cc_test(
     deps = [
         ":route_segments",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

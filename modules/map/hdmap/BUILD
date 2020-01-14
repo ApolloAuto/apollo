@@ -66,8 +66,8 @@ cc_test(
     deps = [
         ":hdmap",
         "//cyber/common:file",
+        "@com_google_googletest//:gtest_main",
         "@glog",
-        "@gtest//:main",
     ],
 )
 
@@ -81,8 +81,8 @@ cc_test(
     ],
     deps = [
         ":hdmap_util",
+        "@com_google_googletest//:gtest_main",
         "@glog",
-        "@gtest//:main",
     ],
 )
 

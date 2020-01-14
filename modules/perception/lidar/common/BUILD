@@ -31,7 +31,7 @@ cc_test(
     srcs = ["cloud_mask_test.cc"],
     deps = [
         ":cloud_mask",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

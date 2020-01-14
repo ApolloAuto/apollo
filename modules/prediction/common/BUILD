@@ -33,7 +33,7 @@ cc_test(
     srcs = ["prediction_util_test.cc"],
     deps = [
         ":prediction_util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -61,7 +61,7 @@ cc_test(
     deps = [
         ":kml_map_based_test",
         ":prediction_map",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -87,7 +87,7 @@ cc_test(
     srcs = ["feature_output_test.cc"],
     deps = [
         ":feature_output",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -118,7 +118,7 @@ cc_test(
     deps = [
         ":kml_map_based_test",
         ":road_graph",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -148,7 +148,7 @@ cc_test(
     ],
     deps = [
         ":validation_checker",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -168,7 +168,7 @@ cc_test(
     srcs = ["environment_features_test.cc"],
     deps = [
         ":environment_features",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -196,7 +196,7 @@ cc_test(
     deps = [
         ":junction_analyzer",
         ":kml_map_based_test",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -238,7 +238,7 @@ cc_test(
     srcs = ["prediction_thread_pool_test.cc"],
     deps = [
         ":prediction_thread_pool",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

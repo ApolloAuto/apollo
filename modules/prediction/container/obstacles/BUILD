@@ -48,7 +48,7 @@ cc_test(
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/container/obstacles:obstacles_container",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -63,7 +63,7 @@ cc_test(
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/container/obstacles:obstacles_container",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -91,7 +91,7 @@ cc_test(
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/container/obstacles:obstacle_clusters",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

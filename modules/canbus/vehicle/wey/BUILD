@@ -19,7 +19,7 @@ cc_test(
     srcs = ["wey_vehicle_factory_test.cc"],
     deps = [
         ":wey_vehicle_factory",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -41,7 +41,7 @@ cc_test(
     srcs = ["wey_message_manager_test.cc"],
     deps = [
         ":wey_message_manager",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -68,7 +68,7 @@ cc_test(
     deps = [
         ":wey_controller",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

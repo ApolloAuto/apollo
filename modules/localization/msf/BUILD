@@ -43,8 +43,8 @@ cc_library(
         "//modules/localization/proto:sins_pva_proto",
         "//modules/transform:transform_broadcaster_lib",
         "@boost",
+        "@com_google_googletest//:gtest",
         "@glog",
-        "@gtest",
         "@yaml_cpp//:yaml",
     ],
 )
@@ -70,7 +70,7 @@ cc_test(
         "//modules/common/time",
         "//modules/common/util",
         "//modules/localization/msf:msf_localization_component_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

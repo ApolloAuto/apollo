@@ -31,7 +31,7 @@ cc_test(
     srcs = ["grpc_client_test.cc"],
     deps = [
         ":grpc_client",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -41,7 +41,7 @@ cc_test(
     srcs = ["grpc_server_test.cc"],
     deps = [
         ":grpc_server",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

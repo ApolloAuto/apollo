@@ -8,7 +8,7 @@ cc_test(
     srcs = ["conti_ars_tracker_test.cc"],
     deps = [
         ":conti_ars_tracker",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -18,7 +18,7 @@ cc_test(
     srcs = ["conti_ars_tracker_empty_test.cc"],
     deps = [
         ":conti_ars_tracker",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

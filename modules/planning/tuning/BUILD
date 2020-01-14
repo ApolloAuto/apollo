@@ -22,7 +22,7 @@ cc_test(
     srcs = ["autotuning_raw_feature_generator_test.cc"],
     deps = [
         ":autotuning_raw_feature_generator",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -51,7 +51,7 @@ cc_test(
     srcs = ["autotuning_mlp_net_model_test.cc"],
     deps = [
         ":autotuning_mlp_net_model",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

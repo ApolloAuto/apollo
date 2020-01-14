@@ -36,7 +36,7 @@ cc_test(
     data = ["//modules/planning:planning_conf"],
     deps = [
         ":bare_intersection_unprotected_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -49,7 +49,7 @@ cc_test(
     ],
     deps = [
         ":bare_intersection_unprotected_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

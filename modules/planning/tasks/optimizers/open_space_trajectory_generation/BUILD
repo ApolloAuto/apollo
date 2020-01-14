@@ -56,7 +56,7 @@ cc_test(
     ],
     deps = [
         ":open_space_trajectory_provider",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -69,7 +69,7 @@ cc_test(
     ],
     deps = [
         ":open_space_trajectory_optimizer",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

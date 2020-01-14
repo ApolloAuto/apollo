@@ -83,7 +83,7 @@ cc_test(
     srcs = ["udp_bridge_component_test.cc"],
     deps = [
         ":udp_bridge_sender",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

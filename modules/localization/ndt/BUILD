@@ -55,7 +55,7 @@ cc_test(
     deps = [
         "//cyber",
         "//modules/localization/ndt:ndt_localization_component_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -67,7 +67,7 @@ cc_test(
     deps = [
         "//cyber",
         "//modules/localization/ndt:ndt_localization_component_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

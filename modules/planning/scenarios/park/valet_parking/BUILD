@@ -31,7 +31,7 @@ cc_test(
     ],
     deps = [
         ":valet_parking",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -44,7 +44,7 @@ cc_test(
     ],
     deps = [
         ":valet_parking",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -57,7 +57,7 @@ cc_test(
     ],
     deps = [
         ":valet_parking",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

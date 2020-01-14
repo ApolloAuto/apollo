@@ -22,7 +22,7 @@ cc_test(
         ":indexed_list",
         "//modules/common/util",
         "@boost",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -44,7 +44,7 @@ cc_test(
     deps = [
         ":indexed_queue",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -84,7 +84,7 @@ cc_test(
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
         "@boost",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -183,7 +183,7 @@ cc_test(
     srcs = ["reference_line_info_test.cc"],
     deps = [
         ":reference_line_info",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -214,7 +214,7 @@ cc_test(
     srcs = ["speed_profile_generator_test.cc"],
     deps = [
         ":speed_profile_generator",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -274,7 +274,7 @@ cc_test(
         "//modules/common/util",
         "//modules/map/hdmap:hdmap_util",
         "//modules/planning/proto:planning_config_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -300,7 +300,7 @@ cc_test(
     srcs = ["history_test.cc"],
     deps = [
         ":history",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -323,7 +323,7 @@ cc_test(
     srcs = ["speed_limit_test.cc"],
     deps = [
         ":speed_limit",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -353,7 +353,7 @@ cc_test(
     deps = [
         ":ego_info",
         ":frame",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -415,7 +415,7 @@ cc_test(
     deps = [
         "open_space_info",
         "@boost",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -440,7 +440,7 @@ cc_test(
         "//cyber/common:log",
         "//modules/common/time",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

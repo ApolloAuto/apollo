@@ -41,7 +41,7 @@ cc_test(
     ],
     deps = [
         ":pull_over_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -54,7 +54,7 @@ cc_test(
     ],
     deps = [
         ":pull_over_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -67,7 +67,7 @@ cc_test(
     ],
     deps = [
         ":pull_over_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -80,7 +80,7 @@ cc_test(
     ],
     deps = [
         ":pull_over_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

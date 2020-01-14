@@ -29,7 +29,7 @@ cc_test(
     ],
     deps = [
         ":sensor_manager",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

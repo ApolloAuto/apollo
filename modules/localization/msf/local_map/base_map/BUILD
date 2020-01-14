@@ -39,7 +39,7 @@ cc_test(
         "//modules/localization/msf/common/util:localization_msf_common_util_compression",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
         "@boost",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -51,7 +51,7 @@ cc_test(
     deps = [
         "//cyber",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

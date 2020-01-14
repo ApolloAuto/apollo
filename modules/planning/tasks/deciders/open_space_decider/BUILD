@@ -45,7 +45,7 @@ cc_test(
     srcs = ["open_space_roi_decider_test.cc"],
     deps = [
         ":open_space_roi_decider",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -55,7 +55,7 @@ cc_test(
     srcs = ["open_space_fallback_decider_test.cc"],
     deps = [
         ":open_space_fallback_decider",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
