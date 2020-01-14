@@ -103,6 +103,6 @@ data_files {
   dest_path: "/apollo/modules/teleop/router/conf/router_node_conf.pb.txt"
 }
 data_files {
-  source_path: "teleop_conf/router/conf/initial_routes_and_filters.pb.txt"
+  source_path: "teleop_conf/router/initial_routes_and_filters.pb.txt"
   dest_path: "/apollo/modules/teleop/router/conf/initial_routes_and_filters.pb.txt"
 }
