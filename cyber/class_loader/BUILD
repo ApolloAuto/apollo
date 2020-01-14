@@ -45,7 +45,7 @@ cc_test(
         "//cyber",
         "//cyber/class_loader/test:base",
         "//cyber/proto:unit_test_cc_proto",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 

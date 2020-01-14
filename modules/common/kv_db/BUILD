@@ -23,7 +23,7 @@ cc_test(
     srcs = ["kv_db_test.cc"],
     deps = [
         ":kv_db",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

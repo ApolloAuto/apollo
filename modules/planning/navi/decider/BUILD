@@ -108,7 +108,7 @@ cc_test(
         ":navi_speed_decider",
         "//modules/common/time",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

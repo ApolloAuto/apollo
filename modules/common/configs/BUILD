@@ -37,7 +37,7 @@ cc_test(
     srcs = ["vehicle_config_helper_test.cc"],
     deps = [
         "vehicle_config_helper",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

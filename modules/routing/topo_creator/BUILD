@@ -32,7 +32,7 @@ cc_test(
     srcs = ["graph_creator_test.cc"],
     deps = [
         ":graph_creator",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

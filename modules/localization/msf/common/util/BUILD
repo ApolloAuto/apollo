@@ -71,7 +71,7 @@ cc_test(
     srcs = ["compression_test.cc"],
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util_compression",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -82,7 +82,7 @@ cc_test(
     srcs = ["rect2d_test.cc"],
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -99,7 +99,7 @@ cc_test(
     data = ["localization_msf_common_test_data"],
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util_system_utility",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -110,7 +110,7 @@ cc_test(
     srcs = ["frame_transform_test.cc"],
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util_frame_transform",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

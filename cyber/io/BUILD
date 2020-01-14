@@ -50,7 +50,7 @@ cc_test(
     deps = [
         ":poller",
         "//cyber:cyber_core",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 

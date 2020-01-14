@@ -18,7 +18,7 @@ cc_library(
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning:planning_component_lib",
         "//modules/planning/proto:dp_st_speed_config_proto",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 

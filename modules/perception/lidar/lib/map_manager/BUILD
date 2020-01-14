@@ -24,7 +24,7 @@ cc_library(
 #    srcs = ["map_manager_test.cc"],
 #    deps = [
 #        ":map_manager",
-#        "@gtest//:main",
+#        "@com_google_googletest//:gtest_main",
 #    ],
 #)
 

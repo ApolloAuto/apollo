@@ -302,7 +302,7 @@ cc_test(
     deps = [
         ":distance_approach_ipopt_interface",
         "//cyber/common:log",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -317,7 +317,7 @@ cc_test(
     deps = [
         ":distance_approach_ipopt_cuda_interface",
         "//cyber/common:log",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -332,7 +332,7 @@ cc_test(
     deps = [
         ":distance_approach_problem",
         "//cyber/common:log",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -342,7 +342,7 @@ cc_test(
     srcs = ["dual_variable_warm_start_ipopt_interface_test.cc"],
     deps = [
         ":dual_variable_warm_start_ipopt_interface",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -353,7 +353,7 @@ cc_test(
     deps = [
         ":dual_variable_warm_start_ipopt_qp_interface",
         ":dual_variable_warm_start_osqp_interface",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
         "@ipopt",
     ],
 )
@@ -364,7 +364,7 @@ cc_test(
     srcs = ["dual_variable_warm_start_problem_test.cc"],
     deps = [
         ":dual_variable_warm_start_problem",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -37,7 +37,7 @@ cc_test(
     data = ["//modules/planning:planning_conf"],
     deps = [
         ":traffic_light_unprotected_left_turn_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -50,7 +50,7 @@ cc_test(
     ],
     deps = [
         ":traffic_light_unprotected_left_turn_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -63,7 +63,7 @@ cc_test(
     ],
     deps = [
         ":traffic_light_unprotected_left_turn_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

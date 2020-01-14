@@ -27,7 +27,7 @@ cc_test(
     deps = [
         ":adc_trajectory_container",
         "//modules/prediction/common:kml_map_based_test",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

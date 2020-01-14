@@ -39,7 +39,7 @@ cc_test(
     ],
     deps = [
         ":emergency_stop_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -52,7 +52,7 @@ cc_test(
     ],
     deps = [
         ":emergency_stop_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -65,7 +65,7 @@ cc_test(
     ],
     deps = [
         ":emergency_stop_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

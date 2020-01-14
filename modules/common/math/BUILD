@@ -110,7 +110,7 @@ cc_test(
     srcs = ["matrix_operations_test.cc"],
     deps = [
         ":matrix_operations",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -156,7 +156,7 @@ cc_test(
     srcs = ["angle_test.cc"],
     deps = [
         ":angle",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -235,7 +235,7 @@ cc_test(
         ":mpc_osqp",
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -247,7 +247,7 @@ cc_test(
         ":mpc",
         "//modules/common/math/qp_solver",
         "//modules/common/math/qp_solver:active_set_qp_solver",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -257,7 +257,7 @@ cc_test(
     srcs = ["math_utils_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -268,8 +268,8 @@ cc_test(
     deps = [
         ":linear_interpolation",
         "//cyber/common:log",
+        "@com_google_googletest//:gtest_main",
         "@eigen",
-        "@gtest//:main",
     ],
 )
 
@@ -279,7 +279,7 @@ cc_test(
     srcs = ["search_test.cc"],
     deps = [
         ":search",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -289,7 +289,7 @@ cc_test(
     srcs = ["integral_test.cc"],
     deps = [
         ":integral",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -299,7 +299,7 @@ cc_test(
     srcs = ["vec2d_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -309,7 +309,7 @@ cc_test(
     srcs = ["quaternion_test.cc"],
     deps = [
         ":quaternion",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -319,7 +319,7 @@ cc_test(
     srcs = ["euler_angles_zxy_test.cc"],
     deps = [
         ":euler_angles_zxy",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -329,7 +329,7 @@ cc_test(
     srcs = ["aabox2d_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -339,7 +339,7 @@ cc_test(
     srcs = ["aaboxkdtree2d_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -349,7 +349,7 @@ cc_test(
     srcs = ["box2d_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -359,7 +359,7 @@ cc_test(
     srcs = ["polygon2d_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -369,7 +369,7 @@ cc_test(
     srcs = ["line_segment2d_test.cc"],
     deps = [
         ":geometry",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -379,7 +379,7 @@ cc_test(
     srcs = ["kalman_filter_test.cc"],
     deps = [
         ":kalman_filter",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -389,7 +389,7 @@ cc_test(
     srcs = ["cartesian_frenet_conversion_test.cc"],
     deps = [
         ":cartesian_frenet_conversion",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

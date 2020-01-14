@@ -56,7 +56,7 @@ cc_test(
         ":app",
         "//external:gflags",
         "//modules/perception/common/io:io_util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

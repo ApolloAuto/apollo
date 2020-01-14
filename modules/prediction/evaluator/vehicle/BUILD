@@ -30,7 +30,7 @@ cc_test(
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -59,7 +59,7 @@ cc_test(
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/evaluator/vehicle:cost_evaluator",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -98,7 +98,7 @@ cc_test(
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/evaluator/vehicle:junction_mlp_evaluator",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

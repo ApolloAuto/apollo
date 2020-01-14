@@ -30,7 +30,7 @@ cc_test(
     deps = [
         ":canbus_lib",
         "//modules/common/status",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -83,7 +83,7 @@ cc_test(
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
         "//modules/planning/proto:planner_open_space_config_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -94,7 +94,7 @@ cc_test(
     deps = [
         "open_space_utils",
         "//cyber/common:log",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -104,7 +104,7 @@ cc_test(
     srcs = ["hybrid_a_star_test.cc"],
     deps = [
         "hybrid_a_star",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

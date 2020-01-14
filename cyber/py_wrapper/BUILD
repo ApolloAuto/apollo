@@ -47,7 +47,7 @@ cc_test(
     deps = [
         ":py3_cyber",
         "//cyber/proto:unit_test_cc_proto",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -97,8 +97,8 @@ cc_test(
         ":py3_record",
         "//cyber:cyber_core",
         "//cyber/proto:unit_test_cc_proto",
+        "@com_google_googletest//:gtest_main",
         "@fastrtps",
-        "@gtest//:main",
     ],
 )
 

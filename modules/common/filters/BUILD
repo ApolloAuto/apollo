@@ -38,7 +38,7 @@ cc_test(
         ":digital_filter",
         ":digital_filter_coefficients",
         "//cyber",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -48,7 +48,7 @@ cc_test(
     srcs = ["mean_filter_test.cc"],
     deps = [
         ":mean_filter",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -59,7 +59,7 @@ cc_test(
     deps = [
         ":digital_filter_coefficients",
         "//cyber",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

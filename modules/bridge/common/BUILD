@@ -67,7 +67,7 @@ cc_test(
     srcs = ["bridge_buffer_test.cc"],
     deps = [
         ":bridge_buffer",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -77,7 +77,7 @@ cc_test(
     srcs = ["bridge_proto_buf_test.cc"],
     deps = [
         "//modules/bridge:udp_bridge",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -6,7 +6,7 @@ cc_library(
     name = "test_helper",
     hdrs = ["test_helper.h"],
     deps = [
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

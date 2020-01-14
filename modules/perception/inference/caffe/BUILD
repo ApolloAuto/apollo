@@ -23,7 +23,7 @@ cc_test(
     deps = [
         ":caffe_net_lib",
         "//modules/perception/inference/utils:inference_util_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
