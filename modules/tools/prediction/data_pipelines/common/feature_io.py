@@ -16,13 +16,14 @@
 # limitations under the License.
 ###############################################################################
 
-import sys
 import copy
 import logging
+import sys
 
 from google.protobuf.internal import decoder
 from google.protobuf.internal import encoder
 import google.protobuf.text_format as text_format
+
 from modules.prediction.proto import feature_pb2
 from modules.prediction.proto import offline_features_pb2
 
@@ -61,7 +62,7 @@ def load_label_feature(filename):
             read_bytes, _ = decoder._DecodeVarint32(size, 0)
             data = f.read(read_bytes)
             if len(data) < read_bytes:
-                print ("Failed to load protobuf")
+                print("Failed to load protobuf")
                 break
             fea = feature_pb2.Feature()
             fea.ParseFromString(data)

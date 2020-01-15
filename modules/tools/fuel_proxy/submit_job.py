@@ -17,21 +17,23 @@
 ###############################################################################
 
 """ Submit Apollo fuel job. """
-import sys
-# Disable python2 paths.
-sys.path = [path for path in sys.path if 'python2' not in path]
 
 import json
 import os
-
-from absl import app
-from absl import flags
-from absl import logging
-import google.protobuf.json_format as json_format
-import google.protobuf.text_format as text_format
 import requests
+import sys
+
+from absl import logging
+from absl import flags
+from absl import app
+import google.protobuf.text_format as text_format
+import google.protobuf.json_format as json_format
 
 from modules.tools.fuel_proxy.proto.job_config_pb2 import JobConfig
+
+
+# Disable python2 paths.
+sys.path = [path for path in sys.path if 'python2' not in path]
 
 
 flags.DEFINE_string('fuel_proxy', 'https://apollofuel0.bceapp.com:8443/proxy',
@@ -89,6 +91,7 @@ def main(argv):
     job = FuelJob()
     if job.parse_input():
         job.send_request()
+
 
 if __name__ == '__main__':
     app.run(main)

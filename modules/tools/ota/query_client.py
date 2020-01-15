@@ -16,14 +16,17 @@
 # limitations under the License.
 ###############################################################################
 
-import secure_upgrade_export as sec_api
+import os
 import requests
 import sys
-import os
-import urllib3
+
 from configparser import ConfigParser
+import secure_upgrade_export as sec_api
+import urllib3
+
 from modules.data.proto.static_info_pb2 import VehicleInfo
 import common.proto_utils as proto_utils
+
 
 sys.path.append('/home/caros/secure_upgrade/python')
 
@@ -32,6 +35,7 @@ ret = sec_api.init_secure_upgrade(root_config_path)
 if ret is False:
     print('Failed to initialize security environment!')
     sys.exit(1)
+
 
 def query():
     vehicle_info = VehicleInfo()
@@ -99,6 +103,7 @@ def query():
         print('Cannot connect to server.')
 
     sys.exit(1)
+
 
 if __name__ == '__main__':
     query()

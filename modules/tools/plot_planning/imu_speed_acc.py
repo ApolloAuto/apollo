@@ -17,8 +17,9 @@
 ###############################################################################
 
 import math
-from record_reader import RecordItemReader
+
 from imu_speed import ImuSpeed
+from record_reader import RecordItemReader
 
 
 class ImuSpeedAcc:
@@ -135,7 +136,7 @@ if __name__ == "__main__":
 
         ax[0][1].plot(lat_time, lat_acc, c=color, alpha=0.4)
 
-        ax[1][0].plot(lat_acc, lon_acc , '.', c=color, alpha=0.4)
+        ax[1][0].plot(lat_acc, lon_acc, '.', c=color, alpha=0.4)
     ax[0][0].set_xlabel('Timestamp')
     ax[0][0].set_ylabel('Lon Acc')
     ax[0][1].set_xlabel('Timestamp')

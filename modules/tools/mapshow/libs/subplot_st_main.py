@@ -62,7 +62,7 @@ class StMainSubplot:
         cnt = 1
         for boundary_name in obstacles_boundary_s.keys():
             if cnt >= self.obstacle_boundary_size:
-                print("WARNING: number of path lines is more than " \
+                print("WARNING: number of path lines is more than "
                       + self.obstacle_boundary_size)
                 continue
             boundary = self.obstacle_boundary_lines[cnt]

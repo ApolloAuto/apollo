@@ -22,25 +22,26 @@ Generate Planning Path
 import argparse
 import atexit
 import logging
+import math
 import os
 import sys
 import time
-import math
+
+from numpy import genfromtxt
+import scipy.signal as signal
 
 from cyber_py import cyber
 from cyber_py import cyber_time
-import scipy.signal as signal
 from common.logger import Logger
-from numpy import genfromtxt
-
 from modules.canbus.proto import chassis_pb2
-from modules.common.proto import pnc_point_pb2
+from modules.common.configs.proto import vehicle_config_pb2
 from modules.common.proto import drive_state_pb2
+from modules.common.proto import pnc_point_pb2
 from modules.control.proto import pad_msg_pb2
 from modules.localization.proto import localization_pb2
 from modules.planning.proto import planning_pb2
-from modules.common.configs.proto import vehicle_config_pb2
 import common.proto_utils as proto_utils
+
 
 APOLLO_ROOT = os.path.join(os.path.dirname(__file__), '../../../')
 SEARCH_INTERVAL = 5000
@@ -188,7 +189,7 @@ class RtkPlayer(object):
             # include gear_neutral at the beginning of a trajectory
             if (i < end - 1 and
                 self.data['gear'][i] in {1, 2} and
-                self.data['gear'][i + 1] != self.data['gear'][i]):
+                    self.data['gear'][i + 1] != self.data['gear'][i]):
                 self.logger.debug("enter i in while loop: [ %s ]" % i)
                 self.logger.debug("self.data['gear'][i] != 1: %s" % self.data['gear'][i])
                 self.logger.debug("self.data['gear'][i] != 2: %s" % self.data['gear'][i])

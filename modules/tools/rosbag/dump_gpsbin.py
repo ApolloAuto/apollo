@@ -31,8 +31,10 @@ from cyber_py import cyber
 from cyber_py.record import RecordReader
 from modules.drivers.gnss.proto import gnss_pb2
 
+
 g_args = None
 kRawDataTopic = '/apollo/sensor/gnss/raw_data'
+
 
 def dump_bag(in_dir, out_file):
     """
@@ -50,6 +52,7 @@ def dump_bag(in_dir, out_file):
                 if msg.topic == kRawDataTopic:
                     gnss.ParseFromString(msg.message)
                     f.write(str(gnss))
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

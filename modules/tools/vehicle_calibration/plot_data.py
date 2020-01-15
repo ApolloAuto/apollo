@@ -18,6 +18,7 @@
 """
 This module provide function to plot the speed control info from log csv file
 """
+
 import sys
 
 import matplotlib.pyplot as plt
@@ -98,7 +99,7 @@ class Plotter(object):
         mng = plt.get_current_fig_manager()
         mng.full_screen_toggle()
 
-        #plt.tight_layout(pad=0.20)
+        # plt.tight_layout(pad=0.20)
         fig.canvas.mpl_connect('key_press_event', self.press)
         plt.show()
 
@@ -135,6 +136,7 @@ def main():
     plotter.process_data(file_path)
     print('Finished reading the file.')
     plotter.plot_result()
+
 
 if __name__ == '__main__':
     main()

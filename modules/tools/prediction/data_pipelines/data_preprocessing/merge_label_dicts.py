@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
 #
@@ -16,14 +18,15 @@
 
 import argparse
 
-from features_labels_utils import *
+import features_labels_utils
+
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Merge all label_dicts in each'\
+    parser = argparse.ArgumentParser(description='Merge all label_dicts in each'
                                                  'terminal folder.')
     parser.add_argument('dirpath', type=str, help='Path of terminal folder.')
     args = parser.parse_args()
 
-    MergeDicts(args.dirpath, dict_name='future_status')
-    MergeDicts(args.dirpath, dict_name='junction_label')
-    MergeDicts(args.dirpath, dict_name='cruise_label')
+    features_labels_utils.MergeDicts(args.dirpath, dict_name='future_status')
+    features_labels_utils.MergeDicts(args.dirpath, dict_name='junction_label')
+    features_labels_utils.MergeDicts(args.dirpath, dict_name='cruise_label')

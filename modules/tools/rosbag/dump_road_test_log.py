@@ -20,6 +20,7 @@ dump road test log.
 Usage:
     ./dump_road_test_log.py bag1 bag2 ...
 """
+
 import sys
 import time
 
@@ -46,7 +47,7 @@ class EventDumper(object):
         Calculate mileage
         """
         try:
-	    drive_event = drive_event_pb2.DriveEvent()
+            drive_event = drive_event_pb2.DriveEvent()
             reader = RecordReader(bag_file)
         except Exception:
             print('Cannot open bag file %s' % bag_file)
@@ -60,6 +61,7 @@ class EventDumper(object):
                         fp.write(str(drive_event.type) + ':')
                         fp.write(drive_event.event.encode('utf-8') + '\n')
 
+
 def main():
     if len(sys.argv) < 2:
         print('Usage: %s <bag_file1> <bag_file2> ...' % sys.argv[0])
@@ -68,6 +70,7 @@ def main():
     ed = EventDumper()
     for bag_file in sys.argv[1:]:
         ed.calculate(bag_file)
+
 
 if __name__ == '__main__':
     main()

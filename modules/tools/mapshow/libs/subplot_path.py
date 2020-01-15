@@ -56,7 +56,7 @@ class PathSubplot:
         planning.path_data_lock.acquire()
         for name in planning.path_data_x.keys():
             if cnt >= self.path_lines_size:
-                print("WARNING: number of path lines is more than " \
+                print("WARNING: number of path lines is more than "
                       + str(self.path_lines_size))
                 continue
             if len(planning.path_data_x[name]) <= 1:

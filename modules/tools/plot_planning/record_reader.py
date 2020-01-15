@@ -21,9 +21,11 @@ from modules.canbus.proto import chassis_pb2
 from modules.localization.proto import localization_pb2
 from modules.planning.proto import planning_pb2
 
+
 class RecordItemReader:
     def __init__(self, record_file):
         self.record_file = record_file
+
     def read(self, topics):
         reader = RecordReader(self.record_file)
         for msg in reader.read_messages():

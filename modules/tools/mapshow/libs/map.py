@@ -18,12 +18,12 @@
 
 import random
 
-import matplotlib.pyplot as plt
 from matplotlib import cm as cmx
 from matplotlib import colors as mcolors
+import matplotlib.pyplot as plt
 
-import common.proto_utils as proto_utils
 from modules.map.proto import map_pb2
+import common.proto_utils as proto_utils
 
 
 class Map:
@@ -89,7 +89,7 @@ class Map:
     def _draw_lane_id(self, lane, ax, color_val):
         """draw lane id"""
         x, y = self._find_lane_central_point(lane)
-        self._draw_label(lane.id.id, (x, y), ax, color_val);
+        self._draw_label(lane.id.id, (x, y), ax, color_val)
 
     def _draw_lane_details(self, lane, ax, color_val):
         """draw lane id"""
@@ -142,7 +142,7 @@ class Map:
     def _draw_pnc_junction_id(self, pnc_junction, ax, color_val):
         x = pnc_junction.polygon.point[0].x
         y = pnc_junction.polygon.point[0].y
-        self._draw_label(pnc_junction.id.id, (x, y), ax, color_val);
+        self._draw_label(pnc_junction.id.id, (x, y), ax, color_val)
 
     def draw_crosswalks(self, ax):
         cnt = 1
@@ -155,7 +155,7 @@ class Map:
     def _draw_crosswalk_id(self, crosswalk, ax, color_val):
         x = crosswalk.polygon.point[0].x
         y = crosswalk.polygon.point[0].y
-        self._draw_label(crosswalk.id.id, (x, y), ax, color_val);
+        self._draw_label(crosswalk.id.id, (x, y), ax, color_val)
 
     @staticmethod
     def _draw_label(label_id, point, ax, color_val):
