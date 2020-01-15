@@ -20,22 +20,24 @@
 This is a tool to etract useful information from already extracted sensor data,
 mainly for camera lidar calibration.
 """
+
+from datetime import datetime
+from shutil import copyfile
 import argparse
 import cv2
-from datetime import datetime
-import numpy as np
 import os
-from shutil import copyfile
 import six
 import sys
 
 from google.protobuf import text_format
+import numpy as np
 
 from cyber_py.record import RecordReader
 from cyber.proto import record_pb2
 from configuration_yaml_generator import ConfigYaml
 from data_file_object import TimestampFileObject, OdometryFileObject
 from modules.tools.sensor_calibration.proto import extractor_config_pb2
+
 
 CYBER_PATH = os.environ['CYBER_PATH']
 CYBER_RECORD_HEADER_LENGTH = 2048

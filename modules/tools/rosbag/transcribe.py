@@ -19,16 +19,16 @@
 This program can transcribe a protobuf message to file
 """
 
-from cyber_py import cyber
-
 import argparse
 import shutil
 import os
 import sys
 import time
 
-import common.proto_utils as proto_utils
+from cyber_py import cyber
 from common.message_manager import PbMessageManager
+import common.proto_utils as proto_utils
+
 
 g_message_manager = PbMessageManager()
 g_args = None

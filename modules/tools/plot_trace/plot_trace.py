@@ -25,6 +25,7 @@ import numpy as np
 from modules.canbus.proto import chassis_pb2
 from modules.localization.proto import localization_pb2
 
+
 GPS_X = list()
 GPS_Y = list()
 GPS_LINE = None

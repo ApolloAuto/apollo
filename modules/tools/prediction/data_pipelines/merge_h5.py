@@ -16,9 +16,9 @@
 # limitations under the License.
 ###############################################################################
 
-import os
 import argparse
 import datetime
+import os
 
 import numpy as np
 import h5py

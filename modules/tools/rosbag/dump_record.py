@@ -21,14 +21,15 @@ the pb messages
 """
 
 import argparse
-import shutil
 import os
-import time
+import shutil
 import sys
+import time
 
 from cyber_py import cyber
 from cyber_py import record
 from common.message_manager import PbMessageManager
+
 
 g_message_manager = PbMessageManager()
 

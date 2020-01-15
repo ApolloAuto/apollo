@@ -33,6 +33,7 @@ import cv2
 from cyber_py.record import RecordReader, RecordWriter
 from modules.drivers.proto.sensor_image_pb2 import CompressedImage
 
+
 flags.DEFINE_string('from_record', None, 'The source record file that needs to be restored.')
 flags.DEFINE_string('to_record', None, 'The restored record file.')
 

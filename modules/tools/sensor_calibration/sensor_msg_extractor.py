@@ -19,20 +19,21 @@
 """
 This is a bunch of classes to manage cyber record channel extractor.
 """
-import cv2
-import numpy as np
-import os
-import pypcd
-import sys
-import struct
 
-from modules.drivers.proto import sensor_image_pb2
-from modules.drivers.proto import pointcloud_pb2
-from modules.drivers.proto import conti_radar_pb2
-from modules.localization.proto import gps_pb2
-from modules.localization.proto import localization_pb2
+import os
+import struct
+import sys
+
+import cv2
+import pypcd
+import numpy as np
 
 from data_file_object import TimestampFileObject, OdometryFileObject
+from modules.drivers.proto import conti_radar_pb2
+from modules.drivers.proto import sensor_image_pb2
+from modules.drivers.proto import pointcloud_pb2
+from modules.localization.proto import gps_pb2
+from modules.localization.proto import localization_pb2
 
 
 class SensorMessageParser(object):

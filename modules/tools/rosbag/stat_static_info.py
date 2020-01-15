@@ -24,10 +24,13 @@ Usage:
 
 import os
 import sys
+
 from cyber_py import cyber
 from cyber_py.record import RecordReader
 from modules.canbus.proto import chassis_pb2
 from modules.dreamview.proto import hmi_status_pb2
+
+
 kChassisInfoTopic = '/apollo/canbus/chassis'
 kHMIInfoTopic = '/apollo/hmi/status'
 

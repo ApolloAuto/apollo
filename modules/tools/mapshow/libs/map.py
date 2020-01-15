@@ -18,12 +18,12 @@
 
 import random
 
-import matplotlib.pyplot as plt
 from matplotlib import cm as cmx
 from matplotlib import colors as mcolors
+import matplotlib.pyplot as plt
 
-import common.proto_utils as proto_utils
 from modules.map.proto import map_pb2
+import common.proto_utils as proto_utils
 
 
 class Map:

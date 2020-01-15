@@ -16,14 +16,17 @@
 # limitations under the License.
 ###############################################################################
 
-import secure_upgrade_export as sec_api
+import os
 import requests
 import sys
-import os
-import urllib3
+
 from configparser import ConfigParser
+import secure_upgrade_export as sec_api
+import urllib3
+
 from modules.data.proto.static_info_pb2 import VehicleInfo
 import common.proto_utils as proto_utils
+
 
 sys.path.append('/home/caros/secure_upgrade/python')
 

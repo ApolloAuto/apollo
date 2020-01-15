@@ -16,12 +16,14 @@
 # limitations under the License.
 ###############################################################################
 
-from online_to_offline import LabelGenerator
+import argparse
+import glob
+import logging
 import os
 import sys
-import glob
-import argparse
-import logging
+
+from online_to_offline import LabelGenerator
+
 
 sys.path.append('/apollo/modules/tools/prediction/data_pipelines/common/')
 

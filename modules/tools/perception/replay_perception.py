@@ -20,17 +20,19 @@
 This module creates a node and fake perception data based
 on json configurations
 """
+
 import argparse
 import math
 import time
 
 import simplejson
+
 from cyber_py import cyber
 from cyber_py import cyber_time
-
+from modules.common.proto.geometry_pb2 import Point3D
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
-from modules.common.proto.geometry_pb2 import Point3D
+
 
 _s_seq_num = 0
 _s_delta_t = 0.1

@@ -17,8 +17,9 @@
 ###############################################################################
 
 import math
-from record_reader import RecordItemReader
+
 from imu_speed import ImuSpeed
+from record_reader import RecordItemReader
 
 
 class ImuSpeedAcc:

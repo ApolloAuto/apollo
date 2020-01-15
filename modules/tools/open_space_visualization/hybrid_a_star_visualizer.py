@@ -16,13 +16,15 @@
 # limitations under the License.
 ###############################################################################
 
-from hybrid_a_star_python_interface import *
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from matplotlib import animation
-import numpy as np
-import time
 import math
+import time
+
+from matplotlib import animation
+import matplotlib.patches as patches
+import matplotlib.pyplot as plt
+import numpy as np
+
+from hybrid_a_star_python_interface import *
 
 
 def HybridAStarPlan(visualize_flag):

@@ -18,32 +18,29 @@
     pytorch 0.4.1
 """
 
+import argparse
 import os
+import logging
+
+from sklearn.model_selection import train_test_split
+from sklearn.utils import class_weight
+from torch.autograd import Variable
+from torch.utils.data import Dataset, DataLoader, sampler
 import h5py
 import numpy as np
-import logging
-import argparse
+import sklearn
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
 
-import proto.cruise_model_pb2
+from common.configure import parameters
+from cruise_models import FullyConn_NN, FCNN_CNN1D
 from proto.cruise_model_pb2 import TensorParameter, InputParameter,\
     Conv1dParameter, DenseParameter, ActivationParameter, MaxPool1dParameter,\
     AvgPool1dParameter, LaneFeatureConvParameter, ObsFeatureFCParameter,\
     ClassifyParameter, RegressParameter, CruiseModelParameter
 
-from cruise_models import FullyConn_NN, FCNN_CNN1D
-
-import torch
-import torch.nn as nn
-import torch.optim as optim
-import torch.nn.functional as F
-from torch.autograd import Variable
-from torch.utils.data import Dataset, DataLoader, sampler
-
-import sklearn
-from sklearn.model_selection import train_test_split
-from sklearn.utils import class_weight
-
-from common.configure import parameters
 
 # TODO(panjiacheng): the data-loader part needs to be modified.
 

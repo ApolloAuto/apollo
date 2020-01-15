@@ -21,15 +21,16 @@ This is a tool to extract useful information from given record files. It does
 self-check the validity of the uploaded data and able to inform developer's when
 the data is not qualified, and reduce the size of uploaded data significantly.
 """
-import argparse
+
 from datetime import datetime
-import numpy as np
+import argparse
 import os
-import sys
 import shutil
 import six
+import sys
 
 from google.protobuf import text_format
+import numpy as np
 
 from cyber_py.record import RecordReader
 from cyber.proto import record_pb2
@@ -38,7 +39,6 @@ from extract_static_data import get_subfolder_list, select_static_image_pcd
 from modules.tools.sensor_calibration.proto import extractor_config_pb2
 from sensor_msg_extractor import GpsParser, ImageParser, PointCloudParser, PoseParser, ContiRadarParser
 
-#from scripts.record_bag import SMALL_TOPICS
 
 SMALL_TOPICS = [
     '/apollo/canbus/chassis',

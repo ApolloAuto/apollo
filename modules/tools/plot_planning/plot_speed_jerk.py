@@ -16,16 +16,17 @@
 # limitations under the License.
 ###############################################################################
 
-import math
-import sys
-import matplotlib.pyplot as plt
-import numpy as np
 from os import listdir
 from os.path import isfile, join
+import math
+import sys
 
-from record_reader import RecordItemReader
-from imu_speed_jerk import ImuSpeedJerk
+import matplotlib.pyplot as plt
+import numpy as np
+
 from imu_speed import ImuSpeed
+from imu_speed_jerk import ImuSpeedJerk
+from record_reader import RecordItemReader
 
 
 def grid(data_list, shift):

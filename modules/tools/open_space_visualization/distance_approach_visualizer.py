@@ -16,13 +16,17 @@
 # limitations under the License.
 ###############################################################################
 
-from distance_approach_python_interface import *
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from matplotlib import animation
-import numpy as np
-import time
 import math
+import time
+
+from matplotlib import animation
+import matplotlib.patches as patches
+import matplotlib.pyplot as plt
+import numpy as np
+
+from distance_approach_python_interface import *
+
+
 result_file = "/tmp/open_space_osqp_ipopt.csv"
 
 

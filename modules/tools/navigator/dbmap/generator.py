@@ -16,10 +16,12 @@
 # limitations under the License.
 ###############################################################################
 
-import sys
-import json
 from datetime import datetime
+import json
+import sys
+
 from modules.map.relative_map.proto import navigation_pb2
+
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:

@@ -16,13 +16,15 @@
 # limitations under the License.
 ###############################################################################
 
-from cyber_py import cyber
-from .planning import Planning
-import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+
+from cyber_py import cyber
+from modules.planning.proto import planning_pb2
+from .planning import Planning
 from .subplot_st_main import StMainSubplot
 from .subplot_st_speed import StSpeedSubplot
-from modules.planning.proto import planning_pb2
+
 
 planning = Planning()
 

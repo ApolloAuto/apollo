@@ -16,9 +16,9 @@
 # limitations under the License.
 ###############################################################################
 
-import matplotlib.pyplot as plt
 from matplotlib import cm as cmx
 from matplotlib import colors as mcolors
+import matplotlib.pyplot as plt
 
 
 class TrajSpeedSubplot:

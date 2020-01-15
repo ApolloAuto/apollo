@@ -31,6 +31,7 @@ from modules.canbus.proto import chassis_pb2
 from modules.canbus.proto.chassis_pb2 import Chassis
 from modules.localization.proto import localization_pb2
 
+
 kChassisTopic = '/apollo/canbus/chassis'
 kLocalizationTopic = '/apollo/localization/pose'
 

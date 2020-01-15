@@ -16,12 +16,14 @@
 # limitations under the License.
 ###############################################################################
 
-import sys
 import json
-import pyproj
+import sys
+
 from yattag import Doc
-import common.proto_utils as proto_utils
+import pyproj
+
 from modules.map.relative_map.proto import navigation_pb2
+import common.proto_utils as proto_utils
 
 
 class DBMapViewer:

@@ -26,11 +26,13 @@ Example:
     ./sample_pnc_topics.py '/mnt/nfs/public_test/2018-04-??/*/mkz8/*/*.record'
 """
 
+import argparse
 import glob
 import os
 import sys
+
 import glog
-import argparse
+
 from cyber_py import cyber
 from cyber_py.record import RecordReader
 from cyber_py.record import RecordWriter

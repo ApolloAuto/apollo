@@ -17,16 +17,21 @@
 ###############################################################################
 
 """ Submit Apollo fuel job. """
-from modules.tools.fuel_proxy.proto.job_config_pb2 import JobConfig
+
+import os
+import json
 import requests
-import google.protobuf.text_format as text_format
-import google.protobuf.json_format as json_format
+import sys
+
 from absl import logging
 from absl import flags
 from absl import app
-import os
-import json
-import sys
+import google.protobuf.text_format as text_format
+import google.protobuf.json_format as json_format
+
+from modules.tools.fuel_proxy.proto.job_config_pb2 import JobConfig
+
+
 # Disable python2 paths.
 sys.path = [path for path in sys.path if 'python2' not in path]
 

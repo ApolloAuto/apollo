@@ -15,15 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+
 """
 This program can replay a planning output pb file via ros
 """
+
+import argparse
 import os.path
 import sys
-import argparse
-import rospy
-from std_msgs.msg import String
+
 from google.protobuf import text_format
+from std_msgs.msg import String
+import rospy
 
 import common.message_manager as message_manager
 

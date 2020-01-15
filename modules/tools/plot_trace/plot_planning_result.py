@@ -16,19 +16,20 @@
 # limitations under the License.
 ###############################################################################
 
+from subprocess import call
 import sys
 
+from google.protobuf import text_format
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
-from subprocess import call
 import numpy as np
-from google.protobuf import text_format
-from mpl_toolkits.mplot3d import Axes3D
 
 from modules.canbus.proto import chassis_pb2
 from modules.localization.proto import localization_pb2
 from modules.planning.proto import planning_pb2
+
 
 g_args = None
 

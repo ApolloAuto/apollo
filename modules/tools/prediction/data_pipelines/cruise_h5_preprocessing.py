@@ -20,11 +20,12 @@ This .py file includes functions for data preprocessing:
     - balancing the datasets
 '''
 
-import os
 import argparse
 import datetime
-import numpy as np
+import os
+
 import h5py
+import numpy as np
 
 
 def getListOfFiles(dirName):

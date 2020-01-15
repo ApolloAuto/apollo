@@ -19,10 +19,12 @@
 """
 This is a bunch of classes to manage cyber record channel FileIO.
 """
-import numpy as np
+
 import os
 import sys
 import struct
+
+import numpy as np
 
 
 class FileObject(object):

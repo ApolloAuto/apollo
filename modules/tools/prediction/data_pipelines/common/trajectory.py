@@ -19,10 +19,13 @@
 import abc
 import logging
 import math
+
 import numpy as np
 
-from .configure import parameters
 from common.bounding_rectangle import BoundingRectangle
+from .configure import parameters
+
+
 param_fea = parameters['feature']
 
 

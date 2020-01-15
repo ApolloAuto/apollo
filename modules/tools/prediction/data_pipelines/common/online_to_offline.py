@@ -19,14 +19,15 @@
 import abc
 import logging
 import math
-import numpy as np
 
 from google.protobuf.internal import decoder
 from google.protobuf.internal import encoder
+import numpy as np
 
 from modules.prediction.proto import offline_features_pb2
 from .bounding_rectangle import BoundingRectangle
 from .configure import parameters
+
 
 param_fea = parameters['feature']
 

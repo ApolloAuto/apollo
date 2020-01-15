@@ -16,14 +16,16 @@
 # limitations under the License.
 ###############################################################################
 
-import sys
 import argparse
+import sys
+
 from cyber_py.record import RecordReader
-from modules.control.proto import control_cmd_pb2
-from modules.planning.proto import planning_pb2
 from modules.canbus.proto import chassis_pb2
+from modules.control.proto import control_cmd_pb2
 from modules.drivers.proto import pointcloud_pb2
 from modules.perception.proto import perception_obstacle_pb2
+from modules.planning.proto import planning_pb2
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

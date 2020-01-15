@@ -16,10 +16,10 @@
 # limitations under the License.
 ###############################################################################
 
-from common.statistical_analyzer import StatisticalAnalyzer
-from common.statistical_analyzer import PrintColors
 from common.error_code_analyzer import ErrorCodeAnalyzer
 from common.error_msg_analyzer import ErrorMsgAnalyzer
+from common.statistical_analyzer import PrintColors
+from common.statistical_analyzer import StatisticalAnalyzer
 
 
 class ControlAnalyzer:

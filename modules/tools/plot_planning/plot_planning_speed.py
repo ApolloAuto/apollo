@@ -18,12 +18,16 @@
 
 import sys
 import threading
+
 import gflags
-from cyber_py import cyber
-import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+
+from cyber_py import cyber
 from modules.control.proto import control_cmd_pb2
 from modules.planning.proto import planning_pb2
+
+
 LAST_TRAJ_DATA = []
 LAST_TRAJ_T_DATA = []
 CURRENT_TRAJ_DATA = []

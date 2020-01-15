@@ -20,6 +20,7 @@ dump road test log.
 Usage:
     ./dump_road_test_log.py bag1 bag2 ...
 """
+
 import sys
 import time
 

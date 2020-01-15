@@ -26,6 +26,7 @@ import common.proto_utils as proto_utils
 import modules.routing.proto.topo_graph_pb2 as topo_graph_pb2
 import util
 
+
 color_iter = itertools.cycle(
     ['navy', 'c', 'cornflowerblue', 'gold', 'darkorange'])
 

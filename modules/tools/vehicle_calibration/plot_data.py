@@ -18,6 +18,7 @@
 """
 This module provide function to plot the speed control info from log csv file
 """
+
 import sys
 
 import matplotlib.pyplot as plt

@@ -17,7 +17,9 @@
 ###############################################################################
 
 import threading
+
 import numpy as np
+
 from modules.planning.proto import planning_internal_pb2
 
 

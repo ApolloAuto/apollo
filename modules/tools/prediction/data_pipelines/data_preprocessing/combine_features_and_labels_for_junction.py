@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
 #
@@ -19,6 +21,7 @@ import os
 import re
 
 from features_labels_utils import *
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

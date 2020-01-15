@@ -17,17 +17,20 @@
 ###############################################################################
 
 import argparse
-import matplotlib.pyplot as plt
+
 import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+
 from cyber_py import cyber
 from modules.planning.proto import planning_pb2
-from .subplot_st_main import StMainSubplot
-from .subplot_path import PathSubplot
-from .subplot_sl_main import SlMainSubplot
-from .subplot_st_speed import StSpeedSubplot
-from .subplot_speed import SpeedSubplot
 from .localization import Localization
 from .planning import Planning
+from .subplot_path import PathSubplot
+from .subplot_sl_main import SlMainSubplot
+from .subplot_speed import SpeedSubplot
+from .subplot_st_main import StMainSubplot
+from .subplot_st_speed import StSpeedSubplot
+
 
 planning = Planning()
 localization = Localization()

@@ -23,8 +23,10 @@ usage:
 """
 
 import argparse
+
 from cyber_py.record import RecordReader
 from modules.transform.proto import transform_pb2
+
 
 g_args = None
 

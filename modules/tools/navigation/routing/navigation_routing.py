@@ -16,27 +16,30 @@
 # limitations under the License.
 ###############################################################################
 
-import os
-import rospy
-import math
-import _thread
-import requests
 import json
-import pyproj
-import urllib3.contrib.pyopenssl
-import certifi
-import urllib3
-from std_msgs.msg import String
-from flask import jsonify
+import math
+import os
+import requests
+import _thread
+
 from flask import Flask
+from flask import jsonify
 from flask import request
 from flask_cors import CORS
-from shapely.geometry import LineString, Point
 from numpy.polynomial.polynomial import polyval
-from modules.localization.proto import localization_pb2
-from modules.planning.proto import planning_pb2
-from modules.map.relative_map.proto import navigation_pb2
+from shapely.geometry import LineString, Point
+from std_msgs.msg import String
+import certifi
+import pyproj
+import rospy
+import urllib3
+import urllib3.contrib.pyopenssl
+
 from modules.drivers.proto import mobileye_pb2
+from modules.localization.proto import localization_pb2
+from modules.map.relative_map.proto import navigation_pb2
+from modules.planning.proto import planning_pb2
+
 
 # pip install -U flask-cors
 # is currently required in docker

@@ -21,33 +21,34 @@
     Keras-1.2.2
 """
 
+import argparse
+import logging
 import os
+
 import h5py
 import numpy as np
-import logging
-import argparse
 
-import google.protobuf.text_format as text_format
 from keras.callbacks import ModelCheckpoint
 from keras.metrics import mse
 from keras.models import Sequential, Model
 from keras.layers.normalization import BatchNormalization
-from keras.layers import Dense, Input
 from keras.layers import Activation
+from keras.layers import Dense, Input
 from keras.layers import Dropout
-from keras.utils import np_utils
 from keras.regularizers import l2, l1
+from keras.utils import np_utils
 from sklearn.model_selection import train_test_split
-
-from . import proto.fnn_model_pb2
-from .proto.fnn_model_pb2 import FnnModel, Layer
+import google.protobuf.text_format as text_format
 
 from . import common.log
+from . import proto.fnn_model_pb2
 from .common.data_preprocess import load_h5
 from .common.data_preprocess import down_sample
 from .common.data_preprocess import train_test_split
 from .common.configure import parameters
 from .common.configure import labels
+from .proto.fnn_model_pb2 import FnnModel, Layer
+
 
 # Constants
 dim_input = parameters['mlp']['dim_input']

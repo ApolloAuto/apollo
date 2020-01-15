@@ -1,3 +1,21 @@
+#!/usr/bin/env python3
+
+###############################################################################
+# Copyright 2018 The Apollo Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+###############################################################################
+
 """
 function to parse data from *.record files, created using Apollo-Auto
 
@@ -12,21 +30,18 @@ current implementation illustrates sample record file parsing for
 
 """
 
-###########################################################
-# import packages
+import os
 import sys
 import time
-import os
-import yaml
+
 from importlib import import_module
+import yaml
 
 from cyber_py import cyber
 from cyber_py import record
 
+
 os.system('clear')
-
-###########################################################
-
 
 def read_parameters(yaml_file):
     """
@@ -55,9 +70,6 @@ def read_parameters(yaml_file):
 
     return parse_dict
 
-###########################################################
-
-
 def define_destinations(parse_dict):
     """
     define destination for extracted files
@@ -84,9 +96,6 @@ def define_destinations(parse_dict):
         os.makedirs(dest_dict["destination_folder"])
 
     return dest_dict, parser_func
-
-###########################################################
-
 
 def parse_apollo_record(parse_dict, dest_dict, parser_func):
     """
@@ -120,8 +129,6 @@ def parse_apollo_record(parse_dict, dest_dict, parser_func):
     print('DONE: records parsed and data saved to: \n  ' + dest_dict['destination_folder'])
     print("=" * 60)
 
-
-###########################################################
 if __name__ == '__main__':
     cyber.init()
     parse_dict = read_parameters('parser_params.yaml')

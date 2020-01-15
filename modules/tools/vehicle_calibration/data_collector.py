@@ -18,20 +18,18 @@
 """
 Data Collector
 """
+
 import os
-import sys
-import time
 import signal
+import sys
 import time
 
 from cyber_py import cyber
 from cyber_py import cyber_time
-
-from plot_data import Plotter
-
 from modules.canbus.proto import chassis_pb2
 from modules.control.proto import control_cmd_pb2
 from modules.localization.proto import localization_pb2
+from plot_data import Plotter
 
 
 class DataCollector(object):

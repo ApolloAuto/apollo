@@ -25,11 +25,13 @@ Example:
     ./channel_size_stats.py a.record
 """
 
+import argparse
 import glob
 import os
 import sys
+
 import glog
-import argparse
+
 from cyber_py import cyber
 from cyber_py.record import RecordReader
 from cyber_py.record import RecordWriter

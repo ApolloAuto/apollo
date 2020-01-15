@@ -16,10 +16,10 @@
 # limitations under the License.
 ###############################################################################
 
-import sys
-import numpy
 import math
+import numpy
 import os
+import sys
 
 
 def get_stat2_from_data(data):

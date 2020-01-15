@@ -17,13 +17,15 @@
 ###############################################################################
 """Real Time ACC Calculate Test Tool Based on Speed"""
 
-import sys
-import os
-import datetime
 import argparse
+import datetime
+import os
+import sys
+
 from cyber_py import cyber
-from modules.localization.proto import localization_pb2
 from modules.canbus.proto import chassis_pb2
+from modules.localization.proto import localization_pb2
+
 
 SmoothParam = 9
 

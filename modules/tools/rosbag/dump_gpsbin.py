@@ -31,6 +31,7 @@ from cyber_py import cyber
 from cyber_py.record import RecordReader
 from modules.drivers.gnss.proto import gnss_pb2
 
+
 g_args = None
 kRawDataTopic = '/apollo/sensor/gnss/raw_data'
 

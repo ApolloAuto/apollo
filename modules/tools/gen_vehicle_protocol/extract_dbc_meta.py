@@ -16,10 +16,12 @@
 # limitations under the License.
 ###############################################################################
 
-import sys
-import yaml
-import shlex
 import re
+import shlex
+import sys
+
+import yaml
+
 
 MAX_CAN_ID = 4096000000  # 2048
 

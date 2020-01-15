@@ -18,10 +18,11 @@
 
 import datetime
 import os
+import re
 import shutil
 import sys
+
 import yaml
-import re
 
 
 def write_single_protocol_vars(pb_fp, p):

@@ -20,10 +20,12 @@ This program can dump a rosbag into separate text files that contains the pb mes
 """
 
 import argparse
+from datetime import datetime
 import os
 import shutil
+
 from cyber_py.record import RecordReader
-from datetime import datetime
+
 
 g_args = None
 

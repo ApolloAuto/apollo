@@ -17,9 +17,11 @@
 ###############################################################################
 
 import argparse
+
 import matplotlib.pyplot as plt
-from libs.map import Map
+
 from libs.localization import Localization
+from libs.map import Map
 from libs.path import Path
 
 

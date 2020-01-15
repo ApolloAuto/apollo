@@ -24,6 +24,7 @@ import matplotlib.pyplot as plt
 import common.proto_utils as proto_utils
 import util
 
+
 g_color = [
     'navy', 'c', 'cornflowerblue', 'gold', 'darkorange', 'darkviolet',
     'aquamarine', 'firebrick', 'limegreen'

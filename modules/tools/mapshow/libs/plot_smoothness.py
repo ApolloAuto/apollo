@@ -16,14 +16,16 @@
 # limitations under the License.
 ###############################################################################
 
+import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+
 from cyber_py import cyber
 from modules.planning.proto import planning_pb2
-import matplotlib.pyplot as plt
 from .planning import Planning
-import matplotlib.animation as animation
-from .subplot_traj_speed import TrajSpeedSubplot
 from .subplot_traj_acc import TrajAccSubplot
 from .subplot_traj_path import TrajPathSubplot
+from .subplot_traj_speed import TrajSpeedSubplot
+
 
 planning = Planning()
 

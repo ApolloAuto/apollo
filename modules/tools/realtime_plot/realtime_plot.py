@@ -22,16 +22,18 @@ import sys
 import threading
 
 import gflags
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 from cyber_py import cyber
-import common.proto_utils as proto_utils
 from item import Item
-from modules.localization.proto.localization_pb2 import LocalizationEstimate
 from modules.canbus.proto.chassis_pb2 import Chassis
+from modules.localization.proto.localization_pb2 import LocalizationEstimate
 from modules.planning.proto.planning_pb2 import ADCTrajectory
 from stitem import Stitem
 from xyitem import Xyitem
+import common.proto_utils as proto_utils
+
 
 VehicleLength = 2.85
 HistLine2display = 2  # The number of lines to display
