@@ -18,8 +18,8 @@
 
 """ Submit Apollo fuel job. """
 
-import os
 import json
+import os
 import requests
 import sys
 
