@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -17,9 +17,10 @@
 ###############################################################################
 
 import math
-import numpy
 import os
 import sys
+
+import numpy
 
 
 def get_stat2_from_data(data):

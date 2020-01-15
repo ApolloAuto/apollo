@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 ###############################################################################
 # Modification Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
@@ -29,16 +31,14 @@
 # limitations under the License.
 # ==============================================================================
 """Converts MLP data to TFRecords file format with Example protos."""
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import argparse
 import os
 import sys
 
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
+
 
 FLAGS = None
 feature_dim = 62
