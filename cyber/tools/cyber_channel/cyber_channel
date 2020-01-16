@@ -90,10 +90,10 @@ class CyberChannelBw(object):
             bw, mean, min_s, max_s = [
                 "%.2fB" % v for v in [bytes_per_s, mean, min_s, max_s]]
         elif bytes_per_s < 1000000:
-            bw, mean, min_s, max_s = ["%.2fKB" % (v // 1000)
+            bw, mean, min_s, max_s = ["%.2fKB" % (v / 1000)
                                       for v in [bytes_per_s, mean, min_s, max_s]]
         else:
-            bw, mean, min_s, max_s = ["%.2fMB" % (v // 1000000)
+            bw, mean, min_s, max_s = ["%.2fMB" % (v / 1000000)
                                       for v in [bytes_per_s, mean, min_s, max_s]]
 
         print("average: %s/s\n\tmean: %s min: %s max: %s window: %s" %

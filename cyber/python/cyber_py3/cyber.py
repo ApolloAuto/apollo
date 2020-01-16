@@ -251,7 +251,7 @@ class Node(object):
         create a channel reader for receive message from another channel.
         """
         self.mutex.acquire()
-        if name in list(self.subs.keys()):
+        if name in self.subs.keys():
             self.mutex.release()
             return None
         self.mutex.release()
@@ -324,7 +324,7 @@ class Node(object):
     def create_service(self, name, req_data_type, res_data_type, callback,
                        args=None):
         self.mutex.acquire()
-        if name in list(self.services.keys()):
+        if name in self.services.keys():
             self.mutex.release()
             return None
         self.mutex.release()

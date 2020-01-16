@@ -42,7 +42,7 @@ def retrieve_rosbag(bagname):
     if bagname not in URL_DICT:
         print(
             "bag[%s] is unknown, use one of the following rosbag names:\n%s" %
-            (bagname, ", ".join([name for name in list(URL_DICT.keys())])))
+            (bagname, ", ".join([name for name in URL_DICT.keys()])))
         return False
     url = URL_DICT[bagname]
     print("Downloading from %s" % url)
@@ -58,7 +58,7 @@ if __name__ == "__main__":
         'name',
         type=str,
         help='rosbag names. You can choose one of [%s]' % ", ".join(
-            [name for name in list(URL_DICT.keys())]))
+            [name for name in URL_DICT.keys()]))
     args = parser.parse_args()
     if retrieve_rosbag(args.name):
         print("Download %s success" % args.name)
