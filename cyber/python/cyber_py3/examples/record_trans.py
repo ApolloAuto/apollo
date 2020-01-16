@@ -52,6 +52,7 @@ def test_record_trans(reader_path):
     print('Channel count: %d' % len(channel_list))
     print(channel_list)
 
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print('Usage: %s record_file' % sys.argv[0])

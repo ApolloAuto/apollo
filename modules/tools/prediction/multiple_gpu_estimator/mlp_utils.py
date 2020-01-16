@@ -63,7 +63,7 @@ class RunConfig(tf.contrib.learn.RunConfig):
 
         state = {
             k: v
-            for k, v in list(self.__dict__.items()) if not k.startswith('__')
+            for k, v in self.__dict__.items() if not k.startswith('__')
         }
         # Pop out the keys in whitelist.
         for k in whitelist:

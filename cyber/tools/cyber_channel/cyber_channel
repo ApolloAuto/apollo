@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
 
@@ -15,14 +15,16 @@
 # limitations under the License.
 # ****************************************************************************
 
-import sys
-import os
-import time
 import math
+import os
+import sys
+import time
+
+from cyber_py import cyber_time
+from cyber_py import cyber
+
 
 sys.path.append("../")
-from cyber_py import cyber
-from cyber_py import cyber_time
 
 
 def print_channel_type(channel_name):
@@ -88,10 +90,10 @@ class CyberChannelBw(object):
             bw, mean, min_s, max_s = [
                 "%.2fB" % v for v in [bytes_per_s, mean, min_s, max_s]]
         elif bytes_per_s < 1000000:
-            bw, mean, min_s, max_s = ["%.2fKB" % (v / 1000)
+            bw, mean, min_s, max_s = ["%.2fKB" % (v // 1000)
                                       for v in [bytes_per_s, mean, min_s, max_s]]
         else:
-            bw, mean, min_s, max_s = ["%.2fMB" % (v / 1000000)
+            bw, mean, min_s, max_s = ["%.2fMB" % (v // 1000000)
                                       for v in [bytes_per_s, mean, min_s, max_s]]
 
         print("average: %s/s\n\tmean: %s min: %s max: %s window: %s" %
@@ -390,6 +392,7 @@ Commands:
 Type cyber_channel <command> -h for more detailed usage, e.g. 'cyber_channel echo -h'
 """)
     sys.exit(getattr(os, 'EX_USAGE', 1))
+
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:

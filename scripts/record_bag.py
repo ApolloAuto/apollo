@@ -153,7 +153,7 @@ class ArgManager(object):
     def args(self):
         """Get parsed args."""
         if self._args is None:
-           self._args = self.parser.parse_args()
+            self._args = self.parser.parse_args()
         return self._args
 
 
@@ -258,6 +258,7 @@ def main():
         recorder.stop()
     else:
         recorder.start()
+
 
 if __name__ == '__main__':
     main()

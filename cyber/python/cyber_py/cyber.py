@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # ****************************************************************************
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -24,6 +24,7 @@ import os
 import sys
 import threading
 import time
+
 
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
 
@@ -214,7 +215,7 @@ class Node(object):
         self.register_message(data_type.DESCRIPTOR.file)
         datatype = data_type.DESCRIPTOR.full_name
         writer = _CYBER.PyNode_create_writer(self.node, name,
-                                                  datatype, qos_depth)
+                                             datatype, qos_depth)
         self.list_writer.append(writer)
         return Writer(name, writer, datatype)
 
@@ -251,7 +252,7 @@ class Node(object):
         create a channel reader for receive message from another channel.
         """
         self.mutex.acquire()
-        if name in self.subs.keys():
+        if name in list(self.subs.keys()):
             self.mutex.release()
             return None
         self.mutex.release()
@@ -291,7 +292,7 @@ class Node(object):
     def create_client(self, name, request_data_type, response_data_type):
         datatype = request_data_type.DESCRIPTOR.full_name
         c = _CYBER.PyNode_create_client(self.node, name,
-                                             str(datatype))
+                                        str(datatype))
         self.list_client.append(c)
         return Client(c, response_data_type)
 
@@ -324,7 +325,7 @@ class Node(object):
     def create_service(self, name, req_data_type, res_data_type, callback,
                        args=None):
         self.mutex.acquire()
-        if name in self.services.keys():
+        if name in list(self.services.keys()):
             self.mutex.release()
             return None
         self.mutex.release()

@@ -87,5 +87,6 @@ class TestTime(unittest.TestCase):
         self.assertEqual(0, rt3.get_cycle_time().to_nsec())
         self.assertEqual(666, rt3.get_expected_cycle_time().to_nsec())
 
+
 if __name__ == '__main__':
     unittest.main()

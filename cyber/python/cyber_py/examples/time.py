@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -72,6 +72,7 @@ def test_rate():
     print(rt1)
     print(rt2)
     print(rt3)
+
 
 if __name__ == '__main__':
     print("test time", "-" * 50)
