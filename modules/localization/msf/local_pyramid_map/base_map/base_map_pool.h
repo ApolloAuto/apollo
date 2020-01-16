@@ -15,11 +15,11 @@
  *****************************************************************************/
 #pragma once
 
+#include <boost/thread.hpp>
 #include <list>
 #include <set>
 
 #include "Eigen/Core"
-#include "boost/thread.hpp"
 
 #include "cyber/task/task.h"
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map_fwd.h"

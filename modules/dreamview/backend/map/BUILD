@@ -11,8 +11,8 @@ cc_library(
         "//modules/dreamview/proto:simulation_world_proto",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",
+        "//third_party:boost",
         "//third_party/json",
-        "@boost",
         "@com_google_glog//:glog",
     ],
 )

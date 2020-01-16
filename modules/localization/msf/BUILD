@@ -42,7 +42,7 @@ cc_library(
         "//modules/localization/proto:measure_proto",
         "//modules/localization/proto:sins_pva_proto",
         "//modules/transform:transform_broadcaster_lib",
-        "@boost",
+        "//third_party:boost",
         "@com_google_glog//:glog",
         "@com_google_googletest//:gtest",
         "@yaml_cpp//:yaml",

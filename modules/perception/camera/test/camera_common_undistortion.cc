@@ -16,9 +16,9 @@
 #include "modules/perception/camera/test/camera_common_undistortion.h"
 
 #include <npp.h>
+#include <boost/filesystem.hpp>
 #include <opencv2/opencv.hpp>
 
-#include "boost/filesystem.hpp"
 #include "yaml-cpp/yaml.h"
 
 namespace apollo {

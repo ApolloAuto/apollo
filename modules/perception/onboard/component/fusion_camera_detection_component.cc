@@ -15,9 +15,10 @@
  *****************************************************************************/
 #include "modules/perception/onboard/component/fusion_camera_detection_component.h"
 
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
+
 #include "absl/strings/str_cat.h"
-#include "boost/algorithm/string.hpp"
-#include "boost/format.hpp"
 #include "yaml-cpp/yaml.h"
 
 #include "cyber/common/file.h"

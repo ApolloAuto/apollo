@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "boost/filesystem.hpp"
-#include "boost/program_options.hpp"
+#include <boost/filesystem.hpp>
+#include <boost/program_options.hpp>
 
 #include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map.h"
 #include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_config.h"

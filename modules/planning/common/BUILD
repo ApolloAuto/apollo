@@ -10,7 +10,7 @@ cc_library(
     ],
     deps = [
         "//modules/common/util:map_util",
-        "@boost",
+        "//third_party:boost",
     ],
 )
 
@@ -21,7 +21,7 @@ cc_test(
     deps = [
         ":indexed_list",
         "//modules/common/util",
-        "@boost",
+        "//third_party:boost",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -83,7 +83,7 @@ cc_test(
         ":obstacle",
         "//modules/common/util",
         "//modules/perception/proto:perception_proto",
-        "@boost",
+        "//third_party:boost",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -414,7 +414,7 @@ cc_test(
     srcs = ["open_space_info_test.cc"],
     deps = [
         "open_space_info",
-        "@boost",
+        "//third_party:boost",
         "@com_google_googletest//:gtest_main",
     ],
 )

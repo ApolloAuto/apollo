@@ -15,12 +15,12 @@
  *****************************************************************************/
 #include "modules/perception/fusion/lib/data_association/hm_data_association/track_object_distance.h"
 
+#include <boost/format.hpp>
+
 #include <algorithm>
 #include <limits>
 #include <map>
 #include <utility>
-
-#include "boost/format.hpp"
 
 #include "modules/perception/base/camera.h"
 #include "modules/perception/base/point.h"
