@@ -44,8 +44,8 @@ TEST_F(NDTLocalizationTest, UpdateLidarPose) {
   pose_buffer_ptr_->UpdateLidarPose(time_now, lidar_pose, odometry_pose);
   time_now = apollo::common::time::Clock::NowInSeconds();
   pose_buffer_ptr_->UpdateLidarPose(time_now, lidar_pose, odometry_pose);
-  ASSERT_EQ(pose_buffer_ptr_->GetUsedBufferSize(), 2);
-  ASSERT_EQ(pose_buffer_ptr_->GetHeadIndex(), 0);
+  EXPECT_EQ(pose_buffer_ptr_->GetUsedBufferSize(), 2);
+  EXPECT_EQ(pose_buffer_ptr_->GetHeadIndex(), 0);
 }
 
 TEST_F(NDTLocalizationTest, UpdateOdometryPose) {
@@ -62,7 +62,7 @@ TEST_F(NDTLocalizationTest, UpdateOdometryPose) {
   time_now = apollo::common::time::Clock::NowInSeconds();
   Eigen::Affine3d pose =
       pose_buffer_ptr_->UpdateOdometryPose(time_now, odometry_pose);
-  ASSERT_LE(std::abs(pose.translation()[0] - 1.0), 1e-5);
+  EXPECT_LE(std::abs(pose.translation()[0] - 1.0), 1e-5);
 }
 
 }  // namespace ndt
