@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 
 # ****************************************************************************
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -51,7 +51,6 @@ def test_record_trans(reader_path):
     channel_list = fread.get_channellist()
     print('Channel count: %d' % len(channel_list))
     print(channel_list)
-
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:

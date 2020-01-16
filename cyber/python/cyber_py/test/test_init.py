@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 
 # ****************************************************************************
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -37,7 +37,6 @@ class TestInit(unittest.TestCase):
         self.assertTrue(cyber.ok())
         cyber.shutdown()
         self.assertTrue(cyber.is_shutdown())
-
 
 if __name__ == '__main__':
     unittest.main()

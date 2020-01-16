@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -48,7 +48,7 @@ class Parameter(object):
             self.param = name
         elif (name is None and value is None):
             self.param = _CYBER_PARAM.new_PyParameter_noparam()
-        elif isinstance(value, int) or isinstance(value, int):
+        elif isinstance(value, int) or isinstance(value, long):
             self.param = _CYBER_PARAM.new_PyParameter_int(name, value)
         elif isinstance(value, float):
             self.param = _CYBER_PARAM.new_PyParameter_double(name, value)
