@@ -22,16 +22,7 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-class CompressionTestSuite : public ::testing::Test {
- protected:
-  CompressionTestSuite() {}
-  virtual ~CompressionTestSuite() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
-};
-
-/**@brief ZlibStrategyTest. */
-TEST_F(CompressionTestSuite, ZlibStrategyTest) {
+TEST(CompressionTestSuite, ZlibStrategyTest) {
   ZlibStrategy zlib;
   std::vector<unsigned char> buf_uncompressed;
   std::vector<unsigned char> buf_compressed;
@@ -44,7 +35,7 @@ TEST_F(CompressionTestSuite, ZlibStrategyTest) {
   zlib.Decode(&buf_compressed, &buf_uncompressed2);
 
   for (int i = 0; i < 255; i++) {
-    ASSERT_EQ(buf_uncompressed2[i], (unsigned char)i);
+    EXPECT_EQ(buf_uncompressed2[i], (unsigned char)i);
   }
 }
 

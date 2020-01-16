@@ -48,11 +48,11 @@ TEST_F(BaseMapPoolTestSuite, MapNodePoolTest) {
   pool.FreeMapNodeTask(node3);
 
   unsigned int pool_size = pool.GetPoolSize();
-  ASSERT_EQ(pool_size, 3);
+  EXPECT_EQ(pool_size, 3);
 
   pool.Release();
   pool_size = pool.GetPoolSize();
-  ASSERT_EQ(pool_size, 0);
+  EXPECT_EQ(pool_size, 0);
 }
 
 }  // namespace msf
