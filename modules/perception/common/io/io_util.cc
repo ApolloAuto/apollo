@@ -15,8 +15,9 @@
  *****************************************************************************/
 #include "modules/perception/common/io/io_util.h"
 
+#include <boost/filesystem.hpp>
+
 #include "absl/strings/match.h"
-#include "boost/filesystem.hpp"
 #include "yaml-cpp/yaml.h"
 
 #include "cyber/common/file.h"

@@ -19,7 +19,6 @@
 #include <cuda_runtime_api.h>
 #include <boost/thread.hpp>
 
-#include "boost/thread.hpp"
 #include "cyber/common/log.h"
 
 namespace apollo {

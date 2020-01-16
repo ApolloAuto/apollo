@@ -8,7 +8,7 @@ cc_binary(
     deps = [
         ":client",
         ":client_gflags",
-        "@boost",
+        "//third_party:boost",
         "@com_github_grpc_grpc//:grpc++",
     ],
 )
@@ -26,7 +26,7 @@ cc_library(
         ":client_gflags",
         ":client_loops_check",
         "//cyber",
-        "@boost",
+        "//third_party:boost",
         "@com_github_grpc_grpc//:grpc++",
         "@yaml_cpp//:yaml",
     ],
@@ -42,7 +42,7 @@ cc_library(
         ":exception_handler",
         "//cyber",
         "//modules/map/tools/map_datachecker/proto:map_datachecker_grpc",
-        "@boost",
+        "//third_party:boost",
         "@com_github_grpc_grpc//:grpc++",
         "@yaml_cpp//:yaml",
     ],
@@ -54,7 +54,7 @@ cc_library(
     hdrs = ["client_common.h"],
     deps = [
         "//cyber",
-        "@boost",
+        "//third_party:boost",
         "@com_github_grpc_grpc//:grpc++",
     ],
 )
@@ -78,7 +78,7 @@ cc_library(
         ":exception_handler",
         "//cyber",
         "//modules/map/tools/map_datachecker/proto:map_datachecker_grpc",
-        "@boost",
+        "//third_party:boost",
         "@com_github_grpc_grpc//:grpc++",
         "@yaml_cpp//:yaml",
     ],

@@ -35,7 +35,7 @@ cc_library(
         "//modules/localization/proto:measure_proto",
         "//modules/localization/proto:pose_proto",
         "//modules/localization/proto:sins_pva_proto",
-        "@boost",
+        "//third_party:boost",
         "@com_github_gflags_gflags//:gflags",
         "@com_google_glog//:glog",
         "@eigen",

@@ -19,7 +19,7 @@ cc_binary(
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
         "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map",
         "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map_pool",
-        "@boost",
+        "//third_party:boost",
         "@eigen",
         "@pcl",
     ],

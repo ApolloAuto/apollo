@@ -20,10 +20,9 @@
 
 #pragma once
 
+#include <boost/thread/shared_mutex.hpp>
 #include <unordered_map>
 #include <vector>
-
-#include "boost/thread/shared_mutex.hpp"
 
 #include "cyber/common/log.h"
 #include "modules/common/util/map_util.h"

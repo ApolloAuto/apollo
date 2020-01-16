@@ -9,7 +9,7 @@ cc_binary(
         "//modules/perception/base",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/common/io:io_util",
-        "@boost",
+        "//third_party:boost",
         "@com_google_googletest//:gtest",
         "@opencv",
     ],

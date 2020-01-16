@@ -14,9 +14,9 @@ cc_library(
     deps = [
         "//cyber/common:log",
         "//modules/perception/inference:inference_lib",
+        "//third_party:boost",
         "//third_party:pthread",
         "//third_party:rt",
-        "@boost",
         "@com_github_gflags_gflags//:gflags",
         "@com_google_protobuf//:protobuf",
         "@cuda",

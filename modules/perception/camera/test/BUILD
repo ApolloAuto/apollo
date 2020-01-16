@@ -108,7 +108,7 @@ cc_library(
     hdrs = ["camera_common_undistortion.h"],
     deps = [
         "//modules/perception/base",
-        "@boost",
+        "//third_party:boost",
         "@opencv",
         "@yaml_cpp//:yaml",
     ],
@@ -211,7 +211,7 @@ cc_library(
     deps = [
         "//modules/perception/common/i_lib/core",
         "//modules/perception/common/i_lib/geometry:i_plane",
-        "@boost",
+        "//third_party:boost",
         "@opencv",
     ],
 )

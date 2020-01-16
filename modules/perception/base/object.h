@@ -15,12 +15,12 @@
  *****************************************************************************/
 #pragma once
 
+#include <boost/circular_buffer.hpp>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "Eigen/Core"
-#include "boost/circular_buffer.hpp"
 
 #include "modules/perception/base/object_supplement.h"
 #include "modules/perception/base/object_types.h"

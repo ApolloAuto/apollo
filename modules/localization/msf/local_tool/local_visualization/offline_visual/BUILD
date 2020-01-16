@@ -12,7 +12,7 @@ cc_library(
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
         "//modules/localization/msf/local_tool/local_visualization/engine",
-        "@boost",
+        "//third_party:boost",
         "@eigen",
     ],
 )
@@ -26,7 +26,7 @@ cc_binary(
         "//cyber",
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
-        "@boost",
+        "//third_party:boost",
         "@eigen",
     ],
 )
