@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -47,13 +47,13 @@ class Duration(object):
     def __init__(self, other):
         if isinstance(other, int):
             self.nanoseconds_ = other
-        elif isinstance(other, long):
+        elif isinstance(other, int):
             self.nanoseconds_ = other
         elif isinstance(other, float):
             self.nanoseconds_ = other * 1000000000
         elif isinstance(other, Duration):
             self.nanoseconds_ = other.nanoseconds_
-        self.duration_ = _CYBER_TIME.new_PyDuration(long(self.nanoseconds_))
+        self.duration_ = _CYBER_TIME.new_PyDuration(int(self.nanoseconds_))
 
     def __del__(self):
         _CYBER_TIME.delete_PyDuration(self.duration_)
@@ -125,14 +125,14 @@ class Time(object):
         nanoseconds = 0
         if isinstance(other, int):
             nanoseconds = other
-        elif isinstance(other, long):
+        elif isinstance(other, int):
             nanoseconds = other
         elif isinstance(other, float):
             nanoseconds = other * 1000000000
         elif isinstance(other, Time):
             nanoseconds = other.to_nsec()
 
-        self.time = _CYBER_TIME.new_PyTime(long(nanoseconds))
+        self.time = _CYBER_TIME.new_PyTime(int(nanoseconds))
 
     def __del__(self):
         _CYBER_TIME.delete_PyTime(self.time)
@@ -223,10 +223,10 @@ class Rate(object):
     # @param other float means frequency the desired rate to run at in Hz.
     # int or long means the expected_cycle_time.
     def __init__(self, other):
-        if isinstance(other, int) or isinstance(other, long):
-            self.rate_ = _CYBER_TIME.new_PyRate(long(other))
+        if isinstance(other, int) or isinstance(other, int):
+            self.rate_ = _CYBER_TIME.new_PyRate(int(other))
         elif isinstance(other, float):
-            self.rate_ = _CYBER_TIME.new_PyRate(long(1.0 / other))
+            self.rate_ = _CYBER_TIME.new_PyRate(int(1.0 / other))
         elif isinstance(other, Duration):
             self.rate_ = _CYBER_TIME.new_PyRate(other.to_nsec())
 

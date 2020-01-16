@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -86,6 +86,7 @@ class TestTime(unittest.TestCase):
         rt3 = cyber_time.Rate(cyber_time.Duration(666))
         self.assertEqual(0, rt3.get_cycle_time().to_nsec())
         self.assertEqual(666, rt3.get_expected_cycle_time().to_nsec())
+
 
 if __name__ == '__main__':
     unittest.main()

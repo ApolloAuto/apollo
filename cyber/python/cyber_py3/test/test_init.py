@@ -38,5 +38,6 @@ class TestInit(unittest.TestCase):
         cyber.shutdown()
         self.assertTrue(cyber.is_shutdown())
 
+
 if __name__ == '__main__':
     unittest.main()

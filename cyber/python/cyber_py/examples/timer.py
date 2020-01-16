@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python32
 
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -48,6 +48,7 @@ def test_timer():
     ct2.stop()
 
     cyber.shutdown()
+
 
 if __name__ == '__main__':
     test_timer()

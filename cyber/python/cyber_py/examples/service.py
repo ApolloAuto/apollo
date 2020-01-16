@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -37,6 +37,7 @@ def test_service_class():
     r = node.create_service(
         "server_01", ChatterBenchmark, ChatterBenchmark, callback)
     node.spin()
+
 
 if __name__ == '__main__':
     cyber.init()

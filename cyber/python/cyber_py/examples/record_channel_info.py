@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -52,6 +52,7 @@ def print_channel_info(file_path):
             (channel, count, len(desc)))
         # print(desc)
     print("++++++++++++Finish Channel Info Statistics++++++++++++++\n")
+
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
