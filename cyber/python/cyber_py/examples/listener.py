@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 
 # ****************************************************************************
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -40,7 +40,6 @@ def test_listener_class():
     test_node = cyber.Node("listener")
     test_node.create_reader("channel/chatter", ChatterBenchmark, callback)
     test_node.spin()
-
 
 if __name__ == '__main__':
     cyber.init()
