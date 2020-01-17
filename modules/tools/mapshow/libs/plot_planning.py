@@ -21,7 +21,7 @@ import argparse
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 
-from cyber_py import cyber
+from cyber_py3 import cyber
 from modules.planning.proto import planning_pb2
 from .localization import Localization
 from .planning import Planning

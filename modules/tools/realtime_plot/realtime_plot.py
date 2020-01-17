@@ -25,7 +25,7 @@ import gflags
 import matplotlib.pyplot as plt
 import numpy as np
 
-from cyber_py import cyber
+from cyber_py3 import cyber
 from item import Item
 from modules.canbus.proto.chassis_pb2 import Chassis
 from modules.localization.proto.localization_pb2 import LocalizationEstimate

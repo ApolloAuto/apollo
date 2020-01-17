@@ -21,7 +21,7 @@ import sys
 
 import matplotlib.pyplot as plt
 
-from cyber_py.record import RecordReader
+from cyber_py3.record import RecordReader
 from modules.canbus.proto import chassis_pb2
 
 

@@ -30,8 +30,8 @@ import time
 from numpy import genfromtxt
 import scipy.signal as signal
 
-from cyber_py import cyber
-from cyber_py import cyber_time
+from cyber_py3 import cyber
+from cyber_py3 import cyber_time
 from common.logger import Logger
 from modules.canbus.proto import chassis_pb2
 from modules.common.configs.proto import vehicle_config_pb2

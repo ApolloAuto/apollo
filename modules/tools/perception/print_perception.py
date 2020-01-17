@@ -20,7 +20,7 @@
 print received perception message
 """
 import argparse
-from cyber_py import cyber
+from cyber_py3 import cyber
 
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
 

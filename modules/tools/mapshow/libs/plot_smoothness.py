@@ -19,7 +19,7 @@
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 
-from cyber_py import cyber
+from cyber_py3 import cyber
 from modules.planning.proto import planning_pb2
 from .planning import Planning
 from .subplot_traj_acc import TrajAccSubplot

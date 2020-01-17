@@ -26,6 +26,10 @@ usermod -aG sudo ${USER_NAME}
 echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 echo """
+alias python='/usr/bin/python3'
+alias pip='/usr/bin/pip3'
+
 ulimit -c unlimited
+
 source /apollo/scripts/apollo_base.sh
 """ >> /home/${USER_NAME}/.bashrc
