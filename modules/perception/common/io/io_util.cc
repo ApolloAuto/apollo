@@ -18,10 +18,11 @@
 #include <boost/filesystem.hpp>
 
 #include "absl/strings/match.h"
+#include "yaml-cpp/yaml.h"
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/perception/base/camera.h"
-#include "yaml-cpp/yaml.h"
 
 namespace apollo {
 namespace perception {

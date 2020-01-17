@@ -14,12 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/localization/msf/common/util/system_utility.h"
+
 #define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
 #undef BOOST_NO_CXX11_SCOPED_ENUMS
-#include <algorithm>
 
-#include "modules/localization/msf/common/util/system_utility.h"
+#include <algorithm>
 
 namespace apollo {
 namespace localization {

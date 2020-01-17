@@ -20,9 +20,6 @@
 
 #pragma once
 #include <omp.h>
-#include <algorithm>
-#include <limits>
-#include <vector>
 #include "Eigen/Dense"
 #include "IpTNLP.hpp"
 #include "IpTypes.hpp"

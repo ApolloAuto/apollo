@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -55,13 +55,13 @@ with open(sys.argv[1], 'r') as f:
 NCURVES = len(cmd_table)
 np.random.seed(101)
 curves = [np.random.random(20) for i in range(NCURVES)]
-values = range(NCURVES)
+values = list(range(NCURVES))
 jet = cm = plt.get_cmap('brg')
 cNorm = mcolors.Normalize(vmin=0, vmax=values[-1])
 scalarMap = cmx.ScalarMappable(norm=cNorm, cmap=jet)
 
 cnt = 0
-cmds = cmd_table.keys()
+cmds = list(cmd_table.keys())
 cmds.sort()
 
 fig, ax = plt.subplots()
@@ -70,7 +70,7 @@ for cmd in cmds:
     speed_table = cmd_table[cmd]
     X = []
     Y = []
-    speeds = speed_table.keys()
+    speeds = list(speed_table.keys())
     speeds.sort()
     for speed in speeds:
         X.append(speed)

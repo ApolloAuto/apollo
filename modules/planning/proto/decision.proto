@@ -202,8 +202,8 @@ message MainNotReady {
 
 message MainParking {
   enum ParkingStatus {
-  // TODO(QiL): implement and expand to more enums
-     IN_PARKING = 1;
+    // TODO(QiL): implement and expand to more enums
+    IN_PARKING = 1;
   }
   optional ParkingStatus status = 1;
 }

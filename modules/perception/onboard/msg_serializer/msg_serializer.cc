@@ -26,7 +26,8 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
-bool MsgSerializer::SerializeMsg(double timestamp, int seq_num,
+bool MsgSerializer::SerializeMsg(double timestamp, uint64_t lidar_timestamp,
+                                 int seq_num,
                                  const std::vector<base::ObjectPtr> &objects,
                                  const apollo::common::ErrorCode &error_code,
                                  PerceptionObstacles *obstacles) {
@@ -35,8 +36,7 @@ bool MsgSerializer::SerializeMsg(double timestamp, int seq_num,
   header->set_timestamp_sec(publish_time);
   header->set_module_name("perception_obstacle");
   header->set_sequence_num(seq_num);
-  // in nanosecond
-  header->set_lidar_timestamp(static_cast<uint64_t>(timestamp * 1e9));
+  header->set_lidar_timestamp(lidar_timestamp);
   header->set_camera_timestamp(0);
   header->set_radar_timestamp(0);
 

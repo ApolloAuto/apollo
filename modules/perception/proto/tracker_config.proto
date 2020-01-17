@@ -1,6 +1,6 @@
 syntax = "proto2";
 
 message MatcherConfig {
-  optional double  max_match_distance = 1 [default = 2.5];
-  optional double  bound_match_distance = 2 [default = 10.0];
+  optional double max_match_distance = 1 [default = 2.5];
+  optional double bound_match_distance = 2 [default = 10.0];
 }

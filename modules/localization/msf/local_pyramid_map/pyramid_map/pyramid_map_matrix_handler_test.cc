@@ -14,8 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_matrix_handler.h"
-#include <gtest/gtest.h>
+
 #include <memory>
+#include "gtest/gtest.h"
+
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map_matrix_handler.h"
 #include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_matrix.h"
 

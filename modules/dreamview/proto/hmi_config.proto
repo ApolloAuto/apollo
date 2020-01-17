@@ -5,10 +5,10 @@ package apollo.dreamview;
 enum HMIAction {
   // Simple HMI action without any parameter.
   NONE = 0;
-  SETUP_MODE = 1;  // Setup current mode.
-  RESET_MODE = 2;  // Reset current mode.
+  SETUP_MODE = 1;       // Setup current mode.
+  RESET_MODE = 2;       // Reset current mode.
   ENTER_AUTO_MODE = 3;  // Enter into auto driving mode.
-  DISENGAGE = 4;   // Disengage from auto driving mode.
+  DISENGAGE = 4;        // Disengage from auto driving mode.
 
   // HMI action with a value string parameter.
   CHANGE_MODE = 5;     // value = mode_name
@@ -19,8 +19,8 @@ enum HMIAction {
 }
 
 message HMIConfig {
-  map<string, string> modes = 1;  // {mode_name: mode_path}
-  map<string, string> maps = 2;  // {map_name: map_path}
+  map<string, string> modes = 1;     // {mode_name: mode_path}
+  map<string, string> maps = 2;      // {map_name: map_path}
   map<string, string> vehicles = 3;  // {vehicle_name: vehicle_path}
 }
 

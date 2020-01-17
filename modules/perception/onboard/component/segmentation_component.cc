@@ -110,6 +110,7 @@ bool SegmentationComponent::InternalProc(
         << "]";
 
   out_message->timestamp_ = timestamp;
+  out_message->lidar_timestamp_ = in_message->header().lidar_timestamp();
   out_message->seq_num_ = s_seq_num_;
   out_message->process_stage_ = ProcessStage::LIDAR_SEGMENTATION;
   out_message->error_code_ = apollo::common::ErrorCode::OK;

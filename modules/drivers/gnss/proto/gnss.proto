@@ -54,54 +54,6 @@ message Gnss {
   optional uint32 position_type = 11;
 }
 
-// Range information for one GNSS satellite.
-message RangeInfo {
-  enum Constellation {
-    GPS = 0;
-    GLONASS = 1;
-    SBAS = 2;
-    GALILEO = 3;
-    BEIDOU = 4;
-    QZSS = 5;
-  }
-  optional Constellation constellation = 1 [default = GPS];
-
-  optional int32 prn = 2;  // Satellite PRN number.
-
-  // Carrier frequency of the signal used in this range measurement. Note that
-  // GLONASS uses FDMA, so different satellites transmit signals on different
-  // frequencies.
-  optional fixed32 carrier_frequency = 3;  // In Hz.
-
-  optional double pseudorange = 4 [default = nan];  // In meters.
-
-  optional float pseudorange_std_dev = 5 [default = nan];  // In meters.
-
-  optional double carrier_phase = 6 [default = nan];  // In cycles.
-
-  optional float carrier_phase_std_dev = 7 [default = nan];  // In cycles.
-
-  optional float doppler = 8 [default = nan];  // In Hz.
-
-  optional float doppler_std_dev = 9 [default = nan];  // In Hz.
-
-  // Carrier-to-noise ratio (signal // strength) in dB-Hz.
-  optional int32 cno = 10 [default = -1];
-
-  // Carrier phase lock time in seconds.
-  optional int32 lock_time = 11 [default = -1];
-}
-
-// All range measurements at a time.
-message GnssRange {
-  optional apollo.common.Header header = 1;
-
-  // The time of range measurement, seconds since the GPS epoch (Jan 6, 1980).
-  optional double measurement_time = 2;  // In seconds.
-
-  repeated RangeInfo ranges = 3;
-}
-
 // gnss raw data
 message RawData {
   optional apollo.common.Header header = 1;

@@ -16,8 +16,8 @@
 
 #include "cyber/logger/logger.h"
 
-#include <glog/logging.h>
-#include <gtest/gtest.h>
+#include "glog/logging.h"
+#include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
 

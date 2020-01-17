@@ -37,8 +37,6 @@ namespace scenario {
 namespace yield_sign {
 
 using apollo::hdmap::HDMapUtil;
-using apollo::hdmap::YieldSignInfo;
-using apollo::hdmap::YieldSignInfoConstPtr;
 
 using StopSignLaneVehicles =
     std::unordered_map<std::string, std::vector<std::string>>;

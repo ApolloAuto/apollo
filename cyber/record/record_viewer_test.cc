@@ -16,12 +16,12 @@
 
 #include "cyber/record/record_viewer.h"
 
-#include <gtest/gtest.h>
 #include <unistd.h>
 #include <algorithm>
 #include <atomic>
 #include <memory>
 #include <string>
+#include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
 #include "cyber/record/record_reader.h"

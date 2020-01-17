@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/lib/thread/thread.h"
 
-#include <signal.h>
+#include <csignal>
 
 #include "cyber/common/log.h"
 

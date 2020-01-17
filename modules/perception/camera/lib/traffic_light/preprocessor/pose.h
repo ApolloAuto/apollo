@@ -15,9 +15,10 @@
  *****************************************************************************/
 #pragma once
 
-#include <eigen3/Eigen/Core>
 #include <map>
 #include <string>
+
+#include "Eigen/Core"
 
 #include "modules/perception/base/image_8u.h"
 

@@ -29,7 +29,6 @@ namespace {
 
 using apollo::cyber::CreateNode;
 using apollo::cyber::Node;
-using apollo::cyber::Reader;
 using apollo::cyber::Writer;
 using apollo::planning::DrivingAction;
 using apollo::planning::PadMessage;
@@ -70,7 +69,7 @@ class PadTerminal {
       AINFO << "sending RESUME CRUISE action command.";
     }
     apollo::common::util::FillHeader("terminal", &pad);
-    pad_writer_->Write(std::make_shared<PadMessage>(pad));
+    pad_writer_->Write(pad);
     AINFO << "send pad_message OK";
   }
 

@@ -32,18 +32,19 @@ class LatencyMonitor : public RecurrentRunner {
  public:
   LatencyMonitor();
   void RunOnce(const double current_time) override;
+  bool GetFrequency(const std::string& channel_name, double* freq);
 
  private:
-  void UpdateLatencyStat(
+  void UpdateStat(
       const std::shared_ptr<apollo::common::LatencyRecordMap>& records);
   void PublishLatencyReport();
   void AggregateLatency();
-  void ValidateMaxLatency();
 
   apollo::common::LatencyReport latency_report_;
   std::unordered_map<uint64_t,
                      std::set<std::tuple<uint64_t, uint64_t, std::string>>>
       track_map_;
+  std::unordered_map<std::string, double> freq_map_;
   double flush_time_ = 0.0;
 };
 

@@ -7,8 +7,8 @@ cc_library(
     srcs = ["st_point.cc"],
     hdrs = ["st_point.h"],
     deps = [
-        "//external:gflags",
         "//modules/common/math",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
@@ -24,7 +24,7 @@ cc_library(
         "//cyber/common:log",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planning_proto",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -40,7 +40,7 @@ cc_test(
         "//cyber/common:log",
         "//modules/common/time",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -50,7 +50,6 @@ cc_library(
     hdrs = ["speed_data.h"],
     deps = [
         ":st_point",
-        "//external:gflags",
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/util:point_factory",
@@ -58,6 +57,7 @@ cc_library(
         "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planning_proto",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 

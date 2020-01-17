@@ -79,15 +79,7 @@ class Service : public ServiceBase {
   Service() = delete;
 
   ~Service() {
-    inited_ = false;
-    {
-      std::lock_guard<std::mutex> lg(queue_mutex_);
-      tasks_.clear();
-    }
-    condition_.notify_all();
-    if (thread_.joinable()) {
-      thread_.join();
-    }
+    destroy();
   }
 
   /**

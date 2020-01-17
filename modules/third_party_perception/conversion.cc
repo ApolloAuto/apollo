@@ -18,6 +18,7 @@
  * @file
  */
 
+#include <cmath>
 #include <map>
 #include <vector>
 

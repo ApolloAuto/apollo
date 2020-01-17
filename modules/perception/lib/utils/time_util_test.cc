@@ -16,8 +16,8 @@
 
 #include "modules/perception/lib/utils/time_util.h"
 
-#include <gtest/gtest.h>
 #include <thread>
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {

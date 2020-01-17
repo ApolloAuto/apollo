@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -16,14 +16,16 @@
 # limitations under the License.
 ###############################################################################
 
-import sys
-import json
 from datetime import datetime
+import json
+import sys
+
 from modules.map.relative_map.proto import navigation_pb2
+
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print("usage: python generator.py " \
+        print("usage: python generator.py "
               "navi_line1.smoothed navi_line2.smoothed ...")
         sys.exit(0)
     navi_files = sys.argv[1:]

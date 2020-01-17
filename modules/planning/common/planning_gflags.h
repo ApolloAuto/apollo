@@ -122,6 +122,7 @@ DECLARE_double(signal_expire_time_sec);
 
 // Path Deciders
 DECLARE_bool(enable_skip_path_tasks);
+DECLARE_bool(enable_reuse_path_in_lane_follow);
 
 DECLARE_double(obstacle_lat_buffer);
 DECLARE_double(obstacle_lon_start_buffer);
@@ -257,3 +258,9 @@ DECLARE_double(short_path_length_threshold);
 DECLARE_uint64(trajectory_stitching_preserved_length);
 
 DECLARE_bool(use_st_drivable_boundary);
+
+DECLARE_bool(use_smoothed_dp_guide_line);
+
+DECLARE_bool(use_soft_bound_in_nonlinear_speed_opt);
+
+DECLARE_bool(use_front_axe_center_in_path_planning);

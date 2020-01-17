@@ -499,7 +499,7 @@ DEFINE_bool(enable_dp_reference_speed, true,
             "True to penalize dp result towards default cruise speed");
 
 DEFINE_double(message_latency_threshold, 0.02, "Threshold for message delay");
-DEFINE_bool(enable_lane_change_urgency_checking, true,
+DEFINE_bool(enable_lane_change_urgency_checking, false,
             "True to check the urgency of lane changing");
 DEFINE_double(short_path_length_threshold, 20.0,
               "Threshold for too short path length");
@@ -512,3 +512,16 @@ DEFINE_double(side_pass_driving_width_l_buffer, 0.1,
 
 DEFINE_bool(use_st_drivable_boundary, false,
             "True to use st_drivable boundary in speed planning");
+
+DEFINE_bool(enable_reuse_path_in_lane_follow, false,
+            "True to enable reuse path in lane follow");
+DEFINE_bool(
+    use_smoothed_dp_guide_line, false,
+    "True to penalize speed optimization result to be close to dp guide line");
+
+DEFINE_bool(use_soft_bound_in_nonlinear_speed_opt, true,
+            "False to disallow soft bound in nonlinear speed opt");
+
+DEFINE_bool(use_front_axe_center_in_path_planning, false,
+            "If using front axe center in path planning, the path can be "
+            "more agile.");

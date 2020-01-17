@@ -15,14 +15,16 @@
  *****************************************************************************/
 #include "modules/map/tools/map_datachecker/client/client_common.h"
 
-#include <grpc++/grpc++.h>
 #include <boost/algorithm/string.hpp>
 #include <fstream>
 #include <string>
 #include <vector>
 
+#include "grpc++/grpc++.h"
+
 namespace apollo {
 namespace hdmap {
+
 std::vector<std::string> GetFileLines(const std::string& path) {
   std::ifstream file_handler(path);
   std::string line;

@@ -105,7 +105,7 @@ cc_test(
     srcs = ["active_set_spline_1d_solver_test.cc"],
     deps = [
         ":active_set_spline_1d_solver",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -128,7 +128,7 @@ cc_test(
     srcs = ["osqp_spline_1d_solver_test.cc"],
     deps = [
         ":osqp_spline_1d_solver",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -216,7 +216,7 @@ cc_test(
     deps = [
         ":active_set_spline_2d_solver",
         "//modules/planning/math:curve_math",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -238,7 +238,7 @@ cc_test(
     deps = [
         ":osqp_spline_2d_solver",
         "//modules/planning/math:curve_math",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -287,7 +287,7 @@ cc_test(
     srcs = ["spline_1d_kernel_test.cc"],
     deps = [
         ":spline_1d_kernel",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -298,7 +298,7 @@ cc_test(
     deps = [
         ":spline_1d_constraint",
         "//cyber/common",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -309,7 +309,7 @@ cc_test(
     deps = [
         ":piecewise_linear_kernel",
         "//cyber/common",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -320,7 +320,7 @@ cc_test(
     deps = [
         ":piecewise_linear_constraint",
         "//cyber/common",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -330,7 +330,7 @@ cc_test(
     srcs = ["spline_2d_kernel_test.cc"],
     deps = [
         ":spline_2d_kernel",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -340,7 +340,7 @@ cc_test(
     srcs = ["spline_2d_constraint_test.cc"],
     deps = [
         ":spline_2d_constraint",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

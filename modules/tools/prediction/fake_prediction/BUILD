@@ -10,7 +10,7 @@ cc_binary(
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/util",
+        "//modules/common/util:message_util",
         "//modules/prediction/proto:prediction_proto",
     ],
 )

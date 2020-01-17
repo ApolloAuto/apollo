@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -15,7 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+
 import math
+
 import numpy as np
 
 
@@ -52,6 +54,7 @@ def frechet_distance(P, Q):
     except:
         print("calculate frechet_distance exception.")
     return dist
+
 
 if __name__ == "__main__":
     """test"""

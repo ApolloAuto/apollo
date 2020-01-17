@@ -20,12 +20,12 @@
 
 #pragma once
 
+#include <boost/thread/shared_mutex.hpp>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
-#include "boost/thread/shared_mutex.hpp"
 #include "gtest/gtest_prod.h"
 #include "third_party/json/json.hpp"
 

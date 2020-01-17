@@ -81,7 +81,7 @@ cc_test(
     deps = [
         ":gridded_path_time_graph",
         "//modules/planning/proto:planning_config_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

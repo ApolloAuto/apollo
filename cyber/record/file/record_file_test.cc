@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
 #include <unistd.h>
 #include <atomic>
 #include <string>
+#include "gtest/gtest.h"
 
 #include "cyber/record/file/record_file_base.h"
 #include "cyber/record/file/record_file_reader.h"

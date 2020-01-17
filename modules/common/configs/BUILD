@@ -10,7 +10,7 @@ cc_library(
         "//modules/common/data:global_flagfile",
     ],
     deps = [
-        "//external:gflags",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
@@ -24,10 +24,10 @@ cc_library(
     deps = [
         ":config_gflags",
         "//cyber/common:file",
-        "//modules/common",
+        "//cyber/common:macros",
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/util",
-        "@glog",
+        "@com_google_glog//:glog",
     ],
 )
 
@@ -37,7 +37,7 @@ cc_test(
     srcs = ["vehicle_config_helper_test.cc"],
     deps = [
         "vehicle_config_helper",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

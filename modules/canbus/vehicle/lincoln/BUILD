@@ -41,7 +41,7 @@ cc_library(
         "//modules/drivers/canbus/can_comm:can_sender",
         "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/drivers/canbus/common:canbus_common",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -52,7 +52,7 @@ cc_test(
     data = ["//modules/canbus:canbus_testdata"],
     deps = [
         "//modules/canbus/vehicle/lincoln:lincoln_controller",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -62,7 +62,7 @@ cc_test(
     srcs = ["lincoln_message_manager_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln:lincoln_message_manager",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -72,7 +72,7 @@ cc_test(
     srcs = ["lincoln_vehicle_factory_test.cc"],
     deps = [
         ":lincoln_vehicle_factory",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

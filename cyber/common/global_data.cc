@@ -18,11 +18,11 @@
 
 #include <arpa/inet.h>
 #include <ifaddrs.h>
-#include <limits.h>
 #include <netdb.h>
-#include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <climits>
+#include <cstdlib>
 #include <functional>
 
 #include "cyber/common/environment.h"

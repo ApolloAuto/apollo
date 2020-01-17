@@ -7,7 +7,7 @@ cc_library(
     srcs = ["qp_solver_gflags.cc"],
     hdrs = ["qp_solver_gflags.h"],
     deps = [
-        "//external:gflags",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
@@ -40,7 +40,7 @@ cc_test(
     srcs = ["active_set_qp_solver_test.cc"],
     deps = [
         ":active_set_qp_solver",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

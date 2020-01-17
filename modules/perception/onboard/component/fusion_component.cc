@@ -104,11 +104,12 @@ bool FusionComponent::InternalProc(
 
   PERCEPTION_PERF_BLOCK_START();
   const double timestamp = in_message->timestamp_;
+  const uint64_t lidar_timestamp = in_message->lidar_timestamp_;
   std::vector<base::ObjectPtr> valid_objects;
   if (in_message->error_code_ != apollo::common::ErrorCode::OK) {
-    if (!MsgSerializer::SerializeMsg(timestamp, in_message->seq_num_,
-                                     valid_objects, in_message->error_code_,
-                                     out_message.get())) {
+    if (!MsgSerializer::SerializeMsg(
+            timestamp, lidar_timestamp, in_message->seq_num_, valid_objects,
+            in_message->error_code_, out_message.get())) {
       AERROR << "Failed to gen PerceptionObstacles object.";
       return false;
     }
@@ -173,9 +174,9 @@ bool FusionComponent::InternalProc(
   }
   // produce pb output msg
   apollo::common::ErrorCode error_code = apollo::common::ErrorCode::OK;
-  if (!MsgSerializer::SerializeMsg(timestamp, in_message->seq_num_,
-                                   valid_objects, error_code,
-                                   out_message.get())) {
+  if (!MsgSerializer::SerializeMsg(timestamp, lidar_timestamp,
+                                   in_message->seq_num_, valid_objects,
+                                   error_code, out_message.get())) {
     AERROR << "Failed to gen PerceptionObstacles object.";
     return false;
   }

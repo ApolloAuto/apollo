@@ -18,8 +18,6 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
-        "//external:gflags",
-        "//modules/common",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
         "//modules/common/time",
@@ -41,6 +39,7 @@ cc_library(
         "//modules/planning/tasks/optimizers:path_optimizer",
         "//modules/planning/tasks/optimizers:speed_optimizer",
         "//modules/planning/tasks/optimizers/path_time_heuristic:path_time_heuristic_optimizer",
+        "@com_github_gflags_gflags//:gflags",
         "@eigen",
     ],
 )
@@ -53,8 +52,6 @@ cc_library(
     deps = [
         ":lane_follow_stage",
         "//cyber/common:log",
-        "//external:gflags",
-        "//modules/common",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
         "//modules/common/time",
@@ -75,6 +72,7 @@ cc_library(
         "//modules/planning/tasks/optimizers:path_optimizer",
         "//modules/planning/tasks/optimizers:speed_optimizer",
         "//modules/planning/tasks/optimizers/path_time_heuristic:path_time_heuristic_optimizer",
+        "@com_github_gflags_gflags//:gflags",
         "@eigen",
     ],
 )
@@ -88,7 +86,7 @@ cc_test(
     ],
     deps = [
         ":lane_follow",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -21,33 +21,34 @@
     Keras-1.2.2
 """
 
+import argparse
+import logging
 import os
+
 import h5py
 import numpy as np
-import logging
-import argparse
 
-import google.protobuf.text_format as text_format
 from keras.callbacks import ModelCheckpoint
 from keras.metrics import mse
 from keras.models import Sequential, Model
 from keras.layers.normalization import BatchNormalization
-from keras.layers import Dense, Input
 from keras.layers import Activation
+from keras.layers import Dense, Input
 from keras.layers import Dropout
-from keras.utils import np_utils
 from keras.regularizers import l2, l1
+from keras.utils import np_utils
 from sklearn.model_selection import train_test_split
+import google.protobuf.text_format as text_format
 
-import proto.fnn_model_pb2
-from proto.fnn_model_pb2 import FnnModel, Layer
+from . import common.log
+from . import proto.fnn_model_pb2
+from .common.data_preprocess import load_h5
+from .common.data_preprocess import down_sample
+from .common.data_preprocess import train_test_split
+from .common.configure import parameters
+from .common.configure import labels
+from .proto.fnn_model_pb2 import FnnModel, Layer
 
-import common.log
-from common.data_preprocess import load_h5
-from common.data_preprocess import down_sample
-from common.data_preprocess import train_test_split
-from common.configure import parameters
-from common.configure import labels
 
 # Constants
 dim_input = parameters['mlp']['dim_input']
@@ -272,12 +273,12 @@ if __name__ == "__main__":
 
     data = load_data(file)
     data = down_sample(data)
-    print ("Data load success.")
-    print ("data size =", data.shape)
+    print("Data load success.")
+    print("data size =", data.shape)
 
     train_data, test_data = train_test_split(data, train_data_rate)
 
-    print ("training size =", train_data.shape)
+    print("training size =", train_data.shape)
 
     X_train = train_data[:, 0:dim_input]
     Y_train = train_data[:, -1]
@@ -296,12 +297,12 @@ if __name__ == "__main__":
     model = setup_model()
 
     model.fit(X_train, Y_trainc, shuffle=True, nb_epoch=20, batch_size=32)
-    print ("Model trained success.")
+    print("Model trained success.")
 
     X_test = (X_test - param_norm[0]) / param_norm[1]
 
     score = model.evaluate(X_test, Y_testc)
-    print ("\nThe accuracy on testing dat is", score[1])
+    print("\nThe accuracy on testing dat is", score[1])
 
     logging.info("Test data loss: {}, accuracy: {} ".format(
         score[0], score[1]))
@@ -314,9 +315,9 @@ if __name__ == "__main__":
         performance = evaluate_model(Y_test, Y_test_hat > thres)
     performance['accuracy'] = [score[1]]
 
-    print ("\nFor more detailed evaluation results, please refer to",
-           evaluation_log_path + ".log")
+    print("\nFor more detailed evaluation results, please refer to",
+          evaluation_log_path + ".log")
 
     model_path = os.path.join(os.getcwd(), "mlp_model.bin")
     save_model(model, param_norm, model_path)
-    print ("Model has been saved to", model_path)
+    print("Model has been saved to", model_path)

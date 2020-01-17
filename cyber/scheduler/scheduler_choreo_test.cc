@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
 #include <algorithm>
+#include "gtest/gtest.h"
 
 #include "cyber/common/global_data.h"
 #include "cyber/cyber.h"

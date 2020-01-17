@@ -54,7 +54,7 @@ class ParkAndGoStageCheck : public Stage {
 
  private:
   bool CheckObstacle(const ReferenceLineInfo& reference_line_info);
-  void ADCInitStatus(Frame* frame);
+  void ADCInitStatus();
 
  private:
   ScenarioParkAndGoConfig scenario_config_;

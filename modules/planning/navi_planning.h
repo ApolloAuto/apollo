@@ -21,11 +21,11 @@
 #include <utility>
 #include <vector>
 
-#include "modules/planning/proto/pad_msg.pb.h"
-
+#include "modules/common/util/future.h"
 #include "modules/planning/planner/navi_planner_dispatcher.h"
 #include "modules/planning/planner/planner_dispatcher.h"
 #include "modules/planning/planning_base.h"
+#include "modules/planning/proto/pad_msg.pb.h"
 
 /**
  * @namespace apollo::planning

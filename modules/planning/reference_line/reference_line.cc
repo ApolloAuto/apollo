@@ -187,7 +187,7 @@ common::FrenetFramePoint ReferenceLine::GetFrenetPoint(
   }
 
   common::SLPoint sl_point;
-  XYToSL({path_point.x(), path_point.y()}, &sl_point);
+  XYToSL(path_point, &sl_point);
   common::FrenetFramePoint frenet_frame_point;
   frenet_frame_point.set_s(sl_point.s());
   frenet_frame_point.set_l(sl_point.l());
@@ -217,7 +217,7 @@ ReferenceLine::ToFrenetFrame(const common::TrajectoryPoint& traj_point) const {
   CHECK(!reference_points_.empty());
 
   common::SLPoint sl_point;
-  XYToSL({traj_point.path_point().x(), traj_point.path_point().y()}, &sl_point);
+  XYToSL(traj_point.path_point(), &sl_point);
 
   std::array<double, 3> s_condition;
   std::array<double, 3> l_condition;
@@ -377,7 +377,6 @@ ReferencePoint ReferenceLine::GetReferencePoint(const double x,
 
 bool ReferenceLine::SLToXY(const SLPoint& sl_point,
                            common::math::Vec2d* const xy_point) const {
-  CHECK_NOTNULL(xy_point);
   if (map_path_.num_points() < 2) {
     AERROR << "The reference line has too few points.";
     return false;
@@ -392,7 +391,6 @@ bool ReferenceLine::SLToXY(const SLPoint& sl_point,
 
 bool ReferenceLine::XYToSL(const common::math::Vec2d& xy_point,
                            SLPoint* const sl_point) const {
-  DCHECK_NOTNULL(sl_point);
   double s = 0.0;
   double l = 0.0;
   if (!map_path_.GetProjection(xy_point, &s, &l)) {

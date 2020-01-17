@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
@@ -13,26 +15,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-from common.configure import parameters
-from sklearn.utils import class_weight
+
+import argparse
+import logging
+import os
+
 from sklearn.model_selection import train_test_split
-import sklearn
-from torch.utils.data import Dataset, DataLoader, sampler
+from sklearn.utils import class_weight
 from torch.autograd import Variable
+from torch.utils.data import Dataset, DataLoader, sampler
+import h5py
+import numpy as np
+import sklearn
+import torch
+import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-import torch.nn as nn
-import torch
+
+from common.configure import parameters
 from proto.cruise_model_pb2 import TensorParameter, InputParameter,\
     Conv1dParameter, DenseParameter, ActivationParameter, MaxPool1dParameter,\
     AvgPool1dParameter, LaneFeatureConvParameter, ObsFeatureFCParameter,\
     ClassifyParameter, RegressParameter, CruiseModelParameter
-import proto.cruise_model_pb2
-import argparse
-import logging
-import numpy as np
-import h5py
-import os
+
+
 """
 @requirement:
     pytorch 0.4.1
@@ -100,13 +106,13 @@ class FCNN_CNN1D(torch.nn.Module):
         super(FCNN_CNN1D, self).__init__()
         self.lane_feature_conv = torch.nn.Sequential(
             nn.Conv1d(4, 10, 3, stride=1),\
-            #nn.BatchNorm1d(10),\
+            # nn.BatchNorm1d(10),\
             nn.ReLU(),\
             #nn.Conv1d(10, 16, 3, stride=2),\
-            #nn.BatchNorm1d(16),\
-            #nn.ReLU(),\
+            # nn.BatchNorm1d(16),\
+            # nn.ReLU(),\
             nn.Conv1d(10, 25, 3, stride=2),\
-            #nn.BatchNorm1d(25)
+            # nn.BatchNorm1d(25)
         )
         self.lane_feature_maxpool = nn.MaxPool1d(4)
         self.lane_feature_avgpool = nn.AvgPool1d(4)
@@ -135,7 +141,7 @@ class FCNN_CNN1D(torch.nn.Module):
             nn.Dropout(0.1),
 
             nn.Linear(11, 1),\
-            #nn.Sigmoid()
+            # nn.Sigmoid()
         )
         self.regress = torch.nn.Sequential(
             nn.Linear(125, 77),

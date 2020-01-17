@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -66,7 +66,7 @@ def main(args):
                                 drive_event_meta_msg.msg_type)
     seq_num = 0
     while not cyber.is_shutdown():
-        event_type = raw_input(
+        event_type = input(
             "Type in Event Type('d') and press Enter (current time: " +
             str(datetime.datetime.now()) + ")\n>")
         event_type = event_type.strip()
@@ -75,7 +75,7 @@ def main(args):
         current_time = cyber_time.Time.now().to_sec()
         event_str = None
         while not event_str:
-            event_str = raw_input("Type Event:>")
+            event_str = input("Type Event:>")
             event_str = event_str.strip()
         event_msg = drive_event_meta_msg.msg_type()
         event_msg.header.timestamp_sec = current_time

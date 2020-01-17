@@ -24,7 +24,7 @@ cc_library(
         "//modules/localization/msf/local_tool/local_visualization/engine",
         "//modules/localization/proto:localization_config_proto",
         "//modules/localization/proto:localization_proto",
-        "@boost",
+        "//third_party:boost",
         "@eigen",
         "@pcl",
     ],

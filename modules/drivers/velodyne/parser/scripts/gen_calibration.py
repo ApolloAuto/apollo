@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -60,17 +60,15 @@ standards [REP-0103].
 
 """
 
-from __future__ import print_function
-
+from xml.etree import ElementTree
 import math
 import optparse
 import os
+import six
 import sys
-from xml.etree import ElementTree
+
 import yaml
 
-import six
-from six.moves import xrange  # pylint: disable=redefined-builtin
 
 # parse the command line
 usage = """usage: %prog infile.xml [outfile.yaml]
@@ -93,11 +91,14 @@ else:
 print('converting "' + xmlFile + '" to "' + yamlFile + '"')
 
 calibrationGood = True
+
+
 def xmlError(msg):
     'handle XML calibration error'
     global calibrationGood
     calibrationGood = False
     print('gen_calibration.py: ' + msg)
+
 
 db = None
 try:
@@ -114,6 +115,7 @@ if not calibrationGood:
 calibration = {'num_lasers': 0, 'lasers': []}
 cm2meters = 0.01                       # convert centimeters to meters
 
+
 def addLaserCalibration(laser_num, key, val):
     """Define key and corresponding value for laser_num"""
 
@@ -123,6 +125,7 @@ def addLaserCalibration(laser_num, key, val):
     else:
         calibration['lasers'].append({key: val})
 
+
 # add enabled flags
 num_enabled = 0
 enabled_lasers = []
@@ -130,7 +133,7 @@ enabled = db.find('DB/enabled_')
 if enabled is None:
     print('no enabled tags found: assuming all 64 enabled')
     num_enabled = 64
-    enabled_lasers = [True for i in xrange(num_enabled)]
+    enabled_lasers = [True for i in range(num_enabled)]
 else:
     index = 0
     for el in enabled:

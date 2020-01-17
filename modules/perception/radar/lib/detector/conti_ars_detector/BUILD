@@ -8,7 +8,7 @@ cc_test(
     srcs = ["conti_ars_detector_test.cc"],
     deps = [
         ":conti_ars_detector",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

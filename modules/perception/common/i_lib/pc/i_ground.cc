@@ -1296,11 +1296,11 @@ const GroundPlaneLiDAR *PlaneFitGroundDetector::GetGroundPlane(int r,
   return ground_planes_ != nullptr ? ground_planes_[r] + c : nullptr;
 }
 
-const unsigned int PlaneFitGroundDetector::GetGridDimX() const {
+unsigned int PlaneFitGroundDetector::GetGridDimX() const {
   return vg_coarse_->NrVoxelX();
 }
 
-const unsigned int PlaneFitGroundDetector::GetGridDimY() const {
+unsigned int PlaneFitGroundDetector::GetGridDimY() const {
   return vg_coarse_->NrVoxelY();
 }
 

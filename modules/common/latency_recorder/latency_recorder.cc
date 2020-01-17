@@ -16,22 +16,12 @@
 
 #include "modules/common/latency_recorder/latency_recorder.h"
 
+#include "cyber/common/global_data.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
 
 namespace apollo {
 namespace common {
-
-namespace {
-
-using apollo::cyber::Time;
-
-uint64_t ToNanoSeconds(const double seconds) {
-  static constexpr double kNanoSecondsFactor = 1e9;
-  return static_cast<uint64_t>(kNanoSecondsFactor * seconds);
-}
-
-};  // namespace
 
 LatencyRecorder::LatencyRecorder(const std::string& module_name)
     : module_name_(module_name) {
@@ -39,32 +29,43 @@ LatencyRecorder::LatencyRecorder(const std::string& module_name)
 }
 
 void LatencyRecorder::AppendLatencyRecord(const uint64_t message_id,
-                                          const double begin_time,
-                                          const double end_time) {
-  AppendLatencyRecord(message_id, ToNanoSeconds(begin_time),
-                      ToNanoSeconds(end_time));
-}
+                                          const absl::Time& begin_time,
+                                          const absl::Time& end_time) {
+  // TODO(michael): ALERT for now for trouble shooting,
+  // CHECK_LT(begin_time, end_time) in the future to enforce the validation
+  if (begin_time >= end_time) {
+    // In Simulation mode, there might be large number of cases where
+    // begin_times equal to end_times, reduce the error frequency in this mode
+    static const int kErrorReduceBase = 1000;
+    if (!cyber::common::GlobalData::Instance()->IsRealityMode()) {
+      AERROR_EVERY(kErrorReduceBase)
+          << "latency begin_time: " << begin_time
+          << " greater than or equal to end_time: " << end_time << ", "
+          << kErrorReduceBase << " times";
+      return;
+    }
+    AERROR << "latency begin_time: " << begin_time
+           << " greater than or equal to end_time: " << end_time;
+    return;
+  }
 
-void LatencyRecorder::AppendLatencyRecord(const uint64_t message_id,
-                                          const uint64_t begin_time,
-                                          const uint64_t end_time) {
   static auto writer = CreateWriter();
-  if (writer == nullptr) {
+  if (writer == nullptr || message_id == 0) {
     return;
   }
 
   std::lock_guard<std::mutex> lock(mutex_);
 
-  LatencyRecord record;
-  record.set_begin_time(begin_time);
-  record.set_end_time(end_time);
-  records_->mutable_latency_records()->insert({message_id, record});
+  auto* latency_record = records_->add_latency_records();
+  latency_record->set_begin_time(absl::ToUnixNanos(begin_time));
+  latency_record->set_end_time(absl::ToUnixNanos(end_time));
+  latency_record->set_message_id(message_id);
 
-  const auto now_nano_time = Time::Now().ToNanosecond();
-  if (now_nano_time - current_timestamp_ >
-      Time(publish_interval_).ToNanosecond()) {
+  const auto now = absl::Now();
+  static const absl::Duration kPublishInterval = absl::Seconds(3);
+  if (now - current_time_ > kPublishInterval) {
     PublishLatencyRecords(writer);
-    current_timestamp_ = now_nano_time;
+    current_time_ = now;
   }
 }
 
@@ -76,9 +77,9 @@ LatencyRecorder::CreateWriter() {
     return nullptr;
   }
   if (node_ == nullptr) {
-    current_timestamp_ = apollo::cyber::Time::Now().ToNanosecond();
-    node_ = apollo::cyber::CreateNode(
-        absl::StrCat(node_name_prefix, module_name_, current_timestamp_));
+    current_time_ = absl::Now();
+    node_ = apollo::cyber::CreateNode(absl::StrCat(
+        node_name_prefix, module_name_, absl::ToUnixNanos(current_time_)));
     if (node_ == nullptr) {
       AERROR << "unable to create node for latency recording";
       return nullptr;

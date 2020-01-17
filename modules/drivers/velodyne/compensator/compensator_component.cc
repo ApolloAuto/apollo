@@ -16,6 +16,9 @@
 
 #include <memory>
 
+#include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/latency_recorder/latency_recorder.h"
+#include "modules/common/time/time.h"
 #include "modules/drivers/velodyne/compensator/compensator_component.h"
 #include "modules/drivers/velodyne/proto/velodyne.pb.h"
 
@@ -48,7 +51,7 @@ bool CompensatorComponent::Init() {
 
 bool CompensatorComponent::Proc(
     const std::shared_ptr<PointCloud>& point_cloud) {
-  uint64_t start = cyber::Time().Now().ToNanosecond();
+  const auto start_time = common::time::Clock::Now();
   std::shared_ptr<PointCloud> point_cloud_compensated =
       compensator_pool_->GetObject();
   if (point_cloud_compensated == nullptr) {
@@ -62,9 +65,19 @@ bool CompensatorComponent::Proc(
   }
   point_cloud_compensated->Clear();
   if (compensator_->MotionCompensation(point_cloud, point_cloud_compensated)) {
-    uint64_t diff = cyber::Time().Now().ToNanosecond() - start;
-    AINFO << "compenstator diff:" << diff
-          << ";meta:" << point_cloud_compensated->header().lidar_timestamp();
+    const auto end_time = common::time::Clock::Now();
+    const auto diff = end_time - start_time;
+    const auto meta_diff =
+        end_time - absl::FromUnixNanos(
+                       point_cloud_compensated->header().lidar_timestamp());
+    AINFO << "compenstator diff:" << absl::ToInt64Milliseconds(diff) << " ms"
+          << ";meta:" << point_cloud_compensated->header().lidar_timestamp()
+          << ";meta diff: " << absl::ToInt64Milliseconds(meta_diff) << " ms";
+    static common::LatencyRecorder latency_recorder(FLAGS_pointcloud_topic);
+    latency_recorder.AppendLatencyRecord(
+        point_cloud_compensated->header().lidar_timestamp(), start_time,
+        end_time);
+
     point_cloud_compensated->mutable_header()->set_sequence_num(seq_);
     writer_->Write(point_cloud_compensated);
     seq_++;

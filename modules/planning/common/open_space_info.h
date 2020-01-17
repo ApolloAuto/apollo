@@ -19,8 +19,6 @@
  **/
 #pragma once
 
-#include <algorithm>
-#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -45,7 +43,6 @@
 
 namespace apollo {
 namespace planning {
-using apollo::planning_internal::Debug;
 
 typedef std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>
     TrajGearPair;

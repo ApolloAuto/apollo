@@ -8,6 +8,7 @@ cc_library(
     hdrs = ["motion_service.h"],
     deps = [
         "//cyber",
+        "//modules/common/math",
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/camera/common",

@@ -16,10 +16,10 @@
 
 #include "cyber/service_discovery/specific_manager/channel_manager.h"
 
-#include <gtest/gtest.h>
 #include <memory>
 #include <string>
 #include <vector>
+#include "gtest/gtest.h"
 
 #include "cyber/common/global_data.h"
 #include "cyber/message/message_traits.h"

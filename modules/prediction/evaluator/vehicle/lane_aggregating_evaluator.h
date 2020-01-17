@@ -21,9 +21,7 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "torch/script.h"

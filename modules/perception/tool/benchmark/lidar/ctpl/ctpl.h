@@ -35,7 +35,6 @@
 #ifndef __ctpl_thread_pool_H__
 #define __ctpl_thread_pool_H__
 
-#include <boost/lockfree/queue.hpp>
 #include <atomic>
 #include <exception>
 #include <functional>
@@ -45,6 +44,8 @@
 #include <thread>
 #include <utility>
 #include <vector>
+
+#include "boost/lockfree/queue.hpp"
 
 #ifndef _ctplThreadPoolLength_
 #define _ctplThreadPoolLength_ 100

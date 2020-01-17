@@ -33,7 +33,7 @@ cc_test(
         ":ground_service_detector",
         "//modules/perception/common:perception_gflags",
         "//modules/perception/common/io:io_util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

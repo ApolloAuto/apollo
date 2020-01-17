@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -16,9 +16,14 @@
 # limitations under the License.
 ###############################################################################
 
-import ctypes
-from ctypes import *
 import math
+
+from ctypes import c_bool
+from ctypes import c_double
+from ctypes import c_int
+from ctypes import c_ushort
+from ctypes import c_void_p
+
 
 lib = cdll.LoadLibrary(
     '/apollo/bazel-bin/modules/planning/open_space/tools/hybrid_a_star_wrapper_lib.so')
@@ -34,7 +39,8 @@ lib.Plan.restype = c_bool
 lib.Plan.argtypes = [c_void_p, c_void_p, c_void_p, c_double, c_double, c_double, c_double,
                      c_double, c_double, POINTER(c_double)]
 lib.GetResult.argtypes = [c_void_p, POINTER(c_double), POINTER(c_double), POINTER(c_double),
-                    POINTER(c_double), POINTER(c_double), POINTER(c_double), POINTER(c_ushort)]
+                          POINTER(c_double), POINTER(c_double), POINTER(c_double), POINTER(c_ushort)]
+
 
 class HybridAStarPlanner(object):
     def __init__(self):

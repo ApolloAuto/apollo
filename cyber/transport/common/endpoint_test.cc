@@ -16,7 +16,7 @@
 
 #include "cyber/transport/common/endpoint.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "cyber/common/global_data.h"
 

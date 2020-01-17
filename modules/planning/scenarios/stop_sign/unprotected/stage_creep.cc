@@ -18,7 +18,6 @@
  * @file
  **/
 #include <string>
-#include <vector>
 
 #include "modules/planning/scenarios/stop_sign/unprotected/stage_creep.h"
 
@@ -102,11 +101,6 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
                            wait_time, timeout_sec)) {
     return FinishStage();
   }
-
-  // set param for PROCEED_WITH_CAUTION_SPEED
-  // dynamic_cast<CreepDecider*>(FindTask(TaskConfig::CREEP_DECIDER))
-  //    ->SetProceedWithCautionSpeedParam(*frame, reference_line_info,
-  //                                      stop_sign_end_s);
 
   return Stage::RUNNING;
 }

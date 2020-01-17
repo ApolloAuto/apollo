@@ -20,7 +20,7 @@ cc_test(
     srcs = ["byte_test.cc"],
     deps = [
         "//modules/drivers/canbus/common:canbus_common",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

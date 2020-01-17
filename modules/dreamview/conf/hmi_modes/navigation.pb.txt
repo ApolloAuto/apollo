@@ -68,12 +68,6 @@ cyber_modules {
     dag_files: "/apollo/modules/guardian/dag/guardian.dag"
   }
 }
-cyber_modules {
-  key: "Tick"
-  value: {
-    dag_files: "/apollo/modules/tick/dag/tick.dag"
-  }
-}
 modules {
   key: "Recorder"
   value: {

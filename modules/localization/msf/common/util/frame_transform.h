@@ -16,7 +16,8 @@
 #pragma once
 
 #include <proj_api.h>
-#include <Eigen/Geometry>
+
+#include "Eigen/Geometry"
 
 namespace apollo {
 namespace localization {

@@ -3,19 +3,19 @@ syntax = "proto2";
 package apollo.perception.camera.traffic_light.detection;
 
 message DetectionParam {
-    optional int32  min_crop_size = 1 [default = 270];
-    optional int32  crop_method = 2 [default = 0];
-    optional float  mean_b = 3 [default = 95];
-    optional float  mean_g = 4 [default = 99];
-    optional float  mean_r = 5 [default = 96];
-    optional bool   is_bgr = 6 [default = true];
-    optional float  crop_scale = 7 [default = 2.5];
-    optional string input_blob_name = 8;
-    optional string im_param_blob_name = 9;
-    optional string output_blob_name = 10;
-    optional string model_name = 11 [default = "RTNet"];
-    optional string model_type = 12 [default = "RTNet"];
-    optional string proto_file = 13 [default = "caffe.pt"];
-    optional string weight_file = 14 [default = "caffe.model"];
-    optional int32  max_batch_size = 15 [default = 1];
+  optional int32 min_crop_size = 1 [default = 270];
+  optional int32 crop_method = 2 [default = 0];
+  optional float mean_b = 3 [default = 95];
+  optional float mean_g = 4 [default = 99];
+  optional float mean_r = 5 [default = 96];
+  optional bool is_bgr = 6 [default = true];
+  optional float crop_scale = 7 [default = 2.5];
+  optional string input_blob_name = 8;
+  optional string im_param_blob_name = 9;
+  optional string output_blob_name = 10;
+  optional string model_name = 11 [default = "RTNet"];
+  optional string model_type = 12 [default = "RTNet"];
+  optional string proto_file = 13 [default = "caffe.pt"];
+  optional string weight_file = 14 [default = "caffe.model"];
+  optional int32 max_batch_size = 15 [default = 1];
 }

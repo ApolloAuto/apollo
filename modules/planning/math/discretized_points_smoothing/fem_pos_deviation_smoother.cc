@@ -20,8 +20,6 @@
 
 #include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_smoother.h"
 
-#include <limits>
-
 #include "IpIpoptApplication.hpp"
 #include "IpSolveStatistics.hpp"
 

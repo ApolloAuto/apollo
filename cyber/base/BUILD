@@ -33,7 +33,7 @@ cc_test(
     srcs = ["atomic_hash_map_test.cc"],
     deps = [
         "//cyber/base:atomic_hash_map",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -52,7 +52,7 @@ cc_test(
     deps = [
         "//cyber/base:atomic_rw_lock",
         "//cyber/base:reentrant_rw_lock",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -71,7 +71,7 @@ cc_test(
     srcs = ["bounded_queue_test.cc"],
     deps = [
         "//cyber/base:bounded_queue",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -97,7 +97,7 @@ cc_test(
     srcs = ["for_each_test.cc"],
     deps = [
         "//cyber/base:for_each",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -125,7 +125,7 @@ cc_test(
     deps = [
         "//cyber/base:concurrent_object_pool",
         "//cyber/base:object_pool",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -150,7 +150,7 @@ cc_test(
     srcs = ["signal_test.cc"],
     deps = [
         "//cyber/base:signal",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -175,7 +175,7 @@ cc_test(
     srcs = ["unbounded_queue_test.cc"],
     deps = [
         "//cyber/base:unbounded_queue",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

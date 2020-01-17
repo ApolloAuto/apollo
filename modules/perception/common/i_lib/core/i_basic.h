@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include <math.h>
-#include <string.h>
+#include <cmath>
+#include <cstring>
 
 #include "modules/perception/common/i_lib/core/i_constant.h"
 

@@ -20,8 +20,6 @@
 
 #include "modules/planning/scenarios/lane_follow/lane_follow_stage.h"
 
-#include <algorithm>
-#include <limits>
 #include <utility>
 
 #include "cyber/common/log.h"
@@ -323,7 +321,7 @@ void LaneFollowStage::GenerateFallbackPathProfile(
   const auto adc_point_y = adc_point.path_point().y();
 
   common::SLPoint adc_point_s_l;
-  if (!reference_line.XYToSL({adc_point_x, adc_point_y}, &adc_point_s_l)) {
+  if (!reference_line.XYToSL(adc_point.path_point(), &adc_point_s_l)) {
     AERROR << "Fail to project ADC to reference line when calculating path "
               "fallback. Straight forward path is generated";
     const auto adc_point_heading = adc_point.path_point().theta();
@@ -394,9 +392,7 @@ bool LaneFollowStage::RetrieveLastFramePathProfile(
 SLPoint LaneFollowStage::GetStopSL(const ObjectStop& stop_decision,
                                    const ReferenceLine& reference_line) const {
   SLPoint sl_point;
-  reference_line.XYToSL(
-      {stop_decision.stop_point().x(), stop_decision.stop_point().y()},
-      &sl_point);
+  reference_line.XYToSL(stop_decision.stop_point(), &sl_point);
   return sl_point;
 }
 

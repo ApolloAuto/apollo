@@ -18,7 +18,7 @@ cc_test(
     srcs = ["status_test.cc"],
     deps = [
         ":status",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

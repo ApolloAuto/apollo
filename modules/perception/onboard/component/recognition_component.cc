@@ -81,6 +81,7 @@ bool RecognitionComponent::InternalProc(
   auto& sensor_name = in_message->lidar_frame_->sensor_info.name;
   PERCEPTION_PERF_FUNCTION_WITH_INDICATOR(sensor_name);
   out_message->timestamp_ = in_message->timestamp_;
+  out_message->lidar_timestamp_ = in_message->lidar_timestamp_;
   out_message->seq_num_ = in_message->seq_num_;
   out_message->process_stage_ = ProcessStage::LIDAR_RECOGNITION;
   out_message->sensor_id_ = sensor_name;

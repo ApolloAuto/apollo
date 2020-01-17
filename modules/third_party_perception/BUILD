@@ -12,6 +12,7 @@ cc_library(
         ":third_party_perception_fusion",
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
+        "//modules/common/util:message_util",
     ],
 )
 

@@ -16,7 +16,7 @@
 
 #include "cyber/service_discovery/role/role.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {

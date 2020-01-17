@@ -19,22 +19,16 @@
 #include <algorithm>
 
 #include "cyber/common/log.h"
-#include "modules/perception/inference/utils/util.h"
 #include "modules/perception/inference/utils/cuda_util.h"
+#include "modules/perception/inference/utils/util.h"
 
 namespace apollo {
 namespace perception {
 namespace inference {
-__global__ void resize_linear_kernel(const unsigned char *src,
-                     float *dst,
-                     int channel,
-                     int height,
-                     int width,
-                     int stepwidth,
-                     int dst_height,
-                     int dst_width,
-                     float fx,
-                     float fy) {
+__global__ void resize_linear_kernel(const unsigned char *src, float *dst,
+                                     int channel, int height, int width,
+                                     int stepwidth, int dst_height,
+                                     int dst_width, float fx, float fy) {
   const int dst_x = blockDim.x * blockIdx.x + threadIdx.x;
   const int dst_y = blockDim.y * blockIdx.y + threadIdx.y;
   if (dst_x < dst_width && dst_y < dst_height) {
@@ -85,22 +79,13 @@ int divup(int a, int b) {
   }
 }
 
-template<typename T>
-__global__ void resize_linear_kernel_mean(const unsigned char *src,
-                                          float *dst,
-                                          int channel,
-                                          int height,
-                                          int width,
-                                          int stepwidth,
-                                          int dst_height,
-                                          int dst_width,
-                                          float fx,
-                                          float fy,
-                                          T mean_b,
-                                          T mean_g,
-                                          T mean_r,
-                                          bool channel_axis,
-                                          float scale) {
+template <typename T>
+__global__ void resize_linear_kernel_mean(const unsigned char *src, float *dst,
+                                          int channel, int height, int width,
+                                          int stepwidth, int dst_height,
+                                          int dst_width, float fx, float fy,
+                                          T mean_b, T mean_g, T mean_r,
+                                          bool channel_axis, float scale) {
   const int dst_x = blockDim.x * blockIdx.x + threadIdx.x;
   const int dst_y = blockDim.y * blockIdx.y + threadIdx.y;
   if (dst_x < dst_width && dst_y < dst_height) {
@@ -159,9 +144,8 @@ __global__ void resize_linear_kernel_mean(const unsigned char *src,
 }
 
 bool ResizeGPU(const base::Image8U &src,
-               std::shared_ptr<apollo::perception::base::Blob<float> > dst,
-               int stepwidth,
-               int start_axis) {
+               std::shared_ptr<apollo::perception::base::Blob<float>> dst,
+               int stepwidth, int start_axis) {
   int width = dst->shape(2);
   int height = dst->shape(1);
   int channel = dst->shape(3);
@@ -179,22 +163,16 @@ bool ResizeGPU(const base::Image8U &src,
 
   const dim3 grid(divup(width, block.x), divup(height, block.y));
 
-  resize_linear_kernel << < grid, block >> >
-      (src.gpu_data(), dst->mutable_gpu_data(),
-          origin_channel, origin_height, origin_width,
-          stepwidth, height, width, fx, fy);
+  resize_linear_kernel<<<grid, block>>>(
+      src.gpu_data(), dst->mutable_gpu_data(), origin_channel, origin_height,
+      origin_width, stepwidth, height, width, fx, fy);
   return true;
 }
 
 bool ResizeGPU(const apollo::perception::base::Blob<uint8_t> &src_gpu,
-               std::shared_ptr<apollo::perception::base::Blob<float> > dst,
-               int stepwidth,
-               int start_axis,
-               int mean_b,
-               int mean_g,
-               int mean_r,
-               bool channel_axis,
-               float scale) {
+               std::shared_ptr<apollo::perception::base::Blob<float>> dst,
+               int stepwidth, int start_axis, int mean_b, int mean_g,
+               int mean_r, bool channel_axis, float scale) {
   int width = dst->shape(2);
   int height = dst->shape(1);
   int channel = dst->shape(3);
@@ -223,24 +201,18 @@ bool ResizeGPU(const apollo::perception::base::Blob<uint8_t> &src_gpu,
   const dim3 block(32, 8);
   const dim3 grid(divup(width, block.x), divup(height, block.y));
 
-  resize_linear_kernel_mean << < grid, block >> >
-      ((const unsigned char *) src_gpu.gpu_data(),
-          dst->mutable_gpu_data() + dst->offset(start_axis),
-          origin_channel, origin_height, origin_width,
-          stepwidth, height, width, fx, fy, mean_b, mean_g, mean_r,
-          channel_axis, scale);
+  resize_linear_kernel_mean<<<grid, block>>>(
+      (const unsigned char *)src_gpu.gpu_data(),
+      dst->mutable_gpu_data() + dst->offset(start_axis), origin_channel,
+      origin_height, origin_width, stepwidth, height, width, fx, fy, mean_b,
+      mean_g, mean_r, channel_axis, scale);
   return true;
 }
 
 bool ResizeGPU(const base::Image8U &src,
-               std::shared_ptr<apollo::perception::base::Blob<float> > dst,
-               int stepwidth,
-               int start_axis,
-               float mean_b,
-               float mean_g,
-               float mean_r,
-               bool channel_axis,
-               float scale) {
+               std::shared_ptr<apollo::perception::base::Blob<float>> dst,
+               int stepwidth, int start_axis, float mean_b, float mean_g,
+               float mean_r, bool channel_axis, float scale) {
   int width = dst->shape(2);
   int height = dst->shape(1);
   int channel = dst->shape(3);
@@ -269,11 +241,10 @@ bool ResizeGPU(const base::Image8U &src,
   const dim3 block(32, 8);
   const dim3 grid(divup(width, block.x), divup(height, block.y));
 
-  resize_linear_kernel_mean << < grid, block >> >
-      (src.gpu_data(), dst->mutable_gpu_data() + dst->offset(start_axis),
-          origin_channel, origin_height, origin_width,
-          stepwidth, height, width, fx, fy, mean_b, mean_g, mean_r,
-          channel_axis, scale);
+  resize_linear_kernel_mean<<<grid, block>>>(
+      src.gpu_data(), dst->mutable_gpu_data() + dst->offset(start_axis),
+      origin_channel, origin_height, origin_width, stepwidth, height, width, fx,
+      fy, mean_b, mean_g, mean_r, channel_axis, scale);
   return true;
 }
 

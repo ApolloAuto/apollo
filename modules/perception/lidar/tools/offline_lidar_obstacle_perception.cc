@@ -204,7 +204,7 @@ class OfflineLidarObstaclePerception {
       }
       if (!WriteObjectsForNewBenchmark(
               i, filtered_objects,
-              absl::StrCat(output_path, "/", file_name, ".pcd"))) {
+              absl::StrCat(output_path, "/", file_name, ".txt"))) {
         return false;
       }
     }

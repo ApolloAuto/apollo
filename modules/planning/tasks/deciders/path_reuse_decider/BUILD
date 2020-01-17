@@ -13,6 +13,7 @@ cc_library(
         "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
+        "//modules/planning/proto:planning_proto",
         "//modules/planning/tasks/deciders:decider_base",
     ],
 )
@@ -23,7 +24,7 @@ cc_test(
     srcs = ["path_reuse_decider_test.cc"],
     deps = [
         "path_reuse_decider",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

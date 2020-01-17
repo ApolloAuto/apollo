@@ -82,7 +82,7 @@ cc_test(
     srcs = ["accel_rpt_68_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -92,7 +92,7 @@ cc_test(
     srcs = ["brake_rpt_6c_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -102,7 +102,7 @@ cc_test(
     srcs = ["wheel_speed_rpt_7a_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -112,7 +112,7 @@ cc_test(
     srcs = ["yaw_rate_rpt_81_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -122,7 +122,7 @@ cc_test(
     srcs = ["wiper_rpt_91_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -132,7 +132,7 @@ cc_test(
     srcs = ["brake_motor_rpt_1_70_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -142,7 +142,7 @@ cc_test(
     srcs = ["brake_motor_rpt_2_71_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -152,7 +152,7 @@ cc_test(
     srcs = ["brake_motor_rpt_3_72_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -162,7 +162,7 @@ cc_test(
     srcs = ["date_time_rpt_83_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -172,7 +172,7 @@ cc_test(
     srcs = ["global_rpt_6a_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -182,7 +182,7 @@ cc_test(
     srcs = ["lat_lon_heading_rpt_82_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -192,7 +192,7 @@ cc_test(
     srcs = ["steering_motor_rpt_1_73_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -202,7 +202,7 @@ cc_test(
     srcs = ["steering_motor_rpt_2_74_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -212,7 +212,7 @@ cc_test(
     srcs = ["steering_motor_rpt_3_75_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -222,7 +222,7 @@ cc_test(
     srcs = ["steering_rpt_1_6e_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -232,7 +232,7 @@ cc_test(
     srcs = ["accel_cmd_67_test.cc"],
     deps = [
         "//modules/canbus/vehicle/gem/protocol:canbus_gem_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

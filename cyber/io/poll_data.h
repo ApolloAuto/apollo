@@ -17,8 +17,8 @@
 #ifndef CYBER_IO_POLL_DATA_H_
 #define CYBER_IO_POLL_DATA_H_
 
-#include <stdint.h>
 #include <sys/epoll.h>
+#include <cstdint>
 #include <functional>
 
 namespace apollo {

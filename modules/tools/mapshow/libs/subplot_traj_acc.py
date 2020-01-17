@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -16,9 +16,9 @@
 # limitations under the License.
 ###############################################################################
 
-import matplotlib.pyplot as plt
 from matplotlib import cm as cmx
 from matplotlib import colors as mcolors
+import matplotlib.pyplot as plt
 
 
 class TrajAccSubplot:
@@ -50,7 +50,7 @@ class TrajAccSubplot:
 
     def init_colors(self):
         self.colors = []
-        values = range(self.acc_lines_size)
+        values = list(range(self.acc_lines_size))
         jet = plt.get_cmap('brg')
         color_norm = mcolors.Normalize(vmin=0, vmax=values[-1])
         scalar_map = cmx.ScalarMappable(norm=color_norm, cmap=jet)
@@ -66,7 +66,7 @@ class TrajAccSubplot:
         planning.traj_data_lock.acquire()
         for i in range(len(planning.traj_speed_t_history)):
             if i >= self.acc_lines_size:
-                print("WARNING: number of path lines is more than " \
+                print("WARNING: number of path lines is more than "
                       + str(self.acc_lines_size))
                 continue
             speed_line = self.acc_lines[self.acc_lines_size - i - 1]

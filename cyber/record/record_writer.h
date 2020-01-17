@@ -17,7 +17,7 @@
 #ifndef CYBER_RECORD_RECORD_WRITER_H_
 #define CYBER_RECORD_RECORD_WRITER_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include <memory>
 #include <mutex>
 #include <set>

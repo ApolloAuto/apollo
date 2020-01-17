@@ -78,20 +78,19 @@ cc_test(
     deps = [
         ":cnn_segmentation",
         "//modules/perception/common:perception_gflags",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
 #cc_test(
 #    name = "feature_generator_test",
 #    size = "small",
-#    srcs = [#        "feature_generator_test.cc"
-#    ],
+#    srcs = ["feature_generator_test.cc"],
 #    deps = [
 #        ":feature_generator",
 #        "//modules/perception/common:perception_gflags",
 #        "//modules/perception/lidar/common:pcl_util",
-#        "@gtest//:main",
+#        "@com_google_googletest//:gtest_main",
 #        "@opencv2//:core",
 #        "@opencv2//:highgui",
 #    ],

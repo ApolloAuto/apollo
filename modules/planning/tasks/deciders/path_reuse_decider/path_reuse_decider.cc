@@ -21,9 +21,9 @@
 
 #include <algorithm>
 #include <string>
-#include <vector>
 
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -34,6 +34,7 @@ using apollo::common::math::Vec2d;
 
 int PathReuseDecider::reusable_path_counter_ = 0;
 int PathReuseDecider::total_path_counter_ = 0;
+bool PathReuseDecider::path_reusable_ = false;
 
 PathReuseDecider::PathReuseDecider(const TaskConfig& config)
     : Decider(config) {}
@@ -44,26 +45,32 @@ Status PathReuseDecider::Process(Frame* const frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  bool is_change_lane_path = reference_line_info->IsChangeLanePath();
+  if (!Decider::config_.path_reuse_decider_config().reuse_path()) {
+    ADEBUG << "skipping reusing path: conf";
+    reference_line_info->set_path_reusable(false);
+    return Status::OK();
+  }
+
+  // skip path reuse if not in LANE_FOLLOW_SCENARIO
+  const auto scenario_type =
+      PlanningContext::Instance()->planning_status().scenario().scenario_type();
+  if (scenario_type != ScenarioConfig::LANE_FOLLOW) {
+    ADEBUG << "skipping reusing path: not in LANE_FOLLOW scenario";
+    reference_line_info->set_path_reusable(false);
+    return Status::OK();
+  }
 
   // active path reuse during change_lane only
   auto* lane_change_status = PlanningContext::Instance()
                                  ->mutable_planning_status()
                                  ->mutable_change_lane();
-
-  // skip path reuse if not in_change_lane
   ADEBUG << "lane change status: " << lane_change_status->ShortDebugString();
 
-  // check front static blocking obstacle
-  auto* mutable_path_reuse_decider_status = PlanningContext::Instance()
-                                                ->mutable_planning_status()
-                                                ->mutable_path_reuse_decider();
-  ADEBUG << "lane_change_status->is_current_opt_succeed(): "
-         << lane_change_status->is_current_opt_succeed();
-
-  if (!Decider::config_.path_reuse_decider_config().reuse_path() ||
-      lane_change_status->status() != ChangeLaneStatus::IN_CHANGE_LANE) {
-    ADEBUG << "skipping reusing path";
+  // skip path reuse if not in_change_lane
+  if (lane_change_status->status() != ChangeLaneStatus::IN_CHANGE_LANE &&
+      !FLAGS_enable_reuse_path_in_lane_follow) {
+    ADEBUG << "skipping reusing path: not in lane_change";
+    reference_line_info->set_path_reusable(false);
     return Status::OK();
   }
 
@@ -73,67 +80,77 @@ Status PathReuseDecider::Process(Frame* const frame,
   /*reuse path when in non_change_lane reference line or
     optimization succeeded in change_lane reference line
   */
-  if (!is_change_lane_path || lane_change_status->is_current_opt_succeed()) {
-    mutable_path_reuse_decider_status->set_reused_path(true);
-  } else {
-    mutable_path_reuse_decider_status->set_reused_path(false);
-    ADEBUG << "reusable_path_counter_" << reusable_path_counter_;
-    ADEBUG << "total_path_counter_" << total_path_counter_;
+  bool is_change_lane_path = reference_line_info->IsChangeLanePath();
+  if (is_change_lane_path && !lane_change_status->is_current_opt_succeed()) {
+    reference_line_info->set_path_reusable(false);
+    ADEBUG << "reusable_path_counter[" << reusable_path_counter_
+           << "] total_path_counter[" << total_path_counter_ << "]";
+    ADEBUG << "Stop reusing path when optimization failed on change lane path";
     return Status::OK();
   }
 
-  auto* mutable_path_decider_status = PlanningContext::Instance()
-                                          ->mutable_planning_status()
-                                          ->mutable_path_decider();
-  static constexpr int kWaitCycle = -2;  // wait 2 cycle
+  // stop reusing current path:
+  // 1. replan path
+  // 2. collision
+  // 3. failed to trim previous path
+  // 4. speed optimization failed on previous path
+  bool speed_optimization_successful = false;
+  const auto& history_frame = FrameHistory::Instance()->Latest();
+  if (history_frame) {
+    const auto history_trajectory_type =
+        history_frame->reference_line_info().front().trajectory_type();
+    speed_optimization_successful =
+        (history_trajectory_type != ADCTrajectory::SPEED_FALLBACK);
+  }
 
-  ADEBUG << "reuse or not: "
-         << mutable_path_reuse_decider_status->reused_path();
-  ADEBUG << "is replane: "
-         << frame->current_frame_planned_trajectory().is_replan();
-
-  // T -> F
-  if (mutable_path_reuse_decider_status->reused_path()) {
-    bool trimmed = TrimHistoryPath(frame, reference_line_info);
-    ADEBUG << "reusing path....";
-    ADEBUG << "is replane: "
-           << frame->current_frame_planned_trajectory().is_replan();
-    ADEBUG << "is reusable: " << CheckPathReusable(frame, reference_line_info);
-    ADEBUG << "is trim successful: " << trimmed;
+  // const auto history_trajectory_type = FrameHistory::Instance()
+  //                                          ->Latest()
+  //                                          ->reference_line_info()
+  //                                          .front()
+  //                                          .trajectory_type();
+  if (path_reusable_) {
     if (!frame->current_frame_planned_trajectory().is_replan() &&
-        CheckPathReusable(frame, reference_line_info) && trimmed) {
+        speed_optimization_successful && IsCollisionFree(reference_line_info) &&
+        TrimHistoryPath(frame, reference_line_info)) {
+      ADEBUG << "reuse path";
       ++reusable_path_counter_;  // count reusable path
     } else {
-      // disable reuse path
+      // stop reuse path
       ADEBUG << "stop reuse path";
-      mutable_path_reuse_decider_status->set_reused_path(false);
+      path_reusable_ = false;
     }
   } else {
     // F -> T
-    ADEBUG
-        << "counter: "
-        << mutable_path_decider_status->front_static_obstacle_cycle_counter();
-    ADEBUG << "IsIgnoredBlockingObstacle: "
-           << IsIgnoredBlockingObstacle(reference_line_info);
-    // far from blocking obstacle or no blocking obstacle for a while
-    if ((mutable_path_decider_status->front_static_obstacle_cycle_counter() <=
-             kWaitCycle ||
-         IsIgnoredBlockingObstacle(reference_line_info)) &&
+    auto* mutable_path_decider_status = PlanningContext::Instance()
+                                            ->mutable_planning_status()
+                                            ->mutable_path_decider();
+    static constexpr int kWaitCycle = -2;  // wait 2 cycle
+
+    const int front_static_obstacle_cycle_counter =
+        mutable_path_decider_status->front_static_obstacle_cycle_counter();
+    const bool ignore_blocking_obstacle =
+        IsIgnoredBlockingObstacle(reference_line_info);
+    ADEBUG << "counter[" << front_static_obstacle_cycle_counter
+           << "] IsIgnoredBlockingObstacle[" << ignore_blocking_obstacle << "]";
+    // stop reusing current path:
+    // 1. blocking obstacle disappeared or moving far away
+    // 2. trimming successful
+    // 3. no statical obstacle collision.
+    if ((front_static_obstacle_cycle_counter <= kWaitCycle ||
+         ignore_blocking_obstacle) &&
+        speed_optimization_successful && IsCollisionFree(reference_line_info) &&
         TrimHistoryPath(frame, reference_line_info)) {
       // enable reuse path
+      ADEBUG << "reuse path: front_blocking_obstacle ignorable";
+      path_reusable_ = true;
       ++reusable_path_counter_;
-      mutable_path_reuse_decider_status->set_reused_path(true);
     }
   }
-  ADEBUG << "reusable_path_counter_" << reusable_path_counter_;
-  ADEBUG << "total_path_counter_" << total_path_counter_;
-  return Status::OK();
-}
 
-bool PathReuseDecider::CheckPathReusable(
-    Frame* const frame, ReferenceLineInfo* const reference_line_info) {
-  ADEBUG << "Check Collision";
-  return IsCollisionFree(reference_line_info);
+  reference_line_info->set_path_reusable(path_reusable_);
+  ADEBUG << "reusable_path_counter[" << reusable_path_counter_
+         << "] total_path_counter[" << total_path_counter_ << "]";
+  return Status::OK();
 }
 
 bool PathReuseDecider::IsIgnoredBlockingObstacle(
@@ -299,7 +316,7 @@ bool PathReuseDecider::IsCollisionFree(
 // check the length of the path
 bool PathReuseDecider::NotShortPath(const DiscretizedPath& current_path) {
   // TODO(shu): use gflag
-  static constexpr double kShortPathThreshold = 15;
+  static constexpr double kShortPathThreshold = 60;
   return current_path.size() >= kShortPathThreshold;
 }
 
@@ -368,13 +385,14 @@ bool PathReuseDecider::TrimHistoryPath(
 
     trimmed_path.emplace_back(history_path[i]);
 
-    if (i < 50) {
-      ADEBUG << "path_point:[" << i << "]" << updated_s;
-      path_position_sl.s();
-      ADEBUG << std::setprecision(9) << "path_point:[" << i << "]"
-             << "x: [" << history_path[i].x() << "], y:[" << history_path[i].y()
-             << "]. s[" << history_path[i].s() << "]";
-    }
+    // if (i < 50) {
+    //   ADEBUG << "path_point:[" << i << "]" << updated_s;
+    //   path_position_sl.s();
+    //   ADEBUG << std::setprecision(9) << "path_point:[" << i << "]"
+    //          << "x: [" << history_path[i].x() << "], y:[" <<
+    //          history_path[i].y()
+    //          << "]. s[" << history_path[i].s() << "]";
+    // }
     trimmed_path.back().set_s(updated_s);
   }
 

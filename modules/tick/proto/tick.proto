@@ -1,9 +1,0 @@
-syntax = "proto2";
-
-package apollo.tick;
-
-import "modules/common/proto/header.proto";
-
-message Tick {
-    required apollo.common.Header header = 1;
-}

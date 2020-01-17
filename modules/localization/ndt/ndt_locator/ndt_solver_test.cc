@@ -15,9 +15,11 @@
  *****************************************************************************/
 
 #include "modules/localization/ndt/ndt_locator/ndt_solver.h"
-#include <gtest/gtest.h>
-#include <pcl/io/pcd_io.h>
-#include <pcl/point_types.h>
+
+#include "gtest/gtest.h"
+#include "pcl/io/pcd_io.h"
+#include "pcl/point_types.h"
+
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map_node_index.h"
 #include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map.h"
 #include "modules/localization/msf/local_pyramid_map/ndt_map/ndt_map_config.h"

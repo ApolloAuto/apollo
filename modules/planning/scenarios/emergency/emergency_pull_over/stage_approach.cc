@@ -66,9 +66,7 @@ Stage::StageStatus EmergencyPullOverStageApproach::Process(
       pull_over_status.position().has_y()) {
     const auto& reference_line = reference_line_info.reference_line();
     common::SLPoint pull_over_sl;
-    reference_line.XYToSL(
-        {pull_over_status.position().x(), pull_over_status.position().y()},
-        &pull_over_sl);
+    reference_line.XYToSL(pull_over_status.position(), &pull_over_sl);
     const double stop_distance = scenario_config_.stop_distance();
     stop_line_s =
         pull_over_sl.s() + stop_distance +

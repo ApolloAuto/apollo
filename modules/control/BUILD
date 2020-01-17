@@ -8,9 +8,7 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"control\\"'],
     deps = [
         "//cyber",
-        "//external:gflags",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/common",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/latency_recorder",
         "//modules/common/monitor_log",
@@ -28,6 +26,7 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
@@ -55,7 +54,7 @@ cc_test(
     data = ["//modules/control:control_testdata"],
     deps = [
         ":control_component_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -23,7 +23,6 @@
 #include <algorithm>
 #include <limits>
 #include <string>
-#include <utility>
 
 #include "cyber/task/task.h"
 
@@ -50,6 +49,9 @@ static constexpr double kDoubleEpsilon = 1.0e-6;
 // dynamics
 bool CheckOverlapOnDpStGraph(const std::vector<const STBoundary*>& boundaries,
                              const StGraphPoint& p1, const StGraphPoint& p2) {
+  if (FLAGS_use_st_drivable_boundary) {
+    return false;
+  }
   for (const auto* boundary : boundaries) {
     if (boundary->boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
       continue;

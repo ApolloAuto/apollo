@@ -16,7 +16,7 @@
 
 #include "cyber/blocker/blocker_manager.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "cyber/blocker/intra_reader.h"
 #include "cyber/blocker/intra_writer.h"

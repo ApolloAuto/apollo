@@ -9,7 +9,6 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":stage",
-        "//modules/common",
         "//modules/planning/common:planning_common",
         "//modules/planning/common/util:util_lib",
         "//modules/planning/tasks:task",
@@ -22,24 +21,10 @@ cc_library(
     hdrs = ["stage.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//modules/common",
         "//modules/planning/common:planning_common",
         "//modules/planning/common/util:util_lib",
         "//modules/planning/tasks:task",
         "//modules/planning/tasks:task_factory",
-    ],
-)
-
-cc_library(
-    name = "stage_intersection_cruise_impl",
-    srcs = ["stage_intersection_cruise_impl.cc"],
-    hdrs = ["stage_intersection_cruise_impl.h"],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
-    deps = [
-        "//modules/common",
-        "//modules/planning/common:planning_common",
-        "//modules/planning/common/util:util_lib",
-        "//modules/planning/scenarios/util:scenario_util_lib",
     ],
 )
 
@@ -49,7 +34,6 @@ cc_library(
     hdrs = ["scenario_manager.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//modules/common",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:planning_common",

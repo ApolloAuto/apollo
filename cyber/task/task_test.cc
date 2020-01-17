@@ -16,10 +16,10 @@
 
 #include "cyber/task/task.h"
 
-#include <gtest/gtest.h>
 #include <memory>
 #include <thread>
 #include <vector>
+#include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"

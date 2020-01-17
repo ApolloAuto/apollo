@@ -7,10 +7,10 @@ cc_binary(
     srcs = ["pad_terminal.cc"],
     deps = [
         "//cyber",
-        "//external:gflags",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/util",
+        "//modules/common/util:message_util",
         "//modules/planning/proto:planning_proto",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 

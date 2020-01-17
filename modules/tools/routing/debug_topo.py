@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 import common.proto_utils as proto_utils
 import modules.routing.proto.topo_graph_pb2 as topo_graph_pb2
 import util
+
 
 color_iter = itertools.cycle(
     ['navy', 'c', 'cornflowerblue', 'gold', 'darkorange'])
@@ -120,9 +121,9 @@ def plot_central_curve(central_curve, color):
             px, py = draw_line(curve.line_segment, color)
             node_x = node_x + px
             node_y = node_y + py
-        #if curve.HasField('arc'):
+        # if curve.HasField('arc'):
         #    draw_arc(curve.arc)
-    return [node_x[len(node_x) / 2], node_y[len(node_y) / 2]]
+    return [node_x[len(node_x) // 2], node_y[len(node_y) // 2]]
 
 
 def plot_node(node, plot_id, color):

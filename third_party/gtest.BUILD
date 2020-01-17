@@ -114,7 +114,7 @@ cc_library(
 )
 
 cc_library(
-    name = "main",
+    name = "gtest_main",
     srcs = [
         "googlemock/src/gmock_main.cc",
     ],

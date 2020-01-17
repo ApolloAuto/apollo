@@ -2,63 +2,63 @@ syntax = "proto2";
 
 package apollo.perception.camera.app;
 message PluginParam {
-    optional string name = 1;
-    optional string root_dir = 2;
-    optional string config_file = 3;
+  optional string name = 1;
+  optional string root_dir = 2;
+  optional string config_file = 3;
 }
 message DetectorParam {
-    optional PluginParam plugin_param = 1;
-    optional string camera_name = 2;
+  optional PluginParam plugin_param = 1;
+  optional string camera_name = 2;
 }
 message TrackerParam {
-    optional PluginParam plugin_param = 1;
+  optional PluginParam plugin_param = 1;
 }
 message TransformerParam {
-    optional PluginParam plugin_param = 1;
+  optional PluginParam plugin_param = 1;
 }
 message PostprocessorParam {
-    optional PluginParam plugin_param = 1;
+  optional PluginParam plugin_param = 1;
 }
 message FeatureParam {
-    optional PluginParam plugin_param = 1;
+  optional PluginParam plugin_param = 1;
 }
 message DebugParam {
-    optional string detection_out_dir = 1;
-    optional string tracked_detection_out_dir = 2;
-    optional string track_out_file = 3;
-    optional string detect_feature_dir = 4;
-    optional string lane_out_dir = 5;
-    optional string camera2world_out_file = 6;
-    optional string calibration_out_dir = 7;
+  optional string detection_out_dir = 1;
+  optional string tracked_detection_out_dir = 2;
+  optional string track_out_file = 3;
+  optional string detect_feature_dir = 4;
+  optional string lane_out_dir = 5;
+  optional string camera2world_out_file = 6;
+  optional string calibration_out_dir = 7;
 }
 message LanePerceptionParam {
-    optional DetectorParam lane_detector_param = 1;
-    optional PluginParam lane_postprocessor_param = 2;
-    optional PluginParam lane_tracker_param = 3;
-    optional int32 gpu_id = 4;
+  optional DetectorParam lane_detector_param = 1;
+  optional PluginParam lane_postprocessor_param = 2;
+  optional PluginParam lane_tracker_param = 3;
+  optional int32 gpu_id = 4;
 }
 message CalibrationServiceParam {
-    optional string calibrator_method = 2;
-    optional PluginParam plugin_param = 3;
+  optional string calibrator_method = 2;
+  optional PluginParam plugin_param = 3;
 }
 message ObjectTemplateParam {
-    optional PluginParam plugin_param = 1;
+  optional PluginParam plugin_param = 1;
 }
 message PerceptionParam {
-    repeated DetectorParam detector_param = 1;
-    optional TrackerParam tracker_param = 2;
-    optional TransformerParam transformer_param = 3;
-    optional PostprocessorParam postprocessor_param = 4;
-    optional int32 gpu_id = 5;
-    optional string camera_intrinsics = 6;
-    optional FeatureParam feature_param = 7;
-    repeated LanePerceptionParam lane_param = 8;
-    optional CalibrationServiceParam calibration_service_param = 9;
-    optional DebugParam debug_param = 10;
-    optional ObjectTemplateParam object_template_param = 11;
+  repeated DetectorParam detector_param = 1;
+  optional TrackerParam tracker_param = 2;
+  optional TransformerParam transformer_param = 3;
+  optional PostprocessorParam postprocessor_param = 4;
+  optional int32 gpu_id = 5;
+  optional string camera_intrinsics = 6;
+  optional FeatureParam feature_param = 7;
+  repeated LanePerceptionParam lane_param = 8;
+  optional CalibrationServiceParam calibration_service_param = 9;
+  optional DebugParam debug_param = 10;
+  optional ObjectTemplateParam object_template_param = 11;
 }
 message TrafficLightParam {
-    repeated DetectorParam detector_param = 1;
-    optional TrackerParam tracker_param = 2;
-    optional int32 gpu_id = 3;
+  repeated DetectorParam detector_param = 1;
+  optional TrackerParam tracker_param = 2;
+  optional int32 gpu_id = 3;
 }

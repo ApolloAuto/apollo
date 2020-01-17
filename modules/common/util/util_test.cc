@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+
+#include "modules/common/util/util.h"
+
 #include <vector>
 
 #include "gtest/gtest.h"
 #include "modules/common/util/testdata/simple.pb.h"
-
-#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace common {

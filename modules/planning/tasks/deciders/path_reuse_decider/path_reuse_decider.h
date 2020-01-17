@@ -27,7 +27,6 @@
 #include "modules/planning/common/history.h"
 #include "modules/planning/common/indexed_list.h"
 #include "modules/planning/common/obstacle_blocking_analyzer.h"
-#include "modules/planning/proto/decider_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
 
@@ -41,9 +40,6 @@ class PathReuseDecider : public Decider {
  private:
   common::Status Process(Frame* frame,
                          ReferenceLineInfo* reference_line_info) override;
-
-  // check if previous path reusable
-  bool CheckPathReusable(Frame* frame, ReferenceLineInfo* reference_line_info);
 
   void GetCurrentStopPositions(
       Frame* frame,
@@ -78,6 +74,7 @@ class PathReuseDecider : public Decider {
   History* history_ = History::Instance();
   static int reusable_path_counter_;  // count reused path
   static int total_path_counter_;     // count total path
+  static bool path_reusable_;
 };
 
 }  // namespace planning

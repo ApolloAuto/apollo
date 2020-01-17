@@ -8,7 +8,7 @@ cc_test(
     srcs = ["dummy_algorithms_test.cc"],
     deps = [
         ":dummy_algorithms",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

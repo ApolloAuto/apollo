@@ -22,7 +22,7 @@
 
 #include "cyber/common/macros.h"
 
-#include "modules/planning/proto/decider_config.pb.h"
+#include "modules/planning/proto/creep_decider_config.pb.h"
 
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"

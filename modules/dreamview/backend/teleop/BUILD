@@ -54,7 +54,7 @@ cc_test(
     ],
     deps = [
         ":teleop",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

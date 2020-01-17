@@ -16,11 +16,11 @@
 
 #include "cyber/common/file.h"
 
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <string>
 #include <vector>
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 #include "cyber/proto/unit_test.pb.h"
 

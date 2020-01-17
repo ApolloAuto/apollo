@@ -26,12 +26,10 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 namespace util {
-using apollo::common::VehicleConfigHelper;
+
 using apollo::common::math::Box2d;
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
-using apollo::common::util::DistanceXY;
-using apollo::hdmap::PathOverlap;
 
 hdmap::PathOverlap* GetOverlapOnReferenceLine(
     const ReferenceLineInfo& reference_line_info, const std::string& overlap_id,
@@ -94,9 +92,7 @@ PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
 
   const auto& reference_line = reference_line_info.reference_line();
   common::SLPoint pull_over_sl;
-  reference_line.XYToSL(
-      {pull_over_status.position().x(), pull_over_status.position().y()},
-      &pull_over_sl);
+  reference_line.XYToSL(pull_over_status.position(), &pull_over_sl);
 
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   double distance = adc_front_edge_s - pull_over_sl.s();
@@ -163,32 +159,6 @@ PullOverStatus CheckADCPullOverPathPoint(
   return position_check ? PARK_COMPLETE : PARK_FAIL;
 }
 
-PullOverStatus CheckADCPullOverOpenSpace(
-    const ScenarioPullOverConfig& scenario_config) {
-  const auto& pull_over_status =
-      PlanningContext::Instance()->planning_status().pull_over();
-  if (!pull_over_status.has_position() ||
-      !pull_over_status.position().has_x() ||
-      !pull_over_status.position().has_y() || !pull_over_status.has_theta()) {
-    ADEBUG << "pull_over status not set properly: "
-           << pull_over_status.DebugString();
-    return UNKNOWN;
-  }
-
-  const common::math::Vec2d adc_position = {
-      common::VehicleStateProvider::Instance()->x(),
-      common::VehicleStateProvider::Instance()->y()};
-  const common::math::Vec2d target_position = {pull_over_status.position().x(),
-                                               pull_over_status.position().y()};
-
-  const bool position_check = CheckPullOverPositionByDistance(
-      scenario_config, adc_position,
-      common::VehicleStateProvider::Instance()->heading(), target_position,
-      pull_over_status.theta());
-
-  return position_check ? PARK_COMPLETE : PARK_FAIL;
-}
-
 bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
                                const ScenarioPullOverConfig& scenario_config,
                                const common::math::Vec2d& adc_position,
@@ -222,34 +192,31 @@ bool CheckPullOverPositionBySL(const ReferenceLineInfo& reference_line_info,
   return ret;
 }
 
-bool CheckPullOverPositionByDistance(
-    const ScenarioPullOverConfig& scenario_config,
-    const common::math::Vec2d& adc_position, const double adc_theta,
-    const common::math::Vec2d& target_position, const double target_theta) {
-  const double distance_diff = adc_position.DistanceTo(target_position);
-  const double theta_diff =
-      std::fabs(common::math::NormalizeAngle(target_theta - adc_theta));
-  ADEBUG << "distance_diff[" << distance_diff << "] theta_diff[" << theta_diff
-         << "]";
-  // check distance/theta diff
-  return (distance_diff <= scenario_config.max_distance_error_to_end_point() &&
-          theta_diff <= scenario_config.max_theta_error_to_end_point());
-}
-
 bool CheckADCReadyToCruise(Frame* frame,
                            const ScenarioParkAndGoConfig& scenario_config) {
-  common::math::Vec2d adc_position = {
-      common::VehicleStateProvider::Instance()->x(),
-      common::VehicleStateProvider::Instance()->y()};
-  const double adc_heading =
-      common::VehicleStateProvider::Instance()->heading();
-  const ReferenceLineInfo& reference_line_info =
-      frame->reference_line_info().front();
+  auto vehicle_status = common::VehicleStateProvider::Instance();
+  common::math::Vec2d adc_position = {vehicle_status->x(), vehicle_status->y()};
+  const double adc_heading = vehicle_status->heading();
+
+  common::SLPoint adc_position_sl;
+  // get nearest reference line
+  const auto& reference_line_list = frame->reference_line_info();
+  const auto reference_line_info = std::min_element(
+      reference_line_list.begin(), reference_line_list.end(),
+      [&](const ReferenceLineInfo& ref_a, const ReferenceLineInfo& ref_b) {
+        common::SLPoint adc_position_sl_a;
+        common::SLPoint adc_position_sl_b;
+        ref_a.reference_line().XYToSL(adc_position, &adc_position_sl_a);
+        ref_b.reference_line().XYToSL(adc_position, &adc_position_sl_b);
+        return std::fabs(adc_position_sl_a.l()) <
+               std::fabs(adc_position_sl_b.l());
+      });
+  reference_line_info->reference_line().XYToSL(adc_position, &adc_position_sl);
   bool is_near_front_obstacle =
       CheckADCSurroundObstacles(adc_position, adc_heading, frame,
                                 scenario_config.front_obstacle_buffer());
   bool heading_align_w_reference_line =
-      CheckADCHeading(adc_position, adc_heading, reference_line_info,
+      CheckADCHeading(adc_position, adc_heading, *reference_line_info,
                       scenario_config.heading_buffer());
   ADEBUG << "is_near_front_obstacle: " << is_near_front_obstacle;
   ADEBUG << "heading_align_w_reference_line: "
@@ -257,15 +224,11 @@ bool CheckADCReadyToCruise(Frame* frame,
   // check gear status
   // TODO(SHU): align with vehicle parameters
   static constexpr double kMinSpeed = 0.1;  // m/s
-  if ((common::VehicleStateProvider::Instance()->gear() ==
-           canbus::Chassis::GEAR_DRIVE ||
-       std::fabs(common::VehicleStateProvider::Instance()
-                     ->vehicle_state()
-                     .linear_velocity()) < kMinSpeed) &&
-      !is_near_front_obstacle && heading_align_w_reference_line) {
-    return true;
-  }
-  return false;
+  return ((vehicle_status->gear() == canbus::Chassis::GEAR_DRIVE ||
+           std::fabs(vehicle_status->vehicle_state().linear_velocity()) <
+               kMinSpeed) &&
+          !is_near_front_obstacle && heading_align_w_reference_line &&
+          std::fabs(adc_position_sl.l()) < 0.5);
 }
 
 /**

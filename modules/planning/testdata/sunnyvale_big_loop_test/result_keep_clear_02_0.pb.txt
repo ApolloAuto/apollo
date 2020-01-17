@@ -8,49 +8,11 @@ is_replan: true
 gear: GEAR_DRIVE
 decision {
   main_decision {
-    stop {
-      reason_code: STOP_REASON_CLEAR_ZONE
-      reason: "stop by KC_1254"
-      stop_point {
-        x: 586425.59884182783
-        y: 4140681.7711326834
-      }
-      stop_heading: 1.3323877121237815
+    cruise {
       change_lane_type: FORWARD
     }
   }
   object_decision {
-    decision {
-      id: "9830"
-      perception_id: 9830
-      object_decision {
-        follow {
-          distance_s: -5.08480716496706
-          fence_point {
-            x: 586426.83564429672
-            y: 4140687.0030820039
-            z: 0
-          }
-          fence_heading: 1.3424711139179113
-        }
-      }
-    }
-    decision {
-      id: "KC_1254"
-      perception_id: -1540021536
-      object_decision {
-        stop {
-          reason_code: STOP_REASON_CLEAR_ZONE
-          distance_s: 0
-          stop_point {
-            x: 586425.59884182783
-            y: 4140681.7711326834
-            z: 0
-          }
-          stop_heading: 1.3323877121237815
-        }
-      }
-    }
   }
   vehicle_signal {
     turn_signal: TURN_NONE

@@ -30,6 +30,7 @@
 #include "cyber/common/log.h"
 #include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/latency_recorder/proto/latency_record.pb.h"
 #include "modules/common/util/map_util.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
@@ -61,7 +62,7 @@ GetReaderAndLatestMessage(const std::string& channel) {
   if (channel == FLAGS_control_command_topic) {
     const auto reader = manager->CreateReader<control::ControlCommand>(channel);
     reader->Observe();
-    const auto message = reader ? reader->GetLatestObserved() : nullptr;
+    const auto message = reader->GetLatestObserved();
     return std::pair<std::shared_ptr<cyber::ReaderBase>,
                      std::shared_ptr<google::protobuf::Message>>(reader,
                                                                  message);
@@ -69,7 +70,7 @@ GetReaderAndLatestMessage(const std::string& channel) {
     const auto reader =
         manager->CreateReader<localization::LocalizationEstimate>(channel);
     reader->Observe();
-    const auto message = reader ? reader->GetLatestObserved() : nullptr;
+    const auto message = reader->GetLatestObserved();
     return std::pair<std::shared_ptr<cyber::ReaderBase>,
                      std::shared_ptr<google::protobuf::Message>>(reader,
                                                                  message);
@@ -77,7 +78,7 @@ GetReaderAndLatestMessage(const std::string& channel) {
     const auto reader =
         manager->CreateReader<perception::PerceptionObstacles>(channel);
     reader->Observe();
-    const auto message = reader ? reader->GetLatestObserved() : nullptr;
+    const auto message = reader->GetLatestObserved();
     return std::pair<std::shared_ptr<cyber::ReaderBase>,
                      std::shared_ptr<google::protobuf::Message>>(reader,
                                                                  message);
@@ -85,28 +86,28 @@ GetReaderAndLatestMessage(const std::string& channel) {
     const auto reader =
         manager->CreateReader<prediction::PredictionObstacles>(channel);
     reader->Observe();
-    const auto message = reader ? reader->GetLatestObserved() : nullptr;
+    const auto message = reader->GetLatestObserved();
     return std::pair<std::shared_ptr<cyber::ReaderBase>,
                      std::shared_ptr<google::protobuf::Message>>(reader,
                                                                  message);
   } else if (channel == FLAGS_planning_trajectory_topic) {
     const auto reader = manager->CreateReader<planning::ADCTrajectory>(channel);
     reader->Observe();
-    const auto message = reader ? reader->GetLatestObserved() : nullptr;
+    const auto message = reader->GetLatestObserved();
     return std::pair<std::shared_ptr<cyber::ReaderBase>,
                      std::shared_ptr<google::protobuf::Message>>(reader,
                                                                  message);
   } else if (channel == FLAGS_conti_radar_topic) {
     const auto reader = manager->CreateReader<drivers::ContiRadar>(channel);
     reader->Observe();
-    const auto message = reader ? reader->GetLatestObserved() : nullptr;
+    const auto message = reader->GetLatestObserved();
     return std::pair<std::shared_ptr<cyber::ReaderBase>,
                      std::shared_ptr<google::protobuf::Message>>(reader,
                                                                  message);
   } else if (channel == FLAGS_relative_map_topic) {
     const auto reader = manager->CreateReader<relative_map::MapMsg>(channel);
     reader->Observe();
-    const auto message = reader ? reader->GetLatestObserved() : nullptr;
+    const auto message = reader->GetLatestObserved();
     return std::pair<std::shared_ptr<cyber::ReaderBase>,
                      std::shared_ptr<google::protobuf::Message>>(reader,
                                                                  message);
@@ -115,7 +116,7 @@ GetReaderAndLatestMessage(const std::string& channel) {
              channel == FLAGS_pointcloud_16_front_up_topic) {
     const auto reader = manager->CreateReader<drivers::PointCloud>(channel);
     reader->Observe();
-    const auto message = reader ? reader->GetLatestObserved() : nullptr;
+    const auto message = reader->GetLatestObserved();
     return std::pair<std::shared_ptr<cyber::ReaderBase>,
                      std::shared_ptr<google::protobuf::Message>>(reader,
                                                                  message);
@@ -158,9 +159,11 @@ bool ValidateFields(const google::protobuf::Message& message,
 
 }  // namespace
 
-ChannelMonitor::ChannelMonitor()
+ChannelMonitor::ChannelMonitor(
+    const std::shared_ptr<LatencyMonitor>& latency_monitor)
     : RecurrentRunner(FLAGS_channel_monitor_name,
-                      FLAGS_channel_monitor_interval) {}
+                      FLAGS_channel_monitor_interval),
+      latency_monitor_(latency_monitor) {}
 
 void ChannelMonitor::RunOnce(const double current_time) {
   auto manager = MonitorManager::Instance();
@@ -170,15 +173,19 @@ void ChannelMonitor::RunOnce(const double current_time) {
     const std::string& name = iter.first;
     const auto& config = iter.second;
     if (config.has_channel()) {
+      double freq;
+      const auto update_freq =
+          latency_monitor_->GetFrequency(config.channel().name(), &freq);
       UpdateStatus(config.channel(),
-                   components->at(name).mutable_channel_status());
+                   components->at(name).mutable_channel_status(), update_freq,
+                   freq);
     }
   }
 }
 
 void ChannelMonitor::UpdateStatus(
     const apollo::dreamview::ChannelMonitorConfig& config,
-    ComponentStatus* status) {
+    ComponentStatus* status, const bool update_freq, const double freq) {
   status->clear_status();
 
   const auto reader_message_pair = GetReaderAndLatestMessage(config.name());
@@ -211,6 +218,24 @@ void ChannelMonitor::UpdateStatus(
             ComponentStatus::ERROR,
             absl::StrCat(config.name(), " missing field ", field), status);
       }
+    }
+  }
+
+  // Check channel frequency
+  if (update_freq) {
+    if (freq > config.max_frequency_allowed()) {
+      SummaryMonitor::EscalateStatus(
+          ComponentStatus::WARN,
+          absl::StrCat(config.name(), " has frequency ", freq,
+                       " > max allowed ", config.max_frequency_allowed()),
+          status);
+    }
+    if (freq < config.min_frequency_allowed()) {
+      SummaryMonitor::EscalateStatus(
+          ComponentStatus::WARN,
+          absl::StrCat(config.name(), " has frequency ", freq,
+                       " < min allowed ", config.max_frequency_allowed()),
+          status);
     }
   }
 

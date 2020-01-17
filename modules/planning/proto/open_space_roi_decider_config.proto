@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.planning;
 
-message OpenSpaceRoiDeciderConfig{
+message OpenSpaceRoiDeciderConfig {
   // roi scenario definitions
   enum RoiType {
     NOT_DEFINED = 0;
@@ -23,13 +23,14 @@ message OpenSpaceRoiDeciderConfig{
   // buffer distance from vehicle's edge to parking spot end line
   optional double parking_depth_buffer = 6 [default = 0.1];
   // min angle difference to stitch a new segment in roi representation
-  optional double roi_linesegment_min_angle = 7 [default = 0.3];
-  // roi_linesegment_length
-  optional double roi_linesegment_length = 8 [default = 1.0];
+  optional double roi_line_segment_min_angle = 7 [default = 0.3];
+  optional double roi_line_segment_length = 8 [default = 1.0];
   // relative distance threshold to filter out ignored obstacle
   optional double perception_obstacle_filtering_distance = 9 [default = 1000.0];
   // buffer distance for perception obstacle
   optional double perception_obstacle_buffer = 10;
   // tolerance limit for road_bound_width abnormal changes
-  optional double curb_heading_tangent_change_uppper_limit = 11 [default = 1.0];
+  optional double curb_heading_tangent_change_upper_limit = 11 [default = 1.0];
+  // end pose s distance to current vehicle
+  optional double end_pose_s_distance = 12 [default = 10.0];
 }

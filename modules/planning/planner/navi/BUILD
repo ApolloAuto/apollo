@@ -9,7 +9,6 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
-        "//external:gflags",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
         "//modules/common/time",
@@ -27,6 +26,7 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line",
         "//modules/planning/reference_line:qp_spline_reference_line_smoother",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
@@ -40,7 +40,7 @@ cc_test(
         "//cyber/common:log",
         "//modules/common/time",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

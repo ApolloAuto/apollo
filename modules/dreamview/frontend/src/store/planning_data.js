@@ -8,7 +8,7 @@ const MAX_SCENARIO_LENGTH = 5;
 const PATH_DISPLAY_NAME = SETTING.nameMapper;
 
 export default class PlanningData {
-  @observable planningTime = null;
+  @observable planningTimeSec = null;
 
   data = this.initData();
 
@@ -16,8 +16,8 @@ export default class PlanningData {
 
   scenarioHistory = [];
 
-  @action updatePlanningTime(newTime) {
-    this.planningTime = newTime;
+  @action updatePlanningTime(newTimeInSec) {
+    this.planningTimeSec = newTimeInSec;
   }
 
   initData() {
@@ -170,7 +170,7 @@ export default class PlanningData {
 
     if (trajectory) {
       graph.VehicleSpeed = this.extractDataPoints(
-        trajectory, 'timestampSec', 'speed', false /* loop back */, -this.planningTime);
+        trajectory, 'timestampSec', 'speed', false /* loop back */, -this.planningTimeSec);
     }
   }
 
@@ -178,7 +178,7 @@ export default class PlanningData {
     const graph = this.data.accelerationGraph;
     if (trajectory) {
       graph.acceleration = this.extractDataPoints(
-        trajectory, 'timestampSec', 'speedAcceleration', false /* loop back */, -this.planningTime);
+        trajectory, 'timestampSec', 'speedAcceleration', false /* loop back */, -this.planningTimeSec);
     }
   }
 
@@ -227,7 +227,7 @@ export default class PlanningData {
     }
   }
 
-  updateScenario(newScenario, newTime) {
+  updateScenario(newScenario, newTimeInSec) {
     if (!newScenario) {
       return;
     }
@@ -235,7 +235,7 @@ export default class PlanningData {
     const currScenario = this.scenarioHistory.length > 0
             ? this.scenarioHistory[this.scenarioHistory.length - 1] : {};
 
-    if (currScenario.time && newTime < currScenario.time) {
+    if (currScenario.timeSec && newTimeInSec < currScenario.timeSec) {
         // new data set, clean up existing one
         this.scenarioHistory = [];
     }
@@ -243,7 +243,7 @@ export default class PlanningData {
     if (currScenario.scenarioType !== newScenario.scenarioType ||
         currScenario.stageType !== newScenario.stageType) {
       this.scenarioHistory.push({
-        time: newTime,
+        timeSec: newTimeInSec,
         scenarioType: newScenario.scenarioType,
         stageType: newScenario.stageType,
       });
@@ -257,7 +257,7 @@ export default class PlanningData {
     const planningData = world.planningData;
     if (planningData) {
       const newPlanningTime = world.latency.planning.timestampSec;
-      if (this.planningTime === newPlanningTime) {
+      if (this.planningTimeSec === newPlanningTime) {
         return;
       }
 

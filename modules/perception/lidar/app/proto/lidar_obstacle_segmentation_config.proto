@@ -2,7 +2,7 @@ syntax = "proto2";
 package apollo.perception.lidar;
 
 message LidarObstacleSegmentationConfig {
-  optional string segmentor = 1 [default="DummySegmentation"];
-  optional bool use_map_manager = 2 [default=true];
-  optional bool use_object_filter_bank = 3 [default=true];
+  optional string segmentor = 1 [default = "DummySegmentation"];
+  optional bool use_map_manager = 2 [default = true];
+  optional bool use_object_filter_bank = 3 [default = true];
 }

@@ -16,8 +16,8 @@
 
 #include "modules/perception/lib/thread/thread_worker.h"
 
-#include <gtest/gtest.h>
 #include <thread>
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {

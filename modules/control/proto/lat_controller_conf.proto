@@ -17,10 +17,11 @@ message LatControllerConf {
   optional int32 mass_fr = 6;
   optional int32 mass_rl = 7;
   optional int32 mass_rr = 8;
-  optional double eps = 9;          // converge threshold for lqr solver
-  repeated double matrix_q = 10;    // matrix_q size = 4 + preview_window
-  repeated double reverse_matrix_q = 11;    // matrix_q size = 4 + preview_window for reverse gear
-  optional int32 cutoff_freq = 12;  // cutoff frequency
+  optional double eps = 9;        // converge threshold for lqr solver
+  repeated double matrix_q = 10;  // matrix_q size = 4 + preview_window
+  // matrix_q size = 4 + preview_window for reverse gear
+  repeated double reverse_matrix_q = 11;
+  optional int32 cutoff_freq = 12;              // cutoff frequency
   optional int32 mean_filter_window_size = 13;  // window size of mean filter
   // for a normal car, it should be in range[16, 18]
   optional int32 max_iteration = 14;  // maximum iteration for lqr solve

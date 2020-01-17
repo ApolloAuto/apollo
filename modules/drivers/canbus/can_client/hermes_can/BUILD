@@ -24,7 +24,7 @@ cc_test(
         "//cyber",
         "//modules/drivers/canbus/can_client/hermes_can:hermes_can_client",
         "//modules/drivers/canbus/common:canbus_common",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

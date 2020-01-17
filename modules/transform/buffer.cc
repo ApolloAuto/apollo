@@ -16,8 +16,6 @@
 
 #include "modules/transform/buffer.h"
 
-#include <thread>
-
 #include "absl/strings/str_cat.h"
 #include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"

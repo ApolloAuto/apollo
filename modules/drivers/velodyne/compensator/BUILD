@@ -16,6 +16,9 @@ cc_library(
     copts = ['-DMODULE_NAME=\\"velodyne\\"'],
     deps = [
         "//cyber",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/common/latency_recorder",
+        "//modules/common/time",
         "//modules/drivers/velodyne/compensator:compensator_lib",
     ],
 )

@@ -16,11 +16,11 @@
 
 #include "cyber/logger/logger_util.h"
 
-#include <gtest/gtest.h>
 #include <algorithm>
 #include <sstream>
 #include <string>
 #include <utility>
+#include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
 

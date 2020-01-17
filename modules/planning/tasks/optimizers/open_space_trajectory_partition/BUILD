@@ -23,7 +23,7 @@ cc_test(
     srcs = ["open_space_trajectory_partition_test.cc"],
     deps = [
         ":open_space_trajectory_partition",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

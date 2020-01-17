@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <stdio.h>
 #include <termios.h>
+#include <cstdio>
 #include <iostream>
 #include <memory>
 #include <thread>
@@ -143,10 +143,10 @@ class Teleop {
     Chassis::GearPosition gear = Chassis::GEAR_INVALID;
     PadMessage pad_msg;
     ControlCommand &control_command_ = control_command();
-    apollo::common::VehicleParam vehicle_params_;
-    vehicle_params_.CopyFrom(apollo::common::VehicleConfigHelper::Instance()
-                                 ->GetConfig()
-                                 .vehicle_param());
+    apollo::common::VehicleParam vehicle_params_ =
+        apollo::common::VehicleConfigHelper::Instance()
+            ->GetConfig()
+            .vehicle_param();
 
     // get the console in raw mode
     tcgetattr(kfd_, &cooked_);
@@ -391,8 +391,7 @@ class Teleop {
 
   void Send() {
     apollo::common::util::FillHeader("control", &control_command_);
-    control_command_writer_->Write(
-        std::make_shared<ControlCommand>(control_command_));
+    control_command_writer_->Write(control_command_);
     ADEBUG << "Control Command send OK:" << control_command_.ShortDebugString();
   }
 

@@ -27,14 +27,10 @@
 
 namespace apollo {
 namespace planning {
-// #define ADEBUG AINFO
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::VehicleConfigHelper;
 using apollo::common::math::Box2d;
-using apollo::common::math::CrossProd;
-using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneInfoConstPtr;
@@ -120,7 +116,14 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
 
     ADEBUG << "nearby_path: " << nearby_path.DebugString();
     ADEBUG << "found nearby_path";
-
+    if (!PlanningContext::Instance()
+             ->planning_status()
+             .park_and_go()
+             .has_adc_init_position()) {
+      const std::string msg = "ADC initial position is unavailable";
+      AERROR << msg;
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+    }
     SetOriginFromADC(frame, nearby_path);
     ADEBUG << "SetOrigin";
     SetParkAndGoEndPose(frame);
@@ -152,14 +155,13 @@ void OpenSpaceRoiDecider::SetOriginFromADC(Frame *const frame,
   // get ADC box
   const auto &park_and_go_status =
       PlanningContext::Instance()->planning_status().park_and_go();
+
   const double adc_init_x = park_and_go_status.adc_init_position().x();
   const double adc_init_y = park_and_go_status.adc_init_position().y();
   const double adc_init_heading = park_and_go_status.adc_init_heading();
   common::math::Vec2d adc_init_position = {adc_init_x, adc_init_y};
-  const auto &vehicle_config =
-      common::VehicleConfigHelper::Instance()->GetConfig();
-  const double adc_length = vehicle_config.vehicle_param().length();
-  const double adc_width = vehicle_config.vehicle_param().width();
+  const double adc_length = vehicle_params_.length();
+  const double adc_width = vehicle_params_.width();
   // ADC box
   Box2d adc_box(adc_init_position, adc_init_heading, adc_length, adc_width);
   // get vertices from ADC box
@@ -298,14 +300,10 @@ void OpenSpaceRoiDecider::SetPullOverSpotEndPose(Frame *const frame) {
 }
 
 void OpenSpaceRoiDecider::SetParkAndGoEndPose(Frame *const frame) {
-  const double kSTargetBuffer = 8.0;
-  const double kSpeedRatio = 0.3;  // after adjust speed is 30% of speed limit
+  const double kSTargetBuffer =
+      config_.open_space_roi_decider_config().end_pose_s_distance();
+  const double kSpeedRatio = 0.1;  // after adjust speed is 10% of speed limit
   // get vehicle current location
-  const ReferenceLineInfo &reference_line_info =
-      frame->reference_line_info().front();
-
-  ADEBUG << "reference_line ID: " << reference_line_info.Lanes().Id();
-  const auto &reference_line = reference_line_info.reference_line();
   // get vehicle s,l info
   auto park_and_go_status = PlanningContext::Instance()
                                 ->mutable_planning_status()
@@ -319,6 +317,22 @@ void OpenSpaceRoiDecider::SetParkAndGoEndPose(Frame *const frame) {
 
   const common::math::Vec2d adc_position = {adc_init_x, adc_init_y};
   common::SLPoint adc_position_sl;
+
+  // get nearest reference line
+  const auto &reference_line_list = frame->reference_line_info();
+  ADEBUG << reference_line_list.size();
+  const auto reference_line_info = std::min_element(
+      reference_line_list.begin(), reference_line_list.end(),
+      [&](const ReferenceLineInfo &ref_a, const ReferenceLineInfo &ref_b) {
+        common::SLPoint adc_position_sl_a;
+        common::SLPoint adc_position_sl_b;
+        ref_a.reference_line().XYToSL(adc_position, &adc_position_sl_a);
+        ref_b.reference_line().XYToSL(adc_position, &adc_position_sl_b);
+        return std::fabs(adc_position_sl_a.l()) <
+               std::fabs(adc_position_sl_b.l());
+      });
+
+  const auto &reference_line = reference_line_info->reference_line();
   reference_line.XYToSL(adc_position, &adc_position_sl);
 
   // target is at reference line
@@ -350,6 +364,10 @@ void OpenSpaceRoiDecider::SetParkAndGoEndPose(Frame *const frame) {
   end_pose->push_back(center.y());
   end_pose->push_back(target_theta);
 
+  ADEBUG << "ADC position (x): " << std::setprecision(9) << (*end_pose)[0];
+  ADEBUG << "ADC position (y): " << std::setprecision(9) << (*end_pose)[1];
+  ADEBUG << "reference_line ID: " << reference_line_info->Lanes().Id();
+
   // end pose velocity set to be speed limit
   double target_speed = reference_line.GetSpeedLimitFromS(target_s);
   end_pose->push_back(kSpeedRatio * target_speed);
@@ -380,7 +398,7 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
 
   // For the road boundary, add key points to left/right side boundary
   // separately. Iterate s_value to check key points at a step of
-  // roi_linesegment_length. Key points include: start_point, end_point, points
+  // roi_line_segment_length. Key points include: start_point, end_point, points
   // where path curvature is large, points near left/right road-curb corners
   while (check_point_s <= end_s) {
     hdmap::MapPathPoint check_point = nearby_path.GetSmoothPoint(check_point_s);
@@ -388,7 +406,7 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
     bool is_center_lane_heading_change =
         std::abs(common::math::NormalizeAngle(check_point_heading -
                                               last_check_point_heading)) >
-        config_.open_space_roi_decider_config().roi_linesegment_min_angle();
+        config_.open_space_roi_decider_config().roi_line_segment_min_angle();
     last_check_point_heading = check_point_heading;
 
     ADEBUG << "is is_center_lane_heading_change: "
@@ -415,7 +433,7 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
     check_point_s =
         start_s +
         index *
-            config_.open_space_roi_decider_config().roi_linesegment_length();
+            config_.open_space_roi_decider_config().roi_line_segment_length();
     check_point_s = check_point_s >= end_s ? end_s : check_point_s;
   }
 
@@ -456,12 +474,16 @@ void OpenSpaceRoiDecider::AddBoundaryKeyPoint(
   //                                \               /
   //                                 *-------------*
 
-  const double previous_distance_s =
-      std::min(config_.open_space_roi_decider_config().roi_linesegment_length(),
-               check_point_s - start_s);
-  const double next_distance_s =
-      std::min(config_.open_space_roi_decider_config().roi_linesegment_length(),
-               end_s - check_point_s);
+  // road width changes slightly at the turning point of a path
+  // TODO(SHU): 1. consider distortion introduced by curvy road; 2. use both
+  // round boundaries for single-track road; 3. longitudinal range may not be
+  // symmetric
+  const double previous_distance_s = std::min(
+      config_.open_space_roi_decider_config().roi_line_segment_length(),
+      check_point_s - start_s);
+  const double next_distance_s = std::min(
+      config_.open_space_roi_decider_config().roi_line_segment_length(),
+      end_s - check_point_s);
 
   hdmap::MapPathPoint current_check_point =
       nearby_path.GetSmoothPoint(check_point_s);
@@ -511,7 +533,7 @@ void OpenSpaceRoiDecider::AddBoundaryKeyPoint(
   // a key point.
   if (std::abs(current_curb_point_delta_theta) >
       config_.open_space_roi_decider_config()
-          .curb_heading_tangent_change_uppper_limit()) {
+          .curb_heading_tangent_change_upper_limit()) {
     double point_vec_cos =
         is_left_curb ? std::cos(current_check_point_heading + M_PI / 2.0)
                      : std::cos(current_check_point_heading - M_PI / 2.0);
@@ -920,10 +942,8 @@ bool OpenSpaceRoiDecider::GetParkAndGoBoundary(
   const double adc_init_y = park_and_go_status.adc_init_position().y();
   const double adc_init_heading = park_and_go_status.adc_init_heading();
   common::math::Vec2d adc_init_position = {adc_init_x, adc_init_y};
-  const auto &vehicle_config =
-      common::VehicleConfigHelper::Instance()->GetConfig();
-  const double adc_length = vehicle_config.vehicle_param().length();
-  const double adc_width = vehicle_config.vehicle_param().width();
+  const double adc_length = vehicle_params_.length();
+  const double adc_width = vehicle_params_.width();
   // ADC box
   Box2d adc_box(adc_init_position, adc_init_heading, adc_length, adc_width);
   // get vertices from ADC box

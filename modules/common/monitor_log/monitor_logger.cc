@@ -55,7 +55,7 @@ void MonitorLogger::Publish(const MonitorMessageItem::MessageSource &source,
 void MonitorLogger::DoPublish(MonitorMessage *message) const {
   RETURN_IF_NULL(monitor_msg_writer_);
   common::util::FillHeader("monitor", message);
-  monitor_msg_writer_->Write(std::make_shared<MonitorMessage>(*message));
+  monitor_msg_writer_->Write(*message);
 }
 
 }  // namespace monitor

@@ -20,7 +20,7 @@ cc_test(
     srcs = ["gem_vehicle_factory_test.cc"],
     deps = [
         ":gem_vehicle_factory",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -43,7 +43,7 @@ cc_test(
     srcs = ["gem_message_manager_test.cc"],
     deps = [
         ":gem_message_manager",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -71,7 +71,7 @@ cc_test(
     deps = [
         ":gem_controller",
         "//modules/common/util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

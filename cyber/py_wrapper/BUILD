@@ -37,7 +37,7 @@ cc_library(
     defines = ["PY_MAJOR_VERSION=3"],
     deps = [
         "//cyber:cyber_core",
-        "@python3",
+        "//third_party:python3",
     ],
 )
 
@@ -47,7 +47,7 @@ cc_test(
     deps = [
         ":py3_cyber",
         "//cyber/proto:unit_test_cc_proto",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -86,7 +86,7 @@ cc_library(
     deps = [
         "//cyber/message:py_message",
         "//cyber/record",
-        "@python3",
+        "//third_party:python3",
     ],
 )
 
@@ -97,8 +97,8 @@ cc_test(
         ":py3_record",
         "//cyber:cyber_core",
         "//cyber/proto:unit_test_cc_proto",
+        "@com_google_googletest//:gtest_main",
         "@fastrtps",
-        "@gtest//:main",
     ],
 )
 
@@ -136,8 +136,8 @@ cc_library(
     defines = ["PY_MAJOR_VERSION=3"],
     deps = [
         "//cyber:cyber_core",
+        "//third_party:python3",
         "@fastrtps",
-        "@python3",
     ],
 )
 
@@ -174,7 +174,7 @@ cc_library(
     defines = ["PY_MAJOR_VERSION=3"],
     deps = [
         "//cyber:cyber_core",
-        "@python3",
+        "//third_party:python3",
     ],
 )
 
@@ -213,7 +213,7 @@ cc_library(
     deps = [
         ":py3_cyber",
         "//cyber:cyber_core",
-        "@python3",
+        "//third_party:python3",
     ],
 )
 

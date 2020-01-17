@@ -16,9 +16,9 @@
 
 #include "cyber/transport/transport.h"
 
-#include <gtest/gtest.h>
 #include <memory>
 #include <typeinfo>
+#include "gtest/gtest.h"
 
 #include "cyber/init.h"
 #include "cyber/proto/unit_test.pb.h"

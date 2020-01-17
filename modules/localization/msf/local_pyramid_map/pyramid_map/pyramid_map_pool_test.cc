@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
+
 #include <boost/filesystem.hpp>
+
+#include "gtest/gtest.h"
 
 #include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map.h"
 #include "modules/localization/msf/local_pyramid_map/pyramid_map/pyramid_map_config.h"

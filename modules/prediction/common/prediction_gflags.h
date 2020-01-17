@@ -50,6 +50,7 @@ DECLARE_bool(img_show_semantic_map);
 DECLARE_double(junction_distance_threshold);
 DECLARE_bool(enable_all_junction);
 DECLARE_int32(caution_obs_max_nums);
+DECLARE_double(caution_distance_threshold);
 DECLARE_double(caution_search_distance_ahead);
 DECLARE_double(caution_search_distance_backward);
 DECLARE_double(caution_search_distance_backward_for_merge);

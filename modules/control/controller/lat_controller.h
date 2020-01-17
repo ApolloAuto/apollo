@@ -215,9 +215,11 @@ class LatController : public Controller {
   common::MeanFilter heading_error_filter_;
 
   // Lead/Lag controller
+  bool enable_leadlag_ = false;
   LeadlagController leadlag_controller_;
 
   // Mrac controller
+  bool enable_mrac_ = false;
   MracController mrac_controller_;
 
   // for compute the differential valute to estimate acceleration/lon_jerk
