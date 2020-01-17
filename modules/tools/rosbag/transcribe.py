@@ -25,7 +25,7 @@ import os
 import sys
 import time
 
-from cyber_py import cyber
+from cyber_py3 import cyber
 from common.message_manager import PbMessageManager
 import common.proto_utils as proto_utils
 

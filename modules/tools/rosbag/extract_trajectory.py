@@ -25,8 +25,8 @@ import shutil
 import sys
 import time
 
-from cyber_py import cyber
-from cyber_py import record
+from cyber_py3 import cyber
+from cyber_py3 import record
 from common.message_manager import PbMessageManager
 
 
