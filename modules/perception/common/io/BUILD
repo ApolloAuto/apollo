@@ -13,9 +13,9 @@ cc_library(
         "//modules/perception/base:omnidirectional_model",
         "//modules/perception/common/geometry:basic",
         "//third_party:boost",
+        "@com_github_jbeder_yaml_cpp//:yaml",
         "@com_google_absl//absl/strings",
         "@eigen",
-        "@yaml_cpp//:yaml",
     ],
 )
 

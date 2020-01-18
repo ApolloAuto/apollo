@@ -8,9 +8,9 @@ cc_library(
     hdrs = glob(["*.h"]),
     deps = [
         "//cyber",
+        "@com_github_jbeder_yaml_cpp//:yaml",
         "@eigen",
         "@pcl",
-        "@yaml_cpp//:yaml",
     ],
 )
 

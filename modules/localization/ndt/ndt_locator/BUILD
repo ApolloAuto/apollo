@@ -21,10 +21,10 @@ cc_library(
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map",
         "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map_pool",
+        "@com_github_jbeder_yaml_cpp//:yaml",
         "@com_google_glog//:glog",
         "@eigen",
         "@pcl",
-        "@yaml_cpp//:yaml",
     ],
 )
 
