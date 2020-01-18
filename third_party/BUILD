@@ -2,6 +2,13 @@ package(default_visibility = ["//visibility:public"])
 
 # Libs provided by the system.
 
+cc_library(
+    name = "adolc",
+    deps = [
+        "@adolc",
+    ],
+)
+
 # libboost-dev
 # TODO(xiaoxq): This is not a recommended way to introduce boost. Instead, we'd
 # better leverage things like https://github.com/nelhage/rules_boost
