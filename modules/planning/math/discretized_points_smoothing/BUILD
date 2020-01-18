@@ -26,7 +26,7 @@ cc_library(
     ],
     deps = [
         "//cyber/common:log",
-        "@adolc",
+        "//third_party:adolc",
         "//third_party:ipopt",
     ],
 )
@@ -57,7 +57,7 @@ cc_library(
     ],
     deps = [
         "//cyber/common:log",
-        "@adolc",
+        "//third_party:adolc",
         "//third_party:ipopt",
     ],
 )
