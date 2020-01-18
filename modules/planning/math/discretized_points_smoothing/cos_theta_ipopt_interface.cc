@@ -16,8 +16,9 @@
 
 #include "modules/planning/math/discretized_points_smoothing/cos_theta_ipopt_interface.h"
 
-#include "IpIpoptApplication.hpp"
-#include "IpSolveStatistics.hpp"
+#include <coin/IpIpoptApplication.hpp>
+#include <coin/IpSolveStatistics.hpp>
+
 #include "cyber/common/log.h"
 
 namespace apollo {

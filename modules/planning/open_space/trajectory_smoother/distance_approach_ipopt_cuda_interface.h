@@ -19,11 +19,11 @@
  */
 
 #pragma once
+#include <coin/IpTNLP.hpp>
+#include <coin/IpTypes.hpp>
 #include <omp.h>
 #include <vector>
 #include "Eigen/Dense"
-#include "IpTNLP.hpp"
-#include "IpTypes.hpp"
 
 #include "adolc/adolc.h"
 #include "adolc/adolc_openmp.h"
