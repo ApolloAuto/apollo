@@ -20,9 +20,10 @@
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_osqp_interface.h"
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_ipopt_qp_interface.h"
 
-#include "IpIpoptApplication.hpp"
-#include "IpSolveStatistics.hpp"
 #include "cyber/common/file.h"
+#include <coin/IpIpoptApplication.hpp>
+#include <coin/IpSolveStatistics.hpp>
+
 #include "gtest/gtest.h"
 
 #include "modules/planning/common/planning_gflags.h"

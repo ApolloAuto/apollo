@@ -12,6 +12,13 @@ cc_library(
     deps = ["@boost"],
 )
 
+cc_library(
+    name = "ipopt",
+    deps = [
+        "@ipopt",
+    ],
+)
+
 # libncurses5-dev
 cc_library(
     name = "ncurses",

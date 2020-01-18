@@ -155,7 +155,7 @@ new_local_repository(
 new_local_repository(
     name = "ipopt",
     build_file = "third_party/ipopt.BUILD",
-    path = "/usr/local/ipopt/include/coin",
+    path = "/usr/local/ipopt/include",
 )
 
 # ADOL-C
