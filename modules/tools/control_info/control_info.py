@@ -30,8 +30,8 @@ import numpy
 import tkinter.filedialog
 from matplotlib import patches
 from matplotlib import lines
-from cyber_py3 import cyber
 
+from cyber_py3 import cyber
 from modules.localization.proto import localization_pb2
 from modules.canbus.proto import chassis_pb2
 from modules.planning.proto import planning_pb2
