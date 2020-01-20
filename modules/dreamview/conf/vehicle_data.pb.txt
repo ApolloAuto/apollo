@@ -110,3 +110,7 @@ data_files {
   source_path: "teleop_conf/network/initial_routes_and_filters.pb.txt"
   dest_path: "/apollo/modules/teleop/network/conf/initial_routes_and_filters.pb.txt"
 }
+data_files {
+  source_path: "transform_conf/static_transform_conf.pb.txt"
+  dest_path: "/apollo/modules/transform/conf/static_transform_conf.pb.txt"
+}
