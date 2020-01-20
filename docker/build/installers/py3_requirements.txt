@@ -4,7 +4,6 @@ supervisor
 # Google infras.
 absl-py
 glog
-grpcio-tools == 1.2.0
 protobuf
 python-gflags
 
