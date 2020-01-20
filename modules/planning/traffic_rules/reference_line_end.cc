@@ -36,6 +36,11 @@ ReferenceLineEnd::ReferenceLineEnd(const TrafficRuleConfig& config)
 Status ReferenceLineEnd::ApplyRule(
     Frame* frame, ReferenceLineInfo* const reference_line_info) {
   const auto& reference_line = reference_line_info->reference_line();
+
+  ADEBUG << "ReferenceLineEnd length[" << reference_line.Length() << "]";
+  for (const auto& segment : reference_line_info->Lanes()) {
+    ADEBUG << "   lane[" << segment.lane->lane().id().id() << "]";
+  }
   // check
   double remain_s =
       reference_line.Length() - reference_line_info->AdcSlBoundary().end_s();
