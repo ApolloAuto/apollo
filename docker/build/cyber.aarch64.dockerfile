@@ -22,6 +22,8 @@ RUN apt update -y && \
     bc \
     gdb \
     uuid-dev \
+    python \
+    python-dev \
     python3 \
     python3-dev \
     libasio-dev \
@@ -123,6 +125,7 @@ RUN ln -s /usr/lib/aarch64-linux-gnu/libboost_thread.so.1.54.0 /usr/lib/aarch64-
 RUN ln -s /usr/lib/aarch64-linux-gnu/libboost_wserialization.so.1.65.1 /usr/lib/aarch64-linux-gnu/libboost_wserialization.so
 RUN ln -s /usr/lib/aarch64-linux-gnu/libboost_chrono.so.1.54.0 /usr/lib/aarch64-linux-gnu/libboost_chrono.so
 RUN ln -s /usr/lib/libgl2ps.so.0 /usr/lib/libgl2ps.so
+RUN ln -s /usr/lib/python2.7/dist-packages/vtk/libvtkRenderingPythonTkWidgets.aarch64-linux-gnu.so /usr/lib/aarch64-linux-gnu/libvtkRenderingPythonTkWidgets.so
 
 RUN bash /tmp/installers/install_fast-rtps.sh
 RUN bash /tmp/installers/install_pcl.sh ${INSTALL_MODE}

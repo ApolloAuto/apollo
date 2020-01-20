@@ -24,11 +24,16 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 apt update -y && apt install -y \
     libgeos-dev \
     software-properties-common \
+    python-pip \
+    python-psutil \
+    python-scipy \
+    python-matplotlib \
     python3-pip \
     python3-psutil \
     python3-scipy \
     python3-matplotlib
 
+pip2 install --no-cache-dir -r py27_requirements.txt
 pip3 install --no-cache-dir -r py3_requirements.txt
 
 # Clean up.

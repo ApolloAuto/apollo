@@ -21,6 +21,8 @@ RUN apt update -y && \
     bc \
     gdb \
     uuid-dev \
+    python \
+    python-dev \
     python3 \
     python3-dev \
     qt5-default \
@@ -111,6 +113,7 @@ RUN ln -s /usr/lib/x86_64-linux-gnu/libboost_system.so.1.54.0 /usr/lib/x86_64-li
 RUN ln -s /usr/lib/x86_64-linux-gnu/libboost_thread.so.1.54.0 /usr/lib/x86_64-linux-gnu/libboost_thread.so
 RUN ln -s /usr/lib/x86_64-linux-gnu/libboost_wserialization.so.1.65.1 /usr/lib/x86_64-linux-gnu/libboost_wserialization.so
 RUN ln -s /usr/lib/x86_64-linux-gnu/libboost_chrono.so.1.54.0 /usr/lib/x86_64-linux-gnu/libboost_chrono.so
+RUN ln -s /usr/lib/python2.7/dist-packages/vtk/libvtkRenderingPythonTkWidgets.x86_64-linux-gnu.so /usr/lib/x86_64-linux-gnu/libvtkRenderingPythonTkWidgets.so
 
 RUN bash /tmp/installers/install_fast-rtps.sh
 RUN bash /tmp/installers/install_pcl.sh
