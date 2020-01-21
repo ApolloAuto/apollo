@@ -208,10 +208,11 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   Status status = VehicleStateProvider::Instance()->Update(
       *local_view_.localization_estimate, *local_view_.chassis);
 
-  VehicleState vehicle_state =
-      VehicleStateProvider::Instance()->vehicle_state();
+  const auto& vehicle_state = VehicleStateProvider::Instance()->vehicle_state();
   const double vehicle_state_timestamp = vehicle_state.timestamp();
-  DCHECK_GE(start_timestamp, vehicle_state_timestamp);
+  DCHECK_GE(start_timestamp, vehicle_state_timestamp)
+      << "start_time_stamp is behind vehicle_state_timestamp by "
+      << vehicle_state_timestamp - start_timestamp << " secs";
 
   if (!status.ok() || !util::IsVehicleStateValid(vehicle_state)) {
     std::string msg(
@@ -230,10 +231,13 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     return;
   }
 
-  if (start_timestamp - vehicle_state_timestamp <
-      FLAGS_message_latency_threshold) {
-    vehicle_state = AlignTimeStamp(vehicle_state, start_timestamp);
-  }
+  /*
+  TODO(all: verify and find the root cause)
+    if (start_timestamp - vehicle_state_timestamp <
+        FLAGS_message_latency_threshold) {
+      vehicle_state = AlignTimeStamp(vehicle_state, start_timestamp);
+    }
+  */
 
   if (util::IsDifferentRouting(last_routing_, *local_view_.routing)) {
     last_routing_ = *local_view_.routing;
@@ -1097,6 +1101,8 @@ void OnLanePlanning::AddPublishedSpeed(const ADCTrajectory& trajectory_pb,
   (*sliding_line_properties)["showLine"] = "true";
 }
 
+/*
+// TODO(QiL): comment this out and double verify if this is really needed.
 VehicleState OnLanePlanning::AlignTimeStamp(const VehicleState& vehicle_state,
                                             const double curr_timestamp) const {
   // TODO(Jinyun): use the same method in trajectory stitching
@@ -1110,7 +1116,7 @@ VehicleState OnLanePlanning::AlignTimeStamp(const VehicleState& vehicle_state,
   aligned_vehicle_state.set_timestamp(curr_timestamp);
   return aligned_vehicle_state;
 }
-
+*/
 void OnLanePlanning::AddPublishedAcceleration(
     const ADCTrajectory& trajectory_pb, planning_internal::Debug* debug) {
   // if open space info provider success run
