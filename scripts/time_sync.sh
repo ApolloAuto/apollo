@@ -20,10 +20,24 @@ sudo apt-get install -y ntpdate
 
 grep -q ntpdate /etc/crontab
 
+case $1 in
+  cn)
+    REGIN="cn"
+    ;;
+  us)
+    REGIN="us"
+    ;;
+  *)
+    REGIN="us"
+    ;;
+esac
+
+echo "Regin is set as: ${REGIN}"
+
 if [ $? -eq 1 ]; then
-    echo "*/1 * * * * root ntpdate -v -u us.pool.ntp.org" | sudo tee -a /etc/crontab
+      echo "*/1 * * * * root ntpdate -v -u ${REGIN}.pool.ntp.org" | sudo tee -a /etc/crontab
 fi
 
 # ntpdate running log at /var/log/syslog
 
-sudo ntpdate -v -u us.pool.ntp.org
+sudo ntpdate -v -u ${REGIN}.pool.ntp.org
