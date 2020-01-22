@@ -20,7 +20,7 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-git clone --recursive --single-branch --branch apollo --depth 1 https://github.com/ApolloAuto/pytorch.git 
+git clone --recursive --single-branch --branch apollo --depth 1 https://github.com/ApolloAuto/pytorch.git
 
 pushd pytorch
 
