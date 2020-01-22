@@ -20,13 +20,13 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-git clone --recursive --single-branch --branch apollo --depth 1 git@github.com:ApolloAuto/pytorch.git
+git clone --recursive --single-branch --branch apollo --depth 1 https://github.com/ApolloAuto/pytorch.git 
 
 pushd pytorch
 
   export TORCH_CUDA_ARCH_LIST="3.5;5.0;5.2;6.1;7.0;7.5"
-  pip install typing
-  python setup.py install
+  pip3 install typing
+  python3 setup.py install
 
   mkdir /usr/local/apollo/libtorch
   cp -r build/lib /usr/local/apollo/libtorch/
