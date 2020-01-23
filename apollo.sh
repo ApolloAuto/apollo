@@ -282,6 +282,9 @@ function build_py_proto() {
   find modules/ cyber/ -name "*.proto" \
       | grep -v node_modules \
       | xargs protoc --python_out=py_proto
+  find modules/ cyber/ -name "*_service.proto" \
+      | grep -v node_modules \
+      | xargs python -m grpc_tools.protoc --proto_path=. --python_out=py_proto --grpc_python_out=py_proto
   find py_proto/* -type d -exec touch "{}/__init__.py" \;
 }
 
