@@ -168,13 +168,38 @@ c 按G1，挂前进档，按几次W，看车辆是否前进，按几次S看车�
 
 #### 提示警告Nvidia GPU Driver未安装 
 
-下载并修改apollo-kernel官网上的脚本[install-nvidia.sh](https://github.com/ApolloAuto/apollo-kernel/blob/master/linux/install-nvidia.sh)，将`NV_FILE="NVIDIA-Linux-x86_64-375.39.run"`和`NV_URL="http://us.download.nvidia.com/XFree86/Linux-x86_64/375.39/${NV_FILE}"`中的显卡驱动由375.39改为430.50，将`NEED_TO_COMPILE_NV_KO=0`中的0改为1，用`sudo`执行这个脚本完成安装。然后在终端中依次输入以下三条命令：
+下载apollo-kernel官网上的脚本[install-nvidia.sh](https://github.com/ApolloAuto/apollo-kernel/blob/master/linux/install-nvidia.sh)至当前用户的`home`目录下，输入以下命令完成显卡驱动内核模块的安装：
+
 ```
-sudo add-apt-repository ppa:graphics-drivers/ppa
-sudo apt-get update
-sudo apt-get install nvidia-driver-430
+cd ~    
+sudo apt install make    
+sudo bash install-nvidia.sh    
 ```
-等待命令执行完成后重启工控机，在终端中输入`nvidia-smi`，能看到显卡的信息且最下面没有出现No running processes found的相关字样，输入`nvidia-settings`能调出显卡的配置界面，系统设置中可以修改屏幕的分辨率且系统信息中可以查看到独立显卡的信息时则表示显卡驱动安装成功。 
+
+完成显卡驱动内核模块的安装后，在当前用户的`home`目录下会出现一个名为`NVIDIA-Linux-x86_64-430.50.run`的文件，执行以下命令完成显卡驱动用户库的安装：
+
+```
+cd ~    
+sudo bash ./NVIDIA-Linux-x86_64-430.50.run --no-x-check -a -s --no-kernel-module    
+```
+
+完成显卡驱动用户库的安装后，重新启动工控机。    
+在终端中输入以下命令来检查显卡驱动内核模块是否安装成功：
+
+```
+cat /proc/driver/nvidia/version
+```
+
+若输出的内容中包含”430.50”字样，则表示显卡驱动内核模块安装成功；若不是，请重新安装显卡驱动内核模块。    
+在终端中输入以下命令来检查显卡驱动用户库是否安装成功：
+
+```
+sudo dpkg --list | grep nvidia*
+```
+
+若输出的内容中显示显卡的用户库的版本是430.50的，则表示显卡驱动用户库安装成功；若不是，请重新安装显卡驱动用户库。    
+
+在终端中输入`nvidia-smi`，能看到显卡的信息且最下面没有出现No running processes found的相关字样，输入`nvidia-settings`能调出显卡的配置界面，则表示显卡驱动安装成功。 
  
 #### 星网宇达M2 GPS调试 
  
