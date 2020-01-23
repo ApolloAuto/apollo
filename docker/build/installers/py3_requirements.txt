@@ -1,20 +1,20 @@
 # system utils
 supervisor
 
-# Google infras.
+# Google infras
 absl-py
 glog
 grpcio-tools
 protobuf
 python-gflags
 
-# Web.
+# Web
 flask
 flask-cors
 requests
 simplejson
 
-# ROS env.
+# ROS env
 PyYAML
 
 # Python tools
