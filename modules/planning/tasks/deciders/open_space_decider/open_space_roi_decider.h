@@ -86,6 +86,19 @@ class OpenSpaceRoiDecider : public Decider {
       std::vector<double> *left_lane_road_width,
       std::vector<double> *right_lane_road_width);
 
+  // @brief Get the Road Boundary From Map object
+  void GetRoadBoundaryFromMap(
+      const hdmap::Path &nearby_path, const double center_line_s,
+      const common::math::Vec2d &origin_point, const double origin_heading,
+      std::vector<common::math::Vec2d> *left_lane_boundary,
+      std::vector<common::math::Vec2d> *right_lane_boundary,
+      std::vector<common::math::Vec2d> *center_lane_boundary_left,
+      std::vector<common::math::Vec2d> *center_lane_boundary_right,
+      std::vector<double> *center_lane_s_left,
+      std::vector<double> *center_lane_s_right,
+      std::vector<double> *left_lane_road_width,
+      std::vector<double> *right_lane_road_width);
+
   // @brief Check single-side curb and add key points to the boundary
   void AddBoundaryKeyPoint(
       const hdmap::Path &nearby_path, const double check_point_s,
