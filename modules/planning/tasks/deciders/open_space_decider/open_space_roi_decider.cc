@@ -451,11 +451,11 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
 
 void OpenSpaceRoiDecider::GetRoadBoundaryFromMap(
     const hdmap::Path &nearby_path, const double center_line_s,
-    const common::math::Vec2d &origin_point, const double origin_heading,
-    std::vector<common::math::Vec2d> *left_lane_boundary,
-    std::vector<common::math::Vec2d> *right_lane_boundary,
-    std::vector<common::math::Vec2d> *center_lane_boundary_left,
-    std::vector<common::math::Vec2d> *center_lane_boundary_right,
+    const Vec2d &origin_point, const double origin_heading,
+    std::vector<Vec2d> *left_lane_boundary,
+    std::vector<Vec2d> *right_lane_boundary,
+    std::vector<Vec2d> *center_lane_boundary_left,
+    std::vector<Vec2d> *center_lane_boundary_right,
     std::vector<double> *center_lane_s_left,
     std::vector<double> *center_lane_s_right,
     std::vector<double> *left_lane_road_width,
@@ -491,14 +491,23 @@ void OpenSpaceRoiDecider::GetRoadBoundaryFromMap(
     auto &left_boundary = (*road_boundaries.at(0)).left_boundary;
 
     // save road boundaries
-    for (size_t i = 0; i < right_boundary.line_points.size(); ++i) {
+    for (size_t i = 0; i < left_boundary.line_points.size(); i++) {
+      left_lane_boundary->push_back(Vec2d(left_boundary.line_points[i].x(),
+                                          left_boundary.line_points[i].y()));
+    }
+    if (left_boundary.line_points.size()) {
+      auto unique_end =
+          std::unique(left_lane_boundary->begin(), left_lane_boundary->end());
+      left_lane_boundary->erase(unique_end, left_lane_boundary->end());
+    }
+    for (size_t i = 0; i < right_boundary.line_points.size(); i++) {
       right_lane_boundary->push_back(Vec2d(right_boundary.line_points[i].x(),
                                            right_boundary.line_points[i].y()));
     }
-
-    for (size_t i = 0; i < left_boundary.line_points.size(); ++i) {
-      left_lane_boundary->push_back(Vec2d(left_boundary.line_points[i].x(),
-                                          left_boundary.line_points[i].y()));
+    if (right_boundary.line_points.size()) {
+      auto unique_end =
+          std::unique(right_lane_boundary->begin(), right_lane_boundary->end());
+      right_lane_boundary->erase(unique_end, right_lane_boundary->end());
     }
 
     center_lane_boundary_right->push_back(check_point);
@@ -523,10 +532,16 @@ void OpenSpaceRoiDecider::GetRoadBoundaryFromMap(
   for (size_t i = 0; i < left_point_size; i++) {
     left_lane_boundary->at(i) -= origin_point;
     left_lane_boundary->at(i).SelfRotate(-origin_heading);
+    AERROR << "left_road_boundary: [" << std::setprecision(9)
+           << left_lane_boundary->at(i).x() << ", "
+           << left_lane_boundary->at(i).y() << "]";
   }
   for (size_t i = 0; i < right_point_size; i++) {
     right_lane_boundary->at(i) -= origin_point;
     right_lane_boundary->at(i).SelfRotate(-origin_heading);
+    AERROR << "right_road_boundary: [" << std::setprecision(9)
+           << right_lane_boundary->at(i).x() << ", "
+           << right_lane_boundary->at(i).y() << "]";
   }
 }
 
@@ -1060,17 +1075,19 @@ bool OpenSpaceRoiDecider::GetParkAndGoBoundary(
   std::vector<double> left_lane_road_width;
   std::vector<double> right_lane_road_width;
 
-  // GetRoadBoundary(nearby_path, center_line_s, origin_point, origin_heading,
-  //                 &left_lane_boundary, &right_lane_boundary,
-  //                 &center_lane_boundary_left, &center_lane_boundary_right,
-  //                 &center_lane_s_left, &center_lane_s_right,
-  //                 &left_lane_road_width, &right_lane_road_width);
-
-  GetRoadBoundaryFromMap(
-      nearby_path, center_line_s, origin_point, origin_heading,
-      &left_lane_boundary, &right_lane_boundary, &center_lane_boundary_left,
-      &center_lane_boundary_right, &center_lane_s_left, &center_lane_s_right,
-      &left_lane_road_width, &right_lane_road_width);
+  if (FLAGS_use_road_boundary_from_map) {
+    GetRoadBoundaryFromMap(
+        nearby_path, center_line_s, origin_point, origin_heading,
+        &left_lane_boundary, &right_lane_boundary, &center_lane_boundary_left,
+        &center_lane_boundary_right, &center_lane_s_left, &center_lane_s_right,
+        &left_lane_road_width, &right_lane_road_width);
+  } else {
+    GetRoadBoundary(nearby_path, center_line_s, origin_point, origin_heading,
+                    &left_lane_boundary, &right_lane_boundary,
+                    &center_lane_boundary_left, &center_lane_boundary_right,
+                    &center_lane_s_left, &center_lane_s_right,
+                    &left_lane_road_width, &right_lane_road_width);
+  }
 
   // Load boundary as line segments in counter-clockwise order
   std::reverse(left_lane_boundary.begin(), left_lane_boundary.end());
@@ -1095,10 +1112,16 @@ bool OpenSpaceRoiDecider::GetParkAndGoBoundary(
     roi_parking_boundary->push_back(segment);
   }
 
-  // // Fuse line segments into convex contraints
-  if (!FuseLineSegments(roi_parking_boundary)) {
-    return false;
-  }
+  AERROR << "roi_parking_boundary size: [" << roi_parking_boundary->size()
+         << "]";
+
+  // Fuse line segments into convex contraints
+  // if (!FuseLineSegments(roi_parking_boundary)) {
+  //   return false;
+  // }
+
+  AERROR << "roi_parking_boundary size: [" << roi_parking_boundary->size()
+         << "]";
   // Get xy boundary
   auto xminmax = std::minmax_element(
       boundary_points.begin(), boundary_points.end(),
