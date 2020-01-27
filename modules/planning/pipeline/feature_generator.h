@@ -27,7 +27,6 @@ namespace planning {
 
 class FeatureGenerator {
  public:
-
   void Init();
   void Close();
 
