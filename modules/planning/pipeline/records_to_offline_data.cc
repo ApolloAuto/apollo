@@ -51,7 +51,7 @@ void GenerateDataForLearning() {
   feature_generator.Close();
 }
 
-}  // namespace prediction
+}  // namespace planning
 }  // namespace apollo
 
 int main(int argc, char* argv[]) {

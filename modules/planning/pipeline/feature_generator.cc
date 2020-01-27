@@ -32,20 +32,16 @@ using apollo::cyber::record::RecordReader;
 using apollo::localization::LocalizationEstimate;
 
 void FeatureGenerator::Init() {
-
 }
 
 void FeatureGenerator::Close() {
-
 }
 
 void FeatureGenerator::OnLocalization(
   const apollo::localization::LocalizationEstimate& le) {
-
 }
 
 void FeatureGenerator::OnChassis(const apollo::canbus::Chassis& chassis) {
-
 }
 
 void FeatureGenerator::ProcessOfflineData(const std::string& record_filename) {
