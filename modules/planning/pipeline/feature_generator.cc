@@ -39,9 +39,23 @@ void FeatureGenerator::Close() {
 
 void FeatureGenerator::OnLocalization(
   const apollo::localization::LocalizationEstimate& le) {
+    auto features = instance_.mutable_localization_feature();
+    const auto& pose = le.pose();
+    features->mutable_position()->CopyFrom(pose.position());
+    features->set_heading(pose.heading());
+    features->mutable_linear_velocity()->CopyFrom(pose.linear_velocity());
+    features->mutable_linear_acceleration()->CopyFrom(
+        pose.linear_acceleration());
+    features->mutable_angular_velocity()->CopyFrom(pose.angular_velocity());
 }
 
 void FeatureGenerator::OnChassis(const apollo::canbus::Chassis& chassis) {
+  auto features = instance_.mutable_chassis_feature();
+  features->set_speed_mps(chassis.speed_mps());
+  features->set_throttle_percentage(chassis.throttle_percentage());
+  features->set_brake_percentage(chassis.brake_percentage());
+  features->set_steering_percentage(chassis.steering_percentage());
+  features->set_gear_location(chassis.gear_location());
 }
 
 void FeatureGenerator::ProcessOfflineData(const std::string& record_filename) {
