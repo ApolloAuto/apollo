@@ -488,32 +488,32 @@ void OpenSpaceRoiDecider::GetRoadBoundaryFromMap(
     check_point_xy.set_y(check_point.y());
     hdmap_->GetRoadBoundaries(check_point_xy, current_road_width,
                               &road_boundaries, &junctions);
-    hdmap::LineBoundary right_boundary;
-    hdmap::LineBoundary left_boundary;
+
+    std::vector<common::PointENU> *right_boundary;
+    std::vector<common::PointENU> *left_boundary;
     if (check_point_s < center_line_s) {
-      right_boundary = (*road_boundaries.at(0)).left_boundary;
-      left_boundary = (*road_boundaries.at(0)).right_boundary;
+      right_boundary = &(*road_boundaries.at(0)).left_boundary.line_points;
+      left_boundary = &(*road_boundaries.at(0)).right_boundary.line_points;
     } else {
-      right_boundary = (*road_boundaries.at(0)).right_boundary;
-      left_boundary = (*road_boundaries.at(0)).left_boundary;
+      right_boundary = &(*road_boundaries.at(0)).right_boundary.line_points;
+      left_boundary = &(*road_boundaries.at(0)).left_boundary.line_points;
     }
-
     // save road boundaries
-    for (size_t i = 0; i < left_boundary.line_points.size(); i++) {
-      left_lane_boundary->push_back(Vec2d(left_boundary.line_points[i].x(),
-                                          left_boundary.line_points[i].y()));
+    for (size_t i = 0; i < left_boundary->size(); i++) {
+      left_lane_boundary->emplace_back(
+          Vec2d(left_boundary->at(i).x(), left_boundary->at(i).y()));
     }
-    for (size_t i = 0; i < right_boundary.line_points.size(); i++) {
-      right_lane_boundary->push_back(Vec2d(right_boundary.line_points[i].x(),
-                                           right_boundary.line_points[i].y()));
+    for (size_t i = 0; i < right_boundary->size(); i++) {
+      right_lane_boundary->emplace_back(
+          Vec2d(right_boundary->at(i).x(), right_boundary->at(i).y()));
     }
 
-    center_lane_boundary_right->push_back(check_point);
-    center_lane_boundary_left->push_back(check_point);
-    center_lane_s_left->push_back(check_point_s);
-    center_lane_s_right->push_back(check_point_s);
-    left_lane_road_width->push_back(left_road_width);
-    right_lane_road_width->push_back(right_road_width);
+    center_lane_boundary_right->emplace_back(check_point);
+    center_lane_boundary_left->emplace_back(check_point);
+    center_lane_s_left->emplace_back(check_point_s);
+    center_lane_s_right->emplace_back(check_point_s);
+    left_lane_road_width->emplace_back(left_road_width);
+    right_lane_road_width->emplace_back(right_road_width);
 
     check_point_s = check_point_s + config_.open_space_roi_decider_config()
                                         .roi_line_segment_length_from_map();
