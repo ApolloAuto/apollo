@@ -16,6 +16,7 @@
 #pragma once
 
 #include <string>
+#include <list>
 
 #include "cyber/common/file.h"
 #include "modules/canbus/proto/chassis.pb.h"
@@ -35,8 +36,18 @@ class FeatureGenerator {
  private:
   void OnLocalization(const apollo::localization::LocalizationEstimate& le);
   void OnChassis(const apollo::canbus::Chassis& chassis);
+  void WriteOutInstances(const Instances& instances,
+                         const std::string& file_name);
+  void GenerateTrajectoryLabel(
+      const std::list<apollo::localization::LocalizationEstimate>&
+          localization_for_label,
+      Instance* instance);
 
-  Instance instance_;
+  Instance *instance_ = nullptr;  // not owned
+  Instances instances_;
+  int instance_file_index_ = 0;
+  std::list<apollo::localization::LocalizationEstimate>
+      localization_for_label_;
 };
 
 }  // namespace planning
