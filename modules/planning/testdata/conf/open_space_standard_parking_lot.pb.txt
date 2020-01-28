@@ -2,7 +2,8 @@ delta_t : 0.5
 is_near_destination_threshold : 0.05
 
 roi_config : {
-  roi_longitudinal_range : 15.0
+  roi_longitudinal_range_start : 15.0
+  roi_longitudinal_range_end : 15.0
   parking_start_range : 12.0
   parking_inwards : false
 }

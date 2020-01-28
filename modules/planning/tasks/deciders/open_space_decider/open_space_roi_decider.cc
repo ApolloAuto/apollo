@@ -386,10 +386,10 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
     std::vector<double> *right_lane_road_width) {
   double start_s =
       center_line_s -
-      config_.open_space_roi_decider_config().roi_longitudinal_range();
+      config_.open_space_roi_decider_config().roi_longitudinal_range_start();
   double end_s =
       center_line_s +
-      config_.open_space_roi_decider_config().roi_longitudinal_range();
+      config_.open_space_roi_decider_config().roi_longitudinal_range_end();
 
   hdmap::MapPathPoint start_point = nearby_path.GetSmoothPoint(start_s);
   double last_check_point_heading = start_point.heading();
