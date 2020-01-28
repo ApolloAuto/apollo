@@ -461,13 +461,14 @@ void OpenSpaceRoiDecider::GetRoadBoundaryFromMap(
     std::vector<double> *left_lane_road_width,
     std::vector<double> *right_lane_road_width) {
   // Longitudinal range can be asymmetric.
-  const double kLongitudinalStartRange = 10.0;
-  const double kLongitudinalEndRange = 20.0;
-  double start_s = center_line_s - kLongitudinalStartRange;
-  double end_s = center_line_s + kLongitudinalEndRange;
+  double start_s =
+      center_line_s -
+      config_.open_space_roi_decider_config().roi_longitudinal_range_start();
+  double end_s =
+      center_line_s +
+      config_.open_space_roi_decider_config().roi_longitudinal_range_end();
   hdmap::MapPathPoint start_point = nearby_path.GetSmoothPoint(start_s);
 
-  double index = 0.0;
   double check_point_s = start_s;
 
   while (check_point_s <= end_s) {
@@ -514,12 +515,8 @@ void OpenSpaceRoiDecider::GetRoadBoundaryFromMap(
     left_lane_road_width->push_back(left_road_width);
     right_lane_road_width->push_back(right_road_width);
 
-    if (check_point_s == end_s) {
-      break;
-    }
-    index += 10.0;
-    check_point_s = check_point_s + index;
-    check_point_s = check_point_s > end_s ? end_s : check_point_s;
+    check_point_s = check_point_s + config_.open_space_roi_decider_config()
+                                        .roi_line_segment_length_from_map();
   }
 
   size_t left_point_size = left_lane_boundary->size();
