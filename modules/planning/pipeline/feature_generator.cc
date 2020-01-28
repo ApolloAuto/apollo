@@ -42,7 +42,7 @@ DEFINE_int32(localization_move_window_step, 5,
              "number of localization msgs to skip after generating one label "
              "trajectory point.");
 
-DEFINE_bool(enable_binary_instance, false,
+DEFINE_bool(enable_binary_instance, true,
             "True to generate protobuf binary data file.");
 
 
