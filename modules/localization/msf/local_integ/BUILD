@@ -37,7 +37,7 @@ cc_library(
         "//modules/localization/proto:sins_pva_proto",
         "//third_party:boost",
         "@com_github_gflags_gflags//:gflags",
-        "@com_github_jbeder_yaml_cpp//:yaml",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_glog//:glog",
         "@eigen",
         "@local_integ",

@@ -52,7 +52,7 @@ cc_library(
         "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/lib/utils",
         "@com_github_gflags_gflags//:gflags",
-        "@com_github_jbeder_yaml_cpp//:yaml",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
     ],
 )
 
@@ -94,7 +94,7 @@ cc_library(
         "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/lib/utils",
         "@com_github_gflags_gflags//:gflags",
-        "@com_github_jbeder_yaml_cpp//:yaml",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
     ],
 )
 

@@ -39,7 +39,7 @@ cc_library(
         "//modules/common/util:message_util",
         "//modules/transform/proto:static_transform_conf_proto",
         "//modules/transform/proto:transform_proto",
-        "@com_github_jbeder_yaml_cpp//:yaml",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
     ],
 )
 

@@ -17,7 +17,7 @@ cc_library(
         "//modules/localization/proto:localization_proto",
         "//third_party:boost",
         "//third_party/json",
-        "@com_github_jbeder_yaml_cpp//:yaml",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_protobuf//:protobuf",
         "@pcl",
     ],
