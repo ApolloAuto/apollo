@@ -43,7 +43,7 @@ cc_library(
         "//modules/localization/proto:sins_pva_proto",
         "//modules/transform:transform_broadcaster_lib",
         "//third_party:boost",
-        "@com_github_jbeder_yaml_cpp//:yaml",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_glog//:glog",
         "@com_google_googletest//:gtest",
     ],

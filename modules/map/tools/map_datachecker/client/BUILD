@@ -28,7 +28,7 @@ cc_library(
         "//cyber",
         "//third_party:boost",
         "@com_github_grpc_grpc//:grpc++",
-        "@com_github_jbeder_yaml_cpp//:yaml",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
     ],
 )
 
@@ -44,7 +44,7 @@ cc_library(
         "//modules/map/tools/map_datachecker/proto:map_datachecker_grpc",
         "//third_party:boost",
         "@com_github_grpc_grpc//:grpc++",
-        "@com_github_jbeder_yaml_cpp//:yaml",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
     ],
 )
 
@@ -80,7 +80,7 @@ cc_library(
         "//modules/map/tools/map_datachecker/proto:map_datachecker_grpc",
         "//third_party:boost",
         "@com_github_grpc_grpc//:grpc++",
-        "@com_github_jbeder_yaml_cpp//:yaml",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
     ],
 )
 
