@@ -489,23 +489,34 @@ void OpenSpaceRoiDecider::GetRoadBoundaryFromMap(
     hdmap_->GetRoadBoundaries(check_point_xy, current_road_width,
                               &road_boundaries, &junctions);
 
-    std::vector<common::PointENU> *right_boundary;
-    std::vector<common::PointENU> *left_boundary;
     if (check_point_s < center_line_s) {
-      right_boundary = &(*road_boundaries.at(0)).left_boundary.line_points;
-      left_boundary = &(*road_boundaries.at(0)).right_boundary.line_points;
+      for (size_t i = 0;
+           i < (*road_boundaries.at(0)).left_boundary.line_points.size(); i++) {
+        right_lane_boundary->emplace_back(
+            Vec2d((*road_boundaries.at(0)).left_boundary.line_points[i].x(),
+                  (*road_boundaries.at(0)).left_boundary.line_points[i].y()));
+      }
+      for (size_t i = 0;
+           i < (*road_boundaries.at(0)).right_boundary.line_points.size();
+           i++) {
+        left_lane_boundary->emplace_back(
+            Vec2d((*road_boundaries.at(0)).right_boundary.line_points[i].x(),
+                  (*road_boundaries.at(0)).right_boundary.line_points[i].y()));
+      }
     } else {
-      right_boundary = &(*road_boundaries.at(0)).right_boundary.line_points;
-      left_boundary = &(*road_boundaries.at(0)).left_boundary.line_points;
-    }
-    // save road boundaries
-    for (size_t i = 0; i < left_boundary->size(); i++) {
-      left_lane_boundary->emplace_back(
-          Vec2d(left_boundary->at(i).x(), left_boundary->at(i).y()));
-    }
-    for (size_t i = 0; i < right_boundary->size(); i++) {
-      right_lane_boundary->emplace_back(
-          Vec2d(right_boundary->at(i).x(), right_boundary->at(i).y()));
+      for (size_t i = 0;
+           i < (*road_boundaries.at(0)).left_boundary.line_points.size(); i++) {
+        left_lane_boundary->emplace_back(
+            Vec2d((*road_boundaries.at(0)).left_boundary.line_points[i].x(),
+                  (*road_boundaries.at(0)).left_boundary.line_points[i].y()));
+      }
+      for (size_t i = 0;
+           i < (*road_boundaries.at(0)).right_boundary.line_points.size();
+           i++) {
+        right_lane_boundary->emplace_back(
+            Vec2d((*road_boundaries.at(0)).right_boundary.line_points[i].x(),
+                  (*road_boundaries.at(0)).right_boundary.line_points[i].y()));
+      }
     }
 
     center_lane_boundary_right->emplace_back(check_point);
