@@ -277,6 +277,10 @@ Status ControlComponent::ProduceControlCommand(
 
 bool ControlComponent::Proc() {
   const auto start_time = Clock::Now();
+  const auto start_system_timestamp =
+      std::chrono::duration<double>(
+          std::chrono::system_clock::now().time_since_epoch())
+          .count();
 
   chassis_reader_->Observe();
   const auto &chassis_msg = chassis_reader_->GetLatestObserved();
@@ -393,9 +397,19 @@ bool ControlComponent::Proc() {
     return true;
   }
 
+  double time_diff_ms;
   const auto end_time = Clock::Now();
+  if (FLAGS_use_system_time_in_control) {
+    const auto end_system_timestamp =
+        std::chrono::duration<double>(
+            std::chrono::system_clock::now().time_since_epoch())
+            .count();
+    time_diff_ms = (end_system_timestamp - start_system_timestamp) * 1000;
+    ADEBUG << "total control time spend: " << time_diff_ms << " ms.";
+  } else {
+    time_diff_ms = absl::ToDoubleMilliseconds(end_time - start_time);
+  }
 
-  const double time_diff_ms = absl::ToDoubleMilliseconds(end_time - start_time);
   control_command.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
   control_command.mutable_latency_stats()->set_total_time_exceeded(
       time_diff_ms > absl::ToDoubleMilliseconds(
