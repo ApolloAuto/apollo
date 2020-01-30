@@ -26,6 +26,18 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "libtorch",
+    deps = select({
+        "//tools/platforms:use_gpu": [
+            "@pytorch_gpu",
+        ],
+        "//conditions:default": [
+            "@pytorch",
+        ],
+    }),
+)
+
 # libncurses5-dev
 cc_library(
     name = "ncurses",
