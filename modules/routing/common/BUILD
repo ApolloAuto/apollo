@@ -8,7 +8,7 @@ cc_library(
     hdrs = ["routing_gflags.h"],
     deps = [
         "@com_github_gflags_gflags//:gflags",
-    ]
+    ],
 )
 
 cpplint()
