@@ -20,15 +20,14 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+pip3 install --no-cache-dir PyYAML typing
+
 git clone --recursive --single-branch --branch apollo --depth 1 https://github.com/ApolloAuto/pytorch.git
 
 pushd pytorch
-  pip3 install typing
-  pip3 install pyyaml
-
   export USE_CUDA=0
   python3 setup.py install
-  mkdir /usr/local/apollo/libtorch
+  mkdir -p /usr/local/apollo/libtorch
   cp -r build/lib /usr/local/apollo/libtorch/
   cp -r build/include /usr/local/apollo/libtorch/
 
@@ -39,7 +38,7 @@ pushd pytorch
 
   python3 setup.py install
 
-  mkdir /usr/local/apollo/libtorch_gpu
+  mkdir -p /usr/local/apollo/libtorch_gpu
   cp -r build/lib /usr/local/apollo/libtorch_gpu/
   cp -r build/include /usr/local/apollo/libtorch_gpu/
 

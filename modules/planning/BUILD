@@ -87,7 +87,7 @@ cc_library(
     ],
     deps = [
         ":planning_base",
-         "//cyber/common:log",
+        "//cyber/common:log",
     ],
 )
 

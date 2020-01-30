@@ -60,6 +60,7 @@
 #include <map>
 #include <vector>
 
+#include "pcl/common/common.h"
 #include "pcl/filters/voxel_grid.h"
 #include "pcl/kdtree/kdtree_flann.h"
 
