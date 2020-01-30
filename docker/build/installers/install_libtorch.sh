@@ -23,14 +23,25 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 git clone --recursive --single-branch --branch apollo --depth 1 https://github.com/ApolloAuto/pytorch.git
 
 pushd pytorch
-
-  export TORCH_CUDA_ARCH_LIST="3.5;5.0;5.2;6.1;7.0;7.5"
   pip3 install typing
-  python3 setup.py install
+  pip3 install pyyaml
 
+  export USE_CUDA=0
+  python3 setup.py install
   mkdir /usr/local/apollo/libtorch
   cp -r build/lib /usr/local/apollo/libtorch/
   cp -r build/include /usr/local/apollo/libtorch/
+
+  python3 setup.py clean
+
+  export USE_CUDA=1
+  export TORCH_CUDA_ARCH_LIST="3.5;5.0;5.2;6.1;7.0;7.5"
+
+  python3 setup.py install
+
+  mkdir /usr/local/apollo/libtorch_gpu
+  cp -r build/lib /usr/local/apollo/libtorch_gpu/
+  cp -r build/include /usr/local/apollo/libtorch_gpu/
 
 popd
 rm -fr pytorch
