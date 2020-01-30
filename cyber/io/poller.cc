@@ -60,7 +60,7 @@ bool Poller::Register(const PollRequest& req) {
     return false;
   }
 
-  PollCtrlParam ctrl_param;
+  PollCtrlParam ctrl_param{};
   ctrl_param.fd = req.fd;
   ctrl_param.event.data.fd = req.fd;
   ctrl_param.event.events = req.events;
@@ -142,7 +142,7 @@ bool Poller::Init() {
   };
   requests_[request->fd] = request;
 
-  PollCtrlParam ctrl_param;
+  PollCtrlParam ctrl_param{};
   ctrl_param.operation = EPOLL_CTL_ADD;
   ctrl_param.fd = pipe_fd_[0];
   ctrl_param.event.data.fd = pipe_fd_[0];
