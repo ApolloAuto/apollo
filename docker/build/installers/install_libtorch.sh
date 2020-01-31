@@ -28,8 +28,8 @@ pushd pytorch
   export USE_CUDA=0
   python3 setup.py install
   mkdir -p /usr/local/apollo/libtorch
-  cp -r build/lib /usr/local/apollo/libtorch/
-  cp -r build/include /usr/local/apollo/libtorch/
+  cp -r build/lib.linux-x86_64-3.6/torch/lib /usr/local/apollo/libtorch/
+  cp -r build/lib.linux-x86_64-3.6/torch/include /usr/local/apollo/libtorch/
 
   python3 setup.py clean
 
@@ -37,10 +37,9 @@ pushd pytorch
   export TORCH_CUDA_ARCH_LIST="3.5;5.0;5.2;6.1;7.0;7.5"
 
   python3 setup.py install
-
   mkdir -p /usr/local/apollo/libtorch_gpu
-  cp -r build/lib /usr/local/apollo/libtorch_gpu/
-  cp -r build/include /usr/local/apollo/libtorch_gpu/
+  cp -r build/lib.linux-x86_64-3.6/torch/lib /usr/local/apollo/libtorch_gpu/
+  cp -r build/lib.linux-x86_64-3.6/torch/include /usr/local/apollo/libtorch_gpu/
 
 popd
 rm -fr pytorch
