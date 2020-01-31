@@ -22,9 +22,8 @@
 #include "torch/extension.h"
 #include "torch/script.h"
 
-#include "modules/prediction/evaluator/evaluator.h"
-
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/evaluator/evaluator.h"
 
 namespace apollo {
 namespace prediction {
