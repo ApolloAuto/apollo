@@ -49,6 +49,7 @@ cc_library(
         ":util",
         "//modules/perception/base",
         "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_param_proto",
+        "@com_google_googletest//:gtest",
         "@eigen",
     ],
 )

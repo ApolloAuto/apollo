@@ -6,12 +6,18 @@ cc_library(
     name = "prediction_gflags",
     srcs = ["prediction_gflags.cc"],
     hdrs = ["prediction_gflags.h"],
+    deps = [
+        "@com_github_gflags_gflags//:gflags",
+    ],
 )
 
 cc_library(
     name = "prediction_system_gflags",
     srcs = ["prediction_system_gflags.cc"],
     hdrs = ["prediction_system_gflags.h"],
+    deps = [
+        "@com_github_gflags_gflags//:gflags",
+    ],
 )
 
 cc_library(
