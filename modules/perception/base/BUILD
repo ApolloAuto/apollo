@@ -55,8 +55,8 @@ cc_test(
     deps = [
         ":blob",
         "//modules/perception/base/test:test_helper",
+        "//third_party:cuda",
         "@com_google_googletest//:gtest_main",
-        "@cuda",
     ],
 )
 
@@ -104,7 +104,7 @@ cc_library(
     name = "common",
     hdrs = ["common.h"],
     deps = [
-        "@cuda",
+        "//third_party:cuda",
     ],
 )
 
@@ -300,13 +300,10 @@ cc_library(
     name = "point_cloud_util",
     srcs = ["point_cloud_util.cc"],
     hdrs = ["point_cloud_util.h"],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_highgui",
-    ],
     deps = [
         ":point_cloud",
         "//cyber",
+        "//third_party:opencv",
         "@eigen",
     ],
 )
@@ -354,8 +351,8 @@ cc_test(
     deps = [
         ":syncedmem",
         "//modules/perception/base/test:test_helper",
+        "//third_party:cuda",
         "@com_google_googletest//:gtest_main",
-        "@cuda",
     ],
 )
 

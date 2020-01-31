@@ -1,5 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
-load("//tools:grpc_library.bzl", "cc_grpc_library")
+load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -21,9 +21,6 @@ proto_library(
 cc_grpc_library(
     name = "map_datachecker_grpc",
     srcs = ["collection_service.proto"],
-    deps_cc = [
-        ":map_datachecker_proto",
-    ],
     deps = [
         ":map_datachecker_proto_lib",
     ],

@@ -31,7 +31,7 @@ cc_library(
     hdrs = ["communication/participant_listener.h"],
     deps = [
         "//cyber/common:log",
-        "@fastrtps",
+        "//third_party:fastrtps",
     ],
 )
 
@@ -43,7 +43,7 @@ cc_library(
         "//cyber/common:log",
         "//cyber/transport:underlay_message",
         "//cyber/transport:underlay_message_type",
-        "@fastrtps",
+        "//third_party:fastrtps",
     ],
 )
 

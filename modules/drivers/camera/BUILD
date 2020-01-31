@@ -35,14 +35,11 @@ cc_library(
     srcs = ["compress_component.cc"],
     hdrs = ["compress_component.h"],
     copts = ['-DMODULE_NAME=\\"camera\\"'],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_highgui",
-    ],
     deps = [
         "//cyber",
         "//modules/drivers/camera/proto:camera_proto",
         "//modules/drivers/proto:sensor_proto",
+        "//third_party:opencv",
     ],
 )
 

@@ -16,13 +16,14 @@
 
 #include "modules/dreamview/backend/perception_camera_updater/perception_camera_updater.h"
 
+#include <opencv2/opencv.hpp>
+
 #include <cfloat>
 #include <string>
 
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/proto/geometry.pb.h"
-#include "opencv2/opencv.hpp"
 
 namespace apollo {
 namespace dreamview {

@@ -28,7 +28,7 @@ cc_library(
     hdrs = ["h265_decoder.h"],
     deps = [
         "//cyber/common:log",
-        "@ffmpeg",
+        "//third_party:ffmpeg",
     ],
 )
 

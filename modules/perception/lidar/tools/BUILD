@@ -28,8 +28,8 @@ cc_binary(
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_track_object_matcher",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_tracker",
         "//modules/perception/proto:perception_config_schema_proto",
+        "//third_party:pcl",
         "@eigen",
-        "@pcl",
     ],
 )
 

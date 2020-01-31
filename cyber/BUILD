@@ -58,9 +58,6 @@ cc_library(
     name = "cyber_core",
     srcs = ["cyber.cc"],
     hdrs = ["cyber.h"],
-    linkopts = [
-        "-lprotobuf",
-    ],
     deps = [
         "//cyber:binary",
         "//cyber:init",
@@ -101,10 +98,11 @@ cc_library(
         "//cyber/transport",
         "//cyber/transport:participant",
         "//cyber/transport:sub_listener",
+        "//third_party:fastrtps",
         "//third_party:rt",
         "//third_party:uuid",
         "//third_party/tf2",
-        "@fastrtps",
+        "@com_google_protobuf//:protobuf",
     ],
 )
 

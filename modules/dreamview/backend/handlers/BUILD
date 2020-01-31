@@ -21,16 +21,12 @@ cc_library(
     srcs = ["image_handler.cc"],
     hdrs = ["image_handler.h"],
     copts = ['-DMODULE_NAME=\\"dreamview\\"'],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_highgui",
-        "-lopencv_imgproc",
-    ],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:config_gflags",
         "//modules/drivers/proto:sensor_proto",
+        "//third_party:opencv",
         "@civetweb//:civetweb++",
     ],
 )

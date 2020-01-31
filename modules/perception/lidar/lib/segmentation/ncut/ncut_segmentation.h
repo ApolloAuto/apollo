@@ -19,10 +19,6 @@
 #include <string>
 #include <vector>
 
-#ifdef DEBUG_NCUT
-#include "pcl/visualization/pcl_visualizer.h"
-#endif
-
 #include "modules/perception/base/object.h"
 #include "modules/perception/lib/thread/thread_worker.h"
 #include "modules/perception/lidar/common/pcl_util.h"

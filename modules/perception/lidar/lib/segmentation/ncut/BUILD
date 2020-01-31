@@ -37,8 +37,8 @@ cc_library(
         "//modules/perception/lidar/lib/segmentation/ncut/common:flood_fill",
         "//modules/perception/lidar/lib/segmentation/ncut/common:lr_classifier",
         "//modules/perception/lidar/lib/segmentation/ncut/proto:ncut_param_proto",
-        "@pcl",
-        "@vtk",
+        "//third_party:openmp",
+        "//third_party:pcl",
     ],
 )
 

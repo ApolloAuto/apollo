@@ -15,10 +15,12 @@
  *****************************************************************************/
 #include "modules/perception/base/point_cloud_util.h"
 
+#include <opencv2/opencv.hpp>
+
 #include <algorithm>
 #include <limits>
+
 #include "cyber/common/log.h"
-#include "opencv2/opencv.hpp"
 
 namespace apollo {
 namespace perception {

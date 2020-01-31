@@ -5,9 +5,6 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "lossless_map_creator",
     srcs = ["lossless_map_creator.cc"],
-    linkopts = [
-        "-llz4",
-    ],
     linkstatic = 0,
     deps = [
         "//cyber",

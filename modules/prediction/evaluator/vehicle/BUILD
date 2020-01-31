@@ -78,6 +78,7 @@ cc_library(
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
         "//third_party:libtorch",
+        "//third_party:openmp",
     ],
 )
 
@@ -109,6 +110,7 @@ cc_library(
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
         "//third_party:libtorch",
+        "//third_party:openmp",
     ],
 )
 
@@ -125,6 +127,7 @@ cc_library(
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
         "//third_party:libtorch",
+        "//third_party:openmp",
     ],
 )
 
@@ -154,6 +157,7 @@ cc_library(
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
         "//third_party:libtorch",
+        "//third_party:openmp",
     ],
 )
 
@@ -185,6 +189,7 @@ cc_library(
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
         "//third_party:libtorch",
+        "//third_party:openmp",
         "@eigen",
     ],
 )

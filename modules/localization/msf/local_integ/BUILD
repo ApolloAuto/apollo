@@ -10,11 +10,6 @@ cc_library(
         "-O2",
         "-DMODULE_NAME=\\\"localization\\\"",
     ],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_highgui",
-        "-lopencv_imgproc",
-    ],
     deps = [
         "//modules/common/status",
         "//modules/common/time",
@@ -36,6 +31,7 @@ cc_library(
         "//modules/localization/proto:pose_proto",
         "//modules/localization/proto:sins_pva_proto",
         "//third_party:boost",
+        "//third_party:opencv",
         "@com_github_gflags_gflags//:gflags",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_glog//:glog",

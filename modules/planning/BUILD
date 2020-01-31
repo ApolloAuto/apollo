@@ -63,6 +63,7 @@ cc_library(
         "//modules/planning/tasks:task_factory",
         "//modules/planning/traffic_rules:traffic_decider",
         "//modules/prediction/proto:prediction_proto",
+        "//third_party:openmp",
     ],
 )
 
@@ -75,6 +76,7 @@ cc_library(
     ],
     deps = [
         ":planning_base",
+        "//third_party:openmp",
     ],
 )
 
@@ -88,6 +90,7 @@ cc_library(
     deps = [
         ":planning_base",
         "//cyber/common:log",
+        "//third_party:openmp",
     ],
 )
 

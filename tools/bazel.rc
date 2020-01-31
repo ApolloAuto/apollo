@@ -13,17 +13,35 @@ startup --batch_cpu_scheduling
 startup --host_jvm_args=-XX:-UseParallelGC
 
 # +------------------------------------------------------------+
-# | Test Configurations                                        |
+# | Common Configurations for both build and test              |
 # +------------------------------------------------------------+
+
+# Common compiling flags.
+build --cxxopt="-std=c++17"
+
+# Avoid sandbox.
+build --spawn_strategy=local
+
+build --copt="-I/usr/include/python3.6m"
+
+# Code check.
+#common --copt="-Werror=sign-compare"
+#common --copt="-Werror=return-type"
+#common --copt="-Werror=reorder"
+#common --copt="-Werror=unused-variable"
+#common --copt="-Werror=unused-but-set-variable"
+#common --copt="-Werror=switch"
+
+# Specify protobuf cc toolchain
+build --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
+
+build --show_timestamps
+
+# Do not show warnings from external dependencies.
+build --output_filter="^//"
 
 # By default prints output only from failed tests.
 test --test_output=errors
-
-# Work around the sandbox issue.
-test --spawn_strategy=standalone
-
-# Specify protobuf cc toolchain
-test --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
 
 # +------------------------------------------------------------+
 # | CPP Lint Tests & Unit Tests                                |
@@ -40,48 +58,3 @@ test:cpplint --build_tests_only
 
 # Regular unit tests.
 test:unit_test --test_tag_filters=-cpplint
-
-# Coverage tests
-test:coverage --test_tag_filters=-cpplint
-test:coverage --copt=--coverage
-test:coverage --cxxopt=--coverage
-test:coverage --cxxopt=-fprofile-arcs
-test:coverage --cxxopt=-ftest-coverage
-test:coverage --linkopt=-coverage
-test:coverage --linkopt=-lgcov
-test:coverage --linkopt=-lgcc
-test:coverage --linkopt=-lc
-
-# +------------------------------------------------------------+
-# | Build Configurations                                       |
-# +------------------------------------------------------------+
-# Do not show warnings from external dependencies.
-build --output_filter="^//"
-
-build --show_timestamps
-
-# Work around the sandbox issue.
-build --spawn_strategy=standalone
-
-# Specify protobuf cc toolchain
-build --proto_toolchain_for_cc="@com_google_protobuf//:cc_toolchain"
-
-# build with profiling
-build:cpu_prof --linkopt=-lprofiler
-
-build --copt="-Werror=sign-compare"
-build --copt="-Werror=return-type"
-build --copt="-Werror=reorder"
-build --copt="-Werror=unused-variable"
-build --copt="-Werror=unused-but-set-variable"
-build --copt="-Werror=switch"
-
-# Strict check on type conversion.
-# absl/strings/str_cat.h breaks the rule.
-# build --per_file_copt=^modules/.*\.cc,-modules/tools/visualizer/.*\.cc,^cyber/.*\.cc@-Werror=conversion
-
-
-# Enable C++14
-build --cxxopt="-std=c++1y"
-# Enable colorful output of GCC
-# build --cxxopt="-fdiagnostics-color=always"

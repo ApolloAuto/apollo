@@ -17,16 +17,12 @@ cc_library(
     name = "localization_pyramid_map_ndt_map_matrix",
     srcs = ["ndt_map_matrix.cc"],
     hdrs = ["ndt_map_matrix.h"],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_highgui",
-        "-lopencv_imgproc",
-    ],
     deps = [
         ":localization_pyramid_map_ndt_map_config",
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map_config",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map_matrix",
+        "//third_party:opencv",
         "@com_google_glog//:glog",
         "@eigen",
     ],
@@ -76,11 +72,6 @@ cc_library(
     name = "localization_pyramid_map_ndt_map_pool",
     srcs = ["ndt_map_pool.cc"],
     hdrs = ["ndt_map_pool.h"],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_highgui",
-        "-lopencv_imgproc",
-    ],
     deps = [
         ":localization_pyramid_map_ndt_map_matrix",
         ":localization_pyramid_map_ndt_map_matrix_handler",
@@ -89,6 +80,7 @@ cc_library(
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map_config",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map_pool",
+        "//third_party:opencv",
         "@com_google_glog//:glog",
         "@eigen",
     ],

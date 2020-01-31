@@ -1,13 +1,13 @@
-cuda_srcs = FileType([
+cuda_srcs = [
     ".cu",
     ".cc",
     ".cpp",
-])
+]
 
-cuda_headers = FileType([
+cuda_headers = [
     ".h",
     ".hpp",
-])
+]
 
 cuda_arch = " ".join([
     "-arch=sm_30",
@@ -22,15 +22,9 @@ cuda_arch = " ".join([
 def cuda_library_impl(ctx):
     flags = ' '.join(ctx.attr.flags)
     output = ctx.outputs.out
-    lib_flags = ["-std=c++11", "--shared", "--compiler-options -fPIC"]
+    lib_flags = ["-std=c++17", "--shared", "--compiler-options -fPIC"]
     args = [f.path for f in ctx.files.srcs]
     deps_flags=[]
-    for f in ctx.attr.deps:
-      deps_flags += f.cc.link_flags
-      deps_flags += ["-I" + d for d in f.cc.include_directories]
-      deps_flags += ["-I" + d for d in f.cc.quote_include_directories]
-      deps_flags += ["-I" + d for d in f.cc.system_include_directories]
-
     ctx.actions.run_shell(
             inputs=ctx.files.srcs + ctx.files.hdrs + ctx.files.deps,
             outputs=[ctx.outputs.out],

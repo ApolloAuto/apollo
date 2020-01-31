@@ -13,17 +13,12 @@ cc_library(
         "base_map_pool.cc",
     ],
     hdrs = glob(["*.h"]),
-    linkopts = [
-        "-lz",
-        "-lopencv_core",
-        "-lopencv_highgui",
-        "-lopencv_imgproc",
-    ],
     deps = [
         "//modules/common/util",
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/common/util:localization_msf_common_util_compression",
         "//modules/localization/msf/common/util:localization_msf_common_util_system_utility",
+        "//third_party:opencv",
         "@eigen",
     ],
 )

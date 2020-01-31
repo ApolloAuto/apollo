@@ -1,0 +1,5 @@
+name: py3c
+dependencies:
+  - python = 3.6
+  - pip
+  - pytorch = 1.2.0 = cpu_py36h00be3c6_0

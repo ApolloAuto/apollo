@@ -35,8 +35,8 @@ cc_test(
     copts = ["-msse4.1"],
     deps = [
         ":spatio_temporal_ground_detector",
+        "//third_party:pcl",
         "@com_google_googletest//:gtest_main",
-        "@pcl",
     ],
 )
 

@@ -16,10 +16,9 @@
 
 #include "modules/drivers/tools/image_decompress/image_decompress.h"
 
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <vector>
-
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
 
 namespace apollo {
 namespace image_decompress {

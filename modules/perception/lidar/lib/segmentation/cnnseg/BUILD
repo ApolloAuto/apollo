@@ -16,7 +16,7 @@ cc_library(
         "//modules/perception/inference:inference_factory_lib",
         "//modules/perception/inference:inference_lib",
         "//modules/perception/inference/caffe:caffe_net_lib",
-        "//modules/perception/inference/tensorrt:rt_net",
+        # "//modules/perception/inference/tensorrt:rt_net",
         "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector",
@@ -62,7 +62,7 @@ cuda_library(
         ":util",
         "//modules/perception/base",
         "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_param_proto",
-        "@cuda",
+        "//third_party:cuda",
         "@eigen",
     ],
 )
@@ -91,9 +91,8 @@ cc_test(
 #        ":feature_generator",
 #        "//modules/perception/common:perception_gflags",
 #        "//modules/perception/lidar/common:pcl_util",
+#        "//third_party:opencv",
 #        "@com_google_googletest//:gtest_main",
-#        "@opencv2//:core",
-#        "@opencv2//:highgui",
 #    ],
 #)
 

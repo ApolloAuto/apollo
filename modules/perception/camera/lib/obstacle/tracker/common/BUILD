@@ -11,7 +11,7 @@ cuda_library(
         "//cyber",
         "//modules/perception/camera/common:camera_frame",
         "//modules/perception/inference/utils:inference_gemm_lib",
-        "@cuda",
+        "//third_party:cuda",
     ],
 )
 

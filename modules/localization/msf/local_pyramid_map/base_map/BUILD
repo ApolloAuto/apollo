@@ -25,14 +25,9 @@ cc_library(
         "base_map_fwd.h",
         "base_map_matrix.h",
     ],
-    linkopts = [
-        "-lz",
-        "-lopencv_core",
-        "-lopencv_highgui",
-        "-lopencv_imgproc",
-    ],
     deps = [
         "//cyber/common",
+        "//third_party:opencv",
         "@com_google_glog//:glog",
         "@eigen",
     ],

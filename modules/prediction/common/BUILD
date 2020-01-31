@@ -263,7 +263,7 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/pose:pose_container",
         "//modules/prediction/proto:feature_proto",
-        "@opencv",
+        "//third_party:opencv",
     ],
 )
 

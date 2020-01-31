@@ -31,7 +31,7 @@ cc_library(
         ":parameter_service_names",
         "//cyber/node",
         "//cyber/service:client",
-        "@fastrtps",
+        "//third_party:fastrtps",
     ],
 )
 
@@ -53,7 +53,7 @@ cc_library(
         ":parameter_service_names",
         "//cyber/node",
         "//cyber/service",
-        "@fastrtps",
+        "//third_party:fastrtps",
     ],
 )
 

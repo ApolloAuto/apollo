@@ -49,6 +49,7 @@ cc_library(
         "//modules/planning/tasks/optimizers/piecewise_jerk_path:piecewise_jerk_path_optimizer",
         "//modules/planning/tasks/optimizers/piecewise_jerk_speed:piecewise_jerk_speed_nonlinear_optimizer",
         "//modules/planning/tasks/optimizers/piecewise_jerk_speed:piecewise_jerk_speed_optimizer",
+        "//third_party:openmp",
     ],
 )
 
