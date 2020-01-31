@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/segmentation/cnnseg/feature_generator.h"
 
-#include "opencv2/opencv.hpp"
+#include <opencv2/opencv.hpp>
 
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/lidar/common/pcl_util.h"

@@ -12,7 +12,7 @@ cuda_library(
     deps = [
         "//modules/perception/base:blob",
         "//modules/perception/inference:layer_lib",
-        "@cuda",
+        "//third_party:cuda",
         "@eigen",
     ],
 )

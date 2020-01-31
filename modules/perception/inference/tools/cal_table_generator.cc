@@ -14,11 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <opencv2/opencv.hpp>
+
 #include <algorithm>
 
 #include "absl/strings/str_cat.h"
 #include "gflags/gflags.h"
-#include "opencv2/opencv.hpp"
 
 #include "cyber/common/log.h"
 #include "modules/perception/inference/inference.h"

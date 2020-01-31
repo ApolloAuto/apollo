@@ -13,7 +13,7 @@ cc_library(
         "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/lane/common:denseline_proto",
         "//modules/perception/inference:inference_factory_lib",
-        "//modules/perception/inference/tensorrt:rt_net",
+        # "//modules/perception/inference/tensorrt:rt_net",
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/lib/registerer",

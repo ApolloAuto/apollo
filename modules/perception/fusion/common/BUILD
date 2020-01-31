@@ -53,26 +53,6 @@ cc_test(
 )
 
 cc_library(
-    name = "information_filter",
-    srcs = ["information_filter.cc"],
-    hdrs = ["information_filter.h"],
-    deps = [
-        ":base_filter",
-    ],
-)
-
-cc_test(
-    name = "information_filter_test",
-    size = "small",
-    srcs = ["information_filter_test.cc"],
-    deps = [
-        ":information_filter",
-        "//modules/perception/fusion/base",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "kalman_filter",
     srcs = ["kalman_filter.cc"],
     hdrs = ["kalman_filter.h"],

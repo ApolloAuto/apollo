@@ -19,6 +19,7 @@ cc_library(
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/tasks:task",
         "//modules/planning/tasks/optimizers:trajectory_optimizer",
+        "//third_party:openmp",
     ],
 )
 
@@ -42,6 +43,7 @@ cc_library(
         "//modules/planning/open_space/trajectory_smoother:dual_variable_warm_start_problem",
         "//modules/planning/open_space/trajectory_smoother:iterative_anchoring_smoother",
         "//modules/planning/proto:planning_config_proto",
+        "//third_party:openmp",
         "@com_github_gflags_gflags//:gflags",
         "@eigen",
     ],
@@ -56,6 +58,7 @@ cc_test(
     ],
     deps = [
         ":open_space_trajectory_provider",
+        "//third_party:openmp",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -69,6 +72,7 @@ cc_test(
     ],
     deps = [
         ":open_space_trajectory_optimizer",
+        "//third_party:openmp",
         "@com_google_googletest//:gtest_main",
     ],
 )

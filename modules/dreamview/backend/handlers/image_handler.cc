@@ -16,11 +16,11 @@
 
 #include "modules/dreamview/backend/handlers/image_handler.h"
 
+#include <opencv2/opencv.hpp>
+
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
-
-#include "opencv2/opencv.hpp"
 
 namespace apollo {
 namespace dreamview {

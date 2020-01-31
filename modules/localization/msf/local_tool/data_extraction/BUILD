@@ -23,8 +23,8 @@ cc_library(
         "//modules/localization/proto:localization_proto",
         "//modules/localization/proto:measure_proto",
         "//third_party:boost",
+        "//third_party:pcl",
         "@eigen",
-        "@pcl",
     ],
 )
 
@@ -36,8 +36,8 @@ cc_binary(
         ":data_extraction",
         "//cyber",
         "//third_party:boost",
+        "//third_party:pcl",
         "@eigen",
-        "@pcl",
     ],
 )
 

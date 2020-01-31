@@ -20,6 +20,8 @@
  */
 #pragma once
 
+#include <opencv2/opencv.hpp>
+
 #include <list>
 #include <map>
 #include <string>
@@ -27,7 +29,6 @@
 #include <vector>
 
 #include "Eigen/Geometry"
-#include "opencv2/opencv.hpp"
 
 namespace apollo {
 namespace localization {

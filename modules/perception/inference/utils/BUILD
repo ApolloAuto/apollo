@@ -9,7 +9,7 @@ cuda_library(
     hdrs = ["cuda_util.h"],
     deps = [
         "//cyber",
-        "@cuda",
+        "//third_party:cuda",
     ],
 )
 
@@ -20,8 +20,8 @@ cc_library(
     linkopts = ["-lnvinfer_plugin"],
     linkstatic = 1,
     deps = [
-        "@caffe",
-        "@opencv",
+        "//third_party:caffe",
+        "//third_party:opencv",
     ],
 )
 
@@ -31,7 +31,7 @@ cuda_library(
     hdrs = ["util.h"],
     deps = [
         "//cyber",
-        "@cuda",
+        "//third_party:cuda",
         "@eigen",
     ],
 )
@@ -50,8 +50,8 @@ cc_library(
         "//modules/perception/base:box",
         "//modules/perception/base:image",
         "//modules/perception/base:point_cloud",
-        "@caffe",
-        "@opencv",
+        "//third_party:caffe",
+        "//third_party:opencv",
     ],
 )
 
@@ -65,7 +65,7 @@ cuda_library(
         "//cyber",
         "//modules/perception/base:blob",
         "//modules/perception/base:image",
-        "@cuda",
+        "//third_party:cuda",
     ],
 )
 
@@ -76,8 +76,8 @@ cc_library(
     linkopts = ["-lnvinfer_plugin"],
     linkstatic = 1,
     deps = [
-        "@caffe",
-        "@opencv",
+        "//third_party:caffe",
+        "//third_party:opencv",
     ],
 )
 
@@ -91,7 +91,7 @@ cuda_library(
         "//cyber",
         "//modules/perception/base:blob",
         "//modules/perception/base:image",
-        "@cuda",
+        "//third_party:cuda",
     ],
 )
 
@@ -102,8 +102,8 @@ cc_library(
     linkopts = ["-lnvinfer_plugin"],
     linkstatic = 1,
     deps = [
-        "@caffe",
-        "@opencv",
+        "//third_party:caffe",
+        "//third_party:opencv",
     ],
 )
 
@@ -116,31 +116,6 @@ cc_test(
     ],
     deps = [
         ":inference_util_lib",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_library(
-    name = "inference_binary_data_lib",
-    srcs = ["binary_data.cc"],
-    hdrs = ["binary_data.h"],
-    linkopts = ["-lnvinfer_plugin"],
-    deps = [
-        "//modules/perception/base:blob",
-        "@caffe",
-        "@opencv",
-    ],
-)
-
-cc_test(
-    name = "inference_binary_data_test",
-    size = "small",
-    srcs = ["binary_data_test.cc"],
-    data = [
-        "//modules/perception/inference:inference_test_data",
-    ],
-    deps = [
-        ":inference_binary_data_lib",
         "@com_google_googletest//:gtest_main",
     ],
 )

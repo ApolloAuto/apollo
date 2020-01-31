@@ -20,9 +20,9 @@ cc_library(
     deps = [
         "//cyber/common:log",
         "//third_party:boost",
+        "//third_party:fastrtps",
         "@com_google_glog//:glog",
         "@eigen",
-        "@fastrtps",
     ],
 )
 

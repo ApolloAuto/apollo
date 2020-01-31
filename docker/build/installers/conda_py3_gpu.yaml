@@ -1,0 +1,5 @@
+name: py3g
+dependencies:
+  - python = 3.6
+  - pip
+  - pytorch = 1.2.0 = cuda100py36h938c94c_0

@@ -41,6 +41,7 @@ cc_library(
         "//modules/planning/planner/public_road:public_road_planner",
         "//modules/planning/planner/rtk:rtk_planner",
         "//modules/planning/proto:planning_proto",
+        "//third_party:openmp",
     ],
 )
 

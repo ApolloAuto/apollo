@@ -106,6 +106,7 @@ cc_library(
         "//modules/common/time",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
+        "//third_party:openmp",
     ],
 )
 
@@ -130,6 +131,7 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//third_party:adolc",
         "//third_party:ipopt",
+        "//third_party:openmp",
         "@eigen",
     ],
 )
@@ -155,6 +157,7 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//third_party:adolc",
         "//third_party:ipopt",
+        "//third_party:openmp",
         "@eigen",
     ],
 )
@@ -180,6 +183,7 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//third_party:adolc",
         "//third_party:ipopt",
+        "//third_party:openmp",
         "@eigen",
     ],
 )
@@ -205,6 +209,7 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//third_party:adolc",
         "//third_party:ipopt",
+        "//third_party:openmp",
         "@eigen",
     ],
 )
@@ -230,6 +235,7 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//third_party:adolc",
         "//third_party:ipopt",
+        "//third_party:openmp",
         "@eigen",
     ],
 )
@@ -261,6 +267,7 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//third_party:adolc",
         "//third_party:ipopt",
+        "//third_party:openmp",
         "@eigen",
     ],
 )
@@ -287,7 +294,7 @@ cuda_library(
     srcs = ["planning_block.cu"],
     hdrs = ["planning_block.h"],
     deps = [
-        "@cuda",
+        "//third_party:cuda",
     ],
 )
 
@@ -302,6 +309,7 @@ cc_test(
     deps = [
         ":distance_approach_ipopt_interface",
         "//cyber/common:log",
+        "//third_party:openmp",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -317,6 +325,7 @@ cc_test(
     deps = [
         ":distance_approach_ipopt_cuda_interface",
         "//cyber/common:log",
+        "//third_party:openmp",
         "@com_google_googletest//:gtest_main",
     ],
 )
@@ -332,6 +341,7 @@ cc_test(
     deps = [
         ":distance_approach_problem",
         "//cyber/common:log",
+        "//third_party:openmp",
         "@com_google_googletest//:gtest_main",
     ],
 )

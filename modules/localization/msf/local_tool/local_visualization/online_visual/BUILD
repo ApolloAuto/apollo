@@ -25,8 +25,8 @@ cc_library(
         "//modules/localization/proto:localization_config_proto",
         "//modules/localization/proto:localization_proto",
         "//third_party:boost",
+        "//third_party:pcl",
         "@eigen",
-        "@pcl",
     ],
 )
 

@@ -27,7 +27,7 @@ cc_library(
         ":underlay_message_type",
         "//cyber/service_discovery:role",
         "//cyber/task",
-        "@fastrtps",
+        "//third_party:fastrtps",
     ],
 )
 
@@ -298,7 +298,7 @@ cc_library(
     deps = [
         ":qos_profile_conf",
         "//cyber/common:log",
-        "@fastrtps",
+        "//third_party:fastrtps",
     ],
 )
 
@@ -308,7 +308,7 @@ cc_library(
     hdrs = ["rtps/underlay_message.h"],
     deps = [
         "//cyber/common:log",
-        "@fastrtps",
+        "//third_party:fastrtps",
     ],
 )
 
@@ -340,7 +340,7 @@ cc_library(
     hdrs = ["rtps/underlay_message_type.h"],
     deps = [
         ":underlay_message",
-        "@fastrtps",
+        "//third_party:fastrtps",
     ],
 )
 

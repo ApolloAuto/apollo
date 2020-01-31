@@ -1,7 +1,6 @@
 digraph {
   "infra" -> "bazel 0.5.3";
   "bazel 0.5.3" -> "GCC 4.8";
-  "bazel 0.5.3" -> "openjdk-8-jdk";
   "infra" -> "glog 0.3.5" -> "gflags 2.2" -> "cmake";
   "infra" -> "protobuf 3.3";
   "infra" -> "gtest 1.8" -> "absl 20180600";
@@ -9,14 +8,20 @@ digraph {
   "cyber" -> "infra";
   "cyber" -> "FastRTPS 1.5.0" -> "Fast CDR";
   "cyber" -> "POCO Foundation 50";
-  "cyber" -> "python2/3-dev";
+  "cyber" -> "python3-dev";
   "cyber" -> "uuid-dev";
 
   "modules" -> "multiple" -> "boost 1.54/1.65";
   "multiple" -> "pcl 1.9.1";
+  "multiple" -> "yaml-cpp 0.5.3";
+  "multiple" -> "eigen 3.2.10";
 
   "modules" -> "perception" -> "cuda 10.0";
   "perception" -> "opencv 2.4.8";
 
-  "offline" -> "bosfs 1.0.0";
+  "modules" -> "map" -> "tinyxml2 5.0.1";
+
+  "offline" -> "bosfs";
+  "offline" -> "vim";
+  "offline" -> "gdb";
 }

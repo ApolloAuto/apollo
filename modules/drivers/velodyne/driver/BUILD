@@ -42,7 +42,7 @@ cc_library(
         "//cyber",
         "//modules/common/util",
         "//modules/drivers/velodyne/proto:velodyne_proto",
-        "@pcl",
+        "//third_party:pcl",
     ],
 )
 

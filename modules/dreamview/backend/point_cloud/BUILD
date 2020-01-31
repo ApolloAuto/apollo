@@ -16,10 +16,10 @@ cc_library(
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:localization_proto",
         "//third_party:boost",
+        "//third_party:pcl",
         "//third_party/json",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_protobuf//:protobuf",
-        "@pcl",
     ],
 )
 

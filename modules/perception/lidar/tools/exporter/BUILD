@@ -10,8 +10,8 @@ cc_library(
         "//modules/perception/lidar/common:pcl_util",
         "//modules/perception/onboard/transform_wrapper",
         "//modules/transform/proto:transform_proto",
+        "//third_party:opencv",
         "@com_google_absl//absl/strings",
-        "@opencv",
     ],
 )
 

@@ -14,8 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <opencv2/opencv.hpp>
+
 #include "gflags/gflags.h"
-#include "opencv2/opencv.hpp"
 
 #include "modules/perception/inference/inference.h"
 #include "modules/perception/inference/inference_factory.h"

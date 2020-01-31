@@ -9,7 +9,7 @@ cuda_library(
     hdrs = ["cuda_util.h"],
     deps = [
         "//cyber/common:log",
-        "@cuda",
+        "//third_party:cuda",
     ],
 )
 
@@ -23,8 +23,8 @@ cc_test(
     ],
     deps = [
         "//modules/common/math",
+        "//third_party:cuda",
         "@com_google_googletest//:gtest_main",
-        "@cuda",
     ],
 )
 

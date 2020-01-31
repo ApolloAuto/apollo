@@ -10,9 +10,9 @@ cc_library(
     deps = [
         "//modules/perception/inference:inference_lib",
         "//third_party:boost",
-        "@caffe",
+        "//third_party:caffe",
+        "//third_party:opencv",
         "@com_google_protobuf//:protobuf",
-        "@opencv",
     ],
 )
 

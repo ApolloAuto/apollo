@@ -21,10 +21,10 @@ cc_library(
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map",
         "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map_pool",
+        "//third_party:pcl",
         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_glog//:glog",
         "@eigen",
-        "@pcl",
     ],
 )
 
@@ -55,9 +55,6 @@ cc_test(
     timeout = "short",
     srcs = ["ndt_solver_test.cc"],
     data = [":ndt_lidar_locator_test_data"],
-    linkopts = [
-        "-llz4",
-    ],
     deps = [
         "//cyber",
         "//modules/localization/msf/common/io:localization_msf_common_io",
