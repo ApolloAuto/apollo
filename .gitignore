@@ -1,6 +1,5 @@
 # Bazel
 bazel-*
-WORKSPACE
 
 # Temporary files
 *.pyc
