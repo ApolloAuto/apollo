@@ -63,7 +63,7 @@ cc_library(
     hdrs = ["hybrid_a_star.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "open_space_utils",
+        ":open_space_utils",
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/planning/common:obstacle",
@@ -78,7 +78,7 @@ cc_test(
     size = "small",
     srcs = ["reeds_shepp_path_test.cc"],
     deps = [
-        "open_space_utils",
+        ":open_space_utils",
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/math",
@@ -92,7 +92,7 @@ cc_test(
     size = "small",
     srcs = ["node3d_test.cc"],
     deps = [
-        "open_space_utils",
+        ":open_space_utils",
         "//cyber/common:log",
         "@com_google_googletest//:gtest_main",
     ],
@@ -103,7 +103,7 @@ cc_test(
     size = "small",
     srcs = ["hybrid_a_star_test.cc"],
     deps = [
-        "hybrid_a_star",
+        ":hybrid_a_star",
         "@com_google_googletest//:gtest_main",
     ],
 )
