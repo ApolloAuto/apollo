@@ -17,7 +17,5 @@ cc_library(
         "include/torch/csrc/api/include/torch",
     ],
     linkstatic = False,
-    deps = [
-        "@python27",
-    ],
+    linkopts = ["-lpython3.6m"],
 )

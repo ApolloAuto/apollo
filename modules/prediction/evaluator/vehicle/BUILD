@@ -69,6 +69,7 @@ cc_library(
     hdrs = ["junction_mlp_evaluator.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
+        "-I/usr/include/python3.6m",
     ],
     deps = [
         "//modules/common/math:geometry",
@@ -102,6 +103,7 @@ cc_library(
     hdrs = ["junction_map_evaluator.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
+        "-I/usr/include/python3.6m",
     ],
     deps = [
         "//modules/prediction/common:prediction_util",
@@ -118,6 +120,7 @@ cc_library(
     hdrs = ["cruise_mlp_evaluator.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
+        "-I/usr/include/python3.6m",
     ],
     deps = [
         "//modules/prediction/common:prediction_util",
@@ -148,6 +151,7 @@ cc_library(
     hdrs = ["lane_scanning_evaluator.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
+        "-I/usr/include/python3.6m",
     ],
     deps = [
         "//modules/prediction/container:container_manager",
@@ -163,6 +167,7 @@ cc_library(
     hdrs = ["lane_aggregating_evaluator.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
+        "-I/usr/include/python3.6m",
     ],
     deps = [
         "//modules/prediction/container:container_manager",
@@ -178,6 +183,7 @@ cc_library(
     hdrs = ["semantic_lstm_evaluator.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
+        "-I/usr/include/python3.6m",
     ],
     deps = [
         "//modules/prediction/common:prediction_util",

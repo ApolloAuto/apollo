@@ -8,6 +8,7 @@ cc_library(
     hdrs = ["evaluator_manager.h"],
     copts = [
         "-DMODULE_NAME=\\\"prediction\\\"",
+	"-I/usr/include/python3.6m",
     ],
     deps = [
         "//modules/common/configs:vehicle_config_helper",
