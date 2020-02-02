@@ -20,9 +20,6 @@
 
 #include "modules/planning/tasks/optimizers/road_graph/trajectory_cost.h"
 
-#include <algorithm>
-#include <utility>
-
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -32,11 +29,6 @@
 
 namespace apollo {
 namespace planning {
-
-using apollo::common::TrajectoryPoint;
-using apollo::common::math::Box2d;
-using apollo::common::math::Sigmoid;
-using apollo::common::math::Vec2d;
 
 TrajectoryCost::TrajectoryCost(const DpPolyPathConfig &config,
                                const ReferenceLine &reference_line,

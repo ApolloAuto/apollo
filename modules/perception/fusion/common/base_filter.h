@@ -15,8 +15,9 @@
  *****************************************************************************/
 #pragma once
 
-#include <Eigen/Dense>
 #include <string>
+
+#include "Eigen/Dense"
 
 namespace apollo {
 namespace perception {

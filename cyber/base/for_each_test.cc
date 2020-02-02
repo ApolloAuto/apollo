@@ -15,9 +15,9 @@
  *****************************************************************************/
 #include "cyber/base/for_each.h"
 
-#include <gtest/gtest.h>
 #include <memory>
 #include <vector>
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {

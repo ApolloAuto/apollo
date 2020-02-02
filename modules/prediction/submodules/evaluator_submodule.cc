@@ -14,8 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <utility>
-
 #include "modules/prediction/submodules/evaluator_submodule.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
@@ -46,18 +44,13 @@ bool EvaluatorSubmodule::Init() {
 
 bool EvaluatorSubmodule::Proc(
     const std::shared_ptr<SubmoduleOutput>& container_output) {
-  const apollo::common::Header& perception_header =
-      container_output->perception_header();
-  const apollo::common::ErrorCode& perception_error_code =
-      container_output->perception_error_code();
-  const double frame_start_time = container_output->frame_start_time();
+  constexpr static size_t kHistorySize = 1;
+  const auto frame_start_time = container_output->frame_start_time();
   ObstaclesContainer obstacles_container(*container_output);
   EvaluatorManager::Instance()->Run(&obstacles_container);
-  SubmoduleOutput submodule_output = obstacles_container.GetSubmoduleOutput();
-  submodule_output.set_perception_header(perception_header);
-  submodule_output.set_perception_error_code(perception_error_code);
-  submodule_output.set_frame_start_time(frame_start_time);
-  evaluator_writer_->Write(std::make_shared<SubmoduleOutput>(submodule_output));
+  SubmoduleOutput submodule_output =
+      obstacles_container.GetSubmoduleOutput(kHistorySize, frame_start_time);
+  evaluator_writer_->Write(submodule_output);
   return true;
 }
 

@@ -8,7 +8,6 @@ cc_library(
     hdrs = ["stage_intersection_cruise_impl.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//modules/common",
         "//modules/planning/common:planning_common",
         "//modules/planning/common/util:util_lib",
         "//modules/planning/scenarios/util:scenario_util_lib",

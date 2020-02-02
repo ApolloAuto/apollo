@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -20,14 +20,15 @@ This program can extract driving trajectory from a record
 """
 
 import argparse
-import shutil
 import os
-import time
+import shutil
 import sys
+import time
 
-from cyber_py import cyber
-from cyber_py import record
+from cyber_py3 import cyber
+from cyber_py3 import record
 from common.message_manager import PbMessageManager
+
 
 g_message_manager = PbMessageManager()
 
@@ -38,6 +39,7 @@ def write_to_file(file_path, topic_pb):
     """
     with open(file_path, 'w') as fp:
         fp.write(str(topic_pb))
+
 
 def extract_record(in_record, output):
     freader = record.RecordReader(in_record)
@@ -61,11 +63,13 @@ def extract_record(in_record, output):
                       pose.orientation.qw))
     print("Finished extracting from record {}".format(in_record))
 
+
 def main(args):
     out = open(args.output, 'w') if args.output or sys.stdout
     for record_file in args.in_record:
         extract_record(record_file, out)
     out.close()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

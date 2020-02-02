@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
 #
@@ -14,15 +16,16 @@
 # limitations under the License.
 ###############################################################################
 
+import argparse
+import glob
+import logging
 import os
 import sys
-import glob
-import argparse
-import logging
-
-sys.path.append('/apollo/modules/tools/prediction/data_pipelines/common/')
 
 from online_to_offline import LabelGenerator
+
+
+sys.path.append('/apollo/modules/tools/prediction/data_pipelines/common/')
 
 
 if __name__ == "__main__":

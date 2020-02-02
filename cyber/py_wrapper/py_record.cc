@@ -14,11 +14,16 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <Python.h>
+#include "cyber/py_wrapper/py_record.h"
+
+#if PY_MAJOR_VERSION >= 3
+#include <python3.6m/Python.h>
+#else
+#include <python2.7/Python.h>
+#endif
+
 #include <set>
 #include <string>
-
-#include "cyber/py_wrapper/py_record.h"
 
 using apollo::cyber::record::PyRecordReader;
 using apollo::cyber::record::PyRecordWriter;

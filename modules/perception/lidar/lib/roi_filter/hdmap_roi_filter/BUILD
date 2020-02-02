@@ -40,7 +40,7 @@ cc_library(
 #    srcs = ["hdmap_roi_filter_test.cc"],
 #    deps = [
 #        ":hdmap_roi_filter",
-#        "@gtest//:main",
+#        "@com_google_googletest//:gtest_main",
 #    ],
 #)
 

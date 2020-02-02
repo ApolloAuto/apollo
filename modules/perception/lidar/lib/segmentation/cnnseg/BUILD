@@ -49,6 +49,7 @@ cc_library(
         ":util",
         "//modules/perception/base",
         "//modules/perception/lidar/lib/segmentation/cnnseg/proto:cnnseg_param_proto",
+        "@com_google_googletest//:gtest",
         "@eigen",
     ],
 )
@@ -78,7 +79,7 @@ cc_test(
     deps = [
         ":cnn_segmentation",
         "//modules/perception/common:perception_gflags",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -90,7 +91,7 @@ cc_test(
 #        ":feature_generator",
 #        "//modules/perception/common:perception_gflags",
 #        "//modules/perception/lidar/common:pcl_util",
-#        "@gtest//:main",
+#        "@com_google_googletest//:gtest_main",
 #        "@opencv2//:core",
 #        "@opencv2//:highgui",
 #    ],

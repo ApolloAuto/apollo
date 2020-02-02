@@ -30,35 +30,7 @@ cc_test(
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
-        "@gtest//:main",
-    ],
-)
-
-cc_library(
-    name = "rnn_evaluator",
-    srcs = ["rnn_evaluator.cc"],
-    hdrs = ["rnn_evaluator.h"],
-    copts = [
-        "-DMODULE_NAME=\\\"prediction\\\"",
-    ],
-    deps = [
-        "//modules/prediction/container/obstacles:obstacles_container",
-        "//modules/prediction/evaluator",
-    ],
-)
-
-cc_test(
-    name = "rnn_evaluator_test",
-    size = "small",
-    srcs = ["rnn_evaluator_test.cc"],
-    data = [
-        "//modules/prediction:prediction_data",
-        "//modules/prediction:prediction_testdata",
-    ],
-    deps = [
-        "//modules/prediction/common:kml_map_based_test",
-        "//modules/prediction/evaluator/vehicle:rnn_evaluator",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -87,7 +59,7 @@ cc_test(
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/evaluator/vehicle:cost_evaluator",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -105,14 +77,8 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
-    ] + select({
-        "//tools/platforms:use_gpu": [
-            "@pytorch_gpu",
-        ],
-        "//conditions:default": [
-            "@pytorch",
-        ],
-    }),
+        "//third_party:libtorch",
+    ],
 )
 
 cc_test(
@@ -126,7 +92,7 @@ cc_test(
     deps = [
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/evaluator/vehicle:junction_mlp_evaluator",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -142,14 +108,8 @@ cc_library(
         "//modules/prediction/common:semantic_map",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
-    ] + select({
-        "//tools/platforms:use_gpu": [
-            "@pytorch_gpu",
-        ],
-        "//conditions:default": [
-            "@pytorch",
-        ],
-    }),
+        "//third_party:libtorch",
+    ],
 )
 
 cc_library(
@@ -164,14 +124,8 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
-    ] + select({
-        "//tools/platforms:use_gpu": [
-            "@pytorch_gpu",
-        ],
-        "//conditions:default": [
-            "@pytorch",
-        ],
-    }),
+        "//third_party:libtorch",
+    ],
 )
 
 cc_test(
@@ -199,14 +153,8 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
-    ] + select({
-        "//tools/platforms:use_gpu": [
-            "@pytorch_gpu",
-        ],
-        "//conditions:default": [
-            "@pytorch",
-        ],
-    }),
+        "//third_party:libtorch",
+    ],
 )
 
 cc_library(
@@ -220,14 +168,8 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
-    ] + select({
-        "//tools/platforms:use_gpu": [
-            "@pytorch_gpu",
-        ],
-        "//conditions:default": [
-            "@pytorch",
-        ],
-    }),
+        "//third_party:libtorch",
+    ],
 )
 
 cc_library(
@@ -242,15 +184,9 @@ cc_library(
         "//modules/prediction/common:semantic_map",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
+        "//third_party:libtorch",
         "@eigen",
-    ] + select({
-        "//tools/platforms:use_gpu": [
-            "@pytorch_gpu",
-        ],
-        "//conditions:default": [
-            "@pytorch",
-        ],
-    }),
+    ],
 )
 
 cpplint()

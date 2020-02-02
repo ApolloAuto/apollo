@@ -19,11 +19,7 @@
  **/
 #include "modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.h"
 
-#include <limits>
 #include <queue>
-#include <string>
-#include <utility>
-#include <vector>
 
 #include "absl/strings/str_cat.h"
 #include "modules/common/math/polygon2d.h"

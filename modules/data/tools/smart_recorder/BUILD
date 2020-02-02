@@ -63,7 +63,9 @@ cc_library(
     name = "smart_recorder_gflags",
     srcs = ["smart_recorder_gflags.cc"],
     hdrs = ["smart_recorder_gflags.h"],
-    deps = ["//external:gflags"],
+    deps = [
+        "@com_github_gflags_gflags//:gflags",
+    ],
 )
 
 cc_library(
@@ -149,7 +151,8 @@ cc_library(
     hdrs = ["interval_pool.h"],
     deps = [
         "//cyber/common:log",
-        "//modules/common/util",
+        "//cyber/common:macros",
+        "@com_google_absl//absl/strings",
     ],
 )
 
@@ -158,8 +161,8 @@ cc_library(
     srcs = ["channel_pool.cc"],
     hdrs = ["channel_pool.h"],
     deps = [
+        "//cyber/common:macros",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/util",
     ],
 )
 

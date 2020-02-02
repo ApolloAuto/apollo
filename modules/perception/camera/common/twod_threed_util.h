@@ -15,8 +15,8 @@
  *****************************************************************************/
 #pragma once
 
-#include <float.h>
 #include <algorithm>
+#include <cfloat>
 #include <utility>
 
 #include "cyber/common/log.h"

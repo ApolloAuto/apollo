@@ -44,8 +44,8 @@ struct TrafficLightUnprotectedLeftTurnContext {
 
 class TrafficLightUnprotectedLeftTurnScenario : public Scenario {
  public:
-  explicit TrafficLightUnprotectedLeftTurnScenario(
-      const ScenarioConfig& config, const ScenarioContext* context)
+  TrafficLightUnprotectedLeftTurnScenario(const ScenarioConfig& config,
+                                          const ScenarioContext* context)
       : Scenario(config, context) {}
 
   void Init() override;

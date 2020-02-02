@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -18,10 +18,11 @@
 
 import datetime
 import os
+import re
 import shutil
 import sys
+
 import yaml
-import re
 
 
 def write_single_protocol_vars(pb_fp, p):
@@ -131,7 +132,7 @@ def gen_proto_file(config_file, work_dir):
                 pb_var_seq = pb_var_seq + 1
             pb_fp.write("}\n")
 
-            #update_detail_pb(car_type)
+            # update_detail_pb(car_type)
 
 
 if __name__ == "__main__":

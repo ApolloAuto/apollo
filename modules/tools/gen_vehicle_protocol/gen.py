@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -16,13 +16,15 @@
 # limitations under the License.
 ###############################################################################
 
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 
 import datetime
 import os
 import shutil
 import sys
+
 import yaml
+
 from gen_proto_file import gen_proto_file
 from gen_protocols import gen_protocols
 from gen_vehicle_controller_and_manager import gen_vehicle_controller_and_manager

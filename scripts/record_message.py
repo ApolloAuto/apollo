@@ -37,6 +37,7 @@ import sys
 
 import psutil
 
+
 def shell_cmd(cmd, alert_on_failure=True):
     """Execute shell command and return (ret-code, stdout, stderr)."""
     print('SHELL > {}'.format(cmd))
@@ -49,8 +50,10 @@ def shell_cmd(cmd, alert_on_failure=True):
         sys.stderr.write('{}\n'.format(stderr))
     return (ret, stdout, stderr)
 
+
 class ArgManager(object):
     """Arguments manager."""
+
     def __init__(self):
         """Init."""
         self.parser = argparse.ArgumentParser(
@@ -66,11 +69,13 @@ class ArgManager(object):
     def args(self):
         """Get parsed args."""
         if self._args is None:
-           self._args = self.parser.parse_args()
+            self._args = self.parser.parse_args()
         return self._args
+
 
 class DiskManager(object):
     """Disk manager."""
+
     def __init__(self):
         """Manage disks."""
         disks = []
@@ -96,6 +101,7 @@ class DiskManager(object):
 
 class Recorder(object):
     """Data recorder."""
+
     def __init__(self, args):
         """Init."""
         self.args = args
@@ -150,6 +156,7 @@ def main():
         recorder.stop()
     else:
         recorder.start()
+
 
 if __name__ == '__main__':
     main()

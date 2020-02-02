@@ -16,38 +16,30 @@
 
 #include "modules/localization/msf/common/util/frame_transform.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
 
-class FrameTransformTestSuite : public ::testing::Test {
- protected:
-  FrameTransformTestSuite() {}
-  virtual ~FrameTransformTestSuite() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
-};
-
-TEST_F(FrameTransformTestSuite, LatlonToUtmXYTest) {
+TEST(FrameTransformTestSuite, LatlonToUtmXYTest) {
   double lon_rad = -2.129343746458001;
   double lat_rad = 0.6530018835651807;
   UTMCoor utm_xy;
-  ASSERT_TRUE(FrameTransform::LatlonToUtmXY(lon_rad, lat_rad, &utm_xy));
-  ASSERT_LT(std::fabs(utm_xy.x - 588278.9834174265), 1e-5);
-  ASSERT_LT(std::fabs(utm_xy.y - 4141295.255870659), 1e-5);
+  EXPECT_TRUE(FrameTransform::LatlonToUtmXY(lon_rad, lat_rad, &utm_xy));
+  EXPECT_LT(std::fabs(utm_xy.x - 588278.9834174265), 1e-5);
+  EXPECT_LT(std::fabs(utm_xy.y - 4141295.255870659), 1e-5);
 }
 
-TEST_F(FrameTransformTestSuite, UtmXYToLatlonTest) {
+TEST(FrameTransformTestSuite, UtmXYToLatlonTest) {
   double x = 588278.9834174265;
   double y = 4141295.255870659;
   int zone = 10;
   bool southhemi = false;
   WGS84Corr latlon;
-  ASSERT_TRUE(FrameTransform::UtmXYToLatlon(x, y, zone, southhemi, &latlon));
-  ASSERT_LT(std::fabs(latlon.log + 2.129343746458001), 1e-5);
-  ASSERT_LT(std::fabs(latlon.lat - 0.6530018835651807), 1e-5);
+  EXPECT_TRUE(FrameTransform::UtmXYToLatlon(x, y, zone, southhemi, &latlon));
+  EXPECT_LT(std::fabs(latlon.log + 2.129343746458001), 1e-5);
+  EXPECT_LT(std::fabs(latlon.lat - 0.6530018835651807), 1e-5);
 }
 
 }  // namespace msf

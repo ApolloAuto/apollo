@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -20,7 +20,7 @@ import requests
 import os
 import sys
 import urllib3
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 from modules.data.proto.static_info_pb2 import VehicleInfo
 import common.proto_utils as proto_utils
 

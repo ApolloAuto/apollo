@@ -9,7 +9,6 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
-        "//external:gflags",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/status",
         "//modules/common/time",
@@ -31,6 +30,7 @@ cc_library(
         "//modules/planning/tasks/optimizers:path_optimizer",
         "//modules/planning/tasks/optimizers:speed_optimizer",
         "//modules/planning/tasks/optimizers/path_time_heuristic:path_time_heuristic_optimizer",
+        "@com_github_gflags_gflags//:gflags",
         "@eigen",
     ],
 )
@@ -41,7 +41,7 @@ cc_test(
     srcs = ["public_road_planner_test.cc"],
     deps = [
         ":public_road_planner",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

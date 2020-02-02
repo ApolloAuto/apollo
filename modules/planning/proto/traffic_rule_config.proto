@@ -77,7 +77,6 @@ message YieldSignConfig {
   optional double start_watch_distance = 3 [default = 2.0];  // meter
 }
 
-// TODO(all) migrate all other traffic rules to pb config
 message TrafficRuleConfig {
   enum RuleId {
     BACKSIDE_VEHICLE = 1;

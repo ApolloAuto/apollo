@@ -34,7 +34,6 @@ namespace scenario {
 namespace traffic_light {
 
 using apollo::hdmap::HDMapUtil;
-using apollo::perception::TrafficLight;
 
 void TrafficLightProtectedScenario::Init() {
   if (init_) {

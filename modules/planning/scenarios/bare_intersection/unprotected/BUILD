@@ -17,8 +17,6 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
-        "//external:gflags",
-        "//modules/common",
         "//modules/common/util",
         "//modules/common/util:factory",
         "//modules/planning/common/util:common_lib",
@@ -26,6 +24,7 @@ cc_library(
         "//modules/planning/scenarios:scenario",
         "//modules/planning/scenarios/common:stage_intersection_cruise_impl",
         "//modules/planning/tasks/deciders/creep_decider",
+        "@com_github_gflags_gflags//:gflags",
         "@eigen",
     ],
 )
@@ -37,7 +36,7 @@ cc_test(
     data = ["//modules/planning:planning_conf"],
     deps = [
         ":bare_intersection_unprotected_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -50,7 +49,7 @@ cc_test(
     ],
     deps = [
         ":bare_intersection_unprotected_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

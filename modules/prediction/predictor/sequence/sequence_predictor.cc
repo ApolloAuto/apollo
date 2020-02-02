@@ -18,7 +18,6 @@
 
 #include <limits>
 #include <memory>
-#include <utility>
 
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -31,7 +30,6 @@ namespace prediction {
 using apollo::common::PathPoint;
 using apollo::common::Point3D;
 using apollo::common::TrajectoryPoint;
-using apollo::common::adapter::AdapterConfig;
 using apollo::hdmap::LaneInfo;
 
 bool SequencePredictor::Predict(
@@ -212,7 +210,7 @@ double SequencePredictor::GetLaneChangeDistanceWithADC(
   }
 
   Eigen::Vector2d adc_position;
-  if (ego_vehicle_ptr != nullptr) {
+  if (ego_vehicle_ptr != nullptr && ego_vehicle_ptr->history_size() > 0) {
     const auto& position = ego_vehicle_ptr->latest_feature().position();
     adc_position[0] = position.x();
     adc_position[1] = position.y();

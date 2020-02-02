@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
+#include "gtest/gtest.h"
 
 #include "cyber/common/file.h"
 #include "modules/perception/base/distortion_model.h"
@@ -146,8 +146,7 @@ TEST(YoloCameraDetectorTest, inference_init_test) {
       GetAbsolutePath(init_options.root_dir, init_options.conf_file);
   yolo::YoloParam yolo_param;
   cyber::common::GetProtoFromFile(config_path, &yolo_param);
-  yolo::YoloParam origin_yolo_param;
-  origin_yolo_param.CopyFrom(yolo_param);
+  yolo::YoloParam origin_yolo_param = yolo_param;
   yolo_param.mutable_model_param()->set_model_type("Unknownnet");
 
   {

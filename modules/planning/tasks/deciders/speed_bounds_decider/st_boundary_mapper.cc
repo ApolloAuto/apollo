@@ -22,7 +22,6 @@
 
 #include <algorithm>
 #include <limits>
-#include <unordered_map>
 #include <utility>
 
 #include "modules/common/proto/pnc_point.pb.h"
@@ -161,6 +160,9 @@ bool STBoundaryMapper::MapStopDecision(
 }
 
 void STBoundaryMapper::ComputeSTBoundary(Obstacle* obstacle) const {
+  if (FLAGS_use_st_drivable_boundary) {
+    return;
+  }
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
 
@@ -189,8 +191,6 @@ bool STBoundaryMapper::GetOverlapBoundaryPoints(
     std::vector<STPoint>* upper_points,
     std::vector<STPoint>* lower_points) const {
   // Sanity checks.
-  DCHECK_NOTNULL(upper_points);
-  DCHECK_NOTNULL(lower_points);
   DCHECK(upper_points->empty());
   DCHECK(lower_points->empty());
   DCHECK_GT(path_points.size(), 0);
@@ -347,9 +347,16 @@ void STBoundaryMapper::ComputeSTBoundaryWithDecision(
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
 
-  if (!GetOverlapBoundaryPoints(path_data_.discretized_path(), *obstacle,
-                                &upper_points, &lower_points)) {
-    return;
+  if (FLAGS_use_st_drivable_boundary &&
+      obstacle->is_path_st_boundary_initialized()) {
+    const auto& path_st_boundary = obstacle->path_st_boundary();
+    lower_points = path_st_boundary.lower_points();
+    upper_points = path_st_boundary.upper_points();
+  } else {
+    if (!GetOverlapBoundaryPoints(path_data_.discretized_path(), *obstacle,
+                                  &upper_points, &lower_points)) {
+      return;
+    }
   }
 
   auto boundary = STBoundary::CreateInstance(lower_points, upper_points);

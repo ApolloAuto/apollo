@@ -28,8 +28,6 @@
 namespace apollo {
 namespace planning {
 
-using apollo::perception::PerceptionObstacle;
-
 Obstacle *PathDecision::AddObstacle(const Obstacle &obstacle) {
   return obstacles_.Add(obstacle.Id(), obstacle);
 }
@@ -104,7 +102,7 @@ bool PathDecision::MergeWithMainStop(const ObjectStop &obj_stop,
                                      const SLBoundary &adc_sl_boundary) {
   common::PointENU stop_point = obj_stop.stop_point();
   common::SLPoint stop_line_sl;
-  reference_line.XYToSL({stop_point.x(), stop_point.y()}, &stop_line_sl);
+  reference_line.XYToSL(stop_point, &stop_line_sl);
 
   double stop_line_s = stop_line_sl.s();
   if (stop_line_s < 0.0 || stop_line_s > reference_line.Length()) {

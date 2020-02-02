@@ -7,6 +7,7 @@ cc_library(
     srcs = ["racobit_radar_message_manager.cc"],
     hdrs = ["racobit_radar_message_manager.h"],
     deps = [
+        "//modules/common/util:message_util",
         "//modules/drivers/canbus:sensor_gflags",
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_sender",
@@ -21,7 +22,7 @@ cc_library(
 #     srcs = ["racobit_radar_message_manager_test.cc"],
 #     deps = [
 #         "racobit_radar_message_manager",
-#         "@gtest//:main",
+#         "@com_google_googletest//:gtest_main",
 #     ],
 # )
 
@@ -33,9 +34,9 @@ cc_library(
     deps = [
         ":racobit_radar_message_manager",
         "//cyber",
-        "//modules/common",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/monitor_log",
+        "//modules/common/status",
         "//modules/drivers/canbus:sensor_gflags",
         "//modules/drivers/canbus/can_client:can_client_factory",
         "//modules/drivers/canbus/can_comm:can_receiver",

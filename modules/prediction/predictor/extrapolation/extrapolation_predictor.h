@@ -22,8 +22,6 @@
 #pragma once
 
 #include <string>
-#include <utility>
-#include <vector>
 
 #include "modules/prediction/predictor/sequence/sequence_predictor.h"
 

@@ -6,9 +6,6 @@ cc_binary(
     name = "ndt_map_creator",
     srcs = ["ndt_map_creator.cc"],
     linkopts = [
-        "-lboost_filesystem",
-        "-lboost_system",
-        "-lboost_program_options",
         "-lopencv_core",
         "-lopencv_highgui",
         "-lopencv_imgproc",
@@ -22,6 +19,7 @@ cc_binary(
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
         "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map",
         "//modules/localization/msf/local_pyramid_map/ndt_map:localization_pyramid_map_ndt_map_pool",
+        "//third_party:boost",
         "@eigen",
         "@pcl",
     ],

@@ -17,10 +17,10 @@
 #ifndef CYBER_BASE_REENTRANT_RW_LOCK_H_
 #define CYBER_BASE_REENTRANT_RW_LOCK_H_
 
-#include <stdint.h>
 #include <unistd.h>
 #include <atomic>
 #include <condition_variable>
+#include <cstdint>
 #include <cstdlib>
 #include <iostream>
 #include <mutex>

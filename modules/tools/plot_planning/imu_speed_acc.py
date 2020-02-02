@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -17,8 +17,9 @@
 ###############################################################################
 
 import math
-from record_reader import RecordItemReader
+
 from imu_speed import ImuSpeed
+from record_reader import RecordItemReader
 
 
 class ImuSpeedAcc:
@@ -79,12 +80,12 @@ if __name__ == "__main__":
         Fs = len(y) / float(x[-1] - x[0])
         n = len(y)
         k = np.arange(n)
-        T = n/Fs
-        frq = k/T
-        frq = frq[range(n/2)]
+        T = n / Fs
+        frq = k / T
+        frq = frq[range(n // 2)]
 
-        Y = np.fft.fft(y)/n
-        Y = Y[range(n/2)]
+        Y = np.fft.fft(y) / n
+        Y = Y[range(n // 2)]
         ax.plot(frq, abs(Y), c=color)
 
     folders = sys.argv[1:]
@@ -135,7 +136,7 @@ if __name__ == "__main__":
 
         ax[0][1].plot(lat_time, lat_acc, c=color, alpha=0.4)
 
-        ax[1][0].plot(lat_acc, lon_acc , '.', c=color, alpha=0.4)
+        ax[1][0].plot(lat_acc, lon_acc, '.', c=color, alpha=0.4)
     ax[0][0].set_xlabel('Timestamp')
     ax[0][0].set_ylabel('Lon Acc')
     ax[0][1].set_xlabel('Timestamp')

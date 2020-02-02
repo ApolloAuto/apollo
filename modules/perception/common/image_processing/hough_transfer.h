@@ -15,8 +15,8 @@
  *****************************************************************************/
 #pragma once
 
-#include <math.h>
 #include <memory.h>
+#include <cmath>
 
 #include <set>
 #include <string>

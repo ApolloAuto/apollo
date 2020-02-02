@@ -128,12 +128,19 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
     if (s > upper_bound || s < lower_bound) {
       return kInf;
     }
-    return cost * unit_t_;
   }
 
   for (const auto* obstacle : obstacles_) {
-    // Not applying obstacle approaching cost to virtual obstacle
+    // Not applying obstacle approaching cost to virtual obstacle like created
+    // stop fences
     if (obstacle->IsVirtual()) {
+      continue;
+    }
+
+    // Stop obstacles are assumed to have a safety margin when mapping them out,
+    // so repelling force in dp st is not needed as it is designed to have adc
+    // stop right at the stop distance we design in prior mapping process
+    if (obstacle->LongitudinalDecision().has_stop()) {
       continue;
     }
 
@@ -161,10 +168,7 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
       s_lower = boundary_cost_[boundary_index][st_graph_point.index_t()].second;
     }
     if (s < s_lower) {
-      const double follow_distance_s =
-          config_.is_lane_changing()
-              ? config_.safe_distance()
-              : StGapEstimator::EstimateSafeFollowingGap(obstacle->speed());
+      const double follow_distance_s = config_.safe_distance();
       if (s + follow_distance_s < s_lower) {
         continue;
       } else {

@@ -16,8 +16,8 @@
 
 #include "cyber/base/object_pool.h"
 
-#include <gtest/gtest.h>
 #include <thread>
+#include "gtest/gtest.h"
 
 #include "cyber/base/concurrent_object_pool.h"
 

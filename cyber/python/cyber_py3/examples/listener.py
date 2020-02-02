@@ -41,6 +41,7 @@ def test_listener_class():
     test_node.create_reader("channel/chatter", ChatterBenchmark, callback)
     test_node.spin()
 
+
 if __name__ == '__main__':
     cyber.init()
     test_listener_class()

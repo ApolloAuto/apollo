@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -19,19 +19,20 @@
 This program can transcribe a protobuf message to file
 """
 
-from cyber_py import cyber
-
 import argparse
 import shutil
 import os
 import sys
 import time
 
-import common.proto_utils as proto_utils
+from cyber_py3 import cyber
 from common.message_manager import PbMessageManager
+import common.proto_utils as proto_utils
+
 
 g_message_manager = PbMessageManager()
 g_args = None
+
 
 def transcribe(proto_msg):
     header = proto_msg.header
@@ -40,6 +41,7 @@ def transcribe(proto_msg):
     file_path = os.path.join(g_args.out_dir, seq + "_" + name + ".pb.txt")
     print('Write proto buffer message to file: %s' % file_path)
     proto_utils.write_pb_to_text_file(proto_msg, file_path)
+
 
 def main(args):
     if not os.path.exists(args.out_dir):
@@ -53,6 +55,7 @@ def main(args):
     node.create_reader(args.topic, meta_msg.msg_type, transcribe)
     while not cyber.is_shutdown():
         time.sleep(0.005)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

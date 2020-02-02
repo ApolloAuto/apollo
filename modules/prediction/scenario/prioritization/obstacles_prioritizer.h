@@ -32,7 +32,7 @@ class ObstaclesPrioritizer {
  public:
   void AssignIgnoreLevel();
 
-  void AssignCautionLevel(const Scenario& scenario);
+  void AssignCautionLevel();
 
  private:
   void AssignCautionLevelInJunction(const Obstacle& ego_vehicle,

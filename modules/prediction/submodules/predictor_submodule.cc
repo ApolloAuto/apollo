@@ -16,7 +16,7 @@
 
 #include "modules/prediction/submodules/predictor_submodule.h"
 
-#include <utility>
+#include "absl/time/time.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
@@ -29,8 +29,7 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::time::Clock;
-
-PredictorSubmodule::~PredictorSubmodule() {}
+using apollo::perception::PerceptionObstacles;
 
 std::string PredictorSubmodule::Name() const {
   return FLAGS_evaluator_submodule_name;
@@ -46,15 +45,17 @@ bool PredictorSubmodule::Init() {
 }
 
 bool PredictorSubmodule::Proc(
+    const std::shared_ptr<PerceptionObstacles>& perception_obstacles,
     const std::shared_ptr<ADCTrajectoryContainer>& adc_trajectory_container,
     const std::shared_ptr<SubmoduleOutput>& submodule_output) {
   const apollo::common::Header& perception_header =
-      submodule_output->perception_header();
+      perception_obstacles->header();
   const apollo::common::ErrorCode& perception_error_code =
-      submodule_output->perception_error_code();
-  const double frame_start_time = submodule_output->frame_start_time();
+      perception_obstacles->error_code();
+  const absl::Time& frame_start_time = submodule_output->frame_start_time();
   ObstaclesContainer obstacles_container(*submodule_output);
-  PredictorManager::Instance()->Run(adc_trajectory_container.get(),
+  PredictorManager::Instance()->Run(*perception_obstacles,
+                                    adc_trajectory_container.get(),
                                     &obstacles_container);
   PredictionObstacles prediction_obstacles =
       PredictorManager::Instance()->prediction_obstacles();
@@ -67,11 +68,13 @@ bool PredictorSubmodule::Proc(
   prediction_obstacles.mutable_header()->set_radar_timestamp(
       perception_header.radar_timestamp());
   prediction_obstacles.set_perception_error_code(perception_error_code);
-  prediction_obstacles.set_start_timestamp(frame_start_time);
 
   common::util::FillHeader(node_->Name(), &prediction_obstacles);
-  predictor_writer_->Write(
-      std::make_shared<PredictionObstacles>(prediction_obstacles));
+  predictor_writer_->Write(prediction_obstacles);
+
+  const absl::Time& end_time = absl::Now();
+  ADEBUG << "End to end time = "
+         << absl::ToDoubleMilliseconds(end_time - frame_start_time) << " ms";
 
   return true;
 }

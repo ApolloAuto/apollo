@@ -32,9 +32,7 @@ namespace planning {
 namespace scenario {
 namespace pull_over {
 
-using apollo::common::math::Vec2d;
 using apollo::common::TrajectoryPoint;
-using apollo::common::VehicleConfigHelper;
 
 PullOverStageRetryParking::PullOverStageRetryParking(
     const ScenarioConfig::StageConfig& config)
@@ -98,10 +96,9 @@ bool PullOverStageRetryParking::CheckADCPullOverOpenSpace() {
                                                pull_over_status.position().y()};
 
   const double distance_diff = adc_position.DistanceTo(target_position);
-  const double theta_diff =
-      std::fabs(common::math::NormalizeAngle(
-          pull_over_status.theta() -
-          common::VehicleStateProvider::Instance()->heading()));
+  const double theta_diff = std::fabs(common::math::NormalizeAngle(
+      pull_over_status.theta() -
+      common::VehicleStateProvider::Instance()->heading()));
   ADEBUG << "distance_diff[" << distance_diff << "] theta_diff[" << theta_diff
          << "]";
   // check distance/theta diff

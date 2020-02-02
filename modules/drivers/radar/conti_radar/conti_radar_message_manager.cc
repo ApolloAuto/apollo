@@ -98,7 +98,7 @@ void ContiRadarMessageManager::Parse(const uint32_t message_id,
     if (sensor_data_.contiobs_size() <=
         sensor_data_.object_list_status().nof_objects()) {
       // maybe lost an object_list_status msg
-      conti_radar_writer_->Write(std::make_shared<ContiRadar>(sensor_data_));
+      conti_radar_writer_->Write(sensor_data_);
     }
     sensor_data_.Clear();
     // fill header when receive the general info message

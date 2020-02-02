@@ -22,12 +22,12 @@ cc_binary(
     srcs = ["pad_terminal.cc"],
     deps = [
         "//cyber",
-        "//external:gflags",
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_gflags",
-        "//modules/common/util",
+        "//modules/common/util:message_util",
         "//modules/control/common",
         "//modules/control/proto:control_proto",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 

@@ -46,7 +46,7 @@ cc_test(
     deps = [
         "//cyber:cyber_core",
         "//cyber:init",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -35,15 +35,15 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "decider_config_proto",
+    name = "creep_decider_config_proto",
     deps = [
-        ":decider_config_proto_lib",
+        ":creep_decider_config_proto_lib",
     ],
 )
 
 proto_library(
-    name = "decider_config_proto_lib",
-    srcs = ["decider_config.proto"],
+    name = "creep_decider_config_proto_lib",
+    srcs = ["creep_decider_config.proto"],
 )
 
 cc_proto_library(
@@ -73,18 +73,6 @@ cc_proto_library(
 proto_library(
     name = "dp_st_speed_config_proto_lib",
     srcs = ["dp_st_speed_config.proto"],
-)
-
-cc_proto_library(
-    name = "proceed_with_caution_speed_config_proto",
-    deps = [
-        ":proceed_with_caution_speed_config_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "proceed_with_caution_speed_config_proto_lib",
-    srcs = ["proceed_with_caution_speed_config.proto"],
 )
 
 cc_proto_library(
@@ -134,7 +122,7 @@ proto_library(
     name = "planning_config_proto_lib",
     srcs = ["planning_config.proto"],
     deps = [
-        ":decider_config_proto_lib",
+        ":creep_decider_config_proto_lib",
         ":dp_st_speed_config_proto_lib",
         ":lane_change_decider_config_proto_lib",
         ":navi_obstacle_decider_config_proto_lib",
@@ -154,7 +142,6 @@ proto_library(
         ":piecewise_jerk_path_config_proto_lib",
         ":piecewise_jerk_speed_config_proto_lib",
         ":planner_open_space_config_proto_lib",
-        ":proceed_with_caution_speed_config_proto_lib",
         ":reference_line_smoother_config_proto_lib",
         ":rule_based_stop_decider_config_proto_lib",
         ":speed_bounds_decider_config_proto_lib",
@@ -598,5 +585,23 @@ proto_library(
     name = "ipopt_return_status_proto_lib",
     srcs = ["ipopt_return_status.proto"],
 )
+
+cc_proto_library(
+    name = "instance_proto",
+    deps = [
+        ":instance_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "instance_proto_lib",
+    srcs = ["instance.proto"],
+    deps = [
+        "//modules/common/proto:geometry_proto_lib",
+        "//modules/common/proto:pnc_point_proto_lib",
+        "//modules/canbus/proto:canbus_proto_lib",
+    ],
+)
+
 
 cpplint()

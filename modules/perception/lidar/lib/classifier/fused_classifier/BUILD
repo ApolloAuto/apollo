@@ -62,7 +62,7 @@ cc_library(
     deps = [
         ":fused_classifier",
         ":util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

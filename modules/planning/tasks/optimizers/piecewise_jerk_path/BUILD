@@ -43,8 +43,8 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 

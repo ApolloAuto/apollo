@@ -34,7 +34,6 @@ namespace planning {
 namespace scenario {
 
 using apollo::common::time::Clock;
-using apollo::hdmap::PathOverlap;
 
 namespace {
 // constexpr double kPathOptimizationFallbackCost = 2e4;

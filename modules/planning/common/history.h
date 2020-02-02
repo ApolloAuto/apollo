@@ -40,7 +40,7 @@ class HistoryObjectDecision {
             const std::vector<ObjectDecisionType>& object_decisions);
 
   const std::string& id() const { return id_; }
-  const std::vector<const ObjectDecisionType*> GetObjectDecision() const;
+  std::vector<const ObjectDecisionType*> GetObjectDecision() const;
 
  private:
   std::string id_;
@@ -55,10 +55,8 @@ class HistoryFrame {
 
   int seq_num() const { return seq_num_; }
 
-  const std::vector<const HistoryObjectDecision*> GetObjectDecisions() const;
-
-  const std::vector<const HistoryObjectDecision*> GetStopObjectDecisions()
-      const;
+  std::vector<const HistoryObjectDecision*> GetObjectDecisions() const;
+  std::vector<const HistoryObjectDecision*> GetStopObjectDecisions() const;
 
   const HistoryObjectDecision* GetObjectDecisionsById(
       const std::string& id) const;
@@ -104,9 +102,11 @@ class History {
   int Add(const ADCTrajectory& adc_trajectory_pb);
   void Clear();
   size_t Size() const;
+  HistoryStatus* mutable_history_status() { return &history_status_; }
 
  private:
   std::list<HistoryFrame> history_frames_;
+  HistoryStatus history_status_;
 
   // this is a singleton class
   DECLARE_SINGLETON(History)

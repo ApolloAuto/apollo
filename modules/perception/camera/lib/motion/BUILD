@@ -10,7 +10,6 @@ cc_library(
         "-Wno-deprecated",
     ],
     deps = [
-        "//modules/common",
         "//modules/perception/base",
     ],
 )

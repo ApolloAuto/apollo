@@ -33,10 +33,8 @@ namespace planning {
 namespace scenario {
 
 bool StageIntersectionCruiseImpl::CheckDone(
-    const Frame& frame,
-    const ScenarioConfig::ScenarioType& scenario_type,
-    const ScenarioConfig::StageConfig& config,
-    const bool right_of_way_status) {
+    const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type,
+    const ScenarioConfig::StageConfig& config, const bool right_of_way_status) {
   const auto& reference_line_info = frame.reference_line_info().front();
 
   const auto& pnc_junction_overlaps =
@@ -94,8 +92,8 @@ bool StageIntersectionCruiseImpl::CheckDone(
     const double distance_adc_pass_traffic_sign =
         adc_back_edge_s - traffic_sign_overlap->end_s;
     ADEBUG << "distance_adc_pass_traffic_sign["
-           << distance_adc_pass_traffic_sign
-           << "] traffic_sign_end_s[" << traffic_sign_overlap->end_s << "]";
+           << distance_adc_pass_traffic_sign << "] traffic_sign_end_s["
+           << traffic_sign_overlap->end_s << "]";
 
     // set right_of_way_status
     reference_line_info.SetJunctionRightOfWay(traffic_sign_overlap->start_s,

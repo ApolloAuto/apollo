@@ -18,7 +18,6 @@
 
 #include <algorithm>
 #include <utility>
-#include <vector>
 
 #include "modules/common/math/vec2d.h"
 #include "modules/prediction/common/feature_output.h"
@@ -29,13 +28,6 @@
 
 namespace apollo {
 namespace prediction {
-
-using apollo::common::Point3D;
-using apollo::common::TrajectoryPoint;
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::math::Vec2d;
-using apollo::perception::PerceptionObstacle;
-using apollo::perception::PerceptionObstacles;
 
 LaneAggregatingEvaluator::LaneAggregatingEvaluator() : device_(torch::kCPU) {
   evaluator_type_ = ObstacleConf::LANE_AGGREGATING_EVALUATOR;

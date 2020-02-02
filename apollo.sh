@@ -63,20 +63,14 @@ function apollo_check_system_config() {
 function check_machine_arch() {
   # the machine type, currently support x86_64, aarch64
   MACHINE_ARCH=$(uname -m)
-
-  # Generate WORKSPACE file based on marchine architecture
-  if [ "$MACHINE_ARCH" == 'x86_64' ]; then
-    sed "s/MACHINE_ARCH/x86_64/g" WORKSPACE.in > WORKSPACE
-  elif [ "$MACHINE_ARCH" == 'aarch64' ]; then
-    sed "s/MACHINE_ARCH/aarch64/g" WORKSPACE.in > WORKSPACE
-  else
+  if [ "${MACHINE_ARCH}" != "x86_64" ] && [ "${MACHINE_ARCH}" != "aarch64" ]; then
     fail "Unknown machine architecture $MACHINE_ARCH"
     exit 1
   fi
 
   #setup vtk folder name for different systems.
   VTK_VERSION=$(find /usr/include/ -type d  -name "vtk-*" | tail -n1 | cut -d '-' -f 2)
-  sed -i "s/VTK_VERSION/${VTK_VERSION}/g" WORKSPACE
+  sed "s/VTK_VERSION/${VTK_VERSION}/g" WORKSPACE.in > WORKSPACE
 }
 
 function check_esd_files() {
@@ -282,6 +276,9 @@ function build_py_proto() {
   find modules/ cyber/ -name "*.proto" \
       | grep -v node_modules \
       | xargs protoc --python_out=py_proto
+  find modules/ cyber/ -name "*_service.proto" \
+      | grep -v node_modules \
+      | xargs python -m grpc_tools.protoc --proto_path=. --python_out=py_proto --grpc_python_out=py_proto
   find py_proto/* -type d -exec touch "{}/__init__.py" \;
 }
 

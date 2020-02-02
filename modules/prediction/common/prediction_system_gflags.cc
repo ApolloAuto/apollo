@@ -81,3 +81,6 @@ DEFINE_string(container_submodule_name, "container_submodule",
               "Container submodule name");
 DEFINE_string(evaluator_submodule_name, "evaluator_submodule",
               "Evaluator submodule name");
+DEFINE_string(perception_obstacles_topic_name,
+              "/apollo/prediction/perception_obstacles",
+              "Internal topic of perception obstacles");

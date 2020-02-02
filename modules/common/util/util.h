@@ -29,13 +29,11 @@
 #include <utility>
 #include <vector>
 
-#include "absl/memory/memory.h"
 #include "cyber/common/log.h"
 #include "cyber/common/types.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/common/util/future.h"
 
 /**
  * @namespace apollo::common::util

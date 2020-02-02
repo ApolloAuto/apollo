@@ -30,6 +30,9 @@ if [ -e "/apollo/scripts/apollo_base.sh" ]; then
   source /apollo/scripts/apollo_base.sh
 fi
 
+alias python='/usr/bin/python3'
+alias pip='/usr/bin/pip3'
+
 ulimit -c unlimited
 ' >> "/home/${DOCKER_USER}/.bashrc"
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -25,14 +25,16 @@ import collections
 import math
 import sys
 
-from cyber_py import cyber
-from cyber_py.record import RecordReader
+from cyber_py3 import cyber
+from cyber_py3.record import RecordReader
 from modules.canbus.proto import chassis_pb2
 from modules.canbus.proto.chassis_pb2 import Chassis
 from modules.localization.proto import localization_pb2
 
+
 kChassisTopic = '/apollo/canbus/chassis'
 kLocalizationTopic = '/apollo/localization/pose'
+
 
 class MileageCalculator(object):
     """
@@ -61,7 +63,7 @@ class MileageCalculator(object):
                 # Mode changed
                 if last_mode != chassis.driving_mode:
                     if (last_mode == Chassis.COMPLETE_AUTO_DRIVE and
-                        chassis.driving_mode == Chassis.EMERGENCY_MODE):
+                            chassis.driving_mode == Chassis.EMERGENCY_MODE):
                         self.disengagements += 1
                     last_mode = chassis.driving_mode
                     # Reset start position.
@@ -80,6 +82,7 @@ class MileageCalculator(object):
         self.manual_mileage += (mileage[Chassis.COMPLETE_MANUAL] +
                                 mileage[Chassis.EMERGENCY_MODE])
 
+
 def main():
     if len(sys.argv) < 2:
         print('Usage: %s [Bag_file1] [Bag_file2] ...' % sys.argv[0])
@@ -89,10 +92,11 @@ def main():
     for bag_file in sys.argv[1:]:
         mc.calculate(bag_file)
     print('Disengagements: %d' % mc.disengagements)
-    print('Auto mileage:   %.3f km / %.3f miles' % \
-        (mc.auto_mileage * 1.60934, mc.auto_mileage))
-    print('Manual mileage: %.3f km / %.3f miles' % \
-        (mc.manual_mileage * 1.60934, mc.manual_mileage))
+    print('Auto mileage:   %.3f km / %.3f miles' %
+          (mc.auto_mileage * 1.60934, mc.auto_mileage))
+    print('Manual mileage: %.3f km / %.3f miles' %
+          (mc.manual_mileage * 1.60934, mc.manual_mileage))
+
 
 if __name__ == '__main__':
     main()

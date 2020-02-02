@@ -22,7 +22,8 @@
 
 #include <memory>
 #include <string>
-#include <utility>
+
+#include "absl/time/time.h"
 
 #include "cyber/component/component.h"
 #include "modules/prediction/common/message_process.h"
@@ -92,6 +93,9 @@ class PredictionComponent
   std::shared_ptr<cyber::Writer<SubmoduleOutput>> container_writer_;
 
   std::shared_ptr<cyber::Writer<ADCTrajectoryContainer>> adc_container_writer_;
+
+  std::shared_ptr<cyber::Writer<perception::PerceptionObstacles>>
+      perception_obstacles_writer_;
 };
 
 CYBER_REGISTER_COMPONENT(PredictionComponent)

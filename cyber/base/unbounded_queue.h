@@ -17,9 +17,9 @@
 #ifndef CYBER_BASE_UNBOUNDED_QUEUE_H_
 #define CYBER_BASE_UNBOUNDED_QUEUE_H_
 
-#include <stdint.h>
 #include <unistd.h>
 #include <atomic>
+#include <cstdint>
 #include <memory>
 
 namespace apollo {

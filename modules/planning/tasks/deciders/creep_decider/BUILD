@@ -23,7 +23,7 @@ cc_test(
     srcs = ["creep_decider_test.cc"],
     deps = [
         "creep_decider",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

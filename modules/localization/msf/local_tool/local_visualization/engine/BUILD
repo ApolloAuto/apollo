@@ -21,7 +21,7 @@ cc_library(
         "//modules/common/util",
         "//modules/localization/msf/common/io:localization_msf_common_io",
         "//modules/localization/msf/local_pyramid_map/base_map:localization_pyramid_map_base_map",
-        "@boost",
+        "//third_party:boost",
         "@eigen",
     ],
 )

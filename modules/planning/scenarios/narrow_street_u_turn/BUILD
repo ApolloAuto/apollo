@@ -17,7 +17,6 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
-        "//modules/common",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/scenarios:scenario",
     ],
@@ -32,7 +31,7 @@ cc_test(
     ],
     deps = [
         ":narrow_street_u_turn",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -19,10 +19,9 @@ message ChannelMonitorConfig {
   // Specify in the format of "a.b.c"
   repeated string mandatory_fields = 3;
 
-  // Minimum and maximum latency allowed for this channel
-  // Alert may be triggered if average latency falls out of this range.
-  optional uint64 min_latency_allowed = 4;  // In nano seconds.
-  optional uint64 max_latency_allowed = 5;  // In nano seconds.
+  // Minimum and maximum frequency allowed for this channel
+  optional double min_frequency_allowed = 4 [default = 0.0];
+  optional double max_frequency_allowed = 5 [default = 1000.0];
 }
 
 // For ResourceMonitor.

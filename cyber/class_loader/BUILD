@@ -15,12 +15,10 @@ cc_library(
         "utility/class_factory.h",
         "utility/class_loader_utility.h",
     ],
-    linkopts = [
-        "-lPocoFoundation",
-    ],
     deps = [
         "//cyber:init",
         "//cyber/common:log",
+        "//third_party:PocoFoundation",
     ],
 )
 
@@ -45,7 +43,7 @@ cc_test(
         "//cyber",
         "//cyber/class_loader/test:base",
         "//cyber/proto:unit_test_cc_proto",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 

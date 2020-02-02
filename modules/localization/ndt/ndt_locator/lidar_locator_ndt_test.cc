@@ -15,11 +15,14 @@
  *****************************************************************************/
 
 #include "modules/localization/ndt/ndt_locator/lidar_locator_ndt.h"
-#include <gtest/gtest.h>
-#include <pcl/io/pcd_io.h>
+
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <sstream>
+
+#include "gtest/gtest.h"
+#include "pcl/io/pcd_io.h"
+
 #include "cyber/common/log.h"
 #include "modules/localization/msf/common/io/pcl_point_types.h"
 #include "modules/localization/msf/common/io/velodyne_utility.h"
@@ -28,15 +31,7 @@ namespace apollo {
 namespace localization {
 namespace ndt {
 
-class LidarLocatorNdtTestSuite : public ::testing::Test {
- protected:
-  LidarLocatorNdtTestSuite() {}
-  virtual ~LidarLocatorNdtTestSuite() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
-};
-
-TEST_F(LidarLocatorNdtTestSuite, LidarLocatorNdt) {
+TEST(LidarLocatorNdtTestSuite, LidarLocatorNdt) {
   const std::string map_folder =
       "/apollo/modules/localization/ndt/test_data/ndt_map";
   const std::string poses_file =
@@ -87,14 +82,14 @@ TEST_F(LidarLocatorNdtTestSuite, LidarLocatorNdt) {
       lidar_frame.intensities.push_back(intensities[i]);
     }
     int ret = locator.Update(0, poses[frame_idx], lidar_frame);
-    ASSERT_LE(std::fabs(ret - 0), 1e-6);
+    EXPECT_LE(std::fabs(ret - 0), 1e-6);
 
     location = locator.GetPose();
   }
-  ASSERT_LE(std::fabs(location.translation()[0] - 588349.337377345), 0.1);
-  ASSERT_LE(std::fabs(location.translation()[1] - 4141239.53859664), 0.1);
-  ASSERT_LE(std::fabs(location.translation()[2] + 30.0964486966756), 0.1);
-  ASSERT_EQ(frame_idx, 2);
+  EXPECT_LE(std::fabs(location.translation()[0] - 588349.337377345), 0.1);
+  EXPECT_LE(std::fabs(location.translation()[1] - 4141239.53859664), 0.1);
+  EXPECT_LE(std::fabs(location.translation()[2] + 30.0964486966756), 0.1);
+  EXPECT_EQ(frame_idx, 2);
 }
 
 }  // namespace ndt

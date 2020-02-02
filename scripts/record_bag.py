@@ -47,6 +47,8 @@ import psutil
 SMALL_TOPICS = [
     '/apollo/canbus/chassis',
     '/apollo/canbus/chassis_detail',
+    '/apollo/common/latency_records',
+    '/apollo/common/latency_reports',
     '/apollo/control',
     '/apollo/control/pad',
     '/apollo/drive_event',
@@ -151,7 +153,7 @@ class ArgManager(object):
     def args(self):
         """Get parsed args."""
         if self._args is None:
-           self._args = self.parser.parse_args()
+            self._args = self.parser.parse_args()
         return self._args
 
 
@@ -256,6 +258,7 @@ def main():
         recorder.stop()
     else:
         recorder.start()
+
 
 if __name__ == '__main__':
     main()

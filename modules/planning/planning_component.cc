@@ -30,7 +30,6 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::perception::TrafficLightDetection;
 using apollo::relative_map::MapMsg;
@@ -140,7 +139,7 @@ bool PlanningComponent::Proc(
   for (auto& p : *adc_trajectory_pb.mutable_trajectory_point()) {
     p.set_relative_time(p.relative_time() + dt);
   }
-  planning_writer_->Write(std::make_shared<ADCTrajectory>(adc_trajectory_pb));
+  planning_writer_->Write(adc_trajectory_pb);
 
   // record in history
   auto* history = History::Instance();
@@ -158,8 +157,7 @@ void PlanningComponent::CheckRerouting() {
   }
   common::util::FillHeader(node_->Name(), rerouting->mutable_routing_request());
   rerouting->set_need_rerouting(false);
-  rerouting_writer_->Write(
-      std::make_shared<RoutingRequest>(rerouting->routing_request()));
+  rerouting_writer_->Write(rerouting->routing_request());
 }
 
 bool PlanningComponent::CheckInput() {
@@ -191,7 +189,7 @@ bool PlanningComponent::CheckInput() {
   if (not_ready->has_reason()) {
     AERROR << not_ready->reason() << "; skip the planning cycle.";
     common::util::FillHeader(node_->Name(), &trajectory_pb);
-    planning_writer_->Write(std::make_shared<ADCTrajectory>(trajectory_pb));
+    planning_writer_->Write(trajectory_pb);
     return false;
   }
   return true;

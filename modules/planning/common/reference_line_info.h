@@ -24,7 +24,7 @@
 #include <list>
 #include <memory>
 #include <string>
-#include <tuple>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -152,7 +152,7 @@ class ReferenceLineInfo {
   void ExportEngageAdvice(common::EngageAdvice* engage_advice) const;
 
   const hdmap::RouteSegments& Lanes() const;
-  const std::list<hdmap::Id> TargetLaneId() const;
+  std::list<hdmap::Id> TargetLaneId() const;
 
   void ExportDecision(DecisionResult* decision_result) const;
 
@@ -161,9 +161,9 @@ class ReferenceLineInfo {
 
   ADCTrajectory::RightOfWayStatus GetRightOfWayStatus() const;
 
-  const hdmap::Lane::LaneTurn GetPathTurnType(const double s) const;
+  hdmap::Lane::LaneTurn GetPathTurnType(const double s) const;
 
-  const bool GetIntersectionRightofWayStatus(
+  bool GetIntersectionRightofWayStatus(
       const hdmap::PathOverlap& pnc_junction_overlap) const;
 
   double OffsetToOtherReferenceLine() const {
@@ -186,7 +186,7 @@ class ReferenceLineInfo {
   void SetBlockingObstacle(const std::string& blocking_obstacle_id);
 
   bool is_path_lane_borrow() const { return is_path_lane_borrow_; }
-  void set_is_path_lane_borrow(bool is_path_lane_borrow) {
+  void set_is_path_lane_borrow(const bool is_path_lane_borrow) {
     is_path_lane_borrow_ = is_path_lane_borrow;
   }
 
@@ -233,6 +233,12 @@ class ReferenceLineInfo {
   void SetTurnSignal(const common::VehicleSignal::TurnSignal& turn_signal);
   void SetEmergencyLight();
 
+  void set_path_reusable(const bool path_reusable) {
+    path_reusable_ = path_reusable;
+  }
+
+  bool path_reusable() const { return path_reusable_; }
+
  private:
   void InitFirstOverlaps();
 
@@ -261,6 +267,7 @@ class ReferenceLineInfo {
                        hdmap::PathOverlap* path_overlap);
 
  private:
+  static std::unordered_map<std::string, bool> junction_right_of_way_map_;
   const common::VehicleState vehicle_state_;
   const common::TrajectoryPoint adc_planning_point_;
   ReferenceLine reference_line_;
@@ -329,6 +336,8 @@ class ReferenceLineInfo {
   common::VehicleSignal vehicle_signal_;
 
   double cruise_speed_ = 0.0;
+
+  bool path_reusable_ = false;
 
   DISALLOW_COPY_AND_ASSIGN(ReferenceLineInfo);
 };

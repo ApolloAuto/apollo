@@ -28,9 +28,7 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//external:gflags",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/common",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/latency_recorder",
         "//modules/common/monitor_log",
@@ -44,6 +42,7 @@ cc_library(
         "//modules/control/proto:preprocessor_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/planning/proto:planning_proto",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
@@ -63,9 +62,7 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//external:gflags",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/common",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/latency_recorder",
         "//modules/common/monitor_log",
@@ -81,6 +78,7 @@ cc_library(
         "//modules/control/proto:preprocessor_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/planning/proto:planning_proto",
+        "@com_github_gflags_gflags//:gflags",
     ],
     alwayslink = True,
 )
@@ -101,9 +99,7 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//external:gflags",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/common",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/latency_recorder",
         "//modules/common/monitor_log",
@@ -118,6 +114,7 @@ cc_library(
         "//modules/control/proto:preprocessor_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/planning/proto:planning_proto",
+        "@com_github_gflags_gflags//:gflags",
     ],
     alwayslink = True,
 )
@@ -138,9 +135,7 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//external:gflags",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/common",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/latency_recorder",
         "//modules/common/monitor_log",
@@ -155,6 +150,7 @@ cc_library(
         "//modules/control/proto:preprocessor_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/planning/proto:planning_proto",
+        "@com_github_gflags_gflags//:gflags",
     ],
     alwayslink = True,
 )

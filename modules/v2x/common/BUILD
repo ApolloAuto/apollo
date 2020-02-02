@@ -7,7 +7,7 @@ cc_library(
     srcs = ["v2x_proxy_gflags.cc"],
     hdrs = ["v2x_proxy_gflags.h"],
     deps = [
-        "//external:gflags",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 

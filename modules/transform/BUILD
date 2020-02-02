@@ -39,7 +39,7 @@ cc_library(
         "//modules/common/util:message_util",
         "//modules/transform/proto:static_transform_conf_proto",
         "//modules/transform/proto:transform_proto",
-        "@yaml_cpp//:yaml",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
     ],
 )
 
@@ -49,7 +49,7 @@ cc_test(
     srcs = ["static_transform_component_test.cc"],
     deps = [
         ":static_transform_component_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

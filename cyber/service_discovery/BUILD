@@ -21,7 +21,7 @@ cc_test(
     srcs = ["topology_manager_test.cc"],
     deps = [
         "//cyber",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -60,7 +60,7 @@ cc_test(
     srcs = ["container/graph_test.cc"],
     deps = [
         "//cyber",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -80,7 +80,7 @@ cc_test(
     srcs = ["container/multi_value_warehouse_test.cc"],
     deps = [
         ":multi_value_warehouse",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -100,7 +100,7 @@ cc_test(
     srcs = ["container/single_value_warehouse_test.cc"],
     deps = [
         ":single_value_warehouse",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -128,7 +128,7 @@ cc_test(
     srcs = ["role/role_test.cc"],
     deps = [
         "//cyber",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -171,7 +171,7 @@ cc_test(
     deps = [
         "//cyber",
         "//cyber/proto:unit_test_cc_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -192,7 +192,7 @@ cc_test(
     srcs = ["specific_manager/node_manager_test.cc"],
     deps = [
         "//cyber",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -213,7 +213,7 @@ cc_test(
     srcs = ["specific_manager/service_manager_test.cc"],
     deps = [
         "//cyber",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

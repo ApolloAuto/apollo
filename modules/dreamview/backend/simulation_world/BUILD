@@ -45,7 +45,7 @@ cc_test(
     deps = [
         ":simulation_world_service",
         "//modules/common/math:quaternion",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -63,7 +63,7 @@ cc_library(
         "//modules/dreamview/backend/map:map_service",
         "//modules/dreamview/backend/perception_camera_updater",
         "//modules/dreamview/backend/sim_control",
-        "@boost",
+        "//third_party:boost",
     ],
 )
 

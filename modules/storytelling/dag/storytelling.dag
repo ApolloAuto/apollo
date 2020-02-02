@@ -4,6 +4,7 @@ module_config {
         class_name : "Storytelling"
         config {
             name: "storytelling"
+            flag_file_path: "/apollo/modules/common/data/global_flagfile.txt"
             interval: 100
         }
     }

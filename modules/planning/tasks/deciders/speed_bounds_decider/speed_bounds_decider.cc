@@ -19,7 +19,6 @@
 #include <algorithm>
 #include <limits>
 #include <string>
-#include <tuple>
 #include <vector>
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -35,10 +34,8 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::ErrorCode;
-using apollo::common::SLPoint;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
-using apollo::common::math::Vec2d;
 using apollo::planning_internal::StGraphBoundaryDebug;
 using apollo::planning_internal::STGraphDebug;
 
@@ -62,7 +59,10 @@ Status SpeedBoundsDecider::Process(
       speed_bounds_config_, reference_line, path_data,
       path_data.discretized_path().Length(), speed_bounds_config_.total_time());
 
-  path_decision->EraseStBoundaries();
+  if (!FLAGS_use_st_drivable_boundary) {
+    path_decision->EraseStBoundaries();
+  }
+
   if (boundary_mapper.ComputeSTBoundary(path_decision).code() ==
       ErrorCode::PLANNING_ERROR) {
     const std::string msg = "Mapping obstacle failed.";

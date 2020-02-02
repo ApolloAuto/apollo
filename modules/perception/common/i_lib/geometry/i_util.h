@@ -14,8 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 #pragma once
-#include <Eigen/Dense>
+
 #include <utility>
+
+#include "Eigen/Dense"
 
 #include "modules/perception/common/i_lib/core/i_blas.h"
 

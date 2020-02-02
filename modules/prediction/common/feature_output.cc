@@ -16,8 +16,6 @@
 
 #include "modules/prediction/common/feature_output.h"
 
-#include <vector>
-
 #include "absl/strings/str_cat.h"
 #include "cyber/common/file.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
@@ -72,8 +70,14 @@ void FeatureOutput::Close() {
 void FeatureOutput::Clear() {
   idx_feature_ = 0;
   idx_learning_ = 0;
+  idx_prediction_result_ = 0;
+  idx_frame_env_ = 0;
+  idx_tuning_ = 0;
   features_.Clear();
   list_data_for_learning_.Clear();
+  list_prediction_result_.Clear();
+  list_frame_env_.Clear();
+  list_data_for_tuning_.Clear();
 }
 
 bool FeatureOutput::Ready() {

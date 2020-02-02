@@ -29,7 +29,6 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::VehicleConfigHelper;
 
 using ad_rss::physics::Distance;
 using ad_rss::physics::ParametricValue;

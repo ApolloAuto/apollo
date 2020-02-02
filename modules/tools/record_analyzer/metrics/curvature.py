@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -17,6 +17,7 @@
 ###############################################################################
 
 import numpy as np
+
 
 class Curvature:
     def __init__(self):

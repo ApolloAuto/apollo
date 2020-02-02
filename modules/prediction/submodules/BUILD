@@ -14,6 +14,7 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/container/obstacles:obstacle",
+        "@com_google_absl//absl/time",
     ],
 )
 
@@ -56,6 +57,7 @@ cc_library(
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/adapters/proto:adapter_config_proto",
         "//modules/common/time",
+        "//modules/common/util:message_util",
         "//modules/perception/proto:perception_proto",
         "//modules/prediction/common:message_process",
         "//modules/prediction/common:prediction_gflags",
@@ -76,9 +78,9 @@ cc_binary(
 cc_library(
     name = "prediction_lego_lib",
     deps = [
-        "//modules/prediction:prediction_component_lib",
         ":evaluator_submodule_lib",
         ":predictor_submodule_lib",
+        "//modules/prediction:prediction_component_lib",
     ],
 )
 

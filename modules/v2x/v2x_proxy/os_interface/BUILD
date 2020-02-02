@@ -23,7 +23,7 @@ cc_test(
     srcs = ["os_interface_test.cc"],
     deps = [
         ":os_interface",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -249,8 +249,8 @@ class PlaneFitGroundDetector : public BaseGroundDetector {
   const char *GetLabel() const;
   const VoxelGridXY<float> *GetGrid() const;
   const GroundPlaneLiDAR *GetGroundPlane(int r, int c) const;
-  const unsigned int GetGridDimX() const;
-  const unsigned int GetGridDimY() const;
+  unsigned int GetGridDimX() const;
+  unsigned int GetGridDimY() const;
   float GetUnknownHeight();
   PlaneFitPointCandIndices **GetCandis() const;
 

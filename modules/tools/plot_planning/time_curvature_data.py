@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -61,7 +61,7 @@ class TimeCurvatureData:
         return self.speed_list, self.curvature_list
 
     def get_fixed_ca_speed_curvature(self):
-        speed_list = range(1, 31)
+        speed_list = list(range(1, 31))
         curvature_list = []
         for speed in speed_list:
             curvature = 2.0 / (speed * speed)

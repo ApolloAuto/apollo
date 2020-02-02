@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -19,7 +19,7 @@
 import os
 import rospy
 import math
-import thread
+import _thread
 import requests
 import json
 import pyproj

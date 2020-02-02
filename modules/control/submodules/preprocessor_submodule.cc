@@ -64,7 +64,7 @@ bool PreprocessorSubmodule::Init() {
 
 bool PreprocessorSubmodule::Proc(const std::shared_ptr<LocalView> &local_view) {
   ADEBUG << "Preprocessor started ....";
-  const double start_timestamp = Clock::NowInSeconds();
+  const auto start_time = Clock::Now();
 
   Preprocessor control_preprocessor;
   // handling estop
@@ -104,13 +104,12 @@ bool PreprocessorSubmodule::Proc(const std::shared_ptr<LocalView> &local_view) {
       local_view->trajectory().header().radar_timestamp());
   common::util::FillHeader(Name(), &control_preprocessor);
 
-  const double end_timestamp = Clock::NowInSeconds();
+  const auto end_time = Clock::Now();
 
   static apollo::common::LatencyRecorder latency_recorder(
       FLAGS_control_preprocessor_topic);
   latency_recorder.AppendLatencyRecord(
-      control_preprocessor.header().lidar_timestamp(), start_timestamp,
-      end_timestamp);
+      control_preprocessor.header().lidar_timestamp(), start_time, end_time);
 
   preprocessor_writer_->Write(control_preprocessor);
   ADEBUG << "Preprocessor finished.";

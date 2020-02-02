@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -17,13 +17,15 @@
 ###############################################################################
 """Real Time ACC Calculate Test Tool Based on Speed"""
 
-import sys
-import os
-import datetime
 import argparse
-from cyber_py import cyber
-from modules.localization.proto import localization_pb2
+import datetime
+import os
+import sys
+
+from cyber_py3 import cyber
 from modules.canbus.proto import chassis_pb2
+from modules.localization.proto import localization_pb2
+
 
 SmoothParam = 9
 
@@ -60,8 +62,8 @@ class RealTimeTest(object):
 
             self.accs.append(self.acc)
             if abs(self.acc) > self.acclimit:
-                print(t, "\t", (sum(self.buff) / len(self.buff)) * 3.6, "\t", \
-                    self.acc, "\t", self.count, "\t", self.acclimit)
+                print(t, "\t", (sum(self.buff) / len(self.buff)) * 3.6, "\t",
+                      self.acc, "\t", self.count, "\t", self.acclimit)
         self.last_acc = self.acc
         self.last_t = t
         self.last_speed = sum(self.buff) / len(self.buff)

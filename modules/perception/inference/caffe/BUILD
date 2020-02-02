@@ -9,7 +9,7 @@ cc_library(
     linkopts = ["-lnvinfer_plugin"],
     deps = [
         "//modules/perception/inference:inference_lib",
-        "@boost",
+        "//third_party:boost",
         "@caffe",
         "@com_google_protobuf//:protobuf",
         "@opencv",
@@ -23,7 +23,7 @@ cc_test(
     deps = [
         ":caffe_net_lib",
         "//modules/perception/inference/utils:inference_util_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

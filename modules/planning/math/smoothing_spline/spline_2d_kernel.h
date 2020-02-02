@@ -44,7 +44,7 @@ class Spline2dKernel {
   Eigen::MatrixXd* mutable_kernel_matrix();
   Eigen::MatrixXd* mutable_offset();
 
-  const Eigen::MatrixXd kernel_matrix() const;
+  Eigen::MatrixXd kernel_matrix() const;
   const Eigen::MatrixXd offset() const;
 
   // build-in kernel methods

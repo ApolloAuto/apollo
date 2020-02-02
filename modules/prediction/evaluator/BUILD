@@ -25,7 +25,6 @@ cc_library(
         "//modules/prediction/evaluator/vehicle:lane_aggregating_evaluator",
         "//modules/prediction/evaluator/vehicle:lane_scanning_evaluator",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
-        "//modules/prediction/evaluator/vehicle:rnn_evaluator",
         "//modules/prediction/evaluator/vehicle:semantic_lstm_evaluator",
         "//modules/prediction/proto:prediction_conf_proto",
     ],

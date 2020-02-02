@@ -21,8 +21,9 @@
 
 #pragma once
 
-#include <grpc++/grpc++.h>
 #include <memory>
+
+#include "grpc++/grpc++.h"
 
 #include "modules/v2x/common/v2x_proxy_gflags.h"
 #include "modules/v2x/proto/v2x_service_car_to_obu.grpc.pb.h"

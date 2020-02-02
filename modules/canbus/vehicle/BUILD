@@ -56,7 +56,7 @@ cc_test(
     srcs = ["vehicle_factory_test.cc"],
     deps = [
         ":vehicle_factory",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

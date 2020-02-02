@@ -16,12 +16,11 @@
 
 #pragma once
 
+#include <boost/thread/locks.hpp>
+#include <boost/thread/shared_mutex.hpp>
 #include <memory>
 #include <string>
 #include <vector>
-
-#include "boost/thread/locks.hpp"
-#include "boost/thread/shared_mutex.hpp"
 
 #include "cyber/cyber.h"
 #include "modules/canbus/proto/chassis.pb.h"

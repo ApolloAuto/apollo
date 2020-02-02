@@ -16,9 +16,9 @@
 
 #include "cyber/py_wrapper/py_record.h"
 
-#include <gtest/gtest.h>
 #include <set>
 #include <string>
+#include "gtest/gtest.h"
 
 #include "cyber/cyber.h"
 #include "cyber/proto/unit_test.pb.h"

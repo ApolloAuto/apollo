@@ -19,7 +19,6 @@
 #include <omp.h>
 
 #include <algorithm>
-#include <limits>
 #include <utility>
 
 #include "cyber/common/file.h"
@@ -35,9 +34,7 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::adapter::AdapterConfig;
 using apollo::common::math::Vec2d;
-using apollo::cyber::common::GetProtoFromFile;
 
 LaneScanningEvaluator::LaneScanningEvaluator() : device_(torch::kCPU) {
   evaluator_type_ = ObstacleConf::LANE_SCANNING_EVALUATOR;

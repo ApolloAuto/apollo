@@ -103,9 +103,9 @@ bool DataParser::Init() {
   gps_writer_ = node_->CreateWriter<Gps>(FLAGS_gps_topic);
 
   common::util::FillHeader("gnss", &ins_status_);
-  insstatus_writer_->Write(std::make_shared<InsStatus>(ins_status_));
+  insstatus_writer_->Write(ins_status_);
   common::util::FillHeader("gnss", &gnss_status_);
-  gnssstatus_writer_->Write(std::make_shared<GnssStatus>(gnss_status_));
+  gnssstatus_writer_->Write(gnss_status_);
 
   AINFO << "Creating data parser of format: " << config_.data().format();
   data_parser_.reset(CreateParser(config_, false));
@@ -160,7 +160,7 @@ void DataParser::CheckInsStatus(::apollo::drivers::gnss::Ins *ins) {
     }
 
     common::util::FillHeader("gnss", &ins_status_);
-    insstatus_writer_->Write(std::make_shared<InsStatus>(ins_status_));
+    insstatus_writer_->Write(ins_status_);
   }
 }
 
@@ -176,7 +176,7 @@ void DataParser::CheckGnssStatus(::apollo::drivers::gnss::Gnss *gnss) {
     gnss_status_.set_solution_completed(false);
   }
   common::util::FillHeader("gnss", &gnss_status_);
-  gnssstatus_writer_->Write(std::make_shared<GnssStatus>(gnss_status_));
+  gnssstatus_writer_->Write(gnss_status_);
 }
 
 void DataParser::DispatchMessage(Parser::MessageType type, MessagePtr message) {

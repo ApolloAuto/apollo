@@ -21,10 +21,7 @@
 #include "modules/planning/tasks/deciders/st_bounds_decider/st_obstacles_processor.h"
 
 #include <algorithm>
-#include <limits>
-#include <tuple>
-#include <unordered_map>
-#include <utility>
+#include <unordered_set>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/decision.pb.h"
@@ -53,23 +50,24 @@ using ObsTEdge = std::tuple<int, double, double, double, std::string>;
 
 void STObstaclesProcessor::Init(const double planning_distance,
                                 const double planning_time,
-                                const PathData& path_data) {
+                                const PathData& path_data,
+                                PathDecision* const path_decision) {
   planning_time_ = planning_time;
   planning_distance_ = planning_distance;
   path_data_ = path_data;
   vehicle_param_ = common::VehicleConfigHelper::GetConfig().vehicle_param();
   adc_path_init_s_ = path_data_.discretized_path().front().s();
+  path_decision_ = path_decision;
 
   obs_t_edges_.clear();
   obs_t_edges_idx_ = 0;
 
   obs_id_to_st_boundary_.clear();
   obs_id_to_decision_.clear();
+  candidate_clear_zones_.clear();
+  obs_id_to_alternative_st_boundary_.clear();
 }
 
-// TODO(jiacheng):
-//  1. Properly deal with clear-zone type obstacles.
-//  2. Further speed up by early terminating processing non-related obstacles.
 Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     PathDecision* const path_decision) {
   // Sanity checks.
@@ -114,19 +112,18 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
 
   // Map obstacles into ST-graph.
   // Go through every obstacle and plot them in ST-graph.
+  std::unordered_set<std::string> non_ignore_obstacles;
   std::tuple<std::string, STBoundary, Obstacle*> closest_stop_obstacle;
   std::get<0>(closest_stop_obstacle) = "NULL";
   for (const auto* obs_item_ptr : path_decision->obstacles().Items()) {
+    // Sanity checks.
     Obstacle* obs_ptr = path_decision->Find(obs_item_ptr->Id());
     if (obs_ptr == nullptr) {
       const std::string msg = "Null obstacle pointer.";
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
-    // Temporarily ignore
-    if (obs_item_ptr->Id().find("KC_JC") != std::string::npos) {
-      continue;
-    }
 
+    // Draw the obstacle's st-boundary.
     std::vector<STPoint> lower_points;
     std::vector<STPoint> upper_points;
     bool is_caution_obstacle = false;
@@ -142,6 +139,32 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     if (is_caution_obstacle) {
       boundary.set_obstacle_road_right_ending_t(obs_caution_end_t);
     }
+    // Update the trimmed obstacle into alternative st-bound storage
+    // for later uses.
+    while (lower_points.size() > 2 &&
+           lower_points.back().t() > obs_caution_end_t) {
+      lower_points.pop_back();
+    }
+    while (upper_points.size() > 2 &&
+           upper_points.back().t() > obs_caution_end_t) {
+      upper_points.pop_back();
+    }
+    auto alternative_boundary =
+        STBoundary::CreateInstanceAccurate(lower_points, upper_points);
+    alternative_boundary.set_id(obs_ptr->Id());
+    obs_id_to_alternative_st_boundary_[obs_ptr->Id()] = alternative_boundary;
+    ADEBUG << "Obstacle " << obs_ptr->Id()
+           << " has an alternative st-boundary with "
+           << lower_points.size() + upper_points.size() << " points.";
+
+    // Store all Keep-Clear zone together.
+    if (obs_item_ptr->Id().find("KC") != std::string::npos) {
+      candidate_clear_zones_.push_back(
+          make_tuple(obs_ptr->Id(), boundary, obs_ptr));
+      continue;
+    }
+
+    // Process all other obstacles than Keep-Clear zone.
     if (obs_ptr->Trajectory().trajectory_point().empty()) {
       // Obstacle is static.
       if (std::get<0>(closest_stop_obstacle) == "NULL" ||
@@ -154,21 +177,67 @@ Status STObstaclesProcessor::MapObstaclesToSTBoundaries(
     } else {
       // Obstacle is dynamic.
       if (boundary.bottom_left_point().s() - adc_path_init_s_ <
-          kSIgnoreThreshold) {
-        // Ignore backward obstacles.
+              kSIgnoreThreshold &&
+          boundary.bottom_left_point().t() > kTIgnoreThreshold) {
+        // Ignore obstacles that are behind.
         // TODO(jiacheng): don't ignore if ADC is in dangerous segments.
-        // continue;
+        continue;
       }
       obs_id_to_st_boundary_[obs_ptr->Id()] = boundary;
       obs_ptr->set_path_st_boundary(boundary);
+      non_ignore_obstacles.insert(obs_ptr->Id());
+      ADEBUG << "Adding " << obs_ptr->Id() << " into the ST-graph.";
     }
   }
-  // For static obstacles, only retain the closest one.
+  // For static obstacles, only retain the closest one (also considers
+  // Keep-Clear zone here).
+  // Note: We only need to check the overlapping between the closest obstacle
+  //       and all the Keep-Clear zones. Because if there is another obstacle
+  //       overlapping with a Keep-Clear zone, which results in an even closer
+  //       stop fence, then that very Keep-Clear zone must also overlap with
+  //       the closest obstacle. (Proof omitted here)
   if (std::get<0>(closest_stop_obstacle) != "NULL") {
-    obs_id_to_st_boundary_[std::get<0>(closest_stop_obstacle)] =
-        std::get<1>(closest_stop_obstacle);
-    std::get<2>(closest_stop_obstacle)
-        ->set_path_st_boundary(std::get<1>(closest_stop_obstacle));
+    std::string closest_stop_obs_id;
+    STBoundary closest_stop_obs_boundary;
+    Obstacle* closest_stop_obs_ptr;
+    std::tie(closest_stop_obs_id, closest_stop_obs_boundary,
+             closest_stop_obs_ptr) = closest_stop_obstacle;
+    ADEBUG << "Closest obstacle ID = " << closest_stop_obs_id;
+    // Go through all Keep-Clear zones, and see if there is an even closer
+    // stop fence due to them.
+    if (!closest_stop_obs_ptr->IsVirtual()) {
+      for (const auto& clear_zone : candidate_clear_zones_) {
+        const auto& clear_zone_boundary = std::get<1>(clear_zone);
+        if (closest_stop_obs_boundary.min_s() >= clear_zone_boundary.min_s() &&
+            closest_stop_obs_boundary.min_s() <= clear_zone_boundary.max_s()) {
+          std::tie(closest_stop_obs_id, closest_stop_obs_boundary,
+                   closest_stop_obs_ptr) = clear_zone;
+          ADEBUG << "Clear zone " << closest_stop_obs_id << " is closer.";
+          break;
+        }
+      }
+    }
+    obs_id_to_st_boundary_[closest_stop_obs_id] = closest_stop_obs_boundary;
+    closest_stop_obs_ptr->set_path_st_boundary(closest_stop_obs_boundary);
+    non_ignore_obstacles.insert(closest_stop_obs_id);
+    ADEBUG << "Adding " << closest_stop_obs_ptr->Id() << " into the ST-graph.";
+    ADEBUG << "min_s = " << closest_stop_obs_boundary.min_s();
+  }
+
+  // Set IGNORE decision for those that are not in ST-graph:
+  for (const auto* obs_item_ptr : path_decision->obstacles().Items()) {
+    Obstacle* obs_ptr = path_decision->Find(obs_item_ptr->Id());
+    if (non_ignore_obstacles.count(obs_ptr->Id()) == 0) {
+      ObjectDecisionType ignore_decision;
+      ignore_decision.mutable_ignore();
+      if (!obs_ptr->HasLongitudinalDecision()) {
+        obs_ptr->AddLongitudinalDecision("st_obstacle_processor",
+                                         ignore_decision);
+      }
+      if (!obs_ptr->HasLateralDecision()) {
+        obs_ptr->AddLateralDecision("st_obstacle_processor", ignore_decision);
+      }
+    }
   }
 
   // Preprocess the obstacles for sweep-line algorithms.
@@ -283,6 +352,15 @@ bool STObstaclesProcessor::GetSBoundsFromDecisions(
   }
   for (const auto& obs_id : obs_id_to_remove) {
     obs_id_to_decision_.erase(obs_id);
+    // Change the displayed st-boundary to the alternative one:
+    if (obs_id_to_alternative_st_boundary_.count(obs_id) > 0) {
+      Obstacle* obs_ptr = path_decision_->Find(obs_id);
+      obs_id_to_st_boundary_[obs_id] =
+          obs_id_to_alternative_st_boundary_[obs_id];
+      obs_id_to_st_boundary_[obs_id].SetBoundaryType(
+          STBoundary::BoundaryType::OVERTAKE);
+      obs_ptr->set_path_st_boundary(obs_id_to_alternative_st_boundary_[obs_id]);
+    }
   }
 
   // Based on existing decisions, get the s-boundary.
@@ -361,13 +439,18 @@ bool STObstaclesProcessor::GetSBoundsFromDecisions(
 void STObstaclesProcessor::SetObstacleDecision(
     const std::string& obs_id, const ObjectDecisionType& obs_decision) {
   obs_id_to_decision_[obs_id] = obs_decision;
+  ObjectStatus object_status;
+  object_status.mutable_motion_type()->mutable_dynamic();
   if (obs_decision.has_yield() || obs_decision.has_stop()) {
     obs_id_to_st_boundary_[obs_id].SetBoundaryType(
         STBoundary::BoundaryType::YIELD);
+    object_status.mutable_decision_type()->mutable_yield();
   } else if (obs_decision.has_overtake()) {
     obs_id_to_st_boundary_[obs_id].SetBoundaryType(
         STBoundary::BoundaryType::OVERTAKE);
+    object_status.mutable_decision_type()->mutable_overtake();
   }
+  history_->mutable_history_status()->SetObjectStatus(obs_id, object_status);
 }
 
 void STObstaclesProcessor::SetObstacleDecision(
@@ -409,6 +492,8 @@ bool STObstaclesProcessor::ComputeObstacleSTBoundary(
       upper_points->emplace_back(overlapping_s.second, 0.0);
       upper_points->emplace_back(overlapping_s.second, planning_time_);
     }
+    *is_caution_obstacle = true;
+    *obs_caution_end_t = planning_time_;
   } else {
     // Processing a dynamic obstacle.
     // Go through every occurrence of the obstacle at all timesteps, and
@@ -420,9 +505,11 @@ bool STObstaclesProcessor::ComputeObstacleSTBoundary(
       // In the future, this could be considered in greater details rather
       // than being approximated.
       const Box2d& obs_box = obstacle.GetBoundingBox(obs_traj_pt);
+      ADEBUG << obs_box.DebugString();
       std::pair<double, double> overlapping_s;
       if (GetOverlappingS(adc_path_points, obs_box, kADCSafetyLBuffer,
                           &overlapping_s)) {
+        ADEBUG << "Obstacle instance is overlapping with ADC path.";
         lower_points->emplace_back(overlapping_s.first,
                                    obs_traj_pt.relative_time());
         upper_points->emplace_back(overlapping_s.second,
@@ -461,9 +548,11 @@ bool STObstaclesProcessor::GetOverlappingS(
   int pt_before_idx = GetSBoundingPathPointIndex(
       adc_path_points, obstacle_instance, vehicle_param_.front_edge_to_center(),
       true, 0, static_cast<int>(adc_path_points.size()) - 2);
+  ADEBUG << "The index before is " << pt_before_idx;
   int pt_after_idx = GetSBoundingPathPointIndex(
       adc_path_points, obstacle_instance, vehicle_param_.back_edge_to_center(),
       false, 0, static_cast<int>(adc_path_points.size()) - 2);
+  ADEBUG << "The index after is " << pt_after_idx;
   if (pt_before_idx == static_cast<int>(adc_path_points.size()) - 2) {
     return false;
   }
@@ -484,10 +573,12 @@ bool STObstaclesProcessor::GetOverlappingS(
   // Detailed searching.
   bool has_overlapping = false;
   for (int i = pt_before_idx; i <= pt_after_idx; ++i) {
+    ADEBUG << "At ADC path index = " << i << " :";
     if (IsADCOverlappingWithObstacle(adc_path_points[i], obstacle_instance,
                                      adc_l_buffer)) {
       overlapping_s->first = adc_path_points[std::max(i - 1, 0)].s();
       has_overlapping = true;
+      ADEBUG << "There is overlapping.";
       break;
     }
   }
@@ -495,9 +586,11 @@ bool STObstaclesProcessor::GetOverlappingS(
     return false;
   }
   for (int i = pt_after_idx; i >= pt_before_idx; --i) {
+    ADEBUG << "At ADC path index = " << i << " :";
     if (IsADCOverlappingWithObstacle(adc_path_points[i], obstacle_instance,
                                      adc_l_buffer)) {
       overlapping_s->second = adc_path_points[i + 1].s();
+      ADEBUG << "There is overlapping.";
       break;
     }
   }
@@ -588,6 +681,9 @@ bool STObstaclesProcessor::IsADCOverlappingWithObstacle(
   // Compute the ADC bounding box.
   Box2d adc_box(ego_center_map_frame, adc_path_point.theta(),
                 vehicle_param_.length(), vehicle_param_.width() + l_buffer * 2);
+
+  ADEBUG << "    ADC box is: " << adc_box.DebugString();
+  ADEBUG << "    Obs box is: " << obs_box.DebugString();
 
   // Check whether ADC bounding box overlaps with obstacle bounding box.
   return obs_box.HasOverlap(adc_box);

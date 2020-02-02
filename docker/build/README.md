@@ -7,6 +7,27 @@ Simply run
 ./build_dev.sh ./dev.x86_64.dockerfile
 ```
 
+## Understand the dependencies
+
+To help users to understand the dependencies, we are trying to compile a high
+level [dependency graph](dependencies.dot). You can build your own Dockerfile or
+ISO package according to it.
+
+To view the graph, please run:
+
+```bash
+sudo apt install xdot
+xdot dependencies.dot
+```
+
+## Add new dependency
+
+When you need to add something to the Docker image or the bazel WORKSPACE, it's
+defined as a new dependency. Before doing that, please add it as well as all its
+dependencies to the dependencies.dot first, so we understand all the
+dependencies and dependents, which helps us manage its lifecycle like upgrading
+and retiring in the future.
+
 ## Add new installer
 
 The best practice of a new installer would be:

@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <gtest/gtest.h>
-
 #include <atomic>
 #include <chrono>
 #include <thread>
+
+#include "gtest/gtest.h"
 
 #include "cyber/record/file/record_file_base.h"
 #include "cyber/record/file/record_file_reader.h"

@@ -34,7 +34,6 @@ cc_library(
         ":camera_app_lib_proto",
         ":debug_info",
         "//cyber",
-        "//external:gflags",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/calibration_service/online_calibration_service",
@@ -52,7 +51,8 @@ cc_library(
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/lib/utils",
-        "@yaml_cpp//:yaml",
+        "@com_github_gflags_gflags//:gflags",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
     ],
 )
 
@@ -81,7 +81,6 @@ cc_library(
         ":camera_app_lib_proto",
         ":debug_info",
         "//cyber",
-        "//external:gflags",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/calibration_service/online_calibration_service",
@@ -94,7 +93,8 @@ cc_library(
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/lib/utils",
-        "@yaml_cpp//:yaml",
+        "@com_github_gflags_gflags//:gflags",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
     ],
 )
 

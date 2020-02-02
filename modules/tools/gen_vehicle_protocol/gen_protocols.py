@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -16,12 +16,13 @@
 # limitations under the License.
 ###############################################################################
 
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 
 import datetime
 import os
 import shutil
 import sys
+
 import yaml
 
 
@@ -215,7 +216,7 @@ def get_byte_info(var):
     bit = var["bit"]
     byte_info = []
     left_len = var["len"]
-    byte_idx = bit / 8
+    byte_idx = bit // 8
     bit_start = bit % 8
     if var["order"] == "motorola":
         while left_len > 0:
@@ -322,7 +323,7 @@ def gen_control_value_func_impl(classname, var, protocol):
     """
     impl = ""
     if var["len"] > 32:
-        print("This generator not support big than four bytes var." + \
+        print("This generator not support big than four bytes var." +
               "protocol classname: %s, var_name:%s " % (
                   class_name, var["name"]))
         return impl
@@ -399,7 +400,7 @@ def gen_control_cpp(car_type, protocol, output_dir):
                     ) + "::" + var["enum"][0].upper()
                 else:
                     init_val = protocol["name"].capitalize(
-                    ) + "::" + var["enum"].values()[0].upper()
+                    ) + "::" + list(var["enum"].values())[0].upper()
 
             set_private_var_init_list.append("  %s_ = %s;" %
                                              (var["name"].lower(), init_val))
@@ -457,15 +458,17 @@ def gen_protocols(protocol_conf_file, protocol_dir):
                 print("Unknown protocol_type:%s" % protocol["protocol_type"])
         gen_build_file(car_type, protocol_dir)
 
+
 def gen_esd_can_extended(str):
     """
         id string:
     """
-    int_id = int(str,16)
+    int_id = int(str, 16)
     int_id &= 0x1FFFFFFF
     int_id |= 0x20000000
     str = hex(int_id).replace('0x', '')
     return str
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

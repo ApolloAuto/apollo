@@ -16,7 +16,7 @@ message ObstacleConf {
 
   enum EvaluatorType {
     MLP_EVALUATOR = 0;
-    RNN_EVALUATOR = 1;
+    RNN_EVALUATOR = 1 [deprecated = true];
     COST_EVALUATOR = 2;  // navi mode can only support this evaluator
     CRUISE_MLP_EVALUATOR = 3;
     JUNCTION_MLP_EVALUATOR = 4;
@@ -31,7 +31,7 @@ message ObstacleConf {
   enum PredictorType {
     LANE_SEQUENCE_PREDICTOR = 0;
     FREE_MOVE_PREDICTOR = 1;
-    REGIONAL_PREDICTOR = 2;
+    REGIONAL_PREDICTOR = 2 [deprecated = true];
     MOVE_SEQUENCE_PREDICTOR = 3;
     EMPTY_PREDICTOR = 4;
     SINGLE_LANE_PREDICTOR = 5;

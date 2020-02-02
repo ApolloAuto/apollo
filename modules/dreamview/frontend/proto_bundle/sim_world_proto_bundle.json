@@ -878,6 +878,7 @@
                 "CONTROL_ERROR": 1000,
                 "CONTROL_INIT_ERROR": 1001,
                 "CONTROL_COMPUTE_ERROR": 1002,
+                "CONTROL_ESTOP_ERROR": 1003,
                 "CANBUS_ERROR": 2000,
                 "CAN_CLIENT_ERROR_BASE": 2100,
                 "CAN_CLIENT_ERROR_OPEN_DEVICE_FAILED": 2101,
@@ -909,7 +910,8 @@
                 "RELATIVE_MAP_ERROR": 11000,
                 "RELATIVE_MAP_NOT_READY": 11001,
                 "DRIVER_ERROR_GNSS": 12000,
-                "DRIVER_ERROR_VELODYNE": 13000
+                "DRIVER_ERROR_VELODYNE": 13000,
+                "STORYTELLING_ERROR": 14000
               }
             },
             "StatusPb": {
@@ -3081,31 +3083,6 @@
                 }
               }
             },
-            "SidePassSafetyConfig": {
-              "fields": {
-                "minObstacleLateralDistance": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "maxOverlapSRange": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 5
-                  }
-                },
-                "safeDurationReachRefLine": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 5
-                  }
-                }
-              }
-            },
             "TargetLane": {
               "fields": {
                 "id": {
@@ -3982,6 +3959,41 @@
                 "enableLaneChangeUrgencyCheck": {
                   "type": "bool",
                   "id": 1
+                },
+                "enablePrioritizeChangeLane": {
+                  "type": "bool",
+                  "id": 2,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "enableRemoveChangeLane": {
+                  "type": "bool",
+                  "id": 3,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "recklessChangeLane": {
+                  "type": "bool",
+                  "id": 4,
+                  "options": {
+                    "default": false
+                  }
+                },
+                "changeLaneSuccessFreezeTime": {
+                  "type": "double",
+                  "id": 5,
+                  "options": {
+                    "default": 1.5
+                  }
+                },
+                "changeLaneFailFreezeTime": {
+                  "type": "double",
+                  "id": 6,
+                  "options": {
+                    "default": 1
+                  }
                 }
               }
             },
@@ -4600,6 +4612,13 @@
                   "id": 11,
                   "options": {
                     "default": 1
+                  }
+                },
+                "endPoseSDistance": {
+                  "type": "double",
+                  "id": 12,
+                  "options": {
+                    "default": 10
                   }
                 }
               },
@@ -6187,7 +6206,6 @@
                   "oneof": [
                     "speedHeuristicConfig",
                     "pathDeciderConfig",
-                    "proceedWithCautionSpeedConfig",
                     "creepDeciderConfig",
                     "openSpacePreStopDeciderConfig",
                     "speedBoundsDeciderConfig",
@@ -6220,10 +6238,6 @@
                 "pathDeciderConfig": {
                   "type": "PathDeciderConfig",
                   "id": 7
-                },
-                "proceedWithCautionSpeedConfig": {
-                  "type": "ProceedWithCautionSpeedConfig",
-                  "id": 8
                 },
                 "creepDeciderConfig": {
                   "type": "CreepDeciderConfig",
@@ -6305,7 +6319,6 @@
                     "NAVI_OBSTACLE_DECIDER": 9,
                     "CREEP_DECIDER": 11,
                     "OPEN_SPACE_PRE_STOP_DECIDER": 12,
-                    "PROCEED_WITH_CAUTION_SPEED": 15,
                     "DECIDER_RSS": 16,
                     "SPEED_BOUNDS_PRIORI_DECIDER": 17,
                     "SPEED_BOUNDS_FINAL_DECIDER": 18,
@@ -6727,6 +6740,13 @@
                   "options": {
                     "default": 25
                   }
+                },
+                "maxSteeringPercentageWhenCruise": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 90
+                  }
                 }
               }
             },
@@ -6903,6 +6923,7 @@
                     "PARK_AND_GO_CHECK": 800,
                     "PARK_AND_GO_CRUISE": 801,
                     "PARK_AND_GO_ADJUST": 802,
+                    "PARK_AND_GO_PRE_CRUISE": 803,
                     "YIELD_SIGN_APPROACH": 900,
                     "YIELD_SIGN_CREEP": 901
                   }
@@ -7241,6 +7262,10 @@
                 "inCheckStage": {
                   "type": "bool",
                   "id": 3
+                },
+                "adcAdjustEndPose": {
+                  "type": "apollo.common.PointENU",
+                  "id": 4
                 }
               }
             },
@@ -7289,30 +7314,6 @@
                     "LEFT_BORROW": 1,
                     "RIGHT_BORROW": 2
                   }
-                }
-              }
-            },
-            "PathReuseDeciderStatus": {
-              "fields": {
-                "reusedPath": {
-                  "type": "bool",
-                  "id": 1,
-                  "options": {
-                    "default": true
-                  }
-                },
-                "laneChangeFailureCounter": {
-                  "type": "int32",
-                  "id": 2
-                }
-              }
-            },
-            "PedestrianStatus": {
-              "fields": {
-                "stopTime": {
-                  "rule": "repeated",
-                  "type": "StopTime",
-                  "id": 1
                 }
               }
             },
@@ -7382,15 +7383,6 @@
                 }
               }
             },
-            "RightOfWayStatus": {
-              "fields": {
-                "junction": {
-                  "keyType": "string",
-                  "type": "bool",
-                  "id": 1
-                }
-              }
-            },
             "ScenarioStatus": {
               "fields": {
                 "scenarioType": {
@@ -7399,18 +7391,6 @@
                 },
                 "stageType": {
                   "type": "ScenarioConfig.StageType",
-                  "id": 2
-                }
-              }
-            },
-            "SidePassStatus": {
-              "fields": {
-                "changeLaneStopPathPoint": {
-                  "type": "apollo.common.PathPoint",
-                  "id": 1
-                },
-                "checkClearFlag": {
-                  "type": "bool",
                   "id": 2
                 }
               }
@@ -7487,72 +7467,41 @@
                   "type": "EmergencyStopStatus",
                   "id": 5
                 },
-                "engageAdvice": {
-                  "type": "apollo.common.EngageAdvice",
-                  "id": 6
-                },
                 "openSpace": {
                   "type": "OpenSpaceStatus",
-                  "id": 7
-                },
-                "pedestrian": {
-                  "type": "PedestrianStatus",
-                  "id": 8
+                  "id": 6
                 },
                 "parkAndGo": {
                   "type": "ParkAndGoStatus",
-                  "id": 9
+                  "id": 7
                 },
                 "pathDecider": {
                   "type": "PathDeciderStatus",
-                  "id": 10
-                },
-                "pathReuseDecider": {
-                  "type": "PathReuseDeciderStatus",
-                  "id": 11
+                  "id": 8
                 },
                 "pullOver": {
                   "type": "PullOverStatus",
-                  "id": 12
+                  "id": 9
                 },
                 "rerouting": {
                   "type": "ReroutingStatus",
-                  "id": 13
-                },
-                "rightOfWay": {
-                  "type": "RightOfWayStatus",
-                  "id": 14
+                  "id": 10
                 },
                 "scenario": {
                   "type": "ScenarioStatus",
-                  "id": 15
-                },
-                "sidePass": {
-                  "type": "SidePassStatus",
-                  "id": 16
+                  "id": 11
                 },
                 "stopSign": {
                   "type": "StopSignStatus",
-                  "id": 17
+                  "id": 12
                 },
                 "trafficLight": {
                   "type": "TrafficLightStatus",
-                  "id": 18
+                  "id": 13
                 },
                 "yieldSign": {
                   "type": "YieldSignStatus",
-                  "id": 19
-                }
-              }
-            },
-            "ProceedWithCautionSpeedConfig": {
-              "fields": {
-                "maxDistance": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 5
-                  }
+                  "id": 14
                 }
               }
             },
@@ -7969,80 +7918,48 @@
                     "default": 0.1
                   }
                 },
-                "highSpeedCentricAccelerationLimit": {
+                "maxCentricAccelerationLimit": {
                   "type": "double",
                   "id": 3,
                   "options": {
-                    "default": 1.2
-                  }
-                },
-                "lowSpeedCentricAccelerationLimit": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 1.4
-                  }
-                },
-                "highSpeedThreshold": {
-                  "type": "double",
-                  "id": 5,
-                  "options": {
-                    "default": 20
-                  }
-                },
-                "lowSpeedThreshold": {
-                  "type": "double",
-                  "id": 6,
-                  "options": {
-                    "default": 7
+                    "default": 2
                   }
                 },
                 "minimalKappa": {
                   "type": "double",
-                  "id": 7,
+                  "id": 4,
                   "options": {
                     "default": 0.00001
                   }
                 },
                 "pointExtension": {
                   "type": "double",
-                  "id": 8,
+                  "id": 5,
                   "options": {
                     "default": 1
                   }
                 },
                 "lowestSpeed": {
                   "type": "double",
-                  "id": 9,
+                  "id": 6,
                   "options": {
                     "default": 2.5
                   }
                 },
-                "numPointsToAvgKappa": {
-                  "type": "uint32",
-                  "id": 10,
-                  "options": {
-                    "default": 4
-                  }
-                },
                 "collisionSafetyRange": {
                   "type": "double",
-                  "id": 11,
+                  "id": 7,
                   "options": {
                     "default": 1
                   }
                 },
                 "staticObsNudgeSpeedRatio": {
                   "type": "double",
-                  "id": 12
+                  "id": 8
                 },
                 "dynamicObsNudgeSpeedRatio": {
                   "type": "double",
-                  "id": 13
-                },
-                "centriJerkSpeedCoeff": {
-                  "type": "double",
-                  "id": 14
+                  "id": 9
                 }
               }
             },

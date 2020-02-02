@@ -20,7 +20,6 @@
 
 #include "modules/planning/common/history.h"
 
-#include <algorithm>
 #include <utility>
 
 #include "cyber/common/log.h"
@@ -50,7 +49,7 @@ void HistoryObjectDecision::Init(
   }
 }
 
-const std::vector<const ObjectDecisionType*>
+std::vector<const ObjectDecisionType*>
 HistoryObjectDecision::GetObjectDecision() const {
   std::vector<const ObjectDecisionType*> result;
   for (size_t i = 0; i < object_decision_.size(); i++) {
@@ -78,8 +77,8 @@ void HistoryFrame::Init(const ADCTrajectory& adc_trajactory) {
   }
 }
 
-const std::vector<const HistoryObjectDecision*>
-HistoryFrame::GetObjectDecisions() const {
+std::vector<const HistoryObjectDecision*> HistoryFrame::GetObjectDecisions()
+    const {
   std::vector<const HistoryObjectDecision*> result;
   for (size_t i = 0; i < object_decisions_.size(); i++) {
     result.push_back(&(object_decisions_[i]));
@@ -88,8 +87,8 @@ HistoryFrame::GetObjectDecisions() const {
   return result;
 }
 
-const std::vector<const HistoryObjectDecision*>
-HistoryFrame::GetStopObjectDecisions() const {
+std::vector<const HistoryObjectDecision*> HistoryFrame::GetStopObjectDecisions()
+    const {
   std::vector<const HistoryObjectDecision*> result;
   for (size_t i = 0; i < object_decisions_.size(); i++) {
     auto obj_decision = object_decisions_[i].GetObjectDecision();

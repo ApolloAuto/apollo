@@ -17,7 +17,6 @@
 #include "modules/prediction/evaluator/vehicle/semantic_lstm_evaluator.h"
 
 #include <omp.h>
-#include <unordered_map>
 
 #include "Eigen/Dense"
 

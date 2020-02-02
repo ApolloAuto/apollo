@@ -26,12 +26,12 @@
  */
 
 #include <arpa/inet.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <poll.h>
 #include <sys/file.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <cerrno>
 
 #include "modules/drivers/velodyne/driver/socket_input.h"
 

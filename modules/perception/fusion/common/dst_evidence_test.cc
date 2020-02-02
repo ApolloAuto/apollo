@@ -14,7 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "boost/format.hpp"
+#include <boost/format.hpp>
+
 #include "cyber/common/log.h"
 #include "gtest/gtest.h"
 

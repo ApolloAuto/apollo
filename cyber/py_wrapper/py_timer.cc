@@ -16,7 +16,12 @@
 
 #include "cyber/py_wrapper/py_timer.h"
 
-#include <Python.h>
+#if PY_MAJOR_VERSION >= 3
+#include <python3.6m/Python.h>
+#else
+#include <python2.7/Python.h>
+#endif
+
 #include <set>
 #include <string>
 

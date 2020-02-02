@@ -21,17 +21,14 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 #include "torch/script.h"
 #include "torch/torch.h"
 
-#include "modules/prediction/evaluator/evaluator.h"
-
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/evaluator/evaluator.h"
 
 /**
  * @namespace apollo::prediction

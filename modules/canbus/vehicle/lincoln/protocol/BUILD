@@ -68,7 +68,7 @@ cc_test(
     srcs = ["accel_6b_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -78,7 +78,7 @@ cc_test(
     srcs = ["brake_60_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -88,7 +88,7 @@ cc_test(
     srcs = ["brake_61_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -98,7 +98,7 @@ cc_test(
     srcs = ["brakeinfo_74_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -108,7 +108,7 @@ cc_test(
     srcs = ["fuellevel_72_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -118,7 +118,7 @@ cc_test(
     srcs = ["gear_66_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -128,7 +128,7 @@ cc_test(
     srcs = ["gear_67_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -138,7 +138,7 @@ cc_test(
     srcs = ["gps_6d_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -148,7 +148,7 @@ cc_test(
     srcs = ["gps_6e_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -158,7 +158,7 @@ cc_test(
     srcs = ["gps_6f_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -168,7 +168,7 @@ cc_test(
     srcs = ["gyro_6c_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -178,7 +178,7 @@ cc_test(
     srcs = ["misc_69_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -188,7 +188,7 @@ cc_test(
     srcs = ["steering_64_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -198,7 +198,7 @@ cc_test(
     srcs = ["steering_65_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -208,7 +208,7 @@ cc_test(
     srcs = ["throttle_62_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -218,7 +218,7 @@ cc_test(
     srcs = ["throttle_63_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -228,7 +228,7 @@ cc_test(
     srcs = ["throttleinfo_75_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -238,7 +238,7 @@ cc_test(
     srcs = ["tirepressure_71_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -248,7 +248,7 @@ cc_test(
     srcs = ["turnsignal_68_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -258,7 +258,7 @@ cc_test(
     srcs = ["version_7f_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -268,7 +268,7 @@ cc_test(
     srcs = ["wheelspeed_6a_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -278,7 +278,7 @@ cc_test(
     srcs = ["surround_73_test.cc"],
     deps = [
         "//modules/canbus/vehicle/lincoln/protocol:canbus_lincoln_protocol",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

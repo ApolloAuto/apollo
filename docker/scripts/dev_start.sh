@@ -24,6 +24,7 @@ ARCH=$(uname -m)
 VERSION_X86_64="dev-18.04-x86_64-20191111_1530"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
+NO_PULL_IMAGE=""
 
 # Check whether user has agreed license agreement
 function check_agreement() {
@@ -61,6 +62,7 @@ OPTIONS:
     -h, --help             Display this help and exit.
     -t, --tag <version>    Specify which version of a docker image to pull.
     -l, --local            Use local docker image.
+    -n,                    Do not pull docker image.
     stop                   Stop all running Apollo containers.
 EOF
 exit 0
@@ -150,6 +152,10 @@ do
         source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh \
             "${map_name}" "${VOLUME_VERSION}"
         ;;
+    -n)
+        NO_PULL_IMAGE="yes"
+        info "running without pulling docker image"
+        ;;
     stop)
 	stop_containers
 	exit 0
@@ -182,7 +188,10 @@ if [ "$LOCAL_IMAGE" == "yes" ] && [ -z "$VERSION_OPT" ]; then
 fi
 
 
-IMG=${DOCKER_REPO}:$VERSION
+APOLLO_DEV_IMAGE=${DOCKER_REPO}:$VERSION
+LOCALIZATION_VOLUME_IMAGE=${DOCKER_REPO}:localization_volume-${ARCH}-latest
+PADDLE_VOLUME_IMAGE=${DOCKER_REPO}:paddlepaddle_volume-${ARCH}-2.0.0
+LOCAL_THIRD_PARTY_VOLUME_IMAGE=${DOCKER_REPO}:local_third_party_volume-${ARCH}-latest
 
 
 function local_volumes() {
@@ -219,14 +228,39 @@ function local_volumes() {
     echo "${volumes}"
 }
 
+## customized docker cmd
+function do_docker_image_inspect()
+{
+    docker image inspect -f {{.Config.Image}} $1 &> /dev/null
+    if [ $? -ne 0 ];then
+        error "Failed to find local docker image : $1"
+        exit 1
+    fi
+}
+
+function do_docker_pull()
+{
+    IMG=$1
+    if [ "$NO_PULL_IMAGE" = "yes" ];then
+        echo "Skipping pull docker image for $IMG"
+        # check for local existence if we skip
+        do_docker_image_inspect $IMG
+    else
+        info "Start pulling docker image $IMG ..."
+        docker pull $IMG
+        if [ $? -ne 0 ];then
+            error "Failed to pull docker image : $IMG"
+            exit 1
+        fi
+    fi
+}
 
 function main(){
 
     if [ "$LOCAL_IMAGE" = "yes" ];then
-        info "Start docker container based on local image : $IMG"
+        info "Start docker container based on local image : $APOLLO_DEV_IMAGE"
     else
-        info "Start pulling docker image $IMG ..."
-        docker pull $IMG
+        do_docker_pull $APOLLO_DEV_IMAGE
         if [ $? -ne 0 ];then
             error "Failed to pull docker image."
             exit 1
@@ -236,7 +270,7 @@ function main(){
     APOLLO_DEV="apollo_dev_${USER}"
     docker ps -a --format "{{.Names}}" | grep "$APOLLO_DEV" 1>/dev/null
     if [ $? == 0 ]; then
-        if [[ "$(docker inspect --format='{{.Config.Image}}' $APOLLO_DEV 2> /dev/null)" != "$IMG" ]]; then
+        if [[ "$(docker inspect --format='{{.Config.Image}}' $APOLLO_DEV 2> /dev/null)" != "$APOLLO_DEV_IMAGE" ]]; then
             rm -rf $APOLLO_ROOT_DIR/bazel-*
             rm -rf $HOME/.cache/bazel/*
         fi
@@ -254,7 +288,7 @@ function main(){
             docker stop ${YOLO3D_VOLUME} > /dev/null 2>&1
 
             YOLO3D_VOLUME_IMAGE=${DOCKER_REPO}:yolo3d_volume-${ARCH}-latest
-            docker pull ${YOLO3D_VOLUME_IMAGE}
+            do_docker_pull ${YOLO3D_VOLUME_IMAGE}
             docker run -it -d --rm --name ${YOLO3D_VOLUME} ${YOLO3D_VOLUME_IMAGE}
 
             OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${YOLO3D_VOLUME}"
@@ -270,21 +304,21 @@ function main(){
     docker stop ${LOCALIZATION_VOLUME} > /dev/null 2>&1
 
     LOCALIZATION_VOLUME_IMAGE=${DOCKER_REPO}:localization_volume-${ARCH}-latest
-    docker pull ${LOCALIZATION_VOLUME_IMAGE}
+    do_docker_pull ${LOCALIZATION_VOLUME_IMAGE}
     docker run -it -d --rm --name ${LOCALIZATION_VOLUME} ${LOCALIZATION_VOLUME_IMAGE}
 
     PADDLE_VOLUME=apollo_paddlepaddle_volume_$USER
     docker stop ${PADDLE_VOLUME} > /dev/null 2>&1
 
     PADDLE_VOLUME_IMAGE=${DOCKER_REPO}:paddlepaddle_volume-${ARCH}-2.0.0
-    docker pull ${PADDLE_VOLUME_IMAGE}
+    do_docker_pull ${PADDLE_VOLUME_IMAGE}
     docker run -it -d --rm --name ${PADDLE_VOLUME} ${PADDLE_VOLUME_IMAGE}
 
     LOCAL_THIRD_PARTY_VOLUME=apollo_local_third_party_volume_$USER
     docker stop ${LOCAL_THIRD_PARTY_VOLUME} > /dev/null 2>&1
 
     LOCAL_THIRD_PARTY_VOLUME_IMAGE=${DOCKER_REPO}:local_third_party_volume-${ARCH}-latest
-    docker pull ${LOCAL_THIRD_PARTY_VOLUME_IMAGE}
+    do_docker_pull ${LOCAL_THIRD_PARTY_VOLUME_IMAGE}
     docker run -it -d --rm --name ${LOCAL_THIRD_PARTY_VOLUME} ${LOCAL_THIRD_PARTY_VOLUME_IMAGE}
 
     OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCALIZATION_VOLUME} "
@@ -361,7 +395,7 @@ function main(){
         -e DOCKER_USER_ID=$USER_ID \
         -e DOCKER_GRP="$GRP" \
         -e DOCKER_GRP_ID=$GRP_ID \
-        -e DOCKER_IMG=$IMG \
+        -e DOCKER_IMG=$APOLLO_DEV_IMAGE \
         -e USE_GPU=$USE_GPU \
         -e NVIDIA_VISIBLE_DEVICES=all \
         -e NVIDIA_DRIVER_CAPABILITIES=compute,video,utility \
@@ -374,10 +408,10 @@ function main(){
         --shm-size 2G \
         --pid=host \
         -v /dev/null:/dev/raw1394 \
-        $IMG \
+        $APOLLO_DEV_IMAGE \
         /bin/bash
     if [ $? -ne 0 ];then
-        error "Failed to start docker container \"${APOLLO_DEV}\" based on image: $IMG"
+        error "Failed to start docker container \"${APOLLO_DEV}\" based on image: $APOLLO_DEV_IMAGE"
         exit 1
     fi
     set +x
@@ -385,7 +419,6 @@ function main(){
     if [ "${USER}" != "root" ]; then
         docker exec $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
     fi
-    docker exec $APOLLO_DEV bash -c '/apollo/docker/scripts/container_setup.sh'
 
     ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/dev_into.sh"
     ok "Enjoy!"

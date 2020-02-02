@@ -1,0 +1,79 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/canbus/proto/chassis.proto";
+import "modules/common/proto/geometry.proto";
+import "modules/common/proto/pnc_point.proto";
+
+message ObstacleFeature {
+  // TODO(all): add more obstacle features.
+}
+
+message RoutingFeature {
+  // TODO(all): add more routing features.
+}
+
+message LocalizationFeature {
+  // Position of the vehicle reference point (VRP) in the map reference frame.
+  // The VRP is the center of rear axle.
+  optional apollo.common.PointENU position = 1;
+
+  // Heading
+  // The heading is zero when the car is facing East and positive when facing
+  // North.
+  optional double heading = 2;
+
+  // Linear velocity of the VRP in the map reference frame.
+  // East/north/up in meters per second.
+  optional apollo.common.Point3D linear_velocity = 3;
+
+  // Linear acceleration of the VRP in the map reference frame.
+  // East/north/up in meters per second.
+  optional apollo.common.Point3D linear_acceleration = 4;
+
+  // Angular velocity of the vehicle in the map reference frame.
+  // Around east/north/up axes in radians per second.
+  optional apollo.common.Point3D angular_velocity = 5;
+}
+
+message ChassisFeature {
+  // Features from chassis
+  // Vehicle Speed in meters per second.
+  optional float speed_mps = 1;
+
+  // Real throttle location in [%], ranging from 0 to 100.
+  optional float throttle_percentage = 2;
+
+  // Real brake location in [%], ranging from 0 to 100.
+  optional float brake_percentage = 3;
+
+  // Real steering location in [%], ranging from -100 to 100.
+  // steering_angle / max_steering_angle
+  // Clockwise: negative
+  // CountClockwise: positive
+  optional float steering_percentage = 4;
+
+  optional apollo.canbus.Chassis.GearPosition gear_location = 5;
+}
+
+message Instance {
+  // Message publishing time in seconds.
+  optional double timestamp_sec = 1;
+
+  // Features from localization
+  optional LocalizationFeature localization_feature = 2;
+
+  // Features from chassis
+  optional ChassisFeature chassis_feature = 3;
+
+  repeated ObstacleFeature obstacle_features = 4;
+  optional RoutingFeature routing_features = 5;
+
+  // ADC ground-truth label trajectory
+  repeated apollo.common.TrajectoryPoint label_trajectory_points = 6;
+}
+
+message Instances {
+  repeated Instance instances = 1;
+}

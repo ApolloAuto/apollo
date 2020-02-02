@@ -38,7 +38,6 @@ namespace scenario {
 namespace emergency_stop {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::VehicleConfigHelper;
 
 EmergencyStopStageApproach::EmergencyStopStageApproach(
     const ScenarioConfig::StageConfig& config)
@@ -68,8 +67,7 @@ Stage::StageStatus EmergencyStopStageApproach::Process(
       PlanningContext::Instance()->planning_status().emergency_stop();
   if (emergency_stop_status.has_stop_fence_point()) {
     common::SLPoint stop_fence_sl;
-    reference_line.XYToSL({emergency_stop_status.stop_fence_point().x(),
-                           emergency_stop_status.stop_fence_point().y()},
+    reference_line.XYToSL(emergency_stop_status.stop_fence_point(),
                           &stop_fence_sl);
     if (stop_fence_sl.s() > adc_front_edge_s) {
       stop_fence_exist = true;

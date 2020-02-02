@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -17,9 +17,9 @@
 ###############################################################################
 
 
-from vector2d import Vector2
-from rotation2d import *
-from util import segment_overlap
+from .vector2d import Vector2
+from .rotation2d import *
+from .util import segment_overlap
 
 
 class BoundingRectangle:

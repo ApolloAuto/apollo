@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -16,16 +16,17 @@
 # limitations under the License.
 ###############################################################################
 
-import math
-import sys
-import matplotlib.pyplot as plt
-import numpy as np
 from os import listdir
 from os.path import isfile, join
+import math
+import sys
 
-from record_reader import RecordItemReader
-from imu_speed_jerk import ImuSpeedJerk
+import matplotlib.pyplot as plt
+import numpy as np
+
 from imu_speed import ImuSpeed
+from imu_speed_jerk import ImuSpeedJerk
+from record_reader import RecordItemReader
 
 
 def grid(data_list, shift):
@@ -33,6 +34,7 @@ def grid(data_list, shift):
     for data in data_list:
         data_grid.append(round(data) + shift / 10.0)
     return data_grid
+
 
 def generate_speed_jerk_dict(speed_jerk_dict, speed_list, jerk_list):
     for i in range(len(speed_list)):
@@ -42,8 +44,9 @@ def generate_speed_jerk_dict(speed_jerk_dict, speed_list, jerk_list):
             if jerk not in speed_jerk_dict[speed]:
                 speed_jerk_dict[speed].append(jerk)
         else:
-             speed_jerk_dict[speed] = [jerk]
+            speed_jerk_dict[speed] = [jerk]
     return speed_jerk_dict
+
 
 if __name__ == "__main__":
 

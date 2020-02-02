@@ -15,9 +15,10 @@
  *****************************************************************************/
 #pragma once
 
-#include <google/protobuf/stubs/common.h>
-
 #include <vector>
+
+#include "google/protobuf/stubs/callback.h"
+#include "google/protobuf/stubs/common.h"
 
 #include "modules/perception/lib/thread/concurrent_queue.h"
 #include "modules/perception/lib/thread/mutex.h"

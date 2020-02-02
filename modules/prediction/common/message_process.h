@@ -20,12 +20,12 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
 
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/storytelling/proto/story.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -53,6 +53,8 @@ class MessageProcess {
       const localization::LocalizationEstimate &localization);
 
   static void OnPlanning(const planning::ADCTrajectory &adc_trajectory);
+
+  static void OnStoryTelling(const storytelling::Stories &story);
 
   static void ProcessOfflineData(const std::string &record_filename);
 };

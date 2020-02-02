@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -15,15 +15,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+
 """
 This program can replay a planning output pb file via ros
 """
+
+import argparse
 import os.path
 import sys
-import argparse
-import rospy
-from std_msgs.msg import String
+
 from google.protobuf import text_format
+from std_msgs.msg import String
+import rospy
 
 import common.message_manager as message_manager
 
@@ -55,6 +58,7 @@ def seq_publisher(seq_num, period):
                 print('publish: %s' % topic)
                 messages[topic]["publisher"].publish(messages[topic]["value"])
         rate.sleep()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

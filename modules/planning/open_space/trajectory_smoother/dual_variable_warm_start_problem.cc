@@ -20,8 +20,8 @@
 
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_problem.h"
 
-#include "IpIpoptApplication.hpp"
-#include "IpSolveStatistics.hpp"
+#include <coin/IpIpoptApplication.hpp>
+#include <coin/IpSolveStatistics.hpp>
 
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"

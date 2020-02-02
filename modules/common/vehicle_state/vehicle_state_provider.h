@@ -94,7 +94,7 @@ class VehicleStateProvider {
 
   /**
    * @brief Get the kappa of vehicle position.
-   *  the poistive or negative sign is decided by the vehicle heading vector
+   *  the positive or negative sign is decided by the vehicle heading vector
    *  along the path
    * @return The kappa of vehicle position.
    */
@@ -151,6 +151,12 @@ class VehicleStateProvider {
    * @return The vehicle's gear position.
    */
   double gear() const;
+
+  /**
+   * @brief Get the vehicle's steering angle.
+   * @return double
+   */
+  double steering_percentage() const;
 
   /**
    * @brief Set the vehicle's linear velocity.

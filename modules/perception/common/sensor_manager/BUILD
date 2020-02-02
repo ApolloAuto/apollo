@@ -16,7 +16,7 @@ cc_library(
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/thread",
         "//modules/perception/proto:sensor_meta_schema_proto",
-        "@yaml_cpp//:yaml",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
     ],
 )
 
@@ -29,7 +29,7 @@ cc_test(
     ],
     deps = [
         ":sensor_manager",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -63,7 +63,7 @@ bool MPCControllerSubmodule::Init() {
 
 bool MPCControllerSubmodule::Proc(
     const std::shared_ptr<Preprocessor>& preprocessor_status) {
-  const double start_timestamp = Clock::NowInSeconds();
+  const auto start_time = Clock::Now();
 
   ControlCommand control_core_command;
   // recording pad msg
@@ -95,13 +95,12 @@ bool MPCControllerSubmodule::Proc(
       preprocessor_status->header().radar_timestamp());
   common::util::FillHeader(Name(), &control_core_command);
 
-  const double end_timestamp = Clock::NowInSeconds();
+  const auto end_time = Clock::Now();
 
   static apollo::common::LatencyRecorder latency_recorder(
       FLAGS_control_core_command_topic);
   latency_recorder.AppendLatencyRecord(
-      control_core_command.header().lidar_timestamp(), start_timestamp,
-      end_timestamp);
+      control_core_command.header().lidar_timestamp(), start_time, end_time);
 
   control_core_command.mutable_header()->mutable_status()->set_error_code(
       status.code());

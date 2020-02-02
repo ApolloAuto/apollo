@@ -44,7 +44,7 @@ class QpSplineReferenceLineSmoother : public ReferenceLineSmoother {
   bool Smooth(const ReferenceLine& raw_reference_line,
               ReferenceLine* const smoothed_reference_line) override;
 
-  void SetAnchorPoints(const std::vector<AnchorPoint>& achor_points) override;
+  void SetAnchorPoints(const std::vector<AnchorPoint>& anchor_points) override;
 
  private:
   void Clear();

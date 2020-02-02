@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -16,14 +16,16 @@
 # limitations under the License.
 ###############################################################################
 
-import sys
 import argparse
-from cyber_py.record import RecordReader
-from modules.control.proto import control_cmd_pb2
-from modules.planning.proto import planning_pb2
+import sys
+
+from cyber_py3.record import RecordReader
 from modules.canbus.proto import chassis_pb2
+from modules.control.proto import control_cmd_pb2
 from modules.drivers.proto import pointcloud_pb2
 from modules.perception.proto import perception_obstacle_pb2
+from modules.planning.proto import planning_pb2
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -49,7 +51,7 @@ if __name__ == "__main__":
 
     for msg in reader.read_messages():
         timestamp = msg.timestamp / float(1e9)
-        if msg.topic == args.message and abs(timestamp - args.timestamp) <=1:
+        if msg.topic == args.message and abs(timestamp - args.timestamp) <= 1:
             if msg.topic == "/apollo/perception/obstacles":
                 perception_obstacles = \
                     perception_obstacle_pb2.PerceptionObstacles()

@@ -39,6 +39,7 @@ cc_library(
         "-fopenmp",
     ],
     deps = [
+        "//cyber",
         "//modules/common/configs:config_gflags",
         "//modules/common/math:quaternion",
         "//modules/common/proto:pnc_point_proto",
@@ -51,8 +52,8 @@ cc_library(
         "//modules/planning/common:history",
         "//modules/planning/common:planning_common",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/common/smoothers:smoother",
         "//modules/planning/common:trajectory_stitcher",
+        "//modules/planning/common/smoothers:smoother",
         "//modules/planning/common/util:util_lib",
         "//modules/planning/planner",
         "//modules/planning/planner:planner_dispatcher",
@@ -86,6 +87,7 @@ cc_library(
     ],
     deps = [
         ":planning_base",
+        "//cyber/common:log",
     ],
 )
 

@@ -19,10 +19,10 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/utsname.h>
-#include <time.h>
 #include <unistd.h>
 #include <cstdint>
 #include <cstdlib>
+#include <ctime>
 #include <string>
 #include <vector>
 

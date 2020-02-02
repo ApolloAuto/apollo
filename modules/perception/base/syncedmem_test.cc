@@ -63,7 +63,7 @@ license and copyright terms herein.
 
 #include "modules/perception/base/syncedmem.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 #include "modules/perception/base/test/test_helper.h"
 

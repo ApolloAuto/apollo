@@ -172,8 +172,7 @@ void LaneChangeDecider::UpdatePreparationDistance(
     return;
   }
   common::SLPoint point_sl;
-  reference_line.XYToSL({lane_change_status->lane_change_start_position().x(),
-                         lane_change_status->lane_change_start_position().y()},
+  reference_line.XYToSL(lane_change_status->lane_change_start_position(),
                         &point_sl);
   ADEBUG << "Current ADC s: " << adc_sl_info.first[0];
   ADEBUG << "Change lane point s: " << point_sl.s();
@@ -286,7 +285,7 @@ bool LaneChangeDecider::IsClearToChangeLane(
 
     for (const auto& p : obstacle->PerceptionPolygon().points()) {
       SLPoint sl_point;
-      reference_line_info->reference_line().XYToSL({p.x(), p.y()}, &sl_point);
+      reference_line_info->reference_line().XYToSL(p, &sl_point);
       start_s = std::fmin(start_s, sl_point.s());
       end_s = std::fmax(end_s, sl_point.s());
 
@@ -321,8 +320,8 @@ bool LaneChangeDecider::IsClearToChangeLane(
     // TODO(All) move to confs
     static constexpr double kSafeTimeOnSameDirection = 3.0;
     static constexpr double kSafeTimeOnOppositeDirection = 5.0;
-    static constexpr double kForwardMinSafeDistanceOnSameDirection = 3.0;
-    static constexpr double kBackwardMinSafeDistanceOnSameDirection = 4.0;
+    static constexpr double kForwardMinSafeDistanceOnSameDirection = 10.0;
+    static constexpr double kBackwardMinSafeDistanceOnSameDirection = 10.0;
     static constexpr double kForwardMinSafeDistanceOnOppositeDirection = 50.0;
     static constexpr double kBackwardMinSafeDistanceOnOppositeDirection = 1.0;
     static constexpr double kDistanceBuffer = 0.5;

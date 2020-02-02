@@ -17,8 +17,8 @@
 #ifndef CYBER_MESSAGE_RAW_MESSAGE_H_
 #define CYBER_MESSAGE_RAW_MESSAGE_H_
 
-#include <string.h>
 #include <cassert>
+#include <cstring>
 #include <memory>
 #include <string>
 

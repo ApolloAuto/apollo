@@ -123,7 +123,7 @@ bool ActiveSetSpline2dSolver::Solve() {
   }
   DCHECK_EQ(index, kernel_matrix.rows() * kernel_matrix.cols());
 
-  // search space lower bound and uppper bound
+  // search space lower bound and upper bound
   double lower_bound[num_param];  // NOLINT
   double upper_bound[num_param];  // NOLINT
   memset(lower_bound, 0, sizeof lower_bound);

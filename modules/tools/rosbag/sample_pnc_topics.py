@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -26,14 +26,17 @@ Example:
     ./sample_pnc_topics.py '/mnt/nfs/public_test/2018-04-??/*/mkz8/*/*.record'
 """
 
+import argparse
 import glob
 import os
 import sys
+
 import glog
-import argparse
-from cyber_py import cyber
-from cyber_py.record import RecordReader
-from cyber_py.record import RecordWriter
+
+from cyber_py3 import cyber
+from cyber_py3.record import RecordReader
+from cyber_py3.record import RecordWriter
+
 
 class SamplePNC(object):
     """Sample bags to contain PNC related topics only."""
@@ -87,6 +90,7 @@ class SamplePNC(object):
                 fwriter.write_channel(channelname, datatype, desc)
                 fwriter.write_message(channelname, msg, timestamp)
         print('----- Finish processing record -----')
+
 
 if __name__ == '__main__':
     cyber.init()
