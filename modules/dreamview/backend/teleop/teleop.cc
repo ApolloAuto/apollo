@@ -34,9 +34,9 @@ using apollo::planning::DrivingAction;
 using apollo::planning::PadMessage;
 using apollo::planning::ScenarioConfig;
 using ::google::protobuf::util::MessageToJsonString;
-using modules::teleop::modem::ModemInfo;
 using modules::teleop::daemon::DaemonCmd;
 using modules::teleop::daemon::DaemonRpt;
+using modules::teleop::modem::ModemInfo;
 
 // modem ids
 const std::string modem0_id = "0";
@@ -59,10 +59,8 @@ const std::string remote_daemon_cmd_channel =
     "/apollo/teleop/daemon/remote/cmd";
 const std::string remote_daemon_rpt_channel =
     "/apollo/teleop/daemon/remote/rpt";
-const std::string local_daemon_cmd_channel =
-    "/apollo/teleop/daemon/local/cmd";
-const std::string local_daemon_rpt_channel =
-    "/apollo/teleop/daemon/local/rpt";
+const std::string local_daemon_cmd_channel = "/apollo/teleop/daemon/local/cmd";
+const std::string local_daemon_rpt_channel = "/apollo/teleop/daemon/local/rpt";
 const std::string planning_channel = "/apollo/planning";
 const std::string planning_pad_channel = "/apollo/planning/pad";
 

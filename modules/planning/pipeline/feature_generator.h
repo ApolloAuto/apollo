@@ -15,8 +15,8 @@
  *****************************************************************************/
 #pragma once
 
-#include <string>
 #include <list>
+#include <string>
 
 #include "cyber/common/file.h"
 #include "modules/canbus/proto/chassis.pb.h"
@@ -43,13 +43,11 @@ class FeatureGenerator {
           localization_for_label,
       Instance* instance);
 
-  Instance *instance_ = nullptr;  // not owned
+  Instance* instance_ = nullptr;  // not owned
   Instances instances_;
   int instance_file_index_ = 0;
-  std::list<apollo::localization::LocalizationEstimate>
-      localization_for_label_;
+  std::list<apollo::localization::LocalizationEstimate> localization_for_label_;
 };
 
 }  // namespace planning
 }  // namespace apollo
-

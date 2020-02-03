@@ -452,8 +452,8 @@ TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
 
     for (int j = 0; j < obj.prediction_size(); ++j) {
       const Prediction& prediction = obj.prediction(j);
-      const std::pair<int, double> item_to_find(
-          std::stoi(obj.id()), prediction.probability());
+      const std::pair<int, double> item_to_find(std::stoi(obj.id()),
+                                                prediction.probability());
       const auto id_prob_it = original_probabilities.find(item_to_find);
       EXPECT_NE(id_prob_it, original_probabilities.end());
       if (id_prob_it != original_probabilities.end()) {

@@ -25,9 +25,9 @@
 #ifdef TELEOP
 #include "modules/planning/proto/pad_msg.pb.h"
 #include "modules/planning/proto/planning.pb.h"
-#include "modules/teleop/modem/proto/modem_info.pb.h"
 #include "modules/teleop/daemon/proto/daemon_cmd.pb.h"
 #include "modules/teleop/daemon/proto/daemon_rpt.pb.h"
+#include "modules/teleop/modem/proto/modem_info.pb.h"
 #endif
 
 #include "modules/dreamview/backend/handlers/websocket_handler.h"

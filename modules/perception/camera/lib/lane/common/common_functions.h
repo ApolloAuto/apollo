@@ -152,7 +152,7 @@ bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
     Eigen::FullPivLU<Eigen::Matrix<Dtype, 3, 3>> mat(matA);
     mat.setThreshold(1e-5f);
     if (mat.rank() < 3) {
-      ADEBUG << "matA: "<< matA;
+      ADEBUG << "matA: " << matA;
       ADEBUG << "Matrix is not full rank (3). The rank is: " << mat.rank();
       continue;
     }
@@ -162,7 +162,7 @@ bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
     Eigen::Matrix<Dtype, 3, 1> matB;
     matB << pos_vec[index[0]](1), pos_vec[index[1]](1), pos_vec[index[2]](1);
     Eigen::Vector3f c =
-        static_cast<Eigen::Matrix<Dtype, 3, 1>> (matA.inverse() * matB);
+        static_cast<Eigen::Matrix<Dtype, 3, 1>>(matA.inverse() * matB);
     if (!(matA * c).isApprox(matB)) {
       ADEBUG << "No solution.";
       continue;

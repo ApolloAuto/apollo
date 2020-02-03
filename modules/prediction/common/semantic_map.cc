@@ -37,8 +37,7 @@ namespace prediction {
 namespace {
 
 bool ValidFeatureHistory(const ObstacleHistory& obstacle_history,
-                         const double curr_base_x,
-                         const double curr_base_y) {
+                         const double curr_base_x, const double curr_base_y) {
   if (obstacle_history.feature_size() == 0) {
     return false;
   }

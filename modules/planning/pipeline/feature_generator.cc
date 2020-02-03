@@ -45,7 +45,6 @@ DEFINE_int32(localization_move_window_step, 5,
 DEFINE_bool(enable_binary_instance, true,
             "True to generate protobuf binary data file.");
 
-
 namespace apollo {
 namespace planning {
 
