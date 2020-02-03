@@ -588,7 +588,7 @@ LaneInfoConstPtr PncMap::GetRoutePredecessor(LaneInfoConstPtr lane) const {
 
   hdmap::Id preferred_id = lane->lane().predecessor_id(0);
   for (size_t i = 1; i < route_indices_.size(); ++i) {
-    auto& lane = route_indices_[i].segment.lane->id();
+    auto &lane = route_indices_[i].segment.lane->id();
     if (predecessor_ids.count(lane.id()) != 0) {
       preferred_id = lane;
       break;
