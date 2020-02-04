@@ -15,11 +15,11 @@ cc_test(
         "//modules/perception/inference:inference_factory_lib",
         "//modules/perception/inference/operators:perception_inference_operators",
         "@caffe",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
         "@opencv",
         "@tensorrt",
-        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -34,11 +34,11 @@ cc_test(
 #        "//modules/perception/inference:inference_factory_lib",
 #        "//modules/perception/inference/operators:perception_inference_operators",
 #        "@caffe",
+#        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
+#        "@com_google_googletest//:gtest_main",
 #        "@com_google_protobuf//:protobuf",
 #        "@opencv",
 #        "@tensorrt",
-#        "@com_google_googletest//:gtest_main",
-#        "@yaml_cpp//:yaml",
 #    ],
 #)
 cc_test(
@@ -49,8 +49,8 @@ cc_test(
         "//modules/perception/base",
         "//modules/perception/camera/common:camera_ground_plane",
         "//modules/perception/common/io:io_util",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
-        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -73,11 +73,11 @@ cc_test(
         "//modules/perception/inference:inference_factory_lib",
         "//modules/perception/inference/operators:perception_inference_operators",
         "@caffe",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
         "@opencv",
         "@tensorrt",
-        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -94,11 +94,11 @@ cc_test(
         "//modules/perception/inference:inference_factory_lib",
         "//modules/perception/inference/operators:perception_inference_operators",
         "@caffe",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
         "@opencv",
         "@tensorrt",
-        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -109,8 +109,8 @@ cc_library(
     deps = [
         "//modules/perception/base",
         "//third_party:boost",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@opencv",
-        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -121,18 +121,18 @@ cc_library(
 #        "-lnvinfer_plugin",
 #    ],
 #    deps = [
+#        ":camera_common_io_util",
+#        ":camera_common_undistortion",
 #        "//modules/perception/camera/common:undistortion_handler",
 #        "//modules/perception/inference:inference_factory_lib",
 #        "//modules/perception/inference/operators:perception_inference_operators",
 #        "//modules/perception/lib/utils:utils",
 #        "@caffe",
+#        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
+#        "@com_google_googletest//:gtest_main",
 #        "@com_google_protobuf//:protobuf",
 #        "@opencv",
 #        "@tensorrt",
-#        "@com_google_googletest//:gtest_main",
-#        "@yaml_cpp//:yaml",
-#        ":camera_common_undistortion",
-#        ":camera_common_io_util",
 #    ],
 #)
 cc_test(
@@ -151,11 +151,11 @@ cc_test(
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_util_lib",
         "@caffe",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
         "@opencv",
         "@tensorrt",
-        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -171,11 +171,11 @@ cc_test(
         "//modules/perception/inference:inference_factory_lib",
         "//modules/perception/inference/operators:perception_inference_operators",
         "@caffe",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
         "@opencv",
         "@tensorrt",
-        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -189,8 +189,8 @@ cc_test(
         "//modules/perception/camera/lib/calibration_service/online_calibration_service",
         "//modules/perception/camera/lib/calibrator/laneline:laneline_calibrator",
         "//modules/perception/common/io:io_util",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
-        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -298,9 +298,9 @@ cc_test(
         "//modules/perception/base",
         "//modules/perception/camera/lib/lane/common:common_functions",
         "//modules/perception/common/io:io_util",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@opencv",
-        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -392,9 +392,9 @@ cc_test(
         "//modules/perception/common/io:io_util",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_util_lib",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@opencv",
-        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -451,10 +451,10 @@ cc_test(
 #         "//modules/perception/camera/lib/interface:interface",
 #         "//modules/perception/common/geometry:common",
 #         "//modules/perception/common/io:io_util",
+#         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
 #         "@com_google_absl//absl/strings",
 #         "@com_google_googletest//:gtest_main",
 #         "@opencv",
-#         "@yaml_cpp//:yaml",
 #     ],
 # )
 
@@ -516,11 +516,11 @@ cc_test(
     deps = [
         "//modules/perception/camera/lib/traffic_light/detector/detection:cropbox",
         "@caffe",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
         "@opencv",
         "@tensorrt",
-        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -535,11 +535,11 @@ cc_test(
 #         "//modules/perception/inference:inference_factory_lib",
 #         "//modules/perception/inference/operators:perception_inference_operators",
 #         "@caffe",
+#         "@com_github_jbeder_yaml_cpp//:yaml-cpp",
+#         "@com_google_googletest//:gtest_main",
 #         "@com_google_protobuf//:protobuf",
 #         "@opencv",
 #         "@tensorrt",
-#         "@com_google_googletest//:gtest_main",
-#         "@yaml_cpp//:yaml",
 #     ],
 # )
 
@@ -554,11 +554,11 @@ cc_test(
 #        "//modules/perception/inference:inference_factory_lib",
 #        "//modules/perception/inference/operators:perception_inference_operators",
 #        "@caffe",
+#        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
+#        "@com_google_googletest//:gtest_main",
 #        "@com_google_protobuf//:protobuf",
 #        "@opencv",
 #        "@tensorrt",
-#        "@com_google_googletest//:gtest_main",
-#        "@yaml_cpp//:yaml",
 #    ],
 #)
 cc_test(
@@ -573,11 +573,11 @@ cc_test(
         "//modules/perception/inference:inference_factory_lib",
         "//modules/perception/inference/operators:perception_inference_operators",
         "@caffe",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
         "@opencv",
         "@tensorrt",
-        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -594,11 +594,11 @@ cc_test(
 #        "//modules/perception/inference:inference_factory_lib",
 #        "//modules/perception/inference/operators:perception_inference_operators",
 #        "@caffe",
-#        "@com_google_protobuf//:protobuf",
+#        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
 #        "@com_google_googletest//:gtest_main",
+#        "@com_google_protobuf//:protobuf",
 #        "@opencv",
 #        "@tensorrt",
-#        "@yaml_cpp//:yaml",
 #    ],
 #)
 
@@ -617,11 +617,11 @@ cc_test(
         "//modules/perception/inference:inference_factory_lib",
         "//modules/perception/inference/operators:perception_inference_operators",
         "@caffe",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_googletest//:gtest_main",
         "@com_google_protobuf//:protobuf",
         "@opencv",
         "@tensorrt",
-        "@yaml_cpp//:yaml",
     ],
 )
 

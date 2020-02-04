@@ -73,8 +73,8 @@ cc_library(
         "//modules/planning/math/curve1d:quintic_spiral_path",
         "//modules/planning/math/smoothing_spline:spline_2d_solver",
         "//modules/planning/proto:planning_proto",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 

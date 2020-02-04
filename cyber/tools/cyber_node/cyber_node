@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
 
@@ -15,11 +15,13 @@
 # limitations under the License.
 # ****************************************************************************
 
-import sys
 import os
+import sys
+
+from cyber_py3 import cyber
+
 
 sys.path.append("../")
-from cyber_py import cyber
 
 
 def print_node_info(node_name, sleep_s=2):

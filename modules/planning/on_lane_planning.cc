@@ -211,7 +211,9 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   VehicleState vehicle_state =
       VehicleStateProvider::Instance()->vehicle_state();
   const double vehicle_state_timestamp = vehicle_state.timestamp();
-  DCHECK_GE(start_timestamp, vehicle_state_timestamp);
+  DCHECK_GE(start_timestamp, vehicle_state_timestamp)
+      << "start_timestamp is behind vehicle_state_timestamp by "
+      << start_timestamp - vehicle_state_timestamp << " secs";
 
   if (!status.ok() || !util::IsVehicleStateValid(vehicle_state)) {
     std::string msg(

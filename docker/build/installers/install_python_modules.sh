@@ -27,9 +27,11 @@ apt update -y && apt install -y \
     python-pip \
     python-psutil \
     python-scipy \
-    software-properties-common \
+    python3-matplotlib \
     python3-pip \
-    python3-psutil
+    python3-psutil \
+    python3-scipy \
+    software-properties-common 
 
 pip2 install --no-cache-dir -r py27_requirements.txt
 pip3 install --no-cache-dir -r py3_requirements.txt

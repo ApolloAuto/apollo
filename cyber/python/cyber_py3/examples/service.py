@@ -38,6 +38,7 @@ def test_service_class():
         "server_01", ChatterBenchmark, ChatterBenchmark, callback)
     node.spin()
 
+
 if __name__ == '__main__':
     cyber.init()
     test_service_class()

@@ -53,6 +53,7 @@ def print_channel_info(file_path):
         # print(desc)
     print("++++++++++++Finish Channel Info Statistics++++++++++++++\n")
 
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print('Usage: %s record_file' % sys.argv[0])

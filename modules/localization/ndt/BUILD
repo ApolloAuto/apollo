@@ -34,9 +34,9 @@ cc_library(
         "//modules/transform:tf2_buffer_lib",
         "//modules/transform:transform_broadcaster_lib",
         "//third_party:boost",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
         "@com_google_glog//:glog",
         "@eigen",
-        "@yaml_cpp//:yaml",
     ],
 )
 

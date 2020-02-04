@@ -29,8 +29,8 @@ current implementation for:
 import os
 import sys
 
-from cyber_py import cyber
-from cyber_py import record
+from cyber_py3 import cyber
+from cyber_py3 import record
 from modules.drivers.proto.pointcloud_pb2 import PointCloud
 
 

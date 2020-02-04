@@ -130,7 +130,7 @@ new_local_repository(
 
 # YAML-CPP
 new_http_archive(
-    name = "yaml_cpp",
+    name = "com_github_jbeder_yaml_cpp",
     build_file = "third_party/yaml_cpp.BUILD",
     strip_prefix = "yaml-cpp-yaml-cpp-0.5.3",
     url = "file:///home/tmp/yaml-cpp-0.5.3.zip",
@@ -155,7 +155,7 @@ new_local_repository(
 new_local_repository(
     name = "ipopt",
     build_file = "third_party/ipopt.BUILD",
-    path = "/usr/local/ipopt/include/coin",
+    path = "/usr/local/ipopt/include",
 )
 
 # ADOL-C

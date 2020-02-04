@@ -30,7 +30,7 @@ from absl import flags
 from absl import logging
 import cv2
 
-from cyber_py.record import RecordReader, RecordWriter
+from cyber_py3.record import RecordReader, RecordWriter
 from modules.drivers.proto.sensor_image_pb2 import CompressedImage
 
 
@@ -91,7 +91,7 @@ class VideoConverter(object):
         self.image_dir = '{}_images'.format(self.video_file)
         makedirs(video_dir)
         makedirs(self.image_dir)
-        self.frame_writer = open(self.video_file, 'w+')
+        self.frame_writer = open(self.video_file, 'wb+')
 
     def close_writer(self):
         """Close the video frames writer"""

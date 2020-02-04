@@ -77,14 +77,8 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
-    ] + select({
-        "//tools/platforms:use_gpu": [
-            "@pytorch_gpu",
-        ],
-        "//conditions:default": [
-            "@pytorch",
-        ],
-    }),
+        "//third_party:libtorch",
+    ],
 )
 
 cc_test(
@@ -114,14 +108,8 @@ cc_library(
         "//modules/prediction/common:semantic_map",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
-    ] + select({
-        "//tools/platforms:use_gpu": [
-            "@pytorch_gpu",
-        ],
-        "//conditions:default": [
-            "@pytorch",
-        ],
-    }),
+        "//third_party:libtorch",
+    ],
 )
 
 cc_library(
@@ -136,14 +124,8 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
-    ] + select({
-        "//tools/platforms:use_gpu": [
-            "@pytorch_gpu",
-        ],
-        "//conditions:default": [
-            "@pytorch",
-        ],
-    }),
+        "//third_party:libtorch",
+    ],
 )
 
 cc_test(
@@ -171,14 +153,8 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
-    ] + select({
-        "//tools/platforms:use_gpu": [
-            "@pytorch_gpu",
-        ],
-        "//conditions:default": [
-            "@pytorch",
-        ],
-    }),
+        "//third_party:libtorch",
+    ],
 )
 
 cc_library(
@@ -192,14 +168,8 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
-    ] + select({
-        "//tools/platforms:use_gpu": [
-            "@pytorch_gpu",
-        ],
-        "//conditions:default": [
-            "@pytorch",
-        ],
-    }),
+        "//third_party:libtorch",
+    ],
 )
 
 cc_library(
@@ -214,15 +184,9 @@ cc_library(
         "//modules/prediction/common:semantic_map",
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator",
+        "//third_party:libtorch",
         "@eigen",
-    ] + select({
-        "//tools/platforms:use_gpu": [
-            "@pytorch_gpu",
-        ],
-        "//conditions:default": [
-            "@pytorch",
-        ],
-    }),
+    ],
 )
 
 cpplint()

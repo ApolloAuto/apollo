@@ -65,10 +65,10 @@ class OpenSpaceROITest {
     double center_line_s = (left_top_s + right_top_s) / 2;
     double start_s =
         center_line_s -
-        planner_open_space_config_.roi_config().roi_longitudinal_range();
+        planner_open_space_config_.roi_config().roi_longitudinal_range_start();
     double end_s =
         center_line_s +
-        planner_open_space_config_.roi_config().roi_longitudinal_range();
+        planner_open_space_config_.roi_config().roi_longitudinal_range_end();
     hdmap::MapPathPoint end_point = nearby_path_->GetSmoothPoint(end_s);
     hdmap::MapPathPoint start_point = nearby_path_->GetSmoothPoint(start_s);
     double start_left_width = nearby_path_->GetRoadLeftWidth(start_s);
@@ -240,10 +240,10 @@ class OpenSpaceROITest {
     double center_line_s = (left_top_s + right_top_s) / 2;
     double start_s =
         center_line_s -
-        planner_open_space_config_.roi_config().roi_longitudinal_range();
+        planner_open_space_config_.roi_config().roi_longitudinal_range_start();
     double end_s =
         center_line_s +
-        planner_open_space_config_.roi_config().roi_longitudinal_range();
+        planner_open_space_config_.roi_config().roi_longitudinal_range_end();
     hdmap::MapPathPoint end_point = nearby_path_->GetSmoothPoint(end_s);
     hdmap::MapPathPoint start_point = nearby_path_->GetSmoothPoint(start_s);
     double start_left_width = nearby_path_->GetRoadLeftWidth(start_s);

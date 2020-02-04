@@ -86,7 +86,7 @@ ErrorCode SocketCanClientRaw::Start() {
     }
 
     ret = setsockopt(dev_handler_, SOL_CAN_RAW, CAN_RAW_FILTER, &filter,
-                         sizeof(filter));
+                     sizeof(filter));
     if (ret < 0) {
       AERROR << "add receive msg id filter error code: " << ret;
       return ErrorCode::CAN_CLIENT_ERROR_BASE;

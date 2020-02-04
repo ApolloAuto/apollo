@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # ****************************************************************************
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
 
@@ -15,14 +15,16 @@
 # limitations under the License.
 # ****************************************************************************
 
-import sys
-import os
-import time
 import math
+import os
+import sys
+import time
+
+from cyber_py3 import cyber_time
+from cyber_py3 import cyber
+
 
 sys.path.append("../")
-from cyber_py import cyber
-from cyber_py import cyber_time
 
 
 def print_channel_type(channel_name):
@@ -390,6 +392,7 @@ Commands:
 Type cyber_channel <command> -h for more detailed usage, e.g. 'cyber_channel echo -h'
 """)
     sys.exit(getattr(os, 'EX_USAGE', 1))
+
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:

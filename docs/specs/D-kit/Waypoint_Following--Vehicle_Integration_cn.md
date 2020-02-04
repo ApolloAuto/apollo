@@ -9,7 +9,9 @@
 
 ## 概览
 
-该手册旨在帮助用户在自动驾驶开发套件上安装和配置IPC和GPS导航等相关设备。
+该手册旨在帮助用户在自动驾驶开发套件上安装和配置IPC和GPS导航等相关设备。设备集成后的硬件连接图如下所示：
+
+![waypoint_following.png](../images/waypoint_following.png)
 
 ## 工控机安装
 
