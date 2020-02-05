@@ -800,15 +800,28 @@ double ReferenceLine::GetSpeedLimitFromS(const double s) const {
     }
   }
   const auto& map_path_point = GetReferencePoint(s);
+
   double speed_limit = FLAGS_planning_upper_speed_limit;
+  bool speed_limit_found = false;
   for (const auto& lane_waypoint : map_path_point.lane_waypoints()) {
     if (lane_waypoint.lane == nullptr) {
       AWARN << "lane_waypoint.lane is nullptr.";
       continue;
     }
+    speed_limit_found = true;
     speed_limit =
         std::fmin(lane_waypoint.lane->lane().speed_limit(), speed_limit);
   }
+
+  if (!speed_limit_found) {
+    // use default speed limit based on road_type
+    speed_limit = FLAGS_default_city_road_speed_limit;
+    hdmap::Road::Type road_type = GetRoadType(s);
+    if (road_type == hdmap::Road::HIGHWAY) {
+      speed_limit = FLAGS_default_highway_speed_limit;
+    }
+  }
+
   return speed_limit;
 }
 

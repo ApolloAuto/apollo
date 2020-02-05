@@ -210,6 +210,8 @@ DECLARE_double(fallback_total_time);
 DECLARE_double(fallback_time_unit);
 
 DECLARE_double(speed_bump_speed_limit);
+DECLARE_double(default_city_road_speed_limit);
+DECLARE_double(default_highway_speed_limit);
 
 // navigation mode
 DECLARE_bool(enable_planning_pad_msg);
