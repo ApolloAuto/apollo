@@ -32,5 +32,6 @@ The ego car has to park itself in a designated spot. This scenario is complex as
 ![](images/Backward.png)
 
 ## References
+The algorithm behind this learning based control-in-loop simulation has been published at IROS 2019, please cite us at:
 
-A paper has been written by our engineers on the Dynamic Model which will provide an in-depth explanation of the concepts mentioned above. This paper has already been approved and will be published in ArXiv soon. Please stay tuned!
+Xu, Jiaxuan, Qi Luo, Kecheng Xu, Xiangquan Xiao, Siyang Yu, Jiangtao Hu, Jinghao Miao, and Jingao Wang. "An Automated Learning-Based Procedure for Large-scale Vehicle Dynamics Modeling on Baidu Apollo Platform." In 2019 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS), pp. 5049-5056. IEEE, 2019.
