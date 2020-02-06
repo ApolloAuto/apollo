@@ -46,7 +46,9 @@ class FeatureGenerator {
   Instance* instance_ = nullptr;  // not owned
   Instances instances_;
   int instance_file_index_ = 0;
-  std::list<apollo::localization::LocalizationEstimate> localization_for_label_;
+  std::list<apollo::localization::LocalizationEstimate>
+      localization_for_label_;
+  int total_instance_num_ = 0;
 };
 
 }  // namespace planning
