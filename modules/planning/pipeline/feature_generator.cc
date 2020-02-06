@@ -67,8 +67,10 @@ void FeatureGenerator::WriteOutInstances(const Instances& instances,
 void FeatureGenerator::Close() {
   const std::string file_name = absl::StrCat(
       FLAGS_planning_data_dir, "/instances.", instance_file_index_, ".bin");
+  total_instance_num_ += instances_.instances_size();
   WriteOutInstances(instances_, file_name);
   ++instance_file_index_;
+  AINFO << "Total instance number:" << total_instance_num_;
 }
 
 void FeatureGenerator::GenerateTrajectoryLabel(
@@ -126,6 +128,7 @@ void FeatureGenerator::OnLocalization(
     const std::string file_name = absl::StrCat(
         FLAGS_planning_data_dir, "/instances.", instance_file_index_, ".bin");
     WriteOutInstances(instances_, file_name);
+    total_instance_num_ += instances_.instances_size();
     instances_.Clear();
     ++instance_file_index_;
     instance_ = instances_.add_instances();
