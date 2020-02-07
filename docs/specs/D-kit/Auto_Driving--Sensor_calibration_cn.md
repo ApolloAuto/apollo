@@ -74,14 +74,11 @@ ros使用yaml文件来描述两个传感器之间的位置、姿态的关系，�
 
 ### 各传感器坐标系的定义及初始化外参文件的配置
 
- - 需要进行标定的传感器包括 IMU、Lidar、Camera、Radar的初始化坐标系定义如下图所示：
+ - 需要进行标定的传感器包括 IMU、Lidar、Camera、Radar，传感器的初始化坐标系定义如下图所示：
 
- ![图片](../images/sensor_calibration/init_frames.png)
+ ![图片](../images/sensor_calibration/camera_calibration_coordinate_system.jpeg)
 
-### 传感器标定的相关脚本
 
- - 在进行传感器标定时，需要向传感器提供相应的`topic`，大部分`topic`都可以由传感器直接提供，但由于GNSS设备的限制，`/apollo/sensor/gnss/odometry`、`/apollo/sensor/gnss/ins_stat`这两个`topic`不能由GNSS设备直接给出，需要借助`/apollo/modules/tools/sensor_calibration/`下的两个脚本工具。在`localization`模块正常启动且输出`/apollo/localization/pose`数据时，分别执行`python modules/tools/sensor_calibration/ins_stat_publisher.py`、`python modules/tools/sensor_calibration/odom_publisher.py`两个命令，便可以分别产生`/apollo/sensor/gnss/ins_stat`、`/apollo/sensor/gnss/odometry`这两个`topic`。
- - 注意，在执行`sensor_calibration/ins_stat_publisher.py`脚本前，请务必检查`/apollo/sensor/gnss/best_pose`中GPS信号质量，确保GPS信号质量为`NARROW_INT`时，才可以使用`ins_stat_publisher.py`脚本。
 
 
   
@@ -109,6 +106,12 @@ ros使用yaml文件来描述两个传感器之间的位置、姿态的关系，�
 Lidar-IMU标定流程图如下图所示：
 
 ![图片](../images/sensor_calibration/flow_chart.png)
+### 启动python脚本
+ - 在进行传感器标定时，需要向传感器提供相应的`topic`，大部分`topic`都可以由传感器直接提供，但由于GNSS设备的限制，`/apollo/sensor/gnss/odometry`、`/apollo/sensor/gnss/ins_stat`这两个`topic`不能由GNSS设备直接给出，需要借助`/apollo/modules/tools/sensor_calibration/`下的两个脚本工具。在`localization`模块正常启动且输出`/apollo/localization/pose`数据时，分别在不同终端中执行`python modules/tools/sensor_calibration/ins_stat_publisher.py`、`python modules/tools/sensor_calibration/odom_publisher.py`两个命令，便可以分别产生`/apollo/sensor/gnss/ins_stat`、`/apollo/sensor/gnss/odometry`这两个`topic`。
+ - 注意，在执行`sensor_calibration/ins_stat_publisher.py`脚本前，请务必检查`/apollo/sensor/gnss/best_pose`中GPS信号质量，确保GPS信号质量为`NARROW_INT`时，才可以使用`ins_stat_publisher.py`脚本。
+ - 提示：在docker环境下启动新的终端，只需要在Apollo目录下执行`bash docker/scripts/dev_into.sh`即可，切记不要再执行`dev_start`。
+ 
+ ![图片](../images/sensor_calibration/docker_terminal.png)
 
 ### 录制bag包
 进行Lidar-IMU的标定，需要录制包含传感器信息的bag包作为数据输入，所需的`topic`及`topic`频率如下表所示。
@@ -125,6 +128,7 @@ Lidar-IMU标定流程图如下图所示：
 ### 配置`export_config.yaml`文件
  - 将`/apollo/modules/calibration/exporter/conf`目录下的`export_config.yaml`文件修改为如下内容：
  - 将录制的包含传感器信息的bag包存储到 `/apollo/data/bag/calibration/`目录下
+ - 注意，`/apollo/data/bag/calibration/`目录需要用户自己创建，用户也可以更改目录名称，这里只是一个示例。
 
 ```
 bag_path: "/apollo/data/bag/calibration/"         #录制的bag包位置
@@ -300,7 +304,7 @@ transform:
 | INS          | /apollo/sensor/gnss/ins_stat              | 2                 |
 
 ### 修改摄像头Topic的频率
-摄像头数据默认的发布频率为30HZ，在进行标定过程中，需要将频率修改为9HZ。修改方法如下：
+摄像头数据默认的发布频率为30HZ，在进行标定过程中，需要将频率修改为9HZ(注意，标定完成后，需要将频率改回30HZ)。修改方法如下：
 - 关闭摄像头模块
 - 分别将`modules/calibration/data/ch/camera_params/start_leopard.launch`、`modules/drivers/camera/launch/start_leopard.launch`两个文件中的`<arg name="frame_rate" default="30"/>`修改为`<arg name="frame_rate" default="9"/>`
 - 执行如下命令，重新编译摄像头
