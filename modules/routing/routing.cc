@@ -66,12 +66,9 @@ std::vector<RoutingRequest> Routing::FillLaneInfoIfMissing(
   RoutingRequest fixed_request(routing_request);
   for (int i = 0; i < routing_request.waypoint_size(); ++i) {
     LaneWaypoint lane_waypoint(routing_request.waypoint(i));
-    // TODO(all): temporarily comment out,
-    //            to test this support with existing routing requests
-    //            will bring back soon
-    // if (lane_waypoint.has_id()) {
-    //  continue;
-    // }
+    if (lane_waypoint.has_id()) {
+      continue;
+    }
 
     // fill lane info when missing
     const auto point =
