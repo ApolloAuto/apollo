@@ -22,13 +22,6 @@
 
 DISABLED_CYBER_MODULES="except //cyber/record:record_file_integration_test"
 
-function source_apollo_base() {
-  DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-  cd "${DIR}"
-
-  source ${DIR}/scripts/apollo_base.sh $1
-}
-
 function apollo_check_system_config() {
   # check docker environment
   if [ ${MACHINE_ARCH} == "x86_64" ] && [ ${APOLLO_IN_DOCKER} != "true" ]; then
@@ -721,7 +714,8 @@ function print_usage() {
 }
 
 function main() {
-  source_apollo_base
+  cd "$( dirname "${BASH_SOURCE[0]}" )"
+  source scripts/apollo_base.sh
 
   check_machine_arch
   apollo_check_system_config
