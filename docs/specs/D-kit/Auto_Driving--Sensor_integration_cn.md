@@ -161,7 +161,8 @@ rostopic echo /apollo/sensor/camera/traffic/image_short
  请务必再次确认正确执行了上述安装步骤，电源线接反会烧毁激光雷达，确认无误后才可以上电，至此激光雷达线束接线完成。
 
 ### 激光雷达的配置及启动
- - 激光雷达的相关参数配置：雷达出厂默认ip地址为192.168.1.201，在浏览器中输入激光雷达ip地址，打开配置界面，将激光雷达的ip地址修改为与IPC的ip地址处于相同号段， 将`NetWork(Sensor)`选项卡下的`Data Port`修改为2369，将`Telemetry Port`修改为8309，点击`set` 按键、`Save Configuration`按键使配置生效。
+ - 配置工控机IP地址：激光雷达的默认IP地址是192.168.1.201，通过网线与工控机Ethernet接口连接，将该Ehternet接口的IP修改为固定IP，且与激光雷达IP处在同一网段，即192.168.1.xx。
+ - 激光雷达的相关参数配置：在浏览器中输入激光雷达ip地址，打开激光雷达配置界面， 将Host IP Address修改为255.255.255.255，将Data Port修改为2369，将Telemetry Port修改为8309，点击set 按键、Save Configuration按键保存配置。
 ![图片](../images/lidar_config.png)
 ### 激光雷达数据的验证
  在完成上述配置后，可以使用以下方法验证激光雷达能否正常工作：
