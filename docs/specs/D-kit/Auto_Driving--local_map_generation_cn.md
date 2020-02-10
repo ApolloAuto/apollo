@@ -31,8 +31,8 @@ o/msf/ /apollo/msf/velodyne16_novatel_extrinsics_example.yaml 50 16
 ```
 
  - 注意，执行该脚本时，需要给绝对路径，utm-zone需要根据当地所处位置给定，北京地区为50，16代表lidar_type为16线激光雷达，如果不给定lidar_type参数，则会使用默认值64。
- - 定位地图制作成功后，会在创建的`msf`文件夹中生成`lossy_map`文件夹，将其重命名为`local_map`，并将该目录复制到用户的高精地图目录(例如用户使用名为demo的高精度图，则需要将生成的local_map目录放置到`modules/map/data/demo/`目录下)，如下图所示
-
+ - 定位地图制作成功后，会在创建的`msf`文件夹中生成`lossy_map`文件夹，将其重命名为`local_map`，并将该目录复制到用户的高精地图目录(例如用户使用名为demo的高精度图，则需要将生成的local_map目录放置到`modules/map/data/demo/`目录下)，如下图所示:
+ 
 	![图片](../images/local_map/local_map_position.png)
  
 ## 可视化定位（定位地图验证）
