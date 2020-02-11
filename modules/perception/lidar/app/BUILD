@@ -60,4 +60,16 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "lidar_app_lidar_obstacle_segmentation_test",
+    size = "small",
+    srcs = ["lidar_app_lidar_obstacle_segmentation_test.cc"],
+    deps = [
+        ":app",
+        "//modules/perception/common/io:io_util",
+        "@com_github_gflags_gflags//:gflags",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
 cpplint()
