@@ -12,6 +12,9 @@ cc_library(
     name = "bridge_gflags",
     srcs = ["bridge_gflags.cc"],
     hdrs = ["bridge_gflags.h"],
+    deps = [
+        "@com_github_gflags_gflags//:gflags",
+    ],
 )
 
 cc_library(

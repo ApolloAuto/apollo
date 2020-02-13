@@ -19,8 +19,8 @@
 This program can publish drive event message
 """
 
-from cyber_py import cyber
-from cyber_py import cyber_time
+from cyber_py3 import cyber
+from cyber_py3 import cyber_time
 
 import argparse
 import datetime

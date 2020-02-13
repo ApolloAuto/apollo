@@ -78,9 +78,7 @@ class Service : public ServiceBase {
    */
   Service() = delete;
 
-  ~Service() {
-    destroy();
-  }
+  ~Service() { destroy(); }
 
   /**
    * @brief Init the Service

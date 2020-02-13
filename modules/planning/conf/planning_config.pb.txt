@@ -244,7 +244,7 @@ default_task_config: {
           enable_jacobian_ad: false
           enable_hand_derivative: false
           enable_derivative_check: false
-          distance_approach_mode: DISTANCE_APPROACH_IPOPT
+          distance_approach_mode: DISTANCE_APPROACH_IPOPT_RELAX_END_SLACK
           enable_check_initial_state: false
         }
         iterative_anchoring_smoother_config {
@@ -313,7 +313,8 @@ default_task_config: {
 default_task_config: {
   task_type: OPEN_SPACE_ROI_DECIDER
   open_space_roi_decider_config {
-    roi_longitudinal_range: 15
+    roi_longitudinal_range_start: 15
+    roi_longitudinal_range_end: 15
     parking_start_range: 20.0
     parking_inwards: false
     enable_perception_obstacles: true

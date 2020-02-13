@@ -26,6 +26,7 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/map/proto/map_geometry.pb.h"
+#include "modules/map/proto/map.pb.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
@@ -126,6 +127,8 @@ class ReferenceLine {
 
   bool GetRoadWidth(const double s, double* const road_left_width,
                     double* const road_right_width) const;
+
+  hdmap::Road::Type GetRoadType(const double s) const;
 
   void GetLaneFromS(const double s,
                     std::vector<hdmap::LaneInfoConstPtr>* lanes) const;

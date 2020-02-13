@@ -27,8 +27,8 @@ import glob
 import os
 import shutil
 
-from cyber_py import cyber
-from cyber_py.record import RecordReader
+from cyber_py3 import cyber
+from cyber_py3.record import RecordReader
 from modules.drivers.gnss.proto import gnss_pb2
 
 

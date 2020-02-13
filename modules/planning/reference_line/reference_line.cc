@@ -496,6 +496,33 @@ bool ReferenceLine::GetRoadWidth(const double s, double* const road_left_width,
   return map_path_.GetRoadWidth(s, road_left_width, road_right_width);
 }
 
+hdmap::Road::Type ReferenceLine::GetRoadType(const double s) const {
+  const hdmap::HDMap *hdmap = hdmap::HDMapUtil::BaseMapPtr();
+  CHECK_NOTNULL(hdmap);
+
+  hdmap::Road::Type road_type = hdmap::Road::UNKNOWN;
+
+  SLPoint sl_point;
+  sl_point.set_s(s);
+  sl_point.set_l(0.0);
+  common::math::Vec2d pt;
+  SLToXY(sl_point, &pt);
+
+  common::PointENU point;
+  point.set_x(pt.x());
+  point.set_y(pt.y());
+  point.set_z(0.0);
+  std::vector<hdmap::RoadInfoConstPtr> roads;
+  hdmap->GetRoads(point, 4.0, &roads);
+  for (auto road : roads) {
+    if (road->type() != hdmap::Road::UNKNOWN) {
+      road_type = road->type();
+      break;
+    }
+  }
+  return road_type;
+}
+
 void ReferenceLine::GetLaneFromS(
     const double s, std::vector<hdmap::LaneInfoConstPtr>* lanes) const {
   CHECK_NOTNULL(lanes);
@@ -773,15 +800,28 @@ double ReferenceLine::GetSpeedLimitFromS(const double s) const {
     }
   }
   const auto& map_path_point = GetReferencePoint(s);
+
   double speed_limit = FLAGS_planning_upper_speed_limit;
+  bool speed_limit_found = false;
   for (const auto& lane_waypoint : map_path_point.lane_waypoints()) {
     if (lane_waypoint.lane == nullptr) {
       AWARN << "lane_waypoint.lane is nullptr.";
       continue;
     }
+    speed_limit_found = true;
     speed_limit =
         std::fmin(lane_waypoint.lane->lane().speed_limit(), speed_limit);
   }
+
+  if (!speed_limit_found) {
+    // use default speed limit based on road_type
+    speed_limit = FLAGS_default_city_road_speed_limit;
+    hdmap::Road::Type road_type = GetRoadType(s);
+    if (road_type == hdmap::Road::HIGHWAY) {
+      speed_limit = FLAGS_default_highway_speed_limit;
+    }
+  }
+
   return speed_limit;
 }
 

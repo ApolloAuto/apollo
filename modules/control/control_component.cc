@@ -276,7 +276,8 @@ Status ControlComponent::ProduceControlCommand(
 }
 
 bool ControlComponent::Proc() {
-  const auto start_time = Clock::Now();
+  const auto start_time =
+      FLAGS_use_system_time_in_control ? absl::Now() : Clock::Now();
 
   chassis_reader_->Observe();
   const auto &chassis_msg = chassis_reader_->GetLatestObserved();
@@ -393,12 +394,15 @@ bool ControlComponent::Proc() {
     return true;
   }
 
-  const auto end_time = Clock::Now();
-
+  const auto end_time =
+      FLAGS_use_system_time_in_control ? absl::Now() : Clock::Now();
   const double time_diff_ms = absl::ToDoubleMilliseconds(end_time - start_time);
+  ADEBUG << "total control time spend: " << time_diff_ms << " ms.";
+
   control_command.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
   control_command.mutable_latency_stats()->set_total_time_exceeded(
-      time_diff_ms > control_conf_.control_period());
+      time_diff_ms > absl::ToDoubleMilliseconds(
+                         absl::Seconds(control_conf_.control_period())));
   ADEBUG << "control cycle time is: " << time_diff_ms << " ms.";
   status.Save(control_command.mutable_header()->mutable_status());
 

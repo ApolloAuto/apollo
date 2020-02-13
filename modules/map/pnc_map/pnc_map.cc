@@ -580,10 +580,17 @@ LaneInfoConstPtr PncMap::GetRoutePredecessor(LaneInfoConstPtr lane) const {
   if (lane->lane().predecessor_id().empty()) {
     return nullptr;
   }
-  hdmap::Id preferred_id = lane->lane().predecessor_id(0);
+
+  std::unordered_set<std::string> predecessor_ids;
   for (const auto &lane_id : lane->lane().predecessor_id()) {
-    if (range_lane_ids_.count(lane_id.id()) != 0) {
-      preferred_id = lane_id;
+    predecessor_ids.insert(lane_id.id());
+  }
+
+  hdmap::Id preferred_id = lane->lane().predecessor_id(0);
+  for (size_t i = 1; i < route_indices_.size(); ++i) {
+    auto &lane = route_indices_[i].segment.lane->id();
+    if (predecessor_ids.count(lane.id()) != 0) {
+      preferred_id = lane;
       break;
     }
   }

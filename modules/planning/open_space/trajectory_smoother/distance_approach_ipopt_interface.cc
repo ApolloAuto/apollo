@@ -1876,7 +1876,7 @@ bool DistanceApproachIPOPTInterface::check_g(int n, const double* x, int m,
 
   for (int idx = 0; idx < m; ++idx) {
     if (g[idx] > g_u_tmp[idx] + delta_v || g[idx] < g_l_tmp[idx] - delta_v) {
-      AINFO << "constratins idx unfeasible: " << idx << ", g: " << g[idx]
+      AINFO << "constrains idx unfeasible: " << idx << ", g: " << g[idx]
             << ", lower: " << g_l_tmp[idx] << ", upper: " << g_u_tmp[idx];
     }
   }

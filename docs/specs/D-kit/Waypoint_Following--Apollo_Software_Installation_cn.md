@@ -188,7 +188,7 @@ d.重启ubuntu系统进入grub引导界面，在引导界面选择高级选项�
 
 ```
 cd ~    
-sudo apt-get install make    
+sudo apt install make    
 sudo bash install-nvidia.sh    
 ```
 
@@ -281,8 +281,8 @@ d.注意事项：
 
 使用apollo官网上的[install_nvidia_docker.sh](https://github.com/ApolloAuto/apollo/blob/master/docker/setup_host/install_nvidia_docker.sh)来安装docker。工控机在联网情况下在终端中输入以下命令来完成安装：
 ```
-sudo apt-get update
-sudo apt-get install curl
+sudo apt update
+sudo apt install curl
 sudo bash install_nvidia_docker.sh
 ```
 
@@ -301,9 +301,14 @@ a.获取Apollo源代码
 可以在github上下载，在终端中输入以下命令：
 ```
 cd ~
+sudo apt update
+sudo apt install git -y
+git init
 git clone https://github.com/ApolloAuto/apollo.git
 ```
-代码下载的时间视网速的快慢而有所区别，请耐心等待，下载完成后的代码在～/apollo目录下。
+代码下载的时间视网速的快慢而有所区别，请耐心等待；
+下载完成后的代码在~/apollo目录下，然后执行`git checkout -b r5.5.0 origin/r5.5.0`将代码切换到我们所需要的工作分支r5.5.0上。
+
 b.设置环境变量，在终端输入以下命令：
 
 ```

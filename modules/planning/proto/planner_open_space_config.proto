@@ -43,12 +43,14 @@ message PlannerOpenSpaceConfig {
 }
 
 message ROIConfig {
-  // longitudinal range of parking roi
-  optional double roi_longitudinal_range = 1 [default = 10.0];
+  // longitudinal range of parking roi backward
+  optional double roi_longitudinal_range_start = 1 [default = 10.0];
+  // longitudinal range of parking roi forward
+  optional double roi_longitudinal_range_end = 2 [default = 10.0];
   // parking spot range detection threshold
-  optional double parking_start_range = 2 [default = 7.0];
+  optional double parking_start_range = 3 [default = 7.0];
   // Parking orientation for reverse parking
-  optional bool parking_inwards = 3 [default = false];
+  optional bool parking_inwards = 4 [default = false];
 }
 
 message WarmStartConfig {

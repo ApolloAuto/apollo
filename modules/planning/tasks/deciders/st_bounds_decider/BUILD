@@ -85,7 +85,6 @@ cc_library(
     hdrs = ["st_obstacles_processor.h"],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "//modules/planning/common:history",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/configs/proto:vehicle_config_proto",
         "//modules/common/proto:pnc_point_proto",
@@ -93,6 +92,7 @@ cc_library(
         "//modules/map/pnc_map",
         "//modules/map/proto:map_proto",
         "//modules/planning/common:frame",
+        "//modules/planning/common:history",
         "//modules/planning/common:obstacle",
         "//modules/planning/common:path_decision",
         "//modules/planning/common:planning_gflags",

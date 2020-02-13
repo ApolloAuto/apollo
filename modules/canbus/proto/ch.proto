@@ -4,7 +4,7 @@ package apollo.canbus;
 
 // Coolhigh vehicle starts from here
 message Control_command_115 {
-// Control Message
+  // Control Message
   enum Ctrl_cmdType {
     CTRL_CMD_OUT_OF_CONTROL = 0;
     CTRL_CMD_UNDER_CONTROL = 1;
@@ -14,7 +14,7 @@ message Control_command_115 {
 }
 
 message Gear_command_114 {
-// Control Message
+  // Control Message
   enum Gear_cmdType {
     GEAR_CMD_PARK = 1;
     GEAR_CMD_REVERSE = 2;
@@ -26,7 +26,7 @@ message Gear_command_114 {
 }
 
 message Brake_command_111 {
-// Control Message
+  // Control Message
   enum Brake_pedal_en_ctrlType {
     BRAKE_PEDAL_EN_CTRL_DISABLE = 0;
     BRAKE_PEDAL_EN_CTRL_ENABLE = 1;
@@ -38,7 +38,7 @@ message Brake_command_111 {
 }
 
 message Throttle_command_110 {
-// Control Message
+  // Control Message
   enum Throttle_pedal_en_ctrlType {
     THROTTLE_PEDAL_EN_CTRL_DISABLE = 0;
     THROTTLE_PEDAL_EN_CTRL_ENABLE = 1;
@@ -50,7 +50,7 @@ message Throttle_command_110 {
 }
 
 message Turnsignal_command_113 {
-// Control Message
+  // Control Message
   enum Turn_signal_cmdType {
     TURN_SIGNAL_CMD_NONE = 0;
     TURN_SIGNAL_CMD_LEFT = 1;
@@ -61,7 +61,7 @@ message Turnsignal_command_113 {
 }
 
 message Steer_command_112 {
-// Control Message
+  // Control Message
   enum Steer_angle_en_ctrlType {
     STEER_ANGLE_EN_CTRL_DISABLE = 0;
     STEER_ANGLE_EN_CTRL_ENABLE = 1;
@@ -73,7 +73,7 @@ message Steer_command_112 {
 }
 
 message Brake_status__511 {
-// Report Message
+  // Report Message
   enum Brake_pedal_en_stsType {
     BRAKE_PEDAL_EN_STS_DISABLE = 0;
     BRAKE_PEDAL_EN_STS_ENABLE = 1;
@@ -116,7 +116,7 @@ message Brake_status__511 {
 }
 
 message Throttle_status__510 {
-// Report Message
+  // Report Message
   enum Throttle_pedal_en_stsType {
     THROTTLE_PEDAL_EN_STS_DISABLE = 0;
     THROTTLE_PEDAL_EN_STS_ENABLE = 1;
@@ -141,7 +141,7 @@ message Throttle_status__510 {
 }
 
 message Turnsignal_status__513 {
-// Report Message
+  // Report Message
   enum Turn_signal_stsType {
     TURN_SIGNAL_STS_NONE = 0;
     TURN_SIGNAL_STS_LEFT = 1;
@@ -152,7 +152,7 @@ message Turnsignal_status__513 {
 }
 
 message Steer_status__512 {
-// Report Message
+  // Report Message
   enum Steer_angle_en_stsType {
     STEER_ANGLE_EN_STS_DISABLE = 0;
     STEER_ANGLE_EN_STS_ENABLE = 1;
@@ -177,7 +177,7 @@ message Steer_status__512 {
 }
 
 message Ecu_status_1_515 {
-// Report Message
+  // Report Message
   enum Ctrl_stsType {
     CTRL_STS_OUT_OF_CONTROL = 0;
     CTRL_STS_UNDER_CONTROL = 1;
@@ -195,7 +195,7 @@ message Ecu_status_1_515 {
 }
 
 message Gear_status_514 {
-// Report Message
+  // Report Message
   enum Gear_stsType {
     GEAR_STS_PARK = 1;
     GEAR_STS_REVERSE = 2;
@@ -207,7 +207,7 @@ message Gear_status_514 {
 }
 
 message Ecu_status_3_517 {
-// Report Message
+  // Report Message
   // Ultrasonic detection distance 1 (Ultrasound status) [cm] [0|0]
   optional int32 ultrasound_dist_1 = 1;
   // Ultrasonic detection distance 2 (Ultrasound status) [cm] [0|0]
@@ -227,7 +227,7 @@ message Ecu_status_3_517 {
 }
 
 message Ecu_status_2_516 {
-// Report Message
+  // Report Message
   // Percentage of battery remaining (BMS status) [%] [0|100]
   optional int32 battery_remaining_capacity = 1;
   // Current battery voltage (BMS status) [V] [0|80]
@@ -239,18 +239,19 @@ message Ecu_status_2_516 {
 }
 
 message Ch {
-  optional Control_command_115 control_command_115 = 1; // control message
-  optional Gear_command_114 gear_command_114 = 2; // control message
-  optional Brake_command_111 brake_command_111 = 3; // control message
-  optional Throttle_command_110 throttle_command_110 = 4; // control message
-  optional Turnsignal_command_113 turnsignal_command_113 = 5; // control message
-  optional Steer_command_112 steer_command_112 = 6; // control message
-  optional Brake_status__511 brake_status__511 = 7; // report message
-  optional Throttle_status__510 throttle_status__510 = 8; // report message
-  optional Turnsignal_status__513 turnsignal_status__513 = 9; // report message
-  optional Steer_status__512 steer_status__512 = 10; // report message
-  optional Ecu_status_1_515 ecu_status_1_515 = 11; // report message
-  optional Gear_status_514 gear_status_514 = 12; // report message
-  optional Ecu_status_3_517 ecu_status_3_517 = 13; // report message
-  optional Ecu_status_2_516 ecu_status_2_516 = 14; // report message
+  optional Control_command_115 control_command_115 = 1;    // control message
+  optional Gear_command_114 gear_command_114 = 2;          // control message
+  optional Brake_command_111 brake_command_111 = 3;        // control message
+  optional Throttle_command_110 throttle_command_110 = 4;  // control message
+  optional Turnsignal_command_113 turnsignal_command_113 =
+      5;                                                   // control message
+  optional Steer_command_112 steer_command_112 = 6;        // control message
+  optional Brake_status__511 brake_status__511 = 7;        // report message
+  optional Throttle_status__510 throttle_status__510 = 8;  // report message
+  optional Turnsignal_status__513 turnsignal_status__513 = 9;  // report message
+  optional Steer_status__512 steer_status__512 = 10;           // report message
+  optional Ecu_status_1_515 ecu_status_1_515 = 11;             // report message
+  optional Gear_status_514 gear_status_514 = 12;               // report message
+  optional Ecu_status_3_517 ecu_status_3_517 = 13;             // report message
+  optional Ecu_status_2_516 ecu_status_2_516 = 14;             // report message
 }

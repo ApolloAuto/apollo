@@ -83,30 +83,30 @@ data_files {
   dest_path: "/apollo/cyber/conf"
 }
 data_files {
-  source_path: "teleop_conf/teleop/daemon_service_conf.pb.txt"
-  dest_path: "/apollo/modules/teleop/teleop/daemon_service_conf.pb.txt"
+  source_path: "teleop_conf/voip_decoder/voip_decoder_conf.pb.txt"
+  dest_path: "/apollo/modules/teleop/voip_decoder/conf/voip_decoder_conf.pb.txt"
 }
 data_files {
-  source_path: "teleop_conf/voip/voip_decoder_conf.pb.txt"
-  dest_path: "/apollo/modules/teleop/voip/conf/voip_decoder_conf.pb.txt"
+  source_path: "teleop_conf/voip_encoder/voip_encoder_conf.pb.txt"
+  dest_path: "/apollo/modules/teleop/voip_encoder/conf/voip_encoder_conf.pb.txt"
 }
 data_files {
-  source_path: "teleop_conf/voip/voip_encoder_conf.pb.txt"
-  dest_path: "/apollo/modules/teleop/voip/conf/voip_encoder_conf.pb.txt"
+  source_path: "teleop_conf/daemon/daemon_conf.pb.txt"
+  dest_path: "/apollo/modules/teleop/daemon/conf/daemon_conf.pb.txt"
 }
 data_files {
-  source_path: "teleop_conf/teleop/daemon_service_conf.pb.txt"
-  dest_path: "/apollo/modules/teleop/teleop/conf/daemon_service_conf.pb.txt"
+  source_path: "teleop_conf/modem/modem_conf.pb.txt"
+  dest_path: "/apollo/modules/teleop/modem/conf/modem_conf.pb.txt"
 }
 data_files {
-  source_path: "teleop_conf/network/modem_monitor_node_conf.pb.txt"
-  dest_path: "/apollo/modules/teleop/network/conf/modem_monitor_node_conf.pb.txt"
+  source_path: "teleop_conf/router/router_conf.pb.txt"
+  dest_path: "/apollo/modules/teleop/router/conf/router_conf.pb.txt"
 }
 data_files {
-  source_path: "teleop_conf/network/modem_router_node_conf.pb.txt"
-  dest_path: "/apollo/modules/teleop/network/conf/modem_router_node_conf.pb.txt"
+  source_path: "teleop_conf/router/initial_routes_and_filters.pb.txt"
+  dest_path: "/apollo/modules/teleop/router/conf/initial_routes_and_filters.pb.txt"
 }
 data_files {
-  source_path: "teleop_conf/network/initial_routes_and_filters.pb.txt"
-  dest_path: "/apollo/modules/teleop/network/conf/initial_routes_and_filters.pb.txt"
+  source_path: "transform_conf/static_transform_conf.pb.txt"
+  dest_path: "/apollo/modules/transform/conf/static_transform_conf.pb.txt"
 }

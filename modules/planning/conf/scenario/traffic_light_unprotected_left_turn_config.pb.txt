@@ -1,6 +1,6 @@
 scenario_type: TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN
 traffic_light_unprotected_left_turn_config: {
-  start_traffic_light_scenario_distance: 15.0
+  start_traffic_light_scenario_distance: 30.0
   approach_cruise_speed: 2.78
   max_valid_stop_distance: 2.0
   min_pass_s_distance: 3.0

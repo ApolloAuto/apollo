@@ -15,9 +15,11 @@
  *****************************************************************************/
 
 #include "modules/perception/lidar/lib/segmentation/ncut/ncut_segmentation.h"
+
 #include <omp.h>
 #include <algorithm>
 #include <map>
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/perception/lib/config_manager/config_manager.h"

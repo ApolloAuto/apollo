@@ -558,6 +558,7 @@ Status LatController::ComputeControlCommand(
         mrac_controller_.ControlSaturationStatus());
   }
   pre_steering_position_ = steering_position;
+  debug->set_steer_mrac_enable_status(enable_mrac_);
 
   // Clamp the steer angle with steer limitations at current speed
   double steer_angle_limited =

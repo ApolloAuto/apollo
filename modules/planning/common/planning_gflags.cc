@@ -412,6 +412,10 @@ DEFINE_double(fallback_time_unit, 0.1,
 DEFINE_double(speed_bump_speed_limit, 4.4704,
               "the speed limit when passing a speed bump, m/s. The default "
               "speed limit is 10 mph.");
+DEFINE_double(default_city_road_speed_limit, 15.67,
+              "default speed limit (m/s) for city road. 35 mph.");
+DEFINE_double(default_highway_speed_limit, 29.06,
+              "default speed limit (m/s) for highway. 65 mph.");
 
 // navigation mode
 DEFINE_bool(enable_planning_pad_msg, false,
@@ -525,3 +529,5 @@ DEFINE_bool(use_soft_bound_in_nonlinear_speed_opt, true,
 DEFINE_bool(use_front_axe_center_in_path_planning, false,
             "If using front axe center in path planning, the path can be "
             "more agile.");
+
+DEFINE_bool(use_road_boundary_from_map, false, "get road boundary from HD map");

@@ -84,9 +84,7 @@ class ReferenceLineProvider {
 
   std::vector<routing::LaneWaypoint> FutureRouteWaypoints();
 
-  bool UpdatedReferenceLine() {
-    return is_reference_line_updated_.load();
-  }
+  bool UpdatedReferenceLine() { return is_reference_line_updated_.load(); }
 
  private:
   /**

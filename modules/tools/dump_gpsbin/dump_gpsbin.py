@@ -32,9 +32,10 @@ import time
 import gflags
 import glog
 
-from cyber_py import cyber
-from cyber_py import record
+from cyber_py3 import cyber
+from cyber_py3 import record
 from modules.drivers.gnss.proto.gnss_pb2 import RawData
+
 
 # Requried flags.
 gflags.DEFINE_string('input_file', None, 'Input record file path.')

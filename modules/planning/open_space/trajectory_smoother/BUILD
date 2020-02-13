@@ -29,9 +29,9 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
@@ -47,9 +47,9 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
@@ -128,9 +128,9 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
@@ -153,9 +153,9 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
@@ -178,9 +178,9 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
@@ -203,9 +203,9 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
@@ -228,9 +228,9 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
@@ -259,9 +259,9 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
@@ -353,8 +353,8 @@ cc_test(
     deps = [
         ":dual_variable_warm_start_ipopt_qp_interface",
         ":dual_variable_warm_start_osqp_interface",
+        "//third_party:ipopt",
         "@com_google_googletest//:gtest_main",
-        "@ipopt",
     ],
 )
 
