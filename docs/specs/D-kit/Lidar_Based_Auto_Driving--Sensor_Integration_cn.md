@@ -165,7 +165,7 @@ budaoshi@in_dev_docker:/apollo$ cyber_launch start modules/drivers/velodyne/laun
 
 - 输入`cyber_monitor`命令，应显示`/apollo/sensor/conti_radar`话题，如下图所示：
 
-> <font color='red'>图片是ros操作命令，非Cyber</font>
+> **图片是ros操作命令，非Cyber**
 
 ![lidar_integration_radar_rostopic1](images/lidar_integration_radar_rostopic1.png)
 
