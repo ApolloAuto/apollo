@@ -118,7 +118,7 @@ IMU坐标系原点位于IMU的几何中心上(中心点在Z轴方向上的位置
 
 #### 1. 按照目录结构放置好Lidar-GNSS标定数据包
 
-下载[配置样例目录包](sample.gzip)并放置于apollo根目录下，其目录结构如下：
+下载[配置样例目录包](sensor_calibration.zip)并放置于apollo根目录下，其目录结构如下：
 
  ![lidar_calibration_tree1](images/lidar_calibration_tree1.jpeg)
  
