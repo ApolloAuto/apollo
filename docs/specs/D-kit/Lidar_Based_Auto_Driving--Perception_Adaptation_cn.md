@@ -28,11 +28,11 @@
     bash apollo.sh build_gpu
     bash scripts/bootstrap.sh
 
-####2. 在浏览器中打开(http://localhost:8888), 选择`dev_kit`并选择相应高精地图，在Module Controller标签页启动GPS、Localization、Radar、Transform模块。
+#### 2. 在浏览器中打开(http://localhost:8888), 选择`dev_kit`并选择相应高精地图，在Module Controller标签页启动GPS、Localization、Radar、Transform模块。
 
 ![lidar_adaptation_dreamview1](images/lidar_adaptation_dreamview1.jpeg)
 
-####3. 用以下命令启动激光雷达 
+#### 3. 用以下命令启动激光雷达
 
     budaoshi@in_dev_docker:/apollo$ cyber_launch start modules/drivers/velodyne/launch/velodyne16.launch
 
@@ -49,7 +49,7 @@
 |`/tf`|确保能正常输出数据|
 |`/tf_static`|确保能正常输出数据|
 
-####5.  使用如下命令启动perception模块，使用`cyber_monitor`查看`/apollo/perception/obstacles`是否正常输出，并在dreamview上查看障碍物信息：
+#### 5.  使用如下命令启动perception模块，使用`cyber_monitor`查看`/apollo/perception/obstacles`是否正常输出，并在dreamview上查看障碍物信息：
 
     budaoshi@in_dev_docker:/apollo$ cyber_launch start modules/perception/production/launch/perception.launch
 
