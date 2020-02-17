@@ -151,7 +151,7 @@ budaoshi@in_dev_docker:/apollo/modules/tools/sensor_calibration$ python extract_
 
 修改数据抽取工具生成的sample_config.yaml文件。把前面步骤手动测量的Lidar-GNSS标定初始外参信息填入，仅需要填写`translation`字段。修改完之后把`lidar16_to_gnss_calibration`目录准备后续待用。
 
-##使用标定云服务生成外参文件
+## 使用标定云服务生成外参文件
 
 #### 1. 准备百度云对象存储BOS服务
 
