@@ -184,11 +184,11 @@ budaoshi@in_dev_docker:/apollo/modules/tools/sensor_calibration$ python extract_
 ![lidar_calibration_point_cloud](images/lidar_calibration_point_cloud.png)
  
  - 在ubuntu系统下，可以使用`pcl-tools`工具查看点云文件
-	
-	sudo apt-get update
-	sudo apt-get install pcl-tools
-	pcl_viewer xxx.pcd
-
+```bash
+  sudo apt-get update
+  sudo apt-get install pcl-tools
+  pcl_viewer xxx.pcd
+```
  **Lidar-GNSS标定外参文件**：
  
 确认邮件得到的外参文件合理后，将邮件发送的外参文件的`rotation`、`translation`的值替换掉`modules/calibration/data/ch/velodyne_params/velodyne16_novatel_extrinsics.yaml`中对应的`rotation`、`translation`值。注意不要修改`frame_id`。
