@@ -95,7 +95,7 @@ Camera坐标系原点在下图所示平面的中心点：
 
 #### 1. 按照目录结构放置好Camera-Lidar标定数据包
 
-下载配置样例目录包并放置于apollo根目录下（如在Lidar-GNSS标定中已经下载，可跳过），其目录结构如下：
+下载[配置样例目录包](sensor_calibration.zip)并放置于apollo根目录下（如在Lidar-GNSS标定中已经下载，可跳过），其目录结构如下：
 
 ![camera_calibration_tree1](images/camera_calibration_tree1.jpeg)
  
