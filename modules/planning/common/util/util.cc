@@ -128,6 +128,28 @@ bool CheckInsidePnCJunction(const ReferenceLineInfo& reference_line_info) {
   return distance_adc_pass_intersection < kIntersectionPassDist;
 }
 
+/*
+ * @brief: get files at a path
+ */
+void GetFilesByPath(const boost::filesystem::path& path,
+                    std::vector<std::string>* files) {
+  CHECK(files);
+  if (!boost::filesystem::exists(path)) {
+    return;
+  }
+  if (boost::filesystem::is_regular_file(path)) {
+    AINFO << "Found record file: " << path.c_str();
+    files->push_back(path.c_str());
+    return;
+  }
+  if (boost::filesystem::is_directory(path)) {
+    for (auto& entry : boost::make_iterator_range(
+             boost::filesystem::directory_iterator(path), {})) {
+      GetFilesByPath(entry.path(), files);
+    }
+  }
+}
+
 }  // namespace util
 }  // namespace planning
 }  // namespace apollo
