@@ -20,6 +20,7 @@
 
 #include "cyber/common/file.h"
 #include "modules/common/configs/config_gflags.h"
+#include "modules/planning/common/util/util.h"
 #include "modules/planning/pipeline/feature_generator.h"
 #include "modules/prediction/util/data_extraction.h"
 
@@ -39,8 +40,7 @@ void GenerateDataForLearning() {
   feature_generator.Init();
   for (const auto& input : inputs) {
     std::vector<std::string> offline_bags;
-    apollo::prediction::GetRecordFileNames(boost::filesystem::path(input),
-                                           &offline_bags);
+    util::GetFilesByPath(boost::filesystem::path(input), &offline_bags);
     std::sort(offline_bags.begin(), offline_bags.end());
     AINFO << "For input " << input << ", found " << offline_bags.size()
           << " rosbags to process";
