@@ -587,15 +587,15 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "instance_proto",
+    name = "learning_data_proto",
     deps = [
-        ":instance_proto_lib",
+        ":learning_data_proto_lib",
     ],
 )
 
 proto_library(
-    name = "instance_proto_lib",
-    srcs = ["instance.proto"],
+    name = "learning_data_proto_lib",
+    srcs = ["learning_data.proto"],
     deps = [
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/proto:geometry_proto_lib",
