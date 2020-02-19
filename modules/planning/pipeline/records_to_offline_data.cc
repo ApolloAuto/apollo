@@ -19,6 +19,7 @@
 #include "absl/strings/str_split.h"
 
 #include "cyber/common/file.h"
+#include "modules/common/configs/config_gflags.h"
 #include "modules/planning/pipeline/feature_generator.h"
 #include "modules/prediction/util/data_extraction.h"
 
@@ -31,6 +32,7 @@ namespace apollo {
 namespace planning {
 
 void GenerateDataForLearning() {
+  AINFO << "map_dir: " << FLAGS_map_dir;
   const std::vector<std::string> inputs =
       absl::StrSplit(FLAGS_planning_offline_bags, ':');
   FeatureGenerator feature_generator;
@@ -41,7 +43,7 @@ void GenerateDataForLearning() {
                                            &offline_bags);
     std::sort(offline_bags.begin(), offline_bags.end());
     AINFO << "For input " << input << ", found " << offline_bags.size()
-          << "  rosbags to process";
+          << " rosbags to process";
     for (std::size_t i = 0; i < offline_bags.size(); ++i) {
       AINFO << "\tProcessing: [ " << i << " / " << offline_bags.size()
             << " ]: " << offline_bags[i];
