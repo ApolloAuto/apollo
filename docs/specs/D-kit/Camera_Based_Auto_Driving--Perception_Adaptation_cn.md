@@ -43,11 +43,9 @@
 	|`/apollo/sensor/camera/front_6mm/image` | 确保能正常输出数据，帧率稳定在15HZ左右 |
 	|`/apollo/sensor/camera/front_12mm/image` | 确保能正常输出数据，帧率稳定在15HZ左右 |
 	|`/tf`| 确保能正常输出数据 |
-        |`/tf_static` | 确保能正常输出数据 |        
-        
+	|`/tf_static` | 确保能正常输出数据 |
+	
  4.  使用如下命令启动perception模块，使用`cyber_monitor`查看`/apollo/perception/obstacles`是否正常输出，并在dreamview上查看障碍物信息：
- 
- 5. 使用如下命令启动perception模块，使用`cyber_monitor`查看`/apollo/perception/obstacles`是否正常输出，并在dreamview上查看障碍物信息：
 
 ```
 budaoshi@in_dev_docker:/apollo$ cyber_launch start modules/perception/production/launch/perception_camera.launch
