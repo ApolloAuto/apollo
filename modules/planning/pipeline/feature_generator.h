@@ -21,7 +21,7 @@
 #include "cyber/common/file.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/localization/proto/localization.pb.h"
-#include "modules/planning/proto/instance.pb.h"
+#include "modules/planning/proto/learning_data.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -36,19 +36,19 @@ class FeatureGenerator {
  private:
   void OnLocalization(const apollo::localization::LocalizationEstimate& le);
   void OnChassis(const apollo::canbus::Chassis& chassis);
-  void WriteOutInstances(const Instances& instances,
-                         const std::string& file_name);
+  void WriteOutLearningData(const LearningData& learning_data,
+                            const std::string& file_name);
   void GenerateTrajectoryLabel(
       const std::list<apollo::localization::LocalizationEstimate>&
           localization_for_label,
-      Instance* instance);
+      LearningDataFrame* learning_data_frame);
 
-  Instance* instance_ = nullptr;  // not owned
-  Instances instances_;
-  int instance_file_index_ = 0;
+  LearningDataFrame* learning_data_frame_ = nullptr;  // not owned
+  LearningData learning_data_;
+  int learning_data_frame_file_index_ = 0;
   std::list<apollo::localization::LocalizationEstimate>
       localization_for_label_;
-  int total_instance_num_ = 0;
+  int total_learning_data_frame_num_ = 0;
 };
 
 }  // namespace planning

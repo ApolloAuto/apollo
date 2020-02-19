@@ -14,7 +14,7 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/localization/proto:localization_proto",
-        "//modules/planning/proto:instance_proto",
+        "//modules/planning/proto:learning_data_proto",
         "//modules/prediction/util:data_extraction",
         "//third_party:boost",
         "@com_google_absl//absl/strings",
