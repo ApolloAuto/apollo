@@ -187,11 +187,11 @@
     bash scripts/canbus.sh
     bash scripts/localization.sh
 
-在`DreamView`界面点击左侧边栏，选择`Module Controller`，可以看到`Canbus`开关已经打开，这时开始点击`Recorder`开关，<font color='red'>（请务必切记先打开<Recorder>开关，再进行标定数据采集操作，实际情况常常会因未打开<Recorder>开关造成数据未记录保存，影响效率）</font>，这时Apollo系统就开始录制记录`canbus` 和`localization` 数据了。
+在`DreamView`界面点击左侧边栏，选择`Module Controller`，可以看到`Canbus`开关已经打开，这时开始点击`Recorder`开关，**（请务必切记先打开<Recorder>开关，再进行标定数据采集操作，实际情况常常会因未打开<Recorder>开关造成数据未记录保存，影响效率）**，这时Apollo系统就开始录制记录`canbus` 和`localization` 数据了。
 
 ![vehicle_calibration_online_dreamview2](images/vehicle_calibration_online_dreamview2.png)
 
-这时，我们使用车辆遥控器，根据右侧数据采集监视器，采集相应标定条件的车辆数据，直到采集监视器内各标定条件进度条（<font color='blue'>蓝色</font>）全部集满后，再次点击`Recorder`开关，关闭数据记录，结束车辆标定。
+这时，我们使用车辆遥控器，根据右侧数据采集监视器，采集相应标定条件的车辆数据，直到采集监视器内各标定条件进度条（**蓝色**）全部集满后，再次点击`Recorder`开关，关闭数据记录，结束车辆标定。
 
 ![vehicle_calibration_online_mainboard2](images/vehicle_calibration_online_mainboard2.png)
 
@@ -219,10 +219,10 @@
 
 3）`task001、task002...`代表一次车辆标定任务文件夹，即每次标定任务提交时，会训练一个`task文件夹`内的车辆数据；`task文件夹`上一层（`Origin Folder`）可以是BOS根目录或其他目录；
 
-3） `Vheicle1、Vheicle2...`代表标定的车辆文件夹，可以根据实际情况，按照车辆名称+编号的形式命名，如`ch01`、`ch02`等。一个task文件夹下内可以包含多个Vehicle车辆文件夹，在一次任务提交中标定多个车辆；
+3） `Vehicle1、Vehicle2...`代表标定的车辆文件夹，可以根据实际情况，按照车辆名称+编号的形式命名，如`ch01`、`ch02`等。一个task文件夹下内可以包含多个Vehicle车辆文件夹，在一次任务提交中标定多个车辆；
 
 4）`Records`文件内导入采集的车辆标定数据，车辆的录制数据在`apollo/data/bag/`目录下；
-<font color='red'>需要注意：</font>`Records`文件夹下需要有2层子文件夹，第一层为大时间（年月任）文件夹结构需要图上图保持一致；
+**需要注意：**`Records`文件夹下需要有2层子文件夹，第一层为大时间（年月任）文件夹结构需要图上图保持一致；
 
 5） `Configuration File`即为`vehicle_param.pb.txt`（车辆配置文件），该文件在`apollo/modules/calition/data/dev_kit`文件夹内，将该文件夹下的`vehicle_param.pb.txt`拷贝至BOS对应的车辆标定文件夹下，如上图`Vehicle2`内；
  

@@ -88,7 +88,7 @@
 
 #### 2.修改`modules/transform/conf/static_transform_conf.pb.txt`文件
 
-使用`modules/calibration/data/dev_kit/Config_files/static_transform_conf.pb.txt`替换`modules/transform/conf/static_transform_conf.pb.txt`文件。
+使用`modules/calibration/data/dev_kit/transform_conf/static_transform_conf.pb.txt`替换`modules/transform/conf/static_transform_conf.pb.txt`文件。
 
 
 ### 激光雷达数据的验证
@@ -157,7 +157,7 @@ budaoshi@in_dev_docker:/apollo$ cyber_launch start modules/drivers/velodyne/laun
   }
 ```
 
-另外，我们还需要在配置文件les/drivers/radar/contiradar/dag/conti_radar.dag删除后向毫米波雷达（rear components）的相关配置，否则，由于后向毫米波雷达使用的can 2，而我们的socket can没有can 2将会导致canbus无法正常启动。
+另外，我们还需要在配置文件modules/drivers/radar/contiradar/dag/conti_radar.dag中删除后向毫米波雷达（rear components）的相关配置，否则，由于后向毫米波雷达使用的can 2，而我们的socket can没有can 2将会导致canbus无法正常启动。
 
 - 正确启动Apollo及DreamView，选择车辆型号及运行模式，并打开`radar`模块开关，如下图所示：
 
@@ -165,7 +165,7 @@ budaoshi@in_dev_docker:/apollo$ cyber_launch start modules/drivers/velodyne/laun
 
 - 输入`cyber_monitor`命令，应显示`/apollo/sensor/conti_radar`话题，如下图所示：
 
-> <font color='red'>图片是ros操作命令，非Cyber</font>
+> **图片是ros操作命令，非Cyber**
 
 ![lidar_integration_radar_rostopic1](images/lidar_integration_radar_rostopic1.png)
 
@@ -192,4 +192,4 @@ budaoshi@in_dev_docker:/apollo$ cyber_launch start modules/drivers/velodyne/laun
  
  - 该传感器各项参数的测量范围及分辨率如下图所示：
  
- ![lidar_integration_radar_verify_excel](images/lidar_integration_radar_verify_excel.png)	
+ ![lidar_integration_radar_verify_excel](images/lidar_integration_radar_verify_excel.png)
