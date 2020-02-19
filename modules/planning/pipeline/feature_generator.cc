@@ -69,10 +69,10 @@ void FeatureGenerator::WriteOutLearningData(const LearningData& learning_data,
 void FeatureGenerator::Close() {
   const std::string file_name = absl::StrCat(
       FLAGS_planning_data_dir, "/learning_data.",
-      learning_data_frame_file_index_, ".bin");
+      learning_data_file_index_, ".bin");
   total_learning_data_frame_num_ += learning_data_.learning_data_size();
   WriteOutLearningData(learning_data_, file_name);
-  ++learning_data_frame_file_index_;
+  ++learning_data_file_index_;
   AINFO << "Total learning_data_frame number:"
         << total_learning_data_frame_num_;
 }
@@ -132,11 +132,11 @@ void FeatureGenerator::OnLocalization(
       FLAGS_learning_data_frame_num_per_file) {
     const std::string file_name =
         absl::StrCat(FLAGS_planning_data_dir, "/learning_data.",
-                     learning_data_frame_file_index_, ".bin");
+                     learning_data_file_index_, ".bin");
     WriteOutLearningData(learning_data_, file_name);
     total_learning_data_frame_num_ += learning_data_.learning_data_size();
     learning_data_.Clear();
-    ++learning_data_frame_file_index_;
+    ++learning_data_file_index_;
     learning_data_frame_ = learning_data_.add_learning_data();
   }
 }

@@ -13,6 +13,7 @@ cc_library(
         "//cyber",
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_gflags",
+        "//modules/common/configs:config_gflags",
         "//modules/localization/proto:localization_proto",
         "//modules/planning/proto:learning_data_proto",
         "//modules/prediction/util:data_extraction",
