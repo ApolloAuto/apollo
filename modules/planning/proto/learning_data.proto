@@ -6,7 +6,7 @@ import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/geometry.proto";
 import "modules/common/proto/pnc_point.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
-
+import "modules/routing/proto/routing.proto";
 
 message ObstacleData {
   optional int32 id = 1;  // obstacle ID.
@@ -46,7 +46,7 @@ message ObstacleFeature {
 }
 
 message RoutingFeature {
-  // TODO(all): add more routing features.
+  repeated apollo.routing.RoadSegment road = 1;
 }
 
 message LocalizationFeature {
