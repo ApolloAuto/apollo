@@ -600,6 +600,7 @@ proto_library(
         "//modules/canbus/proto:canbus_proto_lib",
         "//modules/common/proto:geometry_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
+        "//modules/perception/proto:perception_proto_lib",
     ],
 )
 
