@@ -5,6 +5,7 @@ package apollo.planning;
 import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/geometry.proto";
 import "modules/common/proto/pnc_point.proto";
+import "modules/perception/proto/traffic_light_detection.proto";
 
 message ObstacleFeature {
   // TODO(all): add more obstacle features.
@@ -57,6 +58,11 @@ message ChassisFeature {
   optional apollo.canbus.Chassis.GearPosition gear_location = 5;
 }
 
+message TrafficLightFeature {
+    optional string light_id = 1;
+    optional apollo.perception.TrafficLight.Color color = 2;
+}
+
 message LearningDataFrame {
   // Message publishing time in seconds.
   optional double timestamp_sec = 1;
@@ -79,5 +85,6 @@ message LearningDataFrame {
 }
 
 message LearningData {
-  repeated LearningDataFrame learning_data = 1;
+  repeated TrafficLightFeature traffic_light = 1;
+  repeated LearningDataFrame learning_data = 2;
 }
