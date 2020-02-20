@@ -63,7 +63,7 @@ message LearningDataFrame {
 
   // Sequence number for each frame
   // sequence_num, always starting from 1.
-  optional uint32 sequence_num = 2;
+  optional uint32 frame_num = 2;
 
   // Features from localization
   optional LocalizationFeature localization_feature = 3;
