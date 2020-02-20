@@ -7,8 +7,42 @@ import "modules/common/proto/geometry.proto";
 import "modules/common/proto/pnc_point.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
 
+
+message ObstacleData {
+  optional int32 id = 1;  // obstacle ID.
+
+  // obstacle position in the OBJECT coordinate system.
+  optional apollo.common.Point3D position = 2;
+
+  optional double theta = 3;  // heading in the world coordinate system.
+  optional apollo.common.Point3D velocity = 4;  // obstacle velocity.
+
+  // Size of obstacle bounding box.
+  optional double length = 5;  // obstacle length.
+  optional double width = 6;   // obstacle width.
+  optional double height = 7;  // obstacle height.
+
+  // obstacle corner points in in the OBJECT coordinate system.
+  repeated apollo.common.Point3D polygon_point = 8;
+
+  enum Type {
+    UNKNOWN = 0;
+    UNKNOWN_MOVABLE = 1;
+    UNKNOWN_UNMOVABLE = 2;
+    PEDESTRIAN = 3;  // Pedestrian, usually determined by moving behavior.
+    BICYCLE = 4;     // bike, motor bike
+    VEHICLE = 5;     // Passenger car or truck.
+  };
+  optional Type type = 10;         // obstacle type
+  optional double timestamp = 11;  // GPS time in seconds.
+
+  // The following fields are new added in Apollo 4.0
+  optional apollo.common.Point3D acceleration = 16;  // obstacle acceleration
+}
+
 message ObstacleFeature {
-  // TODO(all): add more obstacle features.
+  optional int32 id = 1;  // obstacle ID.
+  repeated ObstacleData obstacle = 2;
 }
 
 message RoutingFeature {
@@ -77,14 +111,19 @@ message LearningDataFrame {
   // Features from chassis
   optional ChassisFeature chassis_feature = 4;
 
+  // Features from perception obstacles
   repeated ObstacleFeature obstacle_features = 5;
-  optional RoutingFeature routing_features = 6;
+
+  // Features from routing
+  optional RoutingFeature routing_feature = 6;
+
+  // Features from traffic_light_detection
+  repeated TrafficLightFeature traffic_light_features = 7;
 
   // ADC ground-truth label trajectory
-  repeated apollo.common.TrajectoryPoint label_trajectory_points = 7;
+  repeated apollo.common.TrajectoryPoint label_trajectory_points = 8;
 }
 
 message LearningData {
-  repeated TrafficLightFeature traffic_light = 1;
-  repeated LearningDataFrame learning_data = 2;
+  repeated LearningDataFrame learning_data = 1;
 }
