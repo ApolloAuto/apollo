@@ -8,7 +8,7 @@ import "modules/common/proto/pnc_point.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
 import "modules/routing/proto/routing.proto";
 
-message ObstacleData {
+message ObstacleFeature {
   optional int32 id = 1;  // obstacle ID.
 
   // obstacle position in the OBJECT coordinate system.
@@ -40,12 +40,12 @@ message ObstacleData {
   optional apollo.common.Point3D acceleration = 16;  // obstacle acceleration
 }
 
-message ObstacleFeature {
+message ObstacleData {
   optional int32 id = 1;  // obstacle ID.
-  repeated ObstacleData obstacle = 2;
+  repeated ObstacleFeature obstacle_feature = 2;
 }
 
-message RoutingFeature {
+message RoutingResponseFeature {
   repeated apollo.routing.RoadSegment road = 1;
 }
 
@@ -105,23 +105,23 @@ message LearningDataFrame {
   // sequence_num, always starting from 1.
   optional uint32 frame_num = 2;
 
-  // Features from localization
-  optional LocalizationFeature localization_feature = 3;
-
   // Features from chassis
-  optional ChassisFeature chassis_feature = 4;
+  optional ChassisFeature chassis = 3;
+
+  // Features from localization
+  optional LocalizationFeature localization = 4;
 
   // Features from perception obstacles
-  repeated ObstacleFeature obstacle_features = 5;
+  repeated ObstacleData obstacle = 5;
 
   // Features from routing
-  optional RoutingFeature routing_feature = 6;
+  optional RoutingResponseFeature routing_response = 6;
 
   // Features from traffic_light_detection
-  repeated TrafficLightFeature traffic_light_features = 7;
+  repeated TrafficLightFeature traffic_light = 7;
 
   // ADC ground-truth label trajectory
-  repeated apollo.common.TrajectoryPoint label_trajectory_points = 8;
+  repeated apollo.common.TrajectoryPoint trajectory_point = 8;
 }
 
 message LearningData {

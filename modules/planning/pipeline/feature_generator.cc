@@ -85,7 +85,7 @@ void FeatureGenerator::GenerateTrajectoryLabel(
     if ((i % localization_sample_interval_for_trajectory_point) != 0) {
       continue;
     }
-    auto trajectory_point = learning_data_frame->add_label_trajectory_points();
+    auto trajectory_point = learning_data_frame->add_trajectory_point();
     auto& pose = le.pose();
     trajectory_point->mutable_path_point()->set_x(pose.position().x());
     trajectory_point->mutable_path_point()->set_y(pose.position().y());
@@ -111,7 +111,7 @@ void FeatureGenerator::OnLocalization(
     return;
   }
 
-  auto features = learning_data_frame_->mutable_localization_feature();
+  auto features = learning_data_frame_->mutable_localization();
   const auto& pose = le.pose();
   features->mutable_position()->CopyFrom(pose.position());
   features->set_heading(pose.heading());
@@ -151,7 +151,7 @@ void FeatureGenerator::OnChassis(const apollo::canbus::Chassis& chassis) {
     AERROR << "learning_data_frame_ pointer is nullptr";
     return;
   }
-  auto features = learning_data_frame_->mutable_chassis_feature();
+  auto features = learning_data_frame_->mutable_chassis();
   features->set_speed_mps(chassis.speed_mps());
   features->set_throttle_percentage(chassis.throttle_percentage());
   features->set_brake_percentage(chassis.brake_percentage());
