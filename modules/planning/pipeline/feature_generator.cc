@@ -69,13 +69,6 @@ void FeatureGenerator::Close() {
 
 void FeatureGenerator::OnLocalization(
     const apollo::localization::LocalizationEstimate& le) {
-  // auto features = learning_data_frame_->mutable_localization();
-  // const auto& pose = le.pose();
-  // features->mutable_position()->CopyFrom(pose.position());
-  // features->set_heading(pose.heading());
-  // features->mutable_linear_velocity()->CopyFrom(pose.linear_velocity());
-  // features->mutable_linear_acceleration()->CopyFrom(pose.linear_acceleration());
-  // features->mutable_angular_velocity()->CopyFrom(pose.angular_velocity());
   localization_for_label_.push_back(le);
 
   const int localization_msg_start_cnt =
@@ -194,6 +187,16 @@ void FeatureGenerator::GenerateLearningDataFrame() {
       localization_for_label_.back().header().timestamp_sec());
   learning_data_frame->set_frame_num(total_learning_data_frame_num_++);
 
+  // add localization
+  auto localization = learning_data_frame->mutable_localization();
+  const auto& pose = localization_for_label_.back().pose();
+  localization->mutable_position()->CopyFrom(pose.position());
+  localization->set_heading(pose.heading());
+  localization->mutable_linear_velocity()->CopyFrom(pose.linear_velocity());
+  localization->mutable_linear_acceleration()->CopyFrom(
+      pose.linear_acceleration());
+  localization->mutable_angular_velocity()->CopyFrom(pose.angular_velocity());
+
   // add traffic_light
   learning_data_frame->clear_traffic_light();
   for (const auto& tl : traffic_lights_) {
@@ -203,10 +206,10 @@ void FeatureGenerator::GenerateLearningDataFrame() {
   }
 
   // add routing
-  auto features = learning_data_frame->mutable_routing_response();
-  features->Clear();
+  auto routing_response = learning_data_frame->mutable_routing_response();
+  routing_response->Clear();
   for (const auto& lane_id : routing_lane_ids_) {
-    features->add_lane_id(lane_id);
+    routing_response->add_lane_id(lane_id);
   }
 
   // add trajectory_points
