@@ -17,10 +17,12 @@
 
 #include <list>
 #include <string>
+#include <vector>
 
 #include "cyber/common/file.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "modules/routing/proto/routing.pb.h"
 #include "modules/planning/proto/learning_data.pb.h"
 
 namespace apollo {
@@ -34,8 +36,11 @@ class FeatureGenerator {
   void ProcessOfflineData(const std::string& record_filename);
 
  private:
-  void OnLocalization(const apollo::localization::LocalizationEstimate& le);
   void OnChassis(const apollo::canbus::Chassis& chassis);
+  void OnLocalization(const apollo::localization::LocalizationEstimate& le);
+  void OnRoutingResponse(
+      const apollo::routing::RoutingResponse& routing_response);
+
   void WriteOutLearningData(const LearningData& learning_data,
                             const std::string& file_name);
   void GenerateTrajectoryLabel(
@@ -43,12 +48,14 @@ class FeatureGenerator {
           localization_for_label,
       LearningDataFrame* learning_data_frame);
 
+ private:
   LearningDataFrame* learning_data_frame_ = nullptr;  // not owned
   LearningData learning_data_;
   int learning_data_file_index_ = 0;
   std::list<apollo::localization::LocalizationEstimate>
       localization_for_label_;
   int total_learning_data_frame_num_ = 0;
+  std::vector<std::string> routing_lane_ids;
 };
 
 }  // namespace planning

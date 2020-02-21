@@ -41,6 +41,7 @@ using apollo::canbus::Chassis;
 using apollo::cyber::record::RecordMessage;
 using apollo::cyber::record::RecordReader;
 using apollo::localization::LocalizationEstimate;
+using apollo::routing::RoutingResponse;
 
 void FeatureGenerator::Init() {
   learning_data_frame_ = learning_data_.add_learning_data();
@@ -74,6 +75,13 @@ void FeatureGenerator::GenerateTrajectoryLabel(
   learning_data_frame->set_timestamp_sec(
       localization_for_label.back().header().timestamp_sec());
   learning_data_frame->set_frame_num(total_learning_data_frame_num_++);
+
+  // add routing
+  auto features = learning_data_frame->mutable_routing_response();
+  features->Clear();
+  for (const auto& lane_id : routing_lane_ids) {
+    features->add_lane_id(lane_id);
+  }
 
   int i = -1;
   int cnt = 0;
@@ -159,6 +167,28 @@ void FeatureGenerator::OnChassis(const apollo::canbus::Chassis& chassis) {
   features->set_gear_location(chassis.gear_location());
 }
 
+void FeatureGenerator::OnRoutingResponse(
+  const apollo::routing::RoutingResponse& routing_response) {
+  if (learning_data_frame_ == nullptr) {
+    AERROR << "learning_data_frame_ pointer is nullptr";
+    return;
+  }
+
+  AINFO << "routing_response received at frame["
+        << total_learning_data_frame_num_ << "]";
+
+  routing_lane_ids.clear();
+  for (int i = 0; i < routing_response.road_size(); ++i) {
+    for (int j = 0; j < routing_response.road(i).passage_size(); ++j) {
+      for (int k = 0; k < routing_response.road(i).passage(j).segment_size();
+          ++k) {
+        routing_lane_ids.push_back(
+            routing_response.road(i).passage(j).segment(k).id());
+      }
+    }
+  }
+}
+
 void FeatureGenerator::ProcessOfflineData(const std::string& record_filename) {
   RecordReader reader(record_filename);
   if (!reader.IsValid()) {
@@ -168,15 +198,20 @@ void FeatureGenerator::ProcessOfflineData(const std::string& record_filename) {
 
   RecordMessage message;
   while (reader.ReadMessage(&message)) {
-    if (message.channel_name == FLAGS_localization_topic) {
+    if (message.channel_name == FLAGS_chassis_topic) {
+      Chassis chassis;
+      if (chassis.ParseFromString(message.content)) {
+        OnChassis(chassis);
+      }
+    } else if (message.channel_name == FLAGS_localization_topic) {
       LocalizationEstimate localization;
       if (localization.ParseFromString(message.content)) {
         OnLocalization(localization);
       }
-    } else if (message.channel_name == FLAGS_chassis_topic) {
-      Chassis chassis;
-      if (chassis.ParseFromString(message.content)) {
-        OnChassis(chassis);
+    } else if (message.channel_name == FLAGS_routing_response_topic) {
+      RoutingResponse routing_response;
+      if (routing_response.ParseFromString(message.content)) {
+        OnRoutingResponse(routing_response);
       }
     }
   }
