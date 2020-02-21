@@ -101,7 +101,7 @@ double DistanceToJunction(const ADCTrajectory& adc_trajectory,
 void CloseToJunctionTeller::Init() {
   auto* manager = FrameManager::Instance();
   manager->CreateOrGetReader<ADCTrajectory>(FLAGS_planning_trajectory_topic);
-  CHECK(PredictionMap::Ready()) << "PredictionMap not ready";
+  ACHECK(PredictionMap::Ready()) << "PredictionMap not ready";
 }
 
 void CloseToJunctionTeller::Update(Stories* stories) {

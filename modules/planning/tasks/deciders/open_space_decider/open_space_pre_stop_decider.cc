@@ -39,7 +39,7 @@ using apollo::hdmap::ParkingSpaceInfoConstPtr;
 
 OpenSpacePreStopDecider::OpenSpacePreStopDecider(const TaskConfig& config)
     : Decider(config) {
-  CHECK(config.has_open_space_pre_stop_decider_config());
+  ACHECK(config.has_open_space_pre_stop_decider_config());
 }
 
 Status OpenSpacePreStopDecider::Process(

@@ -34,7 +34,7 @@ TEST(RefTest, update_test) {
       "/apollo/modules/perception/testdata/"
       "camera/app/data/perception/camera/common/object_template/";
   object_template_init_options.conf_file = "object_template.pt";
-  CHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
+  ACHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   ObstacleReference ref;
   omt::OmtParam omt_param;
@@ -42,7 +42,7 @@ TEST(RefTest, update_test) {
       "/apollo/modules/perception/testdata/"
       "camera/lib/obstacle/tracker/omt/data/models/omt_obstacle_tracker",
       "config.pt");
-  CHECK(apollo::cyber::common::GetProtoFromFile(omt_config, &omt_param));
+  ACHECK(apollo::cyber::common::GetProtoFromFile(omt_config, &omt_param));
   ref.Init(omt_param.reference(), 1920.0f, 1080.0f);
   std::string sensor_name = "onsemi_obstacle";
   DataProvider provider;
@@ -115,17 +115,17 @@ TEST(RefTest, update_test) {
   CHECK_EQ(ref.reference_[sensor_name].size(), 1);
   object->size << 0.6, 0.7, 1.5;
   ref.CorrectSize(&frame);
-  CHECK(Equal(1.38566f, object->size[2], 0.01f));
+  ACHECK(Equal(1.38566f, object->size[2], 0.01f));
   object->size << 4, 2, 0.8;
   ref.CorrectSize(&frame);
-  CHECK(Equal(1.38566f, object->size[2], 0.01f));
+  ACHECK(Equal(1.38566f, object->size[2], 0.01f));
 
   object->size << 5.6, 5.7, 1.5;
   ref.CorrectSize(&frame);
-  CHECK(Equal(1.68300f, object->size[2], 0.01f));
+  ACHECK(Equal(1.68300f, object->size[2], 0.01f));
   object->size << 4, 2, 4;
   ref.CorrectSize(&frame);
-  CHECK(Equal(1.68300f, object->size[2], 0.01f));
+  ACHECK(Equal(1.68300f, object->size[2], 0.01f));
 }
 }  // namespace camera
 }  // namespace perception

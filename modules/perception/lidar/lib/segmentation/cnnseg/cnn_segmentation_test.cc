@@ -131,7 +131,7 @@ TEST(CNNSegmentationTest, cnn_segmentation_test) {
       "/apollo/modules/perception/testdata/lidar/lib/segmentation/cnnseg/"
       "pcd_data/3_car_1_person.pcd";
   bool ret = LoadPCDFile(filename, pc_ptr);
-  CHECK(ret) << "Failed to load " << filename;
+  ACHECK(ret) << "Failed to load " << filename;
   // load non ground indices
   base::PointIndices non_ground_indices;
   auto& indices = non_ground_indices.indices;

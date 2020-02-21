@@ -107,7 +107,7 @@ bool DpRoadGraph::FindPathTunnel(const common::TrajectoryPoint &init_point,
 bool DpRoadGraph::GenerateMinCostPath(
     const std::vector<const Obstacle *> &obstacles,
     std::vector<DpRoadGraphNode> *min_cost_path) {
-  CHECK(min_cost_path != nullptr);
+  ACHECK(min_cost_path != nullptr);
 
   std::vector<std::vector<common::SLPoint>> path_waypoints;
   if (!waypoint_sampler_->SamplePathWaypoints(init_point_, &path_waypoints) ||

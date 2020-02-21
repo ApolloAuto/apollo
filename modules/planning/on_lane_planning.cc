@@ -86,7 +86,7 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
 
   planner_dispatcher_->Init();
 
-  CHECK(apollo::cyber::common::GetProtoFromFile(
+  ACHECK(apollo::cyber::common::GetProtoFromFile(
       FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
       << "Failed to load traffic rule config file "
       << FLAGS_traffic_rule_config_filename;
@@ -99,7 +99,7 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
 
   // load map
   hdmap_ = HDMapUtil::BaseMapPtr();
-  CHECK(hdmap_) << "Failed to load map";
+  ACHECK(hdmap_) << "Failed to load map";
 
   // instantiate reference line provider
   reference_line_provider_ = std::make_unique<ReferenceLineProvider>(hdmap_);

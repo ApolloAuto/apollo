@@ -191,7 +191,7 @@ bool ReferenceLineInfo::GetNeighborLaneInfo(
       break;
     }
     default:
-      CHECK(false);
+      ACHECK(false);
   }
   auto ptr_neighbor_lane =
       hdmap::HDMapUtil::BaseMapPtr()->GetLaneById(*ptr_lane_id);
@@ -494,7 +494,7 @@ RSSInfo* ReferenceLineInfo::mutable_rss_info() { return &rss_info_; }
 bool ReferenceLineInfo::CombinePathAndSpeedProfile(
     const double relative_time, const double start_s,
     DiscretizedTrajectory* ptr_discretized_trajectory) {
-  CHECK(ptr_discretized_trajectory != nullptr);
+  ACHECK(ptr_discretized_trajectory != nullptr);
   // use varied resolution to reduce data load but also provide enough data
   // point for control module
   const double kDenseTimeResoltuion = FLAGS_trajectory_time_min_interval;

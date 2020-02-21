@@ -79,7 +79,7 @@ Status ControllerAgent::InitializeConf(const ControlConf *control_conf) {
 
 Status ControllerAgent::Init(const ControlConf *control_conf) {
   RegisterControllers(control_conf);
-  CHECK(InitializeConf(control_conf).ok()) << "Failed to initialize config.";
+  ACHECK(InitializeConf(control_conf).ok()) << "Failed to initialize config.";
   for (auto &controller : controller_list_) {
     if (controller == nullptr) {
       return Status(ErrorCode::CONTROL_INIT_ERROR, "Controller is null.");

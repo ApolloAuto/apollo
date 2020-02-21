@@ -39,7 +39,7 @@ using ObsDecSet = std::vector<std::pair<std::string, ObjectDecisionType>>;
 }  // namespace
 
 STBoundsDecider::STBoundsDecider(const TaskConfig& config) : Decider(config) {
-  CHECK(config.has_st_bounds_decider_config());
+  ACHECK(config.has_st_bounds_decider_config());
   st_bounds_config_ = config.st_bounds_decider_config();
 }
 

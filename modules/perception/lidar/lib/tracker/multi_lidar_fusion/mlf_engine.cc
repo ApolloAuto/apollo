@@ -32,15 +32,15 @@ using cyber::common::GetAbsolutePath;
 bool MlfEngine::Init(const MultiTargetTrackerInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "mlf_engine.conf");
   MlfEngineConfig config;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
 
   main_sensor_.clear();
   for (int i = 0; i < config.main_sensor_size(); ++i) {
@@ -63,11 +63,11 @@ bool MlfEngine::Init(const MultiTargetTrackerInitOptions& options) {
 
   matcher_.reset(new MlfTrackObjectMatcher);
   MlfTrackObjectMatcherInitOptions matcher_init_options;
-  CHECK(matcher_->Init(matcher_init_options));
+  ACHECK(matcher_->Init(matcher_init_options));
 
   tracker_.reset(new MlfTracker);
   MlfTrackerInitOptions tracker_init_options;
-  CHECK(tracker_->Init(tracker_init_options));
+  ACHECK(tracker_->Init(tracker_init_options));
   return true;
 }
 

@@ -32,7 +32,7 @@ using apollo::common::time::Clock;
 
 LaneChangeDecider::LaneChangeDecider(const TaskConfig& config)
     : Decider(config) {
-  CHECK(config_.has_lane_change_decider_config());
+  ACHECK(config_.has_lane_change_decider_config());
 }
 
 // added a dummy parameter to enable this task in ExecuteTaskOnReferenceLine

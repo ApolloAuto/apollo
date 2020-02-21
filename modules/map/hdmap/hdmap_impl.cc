@@ -503,7 +503,7 @@ int HDMapImpl::GetNearestLane(const Vec2d& point,
   }
   const Id& lane_id = segment_object->object()->id();
   *nearest_lane = GetLaneById(lane_id);
-  CHECK(*nearest_lane);
+  ACHECK(*nearest_lane);
   const int id = segment_object->id();
   const auto& segment = (*nearest_lane)->segments()[id];
   Vec2d nearest_pt;

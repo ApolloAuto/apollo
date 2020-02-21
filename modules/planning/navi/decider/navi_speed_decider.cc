@@ -55,58 +55,58 @@ bool NaviSpeedDecider::Init(const PlanningConfig& planning_config) {
   CHECK_GT(FLAGS_planning_upper_speed_limit, 0.0);
   NavigationPlanningConfig config =
       planning_config.navigation_planning_config();
-  CHECK(config.has_planner_navi_config());
-  CHECK(config.planner_navi_config().has_navi_speed_decider_config());
-  CHECK(config.planner_navi_config()
+  ACHECK(config.has_planner_navi_config());
+  ACHECK(config.planner_navi_config().has_navi_speed_decider_config());
+  ACHECK(config.planner_navi_config()
             .navi_speed_decider_config()
             .has_preferred_accel());
-  CHECK(config.planner_navi_config()
+  ACHECK(config.planner_navi_config()
             .navi_speed_decider_config()
             .has_preferred_decel());
-  CHECK(
+  ACHECK(
       config.planner_navi_config().navi_speed_decider_config().has_max_accel());
-  CHECK(
+  ACHECK(
       config.planner_navi_config().navi_speed_decider_config().has_max_decel());
-  CHECK(config.planner_navi_config()
+  ACHECK(config.planner_navi_config()
             .navi_speed_decider_config()
             .has_preferred_jerk());
-  CHECK(config.planner_navi_config()
+  ACHECK(config.planner_navi_config()
             .navi_speed_decider_config()
             .has_obstacle_buffer());
-  CHECK(config.planner_navi_config()
+  ACHECK(config.planner_navi_config()
             .navi_speed_decider_config()
             .has_safe_distance_base());
-  CHECK(config.planner_navi_config()
+  ACHECK(config.planner_navi_config()
             .navi_speed_decider_config()
             .has_safe_distance_ratio());
-  CHECK(config.planner_navi_config()
+  ACHECK(config.planner_navi_config()
             .navi_speed_decider_config()
             .has_following_accel_ratio());
-  CHECK(config.planner_navi_config()
+  ACHECK(config.planner_navi_config()
             .navi_speed_decider_config()
             .has_soft_centric_accel_limit());
-  CHECK(config.planner_navi_config()
+  ACHECK(config.planner_navi_config()
             .navi_speed_decider_config()
             .has_hard_centric_accel_limit());
-  CHECK(config.planner_navi_config()
+  ACHECK(config.planner_navi_config()
             .navi_speed_decider_config()
             .has_hard_speed_limit());
-  CHECK(config.planner_navi_config()
+  ACHECK(config.planner_navi_config()
             .navi_speed_decider_config()
             .has_hard_accel_limit());
-  CHECK(config.planner_navi_config()
+  ACHECK(config.planner_navi_config()
             .navi_speed_decider_config()
             .has_enable_safe_path());
-  CHECK(config.planner_navi_config()
+  ACHECK(config.planner_navi_config()
             .navi_speed_decider_config()
             .has_enable_planning_start_point());
-  CHECK(config.planner_navi_config()
+  ACHECK(config.planner_navi_config()
             .navi_speed_decider_config()
             .has_enable_accel_auto_compensation());
-  CHECK(config.planner_navi_config()
+  ACHECK(config.planner_navi_config()
             .navi_speed_decider_config()
             .has_kappa_preview());
-  CHECK(config.planner_navi_config()
+  ACHECK(config.planner_navi_config()
             .navi_speed_decider_config()
             .has_kappa_threshold());
 

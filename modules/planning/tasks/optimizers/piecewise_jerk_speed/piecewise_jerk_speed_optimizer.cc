@@ -44,7 +44,7 @@ using apollo::common::TrajectoryPoint;
 PiecewiseJerkSpeedOptimizer::PiecewiseJerkSpeedOptimizer(
     const TaskConfig& config)
     : SpeedOptimizer(config) {
-  CHECK(config_.has_piecewise_jerk_speed_config());
+  ACHECK(config_.has_piecewise_jerk_speed_config());
 }
 
 Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
@@ -54,7 +54,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
     return Status::OK();
   }
 
-  CHECK(speed_data != nullptr);
+  ACHECK(speed_data != nullptr);
   SpeedData reference_speed_data = *speed_data;
 
   if (path_data.discretized_path().empty()) {

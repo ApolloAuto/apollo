@@ -214,7 +214,7 @@ common::FrenetFramePoint ReferenceLine::GetFrenetPoint(
 
 std::pair<std::array<double, 3>, std::array<double, 3>>
 ReferenceLine::ToFrenetFrame(const common::TrajectoryPoint& traj_point) const {
-  CHECK(!reference_points_.empty());
+  ACHECK(!reference_points_.empty());
 
   common::SLPoint sl_point;
   XYToSL(traj_point.path_point(), &sl_point);

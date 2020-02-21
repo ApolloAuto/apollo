@@ -33,7 +33,7 @@ using apollo::common::math::Vec2d;
 STBoundary::STBoundary(
     const std::vector<std::pair<STPoint, STPoint>>& point_pairs,
     bool is_accurate_boundary) {
-  CHECK(IsValid(point_pairs)) << "The input point_pairs are NOT valid";
+  ACHECK(IsValid(point_pairs)) << "The input point_pairs are NOT valid";
 
   std::vector<std::pair<STPoint, STPoint>> reduced_pairs(point_pairs);
   if (!is_accurate_boundary) {

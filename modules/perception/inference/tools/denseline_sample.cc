@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
   std::vector<int> shape = {1, 3, height, width};
   std::map<std::string, std::vector<int>> shape_map{{input_blob_name, shape}};
 
-  CHECK(rt_net->Init(shape_map));
+  ACHECK(rt_net->Init(shape_map));
 
   auto input_blob = rt_net->get_blob(input_blob_name);
   std::vector<std::string> image_lists;

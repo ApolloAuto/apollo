@@ -111,7 +111,7 @@ void GPUGemmFloat(const CBLAS_TRANSPOSE TransA, const CBLAS_TRANSPOSE TransB,
       (TransA == CblasNoTrans) ? CUBLAS_OP_N : CUBLAS_OP_T;
   cublasOperation_t cuTransB =
       (TransB == CblasNoTrans) ? CUBLAS_OP_N : CUBLAS_OP_T;
-  CHECK(cublasSgemm(CudaUtil::get_handler(), cuTransB, cuTransA, N, M, K,
+  ACHECK(cublasSgemm(CudaUtil::get_handler(), cuTransB, cuTransA, N, M, K,
                     &alpha, B, ldb, A, lda, &beta, C,
                     N) == CUBLAS_STATUS_SUCCESS);
 }

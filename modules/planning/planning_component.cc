@@ -43,7 +43,7 @@ bool PlanningComponent::Init() {
     planning_base_ = std::make_unique<OnLanePlanning>();
   }
 
-  CHECK(apollo::cyber::common::GetProtoFromFile(FLAGS_planning_config_file,
+  ACHECK(apollo::cyber::common::GetProtoFromFile(FLAGS_planning_config_file,
                                                 &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
   planning_base_->Init(config_);
@@ -96,7 +96,7 @@ bool PlanningComponent::Proc(
     const std::shared_ptr<canbus::Chassis>& chassis,
     const std::shared_ptr<localization::LocalizationEstimate>&
         localization_estimate) {
-  CHECK(prediction_obstacles != nullptr);
+  ACHECK(prediction_obstacles != nullptr);
 
   // check and process possible rerouting request
   CheckRerouting();

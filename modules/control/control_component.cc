@@ -43,7 +43,7 @@ bool ControlComponent::Init() {
 
   AINFO << "Control init, starting ...";
 
-  CHECK(
+  ACHECK(
       cyber::common::GetProtoFromFile(FLAGS_control_conf_file, &control_conf_))
       << "Unable to load control conf file: " + FLAGS_control_conf_file;
 
@@ -67,7 +67,7 @@ bool ControlComponent::Init() {
 
   chassis_reader_ =
       node_->CreateReader<Chassis>(chassis_reader_config, nullptr);
-  CHECK(chassis_reader_ != nullptr);
+  ACHECK(chassis_reader_ != nullptr);
 
   cyber::ReaderConfig planning_reader_config;
   planning_reader_config.channel_name = FLAGS_planning_trajectory_topic;
@@ -75,7 +75,7 @@ bool ControlComponent::Init() {
 
   trajectory_reader_ =
       node_->CreateReader<ADCTrajectory>(planning_reader_config, nullptr);
-  CHECK(trajectory_reader_ != nullptr);
+  ACHECK(trajectory_reader_ != nullptr);
 
   cyber::ReaderConfig localization_reader_config;
   localization_reader_config.channel_name = FLAGS_localization_topic;
@@ -84,7 +84,7 @@ bool ControlComponent::Init() {
 
   localization_reader_ = node_->CreateReader<LocalizationEstimate>(
       localization_reader_config, nullptr);
-  CHECK(localization_reader_ != nullptr);
+  ACHECK(localization_reader_ != nullptr);
 
   cyber::ReaderConfig pad_msg_reader_config;
   pad_msg_reader_config.channel_name = FLAGS_pad_topic;
@@ -92,16 +92,16 @@ bool ControlComponent::Init() {
 
   pad_msg_reader_ =
       node_->CreateReader<PadMessage>(pad_msg_reader_config, nullptr);
-  CHECK(pad_msg_reader_ != nullptr);
+  ACHECK(pad_msg_reader_ != nullptr);
 
   if (!FLAGS_use_control_submodules) {
     control_cmd_writer_ =
         node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
-    CHECK(control_cmd_writer_ != nullptr);
+    ACHECK(control_cmd_writer_ != nullptr);
   } else {
     local_view_writer_ =
         node_->CreateWriter<LocalView>(FLAGS_control_local_view_topic);
-    CHECK(local_view_writer_ != nullptr);
+    ACHECK(local_view_writer_ != nullptr);
   }
 
   // set initial vehicle state by cmd

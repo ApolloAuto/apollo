@@ -133,7 +133,7 @@ bool CheckInsidePnCJunction(const ReferenceLineInfo& reference_line_info) {
  */
 void GetFilesByPath(const boost::filesystem::path& path,
                     std::vector<std::string>* files) {
-  CHECK(files);
+  ACHECK(files);
   if (!boost::filesystem::exists(path)) {
     return;
   }

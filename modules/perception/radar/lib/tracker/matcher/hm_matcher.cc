@@ -44,14 +44,14 @@ bool HMMatcher::Init() {
 
   const std::string &work_root = config_manager->work_root();
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path))
+  ACHECK(model_config->get_value("root_path", &root_path))
       << "Failed to get value of root_path.";
   std::string config_file;
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "hm_matcher.conf");
   // get config params
   MatcherConfig config_params;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config_params))
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config_params))
       << "Failed to parse MatcherConfig config file.";
   double max_match_distance = config_params.max_match_distance();
   double bound_match_distance = config_params.bound_match_distance();

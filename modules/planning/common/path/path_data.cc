@@ -119,7 +119,7 @@ common::PathPoint PathData::GetPathPointWithPathS(const double s) const {
 
 bool PathData::GetPathPointWithRefS(const double ref_s,
                                     common::PathPoint *const path_point) const {
-  CHECK(reference_line_);
+  ACHECK(reference_line_);
   DCHECK_EQ(discretized_path_.size(), frenet_path_.size());
   if (ref_s < 0) {
     AERROR << "ref_s[" << ref_s << "] should be > 0";
@@ -214,7 +214,7 @@ bool PathData::SLToXY(const FrenetFramePath &frenet_path,
 
 bool PathData::XYToSL(const DiscretizedPath &discretized_path,
                       FrenetFramePath *const frenet_path) {
-  CHECK(reference_line_);
+  ACHECK(reference_line_);
   std::vector<common::FrenetFramePoint> frenet_frame_points;
   const double max_len = reference_line_->Length();
   for (const auto &path_point : discretized_path) {
@@ -241,7 +241,7 @@ bool PathData::XYToSL(const DiscretizedPath &discretized_path,
 }
 
 bool PathData::LeftTrimWithRefS(const common::FrenetFramePoint &frenet_point) {
-  CHECK(reference_line_);
+  ACHECK(reference_line_);
   std::vector<common::FrenetFramePoint> frenet_frame_points;
   frenet_frame_points.emplace_back(frenet_point);
 

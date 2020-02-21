@@ -49,7 +49,7 @@ bool RadarDetectionComponent::Init() {
       comp_config.output_channel_name());
 
   // Init algorithm plugin
-  CHECK(InitAlgorithmPlugin()) << "Failed to init algorithm plugin.";
+  ACHECK(InitAlgorithmPlugin()) << "Failed to init algorithm plugin.";
   radar2world_trans_.Init(tf_child_frame_id_);
   radar2novatel_trans_.Init(tf_child_frame_id_);
   localization_subscriber_.Init(
@@ -76,21 +76,21 @@ bool RadarDetectionComponent::InitAlgorithmPlugin() {
   AINFO << "onboard radar_preprocessor: " << preprocessor_method_;
   if (FLAGS_obs_enable_hdmap_input) {
     hdmap_input_ = map::HDMapInput::Instance();
-    CHECK(hdmap_input_->Init()) << "Failed to init hdmap input.";
+    ACHECK(hdmap_input_->Init()) << "Failed to init hdmap input.";
   }
   radar::BasePreprocessor* preprocessor =
       radar::BasePreprocessorRegisterer::GetInstanceByName(
           preprocessor_method_);
   CHECK_NOTNULL(preprocessor);
   radar_preprocessor_.reset(preprocessor);
-  CHECK(radar_preprocessor_->Init()) << "Failed to init radar preprocessor.";
+  ACHECK(radar_preprocessor_->Init()) << "Failed to init radar preprocessor.";
   radar::BaseRadarObstaclePerception* radar_perception =
       radar::BaseRadarObstaclePerceptionRegisterer::GetInstanceByName(
           perception_method_);
-  CHECK(radar_perception != nullptr)
+  ACHECK(radar_perception != nullptr)
       << "No radar obstacle perception named: " << perception_method_;
   radar_perception_.reset(radar_perception);
-  CHECK(radar_perception_->Init(pipeline_name_))
+  ACHECK(radar_perception_->Init(pipeline_name_))
       << "Failed to init radar perception.";
   AINFO << "Init algorithm plugin successfully.";
   return true;

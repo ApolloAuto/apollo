@@ -76,7 +76,7 @@ Status STBoundaryMapper::ComputeSTBoundary(PathDecision* path_decision) const {
   double min_stop_s = std::numeric_limits<double>::max();
   for (const auto* ptr_obstacle_item : path_decision->obstacles().Items()) {
     Obstacle* ptr_obstacle = path_decision->Find(ptr_obstacle_item->Id());
-    CHECK(ptr_obstacle != nullptr);
+    ACHECK(ptr_obstacle != nullptr);
 
     // If no longitudinal decision has been made, then plot it onto ST-graph.
     if (!ptr_obstacle->HasLongitudinalDecision()) {

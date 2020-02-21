@@ -180,7 +180,7 @@ bool ControlComponentTest::FeedTestData() {
 }
 
 bool ControlComponentTest::RunControl(const std::string& test_case_name) {
-  CHECK(FeedTestData()) << "Failed to feed test data";
+  ACHECK(FeedTestData()) << "Failed to feed test data";
 
   control_component_.reset(new ControlComponent());
   control_component_->Initialize(component_config_);

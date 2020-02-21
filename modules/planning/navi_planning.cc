@@ -71,7 +71,7 @@ Status NaviPlanning::Init(const PlanningConfig& config) {
 
   planner_dispatcher_->Init();
 
-  CHECK(apollo::cyber::common::GetProtoFromFile(
+  ACHECK(apollo::cyber::common::GetProtoFromFile(
       FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
       << "Failed to load traffic rule config file "
       << FLAGS_traffic_rule_config_filename;
