@@ -93,7 +93,7 @@ message RoutingResponseFeature {
 }
 
 message TrafficLightFeature {
-    optional string light_id = 1;
+    optional string id = 1;
     optional apollo.perception.TrafficLight.Color color = 2;
 }
 

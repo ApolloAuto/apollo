@@ -18,12 +18,14 @@
 #include <list>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "cyber/common/file.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/localization/proto/localization.pb.h"
-#include "modules/routing/proto/routing.pb.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/proto/learning_data.pb.h"
+#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -40,6 +42,8 @@ class FeatureGenerator {
   void OnLocalization(const apollo::localization::LocalizationEstimate& le);
   void OnRoutingResponse(
       const apollo::routing::RoutingResponse& routing_response);
+  void OnTafficLightDetection(
+      const apollo::perception::TrafficLightDetection& traffic_light_detection);
 
   void WriteOutLearningData(const LearningData& learning_data,
                             const std::string& file_name);
@@ -55,7 +59,9 @@ class FeatureGenerator {
   std::list<apollo::localization::LocalizationEstimate>
       localization_for_label_;
   int total_learning_data_frame_num_ = 0;
-  std::vector<std::string> routing_lane_ids;
+  std::vector<std::string> routing_lane_ids_;
+  std::unordered_map<std::string, apollo::perception::TrafficLight::Color>
+        traffic_lights_;
 };
 
 }  // namespace planning
