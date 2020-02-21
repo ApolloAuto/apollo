@@ -61,6 +61,7 @@ class FeatureGenerator {
   std::list<apollo::localization::LocalizationEstimate>
       localization_for_label_;
   int total_learning_data_frame_num_ = 0;
+  ChassisFeature chassis_feature_;
   std::vector<std::string> routing_lane_ids_;
   std::unordered_map<std::string, apollo::perception::TrafficLight::Color>
         traffic_lights_;
