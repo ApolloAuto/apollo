@@ -18,6 +18,7 @@ cc_library(
         "//modules/planning/common/util:util_lib",
         "//modules/planning/proto:learning_data_proto",
         "//modules/prediction/util:data_extraction",
+        "//modules/routing/proto:routing_proto",
         "//third_party:boost",
         "@com_google_absl//absl/strings",
     ],
