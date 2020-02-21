@@ -45,12 +45,15 @@ class FeatureGenerator {
   void OnTafficLightDetection(
       const apollo::perception::TrafficLightDetection& traffic_light_detection);
 
-  void WriteOutLearningData(const LearningData& learning_data,
-                            const std::string& file_name);
-  void GenerateTrajectoryLabel(
+  void GenerateTrajectoryPoints(
       const std::list<apollo::localization::LocalizationEstimate>&
           localization_for_label,
       LearningDataFrame* learning_data_frame);
+
+  void GenerateLearningDataFrame();
+
+  void WriteOutLearningData(const LearningData& learning_data,
+                            const std::string& file_name);
 
  private:
   LearningDataFrame* learning_data_frame_ = nullptr;  // not owned

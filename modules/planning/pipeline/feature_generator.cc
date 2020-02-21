@@ -69,58 +69,6 @@ void FeatureGenerator::Close() {
         << total_learning_data_frame_num_;
 }
 
-void FeatureGenerator::GenerateTrajectoryLabel(
-    const std::list<apollo::localization::LocalizationEstimate>&
-        localization_for_label,
-    LearningDataFrame* learning_data_frame) {
-  learning_data_frame->set_timestamp_sec(
-      localization_for_label.back().header().timestamp_sec());
-  learning_data_frame->set_frame_num(total_learning_data_frame_num_++);
-
-  // add traffic_light
-  learning_data_frame->clear_traffic_light();
-  for (const auto& tl : traffic_lights_) {
-    auto traffic_light = learning_data_frame->add_traffic_light();
-    traffic_light->set_id(tl.first);
-    traffic_light->set_color(tl.second);
-  }
-
-  // add routing
-  auto features = learning_data_frame->mutable_routing_response();
-  features->Clear();
-  for (const auto& lane_id : routing_lane_ids_) {
-    features->add_lane_id(lane_id);
-  }
-
-  int i = -1;
-  int cnt = 0;
-
-  const int localization_sample_interval_for_trajectory_point =
-      FLAGS_localization_freq / FLAGS_planning_freq;
-  for (const auto& le : localization_for_label) {
-    ++i;
-    if ((i % localization_sample_interval_for_trajectory_point) != 0) {
-      continue;
-    }
-    auto trajectory_point = learning_data_frame->add_trajectory_point();
-    auto& pose = le.pose();
-    trajectory_point->mutable_path_point()->set_x(pose.position().x());
-    trajectory_point->mutable_path_point()->set_y(pose.position().y());
-    trajectory_point->mutable_path_point()->set_z(pose.position().z());
-    trajectory_point->mutable_path_point()->set_theta(pose.heading());
-    auto v = std::sqrt(pose.linear_velocity().x() * pose.linear_velocity().x() +
-                       pose.linear_velocity().y() * pose.linear_velocity().y());
-    trajectory_point->set_v(v);
-    auto a = std::sqrt(
-        pose.linear_acceleration().x() * pose.linear_acceleration().x() +
-        pose.linear_acceleration().y() * pose.linear_acceleration().y());
-    trajectory_point->set_a(a);
-
-    cnt++;
-  }
-  // AINFO << "number of trajectory points in one frame: " << cnt;
-}
-
 void FeatureGenerator::OnLocalization(
     const apollo::localization::LocalizationEstimate& le) {
   if (learning_data_frame_ == nullptr) {
@@ -144,8 +92,9 @@ void FeatureGenerator::OnLocalization(
     return;
   }
 
-  // generate trajectory points for one frame
-  GenerateTrajectoryLabel(localization_for_label_, learning_data_frame_);
+  // generate one frame data
+  GenerateLearningDataFrame();
+
   const int localization_move_window_step =
       FLAGS_localization_freq / FLAGS_planning_freq;
   for (int i = 0; i < localization_move_window_step; ++i) {
@@ -187,8 +136,8 @@ void FeatureGenerator::OnTafficLightDetection(
         traffic_light_detection.traffic_light(i).id();
     if (traffic_light_id.empty()) continue;
 
-    // AINFO << "  traffic_light_id[" << traffic_light_id
-    //      << "] color[" << traffic_light_detection.traffic_light(i).color() << "]";
+    // AINFO << "  traffic_light_id[" << traffic_light_id << "] color["
+    //       << traffic_light_detection.traffic_light(i).color() << "]";
     traffic_lights_[traffic_light_id] =
         traffic_light_detection.traffic_light(i).color();
   }
@@ -209,6 +158,64 @@ void FeatureGenerator::OnRoutingResponse(
       }
     }
   }
+}
+
+void FeatureGenerator::GenerateTrajectoryPoints(
+    const std::list<apollo::localization::LocalizationEstimate>&
+        localization_for_label,
+    LearningDataFrame* learning_data_frame) {
+  int i = -1;
+  int cnt = 0;
+
+  const int localization_sample_interval_for_trajectory_point =
+      FLAGS_localization_freq / FLAGS_planning_freq;
+  for (const auto& le : localization_for_label) {
+    ++i;
+    if ((i % localization_sample_interval_for_trajectory_point) != 0) {
+      continue;
+    }
+    auto trajectory_point = learning_data_frame->add_trajectory_point();
+    auto& pose = le.pose();
+    trajectory_point->mutable_path_point()->set_x(pose.position().x());
+    trajectory_point->mutable_path_point()->set_y(pose.position().y());
+    trajectory_point->mutable_path_point()->set_z(pose.position().z());
+    trajectory_point->mutable_path_point()->set_theta(pose.heading());
+    auto v = std::sqrt(pose.linear_velocity().x() * pose.linear_velocity().x() +
+                       pose.linear_velocity().y() * pose.linear_velocity().y());
+    trajectory_point->set_v(v);
+    auto a = std::sqrt(
+        pose.linear_acceleration().x() * pose.linear_acceleration().x() +
+        pose.linear_acceleration().y() * pose.linear_acceleration().y());
+    trajectory_point->set_a(a);
+
+    cnt++;
+  }
+  // AINFO << "number of trajectory points in one frame: " << cnt;
+}
+
+void FeatureGenerator::GenerateLearningDataFrame() {
+  // add timestamp_sec & frame_num
+  learning_data_frame_->set_timestamp_sec(
+      localization_for_label_.back().header().timestamp_sec());
+  learning_data_frame_->set_frame_num(total_learning_data_frame_num_++);
+
+  // add traffic_light
+  learning_data_frame_->clear_traffic_light();
+  for (const auto& tl : traffic_lights_) {
+    auto traffic_light = learning_data_frame_->add_traffic_light();
+    traffic_light->set_id(tl.first);
+    traffic_light->set_color(tl.second);
+  }
+
+  // add routing
+  auto features = learning_data_frame_->mutable_routing_response();
+  features->Clear();
+  for (const auto& lane_id : routing_lane_ids_) {
+    features->add_lane_id(lane_id);
+  }
+
+  // add trajectory_points
+  GenerateTrajectoryPoints(localization_for_label_, learning_data_frame_);
 }
 
 void FeatureGenerator::ProcessOfflineData(const std::string& record_filename) {
