@@ -16,7 +16,10 @@
 
 #pragma once
 
+#include <boost/filesystem.hpp>
+#include <boost/range/iterator_range.hpp>
 #include <string>
+#include <vector>
 
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/planning/common/reference_line_info.h"
@@ -42,6 +45,9 @@ bool CheckTrafficLightOnReferenceLine(
     const std::string& traffic_light_overlap_id);
 
 bool CheckInsidePnCJunction(const ReferenceLineInfo& reference_line_info);
+
+void GetFilesByPath(const boost::filesystem::path& path,
+                    std::vector<std::string>* files);
 
 }  // namespace util
 }  // namespace planning

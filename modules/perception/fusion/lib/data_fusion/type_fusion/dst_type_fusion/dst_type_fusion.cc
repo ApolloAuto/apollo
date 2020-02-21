@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/fusion/lib/data_fusion/type_fusion/dst_type_fusion/dst_type_fusion.h"
 
-#include "boost/format.hpp"
+#include <boost/format.hpp>
 
 #include "cyber/common/file.h"
 #include "modules/perception/fusion/base/base_init_options.h"

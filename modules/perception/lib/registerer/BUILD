@@ -17,7 +17,7 @@ cc_test(
     srcs = ["registerer_test.cc"],
     deps = [
         ":registerer",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

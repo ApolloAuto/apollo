@@ -20,11 +20,11 @@ decision {
         follow {
           distance_s: -3
           fence_point {
-            x: 586436.91460396955
-            y: 4140728.4578750865
+            x: 586437.407446284
+            y: 4140728.3336737519
             z: 0
           }
-          fence_heading: 1.317975721968581
+          fence_heading: 1.328308715223566
         }
       }
     }
@@ -40,10 +40,13 @@ routing_header {
 }
 right_of_way_status: UNPROTECTED
 lane_id {
-  id: "2849_1_-1"
+  id: "2900_1_-1"
 }
 lane_id {
-  id: "10591a_1_-1"
+  id: "11043_1_-1"
+}
+lane_id {
+  id: "2907_1_-1"
 }
 lane_id {
   id: "2906_1_-1"
@@ -93,10 +96,13 @@ engage_advice {
 trajectory_type: SPEED_FALLBACK
 replan_reason: "replan for no previous trajectory."
 target_lane_id {
-  id: "2849_1_-1"
+  id: "2900_1_-1"
 }
 target_lane_id {
-  id: "10591a_1_-1"
+  id: "11043_1_-1"
+}
+target_lane_id {
+  id: "2907_1_-1"
 }
 target_lane_id {
   id: "2906_1_-1"

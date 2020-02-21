@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -29,7 +29,7 @@ from modules.common.proto import drive_event_pb2
 from modules.map.relative_map.proto import navigation_pb2
 from modules.guardian.proto import guardian_pb2
 
-import proto_utils
+from . import proto_utils
 
 
 class MessageType:

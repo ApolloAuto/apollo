@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -30,8 +30,9 @@ from absl import flags
 from absl import logging
 import cv2
 
-from cyber_py.record import RecordReader, RecordWriter
+from cyber_py3.record import RecordReader, RecordWriter
 from modules.drivers.proto.sensor_image_pb2 import CompressedImage
+
 
 flags.DEFINE_string('from_record', None, 'The source record file that needs to be restored.')
 flags.DEFINE_string('to_record', None, 'The restored record file.')
@@ -75,8 +76,10 @@ VIDEO_IMAGE_MAP = {
     VIDEO_RIGHT_FISHEYE_CHANNEL: IMAGE_RIGHT_FISHEYE_CHANNEL,
 }
 
+
 class VideoConverter(object):
     """Convert video into images."""
+
     def __init__(self, work_dir, topic):
         # Initial type of video frames that defined in apollo video drive proto
         # The initial frame has meta data information shared by the following tens of frames
@@ -88,7 +91,7 @@ class VideoConverter(object):
         self.image_dir = '{}_images'.format(self.video_file)
         makedirs(video_dir)
         makedirs(self.image_dir)
-        self.frame_writer = open(self.video_file, 'w+')
+        self.frame_writer = open(self.video_file, 'wb+')
 
     def close_writer(self):
         """Close the video frames writer"""
@@ -126,6 +129,7 @@ class VideoConverter(object):
         for image_file in os.listdir(self.image_dir):
             shutil.move(os.path.join(self.image_dir, image_file),
                         os.path.join(overall_image_dir, image_file))
+
 
 def restore_record(input_record, output_record):
     """Entrance of processing."""
@@ -175,6 +179,7 @@ def restore_record(input_record, output_record):
 
     logging.info('All Done, converted record: {}'.format(output_record))
 
+
 def retrieve_image(image_dir, message):
     """Actually change the content of message from video bytes to image bytes"""
     message_id = get_message_id(message.timestamp, message.topic)
@@ -197,15 +202,18 @@ def retrieve_image(image_dir, message):
     message_proto.data = message_proto.data.replace(message_proto.data[:], bytearray(encode_img))
     return message_proto.SerializeToString()
 
+
 def get_message_id(timestamp, topic):
     """Unify the way to get a unique identifier for the given message"""
     return '{}{}'.format(timestamp, topic.replace('/', '_'))
+
 
 def image_message_to_proto(py_message):
     """Message to prototype"""
     message_proto = CompressedImage()
     message_proto.ParseFromString(py_message.message)
     return message_proto
+
 
 def makedirs(dir_path):
     """Make directories recursively."""
@@ -218,6 +226,7 @@ def makedirs(dir_path):
             logging.error('Failed to makedir ' + dir_path)
             raise
 
+
 def main(argv):
     """Main process."""
     if not flags.FLAGS.from_record or not os.path.exists(flags.FLAGS.from_record):
@@ -228,6 +237,7 @@ def main(argv):
         to_record = '{}_restored'.format(flags.FLAGS.from_record)
         logging.warn('The default restored record file is set as {}'.format(to_record))
     restore_record(flags.FLAGS.from_record, to_record)
+
 
 if __name__ == '__main__':
     app.run(main)

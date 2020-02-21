@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -22,7 +22,7 @@ Usage:
 """
 import sys
 import datetime
-from cyber_py.record import RecordReader
+from cyber_py3.record import RecordReader
 from modules.localization.proto import localization_pb2
 
 kLocalizationTopic = '/apollo/localization/pose'

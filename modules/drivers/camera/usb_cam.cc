@@ -93,7 +93,7 @@ bool UsbCam::init(const std::shared_ptr<Config>& cameraconfig) {
 
   // Warning when diff with last > 1.5* interval
   frame_warning_interval_ = static_cast<float>(1.5 / config_->frame_rate());
-  // now max fps 30, we use a appox time 0.9 to drop image.
+  // now max fps 30, we use an appox time 0.9 to drop image.
   frame_drop_interval_ = static_cast<float>(0.9 / config_->frame_rate());
 
   return true;

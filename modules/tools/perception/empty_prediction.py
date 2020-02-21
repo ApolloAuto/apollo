@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -26,8 +26,8 @@ import time
 
 import numpy
 import simplejson
-from cyber_py import cyber
-from cyber_py import cyber_time
+from cyber_py3 import cyber
+from cyber_py3 import cyber_time
 
 from modules.prediction.proto.prediction_obstacle_pb2 import PredictionObstacles
 

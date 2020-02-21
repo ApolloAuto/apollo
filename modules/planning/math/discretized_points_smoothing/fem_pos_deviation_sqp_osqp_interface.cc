@@ -22,7 +22,6 @@
 
 #include <cmath>
 #include <limits>
-#include <numeric>
 
 #include "cyber/common/log.h"
 

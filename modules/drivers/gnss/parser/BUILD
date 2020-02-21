@@ -63,11 +63,11 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//external:gflags",
         "//modules/common/monitor_log",
         "//modules/drivers/gnss/proto:gnss_proto",
         "//modules/drivers/gnss/third_party:rtcm",
         "//modules/drivers/gnss/util:gnss_util",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 

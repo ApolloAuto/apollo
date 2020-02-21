@@ -16,44 +16,35 @@
 
 #include "modules/localization/msf/common/util/rect2d.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
 
-class Rect2DTestSuite : public ::testing::Test {
- protected:
-  Rect2DTestSuite() {}
-  virtual ~Rect2DTestSuite() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
-};
-
-/**@brief Rect2DTest. */
-TEST_F(Rect2DTestSuite, Rect2DTest) {
+TEST(Rect2DTestSuite, Rect2DTest) {
   Rect2D<double> rect_a(0.5, 0.5, 1.0, 1.0);
   double min_x = rect_a.GetMinX();
   double min_y = rect_a.GetMinY();
   double max_x = rect_a.GetMaxX();
   double max_y = rect_a.GetMaxY();
-  ASSERT_LT(std::abs(min_x - 0.5), 1e-5);
-  ASSERT_LT(std::abs(min_y - 0.5), 1e-5);
-  ASSERT_LT(std::abs(max_x - 1.0), 1e-5);
-  ASSERT_LT(std::abs(max_y - 1.0), 1e-5);
+  EXPECT_LT(std::abs(min_x - 0.5), 1e-5);
+  EXPECT_LT(std::abs(min_y - 0.5), 1e-5);
+  EXPECT_LT(std::abs(max_x - 1.0), 1e-5);
+  EXPECT_LT(std::abs(max_y - 1.0), 1e-5);
 
   Eigen::Matrix<double, 2, 1> lt_corner = rect_a.GetLeftTopCorner();
   Eigen::Matrix<double, 2, 1> rb_corner = rect_a.GetRightBottomCorner();
-  ASSERT_LT(std::abs(lt_corner(0) - 0.5), 1e-5);
-  ASSERT_LT(std::abs(lt_corner(1) - 0.5), 1e-5);
-  ASSERT_LT(std::abs(rb_corner(0) - 1.0), 1e-5);
-  ASSERT_LT(std::abs(rb_corner(1) - 1.0), 1e-5);
+  EXPECT_LT(std::abs(lt_corner(0) - 0.5), 1e-5);
+  EXPECT_LT(std::abs(lt_corner(1) - 0.5), 1e-5);
+  EXPECT_LT(std::abs(rb_corner(0) - 1.0), 1e-5);
+  EXPECT_LT(std::abs(rb_corner(1) - 1.0), 1e-5);
 
   Rect2D<double> rect_b(rect_a);
-  ASSERT_LT(std::abs(rect_b.GetMinX() - 0.5), 1e-5);
+  EXPECT_LT(std::abs(rect_b.GetMinX() - 0.5), 1e-5);
 
   Rect2D<double> rect_c = rect_b;
-  ASSERT_LT(std::abs(rect_c.GetMinX() - 0.5), 1e-5);
+  EXPECT_LT(std::abs(rect_c.GetMinX() - 0.5), 1e-5);
 }
 
 }  // namespace msf

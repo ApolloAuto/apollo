@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -24,10 +24,13 @@ Usage:
 
 import os
 import sys
-from cyber_py import cyber
-from cyber_py.record import RecordReader
+
+from cyber_py3 import cyber
+from cyber_py3.record import RecordReader
 from modules.canbus.proto import chassis_pb2
 from modules.dreamview.proto import hmi_status_pb2
+
+
 kChassisInfoTopic = '/apollo/canbus/chassis'
 kHMIInfoTopic = '/apollo/hmi/status'
 
@@ -99,6 +102,7 @@ class StaticInfoCalculator(object):
         # Currently we only care about vehicle name.
         return bool(self.vehicle_name)
 
+
 def main():
     """
     Process a path
@@ -117,6 +121,7 @@ def main():
     # Output result, which might be None
     print('vehicle_name: %s' % calc.vehicle_name)
     print('vehicle_vin: %s' % calc.vehicle_vin)
+
 
 if __name__ == '__main__':
     main()

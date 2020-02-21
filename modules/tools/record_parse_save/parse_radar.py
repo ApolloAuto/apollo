@@ -1,3 +1,21 @@
+#!/usr/bin/env python3
+
+###############################################################################
+# Copyright 2018 The Apollo Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+###############################################################################
+
 """
 function to parse radar data from *.record files, created using Apollo-Auto
 
@@ -8,15 +26,15 @@ currently implementation for:
 
 """
 
-import sys, json, os
+import json
+import os
+import sys
 
-from cyber_py import cyber
-from cyber_py import record
-
+from cyber_py3 import cyber
+from cyber_py3 import record
 from modules.drivers.proto.conti_radar_pb2 import ContiRadar
 
 
-###########################################################
 class RadarMessageConti408(object):
     def __init__(self):
         self.radarDetectionList = []
@@ -30,6 +48,7 @@ class RadarMessageConti408(object):
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,
                           sort_keys=True, indent=4)
+
 
 class ContiRadarARS408Detection(object):
     def __init__(self):
@@ -56,6 +75,7 @@ class ContiRadarARS408Detection(object):
         self.length = None
         self.width = None
         self.obstacle_class = None
+
 
 def pull_conti_radar_detections(obs):
     """
@@ -90,8 +110,6 @@ def pull_conti_radar_detections(obs):
 
     return dets
 
-
-###########################################################
 def parse_data(channelname, msg, out_folder):
     """
     parser for record-file data from continental ars-408 radar
@@ -117,14 +135,12 @@ def parse_data(channelname, msg, out_folder):
     radar_msg.radarDetectionList = detections
 
     json_data = radar_msg.toJSON()
-    tstamp = json_data.split()[-2].ljust(20,'0')
+    tstamp = json_data.split()[-2].ljust(20, '0')
 
     # write this scan to file
-    scan_filename = "radar_scan_" + tstamp.replace('.','_') + ".txt"
+    scan_filename = "radar_scan_" + tstamp.replace('.', '_') + ".txt"
     with open(out_folder + scan_filename, 'w') as outfile:
         outfile.write(json_data)
 
-
     return tstamp
 
-###########################################################

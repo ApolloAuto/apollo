@@ -29,9 +29,9 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
@@ -47,9 +47,9 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
@@ -128,9 +128,9 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
@@ -153,9 +153,9 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
@@ -178,9 +178,9 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
@@ -203,9 +203,9 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
@@ -228,9 +228,9 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
@@ -259,9 +259,9 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
+        "//third_party:adolc",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
@@ -302,7 +302,7 @@ cc_test(
     deps = [
         ":distance_approach_ipopt_interface",
         "//cyber/common:log",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -317,7 +317,7 @@ cc_test(
     deps = [
         ":distance_approach_ipopt_cuda_interface",
         "//cyber/common:log",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -332,7 +332,7 @@ cc_test(
     deps = [
         ":distance_approach_problem",
         "//cyber/common:log",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -342,7 +342,7 @@ cc_test(
     srcs = ["dual_variable_warm_start_ipopt_interface_test.cc"],
     deps = [
         ":dual_variable_warm_start_ipopt_interface",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -353,8 +353,8 @@ cc_test(
     deps = [
         ":dual_variable_warm_start_ipopt_qp_interface",
         ":dual_variable_warm_start_osqp_interface",
-        "@gtest//:main",
-        "@ipopt",
+        "//third_party:ipopt",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -364,7 +364,7 @@ cc_test(
     srcs = ["dual_variable_warm_start_problem_test.cc"],
     deps = [
         ":dual_variable_warm_start_problem",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

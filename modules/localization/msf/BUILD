@@ -42,10 +42,10 @@ cc_library(
         "//modules/localization/proto:measure_proto",
         "//modules/localization/proto:sins_pva_proto",
         "//modules/transform:transform_broadcaster_lib",
-        "@boost",
-        "@glog",
-        "@gtest",
-        "@yaml_cpp//:yaml",
+        "//third_party:boost",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
+        "@com_google_glog//:glog",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -70,7 +70,7 @@ cc_test(
         "//modules/common/time",
         "//modules/common/util",
         "//modules/localization/msf:msf_localization_component_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

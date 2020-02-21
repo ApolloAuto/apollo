@@ -16,8 +16,8 @@
 
 #include "modules/perception/inference/utils/cuda_util.h"
 
-#include <boost/thread.hpp>
 #include <cuda_runtime_api.h>
+#include <boost/thread.hpp>
 
 #include "cyber/common/log.h"
 
@@ -27,9 +27,9 @@ namespace inference {
 
 static boost::thread_specific_ptr<CudaUtil> thread_instance_;
 
-#define CUBLAS_CHECK(condition) \
-  do { \
-    cublasStatus_t status = condition; \
+#define CUBLAS_CHECK(condition)                               \
+  do {                                                        \
+    cublasStatus_t status = condition;                        \
     CHECK_EQ(status, CUBLAS_STATUS_SUCCESS) << " " << status; \
   } while (0)
 
@@ -40,9 +40,7 @@ CudaUtil &CudaUtil::get() {
   return *(thread_instance_.get());
 }
 
-CudaUtil::CudaUtil() {
-  CUBLAS_CHECK(cublasCreate(&cublas_handle_));
-}
+CudaUtil::CudaUtil() { CUBLAS_CHECK(cublasCreate(&cublas_handle_)); }
 
 bool CudaUtil::set_device_id(int device_id) {
   int now_device = -1;
@@ -61,9 +59,7 @@ bool CudaUtil::set_device_id(int device_id) {
   }
   return true;
 }
-cublasHandle_t &CudaUtil::get_handler() {
-  return get().cublas_handle_;
-}
+cublasHandle_t &CudaUtil::get_handler() { return get().cublas_handle_; }
 
 CudaUtil::~CudaUtil() {
   if (get().cublas_handle_) {

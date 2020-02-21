@@ -38,7 +38,6 @@ namespace scenario {
 namespace emergency_stop {
 
 using apollo::common::TrajectoryPoint;
-using apollo::common::VehicleConfigHelper;
 
 EmergencyStopStageApproach::EmergencyStopStageApproach(
     const ScenarioConfig::StageConfig& config)

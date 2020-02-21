@@ -16,15 +16,11 @@
 
 #include "modules/planning/scenarios/park_and_go/stage_check.h"
 
-#include <string>
-#include <vector>
-
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace park_and_go {
 
-using apollo::common::EngageAdvice;
 using apollo::common::TrajectoryPoint;
 
 Stage::StageStatus ParkAndGoStageCheck::Process(

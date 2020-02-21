@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -17,10 +17,13 @@
 ###############################################################################
 
 import argparse
+
 import matplotlib.pyplot as plt
-from libs.map import Map
+
 from libs.localization import Localization
+from libs.map import Map
 from libs.path import Path
+
 
 def draw(map):
     lane_ids = args.laneid
@@ -37,6 +40,7 @@ def draw(map):
         map.draw_crosswalks(plt)
     if args.showyieldsigns:
         map.draw_yield_signs(plt)
+
 
 if __name__ == "__main__":
 

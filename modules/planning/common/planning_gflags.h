@@ -210,6 +210,8 @@ DECLARE_double(fallback_total_time);
 DECLARE_double(fallback_time_unit);
 
 DECLARE_double(speed_bump_speed_limit);
+DECLARE_double(default_city_road_speed_limit);
+DECLARE_double(default_highway_speed_limit);
 
 // navigation mode
 DECLARE_bool(enable_planning_pad_msg);
@@ -264,3 +266,5 @@ DECLARE_bool(use_smoothed_dp_guide_line);
 DECLARE_bool(use_soft_bound_in_nonlinear_speed_opt);
 
 DECLARE_bool(use_front_axe_center_in_path_planning);
+
+DECLARE_bool(use_road_boundary_from_map);

@@ -20,10 +20,22 @@ sudo apt-get install -y ntpdate
 
 grep -q ntpdate /etc/crontab
 
+REGIN="us"
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage:      ./time_sync.sh <ntp_pool_regin>"
+    echo "Example:    ./time_sync.sh cn                               # Set ntp pool to China server"
+    echo "Default using us as ntp pool regin"
+else
+    REGIN=$1
+fi
+
+echo "Regin is set as: ${REGIN}, make sure this regin is consistent with list on pool.npt.org"
+
 if [ $? -eq 1 ]; then
-    echo "*/1 * * * * root ntpdate -v -u us.pool.ntp.org" | sudo tee -a /etc/crontab
+    echo "*/1 * * * * root ntpdate -v -u ${REGIN}.pool.ntp.org" | sudo tee -a /etc/crontab
 fi
 
 # ntpdate running log at /var/log/syslog
 
-sudo ntpdate -v -u us.pool.ntp.org
+sudo ntpdate -v -u ${REGIN}.pool.ntp.org

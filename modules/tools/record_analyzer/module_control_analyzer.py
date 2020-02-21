@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -16,10 +16,10 @@
 # limitations under the License.
 ###############################################################################
 
-from common.statistical_analyzer import StatisticalAnalyzer
-from common.statistical_analyzer import PrintColors
 from common.error_code_analyzer import ErrorCodeAnalyzer
 from common.error_msg_analyzer import ErrorMsgAnalyzer
+from common.statistical_analyzer import PrintColors
+from common.statistical_analyzer import StatisticalAnalyzer
 
 
 class ControlAnalyzer:
@@ -51,31 +51,31 @@ class ControlAnalyzer:
     def print_latency_statistics(self):
         """print_latency_statistics"""
         print("\n\n")
-        print(PrintColors.HEADER + "--- Control Latency (ms) ---" + \
-            PrintColors.ENDC)
+        print(PrintColors.HEADER + "--- Control Latency (ms) ---" +
+              PrintColors.ENDC)
         analyzer = StatisticalAnalyzer()
         analyzer.print_statistical_results(self.module_latency)
 
-        print(PrintColors.HEADER + "--- station error ---" + \
-            PrintColors.ENDC)
+        print(PrintColors.HEADER + "--- station error ---" +
+              PrintColors.ENDC)
         analyzer.print_statistical_results(self.lon_station_error)
 
-        print(PrintColors.HEADER + "--- speed error ---" + \
-            PrintColors.ENDC)
+        print(PrintColors.HEADER + "--- speed error ---" +
+              PrintColors.ENDC)
         analyzer.print_statistical_results(self.lon_speed_error)
 
-        print(PrintColors.HEADER + "--- lateral error ---" + \
-            PrintColors.ENDC)
+        print(PrintColors.HEADER + "--- lateral error ---" +
+              PrintColors.ENDC)
         analyzer.print_statistical_results(self.lat_lateral_error)
 
-        print(PrintColors.HEADER + "--- heading error ---" + \
-            PrintColors.ENDC)
+        print(PrintColors.HEADER + "--- heading error ---" +
+              PrintColors.ENDC)
         analyzer.print_statistical_results(self.lat_heading_error)
 
-        print(PrintColors.HEADER + "--- Control Error Code Distribution ---" + \
-            PrintColors.ENDC)
+        print(PrintColors.HEADER + "--- Control Error Code Distribution ---" +
+              PrintColors.ENDC)
         self.error_code_analyzer.print_results()
 
-        print(PrintColors.HEADER + "--- Control Error Msg Distribution ---" + \
-            PrintColors.ENDC)
+        print(PrintColors.HEADER + "--- Control Error Msg Distribution ---" +
+              PrintColors.ENDC)
         self.error_msg_analyzer.print_results()

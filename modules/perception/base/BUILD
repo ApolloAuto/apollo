@@ -55,8 +55,8 @@ cc_test(
     deps = [
         ":blob",
         "//modules/perception/base/test:test_helper",
+        "@com_google_googletest//:gtest_main",
         "@cuda",
-        "@gtest//:main",
     ],
 )
 
@@ -77,7 +77,7 @@ cc_test(
     srcs = ["box_test.cc"],
     deps = [
         ":box",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -96,7 +96,7 @@ cc_test(
     srcs = ["camera_test.cc"],
     deps = [
         ":camera",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -114,7 +114,7 @@ cc_test(
     srcs = ["common_test.cc"],
     deps = [
         ":common",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -135,7 +135,7 @@ cc_test(
     srcs = ["distortion_model_test.cc"],
     deps = [
         ":distortion_model",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -171,7 +171,7 @@ cc_test(
     size = "small",
     deps = [
         ":image",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -190,7 +190,7 @@ cc_test(
     srcs = ["impending_collision_edge_test.cc"],
     deps = [
         ":impending_collision_edge",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -216,7 +216,7 @@ cc_test(
     srcs = ["object_test.cc"],
     deps = [
         ":object",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -243,8 +243,8 @@ cc_test(
         ":object_pool_types",
         ":point_cloud",
         "//cyber",
+        "@com_google_googletest//:gtest_main",
         "@eigen",
-        "@gtest//:main",
     ],
 )
 
@@ -281,7 +281,7 @@ cc_test(
     srcs = ["omnidirectional_model_test.cc"],
     deps = [
         ":omnidirectional_model",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -317,7 +317,7 @@ cc_test(
     srcs = ["point_cloud_test.cc"],
     deps = [
         ":point_cloud",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -333,7 +333,7 @@ cc_test(
     srcs = ["polynomial_test.cc"],
     deps = [
         ":polynomial",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -354,8 +354,8 @@ cc_test(
     deps = [
         ":syncedmem",
         "//modules/perception/base/test:test_helper",
+        "@com_google_googletest//:gtest_main",
         "@cuda",
-        "@gtest//:main",
     ],
 )
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -20,17 +20,19 @@
 This module creates a node and fake perception data based
 on json configurations
 """
+
 import argparse
 import math
 import time
 
 import simplejson
-from cyber_py import cyber
-from cyber_py import cyber_time
 
+from cyber_py3 import cyber
+from cyber_py3 import cyber_time
+from modules.common.proto.geometry_pb2 import Point3D
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
-from modules.common.proto.geometry_pb2 import Point3D
+
 
 _s_seq_num = 0
 _s_delta_t = 0.1
@@ -101,7 +103,7 @@ def load_descrptions(files):
                             print('same trace point found in obstacle: %s' % obstacle["id"])
                             return None
                     objects.append(obstacle)
-            else: # Default case. handles only one obstacle
+            else:  # Default case. handles only one obstacle
                 obstacle = obstacles
                 trace = obstacle.get('trace', [])
                 for i in range(1, len(trace)):

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -19,14 +19,15 @@
 import abc
 import logging
 import math
-import numpy as np
 
 from google.protobuf.internal import decoder
 from google.protobuf.internal import encoder
+import numpy as np
 
 from modules.prediction.proto import offline_features_pb2
-from bounding_rectangle import BoundingRectangle
-from configure import parameters
+from .bounding_rectangle import BoundingRectangle
+from .configure import parameters
+
 
 param_fea = parameters['feature']
 
@@ -40,7 +41,6 @@ class LabelGenerator(object):
             obstacle_ID --> [Feature1, Feature2, Feature3, ...] (sequentially sorted)
         '''
         self.feature_dict = dict()
-
 
         '''
         observation_dict contains the important observations of the subsequent
@@ -69,7 +69,6 @@ class LabelGenerator(object):
         self.cruise_label_dict = dict()
         self.junction_label_dict = dict()
 
-
     def LoadFeaturePBAndSaveLabelFiles(self, input_filepath):
         '''
         This function will be used to replace all the functionalities in
@@ -78,9 +77,8 @@ class LabelGenerator(object):
         self.filepath = input_filepath
         feature_sequences = self.LoadPBFeatures(input_filepath)
         self.OrganizeFeatures(feature_sequences)
-        del feature_sequences # Try to free up some memory
+        del feature_sequences  # Try to free up some memory
         self.ObserveAllFeatureSequences()
-
 
     '''
     @brief: parse the pb file of Feature of all obstacles at all times.
@@ -88,13 +86,13 @@ class LabelGenerator(object):
                      every obstacle at every timestamp.
     @output: python readable format of the same content.
     '''
+
     def LoadPBFeatures(self, filepath):
         self.filepath = filepath
         offline_features = offline_features_pb2.Features()
         with open(filepath, 'rb') as file_in:
             offline_features.ParseFromString(file_in.read())
         return offline_features.feature
-
 
     '''
     @brief: save the feature_sequences to an output protobuf file.
@@ -107,7 +105,6 @@ class LabelGenerator(object):
             serializedMessage = pb_message.SerializeToString()
             file.write(serializedMessage)
 
-
     '''
     @brief: organize the features by obstacle IDs first, then sort each
             obstacle's feature according to time sequence.
@@ -115,6 +112,7 @@ class LabelGenerator(object):
     @output: organized (meaning: grouped by obstacle ID and sorted by time)
              features.
     '''
+
     def OrganizeFeatures(self, features):
         # Organize Feature by obstacle_ID (put those belonging to the same obstacle together)
         for feature in features:
@@ -130,11 +128,11 @@ class LabelGenerator(object):
                 continue
             self.feature_dict[obs_id].sort(key=lambda x: x.timestamp)
 
-
     '''
     @brief: observe all feature sequences and build observation_dict.
     @output: the complete observation_dict.
     '''
+
     def ObserveAllFeatureSequences(self):
         for obs_id, feature_sequence in self.feature_dict.items():
             for idx, feature in enumerate(feature_sequence):
@@ -157,6 +155,7 @@ class LabelGenerator(object):
     @output: All saved as class variables in observation_dict,
              including: its trajectory info and its lane changing info.
     '''
+
     def ObserveFeatureSequence(self, feature_sequence, idx_curr):
         # Initialization.
         feature_curr = feature_sequence[idx_curr]
@@ -262,9 +261,9 @@ class LabelGenerator(object):
         dict_val['is_jittering'] = is_jittering
         dict_val['new_lane_id'] = new_lane_id
         dict_val['total_observed_time_span'] = total_observed_time_span
-        self.observation_dict["{}@{:.3f}".format(feature_curr.id, feature_curr.timestamp)] = dict_val
+        self.observation_dict["{}@{:.3f}".format(
+            feature_curr.id, feature_curr.timestamp)] = dict_val
         return
-
 
     '''
     @brief Based on the observation, label each lane sequence accordingly:
@@ -272,6 +271,7 @@ class LabelGenerator(object):
                 within a certain amount of time.
               - if there is lane chage, label the time it takes to get to that lane.
     '''
+
     def LabelSingleLane(self, period_of_interest=3.0):
         output_features = offline_features_pb2.Features()
         for obs_id, feature_sequence in self.feature_dict.items():
@@ -285,7 +285,8 @@ class LabelGenerator(object):
                 # Observe the subsequent Features
                 if "{}@{:.3f}".format(feature.id, feature.timestamp) not in self.observation_dict:
                     continue
-                observed_val = self.observation_dict["{}@{:.3f}".format(feature.id, feature.timestamp)]
+                observed_val = self.observation_dict["{}@{:.3f}".format(
+                    feature.id, feature.timestamp)]
 
                 lane_sequence_dict = dict()
                 # Based on the observation, label data.
@@ -321,7 +322,7 @@ class LabelGenerator(object):
                                     current_lane_ids.append(lane_sequence.lane_segment[k].lane_id)
 
                             is_following_this_lane = True
-                            for l_id in range(1, min(len(current_lane_ids), \
+                            for l_id in range(1, min(len(current_lane_ids),
                                                      len(observed_val['obs_actual_lane_ids']))):
                                 if current_lane_ids[l_id] != observed_val['obs_actual_lane_ids'][l_id]:
                                     is_following_this_lane = False
@@ -386,11 +387,11 @@ class LabelGenerator(object):
                                 lane_sequence.time_to_lane_center = -1.0
 
                 for lane_sequence in feature.lane.lane_graph.lane_sequence:
-                    lane_sequence_dict[lane_sequence.lane_sequence_id] = [lane_sequence.label, \
-                   lane_sequence.time_to_lane_center, lane_sequence.time_to_lane_edge]
-                self.cruise_label_dict["{}@{:.3f}".format(feature.id, feature.timestamp)] = lane_sequence_dict
+                    lane_sequence_dict[lane_sequence.lane_sequence_id] = [lane_sequence.label,
+                                                                          lane_sequence.time_to_lane_center, lane_sequence.time_to_lane_edge]
+                self.cruise_label_dict["{}@{:.3f}".format(
+                    feature.id, feature.timestamp)] = lane_sequence_dict
         np.save(self.filepath + '.cruise_label.npy', self.cruise_label_dict)
-
 
     def LabelTrajectory(self, period_of_interest=3.0):
         output_features = offline_features_pb2.Features()
@@ -399,8 +400,10 @@ class LabelGenerator(object):
                 # Observe the subsequent Features
                 if "{}@{:.3f}".format(feature.id, feature.timestamp) not in self.observation_dict:
                     continue
-                observed_val = self.observation_dict["{}@{:.3f}".format(feature.id, feature.timestamp)]
-                self.future_status_dict["{}@{:.3f}".format(feature.id, feature.timestamp)] = observed_val['obs_traj']
+                observed_val = self.observation_dict["{}@{:.3f}".format(
+                    feature.id, feature.timestamp)]
+                self.future_status_dict["{}@{:.3f}".format(
+                    feature.id, feature.timestamp)] = observed_val['obs_traj']
         np.save(self.filepath + '.future_status.npy', self.future_status_dict)
         #         for point in observed_val['obs_traj']:
         #             traj_point = feature.future_trajectory_points.add()
@@ -412,7 +415,6 @@ class LabelGenerator(object):
         #         output_features.feature.add().CopyFrom(feature)
 
         # self.SaveOutputPB(self.filepath + '.future_status.label', output_features)
-
 
     def LabelJunctionExit(self):
         '''
@@ -440,12 +442,13 @@ class LabelGenerator(object):
                 for junction_exit in fea.junction_feature.junction_exit:
                     if junction_exit.HasField('exit_lane_id'):
                         exit_dict[junction_exit.exit_lane_id] = \
-                        BoundingRectangle(junction_exit.exit_position.x,
-                                          junction_exit.exit_position.y,
-                                          junction_exit.exit_heading,
-                                          0.01,
-                                          junction_exit.exit_width)
-                        exit_pos = np.array([junction_exit.exit_position.x, junction_exit.exit_position.y])
+                            BoundingRectangle(junction_exit.exit_position.x,
+                                              junction_exit.exit_position.y,
+                                              junction_exit.exit_heading,
+                                              0.01,
+                                              junction_exit.exit_width)
+                        exit_pos = np.array([junction_exit.exit_position.x,
+                                             junction_exit.exit_position.y])
                         exit_pos_dict[junction_exit.exit_lane_id] = exit_pos
                         delta_pos = exit_pos - curr_pos
                         angle = math.atan2(delta_pos[1], delta_pos[0]) - heading
@@ -470,7 +473,8 @@ class LabelGenerator(object):
                             label = [0] * 12
                             label[d_idx] = 1
                             fea.junction_feature.junction_mlp_label.extend(label)
-                            self.junction_label_dict["{}@{:.3f}".format(fea.id, fea.timestamp)] = label + mask
+                            self.junction_label_dict["{}@{:.3f}".format(
+                                fea.id, fea.timestamp)] = label + mask
                             break  # actually break two level
                     else:
                         continue
@@ -481,7 +485,6 @@ class LabelGenerator(object):
         #             output_features.feature.add().CopyFrom(fea)
 
         # self.SaveOutputPB(self.filepath + '.junction.label', output_features)
-
 
     def Label(self):
         self.LabelTrajectory()

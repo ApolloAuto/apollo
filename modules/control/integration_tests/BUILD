@@ -13,7 +13,7 @@ cc_library(
         "//modules/control:control_component_lib",
         "//modules/control/common:control_gflags",
         "//modules/control/proto:control_proto",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -24,7 +24,7 @@ cc_test(
     data = ["//modules/control:control_testdata"],
     deps = [
         ":control_test_base",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -35,7 +35,7 @@ cc_test(
     data = ["//modules/control:control_testdata"],
     deps = [
         ":control_test_base",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -46,7 +46,7 @@ cc_test(
     data = ["//modules/control:control_testdata"],
     deps = [
         ":control_test_base",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 

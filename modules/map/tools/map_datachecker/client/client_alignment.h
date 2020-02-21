@@ -15,11 +15,12 @@
  *****************************************************************************/
 #pragma once
 
-#include <grpc++/grpc++.h>
-#include <yaml-cpp/yaml.h>
 #include <memory>
 #include <string>
 #include <typeinfo>
+
+#include "grpc++/grpc++.h"
+#include "yaml-cpp/yaml.h"
 
 #include "cyber/cyber.h"
 #include "modules/map/tools/map_datachecker/client/client_common.h"

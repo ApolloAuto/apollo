@@ -50,7 +50,7 @@ cc_test(
     data = ["//modules/canbus:canbus_testdata"],
     deps = [
         "//modules/canbus/vehicle/lexus:lexus_controller",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

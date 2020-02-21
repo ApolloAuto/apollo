@@ -586,4 +586,23 @@ proto_library(
     srcs = ["ipopt_return_status.proto"],
 )
 
+cc_proto_library(
+    name = "learning_data_proto",
+    deps = [
+        ":learning_data_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "learning_data_proto_lib",
+    srcs = ["learning_data.proto"],
+    deps = [
+        "//modules/canbus/proto:canbus_proto_lib",
+        "//modules/common/proto:geometry_proto_lib",
+        "//modules/common/proto:pnc_point_proto_lib",
+        "//modules/perception/proto:perception_proto_lib",
+        "//modules/routing/proto:routing_proto_lib",
+    ],
+)
+
 cpplint()

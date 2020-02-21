@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -18,20 +18,18 @@
 """
 Data Collector
 """
+
 import os
+import signal
 import sys
 import time
-import signal
-import time
 
-from cyber_py import cyber
-from cyber_py import cyber_time
-
-from plot_data import Plotter
-
+from cyber_py3 import cyber
+from cyber_py3 import cyber_time
 from modules.canbus.proto import chassis_pb2
 from modules.control.proto import control_cmd_pb2
 from modules.localization.proto import localization_pb2
+from plot_data import Plotter
 
 
 class DataCollector(object):
@@ -58,7 +56,7 @@ class DataCollector(object):
         signal.signal(signal.SIGINT, self.signal_handler)
 
         self.in_session = True
-        self.cmd = map(float, cmd)
+        self.cmd = list(map(float, cmd))
         out = ''
         if self.cmd[0] > 0:
             out += 't'
@@ -185,6 +183,7 @@ class DataCollector(object):
              self.driving_mode, self.throttle_percentage, self.brake_percentage,
              self.gear_location, self.acceleration))
 
+
 def main():
     """
     Main function
@@ -207,7 +206,7 @@ def main():
     print('Positive number for throttle and negative number for brake.')
 
     while True:
-        cmd = raw_input("Enter commands: ").split()
+        cmd = input("Enter commands: ").split()
         if len(cmd) == 0:
             print('Quiting.')
             break
@@ -229,6 +228,7 @@ def main():
                     print('File does not exist: %s' % date_collector.outfile)
         elif len(cmd) == 3:
             data_collector.run(cmd)
+
 
 if __name__ == '__main__':
     cyber.init()

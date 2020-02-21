@@ -16,6 +16,8 @@
 
 #include "modules/dreamview/backend/simulation_world/simulation_world_service.h"
 
+#include <string>
+
 #include "gtest/gtest.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
@@ -415,6 +417,7 @@ TEST_F(SimulationWorldServiceTest, UpdateDecision) {
 TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
   // Update with prediction obstacles
   PredictionObstacles prediction_obstacles;
+  std::set<std::pair<int, double>> original_probabilities;
   for (int i = 0; i < 3; ++i) {
     auto* obstacle = prediction_obstacles.add_prediction_obstacle();
     auto* perception_obstacle = obstacle->mutable_perception_obstacle();
@@ -422,6 +425,8 @@ TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
     for (int j = 0; j < 5; ++j) {
       auto* traj = obstacle->add_trajectory();
       traj->set_probability(i * 0.1 + j);
+      original_probabilities.emplace(perception_obstacle->id(),
+                                     traj->probability());
       for (int k = 0; k < 8; ++k) {
         auto* traj_pt = traj->add_trajectory_point()->mutable_path_point();
         int pt = j * 10 + k;
@@ -447,12 +452,18 @@ TEST_F(SimulationWorldServiceTest, UpdatePrediction) {
 
     for (int j = 0; j < obj.prediction_size(); ++j) {
       const Prediction& prediction = obj.prediction(j);
-      EXPECT_NEAR((sim_world.object_size() - i - 1) * 0.1 + j,
-                  prediction.probability(), kEpsilon);
+      const std::pair<int, double> item_to_find(std::stoi(obj.id()),
+                                                prediction.probability());
+      const auto id_prob_it = original_probabilities.find(item_to_find);
+      EXPECT_NE(id_prob_it, original_probabilities.end());
+      if (id_prob_it != original_probabilities.end()) {
+        original_probabilities.erase(id_prob_it);
+      }
       EXPECT_EQ(prediction.predicted_trajectory_size(), 2);  // Downsampled
     }
     EXPECT_NEAR(123.456, obj.timestamp_sec(), kEpsilon);
   }
+  EXPECT_TRUE(original_probabilities.empty());
 }
 
 TEST_F(SimulationWorldServiceTest, UpdateRouting) {

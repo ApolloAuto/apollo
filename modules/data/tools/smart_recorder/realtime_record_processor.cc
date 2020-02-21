@@ -16,10 +16,9 @@
 
 #include "modules/data/tools/smart_recorder/realtime_record_processor.h"
 
-#include <signal.h>
-
 #include <algorithm>
 #include <chrono>
+#include <csignal>
 #include <set>
 #include <sstream>
 #include <thread>

@@ -14,7 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "boost/format.hpp"
+#include <boost/format.hpp>
+
 #include "gtest/gtest.h"
 
 #include "modules/perception/common/perception_gflags.h"

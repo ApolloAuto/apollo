@@ -529,11 +529,16 @@ Status LatController::ComputeControlCommand(
     if (mrac_model_order > 1) {
       steer_state(1, 0) = (steering_position - pre_steering_position_) / ts_;
     }
-    bool enable_adapt = (std::fabs(vehicle_state->linear_velocity()) >
-                         control_conf_->minimum_speed_resolution());
-    steer_angle =
-        mrac_controller_.Control(steer_angle, steer_state, steer_limit,
-                                 steer_diff_with_max_rate / ts_, enable_adapt);
+    if (std::fabs(vehicle_state->linear_velocity()) >
+        control_conf_->minimum_speed_resolution()) {
+      mrac_controller_.SetStateAdaptionRate(1.0);
+      mrac_controller_.SetInputAdaptionRate(1.0);
+    } else {
+      mrac_controller_.SetStateAdaptionRate(0.0);
+      mrac_controller_.SetInputAdaptionRate(0.0);
+    }
+    steer_angle = mrac_controller_.Control(
+        steer_angle, steer_state, steer_limit, steer_diff_with_max_rate / ts_);
     // Set the steer mrac debug message
     MracDebug *mracdebug = debug->mutable_steer_mrac_debug();
     Matrix steer_reference = mrac_controller_.CurrentReferenceState();
@@ -553,6 +558,7 @@ Status LatController::ComputeControlCommand(
         mrac_controller_.ControlSaturationStatus());
   }
   pre_steering_position_ = steering_position;
+  debug->set_steer_mrac_enable_status(enable_mrac_);
 
   // Clamp the steer angle with steer limitations at current speed
   double steer_angle_limited =

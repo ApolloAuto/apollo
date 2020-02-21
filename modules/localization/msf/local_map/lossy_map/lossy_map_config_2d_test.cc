@@ -16,7 +16,7 @@
 
 #include "modules/localization/msf/local_map/lossy_map/lossy_map_config_2d.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace localization {
@@ -25,11 +25,11 @@ namespace msf {
 /**@brief Test load and set methods in LossyMapConfig2D. */
 TEST(LossyMapConfig2DTestSuite, LoadSetTest) {
   BaseMapConfig config("lossy_map");
-  ASSERT_TRUE(
+  EXPECT_TRUE(
       config.Load("/apollo/modules/localization/msf/local_map/"
                   "test_data/lossy_single_map/config.xml"));
   config.SetMultiResolutions();
-  ASSERT_EQ(config.map_resolutions_.size(), 10);
+  EXPECT_EQ(config.map_resolutions_.size(), 10);
   EXPECT_DOUBLE_EQ(config.map_resolutions_[0], 0.03125);
 
   config.ResizeMapRange();
@@ -39,7 +39,7 @@ TEST(LossyMapConfig2DTestSuite, LoadSetTest) {
   EXPECT_DOUBLE_EQ(config.map_range_.GetMaxY(), 630.0 * 16.0 * 1024);
 
   config.SetSingleResolutions();
-  ASSERT_EQ(config.map_resolutions_.size(), 1);
+  EXPECT_EQ(config.map_resolutions_.size(), 1);
   EXPECT_DOUBLE_EQ(config.map_resolutions_[0], 0.125);
 
   BaseMapConfig config2;
@@ -51,7 +51,7 @@ TEST(LossyMapConfig2DTestSuite, LoadSetTest) {
 /**@brief Test save method. */
 TEST(LossyMapConfig2DTestSuite, SaveTest) {
   BaseMapConfig config("lossy_map");
-  ASSERT_TRUE(
+  EXPECT_TRUE(
       config.Load("/apollo/modules/localization/msf/local_map/"
                   "test_data/lossy_single_map/config.xml"));
   EXPECT_TRUE(config.Save("/tmp/temp_output_file.xml"));

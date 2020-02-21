@@ -26,7 +26,7 @@ cc_test(
         "//modules/perception/common/sensor_manager",
         "//modules/perception/fusion/base:sensor",
         "//modules/perception/fusion/base:track",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

@@ -29,13 +29,13 @@
 
 #include "modules/drivers/velodyne/parser/calibration.h"
 
-#include <yaml-cpp/yaml.h>
 #include <cmath>
 #include <fstream>
 #include <iostream>
 #include <limits>
 #include <string>
 #include <utility>
+#include "yaml-cpp/yaml.h"
 
 namespace YAML {
 

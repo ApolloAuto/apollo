@@ -17,7 +17,7 @@
 #ifndef CYBER_COMMON_TIME_CONVERSION_H_
 #define CYBER_COMMON_TIME_CONVERSION_H_
 
-#include <stdint.h>
+#include <cstdint>
 #include <ctime>
 #include <iostream>
 #include <string>

@@ -17,13 +17,13 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//cyber/common:log",
-        "//external:gflags",
         "//modules/common/util",
         "//modules/common/util:factory",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/scenarios:scenario",
         "//modules/planning/scenarios/common:stage_intersection_cruise_impl",
         "//modules/planning/scenarios/util:scenario_util_lib",
+        "@com_github_gflags_gflags//:gflags",
         "@eigen",
     ],
 )
@@ -35,7 +35,7 @@ cc_test(
     data = ["//modules/planning:planning_conf"],
     deps = [
         ":traffic_light_protected_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -48,7 +48,7 @@ cc_test(
     ],
     deps = [
         ":traffic_light_protected_scenario",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

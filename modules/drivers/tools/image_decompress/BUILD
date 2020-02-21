@@ -24,7 +24,7 @@ cc_test(
     srcs = ["image_decompress_test.cc"],
     deps = [
         ":image_decompress_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

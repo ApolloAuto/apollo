@@ -33,10 +33,10 @@ cc_library(
         "//modules/localization/proto:localization_proto",
         "//modules/transform:tf2_buffer_lib",
         "//modules/transform:transform_broadcaster_lib",
-        "@boost",
+        "//third_party:boost",
+        "@com_github_jbeder_yaml_cpp//:yaml-cpp",
+        "@com_google_glog//:glog",
         "@eigen",
-        "@glog",
-        "@yaml_cpp//:yaml",
     ],
 )
 
@@ -55,7 +55,7 @@ cc_test(
     deps = [
         "//cyber",
         "//modules/localization/ndt:ndt_localization_component_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -67,7 +67,7 @@ cc_test(
     deps = [
         "//cyber",
         "//modules/localization/ndt:ndt_localization_component_lib",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

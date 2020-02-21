@@ -27,14 +27,10 @@
 
 namespace apollo {
 namespace planning {
-// #define ADEBUG AINFO
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::VehicleConfigHelper;
 using apollo::common::math::Box2d;
-using apollo::common::math::CrossProd;
-using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneInfoConstPtr;
@@ -164,10 +160,8 @@ void OpenSpaceRoiDecider::SetOriginFromADC(Frame *const frame,
   const double adc_init_y = park_and_go_status.adc_init_position().y();
   const double adc_init_heading = park_and_go_status.adc_init_heading();
   common::math::Vec2d adc_init_position = {adc_init_x, adc_init_y};
-  const auto &vehicle_config =
-      common::VehicleConfigHelper::Instance()->GetConfig();
-  const double adc_length = vehicle_config.vehicle_param().length();
-  const double adc_width = vehicle_config.vehicle_param().width();
+  const double adc_length = vehicle_params_.length();
+  const double adc_width = vehicle_params_.width();
   // ADC box
   Box2d adc_box(adc_init_position, adc_init_heading, adc_length, adc_width);
   // get vertices from ADC box
@@ -392,10 +386,10 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
     std::vector<double> *right_lane_road_width) {
   double start_s =
       center_line_s -
-      config_.open_space_roi_decider_config().roi_longitudinal_range();
+      config_.open_space_roi_decider_config().roi_longitudinal_range_start();
   double end_s =
       center_line_s +
-      config_.open_space_roi_decider_config().roi_longitudinal_range();
+      config_.open_space_roi_decider_config().roi_longitudinal_range_end();
 
   hdmap::MapPathPoint start_point = nearby_path.GetSmoothPoint(start_s);
   double last_check_point_heading = start_point.heading();
@@ -404,7 +398,7 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
 
   // For the road boundary, add key points to left/right side boundary
   // separately. Iterate s_value to check key points at a step of
-  // roi_linesegment_length. Key points include: start_point, end_point, points
+  // roi_line_segment_length. Key points include: start_point, end_point, points
   // where path curvature is large, points near left/right road-curb corners
   while (check_point_s <= end_s) {
     hdmap::MapPathPoint check_point = nearby_path.GetSmoothPoint(check_point_s);
@@ -412,7 +406,7 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
     bool is_center_lane_heading_change =
         std::abs(common::math::NormalizeAngle(check_point_heading -
                                               last_check_point_heading)) >
-        config_.open_space_roi_decider_config().roi_linesegment_min_angle();
+        config_.open_space_roi_decider_config().roi_line_segment_min_angle();
     last_check_point_heading = check_point_heading;
 
     ADEBUG << "is is_center_lane_heading_change: "
@@ -439,7 +433,7 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
     check_point_s =
         start_s +
         index *
-            config_.open_space_roi_decider_config().roi_linesegment_length();
+            config_.open_space_roi_decider_config().roi_line_segment_length();
     check_point_s = check_point_s >= end_s ? end_s : check_point_s;
   }
 
@@ -455,6 +449,129 @@ void OpenSpaceRoiDecider::GetRoadBoundary(
   }
 }
 
+void OpenSpaceRoiDecider::GetRoadBoundaryFromMap(
+    const hdmap::Path &nearby_path, const double center_line_s,
+    const Vec2d &origin_point, const double origin_heading,
+    std::vector<Vec2d> *left_lane_boundary,
+    std::vector<Vec2d> *right_lane_boundary,
+    std::vector<Vec2d> *center_lane_boundary_left,
+    std::vector<Vec2d> *center_lane_boundary_right,
+    std::vector<double> *center_lane_s_left,
+    std::vector<double> *center_lane_s_right,
+    std::vector<double> *left_lane_road_width,
+    std::vector<double> *right_lane_road_width) {
+  // Longitudinal range can be asymmetric.
+  double start_s =
+      center_line_s -
+      config_.open_space_roi_decider_config().roi_longitudinal_range_start();
+  double end_s =
+      center_line_s +
+      config_.open_space_roi_decider_config().roi_longitudinal_range_end();
+  hdmap::MapPathPoint start_point = nearby_path.GetSmoothPoint(start_s);
+
+  double check_point_s = start_s;
+
+  while (check_point_s <= end_s) {
+    hdmap::MapPathPoint check_point = nearby_path.GetSmoothPoint(check_point_s);
+
+    // get road boundaries
+    double left_road_width = nearby_path.GetRoadLeftWidth(check_point_s);
+    double right_road_width = nearby_path.GetRoadRightWidth(check_point_s);
+
+    double current_road_width = std::max(left_road_width, right_road_width);
+
+    // get road boundaries at current location
+    common::PointENU check_point_xy;
+    std::vector<hdmap::RoadRoiPtr> road_boundaries;
+    std::vector<hdmap::JunctionInfoConstPtr> junctions;
+    check_point_xy.set_x(check_point.x());
+    check_point_xy.set_y(check_point.y());
+    hdmap_->GetRoadBoundaries(check_point_xy, current_road_width,
+                              &road_boundaries, &junctions);
+
+    if (check_point_s < center_line_s) {
+      for (size_t i = 0;
+           i < (*road_boundaries.at(0)).left_boundary.line_points.size(); i++) {
+        right_lane_boundary->emplace_back(
+            Vec2d((*road_boundaries.at(0)).left_boundary.line_points[i].x(),
+                  (*road_boundaries.at(0)).left_boundary.line_points[i].y()));
+      }
+      for (size_t i = 0;
+           i < (*road_boundaries.at(0)).right_boundary.line_points.size();
+           i++) {
+        left_lane_boundary->emplace_back(
+            Vec2d((*road_boundaries.at(0)).right_boundary.line_points[i].x(),
+                  (*road_boundaries.at(0)).right_boundary.line_points[i].y()));
+      }
+    } else {
+      for (size_t i = 0;
+           i < (*road_boundaries.at(0)).left_boundary.line_points.size(); i++) {
+        left_lane_boundary->emplace_back(
+            Vec2d((*road_boundaries.at(0)).left_boundary.line_points[i].x(),
+                  (*road_boundaries.at(0)).left_boundary.line_points[i].y()));
+      }
+      for (size_t i = 0;
+           i < (*road_boundaries.at(0)).right_boundary.line_points.size();
+           i++) {
+        right_lane_boundary->emplace_back(
+            Vec2d((*road_boundaries.at(0)).right_boundary.line_points[i].x(),
+                  (*road_boundaries.at(0)).right_boundary.line_points[i].y()));
+      }
+    }
+
+    center_lane_boundary_right->emplace_back(check_point);
+    center_lane_boundary_left->emplace_back(check_point);
+    center_lane_s_left->emplace_back(check_point_s);
+    center_lane_s_right->emplace_back(check_point_s);
+    left_lane_road_width->emplace_back(left_road_width);
+    right_lane_road_width->emplace_back(right_road_width);
+
+    check_point_s = check_point_s + config_.open_space_roi_decider_config()
+                                        .roi_line_segment_length_from_map();
+  }
+
+  size_t left_point_size = left_lane_boundary->size();
+  size_t right_point_size = right_lane_boundary->size();
+  ADEBUG << "right_road_boundary size: " << right_lane_boundary->size();
+  ADEBUG << "left_road_boundary size: " << left_lane_boundary->size();
+  for (size_t i = 0; i < left_point_size; i++) {
+    left_lane_boundary->at(i) -= origin_point;
+    left_lane_boundary->at(i).SelfRotate(-origin_heading);
+    ADEBUG << "left_road_boundary: [" << std::setprecision(9)
+           << left_lane_boundary->at(i).x() << ", "
+           << left_lane_boundary->at(i).y() << "]";
+  }
+  for (size_t i = 0; i < right_point_size; i++) {
+    right_lane_boundary->at(i) -= origin_point;
+    right_lane_boundary->at(i).SelfRotate(-origin_heading);
+    ADEBUG << "right_road_boundary: [" << std::setprecision(9)
+           << right_lane_boundary->at(i).x() << ", "
+           << right_lane_boundary->at(i).y() << "]";
+  }
+  if (!left_lane_boundary->empty()) {
+    sort(left_lane_boundary->begin(), left_lane_boundary->end(),
+         [](const Vec2d &first_pt, const Vec2d &second_pt) {
+           return first_pt.x() < second_pt.x() ||
+                  (first_pt.x() == second_pt.x() &&
+                   first_pt.y() < second_pt.y());
+         });
+    auto unique_end =
+        std::unique(left_lane_boundary->begin(), left_lane_boundary->end());
+    left_lane_boundary->erase(unique_end, left_lane_boundary->end());
+  }
+  if (!right_lane_boundary->empty()) {
+    sort(right_lane_boundary->begin(), right_lane_boundary->end(),
+         [](const Vec2d &first_pt, const Vec2d &second_pt) {
+           return first_pt.x() < second_pt.x() ||
+                  (first_pt.x() == second_pt.x() &&
+                   first_pt.y() < second_pt.y());
+         });
+    auto unique_end =
+        std::unique(right_lane_boundary->begin(), right_lane_boundary->end());
+    right_lane_boundary->erase(unique_end, right_lane_boundary->end());
+  }
+}
+
 void OpenSpaceRoiDecider::AddBoundaryKeyPoint(
     const hdmap::Path &nearby_path, const double check_point_s,
     const double start_s, const double end_s, const bool is_anchor_point,
@@ -462,10 +579,10 @@ void OpenSpaceRoiDecider::AddBoundaryKeyPoint(
     std::vector<Vec2d> *curb_lane_boundary, std::vector<double> *center_lane_s,
     std::vector<double> *road_width) {
   // Check if current central-lane checking point's mapping on the left/right
-  // road boundary is a key point. The road boundary point is a key point if one
-  // of the following two confitions is satisfied:
-  // 1. the current central-lane point is an anchor point: (a start/end point or
-  // the point on path with large curvatures)
+  // road boundary is a key point. The road boundary point is a key point if
+  // one of the following two confitions is satisfied:
+  // 1. the current central-lane point is an anchor point: (a start/end point
+  // or the point on path with large curvatures)
   // 2. the point on the left/right lane boundary is close to a curb corner
   // As indicated below:
   // (#) Key Point Type 1: Lane anchor points
@@ -480,12 +597,16 @@ void OpenSpaceRoiDecider::AddBoundaryKeyPoint(
   //                                \               /
   //                                 *-------------*
 
-  const double previous_distance_s =
-      std::min(config_.open_space_roi_decider_config().roi_linesegment_length(),
-               check_point_s - start_s);
-  const double next_distance_s =
-      std::min(config_.open_space_roi_decider_config().roi_linesegment_length(),
-               end_s - check_point_s);
+  // road width changes slightly at the turning point of a path
+  // TODO(SHU): 1. consider distortion introduced by curvy road; 2. use both
+  // round boundaries for single-track road; 3. longitudinal range may not be
+  // symmetric
+  const double previous_distance_s = std::min(
+      config_.open_space_roi_decider_config().roi_line_segment_length(),
+      check_point_s - start_s);
+  const double next_distance_s = std::min(
+      config_.open_space_roi_decider_config().roi_line_segment_length(),
+      end_s - check_point_s);
 
   hdmap::MapPathPoint current_check_point =
       nearby_path.GetSmoothPoint(check_point_s);
@@ -531,11 +652,11 @@ void OpenSpaceRoiDecider::AddBoundaryKeyPoint(
   double current_curb_point_delta_theta =
       next_segment_angle - previous_curb_segment_angle;
   // If the delta angle between the previous curb segment and the next curb
-  // segment is large (near a curb corner), then add current curb_lane_point as
-  // a key point.
+  // segment is large (near a curb corner), then add current curb_lane_point
+  // as a key point.
   if (std::abs(current_curb_point_delta_theta) >
       config_.open_space_roi_decider_config()
-          .curb_heading_tangent_change_uppper_limit()) {
+          .curb_heading_tangent_change_upper_limit()) {
     double point_vec_cos =
         is_left_curb ? std::cos(current_check_point_heading + M_PI / 2.0)
                      : std::cos(current_check_point_heading - M_PI / 2.0);
@@ -944,10 +1065,8 @@ bool OpenSpaceRoiDecider::GetParkAndGoBoundary(
   const double adc_init_y = park_and_go_status.adc_init_position().y();
   const double adc_init_heading = park_and_go_status.adc_init_heading();
   common::math::Vec2d adc_init_position = {adc_init_x, adc_init_y};
-  const auto &vehicle_config =
-      common::VehicleConfigHelper::Instance()->GetConfig();
-  const double adc_length = vehicle_config.vehicle_param().length();
-  const double adc_width = vehicle_config.vehicle_param().width();
+  const double adc_length = vehicle_params_.length();
+  const double adc_width = vehicle_params_.width();
   // ADC box
   Box2d adc_box(adc_init_position, adc_init_heading, adc_length, adc_width);
   // get vertices from ADC box
@@ -983,11 +1102,19 @@ bool OpenSpaceRoiDecider::GetParkAndGoBoundary(
   std::vector<double> left_lane_road_width;
   std::vector<double> right_lane_road_width;
 
-  GetRoadBoundary(nearby_path, center_line_s, origin_point, origin_heading,
-                  &left_lane_boundary, &right_lane_boundary,
-                  &center_lane_boundary_left, &center_lane_boundary_right,
-                  &center_lane_s_left, &center_lane_s_right,
-                  &left_lane_road_width, &right_lane_road_width);
+  if (FLAGS_use_road_boundary_from_map) {
+    GetRoadBoundaryFromMap(
+        nearby_path, center_line_s, origin_point, origin_heading,
+        &left_lane_boundary, &right_lane_boundary, &center_lane_boundary_left,
+        &center_lane_boundary_right, &center_lane_s_left, &center_lane_s_right,
+        &left_lane_road_width, &right_lane_road_width);
+  } else {
+    GetRoadBoundary(nearby_path, center_line_s, origin_point, origin_heading,
+                    &left_lane_boundary, &right_lane_boundary,
+                    &center_lane_boundary_left, &center_lane_boundary_right,
+                    &center_lane_s_left, &center_lane_s_right,
+                    &left_lane_road_width, &right_lane_road_width);
+  }
 
   // Load boundary as line segments in counter-clockwise order
   std::reverse(left_lane_boundary.begin(), left_lane_boundary.end());
@@ -1002,6 +1129,13 @@ bool OpenSpaceRoiDecider::GetParkAndGoBoundary(
   for (size_t i = 0; i < right_lane_boundary_last_index; i++) {
     std::vector<Vec2d> segment{right_lane_boundary[i],
                                right_lane_boundary[i + 1]};
+    ADEBUG << "right segment";
+    ADEBUG << "right_road_boundary: [" << std::setprecision(9)
+           << right_lane_boundary[i].x() << ", " << right_lane_boundary[i].y()
+           << "]";
+    ADEBUG << "right_road_boundary: [" << std::setprecision(9)
+           << right_lane_boundary[i + 1].x() << ", "
+           << right_lane_boundary[i + 1].y() << "]";
     roi_parking_boundary->push_back(segment);
   }
 
@@ -1012,10 +1146,16 @@ bool OpenSpaceRoiDecider::GetParkAndGoBoundary(
     roi_parking_boundary->push_back(segment);
   }
 
+  ADEBUG << "roi_parking_boundary size: [" << roi_parking_boundary->size()
+         << "]";
+
   // Fuse line segments into convex contraints
   if (!FuseLineSegments(roi_parking_boundary)) {
     return false;
   }
+
+  ADEBUG << "roi_parking_boundary size: [" << roi_parking_boundary->size()
+         << "]";
   // Get xy boundary
   auto xminmax = std::minmax_element(
       boundary_points.begin(), boundary_points.end(),
@@ -1358,19 +1498,14 @@ bool OpenSpaceRoiDecider::LoadObstacleInVertices(
     // obstacle boundary box is used, thus the edges are set to be 4
     Eigen::MatrixXi perception_obstacles_edges_num =
         4 * Eigen::MatrixXi::Ones(perception_obstacles_num, 1);
-    Eigen::MatrixXi parking_boundaries_obstacles_edges_num(
-        parking_boundaries_num, 1);
-    for (size_t i = 0; i < parking_boundaries_num; i++) {
-      CHECK_GT(roi_parking_boundary[i].size(), 1);
-      parking_boundaries_obstacles_edges_num(i, 0) =
-          static_cast<int>(roi_parking_boundary[i].size()) - 1;
-    }
+
     obstacles_edges_num_vec->resize(
         parking_boundaries_obstacles_edges_num.rows() +
             perception_obstacles_edges_num.rows(),
         1);
     *(obstacles_edges_num_vec) << parking_boundaries_obstacles_edges_num,
         perception_obstacles_edges_num;
+
   } else {
     obstacles_edges_num_vec->resize(
         parking_boundaries_obstacles_edges_num.rows(), 1);
@@ -1536,9 +1671,7 @@ bool OpenSpaceRoiDecider::IsInParkingLot(
                                      &parking_lots);
   if (hdmap_->GetParkingSpaces(adc_parking_spot, kDistance, &parking_lots) ==
       0) {
-    std::array<Vec2d, 4> vertices;
     GetParkSpotFromMap(parking_lots.front(), parking_lot_vertices);
-    // *parking_lot_vertices = vertices;
     return true;
   }
   return false;

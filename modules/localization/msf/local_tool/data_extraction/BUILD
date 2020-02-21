@@ -22,7 +22,7 @@ cc_library(
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/localization/proto:measure_proto",
-        "@boost",
+        "//third_party:boost",
         "@eigen",
         "@pcl",
     ],
@@ -35,7 +35,7 @@ cc_binary(
     deps = [
         ":data_extraction",
         "//cyber",
-        "@boost",
+        "//third_party:boost",
         "@eigen",
         "@pcl",
     ],
@@ -47,7 +47,7 @@ cc_binary(
     deps = [
         ":data_extraction",
         "//cyber",
-        "@boost",
+        "//third_party:boost",
         "@eigen",
     ],
 )

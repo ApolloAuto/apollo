@@ -73,8 +73,8 @@ cc_library(
         "//modules/planning/math/curve1d:quintic_spiral_path",
         "//modules/planning/math/smoothing_spline:spline_2d_solver",
         "//modules/planning/proto:planning_proto",
+        "//third_party:ipopt",
         "@eigen",
-        "@ipopt",
     ],
 )
 
@@ -87,7 +87,7 @@ cc_test(
     ],
     deps = [
         ":spiral_reference_line_smoother",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -121,7 +121,7 @@ cc_test(
     deps = [
         ":qp_spline_reference_line_smoother",
         "//modules/map/hdmap",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -136,7 +136,7 @@ cc_test(
     deps = [
         ":discrete_points_reference_line_smoother",
         "//modules/map/hdmap",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

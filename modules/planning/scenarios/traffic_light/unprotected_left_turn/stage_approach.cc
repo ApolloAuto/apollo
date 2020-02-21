@@ -18,9 +18,6 @@
  * @file
  **/
 
-#include <string>
-#include <vector>
-
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/stage_approach.h"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"

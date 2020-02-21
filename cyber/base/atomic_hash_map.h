@@ -17,8 +17,8 @@
 #ifndef CYBER_BASE_ATOMIC_HASH_MAP_H_
 #define CYBER_BASE_ATOMIC_HASH_MAP_H_
 
-#include <stdint.h>
 #include <atomic>
+#include <cstdint>
 #include <type_traits>
 #include <utility>
 

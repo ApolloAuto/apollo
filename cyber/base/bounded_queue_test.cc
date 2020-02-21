@@ -16,8 +16,8 @@
 
 #include "cyber/base/bounded_queue.h"
 
-#include <gtest/gtest.h>
 #include <thread>
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {

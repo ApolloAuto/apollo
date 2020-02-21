@@ -7,7 +7,7 @@ cc_binary(
     srcs = ["video2jpg.cc"],
     deps = [
         ":frame_processor",
-        "//external:gflags",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 

@@ -39,6 +39,7 @@ cc_library(
         "-fopenmp",
     ],
     deps = [
+        "//cyber",
         "//modules/common/configs:config_gflags",
         "//modules/common/math:quaternion",
         "//modules/common/proto:pnc_point_proto",
@@ -86,6 +87,7 @@ cc_library(
     ],
     deps = [
         ":planning_base",
+        "//cyber/common:log",
     ],
 )
 

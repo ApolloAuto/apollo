@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -21,16 +21,18 @@ the pb messages
 """
 
 import argparse
-import shutil
 import os
-import time
+import shutil
 import sys
+import time
 
-from cyber_py import cyber
-from cyber_py import record
+from cyber_py3 import cyber
+from cyber_py3 import record
 from common.message_manager import PbMessageManager
 
+
 g_message_manager = PbMessageManager()
+
 
 def write_to_file(file_path, topic_pb):
     """
@@ -38,6 +40,7 @@ def write_to_file(file_path, topic_pb):
     """
     with open(file_path, 'w') as fp:
         fp.write(str(topic_pb))
+
 
 def dump_record(in_record, out_dir, start_time, duration, filter_topic):
     freader = record.RecordReader()
@@ -75,6 +78,7 @@ def dump_record(in_record, out_dir, start_time, duration, filter_topic):
             write_to_file(file_path, msg)
         seq += 1
     freader.close()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

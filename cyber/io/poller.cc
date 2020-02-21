@@ -17,10 +17,10 @@
 #include "cyber/io/poller.h"
 
 #include <fcntl.h>
-#include <signal.h>
-#include <string.h>
 #include <sys/epoll.h>
 #include <unistd.h>
+#include <csignal>
+#include <cstring>
 
 #include "cyber/common/log.h"
 #include "cyber/scheduler/scheduler_factory.h"
@@ -60,7 +60,7 @@ bool Poller::Register(const PollRequest& req) {
     return false;
   }
 
-  PollCtrlParam ctrl_param;
+  PollCtrlParam ctrl_param{};
   ctrl_param.fd = req.fd;
   ctrl_param.event.data.fd = req.fd;
   ctrl_param.event.events = req.events;
@@ -142,7 +142,7 @@ bool Poller::Init() {
   };
   requests_[request->fd] = request;
 
-  PollCtrlParam ctrl_param;
+  PollCtrlParam ctrl_param{};
   ctrl_param.operation = EPOLL_CTL_ADD;
   ctrl_param.fd = pipe_fd_[0];
   ctrl_param.event.data.fd = pipe_fd_[0];

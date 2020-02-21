@@ -16,11 +16,11 @@
 
 #include "cyber/transport/transmitter/rtps_transmitter.h"
 
-#include <gtest/gtest.h>
 #include <memory>
 #include <string>
 #include <thread>
 #include <vector>
+#include "gtest/gtest.h"
 
 #include "cyber/common/util.h"
 #include "cyber/init.h"

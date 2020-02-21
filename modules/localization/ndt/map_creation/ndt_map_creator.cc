@@ -19,6 +19,7 @@
 #include <boost/random.hpp>
 #include <string>
 #include <vector>
+
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 #include "modules/localization/msf/common/util/extract_ground_plane.h"
 #include "modules/localization/msf/common/util/system_utility.h"

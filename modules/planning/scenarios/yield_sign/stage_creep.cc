@@ -18,7 +18,6 @@
  * @file
  **/
 #include <string>
-#include <vector>
 
 #include "modules/planning/scenarios/yield_sign/stage_creep.h"
 

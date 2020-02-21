@@ -16,8 +16,8 @@
 
 #include "cyber/parameter/parameter.h"
 
-#include <gtest/gtest.h>
 #include <string>
+#include "gtest/gtest.h"
 
 #include "cyber/cyber.h"
 #include "cyber/message/message_traits.h"

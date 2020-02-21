@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -26,8 +26,8 @@ import logging
 import argparse
 import numpy as np
 import tensorflow as tf
-import proto.fnn_model_pb2
-from proto.fnn_model_pb2 import FnnModel, Layer
+from . import proto.fnn_model_pb2
+from .proto.fnn_model_pb2 import FnnModel, Layer
 from sklearn.model_selection import train_test_split
 
 dim_input = 7 + 72

@@ -16,7 +16,7 @@ cc_library(
         "//modules/dreamview/backend/hmi:vehicle_manager",
         "//modules/dreamview/proto:data_collection_table_proto",
         "//third_party/json",
-        "@gtest",
+        "@com_google_googletest//:gtest",
     ],
 )
 
@@ -30,7 +30,7 @@ cc_test(
     deps = [
         ":data_collection_monitor",
         "//modules/common/util:json_util",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

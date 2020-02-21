@@ -20,9 +20,7 @@
 
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_optimizer.h"
 
-#include <memory>
 #include <string>
-#include <tuple>
 #include <utility>
 #include <vector>
 

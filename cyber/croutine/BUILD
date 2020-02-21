@@ -62,7 +62,7 @@ cc_test(
     srcs = ["croutine_test.cc"],
     deps = [
         "//cyber",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

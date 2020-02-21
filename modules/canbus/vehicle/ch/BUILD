@@ -47,7 +47,7 @@ cc_test(
     data = ["//modules/canbus:canbus_testdata"],
     deps = [
         ":ch_controller",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -57,7 +57,7 @@ cc_test(
     srcs = ["ch_message_manager_test.cc"],
     deps = [
         "//modules/canbus/vehicle/ch:ch_message_manager",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 
@@ -67,7 +67,7 @@ cc_test(
     srcs = ["ch_vehicle_factory_test.cc"],
     deps = [
         ":ch_vehicle_factory",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

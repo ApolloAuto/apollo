@@ -32,7 +32,7 @@ PY_CALLBACK_TYPE = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p)
 PY_CALLBACK_TYPE_T = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_char_p)
 
 # init vars
-CYBER_PATH = os.environ['CYBER_PATH']
+CYBER_PATH = os.environ.get('CYBER_PATH', '/apollo/cyber')
 CYBER_DIR = os.path.split(CYBER_PATH)[0]
 sys.path.append(CYBER_PATH + "/third_party/")
 sys.path.append(CYBER_PATH + "/lib/")
@@ -214,7 +214,7 @@ class Node(object):
         self.register_message(data_type.DESCRIPTOR.file)
         datatype = data_type.DESCRIPTOR.full_name
         writer = _CYBER.PyNode_create_writer(self.node, name,
-                                                  datatype, qos_depth)
+                                             datatype, qos_depth)
         self.list_writer.append(writer)
         return Writer(name, writer, datatype)
 
@@ -291,7 +291,7 @@ class Node(object):
     def create_client(self, name, request_data_type, response_data_type):
         datatype = request_data_type.DESCRIPTOR.full_name
         c = _CYBER.PyNode_create_client(self.node, name,
-                                             str(datatype))
+                                        str(datatype))
         self.list_client.append(c)
         return Client(c, response_data_type)
 

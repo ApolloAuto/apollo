@@ -16,9 +16,9 @@
 
 #include "modules/localization/msf/local_pyramid_map/base_map/base_map.h"
 
+#include <boost/filesystem.hpp>
 #include <set>
 #include <string>
-#include "boost/filesystem.hpp"
 
 #include "modules/localization/msf/common/util/file_utility.h"
 

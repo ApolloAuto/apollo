@@ -16,7 +16,6 @@
 #pragma once
 
 #include <boost/circular_buffer.hpp>
-
 #include <vector>
 
 #include "modules/perception/base/object.h"

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -16,14 +16,16 @@
 # limitations under the License.
 ###############################################################################
 
-from cyber_py import cyber
-from modules.planning.proto import planning_pb2
-import matplotlib.pyplot as plt
-from planning import Planning
 import matplotlib.animation as animation
-from subplot_traj_speed import TrajSpeedSubplot
-from subplot_traj_acc import TrajAccSubplot
-from subplot_traj_path import TrajPathSubplot
+import matplotlib.pyplot as plt
+
+from cyber_py3 import cyber
+from modules.planning.proto import planning_pb2
+from .planning import Planning
+from .subplot_traj_acc import TrajAccSubplot
+from .subplot_traj_path import TrajPathSubplot
+from .subplot_traj_speed import TrajSpeedSubplot
+
 
 planning = Planning()
 
@@ -42,7 +44,7 @@ def planning_callback(planning_pb):
 def add_listener():
     planning_sub = cyber.Node("st_plot")
     planning_sub.create_reader('/apollo/planning', planning_pb2.ADCTrajectory,
-                     planning_callback)
+                               planning_callback)
 
 
 def press_key():

@@ -24,8 +24,6 @@
 namespace ad_rss {
 namespace core {
 
-using ad_rss::physics::Distance;
-using ad_rss::physics::ParametricValue;
 using ad_rss::world::OccupiedRegion;
 
 class RssCheckSameDirectionTests : public testing::Test {

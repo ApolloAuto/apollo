@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -16,10 +16,12 @@
 # limitations under the License.
 ###############################################################################
 
-import sys
-import yaml
-import shlex
 import re
+import shlex
+import sys
+
+import yaml
+
 
 MAX_CAN_ID = 4096000000  # 2048
 
@@ -106,7 +108,7 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
                     if len(protocol) != 0 and len(protocol["vars"]) != 0 and len(
                             protocol["vars"]) < 65:
                         protocols[protocol["id"]] = protocol
-                        #print protocol
+                        # print protocol
                         protocol = {}
 
             if len(items) == 5 and items[0] == "CM_" and items[1] == "SG_":
@@ -138,7 +140,7 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
                 if var["name"].lower() in cpp_reserved_key_words:
                     var["name"] = "MY_" + var["name"]
 
-        #print protocols
+        # print protocols
         config = {}
         config["car_type"] = car_type
         config["protocols"] = protocols

@@ -36,7 +36,7 @@ cc_library(
 #    srcs = ["roipooling_layer_test.cc"],
 #    deps = [
 #        ":perception_inference_operators",
-#        "@gtest//:main",
+#        "@com_google_googletest//:gtest_main",
 #    ],
 #)
 

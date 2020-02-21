@@ -16,9 +16,9 @@
 
 #include "cyber/scheduler/scheduler.h"
 
-#include <gtest/gtest.h>
 #include <string>
 #include <thread>
+#include "gtest/gtest.h"
 
 #include "cyber/common/global_data.h"
 #include "cyber/cyber.h"

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
@@ -18,7 +18,7 @@
 
 import sys
 import gflags
-from cyber_py import cyber
+from cyber_py3 import cyber
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from modules.control.proto import control_cmd_pb2

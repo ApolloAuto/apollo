@@ -16,8 +16,8 @@
 
 #include "cyber/time/time.h"
 
-#include <time.h>
 #include <chrono>
+#include <ctime>
 #include <iomanip>
 #include <limits>
 #include <sstream>

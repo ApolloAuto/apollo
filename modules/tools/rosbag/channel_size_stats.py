@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -25,15 +25,18 @@ Example:
     ./channel_size_stats.py a.record
 """
 
+import argparse
 import glob
 import os
 import sys
+
 import glog
-import argparse
-from cyber_py import cyber
-from cyber_py.record import RecordReader
-from cyber_py.record import RecordWriter
+
+from cyber_py3 import cyber
+from cyber_py3.record import RecordReader
+from cyber_py3.record import RecordWriter
 from modules.planning.proto import planning_pb2
+
 
 class ChannelSizeStats(object):
     """Sample bags to contain PNC related topics only."""
@@ -42,7 +45,7 @@ class ChannelSizeStats(object):
         '/apollo/control',
         '/apollo/perception/obstacles',
         '/apollo/perception/traffic_light',
-#        '/apollo/planning',
+        #        '/apollo/planning',
         '/apollo/prediction',
         '/apollo/routing_request',
         '/apollo/routing_response',
@@ -52,7 +55,7 @@ class ChannelSizeStats(object):
     ]
 
     @classmethod
-    def process_record(cls, input_record ):
+    def process_record(cls, input_record):
         channel_size_stats = {}
         freader = RecordReader(input_record)
         print('----- Begin to process record -----')
@@ -79,11 +82,11 @@ class ChannelSizeStats(object):
                     channel_size_stats[name]['total'] = len(planning_str)
                     channel_size_stats[name]['num'] = 1.0
 
-
         for channelname in channel_size_stats.keys():
             print(channelname, " num:", channel_size_stats[channelname]['num'],
-                " avg size:", channel_size_stats[channelname]['total'] / channel_size_stats[channelname]['num'])
+                  " avg size:", channel_size_stats[channelname]['total'] / channel_size_stats[channelname]['num'])
         print('----- Finish processing record -----')
+
 
 if __name__ == '__main__':
     cyber.init()

@@ -15,11 +15,13 @@
  *****************************************************************************/
 #include "cyber/class_loader/class_loader.h"
 
-#include <gtest/gtest.h>
 #include <iostream>
 #include <string>
 #include <thread>
 #include <vector>
+
+#include "gtest/gtest.h"
+
 #include "cyber/class_loader/class_loader_manager.h"
 #include "cyber/class_loader/test/base.h"
 #include "cyber/cyber.h"

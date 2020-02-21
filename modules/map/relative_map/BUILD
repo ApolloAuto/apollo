@@ -53,8 +53,8 @@ cc_library(
     deps = [
         ":relative_map_lib",
         "//cyber",
-        "//external:gflags",
         "//modules/common/adapters:adapter_gflags",
+        "@com_github_gflags_gflags//:gflags",
     ],
 )
 
@@ -84,7 +84,7 @@ cc_test(
     deps = [
         ":relative_map_component_lib",
         "//third_party/json",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

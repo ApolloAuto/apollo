@@ -16,7 +16,7 @@
 
 #include "cyber/transport/common/identity.h"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace cyber {

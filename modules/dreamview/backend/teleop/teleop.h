@@ -16,17 +16,18 @@
 
 #pragma once
 
-#include "boost/thread/locks.hpp"
-#include "boost/thread/shared_mutex.hpp"
+#include <boost/thread/locks.hpp>
+#include <boost/thread/shared_mutex.hpp>
+
 #include "cyber/cyber.h"
 #include "third_party/json/json.hpp"
 
 #ifdef TELEOP
 #include "modules/planning/proto/pad_msg.pb.h"
 #include "modules/planning/proto/planning.pb.h"
-#include "modules/teleop/network/proto/modem_info.pb.h"
-#include "modules/teleop/teleop/proto/daemon_service_cmd.pb.h"
-#include "modules/teleop/teleop/proto/daemon_service_rpt.pb.h"
+#include "modules/teleop/daemon/proto/daemon_cmd.pb.h"
+#include "modules/teleop/daemon/proto/daemon_rpt.pb.h"
+#include "modules/teleop/modem/proto/modem_info.pb.h"
 #endif
 
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
@@ -56,7 +57,7 @@ class TeleopService {
   void SendResumeCruiseCmd();
 
   void UpdateModemInfo(
-      const std::shared_ptr<modules::teleop::network::ModemInfo> &modem_info);
+      const std::shared_ptr<modules::teleop::modem::ModemInfo> &modem_info);
 #endif
 
   std::unique_ptr<cyber::Node> node_;
@@ -65,33 +66,33 @@ class TeleopService {
 
 #ifdef TELEOP
   // modem info readers and callback
-  std::shared_ptr<cyber::Reader<modules::teleop::network::ModemInfo>>
+  std::shared_ptr<cyber::Reader<modules::teleop::modem::ModemInfo>>
       modem0_info_reader_;
-  std::shared_ptr<cyber::Reader<modules::teleop::network::ModemInfo>>
+  std::shared_ptr<cyber::Reader<modules::teleop::modem::ModemInfo>>
       modem1_info_reader_;
-  std::shared_ptr<cyber::Reader<modules::teleop::network::ModemInfo>>
+  std::shared_ptr<cyber::Reader<modules::teleop::modem::ModemInfo>>
       modem2_info_reader_;
   // modem info callback
   void UpdateModem(
       const std::string &modem_id,
-      const std::shared_ptr<modules::teleop::network::ModemInfo> &modem_info);
+      const std::shared_ptr<modules::teleop::modem::ModemInfo> &modem_info);
   // planning message reader
   std::shared_ptr<cyber::Reader<apollo::planning::ADCTrajectory>>
       planning_reader_;
 
   // daemon report readers and callback
   void UpdateCarDaemonRpt(
-      const std::shared_ptr<modules::teleop::teleop::DaemonServiceRpt> &rpt);
+      const std::shared_ptr<modules::teleop::daemon::DaemonRpt> &rpt);
   void UpdateOperatorDaemonRpt(
-      const std::shared_ptr<modules::teleop::teleop::DaemonServiceRpt> &rpt);
-  std::shared_ptr<cyber::Reader<modules::teleop::teleop::DaemonServiceRpt>>
+      const std::shared_ptr<modules::teleop::daemon::DaemonRpt> &rpt);
+  std::shared_ptr<cyber::Reader<modules::teleop::daemon::DaemonRpt>>
       remote_daemon_rpt_reader_;
-  std::shared_ptr<cyber::Reader<modules::teleop::teleop::DaemonServiceRpt>>
+  std::shared_ptr<cyber::Reader<modules::teleop::daemon::DaemonRpt>>
       local_daemon_rpt_reader_;
   // daemon commands writers
-  std::shared_ptr<cyber::Writer<modules::teleop::teleop::DaemonServiceCmd>>
+  std::shared_ptr<cyber::Writer<modules::teleop::daemon::DaemonCmd>>
       remote_daemon_cmd_writer_;
-  std::shared_ptr<cyber::Writer<modules::teleop::teleop::DaemonServiceCmd>>
+  std::shared_ptr<cyber::Writer<modules::teleop::daemon::DaemonCmd>>
       local_daemon_cmd_writer_;
 
   // planning driving actions  and feedback

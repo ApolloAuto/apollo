@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -18,12 +18,15 @@
 
 import sys
 import threading
+
 import gflags
-from cyber_py import cyber
-import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from modules.control.proto import control_cmd_pb2
+import matplotlib.pyplot as plt
+
+from cyber_py3 import cyber
 from modules.canbus.proto import chassis_pb2
+from modules.control.proto import control_cmd_pb2
+
 
 INIT_ACC_DATA = []
 INIT_T_DATA = []
@@ -69,6 +72,7 @@ def callback(chassis_pb):
 
     last_t = current_t
     last_v = current_v
+
 
 def listener():
     cyber.init()

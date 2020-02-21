@@ -5,7 +5,6 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "cal_table_generator",
     srcs = ["cal_table_generator.cc"],
-    linkopts = ["-lprotobuf"],
     linkstatic = False,
     deps = [
         "//modules/perception/inference:inference_factory_lib",
@@ -20,7 +19,6 @@ cc_binary(
 cc_binary(
     name = "denseline_sample",
     srcs = ["denseline_sample.cc"],
-    linkopts = ["-lprotobuf"],
     linkstatic = False,
     deps = [
         "//modules/perception/inference:inference_factory_lib",
@@ -35,7 +33,6 @@ cc_binary(
 cc_binary(
     name = "lane_sample",
     srcs = ["lane_sample.cc"],
-    linkopts = ["-lprotobuf"],
     linkstatic = False,
     deps = [
         "//modules/perception/inference:inference_factory_lib",
@@ -50,7 +47,6 @@ cc_binary(
 cc_binary(
     name = "yolo_sample",
     srcs = ["yolo_sample.cc"],
-    linkopts = ["-lprotobuf"],
     linkstatic = False,
     deps = [
         "//modules/perception/inference:inference_factory_lib",

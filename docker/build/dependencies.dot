@@ -1,0 +1,22 @@
+digraph {
+  "infra" -> "bazel 0.5.3";
+  "bazel 0.5.3" -> "GCC 4.8";
+  "bazel 0.5.3" -> "openjdk-8-jdk";
+  "infra" -> "glog 0.3.5" -> "gflags 2.2" -> "cmake";
+  "infra" -> "protobuf 3.3";
+  "infra" -> "gtest 1.8" -> "absl 20180600";
+
+  "cyber" -> "infra";
+  "cyber" -> "FastRTPS 1.5.0" -> "Fast CDR";
+  "cyber" -> "POCO Foundation 50";
+  "cyber" -> "python2/3-dev";
+  "cyber" -> "uuid-dev";
+
+  "modules" -> "multiple" -> "boost 1.54/1.65";
+  "multiple" -> "pcl 1.9.1";
+
+  "modules" -> "perception" -> "cuda 10.0";
+  "perception" -> "opencv 2.4.8";
+
+  "offline" -> "bosfs 1.0.0";
+}

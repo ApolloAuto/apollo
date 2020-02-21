@@ -1,0 +1,129 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+import "modules/canbus/proto/chassis.proto";
+import "modules/common/proto/geometry.proto";
+import "modules/common/proto/pnc_point.proto";
+import "modules/perception/proto/traffic_light_detection.proto";
+import "modules/routing/proto/routing.proto";
+
+message ObstacleData {
+  optional int32 id = 1;  // obstacle ID.
+
+  // obstacle position in the OBJECT coordinate system.
+  optional apollo.common.Point3D position = 2;
+
+  optional double theta = 3;  // heading in the world coordinate system.
+  optional apollo.common.Point3D velocity = 4;  // obstacle velocity.
+
+  // Size of obstacle bounding box.
+  optional double length = 5;  // obstacle length.
+  optional double width = 6;   // obstacle width.
+  optional double height = 7;  // obstacle height.
+
+  // obstacle corner points in in the OBJECT coordinate system.
+  repeated apollo.common.Point3D polygon_point = 8;
+
+  enum Type {
+    UNKNOWN = 0;
+    UNKNOWN_MOVABLE = 1;
+    UNKNOWN_UNMOVABLE = 2;
+    PEDESTRIAN = 3;  // Pedestrian, usually determined by moving behavior.
+    BICYCLE = 4;     // bike, motor bike
+    VEHICLE = 5;     // Passenger car or truck.
+  };
+  optional Type type = 10;         // obstacle type
+  optional double timestamp = 11;  // GPS time in seconds.
+
+  // The following fields are new added in Apollo 4.0
+  optional apollo.common.Point3D acceleration = 16;  // obstacle acceleration
+}
+
+message ObstacleFeature {
+  optional int32 id = 1;  // obstacle ID.
+  repeated ObstacleData obstacle = 2;
+}
+
+message RoutingFeature {
+  repeated apollo.routing.RoadSegment road = 1;
+}
+
+message LocalizationFeature {
+  // Position of the vehicle reference point (VRP) in the map reference frame.
+  // The VRP is the center of rear axle.
+  optional apollo.common.PointENU position = 1;
+
+  // Heading
+  // The heading is zero when the car is facing East and positive when facing
+  // North.
+  optional double heading = 2;
+
+  // Linear velocity of the VRP in the map reference frame.
+  // East/north/up in meters per second.
+  optional apollo.common.Point3D linear_velocity = 3;
+
+  // Linear acceleration of the VRP in the map reference frame.
+  // East/north/up in meters per second.
+  optional apollo.common.Point3D linear_acceleration = 4;
+
+  // Angular velocity of the vehicle in the map reference frame.
+  // Around east/north/up axes in radians per second.
+  optional apollo.common.Point3D angular_velocity = 5;
+}
+
+message ChassisFeature {
+  // Features from chassis
+  // Vehicle Speed in meters per second.
+  optional float speed_mps = 1;
+
+  // Real throttle location in [%], ranging from 0 to 100.
+  optional float throttle_percentage = 2;
+
+  // Real brake location in [%], ranging from 0 to 100.
+  optional float brake_percentage = 3;
+
+  // Real steering location in [%], ranging from -100 to 100.
+  // steering_angle / max_steering_angle
+  // Clockwise: negative
+  // CountClockwise: positive
+  optional float steering_percentage = 4;
+
+  optional apollo.canbus.Chassis.GearPosition gear_location = 5;
+}
+
+message TrafficLightFeature {
+    optional string light_id = 1;
+    optional apollo.perception.TrafficLight.Color color = 2;
+}
+
+message LearningDataFrame {
+  // Message publishing time in seconds.
+  optional double timestamp_sec = 1;
+
+  // Sequence number for each frame
+  // sequence_num, always starting from 1.
+  optional uint32 frame_num = 2;
+
+  // Features from localization
+  optional LocalizationFeature localization_feature = 3;
+
+  // Features from chassis
+  optional ChassisFeature chassis_feature = 4;
+
+  // Features from perception obstacles
+  repeated ObstacleFeature obstacle_features = 5;
+
+  // Features from routing
+  optional RoutingFeature routing_feature = 6;
+
+  // Features from traffic_light_detection
+  repeated TrafficLightFeature traffic_light_features = 7;
+
+  // ADC ground-truth label trajectory
+  repeated apollo.common.TrajectoryPoint label_trajectory_points = 8;
+}
+
+message LearningData {
+  repeated LearningDataFrame learning_data = 1;
+}

@@ -27,7 +27,7 @@ cc_test(
         "//modules/prediction/container/obstacles:obstacles_container",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
         "//modules/prediction/predictor/empty:empty_predictor",
-        "@gtest//:main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

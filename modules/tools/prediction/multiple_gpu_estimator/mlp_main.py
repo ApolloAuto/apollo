@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 ###############################################################################
 # Modification Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
@@ -31,21 +33,19 @@
 """Mlp model for classifying prediction from Mlp dataset.
 
 """
-from __future__ import division
-from __future__ import print_function
 
 import argparse
 import functools
 import itertools
 import os
+import six
 
 import mlp_data
 import mlp_model
 import mlp_utils
 import numpy as np
-import six
-from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
+
 
 tf.logging.set_verbosity(tf.logging.INFO)
 
@@ -254,7 +254,7 @@ def _tower_fn(is_training, weight_decay, feature, label, data_format,
 
     tower_grad = tf.gradients(tower_loss, model_params)
 
-    return tower_loss, zip(tower_grad, model_params), tower_pred
+    return tower_loss, list(zip(tower_grad, model_params)), tower_pred
 
 
 def input_fn(data_dir, subset, num_shards, batch_size):
@@ -284,7 +284,7 @@ def input_fn(data_dir, subset, num_shards, batch_size):
         label_batch = tf.unstack(label_batch, num=batch_size, axis=0)
         feature_shards = [[] for i in range(num_shards)]
         label_shards = [[] for i in range(num_shards)]
-        for i in xrange(batch_size):
+        for i in range(batch_size):
             idx = i % num_shards
             feature_shards[idx].append(image_batch[i])
             label_shards[idx].append(label_batch[i])

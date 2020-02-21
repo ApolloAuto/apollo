@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -18,7 +18,7 @@
 
 
 from math import cos, sin
-from vector2d import Vector2
+from .vector2d import Vector2
 
 
 def rotate(v, theta):

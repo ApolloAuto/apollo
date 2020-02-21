@@ -229,7 +229,7 @@ bool DarkSCNNLanePostprocessor::Process2D(
     Eigen::Matrix<float, 4, 1> coeff;
     // Solve linear system to estimate polynomial coefficients
     if (RansacFitting<float>(xy_points[i], &selected_xy_points, &coeff, 200,
-                      static_cast<int>(minNumPoints_), 0.1f)) {
+                             static_cast<int>(minNumPoints_), 0.1f)) {
       coeffs[i] = coeff;
 
       xy_points[i].clear();

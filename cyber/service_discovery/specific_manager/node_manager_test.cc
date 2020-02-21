@@ -16,9 +16,9 @@
 
 #include "cyber/service_discovery/specific_manager/node_manager.h"
 
-#include <gtest/gtest.h>
 #include <memory>
 #include <vector>
+#include "gtest/gtest.h"
 
 #include "cyber/common/global_data.h"
 

@@ -21,7 +21,6 @@
 #include "modules/planning/tasks/deciders/speed_decider/speed_decider.h"
 
 #include <algorithm>
-#include <string>
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/decision.pb.h"
@@ -186,7 +185,7 @@ bool SpeedDecider::IsFollowTooClose(const Obstacle& obstacle) const {
   }
   const double distance =
       obstacle.path_st_boundary().min_s() - FLAGS_min_stop_distance_obstacle;
-  static constexpr double lane_follow_max_decel = 1.0;
+  static constexpr double lane_follow_max_decel = 3.0;
   static constexpr double lane_change_max_decel = 3.0;
   auto* planning_status = PlanningContext::Instance()
                               ->mutable_planning_status()
@@ -338,8 +337,6 @@ void SpeedDecider::AppendIgnoreDecision(Obstacle* obstacle) const {
 bool SpeedDecider::CreateStopDecision(const Obstacle& obstacle,
                                       ObjectDecisionType* const stop_decision,
                                       double stop_distance) const {
-  DCHECK_NOTNULL(stop_decision);
-
   const auto& boundary = obstacle.path_st_boundary();
 
   // TODO(all): this is a bug! Cannot mix reference s and path s!
@@ -380,8 +377,6 @@ bool SpeedDecider::CreateStopDecision(const Obstacle& obstacle,
 
 bool SpeedDecider::CreateFollowDecision(
     const Obstacle& obstacle, ObjectDecisionType* const follow_decision) const {
-  DCHECK_NOTNULL(follow_decision);
-
   const double follow_speed = init_point_.v();
   const double follow_distance_s =
       -StGapEstimator::EstimateProperFollowingGap(follow_speed);
@@ -416,8 +411,6 @@ bool SpeedDecider::CreateFollowDecision(
 
 bool SpeedDecider::CreateYieldDecision(
     const Obstacle& obstacle, ObjectDecisionType* const yield_decision) const {
-  DCHECK_NOTNULL(yield_decision);
-
   PerceptionObstacle::Type obstacle_type = obstacle.Perception().type();
   double yield_distance = StGapEstimator::EstimateProperYieldingGap();
 
@@ -453,8 +446,6 @@ bool SpeedDecider::CreateYieldDecision(
 bool SpeedDecider::CreateOvertakeDecision(
     const Obstacle& obstacle,
     ObjectDecisionType* const overtake_decision) const {
-  DCHECK_NOTNULL(overtake_decision);
-
   const auto& velocity = obstacle.Perception().velocity();
   const double obstacle_speed =
       common::math::Vec2d::CreateUnitVec2d(init_point_.path_point().theta())

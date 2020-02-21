@@ -18,7 +18,6 @@
  * @file
  **/
 #include <string>
-#include <vector>
 
 #include "modules/planning/scenarios/stop_sign/unprotected/stage_creep.h"
 

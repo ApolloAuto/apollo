@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
 #
@@ -13,37 +15,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+
 """
 @requirement:
     pytorch 0.4.1
 """
 
+import argparse
+import logging
 import os
+
+from sklearn.model_selection import train_test_split
+from sklearn.utils import class_weight
+from torch.autograd import Variable
+from torch.utils.data import Dataset, DataLoader, sampler
 import h5py
 import numpy as np
-import logging
-import argparse
+import sklearn
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
 
-import proto.cruise_model_pb2
-from proto.cruise_model_pb2 import TensorParameter, InputParameter,\
+from .common.configure import parameters
+from .cruise_models import FullyConn_NN, FCNN_CNN1D
+from .proto.cruise_model_pb2 import TensorParameter, InputParameter,\
     Conv1dParameter, DenseParameter, ActivationParameter, MaxPool1dParameter,\
     AvgPool1dParameter, LaneFeatureConvParameter, ObsFeatureFCParameter,\
     ClassifyParameter, RegressParameter, CruiseModelParameter
 
-from cruise_models import FullyConn_NN, FCNN_CNN1D
-
-import torch
-import torch.nn as nn
-import torch.optim as optim
-import torch.nn.functional as F
-from torch.autograd import Variable
-from torch.utils.data import Dataset, DataLoader, sampler
-
-import sklearn
-from sklearn.model_selection import train_test_split
-from sklearn.utils import class_weight
-
-from common.configure import parameters
 
 # TODO(panjiacheng): the data-loader part needs to be modified.
 
@@ -185,9 +185,9 @@ def loss_fn(c_pred, r_pred, target, balance):
                ((target[:, 2] <= 0.0) + (target[:, 2] > 3.0)).float().view(
                    target.shape[0], 1) * target[:, 2].view(target.shape[0], 1),
                target[:, 2].view(target.shape[0], 1))
-        #loss_R((target[:,1] < 10.0).float().view(target.shape[0],1) * r_pred + \
-        #        (target[:,1] >= 10.0).float().view(target.shape[0],1) * target[:,1].view(target.shape[0],1), \
-        #        target[:,1].view(target.shape[0],1))
+    # loss_R((target[:,1] < 10.0).float().view(target.shape[0],1) * r_pred + \
+    #        (target[:,1] >= 10.0).float().view(target.shape[0],1) * target[:,1].view(target.shape[0],1), \
+    #        target[:,1].view(target.shape[0],1))
     return loss
 
 
@@ -220,7 +220,7 @@ Print the distribution of data labels.
 def print_dist(label):
     unique_labels = np.unique(label)
     for l in unique_labels:
-        print ('Label = {}: {}%'.format(l, np.sum(label == l)/len(label)*100))
+        print('Label = {}: {}%'.format(l, np.sum(label == l)/len(label)*100))
 
 
 # ========================================================================
@@ -257,7 +257,6 @@ def load_npy_data(dir):
     merge them together into one;
     return.
     '''
-
 
 
 def data_preprocessing(data):
@@ -373,7 +372,7 @@ def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048, ba
 
     loss_history = []
     logging.info('Epoch: {}'.format(epoch+1))
-    print ('Epoch: {}.'.format(epoch+1))
+    print('Epoch: {}.'.format(epoch+1))
     num_of_data = train_X.shape[0]
     num_of_batch = int(num_of_data / batch_size) + 1
     pred_y = None
@@ -395,7 +394,7 @@ def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048, ba
         if (i > 0) and (i % 100 == 0):
             logging.info('Step: {}, train_loss: {}'.format(
                 i, np.mean(loss_history[-100:])))
-            print ("Step: {}, training loss: {}".format(
+            print("Step: {}, training loss: {}".format(
                 i, np.mean(loss_history[-100:])))
 
     pred_y = (pred_y > 0.0)
@@ -406,8 +405,8 @@ def train_vanilla(train_X, train_y, model, optimizer, epoch, batch_size=2048, ba
     logging.info('Training loss: {}'.format(train_loss))
     logging.info('Training Accuracy: {}.'.format(training_accuracy))
 
-    print ('Training Loss: {}. Training Accuracy: {}'
-           .format(train_loss, training_accuracy))
+    print('Training Loss: {}. Training Accuracy: {}'
+          .format(train_loss, training_accuracy))
 
 
 '''
@@ -450,10 +449,10 @@ def validate_vanilla(valid_X, valid_y, model, batch_size=2048, balance=1.0, pos_
                   Precision: {}. Recall: {}. AUC: {}.'
                  .format(np.mean(loss_history), valid_accuracy, valid_precision,
                          valid_recall, valid_auc))
-    print ('Validation loss: {}. Accuracy: {}.\
+    print('Validation loss: {}. Accuracy: {}.\
             Precision: {}. Recall: {}. AUC: {}.'
-           .format(np.mean(loss_history), valid_accuracy, valid_precision,
-                   valid_recall, valid_auc))
+          .format(np.mean(loss_history), valid_accuracy, valid_precision,
+                  valid_recall, valid_auc))
 
     return np.mean(loss_history)
 
@@ -478,7 +477,7 @@ def train_dataloader(train_loader, model, optimizer, epoch, balance=1.0):
             y = (targets).float().cuda()
         c_pred, r_pred = model(X)
         loss = loss_fn(c_pred, r_pred, y, balance)
-        #loss.data[0].cpu().numpy()
+        # loss.data[0].cpu().numpy()
         loss_history.append(loss.data)
         loss.backward()
         optimizer.step()
@@ -487,17 +486,17 @@ def train_dataloader(train_loader, model, optimizer, epoch, balance=1.0):
             np.sum((c_pred.data.cpu().numpy() > 0.5).astype(float) ==
                    y[:, 0].data.cpu().numpy().reshape(c_pred.data.cpu().numpy().shape[0], 1))
 
-        #if i > 100:
+        # if i > 100:
         #    break
         if i % 100 == 0:
             logging.info('Step: {}, train_loss: {}'.format(
                 i, np.mean(loss_history[-100:])))
-            print ("Step: {}, training loss: {}".format(
+            print("Step: {}, training loss: {}".format(
                 i, np.mean(loss_history[-100:])))
 
     train_loss = np.mean(loss_history)
     logging.info('Training loss: {}'.format(train_loss))
-    print ('Epoch: {}. Training Loss: {}'.format(epoch, train_loss))
+    print('Epoch: {}. Training Loss: {}'.format(epoch, train_loss))
 
 
 '''
@@ -527,8 +526,8 @@ def validate_dataloader(valid_loader, model, balance=1.0):
     valid_classification_accuracy = valid_correct_class / total_size
     logging.info('Validation loss: {}. Validation classification accuracy: {}'
                  .format(np.mean(loss_history), valid_classification_accuracy))
-    print ('Validation loss: {}. Classification accuracy: {}.'
-           .format(np.mean(loss_history), valid_classification_accuracy))
+    print('Validation loss: {}. Classification accuracy: {}.'
+          .format(np.mean(loss_history), valid_classification_accuracy))
 
     return valid_loss
 # ========================================================================
@@ -555,12 +554,12 @@ if __name__ == "__main__":
                         help='It is training lane-follow (go) cases.')
     parser.add_argument('-b', '--balance', type=float, default=1.0,
                         help='Specify the weight for positive predictions.')
-    #parser.add_argument('-g', '--gpu_num', type=int, default=0, \
+    # parser.add_argument('-g', '--gpu_num', type=int, default=0, \
     #    help='Specify which GPU to use.')
 
     args = parser.parse_args()
 
-    #os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID' #specifies the same order as nvidia-smi
+    # os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID' #specifies the same order as nvidia-smi
     #os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_num)
 
     if not args.data_loader:
@@ -570,14 +569,14 @@ if __name__ == "__main__":
         valid_file = args.valid_file
         train_data = load_data(train_file)
         valid_data = load_data(valid_file)
-        print ('Data loaded successfully.')
+        print('Data loaded successfully.')
         classes_train = np.asarray(train_data[:, -dim_output])
-        print ('Total number of training samples: {}'.format(len(classes_train)))
-        print ('Training set distribution:')
+        print('Total number of training samples: {}'.format(len(classes_train)))
+        print('Training set distribution:')
         print_dist(classes_train)
         classes_valid = np.asarray(valid_data[:, -dim_output])
-        print ('Total number of validation samples: {}'.format(len(classes_valid)))
-        print ('Validation set distribution:')
+        print('Total number of validation samples: {}'.format(len(classes_valid)))
+        print('Validation set distribution:')
         print_dist(classes_valid)
 
         # Data preprocessing
@@ -590,8 +589,8 @@ if __name__ == "__main__":
             model = FullyConn_NN()
         elif args.network_structure == 1:
             model = FCNN_CNN1D()
-        print ("The model used is: ")
-        print (model)
+        print("The model used is: ")
+        print(model)
         learning_rate = 6.561e-4
         optimizer = optim.Adam(model.parameters(), lr=learning_rate)
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(
@@ -600,7 +599,7 @@ if __name__ == "__main__":
         # CUDA set-up:
         cuda_is_available = torch.cuda.is_available()
         if (cuda_is_available):
-            print ("Using CUDA to speed up training.")
+            print("Using CUDA to speed up training.")
             model.cuda()
             X_train = Variable(torch.FloatTensor(X_train).cuda())
             X_valid = Variable(torch.FloatTensor(X_valid).cuda())
@@ -639,8 +638,8 @@ if __name__ == "__main__":
         # "Flattening" the list of lists
         classes_train = [item for sublist in classes_train for item in sublist]
         classes_train = np.asarray(classes_train)
-        print ('Total number of training samples: {}'.format(len(classes_train)))
-        print ('Training set distribution:')
+        print('Total number of training samples: {}'.format(len(classes_train)))
+        print('Training set distribution:')
         print_dist(classes_train)
 
         classes_valid = []
@@ -651,8 +650,8 @@ if __name__ == "__main__":
         # "Flattening" the list of lists
         classes_valid = [item for sublist in classes_valid for item in sublist]
         classes_valid = np.asarray(classes_valid)
-        print ('Total number of validation samples: {}'.format(len(classes_valid)))
-        print ('Validation set distribution:')
+        print('Total number of validation samples: {}'.format(len(classes_valid)))
+        print('Validation set distribution:')
         print_dist(classes_valid)
 
         #class_weights = class_weight.compute_class_weight('balanced', np.unique(classes_train), classes_train)
@@ -666,7 +665,7 @@ if __name__ == "__main__":
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(
             optimizer, factor=0.3, patience=2, min_lr=1e-8, verbose=1, mode='min')
         if (cuda_is_available):
-            print ('Using CUDA to speed up training.')
+            print('Using CUDA to speed up training.')
             model.cuda()
 
         train_dataset = TrainValidDataset(list_of_training_files)

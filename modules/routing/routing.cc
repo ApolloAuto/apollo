@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <unordered_map>
+
 #include "modules/routing/routing.h"
 
 #include "modules/common/util/point_factory.h"
@@ -56,49 +58,93 @@ apollo::common::Status Routing::Start() {
   return apollo::common::Status::OK();
 }
 
-RoutingRequest Routing::FillLaneInfoIfMissing(
+std::vector<RoutingRequest> Routing::FillLaneInfoIfMissing(
     const RoutingRequest& routing_request) {
+  std::vector<RoutingRequest> fixed_requests;
+  std::unordered_map<int, std::vector<LaneWaypoint>>
+      additional_lane_waypoint_map;
   RoutingRequest fixed_request(routing_request);
   for (int i = 0; i < routing_request.waypoint_size(); ++i) {
-    const auto& lane_waypoint = routing_request.waypoint(i);
+    LaneWaypoint lane_waypoint(routing_request.waypoint(i));
     if (lane_waypoint.has_id()) {
       continue;
     }
+
+    // fill lane info when missing
     const auto point =
         common::util::PointFactory::ToPointENU(lane_waypoint.pose());
-
-    double s = 0.0;
-    double l = 0.0;
-    hdmap::LaneInfoConstPtr lane;
-    // FIXME(all): select one reasonable lane candidate for point=>lane
-    // is one to many relationship.
-    if (hdmap_->GetNearestLane(point, &lane, &s, &l) != 0) {
+    std::vector<std::shared_ptr<const hdmap::LaneInfo>> lanes;
+    // look for lanes with bigger radius if not found
+    constexpr double kRadius = 0.3;
+    for (int i = 0; i < 20; ++i) {
+      hdmap_->GetLanes(point, kRadius + i * kRadius, &lanes);
+      if (lanes.size() > 0) {
+        break;
+      }
+    }
+    if (lanes.empty()) {
       AERROR << "Failed to find nearest lane from map at position: "
              << point.DebugString();
-      return routing_request;
+      return fixed_requests;  // return empty vector
     }
-    auto waypoint_info = fixed_request.mutable_waypoint(i);
-    waypoint_info->set_id(lane->id().id());
-    waypoint_info->set_s(s);
+    for (size_t j = 0; j < lanes.size(); ++j) {
+      double s = 0.0;
+      double l = 0.0;
+      lanes[j]->GetProjection({point.x(), point.y()}, &s, &l);
+      if (j == 0) {
+        auto waypoint_info = fixed_request.mutable_waypoint(i);
+        waypoint_info->set_id(lanes[j]->id().id());
+        waypoint_info->set_s(s);
+      } else {
+        // additional candidate lanes
+        LaneWaypoint new_lane_waypoint(lane_waypoint);
+        new_lane_waypoint.set_id(lanes[j]->id().id());
+        new_lane_waypoint.set_s(s);
+        additional_lane_waypoint_map[i].push_back(new_lane_waypoint);
+      }
+    }
   }
-  AINFO << "Fixed routing request:" << fixed_request.DebugString();
-  return fixed_request;
+  // first routing_request
+  fixed_requests.push_back(fixed_request);
+
+  // additional routing_requests because of lane overlaps
+  for (const auto& m : additional_lane_waypoint_map) {
+    size_t cur_size = fixed_requests.size();
+    for (size_t i = 0; i < cur_size; ++i) {
+      // use index to iterate while keeping push_back
+      for (const auto& lane_waypoint : m.second) {
+        RoutingRequest new_request(fixed_requests[i]);
+        auto waypoint_info = new_request.mutable_waypoint(m.first);
+        waypoint_info->set_id(lane_waypoint.id());
+        waypoint_info->set_s(lane_waypoint.s());
+        fixed_requests.push_back(new_request);
+      }
+    }
+  }
+
+  for (const auto& fixed_request : fixed_requests) {
+    ADEBUG << "Fixed routing request:" << fixed_request.DebugString();
+  }
+  return fixed_requests;
 }
 
 bool Routing::Process(const std::shared_ptr<RoutingRequest>& routing_request,
                       RoutingResponse* const routing_response) {
   CHECK_NOTNULL(routing_response);
   AINFO << "Get new routing request:" << routing_request->DebugString();
-  const auto& fixed_request = FillLaneInfoIfMissing(*routing_request);
-  if (!navigator_ptr_->SearchRoute(fixed_request, routing_response)) {
-    AERROR << "Failed to search route with navigator.";
 
-    monitor_logger_buffer_.WARN("Routing failed! " +
-                                routing_response->status().msg());
-    return false;
+  const auto& fixed_requests = FillLaneInfoIfMissing(*routing_request);
+  for (const auto& fixed_request : fixed_requests) {
+    if (navigator_ptr_->SearchRoute(fixed_request, routing_response)) {
+      monitor_logger_buffer_.INFO("Routing success!");
+      return true;
+    }
   }
-  monitor_logger_buffer_.INFO("Routing success!");
-  return true;
+
+  AERROR << "Failed to search route with navigator.";
+  monitor_logger_buffer_.WARN("Routing failed! " +
+                              routing_response->status().msg());
+  return false;
 }
 
 }  // namespace routing

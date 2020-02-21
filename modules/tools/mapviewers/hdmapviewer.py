@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############################################################################
 # Copyright 2018 The Apollo Authors. All Rights Reserved.
@@ -17,9 +17,11 @@
 ###############################################################################
 
 import argparse
+
 from bokeh.plotting import figure, output_file, show
-import common.proto_utils as proto_utils
 from modules.map.proto import map_pb2
+import common.proto_utils as proto_utils
+
 
 def draw(map_pb, plot):
     for lane in map_pb.lane:

@@ -22,5 +22,5 @@ import sys
 if sys.version_info[0] >= 3:
     sys.stderr.write('''
         You are running Python3 while importing Python2 Cyber wrapper!
-        Please change to "import cyber_py3.xyz" accordingly.''')
+        Please change to "import cyber_py3.xyz" accordingly.\n''')
     sys.exit(1)
