@@ -84,7 +84,7 @@ Obstacle::Obstacle(const std::string& id,
     }
   }
   ACHECK(common::math::Polygon2d::ComputeConvexHull(polygon_points,
-                                                   &perception_polygon_))
+                                                    &perception_polygon_))
       << "object[" << id << "] polygon is not a valid convex hull.\n"
       << perception_obstacle.DebugString();
 

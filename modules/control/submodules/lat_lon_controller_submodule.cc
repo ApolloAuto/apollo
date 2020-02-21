@@ -43,7 +43,7 @@ std::string LatLonControllerSubmodule::Name() const {
 bool LatLonControllerSubmodule::Init() {
   // lateral controller initialization
   ACHECK(cyber::common::GetProtoFromFile(FLAGS_lateral_controller_conf_file,
-                                        &lateral_controller_conf_))
+                                         &lateral_controller_conf_))
       << "Unable to load lateral controller conf file: "
       << FLAGS_lateral_controller_conf_file;
 
@@ -53,8 +53,8 @@ bool LatLonControllerSubmodule::Init() {
     return false;
   }
   // longitudinal controller
-  ACHECK(cyber::common::GetProtoFromFile(FLAGS_longitudinal_controller_conf_file,
-                                        &longitudinal_controller_conf_))
+  ACHECK(cyber::common::GetProtoFromFile(
+      FLAGS_longitudinal_controller_conf_file, &longitudinal_controller_conf_))
       << "Unable to load longitudinal controller conf file: " +
              FLAGS_longitudinal_controller_conf_file;
 

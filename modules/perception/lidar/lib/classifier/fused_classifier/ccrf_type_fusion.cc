@@ -45,7 +45,7 @@ bool CCRFOneShotTypeFusion::Init(const TypeFusionInitOption& option) {
   std::string classifiers_property_file_path =
       GetAbsolutePath(work_root, config.classifiers_property_file_path());
   ACHECK(util::LoadMultipleMatricesFile(classifiers_property_file_path,
-                                       &smooth_matrices_));
+                                        &smooth_matrices_));
 
   for (auto& pair : smooth_matrices_) {
     util::NormalizeRow(&pair.second);
@@ -140,7 +140,7 @@ bool CCRFSequenceTypeFusion::Init(const TypeFusionInitOption& option) {
       GetAbsolutePath(work_root, config.transition_property_file_path());
   s_alpha_ = config.transition_matrix_alpha();
   ACHECK(util::LoadSingleMatrixFile(transition_property_file_path,
-                                   &transition_matrix_));
+                                    &transition_matrix_));
   transition_matrix_ += Matrixd::Ones() * 1e-6;
   util::NormalizeRow(&transition_matrix_);
   AINFO << "transition matrix";

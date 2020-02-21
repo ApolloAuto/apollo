@@ -120,7 +120,7 @@ void DataCollectionMonitor::LoadConfiguration() {
   }
 
   ACHECK(cyber::common::GetProtoFromFile(data_collection_config_path,
-                                        &data_collection_table_))
+                                         &data_collection_table_))
       << "Unable to parse data collection configuration from file "
       << data_collection_config_path;
 

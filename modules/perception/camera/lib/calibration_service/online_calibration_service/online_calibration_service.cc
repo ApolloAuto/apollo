@@ -32,7 +32,7 @@ bool OnlineCalibrationService::Init(
   // Init k_matrix
   auto &name_intrinsic_map = options.name_intrinsic_map;
   ACHECK(name_intrinsic_map.find(master_sensor_name_) !=
-        name_intrinsic_map.end());
+         name_intrinsic_map.end());
   CameraStatus camera_status;
   name_camera_status_map_.clear();
   for (auto iter = name_intrinsic_map.begin(); iter != name_intrinsic_map.end();

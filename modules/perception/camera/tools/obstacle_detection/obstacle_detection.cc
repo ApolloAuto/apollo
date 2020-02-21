@@ -230,7 +230,7 @@ int main() {
       }
 
       ACHECK(frame.data_provider->FillImageData(cv_img.rows, cv_img.cols,
-                                               image.gpu_data(), "bgr8"));
+                                                image.gpu_data(), "bgr8"));
 
       EXPECT_TRUE(detector->Detect(options, &frame));
     }

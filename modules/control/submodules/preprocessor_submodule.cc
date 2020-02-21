@@ -50,7 +50,7 @@ std::string PreprocessorSubmodule::Name() const {
 
 bool PreprocessorSubmodule::Init() {
   ACHECK(cyber::common::GetProtoFromFile(FLAGS_control_common_conf_file,
-                                        &control_common_conf_))
+                                         &control_common_conf_))
       << "Unable to load control common conf file: "
       << FLAGS_control_common_conf_file;
 

@@ -71,7 +71,7 @@ bool SegmentationComponent::Proc(
 
 bool SegmentationComponent::InitAlgorithmPlugin() {
   ACHECK(common::SensorManager::Instance()->GetSensorInfo(sensor_name_,
-                                                         &sensor_info_));
+                                                          &sensor_info_));
 
   segmentor_.reset(new lidar::LidarObstacleSegmentation);
   if (segmentor_ == nullptr) {

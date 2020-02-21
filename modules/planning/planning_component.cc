@@ -44,7 +44,7 @@ bool PlanningComponent::Init() {
   }
 
   ACHECK(apollo::cyber::common::GetProtoFromFile(FLAGS_planning_config_file,
-                                                &config_))
+                                                 &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
   planning_base_->Init(config_);
 

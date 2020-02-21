@@ -192,7 +192,7 @@ bool PedestrianInteractionEvaluator::Evaluate(
     double prev_x = trajectory->trajectory_point(i - 1).path_point().x();
     double prev_y = trajectory->trajectory_point(i - 1).path_point().y();
     ACHECK(obstacle_id_lstm_state_map_.find(id) !=
-          obstacle_id_lstm_state_map_.end());
+           obstacle_id_lstm_state_map_.end());
     torch::Tensor torch_position = torch::zeros({1, 2});
     double curr_rel_x = rel_x;
     double curr_rel_y = rel_y;

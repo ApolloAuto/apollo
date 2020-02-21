@@ -101,7 +101,7 @@ bool BatchStream::update() {
   int fs = static_cast<int>(fread(d, sizeof(int), 4, file));
   CHECK_EQ(fs, 4);
   ACHECK(mDims.n() == d[0] && mDims.c() == d[1] && mDims.h() == d[2] &&
-        mDims.w() == d[3]);
+         mDims.w() == d[3]);
 
   size_t readInputCount =
       fread(getFileBatch(), sizeof(float), mDims.n() * mImageSize, file);

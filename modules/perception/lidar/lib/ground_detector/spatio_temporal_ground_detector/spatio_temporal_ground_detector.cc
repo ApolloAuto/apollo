@@ -34,7 +34,7 @@ bool SpatioTemporalGroundDetector::Init(
   const lib::ModelConfig* model_config = nullptr;
   auto config_manager = lib::ConfigManager::Instance();
   ACHECK(config_manager->GetModelConfig("SpatioTemporalGroundDetector",
-                                       &model_config))
+                                        &model_config))
       << "Failed to get model config: SpatioTemporalGroundDetector";
 
   const std::string& work_root = config_manager->work_root();

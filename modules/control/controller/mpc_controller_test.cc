@@ -46,7 +46,7 @@ class MPCControllerTest : public ::testing::Test, MPCController {
         "control_conf.pb.txt ";
     ControlConf control_conf;
     ACHECK(cyber::common::GetProtoFromFile(FLAGS_control_conf_file,
-                                          &control_conf));
+                                           &control_conf));
     mpc_conf_ = control_conf.mpc_controller_conf();
 
     timestamp_ = Clock::NowInSeconds();

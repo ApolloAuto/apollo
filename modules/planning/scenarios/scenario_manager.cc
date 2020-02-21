@@ -124,7 +124,7 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
 void ScenarioManager::RegisterScenarios() {
   // lane_follow
   ACHECK(Scenario::LoadConfig(FLAGS_scenario_lane_follow_config_file,
-                             &config_map_[ScenarioConfig::LANE_FOLLOW]));
+                              &config_map_[ScenarioConfig::LANE_FOLLOW]));
 
   // bare_intersection
   ACHECK(Scenario::LoadConfig(
@@ -138,15 +138,15 @@ void ScenarioManager::RegisterScenarios() {
 
   // emergency_stop
   ACHECK(Scenario::LoadConfig(FLAGS_scenario_emergency_stop_config_file,
-                             &config_map_[ScenarioConfig::EMERGENCY_STOP]));
+                              &config_map_[ScenarioConfig::EMERGENCY_STOP]));
 
   // park_and_go
   ACHECK(Scenario::LoadConfig(FLAGS_scenario_park_and_go_config_file,
-                             &config_map_[ScenarioConfig::PARK_AND_GO]));
+                              &config_map_[ScenarioConfig::PARK_AND_GO]));
 
   // pull_over
   ACHECK(Scenario::LoadConfig(FLAGS_scenario_pull_over_config_file,
-                             &config_map_[ScenarioConfig::PULL_OVER]));
+                              &config_map_[ScenarioConfig::PULL_OVER]));
 
   // stop_sign
   ACHECK(Scenario::LoadConfig(
@@ -166,11 +166,11 @@ void ScenarioManager::RegisterScenarios() {
 
   // valet parking
   ACHECK(Scenario::LoadConfig(FLAGS_scenario_valet_parking_config_file,
-                             &config_map_[ScenarioConfig::VALET_PARKING]));
+                              &config_map_[ScenarioConfig::VALET_PARKING]));
 
   // yield_sign
   ACHECK(Scenario::LoadConfig(FLAGS_scenario_yield_sign_config_file,
-                             &config_map_[ScenarioConfig::YIELD_SIGN]));
+                              &config_map_[ScenarioConfig::YIELD_SIGN]));
 }
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
