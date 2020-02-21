@@ -98,18 +98,11 @@ void FeatureGenerator::OnLocalization(
 }
 
 void FeatureGenerator::OnChassis(const apollo::canbus::Chassis& chassis) {
-  /* To be fixed
-  if (learning_data_frame_ == nullptr) {
-    AERROR << "learning_data_frame_ pointer is nullptr";
-    return;
-  }
-  auto features = learning_data_frame_->mutable_chassis();
-  features->set_speed_mps(chassis.speed_mps());
-  features->set_throttle_percentage(chassis.throttle_percentage());
-  features->set_brake_percentage(chassis.brake_percentage());
-  features->set_steering_percentage(chassis.steering_percentage());
-  features->set_gear_location(chassis.gear_location());
-  */
+  chassis_feature_.set_speed_mps(chassis.speed_mps());
+  chassis_feature_.set_throttle_percentage(chassis.throttle_percentage());
+  chassis_feature_.set_brake_percentage(chassis.brake_percentage());
+  chassis_feature_.set_steering_percentage(chassis.steering_percentage());
+  chassis_feature_.set_gear_location(chassis.gear_location());
 }
 
 void FeatureGenerator::OnTafficLightDetection(
@@ -186,6 +179,10 @@ void FeatureGenerator::GenerateLearningDataFrame() {
   learning_data_frame->set_timestamp_sec(
       localization_for_label_.back().header().timestamp_sec());
   learning_data_frame->set_frame_num(total_learning_data_frame_num_++);
+
+  // add chassis
+  auto chassis = learning_data_frame->mutable_chassis();
+  chassis->CopyFrom(chassis_feature_);
 
   // add localization
   auto localization = learning_data_frame->mutable_localization();
