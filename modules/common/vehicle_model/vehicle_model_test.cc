@@ -33,11 +33,11 @@ class VehicleModelTest : public ::testing::Test {
     std::string localization_pre_file =
         "modules/common/testdata/localization_pre.pb.txt";
     ACHECK(cyber::common::GetProtoFromFile(localization_pre_file,
-                                          &localization_pre_));
+                                           &localization_pre_));
     std::string localization_post_file =
         "modules/common/testdata/localization_post.pb.txt";
     ACHECK(cyber::common::GetProtoFromFile(localization_post_file,
-                                          &localization_post_));
+                                           &localization_post_));
     const std::string chassis_pre_file =
         "modules/common/testdata/chassis_pre.pb.txt";
     ACHECK(cyber::common::GetProtoFromFile(chassis_pre_file, &chassis_pre_));

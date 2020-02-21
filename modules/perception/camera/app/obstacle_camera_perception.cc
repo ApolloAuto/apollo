@@ -75,7 +75,7 @@ bool ObstacleCameraPerception::Init(
             detector_param.camera_name(), detector_ptr));
     ACHECK(name_detector_map_.at(detector_param.camera_name()) != nullptr);
     ACHECK(name_detector_map_.at(detector_param.camera_name())
-              ->Init(detector_init_options))
+               ->Init(detector_init_options))
         << "Failed to init: " << plugin_param.name();
   }
 

@@ -267,7 +267,7 @@ double Box2d::DistanceTo(const LineSegment2d &line_segment) const {
     }
   }
   ACHECK(0) << "unimplemented state: " << gx1 << " " << gy1 << " " << gx2 << " "
-           << gy2;
+            << gy2;
   return 0.0;
 }
 

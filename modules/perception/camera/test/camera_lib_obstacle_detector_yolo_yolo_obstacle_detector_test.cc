@@ -55,7 +55,7 @@ TEST(YoloCameraDetectorTest, demo_test) {
   dp_init_options.device_id = 0;
   ACHECK(frame.data_provider->Init(dp_init_options));
   ACHECK(frame.data_provider->FillImageData(cv_img.rows, cv_img.cols,
-                                           image.gpu_data(), "bgr8"));
+                                            image.gpu_data(), "bgr8"));
 
   ObstacleDetectorInitOptions init_options;
   init_options.root_dir =

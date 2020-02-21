@@ -366,7 +366,8 @@ int main(int argc, char *argv[]) {
   if (!FLAGS_dump_bin_map.empty()) {
     apollo::hdmap::Map map;
     ACHECK(apollo::cyber::common::GetProtoFromFile(map_file, &map));
-    ACHECK(apollo::cyber::common::SetProtoToBinaryFile(map, FLAGS_dump_bin_map));
+    ACHECK(
+        apollo::cyber::common::SetProtoToBinaryFile(map, FLAGS_dump_bin_map));
     valid_arg = true;
   }
   if (!valid_arg) {

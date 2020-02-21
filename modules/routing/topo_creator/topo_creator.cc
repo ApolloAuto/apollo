@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
   apollo::routing::RoutingConfig routing_conf;
 
   ACHECK(apollo::cyber::common::GetProtoFromFile(FLAGS_routing_conf_file,
-                                                &routing_conf))
+                                                 &routing_conf))
       << "Unable to load routing conf file: " + FLAGS_routing_conf_file;
 
   AINFO << "Conf file: " << FLAGS_routing_conf_file << " is loaded.";

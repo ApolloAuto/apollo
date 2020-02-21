@@ -27,7 +27,7 @@ bool ContiArsPreprocessor::Init() {
   std::string model_name = "ContiArsPreprocessor";
   const lib::ModelConfig* model_config = nullptr;
   ACHECK(lib::ConfigManager::Instance()->GetModelConfig(model_name,
-                                                       &model_config));
+                                                        &model_config));
   ACHECK(model_config->get_value("delay_time", &delay_time_));
   return true;
 }
