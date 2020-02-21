@@ -41,6 +41,7 @@ using apollo::canbus::Chassis;
 using apollo::cyber::record::RecordMessage;
 using apollo::cyber::record::RecordReader;
 using apollo::localization::LocalizationEstimate;
+using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
 
 void FeatureGenerator::Init() {
@@ -76,10 +77,18 @@ void FeatureGenerator::GenerateTrajectoryLabel(
       localization_for_label.back().header().timestamp_sec());
   learning_data_frame->set_frame_num(total_learning_data_frame_num_++);
 
+  // add traffic_light
+  learning_data_frame->clear_traffic_light();
+  for (const auto& tl : traffic_lights_) {
+    auto traffic_light = learning_data_frame->add_traffic_light();
+    traffic_light->set_id(tl.first);
+    traffic_light->set_color(tl.second);
+  }
+
   // add routing
   auto features = learning_data_frame->mutable_routing_response();
   features->Clear();
-  for (const auto& lane_id : routing_lane_ids) {
+  for (const auto& lane_id : routing_lane_ids_) {
     features->add_lane_id(lane_id);
   }
 
@@ -167,22 +176,35 @@ void FeatureGenerator::OnChassis(const apollo::canbus::Chassis& chassis) {
   features->set_gear_location(chassis.gear_location());
 }
 
+void FeatureGenerator::OnTafficLightDetection(
+    const TrafficLightDetection& traffic_light_detection) {
+  // AINFO << "traffic_light_detection received at frame["
+  //      << total_learning_data_frame_num_ << "]";
+
+  traffic_lights_.clear();
+  for (int i = 0; i < traffic_light_detection.traffic_light_size(); ++i) {
+    const auto& traffic_light_id =
+        traffic_light_detection.traffic_light(i).id();
+    if (traffic_light_id.empty()) continue;
+
+    // AINFO << "  traffic_light_id[" << traffic_light_id
+    //      << "] color[" << traffic_light_detection.traffic_light(i).color() << "]";
+    traffic_lights_[traffic_light_id] =
+        traffic_light_detection.traffic_light(i).color();
+  }
+}
+
+
 void FeatureGenerator::OnRoutingResponse(
   const apollo::routing::RoutingResponse& routing_response) {
-  if (learning_data_frame_ == nullptr) {
-    AERROR << "learning_data_frame_ pointer is nullptr";
-    return;
-  }
-
   AINFO << "routing_response received at frame["
         << total_learning_data_frame_num_ << "]";
-
-  routing_lane_ids.clear();
+  routing_lane_ids_.clear();
   for (int i = 0; i < routing_response.road_size(); ++i) {
     for (int j = 0; j < routing_response.road(i).passage_size(); ++j) {
       for (int k = 0; k < routing_response.road(i).passage(j).segment_size();
           ++k) {
-        routing_lane_ids.push_back(
+        routing_lane_ids_.push_back(
             routing_response.road(i).passage(j).segment(k).id());
       }
     }
@@ -212,6 +234,11 @@ void FeatureGenerator::ProcessOfflineData(const std::string& record_filename) {
       RoutingResponse routing_response;
       if (routing_response.ParseFromString(message.content)) {
         OnRoutingResponse(routing_response);
+      }
+    } else if (message.channel_name == FLAGS_traffic_light_detection_topic) {
+      TrafficLightDetection traffic_light_detection;
+      if (traffic_light_detection.ParseFromString(message.content)) {
+        OnTafficLightDetection(traffic_light_detection);
       }
     }
   }
