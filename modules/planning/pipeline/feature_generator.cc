@@ -44,9 +44,7 @@ using apollo::localization::LocalizationEstimate;
 using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
 
-void FeatureGenerator::Init() {
-  learning_data_frame_ = learning_data_.add_learning_data();
-}
+void FeatureGenerator::Init() {}
 
 void FeatureGenerator::WriteOutLearningData(const LearningData& learning_data,
                                             const std::string& file_name) {
@@ -71,18 +69,13 @@ void FeatureGenerator::Close() {
 
 void FeatureGenerator::OnLocalization(
     const apollo::localization::LocalizationEstimate& le) {
-  if (learning_data_frame_ == nullptr) {
-    AERROR << "learning_data_frame_ pointer is nullptr";
-    return;
-  }
-
-  auto features = learning_data_frame_->mutable_localization();
-  const auto& pose = le.pose();
-  features->mutable_position()->CopyFrom(pose.position());
-  features->set_heading(pose.heading());
-  features->mutable_linear_velocity()->CopyFrom(pose.linear_velocity());
-  features->mutable_linear_acceleration()->CopyFrom(pose.linear_acceleration());
-  features->mutable_angular_velocity()->CopyFrom(pose.angular_velocity());
+  // auto features = learning_data_frame_->mutable_localization();
+  // const auto& pose = le.pose();
+  // features->mutable_position()->CopyFrom(pose.position());
+  // features->set_heading(pose.heading());
+  // features->mutable_linear_velocity()->CopyFrom(pose.linear_velocity());
+  // features->mutable_linear_acceleration()->CopyFrom(pose.linear_acceleration());
+  // features->mutable_angular_velocity()->CopyFrom(pose.angular_velocity());
   localization_for_label_.push_back(le);
 
   const int localization_msg_start_cnt =
@@ -109,10 +102,10 @@ void FeatureGenerator::OnLocalization(
         learning_data_file_index_, ".bin");
     WriteOutLearningData(learning_data_, file_name);
   }
-  learning_data_frame_ = learning_data_.add_learning_data();
 }
 
 void FeatureGenerator::OnChassis(const apollo::canbus::Chassis& chassis) {
+  /* To be fixed
   if (learning_data_frame_ == nullptr) {
     AERROR << "learning_data_frame_ pointer is nullptr";
     return;
@@ -123,6 +116,7 @@ void FeatureGenerator::OnChassis(const apollo::canbus::Chassis& chassis) {
   features->set_brake_percentage(chassis.brake_percentage());
   features->set_steering_percentage(chassis.steering_percentage());
   features->set_gear_location(chassis.gear_location());
+  */
 }
 
 void FeatureGenerator::OnTafficLightDetection(
@@ -194,28 +188,29 @@ void FeatureGenerator::GenerateTrajectoryPoints(
 }
 
 void FeatureGenerator::GenerateLearningDataFrame() {
+  auto learning_data_frame = learning_data_.add_learning_data();
   // add timestamp_sec & frame_num
-  learning_data_frame_->set_timestamp_sec(
+  learning_data_frame->set_timestamp_sec(
       localization_for_label_.back().header().timestamp_sec());
-  learning_data_frame_->set_frame_num(total_learning_data_frame_num_++);
+  learning_data_frame->set_frame_num(total_learning_data_frame_num_++);
 
   // add traffic_light
-  learning_data_frame_->clear_traffic_light();
+  learning_data_frame->clear_traffic_light();
   for (const auto& tl : traffic_lights_) {
-    auto traffic_light = learning_data_frame_->add_traffic_light();
+    auto traffic_light = learning_data_frame->add_traffic_light();
     traffic_light->set_id(tl.first);
     traffic_light->set_color(tl.second);
   }
 
   // add routing
-  auto features = learning_data_frame_->mutable_routing_response();
+  auto features = learning_data_frame->mutable_routing_response();
   features->Clear();
   for (const auto& lane_id : routing_lane_ids_) {
     features->add_lane_id(lane_id);
   }
 
   // add trajectory_points
-  GenerateTrajectoryPoints(localization_for_label_, learning_data_frame_);
+  GenerateTrajectoryPoints(localization_for_label_, learning_data_frame);
 }
 
 void FeatureGenerator::ProcessOfflineData(const std::string& record_filename) {

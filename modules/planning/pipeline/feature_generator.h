@@ -56,7 +56,6 @@ class FeatureGenerator {
                             const std::string& file_name);
 
  private:
-  LearningDataFrame* learning_data_frame_ = nullptr;  // not owned
   LearningData learning_data_;
   int learning_data_file_index_ = 0;
   std::list<apollo::localization::LocalizationEstimate>
