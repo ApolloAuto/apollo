@@ -38,7 +38,7 @@ using apollo::hdmap::PathOverlap;
 uint32_t CreepDecider::creep_clear_counter_ = 0;
 
 CreepDecider::CreepDecider(const TaskConfig& config) : Decider(config) {
-  CHECK(config_.has_creep_decider_config());
+  ACHECK(config_.has_creep_decider_config());
 }
 
 Status CreepDecider::Process(Frame* frame,

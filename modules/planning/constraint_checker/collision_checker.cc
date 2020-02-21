@@ -117,7 +117,7 @@ void CollisionChecker::BuildPredictedEnvironment(
     const std::vector<const Obstacle*>& obstacles, const double ego_vehicle_s,
     const double ego_vehicle_d,
     const std::vector<PathPoint>& discretized_reference_line) {
-  CHECK(predicted_bounding_rectangles_.empty());
+  ACHECK(predicted_bounding_rectangles_.empty());
 
   // If the ego vehicle is in lane,
   // then, ignore all obstacles from the same lane.

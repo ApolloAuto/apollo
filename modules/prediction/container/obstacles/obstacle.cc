@@ -53,33 +53,33 @@ PerceptionObstacle::Type Obstacle::type() const { return type_; }
 int Obstacle::id() const { return id_; }
 
 double Obstacle::timestamp() const {
-  CHECK(!feature_history_.empty());
+  ACHECK(!feature_history_.empty());
   return feature_history_.front().timestamp();
 }
 
 const Feature& Obstacle::feature(const size_t i) const {
-  CHECK(i < feature_history_.size());
+  ACHECK(i < feature_history_.size());
   return feature_history_[i];
 }
 
 Feature* Obstacle::mutable_feature(const size_t i) {
-  CHECK(!feature_history_.empty());
-  CHECK(i < feature_history_.size());
+  ACHECK(!feature_history_.empty());
+  ACHECK(i < feature_history_.size());
   return &feature_history_[i];
 }
 
 const Feature& Obstacle::latest_feature() const {
-  CHECK(!feature_history_.empty());
+  ACHECK(!feature_history_.empty());
   return feature_history_.front();
 }
 
 const Feature& Obstacle::earliest_feature() const {
-  CHECK(!feature_history_.empty());
+  ACHECK(!feature_history_.empty());
   return feature_history_.back();
 }
 
 Feature* Obstacle::mutable_latest_feature() {
-  CHECK(!feature_history_.empty());
+  ACHECK(!feature_history_.empty());
   return &(feature_history_.front());
 }
 
@@ -248,7 +248,7 @@ void Obstacle::BuildJunctionFeature() {
   }
   const Feature& prev_feature = feature(1);
   if (prev_feature.junction_feature().has_enter_lane()) {
-    CHECK(prev_feature.junction_feature().enter_lane().has_lane_id());
+    ACHECK(prev_feature.junction_feature().enter_lane().has_lane_id());
     std::string enter_lane_id =
         prev_feature.junction_feature().enter_lane().lane_id();
     // TODO(all) use enter lane when tracking is better

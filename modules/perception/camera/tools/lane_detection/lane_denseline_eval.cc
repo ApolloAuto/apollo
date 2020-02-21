@@ -106,7 +106,7 @@ int lane_postprocessor_eval() {
     // Image data initialized
     CameraFrame frame;
     cv::Mat img = cv::imread(impath);
-    CHECK(!img.empty()) << "input image is empty.";
+    ACHECK(!img.empty()) << "input image is empty.";
     std::shared_ptr<base::SyncedMemory> img_gpu_data;
     int size = img.cols * img.rows * img.channels();
     img_gpu_data.reset(new base::SyncedMemory(size, true));
@@ -145,7 +145,7 @@ int lane_postprocessor_eval() {
     calibration_service.reset(
         BaseCalibrationServiceRegisterer::GetInstanceByName(
             "OnlineCalibration"));
-    CHECK(calibration_service->Init(calibration_service_init_options));
+    ACHECK(calibration_service->Init(calibration_service_init_options));
 
     std::map<std::string, float> name_camera_ground_height_map;
     std::map<std::string, float> name_camera_pitch_angle_diff_map;

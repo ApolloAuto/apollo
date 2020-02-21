@@ -245,7 +245,7 @@ void MessageProcess::OnLocalization(
   auto ptr_ego_pose_container =
       ContainerManager::Instance()->GetContainer<PoseContainer>(
           AdapterConfig::LOCALIZATION);
-  CHECK(ptr_ego_pose_container != nullptr);
+  ACHECK(ptr_ego_pose_container != nullptr);
   ptr_ego_pose_container->Insert(localization);
 
   ADEBUG << "Received a localization message ["
@@ -256,7 +256,7 @@ void MessageProcess::OnPlanning(const planning::ADCTrajectory& adc_trajectory) {
   auto ptr_ego_trajectory_container =
       ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
           AdapterConfig::PLANNING_TRAJECTORY);
-  CHECK(ptr_ego_trajectory_container != nullptr);
+  ACHECK(ptr_ego_trajectory_container != nullptr);
   ptr_ego_trajectory_container->Insert(adc_trajectory);
 
   ADEBUG << "Received a planning message [" << adc_trajectory.ShortDebugString()

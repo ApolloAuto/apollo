@@ -266,8 +266,8 @@ bool CameraGroundPlaneDetector::DetetGround(float pitch, float camera_height,
       GetGround3FromPitchHeight(k_mat, baseline_, ph[0], ph[1], &ground3);
       FillGroundModel(ground3);
     } else {
-      CHECK(fabs(pitch) < params_.max_tilt_angle);
-      CHECK(camera_height < params_.max_camera_ground_height);
+      ACHECK(fabs(pitch) < params_.max_tilt_angle);
+      ACHECK(camera_height < params_.max_camera_ground_height);
       CHECK_GT(camera_height, 0.f);
       GetGround3FromPitchHeight(k_mat, baseline_, pitch, camera_height,
                                 &ground3);

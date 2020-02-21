@@ -46,13 +46,13 @@ void PiecewiseAccelerationTrajectory1d::AppendSegment(const double a,
   double t0 = t_.back();
 
   double v1 = v0 + a * t_duration;
-  CHECK(v1 >= -FLAGS_numerical_epsilon);
+  ACHECK(v1 >= -FLAGS_numerical_epsilon);
 
   double delta_s = (v0 + v1) * t_duration * 0.5;
   double s1 = s0 + delta_s;
   double t1 = t0 + t_duration;
 
-  CHECK(s1 >= s0 - FLAGS_numerical_epsilon);
+  ACHECK(s1 >= s0 - FLAGS_numerical_epsilon);
   s1 = std::max(s1, s0);
   s_.push_back(s1);
   v_.push_back(v1);
@@ -82,7 +82,7 @@ std::string PiecewiseAccelerationTrajectory1d::ToString() const {
 double PiecewiseAccelerationTrajectory1d::Evaluate(const std::uint32_t order,
                                                    const double param) const {
   CHECK_GT(t_.size(), 1);
-  CHECK(t_.front() <= param && param <= t_.back());
+  ACHECK(t_.front() <= param && param <= t_.back());
 
   switch (order) {
     case 0:
@@ -140,7 +140,7 @@ double PiecewiseAccelerationTrajectory1d::Evaluate_j(const double t) const {
 std::array<double, 4> PiecewiseAccelerationTrajectory1d::Evaluate(
     const double t) const {
   CHECK_GT(t_.size(), 1);
-  CHECK(t_.front() <= t && t <= t_.back());
+  ACHECK(t_.front() <= t && t <= t_.back());
 
   auto it_lower = std::lower_bound(t_.begin(), t_.end(), t);
   auto index = std::distance(t_.begin(), it_lower);

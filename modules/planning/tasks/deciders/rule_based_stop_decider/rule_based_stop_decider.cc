@@ -43,7 +43,7 @@ constexpr double kStraightForwardLineCost = 10.0;
 
 RuleBasedStopDecider::RuleBasedStopDecider(const TaskConfig &config)
     : Decider(config) {
-  CHECK(config.has_rule_based_stop_decider_config());
+  ACHECK(config.has_rule_based_stop_decider_config());
   rule_based_stop_decider_config_ = config.rule_based_stop_decider_config();
 }
 

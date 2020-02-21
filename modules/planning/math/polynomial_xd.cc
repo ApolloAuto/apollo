@@ -32,7 +32,7 @@ PolynomialXd::PolynomialXd(const std::uint32_t order)
 
 PolynomialXd::PolynomialXd(const std::vector<double>& params)
     : params_(params) {
-  CHECK(!params.empty());
+  ACHECK(!params.empty());
 }
 
 std::uint32_t PolynomialXd::order() const {
@@ -40,7 +40,7 @@ std::uint32_t PolynomialXd::order() const {
 }
 
 void PolynomialXd::SetParams(const std::vector<double>& params) {
-  CHECK(!params.empty());
+  ACHECK(!params.empty());
   params_ = params;
 }
 

@@ -29,22 +29,22 @@ using cyber::common::GetAbsolutePath;
 bool MlfTracker::Init(const MlfTrackerInitOptions options) {
   auto config_manager = lib::ConfigManager::Instance();
   const lib::ModelConfig* model_config = nullptr;
-  CHECK(config_manager->GetModelConfig(Name(), &model_config));
+  ACHECK(config_manager->GetModelConfig(Name(), &model_config));
   const std::string work_root = config_manager->work_root();
   std::string config_file;
   std::string root_path;
-  CHECK(model_config->get_value("root_path", &root_path));
+  ACHECK(model_config->get_value("root_path", &root_path));
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "mlf_tracker.conf");
   MlfTrackerConfig config;
-  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
+  ACHECK(cyber::common::GetProtoFromFile(config_file, &config));
 
   for (int i = 0; i < config.filter_name_size(); ++i) {
     const auto& name = config.filter_name(i);
     MlfBaseFilter* filter = MlfBaseFilterRegisterer::GetInstanceByName(name);
-    CHECK(filter);
+    ACHECK(filter);
     MlfFilterInitOptions filter_init_options;
-    CHECK(filter->Init(filter_init_options));
+    ACHECK(filter->Init(filter_init_options));
     filters_.push_back(filter);
     AINFO << "MlfTracker add filter: " << filter->Name();
   }

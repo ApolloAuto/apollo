@@ -113,7 +113,7 @@ void SetGlobalFlag(std::string_view flag_name, const ValueType& value,
     *flag = value;
     // Overwrite global flagfile.
     std::ofstream fout(kGlobalFlagfile, std::ios_base::app);
-    CHECK(fout) << "Fail to open global flagfile " << kGlobalFlagfile;
+    ACHECK(fout) << "Fail to open global flagfile " << kGlobalFlagfile;
     fout << "\n--" << flag_name << "=" << value << std::endl;
   }
 }
@@ -157,7 +157,7 @@ HMIConfig HMIWorker::LoadConfig() {
   // Get available modes, maps and vehicles by listing data directory.
   *config.mutable_modes() =
       ListFilesAsDict(FLAGS_hmi_modes_config_path, ".pb.txt");
-  CHECK(!config.modes().empty())
+  ACHECK(!config.modes().empty())
       << "No modes config loaded from " << FLAGS_hmi_modes_config_path;
 
   *config.mutable_maps() = ListDirAsDict(FLAGS_maps_data_path);
@@ -168,14 +168,14 @@ HMIConfig HMIWorker::LoadConfig() {
 
 HMIMode HMIWorker::LoadMode(const std::string& mode_config_path) {
   HMIMode mode;
-  CHECK(cyber::common::GetProtoFromFile(mode_config_path, &mode))
+  ACHECK(cyber::common::GetProtoFromFile(mode_config_path, &mode))
       << "Unable to parse HMIMode from file " << mode_config_path;
   // Translate cyber_modules to regular modules.
   for (const auto& iter : mode.cyber_modules()) {
     const std::string& module_name = iter.first;
     const CyberModule& cyber_module = iter.second;
     // Each cyber module should have at least one dag file.
-    CHECK(!cyber_module.dag_files().empty())
+    ACHECK(!cyber_module.dag_files().empty())
         << "None dag file is provided for " << module_name << " module in "
         << mode_config_path;
 
@@ -464,7 +464,7 @@ void HMIWorker::ChangeVehicle(const std::string& vehicle_name) {
   }
   ResetMode();
 
-  CHECK(VehicleManager::Instance()->UseVehicle(*vehicle_dir));
+  ACHECK(VehicleManager::Instance()->UseVehicle(*vehicle_dir));
 }
 
 void HMIWorker::ChangeMode(const std::string& mode_name) {

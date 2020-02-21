@@ -59,7 +59,7 @@ std::string getLocalTimeFileStr(const std::string &gpsbin_folder) {
   std::strftime(local_time_char, sizeof(local_time_char), "%Y%m%d_%H%M%S",
                 &time_tm);
   std::string local_time_str = local_time_char;
-  CHECK(cyber::common::EnsureDirectory(gpsbin_folder))
+  ACHECK(cyber::common::EnsureDirectory(gpsbin_folder))
       << "gbsbin folder : " << gpsbin_folder << " create fail";
   std::string local_time_file_str =
       gpsbin_folder + "/" + local_time_str + ".bin";

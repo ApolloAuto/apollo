@@ -282,19 +282,19 @@ void MPCController::LoadMPCGainScheduler(
   }
 
   lat_err_interpolation_.reset(new Interpolation1D);
-  CHECK(lat_err_interpolation_->Init(xy1))
+  ACHECK(lat_err_interpolation_->Init(xy1))
       << "Fail to load lateral error gain scheduler for MPC controller";
 
   heading_err_interpolation_.reset(new Interpolation1D);
-  CHECK(heading_err_interpolation_->Init(xy2))
+  ACHECK(heading_err_interpolation_->Init(xy2))
       << "Fail to load heading error gain scheduler for MPC controller";
 
   feedforwardterm_interpolation_.reset(new Interpolation1D);
-  CHECK(feedforwardterm_interpolation_->Init(xy2))
+  ACHECK(feedforwardterm_interpolation_->Init(xy2))
       << "Fail to load feed forward term gain scheduler for MPC controller";
 
   steer_weight_interpolation_.reset(new Interpolation1D);
-  CHECK(steer_weight_interpolation_->Init(xy2))
+  ACHECK(steer_weight_interpolation_->Init(xy2))
       << "Fail to load steer weight gain scheduler for MPC controller";
 }
 
@@ -559,7 +559,7 @@ void MPCController::LoadControlCalibrationTable(
                                   calibration.command()));
   }
   control_interpolation_.reset(new Interpolation2D);
-  CHECK(control_interpolation_->Init(xyz))
+  ACHECK(control_interpolation_->Init(xyz))
       << "Fail to load control calibration table";
 }
 

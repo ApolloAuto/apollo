@@ -38,7 +38,7 @@ class RouteSegmentsTest : public ::testing::Test {
     AINFO << "map file: " << FLAGS_test_map_file;
     if (hdmap_.LoadMapFromFile(FLAGS_test_map_file) != 0) {
       AERROR << "Failed to load map: " << FLAGS_test_map_file;
-      CHECK(false);
+      ACHECK(false);
     }
   }
 

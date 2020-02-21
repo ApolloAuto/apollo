@@ -109,7 +109,7 @@ Status PathBoundsDecider::Process(
     if (!ret.ok()) {
       AWARN << "Cannot generate a pullover path bound, do regular planning.";
     } else {
-      CHECK(!pull_over_path_bound.empty());
+      ACHECK(!pull_over_path_bound.empty());
       CHECK_LE(adc_frenet_l_, std::get<2>(pull_over_path_bound[0]));
       CHECK_GE(adc_frenet_l_, std::get<1>(pull_over_path_bound[0]));
 
@@ -909,7 +909,7 @@ bool PathBoundsDecider::GetBoundaryFromRoads(
     const ReferenceLineInfo& reference_line_info, PathBound* const path_bound) {
   // Sanity checks.
   CHECK_NOTNULL(path_bound);
-  CHECK(!path_bound->empty());
+  ACHECK(!path_bound->empty());
   const ReferenceLine& reference_line = reference_line_info.reference_line();
 
   // Go through every point, update the boudnary based on the road boundary.
@@ -963,7 +963,7 @@ bool PathBoundsDecider::GetBoundaryFromLanes(
     std::string* const borrow_lane_type) {
   // Sanity checks.
   CHECK_NOTNULL(path_bound);
-  CHECK(!path_bound->empty());
+  ACHECK(!path_bound->empty());
   const ReferenceLine& reference_line = reference_line_info.reference_line();
 
   // Go through every point, update the boundary based on lane-info.
@@ -1062,7 +1062,7 @@ bool PathBoundsDecider::GetBoundaryFromADC(
     PathBound* const path_bound) {
   // Sanity checks.
   CHECK_NOTNULL(path_bound);
-  CHECK(!path_bound->empty());
+  ACHECK(!path_bound->empty());
 
   // Calculate the ADC's lateral boundary.
   static constexpr double kMaxLateralAccelerations = 1.5;
@@ -1096,7 +1096,7 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
     PathBound* const path_bound, std::string* const borrow_lane_type) {
   // Sanity checks.
   CHECK_NOTNULL(path_bound);
-  CHECK(!path_bound->empty());
+  ACHECK(!path_bound->empty());
   const ReferenceLine& reference_line = reference_line_info.reference_line();
 
   // Go through every point, update the boundary based on lane info and
@@ -1805,7 +1805,7 @@ void PathBoundsDecider::RecordDebugInfo(
     const PathBound& path_boundaries, const std::string& debug_name,
     ReferenceLineInfo* const reference_line_info) {
   // Sanity checks.
-  CHECK(!path_boundaries.empty());
+  ACHECK(!path_boundaries.empty());
   CHECK_NOTNULL(reference_line_info);
 
   // Take the left and right path boundaries, and transform them into two

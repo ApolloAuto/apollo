@@ -35,14 +35,14 @@ apollo::common::Status Routing::Init() {
   const auto routing_map_file = apollo::hdmap::RoutingMapFile();
   AINFO << "Use routing topology graph path: " << routing_map_file;
   navigator_ptr_.reset(new Navigator(routing_map_file));
-  CHECK(
+  ACHECK(
       cyber::common::GetProtoFromFile(FLAGS_routing_conf_file, &routing_conf_))
       << "Unable to load routing conf file: " + FLAGS_routing_conf_file;
 
   AINFO << "Conf file: " << FLAGS_routing_conf_file << " is loaded.";
 
   hdmap_ = apollo::hdmap::HDMapUtil::BaseMapPtr();
-  CHECK(hdmap_) << "Failed to load map file:" << apollo::hdmap::BaseMapFile();
+  ACHECK(hdmap_) << "Failed to load map file:" << apollo::hdmap::BaseMapFile();
 
   return apollo::common::Status::OK();
 }

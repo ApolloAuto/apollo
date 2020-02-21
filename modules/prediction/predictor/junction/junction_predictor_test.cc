@@ -32,7 +32,7 @@ class JunctionPredictorTest : public KMLMapBasedTest {
     const std::string file =
         "modules/prediction/testdata/"
         "single_perception_vehicle_injunction.pb.txt";
-    CHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
+    ACHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
     FLAGS_enable_all_junction = true;
     JunctionAnalyzer::Init("j2");
   }

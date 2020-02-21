@@ -806,8 +806,8 @@ int ContainsOutOnReverseLane(
 
 int GetBackToInLaneIndex(
     const std::vector<PathPointDecision>& path_point_decision) {
-  // CHECK(!path_point_decision.empty());
-  // CHECK(std::get<1>(path_point_decision.back()) ==
+  // ACHECK(!path_point_decision.empty());
+  // ACHECK(std::get<1>(path_point_decision.back()) ==
   //       PathData::PathPointType::IN_LANE);
 
   for (int i = static_cast<int>(path_point_decision.size()) - 1; i >= 0; --i) {

@@ -119,7 +119,7 @@ void DataCollectionMonitor::LoadConfiguration() {
     data_collection_config_path = FLAGS_default_data_collection_config_path;
   }
 
-  CHECK(cyber::common::GetProtoFromFile(data_collection_config_path,
+  ACHECK(cyber::common::GetProtoFromFile(data_collection_config_path,
                                         &data_collection_table_))
       << "Unable to parse data collection configuration from file "
       << data_collection_config_path;

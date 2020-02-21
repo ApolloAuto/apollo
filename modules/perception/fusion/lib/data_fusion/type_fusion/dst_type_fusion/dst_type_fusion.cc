@@ -144,7 +144,7 @@ void DstTypeFusion::UpdateWithoutMeasurement(const std::string &sensor_id,
     SensorDataManager *sensor_data_manager = SensorDataManager::Instance();
     base::BaseCameraModelPtr camera_model =
         sensor_data_manager->GetCameraIntrinsic(sensor_id);
-    CHECK(camera_model != nullptr)
+    ACHECK(camera_model != nullptr)
         << "Failed to get camera intrinsic for " << sensor_id;
 
     Eigen::Affine3d sensor2world_pose;
@@ -252,7 +252,7 @@ Dst DstTypeFusion::TypeProbsToDst(const std::vector<float> &type_probs) {
   //         find_res->second += (1 - type_probs_sum);
   //     }
   // }
-  CHECK(res_dst.SetBba(res_bba_map));
+  ACHECK(res_dst.SetBba(res_bba_map));
   return res_dst;
 }
 

@@ -285,11 +285,11 @@ void LatController::LoadLatGainScheduler(
   }
 
   lat_err_interpolation_.reset(new Interpolation1D);
-  CHECK(lat_err_interpolation_->Init(xy1))
+  ACHECK(lat_err_interpolation_->Init(xy1))
       << "Fail to load lateral error gain scheduler";
 
   heading_err_interpolation_.reset(new Interpolation1D);
-  CHECK(heading_err_interpolation_->Init(xy2))
+  ACHECK(heading_err_interpolation_->Init(xy2))
       << "Fail to load heading error gain scheduler";
 }
 

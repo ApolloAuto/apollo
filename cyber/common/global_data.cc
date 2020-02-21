@@ -55,7 +55,7 @@ char* program_path() {
 
 GlobalData::GlobalData() {
   InitHostInfo();
-  CHECK(InitConfig());
+  ACHECK(InitConfig());
   process_id_ = getpid();
   char* prog_path = program_path();
   if (prog_path) {

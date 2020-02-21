@@ -123,53 +123,53 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
 
 void ScenarioManager::RegisterScenarios() {
   // lane_follow
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_lane_follow_config_file,
+  ACHECK(Scenario::LoadConfig(FLAGS_scenario_lane_follow_config_file,
                              &config_map_[ScenarioConfig::LANE_FOLLOW]));
 
   // bare_intersection
-  CHECK(Scenario::LoadConfig(
+  ACHECK(Scenario::LoadConfig(
       FLAGS_scenario_bare_intersection_unprotected_config_file,
       &config_map_[ScenarioConfig::BARE_INTERSECTION_UNPROTECTED]));
 
   // emergency_pull_over
-  CHECK(
+  ACHECK(
       Scenario::LoadConfig(FLAGS_scenario_emergency_pull_over_config_file,
                            &config_map_[ScenarioConfig::EMERGENCY_PULL_OVER]));
 
   // emergency_stop
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_emergency_stop_config_file,
+  ACHECK(Scenario::LoadConfig(FLAGS_scenario_emergency_stop_config_file,
                              &config_map_[ScenarioConfig::EMERGENCY_STOP]));
 
   // park_and_go
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_park_and_go_config_file,
+  ACHECK(Scenario::LoadConfig(FLAGS_scenario_park_and_go_config_file,
                              &config_map_[ScenarioConfig::PARK_AND_GO]));
 
   // pull_over
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_pull_over_config_file,
+  ACHECK(Scenario::LoadConfig(FLAGS_scenario_pull_over_config_file,
                              &config_map_[ScenarioConfig::PULL_OVER]));
 
   // stop_sign
-  CHECK(Scenario::LoadConfig(
+  ACHECK(Scenario::LoadConfig(
       FLAGS_scenario_stop_sign_unprotected_config_file,
       &config_map_[ScenarioConfig::STOP_SIGN_UNPROTECTED]));
 
   // traffic_light
-  CHECK(Scenario::LoadConfig(
+  ACHECK(Scenario::LoadConfig(
       FLAGS_scenario_traffic_light_protected_config_file,
       &config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]));
-  CHECK(Scenario::LoadConfig(
+  ACHECK(Scenario::LoadConfig(
       FLAGS_scenario_traffic_light_unprotected_left_turn_config_file,
       &config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN]));
-  CHECK(Scenario::LoadConfig(
+  ACHECK(Scenario::LoadConfig(
       FLAGS_scenario_traffic_light_unprotected_right_turn_config_file,
       &config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN]));
 
   // valet parking
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_valet_parking_config_file,
+  ACHECK(Scenario::LoadConfig(FLAGS_scenario_valet_parking_config_file,
                              &config_map_[ScenarioConfig::VALET_PARKING]));
 
   // yield_sign
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_yield_sign_config_file,
+  ACHECK(Scenario::LoadConfig(FLAGS_scenario_yield_sign_config_file,
                              &config_map_[ScenarioConfig::YIELD_SIGN]));
 }
 
@@ -776,7 +776,7 @@ void ScenarioManager::Observe(const Frame& frame) {
 
 void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
                              const Frame& frame) {
-  CHECK(!frame.reference_line_info().empty());
+  ACHECK(!frame.reference_line_info().empty());
 
   Observe(frame);
 
@@ -785,7 +785,7 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
 
 void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
                                        const Frame& frame) {
-  CHECK(!frame.reference_line_info().empty());
+  ACHECK(!frame.reference_line_info().empty());
 
   ////////////////////////////////////////
   // default: LANE_FOLLOW

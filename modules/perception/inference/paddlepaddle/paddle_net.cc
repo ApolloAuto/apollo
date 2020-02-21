@@ -72,7 +72,7 @@ bool PaddleNet::Init(const std::map<std::string, std::vector<int>> &shapes) {
     input_t->copy_from_cpu(input_data[index].data());
     index += 1;
   }
-  CHECK(predictor_->ZeroCopyRun());
+  ACHECK(predictor_->ZeroCopyRun());
   for (auto name : output_names_) {
     if (name_map_.find(name) == name_map_.end()) {
       continue;

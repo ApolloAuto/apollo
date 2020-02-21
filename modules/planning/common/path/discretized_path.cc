@@ -40,7 +40,7 @@ double DiscretizedPath::Length() const {
 }
 
 PathPoint DiscretizedPath::Evaluate(const double path_s) const {
-  CHECK(!empty());
+  ACHECK(!empty());
   auto it_lower = QueryLowerBound(path_s);
   if (it_lower == begin()) {
     return front();
@@ -61,7 +61,7 @@ std::vector<PathPoint>::const_iterator DiscretizedPath::QueryLowerBound(
 }
 
 PathPoint DiscretizedPath::EvaluateReverse(const double path_s) const {
-  CHECK(!empty());
+  ACHECK(!empty());
   auto it_upper = QueryUpperBound(path_s);
   if (it_upper == begin()) {
     return front();

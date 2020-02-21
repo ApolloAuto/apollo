@@ -37,7 +37,7 @@ using apollo::common::VehicleConfigHelper;
 
 PiecewiseJerkPathOptimizer::PiecewiseJerkPathOptimizer(const TaskConfig& config)
     : PathOptimizer(config) {
-  CHECK(config_.has_piecewise_jerk_path_config());
+  ACHECK(config_.has_piecewise_jerk_path_config());
 }
 
 common::Status PiecewiseJerkPathOptimizer::Process(
@@ -270,9 +270,9 @@ FrenetFramePath PiecewiseJerkPathOptimizer::ToPiecewiseJerkPath(
     const std::vector<double>& x, const std::vector<double>& dx,
     const std::vector<double>& ddx, const double delta_s,
     const double start_s) const {
-  CHECK(!x.empty());
-  CHECK(!dx.empty());
-  CHECK(!ddx.empty());
+  ACHECK(!x.empty());
+  ACHECK(!dx.empty());
+  ACHECK(!ddx.empty());
 
   PiecewiseJerkTrajectory1d piecewise_jerk_traj(x.front(), dx.front(),
                                                 ddx.front());

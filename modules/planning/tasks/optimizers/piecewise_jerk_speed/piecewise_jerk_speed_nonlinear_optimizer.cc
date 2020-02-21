@@ -49,7 +49,7 @@ PiecewiseJerkSpeedNonlinearOptimizer::PiecewiseJerkSpeedNonlinearOptimizer(
     : SpeedOptimizer(config),
       smoothed_speed_limit_(0.0, 0.0, 0.0),
       smoothed_path_curvature_(0.0, 0.0, 0.0) {
-  CHECK(config_.has_piecewise_jerk_nonlinear_speed_config());
+  ACHECK(config_.has_piecewise_jerk_nonlinear_speed_config());
 }
 
 Status PiecewiseJerkSpeedNonlinearOptimizer::Process(

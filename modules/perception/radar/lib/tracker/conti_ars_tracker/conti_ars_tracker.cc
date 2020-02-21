@@ -80,7 +80,7 @@ bool ContiArsTracker::Init() {
   }
 
   track_manager_ = new RadarTrackManager();
-  CHECK(track_manager_ != nullptr)
+  ACHECK(track_manager_ != nullptr)
       << "Failed to get RadarTrackManager instance.";
   return state;
 }

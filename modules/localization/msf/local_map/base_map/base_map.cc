@@ -44,8 +44,8 @@ BaseMap::~BaseMap() {
 }
 
 void BaseMap::InitMapNodeCaches(int cacheL1_size, int cahceL2_size) {
-  CHECK(map_node_cache_lvl1_ == nullptr);
-  CHECK(map_node_cache_lvl2_ == nullptr);
+  ACHECK(map_node_cache_lvl1_ == nullptr);
+  ACHECK(map_node_cache_lvl2_ == nullptr);
   map_node_cache_lvl1_ =
       new MapNodeCacheL1<MapNodeIndex, BaseMapNode>(cacheL1_size);
   map_node_cache_lvl2_ =
@@ -175,7 +175,7 @@ void BaseMap::LoadMapNodes(std::set<MapNodeIndex>* map_ids) {
   }
   lock2.unlock();
 
-  CHECK(map_ids->empty());
+  ACHECK(map_ids->empty());
 }
 
 void BaseMap::PreloadMapNodes(std::set<MapNodeIndex>* map_ids) {

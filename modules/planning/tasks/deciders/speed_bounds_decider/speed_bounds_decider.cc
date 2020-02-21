@@ -41,7 +41,7 @@ using apollo::planning_internal::STGraphDebug;
 
 SpeedBoundsDecider::SpeedBoundsDecider(const TaskConfig &config)
     : Decider(config) {
-  CHECK(config.has_speed_bounds_decider_config());
+  ACHECK(config.has_speed_bounds_decider_config());
   speed_bounds_config_ = config.speed_bounds_decider_config();
 }
 

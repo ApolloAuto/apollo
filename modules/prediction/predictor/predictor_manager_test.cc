@@ -33,7 +33,7 @@ class PredictorManagerTest : public KMLMapBasedTest {
   void SetUp() override {
     std::string file =
         "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
-    CHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
+    ACHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
   }
 
  protected:

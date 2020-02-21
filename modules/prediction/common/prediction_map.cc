@@ -659,8 +659,8 @@ int PredictionMap::LaneTurnType(const std::string& lane_id) {
 
 std::vector<std::shared_ptr<const LaneInfo>> PredictionMap::GetNearbyLanes(
     const common::PointENU& position, const double nearby_radius) {
-  CHECK(position.has_x() && position.has_y() && position.has_z());
-  CHECK(nearby_radius > 0.0);
+  ACHECK(position.has_x() && position.has_y() && position.has_z());
+  ACHECK(nearby_radius > 0.0);
 
   std::vector<std::shared_ptr<const LaneInfo>> nearby_lanes;
 
@@ -670,7 +670,7 @@ std::vector<std::shared_ptr<const LaneInfo>> PredictionMap::GetNearbyLanes(
 
 std::shared_ptr<const LaneInfo> PredictionMap::LaneWithSmallestAverageCurvature(
     const std::vector<std::shared_ptr<const LaneInfo>>& lane_infos) {
-  CHECK(!lane_infos.empty());
+  ACHECK(!lane_infos.empty());
   size_t sample_size = FLAGS_sample_size_for_average_lane_curvature;
   std::shared_ptr<const hdmap::LaneInfo> selected_lane_info = lane_infos[0];
   if (selected_lane_info == nullptr) {

@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
 
   apollo::routing::RoutingConfig routing_conf;
 
-  CHECK(apollo::cyber::common::GetProtoFromFile(FLAGS_routing_conf_file,
+  ACHECK(apollo::cyber::common::GetProtoFromFile(FLAGS_routing_conf_file,
                                                 &routing_conf))
       << "Unable to load routing conf file: " + FLAGS_routing_conf_file;
 
@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
   const auto routing_map = apollo::hdmap::RoutingMapFile();
 
   apollo::routing::GraphCreator creator(base_map, routing_map, routing_conf);
-  CHECK(creator.Create()) << "Create routing topo failed!";
+  ACHECK(creator.Create()) << "Create routing topo failed!";
 
   AINFO << "Create routing topo successfully from " << base_map << " to "
         << routing_map;

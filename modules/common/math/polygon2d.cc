@@ -335,7 +335,7 @@ bool Polygon2d::ComputeOverlap(const Polygon2d &other_polygon,
                                Polygon2d *const overlap_polygon) const {
   CHECK_GE(points_.size(), 3);
   CHECK_NOTNULL(overlap_polygon);
-  CHECK(is_convex_ && other_polygon.is_convex());
+  ACHECK(is_convex_ && other_polygon.is_convex());
   std::vector<Vec2d> points = other_polygon.points();
   for (int i = 0; i < num_points_; ++i) {
     if (!ClipConvexHull(line_segments_[i], &points)) {
@@ -523,7 +523,7 @@ Box2d Polygon2d::MinAreaBoundingBox() const {
   if (!is_convex_) {
     Polygon2d convex_polygon;
     ComputeConvexHull(points_, &convex_polygon);
-    CHECK(convex_polygon.is_convex());
+    ACHECK(convex_polygon.is_convex());
     return convex_polygon.MinAreaBoundingBox();
   }
   double min_area = std::numeric_limits<double>::infinity();
@@ -581,7 +581,7 @@ Polygon2d Polygon2d::ExpandByDistance(const double distance) const {
   if (!is_convex_) {
     Polygon2d convex_polygon;
     ComputeConvexHull(points_, &convex_polygon);
-    CHECK(convex_polygon.is_convex());
+    ACHECK(convex_polygon.is_convex());
     return convex_polygon.ExpandByDistance(distance);
   }
   const double kMinAngle = 0.1;
@@ -603,7 +603,7 @@ Polygon2d Polygon2d::ExpandByDistance(const double distance) const {
     }
   }
   Polygon2d new_polygon;
-  CHECK(ComputeConvexHull(points, &new_polygon));
+  ACHECK(ComputeConvexHull(points, &new_polygon));
   return new_polygon;
 }
 

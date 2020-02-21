@@ -35,7 +35,7 @@ using apollo::common::Status;
 
 PathTimeHeuristicOptimizer::PathTimeHeuristicOptimizer(const TaskConfig& config)
     : SpeedOptimizer(config) {
-  CHECK(config.has_speed_heuristic_config());
+  ACHECK(config.has_speed_heuristic_config());
   speed_heuristic_config_ = config.speed_heuristic_config();
 }
 
