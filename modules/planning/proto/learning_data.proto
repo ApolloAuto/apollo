@@ -51,22 +51,30 @@ message LocalizationFeature {
   optional apollo.common.Point3D angular_velocity = 5;
 }
 
-message ObstacleFeature {
-  optional int32 id = 1;  // obstacle ID.
+message ObstacleTrajectoryPoint {
+  optional double timestamp = 1;  // GPS time in seconds.
 
-  // obstacle position in the OBJECT coordinate system.
+  // obstacle position in the OBJECT coordinate system
   optional apollo.common.Point3D position = 2;
 
-  optional double theta = 3;  // heading in the world coordinate system.
-  optional apollo.common.Point3D velocity = 4;  // obstacle velocity.
+  // heading in OBJECT coordinate system
+  optional double theta = 3;
 
-  // Size of obstacle bounding box.
-  optional double length = 5;  // obstacle length.
-  optional double width = 6;   // obstacle width.
-  optional double height = 7;  // obstacle height.
+  // obstacle velocity in OBJECT coordinate system
+  optional apollo.common.Point3D velocity = 4;  // obstacle velocity
 
-  // obstacle corner points in in the OBJECT coordinate system.
-  repeated apollo.common.Point3D polygon_point = 8;
+  // obstacle corner points in OBJECT coordinate system
+  repeated apollo.common.Point3D polygon_point = 5;
+
+  // obstacle acceleration in OBJECT coordinate system
+  optional apollo.common.Point3D acceleration = 6;
+}
+
+message ObstacleFeature {
+  optional int32 id = 1;  // obstacle ID.
+  optional double length = 2;  // obstacle length.
+  optional double width = 3;   // obstacle width.
+  optional double height = 4;  // obstacle height.
 
   enum Type {
     UNKNOWN = 0;
@@ -76,16 +84,9 @@ message ObstacleFeature {
     BICYCLE = 4;     // bike, motor bike
     VEHICLE = 5;     // Passenger car or truck.
   };
-  optional Type type = 10;         // obstacle type
-  optional double timestamp = 11;  // GPS time in seconds.
+  optional Type type = 5;         // obstacle type
 
-  // The following fields are new added in Apollo 4.0
-  optional apollo.common.Point3D acceleration = 16;  // obstacle acceleration
-}
-
-message ObstacleData {
-  optional int32 id = 1;  // obstacle ID.
-  repeated ObstacleFeature obstacle_feature = 2;
+  repeated ObstacleTrajectoryPoint obstacle_trajectory_point = 6;
 }
 
 message RoutingResponseFeature {
@@ -112,7 +113,7 @@ message LearningDataFrame {
   optional LocalizationFeature localization = 4;
 
   // Features from perception obstacles
-  repeated ObstacleData obstacle = 5;
+  repeated ObstacleFeature obstacle = 5;
 
   // Features from routing
   optional RoutingResponseFeature routing_response = 6;
