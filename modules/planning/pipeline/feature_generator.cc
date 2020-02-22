@@ -31,6 +31,8 @@ DEFINE_int32(localization_freq, 100, "frequence of localization message");
 DEFINE_int32(planning_freq, 10, "frequence of planning message");
 DEFINE_int32(learning_data_frame_num_per_file, 100,
              "number of learning_data_frame to write out in one data file.");
+DEFINE_int32(learning_data_obstacle_history_point_cnt, 20,
+             "number of history trajectory points for a obstacle");
 DEFINE_bool(enable_binary_learning_data, true,
             "True to generate protobuf binary data file.");
 
@@ -41,6 +43,7 @@ using apollo::canbus::Chassis;
 using apollo::cyber::record::RecordMessage;
 using apollo::cyber::record::RecordReader;
 using apollo::localization::LocalizationEstimate;
+using apollo::perception::PerceptionObstacles;
 using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
 
@@ -103,6 +106,56 @@ void FeatureGenerator::OnChassis(const apollo::canbus::Chassis& chassis) {
   chassis_feature_.set_brake_percentage(chassis.brake_percentage());
   chassis_feature_.set_steering_percentage(chassis.steering_percentage());
   chassis_feature_.set_gear_location(chassis.gear_location());
+}
+
+void FeatureGenerator::OnPerceptionObstacle(
+    const apollo::perception::PerceptionObstacles& perception_obstacles) {
+  perception_obstacles_map_.clear();
+  for (int i = 0; i < perception_obstacles.perception_obstacle_size(); ++i) {
+    const auto perception_obstale = perception_obstacles.perception_obstacle(i);
+    const int obstacle_id = perception_obstale.id();
+    perception_obstacles_map_[obstacle_id].CopyFrom(perception_obstale);
+  }
+
+  // erase perception obstacle not exist in current perception msg
+  std::unordered_map<int, std::list<ObstacleTrajectoryPoint>> ::iterator it =
+      obstacle_history_map_.begin();
+  while (it != obstacle_history_map_.end()) {
+    const int obstacle_id = it->first;
+    if (perception_obstacles_map_.count(obstacle_id) == 0) {
+      // not exist in current perception
+      it = obstacle_history_map_.erase(it);
+    } else {
+      it++;
+    }
+  }
+
+  for (const auto& m : perception_obstacles_map_) {
+    const auto perception_obstale = m.second;
+    ObstacleTrajectoryPoint obstacle_trajectory_point;
+    obstacle_trajectory_point.set_timestamp(perception_obstale.timestamp());
+    // TODO(all): convert from world coord to obj coord
+    obstacle_trajectory_point.mutable_position()->CopyFrom(
+        perception_obstale.position());
+    obstacle_trajectory_point.set_theta(perception_obstale.theta());
+    obstacle_trajectory_point.mutable_velocity()->CopyFrom(
+        perception_obstale.velocity());
+    for (int j = 0; j < perception_obstale.polygon_point_size(); ++j) {
+      auto polygon_point = obstacle_trajectory_point.add_polygon_point();
+      polygon_point->CopyFrom(perception_obstale.polygon_point(j));
+    }
+    obstacle_trajectory_point.mutable_acceleration()->CopyFrom(
+        perception_obstale.acceleration());
+
+    obstacle_history_map_[m.first].push_back(obstacle_trajectory_point);
+
+    // TODO(all): need to fix pop_front here
+    obstacle_history_map_[m.first].push_back(obstacle_trajectory_point);
+    if (static_cast<int>(obstacle_history_map_[m.first].size()) >=
+        FLAGS_learning_data_obstacle_history_point_cnt) {
+      obstacle_history_map_[m.first].pop_front();
+    }
+  }
 }
 
 void FeatureGenerator::OnTafficLightDetection(
@@ -231,6 +284,11 @@ void FeatureGenerator::ProcessOfflineData(const std::string& record_filename) {
       LocalizationEstimate localization;
       if (localization.ParseFromString(message.content)) {
         OnLocalization(localization);
+      }
+    } else if (message.channel_name == FLAGS_perception_obstacle_topic) {
+      PerceptionObstacles perception_obstacles;
+      if (perception_obstacles.ParseFromString(message.content)) {
+        OnPerceptionObstacle(perception_obstacles);
       }
     } else if (message.channel_name == FLAGS_routing_response_topic) {
       RoutingResponse routing_response;
