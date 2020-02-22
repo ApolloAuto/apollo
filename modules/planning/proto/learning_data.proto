@@ -5,6 +5,7 @@ package apollo.planning;
 import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/geometry.proto";
 import "modules/common/proto/pnc_point.proto";
+import "modules/perception/proto/perception_obstacle.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
 import "modules/routing/proto/routing.proto";
 
@@ -75,17 +76,7 @@ message ObstacleFeature {
   optional double length = 2;  // obstacle length.
   optional double width = 3;   // obstacle width.
   optional double height = 4;  // obstacle height.
-
-  enum Type {
-    UNKNOWN = 0;
-    UNKNOWN_MOVABLE = 1;
-    UNKNOWN_UNMOVABLE = 2;
-    PEDESTRIAN = 3;  // Pedestrian, usually determined by moving behavior.
-    BICYCLE = 4;     // bike, motor bike
-    VEHICLE = 5;     // Passenger car or truck.
-  };
-  optional Type type = 5;         // obstacle type
-
+  optional apollo.perception.PerceptionObstacle.Type type = 5;  // obstacle type
   repeated ObstacleTrajectoryPoint obstacle_trajectory_point = 6;
 }
 
