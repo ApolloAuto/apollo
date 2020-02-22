@@ -48,6 +48,8 @@ class FeatureGenerator {
   void OnTafficLightDetection(
       const apollo::perception::TrafficLightDetection& traffic_light_detection);
 
+  void GenerateObstacleData(LearningDataFrame* learning_data_frame);
+
   void GenerateTrajectoryPoints(
       const std::list<apollo::localization::LocalizationEstimate>&
           localization_for_label,

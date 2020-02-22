@@ -112,8 +112,8 @@ void FeatureGenerator::OnPerceptionObstacle(
     const apollo::perception::PerceptionObstacles& perception_obstacles) {
   perception_obstacles_map_.clear();
   for (int i = 0; i < perception_obstacles.perception_obstacle_size(); ++i) {
-    const auto& perception_obstale = perception_obstacles.perception_obstacle(i);
-
+    const auto& perception_obstale =
+        perception_obstacles.perception_obstacle(i);
     const int obstacle_id = perception_obstale.id();
     perception_obstacles_map_[obstacle_id].CopyFrom(perception_obstale);
   }
@@ -193,6 +193,35 @@ void FeatureGenerator::OnRoutingResponse(
   }
 }
 
+void FeatureGenerator::GenerateObstacleData(
+    LearningDataFrame* learning_data_frame) {
+  for (const auto& m : perception_obstacles_map_) {
+    auto obstacle_feature = learning_data_frame->add_obstacle();
+    obstacle_feature->set_id(m.first);
+    obstacle_feature->set_length(m.second.length());
+    obstacle_feature->set_width(m.second.width());
+    obstacle_feature->set_height(m.second.height());
+    obstacle_feature->set_type(m.second.type());
+
+    const auto& obstacle_history = obstacle_history_map_[m.first];
+    for (const auto& obj_traj_point : obstacle_history) {
+      auto obstacle_trajectory_point =
+          obstacle_feature->add_obstacle_trajectory_point();
+      obstacle_trajectory_point->set_timestamp(obj_traj_point.timestamp());
+      obstacle_trajectory_point->mutable_position()->CopyFrom(
+          obj_traj_point.position());
+      obstacle_trajectory_point->set_theta(obj_traj_point.theta());
+      obstacle_trajectory_point->mutable_velocity()->CopyFrom(
+          obj_traj_point.velocity());
+      obstacle_trajectory_point->mutable_polygon_point()->CopyFrom(
+          obj_traj_point.polygon_point());
+      obstacle_trajectory_point->mutable_acceleration()->CopyFrom(
+          obj_traj_point.acceleration());
+    }
+  }
+}
+
+
 void FeatureGenerator::GenerateTrajectoryPoints(
     const std::list<apollo::localization::LocalizationEstimate>&
         localization_for_label,
@@ -261,6 +290,9 @@ void FeatureGenerator::GenerateLearningDataFrame() {
   for (const auto& lane_id : routing_lane_ids_) {
     routing_response->add_lane_id(lane_id);
   }
+
+  // add obstacle
+  GenerateObstacleData(learning_data_frame);
 
   // add trajectory_points
   GenerateTrajectoryPoints(localization_for_label_, learning_data_frame);
