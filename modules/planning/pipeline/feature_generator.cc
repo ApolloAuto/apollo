@@ -112,7 +112,8 @@ void FeatureGenerator::OnPerceptionObstacle(
     const apollo::perception::PerceptionObstacles& perception_obstacles) {
   perception_obstacles_map_.clear();
   for (int i = 0; i < perception_obstacles.perception_obstacle_size(); ++i) {
-    const auto perception_obstale = perception_obstacles.perception_obstacle(i);
+    const auto& perception_obstale = perception_obstacles.perception_obstacle(i);
+
     const int obstacle_id = perception_obstale.id();
     perception_obstacles_map_[obstacle_id].CopyFrom(perception_obstale);
   }
@@ -131,7 +132,7 @@ void FeatureGenerator::OnPerceptionObstacle(
   }
 
   for (const auto& m : perception_obstacles_map_) {
-    const auto perception_obstale = m.second;
+    const auto& perception_obstale = m.second;
     ObstacleTrajectoryPoint obstacle_trajectory_point;
     obstacle_trajectory_point.set_timestamp(perception_obstale.timestamp());
     // TODO(all): convert from world coord to obj coord
@@ -149,11 +150,10 @@ void FeatureGenerator::OnPerceptionObstacle(
 
     obstacle_history_map_[m.first].push_back(obstacle_trajectory_point);
 
-    // TODO(all): need to fix pop_front here
-    obstacle_history_map_[m.first].push_back(obstacle_trajectory_point);
-    if (static_cast<int>(obstacle_history_map_[m.first].size()) >=
+    auto& obstacle_history = obstacle_history_map_[m.first];
+    if (static_cast<int>(obstacle_history.size()) >
         FLAGS_learning_data_obstacle_history_point_cnt) {
-      obstacle_history_map_[m.first].pop_front();
+      obstacle_history.pop_front();
     }
   }
 }
