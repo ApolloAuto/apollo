@@ -24,6 +24,7 @@
 #include "cyber/record/record_reader.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/util/math_util.h"
 
 DEFINE_string(planning_data_dir, "/apollo/modules/planning/data/",
               "Prefix of files to store learning_data_frame data");
@@ -135,7 +136,6 @@ void FeatureGenerator::OnPerceptionObstacle(
     const auto& perception_obstale = m.second;
     ObstacleTrajectoryPoint obstacle_trajectory_point;
     obstacle_trajectory_point.set_timestamp(perception_obstale.timestamp());
-    // TODO(all): convert from world coord to obj coord
     obstacle_trajectory_point.mutable_position()->CopyFrom(
         perception_obstale.position());
     obstacle_trajectory_point.set_theta(perception_obstale.theta());
@@ -203,20 +203,71 @@ void FeatureGenerator::GenerateObstacleData(
     obstacle_feature->set_height(m.second.height());
     obstacle_feature->set_type(m.second.type());
 
+    // ADC current position / heading
+    const auto& adc_cur_pose = localization_for_label_.back().pose();
+    const auto& adc_cur_position = std::make_pair(adc_cur_pose.position().x(),
+                                                  adc_cur_pose.position().y());
+    const auto& adc_cur_velocity =
+        std::make_pair(adc_cur_pose.linear_velocity().x(),
+                       adc_cur_pose.linear_velocity().y());
+    const auto& adc_cur_acc =
+        std::make_pair(adc_cur_pose.linear_acceleration().x(),
+                       adc_cur_pose.linear_acceleration().y());
+    const auto adc_cur_heading = adc_cur_pose.heading();
+
     const auto& obstacle_history = obstacle_history_map_[m.first];
     for (const auto& obj_traj_point : obstacle_history) {
       auto obstacle_trajectory_point =
           obstacle_feature->add_obstacle_trajectory_point();
       obstacle_trajectory_point->set_timestamp(obj_traj_point.timestamp());
-      obstacle_trajectory_point->mutable_position()->CopyFrom(
-          obj_traj_point.position());
-      obstacle_trajectory_point->set_theta(obj_traj_point.theta());
-      obstacle_trajectory_point->mutable_velocity()->CopyFrom(
-          obj_traj_point.velocity());
-      obstacle_trajectory_point->mutable_polygon_point()->CopyFrom(
-          obj_traj_point.polygon_point());
-      obstacle_trajectory_point->mutable_acceleration()->CopyFrom(
-          obj_traj_point.acceleration());
+
+      // convert position to relative coordinate
+      const auto& relative_posistion =
+          util::WorldCoordToObjCoord(
+              std::make_pair(obj_traj_point.position().x(),
+                             obj_traj_point.position().y()),
+              adc_cur_position, adc_cur_heading);
+      auto position = obstacle_trajectory_point->mutable_position();
+      position->set_x(relative_posistion.first);
+      position->set_y(relative_posistion.second);
+
+      // convert theta to relative coordinate
+      const double relative_theta =
+          util::WorldAngleToObjAngle(obj_traj_point.theta(), adc_cur_heading);
+      obstacle_trajectory_point->set_theta(relative_theta);
+
+      // convert velocity to relative coordinate
+      const auto& relative_velocity =
+          util::WorldCoordToObjCoord(
+              std::make_pair(obj_traj_point.velocity().x(),
+                             obj_traj_point.velocity().y()),
+              adc_cur_velocity, adc_cur_heading);
+      auto velocity = obstacle_trajectory_point->mutable_velocity();
+      velocity->set_x(relative_velocity.first);
+      velocity->set_y(relative_velocity.second);
+
+      // convert polygon_point(s) to relative coordinate
+      for (int i = 0; i < obj_traj_point.polygon_point_size();
+          ++i) {
+        const auto& relative_point =
+            util::WorldCoordToObjCoord(
+                std::make_pair(obj_traj_point.polygon_point(i).x(),
+                               obj_traj_point.polygon_point(i).y()),
+                adc_cur_position, adc_cur_heading);
+        auto polygon_point = obstacle_trajectory_point->add_polygon_point();
+        polygon_point->set_x(relative_point.first);
+        polygon_point->set_y(relative_point.second);
+      }
+
+      // convert acceleration to relative coordinate
+      const auto& relative_acc =
+          util::WorldCoordToObjCoord(
+              std::make_pair(obj_traj_point.acceleration().x(),
+                             obj_traj_point.acceleration().y()),
+              adc_cur_acc, adc_cur_heading);
+      auto acceleration = obstacle_trajectory_point->mutable_acceleration();
+      acceleration->set_x(relative_acc.first);
+      acceleration->set_y(relative_acc.second);
     }
   }
 }

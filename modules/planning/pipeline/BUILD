@@ -16,6 +16,7 @@ cc_library(
         "//modules/common/configs:config_gflags",
         "//modules/localization/proto:localization_proto",
         "//modules/perception/proto:perception_proto",
+        "//modules/planning/common/util:math_util_lib",        
         "//modules/planning/common/util:util_lib",
         "//modules/planning/proto:learning_data_proto",
         "//modules/prediction/util:data_extraction",

@@ -15,6 +15,8 @@
  *****************************************************************************/
 #pragma once
 
+#include <utility>
+
 #include "modules/common/math/math_utils.h"
 
 namespace apollo {
@@ -36,9 +38,9 @@ std::pair<double, double> WorldCoordToObjCoord(
 
 double WorldAngleToObjAngle(double input_world_angle,
                             double obj_world_angle) {
-  return apollo::common::math::NormalizeAngle(input_world_angle - obj_world_angle);
+  return common::math::NormalizeAngle(input_world_angle - obj_world_angle);
 }
 
-}  // namespace msf
-}  // namespace localization
+}  // namespace util
+}  // namespace planning
 }  // namespace apollo
