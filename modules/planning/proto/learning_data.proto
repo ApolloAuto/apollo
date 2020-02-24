@@ -58,16 +58,16 @@ message ObstacleTrajectoryPoint {
   // obstacle position in the OBJECT coordinate system
   optional apollo.common.Point3D position = 2;
 
-  // heading in OBJECT coordinate system
+  // heading in RELATIVE coordinate to ADC
   optional double theta = 3;
 
-  // obstacle velocity in OBJECT coordinate system
+  // obstacle velocity in RELATIVE coordinate to ADC
   optional apollo.common.Point3D velocity = 4;  // obstacle velocity
 
-  // obstacle corner points in OBJECT coordinate system
+  // obstacle corner points in RELATIVE coordinate to ADC
   repeated apollo.common.Point3D polygon_point = 5;
 
-  // obstacle acceleration in OBJECT coordinate system
+  // obstacle acceleration in RELATIVE coordinate to ADC
   optional apollo.common.Point3D acceleration = 6;
 }
 
