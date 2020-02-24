@@ -177,6 +177,7 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
         init_v = 0.0;
       }
       // TODO(Jinyun): Further testing
+      const auto smoother_start_timestamp = std::chrono::system_clock::now();
       if (FLAGS_use_iterative_anchoring_smoother) {
         if (!GenerateDecoupledTraj(
                 xWS_vec[i], last_time_u(1, 0), init_v, obstacles_vertices_vec,
@@ -222,6 +223,15 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
         ADEBUG << i << "th smoothed trajectory size is "
                << state_result_ds_vec[i].cols();
       }
+      const auto smoother_end_timestamp = std::chrono::system_clock::now();
+      std::chrono::duration<double> smoother_diff =
+          smoother_end_timestamp - smoother_start_timestamp;
+      ADEBUG << "Open space trajectory smoothing total time: "
+             << smoother_diff.count() * 1000.0 << " ms at the " << i
+             << "th trajectory.";
+      ADEBUG << "The " << i << "th trajectory pre-smoothing size is "
+             << xWS_vec[i].cols() << "; post-smoothing size is "
+             << state_result_ds_vec[i].cols();
     }
 
     // Retrive the trajectory in one piece
