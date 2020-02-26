@@ -14,6 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <limits>
 #include <unordered_map>
 
 #include "modules/routing/routing.h"
@@ -128,17 +129,42 @@ std::vector<RoutingRequest> Routing::FillLaneInfoIfMissing(
   return fixed_requests;
 }
 
+double Routing::GetRoutingLength(const RoutingResponse& routing_response) {
+  double length = 0;
+  for (int i = 0; i < routing_response.road_size(); ++i) {
+    const auto& road = routing_response.road(i);
+    for (int j = 0; j < road.passage_size(); ++j) {
+      const auto& passage = routing_response.road(i).passage(j);
+      for (int k = 0; k < passage.segment_size(); ++k) {
+        const auto& segment = passage.segment(k);
+        length += (segment.end_s() - segment.start_s());
+      }
+    }
+  }
+  return length;
+}
+
+
 bool Routing::Process(const std::shared_ptr<RoutingRequest>& routing_request,
                       RoutingResponse* const routing_response) {
   CHECK_NOTNULL(routing_response);
   AINFO << "Get new routing request:" << routing_request->DebugString();
 
   const auto& fixed_requests = FillLaneInfoIfMissing(*routing_request);
+  double min_routing_length = std::numeric_limits<double>::max();
   for (const auto& fixed_request : fixed_requests) {
-    if (navigator_ptr_->SearchRoute(fixed_request, routing_response)) {
-      monitor_logger_buffer_.INFO("Routing success!");
-      return true;
+    RoutingResponse routing_response_temp;
+    if (navigator_ptr_->SearchRoute(fixed_request, &routing_response_temp)) {
+      const double routing_length = GetRoutingLength(routing_response_temp);
+      if (routing_length < min_routing_length) {
+        routing_response->CopyFrom(routing_response_temp);
+        min_routing_length = routing_length;
+      }
     }
+  }
+  if (min_routing_length < std::numeric_limits<double>::max()) {
+    monitor_logger_buffer_.INFO("Routing success!");
+    return true;
   }
 
   AERROR << "Failed to search route with navigator.";

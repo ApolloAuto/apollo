@@ -63,6 +63,9 @@ class Routing {
   std::vector<RoutingRequest>
   FillLaneInfoIfMissing(const RoutingRequest &routing_request);
 
+  double GetRoutingLength(const RoutingResponse& routing_response);
+
+ private:
   std::unique_ptr<Navigator> navigator_ptr_;
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
 
