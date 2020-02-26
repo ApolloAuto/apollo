@@ -194,6 +194,14 @@ class PathBoundsDecider : public Decider {
       std::vector<std::tuple<double, double, double>>* const path_bound,
       std::string* const borrow_lane_type);
 
+  /** @brief Update left boundary by lane_left_width
+   *   This is for normal pull-over, which uses lane boundary as left boundary
+   *   and road_boundary for right boundary
+   */
+  void UpdatePullOverBoundaryByLaneBoundary(
+      const ReferenceLineInfo& reference_line_info,
+      std::vector<std::tuple<double, double, double>>* const path_bound);
+
   void ConvertBoundarySAxisFromLaneCenterToRefLine(
       const ReferenceLineInfo& reference_line_info,
       std::vector<std::tuple<double, double, double>>* const path_bound);

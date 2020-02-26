@@ -438,6 +438,10 @@ Status PathBoundsDecider::GeneratePullOverPathBound(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
+  // 2. Update boundary by lane boundary for pull_over
+  UpdatePullOverBoundaryByLaneBoundary(reference_line_info, path_bound);
+  // PathBoundsDebugString(*path_bound);
+
   // 3. Fine-tune the boundary based on static obstacles
   PathBound temp_path_bound = *path_bound;
   std::string blocking_obstacle_id;
@@ -585,8 +589,8 @@ bool PathBoundsDecider::FindDestinationPullOverS(
   const double adc_end_s = reference_line_info.AdcSlBoundary().end_s();
 
   // Check if destination is some distance away from ADC.
-  ADEBUG << "Destination is at s = " << destination_s
-         << ", ADC is at s = " << adc_end_s;
+  ADEBUG << "Destination s[" << destination_s
+         << "] adc_end_s[" << adc_end_s << "]";
   if (destination_s - adc_end_s < config_.path_bounds_decider_config()
                                       .pull_over_destination_to_adc_buffer()) {
     AERROR << "Destination is too close to ADC. distance["
@@ -728,17 +732,20 @@ bool PathBoundsDecider::SearchPullOverPosition(
       double curr_road_right_width = 0;
       reference_line_info.reference_line().GetRoadWidth(
           curr_s, &curr_road_left_width, &curr_road_right_width);
-      ADEBUG << "At s = " << curr_s
-             << ", the road left width = " << curr_road_left_width
-             << ", and the road right width = " << curr_road_right_width;
+      ADEBUG << "s[" << curr_s
+             << "] curr_road_left_width[" << curr_road_left_width
+             << "] curr_road_right_width[" << curr_road_right_width << "]";
       if (curr_road_right_width - (curr_right_bound + adc_half_width) >
           config_.path_bounds_decider_config().pull_over_road_edge_buffer()) {
         AERROR << "Not close enough to road-edge. Not feasible for pull-over.";
         is_feasible_window = false;
         break;
       }
-      if (std::get<2>(path_bound[j]) - std::get<1>(path_bound[j]) <
-          pull_over_space_width) {
+      const double right_bound = std::get<1>(path_bound[j]);
+      const double left_bound = std::get<2>(path_bound[j]);
+      ADEBUG << "left_bound[" << left_bound
+             << "] right_bound[" << right_bound << "]";
+      if (left_bound - right_bound < pull_over_space_width) {
         AERROR << "Not wide enough to fit ADC. Not feasible for pull-over.";
         is_feasible_window = false;
         break;
@@ -943,9 +950,8 @@ bool PathBoundsDecider::GetBoundaryFromRoads(
            << refline_offset_to_lane_center;
 
     // 2. Update into path_bound.
-    double dummy = 0.0;
-    if (!UpdatePathBoundaryAndCenterLine(i, curr_left_bound, curr_right_bound,
-                                         path_bound, &dummy)) {
+    if (!UpdatePathBoundary(i, curr_left_bound, curr_right_bound,
+                            path_bound)) {
       path_blocked_idx = static_cast<int>(i);
     }
     if (path_blocked_idx != -1) {
@@ -1198,9 +1204,8 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
            << ", offset = " << offset_to_map;
 
     // 4. Update the boundary.
-    double dummy = 0.0;
-    if (!UpdatePathBoundaryAndCenterLine(i, curr_left_bound, curr_right_bound,
-                                         path_bound, &dummy)) {
+    if (!UpdatePathBoundary(i, curr_left_bound, curr_right_bound,
+                            path_bound)) {
       path_blocked_idx = static_cast<int>(i);
     }
     if (path_blocked_idx != -1) {
@@ -1217,6 +1222,33 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
   }
 
   return true;
+}
+
+// update boundaries with corresponding one-side lane boundary for pull over
+// (1) use left lane boundary for normal PULL_OVER type
+// (2) use left/right(which is opposite to pull over direction
+//     (pull over at closer road side) lane boundary for EMERGENCY_PULL_OVER
+void PathBoundsDecider::UpdatePullOverBoundaryByLaneBoundary(
+    const ReferenceLineInfo& reference_line_info, PathBound* const path_bound) {
+  const ReferenceLine& reference_line = reference_line_info.reference_line();
+  const auto& pull_over_status =
+      PlanningContext::Instance()->planning_status().pull_over();
+  if (pull_over_status.pull_over_type() == PullOverStatus::PULL_OVER) {
+    for (size_t i = 0; i < path_bound->size(); ++i) {
+      double curr_s = std::get<0>((*path_bound)[i]);
+      double curr_lane_left_width = 0.0;
+      double curr_lane_right_width = 0.0;
+      if (reference_line.GetLaneWidth(curr_s, &curr_lane_left_width,
+                                      &curr_lane_right_width)) {
+        double offset_to_lane_center = 0.0;
+        reference_line.GetOffsetToMap(curr_s, &offset_to_lane_center);
+        const double left_bound = curr_lane_left_width + offset_to_lane_center;
+        std::get<2>((*path_bound)[i]) = left_bound;
+      }
+    }
+  } else {
+    // TODO(all): EMERGENCY_PULL_OVER
+  }
 }
 
 void PathBoundsDecider::ConvertBoundarySAxisFromLaneCenterToRefLine(
@@ -1345,9 +1377,14 @@ bool PathBoundsDecider::GetBoundaryFromStaticObstacles(
       while (obs_idx < sorted_obstacles.size() &&
              std::get<1>(sorted_obstacles[obs_idx]) < curr_s) {
         const auto& curr_obstacle = sorted_obstacles[obs_idx];
-        double curr_obstacle_l_min = std::get<2>(curr_obstacle);
-        double curr_obstacle_l_max = std::get<3>(curr_obstacle);
-        std::string curr_obstacle_id = std::get<4>(curr_obstacle);
+        const double curr_obstacle_s = std::get<1>(curr_obstacle);
+        const double curr_obstacle_l_min = std::get<2>(curr_obstacle);
+        const double curr_obstacle_l_max = std::get<3>(curr_obstacle);
+        const std::string curr_obstacle_id = std::get<4>(curr_obstacle);
+        ADEBUG << "id[" << curr_obstacle_id << "] s[" << curr_obstacle_s
+               << "] curr_obstacle_l_min[" << curr_obstacle_l_min
+               << "] curr_obstacle_l_max[" << curr_obstacle_l_max
+               << "] center_line[" << center_line << "]";
         if (std::get<0>(curr_obstacle) == 1) {
           // A new obstacle enters into our scope:
           //   - Decide which direction for the ADC to pass.
@@ -1358,24 +1395,17 @@ bool PathBoundsDecider::GetBoundaryFromStaticObstacles(
             // Obstacle is to the right of center-line, should pass from left.
             obs_id_to_direction[curr_obstacle_id] = true;
             right_bounds.insert(curr_obstacle_l_max);
-            if (!UpdatePathBoundaryAndCenterLine(
-                    i, *left_bounds.begin(), *right_bounds.begin(),
-                    path_boundaries, &center_line)) {
-              path_blocked_idx = static_cast<int>(i);
-              *blocking_obstacle_id = curr_obstacle_id;
-              break;
-            }
           } else {
             // Obstacle is to the left of center-line, should pass from right.
             obs_id_to_direction[curr_obstacle_id] = false;
             left_bounds.insert(curr_obstacle_l_min);
-            if (!UpdatePathBoundaryAndCenterLine(
-                    i, *left_bounds.begin(), *right_bounds.begin(),
-                    path_boundaries, &center_line)) {
-              path_blocked_idx = static_cast<int>(i);
-              *blocking_obstacle_id = curr_obstacle_id;
-              break;
-            }
+          }
+          if (!UpdatePathBoundaryAndCenterLine(
+              i, *left_bounds.begin(), *right_bounds.begin(),
+              path_boundaries, &center_line)) {
+            path_blocked_idx = static_cast<int>(i);
+            *blocking_obstacle_id = curr_obstacle_id;
+            break;
           }
         } else {
           // An existing obstacle exits our scope.
@@ -1504,7 +1534,6 @@ std::vector<PathBound> PathBoundsDecider::ConstructSubsequentPathBounds(
   if (obs_idx >= sorted_obstacles.size() ||
       std::get<1>(sorted_obstacles[obs_idx]) > curr_s) {
     // 0. Backup the old memory.
-    double dummy = 0.0;
     auto old_path_boundary = *curr_path_bounds;
     // 1. Get the boundary from obstacles.
     for (auto it = obs_id_to_details->begin(); it != obs_id_to_details->end();
@@ -1520,9 +1549,9 @@ std::vector<PathBound> PathBoundsDecider::ConstructSubsequentPathBounds(
       }
     }
     // 2. Update the path boundary
-    bool is_able_to_update = UpdatePathBoundaryAndCenterLine(
+    bool is_able_to_update = UpdatePathBoundary(
         path_idx, left_bounds_from_obstacles, right_bounds_from_obstacles,
-        curr_path_bounds, &dummy);
+        curr_path_bounds);
     // 3. Return proper values.
     std::vector<PathBound> ret;
     if (is_able_to_update) {
@@ -1543,7 +1572,7 @@ std::vector<PathBound> PathBoundsDecider::ConstructSubsequentPathBounds(
   std::unordered_map<std::string, std::tuple<bool, double>>
       old_obs_id_to_details = *obs_id_to_details;
   auto old_path_boundary = *curr_path_bounds;
-  double dummy = 0.0;
+
   // 1. Go through all obstacle changes.
   //    - For exiting obstacle, remove from our memory.
   //    - For entering obstacle, save it to a vector.
@@ -1595,9 +1624,9 @@ std::vector<PathBound> PathBoundsDecider::ConstructSubsequentPathBounds(
     }
     // c. Update for this path_idx, and construct the subsequent path bounds.
     std::vector<PathBound> curr_dir_path_boundaries;
-    bool is_able_to_update = UpdatePathBoundaryAndCenterLine(
+    bool is_able_to_update = UpdatePathBoundary(
         path_idx, left_bounds_from_obstacles, right_bounds_from_obstacles,
-        curr_path_bounds, &dummy);
+        curr_path_bounds);
     if (is_able_to_update) {
       curr_dir_path_boundaries = ConstructSubsequentPathBounds(
           sorted_obstacles, path_idx + 1, new_obs_idx, obs_id_to_details,
