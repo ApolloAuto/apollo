@@ -188,6 +188,10 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
                         "distance approach smoothing problem failed to solve");
         }
       } else {
+        const double start_system_timestamp =
+            std::chrono::duration<double>(
+                std::chrono::system_clock::now().time_since_epoch())
+                .count();
         if (!GenerateDistanceApproachTraj(
                 xWS_vec[i], uWS_vec[i], XYbounds, obstacles_edges_num,
                 obstacles_A, obstacles_b, obstacles_vertices_vec, last_time_u,
@@ -202,6 +206,21 @@ Status OpenSpaceTrajectoryOptimizer::Plan(
           return Status(ErrorCode::PLANNING_ERROR,
                         "distance approach smoothing problem failed to solve");
         }
+        const auto end_system_timestamp =
+            std::chrono::duration<double>(
+                std::chrono::system_clock::now().time_since_epoch())
+                .count();
+        const auto time_diff_ms =
+            (end_system_timestamp - start_system_timestamp) * 1000;
+        ADEBUG << "total planning time spend: " << time_diff_ms << " ms.";
+        ADEBUG << i << "th trajectory size is " << xWS_vec[i].cols();
+        ADEBUG << "average time spend: " << time_diff_ms / xWS_vec[i].cols()
+               << " ms per point.";
+        ADEBUG << "average time spend after smooth: "
+               << time_diff_ms / state_result_ds_vec[i].cols()
+               << " ms per point.";
+        ADEBUG << i << "th smoothed trajectory size is "
+               << state_result_ds_vec[i].cols();
       }
     }
 
