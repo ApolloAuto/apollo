@@ -128,7 +128,7 @@ void FeatureGenerator::OnPerceptionObstacle(
       // not exist in current perception
       it = obstacle_history_map_.erase(it);
     } else {
-      it++;
+      ++it;
     }
   }
 
@@ -301,7 +301,7 @@ void FeatureGenerator::GenerateTrajectoryPoints(
         pose.linear_acceleration().y() * pose.linear_acceleration().y());
     trajectory_point->set_a(a);
 
-    cnt++;
+    ++cnt;
   }
   // AINFO << "number of trajectory points in one frame: " << cnt;
 }
