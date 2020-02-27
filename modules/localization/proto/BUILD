@@ -1,4 +1,4 @@
-load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -158,4 +158,81 @@ proto_library(
     srcs = ["rtk_config.proto"],
 )
 
-cpplint()
+py_proto(
+    name = "measure_pb2",
+    src = "measure.proto",
+    deps = [
+        "//modules/common/proto:geometry_pb2",
+        "//modules/common/proto:header_pb2",
+    ],
+)
+
+py_proto(
+    name = "gnss_pnt_result_pb2",
+    src = "gnss_pnt_result.proto",
+    deps = [
+        "//modules/drivers/gnss/proto:gnss_raw_observation_pb2",
+    ],
+)
+
+py_proto(
+    name = "pose_pb2",
+    src = "pose.proto",
+    deps = [
+        "//modules/common/proto:geometry_pb2",
+    ],
+)
+
+py_proto(
+    name = "gps_pb2",
+    src = "gps.proto",
+    deps = [
+        "//modules/common/proto:header_pb2",
+        "//modules/localization/proto:pose_pb2",
+    ],
+)
+
+py_proto(
+    name = "imu_pb2",
+    src = "imu.proto",
+    deps = [
+        "//modules/common/proto:header_pb2",
+        "//modules/localization/proto:pose_pb2",
+    ],
+)
+
+py_proto(
+    name = "rtk_config_pb2",
+    src = "rtk_config.proto",
+)
+
+py_proto(
+    name = "localization_status_pb2",
+    src = "localization_status.proto",
+)
+
+py_proto(
+    name = "sins_pva_pb2",
+    src = "sins_pva.proto",
+    deps = [
+        "//modules/common/proto:geometry_pb2",
+        "//modules/common/proto:header_pb2",
+    ],
+)
+
+py_proto(
+    name = "localization_pb2",
+    src = "localization.proto",
+    deps = [
+        "//modules/common/proto:geometry_pb2",
+        "//modules/common/proto:header_pb2",
+        "//modules/common/proto:pnc_point_pb2",
+        "//modules/localization/proto:localization_status_pb2",
+        "//modules/localization/proto:pose_pb2",
+    ],
+)
+
+py_proto(
+    name = "localization_config_pb2",
+    src = "localization_config.proto",
+)

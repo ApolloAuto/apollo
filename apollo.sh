@@ -262,6 +262,7 @@ function apollo_build_opt() {
 }
 
 function build_py_proto() {
+  # TODO(xiaoxq): Retire this as we are using bazel to compile protos into bazel-genfiles.
   if [ -d "./py_proto" ];then
     rm -rf py_proto
   fi

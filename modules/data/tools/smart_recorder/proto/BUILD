@@ -1,4 +1,4 @@
-load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -23,4 +23,15 @@ proto_library(
     deps = ["//modules/common/proto:header_proto_lib"],
 )
 
-cpplint()
+py_proto(
+    name = "smart_recorder_status_pb2",
+    src = "smart_recorder_status.proto",
+    deps = [
+        "//modules/common/proto:header_pb2",
+    ],
+)
+
+py_proto(
+    name = "smart_recorder_triggers_pb2",
+    src = "smart_recorder_triggers.proto",
+)

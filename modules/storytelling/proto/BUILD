@@ -1,4 +1,4 @@
-load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -17,4 +17,10 @@ proto_library(
     ],
 )
 
-cpplint()
+py_proto(
+    name = "story_pb2",
+    src = "story.proto",
+    deps = [
+        "//modules/common/proto:header_pb2",
+    ],
+)

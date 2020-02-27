@@ -1,3 +1,5 @@
+load("//tools:py_proto.bzl", "py_proto")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_proto_library(
@@ -10,4 +12,9 @@ cc_proto_library(
 proto_library(
     name = "adapter_config_proto_lib",
     srcs = ["adapter_config.proto"],
+)
+
+py_proto(
+    name = "adapter_config_pb2",
+    src = "adapter_config.proto",
 )

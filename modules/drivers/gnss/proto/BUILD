@@ -1,4 +1,4 @@
-load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -147,4 +147,63 @@ proto_library(
     ],
 )
 
-cpplint()
+py_proto(
+    name = "gnss_best_pose_pb2",
+    src = "gnss_best_pose.proto",
+    deps = [
+        "//modules/common/proto:header_pb2",
+    ],
+)
+
+py_proto(
+    name = "gnss_pb2",
+    src = "gnss.proto",
+    deps = [
+        "//modules/common/proto:geometry_pb2",
+        "//modules/common/proto:header_pb2",
+    ],
+)
+
+py_proto(
+    name = "imu_pb2",
+    src = "imu.proto",
+    deps = [
+        "//modules/common/proto:geometry_pb2",
+        "//modules/common/proto:header_pb2",
+    ],
+)
+
+py_proto(
+    name = "ins_pb2",
+    src = "ins.proto",
+    deps = [
+        "//modules/common/proto:geometry_pb2",
+        "//modules/common/proto:header_pb2",
+    ],
+)
+
+py_proto(
+    name = "heading_pb2",
+    src = "heading.proto",
+    deps = [
+        "//modules/common/proto:header_pb2",
+    ],
+)
+
+py_proto(
+    name = "config_pb2",
+    src = "config.proto",
+)
+
+py_proto(
+    name = "gnss_status_pb2",
+    src = "gnss_status.proto",
+    deps = [
+        "//modules/common/proto:header_pb2",
+    ],
+)
+
+py_proto(
+    name = "gnss_raw_observation_pb2",
+    src = "gnss_raw_observation.proto",
+)
