@@ -1,4 +1,4 @@
-load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -14,4 +14,7 @@ proto_library(
     srcs = ["filter_bank_config.proto"],
 )
 
-cpplint()
+py_proto(
+    name = "filter_bank_config_pb2",
+    src = "filter_bank_config.proto",
+)

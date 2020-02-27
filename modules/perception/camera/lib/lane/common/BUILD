@@ -1,4 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -35,6 +36,16 @@ cc_library(
         "//modules/perception/base",
         "@eigen",
     ],
+)
+
+py_proto(
+    name = "darkSCNN_pb2",
+    src = "darkSCNN.proto",
+)
+
+py_proto(
+    name = "denseline_pb2",
+    src = "denseline.proto",
 )
 
 cpplint()

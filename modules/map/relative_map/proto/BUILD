@@ -1,4 +1,4 @@
-load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -45,4 +45,24 @@ proto_library(
     srcs = ["navigator_config.proto"],
 )
 
-cpplint()
+py_proto(
+    name = "navigator_config_pb2",
+    src = "navigator_config.proto",
+)
+
+py_proto(
+    name = "relative_map_config_pb2",
+    src = "relative_map_config.proto",
+)
+
+py_proto(
+    name = "navigation_pb2",
+    src = "navigation.proto",
+    deps = [
+        "//modules/common/proto:header_pb2",
+        "//modules/common/proto:pnc_point_pb2",
+        "//modules/localization/proto:localization_pb2",
+        "//modules/map/proto:map_pb2",
+        "//modules/perception/proto:perception_obstacle_pb2",
+    ],
+)

@@ -1,4 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -29,6 +30,11 @@ cc_library(
         "//modules/perception/lib/registerer",
         "//modules/perception/lib/utils",
     ],
+)
+
+py_proto(
+    name = "denseline_postprocessor_pb2",
+    src = "denseline_postprocessor.proto",
 )
 
 cpplint()

@@ -1,4 +1,4 @@
-load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -14,4 +14,7 @@ proto_library(
     srcs = ["multi_lidar_fusion_config.proto"],
 )
 
-cpplint()
+py_proto(
+    name = "multi_lidar_fusion_config_pb2",
+    src = "multi_lidar_fusion_config.proto",
+)

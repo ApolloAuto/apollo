@@ -4,7 +4,7 @@ def py_proto(name, src, with_grpc=False, deps=[]):
     pb2_path = "$$(dirname {})/{}".format(proto_path, pb2_file)
 
     # Require `pip install grpcio-tools` to have the tool available.
-    executable = "/usr/bin/python -m grpc_tools.protoc -I/apollo --python_out=."
+    executable = "/usr/bin/python -m grpc_tools.protoc -I. --python_out=."
     native.genrule(
         name = name + "_rule",
         srcs = [src],

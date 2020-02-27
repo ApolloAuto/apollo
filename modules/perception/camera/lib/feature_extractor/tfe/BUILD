@@ -1,4 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:py_proto.bzl", "py_proto")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -60,6 +61,11 @@ cc_library(
         "//modules/perception/inference/utils:inference_gemm_lib",
         "//modules/perception/inference/utils:inference_util_lib",
     ],
+)
+
+py_proto(
+    name = "tracking_feature_pb2",
+    src = "tracking_feature.proto",
 )
 
 cpplint()
