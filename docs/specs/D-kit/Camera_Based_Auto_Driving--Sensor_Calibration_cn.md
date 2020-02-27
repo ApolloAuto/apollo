@@ -55,7 +55,7 @@ Camera坐标系原点在下图所示平面的中心点：
     y: 0.5
     z: -0.5
 ```
- - translation:用户需要手动测量以IMU坐标系为基坐标系，以Velodyne16坐标系为目标坐标系的位移变换，一个IMU-Velodyne16的位移变换的示例如下所示：
+ - translation:用户需要手动测量以Velodyne16坐标系为基坐标系，以Camera坐标系为目标坐标系的位移变换，一个Velodyne16-Camera的位移变换的示例如下所示：
 ```
   translation:
     x: 0.67
@@ -132,7 +132,7 @@ budaoshi@in_dev_docker:/apollo/modules/tools/sensor_calibration$ python extract_
 
 修改数据抽取工具生成的init_params/extrinsics.yaml文件。把前面步骤手动测量的Camera-Lidar标定初始外参信息填入，仅需要填写`translation`字段。
 
-#### 6. 修改初始外参文件intrinsics.yaml
+#### 6. 修改初始化内参文件intrinsics.yaml
 
 修改数据抽取工具生成的init_params/intrinsics.yaml文件。把内参标定的Camera内参信息填入，仅需要填写`R`、`K`、`D`字段。
 
