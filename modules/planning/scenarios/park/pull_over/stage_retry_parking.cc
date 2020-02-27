@@ -61,6 +61,7 @@ Stage::StageStatus PullOverStageRetryParking::Process(
                               ->mutable_debug()
                               ->mutable_planning_data()
                               ->mutable_pull_over();
+  pull_over_debug->mutable_position()->CopyFrom(pull_over_status.position());
   pull_over_debug->set_theta(pull_over_status.theta());
   pull_over_debug->set_length_front(pull_over_status.length_front());
   pull_over_debug->set_length_back(pull_over_status.length_back());
@@ -71,6 +72,7 @@ Stage::StageStatus PullOverStageRetryParking::Process(
   if (CheckADCPullOverOpenSpace()) {
     return FinishStage();
   }
+
   return StageStatus::RUNNING;
 }
 
