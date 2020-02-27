@@ -16,13 +16,19 @@
 # limitations under the License.
 # ****************************************************************************
 # -*- coding: utf-8 -*-
-"""Module for example of record."""
+"""
+Module for example of record.
+
+Run with:
+    bazel run //cyber/python/cyber_py3/examples:record
+"""
 
 import time
 
-from cyber.proto.unit_test_pb2 import Chatter
-from cyber_py3 import record
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
+
+from cyber.proto.unit_test_pb2 import Chatter
+from cyber.python.cyber_py3 import record
 from modules.common.util.testdata.simple_pb2 import SimpleMessage
 
 
