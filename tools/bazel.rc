@@ -85,3 +85,8 @@ build --copt="-Werror=switch"
 build --cxxopt="-std=c++1y"
 # Enable colorful output of GCC
 # build --cxxopt="-fdiagnostics-color=always"
+
+# +------------------------------------------------------------+
+# | Python Configurations                                      |
+# +------------------------------------------------------------+
+run --python_path=/usr/bin/python3
