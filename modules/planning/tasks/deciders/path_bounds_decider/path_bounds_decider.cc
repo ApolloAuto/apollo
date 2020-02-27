@@ -950,8 +950,8 @@ bool PathBoundsDecider::GetBoundaryFromRoads(
            << refline_offset_to_lane_center;
 
     // 2. Update into path_bound.
-    if (!UpdatePathBoundary(i, curr_left_bound, curr_right_bound,
-                            path_bound)) {
+    if (!UpdatePathBoundaryWithBuffer(i, curr_left_bound, curr_right_bound,
+                                      path_bound)) {
       path_blocked_idx = static_cast<int>(i);
     }
     if (path_blocked_idx != -1) {
@@ -1204,8 +1204,8 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
            << ", offset = " << offset_to_map;
 
     // 4. Update the boundary.
-    if (!UpdatePathBoundary(i, curr_left_bound, curr_right_bound,
-                            path_bound)) {
+    if (!UpdatePathBoundaryWithBuffer(i, curr_left_bound, curr_right_bound,
+                                      path_bound)) {
       path_blocked_idx = static_cast<int>(i);
     }
     if (path_blocked_idx != -1) {
@@ -1400,7 +1400,7 @@ bool PathBoundsDecider::GetBoundaryFromStaticObstacles(
             obs_id_to_direction[curr_obstacle_id] = false;
             left_bounds.insert(curr_obstacle_l_min);
           }
-          if (!UpdatePathBoundaryAndCenterLine(
+          if (!UpdatePathBoundaryAndCenterLineWithBuffer(
               i, *left_bounds.begin(), *right_bounds.begin(),
               path_boundaries, &center_line)) {
             path_blocked_idx = static_cast<int>(i);
@@ -1549,7 +1549,7 @@ std::vector<PathBound> PathBoundsDecider::ConstructSubsequentPathBounds(
       }
     }
     // 2. Update the path boundary
-    bool is_able_to_update = UpdatePathBoundary(
+    bool is_able_to_update = UpdatePathBoundaryWithBuffer(
         path_idx, left_bounds_from_obstacles, right_bounds_from_obstacles,
         curr_path_bounds);
     // 3. Return proper values.
@@ -1624,7 +1624,7 @@ std::vector<PathBound> PathBoundsDecider::ConstructSubsequentPathBounds(
     }
     // c. Update for this path_idx, and construct the subsequent path bounds.
     std::vector<PathBound> curr_dir_path_boundaries;
-    bool is_able_to_update = UpdatePathBoundary(
+    bool is_able_to_update = UpdatePathBoundaryWithBuffer(
         path_idx, left_bounds_from_obstacles, right_bounds_from_obstacles,
         curr_path_bounds);
     if (is_able_to_update) {
@@ -1732,9 +1732,9 @@ double PathBoundsDecider::GetBufferBetweenADCCenterAndEdge() {
   return (adc_half_width + kAdcEdgeBuffer);
 }
 
-bool PathBoundsDecider::UpdatePathBoundaryAndCenterLine(
+bool PathBoundsDecider::UpdatePathBoundaryWithBuffer(
     size_t idx, double left_bound, double right_bound,
-    PathBound* const path_boundaries, double* const center_line) {
+    PathBound* const path_boundaries) {
   // Update the right bound (l_min):
   double new_l_min =
       std::fmax(std::get<1>((*path_boundaries)[idx]),
@@ -1752,6 +1752,14 @@ bool PathBoundsDecider::UpdatePathBoundaryAndCenterLine(
   // Otherwise, update path_boundaries and center_line; then return true.
   std::get<1>((*path_boundaries)[idx]) = new_l_min;
   std::get<2>((*path_boundaries)[idx]) = new_l_max;
+  return true;
+}
+
+bool PathBoundsDecider::UpdatePathBoundaryAndCenterLineWithBuffer(
+    size_t idx, double left_bound, double right_bound,
+    PathBound* const path_boundaries, double* const center_line) {
+  UpdatePathBoundaryWithBuffer(idx, left_bound, right_bound,
+                               path_boundaries);
   *center_line = (std::get<1>((*path_boundaries)[idx]) +
                   std::get<2>((*path_boundaries)[idx])) /
                  2.0;
