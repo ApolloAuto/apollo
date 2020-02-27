@@ -1233,21 +1233,33 @@ void PathBoundsDecider::UpdatePullOverBoundaryByLaneBoundary(
   const ReferenceLine& reference_line = reference_line_info.reference_line();
   const auto& pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
-  if (pull_over_status.pull_over_type() == PullOverStatus::PULL_OVER) {
-    for (size_t i = 0; i < path_bound->size(); ++i) {
-      double curr_s = std::get<0>((*path_bound)[i]);
-      double curr_lane_left_width = 0.0;
-      double curr_lane_right_width = 0.0;
-      if (reference_line.GetLaneWidth(curr_s, &curr_lane_left_width,
-                                      &curr_lane_right_width)) {
-        double offset_to_lane_center = 0.0;
-        reference_line.GetOffsetToMap(curr_s, &offset_to_lane_center);
-        const double left_bound = curr_lane_left_width + offset_to_lane_center;
-        std::get<2>((*path_bound)[i]) = left_bound;
-      }
+  const auto pull_over_type = pull_over_status.pull_over_type();
+  if (pull_over_type != PullOverStatus::PULL_OVER &&
+      pull_over_type != PullOverStatus::EMERGENCY_PULL_OVER) {
+    return;
+  }
+
+  for (size_t i = 0; i < path_bound->size(); ++i) {
+    const double curr_s = std::get<0>((*path_bound)[i]);
+    double left_bound = 3.0;
+    double right_bound = 3.0;
+    double curr_lane_left_width = 0.0;
+    double curr_lane_right_width = 0.0;
+    if (reference_line.GetLaneWidth(curr_s, &curr_lane_left_width,
+                                    &curr_lane_right_width)) {
+      double offset_to_lane_center = 0.0;
+      reference_line.GetOffsetToMap(curr_s, &offset_to_lane_center);
+      left_bound = curr_lane_left_width + offset_to_lane_center;
+      right_bound = curr_lane_right_width + offset_to_lane_center;
     }
-  } else {
-    // TODO(all): EMERGENCY_PULL_OVER
+    ADEBUG << "left_bound[" << left_bound
+           << "] right_bound[" << right_bound << "]";
+    if (pull_over_type != PullOverStatus::PULL_OVER) {
+      std::get<2>((*path_bound)[i]) = left_bound;
+    } else if (pull_over_type == PullOverStatus::EMERGENCY_PULL_OVER) {
+      // TODO(all): use left/right lane boundary accordingly
+      std::get<2>((*path_bound)[i]) = left_bound;
+    }
   }
 }
 
