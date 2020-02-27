@@ -245,6 +245,18 @@ class PathBoundsDecider : public Decider {
    */
   double GetBufferBetweenADCCenterAndEdge();
 
+  /** @brief Update the path_boundary at "idx"
+   *         It also checks if ADC is blocked (lmax < lmin).
+   *  @param The current index of the path_bounds
+   *  @param The minimum left boundary (l_max)
+   *  @param The maximum right boundary (l_min)
+   *  @param The path_boundaries (its content at idx will be updated)
+   *  @return If path is good, true; if path is blocked, false.
+   */
+  bool UpdatePathBoundaryWithBuffer(
+      size_t idx, double left_bound, double right_bound,
+      std::vector<std::tuple<double, double, double>>* const path_boundaries);
+
   /** @brief Update the path_boundary at "idx", as well as the new center-line.
    *         It also checks if ADC is blocked (lmax < lmin).
    *  @param The current index of the path_bounds
@@ -254,7 +266,7 @@ class PathBoundsDecider : public Decider {
    *  @param The center_line (to be updated)
    *  @return If path is good, true; if path is blocked, false.
    */
-  bool UpdatePathBoundaryAndCenterLine(
+  bool UpdatePathBoundaryAndCenterLineWithBuffer(
       size_t idx, double left_bound, double right_bound,
       std::vector<std::tuple<double, double, double>>* const path_boundaries,
       double* const center_line);
