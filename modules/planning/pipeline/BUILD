@@ -36,7 +36,6 @@ cc_binary(
         ":feature_generator",
         "//third_party:boost",
         "@com_google_absl//absl/strings",
-        "@opencv",
     ],
 )
 
