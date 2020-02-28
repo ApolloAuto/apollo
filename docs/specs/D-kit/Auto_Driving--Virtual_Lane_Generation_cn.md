@@ -54,4 +54,4 @@
 
 ![virtual_lane_tree2](images/virtual_lane_tree2.png)
 
-将上图中的2020-01-16-08-08-42整个文件夹拷贝到/apollo/modules/data/下，重命名为自己的地图名字（例如gongyuan），重启DreamView即可在地图下拉框中看到自己刚添加的地图。
+将上图中的2020-01-16-08-08-42整个文件夹拷贝到/apollo/modules/map/data/下，重命名为自己的地图名字（例如gongyuan），重启DreamView即可在地图下拉框中看到自己刚添加的地图。
