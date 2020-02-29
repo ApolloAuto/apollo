@@ -61,7 +61,7 @@ For those developers that would like to continue working with Ubuntu 14.04, plea
 
 
  - Please note, it is recommended that you install the versions of Apollo in the following order:
- **1.0 > whichever version you would like to test out**.
+ **1.0 -> whichever version you would like to test out**.
  The reason behind this recommendation is that you need to confirm whether individual hardware components
  and modules are functioning correctly and clear various version test cases,
  before progressing to a higher, more capable version for your safety and the safety of those around you.
