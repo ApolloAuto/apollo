@@ -135,7 +135,7 @@ void FeatureGenerator::OnPerceptionObstacle(
   for (const auto& m : perception_obstacles_map_) {
     const auto& perception_obstale = m.second;
     ObstacleTrajectoryPoint obstacle_trajectory_point;
-    obstacle_trajectory_point.set_timestamp(perception_obstale.timestamp());
+    obstacle_trajectory_point.set_timestamp_sec(perception_obstale.timestamp());
     obstacle_trajectory_point.mutable_position()->CopyFrom(
         perception_obstale.position());
     obstacle_trajectory_point.set_theta(perception_obstale.theta());
@@ -219,7 +219,8 @@ void FeatureGenerator::GenerateObstacleData(
     for (const auto& obj_traj_point : obstacle_history) {
       auto obstacle_trajectory_point =
           obstacle_feature->add_obstacle_trajectory_point();
-      obstacle_trajectory_point->set_timestamp(obj_traj_point.timestamp());
+      obstacle_trajectory_point->set_timestamp_sec(
+          obj_traj_point.timestamp_sec());
 
       // convert position to relative coordinate
       const auto& relative_posistion =
@@ -272,8 +273,7 @@ void FeatureGenerator::GenerateObstacleData(
   }
 }
 
-
-void FeatureGenerator::GenerateTrajectoryPoints(
+void FeatureGenerator::GenerateADCTrajectoryPoints(
     const std::list<apollo::localization::LocalizationEstimate>&
         localization_for_label,
     LearningDataFrame* learning_data_frame) {
@@ -287,7 +287,10 @@ void FeatureGenerator::GenerateTrajectoryPoints(
     if ((i % localization_sample_interval_for_trajectory_point) != 0) {
       continue;
     }
-    auto trajectory_point = learning_data_frame->add_trajectory_point();
+    auto adc_trajectory_point = learning_data_frame->add_adc_trajectory_point();
+    adc_trajectory_point->set_timestamp_sec(le.measurement_time());
+
+    auto trajectory_point = adc_trajectory_point->mutable_trajectory_point();
     auto& pose = le.pose();
     trajectory_point->mutable_path_point()->set_x(pose.position().x());
     trajectory_point->mutable_path_point()->set_y(pose.position().y());
@@ -346,7 +349,7 @@ void FeatureGenerator::GenerateLearningDataFrame() {
   GenerateObstacleData(learning_data_frame);
 
   // add trajectory_points
-  GenerateTrajectoryPoints(localization_for_label_, learning_data_frame);
+  GenerateADCTrajectoryPoints(localization_for_label_, learning_data_frame);
 }
 
 void FeatureGenerator::ProcessOfflineData(const std::string& record_filename) {

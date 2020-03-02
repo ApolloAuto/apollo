@@ -45,7 +45,7 @@ void GenerateDataForLearning() {
     AINFO << "For input " << input << ", found " << offline_bags.size()
           << " rosbags to process";
     for (std::size_t i = 0; i < offline_bags.size(); ++i) {
-      AINFO << "\tProcessing: [ " << i << " / " << offline_bags.size()
+      AINFO << "\tProcessing: [ " << i + 1 << " / " << offline_bags.size()
             << " ]: " << offline_bags[i];
       feature_generator.ProcessOfflineData(offline_bags[i]);
     }

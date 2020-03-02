@@ -51,7 +51,7 @@ class FeatureGenerator {
 
   void GenerateObstacleData(LearningDataFrame* learning_data_frame);
 
-  void GenerateTrajectoryPoints(
+  void GenerateADCTrajectoryPoints(
       const std::list<apollo::localization::LocalizationEstimate>&
           localization_for_label,
       LearningDataFrame* learning_data_frame);
