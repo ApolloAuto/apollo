@@ -53,7 +53,7 @@ message LocalizationFeature {
 }
 
 message ObstacleTrajectoryPoint {
-  optional double timestamp = 1;  // GPS time in seconds.
+  optional double timestamp_sec = 1;
 
   // obstacle position in the OBJECT coordinate system
   optional apollo.common.Point3D position = 2;
@@ -89,12 +89,15 @@ message TrafficLightFeature {
     optional apollo.perception.TrafficLight.Color color = 2;
 }
 
+message ADCTrajectoryPoint {
+  optional double timestamp_sec = 1;  // localization measurement_time
+  optional apollo.common.TrajectoryPoint trajectory_point = 2;
+}
+
 message LearningDataFrame {
-  // Message publishing time in seconds.
+  // localization message publishing time in seconds.
   optional double timestamp_sec = 1;
 
-  // Sequence number for each frame
-  // sequence_num, always starting from 1.
   optional uint32 frame_num = 2;
 
   // Features from chassis
@@ -113,7 +116,7 @@ message LearningDataFrame {
   repeated TrafficLightFeature traffic_light = 7;
 
   // ADC ground-truth label trajectory
-  repeated apollo.common.TrajectoryPoint trajectory_point = 8;
+  repeated ADCTrajectoryPoint adc_trajectory_point = 8;
 }
 
 message LearningData {
