@@ -71,6 +71,7 @@ def SmoothTrajectory(visualize_flag, sx, sy):
                              ])
         OpenSpacePlanner.AddObstacle(
             ROI_distance_approach_parking_boundary)
+        # parking lot position
         ex = 1.359
         ey = -3.86443643718
         ephi = 1.581
@@ -159,10 +160,10 @@ def SmoothTrajectory(visualize_flag, sx, sy):
             lefty = 1.043 * math.sin(phi_out[i] - math.pi)
             x_shift_leftbottom = x_out[i] + downx + leftx
             y_shift_leftbottom = y_out[i] + downy + lefty
-            warm_start_car = patches.Rectangle((x_shift_leftbottom, y_shift_leftbottom), 3.89 + 1.043, 1.055*2,
+            warm_start_car = patches.Rectangle((x_shift_leftbottom, y_shift_leftbottom), 3.89 + 1.043, 1.055 * 2,
                                                angle=phi_out[i] * 180 / math.pi, linewidth=1, edgecolor='r', facecolor='none')
             warm_start_arrow = patches.Arrow(
-                x_out[i], y_out[i], 0.25*math.cos(phi_out[i]), 0.25*math.sin(phi_out[i]), 0.2, edgecolor='r',)
+                x_out[i], y_out[i], 0.25 * math.cos(phi_out[i]), 0.25 * math.sin(phi_out[i]), 0.2, edgecolor='r',)
             # ax.add_patch(warm_start_car)
             ax.add_patch(warm_start_arrow)
             # distance approach
@@ -172,10 +173,10 @@ def SmoothTrajectory(visualize_flag, sx, sy):
             lefty = 1.043 * math.sin(opt_phi_out[i] - math.pi)
             x_shift_leftbottom = opt_x_out[i] + downx + leftx
             y_shift_leftbottom = opt_y_out[i] + downy + lefty
-            smoothing_car = patches.Rectangle((x_shift_leftbottom, y_shift_leftbottom), 3.89 + 1.043, 1.055*2,
+            smoothing_car = patches.Rectangle((x_shift_leftbottom, y_shift_leftbottom), 3.89 + 1.043, 1.055 * 2,
                                               angle=opt_phi_out[i] * 180 / math.pi, linewidth=1, edgecolor='y', facecolor='none')
             smoothing_arrow = patches.Arrow(
-                opt_x_out[i], opt_y_out[i], 0.25*math.cos(opt_phi_out[i]), 0.25*math.sin(opt_phi_out[i]), 0.2, edgecolor='y',)
+                opt_x_out[i], opt_y_out[i], 0.25 * math.cos(opt_phi_out[i]), 0.25 * math.sin(opt_phi_out[i]), 0.2, edgecolor='y',)
             ax.add_patch(smoothing_car)
             ax.add_patch(smoothing_arrow)
 
@@ -246,7 +247,15 @@ def SmoothTrajectory(visualize_flag, sx, sy):
                 opt_a_out.append(float(opt_a[i]))
                 opt_steer_out.append(float(opt_steer[i]))
                 opt_time_out.append(float(opt_time[i]))
-        return [success, opt_x_out, opt_y_out, opt_phi_out, opt_v_out, opt_a_out, opt_steer_out, opt_time_out,
+            # check end_pose distacne
+            end_pose_dist = math.sqrt((opt_x_out[-1] - ex)**2 + (opt_y_out[-1] - ey)**2)
+            end_pose_heading = abs(opt_phi_out[-1] - ephi)
+            reach_end_pose = (end_pose_dist <= 0.1 and end_pose_heading <= 0.17)
+        else:
+            end_pose_dist = 100.0
+            end_pose_heading = 100.0
+            reach_end_pose = 0
+        return [success, end_pose_dist, end_pose_heading, reach_end_pose, opt_x_out, opt_y_out, opt_phi_out, opt_v_out, opt_a_out, opt_steer_out, opt_time_out,
                 hybrid_time, dual_time, ipopt_time, planning_time]
     return False
 
@@ -260,6 +269,8 @@ if __name__ == '__main__':
     hybrid_time_stats = []
     dual_time_stats = []
     ipopt_time_stats = []
+    end_pose_dist_stats = []
+    end_pose_heading_stats = []
 
     test_count = 0
     success_count = 0
@@ -268,27 +279,38 @@ if __name__ == '__main__':
             print("sx is " + str(sx) + " and sy is " + str(sy))
             test_count += 1
             result = SmoothTrajectory(visualize_flag, sx, sy)
+            # if result[0] and result[3]:  # success cases only
             if result[0]:
                 success_count += 1
                 planning_time_stats.append(result[-1])
                 ipopt_time_stats.append(result[-2][0])
                 dual_time_stats.append(result[-3][0])
                 hybrid_time_stats.append(result[-4][0])
+                end_pose_dist_stats.append(result[1])
+                end_pose_heading_stats.append(result[2])
 
     print("success rate is " + str(float(success_count) / float(test_count)))
     print("min is " + str(min(planning_time_stats)))
     print("max is " + str(max(planning_time_stats)))
     print("average is " + str(sum(planning_time_stats) / len(planning_time_stats)))
+    print("max end_pose_dist difference is: " + str(max(end_pose_dist_stats)))
+    print("min end_pose_dist difference is: " + str(min(end_pose_dist_stats)))
+    print("average end_pose_dist difference is: " +
+          str(sum(end_pose_dist_stats) / len(end_pose_dist_stats)))
+    print("max end_pose_heading difference is: " + str(max(end_pose_heading_stats)))
+    print("min end_pose_heading difference is: " + str(min(end_pose_heading_stats)))
+    print("average end_pose_heading difference is: " +
+          str(sum(end_pose_heading_stats) / len(end_pose_heading_stats)))
 
     module_timing = np.asarray([hybrid_time_stats, dual_time_stats, ipopt_time_stats])
     np.savetxt(result_file, module_timing, delimiter=",")
 
-    print("average hybird time: %4.4f, with max: %4.4f, min: %4.4f" % (
-        sum(hybrid_time_stats) / len(hybrid_time_stats), max(hybrid_time_stats),
-        min(hybrid_time_stats)))
-    print("average dual time: %4.4f, with max: %4.4f, min: %4.4f" % (
-        sum(dual_time_stats) / len(dual_time_stats), max(dual_time_stats),
-        min(dual_time_stats)))
-    print("average ipopt time: %4.4f, with max: %4.4f, min: %4.4f" % (
-        sum(ipopt_time_stats) / len(ipopt_time_stats), max(ipopt_time_stats),
-        min(ipopt_time_stats)))
+    print("average hybrid time(s): %4.4f, with max: %4.4f, min: %4.4f" % (
+        sum(hybrid_time_stats) / len(hybrid_time_stats) / 1000.0, max(hybrid_time_stats) / 1000.0,
+        min(hybrid_time_stats) / 1000.0))
+    print("average dual time(s): %4.4f, with max: %4.4f, min: %4.4f" % (
+        sum(dual_time_stats) / len(dual_time_stats) / 1000.0, max(dual_time_stats) / 1000.0,
+        min(dual_time_stats) / 1000.0))
+    print("average ipopt time(s): %4.4f, with max: %4.4f, min: %4.4f" % (
+        sum(ipopt_time_stats) / len(ipopt_time_stats) / 1000.0, max(ipopt_time_stats) / 1000.0,
+        min(ipopt_time_stats) / 1000.0))
