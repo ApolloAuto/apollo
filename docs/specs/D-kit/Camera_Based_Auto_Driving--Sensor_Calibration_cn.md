@@ -156,16 +156,16 @@ budaoshi@in_dev_docker:/apollo/modules/tools/sensor_calibration$ python extract_
 
 打开Apollo云服务页面，如下图：
 
-![camera_calibration_fuel](images/camera_calibration_fuel.png)
+![camera_calibration_fuel](images/lidar_calibration_fuel.png)
 
-在New Job下拉框中选择Sensor Calibration选项，根据实际情况填写Partner ID（请与商务联系）、Access Key（按BOS账号实际情况填写）、Secret Key（按BOS账号实际情况填写）、Input Data Path（在本例中为"sensor_calibration"），最后点击Submit Job按钮提交。
+在New Job下拉框中选择Sensor Calibration选项，根据实际情况填写Partner ID（请与商务联系）、Access Key（按BOS账号实际情况填写）、Secret Key（按BOS账号实际情况填写）、Input Data Path（在本例中为"sensor_calibration"）、Output Data Path（用户需要在BOS中指定一个目录，用于存储验证标定效果的图片文件）最后点击Submit Job按钮提交。
 
 #### 5. 获取标定结果验证及标定外参文件
 
-云标定任务完成后，将在注册的邮箱（请与商务联系）中收到一封标定结果邮件。如果标定任务成功，将包含标定结果验证图及标定外参文件。
+云标定任务完成后，将在注册的邮箱（请与商务联系）中收到一封标定结果邮件。如果标定任务成功，将包含标定外参文件。
 
  **Camera-Lidar标定结果验证**：
- 邮件中附带标定结果验证图片。在产生的点云投影图像内，可寻找其中具有明显边缘的物体和标志物，查看其边缘轮廓对齐情况。如果50米以内的目标，点云边缘和图像边缘能够重合，则可以证明标定结果的精度很高。反之，若出现错位现象，则说明标定结果存在误差。当误差大于一定范围时（范围依据实际使用情况而定），该外参不可用。如下图所示，图1为准确外参的点云投影效果，图2为有偏差外参的点云投影效果。
+ BOS中用户指定的Output Data Path路径下包含了标定结果验证图片。在产生的点云投影图像内，可寻找其中具有明显边缘的物体和标志物，查看其边缘轮廓对齐情况。如果50米以内的目标，点云边缘和图像边缘能够重合，则可以证明标定结果的精度很高。反之，若出现错位现象，则说明标定结果存在误差。当误差大于一定范围时（范围依据实际使用情况而定），该外参不可用。如下图所示，图1为准确外参的点云投影效果，图2为有偏差外参的点云投影效果。
  
 ![camera_calibration_result_picture1](images/camera_calibration_result_picture1.png) 
 
