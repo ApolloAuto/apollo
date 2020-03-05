@@ -4164,6 +4164,193 @@
                 }
               }
             },
+            "ChassisFeature": {
+              "fields": {
+                "speedMps": {
+                  "type": "float",
+                  "id": 1
+                },
+                "throttlePercentage": {
+                  "type": "float",
+                  "id": 2
+                },
+                "brakePercentage": {
+                  "type": "float",
+                  "id": 3
+                },
+                "steeringPercentage": {
+                  "type": "float",
+                  "id": 4
+                },
+                "gearLocation": {
+                  "type": "apollo.canbus.Chassis.GearPosition",
+                  "id": 5
+                }
+              }
+            },
+            "LocalizationFeature": {
+              "fields": {
+                "position": {
+                  "type": "apollo.common.PointENU",
+                  "id": 1
+                },
+                "heading": {
+                  "type": "double",
+                  "id": 2
+                },
+                "linearVelocity": {
+                  "type": "apollo.common.Point3D",
+                  "id": 3
+                },
+                "linearAcceleration": {
+                  "type": "apollo.common.Point3D",
+                  "id": 4
+                },
+                "angularVelocity": {
+                  "type": "apollo.common.Point3D",
+                  "id": 5
+                }
+              }
+            },
+            "ObstacleTrajectoryPoint": {
+              "fields": {
+                "timestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "position": {
+                  "type": "apollo.common.Point3D",
+                  "id": 2
+                },
+                "theta": {
+                  "type": "double",
+                  "id": 3
+                },
+                "velocity": {
+                  "type": "apollo.common.Point3D",
+                  "id": 4
+                },
+                "polygonPoint": {
+                  "rule": "repeated",
+                  "type": "apollo.common.Point3D",
+                  "id": 5
+                },
+                "acceleration": {
+                  "type": "apollo.common.Point3D",
+                  "id": 6
+                }
+              }
+            },
+            "ObstacleFeature": {
+              "fields": {
+                "id": {
+                  "type": "int32",
+                  "id": 1
+                },
+                "length": {
+                  "type": "double",
+                  "id": 2
+                },
+                "width": {
+                  "type": "double",
+                  "id": 3
+                },
+                "height": {
+                  "type": "double",
+                  "id": 4
+                },
+                "type": {
+                  "type": "apollo.perception.PerceptionObstacle.Type",
+                  "id": 5
+                },
+                "obstacleTrajectoryPoint": {
+                  "rule": "repeated",
+                  "type": "ObstacleTrajectoryPoint",
+                  "id": 6
+                }
+              }
+            },
+            "RoutingResponseFeature": {
+              "fields": {
+                "laneId": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 1
+                }
+              }
+            },
+            "TrafficLightFeature": {
+              "fields": {
+                "id": {
+                  "type": "string",
+                  "id": 1
+                },
+                "color": {
+                  "type": "apollo.perception.TrafficLight.Color",
+                  "id": 2
+                }
+              }
+            },
+            "ADCTrajectoryPoint": {
+              "fields": {
+                "timestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "trajectoryPoint": {
+                  "type": "apollo.common.TrajectoryPoint",
+                  "id": 2
+                }
+              }
+            },
+            "LearningDataFrame": {
+              "fields": {
+                "timestampSec": {
+                  "type": "double",
+                  "id": 1
+                },
+                "frameNum": {
+                  "type": "uint32",
+                  "id": 2
+                },
+                "chassis": {
+                  "type": "ChassisFeature",
+                  "id": 3
+                },
+                "localization": {
+                  "type": "LocalizationFeature",
+                  "id": 4
+                },
+                "obstacle": {
+                  "rule": "repeated",
+                  "type": "ObstacleFeature",
+                  "id": 5
+                },
+                "routingResponse": {
+                  "type": "RoutingResponseFeature",
+                  "id": 6
+                },
+                "trafficLight": {
+                  "rule": "repeated",
+                  "type": "TrafficLightFeature",
+                  "id": 7
+                },
+                "adcTrajectoryPoint": {
+                  "rule": "repeated",
+                  "type": "ADCTrajectoryPoint",
+                  "id": 8
+                }
+              }
+            },
+            "LearningData": {
+              "fields": {
+                "learningData": {
+                  "rule": "repeated",
+                  "type": "LearningDataFrame",
+                  "id": 1
+                }
+              }
+            },
             "NaviObstacleDeciderConfig": {
               "fields": {
                 "minNudgeDistance": {
@@ -4550,73 +4737,87 @@
                   "type": "RoiType",
                   "id": 1
                 },
-                "roiLongitudinalRange": {
+                "roiLongitudinalRangeStart": {
                   "type": "double",
                   "id": 2,
                   "options": {
                     "default": 10
                   }
                 },
-                "parkingStartRange": {
+                "roiLongitudinalRangeEnd": {
                   "type": "double",
                   "id": 3,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "parkingStartRange": {
+                  "type": "double",
+                  "id": 4,
                   "options": {
                     "default": 7
                   }
                 },
                 "parkingInwards": {
                   "type": "bool",
-                  "id": 4,
+                  "id": 5,
                   "options": {
                     "default": false
                   }
                 },
                 "enablePerceptionObstacles": {
                   "type": "bool",
-                  "id": 5
+                  "id": 6
                 },
                 "parkingDepthBuffer": {
                   "type": "double",
-                  "id": 6,
+                  "id": 7,
                   "options": {
                     "default": 0.1
                   }
                 },
-                "roiLinesegmentMinAngle": {
+                "roiLineSegmentMinAngle": {
                   "type": "double",
-                  "id": 7,
+                  "id": 8,
                   "options": {
                     "default": 0.3
                   }
                 },
-                "roiLinesegmentLength": {
+                "roiLineSegmentLength": {
                   "type": "double",
-                  "id": 8,
+                  "id": 9,
                   "options": {
                     "default": 1
                   }
                 },
+                "roiLineSegmentLengthFromMap": {
+                  "type": "double",
+                  "id": 10,
+                  "options": {
+                    "default": 10
+                  }
+                },
                 "perceptionObstacleFilteringDistance": {
                   "type": "double",
-                  "id": 9,
+                  "id": 11,
                   "options": {
                     "default": 1000
                   }
                 },
                 "perceptionObstacleBuffer": {
                   "type": "double",
-                  "id": 10
+                  "id": 12
                 },
-                "curbHeadingTangentChangeUppperLimit": {
+                "curbHeadingTangentChangeUpperLimit": {
                   "type": "double",
-                  "id": 11,
+                  "id": 13,
                   "options": {
                     "default": 1
                   }
                 },
                 "endPoseSDistance": {
                   "type": "double",
-                  "id": 12,
+                  "id": 14,
                   "options": {
                     "default": 10
                   }
@@ -5403,23 +5604,30 @@
             },
             "ROIConfig": {
               "fields": {
-                "roiLongitudinalRange": {
+                "roiLongitudinalRangeStart": {
                   "type": "double",
                   "id": 1,
                   "options": {
                     "default": 10
                   }
                 },
-                "parkingStartRange": {
+                "roiLongitudinalRangeEnd": {
                   "type": "double",
                   "id": 2,
+                  "options": {
+                    "default": 10
+                  }
+                },
+                "parkingStartRange": {
+                  "type": "double",
+                  "id": 3,
                   "options": {
                     "default": 7
                   }
                 },
                 "parkingInwards": {
                   "type": "bool",
-                  "id": 3,
+                  "id": 4,
                   "options": {
                     "default": false
                   }
@@ -9761,7 +9969,14 @@
                 },
                 "parkingSpace": {
                   "type": "apollo.hdmap.ParkingSpace",
-                  "id": 6
+                  "id": 6,
+                  "options": {
+                    "deprecated": true
+                  }
+                },
+                "parkingPoint": {
+                  "type": "apollo.common.PointENU",
+                  "id": 7
                 }
               }
             },

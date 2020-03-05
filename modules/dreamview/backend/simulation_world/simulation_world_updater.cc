@@ -208,7 +208,14 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
           for (const auto &landmark : poi_.landmark()) {
             Json place;
             place["name"] = landmark.name();
-            place["parkingSpaceId"] = landmark.parking_space_id();
+
+            if (landmark.has_parking_point()) {
+              Json parking_point;
+              parking_point["x"] = landmark.parking_point().x();
+              parking_point["y"] = landmark.parking_point().y();
+              place["parkingPoint"] = parking_point;
+            }
+
             Json waypoint_list;
             for (const auto &waypoint : landmark.waypoint()) {
               Json point;
@@ -217,6 +224,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
               waypoint_list.push_back(point);
             }
             place["waypoint"] = waypoint_list;
+
             poi_list.push_back(place);
           }
         } else {
@@ -366,11 +374,17 @@ bool SimulationWorldUpdater::ConstructRoutingRequest(
     return false;
   }
 
-  // set parking space
-  if (ContainsKey(json, "parkingSpaceId") &&
-      json.find("parkingSpaceId")->is_string()) {
-    routing_request->mutable_parking_space()->mutable_id()->set_id(
-        json["parkingSpaceId"]);
+  // set parking point
+  if (ContainsKey(json, "parkingPoint")) {
+    auto parking_point = json["parkingPoint"];
+    if (!ValidateCoordinate(parking_point)) {
+      AERROR << "Failed to prepare a routing request: invalid parking point.";
+      return false;
+    }
+
+    auto *requested_parking_point = routing_request->mutable_parking_point();
+    requested_parking_point->set_x(parking_point["x"]);
+    requested_parking_point->set_y(parking_point["y"]);
   }
 
   AINFO << "Constructed RoutingRequest to be sent:\n"
