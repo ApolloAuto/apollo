@@ -29,6 +29,7 @@ py_proto(
     name = "poi_pb2",
     src = "poi.proto",
     deps = [
+        "//modules/common/proto:geometry_pb2",
         "//modules/routing/proto:routing_pb2",
     ],
 )

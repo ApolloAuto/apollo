@@ -1,5 +1,3 @@
-import * as THREE from "three";
-
 import STORE from "store";
 
 import { drawThickBandFromPoints } from "utils/draw";

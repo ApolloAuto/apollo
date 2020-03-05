@@ -333,8 +333,8 @@ class Renderer {
         this.routingEditor.removeInvalidRoutingPoint(pointId, error, this.scene);
     }
 
-    setParkingSpaceId(id) {
-        this.routingEditor.setParkingSpaceId(id);
+    setParkingInfo(info) {
+        this.routingEditor.setParkingInfo(info);
     }
 
     removeAllRoutingPoints() {
