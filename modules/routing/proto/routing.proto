@@ -27,7 +27,8 @@ message RoutingRequest {
   repeated LaneSegment blacklisted_lane = 3;
   repeated string blacklisted_road = 4;
   optional bool broadcast = 5 [default = true];
-  optional apollo.hdmap.ParkingSpace parking_space = 6;
+  optional apollo.hdmap.ParkingSpace parking_space = 6 [deprecated = true];
+  optional apollo.common.PointENU parking_point = 7;
 }
 
 message Measurement {
