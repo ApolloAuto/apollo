@@ -44,7 +44,7 @@ using apollo::canbus::Chassis;
 using apollo::cyber::record::RecordMessage;
 using apollo::cyber::record::RecordReader;
 using apollo::localization::LocalizationEstimate;
-using apollo::perception::PerceptionObstacles;
+using apollo::prediction::PredictionObstacles;
 using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
 
@@ -109,31 +109,31 @@ void FeatureGenerator::OnChassis(const apollo::canbus::Chassis& chassis) {
   chassis_feature_.set_gear_location(chassis.gear_location());
 }
 
-void FeatureGenerator::OnPerceptionObstacle(
-    const apollo::perception::PerceptionObstacles& perception_obstacles) {
-  perception_obstacles_map_.clear();
-  for (int i = 0; i < perception_obstacles.perception_obstacle_size(); ++i) {
-    const auto& perception_obstale =
-        perception_obstacles.perception_obstacle(i);
-    const int obstacle_id = perception_obstale.id();
-    perception_obstacles_map_[obstacle_id].CopyFrom(perception_obstale);
+void FeatureGenerator::OnPrediction(
+    const PredictionObstacles& prediction_obstacles) {
+  prediction_obstacles_map_.clear();
+  for (int i = 0; i < prediction_obstacles.prediction_obstacle_size(); ++i) {
+    const auto& prediction_obstacle =
+        prediction_obstacles.prediction_obstacle(i);
+    const int obstacle_id = prediction_obstacle.perception_obstacle().id();
+    prediction_obstacles_map_[obstacle_id].CopyFrom(prediction_obstacle);
   }
 
-  // erase perception obstacle not exist in current perception msg
+  // erase perception obstacle not exist in current predictio  msg
   std::unordered_map<int, std::list<ObstacleTrajectoryPoint>> ::iterator it =
       obstacle_history_map_.begin();
   while (it != obstacle_history_map_.end()) {
     const int obstacle_id = it->first;
-    if (perception_obstacles_map_.count(obstacle_id) == 0) {
-      // not exist in current perception
+    if (prediction_obstacles_map_.count(obstacle_id) == 0) {
+      // not exist in current prediction msg
       it = obstacle_history_map_.erase(it);
     } else {
       ++it;
     }
   }
 
-  for (const auto& m : perception_obstacles_map_) {
-    const auto& perception_obstale = m.second;
+  for (const auto& m : prediction_obstacles_map_) {
+    const auto& perception_obstale = m.second.perception_obstacle();
     ObstacleTrajectoryPoint obstacle_trajectory_point;
     obstacle_trajectory_point.set_timestamp_sec(perception_obstale.timestamp());
     obstacle_trajectory_point.mutable_position()->CopyFrom(
@@ -195,13 +195,15 @@ void FeatureGenerator::OnRoutingResponse(
 
 void FeatureGenerator::GenerateObstacleData(
     LearningDataFrame* learning_data_frame) {
-  for (const auto& m : perception_obstacles_map_) {
+  for (const auto& m : prediction_obstacles_map_) {
     auto obstacle_feature = learning_data_frame->add_obstacle();
+
+    const auto& perception_obstale = m.second.perception_obstacle();
     obstacle_feature->set_id(m.first);
-    obstacle_feature->set_length(m.second.length());
-    obstacle_feature->set_width(m.second.width());
-    obstacle_feature->set_height(m.second.height());
-    obstacle_feature->set_type(m.second.type());
+    obstacle_feature->set_length(perception_obstale.length());
+    obstacle_feature->set_width(perception_obstale.width());
+    obstacle_feature->set_height(perception_obstale.height());
+    obstacle_feature->set_type(perception_obstale.type());
 
     // ADC current position / heading
     const auto& adc_cur_pose = localization_for_label_.back().pose();
@@ -371,10 +373,10 @@ void FeatureGenerator::ProcessOfflineData(const std::string& record_filename) {
       if (localization.ParseFromString(message.content)) {
         OnLocalization(localization);
       }
-    } else if (message.channel_name == FLAGS_perception_obstacle_topic) {
-      PerceptionObstacles perception_obstacles;
-      if (perception_obstacles.ParseFromString(message.content)) {
-        OnPerceptionObstacle(perception_obstacles);
+    } else if (message.channel_name == FLAGS_prediction_topic) {
+      PredictionObstacles prediction_obstacles;
+      if (prediction_obstacles.ParseFromString(message.content)) {
+        OnPrediction(prediction_obstacles);
       }
     } else if (message.channel_name == FLAGS_routing_response_topic) {
       RoutingResponse routing_response;
