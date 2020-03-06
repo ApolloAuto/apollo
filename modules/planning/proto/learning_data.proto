@@ -6,8 +6,9 @@ import "modules/canbus/proto/chassis.proto";
 import "modules/common/proto/geometry.proto";
 import "modules/common/proto/pnc_point.proto";
 import "modules/perception/proto/perception_obstacle.proto";
+import "modules/prediction/proto/feature.proto";
+import "modules/prediction/proto/prediction_obstacle.proto";
 import "modules/perception/proto/traffic_light_detection.proto";
-import "modules/routing/proto/routing.proto";
 
 message ChassisFeature {
   // Features from chassis
@@ -71,6 +72,18 @@ message ObstacleTrajectoryPoint {
   optional apollo.common.Point3D acceleration = 6;
 }
 
+message ObstaclePrediction {
+  optional double timestamp_sec = 1;  // GPS time in seconds
+  optional double predicted_period = 2;
+  // can have multiple trajectories per obstacle
+  repeated apollo.prediction.Trajectory trajectory = 3;
+
+  // estimated obstacle intent
+  optional apollo.prediction.ObstacleIntent intent = 4;
+  optional apollo.prediction.ObstaclePriority priority = 5;
+  optional bool is_static = 6 [default = false];
+}
+
 message ObstacleFeature {
   optional int32 id = 1;  // obstacle ID.
   optional double length = 2;  // obstacle length.
@@ -78,6 +91,7 @@ message ObstacleFeature {
   optional double height = 4;  // obstacle height.
   optional apollo.perception.PerceptionObstacle.Type type = 5;  // obstacle type
   repeated ObstacleTrajectoryPoint obstacle_trajectory_point = 6;
+  optional ObstaclePrediction obstacle_prediction = 7;
 }
 
 message RoutingResponseFeature {
