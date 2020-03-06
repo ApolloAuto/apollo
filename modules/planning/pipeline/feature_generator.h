@@ -24,8 +24,8 @@
 #include "cyber/common/file.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/localization/proto/localization.pb.h"
-#include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/planning/proto/learning_data.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
@@ -42,8 +42,8 @@ class FeatureGenerator {
  private:
   void OnChassis(const apollo::canbus::Chassis& chassis);
   void OnLocalization(const apollo::localization::LocalizationEstimate& le);
-  void OnPerceptionObstacle(
-      const apollo::perception::PerceptionObstacles& perception_obstacles);
+  void OnPrediction(
+      const apollo::prediction::PredictionObstacles& prediction_obstacles);
   void OnRoutingResponse(
       const apollo::routing::RoutingResponse& routing_response);
   void OnTafficLightDetection(
@@ -66,10 +66,12 @@ class FeatureGenerator {
   int learning_data_file_index_ = 0;
   std::list<apollo::localization::LocalizationEstimate>
       localization_for_label_;
-  std::unordered_map<int, apollo::perception::PerceptionObstacle>
-      perception_obstacles_map_;
+
+  std::unordered_map<int, apollo::prediction::PredictionObstacle>
+      prediction_obstacles_map_;
   std::unordered_map<int, std::list<ObstacleTrajectoryPoint>>
       obstacle_history_map_;
+
   ChassisFeature chassis_feature_;
   std::vector<std::string> routing_lane_ids_;
   std::unordered_map<std::string, apollo::perception::TrafficLight::Color>
