@@ -21,14 +21,10 @@
 #include "cyber/mainboard/module_controller.h"
 #include "cyber/state.h"
 
-#include "gflags/gflags.h"
-
 using apollo::cyber::mainboard::ModuleArgument;
 using apollo::cyber::mainboard::ModuleController;
 
 int main(int argc, char** argv) {
-  google::SetUsageMessage("we use this program to load dag and run user apps.");
-
   // parse the argument
   ModuleArgument module_args;
   module_args.ParseArgument(argc, argv);
