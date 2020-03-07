@@ -115,6 +115,18 @@ void ModuleArgument::GetOptions(const int argc, char* const argv[]) {
         break;
     }
   } while (true);
+
+  if (optind < argc) {
+    AINFO << "Found non-option ARGV-element \"" << argv[optind++] << "\"";
+    DisplayUsage();
+    exit(1);
+  }
+
+  if (dag_conf_list_.empty()) {
+    AINFO << "-d parameter must be specified";
+    DisplayUsage();
+    exit(1);
+  }
 }
 
 }  // namespace mainboard
