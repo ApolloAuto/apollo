@@ -40,6 +40,13 @@ class FeatureGenerator {
   void ProcessOfflineData(const std::string& record_filename);
 
  private:
+  struct ADCCurrentInfo {
+    std::pair<double, double> adc_cur_position_;
+    std::pair<double, double> adc_cur_velocity_;
+    std::pair<double, double> adc_cur_acc_;
+    double adc_cur_heading_;
+  };
+
   void OnChassis(const apollo::canbus::Chassis& chassis);
   void OnLocalization(const apollo::localization::LocalizationEstimate& le);
   void OnPrediction(
@@ -49,7 +56,16 @@ class FeatureGenerator {
   void OnTafficLightDetection(
       const apollo::perception::TrafficLightDetection& traffic_light_detection);
 
-  void GenerateObstacleData(LearningDataFrame* learning_data_frame);
+  void GetADCCurrentInfo(ADCCurrentInfo* adc_curr_info);
+  void GenerateObstacleTrajectoryPoint(
+      const int obstacle_id,
+      const ADCCurrentInfo& adc_curr_info,
+      ObstacleFeature* obstacle_feature);
+  void GenerateObstaclePrediction(
+      const int obstacle_id,
+      const ADCCurrentInfo& adc_curr_info,
+      ObstacleFeature* obstacle_feature);
+  void GenerateObstacleFeature(LearningDataFrame* learning_data_frame);
 
   void GenerateADCTrajectoryPoints(
       const std::list<apollo::localization::LocalizationEstimate>&
