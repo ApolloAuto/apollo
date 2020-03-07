@@ -62,7 +62,7 @@ class FeatureGenerator {
       const ADCCurrentInfo& adc_curr_info,
       ObstacleFeature* obstacle_feature);
   void GenerateObstaclePrediction(
-      const int obstacle_id,
+      const apollo::prediction::PredictionObstacle& prediction_obstacle,
       const ADCCurrentInfo& adc_curr_info,
       ObstacleFeature* obstacle_feature);
   void GenerateObstacleFeature(LearningDataFrame* learning_data_frame);
