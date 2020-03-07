@@ -44,6 +44,7 @@ using apollo::canbus::Chassis;
 using apollo::cyber::record::RecordMessage;
 using apollo::cyber::record::RecordReader;
 using apollo::localization::LocalizationEstimate;
+using apollo::prediction::PredictionObstacle;
 using apollo::prediction::PredictionObstacles;
 using apollo::perception::TrafficLightDetection;
 using apollo::routing::RoutingResponse;
@@ -277,10 +278,23 @@ void FeatureGenerator::GenerateObstacleTrajectoryPoint(
 }
 
 void FeatureGenerator::GenerateObstaclePrediction(
-    const int obstacle_id,
+    const PredictionObstacle& prediction_obstacle,
     const ADCCurrentInfo& adc_curr_info,
     ObstacleFeature* obstacle_feature) {
-  // TODO(all)
+  auto obstacle_prediction = obstacle_feature->mutable_obstacle_prediction();
+  obstacle_prediction->set_timestamp_sec(prediction_obstacle.timestamp());
+  obstacle_prediction->set_predicted_period(
+      prediction_obstacle.predicted_period());
+  obstacle_prediction->mutable_intent()->CopyFrom(
+      prediction_obstacle.intent());
+  obstacle_prediction->mutable_priority()->CopyFrom(
+      prediction_obstacle.priority());
+  obstacle_prediction->set_is_static(prediction_obstacle.is_static());
+
+  for (int i = 0; i < prediction_obstacle.trajectory_size(); ++i) {
+    auto trajectory = obstacle_prediction->add_trajectory();
+    trajectory->CopyFrom(prediction_obstacle.trajectory(i));
+  }
 }
 
 void FeatureGenerator::GenerateObstacleFeature(
@@ -302,7 +316,7 @@ void FeatureGenerator::GenerateObstacleFeature(
     GenerateObstacleTrajectoryPoint(m.first, adc_curr_info, obstacle_feature);
 
     // obstacle prediction
-    GenerateObstaclePrediction(m.first, adc_curr_info, obstacle_feature);
+    GenerateObstaclePrediction(m.second, adc_curr_info, obstacle_feature);
   }
 }
 
