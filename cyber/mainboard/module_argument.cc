@@ -80,6 +80,11 @@ void ModuleArgument::GetOptions(const int argc, char* const argv[]) {
   }
   AINFO << "command: " << cmd;
 
+  if (1 == argc) {
+    DisplayUsage();
+    exit(0);
+  }
+
   do {
     int opt =
         getopt_long(argc, argv, short_opts.c_str(), long_opts, &long_index);
