@@ -2,7 +2,6 @@ syntax = "proto2";
 
 package apollo.routing;
 
-import "modules/common/proto/geometry.proto";
 import "modules/routing/proto/routing.proto";
 
 message Landmark {
