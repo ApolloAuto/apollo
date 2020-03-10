@@ -65,12 +65,11 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
 
   const auto &roi_type = config_.open_space_roi_decider_config().roi_type();
   if (roi_type == OpenSpaceRoiDeciderConfig::PARKING) {
-    const auto &routing_request =
-        frame->local_view().routing->routing_request();
-
-    if (routing_request.has_parking_space() &&
-        !routing_request.parking_space().id().id().empty()) {
-      target_parking_spot_id_ = routing_request.parking_space().id().id();
+    AWARN << "target_parking_spot_id: ["
+          << frame->open_space_info().target_parking_spot_id() << "]";
+    if (!frame->open_space_info().target_parking_spot_id().empty()) {
+      target_parking_spot_id_ =
+          frame->open_space_info().target_parking_spot_id();
     } else {
       const std::string msg = "Failed to get parking space id from routing";
       AERROR << msg;
