@@ -294,6 +294,26 @@ void FeatureGenerator::GenerateObstaclePrediction(
   for (int i = 0; i < prediction_obstacle.trajectory_size(); ++i) {
     auto trajectory = obstacle_prediction->add_trajectory();
     trajectory->CopyFrom(prediction_obstacle.trajectory(i));
+
+    // convert to relative coordinate
+    for (int j = 0; j < trajectory->trajectory_point_size(); ++j) {
+      auto trajectory_point = trajectory->mutable_trajectory_point(j);
+
+      // convert path_point to relative coordinate
+      const auto& relative_path_point =
+        util::WorldCoordToObjCoord(
+            std::make_pair(trajectory_point->path_point().x(),
+                           trajectory_point->path_point().y()),
+            adc_curr_info.adc_cur_position_,
+            adc_curr_info.adc_cur_heading_);
+      trajectory_point->mutable_path_point()->set_x(relative_path_point.first);
+      trajectory_point->mutable_path_point()->set_y(relative_path_point.second);
+
+      const double relative_theta =
+          util::WorldAngleToObjAngle(trajectory_point->path_point().theta(),
+                                     adc_curr_info.adc_cur_heading_);
+      trajectory_point->mutable_path_point()->set_theta(relative_theta);
+    }
   }
 }
 
