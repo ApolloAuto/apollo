@@ -531,3 +531,6 @@ DEFINE_bool(use_front_axe_center_in_path_planning, false,
             "more agile.");
 
 DEFINE_bool(use_road_boundary_from_map, false, "get road boundary from HD map");
+
+DEFINE_double(parking_space_search_range, 0.01,
+              "search radius for parking space on HD map in meter");
