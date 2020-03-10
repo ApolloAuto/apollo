@@ -85,7 +85,7 @@ class FeatureGenerator {
 
   std::unordered_map<int, apollo::prediction::PredictionObstacle>
       prediction_obstacles_map_;
-  std::unordered_map<int, std::list<ObstacleTrajectoryPoint>>
+  std::unordered_map<int, std::list<ObstacleTrajectoryPointFeature>>
       obstacle_history_map_;
 
   ChassisFeature chassis_feature_;
