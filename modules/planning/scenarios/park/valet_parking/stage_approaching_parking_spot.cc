@@ -67,8 +67,8 @@ Stage::StageStatus StageApproachingParkingSpot::Process(
       }
     }
   }
-  AWARN << "target_parking_spot_id: [" << GetContext()->target_parking_spot_id
-        << "]";
+  ADEBUG << "target_parking_spot_id: [" << GetContext()->target_parking_spot_id
+         << "]";
 
   if (GetContext()->target_parking_spot_id.empty()) {
     return StageStatus::ERROR;

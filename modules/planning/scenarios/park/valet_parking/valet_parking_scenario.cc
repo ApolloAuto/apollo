@@ -105,7 +105,16 @@ bool ValetParkingScenario::IsTransferable(const Frame& frame,
     if (frame.local_view()
             .routing->routing_request()
             .parking_info()
-            .has_parking_point()) {
+            .has_parking_space_id()) {
+      // when parking id is available
+      target_parking_spot_id = frame.local_view()
+                                   .routing->routing_request()
+                                   .parking_info()
+                                   .parking_space_id();
+    } else if (frame.local_view()
+                   .routing->routing_request()
+                   .parking_info()
+                   .has_parking_point()) {
       // when parking_point is available
       // get parking id from parking_point
       PointENU target_parking_spot;
@@ -119,20 +128,12 @@ bool ValetParkingScenario::IsTransferable(const Frame& frame,
                                    &parking_lots)) {
         target_parking_spot_id = parking_lots.front()->id().id();
       }
-    } else if (frame.local_view()
-                   .routing->routing_request()
-                   .parking_info()
-                   .has_parking_space_id()) {
-      // when parking id is available
-      target_parking_spot_id = frame.local_view()
-                                   .routing->routing_request()
-                                   .parking_info()
-                                   .parking_space_id();
     }
   } else {
-    ADEBUG << "No parking info from routing";
+    AWARN << "No parking info from routing";
     return false;
   }
+  ADEBUG << "target_parking_spot_id: [" << target_parking_spot_id << "]";
 
   // get parking lot id from parking point
   if (target_parking_spot_id.empty()) {
